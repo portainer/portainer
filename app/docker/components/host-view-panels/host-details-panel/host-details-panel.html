@@ -25,13 +25,10 @@
               <td>Total memory</td>
               <td>{{ $ctrl.host.totalMemory | humansize }}</td>
             </tr>
-            <tr ng-if="$ctrl.isBrowseEnabled || $ctrl.isJobEnabled">
+            <tr ng-if="$ctrl.isBrowseEnabled">
               <td colspan="2">
-                <button class="btn btn-primary btn-sm" title="Browse" ng-if="$ctrl.isBrowseEnabled" ui-sref="{{ $ctrl.browseUrl }}">
+                <button class="btn btn-primary btn-sm" title="Browse" ui-sref="{{ $ctrl.browseUrl }}">
                   Browse
-                </button>
-                <button class="btn btn-primary btn-sm" title="Execute job" ng-if="$ctrl.isJobEnabled" ui-sref="{{ $ctrl.jobUrl }}">
-                  Execute job
                 </button>
               </td>
             </tr>

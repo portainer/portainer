@@ -110,7 +110,32 @@ type (
 	// EdgeGroupID represents an Edge group identifier
 	EdgeGroupID int
 
+	// EdgeJob represents a job that can run on Edge environments.
+	EdgeJob struct {
+		ID             EdgeJobID                          `json:"Id"`
+		Created        int64                              `json:"Created"`
+		CronExpression string                             `json:"CronExpression"`
+		Endpoints      map[EndpointID]EdgeJobEndpointMeta `json:"Endpoints"`
+		Name           string                             `json:"Name"`
+		ScriptPath     string                             `json:"ScriptPath"`
+		Recurring      bool                               `json:"Recurring"`
+		Version        int                                `json:"Version"`
+	}
+
+	// EdgeJobEndpointMeta represents a meta data object for an Edge job and Endpoint relation
+	EdgeJobEndpointMeta struct {
+		LogsStatus  EdgeJobLogsStatus
+		CollectLogs bool
+	}
+
+	// EdgeJobID represents an Edge job identifier
+	EdgeJobID int
+
+	// EdgeJobLogsStatus represent status of logs collection job
+	EdgeJobLogsStatus int
+
 	// EdgeSchedule represents a scheduled job that can run on Edge environments.
+	// Deprecated in favor of EdgeJob
 	EdgeSchedule struct {
 		ID             ScheduleID   `json:"Id"`
 		CronExpression string       `json:"CronExpression"`
@@ -437,22 +462,19 @@ type (
 	// It only contains a pointer to one of the JobRunner implementations
 	// based on the JobType.
 	// NOTE: The Recurring option is only used by ScriptExecutionJob at the moment
+	// Deprecated in favor of EdgeJob
 	Schedule struct {
-		ID                 ScheduleID `json:"Id"`
-		Name               string
-		CronExpression     string
-		Recurring          bool
-		Created            int64
-		JobType            JobType
-		EdgeSchedule       *EdgeSchedule
-		ScriptExecutionJob *ScriptExecutionJob
-		SnapshotJob        *SnapshotJob
-
-		// Deprecated fields
-		EndpointSyncJob *EndpointSyncJob
+		ID             ScheduleID `json:"Id"`
+		Name           string
+		CronExpression string
+		Recurring      bool
+		Created        int64
+		JobType        JobType
+		EdgeSchedule   *EdgeSchedule
 	}
 
 	// ScheduleID represents a schedule identifier.
+	// Deprecated in favor of EdgeJob
 	ScheduleID int
 
 	// ScriptExecutionJob represents a scheduled job that can execute a script via a privileged container
@@ -656,7 +678,7 @@ type (
 		Status       string
 		LastActivity time.Time
 		Port         int
-		Schedules    []EdgeSchedule
+		Jobs         []EdgeJob
 		Credentials  string
 	}
 
@@ -734,6 +756,7 @@ type (
 
 		DockerHub() DockerHubService
 		EdgeGroup() EdgeGroupService
+		EdgeJob() EdgeJobService
 		EdgeStack() EdgeStackService
 		Endpoint() EndpointService
 		EndpointGroup() EndpointGroupService
@@ -742,7 +765,6 @@ type (
 		Registry() RegistryService
 		ResourceControl() ResourceControlService
 		Role() RoleService
-		Schedule() ScheduleService
 		Settings() SettingsService
 		Stack() StackService
 		Tag() TagService
@@ -767,6 +789,40 @@ type (
 	DockerHubService interface {
 		DockerHub() (*DockerHub, error)
 		UpdateDockerHub(registry *DockerHub) error
+	}
+
+	// DockerSnapshotter represents a service used to create Docker endpoint snapshots
+	DockerSnapshotter interface {
+		CreateSnapshot(endpoint *Endpoint) (*DockerSnapshot, error)
+	}
+
+	// EdgeGroupService represents a service to manage Edge groups
+	EdgeGroupService interface {
+		EdgeGroups() ([]EdgeGroup, error)
+		EdgeGroup(ID EdgeGroupID) (*EdgeGroup, error)
+		CreateEdgeGroup(group *EdgeGroup) error
+		UpdateEdgeGroup(ID EdgeGroupID, group *EdgeGroup) error
+		DeleteEdgeGroup(ID EdgeGroupID) error
+	}
+
+	// EdgeJobService represents a service to manage Edge jobs
+	EdgeJobService interface {
+		EdgeJobs() ([]EdgeJob, error)
+		EdgeJob(ID EdgeJobID) (*EdgeJob, error)
+		CreateEdgeJob(edgeJob *EdgeJob) error
+		UpdateEdgeJob(ID EdgeJobID, edgeJob *EdgeJob) error
+		DeleteEdgeJob(ID EdgeJobID) error
+		GetNextIdentifier() int
+	}
+
+	// EdgeStackService represents a service to manage Edge stacks
+	EdgeStackService interface {
+		EdgeStacks() ([]EdgeStack, error)
+		EdgeStack(ID EdgeStackID) (*EdgeStack, error)
+		CreateEdgeStack(edgeStack *EdgeStack) error
+		UpdateEdgeStack(ID EdgeStackID, edgeStack *EdgeStack) error
+		DeleteEdgeStack(ID EdgeStackID) error
+		GetNextIdentifier() int
 	}
 
 	// EndpointService represents a service for managing endpoint data
@@ -834,8 +890,11 @@ type (
 		LoadKeyPair() ([]byte, []byte, error)
 		WriteJSONToFile(path string, content interface{}) error
 		FileExists(path string) (bool, error)
-		StoreScheduledJobFileFromBytes(identifier string, data []byte) (string, error)
-		GetScheduleFolder(identifier string) string
+		StoreEdgeJobFileFromBytes(identifier string, data []byte) (string, error)
+		GetEdgeJobFolder(identifier string) string
+		ClearEdgeJobTaskLogs(edgeJobID, taskID string) error
+		GetEdgeJobTaskLogFileContent(edgeJobID, taskID string) (string, error)
+		StoreEdgeJobTaskLogFileFromBytes(edgeJobID, taskID string, data []byte) error
 		ExtractExtensionArchive(data []byte) error
 		GetBinaryFolder() string
 	}
@@ -846,36 +905,28 @@ type (
 		ClonePrivateRepositoryWithBasicAuth(repositoryURL, referenceName string, destination, username, password string) error
 	}
 
-	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes endpoint
-	KubernetesDeployer interface {
-		Deploy(endpoint *Endpoint, data string, composeFormat bool, namespace string) ([]byte, error)
-	}
-
-	// JobRunner represents a service that can be used to run a job
-	JobRunner interface {
-		Run()
-		GetSchedule() *Schedule
-	}
-
-	// JobScheduler represents a service to run jobs on a periodic basis
-	JobScheduler interface {
-		ScheduleJob(runner JobRunner) error
-		UpdateJobSchedule(runner JobRunner) error
-		UpdateSystemJobSchedule(jobType JobType, newCronExpression string) error
-		UnscheduleJob(ID ScheduleID)
-		Start()
-	}
-
-	// JobService represents a service to manage job execution on hosts
-	JobService interface {
-		ExecuteScript(endpoint *Endpoint, nodeName, image string, script []byte, schedule *Schedule) error
-	}
-
 	// JWTService represents a service for managing JWT tokens
 	JWTService interface {
 		GenerateToken(data *TokenData) (string, error)
 		ParseAndVerifyToken(token string) (*TokenData, error)
 		SetUserSessionDuration(userSessionDuration time.Duration)
+	}
+
+	// KubeClient represents a service used to query a Kubernetes environment
+	KubeClient interface {
+		SetupUserServiceAccount(userID int, username string, teamIDs []int) error
+		GetServiceAccountBearerToken(userID int, username string) (string, error)
+		StartExecProcess(namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error
+	}
+
+	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes endpoint
+	KubernetesDeployer interface {
+		Deploy(endpoint *Endpoint, data string, composeFormat bool, namespace string) ([]byte, error)
+	}
+
+	// KubernetesSnapshotter represents a service used to create Kubernetes endpoint snapshots
+	KubernetesSnapshotter interface {
+		CreateSnapshot(endpoint *Endpoint) (*KubernetesSnapshot, error)
 	}
 
 	// LDAPService represents a service used to authenticate users against a LDAP/AD
@@ -906,14 +957,14 @@ type (
 
 	// ReverseTunnelService represensts a service used to manage reverse tunnel connections.
 	ReverseTunnelService interface {
-		StartTunnelServer(addr, port string, snapshotManager *SnapshotManager) error
+		StartTunnelServer(addr, port string, snapshotService SnapshotService) error
 		GenerateEdgeKey(url, host string, endpointIdentifier int) string
 		SetTunnelStatusToActive(endpointID EndpointID)
 		SetTunnelStatusToRequired(endpointID EndpointID) error
 		SetTunnelStatusToIdle(endpointID EndpointID)
 		GetTunnelDetails(endpointID EndpointID) *TunnelDetails
-		AddSchedule(endpointID EndpointID, schedule *EdgeSchedule)
-		RemoveSchedule(scheduleID ScheduleID)
+		AddEdgeJob(endpointID EndpointID, edgeJob *EdgeJob)
+		RemoveEdgeJob(edgeJobID EdgeJobID)
 	}
 
 	// RoleService represents a service for managing user roles
@@ -922,17 +973,6 @@ type (
 		Roles() ([]Role, error)
 		CreateRole(role *Role) error
 		UpdateRole(ID RoleID, role *Role) error
-	}
-
-	// ScheduleService represents a service for managing schedule data
-	ScheduleService interface {
-		Schedule(ID ScheduleID) (*Schedule, error)
-		Schedules() ([]Schedule, error)
-		SchedulesByJobType(jobType JobType) ([]Schedule, error)
-		CreateSchedule(schedule *Schedule) error
-		UpdateSchedule(ID ScheduleID, schedule *Schedule) error
-		DeleteSchedule(ID ScheduleID) error
-		GetNextIdentifier() int
 	}
 
 	// SettingsService represents a service for managing application settings
@@ -946,16 +986,6 @@ type (
 		Start() error
 	}
 
-	// DockerSnapshotter represents a service used to create Docker endpoint snapshots
-	DockerSnapshotter interface {
-		CreateSnapshot(endpoint *Endpoint) (*DockerSnapshot, error)
-	}
-
-	// KubernetesSnapshotter represents a service used to create Kubernetes endpoint snapshots
-	KubernetesSnapshotter interface {
-		CreateSnapshot(endpoint *Endpoint) (*KubernetesSnapshot, error)
-	}
-
 	// StackService represents a service for managing stack data
 	StackService interface {
 		Stack(ID StackID) (*Stack, error)
@@ -965,6 +995,13 @@ type (
 		UpdateStack(ID StackID, stack *Stack) error
 		DeleteStack(ID StackID) error
 		GetNextIdentifier() int
+	}
+
+	// StackService represents a service for managing endpoint snapshots
+	SnapshotService interface {
+		Start()
+		SetSnapshotInterval(snapshotInterval string) error
+		SnapshotEndpoint(endpoint *Endpoint) error
 	}
 
 	// SwarmStackManager represents a service to manage Swarm stacks
@@ -1039,32 +1076,6 @@ type (
 		WebhookByToken(token string) (*Webhook, error)
 		DeleteWebhook(serviceID WebhookID) error
 	}
-
-	// EdgeGroupService represents a service to manage Edge groups
-	EdgeGroupService interface {
-		EdgeGroups() ([]EdgeGroup, error)
-		EdgeGroup(ID EdgeGroupID) (*EdgeGroup, error)
-		CreateEdgeGroup(group *EdgeGroup) error
-		UpdateEdgeGroup(ID EdgeGroupID, group *EdgeGroup) error
-		DeleteEdgeGroup(ID EdgeGroupID) error
-	}
-
-	// EdgeStackService represents a service to manage Edge stacks
-	EdgeStackService interface {
-		EdgeStacks() ([]EdgeStack, error)
-		EdgeStack(ID EdgeStackID) (*EdgeStack, error)
-		CreateEdgeStack(edgeStack *EdgeStack) error
-		UpdateEdgeStack(ID EdgeStackID, edgeStack *EdgeStack) error
-		DeleteEdgeStack(ID EdgeStackID) error
-		GetNextIdentifier() int
-	}
-
-	// KubeClient represents a service used to query a Kubernetes environment
-	KubeClient interface {
-		SetupUserServiceAccount(userID int, username string, teamIDs []int) error
-		GetServiceAccountBearerToken(userID int, username string) (string, error)
-		StartExecProcess(namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error
-	}
 )
 
 const (
@@ -1120,6 +1131,16 @@ const (
 )
 
 const (
+	_ EdgeJobLogsStatus = iota
+	// EdgeJobLogsStatusIdle represents an idle log collection job
+	EdgeJobLogsStatusIdle
+	// EdgeJobLogsStatusPending represents a pending log collection job
+	EdgeJobLogsStatusPending
+	// EdgeJobLogsStatusCollected represents a completed log collection job
+	EdgeJobLogsStatusCollected
+)
+
+const (
 	_ EdgeStackStatusType = iota
 	//StatusOk represents a successfully deployed edge stack
 	StatusOk
@@ -1144,6 +1165,24 @@ const (
 )
 
 const (
+	_ EndpointType = iota
+	// DockerEnvironment represents an endpoint connected to a Docker environment
+	DockerEnvironment
+	// AgentOnDockerEnvironment represents an endpoint connected to a Portainer agent deployed on a Docker environment
+	AgentOnDockerEnvironment
+	// AzureEnvironment represents an endpoint connected to an Azure environment
+	AzureEnvironment
+	// EdgeAgentOnDockerEnvironment represents an endpoint connected to an Edge agent deployed on a Docker environment
+	EdgeAgentOnDockerEnvironment
+	// KubernetesLocalEnvironment represents an endpoint connected to a local Kubernetes environment
+	KubernetesLocalEnvironment
+	// AgentOnKubernetesEnvironment represents an endpoint connected to a Portainer agent deployed on a Kubernetes environment
+	AgentOnKubernetesEnvironment
+	// EdgeAgentOnKubernetesEnvironment represents an endpoint connected to an Edge agent deployed on a Kubernetes environment
+	EdgeAgentOnKubernetesEnvironment
+)
+
+const (
 	_ ExtensionID = iota
 	// RegistryManagementExtension represents the registry management extension
 	RegistryManagementExtension
@@ -1155,14 +1194,8 @@ const (
 
 const (
 	_ JobType = iota
-	// ScriptExecutionJobType is a non-system job used to execute a script against a list of
-	// endpoints via privileged containers
-	ScriptExecutionJobType
 	// SnapshotJobType is a system job used to create endpoint snapshots
-	SnapshotJobType
-	// EndpointSyncJobType is a system job used to synchronize endpoints from
-	// an external definition store (Deprecated)
-	EndpointSyncJobType
+	SnapshotJobType = 2
 )
 
 const (
@@ -1207,24 +1240,6 @@ const (
 	StackResourceControl
 	// ConfigResourceControl represents a resource control associated to a Docker config
 	ConfigResourceControl
-)
-
-const (
-	_ EndpointType = iota
-	// DockerEnvironment represents an endpoint connected to a Docker environment
-	DockerEnvironment
-	// AgentOnDockerEnvironment represents an endpoint connected to a Portainer agent deployed on a Docker environment
-	AgentOnDockerEnvironment
-	// AzureEnvironment represents an endpoint connected to an Azure environment
-	AzureEnvironment
-	// EdgeAgentOnDockerEnvironment represents an endpoint connected to an Edge agent deployed on a Docker environment
-	EdgeAgentOnDockerEnvironment
-	// KubernetesLocalEnvironment represents an endpoint connected to a local Kubernetes environment
-	KubernetesLocalEnvironment
-	// AgentOnKubernetesEnvironment represents an endpoint connected to a Portainer agent deployed on a Kubernetes environment
-	AgentOnKubernetesEnvironment
-	// EdgeAgentOnKubernetesEnvironment represents an endpoint connected to an Edge agent deployed on a Kubernetes environment
-	EdgeAgentOnKubernetesEnvironment
 )
 
 const (

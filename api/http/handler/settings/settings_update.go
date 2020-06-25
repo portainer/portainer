@@ -186,24 +186,9 @@ func (handler *Handler) updateVolumeBrowserSetting(settings *portainer.Settings)
 func (handler *Handler) updateSnapshotInterval(settings *portainer.Settings, snapshotInterval string) error {
 	settings.SnapshotInterval = snapshotInterval
 
-	schedules, err := handler.DataStore.Schedule().SchedulesByJobType(portainer.SnapshotJobType)
+	err := handler.SnapshotService.SetSnapshotInterval(snapshotInterval)
 	if err != nil {
 		return err
-	}
-
-	if len(schedules) != 0 {
-		snapshotSchedule := schedules[0]
-		snapshotSchedule.CronExpression = "@every " + snapshotInterval
-
-		err := handler.JobScheduler.UpdateSystemJobSchedule(portainer.SnapshotJobType, snapshotSchedule.CronExpression)
-		if err != nil {
-			return err
-		}
-
-		err = handler.DataStore.Schedule().UpdateSchedule(snapshotSchedule.ID, &snapshotSchedule)
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil

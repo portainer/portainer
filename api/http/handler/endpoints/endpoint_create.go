@@ -397,7 +397,7 @@ func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload,
 }
 
 func (handler *Handler) snapshotAndPersistEndpoint(endpoint *portainer.Endpoint) *httperror.HandlerError {
-	err := handler.SnapshotManager.SnapshotEndpoint(endpoint)
+	err := handler.SnapshotService.SnapshotEndpoint(endpoint)
 	if err != nil {
 		if strings.Contains(err.Error(), "Invalid request signature") {
 			err = errors.New("agent already paired with another Portainer instance")

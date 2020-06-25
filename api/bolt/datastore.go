@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/dockerhub"
 	"github.com/portainer/portainer/api/bolt/edgegroup"
+	"github.com/portainer/portainer/api/bolt/edgejob"
 	"github.com/portainer/portainer/api/bolt/edgestack"
 	"github.com/portainer/portainer/api/bolt/endpoint"
 	"github.com/portainer/portainer/api/bolt/endpointgroup"
@@ -44,6 +45,7 @@ type Store struct {
 	fileService             portainer.FileService
 	DockerHubService        *dockerhub.Service
 	EdgeGroupService        *edgegroup.Service
+	EdgeJobService          *edgejob.Service
 	EdgeStackService        *edgestack.Service
 	EndpointGroupService    *endpointgroup.Service
 	EndpointService         *endpoint.Service
@@ -184,6 +186,12 @@ func (store *Store) initServices() error {
 	}
 	store.EdgeGroupService = edgeGroupService
 
+	edgeJobService, err := edgejob.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.EdgeJobService = edgeJobService
+
 	endpointgroupService, err := endpointgroup.NewService(store.db)
 	if err != nil {
 		return err
@@ -293,6 +301,11 @@ func (store *Store) EdgeGroup() portainer.EdgeGroupService {
 	return store.EdgeGroupService
 }
 
+// EdgeJob gives access to the EdgeJob data management layer
+func (store *Store) EdgeJob() portainer.EdgeJobService {
+	return store.EdgeJobService
+}
+
 // EdgeStack gives access to the EdgeStack data management layer
 func (store *Store) EdgeStack() portainer.EdgeStackService {
 	return store.EdgeStackService
@@ -331,11 +344,6 @@ func (store *Store) ResourceControl() portainer.ResourceControlService {
 // Role gives access to the Role data management layer
 func (store *Store) Role() portainer.RoleService {
 	return store.RoleService
-}
-
-// Schedule gives access to the Schedule data management layer
-func (store *Store) Schedule() portainer.ScheduleService {
-	return store.ScheduleService
 }
 
 // Settings gives access to the Settings data management layer

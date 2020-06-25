@@ -28,7 +28,7 @@ type Service struct {
 	serverPort        string
 	tunnelDetailsMap  cmap.ConcurrentMap
 	dataStore         portainer.DataStore
-	snapshotManager   *portainer.SnapshotManager
+	snapshotService   portainer.SnapshotService
 	chiselServer      *chserver.Server
 }
 
@@ -45,7 +45,7 @@ func NewService(dataStore portainer.DataStore) *Service {
 // be found inside the database, it will generate a new one randomly and persist it.
 // It starts the tunnel status verification process in the background.
 // The snapshotter is used in the tunnel status verification process.
-func (service *Service) StartTunnelServer(addr, port string, snapshotManager *portainer.SnapshotManager) error {
+func (service *Service) StartTunnelServer(addr, port string, snapshotService portainer.SnapshotService) error {
 	keySeed, err := service.retrievePrivateKeySeed()
 	if err != nil {
 		return err
@@ -78,7 +78,7 @@ func (service *Service) StartTunnelServer(addr, port string, snapshotManager *po
 		return err
 	}
 
-	service.snapshotManager = snapshotManager
+	service.snapshotService = snapshotService
 	go service.startTunnelVerificationLoop()
 
 	return nil
@@ -155,7 +155,7 @@ func (service *Service) checkTunnels() {
 			}
 		}
 
-		if len(tunnel.Schedules) > 0 {
+		if len(tunnel.Jobs) > 0 {
 			endpointID, err := strconv.Atoi(item.Key)
 			if err != nil {
 				log.Printf("[ERROR] [chisel,conversion] Invalid endpoint identifier (id: %s): %s", item.Key, err)
@@ -179,7 +179,7 @@ func (service *Service) snapshotEnvironment(endpointID portainer.EndpointID, tun
 	endpointURL := endpoint.URL
 
 	endpoint.URL = fmt.Sprintf("tcp://127.0.0.1:%d", tunnelPort)
-	err = service.snapshotManager.SnapshotEndpoint(endpoint)
+	err = service.snapshotService.SnapshotEndpoint(endpoint)
 	if err != nil {
 		return err
 	}

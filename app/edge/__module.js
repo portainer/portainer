@@ -71,6 +71,39 @@ angular.module('portainer.edge', []).config(function config($stateRegistryProvid
     },
   };
 
+  const edgeJobs = {
+    name: 'edge.jobs',
+    url: '/jobs',
+    views: {
+      'content@': {
+        component: 'edgeJobsView',
+      },
+    },
+  };
+
+  const edgeJob = {
+    name: 'edge.jobs.job',
+    url: '/:id',
+    views: {
+      'content@': {
+        component: 'edgeJobView',
+      },
+    },
+    params: {
+      tab: 0,
+    },
+  };
+
+  const edgeJobCreation = {
+    name: 'edge.jobs.new',
+    url: '/new',
+    views: {
+      'content@': {
+        component: 'createEdgeJobView',
+      },
+    },
+  };
+
   $stateRegistryProvider.register(edge);
 
   $stateRegistryProvider.register(groups);
@@ -80,4 +113,8 @@ angular.module('portainer.edge', []).config(function config($stateRegistryProvid
   $stateRegistryProvider.register(stacks);
   $stateRegistryProvider.register(stacksNew);
   $stateRegistryProvider.register(stacksEdit);
+
+  $stateRegistryProvider.register(edgeJobs);
+  $stateRegistryProvider.register(edgeJob);
+  $stateRegistryProvider.register(edgeJobCreation);
 });

@@ -1,0 +1,23 @@
+<rd-header>
+  <rd-header-title title-text="Edge Jobs">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="edge.jobs" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>Edge Jobs</rd-header-content>
+</rd-header>
+
+<beta-panel></beta-panel>
+
+<div class="row">
+  <div class="col-sm-12">
+    <edge-jobs-datatable
+      title-text="Edge jobs"
+      title-icon="fa-clock"
+      dataset="$ctrl.edgeJobs"
+      table-key="edgeJobs"
+      order-by="Name"
+      remove-action="$ctrl.removeAction"
+    ></edge-jobs-datatable>
+  </div>
+</div>

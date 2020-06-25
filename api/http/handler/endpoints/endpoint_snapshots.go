@@ -7,6 +7,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/snapshot"
 )
 
 // POST request on /api/endpoints/snapshot
@@ -17,11 +18,11 @@ func (handler *Handler) endpointSnapshots(w http.ResponseWriter, r *http.Request
 	}
 
 	for _, endpoint := range endpoints {
-		if !portainer.SupportDirectSnapshot(&endpoint) {
+		if !snapshot.SupportDirectSnapshot(&endpoint) {
 			continue
 		}
 
-		snapshotError := handler.SnapshotManager.SnapshotEndpoint(&endpoint)
+		snapshotError := handler.SnapshotService.SnapshotEndpoint(&endpoint)
 
 		latestEndpointReference, err := handler.DataStore.Endpoint().Endpoint(endpoint.ID)
 		if latestEndpointReference == nil {

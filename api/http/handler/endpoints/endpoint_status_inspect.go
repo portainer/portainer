@@ -1,6 +1,7 @@
 package endpoints
 
 import (
+	"encoding/base64"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -14,13 +15,21 @@ type stackStatusResponse struct {
 	Version int
 }
 
+type edgeJobResponse struct {
+	ID             portainer.EdgeJobID `json:"Id"`
+	CollectLogs    bool                `json:"CollectLogs"`
+	CronExpression string              `json:"CronExpression"`
+	Script         string              `json:"Script"`
+	Version        int                 `json:"Version"`
+}
+
 type endpointStatusInspectResponse struct {
-	Status          string                   `json:"status"`
-	Port            int                      `json:"port"`
-	Schedules       []portainer.EdgeSchedule `json:"schedules"`
-	CheckinInterval int                      `json:"checkin"`
-	Credentials     string                   `json:"credentials"`
-	Stacks          []stackStatusResponse    `json:"stacks"`
+	Status          string                `json:"status"`
+	Port            int                   `json:"port"`
+	Schedules       []edgeJobResponse     `json:"schedules"`
+	CheckinInterval int                   `json:"checkin"`
+	Credentials     string                `json:"credentials"`
+	Stacks          []stackStatusResponse `json:"stacks"`
 }
 
 // GET request on /api/endpoints/:id/status
@@ -65,10 +74,30 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 		checkinInterval = endpoint.EdgeCheckinInterval
 	}
 
+	schedules := []edgeJobResponse{}
+	for _, job := range tunnel.Jobs {
+		schedule := edgeJobResponse{
+			ID:             job.ID,
+			CronExpression: job.CronExpression,
+			CollectLogs:    job.Endpoints[endpoint.ID].CollectLogs,
+			Version:        job.Version,
+		}
+
+		file, err := handler.FileService.GetFileContent(job.ScriptPath)
+
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Edge job script file", err}
+		}
+
+		schedule.Script = base64.RawStdEncoding.EncodeToString(file)
+
+		schedules = append(schedules, schedule)
+	}
+
 	statusResponse := endpointStatusInspectResponse{
 		Status:          tunnel.Status,
 		Port:            tunnel.Port,
-		Schedules:       tunnel.Schedules,
+		Schedules:       schedules,
 		CheckinInterval: checkinInterval,
 		Credentials:     tunnel.Credentials,
 	}

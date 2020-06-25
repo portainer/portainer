@@ -1,8 +1,9 @@
 package settings
 
 import (
-	"github.com/portainer/portainer/api/internal/authorization"
 	"net/http"
+
+	"github.com/portainer/portainer/api/internal/authorization"
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
@@ -21,9 +22,9 @@ type Handler struct {
 	AuthorizationService *authorization.Service
 	DataStore            portainer.DataStore
 	FileService          portainer.FileService
-	JobScheduler         portainer.JobScheduler
 	JWTService           portainer.JWTService
 	LDAPService          portainer.LDAPService
+	SnapshotService      portainer.SnapshotService
 }
 
 // NewHandler creates a handler to manage settings operations.

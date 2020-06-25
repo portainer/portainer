@@ -20,7 +20,6 @@ angular.module('portainer.app').factory('Endpoints', [
         remove: { method: 'DELETE', params: { id: '@id' } },
         snapshots: { method: 'POST', params: { action: 'snapshot' } },
         snapshot: { method: 'POST', params: { id: '@id', action: 'snapshot' } },
-        executeJob: { method: 'POST', ignoreLoadingBar: true, params: { id: '@id', action: 'job' } },
         status: { method: 'GET', params: { id: '@id', action: 'status' } },
       }
     );
