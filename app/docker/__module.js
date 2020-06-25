@@ -7,18 +7,7 @@ angular.module('portainer.docker', ['portainer.app']).config([
       name: 'docker',
       parent: 'root',
       abstract: true,
-      resolve: {
-        endpointID: [
-          'EndpointProvider',
-          '$state',
-          function (EndpointProvider, $state) {
-            var id = EndpointProvider.endpointID();
-            if (!id) {
-              return $state.go('portainer.home');
-            }
-          },
-        ],
-      },
+      url: '/:endpointId',
     };
 
     var configs = {

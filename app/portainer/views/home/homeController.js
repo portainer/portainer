@@ -100,7 +100,7 @@ angular
       EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
       StateManager.updateEndpointState(endpoint, [])
         .then(function success() {
-          $state.go('azure.dashboard');
+          $state.go('azure.dashboard', { endpointId: endpoint.Id });
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to connect to the Azure endpoint');
@@ -177,7 +177,7 @@ angular
           return StateManager.updateEndpointState(endpoint, extensions);
         })
         .then(function success() {
-          $state.go('docker.dashboard');
+          $state.go('docker.dashboard', { endpointId: endpoint.Id });
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
