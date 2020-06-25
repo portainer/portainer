@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"encoding/pem"
+	"fmt"
 	"io/ioutil"
 
 	"github.com/portainer/portainer/api"
@@ -37,8 +38,8 @@ const (
 	PublicKeyFile = "portainer.pub"
 	// BinaryStorePath represents the subfolder where binaries are stored in the file store folder.
 	BinaryStorePath = "bin"
-	// ScheduleStorePath represents the subfolder where schedule files are stored.
-	ScheduleStorePath = "schedules"
+	// EdgeJobStorePath represents the subfolder where schedule files are stored.
+	EdgeJobStorePath = "edge_jobs"
 	// ExtensionRegistryManagementStorePath represents the subfolder where files related to the
 	// registry management extension are stored.
 	ExtensionRegistryManagementStorePath = "extensions"
@@ -392,22 +393,22 @@ func (service *Service) getContentFromPEMFile(filePath string) ([]byte, error) {
 	return block.Bytes, nil
 }
 
-// GetScheduleFolder returns the absolute path on the filesystem for a schedule based
+// GetEdgeJobFolder returns the absolute path on the filesystem for an Edge job based
 // on its identifier.
-func (service *Service) GetScheduleFolder(identifier string) string {
-	return path.Join(service.fileStorePath, ScheduleStorePath, identifier)
+func (service *Service) GetEdgeJobFolder(identifier string) string {
+	return path.Join(service.fileStorePath, EdgeJobStorePath, identifier)
 }
 
-// StoreScheduledJobFileFromBytes creates a subfolder in the ScheduleStorePath and stores a new file from bytes.
+// StoreEdgeJobFileFromBytes creates a subfolder in the EdgeJobStorePath and stores a new file from bytes.
 // It returns the path to the folder where the file is stored.
-func (service *Service) StoreScheduledJobFileFromBytes(identifier string, data []byte) (string, error) {
-	scheduleStorePath := path.Join(ScheduleStorePath, identifier)
-	err := service.createDirectoryInStore(scheduleStorePath)
+func (service *Service) StoreEdgeJobFileFromBytes(identifier string, data []byte) (string, error) {
+	edgeJobStorePath := path.Join(EdgeJobStorePath, identifier)
+	err := service.createDirectoryInStore(edgeJobStorePath)
 	if err != nil {
 		return "", err
 	}
 
-	filePath := path.Join(scheduleStorePath, createScheduledJobFileName(identifier))
+	filePath := path.Join(edgeJobStorePath, createEdgeJobFileName(identifier))
 	r := bytes.NewReader(data)
 	err = service.createFileInStore(filePath, r)
 	if err != nil {
@@ -417,6 +418,52 @@ func (service *Service) StoreScheduledJobFileFromBytes(identifier string, data [
 	return path.Join(service.fileStorePath, filePath), nil
 }
 
-func createScheduledJobFileName(identifier string) string {
+func createEdgeJobFileName(identifier string) string {
 	return "job_" + identifier + ".sh"
+}
+
+// ClearEdgeJobTaskLogs clears the Edge job task logs
+func (service *Service) ClearEdgeJobTaskLogs(edgeJobID string, taskID string) error {
+	path := service.getEdgeJobTaskLogPath(edgeJobID, taskID)
+
+	err := os.Remove(path)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// GetEdgeJobTaskLogFileContent fetches the Edge job task logs
+func (service *Service) GetEdgeJobTaskLogFileContent(edgeJobID string, taskID string) (string, error) {
+	path := service.getEdgeJobTaskLogPath(edgeJobID, taskID)
+
+	fileContent, err := ioutil.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+
+	return string(fileContent), nil
+}
+
+// StoreEdgeJobTaskLogFileFromBytes stores the log file
+func (service *Service) StoreEdgeJobTaskLogFileFromBytes(edgeJobID, taskID string, data []byte) error {
+	edgeJobStorePath := path.Join(EdgeJobStorePath, edgeJobID)
+	err := service.createDirectoryInStore(edgeJobStorePath)
+	if err != nil {
+		return err
+	}
+
+	filePath := path.Join(edgeJobStorePath, fmt.Sprintf("logs_%s", taskID))
+	r := bytes.NewReader(data)
+	err = service.createFileInStore(filePath, r)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (service *Service) getEdgeJobTaskLogPath(edgeJobID string, taskID string) string {
+	return fmt.Sprintf("%s/logs_%s", service.GetEdgeJobFolder(edgeJobID), taskID)
 }

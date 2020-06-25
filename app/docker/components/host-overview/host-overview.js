@@ -10,10 +10,7 @@ angular.module('portainer.docker').component('hostOverview', {
     agentApiVersion: '<',
     refreshUrl: '@',
     browseUrl: '@',
-    jobUrl: '@',
-    isJobEnabled: '<',
     hostFeaturesEnabled: '<',
-    jobs: '<',
   },
   transclude: true,
 });

@@ -2,9 +2,9 @@ package migrator
 
 import (
 	"strings"
-
-	portainer "github.com/portainer/portainer/api"
 )
+
+const scheduleScriptExecutionJobType = 1
 
 func (m *Migrator) updateUsersToDBVersion20() error {
 	return m.authorizationService.UpdateUsersAuthorizations()
@@ -28,7 +28,7 @@ func (m *Migrator) updateSchedulesToDBVersion20() error {
 	}
 
 	for _, schedule := range legacySchedules {
-		if schedule.JobType == portainer.ScriptExecutionJobType {
+		if schedule.JobType == scheduleScriptExecutionJobType {
 			if schedule.CronExpression == "0 0 * * *" {
 				schedule.CronExpression = "0 * * * *"
 			} else if schedule.CronExpression == "0 0 0/2 * *" {

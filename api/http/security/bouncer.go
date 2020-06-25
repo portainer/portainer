@@ -362,3 +362,22 @@ func (bouncer *RequestBouncer) newRestrictedContextRequest(userID portainer.User
 
 	return requestContext, nil
 }
+
+// EdgeComputeOperation defines a restriced edge compute operation.
+// Use of this operation will only be authorized if edgeCompute is enabled in settings
+func (bouncer *RequestBouncer) EdgeComputeOperation(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		settings, err := bouncer.dataStore.Settings().Settings()
+		if err != nil {
+			httperror.WriteError(w, http.StatusServiceUnavailable, "Unable to retrieve settings", err)
+			return
+		}
+
+		if !settings.EnableEdgeComputeFeatures {
+			httperror.WriteError(w, http.StatusServiceUnavailable, "Edge compute features are disabled", errors.New("Edge compute features are disabled"))
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}

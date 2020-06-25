@@ -1,0 +1,21 @@
+<rd-header>
+  <rd-header-title title-text="Create Edge job"></rd-header-title>
+  <rd-header-content> <a ui-sref="edge.jobs">Edge Jobs</a> &gt; Create Edge job </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <edge-job-form
+          model="$ctrl.model"
+          groups="$ctrl.groups"
+          tags="$ctrl.tags"
+          form-action="$ctrl.create"
+          form-action-label="Create edge job"
+          action-in-progress="$ctrl.state.actionInProgress"
+        ></edge-job-form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

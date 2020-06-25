@@ -14,7 +14,12 @@ class EdgeGroupsController {
   }
 
   async $onInit() {
-    this.items = await this.EdgeGroupService.groups();
+    try {
+      this.items = await this.EdgeGroupService.groups();
+    } catch (err) {
+      this.items = [];
+      this.Notifications.error('Failure', err, 'Unable to retrieve Edge groups');
+    }
   }
 
   removeAction(selectedItems) {

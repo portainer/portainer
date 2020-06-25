@@ -13,21 +13,9 @@
   host="$ctrl.hostDetails"
   is-browse-enabled="$ctrl.isAgent && $ctrl.agentApiVersion > 1 && !$ctrl.offlineMode && $ctrl.hostFeaturesEnabled"
   browse-url="{{ $ctrl.browseUrl }}"
-  is-job-enabled="$ctrl.isJobEnabled && !$ctrl.offlineMode && $ctrl.hostFeaturesEnabled"
-  job-url="{{ $ctrl.jobUrl }}"
 ></host-details-panel>
 
 <engine-details-panel engine="$ctrl.engineDetails"></engine-details-panel>
-
-<jobs-datatable
-  ng-if="$ctrl.isJobEnabled && $ctrl.jobs && !$ctrl.offlineMode && $ctrl.hostFeaturesEnabled"
-  title-text="Jobs"
-  title-icon="fa-tasks"
-  dataset="$ctrl.jobs"
-  table-key="jobs"
-  order-by="Created"
-  reverse-order="true"
-></jobs-datatable>
 
 <devices-panel ng-if="$ctrl.isAgent && $ctrl.agentApiVersion > 1 && !$ctrl.offlineMode && $ctrl.hostFeaturesEnabled" devices="$ctrl.devices"></devices-panel>
 <disks-panel ng-if="$ctrl.isAgent && $ctrl.agentApiVersion > 1 && !$ctrl.offlineMode && $ctrl.hostFeaturesEnabled" disks="$ctrl.disks"></disks-panel>

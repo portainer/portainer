@@ -11,6 +11,9 @@ angular.module('portainer.app').factory('EndpointService', [
     };
 
     service.endpoints = function (start, limit, { search, type, tagIds, endpointIds, tagsPartialMatch } = {}) {
+      if (tagIds && !tagIds.length) {
+        return Promise.resolve({ value: [], totalCount: 0 });
+      }
       return Endpoints.query({ start, limit, search, type, tagIds: JSON.stringify(tagIds), endpointIds: JSON.stringify(endpointIds), tagsPartialMatch }).$promise;
     };
 
@@ -124,19 +127,6 @@ angular.module('portainer.app').factory('EndpointService', [
         });
 
       return deferred.promise;
-    };
-
-    service.executeJobFromFileUpload = function (image, jobFile, endpointId, nodeName) {
-      return FileUploadService.executeEndpointJob(image, jobFile, endpointId, nodeName);
-    };
-
-    service.executeJobFromFileContent = function (image, jobFileContent, endpointId, nodeName) {
-      var payload = {
-        Image: image,
-        FileContent: jobFileContent,
-      };
-
-      return Endpoints.executeJob({ id: endpointId, method: 'string', nodeName: nodeName }, payload).$promise;
     };
 
     return service;
