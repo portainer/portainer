@@ -931,6 +931,7 @@ type (
 		GetBinaryFolder() string
 		StoreCustomTemplateFileFromBytes(identifier, fileName string, data []byte) (string, error)
 		GetCustomTemplateProjectPath(identifier string) string
+		GetTemporaryPath() (string, error)
 	}
 
 	// GitService represents a service for managing Git

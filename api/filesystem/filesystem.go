@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	"github.com/gofrs/uuid"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/archive"
 
@@ -494,4 +495,14 @@ func (service *Service) StoreEdgeJobTaskLogFileFromBytes(edgeJobID, taskID strin
 
 func (service *Service) getEdgeJobTaskLogPath(edgeJobID string, taskID string) string {
 	return fmt.Sprintf("%s/logs_%s", service.GetEdgeJobFolder(edgeJobID), taskID)
+}
+
+// GetTemporaryPath returns a temp folder
+func (service *Service) GetTemporaryPath() (string, error) {
+	uid, err := uuid.NewV4()
+	if err != nil {
+		return "", err
+	}
+
+	return path.Join(service.fileStorePath, "temp", uid.String()), nil
 }
