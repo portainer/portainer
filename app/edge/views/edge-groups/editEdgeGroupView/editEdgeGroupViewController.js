@@ -1,6 +1,4 @@
-import angular from 'angular';
-
-class EditEdgeGroupController {
+export default class EditEdgeGroupController {
   /* @ngInject */
   constructor(EdgeGroupService, GroupService, TagService, Notifications, $state, $async, EndpointService, EndpointHelper) {
     this.EdgeGroupService = EdgeGroupService;
@@ -51,6 +49,3 @@ class EditEdgeGroupController {
     }
   }
 }
-
-angular.module('portainer.edge').controller('EditEdgeGroupController', EditEdgeGroupController);
-export default EditEdgeGroupController;

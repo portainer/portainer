@@ -1,7 +1,6 @@
-import angular from 'angular';
 import _ from 'lodash-es';
 
-class EdgeGroupsController {
+export default class EdgeGroupsController {
   /* @ngInject */
   constructor($async, $state, EdgeGroupService, Notifications) {
     this.$async = $async;
@@ -41,5 +40,3 @@ class EdgeGroupsController {
     this.$state.reload();
   }
 }
-
-angular.module('portainer.edge').controller('EdgeGroupsController', EdgeGroupsController);
