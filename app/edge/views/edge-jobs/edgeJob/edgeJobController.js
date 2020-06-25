@@ -1,7 +1,6 @@
-import angular from 'angular';
 import _ from 'lodash-es';
 
-class EdgeJobController {
+export default class EdgeJobController {
   constructor($async, $q, $state, EdgeJobService, EndpointService, FileSaver, GroupService, HostBrowserService, Notifications, TagService) {
     this.state = {
       actionInProgress: false,
@@ -154,6 +153,3 @@ class EdgeJobController {
     }
   }
 }
-
-angular.module('portainer.edge').controller('EdgeJobController', EdgeJobController);
-export default EdgeJobController;

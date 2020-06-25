@@ -1,6 +1,4 @@
-import angular from 'angular';
-
-class CreateEdgeJobController {
+export default class CreateEdgeJobController {
   constructor($async, $q, $state, EdgeJobService, GroupService, Notifications, TagService) {
     this.state = {
       actionInProgress: false,
@@ -63,6 +61,3 @@ class CreateEdgeJobController {
     }
   }
 }
-
-angular.module('portainer.edge').controller('CreateEdgeJobController', CreateEdgeJobController);
-export default CreateEdgeJobController;
