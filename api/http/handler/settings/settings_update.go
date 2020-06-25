@@ -25,7 +25,7 @@ type settingsUpdatePayload struct {
 	TemplatesURL                       *string
 	EdgeAgentCheckinInterval           *int
 	EnableEdgeComputeFeatures          *bool
-	PreventUserRoleStackCreation       *bool
+	HideStacksForUserRole              *bool
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
@@ -115,8 +115,8 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		settings.EnableEdgeComputeFeatures = *payload.EnableEdgeComputeFeatures
 	}
 
-	if payload.PreventUserRoleStackCreation != nil {
-		settings.PreventUserRoleStackCreation = *payload.PreventUserRoleStackCreation
+	if payload.HideStacksForUserRole != nil {
+		settings.HideStacksForUserRole = *payload.HideStacksForUserRole
 	}
 
 	if payload.SnapshotInterval != nil && *payload.SnapshotInterval != settings.SnapshotInterval {

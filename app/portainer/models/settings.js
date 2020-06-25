@@ -13,7 +13,7 @@ export function SettingsViewModel(data) {
   this.EnableHostManagementFeatures = data.EnableHostManagementFeatures;
   this.EdgeAgentCheckinInterval = data.EdgeAgentCheckinInterval;
   this.EnableEdgeComputeFeatures = data.EnableEdgeComputeFeatures;
-  this.PreventUserRoleStackCreation = data.PreventUserRoleStackCreation;
+  this.HideStacksForUserRole = data.HideStacksForUserRole;
 }
 
 export function PublicSettingsViewModel(settings) {
@@ -26,7 +26,7 @@ export function PublicSettingsViewModel(settings) {
   this.EnableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
   this.LogoURL = settings.LogoURL;
   this.OAuthLoginURI = settings.OAuthLoginURI;
-  this.PreventUserRoleStackCreation = settings.PreventUserRoleStackCreation;
+  this.HideStacksForUserRole = settings.HideStacksForUserRole;
 }
 
 export function LDAPSettingsViewModel(data) {

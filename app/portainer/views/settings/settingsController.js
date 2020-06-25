@@ -33,7 +33,7 @@ angular.module('portainer.app').controller('SettingsController', [
       enableHostManagementFeatures: false,
       enableVolumeBrowser: false,
       enableEdgeComputeFeatures: false,
-      preventUserRoleStackCreation: false,
+      hideStacksForUserRole: false,
     };
 
     $scope.removeFilteredContainerLabel = function (index) {
@@ -70,7 +70,7 @@ angular.module('portainer.app').controller('SettingsController', [
       settings.AllowVolumeBrowserForRegularUsers = $scope.formValues.enableVolumeBrowser;
       settings.EnableHostManagementFeatures = $scope.formValues.enableHostManagementFeatures;
       settings.EnableEdgeComputeFeatures = $scope.formValues.enableEdgeComputeFeatures;
-      settings.PreventUserRoleStackCreation = $scope.formValues.preventUserRoleStackCreation;
+      settings.HideStacksForUserRole = $scope.formValues.hideStacksForUserRole;
 
       $scope.state.actionInProgress = true;
       updateSettings(settings);
@@ -85,7 +85,7 @@ angular.module('portainer.app').controller('SettingsController', [
           StateManager.updateEnableHostManagementFeatures(settings.EnableHostManagementFeatures);
           StateManager.updateEnableVolumeBrowserForNonAdminUsers(settings.AllowVolumeBrowserForRegularUsers);
           StateManager.updateEnableEdgeComputeFeatures(settings.EnableEdgeComputeFeatures);
-          StateManager.updatePreventUserRoleStackCreation(settings.PreventUserRoleStackCreation);
+          StateManager.updateHideStacksForUserRole(settings.HideStacksForUserRole);
           $state.reload();
         })
         .catch(function error(err) {
@@ -112,7 +112,7 @@ angular.module('portainer.app').controller('SettingsController', [
           $scope.formValues.enableVolumeBrowser = settings.AllowVolumeBrowserForRegularUsers;
           $scope.formValues.enableHostManagementFeatures = settings.EnableHostManagementFeatures;
           $scope.formValues.enableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
-          $scope.formValues.preventUserRoleStackCreation = settings.PreventUserRoleStackCreation;
+          $scope.formValues.hideStacksForUserRole = settings.HideStacksForUserRole;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve application settings');

@@ -76,8 +76,8 @@ angular.module('portainer.app').factory('StateManager', [
       LocalStorage.storeApplicationState(state.application);
     };
 
-    manager.updatePreventUserRoleStackCreation = function updatePreventUserRoleStackCreation(preventUserRoleStackCreation) {
-      state.application.preventUserRoleStackCreation = preventUserRoleStackCreation;
+    manager.updateHideStacksForUserRole = function updateHideStacksForUserRole(hideStacksForUserRole) {
+      state.application.hideStacksForUserRole = hideStacksForUserRole;
       LocalStorage.storeApplicationState(state.application);
     };
 
@@ -92,7 +92,7 @@ angular.module('portainer.app').factory('StateManager', [
       state.application.enableHostManagementFeatures = settings.EnableHostManagementFeatures;
       state.application.enableVolumeBrowserForNonAdminUsers = settings.AllowVolumeBrowserForRegularUsers;
       state.application.enableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
-      state.application.preventUserRoleStackCreation = settings.PreventUserRoleStackCreation;
+      state.application.hideStacksForUserRole = settings.HideStacksForUserRole;
       state.application.validity = moment().unix();
     }
 
