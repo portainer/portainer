@@ -51,7 +51,13 @@
           model="template"
           type-label="{{ template.Type === 1 ? 'container' : 'stack' }}"
           on-select="($ctrl.selectAction)"
-        ></template-item>
+        >
+          <template-item-actions ng-if="template.Type === 2 || template.Type === 3">
+            <button ng-click="$event.stopPropagation(); $ctrl.duplicateTemplate(template)" class="btn btn-primary btn-xs">
+              Duplicate template
+            </button>
+          </template-item-actions>
+        </template-item>
         <div ng-if="!$ctrl.templates" class="text-center text-muted">
           Loading...
         </div>
