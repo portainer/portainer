@@ -64,6 +64,7 @@ class CustomTemplatesViewController {
     this.selectTemplate = this.selectTemplate.bind(this);
     this.selectTemplateAsync = this.selectTemplateAsync.bind(this);
     this.unselectTemplate = this.unselectTemplate.bind(this);
+    this.unselectTemplateAsync = this.unselectTemplateAsync.bind(this);
     this.getNetworks = this.getNetworks.bind(this);
     this.getNetworksAsync = this.getNetworksAsync.bind(this);
     this.confirmDelete = this.confirmDelete.bind(this);
@@ -148,6 +149,10 @@ class CustomTemplatesViewController {
   }
 
   unselectTemplate(template) {
+    // wrapping unselect with async to make a digest cycle run between unselect to select
+    return this.$async(this.unselectTemplateAsync, template);
+  }
+  async unselectTemplateAsync(template) {
     template.Selected = false;
     this.state.selectedTemplate = null;
 
@@ -164,7 +169,7 @@ class CustomTemplatesViewController {
   }
   async selectTemplateAsync(template) {
     if (this.state.selectedTemplate) {
-      this.unselectTemplate(this.state.selectedTemplate);
+      await this.unselectTemplate(this.state.selectedTemplate);
     }
 
     template.Selected = true;
