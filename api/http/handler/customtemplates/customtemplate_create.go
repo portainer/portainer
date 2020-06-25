@@ -33,6 +33,17 @@ func (handler *Handler) customTemplateCreate(w http.ResponseWriter, r *http.Requ
 
 	customTemplate.CreatedByUserID = tokenData.ID
 
+	customTemplates, err := handler.DataStore.CustomTemplate().CustomTemplates()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve custom templates from the database", err}
+	}
+
+	for _, existingTemplate := range customTemplates {
+		if existingTemplate.Title == customTemplate.Title {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Template name must be unique", errors.New("Template name must be unique")}
+		}
+	}
+
 	err = handler.DataStore.CustomTemplate().CreateCustomTemplate(customTemplate)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create custom template", err}
