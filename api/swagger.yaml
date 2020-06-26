@@ -1,5 +1,5 @@
 ---
-swagger: "1.24.1"
+swagger: "2.0"
 info:
   description: |
     Portainer API is an HTTP API served by Portainer. It is used by the Portainer UI and everything you can do with the UI can be done using the HTTP API.
