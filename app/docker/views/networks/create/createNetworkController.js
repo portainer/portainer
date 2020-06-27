@@ -97,12 +97,12 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
 
     function prepareAuxiliaryAddresses(ipamConfig, auxAddresses) {
       ipamConfig.AuxiliaryAddresses = {};
-      _.forEach(auxAddresses, (auxAddress) => {
+      _.forEach(auxAddresses, (auxAddress, index) => {
         const split = _.split(auxAddress, '=');
         if (split.length === 2) {
           ipamConfig.AuxiliaryAddresses[split[0]] = split[1];
         } else {
-          throw new Error('Auxiliary address bad format');
+          ipamConfig.AuxiliaryAddresses['device' + index] = auxAddress;
         }
       });
     }
@@ -222,12 +222,7 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
     }
 
     $scope.create = function () {
-      try {
-        var networkConfiguration = prepareConfiguration();
-      } catch (err) {
-        Notifications.error('Failure', err, 'An error occured during network creation');
-        return;
-      }
+      var networkConfiguration = prepareConfiguration();
       var accessControlData = $scope.formValues.AccessControlData;
       var userDetails = Authentication.getUserDetails();
       var isAdmin = Authentication.isAdmin();
