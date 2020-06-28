@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 
-export default class EdgeGroupsController {
+export class EdgeGroupsController {
   /* @ngInject */
   constructor($async, $state, EdgeGroupService, Notifications) {
     this.$async = $async;

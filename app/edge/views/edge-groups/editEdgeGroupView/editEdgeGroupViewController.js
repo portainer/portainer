@@ -1,4 +1,4 @@
-export default class EditEdgeGroupController {
+export class EditEdgeGroupController {
   /* @ngInject */
   constructor(EdgeGroupService, GroupService, TagService, Notifications, $state, $async, EndpointService, EndpointHelper) {
     this.EdgeGroupService = EdgeGroupService;

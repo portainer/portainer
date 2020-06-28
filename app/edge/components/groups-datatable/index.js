@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-import EdgeGroupsDatatableController from './groupsDatatableController';
+import { EdgeGroupsDatatableController } from './groupsDatatableController';
 
 angular.module('portainer.edge').component('edgeGroupsDatatable', {
   templateUrl: './groupsDatatable.html',

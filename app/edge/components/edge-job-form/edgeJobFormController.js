@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 import moment from 'moment';
 
-export default class EdgeJobFormController {
+export class EdgeJobFormController {
   /* @ngInject */
   constructor() {
     this.state = {

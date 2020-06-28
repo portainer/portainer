@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-import EdgeStackEndpointsDatatableController from './edgeStackEndpointsDatatableController';
+import { EdgeStackEndpointsDatatableController } from './edgeStackEndpointsDatatableController';
 
 angular.module('portainer.edge').component('edgeStackEndpointsDatatable', {
   templateUrl: './edgeStackEndpointsDatatable.html',

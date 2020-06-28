@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 
-export default class CreateEdgeStackViewController {
+export class CreateEdgeStackViewController {
   constructor($state, EdgeStackService, EdgeGroupService, EdgeTemplateService, Notifications, FormHelper, $async) {
     Object.assign(this, { $state, EdgeStackService, EdgeGroupService, EdgeTemplateService, Notifications, FormHelper, $async });
 

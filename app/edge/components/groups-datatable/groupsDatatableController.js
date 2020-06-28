@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-export default class EdgeGroupsDatatableController {
+export class EdgeGroupsDatatableController {
   constructor($scope, $controller) {
     const allowSelection = this.allowSelection;
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));

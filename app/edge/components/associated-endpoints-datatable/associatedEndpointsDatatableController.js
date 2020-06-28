@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-export default class AssociatedEndpointsDatatableController {
+export class AssociatedEndpointsDatatableController {
   constructor($scope, $controller, DatatableService, PaginationService) {
     this.extendGenericController($controller, $scope);
     this.DatatableService = DatatableService;

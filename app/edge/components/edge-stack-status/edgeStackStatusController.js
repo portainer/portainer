@@ -4,7 +4,7 @@ const statusMap = {
   3: 'acknowledged',
 };
 
-export default class EdgeStackStatusController {
+export class EdgeStackStatusController {
   $onChanges({ stackStatus }) {
     if (!stackStatus || !stackStatus.currentValue) {
       return;

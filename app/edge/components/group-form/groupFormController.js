@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 
-export default class EdgeGroupFormController {
+export class EdgeGroupFormController {
   /* @ngInject */
   constructor(EndpointService, $async, $scope) {
     this.EndpointService = EndpointService;

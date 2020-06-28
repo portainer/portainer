@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-import EdgeGroupsController from './edgeGroupsViewController';
+import { EdgeGroupsController } from './edgeGroupsViewController';
 
 angular.module('portainer.edge').component('edgeGroupsView', {
   templateUrl: './edgeGroupsView.html',

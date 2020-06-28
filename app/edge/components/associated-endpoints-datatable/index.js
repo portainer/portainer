@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-import AssociatedEndpointsDatatableController from './associatedEndpointsDatatableController';
+import { AssociatedEndpointsDatatableController } from './associatedEndpointsDatatableController';
 
 angular.module('portainer.edge').component('associatedEndpointsDatatable', {
   templateUrl: './associatedEndpointsDatatable.html',

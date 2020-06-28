@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 
-export default class EdgeJobsController {
+export class EdgeJobsViewController {
   constructor($async, $state, EdgeJobService, ModalService, Notifications) {
     this.$async = $async;
     this.$state = $state;

@@ -1,4 +1,4 @@
-export default class CreateEdgeJobController {
+export class CreateEdgeJobViewController {
   constructor($async, $q, $state, EdgeJobService, GroupService, Notifications, TagService) {
     this.state = {
       actionInProgress: false,

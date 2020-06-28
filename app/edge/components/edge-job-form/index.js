@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-import EdgeJobFormController from './edgeJobFormController';
+import { EdgeJobFormController } from './edgeJobFormController';
 
 angular.module('portainer.edge').component('edgeJobForm', {
   templateUrl: './edgeJobForm.html',

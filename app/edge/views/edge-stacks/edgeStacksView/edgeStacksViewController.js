@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 
-export default class EdgeStacksViewController {
+export class EdgeStacksViewController {
   constructor($state, Notifications, EdgeStackService, $scope, $async) {
     this.$state = $state;
     this.Notifications = Notifications;

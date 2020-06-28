@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-import EditEdgeStackFormController from './editEdgeStackFormController';
+import { EditEdgeStackFormController } from './editEdgeStackFormController';
 
 angular.module('portainer.edge').component('editEdgeStackForm', {
   templateUrl: './editEdgeStackForm.html',

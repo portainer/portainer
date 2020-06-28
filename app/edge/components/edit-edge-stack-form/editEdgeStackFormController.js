@@ -1,4 +1,4 @@
-export default class EditEdgeStackFormController {
+export class EditEdgeStackFormController {
   constructor() {
     this.editorUpdate = this.editorUpdate.bind(this);
   }

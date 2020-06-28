@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 
-export default class EdgeJobController {
+export class EdgeJobController {
   constructor($async, $q, $state, EdgeJobService, EndpointService, FileSaver, GroupService, HostBrowserService, Notifications, TagService) {
     this.state = {
       actionInProgress: false,

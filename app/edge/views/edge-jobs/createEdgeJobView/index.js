@@ -1,5 +1,5 @@
 import angular from 'angular';
-import CreateEdgeJobViewController from './createEdgeJobViewController';
+import { CreateEdgeJobViewController } from './createEdgeJobViewController';
 
 angular.module('portainer.edge').component('createEdgeJobView', {
   templateUrl: './createEdgeJobView.html',
