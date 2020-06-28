@@ -209,7 +209,7 @@ func (transport *Transport) proxyConfigRequest(request *http.Request) (*http.Res
 func (transport *Transport) proxyContainerRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/containers/create":
-		return transport.decorateGenericResourceCreationOperation(request, containerObjectIdentifier, portainer.ContainerResourceControl)
+		return transport.decorateContainerCreationOperation(request, containerObjectIdentifier, portainer.ContainerResourceControl)
 
 	case "/containers/prune":
 		return transport.administratorOperation(request)
@@ -655,6 +655,7 @@ func (transport *Transport) createRegistryAccessContext(request *http.Request) (
 	if err != nil {
 		return nil, err
 	}
+
 
 	accessContext := &registryAccessContext{
 		isAdmin: true,
