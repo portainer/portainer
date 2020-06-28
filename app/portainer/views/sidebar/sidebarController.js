@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-function SidebarController($q, $scope, $state, StateManager, Notifications, Authentication, UserService) {
+function SidebarController($q, $scope, $state, $transitions, StateManager, Notifications, Authentication, UserService) {
   function checkPermissions(memberships) {
     var isLeader = false;
     angular.forEach(memberships, function (membership) {
@@ -27,6 +27,10 @@ function SidebarController($q, $scope, $state, StateManager, Notifications, Auth
       .catch(function error(err) {
         Notifications.error('Failure', err, 'Unable to retrieve user memberships');
       });
+
+    $transitions.onSuccess({}, () => {
+      $scope.endpointId = +$state.params.endpointId;
+    });
   }
 
   initView();
