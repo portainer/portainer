@@ -10,6 +10,7 @@ import { KubernetesDeployment } from 'Kubernetes/models/deployment/models';
 import { KubernetesStatefulSet } from 'Kubernetes/models/stateful-set/models';
 import { KubernetesDaemonSet } from 'Kubernetes/models/daemon-set/models';
 import { KubernetesApplication } from 'Kubernetes/models/application/models';
+import KubernetesServiceHelper from 'Kubernetes/helpers/serviceHelper';
 
 class KubernetesApplicationService {
   /* @ngInject */
@@ -92,7 +93,7 @@ class KubernetesApplicationService {
       }
 
       const services = await this.KubernetesServiceService.get(namespace);
-      const boundService = _.find(services, (item) => _.isMatch(rootItem.value.Raw.spec.template.metadata.labels, item.spec.selector));
+      const boundService = KubernetesServiceHelper.findApplicationBoundService(services, rootItem.value.Raw);
       const service = boundService ? await this.KubernetesServiceService.get(namespace, boundService.metadata.name) : {};
       const application = converterFunction(rootItem.value.Raw, service.Raw);
       application.Yaml = rootItem.value.Yaml;
@@ -122,19 +123,19 @@ class KubernetesApplicationService {
             this.KubernetesPodService.get(ns),
           ]);
           const deploymentApplications = _.map(deployments, (item) => {
-            const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
+            const service = KubernetesServiceHelper.findApplicationBoundService(services, item);
             const application = KubernetesApplicationConverter.apiDeploymentToApplication(item, service);
             application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods, item);
             return application;
           });
           const daemonSetApplications = _.map(daemonSets, (item) => {
-            const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
+            const service = KubernetesServiceHelper.findApplicationBoundService(services, item);
             const application = KubernetesApplicationConverter.apiDaemonSetToApplication(item, service);
             application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods, item);
             return application;
           });
           const statefulSetApplications = _.map(statefulSets, (item) => {
-            const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
+            const service = KubernetesServiceHelper.findApplicationBoundService(services, item);
             const application = KubernetesApplicationConverter.apiStatefulSetToapplication(item, service);
             application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods, item);
             return application;

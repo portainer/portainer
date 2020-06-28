@@ -146,7 +146,7 @@ class KubernetesApplicationConverter {
       }
     });
 
-    res.PersistedFolders = _.reject(res.PersistedFolders, _.isUndefined);
+    res.PersistedFolders = _.without(res.PersistedFolders, undefined);
 
     res.ConfigurationVolumes = _.reduce(
       data.spec.template.spec.volumes,
