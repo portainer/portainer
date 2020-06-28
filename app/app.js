@@ -48,6 +48,13 @@ angular.module('portainer').run([
       }
       jqXhr.setRequestHeader('Authorization', 'Bearer ' + LocalStorage.getJWT());
     });
+
+    $transitions.onSuccess({}, () => {
+      const { endpointId } = $state.params;
+      if (endpointId) {
+        EndpointProvider.setEndpointID(+endpointId);
+      }
+    });
   },
 ]);
 
