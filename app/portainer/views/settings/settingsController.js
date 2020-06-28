@@ -33,7 +33,11 @@ angular.module('portainer.app').controller('SettingsController', [
       enableHostManagementFeatures: false,
       enableVolumeBrowser: false,
       enableEdgeComputeFeatures: false,
+<<<<<<< HEAD
       disableStackManagementForRegularUsers: false,
+=======
+      enableHostNamespaceUse: false,
+>>>>>>> feat(containers): Prevent non-admin users from running containers using the host namespace pid
     };
 
     $scope.removeFilteredContainerLabel = function (index) {
@@ -71,6 +75,7 @@ angular.module('portainer.app').controller('SettingsController', [
       settings.EnableHostManagementFeatures = $scope.formValues.enableHostManagementFeatures;
       settings.EnableEdgeComputeFeatures = $scope.formValues.enableEdgeComputeFeatures;
       settings.DisableStackManagementForRegularUsers = $scope.formValues.disableStackManagementForRegularUsers;
+      settings.EnableHostNamespaceUse = !$scope.formValues.enableHostNamespaceUse;
 
       $scope.state.actionInProgress = true;
       updateSettings(settings);
@@ -86,6 +91,7 @@ angular.module('portainer.app').controller('SettingsController', [
           StateManager.updateEnableVolumeBrowserForNonAdminUsers(settings.AllowVolumeBrowserForRegularUsers);
           StateManager.updateEnableEdgeComputeFeatures(settings.EnableEdgeComputeFeatures);
           StateManager.updateDisableStackManagementForRegularUsers(settings.DisableStackManagementForRegularUsers);
+          StateManager.updateEnableHostNamespaceUse(settings.EnableHostNamespaceUse);
           $state.reload();
         })
         .catch(function error(err) {
@@ -113,6 +119,7 @@ angular.module('portainer.app').controller('SettingsController', [
           $scope.formValues.enableHostManagementFeatures = settings.EnableHostManagementFeatures;
           $scope.formValues.enableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
           $scope.formValues.disableStackManagementForRegularUsers = settings.DisableStackManagementForRegularUsers;
+          $scope.formValues.enableHostNamespaceUse = !settings.EnableHostNamespaceUse;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve application settings');

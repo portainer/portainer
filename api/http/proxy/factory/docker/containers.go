@@ -156,7 +156,8 @@ func containerHasBlackListedLabel(containerLabels map[string]interface{}, labelB
 func (transport *Transport) decorateContainerCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
 	type PartialContainer struct {
 		HostConfig struct {
-			Privileged bool `json:"Privileged"`
+			Privileged bool   `json:"Privileged"`
+			PidMode    string `json:"PidMode"`
 		} `json:"HostConfig"`
 	}
 
@@ -188,7 +189,7 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 			return nil, err
 		}
 
-		if !settings.AllowPrivilegedModeForRegularUsers {
+		if !settings.AllowPrivilegedModeForRegularUsers || !settings.EnableHostNamespaceUse {
 			body, err := ioutil.ReadAll(request.Body)
 			if err != nil {
 				return nil, err
@@ -202,6 +203,10 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 
 			if partialContainer.HostConfig.Privileged {
 				return nil, errors.New("forbidden to use privileged mode")
+			}
+
+			if partialContainer.HostConfig.PidMode == "host" {
+				return nil, errors.New("forbidden to use pid host namespace")
 			}
 
 			request.Body = ioutil.NopCloser(bytes.NewBuffer(body))

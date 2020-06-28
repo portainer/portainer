@@ -353,7 +353,7 @@ func (handler *Handler) deployComposeStack(config *composeStackDeploymentConfig)
 		}
 	}
 
-	if (!settings.AllowBindMountsForRegularUsers || !settings.AllowPrivilegedModeForRegularUsers) && mustBeChecked {
+	if (!settings.AllowBindMountsForRegularUsers || !settings.AllowPrivilegedModeForRegularUsers || !settings.EnableHostNamespaceUse) && mustBeChecked {
 		composeFilePath := path.Join(config.stack.ProjectPath, config.stack.EntryPoint)
 
 		stackContent, err := handler.FileService.GetFileContent(composeFilePath)

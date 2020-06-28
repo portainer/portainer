@@ -81,6 +81,11 @@ angular.module('portainer.app').factory('StateManager', [
       LocalStorage.storeApplicationState(state.application);
     };
 
+    manager.updateEnableHostNamespaceUse = function (enableHostNamespaceUse) {
+      state.application.enableHostNamespaceUse = enableHostNamespaceUse;
+      LocalStorage.storeApplicationState(state.application);
+    };
+
     function assignStateFromStatusAndSettings(status, settings) {
       state.application.authentication = status.Authentication;
       state.application.analytics = status.Analytics;
