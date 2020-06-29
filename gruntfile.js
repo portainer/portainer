@@ -34,7 +34,12 @@ module.exports = function (grunt) {
 
   grunt.registerTask('lint', ['eslint']);
 
-  grunt.registerTask('build:server', ['shell:build_binary:linux:' + arch, 'shell:download_kompose_binary:linux:' + arch, 'shell:download_kubectl_binary:linux:' + arch]);
+  grunt.registerTask('build:server', [
+    'shell:build_binary:linux:' + arch,
+    'shell:download_docker_binary:linux:' + arch,
+    'shell:download_kompose_binary:linux:' + arch,
+    'shell:download_kubectl_binary:linux:' + arch,
+  ]);
 
   grunt.registerTask('build:client', ['config:dev', 'env:dev', 'webpack:dev']);
 
