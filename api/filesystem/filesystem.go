@@ -46,6 +46,8 @@ const (
 	ExtensionRegistryManagementStorePath = "extensions"
 	// CustomTemplateStorePath represents the subfolder where custom template files are stored in the file store folder.
 	CustomTemplateStorePath = "custom_templates"
+	// TempPath represent the subfolder where temporary files are saved
+	TempPath = "tmp"
 )
 
 // Service represents a service for managing files and directories.
@@ -504,5 +506,5 @@ func (service *Service) GetTemporaryPath() (string, error) {
 		return "", err
 	}
 
-	return path.Join(service.fileStorePath, "temp", uid.String()), nil
+	return path.Join(service.fileStorePath, TempPath, uid.String()), nil
 }
