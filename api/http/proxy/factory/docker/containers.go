@@ -165,26 +165,23 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 		return nil, err
 	}
 
-	if tokenData.Role != portainer.AdministratorRole {
-		user, err := transport.userService.User(tokenData.ID)
-		if err != nil {
-			return nil, err
-		}
+	user, err := transport.userService.User(tokenData.ID)
+	if err != nil {
+		return nil, err
+	}
 
-		rbacExtension, err := transport.extensionService.Extension(portainer.RBACExtension)
-		if err != nil && err != portainer.ErrObjectNotFound {
-			return nil, err
-		}
+	rbacExtension, err := transport.extensionService.Extension(portainer.RBACExtension)
+	if err != nil && err != portainer.ErrObjectNotFound {
+		return nil, err
+	}
 
-		endpointResourceAccess := false
-		_, ok := user.EndpointAuthorizations[portainer.EndpointID(transport.endpoint.ID)][portainer.EndpointResourcesAccess]
-		if ok {
-			endpointResourceAccess = true
-		}
+	endpointResourceAccess := false
+	_, ok := user.EndpointAuthorizations[portainer.EndpointID(transport.endpoint.ID)][portainer.EndpointResourcesAccess]
+	if ok {
+		endpointResourceAccess = true
+	}
 
-		if rbacExtension != nil && !endpointResourceAccess {
-			return nil, errors.New("Permission denied to create container")
-		}
+	if (rbacExtension != nil && !endpointResourceAccess && tokenData.Role != portainer.AdministratorRole) || (rbacExtension == nil && tokenData.Role != portainer.AdministratorRole) {
 
 		settings, err := transport.settingsService.Settings()
 		if err != nil {

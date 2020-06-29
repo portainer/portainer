@@ -1,6 +1,7 @@
 package stacks
 
 import (
+	"errors"
 	"net/http"
 	"path"
 	"regexp"
@@ -282,6 +283,7 @@ type composeStackDeploymentConfig struct {
 	dockerhub  *portainer.DockerHub
 	registries []portainer.Registry
 	isAdmin    bool
+	user       *portainer.User
 }
 
 func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) (*composeStackDeploymentConfig, *httperror.HandlerError) {
@@ -301,12 +303,18 @@ func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portai
 	}
 	filteredRegistries := security.FilterRegistries(registries, securityContext)
 
+	user, err := handler.UserService.User(securityContext.UserID)
+	if err != nil {
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to load user information from the database", err}
+	}
+
 	config := &composeStackDeploymentConfig{
 		stack:      stack,
 		endpoint:   endpoint,
 		dockerhub:  dockerhub,
 		registries: filteredRegistries,
 		isAdmin:    securityContext.IsAdmin,
+		user:       user,
 	}
 
 	return config, nil
@@ -323,7 +331,29 @@ func (handler *Handler) deployComposeStack(config *composeStackDeploymentConfig)
 		return err
 	}
 
-	if (!settings.AllowBindMountsForRegularUsers || !settings.AllowPrivilegedModeForRegularUsers) && !config.isAdmin {
+	rbacExtension, err := handler.ExtensionService.Extension(portainer.RBACExtension)
+	if err != nil && err != portainer.ErrObjectNotFound {
+		return errors.New("Unable to verify if RBAC extension is loaded")
+	}
+
+	endpointResourceAccess := false
+	_, ok := config.user.EndpointAuthorizations[portainer.EndpointID(config.endpoint.ID)][portainer.EndpointResourcesAccess]
+	if ok {
+		endpointResourceAccess = true
+	}
+
+	mustBeChecked := false
+	if rbacExtension != nil {
+		if !config.isAdmin && !endpointResourceAccess {
+			mustBeChecked = true
+		}
+	} else {
+		if !config.isAdmin {
+			mustBeChecked = true
+		}
+	}
+
+	if (!settings.AllowBindMountsForRegularUsers || !settings.AllowPrivilegedModeForRegularUsers) && mustBeChecked {
 		composeFilePath := path.Join(config.stack.ProjectPath, config.stack.EntryPoint)
 
 		stackContent, err := handler.FileService.GetFileContent(composeFilePath)
