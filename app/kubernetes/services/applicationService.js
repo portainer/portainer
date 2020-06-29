@@ -11,6 +11,7 @@ import { KubernetesStatefulSet } from 'Kubernetes/models/stateful-set/models';
 import { KubernetesDaemonSet } from 'Kubernetes/models/daemon-set/models';
 import { KubernetesApplication } from 'Kubernetes/models/application/models';
 import KubernetesServiceHelper from 'Kubernetes/helpers/serviceHelper';
+import { KubernetesHorizontalPodAutoScalerHelper } from 'Kubernetes/horizontal-pod-auto-scaler/helper';
 
 class KubernetesApplicationService {
   /* @ngInject */
@@ -25,7 +26,8 @@ class KubernetesApplicationService {
     KubernetesPersistentVolumeClaimService,
     KubernetesNamespaceService,
     KubernetesPodService,
-    KubernetesHistoryService
+    KubernetesHistoryService,
+    KubernetesHorizontalPodAutoScalerService
   ) {
     this.$async = $async;
     this.Authentication = Authentication;
@@ -38,6 +40,7 @@ class KubernetesApplicationService {
     this.KubernetesNamespaceService = KubernetesNamespaceService;
     this.KubernetesPodService = KubernetesPodService;
     this.KubernetesHistoryService = KubernetesHistoryService;
+    this.KubernetesHorizontalPodAutoScalerService = KubernetesHorizontalPodAutoScalerService;
 
     this.getAsync = this.getAsync.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
@@ -70,11 +73,12 @@ class KubernetesApplicationService {
    */
   async getAsync(namespace, name) {
     try {
-      const [deployment, daemonSet, statefulSet, pods] = await Promise.allSettled([
+      const [deployment, daemonSet, statefulSet, pods, autoScalers] = await Promise.allSettled([
         this.KubernetesDeploymentService.get(namespace, name),
         this.KubernetesDaemonSetService.get(namespace, name),
         this.KubernetesStatefulSetService.get(namespace, name),
         this.KubernetesPodService.get(namespace),
+        this.KubernetesHorizontalPodAutoScalerService.get(namespace),
       ]);
 
       let rootItem;
@@ -95,14 +99,23 @@ class KubernetesApplicationService {
       const services = await this.KubernetesServiceService.get(namespace);
       const boundService = KubernetesServiceHelper.findApplicationBoundService(services, rootItem.value.Raw);
       const service = boundService ? await this.KubernetesServiceService.get(namespace, boundService.metadata.name) : {};
+
       const application = converterFunction(rootItem.value.Raw, service.Raw);
       application.Yaml = rootItem.value.Yaml;
       application.Raw = rootItem.value.Raw;
       application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods.value, application.Raw);
+
+      const boundScaler = KubernetesHorizontalPodAutoScalerHelper.findApplicationBoundScaler(autoScalers.value, application);
+      const scaler = boundScaler ? await this.KubernetesHorizontalPodAutoScalerService.get(namespace, boundScaler.Name) : undefined;
+      application.AutoScaler = scaler;
+
       await this.KubernetesHistoryService.get(application);
 
       if (service.Yaml) {
         application.Yaml += '---\n' + service.Yaml;
+      }
+      if (scaler && scaler.Yaml) {
+        application.Yaml += '---\n' + scaler.Yaml;
       }
       return application;
     } catch (err) {

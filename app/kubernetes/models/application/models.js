@@ -14,6 +14,12 @@ export const KubernetesApplicationTypes = Object.freeze({
   STATEFULSET: 3,
 });
 
+export const KubernetesApplicationTypeStrings = Object.freeze({
+  DEPLOYMENT: 'Deployment',
+  DAEMONSET: 'DaemonSet',
+  STATEFULSET: 'StatefulSet',
+});
+
 export const KubernetesApplicationPublishingTypes = Object.freeze({
   INTERNAL: 1,
   CLUSTER: 2,
@@ -67,6 +73,7 @@ const _KubernetesApplication = Object.freeze({
   Revisions: undefined,
   CurrentRevision: undefined,
   Raw: undefined, // only filled when inspecting app details / create / edit view (never filled in multiple-apps views)
+  AutoScaler: undefined, // only filled if the application has an HorizontalPodAutoScaler bound to it
 });
 
 export class KubernetesApplication {

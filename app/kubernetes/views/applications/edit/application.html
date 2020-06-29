@@ -169,6 +169,7 @@
             </button>
           </div>
 
+          <!-- ACCESSING APPLICATION -->
           <div class="text-muted" style="margin-bottom: 15px;">
             <i class="fa fa-external-link-alt" aria-hidden="true" style="margin-right: 2px;"></i> Accessing the application
           </div>
@@ -287,7 +288,42 @@
               </div>
             </div>
           </div>
+          <!-- !ACCESSING APPLICATION -->
+          <!-- AUTO SCALING -->
+          <div class="text-muted" style="margin-bottom: 15px;"> <i class="fa fa-expand-arrows-alt" aria-hidden="true" style="margin-right: 2px;"></i> Auto-scaling</div>
 
+          <div class="small text-muted" ng-if="!ctrl.application.AutoScaler" style="margin-bottom: 15px;">
+            <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+            This application does not have an autoscaling policy defined.
+          </div>
+
+          <div ng-if="ctrl.application.AutoScaler">
+            <div style="margin-top: 15px; width: 50%;">
+              <table class="table">
+                <tbody>
+                  <tr class="text-muted">
+                    <td style="width: 33%;">Minimum instances</td>
+                    <td style="width: 33%;">Maximum instances</td>
+                    <td style="width: 33%;">
+                      Target CPU usage
+                      <portainer-tooltip
+                        position="bottom"
+                        message="The autoscaler will ensure enough instances are running to maintain an average CPU usage across all instances."
+                      ></portainer-tooltip>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>{{ ctrl.application.AutoScaler.MinReplicas }}</td>
+                    <td>{{ ctrl.application.AutoScaler.MaxReplicas }}</td>
+                    <td>{{ ctrl.application.AutoScaler.TargetCPUUtilizationPercentage }}%</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- !AUTO SCALING -->
+
+          <!-- CONFIGURATIONS -->
           <div class="text-muted" style="margin-bottom: 15px; margin-top: 25px;"> <i class="fa fa-file-code" aria-hidden="true" style="margin-right: 2px;"></i> Configuration </div>
 
           <div class="small text-muted" ng-if="!ctrl.application.Env && !ctrl.hasVolumeConfiguration()" style="margin-bottom: 15px;">
@@ -361,7 +397,9 @@
               </tbody>
             </table>
           </div>
+          <!-- !CONFIGURATIONS -->
 
+          <!-- DATA PERSISTENCE -->
           <div class="text-muted" style="margin-bottom: 15px; margin-top: 25px;">
             <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px;"></i> Data persistence
           </div>
@@ -423,6 +461,7 @@
                 </tr>
               </tbody>
             </table>
+            <!-- !DATA PERSISTENCE -->
           </div>
         </rd-widget-body>
       </rd-widget>
