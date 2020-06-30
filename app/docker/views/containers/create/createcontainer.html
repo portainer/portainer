@@ -629,7 +629,7 @@
             </form>
             <form class="form-horizontal" style="margin-top: 15px;">
               <!-- devices -->
-              <div class="form-group">
+              <div ng-if="showDeviceMapping" class="form-group">
                 <div class="col-sm-12" style="margin-top: 5px;">
                   <label class="control-label text-left">Devices</label>
                   <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addDevice()">
