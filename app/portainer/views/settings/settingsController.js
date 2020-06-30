@@ -33,11 +33,8 @@ angular.module('portainer.app').controller('SettingsController', [
       enableHostManagementFeatures: false,
       enableVolumeBrowser: false,
       enableEdgeComputeFeatures: false,
-<<<<<<< HEAD
       disableStackManagementForRegularUsers: false,
-=======
       enableHostNamespaceUse: false,
->>>>>>> feat(containers): Prevent non-admin users from running containers using the host namespace pid
     };
 
     $scope.removeFilteredContainerLabel = function (index) {
