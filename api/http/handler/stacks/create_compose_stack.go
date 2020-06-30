@@ -283,6 +283,7 @@ type composeStackDeploymentConfig struct {
 	dockerhub  *portainer.DockerHub
 	registries []portainer.Registry
 	isAdmin    bool
+	user       *portainer.User
 }
 
 func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) (*composeStackDeploymentConfig, *httperror.HandlerError) {
@@ -302,12 +303,18 @@ func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portai
 	}
 	filteredRegistries := security.FilterRegistries(registries, securityContext)
 
+	user, err := handler.DataStore.User().User(securityContext.UserID)
+	if err != nil {
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to load user information from the database", err}
+	}
+
 	config := &composeStackDeploymentConfig{
 		stack:      stack,
 		endpoint:   endpoint,
 		dockerhub:  dockerhub,
 		registries: filteredRegistries,
 		isAdmin:    securityContext.IsAdmin,
+		user:       user,
 	}
 
 	return config, nil
@@ -324,7 +331,12 @@ func (handler *Handler) deployComposeStack(config *composeStackDeploymentConfig)
 		return err
 	}
 
-	if !settings.AllowBindMountsForRegularUsers && !config.isAdmin {
+	isAdminOrEndpointAdmin, err := handler.userIsAdminOrEndpointAdmin(config.user, config.endpoint.ID)
+	if err != nil {
+		return err
+	}
+
+	if (!settings.AllowBindMountsForRegularUsers || !settings.AllowPrivilegedModeForRegularUsers) && !isAdminOrEndpointAdmin {
 		composeFilePath := path.Join(config.stack.ProjectPath, config.stack.EntryPoint)
 
 		stackContent, err := handler.FileService.GetFileContent(composeFilePath)
@@ -332,12 +344,9 @@ func (handler *Handler) deployComposeStack(config *composeStackDeploymentConfig)
 			return err
 		}
 
-		valid, err := handler.isValidStackFile(stackContent)
+		err = handler.isValidStackFile(stackContent, settings)
 		if err != nil {
 			return err
-		}
-		if !valid {
-			return errors.New("bind-mount disabled for non administrator users")
 		}
 	}
 
