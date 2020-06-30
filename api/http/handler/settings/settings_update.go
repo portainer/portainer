@@ -12,19 +12,20 @@ import (
 )
 
 type settingsUpdatePayload struct {
-	LogoURL                            *string
-	BlackListedLabels                  []portainer.Pair
-	AuthenticationMethod               *int
-	LDAPSettings                       *portainer.LDAPSettings
-	OAuthSettings                      *portainer.OAuthSettings
-	AllowBindMountsForRegularUsers     *bool
-	AllowPrivilegedModeForRegularUsers *bool
-	AllowVolumeBrowserForRegularUsers  *bool
-	EnableHostManagementFeatures       *bool
-	SnapshotInterval                   *string
-	TemplatesURL                       *string
-	EdgeAgentCheckinInterval           *int
-	EnableEdgeComputeFeatures          *bool
+	LogoURL                               *string
+	BlackListedLabels                     []portainer.Pair
+	AuthenticationMethod                  *int
+	LDAPSettings                          *portainer.LDAPSettings
+	OAuthSettings                         *portainer.OAuthSettings
+	AllowBindMountsForRegularUsers        *bool
+	AllowPrivilegedModeForRegularUsers    *bool
+	AllowVolumeBrowserForRegularUsers     *bool
+	EnableHostManagementFeatures          *bool
+	SnapshotInterval                      *string
+	TemplatesURL                          *string
+	EdgeAgentCheckinInterval              *int
+	EnableEdgeComputeFeatures             *bool
+	DisableStackManagementForRegularUsers *bool
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
@@ -112,6 +113,10 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.EnableEdgeComputeFeatures != nil {
 		settings.EnableEdgeComputeFeatures = *payload.EnableEdgeComputeFeatures
+	}
+
+	if payload.DisableStackManagementForRegularUsers != nil {
+		settings.DisableStackManagementForRegularUsers = *payload.DisableStackManagementForRegularUsers
 	}
 
 	if payload.SnapshotInterval != nil && *payload.SnapshotInterval != settings.SnapshotInterval {

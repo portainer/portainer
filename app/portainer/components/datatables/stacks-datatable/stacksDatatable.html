@@ -2,7 +2,7 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
+        <div class="toolBarTitle"><i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
         <div class="settings">
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
             <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Settings</span>
@@ -52,7 +52,7 @@
         >
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.stacks.newstack" authorization="PortainerStackCreate">
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.stacks.newstack" ng-disabled="!$ctrl.createEnabled" authorization="PortainerStackCreate">
           <i class="fa fa-plus space-right" aria-hidden="true"></i>Add stack
         </button>
       </div>
@@ -144,7 +144,10 @@
         </table>
       </div>
       <div class="footer" ng-if="$ctrl.dataset">
-        <div class="infoBar" ng-if="$ctrl.state.selectedItemCount !== 0"> {{ $ctrl.state.selectedItemCount }} item(s) selected </div>
+        <div class="infoBar" ng-if="$ctrl.state.selectedItemCount !== 0">
+          {{ $ctrl.state.selectedItemCount }}
+          item(s) selected
+        </div>
         <div class="paginationControls">
           <form class="form-inline">
             <span class="limitSelector">

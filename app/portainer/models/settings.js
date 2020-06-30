@@ -13,6 +13,7 @@ export function SettingsViewModel(data) {
   this.EnableHostManagementFeatures = data.EnableHostManagementFeatures;
   this.EdgeAgentCheckinInterval = data.EdgeAgentCheckinInterval;
   this.EnableEdgeComputeFeatures = data.EnableEdgeComputeFeatures;
+  this.DisableStackManagementForRegularUsers = data.DisableStackManagementForRegularUsers;
 }
 
 export function PublicSettingsViewModel(settings) {
@@ -25,6 +26,7 @@ export function PublicSettingsViewModel(settings) {
   this.EnableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
   this.LogoURL = settings.LogoURL;
   this.OAuthLoginURI = settings.OAuthLoginURI;
+  this.DisableStackManagementForRegularUsers = settings.DisableStackManagementForRegularUsers;
 }
 
 export function LDAPSettingsViewModel(data) {

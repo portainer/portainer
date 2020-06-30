@@ -87,3 +87,27 @@ func (handler *Handler) userCanAccessStack(securityContext *security.RestrictedR
 	}
 	return false, nil
 }
+
+func (handler *Handler) userCanCreateStack(securityContext *security.RestrictedRequestContext, endpointID portainer.EndpointID) (bool, error) {
+	if securityContext.IsAdmin {
+		return true, nil
+	}
+
+	_, err := handler.ExtensionService.Extension(portainer.RBACExtension)
+	if err == portainer.ErrObjectNotFound {
+		return false, nil
+	} else if err != nil && err != portainer.ErrObjectNotFound {
+		return false, err
+	}
+
+	user, err := handler.UserService.User(securityContext.UserID)
+	if err != nil {
+		return false, err
+	}
+
+	_, ok := user.EndpointAuthorizations[endpointID][portainer.EndpointResourcesAccess]
+	if ok {
+		return true, nil
+	}
+	return false, nil
+}

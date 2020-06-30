@@ -43,6 +43,29 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: endpointId", err}
 	}
 
+	settings, err := handler.SettingsService.Settings()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+	}
+
+	if settings.DisableStackManagementForRegularUsers {
+		securityContext, err := security.RetrieveRestrictedRequestContext(r)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user info from request context", err}
+		}
+
+		canCreate, err := handler.userCanCreateStack(securityContext, portainer.EndpointID(endpointID))
+
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify user authorizations to validate stack creation", err}
+		}
+
+		if !canCreate {
+			errMsg := "Stack creation is disabled for non-admin users"
+			return &httperror.HandlerError{http.StatusForbidden, errMsg, errors.New(errMsg)}
+		}
+	}
+
 	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}

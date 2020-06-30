@@ -420,19 +420,20 @@ type (
 
 	// Settings represents the application settings
 	Settings struct {
-		LogoURL                            string               `json:"LogoURL"`
-		BlackListedLabels                  []Pair               `json:"BlackListedLabels"`
-		AuthenticationMethod               AuthenticationMethod `json:"AuthenticationMethod"`
-		LDAPSettings                       LDAPSettings         `json:"LDAPSettings"`
-		OAuthSettings                      OAuthSettings        `json:"OAuthSettings"`
-		AllowBindMountsForRegularUsers     bool                 `json:"AllowBindMountsForRegularUsers"`
-		AllowPrivilegedModeForRegularUsers bool                 `json:"AllowPrivilegedModeForRegularUsers"`
-		AllowVolumeBrowserForRegularUsers  bool                 `json:"AllowVolumeBrowserForRegularUsers"`
-		SnapshotInterval                   string               `json:"SnapshotInterval"`
-		TemplatesURL                       string               `json:"TemplatesURL"`
-		EnableHostManagementFeatures       bool                 `json:"EnableHostManagementFeatures"`
-		EdgeAgentCheckinInterval           int                  `json:"EdgeAgentCheckinInterval"`
-		EnableEdgeComputeFeatures          bool                 `json:"EnableEdgeComputeFeatures"`
+		LogoURL                               string               `json:"LogoURL"`
+		BlackListedLabels                     []Pair               `json:"BlackListedLabels"`
+		AuthenticationMethod                  AuthenticationMethod `json:"AuthenticationMethod"`
+		LDAPSettings                          LDAPSettings         `json:"LDAPSettings"`
+		OAuthSettings                         OAuthSettings        `json:"OAuthSettings"`
+		AllowBindMountsForRegularUsers        bool                 `json:"AllowBindMountsForRegularUsers"`
+		AllowPrivilegedModeForRegularUsers    bool                 `json:"AllowPrivilegedModeForRegularUsers"`
+		AllowVolumeBrowserForRegularUsers     bool                 `json:"AllowVolumeBrowserForRegularUsers"`
+		SnapshotInterval                      string               `json:"SnapshotInterval"`
+		TemplatesURL                          string               `json:"TemplatesURL"`
+		EnableHostManagementFeatures          bool                 `json:"EnableHostManagementFeatures"`
+		EdgeAgentCheckinInterval              int                  `json:"EdgeAgentCheckinInterval"`
+		EnableEdgeComputeFeatures             bool                 `json:"EnableEdgeComputeFeatures"`
+		DisableStackManagementForRegularUsers bool                 `json:"DisableStackManagementForRegularUsers"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
