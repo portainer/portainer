@@ -90,6 +90,13 @@
                 </a>
               </th>
               <th>
+                <a ng-click="$ctrl.changeOrderBy('PersistentVolumeClaim.Applications[0].Name')">
+                  Used by
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'PersistentVolumeClaim.Applications[0].Name' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'PersistentVolumeClaim.Applications[0].Name' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
                 <a ng-click="$ctrl.changeOrderBy('PersistentVolumeClaim.StorageClass.Name')">
                   Storage
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'PersistentVolumeClaim.StorageClass.Name' && !$ctrl.state.reverseOrder"></i>
@@ -131,6 +138,14 @@
               </td>
               <td>
                 <a ui-sref="kubernetes.resourcePools.resourcePool({ id: item.ResourcePool.Namespace.Name })">{{ item.ResourcePool.Namespace.Name }}</a>
+              </td>
+              <td>
+                <a
+                  ng-if="item.Applications.length"
+                  ui-sref="kubernetes.applications.application({ name: item.Applications[0].Name, namespace: item.ResourcePool.Namespace.Name })"
+                  >{{ item.Applications[0].Name }}</a
+                >
+                <span ng-if="!item.Applications.length">-</span>
               </td>
               <td>
                 {{ item.PersistentVolumeClaim.StorageClass.Name }}
