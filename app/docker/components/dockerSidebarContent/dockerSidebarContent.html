@@ -8,7 +8,7 @@
     <a ui-sref="docker.templates.custom({endpointId: $ctrl.endpointId})" ui-sref-active="active">Custom Templates</a>
   </div>
 </li>
-<li class="sidebar-list">
+<li class="sidebar-list" ng-if="!$ctrl.hideStacks">
   <a ui-sref="docker.stacks({endpointId: $ctrl.endpointId})" ui-sref-active="active">Stacks <span class="menu-icon fa fa-th-list fa-fw"></span></a>
 </li>
 <li class="sidebar-list" ng-if="$ctrl.swarmManagement">

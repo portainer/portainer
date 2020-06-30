@@ -9,5 +9,6 @@ angular.module('portainer.docker').component('dockerSidebarContent', {
     toggle: '<',
     currentRouteName: '<',
     endpointId: '<',
+    hideStacks: '<',
   },
 });

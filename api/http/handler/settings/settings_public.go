@@ -17,6 +17,7 @@ type publicSettingsResponse struct {
 	AllowVolumeBrowserForRegularUsers  bool                           `json:"AllowVolumeBrowserForRegularUsers"`
 	AllowHostNamespaceForRegularUsers  bool                           `json:"AllowHostNamespaceForRegularUsers"`
 	AllowDeviceMappingForRegularUsers  bool                           `json:"AllowDeviceMappingForRegularUsers"`
+	DisableStackManagementForRegularUsers bool                           `json:"DisableStackManagementForRegularUsers"`
 	EnableHostManagementFeatures       bool                           `json:"EnableHostManagementFeatures"`
 	EnableEdgeComputeFeatures          bool                           `json:"EnableEdgeComputeFeatures"`
 	OAuthLoginURI                      string                         `json:"OAuthLoginURI"`
@@ -37,6 +38,7 @@ func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *
 		AllowVolumeBrowserForRegularUsers:  settings.AllowVolumeBrowserForRegularUsers,
 		AllowHostNamespaceForRegularUsers:  settings.AllowHostNamespaceForRegularUsers,
 		AllowDeviceMappingForRegularUsers:  settings.AllowDeviceMappingForRegularUsers,
+		DisableStackManagementForRegularUsers: settings.DisableStackManagementForRegularUsers,
 		EnableHostManagementFeatures:       settings.EnableHostManagementFeatures,
 		EnableEdgeComputeFeatures:          settings.EnableEdgeComputeFeatures,
 		OAuthLoginURI: fmt.Sprintf("%s?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&prompt=login",
