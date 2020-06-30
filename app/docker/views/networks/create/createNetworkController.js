@@ -95,15 +95,23 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
       $scope.formValues.IPV6.AuxiliaryAddresses.splice(index, 1);
     };
 
-    function prepareAuxiliaryAddresses(ipamConfig, auxAddresses) {
+    function prepareAuxiliaryAddresses(ipamConfig, ipFormValues) {
       ipamConfig.AuxiliaryAddresses = {};
-      _.forEach(auxAddresses, (auxAddress, index) => {
+      _.forEach(ipFormValues.AuxiliaryAddresses, (auxAddress, index) => {
         const split = _.split(auxAddress, '=');
+        let name = '';
+        let ip = '';
         if (split.length === 2) {
-          ipamConfig.AuxiliaryAddresses[split[0]] = split[1];
+          name = split[0];
+          ip = split[1];
         } else {
-          ipamConfig.AuxiliaryAddresses['device' + index] = auxAddress;
+          name = 'device' + index;
+          ip = auxAddress;
         }
+        if (ip === ipFormValues.Gateway) {
+          throw new Error('Exclude ip cannot be the same as gateway');
+        }
+        ipamConfig.AuxiliaryAddresses[name] = ip;
       });
     }
 
@@ -118,7 +126,7 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
           ipamConfig.IPRange = $scope.formValues.IPV4.IPRange;
         }
         if ($scope.formValues.IPV4.AuxiliaryAddresses.length) {
-          prepareAuxiliaryAddresses(ipamConfig, $scope.formValues.IPV4.AuxiliaryAddresses);
+          prepareAuxiliaryAddresses(ipamConfig, $scope.formValues.IPV4);
         }
         config.IPAM.Config.push(ipamConfig);
       }
@@ -132,7 +140,7 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
           ipamConfig.IPRange = $scope.formValues.IPV6.IPRange;
         }
         if ($scope.formValues.IPV6.AuxiliaryAddresses.length) {
-          prepareAuxiliaryAddresses(ipamConfig, $scope.formValues.IPV6.AuxiliaryAddresses);
+          prepareAuxiliaryAddresses(ipamConfig, $scope.formValues.IPV6);
         }
         config.EnableIPv6 = true;
         config.IPAM.Config.push(ipamConfig);
@@ -222,7 +230,11 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
     }
 
     $scope.create = function () {
-      var networkConfiguration = prepareConfiguration();
+      try {
+        var networkConfiguration = prepareConfiguration();
+      } catch (err) {
+        Notifications.error('Failure', err, 'An error occured during network creation');
+      }
       var accessControlData = $scope.formValues.AccessControlData;
       var userDetails = Authentication.getUserDetails();
       var isAdmin = Authentication.isAdmin();
