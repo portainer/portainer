@@ -10,16 +10,16 @@ import (
 )
 
 type publicSettingsResponse struct {
-	LogoURL                            string                         `json:"LogoURL"`
-	AuthenticationMethod               portainer.AuthenticationMethod `json:"AuthenticationMethod"`
-	AllowBindMountsForRegularUsers     bool                           `json:"AllowBindMountsForRegularUsers"`
-	AllowPrivilegedModeForRegularUsers bool                           `json:"AllowPrivilegedModeForRegularUsers"`
-	AllowVolumeBrowserForRegularUsers  bool                           `json:"AllowVolumeBrowserForRegularUsers"`
-	EnableHostManagementFeatures       bool                           `json:"EnableHostManagementFeatures"`
-	EnableEdgeComputeFeatures          bool                           `json:"EnableEdgeComputeFeatures"`
-	ExternalTemplates                  bool                           `json:"ExternalTemplates"`
-	OAuthLoginURI                      string                         `json:"OAuthLoginURI"`
-	HideStacksForUserRole              bool                           `json:"HideStacksForUserRole"`
+	LogoURL                               string                         `json:"LogoURL"`
+	AuthenticationMethod                  portainer.AuthenticationMethod `json:"AuthenticationMethod"`
+	AllowBindMountsForRegularUsers        bool                           `json:"AllowBindMountsForRegularUsers"`
+	AllowPrivilegedModeForRegularUsers    bool                           `json:"AllowPrivilegedModeForRegularUsers"`
+	AllowVolumeBrowserForRegularUsers     bool                           `json:"AllowVolumeBrowserForRegularUsers"`
+	EnableHostManagementFeatures          bool                           `json:"EnableHostManagementFeatures"`
+	EnableEdgeComputeFeatures             bool                           `json:"EnableEdgeComputeFeatures"`
+	ExternalTemplates                     bool                           `json:"ExternalTemplates"`
+	OAuthLoginURI                         string                         `json:"OAuthLoginURI"`
+	DisableStackManagementForRegularUsers bool                           `json:"DisableStackManagementForRegularUsers"`
 }
 
 // GET request on /api/settings/public
@@ -43,7 +43,7 @@ func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *
 			settings.OAuthSettings.ClientID,
 			settings.OAuthSettings.RedirectURI,
 			settings.OAuthSettings.Scopes),
-		HideStacksForUserRole: settings.HideStacksForUserRole,
+		DisableStackManagementForRegularUsers: settings.DisableStackManagementForRegularUsers,
 	}
 
 	if settings.TemplatesURL != "" {
