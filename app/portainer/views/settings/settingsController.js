@@ -35,6 +35,7 @@ angular.module('portainer.app').controller('SettingsController', [
       enableEdgeComputeFeatures: false,
       disableStackManagementForRegularUsers: false,
       restrictHostNamespaceForRegularUsers: false,
+      disableDeviceMappingForRegularUsers: false,
     };
 
     $scope.removeFilteredContainerLabel = function (index) {
@@ -73,6 +74,7 @@ angular.module('portainer.app').controller('SettingsController', [
       settings.EnableEdgeComputeFeatures = $scope.formValues.enableEdgeComputeFeatures;
       settings.DisableStackManagementForRegularUsers = $scope.formValues.disableStackManagementForRegularUsers;
       settings.AllowHostNamespaceForRegularUsers = !$scope.formValues.restrictHostNamespaceForRegularUsers;
+      settings.DisableDeviceMappingForRegularUsers = $scope.formValues.disableDeviceMappingForRegularUsers;
 
       $scope.state.actionInProgress = true;
       updateSettings(settings);
@@ -89,6 +91,7 @@ angular.module('portainer.app').controller('SettingsController', [
           StateManager.updateEnableEdgeComputeFeatures(settings.EnableEdgeComputeFeatures);
           StateManager.updateDisableStackManagementForRegularUsers(settings.DisableStackManagementForRegularUsers);
           StateManager.updateAllowHostNamespaceForRegularUsers(settings.AllowHostNamespaceForRegularUsers);
+          StateManager.updateDisableDeviceMappingForRegularUsers(settings.DisableDeviceMappingForRegularUsers);
           $state.reload();
         })
         .catch(function error(err) {
@@ -117,6 +120,7 @@ angular.module('portainer.app').controller('SettingsController', [
           $scope.formValues.enableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
           $scope.formValues.disableStackManagementForRegularUsers = settings.DisableStackManagementForRegularUsers;
           $scope.formValues.restrictHostNamespaceForRegularUsers = !settings.AllowHostNamespaceForRegularUsers;
+          $scope.formValues.disableDeviceMappingForRegularUsers = settings.DisableDeviceMappingForRegularUsers;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve application settings');

@@ -15,6 +15,7 @@ export function SettingsViewModel(data) {
   this.EnableEdgeComputeFeatures = data.EnableEdgeComputeFeatures;
   this.DisableStackManagementForRegularUsers = data.DisableStackManagementForRegularUsers;
   this.AllowHostNamespaceForRegularUsers = data.AllowHostNamespaceForRegularUsers;
+  this.DisableDeviceMappingForRegularUsers = data.DisableDeviceMappingForRegularUsers;
 }
 
 export function PublicSettingsViewModel(settings) {
@@ -28,6 +29,7 @@ export function PublicSettingsViewModel(settings) {
   this.LogoURL = settings.LogoURL;
   this.OAuthLoginURI = settings.OAuthLoginURI;
   this.DisableStackManagementForRegularUsers = settings.DisableStackManagementForRegularUsers;
+  this.DisableDeviceMappingForRegularUsers = settings.DisableDeviceMappingForRegularUsers;
 }
 
 export function LDAPSettingsViewModel(data) {

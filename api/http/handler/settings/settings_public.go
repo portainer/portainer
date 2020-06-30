@@ -21,6 +21,7 @@ type publicSettingsResponse struct {
 	OAuthLoginURI                         string                         `json:"OAuthLoginURI"`
 	DisableStackManagementForRegularUsers bool                           `json:"DisableStackManagementForRegularUsers"`
 	AllowHostNamespaceForRegularUsers     bool                           `json:"AllowHostNamespaceForRegularUsers"`
+	DisableDeviceMappingForRegularUsers   bool                           `json:"DisableDeviceMappingForRegularUsers"`
 }
 
 // GET request on /api/settings/public
@@ -45,6 +46,7 @@ func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *
 			settings.OAuthSettings.ClientID,
 			settings.OAuthSettings.RedirectURI,
 			settings.OAuthSettings.Scopes),
+		DisableDeviceMappingForRegularUsers:   settings.DisableDeviceMappingForRegularUsers,
 		DisableStackManagementForRegularUsers: settings.DisableStackManagementForRegularUsers,
 	}
 
