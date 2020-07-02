@@ -86,7 +86,8 @@ angular.module('portainer.app').controller('porAccessControlPanelController', [
         });
     }
 
-    function initComponent() {
+    this.$onInit = $onInit;
+    function $onInit() {
       var userDetails = Authentication.getUserDetails();
       var isAdmin = Authentication.isAdmin();
       var userId = userDetails.ID;
@@ -138,7 +139,5 @@ angular.module('portainer.app').controller('porAccessControlPanelController', [
           Notifications.error('Failure', err, 'Unable to retrieve access control information');
         });
     }
-
-    initComponent();
   },
 ]);

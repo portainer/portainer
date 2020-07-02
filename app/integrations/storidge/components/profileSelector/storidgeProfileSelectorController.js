@@ -4,7 +4,8 @@ angular.module('portainer.integrations.storidge').controller('StoridgeProfileSel
   function (StoridgeProfileService, Notifications) {
     var ctrl = this;
 
-    function initComponent() {
+    this.$onInit = $onInit;
+    function $onInit() {
       StoridgeProfileService.profiles()
         .then(function success(data) {
           ctrl.profiles = data;
@@ -13,7 +14,5 @@ angular.module('portainer.integrations.storidge').controller('StoridgeProfileSel
           Notifications.error('Failure', err, 'Unable to retrieve Storidge profiles');
         });
     }
-
-    initComponent();
   },
 ]);

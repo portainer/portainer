@@ -2,7 +2,8 @@ angular.module('portainer.app').controller('porEndpointSecurityController', [
   function () {
     var ctrl = this;
 
-    function initComponent() {
+    this.$onInit = $onInit;
+    function $onInit() {
       if (ctrl.endpoint) {
         var endpoint = ctrl.endpoint;
         var TLS = endpoint.TLSConfig.TLS;
@@ -27,7 +28,5 @@ angular.module('portainer.app').controller('porEndpointSecurityController', [
         }
       }
     }
-
-    initComponent();
   },
 ]);
