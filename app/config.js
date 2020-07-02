@@ -20,6 +20,7 @@ angular.module('portainer').config([
     }
 
     localStorageServiceProvider.setPrefix('portainer');
+    localStorageServiceProvider.setStorageCookie(30, '/', true);
 
     jwtOptionsProvider.config({
       tokenGetter: [
