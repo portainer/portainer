@@ -14,7 +14,6 @@ function run(
   $transitions,
   HttpRequestHelper,
   EndpointService,
-  Notifications,
   StateManager,
   LegacyExtensionManager,
   KubernetesHealthService
@@ -56,51 +55,58 @@ function run(
     jqXhr.setRequestHeader('Authorization', 'Bearer ' + LocalStorage.getJWT());
   });
 
-  let currentEndpointId = 0;
   $transitions.onBefore({}, async (transition) => {
     const { endpointId } = transition.params();
+    const currentEndpointId = EndpointProvider.endpointID();
+    const routerStateService = transition.router.stateService;
     if (!endpointId || endpointId === currentEndpointId) {
       return true;
     }
 
-    currentEndpointId = endpointId;
-    const endpoint = await EndpointService.endpoint(endpointId);
-    if (endpoint.Type === 3) {
-      return switchToAzureEndpoint(endpoint);
-    } else if (endpoint.Type === 4) {
-      return switchToEdgeEndpoint(endpoint);
+    try {
+      const endpoint = await EndpointService.endpoint(endpointId);
+      if (endpoint.Type === 3) {
+        return await switchToAzureEndpoint(endpoint);
+      }
+
+      if (endpoint.Type === 4) {
+        return await switchToEdgeEndpoint(endpoint);
+      }
+
+      if (endpoint.Type === 5 || endpoint.Type === 6) {
+        return await switchToKubernetesEndpoint(endpoint);
+      }
+      if (endpoint.Type === 7) {
+        return await switchToKubernetesEdgeEndpoint(endpoint);
+      }
+
+      const status = await checkEndpointStatus(endpoint);
+      endpoint.Status = status;
+      return await switchToDockerEndpoint(endpoint);
+    } catch (error) {
+      return routerStateService.target('portainer.home', { error });
     }
 
-    const status = await checkEndpointStatus(endpoint);
-    endpoint.Status = status;
-    return switchToDockerEndpoint(endpoint);
-
-    function switchToAzureEndpoint(endpoint) {
+    async function switchToAzureEndpoint(endpoint) {
       EndpointProvider.setEndpointID(endpoint.Id);
       EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
       EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
-      StateManager.updateEndpointState(endpoint, []).catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to connect to the Azure endpoint');
-      });
+      await StateManager.updateEndpointState(endpoint, []);
     }
 
-    function switchToEdgeEndpoint(endpoint) {
+    async function switchToEdgeEndpoint(endpoint) {
       if (!endpoint.EdgeID) {
-        $state.go('portainer.endpoints.endpoint', { id: endpoint.Id });
-        return;
+        return routerStateService.target('portainer.endpoints.endpoint', { id: endpoint.Id });
       }
 
       // $scope.state.connectingToEdgeEndpoint = true;
-      SystemService.ping(endpoint.Id)
-        .then(function success() {
-          endpoint.Status = 1;
-        })
-        .catch(function error() {
-          endpoint.Status = 2;
-        })
-        .finally(function final() {
-          switchToDockerEndpoint(endpoint);
-        });
+      try {
+        await SystemService.ping(endpoint.Id);
+        endpoint.Status = 1;
+      } catch (e) {
+        endpoint.Status = 2;
+      }
+      return switchToDockerEndpoint(endpoint);
     }
 
     async function switchToDockerEndpoint(endpoint) {
@@ -120,35 +126,25 @@ function run(
       return StateManager.updateEndpointState(endpoint, extensions);
     }
 
-    function switchToKubernetesEdgeEndpoint(endpoint) {
+    async function switchToKubernetesEdgeEndpoint(endpoint) {
       if (!endpoint.EdgeID) {
-        $state.go('portainer.endpoints.endpoint', { id: endpoint.Id });
-        return;
+        return routerStateService.target('portainer.endpoints.endpoint', { id: endpoint.Id });
       }
 
       EndpointProvider.setEndpointID(endpoint.Id);
       // $scope.state.connectingToEdgeEndpoint = true;
-      KubernetesHealthService.ping()
-        .then(function success() {
-          endpoint.Status = 1;
-        })
-        .catch(function error() {
-          endpoint.Status = 2;
-        })
-        .finally(function final() {
-          switchToKubernetesEndpoint(endpoint);
-        });
+      try {
+        await KubernetesHealthService.ping();
+        endpoint.Status = 1;
+      } catch (e) {
+        endpoint.Status = 2;
+      }
+      switchToKubernetesEndpoint(endpoint);
     }
 
-    function switchToKubernetesEndpoint(endpoint) {
+    async function switchToKubernetesEndpoint(endpoint) {
       EndpointProvider.setEndpointID(endpoint.Id);
-      StateManager.updateEndpointState(endpoint, [])
-        .then(function success() {
-          $state.go('kubernetes.dashboard');
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to connect to the Kubernetes endpoint');
-        });
+      return StateManager.updateEndpointState(endpoint, []);
     }
 
     async function checkEndpointStatus(endpoint) {

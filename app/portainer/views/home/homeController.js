@@ -27,11 +27,14 @@ angular
       if (endpoint.Type === 3) {
         $state.go('azure.dashboard', { endpointId: endpoint.Id });
         return;
-      } else if ((endpoint.Type === 4 || endpoint.Type === 7) && !endpoint.EdgeID) {
+      }
+      if ((endpoint.Type === 4 || endpoint.Type === 7) && !endpoint.EdgeID) {
         $state.go('portainer.endpoints.endpoint', { id: endpoint.Id });
         return;
-      } else if (endpoint.Type === 5 || endpoint.Type === 6 || endpoint.Type === 7) {
+      }
+      if (endpoint.Type === 5 || endpoint.Type === 6 || endpoint.Type === 7) {
         $state.go('kubernetes.dashboard', { endpointId: endpoint.Id });
+        return;
       }
       $state.go('docker.dashboard', { endpointId: endpoint.Id });
     };
