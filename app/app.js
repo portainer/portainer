@@ -80,8 +80,8 @@ angular.module('portainer').run([
           return await switchToAzureEndpoint(endpoint);
         }
 
-        if (endpoint.Type === 4) {
-          return await switchToEdgeEndpoint(endpoint);
+        if (endpoint.Type === 4 && !endpoint.EdgeID) {
+          return routerStateService.target('portainer.endpoints.endpoint', { id: endpoint.Id });
         }
 
         if (endpoint.Type === 5 || endpoint.Type === 6) {
@@ -92,7 +92,11 @@ angular.module('portainer').run([
         }
 
         const status = await checkEndpointStatus(endpoint);
+        if (endpoint.Type !== 4) {
+          await updateEndpointStatus(endpoint, status);
+        }
         endpoint.Status = status;
+
         return await switchToDockerEndpoint(endpoint);
       } catch (error) {
         return routerStateService.target('portainer.home', { error });
@@ -103,21 +107,6 @@ angular.module('portainer').run([
         EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
         EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
         await StateManager.updateEndpointState(endpoint, []);
-      }
-
-      async function switchToEdgeEndpoint(endpoint) {
-        if (!endpoint.EdgeID) {
-          return routerStateService.target('portainer.endpoints.endpoint', { id: endpoint.Id });
-        }
-
-        // $scope.state.connectingToEdgeEndpoint = true;
-        try {
-          await SystemService.ping(endpoint.Id);
-          endpoint.Status = 1;
-        } catch (e) {
-          endpoint.Status = 2;
-        }
-        return switchToDockerEndpoint(endpoint);
       }
 
       async function switchToDockerEndpoint(endpoint) {
@@ -159,23 +148,19 @@ angular.module('portainer').run([
        }
 
       async function checkEndpointStatus(endpoint) {
-        let status = 1;
         try {
           await SystemService.ping(endpoint.Id);
-          status = 1;
+          return 1;
         } catch (e) {
-          status = 2;
+          return 2;
         }
-        if (endpoint.Status === status) {
-          return status;
-        }
+      }
 
-        try {
-          await EndpointService.updateEndpoint(endpoint.Id, { Status: status });
-          return status;
-        } catch (err) {
-          throw err;
+      async function updateEndpointStatus(endpoint, status) {
+        if (endpoint.Status === status) {
+          return;
         }
+        await EndpointService.updateEndpoint(endpoint.Id, { Status: status });
       }
     });
   },
