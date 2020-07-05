@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-function SidebarController($q, $scope, $state, $transitions, StateManager, Notifications, Authentication, UserService) {
+function SidebarController($q, $scope, $transitions, EndpointProvider, StateManager, Notifications, Authentication, UserService) {
   function checkPermissions(memberships) {
     var isLeader = false;
     angular.forEach(memberships, function (membership) {
@@ -14,7 +14,7 @@ function SidebarController($q, $scope, $state, $transitions, StateManager, Notif
   function initView() {
     $scope.uiVersion = StateManager.getState().application.version;
     $scope.logo = StateManager.getState().application.logo;
-    $scope.endpointId = +$state.params.endpointId;
+    $scope.endpointId = EndpointProvider.endpointID();
 
     let userDetails = Authentication.getUserDetails();
     let isAdmin = Authentication.isAdmin();
@@ -29,7 +29,7 @@ function SidebarController($q, $scope, $state, $transitions, StateManager, Notif
       });
 
     $transitions.onSuccess({}, () => {
-      $scope.endpointId = +$state.params.endpointId;
+      $scope.endpointId = EndpointProvider.endpointID();
     });
   }
 
