@@ -33,7 +33,9 @@ func (handler *Handler) proxyEdgeAgentWebsocketRequest(w http.ResponseWriter, r 
 }
 
 func (handler *Handler) proxyAgentWebsocketRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {
-	agentURL, err := url.Parse(params.endpoint.URL)
+	// TODO: k8s merge - make sure this is still working with Docker agent
+	//agentURL, err := url.Parse(params.endpoint.URL)
+	agentURL, err := url.Parse(fmt.Sprintf("http://%s", params.endpoint.URL))
 	if err != nil {
 		return err
 	}

@@ -2,9 +2,10 @@ package websocket
 
 import (
 	"fmt"
-	"github.com/gorilla/websocket"
 	"net/http"
 	"net/http/httputil"
+
+	"github.com/gorilla/websocket"
 )
 
 func hijackRequest(websocketConn *websocket.Conn, httpConn *httputil.ClientConn, request *http.Request) error {
@@ -24,8 +25,8 @@ func hijackRequest(websocketConn *websocket.Conn, httpConn *httputil.ClientConn,
 	defer tcpConn.Close()
 
 	errorChan := make(chan error, 1)
-	go streamFromTCPConnToWebsocketConn(websocketConn, brw, errorChan)
-	go streamFromWebsocketConnToTCPConn(websocketConn, tcpConn, errorChan)
+	go streamFromReaderToWebsocket(websocketConn, brw, errorChan)
+	go streamFromWebsocketToWriter(websocketConn, tcpConn, errorChan)
 
 	err = <-errorChan
 	if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseNoStatusReceived) {

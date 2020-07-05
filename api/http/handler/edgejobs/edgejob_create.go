@@ -187,7 +187,7 @@ func (handler *Handler) addAndPersistEdgeJob(edgeJob *portainer.EdgeJob, file []
 			return err
 		}
 
-		if endpoint.Type != portainer.EdgeAgentEnvironment {
+		if endpoint.Type != portainer.EdgeAgentOnDockerEnvironment && endpoint.Type != portainer.EdgeAgentOnKubernetesEnvironment {
 			delete(edgeJob.Endpoints, ID)
 		}
 	}

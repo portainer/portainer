@@ -132,7 +132,7 @@ func (transport *Transport) ProxyDockerRequest(request *http.Request) (*http.Res
 func (transport *Transport) executeDockerRequest(request *http.Request) (*http.Response, error) {
 	response, err := transport.HTTPTransport.RoundTrip(request)
 
-	if transport.endpoint.Type != portainer.EdgeAgentEnvironment {
+	if transport.endpoint.Type != portainer.EdgeAgentOnDockerEnvironment {
 		return response, err
 	}
 

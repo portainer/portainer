@@ -2,7 +2,7 @@ package endpoints
 
 import (
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
@@ -15,7 +15,7 @@ import (
 func hideFields(endpoint *portainer.Endpoint) {
 	endpoint.AzureCredentials = portainer.AzureCredentials{}
 	if len(endpoint.Snapshots) > 0 {
-		endpoint.Snapshots[0].SnapshotRaw = portainer.SnapshotRaw{}
+		endpoint.Snapshots[0].SnapshotRaw = portainer.DockerSnapshotRaw{}
 	}
 }
 
@@ -28,7 +28,7 @@ type Handler struct {
 	FileService          portainer.FileService
 	ProxyManager         *proxy.Manager
 	ReverseTunnelService portainer.ReverseTunnelService
-	Snapshotter          portainer.Snapshotter
+	SnapshotService      portainer.SnapshotService
 }
 
 // NewHandler creates a handler to manage endpoint operations.

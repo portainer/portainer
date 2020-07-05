@@ -32,7 +32,7 @@ func (factory *ProxyFactory) newDockerLocalProxy(endpoint *portainer.Endpoint) (
 }
 
 func (factory *ProxyFactory) newDockerHTTPProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
-	if endpoint.Type == portainer.EdgeAgentEnvironment {
+	if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
 		tunnel := factory.reverseTunnelService.GetTunnelDetails(endpoint.ID)
 		endpoint.URL = fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port)
 	}

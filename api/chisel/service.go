@@ -28,7 +28,7 @@ type Service struct {
 	serverPort        string
 	tunnelDetailsMap  cmap.ConcurrentMap
 	dataStore         portainer.DataStore
-	snapshotter       portainer.Snapshotter
+	snapshotService   portainer.SnapshotService
 	chiselServer      *chserver.Server
 }
 
@@ -45,7 +45,7 @@ func NewService(dataStore portainer.DataStore) *Service {
 // be found inside the database, it will generate a new one randomly and persist it.
 // It starts the tunnel status verification process in the background.
 // The snapshotter is used in the tunnel status verification process.
-func (service *Service) StartTunnelServer(addr, port string, snapshotter portainer.Snapshotter) error {
+func (service *Service) StartTunnelServer(addr, port string, snapshotService portainer.SnapshotService) error {
 	keySeed, err := service.retrievePrivateKeySeed()
 	if err != nil {
 		return err
@@ -78,7 +78,7 @@ func (service *Service) StartTunnelServer(addr, port string, snapshotter portain
 		return err
 	}
 
-	service.snapshotter = snapshotter
+	service.snapshotService = snapshotService
 	go service.startTunnelVerificationLoop()
 
 	return nil
@@ -177,13 +177,13 @@ func (service *Service) snapshotEnvironment(endpointID portainer.EndpointID, tun
 	}
 
 	endpointURL := endpoint.URL
+
 	endpoint.URL = fmt.Sprintf("tcp://127.0.0.1:%d", tunnelPort)
-	snapshot, err := service.snapshotter.CreateSnapshot(endpoint)
+	err = service.snapshotService.SnapshotEndpoint(endpoint)
 	if err != nil {
 		return err
 	}
 
-	endpoint.Snapshots = []portainer.Snapshot{*snapshot}
 	endpoint.URL = endpointURL
 	return service.dataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
 }

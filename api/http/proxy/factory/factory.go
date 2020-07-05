@@ -6,7 +6,11 @@ import (
 	"net/http/httputil"
 	"net/url"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
+
+	"github.com/portainer/portainer/api/kubernetes/cli"
+
 	"github.com/portainer/portainer/api/docker"
 )
 
@@ -21,20 +25,24 @@ var extensionPorts = map[portainer.ExtensionID]string{
 type (
 	// ProxyFactory is a factory to create reverse proxies to Docker endpoints and extensions
 	ProxyFactory struct {
-		dataStore            portainer.DataStore
-		signatureService     portainer.DigitalSignatureService
-		reverseTunnelService portainer.ReverseTunnelService
-		dockerClientFactory  *docker.ClientFactory
+		dataStore                   portainer.DataStore
+		signatureService            portainer.DigitalSignatureService
+		reverseTunnelService        portainer.ReverseTunnelService
+		dockerClientFactory         *docker.ClientFactory
+		kubernetesClientFactory     *cli.ClientFactory
+		kubernetesTokenCacheManager *kubernetes.TokenCacheManager
 	}
 )
 
 // NewProxyFactory returns a pointer to a new instance of a ProxyFactory
-func NewProxyFactory(dataStore portainer.DataStore, signatureService portainer.DigitalSignatureService, tunnelService portainer.ReverseTunnelService, clientFactory *docker.ClientFactory) *ProxyFactory {
+func NewProxyFactory(dataStore portainer.DataStore, signatureService portainer.DigitalSignatureService, tunnelService portainer.ReverseTunnelService, clientFactory *docker.ClientFactory, kubernetesClientFactory *cli.ClientFactory, kubernetesTokenCacheManager *kubernetes.TokenCacheManager) *ProxyFactory {
 	return &ProxyFactory{
-		dataStore:            dataStore,
-		signatureService:     signatureService,
-		reverseTunnelService: tunnelService,
-		dockerClientFactory:  clientFactory,
+		dataStore:                   dataStore,
+		signatureService:            signatureService,
+		reverseTunnelService:        tunnelService,
+		dockerClientFactory:         clientFactory,
+		kubernetesClientFactory:     kubernetesClientFactory,
+		kubernetesTokenCacheManager: kubernetesTokenCacheManager,
 	}
 }
 
@@ -74,6 +82,8 @@ func (factory *ProxyFactory) NewEndpointProxy(endpoint *portainer.Endpoint) (htt
 	switch endpoint.Type {
 	case portainer.AzureEnvironment:
 		return newAzureProxy(endpoint)
+	case portainer.EdgeAgentOnKubernetesEnvironment, portainer.AgentOnKubernetesEnvironment, portainer.KubernetesLocalEnvironment:
+		return factory.newKubernetesProxy(endpoint)
 	}
 
 	return factory.newDockerProxy(endpoint)

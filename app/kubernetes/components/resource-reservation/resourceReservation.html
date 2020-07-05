@@ -1,0 +1,32 @@
+<div class="row">
+  <div class="col-sm-12 form-section-title">
+    Resource reservation
+  </div>
+  <div class="form-group">
+    <span class="col-sm-12 text-muted small">
+      <p>
+        {{ $ctrl.description }}
+      </p>
+    </span>
+  </div>
+  <div class="form-group" ng-if="$ctrl.memoryLimit !== 0">
+    <label for="memory-usage" class="col-sm-3 col-lg-2 control-label text-left">
+      Memory reservation
+    </label>
+    <div class="col-sm-9" style="margin-top: 4px;">
+      <uib-progressbar animate="false" value="$ctrl.memoryUsage" type="{{ $ctrl.memoryUsage | kubernetesUsageLevelInfo }}">
+        <b style="white-space: nowrap;"> {{ $ctrl.memory }} / {{ $ctrl.memoryLimit }} MB - {{ $ctrl.memoryUsage }}% </b>
+      </uib-progressbar>
+    </div>
+  </div>
+  <div class="form-group" ng-if="$ctrl.cpuLimit !== 0">
+    <label for="cpu-usage" class="col-sm-3 col-lg-2 control-label text-left">
+      CPU reservation
+    </label>
+    <div class="col-sm-9" style="margin-top: 4px;">
+      <uib-progressbar animate="false" value="$ctrl.cpuUsage" type="{{ $ctrl.cpuUsage | kubernetesUsageLevelInfo }}">
+        <b style="white-space: nowrap;"> {{ $ctrl.cpu | kubernetesApplicationCPUValue }} / {{ $ctrl.cpuLimit }} - {{ $ctrl.cpuUsage }}% </b>
+      </uib-progressbar>
+    </div>
+  </div>
+</div>

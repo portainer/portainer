@@ -118,7 +118,6 @@ a[ng-click] {
 .fa.tooltip-icon {
   margin-left: 5px;
   font-size: 1.3em;
-  color: #337ab7;
 }
 
 .fa.green-icon {
@@ -149,6 +148,11 @@ a[ng-click] {
 .widget .widget-body table tbody .image-tag {
   font-size: 90% !important;
   margin-right: 5px;
+}
+
+.widget .widget-body table tbody .label-margins {
+  margin-left: 5px;
+  margin-right: 0;
 }
 
 .widget .widget-body table tbody .fit-text-size {
@@ -888,6 +892,17 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   vertical-align: middle;
 }
 
+.striked::after {
+  border-bottom: 0.2em solid #777777;
+  content: '';
+  left: 0;
+  margin-top: calc(0.2em / 2 * -1);
+  position: absolute;
+  right: 0;
+  top: 50%;
+  z-index: 2;
+}
+
 /*bootbox override*/
 .modal-open {
   padding-right: 0 !important;
@@ -966,3 +981,40 @@ json-tree .branch-preview {
   opacity: 0.5;
 }
 /* !json-tree override */
+
+/* uib-progressbar override */
+.progress-bar {
+  color: #4e4e4e;
+}
+/* !uib-progressbar override */
+
+.loading-view-area {
+  height: 85%;
+  display: flex;
+  align-items: center;
+}
+
+/* bootstrap extend */
+.input-xs {
+  height: 22px;
+  padding: 2px 5px;
+  font-size: 12px;
+  line-height: 1.5; /* If Placeholder of the input is moved up, rem/modify this. */
+  border-radius: 3px;
+}
+/* !bootstrap extend */
+
+/* spinkit override */
+.sk-fold {
+  width: 57px;
+  height: 57px;
+}
+
+.sk-fold-cube {
+  background-color: white;
+}
+
+.sk-fold-cube:before {
+  background-color: #337ab7;
+}
+/* !spinkit override */

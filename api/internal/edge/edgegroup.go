@@ -13,7 +13,7 @@ func EdgeGroupRelatedEndpoints(edgeGroup *portainer.EdgeGroup, endpoints []porta
 
 	endpointIDs := []portainer.EndpointID{}
 	for _, endpoint := range endpoints {
-		if endpoint.Type != portainer.EdgeAgentEnvironment {
+		if endpoint.Type != portainer.EdgeAgentOnDockerEnvironment && endpoint.Type != portainer.EdgeAgentOnKubernetesEnvironment {
 			continue
 		}
 

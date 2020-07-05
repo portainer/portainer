@@ -38,7 +38,7 @@ func (handler *Handler) getEndpointsByTags(tagIDs []portainer.TagID, partialMatc
 
 	results := []portainer.EndpointID{}
 	for _, endpoint := range endpoints {
-		if _, ok := endpointSet[endpoint.ID]; ok && endpoint.Type == portainer.EdgeAgentEnvironment {
+		if _, ok := endpointSet[endpoint.ID]; ok && (endpoint.Type == portainer.EdgeAgentOnDockerEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment) {
 			results = append(results, endpoint.ID)
 		}
 	}

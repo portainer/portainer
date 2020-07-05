@@ -1,4 +1,5 @@
 import _ from 'lodash-es';
+
 export function RegistryRepositoryViewModel(item) {
   if (item.name && item.tags) {
     this.Name = item.name;

@@ -66,6 +66,12 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 		return handler.createSwarmStack(w, r, method, endpoint, tokenData.ID)
 	case portainer.DockerComposeStack:
 		return handler.createComposeStack(w, r, method, endpoint, tokenData.ID)
+	case portainer.KubernetesStack:
+		if tokenData.Role != portainer.AdministratorRole {
+			return &httperror.HandlerError{http.StatusForbidden, "Access denied", portainer.ErrUnauthorized}
+		}
+
+		return handler.createKubernetesStack(w, r, endpoint)
 	}
 
 	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: type. Value must be one of: 1 (Swarm stack) or 2 (Compose stack)", errors.New(request.ErrInvalidQueryParameter)}

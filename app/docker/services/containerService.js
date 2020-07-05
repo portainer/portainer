@@ -1,4 +1,4 @@
-import { ContainerDetailsViewModel, ContainerViewModel, ContainerStatsViewModel } from '../models/container';
+import { ContainerDetailsViewModel, ContainerStatsViewModel, ContainerViewModel } from '../models/container';
 
 angular.module('portainer.docker').factory('ContainerService', [
   '$q',

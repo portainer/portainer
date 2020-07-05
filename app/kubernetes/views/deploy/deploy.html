@@ -1,0 +1,118 @@
+<kubernetes-view-header title="Advanced deployment" state="kubernetes.deploy" view-ready="ctrl.state.viewReady">
+  Deploy Kubernetes resources
+</kubernetes-view-header>
+
+<kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
+
+<div ng-if="ctrl.state.viewReady">
+  <kubernetes-feedback-panel></kubernetes-feedback-panel>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <rd-widget>
+        <rd-widget-body>
+          <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
+            <uib-tab index="0">
+              <uib-tab-heading> <i class="fa fa-code space-right" aria-hidden="true"></i> Deploy </uib-tab-heading>
+
+              <form class="form-horizontal" style="margin-top: 20px;">
+                <div class="form-group">
+                  <label for="target_node" class="col-lg-1 col-sm-2 control-label text-left">Resource pool</label>
+                  <div class="col-lg-11 col-sm-10">
+                    <select class="form-control" ng-model="ctrl.formValues.Namespace" ng-options="namespace.Name as namespace.Name for namespace in ctrl.namespaces"></select>
+                  </div>
+                </div>
+                <!-- deploy-type -->
+                <div class="col-sm-12 form-section-title">
+                  Deployment type
+                </div>
+                <div class="form-group"></div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <div class="boxselector_wrapper">
+                    <div>
+                      <input type="radio" id="method_kubernetes" ng-model="ctrl.state.DeployType" ng-value="ctrl.ManifestDeployTypes.KUBERNETES" />
+                      <label for="method_kubernetes">
+                        <div class="boxselector_header">
+                          <i class="fa fa-cubes" aria-hidden="true" style="margin-right: 2px;"></i>
+                          Kubernetes
+                        </div>
+                        <p>Kubernetes manifest format</p>
+                      </label>
+                    </div>
+                    <div>
+                      <input type="radio" id="method_compose" ng-model="ctrl.state.DeployType" ng-value="ctrl.ManifestDeployTypes.COMPOSE" />
+                      <label for="method_compose">
+                        <div class="boxselector_header">
+                          <i class="fab fa-docker" aria-hidden="true" style="margin-right: 2px;"></i>
+                          Compose
+                        </div>
+                        <p>docker-compose format</p>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <!-- !deploy-type -->
+                <!-- editor -->
+                <div class="col-sm-12 form-section-title">
+                  Web editor
+                </div>
+                <div class="form-group">
+                  <span class="col-sm-12 text-muted small" ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.COMPOSE">
+                    <p>
+                      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary that not
+                      all the Compose format options are supported by Kompose at the moment.
+                    </p>
+                    <p>
+                      You can get more information about Compose file format in the
+                      <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>.
+                    </p>
+                  </span>
+                  <span class="col-sm-12 text-muted small" ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.KUBERNETES">
+                    You can get more information about Kubernetes file format in the
+                    <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/" target="_blank">official documentation</a>.
+                  </span>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-12">
+                    <code-editor
+                      identifier="kubernetes-deploy-editor"
+                      placeholder="# Define or paste the content of your manifest file here"
+                      yml="false"
+                      on-change="(ctrl.editorUpdate)"
+                    ></code-editor>
+                  </div>
+                </div>
+                <!-- !editor -->
+                <!-- actions -->
+                <div class="col-sm-12 form-section-title">
+                  Actions
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-12">
+                    <button type="button" class="btn btn-primary btn-sm" ng-disabled="ctrl.disableDeploy()" ng-click="ctrl.deploy()" button-spinner="ctrl.state.actionInProgress">
+                      <span ng-hide="ctrl.state.actionInProgress">Deploy</span>
+                      <span ng-show="ctrl.state.actionInProgress">Deployment in progress...</span>
+                    </button>
+                  </div>
+                </div>
+                <!-- !actions -->
+              </form>
+            </uib-tab>
+
+            <uib-tab index="1" disable="ctrl.state.tabLogsDisabled">
+              <uib-tab-heading> <i class="fa fa-file space-right" aria-hidden="true"></i> Logs </uib-tab-heading>
+              <form class="form-horizontal" style="margin-top: 20px;">
+                <div class="form-group" ng-if="ctrl.state.activeTab === 1">
+                  <div class="col-sm-12">
+                    <code-editor identifier="kubernetes-deploy-logs" read-only="true" yml="false" value="ctrl.errorLog"></code-editor>
+                  </div>
+                </div>
+              </form>
+            </uib-tab>
+          </uib-tabset>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+  </div>
+</div>

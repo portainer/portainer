@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/snapshot"
 )
 
 // POST request on /api/endpoints/:id/snapshot
@@ -23,11 +24,11 @@ func (handler *Handler) endpointSnapshot(w http.ResponseWriter, r *http.Request)
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
-	if endpoint.Type == portainer.AzureEnvironment {
-		return &httperror.HandlerError{http.StatusBadRequest, "Snapshots not supported for Azure endpoints", err}
+	if !snapshot.SupportDirectSnapshot(endpoint) {
+		return &httperror.HandlerError{http.StatusBadRequest, "Snapshots not supported for this endpoint", err}
 	}
 
-	snapshot, snapshotError := handler.Snapshotter.CreateSnapshot(endpoint)
+	snapshotError := handler.SnapshotService.SnapshotEndpoint(endpoint)
 
 	latestEndpointReference, err := handler.DataStore.Endpoint().Endpoint(endpoint.ID)
 	if latestEndpointReference == nil {
@@ -39,9 +40,8 @@ func (handler *Handler) endpointSnapshot(w http.ResponseWriter, r *http.Request)
 		latestEndpointReference.Status = portainer.EndpointStatusDown
 	}
 
-	if snapshot != nil {
-		latestEndpointReference.Snapshots = []portainer.Snapshot{*snapshot}
-	}
+	latestEndpointReference.Snapshots = endpoint.Snapshots
+	latestEndpointReference.Kubernetes.Snapshots = endpoint.Kubernetes.Snapshots
 
 	err = handler.DataStore.Endpoint().UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)
 	if err != nil {

@@ -30,6 +30,7 @@ type endpointUpdatePayload struct {
 	UserAccessPolicies     portainer.UserAccessPolicies
 	TeamAccessPolicies     portainer.TeamAccessPolicies
 	EdgeCheckinInterval    *int
+	Kubernetes             *portainer.KubernetesData
 }
 
 func (payload *endpointUpdatePayload) Validate(r *http.Request) error {
@@ -118,6 +119,10 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 				}
 			}
 		}
+	}
+
+	if payload.Kubernetes != nil {
+		endpoint.Kubernetes = *payload.Kubernetes
 	}
 
 	updateAuthorizations := false
@@ -227,7 +232,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
-	if endpoint.Type == portainer.EdgeAgentEnvironment && (groupIDChanged || tagsChanged) {
+	if (endpoint.Type == portainer.EdgeAgentOnDockerEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment) && (groupIDChanged || tagsChanged) {
 		relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpoint.ID)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find endpoint relation inside the database", err}

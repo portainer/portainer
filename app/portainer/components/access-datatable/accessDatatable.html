@@ -69,12 +69,14 @@
             >
               <td>
                 <span class="md-checkbox">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-disabled="item.Inherited" ng-click="$ctrl.selectItem(item, $event)" />
+                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-disabled="$ctrl.disableRemove(item)" ng-click="$ctrl.selectItem(item, $event)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
                 {{ item.Name }}
-                <span ng-if="item.Inherited" class="text-muted small" style="margin-left: 2px;"><code style="font-size: 85% !important;">inherited</code></span>
-                <span ng-if="item.Override" class="text-muted small" style="margin-left: 2px;"><code style="font-size: 85% !important;">override</code></span>
+                <span ng-if="$ctrl.inheritFrom && item.Inherited" class="text-muted small" style="margin-left: 2px;"
+                  ><code style="font-size: 85% !important;">inherited</code></span
+                >
+                <span ng-if="$ctrl.inheritFrom && item.Override" class="text-muted small" style="margin-left: 2px;"><code style="font-size: 85% !important;">override</code></span>
               </td>
               <td>{{ item.Type }}</td>
               <td ng-if="$ctrl.rbacEnabled">

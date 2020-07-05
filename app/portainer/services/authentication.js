@@ -34,11 +34,19 @@ angular.module('portainer.app').factory('Authentication', [
       }
     }
 
-    function logout() {
+    async function logoutAsync(performApiLogout) {
+      if (performApiLogout) {
+        await Auth.logout().$promise;
+      }
+
       StateManager.clean();
       EndpointProvider.clean();
       LocalStorage.clean();
       LocalStorage.storeLoginStateUUID('');
+    }
+
+    function logout(performApiLogout) {
+      return $async(logoutAsync, performApiLogout);
     }
 
     function init() {

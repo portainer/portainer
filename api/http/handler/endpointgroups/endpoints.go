@@ -6,7 +6,7 @@ import (
 )
 
 func (handler *Handler) updateEndpointRelations(endpoint *portainer.Endpoint, endpointGroup *portainer.EndpointGroup) error {
-	if endpoint.Type != portainer.EdgeAgentEnvironment {
+	if endpoint.Type != portainer.EdgeAgentOnKubernetesEnvironment && endpoint.Type != portainer.EdgeAgentOnDockerEnvironment {
 		return nil
 	}
 

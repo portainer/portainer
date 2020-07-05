@@ -12,9 +12,9 @@ import 'angular-json-tree/dist/angular-json-tree.css';
 import 'angular-loading-bar/build/loading-bar.css';
 import 'angular-moment-picker/dist/angular-moment-picker.min.css';
 import 'angular-multiselect/isteven-multi-select.css';
+import 'spinkit/spinkit.min.css';
 
 import angular from 'angular';
-window.angular = angular;
 import 'moment';
 import '@uirouter/angularjs';
 import 'ui-select';
@@ -38,3 +38,5 @@ import 'js-yaml/dist/js-yaml.js';
 import 'angular-ui-bootstrap';
 import 'angular-moment-picker';
 import 'angular-multiselect/isteven-multi-select.js';
+
+window.angular = angular;

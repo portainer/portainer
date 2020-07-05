@@ -1,3 +1,4 @@
+import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
 import { EndpointSecurityFormData } from '../../../components/endpointSecurity/porEndpointSecurityModel';
 
 angular
@@ -19,6 +20,7 @@ angular
     $scope.state = {
       EnvironmentType: 'agent',
       actionInProgress: false,
+      deploymentTab: 0,
       allowCreateTag: Authentication.isAdmin(),
       availableEdgeAgentCheckinOptions: [
         { key: 'Use default interval', value: 0 },
@@ -54,9 +56,12 @@ angular
     };
 
     $scope.copyAgentCommand = function () {
-      clipboard.copyText('curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent');
-      $('#copyNotification').show();
-      $('#copyNotification').fadeOut(2000);
+      if ($scope.state.deploymentTab === 0) {
+        clipboard.copyText('curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent');
+      } else {
+        clipboard.copyText('curl -L https://downloads.portainer.io/portainer-agent-k8s.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml');
+      }
+      $('#copyNotification').show().fadeOut(2500);
     };
 
     $scope.setDefaultPortainerInstanceURL = function () {
@@ -66,6 +71,20 @@ angular
     $scope.resetEndpointURL = function () {
       $scope.formValues.URL = '';
     };
+
+    $scope.onCreateTag = function onCreateTag(tagName) {
+      return $async(onCreateTagAsync, tagName);
+    };
+
+    async function onCreateTagAsync(tagName) {
+      try {
+        const tag = await TagService.createTag(tagName);
+        $scope.availableTags = $scope.availableTags.concat(tag);
+        $scope.formValues.TagIds = $scope.formValues.TagIds.concat(tag.Id);
+      } catch (err) {
+        Notifications.error('Failue', err, 'Unable to create tag');
+      }
+    }
 
     $scope.addDockerEndpoint = function () {
       var name = $scope.formValues.Name;
@@ -83,7 +102,7 @@ angular
       var TLSCertFile = TLSSkipClientVerify ? null : securityData.TLSCert;
       var TLSKeyFile = TLSSkipClientVerify ? null : securityData.TLSKey;
 
-      addEndpoint(name, 1, URL, publicURL, groupId, tagIds, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile);
+      addEndpoint(name, PortainerEndpointTypes.DockerEnvironment, URL, publicURL, groupId, tagIds, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile);
     };
 
     $scope.addAgentEndpoint = function () {
@@ -93,7 +112,9 @@ angular
       var groupId = $scope.formValues.GroupId;
       var tagIds = $scope.formValues.TagIds;
 
-      addEndpoint(name, 2, URL, publicURL, groupId, tagIds, true, true, true, null, null, null);
+      addEndpoint(name, PortainerEndpointTypes.AgentOnDockerEnvironment, URL, publicURL, groupId, tagIds, true, true, true, null, null, null);
+      // TODO: k8s merge - temporarily updated to AgentOnKubernetesEnvironment, breaking Docker agent support
+      // addEndpoint(name, PortainerEndpointTypes.AgentOnKubernetesEnvironment, URL, publicURL, groupId, tags, true, true, true, null, null, null);
     };
 
     $scope.addEdgeAgentEndpoint = function () {
@@ -102,7 +123,9 @@ angular
       var tagIds = $scope.formValues.TagIds;
       var URL = $scope.formValues.URL;
 
-      addEndpoint(name, 4, URL, '', groupId, tagIds, false, false, false, null, null, null, $scope.formValues.CheckinInterval);
+      addEndpoint(name, PortainerEndpointTypes.EdgeAgentOnDockerEnvironment, URL, '', groupId, tagIds, false, false, false, null, null, null, $scope.formValues.CheckinInterval);
+      // TODO: k8s merge - temporarily updated to EdgeAgentOnKubernetesEnvironment, breaking Docker Edge agent support
+      // addEndpoint(name, PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment, URL, "", groupId, tags, false, false, false, null, null, null);
     };
 
     $scope.addAzureEndpoint = function () {
@@ -115,20 +138,6 @@ angular
 
       createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tagIds);
     };
-
-    $scope.onCreateTag = function onCreateTag(tagName) {
-      return $async(onCreateTagAsync, tagName);
-    };
-
-    async function onCreateTagAsync(tagName) {
-      try {
-        const tag = await TagService.createTag(tagName);
-        $scope.availableTags = $scope.availableTags.concat(tag);
-        $scope.formValues.TagIds = $scope.formValues.TagIds.concat(tag.Id);
-      } catch (err) {
-        Notifications.error('Failue', err, 'Unable to create tag');
-      }
-    }
 
     function createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tagIds) {
       $scope.state.actionInProgress = true;
@@ -164,8 +173,10 @@ angular
       )
         .then(function success(data) {
           Notifications.success('Endpoint created', name);
-          if (type === 4) {
+          if (type === PortainerEndpointTypes.EdgeAgentOnDockerEnvironment || type === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment) {
             $state.go('portainer.endpoints.endpoint', { id: data.Id });
+          } else if (type === PortainerEndpointTypes.AgentOnKubernetesEnvironment) {
+            $state.go('portainer.endpoints.endpoint.kubernetesConfig', { id: data.Id });
           } else {
             $state.go('portainer.endpoints', {}, { reload: true });
           }

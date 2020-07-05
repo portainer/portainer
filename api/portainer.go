@@ -1,6 +1,7 @@
 package portainer
 
 import (
+	"io"
 	"time"
 )
 
@@ -60,48 +61,40 @@ type (
 		SnapshotInterval          *string
 	}
 
-	// CLIService represents a service for managing CLI
-	CLIService interface {
-		ParseFlags(version string) (*CLIFlags, error)
-		ValidateFlags(flags *CLIFlags) error
-	}
-
-	// DataStore defines the interface to manage the data
-	DataStore interface {
-		Open() error
-		Init() error
-		Close() error
-		IsNew() bool
-		MigrateData() error
-
-		DockerHub() DockerHubService
-		EdgeGroup() EdgeGroupService
-		EdgeJob() EdgeJobService
-		EdgeStack() EdgeStackService
-		Endpoint() EndpointService
-		EndpointGroup() EndpointGroupService
-		EndpointRelation() EndpointRelationService
-		Extension() ExtensionService
-		Registry() RegistryService
-		ResourceControl() ResourceControlService
-		Role() RoleService
-		Settings() SettingsService
-		Stack() StackService
-		Tag() TagService
-		TeamMembership() TeamMembershipService
-		Team() TeamService
-		TunnelServer() TunnelServerService
-		User() UserService
-		Version() VersionService
-		Webhook() WebhookService
-	}
-
 	// DockerHub represents all the required information to connect and use the
 	// Docker Hub
 	DockerHub struct {
 		Authentication bool   `json:"Authentication"`
 		Username       string `json:"Username"`
 		Password       string `json:"Password,omitempty"`
+	}
+
+	// DockerSnapshot represents a snapshot of a specific Docker endpoint at a specific time
+	DockerSnapshot struct {
+		Time                    int64             `json:"Time"`
+		DockerVersion           string            `json:"DockerVersion"`
+		Swarm                   bool              `json:"Swarm"`
+		TotalCPU                int               `json:"TotalCPU"`
+		TotalMemory             int64             `json:"TotalMemory"`
+		RunningContainerCount   int               `json:"RunningContainerCount"`
+		StoppedContainerCount   int               `json:"StoppedContainerCount"`
+		HealthyContainerCount   int               `json:"HealthyContainerCount"`
+		UnhealthyContainerCount int               `json:"UnhealthyContainerCount"`
+		VolumeCount             int               `json:"VolumeCount"`
+		ImageCount              int               `json:"ImageCount"`
+		ServiceCount            int               `json:"ServiceCount"`
+		StackCount              int               `json:"StackCount"`
+		SnapshotRaw             DockerSnapshotRaw `json:"DockerSnapshotRaw"`
+	}
+
+	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
+	DockerSnapshotRaw struct {
+		Containers interface{} `json:"Containers"`
+		Volumes    interface{} `json:"Volumes"`
+		Networks   interface{} `json:"Networks"`
+		Images     interface{} `json:"Images"`
+		Info       interface{} `json:"Info"`
+		Version    interface{} `json:"Version"`
 	}
 
 	// EdgeGroup represents an Edge group
@@ -191,12 +184,13 @@ type (
 		AzureCredentials    AzureCredentials    `json:"AzureCredentials,omitempty"`
 		TagIDs              []TagID             `json:"TagIds"`
 		Status              EndpointStatus      `json:"Status"`
-		Snapshots           []Snapshot          `json:"Snapshots"`
+		Snapshots           []DockerSnapshot    `json:"Snapshots"`
 		UserAccessPolicies  UserAccessPolicies  `json:"UserAccessPolicies"`
 		TeamAccessPolicies  TeamAccessPolicies  `json:"TeamAccessPolicies"`
 		EdgeID              string              `json:"EdgeID,omitempty"`
 		EdgeKey             string              `json:"EdgeKey"`
 		EdgeCheckinInterval int                 `json:"EdgeCheckinInterval"`
+		Kubernetes          KubernetesData      `json:"Kubernetes"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
@@ -257,7 +251,6 @@ type (
 	EndpointStatus int
 
 	// EndpointSyncJob represents a scheduled job that synchronize endpoints based on an external file
-	//
 	// Deprecated
 	EndpointSyncJob struct{}
 
@@ -302,6 +295,33 @@ type (
 
 	// JobType represents a job type
 	JobType int
+
+	// KubernetesData contains all the Kubernetes related endpoint information
+	KubernetesData struct {
+		Snapshots     []KubernetesSnapshot    `json:"Snapshots"`
+		Configuration KubernetesConfiguration `json:"Configuration"`
+	}
+
+	// KubernetesSnapshot represents a snapshot of a specific Kubernetes endpoint at a specific time
+	KubernetesSnapshot struct {
+		Time              int64  `json:"Time"`
+		KubernetesVersion string `json:"KubernetesVersion"`
+		NodeCount         int    `json:"NodeCount"`
+		TotalCPU          int64  `json:"TotalCPU"`
+		TotalMemory       int64  `json:"TotalMemory"`
+	}
+
+	// KubernetesConfiguration represents the configuration of a Kubernetes endpoint
+	KubernetesConfiguration struct {
+		UseLoadBalancer bool                           `json:"UseLoadBalancer"`
+		StorageClasses  []KubernetesStorageClassConfig `json:"StorageClasses"`
+	}
+
+	// KubernetesStorageClassConfig represents a Kubernetes Storage Class configuration
+	KubernetesStorageClassConfig struct {
+		Name        string   `json:"Name"`
+		AccessModes []string `json:"AccessModes"`
+	}
 
 	// LDAPGroupSearchSettings represents settings used to search for groups in a LDAP server
 	LDAPGroupSearchSettings struct {
@@ -488,33 +508,8 @@ type (
 		DisplayExternalContributors bool
 	}
 
-	// Snapshot represents a snapshot of a specific endpoint at a specific time
-	Snapshot struct {
-		Time                    int64       `json:"Time"`
-		DockerVersion           string      `json:"DockerVersion"`
-		Swarm                   bool        `json:"Swarm"`
-		TotalCPU                int         `json:"TotalCPU"`
-		TotalMemory             int64       `json:"TotalMemory"`
-		RunningContainerCount   int         `json:"RunningContainerCount"`
-		StoppedContainerCount   int         `json:"StoppedContainerCount"`
-		HealthyContainerCount   int         `json:"HealthyContainerCount"`
-		UnhealthyContainerCount int         `json:"UnhealthyContainerCount"`
-		VolumeCount             int         `json:"VolumeCount"`
-		ImageCount              int         `json:"ImageCount"`
-		ServiceCount            int         `json:"ServiceCount"`
-		StackCount              int         `json:"StackCount"`
-		SnapshotRaw             SnapshotRaw `json:"SnapshotRaw"`
-	}
-
-	// SnapshotRaw represents all the information related to a snapshot as returned by the Docker API
-	SnapshotRaw struct {
-		Containers interface{} `json:"Containers"`
-		Volumes    interface{} `json:"Volumes"`
-		Networks   interface{} `json:"Networks"`
-		Images     interface{} `json:"Images"`
-		Info       interface{} `json:"Info"`
-		Version    interface{} `json:"Version"`
-	}
+	// SnapshotJob represents a scheduled job that can create endpoint snapshots
+	SnapshotJob struct{}
 
 	// Stack represents a Docker stack created via docker stack deploy
 	Stack struct {
@@ -733,6 +728,12 @@ type (
 	// WebhookType represents the type of resource a webhook is related to
 	WebhookType int
 
+	// CLIService represents a service for managing CLI
+	CLIService interface {
+		ParseFlags(version string) (*CLIFlags, error)
+		ValidateFlags(flags *CLIFlags) error
+	}
+
 	// ComposeStackManager represents a service to manage Compose stacks
 	ComposeStackManager interface {
 		Up(stack *Stack, endpoint *Endpoint) error
@@ -743,6 +744,36 @@ type (
 	CryptoService interface {
 		Hash(data string) (string, error)
 		CompareHashAndData(hash string, data string) error
+	}
+
+	// DataStore defines the interface to manage the data
+	DataStore interface {
+		Open() error
+		Init() error
+		Close() error
+		IsNew() bool
+		MigrateData() error
+
+		DockerHub() DockerHubService
+		EdgeGroup() EdgeGroupService
+		EdgeJob() EdgeJobService
+		EdgeStack() EdgeStackService
+		Endpoint() EndpointService
+		EndpointGroup() EndpointGroupService
+		EndpointRelation() EndpointRelationService
+		Extension() ExtensionService
+		Registry() RegistryService
+		ResourceControl() ResourceControlService
+		Role() RoleService
+		Settings() SettingsService
+		Stack() StackService
+		Tag() TagService
+		TeamMembership() TeamMembershipService
+		Team() TeamService
+		TunnelServer() TunnelServerService
+		User() UserService
+		Version() VersionService
+		Webhook() WebhookService
 	}
 
 	// DigitalSignatureService represents a service to manage digital signatures
@@ -758,6 +789,11 @@ type (
 	DockerHubService interface {
 		DockerHub() (*DockerHub, error)
 		UpdateDockerHub(registry *DockerHub) error
+	}
+
+	// DockerSnapshotter represents a service used to create Docker endpoint snapshots
+	DockerSnapshotter interface {
+		CreateSnapshot(endpoint *Endpoint) (*DockerSnapshot, error)
 	}
 
 	// EdgeGroupService represents a service to manage Edge groups
@@ -876,6 +912,23 @@ type (
 		SetUserSessionDuration(userSessionDuration time.Duration)
 	}
 
+	// KubeClient represents a service used to query a Kubernetes environment
+	KubeClient interface {
+		SetupUserServiceAccount(userID int, username string, teamIDs []int) error
+		GetServiceAccountBearerToken(userID int, username string) (string, error)
+		StartExecProcess(namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error
+	}
+
+	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes endpoint
+	KubernetesDeployer interface {
+		Deploy(endpoint *Endpoint, data string, composeFormat bool, namespace string) ([]byte, error)
+	}
+
+	// KubernetesSnapshotter represents a service used to create Kubernetes endpoint snapshots
+	KubernetesSnapshotter interface {
+		CreateSnapshot(endpoint *Endpoint) (*KubernetesSnapshot, error)
+	}
+
 	// LDAPService represents a service used to authenticate users against a LDAP/AD
 	LDAPService interface {
 		AuthenticateUser(username, password string, settings *LDAPSettings) error
@@ -904,7 +957,7 @@ type (
 
 	// ReverseTunnelService represensts a service used to manage reverse tunnel connections.
 	ReverseTunnelService interface {
-		StartTunnelServer(addr, port string, snapshotter Snapshotter) error
+		StartTunnelServer(addr, port string, snapshotService SnapshotService) error
 		GenerateEdgeKey(url, host string, endpointIdentifier int) string
 		SetTunnelStatusToActive(endpointID EndpointID)
 		SetTunnelStatusToRequired(endpointID EndpointID) error
@@ -933,11 +986,6 @@ type (
 		Start() error
 	}
 
-	// Snapshotter represents a service used to create endpoint snapshots
-	Snapshotter interface {
-		CreateSnapshot(endpoint *Endpoint) (*Snapshot, error)
-	}
-
 	// StackService represents a service for managing stack data
 	StackService interface {
 		Stack(ID StackID) (*Stack, error)
@@ -947,6 +995,13 @@ type (
 		UpdateStack(ID StackID, stack *Stack) error
 		DeleteStack(ID StackID) error
 		GetNextIdentifier() int
+	}
+
+	// StackService represents a service for managing endpoint snapshots
+	SnapshotService interface {
+		Start()
+		SetSnapshotInterval(snapshotInterval string) error
+		SnapshotEndpoint(endpoint *Endpoint) error
 	}
 
 	// SwarmStackManager represents a service to manage Swarm stacks
@@ -1048,6 +1103,8 @@ const (
 	PortainerAgentSignatureHeader = "X-PortainerAgent-Signature"
 	// PortainerAgentPublicKeyHeader represent the name of the header containing the public key
 	PortainerAgentPublicKeyHeader = "X-PortainerAgent-PublicKey"
+	// PortainerAgentKubernetesSATokenHeader represent the name of the header containing a Kubernetes SA token
+	PortainerAgentKubernetesSATokenHeader = "X-PortainerAgent-SA-Token"
 	// PortainerAgentSignatureMessage represents the message used to create a digital signature
 	// to be used when communicating with an agent
 	PortainerAgentSignatureMessage = "Portainer-App"
@@ -1115,8 +1172,14 @@ const (
 	AgentOnDockerEnvironment
 	// AzureEnvironment represents an endpoint connected to an Azure environment
 	AzureEnvironment
-	// EdgeAgentEnvironment represents an endpoint connected to an Edge agent
-	EdgeAgentEnvironment
+	// EdgeAgentOnDockerEnvironment represents an endpoint connected to an Edge agent deployed on a Docker environment
+	EdgeAgentOnDockerEnvironment
+	// KubernetesLocalEnvironment represents an endpoint connected to a local Kubernetes environment
+	KubernetesLocalEnvironment
+	// AgentOnKubernetesEnvironment represents an endpoint connected to a Portainer agent deployed on a Kubernetes environment
+	AgentOnKubernetesEnvironment
+	// EdgeAgentOnKubernetesEnvironment represents an endpoint connected to an Edge agent deployed on a Kubernetes environment
+	EdgeAgentOnKubernetesEnvironment
 )
 
 const (
@@ -1185,6 +1248,8 @@ const (
 	DockerSwarmStack
 	// DockerComposeStack represents a stack managed via docker-compose
 	DockerComposeStack
+	// KubernetesStack represents a stack managed via kubectl
+	KubernetesStack
 )
 
 const (

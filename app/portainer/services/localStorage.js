@@ -126,6 +126,13 @@ angular.module('portainer.app').factory('LocalStorage', [
       getJobImage: function () {
         return localStorageService.get('job_image');
       },
+      storeActiveTab: function (key, index) {
+        return localStorageService.set('active_tab_' + key, index);
+      },
+      getActiveTab: function (key) {
+        const activeTab = localStorageService.get('active_tab_' + key);
+        return activeTab === null ? 0 : activeTab;
+      },
       storeLogoutReason: (reason) => localStorageService.set('logout_reason', reason),
       getLogoutReason: () => localStorageService.get('logout_reason'),
       cleanLogoutReason: () => localStorageService.remove('logout_reason'),

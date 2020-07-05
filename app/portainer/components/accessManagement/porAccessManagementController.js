@@ -53,27 +53,14 @@ class PorAccessManagementController {
   }
 
   async $onInit() {
-    const entity = this.accessControlledEntity;
-    if (!entity) {
-      this.Notifications.error('Failure', 'Unable to retrieve accesses');
-      return;
-    }
-    if (!entity.UserAccessPolicies) {
-      entity.UserAccessPolicies = {};
-    }
-    if (!entity.TeamAccessPolicies) {
-      entity.TeamAccessPolicies = {};
-    }
-    const parent = this.inheritFrom;
-    if (parent && !parent.UserAccessPolicies) {
-      parent.UserAccessPolicies = {};
-    }
-    if (parent && !parent.TeamAccessPolicies) {
-      parent.TeamAccessPolicies = {};
-    }
-    this.roles = [];
-    this.rbacEnabled = false;
     try {
+      const entity = this.accessControlledEntity;
+      const parent = this.inheritFrom;
+      // TODO: refactor
+      // extract this code and locate it in AccessService.accesses() function
+      // see resourcePoolAccessController for another usage of AccessService.accesses()
+      // which needs RBAC support
+      this.roles = [];
       this.rbacEnabled = await this.ExtensionService.extensionEnabled(this.ExtensionService.EXTENSIONS.RBAC);
       if (this.rbacEnabled) {
         this.roles = await this.RoleService.roles();
@@ -81,13 +68,7 @@ class PorAccessManagementController {
           selectedRole: this.roles[0],
         };
       }
-      const data = await this.AccessService.accesses(
-        entity.UserAccessPolicies,
-        entity.TeamAccessPolicies,
-        parent ? parent.UserAccessPolicies : {},
-        parent ? parent.TeamAccessPolicies : {},
-        this.roles
-      );
+      const data = await this.AccessService.accesses(entity, parent, this.roles);
       this.availableUsersAndTeams = _.orderBy(data.availableUsersAndTeams, 'Name', 'asc');
       this.authorizedUsersAndTeams = data.authorizedUsersAndTeams;
     } catch (err) {

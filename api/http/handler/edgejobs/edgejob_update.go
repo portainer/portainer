@@ -82,7 +82,7 @@ func (handler *Handler) updateEdgeSchedule(edgeJob *portainer.EdgeJob, payload *
 				return err
 			}
 
-			if endpoint.Type != portainer.EdgeAgentEnvironment {
+			if endpoint.Type != portainer.EdgeAgentOnDockerEnvironment && endpoint.Type != portainer.EdgeAgentOnKubernetesEnvironment {
 				continue
 			}
 

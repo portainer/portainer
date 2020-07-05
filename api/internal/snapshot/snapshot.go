@@ -7,16 +7,19 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
-// Service repesents a service to manage system snapshots
+// Service repesents a service to manage endpoint snapshots.
+// It provides an interface to start background snapshots as well as
+// specific Docker/Kubernetes endpoint snapshot methods.
 type Service struct {
 	dataStore                 portainer.DataStore
 	refreshSignal             chan struct{}
 	snapshotIntervalInSeconds float64
-	snapshotter               portainer.Snapshotter
+	dockerSnapshotter         portainer.DockerSnapshotter
+	kubernetesSnapshotter     portainer.KubernetesSnapshotter
 }
 
 // NewService creates a new instance of a service
-func NewService(snapshotInterval string, dataStore portainer.DataStore, snapshotter portainer.Snapshotter) (*Service, error) {
+func NewService(snapshotInterval string, dataStore portainer.DataStore, dockerSnapshotter portainer.DockerSnapshotter, kubernetesSnapshotter portainer.KubernetesSnapshotter) (*Service, error) {
 	snapshotFrequency, err := time.ParseDuration(snapshotInterval)
 	if err != nil {
 		return nil, err
@@ -25,11 +28,12 @@ func NewService(snapshotInterval string, dataStore portainer.DataStore, snapshot
 	return &Service{
 		dataStore:                 dataStore,
 		snapshotIntervalInSeconds: snapshotFrequency.Seconds(),
-		snapshotter:               snapshotter,
+		dockerSnapshotter:         dockerSnapshotter,
+		kubernetesSnapshotter:     kubernetesSnapshotter,
 	}, nil
 }
 
-// Start starts the service
+// Start will start a background routine to execute periodic snapshots of endpoints
 func (service *Service) Start() {
 	if service.refreshSignal != nil {
 		return
@@ -58,6 +62,55 @@ func (service *Service) SetSnapshotInterval(snapshotInterval string) error {
 	service.snapshotIntervalInSeconds = snapshotFrequency.Seconds()
 
 	service.Start()
+
+	return nil
+}
+
+// SupportDirectSnapshot checks whether an endpoint can be used to trigger a direct a snapshot.
+// It is mostly true for all endpoints except Edge and Azure endpoints.
+func SupportDirectSnapshot(endpoint *portainer.Endpoint) bool {
+	switch endpoint.Type {
+	case portainer.EdgeAgentOnDockerEnvironment, portainer.EdgeAgentOnKubernetesEnvironment, portainer.AzureEnvironment:
+		return false
+	}
+	return true
+}
+
+// SnapshotEndpoint will create a snapshot of the endpoint based on the endpoint type.
+// If the snapshot is a success, it will be associated to the endpoint.
+func (service *Service) SnapshotEndpoint(endpoint *portainer.Endpoint) error {
+	switch endpoint.Type {
+	case portainer.AzureEnvironment:
+		return nil
+	case portainer.KubernetesLocalEnvironment, portainer.AgentOnKubernetesEnvironment, portainer.EdgeAgentOnKubernetesEnvironment:
+		return service.snapshotKubernetesEndpoint(endpoint)
+	}
+
+	return service.snapshotDockerEndpoint(endpoint)
+}
+
+func (service *Service) snapshotKubernetesEndpoint(endpoint *portainer.Endpoint) error {
+	snapshot, err := service.kubernetesSnapshotter.CreateSnapshot(endpoint)
+	if err != nil {
+		return err
+	}
+
+	if snapshot != nil {
+		endpoint.Kubernetes.Snapshots = []portainer.KubernetesSnapshot{*snapshot}
+	}
+
+	return nil
+}
+
+func (service *Service) snapshotDockerEndpoint(endpoint *portainer.Endpoint) error {
+	snapshot, err := service.dockerSnapshotter.CreateSnapshot(endpoint)
+	if err != nil {
+		return err
+	}
+
+	if snapshot != nil {
+		endpoint.Snapshots = []portainer.DockerSnapshot{*snapshot}
+	}
 
 	return nil
 }
@@ -96,11 +149,11 @@ func (service *Service) snapshotEndpoints() error {
 	}
 
 	for _, endpoint := range endpoints {
-		if endpoint.Type == portainer.EdgeAgentEnvironment {
+		if !SupportDirectSnapshot(&endpoint) {
 			continue
 		}
 
-		snapshot, snapshotError := service.snapshotter.CreateSnapshot(&endpoint)
+		snapshotError := service.SnapshotEndpoint(&endpoint)
 
 		latestEndpointReference, err := service.dataStore.Endpoint().Endpoint(endpoint.ID)
 		if latestEndpointReference == nil {
@@ -114,9 +167,8 @@ func (service *Service) snapshotEndpoints() error {
 			latestEndpointReference.Status = portainer.EndpointStatusDown
 		}
 
-		if snapshot != nil {
-			latestEndpointReference.Snapshots = []portainer.Snapshot{*snapshot}
-		}
+		latestEndpointReference.Snapshots = endpoint.Snapshots
+		latestEndpointReference.Kubernetes.Snapshots = endpoint.Kubernetes.Snapshots
 
 		err = service.dataStore.Endpoint().UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)
 		if err != nil {

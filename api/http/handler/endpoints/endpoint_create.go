@@ -13,7 +13,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/internal/edge"
 )
@@ -118,11 +117,11 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 		}
 		payload.AzureAuthenticationKey = azureAuthenticationKey
 	default:
-		url, err := request.RetrieveMultiPartFormValue(r, "URL", true)
+		endpointURL, err := request.RetrieveMultiPartFormValue(r, "URL", true)
 		if err != nil {
 			return portainer.Error("Invalid endpoint URL")
 		}
-		payload.URL = url
+		payload.URL = endpointURL
 
 		publicURL, _ := request.RetrieveMultiPartFormValue(r, "PublicURL", true)
 		payload.PublicURL = publicURL
@@ -167,7 +166,7 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 		EdgeStacks: map[portainer.EdgeStackID]bool{},
 	}
 
-	if endpoint.Type == portainer.EdgeAgentEnvironment {
+	if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
 		relatedEdgeStacks := edge.EndpointRelatedEdgeStacks(endpoint, endpointGroup, edgeGroups, edgeStacks)
 		for _, stackID := range relatedEdgeStacks {
 			relationObject.EdgeStacks[stackID] = true
@@ -183,14 +182,22 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 }
 
 func (handler *Handler) createEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
-	if portainer.EndpointType(payload.EndpointType) == portainer.AzureEnvironment {
+	switch portainer.EndpointType(payload.EndpointType) {
+	case portainer.AzureEnvironment:
 		return handler.createAzureEndpoint(payload)
-	} else if portainer.EndpointType(payload.EndpointType) == portainer.EdgeAgentEnvironment {
-		return handler.createEdgeAgentEndpoint(payload)
+
+	case portainer.EdgeAgentOnDockerEnvironment:
+		return handler.createEdgeAgentEndpoint(payload, portainer.EdgeAgentOnDockerEnvironment)
+
+	case portainer.KubernetesLocalEnvironment:
+		return handler.createKubernetesEndpoint(payload)
+
+	case portainer.EdgeAgentOnKubernetesEnvironment:
+		return handler.createEdgeAgentEndpoint(payload, portainer.EdgeAgentOnKubernetesEnvironment)
 	}
 
 	if payload.TLS {
-		return handler.createTLSSecuredEndpoint(payload)
+		return handler.createTLSSecuredEndpoint(payload, portainer.EndpointType(payload.EndpointType))
 	}
 	return handler.createUnsecuredEndpoint(payload)
 }
@@ -222,7 +229,8 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 		AzureCredentials:   credentials,
 		TagIDs:             payload.TagIDs,
 		Status:             portainer.EndpointStatusUp,
-		Snapshots:          []portainer.Snapshot{},
+		Snapshots:          []portainer.DockerSnapshot{},
+		Kubernetes:         portainer.KubernetesDefault(),
 	}
 
 	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
@@ -233,8 +241,7 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 	return endpoint, nil
 }
 
-func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
-	endpointType := portainer.EdgeAgentEnvironment
+func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload, endpointType portainer.EndpointType) (*portainer.Endpoint, *httperror.HandlerError) {
 	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
 
 	portainerURL, err := url.Parse(payload.URL)
@@ -267,9 +274,10 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		Extensions:          []portainer.EndpointExtension{},
 		TagIDs:              payload.TagIDs,
 		Status:              portainer.EndpointStatusUp,
-		Snapshots:           []portainer.Snapshot{},
+		Snapshots:           []portainer.DockerSnapshot{},
 		EdgeKey:             edgeKey,
 		EdgeCheckinInterval: payload.EdgeCheckinInterval,
+		Kubernetes:          portainer.KubernetesDefault(),
 	}
 
 	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
@@ -287,14 +295,6 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 		payload.URL = "unix:///var/run/docker.sock"
 		if runtime.GOOS == "windows" {
 			payload.URL = "npipe:////./pipe/docker_engine"
-		}
-	} else {
-		agentOnDockerEnvironment, err := client.ExecutePingOperation(payload.URL, nil)
-		if err != nil {
-			return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to ping Docker environment", err}
-		}
-		if agentOnDockerEnvironment {
-			endpointType = portainer.AgentOnDockerEnvironment
 		}
 	}
 
@@ -314,7 +314,8 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 		Extensions:         []portainer.EndpointExtension{},
 		TagIDs:             payload.TagIDs,
 		Status:             portainer.EndpointStatusUp,
-		Snapshots:          []portainer.Snapshot{},
+		Snapshots:          []portainer.DockerSnapshot{},
+		Kubernetes:         portainer.KubernetesDefault(),
 	}
 
 	err := handler.snapshotAndPersistEndpoint(endpoint)
@@ -325,22 +326,42 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 	return endpoint, nil
 }
 
-func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
-	tlsConfig, err := crypto.CreateTLSConfigurationFromBytes(payload.TLSCACertFile, payload.TLSCertFile, payload.TLSKeyFile, payload.TLSSkipClientVerify, payload.TLSSkipVerify)
+func (handler *Handler) createKubernetesEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
+	if payload.URL == "" {
+		payload.URL = "https://kubernetes.default.svc"
+	}
+
+	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
+
+	endpoint := &portainer.Endpoint{
+		ID:        portainer.EndpointID(endpointID),
+		Name:      payload.Name,
+		URL:       payload.URL,
+		Type:      portainer.KubernetesLocalEnvironment,
+		GroupID:   portainer.EndpointGroupID(payload.GroupID),
+		PublicURL: payload.PublicURL,
+		TLSConfig: portainer.TLSConfiguration{
+			TLS:           payload.TLS,
+			TLSSkipVerify: payload.TLSSkipVerify,
+		},
+		UserAccessPolicies: portainer.UserAccessPolicies{},
+		TeamAccessPolicies: portainer.TeamAccessPolicies{},
+		Extensions:         []portainer.EndpointExtension{},
+		TagIDs:             payload.TagIDs,
+		Status:             portainer.EndpointStatusUp,
+		Snapshots:          []portainer.DockerSnapshot{},
+		Kubernetes:         portainer.KubernetesDefault(),
+	}
+
+	err := handler.snapshotAndPersistEndpoint(endpoint)
 	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to create TLS configuration", err}
+		return nil, err
 	}
 
-	agentOnDockerEnvironment, err := client.ExecutePingOperation(payload.URL, tlsConfig)
-	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to ping Docker environment", err}
-	}
+	return endpoint, nil
+}
 
-	endpointType := portainer.DockerEnvironment
-	if agentOnDockerEnvironment {
-		endpointType = portainer.AgentOnDockerEnvironment
-	}
-
+func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload, endpointType portainer.EndpointType) (*portainer.Endpoint, *httperror.HandlerError) {
 	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
 		ID:        portainer.EndpointID(endpointID),
@@ -358,34 +379,30 @@ func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload)
 		Extensions:         []portainer.EndpointExtension{},
 		TagIDs:             payload.TagIDs,
 		Status:             portainer.EndpointStatusUp,
-		Snapshots:          []portainer.Snapshot{},
+		Snapshots:          []portainer.DockerSnapshot{},
+		Kubernetes:         portainer.KubernetesDefault(),
 	}
 
-	filesystemError := handler.storeTLSFiles(endpoint, payload)
+	err := handler.storeTLSFiles(endpoint, payload)
 	if err != nil {
-		return nil, filesystemError
+		return nil, err
 	}
 
-	endpointCreationError := handler.snapshotAndPersistEndpoint(endpoint)
-	if endpointCreationError != nil {
-		return nil, endpointCreationError
+	err = handler.snapshotAndPersistEndpoint(endpoint)
+	if err != nil {
+		return nil, err
 	}
 
 	return endpoint, nil
 }
 
 func (handler *Handler) snapshotAndPersistEndpoint(endpoint *portainer.Endpoint) *httperror.HandlerError {
-	snapshot, err := handler.Snapshotter.CreateSnapshot(endpoint)
-	endpoint.Status = portainer.EndpointStatusUp
+	err := handler.SnapshotService.SnapshotEndpoint(endpoint)
 	if err != nil {
 		if strings.Contains(err.Error(), "Invalid request signature") {
 			err = errors.New("agent already paired with another Portainer instance")
 		}
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to initiate communications with endpoint", err}
-	}
-
-	if snapshot != nil {
-		endpoint.Snapshots = []portainer.Snapshot{*snapshot}
 	}
 
 	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)

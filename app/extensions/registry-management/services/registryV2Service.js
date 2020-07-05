@@ -1,6 +1,5 @@
 import _ from 'lodash-es';
-import { RepositoryShortTag } from '../models/repositoryTag';
-import { RepositoryAddTagPayload } from '../models/repositoryTag';
+import { RepositoryAddTagPayload, RepositoryShortTag } from '../models/repositoryTag';
 import { RegistryRepositoryViewModel } from '../models/registryRepository';
 import genericAsyncGenerator from './genericAsyncGenerator';
 

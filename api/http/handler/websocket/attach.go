@@ -64,7 +64,7 @@ func (handler *Handler) handleAttachRequest(w http.ResponseWriter, r *http.Reque
 
 	if params.endpoint.Type == portainer.AgentOnDockerEnvironment {
 		return handler.proxyAgentWebsocketRequest(w, r, params)
-	} else if params.endpoint.Type == portainer.EdgeAgentEnvironment {
+	} else if params.endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
 		return handler.proxyEdgeAgentWebsocketRequest(w, r, params)
 	}
 

@@ -128,6 +128,21 @@ angular.module('portainer.app').factory('ModalService', [
       });
     };
 
+    service.confirmUpdate = function (message, callback) {
+      message = $sanitize(message);
+      service.confirm({
+        title: 'Are you sure ?',
+        message: message,
+        buttons: {
+          confirm: {
+            label: 'Update',
+            className: 'btn-warning',
+          },
+        },
+        callback: callback,
+      });
+    };
+
     service.confirmContainerDeletion = function (title, callback) {
       title = $sanitize(title);
       prompt({

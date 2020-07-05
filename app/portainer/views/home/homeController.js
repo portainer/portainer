@@ -15,7 +15,8 @@ angular
     LegacyExtensionManager,
     ModalService,
     MotdService,
-    SystemService
+    SystemService,
+    KubernetesHealthService
   ) {
     $scope.state = {
       connectingToEdgeEndpoint: false,
@@ -30,6 +31,10 @@ angular
         return switchToAzureEndpoint(endpoint);
       } else if (endpoint.Type === 4) {
         return switchToEdgeEndpoint(endpoint);
+      } else if (endpoint.Type === 5 || endpoint.Type === 6) {
+        return switchToKubernetesEndpoint(endpoint);
+      } else if (endpoint.Type === 7) {
+        return switchToKubernetesEdgeEndpoint(endpoint);
       }
 
       checkEndpointStatus(endpoint)
@@ -102,6 +107,17 @@ angular
         });
     }
 
+    function switchToKubernetesEndpoint(endpoint) {
+      EndpointProvider.setEndpointID(endpoint.Id);
+      StateManager.updateEndpointState(endpoint, [])
+        .then(function success() {
+          $state.go('kubernetes.dashboard');
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to connect to the Kubernetes endpoint');
+        });
+    }
+
     function switchToEdgeEndpoint(endpoint) {
       if (!endpoint.EdgeID) {
         $state.go('portainer.endpoints.endpoint', { id: endpoint.Id });
@@ -118,6 +134,26 @@ angular
         })
         .finally(function final() {
           switchToDockerEndpoint(endpoint);
+        });
+    }
+
+    function switchToKubernetesEdgeEndpoint(endpoint) {
+      if (!endpoint.EdgeID) {
+        $state.go('portainer.endpoints.endpoint', { id: endpoint.Id });
+        return;
+      }
+
+      EndpointProvider.setEndpointID(endpoint.Id);
+      $scope.state.connectingToEdgeEndpoint = true;
+      KubernetesHealthService.ping()
+        .then(function success() {
+          endpoint.Status = 1;
+        })
+        .catch(function error() {
+          endpoint.Status = 2;
+        })
+        .finally(function final() {
+          switchToKubernetesEndpoint(endpoint);
         });
     }
 

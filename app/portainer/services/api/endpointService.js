@@ -1,3 +1,5 @@
+import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
+
 angular.module('portainer.app').factory('EndpointService', [
   '$q',
   'Endpoints',
@@ -57,7 +59,7 @@ angular.module('portainer.app').factory('EndpointService', [
     service.createLocalEndpoint = function () {
       var deferred = $q.defer();
 
-      FileUploadService.createEndpoint('local', 1, '', '', 1, [], false)
+      FileUploadService.createEndpoint('local', PortainerEndpointTypes.DockerEnvironment, '', '', 1, [], false)
         .then(function success(response) {
           deferred.resolve(response.data);
         })
@@ -86,7 +88,11 @@ angular.module('portainer.app').factory('EndpointService', [
       var deferred = $q.defer();
 
       var endpointURL = URL;
-      if (type !== 4) {
+      if (
+        type !== PortainerEndpointTypes.EdgeAgentOnDockerEnvironment &&
+        type !== PortainerEndpointTypes.AgentOnKubernetesEnvironment &&
+        type !== PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment
+      ) {
         endpointURL = 'tcp://' + URL;
       }
 
@@ -105,6 +111,20 @@ angular.module('portainer.app').factory('EndpointService', [
         TLSKeyFile,
         checkinInterval
       )
+        .then(function success(response) {
+          deferred.resolve(response.data);
+        })
+        .catch(function error(err) {
+          deferred.reject({ msg: 'Unable to create endpoint', err: err });
+        });
+
+      return deferred.promise;
+    };
+
+    service.createLocalKubernetesEndpoint = function () {
+      var deferred = $q.defer();
+
+      FileUploadService.createEndpoint('local', 5, '', '', 1, [], true, true, true)
         .then(function success(response) {
           deferred.resolve(response.data);
         })

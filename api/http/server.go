@@ -1,23 +1,20 @@
 package http
 
 import (
+	"net/http"
+	"path/filepath"
 	"time"
-
-	"github.com/portainer/portainer/api/http/handler/edgegroups"
-	"github.com/portainer/portainer/api/http/handler/edgestacks"
-	"github.com/portainer/portainer/api/http/handler/edgetemplates"
-	"github.com/portainer/portainer/api/http/handler/endpointedge"
-	"github.com/portainer/portainer/api/http/handler/support"
-	"github.com/portainer/portainer/api/internal/snapshot"
-
-	"github.com/portainer/portainer/api/http/handler/roles"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/handler"
 	"github.com/portainer/portainer/api/http/handler/auth"
 	"github.com/portainer/portainer/api/http/handler/dockerhub"
+	"github.com/portainer/portainer/api/http/handler/edgegroups"
 	"github.com/portainer/portainer/api/http/handler/edgejobs"
+	"github.com/portainer/portainer/api/http/handler/edgestacks"
+	"github.com/portainer/portainer/api/http/handler/edgetemplates"
+	"github.com/portainer/portainer/api/http/handler/endpointedge"
 	"github.com/portainer/portainer/api/http/handler/endpointgroups"
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
 	"github.com/portainer/portainer/api/http/handler/endpoints"
@@ -26,9 +23,11 @@ import (
 	"github.com/portainer/portainer/api/http/handler/motd"
 	"github.com/portainer/portainer/api/http/handler/registries"
 	"github.com/portainer/portainer/api/http/handler/resourcecontrols"
+	"github.com/portainer/portainer/api/http/handler/roles"
 	"github.com/portainer/portainer/api/http/handler/settings"
 	"github.com/portainer/portainer/api/http/handler/stacks"
 	"github.com/portainer/portainer/api/http/handler/status"
+	"github.com/portainer/portainer/api/http/handler/support"
 	"github.com/portainer/portainer/api/http/handler/tags"
 	"github.com/portainer/portainer/api/http/handler/teammemberships"
 	"github.com/portainer/portainer/api/http/handler/teams"
@@ -38,43 +37,43 @@ import (
 	"github.com/portainer/portainer/api/http/handler/webhooks"
 	"github.com/portainer/portainer/api/http/handler/websocket"
 	"github.com/portainer/portainer/api/http/proxy"
+	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
-
-	"net/http"
-	"path/filepath"
+	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
 // Server implements the portainer.Server interface
 type Server struct {
-	BindAddress          string
-	AssetsPath           string
-	Status               *portainer.Status
-	ReverseTunnelService portainer.ReverseTunnelService
-	ExtensionManager     portainer.ExtensionManager
-	ComposeStackManager  portainer.ComposeStackManager
-	CryptoService        portainer.CryptoService
-	SignatureService     portainer.DigitalSignatureService
-	SnapshotService      *snapshot.Service
-	Snapshotter          portainer.Snapshotter
-	FileService          portainer.FileService
-	DataStore            portainer.DataStore
-	GitService           portainer.GitService
-	JWTService           portainer.JWTService
-	LDAPService          portainer.LDAPService
-	SwarmStackManager    portainer.SwarmStackManager
-	Handler              *handler.Handler
-	SSL                  bool
-	SSLCert              string
-	SSLKey               string
-	DockerClientFactory  *docker.ClientFactory
+	BindAddress             string
+	AssetsPath              string
+	Status                  *portainer.Status
+	ReverseTunnelService    portainer.ReverseTunnelService
+	ExtensionManager        portainer.ExtensionManager
+	ComposeStackManager     portainer.ComposeStackManager
+	CryptoService           portainer.CryptoService
+	SignatureService        portainer.DigitalSignatureService
+	SnapshotService         portainer.SnapshotService
+	FileService             portainer.FileService
+	DataStore               portainer.DataStore
+	GitService              portainer.GitService
+	JWTService              portainer.JWTService
+	LDAPService             portainer.LDAPService
+	SwarmStackManager       portainer.SwarmStackManager
+	Handler                 *handler.Handler
+	SSL                     bool
+	SSLCert                 string
+	SSLKey                  string
+	DockerClientFactory     *docker.ClientFactory
+	KubernetesClientFactory *cli.ClientFactory
+	KubernetesDeployer      portainer.KubernetesDeployer
 }
 
 // Start starts the HTTP server
 func (server *Server) Start() error {
-	proxyManager := proxy.NewManager(server.DataStore, server.SignatureService, server.ReverseTunnelService, server.DockerClientFactory)
-
 	authorizationService := authorization.NewService(server.DataStore)
+	kubernetesTokenCacheManager := kubernetes.NewTokenCacheManager()
+	proxyManager := proxy.NewManager(server.DataStore, server.SignatureService, server.ReverseTunnelService, server.DockerClientFactory, server.KubernetesClientFactory, kubernetesTokenCacheManager)
 
 	rbacExtensionURL := proxyManager.GetExtensionURL(portainer.RBACExtension)
 	requestBouncer := security.NewRequestBouncer(server.DataStore, server.JWTService, rbacExtensionURL)
@@ -88,6 +87,7 @@ func (server *Server) Start() error {
 	authHandler.LDAPService = server.LDAPService
 	authHandler.ProxyManager = proxyManager
 	authHandler.AuthorizationService = authorizationService
+	authHandler.KubernetesTokenCacheManager = kubernetesTokenCacheManager
 
 	var roleHandler = roles.NewHandler(requestBouncer)
 	roleHandler.DataStore = server.DataStore
@@ -116,8 +116,9 @@ func (server *Server) Start() error {
 	endpointHandler.AuthorizationService = authorizationService
 	endpointHandler.FileService = server.FileService
 	endpointHandler.ProxyManager = proxyManager
+	endpointHandler.SnapshotService = server.SnapshotService
+	endpointHandler.ProxyManager = proxyManager
 	endpointHandler.ReverseTunnelService = server.ReverseTunnelService
-	endpointHandler.Snapshotter = server.Snapshotter
 
 	var endpointEdgeHandler = endpointedge.NewHandler(requestBouncer)
 	endpointEdgeHandler.DataStore = server.DataStore
@@ -163,6 +164,7 @@ func (server *Server) Start() error {
 	stackHandler.FileService = server.FileService
 	stackHandler.SwarmStackManager = server.SwarmStackManager
 	stackHandler.ComposeStackManager = server.ComposeStackManager
+	stackHandler.KubernetesDeployer = server.KubernetesDeployer
 	stackHandler.GitService = server.GitService
 
 	var tagHandler = tags.NewHandler(requestBouncer)
@@ -195,6 +197,7 @@ func (server *Server) Start() error {
 	websocketHandler.DataStore = server.DataStore
 	websocketHandler.SignatureService = server.SignatureService
 	websocketHandler.ReverseTunnelService = server.ReverseTunnelService
+	websocketHandler.KubernetesClientFactory = server.KubernetesClientFactory
 
 	var webhookHandler = webhooks.NewHandler(requestBouncer)
 	webhookHandler.DataStore = server.DataStore

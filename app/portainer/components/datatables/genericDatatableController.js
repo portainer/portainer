@@ -6,6 +6,7 @@ function isBetween(value, a, b) {
   return (value >= a && value <= b) || (value >= b && value <= a);
 }
 
+// TODO: review - refactor to use a class that can be extended
 angular.module('portainer.app').controller('GenericDatatableController', [
   '$interval',
   'PaginationService',

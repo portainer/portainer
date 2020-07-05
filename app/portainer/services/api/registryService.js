@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 import { RegistryTypes } from 'Extensions/registry-management/models/registryTypes';
-import { RegistryViewModel, RegistryCreateRequest } from '../../models/registry';
+import { RegistryCreateRequest, RegistryViewModel } from '../../models/registry';
 
 angular.module('portainer.app').factory('RegistryService', [
   '$q',
