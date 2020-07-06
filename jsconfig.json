@@ -3,6 +3,7 @@
     "target": "es2017",
     "allowSyntheticDefaultImports": false,
     "baseUrl": "app",
+    "module": "commonjs",
     "paths": {
       "Agent/*": ["agent/*"],
       "Azure/*": ["azure/*"],

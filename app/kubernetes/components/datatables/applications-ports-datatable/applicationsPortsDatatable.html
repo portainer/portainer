@@ -102,6 +102,9 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Protocol' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
+              <th>
+                Ingress rules
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -123,15 +126,17 @@
                 <span class="label label-primary image-tag label-margins" ng-if="!$ctrl.isSystemNamespace(item) && $ctrl.isExternalApplication(item)">external</span>
               </td>
               <td>
-                <span ng-if="item.ServiceType === 'LoadBalancer'">
+                <span ng-if="item.ServiceType === $ctrl.KubernetesServiceTypes.LOAD_BALANCER">
                   <span> <i class="fa fa-project-diagram" aria-hidden="true" style="margin-right: 2px;"></i> Load balancer </span>
                   <span class="text-muted small" style="margin-left: 5px;">
                     <span ng-if="item.LoadBalancerIPAddress">{{ item.LoadBalancerIPAddress }}</span>
                     <span ng-if="!item.LoadBalancerIPAddress">pending</span>
                   </span>
                 </span>
-                <span ng-if="item.ServiceType === 'ClusterIP'"> <i class="fa fa-list-alt" aria-hidden="true" style="margin-right: 2px;"></i> Internal </span>
-                <span ng-if="item.ServiceType === 'NodePort'"> <i class="fa fa-list" aria-hidden="true" style="margin-right: 2px;"></i> Cluster </span>
+                <span ng-if="item.ServiceType === $ctrl.KubernetesServiceTypes.CLUSTER_IP">
+                  <i class="fa fa-list-alt" aria-hidden="true" style="margin-right: 2px;"></i> Internal
+                </span>
+                <span ng-if="item.ServiceType === $ctrl.KubernetesServiceTypes.NODE_PORT"> <i class="fa fa-list" aria-hidden="true" style="margin-right: 2px;"></i> Cluster </span>
               </td>
               <td ng-if="!$ctrl.itemCanExpand(item)">
                 {{ item.Ports[0].Port }}
@@ -141,6 +146,12 @@
               </td>
               <td ng-if="!$ctrl.itemCanExpand(item)">{{ item.Ports[0].TargetPort }}</td>
               <td ng-if="!$ctrl.itemCanExpand(item)">{{ item.Ports[0].Protocol }}</td>
+              <td ng-if="!$ctrl.itemCanExpand(item) && $ctrl.itemHasIngressRules(item)">
+                <a ng-href="{{ item.Ports[0].IngressRules[0].Host }}{{ item.Ports[0].IngressRules[0].Path }}" target="_blank">{{ item.Ports[0].IngressRules[0].Path }}</a>
+                <span ng-if="item.Ports[0].IngressRules.length > 1"> + {{ item.Ports[0].IngressRules.length - 1 }} more</span>
+              </td>
+              <td ng-if="!$ctrl.itemCanExpand(item) && !$ctrl.itemHasIngressRules(item)">-</td>
+              <td ng-if="$ctrl.itemCanExpand(item)"></td>
               <td ng-if="$ctrl.itemCanExpand(item)"></td>
               <td ng-if="$ctrl.itemCanExpand(item)"></td>
               <td ng-if="$ctrl.itemCanExpand(item)"></td>
@@ -157,6 +168,11 @@
               </td>
               <td>{{ port.TargetPort }}</td>
               <td>{{ port.Protocol }}</td>
+              <td ng-if="$ctrl.portHasIngressRules(port)">
+                <a ng-href="{{ port.IngressRules[0].Host }}{{ port.IngressRules[0].Path }}" target="_blank">{{ port.IngressRules[0].Path }}</a>
+                <span ng-if="port.IngressRules.length > 1"> + {{ ports.IngressRules.length - 1 }} more</span>
+              </td>
+              <td ng-if="!$ctrl.portHasIngressRules(port)">-</td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
               <td colspan="6" class="text-center text-muted">Loading...</td>

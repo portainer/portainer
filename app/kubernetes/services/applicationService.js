@@ -27,7 +27,8 @@ class KubernetesApplicationService {
     KubernetesNamespaceService,
     KubernetesPodService,
     KubernetesHistoryService,
-    KubernetesHorizontalPodAutoScalerService
+    KubernetesHorizontalPodAutoScalerService,
+    KubernetesIngressService
   ) {
     this.$async = $async;
     this.Authentication = Authentication;
@@ -41,6 +42,7 @@ class KubernetesApplicationService {
     this.KubernetesPodService = KubernetesPodService;
     this.KubernetesHistoryService = KubernetesHistoryService;
     this.KubernetesHorizontalPodAutoScalerService = KubernetesHorizontalPodAutoScalerService;
+    this.KubernetesIngressService = KubernetesIngressService;
 
     this.getAsync = this.getAsync.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
@@ -73,25 +75,26 @@ class KubernetesApplicationService {
    */
   async getAsync(namespace, name) {
     try {
-      const [deployment, daemonSet, statefulSet, pods, autoScalers] = await Promise.allSettled([
+      const [deployment, daemonSet, statefulSet, pods, autoScalers, ingresses] = await Promise.allSettled([
         this.KubernetesDeploymentService.get(namespace, name),
         this.KubernetesDaemonSetService.get(namespace, name),
         this.KubernetesStatefulSetService.get(namespace, name),
         this.KubernetesPodService.get(namespace),
         this.KubernetesHorizontalPodAutoScalerService.get(namespace),
+        this.KubernetesIngressService.get(namespace),
       ]);
 
       let rootItem;
-      let converterFunction;
+      let converterFunc;
       if (deployment.status === 'fulfilled') {
         rootItem = deployment;
-        converterFunction = KubernetesApplicationConverter.apiDeploymentToApplication;
+        converterFunc = KubernetesApplicationConverter.apiDeploymentToApplication;
       } else if (daemonSet.status === 'fulfilled') {
         rootItem = daemonSet;
-        converterFunction = KubernetesApplicationConverter.apiDaemonSetToApplication;
+        converterFunc = KubernetesApplicationConverter.apiDaemonSetToApplication;
       } else if (statefulSet.status === 'fulfilled') {
         rootItem = statefulSet;
-        converterFunction = KubernetesApplicationConverter.apiStatefulSetToapplication;
+        converterFunc = KubernetesApplicationConverter.apiStatefulSetToapplication;
       } else {
         throw new PortainerError('Unable to determine which association to use');
       }
@@ -100,7 +103,7 @@ class KubernetesApplicationService {
       const boundService = KubernetesServiceHelper.findApplicationBoundService(services, rootItem.value.Raw);
       const service = boundService ? await this.KubernetesServiceService.get(namespace, boundService.metadata.name) : {};
 
-      const application = converterFunction(rootItem.value.Raw, service.Raw);
+      const application = converterFunc(rootItem.value.Raw, service.Raw, ingresses.value);
       application.Yaml = rootItem.value.Yaml;
       application.Raw = rootItem.value.Raw;
       application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods.value, application.Raw);
@@ -117,6 +120,8 @@ class KubernetesApplicationService {
       if (scaler && scaler.Yaml) {
         application.Yaml += '---\n' + scaler.Yaml;
       }
+      // TODO: refactor
+      // append ingress yaml ?
       return application;
     } catch (err) {
       throw err;
@@ -126,33 +131,35 @@ class KubernetesApplicationService {
   async getAllAsync(namespace) {
     try {
       const namespaces = namespace ? [namespace] : _.map(await this.KubernetesNamespaceService.get(), 'Name');
+
+      const convertToApplication = (item, converterFunc, services, pods, ingresses) => {
+        const service = KubernetesServiceHelper.findApplicationBoundService(services, item);
+        const application = converterFunc(item, service, ingresses);
+        application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods, item);
+        return application;
+      };
+
       const res = await Promise.all(
         _.map(namespaces, async (ns) => {
-          const [deployments, daemonSets, statefulSets, services, pods] = await Promise.all([
+          const [deployments, daemonSets, statefulSets, services, pods, ingresses] = await Promise.all([
             this.KubernetesDeploymentService.get(ns),
             this.KubernetesDaemonSetService.get(ns),
             this.KubernetesStatefulSetService.get(ns),
             this.KubernetesServiceService.get(ns),
             this.KubernetesPodService.get(ns),
+            this.KubernetesIngressService.get(ns),
           ]);
-          const deploymentApplications = _.map(deployments, (item) => {
-            const service = KubernetesServiceHelper.findApplicationBoundService(services, item);
-            const application = KubernetesApplicationConverter.apiDeploymentToApplication(item, service);
-            application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods, item);
-            return application;
-          });
-          const daemonSetApplications = _.map(daemonSets, (item) => {
-            const service = KubernetesServiceHelper.findApplicationBoundService(services, item);
-            const application = KubernetesApplicationConverter.apiDaemonSetToApplication(item, service);
-            application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods, item);
-            return application;
-          });
-          const statefulSetApplications = _.map(statefulSets, (item) => {
-            const service = KubernetesServiceHelper.findApplicationBoundService(services, item);
-            const application = KubernetesApplicationConverter.apiStatefulSetToapplication(item, service);
-            application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods, item);
-            return application;
-          });
+
+          const deploymentApplications = _.map(deployments, (item) =>
+            convertToApplication(item, KubernetesApplicationConverter.apiDeploymentToApplication, services, pods, ingresses)
+          );
+          const daemonSetApplications = _.map(daemonSets, (item) =>
+            convertToApplication(item, KubernetesApplicationConverter.apiDaemonSetToApplication, services, pods, ingresses)
+          );
+          const statefulSetApplications = _.map(statefulSets, (item) =>
+            convertToApplication(item, KubernetesApplicationConverter.apiStatefulSetToapplication, services, pods, ingresses)
+          );
+
           return _.concat(deploymentApplications, daemonSetApplications, statefulSetApplications);
         })
       );

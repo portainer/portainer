@@ -3,6 +3,7 @@ import _ from 'lodash-es';
 import { KubernetesApplicationDataAccessPolicies, KubernetesApplicationDeploymentTypes } from 'Kubernetes/models/application/models';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
+import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 
 class KubernetesApplicationController {
   /* @ngInject */
@@ -34,6 +35,7 @@ class KubernetesApplicationController {
     this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
 
     this.ApplicationDataAccessPolicies = KubernetesApplicationDataAccessPolicies;
+    this.KubernetesServiceTypes = KubernetesServiceTypes;
 
     this.onInit = this.onInit.bind(this);
     this.getApplication = this.getApplication.bind(this);

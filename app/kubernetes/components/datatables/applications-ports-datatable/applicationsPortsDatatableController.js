@@ -1,6 +1,7 @@
 import _ from 'lodash-es';
 import { KubernetesApplicationDeploymentTypes } from 'Kubernetes/models/application/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
+import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 
 angular.module('portainer.docker').controller('KubernetesApplicationsPortsDatatableController', [
   '$scope',
@@ -16,6 +17,7 @@ angular.module('portainer.docker').controller('KubernetesApplicationsPortsDatata
     });
 
     var ctrl = this;
+    this.KubernetesServiceTypes = KubernetesServiceTypes;
 
     this.settings = Object.assign(this.settings, {
       showSystem: false,
@@ -49,7 +51,15 @@ angular.module('portainer.docker').controller('KubernetesApplicationsPortsDatata
     };
 
     this.itemCanExpand = function (item) {
-      return item.Ports.length > 1;
+      return item.Ports && item.Ports.length > 1;
+    };
+
+    this.itemHasIngressRules = function (item) {
+      return item.Ports && _.filter(item.Ports, (p) => ctrl.portHasIngressRules(p)).length > 0;
+    };
+
+    this.portHasIngressRules = function (port) {
+      return port.IngressRules.length > 0;
     };
 
     this.hasExpandableItems = function () {

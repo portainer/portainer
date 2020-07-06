@@ -3,6 +3,7 @@ export const KubernetesServiceHeadlessClusterIP = 'None';
 export const KubernetesServiceTypes = Object.freeze({
   LOAD_BALANCER: 'LoadBalancer',
   NODE_PORT: 'NodePort',
+  CLUSTER_IP: 'ClusterIP',
 });
 
 /**
