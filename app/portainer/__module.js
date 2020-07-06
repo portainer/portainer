@@ -80,6 +80,21 @@ angular.module('portainer.app', []).config([
       url: '/:endpointId',
       parent: 'root',
       abstract: true,
+      resolve: {
+        endpoint($async, $state, $transition$, EndpointService) {
+          return $async(async () => {
+            const endpointId = +$transition$.params().endpointId;
+
+            const endpoint = await EndpointService.endpoint(endpointId);
+            if ((endpoint.Type === 4 || endpoint.Type === 7) && !endpoint.EdgeID) {
+              $state.go('portainer.endpoints.endpoint', { id: endpoint.Id });
+              return;
+            }
+
+            return endpoint;
+          });
+        },
+      },
     };
 
     var portainer = {
