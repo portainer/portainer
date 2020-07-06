@@ -13,7 +13,7 @@ angular
     EndpointProvider,
     StateManager,
     ModalService,
-    MotdService,
+    MotdService
   ) {
     $scope.state = {
       connectingToEdgeEndpoint: false,
@@ -28,9 +28,12 @@ angular
         $state.go('azure.dashboard', { endpointId: endpoint.Id });
         return;
       }
-      if ((endpoint.Type === 4 || endpoint.Type === 7) && !endpoint.EdgeID) {
-        $state.go('portainer.endpoints.endpoint', { id: endpoint.Id });
-        return;
+      if (endpoint.Type === 4 || endpoint.Type === 7) {
+        if (!endpoint.EdgeID) {
+          $state.go('portainer.endpoints.endpoint', { id: endpoint.Id });
+          return;
+        }
+        $scope.state.connectingToEdgeEndpoint = true;
       }
       if (endpoint.Type === 5 || endpoint.Type === 6 || endpoint.Type === 7) {
         $state.go('kubernetes.dashboard', { endpointId: endpoint.Id });
