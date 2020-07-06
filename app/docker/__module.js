@@ -7,7 +7,51 @@ angular.module('portainer.docker', ['portainer.app']).config([
       name: 'docker',
       parent: 'endpoint',
       abstract: true,
-      url: '/:endpointId',
+      resolve: {
+        /* ngInject */
+        async endpointCheck(endpoint, $async, EndpointService, EndpointProvider, LegacyExtensionManager, StateManager, SystemService) {
+          return $async(async () => {
+            const status = await checkEndpointStatus(endpoint);
+
+            if (endpoint.Type !== 4) {
+              await updateEndpointStatus(endpoint, status);
+            }
+            endpoint.Status = status;
+
+            if (status === 2) {
+              if (!endpoint.Snapshots[0]) {
+                throw new Error('Endpoint is unreachable and there is no snapshot available for offline browsing.');
+              }
+              if (endpoint.Snapshots[0].Swarm === true) {
+                throw new Error('Endpoint is unreachable. Connect to another swarm manager.');
+              }
+            }
+
+            EndpointProvider.setEndpointID(endpoint.Id);
+            EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
+            EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
+
+            const extensions = await LegacyExtensionManager.initEndpointExtensions(endpoint);
+            return StateManager.updateEndpointState(endpoint, extensions);
+          });
+
+          async function checkEndpointStatus(endpoint) {
+            try {
+              await SystemService.ping(endpoint.Id);
+              return 1;
+            } catch (e) {
+              return 2;
+            }
+          }
+
+          async function updateEndpointStatus(endpoint, status) {
+            if (endpoint.Status === status) {
+              return;
+            }
+            await EndpointService.updateEndpoint(endpoint.Id, { Status: status });
+          }
+        },
+      },
     };
 
     var stacks = {
