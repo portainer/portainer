@@ -8,6 +8,24 @@ angular.module('portainer.kubernetes', ['portainer.app']).config([
       url: '/kubernetes',
       parent: 'endpoint',
       abstract: true,
+      resolve: {
+        /* @ngInject */
+        endpointCheck($async, endpoint, EndpointProvider, KubernetesHealthService, StateManager) {
+          return $async(async () => {
+            if (endpoint.Type === 7) {
+              try {
+                await KubernetesHealthService.ping();
+                endpoint.Status = 1;
+              } catch (e) {
+                endpoint.Status = 2;
+              }
+            }
+
+            EndpointProvider.setEndpointID(endpoint.Id);
+            return StateManager.updateEndpointState(endpoint, []);
+          });
+        },
+      },
     };
 
     const applications = {
