@@ -99,19 +99,11 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
       ipamConfig.AuxiliaryAddresses = {};
       _.forEach(ipFormValues.AuxiliaryAddresses, (auxAddress, index) => {
         const split = _.split(auxAddress, '=');
-        let name = '';
-        let ip = '';
         if (split.length === 2) {
-          name = split[0];
-          ip = split[1];
+          ipamConfig.AuxiliaryAddresses[split[0]] = split[1];
         } else {
-          name = 'device' + index;
-          ip = auxAddress;
+          ipamConfig.AuxiliaryAddresses['device' + index] = auxAddress;
         }
-        if (ip === ipFormValues.Gateway) {
-          throw new Error('Exclude ip cannot be the same as gateway');
-        }
-        ipamConfig.AuxiliaryAddresses[name] = ip;
       });
     }
 
@@ -230,11 +222,7 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
     }
 
     $scope.create = function () {
-      try {
-        var networkConfiguration = prepareConfiguration();
-      } catch (err) {
-        Notifications.error('Failure', err, 'An error occured during network creation');
-      }
+      var networkConfiguration = prepareConfiguration();
       var accessControlData = $scope.formValues.AccessControlData;
       var userDetails = Authentication.getUserDetails();
       var isAdmin = Authentication.isAdmin();
