@@ -1,10 +1,10 @@
 <rd-header>
   <rd-header-title title-text="Stack details">
-    <a data-toggle="tooltip" title-text="Refresh" ui-sref="portainer.stacks.stack({id: stack.Id})" ui-sref-opts="{reload: true}">
+    <a data-toggle="tooltip" title-text="Refresh" ui-sref="docker.stacks.stack({id: stack.Id})" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
-  <rd-header-content> <a ui-sref="portainer.stacks">Stacks</a> &gt; {{ stackName }} </rd-header-content>
+  <rd-header-content> <a ui-sref="docker.stacks">Stacks</a> &gt; {{ stackName }} </rd-header-content>
 </rd-header>
 
 <div class="row">

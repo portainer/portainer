@@ -376,40 +376,6 @@ angular.module('portainer.app', []).config([
       },
     };
 
-    var stacks = {
-      name: 'stacks',
-      url: '/stacks',
-      parent: 'endpoint',
-      views: {
-        'content@': {
-          templateUrl: './views/stacks/stacks.html',
-          controller: 'StacksController',
-        },
-      },
-    };
-
-    var stack = {
-      name: 'stacks.stack',
-      url: '/:name?id&type&external',
-      views: {
-        'content@': {
-          templateUrl: './views/stacks/edit/stack.html',
-          controller: 'StackController',
-        },
-      },
-    };
-
-    var stackCreation = {
-      name: 'stacks.newstack',
-      url: '/newstack',
-      views: {
-        'content@': {
-          templateUrl: './views/stacks/create/createstack.html',
-          controller: 'CreateStackController',
-        },
-      },
-    };
-
     var support = {
       name: 'portainer.support',
       url: '/support',
@@ -566,9 +532,7 @@ angular.module('portainer.app', []).config([
     $stateRegistryProvider.register(registryCreation);
     $stateRegistryProvider.register(settings);
     $stateRegistryProvider.register(settingsAuthentication);
-    $stateRegistryProvider.register(stacks);
-    $stateRegistryProvider.register(stack);
-    $stateRegistryProvider.register(stackCreation);
+
     $stateRegistryProvider.register(support);
     $stateRegistryProvider.register(supportProduct);
     $stateRegistryProvider.register(tags);

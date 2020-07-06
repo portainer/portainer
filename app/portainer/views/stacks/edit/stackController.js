@@ -56,7 +56,7 @@ angular.module('portainer.app').controller('StackController', [
 
       function onDuplicationSuccess() {
         Notifications.success('Stack successfully duplicated');
-        $state.go('portainer.stacks', { endpointId: $state.params.endpointId }, { reload: true });
+        $state.go('docker.stacks', { endpointId: $state.params.endpointId }, { reload: true });
         EndpointProvider.setEndpointID(stack.EndpointId);
       }
 
@@ -122,7 +122,7 @@ angular.module('portainer.app').controller('StackController', [
       return migrateRequest(stack, targetEndpointId, name)
         .then(function success() {
           Notifications.success('Stack successfully migrated', stack.Name);
-          $state.go('portainer.stacks', { endpointId: $state.params.endpointId }, { reload: true });
+          $state.go('stacks', { endpointId: $state.params.endpointId }, { reload: true });
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to migrate stack');
@@ -139,7 +139,7 @@ angular.module('portainer.app').controller('StackController', [
       StackService.remove(stack, $transition$.params().external, endpointId)
         .then(function success() {
           Notifications.success('Stack successfully removed', stack.Name);
-          $state.go('portainer.stacks', { endpointId });
+          $state.go('stacks', { endpointId });
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to remove stack ' + stack.Name);

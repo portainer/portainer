@@ -52,7 +52,7 @@
         >
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.stacks.newstack" authorization="PortainerStackCreate">
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.stacks.newstack" authorization="PortainerStackCreate">
           <i class="fa fa-plus space-right" aria-hidden="true"></i>Add stack
         </button>
       </div>
@@ -110,7 +110,7 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="!$ctrl.allowSelection(item)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ng-if="!$ctrl.offlineMode" ui-sref="portainer.stacks.stack({ name: item.Name, id: item.Id, type: item.Type, external: item.External })">{{ item.Name }}</a>
+                <a ng-if="!$ctrl.offlineMode" ui-sref="stacks.stack({ name: item.Name, id: item.Id, type: item.Type, external: item.External })">{{ item.Name }}</a>
                 <span ng-if="$ctrl.offlineMode">{{ item.Name }}</span>
               </td>
               <td>{{ item.Type === 1 ? 'Swarm' : 'Compose' }}</td>
