@@ -97,6 +97,14 @@ angular.module('portainer.app').factory('FileUploadService', [
       });
     };
 
+    service.createCustomTemplate = function createCustomTemplate(data) {
+      return Upload.upload({
+        url: 'api/custom_templates?method=file',
+        data,
+        ignoreLoadingBar: true,
+      });
+    };
+
     service.configureRegistry = function (registryId, registryManagementConfigurationModel) {
       return Upload.upload({
         url: 'api/registries/' + registryId + '/configure',

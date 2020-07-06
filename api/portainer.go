@@ -61,6 +61,27 @@ type (
 		SnapshotInterval          *string
 	}
 
+	// CustomTemplate represents a custom template
+	CustomTemplate struct {
+		ID              CustomTemplateID       `json:"Id"`
+		Title           string                 `json:"Title"`
+		Description     string                 `json:"Description"`
+		ProjectPath     string                 `json:"ProjectPath"`
+		EntryPoint      string                 `json:"EntryPoint"`
+		CreatedByUserID UserID                 `json:"CreatedByUserId"`
+		Note            string                 `json:"Note"`
+		Platform        CustomTemplatePlatform `json:"Platform"`
+		Logo            string                 `json:"Logo"`
+		Type            StackType              `json:"Type"`
+		ResourceControl *ResourceControl       `json:"ResourceControl"`
+	}
+
+	// CustomTemplateID represents a custom template identifier
+	CustomTemplateID int
+
+	// CustomTemplatePlatform represents a custom template platform
+	CustomTemplatePlatform int
+
 	// DockerHub represents all the required information to connect and use the
 	// Docker Hub
 	DockerHub struct {
@@ -746,6 +767,16 @@ type (
 		CompareHashAndData(hash string, data string) error
 	}
 
+	// CustomTemplateService represents a service to manage custom templates
+	CustomTemplateService interface {
+		GetNextIdentifier() int
+		CustomTemplates() ([]CustomTemplate, error)
+		CustomTemplate(ID CustomTemplateID) (*CustomTemplate, error)
+		CreateCustomTemplate(customTemplate *CustomTemplate) error
+		UpdateCustomTemplate(ID CustomTemplateID, customTemplate *CustomTemplate) error
+		DeleteCustomTemplate(ID CustomTemplateID) error
+	}
+
 	// DataStore defines the interface to manage the data
 	DataStore interface {
 		Open() error
@@ -755,6 +786,7 @@ type (
 		MigrateData() error
 
 		DockerHub() DockerHubService
+		CustomTemplate() CustomTemplateService
 		EdgeGroup() EdgeGroupService
 		EdgeJob() EdgeJobService
 		EdgeStack() EdgeStackService
@@ -897,6 +929,9 @@ type (
 		StoreEdgeJobTaskLogFileFromBytes(edgeJobID, taskID string, data []byte) error
 		ExtractExtensionArchive(data []byte) error
 		GetBinaryFolder() string
+		StoreCustomTemplateFileFromBytes(identifier, fileName string, data []byte) (string, error)
+		GetCustomTemplateProjectPath(identifier string) string
+		GetTemporaryPath() (string, error)
 	}
 
 	// GitService represents a service for managing Git
@@ -1141,6 +1176,14 @@ const (
 )
 
 const (
+	_ CustomTemplatePlatform = iota
+	// CustomTemplatePlatformLinux represents a custom template for linux
+	CustomTemplatePlatformLinux
+	// CustomTemplatePlatformWindows represents a custom template for windows
+	CustomTemplatePlatformWindows
+)
+
+const (
 	_ EdgeStackStatusType = iota
 	//StatusOk represents a successfully deployed edge stack
 	StatusOk
@@ -1240,6 +1283,8 @@ const (
 	StackResourceControl
 	// ConfigResourceControl represents a resource control associated to a Docker config
 	ConfigResourceControl
+	// CustomTemplateResourceControl  represents a resource control associated to a custom template
+	CustomTemplateResourceControl
 )
 
 const (

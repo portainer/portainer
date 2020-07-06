@@ -9,77 +9,15 @@
 
 <div class="row">
   <!-- stack-form -->
-  <div class="col-sm-12" ng-if="state.selectedTemplate && (state.selectedTemplate.Type === 2 || state.selectedTemplate.Type === 3)">
-    <rd-widget>
-      <rd-widget-custom-header icon="state.selectedTemplate.Logo" title-text="state.selectedTemplate.Title"></rd-widget-custom-header>
-      <rd-widget-body classes="padding">
-        <form class="form-horizontal">
-          <!-- description -->
-          <div ng-if="state.selectedTemplate.Note">
-            <div class="col-sm-12 form-section-title">
-              Information
-            </div>
-            <div class="form-group">
-              <div class="col-sm-12">
-                <div class="template-note" ng-if="state.selectedTemplate.Note" ng-bind-html="state.selectedTemplate.Note"></div>
-              </div>
-            </div>
-          </div>
-          <!-- !description -->
-          <div class="col-sm-12 form-section-title">
-            Configuration
-          </div>
-          <!-- name-input -->
-          <div class="form-group">
-            <label for="container_name" class="col-sm-2 control-label text-left">Name</label>
-            <div class="col-sm-10">
-              <input type="text" name="container_name" class="form-control" ng-model="formValues.name" placeholder="e.g. myStack" required />
-            </div>
-          </div>
-          <!-- !name-input -->
-          <!-- env -->
-          <div ng-repeat="var in state.selectedTemplate.Env" ng-if="!var.preset || var.select" class="form-group">
-            <label for="field_{{ $index }}" class="col-sm-2 control-label text-left">
-              {{ var.label }}
-              <portainer-tooltip ng-if="var.description" position="bottom" message="{{ var.description }}"></portainer-tooltip>
-            </label>
-            <div class="col-sm-10">
-              <input type="text" class="form-control" ng-if="!var.select" ng-model="var.value" id="field_{{ $index }}" />
-              <select class="form-control" ng-if="var.select" ng-model="var.value" id="field_{{ $index }}">
-                <option selected disabled hidden value="">Select value</option>
-                <option ng-repeat="choice in var.select" value="{{ choice.value }}">{{ choice.text }}</option>
-              </select>
-            </div>
-          </div>
-          <!-- !env -->
-          <!-- access-control -->
-          <por-access-control-form form-data="formValues.AccessControlData"></por-access-control-form>
-          <!-- !access-control -->
-          <!-- actions -->
-          <div class="col-sm-12 form-section-title">
-            Actions
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <button
-                type="button"
-                class="btn btn-primary btn-sm"
-                ng-disabled="state.actionInProgress || !formValues.name"
-                ng-click="createTemplate()"
-                button-spinner="state.actionInProgress"
-              >
-                <span ng-hide="state.actionInProgress">Deploy the stack</span>
-                <span ng-show="state.actionInProgress">Deployment in progress...</span>
-              </button>
-              <button type="button" class="btn btn-sm btn-default" ng-click="unselectTemplate(state.selectedTemplate)">Hide</button>
-              <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
-            </div>
-          </div>
-          <!-- !actions -->
-        </form>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
+  <stack-from-template-form
+    ng-if="state.selectedTemplate && (state.selectedTemplate.Type === 2 || state.selectedTemplate.Type === 3)"
+    template="state.selectedTemplate"
+    form-values="formValues"
+    state="state"
+    create-template="createTemplate"
+    unselect-template="unselectTemplate"
+  >
+  </stack-from-template-form>
   <!-- !stack-form -->
   <!-- container-form -->
   <div class="col-sm-12" ng-if="state.selectedTemplate && state.selectedTemplate.Type === 1">

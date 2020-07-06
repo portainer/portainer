@@ -7,6 +7,7 @@ import (
 
 	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt/customtemplate"
 	"github.com/portainer/portainer/api/bolt/dockerhub"
 	"github.com/portainer/portainer/api/bolt/edgegroup"
 	"github.com/portainer/portainer/api/bolt/edgejob"
@@ -43,6 +44,7 @@ type Store struct {
 	db                      *bolt.DB
 	isNew                   bool
 	fileService             portainer.FileService
+	CustomTemplateService   *customtemplate.Service
 	DockerHubService        *dockerhub.Service
 	EdgeGroupService        *edgegroup.Service
 	EdgeJobService          *edgejob.Service
@@ -168,6 +170,12 @@ func (store *Store) initServices() error {
 	}
 	store.RoleService = authorizationsetService
 
+	customTemplateService, err := customtemplate.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.CustomTemplateService = customTemplateService
+
 	dockerhubService, err := dockerhub.NewService(store.db)
 	if err != nil {
 		return err
@@ -289,6 +297,11 @@ func (store *Store) initServices() error {
 	store.ScheduleService = scheduleService
 
 	return nil
+}
+
+// CustomTemplate gives access to the CustomTemplate data management layer
+func (store *Store) CustomTemplate() portainer.CustomTemplateService {
+	return store.CustomTemplateService
 }
 
 // DockerHub gives access to the DockerHub data management layer

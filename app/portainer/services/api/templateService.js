@@ -43,6 +43,11 @@ angular.module('portainer.app').factory('TemplateService', [
       return deferred.promise;
     };
 
+    service.templateFile = templateFile;
+    function templateFile(repositoryUrl, composeFilePathInRepository) {
+      return Templates.file({ repositoryUrl, composeFilePathInRepository }).$promise;
+    }
+
     service.createTemplateConfiguration = function (template, containerName, network) {
       var imageConfiguration = ImageHelper.createImageConfigForContainer(template.RegistryModel);
       var containerConfiguration = createContainerConfiguration(template, containerName, network);

@@ -22,6 +22,10 @@ angular.module('portainer.app').controller('porAccessControlFormController', [
       } else {
         ctrl.formData.Ownership = resourceControl.Ownership;
       }
+
+      if (ctrl.formData.Ownership === RCO.PUBLIC) {
+        ctrl.formData.AccessControlEnabled = false;
+      }
     }
 
     function setAuthorizedUsersAndTeams(authorizedUsers, authorizedTeams) {
