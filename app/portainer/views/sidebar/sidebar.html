@@ -24,7 +24,6 @@
         swarm-management="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'"
         standalone-management="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE'"
         admin-access="isAdmin"
-        endpoint-id="endpointId"
         offline-mode="endpointState.OfflineMode"
       ></docker-sidebar-content>
       <li class="sidebar-title" authorization="IntegrationStoridgeAdmin" ng-if="applicationState.endpoint.mode && applicationState.endpoint.extensions.length > 0">
