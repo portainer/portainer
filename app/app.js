@@ -80,7 +80,7 @@ angular.module('portainer').run([
           return await switchToAzureEndpoint(endpoint);
         }
 
-        if (endpoint.Type === 4 && !endpoint.EdgeID) {
+        if ((endpoint.Type === 4 || endpoint.Type === 7) && !endpoint.EdgeID) {
           return routerStateService.target('portainer.endpoints.endpoint', { id: endpoint.Id });
         }
 
@@ -126,26 +126,26 @@ angular.module('portainer').run([
         return StateManager.updateEndpointState(endpoint, extensions);
       }
 
-       async function switchToKubernetesEdgeEndpoint(endpoint) {
-         if (!endpoint.EdgeID) {
-           return routerStateService.target('portainer.endpoints.endpoint', { id: endpoint.Id });
-         }
+      async function switchToKubernetesEdgeEndpoint(endpoint) {
+        if (!endpoint.EdgeID) {
+          return routerStateService.target('portainer.endpoints.endpoint', { id: endpoint.Id });
+        }
 
-         EndpointProvider.setEndpointID(endpoint.Id);
-         // $scope.state.connectingToEdgeEndpoint = true;
-         try {
-           await KubernetesHealthService.ping();
-           endpoint.Status = 1;
-         } catch (e) {
-           endpoint.Status = 2;
-         }
-         switchToKubernetesEndpoint(endpoint);
-       }
+        EndpointProvider.setEndpointID(endpoint.Id);
+        // $scope.state.connectingToEdgeEndpoint = true;
+        try {
+          await KubernetesHealthService.ping();
+          endpoint.Status = 1;
+        } catch (e) {
+          endpoint.Status = 2;
+        }
+        switchToKubernetesEndpoint(endpoint);
+      }
 
-       async function switchToKubernetesEndpoint(endpoint) {
-         EndpointProvider.setEndpointID(endpoint.Id);
-         return StateManager.updateEndpointState(endpoint, []);
-       }
+      async function switchToKubernetesEndpoint(endpoint) {
+        EndpointProvider.setEndpointID(endpoint.Id);
+        return StateManager.updateEndpointState(endpoint, []);
+      }
 
       async function checkEndpointStatus(endpoint) {
         try {
