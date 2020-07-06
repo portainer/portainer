@@ -11,10 +11,9 @@ angular.module('portainer').run([
   'cfpLoadingBar',
   '$transitions',
   'HttpRequestHelper',
-  'EndpointService',
-  'StateManager',
-  'LegacyExtensionManager',
   function ($rootScope, $state, $interval, LocalStorage, EndpointProvider, SystemService, cfpLoadingBar, $transitions, HttpRequestHelper) {
+    'use strict';
+
     EndpointProvider.initialize();
 
     $rootScope.$state = $state;
