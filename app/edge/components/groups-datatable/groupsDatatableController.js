@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-class EdgeGroupsDatatableController {
+export class EdgeGroupsDatatableController {
   constructor($scope, $controller) {
     const allowSelection = this.allowSelection;
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
@@ -14,6 +14,3 @@ class EdgeGroupsDatatableController {
     return !item.HasEdgeStack;
   }
 }
-
-angular.module('portainer.edge').controller('EdgeGroupsDatatableController', EdgeGroupsDatatableController);
-export default EdgeGroupsDatatableController;

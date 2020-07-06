@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-class EdgeStackEndpointsDatatableController {
+export class EdgeStackEndpointsDatatableController {
   constructor($async, $scope, $controller, DatatableService, PaginationService, Notifications) {
     this.extendGenericController($controller, $scope);
     this.DatatableService = DatatableService;
@@ -106,6 +106,3 @@ class EdgeStackEndpointsDatatableController {
     }
   }
 }
-
-angular.module('portainer.edge').controller('EdgeStackEndpointsDatatableController', EdgeStackEndpointsDatatableController);
-export default EdgeStackEndpointsDatatableController;

@@ -1,6 +1,7 @@
+import angular from 'angular';
 import _ from 'lodash-es';
 
-export default class EdgeJobResultsDatatableController {
+export class EdgeJobResultsDatatableController {
   /* @ngInject */
   constructor($controller, $scope, $state) {
     this.$state = $state;
