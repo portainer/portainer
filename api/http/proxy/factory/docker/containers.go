@@ -161,6 +161,10 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 		} `json:"HostConfig"`
 	}
 
+	forbiddenResponse := &http.Response{
+		StatusCode: http.StatusForbidden,
+	}
+
 	tokenData, err := security.RetrieveTokenData(request)
 	if err != nil {
 		return nil, err
@@ -202,11 +206,11 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 			}
 
 			if partialContainer.HostConfig.Privileged {
-				return nil, errors.New("forbidden to use privileged mode")
+				return forbiddenResponse, errors.New("forbidden to use privileged mode")
 			}
 
 			if partialContainer.HostConfig.PidMode == "host" {
-				return nil, errors.New("forbidden to use pid host namespace")
+				return forbiddenResponse, errors.New("forbidden to use pid host namespace")
 			}
 
 			request.Body = ioutil.NopCloser(bytes.NewBuffer(body))

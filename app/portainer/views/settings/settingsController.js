@@ -34,7 +34,7 @@ angular.module('portainer.app').controller('SettingsController', [
       enableVolumeBrowser: false,
       enableEdgeComputeFeatures: false,
       disableStackManagementForRegularUsers: false,
-      enableHostNamespaceUse: false,
+      restrictHostNamespaceUse: false,
     };
 
     $scope.removeFilteredContainerLabel = function (index) {
@@ -72,7 +72,7 @@ angular.module('portainer.app').controller('SettingsController', [
       settings.EnableHostManagementFeatures = $scope.formValues.enableHostManagementFeatures;
       settings.EnableEdgeComputeFeatures = $scope.formValues.enableEdgeComputeFeatures;
       settings.DisableStackManagementForRegularUsers = $scope.formValues.disableStackManagementForRegularUsers;
-      settings.EnableHostNamespaceUse = !$scope.formValues.enableHostNamespaceUse;
+      settings.EnableHostNamespaceUse = !$scope.formValues.restrictHostNamespaceUse;
 
       $scope.state.actionInProgress = true;
       updateSettings(settings);
@@ -116,7 +116,7 @@ angular.module('portainer.app').controller('SettingsController', [
           $scope.formValues.enableHostManagementFeatures = settings.EnableHostManagementFeatures;
           $scope.formValues.enableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
           $scope.formValues.disableStackManagementForRegularUsers = settings.DisableStackManagementForRegularUsers;
-          $scope.formValues.enableHostNamespaceUse = !settings.EnableHostNamespaceUse;
+          $scope.formValues.restrictHostNamespaceUse = !settings.EnableHostNamespaceUse;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve application settings');
