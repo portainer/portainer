@@ -482,6 +482,54 @@ angular.module('portainer.docker', ['portainer.app']).config([
       },
     };
 
+    const templates = {
+      name: 'docker.templates',
+      url: '/templates',
+      views: {
+        'content@': {
+          templateUrl: '~Portainer/views/templates/templates.html',
+          controller: 'TemplatesController',
+        },
+      },
+    };
+
+    const customTemplates = {
+      name: 'portainer.templates.custom',
+      url: '/custom',
+
+      views: {
+        'content@': {
+          component: 'customTemplatesView',
+        },
+      },
+    };
+
+    const customTemplatesNew = {
+      name: 'portainer.templates.custom.new',
+      url: '/new?fileContent&type',
+
+      views: {
+        'content@': {
+          component: 'createCustomTemplateView',
+        },
+      },
+      params: {
+        fileContent: '',
+        type: '',
+      },
+    };
+
+    const customTemplatesEdit = {
+      name: 'portainer.templates.custom.edit',
+      url: '/:id',
+
+      views: {
+        'content@': {
+          component: 'editCustomTemplateView',
+        },
+      },
+    };
+
     $stateRegistryProvider.register(configs);
     $stateRegistryProvider.register(config);
     $stateRegistryProvider.register(configCreation);
@@ -493,6 +541,9 @@ angular.module('portainer.docker', ['portainer.app']).config([
     $stateRegistryProvider.register(containerInspect);
     $stateRegistryProvider.register(containerLogs);
     $stateRegistryProvider.register(containerStats);
+    $stateRegistryProvider.register(customTemplates);
+    $stateRegistryProvider.register(customTemplatesNew);
+    $stateRegistryProvider.register(customTemplatesEdit);
     $stateRegistryProvider.register(docker);
     $stateRegistryProvider.register(dashboard);
     $stateRegistryProvider.register(host);
@@ -523,6 +574,7 @@ angular.module('portainer.docker', ['portainer.app']).config([
     $stateRegistryProvider.register(tasks);
     $stateRegistryProvider.register(task);
     $stateRegistryProvider.register(taskLogs);
+    $stateRegistryProvider.register(templates);
     $stateRegistryProvider.register(volumes);
     $stateRegistryProvider.register(volume);
     $stateRegistryProvider.register(volumeBrowse);

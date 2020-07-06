@@ -456,54 +456,6 @@ angular.module('portainer.app', []).config([
       },
     };
 
-    var templates = {
-      name: 'portainer.templates',
-      url: '/:endpointId/templates',
-      views: {
-        'content@': {
-          templateUrl: './views/templates/templates.html',
-          controller: 'TemplatesController',
-        },
-      },
-    };
-
-    const customTemplates = {
-      name: 'portainer.templates.custom',
-      url: '/custom',
-
-      views: {
-        'content@': {
-          component: 'customTemplatesView',
-        },
-      },
-    };
-
-    const customTemplatesNew = {
-      name: 'portainer.templates.custom.new',
-      url: '/new?fileContent&type',
-
-      views: {
-        'content@': {
-          component: 'createCustomTemplateView',
-        },
-      },
-      params: {
-        fileContent: '',
-        type: '',
-      },
-    };
-
-    const customTemplatesEdit = {
-      name: 'portainer.templates.custom.edit',
-      url: '/:id',
-
-      views: {
-        'content@': {
-          component: 'editCustomTemplateView',
-        },
-      },
-    };
-
     $stateRegistryProvider.register(root);
     $stateRegistryProvider.register(endpointRoot);
     $stateRegistryProvider.register(portainer);
@@ -532,7 +484,6 @@ angular.module('portainer.app', []).config([
     $stateRegistryProvider.register(registryCreation);
     $stateRegistryProvider.register(settings);
     $stateRegistryProvider.register(settingsAuthentication);
-
     $stateRegistryProvider.register(support);
     $stateRegistryProvider.register(supportProduct);
     $stateRegistryProvider.register(tags);
@@ -540,9 +491,5 @@ angular.module('portainer.app', []).config([
     $stateRegistryProvider.register(user);
     $stateRegistryProvider.register(teams);
     $stateRegistryProvider.register(team);
-    $stateRegistryProvider.register(templates);
-    $stateRegistryProvider.register(customTemplates);
-    $stateRegistryProvider.register(customTemplatesNew);
-    $stateRegistryProvider.register(customTemplatesEdit);
   },
 ]);
