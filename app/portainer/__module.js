@@ -75,6 +75,13 @@ angular.module('portainer.app', []).config([
       },
     };
 
+    var endpointRoot = {
+      name: 'endpoint',
+      url: '/:endpointId',
+      parent: 'root',
+      abstract: true,
+    };
+
     var portainer = {
       name: 'portainer',
       parent: 'root',
@@ -370,8 +377,9 @@ angular.module('portainer.app', []).config([
     };
 
     var stacks = {
-      name: 'portainer.stacks',
-      url: '/:endpointId/stacks',
+      name: 'stacks',
+      url: '/stacks',
+      parent: 'endpoint',
       views: {
         'content@': {
           templateUrl: './views/stacks/stacks.html',
@@ -381,7 +389,7 @@ angular.module('portainer.app', []).config([
     };
 
     var stack = {
-      name: 'portainer.stacks.stack',
+      name: 'stacks.stack',
       url: '/:name?id&type&external',
       views: {
         'content@': {
@@ -392,7 +400,7 @@ angular.module('portainer.app', []).config([
     };
 
     var stackCreation = {
-      name: 'portainer.stacks.newstack',
+      name: 'stacks.newstack',
       url: '/newstack',
       views: {
         'content@': {
@@ -531,6 +539,7 @@ angular.module('portainer.app', []).config([
     };
 
     $stateRegistryProvider.register(root);
+    $stateRegistryProvider.register(endpointRoot);
     $stateRegistryProvider.register(portainer);
     $stateRegistryProvider.register(about);
     $stateRegistryProvider.register(account);

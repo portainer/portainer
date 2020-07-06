@@ -5,8 +5,8 @@ angular.module('portainer.azure', ['portainer.app']).config([
 
     var azure = {
       name: 'azure',
-      url: '/azure/:endpointId',
-      parent: 'root',
+      url: '/azure',
+      parent: 'endpoint',
       abstract: true,
     };
 

@@ -5,8 +5,8 @@ angular.module('portainer.kubernetes', ['portainer.app']).config([
 
     const kubernetes = {
       name: 'kubernetes',
-      url: '/:endpointId/kubernetes',
-      parent: 'root',
+      url: '/kubernetes',
+      parent: 'endpoint',
       abstract: true,
     };
 

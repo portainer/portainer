@@ -5,7 +5,7 @@ angular.module('portainer.docker', ['portainer.app']).config([
 
     var docker = {
       name: 'docker',
-      parent: 'root',
+      parent: 'endpoint',
       abstract: true,
       url: '/:endpointId',
     };
