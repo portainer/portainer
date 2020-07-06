@@ -8,6 +8,17 @@ angular.module('portainer.azure', ['portainer.app']).config([
       url: '/azure',
       parent: 'endpoint',
       abstract: true,
+      resolve: {
+        /* ngInject */
+        endpointCheck($async, endpoint, EndpointProvider, StateManager) {
+          return $async(async () => {
+            EndpointProvider.setEndpointID(endpoint.Id);
+            EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
+            EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
+            await StateManager.updateEndpointState(endpoint, []);
+          });
+        },
+      },
     };
 
     var containerInstances = {
