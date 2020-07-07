@@ -89,10 +89,30 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
 
     $scope.removeIPV4AuxAddress = function (index) {
       $scope.formValues.IPV4.AuxiliaryAddresses.splice(index, 1);
+      $scope.state.IPV4AuxiliaryAddressesError.splice(index, 1);
     };
 
     $scope.removeIPV6AuxAddress = function (index) {
       $scope.formValues.IPV6.AuxiliaryAddresses.splice(index, 1);
+      $scope.state.IPV6AuxiliaryAddressesError.splice(index, 1);
+    };
+
+    $scope.checkIPV4AuxiliaryAddress = function (index) {
+      if (_.includes($scope.formValues.IPV4.AuxiliaryAddresses[index], $scope.formValues.IPV4.Gateway)) {
+        $scope.state.IPV4AuxiliaryAddressesError[index] = true;
+      }
+    };
+
+    $scope.checkIPV6AuxiliaryAddress = function (index) {
+      if (_.includes($scope.formValues.IPV6.AuxiliaryAddresses[index], $scope.formValues.IPV6.Gateway)) {
+        $scope.state.IPV6AuxiliaryAddressesError[index] = true;
+      }
+    };
+
+    $scope.isValid = function () {
+      const validIPV4 = !_.reduce($scope.state.IPV4AuxiliaryAddressesError, (acc, item) => acc || item, false);
+      const validIPV6 = !_.reduce($scope.state.IPV6AuxiliaryAddressesError, (acc, item) => acc || item, false);
+      return validIPV4 && validIPV6;
     };
 
     function prepareAuxiliaryAddresses(ipamConfig, ipFormValues) {
@@ -273,6 +293,8 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
 
     function initView() {
       var apiVersion = $scope.applicationState.endpoint.apiVersion;
+      $scope.state.IPV4AuxiliaryAddressesError = [];
+      $scope.state.IPV6AuxiliaryAddressesError = [];
 
       PluginService.networkPlugins(apiVersion < 1.25)
         .then(function success(data) {

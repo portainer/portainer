@@ -90,12 +90,13 @@
               </div>
             </div>
             <div ng-repeat="auxAddress in formValues.IPV4.AuxiliaryAddresses track by $index" class="form-group">
-              <label for="ipv4_network_auxaddr" class="col-sm-2 col-lg-1 control-label text-left">Exclude IP</label>
+              <label for="ipv4_network_auxaddr_{{ $index }}" class="col-sm-2 col-lg-1 control-label text-left">Exclude IP</label>
               <div class="col-sm-4 col-lg-5">
                 <input
                   type="text"
                   class="form-control"
                   ng-model="formValues.IPV4.AuxiliaryAddresses[$index]"
+                  ng-change="checkIPV4AuxiliaryAddress($index)"
                   id="ipv4_network_auxaddr_{{ $index }}"
                   placeholder="e.g. my-router=172.20.10.129"
                 />
@@ -103,6 +104,9 @@
               <button class="btn btn-sm btn-danger" type="button" ng-click="removeIPV4AuxAddress($index)">
                 <i class="fa fa-trash" aria-hidden="true"></i>
               </button>
+              <div class="col-sm-12 small text-warning" ng-show="state.IPV4AuxiliaryAddressesError[$index]">
+                <p><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Exclude ip cannot be the same as gateway.</p>
+              </div>
             </div>
             <!-- !iprange-auxaddr-inputs -->
             <div class="form-group">
@@ -135,12 +139,13 @@
               </div>
             </div>
             <div ng-repeat="auxAddress in formValues.IPV6.AuxiliaryAddresses track by $index" class="form-group">
-              <label for="ipv4_network_auxaddr" class="col-sm-2 col-lg-1 control-label text-left">Exclude IP</label>
+              <label for="ipv6_network_auxaddr_{{ $index }}" class="col-sm-2 col-lg-1 control-label text-left">Exclude IP</label>
               <div class="col-sm-4 col-lg-5">
                 <input
                   type="text"
                   class="form-control"
                   ng-model="formValues.IPV6.AuxiliaryAddresses[$index]"
+                  ng-change="checkIPV6AuxiliaryAddress($index)"
                   id="ipv6_network_auxaddr_{{ $index }}"
                   placeholder="e.g. my-router=2001:db8::1"
                 />
@@ -148,6 +153,9 @@
               <button class="btn btn-sm btn-danger" type="button" ng-click="removeIPV6AuxAddress($index)">
                 <i class="fa fa-trash" aria-hidden="true"></i>
               </button>
+              <div class="col-sm-12 small text-warning" ng-show="state.IPV6AuxiliaryAddressesError[$index]">
+                <p><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Exclude ip cannot be the same as gateway.</p>
+              </div>
             </div>
             <!-- !iprange-auxaddr-inputs -->
             <div class="form-group">
@@ -237,7 +245,7 @@
               <button
                 type="button"
                 class="btn btn-primary btn-sm"
-                ng-disabled="state.actionInProgress || !config.Name || (config.Driver === 'macvlan' && networkCreationForm.$invalid)"
+                ng-disabled="state.actionInProgress || !config.Name || (config.Driver === 'macvlan' && networkCreationForm.$invalid) || !isValid()"
                 ng-click="create()"
                 button-spinner="state.actionInProgress"
               >
