@@ -9,30 +9,34 @@ angular.module('portainer.docker', ['portainer.app']).config([
       abstract: true,
       resolve: {
         /* ngInject */
-        async endpointCheck(endpoint, $async, EndpointService, EndpointProvider, LegacyExtensionManager, StateManager, SystemService) {
+        endpointCheck(endpoint, $async, $state, EndpointService, EndpointProvider, LegacyExtensionManager, StateManager, SystemService) {
           return $async(async () => {
-            const status = await checkEndpointStatus(endpoint);
+            try {
+              const status = await checkEndpointStatus(endpoint);
 
-            if (endpoint.Type !== 4) {
-              await updateEndpointStatus(endpoint, status);
-            }
-            endpoint.Status = status;
-
-            if (status === 2) {
-              if (!endpoint.Snapshots[0]) {
-                throw new Error('Endpoint is unreachable and there is no snapshot available for offline browsing.');
+              if (endpoint.Type !== 4) {
+                await updateEndpointStatus(endpoint, status);
               }
-              if (endpoint.Snapshots[0].Swarm === true) {
-                throw new Error('Endpoint is unreachable. Connect to another swarm manager.');
+              endpoint.Status = status;
+
+              if (status === 2) {
+                if (!endpoint.Snapshots[0]) {
+                  throw new Error('Endpoint is unreachable and there is no snapshot available for offline browsing.');
+                }
+                if (endpoint.Snapshots[0].Swarm) {
+                  throw new Error('Endpoint is unreachable. Connect to another swarm manager.');
+                }
               }
+
+              EndpointProvider.setEndpointID(endpoint.Id);
+              EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
+              EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
+
+              const extensions = await LegacyExtensionManager.initEndpointExtensions(endpoint);
+              await StateManager.updateEndpointState(endpoint, extensions);
+            } catch (e) {
+              $state.go('portainer.home', { error: e.message || e.msg }, { reload: true });
             }
-
-            EndpointProvider.setEndpointID(endpoint.Id);
-            EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
-            EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
-
-            const extensions = await LegacyExtensionManager.initEndpointExtensions(endpoint);
-            return StateManager.updateEndpointState(endpoint, extensions);
           });
 
           async function checkEndpointStatus(endpoint) {

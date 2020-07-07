@@ -10,12 +10,16 @@ angular.module('portainer.azure', ['portainer.app']).config([
       abstract: true,
       resolve: {
         /* ngInject */
-        endpointCheck($async, endpoint, EndpointProvider, StateManager) {
+        endpointCheck($async, $state, endpoint, EndpointProvider, StateManager) {
           return $async(async () => {
-            EndpointProvider.setEndpointID(endpoint.Id);
-            EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
-            EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
-            await StateManager.updateEndpointState(endpoint, []);
+            try {
+              EndpointProvider.setEndpointID(endpoint.Id);
+              EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
+              EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
+              await StateManager.updateEndpointState(endpoint, []);
+            } catch (e) {
+              $state.go('portainer.home', { error: e.message || e.msg }, { reload: true });
+            }
           });
         },
       },
