@@ -54,39 +54,6 @@ angular.module('portainer.docker', ['portainer.app']).config([
       },
     };
 
-    var stacks = {
-      name: 'docker.stacks',
-      url: '/stacks',
-      views: {
-        'content@': {
-          templateUrl: '~Portainer/views/stacks/stacks.html',
-          controller: 'StacksController',
-        },
-      },
-    };
-
-    var stack = {
-      name: 'docker.stacks.stack',
-      url: '/:name?id&type&external',
-      views: {
-        'content@': {
-          templateUrl: '~Portainer/views/stacks/edit/stack.html',
-          controller: 'StackController',
-        },
-      },
-    };
-
-    var stackCreation = {
-      name: 'docker.stacks.newstack',
-      url: '/newstack',
-      views: {
-        'content@': {
-          templateUrl: '~Portainer/views/stacks/create/createstack.html',
-          controller: 'CreateStackController',
-        },
-      },
-    };
-
     var configs = {
       name: 'docker.configs',
       url: '/configs',
@@ -206,6 +173,43 @@ angular.module('portainer.docker', ['portainer.app']).config([
         'content@': {
           templateUrl: './views/containers/stats/containerstats.html',
           controller: 'ContainerStatsController',
+        },
+      },
+    };
+
+    const customTemplates = {
+      name: 'portainer.templates.custom',
+      url: '/custom',
+
+      views: {
+        'content@': {
+          component: 'customTemplatesView',
+        },
+      },
+    };
+
+    const customTemplatesNew = {
+      name: 'portainer.templates.custom.new',
+      url: '/new?fileContent&type',
+
+      views: {
+        'content@': {
+          component: 'createCustomTemplateView',
+        },
+      },
+      params: {
+        fileContent: '',
+        type: '',
+      },
+    };
+
+    const customTemplatesEdit = {
+      name: 'portainer.templates.custom.edit',
+      url: '/:id',
+
+      views: {
+        'content@': {
+          component: 'editCustomTemplateView',
         },
       },
     };
@@ -432,6 +436,39 @@ angular.module('portainer.docker', ['portainer.app']).config([
       },
     };
 
+    var stacks = {
+      name: 'docker.stacks',
+      url: '/stacks',
+      views: {
+        'content@': {
+          templateUrl: '~Portainer/views/stacks/stacks.html',
+          controller: 'StacksController',
+        },
+      },
+    };
+
+    var stack = {
+      name: 'docker.stacks.stack',
+      url: '/:name?id&type&external',
+      views: {
+        'content@': {
+          templateUrl: '~Portainer/views/stacks/edit/stack.html',
+          controller: 'StackController',
+        },
+      },
+    };
+
+    var stackCreation = {
+      name: 'docker.stacks.newstack',
+      url: '/newstack',
+      views: {
+        'content@': {
+          templateUrl: '~Portainer/views/stacks/create/createstack.html',
+          controller: 'CreateStackController',
+        },
+      },
+    };
+
     var swarm = {
       name: 'docker.swarm',
       url: '/swarm',
@@ -482,6 +519,17 @@ angular.module('portainer.docker', ['portainer.app']).config([
       },
     };
 
+    var templates = {
+      name: 'docker.templates',
+      url: '/templates',
+      views: {
+        'content@': {
+          templateUrl: '~Portainer/views/templates/templates.html',
+          controller: 'TemplatesController',
+        },
+      },
+    };
+
     var volumes = {
       name: 'docker.volumes',
       url: '/volumes',
@@ -526,54 +574,6 @@ angular.module('portainer.docker', ['portainer.app']).config([
       },
     };
 
-    const templates = {
-      name: 'docker.templates',
-      url: '/templates',
-      views: {
-        'content@': {
-          templateUrl: '~Portainer/views/templates/templates.html',
-          controller: 'TemplatesController',
-        },
-      },
-    };
-
-    const customTemplates = {
-      name: 'portainer.templates.custom',
-      url: '/custom',
-
-      views: {
-        'content@': {
-          component: 'customTemplatesView',
-        },
-      },
-    };
-
-    const customTemplatesNew = {
-      name: 'portainer.templates.custom.new',
-      url: '/new?fileContent&type',
-
-      views: {
-        'content@': {
-          component: 'createCustomTemplateView',
-        },
-      },
-      params: {
-        fileContent: '',
-        type: '',
-      },
-    };
-
-    const customTemplatesEdit = {
-      name: 'portainer.templates.custom.edit',
-      url: '/:id',
-
-      views: {
-        'content@': {
-          component: 'editCustomTemplateView',
-        },
-      },
-    };
-
     $stateRegistryProvider.register(configs);
     $stateRegistryProvider.register(config);
     $stateRegistryProvider.register(configCreation);
@@ -610,11 +610,11 @@ angular.module('portainer.docker', ['portainer.app']).config([
     $stateRegistryProvider.register(service);
     $stateRegistryProvider.register(serviceCreation);
     $stateRegistryProvider.register(serviceLogs);
-    $stateRegistryProvider.register(swarm);
-    $stateRegistryProvider.register(swarmVisualizer);
     $stateRegistryProvider.register(stacks);
     $stateRegistryProvider.register(stack);
     $stateRegistryProvider.register(stackCreation);
+    $stateRegistryProvider.register(swarm);
+    $stateRegistryProvider.register(swarmVisualizer);
     $stateRegistryProvider.register(tasks);
     $stateRegistryProvider.register(task);
     $stateRegistryProvider.register(taskLogs);
