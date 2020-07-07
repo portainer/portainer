@@ -148,7 +148,7 @@ angular.module('portainer.app').controller('TemplatesController', [
         })
         .then(function success() {
           Notifications.success('Stack successfully deployed');
-          $state.go('docker.stacks', { endpointId });
+          $state.go('docker.stacks');
         })
         .catch(function error(err) {
           Notifications.warning('Deployment error', err.data.err);
@@ -186,7 +186,7 @@ angular.module('portainer.app').controller('TemplatesController', [
         })
         .then(function success() {
           Notifications.success('Stack successfully deployed');
-          $state.go('stacks', { endpointId });
+          $state.go('docker.stacks');
         })
         .catch(function error(err) {
           Notifications.warning('Deployment error', err.data.err);

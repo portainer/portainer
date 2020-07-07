@@ -59,7 +59,7 @@ angular
 
     function createSwarmStack(name, method) {
       var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
-      const endpointId = $scope.endpointId;
+      const endpointId = +$state.params.endpointId;
 
       if (method === 'template' || method === 'editor') {
         var stackFileContent = $scope.formValues.StackFileContent;
@@ -86,7 +86,7 @@ angular
 
     function createComposeStack(name, method) {
       var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
-      const endpointId = $scope.endpointId;
+      const endpointId = +$state.params.endpointId;
 
       if (method === 'editor' || method === 'template') {
         var stackFileContent = $scope.formValues.StackFileContent;
@@ -141,7 +141,7 @@ angular
         })
         .then(function success() {
           Notifications.success('Stack successfully deployed');
-          $state.go('docker.stacks', { endpointId: $scope.endpointId });
+          $state.go('docker.stacks');
         })
         .catch(function error(err) {
           Notifications.error('Deployment error', err, 'Unable to deploy stack');
@@ -165,7 +165,6 @@ angular
     };
 
     async function initView() {
-      $scope.endpointId = +$state.params.endpointId;
       var endpointMode = $scope.applicationState.endpoint.mode;
       $scope.state.StackType = 2;
       if (endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER') {
