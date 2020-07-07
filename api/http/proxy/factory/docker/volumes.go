@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"path"
 
 	"github.com/docker/docker/client"
 
@@ -14,7 +15,7 @@ import (
 )
 
 const (
-	volumeObjectIdentifier = "Name"
+	volumeObjectIdentifier = "ID"
 )
 
 func getInheritedResourceControlFromVolumeLabels(dockerClient *client.Client, volumeID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
@@ -45,6 +46,14 @@ func (transport *Transport) volumeListOperation(response *http.Response, executo
 	if responseObject["Volumes"] != nil {
 		volumeData := responseObject["Volumes"].([]interface{})
 
+		for _, volumeObject := range volumeData {
+			volume := volumeObject.(map[string]interface{})
+			if volume["Name"] == nil || volume["CreatedAt"] == nil {
+				return errors.New("missing identifier in Docker resource list response")
+			}
+			volume[volumeObjectIdentifier] = volume["Name"].(string) + volume["CreatedAt"].(string)
+		}
+
 		resourceOperationParameters := &resourceOperationParameters{
 			resourceIdentifierAttribute: volumeObjectIdentifier,
 			resourceType:                portainer.VolumeResourceControl,
@@ -55,7 +64,6 @@ func (transport *Transport) volumeListOperation(response *http.Response, executo
 		if err != nil {
 			return err
 		}
-
 		// Overwrite the original volume list
 		responseObject["Volumes"] = volumeData
 	}
@@ -72,6 +80,11 @@ func (transport *Transport) volumeInspectOperation(response *http.Response, exec
 	if err != nil {
 		return err
 	}
+
+	if responseObject["Name"] == nil || responseObject["CreatedAt"] == nil {
+		return errors.New("missing identifier in Docker resource detail response")
+	}
+	responseObject[volumeObjectIdentifier] = responseObject["Name"].(string) + responseObject["CreatedAt"].(string)
 
 	resourceOperationParameters := &resourceOperationParameters{
 		resourceIdentifierAttribute: volumeObjectIdentifier,
@@ -123,7 +136,48 @@ func (transport *Transport) decorateVolumeResourceCreationOperation(request *htt
 	}
 
 	if response.StatusCode == http.StatusCreated {
-		err = transport.decorateGenericResourceCreationResponse(response, resourceIdentifierAttribute, resourceType, tokenData.ID)
+		err = transport.decorateVolumeCreationResponse(response, resourceIdentifierAttribute, resourceType, tokenData.ID)
 	}
 	return response, err
+}
+
+func (transport *Transport) decorateVolumeCreationResponse(response *http.Response, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType, userID portainer.UserID) error {
+	responseObject, err := responseutils.GetResponseAsJSONOBject(response)
+	if err != nil {
+		return err
+	}
+
+	if responseObject["Name"] == nil || responseObject["CreatedAt"] == nil {
+		return errors.New("missing identifier in Docker resource creation response")
+	}
+	resourceID := responseObject["Name"].(string) + responseObject["CreatedAt"].(string)
+
+	resourceControl, err := transport.createPrivateResourceControl(resourceID, resourceType, userID)
+	if err != nil {
+		return err
+	}
+
+	responseObject = decorateObject(responseObject, resourceControl)
+
+	return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
+}
+
+func (transport *Transport) restrictedVolumeOperation(requestPath string, request *http.Request) (*http.Response, error) {
+
+	if request.Method == http.MethodGet {
+		return transport.rewriteOperation(request, transport.volumeInspectOperation)
+	}
+
+	cli := transport.dockerClient
+	volume, err := cli.VolumeInspect(context.Background(), path.Base(requestPath))
+	if err != nil {
+		return nil, err
+	}
+
+	volumeID := volume.Name + volume.CreatedAt
+
+	if request.Method == http.MethodDelete {
+		return transport.executeGenericResourceDeletionOperation(request, volumeID, portainer.VolumeResourceControl)
+	}
+	return transport.restrictedResourceOperation(request, volumeID, portainer.VolumeResourceControl, false)
 }
