@@ -97,16 +97,25 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
       $scope.state.IPV6AuxiliaryAddressesError.splice(index, 1);
     };
 
-    $scope.checkIPV4AuxiliaryAddress = function (index) {
-      if (_.includes($scope.formValues.IPV4.AuxiliaryAddresses[index], $scope.formValues.IPV4.Gateway)) {
-        $scope.state.IPV4AuxiliaryAddressesError[index] = true;
+    function checkAuxiliaryAddress(excludedIP, gateway) {
+      const split = _.split(excludedIP, '=');
+      let ip = '';
+
+      if (split.length === 2) {
+        ip = split[1];
+      } else {
+        ip = excludedIP;
       }
+
+      return ip === gateway;
+    }
+
+    $scope.checkIPV4AuxiliaryAddress = function (index) {
+      $scope.state.IPV4AuxiliaryAddressesError[index] = checkAuxiliaryAddress($scope.formValues.IPV4.AuxiliaryAddresses[index], $scope.formValues.IPV4.Gateway);
     };
 
     $scope.checkIPV6AuxiliaryAddress = function (index) {
-      if (_.includes($scope.formValues.IPV6.AuxiliaryAddresses[index], $scope.formValues.IPV6.Gateway)) {
-        $scope.state.IPV6AuxiliaryAddressesError[index] = true;
-      }
+      $scope.state.IPV6AuxiliaryAddressesError[index] = checkAuxiliaryAddress($scope.formValues.IPV6.AuxiliaryAddresses[index], $scope.formValues.IPV6.Gateway);
     };
 
     $scope.isValid = function () {
