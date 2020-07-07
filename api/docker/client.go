@@ -1,6 +1,7 @@
 package docker
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -11,8 +12,9 @@ import (
 	"github.com/portainer/portainer/api/crypto"
 )
 
+var errUnsupportedEnvironmentType = errors.New("Environment not supported")
+
 const (
-	unsupportedEnvironmentType  = portainer.Error("Environment not supported")
 	defaultDockerRequestTimeout = 60
 	dockerClientVersion         = "1.37"
 )
@@ -36,7 +38,7 @@ func NewClientFactory(signatureService portainer.DigitalSignatureService, revers
 // with an agent enabled endpoint to target a specific node in an agent cluster.
 func (factory *ClientFactory) CreateClient(endpoint *portainer.Endpoint, nodeName string) (*client.Client, error) {
 	if endpoint.Type == portainer.AzureEnvironment {
-		return nil, unsupportedEnvironmentType
+		return nil, errUnsupportedEnvironmentType
 	} else if endpoint.Type == portainer.AgentOnDockerEnvironment {
 		return createAgentClient(endpoint, factory.signatureService, nodeName)
 	} else if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {

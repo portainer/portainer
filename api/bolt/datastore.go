@@ -15,6 +15,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/endpoint"
 	"github.com/portainer/portainer/api/bolt/endpointgroup"
 	"github.com/portainer/portainer/api/bolt/endpointrelation"
+	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/extension"
 	"github.com/portainer/portainer/api/bolt/migrator"
 	"github.com/portainer/portainer/api/bolt/registry"
@@ -123,7 +124,7 @@ func (store *Store) MigrateData() error {
 	}
 
 	version, err := store.VersionService.DBVersion()
-	if err == portainer.ErrObjectNotFound {
+	if err == errors.ErrObjectNotFound {
 		version = 0
 	} else if err != nil {
 		return err

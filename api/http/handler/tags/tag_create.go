@@ -1,6 +1,7 @@
 package tags
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -16,7 +17,7 @@ type tagCreatePayload struct {
 
 func (payload *tagCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
-		return portainer.Error("Invalid tag name")
+		return errors.New("Invalid tag name")
 	}
 	return nil
 }
@@ -36,7 +37,7 @@ func (handler *Handler) tagCreate(w http.ResponseWriter, r *http.Request) *httpe
 
 	for _, tag := range tags {
 		if tag.Name == payload.Name {
-			return &httperror.HandlerError{http.StatusConflict, "This name is already associated to a tag", portainer.ErrTagAlreadyExists}
+			return &httperror.HandlerError{http.StatusConflict, "This name is already associated to a tag", errors.New("A tag already exists with this name")}
 		}
 	}
 

@@ -1,6 +1,7 @@
 package dockerhub
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -18,7 +19,7 @@ type dockerhubUpdatePayload struct {
 
 func (payload *dockerhubUpdatePayload) Validate(r *http.Request) error {
 	if payload.Authentication && (govalidator.IsNull(payload.Username) || govalidator.IsNull(payload.Password)) {
-		return portainer.Error("Invalid credentials. Username and password must be specified when authentication is enabled")
+		return errors.New("Invalid credentials. Username and password must be specified when authentication is enabled")
 	}
 	return nil
 }

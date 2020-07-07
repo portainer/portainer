@@ -1,6 +1,7 @@
 package endpointgroups
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -19,7 +20,7 @@ type endpointGroupCreatePayload struct {
 
 func (payload *endpointGroupCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
-		return portainer.Error("Invalid endpoint group name")
+		return errors.New("Invalid endpoint group name")
 	}
 	if payload.TagIDs == nil {
 		payload.TagIDs = []portainer.TagID{}

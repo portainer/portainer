@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
@@ -45,9 +46,9 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 	if !securityContext.IsAdmin {
 		rbacExtensionEnabled := true
 		_, err := handler.DataStore.Extension().Extension(portainer.RBACExtension)
-		if err == portainer.ErrObjectNotFound {
+		if err == errors.ErrObjectNotFound {
 			rbacExtensionEnabled = false
-		} else if err != nil && err != portainer.ErrObjectNotFound {
+		} else if err != nil && err != errors.ErrObjectNotFound {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check if RBAC extension is enabled", err}
 		}
 

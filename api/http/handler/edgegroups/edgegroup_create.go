@@ -1,6 +1,7 @@
 package edgegroups
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -20,13 +21,13 @@ type edgeGroupCreatePayload struct {
 
 func (payload *edgeGroupCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
-		return portainer.Error("Invalid Edge group name")
+		return errors.New("Invalid Edge group name")
 	}
 	if payload.Dynamic && (payload.TagIDs == nil || len(payload.TagIDs) == 0) {
-		return portainer.Error("TagIDs is mandatory for a dynamic Edge group")
+		return errors.New("TagIDs is mandatory for a dynamic Edge group")
 	}
 	if !payload.Dynamic && (payload.Endpoints == nil || len(payload.Endpoints) == 0) {
-		return portainer.Error("Endpoints is mandatory for a static Edge group")
+		return errors.New("Endpoints is mandatory for a static Edge group")
 	}
 	return nil
 }
@@ -45,7 +46,7 @@ func (handler *Handler) edgeGroupCreate(w http.ResponseWriter, r *http.Request) 
 
 	for _, edgeGroup := range edgeGroups {
 		if edgeGroup.Name == payload.Name {
-			return &httperror.HandlerError{http.StatusBadRequest, "Edge group name must be unique", portainer.Error("Edge group name must be unique")}
+			return &httperror.HandlerError{http.StatusBadRequest, "Edge group name must be unique", errors.New("Edge group name must be unique")}
 		}
 	}
 

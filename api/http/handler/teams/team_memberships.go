@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -23,7 +24,7 @@ func (handler *Handler) teamMemberships(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if !security.AuthorizedTeamManagement(portainer.TeamID(teamID), securityContext) {
-		return &httperror.HandlerError{http.StatusForbidden, "Access denied to team", portainer.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Access denied to team", errors.ErrResourceAccessDenied}
 	}
 
 	memberships, err := handler.DataStore.TeamMembership().TeamMembershipsByTeamID(portainer.TeamID(teamID))

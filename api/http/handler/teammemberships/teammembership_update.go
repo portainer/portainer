@@ -1,12 +1,15 @@
 package teammemberships
 
 import (
+	"errors"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -18,13 +21,13 @@ type teamMembershipUpdatePayload struct {
 
 func (payload *teamMembershipUpdatePayload) Validate(r *http.Request) error {
 	if payload.UserID == 0 {
-		return portainer.Error("Invalid UserID")
+		return errors.New("Invalid UserID")
 	}
 	if payload.TeamID == 0 {
-		return portainer.Error("Invalid TeamID")
+		return errors.New("Invalid TeamID")
 	}
 	if payload.Role != 1 && payload.Role != 2 {
-		return portainer.Error("Invalid role value. Value must be one of: 1 (leader) or 2 (member)")
+		return errors.New("Invalid role value. Value must be one of: 1 (leader) or 2 (member)")
 	}
 	return nil
 }
@@ -48,18 +51,18 @@ func (handler *Handler) teamMembershipUpdate(w http.ResponseWriter, r *http.Requ
 	}
 
 	if !security.AuthorizedTeamManagement(portainer.TeamID(payload.TeamID), securityContext) {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update the membership", portainer.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update the membership", httperrors.ErrResourceAccessDenied}
 	}
 
 	membership, err := handler.DataStore.TeamMembership().TeamMembership(portainer.TeamMembershipID(membershipID))
-	if err == portainer.ErrObjectNotFound {
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a team membership with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a team membership with the specified identifier inside the database", err}
 	}
 
 	if securityContext.IsTeamLeader && membership.Role != portainer.MembershipRole(payload.Role) {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update the role of membership", portainer.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update the role of membership", httperrors.ErrResourceAccessDenied}
 	}
 
 	membership.UserID = portainer.UserID(payload.UserID)

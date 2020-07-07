@@ -52,7 +52,7 @@ func (client *rbacExtensionClient) checkAuthorization(authRequest *portainer.API
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusNoContent {
-		return portainer.ErrAuthorizationRequired
+		return ErrAuthorizationRequired
 	}
 
 	return nil

@@ -1,6 +1,7 @@
 package registries
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -8,6 +9,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
 type registryConfigurePayload struct {
@@ -28,7 +30,7 @@ func (payload *registryConfigurePayload) Validate(r *http.Request) error {
 	if useAuthentication {
 		username, err := request.RetrieveMultiPartFormValue(r, "Username", false)
 		if err != nil {
-			return portainer.Error("Invalid username")
+			return errors.New("Invalid username")
 		}
 		payload.Username = username
 
@@ -45,19 +47,19 @@ func (payload *registryConfigurePayload) Validate(r *http.Request) error {
 	if useTLS && !skipTLSVerify {
 		cert, _, err := request.RetrieveMultiPartFormFile(r, "TLSCertFile")
 		if err != nil {
-			return portainer.Error("Invalid certificate file. Ensure that the file is uploaded correctly")
+			return errors.New("Invalid certificate file. Ensure that the file is uploaded correctly")
 		}
 		payload.TLSCertFile = cert
 
 		key, _, err := request.RetrieveMultiPartFormFile(r, "TLSKeyFile")
 		if err != nil {
-			return portainer.Error("Invalid key file. Ensure that the file is uploaded correctly")
+			return errors.New("Invalid key file. Ensure that the file is uploaded correctly")
 		}
 		payload.TLSKeyFile = key
 
 		ca, _, err := request.RetrieveMultiPartFormFile(r, "TLSCACertFile")
 		if err != nil {
-			return portainer.Error("Invalid CA certificate file. Ensure that the file is uploaded correctly")
+			return errors.New("Invalid CA certificate file. Ensure that the file is uploaded correctly")
 		}
 		payload.TLSCACertFile = ca
 	}
@@ -79,7 +81,7 @@ func (handler *Handler) registryConfigure(w http.ResponseWriter, r *http.Request
 	}
 
 	registry, err := handler.DataStore.Registry().Registry(portainer.RegistryID(registryID))
-	if err == portainer.ErrObjectNotFound {
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a registry with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a registry with the specified identifier inside the database", err}

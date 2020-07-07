@@ -11,6 +11,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt/errors"
 )
 
 // websocketAttach handles GET requests on /websocket/attach?id=<attachID>&endpointId=<endpointID>&nodeName=<nodeName>&token=<token>
@@ -33,7 +34,7 @@ func (handler *Handler) websocketAttach(w http.ResponseWriter, r *http.Request) 
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == portainer.ErrObjectNotFound {
+	if err == errors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the endpoint associated to the stack inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the endpoint associated to the stack inside the database", err}

@@ -7,11 +7,10 @@ import (
 	"time"
 
 	"github.com/dchest/uniuri"
-
-	cmap "github.com/orcaman/concurrent-map"
-
 	chserver "github.com/jpillora/chisel/server"
-	portainer "github.com/portainer/portainer/api"
+	cmap "github.com/orcaman/concurrent-map"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt/errors"
 )
 
 const (
@@ -88,7 +87,7 @@ func (service *Service) retrievePrivateKeySeed() (string, error) {
 	var serverInfo *portainer.TunnelServerInfo
 
 	serverInfo, err := service.dataStore.TunnelServer().Info()
-	if err == portainer.ErrObjectNotFound {
+	if err == errors.ErrObjectNotFound {
 		keySeed := uniuri.NewLen(16)
 
 		serverInfo = &portainer.TunnelServerInfo{

@@ -2,13 +2,14 @@ package bolt
 
 import (
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 // Init creates the default data set.
 func (store *Store) Init() error {
 	_, err := store.SettingsService.Settings()
-	if err == portainer.ErrObjectNotFound {
+	if err == errors.ErrObjectNotFound {
 		defaultSettings := &portainer.Settings{
 			AuthenticationMethod: portainer.AuthenticationInternal,
 			BlackListedLabels:    make([]portainer.Pair, 0),
@@ -42,7 +43,7 @@ func (store *Store) Init() error {
 	}
 
 	_, err = store.DockerHubService.DockerHub()
-	if err == portainer.ErrObjectNotFound {
+	if err == errors.ErrObjectNotFound {
 		defaultDockerHub := &portainer.DockerHub{
 			Authentication: false,
 			Username:       "",

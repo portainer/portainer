@@ -3,6 +3,7 @@ package client
 import (
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -14,9 +15,10 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
+var errInvalidResponseStatus = errors.New("Invalid response status (expecting 200)")
+
 const (
-	errInvalidResponseStatus = portainer.Error("Invalid response status (expecting 200)")
-	defaultHTTPTimeout       = 5
+	defaultHTTPTimeout = 5
 )
 
 // HTTPClient represents a client to send HTTP requests.
@@ -56,7 +58,7 @@ func (client *HTTPClient) ExecuteAzureAuthenticationRequest(credentials *portain
 	}
 
 	if response.StatusCode != http.StatusOK {
-		return nil, portainer.ErrAzureInvalidCredentials
+		return nil, errors.New("Invalid Azure credentials")
 	}
 
 	var token AzureAuthenticationResponse

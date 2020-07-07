@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
 type taskContainer struct {
@@ -18,22 +19,13 @@ type taskContainer struct {
 
 // GET request on /api/edge_jobs/:id/tasks
 func (handler *Handler) edgeJobTasksList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	settings, err := handler.DataStore.Settings().Settings()
-	if err != nil {
-		return &httperror.HandlerError{http.StatusServiceUnavailable, "Unable to retrieve settings", err}
-	}
-
-	if !settings.EnableEdgeComputeFeatures {
-		return &httperror.HandlerError{http.StatusServiceUnavailable, "Edge compute features are disabled", portainer.ErrHostManagementFeaturesDisabled}
-	}
-
 	edgeJobID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid Edge job identifier route variable", err}
 	}
 
 	edgeJob, err := handler.DataStore.EdgeJob().EdgeJob(portainer.EdgeJobID(edgeJobID))
-	if err == portainer.ErrObjectNotFound {
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an Edge job with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an Edge job with the specified identifier inside the database", err}

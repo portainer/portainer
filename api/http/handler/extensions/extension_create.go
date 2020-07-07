@@ -1,6 +1,7 @@
 package extensions
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -17,7 +18,7 @@ type extensionCreatePayload struct {
 
 func (payload *extensionCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.License) {
-		return portainer.Error("Invalid license")
+		return errors.New("Invalid license")
 	}
 
 	return nil
@@ -43,7 +44,7 @@ func (handler *Handler) extensionCreate(w http.ResponseWriter, r *http.Request) 
 
 	for _, existingExtension := range extensions {
 		if existingExtension.ID == extensionID && existingExtension.Enabled {
-			return &httperror.HandlerError{http.StatusConflict, "Unable to enable extension", portainer.ErrExtensionAlreadyEnabled}
+			return &httperror.HandlerError{http.StatusConflict, "Unable to enable extension", errors.New("This extension is already enabled")}
 		}
 	}
 

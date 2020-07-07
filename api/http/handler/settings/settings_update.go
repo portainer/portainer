@@ -1,6 +1,7 @@
 package settings
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/filesystem"
 )
 
@@ -31,18 +33,18 @@ type settingsUpdatePayload struct {
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 	if *payload.AuthenticationMethod != 1 && *payload.AuthenticationMethod != 2 && *payload.AuthenticationMethod != 3 {
-		return portainer.Error("Invalid authentication method value. Value must be one of: 1 (internal), 2 (LDAP/AD) or 3 (OAuth)")
+		return errors.New("Invalid authentication method value. Value must be one of: 1 (internal), 2 (LDAP/AD) or 3 (OAuth)")
 	}
 	if payload.LogoURL != nil && *payload.LogoURL != "" && !govalidator.IsURL(*payload.LogoURL) {
-		return portainer.Error("Invalid logo URL. Must correspond to a valid URL format")
+		return errors.New("Invalid logo URL. Must correspond to a valid URL format")
 	}
 	if payload.TemplatesURL != nil && *payload.TemplatesURL != "" && !govalidator.IsURL(*payload.TemplatesURL) {
-		return portainer.Error("Invalid external templates URL. Must correspond to a valid URL format")
+		return errors.New("Invalid external templates URL. Must correspond to a valid URL format")
 	}
 	if payload.UserSessionTimeout != nil {
 		_, err := time.ParseDuration(*payload.UserSessionTimeout)
 		if err != nil {
-			return portainer.Error("Invalid user session timeout")
+			return errors.New("Invalid user session timeout")
 		}
 	}
 
@@ -169,7 +171,7 @@ func (handler *Handler) updateVolumeBrowserSetting(settings *portainer.Settings)
 	}
 
 	extension, err := handler.DataStore.Extension().Extension(portainer.RBACExtension)
-	if err != nil && err != portainer.ErrObjectNotFound {
+	if err != nil && err != bolterrors.ErrObjectNotFound {
 		return err
 	}
 

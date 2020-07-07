@@ -2,6 +2,7 @@ package team
 
 import (
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/internal"
 
 	"github.com/boltdb/bolt"
@@ -64,7 +65,7 @@ func (service *Service) TeamByName(name string) (*portainer.Team, error) {
 		}
 
 		if team == nil {
-			return portainer.ErrObjectNotFound
+			return errors.ErrObjectNotFound
 		}
 
 		return nil

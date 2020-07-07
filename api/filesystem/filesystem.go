@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"encoding/pem"
+	"errors"
 	"fmt"
 	"io/ioutil"
 
@@ -49,6 +50,9 @@ const (
 	// TempPath represent the subfolder where temporary files are saved
 	TempPath = "tmp"
 )
+
+// ErrUndefinedTLSFileType represents an error returned on undefined TLS file type
+var ErrUndefinedTLSFileType = errors.New("Undefined TLS file type")
 
 // Service represents a service for managing files and directories.
 type Service struct {
@@ -194,7 +198,7 @@ func (service *Service) StoreTLSFileFromBytes(folder string, fileType portainer.
 	case portainer.TLSFileKey:
 		fileName = TLSKeyFile
 	default:
-		return "", portainer.ErrUndefinedTLSFileType
+		return "", ErrUndefinedTLSFileType
 	}
 
 	tlsFilePath := path.Join(storePath, fileName)
@@ -217,7 +221,7 @@ func (service *Service) GetPathForTLSFile(folder string, fileType portainer.TLSF
 	case portainer.TLSFileKey:
 		fileName = TLSKeyFile
 	default:
-		return "", portainer.ErrUndefinedTLSFileType
+		return "", ErrUndefinedTLSFileType
 	}
 	return path.Join(service.fileStorePath, TLSStorePath, folder, fileName), nil
 }
@@ -243,7 +247,7 @@ func (service *Service) DeleteTLSFile(folder string, fileType portainer.TLSFileT
 	case portainer.TLSFileKey:
 		fileName = TLSKeyFile
 	default:
-		return portainer.ErrUndefinedTLSFileType
+		return ErrUndefinedTLSFileType
 	}
 
 	filePath := path.Join(service.fileStorePath, TLSStorePath, folder, fileName)

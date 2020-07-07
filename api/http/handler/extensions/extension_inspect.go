@@ -3,12 +3,12 @@ package extensions
 import (
 	"net/http"
 
-	"github.com/portainer/portainer/api/http/client"
-
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/http/client"
 )
 
 // GET request on /api/extensions/:id
@@ -26,7 +26,7 @@ func (handler *Handler) extensionInspect(w http.ResponseWriter, r *http.Request)
 	}
 
 	localExtension, err := handler.DataStore.Extension().Extension(extensionID)
-	if err != nil && err != portainer.ErrObjectNotFound {
+	if err != nil && err != errors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve extension information from the database", err}
 	}
 

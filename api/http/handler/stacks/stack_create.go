@@ -11,6 +11,8 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
@@ -45,7 +47,7 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == portainer.ErrObjectNotFound {
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
@@ -68,7 +70,7 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 		return handler.createComposeStack(w, r, method, endpoint, tokenData.ID)
 	case portainer.KubernetesStack:
 		if tokenData.Role != portainer.AdministratorRole {
-			return &httperror.HandlerError{http.StatusForbidden, "Access denied", portainer.ErrUnauthorized}
+			return &httperror.HandlerError{http.StatusForbidden, "Access denied", httperrors.ErrUnauthorized}
 		}
 
 		return handler.createKubernetesStack(w, r, endpoint)
