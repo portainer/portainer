@@ -99,15 +99,11 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
 
     function checkAuxiliaryAddress(excludedIP, gateway) {
       const split = _.split(excludedIP, '=');
-      let ip = '';
 
       if (split.length === 2) {
-        ip = split[1];
-      } else {
-        ip = excludedIP;
+        return split[1] === gateway;
       }
-
-      return ip === gateway;
+      return excludedIP === gateway;
     }
 
     $scope.checkIPV4AuxiliaryAddress = function (index) {
