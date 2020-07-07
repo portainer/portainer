@@ -35,7 +35,5 @@ export const PortainerEndpointInitFormValueEndpointSections = Object.freeze([
     'fas fa-dharmachakra',
     'Manage the local Kubernetes environment'
   ),
-  new PortainerEndpointInitFormValueEndpointSection(PortainerEndpointConnectionTypes.REMOTE, 'Remote', 'fab fa-docker', 'Manage a remote Docker environment'),
   new PortainerEndpointInitFormValueEndpointSection(PortainerEndpointConnectionTypes.AGENT, 'Agent', 'fa fa-bolt', 'Connect to a Portainer agent'),
-  new PortainerEndpointInitFormValueEndpointSection(PortainerEndpointConnectionTypes.AZURE, 'Azure', 'fab fa-microsoft', 'Connect to Microsoft Azure ACI'),
 ]);

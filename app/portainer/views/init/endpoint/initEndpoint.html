@@ -45,12 +45,6 @@
             <div ng-if="ctrl.formValues.ConnectionType === ctrl.PortainerEndpointConnectionTypes.KUBERNETES_LOCAL">
               <ng-include src="'app/portainer/views/init/endpoint/includes/localKubernetes.html'"></ng-include>
             </div>
-            <div ng-if="ctrl.formValues.ConnectionType === ctrl.PortainerEndpointConnectionTypes.REMOTE">
-              <ng-include src="'app/portainer/views/init/endpoint/includes/remote.html'"></ng-include>
-            </div>
-            <div ng-if="ctrl.formValues.ConnectionType === ctrl.PortainerEndpointConnectionTypes.AZURE">
-              <ng-include src="'app/portainer/views/init/endpoint/includes/azure.html'"></ng-include>
-            </div>
             <div ng-if="ctrl.formValues.ConnectionType === ctrl.PortainerEndpointConnectionTypes.AGENT">
               <ng-include src="'app/portainer/views/init/endpoint/includes/agent.html'"></ng-include>
             </div>
