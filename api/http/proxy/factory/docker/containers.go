@@ -193,7 +193,7 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 			return nil, err
 		}
 
-		if !settings.AllowPrivilegedModeForRegularUsers || !settings.EnableHostNamespaceUse {
+		if !settings.AllowPrivilegedModeForRegularUsers || !settings.AllowHostNamespaceForRegularUsers {
 			body, err := ioutil.ReadAll(request.Body)
 			if err != nil {
 				return nil, err

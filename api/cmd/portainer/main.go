@@ -274,7 +274,7 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 			AllowPrivilegedModeForRegularUsers: true,
 			AllowVolumeBrowserForRegularUsers:  false,
 			EnableHostManagementFeatures:       false,
-			EnableHostNamespaceUse:             true,
+			AllowHostNamespaceForRegularUsers:  true,
 			SnapshotInterval:                   *flags.SnapshotInterval,
 			EdgeAgentCheckinInterval:           portainer.DefaultEdgeAgentCheckinIntervalInSeconds,
 		}

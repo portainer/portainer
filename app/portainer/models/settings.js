@@ -14,7 +14,7 @@ export function SettingsViewModel(data) {
   this.EdgeAgentCheckinInterval = data.EdgeAgentCheckinInterval;
   this.EnableEdgeComputeFeatures = data.EnableEdgeComputeFeatures;
   this.DisableStackManagementForRegularUsers = data.DisableStackManagementForRegularUsers;
-  this.EnableHostNamespaceUse = data.EnableHostNamespaceUse;
+  this.AllowHostNamespaceForRegularUsers = data.AllowHostNamespaceForRegularUsers;
 }
 
 export function PublicSettingsViewModel(settings) {

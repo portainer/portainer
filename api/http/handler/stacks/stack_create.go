@@ -157,7 +157,7 @@ func (handler *Handler) isValidStackFile(stackFileContent []byte, settings *port
 			return errors.New("privileged mode disabled for non administrator users")
 		}
 
-		if !settings.EnableHostNamespaceUse && service.Pid == "host" {
+		if !settings.AllowHostNamespaceForRegularUsers && service.Pid == "host" {
 			return errors.New("pid host disabled for non administrator users")
 		}
 	}

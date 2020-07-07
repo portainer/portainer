@@ -26,7 +26,7 @@ type settingsUpdatePayload struct {
 	EdgeAgentCheckinInterval              *int
 	EnableEdgeComputeFeatures             *bool
 	DisableStackManagementForRegularUsers *bool
-	EnableHostNamespaceUse                *bool
+	AllowHostNamespaceForRegularUsers     *bool
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
@@ -120,8 +120,8 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		settings.DisableStackManagementForRegularUsers = *payload.DisableStackManagementForRegularUsers
 	}
 
-	if payload.EnableHostNamespaceUse != nil {
-		settings.EnableHostNamespaceUse = *payload.EnableHostNamespaceUse
+	if payload.AllowHostNamespaceForRegularUsers != nil {
+		settings.AllowHostNamespaceForRegularUsers = *payload.AllowHostNamespaceForRegularUsers
 	}
 
 	if payload.SnapshotInterval != nil && *payload.SnapshotInterval != settings.SnapshotInterval {
