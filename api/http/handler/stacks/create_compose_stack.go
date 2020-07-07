@@ -1,7 +1,6 @@
 package stacks
 
 import (
-	"errors"
 	"net/http"
 	"path"
 	"regexp"
@@ -331,29 +330,12 @@ func (handler *Handler) deployComposeStack(config *composeStackDeploymentConfig)
 		return err
 	}
 
-	rbacExtension, err := handler.ExtensionService.Extension(portainer.RBACExtension)
-	if err != nil && err != portainer.ErrObjectNotFound {
-		return errors.New("Unable to verify if RBAC extension is loaded")
+	isAdminOrEndpointAdmin, err := handler.userIsAdminOrEndpointAdmin(config.user, config.endpoint.ID)
+	if err != nil {
+		return err
 	}
 
-	endpointResourceAccess := false
-	_, ok := config.user.EndpointAuthorizations[portainer.EndpointID(config.endpoint.ID)][portainer.EndpointResourcesAccess]
-	if ok {
-		endpointResourceAccess = true
-	}
-
-	mustBeChecked := false
-	if rbacExtension != nil {
-		if !config.isAdmin && !endpointResourceAccess {
-			mustBeChecked = true
-		}
-	} else {
-		if !config.isAdmin {
-			mustBeChecked = true
-		}
-	}
-
-	if (!settings.AllowBindMountsForRegularUsers || !settings.AllowPrivilegedModeForRegularUsers) && mustBeChecked {
+	if (!settings.AllowBindMountsForRegularUsers || !settings.AllowPrivilegedModeForRegularUsers || !settings.AllowHostNamespaceForRegularUsers) && !isAdminOrEndpointAdmin {
 		composeFilePath := path.Join(config.stack.ProjectPath, config.stack.EntryPoint)
 
 		stackContent, err := handler.FileService.GetFileContent(composeFilePath)

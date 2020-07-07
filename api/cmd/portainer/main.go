@@ -9,7 +9,7 @@ import (
 
 	"github.com/portainer/portainer/api/chisel"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt"
 	"github.com/portainer/portainer/api/cli"
 	"github.com/portainer/portainer/api/cron"
@@ -274,6 +274,7 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 			AllowPrivilegedModeForRegularUsers: true,
 			AllowVolumeBrowserForRegularUsers:  false,
 			EnableHostManagementFeatures:       false,
+			AllowHostNamespaceForRegularUsers:  true,
 			SnapshotInterval:                   *flags.SnapshotInterval,
 			EdgeAgentCheckinInterval:           portainer.DefaultEdgeAgentCheckinIntervalInSeconds,
 		}
