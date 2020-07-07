@@ -81,17 +81,24 @@ angular.module('portainer.app', []).config([
       parent: 'root',
       abstract: true,
       resolve: {
-        endpoint($async, $state, $transition$, EndpointService) {
+        /* @ngInject */
+        endpoint($async, $state, $transition$, EndpointService, Notifications) {
           return $async(async () => {
-            const endpointId = +$transition$.params().endpointId;
+            try {
+              const endpointId = +$transition$.params().endpointId;
 
-            const endpoint = await EndpointService.endpoint(endpointId);
-            if ((endpoint.Type === 4 || endpoint.Type === 7) && !endpoint.EdgeID) {
-              $state.go('portainer.endpoints.endpoint', { id: endpoint.Id });
+              const endpoint = await EndpointService.endpoint(endpointId);
+              if ((endpoint.Type === 4 || endpoint.Type === 7) && !endpoint.EdgeID) {
+                $state.go('portainer.endpoints.endpoint', { id: endpoint.Id });
+                return;
+              }
+
+              return endpoint;
+            } catch (e) {
+              Notifications.error('Failed loading endpoint', e);
+              $state.go('portainer.home');
               return;
             }
-
-            return endpoint;
           });
         },
       },
@@ -265,9 +272,6 @@ angular.module('portainer.app', []).config([
           templateUrl: './views/home/home.html',
           controller: 'HomeController',
         },
-      },
-      params: {
-        error: '',
       },
     };
 

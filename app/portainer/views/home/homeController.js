@@ -112,11 +112,6 @@ angular
       } catch (e) {
         Notifications.error('Failed loading tags', e);
       }
-
-      const { error } = $state.params;
-      if (error) {
-        Notifications.error('Failed loading endpoint', { msg: error });
-      }
     }
 
     initView();

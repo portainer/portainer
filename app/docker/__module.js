@@ -9,7 +9,7 @@ angular.module('portainer.docker', ['portainer.app']).config([
       abstract: true,
       resolve: {
         /* ngInject */
-        endpointCheck(endpoint, $async, $state, EndpointService, EndpointProvider, LegacyExtensionManager, StateManager, SystemService) {
+        endpointCheck(endpoint, $async, $state, EndpointService, EndpointProvider, LegacyExtensionManager, Notifications, StateManager, SystemService) {
           return $async(async () => {
             try {
               const status = await checkEndpointStatus(endpoint);
@@ -35,7 +35,8 @@ angular.module('portainer.docker', ['portainer.app']).config([
               const extensions = await LegacyExtensionManager.initEndpointExtensions(endpoint);
               await StateManager.updateEndpointState(endpoint, extensions);
             } catch (e) {
-              $state.go('portainer.home', { error: e.message || e.msg }, { reload: true });
+              Notifications.error('Failed loading endpoint', e);
+              $state.go('portainer.home');
             }
           });
 
