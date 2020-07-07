@@ -1,5 +1,5 @@
 <p align="center">
-  <img title="portainer" src='https://github.com/portainer/portainer/blob/develop/assets/images/logo_alt.png?raw=true' />
+  <img title="portainer" src='https://github.com/portainer/portainer/blob/develop/app/assets/images/logo_alt.png?raw=true' />
 </p>
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/portainer/portainer.svg)](https://hub.docker.com/r/portainer/portainer/)
