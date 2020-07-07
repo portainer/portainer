@@ -96,7 +96,7 @@ angular.module('portainer.app', []).config([
               return endpoint;
             } catch (e) {
               Notifications.error('Failed loading endpoint', e);
-              $state.go('portainer.home');
+              $state.go('portainer.home', {}, { reload: true });
               return;
             }
           });

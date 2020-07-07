@@ -181,7 +181,7 @@ angular.module('portainer.app').factory('StateManager', [
         return deferred.promise;
       }
 
-      const reload = endpoint.Status === 1 || !endpoint.Snaphosts.length || !endpoint.Snapshots[0].SnapshotRaw;
+      const reload = endpoint.Status === 1 || !endpoint.Snaphosts || !endpoint.Snaphosts.length || !endpoint.Snapshots[0].SnapshotRaw;
 
       $q.all({
         version: reload ? SystemService.version() : $q.when(endpoint.Snapshots[0].SnapshotRaw.Version),

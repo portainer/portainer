@@ -26,7 +26,7 @@ angular.module('portainer.kubernetes', ['portainer.app']).config([
               await StateManager.updateEndpointState(endpoint, []);
             } catch (e) {
               Notifications.error('Failed loading endpoint', e);
-              $state.go('portainer.home');
+              $state.go('portainer.home', {}, { reload: true });
             }
           });
         },
