@@ -18,6 +18,7 @@ type publicSettingsResponse struct {
 	EnableHostManagementFeatures       bool                           `json:"EnableHostManagementFeatures"`
 	EnableEdgeComputeFeatures          bool                           `json:"EnableEdgeComputeFeatures"`
 	OAuthLoginURI                      string                         `json:"OAuthLoginURI"`
+	AllowHostNamespaceForRegularUsers  bool                           `json:"AllowHostNamespaceForRegularUsers"`
 }
 
 // GET request on /api/settings/public
@@ -33,6 +34,7 @@ func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *
 		AllowBindMountsForRegularUsers:     settings.AllowBindMountsForRegularUsers,
 		AllowPrivilegedModeForRegularUsers: settings.AllowPrivilegedModeForRegularUsers,
 		AllowVolumeBrowserForRegularUsers:  settings.AllowVolumeBrowserForRegularUsers,
+		AllowHostNamespaceForRegularUsers:  settings.AllowHostNamespaceForRegularUsers,
 		EnableHostManagementFeatures:       settings.EnableHostManagementFeatures,
 		EnableEdgeComputeFeatures:          settings.EnableEdgeComputeFeatures,
 		OAuthLoginURI: fmt.Sprintf("%s?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&prompt=login",

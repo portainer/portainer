@@ -336,7 +336,11 @@ func (handler *Handler) deployComposeStack(config *composeStackDeploymentConfig)
 		return err
 	}
 
-	if (!settings.AllowBindMountsForRegularUsers || !settings.AllowPrivilegedModeForRegularUsers) && !isAdminOrEndpointAdmin {
+	if (!settings.AllowBindMountsForRegularUsers ||
+		!settings.AllowPrivilegedModeForRegularUsers ||
+		!settings.AllowHostNamespaceForRegularUsers) &&
+		!isAdminOrEndpointAdmin {
+
 		composeFilePath := path.Join(config.stack.ProjectPath, config.stack.EntryPoint)
 
 		stackContent, err := handler.FileService.GetFileContent(composeFilePath)
