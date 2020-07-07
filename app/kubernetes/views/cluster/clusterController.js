@@ -6,10 +6,12 @@ import { KubernetesResourceReservation } from 'Kubernetes/models/resource-reserv
 
 class KubernetesClusterController {
   /* @ngInject */
-  constructor($async, Authentication, Notifications, KubernetesNodeService, KubernetesApplicationService) {
+  constructor($async, $state, Authentication, Notifications, LocalStorage, KubernetesNodeService, KubernetesApplicationService) {
     this.$async = $async;
+    this.$state = $state;
     this.Authentication = Authentication;
     this.Notifications = Notifications;
+    this.LocalStorage = LocalStorage;
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesApplicationService = KubernetesApplicationService;
 
@@ -17,6 +19,10 @@ class KubernetesClusterController {
     this.getNodes = this.getNodes.bind(this);
     this.getNodesAsync = this.getNodesAsync.bind(this);
     this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
+  }
+
+  selectTab(index) {
+    this.LocalStorage.storeActiveTab('cluster', index);
   }
 
   async getNodesAsync() {
@@ -67,7 +73,11 @@ class KubernetesClusterController {
     this.state = {
       applicationsLoading: true,
       viewReady: false,
+      activeTab: 0,
+      currentName: this.$state.$current.name,
     };
+
+    this.state.activeTab = this.LocalStorage.getActiveTab('cluster');
 
     this.isAdmin = this.Authentication.isAdmin();
 
@@ -81,6 +91,12 @@ class KubernetesClusterController {
 
   $onInit() {
     return this.$async(this.onInit);
+  }
+
+  $onDestroy() {
+    if (this.state.currentName !== this.$state.$current.name) {
+      this.LocalStorage.storeActiveTab('cluster', 0);
+    }
   }
 }
 

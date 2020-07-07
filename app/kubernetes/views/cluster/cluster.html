@@ -9,16 +9,24 @@
     <div class="col-sm-12">
       <rd-widget>
         <rd-widget-body>
-          <form class="form-horizontal">
-            <kubernetes-resource-reservation
-              cpu="ctrl.resourceReservation.CPU"
-              cpu-limit="ctrl.CPULimit"
-              memory="ctrl.resourceReservation.Memory"
-              memory-limit="ctrl.MemoryLimit"
-              description="Resource reservation represents the total amount of resource assigned to all the applications inside the cluster."
-            >
-            </kubernetes-resource-reservation>
-          </form>
+          <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
+            <uib-tab index="0" classes="btn-sm" select="ctrl.selectTab(0)">
+              <uib-tab-heading> <i class="fa fa-file-code space-right" aria-hidden="true"></i> Resource </uib-tab-heading>
+              <form class="form-horizontal">
+                <kubernetes-resource-reservation
+                  cpu="ctrl.resourceReservation.CPU"
+                  cpu-limit="ctrl.CPULimit"
+                  memory="ctrl.resourceReservation.Memory"
+                  memory-limit="ctrl.MemoryLimit"
+                  description="Resource reservation represents the total amount of resource assigned to all the applications inside the cluster."
+                >
+                </kubernetes-resource-reservation>
+              </form>
+            </uib-tab>
+            <uib-tab index="1" classes="btn-sm" select="ctrl.selectTab(1)">
+              <uib-tab-heading> <i class="fa fa-file-code space-right" aria-hidden="true"></i> Health </uib-tab-heading>
+            </uib-tab>
+          </uib-tabset>
         </rd-widget-body>
       </rd-widget>
     </div>
