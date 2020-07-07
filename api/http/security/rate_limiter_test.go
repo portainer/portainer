@@ -7,12 +7,12 @@ import (
 	"time"
 )
 
-func TestLimitAccess(t *testing.T) {
+func TestLimitAccessOnRegularQuery(t *testing.T) {
 	testHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	})
 
-	t.Run("Request below the limit", func(t *testing.T) {
+	t.Run("Request below the limit and OK", func(t *testing.T) {
 		req := httptest.NewRequest("GET", "/", nil)
 		rr := httptest.NewRecorder()
 		rateLimiter := NewRateLimiter(10, 1*time.Second, 1*time.Hour)
@@ -26,9 +26,47 @@ func TestLimitAccess(t *testing.T) {
 		}
 	})
 
-	t.Run("Request above the limit", func(t *testing.T) {
+	t.Run("Request above the limit but still OK", func(t *testing.T) {
 		rateLimiter := NewRateLimiter(1, 1*time.Second, 1*time.Hour)
 		handler := rateLimiter.LimitAccess(testHandler)
+
+		ts := httptest.NewServer(handler)
+		defer ts.Close()
+		http.Get(ts.URL)
+		resp, err := http.Get(ts.URL)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if status := resp.StatusCode; status != http.StatusOK {
+			t.Errorf("handler returned wrong status code: got %v want %v",
+				status, http.StatusForbidden)
+		}
+	})
+}
+
+func TestLimitAccessFailureQuery(t *testing.T) {
+	testFailHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusBadRequest)
+	})
+
+	t.Run("Request below the limit but not OK", func(t *testing.T) {
+		req := httptest.NewRequest("GET", "/", nil)
+		rr := httptest.NewRecorder()
+		rateLimiter := NewRateLimiter(10, 1*time.Second, 1*time.Hour)
+		handler := rateLimiter.LimitAccess(testFailHandler)
+
+		handler.ServeHTTP(rr, req)
+
+		if status := rr.Code; status != http.StatusBadRequest {
+			t.Errorf("handler returned wrong status code: got %v want %v",
+				status, http.StatusOK)
+		}
+	})
+
+	t.Run("Request above the limit but not OK", func(t *testing.T) {
+		rateLimiter := NewRateLimiter(0, 1*time.Second, 1*time.Hour)
+		handler := rateLimiter.LimitAccess(testFailHandler)
 
 		ts := httptest.NewServer(handler)
 		defer ts.Close()
