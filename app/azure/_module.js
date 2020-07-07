@@ -8,21 +8,17 @@ angular.module('portainer.azure', ['portainer.app']).config([
       url: '/azure',
       parent: 'endpoint',
       abstract: true,
-      resolve: {
-        /* ngInject */
-        endpointCheck($async, $state, endpoint, EndpointProvider, Notifications, StateManager) {
-          return $async(async () => {
-            try {
-              EndpointProvider.setEndpointID(endpoint.Id);
-              EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
-              EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
-              await StateManager.updateEndpointState(endpoint, []);
-            } catch (e) {
-              Notifications.error('Failed loading endpoint', e);
-              $state.go('portainer.home', {}, { reload: true });
-            }
-          });
-        },
+      /* ngInject */
+      async onEnter($state, endpoint, EndpointProvider, Notifications, StateManager) {
+        try {
+          EndpointProvider.setEndpointID(endpoint.Id);
+          EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
+          EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
+          await StateManager.updateEndpointState(endpoint, []);
+        } catch (e) {
+          Notifications.error('Failed loading endpoint', e);
+          $state.go('portainer.home', {}, { reload: true });
+        }
       },
     };
 
