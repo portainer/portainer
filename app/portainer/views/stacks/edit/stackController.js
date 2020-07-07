@@ -151,15 +151,7 @@ angular.module('portainer.app').controller('StackController', [
       var env = FormHelper.removeInvalidEnvVars($scope.stack.Env);
       var prune = $scope.formValues.Prune;
       var stack = $scope.stack;
-
-      // TODO: this is a work-around for stacks created with Portainer version >= 1.17.1
-      // The EndpointID property is not available for these stacks, we can pass
-      // the current endpoint identifier as a part of the update request. It will be used if
-      // the EndpointID property is not defined on the stack.
-      var endpointId = EndpointProvider.endpointID();
-      if (stack.EndpointId === 0) {
-        stack.EndpointId = endpointId;
-      }
+      stack.EndpointId = EndpointProvider.endpointID();
 
       $scope.state.actionInProgress = true;
       StackService.updateStack(stack, stackFile, env, prune)
@@ -199,7 +191,7 @@ angular.module('portainer.app').controller('StackController', [
         });
 
       $q.all({
-        stack: StackService.stack(id),
+        stack: StackService.stack(id, EndpointProvider.endpointID()),
         groups: GroupService.groups(),
       })
         .then(function success(data) {
@@ -208,7 +200,7 @@ angular.module('portainer.app').controller('StackController', [
           $scope.stack = stack;
 
           return $q.all({
-            stackFile: StackService.getStackFile(id),
+            stackFile: StackService.getStackFile(id, EndpointProvider.endpointID()),
             resources: stack.Type === 1 ? retrieveSwarmStackResources(stack.Name, agentProxy) : retrieveComposeStackResources(stack.Name),
           });
         })

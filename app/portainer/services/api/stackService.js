@@ -15,10 +15,10 @@ angular.module('portainer.app').factory('StackService', [
     'use strict';
     var service = {};
 
-    service.stack = function (id) {
+    service.stack = function (id, endpointId) {
       var deferred = $q.defer();
 
-      Stack.get({ id: id })
+      Stack.get({ id: id, endpointId: endpointId })
         .$promise.then(function success(data) {
           var stack = new StackViewModel(data);
           deferred.resolve(stack);
@@ -30,10 +30,10 @@ angular.module('portainer.app').factory('StackService', [
       return deferred.promise;
     };
 
-    service.getStackFile = function (id) {
+    service.getStackFile = function (id, endpointId) {
       var deferred = $q.defer();
 
-      Stack.getStackFile({ id: id })
+      Stack.getStackFile({ id: id, endpointId: endpointId })
         .$promise.then(function success(data) {
           deferred.resolve(data.StackFileContent);
         })
