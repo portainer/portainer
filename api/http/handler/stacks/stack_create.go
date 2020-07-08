@@ -161,7 +161,7 @@ func (handler *Handler) isValidStackFile(stackFileContent []byte, settings *port
 			return errors.New("pid host disabled for non administrator users")
 		}
 
-		if settings.DisableDeviceMappingForRegularUsers && service.Devices != nil && len(service.Devices) > 0 {
+		if !settings.AllowDeviceMappingForRegularUsers && service.Devices != nil && len(service.Devices) > 0 {
 			return errors.New("device mapping disabled for non administrator users")
 		}
 	}

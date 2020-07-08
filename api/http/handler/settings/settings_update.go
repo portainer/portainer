@@ -27,7 +27,7 @@ type settingsUpdatePayload struct {
 	EnableEdgeComputeFeatures             *bool
 	DisableStackManagementForRegularUsers *bool
 	AllowHostNamespaceForRegularUsers     *bool
-	DisableDeviceMappingForRegularUsers   *bool
+	AllowDeviceMappingForRegularUsers     *bool
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
@@ -136,8 +136,8 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		settings.EdgeAgentCheckinInterval = *payload.EdgeAgentCheckinInterval
 	}
 
-	if payload.DisableDeviceMappingForRegularUsers != nil {
-		settings.DisableDeviceMappingForRegularUsers = *payload.DisableDeviceMappingForRegularUsers
+	if payload.AllowDeviceMappingForRegularUsers != nil {
+		settings.AllowDeviceMappingForRegularUsers = *payload.AllowDeviceMappingForRegularUsers
 	}
 
 	tlsError := handler.updateTLS(settings)

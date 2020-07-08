@@ -197,7 +197,7 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 
 		if !settings.AllowPrivilegedModeForRegularUsers ||
 			!settings.AllowHostNamespaceForRegularUsers ||
-			settings.DisableDeviceMappingForRegularUsers {
+			!settings.AllowDeviceMappingForRegularUsers {
 
 			body, err := ioutil.ReadAll(request.Body)
 			if err != nil {

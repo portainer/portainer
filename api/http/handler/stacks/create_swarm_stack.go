@@ -340,7 +340,7 @@ func (handler *Handler) deploySwarmStack(config *swarmStackDeploymentConfig) err
 		return err
 	}
 
-	if (settings.DisableDeviceMappingForRegularUsers ||
+	if (!settings.AllowDeviceMappingForRegularUsers ||
 		!settings.AllowBindMountsForRegularUsers) && !isAdminOrEndpointAdmin {
 
 		composeFilePath := path.Join(config.stack.ProjectPath, config.stack.EntryPoint)

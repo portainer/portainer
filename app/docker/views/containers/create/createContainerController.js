@@ -682,7 +682,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       });
 
       $scope.isAdmin = Authentication.isAdmin();
-      $scope.showDeviceMapping = $scope.isAdmin || !$scope.applicationState.application.disableDeviceMappingForRegularUsers;
+      $scope.showDeviceMapping = $scope.isAdmin || $scope.applicationState.application.allowDeviceMappingForRegularUsers;
     }
 
     function validateForm(accessControlData, isAdmin) {
