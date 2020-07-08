@@ -1,7 +1,6 @@
 package http
 
 import (
-	"crypto/tls"
 	"time"
 
 	"github.com/portainer/portainer/api/crypto"
