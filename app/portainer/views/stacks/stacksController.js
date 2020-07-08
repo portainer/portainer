@@ -56,7 +56,7 @@ function StacksController($scope, $state, Notifications, StackService, ModalServ
 
   async function loadCreateEnabled() {
     const appState = StateManager.getState().application;
-    if (!appState.disableStackManagementForRegularUsers) {
+    if (appState.allowStackManagementForRegularUsers) {
       return true;
     }
 

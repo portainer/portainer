@@ -10,18 +10,18 @@ import (
 )
 
 type publicSettingsResponse struct {
-	LogoURL                               string                         `json:"LogoURL"`
-	AuthenticationMethod                  portainer.AuthenticationMethod `json:"AuthenticationMethod"`
-	AllowBindMountsForRegularUsers        bool                           `json:"AllowBindMountsForRegularUsers"`
-	AllowPrivilegedModeForRegularUsers    bool                           `json:"AllowPrivilegedModeForRegularUsers"`
-	AllowVolumeBrowserForRegularUsers     bool                           `json:"AllowVolumeBrowserForRegularUsers"`
-	EnableHostManagementFeatures          bool                           `json:"EnableHostManagementFeatures"`
-	EnableEdgeComputeFeatures             bool                           `json:"EnableEdgeComputeFeatures"`
-	ExternalTemplates                     bool                           `json:"ExternalTemplates"`
-	OAuthLoginURI                         string                         `json:"OAuthLoginURI"`
-	DisableStackManagementForRegularUsers bool                           `json:"DisableStackManagementForRegularUsers"`
-	AllowHostNamespaceForRegularUsers     bool                           `json:"AllowHostNamespaceForRegularUsers"`
-	AllowDeviceMappingForRegularUsers     bool                           `json:"AllowDeviceMappingForRegularUsers"`
+	LogoURL                             string                         `json:"LogoURL"`
+	AuthenticationMethod                portainer.AuthenticationMethod `json:"AuthenticationMethod"`
+	AllowBindMountsForRegularUsers      bool                           `json:"AllowBindMountsForRegularUsers"`
+	AllowPrivilegedModeForRegularUsers  bool                           `json:"AllowPrivilegedModeForRegularUsers"`
+	AllowVolumeBrowserForRegularUsers   bool                           `json:"AllowVolumeBrowserForRegularUsers"`
+	EnableHostManagementFeatures        bool                           `json:"EnableHostManagementFeatures"`
+	EnableEdgeComputeFeatures           bool                           `json:"EnableEdgeComputeFeatures"`
+	ExternalTemplates                   bool                           `json:"ExternalTemplates"`
+	OAuthLoginURI                       string                         `json:"OAuthLoginURI"`
+	AllowStackManagementForRegularUsers bool                           `json:"AllowStackManagementForRegularUsers"`
+	AllowHostNamespaceForRegularUsers   bool                           `json:"AllowHostNamespaceForRegularUsers"`
+	AllowDeviceMappingForRegularUsers   bool                           `json:"AllowDeviceMappingForRegularUsers"`
 }
 
 // GET request on /api/settings/public
@@ -32,22 +32,22 @@ func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *
 	}
 
 	publicSettings := &publicSettingsResponse{
-		LogoURL:                            settings.LogoURL,
-		AuthenticationMethod:               settings.AuthenticationMethod,
-		AllowBindMountsForRegularUsers:     settings.AllowBindMountsForRegularUsers,
-		AllowPrivilegedModeForRegularUsers: settings.AllowPrivilegedModeForRegularUsers,
-		AllowVolumeBrowserForRegularUsers:  settings.AllowVolumeBrowserForRegularUsers,
-		EnableHostManagementFeatures:       settings.EnableHostManagementFeatures,
-		EnableEdgeComputeFeatures:          settings.EnableEdgeComputeFeatures,
-		AllowHostNamespaceForRegularUsers:  settings.AllowHostNamespaceForRegularUsers,
-		ExternalTemplates:                  false,
+		LogoURL:                             settings.LogoURL,
+		AuthenticationMethod:                settings.AuthenticationMethod,
+		AllowBindMountsForRegularUsers:      settings.AllowBindMountsForRegularUsers,
+		AllowPrivilegedModeForRegularUsers:  settings.AllowPrivilegedModeForRegularUsers,
+		AllowVolumeBrowserForRegularUsers:   settings.AllowVolumeBrowserForRegularUsers,
+		EnableHostManagementFeatures:        settings.EnableHostManagementFeatures,
+		EnableEdgeComputeFeatures:           settings.EnableEdgeComputeFeatures,
+		AllowHostNamespaceForRegularUsers:   settings.AllowHostNamespaceForRegularUsers,
+		AllowStackManagementForRegularUsers: settings.AllowStackManagementForRegularUsers,
+		ExternalTemplates:                   false,
 		OAuthLoginURI: fmt.Sprintf("%s?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&prompt=login",
 			settings.OAuthSettings.AuthorizationURI,
 			settings.OAuthSettings.ClientID,
 			settings.OAuthSettings.RedirectURI,
 			settings.OAuthSettings.Scopes),
-		AllowDeviceMappingForRegularUsers:     settings.AllowDeviceMappingForRegularUsers,
-		DisableStackManagementForRegularUsers: settings.DisableStackManagementForRegularUsers,
+		AllowDeviceMappingForRegularUsers: settings.AllowDeviceMappingForRegularUsers,
 	}
 
 	if settings.TemplatesURL != "" {
