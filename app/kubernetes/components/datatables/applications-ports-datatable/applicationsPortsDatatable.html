@@ -146,9 +146,27 @@
               </td>
               <td ng-if="!$ctrl.itemCanExpand(item)">{{ item.Ports[0].TargetPort }}</td>
               <td ng-if="!$ctrl.itemCanExpand(item)">{{ item.Ports[0].Protocol }}</td>
-              <td ng-if="!$ctrl.itemCanExpand(item) && $ctrl.itemHasIngressRules(item)">
-                <a ng-href="{{ item.Ports[0].IngressRules[0].Host }}{{ item.Ports[0].IngressRules[0].Path }}" target="_blank">{{ item.Ports[0].IngressRules[0].Path }}</a>
+              <td ng-if="!$ctrl.itemCanExpand(item) && $ctrl.itemHasIngressRules(item) && $ctrl.itemCanDisplayIngressRule(item)">
+                <a
+                  ng-href="http://{{ item.Ports[0].IngressRules[0].Host ? item.Ports[0].IngressRules[0].Host : item.Ports[0].IngressRules[0].IP }}{{
+                    item.Ports[0].IngressRules[0].Path
+                  }}"
+                  target="_blank"
+                  >{{ item.Ports[0].IngressRules[0].Path }}</a
+                >
                 <span ng-if="item.Ports[0].IngressRules.length > 1"> + {{ item.Ports[0].IngressRules.length - 1 }} more</span>
+              </td>
+              <td ng-if="!$ctrl.itemCanExpand(item) && $ctrl.itemHasIngressRules(item) && !$ctrl.itemCanDisplayIngressRule(item)">
+                <span
+                  class="text-warning"
+                  tooltip-append-to-body="true"
+                  tooltip-placement="bottom"
+                  tooltip-class="portainer-tooltip"
+                  uib-tooltip="No host defined in ingress rule and IP not provisioned yet."
+                  style="cursor: pointer; border-color: #767676;"
+                >
+                  <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                </span>
               </td>
               <td ng-if="!$ctrl.itemCanExpand(item) && !$ctrl.itemHasIngressRules(item)">-</td>
               <td ng-if="$ctrl.itemCanExpand(item)"></td>
@@ -168,9 +186,23 @@
               </td>
               <td>{{ port.TargetPort }}</td>
               <td>{{ port.Protocol }}</td>
-              <td ng-if="$ctrl.portHasIngressRules(port)">
-                <a ng-href="{{ port.IngressRules[0].Host }}{{ port.IngressRules[0].Path }}" target="_blank">{{ port.IngressRules[0].Path }}</a>
+              <td ng-if="$ctrl.portHasIngressRules(port) && $ctrl.portCanDisplayIngressRule(port)">
+                <a ng-href="http://{{ port.IngressRules[0].Host ? port.IngressRules[0].Host : port.IngressRules[0].IP }}{{ port.IngressRules[0].Path }}" target="_blank">{{
+                  port.IngressRules[0].Path
+                }}</a>
                 <span ng-if="port.IngressRules.length > 1"> + {{ ports.IngressRules.length - 1 }} more</span>
+              </td>
+              <td ng-if="$ctrl.portHasIngressRules(port) && !$ctrl.portCanDisplayIngressRule(port)">
+                <span
+                  class="text-warning"
+                  tooltip-append-to-body="true"
+                  tooltip-placement="bottom"
+                  tooltip-class="portainer-tooltip"
+                  uib-tooltip="No host defined in ingress rule and IP not provisioned yet."
+                  style="cursor: pointer; border-color: #767676;"
+                >
+                  <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                </span>
               </td>
               <td ng-if="!$ctrl.portHasIngressRules(port)">-</td>
             </tr>

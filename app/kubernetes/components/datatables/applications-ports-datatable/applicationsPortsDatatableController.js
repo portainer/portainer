@@ -50,17 +50,33 @@ angular.module('portainer.docker').controller('KubernetesApplicationsPortsDatata
       }
     };
 
+    /**
+     * MAIN ROWS
+     */
     this.itemCanExpand = function (item) {
-      return item.Ports && item.Ports.length > 1;
+      return item.Ports.length > 1;
     };
 
     this.itemHasIngressRules = function (item) {
-      return item.Ports && _.filter(item.Ports, (p) => ctrl.portHasIngressRules(p)).length > 0;
+      return ctrl.portHasIngressRules(item.Ports[0]);
     };
 
+    this.itemCanDisplayIngressRule = function (item) {
+      return ctrl.portCanDisplayIngressRule(item.Ports[0]);
+    };
+    /** !MAIN ROWS */
+
+    /**
+     * EXPANDED ROWS
+     */
     this.portHasIngressRules = function (port) {
       return port.IngressRules.length > 0;
     };
+
+    this.portCanDisplayIngressRule = function (port) {
+      return !port.IngressRules[0].Host && !port.IngressRules[0].IP ? false : true;
+    };
+    /**! EXPANDED ROWS */
 
     this.hasExpandableItems = function () {
       return _.filter(this.state.filteredDataSet, (item) => this.itemCanExpand(item)).length;

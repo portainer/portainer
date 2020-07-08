@@ -8,7 +8,7 @@ export class KubernetesIngressConverter {
         const ingRule = new KubernetesIngressRule();
         ingRule.ServiceName = path.backend.serviceName;
         ingRule.Host = rule.host;
-        ingRule.IP = data.status.loadBalancer.ingress[0].ip;
+        ingRule.IP = data.status.loadBalancer.ingress ? data.status.loadBalancer.ingress[0].ip : undefined;
         ingRule.Port = path.backend.servicePort;
         ingRule.Path = path.path;
         return ingRule;

@@ -87,6 +87,10 @@ class KubernetesApplicationController {
     return this.state.eventWarningCount;
   }
 
+  ruleCanBeDisplayed(rule) {
+    return !rule.Host && !rule.IP ? false : true;
+  }
+
   /**
    * ROLLBACK
    */

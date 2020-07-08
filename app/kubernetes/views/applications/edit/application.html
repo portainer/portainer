@@ -234,9 +234,22 @@
                       </td>
                       <td>{{ port.Protocol }}</td>
                       <td ng-if="port.IngressRules.length > 0">
-                        <a ng-repeat="rule in port.IngressRules" ng-href="http://{{ rule.Host }}{{ rule.Path }}" target="_blank" style="margin-left: 5px;">
-                          {{ rule.Path }}
-                        </a>
+                        <span ng-repeat="rule in port.IngressRules">
+                          <a ng-if="ctrl.ruleCanBeDisplayed(rule)" ng-href="http://{{ rule.Host ? rule.Host : rule.IP }}{{ rule.Path }}" target="_blank" style="margin-left: 5px;">
+                            {{ rule.Path }}
+                          </a>
+                          <span
+                            ng-if="!ctrl.ruleCanBeDisplayed(rule)"
+                            class="text-warning"
+                            tooltip-append-to-body="true"
+                            tooltip-placement="bottom"
+                            tooltip-class="portainer-tooltip"
+                            uib-tooltip="No host defined in ingress rule and IP not provisioned yet."
+                            style="cursor: pointer; border-color: #767676;"
+                          >
+                            {{ rule.Path }} <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                          </span>
+                        </span>
                       </td>
                       <td ng-if="port.IngressRules.length === 0">-</td>
                     </tr>
@@ -265,9 +278,22 @@
                       <td>{{ port.NodePort }}</td>
                       <td>{{ port.Protocol }}</td>
                       <td ng-if="port.IngressRules.length > 0">
-                        <a ng-repeat="rule in port.IngressRules" ng-href="http://{{ rule.Host }}{{ rule.Path }}" target="_blank" style="margin-left: 5px;">
-                          {{ rule.Path }}
-                        </a>
+                        <span ng-repeat="rule in port.IngressRules">
+                          <a ng-if="ctrl.ruleCanBeDisplayed(rule)" ng-href="http://{{ rule.Host ? rule.Host : rule.IP }}{{ rule.Path }}" target="_blank" style="margin-left: 5px;">
+                            {{ rule.Path }}
+                          </a>
+                          <span
+                            ng-if="!ctrl.ruleCanBeDisplayed(rule)"
+                            class="text-warning"
+                            tooltip-append-to-body="true"
+                            tooltip-placement="bottom"
+                            tooltip-class="portainer-tooltip"
+                            uib-tooltip="No host defined in ingress rule and IP not provisioned yet."
+                            style="cursor: pointer; border-color: #767676;"
+                          >
+                            {{ rule.Path }} <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                          </span>
+                        </span>
                       </td>
                       <td ng-if="port.IngressRules.length === 0">-</td>
                     </tr>
@@ -302,9 +328,22 @@
                       <td>{{ port.Port }}</td>
                       <td>{{ port.Protocol }}</td>
                       <td ng-if="port.IngressRules.length > 0">
-                        <a ng-repeat="rule in port.IngressRules" ng-href="http://{{ rule.Host }}{{ rule.Path }}" target="_blank" style="margin-left: 5px;">
-                          {{ rule.Path }}
-                        </a>
+                        <span ng-repeat="rule in port.IngressRules">
+                          <a ng-if="ctrl.ruleCanBeDisplayed(rule)" ng-href="http://{{ rule.Host ? rule.Host : rule.IP }}{{ rule.Path }}" target="_blank" style="margin-left: 5px;">
+                            {{ rule.Path }}
+                          </a>
+                          <span
+                            ng-if="!ctrl.ruleCanBeDisplayed(rule)"
+                            class="text-warning"
+                            tooltip-append-to-body="true"
+                            tooltip-placement="bottom"
+                            tooltip-class="portainer-tooltip"
+                            uib-tooltip="No host defined in ingress rule and IP not provisioned yet."
+                            style="cursor: pointer; border-color: #767676;"
+                          >
+                            {{ rule.Path }} <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                          </span>
+                        </span>
                       </td>
                       <td ng-if="port.IngressRules.length === 0">-</td>
                     </tr>
