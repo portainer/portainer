@@ -5,7 +5,8 @@ angular.module('portainer.app').controller('SidebarController', [
   'Notifications',
   'Authentication',
   'UserService',
-  function ($q, $scope, StateManager, Notifications, Authentication, UserService) {
+  'ExtensionService',
+  function ($q, $scope, StateManager, Notifications, Authentication, UserService, ExtensionService) {
     function checkPermissions(memberships) {
       var isLeader = false;
       angular.forEach(memberships, function (membership) {
@@ -16,9 +17,10 @@ angular.module('portainer.app').controller('SidebarController', [
       $scope.isTeamLeader = isLeader;
     }
 
-    function initView() {
+    async function initView() {
       $scope.uiVersion = StateManager.getState().application.version;
       $scope.logo = StateManager.getState().application.logo;
+      $scope.showStacks = await shouldShowStacks();
 
       var authenticationEnabled = $scope.applicationState.application.authentication;
       if (authenticationEnabled) {
@@ -37,5 +39,18 @@ angular.module('portainer.app').controller('SidebarController', [
     }
 
     initView();
+
+    async function shouldShowStacks() {
+      const isAdmin = !$scope.applicationState.application.authentication || Authentication.isAdmin();
+      const { allowStackManagementForRegularUsers } = $scope.applicationState.application;
+
+      if (isAdmin || allowStackManagementForRegularUsers) {
+        return true;
+      }
+      const rbacEnabled = await ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC);
+      if (rbacEnabled) {
+        return Authentication.hasAuthorizations(['EndpointResourcesAccess']);
+      }
+    }
   },
 ]);
