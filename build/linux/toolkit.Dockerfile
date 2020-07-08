@@ -1,7 +1,8 @@
 FROM ubuntu
 
-# Expose port for the Portainer UI
+# Expose port for the Portainer UI and Edge server
 EXPOSE 9000
+EXPOSE 8000
 
 WORKDIR /src/portainer
 
