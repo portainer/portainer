@@ -25,28 +25,25 @@
             </uib-tab>
             <uib-tab index="1" classes="btn-sm" select="ctrl.selectTab(1)">
               <uib-tab-heading> <i class="fa fa-file-code space-right" aria-hidden="true"></i> Cluster Status </uib-tab-heading>
-              <div ng-repeat="status in ctrl.componentStatuses" class="row">
-                <div class="col-sm-4">
-                  <div class="form-section-title" style="margin-bottom: 20px;">
-                    {{ status.metadata.name }}
-                  </div>
-                  <table class="table">
-                    <tbody>
-                      <tr>
-                        <td>Status</td>
-                        <td>
-                          {{ status.conditions[0].type }}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Message</td>
-                        <td>
-                          {{ status.conditions[0].message }}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+              <div class="row" style="padding: 20px;">
+                <table class="table col-sm-6">
+                  <tbody>
+                    <tr ng-repeat="status in ctrl.componentStatuses">
+                      <td>
+                        {{ status.metadata.name }}
+                      </td>
+                      <td>
+                        {{ status.conditions[0].type }}
+                      </td>
+                      <td>
+                        {{ status.conditions[0].message }}
+                      </td>
+                      <td>
+                        {{ status.conditions[0].error ? status.conditions[0].error : '-' }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </uib-tab>
           </uib-tabset>
