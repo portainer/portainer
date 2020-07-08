@@ -126,6 +126,12 @@ angular.module('portainer.app').factory('LocalStorage', [
       getJobImage: function () {
         return localStorageService.get('job_image');
       },
+      storeToolbarToggle(value) {
+        localStorageService.set('toolbar_toggle', value);
+      },
+      getToolbarToggle() {
+        return localStorageService.get('toolbar_toggle');
+      },
       storeLogoutReason: (reason) => localStorageService.set('logout_reason', reason),
       getLogoutReason: () => localStorageService.get('logout_reason'),
       cleanLogoutReason: () => localStorageService.remove('logout_reason'),
