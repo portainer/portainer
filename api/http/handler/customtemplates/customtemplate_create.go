@@ -85,19 +85,19 @@ type customTemplateFromFileContentPayload struct {
 
 func (payload *customTemplateFromFileContentPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Title) {
-		return portainer.Error("Invalid custom template title")
+		return errors.New("Invalid custom template title")
 	}
 	if govalidator.IsNull(payload.Description) {
-		return portainer.Error("Invalid custom template description")
+		return errors.New("Invalid custom template description")
 	}
 	if govalidator.IsNull(payload.FileContent) {
-		return portainer.Error("Invalid file content")
+		return errors.New("Invalid file content")
 	}
 	if payload.Platform != portainer.CustomTemplatePlatformLinux && payload.Platform != portainer.CustomTemplatePlatformWindows {
-		return portainer.Error("Invalid custom template platform")
+		return errors.New("Invalid custom template platform")
 	}
 	if payload.Type != portainer.DockerSwarmStack && payload.Type != portainer.DockerComposeStack {
-		return portainer.Error("Invalid custom template type")
+		return errors.New("Invalid custom template type")
 	}
 	return nil
 }
@@ -148,25 +148,25 @@ type customTemplateFromGitRepositoryPayload struct {
 
 func (payload *customTemplateFromGitRepositoryPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Title) {
-		return portainer.Error("Invalid custom template title")
+		return errors.New("Invalid custom template title")
 	}
 	if govalidator.IsNull(payload.Description) {
-		return portainer.Error("Invalid custom template description")
+		return errors.New("Invalid custom template description")
 	}
 	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
-		return portainer.Error("Invalid repository URL. Must correspond to a valid URL format")
+		return errors.New("Invalid repository URL. Must correspond to a valid URL format")
 	}
 	if payload.RepositoryAuthentication && (govalidator.IsNull(payload.RepositoryUsername) || govalidator.IsNull(payload.RepositoryPassword)) {
-		return portainer.Error("Invalid repository credentials. Username and password must be specified when authentication is enabled")
+		return errors.New("Invalid repository credentials. Username and password must be specified when authentication is enabled")
 	}
 	if govalidator.IsNull(payload.ComposeFilePathInRepository) {
 		payload.ComposeFilePathInRepository = filesystem.ComposeFileDefaultName
 	}
 	if payload.Platform != portainer.CustomTemplatePlatformLinux && payload.Platform != portainer.CustomTemplatePlatformWindows {
-		return portainer.Error("Invalid custom template platform")
+		return errors.New("Invalid custom template platform")
 	}
 	if payload.Type != portainer.DockerSwarmStack && payload.Type != portainer.DockerComposeStack {
-		return portainer.Error("Invalid custom template type")
+		return errors.New("Invalid custom template type")
 	}
 	return nil
 }
@@ -223,13 +223,13 @@ type customTemplateFromFileUploadPayload struct {
 func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) error {
 	title, err := request.RetrieveMultiPartFormValue(r, "Title", false)
 	if err != nil {
-		return portainer.Error("Invalid custom template title")
+		return errors.New("Invalid custom template title")
 	}
 	payload.Title = title
 
 	description, err := request.RetrieveMultiPartFormValue(r, "Description", false)
 	if err != nil {
-		return portainer.Error("Invalid custom template description")
+		return errors.New("Invalid custom template description")
 	}
 
 	payload.Description = description
@@ -240,20 +240,20 @@ func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) er
 	platform, _ := request.RetrieveNumericMultiPartFormValue(r, "Platform", true)
 	templatePlatform := portainer.CustomTemplatePlatform(platform)
 	if templatePlatform != portainer.CustomTemplatePlatformLinux && templatePlatform != portainer.CustomTemplatePlatformWindows {
-		return portainer.Error("Invalid custom template platform")
+		return errors.New("Invalid custom template platform")
 	}
 	payload.Platform = templatePlatform
 
 	typeNumeral, _ := request.RetrieveNumericMultiPartFormValue(r, "Type", true)
 	templateType := portainer.StackType(typeNumeral)
 	if templateType != portainer.DockerComposeStack && templateType != portainer.DockerSwarmStack {
-		return portainer.Error("Invalid custom template type")
+		return errors.New("Invalid custom template type")
 	}
 	payload.Type = templateType
 
 	composeFileContent, _, err := request.RetrieveMultiPartFormFile(r, "file")
 	if err != nil {
-		return portainer.Error("Invalid Compose file. Ensure that the Compose file is uploaded correctly")
+		return errors.New("Invalid Compose file. Ensure that the Compose file is uploaded correctly")
 	}
 	payload.FileContent = composeFileContent
 

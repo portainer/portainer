@@ -1,14 +1,18 @@
 package customtemplates
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
+
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -24,19 +28,19 @@ type customTemplateUpdatePayload struct {
 
 func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Title) {
-		return portainer.Error("Invalid custom template title")
+		return errors.New("Invalid custom template title")
 	}
 	if govalidator.IsNull(payload.FileContent) {
-		return portainer.Error("Invalid file content")
+		return errors.New("Invalid file content")
 	}
 	if payload.Platform != portainer.CustomTemplatePlatformLinux && payload.Platform != portainer.CustomTemplatePlatformWindows {
-		return portainer.Error("Invalid custom template platform")
+		return errors.New("Invalid custom template platform")
 	}
 	if payload.Type != portainer.DockerComposeStack && payload.Type != portainer.DockerSwarmStack {
-		return portainer.Error("Invalid custom template type")
+		return errors.New("Invalid custom template type")
 	}
 	if govalidator.IsNull(payload.Description) {
-		return portainer.Error("Invalid custom template description")
+		return errors.New("Invalid custom template description")
 	}
 	return nil
 }
@@ -54,7 +58,7 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 	}
 
 	customTemplate, err := handler.DataStore.CustomTemplate().CustomTemplate(portainer.CustomTemplateID(customTemplateID))
-	if err == portainer.ErrObjectNotFound {
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a custom template with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a custom template with the specified identifier inside the database", err}
@@ -67,7 +71,7 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 
 	access := userCanEditTemplate(customTemplate, securityContext)
 	if !access {
-		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", httperrors.ErrResourceAccessDenied}
 	}
 
 	templateFolder := strconv.Itoa(customTemplateID)
