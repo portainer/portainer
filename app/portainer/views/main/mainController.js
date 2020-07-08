@@ -1,9 +1,9 @@
 angular.module('portainer.app').controller('MainController', [
   '$scope',
-  '$cookieStore',
+  'LocalStorage',
   'StateManager',
   'EndpointProvider',
-  function ($scope, $cookieStore, StateManager, EndpointProvider) {
+  function ($scope, LocalStorage, StateManager, EndpointProvider) {
     /**
      * Sidebar Toggle & Cookie Control
      */
@@ -17,11 +17,8 @@ angular.module('portainer.app').controller('MainController', [
 
     $scope.$watch($scope.getWidth, function (newValue) {
       if (newValue >= mobileView) {
-        if (angular.isDefined($cookieStore.get('toggle'))) {
-          $scope.toggle = !$cookieStore.get('toggle') ? false : true;
-        } else {
-          $scope.toggle = true;
-        }
+        const toggleValue = LocalStorage.getToolbarToggle();
+        $scope.toggle = typeof toggleValue === 'boolean' ? toggleValue : true;
       } else {
         $scope.toggle = false;
       }
@@ -29,7 +26,7 @@ angular.module('portainer.app').controller('MainController', [
 
     $scope.toggleSidebar = function () {
       $scope.toggle = !$scope.toggle;
-      $cookieStore.put('toggle', $scope.toggle);
+      LocalStorage.storeToolbarToggle($scope.toggle);
     };
 
     window.onresize = function () {
