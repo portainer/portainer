@@ -6,7 +6,7 @@ import { KubernetesResourceReservation } from 'Kubernetes/models/resource-reserv
 
 class KubernetesClusterController {
   /* @ngInject */
-  constructor($async, $state, Authentication, Notifications, LocalStorage, KubernetesNodeService, KubernetesApplicationService) {
+  constructor($async, $state, Authentication, Notifications, LocalStorage, KubernetesNodeService, KubernetesApplicationService, KubernetesComponentStatusesService) {
     this.$async = $async;
     this.$state = $state;
     this.Authentication = Authentication;
@@ -14,15 +14,30 @@ class KubernetesClusterController {
     this.LocalStorage = LocalStorage;
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesApplicationService = KubernetesApplicationService;
+    this.KubernetesComponentStatusesService = KubernetesComponentStatusesService;
 
     this.onInit = this.onInit.bind(this);
     this.getNodes = this.getNodes.bind(this);
     this.getNodesAsync = this.getNodesAsync.bind(this);
     this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
+    this.getComponentStatuses = this.getComponentStatuses.bind(this);
+    this.getComponentStatusesAsync = this.getComponentStatusesAsync.bind(this);
   }
 
   selectTab(index) {
     this.LocalStorage.storeActiveTab('cluster', index);
+  }
+
+  async getComponentStatusesAsync() {
+    try {
+      this.componentStatuses = await this.KubernetesComponentStatusesService.get();
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to get component status');
+    }
+  }
+
+  getComponentStatuses() {
+    return this.$async(this.getComponentStatusesAsync);
   }
 
   async getNodesAsync() {
@@ -82,6 +97,7 @@ class KubernetesClusterController {
     this.isAdmin = this.Authentication.isAdmin();
 
     await this.getNodes();
+    await this.getComponentStatuses();
     if (this.isAdmin) {
       await this.getApplications();
     }
