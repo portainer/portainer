@@ -1,6 +1,19 @@
 package migrator
 
-import "github.com/portainer/portainer/api"
+import (
+	"github.com/portainer/portainer/api"
+)
+
+func (m *Migrator) updateSettingsToDBVersion23() error {
+	legacySettings, err := m.settingsService.Settings()
+	if err != nil {
+		return err
+	}
+
+	legacySettings.AllowDeviceMappingForRegularUsers = true
+
+	return m.settingsService.UpdateSettings(legacySettings)
+}
 
 func (m *Migrator) updateTagsToDBVersion23() error {
 	tags, err := m.tagService.Tags()
