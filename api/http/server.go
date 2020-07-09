@@ -345,7 +345,7 @@ func (server *Server) Start() error {
 	}
 
 	if server.SSL {
-		httpServer.TLSConfig = crypto.CreateTLSConfiguration()
+		httpServer.TLSConfig = crypto.CreateServerTLSConfiguration()
 		return httpServer.ListenAndServeTLS(server.SSLCert, server.SSLKey)
 	}
 	return httpServer.ListenAndServe()
