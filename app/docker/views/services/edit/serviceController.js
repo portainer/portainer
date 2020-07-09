@@ -675,8 +675,8 @@ angular.module('portainer.docker').controller('ServiceController', [
             return _.find($scope.service.Model.Spec.TaskTemplate.Networks, { Target: item.Id });
           });
 
-          if ($scope.service.Model.Spec.EndpointSpec.Ports.find((port) => port.PublishMode === 'ingress')) {
-            const ingressNetwork = $scope.availableNetworks.find((network) => network.Ingress);
+          if (_.some($scope.service.Ports, (port) => port.PublishMode === 'ingress')) {
+            const ingressNetwork = _.find($scope.availableNetworks, (network) => network.Ingress);
             if (ingressNetwork) {
               networks.unshift(ingressNetwork);
             }
