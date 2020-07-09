@@ -2,7 +2,7 @@ package migrator
 
 import (
 	"github.com/boltdb/bolt"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/endpoint"
 	"github.com/portainer/portainer/api/bolt/endpointgroup"
 	"github.com/portainer/portainer/api/bolt/endpointrelation"
@@ -317,6 +317,11 @@ func (m *Migrator) Migrate() error {
 		}
 
 		err = m.updateEndpointsAndEndpointGroupsToDBVersion23()
+		if err != nil {
+			return err
+		}
+
+		err = m.updateSettingsToDBVersion23()
 		if err != nil {
 			return err
 		}
