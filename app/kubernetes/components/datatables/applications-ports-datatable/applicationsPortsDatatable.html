@@ -103,11 +103,13 @@
                 </a>
               </th>
               <th>
-                Ingress rules
+                HTTP route
               </th>
             </tr>
           </thead>
           <tbody>
+            <!-- main rows -->
+            <!-- dir-paginate-start track by $index -->
             <tr
               dir-paginate-start="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | filter: $ctrl.isDisplayed | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit: $ctrl.tableKey))"
               ng-class="{ active: item.Checked }"
@@ -115,17 +117,21 @@
               ng-click="$ctrl.expandItem(item, !item.Expanded)"
               pagination-id="$ctrl.tableKey"
             >
+              <!-- expandable -->
               <td>
                 <a ng-if="$ctrl.itemCanExpand(item)">
                   <i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i>
                 </a>
               </td>
+              <!-- Application -->
               <td>
                 <a ui-sref="kubernetes.applications.application({ name: item.Name, namespace: item.ResourcePool })">{{ item.Name }}</a>
                 <span class="label label-info image-tag label-margins" ng-if="$ctrl.isSystemNamespace(item)">system</span>
                 <span class="label label-primary image-tag label-margins" ng-if="!$ctrl.isSystemNamespace(item) && $ctrl.isExternalApplication(item)">external</span>
               </td>
+              <!-- Publishing mode -->
               <td>
+                <!-- LB -->
                 <span ng-if="item.ServiceType === $ctrl.KubernetesServiceTypes.LOAD_BALANCER">
                   <span> <i class="fa fa-project-diagram" aria-hidden="true" style="margin-right: 2px;"></i> Load balancer </span>
                   <span class="text-muted small" style="margin-left: 5px;">
@@ -133,48 +139,74 @@
                     <span ng-if="!item.LoadBalancerIPAddress">pending</span>
                   </span>
                 </span>
+                <!-- Internal -->
                 <span ng-if="item.ServiceType === $ctrl.KubernetesServiceTypes.CLUSTER_IP">
                   <i class="fa fa-list-alt" aria-hidden="true" style="margin-right: 2px;"></i> Internal
                 </span>
+                <!-- Cluster -->
                 <span ng-if="item.ServiceType === $ctrl.KubernetesServiceTypes.NODE_PORT"> <i class="fa fa-list" aria-hidden="true" style="margin-right: 2px;"></i> Cluster </span>
               </td>
-              <td ng-if="!$ctrl.itemCanExpand(item)">
-                {{ item.Ports[0].Port }}
-                <a ng-if="item.LoadBalancerIPAddress" ng-href="http://{{ item.LoadBalancerIPAddress }}:{{ item.Ports[0].Port }}" target="_blank" style="margin-left: 5px;">
+              <!-- Exposed port -->
+              <td>
+                <span ng-if="!$ctrl.itemCanExpand(item)">
+                  {{ item.Ports[0].Port }}
+                  <a ng-if="item.LoadBalancerIPAddress" ng-href="http://{{ item.LoadBalancerIPAddress }}:{{ item.Ports[0].Port }}" target="_blank" style="margin-left: 5px;">
+                    <i class="fa fa-external-link-alt" aria-hidden="true"></i> access
+                  </a>
+                </span>
+              </td>
+              <!-- Container port -->
+              <td>
+                <span ng-if="!$ctrl.itemCanExpand(item)">
+                  {{ item.Ports[0].TargetPort }}
+                </span>
+              </td>
+              <!-- Protocol -->
+              <td>
+                <span ng-if="!$ctrl.itemCanExpand(item)">
+                  {{ item.Ports[0].Protocol }}
+                </span>
+              </td>
+              <!-- HTTP route -->
+              <td>
+                <span ng-if="!$ctrl.itemCanExpand(item)">
+                  <span ng-if="!$ctrl.portHasIngressRules(item.Ports[0])">-</span>
+                  <span ng-if="$ctrl.portHasIngressRules(item.Ports[0])">
+                    <span
+                      ng-if="!$ctrl.ruleCanBeDisplayed(item.Ports[0].IngressRules[0])"
+                      class="text-muted"
+                      tooltip-append-to-body="true"
+                      tooltip-placement="bottom"
+                      tooltip-class="portainer-tooltip"
+                      uib-tooltip="No host defined in http rule and IP not provisioned yet"
+                      style="cursor: pointer;"
+                      >pending
+                    </span>
+                    <span ng-if="$ctrl.ruleCanBeDisplayed(item.Ports[0].IngressRules[0])">
+                      <a ng-href="{{ $ctrl.buildIngressRuleURL(item.Ports[0].IngressRules[0]) }}" target="_blank">
+                        {{ item.Ports[0].IngressRules[0].Path }}
+                      </a>
+                    </span>
+                  </span>
+                </span>
+              </td>
+            </tr>
+            <!-- sub rows -->
+            <tr ng-show="item.Expanded" ng-repeat-start="port in item.Ports" ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
+              <td ng-if="!$ctrl.portHasIngressRules(port)"></td>
+              <td ng-if="!$ctrl.portHasIngressRules(port)">-</td>
+              <td ng-if="!$ctrl.portHasIngressRules(port)">-</td>
+              <td ng-if="!$ctrl.portHasIngressRules(port)">
+                {{ port.Port }}
+                <a ng-if="item.LoadBalancerIPAddress" ng-href="http://{{ item.LoadBalancerIPAddress }}:{{ port.Port }}" target="_blank" style="margin-left: 5px;">
                   <i class="fa fa-external-link-alt" aria-hidden="true"></i> access
                 </a>
               </td>
-              <td ng-if="!$ctrl.itemCanExpand(item)">{{ item.Ports[0].TargetPort }}</td>
-              <td ng-if="!$ctrl.itemCanExpand(item)">{{ item.Ports[0].Protocol }}</td>
-              <td ng-if="!$ctrl.itemCanExpand(item) && $ctrl.itemHasIngressRules(item) && $ctrl.itemCanDisplayIngressRule(item)">
-                <a
-                  ng-href="http://{{ item.Ports[0].IngressRules[0].Host ? item.Ports[0].IngressRules[0].Host : item.Ports[0].IngressRules[0].IP }}{{
-                    item.Ports[0].IngressRules[0].Path
-                  }}"
-                  target="_blank"
-                  >{{ item.Ports[0].IngressRules[0].Path }}</a
-                >
-                <span ng-if="item.Ports[0].IngressRules.length > 1"> + {{ item.Ports[0].IngressRules.length - 1 }} more</span>
-              </td>
-              <td ng-if="!$ctrl.itemCanExpand(item) && $ctrl.itemHasIngressRules(item) && !$ctrl.itemCanDisplayIngressRule(item)">
-                <span
-                  class="text-warning"
-                  tooltip-append-to-body="true"
-                  tooltip-placement="bottom"
-                  tooltip-class="portainer-tooltip"
-                  uib-tooltip="No host defined in ingress rule and IP not provisioned yet."
-                  style="cursor: pointer; border-color: #767676;"
-                >
-                  <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                </span>
-              </td>
-              <td ng-if="!$ctrl.itemCanExpand(item) && !$ctrl.itemHasIngressRules(item)">-</td>
-              <td ng-if="$ctrl.itemCanExpand(item)"></td>
-              <td ng-if="$ctrl.itemCanExpand(item)"></td>
-              <td ng-if="$ctrl.itemCanExpand(item)"></td>
-              <td ng-if="$ctrl.itemCanExpand(item)"></td>
+              <td ng-if="!$ctrl.portHasIngressRules(port)">{{ port.TargetPort }}</td>
+              <td ng-if="!$ctrl.portHasIngressRules(port)">{{ port.Protocol }}</td>
+              <td ng-if="!$ctrl.portHasIngressRules(port)">-</td>
             </tr>
-            <tr dir-paginate-end ng-show="item.Expanded" ng-repeat="port in item.Ports" ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
+            <tr ng-show="item.Expanded" ng-repeat-end ng-repeat="rule in port.IngressRules" ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
               <td></td>
               <td>-</td>
               <td>-</td>
@@ -186,29 +218,30 @@
               </td>
               <td>{{ port.TargetPort }}</td>
               <td>{{ port.Protocol }}</td>
-              <td ng-if="$ctrl.portHasIngressRules(port) && $ctrl.portCanDisplayIngressRule(port)">
-                <a ng-href="http://{{ port.IngressRules[0].Host ? port.IngressRules[0].Host : port.IngressRules[0].IP }}{{ port.IngressRules[0].Path }}" target="_blank">{{
-                  port.IngressRules[0].Path
-                }}</a>
-                <span ng-if="port.IngressRules.length > 1"> + {{ ports.IngressRules.length - 1 }} more</span>
-              </td>
-              <td ng-if="$ctrl.portHasIngressRules(port) && !$ctrl.portCanDisplayIngressRule(port)">
+              <td>
                 <span
-                  class="text-warning"
+                  ng-if="!$ctrl.ruleCanBeDisplayed(rule)"
+                  class="text-muted"
                   tooltip-append-to-body="true"
                   tooltip-placement="bottom"
                   tooltip-class="portainer-tooltip"
-                  uib-tooltip="No host defined in ingress rule and IP not provisioned yet."
-                  style="cursor: pointer; border-color: #767676;"
-                >
-                  <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                  uib-tooltip="No host defined in http rule and IP not provisioned yet"
+                  style="cursor: pointer;"
+                  >pending
+                </span>
+                <span ng-if="$ctrl.ruleCanBeDisplayed(rule)">
+                  <a ng-href="{{ $ctrl.buildIngressRuleURL(rule) }}" target="_blank">
+                    {{ rule.Path }}
+                  </a>
                 </span>
               </td>
-              <td ng-if="!$ctrl.portHasIngressRules(port)">-</td>
             </tr>
+            <tr dir-paginate-end></tr>
+            <!-- no dataset -->
             <tr ng-if="!$ctrl.dataset">
               <td colspan="6" class="text-center text-muted">Loading...</td>
             </tr>
+            <!-- no values in filtered dataset -->
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
               <td colspan="6" class="text-center text-muted">No application port mapping available.</td>
             </tr>
