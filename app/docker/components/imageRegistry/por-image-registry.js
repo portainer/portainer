@@ -7,6 +7,7 @@ angular.module('portainer.docker').component('porImageRegistry', {
     autoComplete: '<',
     labelClass: '@',
     inputClass: '@',
+    onImageChange: '&'
   },
   require: {
     form: '^form',

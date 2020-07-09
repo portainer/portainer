@@ -95,6 +95,10 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       });
     };
 
+    $scope.onImageNameChange = function () {
+      delete $scope.config.Entrypoint;
+    }
+
     $scope.config = {
       Image: '',
       Env: [],
