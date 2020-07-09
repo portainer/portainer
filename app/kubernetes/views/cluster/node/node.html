@@ -18,7 +18,7 @@
                   <tbody ng-if="ctrl.node">
                     <tr>
                       <td>Hostname</td>
-                      <td>{{ ctrl.node.Name }}</td>
+                      <td>{{ ctrl.node.Name }} <span class="label label-primary" ng-if="ctrl.node.IsLeader">Leader</span></td>
                     </tr>
                     <tr>
                       <td>Role</td>

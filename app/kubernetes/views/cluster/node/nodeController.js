@@ -3,10 +3,21 @@ import _ from 'lodash-es';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import { KubernetesResourceReservation } from 'Kubernetes/models/resource-reservation/models';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
+import KubernetesEndpointHelper from 'Kubernetes/helpers/endpointHelper';
 
 class KubernetesNodeController {
   /* @ngInject */
-  constructor($async, $state, Notifications, LocalStorage, KubernetesNodeService, KubernetesEventService, KubernetesPodService, KubernetesApplicationService) {
+  constructor(
+    $async,
+    $state,
+    Notifications,
+    LocalStorage,
+    KubernetesNodeService,
+    KubernetesEventService,
+    KubernetesPodService,
+    KubernetesApplicationService,
+    KubernetesEndpointService
+  ) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
@@ -15,16 +26,30 @@ class KubernetesNodeController {
     this.KubernetesEventService = KubernetesEventService;
     this.KubernetesPodService = KubernetesPodService;
     this.KubernetesApplicationService = KubernetesApplicationService;
+    this.KubernetesEndpointService = KubernetesEndpointService;
 
     this.onInit = this.onInit.bind(this);
     this.getNodeAsync = this.getNodeAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
     this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
+    this.getEndpointsAsync = this.getEndpointsAsync.bind(this);
   }
 
   selectTab(index) {
     this.LocalStorage.storeActiveTab('node', index);
+  }
+
+  async getEndpointsAsync() {
+    try {
+      this.endpoints = await this.KubernetesEndpointService.get();
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve endpoints');
+    }
+  }
+
+  getEndpoints() {
+    return this.$async(this.getEndpointsAsync);
   }
 
   async getNodeAsync() {
@@ -32,6 +57,7 @@ class KubernetesNodeController {
       this.state.dataLoading = true;
       const nodeName = this.$transition$.params().name;
       this.node = await this.KubernetesNodeService.get(nodeName);
+      this.node.IsLeader = this.node.Name === KubernetesEndpointHelper.getLeader(this.endpoints);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve node');
     } finally {
@@ -115,6 +141,7 @@ class KubernetesNodeController {
 
     this.state.activeTab = this.LocalStorage.getActiveTab('node');
 
+    await this.getEndpoints();
     await this.getNode();
     await this.getEvents();
     await this.getApplications();

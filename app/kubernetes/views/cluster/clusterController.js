@@ -3,10 +3,11 @@ import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import { KubernetesResourceReservation } from 'Kubernetes/models/resource-reservation/models';
+import KubernetesEndpointHelper from 'Kubernetes/helpers/endpointHelper';
 
 class KubernetesClusterController {
   /* @ngInject */
-  constructor($async, $state, Authentication, Notifications, LocalStorage, KubernetesNodeService, KubernetesApplicationService, KubernetesComponentStatusService) {
+  constructor($async, $state, Authentication, Notifications, LocalStorage, KubernetesNodeService, KubernetesApplicationService, KubernetesComponentStatusService, KubernetesEndpointService) {
     this.$async = $async;
     this.$state = $state;
     this.Authentication = Authentication;
@@ -15,6 +16,7 @@ class KubernetesClusterController {
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesComponentStatusService = KubernetesComponentStatusService;
+    this.KubernetesEndpointService = KubernetesEndpointService;
 
     this.onInit = this.onInit.bind(this);
     this.getNodes = this.getNodes.bind(this);
@@ -22,6 +24,7 @@ class KubernetesClusterController {
     this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
     this.getComponentStatus = this.getComponentStatus.bind(this);
     this.getComponentStatusAsync = this.getComponentStatusAsync.bind(this);
+    this.getEndpointsAsync = this.getEndpointsAsync.bind(this);
   }
 
   async getComponentStatusAsync() {
@@ -35,6 +38,20 @@ class KubernetesClusterController {
 
   getComponentStatus() {
     return this.$async(this.getComponentStatusAsync);
+    this.getEndpointsAsync = this.getEndpointsAsync.bind(this);
+  }
+
+  async getEndpointsAsync() {
+    try {
+      this.endpoints = await this.KubernetesEndpointService.get();
+      this.leader = KubernetesEndpointHelper.getLeader(this.endpoints);
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve endpoints');
+    }
+  }
+
+  getEndpoints() {
+    return this.$async(this.getEndpointsAsync);
   }
 
   async getNodesAsync() {
@@ -44,6 +61,7 @@ class KubernetesClusterController {
       this.nodes = nodes;
       this.CPULimit = _.reduce(this.nodes, (acc, node) => node.CPU + acc, 0);
       this.MemoryLimit = _.reduce(this.nodes, (acc, node) => KubernetesResourceReservationHelper.megaBytesValue(node.Memory) + acc, 0);
+      _.forEach(this.nodes, (node) => (node.IsLeader = node.Name === this.leader));
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve nodes');
     }
@@ -92,6 +110,7 @@ class KubernetesClusterController {
 
     await this.getNodes();
     if (this.isAdmin) {
+      await this.getEndpoints();
       await this.getComponentStatus();
       await this.getApplications();
     }

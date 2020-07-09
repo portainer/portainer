@@ -10,6 +10,7 @@ const _KubernetesNode = Object.freeze({
   Memory: '',
   Version: '',
   IPAddress: '',
+  IsLeader: false,
 });
 
 export class KubernetesNode {
