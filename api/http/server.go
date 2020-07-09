@@ -3,6 +3,7 @@ package http
 import (
 	"time"
 
+	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/handler/edgegroups"
 	"github.com/portainer/portainer/api/http/handler/edgestacks"
 	"github.com/portainer/portainer/api/http/handler/edgetemplates"
@@ -338,8 +339,14 @@ func (server *Server) Start() error {
 		SchedulesHanlder:       schedulesHandler,
 	}
 
-	if server.SSL {
-		return http.ListenAndServeTLS(server.BindAddress, server.SSLCert, server.SSLKey, server.Handler)
+	httpServer := &http.Server{
+		Addr:    server.BindAddress,
+		Handler: server.Handler,
 	}
-	return http.ListenAndServe(server.BindAddress, server.Handler)
+
+	if server.SSL {
+		httpServer.TLSConfig = crypto.CreateServerTLSConfiguration()
+		return httpServer.ListenAndServeTLS(server.SSLCert, server.SSLKey)
+	}
+	return httpServer.ListenAndServe()
 }
