@@ -11,6 +11,7 @@ func (m *Migrator) updateSettingsToDBVersion23() error {
 	}
 
 	legacySettings.AllowDeviceMappingForRegularUsers = true
+	legacySettings.AllowStackManagementForRegularUsers = true
 
 	return m.settingsService.UpdateSettings(legacySettings)
 }
