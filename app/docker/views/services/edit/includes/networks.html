@@ -23,9 +23,16 @@
         <tbody>
           <tr ng-repeat="network in service.Networks">
             <td>
-              <select class="form-control" ng-model="network.Id" ng-options="net.Id as net.Name for net in availableNetworks" disable-authorization="DockerServiceUpdate">
+              <select
+                ng-if="network.Editable"
+                class="form-control"
+                ng-model="network.Id"
+                ng-options="net.Id as net.Name for net in filterNetworks(availableNetworks, network)"
+                disable-authorization="DockerServiceUpdate"
+              >
                 <option disabled hidden value="" selected>Select a network</option>
               </select>
+              <span ng-if="!network.Editable">{{ network.Name }}</span>
             </td>
             <td>
               <a ui-sref="docker.networks.network({id: network.Id})">{{ network.Id }}</a>
@@ -33,13 +40,14 @@
             <td>
               {{ network.Addr }}
             </td>
-            <td authorization="DockerServiceUpdate">
+            <td ng-if="network.Editable" authorization="DockerServiceUpdate">
               <span class="input-group-btn">
                 <button class="btn btn-sm btn-danger" type="button" ng-click="removeNetwork(service, $index)" ng-disabled="isUpdating">
                   <i class="fa fa-trash" aria-hidden="true"></i>
                 </button>
               </span>
             </td>
+            <td ng-if="!network.Editable"></td>
           </tr>
         </tbody>
       </table>

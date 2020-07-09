@@ -670,18 +670,26 @@ angular.module('portainer.docker').controller('ServiceController', [
           $scope.allowBindMounts = data.settings.AllowBindMountsForRegularUsers;
           $scope.isAdmin = Authentication.isAdmin();
           $scope.availableNetworks = data.availableNetworks;
-          $scope.service.Networks = _.map(
-            _.filter(data.availableNetworks, (item) => {
-              return _.find($scope.service.Model.Spec.Networks, { Target: item.Id });
-            }),
-            (item) => {
-              let addr = '';
-              if (item.IPAM.Config.length) {
-                addr = item.IPAM.Config[0].Subnet;
-              }
-              return { Id: item.Id, Name: item.Name, Addr: addr };
+
+          const networks = _.filter(data.availableNetworks, (item) => {
+            return _.find($scope.service.Model.Spec.TaskTemplate.Networks, { Target: item.Id });
+          });
+
+          if ($scope.service.Model.Spec.EndpointSpec.Ports.find((port) => port.PublishMode === 'ingress')) {
+            const ingressNetwork = $scope.availableNetworks.find((network) => network.Ingress);
+            if (ingressNetwork) {
+              networks.unshift(ingressNetwork);
             }
-          );
+          }
+
+          $scope.service.Networks = _.map(networks, (item) => {
+            let addr = '';
+            if (item.IPAM.Config.length) {
+              addr = item.IPAM.Config[0].Subnet;
+            }
+            return { Id: item.Id, Name: item.Name, Addr: addr, Editable: !item.Ingress };
+          });
+
           originalService.Networks = angular.copy($scope.service.Networks);
 
           if (data.webhooks.length > 0) {
@@ -738,6 +746,11 @@ angular.module('portainer.docker').controller('ServiceController', [
         service.hasChanges = true;
       }
       previousServiceValues.push(name);
+    }
+
+    $scope.filterNetworks = filterNetworks;
+    function filterNetworks(networks, current) {
+      return networks.filter((network) => network.Id === current.Id || $scope.service.Networks.every((serviceNetwork) => network.Id !== serviceNetwork.Id));
     }
 
     function updateServiceArray(service, name) {
