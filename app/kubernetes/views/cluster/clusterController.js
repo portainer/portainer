@@ -102,8 +102,8 @@ class KubernetesClusterController {
     this.isAdmin = this.Authentication.isAdmin();
 
     await this.getNodes();
-    await this.getComponentStatuses();
     if (this.isAdmin) {
+      await this.getComponentStatuses();
       await this.getApplications();
     }
 
