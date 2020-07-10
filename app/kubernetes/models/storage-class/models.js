@@ -24,6 +24,7 @@ export function KubernetesStorageClassAccessPolicies() {
 const _KubernetesStorageClass = Object.freeze({
   Name: '',
   AccessModes: [],
+  Provisioner: '',
 });
 
 export class KubernetesStorageClass {
