@@ -87,6 +87,15 @@ class KubernetesApplicationController {
     return this.state.eventWarningCount;
   }
 
+  buildIngressRuleURL(rule) {
+    const hostname = rule.Host ? rule.Host : rule.IP;
+    return 'http://' + hostname + rule.Path;
+  }
+
+  portHasIngressRules(port) {
+    return port.IngressRules.length > 0;
+  }
+
   ruleCanBeDisplayed(rule) {
     return !rule.Host && !rule.IP ? false : true;
   }
