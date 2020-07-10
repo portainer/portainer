@@ -96,13 +96,6 @@
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Protocol')">
-                  Protocol
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Protocol' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Protocol' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
-              <th>
                 HTTP route
               </th>
             </tr>
@@ -157,15 +150,7 @@
               </td>
               <!-- Container port -->
               <td>
-                <span ng-if="!$ctrl.itemCanExpand(item)">
-                  {{ item.Ports[0].TargetPort }}
-                </span>
-              </td>
-              <!-- Protocol -->
-              <td>
-                <span ng-if="!$ctrl.itemCanExpand(item)">
-                  {{ item.Ports[0].Protocol }}
-                </span>
+                <span ng-if="!$ctrl.itemCanExpand(item)"> {{ item.Ports[0].TargetPort }}/{{ item.Ports[0].Protocol }} </span>
               </td>
               <!-- HTTP route -->
               <td>
@@ -202,8 +187,7 @@
                   <i class="fa fa-external-link-alt" aria-hidden="true"></i> access
                 </a>
               </td>
-              <td ng-if="!$ctrl.portHasIngressRules(port)">{{ port.TargetPort }}</td>
-              <td ng-if="!$ctrl.portHasIngressRules(port)">{{ port.Protocol }}</td>
+              <td ng-if="!$ctrl.portHasIngressRules(port)">{{ port.TargetPort }}/{{ port.Protocol }}</td>
               <td ng-if="!$ctrl.portHasIngressRules(port)">-</td>
             </tr>
             <tr ng-show="item.Expanded" ng-repeat-end ng-repeat="rule in port.IngressRules" ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
@@ -216,8 +200,7 @@
                   <i class="fa fa-external-link-alt" aria-hidden="true"></i> access
                 </a>
               </td>
-              <td>{{ port.TargetPort }}</td>
-              <td>{{ port.Protocol }}</td>
+              <td>{{ port.TargetPort }}/{{ port.Protocol }}</td>
               <td>
                 <span
                   ng-if="!$ctrl.ruleCanBeDisplayed(rule)"
