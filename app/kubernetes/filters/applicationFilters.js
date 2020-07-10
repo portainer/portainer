@@ -1,6 +1,7 @@
 import _ from 'lodash-es';
 import { KubernetesApplicationDataAccessPolicies } from 'Kubernetes/models/application/models';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
+import { KubernetesApplicationTypes, KubernetesApplicationTypeStrings } from 'Kubernetes/models/application/models';
 
 angular
   .module('portainer.kubernetes')
@@ -42,6 +43,19 @@ angular
           return 'Application';
         case KubernetesServiceTypes.NODE_PORT:
           return 'Cluster node';
+      }
+    };
+  })
+  .filter('kubernetesApplicationTypeText', function () {
+    'use strict';
+    return function (type) {
+      switch (type) {
+        case KubernetesApplicationTypes.DEPLOYMENT:
+          return KubernetesApplicationTypeStrings.DEPLOYMENT;
+        case KubernetesApplicationTypes.DEAMONSET:
+          return KubernetesApplicationTypeStrings.DAEMONSET;
+        case KubernetesApplicationTypes.STATEFULSET:
+          return KubernetesApplicationTypeStrings.STATEFULSET;
       }
     };
   })
