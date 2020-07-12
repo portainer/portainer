@@ -223,7 +223,7 @@ angular.module('portainer.docker').controller('ServiceController', [
 
     $scope.removeNetwork = function removeNetwork(service, index) {
       var removedElement = service.Networks.splice(index, 1);
-      if (removedElement !== null) {
+      if (removedElement && removedElement.length && removedElement[0].Id) {
         updateServiceArray(service, 'Networks', service.Networks);
       }
     };
