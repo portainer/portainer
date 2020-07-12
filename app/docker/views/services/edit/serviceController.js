@@ -675,7 +675,7 @@ angular.module('portainer.docker').controller('ServiceController', [
           $scope.isAdmin = Authentication.isAdmin();
           $scope.availableNetworks = data.availableNetworks;
 
-          const serviceNetworks = _.concat($scope.service.Model.Spec.Networks || [], $scope.service.Model.Spec.TaskTemplate.Networks);
+          const serviceNetworks = _.uniqBy(_.concat($scope.service.Model.Spec.Networks || [], $scope.service.Model.Spec.TaskTemplate.Networks), 'Target');
           const networks = _.filter(
             _.map(serviceNetworks, ({ Target }) => _.find(data.availableNetworks, { Id: Target })),
             Boolean
