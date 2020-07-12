@@ -13,7 +13,6 @@ export class HostBrowserController {
     this.goToParent = this.goToParent.bind(this);
     this.browse = this.browse.bind(this);
     this.confirmDeleteFile = this.confirmDeleteFile.bind(this);
-    this.deleteFile = this.deleteFile.bind(this);
     this.isRoot = this.isRoot.bind(this);
     this.onFileSelectedForUpload = this.onFileSelectedForUpload.bind(this);
     this.getRelativePath = this.getRelativePath.bind(this);
@@ -23,6 +22,8 @@ export class HostBrowserController {
     this.downloadFileAsync = this.downloadFileAsync.bind(this);
     this.renameFile = this.renameFile.bind(this);
     this.renameFileAsync = this.renameFileAsync.bind(this);
+    this.deleteFile = this.deleteFile.bind(this);
+    this.deleteFileAsync = this.deleteFileAsync.bind(this);
   }
 
   getRelativePath(path) {
@@ -101,17 +102,17 @@ export class HostBrowserController {
   }
 
   deleteFile(path) {
-    this.HostBrowserService.delete(path)
-      .then(() => {
-        this.Notifications.success('File successfully deleted', this.getRelativePath(path));
-        return this.HostBrowserService.ls(this.state.path);
-      })
-      .then((data) => {
-        this.files = data;
-      })
-      .catch((err) => {
-        this.Notifications.error('Failure', err, 'Unable to delete file');
-      });
+    this.$async(this.deleteFileAsync, path);
+  }
+  async deleteFileAsync(path) {
+    try {
+      await this.HostBrowserService.delete(path);
+      this.Notifications.success('File successfully deleted', this.getRelativePath(path));
+      const files = await this.HostBrowserService.ls(this.state.path);
+      this.files = files;
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to delete file');
+    }
   }
 
   $onInit() {
