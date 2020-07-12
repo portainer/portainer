@@ -1,129 +1,145 @@
 import _ from 'lodash-es';
 
-export function VolumeBrowserController(HttpRequestHelper, VolumeBrowserService, FileSaver, Blob, ModalService, Notifications) {
-  var ctrl = this;
+export class VolumeBrowserController {
+  constructor(HttpRequestHelper, VolumeBrowserService, FileSaver, Blob, ModalService, Notifications) {
+    Object.assign(this, { HttpRequestHelper, VolumeBrowserService, FileSaver, Blob, ModalService, Notifications });
+    this.state = {
+      path: '/',
+    };
 
-  this.state = {
-    path: '/',
-  };
+    // this. = this..bind(this)
+    this.rename = this.rename.bind(this);
+    this.confirmDelete = this.confirmDelete.bind(this);
+    this.download = this.download.bind(this);
+    this.up = this.up.bind(this);
+    this.browse = this.browse.bind(this);
+    this.deleteFile = this.deleteFile.bind(this);
+    this.getFilesForPath = this.getFilesForPath.bind(this);
+    this.onFileSelectedForUpload = this.onFileSelectedForUpload.bind(this);
+    this.parentPath = this.parentPath.bind(this);
+    this.buildPath = this.buildPath.bind(this);
+    this.$onInit = this.$onInit.bind(this);
+    this.onFileUploaded = this.onFileUploaded.bind(this);
+    this.refreshList = this.refreshList.bind(this);
+  }
 
-  this.rename = function (file, newName) {
-    var filePath = this.state.path === '/' ? file : this.state.path + '/' + file;
-    var newFilePath = this.state.path === '/' ? newName : this.state.path + '/' + newName;
+  rename(file, newName) {
+    const filePath = this.state.path === '/' ? file : this.state.path + '/' + file;
+    const newFilePath = this.state.path === '/' ? newName : this.state.path + '/' + newName;
 
-    VolumeBrowserService.rename(this.volumeId, filePath, newFilePath)
-      .then(function success() {
-        Notifications.success('File successfully renamed', newFilePath);
-        return VolumeBrowserService.ls(ctrl.volumeId, ctrl.state.path);
+    this.VolumeBrowserService.rename(this.volumeId, filePath, newFilePath)
+      .then(() => {
+        this.Notifications.success('File successfully renamed', newFilePath);
+        return this.VolumeBrowserService.ls(this.volumeId, this.state.path);
       })
-      .then(function success(data) {
-        ctrl.files = data;
+      .then((data) => {
+        this.files = data;
       })
-      .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to rename file');
+      .catch((err) => {
+        this.Notifications.error('Failure', err, 'Unable to rename file');
       });
-  };
+  }
 
-  this.delete = function (file) {
-    var filePath = this.state.path === '/' ? file : this.state.path + '/' + file;
+  confirmDelete(file) {
+    const filePath = this.state.path === '/' ? file : this.state.path + '/' + file;
 
-    ModalService.confirmDeletion('Are you sure that you want to delete ' + filePath + ' ?', function onConfirm(confirmed) {
+    this.ModalService.confirmDeletion('Are you sure that you want to delete ' + filePath + ' ?', (confirmed) => {
       if (!confirmed) {
         return;
       }
-      deleteFile(filePath);
+      this.deleteFile(filePath);
     });
-  };
+  }
 
-  this.download = function (file) {
-    var filePath = this.state.path === '/' ? file : this.state.path + '/' + file;
-    VolumeBrowserService.get(this.volumeId, filePath)
-      .then(function success(data) {
-        var downloadData = new Blob([data.file]);
-        FileSaver.saveAs(downloadData, file);
+  download(file) {
+    const filePath = this.state.path === '/' ? file : this.state.path + '/' + file;
+    this.VolumeBrowserService.get(this.volumeId, filePath)
+      .then((data) => {
+        const downloadData = new Blob([data.file]);
+        this.FileSaver.saveAs(downloadData, file);
       })
-      .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to download file');
-      });
-  };
-
-  this.up = function () {
-    var parentFolder = parentPath(this.state.path);
-    browse(parentFolder);
-  };
-
-  this.browse = function (folder) {
-    var path = buildPath(this.state.path, folder);
-    browse(path);
-  };
-
-  function deleteFile(file) {
-    VolumeBrowserService.delete(ctrl.volumeId, file)
-      .then(function success() {
-        Notifications.success('File successfully deleted', file);
-        return VolumeBrowserService.ls(ctrl.volumeId, ctrl.state.path);
-      })
-      .then(function success(data) {
-        ctrl.files = data;
-      })
-      .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to delete file');
+      .catch((err) => {
+        this.Notifications.error('Failure', err, 'Unable to download file');
       });
   }
 
-  function browse(path) {
-    VolumeBrowserService.ls(ctrl.volumeId, path)
-      .then(function success(data) {
-        ctrl.state.path = path;
-        ctrl.files = data;
+  up() {
+    const parentFolder = this.parentPath(this.state.path);
+    this.getFilesForPath(parentFolder);
+  }
+
+  browse(folder) {
+    const path = this.buildPath(this.state.path, folder);
+    this.getFilesForPath(path);
+  }
+
+  deleteFile(file) {
+    this.VolumeBrowserService.delete(this.volumeId, file)
+      .then(() => {
+        this.Notifications.success('File successfully deleted', file);
+        return this.VolumeBrowserService.ls(this.volumeId, this.state.path);
       })
-      .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to browse volume');
+      .then((data) => {
+        this.files = data;
+      })
+      .catch((err) => {
+        this.Notifications.error('Failure', err, 'Unable to delete file');
       });
   }
 
-  this.onFileSelectedForUpload = function onFileSelectedForUpload(file) {
-    VolumeBrowserService.upload(ctrl.state.path, file, ctrl.volumeId)
-      .then(function onFileUpload() {
-        onFileUploaded();
+  getFilesForPath(path) {
+    this.VolumeBrowserService.ls(this.volumeId, path)
+      .then((data) => {
+        this.state.path = path;
+        this.files = data;
       })
-      .catch(function onFileUpload(err) {
-        Notifications.error('Failure', err, 'Unable to upload file');
+      .catch((err) => {
+        this.Notifications.error('Failure', err, 'Unable to browse volume');
       });
-  };
+  }
 
-  function parentPath(path) {
+  onFileSelectedForUpload(file) {
+    this.VolumeBrowserService.upload(this.state.path, file, this.volumeId)
+      .then(() => {
+        this.onFileUploaded();
+      })
+      .catch((err) => {
+        this.Notifications.error('Failure', err, 'Unable to upload file');
+      });
+  }
+
+  parentPath(path) {
     if (path.lastIndexOf('/') === 0) {
       return '/';
     }
 
-    var split = _.split(path, '/');
+    const split = _.split(path, '/');
     return _.join(_.slice(split, 0, split.length - 1), '/');
   }
 
-  function buildPath(parent, file) {
+  buildPath(parent, file) {
     if (parent === '/') {
       return parent + file;
     }
     return parent + '/' + file;
   }
 
-  this.$onInit = function () {
-    HttpRequestHelper.setPortainerAgentTargetHeader(this.nodeName);
-    VolumeBrowserService.ls(this.volumeId, this.state.path)
-      .then(function success(data) {
-        ctrl.files = data;
+  $onInit() {
+    this.HttpRequestHelper.setPortainerAgentTargetHeader(this.nodeName);
+    this.VolumeBrowserService.ls(this.volumeId, this.state.path)
+      .then((data) => {
+        this.files = data;
       })
-      .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to browse volume');
+      .catch((err) => {
+        this.Notifications.error('Failure', err, 'Unable to browse volume');
       });
-  };
-
-  function onFileUploaded() {
-    refreshList();
   }
 
-  function refreshList() {
-    browse(ctrl.state.path);
+  onFileUploaded() {
+    this.refreshList();
+  }
+
+  refreshList() {
+    this.getFilesForPath(this.state.path);
   }
 }
