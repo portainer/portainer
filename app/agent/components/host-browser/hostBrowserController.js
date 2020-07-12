@@ -14,7 +14,6 @@ export class HostBrowserController {
     this.browse = this.browse.bind(this);
     this.confirmDeleteFile = this.confirmDeleteFile.bind(this);
     this.isRoot = this.isRoot.bind(this);
-    this.onFileSelectedForUpload = this.onFileSelectedForUpload.bind(this);
     this.getRelativePath = this.getRelativePath.bind(this);
     this.getFilesForPath = this.getFilesForPath.bind(this);
     this.getFilesForPathAsync = this.getFilesForPathAsync.bind(this);
@@ -24,6 +23,8 @@ export class HostBrowserController {
     this.renameFileAsync = this.renameFileAsync.bind(this);
     this.deleteFile = this.deleteFile.bind(this);
     this.deleteFileAsync = this.deleteFileAsync.bind(this);
+    this.onFileSelectedForUpload = this.onFileSelectedForUpload.bind(this);
+    this.onFileSelectedForUploadAsync = this.onFileSelectedForUploadAsync.bind(this);
   }
 
   getRelativePath(path) {
@@ -136,13 +137,15 @@ export class HostBrowserController {
   }
 
   onFileSelectedForUpload(file) {
-    this.HostBrowserService.upload(this.state.path, file)
-      .then(() => {
-        this.onFileUploaded();
-      })
-      .catch((err) => {
-        this.Notifications.error('Failure', err, 'Unable to upload file');
-      });
+    return this.$async(this.onFileSelectedForUploadAsync, file);
+  }
+  async onFileSelectedForUploadAsync(file) {
+    try {
+      await this.HostBrowserService.upload(this.state.path, file);
+      this.onFileUploaded();
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to upload file');
+    }
   }
 
   onFileUploaded() {
