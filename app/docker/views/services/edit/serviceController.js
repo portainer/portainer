@@ -393,7 +393,10 @@ angular.module('portainer.docker').controller('ServiceController', [
       }
 
       if ($scope.hasChanges(service, ['Networks'])) {
-        config.Networks = _.map(service.Networks, (item) => ({ Target: item.Id }));
+        config.Networks = _.map(
+          _.filter(service.Networks, (item) => item.Id && item.Editable),
+          (item) => ({ Target: item.Id })
+        );
         config.TaskTemplate.Networks = config.Networks;
       }
 
