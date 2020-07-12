@@ -29,7 +29,7 @@ export class HostBrowserController {
 
   getRelativePath(path) {
     path = path || this.state.path;
-    const rootPathRegex = new RegExp('^' + ROOT_PATH + '/?');
+    const rootPathRegex = new RegExp(`^${ROOT_PATH}/?`);
     const relativePath = path.replace(rootPathRegex, '/');
     return relativePath;
   }
@@ -94,7 +94,7 @@ export class HostBrowserController {
   confirmDeleteFile(name) {
     const filePath = this.buildPath(this.state.path, name);
 
-    this.ModalService.confirmDeletion('Are you sure that you want to delete ' + this.getRelativePath(filePath) + ' ?', (confirmed) => {
+    this.ModalService.confirmDeletion(`Are you sure that you want to delete ${this.getRelativePath(filePath)} ?`, (confirmed) => {
       if (!confirmed) {
         return;
       }
