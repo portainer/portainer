@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 
-const ROOT_PATH = '/host/home/chaim/Downloads';
+const ROOT_PATH = '/host';
 
 export class HostBrowserController {
   constructor($async, HostBrowserService, Notifications, FileSaver, ModalService) {
