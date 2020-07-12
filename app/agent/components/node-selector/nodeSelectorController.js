@@ -3,16 +3,15 @@ export class NodeSelectorController {
     Object.assign(this, { AgentService, Notifications });
   }
 
-  $onInit() {
-    this.AgentService.agents()
-      .then((data) => {
-        this.agents = data;
-        if (!this.model) {
-          this.model = data[0].NodeName;
-        }
-      })
-      .catch((err) => {
-        this.Notifications.error('Failure', err, 'Unable to load agents');
-      });
+  async $onInit() {
+    try {
+      const agents = await this.AgentService.agents();
+      this.agents = agents;
+      if (!this.model) {
+        this.model = agents[0].NodeName;
+      }
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to load agents');
+    }
   }
 }
