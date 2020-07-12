@@ -218,15 +218,16 @@ angular.module('portainer.docker').controller('ServiceController', [
       if (!service.Networks) {
         service.Networks = [];
       }
-      service.Networks.push({ Id: '', Name: '', Addr: '' });
-      updateServiceArray(service, 'Networks', service.Networks);
+      service.Networks.push({ Id: '', Name: '', Addr: '', Editable: true });
     };
+
     $scope.removeNetwork = function removeNetwork(service, index) {
       var removedElement = service.Networks.splice(index, 1);
       if (removedElement !== null) {
         updateServiceArray(service, 'Networks', service.Networks);
       }
     };
+
     $scope.updateNetwork = function updateNetwork(service) {
       updateServiceArray(service, 'Networks', service.Networks);
     };
@@ -671,9 +672,11 @@ angular.module('portainer.docker').controller('ServiceController', [
           $scope.isAdmin = Authentication.isAdmin();
           $scope.availableNetworks = data.availableNetworks;
 
-          const networks = _.filter(data.availableNetworks, (item) => {
-            return _.find($scope.service.Model.Spec.TaskTemplate.Networks, { Target: item.Id });
-          });
+          const serviceNetworks = _.concat($scope.service.Model.Spec.Networks || [], $scope.service.Model.Spec.TaskTemplate.Networks);
+          const networks = _.filter(
+            _.map(serviceNetworks, ({ Target }) => _.find(data.availableNetworks, { Id: Target })),
+            Boolean
+          );
 
           if (_.some($scope.service.Ports, (port) => port.PublishMode === 'ingress')) {
             const ingressNetwork = _.find($scope.availableNetworks, (network) => network.Ingress);
@@ -750,7 +753,7 @@ angular.module('portainer.docker').controller('ServiceController', [
 
     $scope.filterNetworks = filterNetworks;
     function filterNetworks(networks, current) {
-      return networks.filter((network) => network.Id === current.Id || $scope.service.Networks.every((serviceNetwork) => network.Id !== serviceNetwork.Id));
+      return networks.filter((network) => !network.Ingress && (network.Id === current.Id || $scope.service.Networks.every((serviceNetwork) => network.Id !== serviceNetwork.Id)));
     }
 
     function updateServiceArray(service, name) {

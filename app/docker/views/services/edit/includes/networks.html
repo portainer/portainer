@@ -2,7 +2,7 @@
   <rd-widget>
     <rd-widget-header icon="fa-tasks" title-text="Networks">
       <div class="nopadding" authorization="DockerServiceUpdate">
-        <a class="btn btn-default btn-sm pull-right" ng-click="isUpdating ||addNetwork(service)" ng-disabled="isUpdating">
+        <a class="btn btn-default btn-sm pull-right" ng-click="isUpdating || addNetwork(service)" ng-disabled="isUpdating">
           <i class="fa fa-plus-circle" aria-hidden="true"></i> network
         </a>
       </div>
@@ -27,6 +27,7 @@
                 ng-if="network.Editable"
                 class="form-control"
                 ng-model="network.Id"
+                ng-change="updateNetwork(service)"
                 ng-options="net.Id as net.Name for net in filterNetworks(availableNetworks, network)"
                 disable-authorization="DockerServiceUpdate"
               >
@@ -55,7 +56,9 @@
     <rd-widget-footer authorization="DockerServiceUpdate">
       <div class="btn-toolbar" role="toolbar">
         <div class="btn-group" role="group">
-          <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['Networks'])" ng-click="updateService(service)">Apply changes</button>
+          <button type="button" class="btn btn-primary btn-sm" ng-disabled="isUpdating || !hasChanges(service, ['Networks'])" ng-click="updateService(service)"
+            >Apply changes</button
+          >
           <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="caret"></span>
           </button>
