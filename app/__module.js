@@ -1,4 +1,6 @@
 import './assets/css';
+import '@babel/polyfill';
+
 import angular from 'angular';
 
 import './agent/_module';

@@ -1,5 +1,4 @@
 import $ from 'jquery';
-import '@babel/polyfill';
 
 angular.module('portainer').run([
   '$rootScope',
