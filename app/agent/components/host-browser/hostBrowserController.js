@@ -1,10 +1,10 @@
 import _ from 'lodash-es';
 
-const ROOT_PATH = '/host';
+const ROOT_PATH = '/host/home/chaim/Downloads';
 
 export class HostBrowserController {
-  constructor(HostBrowserService, Notifications, FileSaver, ModalService) {
-    Object.assign(this, { HostBrowserService, Notifications, FileSaver, ModalService });
+  constructor($async, HostBrowserService, Notifications, FileSaver, ModalService) {
+    Object.assign(this, { $async, HostBrowserService, Notifications, FileSaver, ModalService });
 
     this.state = {
       path: ROOT_PATH,
@@ -12,22 +12,23 @@ export class HostBrowserController {
 
     this.goToParent = this.goToParent.bind(this);
     this.browse = this.browse.bind(this);
-    this.renameFile = this.renameFile.bind(this);
-    this.downloadFile = this.downloadFile.bind(this);
     this.confirmDeleteFile = this.confirmDeleteFile.bind(this);
     this.deleteFile = this.deleteFile.bind(this);
     this.isRoot = this.isRoot.bind(this);
     this.onFileSelectedForUpload = this.onFileSelectedForUpload.bind(this);
     this.getRelativePath = this.getRelativePath.bind(this);
-
     this.getFilesForPath = this.getFilesForPath.bind(this);
-    // this.=this..bind(this)
+    this.getFilesForPathAsync = this.getFilesForPathAsync.bind(this);
+    this.downloadFile = this.downloadFile.bind(this);
+    this.downloadFileAsync = this.downloadFileAsync.bind(this);
+    this.renameFile = this.renameFile.bind(this);
+    this.renameFileAsync = this.renameFileAsync.bind(this);
   }
 
   getRelativePath(path) {
     path = path || this.state.path;
-    var rootPathRegex = new RegExp('^' + ROOT_PATH + '/?');
-    var relativePath = path.replace(rootPathRegex, '/');
+    const rootPathRegex = new RegExp('^' + ROOT_PATH + '/?');
+    const relativePath = path.replace(rootPathRegex, '/');
     return relativePath;
   }
 
@@ -44,49 +45,52 @@ export class HostBrowserController {
   }
 
   getFilesForPath(path) {
-    this.HostBrowserService.ls(path)
-      .then((files) => {
-        this.state.path = path;
-        this.files = files;
-      })
-      .catch((err) => {
-        this.Notifications.error('Failure', err, 'Unable to browse');
-      });
+    return this.$async(this.getFilesForPathAsync, path);
+  }
+  async getFilesForPathAsync(path) {
+    try {
+      const files = await this.HostBrowserService.ls(path);
+      this.state.path = path;
+      this.files = files;
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to browse');
+    }
   }
 
   renameFile(name, newName) {
-    var filePath = this.buildPath(this.state.path, name);
-    var newFilePath = this.buildPath(this.state.path, newName);
-
-    this.HostBrowserService.rename(filePath, newFilePath)
-      .then(() => {
-        this.Notifications.success('File successfully renamed', this.getRelativePath(newFilePath));
-        return this.HostBrowserService.ls(this.state.path);
-      })
-      .then((files) => {
-        this.files = files;
-      })
-      .catch((err) => {
-        this.Notifications.error('Failure', err, 'Unable to rename file');
-      });
+    return this.$async(this.renameFileAsync, name, newName);
+  }
+  async renameFileAsync(name, newName) {
+    const filePath = this.buildPath(this.state.path, name);
+    const newFilePath = this.buildPath(this.state.path, newName);
+    try {
+      await this.HostBrowserService.rename(filePath, newFilePath);
+      this.Notifications.success('File successfully renamed', this.getRelativePath(newFilePath));
+      const files = await this.HostBrowserService.ls(this.state.path);
+      this.files = files;
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to rename file');
+    }
   }
 
-  downloadFile(file) {
-    var filePath = this.buildPath(this.state.path, file);
-    this.HostBrowserService.get(filePath)
-      .then((data) => {
-        var downloadData = new Blob([data.file], {
-          type: 'text/plain;charset=utf-8',
-        });
-        this.FileSaver.saveAs(downloadData, file);
-      })
-      .catch((err) => {
-        this.Notifications.error('Failure', err, 'Unable to download file');
+  downloadFile(fileName) {
+    return this.$async(this.downloadFileAsync, fileName);
+  }
+  async downloadFileAsync(fileName) {
+    const filePath = this.buildPath(this.state.path, fileName);
+    try {
+      const { file } = await this.HostBrowserService.get(filePath);
+      const downloadData = new Blob([file], {
+        type: 'text/plain;charset=utf-8',
       });
+      this.FileSaver.saveAs(downloadData, fileName);
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to download file');
+    }
   }
 
   confirmDeleteFile(name) {
-    var filePath = this.buildPath(this.state.path, name);
+    const filePath = this.buildPath(this.state.path, name);
 
     this.ModalService.confirmDeletion('Are you sure that you want to delete ' + this.getRelativePath(filePath) + ' ?', (confirmed) => {
       if (!confirmed) {
@@ -119,7 +123,7 @@ export class HostBrowserController {
       return ROOT_PATH;
     }
 
-    var split = _.split(path, '/');
+    const split = _.split(path, '/');
     return _.join(_.slice(split, 0, split.length - 1), '/');
   }
 
