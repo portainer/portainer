@@ -16,12 +16,12 @@
       <azure-sidebar-content ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider === 'AZURE'"> </azure-sidebar-content>
       <docker-sidebar-content
         ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider !== 'AZURE'"
-        hide-stacks="!showStacks"
         endpoint-api-version="applicationState.endpoint.apiVersion"
         swarm-management="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'"
         standalone-management="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE' || applicationState.endpoint.mode.provider === 'VMWARE_VIC'"
         admin-access="!applicationState.application.authentication || isAdmin"
         offline-mode="endpointState.OfflineMode"
+        show-stacks="showStacks"
       ></docker-sidebar-content>
       <li class="sidebar-title" authorization="IntegrationStoridgeAdmin" ng-if="applicationState.endpoint.mode && applicationState.endpoint.extensions.length > 0">
         <span>Integrations</span>

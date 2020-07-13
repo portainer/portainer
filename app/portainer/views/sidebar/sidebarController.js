@@ -1,12 +1,13 @@
 angular.module('portainer.app').controller('SidebarController', [
   '$q',
   '$scope',
+  '$transitions',
   'StateManager',
   'Notifications',
   'Authentication',
   'UserService',
   'ExtensionService',
-  function ($q, $scope, StateManager, Notifications, Authentication, UserService, ExtensionService) {
+  function ($q, $scope, $transitions, StateManager, Notifications, Authentication, UserService, ExtensionService) {
     function checkPermissions(memberships) {
       var isLeader = false;
       angular.forEach(memberships, function (membership) {
@@ -51,6 +52,12 @@ angular.module('portainer.app').controller('SidebarController', [
       if (rbacEnabled) {
         return Authentication.hasAuthorizations(['EndpointResourcesAccess']);
       }
+
+      return false;
     }
+
+    $transitions.onEnter({}, async () => {
+      $scope.showStacks = await shouldShowStacks();
+    });
   },
 ]);
