@@ -3,7 +3,7 @@ import _ from 'lodash-es';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import { KubernetesResourceReservation } from 'Kubernetes/models/resource-reservation/models';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
-import KubernetesEndpointHelper from 'Kubernetes/helpers/endpointHelper';
+import KubernetesEndpointHelper from 'Kubernetes/endpoint/helper';
 
 class KubernetesNodeController {
   /* @ngInject */

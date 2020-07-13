@@ -8,10 +8,10 @@ const _KubernetesEndpoint = Object.freeze({
   HolderIdentity: '',
 });
 
+export const KubernetesEndpointAnnotationLeader = 'control-plane.alpha.kubernetes.io/leader';
+
 export class KubernetesEndpoint {
   constructor() {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesEndpoint)));
   }
 }
-
-export const KubernetesEndpointAnnotationLeader = 'control-plane.alpha.kubernetes.io/leader';

@@ -1,4 +1,4 @@
-import { KubernetesEndpoint, KubernetesEndpointAnnotationLeader } from 'Kubernetes/models/endpoint/models';
+import { KubernetesEndpoint, KubernetesEndpointAnnotationLeader } from 'Kubernetes/endpoint/models';
 import _ from 'lodash-es';
 
 class KubernetesEndpointConverter {

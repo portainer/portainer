@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 
-class KubernetesEventHelper {
+class KubernetesEndpointHelper {
   static getLeader(endpoints) {
     let leader = '';
     _.forEach(endpoints, (endpoint) => {
@@ -13,4 +13,4 @@ class KubernetesEventHelper {
   }
 }
 
-export default KubernetesEventHelper;
+export default KubernetesEndpointHelper;

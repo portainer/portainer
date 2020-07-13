@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 import angular from 'angular';
 import PortainerError from 'Portainer/error';
-import KubernetesEndpointConverter from 'Kubernetes/converters/endpoint';
+import KubernetesEndpointConverter from 'Kubernetes/endpoint/converter';
 
 class KubernetesEndpointService {
   /* @ngInject */
@@ -18,11 +18,9 @@ class KubernetesEndpointService {
   async getAllAsync(namespace) {
     try {
       const data = await this.KubernetesEndpoints(namespace).get().$promise;
-      return _.map(data.items, (item) => {
-        return KubernetesEndpointConverter.apiToEndpoint(item);
-      });
+      return _.map(data.items, (item) => KubernetesEndpointConverter.apiToEndpoint(item));
     } catch (err) {
-      throw new PortainerError('Unable to retrieve events', err);
+      throw new PortainerError('Unable to retrieve endpoints', err);
     }
   }
 
