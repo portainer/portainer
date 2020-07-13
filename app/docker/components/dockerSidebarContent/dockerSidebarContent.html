@@ -4,7 +4,7 @@
 <li class="sidebar-list" ng-if="!$ctrl.offlineMode" authorization="DockerContainerCreate, PortainerStackCreate">
   <a ui-sref="portainer.templates" ui-sref-active="active">App Templates <span class="menu-icon fa fa-rocket fa-fw"></span></a>
 </li>
-<li class="sidebar-list" ng-if="!$ctrl.hideStacks">
+<li class="sidebar-list" ng-if="$ctrl.showStacks">
   <a ui-sref="portainer.stacks" ui-sref-active="active">Stacks <span class="menu-icon fa fa-th-list fa-fw"></span></a>
 </li>
 <li class="sidebar-list" ng-if="$ctrl.swarmManagement">

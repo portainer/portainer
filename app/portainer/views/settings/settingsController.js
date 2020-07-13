@@ -33,7 +33,7 @@ angular.module('portainer.app').controller('SettingsController', [
       enableHostManagementFeatures: false,
       enableVolumeBrowser: false,
       enableEdgeComputeFeatures: false,
-      disableStackManagementForRegularUsers: false,
+      allowStackManagementForRegularUsers: false,
       restrictHostNamespaceForRegularUsers: false,
       allowDeviceMappingForRegularUsers: false,
     };
@@ -72,7 +72,7 @@ angular.module('portainer.app').controller('SettingsController', [
       settings.AllowVolumeBrowserForRegularUsers = $scope.formValues.enableVolumeBrowser;
       settings.EnableHostManagementFeatures = $scope.formValues.enableHostManagementFeatures;
       settings.EnableEdgeComputeFeatures = $scope.formValues.enableEdgeComputeFeatures;
-      settings.DisableStackManagementForRegularUsers = $scope.formValues.disableStackManagementForRegularUsers;
+      settings.AllowStackManagementForRegularUsers = !$scope.formValues.disableStackManagementForRegularUsers;
       settings.AllowHostNamespaceForRegularUsers = !$scope.formValues.restrictHostNamespaceForRegularUsers;
       settings.AllowDeviceMappingForRegularUsers = !$scope.formValues.disableDeviceMappingForRegularUsers;
 
@@ -89,7 +89,7 @@ angular.module('portainer.app').controller('SettingsController', [
           StateManager.updateEnableHostManagementFeatures(settings.EnableHostManagementFeatures);
           StateManager.updateEnableVolumeBrowserForNonAdminUsers(settings.AllowVolumeBrowserForRegularUsers);
           StateManager.updateEnableEdgeComputeFeatures(settings.EnableEdgeComputeFeatures);
-          StateManager.updateDisableStackManagementForRegularUsers(settings.DisableStackManagementForRegularUsers);
+          StateManager.updateAllowStackManagementForRegularUsers(settings.AllowStackManagementForRegularUsers);
           StateManager.updateAllowHostNamespaceForRegularUsers(settings.AllowHostNamespaceForRegularUsers);
           StateManager.updateAllowDeviceMappingForRegularUsers(settings.AllowDeviceMappingForRegularUsers);
           $state.reload();
@@ -118,7 +118,7 @@ angular.module('portainer.app').controller('SettingsController', [
           $scope.formValues.enableVolumeBrowser = settings.AllowVolumeBrowserForRegularUsers;
           $scope.formValues.enableHostManagementFeatures = settings.EnableHostManagementFeatures;
           $scope.formValues.enableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
-          $scope.formValues.disableStackManagementForRegularUsers = settings.DisableStackManagementForRegularUsers;
+          $scope.formValues.disableStackManagementForRegularUsers = !settings.AllowStackManagementForRegularUsers;
           $scope.formValues.restrictHostNamespaceForRegularUsers = !settings.AllowHostNamespaceForRegularUsers;
           $scope.formValues.disableDeviceMappingForRegularUsers = !settings.AllowDeviceMappingForRegularUsers;
         })
