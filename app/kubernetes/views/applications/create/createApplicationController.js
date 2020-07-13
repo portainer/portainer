@@ -37,7 +37,8 @@ class KubernetesCreateApplicationController {
     KubernetesStackService,
     KubernetesConfigurationService,
     KubernetesNodeService,
-    KubernetesPersistentVolumeClaimService
+    KubernetesPersistentVolumeClaimService,
+    KubernetesNamespaceHelper
   ) {
     this.$async = $async;
     this.$state = $state;
@@ -51,6 +52,7 @@ class KubernetesCreateApplicationController {
     this.KubernetesConfigurationService = KubernetesConfigurationService;
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesPersistentVolumeClaimService = KubernetesPersistentVolumeClaimService;
+    this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
 
     this.ApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
     this.ApplicationDataAccessPolicies = KubernetesApplicationDataAccessPolicies;
@@ -592,7 +594,8 @@ class KubernetesCreateApplicationController {
 
       const [resourcePools, nodes] = await Promise.all([this.KubernetesResourcePoolService.get(), this.KubernetesNodeService.get()]);
 
-      this.resourcePools = resourcePools;
+      this.resourcePools = _.filter(resourcePools, (resourcePool) => !this.KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name));
+
       this.formValues.ResourcePool = this.resourcePools[0];
 
       _.forEach(nodes, (item) => {

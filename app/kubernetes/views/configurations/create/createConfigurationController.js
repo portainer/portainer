@@ -5,7 +5,7 @@ import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/mo
 
 class KubernetesCreateConfigurationController {
   /* @ngInject */
-  constructor($async, $state, Notifications, Authentication, KubernetesConfigurationService, KubernetesResourcePoolService) {
+  constructor($async, $state, Notifications, Authentication, KubernetesConfigurationService, KubernetesResourcePoolService, KubernetesNamespaceHelper) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
@@ -13,6 +13,7 @@ class KubernetesCreateConfigurationController {
     this.KubernetesConfigurationService = KubernetesConfigurationService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesConfigurationTypes = KubernetesConfigurationTypes;
+    this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
 
     this.onInit = this.onInit.bind(this);
     this.createConfigurationAsync = this.createConfigurationAsync.bind(this);
@@ -74,7 +75,9 @@ class KubernetesCreateConfigurationController {
     this.formValues.Data.push(new KubernetesConfigurationFormValuesDataEntry());
 
     try {
-      this.resourcePools = await this.KubernetesResourcePoolService.get();
+      const resourcePools = await this.KubernetesResourcePoolService.get();
+      this.resourcePools = _.filter(resourcePools, (resourcePool) => !this.KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name));
+
       this.formValues.ResourcePool = this.resourcePools[0];
       await this.getConfigurations();
     } catch (err) {
