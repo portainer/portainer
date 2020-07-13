@@ -97,6 +97,8 @@ angular.module('portainer.app').controller('SettingsController', [
           StateManager.updateAllowStackManagementForRegularUsers(settings.AllowStackManagementForRegularUsers);
           StateManager.updateAllowHostNamespaceForRegularUsers(settings.AllowHostNamespaceForRegularUsers);
           StateManager.updateAllowDeviceMappingForRegularUsers(settings.AllowDeviceMappingForRegularUsers);
+          StateManager.updateAllowPrivilegedModeForRegularUsers(settings.AllowPrivilegedModeForRegularUsers);
+          StateManager.updateAllowBindMountsForRegularUsers(settings.AllowBindMountsForRegularUsers);
           $state.reload();
         })
         .catch(function error(err) {

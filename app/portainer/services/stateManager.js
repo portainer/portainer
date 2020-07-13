@@ -91,6 +91,16 @@ angular.module('portainer.app').factory('StateManager', [
       LocalStorage.storeApplicationState(state.application);
     };
 
+    manager.updateAllowBindMountsForRegularUsers = function updateAllowBindMountsForRegularUsers(allowBindMountsForRegularUsers) {
+      state.application.allowBindMountsForRegularUsers = allowBindMountsForRegularUsers;
+      LocalStorage.storeApplicationState(state.application);
+    };
+
+    manager.updateAllowPrivilegedModeForRegularUsers = function (AllowPrivilegedModeForRegularUsers) {
+      state.application.allowPrivilegedModeForRegularUsers = AllowPrivilegedModeForRegularUsers;
+      LocalStorage.storeApplicationState(state.application);
+    };
+
     function assignStateFromStatusAndSettings(status, settings) {
       state.application.authentication = status.Authentication;
       state.application.analytics = status.Analytics;
@@ -103,6 +113,8 @@ angular.module('portainer.app').factory('StateManager', [
       state.application.enableVolumeBrowserForNonAdminUsers = settings.AllowVolumeBrowserForRegularUsers;
       state.application.enableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
       state.application.allowStackManagementForRegularUsers = settings.AllowStackManagementForRegularUsers;
+      state.application.allowBindMountsForRegularUsers = settings.AllowBindMountsForRegularUsers;
+      state.application.allowPrivilegedModeForRegularUsers = settings.AllowPrivilegedModeForRegularUsers;
       state.application.allowDeviceMappingForRegularUsers = settings.AllowDeviceMappingForRegularUsers;
       state.application.validity = moment().unix();
     }
