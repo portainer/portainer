@@ -518,13 +518,14 @@ type (
 		AllowBindMountsForRegularUsers     bool                 `json:"AllowBindMountsForRegularUsers"`
 		AllowPrivilegedModeForRegularUsers bool                 `json:"AllowPrivilegedModeForRegularUsers"`
 		AllowVolumeBrowserForRegularUsers  bool                 `json:"AllowVolumeBrowserForRegularUsers"`
+		AllowHostNamespaceForRegularUsers  bool                 `json:"AllowHostNamespaceForRegularUsers"`
+		AllowDeviceMappingForRegularUsers  bool                 `json:"AllowDeviceMappingForRegularUsers"`
 		SnapshotInterval                   string               `json:"SnapshotInterval"`
 		TemplatesURL                       string               `json:"TemplatesURL"`
 		EnableHostManagementFeatures       bool                 `json:"EnableHostManagementFeatures"`
 		EdgeAgentCheckinInterval           int                  `json:"EdgeAgentCheckinInterval"`
 		EnableEdgeComputeFeatures          bool                 `json:"EnableEdgeComputeFeatures"`
 		UserSessionTimeout                 string               `json:"UserSessionTimeout"`
-		AllowHostNamespaceForRegularUsers  bool                 `json:"AllowHostNamespaceForRegularUsers"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool

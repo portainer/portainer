@@ -6,7 +6,7 @@ import (
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 type publicSettingsResponse struct {
@@ -15,10 +15,11 @@ type publicSettingsResponse struct {
 	AllowBindMountsForRegularUsers     bool                           `json:"AllowBindMountsForRegularUsers"`
 	AllowPrivilegedModeForRegularUsers bool                           `json:"AllowPrivilegedModeForRegularUsers"`
 	AllowVolumeBrowserForRegularUsers  bool                           `json:"AllowVolumeBrowserForRegularUsers"`
+	AllowHostNamespaceForRegularUsers  bool                           `json:"AllowHostNamespaceForRegularUsers"`
+	AllowDeviceMappingForRegularUsers  bool                           `json:"AllowDeviceMappingForRegularUsers"`
 	EnableHostManagementFeatures       bool                           `json:"EnableHostManagementFeatures"`
 	EnableEdgeComputeFeatures          bool                           `json:"EnableEdgeComputeFeatures"`
 	OAuthLoginURI                      string                         `json:"OAuthLoginURI"`
-	AllowHostNamespaceForRegularUsers  bool                           `json:"AllowHostNamespaceForRegularUsers"`
 }
 
 // GET request on /api/settings/public
@@ -35,6 +36,7 @@ func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *
 		AllowPrivilegedModeForRegularUsers: settings.AllowPrivilegedModeForRegularUsers,
 		AllowVolumeBrowserForRegularUsers:  settings.AllowVolumeBrowserForRegularUsers,
 		AllowHostNamespaceForRegularUsers:  settings.AllowHostNamespaceForRegularUsers,
+		AllowDeviceMappingForRegularUsers:  settings.AllowDeviceMappingForRegularUsers,
 		EnableHostManagementFeatures:       settings.EnableHostManagementFeatures,
 		EnableEdgeComputeFeatures:          settings.EnableEdgeComputeFeatures,
 		OAuthLoginURI: fmt.Sprintf("%s?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&prompt=login",
