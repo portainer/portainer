@@ -66,7 +66,7 @@
               <td>{{ item.Location }}</td>
               <td>
                 <a ng-if="item.Ports.length > 0" ng-repeat="p in item.Ports" class="image-tag" ng-href="http://{{ item.IPAddress }}:{{ p.port }}" target="_blank">
-                  <i class="fa fa-external-link-alt" aria-hidden="true"></i> :{{ p.port }}
+                  <i class="fa fa-external-link-alt" aria-hidden="true"></i> {{ item.IPAddress }}:{{ p.port }}
                 </a>
                 <span ng-if="item.Ports.length == 0">-</span>
               </td>
