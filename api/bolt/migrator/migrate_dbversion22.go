@@ -12,6 +12,7 @@ func (m *Migrator) updateSettingsToDBVersion23() error {
 
 	legacySettings.AllowDeviceMappingForRegularUsers = true
 	legacySettings.AllowStackManagementForRegularUsers = true
+	legacySettings.AllowHostNamespaceForRegularUsers = true
 
 	return m.settingsService.UpdateSettings(legacySettings)
 }
