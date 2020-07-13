@@ -30,6 +30,7 @@ export function PublicSettingsViewModel(settings) {
   this.OAuthLoginURI = settings.OAuthLoginURI;
   this.AllowStackManagementForRegularUsers = settings.AllowStackManagementForRegularUsers;
   this.AllowDeviceMappingForRegularUsers = settings.AllowDeviceMappingForRegularUsers;
+  this.AllowHostNamespaceForRegularUsers = settings.AllowHostNamespaceForRegularUsers;
 }
 
 export function LDAPSettingsViewModel(data) {

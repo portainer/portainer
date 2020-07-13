@@ -116,6 +116,7 @@ angular.module('portainer.app').factory('StateManager', [
       state.application.allowBindMountsForRegularUsers = settings.AllowBindMountsForRegularUsers;
       state.application.allowPrivilegedModeForRegularUsers = settings.AllowPrivilegedModeForRegularUsers;
       state.application.allowDeviceMappingForRegularUsers = settings.AllowDeviceMappingForRegularUsers;
+      state.application.allowHostNamespaceForRegularUsers = settings.AllowHostNamespaceForRegularUsers;
       state.application.validity = moment().unix();
     }
 
