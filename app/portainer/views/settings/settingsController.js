@@ -38,6 +38,11 @@ angular.module('portainer.app').controller('SettingsController', [
       allowDeviceMappingForRegularUsers: false,
     };
 
+    $scope.isContainerEditDisabled = function isContainerEditDisabled() {
+      const { restrictBindMounts, restrictHostNamespaceForRegularUsers, restrictPrivilegedMode, disableDeviceMappingForRegularUsers } = this.formValues;
+      return restrictBindMounts || restrictHostNamespaceForRegularUsers || restrictPrivilegedMode || disableDeviceMappingForRegularUsers;
+    };
+
     $scope.removeFilteredContainerLabel = function (index) {
       var settings = $scope.settings;
       settings.BlackListedLabels.splice(index, 1);

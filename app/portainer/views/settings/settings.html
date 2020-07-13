@@ -152,6 +152,12 @@
               </label>
             </div>
           </div>
+          
+          <div class="form-group" ng-if="isContainerEditDisabled()">
+            <span class="col-sm-12 text-muted small">
+              A security setting is enabled which precluded the user of the container recreate/duplicate/edit feature; thereby these features are disabled
+            </span>
+          </div>
           <!-- !security -->
           <!-- edge -->
           <div class="col-sm-12 form-section-title">
