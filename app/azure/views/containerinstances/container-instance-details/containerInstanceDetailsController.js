@@ -3,12 +3,17 @@ class ContainerInstanceDetailsController {
   constructor($state, AzureService, Notifications, ResourceGroupService) {
     Object.assign(this, { $state, AzureService, Notifications, ResourceGroupService });
 
+    this.state = {
+      loading: false,
+    };
+
     this.container = null;
     this.subscription = null;
     this.resourceGroup = null;
   }
 
   async $onInit() {
+    this.state.loading = true;
     const { id } = this.$state.params;
     const { subscriptionId, resourceGroupId } = parseId(id);
     try {
@@ -23,6 +28,7 @@ class ContainerInstanceDetailsController {
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrive container instance details');
     }
+    this.state.loading = false;
   }
 }
 
