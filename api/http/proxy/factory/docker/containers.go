@@ -156,8 +156,9 @@ func containerHasBlackListedLabel(containerLabels map[string]interface{}, labelB
 func (transport *Transport) decorateContainerCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
 	type PartialContainer struct {
 		HostConfig struct {
-			Privileged bool   `json:"Privileged"`
-			PidMode    string `json:"PidMode"`
+			Privileged bool          `json:"Privileged"`
+			PidMode    string        `json:"PidMode"`
+			Devices    []interface{} `json:"Devices"`
 		} `json:"HostConfig"`
 	}
 
@@ -186,14 +187,18 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 		endpointResourceAccess = true
 	}
 
-	if (rbacExtension != nil && !endpointResourceAccess && tokenData.Role != portainer.AdministratorRole) || (rbacExtension == nil && tokenData.Role != portainer.AdministratorRole) {
+	isAdmin := (rbacExtension != nil && endpointResourceAccess) || tokenData.Role == portainer.AdministratorRole
 
+	if !isAdmin {
 		settings, err := transport.settingsService.Settings()
 		if err != nil {
 			return nil, err
 		}
 
-		if !settings.AllowPrivilegedModeForRegularUsers || !settings.AllowHostNamespaceForRegularUsers {
+		if !settings.AllowPrivilegedModeForRegularUsers ||
+			!settings.AllowHostNamespaceForRegularUsers ||
+			!settings.AllowDeviceMappingForRegularUsers {
+
 			body, err := ioutil.ReadAll(request.Body)
 			if err != nil {
 				return nil, err
@@ -211,6 +216,10 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 
 			if partialContainer.HostConfig.PidMode == "host" {
 				return forbiddenResponse, errors.New("forbidden to use pid host namespace")
+			}
+
+			if len(partialContainer.HostConfig.Devices) > 0 {
+				return nil, errors.New("forbidden to use device mapping")
 			}
 
 			request.Body = ioutil.NopCloser(bytes.NewBuffer(body))

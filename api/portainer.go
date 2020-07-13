@@ -435,6 +435,7 @@ type (
 		EnableEdgeComputeFeatures             bool                 `json:"EnableEdgeComputeFeatures"`
 		DisableStackManagementForRegularUsers bool                 `json:"DisableStackManagementForRegularUsers"`
 		AllowHostNamespaceForRegularUsers     bool                 `json:"AllowHostNamespaceForRegularUsers"`
+		AllowDeviceMappingForRegularUsers     bool                 `json:"AllowDeviceMappingForRegularUsers"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
