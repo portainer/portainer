@@ -47,6 +47,28 @@
                     Create template from stack
                   </a>
 
+                  <button
+                    authorization="PortainerStackStart"
+                    ng-if="!state.externalStack && stack.Status === 2"
+                    ng-disabled="state.actionInProgress"
+                    class="btn btn-xs btn-success"
+                    ng-click="startStack()"
+                  >
+                    <i class="fa fa-play space-right" aria-hidden="true"></i>
+                    Start this stack
+                  </button>
+
+                  <button
+                    ng-if="!state.externalStack && stack.Status === 1"
+                    authorization="PortainerStackStop"
+                    ng-disabled="state.actionInProgress"
+                    class="btn btn-xs btn-danger"
+                    ng-click="stopStack()"
+                  >
+                    <i class="fa fa-stop space-right" aria-hidden="true"></i>
+                    Stop this stack
+                  </button>
+
                   <button authorization="PortainerStackDelete" class="btn btn-xs btn-danger" ng-click="removeStack()" ng-if="!state.externalStack || stack.Type === 1">
                     <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>
                     Delete this stack
@@ -140,7 +162,13 @@
                 </div>
                 <div class="form-group">
                   <div class="col-sm-12">
-                    <button type="button" class="btn btn-sm btn-primary" ng-disabled="state.actionInProgress" ng-click="deployStack()" button-spinner="state.actionInProgress">
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-primary"
+                      ng-disabled="state.actionInProgress || stack.Status === 2"
+                      ng-click="deployStack()"
+                      button-spinner="state.actionInProgress"
+                    >
                       <span ng-hide="state.actionInProgress">Update the stack</span>
                       <span ng-show="state.actionInProgress">Deployment in progress...</span>
                     </button>

@@ -1,4 +1,5 @@
 angular.module('portainer.app').controller('StackController', [
+  '$async',
   '$q',
   '$scope',
   '$state',
@@ -17,6 +18,7 @@ angular.module('portainer.app').controller('StackController', [
   'GroupService',
   'ModalService',
   function (
+    $async,
     $q,
     $scope,
     $state,
@@ -187,6 +189,37 @@ angular.module('portainer.app').controller('StackController', [
       $scope.stackFileContent = cm.getValue();
     };
 
+    $scope.stopStack = stopStack;
+    function stopStack() {
+      return $async(stopStackAsync);
+    }
+    async function stopStackAsync() {
+      $scope.state.actionInProgress = true;
+      try {
+        await StackService.stop($scope.stack.Id);
+        $state.go('portainer.stacks.stack', { id: $scope.stack.Id }, { reload: true });
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to stop stack');
+      }
+      $scope.state.actionInProgress = false;
+    }
+
+    $scope.startStack = startStack;
+    function startStack() {
+      return $async(startStackAsync);
+    }
+    async function startStackAsync() {
+      $scope.state.actionInProgress = true;
+      const id = $scope.stack.Id;
+      try {
+        await StackService.start(id);
+        $state.go('portainer.stacks.stack', { id }, { reload: true });
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to start stack');
+      }
+      $scope.state.actionInProgress = false;
+    }
+
     function loadStack(id) {
       var agentProxy = $scope.applicationState.endpoint.mode.agentProxy;
 
@@ -207,17 +240,24 @@ angular.module('portainer.app').controller('StackController', [
           $scope.groups = data.groups;
           $scope.stack = stack;
 
+          let resourcesPromise = Promise.resolve({});
+          if (stack.Status === 1) {
+            resourcesPromise = stack.Type === 1 ? retrieveSwarmStackResources(stack.Name, agentProxy) : retrieveComposeStackResources(stack.Name);
+          }
+
           return $q.all({
             stackFile: StackService.getStackFile(id),
-            resources: stack.Type === 1 ? retrieveSwarmStackResources(stack.Name, agentProxy) : retrieveComposeStackResources(stack.Name),
+            resources: resourcesPromise,
           });
         })
         .then(function success(data) {
           $scope.stackFileContent = data.stackFile;
-          if ($scope.stack.Type === 1) {
-            assignSwarmStackResources(data.resources, agentProxy);
-          } else {
-            assignComposeStackResources(data.resources);
+          if ($scope.stack.Status === 1) {
+            if ($scope.stack.Type === 1) {
+              assignSwarmStackResources(data.resources, agentProxy);
+            } else {
+              assignComposeStackResources(data.resources);
+            }
           }
         })
         .catch(function error(err) {
