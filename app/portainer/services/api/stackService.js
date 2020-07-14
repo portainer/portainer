@@ -349,6 +349,16 @@ angular.module('portainer.app').factory('StackService', [
       return $async(kubernetesDeployAsync, endpointId, namespace, content, compose);
     };
 
+    service.start = start;
+    function start(id) {
+      return Stack.start({ id }).$promise;
+    }
+
+    service.stop = stop;
+    function stop(id) {
+      return Stack.stop({ id }).$promise;
+    }
+
     return service;
   },
 ]);
