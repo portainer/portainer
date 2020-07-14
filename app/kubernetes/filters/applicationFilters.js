@@ -52,10 +52,12 @@ angular
       switch (type) {
         case KubernetesApplicationTypes.DEPLOYMENT:
           return KubernetesApplicationTypeStrings.DEPLOYMENT;
-        case KubernetesApplicationTypes.DEAMONSET:
+        case KubernetesApplicationTypes.DAEMONSET:
           return KubernetesApplicationTypeStrings.DAEMONSET;
         case KubernetesApplicationTypes.STATEFULSET:
           return KubernetesApplicationTypeStrings.STATEFULSET;
+        default:
+          return '-';
       }
     };
   })
