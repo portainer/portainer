@@ -41,6 +41,7 @@ class KubernetesConfigureController {
             const res = new KubernetesStorageClass();
             res.Name = item.Name;
             res.AccessModes = _.map(item.AccessModes, 'Name');
+            res.Provisioner = item.Provisioner;
             return res;
           }
         }),

@@ -7,6 +7,7 @@ class KubernetesStorageClassConverter {
   static apiToStorageClass(data) {
     const res = new KubernetesStorageClass();
     res.Name = data.metadata.name;
+    res.Provisioner = data.provisioner;
     return res;
   }
 }
