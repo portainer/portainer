@@ -48,7 +48,7 @@
                   </a>
 
                   <button
-                    authorization="PortainerStackStart"
+                    authorization="PortainerStackUpdate"
                     ng-if="!state.externalStack && stack.Status === 2"
                     ng-disabled="state.actionInProgress"
                     class="btn btn-xs btn-success"
@@ -60,7 +60,7 @@
 
                   <button
                     ng-if="!state.externalStack && stack.Status === 1"
-                    authorization="PortainerStackStop"
+                    authorization="PortainerStackUpdate"
                     ng-disabled="state.actionInProgress"
                     class="btn btn-xs btn-danger"
                     ng-click="stopStack()"
