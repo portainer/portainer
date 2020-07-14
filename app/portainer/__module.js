@@ -75,6 +75,35 @@ angular.module('portainer.app', []).config([
       },
     };
 
+    var endpointRoot = {
+      name: 'endpoint',
+      url: '/:endpointId',
+      parent: 'root',
+      abstract: true,
+      resolve: {
+        /* @ngInject */
+        endpoint($async, $state, $transition$, EndpointService, Notifications) {
+          return $async(async () => {
+            try {
+              const endpointId = +$transition$.params().endpointId;
+
+              const endpoint = await EndpointService.endpoint(endpointId);
+              if ((endpoint.Type === 4 || endpoint.Type === 7) && !endpoint.EdgeID) {
+                $state.go('portainer.endpoints.endpoint', { id: endpoint.Id });
+                return;
+              }
+
+              return endpoint;
+            } catch (e) {
+              Notifications.error('Failed loading endpoint', e);
+              $state.go('portainer.home', {}, { reload: true });
+              return;
+            }
+          });
+        },
+      },
+    };
+
     var portainer = {
       name: 'portainer',
       parent: 'root',
@@ -366,51 +395,6 @@ angular.module('portainer.app', []).config([
       },
     };
 
-    var stacks = {
-      name: 'portainer.stacks',
-      url: '/stacks',
-      views: {
-        'content@': {
-          templateUrl: './views/stacks/stacks.html',
-          controller: 'StacksController',
-        },
-      },
-      resolve: {
-        endpointID: [
-          'EndpointProvider',
-          '$state',
-          function (EndpointProvider, $state) {
-            var id = EndpointProvider.endpointID();
-            if (!id) {
-              return $state.go('portainer.home');
-            }
-          },
-        ],
-      },
-    };
-
-    var stack = {
-      name: 'portainer.stacks.stack',
-      url: '/:name?id&type&external',
-      views: {
-        'content@': {
-          templateUrl: './views/stacks/edit/stack.html',
-          controller: 'StackController',
-        },
-      },
-    };
-
-    var stackCreation = {
-      name: 'portainer.stacks.newstack',
-      url: '/newstack',
-      views: {
-        'content@': {
-          templateUrl: './views/stacks/create/createstack.html',
-          controller: 'CreateStackController',
-        },
-      },
-    };
-
     var support = {
       name: 'portainer.support',
       url: '/support',
@@ -491,67 +475,8 @@ angular.module('portainer.app', []).config([
       },
     };
 
-    var templates = {
-      name: 'portainer.templates',
-      url: '/templates',
-      resolve: {
-        endpointID: [
-          'EndpointProvider',
-          '$state',
-          function (EndpointProvider, $state) {
-            var id = EndpointProvider.endpointID();
-            if (!id) {
-              return $state.go('portainer.home');
-            }
-          },
-        ],
-      },
-      views: {
-        'content@': {
-          templateUrl: './views/templates/templates.html',
-          controller: 'TemplatesController',
-        },
-      },
-    };
-
-    const customTemplates = {
-      name: 'portainer.templates.custom',
-      url: '/custom',
-
-      views: {
-        'content@': {
-          component: 'customTemplatesView',
-        },
-      },
-    };
-
-    const customTemplatesNew = {
-      name: 'portainer.templates.custom.new',
-      url: '/new?fileContent&type',
-
-      views: {
-        'content@': {
-          component: 'createCustomTemplateView',
-        },
-      },
-      params: {
-        fileContent: '',
-        type: '',
-      },
-    };
-
-    const customTemplatesEdit = {
-      name: 'portainer.templates.custom.edit',
-      url: '/:id',
-
-      views: {
-        'content@': {
-          component: 'editCustomTemplateView',
-        },
-      },
-    };
-
     $stateRegistryProvider.register(root);
+    $stateRegistryProvider.register(endpointRoot);
     $stateRegistryProvider.register(portainer);
     $stateRegistryProvider.register(about);
     $stateRegistryProvider.register(account);
@@ -578,9 +503,6 @@ angular.module('portainer.app', []).config([
     $stateRegistryProvider.register(registryCreation);
     $stateRegistryProvider.register(settings);
     $stateRegistryProvider.register(settingsAuthentication);
-    $stateRegistryProvider.register(stacks);
-    $stateRegistryProvider.register(stack);
-    $stateRegistryProvider.register(stackCreation);
     $stateRegistryProvider.register(support);
     $stateRegistryProvider.register(supportProduct);
     $stateRegistryProvider.register(tags);
@@ -588,9 +510,5 @@ angular.module('portainer.app', []).config([
     $stateRegistryProvider.register(user);
     $stateRegistryProvider.register(teams);
     $stateRegistryProvider.register(team);
-    $stateRegistryProvider.register(templates);
-    $stateRegistryProvider.register(customTemplates);
-    $stateRegistryProvider.register(customTemplatesNew);
-    $stateRegistryProvider.register(customTemplatesEdit);
   },
 ]);

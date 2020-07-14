@@ -34,8 +34,9 @@ angular.module('portainer.docker').controller('DashboardController', [
     $scope.offlineMode = false;
 
     function initView() {
-      var endpointMode = $scope.applicationState.endpoint.mode;
-      var endpointId = EndpointProvider.endpointID();
+      const endpointMode = $scope.applicationState.endpoint.mode;
+      const endpointId = EndpointProvider.endpointID();
+      $scope.endpointId = endpointId;
 
       $q.all({
         containers: ContainerService.containers(1),

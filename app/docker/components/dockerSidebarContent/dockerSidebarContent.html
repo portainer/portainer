@@ -2,14 +2,14 @@
   <a ui-sref="docker.dashboard" ui-sref-active="active">Dashboard <span class="menu-icon fa fa-tachometer-alt fa-fw"></span></a>
 </li>
 <li class="sidebar-list" ng-if="!$ctrl.offlineMode" authorization="DockerContainerCreate, PortainerStackCreate">
-  <a ui-sref="portainer.templates" ui-sref-active="active">App Templates <span class="menu-icon fa fa-rocket fa-fw"></span></a>
+  <a ui-sref="docker.templates" ui-sref-active="active">App Templates <span class="menu-icon fa fa-rocket fa-fw"></span></a>
 
-  <div class="sidebar-sublist" ng-if="$ctrl.toggle && $ctrl.currentRouteName.includes('portainer.templates')">
-    <a ui-sref="portainer.templates.custom" ui-sref-active="active">Custom Templates</a></div
-  >
+  <div class="sidebar-sublist" ng-if="$ctrl.toggle && $ctrl.currentRouteName.includes('docker.templates')">
+    <a ui-sref="docker.templates.custom" ui-sref-active="active">Custom Templates</a>
+  </div>
 </li>
 <li class="sidebar-list">
-  <a ui-sref="portainer.stacks" ui-sref-active="active">Stacks <span class="menu-icon fa fa-th-list fa-fw"></span></a>
+  <a ui-sref="docker.stacks" ui-sref-active="active">Stacks <span class="menu-icon fa fa-th-list fa-fw"></span></a>
 </li>
 <li class="sidebar-list" ng-if="$ctrl.swarmManagement">
   <a ui-sref="docker.services" ui-sref-active="active">Services <span class="menu-icon fa fa-list-alt fa-fw"></span></a>

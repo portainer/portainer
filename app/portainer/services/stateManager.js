@@ -181,9 +181,11 @@ angular.module('portainer.app').factory('StateManager', [
         return deferred.promise;
       }
 
+      const reload = endpoint.Status === 1 || !endpoint.Snaphosts || !endpoint.Snaphosts.length || !endpoint.Snapshots[0].SnapshotRaw;
+
       $q.all({
-        version: endpoint.Status === 1 ? SystemService.version() : $q.when(endpoint.Snapshots[0].SnapshotRaw.Version),
-        info: endpoint.Status === 1 ? SystemService.info() : $q.when(endpoint.Snapshots[0].SnapshotRaw.Info),
+        version: reload ? SystemService.version() : $q.when(endpoint.Snapshots[0].SnapshotRaw.Version),
+        info: reload ? SystemService.info() : $q.when(endpoint.Snapshots[0].SnapshotRaw.Info),
       })
         .then(function success(data) {
           var endpointMode = InfoHelper.determineEndpointMode(data.info, endpoint.Type);
