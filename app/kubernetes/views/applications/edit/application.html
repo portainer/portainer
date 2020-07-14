@@ -291,13 +291,13 @@
                         tooltip-append-to-body="true"
                         tooltip-placement="bottom"
                         tooltip-class="portainer-tooltip"
-                        uib-tooltip="No host defined in http rule and IP not provisioned yet"
+                        uib-tooltip="Ingress controller IP address not available yet"
                         style="cursor: pointer;"
                         >pending
                       </span>
                       <span ng-if="ctrl.ruleCanBeDisplayed(rule)">
                         <a ng-href="{{ ctrl.buildIngressRuleURL(rule) }}" target="_blank">
-                          {{ rule.Path }}
+                          {{ ctrl.buildIngressRuleURL(rule) | stripprotocol }}
                         </a>
                       </span>
                     </td>
