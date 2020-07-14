@@ -29,7 +29,17 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 		return &httperror.HandlerError{http.StatusBadRequest, "Stack is already active", errors.New("Stack is already active")}
 	}
 
-	//...
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(stack.EndpointID)
+	if err == bolterrors.ErrObjectNotFound {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
+	} else if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
+	}
+
+	err = handler.startStack(stack, endpoint)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to stop stack", err}
+	}
 
 	stack.Status = portainer.StackStatusActive
 	err = handler.DataStore.Stack().UpdateStack(stack.ID, stack)
@@ -38,4 +48,14 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	return response.JSON(w, stack)
+}
+
+func (handler *Handler) startStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+	switch stack.Type {
+	case portainer.DockerComposeStack:
+		return handler.ComposeStackManager.Up(stack, endpoint)
+	case portainer.DockerSwarmStack:
+		return handler.SwarmStackManager.Deploy(stack, true, endpoint)
+	}
+	return nil
 }
