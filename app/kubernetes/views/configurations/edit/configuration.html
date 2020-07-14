@@ -76,7 +76,7 @@
     <div class="col-sm-12">
       <rd-widget>
         <rd-widget-body>
-          <form class="form-horizontal" name="kubernetesConfigurationCreationForm" autocomplete="off">
+          <form ng-if="!ctrl.isSystemNamespace()" class="form-horizontal" name="kubernetesConfigurationCreationForm" autocomplete="off">
             <kubernetes-configuration-data ng-if="ctrl.formValues" form-values="ctrl.formValues" is-valid="ctrl.state.isDataValid"></kubernetes-configuration-data>
 
             <!-- actions -->
@@ -99,6 +99,32 @@
             </div>
             <!-- !actions -->
           </form>
+          <div ng-if="ctrl.isSystemNamespace()">
+            <div class="col-sm-12 form-section-title" style="margin-top: 10px;">
+              Data
+            </div>
+            <table class="table">
+              <tbody>
+                <tr class="text-muted">
+                  <td style="width: 10%; border-top: none;">Key</td>
+                  <td style="width: 90%; border-top: none;">Value</td>
+                </tr>
+
+                <tr ng-repeat="item in ctrl.formValues.Data track by $index">
+                  <td>{{ item.Key }}</td>
+                  <td>
+                    <div style="white-space: pre-wrap;">{{ item.Value }}</div>
+                    <div style="margin-top: 2px;">
+                      <span class="btn btn-primary btn-xs" ng-click="ctrl.copyConfigurationValue($index)"> <i class="fa fa-copy space-right" aria-hidden="true"></i>Copy </span>
+                      <span id="copyValueNotification_{{ $index }}" style="display: none; color: #23ae89; margin-left: 5px;" class="small">
+                        <i class="fa fa-check" aria-hidden="true"></i> copied
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </rd-widget-body>
       </rd-widget>
     </div>

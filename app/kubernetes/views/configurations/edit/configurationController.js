@@ -10,6 +10,7 @@ class KubernetesConfigurationController {
   constructor(
     $async,
     $state,
+    clipboard,
     Notifications,
     LocalStorage,
     KubernetesConfigurationService,
@@ -21,6 +22,7 @@ class KubernetesConfigurationController {
   ) {
     this.$async = $async;
     this.$state = $state;
+    this.clipboard = clipboard;
     this.Notifications = Notifications;
     this.LocalStorage = LocalStorage;
     this.ModalService = ModalService;
@@ -53,6 +55,13 @@ class KubernetesConfigurationController {
   showEditor() {
     this.state.showEditorTab = true;
     this.selectTab(2);
+  }
+
+  copyConfigurationValue(idx) {
+    this.clipboard.copyText(this.formValues.Data[idx].Value);
+    $('#copyValueNotification_' + idx)
+      .show()
+      .fadeOut(2500);
   }
 
   isFormValid() {
