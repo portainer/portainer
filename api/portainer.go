@@ -546,11 +546,15 @@ type (
 		EntryPoint      string           `json:"EntryPoint"`
 		Env             []Pair           `json:"Env"`
 		ResourceControl *ResourceControl `json:"ResourceControl"`
+		Status          StackStatus      `json:"Status"`
 		ProjectPath     string
 	}
 
 	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier)
 	StackID int
+
+	// StackStatus represent a status for a stack
+	StackStatus int
 
 	// StackType represents the type of the stack (compose v2, stack deploy v3)
 	StackType int
@@ -1299,6 +1303,13 @@ const (
 	DockerComposeStack
 	// KubernetesStack represents a stack managed via kubectl
 	KubernetesStack
+)
+
+// StackStatus represents a status for a stack
+const (
+	_ StackStatus = iota
+	StackStatusActive
+	StackStatusInactive
 )
 
 const (
