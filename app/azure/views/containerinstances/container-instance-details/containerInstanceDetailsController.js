@@ -1,7 +1,7 @@
 class ContainerInstanceDetailsController {
   /* @ngInject */
-  constructor($state, AzureService, Notifications, ResourceGroupService) {
-    Object.assign(this, { $state, AzureService, Notifications, ResourceGroupService });
+  constructor($state, AzureService, ContainerGroupService, Notifications, ResourceGroupService, SubscriptionService) {
+    Object.assign(this, { $state, AzureService, ContainerGroupService, Notifications, ResourceGroupService, SubscriptionService });
 
     this.state = {
       loading: false,
@@ -15,16 +15,11 @@ class ContainerInstanceDetailsController {
   async $onInit() {
     this.state.loading = true;
     const { id } = this.$state.params;
-    const { subscriptionId, resourceGroupId } = parseId(id);
+    const { subscriptionId, resourceGroupId, containerGroupId } = parseId(id);
     try {
-      const subscriptions = await this.AzureService.subscriptions();
-      this.subscription = subscriptions.find((subscription) => subscription.Id === subscriptionId);
-
-      const containerGroups = this.AzureService.aggregate(await this.AzureService.containerGroups(subscriptions));
-      this.container = containerGroups.find((group) => group.Id === id);
-
-      const resourceGroups = this.AzureService.aggregate(await this.ResourceGroupService.resourceGroups(subscriptionId));
-      this.resourceGroup = resourceGroups.find((group) => group.Id.endsWith(resourceGroupId));
+      this.subscription = await this.SubscriptionService.subscription(subscriptionId);
+      this.container = await this.ContainerGroupService.containerGroup(subscriptionId, resourceGroupId, containerGroupId);
+      this.resourceGroup = await this.ResourceGroupService.resourceGroup(subscriptionId, resourceGroupId);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrive container instance details');
     }
@@ -33,9 +28,9 @@ class ContainerInstanceDetailsController {
 }
 
 function parseId(id) {
-  const [, subscriptionId, resourceGroupId] = id.match(/^\/subscriptions\/(.+)\/resourceGroups\/(.+)\/providers\/.+$/);
+  const [, subscriptionId, resourceGroupId, , containerGroupId] = id.match(/^\/subscriptions\/(.+)\/resourceGroups\/(.+)\/providers\/(.+)\/containerGroups\/(.+)$/);
 
-  return { subscriptionId, resourceGroupId };
+  return { subscriptionId, resourceGroupId, containerGroupId };
 }
 
 export default ContainerInstanceDetailsController;

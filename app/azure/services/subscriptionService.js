@@ -24,6 +24,12 @@ angular.module('portainer.azure').factory('SubscriptionService', [
       return deferred.promise;
     };
 
+    service.subscription = subscription;
+    async function subscription(id) {
+      const subscription = await Subscription.get({ id }).$promise;
+      return new SubscriptionViewModel(subscription);
+    }
+
     return service;
   },
 ]);
