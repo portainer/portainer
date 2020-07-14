@@ -5,6 +5,7 @@ const _KubernetesPortMappingPort = Object.freeze({
   Port: 0,
   TargetPort: 0,
   Protocol: '',
+  IngressRules: [], // KubernetesIngressRule[]
 });
 
 export class KubernetesPortMappingPort {

@@ -41,9 +41,10 @@ class KubernetesApplicationHelper {
 
           mapping.Ports = _.map(app.PublishedPorts, (item) => {
             const port = new KubernetesPortMappingPort();
-            port.Port = mapping.ServiceType === KubernetesServiceTypes.NODE_PORT ? item.nodePort : item.port;
-            port.TargetPort = item.targetPort;
-            port.Protocol = item.protocol;
+            port.Port = mapping.ServiceType === KubernetesServiceTypes.NODE_PORT ? item.NodePort : item.Port;
+            port.TargetPort = item.TargetPort;
+            port.Protocol = item.Protocol;
+            port.IngressRules = item.IngressRules;
             return port;
           });
           acc.push(mapping);
@@ -249,13 +250,13 @@ class KubernetesApplicationHelper {
   static generatePublishedPortsFormValuesFromPublishedPorts(serviceType, publishedPorts) {
     const finalRes = _.map(publishedPorts, (port) => {
       const res = new KubernetesApplicationPublishedPortFormValue();
-      res.Protocol = port.protocol;
-      res.ContainerPort = port.targetPort;
+      res.Protocol = port.Protocol;
+      res.ContainerPort = port.TargetPort;
       if (serviceType === KubernetesServiceTypes.LOAD_BALANCER) {
-        res.LoadBalancerPort = port.port;
-        res.LoadBalancerNodePort = port.nodePort;
+        res.LoadBalancerPort = port.Port;
+        res.LoadBalancerNodePort = port.NodePort;
       } else if (serviceType === KubernetesServiceTypes.NODE_PORT) {
-        res.NodePort = port.nodePort;
+        res.NodePort = port.NodePort;
       }
       return res;
     });

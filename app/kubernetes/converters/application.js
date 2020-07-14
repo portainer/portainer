@@ -1,4 +1,4 @@
-import _ from 'lodash-es';
+import * as _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 
 import {
@@ -25,9 +25,31 @@ import KubernetesStatefulSetConverter from 'Kubernetes/converters/statefulSet';
 import KubernetesServiceConverter from 'Kubernetes/converters/service';
 import KubernetesPersistentVolumeClaimConverter from 'Kubernetes/converters/persistentVolumeClaim';
 import PortainerError from 'Portainer/error';
+import { KubernetesApplicationPort } from 'Kubernetes/models/application/models';
+import { KubernetesIngressHelper } from 'Kubernetes/ingress/helper';
+
+function _apiPortsToPublishedPorts(pList, pRefs) {
+  const ports = _.map(pList, (item) => {
+    const res = new KubernetesApplicationPort();
+    res.Port = item.port;
+    res.TargetPort = item.targetPort;
+    res.NodePort = item.nodePort;
+    res.Protocol = item.protocol;
+    return res;
+  });
+  _.forEach(ports, (port) => {
+    if (isNaN(port.TargetPort)) {
+      const targetPort = _.find(pRefs, { name: port.TargetPort });
+      if (targetPort) {
+        port.TargetPort = targetPort.containerPort;
+      }
+    }
+  });
+  return ports;
+}
 
 class KubernetesApplicationConverter {
-  static applicationCommon(res, data, service) {
+  static applicationCommon(res, data, service, ingressRules) {
     res.Id = data.metadata.uid;
     res.Name = data.metadata.name;
     res.StackName = data.metadata.labels ? data.metadata.labels[KubernetesPortainerApplicationStackNameLabel] || '-' : '-';
@@ -87,16 +109,11 @@ class KubernetesApplicationConverter {
         }
       }
 
-      const ports = _.concat(..._.map(data.spec.template.spec.containers, (container) => container.ports));
-      res.PublishedPorts = service.spec.ports;
-      _.forEach(res.PublishedPorts, (publishedPort) => {
-        if (isNaN(publishedPort.targetPort)) {
-          const targetPort = _.find(ports, { name: publishedPort.targetPort });
-          if (targetPort) {
-            publishedPort.targetPort = targetPort.containerPort;
-          }
-        }
-      });
+      const portsRefs = _.concat(..._.map(data.spec.template.spec.containers, (container) => container.ports));
+      const ports = _apiPortsToPublishedPorts(service.spec.ports, portsRefs);
+      const rules = KubernetesIngressHelper.findSBoundServiceIngressesRules(ingressRules, service);
+      _.forEach(ports, (port) => (port.IngressRules = _.filter(rules, (rule) => rule.Port === port.Port)));
+      res.PublishedPorts = ports;
     }
 
     res.Volumes = data.spec.template.spec.volumes ? data.spec.template.spec.volumes : [];
@@ -193,9 +210,9 @@ class KubernetesApplicationConverter {
     );
   }
 
-  static apiDeploymentToApplication(data, service) {
+  static apiDeploymentToApplication(data, service, ingressRules) {
     const res = new KubernetesApplication();
-    KubernetesApplicationConverter.applicationCommon(res, data, service);
+    KubernetesApplicationConverter.applicationCommon(res, data, service, ingressRules);
     res.ApplicationType = KubernetesApplicationTypes.DEPLOYMENT;
     res.DeploymentType = KubernetesApplicationDeploymentTypes.REPLICATED;
     res.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.SHARED;
@@ -204,9 +221,9 @@ class KubernetesApplicationConverter {
     return res;
   }
 
-  static apiDaemonSetToApplication(data, service) {
+  static apiDaemonSetToApplication(data, service, ingressRules) {
     const res = new KubernetesApplication();
-    KubernetesApplicationConverter.applicationCommon(res, data, service);
+    KubernetesApplicationConverter.applicationCommon(res, data, service, ingressRules);
     res.ApplicationType = KubernetesApplicationTypes.DAEMONSET;
     res.DeploymentType = KubernetesApplicationDeploymentTypes.GLOBAL;
     res.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.SHARED;
@@ -215,9 +232,9 @@ class KubernetesApplicationConverter {
     return res;
   }
 
-  static apiStatefulSetToapplication(data, service) {
+  static apiStatefulSetToapplication(data, service, ingressRules) {
     const res = new KubernetesApplication();
-    KubernetesApplicationConverter.applicationCommon(res, data, service);
+    KubernetesApplicationConverter.applicationCommon(res, data, service, ingressRules);
     res.ApplicationType = KubernetesApplicationTypes.STATEFULSET;
     res.DeploymentType = KubernetesApplicationDeploymentTypes.REPLICATED;
     res.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.ISOLATED;

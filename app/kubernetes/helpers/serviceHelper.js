@@ -7,7 +7,7 @@ class KubernetesServiceHelper {
   }
 
   static findApplicationBoundService(services, rawApp) {
-    return _.find(services, (item) => _.isMatch(rawApp.spec.template.metadata.labels, item.spec.selector));
+    return _.find(services, (item) => item.spec.selector && _.isMatch(rawApp.spec.template.metadata.labels, item.spec.selector));
   }
 }
 export default KubernetesServiceHelper;

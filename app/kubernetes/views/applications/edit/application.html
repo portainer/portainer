@@ -180,7 +180,8 @@
           </div>
 
           <div ng-if="ctrl.application.PublishedPorts.length > 0">
-            <div ng-if="ctrl.application.ServiceType === 'LoadBalancer'">
+            <!-- LB notice -->
+            <div ng-if="ctrl.application.ServiceType === ctrl.KubernetesServiceTypes.LOAD_BALANCER">
               <div class="small text-muted">
                 <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                 This application is exposed through an external load balancer. Use the links below to access the different ports exposed.
@@ -210,55 +211,19 @@
                   </p>
                 </span>
               </div>
-              <div style="margin-top: 15px; width: 33%;">
-                <table class="table">
-                  <tbody>
-                    <tr class="text-muted">
-                      <td style="width: 50%;">Container port</td>
-                      <td style="width: 50%;">Load balancer port</td>
-                    </tr>
-                    <tr ng-repeat="port in ctrl.application.PublishedPorts track by $index">
-                      <td>{{ port.targetPort }}</td>
-                      <td>
-                        {{ port.port }}
-                        <a
-                          ng-if="ctrl.application.LoadBalancerIPAddress"
-                          ng-href="http://{{ ctrl.application.LoadBalancerIPAddress }}:{{ port.port }}"
-                          target="_blank"
-                          style="margin-left: 5px;"
-                        >
-                          <i class="fa fa-external-link-alt" aria-hidden="true"></i> access
-                        </a>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
             </div>
 
-            <div ng-if="ctrl.application.ServiceType === 'NodePort'">
+            <!-- cluster notice -->
+            <div ng-if="ctrl.application.ServiceType === ctrl.KubernetesServiceTypes.NODE_PORT">
               <div class="small text-muted">
                 <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                 This application is exposed globally on all nodes of your cluster. It can be reached using the IP address of any node in your cluster using the port configuration
                 below.
               </div>
-              <div style="margin-top: 15px; width: 33%;">
-                <table class="table">
-                  <tbody>
-                    <tr class="text-muted">
-                      <td style="width: 50%;">Container port</td>
-                      <td style="width: 50%;">Cluster node port</td>
-                    </tr>
-                    <tr ng-repeat="port in ctrl.application.PublishedPorts track by $index">
-                      <td>{{ port.targetPort }}</td>
-                      <td>{{ port.nodePort }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
             </div>
 
-            <div ng-if="ctrl.application.ServiceType === 'ClusterIP'">
+            <!-- internal notice -->
+            <div ng-if="ctrl.application.ServiceType === ctrl.KubernetesServiceTypes.CLUSTER_IP">
               <div class="small text-muted">
                 <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                 This application is only available for internal usage inside the cluster via the application name <code>{{ ctrl.application.ServiceName }}</code>
@@ -270,22 +235,75 @@
               <div class="small text-muted" style="margin-top: 2px;">
                 <p>Refer to the below port configuration to access the application.</p>
               </div>
-              <div style="margin-top: 15px; width: 50%;">
-                <table class="table">
-                  <tbody>
-                    <tr class="text-muted">
-                      <td style="width: 33%;">Container port</td>
-                      <td style="width: 33%;">Application port</td>
-                      <td style="width: 33%;">Protocol</td>
-                    </tr>
-                    <tr ng-repeat="port in ctrl.application.PublishedPorts track by $index">
-                      <td>{{ port.targetPort }}</td>
-                      <td>{{ port.port }}</td>
-                      <td>{{ port.protocol }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+            </div>
+
+            <!-- table -->
+            <div style="margin-top: 15px;">
+              <table class="table">
+                <tbody>
+                  <tr class="text-muted">
+                    <td style="width: 25%;">Container port</td>
+                    <td style="width: 25%;">{{ ctrl.application.ServiceType | kubernetesApplicationPortsTableHeaderText }} port</td>
+                    <td style="width: 50%;">HTTP route</td>
+                  </tr>
+                  <tr ng-repeat-start="port in ctrl.application.PublishedPorts">
+                    <td ng-if="!ctrl.portHasIngressRules(port)">{{ port.TargetPort }}/{{ port.Protocol }}</td>
+                    <td ng-if="!ctrl.portHasIngressRules(port)">
+                      <span ng-if="ctrl.application.ServiceType === ctrl.KubernetesServiceTypes.NODE_PORT">
+                        {{ port.NodePort }}
+                      </span>
+                      <span ng-if="ctrl.application.ServiceType !== ctrl.KubernetesServiceTypes.NODE_PORT">
+                        {{ port.Port }}
+                      </span>
+                      <a
+                        ng-if="ctrl.application.LoadBalancerIPAddress"
+                        ng-href="http://{{ ctrl.application.LoadBalancerIPAddress }}:{{ port.Port }}"
+                        target="_blank"
+                        style="margin-left: 5px;"
+                      >
+                        <i class="fa fa-external-link-alt" aria-hidden="true"></i> access
+                      </a>
+                    </td>
+                    <td ng-if="!ctrl.portHasIngressRules(port)">-</td>
+                  </tr>
+                  <tr ng-repeat-end ng-repeat="rule in port.IngressRules">
+                    <td>{{ port.TargetPort }}/{{ port.Protocol }}</td>
+                    <td>
+                      <span ng-if="ctrl.application.ServiceType === ctrl.KubernetesServiceTypes.NODE_PORT">
+                        {{ port.NodePort }}
+                      </span>
+                      <span ng-if="ctrl.application.ServiceType !== ctrl.KubernetesServiceTypes.NODE_PORT">
+                        {{ port.Port }}
+                      </span>
+                      <a
+                        ng-if="ctrl.application.LoadBalancerIPAddress"
+                        ng-href="http://{{ ctrl.application.LoadBalancerIPAddress }}:{{ port.Port }}"
+                        target="_blank"
+                        style="margin-left: 5px;"
+                      >
+                        <i class="fa fa-external-link-alt" aria-hidden="true"></i> access
+                      </a>
+                    </td>
+                    <td>
+                      <span
+                        ng-if="!ctrl.ruleCanBeDisplayed(rule)"
+                        class="text-muted"
+                        tooltip-append-to-body="true"
+                        tooltip-placement="bottom"
+                        tooltip-class="portainer-tooltip"
+                        uib-tooltip="Ingress controller IP address not available yet"
+                        style="cursor: pointer;"
+                        >pending
+                      </span>
+                      <span ng-if="ctrl.ruleCanBeDisplayed(rule)">
+                        <a ng-href="{{ ctrl.buildIngressRuleURL(rule) }}" target="_blank">
+                          {{ ctrl.buildIngressRuleURL(rule) | stripprotocol }}
+                        </a>
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
           <!-- !ACCESSING APPLICATION -->
@@ -306,10 +324,8 @@
                     <td style="width: 33%;">Maximum instances</td>
                     <td style="width: 33%;">
                       Target CPU usage
-                      <portainer-tooltip
-                        position="bottom"
-                        message="The autoscaler will ensure enough instances are running to maintain an average CPU usage across all instances."
-                      ></portainer-tooltip>
+                      <portainer-tooltip position="bottom" message="The autoscaler will ensure enough instances are running to maintain an average CPU usage across all instances.">
+                      </portainer-tooltip>
                     </td>
                   </tr>
                   <tr>

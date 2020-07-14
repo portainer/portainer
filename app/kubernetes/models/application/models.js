@@ -112,3 +112,20 @@ export class KubernetesApplicationConfigurationVolume {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesApplicationConfigurationVolume)));
   }
 }
+
+/**
+ * KubernetesApplicationPort Model
+ */
+const _KubernetesApplicationPort = Object.freeze({
+  IngressRules: [], // KubernetesIngressRule[]
+  NodePort: 0,
+  TargetPort: 0,
+  Port: 0,
+  Protocol: '',
+});
+
+export class KubernetesApplicationPort {
+  constructor() {
+    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesApplicationPort)));
+  }
+}
