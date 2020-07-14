@@ -72,7 +72,7 @@
         <table class="table table-hover nowrap-cells">
           <thead>
             <tr>
-              <th>
+              <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.state.open">
                 <span class="md-checkbox" ng-if="!$ctrl.offlineMode" authorization="PortainerStackCreate, PortainerStackDelete">
                   <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                   <label for="select_all"></label>
@@ -82,6 +82,32 @@
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
                 </a>
+                <div>
+                  <span uib-dropdown-toggle ng-class="['table-filter', { 'filter-active': $ctrl.filters.state.enabled }]">
+                    Filter
+                    <i ng-class="['fa', { 'fa-filter': !$ctrl.filters.state.enabled, 'fa-check': $ctrl.filters.state.enabled }]" aria-hidden="true"></i>
+                  </span>
+                </div>
+                <div class="dropdown-menu" uib-dropdown-menu>
+                  <div class="tableMenu">
+                    <div class="menuHeader">
+                      Filter by activity
+                    </div>
+                    <div class="menuContent">
+                      <div class="md-checkbox">
+                        <input id="filter_usage_activeStacks" type="checkbox" ng-model="$ctrl.filters.state.showActiveStacks" ng-change="$ctrl.onFilterChange()" />
+                        <label for="filter_usage_activeStacks">Active stacks</label>
+                      </div>
+                      <div class="md-checkbox">
+                        <input id="filter_usage_unactiveStacks" type="checkbox" ng-model="$ctrl.filters.state.showUnactiveStacks" ng-change="$ctrl.onFilterChange()" />
+                        <label for="filter_usage_unactiveStacks">Inactive stacks</label>
+                      </div>
+                    </div>
+                    <div>
+                      <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.filters.state.open = false;">Close</a>
+                    </div>
+                  </div>
+                </div>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('Type')">
@@ -102,7 +128,7 @@
           </thead>
           <tbody>
             <tr
-              dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))"
+              dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter: $ctrl.applyFilters | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))"
               ng-class="{ active: item.Checked }"
             >
               <td>
