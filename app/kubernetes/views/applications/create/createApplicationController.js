@@ -39,7 +39,8 @@ class KubernetesCreateApplicationController {
     KubernetesConfigurationService,
     KubernetesNodeService,
     KubernetesPersistentVolumeClaimService,
-    KubernetesNamespaceHelper
+    KubernetesNamespaceHelper,
+    KubernetesVolumeService
   ) {
     this.$async = $async;
     this.$state = $state;
@@ -52,6 +53,7 @@ class KubernetesCreateApplicationController {
     this.KubernetesStackService = KubernetesStackService;
     this.KubernetesConfigurationService = KubernetesConfigurationService;
     this.KubernetesNodeService = KubernetesNodeService;
+    this.KubernetesVolumeService = KubernetesVolumeService;
     this.KubernetesPersistentVolumeClaimService = KubernetesPersistentVolumeClaimService;
     this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
 
@@ -627,10 +629,19 @@ class KubernetesCreateApplicationController {
 
       this.formValues = new KubernetesApplicationFormValues();
 
-      const [resourcePools, nodes] = await Promise.all([this.KubernetesResourcePoolService.get(), this.KubernetesNodeService.get()]);
+      const [resourcePools, nodes, volumes] = await Promise.all([this.KubernetesResourcePoolService.get(), this.KubernetesNodeService.get(), this.KubernetesVolumeService.get()]);
 
       this.resourcePools = _.filter(resourcePools, (resourcePool) => !this.KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name));
 
+      this.availablePersistedFolders = _.map(volumes, (volume) => {
+        const res = new KubernetesApplicationPersistedFolderFormValue(volume.PersistentVolumeClaim.StorageClass);
+        res.PersistentVolumeClaimName = volume.PersistentVolumeClaim.Name;
+        res.ExistingVolume = true;
+        res.Size = _.split(volume.PersistentVolumeClaim.Storage, /MB|GB|TB/, 1)[0];
+        res.SizeUnit = _.split(volume.PersistentVolumeClaim.Storage, /[0-9]+/)[1];
+        res.ContainerPath = volume.PersistentVolumeClaim.MountPath;
+        return res;
+      });
       this.formValues.ResourcePool = this.resourcePools[0];
 
       _.forEach(nodes, (item) => {

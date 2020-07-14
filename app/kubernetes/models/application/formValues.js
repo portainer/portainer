@@ -92,6 +92,7 @@ const _KubernetesApplicationPersistedFolderFormValue = Object.freeze({
   Size: '',
   SizeUnit: 'GB',
   StorageClass: {},
+  ExistingVolume: false,
 });
 
 export class KubernetesApplicationPersistedFolderFormValue {
