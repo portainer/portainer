@@ -99,19 +99,28 @@
             </div>
             <!-- !actions -->
           </form>
-          <div class="row" style="padding: 20px;" ng-if="ctrl.isSystemNamespace()">
+          <div ng-if="ctrl.isSystemNamespace()">
             <div class="col-sm-12 form-section-title" style="margin-top: 10px;">
               Data
             </div>
-            <table class="table" ng-repeat="item in ctrl.formValues.Data">
+            <table class="table">
               <tbody>
-                <tr>
-                  <th class="col-sm-1">Key</th>
-                  <td>{{ item.Key }}</td>
+                <tr class="text-muted">
+                  <td style="width: 10%; border-top: none;">Key</td>
+                  <td style="width: 90%; border-top: none;">Value</td>
                 </tr>
-                <tr>
-                  <th class="col-sm-1">Value</th>
-                  <td>{{ item.Value }}</td>
+
+                <tr ng-repeat="item in ctrl.formValues.Data track by $index">
+                  <td>{{ item.Key }}</td>
+                  <td>
+                    <div style="white-space: pre-wrap;">{{ item.Value }}</div>
+                    <div style="margin-top: 2px;">
+                      <span class="btn btn-primary btn-xs" ng-click="ctrl.copyConfigurationValue($index)"> <i class="fa fa-copy space-right" aria-hidden="true"></i>Copy </span>
+                      <span id="copyValueNotification_{{ $index }}" style="display: none; color: #23ae89; margin-left: 5px;" class="small">
+                        <i class="fa fa-check" aria-hidden="true"></i> copied
+                      </span>
+                    </div>
+                  </td>
                 </tr>
               </tbody>
             </table>
