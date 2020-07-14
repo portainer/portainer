@@ -1,7 +1,7 @@
 package migrator
 
 import (
-	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api"
 )
 
 func (m *Migrator) updateSettingsToDB24() error {

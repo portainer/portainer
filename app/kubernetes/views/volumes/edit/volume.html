@@ -39,7 +39,7 @@
                     </tr>
                     <tr>
                       <td>Provisioner</td>
-                      <td>{{ ctrl.volume.PersistentVolumeClaim.StorageClass.Provisioner }}</td>
+                      <td>{{ ctrl.volume.PersistentVolumeClaim.StorageClass.Provisioner ? ctrl.volume.PersistentVolumeClaim.StorageClass.Provisioner : '-' }}</td>
                     </tr>
                     <tr>
                       <td>Size</td>
