@@ -11,7 +11,7 @@ class KubernetesNodeConverter {
     res.Id = data.metadata.uid;
     const hostName = _.find(data.status.addresses, { type: 'Hostname' });
     res.Name = hostName ? hostName.address : data.metadata.Name;
-    res.Role = _.has(data.metadata.labels, 'node-role.kubernetes.io/master') ? 'Manager' : 'Worker';
+    res.Role = _.has(data.metadata.labels, 'node-role.kubernetes.io/master') ? 'Master' : 'Worker';
 
     const ready = _.find(data.status.conditions, { type: KubernetesNodeConditionTypes.READY });
     const memoryPressure = _.find(data.status.conditions, { type: KubernetesNodeConditionTypes.MEMORY_PRESSURE });
