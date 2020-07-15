@@ -64,35 +64,14 @@
           <!-- !os-input -->
           <!-- port-mapping -->
           <div class="form-group">
-            <div class="col-sm-12">
+            <div class="col-sm-2">
               <label class="text-left">Port mapping</label>
             </div>
-            <!-- port-mapping-input-list -->
-            <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-              <div ng-repeat="binding in $ctrl.container.Ports" style="margin-top: 2px;">
-                <!-- host-port -->
-                <div class="input-group col-sm-4 input-group-sm">
-                  <span class="input-group-addon">host</span>
-                  <input class="form-control" ng-value="binding.host" />
-                </div>
-                <!-- !host-port -->
-                <span style="margin: 0 10px 0 10px;">
-                  <i class="fa fa-long-arrow-alt-right" aria-hidden="true"></i>
-                </span>
-                <!-- container-port -->
-                <div class="input-group col-sm-4 input-group-sm">
-                  <span class="input-group-addon">container</span>
-                  <input class="form-control" ng-value="binding.container" />
-                </div>
-                <!-- !container-port -->
-                <!-- protocol-actions -->
-                <div class="input-group col-sm-3 input-group-sm">
-                  {{ binding.protocol }}
-                </div>
-                <!-- !protocol-actions -->
+            <div class="col-sm-10 form-inline">
+              <div ng-repeat="portMapping in $ctrl.container.Ports" style="margin-bottom: 10px;">
+                {{ portMapping.host }} <i class="fa fa-long-arrow-alt-right"></i> {{ portMapping.container }} / {{ portMapping.protocol }}
               </div>
             </div>
-            <!-- !port-mapping-input-list -->
           </div>
           <!-- !port-mapping -->
           <!-- public-ip -->
