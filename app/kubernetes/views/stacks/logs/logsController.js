@@ -6,13 +6,15 @@ const colors = ['red', 'orange', 'lime', 'green', 'darkgreen', 'cyan', 'turquois
 
 class KubernetesStackLogsController {
   /* @ngInject */
-  constructor($async, $state, $interval, Notifications, KubernetesApplicationService, KubernetesPodService) {
+  constructor($async, $state, $interval, Notifications, KubernetesApplicationService, KubernetesPodService, FileSaver, Blob) {
     this.$async = $async;
     this.$state = $state;
     this.$interval = $interval;
     this.Notifications = Notifications;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesPodService = KubernetesPodService;
+    this.Blob = Blob;
+    this.FileSaver = FileSaver;
 
     this.onInit = this.onInit.bind(this);
     this.stopRepeater = this.stopRepeater.bind(this);
@@ -85,6 +87,11 @@ class KubernetesStackLogsController {
       this.stopRepeater();
       this.Notifications.error('Failure', err, 'Unable to retrieve application logs');
     }
+  }
+
+  downloadLogs() {
+    const data = new this.Blob([(this.dataLogs = _.reduce(this.stackLogs, (acc, log) => acc + '\n' + log.AppName + ' ' + log.Line, ''))]);
+    this.FileSaver.saveAs(data, this.state.transition.name + '_logs.txt');
   }
 
   async onInit() {
