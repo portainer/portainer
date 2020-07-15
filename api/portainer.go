@@ -342,6 +342,7 @@ type (
 	KubernetesStorageClassConfig struct {
 		Name        string   `json:"Name"`
 		AccessModes []string `json:"AccessModes"`
+		Provisioner string   `json:"Provisioner"`
 	}
 
 	// LDAPGroupSearchSettings represents settings used to search for groups in a LDAP server
