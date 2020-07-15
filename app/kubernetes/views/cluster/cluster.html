@@ -5,48 +5,46 @@
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
 <div ng-if="ctrl.state.viewReady">
-  <div class="row" ng-if="ctrl.resourceReservation && ctrl.isAdmin">
+  <div class="row" ng-if="ctrl.isAdmin">
     <div class="col-sm-12">
       <rd-widget>
-        <rd-widget-body classes="no-padding">
-          <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
-            <uib-tab index="0" classes="btn-sm" select="ctrl.selectTab(0)">
-              <uib-tab-heading> <i class="fa fa-file-code space-right" aria-hidden="true"></i> Cluster Resource Reservation </uib-tab-heading>
-              <form class="form-horizontal" style="padding: 20px;">
-                <kubernetes-resource-reservation
-                  cpu="ctrl.resourceReservation.CPU"
-                  cpu-limit="ctrl.CPULimit"
-                  memory="ctrl.resourceReservation.Memory"
-                  memory-limit="ctrl.MemoryLimit"
-                  description="Resource reservation represents the total amount of resource assigned to all the applications inside the cluster."
-                >
-                </kubernetes-resource-reservation>
-              </form>
-            </uib-tab>
-            <uib-tab index="1" classes="btn-sm" select="ctrl.selectTab(1)">
-              <uib-tab-heading> <i class="fa fa-file-code space-right" aria-hidden="true"></i> Cluster Status </uib-tab-heading>
-              <div class="row" style="padding: 20px;">
-                <table class="table col-sm-6">
-                  <tbody>
-                    <tr ng-repeat="status in ctrl.componentStatuses">
-                      <td>
-                        {{ status.metadata.name }}
-                      </td>
-                      <td>
-                        {{ status.conditions[0].type }}
-                      </td>
-                      <td>
-                        {{ status.conditions[0].message }}
-                      </td>
-                      <td>
-                        {{ status.conditions[0].error ? status.conditions[0].error : '-' }}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </uib-tab>
-          </uib-tabset>
+        <rd-widget-body>
+          <form class="form-horizontal" ng-if="ctrl.resourceReservation">
+            <kubernetes-resource-reservation
+              cpu="ctrl.resourceReservation.CPU"
+              cpu-limit="ctrl.CPULimit"
+              memory="ctrl.resourceReservation.Memory"
+              memory-limit="ctrl.MemoryLimit"
+              description="Resource reservation represents the total amount of resource assigned to all the applications inside the cluster."
+            >
+            </kubernetes-resource-reservation>
+          </form>
+
+          <div class="col-sm-12 form-section-title">
+            Cluster status
+          </div>
+
+          <table class="table">
+            <tbody>
+              <tr class="text-muted">
+                <td style="border-top: none;">Component</td>
+                <td style="border-top: none;">Status</td>
+                <td style="border-top: none;" ng-if="ctrl.hasUnhealthyComponentStatus">Error</td>
+              </tr>
+              <tr ng-repeat="cs in ctrl.ComponentStatus">
+                <td>
+                  {{ cs.ComponentName }}
+                </td>
+                <td>
+                  <span ng-if="cs.Healthy"><i class="fa fa-check green-icon" aria-hidden="true" style="margin-right: 2px;"></i> healthy</span>
+                  <span ng-if="!cs.Healthy"><i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i> unhealthy</span>
+                </td>
+                <td ng-if="ctrl.hasUnhealthyComponentStatus">
+                  {{ cs.ErrorMessage !== '' ? cs.ErrorMessage : '-' }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </rd-widget-body>
       </rd-widget>
     </div>

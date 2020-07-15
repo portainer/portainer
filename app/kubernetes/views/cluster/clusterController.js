@@ -6,7 +6,7 @@ import { KubernetesResourceReservation } from 'Kubernetes/models/resource-reserv
 
 class KubernetesClusterController {
   /* @ngInject */
-  constructor($async, $state, Authentication, Notifications, LocalStorage, KubernetesNodeService, KubernetesApplicationService, KubernetesComponentStatusesService) {
+  constructor($async, $state, Authentication, Notifications, LocalStorage, KubernetesNodeService, KubernetesApplicationService, KubernetesComponentStatusService) {
     this.$async = $async;
     this.$state = $state;
     this.Authentication = Authentication;
@@ -14,26 +14,24 @@ class KubernetesClusterController {
     this.LocalStorage = LocalStorage;
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesApplicationService = KubernetesApplicationService;
-    this.KubernetesComponentStatusesService = KubernetesComponentStatusesService;
+    this.KubernetesComponentStatusService = KubernetesComponentStatusService;
 
     this.onInit = this.onInit.bind(this);
     this.getNodes = this.getNodes.bind(this);
     this.getNodesAsync = this.getNodesAsync.bind(this);
     this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
-    this.getComponentStatuses = this.getComponentStatuses.bind(this);
-    this.getComponentStatusesAsync = this.getComponentStatusesAsync.bind(this);
+    this.getComponentStatus = this.getComponentStatus.bind(this);
+    this.getComponentStatusAsync = this.getComponentStatusAsync.bind(this);
   }
 
-  selectTab(index) {
-    this.LocalStorage.storeActiveTab('cluster', index);
-  }
-
-  async getComponentStatusesAsync() {
+  async getComponentStatusAsync() {
     try {
-      this.componentStatuses = await this.KubernetesComponentStatusesService.get();
-      this.componentStatuses = _.forEach(this.componentStatuses, (status) => {
-        if (status.conditions && status.conditions[0].message === '{"health":"true"}') {
-          status.conditions[0].message = 'ok';
+      this.ComponentStatus = await this.KubernetesComponentStatusService.get();
+
+      _.forEach(this.ComponentStatus, (cs) => {
+        if (!cs.Healthy) {
+          this.hasUnhealthyComponentStatus = true;
+          return;
         }
       });
     } catch (err) {
@@ -41,8 +39,8 @@ class KubernetesClusterController {
     }
   }
 
-  getComponentStatuses() {
-    return this.$async(this.getComponentStatusesAsync);
+  getComponentStatus() {
+    return this.$async(this.getComponentStatusAsync);
   }
 
   async getNodesAsync() {
@@ -93,17 +91,15 @@ class KubernetesClusterController {
     this.state = {
       applicationsLoading: true,
       viewReady: false,
-      activeTab: 0,
       currentName: this.$state.$current.name,
+      hasUnhealthyComponentStatus: false,
     };
-
-    this.state.activeTab = this.LocalStorage.getActiveTab('cluster');
 
     this.isAdmin = this.Authentication.isAdmin();
 
     await this.getNodes();
     if (this.isAdmin) {
-      await this.getComponentStatuses();
+      await this.getComponentStatus();
       await this.getApplications();
     }
 
@@ -112,12 +108,6 @@ class KubernetesClusterController {
 
   $onInit() {
     return this.$async(this.onInit);
-  }
-
-  $onDestroy() {
-    if (this.state.currentName !== this.$state.$current.name) {
-      this.LocalStorage.storeActiveTab('cluster', 0);
-    }
   }
 }
 
