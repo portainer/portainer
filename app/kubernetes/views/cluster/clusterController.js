@@ -91,7 +91,6 @@ class KubernetesClusterController {
     this.state = {
       applicationsLoading: true,
       viewReady: false,
-      currentName: this.$state.$current.name,
       hasUnhealthyComponentStatus: false,
     };
 
