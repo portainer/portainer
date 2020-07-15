@@ -319,17 +319,22 @@
                 </span>
               </div>
 
-              <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-                <div ng-repeat-start="persistedFolder in ctrl.formValues.PersistedFolders">
+              <div class="col-sm-12 form-inline" style="margin-top: 10px;" ng-repeat="persistedFolder in ctrl.formValues.PersistedFolders">
+                <div ng-if="ctrl.availableVolumes.length > 0">
                   <label for="use_existing_volumes_{{ $index }}" class="control-label text-left">
                     Use existing volumes
                   </label>
                   <label class="switch" style="margin-left: 20px;">
-                    <input id="use_existing_volumes_{{ $index }}" type="checkbox" ng-model="persistedFolder.ExistingVolume" /><i></i>
+                    <input
+                      id="use_existing_volumes_{{ $index }}"
+                      type="checkbox"
+                      ng-model="ctrl.state.useExistingVolume[$index]"
+                      ng-change="ctrl.onChangeExistingVolume($index)"
+                    /><i></i>
                   </label>
                 </div>
 
-                <div style="margin-top: 2px;" ng-if="!persistedFolder.ExistingVolume">
+                <div style="margin-top: 2px;">
                   <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: persistedFolder.NeedsDeletion }">
                     <span class="input-group-addon">path in container</span>
                     <input
@@ -343,7 +348,7 @@
                     />
                   </div>
 
-                  <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: persistedFolder.NeedsDeletion }" ng-if="!persistedFolder.ExistingVolume">
+                  <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: persistedFolder.NeedsDeletion }" ng-if="!ctrl.state.useExistingVolume[$index]">
                     <span class="input-group-addon">requested size</span>
                     <input
                       type="number"
@@ -369,7 +374,7 @@
                     class="input-group col-sm-3 input-group-sm"
                     ng-class="{ striked: persistedFolder.NeedsDeletion }"
                     style="vertical-align: top;"
-                    ng-if="!persistedFolder.ExistingVolume"
+                    ng-if="!ctrl.state.useExistingVolume[$index]"
                   >
                     <span class="input-group-addon">storage</span>
                     <select
@@ -382,7 +387,7 @@
                     <input ng-if="!ctrl.hasMultipleStorageClassesAvailable()" type="text" class="form-control" disabled ng-model="persistedFolder.StorageClass.Name" />
                   </div>
 
-                  <div class="input-group col-sm-1 input-group-sm" style="vertical-align: top;" ng-if="!ctrl.isEditAndStatefulSet()" ng-if="!persistedFolder.ExistingVolume">
+                  <div class="input-group col-sm-1 input-group-sm" style="vertical-align: top;" ng-if="!ctrl.isEditAndStatefulSet()" ng-if="!ctrl.state.useExistingVolume[$index]">
                     <button ng-if="!persistedFolder.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removePersistedFolder($index)">
                       <i class="fa fa-times" aria-hidden="true"></i>
                     </button>
@@ -390,10 +395,19 @@
                       Restore
                     </button>
                   </div>
+
+                  <div class="input-group col-sm-7 input-group-sm" ng-if="ctrl.state.useExistingVolume[$index]">
+                    <select
+                      class="form-control"
+                      ng-init="ctrl.formValues.PersistedFolders[$index].ExistingVolume = ctrl.availableVolumes[0]"
+                      ng-model="ctrl.formValues.PersistedFolders[$index].ExistingVolume"
+                      ng-options="vol as vol.PersistentVolumeClaim.Name for vol in ctrl.availableVolumes"
+                    >
+                    </select>
+                  </div>
                 </div>
 
                 <div
-                  ng-if="!persistedFolder.ExistingVolume"
                   ng-show="
                     kubernetesApplicationCreationForm['persisted_folder_path_' + $index].$invalid ||
                     ctrl.state.duplicatePersistedFolderPaths[$index] !== undefined ||
@@ -427,11 +441,6 @@
                   <div class="input-group col-sm-3 input-group-sm"> </div>
 
                   <div class="input-group col-sm-1 input-group-sm"> </div>
-                </div>
-
-                <div class="input-group col-sm-12 input-group-sm" ng-repeat-end ng-if="persistedFolder.ExistingVolume">
-                  <select class="form-control" ng-model="persistedFolder" ng-options="name as volume.PersistentVolumeClaimName for volume in ctrl.availablePersistedFolders">
-                  </select>
                 </div>
               </div>
             </div>

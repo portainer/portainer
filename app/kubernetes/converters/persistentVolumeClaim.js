@@ -28,16 +28,28 @@ class KubernetesPersistentVolumeClaimConverter {
     _.remove(formValues.PersistedFolders, (item) => item.NeedsDeletion);
     const res = _.map(formValues.PersistedFolders, (item) => {
       const pvc = new KubernetesPersistentVolumeClaim();
-      if (item.PersistentVolumeClaimName) {
-        pvc.Name = item.PersistentVolumeClaimName;
-        pvc.PreviousName = item.PersistentVolumeClaimName;
+      if (!_.isEmpty(item.ExistingVolume)) {
+        const existantPVC = item.ExistingVolume.PersistentVolumeClaim;
+        pvc.Name = existantPVC.Name;
+        if (item.PersistentVolumeClaimName) {
+          pvc.PreviousName = item.PersistentVolumeClaimName;
+        }
+        pvc.StorageClass = existantPVC.StorageClass;
+        pvc.Storage = existantPVC.Storage.charAt(0) + 'i';
+        pvc.CreationDate = existantPVC.CreationDate;
+        pvc.Id = existantPVC.Id;
       } else {
-        pvc.Name = formValues.Name + '-' + pvc.Name;
+        if (item.PersistentVolumeClaimName) {
+          pvc.Name = item.PersistentVolumeClaimName;
+          pvc.PreviousName = item.PersistentVolumeClaimName;
+        } else {
+          pvc.Name = formValues.Name + '-' + pvc.Name;
+        }
+        pvc.Storage = '' + item.Size + item.SizeUnit.charAt(0) + 'i';
+        pvc.StorageClass = item.StorageClass;
       }
       pvc.MountPath = item.ContainerPath;
       pvc.Namespace = formValues.ResourcePool.Namespace.Name;
-      pvc.Storage = '' + item.Size + item.SizeUnit.charAt(0) + 'i';
-      pvc.StorageClass = item.StorageClass;
       pvc.ApplicationOwner = formValues.ApplicationOwner;
       pvc.ApplicationName = formValues.Name;
       return pvc;

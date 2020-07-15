@@ -215,6 +215,12 @@ class KubernetesCreateApplicationController {
     }
     this.onChangePersistedFolderPath();
   }
+
+  onChangeExistingVolume(index) {
+    if (!this.state.useExistingVolume[index]) {
+      this.formValues.PersistedFolders[index].ExistingVolume = {};
+    }
+  }
   /**
    * !PERSISTENT FOLDERS UI MANAGEMENT
    */
@@ -503,6 +509,11 @@ class KubernetesCreateApplicationController {
     this.updateSliders();
     this.refreshStacksConfigsApps(namespace);
     this.formValues.Configurations = [];
+    this.availableVolumes = _.filter(this.volumes, (volume) => volume.ResourcePool.Namespace.Name === namespace);
+    this.formValues.PersistedFolders = _.forEach(this.formValues.PersistedFolders, (persistedFolder, index) => {
+      persistedFolder.ExistingVolume = {};
+      this.state.useExistingVolume[index] = false;
+    });
   }
   /**
    * !DATA AUTO REFRESH
@@ -611,6 +622,7 @@ class KubernetesCreateApplicationController {
           namespace: this.$transition$.params().namespace,
           name: this.$transition$.params().name,
         },
+        useExistingVolume: [],
       };
 
       this.isAdmin = this.Authentication.isAdmin();
@@ -632,17 +644,9 @@ class KubernetesCreateApplicationController {
       const [resourcePools, nodes, volumes] = await Promise.all([this.KubernetesResourcePoolService.get(), this.KubernetesNodeService.get(), this.KubernetesVolumeService.get()]);
 
       this.resourcePools = _.filter(resourcePools, (resourcePool) => !this.KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name));
-
-      this.availablePersistedFolders = _.map(volumes, (volume) => {
-        const res = new KubernetesApplicationPersistedFolderFormValue(volume.PersistentVolumeClaim.StorageClass);
-        res.PersistentVolumeClaimName = volume.PersistentVolumeClaim.Name;
-        res.ExistingVolume = true;
-        res.Size = _.split(volume.PersistentVolumeClaim.Storage, /MB|GB|TB/, 1)[0];
-        res.SizeUnit = _.split(volume.PersistentVolumeClaim.Storage, /[0-9]+/)[1];
-        res.ContainerPath = volume.PersistentVolumeClaim.MountPath;
-        return res;
-      });
       this.formValues.ResourcePool = this.resourcePools[0];
+      this.volumes = volumes;
+      this.availableVolumes = _.filter(this.volumes, (volume) => volume.ResourcePool.Namespace.Name === this.formValues.ResourcePool.Namespace.Name);
 
       _.forEach(nodes, (item) => {
         this.state.nodes.memory += filesizeParser(item.Memory);
