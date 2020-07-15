@@ -26,16 +26,16 @@ class KubernetesClusterController {
 
   async getComponentStatusAsync() {
     try {
-      this.ComponentStatus = await this.KubernetesComponentStatusService.get();
+      this.ComponentStatuses = await this.KubernetesComponentStatusService.get();
 
-      _.forEach(this.ComponentStatus, (cs) => {
+      _.forEach(this.ComponentStatuses, (cs) => {
         if (!cs.Healthy) {
           this.hasUnhealthyComponentStatus = true;
           return;
         }
       });
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to get component status');
+      this.Notifications.error('Failure', err, 'Unable to retrieve cluster component statuses');
     }
   }
 

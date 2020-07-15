@@ -9,22 +9,12 @@ export class KubernetesComponentStatusConverter {
     const res = new KubernetesComponentStatus();
     res.ComponentName = data.metadata.name;
 
-    _.forEach(data.conditions, (condition) => {
-      // if (condition.type === "Healthy" && condition.status === "True") {
-      //   res.Healthy = true;
-      //   return;
-      // }
-
-      if (condition.type === 'Healthy') {
-        if (condition.status === 'True') {
-          res.Healthy = true;
-        } else {
-          res.ErrorMessage = condition.message;
-        }
-
-        return;
-      }
-    });
+    const healthyCondition = _.find(data.conditions, { type: 'Healthy' });
+    if (healthyCondition && healthyCondition.status === 'True') {
+      res.Healthy = true;
+    } else if (healthyCondition && healthyCondition.status === 'False') {
+      res.ErrorMessage = healthyCondition.message;
+    }
 
     return res;
   }
