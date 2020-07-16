@@ -5,53 +5,19 @@ angular.module('portainer.docker', ['portainer.app']).config([
 
     var docker = {
       name: 'docker',
-      parent: 'endpoint',
+      parent: 'root',
       abstract: true,
-      /* ngInject */
-      async onEnter(endpoint, $state, EndpointService, EndpointProvider, LegacyExtensionManager, Notifications, StateManager, SystemService) {
-        try {
-          const status = await checkEndpointStatus(endpoint);
-
-          if (endpoint.Type !== 4) {
-            await updateEndpointStatus(endpoint, status);
-          }
-          endpoint.Status = status;
-
-          if (status === 2) {
-            if (!endpoint.Snapshots[0]) {
-              throw new Error('Endpoint is unreachable and there is no snapshot available for offline browsing.');
+      resolve: {
+        endpointID: [
+          'EndpointProvider',
+          '$state',
+          function (EndpointProvider, $state) {
+            var id = EndpointProvider.endpointID();
+            if (!id) {
+              return $state.go('portainer.home');
             }
-            if (endpoint.Snapshots[0].Swarm) {
-              throw new Error('Endpoint is unreachable. Connect to another swarm manager.');
-            }
-          }
-
-          EndpointProvider.setEndpointID(endpoint.Id);
-          EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
-          EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
-
-          const extensions = await LegacyExtensionManager.initEndpointExtensions(endpoint);
-          await StateManager.updateEndpointState(endpoint, extensions);
-        } catch (e) {
-          Notifications.error('Failed loading endpoint', e);
-          $state.go('portainer.home', {}, { reload: true });
-        }
-
-        async function checkEndpointStatus(endpoint) {
-          try {
-            await SystemService.ping(endpoint.Id);
-            return 1;
-          } catch (e) {
-            return 2;
-          }
-        }
-
-        async function updateEndpointStatus(endpoint, status) {
-          if (endpoint.Status === status) {
-            return;
-          }
-          await EndpointService.updateEndpoint(endpoint.Id, { Status: status });
-        }
+          },
+        ],
       },
     };
 
@@ -174,43 +140,6 @@ angular.module('portainer.docker', ['portainer.app']).config([
         'content@': {
           templateUrl: './views/containers/stats/containerstats.html',
           controller: 'ContainerStatsController',
-        },
-      },
-    };
-
-    const customTemplates = {
-      name: 'portainer.templates.custom',
-      url: '/custom',
-
-      views: {
-        'content@': {
-          component: 'customTemplatesView',
-        },
-      },
-    };
-
-    const customTemplatesNew = {
-      name: 'portainer.templates.custom.new',
-      url: '/new?fileContent&type',
-
-      views: {
-        'content@': {
-          component: 'createCustomTemplateView',
-        },
-      },
-      params: {
-        fileContent: '',
-        type: '',
-      },
-    };
-
-    const customTemplatesEdit = {
-      name: 'portainer.templates.custom.edit',
-      url: '/:id',
-
-      views: {
-        'content@': {
-          component: 'editCustomTemplateView',
         },
       },
     };
@@ -437,39 +366,6 @@ angular.module('portainer.docker', ['portainer.app']).config([
       },
     };
 
-    var stacks = {
-      name: 'docker.stacks',
-      url: '/stacks',
-      views: {
-        'content@': {
-          templateUrl: '~Portainer/views/stacks/stacks.html',
-          controller: 'StacksController',
-        },
-      },
-    };
-
-    var stack = {
-      name: 'docker.stacks.stack',
-      url: '/:name?id&type&external',
-      views: {
-        'content@': {
-          templateUrl: '~Portainer/views/stacks/edit/stack.html',
-          controller: 'StackController',
-        },
-      },
-    };
-
-    var stackCreation = {
-      name: 'docker.stacks.newstack',
-      url: '/newstack',
-      views: {
-        'content@': {
-          templateUrl: '~Portainer/views/stacks/create/createstack.html',
-          controller: 'CreateStackController',
-        },
-      },
-    };
-
     var swarm = {
       name: 'docker.swarm',
       url: '/swarm',
@@ -516,17 +412,6 @@ angular.module('portainer.docker', ['portainer.app']).config([
         'content@': {
           templateUrl: './views/tasks/logs/tasklogs.html',
           controller: 'TaskLogsController',
-        },
-      },
-    };
-
-    var templates = {
-      name: 'docker.templates',
-      url: '/templates',
-      views: {
-        'content@': {
-          templateUrl: '~Portainer/views/templates/templates.html',
-          controller: 'TemplatesController',
         },
       },
     };
@@ -586,9 +471,6 @@ angular.module('portainer.docker', ['portainer.app']).config([
     $stateRegistryProvider.register(containerInspect);
     $stateRegistryProvider.register(containerLogs);
     $stateRegistryProvider.register(containerStats);
-    $stateRegistryProvider.register(customTemplates);
-    $stateRegistryProvider.register(customTemplatesNew);
-    $stateRegistryProvider.register(customTemplatesEdit);
     $stateRegistryProvider.register(docker);
     $stateRegistryProvider.register(dashboard);
     $stateRegistryProvider.register(host);
@@ -611,15 +493,11 @@ angular.module('portainer.docker', ['portainer.app']).config([
     $stateRegistryProvider.register(service);
     $stateRegistryProvider.register(serviceCreation);
     $stateRegistryProvider.register(serviceLogs);
-    $stateRegistryProvider.register(stacks);
-    $stateRegistryProvider.register(stack);
-    $stateRegistryProvider.register(stackCreation);
     $stateRegistryProvider.register(swarm);
     $stateRegistryProvider.register(swarmVisualizer);
     $stateRegistryProvider.register(tasks);
     $stateRegistryProvider.register(task);
     $stateRegistryProvider.register(taskLogs);
-    $stateRegistryProvider.register(templates);
     $stateRegistryProvider.register(volumes);
     $stateRegistryProvider.register(volume);
     $stateRegistryProvider.register(volumeBrowse);

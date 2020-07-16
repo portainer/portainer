@@ -14,6 +14,7 @@ angular
     FormValidator,
     ResourceControlService,
     FormHelper,
+    EndpointProvider,
     CustomTemplateService
   ) {
     $scope.formValues = {
@@ -59,7 +60,7 @@ angular
 
     function createSwarmStack(name, method) {
       var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
-      const endpointId = +$state.params.endpointId;
+      var endpointId = EndpointProvider.endpointID();
 
       if (method === 'template' || method === 'editor') {
         var stackFileContent = $scope.formValues.StackFileContent;
@@ -86,7 +87,7 @@ angular
 
     function createComposeStack(name, method) {
       var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
-      const endpointId = +$state.params.endpointId;
+      var endpointId = EndpointProvider.endpointID();
 
       if (method === 'editor' || method === 'template') {
         var stackFileContent = $scope.formValues.StackFileContent;
@@ -141,7 +142,7 @@ angular
         })
         .then(function success() {
           Notifications.success('Stack successfully deployed');
-          $state.go('docker.stacks');
+          $state.go('portainer.stacks');
         })
         .catch(function error(err) {
           Notifications.error('Deployment error', err, 'Unable to deploy stack');
