@@ -41,6 +41,7 @@ angular.module('portainer.azure').controller('AzureCreateContainerInstanceContro
           $state.go('azure.containerinstances');
         })
         .catch(function error(err) {
+          err = err.data ? err.data.error : err;
           Notifications.error('Failure', err, 'Unable to create container');
         })
         .finally(function final() {
