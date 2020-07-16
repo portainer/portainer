@@ -7,51 +7,52 @@ angular.module('portainer.docker', ['portainer.app']).config([
       name: 'docker',
       parent: 'endpoint',
       abstract: true,
-      /* ngInject */
-      async onEnter(endpoint, $state, EndpointService, EndpointProvider, LegacyExtensionManager, Notifications, StateManager, SystemService) {
-        try {
-          const status = await checkEndpointStatus(endpoint);
-
-          if (endpoint.Type !== 4) {
-            await updateEndpointStatus(endpoint, status);
-          }
-          endpoint.Status = status;
-
-          if (status === 2) {
-            if (!endpoint.Snapshots[0]) {
-              throw new Error('Endpoint is unreachable and there is no snapshot available for offline browsing.');
-            }
-            if (endpoint.Snapshots[0].Swarm) {
-              throw new Error('Endpoint is unreachable. Connect to another swarm manager.');
-            }
-          }
-
-          EndpointProvider.setEndpointID(endpoint.Id);
-          EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
-          EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
-
-          const extensions = await LegacyExtensionManager.initEndpointExtensions(endpoint);
-          await StateManager.updateEndpointState(endpoint, extensions);
-        } catch (e) {
-          Notifications.error('Failed loading endpoint', e);
-          $state.go('portainer.home', {}, { reload: true });
-        }
-
-        async function checkEndpointStatus(endpoint) {
+      onEnter: /* @ngInject */ function onEnter(endpoint, $async, $state, EndpointService, EndpointProvider, LegacyExtensionManager, Notifications, StateManager, SystemService) {
+        return $async(async () => {
           try {
-            await SystemService.ping(endpoint.Id);
-            return 1;
-          } catch (e) {
-            return 2;
-          }
-        }
+            const status = await checkEndpointStatus(endpoint);
 
-        async function updateEndpointStatus(endpoint, status) {
-          if (endpoint.Status === status) {
-            return;
+            if (endpoint.Type !== 4) {
+              await updateEndpointStatus(endpoint, status);
+            }
+            endpoint.Status = status;
+
+            if (status === 2) {
+              if (!endpoint.Snapshots[0]) {
+                throw new Error('Endpoint is unreachable and there is no snapshot available for offline browsing.');
+              }
+              if (endpoint.Snapshots[0].Swarm) {
+                throw new Error('Endpoint is unreachable. Connect to another swarm manager.');
+              }
+            }
+
+            EndpointProvider.setEndpointID(endpoint.Id);
+            EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
+            EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
+
+            const extensions = await LegacyExtensionManager.initEndpointExtensions(endpoint);
+            await StateManager.updateEndpointState(endpoint, extensions);
+          } catch (e) {
+            Notifications.error('Failed loading endpoint', e);
+            $state.go('portainer.home', {}, { reload: true });
           }
-          await EndpointService.updateEndpoint(endpoint.Id, { Status: status });
-        }
+
+          async function checkEndpointStatus(endpoint) {
+            try {
+              await SystemService.ping(endpoint.Id);
+              return 1;
+            } catch (e) {
+              return 2;
+            }
+          }
+
+          async function updateEndpointStatus(endpoint, status) {
+            if (endpoint.Status === status) {
+              return;
+            }
+            await EndpointService.updateEndpoint(endpoint.Id, { Status: status });
+          }
+        });
       },
     };
 

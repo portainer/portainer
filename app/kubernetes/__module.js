@@ -8,24 +8,26 @@ angular.module('portainer.kubernetes', ['portainer.app']).config([
       url: '/kubernetes',
       parent: 'endpoint',
       abstract: true,
-      /* @ngInject */
-      async onEnter($state, endpoint, EndpointProvider, KubernetesHealthService, Notifications, StateManager) {
-        try {
-          if (endpoint.Type === 7) {
-            try {
-              await KubernetesHealthService.ping();
-              endpoint.Status = 1;
-            } catch (e) {
-              endpoint.Status = 2;
-            }
-          }
 
-          EndpointProvider.setEndpointID(endpoint.Id);
-          await StateManager.updateEndpointState(endpoint, []);
-        } catch (e) {
-          Notifications.error('Failed loading endpoint', e);
-          $state.go('portainer.home', {}, { reload: true });
-        }
+      onEnter: /* @ngInject */ function onEnter($async, $state, endpoint, EndpointProvider, KubernetesHealthService, Notifications, StateManager) {
+        return $async(async () => {
+          try {
+            if (endpoint.Type === 7) {
+              try {
+                await KubernetesHealthService.ping();
+                endpoint.Status = 1;
+              } catch (e) {
+                endpoint.Status = 2;
+              }
+            }
+
+            EndpointProvider.setEndpointID(endpoint.Id);
+            await StateManager.updateEndpointState(endpoint, []);
+          } catch (e) {
+            Notifications.error('Failed loading endpoint', e);
+            $state.go('portainer.home', {}, { reload: true });
+          }
+        });
       },
     };
 

@@ -81,8 +81,7 @@ angular.module('portainer.app', []).config([
       parent: 'root',
       abstract: true,
       resolve: {
-        /* @ngInject */
-        endpoint($async, $state, $transition$, EndpointService, Notifications) {
+        endpoint: /* @ngInject */ function endpoint($async, $state, $transition$, EndpointService, Notifications) {
           return $async(async () => {
             try {
               const endpointId = +$transition$.params().endpointId;
