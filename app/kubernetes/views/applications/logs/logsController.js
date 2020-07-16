@@ -1,14 +1,17 @@
 import angular from 'angular';
+import _ from 'lodash-es';
 
 class KubernetesApplicationLogsController {
   /* @ngInject */
-  constructor($async, $state, $interval, Notifications, KubernetesApplicationService, KubernetesPodService) {
+  constructor($async, $state, $interval, Notifications, KubernetesApplicationService, KubernetesPodService, Blob, FileSaver) {
     this.$async = $async;
     this.$state = $state;
     this.$interval = $interval;
     this.Notifications = Notifications;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesPodService = KubernetesPodService;
+    this.Blob = Blob;
+    this.FileSaver = FileSaver;
 
     this.onInit = this.onInit.bind(this);
     this.stopRepeater = this.stopRepeater.bind(this);
@@ -33,6 +36,11 @@ class KubernetesApplicationLogsController {
 
   setUpdateRepeater() {
     this.repeater = this.$interval(this.getApplicationLogsAsync, this.state.refreshRate);
+  }
+
+  downloadLogs() {
+    const data = new this.Blob([_.reduce(this.applicationLogs, (acc, log) => acc + '\n' + log, '')]);
+    this.FileSaver.saveAs(data, this.podName + '_logs.txt');
   }
 
   async getApplicationLogsAsync() {
