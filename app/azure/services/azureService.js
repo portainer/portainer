@@ -5,7 +5,8 @@ angular.module('portainer.azure').factory('AzureService', [
   'ResourceGroupService',
   'ContainerGroupService',
   'ProviderService',
-  function AzureServiceFactory($q, Azure, SubscriptionService, ResourceGroupService, ContainerGroupService, ProviderService) {
+  'NetworkProfileService',
+  function AzureServiceFactory($q, Azure, SubscriptionService, ResourceGroupService, ContainerGroupService, ProviderService, NetworkProfileService) {
     'use strict';
     var service = {};
 
@@ -32,6 +33,11 @@ angular.module('portainer.azure').factory('AzureService', [
     service.containerGroups = function (subscriptions) {
       return retrieveResourcesForEachSubscription(subscriptions, ContainerGroupService.containerGroups);
     };
+
+    service.networkProfiles = networkProfiles;
+    function networkProfiles(subscriptions) {
+      return retrieveResourcesForEachSubscription(subscriptions, NetworkProfileService.networkProfiles);
+    }
 
     service.aggregate = function (resourcesBySubcription) {
       var aggregatedResources = [];
