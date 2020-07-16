@@ -9,6 +9,7 @@ angular.module('portainer.azure').controller('AzureCreateContainerInstanceContro
   function ($q, $scope, $state, AzureService, Notifications) {
     var allResourceGroups = [];
     var allProviders = [];
+    let allNetworkProfiles = [];
 
     $scope.state = {
       actionInProgress: false,
@@ -18,7 +19,7 @@ angular.module('portainer.azure').controller('AzureCreateContainerInstanceContro
 
     $scope.changeSubscription = function () {
       var selectedSubscription = $scope.state.selectedSubscription;
-      updateResourceGroupsAndLocations(selectedSubscription, allResourceGroups, allProviders);
+      updateSubscriptionResources(selectedSubscription, allResourceGroups, allProviders);
     };
 
     $scope.addPortBinding = function () {
@@ -49,13 +50,18 @@ angular.module('portainer.azure').controller('AzureCreateContainerInstanceContro
         });
     };
 
-    function updateResourceGroupsAndLocations(subscription, resourceGroups, providers) {
+    function updateSubscriptionResources(subscription, resourceGroups, providers, networkProfiles) {
       $scope.state.selectedResourceGroup = resourceGroups[subscription.Id][0];
       $scope.resourceGroups = resourceGroups[subscription.Id];
 
       var currentSubLocations = providers[subscription.Id].Locations;
       $scope.model.Location = currentSubLocations[0];
       $scope.locations = currentSubLocations;
+
+      $scope.networkProfiles = networkProfiles[subscription.Id];
+      const hasNetworks = $scope.networkProfiles.length > 0;
+      $scope.model.Network = hasNetworks ? $scope.networkProfiles[0].Id : null;
+      $scope.hasNetworks = hasNetworks;
     }
 
     function initView() {
@@ -70,6 +76,7 @@ angular.module('portainer.azure').controller('AzureCreateContainerInstanceContro
           return $q.all({
             resourceGroups: AzureService.resourceGroups(subscriptions),
             containerInstancesProviders: AzureService.containerInstanceProvider(subscriptions),
+            networkProfiles: AzureService.networkProfiles(subscriptions),
           });
         })
         .then(function success(data) {
@@ -79,10 +86,12 @@ angular.module('portainer.azure').controller('AzureCreateContainerInstanceContro
           var containerInstancesProviders = data.containerInstancesProviders;
           allProviders = containerInstancesProviders;
 
+          allNetworkProfiles = data.networkProfiles;
+
           $scope.model = model;
 
           var selectedSubscription = $scope.state.selectedSubscription;
-          updateResourceGroupsAndLocations(selectedSubscription, resourceGroups, containerInstancesProviders);
+          updateSubscriptionResources(selectedSubscription, resourceGroups, containerInstancesProviders, allNetworkProfiles);
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve Azure resources');
