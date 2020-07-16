@@ -387,6 +387,18 @@
                     <input ng-if="!ctrl.hasMultipleStorageClassesAvailable()" type="text" class="form-control" disabled ng-model="persistedFolder.StorageClass.Name" />
                   </div>
 
+                  <div class="input-group col-sm-7 input-group-sm" ng-if="ctrl.state.useExistingVolume[$index]">
+                    <select
+                      class="form-control"
+                      name="existing_volumes_{{ $index }}"
+                      ng-model="ctrl.formValues.PersistedFolders[$index].ExistingVolume"
+                      ng-options="vol as vol.PersistentVolumeClaim.Name for vol in ctrl.availableVolumes"
+                      required
+                    >
+                      <option selected disabled hidden value="">Select a volume</option>
+                    </select>
+                  </div>
+
                   <div class="input-group col-sm-1 input-group-sm" style="vertical-align: top;" ng-if="!ctrl.isEditAndStatefulSet()" ng-if="!ctrl.state.useExistingVolume[$index]">
                     <button ng-if="!persistedFolder.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removePersistedFolder($index)">
                       <i class="fa fa-times" aria-hidden="true"></i>
@@ -395,23 +407,14 @@
                       Restore
                     </button>
                   </div>
-
-                  <div class="input-group col-sm-7 input-group-sm" ng-if="ctrl.state.useExistingVolume[$index]">
-                    <select
-                      class="form-control"
-                      ng-init="ctrl.formValues.PersistedFolders[$index].ExistingVolume = ctrl.availableVolumes[0]"
-                      ng-model="ctrl.formValues.PersistedFolders[$index].ExistingVolume"
-                      ng-options="vol as vol.PersistentVolumeClaim.Name for vol in ctrl.availableVolumes"
-                    >
-                    </select>
-                  </div>
                 </div>
 
                 <div
                   ng-show="
                     kubernetesApplicationCreationForm['persisted_folder_path_' + $index].$invalid ||
                     ctrl.state.duplicatePersistedFolderPaths[$index] !== undefined ||
-                    kubernetesApplicationCreationForm['persisted_folder_size_' + $index].$invalid
+                    kubernetesApplicationCreationForm['persisted_folder_size_' + $index].$invalid ||
+                    kubernetesApplicationCreationForm['existing_volumes_' + $index].$invalid
                   "
                 >
                   <div class="input-group col-sm-3 input-group-sm">
@@ -434,6 +437,11 @@
                       <ng-messages for="kubernetesApplicationCreationForm['persisted_folder_size_' + $index].$error">
                         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Size is required.</p>
                         <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This value must be greater than zero.</p>
+                      </ng-messages>
+                    </div>
+                    <div class="small text-warning" ng-show="kubernetesApplicationCreationForm['existing_volumes_' + $index].$invalid">
+                      <ng-messages for="kubernetesApplicationCreationForm['existing_volumes_' + $index].$error">
+                        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Volume is required.</p>
                       </ng-messages>
                     </div>
                   </div>

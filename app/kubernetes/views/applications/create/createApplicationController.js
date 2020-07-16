@@ -661,6 +661,14 @@ class KubernetesCreateApplicationController {
         this.formValues = KubernetesApplicationConverter.applicationToFormValues(this.application, this.resourcePools, this.configurations, this.persistentVolumeClaims);
         this.savedFormValues = angular.copy(this.formValues);
         delete this.formValues.ApplicationType;
+
+        _.forEach(this.formValues.PersistedFolders, (persistedFolder, index) => {
+          const volume = _.find(this.availableVolumes, (vol) => vol.PersistentVolumeClaim.Name === persistedFolder.PersistentVolumeClaimName);
+          if (volume) {
+            this.state.useExistingVolume[index] = true;
+            persistedFolder.ExistingVolume = volume;
+          }
+        });
       } else {
         this.formValues.AutoScaler = KubernetesApplicationHelper.generateAutoScalerFormValueFromHorizontalPodAutoScaler();
         this.formValues.AutoScaler.MinReplicas = this.formValues.ReplicaCount;
