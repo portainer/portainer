@@ -11,6 +11,10 @@ angular.module('portainer.kubernetes', ['portainer.app']).config([
 
       onEnter: /* @ngInject */ function onEnter($async, $state, endpoint, EndpointProvider, KubernetesHealthService, Notifications, StateManager) {
         return $async(async () => {
+          if (![5, 6, 7].includes(endpoint.Type)) {
+            $state.go('portainer.home');
+            return;
+          }
           try {
             if (endpoint.Type === 7) {
               try {

@@ -9,6 +9,10 @@ angular.module('portainer.docker', ['portainer.app']).config([
       abstract: true,
       onEnter: /* @ngInject */ function onEnter(endpoint, $async, $state, EndpointService, EndpointProvider, LegacyExtensionManager, Notifications, StateManager, SystemService) {
         return $async(async () => {
+          if (![1, 2, 4].includes(endpoint.Type)) {
+            $state.go('portainer.home');
+            return;
+          }
           try {
             const status = await checkEndpointStatus(endpoint);
 

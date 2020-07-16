@@ -8,9 +8,12 @@ angular.module('portainer.azure', ['portainer.app']).config([
       url: '/azure',
       parent: 'endpoint',
       abstract: true,
-
       onEnter: /* @ngInject */ function onEnter($async, $state, endpoint, EndpointProvider, Notifications, StateManager) {
         return $async(async () => {
+          if (endpoint.Type !== 3) {
+            $state.go('portainer.home');
+            return;
+          }
           try {
             EndpointProvider.setEndpointID(endpoint.Id);
             EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
