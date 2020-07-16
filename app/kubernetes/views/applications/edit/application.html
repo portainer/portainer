@@ -36,7 +36,13 @@
                       </td>
                     </tr>
                     <tr>
-                      <td>Deployment</td>
+                      <td>Application Type</td>
+                      <td>
+                        {{ ctrl.application.ApplicationType | kubernetesApplicationTypeText }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Status</td>
                       <td>
                         <span ng-if="ctrl.application.DeploymentType === ctrl.KubernetesApplicationDeploymentTypes.REPLICATED">Replicated</span>
                         <span ng-if="ctrl.application.DeploymentType === ctrl.KubernetesApplicationDeploymentTypes.GLOBAL">Global</span>

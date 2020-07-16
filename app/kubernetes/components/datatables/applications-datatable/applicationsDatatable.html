@@ -107,7 +107,14 @@
                 </a>
               </th>
               <th>
-                Deployment
+                <a ng-click="$ctrl.changeOrderBy('ApplicationType')">
+                  Application Type
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ApplicationType' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ApplicationType' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                Status
               </th>
               <th>
                 Publishing mode
@@ -141,6 +148,7 @@
                 <a ui-sref="kubernetes.resourcePools.resourcePool({ id: item.ResourcePool })">{{ item.ResourcePool }}</a>
               </td>
               <td>{{ item.Image }}</td>
+              <td>{{ item.ApplicationType | kubernetesApplicationTypeText }}</td>
               <td>
                 <span ng-if="item.DeploymentType === $ctrl.KubernetesApplicationDeploymentTypes.REPLICATED">Replicated</span>
                 <span ng-if="item.DeploymentType === $ctrl.KubernetesApplicationDeploymentTypes.GLOBAL">Global</span>
