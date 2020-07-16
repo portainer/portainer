@@ -75,7 +75,13 @@ class KubernetesCreateApplicationController {
   }
 
   isValid() {
-    return !this.state.alreadyExists && !this.state.hasDuplicateEnvironmentVariables && !this.state.hasDuplicatePersistedFolderPaths && !this.state.hasDuplicateConfigurationPaths;
+    return (
+      !this.state.alreadyExists &&
+      !this.state.hasDuplicateEnvironmentVariables &&
+      !this.state.hasDuplicatePersistedFolderPaths &&
+      !this.state.hasDuplicateConfigurationPaths &&
+      !this.state.hasDuplicateExistingVolumes
+    );
   }
 
   onChangeName() {
@@ -214,12 +220,22 @@ class KubernetesCreateApplicationController {
       this.formValues.PersistedFolders.splice(index, 1);
     }
     this.onChangePersistedFolderPath();
+    this.onChangeExistingVolumeSelection();
   }
 
   onChangeExistingVolume(index) {
     if (!this.state.useExistingVolume[index]) {
-      this.formValues.PersistedFolders[index].ExistingVolume = {};
+      this.formValues.PersistedFolders[index].ExistingVolume = null;
     }
+  }
+
+  onChangeExistingVolumeSelection() {
+    this.state.duplicateExistingVolumes = KubernetesFormValidationHelper.getDuplicates(
+      _.map(this.formValues.PersistedFolders, (persistedFolder) => {
+        return persistedFolder.ExistingVolume ? persistedFolder.ExistingVolume.PersistentVolumeClaim.Name : '';
+      })
+    );
+    this.state.hasDuplicateExistingVolumes = Object.keys(this.state.duplicateExistingVolumes).length > 0;
   }
   /**
    * !PERSISTENT FOLDERS UI MANAGEMENT
@@ -617,6 +633,8 @@ class KubernetesCreateApplicationController {
         hasDuplicatePersistedFolderPaths: false,
         duplicateConfigurationPaths: {},
         hasDuplicateConfigurationPaths: false,
+        duplicateExistingVolumes: {},
+        hasDuplicateExistingVolumes: false,
         isEdit: false,
         params: {
           namespace: this.$transition$.params().namespace,

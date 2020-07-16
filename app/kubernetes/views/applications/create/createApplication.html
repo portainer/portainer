@@ -393,6 +393,7 @@
                       name="existing_volumes_{{ $index }}"
                       ng-model="ctrl.formValues.PersistedFolders[$index].ExistingVolume"
                       ng-options="vol as vol.PersistentVolumeClaim.Name for vol in ctrl.availableVolumes"
+                      ng-change="ctrl.onChangeExistingVolumeSelection()"
                       required
                     >
                       <option selected disabled hidden value="">Select a volume</option>
@@ -414,7 +415,8 @@
                     kubernetesApplicationCreationForm['persisted_folder_path_' + $index].$invalid ||
                     ctrl.state.duplicatePersistedFolderPaths[$index] !== undefined ||
                     kubernetesApplicationCreationForm['persisted_folder_size_' + $index].$invalid ||
-                    kubernetesApplicationCreationForm['existing_volumes_' + $index].$invalid
+                    kubernetesApplicationCreationForm['existing_volumes_' + $index].$invalid ||
+                    ctrl.state.duplicateExistingVolumes[$index] !== undefined
                   "
                 >
                   <div class="input-group col-sm-3 input-group-sm">
@@ -439,10 +441,16 @@
                         <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This value must be greater than zero.</p>
                       </ng-messages>
                     </div>
-                    <div class="small text-warning" ng-show="kubernetesApplicationCreationForm['existing_volumes_' + $index].$invalid">
+                    <div
+                      class="small text-warning"
+                      ng-show="kubernetesApplicationCreationForm['existing_volumes_' + $index].$invalid || ctrl.state.duplicateExistingVolumes[$index] !== undefined"
+                    >
                       <ng-messages for="kubernetesApplicationCreationForm['existing_volumes_' + $index].$error">
                         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Volume is required.</p>
                       </ng-messages>
+                      <p ng-if="ctrl.state.duplicateExistingVolumes[$index] !== undefined"
+                        ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This volume is already used.</p
+                      >
                     </div>
                   </div>
 
