@@ -55,7 +55,7 @@ angular.module('portainer.extensions.registrymanagement').controller('RegistryRe
               return RegistryServiceSelector.repositories($scope.registry);
             })
             .then(function success(repositories) {
-              $scope.repositories = _.filter(repositories, (repository) => repository.TagsCount > 0);
+              $scope.repositories = repositories;
             })
             .catch(function error() {
               $scope.state.displayInvalidConfigurationMessage = true;

@@ -42,7 +42,8 @@ angular.module('portainer.extensions.registrymanagement').factory('RegistryGitla
 
     async function _getRepositoriesPage(params, repositories) {
       const response = await Gitlab().repositories(params).$promise;
-      repositories = _.concat(repositories, response.data);
+      const filteredRepositories = _.filter(response.data, (repository) => repository.tags && repository.tags.length > 0);
+      repositories = _.concat(repositories, filteredRepositories);
       if (response.next) {
         params.page = response.next;
         repositories = await _getRepositoriesPage(params, repositories);
