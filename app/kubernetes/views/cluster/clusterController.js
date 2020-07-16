@@ -6,17 +6,35 @@ import { KubernetesResourceReservation } from 'Kubernetes/models/resource-reserv
 
 class KubernetesClusterController {
   /* @ngInject */
-  constructor($async, Authentication, Notifications, KubernetesNodeService, KubernetesApplicationService) {
+  constructor($async, $state, Authentication, Notifications, LocalStorage, KubernetesNodeService, KubernetesApplicationService, KubernetesComponentStatusService) {
     this.$async = $async;
+    this.$state = $state;
     this.Authentication = Authentication;
     this.Notifications = Notifications;
+    this.LocalStorage = LocalStorage;
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesApplicationService = KubernetesApplicationService;
+    this.KubernetesComponentStatusService = KubernetesComponentStatusService;
 
     this.onInit = this.onInit.bind(this);
     this.getNodes = this.getNodes.bind(this);
     this.getNodesAsync = this.getNodesAsync.bind(this);
     this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
+    this.getComponentStatus = this.getComponentStatus.bind(this);
+    this.getComponentStatusAsync = this.getComponentStatusAsync.bind(this);
+  }
+
+  async getComponentStatusAsync() {
+    try {
+      this.ComponentStatuses = await this.KubernetesComponentStatusService.get();
+      this.hasUnhealthyComponentStatus = _.find(this.ComponentStatuses, { Healthy: false }) ? true : false;
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve cluster component statuses');
+    }
+  }
+
+  getComponentStatus() {
+    return this.$async(this.getComponentStatusAsync);
   }
 
   async getNodesAsync() {
@@ -67,12 +85,14 @@ class KubernetesClusterController {
     this.state = {
       applicationsLoading: true,
       viewReady: false,
+      hasUnhealthyComponentStatus: false,
     };
 
     this.isAdmin = this.Authentication.isAdmin();
 
     await this.getNodes();
     if (this.isAdmin) {
+      await this.getComponentStatus();
       await this.getApplications();
     }
 

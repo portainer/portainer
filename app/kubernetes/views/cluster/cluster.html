@@ -5,11 +5,11 @@
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
 <div ng-if="ctrl.state.viewReady">
-  <div class="row" ng-if="ctrl.resourceReservation && ctrl.isAdmin">
+  <div class="row" ng-if="ctrl.isAdmin">
     <div class="col-sm-12">
       <rd-widget>
         <rd-widget-body>
-          <form class="form-horizontal">
+          <form class="form-horizontal" ng-if="ctrl.resourceReservation">
             <kubernetes-resource-reservation
               cpu="ctrl.resourceReservation.CPU"
               cpu-limit="ctrl.CPULimit"
@@ -19,6 +19,32 @@
             >
             </kubernetes-resource-reservation>
           </form>
+
+          <div class="col-sm-12 form-section-title">
+            Cluster status
+          </div>
+
+          <table class="table">
+            <tbody>
+              <tr class="text-muted">
+                <td style="border-top: none;">Component</td>
+                <td style="border-top: none;">Status</td>
+                <td style="border-top: none;" ng-if="ctrl.hasUnhealthyComponentStatus">Error</td>
+              </tr>
+              <tr ng-repeat="cs in ctrl.ComponentStatuses">
+                <td>
+                  {{ cs.ComponentName }}
+                </td>
+                <td>
+                  <span ng-if="cs.Healthy"><i class="fa fa-check green-icon" aria-hidden="true" style="margin-right: 2px;"></i> healthy</span>
+                  <span ng-if="!cs.Healthy"><i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i> unhealthy</span>
+                </td>
+                <td ng-if="ctrl.hasUnhealthyComponentStatus">
+                  {{ cs.ErrorMessage !== '' ? cs.ErrorMessage : '-' }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </rd-widget-body>
       </rd-widget>
     </div>
