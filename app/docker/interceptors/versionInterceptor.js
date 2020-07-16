@@ -10,7 +10,7 @@ angular.module('portainer.app').factory('VersionInterceptor', [
     function responseErrorInterceptor(rejection) {
       if (rejection.status === 502 || rejection.status === 503 || rejection.status === -1) {
         var endpoint = EndpointProvider.currentEndpoint();
-        if (endpoint !== undefined && endpoint.Snapshots.length && endpoint.Snapshots[0].SnapshotRaw) {
+        if (endpoint !== undefined) {
           var data = endpoint.Snapshots[0].SnapshotRaw.Version;
           if (data !== undefined) {
             return data;

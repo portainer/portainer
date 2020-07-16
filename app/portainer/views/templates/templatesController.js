@@ -5,6 +5,7 @@ angular.module('portainer.app').controller('TemplatesController', [
   '$scope',
   '$q',
   '$state',
+  '$transition$',
   '$anchorScroll',
   'ContainerService',
   'ImageService',
@@ -18,10 +19,12 @@ angular.module('portainer.app').controller('TemplatesController', [
   'FormValidator',
   'SettingsService',
   'StackService',
+  'EndpointProvider',
   function (
     $scope,
     $q,
     $state,
+    $transition$,
     $anchorScroll,
     ContainerService,
     ImageService,
@@ -34,7 +37,8 @@ angular.module('portainer.app').controller('TemplatesController', [
     Authentication,
     FormValidator,
     SettingsService,
-    StackService
+    StackService,
+    EndpointProvider
   ) {
     $scope.state = {
       selectedTemplate: null,
@@ -140,7 +144,7 @@ angular.module('portainer.app').controller('TemplatesController', [
         ComposeFilePathInRepository: template.Repository.stackfile,
       };
 
-      const endpointId = +$state.params.endpointId;
+      var endpointId = EndpointProvider.endpointID();
       StackService.createComposeStackFromGitRepository(stackName, repositoryOptions, template.Env, endpointId)
         .then(function success(data) {
           const resourceControl = data.ResourceControl;
@@ -148,7 +152,7 @@ angular.module('portainer.app').controller('TemplatesController', [
         })
         .then(function success() {
           Notifications.success('Stack successfully deployed');
-          $state.go('docker.stacks');
+          $state.go('portainer.stacks');
         })
         .catch(function error(err) {
           Notifications.warning('Deployment error', err.data.err);
@@ -177,8 +181,7 @@ angular.module('portainer.app').controller('TemplatesController', [
         ComposeFilePathInRepository: template.Repository.stackfile,
       };
 
-      const endpointId = +$state.params.endpointId;
-
+      var endpointId = EndpointProvider.endpointID();
       StackService.createSwarmStackFromGitRepository(stackName, repositoryOptions, env, endpointId)
         .then(function success(data) {
           const resourceControl = data.ResourceControl;
@@ -186,7 +189,7 @@ angular.module('portainer.app').controller('TemplatesController', [
         })
         .then(function success() {
           Notifications.success('Stack successfully deployed');
-          $state.go('docker.stacks');
+          $state.go('portainer.stacks');
         })
         .catch(function error(err) {
           Notifications.warning('Deployment error', err.data.err);
