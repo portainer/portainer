@@ -3,7 +3,6 @@ import _ from 'lodash-es';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import { KubernetesResourceReservation } from 'Kubernetes/models/resource-reservation/models';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
-import KubernetesEndpointHelper from 'Kubernetes/endpoint/helper';
 
 class KubernetesNodeController {
   /* @ngInject */
@@ -57,7 +56,6 @@ class KubernetesNodeController {
       this.state.dataLoading = true;
       const nodeName = this.$transition$.params().name;
       this.node = await this.KubernetesNodeService.get(nodeName);
-      this.node.IsLeader = this.node.Name === KubernetesEndpointHelper.getLeader(this.endpoints);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve node');
     } finally {

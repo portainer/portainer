@@ -3,7 +3,6 @@ import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import { KubernetesResourceReservation } from 'Kubernetes/models/resource-reservation/models';
-import KubernetesEndpointHelper from 'Kubernetes/endpoint/helper';
 
 class KubernetesClusterController {
   /* @ngInject */
@@ -39,8 +38,8 @@ class KubernetesClusterController {
 
   async getComponentStatusAsync() {
     try {
-      this.ComponentStatuses = await this.KubernetesComponentStatusService.get();
-      this.hasUnhealthyComponentStatus = _.find(this.ComponentStatuses, { Healthy: false }) ? true : false;
+      this.componentStatuses = await this.KubernetesComponentStatusService.get();
+      this.hasUnhealthyComponentStatus = _.find(this.componentStatuses, { Healthy: false }) ? true : false;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve cluster component statuses');
     }
@@ -52,8 +51,8 @@ class KubernetesClusterController {
 
   async getEndpointsAsync() {
     try {
-      this.endpoints = await this.KubernetesEndpointService.get();
-      this.leader = KubernetesEndpointHelper.getLeader(this.endpoints);
+      const endpoints = await this.KubernetesEndpointService.get('kube-system');
+      this.endpoints = _.filter(endpoints, (ep) => ep.HolderIdentity);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve endpoints');
     }
@@ -70,9 +69,6 @@ class KubernetesClusterController {
       this.nodes = nodes;
       this.CPULimit = _.reduce(this.nodes, (acc, node) => node.CPU + acc, 0);
       this.MemoryLimit = _.reduce(this.nodes, (acc, node) => KubernetesResourceReservationHelper.megaBytesValue(node.Memory) + acc, 0);
-      if (this.isAdmin) {
-        _.forEach(this.nodes, (node) => (node.IsLeader = node.Name === this.leader));
-      }
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve nodes');
     }
