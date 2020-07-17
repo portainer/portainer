@@ -309,7 +309,7 @@ func (m *Migrator) Migrate() error {
 		}
 	}
 
-	// Portainer 1.24.1-dev
+	// Portainer 1.24.0
 	if m.currentDBVersion < 23 {
 		err := m.updateTagsToDBVersion23()
 		if err != nil {
@@ -320,8 +320,11 @@ func (m *Migrator) Migrate() error {
 		if err != nil {
 			return err
 		}
+	}
 
-		err = m.updateSettingsToDBVersion23()
+	// Portainer 1.24.1
+	if m.currentDBVersion < 24 {
+		err := m.updateSettingsToDBVersion24()
 		if err != nil {
 			return err
 		}

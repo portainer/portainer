@@ -1012,7 +1012,7 @@ const (
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "1.24.1-dev"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 23
+	DBVersion = 24
 	// AssetsServerURL represents the URL of the Portainer asset server
 	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
