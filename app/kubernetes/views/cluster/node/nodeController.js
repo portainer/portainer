@@ -6,17 +6,7 @@ import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 
 class KubernetesNodeController {
   /* @ngInject */
-  constructor(
-    $async,
-    $state,
-    Notifications,
-    LocalStorage,
-    KubernetesNodeService,
-    KubernetesEventService,
-    KubernetesPodService,
-    KubernetesApplicationService,
-    KubernetesEndpointService
-  ) {
+  constructor($async, $state, Notifications, LocalStorage, KubernetesNodeService, KubernetesEventService, KubernetesPodService, KubernetesApplicationService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
@@ -25,30 +15,16 @@ class KubernetesNodeController {
     this.KubernetesEventService = KubernetesEventService;
     this.KubernetesPodService = KubernetesPodService;
     this.KubernetesApplicationService = KubernetesApplicationService;
-    this.KubernetesEndpointService = KubernetesEndpointService;
 
     this.onInit = this.onInit.bind(this);
     this.getNodeAsync = this.getNodeAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
     this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
-    this.getEndpointsAsync = this.getEndpointsAsync.bind(this);
   }
 
   selectTab(index) {
     this.LocalStorage.storeActiveTab('node', index);
-  }
-
-  async getEndpointsAsync() {
-    try {
-      this.endpoints = await this.KubernetesEndpointService.get();
-    } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve endpoints');
-    }
-  }
-
-  getEndpoints() {
-    return this.$async(this.getEndpointsAsync);
   }
 
   async getNodeAsync() {
@@ -139,7 +115,6 @@ class KubernetesNodeController {
 
     this.state.activeTab = this.LocalStorage.getActiveTab('node');
 
-    await this.getEndpoints();
     await this.getNode();
     await this.getEvents();
     await this.getApplications();
