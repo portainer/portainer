@@ -12,7 +12,7 @@ class KubernetesPersistentVolumeClaimConverter {
     res.Name = data.metadata.name;
     res.Namespace = data.metadata.namespace;
     res.CreationDate = data.metadata.creationTimestamp;
-    res.Storage = data.spec.resources.requests.storage.replace('i', '') + 'B';
+    res.Storage = data.spec.resources.requests.storage.replace('i', 'B');
     res.StorageClass = _.find(storageClasses, { Name: data.spec.storageClassName });
     res.Yaml = yaml ? yaml.data : '';
     res.ApplicationOwner = data.metadata.labels ? data.metadata.labels[KubernetesPortainerApplicationOwnerLabel] : '';

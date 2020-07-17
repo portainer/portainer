@@ -52,6 +52,16 @@
               >
               </kubernetes-applications-stacks-datatable>
             </uib-tab>
+            <uib-tab index="3" classes="btn-sm" select="ctrl.selectTab(3)">
+              <uib-tab-heading> <i class="fa fa-th-list space-right" aria-hidden="true"></i> Storages </uib-tab-heading>
+              <kubernetes-applications-storages-datatable
+                dataset="ctrl.storages"
+                table-key="kubernetes.applications.storages"
+                order-by="Name"
+                refresh-callback="ctrl.getApplications"
+              >
+              </kubernetes-applications-storages-datatable>
+            </uib-tab>
           </uib-tabset>
         </rd-widget-body>
       </rd-widget>

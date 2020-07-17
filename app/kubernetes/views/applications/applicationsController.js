@@ -1,15 +1,52 @@
 import angular from 'angular';
-import _ from 'lodash-es';
+import * as _ from 'lodash-es';
+import filesizeParser from 'filesize-parser';
 import KubernetesStackHelper from 'Kubernetes/helpers/stackHelper';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 
+function buildStorages(storages, volumes) {
+  _.forEach(storages, (s) => {
+    const filteredVolumes = _.filter(volumes, ['PersistentVolumeClaim.StorageClass.Name', s.Name, 'PersistentVolumeClaim.StorageClass.Provisioner', s.Provisioner]);
+    s.Volumes = filteredVolumes;
+    s.Size = computeSize(filteredVolumes);
+  });
+  return storages;
+}
+
+function computeSize(volumes) {
+  let hasT,
+    hasG,
+    hasM = false;
+  const size = _.sumBy(volumes, (v) => {
+    const storage = v.PersistentVolumeClaim.Storage;
+    if (!hasT && _.endsWith(storage, 'TB')) {
+      hasT = true;
+    } else if (!hasG && _.endsWith(storage, 'GB')) {
+      hasG = true;
+    } else if (!hasM && _.endsWith(storage, 'MB')) {
+      hasM = true;
+    }
+    return filesizeParser(storage, { base: 10 });
+  });
+  if (hasT) {
+    return size / 1000 / 1000 / 1000 / 1000 + 'TB';
+  } else if (hasG) {
+    return size / 1000 / 1000 / 1000 + 'GB';
+  } else if (hasM) {
+    return size / 1000 / 1000 + 'MB';
+  }
+  return size;
+}
+
 class KubernetesApplicationsController {
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesApplicationService, Authentication, ModalService, LocalStorage) {
+  constructor($async, $state, Notifications, KubernetesApplicationService, KubernetesStorageService, KubernetesVolumeService, Authentication, ModalService, LocalStorage) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
     this.KubernetesApplicationService = KubernetesApplicationService;
+    this.KubernetesStorageService = KubernetesStorageService;
+    this.KubernetesVolumeService = KubernetesVolumeService;
     this.Authentication = Authentication;
     this.ModalService = ModalService;
     this.LocalStorage = LocalStorage;
@@ -95,9 +132,15 @@ class KubernetesApplicationsController {
 
   async getApplicationsAsync() {
     try {
-      this.applications = await this.KubernetesApplicationService.get();
-      this.stacks = KubernetesStackHelper.stacksFromApplications(this.applications);
-      this.ports = KubernetesApplicationHelper.portMappingsFromApplications(this.applications);
+      const [applications, storages, volumes] = await Promise.all([
+        this.KubernetesApplicationService.get(),
+        this.KubernetesStorageService.get(this.state.endpointId),
+        this.KubernetesVolumeService.get(),
+      ]);
+      this.applications = applications;
+      this.stacks = KubernetesStackHelper.stacksFromApplications(applications);
+      this.ports = KubernetesApplicationHelper.portMappingsFromApplications(applications);
+      this.storages = buildStorages(storages, volumes);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve applications');
     }
@@ -109,6 +152,7 @@ class KubernetesApplicationsController {
 
   async onInit() {
     this.state = {
+      endpointId: this.$transition$.params().endpointId,
       activeTab: 0,
       currentName: this.$state.$current.name,
       isAdmin: this.Authentication.isAdmin(),
