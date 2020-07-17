@@ -7,7 +7,17 @@ import KubernetesEndpointHelper from 'Kubernetes/endpoint/helper';
 
 class KubernetesClusterController {
   /* @ngInject */
-  constructor($async, $state, Authentication, Notifications, LocalStorage, KubernetesNodeService, KubernetesApplicationService, KubernetesComponentStatusService, KubernetesEndpointService) {
+  constructor(
+    $async,
+    $state,
+    Authentication,
+    Notifications,
+    LocalStorage,
+    KubernetesNodeService,
+    KubernetesApplicationService,
+    KubernetesComponentStatusService,
+    KubernetesEndpointService
+  ) {
     this.$async = $async;
     this.$state = $state;
     this.Authentication = Authentication;
@@ -38,7 +48,6 @@ class KubernetesClusterController {
 
   getComponentStatus() {
     return this.$async(this.getComponentStatusAsync);
-    this.getEndpointsAsync = this.getEndpointsAsync.bind(this);
   }
 
   async getEndpointsAsync() {
@@ -110,12 +119,6 @@ class KubernetesClusterController {
 
     this.isAdmin = this.Authentication.isAdmin();
 
-<<<<<<< HEAD
-=======
-    if (this.isAdmin) {
-      await this.getEndpoints();
-    }
->>>>>>> 35697bbf... feat(cluster): Restrict leader label only to admin users
     await this.getNodes();
     if (this.isAdmin) {
       await this.getEndpoints();
