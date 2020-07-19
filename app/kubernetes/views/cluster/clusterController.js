@@ -6,7 +6,17 @@ import { KubernetesResourceReservation } from 'Kubernetes/models/resource-reserv
 
 class KubernetesClusterController {
   /* @ngInject */
-  constructor($async, $state, Authentication, Notifications, LocalStorage, KubernetesNodeService, KubernetesApplicationService, KubernetesComponentStatusService) {
+  constructor(
+    $async,
+    $state,
+    Authentication,
+    Notifications,
+    LocalStorage,
+    KubernetesNodeService,
+    KubernetesApplicationService,
+    KubernetesComponentStatusService,
+    KubernetesEndpointService
+  ) {
     this.$async = $async;
     this.$state = $state;
     this.Authentication = Authentication;
@@ -15,6 +25,7 @@ class KubernetesClusterController {
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesComponentStatusService = KubernetesComponentStatusService;
+    this.KubernetesEndpointService = KubernetesEndpointService;
 
     this.onInit = this.onInit.bind(this);
     this.getNodes = this.getNodes.bind(this);
@@ -22,12 +33,13 @@ class KubernetesClusterController {
     this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
     this.getComponentStatus = this.getComponentStatus.bind(this);
     this.getComponentStatusAsync = this.getComponentStatusAsync.bind(this);
+    this.getEndpointsAsync = this.getEndpointsAsync.bind(this);
   }
 
   async getComponentStatusAsync() {
     try {
-      this.ComponentStatuses = await this.KubernetesComponentStatusService.get();
-      this.hasUnhealthyComponentStatus = _.find(this.ComponentStatuses, { Healthy: false }) ? true : false;
+      this.componentStatuses = await this.KubernetesComponentStatusService.get();
+      this.hasUnhealthyComponentStatus = _.find(this.componentStatuses, { Healthy: false }) ? true : false;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve cluster component statuses');
     }
@@ -35,6 +47,19 @@ class KubernetesClusterController {
 
   getComponentStatus() {
     return this.$async(this.getComponentStatusAsync);
+  }
+
+  async getEndpointsAsync() {
+    try {
+      const endpoints = await this.KubernetesEndpointService.get('kube-system');
+      this.endpoints = _.filter(endpoints, (ep) => ep.HolderIdentity);
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve endpoints');
+    }
+  }
+
+  getEndpoints() {
+    return this.$async(this.getEndpointsAsync);
   }
 
   async getNodesAsync() {
@@ -92,6 +117,7 @@ class KubernetesClusterController {
 
     await this.getNodes();
     if (this.isAdmin) {
+      await this.getEndpoints();
       await this.getComponentStatus();
       await this.getApplications();
     }
