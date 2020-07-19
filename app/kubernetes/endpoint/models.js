@@ -1,3 +1,5 @@
+export const KubernetesEndpointAnnotationLeader = 'control-plane.alpha.kubernetes.io/leader';
+
 /**
  * KubernetesEndpoint Model
  */
@@ -7,8 +9,6 @@ const _KubernetesEndpoint = Object.freeze({
   Namespace: '',
   HolderIdentity: '',
 });
-
-export const KubernetesEndpointAnnotationLeader = 'control-plane.alpha.kubernetes.io/leader';
 
 export class KubernetesEndpoint {
   constructor() {
