@@ -9,7 +9,6 @@ angular.module('portainer.azure').controller('AzureCreateContainerInstanceContro
   function ($q, $scope, $state, AzureService, Notifications) {
     var allResourceGroups = [];
     var allProviders = [];
-    let allNetworkProfiles = [];
 
     $scope.state = {
       actionInProgress: false,
@@ -19,7 +18,7 @@ angular.module('portainer.azure').controller('AzureCreateContainerInstanceContro
 
     $scope.changeSubscription = function () {
       var selectedSubscription = $scope.state.selectedSubscription;
-      updateSubscriptionResources(selectedSubscription, allResourceGroups, allProviders);
+      updateResourceGroupsAndLocations(selectedSubscription, allResourceGroups, allProviders);
     };
 
     $scope.addPortBinding = function () {
@@ -42,7 +41,6 @@ angular.module('portainer.azure').controller('AzureCreateContainerInstanceContro
           $state.go('azure.containerinstances');
         })
         .catch(function error(err) {
-          err = err.data ? err.data.error : err;
           Notifications.error('Failure', err, 'Unable to create container');
         })
         .finally(function final() {
@@ -50,7 +48,7 @@ angular.module('portainer.azure').controller('AzureCreateContainerInstanceContro
         });
     };
 
-    function updateSubscriptionResources(subscription, resourceGroups, providers) {
+    function updateResourceGroupsAndLocations(subscription, resourceGroups, providers) {
       $scope.state.selectedResourceGroup = resourceGroups[subscription.Id][0];
       $scope.resourceGroups = resourceGroups[subscription.Id];
 
@@ -83,7 +81,7 @@ angular.module('portainer.azure').controller('AzureCreateContainerInstanceContro
           $scope.model = model;
 
           var selectedSubscription = $scope.state.selectedSubscription;
-          updateSubscriptionResources(selectedSubscription, resourceGroups, containerInstancesProviders, allNetworkProfiles);
+          updateResourceGroupsAndLocations(selectedSubscription, resourceGroups, containerInstancesProviders);
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve Azure resources');

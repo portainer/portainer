@@ -19,9 +19,8 @@ export function ContainerGroupViewModel(data) {
   this.Id = data.id;
   this.Name = data.name;
   this.Location = data.location;
-  this.AllocatePublicIP = data.properties.ipAddress ? data.properties.ipAddress.type === 'Public' : false;
-  this.IPAddress = this.AllocatePublicIP ? data.properties.ipAddress.ip : '';
-  this.Ports = this.AllocatePublicIP ? data.properties.ipAddress.ports : [];
+  this.IPAddress = data.properties.ipAddress.ip;
+  this.Ports = data.properties.ipAddress.ports;
 }
 
 export function CreateContainerGroupRequest(model) {
@@ -59,7 +58,6 @@ export function CreateContainerGroupRequest(model) {
         },
       },
     ],
-    networkProfile: model.AllocatePublicIP ? null : { id: model.Network },
     ipAddress: {
       type: model.AllocatePublicIP ? 'Public' : 'Private',
       ports: addressPorts,

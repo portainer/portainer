@@ -23,7 +23,7 @@ angular.module('portainer.azure').factory('ContainerGroup', [
         '/:endpointId/azure/subscriptions/:subscriptionId/resourceGroups/:resourceGroupName/providers/Microsoft.ContainerInstance/containerGroups/:containerGroupName',
       {
         endpointId: EndpointProvider.endpointID,
-        'api-version': '2018-07-01',
+        'api-version': '2018-04-01',
       },
       {
         create: {
