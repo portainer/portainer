@@ -66,6 +66,7 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 		EndpointID: endpoint.ID,
 		EntryPoint: filesystem.ComposeFileDefaultName,
 		Env:        payload.Env,
+		Status:     portainer.StackStatusActive,
 	}
 
 	stackFolder := strconv.Itoa(int(stack.ID))
@@ -151,6 +152,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		EndpointID: endpoint.ID,
 		EntryPoint: payload.ComposeFilePathInRepository,
 		Env:        payload.Env,
+		Status:     portainer.StackStatusActive,
 	}
 
 	projectPath := handler.FileService.GetStackProjectPath(strconv.Itoa(int(stack.ID)))
@@ -246,6 +248,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 		EndpointID: endpoint.ID,
 		EntryPoint: filesystem.ComposeFileDefaultName,
 		Env:        payload.Env,
+		Status:     portainer.StackStatusActive,
 	}
 
 	stackFolder := strconv.Itoa(int(stack.ID))
