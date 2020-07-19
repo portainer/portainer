@@ -119,28 +119,8 @@
           </div>
           <!-- !port-mapping -->
           <!-- public-ip -->
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="public_ip" class="control-label text-left">
-                Allocate public IP address
-              </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="public_ip" ng-model="model.AllocatePublicIP" ng-disabled="!hasNetworks" /><i></i>
-              </label>
-            </div>
-          </div>
+          <div class="form-group"> </div>
           <!-- public-ip -->
-          <div class="form-group" ng-if="!model.AllocatePublicIP">
-            <label for="azure_networkprofile" class="col-sm-1 control-label text-left">Network Profile</label>
-            <div class="col-sm-11">
-              <select
-                class="form-control"
-                name="azure_networkprofile"
-                ng-model="model.Network"
-                ng-options="networkProfile.Id as networkProfile.Name for networkProfile in networkProfiles"
-              ></select>
-            </div>
-          </div>
 
           <div class="col-sm-12 form-section-title">
             Container resources
