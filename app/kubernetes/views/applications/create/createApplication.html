@@ -320,7 +320,7 @@
               </div>
 
               <div class="col-sm-12 form-inline" style="margin-top: 10px;" ng-repeat="persistedFolder in ctrl.formValues.PersistedFolders">
-                <div ng-if="ctrl.availableVolumes.length > 0">
+                <div ng-if="ctrl.availableVolumes.length > 0 && ctrl.application.ApplicationType !== ctrl.ApplicationTypes.STATEFULSET">
                   <label for="use_existing_volumes_{{ $index }}" class="control-label text-left">
                     Use existing volumes
                   </label>

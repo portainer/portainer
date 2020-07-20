@@ -7,6 +7,7 @@ import {
   KubernetesApplicationDataAccessPolicies,
   KubernetesApplicationDeploymentTypes,
   KubernetesApplicationPublishingTypes,
+  KubernetesApplicationTypes,
   KubernetesApplicationQuotaDefaults,
 } from 'Kubernetes/models/application/models';
 import {
@@ -60,6 +61,7 @@ class KubernetesCreateApplicationController {
     this.ApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
     this.ApplicationDataAccessPolicies = KubernetesApplicationDataAccessPolicies;
     this.ApplicationPublishingTypes = KubernetesApplicationPublishingTypes;
+    this.ApplicationTypes = KubernetesApplicationTypes;
     this.ApplicationConfigurationFormValueOverridenKeyTypes = KubernetesApplicationConfigurationFormValueOverridenKeyTypes;
     this.ServiceTypes = KubernetesServiceTypes;
 
@@ -680,13 +682,15 @@ class KubernetesCreateApplicationController {
         this.savedFormValues = angular.copy(this.formValues);
         delete this.formValues.ApplicationType;
 
-        _.forEach(this.formValues.PersistedFolders, (persistedFolder, index) => {
-          const volume = _.find(this.availableVolumes, (vol) => vol.PersistentVolumeClaim.Name === persistedFolder.PersistentVolumeClaimName);
-          if (volume) {
-            this.state.useExistingVolume[index] = true;
-            persistedFolder.ExistingVolume = volume;
-          }
-        });
+        if (this.application.ApplicationType !== KubernetesApplicationTypes.STATEFULSET) {
+          _.forEach(this.formValues.PersistedFolders, (persistedFolder, index) => {
+            const volume = _.find(this.availableVolumes, (vol) => vol.PersistentVolumeClaim.Name === persistedFolder.PersistentVolumeClaimName);
+            if (volume) {
+              this.state.useExistingVolume[index] = true;
+              persistedFolder.ExistingVolume = volume;
+            }
+          });
+        }
       } else {
         this.formValues.AutoScaler = KubernetesApplicationHelper.generateAutoScalerFormValueFromHorizontalPodAutoScaler();
         this.formValues.AutoScaler.MinReplicas = this.formValues.ReplicaCount;
