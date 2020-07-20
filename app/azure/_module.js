@@ -38,6 +38,16 @@ angular.module('portainer.azure', ['portainer.app']).config([
       },
     };
 
+    var containerInstance = {
+      name: 'azure.containerinstances.container',
+      url: '/:id',
+      views: {
+        'content@': {
+          component: 'containerInstanceDetails',
+        },
+      },
+    };
+
     var containerInstanceCreation = {
       name: 'azure.containerinstances.new',
       url: '/new/',
@@ -62,6 +72,7 @@ angular.module('portainer.azure', ['portainer.app']).config([
 
     $stateRegistryProvider.register(azure);
     $stateRegistryProvider.register(containerInstances);
+    $stateRegistryProvider.register(containerInstance);
     $stateRegistryProvider.register(containerInstanceCreation);
     $stateRegistryProvider.register(dashboard);
   },

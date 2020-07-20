@@ -34,12 +34,15 @@ angular.module('portainer.azure').factory('ContainerGroup', [
             containerGroupName: '@containerGroupName',
           },
         },
+        get: {
+          method: 'GET',
+        },
       }
     );
 
     resource.query = base.query;
     resource.create = withResourceGroup.create;
-
+    resource.get = withResourceGroup.get;
     return resource;
   },
 ]);
