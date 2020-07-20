@@ -669,6 +669,46 @@
             </div>
             <!-- !replica count -->
 
+            <!-- auto scaling -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label for="enable_auto_scaling" class="control-label text-left">
+                  Enable auto scaling
+                </label>
+                <label class="switch" style="margin-left: 20px;">
+                  <input type="checkbox" class="form-control" name="enable_auto_scaling" ng-model="ctrl.state.enableAutoScaling" />
+                  <i></i>
+                </label>
+              </div>
+            </div>
+            <div class="col-sm-12 form-inline" ng-if="ctrl.state.enableAutoScaling">
+              <div class="input-group col-sm-5 input-group-sm">
+                <span class="input-group-addon">
+                  Target average CPU utililization
+                </span>
+                <input type="number" class="form-control" name="" min="0" max="100" ng-model="" />
+              </div>
+              <div class="input-group col-sm-5 input-group-sm">
+                <span class="input-group-addon">
+                  Target average memory
+                </span>
+                <input type="number" class="form-control" name="" min="0" max="100" ng-model="" />
+              </div>
+              <div class="input-group col-sm-5 input-group-sm">
+                <span class="input-group-addon">
+                  Minimum number of instances
+                </span>
+                <input type="number" class="form-control" name="" min="0" ng-model="" />
+              </div>
+              <div class="input-group col-sm-5 input-group-sm">
+                <span class="input-group-addon">
+                  Maximum number of instances
+                </span>
+                <input type="number" class="form-control" name="" min="0" ng-model="" />
+              </div>
+            </div>
+            <!-- !auto scaling -->
+
             <div
               class="form-group"
               ng-if="!ctrl.resourceReservationsOverflow() && ctrl.formValues.ReplicaCount > 1 && (ctrl.formValues.CpuLimit !== 0 || ctrl.formValues.MemoryLimit !== 0)"

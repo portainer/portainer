@@ -21,6 +21,7 @@ const _KubernetesApplicationFormValues = Object.freeze({
   PublishingType: KubernetesApplicationPublishingTypes.INTERNAL,
   DataAccessPolicy: KubernetesApplicationDataAccessPolicies.SHARED,
   Configurations: [], // KubernetesApplicationConfigurationFormValue list
+  HorizontalPodAutoScaler: {}, // KubernetesHorizontalPodAutoScaler
 });
 
 export class KubernetesApplicationFormValues {

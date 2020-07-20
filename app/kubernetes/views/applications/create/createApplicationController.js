@@ -578,6 +578,7 @@ class KubernetesCreateApplicationController {
           namespace: this.$transition$.params().namespace,
           name: this.$transition$.params().name,
         },
+        enableAutoScaling: false,
       };
 
       this.editChanges = [];

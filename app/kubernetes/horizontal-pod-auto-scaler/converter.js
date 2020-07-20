@@ -1,4 +1,5 @@
 import { KubernetesHorizontalPodAutoScaler } from './models';
+import { KubernetesHorizontalPodAutoScalerCreatePayload } from './payload';
 
 export class KubernetesHorizontalPodAutoScalerConverter {
   /**
@@ -19,5 +20,16 @@ export class KubernetesHorizontalPodAutoScalerConverter {
     }
     res.Yaml = yaml ? yaml.data : '';
     return res;
+  }
+
+  static createPayload(data) {
+    const payload = new KubernetesHorizontalPodAutoScalerCreatePayload();
+    payload.metadata.namespace = data.Namespace;
+    payload.spec.minReplicas = data.MinReplicas;
+    payload.spec.maxReplicas = data.MaxReplicas;
+    payload.spec.targetCPUUtilizationPercentage = data.TargetCPUUtilizationPercentage;
+    payload.spec.scaleTargetRef.apiVersion = data.TargetEntity.ApiVersion;
+    payload.spec.scaleTargetRef.kind = data.TargetEntity.Kind;
+    payload.spec.scaleTargetRef.name = data.TargetEntity.Name;
   }
 }

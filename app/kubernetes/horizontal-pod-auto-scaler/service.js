@@ -53,28 +53,28 @@ class KubernetesHorizontalPodAutoScalerService {
     return this.$async(this.getAllAsync, namespace);
   }
 
-  // /**
-  //  * CREATE
-  //  */
-  // async createAsync(horizontalPodAutoScaler) {
-  //   try {
-  //     const params = {};
-  //     const payload = KubernetesHorizontalPodAutoScalerConverter.createPayload(horizontalPodAutoScaler);
-  //     const namespace = payload.metadata.namespace;
-  //     const data = await this.KubernetesHorizontalPodAutoScalers(namespace).create(params, payload).$promise;
-  //     return data;
-  //   } catch (err) {
-  //     throw new PortainerError('Unable to create horizontalPodAutoScaler', err);
-  //   }
-  // }
+  /**
+   * CREATE
+   */
+  async createAsync(horizontalPodAutoScaler) {
+    try {
+      const params = {};
+      const payload = KubernetesHorizontalPodAutoScalerConverter.createPayload(horizontalPodAutoScaler);
+      const namespace = payload.metadata.namespace;
+      const data = await this.KubernetesHorizontalPodAutoScalers(namespace).create(params, payload).$promise;
+      return data;
+    } catch (err) {
+      throw new PortainerError('Unable to create horizontalPodAutoScaler', err);
+    }
+  }
 
-  // create(horizontalPodAutoScaler) {
-  //   return this.$async(this.createAsync, horizontalPodAutoScaler);
-  // }
+  create(horizontalPodAutoScaler) {
+    return this.$async(this.createAsync, horizontalPodAutoScaler);
+  }
 
-  // /**
-  //  * PATCH
-  //  */
+  /**
+   * PATCH
+   */
   // async patchAsync(oldHorizontalPodAutoScaler, newHorizontalPodAutoScaler) {
   //   try {
   //     const params = new KubernetesCommonParams();
