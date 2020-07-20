@@ -13,25 +13,25 @@
           </div>
           <!-- subscription-input -->
           <div class="form-group">
-            <label for="azure_subscription" class="col-sm-2 text-left">Subscription</label>
+            <label for="azure_subscription" class="col-sm-2 control-label text-left">Subscription</label>
             <div class="col-sm-10">
-              {{ $ctrl.subscription.Name }}
+              <input type="text" class="form-control" ng-model="$ctrl.subscription.Name" disabled />
             </div>
           </div>
           <!-- !subscription-input -->
           <!-- resourcegroup-input -->
           <div class="form-group">
-            <label for="azure_resourcegroup" class="col-sm-2 text-left">Resource group</label>
+            <label for="azure_resourcegroup" class="col-sm-2 control-label text-left">Resource group</label>
             <div class="col-sm-10">
-              {{ $ctrl.resourceGroup.Name }}
+              <input type="text" class="form-control" ng-model="$ctrl.resourceGroup.Name" disabled />
             </div>
           </div>
           <!-- !resourcegroup-input -->
           <!-- location-input -->
           <div class="form-group">
-            <label for="azure_location" class="col-sm-2 text-left">Location</label>
+            <label for="azure_location" class="col-sm-2 control-label text-left">Location</label>
             <div class="col-sm-10">
-              {{ $ctrl.container.Location }}
+              <input type="text" class="form-control" ng-model="$ctrl.container.Location" disabled />
             </div>
           </div>
           <!-- !location-input -->
@@ -40,47 +40,71 @@
           </div>
           <!-- name-input -->
           <div class="form-group">
-            <label for="container_name" class="col-sm-2 text-left">Name</label>
+            <label for="container_name" class="col-sm-2 control-label text-left">Name</label>
             <div class="col-sm-10">
-              {{ $ctrl.container.Name }}
+              <input type="text" class="form-control" ng-model="$ctrl.container.Name" disabled />
             </div>
           </div>
           <!-- !name-input -->
           <!-- image-input -->
           <div class="form-group">
-            <label for="image_name" class="col-sm-2 text-left">Image</label>
+            <label for="image_name" class="col-sm-2 control-label text-left">Image</label>
             <div class="col-sm-10">
-              {{ $ctrl.container.Image }}
+              <input type="text" class="form-control" ng-model="$ctrl.container.Image" disabled />
             </div>
           </div>
           <!-- !image-input -->
           <!-- os-input -->
           <div class="form-group">
-            <label for="container_os" class="col-sm-2 text-left">OS</label>
+            <label for="container_os" class="col-sm-2 control-label text-left">OS</label>
             <div class="col-sm-10">
-              {{ $ctrl.container.OSType }}
+              <input type="text" class="form-control" ng-model="$ctrl.container.OSType" disabled />
             </div>
           </div>
           <!-- !os-input -->
           <!-- port-mapping -->
           <div class="form-group">
-            <div class="col-sm-2">
-              <label class="text-left">Port mapping</label>
+            <div class="col-sm-12">
+              <label class="control-label text-left">Port mapping</label>
             </div>
-            <div class="col-sm-10 form-inline">
-              <div ng-repeat="portMapping in $ctrl.container.Ports" style="margin-bottom: 10px;">
-                {{ portMapping.host }} <i class="fa fa-long-arrow-alt-right"></i> {{ portMapping.container }} / {{ portMapping.protocol }}
+            <!-- port-mapping-input-list -->
+            <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+              <div ng-repeat="binding in $ctrl.container.Ports" style="margin-top: 2px;">
+                <!-- host-port -->
+                <div class="input-group col-sm-4 input-group-sm">
+                  <span class="input-group-addon">host</span>
+                  <input type="text" class="form-control" ng-model="binding.host" placeholder="e.g. 80" disabled />
+                </div>
+                <!-- !host-port -->
+                <span style="margin: 0 10px 0 10px;">
+                  <i class="fa fa-long-arrow-alt-right" aria-hidden="true"></i>
+                </span>
+                <!-- container-port -->
+                <div class="input-group col-sm-4 input-group-sm">
+                  <span class="input-group-addon">container</span>
+                  <input type="text" class="form-control" ng-model="binding.container" placeholder="e.g. 80" disabled />
+                </div>
+                <!-- !container-port -->
+                <!-- protocol-actions -->
+                <div class="input-group col-sm-3 input-group-sm">
+                  <div class="btn-group btn-group-sm">
+                    <label class="btn btn-primary" ng-model="binding.protocol" uib-btn-radio="'TCP'" disabled>TCP</label>
+                    <label class="btn btn-primary" ng-model="binding.protocol" uib-btn-radio="'UDP'" disabled>UDP</label>
+                  </div>
+                </div>
+                <!-- !protocol-actions -->
               </div>
             </div>
+            <!-- !port-mapping-input-list -->
           </div>
           <!-- !port-mapping -->
           <!-- public-ip -->
           <div class="form-group" ng-if="$ctrl.container.AllocatePublicIP">
-            <label for="public_ip" class="col-sm-2 text-left">
+            <label for="public_ip" class="col-sm-2 control-label text-left">
               Public IP
             </label>
             <div class="col-sm-10">
-              {{ $ctrl.container.IPAddress }}
+              <input type="text" class="form-control" ng-model="$ctrl.container.IPAddress" disabled />
             </div>
           </div>
           <!-- public-ip -->
@@ -89,17 +113,17 @@
           </div>
           <!-- cpu-input -->
           <div class="form-group">
-            <label for="container_cpu" class="col-sm-2 text-left">CPU</label>
+            <label for="container_cpu" class="col-sm-2 control-label text-left">CPU</label>
             <div class="col-sm-10">
-              {{ $ctrl.container.CPU }}
+              <input type="text" class="form-control" ng-model="$ctrl.container.CPU" disabled />
             </div>
           </div>
           <!-- !cpu-input -->
           <!-- memory-input -->
           <div class="form-group">
-            <label for="container_memory" class="col-sm-2 text-left">Memory</label>
+            <label for="container_memory" class="col-sm-2 control-label text-left">Memory</label>
             <div class="col-sm-10">
-              {{ $ctrl.container.Memory }}
+              <input type="text" class="form-control" ng-model="$ctrl.container.Memory" disabled />
             </div>
           </div>
           <!-- !memory-input -->
