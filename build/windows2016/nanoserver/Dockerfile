@@ -1,5 +1,5 @@
 FROM mcr.microsoft.com/windows/servercore:ltsc2019 as core
-FROM microsoft/nanoserver:sac2016
+FROM mcr.microsoft.com/windows/nanoserver:1809-amd64
 
 COPY --from=core /windows/system32/netapi32.dll /windows/system32/netapi32.dll
 
