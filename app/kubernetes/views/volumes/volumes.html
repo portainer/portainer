@@ -7,14 +7,28 @@
 <div ng-if="ctrl.state.viewReady">
   <div class="row">
     <div class="col-sm-12">
-      <kubernetes-volumes-datatable
-        dataset="ctrl.volumes"
-        table-key="kubernetes.volumes"
-        order-by="PersistentVolumeClaim.Name"
-        remove-action="ctrl.removeAction"
-        refresh-callback="ctrl.getVolumes"
-      >
-      </kubernetes-volumes-datatable>
+      <rd-widget>
+        <rd-widget-body classes="no-padding">
+          <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
+            <uib-tab index="0" classes="btn-sm" select="ctrl.selectTab(0)">
+              <uib-tab-heading> <i class="fa fa-th-list space-right" aria-hidden="true"></i> Volumes</uib-tab-heading>
+              <kubernetes-volumes-datatable
+                dataset="ctrl.volumes"
+                table-key="kubernetes.volumes"
+                order-by="PersistentVolumeClaim.Name"
+                remove-action="ctrl.removeAction"
+                refresh-callback="ctrl.getVolumes"
+              >
+              </kubernetes-volumes-datatable>
+            </uib-tab>
+            <uib-tab index="1" classes="btn-sm" select="ctrl.selectTab(1)">
+              <uib-tab-heading> <i class="fa fa-th-list space-right" aria-hidden="true"></i> Storages</uib-tab-heading>
+              <kubernetes-volumes-storages-datatable dataset="ctrl.storages" table-key="kubernetes.volumes.storages" order-by="Name" refresh-callback="ctrl.getVolumes">
+              </kubernetes-volumes-storages-datatable>
+            </uib-tab>
+          </uib-tabset>
+        </rd-widget-body>
+      </rd-widget>
     </div>
   </div>
 </div>

@@ -1,6 +1,6 @@
-angular.module('portainer.kubernetes').component('kubernetesApplicationsStoragesDatatable', {
+angular.module('portainer.kubernetes').component('kubernetesVolumesStoragesDatatable', {
   templateUrl: './template.html',
-  controller: 'KubernetesApplicationsStoragesDatatableController',
+  controller: 'KubernetesVolumesStoragesDatatableController',
   bindings: {
     titleText: '@',
     titleIcon: '@',

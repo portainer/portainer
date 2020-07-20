@@ -1,11 +1,9 @@
 import _ from 'lodash-es';
 
-angular.module('portainer.kubernetes').controller('KubernetesApplicationsStoragesDatatableController', [
+angular.module('portainer.kubernetes').controller('KubernetesVolumesStoragesDatatableController', [
   '$scope',
   '$controller',
-  'KubernetesNamespaceHelper',
   'DatatableService',
-  'Authentication',
   function ($scope, $controller, DatatableService) {
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
     this.state = Object.assign(this.state, {
