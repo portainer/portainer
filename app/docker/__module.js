@@ -184,7 +184,7 @@ angular.module('portainer.docker', ['portainer.app']).config([
     };
 
     const customTemplates = {
-      name: 'portainer.templates.custom',
+      name: 'docker.templates.custom',
       url: '/custom',
 
       views: {
@@ -195,7 +195,7 @@ angular.module('portainer.docker', ['portainer.app']).config([
     };
 
     const customTemplatesNew = {
-      name: 'portainer.templates.custom.new',
+      name: 'docker.templates.custom.new',
       url: '/new?fileContent&type',
 
       views: {
@@ -210,7 +210,7 @@ angular.module('portainer.docker', ['portainer.app']).config([
     };
 
     const customTemplatesEdit = {
-      name: 'portainer.templates.custom.edit',
+      name: 'docker.templates.custom.edit',
       url: '/:id',
 
       views: {
