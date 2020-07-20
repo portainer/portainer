@@ -8,5 +8,6 @@ angular.module('portainer.docker').component('dockerSidebarContent', {
     offlineMode: '<',
     toggle: '<',
     currentRouteName: '<',
+    endpointId: '<',
   },
 });

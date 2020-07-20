@@ -13,9 +13,13 @@
         <a ui-sref="portainer.home" ui-sref-active="active">Home <span class="menu-icon fa fa-home fa-fw"></span></a>
       </li>
       <li class="sidebar-title endpoint-name" ng-if="applicationState.endpoint.name"> <span class="fa fa-plug space-right"></span>{{ applicationState.endpoint.name }} </li>
-      <kubernetes-sidebar-content ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider === 'KUBERNETES'" admin-access="isAdmin">
+      <kubernetes-sidebar-content
+        ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider === 'KUBERNETES'"
+        admin-access="isAdmin"
+        endpoint-id="endpointId"
+      >
       </kubernetes-sidebar-content>
-      <azure-sidebar-content ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider === 'AZURE'"> </azure-sidebar-content>
+      <azure-sidebar-content ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider === 'AZURE'" endpoint-id="endpointId"> </azure-sidebar-content>
       <docker-sidebar-content
         ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider !== 'AZURE' && applicationState.endpoint.mode.provider !== 'KUBERNETES'"
         current-route-name="$state.current.name"
@@ -25,6 +29,7 @@
         standalone-management="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE'"
         admin-access="isAdmin"
         offline-mode="endpointState.OfflineMode"
+        endpoint-id="endpointId"
       ></docker-sidebar-content>
       <li class="sidebar-title" authorization="IntegrationStoridgeAdmin" ng-if="applicationState.endpoint.mode && applicationState.endpoint.extensions.length > 0">
         <span>Integrations</span>
