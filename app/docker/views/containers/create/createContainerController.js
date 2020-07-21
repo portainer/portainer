@@ -189,7 +189,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
     function preparePortBindings(config) {
       const bindings = ContainerHelper.preparePortBindings(config.HostConfig.PortBindings);
-      config.ExposedPorts={};
+      config.ExposedPorts = {};
       _.forEach(bindings, (_, key) => (config.ExposedPorts[key] = {}));
       config.HostConfig.PortBindings = bindings;
     }
@@ -612,6 +612,9 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       Volume.query(
         {},
         function (d) {
+          d.Volumes.sort((vol1, vol2) => {
+            return vol1.Name.localeCompare(vol2.Name);
+          });
           $scope.availableVolumes = d.Volumes;
         },
         function (e) {
