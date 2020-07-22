@@ -1,7 +1,6 @@
 package stacks
 
 import (
-	"errors"
 	"net/http"
 	"path"
 	"strconv"
@@ -10,7 +9,7 @@ import (
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -292,6 +291,7 @@ type swarmStackDeploymentConfig struct {
 	registries []portainer.Registry
 	prune      bool
 	isAdmin    bool
+	user       *portainer.User
 }
 
 func (handler *Handler) createSwarmDeployConfig(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint, prune bool) (*swarmStackDeploymentConfig, *httperror.HandlerError) {
@@ -311,6 +311,11 @@ func (handler *Handler) createSwarmDeployConfig(r *http.Request, stack *portaine
 	}
 	filteredRegistries := security.FilterRegistries(registries, securityContext)
 
+	user, err := handler.UserService.User(securityContext.UserID)
+	if err != nil {
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to load user information from the database", err}
+	}
+
 	config := &swarmStackDeploymentConfig{
 		stack:      stack,
 		endpoint:   endpoint,
@@ -318,6 +323,7 @@ func (handler *Handler) createSwarmDeployConfig(r *http.Request, stack *portaine
 		registries: filteredRegistries,
 		prune:      prune,
 		isAdmin:    securityContext.IsAdmin,
+		user:       user,
 	}
 
 	return config, nil
@@ -329,7 +335,13 @@ func (handler *Handler) deploySwarmStack(config *swarmStackDeploymentConfig) err
 		return err
 	}
 
-	if !settings.AllowBindMountsForRegularUsers && !config.isAdmin {
+	isAdminOrEndpointAdmin, err := handler.userIsAdminOrEndpointAdmin(config.user, config.endpoint.ID)
+	if err != nil {
+		return err
+	}
+
+	if !settings.AllowBindMountsForRegularUsers && !isAdminOrEndpointAdmin {
+
 		composeFilePath := path.Join(config.stack.ProjectPath, config.stack.EntryPoint)
 
 		stackContent, err := handler.FileService.GetFileContent(composeFilePath)
@@ -337,12 +349,9 @@ func (handler *Handler) deploySwarmStack(config *swarmStackDeploymentConfig) err
 			return err
 		}
 
-		valid, err := handler.isValidStackFile(stackContent)
+		err = handler.isValidStackFile(stackContent, settings)
 		if err != nil {
 			return err
-		}
-		if !valid {
-			return errors.New("bind-mount disabled for non administrator users")
 		}
 	}
 

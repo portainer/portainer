@@ -21,6 +21,7 @@ angular.module('portainer.docker').controller('ContainerController', [
   'ImageService',
   'HttpRequestHelper',
   'Authentication',
+  'StateManager',
   function (
     $q,
     $scope,
@@ -40,7 +41,8 @@ angular.module('portainer.docker').controller('ContainerController', [
     RegistryService,
     ImageService,
     HttpRequestHelper,
-    Authentication
+    Authentication,
+    StateManager
   ) {
     $scope.activityTime = 0;
     $scope.portBindings = [];
@@ -94,9 +96,13 @@ angular.module('portainer.docker').controller('ContainerController', [
           const inSwarm = $scope.container.Config.Labels['com.docker.swarm.service.id'];
           const autoRemove = $scope.container.HostConfig.AutoRemove;
           const admin = Authentication.isAdmin();
+          const appState = StateManager.getState();
+          const { allowHostNamespaceForRegularUsers, allowDeviceMappingForRegularUsers, allowBindMountsForRegularUsers, allowPrivilegedModeForRegularUsers } = appState.application;
+          const settingRestrictsRegularUsers =
+            !allowBindMountsForRegularUsers || !allowDeviceMappingForRegularUsers || !allowHostNamespaceForRegularUsers || !allowPrivilegedModeForRegularUsers;
 
           ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC).then((rbacEnabled) => {
-            $scope.displayRecreateButton = !inSwarm && !autoRemove && (rbacEnabled ? admin : true);
+            $scope.displayRecreateButton = !inSwarm && !autoRemove && (settingRestrictsRegularUsers || rbacEnabled ? admin : true);
           });
         })
         .catch(function error(err) {

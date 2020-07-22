@@ -54,8 +54,8 @@ angular.module('portainer.extensions.registrymanagement').controller('RegistryRe
             .then(function success() {
               return RegistryServiceSelector.repositories($scope.registry);
             })
-            .then(function success(data) {
-              $scope.repositories = data;
+            .then(function success(repositories) {
+              $scope.repositories = repositories;
             })
             .catch(function error() {
               $scope.state.displayInvalidConfigurationMessage = true;

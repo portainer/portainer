@@ -420,19 +420,22 @@ type (
 
 	// Settings represents the application settings
 	Settings struct {
-		LogoURL                            string               `json:"LogoURL"`
-		BlackListedLabels                  []Pair               `json:"BlackListedLabels"`
-		AuthenticationMethod               AuthenticationMethod `json:"AuthenticationMethod"`
-		LDAPSettings                       LDAPSettings         `json:"LDAPSettings"`
-		OAuthSettings                      OAuthSettings        `json:"OAuthSettings"`
-		AllowBindMountsForRegularUsers     bool                 `json:"AllowBindMountsForRegularUsers"`
-		AllowPrivilegedModeForRegularUsers bool                 `json:"AllowPrivilegedModeForRegularUsers"`
-		AllowVolumeBrowserForRegularUsers  bool                 `json:"AllowVolumeBrowserForRegularUsers"`
-		SnapshotInterval                   string               `json:"SnapshotInterval"`
-		TemplatesURL                       string               `json:"TemplatesURL"`
-		EnableHostManagementFeatures       bool                 `json:"EnableHostManagementFeatures"`
-		EdgeAgentCheckinInterval           int                  `json:"EdgeAgentCheckinInterval"`
-		EnableEdgeComputeFeatures          bool                 `json:"EnableEdgeComputeFeatures"`
+		LogoURL                             string               `json:"LogoURL"`
+		BlackListedLabels                   []Pair               `json:"BlackListedLabels"`
+		AuthenticationMethod                AuthenticationMethod `json:"AuthenticationMethod"`
+		LDAPSettings                        LDAPSettings         `json:"LDAPSettings"`
+		OAuthSettings                       OAuthSettings        `json:"OAuthSettings"`
+		AllowBindMountsForRegularUsers      bool                 `json:"AllowBindMountsForRegularUsers"`
+		AllowPrivilegedModeForRegularUsers  bool                 `json:"AllowPrivilegedModeForRegularUsers"`
+		AllowVolumeBrowserForRegularUsers   bool                 `json:"AllowVolumeBrowserForRegularUsers"`
+		SnapshotInterval                    string               `json:"SnapshotInterval"`
+		TemplatesURL                        string               `json:"TemplatesURL"`
+		EnableHostManagementFeatures        bool                 `json:"EnableHostManagementFeatures"`
+		EdgeAgentCheckinInterval            int                  `json:"EdgeAgentCheckinInterval"`
+		EnableEdgeComputeFeatures           bool                 `json:"EnableEdgeComputeFeatures"`
+		AllowStackManagementForRegularUsers bool                 `json:"AllowStackManagementForRegularUsers"`
+		AllowHostNamespaceForRegularUsers   bool                 `json:"AllowHostNamespaceForRegularUsers"`
+		AllowDeviceMappingForRegularUsers   bool                 `json:"AllowDeviceMappingForRegularUsers"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
@@ -1007,9 +1010,9 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "1.24.0"
+	APIVersion = "1.24.1"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 23
+	DBVersion = 24
 	// AssetsServerURL represents the URL of the Portainer asset server
 	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved

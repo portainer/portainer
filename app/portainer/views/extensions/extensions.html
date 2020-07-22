@@ -102,8 +102,10 @@
                 button-spinner="state.actionInProgress"
                 style="margin-left: 0px;"
               >
-                <span ng-hide="state.actionInProgress">Enable extension</span>
-                <span ng-show="state.actionInProgress">Enabling extension...</span>
+                <span ng-hide="state.actionInProgress" ng-if="!state.updateLicense">Enable extension</span>
+                <span ng-show="state.actionInProgress" ng-if="!state.updateLicense">Enabling extension...</span>
+                <span ng-hide="state.actionInProgress" ng-if="state.updateLicense">Update license</span>
+                <span ng-show="state.actionInProgress" ng-if="state.updateLicense">Updating license...</span>
               </button>
             </div>
           </div>

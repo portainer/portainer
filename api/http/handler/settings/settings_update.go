@@ -7,24 +7,27 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 )
 
 type settingsUpdatePayload struct {
-	LogoURL                            *string
-	BlackListedLabels                  []portainer.Pair
-	AuthenticationMethod               *int
-	LDAPSettings                       *portainer.LDAPSettings
-	OAuthSettings                      *portainer.OAuthSettings
-	AllowBindMountsForRegularUsers     *bool
-	AllowPrivilegedModeForRegularUsers *bool
-	AllowVolumeBrowserForRegularUsers  *bool
-	EnableHostManagementFeatures       *bool
-	SnapshotInterval                   *string
-	TemplatesURL                       *string
-	EdgeAgentCheckinInterval           *int
-	EnableEdgeComputeFeatures          *bool
+	LogoURL                             *string
+	BlackListedLabels                   []portainer.Pair
+	AuthenticationMethod                *int
+	LDAPSettings                        *portainer.LDAPSettings
+	OAuthSettings                       *portainer.OAuthSettings
+	AllowBindMountsForRegularUsers      *bool
+	AllowPrivilegedModeForRegularUsers  *bool
+	AllowVolumeBrowserForRegularUsers   *bool
+	EnableHostManagementFeatures        *bool
+	SnapshotInterval                    *string
+	TemplatesURL                        *string
+	EdgeAgentCheckinInterval            *int
+	EnableEdgeComputeFeatures           *bool
+	AllowStackManagementForRegularUsers *bool
+	AllowHostNamespaceForRegularUsers   *bool
+	AllowDeviceMappingForRegularUsers   *bool
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
@@ -114,6 +117,14 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		settings.EnableEdgeComputeFeatures = *payload.EnableEdgeComputeFeatures
 	}
 
+	if payload.AllowStackManagementForRegularUsers != nil {
+		settings.AllowStackManagementForRegularUsers = *payload.AllowStackManagementForRegularUsers
+	}
+
+	if payload.AllowHostNamespaceForRegularUsers != nil {
+		settings.AllowHostNamespaceForRegularUsers = *payload.AllowHostNamespaceForRegularUsers
+	}
+
 	if payload.SnapshotInterval != nil && *payload.SnapshotInterval != settings.SnapshotInterval {
 		err := handler.updateSnapshotInterval(settings, *payload.SnapshotInterval)
 		if err != nil {
@@ -123,6 +134,10 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.EdgeAgentCheckinInterval != nil {
 		settings.EdgeAgentCheckinInterval = *payload.EdgeAgentCheckinInterval
+	}
+
+	if payload.AllowDeviceMappingForRegularUsers != nil {
+		settings.AllowDeviceMappingForRegularUsers = *payload.AllowDeviceMappingForRegularUsers
 	}
 
 	tlsError := handler.updateTLS(settings)

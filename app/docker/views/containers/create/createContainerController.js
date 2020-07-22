@@ -30,6 +30,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
   'SettingsService',
   'PluginService',
   'HttpRequestHelper',
+  'ExtensionService',
   function (
     $q,
     $scope,
@@ -55,7 +56,8 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     SystemService,
     SettingsService,
     PluginService,
-    HttpRequestHelper
+    HttpRequestHelper,
+    ExtensionService
   ) {
     $scope.create = create;
 
@@ -603,7 +605,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       });
     }
 
-    function initView() {
+    async function initView() {
       var nodeName = $transition$.params().nodeName;
       $scope.formValues.NodeName = nodeName;
       HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
@@ -682,6 +684,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       });
 
       $scope.isAdmin = Authentication.isAdmin();
+      $scope.showDeviceMapping = await shouldShowDevices();
     }
 
     function validateForm(accessControlData, isAdmin) {
@@ -891,6 +894,19 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       function onSuccess() {
         Notifications.success('Container successfully created');
         $state.go('docker.containers', {}, { reload: true });
+      }
+    }
+
+    async function shouldShowDevices() {
+      const isAdmin = !$scope.applicationState.application.authentication || Authentication.isAdmin();
+      const { allowDeviceMappingForRegularUsers } = $scope.applicationState.application;
+
+      if (isAdmin || allowDeviceMappingForRegularUsers) {
+        return true;
+      }
+      const rbacEnabled = await ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC);
+      if (rbacEnabled) {
+        return Authentication.hasAuthorizations(['EndpointResourcesAccess']);
       }
     }
 

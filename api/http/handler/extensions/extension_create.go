@@ -41,14 +41,19 @@ func (handler *Handler) extensionCreate(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve extensions status from the database", err}
 	}
 
-	for _, existingExtension := range extensions {
-		if existingExtension.ID == extensionID && existingExtension.Enabled {
-			return &httperror.HandlerError{http.StatusConflict, "Unable to enable extension", portainer.ErrExtensionAlreadyEnabled}
-		}
-	}
-
 	extension := &portainer.Extension{
 		ID: extensionID,
+	}
+
+	for _, existingExtension := range extensions {
+		if existingExtension.ID == extensionID && (existingExtension.Enabled || !existingExtension.License.Valid) {
+			if existingExtension.License.LicenseKey == payload.License {
+				return &httperror.HandlerError{http.StatusConflict, "Unable to enable extension", portainer.ErrExtensionAlreadyEnabled}
+			}
+
+			_ = handler.ExtensionManager.DisableExtension(&existingExtension)
+			extension.Enabled = true
+		}
 	}
 
 	extensionDefinitions, err := handler.ExtensionManager.FetchExtensionDefinitions()
@@ -68,15 +73,14 @@ func (handler *Handler) extensionCreate(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to enable extension", err}
 	}
 
-	extension.Enabled = true
-
-	if extension.ID == portainer.RBACExtension {
+	if extension.ID == portainer.RBACExtension && !extension.Enabled {
 		err = handler.upgradeRBACData()
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "An error occured during database update", err}
 		}
 	}
 
+	extension.Enabled = true
 	err = handler.ExtensionService.Persist(extension)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist extension status inside the database", err}

@@ -42,12 +42,11 @@ angular.module('portainer.app').controller('GenericDatatableController', [
       DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);
     };
 
-    this.changeOrderBy = changeOrderBy.bind(this);
-    function changeOrderBy(orderField) {
+    this.changeOrderBy = function changeOrderBy(orderField) {
       this.state.reverseOrder = this.state.orderBy === orderField ? !this.state.reverseOrder : false;
       this.state.orderBy = orderField;
       DatatableService.setDataTableOrder(this.tableKey, orderField, this.state.reverseOrder);
-    }
+    };
 
     this.selectItem = function (item, event) {
       // Handle range select using shift

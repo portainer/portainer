@@ -9,7 +9,7 @@ import (
 
 	"github.com/portainer/portainer/api/chisel"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt"
 	"github.com/portainer/portainer/api/cli"
 	"github.com/portainer/portainer/api/cron"
@@ -308,13 +308,16 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 					portainer.LDAPGroupSearchSettings{},
 				},
 			},
-			OAuthSettings:                      portainer.OAuthSettings{},
-			AllowBindMountsForRegularUsers:     true,
-			AllowPrivilegedModeForRegularUsers: true,
-			AllowVolumeBrowserForRegularUsers:  false,
-			EnableHostManagementFeatures:       false,
-			SnapshotInterval:                   *flags.SnapshotInterval,
-			EdgeAgentCheckinInterval:           portainer.DefaultEdgeAgentCheckinIntervalInSeconds,
+			OAuthSettings:                       portainer.OAuthSettings{},
+			AllowBindMountsForRegularUsers:      true,
+			AllowPrivilegedModeForRegularUsers:  true,
+			AllowVolumeBrowserForRegularUsers:   false,
+			AllowDeviceMappingForRegularUsers:   true,
+			AllowStackManagementForRegularUsers: true,
+			EnableHostManagementFeatures:        false,
+			AllowHostNamespaceForRegularUsers:   true,
+			SnapshotInterval:                    *flags.SnapshotInterval,
+			EdgeAgentCheckinInterval:            portainer.DefaultEdgeAgentCheckinIntervalInSeconds,
 		}
 
 		if *flags.Templates != "" {

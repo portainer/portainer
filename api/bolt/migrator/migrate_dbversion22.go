@@ -1,6 +1,8 @@
 package migrator
 
-import "github.com/portainer/portainer/api"
+import (
+	"github.com/portainer/portainer/api"
+)
 
 func (m *Migrator) updateTagsToDBVersion23() error {
 	tags, err := m.tagService.Tags()

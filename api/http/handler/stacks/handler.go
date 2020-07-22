@@ -1,12 +1,13 @@
 package stacks
 
 import (
+	"errors"
 	"net/http"
 	"sync"
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -85,5 +86,56 @@ func (handler *Handler) userCanAccessStack(securityContext *security.RestrictedR
 	if ok {
 		return true, nil
 	}
+	return false, nil
+}
+
+func (handler *Handler) userCanCreateStack(securityContext *security.RestrictedRequestContext, endpointID portainer.EndpointID) (bool, error) {
+	if securityContext.IsAdmin {
+		return true, nil
+	}
+
+	_, err := handler.ExtensionService.Extension(portainer.RBACExtension)
+	if err == portainer.ErrObjectNotFound {
+		return false, nil
+	} else if err != nil && err != portainer.ErrObjectNotFound {
+		return false, err
+	}
+
+	user, err := handler.UserService.User(securityContext.UserID)
+	if err != nil {
+		return false, err
+	}
+
+	_, ok := user.EndpointAuthorizations[endpointID][portainer.EndpointResourcesAccess]
+	if ok {
+		return true, nil
+	}
+	return false, nil
+}
+
+func (handler *Handler) userIsAdminOrEndpointAdmin(user *portainer.User, endpointID portainer.EndpointID) (bool, error) {
+	isAdmin := user.Role == portainer.AdministratorRole
+
+	rbacExtension, err := handler.ExtensionService.Extension(portainer.RBACExtension)
+	if err != nil && err != portainer.ErrObjectNotFound {
+		return false, errors.New("Unable to verify if RBAC extension is loaded")
+	}
+
+	endpointResourceAccess := false
+	_, ok := user.EndpointAuthorizations[portainer.EndpointID(endpointID)][portainer.EndpointResourcesAccess]
+	if ok {
+		endpointResourceAccess = true
+	}
+
+	if rbacExtension != nil {
+		if isAdmin || endpointResourceAccess {
+			return true, nil
+		}
+	} else {
+		if isAdmin {
+			return true, nil
+		}
+	}
+
 	return false, nil
 }

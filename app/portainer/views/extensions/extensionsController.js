@@ -1,4 +1,5 @@
 import moment from 'moment';
+import _ from 'lodash-es';
 
 angular.module('portainer.app').controller('ExtensionsController', [
   '$scope',
@@ -9,6 +10,7 @@ angular.module('portainer.app').controller('ExtensionsController', [
     $scope.state = {
       actionInProgress: false,
       currentDate: moment().format('YYYY-MM-dd'),
+      updateLicense: false,
     };
 
     $scope.formValues = {
@@ -58,6 +60,15 @@ angular.module('portainer.app').controller('ExtensionsController', [
       if (isNaN($scope.formValues.License[0])) {
         valid = false;
       }
+
+      const licensePrefix = $scope.formValues.License[0];
+
+      $scope.state.updateLicense = false;
+      _.forEach($scope.extensions, (extension) => {
+        if (licensePrefix === '' + extension.Id && extension.Enabled) {
+          $scope.state.updateLicense = true;
+        }
+      });
 
       form.extension_license.$setValidity('invalidLicense', valid);
     };
