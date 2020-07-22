@@ -3,7 +3,7 @@ import '@babel/polyfill';
 
 import angular from 'angular';
 
-import './agent/_module';
+import './agent';
 import './azure/_module';
 import './docker/__module';
 import './edge/__module';
@@ -42,7 +42,10 @@ angular.module('portainer', [
 
 if (require) {
   var req = require.context('./', true, /^(.*\.(js$))[^.]*$/im);
-  req.keys().forEach(function (key) {
-    req(key);
-  });
+  req
+    .keys()
+    .filter((key) => !key.startsWith('./agent'))
+    .forEach(function (key) {
+      req(key);
+    });
 }
