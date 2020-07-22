@@ -41,7 +41,7 @@ angular.module('portainer.app').factory('Authentication', [
 
       StateManager.clean();
       EndpointProvider.clean();
-      LocalStorage.clean();
+      LocalStorage.cleanAuthData();
       LocalStorage.storeLoginStateUUID('');
     }
 
