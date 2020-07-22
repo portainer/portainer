@@ -41,6 +41,10 @@ func (handler *Handler) extensionCreate(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve extensions status from the database", err}
 	}
 
+	extension := &portainer.Extension{
+		ID: extensionID,
+	}
+
 	for _, existingExtension := range extensions {
 		if existingExtension.ID == extensionID && existingExtension.Enabled {
 			if existingExtension.License.LicenseKey == payload.License {
@@ -48,11 +52,8 @@ func (handler *Handler) extensionCreate(w http.ResponseWriter, r *http.Request) 
 			}
 
 			_ = handler.ExtensionManager.DisableExtension(&existingExtension)
+			extension.Enabled = true
 		}
-	}
-
-	extension := &portainer.Extension{
-		ID: extensionID,
 	}
 
 	extensionDefinitions, err := handler.ExtensionManager.FetchExtensionDefinitions()
