@@ -6,6 +6,7 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/handler"
 	"github.com/portainer/portainer/api/http/handler/auth"
@@ -243,8 +244,14 @@ func (server *Server) Start() error {
 		WebhookHandler:         webhookHandler,
 	}
 
-	if server.SSL {
-		return http.ListenAndServeTLS(server.BindAddress, server.SSLCert, server.SSLKey, server.Handler)
+	httpServer := &http.Server{
+		Addr:    server.BindAddress,
+		Handler: server.Handler,
 	}
-	return http.ListenAndServe(server.BindAddress, server.Handler)
+
+	if server.SSL {
+		httpServer.TLSConfig = crypto.CreateServerTLSConfiguration()
+		return httpServer.ListenAndServeTLS(server.SSLCert, server.SSLKey)
+	}
+	return httpServer.ListenAndServe()
 }
