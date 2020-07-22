@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 
-import { KubernetesNode, KubernetesNodeDetails } from 'Kubernetes/models/node/models';
+import { KubernetesNode, KubernetesNodeDetails } from 'Kubernetes/node/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 
 class KubernetesNodeConverter {
@@ -11,6 +11,7 @@ class KubernetesNodeConverter {
     res.Id = data.metadata.uid;
     const hostName = _.find(data.status.addresses, { type: 'Hostname' });
     res.Name = hostName ? hostName.address : data.metadata.Name;
+    res.Labels = data.metadata.labels;
     res.Role = _.has(data.metadata.labels, 'node-role.kubernetes.io/master') ? 'Master' : 'Worker';
 
     const ready = _.find(data.status.conditions, { type: KubernetesNodeConditionTypes.READY });
@@ -39,6 +40,7 @@ class KubernetesNodeConverter {
     res.Version = data.status.nodeInfo.kubeletVersion;
     const internalIP = _.find(data.status.addresses, { type: 'InternalIP' });
     res.IPAddress = internalIP ? internalIP.address : '-';
+    res.Taints = data.spec.taints ? data.spec.taints : [];
     return res;
   }
 

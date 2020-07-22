@@ -1,9 +1,91 @@
 import angular from 'angular';
-import _ from 'lodash-es';
+import * as _ from 'lodash-es';
+import * as JsonPatch from 'fast-json-patch';
 import { KubernetesApplicationDataAccessPolicies, KubernetesApplicationDeploymentTypes } from 'Kubernetes/models/application/models';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
+import { KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'Kubernetes/pod/models';
+
+function computeTolerations(nodes, application) {
+  const pod = application.Pods[0];
+  _.forEach(nodes, (n) => {
+    n.AcceptsApplication = true;
+    n.Expanded = false;
+    if (!pod) {
+      return;
+    }
+    n.UnmetTaints = [];
+    _.forEach(n.Taints, (t) => {
+      const matchKeyMatchValueMatchEffect = _.find(pod.Tolerations, { Key: t.key, Operator: 'Equal', Value: t.value, Effect: t.effect });
+      const matchKeyAnyValueMatchEffect = _.find(pod.Tolerations, { Key: t.key, Operator: 'Exists', Effect: t.effect });
+      const matchKeyMatchValueAnyEffect = _.find(pod.Tolerations, { Key: t.key, Operator: 'Equal', Value: t.value, Effect: '' });
+      const matchKeyAnyValueAnyEffect = _.find(pod.Tolerations, { Key: t.key, Operator: 'Exists', Effect: '' });
+      const anyKeyAnyValueAnyEffect = _.find(pod.Tolerations, { Key: '', Operator: 'Exists', Effect: '' });
+
+      if (!matchKeyMatchValueMatchEffect && !matchKeyAnyValueMatchEffect && !matchKeyMatchValueAnyEffect && !matchKeyAnyValueAnyEffect && !anyKeyAnyValueAnyEffect) {
+        n.AcceptsApplication = false;
+        n.UnmetTaints.push(t);
+      } else {
+        n.AcceptsApplication = true;
+      }
+    });
+  });
+  return nodes;
+}
+
+// For node requirement format depending on operator value
+// see https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#nodeselectorrequirement-v1-core
+// Some operators require empty "values" field, some only one element in "values" field, etc
+
+function computeAffinities(nodes, application) {
+  const pod = application.Pods[0];
+  _.forEach(nodes, (n) => {
+    if (pod.NodeSelector) {
+      const patch = JsonPatch.compare(n.Labels, pod.NodeSelector);
+      _.remove(patch, { op: 'remove' });
+      n.UnmatchedNodeSelectorLabels = _.map(patch, (i) => {
+        return { key: _.trimStart(i.path, '/'), value: i.value };
+      });
+      if (n.UnmatchedNodeSelectorLabels.length) {
+        n.AcceptsApplication = false;
+      }
+    }
+
+    if (pod.Affinity.NodeAffinity.requiredDuringSchedulingIgnoredDuringExecution) {
+      const unmatchedTerms = _.map(pod.Affinity.NodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms, (t) => {
+        const unmatchedExpressions = _.map(t.matchExpressions, (e) => {
+          const exists = {}.hasOwnProperty.call(n.Labels, e.key);
+          const isIn = exists && _.includes(e.values, n.Labels[e.key]);
+          if (
+            (e.operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.EXISTS && exists) ||
+            (e.operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.DOES_NOT_EXIST && !exists) ||
+            (e.operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.IN && isIn) ||
+            (e.operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.NOT_IN && !isIn) ||
+            (e.operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.GREATER_THAN && exists && parseInt(n.Labels[e.key]) > parseInt(e.values[0])) ||
+            (e.operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.LOWER_THAN && exists && parseInt(n.Labels[e.key]) < parseInt(e.values[0]))
+          ) {
+            return;
+          }
+          return e;
+        });
+        return _.without(unmatchedExpressions, undefined);
+      });
+      _.remove(unmatchedTerms, (i) => i.length === 0);
+      n.UnmatchedNodeAffinities = unmatchedTerms;
+      if (n.UnmatchedNodeAffinities.length) {
+        n.AcceptsApplication = false;
+      }
+    }
+  });
+  return nodes;
+}
+
+function computePlacements(nodes, application) {
+  nodes = computeTolerations(nodes, application);
+  nodes = computeAffinities(nodes, application);
+  return nodes;
+}
 
 class KubernetesApplicationController {
   /* @ngInject */
@@ -18,6 +100,7 @@ class KubernetesApplicationController {
     KubernetesEventService,
     KubernetesStackService,
     KubernetesPodService,
+    KubernetesNodeService,
     KubernetesNamespaceHelper
   ) {
     this.$async = $async;
@@ -31,6 +114,7 @@ class KubernetesApplicationController {
     this.KubernetesEventService = KubernetesEventService;
     this.KubernetesStackService = KubernetesStackService;
     this.KubernetesPodService = KubernetesPodService;
+    this.KubernetesNodeService = KubernetesNodeService;
 
     this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
 
@@ -103,7 +187,6 @@ class KubernetesApplicationController {
   /**
    * ROLLBACK
    */
-
   async rollbackApplicationAsync() {
     try {
       // await this.KubernetesApplicationService.rollback(this.application, this.formValues.SelectedRevision);
@@ -196,7 +279,11 @@ class KubernetesApplicationController {
   async getApplicationAsync() {
     try {
       this.state.dataLoading = true;
-      this.application = await this.KubernetesApplicationService.get(this.state.params.namespace, this.state.params.name);
+      const [application, nodes] = await Promise.all([
+        this.KubernetesApplicationService.get(this.state.params.namespace, this.state.params.name),
+        this.KubernetesNodeService.get(),
+      ]);
+      this.application = application;
       this.formValues.Note = this.application.Note;
       if (this.application.Note) {
         this.state.expandedNote = true;
@@ -204,6 +291,8 @@ class KubernetesApplicationController {
       if (this.application.CurrentRevision) {
         this.formValues.SelectedRevision = _.find(this.application.Revisions, { revision: this.application.CurrentRevision.revision });
       }
+
+      this.placements = computePlacements(nodes, this.application);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve application details');
     } finally {

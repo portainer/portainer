@@ -4,12 +4,14 @@
 const _KubernetesNode = Object.freeze({
   Id: '',
   Name: '',
+  Labels: {},
   Role: '',
   Status: '',
   CPU: 0,
   Memory: '',
   Version: '',
   IPAddress: '',
+  Taints: [],
 });
 
 export class KubernetesNode {

@@ -2,7 +2,7 @@ import angular from 'angular';
 import _ from 'lodash-es';
 
 import PortainerError from 'Portainer/error';
-import KubernetesNodeConverter from 'Kubernetes/converters/node';
+import KubernetesNodeConverter from 'Kubernetes/node/converter';
 import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
 
 class KubernetesNodeService {
