@@ -60,7 +60,7 @@ function TemplateListController($async, $state, DatatableService, Notifications,
       if (template.Type === 3) {
         type = 2;
       }
-      $state.go('portainer.templates.custom.new', { fileContent, type });
+      $state.go('docker.templates.custom.new', { fileContent, type });
     } catch (err) {
       Notifications.error('Failure', err, 'Failed to duplicate template');
     }
