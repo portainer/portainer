@@ -72,15 +72,14 @@ func (handler *Handler) extensionCreate(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to enable extension", err}
 	}
 
-	extension.Enabled = true
-
-	if extension.ID == portainer.RBACExtension {
+	if extension.ID == portainer.RBACExtension && !extension.Enabled {
 		err = handler.upgradeRBACData()
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "An error occured during database update", err}
 		}
 	}
 
+	extension.Enabled = true
 	err = handler.ExtensionService.Persist(extension)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist extension status inside the database", err}
