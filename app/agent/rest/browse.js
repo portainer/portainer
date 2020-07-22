@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 import { browseGetResponse } from './response/browse';
 
 angular.module('portainer.agent').factory('Browse', BrowseFactory);
