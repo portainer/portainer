@@ -3,7 +3,7 @@
 // This functions simply creates a response object and assign
 // the data to a field.
 export function browseGetResponse(data) {
-  var response = {};
+  const response = {};
   response.file = data;
   return response;
 }
