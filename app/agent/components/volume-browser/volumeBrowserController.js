@@ -1,21 +1,25 @@
 import _ from 'lodash-es';
 
 export class VolumeBrowserController {
-  constructor(HttpRequestHelper, VolumeBrowserService, FileSaver, Blob, ModalService, Notifications) {
-    Object.assign(this, { HttpRequestHelper, VolumeBrowserService, FileSaver, Blob, ModalService, Notifications });
+  constructor($async, HttpRequestHelper, VolumeBrowserService, FileSaver, Blob, ModalService, Notifications) {
+    Object.assign(this, { $async, HttpRequestHelper, VolumeBrowserService, FileSaver, Blob, ModalService, Notifications });
     this.state = {
       path: '/',
     };
 
-    // this. = this..bind(this)
     this.rename = this.rename.bind(this);
+    this.renameAsync = this.renameAsync.bind(this);
     this.confirmDelete = this.confirmDelete.bind(this);
     this.download = this.download.bind(this);
+    this.downloadAsync = this.downloadAsync.bind(this);
     this.up = this.up.bind(this);
     this.browse = this.browse.bind(this);
     this.deleteFile = this.deleteFile.bind(this);
+    this.deleteFileAsync = this.deleteFileAsync.bind(this);
     this.getFilesForPath = this.getFilesForPath.bind(this);
+    this.getFilesForPathAsync = this.getFilesForPathAsync.bind(this);
     this.onFileSelectedForUpload = this.onFileSelectedForUpload.bind(this);
+    this.onFileSelectedForUploadAsync = this.onFileSelectedForUploadAsync.bind(this);
     this.parentPath = this.parentPath.bind(this);
     this.buildPath = this.buildPath.bind(this);
     this.$onInit = this.$onInit.bind(this);
@@ -24,26 +28,25 @@ export class VolumeBrowserController {
   }
 
   rename(file, newName) {
-    const filePath = this.state.path === '/' ? file : this.state.path + '/' + file;
-    const newFilePath = this.state.path === '/' ? newName : this.state.path + '/' + newName;
+    return this.$async(this.renameAsync, file, newName);
+  }
+  async renameAsync(file, newName) {
+    const filePath = this.state.path === '/' ? file : `${this.state.path}/${file}`;
+    const newFilePath = this.state.path === '/' ? newName : `${this.state.path}/${newName}`;
 
-    this.VolumeBrowserService.rename(this.volumeId, filePath, newFilePath)
-      .then(() => {
-        this.Notifications.success('File successfully renamed', newFilePath);
-        return this.VolumeBrowserService.ls(this.volumeId, this.state.path);
-      })
-      .then((data) => {
-        this.files = data;
-      })
-      .catch((err) => {
-        this.Notifications.error('Failure', err, 'Unable to rename file');
-      });
+    try {
+      await this.VolumeBrowserService.rename(this.volumeId, filePath, newFilePath);
+      this.Notifications.success('File successfully renamed', newFilePath);
+      this.files = await this.VolumeBrowserService.ls(this.volumeId, this.state.path);
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to rename file');
+    }
   }
 
   confirmDelete(file) {
-    const filePath = this.state.path === '/' ? file : this.state.path + '/' + file;
+    const filePath = this.state.path === '/' ? file : `${this.state.path}/${file}`;
 
-    this.ModalService.confirmDeletion('Are you sure that you want to delete ' + filePath + ' ?', (confirmed) => {
+    this.ModalService.confirmDeletion(`Are you sure that you want to delete ${filePath} ?`, (confirmed) => {
       if (!confirmed) {
         return;
       }
@@ -52,15 +55,18 @@ export class VolumeBrowserController {
   }
 
   download(file) {
-    const filePath = this.state.path === '/' ? file : this.state.path + '/' + file;
-    this.VolumeBrowserService.get(this.volumeId, filePath)
-      .then((data) => {
-        const downloadData = new Blob([data.file]);
-        this.FileSaver.saveAs(downloadData, file);
-      })
-      .catch((err) => {
-        this.Notifications.error('Failure', err, 'Unable to download file');
-      });
+    return this.$async(this.downloadAsync, file);
+  }
+  async downloadAsync(file) {
+    const filePath = this.state.path === '/' ? file : `${this.state.path}/${file}`;
+
+    try {
+      const data = await this.VolumeBrowserService.get(this.volumeId, filePath);
+      const downloadData = new Blob([data.file]);
+      this.FileSaver.saveAs(downloadData, file);
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to download file');
+    }
   }
 
   up() {
@@ -74,38 +80,41 @@ export class VolumeBrowserController {
   }
 
   deleteFile(file) {
-    this.VolumeBrowserService.delete(this.volumeId, file)
-      .then(() => {
-        this.Notifications.success('File successfully deleted', file);
-        return this.VolumeBrowserService.ls(this.volumeId, this.state.path);
-      })
-      .then((data) => {
-        this.files = data;
-      })
-      .catch((err) => {
-        this.Notifications.error('Failure', err, 'Unable to delete file');
-      });
+    return this.$async(this.deleteFileAsync, file);
+  }
+  async deleteFileAsync(file) {
+    try {
+      await this.VolumeBrowserService.delete(this.volumeId, file);
+      this.Notifications.success('File successfully deleted', file);
+      this.files = await this.VolumeBrowserService.ls(this.volumeId, this.state.path);
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to delete file');
+    }
   }
 
   getFilesForPath(path) {
-    this.VolumeBrowserService.ls(this.volumeId, path)
-      .then((data) => {
-        this.state.path = path;
-        this.files = data;
-      })
-      .catch((err) => {
-        this.Notifications.error('Failure', err, 'Unable to browse volume');
-      });
+    return this.$async(this.getFilesForPathAsync, path);
+  }
+  async getFilesForPathAsync(path) {
+    try {
+      const files = await this.VolumeBrowserService.ls(this.volumeId, path);
+      this.state.path = path;
+      this.files = files;
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to browse volume');
+    }
   }
 
   onFileSelectedForUpload(file) {
-    this.VolumeBrowserService.upload(this.state.path, file, this.volumeId)
-      .then(() => {
-        this.onFileUploaded();
-      })
-      .catch((err) => {
-        this.Notifications.error('Failure', err, 'Unable to upload file');
-      });
+    return this.$async(this.onFileSelectedForUploadAsync, file);
+  }
+  async onFileSelectedForUploadAsync(file) {
+    try {
+      await this.VolumeBrowserService.upload(this.state.path, file, this.volumeId);
+      this.onFileUploaded();
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to upload file');
+    }
   }
 
   parentPath(path) {
@@ -121,18 +130,7 @@ export class VolumeBrowserController {
     if (parent === '/') {
       return parent + file;
     }
-    return parent + '/' + file;
-  }
-
-  $onInit() {
-    this.HttpRequestHelper.setPortainerAgentTargetHeader(this.nodeName);
-    this.VolumeBrowserService.ls(this.volumeId, this.state.path)
-      .then((data) => {
-        this.files = data;
-      })
-      .catch((err) => {
-        this.Notifications.error('Failure', err, 'Unable to browse volume');
-      });
+    return `${parent}/${file}`;
   }
 
   onFileUploaded() {
@@ -141,5 +139,14 @@ export class VolumeBrowserController {
 
   refreshList() {
     this.getFilesForPath(this.state.path);
+  }
+
+  async $onInit() {
+    this.HttpRequestHelper.setPortainerAgentTargetHeader(this.nodeName);
+    try {
+      this.files = await this.VolumeBrowserService.ls(this.volumeId, this.state.path);
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to browse volume');
+    }
   }
 }
