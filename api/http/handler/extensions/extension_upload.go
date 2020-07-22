@@ -46,8 +46,19 @@ func (handler *Handler) extensionUpload(w http.ResponseWriter, r *http.Request) 
 	}
 	extensionID := portainer.ExtensionID(extensionIdentifier)
 
+	extensions, err := handler.ExtensionService.Extensions()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve extensions status from the database", err}
+	}
+
 	extension := &portainer.Extension{
 		ID: extensionID,
+	}
+
+	for _, existingExtension := range extensions {
+		if existingExtension.ID == extensionID && (existingExtension.Enabled || !existingExtension.License.Valid) {
+			extension.Enabled = true
+		}
 	}
 
 	_ = handler.ExtensionManager.DisableExtension(extension)
@@ -57,14 +68,14 @@ func (handler *Handler) extensionUpload(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to install extension", err}
 	}
 
-	extension.Enabled = true
-
-	if extension.ID == portainer.RBACExtension {
+	if extension.ID == portainer.RBACExtension && !extension.Enabled {
 		err = handler.upgradeRBACData()
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "An error occured during database update", err}
 		}
 	}
+
+	extension.Enabled = true
 
 	err = handler.ExtensionService.Persist(extension)
 	if err != nil {
