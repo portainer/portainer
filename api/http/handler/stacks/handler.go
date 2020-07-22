@@ -89,3 +89,23 @@ func (handler *Handler) userCanAccessStack(securityContext *security.RestrictedR
 	}
 	return false, nil
 }
+
+func (handler *Handler) userIsAdminOrEndpointAdmin(user *portainer.User, endpointID portainer.EndpointID) (bool, error) {
+	isAdmin := user.Role == portainer.AdministratorRole
+	if isAdmin {
+		return true, nil
+	}
+
+	rbacExtension, err := handler.DataStore.Extension().Extension(portainer.RBACExtension)
+	if err != nil && err != bolterrors.ErrObjectNotFound {
+		return false, errors.New("Unable to verify if RBAC extension is loaded")
+	}
+
+	if rbacExtension == nil {
+		return false, nil
+	}
+
+	_, endpointResourceAccess := user.EndpointAuthorizations[portainer.EndpointID(endpointID)][portainer.EndpointResourcesAccess]
+
+	return endpointResourceAccess, nil
+}
