@@ -1,10 +1,10 @@
 <rd-header>
   <rd-header-title title-text="Edit Custom Template">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.templates.custom.edit({id:$ctrl.formValues.Id})" ui-sref-opts="{reload: true}">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="docker.templates.custom.edit({id:$ctrl.formValues.Id})" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
-  <rd-header-content> <a ui-sref="portainer.templates.custom">Custom templates</a> &gt; {{ $ctrl.formValues.Title }} </rd-header-content>
+  <rd-header-content> <a ui-sref="docker.templates.custom">Custom templates</a> &gt; {{ $ctrl.formValues.Title }} </rd-header-content>
 </rd-header>
 
 <div class="row" ng-if="$ctrl.formValues">

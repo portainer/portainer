@@ -71,7 +71,7 @@ class CreateCustomTemplateViewController {
       await this.ResourceControlService.applyResourceControl(userId, accessControlData, ResourceControl);
 
       this.Notifications.success('Custom template successfully created');
-      this.$state.go('portainer.templates.custom');
+      this.$state.go('docker.templates.custom');
     } catch (err) {
       this.Notifications.error('Deployment error', err, 'Unable to create custom template');
     } finally {

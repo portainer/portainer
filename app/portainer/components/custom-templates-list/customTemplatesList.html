@@ -5,7 +5,7 @@
         <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
       </div>
       <div class="actionBar">
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.templates.custom.new">
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.templates.custom.new">
           <i class="fa fa-plus space-right" aria-hidden="true"></i>Add Custom Template
         </button>
       </div>
@@ -32,7 +32,7 @@
         >
           <template-item-actions>
             <div ng-if="$ctrl.isEditAllowed(template)" style="display: flex;">
-              <a ui-sref="portainer.templates.custom.edit({id: template.Id})" ng-click="$event.stopPropagation();" class="btn btn-primary btn-xs" style="margin-right: 10px;">
+              <a ui-sref="docker.templates.custom.edit({id: template.Id})" ng-click="$event.stopPropagation();" class="btn btn-primary btn-xs" style="margin-right: 10px;">
                 Edit
               </a>
               <button class="btn btn-danger btn-xs" ng-click="$ctrl.onDeleteClick(template.Id); $event.stopPropagation();">Delete</button>

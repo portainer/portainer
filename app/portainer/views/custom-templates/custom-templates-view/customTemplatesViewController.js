@@ -140,7 +140,7 @@ class CustomTemplatesViewController {
       const { ResourceControl: resourceControl } = await createAction(stackName, file, [], endpointId);
       await this.ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
       this.Notifications.success('Stack successfully deployed');
-      this.$state.go('portainer.stacks');
+      this.$state.go('docker.stacks');
     } catch (err) {
       this.Notifications.error('Deployment error', err, 'Failed to deploy stack');
     } finally {
