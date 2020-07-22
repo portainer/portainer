@@ -1,14 +1,11 @@
-angular.module('portainer.agent').service('AgentPingService', [
-  'AgentPing',
-  function AgentPingService(AgentPing) {
-    var service = {};
+import angular from 'angular';
 
-    service.ping = ping;
+angular.module('portainer.agent').service('AgentPingService', AgentPingService);
 
-    function ping() {
-      return AgentPing.ping().$promise;
-    }
+function AgentPingService(AgentPing) {
+  return { ping };
 
-    return service;
-  },
-]);
+  function ping() {
+    return AgentPing.ping().$promise;
+  }
+}
