@@ -129,8 +129,12 @@
 
             <uib-tab index="1" classes="btn-sm" select="ctrl.selectTab(1)">
               <uib-tab-heading> <i class="fas fa-compress-arrows-alt space-right" aria-hidden="true"></i> Placement </uib-tab-heading>
+              <div class="small text-muted" style="padding: 20px;">
+                <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                The placement component helps you understand whether or not this application can be deployed on a specific node.
+              </div>
               <kubernetes-application-placements-datatable
-                title-text="Placement"
+                title-text="Placement constraints/preferences"
                 title-icon="fa-compress-arrows-alt"
                 dataset="ctrl.placements"
                 table-key="kubernetes.application.placements"
