@@ -194,28 +194,26 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 			return nil, err
 		}
 
-		if !settings.AllowPrivilegedModeForRegularUsers || !settings.AllowHostNamespaceForRegularUsers {
-			body, err := ioutil.ReadAll(request.Body)
-			if err != nil {
-				return nil, err
-			}
-
-			partialContainer := &PartialContainer{}
-			err = json.Unmarshal(body, partialContainer)
-			if err != nil {
-				return nil, err
-			}
-
-			if partialContainer.HostConfig.Privileged {
-				return forbiddenResponse, errors.New("forbidden to use privileged mode")
-			}
-
-			if partialContainer.HostConfig.PidMode == "host" {
-				return forbiddenResponse, errors.New("forbidden to use pid host namespace")
-			}
-
-			request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+		body, err := ioutil.ReadAll(request.Body)
+		if err != nil {
+			return nil, err
 		}
+
+		partialContainer := &PartialContainer{}
+		err = json.Unmarshal(body, partialContainer)
+		if err != nil {
+			return nil, err
+		}
+
+		if !settings.AllowPrivilegedModeForRegularUsers && partialContainer.HostConfig.Privileged {
+			return forbiddenResponse, errors.New("forbidden to use privileged mode")
+		}
+
+		if !settings.AllowHostNamespaceForRegularUsers && partialContainer.HostConfig.PidMode == "host" {
+			return forbiddenResponse, errors.New("forbidden to use pid host namespace")
+		}
+
+		request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 	}
 
 	response, err := transport.executeDockerRequest(request)
