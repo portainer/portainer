@@ -114,6 +114,7 @@ class KubernetesVolumesController {
     this.state = {
       viewReady: false,
       // endpointId: this.$transition$.params().endpointId, // TODO: use this when moving to endpointID in URL
+      currentName: this.$state.$current.name,
       endpointId: this.EndpointProvider.endpointID(),
       activeTab: this.LocalStorage.getActiveTab('volumes'),
     };
