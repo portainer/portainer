@@ -1197,11 +1197,6 @@ angular-clipboard@^1.6.2:
   resolved "https://registry.yarnpkg.com/angular-clipboard/-/angular-clipboard-1.7.0.tgz#9621a6ce66eab1ea9549aa8bfb3b71352307554f"
   integrity sha512-4/eg3zZw1MJpIsMc+mWzeVNyWBu8YWpXPTdmbgyPRp/6f0xB6I3XR2iC6Mb4mg/5E9q6exCd0sX2yiIsw+ZLJw==
 
-angular-cookies@1.8.0:
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/angular-cookies/-/angular-cookies-1.8.0.tgz#c981c843652e716c1cf993451c2509f00a4b0169"
-  integrity sha512-gWO3RKF0WMmXhseiN3Aw9aEmQ3mB53wSdAxpeKKHbiDwU7vmK+MBuebyOX9qbwZYubn5nM8LByZVmg7T6jOV1w==
-
 angular-file-saver@^1.1.3:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/angular-file-saver/-/angular-file-saver-1.1.3.tgz#dcaec0695214f226a4caafc8c16d21a9a61f7d1b"
@@ -1291,12 +1286,7 @@ angular-utils-pagination@~0.11.1:
   resolved "https://registry.yarnpkg.com/angular-utils-pagination/-/angular-utils-pagination-0.11.1.tgz#efad7c8879beb30ad3d77707f93e3d0ef51f2c66"
   integrity sha1-7618iHm+swrT13cH+T49DvUfLGY=
 
-angular@1.8.0:
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/angular/-/angular-1.8.0.tgz#b1ec179887869215cab6dfd0df2e42caa65b1b51"
-  integrity sha512-VdaMx+Qk0Skla7B5gw77a8hzlcOakwF8mjlW13DpIWIDlfqwAbSSLfd8N/qZnzEmQF4jC4iofInd3gE7vL8ZZg==
-
-angular@1.x, angular@^1.3:
+angular@1.8.0, angular@1.x, angular@^1.3:
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/angular/-/angular-1.8.0.tgz#b1ec179887869215cab6dfd0df2e42caa65b1b51"
   integrity sha512-VdaMx+Qk0Skla7B5gw77a8hzlcOakwF8mjlW13DpIWIDlfqwAbSSLfd8N/qZnzEmQF4jC4iofInd3gE7vL8ZZg==
