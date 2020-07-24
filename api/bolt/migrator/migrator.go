@@ -321,9 +321,17 @@ func (m *Migrator) Migrate() error {
 		}
 	}
 
-	// Portainer 2.0
+	// Portainer 1.24.1
 	if m.currentDBVersion < 24 {
 		err := m.updateSettingsToDB24()
+		if err != nil {
+			return err
+		}
+	}
+
+	// Portainer 2.0
+	if m.currentDBVersion < 25 {
+		err := m.updateSettingsToDB25()
 		if err != nil {
 			return err
 		}
