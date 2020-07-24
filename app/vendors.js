@@ -18,7 +18,6 @@ import angular from 'angular';
 import 'moment';
 import '@uirouter/angularjs';
 import 'ui-select';
-import 'angular-cookies';
 import 'angular-sanitize';
 import 'ng-file-upload';
 import 'angular-messages';
