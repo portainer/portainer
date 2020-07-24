@@ -158,8 +158,13 @@ func containerHasBlackListedLabel(containerLabels map[string]interface{}, labelB
 func (transport *Transport) decorateContainerCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
 	type PartialContainer struct {
 		HostConfig struct {
-			Privileged bool `json:"Privileged"`
+			Privileged bool   `json:"Privileged"`
+			PidMode    string `json:"PidMode"`
 		} `json:"HostConfig"`
+	}
+
+	forbiddenResponse := &http.Response{
+		StatusCode: http.StatusForbidden,
 	}
 
 	tokenData, err := security.RetrieveTokenData(request)
@@ -189,24 +194,26 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 			return nil, err
 		}
 
-		if !settings.AllowPrivilegedModeForRegularUsers {
-			body, err := ioutil.ReadAll(request.Body)
-			if err != nil {
-				return nil, err
-			}
-
-			partialContainer := &PartialContainer{}
-			err = json.Unmarshal(body, partialContainer)
-			if err != nil {
-				return nil, err
-			}
-
-			if partialContainer.HostConfig.Privileged {
-				return nil, errors.New("forbidden to use privileged mode")
-			}
-
-			request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+		body, err := ioutil.ReadAll(request.Body)
+		if err != nil {
+			return nil, err
 		}
+
+		partialContainer := &PartialContainer{}
+		err = json.Unmarshal(body, partialContainer)
+		if err != nil {
+			return nil, err
+		}
+
+		if !settings.AllowPrivilegedModeForRegularUsers && partialContainer.HostConfig.Privileged {
+			return forbiddenResponse, errors.New("forbidden to use privileged mode")
+		}
+
+		if !settings.AllowHostNamespaceForRegularUsers && partialContainer.HostConfig.PidMode == "host" {
+			return forbiddenResponse, errors.New("forbidden to use pid host namespace")
+		}
+
+		request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 	}
 
 	response, err := transport.executeDockerRequest(request)

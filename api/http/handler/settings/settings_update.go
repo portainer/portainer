@@ -22,6 +22,7 @@ type settingsUpdatePayload struct {
 	OAuthSettings                      *portainer.OAuthSettings
 	AllowBindMountsForRegularUsers     *bool
 	AllowPrivilegedModeForRegularUsers *bool
+	AllowHostNamespaceForRegularUsers  *bool
 	AllowVolumeBrowserForRegularUsers  *bool
 	EnableHostManagementFeatures       *bool
 	SnapshotInterval                   *string
@@ -123,6 +124,10 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.EnableEdgeComputeFeatures != nil {
 		settings.EnableEdgeComputeFeatures = *payload.EnableEdgeComputeFeatures
+	}
+
+	if payload.AllowHostNamespaceForRegularUsers != nil {
+		settings.AllowHostNamespaceForRegularUsers = *payload.AllowHostNamespaceForRegularUsers
 	}
 
 	if payload.SnapshotInterval != nil && *payload.SnapshotInterval != settings.SnapshotInterval {

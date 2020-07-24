@@ -524,6 +524,7 @@ type (
 		EdgeAgentCheckinInterval           int                  `json:"EdgeAgentCheckinInterval"`
 		EnableEdgeComputeFeatures          bool                 `json:"EnableEdgeComputeFeatures"`
 		UserSessionTimeout                 string               `json:"UserSessionTimeout"`
+		AllowHostNamespaceForRegularUsers  bool                 `json:"AllowHostNamespaceForRegularUsers"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool

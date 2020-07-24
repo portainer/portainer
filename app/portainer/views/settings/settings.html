@@ -108,6 +108,17 @@
               </label>
             </div>
           </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <label for="toggle_allowHostNamespaceForRegularUsers" class="control-label text-left">
+                Disable the use of host PID 1 for non-administrators
+                <portainer-tooltip position="bottom" message="Prevent users from accessing the host filesystem through the host PID namespace."></portainer-tooltip>
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" name="toggle_allowHostNamespaceForRegularUsers" ng-model="formValues.restrictHostNamespaceForRegularUsers" /><i></i>
+              </label>
+            </div>
+          </div>
           <!-- !security -->
           <!-- edge -->
           <div class="col-sm-12 form-section-title">
