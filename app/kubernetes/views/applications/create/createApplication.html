@@ -320,20 +320,6 @@
               </div>
 
               <div class="col-sm-12 form-inline" style="margin-top: 10px;" ng-repeat="persistedFolder in ctrl.formValues.PersistedFolders">
-                <div ng-if="ctrl.availableVolumes.length > 0 && ctrl.application.ApplicationType !== ctrl.ApplicationTypes.STATEFULSET">
-                  <label for="use_existing_volumes_{{ $index }}" class="control-label text-left">
-                    Use existing volumes
-                  </label>
-                  <label class="switch" style="margin-left: 20px;">
-                    <input
-                      id="use_existing_volumes_{{ $index }}"
-                      type="checkbox"
-                      ng-model="ctrl.state.useExistingVolume[$index]"
-                      ng-change="ctrl.onChangeExistingVolume($index)"
-                    /><i></i>
-                  </label>
-                </div>
-
                 <div style="margin-top: 2px;">
                   <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: persistedFolder.NeedsDeletion }">
                     <span class="input-group-addon">path in container</span>
@@ -348,7 +334,28 @@
                     />
                   </div>
 
-                  <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: persistedFolder.NeedsDeletion }" ng-if="!ctrl.state.useExistingVolume[$index]">
+                  <div class="input-group col-sm-2 input-group-sm">
+                    <span class="btn-group btn-group-sm" ng-class="{ striked: persistedFolder.NeedsDeletion }">
+                      <label
+                        class="btn btn-primary"
+                        ng-model="persistedFolder.UseNewVolume"
+                        uib-btn-radio="true"
+                        ng-change="ctrl.useNewVolume($index)"
+                        ng-disabled="ctrl.isEditAndExistingPersistedFolder($index)"
+                        >New volume</label
+                      >
+                      <label
+                        class="btn btn-primary"
+                        ng-model="persistedFolder.UseNewVolume"
+                        uib-btn-radio="false"
+                        ng-change="ctrl.useExistingVolume($index)"
+                        ng-disabled="ctrl.availableVolumes.length === 0 || ctrl.application.ApplicationType === ctrl.ApplicationTypes.STATEFULSET"
+                        >Use an existing volume</label
+                      >
+                    </span>
+                  </div>
+
+                  <div class="input-group col-sm-2 input-group-sm" ng-class="{ striked: persistedFolder.NeedsDeletion }" ng-if="persistedFolder.UseNewVolume">
                     <span class="input-group-addon">requested size</span>
                     <input
                       type="number"
@@ -374,7 +381,7 @@
                     class="input-group col-sm-3 input-group-sm"
                     ng-class="{ striked: persistedFolder.NeedsDeletion }"
                     style="vertical-align: top;"
-                    ng-if="!ctrl.state.useExistingVolume[$index]"
+                    ng-if="persistedFolder.UseNewVolume"
                   >
                     <span class="input-group-addon">storage</span>
                     <select
@@ -387,7 +394,8 @@
                     <input ng-if="!ctrl.hasMultipleStorageClassesAvailable()" type="text" class="form-control" disabled ng-model="persistedFolder.StorageClass.Name" />
                   </div>
 
-                  <div class="input-group col-sm-7 input-group-sm" ng-if="ctrl.state.useExistingVolume[$index]">
+                  <div class="input-group col-sm-5 input-group-sm" ng-if="!persistedFolder.UseNewVolume" ng-class="{ striked: persistedFolder.NeedsDeletion }">
+                    <span class="input-group-addon">volume</span>
                     <select
                       class="form-control"
                       name="existing_volumes_{{ $index }}"
@@ -400,13 +408,15 @@
                     </select>
                   </div>
 
-                  <div class="input-group col-sm-1 input-group-sm" style="vertical-align: top;" ng-if="!ctrl.isEditAndStatefulSet()" ng-if="!ctrl.state.useExistingVolume[$index]">
-                    <button ng-if="!persistedFolder.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removePersistedFolder($index)">
-                      <i class="fa fa-times" aria-hidden="true"></i>
-                    </button>
-                    <button ng-if="persistedFolder.NeedsDeletion" class="btn btn-sm btn-primary" type="button" ng-click="ctrl.restorePersistedFolder($index)">
-                      Restore
-                    </button>
+                  <div class="input-group col-sm-1 input-group-sm">
+                    <div style="vertical-align: top;" ng-if="!ctrl.isEditAndStatefulSet()" ng-if="!ctrl.state.useExistingVolume[$index]">
+                      <button ng-if="!persistedFolder.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removePersistedFolder($index)">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                      </button>
+                      <button ng-if="persistedFolder.NeedsDeletion" class="btn btn-sm btn-primary" type="button" ng-click="ctrl.restorePersistedFolder($index)">
+                        Restore
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -434,7 +444,9 @@
                     </div>
                   </div>
 
-                  <div class="input-group col-sm-3 input-group-sm">
+                  <div class="input-group col-sm-2 input-group-sm"></div>
+
+                  <div class="input-group col-sm-2 input-group-sm">
                     <div class="small text-warning" style="margin-top: 5px;" ng-show="kubernetesApplicationCreationForm['persisted_folder_size_' + $index].$invalid">
                       <ng-messages for="kubernetesApplicationCreationForm['persisted_folder_size_' + $index].$error">
                         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Size is required.</p>
