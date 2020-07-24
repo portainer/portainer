@@ -13,6 +13,11 @@ func getPortainerUserDefaultPolicies() []rbacv1.PolicyRule {
 			Resources: []string{"namespaces", "nodes"},
 			APIGroups: []string{""},
 		},
+		{
+			Verbs:     []string{"list"},
+			Resources: []string{"storageclasses"},
+			APIGroups: []string{"storage.k8s.io"},
+		},
 	}
 }
 
