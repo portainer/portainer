@@ -14,7 +14,6 @@ angular.module('portainer', [
   'ui.router',
   'ui.select',
   'isteven-multi-select',
-  'ngCookies',
   'ngSanitize',
   'ngFileUpload',
   'ngMessages',

@@ -22,7 +22,8 @@ angular.module('portainer.docker').controller('NetworkMacvlanFormController', [
       return !ctrl.data.SelectedNetworkConfig;
     };
 
-    function initComponent() {
+    this.$onInit = $onInit;
+    function $onInit() {
       var isAdmin = Authentication.isAdmin();
       ctrl.isAdmin = isAdmin;
 
@@ -44,7 +45,5 @@ angular.module('portainer.docker').controller('NetworkMacvlanFormController', [
           Notifications.error('Failure', err, 'Unable to retrieve informations for macvlan');
         });
     }
-
-    initComponent();
   },
 ]);
