@@ -1,5 +1,5 @@
 import angular from 'angular';
-import _ from 'lodash-es';
+import * as _ from 'lodash-es';
 import KubernetesStackHelper from 'Kubernetes/helpers/stackHelper';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 
@@ -10,6 +10,7 @@ class KubernetesApplicationsController {
     this.$state = $state;
     this.Notifications = Notifications;
     this.KubernetesApplicationService = KubernetesApplicationService;
+
     this.Authentication = Authentication;
     this.ModalService = ModalService;
     this.LocalStorage = LocalStorage;
@@ -95,9 +96,10 @@ class KubernetesApplicationsController {
 
   async getApplicationsAsync() {
     try {
-      this.applications = await this.KubernetesApplicationService.get();
-      this.stacks = KubernetesStackHelper.stacksFromApplications(this.applications);
-      this.ports = KubernetesApplicationHelper.portMappingsFromApplications(this.applications);
+      const applications = await this.KubernetesApplicationService.get();
+      this.applications = applications;
+      this.stacks = KubernetesStackHelper.stacksFromApplications(applications);
+      this.ports = KubernetesApplicationHelper.portMappingsFromApplications(applications);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve applications');
     }
@@ -109,13 +111,11 @@ class KubernetesApplicationsController {
 
   async onInit() {
     this.state = {
-      activeTab: 0,
+      activeTab: this.LocalStorage.getActiveTab('applications'),
       currentName: this.$state.$current.name,
       isAdmin: this.Authentication.isAdmin(),
       viewReady: false,
     };
-
-    this.state.activeTab = this.LocalStorage.getActiveTab('applications');
 
     await this.getApplications();
 
