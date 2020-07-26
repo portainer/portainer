@@ -15,7 +15,6 @@ issues:
     - kind/question
     - kind/style
     - kind/workaround
-    - kind/bug
     - bug/need-confirmation
     - bug/confirmed
     - status/discuss
