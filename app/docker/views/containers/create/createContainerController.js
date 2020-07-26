@@ -612,10 +612,9 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       Volume.query(
         {},
         function (d) {
-          d.Volumes.sort((vol1, vol2) => {
+          $scope.availableVolumes = d.Volumes.sort((vol1, vol2) => {
             return vol1.Name.localeCompare(vol2.Name);
           });
-          $scope.availableVolumes = d.Volumes;
         },
         function (e) {
           Notifications.error('Failure', e, 'Unable to retrieve volumes');
