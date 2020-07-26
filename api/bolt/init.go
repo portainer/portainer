@@ -29,6 +29,7 @@ func (store *Store) Init() error {
 			AllowPrivilegedModeForRegularUsers: true,
 			AllowVolumeBrowserForRegularUsers:  false,
 			AllowHostNamespaceForRegularUsers:  true,
+			AllowDeviceMappingForRegularUsers:  true,
 			EnableHostManagementFeatures:       false,
 			EdgeAgentCheckinInterval:           portainer.DefaultEdgeAgentCheckinIntervalInSeconds,
 			TemplatesURL:                       portainer.DefaultTemplatesURL,

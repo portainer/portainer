@@ -7,13 +7,14 @@ export function SettingsViewModel(data) {
   this.AllowBindMountsForRegularUsers = data.AllowBindMountsForRegularUsers;
   this.AllowPrivilegedModeForRegularUsers = data.AllowPrivilegedModeForRegularUsers;
   this.AllowVolumeBrowserForRegularUsers = data.AllowVolumeBrowserForRegularUsers;
+  this.AllowHostNamespaceForRegularUsers = data.AllowHostNamespaceForRegularUsers;
+  this.AllowDeviceMappingForRegularUsers = data.AllowDeviceMappingForRegularUsers;
   this.SnapshotInterval = data.SnapshotInterval;
   this.TemplatesURL = data.TemplatesURL;
   this.EnableHostManagementFeatures = data.EnableHostManagementFeatures;
   this.EdgeAgentCheckinInterval = data.EdgeAgentCheckinInterval;
   this.EnableEdgeComputeFeatures = data.EnableEdgeComputeFeatures;
   this.UserSessionTimeout = data.UserSessionTimeout;
-  this.AllowHostNamespaceForRegularUsers = data.AllowHostNamespaceForRegularUsers;
 }
 
 export function PublicSettingsViewModel(settings) {
@@ -25,6 +26,7 @@ export function PublicSettingsViewModel(settings) {
   this.EnableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
   this.LogoURL = settings.LogoURL;
   this.OAuthLoginURI = settings.OAuthLoginURI;
+  this.AllowDeviceMappingForRegularUsers = settings.AllowDeviceMappingForRegularUsers;
 }
 
 export function LDAPSettingsViewModel(data) {
