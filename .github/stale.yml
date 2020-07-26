@@ -12,14 +12,14 @@ issues:
   # Issues with these labels will never be considered stale
   exemptLabels:
     - kind/enhancement
-    - kind/feature
     - kind/question
     - kind/style
     - kind/workaround
+    - kind/bug
     - bug/need-confirmation
     - bug/confirmed
     - status/discuss
-  
+
   # Only issues with all of these labels are checked if stale. Defaults to `[]` (disabled)
   onlyLabels: []
 
@@ -35,9 +35,9 @@ issues:
 
   # Comment to post when marking an issue as stale. Set to `false` to disable
   markComment: >
-    This issue has been marked as stale as it has not had recent activity, 
+    This issue has been marked as stale as it has not had recent activity,
     it will be closed if no further activity occurs in the next 7 days.
-    If you believe that it has been incorrectly labelled as stale, 
+    If you believe that it has been incorrectly labelled as stale,
     leave a comment and the label will be removed.
 
   # Comment to post when removing the stale label.
@@ -49,7 +49,6 @@ issues:
     Since no further activity has appeared on this issue it will be closed.
     If you believe that it has been incorrectly closed, leave a comment
     and mention @itsconquest. One of our staff will then review the issue.
-    
+
     Note - If it is an old bug report, make sure that it is reproduceable in the
     latest version of Portainer as it may have already been fixed.
-    
