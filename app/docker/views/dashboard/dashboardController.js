@@ -72,7 +72,7 @@ angular.module('portainer.docker').controller('DashboardController', [
     }
 
     async function shouldShowStacks() {
-      const isAdmin = !$scope.applicationState.application.authentication || Authentication.isAdmin();
+      const isAdmin = Authentication.isAdmin();
       const { allowStackManagementForRegularUsers } = $scope.applicationState.application;
 
       if (isAdmin || allowStackManagementForRegularUsers) {
