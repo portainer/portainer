@@ -260,6 +260,7 @@ class KubernetesApplicationConverter {
     res.EnvironmentVariables = KubernetesApplicationHelper.generateEnvVariablesFromEnv(app.Env);
     res.PersistedFolders = KubernetesApplicationHelper.generatePersistedFoldersFormValuesFromPersistedFolders(app.PersistedFolders, persistentVolumeClaims); // generate from PVC and app.PersistedFolders
     res.Configurations = KubernetesApplicationHelper.generateConfigurationFormValuesFromEnvAndVolumes(app.Env, app.ConfigurationVolumes, configurations);
+    res.AutoScaler = KubernetesApplicationHelper.generateAutoScalerFormValueFromHorizontalPodAutoScaler(app.AutoScaler);
 
     if (app.ServiceType === KubernetesServiceTypes.LOAD_BALANCER) {
       res.PublishingType = KubernetesApplicationPublishingTypes.LOAD_BALANCER;

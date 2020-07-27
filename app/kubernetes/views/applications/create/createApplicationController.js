@@ -17,6 +17,7 @@ import {
   KubernetesApplicationFormValues,
   KubernetesApplicationPersistedFolderFormValue,
   KubernetesApplicationPublishedPortFormValue,
+  KubernetesApplicationAutoScalerFormValue,
 } from 'Kubernetes/models/application/formValues';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import KubernetesApplicationConverter from 'Kubernetes/converters/application';
@@ -578,7 +579,6 @@ class KubernetesCreateApplicationController {
           namespace: this.$transition$.params().namespace,
           name: this.$transition$.params().name,
         },
-        enableAutoScaling: false,
       };
 
       this.editChanges = [];
@@ -612,6 +612,10 @@ class KubernetesCreateApplicationController {
         this.formValues = KubernetesApplicationConverter.applicationToFormValues(this.application, this.resourcePools, this.configurations, this.persistentVolumeClaims);
         this.savedFormValues = angular.copy(this.formValues);
         delete this.formValues.ApplicationType;
+      } else {
+        this.formValues.AutoScaler = new KubernetesApplicationAutoScalerFormValue();
+        this.formValues.AutoScaler.MinReplicas = this.formValues.ReplicaCount;
+        this.formValues.AutoScaler.MaxReplicas = this.formValues.ReplicaCount;
       }
 
       await this.updateSliders();

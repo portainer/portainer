@@ -12,10 +12,10 @@ class KubernetesHorizontalPodAutoScalerService {
 
     this.getAsync = this.getAsync.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
-    // this.createAsync = this.createAsync.bind(this);
-    // this.patchAsync = this.patchAsync.bind(this);
+    this.createAsync = this.createAsync.bind(this);
+    this.patchAsync = this.patchAsync.bind(this);
     // this.rollbackAsync = this.rollbackAsync.bind(this);
-    // this.deleteAsync = this.deleteAsync.bind(this);
+    this.deleteAsync = this.deleteAsync.bind(this);
   }
 
   /**
@@ -75,43 +75,43 @@ class KubernetesHorizontalPodAutoScalerService {
   /**
    * PATCH
    */
-  // async patchAsync(oldHorizontalPodAutoScaler, newHorizontalPodAutoScaler) {
-  //   try {
-  //     const params = new KubernetesCommonParams();
-  //     params.id = newHorizontalPodAutoScaler.Name;
-  //     const namespace = newHorizontalPodAutoScaler.Namespace;
-  //     const payload = KubernetesHorizontalPodAutoScalerConverter.patchPayload(oldHorizontalPodAutoScaler, newHorizontalPodAutoScaler);
-  //     if (!payload.length) {
-  //       return;
-  //     }
-  //     const data = await this.KubernetesHorizontalPodAutoScalers(namespace).patch(params, payload).$promise;
-  //     return data;
-  //   } catch (err) {
-  //     throw new PortainerError('Unable to patch horizontalPodAutoScaler', err);
-  //   }
-  // }
+  async patchAsync(oldHorizontalPodAutoScaler, newHorizontalPodAutoScaler) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = newHorizontalPodAutoScaler.Name;
+      const namespace = newHorizontalPodAutoScaler.Namespace;
+      const payload = KubernetesHorizontalPodAutoScalerConverter.patchPayload(oldHorizontalPodAutoScaler, newHorizontalPodAutoScaler);
+      if (!payload.length) {
+        return;
+      }
+      const data = await this.KubernetesHorizontalPodAutoScalers(namespace).patch(params, payload).$promise;
+      return data;
+    } catch (err) {
+      throw new PortainerError('Unable to patch horizontalPodAutoScaler', err);
+    }
+  }
 
-  // patch(oldHorizontalPodAutoScaler, newHorizontalPodAutoScaler) {
-  //   return this.$async(this.patchAsync, oldHorizontalPodAutoScaler, newHorizontalPodAutoScaler);
-  // }
+  patch(oldHorizontalPodAutoScaler, newHorizontalPodAutoScaler) {
+    return this.$async(this.patchAsync, oldHorizontalPodAutoScaler, newHorizontalPodAutoScaler);
+  }
 
-  // /**
-  //  * DELETE
-  //  */
-  // async deleteAsync(horizontalPodAutoScaler) {
-  //   try {
-  //     const params = new KubernetesCommonParams();
-  //     params.id = horizontalPodAutoScaler.Name;
-  //     const namespace = horizontalPodAutoScaler.Namespace;
-  //     await this.KubernetesHorizontalPodAutoScalers(namespace).delete(params).$promise;
-  //   } catch (err) {
-  //     throw new PortainerError('Unable to remove horizontalPodAutoScaler', err);
-  //   }
-  // }
+  /**
+   * DELETE
+   */
+  async deleteAsync(horizontalPodAutoScaler) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = horizontalPodAutoScaler.Name;
+      const namespace = horizontalPodAutoScaler.Namespace;
+      await this.KubernetesHorizontalPodAutoScalers(namespace).delete(params).$promise;
+    } catch (err) {
+      throw new PortainerError('Unable to remove horizontalPodAutoScaler', err);
+    }
+  }
 
-  // delete(horizontalPodAutoScaler) {
-  //   return this.$async(this.deleteAsync, horizontalPodAutoScaler);
-  // }
+  delete(horizontalPodAutoScaler) {
+    return this.$async(this.deleteAsync, horizontalPodAutoScaler);
+  }
 
   // /**
   //  * ROLLBACK

@@ -7,7 +7,7 @@ const _KubernetesHorizontalPodAutoScaler = Object.freeze({
   Name: '',
   MinReplicas: 1,
   MaxReplicas: 1,
-  TargetCPUUtilizationPercentage: undefined,
+  TargetCPUUtilization: 0,
   TargetEntity: {
     ApiVersion: '',
     Kind: '',
