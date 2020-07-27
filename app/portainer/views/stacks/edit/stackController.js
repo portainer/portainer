@@ -197,7 +197,7 @@ angular.module('portainer.app').controller('StackController', [
       $scope.state.actionInProgress = true;
       try {
         await StackService.stop($scope.stack.Id);
-        $state.go('portainer.stacks.stack', { id: $scope.stack.Id }, { reload: true });
+        $state.reload();
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to stop stack');
       }
@@ -213,7 +213,7 @@ angular.module('portainer.app').controller('StackController', [
       const id = $scope.stack.Id;
       try {
         await StackService.start(id);
-        $state.go('portainer.stacks.stack', { id }, { reload: true });
+        $state.reload();
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to start stack');
       }
