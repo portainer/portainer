@@ -29,7 +29,7 @@ angular.module('portainer.app').controller('StacksDatatableController', [
     this.applyFilters = applyFilters.bind(this);
     function applyFilters(stack) {
       const { showActiveStacks, showUnactiveStacks } = this.filters.state;
-      return (stack.Status === 1 && showActiveStacks) || (stack.Status === 2 && showUnactiveStacks);
+      return (stack.Status === 1 && showActiveStacks) || (stack.Status === 2 && showUnactiveStacks) || stack.External;
     }
 
     this.onFilterChange = onFilterChange.bind(this);
