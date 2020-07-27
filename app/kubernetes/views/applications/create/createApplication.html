@@ -329,13 +329,18 @@
                       name="persisted_folder_path_{{ $index }}"
                       ng-model="persistedFolder.ContainerPath"
                       ng-change="ctrl.onChangePersistedFolderPath($index)"
+                      ng-disabled="ctrl.isEditAndExistingPersistedFolder($index)"
                       placeholder="/data"
                       required
                     />
                   </div>
 
                   <div class="input-group col-sm-2 input-group-sm">
-                    <span class="btn-group btn-group-sm" ng-class="{ striked: persistedFolder.NeedsDeletion }">
+                    <span
+                      class="btn-group btn-group-sm"
+                      ng-class="{ striked: persistedFolder.NeedsDeletion }"
+                      ng-if="!ctrl.isEditAndExistingPersistedFolder($index) && ctrl.application.ApplicationType !== ctrl.ApplicationTypes.STATEFULSET"
+                    >
                       <label
                         class="btn btn-primary"
                         ng-model="persistedFolder.UseNewVolume"
@@ -402,6 +407,7 @@
                       ng-model="ctrl.formValues.PersistedFolders[$index].ExistingVolume"
                       ng-options="vol as vol.PersistentVolumeClaim.Name for vol in ctrl.availableVolumes"
                       ng-change="ctrl.onChangeExistingVolumeSelection()"
+                      ng-disabled="ctrl.isEditAndExistingPersistedFolder($index)"
                       required
                     >
                       <option selected disabled hidden value="">Select a volume</option>
