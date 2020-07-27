@@ -670,10 +670,14 @@
             <!-- !replica count -->
 
             <!-- auto scaling -->
+            <div class="col-sm-12 form-section-title">
+              Auto-scaling
+            </div>
+
             <div class="form-group">
               <div class="col-sm-12">
                 <label for="enable_auto_scaling" class="control-label text-left">
-                  Enable auto scaling
+                  Enable auto scaling for this application
                 </label>
                 <label class="switch" style="margin-left: 20px;">
                   <input type="checkbox" class="form-control" name="enable_auto_scaling" ng-model="ctrl.formValues.AutoScaler.IsUsed" />
@@ -681,20 +685,21 @@
                 </label>
               </div>
             </div>
-            <div class="col-sm-12 form-inline" ng-if="ctrl.formValues.AutoScaler.IsUsed">
+
+            <div class="form-inline" ng-if="ctrl.formValues.AutoScaler.IsUsed">
               <table class="table">
                 <tbody>
-                  <tr class="text-muted">
-                    <td style="width: 33%;">Minimum instances</td>
-                    <td style="width: 33%;">Maximum instances</td>
-                    <td style="width: 33%;">
+                  <tr class="small">
+                    <td style="width: 33%; border: none; padding: 2px 0 2px 0;">Minimum instances</td>
+                    <td style="width: 33%; border: none; padding: 2px 0 2px 0;">Maximum instances</td>
+                    <td style="width: 33%; border: none; padding: 2px 0 2px 0;">
                       Target CPU usage (<b>%</b>)
                       <portainer-tooltip position="bottom" message="The autoscaler will ensure enough instances are running to maintain an average CPU usage across all instances.">
                       </portainer-tooltip>
                     </td>
                   </tr>
                   <tr>
-                    <td>
+                    <td style="padding: 8px 5px 5px 0; border: none;">
                       <div class="input-group input-group-sm" style="width: 100%;">
                         <input
                           type="number"
@@ -716,7 +721,7 @@
                         </div>
                       </div>
                     </td>
-                    <td>
+                    <td style="padding: 8px 5px 5px 0; border: none;">
                       <div class="input-group input-group-sm" style="width: 100%;">
                         <input
                           type="number"
@@ -735,9 +740,9 @@
                         </div>
                       </div>
                     </td>
-                    <td>
+                    <td style="padding: 8px 5px 5px 0; border: none;">
                       <div class="input-group input-group-sm" style="width: 100%;">
-                        <input type="number" class="form-control" name="auto_scaler_cpu" ng-model="ctrl.formValues.AutoScaler.TargetCPUUtilization" min="0" max="100" required />
+                        <input type="number" class="form-control" name="auto_scaler_cpu" ng-model="ctrl.formValues.AutoScaler.TargetCPUUtilization" min="1" max="100" required />
                       </div>
                       <div class="input-group input-group-sm" ng-show="kubernetesApplicationCreationForm['auto_scaler_cpu'].$invalid">
                         <div class="small text-warning" style="margin-top: 5px;">
