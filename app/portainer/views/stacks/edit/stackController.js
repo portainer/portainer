@@ -194,6 +194,15 @@ angular.module('portainer.app').controller('StackController', [
       return $async(stopStackAsync);
     }
     async function stopStackAsync() {
+      const confirmed = await ModalService.confirmAsync({
+        title: 'Are you sure?',
+        message: 'Are you sure you want to stop this stack?',
+        buttons: { confirm: { label: 'Stop', className: 'btn-danger' } },
+      });
+      if (!confirmed) {
+        return;
+      }
+
       $scope.state.actionInProgress = true;
       try {
         await StackService.stop($scope.stack.Id);

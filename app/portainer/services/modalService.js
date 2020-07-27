@@ -37,6 +37,13 @@ angular.module('portainer.app').factory('ModalService', [
       });
     };
 
+    service.confirmAsync = confirmAsync;
+    function confirmAsync(options) {
+      return new Promise((resolve) => {
+        service.confirm({ ...options, callback: (confirmed) => resolve(confirmed) });
+      });
+    }
+
     service.confirm = function (options) {
       var box = bootbox.confirm({
         title: options.title,
