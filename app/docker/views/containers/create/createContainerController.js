@@ -626,10 +626,9 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       var provider = $scope.applicationState.endpoint.mode.provider;
       var apiVersion = $scope.applicationState.endpoint.apiVersion;
       NetworkService.networks(provider === 'DOCKER_STANDALONE' || provider === 'DOCKER_SWARM_MODE', false, provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25)
-        .then(function success(data) {
-          var networks = data;
+        .then(function success(networks) {
           networks.push({ Name: 'container' });
-          $scope.availableNetworks = networks;
+          $scope.availableNetworks = networks.sort((a, b) => a.Name.localeCompare(b.Name));
 
           if (_.find(networks, { Name: 'nat' })) {
             $scope.config.HostConfig.NetworkMode = 'nat';
