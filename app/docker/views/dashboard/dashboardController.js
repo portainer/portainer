@@ -1,6 +1,7 @@
 angular.module('portainer.docker').controller('DashboardController', [
   '$scope',
   '$q',
+  'Authentication',
   'ContainerService',
   'ImageService',
   'NetworkService',
@@ -11,10 +12,12 @@ angular.module('portainer.docker').controller('DashboardController', [
   'EndpointService',
   'Notifications',
   'EndpointProvider',
+  'ExtensionService',
   'StateManager',
   function (
     $scope,
     $q,
+    Authentication,
     ContainerService,
     ImageService,
     NetworkService,
@@ -25,6 +28,7 @@ angular.module('portainer.docker').controller('DashboardController', [
     EndpointService,
     Notifications,
     EndpointProvider,
+    ExtensionService,
     StateManager
   ) {
     $scope.dismissInformationPanel = function (id) {
@@ -32,11 +36,14 @@ angular.module('portainer.docker').controller('DashboardController', [
     };
 
     $scope.offlineMode = false;
+    $scope.showStacks = false;
 
-    function initView() {
+    async function initView() {
       const endpointMode = $scope.applicationState.endpoint.mode;
       const endpointId = EndpointProvider.endpointID();
       $scope.endpointId = endpointId;
+
+      $scope.showStacks = await shouldShowStacks();
 
       $q.all({
         containers: ContainerService.containers(1),
@@ -62,6 +69,19 @@ angular.module('portainer.docker').controller('DashboardController', [
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to load dashboard data');
         });
+    }
+
+    async function shouldShowStacks() {
+      const isAdmin = Authentication.isAdmin();
+      const { allowStackManagementForRegularUsers } = $scope.applicationState.application;
+
+      if (isAdmin || allowStackManagementForRegularUsers) {
+        return true;
+      }
+      const rbacEnabled = await ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC);
+      if (rbacEnabled) {
+        return Authentication.hasAuthorizations(['EndpointResourcesAccess']);
+      }
     }
 
     initView();

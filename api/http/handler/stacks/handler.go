@@ -58,8 +58,9 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 }
 
 func (handler *Handler) userCanAccessStack(securityContext *security.RestrictedRequestContext, endpointID portainer.EndpointID, resourceControl *portainer.ResourceControl) (bool, error) {
-	if securityContext.IsAdmin {
-		return true, nil
+	user, err := handler.DataStore.User().User(securityContext.UserID)
+	if err != nil {
+		return false, err
 	}
 
 	userTeamIDs := make([]portainer.TeamID, 0)
@@ -71,23 +72,7 @@ func (handler *Handler) userCanAccessStack(securityContext *security.RestrictedR
 		return true, nil
 	}
 
-	_, err := handler.DataStore.Extension().Extension(portainer.RBACExtension)
-	if err == bolterrors.ErrObjectNotFound {
-		return false, nil
-	} else if err != nil && err != bolterrors.ErrObjectNotFound {
-		return false, err
-	}
-
-	user, err := handler.DataStore.User().User(securityContext.UserID)
-	if err != nil {
-		return false, err
-	}
-
-	_, ok := user.EndpointAuthorizations[endpointID][portainer.EndpointResourcesAccess]
-	if ok {
-		return true, nil
-	}
-	return false, nil
+	return handler.userIsAdminOrEndpointAdmin(user, endpointID)
 }
 
 func (handler *Handler) userIsAdminOrEndpointAdmin(user *portainer.User, endpointID portainer.EndpointID) (bool, error) {
@@ -108,4 +93,13 @@ func (handler *Handler) userIsAdminOrEndpointAdmin(user *portainer.User, endpoin
 	_, endpointResourceAccess := user.EndpointAuthorizations[portainer.EndpointID(endpointID)][portainer.EndpointResourcesAccess]
 
 	return endpointResourceAccess, nil
+}
+
+func (handler *Handler) userCanCreateStack(securityContext *security.RestrictedRequestContext, endpointID portainer.EndpointID) (bool, error) {
+	user, err := handler.DataStore.User().User(securityContext.UserID)
+	if err != nil {
+		return false, err
+	}
+
+	return handler.userIsAdminOrEndpointAdmin(user, endpointID)
 }

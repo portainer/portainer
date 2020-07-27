@@ -510,22 +510,23 @@ type (
 
 	// Settings represents the application settings
 	Settings struct {
-		LogoURL                            string               `json:"LogoURL"`
-		BlackListedLabels                  []Pair               `json:"BlackListedLabels"`
-		AuthenticationMethod               AuthenticationMethod `json:"AuthenticationMethod"`
-		LDAPSettings                       LDAPSettings         `json:"LDAPSettings"`
-		OAuthSettings                      OAuthSettings        `json:"OAuthSettings"`
-		AllowBindMountsForRegularUsers     bool                 `json:"AllowBindMountsForRegularUsers"`
-		AllowPrivilegedModeForRegularUsers bool                 `json:"AllowPrivilegedModeForRegularUsers"`
-		AllowVolumeBrowserForRegularUsers  bool                 `json:"AllowVolumeBrowserForRegularUsers"`
-		AllowHostNamespaceForRegularUsers  bool                 `json:"AllowHostNamespaceForRegularUsers"`
-		AllowDeviceMappingForRegularUsers  bool                 `json:"AllowDeviceMappingForRegularUsers"`
-		SnapshotInterval                   string               `json:"SnapshotInterval"`
-		TemplatesURL                       string               `json:"TemplatesURL"`
-		EnableHostManagementFeatures       bool                 `json:"EnableHostManagementFeatures"`
-		EdgeAgentCheckinInterval           int                  `json:"EdgeAgentCheckinInterval"`
-		EnableEdgeComputeFeatures          bool                 `json:"EnableEdgeComputeFeatures"`
-		UserSessionTimeout                 string               `json:"UserSessionTimeout"`
+		LogoURL                             string               `json:"LogoURL"`
+		BlackListedLabels                   []Pair               `json:"BlackListedLabels"`
+		AuthenticationMethod                AuthenticationMethod `json:"AuthenticationMethod"`
+		LDAPSettings                        LDAPSettings         `json:"LDAPSettings"`
+		OAuthSettings                       OAuthSettings        `json:"OAuthSettings"`
+		AllowBindMountsForRegularUsers      bool                 `json:"AllowBindMountsForRegularUsers"`
+		AllowPrivilegedModeForRegularUsers  bool                 `json:"AllowPrivilegedModeForRegularUsers"`
+		AllowVolumeBrowserForRegularUsers   bool                 `json:"AllowVolumeBrowserForRegularUsers"`
+		AllowHostNamespaceForRegularUsers   bool                 `json:"AllowHostNamespaceForRegularUsers"`
+		AllowDeviceMappingForRegularUsers   bool                 `json:"AllowDeviceMappingForRegularUsers"`
+		AllowStackManagementForRegularUsers bool                 `json:"AllowStackManagementForRegularUsers"`
+		SnapshotInterval                    string               `json:"SnapshotInterval"`
+		TemplatesURL                        string               `json:"TemplatesURL"`
+		EnableHostManagementFeatures        bool                 `json:"EnableHostManagementFeatures"`
+		EdgeAgentCheckinInterval            int                  `json:"EdgeAgentCheckinInterval"`
+		EnableEdgeComputeFeatures           bool                 `json:"EnableEdgeComputeFeatures"`
+		UserSessionTimeout                  string               `json:"UserSessionTimeout"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
