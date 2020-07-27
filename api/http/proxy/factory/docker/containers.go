@@ -163,6 +163,7 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 			Devices    []interface{} `json:"Devices"`
 			CapAdd     []string      `json:"CapAdd"`
 			CapDrop    []string      `json:"CapDrop"`
+			Binds      []string      `json:"Binds"`
 		} `json:"HostConfig"`
 	}
 
@@ -224,6 +225,10 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 
 		if !settings.AllowContainerCapabilitiesForRegularUsers && (len(partialContainer.HostConfig.CapAdd) > 0 || len(partialContainer.HostConfig.CapDrop) > 0) {
 			return nil, errors.New("forbidden to use container capabilities")
+		}
+
+		if !settings.AllowBindMountsForRegularUsers && (len(partialContainer.HostConfig.Binds) > 0) {
+			return nil, errors.New("forbidden to use bind mounts")
 		}
 
 		request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
