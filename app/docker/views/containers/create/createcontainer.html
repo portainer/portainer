@@ -394,9 +394,14 @@
               <div class="form-group">
                 <label for="container_network" class="col-sm-2 col-lg-1 control-label text-left">Network</label>
                 <div class="col-sm-9">
-                  <select class="form-control" ng-model="config.HostConfig.NetworkMode" id="container_network" ng-change="resetNetworkConfig()">
+                  <select
+                    class="form-control"
+                    ng-options="net.Name as net.Name for net in availableNetworks"
+                    ng-model="config.HostConfig.NetworkMode"
+                    id="container_network"
+                    ng-change="resetNetworkConfig()"
+                  >
                     <option selected disabled hidden value="">Select a network</option>
-                    <option ng-repeat="net in availableNetworks | orderBy: 'Name'" ng-value="net.Name">{{ net.Name }}</option>
                   </select>
                 </div>
               </div>
