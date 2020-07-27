@@ -1152,7 +1152,7 @@ const (
 	// DefaultEdgeAgentCheckinIntervalInSeconds represents the default interval (in seconds) used by Edge agents to checkin with the Portainer instance
 	DefaultEdgeAgentCheckinIntervalInSeconds = 5
 	// LocalExtensionManifestFile represents the name of the local manifest file for extensions
-	LocalExtensionManifestFile = "/extensions.json"
+	LocalExtensionManifestFile = "/app/extensions.json"
 	// DefaultTemplatesURL represents the URL to the official templates supported by Portainer
 	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates-2.0.json"
 	// DefaultUserSessionTimeout represents the default timeout after which the user session is cleared
