@@ -10,6 +10,7 @@ export function SettingsViewModel(data) {
   this.AllowHostNamespaceForRegularUsers = data.AllowHostNamespaceForRegularUsers;
   this.AllowDeviceMappingForRegularUsers = data.AllowDeviceMappingForRegularUsers;
   this.AllowStackManagementForRegularUsers = data.AllowStackManagementForRegularUsers;
+  this.AllowContainerCapabilitiesForRegularUsers = data.AllowContainerCapabilitiesForRegularUsers;
   this.SnapshotInterval = data.SnapshotInterval;
   this.TemplatesURL = data.TemplatesURL;
   this.EnableHostManagementFeatures = data.EnableHostManagementFeatures;
@@ -24,6 +25,7 @@ export function PublicSettingsViewModel(settings) {
   this.AllowVolumeBrowserForRegularUsers = settings.AllowVolumeBrowserForRegularUsers;
   this.AllowDeviceMappingForRegularUsers = settings.AllowDeviceMappingForRegularUsers;
   this.AllowStackManagementForRegularUsers = settings.AllowStackManagementForRegularUsers;
+  this.AllowContainerCapabilitiesForRegularUsers = settings.AllowContainerCapabilitiesForRegularUsers;
   this.AuthenticationMethod = settings.AuthenticationMethod;
   this.EnableHostManagementFeatures = settings.EnableHostManagementFeatures;
   this.EnableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;

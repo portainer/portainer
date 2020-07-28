@@ -35,6 +35,7 @@ angular.module('portainer.app').controller('SettingsController', [
       restrictHostNamespaceForRegularUsers: false,
       allowDeviceMappingForRegularUsers: false,
       allowStackManagementForRegularUsers: false,
+      disableContainerCapabilitiesForRegularUsers: false,
     };
 
     $scope.removeFilteredContainerLabel = function (index) {
@@ -70,6 +71,7 @@ angular.module('portainer.app').controller('SettingsController', [
       settings.AllowHostNamespaceForRegularUsers = !$scope.formValues.restrictHostNamespaceForRegularUsers;
       settings.AllowDeviceMappingForRegularUsers = !$scope.formValues.disableDeviceMappingForRegularUsers;
       settings.AllowStackManagementForRegularUsers = !$scope.formValues.disableStackManagementForRegularUsers;
+      settings.AllowContainerCapabilitiesForRegularUsers = !$scope.formValues.disableContainerCapabilitiesForRegularUsers;
 
       $scope.state.actionInProgress = true;
       updateSettings(settings);
@@ -87,6 +89,7 @@ angular.module('portainer.app').controller('SettingsController', [
           StateManager.updateEnableEdgeComputeFeatures(settings.EnableEdgeComputeFeatures);
           StateManager.updateAllowDeviceMappingForRegularUsers(settings.AllowDeviceMappingForRegularUsers);
           StateManager.updateAllowStackManagementForRegularUsers(settings.AllowStackManagementForRegularUsers);
+          StateManager.updateAllowContainerCapabilitiesForRegularUsers(settings.AllowContainerCapabilitiesForRegularUsers);
           $state.reload();
         })
         .catch(function error(err) {
@@ -114,6 +117,7 @@ angular.module('portainer.app').controller('SettingsController', [
           $scope.formValues.restrictHostNamespaceForRegularUsers = !settings.AllowHostNamespaceForRegularUsers;
           $scope.formValues.disableDeviceMappingForRegularUsers = !settings.AllowDeviceMappingForRegularUsers;
           $scope.formValues.disableStackManagementForRegularUsers = !settings.AllowStackManagementForRegularUsers;
+          $scope.formValues.disableContainerCapabilitiesForRegularUsers = !settings.AllowContainerCapabilitiesForRegularUsers;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve application settings');

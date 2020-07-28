@@ -339,7 +339,8 @@ func (handler *Handler) deployComposeStack(config *composeStackDeploymentConfig)
 	if (!settings.AllowBindMountsForRegularUsers ||
 		!settings.AllowPrivilegedModeForRegularUsers ||
 		!settings.AllowHostNamespaceForRegularUsers ||
-		!settings.AllowDeviceMappingForRegularUsers) &&
+		!settings.AllowDeviceMappingForRegularUsers ||
+		!settings.AllowContainerCapabilitiesForRegularUsers) &&
 		!isAdminOrEndpointAdmin {
 
 		composeFilePath := path.Join(config.stack.ProjectPath, config.stack.EntryPoint)

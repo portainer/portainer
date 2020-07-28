@@ -161,6 +161,8 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 			Privileged bool          `json:"Privileged"`
 			PidMode    string        `json:"PidMode"`
 			Devices    []interface{} `json:"Devices"`
+			CapAdd     []string      `json:"CapAdd"`
+			CapDrop    []string      `json:"CapDrop"`
 		} `json:"HostConfig"`
 	}
 
@@ -218,6 +220,10 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 
 		if !settings.AllowDeviceMappingForRegularUsers && len(partialContainer.HostConfig.Devices) > 0 {
 			return nil, errors.New("forbidden to use device mapping")
+		}
+
+		if !settings.AllowContainerCapabilitiesForRegularUsers && (len(partialContainer.HostConfig.CapAdd) > 0 || len(partialContainer.HostConfig.CapDrop) > 0) {
+			return nil, errors.New("forbidden to use container capabilities")
 		}
 
 		request.Body = ioutil.NopCloser(bytes.NewBuffer(body))

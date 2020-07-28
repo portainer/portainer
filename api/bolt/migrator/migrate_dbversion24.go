@@ -16,5 +16,7 @@ func (m *Migrator) updateSettingsToDB25() error {
 
 	legacySettings.UserSessionTimeout = portainer.DefaultUserSessionTimeout
 
+	legacySettings.AllowContainerCapabilitiesForRegularUsers = true
+
 	return m.settingsService.UpdateSettings(legacySettings)
 }
