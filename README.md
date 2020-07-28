@@ -13,7 +13,6 @@
 **_Portainer_** allows you to manage all your Docker resources (containers, images, volumes, networks and more) ! It is compatible with the _standalone Docker_ engine and with _Docker Swarm mode_.
 
 ## Demo
-
 You can try out the public demo instance: http://demo.portainer.io/ (login with the username **admin** and the password **tryportainer**).
 
 Please note that the public demo cluster is **reset every 15min**.
