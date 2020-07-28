@@ -9,8 +9,7 @@ import (
 	"net/http"
 
 	"github.com/docker/docker/client"
-	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
@@ -207,7 +206,7 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 		}
 
 		if !settings.AllowDeviceMappingForRegularUsers && len(partialContainer.HostConfig.Devices) > 0 {
-			return nil, errors.New("forbidden to use device mapping")
+			return forbiddenResponse, errors.New("forbidden to use device mapping")
 		}
 
 		if !settings.AllowContainerCapabilitiesForRegularUsers && (len(partialContainer.HostConfig.CapAdd) > 0 || len(partialContainer.HostConfig.CapDrop) > 0) {
@@ -215,7 +214,7 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 		}
 
 		if !settings.AllowBindMountsForRegularUsers && (len(partialContainer.HostConfig.Binds) > 0) {
-			return nil, errors.New("forbidden to use bind mounts")
+			return forbiddenResponse, errors.New("forbidden to use bind mounts")
 		}
 
 		request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
