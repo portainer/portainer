@@ -25,6 +25,7 @@ Alternatively, you can deploy a copy of the demo stack inside a [play-with-docke
 
 Unlike the public demo, the playground sessions are deleted after 4 hours. Apart from that, all the settings are same, including default credentials.
 
+
 ## Getting started
 
 - [Deploy Portainer](https://www.portainer.io/installation/)
