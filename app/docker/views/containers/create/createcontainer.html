@@ -35,6 +35,7 @@
               auto-complete="true"
               label-class="col-sm-1"
               input-class="col-sm-11"
+              on-image-change="onImageNameChange()"
             ></por-image-registry>
             <!-- !image-and-registry -->
             <!-- always-pull -->
@@ -192,7 +193,20 @@
               <div class="form-group">
                 <label for="container_command" class="col-sm-2 col-lg-1 control-label text-left">Command</label>
                 <div class="col-sm-9">
-                  <input type="text" class="form-control" ng-model="config.Cmd" id="container_command" placeholder="e.g. /usr/bin/nginx -t -c /mynginx.conf" />
+                  <div class="input-group">
+                    <div class="input-group-btn">
+                      <button class="btn btn-primary" ng-model="formValues.CmdMode" uib-btn-radio="'default'" style="margin-left: 0px;"> Default</button>
+                      <button class="btn btn-primary" ng-model="formValues.CmdMode" uib-btn-radio="'override'">Override</button>
+                    </div>
+                    <input
+                      type="text"
+                      class="form-control"
+                      ng-model="config.Cmd"
+                      ng-disabled="formValues.CmdMode === 'default'"
+                      id="container_command"
+                      placeholder="e.g. /usr/bin/nginx -t -c /mynginx.conf"
+                    />
+                  </div>
                 </div>
               </div>
               <!-- !command-input -->
@@ -200,7 +214,20 @@
               <div class="form-group">
                 <label for="container_entrypoint" class="col-sm-2 col-lg-1 control-label text-left">Entry Point</label>
                 <div class="col-sm-9">
-                  <input type="text" class="form-control" ng-model="config.Entrypoint" id="container_entrypoint" placeholder="e.g. /bin/sh -c" />
+                  <div class="input-group">
+                    <div class="input-group-btn">
+                      <label class="btn btn-primary" ng-model="formValues.EntrypointMode" uib-btn-radio="'default'" style="margin-left: 0px;"> Default</label>
+                      <label class="btn btn-primary" ng-model="formValues.EntrypointMode" uib-btn-radio="'override'">Override</label>
+                    </div>
+                    <input
+                      type="text"
+                      class="form-control"
+                      ng-model="config.Entrypoint"
+                      ng-disabled="formValues.EntrypointMode === 'default'"
+                      id="container_entrypoint"
+                      placeholder="e.g. /bin/sh -c"
+                    />
+                  </div>
                 </div>
               </div>
               <!-- !entrypoint-input -->

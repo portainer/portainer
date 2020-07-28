@@ -77,6 +77,8 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       CpuLimit: 0,
       MemoryLimit: 0,
       MemoryReservation: 0,
+      CmdMode: 'default',
+      EntrypointMode: 'default',
       NodeName: null,
       capabilities: [],
       LogDriverName: '',
@@ -95,6 +97,11 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       $timeout(function () {
         $scope.$broadcast('rzSliderForceRender');
       });
+    };
+
+    $scope.onImageNameChange = function () {
+      $scope.formValues.CmdMode = 'default';
+      $scope.formValues.EntrypointMode = 'default';
     };
 
     $scope.config = {
@@ -210,6 +217,20 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       }
       config.OpenStdin = openStdin;
       config.Tty = tty;
+    }
+
+    function prepareCmd(config) {
+      if (_.isEmpty(config.Cmd) || $scope.formValues.CmdMode == 'default') {
+        delete config.Cmd;
+      } else {
+        config.Cmd = ContainerHelper.commandStringToArray(config.Cmd);
+      }
+    }
+
+    function prepareEntrypoint(config) {
+      if ($scope.formValues.EntrypointMode == 'default') {
+        config.entryPoint = null;
+      }
     }
 
     function prepareEnvironmentVariables(config) {
@@ -367,7 +388,8 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
     function prepareConfiguration() {
       var config = angular.copy($scope.config);
-      config.Cmd = ContainerHelper.commandStringToArray(config.Cmd);
+      prepareCmd(config);
+      prepareEntrypoint(config);
       prepareNetworkConfig(config);
       prepareImageConfig(config);
       preparePortBindings(config);
@@ -385,8 +407,18 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     function loadFromContainerCmd() {
       if ($scope.config.Cmd) {
         $scope.config.Cmd = ContainerHelper.commandArrayToString($scope.config.Cmd);
+        $scope.formValues.CmdMode = 'override';
+      }
+    }
+
+    function loadFromContainerEntrypoint() {
+      if (_.has($scope.config, 'Entrypoint')) {
+        if ($scope.config.Entrypoint == null) {
+          $scope.config.Entrypoint = '';
+        }
+        $scope.formValues.EntrypointMode = 'override';
       } else {
-        $scope.config.Cmd = '';
+        $scope.config.Entrypoint = '';
       }
     }
 
@@ -578,6 +610,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
           $scope.fromContainer = fromContainer;
           $scope.config = ContainerHelper.configFromContainer(fromContainer.Model);
           loadFromContainerCmd(d);
+          loadFromContainerEntrypoint(d);
           loadFromContainerLogging(d);
           loadFromContainerPortBindings(d);
           loadFromContainerVolumes(d);
@@ -704,7 +737,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
     function create() {
       var oldContainer = null;
-
       HttpRequestHelper.setPortainerAgentTargetHeader($scope.formValues.NodeName);
       return findCurrentContainer().then(setOldContainer).then(confirmCreateContainer).then(startCreationProcess).catch(notifyOnError).finally(final);
 
