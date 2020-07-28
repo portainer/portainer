@@ -707,3 +707,32 @@ func (transport *Transport) createOperationContext(request *http.Request) (*rest
 
 	return operationContext, nil
 }
+
+func (transport *Transport) isAdminOrEndpointAdmin(request *http.Request) (bool, error) {
+	tokenData, err := security.RetrieveTokenData(request)
+	if err != nil {
+		return false, err
+	}
+
+	if tokenData.Role == portainer.AdministratorRole {
+		return true, nil
+	}
+
+	user, err := transport.dataStore.User().User(tokenData.ID)
+	if err != nil {
+		return false, err
+	}
+
+	rbacExtension, err := transport.dataStore.Extension().Extension(portainer.RBACExtension)
+	if err != nil && err != bolterrors.ErrObjectNotFound {
+		return false, err
+	}
+
+	if rbacExtension == nil {
+		return false, nil
+	}
+
+	_, endpointResourceAccess := user.EndpointAuthorizations[portainer.EndpointID(transport.endpoint.ID)][portainer.EndpointResourcesAccess]
+
+	return endpointResourceAccess, nil
+}

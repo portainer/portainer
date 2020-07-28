@@ -176,25 +176,12 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 		return nil, err
 	}
 
-	user, err := transport.dataStore.User().User(tokenData.ID)
+	isAdminOrEndpointAdmin, err := transport.isAdminOrEndpointAdmin(request)
 	if err != nil {
 		return nil, err
 	}
 
-	rbacExtension, err := transport.dataStore.Extension().Extension(portainer.RBACExtension)
-	if err != nil && err != bolterrors.ErrObjectNotFound {
-		return nil, err
-	}
-
-	endpointResourceAccess := false
-	_, ok := user.EndpointAuthorizations[portainer.EndpointID(transport.endpoint.ID)][portainer.EndpointResourcesAccess]
-	if ok {
-		endpointResourceAccess = true
-	}
-
-	isAdmin := (rbacExtension != nil && endpointResourceAccess) || tokenData.Role == portainer.AdministratorRole
-
-	if !isAdmin {
+	if !isAdminOrEndpointAdmin {
 		settings, err := transport.dataStore.Settings().Settings()
 		if err != nil {
 			return nil, err
