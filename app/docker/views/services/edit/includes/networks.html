@@ -28,7 +28,7 @@
                 class="form-control"
                 ng-model="network.Id"
                 ng-change="updateNetwork(service)"
-                ng-options="net.Id as net.Name for net in filterNetworks(availableNetworks, network)"
+                ng-options="net.Id as net.Name for net in filterNetworks(swarmNetworks, network)"
                 disable-authorization="DockerServiceUpdate"
                 style="width: initial;"
               >

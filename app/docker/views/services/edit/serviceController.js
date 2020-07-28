@@ -674,6 +674,7 @@ angular.module('portainer.docker').controller('ServiceController', [
           $scope.allowBindMounts = data.settings.AllowBindMountsForRegularUsers;
           $scope.isAdmin = Authentication.isAdmin();
           $scope.availableNetworks = data.availableNetworks;
+          $scope.swarmNetworks = _.filter($scope.availableNetworks, (network) => network.Scope === 'swarm');
 
           const serviceNetworks = _.uniqBy(_.concat($scope.service.Model.Spec.Networks || [], $scope.service.Model.Spec.TaskTemplate.Networks || []), 'Target');
           const networks = _.filter(
