@@ -20,49 +20,26 @@
     <meta name="msapplication-config" content="${require('./assets/ico/browserconfig.xml')}" />
     <meta name="theme-color" content="#ffffff" />
 
-    <script>
-      !(function (t, e) {
-        var o, n, p, r;
-        e.__SV ||
-          ((window.posthog = e),
-          (e._i = []),
-          (e.init = function (i, s, a) {
-            function g(t, e) {
-              var o = e.split('.');
-              2 == o.length && ((t = t[o[0]]), (e = o[1])),
-                (t[e] = function () {
-                  t.push([e].concat(Array.prototype.slice.call(arguments, 0)));
-                });
-            }
-            ((p = t.createElement('script')).type = 'text/javascript'),
-              (p.async = !0),
-              (p.src = s.api_host + '/static/array.js'),
-              (r = t.getElementsByTagName('script')[0]).parentNode.insertBefore(p, r);
-            var u = e;
-            for (
-              void 0 !== a ? (u = e[a] = []) : (a = 'posthog'),
-                u.people = u.people || [],
-                u.toString = function (t) {
-                  var e = 'posthog';
-                  return 'posthog' !== a && (e += '.' + a), t || (e += ' (stub)'), e;
-                },
-                u.people.toString = function () {
-                  return u.toString(1) + '.people (stub)';
-                },
-                o = 'capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags'.split(
-                  ' '
-                ),
-                n = 0;
-              n < o.length;
-              n++
-            )
-              g(u, o[n]);
-            e._i.push([i, s, a]);
-          }),
-          (e.__SV = 1));
-      })(document, window.posthog || []);
-      posthog.init('LCRjxEU0Td4RLzxjJgyN1V2N8GkmALlkc_1vmUdfVbY', { api_host: 'http://188.166.250.54' });
+    <!-- Matomo -->
+    <script type="text/javascript">
+      var _paq = (window._paq = window._paq || []);
+      /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+      _paq.push(['trackPageView']);
+      _paq.push(['enableLinkTracking']);
+      (function () {
+        var u = '//188.166.250.54/';
+        _paq.push(['setTrackerUrl', u + 'matomo.php']);
+        _paq.push(['setSiteId', '1']);
+        var d = document,
+          g = d.createElement('script'),
+          s = d.getElementsByTagName('script')[0];
+        g.type = 'text/javascript';
+        g.async = true;
+        g.src = u + 'matomo.js';
+        s.parentNode.insertBefore(g, s);
+      })();
     </script>
+    <!-- End Matomo Code -->
   </head>
 
   <body ng-controller="MainController">
