@@ -38,6 +38,19 @@ angular.module('portainer.app').controller('SettingsController', [
       disableContainerCapabilitiesForRegularUsers: false,
     };
 
+    $scope.isContainerEditDisabled = function isContainerEditDisabled() {
+      const {
+        restrictBindMounts,
+        restrictHostNamespaceForRegularUsers,
+        restrictPrivilegedMode,
+        disableDeviceMappingForRegularUsers,
+        disableContainerCapabilitiesForRegularUsers,
+      } = this.formValues;
+      return (
+        restrictBindMounts || restrictHostNamespaceForRegularUsers || restrictPrivilegedMode || disableDeviceMappingForRegularUsers || disableContainerCapabilitiesForRegularUsers
+      );
+    };
+
     $scope.removeFilteredContainerLabel = function (index) {
       var settings = $scope.settings;
       settings.BlackListedLabels.splice(index, 1);
@@ -90,6 +103,8 @@ angular.module('portainer.app').controller('SettingsController', [
           StateManager.updateAllowDeviceMappingForRegularUsers(settings.AllowDeviceMappingForRegularUsers);
           StateManager.updateAllowStackManagementForRegularUsers(settings.AllowStackManagementForRegularUsers);
           StateManager.updateAllowContainerCapabilitiesForRegularUsers(settings.AllowContainerCapabilitiesForRegularUsers);
+          StateManager.updateAllowPrivilegedModeForRegularUsers(settings.AllowPrivilegedModeForRegularUsers);
+          StateManager.updateAllowBindMountsForRegularUsers(settings.AllowBindMountsForRegularUsers);
           $state.reload();
         })
         .catch(function error(err) {

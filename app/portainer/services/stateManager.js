@@ -96,6 +96,16 @@ angular.module('portainer.app').factory('StateManager', [
       LocalStorage.storeApplicationState(state.application);
     };
 
+    manager.updateAllowBindMountsForRegularUsers = function updateAllowBindMountsForRegularUsers(allowBindMountsForRegularUsers) {
+      state.application.allowBindMountsForRegularUsers = allowBindMountsForRegularUsers;
+      LocalStorage.storeApplicationState(state.application);
+    };
+
+    manager.updateAllowPrivilegedModeForRegularUsers = function (AllowPrivilegedModeForRegularUsers) {
+      state.application.allowPrivilegedModeForRegularUsers = AllowPrivilegedModeForRegularUsers;
+      LocalStorage.storeApplicationState(state.application);
+    };
+
     function assignStateFromStatusAndSettings(status, settings) {
       state.application.analytics = status.Analytics;
       state.application.version = status.Version;
@@ -107,6 +117,9 @@ angular.module('portainer.app').factory('StateManager', [
       state.application.allowDeviceMappingForRegularUsers = settings.AllowDeviceMappingForRegularUsers;
       state.application.allowStackManagementForRegularUsers = settings.AllowStackManagementForRegularUsers;
       state.application.allowContainerCapabilitiesForRegularUsers = settings.AllowContainerCapabilitiesForRegularUsers;
+      state.application.allowBindMountsForRegularUsers = settings.AllowBindMountsForRegularUsers;
+      state.application.allowPrivilegedModeForRegularUsers = settings.AllowPrivilegedModeForRegularUsers;
+      state.application.allowHostNamespaceForRegularUsers = settings.AllowHostNamespaceForRegularUsers;
       state.application.validity = moment().unix();
     }
 
