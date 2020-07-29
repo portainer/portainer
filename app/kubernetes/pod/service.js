@@ -3,7 +3,7 @@ import angular from 'angular';
 import PortainerError from 'Portainer/error';
 
 import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
-import KubernetesPodConverter from 'Kubernetes/converters/pod';
+import KubernetesPodConverter from 'Kubernetes/pod/converter';
 
 class KubernetesPodService {
   /* @ngInject */
@@ -21,7 +21,7 @@ class KubernetesPodService {
   async getAllAsync(namespace) {
     try {
       const data = await this.KubernetesPods(namespace).get().$promise;
-      return _.map(data.items, (item) => KubernetesPodConverter.apiToPod(item));
+      return _.map(data.items, (item) => KubernetesPodConverter.apiToModel(item));
     } catch (err) {
       throw new PortainerError('Unable to retrieve pods', err);
     }

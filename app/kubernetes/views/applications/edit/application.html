@@ -128,6 +128,24 @@
             </uib-tab>
 
             <uib-tab index="1" classes="btn-sm" select="ctrl.selectTab(1)">
+              <uib-tab-heading> <i class="fas fa-compress-arrows-alt space-right" aria-hidden="true"></i> Placement </uib-tab-heading>
+              <div class="small text-muted" style="padding: 20px;">
+                <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                The placement component helps you understand whether or not this application can be deployed on a specific node.
+              </div>
+              <kubernetes-application-placements-datatable
+                title-text="Placement constraints/preferences"
+                title-icon="fa-compress-arrows-alt"
+                dataset="ctrl.placements"
+                table-key="kubernetes.application.placements"
+                order-by="Name"
+                reverse-order="false"
+                loading="ctrl.state.dataLoading"
+                refresh-callback="ctrl.getApplication"
+              ></kubernetes-application-placements-datatable>
+            </uib-tab>
+
+            <uib-tab index="2" classes="btn-sm" select="ctrl.selectTab(2)">
               <uib-tab-heading>
                 <i class="fa fa-history space-right" aria-hidden="true"></i> Events
                 <div ng-if="ctrl.hasEventWarnings()">
@@ -147,7 +165,7 @@
               ></kubernetes-events-datatable>
             </uib-tab>
 
-            <uib-tab index="2" ng-if="ctrl.application.Yaml" select="ctrl.showEditor()" classes="btn-sm">
+            <uib-tab index="3" ng-if="ctrl.application.Yaml" select="ctrl.showEditor()" classes="btn-sm">
               <uib-tab-heading> <i class="fa fa-code space-right" aria-hidden="true"></i> YAML </uib-tab-heading>
               <div style="padding-right: 25px;" ng-if="ctrl.state.showEditorTab">
                 <kubernetes-yaml-inspector key="application-yaml" data="ctrl.application.Yaml"></kubernetes-yaml-inspector>

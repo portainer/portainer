@@ -2,6 +2,7 @@ import _ from 'lodash-es';
 import { KubernetesApplicationDataAccessPolicies } from 'Kubernetes/models/application/models';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import { KubernetesApplicationTypes, KubernetesApplicationTypeStrings } from 'Kubernetes/models/application/models';
+import { KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'Kubernetes/pod/models';
 
 angular
   .module('portainer.kubernetes')
@@ -98,5 +99,24 @@ angular
         case KubernetesApplicationDataAccessPolicies.SHARED:
           return 'All the instances of this application are sharing the same data.';
       }
+    };
+  })
+  .filter('kubernetesApplicationConstraintNodeAffinityValue', function () {
+    'use strict';
+    return function (values, operator) {
+      if (operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.IN || operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.NOT_IN) {
+        return values;
+      } else if (
+        operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.EXISTS ||
+        operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.DOES_NOT_EXIST
+      ) {
+        return '';
+      } else if (
+        operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.GREATER_THAN ||
+        operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.LOWER_THAN
+      ) {
+        return values[0];
+      }
+      return '';
     };
   });

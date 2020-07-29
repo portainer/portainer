@@ -21,7 +21,7 @@ angular.module('portainer.docker').controller('KubernetesApplicationsStacksDatat
       showSystem: false,
     });
 
-    this.onSettingsRepeaterChange = function () {
+    this.onSettingsShowSystemChange = function () {
       DatatableService.setDataTableSettings(this.tableKey, this.settings);
     };
 
