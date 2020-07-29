@@ -225,7 +225,7 @@ func (transport *Transport) proxyContainerRequest(request *http.Request) (*http.
 func (transport *Transport) proxyServiceRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/services/create":
-		return transport.decorateServicCreationOperation(request)
+		return transport.decorateServiceCreationOperation(request)
 
 	case "/services":
 		return transport.rewriteOperation(request, transport.serviceListOperation)

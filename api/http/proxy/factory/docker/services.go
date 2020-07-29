@@ -90,7 +90,7 @@ func selectorServiceLabels(responseObject map[string]interface{}) map[string]int
 	return nil
 }
 
-func (transport *Transport) decorateServicCreationOperation(request *http.Request) (*http.Response, error) {
+func (transport *Transport) decorateServiceCreationOperation(request *http.Request) (*http.Response, error) {
 	type PartialService struct {
 		TaskTemplate struct {
 			ContainerSpec struct {
