@@ -696,6 +696,168 @@
             </div>
 
             <div class="col-sm-12 form-section-title">
+              Placement preferences and constraints
+            </div>
+
+            <div class="form-group">
+              <div class="col-sm-12 small text-muted">
+                <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                Deploy this application on nodes that respect all of the following placement rules.
+              </div>
+            </div>
+
+            <!-- placement-rules -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label class="control-label text-left">Placement rules</label>
+                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addPlacementRule()">
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i> add rule
+                </span>
+              </div>
+
+              <div class="col-sm-12" style="margin-top: 12px;">
+                <!-- mockup-rule-1 -->
+                <div class="form-group">
+                  <!-- label selector -->
+                  <div class="col-sm-5">
+                    <select class="form-control">
+                      <option value="1">Operating system</option>
+                      <option value="2">Architecture</option>
+                      <option value="3">Node</option>
+                      <option value="4">node.kubernetes.io/instance-type</option>
+                      <option value="5">custom.label1</option>
+                      <option value="6">custom.label2</option>
+                    </select>
+                  </div>
+                  <!-- !label selector -->
+
+                  <!-- label value selector -->
+                  <div class="col-sm-5">
+                    <select class="form-control">
+                      <option value="1">Linux</option>
+                      <option value="2">Windows</option>
+                    </select>
+                  </div>
+                  <!-- !label value selector -->
+
+                  <div class="input-group col-sm-2 input-group-sm">
+                    <button ng-if="!envVar.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removePlacementRule($index)">
+                      <i class="fa fa-times" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- !mockup-rule-1 -->
+
+                <!-- mockup-rule-2 -->
+                <div class="form-group">
+                  <!-- label selector -->
+                  <div class="col-sm-5">
+                    <select class="form-control">
+                      <option value="3">Node</option>
+                      <option value="1">Operating system</option>
+                      <option value="2">Architecture</option>
+                      <option value="4">node.kubernetes.io/instance-type</option>
+                      <option value="5">custom.label1</option>
+                      <option value="6">custom.label2</option>
+                    </select>
+                  </div>
+                  <!-- !label selector -->
+
+                  <!-- label value selector -->
+                  <div class="col-sm-5">
+                    <select class="form-control">
+                      <option value="1">nodename-1</option>
+                      <option value="2">nodename-2</option>
+                    </select>
+                  </div>
+                  <!-- !label value selector -->
+
+                  <div class="input-group col-sm-2 input-group-sm">
+                    <button ng-if="!envVar.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removePlacementRule($index)">
+                      <i class="fa fa-times" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- !mockup-rule-2 -->
+
+                <!-- mockup-rule-3 -->
+                <div class="form-group">
+                  <!-- label selector -->
+                  <div class="col-sm-5">
+                    <select class="form-control">
+                      <option value="6">custom.label2</option>
+                      <option value="3">Node</option>
+                      <option value="1">Operating system</option>
+                      <option value="2">Architecture</option>
+                      <option value="4">node.kubernetes.io/instance-type</option>
+                      <option value="5">custom.label1</option>
+                    </select>
+                  </div>
+                  <!-- !label selector -->
+
+                  <!-- label value selector -->
+                  <div class="col-sm-5">
+                    <select class="form-control">
+                      <option value="1">custom-value-1</option>
+                      <option value="2">custom-value-2</option>
+                    </select>
+                  </div>
+                  <!-- !label value selector -->
+
+                  <div class="input-group col-sm-2 input-group-sm">
+                    <button ng-if="!envVar.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removePlacementRule($index)">
+                      <i class="fa fa-times" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <!-- !mockup-rule-3 -->
+            </div>
+
+            <div>
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <label class="control-label text-left">Placement policy</label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="col-sm-12 small text-muted">
+                  Specify the policy associated to the placement rules.
+                </div>
+              </div>
+
+              <!-- placement policy options -->
+              <div class="form-group" style="margin-bottom: 0;">
+                <div class="boxselector_wrapper">
+                  <div>
+                    <input type="radio" id="placement_soft" />
+                    <label for="placement_soft">
+                      <div class="boxselector_header">
+                        <i class="fa fa-list" aria-hidden="true" style="margin-right: 2px;"></i>
+                        Preferred
+                      </div>
+                      <p>Schedule this application on nodes that match the rules if possible</p>
+                    </label>
+                  </div>
+                  <div>
+                    <input type="radio" id="placement_hard" />
+                    <label for="placement_hard">
+                      <div class="boxselector_header">
+                        <i class="fa fa-tasks" aria-hidden="true" style="margin-right: 2px;"></i>
+                        Mandatory
+                      </div>
+                      <p>Schedule this application on nodes that match the rules only</p>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <!-- !placement policy options -->
+            </div>
+
+            <!-- !placement-rules -->
+
+            <div class="col-sm-12 form-section-title">
               Publishing the application
             </div>
 
