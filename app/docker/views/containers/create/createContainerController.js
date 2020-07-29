@@ -110,6 +110,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       Cmd: '',
       MacAddress: '',
       ExposedPorts: {},
+      Entrypoint: '',
       HostConfig: {
         RestartPolicy: {
           Name: 'no',
@@ -229,7 +230,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
     function prepareEntrypoint(config) {
       if ($scope.formValues.EntrypointMode == 'default') {
-        config.entryPoint = null;
+        config.Entrypoint = null;
       }
     }
 
@@ -417,8 +418,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
           $scope.config.Entrypoint = '';
         }
         $scope.formValues.EntrypointMode = 'override';
-      } else {
-        $scope.config.Entrypoint = '';
       }
     }
 
