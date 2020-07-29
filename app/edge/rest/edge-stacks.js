@@ -1,6 +1,8 @@
+import { API_ENDPOINT_EDGE_STACKS } from '@/constants';
+
 import angular from 'angular';
 
-angular.module('portainer.edge').factory('EdgeStacks', function EdgeStacksFactory($resource, API_ENDPOINT_EDGE_STACKS) {
+angular.module('portainer.edge').factory('EdgeStacks', function EdgeStacksFactory($resource) {
   return $resource(
     API_ENDPOINT_EDGE_STACKS + '/:id/:action',
     {},

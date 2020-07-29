@@ -1,6 +1,8 @@
+import { API_ENDPOINT_EDGE_JOBS } from '@/constants';
+
 angular.module('portainer.edge').factory('EdgeJobs', EdgeJobsFactory);
 
-function EdgeJobsFactory($resource, API_ENDPOINT_EDGE_JOBS) {
+function EdgeJobsFactory($resource) {
   return $resource(
     API_ENDPOINT_EDGE_JOBS + '/:id/:action',
     {},

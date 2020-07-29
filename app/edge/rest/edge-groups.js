@@ -1,6 +1,8 @@
 import angular from 'angular';
 
-angular.module('portainer.edge').factory('EdgeGroups', function EdgeGroupsFactory($resource, API_ENDPOINT_EDGE_GROUPS) {
+import { API_ENDPOINT_EDGE_GROUPS } from '@/constants';
+
+angular.module('portainer.edge').factory('EdgeGroups', function EdgeGroupsFactory($resource) {
   return $resource(
     API_ENDPOINT_EDGE_GROUPS + '/:id/:action',
     {},
