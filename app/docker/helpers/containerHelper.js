@@ -179,7 +179,11 @@ angular.module('portainer.docker').factory('ContainerHelper', [
           }
 
           const bindKey = containerPort + '/' + portBinding.protocol;
-          bindings[bindKey] = [{ HostIp: hostIp, HostPort: hostPort }];
+          if (bindings[bindKey]) {
+            bindings[bindKey].push({ HostIp: hostIp, HostPort: hostPort });
+          } else {
+            bindings[bindKey] = [{ HostIp: hostIp, HostPort: hostPort }];
+          }
         }
       });
       return bindings;
