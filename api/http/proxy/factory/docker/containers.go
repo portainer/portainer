@@ -9,8 +9,7 @@ import (
 	"net/http"
 
 	"github.com/docker/docker/client"
-	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
@@ -163,6 +162,7 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 			Devices    []interface{} `json:"Devices"`
 			CapAdd     []string      `json:"CapAdd"`
 			CapDrop    []string      `json:"CapDrop"`
+			Binds      []string      `json:"Binds"`
 		} `json:"HostConfig"`
 	}
 
@@ -175,25 +175,12 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 		return nil, err
 	}
 
-	user, err := transport.dataStore.User().User(tokenData.ID)
+	isAdminOrEndpointAdmin, err := transport.isAdminOrEndpointAdmin(request)
 	if err != nil {
 		return nil, err
 	}
 
-	rbacExtension, err := transport.dataStore.Extension().Extension(portainer.RBACExtension)
-	if err != nil && err != bolterrors.ErrObjectNotFound {
-		return nil, err
-	}
-
-	endpointResourceAccess := false
-	_, ok := user.EndpointAuthorizations[portainer.EndpointID(transport.endpoint.ID)][portainer.EndpointResourcesAccess]
-	if ok {
-		endpointResourceAccess = true
-	}
-
-	isAdmin := (rbacExtension != nil && endpointResourceAccess) || tokenData.Role == portainer.AdministratorRole
-
-	if !isAdmin {
+	if !isAdminOrEndpointAdmin {
 		settings, err := transport.dataStore.Settings().Settings()
 		if err != nil {
 			return nil, err
@@ -219,11 +206,15 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 		}
 
 		if !settings.AllowDeviceMappingForRegularUsers && len(partialContainer.HostConfig.Devices) > 0 {
-			return nil, errors.New("forbidden to use device mapping")
+			return forbiddenResponse, errors.New("forbidden to use device mapping")
 		}
 
 		if !settings.AllowContainerCapabilitiesForRegularUsers && (len(partialContainer.HostConfig.CapAdd) > 0 || len(partialContainer.HostConfig.CapDrop) > 0) {
 			return nil, errors.New("forbidden to use container capabilities")
+		}
+
+		if !settings.AllowBindMountsForRegularUsers && (len(partialContainer.HostConfig.Binds) > 0) {
+			return forbiddenResponse, errors.New("forbidden to use bind mounts")
 		}
 
 		request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
