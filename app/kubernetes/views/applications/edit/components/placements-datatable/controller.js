@@ -1,6 +1,6 @@
 import * as _ from 'lodash-es';
 
-angular.module('portainer.docker').controller('KubernetesApplicationPlacementsDatatableController', function ($scope, $controller, DatatableService) {
+angular.module('portainer.docker').controller('KubernetesApplicationPlacementsDatatableController', function ($scope, $controller, DatatableService, Authentication) {
   angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
   this.state = Object.assign(this.state, {
     expandedItems: [],
@@ -36,6 +36,7 @@ angular.module('portainer.docker').controller('KubernetesApplicationPlacementsDa
   };
 
   this.$onInit = function () {
+    this.isAdmin = Authentication.isAdmin();
     this.setDefaults();
     this.prepareTableFromDataset();
 

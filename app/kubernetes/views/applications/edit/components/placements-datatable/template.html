@@ -85,37 +85,62 @@
                   <i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i>
                 </a>
                 <i ng-if="item.AcceptsApplication" class="fa fa-check green-icon" aria-hidden="true"></i>
-                <i
-                  ng-if="!item.AcceptsApplication"
-                  class="fa fa-times red-icon"
-                  aria-hidden="true"
-                  tooltip-append-to-body="true"
-                  tooltip-placement="bottom"
-                  tooltip-class="portainer-tooltip"
-                  uib-tooltip="Node has untolerated taints"
-                  style="cursor: pointer;"
-                ></i>
+                <i ng-if="!item.AcceptsApplication" class="fa fa-times red-icon" aria-hidden="true"></i>
               </td>
               <td>
                 {{ item.Name }}
               </td>
             </tr>
-            <tr ng-show="item.Expanded" ng-repeat="taint in item.UnmetTaints" ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
+            <!-- ADMIN + UNMET TAINTS -->
+            <tr ng-if="$ctrl.isAdmin" ng-show="item.Expanded" ng-repeat="taint in item.UnmetTaints" ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
               <td colspan="2">
                 This application is missing a toleration for the taint <code>{{ taint.key }}{{ taint.value ? '=' + taint.value : '' }}:{{ taint.effect }}</code>
               </td>
             </tr>
-            <tr ng-show="item.Expanded" ng-repeat="label in item.UnmatchedNodeSelectorLabels" ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
+            <!-- !ADMIN + UNMET TAINTS -->
+            <!-- USER + UNMET TAINTS -->
+            <tr ng-if="!$ctrl.isAdmin && item.UnmetTaints.length" ng-show="item.Expanded" ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
+              <td colspan="2">
+                Placement constraint not respected for that node.
+              </td>
+            </tr>
+            <!-- ! USER + UNMET TAINTS -->
+            <!-- ADMIN + UNMET NODE SELECTOR LABELS -->
+            <tr
+              ng-if="$ctrl.isAdmin"
+              ng-show="item.Expanded"
+              ng-repeat="label in item.UnmatchedNodeSelectorLabels"
+              ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }"
+            >
               <td colspan="2">
                 This application can only be scheduled on a node where the label <code>{{ label.key }}</code> is set to <code>{{ label.value }}</code>
               </td>
             </tr>
-            <tr ng-show="item.Expanded && item.UnmatchedNodeAffinities.length" ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
+            <!-- ! ADMIN + UNMET NODE SELECTOR LABELS -->
+            <!-- USER + UNMET NODE SELECTOR LABELS || UNMET NODE AFFINITIES -->
+            <tr
+              ng-if="!$ctrl.isAdmin && (item.UnmatchedNodeSelectorLabels.length || item.UnmatchedNodeAffinities.length)"
+              ng-show="item.Expanded"
+              ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }"
+            >
               <td colspan="2">
-                One of the following mandatory combination of node's labels is not respected.
+                Placement label not respected for that node.
               </td>
             </tr>
-            <tr dir-paginate-end ng-show="item.Expanded" ng-repeat="aff in item.UnmatchedNodeAffinities" ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
+            <!-- ! USER + UNMET NODE SELECTOR LABELS || UNMET NODE AFFINITIES -->
+            <!-- ADMIN + UNMET NODE AFFINITIES -->
+            <tr ng-if="$ctrl.isAdmin" ng-show="item.Expanded && item.UnmatchedNodeAffinities.length" ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
+              <td colspan="2">
+                This application can only be scheduled on nodes respecting one of the following labels combination
+              </td>
+            </tr>
+            <tr
+              dir-paginate-end
+              ng-if="$ctrl.isAdmin"
+              ng-show="item.Expanded"
+              ng-repeat="aff in item.UnmatchedNodeAffinities"
+              ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }"
+            >
               <td></td>
               <td>
                 <code ng-repeat-start="term in aff track by $index">
@@ -124,6 +149,7 @@
                 <span ng-repeat-end>{{ $last ? '' : ' + ' }}</span>
               </td>
             </tr>
+            <!-- ! ADMIN + UNMET NODE AFFINITIES -->
             <tr ng-if="$ctrl.loading">
               <td colspan="2" class="text-center text-muted">Loading...</td>
             </tr>
