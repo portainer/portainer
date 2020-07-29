@@ -204,7 +204,7 @@
                       ng-model="config.Cmd"
                       ng-disabled="formValues.CmdMode === 'default'"
                       id="container_command"
-                      placeholder="e.g. /usr/bin/nginx -t -c /mynginx.conf"
+                      placeholder="e.g. '-logtostderr' '--housekeeping_interval=5s' or /usr/bin/nginx -t -c /mynginx.conf"
                     />
                   </div>
                 </div>
@@ -212,7 +212,13 @@
               <!-- !command-input -->
               <!-- entrypoint-input -->
               <div class="form-group">
-                <label for="container_entrypoint" class="col-sm-2 col-lg-1 control-label text-left">Entry Point</label>
+                <label for="container_entrypoint" class="col-sm-2 col-lg-1 control-label text-left">
+                  Entrypoint
+                  <portainer-tooltip
+                    position="bottom"
+                    message="When container entrypoint is entered as part of the Command field, set Entrypoint to Override mode and leave blank, else it will revert to default."
+                  ></portainer-tooltip>
+                </label>
                 <div class="col-sm-9">
                   <div class="input-group">
                     <div class="input-group-btn">

@@ -229,7 +229,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     }
 
     function prepareEntrypoint(config) {
-      if ($scope.formValues.EntrypointMode == 'default') {
+      if ($scope.formValues.EntrypointMode == 'default' || (_.isEmpty(config.Cmd) && _.isEmpty(config.Entrypoint))) {
         config.Entrypoint = null;
       }
     }
