@@ -3,6 +3,7 @@ import { Terminal } from 'xterm';
 import * as fit from 'xterm/lib/addons/fit/fit';
 
 angular.module('portainer').config([
+  '$analyticsProvider',
   '$urlRouterProvider',
   '$httpProvider',
   'localStorageServiceProvider',
@@ -11,7 +12,17 @@ angular.module('portainer').config([
   '$uibTooltipProvider',
   '$compileProvider',
   'cfpLoadingBarProvider',
-  function ($urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider, $uibTooltipProvider, $compileProvider, cfpLoadingBarProvider) {
+  function (
+    $analyticsProvider,
+    $urlRouterProvider,
+    $httpProvider,
+    localStorageServiceProvider,
+    jwtOptionsProvider,
+    AnalyticsProvider,
+    $uibTooltipProvider,
+    $compileProvider,
+    cfpLoadingBarProvider
+  ) {
     'use strict';
 
     var environment = '@@ENVIRONMENT';
@@ -52,8 +63,13 @@ angular.module('portainer').config([
       },
     ]);
 
-    AnalyticsProvider.setAccount({ tracker: __CONFIG_GA_ID, set: { anonymizeIp: true } });
-    AnalyticsProvider.startOffline(true);
+    $analyticsProvider.withBase(false);
+    $analyticsProvider.withAutoBase(true);
+
+    // need to set trackRelativePath
+
+    // AnalyticsProvider.setAccount({ tracker: __CONFIG_GA_ID, set: { anonymizeIp: true } });
+    // AnalyticsProvider.startOffline(true);
 
     toastr.options.timeOut = 3000;
 

@@ -24,7 +24,6 @@
     <script type="text/javascript">
       var _paq = (window._paq = window._paq || []);
       /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-      _paq.push(['trackPageView']);
       _paq.push(['enableLinkTracking']);
       (function () {
         var u = '//188.166.250.54/';
@@ -38,26 +37,6 @@
         g.src = u + 'matomo.js';
         s.parentNode.insertBefore(g, s);
       })();
-
-      var currentUrl = location.href;
-      window.addEventListener('hashchange', function () {
-        _paq.push(['setReferrerUrl', currentUrl]);
-        currentUrl = '/' + window.location.hash.substr(1);
-        _paq.push(['setCustomUrl', currentUrl]);
-        _paq.push(['setDocumentTitle', 'My New Title']);
-
-        // remove all previously assigned custom variables, requires Matomo (formerly Piwik) 3.0.2
-        _paq.push(['deleteCustomVariables', 'page']);
-        _paq.push(['setGenerationTimeMs', 0]);
-        _paq.push(['trackPageView']);
-
-        // make Matomo aware of newly added content
-        var content = document.getElementById('content');
-        _paq.push(['MediaAnalytics::scanForMedia', content]);
-        _paq.push(['FormAnalytics::scanForForms', content]);
-        _paq.push(['trackContentImpressionsWithinNode', content]);
-        _paq.push(['enableLinkTracking']);
-      });
     </script>
     <!-- End Matomo Code -->
   </head>

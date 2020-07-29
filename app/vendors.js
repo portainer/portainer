@@ -37,5 +37,7 @@ import 'js-yaml/dist/js-yaml.js';
 import 'angular-ui-bootstrap';
 import 'angular-moment-picker';
 import 'angular-multiselect/isteven-multi-select.js';
+import 'angulartics/dist/angulartics.min.js';
+import 'angulartics-piwik/dist/angulartics-piwik.min.js';
 
 window.angular = angular;
