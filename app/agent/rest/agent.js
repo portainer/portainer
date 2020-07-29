@@ -1,8 +1,10 @@
 import angular from 'angular';
 
+import { API_ENDPOINT_ENDPOINTS } from '@/constants';
+
 angular.module('portainer.agent').factory('Agent', AgentFactory);
 
-function AgentFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, StateManager) {
+function AgentFactory($resource, EndpointProvider, StateManager) {
   return $resource(
     `${API_ENDPOINT_ENDPOINTS}/:endpointId/docker/v:version/agents`,
     {

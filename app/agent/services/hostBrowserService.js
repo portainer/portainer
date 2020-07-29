@@ -1,8 +1,10 @@
 import angular from 'angular';
 
+import { API_ENDPOINT_ENDPOINTS } from '@/constants';
+
 angular.module('portainer.agent').factory('HostBrowserService', HostBrowserServiceFactory);
 
-function HostBrowserServiceFactory(Browse, Upload, API_ENDPOINT_ENDPOINTS, EndpointProvider, StateManager) {
+function HostBrowserServiceFactory(Browse, Upload, EndpointProvider, StateManager) {
   return { ls, get, delete: deletePath, rename, upload };
 
   function ls(path) {

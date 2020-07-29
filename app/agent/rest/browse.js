@@ -1,10 +1,11 @@
 import angular from 'angular';
 
+import { API_ENDPOINT_ENDPOINTS } from '@/constants';
 import { browseGetResponse } from './response/browse';
 
 angular.module('portainer.agent').factory('Browse', BrowseFactory);
 
-function BrowseFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, StateManager) {
+function BrowseFactory($resource, EndpointProvider, StateManager) {
   return $resource(
     `${API_ENDPOINT_ENDPOINTS}/:endpointId/docker/v:version/browse/:action`,
     {
