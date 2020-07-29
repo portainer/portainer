@@ -117,9 +117,13 @@ angular.module('portainer.docker').factory('ImageService', [
     function pullImageAndIgnoreErrors(imageConfiguration) {
       var deferred = $q.defer();
 
-      Image.create({}, imageConfiguration).$promise.finally(function final() {
-        deferred.resolve();
-      });
+      Image.create({}, imageConfiguration)
+        .$promise.catch(() => {
+          // left empty to ignore errors
+        })
+        .finally(function final() {
+          deferred.resolve();
+        });
 
       return deferred.promise;
     }
