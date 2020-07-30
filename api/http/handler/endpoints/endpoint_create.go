@@ -2,12 +2,14 @@ package endpoints
 
 import (
 	"errors"
+	"fmt"
 	"net"
 	"net/http"
 	"net/url"
 	"runtime"
 	"strconv"
 	"strings"
+	"time"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -20,7 +22,7 @@ import (
 type endpointCreatePayload struct {
 	Name                   string
 	URL                    string
-	EndpointType           int
+	EndpointCreationType   endpointCreationEnum
 	PublicURL              string
 	GroupID                int
 	TLS                    bool
@@ -36,6 +38,17 @@ type endpointCreatePayload struct {
 	EdgeCheckinInterval    int
 }
 
+type endpointCreationEnum int
+
+const (
+	_ endpointCreationEnum = iota
+	localDockerEnvironment
+	agentEnvironment
+	azureEnvironment
+	edgeAgentEnvironment
+	localKubernetesEnvironment
+)
+
 func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	name, err := request.RetrieveMultiPartFormValue(r, "Name", false)
 	if err != nil {
@@ -43,11 +56,11 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	}
 	payload.Name = name
 
-	endpointType, err := request.RetrieveNumericMultiPartFormValue(r, "EndpointType", false)
-	if err != nil || endpointType == 0 {
-		return errors.New("Invalid endpoint type value. Value must be one of: 1 (Docker environment), 2 (Agent environment), 3 (Azure environment) or 4 (Edge Agent environment)")
+	endpointCreationType, err := request.RetrieveNumericMultiPartFormValue(r, "EndpointCreationType", false)
+	if err != nil || endpointCreationType == 0 {
+		return errors.New("Invalid endpoint type value. Value must be one of: 1 (Docker environment), 2 (Agent environment), 3 (Azure environment), 4 (Edge Agent environment) or 5 (Local Kubernetes environment)")
 	}
-	payload.EndpointType = endpointType
+	payload.EndpointCreationType = endpointCreationEnum(endpointCreationType)
 
 	groupID, _ := request.RetrieveNumericMultiPartFormValue(r, "GroupID", true)
 	if groupID == 0 {
@@ -97,8 +110,8 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 		}
 	}
 
-	switch portainer.EndpointType(payload.EndpointType) {
-	case portainer.AzureEnvironment:
+	switch payload.EndpointCreationType {
+	case azureEnvironment:
 		azureApplicationID, err := request.RetrieveMultiPartFormValue(r, "AzureApplicationID", false)
 		if err != nil {
 			return errors.New("Invalid Azure application ID")
@@ -182,22 +195,33 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 }
 
 func (handler *Handler) createEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
-	switch portainer.EndpointType(payload.EndpointType) {
-	case portainer.AzureEnvironment:
+	switch payload.EndpointCreationType {
+	case azureEnvironment:
 		return handler.createAzureEndpoint(payload)
 
-	case portainer.EdgeAgentOnDockerEnvironment:
-		return handler.createEdgeAgentEndpoint(payload, portainer.EdgeAgentOnDockerEnvironment)
+	case edgeAgentEnvironment:
+		return handler.createEdgeAgentEndpoint(payload)
 
-	case portainer.KubernetesLocalEnvironment:
+	case localKubernetesEnvironment:
 		return handler.createKubernetesEndpoint(payload)
+	}
 
-	case portainer.EdgeAgentOnKubernetesEnvironment:
-		return handler.createEdgeAgentEndpoint(payload, portainer.EdgeAgentOnKubernetesEnvironment)
+	endpointType := portainer.DockerEnvironment
+	if payload.EndpointCreationType == agentEnvironment {
+		agentPlatform, err := handler.pingAndCheckPlatform(payload)
+		if err != nil {
+			return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to get endpoint type", err}
+		}
+
+		if agentPlatform == portainer.AgentPlatformDocker {
+			endpointType = portainer.EdgeAgentOnDockerEnvironment
+		} else if agentPlatform == portainer.AgentPlatformKubernetes {
+			endpointType = portainer.EdgeAgentOnKubernetesEnvironment
+		}
 	}
 
 	if payload.TLS {
-		return handler.createTLSSecuredEndpoint(payload, portainer.EndpointType(payload.EndpointType))
+		return handler.createTLSSecuredEndpoint(payload, endpointType)
 	}
 	return handler.createUnsecuredEndpoint(payload)
 }
@@ -241,7 +265,7 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 	return endpoint, nil
 }
 
-func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload, endpointType portainer.EndpointType) (*portainer.Endpoint, *httperror.HandlerError) {
+func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
 	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
 
 	portainerURL, err := url.Parse(payload.URL)
@@ -264,7 +288,7 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload, 
 		ID:      portainer.EndpointID(endpointID),
 		Name:    payload.Name,
 		URL:     portainerHost,
-		Type:    endpointType,
+		Type:    portainer.EdgeAgentOnDockerEnvironment,
 		GroupID: portainer.EndpointGroupID(payload.GroupID),
 		TLSConfig: portainer.TLSConfiguration{
 			TLS: false,
@@ -471,4 +495,38 @@ func (handler *Handler) storeTLSFiles(endpoint *portainer.Endpoint, payload *end
 	}
 
 	return nil
+}
+
+func (handler *Handler) pingAndCheckPlatform(payload *endpointCreatePayload) (portainer.AgentPlatform, error) {
+	httpCli := &http.Client{
+		Timeout: 3 * time.Second,
+	}
+
+	url := fmt.Sprintf("%s/ping", payload.URL)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return 0, err
+	}
+
+	resp, err := httpCli.Do(req)
+	if err != nil {
+		return 0, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return 0, errors.New("Failed request")
+	}
+
+	agentPlatformHeader := resp.Header.Get(portainer.HTTPResponseAgentPlatform)
+	if agentPlatformHeader == "" {
+		return 0, err
+	}
+
+	agentPlatformNumber, err := strconv.Atoi(agentPlatformHeader)
+	if err != nil {
+		return 0, err
+	}
+
+	return portainer.AgentPlatform(agentPlatformNumber), nil
 }
