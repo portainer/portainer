@@ -15,6 +15,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/internal/edge"
 )
@@ -500,6 +501,17 @@ func (handler *Handler) storeTLSFiles(endpoint *portainer.Endpoint, payload *end
 func (handler *Handler) pingAndCheckPlatform(payload *endpointCreatePayload) (portainer.AgentPlatform, error) {
 	httpCli := &http.Client{
 		Timeout: 3 * time.Second,
+	}
+
+	if payload.TLS {
+		tlsConfig, err := crypto.CreateTLSConfigurationFromBytes(payload.TLSCACertFile, payload.TLSCertFile, payload.TLSKeyFile, payload.TLSSkipVerify, payload.TLSSkipClientVerify)
+		if err != nil {
+			return 0, err
+		}
+
+		httpCli.Transport = &http.Transport{
+			TLSClientConfig: tlsConfig,
+		}
 	}
 
 	url := fmt.Sprintf("%s/ping", payload.URL)
