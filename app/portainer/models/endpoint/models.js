@@ -18,6 +18,17 @@ export const PortainerEndpointTypes = Object.freeze({
   EdgeAgentOnKubernetesEnvironment: 7,
 });
 
+/**
+ * JS reference of endpoint_create.go#EndpointCreationType iota
+ */
+export const PortainerEndpointCreationTypes = Object.freeze({
+  LocalDockerEnvironment: 1,
+  AgentEnvironment: 2,
+  AzureEnvironment: 3,
+  EdgeAgentEnvironment: 4,
+  LocalKubernetesEnvironment: 5,
+});
+
 export const PortainerEndpointConnectionTypes = Object.freeze({
   DOCKER_LOCAL: 1,
   KUBERNETES_LOCAL: 2,

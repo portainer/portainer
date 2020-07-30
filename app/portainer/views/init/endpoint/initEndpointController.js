@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 import angular from 'angular';
 import { PortainerEndpointInitFormValueEndpointSections, PortainerEndpointInitFormValues } from 'Portainer/models/endpoint/formValues';
-import { PortainerEndpointConnectionTypes, PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
+import { PortainerEndpointConnectionTypes, PortainerEndpointCreationTypes, PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
 
 require('./includes/localDocker.html');
 require('./includes/localKubernetes.html');
@@ -61,7 +61,7 @@ class InitEndpointController {
       case PortainerEndpointConnectionTypes.AGENT:
         return this.createAgentEndpoint();
       default:
-        this.Notifications.error('Failure', 'Unable to determine wich action to do');
+        this.Notifications.error('Failure', 'Unable to determine which action to do');
     }
   }
 
@@ -112,10 +112,10 @@ class InitEndpointController {
       const name = this.formValues.Name;
       const URL = this.formValues.URL;
       const PublicURL = URL.split(':')[0];
-      // TODO: k8s merge - change type ID for agent on kube (6) or agent on swarm (2)
+
       const endpoint = await this.EndpointService.createRemoteEndpoint(
         name,
-        PortainerEndpointTypes.AgentOnKubernetesEnvironment,
+        PortainerEndpointCreationTypes.AgentEnvironment,
         URL,
         PublicURL,
         1,
@@ -127,8 +127,9 @@ class InitEndpointController {
         null,
         null
       );
-      // TODO: k8s merge - go on home whith agent on swarm (2)
-      this.$state.go('portainer.endpoints.endpoint.kubernetesConfig', { id: endpoint.Id });
+      // TODO: k8s merge - go on home with agent on swarm (2)
+      const routeName = endpoint.Type === PortainerEndpointTypes.AgentOnKubernetesEnvironment ? 'portainer.endpoints.endpoint.kubernetesConfig' : 'portainer.home';
+      this.$state.go(routeName, { id: endpoint.Id });
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to connect to the Docker environment');
     } finally {

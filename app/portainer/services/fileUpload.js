@@ -1,3 +1,4 @@
+import { PortainerEndpointCreationTypes } from 'Portainer/models/endpoint/models';
 import { genericHandler, jsonObjectsToArrayHandler } from '../../docker/rest/response/handlers';
 
 angular.module('portainer.app').factory('FileUploadService', [
@@ -112,12 +113,26 @@ angular.module('portainer.app').factory('FileUploadService', [
       });
     };
 
-    service.createEndpoint = function (name, type, URL, PublicURL, groupID, tagIds, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile, checkinInterval) {
+    service.createEndpoint = function (
+      name,
+      creationType,
+      URL,
+      PublicURL,
+      groupID,
+      tagIds,
+      TLS,
+      TLSSkipVerify,
+      TLSSkipClientVerify,
+      TLSCAFile,
+      TLSCertFile,
+      TLSKeyFile,
+      checkinInterval
+    ) {
       return Upload.upload({
         url: 'api/endpoints',
         data: {
           Name: name,
-          EndpointType: type,
+          EndpointCreationType: creationType,
           URL: URL,
           PublicURL: PublicURL,
           GroupID: groupID,
@@ -139,7 +154,7 @@ angular.module('portainer.app').factory('FileUploadService', [
         url: 'api/endpoints',
         data: {
           Name: name,
-          EndpointType: 3,
+          EndpointCreationType: PortainerEndpointCreationTypes.Azure,
           GroupID: groupId,
           TagIds: Upload.json(tagIds),
           AzureApplicationID: applicationId,

@@ -1,4 +1,4 @@
-import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
+import { PortainerEndpointCreationTypes } from 'Portainer/models/endpoint/models';
 
 angular.module('portainer.app').factory('EndpointService', [
   '$q',
@@ -59,7 +59,7 @@ angular.module('portainer.app').factory('EndpointService', [
     service.createLocalEndpoint = function () {
       var deferred = $q.defer();
 
-      FileUploadService.createEndpoint('local', PortainerEndpointTypes.DockerEnvironment, '', '', 1, [], false)
+      FileUploadService.createEndpoint('local', PortainerEndpointCreationTypes.LocalDockerEnvironment, '', '', 1, [], false)
         .then(function success(response) {
           deferred.resolve(response.data);
         })
@@ -72,7 +72,7 @@ angular.module('portainer.app').factory('EndpointService', [
 
     service.createRemoteEndpoint = function (
       name,
-      type,
+      creationType,
       URL,
       PublicURL,
       groupID,
@@ -88,17 +88,13 @@ angular.module('portainer.app').factory('EndpointService', [
       var deferred = $q.defer();
 
       var endpointURL = URL;
-      if (
-        type !== PortainerEndpointTypes.EdgeAgentOnDockerEnvironment &&
-        type !== PortainerEndpointTypes.AgentOnKubernetesEnvironment &&
-        type !== PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment
-      ) {
+      if (creationType !== PortainerEndpointCreationTypes.EdgeAgentEnvironment && creationType !== PortainerEndpointCreationTypes.AgentEnvironment) {
         endpointURL = 'tcp://' + URL;
       }
 
       FileUploadService.createEndpoint(
         name,
-        type,
+        creationType,
         endpointURL,
         PublicURL,
         groupID,
@@ -124,7 +120,7 @@ angular.module('portainer.app').factory('EndpointService', [
     service.createLocalKubernetesEndpoint = function () {
       var deferred = $q.defer();
 
-      FileUploadService.createEndpoint('local', 5, '', '', 1, [], true, true, true)
+      FileUploadService.createEndpoint('local', PortainerEndpointCreationTypes.LocalKubernetesEnvironment, '', '', 1, [], true, true, true)
         .then(function success(response) {
           deferred.resolve(response.data);
         })
