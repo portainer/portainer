@@ -529,7 +529,12 @@
                       <p>All the instances of this application will use the same data</p>
                     </label>
                   </div>
-                  <div ng-if="!ctrl.state.isEdit || (ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.ISOLATED)">
+                  <div
+                    ng-if="
+                      (!ctrl.state.isEdit && !ctrl.state.PersistedFoldersUseExistingVolumes) ||
+                      (ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.ISOLATED)
+                    "
+                  >
                     <input
                       type="radio"
                       id="data_access_isolated"
@@ -545,7 +550,10 @@
                       <p>Every instance of this application will use their own data</p>
                     </label>
                   </div>
-                  <div style="color: #767676;" ng-if="ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.SHARED">
+                  <div
+                    style="color: #767676;"
+                    ng-if="(ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.SHARED) || ctrl.state.PersistedFoldersUseExistingVolumes"
+                  >
                     <input type="radio" id="data_access_isolated" disabled />
                     <label
                       for="data_access_isolated"

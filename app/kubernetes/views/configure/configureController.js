@@ -42,6 +42,7 @@ class KubernetesConfigureController {
             res.Name = item.Name;
             res.AccessModes = _.map(item.AccessModes, 'Name');
             res.Provisioner = item.Provisioner;
+            res.AllowVolumeExpansion = item.AllowVolumeExpansion;
             return res;
           }
         }),

@@ -25,6 +25,7 @@ const _KubernetesStorageClass = Object.freeze({
   Name: '',
   AccessModes: [],
   Provisioner: '',
+  AllowVolumeExpansion: false,
 });
 
 export class KubernetesStorageClass {

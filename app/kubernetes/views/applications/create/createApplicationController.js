@@ -23,7 +23,11 @@ import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHel
 import KubernetesApplicationConverter from 'Kubernetes/converters/application';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
+<<<<<<< HEAD
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application/index';
+=======
+import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
+>>>>>>> feat(volume): allow to increase volume size and few other things
 
 class KubernetesCreateApplicationController {
   /* @ngInject */
@@ -207,7 +211,14 @@ class KubernetesCreateApplicationController {
   }
 
   onChangePersistedFolderPath() {
-    this.state.duplicatePersistedFolderPaths = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.PersistedFolders, 'ContainerPath'));
+    this.state.duplicatePersistedFolderPaths = KubernetesFormValidationHelper.getDuplicates(
+      _.map(this.formValues.PersistedFolders, (persistedFolder) => {
+        if (persistedFolder.NeedsDeletion) {
+          return undefined;
+        }
+        return persistedFolder.ContainerPath;
+      })
+    );
     this.state.hasDuplicatePersistedFolderPaths = Object.keys(this.state.duplicatePersistedFolderPaths).length > 0;
   }
 
@@ -234,10 +245,16 @@ class KubernetesCreateApplicationController {
   useNewVolume(index) {
     this.formValues.PersistedFolders[index].UseNewVolume = true;
     this.formValues.PersistedFolders[index].ExistingVolume = null;
+    this.state.PersistedFoldersUseExistingVolumes = !_.reduce(this.formValues.PersistedFolders, (acc, pf) => acc && pf.UseNewVolume, true);
   }
 
   useExistingVolume(index) {
     this.formValues.PersistedFolders[index].UseNewVolume = false;
+    this.state.PersistedFoldersUseExistingVolumes = _.find(this.formValues.PersistedFolders, { UseNewVolume: false }) ? true : false;
+    if (this.formValues.DataAccessPolicy === this.ApplicationDataAccessPolicies.ISOLATED) {
+      this.formValues.DataAccessPolicy = this.ApplicationDataAccessPolicies.SHARED;
+      this.resetDeploymentType();
+    }
   }
 
   onChangeExistingVolumeSelection() {
@@ -247,6 +264,16 @@ class KubernetesCreateApplicationController {
       })
     );
     this.state.hasDuplicateExistingVolumes = Object.keys(this.state.duplicateExistingVolumes).length > 0;
+  }
+
+  filterAvailableVolumes() {
+    const filteredVolumes = _.filter(this.volumes, (volume) => {
+      const isSameNamespace = volume.ResourcePool.Namespace.Name === this.formValues.ResourcePool.Namespace.Name;
+      const isUnused = !KubernetesVolumeHelper.isUsed(volume);
+      const isRWX = _.find(volume.PersistentVolumeClaim.StorageClass.AccessModes, (am) => am === 'RWX');
+      return isSameNamespace && (isUnused || isRWX);
+    });
+    this.availableVolumes = filteredVolumes;
   }
   /**
    * !PERSISTENT FOLDERS UI MANAGEMENT
@@ -535,8 +562,8 @@ class KubernetesCreateApplicationController {
     const namespace = this.formValues.ResourcePool.Namespace.Name;
     this.updateSliders();
     this.refreshStacksConfigsApps(namespace);
+    this.filterAvailableVolumes();
     this.formValues.Configurations = [];
-    this.availableVolumes = _.filter(this.volumes, (volume) => volume.ResourcePool.Namespace.Name === namespace);
     this.formValues.PersistedFolders = _.forEach(this.formValues.PersistedFolders, (persistedFolder) => {
       persistedFolder.ExistingVolume = null;
       persistedFolder.UseNewVolume = true;
@@ -651,6 +678,7 @@ class KubernetesCreateApplicationController {
           namespace: this.$transition$.params().namespace,
           name: this.$transition$.params().name,
         },
+        PersistedFoldersUseExistingVolumes: false,
       };
 
       this.isAdmin = this.Authentication.isAdmin();
@@ -669,12 +697,20 @@ class KubernetesCreateApplicationController {
 
       this.formValues = new KubernetesApplicationFormValues();
 
-      const [resourcePools, nodes, volumes] = await Promise.all([this.KubernetesResourcePoolService.get(), this.KubernetesNodeService.get(), this.KubernetesVolumeService.get()]);
+      const [resourcePools, nodes, volumes, applications] = await Promise.all([
+        this.KubernetesResourcePoolService.get(),
+        this.KubernetesNodeService.get(),
+        this.KubernetesVolumeService.get(),
+        this.KubernetesApplicationService.get(),
+      ]);
 
       this.resourcePools = _.filter(resourcePools, (resourcePool) => !this.KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name));
       this.formValues.ResourcePool = this.resourcePools[0];
       this.volumes = volumes;
-      this.availableVolumes = _.filter(this.volumes, (volume) => volume.ResourcePool.Namespace.Name === this.formValues.ResourcePool.Namespace.Name);
+      _.forEach(this.volumes, (volume) => {
+        volume.Applications = KubernetesVolumeHelper.getUsingApplications(volume, applications);
+      });
+      this.filterAvailableVolumes();
 
       _.forEach(nodes, (item) => {
         this.state.nodes.memory += filesizeParser(item.Memory);
