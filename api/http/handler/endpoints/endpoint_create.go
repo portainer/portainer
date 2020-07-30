@@ -526,18 +526,22 @@ func (handler *Handler) pingAndCheckPlatform(payload *endpointCreatePayload) (po
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return 0, errors.New("Failed request")
+	if resp.StatusCode != http.StatusNoContent {
+		return 0, fmt.Errorf("Failed request with status %d", resp.StatusCode)
 	}
 
 	agentPlatformHeader := resp.Header.Get(portainer.HTTPResponseAgentPlatform)
 	if agentPlatformHeader == "" {
-		return 0, err
+		return 0, errors.New("Agent Platform Header is missing")
 	}
 
 	agentPlatformNumber, err := strconv.Atoi(agentPlatformHeader)
 	if err != nil {
 		return 0, err
+	}
+
+	if agentPlatformNumber == 0 {
+		return 0, errors.New("Agent platform is invalid")
 	}
 
 	return portainer.AgentPlatform(agentPlatformNumber), nil
