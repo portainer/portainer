@@ -3,6 +3,7 @@ package endpoints
 import (
 	"encoding/base64"
 	"net/http"
+	"strconv"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -54,10 +55,22 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 
 	if endpoint.EdgeID == "" {
 		edgeIdentifier := r.Header.Get(portainer.PortainerAgentEdgeIDHeader)
+		agentPlatformHeader := r.Header.Get(portainer.HTTPResponseAgentPlatform)
+		agentPlatformNumber, err := strconv.Atoi(agentPlatformHeader)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to parse agent platform header", err}
+		}
 
+		agentPlatform := portainer.AgentPlatform(agentPlatformNumber)
 		endpoint.EdgeID = edgeIdentifier
 
-		err := handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
+		if agentPlatform == portainer.AgentPlatformDocker {
+			endpoint.Type = portainer.EdgeAgentOnDockerEnvironment
+		} else if agentPlatform == portainer.AgentPlatformKubernetes {
+			endpoint.Type = portainer.EdgeAgentOnKubernetesEnvironment
+		}
+
+		err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to Unable to persist endpoint changes inside the database", err}
 		}
