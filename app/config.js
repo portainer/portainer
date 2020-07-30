@@ -3,7 +3,6 @@ import { Terminal } from 'xterm';
 import * as fit from 'xterm/lib/addons/fit/fit';
 
 angular.module('portainer').config([
-  '$analyticsProvider',
   '$urlRouterProvider',
   '$httpProvider',
   'localStorageServiceProvider',
@@ -12,17 +11,7 @@ angular.module('portainer').config([
   '$uibTooltipProvider',
   '$compileProvider',
   'cfpLoadingBarProvider',
-  function (
-    $analyticsProvider,
-    $urlRouterProvider,
-    $httpProvider,
-    localStorageServiceProvider,
-    jwtOptionsProvider,
-    AnalyticsProvider,
-    $uibTooltipProvider,
-    $compileProvider,
-    cfpLoadingBarProvider
-  ) {
+  function ($urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider, $uibTooltipProvider, $compileProvider, cfpLoadingBarProvider) {
     'use strict';
 
     var environment = '@@ENVIRONMENT';
@@ -63,8 +52,8 @@ angular.module('portainer').config([
       },
     ]);
 
-    $analyticsProvider.withBase(false);
-    $analyticsProvider.withAutoBase(true);
+    // $analyticsProvider.withBase(false);
+    // $analyticsProvider.withAutoBase(true);
 
     // need to set trackRelativePath
 
