@@ -215,9 +215,9 @@ func (handler *Handler) createEndpoint(payload *endpointCreatePayload) (*portain
 		}
 
 		if agentPlatform == portainer.AgentPlatformDocker {
-			endpointType = portainer.EdgeAgentOnDockerEnvironment
+			endpointType = portainer.AgentOnDockerEnvironment
 		} else if agentPlatform == portainer.AgentPlatformKubernetes {
-			endpointType = portainer.EdgeAgentOnKubernetesEnvironment
+			endpointType = portainer.AgentOnKubernetesEnvironment
 		}
 	}
 
