@@ -670,7 +670,7 @@
             <!-- !replica count -->
 
             <!-- auto scaling -->
-            <div class="form-group">
+            <div class="form-group" ng-if="ctrl.formValues.DeploymentType !== ctrl.ApplicationDeploymentTypes.GLOBAL">
               <div class="col-sm-12">
                 <label for="enable_auto_scaling" class="control-label text-left">
                   Enable auto scaling

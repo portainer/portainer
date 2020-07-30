@@ -34,7 +34,6 @@ export class KubernetesHorizontalPodAutoScalerConverter {
     payload.spec.scaleTargetRef.apiVersion = data.TargetEntity.ApiVersion;
     payload.spec.scaleTargetRef.kind = data.TargetEntity.Kind;
     payload.spec.scaleTargetRef.name = data.TargetEntity.Name;
-
     return payload;
   }
 
@@ -54,6 +53,7 @@ export class KubernetesHorizontalPodAutoScalerConverter {
     res.TargetCPUUtilization = formValues.AutoScaler.TargetCPUUtilization;
     res.TargetEntity.Name = formValues.Name;
     res.TargetEntity.Kind = kind;
+    res.TargetEntity.ApiVersion = formValues.AutoScaler.ApiVersion;
     return res;
   }
 

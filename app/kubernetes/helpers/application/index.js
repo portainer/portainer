@@ -271,6 +271,9 @@ class KubernetesApplicationHelper {
       res.MinReplicas = autoScaler.MinReplicas;
       res.MaxReplicas = autoScaler.MaxReplicas;
       res.TargetCPUUtilization = autoScaler.TargetCPUUtilization;
+      res.ApiVersion = autoScaler.ApiVersion;
+    } else {
+      res.ApiVersion = 'apps/v1';
     }
     return res;
   }

@@ -125,6 +125,7 @@ const _KubernetesApplicationAutoScalerFormValue = Object.freeze({
   MinReplicas: 0,
   MaxReplicas: 0,
   TargetCPUUtilization: 0,
+  ApiVersion: '',
   IsUsed: false,
 });
 
