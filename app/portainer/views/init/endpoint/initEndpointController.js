@@ -127,7 +127,6 @@ class InitEndpointController {
         null,
         null
       );
-      // TODO: k8s merge - go on home with agent on swarm (2)
       const routeName = endpoint.Type === PortainerEndpointTypes.AgentOnKubernetesEnvironment ? 'portainer.endpoints.endpoint.kubernetesConfig' : 'portainer.home';
       this.$state.go(routeName, { id: endpoint.Id });
     } catch (err) {
