@@ -1,4 +1,4 @@
-import { KubernetesApplicationDeploymentTypes, KubernetesApplicationPublishingTypes, KubernetesApplicationDataAccessPolicies } from './models';
+import { KubernetesApplicationDataAccessPolicies, KubernetesApplicationDeploymentTypes, KubernetesApplicationPublishingTypes } from './models';
 
 /**
  * KubernetesApplicationFormValues Model
@@ -124,7 +124,7 @@ export class KubernetesApplicationPublishedPortFormValue {
 const _KubernetesApplicationAutoScalerFormValue = Object.freeze({
   MinReplicas: 0,
   MaxReplicas: 0,
-  TargetCPUUtilization: 0,
+  TargetCPUUtilization: 50,
   ApiVersion: '',
   IsUsed: false,
 });

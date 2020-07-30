@@ -82,6 +82,16 @@ class KubernetesCreateApplicationController {
   }
 
   /**
+   * AUTO SCALER UI MANAGEMENT
+   */
+
+  unselectAutoScaler() {
+    if (this.formValues.DeploymentType === this.ApplicationDeploymentTypes.GLOBAL) {
+      this.formValues.AutoScaler.IsUsed = false;
+    }
+  }
+
+  /**
    * CONFIGURATION UI MANAGEMENT
    */
   addConfiguration() {
