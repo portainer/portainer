@@ -675,12 +675,38 @@
             </div>
             <!-- !replica count -->
 
+            <div
+              class="form-group"
+              ng-if="!ctrl.resourceReservationsOverflow() && ctrl.formValues.ReplicaCount > 1 && (ctrl.formValues.CpuLimit !== 0 || ctrl.formValues.MemoryLimit !== 0)"
+            >
+              <div class="col-sm-12 small text-muted">
+                <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                This application will reserve the following resources: <b>{{ ctrl.formValues.CpuLimit * ctrl.formValues.ReplicaCount | kubernetesApplicationCPUValue }} CPU</b> and
+                <b>{{ ctrl.formValues.MemoryLimit * ctrl.formValues.ReplicaCount }} MB</b> of memory.
+              </div>
+            </div>
+
+            <div class="form-group" ng-if="ctrl.resourceReservationsOverflow()">
+              <div class="col-sm-12 small text-muted">
+                <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                This application would exceed available resources. Please review resource reservations or the instance count.
+              </div>
+            </div>
+
+            <div class="form-group" ng-if="!ctrl.supportScalableReplicaDeployment()">
+              <div class="col-sm-12 small text-muted">
+                <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                The following storage option(s) do not support concurrent access from multiples instances: <code>{{ ctrl.getNonScalableStorage() }}</code
+                >. You will not be able to scale that application.
+              </div>
+            </div>
+
             <!-- auto scaling -->
             <div class="col-sm-12 form-section-title" ng-if="ctrl.formValues.DeploymentType !== ctrl.ApplicationDeploymentTypes.GLOBAL">
               Auto-scaling
             </div>
 
-            <div class="form-group" ng-if="ctrl.formValues.DeploymentType !== ctrl.ApplicationDeploymentTypes.GLOBAL">
+            <div class="form-group" ng-if="ctrl.formValues.DeploymentType !== ctrl.ApplicationDeploymentTypes.GLOBAL && ctrl.state.useServerMetrics">
               <div class="col-sm-12">
                 <label for="enable_auto_scaling" class="control-label text-left">
                   Enable auto scaling for this application
@@ -689,6 +715,15 @@
                   <input type="checkbox" class="form-control" name="enable_auto_scaling" ng-model="ctrl.formValues.AutoScaler.IsUsed" />
                   <i></i>
                 </label>
+              </div>
+            </div>
+
+            <div class="form-group" ng-if="ctrl.formValues.DeploymentType !== ctrl.ApplicationDeploymentTypes.GLOBAL && !ctrl.state.useServerMetrics">
+              <div class="col-sm-12">
+                <p
+                  >Server metrics capabilities must be enabled in the <span ng-if="!ctrl.isAdmin">endpoint configuration view</span>
+                  <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: ctrl.endpoint.Id})" class="ctrl.isAdmin">endpoint configuration view</a></p
+                >
               </div>
             </div>
 
@@ -737,12 +772,16 @@
                           ng-model="ctrl.formValues.AutoScaler.MaxReplicas"
                         />
                       </div>
-                      <div class="input-group input-group-sm" ng-show="kubernetesApplicationCreationForm['auto_scaler_max'].$invalid">
+                      <div class="input-group input-group-sm" ng-show="kubernetesApplicationCreationForm['auto_scaler_max'].$invalid || ctrl.autoScalerOverflow()">
                         <div class="small text-warning" style="margin-top: 5px;">
                           <ng-messages for="kubernetesApplicationCreationForm['auto_scaler_max'].$error">
                             <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Maximum instances is required.</p>
                             <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Maximum instances must be greater than minimum instances.</p>
                           </ng-messages>
+                          <p ng-if="ctrl.autoScalerOverflow()">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            This application would exceed available resources. Please review resource reservations or the instance count.
+                          </p>
                         </div>
                       </div>
                     </td>
@@ -765,32 +804,6 @@
               </table>
             </div>
             <!-- !auto scaling -->
-
-            <div
-              class="form-group"
-              ng-if="!ctrl.resourceReservationsOverflow() && ctrl.formValues.ReplicaCount > 1 && (ctrl.formValues.CpuLimit !== 0 || ctrl.formValues.MemoryLimit !== 0)"
-            >
-              <div class="col-sm-12 small text-muted">
-                <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                This application will reserve the following resources: <b>{{ ctrl.formValues.CpuLimit * ctrl.formValues.ReplicaCount | kubernetesApplicationCPUValue }} CPU</b> and
-                <b>{{ ctrl.formValues.MemoryLimit * ctrl.formValues.ReplicaCount }} MB</b> of memory.
-              </div>
-            </div>
-
-            <div class="form-group" ng-if="ctrl.resourceReservationsOverflow()">
-              <div class="col-sm-12 small text-muted">
-                <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                This application would exceed available resources. Please review resource reservations or the instance count.
-              </div>
-            </div>
-
-            <div class="form-group" ng-if="!ctrl.supportScalableReplicaDeployment()">
-              <div class="col-sm-12 small text-muted">
-                <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                The following storage option(s) do not support concurrent access from multiples instances: <code>{{ ctrl.getNonScalableStorage() }}</code
-                >. You will not be able to scale that application.
-              </div>
-            </div>
 
             <div class="col-sm-12 form-section-title">
               Publishing the application

@@ -330,6 +330,14 @@ class KubernetesCreateApplicationController {
     return false;
   }
 
+  autoScalerOverflow() {
+    const cpu = this.formValues.CpuLimit;
+    const maxCpu = this.state.sliders.cpu.max;
+    const maxInstances = this.formValues.AutoScaler.MaxReplicas;
+
+    return cpu * maxInstances > maxCpu;
+  }
+
   publishViaLoadBalancerEnabled() {
     return this.state.useLoadBalancer;
   }
@@ -356,11 +364,12 @@ class KubernetesCreateApplicationController {
 
   isDeployUpdateButtonDisabled() {
     const overflow = this.resourceReservationsOverflow();
+    const autoScalerOverflow = this.autoScalerOverflow();
     const inProgress = this.state.actionInProgress;
     const invalid = !this.isValid();
     const hasNoChanges = this.isEditAndNoChangesMade();
     const nonScalable = this.isNonScalable();
-    const res = overflow || inProgress || invalid || hasNoChanges || nonScalable;
+    const res = overflow || autoScalerOverflow || inProgress || invalid || hasNoChanges || nonScalable;
     return res;
   }
 
@@ -560,6 +569,7 @@ class KubernetesCreateApplicationController {
       this.state = {
         actionInProgress: false,
         useLoadBalancer: false,
+        useServerMetrics: false,
         sliders: {
           cpu: {
             min: 0,
@@ -598,8 +608,10 @@ class KubernetesCreateApplicationController {
       }
 
       const endpoint = this.EndpointProvider.currentEndpoint();
+      this.endpoint = endpoint;
       this.storageClasses = endpoint.Kubernetes.Configuration.StorageClasses;
       this.state.useLoadBalancer = endpoint.Kubernetes.Configuration.UseLoadBalancer;
+      this.state.useServerMetrics = endpoint.Kubernetes.Configuration.UseServerMetrics;
 
       this.formValues = new KubernetesApplicationFormValues();
 
