@@ -514,8 +514,14 @@ func (handler *Handler) pingAndCheckPlatform(payload *endpointCreatePayload) (po
 		}
 	}
 
-	url := fmt.Sprintf("%s/ping", payload.URL)
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	url, err := url.Parse(fmt.Sprintf("%s/ping", payload.URL))
+	if err != nil {
+		return 0, err
+	}
+
+	url.Scheme = "https"
+
+	req, err := http.NewRequest(http.MethodGet, url.String(), nil)
 	if err != nil {
 		return 0, err
 	}
