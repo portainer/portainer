@@ -77,13 +77,13 @@
                 <div style="margin-top: 10px;">
                   <uib-tabset active="state.deploymentTab">
                     <uib-tab index="0" heading="Kubernetes">
-                      <code style="display: block; white-space: pre-wrap;">
+                      <code style="display: block;">
                         curl -L https://downloads.portainer.io/portainer-agent-k8s.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml
                       </code>
                     </uib-tab>
 
-                    <uib-tab index="0" heading="Docker">
-                      <code>
+                    <uib-tab index="1" heading="Docker">
+                      <code style="display: block;">
                         curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent
                       </code>
                     </uib-tab>
