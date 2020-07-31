@@ -88,7 +88,7 @@ angular.module('portainer.app').factory('EndpointService', [
       var deferred = $q.defer();
 
       var endpointURL = URL;
-      if (creationType !== PortainerEndpointCreationTypes.EdgeAgentEnvironment && creationType !== PortainerEndpointCreationTypes.AgentEnvironment) {
+      if (creationType !== PortainerEndpointCreationTypes.EdgeAgentEnvironment) {
         endpointURL = 'tcp://' + URL;
       }
 
