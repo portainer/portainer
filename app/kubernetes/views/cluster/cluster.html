@@ -51,7 +51,7 @@
           <!-- !cluster-status -->
 
           <!-- leader-status -->
-          <div ng-if="ctrl.endpoints.length > 0">
+          <div ng-if="ctrl.endpointsSystem.length > 0">
             <div class="col-sm-12 form-section-title">
               Leader status
             </div>
@@ -62,7 +62,7 @@
                   <td style="border-top: none; width: 25%;">Component</td>
                   <td style="border-top: none; width: 25%;">Leader node</td>
                 </tr>
-                <tr ng-repeat="ep in ctrl.endpoints">
+                <tr ng-repeat="ep in ctrl.endpointsSystem">
                   <td style="width: 25%;">
                     {{ ep.Name }}
                   </td>

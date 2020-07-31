@@ -8,10 +8,22 @@ const _KubernetesEndpoint = Object.freeze({
   Name: '',
   Namespace: '',
   HolderIdentity: '',
+  Subsets: [],
 });
 
 export class KubernetesEndpoint {
   constructor() {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesEndpoint)));
+  }
+}
+
+const _KubernetesEndpointSubset = Object.freeze({
+  Ip: '',
+  Port: '',
+});
+
+export class KubernetesEndpointSubset {
+  constructor() {
+    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesEndpointSubset)));
   }
 }
