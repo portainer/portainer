@@ -46,13 +46,39 @@
                 </p>
               </span>
             </div>
-
             <div class="form-group">
               <div class="col-sm-12">
                 <label class="control-label text-left">
                   Enable features using server metrics
                 </label>
                 <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.UseServerMetrics" /><i></i> </label>
+              </div>
+            </div>
+
+            <div class="col-sm-12 form-section-title">
+              Expose applications over ingresses
+            </div>
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                Enabling this feature will allow users to expose application they deploy over a route.<br />
+                You need to define all the ingress classes (controllers) you want to expose for this endpoint.<br />
+                Once they are exposed, you can enable specific ingresses for every resource pool of your cluster
+              </span>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label class="control-label text-left">
+                  Allow users to use ingress routes
+                </label>
+                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.UseIngress" /><i></i> </label>
+              </div>
+            </div>
+            <div class="form-group" ng-if="ctrl.formValues.UseIngress">
+              <label for="ingress_classes" class="col-sm-3 col-lg-2 control-label text-left">
+                Ingress controllers
+              </label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="text" class="form-control" id="ingress_classes" ng-model="ctrl.formValues.IngressClasses" placeholder="nginx,gce,traefik" />
               </div>
             </div>
 
@@ -97,17 +123,8 @@
                         </div>
                       </td>
                       <td>
-                        <span
-                          isteven-multi-select
-                          input-model="class.availableAccessModes"
-                          output-model="class.AccessModes"
-                          button-label="Name"
-                          item-label="Description"
-                          tick-property="selected"
-                          directive-id="{{ class.Name }}"
-                          helper-elements=""
-                          translation="{nothingSelected: 'Not configured'}"
-                        >
+                        <span isteven-multi-select input-model="class.availableAccessModes" output-model="class.AccessModes" button-label="Name" item-label="Description"
+                          tick-property="selected" directive-id="{{ class.Name }}" helper-elements="" translation="{nothingSelected: 'Not configured'}">
                         </span>
                       </td>
                       <td>
@@ -133,13 +150,8 @@
             <!-- actions -->
             <div class="form-group">
               <div class="col-sm-12">
-                <button
-                  type="submit"
-                  class="btn btn-primary btn-sm"
-                  ng-click="ctrl.configure()"
-                  ng-disabled="ctrl.state.actionInProgress || !ctrl.hasValidStorageConfiguration()"
-                  button-spinner="ctrl.state.actionInProgress"
-                >
+                <button type="submit" class="btn btn-primary btn-sm" ng-click="ctrl.configure()" ng-disabled="ctrl.state.actionInProgress || !ctrl.hasValidStorageConfiguration()"
+                  button-spinner="ctrl.state.actionInProgress">
                   <span ng-hide="ctrl.state.actionInProgress">Save configuration</span>
                   <span ng-show="ctrl.state.actionInProgress">Saving configuration...</span>
                 </button>

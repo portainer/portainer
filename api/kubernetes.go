@@ -5,7 +5,9 @@ func KubernetesDefault() KubernetesData {
 		Configuration: KubernetesConfiguration{
 			UseLoadBalancer:  false,
 			UseServerMetrics: false,
-			StorageClasses:   []KubernetesStorageClassConfig{},
+			UseIngress: false,
+			StorageClasses:  []KubernetesStorageClassConfig{},
+			IngressClasses: "",
 		},
 		Snapshots: []KubernetesSnapshot{},
 	}

@@ -644,6 +644,8 @@ class KubernetesCreateApplicationController {
         actionInProgress: false,
         useLoadBalancer: false,
         useServerMetrics: false,
+        useIngress: false,
+        ingressClasses: '',
         sliders: {
           cpu: {
             min: 0,
@@ -691,6 +693,8 @@ class KubernetesCreateApplicationController {
       this.storageClasses = endpoint.Kubernetes.Configuration.StorageClasses;
       this.state.useLoadBalancer = endpoint.Kubernetes.Configuration.UseLoadBalancer;
       this.state.useServerMetrics = endpoint.Kubernetes.Configuration.UseServerMetrics;
+      this.state.useIngress = endpoint.Kubernetes.Configuration.UseIngress;
+      this.state.ingressClasses = endpoint.Kubernetes.Configuration.IngressClasses;
 
       this.formValues = new KubernetesApplicationFormValues();
 
