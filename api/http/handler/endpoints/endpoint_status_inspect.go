@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"encoding/base64"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -9,7 +10,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/bolt/errors"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
 type stackStatusResponse struct {
@@ -42,7 +43,7 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == errors.ErrObjectNotFound {
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
@@ -55,14 +56,19 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 
 	if endpoint.EdgeID == "" {
 		edgeIdentifier := r.Header.Get(portainer.PortainerAgentEdgeIDHeader)
+		endpoint.EdgeID = edgeIdentifier
+
 		agentPlatformHeader := r.Header.Get(portainer.HTTPResponseAgentPlatform)
+		if agentPlatformHeader == "" {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Agent Platform Header is missing", errors.New("Agent Platform Header is missing")}
+		}
+
 		agentPlatformNumber, err := strconv.Atoi(agentPlatformHeader)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to parse agent platform header", err}
 		}
 
 		agentPlatform := portainer.AgentPlatform(agentPlatformNumber)
-		endpoint.EdgeID = edgeIdentifier
 
 		if agentPlatform == portainer.AgentPlatformDocker {
 			endpoint.Type = portainer.EdgeAgentOnDockerEnvironment
