@@ -2,7 +2,7 @@ import './assets/css';
 import '@babel/polyfill';
 
 import angular from 'angular';
-
+import './matomo';
 import './agent';
 import './azure/_module';
 import './docker/__module';
