@@ -36,6 +36,7 @@ angular.module('portainer.app').controller('SettingsController', [
       allowDeviceMappingForRegularUsers: false,
       allowStackManagementForRegularUsers: false,
       disableContainerCapabilitiesForRegularUsers: false,
+      enableTelemetry: false,
     };
 
     $scope.isContainerEditDisabled = function isContainerEditDisabled() {
@@ -85,6 +86,7 @@ angular.module('portainer.app').controller('SettingsController', [
       settings.AllowDeviceMappingForRegularUsers = !$scope.formValues.disableDeviceMappingForRegularUsers;
       settings.AllowStackManagementForRegularUsers = !$scope.formValues.disableStackManagementForRegularUsers;
       settings.AllowContainerCapabilitiesForRegularUsers = !$scope.formValues.disableContainerCapabilitiesForRegularUsers;
+      settings.EnableTelemetry = $scope.formValues.enableTelemetry;
 
       $scope.state.actionInProgress = true;
       updateSettings(settings);
@@ -105,6 +107,7 @@ angular.module('portainer.app').controller('SettingsController', [
           StateManager.updateAllowContainerCapabilitiesForRegularUsers(settings.AllowContainerCapabilitiesForRegularUsers);
           StateManager.updateAllowPrivilegedModeForRegularUsers(settings.AllowPrivilegedModeForRegularUsers);
           StateManager.updateAllowBindMountsForRegularUsers(settings.AllowBindMountsForRegularUsers);
+          StateManager.updateEnableTelemetry(settings.EnableTelemetry);
           $state.reload();
         })
         .catch(function error(err) {
@@ -133,6 +136,7 @@ angular.module('portainer.app').controller('SettingsController', [
           $scope.formValues.disableDeviceMappingForRegularUsers = !settings.AllowDeviceMappingForRegularUsers;
           $scope.formValues.disableStackManagementForRegularUsers = !settings.AllowStackManagementForRegularUsers;
           $scope.formValues.disableContainerCapabilitiesForRegularUsers = !settings.AllowContainerCapabilitiesForRegularUsers;
+          $scope.formValues.enableTelemetry = settings.EnableTelemetry;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve application settings');
