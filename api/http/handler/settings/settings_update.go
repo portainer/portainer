@@ -33,6 +33,7 @@ type settingsUpdatePayload struct {
 	EdgeAgentCheckinInterval                  *int
 	EnableEdgeComputeFeatures                 *bool
 	UserSessionTimeout                        *string
+	EnableTelemetry                           *bool
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
@@ -162,6 +163,10 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.AllowDeviceMappingForRegularUsers != nil {
 		settings.AllowDeviceMappingForRegularUsers = *payload.AllowDeviceMappingForRegularUsers
+	}
+
+	if payload.EnableTelemetry != nil {
+		settings.EnableTelemetry = *payload.EnableTelemetry
 	}
 
 	tlsError := handler.updateTLS(settings)
