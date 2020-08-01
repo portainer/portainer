@@ -33,17 +33,14 @@ angular.module('portainer.app', ['portainer.oauth']).config([
           '$state',
           '$async',
           '$q',
-          '$analytics',
-          (StateManager, Authentication, Notifications, authManager, $rootScope, $state, $async, $q, $analytics) => {
+          (StateManager, Authentication, Notifications, authManager, $rootScope, $state, $async, $q) => {
             const deferred = $q.defer();
             const appState = StateManager.getState();
             if (!appState.loading) {
               deferred.resolve();
             } else {
               StateManager.initialize()
-                .then(function success(state) {
-                  $analytics.setOptOut(!state.application.enableTelemetry);
-
+                .then(function success() {
                   return $async(initAuthentication, authManager, Authentication, $rootScope, $state);
                 })
                 .then(() => deferred.resolve())

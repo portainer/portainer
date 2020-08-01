@@ -152,6 +152,7 @@ angular.module('portainer.app').factory('StateManager', [
           var status = data.status;
           var settings = data.settings;
           assignStateFromStatusAndSettings(status, settings);
+          $analytics.setOptOut(!settings.EnableTelemetry);
           LocalStorage.storeApplicationState(state.application);
           deferred.resolve(state);
         })
@@ -194,6 +195,7 @@ angular.module('portainer.app').factory('StateManager', [
         } else {
           state.application = applicationState;
           state.loading = false;
+          $analytics.setOptOut(!state.application.enableTelemetry);
           deferred.resolve(state);
         }
       } else {
