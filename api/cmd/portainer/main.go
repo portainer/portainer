@@ -154,8 +154,7 @@ func loadEdgeJobsFromDatabase(dataStore portainer.DataStore, reverseTunnelServic
 
 func initStatus(flags *portainer.CLIFlags) *portainer.Status {
 	return &portainer.Status{
-		Analytics: !*flags.NoAnalytics,
-		Version:   portainer.APIVersion,
+		Version: portainer.APIVersion,
 	}
 }
 

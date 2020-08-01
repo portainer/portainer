@@ -566,8 +566,7 @@ type (
 
 	// Status represents the application status
 	Status struct {
-		Analytics bool   `json:"Analytics"`
-		Version   string `json:"Version"`
+		Version string `json:"Version"`
 	}
 
 	// Tag represents a tag that can be associated to a resource

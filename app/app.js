@@ -30,9 +30,9 @@ angular.module('portainer').run([
       HttpRequestHelper.resetAgentHeaders();
     });
 
-    $state.defaultErrorHandler(function () {
-      // Do not log transitionTo errors
-    });
+    // $state.defaultErrorHandler(function () {
+    //   // Do not log transitionTo errors
+    // });
 
     // Keep-alive Edge endpoints by sending a ping request every minute
     $interval(function () {
