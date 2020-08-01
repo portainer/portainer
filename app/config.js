@@ -7,11 +7,10 @@ angular.module('portainer').config([
   '$httpProvider',
   'localStorageServiceProvider',
   'jwtOptionsProvider',
-  'AnalyticsProvider',
   '$uibTooltipProvider',
   '$compileProvider',
   'cfpLoadingBarProvider',
-  function ($urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider, $uibTooltipProvider, $compileProvider, cfpLoadingBarProvider) {
+  function ($urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, $uibTooltipProvider, $compileProvider, cfpLoadingBarProvider) {
     'use strict';
 
     var environment = '@@ENVIRONMENT';
@@ -51,14 +50,6 @@ angular.module('portainer').config([
         };
       },
     ]);
-
-    // $analyticsProvider.withBase(false);
-    // $analyticsProvider.withAutoBase(true);
-
-    // need to set trackRelativePath
-
-    // AnalyticsProvider.setAccount({ tracker: __CONFIG_GA_ID, set: { anonymizeIp: true } });
-    // AnalyticsProvider.startOffline(true);
 
     toastr.options.timeOut = 3000;
 

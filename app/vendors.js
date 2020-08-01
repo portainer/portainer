@@ -25,7 +25,6 @@ import 'angular-resource';
 import 'angular-utils-pagination';
 import 'angular-local-storage';
 import 'angular-jwt';
-import 'angular-google-analytics';
 import 'angular-json-tree';
 import 'angular-loading-bar';
 import 'angular-clipboard';

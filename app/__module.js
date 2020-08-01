@@ -21,7 +21,6 @@ angular.module('portainer', [
   'angularUtils.directives.dirPagination',
   'LocalStorageModule',
   'angular-jwt',
-  'angular-google-analytics',
   'angular-json-tree',
   'angular-loading-bar',
   'angular-clipboard',

@@ -1,5 +1,5 @@
 const path = require('path');
-const { ProvidePlugin, IgnorePlugin, DefinePlugin } = require('webpack');
+const { ProvidePlugin, IgnorePlugin } = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackBuildNotifierPlugin = require('webpack-build-notifier');
 const CleanTerminalPlugin = require('clean-terminal-webpack-plugin');
@@ -91,9 +91,6 @@ module.exports = {
       shorthands: true,
       collections: true,
       paths: true,
-    }),
-    new DefinePlugin({
-      __CONFIG_GA_ID: JSON.stringify(pkg.config.GA_ID),
     }),
   ],
   optimization: {
