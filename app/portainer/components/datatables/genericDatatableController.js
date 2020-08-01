@@ -57,7 +57,7 @@ angular.module('portainer.app').controller('GenericDatatableController', [
         const itemsInRange = _.filter(this.state.filteredDataSet, (item, index) => {
           return isBetween(index, firstItemIndex, lastItemIndex);
         });
-        const value = item.Checked;
+        const value = this.state.firstClickedItem.Checked;
 
         _.forEach(itemsInRange, (i) => {
           if (!this.allowSelection(i)) {
