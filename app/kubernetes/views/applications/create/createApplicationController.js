@@ -331,11 +331,21 @@ class KubernetesCreateApplicationController {
   }
 
   autoScalerOverflow() {
+    const instances = this.formValues.AutoScaler.MaxReplicas;
     const cpu = this.formValues.CpuLimit;
     const maxCpu = this.state.sliders.cpu.max;
-    const maxInstances = this.formValues.AutoScaler.MaxReplicas;
+    const memory = this.formValues.MemoryLimit;
+    const maxMemory = this.state.sliders.memory.max;
 
-    return cpu * maxInstances > maxCpu;
+    if (cpu * instances > maxCpu) {
+      return true;
+    }
+
+    if (memory * instances > maxMemory) {
+      return true;
+    }
+
+    return false;
   }
 
   publishViaLoadBalancerEnabled() {
@@ -600,6 +610,8 @@ class KubernetesCreateApplicationController {
           name: this.$transition$.params().name,
         },
       };
+
+      this.isAdmin = this.Authentication.isAdmin();
 
       this.editChanges = [];
 

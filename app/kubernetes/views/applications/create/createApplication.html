@@ -719,16 +719,19 @@
             </div>
 
             <div class="form-group" ng-if="ctrl.formValues.DeploymentType !== ctrl.ApplicationDeploymentTypes.GLOBAL && !ctrl.state.useServerMetrics">
-              <div class="col-sm-12">
-                <p
-                  >Server metrics capabilities must be enabled in the <span ng-if="!ctrl.isAdmin">endpoint configuration view</span>
-                  <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: ctrl.endpoint.Id})" class="ctrl.isAdmin">endpoint configuration view</a></p
-                >
+              <div class="col-sm-12 small text-muted">
+                <p ng-if="!ctrl.isAdmin">
+                  This feature is currently disabled and must be enabled by an administrator user.
+                </p>
+                <p ng-if="ctrl.isAdmin">
+                  Server metrics features must be enabled in the
+                  <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: ctrl.endpoint.Id})" class="ctrl.isAdmin">endpoint configuration view</a>.
+                </p>
               </div>
             </div>
 
             <div class="form-inline" ng-if="ctrl.formValues.AutoScaler.IsUsed">
-              <table class="table">
+              <table class="table" style="margin-bottom: 0px;">
                 <tbody>
                   <tr class="small">
                     <td style="width: 33%; border: none; padding: 2px 0 2px 0;">Minimum instances</td>
@@ -778,10 +781,6 @@
                             <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Maximum instances is required.</p>
                             <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Maximum instances must be greater than minimum instances.</p>
                           </ng-messages>
-                          <p ng-if="ctrl.autoScalerOverflow()">
-                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            This application would exceed available resources. Please review resource reservations or the instance count.
-                          </p>
                         </div>
                       </div>
                     </td>
@@ -802,6 +801,13 @@
                   </tr>
                 </tbody>
               </table>
+
+              <div class="form-group" ng-if="ctrl.autoScalerOverflow()" style="margin-bottom: 10px;">
+                <div class="col-sm-12 small text-muted">
+                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  This application would exceed available resources. Please review resource reservations or the maximum instance count of the auto-scaling policy.
+                </div>
+              </div>
             </div>
             <!-- !auto scaling -->
 
