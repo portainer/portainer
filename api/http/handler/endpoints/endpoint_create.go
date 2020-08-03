@@ -218,6 +218,7 @@ func (handler *Handler) createEndpoint(payload *endpointCreatePayload) (*portain
 			endpointType = portainer.AgentOnDockerEnvironment
 		} else if agentPlatform == portainer.AgentPlatformKubernetes {
 			endpointType = portainer.AgentOnKubernetesEnvironment
+			payload.URL = strings.TrimPrefix(payload.URL, "tcp://")
 		}
 	}
 
