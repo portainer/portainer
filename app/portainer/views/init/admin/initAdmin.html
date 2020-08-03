@@ -56,16 +56,6 @@
               </div>
             </div>
             <!-- !confirm-password-input -->
-            <!-- enableTelemetry-->
-            <div class="form-group">
-              <div class="col-sm-12">
-                <label for="toggle_enableTelemetry" class="control-label text-left">
-                  Allow the collection of anonymous statistics
-                </label>
-                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="toggle_enableTelemetry" ng-model="formValues.enableTelemetry" /><i></i> </label>
-              </div>
-            </div>
-            <!-- !enableTelemetry-->
             <!-- note -->
             <div class="form-group">
               <div class="col-sm-12">
@@ -92,6 +82,14 @@
               </div>
             </div>
             <!-- !actions -->
+            <!-- enableTelemetry-->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <input type="checkbox" name="toggle_enableTelemetry" ng-model="formValues.enableTelemetry" />
+                <span class="text-muted small" style="margin-left: 2px;">Allow collection of anonymous statistics</span>
+              </div>
+            </div>
+            <!-- !enableTelemetry-->
           </form>
           <!-- !init password form -->
         </div>
