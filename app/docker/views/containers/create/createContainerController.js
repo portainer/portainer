@@ -316,19 +316,21 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
     function prepareResources(config) {
       // Memory Limit - Round to 0.125
-      var memoryLimit = (Math.round($scope.formValues.MemoryLimit * 8) / 8).toFixed(3);
-      memoryLimit *= 1024 * 1024;
-      if (memoryLimit > 0) {
+      if ($scope.formValues.MemoryLimit >= 0) {
+        var memoryLimit = (Math.round($scope.formValues.MemoryLimit * 8) / 8).toFixed(3);
+        memoryLimit *= 1024 * 1024;
         config.HostConfig.Memory = memoryLimit;
       }
+
       // Memory Resevation - Round to 0.125
-      var memoryReservation = (Math.round($scope.formValues.MemoryReservation * 8) / 8).toFixed(3);
-      memoryReservation *= 1024 * 1024;
-      if (memoryReservation > 0) {
+      if ($scope.formValues.MemoryReservation >= 0) {
+        var memoryReservation = (Math.round($scope.formValues.MemoryReservation * 8) / 8).toFixed(3);
+        memoryReservation *= 1024 * 1024;
         config.HostConfig.MemoryReservation = memoryReservation;
       }
+
       // CPU Limit
-      if ($scope.formValues.CpuLimit > 0) {
+      if ($scope.formValues.CpuLimit >= 0) {
         config.HostConfig.NanoCpus = $scope.formValues.CpuLimit * 1000000000;
       }
     }
