@@ -94,7 +94,7 @@ angular.module('angulartics.matomo', ['angulartics']).config([
       if ($window._paq) {
         $window._paq.push(['setDocumentTitle', $window.document.title]);
         $window._paq.push(['setReferrerUrl', '']);
-        $window._paq.push(['setCustomUrl', 'http://portainer.app' + path]);
+        $window._paq.push(['setCustomUrl', 'http://portainer-ce.app' + path]);
         $window._paq.push(['trackPageView']);
       }
     });
