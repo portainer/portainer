@@ -280,11 +280,13 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       }
       config.HostConfig.Dns = dnsServers;
 
+      var extraHosts = [];
       $scope.formValues.ExtraHosts.forEach(function (v) {
         if (v.value) {
-          config.HostConfig.ExtraHosts.push(v.value);
+          extraHosts.push(v.value);
         }
       });
+      config.HostConfig.ExtraHosts = extraHosts;
     }
 
     function prepareLabels(config) {
