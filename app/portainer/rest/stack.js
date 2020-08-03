@@ -15,6 +15,8 @@ angular.module('portainer.app').factory('Stack', [
         remove: { method: 'DELETE', params: { id: '@id', external: '@external', endpointId: '@endpointId' } },
         getStackFile: { method: 'GET', params: { id: '@id', action: 'file' } },
         migrate: { method: 'POST', params: { id: '@id', action: 'migrate', endpointId: '@endpointId' }, ignoreLoadingBar: true },
+        start: { method: 'POST', params: { id: '@id', action: 'start' } },
+        stop: { method: 'POST', params: { id: '@id', action: 'stop' } },
       }
     );
   },

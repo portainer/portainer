@@ -12,6 +12,7 @@ export function StackViewModel(data) {
     this.ResourceControl = new ResourceControlViewModel(data.ResourceControl);
   }
   this.External = false;
+  this.Status = data.Status;
 }
 
 export function ExternalStackViewModel(name, type) {
