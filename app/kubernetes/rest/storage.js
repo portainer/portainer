@@ -29,6 +29,7 @@ angular.module('portainer.kubernetes').factory('KubernetesStorage', [
           },
           create: { method: 'POST' },
           update: { method: 'PUT' },
+          patch: { method: 'PATCH' },
           delete: { method: 'DELETE' },
         }
       );
