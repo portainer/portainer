@@ -5,7 +5,7 @@
 <div class="form-group"></div>
 <div class="form-group" style="margin-bottom: 0;">
   <div class="boxselector_wrapper">
-    <div ng-click="$ctrl.onSelect($ctrl.provider, true)">
+    <div ng-click="$ctrl.onSelect($ctrl.providers[0], true)">
       <input type="radio" id="oauth_provider_microsoft" ng-model="$ctrl.provider" ng-value="$ctrl.providers[0]" />
       <label for="oauth_provider_microsoft">
         <div class="boxselector_header">
@@ -15,7 +15,7 @@
         <p>Microsoft OAuth provider</p>
       </label>
     </div>
-    <div ng-click="$ctrl.onSelect($ctrl.provider, true)">
+    <div ng-click="$ctrl.onSelect($ctrl.providers[1], true)">
       <input type="radio" id="oauth_provider_google" ng-model="$ctrl.provider" ng-value="$ctrl.providers[1]" />
       <label for="oauth_provider_google">
         <div class="boxselector_header">
@@ -25,7 +25,7 @@
         <p>Google OAuth provider</p>
       </label>
     </div>
-    <div ng-click="$ctrl.onSelect($ctrl.provider, true)">
+    <div ng-click="$ctrl.onSelect($ctrl.providers[2], true)">
       <input type="radio" id="oauth_provider_github" ng-model="$ctrl.provider" ng-value="$ctrl.providers[2]" />
       <label for="oauth_provider_github">
         <div class="boxselector_header">
@@ -35,7 +35,7 @@
         <p>Github OAuth provider</p>
       </label>
     </div>
-    <div ng-click="$ctrl.onSelect($ctrl.provider, true)">
+    <div ng-click="$ctrl.onSelect($ctrl.providers[3], true)">
       <input type="radio" id="oauth_provider_custom" ng-model="$ctrl.provider" ng-value="$ctrl.providers[3]" />
       <label for="oauth_provider_custom">
         <div class="boxselector_header">
