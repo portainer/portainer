@@ -2,13 +2,15 @@ package endpoints
 
 import (
 	"encoding/base64"
+	"errors"
 	"net/http"
+	"strconv"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/bolt/errors"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
 type stackStatusResponse struct {
@@ -41,7 +43,7 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == errors.ErrObjectNotFound {
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
@@ -54,10 +56,27 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 
 	if endpoint.EdgeID == "" {
 		edgeIdentifier := r.Header.Get(portainer.PortainerAgentEdgeIDHeader)
-
 		endpoint.EdgeID = edgeIdentifier
 
-		err := handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
+		agentPlatformHeader := r.Header.Get(portainer.HTTPResponseAgentPlatform)
+		if agentPlatformHeader == "" {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Agent Platform Header is missing", errors.New("Agent Platform Header is missing")}
+		}
+
+		agentPlatformNumber, err := strconv.Atoi(agentPlatformHeader)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to parse agent platform header", err}
+		}
+
+		agentPlatform := portainer.AgentPlatform(agentPlatformNumber)
+
+		if agentPlatform == portainer.AgentPlatformDocker {
+			endpoint.Type = portainer.EdgeAgentOnDockerEnvironment
+		} else if agentPlatform == portainer.AgentPlatformKubernetes {
+			endpoint.Type = portainer.EdgeAgentOnKubernetesEnvironment
+		}
+
+		err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to Unable to persist endpoint changes inside the database", err}
 		}

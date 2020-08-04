@@ -11,6 +11,9 @@ type (
 		RoleID RoleID `json:"RoleId"`
 	}
 
+	// AgentPlatform represents a platform type for an Agent
+	AgentPlatform int
+
 	// APIOperationAuthorizationRequest represent an request for the authorization to execute an API operation
 	APIOperationAuthorizationRequest struct {
 		Path           string
@@ -1141,6 +1144,8 @@ const (
 	PortainerAgentHeader = "Portainer-Agent"
 	// PortainerAgentEdgeIDHeader represent the name of the header containing the Edge ID associated to an agent/agent cluster
 	PortainerAgentEdgeIDHeader = "X-PortainerAgent-EdgeID"
+	// HTTPResponseAgentPlatform represents the name of the header containing the Agent platform
+	HTTPResponseAgentPlatform = "Portainer-Agent-Platform"
 	// PortainerAgentTargetHeader represent the name of the header containing the target node name
 	PortainerAgentTargetHeader = "X-PortainerAgent-Target"
 	// PortainerAgentSignatureHeader represent the name of the header containing the digital signature
@@ -1172,6 +1177,14 @@ const (
 	AuthenticationLDAP
 	//AuthenticationOAuth represents the OAuth authentication method (authentication against a authorization server)
 	AuthenticationOAuth
+)
+
+const (
+	_ AgentPlatform = iota
+	// AgentPlatformDocker represent the Docker platform (Standalone/Swarm)
+	AgentPlatformDocker
+	// AgentPlatformKubernetes represent the Kubernetes platform
+	AgentPlatformKubernetes
 )
 
 const (

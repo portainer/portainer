@@ -1,4 +1,4 @@
-import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
+import { PortainerEndpointCreationTypes, PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
 import { EndpointSecurityFormData } from '../../../components/endpointSecurity/porEndpointSecurityModel';
 
 angular
@@ -56,7 +56,7 @@ angular
     };
 
     $scope.copyAgentCommand = function () {
-      if ($scope.state.deploymentTab === 0) {
+      if ($scope.state.deploymentTab === 1) {
         clipboard.copyText('curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent');
       } else {
         clipboard.copyText('curl -L https://downloads.portainer.io/portainer-agent-k8s.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml');
@@ -102,19 +102,31 @@ angular
       var TLSCertFile = TLSSkipClientVerify ? null : securityData.TLSCert;
       var TLSKeyFile = TLSSkipClientVerify ? null : securityData.TLSKey;
 
-      addEndpoint(name, PortainerEndpointTypes.DockerEnvironment, URL, publicURL, groupId, tagIds, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile);
+      addEndpoint(
+        name,
+        PortainerEndpointCreationTypes.LocalDockerEnvironment,
+        URL,
+        publicURL,
+        groupId,
+        tagIds,
+        TLS,
+        TLSSkipVerify,
+        TLSSkipClientVerify,
+        TLSCAFile,
+        TLSCertFile,
+        TLSKeyFile
+      );
     };
 
     $scope.addAgentEndpoint = function () {
       var name = $scope.formValues.Name;
-      var URL = $filter('stripprotocol')($scope.formValues.URL);
+      // var URL = $filter('stripprotocol')($scope.formValues.URL);
+      var URL = $scope.formValues.URL;
       var publicURL = $scope.formValues.PublicURL === '' ? URL.split(':')[0] : $scope.formValues.PublicURL;
       var groupId = $scope.formValues.GroupId;
       var tagIds = $scope.formValues.TagIds;
 
-      addEndpoint(name, PortainerEndpointTypes.AgentOnDockerEnvironment, URL, publicURL, groupId, tagIds, true, true, true, null, null, null);
-      // TODO: k8s merge - temporarily updated to AgentOnKubernetesEnvironment, breaking Docker agent support
-      // addEndpoint(name, PortainerEndpointTypes.AgentOnKubernetesEnvironment, URL, publicURL, groupId, tags, true, true, true, null, null, null);
+      addEndpoint(name, PortainerEndpointCreationTypes.AgentEnvironment, URL, publicURL, groupId, tagIds, true, true, true, null, null, null);
     };
 
     $scope.addEdgeAgentEndpoint = function () {
@@ -123,9 +135,7 @@ angular
       var tagIds = $scope.formValues.TagIds;
       var URL = $scope.formValues.URL;
 
-      addEndpoint(name, PortainerEndpointTypes.EdgeAgentOnDockerEnvironment, URL, '', groupId, tagIds, false, false, false, null, null, null, $scope.formValues.CheckinInterval);
-      // TODO: k8s merge - temporarily updated to EdgeAgentOnKubernetesEnvironment, breaking Docker Edge agent support
-      // addEndpoint(name, PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment, URL, "", groupId, tags, false, false, false, null, null, null);
+      addEndpoint(name, PortainerEndpointCreationTypes.EdgeAgentEnvironment, URL, '', groupId, tagIds, false, false, false, null, null, null, $scope.formValues.CheckinInterval);
     };
 
     $scope.addAzureEndpoint = function () {
@@ -154,11 +164,11 @@ angular
         });
     }
 
-    function addEndpoint(name, type, URL, PublicURL, groupId, tagIds, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile, CheckinInterval) {
+    function addEndpoint(name, creationType, URL, PublicURL, groupId, tagIds, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile, CheckinInterval) {
       $scope.state.actionInProgress = true;
       EndpointService.createRemoteEndpoint(
         name,
-        type,
+        creationType,
         URL,
         PublicURL,
         groupId,
@@ -171,14 +181,19 @@ angular
         TLSKeyFile,
         CheckinInterval
       )
-        .then(function success(data) {
+        .then(function success(endpoint) {
           Notifications.success('Endpoint created', name);
-          if (type === PortainerEndpointTypes.EdgeAgentOnDockerEnvironment || type === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment) {
-            $state.go('portainer.endpoints.endpoint', { id: data.Id });
-          } else if (type === PortainerEndpointTypes.AgentOnKubernetesEnvironment) {
-            $state.go('portainer.endpoints.endpoint.kubernetesConfig', { id: data.Id });
-          } else {
-            $state.go('portainer.endpoints', {}, { reload: true });
+          switch (endpoint.Type) {
+            case PortainerEndpointTypes.EdgeAgentOnDockerEnvironment:
+            case PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment:
+              $state.go('portainer.endpoints.endpoint', { id: endpoint.Id });
+              break;
+            case PortainerEndpointTypes.AgentOnKubernetesEnvironment:
+              $state.go('portainer.endpoints.endpoint.kubernetesConfig', { id: endpoint.Id });
+              break;
+            default:
+              $state.go('portainer.endpoints', {}, { reload: true });
+              break;
           }
         })
         .catch(function error(err) {

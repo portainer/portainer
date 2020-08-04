@@ -73,19 +73,19 @@
             </div>
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
-                Ensure that you have deployed the Portainer agent in your cluster first. You can use execute the following command on any manager node to deploy it.
+                Ensure that you have deployed the Portainer agent in your cluster first. Refer to the platform related command below to deploy it.
                 <div style="margin-top: 10px;">
                   <uib-tabset active="state.deploymentTab">
                     <uib-tab index="0" heading="Kubernetes">
-                      <code style="display: block; white-space: pre-wrap;">
-                        curl -L https://downloads.portainer.io/portainer-agent-k8s.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml
-                      </code>
+                      <code style="display: block; white-space: pre-wrap; padding: 16px 90px;"
+                        >curl -L https://downloads.portainer.io/portainer-agent-k8s.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml</code
+                      >
                     </uib-tab>
 
-                    <uib-tab index="0" heading="Docker">
-                      <code>
-                        curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent
-                      </code>
+                    <uib-tab index="1" heading="Docker Swarm">
+                      <code style="display: block; white-space: pre-wrap; padding: 16px 90px;"
+                        >curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent</code
+                      >
                     </uib-tab>
                   </uib-tabset>
                   <div style="margin-top: 10px;">
