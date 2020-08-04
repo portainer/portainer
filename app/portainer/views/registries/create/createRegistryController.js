@@ -21,7 +21,12 @@ angular.module('portainer.app').controller('CreateRegistryController', [
     $scope.state = {
       actionInProgress: false,
       overrideConfiguration: false,
-      gitlab: {},
+      gitlab: {
+        get selectedItemCount() {
+          return this.selectedItems.length || 0;
+        },
+        selectedItems: [],
+      },
     };
 
     function selectQuayRegistry() {
