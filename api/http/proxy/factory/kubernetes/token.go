@@ -45,7 +45,7 @@ func (manager *tokenManager) getAdminServiceAccountToken() string {
 	return manager.adminToken
 }
 
-func (manager *tokenManager) getUserServiceAccountToken(userID int, username string) (string, error) {
+func (manager *tokenManager) getUserServiceAccountToken(userID int) (string, error) {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
 
@@ -61,12 +61,12 @@ func (manager *tokenManager) getUserServiceAccountToken(userID int, username str
 			teamIds = append(teamIds, int(membership.TeamID))
 		}
 
-		err = manager.kubecli.SetupUserServiceAccount(userID, username, teamIds)
+		err = manager.kubecli.SetupUserServiceAccount(userID, teamIds)
 		if err != nil {
 			return "", err
 		}
 
-		serviceAccountToken, err := manager.kubecli.GetServiceAccountBearerToken(userID, username)
+		serviceAccountToken, err := manager.kubecli.GetServiceAccountBearerToken(userID)
 		if err != nil {
 			return "", err
 		}

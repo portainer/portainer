@@ -59,7 +59,7 @@ func (transport *localTransport) RoundTrip(request *http.Request) (*http.Respons
 	if tokenData.Role == portainer.AdministratorRole {
 		token = transport.tokenManager.getAdminServiceAccountToken()
 	} else {
-		token, err = transport.tokenManager.getUserServiceAccountToken(int(tokenData.ID), tokenData.Username)
+		token, err = transport.tokenManager.getUserServiceAccountToken(int(tokenData.ID))
 		if err != nil {
 			return nil, err
 		}
@@ -94,7 +94,7 @@ func (transport *agentTransport) RoundTrip(request *http.Request) (*http.Respons
 	if tokenData.Role == portainer.AdministratorRole {
 		token = transport.tokenManager.getAdminServiceAccountToken()
 	} else {
-		token, err = transport.tokenManager.getUserServiceAccountToken(int(tokenData.ID), tokenData.Username)
+		token, err = transport.tokenManager.getUserServiceAccountToken(int(tokenData.ID))
 		if err != nil {
 			return nil, err
 		}
@@ -136,7 +136,7 @@ func (transport *edgeTransport) RoundTrip(request *http.Request) (*http.Response
 	if tokenData.Role == portainer.AdministratorRole {
 		token = transport.tokenManager.getAdminServiceAccountToken()
 	} else {
-		token, err = transport.tokenManager.getUserServiceAccountToken(int(tokenData.ID), tokenData.Username)
+		token, err = transport.tokenManager.getUserServiceAccountToken(int(tokenData.ID))
 		if err != nil {
 			return nil, err
 		}
