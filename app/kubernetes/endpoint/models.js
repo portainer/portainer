@@ -18,8 +18,8 @@ export class KubernetesEndpoint {
 }
 
 const _KubernetesEndpointSubset = Object.freeze({
-  Ip: '',
-  Port: '',
+  Ips: [],
+  Ports: [],
 });
 
 export class KubernetesEndpointSubset {

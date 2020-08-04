@@ -56,12 +56,10 @@ class KubernetesClusterController {
       this.endpointsSystem = _.filter(endpointsSystem, (ep) => ep.HolderIdentity);
 
       const kubernetesEndpoint = _.find(endpoints, { Name: 'kubernetes' });
-      if (kubernetesEndpoint) {
+      if (kubernetesEndpoint && kubernetesEndpoint.Subsets) {
+        const ips = _.flatten(_.map(kubernetesEndpoint.Subsets, 'Ips'));
         _.forEach(this.nodes, (node) => {
-          if (kubernetesEndpoint.Subsets && node.IPAddress === kubernetesEndpoint.Subsets[0].Ip) {
-            node.Api = true;
-            return false;
-          }
+          node.Api = _.includes(ips, node.IPAddress);
         });
       }
     } catch (err) {

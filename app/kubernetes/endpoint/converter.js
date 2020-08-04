@@ -17,12 +17,11 @@ class KubernetesEndpointConverter {
     if (data.subsets) {
       res.Subsets = _.map(data.subsets, (item) => {
         const subset = new KubernetesEndpointSubset();
-        subset.Ip = item.addresses ? item.addresses[0].ip : '';
-        subset.Port = item.ports ? item.ports[0].port : '';
+        subset.Ips = _.map(item.addresses, 'ip');
+        subset.Ports = _.map(item.ports, 'port');
         return subset;
       });
     }
-
     return res;
   }
 }
