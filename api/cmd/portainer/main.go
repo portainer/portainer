@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt"
 	"github.com/portainer/portainer/api/chisel"
 	"github.com/portainer/portainer/api/cli"
@@ -24,6 +24,7 @@ import (
 	kubecli "github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/ldap"
 	"github.com/portainer/portainer/api/libcompose"
+	"github.com/portainer/portainer/api/oauth"
 )
 
 func initCLI() *portainer.CLIFlags {
@@ -106,6 +107,10 @@ func initCryptoService() portainer.CryptoService {
 
 func initLDAPService() portainer.LDAPService {
 	return &ldap.Service{}
+}
+
+func initOAuthService() portainer.OAuthService {
+	return oauth.NewService()
 }
 
 func initGitService() portainer.GitService {
@@ -354,6 +359,8 @@ func main() {
 
 	ldapService := initLDAPService()
 
+	oauthService := initOAuthService()
+
 	gitService := initGitService()
 
 	cryptoService := initCryptoService()
@@ -467,6 +474,7 @@ func main() {
 		JWTService:              jwtService,
 		FileService:             fileService,
 		LDAPService:             ldapService,
+		OAuthService:            oauthService,
 		GitService:              gitService,
 		SignatureService:        digitalSignatureService,
 		SnapshotService:         snapshotService,
