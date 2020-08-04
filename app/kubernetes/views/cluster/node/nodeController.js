@@ -44,13 +44,14 @@ class KubernetesNodeController {
       const endpoints = await this.KubernetesEndpointService.get();
       this.endpoint = _.find(endpoints, { Name: 'kubernetes' });
       if (this.endpoint && this.endpoint.Subsets) {
-        const ips = _.flatten(_.map(this.endpoint.Subsets, 'Ips'));
-        const ports = _.flatten(_.map(this.endpoint.Subsets, 'Ports'));
-        _.forEach(ips, (ip, index) => {
-          if (ip === this.node.IPAddress) {
-            this.node.Port = ports[index];
-            this.node.Api = true;
-          }
+        _.forEach(this.endpoint.Subsets, (subset) => {
+          return _.forEach(subset.Ips, (ip) => {
+            if (ip === this.node.IPAddress) {
+              this.node.Api = true;
+              this.node.Port = subset.Port;
+              return false;
+            }
+          });
         });
       }
     } catch (err) {

@@ -18,7 +18,8 @@ class KubernetesEndpointConverter {
       res.Subsets = _.map(data.subsets, (item) => {
         const subset = new KubernetesEndpointSubset();
         subset.Ips = _.map(item.addresses, 'ip');
-        subset.Ports = _.map(item.ports, 'port');
+        const port = _.find(item.ports, { name: 'https' });
+        subset.Port = port ? port.port : undefined;
         return subset;
       });
     }
