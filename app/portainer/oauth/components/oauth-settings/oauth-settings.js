@@ -1,4 +1,4 @@
-angular.module('portainer.extensions.oauth').component('oauthSettings', {
+angular.module('portainer.oauth').component('oauthSettings', {
   templateUrl: './oauth-settings.html',
   bindings: {
     settings: '=',

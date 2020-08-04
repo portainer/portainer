@@ -25,7 +25,7 @@ function initAnalytics(Analytics, $rootScope) {
   });
 }
 
-angular.module('portainer.app', []).config([
+angular.module('portainer.app', ['portainer.oauth']).config([
   '$stateRegistryProvider',
   function ($stateRegistryProvider) {
     'use strict';

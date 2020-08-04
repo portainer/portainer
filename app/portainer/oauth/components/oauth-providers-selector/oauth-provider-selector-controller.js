@@ -1,4 +1,4 @@
-angular.module('portainer.extensions.oauth').controller('OAuthProviderSelectorController', function OAuthProviderSelectorController() {
+angular.module('portainer.oauth').controller('OAuthProviderSelectorController', function OAuthProviderSelectorController() {
   var ctrl = this;
 
   this.providers = [
