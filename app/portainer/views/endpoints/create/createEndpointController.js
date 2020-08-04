@@ -1,4 +1,4 @@
-import { PortainerEndpointTypes, PortainerEndpointCreationTypes } from 'Portainer/models/endpoint/models';
+import { PortainerEndpointCreationTypes, PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
 import { EndpointSecurityFormData } from '../../../components/endpointSecurity/porEndpointSecurityModel';
 
 angular
@@ -56,7 +56,7 @@ angular
     };
 
     $scope.copyAgentCommand = function () {
-      if ($scope.state.deploymentTab === 0) {
+      if ($scope.state.deploymentTab === 1) {
         clipboard.copyText('curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent');
       } else {
         clipboard.copyText('curl -L https://downloads.portainer.io/portainer-agent-k8s.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml');

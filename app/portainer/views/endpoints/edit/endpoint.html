@@ -28,23 +28,23 @@
     <span class="small text-muted">
       <p>
         <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-        Deploy the Edge agent on your remote Docker/Kubernetes environment using the following command(s)
+        Refer to the platform related command below to deploy the Edge agent in your remote cluster.
       </p>
       <p>
         The agent will communicate with Portainer via <u>{{ edgeKeyDetails.instanceURL }}</u> and <u>tcp://{{ edgeKeyDetails.tunnelServerAddr }}</u>
       </p>
       <div style="margin-top: 10px;">
         <uib-tabset active="state.deploymentTab">
-          <uib-tab index="0" heading="Standalone">
-            <code style="display: block; white-space: pre-wrap; padding: 16px 90px;">{{ dockerCommands.standalone }}</code>
+          <uib-tab index="0" heading="Kubernetes">
+            <code style="display: block; white-space: pre-wrap; padding: 16px 90px;"
+              >curl https://downloads.portainer.io/portainer-edge-agent-setup.sh | sudo bash -s -- {{ randomEdgeID }} {{ endpoint.EdgeKey }}</code
+            >
           </uib-tab>
-          <uib-tab index="1" heading="Swarm">
+          <uib-tab index="1" heading="Docker Swarm">
             <code style="display: block; white-space: pre-wrap; padding: 16px 90px;">{{ dockerCommands.swarm }}</code>
           </uib-tab>
-          <uib-tab index="0" heading="Kubernetes">
-            <code style="display: block; white-space: pre-wrap;">
-              curl https://downloads.portainer.io/portainer-edge-agent-setup.sh | sudo bash -s -- {{ randomEdgeID }} {{ endpoint.EdgeKey }}
-            </code>
+          <uib-tab index="2" heading="Docker Standalone">
+            <code style="display: block; white-space: pre-wrap; padding: 16px 90px;">{{ dockerCommands.standalone }}</code>
           </uib-tab>
         </uib-tabset>
         <div style="margin-top: 10px;">
