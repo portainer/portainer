@@ -22,6 +22,7 @@ import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHel
 import KubernetesApplicationConverter from 'Kubernetes/converters/application';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
+import KubernetesApplicationHelper from 'Kubernetes/helpers/application/index';
 
 class KubernetesCreateApplicationController {
   /* @ngInject */
@@ -78,6 +79,16 @@ class KubernetesCreateApplicationController {
   onChangeName() {
     const existingApplication = _.find(this.applications, { Name: this.formValues.Name });
     this.state.alreadyExists = (this.state.isEdit && existingApplication && this.application.Id !== existingApplication.Id) || (!this.state.isEdit && existingApplication);
+  }
+
+  /**
+   * AUTO SCALER UI MANAGEMENT
+   */
+
+  unselectAutoScaler() {
+    if (this.formValues.DeploymentType === this.ApplicationDeploymentTypes.GLOBAL) {
+      this.formValues.AutoScaler.IsUsed = false;
+    }
   }
 
   /**
@@ -319,6 +330,24 @@ class KubernetesCreateApplicationController {
     return false;
   }
 
+  autoScalerOverflow() {
+    const instances = this.formValues.AutoScaler.MaxReplicas;
+    const cpu = this.formValues.CpuLimit;
+    const maxCpu = this.state.sliders.cpu.max;
+    const memory = this.formValues.MemoryLimit;
+    const maxMemory = this.state.sliders.memory.max;
+
+    if (cpu * instances > maxCpu) {
+      return true;
+    }
+
+    if (memory * instances > maxMemory) {
+      return true;
+    }
+
+    return false;
+  }
+
   publishViaLoadBalancerEnabled() {
     return this.state.useLoadBalancer;
   }
@@ -345,11 +374,12 @@ class KubernetesCreateApplicationController {
 
   isDeployUpdateButtonDisabled() {
     const overflow = this.resourceReservationsOverflow();
+    const autoScalerOverflow = this.autoScalerOverflow();
     const inProgress = this.state.actionInProgress;
     const invalid = !this.isValid();
     const hasNoChanges = this.isEditAndNoChangesMade();
     const nonScalable = this.isNonScalable();
-    const res = overflow || inProgress || invalid || hasNoChanges || nonScalable;
+    const res = overflow || autoScalerOverflow || inProgress || invalid || hasNoChanges || nonScalable;
     return res;
   }
 
@@ -549,6 +579,7 @@ class KubernetesCreateApplicationController {
       this.state = {
         actionInProgress: false,
         useLoadBalancer: false,
+        useServerMetrics: false,
         sliders: {
           cpu: {
             min: 0,
@@ -580,6 +611,8 @@ class KubernetesCreateApplicationController {
         },
       };
 
+      this.isAdmin = this.Authentication.isAdmin();
+
       this.editChanges = [];
 
       if (this.$transition$.params().namespace && this.$transition$.params().name) {
@@ -587,8 +620,10 @@ class KubernetesCreateApplicationController {
       }
 
       const endpoint = this.EndpointProvider.currentEndpoint();
+      this.endpoint = endpoint;
       this.storageClasses = endpoint.Kubernetes.Configuration.StorageClasses;
       this.state.useLoadBalancer = endpoint.Kubernetes.Configuration.UseLoadBalancer;
+      this.state.useServerMetrics = endpoint.Kubernetes.Configuration.UseServerMetrics;
 
       this.formValues = new KubernetesApplicationFormValues();
 
@@ -611,6 +646,10 @@ class KubernetesCreateApplicationController {
         this.formValues = KubernetesApplicationConverter.applicationToFormValues(this.application, this.resourcePools, this.configurations, this.persistentVolumeClaims);
         this.savedFormValues = angular.copy(this.formValues);
         delete this.formValues.ApplicationType;
+      } else {
+        this.formValues.AutoScaler = KubernetesApplicationHelper.generateAutoScalerFormValueFromHorizontalPodAutoScaler();
+        this.formValues.AutoScaler.MinReplicas = this.formValues.ReplicaCount;
+        this.formValues.AutoScaler.MaxReplicas = this.formValues.ReplicaCount;
       }
 
       await this.updateSliders();

@@ -9,6 +9,7 @@ import {
   KubernetesApplicationConfigurationFormValueOverridenKey,
   KubernetesApplicationPersistedFolderFormValue,
   KubernetesApplicationPublishedPortFormValue,
+  KubernetesApplicationAutoScalerFormValue,
 } from 'Kubernetes/models/application/formValues';
 import {
   KubernetesApplicationEnvConfigMapPayload,
@@ -261,6 +262,20 @@ class KubernetesApplicationHelper {
       return res;
     });
     return finalRes;
+  }
+
+  static generateAutoScalerFormValueFromHorizontalPodAutoScaler(autoScaler) {
+    const res = new KubernetesApplicationAutoScalerFormValue();
+    if (autoScaler) {
+      res.IsUsed = true;
+      res.MinReplicas = autoScaler.MinReplicas;
+      res.MaxReplicas = autoScaler.MaxReplicas;
+      res.TargetCPUUtilization = autoScaler.TargetCPUUtilization;
+      res.ApiVersion = autoScaler.ApiVersion;
+    } else {
+      res.ApiVersion = 'apps/v1';
+    }
+    return res;
   }
 
   /**

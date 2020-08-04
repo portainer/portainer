@@ -1,4 +1,4 @@
-import { KubernetesApplicationDeploymentTypes, KubernetesApplicationPublishingTypes, KubernetesApplicationDataAccessPolicies } from './models';
+import { KubernetesApplicationDataAccessPolicies, KubernetesApplicationDeploymentTypes, KubernetesApplicationPublishingTypes } from './models';
 
 /**
  * KubernetesApplicationFormValues Model
@@ -21,6 +21,7 @@ const _KubernetesApplicationFormValues = Object.freeze({
   PublishingType: KubernetesApplicationPublishingTypes.INTERNAL,
   DataAccessPolicy: KubernetesApplicationDataAccessPolicies.SHARED,
   Configurations: [], // KubernetesApplicationConfigurationFormValue list
+  AutoScaler: {},
 });
 
 export class KubernetesApplicationFormValues {
@@ -114,5 +115,22 @@ const _KubernetesApplicationPublishedPortFormValue = Object.freeze({
 export class KubernetesApplicationPublishedPortFormValue {
   constructor() {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesApplicationPublishedPortFormValue)));
+  }
+}
+
+/**
+ * KubernetesApplicationAutoScalerFormValue Model
+ */
+const _KubernetesApplicationAutoScalerFormValue = Object.freeze({
+  MinReplicas: 0,
+  MaxReplicas: 0,
+  TargetCPUUtilization: 50,
+  ApiVersion: '',
+  IsUsed: false,
+});
+
+export class KubernetesApplicationAutoScalerFormValue {
+  constructor() {
+    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesApplicationAutoScalerFormValue)));
   }
 }

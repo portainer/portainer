@@ -3,8 +3,9 @@ package portainer
 func KubernetesDefault() KubernetesData {
 	return KubernetesData{
 		Configuration: KubernetesConfiguration{
-			UseLoadBalancer: false,
-			StorageClasses:  []KubernetesStorageClassConfig{},
+			UseLoadBalancer:  false,
+			UseServerMetrics: false,
+			StorageClasses:   []KubernetesStorageClassConfig{},
 		},
 		Snapshots: []KubernetesSnapshot{},
 	}

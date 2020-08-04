@@ -337,8 +337,9 @@ type (
 
 	// KubernetesConfiguration represents the configuration of a Kubernetes endpoint
 	KubernetesConfiguration struct {
-		UseLoadBalancer bool                           `json:"UseLoadBalancer"`
-		StorageClasses  []KubernetesStorageClassConfig `json:"StorageClasses"`
+		UseLoadBalancer  bool                           `json:"UseLoadBalancer"`
+		UseServerMetrics bool                           `json:"UseServerMetrics"`
+		StorageClasses   []KubernetesStorageClassConfig `json:"StorageClasses"`
 	}
 
 	// KubernetesStorageClassConfig represents a Kubernetes Storage Class configuration

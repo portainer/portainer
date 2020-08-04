@@ -50,12 +50,14 @@ class KubernetesConfigureController {
 
       this.endpoint.Kubernetes.Configuration.StorageClasses = classes;
       this.endpoint.Kubernetes.Configuration.UseLoadBalancer = this.formValues.UseLoadBalancer;
+      this.endpoint.Kubernetes.Configuration.UseServerMetrics = this.formValues.UseServerMetrics;
       await this.EndpointService.updateEndpoint(this.endpoint.Id, this.endpoint);
       const endpoints = this.EndpointProvider.endpoints();
       const modifiedEndpoint = _.find(endpoints, (item) => item.Id === this.endpoint.Id);
       if (modifiedEndpoint) {
         modifiedEndpoint.Kubernetes.Configuration.StorageClasses = classes;
         modifiedEndpoint.Kubernetes.Configuration.UseLoadBalancer = this.formValues.UseLoadBalancer;
+        modifiedEndpoint.Kubernetes.Configuration.UseServerMetrics = this.formValues.UseServerMetrics;
         this.EndpointProvider.setEndpoints(endpoints);
       }
       this.Notifications.success('Configuration successfully applied');
@@ -80,6 +82,7 @@ class KubernetesConfigureController {
 
     this.formValues = {
       UseLoadBalancer: false,
+      UseServerMetrics: false,
     };
 
     try {
@@ -100,6 +103,7 @@ class KubernetesConfigureController {
       });
 
       this.formValues.UseLoadBalancer = this.endpoint.Kubernetes.Configuration.UseLoadBalancer;
+      this.formValues.UseServerMetrics = this.endpoint.Kubernetes.Configuration.UseServerMetrics;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve storage classes');
     } finally {

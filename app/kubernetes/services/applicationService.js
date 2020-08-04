@@ -12,6 +12,7 @@ import { KubernetesDaemonSet } from 'Kubernetes/models/daemon-set/models';
 import { KubernetesApplication } from 'Kubernetes/models/application/models';
 import KubernetesServiceHelper from 'Kubernetes/helpers/serviceHelper';
 import { KubernetesHorizontalPodAutoScalerHelper } from 'Kubernetes/horizontal-pod-auto-scaler/helper';
+import { KubernetesHorizontalPodAutoScalerConverter } from 'Kubernetes/horizontal-pod-auto-scaler/converter';
 
 class KubernetesApplicationService {
   /* @ngInject */
@@ -141,13 +142,14 @@ class KubernetesApplicationService {
 
       const res = await Promise.all(
         _.map(namespaces, async (ns) => {
-          const [deployments, daemonSets, statefulSets, services, pods, ingresses] = await Promise.all([
+          const [deployments, daemonSets, statefulSets, services, pods, ingresses, autoScalers] = await Promise.all([
             this.KubernetesDeploymentService.get(ns),
             this.KubernetesDaemonSetService.get(ns),
             this.KubernetesStatefulSetService.get(ns),
             this.KubernetesServiceService.get(ns),
             this.KubernetesPodService.get(ns),
             this.KubernetesIngressService.get(ns),
+            this.KubernetesHorizontalPodAutoScalerService.get(ns),
           ]);
 
           const deploymentApplications = _.map(deployments, (item) =>
@@ -160,7 +162,15 @@ class KubernetesApplicationService {
             convertToApplication(item, KubernetesApplicationConverter.apiStatefulSetToapplication, services, pods, ingresses)
           );
 
-          return _.concat(deploymentApplications, daemonSetApplications, statefulSetApplications);
+          const applications = _.concat(deploymentApplications, daemonSetApplications, statefulSetApplications);
+          await Promise.all(
+            _.forEach(applications, async (application) => {
+              const boundScaler = KubernetesHorizontalPodAutoScalerHelper.findApplicationBoundScaler(autoScalers, application);
+              const scaler = boundScaler ? await this.KubernetesHorizontalPodAutoScalerService.get(ns, boundScaler.Name) : undefined;
+              application.AutoScaler = scaler;
+            })
+          );
+          return applications;
         })
       );
       return _.flatten(res);
@@ -204,6 +214,12 @@ class KubernetesApplicationService {
           }
         });
         await Promise.all(_.without(claimPromises, undefined));
+      }
+
+      if (formValues.AutoScaler.IsUsed) {
+        const kind = KubernetesHorizontalPodAutoScalerHelper.getApplicationTypeString(app);
+        const autoScaler = KubernetesHorizontalPodAutoScalerConverter.applicationFormValuesToModel(formValues, kind);
+        await this.KubernetesHorizontalPodAutoScalerService.create(autoScaler);
       }
 
       await apiService.create(app);
@@ -256,6 +272,20 @@ class KubernetesApplicationService {
         await this.KubernetesServiceService.create(newService);
       } else if (oldService && !newService) {
         await this.KubernetesServiceService.delete(oldService);
+      }
+
+      const newKind = KubernetesHorizontalPodAutoScalerHelper.getApplicationTypeString(newApp);
+      const newAutoScaler = KubernetesHorizontalPodAutoScalerConverter.applicationFormValuesToModel(newFormValues, newKind);
+      if (_.isEmpty(oldFormValues.AutoScaler)) {
+        await this.KubernetesHorizontalPodAutoScalerService.create(newAutoScaler);
+      } else {
+        const oldKind = KubernetesHorizontalPodAutoScalerHelper.getApplicationTypeString(oldApp);
+        const oldAutoScaler = KubernetesHorizontalPodAutoScalerConverter.applicationFormValuesToModel(oldFormValues, oldKind);
+        if (newFormValues.AutoScaler.IsUsed) {
+          await this.KubernetesHorizontalPodAutoScalerService.patch(oldAutoScaler, newAutoScaler);
+        } else {
+          await this.KubernetesHorizontalPodAutoScalerService.delete(oldAutoScaler);
+        }
       }
     } catch (err) {
       throw err;
@@ -318,6 +348,10 @@ class KubernetesApplicationService {
 
       if (application.ServiceType) {
         await this.KubernetesServiceService.delete(servicePayload);
+      }
+
+      if (!_.isEmpty(application.AutoScaler)) {
+        await this.KubernetesHorizontalPodAutoScalerService.delete(application.AutoScaler);
       }
     } catch (err) {
       throw err;
