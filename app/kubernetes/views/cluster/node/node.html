@@ -20,12 +20,12 @@
                       <td>Hostname</td>
                       <td>
                         {{ ctrl.node.Name }}
-                        <span class="label label-primary" ng-if="ctrl.node.Api">API</span>
+                        <span class="label label-primary image-tag" style="margin-left: 5px;" ng-if="ctrl.node.Api">api</span>
                       </td>
                     </tr>
                     <tr ng-if="ctrl.endpoint.Subsets">
                       <td>
-                        Address
+                        Kubernetes API
                       </td>
                       <td>{{ ctrl.node.IPAddress }}:{{ ctrl.node.Port }}</td>
                     </tr>
