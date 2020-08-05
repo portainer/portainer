@@ -39,30 +39,11 @@
     </div>
   </div>
 
-  <oauth-providers-selector on-select="($ctrl.onSelectProvider)" provider="$ctrl.state.provider"></oauth-providers-selector>
-
   <div class="col-sm-12 form-section-title">OAuth Configuration</div>
-
-  <div class="form-group" ng-if="$ctrl.state.provider.name == 'microsoft'">
-    <label for="oauth_microsoft_tenant_id" class="col-sm-3 col-lg-2 control-label text-left">
-      Tenant ID
-      <portainer-tooltip position="bottom" message="ID of the Azure Directory you wish to authenticate against. Also known as the Directory ID"></portainer-tooltip>
-    </label>
-    <div class="col-sm-9 col-lg-10">
-      <input
-        type="text"
-        class="form-control"
-        id="oauth_microsoft_tenant_id"
-        placeholder="xxxxxxxxxxxxxxxxxxxx"
-        ng-model="$ctrl.state.microsoftTenantID"
-        ng-change="$ctrl.onMicrosoftTenantIDChange()"
-      />
-    </div>
-  </div>
 
   <div class="form-group">
     <label for="oauth_client_id" class="col-sm-3 col-lg-2 control-label text-left">
-      {{ $ctrl.state.provider.name == 'microsoft' ? 'Application ID' : 'Client ID' }}
+      Client ID
       <portainer-tooltip position="bottom" message="Public identifier of the OAuth application"></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
@@ -72,14 +53,14 @@
 
   <div class="form-group">
     <label for="oauth_client_secret" class="col-sm-3 col-lg-2 control-label text-left">
-      {{ $ctrl.state.provider.name == 'microsoft' ? 'Application key' : 'Client secret' }}
+      Client secret
     </label>
     <div class="col-sm-9 col-lg-10">
       <input type="password" class="form-control" id="oauth_client_secret" ng-model="$ctrl.settings.ClientSecret" placeholder="xxxxxxxxxxxxxxxxxxxx" />
     </div>
   </div>
 
-  <div class="form-group" ng-if="$ctrl.state.provider.name == 'custom' || $ctrl.state.overrideConfiguration">
+  <div class="form-group">
     <label for="oauth_authorization_uri" class="col-sm-3 col-lg-2 control-label text-left">
       Authorization URL
       <portainer-tooltip
@@ -92,7 +73,7 @@
     </div>
   </div>
 
-  <div class="form-group" ng-if="$ctrl.state.provider.name == 'custom' || $ctrl.state.overrideConfiguration">
+  <div class="form-group">
     <label for="oauth_access_token_uri" class="col-sm-3 col-lg-2 control-label text-left">
       Access token URL
       <portainer-tooltip position="bottom" message="URL used by Portainer to exchange a valid OAuth authentication code for an access token"></portainer-tooltip>
@@ -102,7 +83,7 @@
     </div>
   </div>
 
-  <div class="form-group" ng-if="$ctrl.state.provider.name == 'custom' || $ctrl.state.overrideConfiguration">
+  <div class="form-group">
     <label for="oauth_resource_uri" class="col-sm-3 col-lg-2 control-label text-left">
       Resource URL
       <portainer-tooltip position="bottom" message="URL used by Portainer to retrieve information about the authenticated user"></portainer-tooltip>
@@ -112,7 +93,7 @@
     </div>
   </div>
 
-  <div class="form-group" ng-if="$ctrl.state.provider.name == 'custom' || $ctrl.state.overrideConfiguration">
+  <div class="form-group">
     <label for="oauth_redirect_uri" class="col-sm-3 col-lg-2 control-label text-left">
       Redirect URL
       <portainer-tooltip
@@ -125,7 +106,7 @@
     </div>
   </div>
 
-  <div class="form-group" ng-if="$ctrl.state.provider.name == 'custom' || $ctrl.state.overrideConfiguration">
+  <div class="form-group">
     <label for="oauth_user_identifier" class="col-sm-3 col-lg-2 control-label text-left">
       User identifier
       <portainer-tooltip
@@ -138,7 +119,7 @@
     </div>
   </div>
 
-  <div class="form-group" ng-if="$ctrl.state.provider.name == 'custom' || $ctrl.state.overrideConfiguration">
+  <div class="form-group">
     <label for="oauth_scopes" class="col-sm-3 col-lg-2 control-label text-left">
       Scopes
       <portainer-tooltip
@@ -148,17 +129,6 @@
     </label>
     <div class="col-sm-9 col-lg-10">
       <input type="text" class="form-control" id="oauth_scopes" ng-model="$ctrl.settings.Scopes" placeholder="id,email,name" />
-    </div>
-  </div>
-
-  <div class="form-group" ng-if="$ctrl.state.provider.name != 'custom'">
-    <div class="col-sm-12">
-      <a class="small interactive" ng-if="!$ctrl.state.overrideConfiguration" ng-click="$ctrl.state.overrideConfiguration = true;">
-        <i class="fa fa-wrench space-right" aria-hidden="true"></i> Override default configuration
-      </a>
-      <a class="small interactive" ng-if="$ctrl.state.overrideConfiguration" ng-click="$ctrl.state.overrideConfiguration = false; $ctrl.useDefaultProviderConfiguration()">
-        <i class="fa fa-cogs space-right" aria-hidden="true"></i> Use default configuration
-      </a>
     </div>
   </div>
 </div>
