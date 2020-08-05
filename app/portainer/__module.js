@@ -292,28 +292,6 @@ angular.module('portainer.app', ['portainer.oauth']).config([
       },
     };
 
-    var extensions = {
-      name: 'portainer.extensions',
-      url: '/extensions',
-      views: {
-        'content@': {
-          templateUrl: './views/extensions/extensions.html',
-          controller: 'ExtensionsController',
-        },
-      },
-    };
-
-    var extension = {
-      name: 'portainer.extensions.extension',
-      url: '/extension/:id',
-      views: {
-        'content@': {
-          templateUrl: './views/extensions/inspect/extension.html',
-          controller: 'ExtensionController',
-        },
-      },
-    };
-
     var registries = {
       name: 'portainer.registries',
       url: '/registries',
@@ -480,8 +458,6 @@ angular.module('portainer.app', ['portainer.oauth']).config([
     $stateRegistryProvider.register(init);
     $stateRegistryProvider.register(initEndpoint);
     $stateRegistryProvider.register(initAdmin);
-    $stateRegistryProvider.register(extensions);
-    $stateRegistryProvider.register(extension);
     $stateRegistryProvider.register(registries);
     $stateRegistryProvider.register(registry);
     $stateRegistryProvider.register(registryAccess);

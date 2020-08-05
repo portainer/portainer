@@ -1,7 +1,6 @@
 package factory
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -16,10 +15,8 @@ import (
 
 const azureAPIBaseURL = "https://management.azure.com"
 
-var extensionPorts = map[portainer.ExtensionID]string{}
-
 type (
-	// ProxyFactory is a factory to create reverse proxies to Docker endpoints and extensions
+	// ProxyFactory is a factory to create reverse proxies
 	ProxyFactory struct {
 		dataStore                   portainer.DataStore
 		signatureService            portainer.DigitalSignatureService
@@ -40,25 +37,6 @@ func NewProxyFactory(dataStore portainer.DataStore, signatureService portainer.D
 		kubernetesClientFactory:     kubernetesClientFactory,
 		kubernetesTokenCacheManager: kubernetesTokenCacheManager,
 	}
-}
-
-// BuildExtensionURL returns the URL to an extension server
-func BuildExtensionURL(extensionID portainer.ExtensionID) string {
-	return fmt.Sprintf("http://%s:%s", portainer.ExtensionServer, extensionPorts[extensionID])
-}
-
-// NewExtensionProxy returns a new HTTP proxy to an extension server
-func (factory *ProxyFactory) NewExtensionProxy(extensionID portainer.ExtensionID) (http.Handler, error) {
-	address := "http://" + portainer.ExtensionServer + ":" + extensionPorts[extensionID]
-
-	extensionURL, err := url.Parse(address)
-	if err != nil {
-		return nil, err
-	}
-
-	extensionURL.Scheme = "http"
-	proxy := httputil.NewSingleHostReverseProxy(extensionURL)
-	return proxy, nil
 }
 
 // NewLegacyExtensionProxy returns a new HTTP proxy to a legacy extension server (Storidge)

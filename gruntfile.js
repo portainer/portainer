@@ -128,13 +128,7 @@ gruntfile_cfg.eslint = {
 
 gruntfile_cfg.copy = {
   assets: {
-    files: [
-      {
-        dest: '<%= root %>/',
-        src: 'extensions.json',
-        cwd: '',
-      },
-    ],
+    files: [],
   },
 };
 

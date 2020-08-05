@@ -318,17 +318,6 @@ func initEndpoint(flags *portainer.CLIFlags, dataStore portainer.DataStore, snap
 	return createUnsecuredEndpoint(*flags.EndpointURL, dataStore, snapshotService)
 }
 
-func initExtensionManager(fileService portainer.FileService, dataStore portainer.DataStore) (portainer.ExtensionManager, error) {
-	extensionManager := exec.NewExtensionManager(fileService, dataStore)
-
-	err := extensionManager.StartExtensions()
-	if err != nil {
-		return nil, err
-	}
-
-	return extensionManager, nil
-}
-
 func terminateIfNoAdminCreated(dataStore portainer.DataStore) {
 	timer1 := time.NewTimer(5 * time.Minute)
 	<-timer1.C
@@ -368,11 +357,6 @@ func main() {
 	digitalSignatureService := initDigitalSignatureService()
 
 	err = initKeyPair(fileService, digitalSignatureService)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	extensionManager, err := initExtensionManager(fileService, dataStore)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -469,7 +453,6 @@ func main() {
 		SwarmStackManager:       swarmStackManager,
 		ComposeStackManager:     composeStackManager,
 		KubernetesDeployer:      kubernetesDeployer,
-		ExtensionManager:        extensionManager,
 		CryptoService:           cryptoService,
 		JWTService:              jwtService,
 		FileService:             fileService,

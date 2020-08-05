@@ -412,7 +412,6 @@ func DefaultPortainerAuthorizations() portainer.Authorizations {
 		portainer.OperationPortainerEndpointInspect:         true,
 		portainer.OperationPortainerEndpointExtensionAdd:    true,
 		portainer.OperationPortainerEndpointExtensionRemove: true,
-		portainer.OperationPortainerExtensionList:           true,
 		portainer.OperationPortainerMOTD:                    true,
 		portainer.OperationPortainerRegistryList:            true,
 		portainer.OperationPortainerRegistryInspect:         true,

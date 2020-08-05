@@ -20,7 +20,6 @@ import (
 	"github.com/portainer/portainer/api/http/handler/endpointgroups"
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
 	"github.com/portainer/portainer/api/http/handler/endpoints"
-	"github.com/portainer/portainer/api/http/handler/extensions"
 	"github.com/portainer/portainer/api/http/handler/file"
 	"github.com/portainer/portainer/api/http/handler/motd"
 	"github.com/portainer/portainer/api/http/handler/registries"
@@ -51,7 +50,6 @@ type Server struct {
 	AssetsPath              string
 	Status                  *portainer.Status
 	ReverseTunnelService    portainer.ReverseTunnelService
-	ExtensionManager        portainer.ExtensionManager
 	ComposeStackManager     portainer.ComposeStackManager
 	CryptoService           portainer.CryptoService
 	SignatureService        portainer.DigitalSignatureService
@@ -146,11 +144,6 @@ func (server *Server) Start() error {
 
 	var motdHandler = motd.NewHandler(requestBouncer)
 
-	var extensionHandler = extensions.NewHandler(requestBouncer)
-	extensionHandler.DataStore = server.DataStore
-	extensionHandler.ExtensionManager = server.ExtensionManager
-	extensionHandler.AuthorizationService = authorizationService
-
 	var registryHandler = registries.NewHandler(requestBouncer)
 	registryHandler.DataStore = server.DataStore
 	registryHandler.FileService = server.FileService
@@ -228,7 +221,6 @@ func (server *Server) Start() error {
 		EndpointProxyHandler:   endpointProxyHandler,
 		FileHandler:            fileHandler,
 		MOTDHandler:            motdHandler,
-		ExtensionHandler:       extensionHandler,
 		RegistryHandler:        registryHandler,
 		ResourceControlHandler: resourceControlHandler,
 		SettingsHandler:        settingsHandler,

@@ -1,4 +1,3 @@
-import _ from 'lodash-es';
 import moment from 'moment';
 
 angular.module('portainer.app').factory('StateManager', [
@@ -60,7 +59,6 @@ angular.module('portainer.app').factory('StateManager', [
 
     manager.clean = function () {
       state.endpoint = {};
-      state.extensions = [];
     };
 
     manager.updateLogo = function (logoURL) {
@@ -174,11 +172,6 @@ angular.module('portainer.app').factory('StateManager', [
         state.UI = UIState;
       }
 
-      const extensionState = LocalStorage.getExtensionState();
-      if (extensionState) {
-        state.extensions = extensionState;
-      }
-
       var endpointState = LocalStorage.getEndpointState();
       if (endpointState) {
         state.endpoint = endpointState;
@@ -274,19 +267,6 @@ angular.module('portainer.app').factory('StateManager', [
 
     manager.getAgentApiVersion = function getAgentApiVersion() {
       return state.endpoint.agentApiVersion;
-    };
-
-    manager.saveExtensions = function (extensions) {
-      state.extensions = extensions;
-      LocalStorage.storeExtensionState(state.extensions);
-    };
-
-    manager.getExtensions = function () {
-      return state.extensions;
-    };
-
-    manager.getExtension = function (extensionId) {
-      return _.find(state.extensions, { Id: extensionId, Enabled: true });
     };
 
     return manager;

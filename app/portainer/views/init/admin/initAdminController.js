@@ -8,8 +8,7 @@ angular.module('portainer.app').controller('InitAdminController', [
   'SettingsService',
   'UserService',
   'EndpointService',
-  'ExtensionService',
-  function ($async, $scope, $state, Notifications, Authentication, StateManager, SettingsService, UserService, EndpointService, ExtensionService) {
+  function ($async, $scope, $state, Notifications, Authentication, StateManager, SettingsService, UserService, EndpointService) {
     $scope.logo = StateManager.getState().application.logo;
 
     $scope.formValues = {
@@ -23,18 +22,6 @@ angular.module('portainer.app').controller('InitAdminController', [
       actionInProgress: false,
     };
 
-    function retrieveAndSaveEnabledExtensions() {
-      return $async(retrieveAndSaveEnabledExtensionsAsync);
-    }
-
-    async function retrieveAndSaveEnabledExtensionsAsync() {
-      try {
-        await ExtensionService.retrieveAndSaveEnabledExtensions();
-      } catch (err) {
-        Notifications.error('Failure', err, 'Unable to retrieve enabled extensions');
-      }
-    }
-
     $scope.createAdminUser = function () {
       var username = $scope.formValues.Username;
       var password = $scope.formValues.Password;
@@ -43,9 +30,6 @@ angular.module('portainer.app').controller('InitAdminController', [
       UserService.initAdministrator(username, password)
         .then(function success() {
           return Authentication.login(username, password);
-        })
-        .then(function success() {
-          return retrieveAndSaveEnabledExtensions();
         })
         .then(function success() {
           StateManager.updateEnableTelemetry($scope.formValues.enableTelemetry);

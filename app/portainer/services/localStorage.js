@@ -50,12 +50,6 @@ angular.module('portainer.app').factory('LocalStorage', [
       getUIState: function () {
         return localStorageService.get('UI_STATE');
       },
-      storeExtensionState: function (state) {
-        localStorageService.set('EXTENSION_STATE', state);
-      },
-      getExtensionState: function () {
-        return localStorageService.get('EXTENSION_STATE');
-      },
       storeJWT: function (jwt) {
         localStorageService.set('JWT', jwt);
       },
@@ -145,7 +139,7 @@ angular.module('portainer.app').factory('LocalStorage', [
         localStorageService.clearAll();
       },
       cleanAuthData() {
-        localStorageService.remove('JWT', 'EXTENSION_STATE', 'APPLICATION_STATE', 'LOGIN_STATE_UUID');
+        localStorageService.remove('JWT', 'APPLICATION_STATE', 'LOGIN_STATE_UUID');
       },
       cleanEndpointData() {
         localStorageService.remove('ENDPOINT_ID', 'ENDPOINT_PUBLIC_URL', 'ENDPOINT_OFFLINE_MODE', 'ENDPOINTS_DATA', 'ENDPOINT_STATE');

@@ -287,7 +287,7 @@ type (
 		EdgeStacks map[EdgeStackID]bool
 	}
 
-	// Extension represents a Portainer extension
+	// Extension represents a deprecated Portainer extension
 	Extension struct {
 		ID               ExtensionID        `json:"Id"`
 		Enabled          bool               `json:"Enabled"`
@@ -807,7 +807,6 @@ type (
 		Endpoint() EndpointService
 		EndpointGroup() EndpointGroupService
 		EndpointRelation() EndpointRelationService
-		Extension() ExtensionService
 		Registry() RegistryService
 		ResourceControl() ResourceControlService
 		Role() RoleService
@@ -899,24 +898,6 @@ type (
 		DeleteEndpointRelation(EndpointID EndpointID) error
 	}
 
-	// ExtensionManager represents a service used to manage extensions
-	ExtensionManager interface {
-		FetchExtensionDefinitions() ([]Extension, error)
-		InstallExtension(extension *Extension, licenseKey string, archiveFileName string, extensionArchive []byte) error
-		EnableExtension(extension *Extension, licenseKey string) error
-		DisableExtension(extension *Extension) error
-		UpdateExtension(extension *Extension, version string) error
-		StartExtensions() error
-	}
-
-	// ExtensionService represents a service for managing extension data
-	ExtensionService interface {
-		Extension(ID ExtensionID) (*Extension, error)
-		Extensions() ([]Extension, error)
-		Persist(extension *Extension) error
-		DeleteExtension(ID ExtensionID) error
-	}
-
 	// FileService represents a service for managing files
 	FileService interface {
 		GetFileContent(filePath string) ([]byte, error)
@@ -941,7 +922,6 @@ type (
 		ClearEdgeJobTaskLogs(edgeJobID, taskID string) error
 		GetEdgeJobTaskLogFileContent(edgeJobID, taskID string) (string, error)
 		StoreEdgeJobTaskLogFileFromBytes(edgeJobID, taskID string, data []byte) error
-		ExtractExtensionArchive(data []byte) error
 		GetBinaryFolder() string
 		StoreCustomTemplateFileFromBytes(identifier, fileName string, data []byte) (string, error)
 		GetCustomTemplateProjectPath(identifier string) string
@@ -1143,8 +1123,6 @@ const (
 	MessageOfTheDayURL = AssetsServerURL + "/motd.json"
 	// VersionCheckURL represents the URL used to retrieve the latest version of Portainer
 	VersionCheckURL = "https://api.github.com/repos/portainer/portainer/releases/latest"
-	// ExtensionDefinitionsURL represents the URL where Portainer extension definitions can be retrieved
-	ExtensionDefinitionsURL = AssetsServerURL + "/extensions-" + APIVersion + ".json"
 	// SupportProductsURL represents the URL where Portainer support products can be retrieved
 	SupportProductsURL = AssetsServerURL + "/support.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response
@@ -1164,12 +1142,8 @@ const (
 	// PortainerAgentSignatureMessage represents the message used to create a digital signature
 	// to be used when communicating with an agent
 	PortainerAgentSignatureMessage = "Portainer-App"
-	// ExtensionServer represents the server used by Portainer to communicate with extensions
-	ExtensionServer = "127.0.0.1"
 	// DefaultEdgeAgentCheckinIntervalInSeconds represents the default interval (in seconds) used by Edge agents to checkin with the Portainer instance
 	DefaultEdgeAgentCheckinIntervalInSeconds = 5
-	// LocalExtensionManifestFile represents the name of the local manifest file for extensions
-	LocalExtensionManifestFile = "/app/extensions.json"
 	// DefaultTemplatesURL represents the URL to the official templates supported by Portainer
 	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates-2.0.json"
 	// DefaultUserSessionTimeout represents the default timeout after which the user session is cleared
@@ -1252,14 +1226,6 @@ const (
 	AgentOnKubernetesEnvironment
 	// EdgeAgentOnKubernetesEnvironment represents an endpoint connected to an Edge agent deployed on a Kubernetes environment
 	EdgeAgentOnKubernetesEnvironment
-)
-
-const (
-	_ ExtensionID = iota
-	// RegistryManagementExtension represents the registry management extension (removed)
-	RegistryManagementExtension
-	// OAuthAuthenticationExtension represents the OAuth authentication extension (Deprecated)
-	OAuthAuthenticationExtension
 )
 
 const (
