@@ -62,6 +62,7 @@ angular.module('portainer.app').factory('RegistryService', [
     };
 
     service.updateRegistry = function (registry) {
+      registry.URL = _.replace(registry.URL, /^https?\:\/\//i, '');
       registry.URL = registry.URL.replace(/\/$/, '');
       return Registries.update({ id: registry.Id }, registry).$promise;
     };
