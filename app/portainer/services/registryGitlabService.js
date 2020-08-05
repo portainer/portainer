@@ -2,7 +2,7 @@ import _ from 'lodash-es';
 import { RegistryGitlabProject } from '../models/gitlabRegistry';
 import { RegistryRepositoryGitlabViewModel } from '../models/registryRepository';
 
-angular.module('portainer.extensions.registrymanagement').factory('RegistryGitlabService', [
+angular.module('portainer.app').factory('RegistryGitlabService', [
   '$async',
   'Gitlab',
   function RegistryGitlabServiceFactory($async, Gitlab) {
