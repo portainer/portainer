@@ -9,7 +9,6 @@ import (
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 // Handler is the HTTP handler used to handle authentication operations.
@@ -21,7 +20,6 @@ type Handler struct {
 	LDAPService                 portainer.LDAPService
 	OAuthService                portainer.OAuthService
 	ProxyManager                *proxy.Manager
-	AuthorizationService        *authorization.Service
 	KubernetesTokenCacheManager *kubernetes.TokenCacheManager
 }
 

@@ -12,7 +12,6 @@ import (
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 type userCreatePayload struct {
@@ -62,9 +61,8 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	user = &portainer.User{
-		Username:                payload.Username,
-		Role:                    portainer.UserRole(payload.Role),
-		PortainerAuthorizations: authorization.DefaultPortainerAuthorizations(),
+		Username: payload.Username,
+		Role:     portainer.UserRole(payload.Role),
 	}
 
 	settings, err := handler.DataStore.Settings().Settings()

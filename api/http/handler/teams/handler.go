@@ -1,7 +1,6 @@
 package teams
 
 import (
-	"github.com/portainer/portainer/api/internal/authorization"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -13,8 +12,7 @@ import (
 // Handler is the HTTP handler used to handle team operations.
 type Handler struct {
 	*mux.Router
-	DataStore            portainer.DataStore
-	AuthorizationService *authorization.Service
+	DataStore portainer.DataStore
 }
 
 // NewHandler creates a handler to manage team operations.

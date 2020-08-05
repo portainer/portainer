@@ -445,15 +445,6 @@ func (handler *Handler) saveEndpointAndUpdateAuthorizations(endpoint *portainer.
 		return err
 	}
 
-	group, err := handler.DataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
-	if err != nil {
-		return err
-	}
-
-	if len(group.UserAccessPolicies) > 0 || len(group.TeamAccessPolicies) > 0 {
-		return handler.AuthorizationService.UpdateUsersAuthorizations()
-	}
-
 	for _, tagID := range endpoint.TagIDs {
 		tag, err := handler.DataStore.Tag().Tag(tagID)
 		if err != nil {

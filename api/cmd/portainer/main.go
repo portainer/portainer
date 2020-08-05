@@ -17,7 +17,6 @@ import (
 	"github.com/portainer/portainer/api/git"
 	"github.com/portainer/portainer/api/http"
 	"github.com/portainer/portainer/api/http/client"
-	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/snapshot"
 	"github.com/portainer/portainer/api/jwt"
 	"github.com/portainer/portainer/api/kubernetes"
@@ -423,10 +422,9 @@ func main() {
 		if len(users) == 0 {
 			log.Println("Created admin user with the given password.")
 			user := &portainer.User{
-				Username:                "admin",
-				Role:                    portainer.AdministratorRole,
-				Password:                adminPasswordHash,
-				PortainerAuthorizations: authorization.DefaultPortainerAuthorizations(),
+				Username: "admin",
+				Role:     portainer.AdministratorRole,
+				Password: adminPasswordHash,
 			}
 			err := dataStore.User().CreateUser(user)
 			if err != nil {

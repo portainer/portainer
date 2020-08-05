@@ -40,13 +40,6 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 
 	handler.ProxyManager.DeleteEndpointProxy(endpoint)
 
-	if len(endpoint.UserAccessPolicies) > 0 || len(endpoint.TeamAccessPolicies) > 0 {
-		err = handler.AuthorizationService.UpdateUsersAuthorizations()
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
-		}
-	}
-
 	err = handler.DataStore.EndpointRelation().DeleteEndpointRelation(endpoint.ID)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove endpoint relation from the database", err}

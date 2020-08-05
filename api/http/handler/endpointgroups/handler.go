@@ -7,14 +7,12 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 // Handler is the HTTP handler used to handle endpoint group operations.
 type Handler struct {
 	*mux.Router
-	DataStore            portainer.DataStore
-	AuthorizationService *authorization.Service
+	DataStore portainer.DataStore
 }
 
 // NewHandler creates a handler to manage endpoint group operations.
