@@ -6,8 +6,7 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
   'SettingsService',
   'FileUploadService',
   'TeamService',
-  'ExtensionService',
-  function ($q, $scope, $state, Notifications, SettingsService, FileUploadService, TeamService, ExtensionService) {
+  function ($q, $scope, $state, Notifications, SettingsService, FileUploadService, TeamService) {
     $scope.state = {
       successfulConnectivityCheck: false,
       failedConnectivityCheck: false,
@@ -66,10 +65,6 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
         ],
         AutoCreateUsers: true,
       },
-    };
-
-    $scope.goToOAuthExtensionView = function () {
-      $state.go('portainer.extensions.extension', { id: 2 });
     };
 
     $scope.isOauthEnabled = function isOauthEnabled() {
@@ -167,7 +162,6 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
       $q.all({
         settings: SettingsService.settings(),
         teams: TeamService.teams(),
-        oauthAuthentication: ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.OAUTH_AUTHENTICATION),
       })
         .then(function success(data) {
           var settings = data.settings;
@@ -176,7 +170,6 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
           $scope.formValues.LDAPSettings = settings.LDAPSettings;
           $scope.OAuthSettings = settings.OAuthSettings;
           $scope.formValues.TLSCACert = settings.LDAPSettings.TLSConfig.TLSCACert;
-          $scope.oauthAuthenticationAvailable = data.oauthAuthentication;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve application settings');

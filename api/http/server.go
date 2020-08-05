@@ -61,6 +61,7 @@ type Server struct {
 	GitService              portainer.GitService
 	JWTService              portainer.JWTService
 	LDAPService             portainer.LDAPService
+	OAuthService            portainer.OAuthService
 	SwarmStackManager       portainer.SwarmStackManager
 	Handler                 *handler.Handler
 	SSL                     bool
@@ -90,6 +91,7 @@ func (server *Server) Start() error {
 	authHandler.ProxyManager = proxyManager
 	authHandler.AuthorizationService = authorizationService
 	authHandler.KubernetesTokenCacheManager = kubernetesTokenCacheManager
+	authHandler.OAuthService = server.OAuthService
 
 	var roleHandler = roles.NewHandler(requestBouncer)
 	roleHandler.DataStore = server.DataStore

@@ -1,4 +1,4 @@
-angular.module('portainer.extensions.oauth').component('oauthProvidersSelector', {
+angular.module('portainer.oauth').component('oauthProvidersSelector', {
   templateUrl: './oauth-providers-selector.html',
   bindings: {
     onSelect: '<',

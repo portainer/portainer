@@ -1,1 +1,1 @@
-angular.module('portainer.extensions', ['portainer.extensions.registrymanagement', 'portainer.extensions.oauth', 'portainer.extensions.rbac']);
+angular.module('portainer.extensions', ['portainer.extensions.registrymanagement', 'portainer.extensions.rbac']);

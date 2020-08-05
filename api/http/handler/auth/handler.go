@@ -19,6 +19,7 @@ type Handler struct {
 	CryptoService               portainer.CryptoService
 	JWTService                  portainer.JWTService
 	LDAPService                 portainer.LDAPService
+	OAuthService                portainer.OAuthService
 	ProxyManager                *proxy.Manager
 	AuthorizationService        *authorization.Service
 	KubernetesTokenCacheManager *kubernetes.TokenCacheManager

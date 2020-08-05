@@ -1,9 +1,7 @@
 package auth
 
 import (
-	"encoding/json"
 	"errors"
-	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -27,52 +25,22 @@ func (payload *oauthPayload) Validate(r *http.Request) error {
 	return nil
 }
 
-func (handler *Handler) authenticateThroughExtension(code, licenseKey string, settings *portainer.OAuthSettings) (string, error) {
-	extensionURL := handler.ProxyManager.GetExtensionURL(portainer.OAuthAuthenticationExtension)
+func (handler *Handler) authenticateOAuth(code string, settings *portainer.OAuthSettings) (string, error) {
+	if code == "" {
+		return "", errors.New("Invalid OAuth authorization code")
+	}
 
-	encodedConfiguration, err := json.Marshal(settings)
+	if settings == nil {
+		return "", errors.New("Invalid OAuth configuration")
+	}
+
+	username, err := handler.OAuthService.Authenticate(code, settings)
 	if err != nil {
+		log.Printf("[DEBUG] - Unable to authenticate user via OAuth: %v", err)
 		return "", nil
 	}
 
-	req, err := http.NewRequest("GET", extensionURL+"/validate", nil)
-	if err != nil {
-		return "", err
-	}
-
-	client := &http.Client{}
-	req.Header.Set("X-OAuth-Config", string(encodedConfiguration))
-	req.Header.Set("X-OAuth-Code", code)
-	req.Header.Set("X-PortainerExtension-License", licenseKey)
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-
-	type extensionResponse struct {
-		Username string `json:"Username,omitempty"`
-		Err      string `json:"err,omitempty"`
-		Details  string `json:"details,omitempty"`
-	}
-
-	var extResp extensionResponse
-	err = json.Unmarshal(body, &extResp)
-	if err != nil {
-		return "", err
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		return "", errors.New(extResp.Err + ":" + extResp.Details)
-	}
-
-	return extResp.Username, nil
+	return username, nil
 }
 
 func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -91,14 +59,7 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusForbidden, "OAuth authentication is not enabled", errors.New("OAuth authentication is not enabled")}
 	}
 
-	extension, err := handler.DataStore.Extension().Extension(portainer.OAuthAuthenticationExtension)
-	if err == bolterrors.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Oauth authentication extension is not enabled", err}
-	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a extension with the specified identifier inside the database", err}
-	}
-
-	username, err := handler.authenticateThroughExtension(payload.Code, extension.License.LicenseKey, &settings.OAuthSettings)
+	username, err := handler.authenticateOAuth(payload.Code, &settings.OAuthSettings)
 	if err != nil {
 		log.Printf("[DEBUG] - OAuth authentication error: %s", err)
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to authenticate through OAuth", httperrors.ErrUnauthorized}

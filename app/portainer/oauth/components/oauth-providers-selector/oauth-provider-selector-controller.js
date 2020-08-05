@@ -1,4 +1,4 @@
-angular.module('portainer.extensions.oauth').controller('OAuthProviderSelectorController', function OAuthProviderSelectorController() {
+angular.module('portainer.oauth').controller('OAuthProviderSelectorController', function OAuthProviderSelectorController() {
   var ctrl = this;
 
   this.providers = [
@@ -9,6 +9,9 @@ angular.module('portainer.extensions.oauth').controller('OAuthProviderSelectorCo
       userIdentifier: 'userPrincipalName',
       scopes: 'id,email,name',
       name: 'microsoft',
+      label: 'Microsoft',
+      description: 'Microsoft OAuth provider',
+      icon: 'fab fa-microsoft',
     },
     {
       authUrl: 'https://accounts.google.com/o/oauth2/auth',
@@ -17,6 +20,9 @@ angular.module('portainer.extensions.oauth').controller('OAuthProviderSelectorCo
       userIdentifier: 'email',
       scopes: 'profile email',
       name: 'google',
+      label: 'Google',
+      description: 'Google OAuth provider',
+      icon: 'fab fa-google',
     },
     {
       authUrl: 'https://github.com/login/oauth/authorize',
@@ -25,6 +31,9 @@ angular.module('portainer.extensions.oauth').controller('OAuthProviderSelectorCo
       userIdentifier: 'login',
       scopes: 'id email name',
       name: 'github',
+      label: 'Github',
+      description: 'Github OAuth provider',
+      icon: 'fab fa-github',
     },
     {
       authUrl: '',
@@ -33,6 +42,9 @@ angular.module('portainer.extensions.oauth').controller('OAuthProviderSelectorCo
       userIdentifier: '',
       scopes: '',
       name: 'custom',
+      label: 'Custom',
+      description: 'Custom OAuth provider',
+      icon: 'fa fa-user-check',
     },
   ];
 
