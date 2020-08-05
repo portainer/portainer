@@ -26,9 +26,8 @@ var extensionDownloadBaseURL = portainer.AssetsServerURL + "/extensions/"
 var extensionVersionRegexp = regexp.MustCompile(`\d+(\.\d+)+`)
 
 var extensionBinaryMap = map[portainer.ExtensionID]string{
-	portainer.RegistryManagementExtension:  "extension-registry-management",
-	portainer.OAuthAuthenticationExtension: "extension-oauth-authentication",
-	portainer.RBACExtension:                "extension-rbac",
+	portainer.RegistryManagementExtension: "extension-registry-management",
+	portainer.RBACExtension:               "extension-rbac",
 }
 
 // ExtensionManager represents a service used to
@@ -114,8 +113,6 @@ func (manager *ExtensionManager) InstallExtension(extension *portainer.Extension
 	switch extension.ID {
 	case portainer.RegistryManagementExtension:
 		extension.Name = "Registry Manager"
-	case portainer.OAuthAuthenticationExtension:
-		extension.Name = "External Authentication"
 	case portainer.RBACExtension:
 		extension.Name = "Role-Based Access Control"
 	}
