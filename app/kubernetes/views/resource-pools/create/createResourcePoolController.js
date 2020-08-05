@@ -3,14 +3,16 @@ import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import { KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resource-quota/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
+import { KubernetesResourcePoolFormValues, KubernetesResourcePoolIngressClassFormValue } from 'Kubernetes/models/resource-pool/formValues';
 
 class KubernetesCreateResourcePoolController {
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesNodeService, KubernetesResourcePoolService, Authentication) {
+  constructor($async, $state, Notifications, KubernetesNodeService, KubernetesResourcePoolService, Authentication, EndpointProvider) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
     this.Authentication = Authentication;
+    this.EndpointProvider = EndpointProvider;
 
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
@@ -53,13 +55,8 @@ class KubernetesCreateResourcePoolController {
     try {
       this.checkDefaults();
       const owner = this.Authentication.getUserDetails().username;
-      await this.KubernetesResourcePoolService.create(
-        this.formValues.Name,
-        owner,
-        this.formValues.hasQuota,
-        this.formValues.CpuLimit,
-        KubernetesResourceReservationHelper.bytesValue(this.formValues.MemoryLimit)
-      );
+      this.formValues.Owner = owner;
+      await this.KubernetesResourcePoolService.create(this.formValues);
       this.Notifications.success('Resource pool successfully created', this.formValues.Name);
       this.$state.go('kubernetes.resourcePools');
     } catch (err) {
@@ -88,12 +85,7 @@ class KubernetesCreateResourcePoolController {
   async onInit() {
     try {
       this.defaults = KubernetesResourceQuotaDefaults;
-
-      this.formValues = {
-        MemoryLimit: this.defaults.MemoryLimit,
-        CpuLimit: this.defaults.CpuLimit,
-        hasQuota: true,
-      };
+      this.formValues = new KubernetesResourcePoolFormValues(this.defaults);
 
       this.state = {
         actionInProgress: false,
@@ -101,6 +93,7 @@ class KubernetesCreateResourcePoolController {
         sliderMaxCpu: 0,
         viewReady: false,
         isAlreadyExist: false,
+        canUseIngress: this.EndpointProvider.currentEndpoint().Kubernetes.Configuration.UseIngress,
       };
 
       const nodes = await this.KubernetesNodeService.get();
@@ -111,6 +104,10 @@ class KubernetesCreateResourcePoolController {
       });
       this.state.sliderMaxMemory = KubernetesResourceReservationHelper.megaBytesValue(this.state.sliderMaxMemory);
       await this.getResourcePools();
+      if (this.state.canUseIngress) {
+        const ingressClasses = this.EndpointProvider.currentEndpoint().Kubernetes.Configuration.IngressClasses;
+        this.formValues.IngressClasses = _.map(ingressClasses, (item) => new KubernetesResourcePoolIngressClassFormValue(item));
+      }
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     } finally {

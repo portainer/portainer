@@ -28,16 +28,16 @@
                     <label class="control-label text-left">
                       Resource assignment
                     </label>
-                    <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.hasQuota" /><i></i> </label>
+                    <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.HasQuota" /><i></i> </label>
                   </div>
                 </div>
-                <div class="form-group" ng-if="ctrl.formValues.hasQuota && !ctrl.isQuotaValid()">
+                <div class="form-group" ng-if="ctrl.formValues.HasQuota && !ctrl.isQuotaValid()">
                   <span class="col-sm-12 text-warning small">
                     <p> <i class="fa fa-exclamation-triangle" aria-hidden="true" style="margin-right: 2px;"></i> At least a single limit must be set for the quota to be valid. </p>
                   </span>
                 </div>
                 <!-- !quotas-switch -->
-                <div ng-if="ctrl.formValues.hasQuota && ctrl.isAdmin && ctrl.isEditable">
+                <div ng-if="ctrl.formValues.HasQuota && ctrl.isAdmin && ctrl.isEditable">
                   <div class="col-sm-12 form-section-title">
                     Resource limits
                   </div>
@@ -109,7 +109,7 @@
                     <!-- !cpu-limit-input -->
                   </div>
                 </div>
-                <div ng-if="ctrl.formValues.hasQuota">
+                <div ng-if="ctrl.formValues.HasQuota">
                   <kubernetes-resource-reservation
                     ng-if="ctrl.pool.Quota"
                     description="Resource reservation represents the total amount of resource assigned to all the applications deployed inside this resource pool."
@@ -129,7 +129,7 @@
                     <button
                       type="button"
                       class="btn btn-primary btn-sm"
-                      ng-disabled="!resourcePoolEditForm.$valid || ctrl.state.actionInProgress || (ctrl.formValues.hasQuota && !ctrl.isQuotaValid())"
+                      ng-disabled="!resourcePoolEditForm.$valid || ctrl.state.actionInProgress || (ctrl.formValues.HasQuota && !ctrl.isQuotaValid())"
                       ng-click="ctrl.updateResourcePool()"
                       button-spinner="ctrl.state.actionInProgress"
                     >

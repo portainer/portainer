@@ -40,6 +40,7 @@ class KubernetesCreateApplicationController {
     KubernetesStackService,
     KubernetesConfigurationService,
     KubernetesNodeService,
+    KubernetesIngressService,
     KubernetesPersistentVolumeClaimService,
     KubernetesNamespaceHelper,
     KubernetesVolumeService
@@ -56,6 +57,7 @@ class KubernetesCreateApplicationController {
     this.KubernetesConfigurationService = KubernetesConfigurationService;
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesVolumeService = KubernetesVolumeService;
+    this.KubernetesIngressService = KubernetesIngressService;
     this.KubernetesPersistentVolumeClaimService = KubernetesPersistentVolumeClaimService;
     this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
 
@@ -411,6 +413,10 @@ class KubernetesCreateApplicationController {
     return this.state.useLoadBalancer;
   }
 
+  publishViaIngressEnabled() {
+    return this.filteredIngresses.length;
+  }
+
   isEditAndNoChangesMade() {
     if (!this.state.isEdit) return false;
     const changes = JsonPatch.compare(this.savedFormValues, this.formValues);
@@ -546,8 +552,12 @@ class KubernetesCreateApplicationController {
     return this.$async(this.refreshApplicationsAsync, namespace);
   }
 
+  refreshIngresses(namespace) {
+    this.filteredIngresses = _.filter(this.ingresses, { Namespace: namespace });
+  }
+
   async refreshStacksConfigsAppsAsync(namespace) {
-    await Promise.all([this.refreshStacks(namespace), this.refreshConfigurations(namespace), this.refreshApplications(namespace)]);
+    await Promise.all([this.refreshStacks(namespace), this.refreshConfigurations(namespace), this.refreshApplications(namespace), this.refreshIngresses(namespace)]);
     this.onChangeName();
   }
 
@@ -595,7 +605,7 @@ class KubernetesCreateApplicationController {
       this.Notifications.success('Application successfully updated');
       this.$state.go('kubernetes.applications.application', { name: this.application.Name, namespace: this.application.ResourcePool });
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve application related events');
+      this.Notifications.error('Failure', err, 'Unable to update application');
     } finally {
       this.state.actionInProgress = false;
     }
@@ -644,8 +654,7 @@ class KubernetesCreateApplicationController {
         actionInProgress: false,
         useLoadBalancer: false,
         useServerMetrics: false,
-        useIngress: false,
-        ingressClasses: '',
+        canUseIngress: false,
         sliders: {
           cpu: {
             min: 0,
@@ -693,17 +702,17 @@ class KubernetesCreateApplicationController {
       this.storageClasses = endpoint.Kubernetes.Configuration.StorageClasses;
       this.state.useLoadBalancer = endpoint.Kubernetes.Configuration.UseLoadBalancer;
       this.state.useServerMetrics = endpoint.Kubernetes.Configuration.UseServerMetrics;
-      this.state.useIngress = endpoint.Kubernetes.Configuration.UseIngress;
-      this.state.ingressClasses = endpoint.Kubernetes.Configuration.IngressClasses;
 
       this.formValues = new KubernetesApplicationFormValues();
 
-      const [resourcePools, nodes, volumes, applications] = await Promise.all([
+      const [resourcePools, nodes, volumes, applications, ingresses] = await Promise.all([
         this.KubernetesResourcePoolService.get(),
         this.KubernetesNodeService.get(),
         this.KubernetesVolumeService.get(),
         this.KubernetesApplicationService.get(),
+        this.KubernetesIngressService.get(),
       ]);
+      this.ingresses = ingresses;
 
       this.resourcePools = _.filter(resourcePools, (resourcePool) => !this.KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name));
       this.formValues.ResourcePool = this.resourcePools[0];
@@ -724,6 +733,7 @@ class KubernetesCreateApplicationController {
       if (this.state.isEdit) {
         await this.getApplication();
         this.formValues = KubernetesApplicationConverter.applicationToFormValues(this.application, this.resourcePools, this.configurations, this.persistentVolumeClaims);
+        this.formValues.OriginalIngressClasses = angular.copy(this.ingresses);
         this.savedFormValues = angular.copy(this.formValues);
         delete this.formValues.ApplicationType;
 
@@ -738,6 +748,7 @@ class KubernetesCreateApplicationController {
         }
       } else {
         this.formValues.AutoScaler = KubernetesApplicationHelper.generateAutoScalerFormValueFromHorizontalPodAutoScaler(null, this.formValues.ReplicaCount);
+        this.formValues.OriginalIngressClasses = angular.copy(this.ingresses);
       }
 
       await this.updateSliders();

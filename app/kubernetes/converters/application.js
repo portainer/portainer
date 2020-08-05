@@ -27,6 +27,7 @@ import KubernetesPersistentVolumeClaimConverter from 'Kubernetes/converters/pers
 import PortainerError from 'Portainer/error';
 import { KubernetesApplicationPort } from 'Kubernetes/models/application/models';
 import { KubernetesIngressHelper } from 'Kubernetes/ingress/helper';
+import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
 
 function _apiPortsToPublishedPorts(pList, pRefs) {
   const ports = _.map(pList, (item) => {
@@ -49,7 +50,7 @@ function _apiPortsToPublishedPorts(pList, pRefs) {
 }
 
 class KubernetesApplicationConverter {
-  static applicationCommon(res, data, service, ingressRules) {
+  static applicationCommon(res, data, service, ingresses) {
     res.Id = data.metadata.uid;
     res.Name = data.metadata.name;
     res.StackName = data.metadata.labels ? data.metadata.labels[KubernetesPortainerApplicationStackNameLabel] || '-' : '-';
@@ -111,7 +112,7 @@ class KubernetesApplicationConverter {
 
       const portsRefs = _.concat(..._.map(data.spec.template.spec.containers, (container) => container.ports));
       const ports = _apiPortsToPublishedPorts(service.spec.ports, portsRefs);
-      const rules = KubernetesIngressHelper.findSBoundServiceIngressesRules(ingressRules, service);
+      const rules = KubernetesIngressHelper.findSBoundServiceIngressesRules(ingresses, service);
       _.forEach(ports, (port) => (port.IngressRules = _.filter(rules, (rule) => rule.Port === port.Port)));
       res.PublishedPorts = ports;
     }
@@ -210,9 +211,9 @@ class KubernetesApplicationConverter {
     );
   }
 
-  static apiDeploymentToApplication(data, service, ingressRules) {
+  static apiDeploymentToApplication(data, service, ingresses) {
     const res = new KubernetesApplication();
-    KubernetesApplicationConverter.applicationCommon(res, data, service, ingressRules);
+    KubernetesApplicationConverter.applicationCommon(res, data, service, ingresses);
     res.ApplicationType = KubernetesApplicationTypes.DEPLOYMENT;
     res.DeploymentType = KubernetesApplicationDeploymentTypes.REPLICATED;
     res.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.SHARED;
@@ -221,9 +222,9 @@ class KubernetesApplicationConverter {
     return res;
   }
 
-  static apiDaemonSetToApplication(data, service, ingressRules) {
+  static apiDaemonSetToApplication(data, service, ingresses) {
     const res = new KubernetesApplication();
-    KubernetesApplicationConverter.applicationCommon(res, data, service, ingressRules);
+    KubernetesApplicationConverter.applicationCommon(res, data, service, ingresses);
     res.ApplicationType = KubernetesApplicationTypes.DAEMONSET;
     res.DeploymentType = KubernetesApplicationDeploymentTypes.GLOBAL;
     res.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.SHARED;
@@ -232,9 +233,9 @@ class KubernetesApplicationConverter {
     return res;
   }
 
-  static apiStatefulSetToapplication(data, service, ingressRules) {
+  static apiStatefulSetToapplication(data, service, ingresses) {
     const res = new KubernetesApplication();
-    KubernetesApplicationConverter.applicationCommon(res, data, service, ingressRules);
+    KubernetesApplicationConverter.applicationCommon(res, data, service, ingresses);
     res.ApplicationType = KubernetesApplicationTypes.STATEFULSET;
     res.DeploymentType = KubernetesApplicationDeploymentTypes.REPLICATED;
     res.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.ISOLATED;
@@ -313,7 +314,9 @@ class KubernetesApplicationConverter {
     if (!service.Ports.length) {
       service = undefined;
     }
-    return [app, headlessService, service, claims];
+
+    const ingresses = KubernetesIngressConverter.applicationFormValuesToIngresses(formValues, service);
+    return [app, headlessService, service, claims, ingresses];
   }
 }
 

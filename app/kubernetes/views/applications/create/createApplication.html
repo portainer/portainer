@@ -919,6 +919,16 @@
                     <p>Publish this application via a port on all nodes of the cluster</p>
                   </label>
                 </div>
+                <div ng-if="ctrl.publishViaIngressEnabled()">
+                  <input type="radio" id="publishing_ingress" ng-value="ctrl.ApplicationPublishingTypes.INGRESS" ng-model="ctrl.formValues.PublishingType" />
+                  <label for="publishing_ingress">
+                    <div class="boxselector_header">
+                      <i class="fa fa-route" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Ingress
+                    </div>
+                    <p>Publish this application via a HTTP route</p>
+                  </label>
+                </div>
                 <div ng-if="ctrl.publishViaLoadBalancerEnabled()">
                   <input type="radio" id="publishing_loadbalancer" ng-value="ctrl.ApplicationPublishingTypes.LOAD_BALANCER" ng-model="ctrl.formValues.PublishingType" />
                   <label for="publishing_loadbalancer">
@@ -962,7 +972,7 @@
                   tooltip-enable="ctrl.disableLoadBalancerEdit()"
                   uib-tooltip="Edition is not allowed while the Load Balancer is in Pending state"
                 >
-                  <div class="col-sm-4 input-group input-group-sm">
+                  <div class="col-sm-3 input-group input-group-sm">
                     <span class="input-group-addon">container port</span>
                     <input
                       type="number"
@@ -977,7 +987,7 @@
                     />
                   </div>
 
-                  <div class="input-group input-group-sm col-sm-4" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER">
+                  <div class="col-sm-3 input-group input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER">
                     <span class="input-group-addon">node port</span>
                     <input
                       name="published_node_port_{{ $index }}"
@@ -990,7 +1000,7 @@
                     />
                   </div>
 
-                  <div class="col-sm-4 input-group input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.LOAD_BALANCER">
+                  <div class="col-sm-3 input-group input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.LOAD_BALANCER">
                     <span class="input-group-addon">load balancer port</span>
                     <input
                       type="number"
@@ -1006,7 +1016,24 @@
                     />
                   </div>
 
-                  <div class="input-group col-sm-3 input-group-sm">
+                  <div class="col-sm-3 input-group input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INGRESS">
+                    <span class="input-group-addon">ingress</span>
+                    <select
+                      class="form-control"
+                      name="ingress_class_{{ $index }}"
+                      ng-model="publishedPort.Ingress"
+                      ng-options="ingress as ingress.IngressClass for ingress in ctrl.filteredIngresses"
+                      required
+                    >
+                    </select>
+                  </div>
+
+                  <div class="col-sm-3 input-group input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INGRESS">
+                    <span class="input-group-addon">route</span>
+                    <input class="form-control" name="ingress_route_{{ $index }}" ng-model="publishedPort.IngressRoute" placeholder="/foo" required />
+                  </div>
+
+                  <div class="input-group col-sm-2 input-group-sm">
                     <div class="btn-group btn-group-sm">
                       <label class="btn btn-primary" ng-model="publishedPort.Protocol" uib-btn-radio="'TCP'" ng-disabled="ctrl.disableLoadBalancerEdit()">TCP</label>
                       <label class="btn btn-primary" ng-model="publishedPort.Protocol" uib-btn-radio="'UDP'" ng-disabled="ctrl.disableLoadBalancerEdit()">UDP</label>
@@ -1022,10 +1049,12 @@
                   ng-if="
                     kubernetesApplicationCreationForm['container_port_' + $index].$invalid ||
                     kubernetesApplicationCreationForm['published_node_port_' + $index].$invalid ||
-                    kubernetesApplicationCreationForm['load_balancer_port_' + $index].$invalid
+                    kubernetesApplicationCreationForm['load_balancer_port_' + $index].$invalid ||
+                    kubernetesApplicationCreationForm['ingress_class_' + $index].$invalid ||
+                    kubernetesApplicationCreationForm['ingress_route_' + $index].$invalid
                   "
                 >
-                  <div class="col-sm-4 input-group input-group-sm">
+                  <div class="col-sm-3 input-group input-group-sm">
                     <div class="small text-warning" style="margin-top: 5px;" ng-if="kubernetesApplicationCreationForm['container_port_' + $index].$invalid">
                       <div ng-messages="kubernetesApplicationCreationForm['container_port_'+$index].$error">
                         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Container port number is required.</p>
@@ -1035,7 +1064,7 @@
                     </div>
                   </div>
 
-                  <div class="input-group input-group-sm col-sm-4" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER">
+                  <div class="col-sm-3 input-group input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER">
                     <div class="small text-warning" style="margin-top: 5px;" ng-if="kubernetesApplicationCreationForm['published_node_port_' + $index].$invalid">
                       <div ng-messages="kubernetesApplicationCreationForm['published_node_port_'+$index].$error">
                         <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Node port number must be inside the range 30000-32767.</p>
@@ -1044,12 +1073,26 @@
                     </div>
                   </div>
 
-                  <div class="col-sm-4 input-group input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.LOAD_BALANCER">
+                  <div class="col-sm-3 input-group input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.LOAD_BALANCER">
                     <div class="small text-warning" style="margin-top: 5px;" ng-if="kubernetesApplicationCreationForm['load_balancer_port_' + $index].$invalid">
                       <div ng-messages="kubernetesApplicationCreationForm['load_balancer_port_'+$index].$error">
                         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Load balancer port number is required.</p>
                         <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Load balancer port number must be inside the range 1-65535.</p>
                         <p ng-message="max"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Load balancer port number must be inside the range 1-65535.</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-3 input-group input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INGRESS">
+                    <div class="small text-warning" style="margin-top: 5px;" ng-if="kubernetesApplicationCreationForm['ingress_class_' + $index].$invalid">
+                      <div ng-messages="kubernetesApplicationCreationForm['ingress_class_'+$index].$error">
+                        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Ingress selection is required.</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-3 input-group input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INGRESS">
+                    <div class="small text-warning" style="margin-top: 5px;" ng-if="kubernetesApplicationCreationForm['ingress_route_' + $index].$invalid">
+                      <div ng-messages="kubernetesApplicationCreationForm['ingress_route_'+$index].$error">
+                        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Route is required.</p>
                       </div>
                     </div>
                   </div>

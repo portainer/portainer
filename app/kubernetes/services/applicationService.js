@@ -1,4 +1,4 @@
-import _ from 'lodash-es';
+import * as _ from 'lodash-es';
 import angular from 'angular';
 import PortainerError from 'Portainer/error';
 
@@ -195,10 +195,15 @@ class KubernetesApplicationService {
   // or should we switch to formValues > Composite > Resource_1 || Resource_2
   async createAsync(formValues) {
     try {
-      let [app, headlessService, service, claims] = KubernetesApplicationConverter.applicationFormValuesToApplication(formValues);
+      let [app, headlessService, service, claims, ingresses] = KubernetesApplicationConverter.applicationFormValuesToApplication(formValues);
 
       if (service) {
         await this.KubernetesServiceService.create(service);
+        const ingressPromises = _.map(ingresses, (ingress) => {
+          const original = _.find(formValues.OriginalIngressClasses, { Namespace: ingress.Namespace, Name: ingress.Name });
+          return this.KubernetesIngressService.patch(original, ingress);
+        });
+        await Promise.all(ingressPromises);
       }
 
       const apiService = this._getApplicationApiService(app);

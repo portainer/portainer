@@ -22,6 +22,7 @@ const _KubernetesApplicationFormValues = Object.freeze({
   DataAccessPolicy: KubernetesApplicationDataAccessPolicies.SHARED,
   Configurations: [], // KubernetesApplicationConfigurationFormValue list
   AutoScaler: {},
+  OriginalIngressClasses: undefined,
 });
 
 export class KubernetesApplicationFormValues {
@@ -112,6 +113,8 @@ const _KubernetesApplicationPublishedPortFormValue = Object.freeze({
   LoadBalancerPort: '',
   LoadBalancerNodePort: undefined, // only filled to save existing loadbalancer nodePort and drop it when moving app exposure from LB to Internal/NodePort
   Protocol: 'TCP',
+  Ingress: undefined,
+  IngressRoute: '',
 });
 
 export class KubernetesApplicationPublishedPortFormValue {

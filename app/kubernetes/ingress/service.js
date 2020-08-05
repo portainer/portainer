@@ -12,6 +12,8 @@ class KubernetesIngressService {
 
     this.getAsync = this.getAsync.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
+    this.createAsync = this.createAsync.bind(this);
+    this.patchAsync = this.patchAsync.bind(this);
   }
 
   /**
@@ -47,6 +49,48 @@ class KubernetesIngressService {
       return this.$async(this.getAsync, namespace, name);
     }
     return this.$async(this.getAllAsync, namespace);
+  }
+
+  /**
+   * CREATE
+   */
+  async createAsync(ingress) {
+    try {
+      const params = {};
+      const payload = KubernetesIngressConverter.createPayload(ingress);
+      const namespace = payload.metadata.namespace;
+      const data = await this.KubernetesIngresses(namespace).create(params, payload).$promise;
+      return data;
+    } catch (err) {
+      throw new PortainerError('Unable to create ingress', err);
+    }
+  }
+
+  create(ingress) {
+    return this.$async(this.createAsync, ingress);
+  }
+
+  /**
+   * PATCH
+   */
+  async patchAsync(oldIngress, newIngress) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = newIngress.Name;
+      const namespace = newIngress.Namespace;
+      const payload = KubernetesIngressConverter.patchPayload(oldIngress, newIngress);
+      if (!payload.length) {
+        return;
+      }
+      const data = await this.KubernetesIngresses(namespace).patch(params, payload).$promise;
+      return data;
+    } catch (err) {
+      throw new PortainerError('Unable to patch ingress', err);
+    }
+  }
+
+  patch(oldIngress, newIngress) {
+    return this.$async(this.patchAsync, oldIngress, newIngress);
   }
 }
 

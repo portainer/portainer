@@ -7,7 +7,7 @@ func KubernetesDefault() KubernetesData {
 			UseServerMetrics: false,
 			UseIngress: false,
 			StorageClasses:  []KubernetesStorageClassConfig{},
-			IngressClasses: "",
+			IngressClasses: []string{},
 		},
 		Snapshots: []KubernetesSnapshot{},
 	}

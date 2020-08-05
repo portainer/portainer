@@ -334,7 +334,7 @@ type (
 		UseServerMetrics bool                           `json:"UseServerMetrics"`
 		UseIngress       bool                           `json:"UseIngress"`
 		StorageClasses   []KubernetesStorageClassConfig `json:"StorageClasses"`
-		IngressClasses   string                         `json:"IngressClasses"`
+		IngressClasses   []string                       `json:"IngressClasses"`
 	}
 
 	// KubernetesStorageClassConfig represents a Kubernetes Storage Class configuration

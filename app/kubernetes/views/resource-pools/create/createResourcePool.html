@@ -56,16 +56,16 @@
                 <label class="control-label text-left">
                   Resource assignment
                 </label>
-                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.hasQuota" /><i></i> </label>
+                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.HasQuota" /><i></i> </label>
               </div>
             </div>
-            <div class="form-group" ng-if="ctrl.formValues.hasQuota && !ctrl.isQuotaValid()">
+            <div class="form-group" ng-if="ctrl.formValues.HasQuota && !ctrl.isQuotaValid()">
               <span class="col-sm-12 text-warning small">
                 <p> <i class="fa fa-exclamation-triangle" aria-hidden="true" style="margin-right: 2px;"></i> At least a single limit must be set for the quota to be valid. </p>
               </span>
             </div>
             <!-- !quotas-switch -->
-            <div ng-if="ctrl.formValues.hasQuota">
+            <div ng-if="ctrl.formValues.HasQuota">
               <div class="col-sm-12 form-section-title">
                 Resource limits
               </div>
@@ -76,13 +76,8 @@
                     Memory
                   </label>
                   <div class="col-sm-3">
-                    <slider
-                      model="ctrl.formValues.MemoryLimit"
-                      floor="ctrl.defaults.MemoryLimit"
-                      ceil="ctrl.state.sliderMaxMemory"
-                      step="128"
-                      ng-if="ctrl.state.sliderMaxMemory"
-                    ></slider>
+                    <slider model="ctrl.formValues.MemoryLimit" floor="ctrl.defaults.MemoryLimit" ceil="ctrl.state.sliderMaxMemory" step="128" ng-if="ctrl.state.sliderMaxMemory">
+                    </slider>
                   </div>
                   <div class="col-sm-2">
                     <input
@@ -106,8 +101,8 @@
                   <div class="col-sm-12 small text-warning">
                     <div ng-messages="resourcePoolCreationForm.pool_name.$error">
                       <p
-                        ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value must be between {{ ctrl.defaults.MemoryLimit }} and {{ ctrl.state.sliderMaxMemory }}</p
-                      >
+                        ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value must be between {{ ctrl.defaults.MemoryLimit }} and {{ ctrl.state.sliderMaxMemory }}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -118,14 +113,8 @@
                     CPU
                   </label>
                   <div class="col-sm-5">
-                    <slider
-                      model="ctrl.formValues.CpuLimit"
-                      floor="ctrl.defaults.CpuLimit"
-                      ceil="ctrl.state.sliderMaxCpu"
-                      step="0.1"
-                      precision="2"
-                      ng-if="ctrl.state.sliderMaxCpu"
-                    ></slider>
+                    <slider model="ctrl.formValues.CpuLimit" floor="ctrl.defaults.CpuLimit" ceil="ctrl.state.sliderMaxCpu" step="0.1" precision="2" ng-if="ctrl.state.sliderMaxCpu">
+                    </slider>
                   </div>
                   <div class="col-sm-4" style="margin-top: 20px;">
                     <p class="small text-muted">
@@ -134,6 +123,51 @@
                   </div>
                 </div>
                 <!-- !cpu-limit-input -->
+              </div>
+            </div>
+            <div class="col-sm-12 form-section-title">
+              Ingresses
+            </div>
+            <div class="form-group" ng-if="!ctrl.state.canUseIngress">
+              <div class="col-sm-12 small text-muted">
+                <p>
+                  <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  Ingress need to be activated by an administrator on the cluster before attempting to setup an ingress for the resource pool.
+                </p>
+              </div>
+            </div>
+            <div class="form-group" ng-if="ctrl.state.canUseIngress">
+              <div class="col-sm-12 small text-muted">
+                <p>
+                  <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  Activating an ingress class will allow users to expose their applications over a path
+                </p>
+              </div>
+              <div class="col-sm-12">
+                <label class="control-label text-left">
+                  Ingress activation
+                </label>
+                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.UseIngress" /><i></i> </label>
+              </div>
+            </div>
+            <div class="form-group" ng-if="ctrl.formValues.UseIngress && ctrl.state.canUseIngress">
+              <div style="margin-top: 10px;" class="col-sm-12">
+                <table class="table" style="table-layout: fixed;">
+                  <tbody>
+                    <tr class="text-muted">
+                      <td>Ingress controller</td>
+                      <td>Activated</td>
+                    </tr>
+                    <tr ng-repeat="class in ctrl.formValues.IngressClasses">
+                      <td>
+                        {{ class.Name }}
+                      </td>
+                      <td>
+                        <label class="switch" style="margin-right: 10px;"> <input type="checkbox" ng-model="class.Selected" /><i></i> </label>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
             <!-- actions -->
@@ -145,7 +179,7 @@
                 <button
                   type="button"
                   class="btn btn-primary btn-sm"
-                  ng-disabled="!resourcePoolCreationForm.$valid || ctrl.state.actionInProgress || (ctrl.formValues.hasQuota && !ctrl.isQuotaValid()) || !ctrl.isValid()"
+                  ng-disabled="!resourcePoolCreationForm.$valid || ctrl.state.actionInProgress || (ctrl.formValues.HasQuota && !ctrl.isQuotaValid()) || !ctrl.isValid()"
                   ng-click="ctrl.createResourcePool()"
                   button-spinner="ctrl.state.actionInProgress"
                 >
