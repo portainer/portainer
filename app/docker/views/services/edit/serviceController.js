@@ -664,7 +664,7 @@ angular.module('portainer.docker').controller('ServiceController', [
             webhooks: WebhookService.webhooks(service.Id, EndpointProvider.endpointID()),
           });
         })
-        .then(function success(data) {
+        .then(async function success(data) {
           $scope.nodes = data.nodes;
           $scope.configs = data.configs;
           $scope.secrets = data.secrets;
@@ -689,13 +689,19 @@ angular.module('portainer.docker').controller('ServiceController', [
             }
           }
 
-          $scope.service.Networks = _.map(networks, (item) => {
-            let addr = '';
-            if (item.IPAM.Config.length) {
-              addr = item.IPAM.Config[0].Subnet;
-            }
-            return { Id: item.Id, Name: item.Name, Addr: addr, Editable: !item.Ingress };
-          });
+          $scope.service.Networks = await Promise.all(
+            _.map(networks, async (item) => {
+              let addr = '';
+              if (item.IPAM.Config.length) {
+                addr = item.IPAM.Config[0].Subnet;
+              }
+              if (item.Driver === 'macvlan') {
+                const network = await NetworkService.network(item.Id);
+                addr = network && network.IPAM && network.IPAM.Config && network.IPAM.Config.length && network.IPAM.Config[0].Subnet;
+              }
+              return { Id: item.Id, Name: item.Name, Addr: addr, Editable: !item.Ingress };
+            })
+          );
 
           originalService.Networks = angular.copy($scope.service.Networks);
 
