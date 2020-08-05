@@ -75,7 +75,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
               .map((k) => k + '=' + params[k])
               .join('&');
 
-          initTerm(url, ContainerService.resizeTTY.bind(this, attachId));
+          initTerm(url, (width, height, timeout) => resizeTTY(ContainerService.resizeTTY, params.id, width, height, timeout));
         })
         .catch(function error(err) {
           Notifications.error('Error', err, 'Unable to retrieve container details');
@@ -115,13 +115,21 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
               .map((k) => k + '=' + params[k])
               .join('&');
 
-          initTerm(url, ExecService.resizeTTY.bind(this, params.id));
+          initTerm(url, (width, height, timeout) => resizeTTY(ExecService.resizeTTY, params.id, width, height, timeout));
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to exec into container');
           $scope.disconnect();
         });
     };
+
+    async function resizeTTY(resizeFn, id, width, height, timeout) {
+      try {
+        await resizeFn(id, width, height, timeout);
+      } catch (err) {
+        Notifications.error('Failure', err, 'Failed resizing the terminal');
+      }
+    }
 
     $scope.disconnect = function () {
       if (socket) {
