@@ -41,7 +41,6 @@ angular.module('portainer.app').factory('Notifications', [
       if (msg !== 'Invalid JWT token') {
         toastr.error($sanitize(msg), $sanitize(title), { timeOut: 6000 });
       }
-      throw e;
     };
 
     return service;
