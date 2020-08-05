@@ -7,8 +7,7 @@ angular.module('portainer.app').controller('CreateRegistryController', [
   'RegistryService',
   'Notifications',
   'RegistryGitlabService',
-  'ExtensionService',
-  function ($scope, $state, RegistryService, Notifications, RegistryGitlabService, ExtensionService) {
+  function ($scope, $state, RegistryService, Notifications, RegistryGitlabService) {
     $scope.selectQuayRegistry = selectQuayRegistry;
     $scope.selectAzureRegistry = selectAzureRegistry;
     $scope.selectCustomRegistry = selectCustomRegistry;
@@ -106,7 +105,6 @@ angular.module('portainer.app').controller('CreateRegistryController', [
     function initView() {
       $scope.RegistryTypes = RegistryTypes;
       $scope.model = new RegistryDefaultModel();
-      ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.REGISTRY_MANAGEMENT).then((data) => ($scope.registryExtensionEnabled = data));
     }
 
     initView();
