@@ -52,8 +52,8 @@ class KubernetesClusterController {
   async getEndpointsAsync() {
     try {
       const endpoints = await this.KubernetesEndpointService.get();
-      const endpointsSystem = _.filter(endpoints, { Namespace: 'kube-system' });
-      this.endpointsSystem = _.filter(endpointsSystem, (ep) => ep.HolderIdentity);
+      const systemEndpoints = _.filter(endpoints, { Namespace: 'kube-system' });
+      this.systemEndpoints = _.filter(systemEndpoints, (ep) => ep.HolderIdentity);
 
       const kubernetesEndpoint = _.find(endpoints, { Name: 'kubernetes' });
       if (kubernetesEndpoint && kubernetesEndpoint.Subsets) {
