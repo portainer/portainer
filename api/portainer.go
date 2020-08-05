@@ -1255,7 +1255,7 @@ const (
 
 const (
 	_ ExtensionID = iota
-	// RegistryManagementExtension represents the registry management extension
+	// RegistryManagementExtension represents the registry management extension (removed)
 	RegistryManagementExtension
 	// OAuthAuthenticationExtension represents the OAuth authentication extension (Deprecated)
 	OAuthAuthenticationExtension
