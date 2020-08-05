@@ -23,11 +23,8 @@ import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHel
 import KubernetesApplicationConverter from 'Kubernetes/converters/application';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
-<<<<<<< HEAD
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application/index';
-=======
 import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
->>>>>>> feat(volume): allow to increase volume size and few other things
 
 class KubernetesCreateApplicationController {
   /* @ngInject */
