@@ -18,7 +18,16 @@
                   <tbody ng-if="ctrl.node">
                     <tr>
                       <td>Hostname</td>
-                      <td>{{ ctrl.node.Name }}</td>
+                      <td>
+                        {{ ctrl.node.Name }}
+                        <span class="label label-primary image-tag" style="margin-left: 5px;" ng-if="ctrl.node.Api">api</span>
+                      </td>
+                    </tr>
+                    <tr ng-if="ctrl.endpoint.Subsets">
+                      <td>
+                        Kubernetes API
+                      </td>
+                      <td>{{ ctrl.node.IPAddress }}:{{ ctrl.node.Port }}</td>
                     </tr>
                     <tr>
                       <td>Role</td>

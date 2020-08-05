@@ -51,8 +51,17 @@ class KubernetesClusterController {
 
   async getEndpointsAsync() {
     try {
-      const endpoints = await this.KubernetesEndpointService.get('kube-system');
-      this.endpoints = _.filter(endpoints, (ep) => ep.HolderIdentity);
+      const endpoints = await this.KubernetesEndpointService.get();
+      const systemEndpoints = _.filter(endpoints, { Namespace: 'kube-system' });
+      this.systemEndpoints = _.filter(systemEndpoints, (ep) => ep.HolderIdentity);
+
+      const kubernetesEndpoint = _.find(endpoints, { Name: 'kubernetes' });
+      if (kubernetesEndpoint && kubernetesEndpoint.Subsets) {
+        const ips = _.flatten(_.map(kubernetesEndpoint.Subsets, 'Ips'));
+        _.forEach(this.nodes, (node) => {
+          node.Api = _.includes(ips, node.IPAddress);
+        });
+      }
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve endpoints');
     }

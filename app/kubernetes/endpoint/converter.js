@@ -1,4 +1,4 @@
-import { KubernetesEndpoint, KubernetesEndpointAnnotationLeader } from 'Kubernetes/endpoint/models';
+import { KubernetesEndpoint, KubernetesEndpointAnnotationLeader, KubernetesEndpointSubset } from 'Kubernetes/endpoint/models';
 import _ from 'lodash-es';
 
 class KubernetesEndpointConverter {
@@ -12,6 +12,16 @@ class KubernetesEndpointConverter {
       const parsedJson = JSON.parse(leaderAnnotation);
       const split = _.split(parsedJson.holderIdentity, '_');
       res.HolderIdentity = split[0];
+    }
+
+    if (data.subsets) {
+      res.Subsets = _.map(data.subsets, (item) => {
+        const subset = new KubernetesEndpointSubset();
+        subset.Ips = _.map(item.addresses, 'ip');
+        const port = _.find(item.ports, { name: 'https' });
+        subset.Port = port ? port.port : undefined;
+        return subset;
+      });
     }
     return res;
   }

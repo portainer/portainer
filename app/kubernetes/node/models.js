@@ -11,7 +11,9 @@ const _KubernetesNode = Object.freeze({
   Memory: '',
   Version: '',
   IPAddress: '',
+  Api: false,
   Taints: [],
+  Port: 0,
 });
 
 export class KubernetesNode {

@@ -6,7 +6,17 @@ import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 
 class KubernetesNodeController {
   /* @ngInject */
-  constructor($async, $state, Notifications, LocalStorage, KubernetesNodeService, KubernetesEventService, KubernetesPodService, KubernetesApplicationService) {
+  constructor(
+    $async,
+    $state,
+    Notifications,
+    LocalStorage,
+    KubernetesNodeService,
+    KubernetesEventService,
+    KubernetesPodService,
+    KubernetesApplicationService,
+    KubernetesEndpointService
+  ) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
@@ -15,16 +25,42 @@ class KubernetesNodeController {
     this.KubernetesEventService = KubernetesEventService;
     this.KubernetesPodService = KubernetesPodService;
     this.KubernetesApplicationService = KubernetesApplicationService;
+    this.KubernetesEndpointService = KubernetesEndpointService;
 
     this.onInit = this.onInit.bind(this);
     this.getNodeAsync = this.getNodeAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
     this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
+    this.getEndpointsAsync = this.getEndpointsAsync.bind(this);
   }
 
   selectTab(index) {
     this.LocalStorage.storeActiveTab('node', index);
+  }
+
+  async getEndpointsAsync() {
+    try {
+      const endpoints = await this.KubernetesEndpointService.get();
+      this.endpoint = _.find(endpoints, { Name: 'kubernetes' });
+      if (this.endpoint && this.endpoint.Subsets) {
+        _.forEach(this.endpoint.Subsets, (subset) => {
+          return _.forEach(subset.Ips, (ip) => {
+            if (ip === this.node.IPAddress) {
+              this.node.Api = true;
+              this.node.Port = subset.Port;
+              return false;
+            }
+          });
+        });
+      }
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve endpoints');
+    }
+  }
+
+  getEndpoints() {
+    return this.$async(this.getEndpointsAsync);
   }
 
   async getNodeAsync() {
@@ -118,6 +154,7 @@ class KubernetesNodeController {
     await this.getNode();
     await this.getEvents();
     await this.getApplications();
+    await this.getEndpoints();
 
     this.state.viewReady = true;
   }

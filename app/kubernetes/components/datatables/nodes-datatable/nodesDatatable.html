@@ -114,7 +114,10 @@
               dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))"
             >
               <td ng-if="$ctrl.isAdmin">
-                <a ui-sref="kubernetes.cluster.node({ name: item.Name })">{{ item.Name }}</a>
+                <a ui-sref="kubernetes.cluster.node({ name: item.Name })">
+                  {{ item.Name }}
+                </a>
+                <span class="label label-primary image-tag" style="margin-left: 5px;" ng-if="item.Api">api</span>
               </td>
               <td ng-if="!$ctrl.isAdmin"> {{ item.Name }}</td>
               <td>{{ item.Role }}</td>
