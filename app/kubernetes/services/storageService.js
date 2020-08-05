@@ -39,7 +39,7 @@ class KubernetesStorageService {
   async patchAsync(oldStorageClass, newStorageClass) {
     try {
       const params = {
-        name: newStorageClass.Name,
+        id: newStorageClass.Name,
       };
       const payload = KubernetesStorageClassConverter.patchPayload(oldStorageClass, newStorageClass);
       await this.KubernetesStorage().patch(params, payload).$promise;

@@ -29,7 +29,12 @@ angular.module('portainer.kubernetes').factory('KubernetesStorage', [
           },
           create: { method: 'POST' },
           update: { method: 'PUT' },
-          patch: { method: 'PATCH' },
+          patch: {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json-patch+json',
+            },
+          },
           delete: { method: 'DELETE' },
         }
       );
