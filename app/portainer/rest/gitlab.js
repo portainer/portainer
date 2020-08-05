@@ -1,6 +1,6 @@
 import gitlabResponseGetLink from './transform/gitlabResponseGetLink';
 
-angular.module('portainer.extensions.registrymanagement').factory('Gitlab', [
+angular.module('portainer.app').factory('Gitlab', [
   '$resource',
   'API_ENDPOINT_REGISTRIES',
   function GitlabFactory($resource, API_ENDPOINT_REGISTRIES) {

@@ -1,7 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import { DockerHubViewModel } from 'Portainer/models/dockerhub';
-import { RegistryTypes } from 'Extensions/registry-management/models/registryTypes';
+import { RegistryTypes } from '@/portainer/models/registryTypes';
 
 class porImageRegistryController {
   /* @ngInject */

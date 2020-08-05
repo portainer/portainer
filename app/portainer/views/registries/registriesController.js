@@ -8,9 +8,8 @@ angular.module('portainer.app').controller('RegistriesController', [
   'DockerHubService',
   'ModalService',
   'Notifications',
-  'ExtensionService',
   'Authentication',
-  function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, Notifications, ExtensionService, Authentication) {
+  function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, Notifications, Authentication) {
     $scope.state = {
       actionInProgress: false,
     };
@@ -75,12 +74,10 @@ angular.module('portainer.app').controller('RegistriesController', [
       $q.all({
         registries: RegistryService.registries(),
         dockerhub: DockerHubService.dockerhub(),
-        registryManagement: ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.REGISTRY_MANAGEMENT),
       })
         .then(function success(data) {
           $scope.registries = data.registries;
           $scope.dockerhub = data.dockerhub;
-          $scope.registryManagementAvailable = data.registryManagement;
           $scope.isAdmin = Authentication.isAdmin();
         })
         .catch(function error(err) {
