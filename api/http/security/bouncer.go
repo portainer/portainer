@@ -14,9 +14,8 @@ import (
 type (
 	// RequestBouncer represents an entity that manages API request accesses
 	RequestBouncer struct {
-		dataStore           portainer.DataStore
-		jwtService          portainer.JWTService
-		rbacExtensionClient *rbacExtensionClient
+		dataStore  portainer.DataStore
+		jwtService portainer.JWTService
 	}
 
 	// RestrictedRequestContext is a data structure containing information
@@ -30,11 +29,10 @@ type (
 )
 
 // NewRequestBouncer initializes a new RequestBouncer
-func NewRequestBouncer(dataStore portainer.DataStore, jwtService portainer.JWTService, rbacExtensionURL string) *RequestBouncer {
+func NewRequestBouncer(dataStore portainer.DataStore, jwtService portainer.JWTService) *RequestBouncer {
 	return &RequestBouncer{
-		dataStore:           dataStore,
-		jwtService:          jwtService,
-		rbacExtensionClient: newRBACExtensionClient(rbacExtensionURL),
+		dataStore:  dataStore,
+		jwtService: jwtService,
 	}
 }
 
@@ -47,8 +45,7 @@ func (bouncer *RequestBouncer) PublicAccess(h http.Handler) http.Handler {
 
 // AdminAccess defines a security check for API endpoints that require an authorization check.
 // Authentication is required to access these endpoints.
-// If the RBAC extension is enabled, authorizations are required to use these endpoints.
-// If the RBAC extension is not enabled, the administrator role is required to use these endpoints.
+// The administrator role is required to use these endpoints.
 // The request context will be enhanced with a RestrictedRequestContext object
 // that might be used later to inside the API operation for extra authorization validation
 // and resource filtering.
@@ -61,8 +58,6 @@ func (bouncer *RequestBouncer) AdminAccess(h http.Handler) http.Handler {
 
 // RestrictedAccess defines a security check for restricted API endpoints.
 // Authentication is required to access these endpoints.
-// If the RBAC extension is enabled, authorizations are required to use these endpoints.
-// If the RBAC extension is not enabled, access is granted to any authenticated user.
 // The request context will be enhanced with a RestrictedRequestContext object
 // that might be used later to inside the API operation for extra authorization validation
 // and resource filtering.
@@ -86,8 +81,6 @@ func (bouncer *RequestBouncer) AuthenticatedAccess(h http.Handler) http.Handler 
 
 // AuthorizedEndpointOperation retrieves the JWT token from the request context and verifies
 // that the user can access the specified endpoint.
-// If the RBAC extension is enabled and the authorizationCheck flag is set,
-// it will also validate that the user can execute the specified operation.
 // An error is returned when access to the endpoint is denied or if the user do not have the required
 // authorization to execute the operation.
 func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endpoint *portainer.Endpoint, authorizationCheck bool) error {
@@ -152,26 +145,7 @@ func (bouncer *RequestBouncer) checkEndpointOperationAuthorization(r *http.Reque
 		return nil
 	}
 
-	extension, err := bouncer.dataStore.Extension().Extension(portainer.RBACExtension)
-	if err == bolterrors.ErrObjectNotFound {
-		return nil
-	} else if err != nil {
-		return err
-	}
-
-	user, err := bouncer.dataStore.User().User(tokenData.ID)
-	if err != nil {
-		return err
-	}
-
-	apiOperation := &portainer.APIOperationAuthorizationRequest{
-		Path:           r.URL.String(),
-		Method:         r.Method,
-		Authorizations: user.EndpointAuthorizations[endpoint.ID],
-	}
-
-	bouncer.rbacExtensionClient.setLicenseKey(extension.License.LicenseKey)
-	return bouncer.rbacExtensionClient.checkAuthorization(apiOperation)
+	return errors.New("Unauthorized")
 }
 
 // RegistryAccess retrieves the JWT token from the request context and verifies
@@ -206,56 +180,14 @@ func (bouncer *RequestBouncer) mwAuthenticatedUser(h http.Handler) http.Handler 
 }
 
 // mwCheckPortainerAuthorizations will verify that the user has the required authorization to access
-// a specific API endpoint. It will leverage the RBAC extension authorization validation if the extension
-// is enabled.
-// If the administratorOnly flag is specified and the RBAC extension is not enabled, this will prevent non-admin
+// a specific API endpoint.
+// If the administratorOnly flag is specified, this will prevent non-admin
 // users from accessing the endpoint.
 func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler, administratorOnly bool) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokenData, err := RetrieveTokenData(r)
-		if err != nil {
+		if err != nil || tokenData.Role != portainer.AdministratorRole {
 			httperror.WriteError(w, http.StatusForbidden, "Access denied", httperrors.ErrUnauthorized)
-			return
-		}
-
-		if tokenData.Role == portainer.AdministratorRole {
-			next.ServeHTTP(w, r)
-			return
-		}
-
-		extension, err := bouncer.dataStore.Extension().Extension(portainer.RBACExtension)
-		if err == bolterrors.ErrObjectNotFound {
-			if administratorOnly {
-				httperror.WriteError(w, http.StatusForbidden, "Access denied", httperrors.ErrUnauthorized)
-				return
-			}
-
-			next.ServeHTTP(w, r)
-			return
-		} else if err != nil {
-			httperror.WriteError(w, http.StatusInternalServerError, "Unable to find a extension with the specified identifier inside the database", err)
-			return
-		}
-
-		user, err := bouncer.dataStore.User().User(tokenData.ID)
-		if err != nil && err == bolterrors.ErrObjectNotFound {
-			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", httperrors.ErrUnauthorized)
-			return
-		} else if err != nil {
-			httperror.WriteError(w, http.StatusInternalServerError, "Unable to retrieve user details from the database", err)
-			return
-		}
-
-		apiOperation := &portainer.APIOperationAuthorizationRequest{
-			Path:           r.URL.String(),
-			Method:         r.Method,
-			Authorizations: user.PortainerAuthorizations,
-		}
-
-		bouncer.rbacExtensionClient.setLicenseKey(extension.License.LicenseKey)
-		err = bouncer.rbacExtensionClient.checkAuthorization(apiOperation)
-		if err != nil {
-			httperror.WriteError(w, http.StatusForbidden, "Access denied", ErrAuthorizationRequired)
 			return
 		}
 

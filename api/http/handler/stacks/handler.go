@@ -8,7 +8,6 @@ import (
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
@@ -81,22 +80,8 @@ func (handler *Handler) userCanAccessStack(securityContext *security.RestrictedR
 
 func (handler *Handler) userIsAdminOrEndpointAdmin(user *portainer.User, endpointID portainer.EndpointID) (bool, error) {
 	isAdmin := user.Role == portainer.AdministratorRole
-	if isAdmin {
-		return true, nil
-	}
 
-	rbacExtension, err := handler.DataStore.Extension().Extension(portainer.RBACExtension)
-	if err != nil && err != bolterrors.ErrObjectNotFound {
-		return false, errors.New("Unable to verify if RBAC extension is loaded")
-	}
-
-	if rbacExtension == nil {
-		return false, nil
-	}
-
-	_, endpointResourceAccess := user.EndpointAuthorizations[portainer.EndpointID(endpointID)][portainer.EndpointResourcesAccess]
-
-	return endpointResourceAccess, nil
+	return isAdmin, nil
 }
 
 func (handler *Handler) userCanCreateStack(securityContext *security.RestrictedRequestContext, endpointID portainer.EndpointID) (bool, error) {

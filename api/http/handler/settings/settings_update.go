@@ -10,7 +10,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/filesystem"
 )
 
@@ -116,10 +115,8 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		settings.AllowPrivilegedModeForRegularUsers = *payload.AllowPrivilegedModeForRegularUsers
 	}
 
-	updateAuthorizations := false
 	if payload.AllowVolumeBrowserForRegularUsers != nil {
 		settings.AllowVolumeBrowserForRegularUsers = *payload.AllowVolumeBrowserForRegularUsers
-		updateAuthorizations = true
 	}
 
 	if payload.EnableHostManagementFeatures != nil {
@@ -179,35 +176,7 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist settings changes inside the database", err}
 	}
 
-	if updateAuthorizations {
-		err := handler.updateVolumeBrowserSetting(settings)
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update RBAC authorizations", err}
-		}
-	}
-
 	return response.JSON(w, settings)
-}
-
-func (handler *Handler) updateVolumeBrowserSetting(settings *portainer.Settings) error {
-	err := handler.AuthorizationService.UpdateVolumeBrowsingAuthorizations(settings.AllowVolumeBrowserForRegularUsers)
-	if err != nil {
-		return err
-	}
-
-	extension, err := handler.DataStore.Extension().Extension(portainer.RBACExtension)
-	if err != nil && err != bolterrors.ErrObjectNotFound {
-		return err
-	}
-
-	if extension != nil {
-		err = handler.AuthorizationService.UpdateUsersAuthorizations()
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
 
 func (handler *Handler) updateSnapshotInterval(settings *portainer.Settings, snapshotInterval string) error {

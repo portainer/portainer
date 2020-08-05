@@ -114,30 +114,8 @@ func (handler *Handler) deleteExternalStack(r *http.Request, w http.ResponseWrit
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: endpointId", err}
 	}
 
-	user, err := handler.DataStore.User().User(securityContext.UserID)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to load user information from the database", err}
-	}
-
-	rbacExtension, err := handler.DataStore.Extension().Extension(portainer.RBACExtension)
-	if err != nil && err != bolterrors.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify if RBAC extension is loaded", err}
-	}
-
-	endpointResourceAccess := false
-	_, ok := user.EndpointAuthorizations[portainer.EndpointID(endpointID)][portainer.EndpointResourcesAccess]
-	if ok {
-		endpointResourceAccess = true
-	}
-
-	if rbacExtension != nil {
-		if !securityContext.IsAdmin && !endpointResourceAccess {
-			return &httperror.HandlerError{http.StatusUnauthorized, "Permission denied to delete the stack", httperrors.ErrUnauthorized}
-		}
-	} else {
-		if !securityContext.IsAdmin {
-			return &httperror.HandlerError{http.StatusUnauthorized, "Permission denied to delete the stack", httperrors.ErrUnauthorized}
-		}
+	if !securityContext.IsAdmin {
+		return &httperror.HandlerError{http.StatusUnauthorized, "Permission denied to delete the stack", httperrors.ErrUnauthorized}
 	}
 
 	stack, err := handler.DataStore.Stack().StackByName(stackName)

@@ -16,9 +16,7 @@ import (
 
 const azureAPIBaseURL = "https://management.azure.com"
 
-var extensionPorts = map[portainer.ExtensionID]string{
-	portainer.RBACExtension: "7003",
-}
+var extensionPorts = map[portainer.ExtensionID]string{}
 
 type (
 	// ProxyFactory is a factory to create reverse proxies to Docker endpoints and extensions

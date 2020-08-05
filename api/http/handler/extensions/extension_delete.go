@@ -30,13 +30,6 @@ func (handler *Handler) extensionDelete(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to delete extension", err}
 	}
 
-	if extensionID == portainer.RBACExtension {
-		err = handler.downgradeRBACData()
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "An error occured during database update", err}
-		}
-	}
-
 	err = handler.DataStore.Extension().DeleteExtension(extensionID)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to delete the extension from the database", err}

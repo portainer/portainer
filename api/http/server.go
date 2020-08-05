@@ -78,8 +78,7 @@ func (server *Server) Start() error {
 	kubernetesTokenCacheManager := kubernetes.NewTokenCacheManager()
 	proxyManager := proxy.NewManager(server.DataStore, server.SignatureService, server.ReverseTunnelService, server.DockerClientFactory, server.KubernetesClientFactory, kubernetesTokenCacheManager)
 
-	rbacExtensionURL := proxyManager.GetExtensionURL(portainer.RBACExtension)
-	requestBouncer := security.NewRequestBouncer(server.DataStore, server.JWTService, rbacExtensionURL)
+	requestBouncer := security.NewRequestBouncer(server.DataStore, server.JWTService)
 
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
 

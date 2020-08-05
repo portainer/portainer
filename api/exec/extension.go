@@ -25,9 +25,7 @@ import (
 var extensionDownloadBaseURL = portainer.AssetsServerURL + "/extensions/"
 var extensionVersionRegexp = regexp.MustCompile(`\d+(\.\d+)+`)
 
-var extensionBinaryMap = map[portainer.ExtensionID]string{
-	portainer.RBACExtension: "extension-rbac",
-}
+var extensionBinaryMap = map[portainer.ExtensionID]string{}
 
 // ExtensionManager represents a service used to
 // manage extension processes.
@@ -109,10 +107,6 @@ func (manager *ExtensionManager) InstallExtension(extension *portainer.Extension
 		return err
 	}
 
-	switch extension.ID {
-	case portainer.RBACExtension:
-		extension.Name = "Role-Based Access Control"
-	}
 	extension.ShortDescription = "Extension enabled offline"
 	extension.Version = extensionVersion
 	extension.Available = true
