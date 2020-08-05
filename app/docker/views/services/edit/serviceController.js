@@ -696,7 +696,7 @@ angular.module('portainer.docker').controller('ServiceController', [
                 addr = item.IPAM.Config[0].Subnet;
               } else {
                 const network = await NetworkService.network(item.Id);
-                addr = network && network.IPAM && network.IPAM.Config && network.IPAM.Config.length && network.IPAM.Config[0].Subnet;
+                addr = (network && network.IPAM && network.IPAM.Config && network.IPAM.Config.length && network.IPAM.Config[0].Subnet) || '';
               }
               return { Id: item.Id, Name: item.Name, Addr: addr, Editable: !item.Ingress };
             })
