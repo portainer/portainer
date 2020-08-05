@@ -12,7 +12,6 @@ angular.module('portainer.docker').controller('DashboardController', [
   'EndpointService',
   'Notifications',
   'EndpointProvider',
-  'ExtensionService',
   'StateManager',
   function (
     $scope,
@@ -28,7 +27,6 @@ angular.module('portainer.docker').controller('DashboardController', [
     EndpointService,
     Notifications,
     EndpointProvider,
-    ExtensionService,
     StateManager
   ) {
     $scope.dismissInformationPanel = function (id) {
@@ -75,13 +73,7 @@ angular.module('portainer.docker').controller('DashboardController', [
       const isAdmin = Authentication.isAdmin();
       const { allowStackManagementForRegularUsers } = $scope.applicationState.application;
 
-      if (isAdmin || allowStackManagementForRegularUsers) {
-        return true;
-      }
-      const rbacEnabled = await ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC);
-      if (rbacEnabled) {
-        return Authentication.hasAuthorizations(['EndpointResourcesAccess']);
-      }
+      return isAdmin || allowStackManagementForRegularUsers;
     }
 
     initView();

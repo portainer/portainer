@@ -57,21 +57,6 @@
               </div>
             </div>
 
-            <!-- KEEP FOR FUTURE RBAC EVOL -->
-            <!-- <div class="form-group" ng-if="ctrl.entityType !== 'registry'">
-              <label class="col-sm-3 col-lg-2 control-label text-left">
-                Role
-              </label>
-              <div class="col-sm-9 col-lg-4">
-                <select ng-if="ctrl.rbacEnabled" class="form-control" ng-model="ctrl.formValues.selectedRole"
-                  ng-options="role.Name for role in ctrl.roles">
-                </select>
-                <span class="small text-muted" ng-if="!ctrl.rbacEnabled">
-                    The <a ui-sref="portainer.extensions.extension({id: 3})">Role-Based Access Control extension</a> is required to select a specific role.
-                </span>
-              </div>
-            </div> -->
-
             <!-- actions -->
             <div class="form-group">
               <div class="col-sm-12">
@@ -96,11 +81,6 @@
 
   <div class="row">
     <div class="col-sm-12">
-      <!--
-        rbac-enabled="ctrl.rbacEnabled && ctrl.entityType !== 'registry'"
-        roles="ctrl.roles"
-        update-action="ctrl.updateAction"
-      -->
       <access-datatable
         ng-if="ctrl.authorizedUsersAndTeams"
         title-text="Access"

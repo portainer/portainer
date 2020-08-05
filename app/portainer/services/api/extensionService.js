@@ -14,7 +14,6 @@ angular.module('portainer.app').factory('ExtensionService', [
     service.EXTENSIONS = Object.freeze({
       REGISTRY_MANAGEMENT: 1,
       OAUTH_AUTHENTICATION: 2,
-      RBAC: 3,
     });
 
     service.enable = enable;
@@ -78,13 +77,9 @@ angular.module('portainer.app').factory('ExtensionService', [
     }
 
     async function extensionsEnabledAsync(extensionId) {
-      if (extensionId === service.EXTENSIONS.RBAC) {
-        return StateManager.getExtension(extensionId) ? true : false;
-      } else {
-        const extensions = await service.extensions(false);
-        const extension = _.find(extensions, (ext) => ext.Id === extensionId);
-        return extension ? extension.Enabled : false;
-      }
+      const extensions = await service.extensions(false);
+      const extension = _.find(extensions, (ext) => ext.Id === extensionId);
+      return extension ? extension.Enabled : false;
     }
 
     function retrieveAndSaveEnabledExtensions() {

@@ -11,7 +11,6 @@ angular.module('portainer.app').component('accessDatatable', {
     removeAction: '<',
     updateAction: '<',
     reverseOrder: '<',
-    rbacEnabled: '<',
     inheritFrom: '<',
   },
 });
