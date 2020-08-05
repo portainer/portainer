@@ -694,8 +694,7 @@ angular.module('portainer.docker').controller('ServiceController', [
               let addr = '';
               if (item.IPAM.Config.length) {
                 addr = item.IPAM.Config[0].Subnet;
-              }
-              if (item.Driver === 'macvlan') {
+              } else {
                 const network = await NetworkService.network(item.Id);
                 addr = network && network.IPAM && network.IPAM.Config && network.IPAM.Config.length && network.IPAM.Config[0].Subnet;
               }
