@@ -17,9 +17,8 @@ import (
 const azureAPIBaseURL = "https://management.azure.com"
 
 var extensionPorts = map[portainer.ExtensionID]string{
-	portainer.RegistryManagementExtension:  "7001",
-	portainer.OAuthAuthenticationExtension: "7002",
-	portainer.RBACExtension:                "7003",
+	portainer.RegistryManagementExtension: "7001",
+	portainer.RBACExtension:               "7003",
 }
 
 type (

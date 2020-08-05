@@ -1257,7 +1257,7 @@ const (
 	_ ExtensionID = iota
 	// RegistryManagementExtension represents the registry management extension
 	RegistryManagementExtension
-	// OAuthAuthenticationExtension represents the OAuth authentication extension
+	// OAuthAuthenticationExtension represents the OAuth authentication extension (Deprecated)
 	OAuthAuthenticationExtension
 	// RBACExtension represents the RBAC extension
 	RBACExtension
