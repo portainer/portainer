@@ -51,6 +51,7 @@ export function RegistryCreateRequest(model) {
   this.Name = model.Name;
   this.Type = model.Type;
   this.URL = _.replace(model.URL, /^https?\:\/\//i, '');
+  this.URL = _.replace(this.URL, /\/$/, '');
   this.Authentication = model.Authentication;
   if (model.Authentication) {
     this.Username = model.Username;
