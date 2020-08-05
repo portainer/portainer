@@ -107,20 +107,16 @@ export class KubernetesApplicationPersistedFolderFormValue {
 /**
  * KubernetesApplicationPublishedPortFormValue Model
  */
-const _KubernetesApplicationPublishedPortFormValue = Object.freeze({
-  ContainerPort: '',
-  NodePort: '',
-  LoadBalancerPort: '',
-  LoadBalancerNodePort: undefined, // only filled to save existing loadbalancer nodePort and drop it when moving app exposure from LB to Internal/NodePort
-  Protocol: 'TCP',
-  Ingress: undefined,
-  IngressRoute: '',
-});
-
-export class KubernetesApplicationPublishedPortFormValue {
-  constructor() {
-    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesApplicationPublishedPortFormValue)));
-  }
+export function KubernetesApplicationPublishedPortFormValue() {
+  return {
+    ContainerPort: '',
+    NodePort: '',
+    LoadBalancerPort: '',
+    LoadBalancerNodePort: undefined, // only filled to save existing loadbalancer nodePort and drop it when moving app exposure from LB to Internal/NodePort
+    Protocol: 'TCP',
+    Ingress: undefined,
+    IngressRoute: '',
+  };
 }
 
 /**

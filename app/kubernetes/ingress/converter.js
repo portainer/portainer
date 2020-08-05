@@ -1,7 +1,6 @@
 import * as _ from 'lodash-es';
 import * as JsonPatch from 'fast-json-patch';
 
-import PortainerError from 'Portainer/error';
 import { KubernetesApplicationPublishingTypes } from 'Kubernetes/models/application/models';
 
 import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
@@ -30,9 +29,6 @@ export class KubernetesIngressConverter {
       data.metadata.annotations && data.metadata.annotations[KubernetesIngressClassAnnotation]
         ? data.metadata.annotations[KubernetesIngressClassAnnotation]
         : data.spec.ingressClassName;
-    if (!res.IngressClass) {
-      throw new PortainerError(`Unable to determine ingress controller for ingress ${res.Namespace}/${res.Name}`);
-    }
     res.Rules = rules;
     return res;
   }

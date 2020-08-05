@@ -1022,7 +1022,7 @@
                       class="form-control"
                       name="ingress_class_{{ $index }}"
                       ng-model="publishedPort.Ingress"
-                      ng-options="ingress as ingress.IngressClass for ingress in ctrl.filteredIngresses"
+                      ng-options="ingress as (ingress.IngressClass ? ingress.IngressClass : ingress.Name) for ingress in ctrl.filteredIngresses"
                       required
                     >
                     </select>
@@ -1030,7 +1030,14 @@
 
                   <div class="col-sm-3 input-group input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INGRESS">
                     <span class="input-group-addon">route</span>
-                    <input class="form-control" name="ingress_route_{{ $index }}" ng-model="publishedPort.IngressRoute" placeholder="/foo" required />
+                    <input
+                      class="form-control"
+                      name="ingress_route_{{ $index }}"
+                      ng-model="publishedPort.IngressRoute"
+                      placeholder="/foo"
+                      required
+                      ng-change="ctrl.onChangePortMappingIngressRoute($index)"
+                    />
                   </div>
 
                   <div class="input-group col-sm-2 input-group-sm">
@@ -1046,12 +1053,13 @@
 
                 <div
                   ng-repeat-end
-                  ng-if="
+                  ng-show="
                     kubernetesApplicationCreationForm['container_port_' + $index].$invalid ||
                     kubernetesApplicationCreationForm['published_node_port_' + $index].$invalid ||
                     kubernetesApplicationCreationForm['load_balancer_port_' + $index].$invalid ||
                     kubernetesApplicationCreationForm['ingress_class_' + $index].$invalid ||
-                    kubernetesApplicationCreationForm['ingress_route_' + $index].$invalid
+                    kubernetesApplicationCreationForm['ingress_route_' + $index].$invalid ||
+                    ctrl.state.duplicateIngressRoutes[$index] !== undefined
                   "
                 >
                   <div class="col-sm-3 input-group input-group-sm">
@@ -1090,10 +1098,17 @@
                     </div>
                   </div>
                   <div class="col-sm-3 input-group input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INGRESS">
-                    <div class="small text-warning" style="margin-top: 5px;" ng-if="kubernetesApplicationCreationForm['ingress_route_' + $index].$invalid">
+                    <div
+                      class="small text-warning"
+                      style="margin-top: 5px;"
+                      ng-if="kubernetesApplicationCreationForm['ingress_route_' + $index].$invalid || ctrl.state.duplicateIngressRoutes[$index] !== undefined"
+                    >
                       <div ng-messages="kubernetesApplicationCreationForm['ingress_route_'+$index].$error">
                         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Route is required.</p>
                       </div>
+                      <p ng-if="ctrl.state.duplicateIngressRoutes[$index] !== undefined"
+                        ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This route is already used.</p
+                      >
                     </div>
                   </div>
 

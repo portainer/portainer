@@ -1,3 +1,12 @@
+export function KubernetesIngress() {
+  return {
+    Name: '',
+    Namespace: '',
+    Rules: [],
+    IngressClass: '',
+  };
+}
+
 export function KubernetesIngressRule() {
   return {
     ServiceName: '',
@@ -5,14 +14,5 @@ export function KubernetesIngressRule() {
     IP: '',
     Port: '',
     Path: '',
-  };
-}
-
-export function KubernetesIngress() {
-  return {
-    Name: '',
-    Namespace: '',
-    Rules: [],
-    IngressClass: '',
   };
 }
