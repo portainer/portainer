@@ -218,7 +218,7 @@ angular.module('portainer.docker').controller('ServiceController', [
       if (!service.Networks) {
         service.Networks = [];
       }
-      service.Networks.push({ Id: '', Name: '', Addr: '', Editable: true });
+      service.Networks.push({ Editable: true });
     };
 
     $scope.removeNetwork = function removeNetwork(service, index) {
