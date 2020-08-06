@@ -371,47 +371,46 @@
             This application is not using any environment variable or configuration.
           </div>
 
-          <div ng-if="ctrl.application.Env.length > 0">
-            <div>
-              <table class="table">
-                <tbody>
-                  <tr class="text-muted">
-                    <td style="width: 33%;">Environment variable</td>
-                    <td style="width: 33%;">Value</td>
-                    <td style="width: 33%;">Configuration</td>
-                  </tr>
-                  <tr ng-repeat="envvar in ctrl.application.Env track by $index">
-                    <td>{{ envvar.name }}</td>
-                    <td>
-                      <span ng-if="envvar.value">{{ envvar.value }}</span>
-                      <span ng-if="envvar.valueFrom.configMapKeyRef"><i class="fa fa-key" aria-hidden="true"></i> {{ envvar.valueFrom.configMapKeyRef.key }}</span>
-                      <span ng-if="envvar.valueFrom.secretKeyRef"><i class="fa fa-key" aria-hidden="true"></i> {{ envvar.valueFrom.secretKeyRef.key }}</span>
-                      <span ng-if="envvar.valueFrom.fieldRef"
-                        ><i class="fa fa-asterisk" aria-hidden="true"></i> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
-                          href="https://kubernetes.io/docs/tasks/inject-data-application/downward-api-volume-expose-pod-information/#capabilities-of-the-downward-api"
-                          target="_blank"
-                          >downward API</a
-                        >)</span
-                      >
-                      <span ng-if="!envvar.value && !envvar.valueFrom.secretKeyRef && !envvar.valueFrom.configMapKeyRef && !envvar.valueFrom.fieldRef">-</span>
-                    </td>
-                    <td>
-                      <span ng-if="envvar.value || envvar.valueFrom.fieldRef || (!envvar.valueFrom.secretKeyRef && !envvar.valueFrom.configMapKeyRef)">-</span>
-                      <span ng-if="envvar.valueFrom.configMapKeyRef"
-                        ><a ui-sref="kubernetes.configurations.configuration({ name: envvar.valueFrom.configMapKeyRef.name, namespace: ctrl.application.ResourcePool })"
-                          ><i class="fa fa-file-code" aria-hidden="true"></i> {{ envvar.valueFrom.configMapKeyRef.name }}</a
-                        ></span
-                      >
-                      <span ng-if="envvar.valueFrom.secretKeyRef"
-                        ><a ui-sref="kubernetes.configurations.configuration({ name: envvar.valueFrom.secretKeyRef.name, namespace: ctrl.application.ResourcePool })"
-                          ><i class="fa fa-file-code" aria-hidden="true"></i> {{ envvar.valueFrom.secretKeyRef.name }}</a
-                        ></span
-                      >
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+          <div ng-repeat="container in ctrl.application.Containers">
+            <label>{{ container.Name }}</label>
+            <table class="table">
+              <tbody>
+                <tr class="text-muted">
+                  <td style="width: 33%;">Environment variable</td>
+                  <td style="width: 33%;">Value</td>
+                  <td style="width: 33%;">Configuration</td>
+                </tr>
+                <tr ng-repeat="envvar in container.Env track by $index">
+                  <td>{{ envvar.name }}</td>
+                  <td>
+                    <span ng-if="envvar.value">{{ envvar.value }}</span>
+                    <span ng-if="envvar.valueFrom.configMapKeyRef"><i class="fa fa-key" aria-hidden="true"></i> {{ envvar.valueFrom.configMapKeyRef.key }}</span>
+                    <span ng-if="envvar.valueFrom.secretKeyRef"><i class="fa fa-key" aria-hidden="true"></i> {{ envvar.valueFrom.secretKeyRef.key }}</span>
+                    <span ng-if="envvar.valueFrom.fieldRef"
+                      ><i class="fa fa-asterisk" aria-hidden="true"></i> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
+                        href="https://kubernetes.io/docs/tasks/inject-data-application/downward-api-volume-expose-pod-information/#capabilities-of-the-downward-api"
+                        target="_blank"
+                        >downward API</a
+                      >)</span
+                    >
+                    <span ng-if="!envvar.value && !envvar.valueFrom.secretKeyRef && !envvar.valueFrom.configMapKeyRef && !envvar.valueFrom.fieldRef">-</span>
+                  </td>
+                  <td>
+                    <span ng-if="envvar.value || envvar.valueFrom.fieldRef || (!envvar.valueFrom.secretKeyRef && !envvar.valueFrom.configMapKeyRef)">-</span>
+                    <span ng-if="envvar.valueFrom.configMapKeyRef"
+                      ><a ui-sref="kubernetes.configurations.configuration({ name: envvar.valueFrom.configMapKeyRef.name, namespace: ctrl.application.ResourcePool })"
+                        ><i class="fa fa-file-code" aria-hidden="true"></i> {{ envvar.valueFrom.configMapKeyRef.name }}</a
+                      ></span
+                    >
+                    <span ng-if="envvar.valueFrom.secretKeyRef"
+                      ><a ui-sref="kubernetes.configurations.configuration({ name: envvar.valueFrom.secretKeyRef.name, namespace: ctrl.application.ResourcePool })"
+                        ><i class="fa fa-file-code" aria-hidden="true"></i> {{ envvar.valueFrom.secretKeyRef.name }}</a
+                      ></span
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
           <div ng-if="ctrl.hasVolumeConfiguration()">
@@ -510,8 +509,14 @@
 
   <div class="row">
     <div class="col-sm-12">
-      <kubernetes-pods-datatable title-text="Application pods" title-icon="fa-server" dataset="ctrl.application.Pods" table-key="kubernetes.application.pods" order-by="Name">
-      </kubernetes-pods-datatable>
+      <kubernetes-containers-datatable
+        title-text="Application containers"
+        title-icon="fa-server"
+        dataset="ctrl.application.Containers"
+        table-key="kubernetes.application.containers"
+        order-by="Name"
+      >
+      </kubernetes-containers-datatable>
     </div>
   </div>
 </div>

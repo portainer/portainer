@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { KubernetesPod, KubernetesPodToleration, KubernetesPodAffinity } from 'Kubernetes/pod/models';
+import { KubernetesPod, KubernetesPodToleration, KubernetesPodAffinity, KubernetesPodContainer } from 'Kubernetes/pod/models';
 
 function computeStatus(statuses) {
   const containerStatuses = _.map(statuses, 'state');
@@ -8,6 +8,21 @@ function computeStatus(statuses) {
   if (waiting) {
     return 'Waiting';
   } else if (!running) {
+    return 'Terminated';
+  }
+  return 'Running';
+}
+
+function computeContainerStatus(statuses, name) {
+  const status = _.find(statuses, { name: name });
+  if (!status) {
+    return 'Terminated';
+  }
+  const state = status.state;
+  if (state.waiting) {
+    return 'Waiting';
+  }
+  if (!state.running) {
     return 'Terminated';
   }
   return 'Running';
@@ -33,6 +48,24 @@ function computeTolerations(tolerations) {
   });
 }
 
+function computeContainers(data) {
+  const containers = data.spec.containers;
+  return _.map(containers, (item) => {
+    const res = new KubernetesPodContainer();
+    res.PodName = data.metadata.name;
+    res.Name = item.name;
+    res.Image = item.image;
+    res.Node = data.spec.nodeName;
+    res.CreationDate = data.status.startTime;
+    res.Status = computeContainerStatus(data.status.containerStatuses, item.name);
+    res.Limits = item.resources.limits;
+    res.Requests = item.resources.requests;
+    res.Volumes = item.volumeMounts;
+    res.Env = item.env;
+    return res;
+  });
+}
+
 export default class KubernetesPodConverter {
   static apiToModel(data) {
     const res = new KubernetesPod();
@@ -44,7 +77,7 @@ export default class KubernetesPodConverter {
     res.Restarts = _.sumBy(data.status.containerStatuses, 'restartCount');
     res.Node = data.spec.nodeName;
     res.CreationDate = data.status.startTime;
-    res.Containers = data.spec.containers;
+    res.Containers = computeContainers(data);
     res.Labels = data.metadata.labels;
     res.Affinity = computeAffinity(data.spec.affinity);
     res.NodeSelector = data.spec.nodeSelector;

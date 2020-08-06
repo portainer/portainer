@@ -147,7 +147,8 @@ class KubernetesApplicationConverter {
     const persistedFolders = _.filter(res.Volumes, (volume) => volume.persistentVolumeClaim || volume.hostPath);
 
     res.PersistedFolders = _.map(persistedFolders, (volume) => {
-      const matchingVolumeMount = _.find(data.spec.template.spec.containers[0].volumeMounts, { name: volume.name });
+      const volumeMounts = _.uniq(_.flatten(_.map(data.spec.template.spec.containers, 'volumeMounts')), 'name');
+      const matchingVolumeMount = _.find(volumeMounts, { name: volume.name });
 
       if (matchingVolumeMount) {
         const persistedFolder = new KubernetesApplicationPersistedFolder();

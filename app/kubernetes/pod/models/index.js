@@ -40,3 +40,19 @@ export class KubernetesPodToleration {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesPodToleration)));
   }
 }
+
+const _KubernetesPodContainer = Object.freeze({
+  PodName: '',
+  Name: '',
+  Image: '',
+  Limits: {},
+  Requests: {},
+  Env: [],
+  Volumes: {},
+});
+
+export class KubernetesPodContainer {
+  constructor() {
+    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesPodContainer)));
+  }
+}

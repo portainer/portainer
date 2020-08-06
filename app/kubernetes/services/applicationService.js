@@ -115,6 +115,7 @@ class KubernetesApplicationService {
       application.Yaml = rootItem.value.Yaml;
       application.Raw = rootItem.value.Raw;
       application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods.value, application.Raw);
+      application.Containers = _.flatten(_.map(application.Pods, 'Containers'));
 
       const boundScaler = KubernetesHorizontalPodAutoScalerHelper.findApplicationBoundScaler(autoScalers.value, application);
       const scaler = boundScaler ? await this.KubernetesHorizontalPodAutoScalerService.get(namespace, boundScaler.Name) : undefined;
