@@ -3,12 +3,13 @@ export function KubernetesIngress() {
     Name: '',
     Namespace: '',
     Rules: [],
-    IngressClass: '',
+    IngressClassName: '',
   };
 }
 
 export function KubernetesIngressRule() {
   return {
+    ParentIngressName: '',
     ServiceName: '',
     Host: '',
     IP: '',

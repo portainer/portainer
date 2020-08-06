@@ -31,7 +31,7 @@
                     <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.HasQuota" /><i></i> </label>
                   </div>
                 </div>
-                <div class="form-group" ng-if="ctrl.formValues.HasQuota && !ctrl.isQuotaValid()">
+                <div class="form-group" ng-if="ctrl.formValues.HasQuota && ctrl.isAdmin && ctrl.isEditable && !ctrl.isQuotaValid()">
                   <span class="col-sm-12 text-warning small">
                     <p> <i class="fa fa-exclamation-triangle" aria-hidden="true" style="margin-right: 2px;"></i> At least a single limit must be set for the quota to be valid. </p>
                   </span>
@@ -120,7 +120,7 @@
                   >
                   </kubernetes-resource-reservation>
                 </div>
-                <div ng-if="ctrl.isAdmin">
+                <div ng-if="ctrl.isAdmin && ctrl.isEditable">
                   <div class="col-sm-12 form-section-title">
                     Ingresses
                   </div>

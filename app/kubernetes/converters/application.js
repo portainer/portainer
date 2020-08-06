@@ -27,7 +27,6 @@ import KubernetesPersistentVolumeClaimConverter from 'Kubernetes/converters/pers
 import PortainerError from 'Portainer/error';
 import { KubernetesApplicationPort } from 'Kubernetes/models/application/models';
 import { KubernetesIngressHelper } from 'Kubernetes/ingress/helper';
-import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
 
 function _apiPortsToPublishedPorts(pList, pRefs) {
   const ports = _.map(pList, (item) => {
@@ -112,7 +111,7 @@ class KubernetesApplicationConverter {
 
       const portsRefs = _.concat(..._.map(data.spec.template.spec.containers, (container) => container.ports));
       const ports = _apiPortsToPublishedPorts(service.spec.ports, portsRefs);
-      const rules = KubernetesIngressHelper.findSBoundServiceIngressesRules(ingresses, service);
+      const rules = KubernetesIngressHelper.findSBoundServiceIngressesRules(ingresses, service.metadata.name);
       _.forEach(ports, (port) => (port.IngressRules = _.filter(rules, (rule) => rule.Port === port.Port)));
       res.PublishedPorts = ports;
     }
@@ -262,15 +261,18 @@ class KubernetesApplicationConverter {
     res.PersistedFolders = KubernetesApplicationHelper.generatePersistedFoldersFormValuesFromPersistedFolders(app.PersistedFolders, persistentVolumeClaims); // generate from PVC and app.PersistedFolders
     res.Configurations = KubernetesApplicationHelper.generateConfigurationFormValuesFromEnvAndVolumes(app.Env, app.ConfigurationVolumes, configurations);
     res.AutoScaler = KubernetesApplicationHelper.generateAutoScalerFormValueFromHorizontalPodAutoScaler(app.AutoScaler, res.ReplicaCount);
+    res.PublishedPorts = KubernetesApplicationHelper.generatePublishedPortsFormValuesFromPublishedPorts(app.ServiceType, app.PublishedPorts);
 
+    const isIngress = _.filter(res.PublishedPorts, (p) => p.IngressName).length;
     if (app.ServiceType === KubernetesServiceTypes.LOAD_BALANCER) {
       res.PublishingType = KubernetesApplicationPublishingTypes.LOAD_BALANCER;
-    } else if (app.ServiceType === KubernetesServiceTypes.NODE_PORT) {
+    } else if (app.ServiceType === KubernetesServiceTypes.NODE_PORT && !isIngress) {
       res.PublishingType = KubernetesApplicationPublishingTypes.CLUSTER;
+    } else if (app.ServiceType === KubernetesServiceTypes.NODE_PORT && isIngress) {
+      res.PublishingType = KubernetesApplicationPublishingTypes.INGRESS;
     } else {
       res.PublishingType = KubernetesApplicationPublishingTypes.INTERNAL;
     }
-    res.PublishedPorts = KubernetesApplicationHelper.generatePublishedPortsFormValuesFromPublishedPorts(app.ServiceType, app.PublishedPorts);
     return res;
   }
 
@@ -315,8 +317,7 @@ class KubernetesApplicationConverter {
       service = undefined;
     }
 
-    const ingresses = KubernetesIngressConverter.applicationFormValuesToIngresses(formValues, service);
-    return [app, headlessService, service, claims, ingresses];
+    return [app, headlessService, service, claims];
   }
 }
 

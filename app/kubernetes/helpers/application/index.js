@@ -251,6 +251,13 @@ class KubernetesApplicationHelper {
   static generatePublishedPortsFormValuesFromPublishedPorts(serviceType, publishedPorts) {
     const finalRes = _.map(publishedPorts, (port) => {
       const res = new KubernetesApplicationPublishedPortFormValue();
+      res.IsNew = false;
+      // REFACTOR: generate one formValue per rule
+      const rule = port.IngressRules ? port.IngressRules[0] : undefined;
+      if (rule) {
+          res.IngressName = rule.ParentIngressName;
+          res.IngressRoute = rule.Path;
+      }
       res.Protocol = port.Protocol;
       res.ContainerPort = port.TargetPort;
       if (serviceType === KubernetesServiceTypes.LOAD_BALANCER) {
@@ -263,6 +270,31 @@ class KubernetesApplicationHelper {
     });
     return finalRes;
   }
+  // static generatePublishedPortsFormValuesFromPublishedPorts(serviceType, publishedPorts, ingresses) {
+  //   const finalRes = _.map(publishedPorts, (port) => {
+  //     const res = new KubernetesApplicationPublishedPortFormValue();
+  //     res.IsNew = false;
+  //     // REFACTOR: generate one formValue per rule
+  //     const rule = port.IngressRules ? port.IngressRules[0] : undefined;
+  //     if (rule) {
+  //       const ingress = _.find(ingresses, { Name: rule.ParentIngressName});
+  //       if (ingress) {
+  //         res.IngressName = ingress.Name;
+  //         res.IngressRoute = rule.Path;
+  //       }
+  //     }
+  //     res.Protocol = port.Protocol;
+  //     res.ContainerPort = port.TargetPort;
+  //     if (serviceType === KubernetesServiceTypes.LOAD_BALANCER) {
+  //       res.LoadBalancerPort = port.Port;
+  //       res.LoadBalancerNodePort = port.NodePort;
+  //     } else if (serviceType === KubernetesServiceTypes.NODE_PORT) {
+  //       res.NodePort = port.NodePort;
+  //     }
+  //     return res;
+  //   });
+  //   return finalRes;
+  // }
 
   static generateAutoScalerFormValueFromHorizontalPodAutoScaler(autoScaler, replicasCount) {
     const res = new KubernetesApplicationAutoScalerFormValue();

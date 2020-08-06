@@ -16,41 +16,29 @@
       <rd-widget>
         <rd-widget-body>
           <form class="form-horizontal" name="kubernetesApplicationCreationForm" autocomplete="off">
-            <!-- name -->
+            <!-- #region NAME FIELD -->
             <div class="form-group">
               <label for="application_name" class="col-sm-1 control-label text-left">Name</label>
               <div class="col-sm-11">
-                <input
-                  type="text"
-                  class="form-control"
-                  name="application_name"
-                  ng-model="ctrl.formValues.Name"
-                  ng-change="ctrl.onChangeName()"
-                  placeholder="my-app"
-                  ng-pattern="/^[a-z]([-a-z0-9]*[a-z0-9])?$/"
-                  auto-focus
-                  required
-                  ng-disabled="ctrl.state.isEdit"
-                />
+                <input type="text" class="form-control" name="application_name" ng-model="ctrl.formValues.Name" ng-change="ctrl.onChangeName()" placeholder="my-app"
+                  ng-pattern="/^[a-z]([-a-z0-9]*[a-z0-9])?$/" auto-focus required ng-disabled="ctrl.state.isEdit" />
               </div>
             </div>
             <div class="form-group" ng-show="kubernetesApplicationCreationForm.application_name.$invalid || ctrl.state.alreadyExists">
               <div class="col-sm-12 small text-warning">
                 <div ng-messages="kubernetesApplicationCreationForm.application_name.$error">
                   <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
-                  <p ng-message="pattern"
-                    ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of lower case alphanumeric characters or '-', start with an alphabetic
-                    character, and end with an alphanumeric character (e.g. 'my-name', or 'abc-123').</p
-                  >
+                  <p ng-message="pattern"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of lower case alphanumeric characters or '-', start
+                    with an alphabetic
+                    character, and end with an alphanumeric character (e.g. 'my-name', or 'abc-123').</p>
                 </div>
-                <p ng-if="ctrl.state.alreadyExists"
-                  ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> An application with the same name already exists inside the selected resource pool.</p
-                >
+                <p ng-if="ctrl.state.alreadyExists"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> An application with the same name already exists inside the
+                  selected resource pool.</p>
               </div>
             </div>
-            <!-- !name -->
+            <!-- #endregion -->
 
-            <!-- image -->
+            <!-- #region IMAGE FIELD -->
             <div class="form-group">
               <label for="container_image" class="col-sm-1 control-label text-left">Image</label>
               <div class="col-sm-11">
@@ -64,24 +52,18 @@
                 </div>
               </div>
             </div>
-            <!-- !image -->
+            <!-- #endregion -->
 
             <div class="col-sm-12 form-section-title">
               Resource pool
             </div>
-
-            <!-- resource-pool -->
+            <!-- #region RESOURCE POOL -->
             <div class="form-group">
               <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Resource pool</label>
               <div class="col-sm-11">
-                <select
-                  class="form-control"
-                  id="resource-pool-selector"
-                  ng-model="ctrl.formValues.ResourcePool"
-                  ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools"
-                  ng-change="ctrl.onResourcePoolSelectionChange()"
-                  ng-disabled="ctrl.state.isEdit"
-                ></select>
+                <select class="form-control" id="resource-pool-selector" ng-model="ctrl.formValues.ResourcePool"
+                  ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools" ng-change="ctrl.onResourcePoolSelectionChange()"
+                  ng-disabled="ctrl.state.isEdit"></select>
               </div>
             </div>
             <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
@@ -91,12 +73,12 @@
                 resource pool.
               </div>
             </div>
-            <!-- !resource-pool -->
+            <!-- #endregion -->
 
             <div class="col-sm-12 form-section-title">
               Stack
             </div>
-
+            <!-- #region STACK -->
             <div class="form-group">
               <div class="col-sm-12 small text-muted">
                 <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -105,29 +87,19 @@
               </div>
             </div>
 
-            <!-- stack -->
             <div class="form-group">
               <label for="stack_name" class="col-sm-1 control-label text-left">Stack</label>
               <div class="col-sm-11">
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="myStack"
-                  ng-model="ctrl.formValues.StackName"
-                  name="stack_name"
-                  uib-typeahead="stack for stack in ctrl.stacks | filter:$viewValue | limitTo:7"
-                  typeahead-show-hint="true"
-                  typeahead-min-length="0"
-                />
+                <input type="text" class="form-control" placeholder="myStack" ng-model="ctrl.formValues.StackName" name="stack_name"
+                  uib-typeahead="stack for stack in ctrl.stacks | filter:$viewValue | limitTo:7" typeahead-show-hint="true" typeahead-min-length="0" />
               </div>
             </div>
-            <!-- !stack -->
+            <!-- #endregion -->
 
             <div class="col-sm-12 form-section-title">
               Environment
             </div>
-
-            <!-- environment-variables -->
+            <!-- #region ENVIRONMENT VARIABLES -->
             <div class="form-group">
               <div class="col-sm-12">
                 <label class="control-label text-left">Environment variables</label>
@@ -152,11 +124,8 @@
                         required
                       />
                     </div>
-                    <div
-                      class="small text-warning"
-                      style="margin-top: 5px;"
-                      ng-show="kubernetesApplicationCreationForm['environment_variable_name_' + $index].$invalid || ctrl.state.duplicateEnvironmentVariables[$index] !== undefined"
-                    >
+                    <div class="small text-warning" style="margin-top: 5px;"
+                      ng-show="kubernetesApplicationCreationForm['environment_variable_name_' + $index].$invalid || ctrl.state.duplicateEnvironmentVariables[$index] !== undefined">
                       <ng-messages for="kubernetesApplicationCreationForm['environment_variable_name_' + $index].$error">
                         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Environment variable name is required.</p>
                         <p ng-message="pattern"
@@ -164,9 +133,8 @@
                           character, and end with an alphanumeric character (e.g. 'my-var', or 'MY_VAR123').</p
                         >
                       </ng-messages>
-                      <p ng-if="ctrl.state.duplicateEnvironmentVariables[$index] !== undefined"
-                        ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This environment variable is already defined.</p
-                      >
+                      <p ng-if="ctrl.state.duplicateEnvironmentVariables[$index] !== undefined"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This environment
+                        variable is already defined.</p>
                     </div>
                   </div>
 
@@ -186,13 +154,12 @@
                 </div>
               </div>
             </div>
-            <!-- !environment-variables -->
+            <!-- #endregion -->
 
             <div class="col-sm-12 form-section-title">
               Configurations
             </div>
-
-            <!-- configurations -->
+            <!-- #region CONFIGURATIONS -->
             <div class="form-group">
               <div class="col-sm-12">
                 <label class="control-label text-left">Configurations</label>
@@ -211,21 +178,12 @@
             <div class="form-group" ng-repeat="(index, config) in ctrl.formValues.Configurations">
               <label for="stack_name" class="col-md-1 col-sm-2 control-label text-left">Configuration</label>
               <div class="col-sm-5">
-                <select
-                  class="form-control"
-                  ng-model="config.SelectedConfiguration"
-                  ng-options="c as c.Name for c in ctrl.configurations"
-                  ng-change="ctrl.resetConfiguration(index)"
-                ></select>
+                <select class="form-control" ng-model="config.SelectedConfiguration" ng-options="c as c.Name for c in ctrl.configurations"
+                  ng-change="ctrl.resetConfiguration(index)"></select>
               </div>
               <div class="col-sm-6" style="margin-top: 2px;">
-                <button
-                  class="btn btn-sm btn-primary"
-                  type="button"
-                  ng-if="!config.Overriden"
-                  ng-click="ctrl.overrideConfiguration(index)"
-                  ng-disabled="!config.SelectedConfiguration"
-                >
+                <button class="btn btn-sm btn-primary" type="button" ng-if="!config.Overriden" ng-click="ctrl.overrideConfiguration(index)"
+                  ng-disabled="!config.SelectedConfiguration">
                   <i class="fa fa-list" aria-hidden="true"></i> Override
                 </button>
                 <button class="btn btn-sm btn-primary" type="button" ng-if="config.Overriden" ng-click="ctrl.resetConfiguration(index)">
@@ -239,8 +197,7 @@
                 <div class="col-md-11 col-sm-10 small text-muted" style="padding-left: 5px;">
                   The following keys will be loaded from the <code>{{ config.SelectedConfiguration.Name }}</code> configuration as environment variables:
                   <span ng-repeat="(key, _) in config.SelectedConfiguration.Data">
-                    <code>{{ key }}</code
-                    >{{ $last ? '' : ', ' }}
+                    <code>{{ key }}</code>{{ $last ? '' : ', ' }}
                   </span>
                 </div>
               </div>
@@ -255,37 +212,22 @@
                     <input type="text" class="form-control" ng-value="overridenKey.Key" disabled />
                   </div>
 
-                  <div
-                    class="col-sm-3 input-group input-group-sm"
-                    style="vertical-align: top;"
-                    ng-if="overridenKey.Type === ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM"
-                  >
+                  <div class="col-sm-3 input-group input-group-sm" style="vertical-align: top;"
+                    ng-if="overridenKey.Type === ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
                     <div class="input-group col-sm-12 input-group-sm">
                       <span class="input-group-addon">path on disk</span>
-                      <input
-                        type="text"
-                        class="form-control"
-                        ng-model="overridenKey.Path"
-                        placeholder="/etc/myapp/conf.d"
-                        name="overriden_key_path_{{ index }}_{{ keyIndex }}"
-                        required
-                        ng-change="ctrl.onChangeConfigurationPath()"
-                      />
+                      <input type="text" class="form-control" ng-model="overridenKey.Path" placeholder="/etc/myapp/conf.d" name="overriden_key_path_{{ index }}_{{ keyIndex }}"
+                        required ng-change="ctrl.onChangeConfigurationPath()" />
                     </div>
-                    <div
-                      class="small text-warning"
-                      style="margin-top: 5px;"
-                      ng-show="
+                    <div class="small text-warning" style="margin-top: 5px;" ng-show="
                         kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$invalid ||
                         ctrl.state.duplicateConfigurationPaths[index + '_' + keyIndex] !== undefined
-                      "
-                    >
+                      ">
                       <ng-messages for="kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$error">
                         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Path is required.</p>
                       </ng-messages>
-                      <p ng-if="ctrl.state.duplicateConfigurationPaths[index + '_' + keyIndex] !== undefined"
-                        ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This path is already used.</p
-                      >
+                      <p ng-if="ctrl.state.duplicateConfigurationPaths[index + '_' + keyIndex] !== undefined"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This
+                        path is already used.</p>
                     </div>
                   </div>
 
@@ -302,12 +244,12 @@
               <!-- !has-override -->
             </div>
             <!-- !config-element -->
-            <!-- !configurations -->
+            <!-- #endregion -->
 
             <div class="col-sm-12 form-section-title">
               Persisting data
             </div>
-
+            <!-- #region PERSISTED FOLDERS -->
             <div class="form-group" ng-if="!ctrl.storageClassAvailable()">
               <div class="col-sm-12 small text-muted">
                 <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -315,7 +257,6 @@
               </div>
             </div>
 
-            <!-- persisted folders -->
             <div class="form-group" ng-if="ctrl.storageClassAvailable()">
               <div class="col-sm-12" style="margin-top: 5px;">
                 <label class="control-label text-left">Persisted folders</label>
@@ -328,93 +269,44 @@
                 <div style="margin-top: 2px;">
                   <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: persistedFolder.NeedsDeletion }">
                     <span class="input-group-addon">path in container</span>
-                    <input
-                      type="text"
-                      class="form-control"
-                      name="persisted_folder_path_{{ $index }}"
-                      ng-model="persistedFolder.ContainerPath"
-                      ng-change="ctrl.onChangePersistedFolderPath($index)"
-                      ng-disabled="ctrl.isEditAndExistingPersistedFolder($index)"
-                      placeholder="/data"
-                      required
-                    />
+                    <input type="text" class="form-control" name="persisted_folder_path_{{ $index }}" ng-model="persistedFolder.ContainerPath"
+                      ng-change="ctrl.onChangePersistedFolderPath($index)" ng-disabled="ctrl.isEditAndExistingPersistedFolder($index)" placeholder="/data" required />
                   </div>
 
                   <div class="input-group col-sm-2 input-group-sm">
-                    <span
-                      class="btn-group btn-group-sm"
-                      ng-class="{ striked: persistedFolder.NeedsDeletion }"
-                      ng-if="!ctrl.isEditAndExistingPersistedFolder($index) && ctrl.application.ApplicationType !== ctrl.ApplicationTypes.STATEFULSET"
-                    >
-                      <label
-                        class="btn btn-primary"
-                        ng-model="persistedFolder.UseNewVolume"
-                        uib-btn-radio="true"
-                        ng-change="ctrl.useNewVolume($index)"
-                        ng-disabled="ctrl.isEditAndExistingPersistedFolder($index)"
-                        >New volume</label
-                      >
-                      <label
-                        class="btn btn-primary"
-                        ng-model="persistedFolder.UseNewVolume"
-                        uib-btn-radio="false"
-                        ng-change="ctrl.useExistingVolume($index)"
-                        ng-disabled="ctrl.availableVolumes.length === 0 || ctrl.application.ApplicationType === ctrl.ApplicationTypes.STATEFULSET"
-                        >Use an existing volume</label
-                      >
+                    <span class="btn-group btn-group-sm" ng-class="{ striked: persistedFolder.NeedsDeletion }"
+                      ng-if="!ctrl.isEditAndExistingPersistedFolder($index) && ctrl.application.ApplicationType !== ctrl.ApplicationTypes.STATEFULSET">
+                      <label class="btn btn-primary" ng-model="persistedFolder.UseNewVolume" uib-btn-radio="true" ng-change="ctrl.useNewVolume($index)"
+                        ng-disabled="ctrl.isEditAndExistingPersistedFolder($index)">New volume</label>
+                      <label class="btn btn-primary" ng-model="persistedFolder.UseNewVolume" uib-btn-radio="false" ng-change="ctrl.useExistingVolume($index)"
+                        ng-disabled="ctrl.availableVolumes.length === 0 || ctrl.application.ApplicationType === ctrl.ApplicationTypes.STATEFULSET">Existing volume</label>
                     </span>
                   </div>
 
                   <div class="input-group col-sm-2 input-group-sm" ng-class="{ striked: persistedFolder.NeedsDeletion }" ng-if="persistedFolder.UseNewVolume">
                     <span class="input-group-addon">requested size</span>
-                    <input
-                      type="number"
-                      class="form-control"
-                      name="persisted_folder_size_{{ $index }}"
-                      ng-model="persistedFolder.Size"
-                      placeholder="20"
-                      ng-min="0"
-                      required
-                      ng-disabled="ctrl.isEditAndExistingPersistedFolder($index)"
-                    />
+                    <input type="number" class="form-control" name="persisted_folder_size_{{ $index }}" ng-model="persistedFolder.Size" placeholder="20" ng-min="0" required
+                      ng-disabled="ctrl.isEditAndExistingPersistedFolder($index)" />
                     <span class="input-group-addon" style="padding: 0;">
-                      <select
-                        ng-model="persistedFolder.SizeUnit"
+                      <select ng-model="persistedFolder.SizeUnit"
                         ng-style="{ width: '100%', height: '100%', cursor: ctrl.isEditAndExistingPersistedFolder($index) ? 'not-allowed' : 'auto' }"
-                        ng-options="unit for unit in ctrl.state.availableSizeUnits"
-                        ng-disabled="ctrl.isEditAndExistingPersistedFolder($index)"
-                      ></select>
+                        ng-options="unit for unit in ctrl.state.availableSizeUnits" ng-disabled="ctrl.isEditAndExistingPersistedFolder($index)"></select>
                     </span>
                   </div>
 
-                  <div
-                    class="input-group col-sm-3 input-group-sm"
-                    ng-class="{ striked: persistedFolder.NeedsDeletion }"
-                    style="vertical-align: top;"
-                    ng-if="persistedFolder.UseNewVolume"
-                  >
+                  <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: persistedFolder.NeedsDeletion }" style="vertical-align: top;"
+                    ng-if="persistedFolder.UseNewVolume">
                     <span class="input-group-addon">storage</span>
-                    <select
-                      ng-if="ctrl.hasMultipleStorageClassesAvailable()"
-                      class="form-control"
-                      ng-model="persistedFolder.StorageClass"
-                      ng-options="storageClass as storageClass.Name for storageClass in ctrl.storageClasses"
-                      ng-disabled="ctrl.state.isEdit"
-                    ></select>
+                    <select ng-if="ctrl.hasMultipleStorageClassesAvailable()" class="form-control" ng-model="persistedFolder.StorageClass"
+                      ng-options="storageClass as storageClass.Name for storageClass in ctrl.storageClasses" ng-disabled="ctrl.state.isEdit"></select>
                     <input ng-if="!ctrl.hasMultipleStorageClassesAvailable()" type="text" class="form-control" disabled ng-model="persistedFolder.StorageClass.Name" />
                   </div>
 
                   <div class="input-group col-sm-5 input-group-sm" ng-if="!persistedFolder.UseNewVolume" ng-class="{ striked: persistedFolder.NeedsDeletion }">
                     <span class="input-group-addon">volume</span>
-                    <select
-                      class="form-control"
-                      name="existing_volumes_{{ $index }}"
-                      ng-model="ctrl.formValues.PersistedFolders[$index].ExistingVolume"
-                      ng-options="vol as vol.PersistentVolumeClaim.Name for vol in ctrl.availableVolumes"
-                      ng-change="ctrl.onChangeExistingVolumeSelection()"
-                      ng-disabled="ctrl.isEditAndExistingPersistedFolder($index)"
-                      required
-                    >
+                    <select class="form-control" name="existing_volumes_{{ $index }}" ng-model="ctrl.formValues.PersistedFolders[$index].ExistingVolume"
+                      ng-options="vol as vol.PersistentVolumeClaim.Name for vol in ctrl.availableVolumes" ng-change="ctrl.onChangeExistingVolumeSelection()"
+                      ng-disabled="ctrl.isEditAndExistingPersistedFolder($index)" required>
                       <option selected disabled hidden value="">Select a volume</option>
                     </select>
                   </div>
@@ -431,27 +323,21 @@
                   </div>
                 </div>
 
-                <div
-                  ng-show="
+                <div ng-show="
                     kubernetesApplicationCreationForm['persisted_folder_path_' + $index].$invalid ||
                     ctrl.state.duplicatePersistedFolderPaths[$index] !== undefined ||
                     kubernetesApplicationCreationForm['persisted_folder_size_' + $index].$invalid ||
                     kubernetesApplicationCreationForm['existing_volumes_' + $index].$invalid ||
                     ctrl.state.duplicateExistingVolumes[$index] !== undefined
-                  "
-                >
+                  ">
                   <div class="input-group col-sm-3 input-group-sm">
-                    <div
-                      class="small text-warning"
-                      style="margin-top: 5px;"
-                      ng-show="kubernetesApplicationCreationForm['persisted_folder_path_' + $index].$invalid || ctrl.state.duplicatePersistedFolderPaths[$index] !== undefined"
-                    >
+                    <div class="small text-warning" style="margin-top: 5px;"
+                      ng-show="kubernetesApplicationCreationForm['persisted_folder_path_' + $index].$invalid || ctrl.state.duplicatePersistedFolderPaths[$index] !== undefined">
                       <ng-messages for="kubernetesApplicationCreationForm['persisted_folder_path_' + $index].$error">
                         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Path is required.</p>
                       </ng-messages>
-                      <p ng-if="ctrl.state.duplicatePersistedFolderPaths[$index] !== undefined"
-                        ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This path is already defined.</p
-                      >
+                      <p ng-if="ctrl.state.duplicatePersistedFolderPaths[$index] !== undefined"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This path is already
+                        defined.</p>
                     </div>
                   </div>
 
@@ -464,16 +350,13 @@
                         <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This value must be greater than zero.</p>
                       </ng-messages>
                     </div>
-                    <div
-                      class="small text-warning"
-                      ng-show="kubernetesApplicationCreationForm['existing_volumes_' + $index].$invalid || ctrl.state.duplicateExistingVolumes[$index] !== undefined"
-                    >
+                    <div class="small text-warning"
+                      ng-show="kubernetesApplicationCreationForm['existing_volumes_' + $index].$invalid || ctrl.state.duplicateExistingVolumes[$index] !== undefined">
                       <ng-messages for="kubernetesApplicationCreationForm['existing_volumes_' + $index].$error">
                         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Volume is required.</p>
                       </ng-messages>
-                      <p ng-if="ctrl.state.duplicateExistingVolumes[$index] !== undefined"
-                        ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This volume is already used.</p
-                      >
+                      <p ng-if="ctrl.state.duplicateExistingVolumes[$index] !== undefined"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This volume is already
+                        used.</p>
                     </div>
                   </div>
 
@@ -483,8 +366,9 @@
                 </div>
               </div>
             </div>
-            <!-- !persisted folders -->
+            <!-- #endregion -->
 
+            <!-- #region DATA ACCESS POLICY -->
             <div ng-if="ctrl.showDataAccessPolicySection()">
               <div class="form-group">
                 <div class="col-sm-12">
@@ -502,13 +386,8 @@
               <div class="form-group" style="margin-bottom: 0;">
                 <div class="boxselector_wrapper">
                   <div ng-if="!ctrl.state.isEdit || (ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.SHARED)">
-                    <input
-                      type="radio"
-                      id="data_access_shared"
-                      ng-value="ctrl.ApplicationDataAccessPolicies.SHARED"
-                      ng-model="ctrl.formValues.DataAccessPolicy"
-                      ng-change="ctrl.resetDeploymentType()"
-                    />
+                    <input type="radio" id="data_access_shared" ng-value="ctrl.ApplicationDataAccessPolicies.SHARED" ng-model="ctrl.formValues.DataAccessPolicy"
+                      ng-change="ctrl.resetDeploymentType()" />
                     <label for="data_access_shared">
                       <div class="boxselector_header">
                         <i class="fa fa-cube" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -519,14 +398,8 @@
                   </div>
                   <div style="color: #767676;" ng-if="ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.ISOLATED">
                     <input type="radio" id="data_access_shared" disabled />
-                    <label
-                      for="data_access_shared"
-                      tooltip-append-to-body="true"
-                      tooltip-placement="bottom"
-                      tooltip-class="portainer-tooltip"
-                      uib-tooltip="Changing the data access policy is not allowed"
-                      style="cursor: pointer; border-color: #767676;"
-                    >
+                    <label for="data_access_shared" tooltip-append-to-body="true" tooltip-placement="bottom" tooltip-class="portainer-tooltip"
+                      uib-tooltip="Changing the data access policy is not allowed" style="cursor: pointer; border-color: #767676;">
                       <div class="boxselector_header">
                         <i class="fa fa-cube" aria-hidden="true" style="margin-right: 2px;"></i>
                         Shared
@@ -534,19 +407,12 @@
                       <p>All the instances of this application will use the same data</p>
                     </label>
                   </div>
-                  <div
-                    ng-if="
+                  <div ng-if="
                       (!ctrl.state.isEdit && !ctrl.state.PersistedFoldersUseExistingVolumes) ||
                       (ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.ISOLATED)
-                    "
-                  >
-                    <input
-                      type="radio"
-                      id="data_access_isolated"
-                      ng-value="ctrl.ApplicationDataAccessPolicies.ISOLATED"
-                      ng-model="ctrl.formValues.DataAccessPolicy"
-                      ng-change="ctrl.resetDeploymentType()"
-                    />
+                    ">
+                    <input type="radio" id="data_access_isolated" ng-value="ctrl.ApplicationDataAccessPolicies.ISOLATED" ng-model="ctrl.formValues.DataAccessPolicy"
+                      ng-change="ctrl.resetDeploymentType()" />
                     <label for="data_access_isolated">
                       <div class="boxselector_header">
                         <i class="fa fa-cubes" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -555,19 +421,11 @@
                       <p>Every instance of this application will use their own data</p>
                     </label>
                   </div>
-                  <div
-                    style="color: #767676;"
-                    ng-if="(ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.SHARED) || ctrl.state.PersistedFoldersUseExistingVolumes"
-                  >
+                  <div style="color: #767676;"
+                    ng-if="(ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.SHARED) || ctrl.state.PersistedFoldersUseExistingVolumes">
                     <input type="radio" id="data_access_isolated" disabled />
-                    <label
-                      for="data_access_isolated"
-                      tooltip-append-to-body="true"
-                      tooltip-placement="bottom"
-                      tooltip-class="portainer-tooltip"
-                      uib-tooltip="Changing the data access policy is not allowed"
-                      style="cursor: pointer; border-color: #767676;"
-                    >
+                    <label for="data_access_isolated" tooltip-append-to-body="true" tooltip-placement="bottom" tooltip-class="portainer-tooltip"
+                      uib-tooltip="Changing the data access policy is not allowed" style="cursor: pointer; border-color: #767676;">
                       <div class="boxselector_header">
                         <i class="fa fa-cubes" aria-hidden="true" style="margin-right: 2px;"></i>
                         Isolated
@@ -579,11 +437,12 @@
               </div>
               <!-- !access policy options -->
             </div>
+            <!-- #endregion -->
 
             <div class="col-sm-12 form-section-title">
               Resource reservations
             </div>
-
+            <!-- #region RESOURCE RESERVATIONS -->
             <div class="form-group" ng-if="!ctrl.state.resourcePoolHasQuota">
               <div class="col-sm-12 small text-muted">
                 <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -611,26 +470,16 @@
             <div class="form-group" ng-if="!ctrl.state.resourcePoolHasQuota || (ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded())">
               <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
                 Memory
-                <portainer-tooltip
-                  position="bottom"
-                  message="An instance of this application will reserve this amount of memory. If the instance memory usage exceeds the reservation, it might be subject to OOM."
-                >
+                <portainer-tooltip position="bottom"
+                  message="An instance of this application will reserve this amount of memory. If the instance memory usage exceeds the reservation, it might be subject to OOM.">
                 </portainer-tooltip>
               </label>
               <div class="col-sm-3">
                 <slider model="ctrl.formValues.MemoryLimit" floor="ctrl.state.sliders.memory.min" ceil="ctrl.state.sliders.memory.max" step="128"></slider>
               </div>
               <div class="col-sm-2">
-                <input
-                  name="memory_limit"
-                  ng-model="ctrl.formValues.MemoryLimit"
-                  type="number"
-                  min="{{ ctrl.state.sliders.memory.min }}"
-                  max="{{ ctrl.state.sliders.memory.max }}"
-                  class="form-control"
-                  id="memory-limit"
-                  required
-                />
+                <input name="memory_limit" ng-model="ctrl.formValues.MemoryLimit" type="number" min="{{ ctrl.state.sliders.memory.min }}" max="{{ ctrl.state.sliders.memory.max }}"
+                  class="form-control" id="memory-limit" required />
               </div>
               <div class="col-sm-4">
                 <p class="small text-muted" style="margin-top: 7px;">
@@ -641,8 +490,7 @@
             <div class="form-group" ng-show="kubernetesApplicationCreationForm.memory_limit.$invalid">
               <div class="col-sm-12 small text-warning">
                 <div ng-messages="kubernetesApplicationCreationForm.memory_limit.$error">
-                  <p
-                    ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value must be between {{ ctrl.state.sliders.memory.min }} and {{ ctrl.state.sliders.memory.max }}
+                  <p><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value must be between {{ ctrl.state.sliders.memory.min }} and {{ ctrl.state.sliders.memory.max }}
                   </p>
                 </div>
               </div>
@@ -652,10 +500,8 @@
             <div class="form-group" ng-if="!ctrl.state.resourcePoolHasQuota || (ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded())">
               <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
                 CPU
-                <portainer-tooltip
-                  position="bottom"
-                  message="An instance of this application will reserve this amount of CPU. If the instance CPU usage exceeds the reservation, it might be subject to CPU throttling."
-                >
+                <portainer-tooltip position="bottom"
+                  message="An instance of this application will reserve this amount of CPU. If the instance CPU usage exceeds the reservation, it might be subject to CPU throttling.">
                 </portainer-tooltip>
               </label>
               <div class="col-sm-5">
@@ -668,11 +514,12 @@
               </div>
             </div>
             <!-- !cpu-limit-input -->
+            <!-- #endregion -->
 
             <div class="col-sm-12 form-section-title">
               Deployment
             </div>
-
+            <!-- #region DEPLOYMENT -->
             <div class="form-group">
               <div class="col-sm-12 small text-muted">
                 Select how you want to deploy your application inside the cluster.
@@ -694,14 +541,8 @@
                 </div>
                 <div style="color: #767676;" ng-if="!ctrl.supportGlobalDeployment()">
                   <input type="radio" id="deployment_global" disabled />
-                  <label
-                    for="deployment_global"
-                    tooltip-append-to-body="true"
-                    tooltip-placement="bottom"
-                    tooltip-class="portainer-tooltip"
-                    uib-tooltip="The storage or access policy used for persisted folders cannot be used with this option"
-                    style="cursor: pointer; border-color: #767676;"
-                  >
+                  <label for="deployment_global" tooltip-append-to-body="true" tooltip-placement="bottom" tooltip-class="portainer-tooltip"
+                    uib-tooltip="The storage or access policy used for persisted folders cannot be used with this option" style="cursor: pointer; border-color: #767676;">
                     <div class="boxselector_header">
                       <i class="fa fa-cubes" aria-hidden="true" style="margin-right: 2px;"></i>
                       Global
@@ -710,13 +551,8 @@
                   </label>
                 </div>
                 <div ng-if="ctrl.supportGlobalDeployment()">
-                  <input
-                    type="radio"
-                    id="deployment_global"
-                    ng-value="ctrl.ApplicationDeploymentTypes.GLOBAL"
-                    ng-model="ctrl.formValues.DeploymentType"
-                    ng-click="ctrl.unselectAutoScaler()"
-                  />
+                  <input type="radio" id="deployment_global" ng-value="ctrl.ApplicationDeploymentTypes.GLOBAL" ng-model="ctrl.formValues.DeploymentType"
+                    ng-click="ctrl.unselectAutoScaler()" />
                   <label for="deployment_global">
                     <div class="boxselector_header">
                       <i class="fa fa-cubes" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -735,25 +571,14 @@
                 <label class="control-label text-left">
                   Instance count
                 </label>
-                <input
-                  type="number"
-                  class="form-control"
-                  min="1"
-                  max="9999"
-                  placeholder="1"
-                  style="margin-left: 20px;"
-                  ng-model="ctrl.formValues.ReplicaCount"
-                  ng-disabled="!ctrl.supportScalableReplicaDeployment()"
-                  ng-change="ctrl.enforceReplicaCountMinimum()"
-                />
+                <input type="number" class="form-control" min="1" max="9999" placeholder="1" style="margin-left: 20px;" ng-model="ctrl.formValues.ReplicaCount"
+                  ng-disabled="!ctrl.supportScalableReplicaDeployment()" ng-change="ctrl.enforceReplicaCountMinimum()" />
               </div>
             </div>
             <!-- !replica count -->
 
-            <div
-              class="form-group"
-              ng-if="!ctrl.resourceReservationsOverflow() && ctrl.formValues.ReplicaCount > 1 && (ctrl.formValues.CpuLimit !== 0 || ctrl.formValues.MemoryLimit !== 0)"
-            >
+            <div class="form-group"
+              ng-if="!ctrl.resourceReservationsOverflow() && ctrl.formValues.ReplicaCount > 1 && (ctrl.formValues.CpuLimit !== 0 || ctrl.formValues.MemoryLimit !== 0)">
               <div class="col-sm-12 small text-muted">
                 <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                 This application will reserve the following resources: <b>{{ ctrl.formValues.CpuLimit * ctrl.formValues.ReplicaCount | kubernetesApplicationCPUValue }} CPU</b> and
@@ -771,12 +596,13 @@
             <div class="form-group" ng-if="!ctrl.supportScalableReplicaDeployment()">
               <div class="col-sm-12 small text-muted">
                 <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                The following storage option(s) do not support concurrent access from multiples instances: <code>{{ ctrl.getNonScalableStorage() }}</code
-                >. You will not be able to scale that application.
+                The following storage option(s) do not support concurrent access from multiples instances: <code>{{ ctrl.getNonScalableStorage() }}</code>. You will not be able to
+                scale that application.
               </div>
             </div>
+            <!-- #endregion -->
 
-            <!-- auto scaling -->
+            <!-- #region AUTO SCALING -->
             <div class="col-sm-12 form-section-title" ng-if="ctrl.formValues.DeploymentType !== ctrl.ApplicationDeploymentTypes.GLOBAL">
               Auto-scaling
             </div>
@@ -820,15 +646,8 @@
                   <tr>
                     <td style="padding: 8px 5px 5px 0; border: none;">
                       <div class="input-group input-group-sm" style="width: 100%;">
-                        <input
-                          type="number"
-                          class="form-control"
-                          name="auto_scaler_min"
-                          min="0"
-                          ng-max="ctrl.formValues.AutoScaler.MaxReplicas"
-                          ng-model="ctrl.formValues.AutoScaler.MinReplicas"
-                          required
-                        />
+                        <input type="number" class="form-control" name="auto_scaler_min" min="0" ng-max="ctrl.formValues.AutoScaler.MaxReplicas"
+                          ng-model="ctrl.formValues.AutoScaler.MinReplicas" required />
                       </div>
                       <div class="input-group input-group-sm" ng-show="kubernetesApplicationCreationForm['auto_scaler_min'].$invalid">
                         <div class="small text-warning" style="margin-top: 5px;">
@@ -842,13 +661,8 @@
                     </td>
                     <td style="padding: 8px 5px 5px 0; border: none;">
                       <div class="input-group input-group-sm" style="width: 100%;">
-                        <input
-                          type="number"
-                          class="form-control"
-                          name="auto_scaler_max"
-                          ng-min="ctrl.formValues.AutoScaler.MinReplicas"
-                          ng-model="ctrl.formValues.AutoScaler.MaxReplicas"
-                        />
+                        <input type="number" class="form-control" name="auto_scaler_max" ng-min="ctrl.formValues.AutoScaler.MinReplicas"
+                          ng-model="ctrl.formValues.AutoScaler.MaxReplicas" />
                       </div>
                       <div class="input-group input-group-sm" ng-show="kubernetesApplicationCreationForm['auto_scaler_max'].$invalid || ctrl.autoScalerOverflow()">
                         <div class="small text-warning" style="margin-top: 5px;">
@@ -884,12 +698,12 @@
                 </div>
               </div>
             </div>
-            <!-- !auto scaling -->
+            <!-- #endregion -->
 
             <div class="col-sm-12 form-section-title">
               Publishing the application
             </div>
-
+            <!-- #region PUBLISHING OPTIONS -->
             <div class="form-group">
               <div class="col-sm-12 small text-muted">
                 Select how you want to publish your application.
@@ -941,9 +755,9 @@
                 </div>
               </div>
             </div>
-            <!-- !publishing options -->
+            <!-- #endregion -->
 
-            <!-- published ports -->
+            <!-- #region PUBLISHED PORTS -->
             <div class="form-group">
               <div class="col-sm-12" style="margin-top: 5px;">
                 <label class="control-label text-left">Published ports</label>
@@ -952,116 +766,80 @@
                 </span>
               </div>
 
-              <div
-                class="col-sm-12 small text-muted"
-                style="margin-top: 15px;"
-                ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER && ctrl.formValues.PublishedPorts.length > 0"
-              >
+              <div class="col-sm-12 small text-muted" style="margin-top: 15px;"
+                ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER && ctrl.formValues.PublishedPorts.length > 0">
                 <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                 When publishing a port in cluster mode, the node port is optional. If left empty Kubernetes will use a random port number. If you wish to specify a port, use a port
                 number inside the default range <code>30000-32767</code>.
               </div>
 
               <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-                <div
-                  ng-repeat-start="publishedPort in ctrl.formValues.PublishedPorts"
-                  style="margin-top: 2px;"
-                  tooltip-append-to-body="true"
-                  tooltip-placement="bottom"
-                  tooltip-class="portainer-tooltip"
-                  tooltip-enable="ctrl.disableLoadBalancerEdit()"
-                  uib-tooltip="Edition is not allowed while the Load Balancer is in Pending state"
-                >
-                  <div class="col-sm-3 input-group input-group-sm">
+                <div ng-repeat-start="publishedPort in ctrl.formValues.PublishedPorts" style="margin-top: 2px;" tooltip-append-to-body="true" tooltip-placement="bottom"
+                  tooltip-class="portainer-tooltip" tooltip-enable="ctrl.disableLoadBalancerEdit()"
+                  uib-tooltip="Edition is not allowed while the Load Balancer is in Pending state">
+                  <div class="col-sm-3 input-group input-group-sm" ng-class="{ striked: publishedPort.NeedsDeletion }">
                     <span class="input-group-addon">container port</span>
-                    <input
-                      type="number"
-                      class="form-control"
-                      name="container_port_{{ $index }}"
-                      ng-model="publishedPort.ContainerPort"
-                      placeholder="80"
-                      ng-min="1"
-                      ng-max="65535"
-                      required
-                      ng-disabled="ctrl.disableLoadBalancerEdit()"
-                    />
+                    <input type="number" class="form-control" name="container_port_{{ $index }}" ng-model="publishedPort.ContainerPort" placeholder="80" ng-min="1" ng-max="65535"
+                      required ng-disabled="ctrl.disableLoadBalancerEdit() || ctrl.isEditAndNotNewPublishedPort($index)" />
                   </div>
 
-                  <div class="col-sm-3 input-group input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER">
+                  <div class="col-sm-3 input-group input-group-sm" ng-class="{ striked: publishedPort.NeedsDeletion }"
+                    ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER">
                     <span class="input-group-addon">node port</span>
-                    <input
-                      name="published_node_port_{{ $index }}"
-                      type="number"
-                      class="form-control"
-                      ng-model="publishedPort.NodePort"
-                      placeholder="30080"
-                      ng-min="30000"
-                      ng-max="32767"
-                    />
+                    <input name="published_node_port_{{ $index }}" type="number" class="form-control" ng-model="publishedPort.NodePort" placeholder="30080" ng-min="30000"
+                      ng-max="32767" ng-disabled="ctrl.disableLoadBalancerEdit() || ctrl.isEditAndNotNewPublishedPort($index)" />
                   </div>
 
-                  <div class="col-sm-3 input-group input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.LOAD_BALANCER">
+                  <div class="col-sm-3 input-group input-group-sm" ng-class="{ striked: publishedPort.NeedsDeletion }"
+                    ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.LOAD_BALANCER">
                     <span class="input-group-addon">load balancer port</span>
-                    <input
-                      type="number"
-                      class="form-control"
-                      name="load_balancer_port_{{ $index }}"
-                      ng-model="publishedPort.LoadBalancerPort"
-                      placeholder="80"
-                      value="8080"
-                      ng-min="1"
-                      ng-max="65535"
-                      required
-                      ng-disabled="ctrl.disableLoadBalancerEdit()"
-                    />
+                    <input type="number" class="form-control" name="load_balancer_port_{{ $index }}" ng-model="publishedPort.LoadBalancerPort" placeholder="80" value="8080"
+                      ng-min="1" ng-max="65535" required ng-disabled="ctrl.disableLoadBalancerEdit() || ctrl.isEditAndNotNewPublishedPort($index)" />
                   </div>
 
-                  <div class="col-sm-3 input-group input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INGRESS">
+                  <div class="col-sm-3 input-group input-group-sm" ng-class="{ striked: publishedPort.NeedsDeletion }"
+                    ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INGRESS">
                     <span class="input-group-addon">ingress</span>
-                    <select
-                      class="form-control"
-                      name="ingress_class_{{ $index }}"
-                      ng-model="publishedPort.Ingress"
-                      ng-options="ingress as (ingress.IngressClass ? ingress.IngressClass : ingress.Name) for ingress in ctrl.filteredIngresses"
-                      required
+                    <select class="form-control" name="ingress_class_{{ $index }}" ng-model="publishedPort.IngressName"
+                      ng-options="ingress.Name as ingress.Name for ingress in ctrl.filteredIngresses" required
+                      ng-disabled="ctrl.disableLoadBalancerEdit() || ctrl.isEditAndNotNewPublishedPort($index)" 
                     >
+                      <option selected disabled hidden value="">Select an ingress</option>
                     </select>
                   </div>
 
-                  <div class="col-sm-3 input-group input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INGRESS">
+                  <div class="col-sm-3 input-group input-group-sm" ng-class="{ striked: publishedPort.NeedsDeletion }"
+                    ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INGRESS">
                     <span class="input-group-addon">route</span>
-                    <input
-                      class="form-control"
-                      name="ingress_route_{{ $index }}"
-                      ng-model="publishedPort.IngressRoute"
-                      placeholder="/foo"
-                      required
-                      ng-change="ctrl.onChangePortMappingIngressRoute($index)"
-                    />
+                    <input class="form-control" name="ingress_route_{{ $index }}" ng-model="publishedPort.IngressRoute" placeholder="/foo" required
+                      ng-change="ctrl.onChangePortMappingIngressRoute($index)" ng-disabled="ctrl.disableLoadBalancerEdit() || ctrl.isEditAndNotNewPublishedPort($index)" />
                   </div>
 
                   <div class="input-group col-sm-2 input-group-sm">
-                    <div class="btn-group btn-group-sm">
+                    <div class="btn-group btn-group-sm" ng-if="!ctrl.isEditAndNotNewPublishedPort($index)">
                       <label class="btn btn-primary" ng-model="publishedPort.Protocol" uib-btn-radio="'TCP'" ng-disabled="ctrl.disableLoadBalancerEdit()">TCP</label>
                       <label class="btn btn-primary" ng-model="publishedPort.Protocol" uib-btn-radio="'UDP'" ng-disabled="ctrl.disableLoadBalancerEdit()">UDP</label>
                     </div>
-                    <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removePublishedPort($index)" ng-if="!ctrl.disableLoadBalancerEdit()">
+                    <div class="btn-group btn-group-sm" ng-if="ctrl.isEditAndNotNewPublishedPort($index)" ng-class="{ striked: publishedPort.NeedsDeletion }">
+                      <label class="btn btn-primary" disabled>{{ publishedPort.Protocol }}</label>
+                    </div>
+                    <button ng-if="!ctrl.disableLoadBalancerEdit() && !publishedPort.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removePublishedPort($index)">
                       <i class="fa fa-times" aria-hidden="true"></i>
+                    </button>
+                    <button ng-if="publishedPort.NeedsDeletion" class="btn btn-sm btn-primary" type="button" ng-click="ctrl.restorePublishedPort($index)">
+                      Restore
                     </button>
                   </div>
                 </div>
 
-                <div
-                  ng-repeat-end
-                  ng-show="
+                <div ng-repeat-end ng-show="
                     kubernetesApplicationCreationForm['container_port_' + $index].$invalid ||
                     kubernetesApplicationCreationForm['published_node_port_' + $index].$invalid ||
                     kubernetesApplicationCreationForm['load_balancer_port_' + $index].$invalid ||
                     kubernetesApplicationCreationForm['ingress_class_' + $index].$invalid ||
                     kubernetesApplicationCreationForm['ingress_route_' + $index].$invalid ||
                     ctrl.state.duplicateIngressRoutes[$index] !== undefined
-                  "
-                >
+                  ">
                   <div class="col-sm-3 input-group input-group-sm">
                     <div class="small text-warning" style="margin-top: 5px;" ng-if="kubernetesApplicationCreationForm['container_port_' + $index].$invalid">
                       <div ng-messages="kubernetesApplicationCreationForm['container_port_'+$index].$error">
@@ -1098,17 +876,13 @@
                     </div>
                   </div>
                   <div class="col-sm-3 input-group input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INGRESS">
-                    <div
-                      class="small text-warning"
-                      style="margin-top: 5px;"
-                      ng-if="kubernetesApplicationCreationForm['ingress_route_' + $index].$invalid || ctrl.state.duplicateIngressRoutes[$index] !== undefined"
-                    >
+                    <div class="small text-warning" style="margin-top: 5px;"
+                      ng-if="kubernetesApplicationCreationForm['ingress_route_' + $index].$invalid || ctrl.state.duplicateIngressRoutes[$index] !== undefined">
                       <div ng-messages="kubernetesApplicationCreationForm['ingress_route_'+$index].$error">
                         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Route is required.</p>
                       </div>
-                      <p ng-if="ctrl.state.duplicateIngressRoutes[$index] !== undefined"
-                        ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This route is already used.</p
-                      >
+                      <p ng-if="ctrl.state.duplicateIngressRoutes[$index] !== undefined"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This route is already used.
+                      </p>
                     </div>
                   </div>
 
@@ -1116,7 +890,7 @@
                 </div>
               </div>
             </div>
-            <!-- !published ports -->
+            <!-- #endregion -->
 
             <div class="col-sm-12 form-section-title">
               Actions
@@ -1124,25 +898,15 @@
 
             <div class="form-group">
               <div class="col-sm-12">
-                <button
-                  type="button"
-                  class="btn btn-primary btn-sm"
-                  ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.isDeployUpdateButtonDisabled()"
-                  ng-click="ctrl.deployApplication()"
-                  button-spinner="ctrl.state.actionInProgress"
-                >
+                <button type="button" class="btn btn-primary btn-sm" ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.isDeployUpdateButtonDisabled()"
+                  ng-click="ctrl.deployApplication()" button-spinner="ctrl.state.actionInProgress">
                   <span ng-show="!ctrl.state.isEdit && !ctrl.state.actionInProgress">Deploy application</span>
                   <span ng-show="!ctrl.state.isEdit && ctrl.state.actionInProgress">Deployment in progress...</span>
                   <span ng-show="ctrl.state.isEdit && !ctrl.state.actionInProgress">Update application</span>
                   <span ng-show="ctrl.state.isEdit && ctrl.state.actionInProgress">Update in progress...</span>
                 </button>
-                <button
-                  ng-if="ctrl.state.isEdit && !ctrl.state.actionInProgress"
-                  type="button"
-                  class="btn btn-sm btn-default"
-                  ui-sref="kubernetes.applications.application({ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool })"
-                  >Cancel</button
-                >
+                <button ng-if="ctrl.state.isEdit && !ctrl.state.actionInProgress" type="button" class="btn btn-sm btn-default"
+                  ui-sref="kubernetes.applications.application({ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool })">Cancel</button>
               </div>
             </div>
           </form>

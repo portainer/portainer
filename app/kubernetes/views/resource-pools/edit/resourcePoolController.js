@@ -268,9 +268,9 @@ class KubernetesResourcePoolController {
         this.isEditable = false;
       }
       if (this.state.canUseIngress) {
-        const ingressClasses = this.EndpointProvider.currentEndpoint().Kubernetes.Configuration.IngressClasses;
         const ingresses = await this.KubernetesIngressService.get(name);
         const iNames = _.map(ingresses, 'Name');
+        const ingressClasses = this.EndpointProvider.currentEndpoint().Kubernetes.Configuration.IngressClasses;
         this.formValues.IngressClasses = _.map(ingressClasses, (item) => {
           const iClass = new KubernetesResourcePoolIngressClassFormValue(item);
           if (_.includes(iNames, iClass.Name)) {

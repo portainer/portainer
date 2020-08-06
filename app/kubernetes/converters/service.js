@@ -11,23 +11,23 @@ import { KubernetesServiceHeadlessClusterIP, KubernetesService, KubernetesServic
 import { KubernetesApplicationPublishingTypes } from 'Kubernetes/models/application/models';
 import KubernetesServiceHelper from 'Kubernetes/helpers/serviceHelper';
 
-class KubernetesServiceConverter {
-  static publishedPortToServicePort(name, publishedPort, type) {
-    const res = new KubernetesServicePort();
-    res.name = _.toLower(name + '-' + publishedPort.ContainerPort + '-' + publishedPort.Protocol);
-    res.port = type === KubernetesServiceTypes.LOAD_BALANCER ? publishedPort.LoadBalancerPort : publishedPort.ContainerPort;
-    res.targetPort = publishedPort.ContainerPort;
-    res.protocol = publishedPort.Protocol;
-    if (type === KubernetesServiceTypes.NODE_PORT && publishedPort.NodePort) {
-      res.nodePort = publishedPort.NodePort;
-    } else if (type === KubernetesServiceTypes.LOAD_BALANCER && publishedPort.LoadBalancerNodePort) {
-      res.nodePort = publishedPort.LoadBalancerNodePort;
-    } else {
-      delete res.nodePort;
-    }
-    return res;
+function _publishedPortToServicePort(name, publishedPort, type) {
+  const res = new KubernetesServicePort();
+  res.name = _.toLower(name + '-' + publishedPort.ContainerPort + '-' + publishedPort.Protocol);
+  res.port = type === KubernetesServiceTypes.LOAD_BALANCER ? publishedPort.LoadBalancerPort : publishedPort.ContainerPort;
+  res.targetPort = publishedPort.ContainerPort;
+  res.protocol = publishedPort.Protocol;
+  if (type === KubernetesServiceTypes.NODE_PORT && publishedPort.NodePort) {
+    res.nodePort = publishedPort.NodePort;
+  } else if (type === KubernetesServiceTypes.LOAD_BALANCER && publishedPort.LoadBalancerNodePort) {
+    res.nodePort = publishedPort.LoadBalancerNodePort;
+  } else {
+    delete res.nodePort;
   }
+  return res;
+}
 
+class KubernetesServiceConverter {
   /**
    * Generate KubernetesService from KubernetesApplicationFormValues
    * @param {KubernetesApplicationFormValues} formValues
@@ -44,7 +44,7 @@ class KubernetesServiceConverter {
     } else if (formValues.PublishingType === KubernetesApplicationPublishingTypes.LOAD_BALANCER) {
       res.Type = KubernetesServiceTypes.LOAD_BALANCER;
     }
-    res.Ports = _.map(formValues.PublishedPorts, (item) => KubernetesServiceConverter.publishedPortToServicePort(formValues.Name, item, res.Type));
+    res.Ports = _.map(formValues.PublishedPorts, (item) => _publishedPortToServicePort(formValues.Name, item, res.Type));
     return res;
   }
 
