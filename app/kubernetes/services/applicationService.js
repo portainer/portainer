@@ -276,8 +276,10 @@ class KubernetesApplicationService {
 
       const newKind = KubernetesHorizontalPodAutoScalerHelper.getApplicationTypeString(newApp);
       const newAutoScaler = KubernetesHorizontalPodAutoScalerConverter.applicationFormValuesToModel(newFormValues, newKind);
-      if (_.isEmpty(oldFormValues.AutoScaler)) {
-        await this.KubernetesHorizontalPodAutoScalerService.create(newAutoScaler);
+      if (!oldFormValues.AutoScaler.IsUsed) {
+        if (newFormValues.AutoScaler.IsUsed) {
+          await this.KubernetesHorizontalPodAutoScalerService.create(newAutoScaler);
+        }
       } else {
         const oldKind = KubernetesHorizontalPodAutoScalerHelper.getApplicationTypeString(oldApp);
         const oldAutoScaler = KubernetesHorizontalPodAutoScalerConverter.applicationFormValuesToModel(oldFormValues, oldKind);
