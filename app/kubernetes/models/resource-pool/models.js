@@ -9,7 +9,8 @@ export const KubernetesPortainerResourcePoolOwnerLabel = 'io.portainer.kubernete
  */
 const _KubernetesResourcePool = Object.freeze({
   Namespace: {}, // KubernetesNamespace
-  Quota: undefined, // KubernetesResourceQuota
+  Quota: undefined, // KubernetesResourceQuota,
+  Ingresses: [], // KubernetesIngress[]
   Yaml: '',
 });
 

@@ -120,6 +120,53 @@
                   >
                   </kubernetes-resource-reservation>
                 </div>
+                <div ng-if="ctrl.isAdmin">
+                  <div class="col-sm-12 form-section-title">
+                    Ingresses
+                  </div>
+                  <div class="form-group" ng-if="!ctrl.state.canUseIngress">
+                    <div class="col-sm-12 small text-muted">
+                      <p>
+                        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                        Ingress need to be activated by an administrator on the cluster before attempting to setup an ingress for the resource pool.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="form-group" ng-if="ctrl.state.canUseIngress">
+                    <div class="col-sm-12 small text-muted">
+                      <p>
+                        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                        Activating an ingress class will allow users to expose their applications over a path
+                      </p>
+                    </div>
+                    <div class="col-sm-12">
+                      <label class="control-label text-left">
+                        Ingress activation
+                      </label>
+                      <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.UseIngress" /><i></i> </label>
+                    </div>
+                  </div>
+                  <div class="form-group" ng-if="ctrl.formValues.UseIngress && ctrl.state.canUseIngress">
+                    <div style="margin-top: 10px;" class="col-sm-12">
+                      <table class="table" style="table-layout: fixed;">
+                        <tbody>
+                          <tr class="text-muted">
+                            <td>Ingress controller</td>
+                            <td>Activated</td>
+                          </tr>
+                          <tr ng-repeat="class in ctrl.formValues.IngressClasses">
+                            <td>
+                              {{ class.Name }}
+                            </td>
+                            <td>
+                              <label class="switch" style="margin-right: 10px;"> <input type="checkbox" ng-model="class.Selected" /><i></i> </label>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
                 <!-- actions -->
                 <div ng-if="ctrl.isAdmin && ctrl.isEditable" class="col-sm-12 form-section-title">
                   Actions

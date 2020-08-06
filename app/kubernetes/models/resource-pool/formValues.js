@@ -8,9 +8,11 @@ export function KubernetesResourcePoolFormValues(defaults) {
   };
 }
 
-export function KubernetesResourcePoolIngressClassFormValue(ingressClass) {
+export function KubernetesResourcePoolIngressClassFormValue(ingressClassName) {
   return {
-    Name: ingressClass ? ingressClass : '',
+    Name: ingressClassName ? ingressClassName : '',
+    IngressClassName: ingressClassName ? ingressClassName : '',
     Selected: false,
+    WasSelected: false,
   };
 }

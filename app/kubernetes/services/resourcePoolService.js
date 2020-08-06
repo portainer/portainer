@@ -6,7 +6,6 @@ import KubernetesResourcePoolConverter from 'Kubernetes/converters/resourcePool'
 import KubernetesResourceQuotaHelper from 'Kubernetes/helpers/resourceQuotaHelper';
 import { KubernetesNamespace } from 'Kubernetes/models/namespace/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
-import { KubernetesIngress } from 'Kubernetes/ingress/models';
 
 class KubernetesResourcePoolService {
   /* @ngInject */
@@ -89,11 +88,8 @@ class KubernetesResourcePoolService {
       if (formValues.UseIngress) {
         const ingressPromises = _.map(formValues.IngressClasses, (c) => {
           if (c.Selected) {
-            const ingress = new KubernetesIngress();
-            ingress.Name = c.Name;
-            ingress.Namespace = namespace.Name;
-            ingress.IngressClass = c.Name;
-            return this.KubernetesIngressService.create(ingress);
+            c.Namespace = namespace.Name;
+            return this.KubernetesIngressService.create(c);
           }
         });
         await Promise.all(ingressPromises);

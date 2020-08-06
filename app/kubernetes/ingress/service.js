@@ -14,6 +14,7 @@ class KubernetesIngressService {
     this.getAllAsync = this.getAllAsync.bind(this);
     this.createAsync = this.createAsync.bind(this);
     this.patchAsync = this.patchAsync.bind(this);
+    this.deleteAsync = this.deleteAsync.bind(this);
   }
 
   /**
@@ -54,10 +55,10 @@ class KubernetesIngressService {
   /**
    * CREATE
    */
-  async createAsync(ingress) {
+  async createAsync(formValues) {
     try {
       const params = {};
-      const payload = KubernetesIngressConverter.createPayload(ingress);
+      const payload = KubernetesIngressConverter.createPayload(formValues);
       const namespace = payload.metadata.namespace;
       const data = await this.KubernetesIngresses(namespace).create(params, payload).$promise;
       return data;
@@ -66,8 +67,8 @@ class KubernetesIngressService {
     }
   }
 
-  create(ingress) {
-    return this.$async(this.createAsync, ingress);
+  create(formValues) {
+    return this.$async(this.createAsync, formValues);
   }
 
   /**
@@ -91,6 +92,24 @@ class KubernetesIngressService {
 
   patch(oldIngress, newIngress) {
     return this.$async(this.patchAsync, oldIngress, newIngress);
+  }
+
+  /**
+   * DELETE
+   */
+  async deleteAsync(ingress) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = ingress.Name;
+      const namespace = ingress.Namespace;
+      await this.KubernetesIngresses(namespace).delete(params).$promise;
+    } catch (err) {
+      throw new PortainerError('Unable to delete ingress', err);
+    }
+  }
+
+  delete(ingress) {
+    return this.$async(this.deleteAsync, ingress);
   }
 }
 
