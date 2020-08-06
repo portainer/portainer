@@ -21,9 +21,9 @@
                   </div>
                 </div>
                 <!-- !name-input -->
-                <div ng-if="ctrl.isAdmin" class="col-sm-12 form-section-title">Quota</div>
+                <div ng-if="ctrl.isAdmin && ctrl.isEditable" class="col-sm-12 form-section-title">Quota</div>
                 <!-- quotas-switch -->
-                <div ng-if="ctrl.isAdmin" class="form-group">
+                <div ng-if="ctrl.isAdmin && ctrl.isEditable" class="form-group">
                   <div class="col-sm-12">
                     <label class="control-label text-left">
                       Resource assignment
@@ -37,7 +37,7 @@
                   </span>
                 </div>
                 <!-- !quotas-switch -->
-                <div ng-if="ctrl.formValues.hasQuota && ctrl.isAdmin">
+                <div ng-if="ctrl.formValues.hasQuota && ctrl.isAdmin && ctrl.isEditable">
                   <div class="col-sm-12 form-section-title">
                     Resource limits
                   </div>
@@ -121,10 +121,10 @@
                   </kubernetes-resource-reservation>
                 </div>
                 <!-- actions -->
-                <div ng-if="ctrl.isAdmin" class="col-sm-12 form-section-title">
+                <div ng-if="ctrl.isAdmin && ctrl.isEditable" class="col-sm-12 form-section-title">
                   Actions
                 </div>
-                <div ng-if="ctrl.isAdmin" class="form-group">
+                <div ng-if="ctrl.isAdmin && ctrl.isEditable" class="form-group">
                   <div class="col-sm-12">
                     <button
                       type="button"
