@@ -17,6 +17,7 @@ require('./includes/servicelabels.html');
 require('./includes/tasks.html');
 require('./includes/updateconfig.html');
 
+import _ from 'lodash-es';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
 angular.module('portainer.docker').controller('ServiceController', [
@@ -51,6 +52,7 @@ angular.module('portainer.docker').controller('ServiceController', [
   'EndpointProvider',
   'clipboard',
   'WebhookHelper',
+  'NetworkService',
   function (
     $q,
     $scope,
@@ -82,7 +84,8 @@ angular.module('portainer.docker').controller('ServiceController', [
     WebhookService,
     EndpointProvider,
     clipboard,
-    WebhookHelper
+    WebhookHelper,
+    NetworkService
   ) {
     $scope.state = {
       updateInProgress: false,
@@ -210,6 +213,25 @@ angular.module('portainer.docker').controller('ServiceController', [
     $scope.updateMount = function updateMount(service) {
       updateServiceArray(service, 'ServiceMounts', service.ServiceMounts);
     };
+
+    $scope.addNetwork = function addNetwork(service) {
+      if (!service.Networks) {
+        service.Networks = [];
+      }
+      service.Networks.push({ Editable: true });
+    };
+
+    $scope.removeNetwork = function removeNetwork(service, index) {
+      var removedElement = service.Networks.splice(index, 1);
+      if (removedElement && removedElement.length && removedElement[0].Id) {
+        updateServiceArray(service, 'Networks', service.Networks);
+      }
+    };
+
+    $scope.updateNetwork = function updateNetwork(service) {
+      updateServiceArray(service, 'Networks', service.Networks);
+    };
+
     $scope.addPlacementConstraint = function addPlacementConstraint(service) {
       service.ServiceConstraints.push({ key: '', operator: '==', value: '' });
       updateServiceArray(service, 'ServiceConstraints', service.ServiceConstraints);
@@ -368,6 +390,14 @@ angular.module('portainer.docker').controller('ServiceController', [
         config.TaskTemplate.ContainerSpec.Image = image.fromImage;
       } else {
         config.TaskTemplate.ContainerSpec.Image = service.Image;
+      }
+
+      if ($scope.hasChanges(service, ['Networks'])) {
+        config.Networks = _.map(
+          _.filter(service.Networks, (item) => item.Id && item.Editable),
+          (item) => ({ Target: item.Id })
+        );
+        config.TaskTemplate.Networks = config.Networks;
       }
 
       config.TaskTemplate.ContainerSpec.Secrets = service.ServiceSecrets ? service.ServiceSecrets.map(SecretHelper.secretConfig) : [];
@@ -629,11 +659,12 @@ angular.module('portainer.docker').controller('ServiceController', [
             configs: apiVersion >= 1.3 ? ConfigService.configs() : [],
             availableImages: ImageService.images(),
             availableLoggingDrivers: PluginService.loggingPlugins(apiVersion < 1.25),
+            availableNetworks: NetworkService.networks(true, true, apiVersion >= 1.25),
             settings: SettingsService.publicSettings(),
             webhooks: WebhookService.webhooks(service.Id, EndpointProvider.endpointID()),
           });
         })
-        .then(function success(data) {
+        .then(async function success(data) {
           $scope.nodes = data.nodes;
           $scope.configs = data.configs;
           $scope.secrets = data.secrets;
@@ -642,6 +673,36 @@ angular.module('portainer.docker').controller('ServiceController', [
           $scope.availableVolumes = data.volumes;
           $scope.allowBindMounts = data.settings.AllowBindMountsForRegularUsers;
           $scope.isAdmin = Authentication.isAdmin();
+          $scope.availableNetworks = data.availableNetworks;
+          $scope.swarmNetworks = _.filter($scope.availableNetworks, (network) => network.Scope === 'swarm');
+
+          const serviceNetworks = _.uniqBy(_.concat($scope.service.Model.Spec.Networks || [], $scope.service.Model.Spec.TaskTemplate.Networks || []), 'Target');
+          const networks = _.filter(
+            _.map(serviceNetworks, ({ Target }) => _.find(data.availableNetworks, { Id: Target })),
+            Boolean
+          );
+
+          if (_.some($scope.service.Ports, (port) => port.PublishMode === 'ingress')) {
+            const ingressNetwork = _.find($scope.availableNetworks, (network) => network.Ingress);
+            if (ingressNetwork) {
+              networks.unshift(ingressNetwork);
+            }
+          }
+
+          $scope.service.Networks = await Promise.all(
+            _.map(networks, async (item) => {
+              let addr = '';
+              if (item.IPAM.Config.length) {
+                addr = item.IPAM.Config[0].Subnet;
+              } else {
+                const network = await NetworkService.network(item.Id);
+                addr = (network && network.IPAM && network.IPAM.Config && network.IPAM.Config.length && network.IPAM.Config[0].Subnet) || '';
+              }
+              return { Id: item.Id, Name: item.Name, Addr: addr, Editable: !item.Ingress };
+            })
+          );
+
+          originalService.Networks = angular.copy($scope.service.Networks);
 
           if (data.webhooks.length > 0) {
             var webhook = data.webhooks[0];
@@ -697,6 +758,11 @@ angular.module('portainer.docker').controller('ServiceController', [
         service.hasChanges = true;
       }
       previousServiceValues.push(name);
+    }
+
+    $scope.filterNetworks = filterNetworks;
+    function filterNetworks(networks, current) {
+      return networks.filter((network) => !network.Ingress && (network.Id === current.Id || $scope.service.Networks.every((serviceNetwork) => network.Id !== serviceNetwork.Id)));
     }
 
     function updateServiceArray(service, name) {
