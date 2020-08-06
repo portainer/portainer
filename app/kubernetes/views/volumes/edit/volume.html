@@ -42,19 +42,23 @@
                       <td>{{ ctrl.volume.PersistentVolumeClaim.StorageClass.Provisioner ? ctrl.volume.PersistentVolumeClaim.StorageClass.Provisioner : '-' }}</td>
                     </tr>
                     <tr>
+                      <td>Creation date</td>
+                      <td>{{ ctrl.volume.PersistentVolumeClaim.CreationDate | getisodate }}</td>
+                    </tr>
+                    <tr>
                       <td>Size</td>
                       <td ng-if="!ctrl.state.increaseSize">
                         {{ ctrl.volume.PersistentVolumeClaim.Storage }}
                         <button
                           type="button"
-                          class="btn btn-xs btn-primary"
+                          class="btn btn-sm btn-primary"
                           ng-click="ctrl.state.increaseSize = true"
                           ng-if="ctrl.volume.PersistentVolumeClaim.StorageClass.AllowVolumeExpansion"
                           >Increase size</button
                         >
                       </td>
                       <td ng-if="ctrl.state.increaseSize">
-                        <form class="form-group" name="kubernetesVolumeUpdateForm">
+                        <form name="kubernetesVolumeUpdateForm">
                           <div class="form-inline">
                             <div class="input-group input-group-sm">
                               <input
@@ -68,30 +72,34 @@
                                 required
                               />
                               <span class="input-group-addon" style="padding: 0;">
-                                <select ng-model="ctrl.state.volumeSizeUnit" ng-change="ctrl.onChangeSize()" ng-options="unit for unit in ctrl.state.availableSizeUnits"></select>
+                                <select
+                                  ng-model="ctrl.state.volumeSizeUnit"
+                                  ng-change="ctrl.onChangeSize()"
+                                  ng-options="unit for unit in ctrl.state.availableSizeUnits"
+                                  style="width: 100%; height: 100%;"
+                                ></select>
                               </span>
-                              <button type="button" class="btn btn-xs btn-primary" ng-disabled="!ctrl.sizeIsValid()" ng-click="ctrl.updateVolume()">
-                                Update volume
-                              </button>
-                              <button type="button" class="btn btn-xs btn-default" ng-click="ctrl.state.increaseSize = false">
-                                Cancel
-                              </button>
                             </div>
+                            <button type="button" class="btn btn-sm btn-primary" ng-disabled="!ctrl.sizeIsValid()" ng-click="ctrl.updateVolume()">
+                              Update size
+                            </button>
+                            <button type="button" class="btn btn-sm btn-default" ng-click="ctrl.state.increaseSize = false">
+                              Cancel
+                            </button>
                           </div>
+
                           <div class="form-inline">
                             <div class="small text-warning" style="margin-top: 5px;" ng-show="ctrl.state.volumeSizeError || kubernetesVolumeUpdateForm.size.$invalid">
                               <div ng-messages="kubernetesVolumeUpdateForm.size.$error">
                                 <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
                               </div>
-                              <p><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This value must be greater than the previous one.</p>
+                              <p ng-show="ctrl.state.volumeSizeError && !kubernetesVolumeUpdateForm.size.$invalid"
+                                ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> The new size must be greater than the actual size.</p
+                              >
                             </div>
                           </div>
                         </form>
                       </td>
-                    </tr>
-                    <tr>
-                      <td>Creation date</td>
-                      <td>{{ ctrl.volume.PersistentVolumeClaim.CreationDate | getisodate }}</td>
                     </tr>
                   </tbody>
                 </table>

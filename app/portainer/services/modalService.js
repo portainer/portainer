@@ -157,8 +157,8 @@ angular.module('portainer.app').factory('ModalService', [
         message: message,
         buttons: {
           confirm: {
-            label: 'Redeploy',
-            className: 'btn-warning',
+            label: 'Redeploy the applications',
+            className: 'btn-primary',
           },
           cancel: {
             label: "I'll do it later",

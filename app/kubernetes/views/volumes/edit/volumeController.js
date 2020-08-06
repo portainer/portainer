@@ -105,7 +105,7 @@ class KubernetesVolumeController {
 
   updateVolume() {
     this.ModalService.confirmRedeploy(
-      'The following applications are using this volume: For this change to be taken into account, applications needs to be redeployed. Do you want us to reschedule it now?',
+      'One or multiple applications are currently using this volume.</br> For the change to be taken into account these applications will need to be redeployed. Do you want us to reschedule it now?',
       (redeploy) => {
         return this.$async(this.updateVolumeAsync, redeploy);
       }
