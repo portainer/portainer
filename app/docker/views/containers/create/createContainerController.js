@@ -91,6 +91,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     $scope.state = {
       formValidationError: '',
       actionInProgress: false,
+      mode: '',
     };
 
     $scope.refreshSlider = function () {
@@ -607,6 +608,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
             $scope.formValues.AccessControlData.AccessControlEnabled = false;
           }
           $scope.fromContainer = fromContainer;
+          $scope.state.mode = 'duplicate';
           $scope.config = ContainerHelper.configFromContainer(fromContainer.Model);
           loadFromContainerCmd(d);
           loadFromContainerEntrypoint(d);
