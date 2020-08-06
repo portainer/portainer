@@ -22,6 +22,7 @@ type publicSettingsResponse struct {
 	EnableHostManagementFeatures              bool                           `json:"EnableHostManagementFeatures"`
 	EnableEdgeComputeFeatures                 bool                           `json:"EnableEdgeComputeFeatures"`
 	OAuthLoginURI                             string                         `json:"OAuthLoginURI"`
+	EnableTelemetry                           bool                           `json:"EnableTelemetry"`
 }
 
 // GET request on /api/settings/public
@@ -43,6 +44,7 @@ func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *
 		AllowContainerCapabilitiesForRegularUsers: settings.AllowContainerCapabilitiesForRegularUsers,
 		EnableHostManagementFeatures:              settings.EnableHostManagementFeatures,
 		EnableEdgeComputeFeatures:                 settings.EnableEdgeComputeFeatures,
+		EnableTelemetry:                           settings.EnableTelemetry,
 		OAuthLoginURI: fmt.Sprintf("%s?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&prompt=login",
 			settings.OAuthSettings.AuthorizationURI,
 			settings.OAuthSettings.ClientID,

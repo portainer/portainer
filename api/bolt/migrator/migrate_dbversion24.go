@@ -15,6 +15,7 @@ func (m *Migrator) updateSettingsToDB25() error {
 	}
 
 	legacySettings.UserSessionTimeout = portainer.DefaultUserSessionTimeout
+	legacySettings.EnableTelemetry = true
 
 	legacySettings.AllowContainerCapabilitiesForRegularUsers = true
 

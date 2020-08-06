@@ -11,7 +11,19 @@ angular.module('portainer.app').factory('StateManager', [
   'StatusService',
   'APPLICATION_CACHE_VALIDITY',
   'AgentPingService',
-  function StateManagerFactory($q, SystemService, InfoHelper, EndpointProvider, LocalStorage, SettingsService, StatusService, APPLICATION_CACHE_VALIDITY, AgentPingService) {
+  '$analytics',
+  function StateManagerFactory(
+    $q,
+    SystemService,
+    InfoHelper,
+    EndpointProvider,
+    LocalStorage,
+    SettingsService,
+    StatusService,
+    APPLICATION_CACHE_VALIDITY,
+    AgentPingService,
+    $analytics
+  ) {
     'use strict';
 
     var manager = {};
@@ -106,9 +118,15 @@ angular.module('portainer.app').factory('StateManager', [
       LocalStorage.storeApplicationState(state.application);
     };
 
+    manager.updateEnableTelemetry = function updateEnableTelemetry(enableTelemetry) {
+      state.application.enableTelemetry = enableTelemetry;
+      $analytics.setOptOut(!enableTelemetry);
+      LocalStorage.storeApplicationState(state.application);
+    };
+
     function assignStateFromStatusAndSettings(status, settings) {
-      state.application.analytics = status.Analytics;
       state.application.version = status.Version;
+      state.application.enableTelemetry = settings.EnableTelemetry;
       state.application.logo = settings.LogoURL;
       state.application.snapshotInterval = settings.SnapshotInterval;
       state.application.enableHostManagementFeatures = settings.EnableHostManagementFeatures;
@@ -134,6 +152,7 @@ angular.module('portainer.app').factory('StateManager', [
           var status = data.status;
           var settings = data.settings;
           assignStateFromStatusAndSettings(status, settings);
+          $analytics.setOptOut(!settings.EnableTelemetry);
           LocalStorage.storeApplicationState(state.application);
           deferred.resolve(state);
         })
@@ -176,6 +195,7 @@ angular.module('portainer.app').factory('StateManager', [
         } else {
           state.application = applicationState;
           state.loading = false;
+          $analytics.setOptOut(!state.application.enableTelemetry);
           deferred.resolve(state);
         }
       } else {

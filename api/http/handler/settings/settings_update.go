@@ -33,10 +33,11 @@ type settingsUpdatePayload struct {
 	EdgeAgentCheckinInterval                  *int
 	EnableEdgeComputeFeatures                 *bool
 	UserSessionTimeout                        *string
+	EnableTelemetry                           *bool
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
-	if *payload.AuthenticationMethod != 1 && *payload.AuthenticationMethod != 2 && *payload.AuthenticationMethod != 3 {
+	if payload.AuthenticationMethod != nil && *payload.AuthenticationMethod != 1 && *payload.AuthenticationMethod != 2 && *payload.AuthenticationMethod != 3 {
 		return errors.New("Invalid authentication method value. Value must be one of: 1 (internal), 2 (LDAP/AD) or 3 (OAuth)")
 	}
 	if payload.LogoURL != nil && *payload.LogoURL != "" && !govalidator.IsURL(*payload.LogoURL) {
@@ -162,6 +163,10 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.AllowDeviceMappingForRegularUsers != nil {
 		settings.AllowDeviceMappingForRegularUsers = *payload.AllowDeviceMappingForRegularUsers
+	}
+
+	if payload.EnableTelemetry != nil {
+		settings.EnableTelemetry = *payload.EnableTelemetry
 	}
 
 	tlsError := handler.updateTLS(settings)

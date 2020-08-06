@@ -17,6 +17,7 @@ export function SettingsViewModel(data) {
   this.EdgeAgentCheckinInterval = data.EdgeAgentCheckinInterval;
   this.EnableEdgeComputeFeatures = data.EnableEdgeComputeFeatures;
   this.UserSessionTimeout = data.UserSessionTimeout;
+  this.EnableTelemetry = data.EnableTelemetry;
 }
 
 export function PublicSettingsViewModel(settings) {
@@ -32,6 +33,7 @@ export function PublicSettingsViewModel(settings) {
   this.EnableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
   this.LogoURL = settings.LogoURL;
   this.OAuthLoginURI = settings.OAuthLoginURI;
+  this.EnableTelemetry = settings.EnableTelemetry;
 }
 
 export function LDAPSettingsViewModel(data) {

@@ -6,7 +6,6 @@ env:
 
 globals:
   angular: true
-  __CONFIG_GA_ID: true
 
 extends:
   - 'eslint:recommended'

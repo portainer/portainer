@@ -532,6 +532,7 @@ type (
 		EdgeAgentCheckinInterval                  int                  `json:"EdgeAgentCheckinInterval"`
 		EnableEdgeComputeFeatures                 bool                 `json:"EnableEdgeComputeFeatures"`
 		UserSessionTimeout                        string               `json:"UserSessionTimeout"`
+		EnableTelemetry                           bool                 `json:"EnableTelemetry"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
@@ -566,8 +567,7 @@ type (
 
 	// Status represents the application status
 	Status struct {
-		Analytics bool   `json:"Analytics"`
-		Version   string `json:"Version"`
+		Version string `json:"Version"`
 	}
 
 	// Tag represents a tag that can be associated to a resource

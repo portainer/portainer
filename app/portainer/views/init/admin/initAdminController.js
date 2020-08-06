@@ -5,16 +5,18 @@ angular.module('portainer.app').controller('InitAdminController', [
   'Notifications',
   'Authentication',
   'StateManager',
+  'SettingsService',
   'UserService',
   'EndpointService',
   'ExtensionService',
-  function ($async, $scope, $state, Notifications, Authentication, StateManager, UserService, EndpointService, ExtensionService) {
+  function ($async, $scope, $state, Notifications, Authentication, StateManager, SettingsService, UserService, EndpointService, ExtensionService) {
     $scope.logo = StateManager.getState().application.logo;
 
     $scope.formValues = {
       Username: 'admin',
       Password: '',
       ConfirmPassword: '',
+      enableTelemetry: true,
     };
 
     $scope.state = {
@@ -44,6 +46,10 @@ angular.module('portainer.app').controller('InitAdminController', [
         })
         .then(function success() {
           return retrieveAndSaveEnabledExtensions();
+        })
+        .then(function success() {
+          StateManager.updateEnableTelemetry($scope.formValues.enableTelemetry);
+          return SettingsService.update({ enableTelemetry: $scope.formValues.enableTelemetry });
         })
         .then(function () {
           return EndpointService.endpoints(0, 100);

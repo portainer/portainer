@@ -3,6 +3,9 @@ import '@babel/polyfill';
 
 import angular from 'angular';
 
+import './matomo-setup';
+import './assets/js/angulartics-matomo';
+
 import './agent';
 import './azure/_module';
 import './docker/__module';
@@ -21,7 +24,6 @@ angular.module('portainer', [
   'angularUtils.directives.dirPagination',
   'LocalStorageModule',
   'angular-jwt',
-  'angular-google-analytics',
   'angular-json-tree',
   'angular-loading-bar',
   'angular-clipboard',
@@ -37,6 +39,8 @@ angular.module('portainer', [
   'portainer.integrations',
   'rzModule',
   'moment-picker',
+  'angulartics',
+  'angulartics.matomo',
 ]);
 
 if (require) {

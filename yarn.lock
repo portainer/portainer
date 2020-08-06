@@ -1205,10 +1205,6 @@ angular-file-saver@^1.1.3:
     blob-tmp "^1.0.0"
     file-saver "^1.3.3"
 
-"angular-google-analytics@github:revolunet/angular-google-analytics#semver:~1.1.9":
-  version "1.1.8"
-  resolved "https://codeload.github.com/revolunet/angular-google-analytics/tar.gz/92768a525870bc066dcf85fbe9d9f115358a6d91"
-
 angular-json-tree@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/angular-json-tree/-/angular-json-tree-1.0.1.tgz#61b6e76ab165130335d9ec46fa572eb99604de51"
@@ -1300,6 +1296,11 @@ angularjs-slider@^6.4.0:
   version "6.7.0"
   resolved "https://registry.yarnpkg.com/angularjs-slider/-/angularjs-slider-6.7.0.tgz#eb2229311b81b79315a36e7b5eb700e128f50319"
   integrity sha512-Cizsuax65wN2Y+htmA3safE5ALOSCyWcKyWkziaO8vCVymi26bQQs6kKDhkYc8GFix/KE7Oc9gH3QLlTUgD38w==
+
+angulartics@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/angulartics/-/angulartics-1.6.0.tgz#a89c17ef8ea2334ebced65d6265951846f848172"
+  integrity sha512-fywhCi1InawcX+rpLv9NQ32Ed87KoZeH20SUIsRUz9dYJSxuk4/uxiKiopITveGxTC8THYHFEATj9Y/X+BvMqA==
 
 ansi-colors@^3.0.0, ansi-colors@^3.2.1:
   version "3.2.4"

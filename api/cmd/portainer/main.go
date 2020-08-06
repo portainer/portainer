@@ -154,8 +154,7 @@ func loadEdgeJobsFromDatabase(dataStore portainer.DataStore, reverseTunnelServic
 
 func initStatus(flags *portainer.CLIFlags) *portainer.Status {
 	return &portainer.Status{
-		Analytics: !*flags.NoAnalytics,
-		Version:   portainer.APIVersion,
+		Version: portainer.APIVersion,
 	}
 }
 
@@ -168,6 +167,7 @@ func updateSettingsFromFlags(dataStore portainer.DataStore, flags *portainer.CLI
 	settings.LogoURL = *flags.Logo
 	settings.SnapshotInterval = *flags.SnapshotInterval
 	settings.EnableEdgeComputeFeatures = *flags.EnableEdgeComputeFeatures
+	settings.EnableTelemetry = true
 
 	if *flags.Templates != "" {
 		settings.TemplatesURL = *flags.Templates

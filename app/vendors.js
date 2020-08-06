@@ -25,7 +25,6 @@ import 'angular-resource';
 import 'angular-utils-pagination';
 import 'angular-local-storage';
 import 'angular-jwt';
-import 'angular-google-analytics';
 import 'angular-json-tree';
 import 'angular-loading-bar';
 import 'angular-clipboard';
@@ -37,5 +36,6 @@ import 'js-yaml/dist/js-yaml.js';
 import 'angular-ui-bootstrap';
 import 'angular-moment-picker';
 import 'angular-multiselect/isteven-multi-select.js';
+import 'angulartics/dist/angulartics.min.js';
 
 window.angular = angular;
