@@ -61,7 +61,7 @@ class KubernetesConfigureController {
         }
       });
 
-      Promise.all(storagePromises);
+      await Promise.all(storagePromises);
 
       const endpoints = this.EndpointProvider.endpoints();
       const modifiedEndpoint = _.find(endpoints, (item) => item.Id === this.endpoint.Id);

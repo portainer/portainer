@@ -2,6 +2,7 @@ import angular from 'angular';
 import _ from 'lodash-es';
 import PortainerError from 'Portainer/error';
 import KubernetesStorageClassConverter from 'Kubernetes/converters/storageClass';
+import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
 
 class KubernetesStorageService {
   /* @ngInject */
@@ -38,9 +39,8 @@ class KubernetesStorageService {
    */
   async patchAsync(oldStorageClass, newStorageClass) {
     try {
-      const params = {
-        id: newStorageClass.Name,
-      };
+      const params = new KubernetesCommonParams();
+      params.id = newStorageClass.Name;
       const payload = KubernetesStorageClassConverter.patchPayload(oldStorageClass, newStorageClass);
       await this.KubernetesStorage().patch(params, payload).$promise;
     } catch (err) {
