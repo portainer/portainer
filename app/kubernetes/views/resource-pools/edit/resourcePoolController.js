@@ -1,7 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
-import { KubernetesResourceQuotaDefaults, KubernetesResourceQuota } from 'Kubernetes/models/resource-quota/models';
+import { KubernetesResourceQuota, KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resource-quota/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 
@@ -19,7 +19,8 @@ class KubernetesResourcePoolController {
     KubernetesEventService,
     KubernetesPodService,
     KubernetesApplicationService,
-    KubernetesNamespaceHelper
+    KubernetesNamespaceHelper,
+    ModalService
   ) {
     this.$async = $async;
     this.$state = $state;
@@ -34,6 +35,7 @@ class KubernetesResourcePoolController {
     this.KubernetesPodService = KubernetesPodService;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
+    this.ModalService = ModalService;
 
     this.onInit = this.onInit.bind(this);
     this.createResourceQuotaAsync = this.createResourceQuotaAsync.bind(this);
@@ -81,6 +83,17 @@ class KubernetesResourcePoolController {
     await this.KubernetesResourceQuotaService.create(quota);
   }
 
+  hasResourceQuotaBeenReduce() {
+    if (this.formValues.hasQuota) {
+      const cpuLimit = this.formValues.CpuLimit;
+      const memoryLimit = KubernetesResourceReservationHelper.bytesValue(this.formValues.MemoryLimit);
+      if (cpuLimit < this.oldQuota.CpuLimit || memoryLimit < this.oldQuota.MemoryLimit) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   async updateResourcePoolAsync() {
     this.state.actionInProgress = true;
     try {
@@ -112,7 +125,18 @@ class KubernetesResourcePoolController {
   }
 
   updateResourcePool() {
-    return this.$async(this.updateResourcePoolAsync);
+    if (this.hasResourceQuotaBeenReduce()) {
+      this.ModalService.confirmUpdate(
+        'Reducing the quota assigned to an "in-use" resource pool may have unintended consequences, including preventing running applications from functioning correctly and potentially even blocking them from running at all.',
+        (confirmed) => {
+          if (confirmed) {
+            return this.$async(this.updateResourcePoolAsync);
+          }
+        }
+      );
+    } else {
+      return this.$async(this.updateResourcePoolAsync);
+    }
   }
 
   hasEventWarnings() {
@@ -200,6 +224,7 @@ class KubernetesResourcePoolController {
 
       const quota = pool.Quota;
       if (quota) {
+        this.oldQuota = angular.copy(quota);
         this.formValues.hasQuota = true;
         this.formValues.CpuLimit = quota.CpuLimit;
         this.formValues.MemoryLimit = KubernetesResourceReservationHelper.megaBytesValue(quota.MemoryLimit);
