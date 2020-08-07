@@ -37,10 +37,11 @@ class KubernetesStorageService {
   /**
    * PATCH
    */
-  async patchAsync(oldStorageClass, newStorageClass) {
+  async patchAsync(endpointId, oldStorageClass, newStorageClass) {
     try {
       const params = new KubernetesCommonParams();
       params.id = newStorageClass.Name;
+      params.endpointId = endpointId;
       const payload = KubernetesStorageClassConverter.patchPayload(oldStorageClass, newStorageClass);
       await this.KubernetesStorage().patch(params, payload).$promise;
     } catch (err) {
@@ -48,8 +49,8 @@ class KubernetesStorageService {
     }
   }
 
-  patch(oldStorageClass, newStorageClass) {
-    return this.$async(this.patchAsync, oldStorageClass, newStorageClass);
+  patch(endpointId, oldStorageClass, newStorageClass) {
+    return this.$async(this.patchAsync, endpointId, oldStorageClass, newStorageClass);
   }
 }
 

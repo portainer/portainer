@@ -57,7 +57,7 @@ class KubernetesConfigureController {
       const storagePromises = _.map(classes, (storageClass) => {
         const oldStorageClass = _.find(this.oldStorageClasses, { Name: storageClass.Name });
         if (oldStorageClass) {
-          return this.KubernetesStorageService.patch(oldStorageClass, storageClass);
+          return this.KubernetesStorageService.patch(this.state.endpointId, oldStorageClass, storageClass);
         }
       });
 
@@ -89,6 +89,7 @@ class KubernetesConfigureController {
       actionInProgress: false,
       displayConfigureClassPanel: {},
       viewReady: false,
+      endpointId: this.$stateParams.id,
     };
 
     this.formValues = {
@@ -97,8 +98,7 @@ class KubernetesConfigureController {
     };
 
     try {
-      const endpointId = this.$stateParams.id;
-      [this.StorageClasses, this.endpoint] = await Promise.all([this.KubernetesStorageService.get(endpointId), this.EndpointService.endpoint(endpointId)]);
+      [this.StorageClasses, this.endpoint] = await Promise.all([this.KubernetesStorageService.get(this.state.endpointId), this.EndpointService.endpoint(this.state.endpointId)]);
       _.forEach(this.StorageClasses, (item) => {
         item.availableAccessModes = new KubernetesStorageClassAccessPolicies();
         const storage = _.find(this.endpoint.Kubernetes.Configuration.StorageClasses, (sc) => sc.Name === item.Name);
