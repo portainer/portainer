@@ -220,6 +220,7 @@ angular.module('portainer.docker').factory('ContainerHelper', [
             const portKeySplit = _.split(portKey, '/');
             const containerPort = parseInt(portKeySplit[0]);
             const portBinding = portBindings[portKey][0];
+            portBindings[portKey].shift();
             const hostPort = parsePort(portBinding.HostPort);
 
             // We only combine single ports, and skip the host port ranges on one container port
