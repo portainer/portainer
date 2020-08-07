@@ -72,9 +72,9 @@ body,
 
 input[type='checkbox'] {
   vertical-align: middle;
-  transform: scale(2);
-  margin-left: 4px;
-  margin-bottom: 4px;
+  transform: scale(1.5);
+  margin-left: 1px;
+  margin-bottom: 5px;
 }
 
 a[ng-click] {
