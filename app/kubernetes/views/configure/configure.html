@@ -71,7 +71,7 @@
               <span class="col-sm-12 text-muted small">
                 <p>
                   Select which storage options will be available for use when deploying applications. Have a look at your storage driver documentation to figure out which access
-                  policy to configure.
+                  policy to configure and if the volume expansion capability is supported.
                 </p>
                 <p>
                   You can find more information about access modes
@@ -87,6 +87,7 @@
                     <tr class="text-muted">
                       <td>Storage</td>
                       <td>Shared access policy</td>
+                      <td>Volume expansion</td>
                     </tr>
                     <tr ng-repeat="class in ctrl.StorageClasses">
                       <td>
@@ -108,6 +109,11 @@
                           translation="{nothingSelected: 'Not configured'}"
                         >
                         </span>
+                      </td>
+                      <td>
+                        <div style="margin: 5px;">
+                          <label class="switch"><input type="checkbox" ng-model="class.AllowVolumeExpansion" /><i></i> </label>
+                        </div>
                       </td>
                     </tr>
                   </tbody>

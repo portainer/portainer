@@ -319,8 +319,8 @@
                 </span>
               </div>
 
-              <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-                <div ng-repeat-start="persistedFolder in ctrl.formValues.PersistedFolders" style="margin-top: 2px;">
+              <div class="col-sm-12 form-inline" style="margin-top: 10px;" ng-repeat="persistedFolder in ctrl.formValues.PersistedFolders">
+                <div style="margin-top: 2px;">
                   <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: persistedFolder.NeedsDeletion }">
                     <span class="input-group-addon">path in container</span>
                     <input
@@ -329,12 +329,38 @@
                       name="persisted_folder_path_{{ $index }}"
                       ng-model="persistedFolder.ContainerPath"
                       ng-change="ctrl.onChangePersistedFolderPath($index)"
+                      ng-disabled="ctrl.isEditAndExistingPersistedFolder($index)"
                       placeholder="/data"
                       required
                     />
                   </div>
 
-                  <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: persistedFolder.NeedsDeletion }">
+                  <div class="input-group col-sm-2 input-group-sm">
+                    <span
+                      class="btn-group btn-group-sm"
+                      ng-class="{ striked: persistedFolder.NeedsDeletion }"
+                      ng-if="!ctrl.isEditAndExistingPersistedFolder($index) && ctrl.application.ApplicationType !== ctrl.ApplicationTypes.STATEFULSET"
+                    >
+                      <label
+                        class="btn btn-primary"
+                        ng-model="persistedFolder.UseNewVolume"
+                        uib-btn-radio="true"
+                        ng-change="ctrl.useNewVolume($index)"
+                        ng-disabled="ctrl.isEditAndExistingPersistedFolder($index)"
+                        >New volume</label
+                      >
+                      <label
+                        class="btn btn-primary"
+                        ng-model="persistedFolder.UseNewVolume"
+                        uib-btn-radio="false"
+                        ng-change="ctrl.useExistingVolume($index)"
+                        ng-disabled="ctrl.availableVolumes.length === 0 || ctrl.application.ApplicationType === ctrl.ApplicationTypes.STATEFULSET"
+                        >Use an existing volume</label
+                      >
+                    </span>
+                  </div>
+
+                  <div class="input-group col-sm-2 input-group-sm" ng-class="{ striked: persistedFolder.NeedsDeletion }" ng-if="persistedFolder.UseNewVolume">
                     <span class="input-group-addon">requested size</span>
                     <input
                       type="number"
@@ -356,7 +382,12 @@
                     </span>
                   </div>
 
-                  <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: persistedFolder.NeedsDeletion }" style="vertical-align: top;">
+                  <div
+                    class="input-group col-sm-3 input-group-sm"
+                    ng-class="{ striked: persistedFolder.NeedsDeletion }"
+                    style="vertical-align: top;"
+                    ng-if="persistedFolder.UseNewVolume"
+                  >
                     <span class="input-group-addon">storage</span>
                     <select
                       ng-if="ctrl.hasMultipleStorageClassesAvailable()"
@@ -368,22 +399,40 @@
                     <input ng-if="!ctrl.hasMultipleStorageClassesAvailable()" type="text" class="form-control" disabled ng-model="persistedFolder.StorageClass.Name" />
                   </div>
 
-                  <div class="input-group col-sm-1 input-group-sm" style="vertical-align: top;" ng-if="!ctrl.isEditAndStatefulSet()">
-                    <button ng-if="!persistedFolder.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removePersistedFolder($index)">
-                      <i class="fa fa-times" aria-hidden="true"></i>
-                    </button>
-                    <button ng-if="persistedFolder.NeedsDeletion" class="btn btn-sm btn-primary" type="button" ng-click="ctrl.restorePersistedFolder($index)">
-                      Restore
-                    </button>
+                  <div class="input-group col-sm-5 input-group-sm" ng-if="!persistedFolder.UseNewVolume" ng-class="{ striked: persistedFolder.NeedsDeletion }">
+                    <span class="input-group-addon">volume</span>
+                    <select
+                      class="form-control"
+                      name="existing_volumes_{{ $index }}"
+                      ng-model="ctrl.formValues.PersistedFolders[$index].ExistingVolume"
+                      ng-options="vol as vol.PersistentVolumeClaim.Name for vol in ctrl.availableVolumes"
+                      ng-change="ctrl.onChangeExistingVolumeSelection()"
+                      ng-disabled="ctrl.isEditAndExistingPersistedFolder($index)"
+                      required
+                    >
+                      <option selected disabled hidden value="">Select a volume</option>
+                    </select>
+                  </div>
+
+                  <div class="input-group col-sm-1 input-group-sm">
+                    <div style="vertical-align: top;" ng-if="!ctrl.isEditAndStatefulSet()" ng-if="!ctrl.state.useExistingVolume[$index]">
+                      <button ng-if="!persistedFolder.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removePersistedFolder($index)">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                      </button>
+                      <button ng-if="persistedFolder.NeedsDeletion" class="btn btn-sm btn-primary" type="button" ng-click="ctrl.restorePersistedFolder($index)">
+                        Restore
+                      </button>
+                    </div>
                   </div>
                 </div>
 
                 <div
-                  ng-repeat-end
                   ng-show="
                     kubernetesApplicationCreationForm['persisted_folder_path_' + $index].$invalid ||
                     ctrl.state.duplicatePersistedFolderPaths[$index] !== undefined ||
-                    kubernetesApplicationCreationForm['persisted_folder_size_' + $index].$invalid
+                    kubernetesApplicationCreationForm['persisted_folder_size_' + $index].$invalid ||
+                    kubernetesApplicationCreationForm['existing_volumes_' + $index].$invalid ||
+                    ctrl.state.duplicateExistingVolumes[$index] !== undefined
                   "
                 >
                   <div class="input-group col-sm-3 input-group-sm">
@@ -401,12 +450,25 @@
                     </div>
                   </div>
 
-                  <div class="input-group col-sm-3 input-group-sm">
+                  <div class="input-group col-sm-2 input-group-sm"></div>
+
+                  <div class="input-group col-sm-2 input-group-sm">
                     <div class="small text-warning" style="margin-top: 5px;" ng-show="kubernetesApplicationCreationForm['persisted_folder_size_' + $index].$invalid">
                       <ng-messages for="kubernetesApplicationCreationForm['persisted_folder_size_' + $index].$error">
                         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Size is required.</p>
                         <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This value must be greater than zero.</p>
                       </ng-messages>
+                    </div>
+                    <div
+                      class="small text-warning"
+                      ng-show="kubernetesApplicationCreationForm['existing_volumes_' + $index].$invalid || ctrl.state.duplicateExistingVolumes[$index] !== undefined"
+                    >
+                      <ng-messages for="kubernetesApplicationCreationForm['existing_volumes_' + $index].$error">
+                        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Volume is required.</p>
+                      </ng-messages>
+                      <p ng-if="ctrl.state.duplicateExistingVolumes[$index] !== undefined"
+                        ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This volume is already used.</p
+                      >
                     </div>
                   </div>
 
@@ -467,7 +529,12 @@
                       <p>All the instances of this application will use the same data</p>
                     </label>
                   </div>
-                  <div ng-if="!ctrl.state.isEdit || (ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.ISOLATED)">
+                  <div
+                    ng-if="
+                      (!ctrl.state.isEdit && !ctrl.state.PersistedFoldersUseExistingVolumes) ||
+                      (ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.ISOLATED)
+                    "
+                  >
                     <input
                       type="radio"
                       id="data_access_isolated"
@@ -483,7 +550,10 @@
                       <p>Every instance of this application will use their own data</p>
                     </label>
                   </div>
-                  <div style="color: #767676;" ng-if="ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.SHARED">
+                  <div
+                    style="color: #767676;"
+                    ng-if="(ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.SHARED) || ctrl.state.PersistedFoldersUseExistingVolumes"
+                  >
                     <input type="radio" id="data_access_isolated" disabled />
                     <label
                       for="data_access_isolated"

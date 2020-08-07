@@ -150,6 +150,24 @@ angular.module('portainer.app').factory('ModalService', [
       });
     };
 
+    service.confirmRedeploy = function (message, callback) {
+      message = $sanitize(message);
+      service.confirm({
+        title: '',
+        message: message,
+        buttons: {
+          confirm: {
+            label: 'Redeploy the applications',
+            className: 'btn-primary',
+          },
+          cancel: {
+            label: "I'll do it later",
+          },
+        },
+        callback: callback,
+      });
+    };
+
     service.confirmDeletionAsync = function confirmDeletionAsync(message) {
       return new Promise((resolve) => {
         service.confirmDeletion(message, (confirmed) => resolve(confirmed));

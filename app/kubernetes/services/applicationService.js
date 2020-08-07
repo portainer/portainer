@@ -209,7 +209,7 @@ class KubernetesApplicationService {
         app.ServiceName = headlessService.metadata.name;
       } else {
         const claimPromises = _.map(claims, (item) => {
-          if (!item.PreviousName) {
+          if (!item.PreviousName && !item.Id) {
             return this.KubernetesPersistentVolumeClaimService.create(item);
           }
         });
@@ -255,11 +255,12 @@ class KubernetesApplicationService {
         await this.KubernetesServiceService.patch(oldHeadlessService, newHeadlessService);
       } else {
         const claimPromises = _.map(newClaims, (newClaim) => {
-          if (!newClaim.PreviousName) {
+          if (!newClaim.PreviousName && !newClaim.Id) {
             return this.KubernetesPersistentVolumeClaimService.create(newClaim);
+          } else if (!newClaim.Id) {
+            const oldClaim = _.find(oldClaims, { Name: newClaim.PreviousName });
+            return this.KubernetesPersistentVolumeClaimService.patch(oldClaim, newClaim);
           }
-          const oldClaim = _.find(oldClaims, { Name: newClaim.PreviousName });
-          return this.KubernetesPersistentVolumeClaimService.patch(oldClaim, newClaim);
         });
         await Promise.all(claimPromises);
       }

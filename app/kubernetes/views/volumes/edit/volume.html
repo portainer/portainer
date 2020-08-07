@@ -42,12 +42,64 @@
                       <td>{{ ctrl.volume.PersistentVolumeClaim.StorageClass.Provisioner ? ctrl.volume.PersistentVolumeClaim.StorageClass.Provisioner : '-' }}</td>
                     </tr>
                     <tr>
-                      <td>Size</td>
-                      <td>{{ ctrl.volume.PersistentVolumeClaim.Storage }}</td>
-                    </tr>
-                    <tr>
                       <td>Creation date</td>
                       <td>{{ ctrl.volume.PersistentVolumeClaim.CreationDate | getisodate }}</td>
+                    </tr>
+                    <tr>
+                      <td>Size</td>
+                      <td ng-if="!ctrl.state.increaseSize">
+                        {{ ctrl.volume.PersistentVolumeClaim.Storage }}
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-primary"
+                          ng-click="ctrl.state.increaseSize = true"
+                          ng-if="ctrl.volume.PersistentVolumeClaim.StorageClass.AllowVolumeExpansion"
+                          >Increase size</button
+                        >
+                      </td>
+                      <td ng-if="ctrl.state.increaseSize">
+                        <form name="kubernetesVolumeUpdateForm">
+                          <div class="form-inline">
+                            <div class="input-group input-group-sm">
+                              <input
+                                type="number"
+                                class="form-control"
+                                name="size"
+                                ng-model="ctrl.state.volumeSize"
+                                placeholder="20"
+                                ng-min="0"
+                                ng-change="ctrl.onChangeSize()"
+                                required
+                              />
+                              <span class="input-group-addon" style="padding: 0;">
+                                <select
+                                  ng-model="ctrl.state.volumeSizeUnit"
+                                  ng-change="ctrl.onChangeSize()"
+                                  ng-options="unit for unit in ctrl.state.availableSizeUnits"
+                                  style="width: 100%; height: 100%;"
+                                ></select>
+                              </span>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-primary" ng-disabled="!ctrl.sizeIsValid()" ng-click="ctrl.updateVolume()">
+                              Update size
+                            </button>
+                            <button type="button" class="btn btn-sm btn-default" ng-click="ctrl.state.increaseSize = false">
+                              Cancel
+                            </button>
+                          </div>
+
+                          <div class="form-inline">
+                            <div class="small text-warning" style="margin-top: 5px;" ng-show="ctrl.state.volumeSizeError || kubernetesVolumeUpdateForm.size.$invalid">
+                              <div ng-messages="kubernetesVolumeUpdateForm.size.$error">
+                                <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                              </div>
+                              <p ng-show="ctrl.state.volumeSizeError && !kubernetesVolumeUpdateForm.size.$invalid"
+                                ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> The new size must be greater than the actual size.</p
+                              >
+                            </div>
+                          </div>
+                        </form>
+                      </td>
                     </tr>
                   </tbody>
                 </table>
