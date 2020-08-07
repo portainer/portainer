@@ -18,7 +18,8 @@ class KubernetesResourcePoolController {
     KubernetesResourcePoolService,
     KubernetesEventService,
     KubernetesPodService,
-    KubernetesApplicationService
+    KubernetesApplicationService,
+    KubernetesNamespaceHelper
   ) {
     this.$async = $async;
     this.$state = $state;
@@ -32,6 +33,7 @@ class KubernetesResourcePoolController {
     this.KubernetesEventService = KubernetesEventService;
     this.KubernetesPodService = KubernetesPodService;
     this.KubernetesApplicationService = KubernetesApplicationService;
+    this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
 
     this.onInit = this.onInit.bind(this);
     this.createResourceQuotaAsync = this.createResourceQuotaAsync.bind(this);
@@ -204,6 +206,11 @@ class KubernetesResourcePoolController {
 
         this.state.cpuUsed = quota.CpuLimitUsed;
         this.state.memoryUsed = KubernetesResourceReservationHelper.megaBytesValue(quota.MemoryLimitUsed);
+      }
+
+      this.isEditable = !this.KubernetesNamespaceHelper.isSystemNamespace(this.pool.Namespace.Name);
+      if (this.pool.Namespace.Name === 'default') {
+        this.isEditable = false;
       }
 
       await this.getEvents();
