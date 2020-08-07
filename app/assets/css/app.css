@@ -71,8 +71,10 @@ body,
 }
 
 input[type='checkbox'] {
-  margin-top: 1px;
   vertical-align: middle;
+  transform: scale(2);
+  margin-left: 4px;
+  margin-bottom: 4px;
 }
 
 a[ng-click] {
