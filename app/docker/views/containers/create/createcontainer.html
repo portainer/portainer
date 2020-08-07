@@ -3,6 +3,16 @@
   <rd-header-content> <a ui-sref="docker.containers">Containers</a> &gt; Add container </rd-header-content>
 </rd-header>
 
+<information-panel title-text="Caution" ng-if="state.mode == 'duplicate'">
+  <span class="small">
+    <p class="text-muted">
+      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      The new container may fail to start if the image is changed, and settings from the previous container aren't compatible. Common causes include entrypoint, cmd or
+      <a href="http://portainer.readthedocs.io/en/stable/agent.html" target="_blank">other settings</a> set by an image.
+    </p>
+  </span>
+</information-panel>
+
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
@@ -35,6 +45,7 @@
               auto-complete="true"
               label-class="col-sm-1"
               input-class="col-sm-11"
+              on-image-change="onImageNameChange()"
             ></por-image-registry>
             <!-- !image-and-registry -->
             <!-- always-pull -->
@@ -192,15 +203,47 @@
               <div class="form-group">
                 <label for="container_command" class="col-sm-2 col-lg-1 control-label text-left">Command</label>
                 <div class="col-sm-9">
-                  <input type="text" class="form-control" ng-model="config.Cmd" id="container_command" placeholder="e.g. /usr/bin/nginx -t -c /mynginx.conf" />
+                  <div class="input-group">
+                    <div class="input-group-btn">
+                      <button class="btn btn-primary" ng-model="formValues.CmdMode" uib-btn-radio="'default'" style="margin-left: 0px;"> Default</button>
+                      <button class="btn btn-primary" ng-model="formValues.CmdMode" uib-btn-radio="'override'">Override</button>
+                    </div>
+                    <input
+                      type="text"
+                      class="form-control"
+                      ng-model="config.Cmd"
+                      ng-disabled="formValues.CmdMode === 'default'"
+                      id="container_command"
+                      placeholder="e.g. '-logtostderr' '--housekeeping_interval=5s' or /usr/bin/nginx -t -c /mynginx.conf"
+                    />
+                  </div>
                 </div>
               </div>
               <!-- !command-input -->
               <!-- entrypoint-input -->
               <div class="form-group">
-                <label for="container_entrypoint" class="col-sm-2 col-lg-1 control-label text-left">Entry Point</label>
+                <label for="container_entrypoint" class="col-sm-2 col-lg-1 control-label text-left">
+                  Entrypoint
+                  <portainer-tooltip
+                    position="bottom"
+                    message="When container entrypoint is entered as part of the Command field, set Entrypoint to Override mode and leave blank, else it will revert to default."
+                  ></portainer-tooltip>
+                </label>
                 <div class="col-sm-9">
-                  <input type="text" class="form-control" ng-model="config.Entrypoint" id="container_entrypoint" placeholder="e.g. /bin/sh -c" />
+                  <div class="input-group">
+                    <div class="input-group-btn">
+                      <label class="btn btn-primary" ng-model="formValues.EntrypointMode" uib-btn-radio="'default'" style="margin-left: 0px;"> Default</label>
+                      <label class="btn btn-primary" ng-model="formValues.EntrypointMode" uib-btn-radio="'override'">Override</label>
+                    </div>
+                    <input
+                      type="text"
+                      class="form-control"
+                      ng-model="config.Entrypoint"
+                      ng-disabled="formValues.EntrypointMode === 'default'"
+                      id="container_entrypoint"
+                      placeholder="e.g. /bin/sh -c"
+                    />
+                  </div>
                 </div>
               </div>
               <!-- !entrypoint-input -->
