@@ -72,8 +72,10 @@ body,
 
 input[type='checkbox'] {
   vertical-align: middle;
-  transform: scale(1.5);
-  margin-left: 1px;
+  -moz-transform: scale(1.8);
+  -webkit-transform: scale(1.8);
+  -o-transform: scale(1.8);
+  margin-left: 2px;
   margin-bottom: 5px;
 }
 
