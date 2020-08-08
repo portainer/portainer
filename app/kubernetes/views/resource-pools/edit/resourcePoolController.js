@@ -89,7 +89,7 @@ class KubernetesResourcePoolController {
   }
 
   hasResourceQuotaBeenReduced() {
-    if (this.formValues.HasQuota) {
+    if (this.formValues.HasQuota && this.oldQuota) {
       const cpuLimit = this.formValues.CpuLimit;
       const memoryLimit = KubernetesResourceReservationHelper.bytesValue(this.formValues.MemoryLimit);
       if (cpuLimit < this.oldQuota.CpuLimit || memoryLimit < this.oldQuota.MemoryLimit) {
@@ -143,34 +143,32 @@ class KubernetesResourcePoolController {
   }
 
   updateResourcePool() {
-    const statuses = {
-      quota: true,
-      ingresses: true
-    }
-    if (this.hasResourceQuotaBeenReduced()) {
-      this.ModalService.confirmUpdate(
-        'Reducing the quota assigned to an "in-use" resource pool may have unintended consequences, including preventing running applications from functioning correctly and potentially even blocking them from running at all.',
-        (confirmed) => statuses.quota = confirmed);
-    }
-    if (!statuses.quota) {
-      return;
-    }
-
     const willBeDeleted = _.filter(this.formValues.IngressClasses, (c) => {
       const deleteOne = this.formValues.UseIngress && c.Selected === false && c.WasSelected === true;
       const deleteAll = !this.formValues.UseIngress && c.WasSelected === true;
       return deleteOne || deleteAll;
     });
-    if (willBeDeleted.length !== 0) {
-      this.ModalService.confirmUpdate(
-        'Deactivating ingresses may cause applications to be unaccessible. All ingress configurations from affected applications will be removed. Do you wish to continue?',
-        (confirmed) => statuses.ingresses = confirmed);
-    }
+    const warnings = {
+      quota: this.hasResourceQuotaBeenReduced(),
+      ingress: willBeDeleted.length !== 0,
+    };
 
-    if (statuses.quota && statuses.ingresses) {
+    if (warnings.quota || warnings.ingress) {
+      const messages = {
+        quota:
+          'Reducing the quota assigned to an "in-use" resource pool may have unintended consequences, including preventing running applications from functioning correctly and potentially even blocking them from running at all.',
+        ingress: 'Deactivating ingresses may cause applications to be unaccessible. All ingress configurations from affected applications will be removed.',
+      };
+      const displayedMessage = `${warnings.quota ? messages.quota : ''}${warnings.quota && warnings.ingress ? '<br/><br/>' : ''}
+      ${warnings.ingress ? messages.ingress : ''}<br/><br/>Do you wish to continue?`;
+      this.ModalService.confirmUpdate(displayedMessage, (confirmed) => {
+        if (confirmed) {
+          return this.$async(this.updateResourcePoolAsync);
+        }
+      });
+    } else {
       return this.$async(this.updateResourcePoolAsync);
     }
-    return;
   }
 
   hasEventWarnings() {
