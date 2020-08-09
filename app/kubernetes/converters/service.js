@@ -1,4 +1,4 @@
-import _ from 'lodash-es';
+import * as _ from 'lodash-es';
 import * as JsonPatch from 'fast-json-patch';
 
 import { KubernetesServiceCreatePayload } from 'Kubernetes/models/service/payloads';
@@ -11,20 +11,23 @@ import { KubernetesServiceHeadlessClusterIP, KubernetesService, KubernetesServic
 import { KubernetesApplicationPublishingTypes } from 'Kubernetes/models/application/models';
 import KubernetesServiceHelper from 'Kubernetes/helpers/serviceHelper';
 
-function _publishedPortToServicePort(name, publishedPort, type) {
-  const res = new KubernetesServicePort();
-  res.name = _.toLower(name + '-' + publishedPort.ContainerPort + '-' + publishedPort.Protocol);
-  res.port = type === KubernetesServiceTypes.LOAD_BALANCER ? publishedPort.LoadBalancerPort : publishedPort.ContainerPort;
-  res.targetPort = publishedPort.ContainerPort;
-  res.protocol = publishedPort.Protocol;
-  if (type === KubernetesServiceTypes.NODE_PORT && publishedPort.NodePort) {
-    res.nodePort = publishedPort.NodePort;
-  } else if (type === KubernetesServiceTypes.LOAD_BALANCER && publishedPort.LoadBalancerNodePort) {
-    res.nodePort = publishedPort.LoadBalancerNodePort;
-  } else {
-    delete res.nodePort;
+function _publishedPortToServicePort(formValues, publishedPort, type) {
+  if (publishedPort.IsNew || !publishedPort.NeedsDeletion) {
+    const name = formValues.Name;
+    const res = new KubernetesServicePort();
+    res.name = _.toLower(name + '-' + publishedPort.ContainerPort + '-' + publishedPort.Protocol);
+    res.port = type === KubernetesServiceTypes.LOAD_BALANCER ? publishedPort.LoadBalancerPort : publishedPort.ContainerPort;
+    res.targetPort = publishedPort.ContainerPort;
+    res.protocol = publishedPort.Protocol;
+    if (type === KubernetesServiceTypes.NODE_PORT && publishedPort.NodePort) {
+      res.nodePort = publishedPort.NodePort;
+    } else if (type === KubernetesServiceTypes.LOAD_BALANCER && publishedPort.LoadBalancerNodePort) {
+      res.nodePort = publishedPort.LoadBalancerNodePort;
+    } else {
+      delete res.nodePort;
+    }
+    return res;
   }
-  return res;
 }
 
 class KubernetesServiceConverter {
@@ -44,7 +47,8 @@ class KubernetesServiceConverter {
     } else if (formValues.PublishingType === KubernetesApplicationPublishingTypes.LOAD_BALANCER) {
       res.Type = KubernetesServiceTypes.LOAD_BALANCER;
     }
-    res.Ports = _.map(formValues.PublishedPorts, (item) => _publishedPortToServicePort(formValues.Name, item, res.Type));
+    const ports = _.map(formValues.PublishedPorts, (item) => _publishedPortToServicePort(formValues, item, res.Type));
+    res.Ports = _.uniqBy(_.without(ports, undefined), (p) => p.targetPort + p.protocol);
     return res;
   }
 

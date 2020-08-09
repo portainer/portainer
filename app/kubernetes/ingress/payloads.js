@@ -5,7 +5,7 @@ export function KubernetesIngressCreatePayload() {
     metadata: new KubernetesCommonMetadataPayload(),
     spec: {
       backend: {
-        serviceName: 'empty',
+        serviceName: 'portainer-empty-default-backend',
         servicePort: 1,
       },
       rules: [],

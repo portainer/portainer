@@ -16,6 +16,7 @@ import { KubernetesHorizontalPodAutoScalerConverter } from 'Kubernetes/horizonta
 import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
 
 class KubernetesApplicationService {
+  /* #region  CONSTRUCTOR */
   /* @ngInject */
   constructor(
     $async,
@@ -54,10 +55,9 @@ class KubernetesApplicationService {
     this.rollbackAsync = this.rollbackAsync.bind(this);
     this.deleteAsync = this.deleteAsync.bind(this);
   }
+  /* #endregion */
 
-  /**
-   * UTILS
-   */
+  /* #region  UTILS */
   _getApplicationApiService(app) {
     let apiService;
     if (app instanceof KubernetesDeployment || (app instanceof KubernetesApplication && app.ApplicationType === KubernetesApplicationTypes.DEPLOYMENT)) {
@@ -72,9 +72,15 @@ class KubernetesApplicationService {
     return apiService;
   }
 
-  /**
-   * GET
-   */
+  _generateIngressPatchPromises(oldIngresses, newIngresses) {
+    return _.map(newIngresses, (newIng) => {
+      const oldIng = _.find(oldIngresses, { Name: newIng.Name });
+      return this.KubernetesIngressService.patch(oldIng, newIng);
+    });
+  }
+  /* #endregion */
+
+  /* #region  GET */
   async getAsync(namespace, name) {
     try {
       const [deployment, daemonSet, statefulSet, pods, autoScalers, ingresses] = await Promise.allSettled([
@@ -186,10 +192,9 @@ class KubernetesApplicationService {
     }
     return this.$async(this.getAllAsync, namespace);
   }
+  /* #endregion */
 
-  /**
-   * CREATE
-   */
+  /* #region  CREATE */
   // TODO: review
   // resource creation flow
   // should we keep formValues > Resource_1 || Resource_2
@@ -201,12 +206,8 @@ class KubernetesApplicationService {
       if (service) {
         await this.KubernetesServiceService.create(service);
         if (formValues.PublishingType === KubernetesApplicationPublishingTypes.INGRESS) {
-          const ingresses = KubernetesIngressConverter.applicationFormValuesToIngresses(formValues, service);
-          const ingressPromises = _.map(ingresses, (ingress) => {
-            const original = _.find(formValues.OriginalIngresses, { Name: ingress.Name });
-            return this.KubernetesIngressService.patch(original, ingress);
-          });
-          await Promise.all(ingressPromises);
+          const ingresses = KubernetesIngressConverter.applicationFormValuesToIngresses(formValues, service.Name);
+          await Promise.all(this._generateIngressPatchPromises(formValues.OriginalIngresses, ingresses));
         }
       }
 
@@ -240,10 +241,9 @@ class KubernetesApplicationService {
   create(formValues) {
     return this.$async(this.createAsync, formValues);
   }
+  /* #endregion */
 
-  /**
-   * PATCH
-   */
+  /* #region  PATCH */
   // this function accepts KubernetesApplicationFormValues as parameters
   async patchAsync(oldFormValues, newFormValues) {
     try {
@@ -278,10 +278,23 @@ class KubernetesApplicationService {
 
       if (oldService && newService) {
         await this.KubernetesServiceService.patch(oldService, newService);
+        if (newFormValues.PublishingType === KubernetesApplicationPublishingTypes.INGRESS || oldFormValues.PublishingType === KubernetesApplicationPublishingTypes.INGRESS) {
+          const oldIngresses = KubernetesIngressConverter.applicationFormValuesToIngresses(oldFormValues, oldService.Name);
+          const newIngresses = KubernetesIngressConverter.applicationFormValuesToIngresses(newFormValues, newService.Name);
+          await Promise.all(this._generateIngressPatchPromises(oldIngresses, newIngresses));
+        }
       } else if (!oldService && newService) {
         await this.KubernetesServiceService.create(newService);
+        if (newFormValues.PublishingType === KubernetesApplicationPublishingTypes.INGRESS) {
+          const ingresses = KubernetesIngressConverter.applicationFormValuesToIngresses(newFormValues, newService.Name);
+          await Promise.all(this._generateIngressPatchPromises(newFormValues.OriginalIngresses, ingresses));
+        }
       } else if (oldService && !newService) {
         await this.KubernetesServiceService.delete(oldService);
+        if (oldFormValues.PublishingType === KubernetesApplicationPublishingTypes.INGRESS) {
+          const ingresses = KubernetesIngressConverter.applicationFormValuesToIngresses(newFormValues, oldService.Name);
+          await Promise.all(this._generateIngressPatchPromises(oldFormValues.OriginalIngresses, ingresses));
+        }
       }
 
       const newKind = KubernetesHorizontalPodAutoScalerHelper.getApplicationTypeString(newApp);
@@ -336,10 +349,9 @@ class KubernetesApplicationService {
     }
     return this.$async(this.patchAsync, oldValues, newValues);
   }
+  /* #endregion */
 
-  /**
-   * DELETE
-   */
+  /* #region  DELETE */
   async deleteAsync(application) {
     try {
       const payload = {
@@ -360,8 +372,18 @@ class KubernetesApplicationService {
 
       if (application.ServiceType) {
         await this.KubernetesServiceService.delete(servicePayload);
+        const isIngress = _.filter(application.PublishedPorts, (p) => p.IngressRules.length).length;
+        if (isIngress) {
+          const originalIngresses = await this.KubernetesIngressService.get(payload.Namespace);
+          const formValues = {
+            OriginalIngresses: originalIngresses,
+            PublishedPorts: KubernetesApplicationHelper.generatePublishedPortsFormValuesFromPublishedPorts(application.ServiceType, application.PublishedPorts),
+          };
+          _.forEach(formValues.PublishedPorts, (p) => (p.NeedsDeletion = true));
+          const ingresses = KubernetesIngressConverter.applicationFormValuesToIngresses(formValues, servicePayload.Name);
+          await Promise.all(this._generateIngressPatchPromises(formValues.OriginalIngresses, ingresses));
+        }
       }
-
       if (!_.isEmpty(application.AutoScaler)) {
         await this.KubernetesHorizontalPodAutoScalerService.delete(application.AutoScaler);
       }
@@ -373,10 +395,9 @@ class KubernetesApplicationService {
   delete(application) {
     return this.$async(this.deleteAsync, application);
   }
+  /* #endregion */
 
-  /**
-   * ROLLBACK
-   */
+  /* #region  ROLLBACK */
   async rollbackAsync(application, targetRevision) {
     try {
       const payload = KubernetesApplicationRollbackHelper.getPatchPayload(application, targetRevision);
@@ -390,6 +411,7 @@ class KubernetesApplicationService {
   rollback(application, targetRevision) {
     return this.$async(this.rollbackAsync, application, targetRevision);
   }
+  /* #endregion */
 }
 
 export default KubernetesApplicationService;

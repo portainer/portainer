@@ -1,8 +1,6 @@
 import * as _ from 'lodash-es';
 import * as JsonPatch from 'fast-json-patch';
 
-import { KubernetesApplicationPublishingTypes } from 'Kubernetes/models/application/models';
-
 import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
 import { KubernetesIngressRule, KubernetesIngress } from './models';
 import { KubernetesIngressCreatePayload, KubernetesIngressRuleCreatePayload, KubernetesIngressRulePathCreatePayload } from './payloads';
@@ -34,48 +32,24 @@ export class KubernetesIngressConverter {
     return res;
   }
 
-  // REFACTOR
-  static applicationFormValuesToIngresses(formValues, service) {
+  static applicationFormValuesToIngresses(formValues, serviceName) {
     const ingresses = angular.copy(formValues.OriginalIngresses);
     _.forEach(formValues.PublishedPorts, (p) => {
-      console.log(p)
       const ingress = _.find(ingresses, { Name: p.IngressName });
       if (ingress && p.NeedsDeletion) {
-        const rule = _.find(ingress.Rules, { Port: p.ContainerPort, ServiceName: service.Name, Path: p.IngressRoute });
+        const rule = _.find(ingress.Rules, { Port: p.ContainerPort, ServiceName: serviceName, Path: p.IngressRoute });
         _.remove(ingress.Rules, rule);
       } else if (ingress && p.IsNew) {
         const rule = new KubernetesIngressRule();
         rule.ParentIngressName = ingress.Name;
-        rule.ServiceName = service.Name;
+        rule.ServiceName = serviceName;
         rule.Port = p.ContainerPort;
         rule.Path = p.IngressRoute;
         ingress.Rules.push(rule);
       }
-    })
+    });
     return ingresses;
   }
-  // static applicationFormValuesToIngresses(formValues, service) {
-  //   let ingresses = [];
-  //   if (formValues.PublishingType === KubernetesApplicationPublishingTypes.INGRESS && service) {
-  //     ingresses = _.map(formValues.PublishedPorts, (publishedPort) => {
-  //       let rule = _.find(publishedPort.Ingress.Rules, { ServiceName: service.Name, Port: publishedPort.ContainerPort });
-  //       const exists = rule !== undefined;
-  //       if (!exists) {
-  //         rule = new KubernetesIngressRule();
-  //       }
-  //       rule.ParentIngressName = publishedPort.Ingress.Name;
-  //       rule.ServiceName = service.Name;
-  //       rule.Port = publishedPort.ContainerPort;
-  //       rule.Path = publishedPort.IngressRoute;
-  //       if (!exists) {
-  //         publishedPort.Ingress.Rules.push(rule);
-  //       }
-  //       return publishedPort.Ingress;
-  //     });
-  //     ingresses = _.uniq(ingresses);
-  //   }
-  //   return ingresses;
-  // }
 
   static createPayload(data) {
     const res = new KubernetesIngressCreatePayload();
