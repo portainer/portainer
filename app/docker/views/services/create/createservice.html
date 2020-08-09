@@ -160,6 +160,7 @@
           <li class="active interactive"><a data-target="#command" data-toggle="tab">Command & Logging</a></li>
           <li class="interactive"><a data-target="#volumes" data-toggle="tab">Volumes</a></li>
           <li class="interactive"><a data-target="#network" data-toggle="tab">Network</a></li>
+          <li class="interactive"><a data-target="#env" data-toggle="tab">Env</a></li>
           <li class="interactive"><a data-target="#labels" data-toggle="tab">Labels</a></li>
           <li class="interactive"><a data-target="#update-config" data-toggle="tab">Update config & Restart</a></li>
           <li class="interactive" ng-if="applicationState.endpoint.apiVersion >= 1.25"><a data-target="#secrets" data-toggle="tab">Secrets</a></li>
@@ -202,34 +203,6 @@
                 </div>
               </div>
               <!-- !workdir-user-input -->
-              <!-- environment-variables -->
-              <div class="form-group">
-                <div class="col-sm-12" style="margin-top: 5px;">
-                  <label class="control-label text-left">Environment variables</label>
-                  <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addEnvironmentVariable()">
-                    <i class="fa fa-plus-circle" aria-hidden="true"></i> add environment variable
-                  </span>
-                </div>
-                <!-- environment-variable-input-list -->
-                <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-                  <div ng-repeat="variable in formValues.Env" style="margin-top: 2px;">
-                    <div class="input-group col-sm-5 input-group-sm">
-                      <span class="input-group-addon">name</span>
-                      <input type="text" class="form-control" ng-model="variable.name" placeholder="e.g. FOO" />
-                    </div>
-                    <div class="input-group col-sm-5 input-group-sm">
-                      <span class="input-group-addon">value</span>
-                      <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. bar" />
-                    </div>
-                    <button class="btn btn-sm btn-danger" type="button" ng-click="removeEnvironmentVariable($index)">
-                      <i class="fa fa-trash" aria-hidden="true"></i>
-                    </button>
-                  </div>
-                </div>
-                <!-- !environment-variable-input-list -->
-              </div>
-              <!-- !environment-variables -->
-
               <div class="col-sm-12 form-section-title">
                 Logging
               </div>
@@ -443,6 +416,15 @@
             </form>
           </div>
           <!-- !tab-network -->
+          <!-- tab-env -->
+          <div class="tab-pane" id="env">
+            <environment-variables-panel
+              ng-model="formValues.Env"
+              explanation="These values will be applied to the service when created"
+              on-change="(handleEnvVarChange)"
+            ></environment-variables-panel>
+          </div>
+          <!-- !tab-env -->
           <!-- tab-labels -->
           <div class="tab-pane" id="labels">
             <form class="form-horizontal" style="margin-top: 15px;">

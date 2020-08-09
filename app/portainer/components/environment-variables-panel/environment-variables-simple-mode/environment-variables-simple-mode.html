@@ -1,0 +1,47 @@
+<div class="environment-variables-simple-mode">
+  <div class="col-sm-12">
+    <a class="small interactive" ng-click="$ctrl.onSwitchModeClick()"> <i class="fa fa-list-ol space-right" aria-hidden="true"></i> Advanced mode </a>
+  </div>
+  <div class="col-sm-12 small text-muted">
+    <i class="fa fa-info-circle blue-icon space-right" aria-hidden="true"></i>
+    Switch to advanced mode to copy & paste multiple variables
+  </div>
+  <div class="col-sm-12 environment-variables-simple-mode--actions">
+    <button type="button" class="btn btn-sm btn-default" ng-click="$ctrl.add()"> <i class="fa fa-plus-circle" aria-hidden="true"></i> Add an environment variable </button>
+    <button type="button" class="btn btn-sm btn-default" ngf-select="$ctrl.addFromFile($file)" ngf-accept="'.env'" ngf-max-size="1MB" ngf-model-invalid="errorFile">
+      <i class="fa fa-file-upload" aria-hidden="true"></i> Load variables from .env file
+    </button>
+    <span class="space-left" ng-if="errorFile.$error == 'maxSize'">
+      <i class="fa fa-times red-icon space-right" aria-hidden="true"></i>
+      File too large! Try uploading a file smaller than 1MB
+    </span>
+  </div>
+  <div class="col-sm-12 form-inline env-items-list">
+    <div ng-repeat="variable in $ctrl.ngModel" class="env-item">
+      <div class="input-group col-sm-5 input-group-sm env-item-key">
+        <span class="input-group-addon">name</span>
+        <input
+          type="text"
+          class="form-control"
+          ng-model="variable.name"
+          ng-change="$ctrl.onChangeName($index, variable.name)"
+          placeholder="e.g. FOO"
+          ng-disabled="variable.added"
+        />
+      </div>
+      <div ng-if="$ctrl.hasValue(variable)" class="col-sm-6 env-item-value">
+        <div class="input-group input-group-sm">
+          <span class="input-group-addon">value</span>
+          <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. bar" ng-trim="false" ng-change="$ctrl.onChangeValue($index, variable.value)" />
+        </div>
+        <button class="btn btn-sm btn-primary" type="button" ng-click="$ctrl.removeValue($index)"> <i class="fa fa-minus" aria-hidden="true"></i> Remove value </button>
+      </div>
+      <button class="btn btn-sm btn-primary" type="button" ng-if="!$ctrl.hasValue(variable)" ng-click="$ctrl.onChangeValue($index, '')">
+        <i class="fa fa-plus" aria-hidden="true"></i> Add value
+      </button>
+      <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.remove($index)">
+        <i class="fa fa-trash" aria-hidden="true"></i>
+      </button>
+    </div>
+  </div>
+</div>

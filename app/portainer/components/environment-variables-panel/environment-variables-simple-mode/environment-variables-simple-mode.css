@@ -1,0 +1,33 @@
+.advanced-actions > * + * {
+  margin-top: 5px;
+}
+
+.environment-variables-simple-mode--actions {
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+  margin-top: 10px;
+}
+
+.env-items-list {
+  margin-top: 10px;
+}
+
+.env-items-list > * + * {
+  margin-top: 2px;
+}
+
+.env-items-list .env-item {
+  display: flex;
+}
+
+.env-item .env-item-key {
+}
+
+.env-item .env-item-value {
+  display: flex;
+}
+
+.env-item .env-item-value .input-group {
+  flex: 1;
+}
