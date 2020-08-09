@@ -1,4 +1,5 @@
 import moment from 'moment';
+import _ from 'lodash-es';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
 angular.module('portainer.docker').controller('ContainerController', [
@@ -83,12 +84,14 @@ angular.module('portainer.docker').controller('ContainerController', [
 
           $scope.portBindings = [];
           if (container.NetworkSettings.Ports) {
-            angular.forEach(Object.keys(container.NetworkSettings.Ports), function (portMapping) {
-              if (container.NetworkSettings.Ports[portMapping]) {
-                var mapping = {};
-                mapping.container = portMapping;
-                mapping.host = container.NetworkSettings.Ports[portMapping][0].HostIp + ':' + container.NetworkSettings.Ports[portMapping][0].HostPort;
-                $scope.portBindings.push(mapping);
+            _.forEach(Object.keys(container.NetworkSettings.Ports), function (key) {
+              if (container.NetworkSettings.Ports[key]) {
+                _.forEach(container.NetworkSettings.Ports[key], (portMapping) => {
+                  const mapping = {};
+                  mapping.container = key;
+                  mapping.host = `${portMapping.HostIp}:${portMapping.HostPort}`;
+                  $scope.portBindings.push(mapping);
+                });
               }
             });
           }
