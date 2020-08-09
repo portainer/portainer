@@ -17,10 +17,10 @@ function computeTolerations(nodes, application) {
     }
     n.UnmetTaints = [];
     _.forEach(n.Taints, (t) => {
-      const matchKeyMatchValueMatchEffect = _.find(pod.Tolerations, { Key: t.key, Operator: 'Equal', Value: t.value, Effect: t.effect });
-      const matchKeyAnyValueMatchEffect = _.find(pod.Tolerations, { Key: t.key, Operator: 'Exists', Effect: t.effect });
-      const matchKeyMatchValueAnyEffect = _.find(pod.Tolerations, { Key: t.key, Operator: 'Equal', Value: t.value, Effect: '' });
-      const matchKeyAnyValueAnyEffect = _.find(pod.Tolerations, { Key: t.key, Operator: 'Exists', Effect: '' });
+      const matchKeyMatchValueMatchEffect = _.find(pod.Tolerations, { Key: t.Key, Operator: 'Equal', Value: t.Value, Effect: t.Effect });
+      const matchKeyAnyValueMatchEffect = _.find(pod.Tolerations, { Key: t.Key, Operator: 'Exists', Effect: t.Effect });
+      const matchKeyMatchValueAnyEffect = _.find(pod.Tolerations, { Key: t.Key, Operator: 'Equal', Value: t.Value, Effect: '' });
+      const matchKeyAnyValueAnyEffect = _.find(pod.Tolerations, { Key: t.Key, Operator: 'Exists', Effect: '' });
       const anyKeyAnyValueAnyEffect = _.find(pod.Tolerations, { Key: '', Operator: 'Exists', Effect: '' });
 
       if (!matchKeyMatchValueMatchEffect && !matchKeyAnyValueMatchEffect && !matchKeyMatchValueAnyEffect && !matchKeyAnyValueAnyEffect && !anyKeyAnyValueAnyEffect) {

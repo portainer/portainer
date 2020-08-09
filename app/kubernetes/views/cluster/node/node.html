@@ -13,7 +13,7 @@
             <uib-tab index="0" classes="btn-sm" select="ctrl.selectTab(0)">
               <uib-tab-heading> <i class="fa fa-hdd space-right" aria-hidden="true"></i> Node </uib-tab-heading>
 
-              <form class="form-horizontal" style="padding: 20px;">
+              <form class="form-horizontal" name="kubernetesNodeUpdateForm" style="padding: 20px;" autocomplete="off">
                 <table class="table">
                   <tbody ng-if="ctrl.node">
                     <tr>
@@ -65,6 +65,123 @@
                   >
                   </kubernetes-resource-reservation>
                 </div>
+
+                <!-- #region labels -->
+
+                <div class="col-sm-12 form-section-title" style="padding: 8px;">
+                  Labels
+                  <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addLabel()">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i> add label
+                  </span>
+                </div>
+
+                <div class="form-inline" ng-repeat="label in ctrl.formValues.Labels" style="padding: 8px;">
+                  <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: label.NeedsDeletion }">
+                    <span class="input-group-addon">Key</span>
+                    <input type="text" class="form-control" name="label_key_{{ $index }}" ng-model="label.Key" ng-change="ctrl.onChangeLabelKey()" required />
+                  </div>
+                  <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: label.NeedsDeletion }">
+                    <span class="input-group-addon">Value</span>
+                    <input type="text" class="form-control" name="label_value_{{ $index }}" ng-model="label.Value" />
+                  </div>
+                  <div class="input-group col-sm-1 input-group-sm">
+                    <div>
+                      <button ng-if="!label.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeLabel($index)">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                      </button>
+                      <button ng-if="label.NeedsDeletion" class="btn btn-sm btn-primary" type="button" ng-click="ctrl.restoreLabel($index)">
+                        Restore
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    class="small text-warning col-sm-12"
+                    style="margin-top: 5px;"
+                    ng-show="kubernetesNodeUpdateForm['label_key_' + $index].$invalid || ctrl.state.duplicateLabelKeys[$index] !== undefined"
+                  >
+                    <ng-messages for="kubernetesNodeUpdateForm['label_key_' + $index].$error">
+                      <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Label key is required.</p>
+                    </ng-messages>
+                    <p ng-if="ctrl.state.duplicateLabelKeys[$index] !== undefined"
+                      ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This label key is already defined.</p
+                    >
+                  </div>
+                </div>
+
+                <!-- #endregion -->
+
+                <!-- #region taints -->
+
+                <div class="col-sm-12 form-section-title" style="padding: 8px;">
+                  Taints
+                  <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addTaint()">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i> add taint
+                  </span>
+                </div>
+
+                <div class="form-inline" ng-repeat="taint in ctrl.formValues.Taints" style="padding: 8px;">
+                  <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: taint.NeedsDeletion }">
+                    <span class="input-group-addon">Key</span>
+                    <input type="text" class="form-control" name="taint_key_{{ $index }}" ng-model="taint.Key" ng-change="ctrl.onChangeTaintKey()" required />
+                  </div>
+                  <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: taint.NeedsDeletion }">
+                    <span class="input-group-addon">Value</span>
+                    <input type="text" class="form-control" name="taint_value_{{ $index }}" ng-model="taint.Value" />
+                  </div>
+                  <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: taint.NeedsDeletion }">
+                    <span class="input-group-addon">Effect</span>
+                    <select
+                      id="taint_effect_{{ $index }}"
+                      name="taint_effect_{{ $index }}"
+                      class="form-control"
+                      ng-model="taint.Effect"
+                      ng-options="effect as effect for effect in ctrl.availableEffects"
+                    ></select>
+                  </div>
+                  <div class="input-group col-sm-1 input-group-sm">
+                    <div>
+                      <button ng-if="!taint.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeTaint($index)">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                      </button>
+                      <button ng-if="taint.NeedsDeletion" class="btn btn-sm btn-primary" type="button" ng-click="ctrl.restoreTaint($index)">
+                        Restore
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    class="small text-warning col-sm-12"
+                    style="margin-top: 5px;"
+                    ng-show="kubernetesNodeUpdateForm['taint_key_' + $index].$invalid || ctrl.state.duplicateTaintKeys[$index] !== undefined"
+                  >
+                    <ng-messages for="kubernetesNodeUpdateForm['taint_key_' + $index].$error">
+                      <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Taint key is required.</p>
+                    </ng-messages>
+                    <p ng-if="ctrl.state.duplicateTaintKeys[$index] !== undefined"
+                      ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This taint key is already defined.</p
+                    >
+                  </div>
+                </div>
+
+                <!-- #endregion -->
+
+                <!-- #region actions -->
+
+                <div class="col-sm-12 form-section-title" ng-if="ctrl.isAdmin">
+                  Actions
+                </div>
+
+                <div class="form-group">
+                  <div class="col-sm-12">
+                    <button class="btn btn-primary btn-sm" type="button" ng-click="ctrl.updateNode()" ng-disabled="kubernetesNodeUpdateForm.$invalid || !ctrl.isFormValid()">
+                      Update node
+                    </button>
+                    <button class="btn btn-default btn-sm" type="button" ng-click="ctrl.resetFormValues()" ng-disabled="ctrl.isNoChangesMade()">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+
+                <!-- #endregion -->
               </form>
             </uib-tab>
             <uib-tab index="1" classes="btn-sm" select="ctrl.selectTab(1)">

@@ -3,6 +3,10 @@ import _ from 'lodash-es';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import { KubernetesResourceReservation } from 'Kubernetes/models/resource-reservation/models';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
+import KubernetesNodeConverter from 'Kubernetes/node/converter';
+import { KubernetesNodeTaintFormValues, KubernetesNodeLabelFormValues } from 'Kubernetes/node/formValues';
+import { KubernetesNodeTaintEffects } from 'Kubernetes/node/models';
+import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 
 class KubernetesNodeController {
   /* @ngInject */
@@ -11,6 +15,7 @@ class KubernetesNodeController {
     $state,
     Notifications,
     LocalStorage,
+    Authentication,
     KubernetesNodeService,
     KubernetesEventService,
     KubernetesPodService,
@@ -21,6 +26,7 @@ class KubernetesNodeController {
     this.$state = $state;
     this.Notifications = Notifications;
     this.LocalStorage = LocalStorage;
+    this.Authentication = Authentication;
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesEventService = KubernetesEventService;
     this.KubernetesPodService = KubernetesPodService;
@@ -33,11 +39,105 @@ class KubernetesNodeController {
     this.getEventsAsync = this.getEventsAsync.bind(this);
     this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
     this.getEndpointsAsync = this.getEndpointsAsync.bind(this);
+    this.updateNodeAsync = this.updateNodeAsync.bind(this);
   }
 
   selectTab(index) {
     this.LocalStorage.storeActiveTab('node', index);
   }
+
+  /* #region taint */
+
+  onChangeTaintKey() {
+    this.state.duplicateTaintKeys = KubernetesFormValidationHelper.getDuplicates(
+      _.map(this.formValues.Taints, (taint) => {
+        if (taint.NeedsDeletion) {
+          return undefined;
+        }
+        return taint.Key;
+      })
+    );
+    this.state.hasDuplicateTaintKeys = Object.keys(this.state.duplicateTaintKeys).length > 0;
+  }
+
+  addTaint() {
+    const taint = new KubernetesNodeTaintFormValues();
+    taint.IsNew = true;
+    taint.Effect = KubernetesNodeTaintEffects.NOSCHEDULE;
+    this.formValues.Taints.push(taint);
+  }
+
+  removeTaint(index) {
+    const taint = this.formValues.Taints[index];
+    if (taint.IsNew) {
+      this.formValues.Taints.splice(index, 1);
+    } else {
+      taint.NeedsDeletion = true;
+    }
+    this.onChangeTaintKey();
+  }
+
+  restoreTaint(index) {
+    this.formValues.Taints[index].NeedsDeletion = false;
+    this.onChangeTaintKey();
+  }
+
+  /* #endregion */
+
+  /* #region label */
+
+  onChangeLabelKey() {
+    this.state.duplicateLabelKeys = KubernetesFormValidationHelper.getDuplicates(
+      _.map(this.formValues.Labels, (label) => {
+        if (label.NeedsDeletion) {
+          return undefined;
+        }
+        return label.Key;
+      })
+    );
+    this.state.hasDuplicateLabelKeys = Object.keys(this.state.duplicateLabelKeys).length > 0;
+  }
+
+  addLabel() {
+    const label = new KubernetesNodeLabelFormValues();
+    label.IsNew = true;
+    this.formValues.Labels.push(label);
+  }
+
+  removeLabel(index) {
+    const label = this.formValues.Labels[index];
+    if (label.IsNew) {
+      this.formValues.Labels.splice(index, 1);
+    } else {
+      label.NeedsDeletion = true;
+    }
+    this.onChangeLabelKey();
+  }
+
+  restoreLabel(index) {
+    this.formValues.Labels[index].NeedsDeletion = false;
+    this.onChangeLabelKey();
+  }
+
+  /* #endregion */
+
+  /* #region actions */
+
+  isNoChangesMade() {
+    const newNode = KubernetesNodeConverter.formValuesToNode(this.node, this.formValues);
+    const payload = KubernetesNodeConverter.patchPayload(this.node, newNode);
+    return !payload.length;
+  }
+
+  isFormValid() {
+    return !this.state.hasDuplicateTaintKeys && !this.state.hasDuplicateLabelKeys && !this.isNoChangesMade();
+  }
+
+  resetFormValues() {
+    this.formValues = KubernetesNodeConverter.nodeToFormValues(this.node);
+  }
+
+  /* #endregion */
 
   async getEndpointsAsync() {
     try {
@@ -61,6 +161,20 @@ class KubernetesNodeController {
 
   getEndpoints() {
     return this.$async(this.getEndpointsAsync);
+  }
+
+  async updateNodeAsync() {
+    try {
+      await this.KubernetesNodeService.patch(this.node, this.formValues);
+      this.Notifications.success('Node updated successfully');
+      this.$state.reload();
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to update node');
+    }
+  }
+
+  updateNode() {
+    return this.$async(this.updateNodeAsync);
   }
 
   async getNodeAsync() {
@@ -147,14 +261,24 @@ class KubernetesNodeController {
       showEditorTab: false,
       viewReady: false,
       eventWarningCount: 0,
+      duplicateTaintKeys: [],
+      hasDuplicateTaintKeys: false,
+      duplicateLabelKeys: [],
+      hasDuplicateLabelKeys: false,
     };
 
     this.state.activeTab = this.LocalStorage.getActiveTab('node');
+    this.isAdmin = this.Authentication.isAdmin();
 
     await this.getNode();
     await this.getEvents();
     await this.getApplications();
     await this.getEndpoints();
+
+    if (this.isAdmin) {
+      this.availableEffects = _.values(KubernetesNodeTaintEffects);
+      this.formValues = KubernetesNodeConverter.nodeToFormValues(this.node);
+    }
 
     this.state.viewReady = true;
   }

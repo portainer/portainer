@@ -13,6 +13,7 @@ class KubernetesNodeService {
 
     this.getAsync = this.getAsync.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
+    this.patchAsync = this.patchAsync.bind(this);
   }
 
   /**
@@ -43,6 +44,27 @@ class KubernetesNodeService {
       return this.$async(this.getAsync, name);
     }
     return this.$async(this.getAllAsync);
+  }
+
+  /**
+   * PATCH
+   */
+
+  async patchAsync(node, nodeFormValues) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = node.Name;
+      const newNode = KubernetesNodeConverter.formValuesToNode(node, nodeFormValues);
+      const payload = KubernetesNodeConverter.patchPayload(node, newNode);
+      const data = await this.KubernetesNodes().patch(params, payload).$promise;
+      return data;
+    } catch (err) {
+      throw { msg: 'Unable to patch node', err: err };
+    }
+  }
+
+  patch(node, nodeFormValues) {
+    return this.$async(this.patchAsync, node, nodeFormValues);
   }
 }
 
