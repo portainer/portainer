@@ -1,6 +1,7 @@
 import _ from 'lodash-es';
 
 export class EdgeJobsViewController {
+  /* @ngInject */
   constructor($async, $state, EdgeJobService, ModalService, Notifications) {
     this.$async = $async;
     this.$state = $state;

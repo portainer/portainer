@@ -1,6 +1,7 @@
 import angular from 'angular';
 
 export class AssociatedEndpointsDatatableController {
+  /* @ngInject */
   constructor($scope, $controller, DatatableService, PaginationService) {
     this.extendGenericController($controller, $scope);
     this.DatatableService = DatatableService;

@@ -1,6 +1,7 @@
 import _ from 'lodash-es';
 
 export class EditEdgeStackViewController {
+  /* @ngInject */
   constructor($async, $state, EdgeGroupService, EdgeStackService, EndpointService, Notifications) {
     this.$async = $async;
     this.$state = $state;

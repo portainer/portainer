@@ -1,7 +1,17 @@
 export class CreateEdgeJobViewController {
+  /* @ngInject */
   constructor($async, $q, $state, EdgeJobService, GroupService, Notifications, TagService) {
     this.state = {
       actionInProgress: false,
+    };
+
+    this.model = {
+      Name: '',
+      Recurring: false,
+      CronExpression: '',
+      Endpoints: [],
+      FileContent: '',
+      File: null,
     };
 
     this.$async = $async;
@@ -43,15 +53,6 @@ export class CreateEdgeJobViewController {
   }
 
   async $onInit() {
-    this.model = {
-      Name: '',
-      Recurring: false,
-      CronExpression: '',
-      Endpoints: [],
-      FileContent: '',
-      File: null,
-    };
-
     try {
       const [groups, tags] = await Promise.all([this.GroupService.groups(), this.TagService.tags()]);
       this.groups = groups;
