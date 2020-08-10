@@ -1,4 +1,5 @@
 export class CreateEdgeJobViewController {
+  /* @ngInject */
   constructor($async, $q, $state, EdgeJobService, GroupService, Notifications, TagService) {
     this.state = {
       actionInProgress: false,

@@ -1,6 +1,7 @@
 import _ from 'lodash-es';
 
 export class EdgeJobController {
+  /* @ngInject */
   constructor($async, $q, $state, EdgeJobService, EndpointService, FileSaver, GroupService, HostBrowserService, Notifications, TagService) {
     this.state = {
       actionInProgress: false,

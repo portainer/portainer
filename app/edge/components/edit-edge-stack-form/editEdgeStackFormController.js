@@ -1,4 +1,5 @@
 export class EditEdgeStackFormController {
+  /* @ngInject */
   constructor() {
     this.editorUpdate = this.editorUpdate.bind(this);
   }

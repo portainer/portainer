@@ -1,6 +1,7 @@
 import angular from 'angular';
 
 export class EdgeStackEndpointsDatatableController {
+  /* @ngInject */
   constructor($async, $scope, $controller, DatatableService, PaginationService, Notifications) {
     this.extendGenericController($controller, $scope);
     this.DatatableService = DatatableService;
