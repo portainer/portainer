@@ -116,8 +116,8 @@ export function KubernetesApplicationPublishedPortFormValue() {
     LoadBalancerPort: '',
     LoadBalancerNodePort: undefined, // only filled to save existing loadbalancer nodePort and drop it when moving app exposure from LB to Internal/NodePort
     Protocol: 'TCP',
-    IngressName: '',
-    IngressRoute: '',
+    IngressName: undefined,
+    IngressRoute: undefined,
   };
 }
 

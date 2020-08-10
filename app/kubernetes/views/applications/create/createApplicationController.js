@@ -250,12 +250,16 @@ class KubernetesCreateApplicationController {
 
   /* #region  PUBLISHED PORTS UI MANAGEMENT */
   addPublishedPort() {
-    this.formValues.PublishedPorts.push(new KubernetesApplicationPublishedPortFormValue());
+    const p = new KubernetesApplicationPublishedPortFormValue();
+    const ingresses = this.filteredIngresses;
+    p.IngressName = ingresses && ingresses.length ? ingresses[0].Name : undefined;
+    this.formValues.PublishedPorts.push(p);
   }
 
   resetPublishedPorts() {
+    const ingresses = this.filteredIngresses;
     _.forEach(this.formValues.PublishedPorts, (p) => {
-      p.IngressName = '';
+      p.IngressName = ingresses && ingresses.length ? ingresses[0].Name : undefined;
     });
   }
 
