@@ -717,11 +717,10 @@ type (
 
 	// User represents a user account
 	User struct {
-		ID       UserID `json:"Id"`
-		Username string `json:"Username"`
-		Password string `json:"Password,omitempty"`
-		Role
-		UserRole `json:"Role"`
+		ID       UserID   `json:"Id"`
+		Username string   `json:"Username"`
+		Password string   `json:"Password,omitempty"`
+		Role     UserRole `json:"Role"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 25
