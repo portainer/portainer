@@ -30,6 +30,7 @@ const _KubernetesNodeLabelFormValues = Object.freeze({
   NeedsDeletion: false,
   IsNew: false,
   IsUsed: false,
+  IsChanged: false,
 });
 
 export class KubernetesNodeLabelFormValues {

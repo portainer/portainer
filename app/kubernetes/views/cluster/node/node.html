@@ -85,14 +85,21 @@
                         class="form-control"
                         name="label_key_{{ $index }}"
                         ng-model="label.Key"
-                        ng-change="ctrl.onChangeLabelKey()"
+                        ng-change="ctrl.onChangeLabelKey($index)"
                         ng-disabled="ctrl.isSystemLabel($index)"
                         required
                       />
                     </div>
                     <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: label.NeedsDeletion }">
                       <span class="input-group-addon">Value</span>
-                      <input type="text" class="form-control" name="label_value_{{ $index }}" ng-model="label.Value" ng-disabled="ctrl.isSystemLabel($index)" />
+                      <input
+                        type="text"
+                        class="form-control"
+                        name="label_value_{{ $index }}"
+                        ng-change="ctrl.onChangeLabel($index)"
+                        ng-model="label.Value"
+                        ng-disabled="ctrl.isSystemLabel($index)"
+                      />
                     </div>
                     <div class="input-group col-sm-1 input-group-sm">
                       <div style="white-space: nowrap;">

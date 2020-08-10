@@ -90,7 +90,7 @@ class KubernetesNodeController {
     this.onChangeTaintKey();
   }
 
-  noExecuteTaintsWarning() {
+  computeTaintsWarning() {
     return _.filter(this.formValues.Taints, (taint) => {
       return taint.Effect === KubernetesNodeTaintEffects.NOEXECUTE && (taint.IsNew || taint.IsChanged);
     }).length;
@@ -100,7 +100,7 @@ class KubernetesNodeController {
 
   /* #region label */
 
-  onChangeLabelKey() {
+  onChangeLabelKey(index) {
     this.state.duplicateLabelKeys = KubernetesFormValidationHelper.getDuplicates(
       _.map(this.formValues.Labels, (label) => {
         if (label.NeedsDeletion) {
@@ -110,6 +110,13 @@ class KubernetesNodeController {
       })
     );
     this.state.hasDuplicateLabelKeys = Object.keys(this.state.duplicateLabelKeys).length > 0;
+    this.onChangeLabel(index);
+  }
+
+  onChangeLabel(index) {
+    if (this.formValues.Labels[index]) {
+      this.formValues.Labels[index].IsChanged = true;
+    }
   }
 
   addLabel() {
@@ -135,6 +142,12 @@ class KubernetesNodeController {
 
   isSystemLabel(index) {
     return KubernetesNodeHelper.isSystemLabel(this.formValues.Labels[index]);
+  }
+
+  computeLabelsWarning() {
+    return _.filter(this.formValues.Labels, (label) => {
+      return label.IsUsed && (label.NeedsDeletion || label.IsChanged);
+    }).length;
   }
 
   /* #endregion */
@@ -192,8 +205,8 @@ class KubernetesNodeController {
   }
 
   updateNode() {
-    const taintsWarning = this.noExecuteTaintsWarning();
-    const labelsWarning = _.find(this.formValues.Labels, { NeedsDeletion: true, IsUsed: true });
+    const taintsWarning = this.computeTaintsWarning();
+    const labelsWarning = this.computeLabelsWarning();
 
     if (taintsWarning && !labelsWarning) {
       this.ModalService.confirmUpdate(
