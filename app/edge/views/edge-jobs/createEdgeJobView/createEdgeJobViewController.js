@@ -5,6 +5,15 @@ export class CreateEdgeJobViewController {
       actionInProgress: false,
     };
 
+    this.model = {
+      Name: '',
+      Recurring: false,
+      CronExpression: '',
+      Endpoints: [],
+      FileContent: '',
+      File: null,
+    };
+
     this.$async = $async;
     this.$q = $q;
     this.$state = $state;
@@ -44,15 +53,6 @@ export class CreateEdgeJobViewController {
   }
 
   async $onInit() {
-    this.model = {
-      Name: '',
-      Recurring: false,
-      CronExpression: '',
-      Endpoints: [],
-      FileContent: '',
-      File: null,
-    };
-
     try {
       const [groups, tags] = await Promise.all([this.GroupService.groups(), this.TagService.tags()]);
       this.groups = groups;

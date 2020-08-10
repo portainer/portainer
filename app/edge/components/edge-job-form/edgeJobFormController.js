@@ -33,8 +33,6 @@ export class EdgeJobFormController {
     // see https://regexr.com/573i2
     this.cronRegex = /(@(annually|yearly|monthly|weekly|daily|hourly|reboot))|(@every (\d+(ns|us|µs|ms|s|m|h))+)|((((\d+,)+\d+|(\d+(\/|-)\d+)|\d+|\*) ){4,6}((\d+,)+\d+|(\d+(\/|-)\d+)|\d+|\*))/;
 
-    this.onChangeModel(this.model);
-
     this.action = this.action.bind(this);
     this.editorUpdate = this.editorUpdate.bind(this);
     this.associateEndpoint = this.associateEndpoint.bind(this);
@@ -84,6 +82,10 @@ export class EdgeJobFormController {
 
   dissociateEndpoint(endpoint) {
     this.model.Endpoints = _.filter(this.model.Endpoints, (id) => id !== endpoint.Id);
+  }
+
+  $onInit() {
+    this.onChangeModel(this.model);
   }
 }
 
