@@ -71,12 +71,14 @@ body,
 }
 
 input[type='checkbox'] {
+  margin-top: 1px;
   vertical-align: middle;
-  -moz-transform: scale(1.8);
-  -webkit-transform: scale(1.8);
-  -o-transform: scale(1.8);
-  margin-left: 2px;
-  margin-bottom: 5px;
+}
+
+.md-checkbox input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  margin-top: -1px;
 }
 
 a[ng-click] {
