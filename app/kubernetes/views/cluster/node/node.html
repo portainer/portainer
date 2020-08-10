@@ -102,6 +102,7 @@
                         <button ng-if="!ctrl.isSystemLabel($index) && label.NeedsDeletion" class="btn btn-sm btn-primary" type="button" ng-click="ctrl.restoreLabel($index)">
                           Restore
                         </button>
+                        <span class="label label-info image-tag" ng-if="ctrl.isSystemLabel($index)" style="margin-left: 5px;">system</span>
                       </div>
                     </div>
                     <div

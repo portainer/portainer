@@ -7,6 +7,7 @@ import KubernetesNodeConverter from 'Kubernetes/node/converter';
 import { KubernetesNodeLabelFormValues, KubernetesNodeTaintFormValues } from 'Kubernetes/node/formValues';
 import { KubernetesNodeTaintEffects } from 'Kubernetes/node/models';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
+import { KubernetesNodeHelper } from 'Kubernetes/node/helper';
 
 class KubernetesNodeController {
   /* @ngInject */
@@ -118,14 +119,7 @@ class KubernetesNodeController {
   }
 
   isSystemLabel(index) {
-    // TODO: there is probably a need for a helper here
-    // the point is to disable "system labels"
-    return (
-      !this.formValues.Labels[index].IsNew &&
-      (_.startsWith(this.formValues.Labels[index].Key, 'beta.kubernetes.io') ||
-        _.startsWith(this.formValues.Labels[index].Key, 'kubernetes.io') ||
-        this.formValues.Labels[index].Key === 'node-role.kubernetes.io/master')
-    );
+    return KubernetesNodeHelper.isSystemLabel(this.formValues.Labels[index]);
   }
 
   /* #endregion */
@@ -285,11 +279,7 @@ class KubernetesNodeController {
 
     this.availableEffects = _.values(KubernetesNodeTaintEffects);
     this.formValues = KubernetesNodeConverter.nodeToFormValues(this.node);
-    // TODO: see my point above about adding a helper
-    // the point is to sort "disabled labels" to show them first in the UI
-    this.formValues.Labels = _.sortBy(this.formValues.Labels, (label) => {
-      return !_.startsWith(label.Key, 'beta.kubernetes.io') && !_.startsWith(label.Key, 'kubernetes.io') && !_.startsWith(label.Key, 'node-role.kubernetes.io/master');
-    });
+    this.formValues.Labels = KubernetesNodeHelper.reorderLabels(this.formValues.Labels);
 
     this.state.viewReady = true;
   }
