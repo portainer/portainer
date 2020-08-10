@@ -4,7 +4,7 @@ import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceRese
 import { KubernetesResourceReservation } from 'Kubernetes/models/resource-reservation/models';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import KubernetesNodeConverter from 'Kubernetes/node/converter';
-import { KubernetesNodeTaintFormValues, KubernetesNodeLabelFormValues } from 'Kubernetes/node/formValues';
+import { KubernetesNodeLabelFormValues, KubernetesNodeTaintFormValues } from 'Kubernetes/node/formValues';
 import { KubernetesNodeTaintEffects } from 'Kubernetes/node/models';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 
@@ -15,7 +15,6 @@ class KubernetesNodeController {
     $state,
     Notifications,
     LocalStorage,
-    Authentication,
     KubernetesNodeService,
     KubernetesEventService,
     KubernetesPodService,
@@ -26,7 +25,6 @@ class KubernetesNodeController {
     this.$state = $state;
     this.Notifications = Notifications;
     this.LocalStorage = LocalStorage;
-    this.Authentication = Authentication;
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesEventService = KubernetesEventService;
     this.KubernetesPodService = KubernetesPodService;
@@ -117,6 +115,17 @@ class KubernetesNodeController {
   restoreLabel(index) {
     this.formValues.Labels[index].NeedsDeletion = false;
     this.onChangeLabelKey();
+  }
+
+  isSystemLabel(index) {
+    // TODO: there is probably a need for a helper here
+    // the point is to disable "system labels"
+    return (
+      !this.formValues.Labels[index].IsNew &&
+      (_.startsWith(this.formValues.Labels[index].Key, 'beta.kubernetes.io') ||
+        _.startsWith(this.formValues.Labels[index].Key, 'kubernetes.io') ||
+        this.formValues.Labels[index].Key === 'node-role.kubernetes.io/master')
+    );
   }
 
   /* #endregion */
@@ -268,17 +277,19 @@ class KubernetesNodeController {
     };
 
     this.state.activeTab = this.LocalStorage.getActiveTab('node');
-    this.isAdmin = this.Authentication.isAdmin();
 
     await this.getNode();
     await this.getEvents();
     await this.getApplications();
     await this.getEndpoints();
 
-    if (this.isAdmin) {
-      this.availableEffects = _.values(KubernetesNodeTaintEffects);
-      this.formValues = KubernetesNodeConverter.nodeToFormValues(this.node);
-    }
+    this.availableEffects = _.values(KubernetesNodeTaintEffects);
+    this.formValues = KubernetesNodeConverter.nodeToFormValues(this.node);
+    // TODO: see my point above about adding a helper
+    // the point is to sort "disabled labels" to show them first in the UI
+    this.formValues.Labels = _.sortBy(this.formValues.Labels, (label) => {
+      return !_.startsWith(label.Key, 'beta.kubernetes.io') && !_.startsWith(label.Key, 'kubernetes.io') && !_.startsWith(label.Key, 'node-role.kubernetes.io/master');
+    });
 
     this.state.viewReady = true;
   }

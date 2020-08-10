@@ -80,24 +80,32 @@
                   <div class="form-inline" ng-repeat="label in ctrl.formValues.Labels" style="padding: 3px 0 3px 0;">
                     <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: label.NeedsDeletion }">
                       <span class="input-group-addon">Key</span>
-                      <input type="text" class="form-control" name="label_key_{{ $index }}" ng-model="label.Key" ng-change="ctrl.onChangeLabelKey()" required />
+                      <input
+                        type="text"
+                        class="form-control"
+                        name="label_key_{{ $index }}"
+                        ng-model="label.Key"
+                        ng-change="ctrl.onChangeLabelKey()"
+                        ng-disabled="ctrl.isSystemLabel($index)"
+                        required
+                      />
                     </div>
                     <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: label.NeedsDeletion }">
                       <span class="input-group-addon">Value</span>
-                      <input type="text" class="form-control" name="label_value_{{ $index }}" ng-model="label.Value" />
+                      <input type="text" class="form-control" name="label_value_{{ $index }}" ng-model="label.Value" ng-disabled="ctrl.isSystemLabel($index)" />
                     </div>
                     <div class="input-group col-sm-1 input-group-sm">
                       <div>
-                        <button ng-if="!label.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeLabel($index)">
+                        <button ng-if="!ctrl.isSystemLabel($index) && !label.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeLabel($index)">
                           <i class="fa fa-times" aria-hidden="true"></i>
                         </button>
-                        <button ng-if="label.NeedsDeletion" class="btn btn-sm btn-primary" type="button" ng-click="ctrl.restoreLabel($index)">
+                        <button ng-if="!ctrl.isSystemLabel($index) && label.NeedsDeletion" class="btn btn-sm btn-primary" type="button" ng-click="ctrl.restoreLabel($index)">
                           Restore
                         </button>
                       </div>
                     </div>
                     <div
-                      class="small text-warning col-sm-12"
+                      class="small text-warning"
                       style="margin-top: 5px;"
                       ng-show="kubernetesNodeUpdateForm['label_key_' + $index].$invalid || ctrl.state.duplicateLabelKeys[$index] !== undefined"
                     >
@@ -169,7 +177,7 @@
 
                   <!-- #region actions -->
 
-                  <div class="col-sm-12 form-section-title" ng-if="ctrl.isAdmin">
+                  <div class="col-sm-12 form-section-title" style="margin-top: 20px;">
                     Actions
                   </div>
 
