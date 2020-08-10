@@ -6,6 +6,7 @@ angular.module('portainer.docker', ['portainer.app']).config([
     var docker = {
       name: 'docker',
       parent: 'endpoint',
+      url: '/docker',
       abstract: true,
       onEnter: /* @ngInject */ function onEnter(endpoint, $async, $state, EndpointService, EndpointProvider, LegacyExtensionManager, Notifications, StateManager, SystemService) {
         return $async(async () => {
