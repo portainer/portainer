@@ -264,7 +264,7 @@ class KubernetesApplicationHelper {
     return finalRes;
   }
 
-  static generateAutoScalerFormValueFromHorizontalPodAutoScaler(autoScaler) {
+  static generateAutoScalerFormValueFromHorizontalPodAutoScaler(autoScaler, replicasCount) {
     const res = new KubernetesApplicationAutoScalerFormValue();
     if (autoScaler) {
       res.IsUsed = true;
@@ -274,6 +274,8 @@ class KubernetesApplicationHelper {
       res.ApiVersion = autoScaler.ApiVersion;
     } else {
       res.ApiVersion = 'apps/v1';
+      res.MinReplicas = replicasCount;
+      res.MaxReplicas = replicasCount;
     }
     return res;
   }
