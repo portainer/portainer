@@ -10,4 +10,14 @@ export class KubernetesNodeHelper {
       return !KubernetesNodeHelper.isSystemLabel(label);
     });
   }
+
+  static computeUsedLabels(applications, labels) {
+    const pods = _.flatten(_.map(applications, 'Pods'));
+    const nodeSelectors = _.uniq(_.flatten(_.map(pods, 'NodeSelector')));
+
+    return _.map(labels, (label) => {
+      label.IsUsed = _.find(nodeSelectors, (ns) => ns && ns[label.Key] === label.Value) ? true : false;
+      return label;
+    });
+  }
 }
