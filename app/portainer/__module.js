@@ -24,7 +24,7 @@ angular.module('portainer.app', ['portainer.oauth']).config([
       name: 'root',
       abstract: true,
       resolve: {
-        initStateManager: /* @ngInject */ function initStateManager($async, StateManager, Authentication, Notifications, Analytics, authManager, $rootScope, $state) {
+        initStateManager: /* @ngInject */ function initStateManager($async, StateManager, Authentication, Notifications, authManager, $rootScope, $state) {
           return $async(async () => {
             const appState = StateManager.getState();
             if (!appState.loading) {
