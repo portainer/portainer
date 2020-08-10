@@ -313,7 +313,7 @@ class KubernetesCreateApplicationController {
     if (this.formValues.PublishingType === KubernetesApplicationPublishingTypes.INGRESS) {
       const newRoutes = _.map(this.formValues.PublishedPorts, (p) => (p.IsNew ? p.IngressRoute : undefined));
       const toDelRoutes = _.map(this.formValues.PublishedPorts, (p) => (p.NeedsDeletion ? p.IngressRoute : undefined));
-      const allRoutes = _.flatMapDeep(this.ingresses, (c) => _.map(c.Rules, 'Path'));
+      const allRoutes = _.flatMapDeep(this.ingresses, (c) => _.map(c.Paths, 'Path'));
       const duplicates = KubernetesFormValidationHelper.getDuplicates(newRoutes);
       _.forEach(newRoutes, (route, idx) => {
         if (_.includes(allRoutes, route) && !_.includes(toDelRoutes, route)) {

@@ -4,11 +4,11 @@ import * as JsonPatch from 'fast-json-patch';
 import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
 import { KubernetesIngressRule, KubernetesIngress } from './models';
 import { KubernetesIngressCreatePayload, KubernetesIngressRuleCreatePayload, KubernetesIngressRulePathCreatePayload } from './payloads';
-import { KubernetesIngressClassAnnotation } from './constants';
+import { KubernetesIngressClassAnnotation, KubernetesIngressClassMandatoryAnnotations } from './constants';
 
 export class KubernetesIngressConverter {
   static apiToModel(data) {
-    const rules = _.flatMap(data.spec.rules, (rule) => {
+    const paths = _.flatMap(data.spec.rules, (rule) => {
       return _.map(rule.http.paths, (path) => {
         const ingRule = new KubernetesIngressRule();
         ingRule.ParentIngressName = data.metadata.name;
@@ -24,11 +24,8 @@ export class KubernetesIngressConverter {
     const res = new KubernetesIngress();
     res.Name = data.metadata.name;
     res.Namespace = data.metadata.namespace;
-    res.IngressClassName =
-      data.metadata.annotations && data.metadata.annotations[KubernetesIngressClassAnnotation]
-        ? data.metadata.annotations[KubernetesIngressClassAnnotation]
-        : data.spec.ingressClassName;
-    res.Rules = rules;
+    res.Annotations = data.metadata.annotations || {};
+    res.Paths = paths;
     return res;
   }
 
@@ -37,15 +34,15 @@ export class KubernetesIngressConverter {
     _.forEach(formValues.PublishedPorts, (p) => {
       const ingress = _.find(ingresses, { Name: p.IngressName });
       if (ingress && p.NeedsDeletion) {
-        const rule = _.find(ingress.Rules, { Port: p.ContainerPort, ServiceName: serviceName, Path: p.IngressRoute });
-        _.remove(ingress.Rules, rule);
+        const path = _.find(ingress.Paths, { Port: p.ContainerPort, ServiceName: serviceName, Path: p.IngressRoute });
+        _.remove(ingress.Paths, path);
       } else if (ingress && p.IsNew) {
         const rule = new KubernetesIngressRule();
         rule.ParentIngressName = ingress.Name;
         rule.ServiceName = serviceName;
         rule.Port = p.ContainerPort;
         rule.Path = p.IngressRoute;
-        ingress.Rules.push(rule);
+        ingress.Paths.push(rule);
       }
     });
     return ingresses;
@@ -55,8 +52,13 @@ export class KubernetesIngressConverter {
     const res = new KubernetesIngressCreatePayload();
     res.metadata.name = data.Name;
     res.metadata.namespace = data.Namespace;
-    res.metadata.annotations[KubernetesIngressClassAnnotation] = data.IngressClassName;
-    const groups = _.groupBy(data.Rules, 'Host');
+    res.metadata.annotations = data.Annotations || {};
+    res.metadata.annotations[KubernetesIngressClassAnnotation] = data.Name;
+    const annotations = KubernetesIngressClassMandatoryAnnotations[data.Name];
+    if (annotations) {
+      _.extend(res.metadata.annotations, annotations);
+    }
+    const groups = _.groupBy(data.Paths, 'Host');
     const rules = _.map(groups, (rules, host) => {
       const rule = new KubernetesIngressRuleCreatePayload();
 

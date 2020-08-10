@@ -4,15 +4,18 @@ export function KubernetesResourcePoolFormValues(defaults) {
     CpuLimit: defaults.CpuLimit,
     HasQuota: true,
     UseIngress: false,
-    IngressClasses: [],
+    IngressClasses: [], // KubernetesResourcePoolIngressClassFormValue
   };
 }
 
-export function KubernetesResourcePoolIngressClassFormValue(ingressClassName) {
+/**
+ * @param {string} ingressName
+ */
+export function KubernetesResourcePoolIngressClassFormValue(ingressName) {
   return {
-    Name: ingressClassName,
-    IngressClassName: ingressClassName,
+    Name: ingressName,
     Selected: false,
     WasSelected: false,
+    Namespace: undefined, // will be filled inside ResourcePoolService.create
   };
 }
