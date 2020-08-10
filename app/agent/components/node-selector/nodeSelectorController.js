@@ -1,4 +1,5 @@
 export class NodeSelectorController {
+  /* @ngInject */
   constructor(AgentService, Notifications) {
     Object.assign(this, { AgentService, Notifications });
   }
