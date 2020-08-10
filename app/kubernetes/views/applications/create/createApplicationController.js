@@ -733,9 +733,7 @@ class KubernetesCreateApplicationController {
           });
         }
       } else {
-        this.formValues.AutoScaler = KubernetesApplicationHelper.generateAutoScalerFormValueFromHorizontalPodAutoScaler();
-        this.formValues.AutoScaler.MinReplicas = this.formValues.ReplicaCount;
-        this.formValues.AutoScaler.MaxReplicas = this.formValues.ReplicaCount;
+        this.formValues.AutoScaler = KubernetesApplicationHelper.generateAutoScalerFormValueFromHorizontalPodAutoScaler(null, this.formValues.ReplicaCount);
       }
 
       await this.updateSliders();
