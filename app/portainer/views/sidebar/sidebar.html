@@ -119,28 +119,10 @@
             ($state.current.name === 'portainer.users' ||
               $state.current.name === 'portainer.users.user' ||
               $state.current.name === 'portainer.teams' ||
-              $state.current.name === 'portainer.teams.team' ||
-              $state.current.name === 'portainer.roles' ||
-              $state.current.name === 'portainer.roles.role' ||
-              $state.current.name === 'portainer.roles.new')
+              $state.current.name === 'portainer.teams.team')
           "
         >
           <a ui-sref="portainer.teams" ui-sref-active="active">Teams</a>
-        </div>
-        <div
-          class="sidebar-sublist"
-          ng-if="
-            toggle &&
-            ($state.current.name === 'portainer.users' ||
-              $state.current.name === 'portainer.users.user' ||
-              $state.current.name === 'portainer.teams' ||
-              $state.current.name === 'portainer.teams.team' ||
-              $state.current.name === 'portainer.roles' ||
-              $state.current.name === 'portainer.roles.role' ||
-              $state.current.name === 'portainer.roles.new')
-          "
-        >
-          <a ui-sref="portainer.roles" ui-sref-active="active">Roles</a>
         </div>
       </li>
       <li class="sidebar-list" ng-if="isAdmin">
