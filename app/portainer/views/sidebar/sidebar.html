@@ -17,6 +17,7 @@
         ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider === 'KUBERNETES'"
         admin-access="isAdmin"
         endpoint-id="endpointId"
+        current-state="$state.current.name"
       >
       </kubernetes-sidebar-content>
       <azure-sidebar-content ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider === 'AZURE'" endpoint-id="endpointId"> </azure-sidebar-content>
@@ -156,6 +157,7 @@
               $state.current.name === 'portainer.endpoints.endpoint' ||
               $state.current.name === 'portainer.endpoints.new' ||
               $state.current.name === 'portainer.endpoints.endpoint.access' ||
+              $state.current.name === 'portainer.endpoints.endpoint.kubernetesConfig' ||
               $state.current.name === 'portainer.groups' ||
               $state.current.name === 'portainer.groups.group' ||
               $state.current.name === 'portainer.groups.group.access' ||
@@ -173,6 +175,7 @@
               $state.current.name === 'portainer.endpoints.endpoint' ||
               $state.current.name === 'portainer.endpoints.new' ||
               $state.current.name === 'portainer.endpoints.endpoint.access' ||
+              $state.current.name === 'portainer.endpoints.endpoint.kubernetesConfig' ||
               $state.current.name === 'portainer.groups' ||
               $state.current.name === 'portainer.groups.group' ||
               $state.current.name === 'portainer.groups.group.access' ||
