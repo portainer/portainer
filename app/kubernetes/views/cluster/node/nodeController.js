@@ -210,7 +210,7 @@ class KubernetesNodeController {
 
     if (taintsWarning && !labelsWarning) {
       this.ModalService.confirmUpdate(
-        'Changing these taints will immediately deschedule applications running on this node without the corresponding tolerations. Do you wish to continue?',
+        'Changes to taints will immediately deschedule applications running on this node without the corresponding tolerations. Do you wish to continue?',
         (confirmed) => {
           if (confirmed) {
             return this.$async(this.updateNodeAsync);
@@ -219,7 +219,7 @@ class KubernetesNodeController {
       );
     } else if (!taintsWarning && labelsWarning) {
       this.ModalService.confirmUpdate(
-        'Removing or changing a label that is used might prevent applications from scheduling on this node in the future. Do you wish to continue?',
+        'Removing or changing a label that is used might prevent applications from being scheduled on this node in the future. Do you wish to continue?',
         (confirmed) => {
           if (confirmed) {
             return this.$async(this.updateNodeAsync);
@@ -228,7 +228,7 @@ class KubernetesNodeController {
       );
     } else if (taintsWarning && labelsWarning) {
       this.ModalService.confirmUpdate(
-        'Changing these taints will immediately deschedule applications running on this node without the corresponding tolerations. Removing or changing a label that is used might prevent applications from scheduling on this node in the future.\n\nDo you wish to continue?',
+        'Changes to taints will immediately deschedule applications running on this node without the corresponding tolerations.<br/></br/>Removing or changing a label that is used might prevent applications from scheduling on this node in the future.\n\nDo you wish to continue?',
         (confirmed) => {
           if (confirmed) {
             return this.$async(this.updateNodeAsync);

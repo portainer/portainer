@@ -103,13 +103,13 @@
                     </div>
                     <div class="input-group col-sm-1 input-group-sm">
                       <div style="white-space: nowrap;">
-                        <span class="label label-warning image-tag" ng-if="label.IsUsed" style="margin-left: 5px;">used</span>
                         <button ng-if="!ctrl.isSystemLabel($index) && !label.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeLabel($index)">
                           <i class="fa fa-times" aria-hidden="true"></i>
                         </button>
                         <button ng-if="!ctrl.isSystemLabel($index) && label.NeedsDeletion" class="btn btn-sm btn-primary" type="button" ng-click="ctrl.restoreLabel($index)">
                           Restore
                         </button>
+                        <span class="label label-warning label-sm image-tag" ng-if="label.IsUsed && !ctrl.isSystemLabel($index)" style="margin-left: 5px;">used</span>
                         <span class="label label-info image-tag" ng-if="ctrl.isSystemLabel($index)" style="margin-left: 5px;">system</span>
                       </div>
                     </div>
