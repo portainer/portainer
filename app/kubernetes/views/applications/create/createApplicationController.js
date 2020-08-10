@@ -628,7 +628,7 @@ class KubernetesCreateApplicationController {
     const filteredVolumes = _.filter(this.volumes, (volume) => {
       const isSameNamespace = volume.ResourcePool.Namespace.Name === namespace;
       const isUnused = !KubernetesVolumeHelper.isUsed(volume);
-      const isRWX = _.find(volume.PersistentVolumeClaim.StorageClass.AccessModes, (am) => am === 'RWX');
+      const isRWX = volume.PersistentVolumeClaim.StorageClass && _.find(volume.PersistentVolumeClaim.StorageClass.AccessModes, (am) => am === 'RWX');
       return isSameNamespace && (isUnused || isRWX);
     });
     this.availableVolumes = filteredVolumes;
@@ -817,21 +817,27 @@ class KubernetesCreateApplicationController {
 
       this.formValues = new KubernetesApplicationFormValues();
 
-      const [resourcePools, nodes, volumes, applications, ingresses] = await Promise.all([
+      const [resourcePools, nodes, ingresses] = await Promise.all([
         this.KubernetesResourcePoolService.get(),
         this.KubernetesNodeService.get(),
-        this.KubernetesVolumeService.get(),
-        this.KubernetesApplicationService.get(),
         this.KubernetesIngressService.get(),
       ]);
       this.ingresses = ingresses;
 
       this.resourcePools = _.filter(resourcePools, (resourcePool) => !this.KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name));
       this.formValues.ResourcePool = this.resourcePools[0];
-      this.volumes = volumes;
-      _.forEach(this.volumes, (volume) => {
-        volume.Applications = KubernetesVolumeHelper.getUsingApplications(volume, applications);
-      });
+
+      // TODO: refactor
+      // Don't pull all volumes and applications across all namespaces
+      // Use refreshNamespaceData flow (triggered on Init + on Namespace change)
+      // and query only accross the selected namespace
+      if (this.storageClassAvailable()) {
+        const [applications, volumes] = await Promise.all([this.KubernetesApplicationService.get(), this.KubernetesVolumeService.get()]);
+        this.volumes = volumes;
+        _.forEach(this.volumes, (volume) => {
+          volume.Applications = KubernetesVolumeHelper.getUsingApplications(volume, applications);
+        });
+      }
 
       _.forEach(nodes, (item) => {
         this.state.nodes.memory += filesizeParser(item.Memory);
