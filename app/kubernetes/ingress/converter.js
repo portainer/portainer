@@ -25,6 +25,10 @@ export class KubernetesIngressConverter {
     res.Name = data.metadata.name;
     res.Namespace = data.metadata.namespace;
     res.Annotations = data.metadata.annotations || {};
+    res.IngressClassName =
+      data.metadata.annotations && data.metadata.annotations[KubernetesIngressClassAnnotation]
+        ? data.metadata.annotations[KubernetesIngressClassAnnotation]
+        : data.spec.ingressClassName;
     res.Paths = paths;
     return res;
   }
@@ -53,7 +57,7 @@ export class KubernetesIngressConverter {
     res.metadata.name = data.Name;
     res.metadata.namespace = data.Namespace;
     res.metadata.annotations = data.Annotations || {};
-    res.metadata.annotations[KubernetesIngressClassAnnotation] = data.Name;
+    res.metadata.annotations[KubernetesIngressClassAnnotation] = data.IngressClassName;
     const annotations = KubernetesIngressClassMandatoryAnnotations[data.Name];
     if (annotations) {
       _.extend(res.metadata.annotations, annotations);

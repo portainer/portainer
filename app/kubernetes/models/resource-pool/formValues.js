@@ -9,11 +9,12 @@ export function KubernetesResourcePoolFormValues(defaults) {
 }
 
 /**
- * @param {string} ingressName
+ * @param {string} ingressClassName
  */
-export function KubernetesResourcePoolIngressClassFormValue(ingressName) {
+export function KubernetesResourcePoolIngressClassFormValue(ingressClassName) {
   return {
-    Name: ingressName,
+    Name: ingressClassName,
+    IngressClassName: ingressClassName,
     Selected: false,
     WasSelected: false,
     Namespace: undefined, // will be filled inside ResourcePoolService.create

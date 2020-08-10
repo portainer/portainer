@@ -4,6 +4,7 @@ export function KubernetesIngress() {
     Namespace: '',
     Annotations: {},
     Paths: [],
+    IngressClassName: '',
   };
 }
 
