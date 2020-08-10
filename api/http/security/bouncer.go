@@ -83,7 +83,7 @@ func (bouncer *RequestBouncer) AuthenticatedAccess(h http.Handler) http.Handler 
 // that the user can access the specified endpoint.
 // An error is returned when access to the endpoint is denied or if the user do not have the required
 // authorization to execute the operation.
-func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endpoint *portainer.Endpoint, authorizationCheck bool) error {
+func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endpoint *portainer.Endpoint) error {
 	tokenData, err := RetrieveTokenData(r)
 	if err != nil {
 		return err
@@ -107,13 +107,6 @@ func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endp
 		return httperrors.ErrEndpointAccessDenied
 	}
 
-	if authorizationCheck {
-		err = bouncer.checkEndpointOperationAuthorization(r, endpoint)
-		if err != nil {
-			return ErrAuthorizationRequired
-		}
-	}
-
 	return nil
 }
 
@@ -133,19 +126,6 @@ func (bouncer *RequestBouncer) AuthorizedEdgeEndpointOperation(r *http.Request, 
 	}
 
 	return nil
-}
-
-func (bouncer *RequestBouncer) checkEndpointOperationAuthorization(r *http.Request, endpoint *portainer.Endpoint) error {
-	tokenData, err := RetrieveTokenData(r)
-	if err != nil {
-		return err
-	}
-
-	if tokenData.Role == portainer.AdministratorRole {
-		return nil
-	}
-
-	return errors.New("Unauthorized")
 }
 
 // RegistryAccess retrieves the JWT token from the request context and verifies
@@ -186,8 +166,27 @@ func (bouncer *RequestBouncer) mwAuthenticatedUser(h http.Handler) http.Handler 
 func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler, administratorOnly bool) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokenData, err := RetrieveTokenData(r)
-		if err != nil || tokenData.Role != portainer.AdministratorRole {
+		if err != nil {
 			httperror.WriteError(w, http.StatusForbidden, "Access denied", httperrors.ErrUnauthorized)
+			return
+		}
+
+		if tokenData.Role == portainer.AdministratorRole {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		if administratorOnly {
+			httperror.WriteError(w, http.StatusForbidden, "Access denied", httperrors.ErrUnauthorized)
+			return
+		}
+
+		_, err = bouncer.dataStore.User().User(tokenData.ID)
+		if err != nil && err == bolterrors.ErrObjectNotFound {
+			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", httperrors.ErrUnauthorized)
+			return
+		} else if err != nil {
+			httperror.WriteError(w, http.StatusInternalServerError, "Unable to retrieve user details from the database", err)
 			return
 		}
 
