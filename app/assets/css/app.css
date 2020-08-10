@@ -75,6 +75,12 @@ input[type='checkbox'] {
   vertical-align: middle;
 }
 
+.md-checkbox input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  margin-top: -1px;
+}
+
 a[ng-click] {
   cursor: pointer;
 }
