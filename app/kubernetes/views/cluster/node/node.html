@@ -135,11 +135,11 @@
                   <div class="form-inline" ng-repeat="taint in ctrl.formValues.Taints" style="padding: 3px 0 3px 0;">
                     <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: taint.NeedsDeletion }">
                       <span class="input-group-addon">Key</span>
-                      <input type="text" class="form-control" name="taint_key_{{ $index }}" ng-model="taint.Key" ng-change="ctrl.onChangeTaintKey()" required />
+                      <input type="text" class="form-control" name="taint_key_{{ $index }}" ng-model="taint.Key" ng-change="ctrl.onChangeTaintKey($index)" required />
                     </div>
                     <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: taint.NeedsDeletion }">
                       <span class="input-group-addon">Value</span>
-                      <input type="text" class="form-control" name="taint_value_{{ $index }}" ng-model="taint.Value" />
+                      <input type="text" class="form-control" name="taint_value_{{ $index }}" ng-model="taint.Value" ng-change="ctrl.onChangeTaint($index)" />
                     </div>
                     <div class="input-group col-sm-3 input-group-sm" ng-class="{ striked: taint.NeedsDeletion }">
                       <span class="input-group-addon">Effect</span>
@@ -148,6 +148,8 @@
                         name="taint_effect_{{ $index }}"
                         class="form-control"
                         ng-model="taint.Effect"
+                        ng-change="ctrl.onChangeTaint($index)"
+                        ;
                         ng-options="effect as effect for effect in ctrl.availableEffects"
                       ></select>
                     </div>

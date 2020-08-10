@@ -16,6 +16,7 @@ class KubernetesNodeController {
     $state,
     Notifications,
     LocalStorage,
+    ModalService,
     KubernetesNodeService,
     KubernetesEventService,
     KubernetesPodService,
@@ -26,6 +27,7 @@ class KubernetesNodeController {
     this.$state = $state;
     this.Notifications = Notifications;
     this.LocalStorage = LocalStorage;
+    this.ModalService = ModalService;
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesEventService = KubernetesEventService;
     this.KubernetesPodService = KubernetesPodService;
@@ -47,7 +49,7 @@ class KubernetesNodeController {
 
   /* #region taint */
 
-  onChangeTaintKey() {
+  onChangeTaintKey(index) {
     this.state.duplicateTaintKeys = KubernetesFormValidationHelper.getDuplicates(
       _.map(this.formValues.Taints, (taint) => {
         if (taint.NeedsDeletion) {
@@ -57,6 +59,13 @@ class KubernetesNodeController {
       })
     );
     this.state.hasDuplicateTaintKeys = Object.keys(this.state.duplicateTaintKeys).length > 0;
+    this.onChangeTaint(index);
+  }
+
+  onChangeTaint(index) {
+    if (this.formValues.Taints[index]) {
+      this.formValues.Taints[index].IsChanged = true;
+    }
   }
 
   addTaint() {
@@ -79,6 +88,12 @@ class KubernetesNodeController {
   restoreTaint(index) {
     this.formValues.Taints[index].NeedsDeletion = false;
     this.onChangeTaintKey();
+  }
+
+  noExecuteTaintsWarning() {
+    return _.filter(this.formValues.Taints, (taint) => {
+      return taint.Effect === KubernetesNodeTaintEffects.NOEXECUTE && (taint.IsNew || taint.IsChanged);
+    }).length;
   }
 
   /* #endregion */
@@ -177,7 +192,39 @@ class KubernetesNodeController {
   }
 
   updateNode() {
-    return this.$async(this.updateNodeAsync);
+    const taintsWarning = this.noExecuteTaintsWarning();
+    const labelsWarning = _.find(this.formValues.Labels, { NeedsDeletion: true, IsUsed: true });
+
+    if (taintsWarning && !labelsWarning) {
+      this.ModalService.confirmUpdate(
+        'Changing these taints will immediately deschedule applications running on this node without the corresponding tolerations. Do you wish to continue?',
+        (confirmed) => {
+          if (confirmed) {
+            return this.$async(this.updateNodeAsync);
+          }
+        }
+      );
+    } else if (!taintsWarning && labelsWarning) {
+      this.ModalService.confirmUpdate(
+        'Removing or changing a label that is used might prevent applications from scheduling on this node in the future. Do you wish to continue?',
+        (confirmed) => {
+          if (confirmed) {
+            return this.$async(this.updateNodeAsync);
+          }
+        }
+      );
+    } else if (taintsWarning && labelsWarning) {
+      this.ModalService.confirmUpdate(
+        'Changing these taints will immediately deschedule applications running on this node without the corresponding tolerations. Removing or changing a label that is used might prevent applications from scheduling on this node in the future.\n\nDo you wish to continue?',
+        (confirmed) => {
+          if (confirmed) {
+            return this.$async(this.updateNodeAsync);
+          }
+        }
+      );
+    } else {
+      return this.$async(this.updateNodeAsync);
+    }
   }
 
   async getNodeAsync() {

@@ -15,6 +15,7 @@ const _KubernetesNodeTaintFormValues = Object.freeze({
   Effect: '',
   NeedsDeletion: false,
   IsNew: false,
+  IsChanged: false,
 });
 
 export class KubernetesNodeTaintFormValues {
