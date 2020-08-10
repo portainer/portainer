@@ -8,7 +8,7 @@ const _KubernetesNodeCreatePayload = Object.freeze({
     labels: {},
   },
   spec: {
-    taints: [],
+    taints: undefined,
   },
 });
 

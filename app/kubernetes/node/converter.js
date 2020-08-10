@@ -118,7 +118,7 @@ class KubernetesNodeConverter {
     const payload = new KubernetesNodeCreatePayload();
     payload.metadata.name = node.Name;
 
-    payload.spec.taints = _.map(node.Taints, (taint) => {
+    const taints = _.map(node.Taints, (taint) => {
       const res = new KubernetesNodeTaintPayload();
       res.key = taint.Key;
       res.value = taint.Value;
@@ -126,14 +126,16 @@ class KubernetesNodeConverter {
       return res;
     });
 
+    payload.spec.taints = taints.length ? taints : undefined;
+
     payload.metadata.labels = node.Labels;
 
     return payload;
   }
 
-  static patchPayload(oldScaler, newScaler) {
-    const oldPayload = KubernetesNodeConverter.createPayload(oldScaler);
-    const newPayload = KubernetesNodeConverter.createPayload(newScaler);
+  static patchPayload(oldNode, newNode) {
+    const oldPayload = KubernetesNodeConverter.createPayload(oldNode);
+    const newPayload = KubernetesNodeConverter.createPayload(newNode);
     const payload = JsonPatch.compare(oldPayload, newPayload);
     return payload;
   }
