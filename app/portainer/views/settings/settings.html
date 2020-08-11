@@ -75,9 +75,34 @@
             </div>
           </div>
           <!-- !templates -->
+          <!-- host-filesystem -->
+          <div class="col-sm-12 form-section-title">
+            Host and Filesystem
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <label for="toggle_enableHostManagementFeatures" class="control-label text-left">
+                Enable host management features
+                <portainer-tooltip position="bottom" message="Enable host management features: host system browsing and advanced host details."></portainer-tooltip>
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" name="toggle_enableHostManagementFeatures" ng-model="formValues.enableHostManagementFeatures" /><i></i>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <label for="toggle_allowvolumebrowser" class="control-label text-left">
+                Enable volume management for non-administrators
+                <portainer-tooltip position="bottom" message="When enabled, regular users will be able to use Portainer volume management features."></portainer-tooltip>
+              </label>
+              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="toggle_allowvolumebrowser" ng-model="formValues.enableVolumeBrowser" /><i></i> </label>
+            </div>
+          </div>
+          <!-- !host-filesystem -->
           <!-- security -->
           <div class="col-sm-12 form-section-title">
-            Security
+            Docker Endpoint Security Options
           </div>
           <div class="form-group">
             <div class="col-sm-12">
@@ -95,26 +120,6 @@
                 <portainer-tooltip position="bottom" message="When enabled, regular users will not be able to use privileged mode when creating containers."></portainer-tooltip>
               </label>
               <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="toggle_allowbindmounts" ng-model="formValues.restrictPrivilegedMode" /><i></i> </label>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="toggle_allowvolumebrowser" class="control-label text-left">
-                Enable volume management for non-administrators
-                <portainer-tooltip position="bottom" message="When enabled, regular users will be able to use Portainer volume management features."></portainer-tooltip>
-              </label>
-              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="toggle_allowvolumebrowser" ng-model="formValues.enableVolumeBrowser" /><i></i> </label>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="toggle_enableHostManagementFeatures" class="control-label text-left">
-                Enable host management features
-                <portainer-tooltip position="bottom" message="Enable host management features: host system browsing and advanced host details."></portainer-tooltip>
-              </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_enableHostManagementFeatures" ng-model="formValues.enableHostManagementFeatures" /><i></i>
-              </label>
             </div>
           </div>
           <div class="form-group">
