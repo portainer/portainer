@@ -33,7 +33,6 @@ angular.module('portainer.docker').controller('CreateServiceController', [
   'SettingsService',
   'WebhookService',
   'EndpointProvider',
-  'ExtensionService',
   function (
     $q,
     $scope,
@@ -59,8 +58,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
     NodeService,
     SettingsService,
     WebhookService,
-    EndpointProvider,
-    ExtensionService
+    EndpointProvider
   ) {
     $scope.formValues = {
       Name: '',
@@ -592,15 +590,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
       const settings = await SettingsService.publicSettings();
       const { AllowBindMountsForRegularUsers } = settings;
 
-      if (isAdmin || AllowBindMountsForRegularUsers) {
-        return true;
-      }
-      const rbacEnabled = await ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC);
-      if (rbacEnabled) {
-        return Authentication.hasAuthorizations(['EndpointResourcesAccess']);
-      }
-
-      return false;
+      return isAdmin || AllowBindMountsForRegularUsers;
     }
   },
 ]);

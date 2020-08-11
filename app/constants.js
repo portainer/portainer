@@ -10,7 +10,6 @@ angular
   .constant('API_ENDPOINT_ENDPOINTS', 'api/endpoints')
   .constant('API_ENDPOINT_ENDPOINT_GROUPS', 'api/endpoint_groups')
   .constant('API_ENDPOINT_MOTD', 'api/motd')
-  .constant('API_ENDPOINT_EXTENSIONS', 'api/extensions')
   .constant('API_ENDPOINT_REGISTRIES', 'api/registries')
   .constant('API_ENDPOINT_RESOURCE_CONTROLS', 'api/resource_controls')
   .constant('API_ENDPOINT_SETTINGS', 'api/settings')

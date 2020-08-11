@@ -40,10 +40,5 @@ func (handler *Handler) teamMembershipDelete(w http.ResponseWriter, r *http.Requ
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the team membership from the database", err}
 	}
 
-	err = handler.AuthorizationService.UpdateUsersAuthorizations()
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
-	}
-
 	return response.Empty(w)
 }

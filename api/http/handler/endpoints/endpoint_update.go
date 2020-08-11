@@ -126,15 +126,12 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		endpoint.Kubernetes = *payload.Kubernetes
 	}
 
-	updateAuthorizations := false
 	if payload.UserAccessPolicies != nil && !reflect.DeepEqual(payload.UserAccessPolicies, endpoint.UserAccessPolicies) {
 		endpoint.UserAccessPolicies = payload.UserAccessPolicies
-		updateAuthorizations = true
 	}
 
 	if payload.TeamAccessPolicies != nil && !reflect.DeepEqual(payload.TeamAccessPolicies, endpoint.TeamAccessPolicies) {
 		endpoint.TeamAccessPolicies = payload.TeamAccessPolicies
-		updateAuthorizations = true
 	}
 
 	if payload.Status != nil {
@@ -224,13 +221,6 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 	err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint changes inside the database", err}
-	}
-
-	if updateAuthorizations {
-		err = handler.AuthorizationService.UpdateUsersAuthorizations()
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
-		}
 	}
 
 	if (endpoint.Type == portainer.EdgeAgentOnDockerEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment) && (groupIDChanged || tagsChanged) {

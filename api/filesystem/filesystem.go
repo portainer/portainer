@@ -10,7 +10,6 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/archive"
 
 	"io"
 	"os"
@@ -94,12 +93,6 @@ func NewService(dataStorePath, fileStorePath string) (*Service, error) {
 // GetBinaryFolder returns the full path to the binary store on the filesystem
 func (service *Service) GetBinaryFolder() string {
 	return path.Join(service.fileStorePath, BinaryStorePath)
-}
-
-// ExtractExtensionArchive extracts the content of an extension archive
-// specified as raw data into the binary store on the filesystem
-func (service *Service) ExtractExtensionArchive(data []byte) error {
-	return archive.UnzipArchive(data, path.Join(service.fileStorePath, BinaryStorePath))
 }
 
 // RemoveDirectory removes a directory on the filesystem.

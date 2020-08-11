@@ -39,10 +39,8 @@ func (handler *Handler) endpointGroupDelete(w http.ResponseWriter, r *http.Reque
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
 	}
 
-	updateAuthorizations := false
 	for _, endpoint := range endpoints {
 		if endpoint.GroupID == portainer.EndpointGroupID(endpointGroupID) {
-			updateAuthorizations = true
 			endpoint.GroupID = portainer.EndpointGroupID(1)
 			err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, &endpoint)
 			if err != nil {
@@ -53,13 +51,6 @@ func (handler *Handler) endpointGroupDelete(w http.ResponseWriter, r *http.Reque
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint relations changes inside the database", err}
 			}
-		}
-	}
-
-	if updateAuthorizations {
-		err = handler.AuthorizationService.UpdateUsersAuthorizations()
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
 		}
 	}
 

@@ -7,8 +7,7 @@ angular.module('portainer.app').controller('SidebarController', [
   'Authentication',
   'UserService',
   'EndpointProvider',
-  'ExtensionService',
-  function ($q, $scope, $transitions, StateManager, Notifications, Authentication, UserService, EndpointProvider, ExtensionService) {
+  function ($q, $scope, $transitions, StateManager, Notifications, Authentication, UserService, EndpointProvider) {
     function checkPermissions(memberships) {
       var isLeader = false;
       angular.forEach(memberships, function (membership) {
@@ -48,15 +47,7 @@ angular.module('portainer.app').controller('SidebarController', [
       const isAdmin = Authentication.isAdmin();
       const { allowStackManagementForRegularUsers } = $scope.applicationState.application;
 
-      if (isAdmin || allowStackManagementForRegularUsers) {
-        return true;
-      }
-      const rbacEnabled = await ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC);
-      if (rbacEnabled) {
-        return Authentication.hasAuthorizations(['EndpointResourcesAccess']);
-      }
-
-      return false;
+      return isAdmin || allowStackManagementForRegularUsers;
     }
 
     $transitions.onEnter({}, async () => {

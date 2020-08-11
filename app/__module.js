@@ -35,7 +35,6 @@ angular.module('portainer', [
   'portainer.docker',
   'portainer.kubernetes',
   'portainer.edge',
-  'portainer.extensions',
   'portainer.integrations',
   'rzModule',
   'moment-picker',

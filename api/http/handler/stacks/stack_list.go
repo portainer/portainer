@@ -7,7 +7,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
@@ -44,14 +43,6 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 	stacks = authorization.DecorateStacks(stacks, resourceControls)
 
 	if !securityContext.IsAdmin {
-		rbacExtensionEnabled := true
-		_, err := handler.DataStore.Extension().Extension(portainer.RBACExtension)
-		if err == errors.ErrObjectNotFound {
-			rbacExtensionEnabled = false
-		} else if err != nil && err != errors.ErrObjectNotFound {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check if RBAC extension is enabled", err}
-		}
-
 		user, err := handler.DataStore.User().User(securityContext.UserID)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user information from the database", err}
@@ -62,7 +53,7 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 			userTeamIDs = append(userTeamIDs, membership.TeamID)
 		}
 
-		stacks = authorization.FilterAuthorizedStacks(stacks, user, userTeamIDs, rbacExtensionEnabled)
+		stacks = authorization.FilterAuthorizedStacks(stacks, user, userTeamIDs)
 	}
 
 	return response.JSON(w, stacks)

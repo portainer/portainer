@@ -17,7 +17,6 @@ import (
 	"github.com/portainer/portainer/api/git"
 	"github.com/portainer/portainer/api/http"
 	"github.com/portainer/portainer/api/http/client"
-	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/snapshot"
 	"github.com/portainer/portainer/api/jwt"
 	"github.com/portainer/portainer/api/kubernetes"
@@ -318,17 +317,6 @@ func initEndpoint(flags *portainer.CLIFlags, dataStore portainer.DataStore, snap
 	return createUnsecuredEndpoint(*flags.EndpointURL, dataStore, snapshotService)
 }
 
-func initExtensionManager(fileService portainer.FileService, dataStore portainer.DataStore) (portainer.ExtensionManager, error) {
-	extensionManager := exec.NewExtensionManager(fileService, dataStore)
-
-	err := extensionManager.StartExtensions()
-	if err != nil {
-		return nil, err
-	}
-
-	return extensionManager, nil
-}
-
 func terminateIfNoAdminCreated(dataStore portainer.DataStore) {
 	timer1 := time.NewTimer(5 * time.Minute)
 	<-timer1.C
@@ -368,11 +356,6 @@ func main() {
 	digitalSignatureService := initDigitalSignatureService()
 
 	err = initKeyPair(fileService, digitalSignatureService)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	extensionManager, err := initExtensionManager(fileService, dataStore)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -439,10 +422,9 @@ func main() {
 		if len(users) == 0 {
 			log.Println("Created admin user with the given password.")
 			user := &portainer.User{
-				Username:                "admin",
-				Role:                    portainer.AdministratorRole,
-				Password:                adminPasswordHash,
-				PortainerAuthorizations: authorization.DefaultPortainerAuthorizations(),
+				Username: "admin",
+				Role:     portainer.AdministratorRole,
+				Password: adminPasswordHash,
 			}
 			err := dataStore.User().CreateUser(user)
 			if err != nil {
@@ -469,7 +451,6 @@ func main() {
 		SwarmStackManager:       swarmStackManager,
 		ComposeStackManager:     composeStackManager,
 		KubernetesDeployer:      kubernetesDeployer,
-		ExtensionManager:        extensionManager,
 		CryptoService:           cryptoService,
 		JWTService:              jwtService,
 		FileService:             fileService,

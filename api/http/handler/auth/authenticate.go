@@ -13,7 +13,6 @@ import (
 	"github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
-	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 type authenticatePayload struct {
@@ -79,11 +78,6 @@ func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.
 		log.Printf("Warning: unable to automatically add user into teams: %s\n", err.Error())
 	}
 
-	err = handler.AuthorizationService.UpdateUsersAuthorizations()
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
-	}
-
 	return handler.writeToken(w, user)
 }
 
@@ -103,9 +97,8 @@ func (handler *Handler) authenticateLDAPAndCreateUser(w http.ResponseWriter, use
 	}
 
 	user := &portainer.User{
-		Username:                username,
-		Role:                    portainer.StandardUserRole,
-		PortainerAuthorizations: authorization.DefaultPortainerAuthorizations(),
+		Username: username,
+		Role:     portainer.StandardUserRole,
 	}
 
 	err = handler.DataStore.User().CreateUser(user)
@@ -116,11 +109,6 @@ func (handler *Handler) authenticateLDAPAndCreateUser(w http.ResponseWriter, use
 	err = handler.addUserIntoTeams(user, ldapSettings)
 	if err != nil {
 		log.Printf("Warning: unable to automatically add user into teams: %s\n", err.Error())
-	}
-
-	err = handler.AuthorizationService.UpdateUsersAuthorizations()
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
 	}
 
 	return handler.writeToken(w, user)

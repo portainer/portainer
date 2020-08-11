@@ -9,7 +9,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 type adminInitPayload struct {
@@ -45,9 +44,8 @@ func (handler *Handler) adminInit(w http.ResponseWriter, r *http.Request) *httpe
 	}
 
 	user := &portainer.User{
-		Username:                payload.Username,
-		Role:                    portainer.AdministratorRole,
-		PortainerAuthorizations: authorization.DefaultPortainerAuthorizations(),
+		Username: payload.Username,
+		Role:     portainer.AdministratorRole,
 	}
 
 	user.Password, err = handler.CryptoService.Hash(payload.Password)

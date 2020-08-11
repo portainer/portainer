@@ -35,9 +35,6 @@ class KubernetesResourcePoolAccessController {
   /**
    * Init
    */
-  // TODO: refactor: roles need to be fetched if RBAC is activated on Portainer
-  // see porAccessManagementController for more details
-  // Extract the fetching code and merge it in AccessService.accesses() function
   async onInit() {
     this.state = {
       actionInProgress: false,

@@ -12,7 +12,6 @@ class AuthenticationController {
     Authentication,
     UserService,
     EndpointService,
-    ExtensionService,
     StateManager,
     Notifications,
     SettingsService,
@@ -28,7 +27,6 @@ class AuthenticationController {
     this.Authentication = Authentication;
     this.UserService = UserService;
     this.EndpointService = EndpointService;
-    this.ExtensionService = ExtensionService;
     this.StateManager = StateManager;
     this.Notifications = Notifications;
     this.SettingsService = SettingsService;
@@ -47,7 +45,6 @@ class AuthenticationController {
       OAuthProvider: '',
     };
 
-    this.retrieveAndSaveEnabledExtensionsAsync = this.retrieveAndSaveEnabledExtensionsAsync.bind(this);
     this.checkForEndpointsAsync = this.checkForEndpointsAsync.bind(this);
     this.checkForLatestVersionAsync = this.checkForLatestVersionAsync.bind(this);
     this.postLoginSteps = this.postLoginSteps.bind(this);
@@ -117,14 +114,6 @@ class AuthenticationController {
    * POST LOGIN STEPS SECTION
    */
 
-  async retrieveAndSaveEnabledExtensionsAsync() {
-    try {
-      await this.ExtensionService.retrieveAndSaveEnabledExtensions();
-    } catch (err) {
-      this.error(err, 'Unable to retrieve enabled extensions');
-    }
-  }
-
   async checkForEndpointsAsync() {
     try {
       const endpoints = await this.EndpointService.endpoints(0, 1);
@@ -158,7 +147,6 @@ class AuthenticationController {
   }
 
   async postLoginSteps() {
-    await this.retrieveAndSaveEnabledExtensionsAsync();
     await this.checkForEndpointsAsync();
     await this.checkForLatestVersionAsync();
   }

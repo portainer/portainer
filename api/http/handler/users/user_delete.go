@@ -81,10 +81,5 @@ func (handler *Handler) deleteUser(w http.ResponseWriter, user *portainer.User) 
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove user memberships from the database", err}
 	}
 
-	err = handler.AuthorizationService.RemoveUserAccessPolicies(user.ID)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to clean-up user access policies", err}
-	}
-
 	return response.Empty(w)
 }

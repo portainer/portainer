@@ -2,7 +2,6 @@ package proxy
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 
@@ -21,7 +20,6 @@ type (
 	Manager struct {
 		proxyFactory           *factory.ProxyFactory
 		endpointProxies        cmap.ConcurrentMap
-		extensionProxies       cmap.ConcurrentMap
 		legacyExtensionProxies cmap.ConcurrentMap
 	}
 )
@@ -30,7 +28,6 @@ type (
 func NewManager(dataStore portainer.DataStore, signatureService portainer.DigitalSignatureService, tunnelService portainer.ReverseTunnelService, clientFactory *docker.ClientFactory, kubernetesClientFactory *cli.ClientFactory, kubernetesTokenCacheManager *kubernetes.TokenCacheManager) *Manager {
 	return &Manager{
 		endpointProxies:        cmap.New(),
-		extensionProxies:       cmap.New(),
 		legacyExtensionProxies: cmap.New(),
 		proxyFactory:           factory.NewProxyFactory(dataStore, signatureService, tunnelService, clientFactory, kubernetesClientFactory, kubernetesTokenCacheManager),
 	}
@@ -61,38 +58,6 @@ func (manager *Manager) GetEndpointProxy(endpoint *portainer.Endpoint) http.Hand
 // DeleteEndpointProxy deletes the proxy associated to a key
 func (manager *Manager) DeleteEndpointProxy(endpoint *portainer.Endpoint) {
 	manager.endpointProxies.Remove(string(endpoint.ID))
-}
-
-// CreateExtensionProxy creates a new HTTP reverse proxy for an extension and
-// registers it in the extension map associated to the specified extension identifier
-func (manager *Manager) CreateExtensionProxy(extensionID portainer.ExtensionID) (http.Handler, error) {
-	proxy, err := manager.proxyFactory.NewExtensionProxy(extensionID)
-	if err != nil {
-		return nil, err
-	}
-
-	manager.extensionProxies.Set(strconv.Itoa(int(extensionID)), proxy)
-	return proxy, nil
-}
-
-// GetExtensionProxy returns an extension proxy associated to an extension identifier
-func (manager *Manager) GetExtensionProxy(extensionID portainer.ExtensionID) http.Handler {
-	proxy, ok := manager.extensionProxies.Get(strconv.Itoa(int(extensionID)))
-	if !ok {
-		return nil
-	}
-
-	return proxy.(http.Handler)
-}
-
-// GetExtensionURL retrieves the URL of an extension running locally based on the extension port table
-func (manager *Manager) GetExtensionURL(extensionID portainer.ExtensionID) string {
-	return factory.BuildExtensionURL(extensionID)
-}
-
-// DeleteExtensionProxy deletes the extension proxy associated to an extension identifier
-func (manager *Manager) DeleteExtensionProxy(extensionID portainer.ExtensionID) {
-	manager.extensionProxies.Remove(strconv.Itoa(int(extensionID)))
 }
 
 // CreateLegacyExtensionProxy creates a new HTTP reverse proxy for a legacy extension and adds it to the registered proxies

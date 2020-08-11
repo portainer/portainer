@@ -340,11 +340,6 @@ func (store *Store) EndpointRelation() portainer.EndpointRelationService {
 	return store.EndpointRelationService
 }
 
-// Extension gives access to the Extension data management layer
-func (store *Store) Extension() portainer.ExtensionService {
-	return store.ExtensionService
-}
-
 // Registry gives access to the Registry data management layer
 func (store *Store) Registry() portainer.RegistryService {
 	return store.RegistryService

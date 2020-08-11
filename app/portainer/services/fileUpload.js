@@ -197,19 +197,6 @@ angular.module('portainer.app').factory('FileUploadService', [
       return $q.all(queue);
     };
 
-    service.uploadExtension = function (license, extensionFile) {
-      const payload = {
-        License: license,
-        file: extensionFile,
-        ArchiveFileName: extensionFile.name,
-      };
-      return Upload.upload({
-        url: 'api/extensions/upload',
-        data: payload,
-        ignoreLoadingBar: true,
-      });
-    };
-
     return service;
   },
 ]);

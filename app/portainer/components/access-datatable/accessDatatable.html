@@ -10,15 +10,6 @@
         <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
-        <button
-          ng-if="$ctrl.rbacEnabled"
-          type="button"
-          class="btn btn-sm btn-primary"
-          ng-disabled="($ctrl.dataset | filter:{ Updated: true}).length === 0 "
-          ng-click="$ctrl.updateAction()"
-        >
-          <i class="fa fa-check space-right" aria-hidden="true"></i>Update
-        </button>
       </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
@@ -53,13 +44,6 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Type' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th ng-if="$ctrl.rbacEnabled">
-                <a ng-click="$ctrl.changeOrderBy('RoleName')">
-                  Role
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'RoleName' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'RoleName' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
             </tr>
           </thead>
           <tbody>
@@ -79,18 +63,6 @@
                 <span ng-if="$ctrl.inheritFrom && item.Override" class="text-muted small" style="margin-left: 2px;"><code style="font-size: 85% !important;">override</code></span>
               </td>
               <td>{{ item.Type }}</td>
-              <td ng-if="$ctrl.rbacEnabled">
-                <span ng-if="!item.Updated">
-                  {{ item.Role.Name }}
-                  <a ng-if="!item.Inherited" class="interactive" ng-click="item.Updated = true; item.OldRole = item.Role; $event.stopPropagation();">
-                    <i class="fa fa-edit" aria-hidden="true"></i> Edit
-                  </a>
-                </span>
-                <span ng-if="item.Updated">
-                  <select ng-model="item.Role" ng-options="role.Name for role in $ctrl.roles"> </select>
-                  <a class="interactive" ng-click="item.Updated = false; item.Role = item.OldRole; item.OldRole = null; $event.stopPropagation();"><i class="fa fa-times"></i></a>
-                </span>
-              </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
               <td colspan="4" class="text-center text-muted">Loading...</td>

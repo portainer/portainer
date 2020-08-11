@@ -1,7 +1,7 @@
 angular.module('portainer.app').controller('StacksController', StacksController);
 
 /* @ngInject */
-function StacksController($scope, $state, Notifications, StackService, ModalService, EndpointProvider, Authentication, StateManager, ExtensionService) {
+function StacksController($scope, $state, Notifications, StackService, ModalService, EndpointProvider, Authentication, StateManager) {
   $scope.removeAction = function (selectedItems) {
     ModalService.confirmDeletion('Do you want to remove the selected stack(s)? Associated services will be removed as well.', function onConfirm(confirmed) {
       if (!confirmed) {
@@ -56,24 +56,7 @@ function StacksController($scope, $state, Notifications, StackService, ModalServ
 
   async function loadCreateEnabled() {
     const appState = StateManager.getState().application;
-    if (appState.allowStackManagementForRegularUsers) {
-      return true;
-    }
-
-    let isAdmin = true;
-    if (appState.authentication) {
-      isAdmin = Authentication.isAdmin();
-    }
-    if (isAdmin) {
-      return true;
-    }
-
-    const RBACExtensionEnabled = await ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC);
-    if (!RBACExtensionEnabled) {
-      return false;
-    }
-
-    return Authentication.hasAuthorizations(['EndpointResourcesAccess']);
+    return appState.allowStackManagementForRegularUsers || Authentication.isAdmin();
   }
 
   async function initView() {

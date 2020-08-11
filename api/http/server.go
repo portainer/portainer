@@ -20,7 +20,6 @@ import (
 	"github.com/portainer/portainer/api/http/handler/endpointgroups"
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
 	"github.com/portainer/portainer/api/http/handler/endpoints"
-	"github.com/portainer/portainer/api/http/handler/extensions"
 	"github.com/portainer/portainer/api/http/handler/file"
 	"github.com/portainer/portainer/api/http/handler/motd"
 	"github.com/portainer/portainer/api/http/handler/registries"
@@ -41,7 +40,6 @@ import (
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
@@ -51,7 +49,6 @@ type Server struct {
 	AssetsPath              string
 	Status                  *portainer.Status
 	ReverseTunnelService    portainer.ReverseTunnelService
-	ExtensionManager        portainer.ExtensionManager
 	ComposeStackManager     portainer.ComposeStackManager
 	CryptoService           portainer.CryptoService
 	SignatureService        portainer.DigitalSignatureService
@@ -74,12 +71,10 @@ type Server struct {
 
 // Start starts the HTTP server
 func (server *Server) Start() error {
-	authorizationService := authorization.NewService(server.DataStore)
 	kubernetesTokenCacheManager := kubernetes.NewTokenCacheManager()
 	proxyManager := proxy.NewManager(server.DataStore, server.SignatureService, server.ReverseTunnelService, server.DockerClientFactory, server.KubernetesClientFactory, kubernetesTokenCacheManager)
 
-	rbacExtensionURL := proxyManager.GetExtensionURL(portainer.RBACExtension)
-	requestBouncer := security.NewRequestBouncer(server.DataStore, server.JWTService, rbacExtensionURL)
+	requestBouncer := security.NewRequestBouncer(server.DataStore, server.JWTService)
 
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
 
@@ -89,7 +84,6 @@ func (server *Server) Start() error {
 	authHandler.JWTService = server.JWTService
 	authHandler.LDAPService = server.LDAPService
 	authHandler.ProxyManager = proxyManager
-	authHandler.AuthorizationService = authorizationService
 	authHandler.KubernetesTokenCacheManager = kubernetesTokenCacheManager
 	authHandler.OAuthService = server.OAuthService
 
@@ -122,7 +116,6 @@ func (server *Server) Start() error {
 
 	var endpointHandler = endpoints.NewHandler(requestBouncer)
 	endpointHandler.DataStore = server.DataStore
-	endpointHandler.AuthorizationService = authorizationService
 	endpointHandler.FileService = server.FileService
 	endpointHandler.ProxyManager = proxyManager
 	endpointHandler.SnapshotService = server.SnapshotService
@@ -136,7 +129,6 @@ func (server *Server) Start() error {
 
 	var endpointGroupHandler = endpointgroups.NewHandler(requestBouncer)
 	endpointGroupHandler.DataStore = server.DataStore
-	endpointGroupHandler.AuthorizationService = authorizationService
 
 	var endpointProxyHandler = endpointproxy.NewHandler(requestBouncer)
 	endpointProxyHandler.DataStore = server.DataStore
@@ -147,11 +139,6 @@ func (server *Server) Start() error {
 
 	var motdHandler = motd.NewHandler(requestBouncer)
 
-	var extensionHandler = extensions.NewHandler(requestBouncer)
-	extensionHandler.DataStore = server.DataStore
-	extensionHandler.ExtensionManager = server.ExtensionManager
-	extensionHandler.AuthorizationService = authorizationService
-
 	var registryHandler = registries.NewHandler(requestBouncer)
 	registryHandler.DataStore = server.DataStore
 	registryHandler.FileService = server.FileService
@@ -161,7 +148,6 @@ func (server *Server) Start() error {
 	resourceControlHandler.DataStore = server.DataStore
 
 	var settingsHandler = settings.NewHandler(requestBouncer)
-	settingsHandler.AuthorizationService = authorizationService
 	settingsHandler.DataStore = server.DataStore
 	settingsHandler.FileService = server.FileService
 	settingsHandler.JWTService = server.JWTService
@@ -181,11 +167,9 @@ func (server *Server) Start() error {
 
 	var teamHandler = teams.NewHandler(requestBouncer)
 	teamHandler.DataStore = server.DataStore
-	teamHandler.AuthorizationService = authorizationService
 
 	var teamMembershipHandler = teammemberships.NewHandler(requestBouncer)
 	teamMembershipHandler.DataStore = server.DataStore
-	teamMembershipHandler.AuthorizationService = authorizationService
 
 	var statusHandler = status.NewHandler(requestBouncer, server.Status)
 
@@ -202,7 +186,6 @@ func (server *Server) Start() error {
 	var userHandler = users.NewHandler(requestBouncer, rateLimiter)
 	userHandler.DataStore = server.DataStore
 	userHandler.CryptoService = server.CryptoService
-	userHandler.AuthorizationService = authorizationService
 
 	var websocketHandler = websocket.NewHandler(requestBouncer)
 	websocketHandler.DataStore = server.DataStore
@@ -229,7 +212,6 @@ func (server *Server) Start() error {
 		EndpointProxyHandler:   endpointProxyHandler,
 		FileHandler:            fileHandler,
 		MOTDHandler:            motdHandler,
-		ExtensionHandler:       extensionHandler,
 		RegistryHandler:        registryHandler,
 		ResourceControlHandler: resourceControlHandler,
 		SettingsHandler:        settingsHandler,

@@ -119,16 +119,10 @@ func DecorateCustomTemplates(templates []portainer.CustomTemplate, resourceContr
 }
 
 // FilterAuthorizedStacks returns a list of decorated stacks filtered through resource control access checks.
-func FilterAuthorizedStacks(stacks []portainer.Stack, user *portainer.User, userTeamIDs []portainer.TeamID, rbacEnabled bool) []portainer.Stack {
+func FilterAuthorizedStacks(stacks []portainer.Stack, user *portainer.User, userTeamIDs []portainer.TeamID) []portainer.Stack {
 	authorizedStacks := make([]portainer.Stack, 0)
 
 	for _, stack := range stacks {
-		_, ok := user.EndpointAuthorizations[stack.EndpointID][portainer.EndpointResourcesAccess]
-		if rbacEnabled && ok {
-			authorizedStacks = append(authorizedStacks, stack)
-			continue
-		}
-
 		if stack.ResourceControl != nil && UserCanAccessResource(user.ID, userTeamIDs, stack.ResourceControl) {
 			authorizedStacks = append(authorizedStacks, stack)
 		}
