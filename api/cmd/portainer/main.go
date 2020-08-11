@@ -6,6 +6,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gofrs/uuid"
+
+	"github.com/portainer/portainer/api/bolt/errors"
+
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt"
 	"github.com/portainer/portainer/api/chisel"
@@ -120,8 +124,8 @@ func initDockerClientFactory(signatureService portainer.DigitalSignatureService,
 	return docker.NewClientFactory(signatureService, reverseTunnelService)
 }
 
-func initKubernetesClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService) *kubecli.ClientFactory {
-	return kubecli.NewClientFactory(signatureService, reverseTunnelService)
+func initKubernetesClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, instanceID string) *kubecli.ClientFactory {
+	return kubecli.NewClientFactory(signatureService, reverseTunnelService, instanceID)
 }
 
 func initSnapshotService(snapshotInterval string, dataStore portainer.DataStore, dockerClientFactory *docker.ClientFactory, kubernetesClientFactory *kubecli.ClientFactory) (portainer.SnapshotService, error) {
@@ -340,6 +344,23 @@ func main() {
 	dataStore := initDataStore(*flags.Data, fileService)
 	defer dataStore.Close()
 
+	instanceID, err := dataStore.Version().InstanceID()
+	if err == errors.ErrObjectNotFound {
+		uid, err := uuid.NewV4()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		instanceID = uid.String()
+
+		err = dataStore.Version().StoreInstanceID(instanceID)
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else if err == nil {
+		log.Fatal(err)
+	}
+
 	jwtService, err := initJWTService(dataStore)
 	if err != nil {
 		log.Fatal(err)
@@ -363,7 +384,7 @@ func main() {
 	reverseTunnelService := chisel.NewService(dataStore)
 
 	dockerClientFactory := initDockerClientFactory(digitalSignatureService, reverseTunnelService)
-	kubernetesClientFactory := initKubernetesClientFactory(digitalSignatureService, reverseTunnelService)
+	kubernetesClientFactory := initKubernetesClientFactory(digitalSignatureService, reverseTunnelService, instanceID)
 
 	snapshotService, err := initSnapshotService(*flags.SnapshotInterval, dataStore, dockerClientFactory, kubernetesClientFactory)
 	if err != nil {

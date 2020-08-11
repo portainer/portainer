@@ -11,7 +11,7 @@ import (
 )
 
 func (kcl *KubeClient) createServiceAccountToken(serviceAccountName string) error {
-	serviceAccountSecretName := userServiceAccountTokenSecretName(serviceAccountName)
+	serviceAccountSecretName := userServiceAccountTokenSecretName(serviceAccountName, kcl.instanceID)
 
 	serviceAccountSecret := &v1.Secret{
 		TypeMeta: metav1.TypeMeta{},
@@ -33,7 +33,7 @@ func (kcl *KubeClient) createServiceAccountToken(serviceAccountName string) erro
 }
 
 func (kcl *KubeClient) getServiceAccountToken(serviceAccountName string) (string, error) {
-	serviceAccountSecretName := userServiceAccountTokenSecretName(serviceAccountName)
+	serviceAccountSecretName := userServiceAccountTokenSecretName(serviceAccountName, kcl.instanceID)
 
 	secret, err := kcl.cli.CoreV1().Secrets(portainerNamespace).Get(serviceAccountSecretName, metav1.GetOptions{})
 	if err != nil {
