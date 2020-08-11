@@ -12,7 +12,7 @@ async function initAuthentication(authManager, Authentication, $rootScope, $stat
     }
   });
 
-  await Authentication.init();
+  return await Authentication.init();
 }
 
 angular.module('portainer.app', ['portainer.oauth']).config([
@@ -24,34 +24,23 @@ angular.module('portainer.app', ['portainer.oauth']).config([
       name: 'root',
       abstract: true,
       resolve: {
-        initStateManager: [
-          'StateManager',
-          'Authentication',
-          'Notifications',
-          'authManager',
-          '$rootScope',
-          '$state',
-          '$async',
-          '$q',
-          (StateManager, Authentication, Notifications, authManager, $rootScope, $state, $async, $q) => {
-            const deferred = $q.defer();
+        initStateManager: /* @ngInject */ function initStateManager($async, StateManager, Authentication, Notifications, authManager, $rootScope, $state) {
+          return $async(async () => {
             const appState = StateManager.getState();
             if (!appState.loading) {
-              deferred.resolve();
-            } else {
-              StateManager.initialize()
-                .then(function success() {
-                  return $async(initAuthentication, authManager, Authentication, $rootScope, $state);
-                })
-                .then(() => deferred.resolve())
-                .catch(function error(err) {
-                  Notifications.error('Failure', err, 'Unable to retrieve application settings');
-                  deferred.reject(err);
-                });
+              return;
             }
-            return deferred.promise;
-          },
-        ],
+            try {
+              const loggedIn = await initAuthentication(authManager, Authentication, $rootScope, $state);
+              await StateManager.initialize();
+              if (!loggedIn) {
+                $state.go('portainer.auth');
+              }
+            } catch (err) {
+              Notifications.error('Failure', err, 'Unable to retrieve application settings');
+            }
+          });
+        },
       },
       views: {
         'sidebar@': {

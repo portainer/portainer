@@ -29,6 +29,7 @@ angular.module('portainer.app').factory('Authentication', [
         if (jwt) {
           await setUser(jwt);
         }
+        return !!jwt;
       } catch (error) {
         throw error;
       }
