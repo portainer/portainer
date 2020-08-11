@@ -35,6 +35,7 @@ angular.module('portainer.app', ['portainer.oauth']).config([
               await StateManager.initialize();
               if (!loggedIn) {
                 $state.go('portainer.auth');
+                return Promise.reject('Unauthenticated');
               }
             } catch (err) {
               Notifications.error('Failure', err, 'Unable to retrieve application settings');
