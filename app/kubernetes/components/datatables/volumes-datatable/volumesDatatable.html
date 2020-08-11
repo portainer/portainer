@@ -145,6 +145,7 @@
                   ui-sref="kubernetes.applications.application({ name: item.Applications[0].Name, namespace: item.ResourcePool.Namespace.Name })"
                   >{{ item.Applications[0].Name }}</a
                 >
+                <span ng-if="item.Applications.length > 1"> + {{ item.Applications.length - 1 }}</span>
                 <span ng-if="!item.Applications.length">-</span>
               </td>
               <td>
