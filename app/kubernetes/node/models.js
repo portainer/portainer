@@ -42,3 +42,24 @@ export class KubernetesNodeDetails {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesNodeDetails)));
   }
 }
+
+/**
+ * KubernetesNodeTaint Model
+ */
+const _KubernetesNodeTaint = Object.freeze({
+  Key: '',
+  Value: '',
+  Effect: '',
+});
+
+export class KubernetesNodeTaint {
+  constructor() {
+    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesNodeTaint)));
+  }
+}
+
+export const KubernetesNodeTaintEffects = Object.freeze({
+  NOSCHEDULE: 'NoSchedule',
+  PREFERNOSCHEDULE: 'PreferNoSchedule',
+  NOEXECUTE: 'NoExecute',
+});

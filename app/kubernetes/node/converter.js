@@ -1,7 +1,10 @@
 import _ from 'lodash-es';
 
-import { KubernetesNode, KubernetesNodeDetails } from 'Kubernetes/node/models';
+import { KubernetesNode, KubernetesNodeDetails, KubernetesNodeTaint } from 'Kubernetes/node/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
+import { KubernetesNodeFormValues, KubernetesNodeTaintFormValues, KubernetesNodeLabelFormValues } from 'Kubernetes/node/formValues';
+import { KubernetesNodeCreatePayload, KubernetesNodeTaintPayload } from 'Kubernetes/node/payload';
+import * as JsonPatch from 'fast-json-patch';
 
 class KubernetesNodeConverter {
   static apiToNode(data, res) {
@@ -40,7 +43,13 @@ class KubernetesNodeConverter {
     res.Version = data.status.nodeInfo.kubeletVersion;
     const internalIP = _.find(data.status.addresses, { type: 'InternalIP' });
     res.IPAddress = internalIP ? internalIP.address : '-';
-    res.Taints = data.spec.taints ? data.spec.taints : [];
+    res.Taints = _.map(data.spec.taints, (taint) => {
+      const res = new KubernetesNodeTaint();
+      res.Key = taint.key;
+      res.Value = taint.value;
+      res.Effect = taint.effect;
+      return res;
+    });
     return res;
   }
 
@@ -53,6 +62,82 @@ class KubernetesNodeConverter {
     res.OS.Image = data.status.nodeInfo.osImage;
     res.Yaml = yaml ? yaml.data : '';
     return res;
+  }
+
+  static nodeToFormValues(node) {
+    const res = new KubernetesNodeFormValues();
+
+    res.Taints = _.map(node.Taints, (taint) => {
+      const res = new KubernetesNodeTaintFormValues();
+      res.Key = taint.Key;
+      res.Value = taint.Value;
+      res.Effect = taint.Effect;
+      res.NeedsDeletion = false;
+      res.IsNew = false;
+      return res;
+    });
+
+    res.Labels = _.map(node.Labels, (value, key) => {
+      const res = new KubernetesNodeLabelFormValues();
+      res.Key = key;
+      res.Value = value;
+      res.NeedsDeletion = false;
+      res.IsNew = false;
+      return res;
+    });
+
+    return res;
+  }
+
+  static formValuesToNode(node, formValues) {
+    const res = angular.copy(node);
+
+    const filteredTaints = _.filter(formValues.Taints, (taint) => !taint.NeedsDeletion);
+    res.Taints = _.map(filteredTaints, (item) => {
+      const taint = new KubernetesNodeTaint();
+      taint.Key = item.Key;
+      taint.Value = item.Value;
+      taint.Effect = item.Effect;
+      return taint;
+    });
+
+    const filteredLabels = _.filter(formValues.Labels, (label) => !label.NeedsDeletion);
+    res.Labels = _.reduce(
+      filteredLabels,
+      (acc, item) => {
+        acc[item.Key] = item.Value ? item.Value : '';
+        return acc;
+      },
+      {}
+    );
+
+    return res;
+  }
+
+  static createPayload(node) {
+    const payload = new KubernetesNodeCreatePayload();
+    payload.metadata.name = node.Name;
+
+    const taints = _.map(node.Taints, (taint) => {
+      const res = new KubernetesNodeTaintPayload();
+      res.key = taint.Key;
+      res.value = taint.Value;
+      res.effect = taint.Effect;
+      return res;
+    });
+
+    payload.spec.taints = taints.length ? taints : undefined;
+
+    payload.metadata.labels = node.Labels;
+
+    return payload;
+  }
+
+  static patchPayload(oldNode, newNode) {
+    const oldPayload = KubernetesNodeConverter.createPayload(oldNode);
+    const newPayload = KubernetesNodeConverter.createPayload(newNode);
+    const payload = JsonPatch.compare(oldPayload, newPayload);
+    return payload;
   }
 }
 
