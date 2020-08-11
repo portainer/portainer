@@ -104,12 +104,16 @@ class KubernetesVolumeController {
   }
 
   updateVolume() {
-    this.ModalService.confirmRedeploy(
-      'One or multiple applications are currently using this volume.</br> For the change to be taken into account these applications will need to be redeployed. Do you want us to reschedule it now?',
-      (redeploy) => {
-        return this.$async(this.updateVolumeAsync, redeploy);
-      }
-    );
+    if (KubernetesVolumeHelper.isUsed(this.volume)) {
+      this.ModalService.confirmRedeploy(
+        'One or multiple applications are currently using this volume.</br> For the change to be taken into account these applications will need to be redeployed. Do you want us to reschedule it now?',
+        (redeploy) => {
+          return this.$async(this.updateVolumeAsync, redeploy);
+        }
+      );
+    } else {
+      return this.$async(this.updateVolumeAsync, false);
+    }
   }
 
   async getVolumeAsync() {
