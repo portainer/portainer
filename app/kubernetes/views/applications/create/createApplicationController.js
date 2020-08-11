@@ -253,6 +253,7 @@ class KubernetesCreateApplicationController {
     const p = new KubernetesApplicationPublishedPortFormValue();
     const ingresses = this.filteredIngresses;
     p.IngressName = ingresses && ingresses.length ? ingresses[0].Name : undefined;
+    p.IngressHost = ingresses && ingresses.length ? ingresses[0].Host : undefined;
     this.formValues.PublishedPorts.push(p);
   }
 
@@ -260,6 +261,7 @@ class KubernetesCreateApplicationController {
     const ingresses = this.filteredIngresses;
     _.forEach(this.formValues.PublishedPorts, (p) => {
       p.IngressName = ingresses && ingresses.length ? ingresses[0].Name : undefined;
+      p.IngressHost = ingresses && ingresses.length ? ingresses[0].Host : undefined;
     });
   }
 
@@ -310,6 +312,12 @@ class KubernetesCreateApplicationController {
       state.refs = {};
       state.hasDuplicates = false;
     }
+  }
+
+  onChangePortMappingIngress(index) {
+    const publishedPort = this.formValues.PublishedPorts[index];
+    const ingress = _.find(this.filteredIngresses, { Name: publishedPort.IngressName });
+    publishedPort.IngressHost = ingress.Host;
   }
 
   onChangePortMappingIngressRoute() {
@@ -831,7 +839,7 @@ class KubernetesCreateApplicationController {
       this.resourcePools = _.filter(resourcePools, (resourcePool) => !this.KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name));
       this.formValues.ResourcePool = this.resourcePools[0];
 
-      // TODO: refactor
+      // TODO: refactor @Max
       // Don't pull all volumes and applications across all namespaces
       // Use refreshNamespaceData flow (triggered on Init + on Namespace change)
       // and query only accross the selected namespace

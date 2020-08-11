@@ -15,6 +15,7 @@ export function KubernetesResourcePoolIngressClassFormValue(ingressClassName) {
   return {
     Name: ingressClassName,
     IngressClassName: ingressClassName,
+    Host: undefined,
     Selected: false,
     WasSelected: false,
     Namespace: undefined, // will be filled inside ResourcePoolService.create

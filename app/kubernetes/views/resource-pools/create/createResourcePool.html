@@ -10,7 +10,7 @@
       <rd-widget>
         <rd-widget-body>
           <form class="form-horizontal" autocomplete="off" name="resourcePoolCreationForm">
-            <!-- name-input -->
+            <!-- #region NAME INPUT -->
             <div class="form-group">
               <label for="pool_name" class="col-sm-1 control-label text-left">Name</label>
               <div class="col-sm-11">
@@ -39,10 +39,12 @@
                 <p ng-if="ctrl.state.isAlreadyExist"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A resource pool with the same name already exists.</p>
               </div>
             </div>
-            <!-- !name-input -->
+            <!-- #endregion -->
+
             <div class="col-sm-12 form-section-title">
               Quota
             </div>
+            <!-- #region QUOTA -->
             <!-- quotas-switch -->
             <div class="form-group">
               <div class="col-sm-12 small text-muted">
@@ -125,9 +127,12 @@
                 <!-- !cpu-limit-input -->
               </div>
             </div>
+            <!-- #endregion -->
+
             <div class="col-sm-12 form-section-title">
               Ingresses
             </div>
+            <!-- #region INGRESSES -->
             <div class="form-group" ng-if="!ctrl.state.canUseIngress">
               <div class="col-sm-12 small text-muted">
                 <p>
@@ -156,11 +161,15 @@
                   <tbody>
                     <tr class="text-muted">
                       <td>Ingress controller</td>
+                      <td>Hostname</td>
                       <td>Activated</td>
                     </tr>
                     <tr ng-repeat="class in ctrl.formValues.IngressClasses">
                       <td>
                         {{ class.Name }}
+                      </td>
+                      <td>
+                        <input class="form-control" ng-model="class.Host" placeholder="host.com" />
                       </td>
                       <td>
                         <label class="switch" style="margin-right: 10px;"> <input type="checkbox" ng-model="class.Selected" /><i></i> </label>
@@ -170,10 +179,12 @@
                 </table>
               </div>
             </div>
-            <!-- actions -->
+            <!-- #endregion -->
+
             <div class="col-sm-12 form-section-title">
               Actions
             </div>
+            <!-- #region ACTIONS -->
             <div class="form-group">
               <div class="col-sm-12">
                 <button
@@ -188,7 +199,8 @@
                 </button>
               </div>
             </div>
-            <!-- !actions -->
+
+            <!-- #endregion -->
           </form>
         </rd-widget-body>
       </rd-widget>

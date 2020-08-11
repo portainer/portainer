@@ -118,6 +118,7 @@ export function KubernetesApplicationPublishedPortFormValue() {
     Protocol: 'TCP',
     IngressName: undefined,
     IngressRoute: undefined,
+    IngressHost: undefined,
   };
 }
 

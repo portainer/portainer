@@ -7,18 +7,28 @@ import { KubernetesIngressCreatePayload, KubernetesIngressRuleCreatePayload, Kub
 import { KubernetesIngressClassAnnotation, KubernetesIngressClassMandatoryAnnotations } from './constants';
 
 export class KubernetesIngressConverter {
+  // TODO: refactor @LP
+  // currently only allows the first non-empty host to be used as the "configured" host.
+  // As we currently only allow a single host to be used for a Portianer-managed ingress
+  // it's working as the only non-empty host will be the one defined by the admin
+  // but it will take a random existing host for non Portainer ingresses (CLI deployed)
+  // Also won't support multiple hosts if we make it available in the future
   static apiToModel(data) {
+    let host = undefined;
     const paths = _.flatMap(data.spec.rules, (rule) => {
-      return _.map(rule.http.paths, (path) => {
-        const ingRule = new KubernetesIngressRule();
-        ingRule.ParentIngressName = data.metadata.name;
-        ingRule.ServiceName = path.backend.serviceName;
-        ingRule.Host = rule.host || '';
-        ingRule.IP = data.status.loadBalancer.ingress ? data.status.loadBalancer.ingress[0].ip : undefined;
-        ingRule.Port = path.backend.servicePort;
-        ingRule.Path = path.path;
-        return ingRule;
-      });
+      host = host || rule.host; // TODO: refactor @LP - read above
+      return !rule.http
+        ? []
+        : _.map(rule.http.paths, (path) => {
+            const ingRule = new KubernetesIngressRule();
+            ingRule.IngressName = data.metadata.name;
+            ingRule.ServiceName = path.backend.serviceName;
+            ingRule.Host = rule.host || '';
+            ingRule.IP = data.status.loadBalancer.ingress ? data.status.loadBalancer.ingress[0].ip : undefined;
+            ingRule.Port = path.backend.servicePort;
+            ingRule.Path = path.path;
+            return ingRule;
+          });
     });
 
     const res = new KubernetesIngress();
@@ -30,6 +40,7 @@ export class KubernetesIngressConverter {
         ? data.metadata.annotations[KubernetesIngressClassAnnotation]
         : data.spec.ingressClassName;
     res.Paths = paths;
+    res.Host = host;
     return res;
   }
 
@@ -42,10 +53,11 @@ export class KubernetesIngressConverter {
         _.remove(ingress.Paths, path);
       } else if (ingress && p.IsNew) {
         const rule = new KubernetesIngressRule();
-        rule.ParentIngressName = ingress.Name;
+        rule.IngressName = ingress.Name;
         rule.ServiceName = serviceName;
         rule.Port = p.ContainerPort;
         rule.Path = p.IngressRoute;
+        rule.Host = p.IngressHost;
         ingress.Paths.push(rule);
       }
     });
@@ -62,22 +74,29 @@ export class KubernetesIngressConverter {
     if (annotations) {
       _.extend(res.metadata.annotations, annotations);
     }
-    const groups = _.groupBy(data.Paths, 'Host');
-    const rules = _.map(groups, (rules, host) => {
-      const rule = new KubernetesIngressRuleCreatePayload();
+    if (data.Paths && data.Paths.length) {
+      const groups = _.groupBy(data.Paths, 'Host');
+      const rules = _.map(groups, (rules, host) => {
+        const rule = new KubernetesIngressRuleCreatePayload();
 
-      KubernetesCommonHelper.assignOrDeleteIfEmpty(rule, 'host', host);
-      rule.http.paths = _.map(rules, (r) => {
-        const path = new KubernetesIngressRulePathCreatePayload();
-        path.path = r.Path;
-        path.backend.serviceName = r.ServiceName;
-        path.backend.servicePort = r.Port;
-        return path;
+        KubernetesCommonHelper.assignOrDeleteIfEmpty(rule, 'host', host);
+        rule.http.paths = _.map(rules, (r) => {
+          const path = new KubernetesIngressRulePathCreatePayload();
+          path.path = r.Path;
+          path.backend.serviceName = r.ServiceName;
+          path.backend.servicePort = r.Port;
+          return path;
+        });
+        return rule;
       });
-      return rule;
-    });
-    KubernetesCommonHelper.assignOrDeleteIfEmpty(res, 'spec.rules', rules);
-
+      KubernetesCommonHelper.assignOrDeleteIfEmpty(res, 'spec.rules', rules);
+    } else {
+      res.spec.rules = [
+        {
+          host: data.Host,
+        },
+      ];
+    }
     return res;
   }
 

@@ -253,8 +253,9 @@ class KubernetesApplicationHelper {
       const res = new KubernetesApplicationPublishedPortFormValue();
       res.IsNew = false;
       if (rule) {
-        res.IngressName = rule.ParentIngressName;
+        res.IngressName = rule.IngressName;
         res.IngressRoute = rule.Path;
+        res.IngressHost = rule.Host;
       }
       res.Protocol = port.Protocol;
       res.ContainerPort = port.TargetPort;

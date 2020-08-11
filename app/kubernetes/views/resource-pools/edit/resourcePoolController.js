@@ -123,12 +123,16 @@ class KubernetesResourcePoolController {
 
       const promises = _.map(this.formValues.IngressClasses, (c) => {
         c.Namespace = namespace;
+        const original = _.find(this.savedIngressClasses, { Name: c.Name });
         if (this.formValues.UseIngress && c.Selected === true && c.WasSelected === false) {
           return this.KubernetesIngressService.create(c);
         } else if (this.formValues.UseIngress && c.Selected === false && c.WasSelected === true) {
           return this.KubernetesIngressService.delete(c);
         } else if (!this.formValues.UseIngress && c.WasSelected === true) {
           return this.KubernetesIngressService.delete(c);
+        } else if (original && original.Host !== c.Host) {
+          original.Namespace = namespace;
+          return this.KubernetesIngressService.patch(original, c);
         }
       });
       await Promise.all(promises);
@@ -267,17 +271,19 @@ class KubernetesResourcePoolController {
       }
       if (this.state.canUseIngress) {
         const ingresses = await this.KubernetesIngressService.get(name);
-        const iNames = _.map(ingresses, 'Name');
         const ingressClasses = this.EndpointProvider.currentEndpoint().Kubernetes.Configuration.IngressClasses;
         this.formValues.IngressClasses = _.map(ingressClasses, (item) => {
           const iClass = new KubernetesResourcePoolIngressClassFormValue(item);
-          if (_.includes(iNames, iClass.Name)) {
+          const matchingIngress = _.find(ingresses, { Name: iClass.Name });
+          if (matchingIngress) {
             iClass.Selected = true;
             iClass.WasSelected = true;
+            iClass.Host = matchingIngress.Host;
             this.formValues.UseIngress = true;
           }
           return iClass;
         });
+        this.savedIngressClasses = angular.copy(this.formValues.IngressClasses);
       }
 
       await this.getEvents();

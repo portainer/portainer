@@ -1161,6 +1161,7 @@
                       ng-model="publishedPort.IngressName"
                       ng-options="ingress.Name as ingress.Name for ingress in ctrl.filteredIngresses"
                       ng-required="!publishedPort.NeedsDeletion"
+                      ng-change="ctrl.onChangePortMappingIngress($index)"
                       ng-disabled="ctrl.disableLoadBalancerEdit() || ctrl.isEditAndNotNewPublishedPort($index)"
                     >
                       <option selected disabled hidden value="">Select an ingress</option>
