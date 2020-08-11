@@ -3,5 +3,6 @@ angular.module('portainer.kubernetes').component('kubernetesSidebarContent', {
   bindings: {
     adminAccess: '<',
     endpointId: '<',
+    currentState: '<',
   },
 });
