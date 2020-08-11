@@ -47,7 +47,10 @@ class KubernetesResourcePoolController {
     this.updateResourcePoolAsync = this.updateResourcePoolAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
+    this.getApplications = this.getApplications.bind(this);
     this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
+    this.getIngresses = this.getIngresses.bind(this);
+    this.getIngressesAsync = this.getIngressesAsync.bind(this);
   }
 
   selectTab(index) {
@@ -216,6 +219,29 @@ class KubernetesResourcePoolController {
     return this.$async(this.getApplicationsAsync);
   }
 
+  async getIngressesAsync() {
+    this.state.ingressesLoading = true;
+    try {
+      const namespace = this.pool.Namespace.Name;
+      this.ingresses = await this.KubernetesIngressService.get(namespace);
+      _.forEach(this.ingresses, (ing) => {
+        ing.Namespace = namespace;
+        _.forEach(ing.Paths, (path) => {
+          const application = _.find(this.applications, { ServiceName: path.ServiceName });
+          path.ApplicationName = application && application.Name ? application.Name : '-';
+        });
+      });
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve ingresses.');
+    } finally {
+      this.state.ingressesLoading = false;
+    }
+  }
+
+  getIngresses() {
+    return this.$async(this.getIngressesAsync);
+  }
+
   async onInit() {
     try {
       this.isAdmin = this.Authentication.isAdmin();
@@ -235,6 +261,7 @@ class KubernetesResourcePoolController {
         showEditorTab: false,
         eventsLoading: true,
         applicationsLoading: true,
+        ingressesLoading: true,
         viewReady: false,
         eventWarningCount: 0,
         canUseIngress: this.EndpointProvider.currentEndpoint().Kubernetes.Configuration.UseIngress,
@@ -269,12 +296,16 @@ class KubernetesResourcePoolController {
       if (this.pool.Namespace.Name === 'default') {
         this.isEditable = false;
       }
+
+      await this.getEvents();
+      await this.getApplications();
+
       if (this.state.canUseIngress) {
-        const ingresses = await this.KubernetesIngressService.get(name);
+        await this.getIngresses();
         const ingressClasses = this.EndpointProvider.currentEndpoint().Kubernetes.Configuration.IngressClasses;
         this.formValues.IngressClasses = _.map(ingressClasses, (item) => {
           const iClass = new KubernetesResourcePoolIngressClassFormValue(item);
-          const matchingIngress = _.find(ingresses, { Name: iClass.Name });
+          const matchingIngress = _.find(this.ingresses, { Name: iClass.Name });
           if (matchingIngress) {
             iClass.Selected = true;
             iClass.WasSelected = true;
@@ -285,9 +316,6 @@ class KubernetesResourcePoolController {
         });
         this.savedIngressClasses = angular.copy(this.formValues.IngressClasses);
       }
-
-      await this.getEvents();
-      await this.getApplications();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     } finally {
