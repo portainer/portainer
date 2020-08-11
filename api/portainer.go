@@ -963,8 +963,8 @@ type (
 
 	// KubeClient represents a service used to query a Kubernetes environment
 	KubeClient interface {
-		SetupUserServiceAccount(userID int, teamIDs []int) error
-		GetServiceAccountBearerToken(userID int) (string, error)
+		SetupUserServiceAccount(userID int, username string, teamIDs []int) error
+		GetServiceAccountBearerToken(userID int, username string) (string, error)
 		StartExecProcess(namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error
 	}
 

@@ -8,8 +8,8 @@ import (
 )
 
 // GetServiceAccountBearerToken returns the ServiceAccountToken associated to the specified user.
-func (kcl *KubeClient) GetServiceAccountBearerToken(userID int) (string, error) {
-	serviceAccountName := userServiceAccountName(userID)
+func (kcl *KubeClient) GetServiceAccountBearerToken(userID int, username string) (string, error) {
+	serviceAccountName := userServiceAccountName(userID, username)
 
 	return kcl.getServiceAccountToken(serviceAccountName)
 }
@@ -17,8 +17,8 @@ func (kcl *KubeClient) GetServiceAccountBearerToken(userID int) (string, error) 
 // SetupUserServiceAccount will make sure that all the required resources are created inside the Kubernetes
 // cluster before creating a ServiceAccount and a ServiceAccountToken for the specified Portainer user.
 //It will also create required default RoleBinding and ClusterRoleBinding rules.
-func (kcl *KubeClient) SetupUserServiceAccount(userID int, teamIDs []int) error {
-	serviceAccountName := userServiceAccountName(userID)
+func (kcl *KubeClient) SetupUserServiceAccount(userID int, username string, teamIDs []int) error {
+	serviceAccountName := userServiceAccountName(userID, username)
 
 	err := kcl.ensureRequiredResourcesExist()
 	if err != nil {

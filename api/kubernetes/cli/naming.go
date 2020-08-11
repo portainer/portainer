@@ -13,8 +13,8 @@ const (
 	portainerConfigMapAccessPoliciesKey = "NamespaceAccessPolicies"
 )
 
-func userServiceAccountName(userID int) string {
-	return fmt.Sprintf("%s-%d", portainerUserServiceAccountPrefix, userID)
+func userServiceAccountName(userID int, username string) string {
+	return fmt.Sprintf("%s-%d-%s", portainerUserServiceAccountPrefix, userID, username)
 }
 
 func userServiceAccountTokenSecretName(serviceAccountName string) string {
