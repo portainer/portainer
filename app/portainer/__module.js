@@ -33,7 +33,8 @@ angular.module('portainer.app', ['portainer.oauth']).config([
             try {
               const loggedIn = await initAuthentication(authManager, Authentication, $rootScope, $state);
               await StateManager.initialize();
-              if (!loggedIn) {
+              const nextTransition = $state.transition.to();
+              if (!loggedIn && !['portainer.logout', 'portainer.auth', 'portainer.init'].some((route) => nextTransition.name.startsWith(route))) {
                 $state.go('portainer.auth');
                 return Promise.reject('Unauthenticated');
               }
