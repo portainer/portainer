@@ -247,6 +247,7 @@ class KubernetesResourcePoolController {
       this.isAdmin = this.Authentication.isAdmin();
       this.defaults = KubernetesResourceQuotaDefaults;
       this.formValues = new KubernetesResourcePoolFormValues(this.defaults);
+      this.formValues.HasQuota = false;
 
       this.state = {
         actionInProgress: false,
