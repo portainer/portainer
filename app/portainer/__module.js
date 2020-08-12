@@ -39,6 +39,7 @@ angular.module('portainer.app', ['portainer.oauth']).config([
             }
           } catch (err) {
             Notifications.error('Failure', err, 'Unable to retrieve application settings');
+            throw err;
           }
         });
       },
