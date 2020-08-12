@@ -132,15 +132,9 @@
                     </div>
                   </div>
                   <div class="form-group" ng-if="ctrl.state.canUseIngress">
-                    <div class="col-sm-12 small text-muted">
-                      <p>
-                        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                        Activating an ingress class will allow users to expose their applications over a path
-                      </p>
-                    </div>
                     <div class="col-sm-12">
                       <label class="control-label text-left">
-                        Ingress activation
+                        Enable ingress usage
                       </label>
                       <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.UseIngress" /><i></i> </label>
                     </div>
@@ -150,19 +144,25 @@
                       <table class="table" style="table-layout: fixed;">
                         <tbody>
                           <tr class="text-muted">
-                            <td>Ingress controller</td>
-                            <td>Hostname</td>
-                            <td>Activated</td>
+                            <td style="width: 33%;">Ingress controller</td>
+                            <td style="width: 66%;">
+                              Hostname
+                              <portainer-tooltip
+                                position="bottom"
+                                message="Optional hostname associated to the ingress inside this resource pool. Users will be able to expose and access their applications over the ingress via this hostname or via IP address directly if not defined."
+                              >
+                              </portainer-tooltip>
+                            </td>
                           </tr>
                           <tr ng-repeat="class in ctrl.formValues.IngressClasses">
-                            <td>
-                              {{ class.Name }}
+                            <td style="width: 33%;">
+                              <div style="margin: 5px;">
+                                <label class="switch" style="margin-right: 10px;"> <input type="checkbox" ng-model="class.Selected" /><i></i> </label>
+                                {{ class.Name }}
+                              </div>
                             </td>
-                            <td>
+                            <td style="width: 66%;">
                               <input class="form-control" ng-model="class.Host" placeholder="host.com" />
-                            </td>
-                            <td>
-                              <label class="switch" style="margin-right: 10px;"> <input type="checkbox" ng-model="class.Selected" /><i></i> </label>
                             </td>
                           </tr>
                         </tbody>
