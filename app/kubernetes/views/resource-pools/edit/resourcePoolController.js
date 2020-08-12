@@ -127,13 +127,11 @@ class KubernetesResourcePoolController {
       const promises = _.map(this.formValues.IngressClasses, (c) => {
         c.Namespace = namespace;
         const original = _.find(this.savedIngressClasses, { Name: c.Name });
-        if (this.formValues.UseIngress && c.Selected === true && c.WasSelected === false) {
+        if (c.WasSelected === false && c.Selected === true) {
           return this.KubernetesIngressService.create(c);
-        } else if (this.formValues.UseIngress && c.Selected === false && c.WasSelected === true) {
+        } else if (c.WasSelected === true && c.Selected === false) {
           return this.KubernetesIngressService.delete(c);
-        } else if (!this.formValues.UseIngress && c.WasSelected === true) {
-          return this.KubernetesIngressService.delete(c);
-        } else if (original && original.Host !== c.Host) {
+        } else if (c.Selected === true && original && original.Host !== c.Host) {
           original.Namespace = namespace;
           return this.KubernetesIngressService.patch(original, c);
         }
@@ -150,11 +148,7 @@ class KubernetesResourcePoolController {
   }
 
   updateResourcePool() {
-    const willBeDeleted = _.filter(this.formValues.IngressClasses, (c) => {
-      const deleteOne = this.formValues.UseIngress && c.Selected === false && c.WasSelected === true;
-      const deleteAll = !this.formValues.UseIngress && c.WasSelected === true;
-      return deleteOne || deleteAll;
-    });
+    const willBeDeleted = _.filter(this.formValues.IngressClasses, { WasSelected: true, Selected: false });
     const warnings = {
       quota: this.hasResourceQuotaBeenReduced(),
       ingress: willBeDeleted.length !== 0,
@@ -312,7 +306,6 @@ class KubernetesResourcePoolController {
             iClass.Selected = true;
             iClass.WasSelected = true;
             iClass.Host = matchingIngress.Host;
-            this.formValues.UseIngress = true;
           }
           return iClass;
         });

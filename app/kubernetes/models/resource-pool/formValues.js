@@ -3,7 +3,6 @@ export function KubernetesResourcePoolFormValues(defaults) {
     MemoryLimit: defaults.MemoryLimit,
     CpuLimit: defaults.CpuLimit,
     HasQuota: true,
-    UseIngress: false,
     IngressClasses: [], // KubernetesResourcePoolIngressClassFormValue
   };
 }

@@ -86,15 +86,13 @@ class KubernetesResourcePoolService {
         quota.ResourcePoolOwner = formValues.Owner;
         await this.KubernetesResourceQuotaService.create(quota);
       }
-      if (formValues.UseIngress) {
-        const ingressPromises = _.map(formValues.IngressClasses, (c) => {
-          if (c.Selected) {
-            c.Namespace = namespace.Name;
-            return this.KubernetesIngressService.create(c);
-          }
-        });
-        await Promise.all(ingressPromises);
-      }
+      const ingressPromises = _.map(formValues.IngressClasses, (c) => {
+        if (c.Selected) {
+          c.Namespace = namespace.Name;
+          return this.KubernetesIngressService.create(c);
+        }
+      });
+      await Promise.all(ingressPromises);
     } catch (err) {
       throw err;
     }
