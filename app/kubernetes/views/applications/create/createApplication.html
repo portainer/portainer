@@ -1184,9 +1184,10 @@
                       class="form-control"
                       name="ingress_route_{{ $index }}"
                       ng-model="publishedPort.IngressRoute"
-                      placeholder="/foo"
+                      placeholder="foo"
                       ng-required="!publishedPort.NeedsDeletion"
                       ng-change="ctrl.onChangePortMappingIngressRoute()"
+                      ng-pattern="/^\/?([a-zA-Z0-9]+[a-zA-Z0-9-/_]*[a-zA-Z0-9]|[a-zA-Z0-9]+)$/"
                       ng-disabled="ctrl.disableLoadBalancerEdit() || ctrl.isEditAndNotNewPublishedPort($index)"
                     />
                   </div>
@@ -1298,6 +1299,10 @@
                     >
                       <div ng-messages="kubernetesApplicationCreationForm['ingress_route_'+$index].$error">
                         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Route is required.</p>
+                        <p ng-message="pattern"
+                          ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of alphanumeric characters or the special characters: '-', '_' or
+                          '/'. It must start and end with an alphanumeric character (e.g. 'my-route', or 'route-123').</p
+                        >
                       </div>
                       <p ng-if="ctrl.state.duplicates.publishedPorts.ingressRoutes.refs[$index] !== undefined">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This route is already used.
