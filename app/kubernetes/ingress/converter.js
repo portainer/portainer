@@ -79,6 +79,9 @@ export class KubernetesIngressConverter {
       const rules = _.map(groups, (rules, host) => {
         const rule = new KubernetesIngressRuleCreatePayload();
 
+        if (host === 'undefined') {
+          host = undefined;
+        }
         KubernetesCommonHelper.assignOrDeleteIfEmpty(rule, 'host', host);
         rule.http.paths = _.map(rules, (r) => {
           const path = new KubernetesIngressRulePathCreatePayload();
@@ -90,12 +93,14 @@ export class KubernetesIngressConverter {
         return rule;
       });
       KubernetesCommonHelper.assignOrDeleteIfEmpty(res, 'spec.rules', rules);
-    } else {
+    } else if (data.Host) {
       res.spec.rules = [
         {
           host: data.Host,
         },
       ];
+    } else {
+      delete res.spec.rules;
     }
     return res;
   }
