@@ -244,6 +244,8 @@ class KubernetesResourcePoolController {
 
   async onInit() {
     try {
+      const endpoint = this.EndpointProvider.currentEndpoint();
+      this.endpoint = endpoint;
       this.isAdmin = this.Authentication.isAdmin();
       this.defaults = KubernetesResourceQuotaDefaults;
       this.formValues = new KubernetesResourcePoolFormValues(this.defaults);
@@ -264,7 +266,7 @@ class KubernetesResourcePoolController {
         ingressesLoading: true,
         viewReady: false,
         eventWarningCount: 0,
-        canUseIngress: this.EndpointProvider.currentEndpoint().Kubernetes.Configuration.UseIngress,
+        canUseIngress: endpoint.Kubernetes.Configuration.UseIngress,
       };
 
       this.state.activeTab = this.LocalStorage.getActiveTab('resourcePool');
@@ -302,7 +304,7 @@ class KubernetesResourcePoolController {
 
       if (this.state.canUseIngress) {
         await this.getIngresses();
-        const ingressClasses = this.EndpointProvider.currentEndpoint().Kubernetes.Configuration.IngressClasses;
+        const ingressClasses = endpoint.Kubernetes.Configuration.IngressClasses;
         this.formValues.IngressClasses = _.map(ingressClasses, (item) => {
           const iClass = new KubernetesResourcePoolIngressClassFormValue(item);
           const matchingIngress = _.find(this.ingresses, { Name: iClass.Name });

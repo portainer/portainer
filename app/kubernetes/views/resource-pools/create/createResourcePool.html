@@ -135,10 +135,9 @@
             <!-- #region INGRESSES -->
             <div class="form-group" ng-if="!ctrl.state.canUseIngress">
               <div class="col-sm-12 small text-muted">
-                <p>
-                  <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                  Ingress need to be activated by an administrator on the cluster before attempting to setup an ingress for the resource pool.
-                </p>
+                The ingress feature must be enabled in the
+                <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: ctrl.endpoint.Id})">endpoint configuration view</a> to be able to register ingresses inside this
+                resource pool.
               </div>
             </div>
             <div class="form-group" ng-if="ctrl.state.canUseIngress">

@@ -84,6 +84,8 @@ class KubernetesCreateResourcePoolController {
 
   async onInit() {
     try {
+      const endpoint = this.EndpointProvider.currentEndpoint();
+      this.endpoint = endpoint;
       this.defaults = KubernetesResourceQuotaDefaults;
       this.formValues = new KubernetesResourcePoolFormValues(this.defaults);
 
@@ -93,7 +95,7 @@ class KubernetesCreateResourcePoolController {
         sliderMaxCpu: 0,
         viewReady: false,
         isAlreadyExist: false,
-        canUseIngress: this.EndpointProvider.currentEndpoint().Kubernetes.Configuration.UseIngress,
+        canUseIngress: endpoint.Kubernetes.Configuration.UseIngress,
       };
 
       const nodes = await this.KubernetesNodeService.get();
@@ -105,7 +107,7 @@ class KubernetesCreateResourcePoolController {
       this.state.sliderMaxMemory = KubernetesResourceReservationHelper.megaBytesValue(this.state.sliderMaxMemory);
       await this.getResourcePools();
       if (this.state.canUseIngress) {
-        const ingressClasses = this.EndpointProvider.currentEndpoint().Kubernetes.Configuration.IngressClasses;
+        const ingressClasses = endpoint.Kubernetes.Configuration.IngressClasses;
         this.formValues.IngressClasses = _.map(ingressClasses, (item) => new KubernetesResourcePoolIngressClassFormValue(item));
       }
     } catch (err) {
