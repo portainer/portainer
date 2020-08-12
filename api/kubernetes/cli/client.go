@@ -19,20 +19,23 @@ type (
 	ClientFactory struct {
 		reverseTunnelService portainer.ReverseTunnelService
 		signatureService     portainer.DigitalSignatureService
+		instanceID           string
 		endpointClients      cmap.ConcurrentMap
 	}
 
 	// KubeClient represent a service used to execute Kubernetes operations
 	KubeClient struct {
-		cli *kubernetes.Clientset
+		cli        *kubernetes.Clientset
+		instanceID string
 	}
 )
 
 // NewClientFactory returns a new instance of a ClientFactory
-func NewClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService) *ClientFactory {
+func NewClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, instanceID string) *ClientFactory {
 	return &ClientFactory{
 		signatureService:     signatureService,
 		reverseTunnelService: reverseTunnelService,
+		instanceID:           instanceID,
 		endpointClients:      cmap.New(),
 	}
 }
@@ -62,7 +65,8 @@ func (factory *ClientFactory) createKubeClient(endpoint *portainer.Endpoint) (po
 	}
 
 	kubecli := &KubeClient{
-		cli: cli,
+		cli:        cli,
+		instanceID: factory.instanceID,
 	}
 
 	return kubecli, nil

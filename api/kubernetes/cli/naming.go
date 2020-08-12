@@ -13,14 +13,14 @@ const (
 	portainerConfigMapAccessPoliciesKey = "NamespaceAccessPolicies"
 )
 
-func userServiceAccountName(userID int) string {
-	return fmt.Sprintf("%s-%d", portainerUserServiceAccountPrefix, userID)
+func userServiceAccountName(userID int, instanceID string) string {
+	return fmt.Sprintf("%s-%s-%d", portainerUserServiceAccountPrefix, instanceID, userID)
 }
 
-func userServiceAccountTokenSecretName(serviceAccountName string) string {
-	return fmt.Sprintf("%s-secret", serviceAccountName)
+func userServiceAccountTokenSecretName(serviceAccountName string, instanceID string) string {
+	return fmt.Sprintf("%s-%s-secret", instanceID, serviceAccountName)
 }
 
-func namespaceClusterRoleBindingName(namespace string) string {
-	return fmt.Sprintf("%s-%s", portainerRBPrefix, namespace)
+func namespaceClusterRoleBindingName(namespace string, instanceID string) string {
+	return fmt.Sprintf("%s-%s-%s", portainerRBPrefix, instanceID, namespace)
 }

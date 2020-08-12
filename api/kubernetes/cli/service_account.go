@@ -9,7 +9,7 @@ import (
 
 // GetServiceAccountBearerToken returns the ServiceAccountToken associated to the specified user.
 func (kcl *KubeClient) GetServiceAccountBearerToken(userID int) (string, error) {
-	serviceAccountName := userServiceAccountName(userID)
+	serviceAccountName := userServiceAccountName(userID, kcl.instanceID)
 
 	return kcl.getServiceAccountToken(serviceAccountName)
 }
@@ -18,7 +18,7 @@ func (kcl *KubeClient) GetServiceAccountBearerToken(userID int) (string, error) 
 // cluster before creating a ServiceAccount and a ServiceAccountToken for the specified Portainer user.
 //It will also create required default RoleBinding and ClusterRoleBinding rules.
 func (kcl *KubeClient) SetupUserServiceAccount(userID int, teamIDs []int) error {
-	serviceAccountName := userServiceAccountName(userID)
+	serviceAccountName := userServiceAccountName(userID, kcl.instanceID)
 
 	err := kcl.ensureRequiredResourcesExist()
 	if err != nil {
@@ -114,7 +114,7 @@ func (kcl *KubeClient) ensureServiceAccountHasPortainerUserClusterRole(serviceAc
 }
 
 func (kcl *KubeClient) removeNamespaceAccessForServiceAccount(serviceAccountName, namespace string) error {
-	roleBindingName := namespaceClusterRoleBindingName(namespace)
+	roleBindingName := namespaceClusterRoleBindingName(namespace, kcl.instanceID)
 
 	roleBinding, err := kcl.cli.RbacV1().RoleBindings(namespace).Get(roleBindingName, metav1.GetOptions{})
 	if k8serrors.IsNotFound(err) {
@@ -138,7 +138,7 @@ func (kcl *KubeClient) removeNamespaceAccessForServiceAccount(serviceAccountName
 }
 
 func (kcl *KubeClient) ensureNamespaceAccessForServiceAccount(serviceAccountName, namespace string) error {
-	roleBindingName := namespaceClusterRoleBindingName(namespace)
+	roleBindingName := namespaceClusterRoleBindingName(namespace, kcl.instanceID)
 
 	roleBinding, err := kcl.cli.RbacV1().RoleBindings(namespace).Get(roleBindingName, metav1.GetOptions{})
 	if k8serrors.IsNotFound(err) {

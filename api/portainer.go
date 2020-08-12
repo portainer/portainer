@@ -1095,6 +1095,8 @@ type (
 	VersionService interface {
 		DBVersion() (int, error)
 		StoreDBVersion(version int) error
+		InstanceID() (string, error)
+		StoreInstanceID(ID string) error
 	}
 
 	// WebhookService represents a service for managing webhook data.

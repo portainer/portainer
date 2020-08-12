@@ -10,8 +10,9 @@ import (
 
 const (
 	// BucketName represents the name of the bucket where this service stores data.
-	BucketName = "version"
-	versionKey = "DB_VERSION"
+	BucketName  = "version"
+	versionKey  = "DB_VERSION"
+	instanceKey = "INSTANCE_ID"
 )
 
 // Service represents a service to manage stored versions.
@@ -62,5 +63,39 @@ func (service *Service) StoreDBVersion(version int) error {
 
 		data := []byte(strconv.Itoa(version))
 		return bucket.Put([]byte(versionKey), data)
+	})
+}
+
+// InstanceID retrieves the stored instance ID.
+func (service *Service) InstanceID() (string, error) {
+	var data []byte
+
+	err := service.db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(BucketName))
+
+		value := bucket.Get([]byte(instanceKey))
+		if value == nil {
+			return errors.ErrObjectNotFound
+		}
+
+		data = make([]byte, len(value))
+		copy(data, value)
+
+		return nil
+	})
+	if err != nil {
+		return "", err
+	}
+
+	return string(data), nil
+}
+
+// StoreInstanceID store the instance ID.
+func (service *Service) StoreInstanceID(ID string) error {
+	return service.db.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(BucketName))
+
+		data := []byte(ID)
+		return bucket.Put([]byte(instanceKey), data)
 	})
 }
