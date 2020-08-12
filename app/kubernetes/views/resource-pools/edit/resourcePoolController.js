@@ -132,8 +132,12 @@ class KubernetesResourcePoolController {
         } else if (c.WasSelected === true && c.Selected === false) {
           return this.KubernetesIngressService.delete(c);
         } else if (c.Selected === true && original && original.Host !== c.Host) {
-          original.Namespace = namespace;
-          return this.KubernetesIngressService.patch(original, c);
+          const oldIngress = _.find(this.ingresses, { Name: c.Name });
+          const newIngress = angular.copy(oldIngress);
+          newIngress.PreviousHost = original.Host;
+          newIngress.Host = c.Host;
+
+          return this.KubernetesIngressService.patch(oldIngress, newIngress);
         }
       });
       await Promise.all(promises);

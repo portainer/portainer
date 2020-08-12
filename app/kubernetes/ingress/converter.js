@@ -76,29 +76,28 @@ export class KubernetesIngressConverter {
     }
     if (data.Paths && data.Paths.length) {
       const groups = _.groupBy(data.Paths, 'Host');
-      const rules = _.map(groups, (rules, host) => {
+      const rules = _.map(groups, (paths, host) => {
         const rule = new KubernetesIngressRuleCreatePayload();
 
-        if (host === 'undefined') {
-          host = undefined;
+        if (host === 'undefined' || _.isEmpty(host)) {
+          host = data.Host;
+        }
+        if (host === data.PreviousHost && host !== data.Host) {
+          host = data.Host;
         }
         KubernetesCommonHelper.assignOrDeleteIfEmpty(rule, 'host', host);
-        rule.http.paths = _.map(rules, (r) => {
+        rule.http.paths = _.map(paths, (p) => {
           const path = new KubernetesIngressRulePathCreatePayload();
-          path.path = r.Path;
-          path.backend.serviceName = r.ServiceName;
-          path.backend.servicePort = r.Port;
+          path.path = p.Path;
+          path.backend.serviceName = p.ServiceName;
+          path.backend.servicePort = p.Port;
           return path;
         });
         return rule;
       });
       KubernetesCommonHelper.assignOrDeleteIfEmpty(res, 'spec.rules', rules);
     } else if (data.Host) {
-      res.spec.rules = [
-        {
-          host: data.Host,
-        },
-      ];
+      res.spec.rules = [{ host: data.Host }];
     } else {
       delete res.spec.rules;
     }
