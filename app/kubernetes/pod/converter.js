@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { KubernetesPod, KubernetesPodToleration, KubernetesPodAffinity, KubernetesPodContainer } from 'Kubernetes/pod/models';
+import { KubernetesPod, KubernetesPodToleration, KubernetesPodAffinity, KubernetesPodContainer, KubernetesPodContainerTypes } from 'Kubernetes/pod/models';
 
 function computeStatus(statuses) {
   const containerStatuses = _.map(statuses, 'state');
@@ -50,20 +50,40 @@ function computeTolerations(tolerations) {
 
 function computeContainers(data) {
   const containers = data.spec.containers;
-  return _.map(containers, (item) => {
-    const res = new KubernetesPodContainer();
-    res.PodName = data.metadata.name;
-    res.Name = item.name;
-    res.Image = item.image;
-    res.Node = data.spec.nodeName;
-    res.CreationDate = data.status.startTime;
-    res.Status = computeContainerStatus(data.status.containerStatuses, item.name);
-    res.Limits = item.resources.limits;
-    res.Requests = item.resources.requests;
-    res.Volumes = item.volumeMounts;
-    res.Env = item.env;
-    return res;
-  });
+  const initContainers = data.spec.initContainers;
+
+  return _.concat(
+    _.map(containers, (item) => {
+      const res = new KubernetesPodContainer();
+      res.Type = KubernetesPodContainerTypes.APP;
+      res.PodName = data.metadata.name;
+      res.Name = item.name;
+      res.Image = item.image;
+      res.Node = data.spec.nodeName;
+      res.CreationDate = data.status.startTime;
+      res.Status = computeContainerStatus(data.status.containerStatuses, item.name);
+      res.Limits = item.resources.limits;
+      res.Requests = item.resources.requests;
+      res.VolumeMounts = item.volumeMounts;
+      res.Env = item.env;
+      return res;
+    }),
+    _.map(initContainers, (item) => {
+      const res = new KubernetesPodContainer();
+      res.Type = KubernetesPodContainerTypes.INIT;
+      res.PodName = data.metadata.name;
+      res.Name = item.name;
+      res.Image = item.image;
+      res.Node = data.spec.nodeName;
+      res.CreationDate = data.status.startTime;
+      res.Status = computeContainerStatus(data.status.containerStatuses, item.name);
+      res.Limits = item.resources.limits;
+      res.Requests = item.resources.requests;
+      res.VolumeMounts = item.volumeMounts;
+      res.Env = item.env;
+      return res;
+    })
+  );
 }
 
 export default class KubernetesPodConverter {

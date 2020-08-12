@@ -28,6 +28,27 @@ class KubernetesApplicationHelper {
     return _.filter(pods, { Labels: app.spec.selector.matchLabels });
   }
 
+  static associateContainersAndApplication(app) {
+    const containers = _.flatten(_.map(app.Pods, 'Containers'));
+    _.forEach(containers, (container) => {
+      container.PersistedFolders = [];
+      _.forEach(app.PersistedFolders, (pf) => {
+        if (_.includes(_.map(container.VolumeMounts, 'name'), pf.PersistentVolumeClaimName)) {
+          container.PersistedFolders.push(pf);
+        }
+      });
+
+      container.ConfigurationVolumes = [];
+      _.forEach(app.ConfigurationVolumes, (cv) => {
+        if (_.includes(_.map(container.VolumeMounts, 'mountPath'), cv.rootMountPath)) {
+          container.ConfigurationVolumes.push(cv);
+        }
+      });
+    });
+
+    return containers;
+  }
+
   static portMappingsFromApplications(applications) {
     const res = _.reduce(
       applications,

@@ -1,4 +1,5 @@
 import _ from 'lodash-es';
+import { KubernetesPodContainerTypes } from 'Kubernetes/pod/models/index';
 
 angular
   .module('portainer.kubernetes')
@@ -79,6 +80,17 @@ angular
           break;
         default:
           return 'Unknown';
+      }
+    };
+  })
+  .filter('kubernetesPodContainerTypeIcon', function () {
+    'use strict';
+    return function (type) {
+      switch (type) {
+        case KubernetesPodContainerTypes.INIT:
+          return 'fa-box';
+        case KubernetesPodContainerTypes.APP:
+          return 'fa-box-open';
       }
     };
   });

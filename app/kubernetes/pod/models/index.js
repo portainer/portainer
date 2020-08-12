@@ -42,13 +42,19 @@ export class KubernetesPodToleration {
 }
 
 const _KubernetesPodContainer = Object.freeze({
+  Type: 0,
   PodName: '',
   Name: '',
   Image: '',
+  Node: '',
+  CreationDate: '',
+  Status: '',
   Limits: {},
   Requests: {},
+  VolumeMounts: {},
+  ConfigurationVolumes: [],
+  PersistedFolders: [],
   Env: [],
-  Volumes: {},
 });
 
 export class KubernetesPodContainer {
@@ -56,3 +62,8 @@ export class KubernetesPodContainer {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesPodContainer)));
   }
 }
+
+export const KubernetesPodContainerTypes = {
+  INIT: 1,
+  APP: 2,
+};
