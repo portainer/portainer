@@ -23,25 +23,25 @@ angular.module('portainer.app', ['portainer.oauth']).config([
     var root = {
       name: 'root',
       abstract: true,
-      resolve: {
-        initStateManager: /* @ngInject */ function initStateManager($async, StateManager, Authentication, Notifications, authManager, $rootScope, $state) {
-          return $async(async () => {
-            const appState = StateManager.getState();
-            if (!appState.loading) {
-              return;
+      onEnter: /* @ngInject */ function onEnter($async, StateManager, Authentication, Notifications, authManager, $rootScope, $state) {
+        return $async(async () => {
+          const appState = StateManager.getState();
+          if (!appState.loading) {
+            return;
+          }
+          try {
+            const loggedIn = await initAuthentication(authManager, Authentication, $rootScope, $state);
+            await StateManager.initialize();
+            const nextTransition = $state.transition.to();
+            if (!loggedIn && !['portainer.logout', 'portainer.auth', 'portainer.init'].some((route) => nextTransition.name.startsWith(route))) {
+              $state.go('portainer.auth');
+              return Promise.reject('Unauthenticated');
             }
-            try {
-              const loggedIn = await initAuthentication(authManager, Authentication, $rootScope, $state);
-              await StateManager.initialize();
-              if (!loggedIn) {
-                $state.go('portainer.auth');
-                return Promise.reject('Unauthenticated');
-              }
-            } catch (err) {
-              Notifications.error('Failure', err, 'Unable to retrieve application settings');
-            }
-          });
-        },
+          } catch (err) {
+            Notifications.error('Failure', err, 'Unable to retrieve application settings');
+            throw err;
+          }
+        });
       },
       views: {
         'sidebar@': {
