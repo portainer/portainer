@@ -24,6 +24,7 @@ export const KubernetesApplicationPublishingTypes = Object.freeze({
   INTERNAL: 1,
   CLUSTER: 2,
   LOAD_BALANCER: 3,
+  INGRESS: 4,
 });
 
 export const KubernetesApplicationQuotaDefaults = {

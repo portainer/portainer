@@ -28,16 +28,16 @@
                     <label class="control-label text-left">
                       Resource assignment
                     </label>
-                    <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.hasQuota" /><i></i> </label>
+                    <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.HasQuota" /><i></i> </label>
                   </div>
                 </div>
-                <div class="form-group" ng-if="ctrl.formValues.hasQuota && !ctrl.isQuotaValid()">
+                <div class="form-group" ng-if="ctrl.formValues.HasQuota && ctrl.isAdmin && ctrl.isEditable && !ctrl.isQuotaValid()">
                   <span class="col-sm-12 text-warning small">
                     <p> <i class="fa fa-exclamation-triangle" aria-hidden="true" style="margin-right: 2px;"></i> At least a single limit must be set for the quota to be valid. </p>
                   </span>
                 </div>
                 <!-- !quotas-switch -->
-                <div ng-if="ctrl.formValues.hasQuota && ctrl.isAdmin && ctrl.isEditable">
+                <div ng-if="ctrl.formValues.HasQuota && ctrl.isAdmin && ctrl.isEditable">
                   <div class="col-sm-12 form-section-title">
                     Resource limits
                   </div>
@@ -109,7 +109,7 @@
                     <!-- !cpu-limit-input -->
                   </div>
                 </div>
-                <div ng-if="ctrl.formValues.hasQuota">
+                <div ng-if="ctrl.formValues.HasQuota">
                   <kubernetes-resource-reservation
                     ng-if="ctrl.pool.Quota"
                     description="Resource reservation represents the total amount of resource assigned to all the applications deployed inside this resource pool."
@@ -120,6 +120,46 @@
                   >
                   </kubernetes-resource-reservation>
                 </div>
+                <div ng-if="ctrl.isAdmin && ctrl.isEditable">
+                  <div class="col-sm-12 form-section-title">
+                    Ingresses
+                  </div>
+                  <div class="form-group" ng-if="!ctrl.state.canUseIngress">
+                    <div class="col-sm-12 small text-muted">
+                      The ingress feature must be enabled in the
+                      <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: ctrl.endpoint.Id})">endpoint configuration view</a> to be able to register ingresses inside
+                      this resource pool.
+                    </div>
+                  </div>
+                  <div class="form-group col-sm-12" ng-if="ctrl.state.canUseIngress">
+                    <table class="table" style="table-layout: fixed;">
+                      <tbody>
+                        <tr class="text-muted">
+                          <td style="width: 33%; border-top: 0px;">Ingress controller</td>
+                          <td style="width: 66%; border-top: 0px;">
+                            Hostname
+                            <portainer-tooltip
+                              position="bottom"
+                              message="Optional hostname associated to the ingress inside this resource pool. Users will be able to expose and access their applications over the ingress via this hostname or via IP address directly if not defined."
+                            >
+                            </portainer-tooltip>
+                          </td>
+                        </tr>
+                        <tr ng-repeat="class in ctrl.formValues.IngressClasses">
+                          <td style="width: 33%;">
+                            <div style="margin: 5px;">
+                              <label class="switch" style="margin-right: 10px;"> <input type="checkbox" ng-model="class.Selected" /><i></i> </label>
+                              {{ class.Name }}
+                            </div>
+                          </td>
+                          <td style="width: 66%;">
+                            <input class="form-control" ng-model="class.Host" placeholder="host.com" />
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
                 <!-- actions -->
                 <div ng-if="ctrl.isAdmin && ctrl.isEditable" class="col-sm-12 form-section-title">
                   Actions
@@ -129,7 +169,7 @@
                     <button
                       type="button"
                       class="btn btn-primary btn-sm"
-                      ng-disabled="!resourcePoolEditForm.$valid || ctrl.state.actionInProgress || (ctrl.formValues.hasQuota && !ctrl.isQuotaValid())"
+                      ng-disabled="!resourcePoolEditForm.$valid || ctrl.state.actionInProgress || (ctrl.formValues.HasQuota && !ctrl.isQuotaValid())"
                       ng-click="ctrl.updateResourcePool()"
                       button-spinner="ctrl.state.actionInProgress"
                     >
@@ -184,6 +224,21 @@
         title-icon="fa-laptop-code"
       >
       </kubernetes-resource-pool-applications-datatable>
+    </div>
+  </div>
+
+  <div class="row" ng-if="ctrl.ingresses && ctrl.ingresses.length > 0">
+    <div class="col-sm-12">
+      <kubernetes-resource-pool-ingresses-datatable
+        dataset="ctrl.ingresses"
+        table-key="kubernetes.resourcepool.ingresses"
+        order-by="Name"
+        refresh-callback="ctrl.getIngresses"
+        loading="ctrl.state.ingressesLoading"
+        title-text="Ingress routes and applications"
+        title-icon="fa-route"
+      >
+      </kubernetes-resource-pool-ingresses-datatable>
     </div>
   </div>
 </div>

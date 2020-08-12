@@ -52,6 +52,10 @@ class KubernetesConfigureController {
       this.endpoint.Kubernetes.Configuration.StorageClasses = classes;
       this.endpoint.Kubernetes.Configuration.UseLoadBalancer = this.formValues.UseLoadBalancer;
       this.endpoint.Kubernetes.Configuration.UseServerMetrics = this.formValues.UseServerMetrics;
+      this.endpoint.Kubernetes.Configuration.UseIngress = this.formValues.UseIngress;
+      if (this.formValues.UseIngress) {
+        this.endpoint.Kubernetes.Configuration.IngressClasses = _.split(this.formValues.IngressClasses, ',');
+      }
       await this.EndpointService.updateEndpoint(this.endpoint.Id, this.endpoint);
 
       const storagePromises = _.map(classes, (storageClass) => {
@@ -69,6 +73,10 @@ class KubernetesConfigureController {
         modifiedEndpoint.Kubernetes.Configuration.StorageClasses = classes;
         modifiedEndpoint.Kubernetes.Configuration.UseLoadBalancer = this.formValues.UseLoadBalancer;
         modifiedEndpoint.Kubernetes.Configuration.UseServerMetrics = this.formValues.UseServerMetrics;
+        modifiedEndpoint.Kubernetes.Configuration.UseIngress = this.formValues.UseIngress;
+        if (this.formValues.UseIngress) {
+          modifiedEndpoint.Kubernetes.Configuration.IngressClasses = _.split(this.formValues.IngressClasses, ',');
+        }
         this.EndpointProvider.setEndpoints(endpoints);
       }
       this.Notifications.success('Configuration successfully applied');
@@ -95,6 +103,8 @@ class KubernetesConfigureController {
     this.formValues = {
       UseLoadBalancer: false,
       UseServerMetrics: false,
+      UseIngress: false,
+      IngressClasses: '',
     };
 
     try {
@@ -117,8 +127,10 @@ class KubernetesConfigureController {
 
       this.formValues.UseLoadBalancer = this.endpoint.Kubernetes.Configuration.UseLoadBalancer;
       this.formValues.UseServerMetrics = this.endpoint.Kubernetes.Configuration.UseServerMetrics;
+      this.formValues.UseIngress = this.endpoint.Kubernetes.Configuration.UseIngress;
+      this.formValues.IngressClasses = _.join(this.endpoint.Kubernetes.Configuration.IngressClasses);
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve storage classes');
+      this.Notifications.error('Failure', err, 'Unable to retrieve endpoint configuration');
     } finally {
       this.state.viewReady = true;
     }

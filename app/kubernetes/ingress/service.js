@@ -12,6 +12,9 @@ class KubernetesIngressService {
 
     this.getAsync = this.getAsync.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
+    this.createAsync = this.createAsync.bind(this);
+    this.patchAsync = this.patchAsync.bind(this);
+    this.deleteAsync = this.deleteAsync.bind(this);
   }
 
   /**
@@ -47,6 +50,66 @@ class KubernetesIngressService {
       return this.$async(this.getAsync, namespace, name);
     }
     return this.$async(this.getAllAsync, namespace);
+  }
+
+  /**
+   * CREATE
+   */
+  async createAsync(formValues) {
+    try {
+      const params = {};
+      const payload = KubernetesIngressConverter.createPayload(formValues);
+      const namespace = payload.metadata.namespace;
+      const data = await this.KubernetesIngresses(namespace).create(params, payload).$promise;
+      return data;
+    } catch (err) {
+      throw new PortainerError('Unable to create ingress', err);
+    }
+  }
+
+  create(formValues) {
+    return this.$async(this.createAsync, formValues);
+  }
+
+  /**
+   * PATCH
+   */
+  async patchAsync(oldIngress, newIngress) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = newIngress.Name;
+      const namespace = newIngress.Namespace;
+      const payload = KubernetesIngressConverter.patchPayload(oldIngress, newIngress);
+      if (!payload.length) {
+        return;
+      }
+      const data = await this.KubernetesIngresses(namespace).patch(params, payload).$promise;
+      return data;
+    } catch (err) {
+      throw new PortainerError('Unable to patch ingress', err);
+    }
+  }
+
+  patch(oldIngress, newIngress) {
+    return this.$async(this.patchAsync, oldIngress, newIngress);
+  }
+
+  /**
+   * DELETE
+   */
+  async deleteAsync(ingress) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = ingress.Name;
+      const namespace = ingress.Namespace;
+      await this.KubernetesIngresses(namespace).delete(params).$promise;
+    } catch (err) {
+      throw new PortainerError('Unable to delete ingress', err);
+    }
+  }
+
+  delete(ingress) {
+    return this.$async(this.deleteAsync, ingress);
   }
 }
 

@@ -1,9 +1,10 @@
 import angular from 'angular';
-import _ from 'lodash-es';
+import * as _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import { KubernetesResourceQuota, KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resource-quota/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
+import { KubernetesResourcePoolFormValues, KubernetesResourcePoolIngressClassFormValue } from 'Kubernetes/models/resource-pool/formValues';
 
 class KubernetesResourcePoolController {
   /* @ngInject */
@@ -13,6 +14,8 @@ class KubernetesResourcePoolController {
     Authentication,
     Notifications,
     LocalStorage,
+    EndpointProvider,
+    ModalService,
     KubernetesNodeService,
     KubernetesResourceQuotaService,
     KubernetesResourcePoolService,
@@ -20,13 +23,15 @@ class KubernetesResourcePoolController {
     KubernetesPodService,
     KubernetesApplicationService,
     KubernetesNamespaceHelper,
-    ModalService
+    KubernetesIngressService
   ) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
     this.Authentication = Authentication;
     this.LocalStorage = LocalStorage;
+    this.EndpointProvider = EndpointProvider;
+    this.ModalService = ModalService;
 
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesResourceQuotaService = KubernetesResourceQuotaService;
@@ -35,14 +40,17 @@ class KubernetesResourcePoolController {
     this.KubernetesPodService = KubernetesPodService;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
-    this.ModalService = ModalService;
+    this.KubernetesIngressService = KubernetesIngressService;
 
     this.onInit = this.onInit.bind(this);
     this.createResourceQuotaAsync = this.createResourceQuotaAsync.bind(this);
     this.updateResourcePoolAsync = this.updateResourcePoolAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
+    this.getApplications = this.getApplications.bind(this);
     this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
+    this.getIngresses = this.getIngresses.bind(this);
+    this.getIngressesAsync = this.getIngressesAsync.bind(this);
   }
 
   selectTab(index) {
@@ -83,8 +91,8 @@ class KubernetesResourcePoolController {
     await this.KubernetesResourceQuotaService.create(quota);
   }
 
-  hasResourceQuotaBeenReduce() {
-    if (this.formValues.hasQuota) {
+  hasResourceQuotaBeenReduced() {
+    if (this.formValues.HasQuota && this.oldQuota) {
       const cpuLimit = this.formValues.CpuLimit;
       const memoryLimit = KubernetesResourceReservationHelper.bytesValue(this.formValues.MemoryLimit);
       if (cpuLimit < this.oldQuota.CpuLimit || memoryLimit < this.oldQuota.MemoryLimit) {
@@ -104,7 +112,7 @@ class KubernetesResourcePoolController {
       const owner = this.pool.Namespace.ResourcePoolOwner;
       const quota = this.pool.Quota;
 
-      if (this.formValues.hasQuota) {
+      if (this.formValues.HasQuota) {
         if (quota) {
           quota.CpuLimit = cpuLimit;
           quota.MemoryLimit = memoryLimit;
@@ -115,6 +123,25 @@ class KubernetesResourcePoolController {
       } else if (quota) {
         await this.KubernetesResourceQuotaService.delete(quota);
       }
+
+      const promises = _.map(this.formValues.IngressClasses, (c) => {
+        c.Namespace = namespace;
+        const original = _.find(this.savedIngressClasses, { Name: c.Name });
+        if (c.WasSelected === false && c.Selected === true) {
+          return this.KubernetesIngressService.create(c);
+        } else if (c.WasSelected === true && c.Selected === false) {
+          return this.KubernetesIngressService.delete(c);
+        } else if (c.Selected === true && original && original.Host !== c.Host) {
+          const oldIngress = _.find(this.ingresses, { Name: c.Name });
+          const newIngress = angular.copy(oldIngress);
+          newIngress.PreviousHost = original.Host;
+          newIngress.Host = c.Host;
+
+          return this.KubernetesIngressService.patch(oldIngress, newIngress);
+        }
+      });
+      await Promise.all(promises);
+
       this.Notifications.success('Resource pool successfully updated', this.pool.Namespace.Name);
       this.$state.reload();
     } catch (err) {
@@ -125,15 +152,25 @@ class KubernetesResourcePoolController {
   }
 
   updateResourcePool() {
-    if (this.hasResourceQuotaBeenReduce()) {
-      this.ModalService.confirmUpdate(
-        'Reducing the quota assigned to an "in-use" resource pool may have unintended consequences, including preventing running applications from functioning correctly and potentially even blocking them from running at all.',
-        (confirmed) => {
-          if (confirmed) {
-            return this.$async(this.updateResourcePoolAsync);
-          }
+    const willBeDeleted = _.filter(this.formValues.IngressClasses, { WasSelected: true, Selected: false });
+    const warnings = {
+      quota: this.hasResourceQuotaBeenReduced(),
+      ingress: willBeDeleted.length !== 0,
+    };
+
+    if (warnings.quota || warnings.ingress) {
+      const messages = {
+        quota:
+          'Reducing the quota assigned to an "in-use" resource pool may have unintended consequences, including preventing running applications from functioning correctly and potentially even blocking them from running at all.',
+        ingress: 'Deactivating ingresses may cause applications to be unaccessible. All ingress configurations from affected applications will be removed.',
+      };
+      const displayedMessage = `${warnings.quota ? messages.quota : ''}${warnings.quota && warnings.ingress ? '<br/><br/>' : ''}
+      ${warnings.ingress ? messages.ingress : ''}<br/><br/>Do you wish to continue?`;
+      this.ModalService.confirmUpdate(displayedMessage, (confirmed) => {
+        if (confirmed) {
+          return this.$async(this.updateResourcePoolAsync);
         }
-      );
+      });
     } else {
       return this.$async(this.updateResourcePoolAsync);
     }
@@ -180,16 +217,36 @@ class KubernetesResourcePoolController {
     return this.$async(this.getApplicationsAsync);
   }
 
+  async getIngressesAsync() {
+    this.state.ingressesLoading = true;
+    try {
+      const namespace = this.pool.Namespace.Name;
+      this.ingresses = await this.KubernetesIngressService.get(namespace);
+      _.forEach(this.ingresses, (ing) => {
+        ing.Namespace = namespace;
+        _.forEach(ing.Paths, (path) => {
+          const application = _.find(this.applications, { ServiceName: path.ServiceName });
+          path.ApplicationName = application && application.Name ? application.Name : '-';
+        });
+      });
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve ingresses.');
+    } finally {
+      this.state.ingressesLoading = false;
+    }
+  }
+
+  getIngresses() {
+    return this.$async(this.getIngressesAsync);
+  }
+
   async onInit() {
     try {
+      const endpoint = this.EndpointProvider.currentEndpoint();
+      this.endpoint = endpoint;
       this.isAdmin = this.Authentication.isAdmin();
       this.defaults = KubernetesResourceQuotaDefaults;
-
-      this.formValues = {
-        MemoryLimit: this.defaults.MemoryLimit,
-        CpuLimit: this.defaults.CpuLimit,
-        hasQuota: false,
-      };
+      this.formValues = new KubernetesResourcePoolFormValues(this.defaults);
 
       this.state = {
         actionInProgress: false,
@@ -204,8 +261,10 @@ class KubernetesResourcePoolController {
         showEditorTab: false,
         eventsLoading: true,
         applicationsLoading: true,
+        ingressesLoading: true,
         viewReady: false,
         eventWarningCount: 0,
+        canUseIngress: endpoint.Kubernetes.Configuration.UseIngress,
       };
 
       this.state.activeTab = this.LocalStorage.getActiveTab('resourcePool');
@@ -225,7 +284,7 @@ class KubernetesResourcePoolController {
       const quota = pool.Quota;
       if (quota) {
         this.oldQuota = angular.copy(quota);
-        this.formValues.hasQuota = true;
+        this.formValues.HasQuota = true;
         this.formValues.CpuLimit = quota.CpuLimit;
         this.formValues.MemoryLimit = KubernetesResourceReservationHelper.megaBytesValue(quota.MemoryLimit);
 
@@ -240,6 +299,22 @@ class KubernetesResourcePoolController {
 
       await this.getEvents();
       await this.getApplications();
+
+      if (this.state.canUseIngress) {
+        await this.getIngresses();
+        const ingressClasses = endpoint.Kubernetes.Configuration.IngressClasses;
+        this.formValues.IngressClasses = _.map(ingressClasses, (item) => {
+          const iClass = new KubernetesResourcePoolIngressClassFormValue(item);
+          const matchingIngress = _.find(this.ingresses, { Name: iClass.Name });
+          if (matchingIngress) {
+            iClass.Selected = true;
+            iClass.WasSelected = true;
+            iClass.Host = matchingIngress.Host;
+          }
+          return iClass;
+        });
+        this.savedIngressClasses = angular.copy(this.formValues.IngressClasses);
+      }
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     } finally {

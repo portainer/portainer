@@ -249,8 +249,14 @@ class KubernetesApplicationHelper {
   }
 
   static generatePublishedPortsFormValuesFromPublishedPorts(serviceType, publishedPorts) {
-    const finalRes = _.map(publishedPorts, (port) => {
+    const generatePort = (port, rule) => {
       const res = new KubernetesApplicationPublishedPortFormValue();
+      res.IsNew = false;
+      if (rule) {
+        res.IngressName = rule.IngressName;
+        res.IngressRoute = rule.Path;
+        res.IngressHost = rule.Host;
+      }
       res.Protocol = port.Protocol;
       res.ContainerPort = port.TargetPort;
       if (serviceType === KubernetesServiceTypes.LOAD_BALANCER) {
@@ -260,6 +266,13 @@ class KubernetesApplicationHelper {
         res.NodePort = port.NodePort;
       }
       return res;
+    };
+
+    const finalRes = _.flatMap(publishedPorts, (port) => {
+      if (port.IngressRules.length) {
+        return _.map(port.IngressRules, (rule) => generatePort(port, rule));
+      }
+      return generatePort(port);
     });
     return finalRes;
   }

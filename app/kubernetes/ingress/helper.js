@@ -1,7 +1,8 @@
 import * as _ from 'lodash-es';
 
 export class KubernetesIngressHelper {
-  static findSBoundServiceIngressesRules(ingressRules, service) {
-    return _.filter(ingressRules, (r) => r.ServiceName === service.metadata.name);
+  static findSBoundServiceIngressesRules(ingresses, serviceName) {
+    const rules = _.flatMap(ingresses, 'Paths');
+    return _.filter(rules, { ServiceName: serviceName });
   }
 }

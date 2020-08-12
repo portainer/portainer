@@ -1,17 +1,19 @@
-import _ from 'lodash-es';
+import * as _ from 'lodash-es';
 import { KubernetesResourceQuota } from 'Kubernetes/models/resource-quota/models';
 
 import angular from 'angular';
 import KubernetesResourcePoolConverter from 'Kubernetes/converters/resourcePool';
 import KubernetesResourceQuotaHelper from 'Kubernetes/helpers/resourceQuotaHelper';
 import { KubernetesNamespace } from 'Kubernetes/models/namespace/models';
+import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 
 class KubernetesResourcePoolService {
   /* @ngInject */
-  constructor($async, KubernetesNamespaceService, KubernetesResourceQuotaService) {
+  constructor($async, KubernetesNamespaceService, KubernetesResourceQuotaService, KubernetesIngressService) {
     this.$async = $async;
     this.KubernetesNamespaceService = KubernetesNamespaceService;
     this.KubernetesResourceQuotaService = KubernetesResourceQuotaService;
+    this.KubernetesIngressService = KubernetesIngressService;
 
     this.getAsync = this.getAsync.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
@@ -67,30 +69,37 @@ class KubernetesResourcePoolService {
 
   /**
    * CREATE
+   * @param {KubernetesResourcePoolFormValues} formValues
    */
-  // TODO: review LimitRange future
-  async createAsync(name, owner, hasQuota, cpuLimit, memoryLimit) {
+  async createAsync(formValues) {
     try {
       const namespace = new KubernetesNamespace();
-      namespace.Name = name;
-      namespace.ResourcePoolName = name;
-      namespace.ResourcePoolOwner = owner;
+      namespace.Name = formValues.Name;
+      namespace.ResourcePoolName = formValues.Name;
+      namespace.ResourcePoolOwner = formValues.Owner;
       await this.KubernetesNamespaceService.create(namespace);
-      if (hasQuota) {
-        const quota = new KubernetesResourceQuota(name);
-        quota.CpuLimit = cpuLimit;
-        quota.MemoryLimit = memoryLimit;
-        quota.ResourcePoolName = name;
-        quota.ResourcePoolOwner = owner;
+      if (formValues.HasQuota) {
+        const quota = new KubernetesResourceQuota(formValues.Name);
+        quota.CpuLimit = formValues.CpuLimit;
+        quota.MemoryLimit = KubernetesResourceReservationHelper.bytesValue(formValues.MemoryLimit);
+        quota.ResourcePoolName = formValues.Name;
+        quota.ResourcePoolOwner = formValues.Owner;
         await this.KubernetesResourceQuotaService.create(quota);
       }
+      const ingressPromises = _.map(formValues.IngressClasses, (c) => {
+        if (c.Selected) {
+          c.Namespace = namespace.Name;
+          return this.KubernetesIngressService.create(c);
+        }
+      });
+      await Promise.all(ingressPromises);
     } catch (err) {
       throw err;
     }
   }
 
-  create(name, owner, hasQuota, cpuLimit, memoryLimit) {
-    return this.$async(this.createAsync, name, owner, hasQuota, cpuLimit, memoryLimit);
+  create(formValues) {
+    return this.$async(this.createAsync, formValues);
   }
 
   /**

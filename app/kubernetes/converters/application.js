@@ -49,7 +49,7 @@ function _apiPortsToPublishedPorts(pList, pRefs) {
 }
 
 class KubernetesApplicationConverter {
-  static applicationCommon(res, data, service, ingressRules) {
+  static applicationCommon(res, data, service, ingresses) {
     res.Id = data.metadata.uid;
     res.Name = data.metadata.name;
     res.StackName = data.metadata.labels ? data.metadata.labels[KubernetesPortainerApplicationStackNameLabel] || '-' : '-';
@@ -111,7 +111,7 @@ class KubernetesApplicationConverter {
 
       const portsRefs = _.concat(..._.map(data.spec.template.spec.containers, (container) => container.ports));
       const ports = _apiPortsToPublishedPorts(service.spec.ports, portsRefs);
-      const rules = KubernetesIngressHelper.findSBoundServiceIngressesRules(ingressRules, service);
+      const rules = KubernetesIngressHelper.findSBoundServiceIngressesRules(ingresses, service.metadata.name);
       _.forEach(ports, (port) => (port.IngressRules = _.filter(rules, (rule) => rule.Port === port.Port)));
       res.PublishedPorts = ports;
     }
@@ -210,9 +210,9 @@ class KubernetesApplicationConverter {
     );
   }
 
-  static apiDeploymentToApplication(data, service, ingressRules) {
+  static apiDeploymentToApplication(data, service, ingresses) {
     const res = new KubernetesApplication();
-    KubernetesApplicationConverter.applicationCommon(res, data, service, ingressRules);
+    KubernetesApplicationConverter.applicationCommon(res, data, service, ingresses);
     res.ApplicationType = KubernetesApplicationTypes.DEPLOYMENT;
     res.DeploymentType = KubernetesApplicationDeploymentTypes.REPLICATED;
     res.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.SHARED;
@@ -221,9 +221,9 @@ class KubernetesApplicationConverter {
     return res;
   }
 
-  static apiDaemonSetToApplication(data, service, ingressRules) {
+  static apiDaemonSetToApplication(data, service, ingresses) {
     const res = new KubernetesApplication();
-    KubernetesApplicationConverter.applicationCommon(res, data, service, ingressRules);
+    KubernetesApplicationConverter.applicationCommon(res, data, service, ingresses);
     res.ApplicationType = KubernetesApplicationTypes.DAEMONSET;
     res.DeploymentType = KubernetesApplicationDeploymentTypes.GLOBAL;
     res.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.SHARED;
@@ -232,9 +232,9 @@ class KubernetesApplicationConverter {
     return res;
   }
 
-  static apiStatefulSetToapplication(data, service, ingressRules) {
+  static apiStatefulSetToapplication(data, service, ingresses) {
     const res = new KubernetesApplication();
-    KubernetesApplicationConverter.applicationCommon(res, data, service, ingressRules);
+    KubernetesApplicationConverter.applicationCommon(res, data, service, ingresses);
     res.ApplicationType = KubernetesApplicationTypes.STATEFULSET;
     res.DeploymentType = KubernetesApplicationDeploymentTypes.REPLICATED;
     res.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.ISOLATED;
@@ -261,15 +261,18 @@ class KubernetesApplicationConverter {
     res.PersistedFolders = KubernetesApplicationHelper.generatePersistedFoldersFormValuesFromPersistedFolders(app.PersistedFolders, persistentVolumeClaims); // generate from PVC and app.PersistedFolders
     res.Configurations = KubernetesApplicationHelper.generateConfigurationFormValuesFromEnvAndVolumes(app.Env, app.ConfigurationVolumes, configurations);
     res.AutoScaler = KubernetesApplicationHelper.generateAutoScalerFormValueFromHorizontalPodAutoScaler(app.AutoScaler, res.ReplicaCount);
+    res.PublishedPorts = KubernetesApplicationHelper.generatePublishedPortsFormValuesFromPublishedPorts(app.ServiceType, app.PublishedPorts);
 
+    const isIngress = _.filter(res.PublishedPorts, (p) => p.IngressName).length;
     if (app.ServiceType === KubernetesServiceTypes.LOAD_BALANCER) {
       res.PublishingType = KubernetesApplicationPublishingTypes.LOAD_BALANCER;
-    } else if (app.ServiceType === KubernetesServiceTypes.NODE_PORT) {
+    } else if (app.ServiceType === KubernetesServiceTypes.NODE_PORT && !isIngress) {
       res.PublishingType = KubernetesApplicationPublishingTypes.CLUSTER;
+    } else if (app.ServiceType === KubernetesServiceTypes.NODE_PORT && isIngress) {
+      res.PublishingType = KubernetesApplicationPublishingTypes.INGRESS;
     } else {
       res.PublishingType = KubernetesApplicationPublishingTypes.INTERNAL;
     }
-    res.PublishedPorts = KubernetesApplicationHelper.generatePublishedPortsFormValuesFromPublishedPorts(app.ServiceType, app.PublishedPorts);
     return res;
   }
 
@@ -313,6 +316,7 @@ class KubernetesApplicationConverter {
     if (!service.Ports.length) {
       service = undefined;
     }
+
     return [app, headlessService, service, claims];
   }
 }

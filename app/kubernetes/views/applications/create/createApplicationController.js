@@ -1,5 +1,5 @@
 import angular from 'angular';
-import _ from 'lodash-es';
+import * as _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import * as JsonPatch from 'fast-json-patch';
 
@@ -27,6 +27,8 @@ import KubernetesApplicationHelper from 'Kubernetes/helpers/application/index';
 import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
 
 class KubernetesCreateApplicationController {
+  /* #region  CONSTRUCTOR */
+
   /* @ngInject */
   constructor(
     $async,
@@ -40,6 +42,7 @@ class KubernetesCreateApplicationController {
     KubernetesStackService,
     KubernetesConfigurationService,
     KubernetesNodeService,
+    KubernetesIngressService,
     KubernetesPersistentVolumeClaimService,
     KubernetesNamespaceHelper,
     KubernetesVolumeService
@@ -56,6 +59,7 @@ class KubernetesCreateApplicationController {
     this.KubernetesConfigurationService = KubernetesConfigurationService;
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesVolumeService = KubernetesVolumeService;
+    this.KubernetesIngressService = KubernetesIngressService;
     this.KubernetesPersistentVolumeClaimService = KubernetesPersistentVolumeClaimService;
     this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
 
@@ -73,38 +77,25 @@ class KubernetesCreateApplicationController {
     this.refreshStacksAsync = this.refreshStacksAsync.bind(this);
     this.refreshConfigurationsAsync = this.refreshConfigurationsAsync.bind(this);
     this.refreshApplicationsAsync = this.refreshApplicationsAsync.bind(this);
-    this.refreshStacksConfigsAppsAsync = this.refreshStacksConfigsAppsAsync.bind(this);
+    this.refreshNamespaceDataAsync = this.refreshNamespaceDataAsync.bind(this);
     this.getApplicationAsync = this.getApplicationAsync.bind(this);
   }
-
-  isValid() {
-    return (
-      !this.state.alreadyExists &&
-      !this.state.hasDuplicateEnvironmentVariables &&
-      !this.state.hasDuplicatePersistedFolderPaths &&
-      !this.state.hasDuplicateConfigurationPaths &&
-      !this.state.hasDuplicateExistingVolumes
-    );
-  }
+  /* #endregion */
 
   onChangeName() {
     const existingApplication = _.find(this.applications, { Name: this.formValues.Name });
     this.state.alreadyExists = (this.state.isEdit && existingApplication && this.application.Id !== existingApplication.Id) || (!this.state.isEdit && existingApplication);
   }
 
-  /**
-   * AUTO SCALER UI MANAGEMENT
-   */
-
+  /* #region  AUTO SCLAER UI MANAGEMENT */
   unselectAutoScaler() {
     if (this.formValues.DeploymentType === this.ApplicationDeploymentTypes.GLOBAL) {
       this.formValues.AutoScaler.IsUsed = false;
     }
   }
+  /* #endregion */
 
-  /**
-   * CONFIGURATION UI MANAGEMENT
-   */
+  /* #region  CONFIGURATION UI MANAGEMENT */
   addConfiguration() {
     let config = new KubernetesApplicationConfigurationFormValue();
     config.SelectedConfiguration = this.configurations[0];
@@ -133,8 +124,12 @@ class KubernetesCreateApplicationController {
     this.onChangeConfigurationPath();
   }
 
+  clearConfigurations() {
+    this.formValues.Configurations = [];
+  }
+
   onChangeConfigurationPath() {
-    this.state.duplicateConfigurationPaths = [];
+    this.state.duplicates.configurationPaths.refs = [];
 
     const paths = _.reduce(
       this.formValues.Configurations,
@@ -151,31 +146,18 @@ class KubernetesCreateApplicationController {
       _.forEach(config.OverridenKeys, (overridenKey, keyIndex) => {
         const findPath = _.find(duplicatePaths, (path) => path === overridenKey.Path);
         if (findPath) {
-          this.state.duplicateConfigurationPaths[index + '_' + keyIndex] = findPath;
+          this.state.duplicates.configurationPaths.refs[index + '_' + keyIndex] = findPath;
         }
       });
     });
 
-    this.state.hasDuplicateConfigurationPaths = Object.keys(this.state.duplicateConfigurationPaths).length > 0;
+    this.state.duplicates.configurationPaths.hasDuplicates = Object.keys(this.state.duplicates.configurationPaths.refs).length > 0;
   }
-  /**
-   * !CONFIGURATION UI MANAGEMENT
-   */
+  /* #endregion */
 
-  /**
-   * ENVIRONMENT UI MANAGEMENT
-   */
+  /* #region  ENVIRONMENT UI MANAGEMENT */
   addEnvironmentVariable() {
     this.formValues.EnvironmentVariables.push(new KubernetesApplicationEnvironmentVariableFormValue());
-  }
-
-  hasEnvironmentVariables() {
-    return this.formValues.EnvironmentVariables.length > 0;
-  }
-
-  onChangeEnvironmentName() {
-    this.state.duplicateEnvironmentVariables = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.EnvironmentVariables, 'Name'));
-    this.state.hasDuplicateEnvironmentVariables = Object.keys(this.state.duplicateEnvironmentVariables).length > 0;
   }
 
   restoreEnvironmentVariable(index) {
@@ -190,13 +172,14 @@ class KubernetesCreateApplicationController {
     }
     this.onChangeEnvironmentName();
   }
-  /**
-   * !ENVIRONMENT UI MANAGEMENT
-   */
 
-  /**
-   * PERSISTENT FOLDERS UI MANAGEMENT
-   */
+  onChangeEnvironmentName() {
+    this.state.duplicates.environmentVariables.refs = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.EnvironmentVariables, 'Name'));
+    this.state.duplicates.environmentVariables.hasDuplicates = Object.keys(this.state.duplicates.environmentVariables.refs).length > 0;
+  }
+  /* #endregion */
+
+  /* #region  PERSISTENT FOLDERS UI MANAGEMENT */
   addPersistedFolder() {
     let storageClass = {};
     if (this.storageClasses.length > 0) {
@@ -207,20 +190,15 @@ class KubernetesCreateApplicationController {
     this.resetDeploymentType();
   }
 
-  onChangePersistedFolderPath() {
-    this.state.duplicatePersistedFolderPaths = KubernetesFormValidationHelper.getDuplicates(
-      _.map(this.formValues.PersistedFolders, (persistedFolder) => {
-        if (persistedFolder.NeedsDeletion) {
-          return undefined;
-        }
-        return persistedFolder.ContainerPath;
-      })
-    );
-    this.state.hasDuplicatePersistedFolderPaths = Object.keys(this.state.duplicatePersistedFolderPaths).length > 0;
-  }
-
   restorePersistedFolder(index) {
     this.formValues.PersistedFolders[index].NeedsDeletion = false;
+  }
+
+  resetPersistedFolders() {
+    this.formValues.PersistedFolders = _.forEach(this.formValues.PersistedFolders, (persistedFolder) => {
+      persistedFolder.ExistingVolume = null;
+      persistedFolder.UseNewVolume = true;
+    });
   }
 
   removePersistedFolder(index) {
@@ -233,10 +211,25 @@ class KubernetesCreateApplicationController {
     this.onChangeExistingVolumeSelection();
   }
 
-  onChangeExistingVolume(index) {
-    if (this.formValues.PersistedFolders[index].UseNewVolume) {
-      this.formValues.PersistedFolders[index].ExistingVolume = null;
-    }
+  onChangePersistedFolderPath() {
+    this.state.duplicates.persistedFolders.refs = KubernetesFormValidationHelper.getDuplicates(
+      _.map(this.formValues.PersistedFolders, (persistedFolder) => {
+        if (persistedFolder.NeedsDeletion) {
+          return undefined;
+        }
+        return persistedFolder.ContainerPath;
+      })
+    );
+    this.state.duplicates.persistedFolders.hasDuplicates = Object.keys(this.state.duplicates.persistedFolders.refs).length > 0;
+  }
+
+  onChangeExistingVolumeSelection() {
+    this.state.duplicates.existingVolumes.refs = KubernetesFormValidationHelper.getDuplicates(
+      _.map(this.formValues.PersistedFolders, (persistedFolder) => {
+        return persistedFolder.ExistingVolume ? persistedFolder.ExistingVolume.PersistentVolumeClaim.Name : '';
+      })
+    );
+    this.state.duplicates.existingVolumes.hasDuplicates = Object.keys(this.state.duplicates.existingVolumes.refs).length > 0;
   }
 
   useNewVolume(index) {
@@ -253,46 +246,129 @@ class KubernetesCreateApplicationController {
       this.resetDeploymentType();
     }
   }
+  /* #endregion */
 
-  onChangeExistingVolumeSelection() {
-    this.state.duplicateExistingVolumes = KubernetesFormValidationHelper.getDuplicates(
-      _.map(this.formValues.PersistedFolders, (persistedFolder) => {
-        return persistedFolder.ExistingVolume ? persistedFolder.ExistingVolume.PersistentVolumeClaim.Name : '';
-      })
-    );
-    this.state.hasDuplicateExistingVolumes = Object.keys(this.state.duplicateExistingVolumes).length > 0;
-  }
-
-  filterAvailableVolumes() {
-    const filteredVolumes = _.filter(this.volumes, (volume) => {
-      const isSameNamespace = volume.ResourcePool.Namespace.Name === this.formValues.ResourcePool.Namespace.Name;
-      const isUnused = !KubernetesVolumeHelper.isUsed(volume);
-      const isRWX = _.find(volume.PersistentVolumeClaim.StorageClass.AccessModes, (am) => am === 'RWX');
-      return isSameNamespace && (isUnused || isRWX);
-    });
-    this.availableVolumes = filteredVolumes;
-  }
-  /**
-   * !PERSISTENT FOLDERS UI MANAGEMENT
-   */
-
-  /**
-   * PUBLISHED PORTS UI MANAGEMENT
-   */
+  /* #region  PUBLISHED PORTS UI MANAGEMENT */
   addPublishedPort() {
-    this.formValues.PublishedPorts.push(new KubernetesApplicationPublishedPortFormValue());
+    const p = new KubernetesApplicationPublishedPortFormValue();
+    const ingresses = this.filteredIngresses;
+    p.IngressName = ingresses && ingresses.length ? ingresses[0].Name : undefined;
+    p.IngressHost = ingresses && ingresses.length ? ingresses[0].Host : undefined;
+    this.formValues.PublishedPorts.push(p);
+  }
+
+  resetPublishedPorts() {
+    const ingresses = this.filteredIngresses;
+    _.forEach(this.formValues.PublishedPorts, (p) => {
+      p.IngressName = ingresses && ingresses.length ? ingresses[0].Name : undefined;
+      p.IngressHost = ingresses && ingresses.length ? ingresses[0].Host : undefined;
+    });
+  }
+
+  restorePublishedPort(index) {
+    this.formValues.PublishedPorts[index].NeedsDeletion = false;
+    this.onChangePublishedPorts();
   }
 
   removePublishedPort(index) {
-    this.formValues.PublishedPorts.splice(index, 1);
+    if (this.state.isEdit && !this.formValues.PublishedPorts[index].IsNew) {
+      this.formValues.PublishedPorts[index].NeedsDeletion = true;
+    } else {
+      this.formValues.PublishedPorts.splice(index, 1);
+    }
+    this.onChangePublishedPorts();
   }
-  /**
-   * !PUBLISHED PORTS UI MANAGEMENT
-   */
+  /* #endregion */
 
-  /**
-   * STATE VALIDATION FUNCTIONS
-   */
+  /* #region  PUBLISHED PORTS ON CHANGE VALIDATION */
+  onChangePublishedPorts() {
+    this.onChangePortMappingContainerPort();
+    this.onChangePortMappingNodePort();
+    this.onChangePortMappingIngressRoute();
+    this.onChangePortMappingLoadBalancer();
+  }
+
+  onChangePortMappingContainerPort() {
+    const state = this.state.duplicates.publishedPorts.containerPorts;
+    if (this.formValues.PublishingType !== KubernetesApplicationPublishingTypes.INGRESS) {
+      const source = _.map(this.formValues.PublishedPorts, (p) => (p.NeedsDeletion ? undefined : p.ContainerPort + p.Protocol));
+      const duplicates = KubernetesFormValidationHelper.getDuplicates(source);
+      state.refs = duplicates;
+      state.hasDuplicates = Object.keys(duplicates).length > 0;
+    } else {
+      state.refs = {};
+      state.hasDuplicates = false;
+    }
+  }
+
+  onChangePortMappingNodePort() {
+    const state = this.state.duplicates.publishedPorts.nodePorts;
+    if (this.formValues.PublishingType === KubernetesApplicationPublishingTypes.CLUSTER) {
+      const source = _.map(this.formValues.PublishedPorts, (p) => (p.NeedsDeletion ? undefined : p.NodePort));
+      const duplicates = KubernetesFormValidationHelper.getDuplicates(source);
+      state.refs = duplicates;
+      state.hasDuplicates = Object.keys(duplicates).length > 0;
+    } else {
+      state.refs = {};
+      state.hasDuplicates = false;
+    }
+  }
+
+  onChangePortMappingIngress(index) {
+    const publishedPort = this.formValues.PublishedPorts[index];
+    const ingress = _.find(this.filteredIngresses, { Name: publishedPort.IngressName });
+    publishedPort.IngressHost = ingress.Host;
+  }
+
+  onChangePortMappingIngressRoute() {
+    const state = this.state.duplicates.publishedPorts.ingressRoutes;
+    if (this.formValues.PublishingType === KubernetesApplicationPublishingTypes.INGRESS) {
+      const newRoutes = _.map(this.formValues.PublishedPorts, (p) => (p.IsNew ? p.IngressRoute : undefined));
+      const toDelRoutes = _.map(this.formValues.PublishedPorts, (p) => (p.NeedsDeletion ? p.IngressRoute : undefined));
+      const allRoutes = _.flatMapDeep(this.ingresses, (c) => _.map(c.Paths, 'Path'));
+      const duplicates = KubernetesFormValidationHelper.getDuplicates(newRoutes);
+      _.forEach(newRoutes, (route, idx) => {
+        if (_.includes(allRoutes, route) && !_.includes(toDelRoutes, route)) {
+          duplicates[idx] = route;
+        }
+      });
+      state.refs = duplicates;
+      state.hasDuplicates = Object.keys(duplicates).length > 0;
+    } else {
+      state.refs = {};
+      state.hasDuplicates = false;
+    }
+  }
+
+  onChangePortMappingLoadBalancer() {
+    const state = this.state.duplicates.publishedPorts.loadBalancerPorts;
+    if (this.formValues.PublishingType === KubernetesApplicationPublishingTypes.LOAD_BALANCER) {
+      const source = _.map(this.formValues.PublishedPorts, (p) => (p.NeedsDeletion ? undefined : p.LoadBalancerPort));
+      const duplicates = KubernetesFormValidationHelper.getDuplicates(source);
+      state.refs = duplicates;
+      state.hasDuplicates = Object.keys(duplicates).length > 0;
+    } else {
+      state.refs = {};
+      state.hasDuplicates = false;
+    }
+  }
+  /* #endregion */
+
+  /* #region  STATE VALIDATION FUNCTIONS */
+  isValid() {
+    return (
+      !this.state.alreadyExists &&
+      !this.state.duplicates.environmentVariables.hasDuplicates &&
+      !this.state.duplicates.persistedFolders.hasDuplicates &&
+      !this.state.duplicates.configurationPaths.hasDuplicates &&
+      !this.state.duplicates.existingVolumes.hasDuplicates &&
+      !this.state.duplicates.publishedPorts.containerPorts.hasDuplicates &&
+      !this.state.duplicates.publishedPorts.nodePorts.hasDuplicates &&
+      !this.state.duplicates.publishedPorts.ingressRoutes.hasDuplicates &&
+      !this.state.duplicates.publishedPorts.loadBalancerPorts.hasDuplicates
+    );
+  }
+
   storageClassAvailable() {
     return this.storageClasses && this.storageClasses.length > 0;
   }
@@ -411,6 +487,10 @@ class KubernetesCreateApplicationController {
     return this.state.useLoadBalancer;
   }
 
+  publishViaIngressEnabled() {
+    return this.filteredIngresses.length;
+  }
+
   isEditAndNoChangesMade() {
     if (!this.state.isEdit) return false;
     const changes = JsonPatch.compare(this.savedFormValues, this.formValues);
@@ -420,6 +500,16 @@ class KubernetesCreateApplicationController {
 
   isEditAndExistingPersistedFolder(index) {
     return this.state.isEdit && this.formValues.PersistedFolders[index].PersistentVolumeClaimName;
+  }
+
+  isEditAndNotNewPublishedPort(index) {
+    return this.state.isEdit && !this.formValues.PublishedPorts[index].IsNew;
+  }
+
+  isNotInternalAndHasNoPublishedPorts() {
+    const toDelPorts = _.filter(this.formValues.PublishedPorts, { NeedsDeletion: true });
+    const toKeepPorts = _.without(this.formValues.PublishedPorts, ...toDelPorts);
+    return this.formValues.PublishingType !== KubernetesApplicationPublishingTypes.INTERNAL && toKeepPorts.length === 0;
   }
 
   isNonScalable() {
@@ -438,8 +528,8 @@ class KubernetesCreateApplicationController {
     const invalid = !this.isValid();
     const hasNoChanges = this.isEditAndNoChangesMade();
     const nonScalable = this.isNonScalable();
-    const res = overflow || autoScalerOverflow || inProgress || invalid || hasNoChanges || nonScalable;
-    return res;
+    const notInternalNoPorts = this.isNotInternalAndHasNoPublishedPorts();
+    return overflow || autoScalerOverflow || inProgress || invalid || hasNoChanges || nonScalable || notInternalNoPorts;
   }
 
   disableLoadBalancerEdit() {
@@ -450,13 +540,19 @@ class KubernetesCreateApplicationController {
       this.formValues.PublishingType === this.ApplicationPublishingTypes.LOAD_BALANCER
     );
   }
-  /**
-   * !STATE VALIDATION FUNCTIONS
-   */
 
-  /**
-   * DATA AUTO REFRESH
-   */
+  isPublishingTypeEditDisabled() {
+    const ports = _.filter(this.formValues.PublishedPorts, { IsNew: false, NeedsDeletion: false });
+    return this.state.isEdit && this.formValues.PublishedPorts.length > 0 && ports.length > 0;
+  }
+
+  isProtocolOptionDisabled(index, protocol) {
+    return this.disableLoadBalancerEdit() || (this.isEditAndNotNewPublishedPort(index) && this.formValues.PublishedPorts[index].Protocol !== protocol);
+  }
+
+  /* #endregion */
+
+  /* #region  DATA AUTO REFRESH */
   async updateSlidersAsync() {
     try {
       const quota = this.formValues.ResourcePool.Quota;
@@ -546,33 +642,54 @@ class KubernetesCreateApplicationController {
     return this.$async(this.refreshApplicationsAsync, namespace);
   }
 
-  async refreshStacksConfigsAppsAsync(namespace) {
-    await Promise.all([this.refreshStacks(namespace), this.refreshConfigurations(namespace), this.refreshApplications(namespace)]);
+  refreshVolumes(namespace) {
+    const filteredVolumes = _.filter(this.volumes, (volume) => {
+      const isSameNamespace = volume.ResourcePool.Namespace.Name === namespace;
+      const isUnused = !KubernetesVolumeHelper.isUsed(volume);
+      const isRWX = volume.PersistentVolumeClaim.StorageClass && _.find(volume.PersistentVolumeClaim.StorageClass.AccessModes, (am) => am === 'RWX');
+      return isSameNamespace && (isUnused || isRWX);
+    });
+    this.availableVolumes = filteredVolumes;
+  }
+
+  refreshIngresses(namespace) {
+    this.filteredIngresses = _.filter(this.ingresses, { Namespace: namespace });
+    if (!this.publishViaIngressEnabled()) {
+      this.formValues.PublishingType = KubernetesApplicationPublishingTypes.INTERNAL;
+    }
+    this.formValues.OriginalIngresses = this.filteredIngresses;
+  }
+
+  async refreshNamespaceDataAsync(namespace) {
+    await Promise.all([
+      this.refreshStacks(namespace),
+      this.refreshConfigurations(namespace),
+      this.refreshApplications(namespace),
+      this.refreshIngresses(namespace),
+      this.refreshVolumes(namespace),
+    ]);
     this.onChangeName();
   }
 
-  refreshStacksConfigsApps(namespace) {
-    return this.$async(this.refreshStacksConfigsAppsAsync, namespace);
+  refreshNamespaceData(namespace) {
+    return this.$async(this.refreshNamespaceDataAsync, namespace);
+  }
+
+  resetFormValues() {
+    this.clearConfigurations();
+    this.resetPersistedFolders();
+    this.resetPublishedPorts();
   }
 
   onResourcePoolSelectionChange() {
     const namespace = this.formValues.ResourcePool.Namespace.Name;
     this.updateSliders();
-    this.refreshStacksConfigsApps(namespace);
-    this.filterAvailableVolumes();
-    this.formValues.Configurations = [];
-    this.formValues.PersistedFolders = _.forEach(this.formValues.PersistedFolders, (persistedFolder) => {
-      persistedFolder.ExistingVolume = null;
-      persistedFolder.UseNewVolume = true;
-    });
+    this.refreshNamespaceData(namespace);
+    this.resetFormValues();
   }
-  /**
-   * !DATA AUTO REFRESH
-   */
+  /* #endregion */
 
-  /**
-   * ACTIONS
-   */
+  /* #region  ACTIONS */
   async deployApplicationAsync() {
     this.state.actionInProgress = true;
     try {
@@ -595,7 +712,7 @@ class KubernetesCreateApplicationController {
       this.Notifications.success('Application successfully updated');
       this.$state.go('kubernetes.applications.application', { name: this.application.Name, namespace: this.application.ResourcePool });
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve application related events');
+      this.Notifications.error('Failure', err, 'Unable to update application');
     } finally {
       this.state.actionInProgress = false;
     }
@@ -612,13 +729,9 @@ class KubernetesCreateApplicationController {
       return this.$async(this.deployApplicationAsync);
     }
   }
-  /**
-   * !ACTIONS
-   */
+  /* #endregion */
 
-  /**
-   * APPLICATION - used on edit context only
-   */
+  /* #region  APPLICATION - used on edit context only */
   async getApplicationAsync() {
     try {
       const namespace = this.state.params.namespace;
@@ -634,16 +747,16 @@ class KubernetesCreateApplicationController {
   getApplication() {
     return this.$async(this.getApplicationAsync);
   }
-  /**
-   * !APPLICATION
-   */
+  /* #endregion */
 
+  /* #region  ON INIT */
   async onInit() {
     try {
       this.state = {
         actionInProgress: false,
         useLoadBalancer: false,
         useServerMetrics: false,
+        canUseIngress: false,
         sliders: {
           cpu: {
             min: 0,
@@ -662,14 +775,42 @@ class KubernetesCreateApplicationController {
         viewReady: false,
         availableSizeUnits: ['MB', 'GB', 'TB'],
         alreadyExists: false,
-        duplicateEnvironmentVariables: {},
-        hasDuplicateEnvironmentVariables: false,
-        duplicatePersistedFolderPaths: {},
-        hasDuplicatePersistedFolderPaths: false,
-        duplicateConfigurationPaths: {},
-        hasDuplicateConfigurationPaths: false,
-        duplicateExistingVolumes: {},
-        hasDuplicateExistingVolumes: false,
+        duplicates: {
+          environmentVariables: {
+            refs: {},
+            hasDuplicates: false,
+          },
+          persistedFolders: {
+            refs: {},
+            hasDuplicates: false,
+          },
+          configurationPaths: {
+            refs: {},
+            hasDuplicates: false,
+          },
+          existingVolumes: {
+            refs: {},
+            hasDuplicates: false,
+          },
+          publishedPorts: {
+            containerPorts: {
+              refs: {},
+              hasDuplicates: false,
+            },
+            nodePorts: {
+              refs: {},
+              hasDuplicates: false,
+            },
+            ingressRoutes: {
+              refs: {},
+              hasDuplicates: false,
+            },
+            loadBalancerPorts: {
+              refs: {},
+              hasDuplicates: false,
+            },
+          },
+        },
         isEdit: false,
         params: {
           namespace: this.$transition$.params().namespace,
@@ -694,20 +835,27 @@ class KubernetesCreateApplicationController {
 
       this.formValues = new KubernetesApplicationFormValues();
 
-      const [resourcePools, nodes, volumes, applications] = await Promise.all([
+      const [resourcePools, nodes, ingresses] = await Promise.all([
         this.KubernetesResourcePoolService.get(),
         this.KubernetesNodeService.get(),
-        this.KubernetesVolumeService.get(),
-        this.KubernetesApplicationService.get(),
+        this.KubernetesIngressService.get(),
       ]);
+      this.ingresses = ingresses;
 
       this.resourcePools = _.filter(resourcePools, (resourcePool) => !this.KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name));
       this.formValues.ResourcePool = this.resourcePools[0];
-      this.volumes = volumes;
-      _.forEach(this.volumes, (volume) => {
-        volume.Applications = KubernetesVolumeHelper.getUsingApplications(volume, applications);
-      });
-      this.filterAvailableVolumes();
+
+      // TODO: refactor @Max
+      // Don't pull all volumes and applications across all namespaces
+      // Use refreshNamespaceData flow (triggered on Init + on Namespace change)
+      // and query only accross the selected namespace
+      if (this.storageClassAvailable()) {
+        const [applications, volumes] = await Promise.all([this.KubernetesApplicationService.get(), this.KubernetesVolumeService.get()]);
+        this.volumes = volumes;
+        _.forEach(this.volumes, (volume) => {
+          volume.Applications = KubernetesVolumeHelper.getUsingApplications(volume, applications);
+        });
+      }
 
       _.forEach(nodes, (item) => {
         this.state.nodes.memory += filesizeParser(item.Memory);
@@ -715,11 +863,12 @@ class KubernetesCreateApplicationController {
       });
 
       const namespace = this.state.isEdit ? this.state.params.namespace : this.formValues.ResourcePool.Namespace.Name;
-      await this.refreshStacksConfigsApps(namespace);
+      await this.refreshNamespaceData(namespace);
 
       if (this.state.isEdit) {
         await this.getApplication();
         this.formValues = KubernetesApplicationConverter.applicationToFormValues(this.application, this.resourcePools, this.configurations, this.persistentVolumeClaims);
+        this.formValues.OriginalIngresses = this.filteredIngresses;
         this.savedFormValues = angular.copy(this.formValues);
         delete this.formValues.ApplicationType;
 
@@ -734,6 +883,7 @@ class KubernetesCreateApplicationController {
         }
       } else {
         this.formValues.AutoScaler = KubernetesApplicationHelper.generateAutoScalerFormValueFromHorizontalPodAutoScaler(null, this.formValues.ReplicaCount);
+        this.formValues.OriginalIngressClasses = angular.copy(this.ingresses);
       }
 
       await this.updateSliders();
@@ -747,6 +897,7 @@ class KubernetesCreateApplicationController {
   $onInit() {
     return this.$async(this.onInit);
   }
+  /* #endregion */
 }
 
 export default KubernetesCreateApplicationController;

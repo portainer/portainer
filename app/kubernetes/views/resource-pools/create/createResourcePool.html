@@ -10,7 +10,7 @@
       <rd-widget>
         <rd-widget-body>
           <form class="form-horizontal" autocomplete="off" name="resourcePoolCreationForm">
-            <!-- name-input -->
+            <!-- #region NAME INPUT -->
             <div class="form-group">
               <label for="pool_name" class="col-sm-1 control-label text-left">Name</label>
               <div class="col-sm-11">
@@ -39,10 +39,12 @@
                 <p ng-if="ctrl.state.isAlreadyExist"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A resource pool with the same name already exists.</p>
               </div>
             </div>
-            <!-- !name-input -->
+            <!-- #endregion -->
+
             <div class="col-sm-12 form-section-title">
               Quota
             </div>
+            <!-- #region QUOTA -->
             <!-- quotas-switch -->
             <div class="form-group">
               <div class="col-sm-12 small text-muted">
@@ -56,16 +58,16 @@
                 <label class="control-label text-left">
                   Resource assignment
                 </label>
-                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.hasQuota" /><i></i> </label>
+                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.HasQuota" /><i></i> </label>
               </div>
             </div>
-            <div class="form-group" ng-if="ctrl.formValues.hasQuota && !ctrl.isQuotaValid()">
+            <div class="form-group" ng-if="ctrl.formValues.HasQuota && !ctrl.isQuotaValid()">
               <span class="col-sm-12 text-warning small">
                 <p> <i class="fa fa-exclamation-triangle" aria-hidden="true" style="margin-right: 2px;"></i> At least a single limit must be set for the quota to be valid. </p>
               </span>
             </div>
             <!-- !quotas-switch -->
-            <div ng-if="ctrl.formValues.hasQuota">
+            <div ng-if="ctrl.formValues.HasQuota">
               <div class="col-sm-12 form-section-title">
                 Resource limits
               </div>
@@ -76,13 +78,8 @@
                     Memory
                   </label>
                   <div class="col-sm-3">
-                    <slider
-                      model="ctrl.formValues.MemoryLimit"
-                      floor="ctrl.defaults.MemoryLimit"
-                      ceil="ctrl.state.sliderMaxMemory"
-                      step="128"
-                      ng-if="ctrl.state.sliderMaxMemory"
-                    ></slider>
+                    <slider model="ctrl.formValues.MemoryLimit" floor="ctrl.defaults.MemoryLimit" ceil="ctrl.state.sliderMaxMemory" step="128" ng-if="ctrl.state.sliderMaxMemory">
+                    </slider>
                   </div>
                   <div class="col-sm-2">
                     <input
@@ -106,8 +103,8 @@
                   <div class="col-sm-12 small text-warning">
                     <div ng-messages="resourcePoolCreationForm.pool_name.$error">
                       <p
-                        ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value must be between {{ ctrl.defaults.MemoryLimit }} and {{ ctrl.state.sliderMaxMemory }}</p
-                      >
+                        ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value must be between {{ ctrl.defaults.MemoryLimit }} and {{ ctrl.state.sliderMaxMemory }}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -118,14 +115,8 @@
                     CPU
                   </label>
                   <div class="col-sm-5">
-                    <slider
-                      model="ctrl.formValues.CpuLimit"
-                      floor="ctrl.defaults.CpuLimit"
-                      ceil="ctrl.state.sliderMaxCpu"
-                      step="0.1"
-                      precision="2"
-                      ng-if="ctrl.state.sliderMaxCpu"
-                    ></slider>
+                    <slider model="ctrl.formValues.CpuLimit" floor="ctrl.defaults.CpuLimit" ceil="ctrl.state.sliderMaxCpu" step="0.1" precision="2" ng-if="ctrl.state.sliderMaxCpu">
+                    </slider>
                   </div>
                   <div class="col-sm-4" style="margin-top: 20px;">
                     <p class="small text-muted">
@@ -136,16 +127,67 @@
                 <!-- !cpu-limit-input -->
               </div>
             </div>
-            <!-- actions -->
+            <!-- #endregion -->
+
+            <div class="col-sm-12 form-section-title">
+              Ingresses
+            </div>
+            <!-- #region INGRESSES -->
+            <div class="form-group" ng-if="!ctrl.state.canUseIngress">
+              <div class="col-sm-12 small text-muted">
+                The ingress feature must be enabled in the
+                <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: ctrl.endpoint.Id})">endpoint configuration view</a> to be able to register ingresses inside this
+                resource pool.
+              </div>
+            </div>
+            <div class="form-group" ng-if="ctrl.state.canUseIngress">
+              <div class="col-sm-12 small text-muted">
+                <p>
+                  <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  You can enable one or multiple ingresses to be used when deploying an application inside this resource pool.
+                </p>
+              </div>
+              <div class="col-sm-12">
+                <table class="table" style="table-layout: fixed;">
+                  <tbody>
+                    <tr class="text-muted">
+                      <td style="width: 33%;">Ingress controller</td>
+                      <td style="width: 66%;">
+                        Hostname
+                        <portainer-tooltip
+                          position="bottom"
+                          message="Optional hostname associated to the ingress inside this resource pool. Users will be able to expose and access their applications over the ingress via this hostname or via IP address directly if not defined."
+                        >
+                        </portainer-tooltip>
+                      </td>
+                    </tr>
+                    <tr ng-repeat="class in ctrl.formValues.IngressClasses">
+                      <td style="width: 33%;">
+                        <div style="margin: 5px;">
+                          <label class="switch" style="margin-right: 10px;"> <input type="checkbox" ng-model="class.Selected" /><i></i> </label>
+                          <span>{{ class.Name }}</span>
+                        </div>
+                      </td>
+                      <td style="width: 66%;">
+                        <input class="form-control" ng-model="class.Host" placeholder="host.com" />
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <!-- #endregion -->
+
             <div class="col-sm-12 form-section-title">
               Actions
             </div>
+            <!-- #region ACTIONS -->
             <div class="form-group">
               <div class="col-sm-12">
                 <button
                   type="button"
                   class="btn btn-primary btn-sm"
-                  ng-disabled="!resourcePoolCreationForm.$valid || ctrl.state.actionInProgress || (ctrl.formValues.hasQuota && !ctrl.isQuotaValid()) || !ctrl.isValid()"
+                  ng-disabled="!resourcePoolCreationForm.$valid || ctrl.state.actionInProgress || (ctrl.formValues.HasQuota && !ctrl.isQuotaValid()) || !ctrl.isValid()"
                   ng-click="ctrl.createResourcePool()"
                   button-spinner="ctrl.state.actionInProgress"
                 >
@@ -154,7 +196,8 @@
                 </button>
               </div>
             </div>
-            <!-- !actions -->
+
+            <!-- #endregion -->
           </form>
         </rd-widget-body>
       </rd-widget>

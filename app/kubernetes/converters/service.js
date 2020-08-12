@@ -1,4 +1,4 @@
-import _ from 'lodash-es';
+import * as _ from 'lodash-es';
 import * as JsonPatch from 'fast-json-patch';
 
 import { KubernetesServiceCreatePayload } from 'Kubernetes/models/service/payloads';
@@ -11,8 +11,9 @@ import { KubernetesServiceHeadlessClusterIP, KubernetesService, KubernetesServic
 import { KubernetesApplicationPublishingTypes } from 'Kubernetes/models/application/models';
 import KubernetesServiceHelper from 'Kubernetes/helpers/serviceHelper';
 
-class KubernetesServiceConverter {
-  static publishedPortToServicePort(name, publishedPort, type) {
+function _publishedPortToServicePort(formValues, publishedPort, type) {
+  if (publishedPort.IsNew || !publishedPort.NeedsDeletion) {
+    const name = formValues.Name;
     const res = new KubernetesServicePort();
     res.name = _.toLower(name + '-' + publishedPort.ContainerPort + '-' + publishedPort.Protocol);
     res.port = type === KubernetesServiceTypes.LOAD_BALANCER ? publishedPort.LoadBalancerPort : publishedPort.ContainerPort;
@@ -27,7 +28,9 @@ class KubernetesServiceConverter {
     }
     return res;
   }
+}
 
+class KubernetesServiceConverter {
   /**
    * Generate KubernetesService from KubernetesApplicationFormValues
    * @param {KubernetesApplicationFormValues} formValues
@@ -39,12 +42,13 @@ class KubernetesServiceConverter {
     res.StackName = formValues.StackName ? formValues.StackName : formValues.Name;
     res.ApplicationOwner = formValues.ApplicationOwner;
     res.ApplicationName = formValues.Name;
-    if (formValues.PublishingType === KubernetesApplicationPublishingTypes.CLUSTER) {
+    if (formValues.PublishingType === KubernetesApplicationPublishingTypes.CLUSTER || formValues.PublishingType === KubernetesApplicationPublishingTypes.INGRESS) {
       res.Type = KubernetesServiceTypes.NODE_PORT;
     } else if (formValues.PublishingType === KubernetesApplicationPublishingTypes.LOAD_BALANCER) {
       res.Type = KubernetesServiceTypes.LOAD_BALANCER;
     }
-    res.Ports = _.map(formValues.PublishedPorts, (item) => KubernetesServiceConverter.publishedPortToServicePort(formValues.Name, item, res.Type));
+    const ports = _.map(formValues.PublishedPorts, (item) => _publishedPortToServicePort(formValues, item, res.Type));
+    res.Ports = _.uniqBy(_.without(ports, undefined), (p) => p.targetPort + p.protocol);
     return res;
   }
 
