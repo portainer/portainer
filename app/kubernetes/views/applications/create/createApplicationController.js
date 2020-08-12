@@ -506,6 +506,12 @@ class KubernetesCreateApplicationController {
     return this.state.isEdit && !this.formValues.PublishedPorts[index].IsNew;
   }
 
+  isNotInternalAndHasNoPublishedPorts() {
+    const toDelPorts = _.filter(this.formValues.PublishedPorts, { NeedsDeletion: true });
+    const toKeepPorts = _.without(this.formValues.PublishedPorts, ...toDelPorts);
+    return this.formValues.PublishingType !== KubernetesApplicationPublishingTypes.INTERNAL && toKeepPorts.length === 0;
+  }
+
   isNonScalable() {
     const scalable = this.supportScalableReplicaDeployment();
     const global = this.supportGlobalDeployment();
@@ -522,8 +528,8 @@ class KubernetesCreateApplicationController {
     const invalid = !this.isValid();
     const hasNoChanges = this.isEditAndNoChangesMade();
     const nonScalable = this.isNonScalable();
-    const res = overflow || autoScalerOverflow || inProgress || invalid || hasNoChanges || nonScalable;
-    return res;
+    const notInternalNoPorts = this.isNotInternalAndHasNoPublishedPorts();
+    return overflow || autoScalerOverflow || inProgress || invalid || hasNoChanges || nonScalable || notInternalNoPorts;
   }
 
   disableLoadBalancerEdit() {

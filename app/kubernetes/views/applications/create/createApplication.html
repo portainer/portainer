@@ -1072,6 +1072,9 @@
                 When publishing a port in cluster mode, the node port is optional. If left empty Kubernetes will use a random port number. If you wish to specify a port, use a port
                 number inside the default range <code>30000-32767</code>.
               </div>
+              <div ng-if="ctrl.isNotInternalAndHasNoPublishedPorts()" class="col-sm-12 small text-muted text-warning" style="margin-top: 15px;">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> You need to publish ports to deploy the application with this publishing type.
+              </div>
 
               <div class="col-sm-12 form-inline" style="margin-top: 10px;">
                 <!-- #region INPUTS -->
