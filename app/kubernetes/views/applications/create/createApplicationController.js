@@ -252,7 +252,7 @@ class KubernetesCreateApplicationController {
   }
   /* #endregion */
 
-  /* #region  PLACEMENT MANAGEMENT */
+  /* #region  PLACEMENT UI MANAGEMENT */
   addPlacement() {
     const placement = new KubernetesApplicationPlacementFormValue();
     const label = this.nodesLabels[0];
@@ -266,7 +266,7 @@ class KubernetesCreateApplicationController {
   }
 
   removePlacement(index) {
-    if (this.state.isEdit) {
+    if (this.state.isEdit && !this.formValues.Placements[index].IsNew) {
       this.formValues.Placements[index].NeedsDeletion = true;
     } else {
       this.formValues.Placements.splice(index, 1);
@@ -545,6 +545,11 @@ class KubernetesCreateApplicationController {
 
   isEditAndNotNewPlacement(index) {
     return this.state.isEdit && !this.formValues.Placements[index].IsNew;
+  }
+
+  showPlacementPolicySection() {
+    const placements = _.filter(this.formValues.Placements, { NeedsDeletion: false });
+    return placements.length !== 0;
   }
 
   isNonScalable() {
@@ -903,7 +908,13 @@ class KubernetesCreateApplicationController {
 
       if (this.state.isEdit) {
         await this.getApplication();
-        this.formValues = KubernetesApplicationConverter.applicationToFormValues(this.application, this.resourcePools, this.configurations, this.persistentVolumeClaims, nodes);
+        this.formValues = KubernetesApplicationConverter.applicationToFormValues(
+          this.application,
+          this.resourcePools,
+          this.configurations,
+          this.persistentVolumeClaims,
+          this.nodesLabels
+        );
         this.formValues.OriginalIngresses = this.filteredIngresses;
         this.savedFormValues = angular.copy(this.formValues);
         delete this.formValues.ApplicationType;

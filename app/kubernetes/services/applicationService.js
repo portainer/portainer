@@ -111,10 +111,9 @@ class KubernetesApplicationService {
       const boundService = KubernetesServiceHelper.findApplicationBoundService(services, rootItem.value.Raw);
       const service = boundService ? await this.KubernetesServiceService.get(namespace, boundService.metadata.name) : {};
 
-      const application = converterFunc(rootItem.value.Raw, service.Raw, ingresses.value);
+      const application = converterFunc(rootItem.value.Raw, pods.value, service.Raw, ingresses.value);
       application.Yaml = rootItem.value.Yaml;
       application.Raw = rootItem.value.Raw;
-      application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods.value, application.Raw);
       application.Containers = KubernetesApplicationHelper.associateContainersAndApplication(application);
 
       const boundScaler = KubernetesHorizontalPodAutoScalerHelper.findApplicationBoundScaler(autoScalers.value, application);
@@ -143,8 +142,7 @@ class KubernetesApplicationService {
 
       const convertToApplication = (item, converterFunc, services, pods, ingresses) => {
         const service = KubernetesServiceHelper.findApplicationBoundService(services, item);
-        const application = converterFunc(item, service, ingresses);
-        application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods, item);
+        const application = converterFunc(item, pods, service, ingresses);
         application.Containers = KubernetesApplicationHelper.associateContainersAndApplication(application);
         return application;
       };

@@ -49,7 +49,7 @@ function _apiPortsToPublishedPorts(pList, pRefs) {
 }
 
 class KubernetesApplicationConverter {
-  static applicationCommon(res, data, service, ingresses) {
+  static applicationCommon(res, data, pods, service, ingresses) {
     const containers = _.without(_.concat(data.spec.template.spec.containers, data.spec.template.spec.initContainers), undefined);
     res.Id = data.metadata.uid;
     res.Name = data.metadata.name;
@@ -61,6 +61,7 @@ class KubernetesApplicationConverter {
     res.Image = containers[0].image;
     res.CreationDate = data.metadata.creationTimestamp;
     res.Env = _.without(_.flatMap(_.map(containers, 'env')), undefined);
+    res.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods, data);
 
     const limits = {
       Cpu: 0,
@@ -212,9 +213,9 @@ class KubernetesApplicationConverter {
     );
   }
 
-  static apiDeploymentToApplication(data, service, ingresses) {
+  static apiDeploymentToApplication(data, pods, service, ingresses) {
     const res = new KubernetesApplication();
-    KubernetesApplicationConverter.applicationCommon(res, data, service, ingresses);
+    KubernetesApplicationConverter.applicationCommon(res, data, pods, service, ingresses);
     res.ApplicationType = KubernetesApplicationTypes.DEPLOYMENT;
     res.DeploymentType = KubernetesApplicationDeploymentTypes.REPLICATED;
     res.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.SHARED;
@@ -223,9 +224,9 @@ class KubernetesApplicationConverter {
     return res;
   }
 
-  static apiDaemonSetToApplication(data, service, ingresses) {
+  static apiDaemonSetToApplication(data, pods, service, ingresses) {
     const res = new KubernetesApplication();
-    KubernetesApplicationConverter.applicationCommon(res, data, service, ingresses);
+    KubernetesApplicationConverter.applicationCommon(res, data, pods, service, ingresses);
     res.ApplicationType = KubernetesApplicationTypes.DAEMONSET;
     res.DeploymentType = KubernetesApplicationDeploymentTypes.GLOBAL;
     res.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.SHARED;
@@ -234,9 +235,9 @@ class KubernetesApplicationConverter {
     return res;
   }
 
-  static apiStatefulSetToapplication(data, service, ingresses) {
+  static apiStatefulSetToapplication(data, pods, service, ingresses) {
     const res = new KubernetesApplication();
-    KubernetesApplicationConverter.applicationCommon(res, data, service, ingresses);
+    KubernetesApplicationConverter.applicationCommon(res, data, pods, service, ingresses);
     res.ApplicationType = KubernetesApplicationTypes.STATEFULSET;
     res.DeploymentType = KubernetesApplicationDeploymentTypes.REPLICATED;
     res.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.ISOLATED;
@@ -246,7 +247,7 @@ class KubernetesApplicationConverter {
     return res;
   }
 
-  static applicationToFormValues(app, resourcePools, configurations, persistentVolumeClaims, nodes) {
+  static applicationToFormValues(app, resourcePools, configurations, persistentVolumeClaims, nodesLabels) {
     const res = new KubernetesApplicationFormValues();
     res.ApplicationType = app.ApplicationType;
     res.ResourcePool = _.find(resourcePools, ['Namespace.Name', app.ResourcePool]);
@@ -277,7 +278,7 @@ class KubernetesApplicationConverter {
       res.PublishingType = KubernetesApplicationPublishingTypes.INTERNAL;
     }
 
-    KubernetesApplicationHelper.generatePlacementsFormValuesFromNodeSelector(res, app.Pods[0].NodeSelector, nodes);
+    KubernetesApplicationHelper.generatePlacementsFormValuesFromAffinity(res, app.Pods[0].Affinity, nodesLabels);
     return res;
   }
 

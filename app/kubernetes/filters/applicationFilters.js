@@ -119,4 +119,15 @@ angular
       }
       return '';
     };
+  })
+  .filter('kubernetesNodeLabelHumanReadbleText', function () {
+    'use strict';
+    return function (text) {
+      const values = {
+        'kubernetes.io/os': 'Operating system',
+        'kubernetes.io/arch': 'Architecture',
+        'kubernetes.io/hostname': 'Node',
+      };
+      return values[text] || text;
+    };
   });
