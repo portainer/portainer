@@ -27,6 +27,11 @@ export const KubernetesApplicationPublishingTypes = Object.freeze({
   INGRESS: 4,
 });
 
+export const KubernetesApplicationPlacementTypes = Object.freeze({
+  PREFERRED: 1,
+  MANDATORY: 2,
+});
+
 export const KubernetesApplicationQuotaDefaults = {
   CpuLimit: 0.1,
   MemoryLimit: 64, // MB

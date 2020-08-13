@@ -9,6 +9,7 @@ import {
   KubernetesApplicationPublishingTypes,
   KubernetesApplicationQuotaDefaults,
   KubernetesApplicationTypes,
+  KubernetesApplicationPlacementTypes,
 } from 'Kubernetes/models/application/models';
 import {
   KubernetesApplicationConfigurationFormValue,
@@ -18,6 +19,7 @@ import {
   KubernetesApplicationFormValues,
   KubernetesApplicationPersistedFolderFormValue,
   KubernetesApplicationPublishedPortFormValue,
+  KubernetesApplicationPlacementFormValue,
 } from 'Kubernetes/models/application/formValues';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import KubernetesApplicationConverter from 'Kubernetes/converters/application';
@@ -25,6 +27,7 @@ import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceRese
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application/index';
 import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
+import { KubernetesNodeHelper } from 'Kubernetes/node/helper';
 
 class KubernetesCreateApplicationController {
   /* #region  CONSTRUCTOR */
@@ -66,6 +69,7 @@ class KubernetesCreateApplicationController {
     this.ApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
     this.ApplicationDataAccessPolicies = KubernetesApplicationDataAccessPolicies;
     this.ApplicationPublishingTypes = KubernetesApplicationPublishingTypes;
+    this.ApplicationPlacementTypes = KubernetesApplicationPlacementTypes;
     this.ApplicationTypes = KubernetesApplicationTypes;
     this.ApplicationConfigurationFormValueOverridenKeyTypes = KubernetesApplicationConfigurationFormValueOverridenKeyTypes;
     this.ServiceTypes = KubernetesServiceTypes;
@@ -246,6 +250,33 @@ class KubernetesCreateApplicationController {
       this.resetDeploymentType();
     }
   }
+  /* #endregion */
+
+  /* #region  PLACEMENT MANAGEMENT */
+  addPlacement() {
+    const placement = new KubernetesApplicationPlacementFormValue();
+    const label = this.nodesLabels[0];
+    placement.Label = label;
+    placement.Value = label.Values[0];
+    this.formValues.Placements.push(placement);
+  }
+
+  restorePlacement(index) {
+    this.formValues.Placements[index].NeedsDeletion = false;
+  }
+
+  removePlacement(index) {
+    if (this.state.isEdit) {
+      this.formValues.Placements[index].NeedsDeletion = true;
+    } else {
+      this.formValues.Placements.splice(index, 1);
+    }
+  }
+
+  onPlacementLabelChange(index) {
+    this.formValues.Placements[index].Value = this.formValues.Placements[index].Label.Values[0];
+  }
+
   /* #endregion */
 
   /* #region  PUBLISHED PORTS UI MANAGEMENT */
@@ -510,6 +541,10 @@ class KubernetesCreateApplicationController {
     const toDelPorts = _.filter(this.formValues.PublishedPorts, { NeedsDeletion: true });
     const toKeepPorts = _.without(this.formValues.PublishedPorts, ...toDelPorts);
     return this.formValues.PublishingType !== KubernetesApplicationPublishingTypes.INTERNAL && toKeepPorts.length === 0;
+  }
+
+  isEditAndNotNewPlacement(index) {
+    return this.state.isEdit && !this.formValues.Placements[index].IsNew;
   }
 
   isNonScalable() {
@@ -861,13 +896,14 @@ class KubernetesCreateApplicationController {
         this.state.nodes.memory += filesizeParser(item.Memory);
         this.state.nodes.cpu += item.CPU;
       });
+      this.nodesLabels = KubernetesNodeHelper.generateNodeLabelsFromNodes(nodes);
 
       const namespace = this.state.isEdit ? this.state.params.namespace : this.formValues.ResourcePool.Namespace.Name;
       await this.refreshNamespaceData(namespace);
 
       if (this.state.isEdit) {
         await this.getApplication();
-        this.formValues = KubernetesApplicationConverter.applicationToFormValues(this.application, this.resourcePools, this.configurations, this.persistentVolumeClaims);
+        this.formValues = KubernetesApplicationConverter.applicationToFormValues(this.application, this.resourcePools, this.configurations, this.persistentVolumeClaims, nodes);
         this.formValues.OriginalIngresses = this.filteredIngresses;
         this.savedFormValues = angular.copy(this.formValues);
         delete this.formValues.ApplicationType;

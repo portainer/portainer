@@ -30,6 +30,7 @@ class KubernetesDaemonSetConverter {
     res.Env = KubernetesApplicationHelper.generateEnvFromEnvVariables(formValues.EnvironmentVariables);
     KubernetesApplicationHelper.generateVolumesFromPersistentVolumClaims(res, volumeClaims);
     KubernetesApplicationHelper.generateEnvOrVolumesFromConfigurations(res, formValues.Configurations);
+    KubernetesApplicationHelper.generateAffinityFromPlacements(res, formValues);
     return res;
   }
 
@@ -51,6 +52,7 @@ class KubernetesDaemonSetConverter {
     payload.spec.template.metadata.labels[KubernetesPortainerApplicationNameLabel] = daemonSet.ApplicationName;
     payload.spec.template.spec.containers[0].name = daemonSet.Name;
     payload.spec.template.spec.containers[0].image = daemonSet.Image;
+    payload.spec.template.spec.affinity = daemonSet.Affinity;
     KubernetesCommonHelper.assignOrDeleteIfEmpty(payload, 'spec.template.spec.containers[0].env', daemonSet.Env);
     KubernetesCommonHelper.assignOrDeleteIfEmpty(payload, 'spec.template.spec.containers[0].volumeMounts', daemonSet.VolumeMounts);
     KubernetesCommonHelper.assignOrDeleteIfEmpty(payload, 'spec.template.spec.volumes', daemonSet.Volumes);

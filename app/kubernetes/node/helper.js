@@ -20,4 +20,15 @@ export class KubernetesNodeHelper {
       return label;
     });
   }
+
+  static generateNodeLabelsFromNodes(nodes) {
+    const pairs = _.flatMap(nodes, (node) => {
+      return _.map(_.toPairs(node.Labels), ([k, v]) => {
+        return { key: k, value: v };
+      });
+    });
+    return _.map(_.groupBy(pairs, 'key'), (values, key) => {
+      return { Key: key, Values: _.uniq(_.map(values, 'value')) };
+    });
+  }
 }

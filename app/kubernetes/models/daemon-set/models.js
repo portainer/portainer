@@ -15,6 +15,7 @@ const _KubernetesDaemonSet = Object.freeze({
   ApplicationName: '',
   ApplicationOwner: '',
   Note: '',
+  Affinity: undefined, // KubernetesPodAffinity
 });
 
 export class KubernetesDaemonSet {

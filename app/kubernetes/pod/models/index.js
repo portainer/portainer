@@ -16,6 +16,7 @@ const _KubernetesPod = Object.freeze({
   Labels: [],
   Affinity: {}, // KubernetesPodAffinity
   Tolerations: [], // KubernetesPodToleration[]
+  NodeSelector: undefined,
 });
 
 export class KubernetesPod {

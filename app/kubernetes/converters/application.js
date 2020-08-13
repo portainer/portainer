@@ -246,7 +246,7 @@ class KubernetesApplicationConverter {
     return res;
   }
 
-  static applicationToFormValues(app, resourcePools, configurations, persistentVolumeClaims) {
+  static applicationToFormValues(app, resourcePools, configurations, persistentVolumeClaims, nodes) {
     const res = new KubernetesApplicationFormValues();
     res.ApplicationType = app.ApplicationType;
     res.ResourcePool = _.find(resourcePools, ['Namespace.Name', app.ResourcePool]);
@@ -276,6 +276,8 @@ class KubernetesApplicationConverter {
     } else {
       res.PublishingType = KubernetesApplicationPublishingTypes.INTERNAL;
     }
+
+    KubernetesApplicationHelper.generatePlacementsFormValuesFromNodeSelector(res, app.Pods[0].NodeSelector, nodes);
     return res;
   }
 

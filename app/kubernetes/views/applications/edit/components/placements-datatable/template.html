@@ -94,7 +94,7 @@
             <!-- ADMIN + UNMET TAINTS -->
             <tr ng-if="$ctrl.isAdmin" ng-show="item.Expanded" ng-repeat="taint in item.UnmetTaints" ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
               <td colspan="2">
-                This application is missing a toleration for the taint <code>{{ taint.Key }}{{ taint.Value ? '=' + taint.Value : '' }}:{{ taint.effect }}</code>
+                This application is missing a toleration for the taint <code>{{ taint.Key }}{{ taint.Value ? '=' + taint.Value : '' }}:{{ taint.Effect }}</code>
               </td>
             </tr>
             <!-- !ADMIN + UNMET TAINTS -->

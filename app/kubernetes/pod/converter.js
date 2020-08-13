@@ -31,7 +31,7 @@ function computeContainerStatus(statuses, name) {
 function computeAffinity(affinity) {
   const res = new KubernetesPodAffinity();
   if (affinity) {
-    res.NodeAffinity = affinity.nodeAffinity || {};
+    res.nodeAffinity = affinity.nodeAffinity || {};
   }
   return res;
 }

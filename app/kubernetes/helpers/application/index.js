@@ -22,6 +22,15 @@ import {
   KubernetesApplicationVolumeSecretPayload,
 } from 'Kubernetes/models/application/payloads';
 import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
+import { KubernetesApplicationPlacementTypes } from 'Kubernetes/models/application/models';
+import PortainerError from 'Portainer/error';
+import { KubernetesPodNodeAffinityNodeSelectorRequirementOperators, KubernetesPodAffinity } from 'Kubernetes/pod/models';
+import {
+  KubernetesNodeSelectorTermPayload,
+  KubernetesPreferredSchedulingTermPayload,
+  KubernetesPodNodeAffinityPayload,
+  KubernetesNodeSelectorRequirementPayload,
+} from 'Kubernetes/pod/payloads/affinities';
 
 class KubernetesApplicationHelper {
   static associatePodsAndApplication(pods, app) {
@@ -198,6 +207,40 @@ class KubernetesApplicationHelper {
       app.Volumes.push(volume);
     });
   }
+
+  static generateAffinityFromPlacements(app, formValues) {
+    const placements = formValues.Placements;
+    const res = new KubernetesPodNodeAffinityPayload();
+    const expressions = _.map(placements, (p) => {
+      const exp = new KubernetesNodeSelectorRequirementPayload();
+      exp.key = p.Label.Key;
+      if (p.Value) {
+        exp.operator = KubernetesPodNodeAffinityNodeSelectorRequirementOperators.IN;
+        exp.values = [p.Value];
+      } else {
+        exp.operator = KubernetesPodNodeAffinityNodeSelectorRequirementOperators.EXISTS;
+        delete exp.values;
+      }
+      return exp;
+    });
+
+    if (formValues.PlacementType === KubernetesApplicationPlacementTypes.MANDATORY) {
+      const term = new KubernetesNodeSelectorTermPayload();
+      term.matchExpressions = expressions;
+      res.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms.push(term);
+      delete res.preferredDuringSchedulingIgnoredDuringExecution;
+    } else if (formValues.PlacementType === KubernetesApplicationPlacementTypes.PREFERRED) {
+      const term = new KubernetesPreferredSchedulingTermPayload();
+      term.preference = new KubernetesNodeSelectorTermPayload();
+      term.preference.matchExpressions = expressions;
+      res.preferredDuringSchedulingIgnoredDuringExecution.push(term);
+      delete res.requiredDuringSchedulingIgnoredDuringExecution;
+    } else {
+      throw new PortainerError('Unable to determine which placement to use');
+    }
+    app.Affinity = new KubernetesPodAffinity();
+    app.Affinity.nodeAffinity = res;
+  }
   /**
    * !FORMVALUES TO APPLICATION FUNCTIONS
    */
@@ -312,6 +355,10 @@ class KubernetesApplicationHelper {
       return generatePort(port);
     });
     return finalRes;
+  }
+
+  static generatePlacementsFormValuesFromNodeSelector(formValues, nodeSelector, nodes) {
+    void formValues, nodeSelector, nodes;
   }
 
   static generateAutoScalerFormValueFromHorizontalPodAutoScaler(autoScaler, replicasCount) {
