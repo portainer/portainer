@@ -54,7 +54,7 @@ class KubernetesApplicationConsoleController {
       endpointId: this.EndpointProvider.endpointID(),
       namespace: this.application.ResourcePool,
       podName: this.podName,
-      containerName: this.application.Pods[0].Containers[0].name,
+      containerName: this.containerName,
       command: this.state.command,
     };
 
@@ -92,8 +92,10 @@ class KubernetesApplicationConsoleController {
     const podName = this.$transition$.params().pod;
     const applicationName = this.$transition$.params().name;
     const namespace = this.$transition$.params().namespace;
+    const containerName = this.$transition$.params().container;
 
     this.podName = podName;
+    this.containerName = containerName;
 
     try {
       this.application = await this.KubernetesApplicationService.get(namespace, applicationName);

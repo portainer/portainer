@@ -43,12 +43,12 @@ class KubernetesStackLogsController {
     this.repeater = this.$interval(this.getStackLogsAsync, this.state.refreshRate);
   }
 
-  async generateLogsPromise(pod) {
+  async generateLogsPromise(pod, container) {
     const res = {
       Pod: pod,
       Logs: [],
     };
-    res.Logs = await this.KubernetesPodService.logs(pod.Namespace, pod.Name);
+    res.Logs = await this.KubernetesPodService.logs(pod.Namespace, pod.Name, container.Name);
     return res;
   }
 
@@ -58,7 +58,7 @@ class KubernetesStackLogsController {
       Pods: [],
     };
 
-    const promises = _.map(app.Pods, this.generateLogsPromise);
+    const promises = _.flatMap(_.map(app.Pods, (pod) => _.map(pod.Containers, (container) => this.generateLogsPromise(pod, container))));
     const result = await $allSettled(promises);
     res.Pods = result.fulfilled;
     return res;

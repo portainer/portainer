@@ -29,7 +29,11 @@ class KubernetesApplicationHelper {
   }
 
   static associateContainersAndApplication(app) {
-    const containers = _.flatten(_.map(app.Pods, 'Containers'));
+    if (!app.Pods) {
+      return [];
+    }
+
+    const containers = app.Pods[0].Containers;
     _.forEach(containers, (container) => {
       container.PersistedFolders = [];
       _.forEach(app.PersistedFolders, (pf) => {
