@@ -284,7 +284,7 @@ class KubernetesApplicationController {
         this.KubernetesNodeService.get(),
       ]);
       this.application = application;
-      this.allContainers = _.without(_.flatMap(_.map(application.Pods, 'Containers')), undefined);
+      this.allContainers = KubernetesApplicationHelper.associateAllContainersAndApplication(application);
       this.formValues.Note = this.application.Note;
       if (this.application.Note) {
         this.state.expandedNote = true;

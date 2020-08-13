@@ -28,28 +28,40 @@ class KubernetesApplicationHelper {
     return _.filter(pods, { Labels: app.spec.selector.matchLabels });
   }
 
+  static associateContainerPersistedFoldersAndConfigurations(app, containers) {
+    _.forEach(containers, (container) => {
+      container.PersistedFolders = _.without(
+        _.map(app.PersistedFolders, (pf) => {
+          if (pf.MountPath && _.includes(_.map(container.VolumeMounts, 'mountPath'), pf.MountPath)) {
+            return pf;
+          }
+        }),
+        undefined
+      );
+
+      container.ConfigurationVolumes = _.without(
+        _.map(app.ConfigurationVolumes, (cv) => {
+          if (cv.rootMountPath && _.includes(_.map(container.VolumeMounts, 'mountPath'), cv.rootMountPath)) {
+            return cv;
+          }
+        }),
+        undefined
+      );
+    });
+  }
+
   static associateContainersAndApplication(app) {
     if (!app.Pods) {
       return [];
     }
-
     const containers = app.Pods[0].Containers;
-    _.forEach(containers, (container) => {
-      container.PersistedFolders = [];
-      _.forEach(app.PersistedFolders, (pf) => {
-        if (_.includes(_.map(container.VolumeMounts, 'name'), pf.PersistentVolumeClaimName)) {
-          container.PersistedFolders.push(pf);
-        }
-      });
+    KubernetesApplicationHelper.associateContainerPersistedFoldersAndConfigurations(app, containers);
+    return containers;
+  }
 
-      container.ConfigurationVolumes = [];
-      _.forEach(app.ConfigurationVolumes, (cv) => {
-        if (_.includes(_.map(container.VolumeMounts, 'mountPath'), cv.rootMountPath)) {
-          container.ConfigurationVolumes.push(cv);
-        }
-      });
-    });
-
+  static associateAllContainersAndApplication(app) {
+    const containers = _.flatMap(_.map(app.Pods, 'Containers'));
+    KubernetesApplicationHelper.associateContainerPersistedFoldersAndConfigurations(app, containers);
     return containers;
   }
 

@@ -484,20 +484,22 @@
             <table class="table" ng-if="ctrl.application.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.ISOLATED">
               <thead>
                 <tr class="text-muted">
-                  <td style="width: 33%;">Container name</td>
-                  <td style="width: 33%;">Persisted folder</td>
-                  <td style="width: 33%;">Persistence</td>
+                  <td style="width: 25%;">Container name</td>
+                  <td style="width: 25%;">Pod name</td>
+                  <td style="width: 25%;">Persisted folder</td>
+                  <td style="width: 25%;">Persistence</td>
                 </tr>
               </thead>
-              <tbody ng-repeat="container in ctrl.application.Containers track by $index" style="border-top: none;">
-                <tr ng-repeat="volume in ctrl.application.PersistedFolders track by $index">
+              <tbody ng-repeat="container in ctrl.allContainers track by $index" style="border-top: none;">
+                <tr ng-repeat="volume in container.PersistedFolders track by $index">
                   <td><i class="fa {{ container.Type | kubernetesPodContainerTypeIcon }}" aria-hidden="true"></i> {{ container.Name }}</td>
+                  <td>{{ container.PodName }}</td>
                   <td>
                     {{ volume.MountPath }}
                   </td>
                   <td ng-if="volume.PersistentVolumeClaimName">
-                    <a ui-sref="kubernetes.volumes.volume({ name: volume.PersistentVolumeClaimName + '-' + pod.Name, namespace: ctrl.application.ResourcePool })">
-                      <i class="fa fa-database" aria-hidden="true"></i> {{ volume.PersistentVolumeClaimName + '-' + pod.Name }}</a
+                    <a ui-sref="kubernetes.volumes.volume({ name: volume.PersistentVolumeClaimName + '-' + container.PodName, namespace: ctrl.application.ResourcePool })">
+                      <i class="fa fa-database" aria-hidden="true"></i> {{ volume.PersistentVolumeClaimName + '-' + container.PodName }}</a
                     >
                   </td>
                   <td ng-if="volume.HostPath"> {{ volume.HostPath }} on host filesystem </td>
