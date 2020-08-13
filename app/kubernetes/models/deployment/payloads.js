@@ -26,6 +26,7 @@ const _KubernetesDeploymentCreatePayload = Object.freeze({
         },
       },
       spec: {
+        affinity: {},
         containers: [
           {
             name: '',

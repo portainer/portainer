@@ -926,6 +926,102 @@
             </div>
             <!-- #endregion -->
 
+            <div ng-if="ctrl.formValues.DeploymentType === ctrl.ApplicationDeploymentTypes.REPLICATED">
+              <div class="col-sm-12 form-section-title">
+                Placement preferences and constraints
+              </div>
+              <!-- #region PLACEMENTS -->
+              <div class="form-group">
+                <div class="col-sm-12 small text-muted">
+                  <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  Deploy this application on nodes that respect all of the following placement rules.
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="col-sm-12" style="margin-top: 5px;">
+                  <label class="control-label text-left">Placement rules</label>
+                  <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addPlacement()">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i> add rule
+                  </span>
+                </div>
+
+                <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                  <div ng-repeat="placement in ctrl.formValues.Placements" style="margin-top: 2px;">
+                    <div class="col-sm-5 input-group" ng-class="{ striked: placement.NeedsDeletion }">
+                      <select
+                        class="form-control"
+                        ng-model="placement.Label"
+                        ng-options="label as (label.Key | kubernetesNodeLabelHumanReadbleText) for label in ctrl.nodesLabels"
+                        ng-change="ctrl.onPlacementLabelChange($index)"
+                        ng-disabled="ctrl.isEditAndNotNewPlacement($index)"
+                      >
+                      </select>
+                    </div>
+                    <div class="col-sm-5 input-group" ng-class="{ striked: placement.NeedsDeletion }">
+                      <select
+                        class="form-control"
+                        ng-model="placement.Value"
+                        ng-options="value for value in placement.Label.Values"
+                        ng-disabled="ctrl.isEditAndNotNewPlacement($index)"
+                      >
+                      </select>
+                    </div>
+
+                    <div class="col-sm-1 input-group">
+                      <button ng-if="!placement.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removePlacement($index)">
+                        <i class="fa fa-trash-alt" aria-hidden="true"></i>
+                      </button>
+                      <button ng-if="placement.NeedsDeletion" class="btn btn-sm btn-primary" type="button" ng-click="ctrl.restorePlacement($index)">
+                        <i class="fa fa-trash-restore" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div ng-if="ctrl.showPlacementPolicySection()">
+                <div class="form-group">
+                  <div class="col-sm-12">
+                    <label class="control-label text-left">Placement policy</label>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <div class="col-sm-12 small text-muted">
+                    Specify the policy associated to the placement rules.
+                  </div>
+                </div>
+
+                <!-- placement policy options -->
+                <div class="form-group" style="margin-bottom: 0;" ng-if="ctrl.formValues.Placements.length">
+                  <div class="boxselector_wrapper">
+                    <div>
+                      <input type="radio" id="placement_soft" ng-value="ctrl.ApplicationPlacementTypes.PREFERRED" ng-model="ctrl.formValues.PlacementType" />
+                      <label for="placement_soft">
+                        <div class="boxselector_header">
+                          <i class="fa fa-list" aria-hidden="true" style="margin-right: 2px;"></i>
+                          Preferred
+                        </div>
+                        <p>Schedule this application on nodes that match the rules if possible</p>
+                      </label>
+                    </div>
+                    <div>
+                      <input type="radio" id="placement_hard" ng-value="ctrl.ApplicationPlacementTypes.MANDATORY" ng-model="ctrl.formValues.PlacementType" />
+                      <label for="placement_hard">
+                        <div class="boxselector_header">
+                          <i class="fa fa-tasks" aria-hidden="true" style="margin-right: 2px;"></i>
+                          Mandatory
+                        </div>
+                        <p>Schedule this application on nodes that match the rules only</p>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <!-- !placement policy options -->
+              </div>
+              <!-- #endregion -->
+            </div>
+
             <div class="col-sm-12 form-section-title">
               Publishing the application
             </div>

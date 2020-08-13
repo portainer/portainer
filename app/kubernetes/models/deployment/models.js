@@ -16,6 +16,7 @@ const _KubernetesDeployment = Object.freeze({
   ApplicationName: '',
   ApplicationOwner: '',
   Note: '',
+  Affinity: undefined, // KubernetesPodAffinity
 });
 
 export class KubernetesDeployment {

@@ -32,6 +32,7 @@ class KubernetesDeploymentConverter {
     res.Containers = formValues.Containers;
     KubernetesApplicationHelper.generateVolumesFromPersistentVolumClaims(res, volumeClaims);
     KubernetesApplicationHelper.generateEnvOrVolumesFromConfigurations(res, formValues.Configurations);
+    KubernetesApplicationHelper.generateAffinityFromPlacements(res, formValues);
     return res;
   }
 
@@ -53,6 +54,7 @@ class KubernetesDeploymentConverter {
     payload.spec.template.metadata.labels[KubernetesPortainerApplicationNameLabel] = deployment.ApplicationName;
     payload.spec.template.spec.containers[0].name = deployment.Name;
     payload.spec.template.spec.containers[0].image = deployment.Image;
+    payload.spec.template.spec.affinity = deployment.Affinity;
     KubernetesCommonHelper.assignOrDeleteIfEmpty(payload, 'spec.template.spec.containers[0].env', deployment.Env);
     KubernetesCommonHelper.assignOrDeleteIfEmpty(payload, 'spec.template.spec.containers[0].volumeMounts', deployment.VolumeMounts);
     KubernetesCommonHelper.assignOrDeleteIfEmpty(payload, 'spec.template.spec.volumes', deployment.Volumes);

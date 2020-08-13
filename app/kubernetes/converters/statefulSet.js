@@ -33,6 +33,7 @@ class KubernetesStatefulSetConverter {
     res.Env = KubernetesApplicationHelper.generateEnvFromEnvVariables(formValues.EnvironmentVariables);
     KubernetesApplicationHelper.generateVolumesFromPersistentVolumClaims(res, volumeClaims);
     KubernetesApplicationHelper.generateEnvOrVolumesFromConfigurations(res, formValues.Configurations);
+    KubernetesApplicationHelper.generateAffinityFromPlacements(res, formValues);
     return res;
   }
 
@@ -56,6 +57,7 @@ class KubernetesStatefulSetConverter {
     payload.spec.template.metadata.labels[KubernetesPortainerApplicationNameLabel] = statefulSet.ApplicationName;
     payload.spec.template.spec.containers[0].name = statefulSet.Name;
     payload.spec.template.spec.containers[0].image = statefulSet.Image;
+    payload.spec.template.spec.affinity = statefulSet.Affinity;
     KubernetesCommonHelper.assignOrDeleteIfEmpty(payload, 'spec.template.spec.containers[0].env', statefulSet.Env);
     KubernetesCommonHelper.assignOrDeleteIfEmpty(payload, 'spec.template.spec.containers[0].volumeMounts', statefulSet.VolumeMounts);
     KubernetesCommonHelper.assignOrDeleteIfEmpty(payload, 'spec.template.spec.volumes', statefulSet.Volumes);

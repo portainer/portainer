@@ -10,56 +10,13 @@ export const KubernetesPodNodeAffinityNodeSelectorRequirementOperators = Object.
 /**
  * KubernetesPodAffinity Model
  */
-const _KubernetesPodAffinity = Object.freeze({
-  NodeAffinity: {},
-  // PodAffinity: {},
-  // PodAntiAffinity: {},
-});
-
-export class KubernetesPodAffinity {
-  constructor() {
-    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesPodAffinity)));
-  }
-}
-
-/**
- * KubernetesPodNodeAffinity Model
- */
-const _KubernetesPodNodeAffinity = Object.freeze({
-  PreferredDuringSchedulingIgnoredDuringExecution: [],
-  RequiredDuringSchedulingIgnoredDuringExecution: {},
-});
-
-export class KubernetesPodNodeAffinity {
-  constructor() {
-    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesPodNodeAffinity)));
-  }
-}
-
-/**
- * KubernetesPodPodAffinity Model
- */
-const _KubernetesPodPodAffinity = Object.freeze({
-  PreferredDuringSchedulingIgnoredDuringExecution: [],
-  equiredDuringSchedulingIgnoredDuringExecution: [],
-});
-
-export class KubernetesPodPodAffinity {
-  constructor() {
-    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesPodPodAffinity)));
-  }
-}
-
-/**
- * KubernetesPodPodAntiAffinity Model
- */
-const _KubernetesPodPodAntiAffinity = Object.freeze({
-  preferredDuringSchedulingIgnoredDuringExecution: [],
-  requiredDuringSchedulingIgnoredDuringExecution: [],
-});
-
-export class KubernetesPodPodAntiAffinity {
-  constructor() {
-    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesPodPodAntiAffinity)));
-  }
+// this model will contain non transformed data (raw payload data)
+// either during creation flow (model > api)
+// than during reading flow (api > model)
+export function KubernetesPodAffinity() {
+  return {
+    nodeAffinity: {}, // KubernetesPodNodeAffinityPayload
+    // podAffinity: {},
+    // podAntiAffinity: {},
+  };
 }

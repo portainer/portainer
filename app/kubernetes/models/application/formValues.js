@@ -1,4 +1,4 @@
-import { KubernetesApplicationDataAccessPolicies, KubernetesApplicationDeploymentTypes, KubernetesApplicationPublishingTypes } from './models';
+import { KubernetesApplicationDataAccessPolicies, KubernetesApplicationDeploymentTypes, KubernetesApplicationPublishingTypes, KubernetesApplicationPlacementTypes } from './models';
 
 /**
  * KubernetesApplicationFormValues Model
@@ -10,19 +10,21 @@ const _KubernetesApplicationFormValues = Object.freeze({
   StackName: '',
   ApplicationOwner: '',
   Image: '',
-  ReplicaCount: 1,
   Note: '',
-  EnvironmentVariables: [], // KubernetesApplicationEnvironmentVariableFormValue list
-  PersistedFolders: [], // KubernetesApplicationPersistedFolderFormValue list
-  PublishedPorts: [], // KubernetesApplicationPublishedPortFormValue list
   MemoryLimit: 0,
   CpuLimit: 0,
   DeploymentType: KubernetesApplicationDeploymentTypes.REPLICATED,
-  PublishingType: KubernetesApplicationPublishingTypes.INTERNAL,
-  DataAccessPolicy: KubernetesApplicationDataAccessPolicies.SHARED,
-  Configurations: [], // KubernetesApplicationConfigurationFormValue list
-  Containers: [],
+  ReplicaCount: 1,
   AutoScaler: {},
+  Containers: [],
+  EnvironmentVariables: [], // KubernetesApplicationEnvironmentVariableFormValue list
+  DataAccessPolicy: KubernetesApplicationDataAccessPolicies.SHARED,
+  PersistedFolders: [], // KubernetesApplicationPersistedFolderFormValue list
+  Configurations: [], // KubernetesApplicationConfigurationFormValue list
+  PublishingType: KubernetesApplicationPublishingTypes.INTERNAL,
+  PublishedPorts: [], // KubernetesApplicationPublishedPortFormValue list
+  PlacementType: KubernetesApplicationPlacementTypes.PREFERRED,
+  Placements: [], // KubernetesApplicationPlacementFormValue list
   OriginalIngresses: undefined,
 });
 
@@ -120,6 +122,15 @@ export function KubernetesApplicationPublishedPortFormValue() {
     IngressName: undefined,
     IngressRoute: undefined,
     IngressHost: undefined,
+  };
+}
+
+export function KubernetesApplicationPlacementFormValue() {
+  return {
+    Label: {},
+    Value: '',
+    NeedsDeletion: false,
+    IsNew: true,
   };
 }
 

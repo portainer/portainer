@@ -53,8 +53,8 @@ function computeAffinities(nodes, application) {
       }
     }
 
-    if (pod.Affinity.NodeAffinity.requiredDuringSchedulingIgnoredDuringExecution) {
-      const unmatchedTerms = _.map(pod.Affinity.NodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms, (t) => {
+    if (pod.Affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution) {
+      const unmatchedTerms = _.map(pod.Affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms, (t) => {
         const unmatchedExpressions = _.map(t.matchExpressions, (e) => {
           const exists = {}.hasOwnProperty.call(n.Labels, e.key);
           const isIn = exists && _.includes(e.values, n.Labels[e.key]);
