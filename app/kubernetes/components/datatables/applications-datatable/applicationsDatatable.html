@@ -147,7 +147,9 @@
               <td>
                 <a ui-sref="kubernetes.resourcePools.resourcePool({ id: item.ResourcePool })">{{ item.ResourcePool }}</a>
               </td>
-              <td>{{ item.Image }}</td>
+              <td
+                >{{ item.Image }} <span ng-if="item.Containers.length > 1">+ {{ item.Containers.length - 1 }}</span></td
+              >
               <td>{{ item.ApplicationType | kubernetesApplicationTypeText }}</td>
               <td>
                 <span ng-if="item.DeploymentType === $ctrl.KubernetesApplicationDeploymentTypes.REPLICATED">Replicated</span>

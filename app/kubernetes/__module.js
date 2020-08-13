@@ -77,7 +77,7 @@ angular.module('portainer.kubernetes', ['portainer.app']).config([
 
     const applicationConsole = {
       name: 'kubernetes.applications.application.console',
-      url: '/:pod/console',
+      url: '/:pod/:container/console',
       views: {
         'content@': {
           component: 'kubernetesApplicationConsoleView',
@@ -87,7 +87,7 @@ angular.module('portainer.kubernetes', ['portainer.app']).config([
 
     const applicationLogs = {
       name: 'kubernetes.applications.application.logs',
-      url: '/:pod/logs',
+      url: '/:pod/:container/logs',
       views: {
         'content@': {
           component: 'kubernetesApplicationLogsView',

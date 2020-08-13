@@ -65,10 +65,17 @@
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Images')">
+                <a ng-click="$ctrl.changeOrderBy('PodName')">
+                  Pod
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'PodName' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'PodName' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('Image')">
                   Image
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Images' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Images' && $ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
@@ -101,9 +108,8 @@
               pagination-id="$ctrl.tableKey"
             >
               <td>{{ item.Name }}</td>
-              <td
-                ><span ng-repeat="image in item.Images track by $index">{{ image }}<br /></span
-              ></td>
+              <td>{{ item.PodName }}</td>
+              <td>{{ item.Image }}</td>
               <td
                 ><span class="label label-{{ item.Status | kubernetesPodStatusColor }}">{{ item.Status }}</span></td
               >
@@ -117,8 +123,8 @@
               </td>
               <td>{{ item.CreationDate | getisodate }}</td>
               <td>
-                <a ui-sref="kubernetes.applications.application.logs({ pod: item.Name })"> <i class="fa fa-file-alt" aria-hidden="true"></i> Logs </a>
-                <a ng-if="item.Status === 'Running'" ui-sref="kubernetes.applications.application.console({ pod: item.Name })" style="margin-left: 10px;">
+                <a ui-sref="kubernetes.applications.application.logs({ pod: item.PodName, container: item.Name })"> <i class="fa fa-file-alt" aria-hidden="true"></i> Logs </a>
+                <a ng-if="item.Status === 'Running'" ui-sref="kubernetes.applications.application.console({ pod: item.PodName, container: item.Name })" style="margin-left: 10px;">
                   <i class="fa fa-terminal" aria-hidden="true"></i> Console
                 </a>
               </td>

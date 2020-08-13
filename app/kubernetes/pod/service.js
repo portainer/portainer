@@ -36,11 +36,15 @@ class KubernetesPodService {
    *
    * @param {string} namespace
    * @param {string} podName
+   * @param {string} containerName
    */
-  async logsAsync(namespace, podName) {
+  async logsAsync(namespace, podName, containerName) {
     try {
       const params = new KubernetesCommonParams();
       params.id = podName;
+      if (containerName) {
+        params.container = containerName;
+      }
       const data = await this.KubernetesPods(namespace).logs(params).$promise;
       return data.logs.length === 0 ? [] : data.logs.split('\n');
     } catch (err) {
@@ -48,8 +52,8 @@ class KubernetesPodService {
     }
   }
 
-  logs(namespace, podName) {
-    return this.$async(this.logsAsync, namespace, podName);
+  logs(namespace, podName, containerName) {
+    return this.$async(this.logsAsync, namespace, podName, containerName);
   }
 
   /**

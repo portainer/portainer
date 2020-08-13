@@ -107,7 +107,9 @@
                 <span style="margin-left: 5px;" class="label label-primary image-tag" ng-if="$ctrl.isExternalApplication(item)">external</span>
               </td>
               <td>{{ item.StackName }}</td>
-              <td>{{ item.Image }}</td>
+              <td
+                >{{ item.Image }} <span ng-if="item.Containers.length > 1">+ {{ item.Containers.length - 1 }}</span></td
+              >
               <td>{{ item.CPU | kubernetesApplicationCPUValue }}</td>
               <td>{{ item.Memory | humansize }}</td>
             </tr>

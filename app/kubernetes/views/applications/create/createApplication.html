@@ -54,7 +54,15 @@
             <div class="form-group">
               <label for="container_image" class="col-sm-1 control-label text-left">Image</label>
               <div class="col-sm-11">
-                <input type="text" class="form-control" name="container_image" ng-model="ctrl.formValues.Image" placeholder="nginx:latest" required />
+                <input
+                  type="text"
+                  class="form-control"
+                  name="container_image"
+                  ng-model="ctrl.formValues.Image"
+                  placeholder="nginx:latest"
+                  required
+                  ng-disabled="ctrl.formValues.Containers.length > 1"
+                />
               </div>
             </div>
             <div class="form-group" ng-show="kubernetesApplicationCreationForm.container_image.$invalid">
@@ -128,7 +136,7 @@
             <div class="form-group">
               <div class="col-sm-12">
                 <label class="control-label text-left">Environment variables</label>
-                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addEnvironmentVariable()">
+                <span ng-if="ctrl.formValues.Containers.length <= 1" class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addEnvironmentVariable()">
                   <i class="fa fa-plus-circle" aria-hidden="true"></i> add environment variable
                 </span>
               </div>
@@ -146,6 +154,7 @@
                         ng-change="ctrl.onChangeEnvironmentName()"
                         ng-pattern="/^[a-zA-Z]([-_a-zA-Z0-9]*[a-zA-Z0-9])?$/"
                         placeholder="foo"
+                        ng-disabled="ctrl.formValues.Containers.length > 1"
                         required
                       />
                     </div>
@@ -171,10 +180,17 @@
 
                   <div class="input-group col-sm-4 input-group-sm" ng-class="{ striked: envVar.NeedsDeletion }">
                     <span class="input-group-addon">value</span>
-                    <input type="text" name="environment_variable_value_{{ $index }}" class="form-control" ng-model="envVar.Value" placeholder="bar" />
+                    <input
+                      type="text"
+                      name="environment_variable_value_{{ $index }}"
+                      class="form-control"
+                      ng-model="envVar.Value"
+                      placeholder="bar"
+                      ng-disabled="ctrl.formValues.Containers.length > 1"
+                    />
                   </div>
 
-                  <div class="input-group col-sm-2 input-group-sm">
+                  <div class="input-group col-sm-2 input-group-sm" ng-if="ctrl.formValues.Containers.length <= 1">
                     <button ng-if="!envVar.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeEnvironmentVariable($index)">
                       <i class="fa fa-trash-alt" aria-hidden="true"></i>
                     </button>
@@ -194,7 +210,7 @@
             <div class="form-group">
               <div class="col-sm-12">
                 <label class="control-label text-left">Configurations</label>
-                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addConfiguration()">
+                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addConfiguration()" ng-if="ctrl.formValues.Containers.length <= 1">
                   <i class="fa fa-plus-circle" aria-hidden="true"></i> add configuration
                 </span>
               </div>
@@ -214,6 +230,7 @@
                   ng-model="config.SelectedConfiguration"
                   ng-options="c as c.Name for c in ctrl.configurations"
                   ng-change="ctrl.resetConfiguration(index)"
+                  ng-disabled="ctrl.formValues.Containers.length > 1"
                 ></select>
               </div>
               <div class="col-sm-6" style="margin-top: 2px;">
@@ -222,14 +239,20 @@
                   type="button"
                   ng-if="!config.Overriden"
                   ng-click="ctrl.overrideConfiguration(index)"
-                  ng-disabled="!config.SelectedConfiguration"
+                  ng-disabled="!config.SelectedConfiguration || ctrl.formValues.Containers.length > 1"
                 >
                   <i class="fa fa-list" aria-hidden="true"></i> Override
                 </button>
-                <button class="btn btn-sm btn-primary" type="button" ng-if="config.Overriden" ng-click="ctrl.resetConfiguration(index)">
+                <button
+                  class="btn btn-sm btn-primary"
+                  type="button"
+                  ng-if="config.Overriden"
+                  ng-click="ctrl.resetConfiguration(index)"
+                  ng-disabled="ctrl.formValues.Containers.length > 1"
+                >
                   <i class="fa fa-undo" aria-hidden="true"></i> Auto
                 </button>
-                <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeConfiguration(index)"> <i class="fa fa-trash-alt" aria-hidden="true"></i> Remove </button>
+                <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeConfiguration(index)" ng-if="ctrl.formValues.Containers.length <= 1"> <i class="fa fa-trash-alt" aria-hidden="true"></i> Remove </button>
               </div>
               <!-- no-override -->
               <div class="col-sm-12" style="margin-top: 10px;" ng-if="config.SelectedConfiguration && !config.Overriden">
@@ -266,6 +289,7 @@
                         ng-model="overridenKey.Path"
                         placeholder="/etc/myapp/conf.d"
                         name="overriden_key_path_{{ index }}_{{ keyIndex }}"
+                        ng-disabled="ctrl.formValues.Containers.length > 1"
                         required
                         ng-change="ctrl.onChangeConfigurationPath()"
                       />
@@ -316,7 +340,12 @@
             <div class="form-group" ng-if="ctrl.storageClassAvailable()">
               <div class="col-sm-12" style="margin-top: 5px;">
                 <label class="control-label text-left">Persisted folders</label>
-                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addPersistedFolder()" ng-if="!ctrl.isEditAndStatefulSet()">
+                <span
+                  class="label label-default interactive"
+                  style="margin-left: 10px;"
+                  ng-click="ctrl.addPersistedFolder()"
+                  ng-if="!ctrl.isEditAndStatefulSet() && ctrl.formValues.Containers.length <= 1"
+                >
                   <i class="fa fa-plus-circle" aria-hidden="true"></i> add persisted folder
                 </span>
               </div>
@@ -331,7 +360,7 @@
                       name="persisted_folder_path_{{ $index }}"
                       ng-model="persistedFolder.ContainerPath"
                       ng-change="ctrl.onChangePersistedFolderPath()"
-                      ng-disabled="ctrl.isEditAndExistingPersistedFolder($index)"
+                      ng-disabled="ctrl.isEditAndExistingPersistedFolder($index) || ctrl.formValues.Containers.length > 1"
                       placeholder="/data"
                       required
                     />
@@ -341,7 +370,11 @@
                     <span
                       class="btn-group btn-group-sm"
                       ng-class="{ striked: persistedFolder.NeedsDeletion }"
-                      ng-if="!ctrl.isEditAndExistingPersistedFolder($index) && ctrl.application.ApplicationType !== ctrl.ApplicationTypes.STATEFULSET"
+                      ng-if="
+                        !ctrl.isEditAndExistingPersistedFolder($index) &&
+                        ctrl.application.ApplicationType !== ctrl.ApplicationTypes.STATEFULSET &&
+                        ctrl.formValues.Containers.length <= 1
+                      "
                     >
                       <label
                         class="btn btn-primary"
@@ -372,14 +405,14 @@
                       placeholder="20"
                       ng-min="0"
                       required
-                      ng-disabled="ctrl.isEditAndExistingPersistedFolder($index)"
+                      ng-disabled="ctrl.isEditAndExistingPersistedFolder($index) || ctrl.formValues.Containers.length > 1"
                     />
                     <span class="input-group-addon" style="padding: 0;">
                       <select
                         ng-model="persistedFolder.SizeUnit"
                         ng-style="{ width: '100%', height: '100%', cursor: ctrl.isEditAndExistingPersistedFolder($index) ? 'not-allowed' : 'auto' }"
                         ng-options="unit for unit in ctrl.state.availableSizeUnits"
-                        ng-disabled="ctrl.isEditAndExistingPersistedFolder($index)"
+                        ng-disabled="ctrl.isEditAndExistingPersistedFolder($index) || ctrl.formValues.Containers.length > 1"
                       ></select>
                     </span>
                   </div>
@@ -396,7 +429,7 @@
                       class="form-control"
                       ng-model="persistedFolder.StorageClass"
                       ng-options="storageClass as storageClass.Name for storageClass in ctrl.storageClasses"
-                      ng-disabled="ctrl.state.isEdit"
+                      ng-disabled="ctrl.state.isEdit || ctrl.formValues.Containers.length > 1"
                     ></select>
                     <input ng-if="!ctrl.hasMultipleStorageClassesAvailable()" type="text" class="form-control" disabled ng-model="persistedFolder.StorageClass.Name" />
                   </div>
@@ -409,7 +442,7 @@
                       ng-model="ctrl.formValues.PersistedFolders[$index].ExistingVolume"
                       ng-options="vol as vol.PersistentVolumeClaim.Name for vol in ctrl.availableVolumes"
                       ng-change="ctrl.onChangeExistingVolumeSelection()"
-                      ng-disabled="ctrl.isEditAndExistingPersistedFolder($index)"
+                      ng-disabled="ctrl.isEditAndExistingPersistedFolder($index) || ctrl.formValues.Containers.length > 1"
                       required
                     >
                       <option selected disabled hidden value="">Select a volume</option>
@@ -417,7 +450,7 @@
                   </div>
 
                   <div class="input-group col-sm-1 input-group-sm">
-                    <div style="vertical-align: top;" ng-if="!ctrl.isEditAndStatefulSet()" ng-if="!ctrl.state.useExistingVolume[$index]">
+                    <div style="vertical-align: top;" ng-if="!ctrl.isEditAndStatefulSet() && !ctrl.state.useExistingVolume[$index] && ctrl.formValues.Containers.length <= 1">
                       <button ng-if="!persistedFolder.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removePersistedFolder($index)">
                         <i class="fa fa-trash-alt" aria-hidden="true"></i>
                       </button>
@@ -607,7 +640,10 @@
             </div>
 
             <!-- memory-limit-input -->
-            <div class="form-group" ng-if="!ctrl.state.resourcePoolHasQuota || (ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded())">
+            <div
+              class="form-group"
+              ng-if="(!ctrl.state.resourcePoolHasQuota || (ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded())) && ctrl.formValues.Containers.length <= 1"
+            >
               <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
                 Memory
                 <portainer-tooltip
@@ -648,7 +684,10 @@
             </div>
             <!-- !memory-limit-input -->
             <!-- cpu-limit-input -->
-            <div class="form-group" ng-if="!ctrl.state.resourcePoolHasQuota || (ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded())">
+            <div
+              class="form-group"
+              ng-if="(!ctrl.state.resourcePoolHasQuota || (ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded())) && ctrl.formValues.Containers.length <= 1"
+            >
               <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
                 CPU
                 <portainer-tooltip

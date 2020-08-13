@@ -6,6 +6,7 @@ import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import { KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'Kubernetes/pod/models';
+import { KubernetesPodContainerTypes } from 'Kubernetes/pod/models/index';
 
 function computeTolerations(nodes, application) {
   const pod = application.Pods[0];
@@ -120,6 +121,7 @@ class KubernetesApplicationController {
 
     this.ApplicationDataAccessPolicies = KubernetesApplicationDataAccessPolicies;
     this.KubernetesServiceTypes = KubernetesServiceTypes;
+    this.KubernetesPodContainerTypes = KubernetesPodContainerTypes;
 
     this.onInit = this.onInit.bind(this);
     this.getApplication = this.getApplication.bind(this);
@@ -284,6 +286,7 @@ class KubernetesApplicationController {
         this.KubernetesNodeService.get(),
       ]);
       this.application = application;
+      this.allContainers = KubernetesApplicationHelper.associateAllContainersAndApplication(application);
       this.formValues.Note = this.application.Note;
       if (this.application.Note) {
         this.state.expandedNote = true;

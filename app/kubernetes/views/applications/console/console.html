@@ -3,7 +3,7 @@
   <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.application.ResourcePool })">{{ ctrl.application.ResourcePool }}</a> &gt;
   <a ui-sref="kubernetes.applications">Applications</a> &gt;
   <a ui-sref="kubernetes.applications.application({ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool })">{{ ctrl.application.Name }}</a> &gt; Pods &gt;
-  {{ ctrl.podName }} &gt; Console
+  {{ ctrl.podName }} &gt; Containers &gt; {{ ctrl.containerName }} &gt; Console
 </kubernetes-view-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>

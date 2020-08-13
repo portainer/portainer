@@ -45,7 +45,7 @@ class KubernetesApplicationLogsController {
 
   async getApplicationLogsAsync() {
     try {
-      this.applicationLogs = await this.KubernetesPodService.logs(this.application.ResourcePool, this.podName);
+      this.applicationLogs = await this.KubernetesPodService.logs(this.application.ResourcePool, this.podName, this.containerName);
     } catch (err) {
       this.stopRepeater();
       this.Notifications.error('Failure', err, 'Unable to retrieve application logs');
@@ -63,14 +63,16 @@ class KubernetesApplicationLogsController {
     const podName = this.$transition$.params().pod;
     const applicationName = this.$transition$.params().name;
     const namespace = this.$transition$.params().namespace;
+    const containerName = this.$transition$.params().container;
 
     this.applicationLogs = [];
     this.podName = podName;
+    this.containerName = containerName;
 
     try {
       const [application, applicationLogs] = await Promise.all([
         this.KubernetesApplicationService.get(namespace, applicationName),
-        this.KubernetesPodService.logs(namespace, podName),
+        this.KubernetesPodService.logs(namespace, podName, containerName),
       ]);
 
       this.application = application;

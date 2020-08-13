@@ -50,6 +50,7 @@ function _apiPortsToPublishedPorts(pList, pRefs) {
 
 class KubernetesApplicationConverter {
   static applicationCommon(res, data, service, ingresses) {
+    const containers = _.without(_.concat(data.spec.template.spec.containers, data.spec.template.spec.initContainers), undefined);
     res.Id = data.metadata.uid;
     res.Name = data.metadata.name;
     res.StackName = data.metadata.labels ? data.metadata.labels[KubernetesPortainerApplicationStackNameLabel] || '-' : '-';
@@ -57,16 +58,16 @@ class KubernetesApplicationConverter {
     res.Note = data.metadata.annotations ? data.metadata.annotations[KubernetesPortainerApplicationNote] || '' : '';
     res.ApplicationName = data.metadata.labels ? data.metadata.labels[KubernetesPortainerApplicationNameLabel] || res.Name : res.Name;
     res.ResourcePool = data.metadata.namespace;
-    res.Image = data.spec.template.spec.containers[0].image;
+    res.Image = containers[0].image;
     res.CreationDate = data.metadata.creationTimestamp;
-    res.Pods = data.Pods;
-    res.Env = data.spec.template.spec.containers[0].env;
+    res.Env = _.without(_.flatMap(_.map(containers, 'env')), undefined);
+
     const limits = {
       Cpu: 0,
       Memory: 0,
     };
     res.Limits = _.reduce(
-      data.spec.template.spec.containers,
+      containers,
       (acc, item) => {
         if (item.resources.limits && item.resources.limits.cpu) {
           acc.Cpu += KubernetesResourceReservationHelper.parseCPU(item.resources.limits.cpu);
@@ -84,7 +85,7 @@ class KubernetesApplicationConverter {
       Memory: 0,
     };
     res.Requests = _.reduce(
-      data.spec.template.spec.containers,
+      containers,
       (acc, item) => {
         if (item.resources.requests && item.resources.requests.cpu) {
           acc.Cpu += KubernetesResourceReservationHelper.parseCPU(item.resources.requests.cpu);
@@ -109,7 +110,7 @@ class KubernetesApplicationConverter {
         }
       }
 
-      const portsRefs = _.concat(..._.map(data.spec.template.spec.containers, (container) => container.ports));
+      const portsRefs = _.concat(..._.map(containers, (container) => container.ports));
       const ports = _apiPortsToPublishedPorts(service.spec.ports, portsRefs);
       const rules = KubernetesIngressHelper.findSBoundServiceIngressesRules(ingresses, service.metadata.name);
       _.forEach(ports, (port) => (port.IngressRules = _.filter(rules, (rule) => rule.Port === port.Port)));
@@ -147,7 +148,8 @@ class KubernetesApplicationConverter {
     const persistedFolders = _.filter(res.Volumes, (volume) => volume.persistentVolumeClaim || volume.hostPath);
 
     res.PersistedFolders = _.map(persistedFolders, (volume) => {
-      const matchingVolumeMount = _.find(data.spec.template.spec.containers[0].volumeMounts, { name: volume.name });
+      const volumeMounts = _.uniq(_.flatMap(_.map(containers, 'volumeMounts')), 'name');
+      const matchingVolumeMount = _.find(volumeMounts, { name: volume.name });
 
       if (matchingVolumeMount) {
         const persistedFolder = new KubernetesApplicationPersistedFolder();
@@ -169,7 +171,7 @@ class KubernetesApplicationConverter {
       data.spec.template.spec.volumes,
       (acc, volume) => {
         if (volume.configMap || volume.secret) {
-          const matchingVolumeMount = _.find(data.spec.template.spec.containers[0].volumeMounts, { name: volume.name });
+          const matchingVolumeMount = _.find(_.flatMap(_.map(containers, 'volumeMounts')), { name: volume.name });
 
           if (matchingVolumeMount) {
             let items = [];
@@ -262,6 +264,7 @@ class KubernetesApplicationConverter {
     res.Configurations = KubernetesApplicationHelper.generateConfigurationFormValuesFromEnvAndVolumes(app.Env, app.ConfigurationVolumes, configurations);
     res.AutoScaler = KubernetesApplicationHelper.generateAutoScalerFormValueFromHorizontalPodAutoScaler(app.AutoScaler, res.ReplicaCount);
     res.PublishedPorts = KubernetesApplicationHelper.generatePublishedPortsFormValuesFromPublishedPorts(app.ServiceType, app.PublishedPorts);
+    res.Containers = app.Containers;
 
     const isIngress = _.filter(res.PublishedPorts, (p) => p.IngressName).length;
     if (app.ServiceType === KubernetesServiceTypes.LOAD_BALANCER) {

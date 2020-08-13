@@ -9,13 +9,13 @@ class KubernetesResourceReservationHelper {
     return _.reduce(
       containers,
       (acc, container) => {
-        if (container.resources && container.resources.requests) {
-          if (container.resources.requests.memory) {
-            acc.Memory += filesizeParser(container.resources.requests.memory, { base: 10 });
+        if (container.Requests) {
+          if (container.Requests.memory) {
+            acc.Memory += filesizeParser(container.Requests.memory, { base: 10 });
           }
 
-          if (container.resources.requests.cpu) {
-            acc.CPU += KubernetesResourceReservationHelper.parseCPU(container.resources.requests.cpu);
+          if (container.Requests.cpu) {
+            acc.CPU += KubernetesResourceReservationHelper.parseCPU(container.Requests.cpu);
           }
         }
 

@@ -28,6 +28,43 @@ class KubernetesApplicationHelper {
     return _.filter(pods, { Labels: app.spec.selector.matchLabels });
   }
 
+  static associateContainerPersistedFoldersAndConfigurations(app, containers) {
+    _.forEach(containers, (container) => {
+      container.PersistedFolders = _.without(
+        _.map(app.PersistedFolders, (pf) => {
+          if (pf.MountPath && _.includes(_.map(container.VolumeMounts, 'mountPath'), pf.MountPath)) {
+            return pf;
+          }
+        }),
+        undefined
+      );
+
+      container.ConfigurationVolumes = _.without(
+        _.map(app.ConfigurationVolumes, (cv) => {
+          if (cv.rootMountPath && _.includes(_.map(container.VolumeMounts, 'mountPath'), cv.rootMountPath)) {
+            return cv;
+          }
+        }),
+        undefined
+      );
+    });
+  }
+
+  static associateContainersAndApplication(app) {
+    if (!app.Pods) {
+      return [];
+    }
+    const containers = app.Pods[0].Containers;
+    KubernetesApplicationHelper.associateContainerPersistedFoldersAndConfigurations(app, containers);
+    return containers;
+  }
+
+  static associateAllContainersAndApplication(app) {
+    const containers = _.flatMap(_.map(app.Pods, 'Containers'));
+    KubernetesApplicationHelper.associateContainerPersistedFoldersAndConfigurations(app, containers);
+    return containers;
+  }
+
   static portMappingsFromApplications(applications) {
     const res = _.reduce(
       applications,

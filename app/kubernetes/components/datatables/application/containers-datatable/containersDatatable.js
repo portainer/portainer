@@ -1,5 +1,5 @@
-angular.module('portainer.kubernetes').component('kubernetesPodsDatatable', {
-  templateUrl: './podsDatatable.html',
+angular.module('portainer.kubernetes').component('kubernetesContainersDatatable', {
+  templateUrl: './containersDatatable.html',
   controller: 'GenericDatatableController',
   bindings: {
     titleText: '@',

@@ -366,77 +366,92 @@
           <!-- CONFIGURATIONS -->
           <div class="text-muted" style="margin-bottom: 15px; margin-top: 25px;"> <i class="fa fa-file-code" aria-hidden="true" style="margin-right: 2px;"></i> Configuration </div>
 
-          <div class="small text-muted" ng-if="!ctrl.application.Env && !ctrl.hasVolumeConfiguration()" style="margin-bottom: 15px;">
+          <div class="small text-muted" ng-if="!ctrl.application.Env.length > 0 && !ctrl.hasVolumeConfiguration()" style="margin-bottom: 15px;">
             <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
             This application is not using any environment variable or configuration.
           </div>
 
-          <div ng-if="ctrl.application.Env.length > 0">
-            <div>
-              <table class="table">
-                <tbody>
-                  <tr class="text-muted">
-                    <td style="width: 33%;">Environment variable</td>
-                    <td style="width: 33%;">Value</td>
-                    <td style="width: 33%;">Configuration</td>
-                  </tr>
-                  <tr ng-repeat="envvar in ctrl.application.Env track by $index">
-                    <td>{{ envvar.name }}</td>
-                    <td>
-                      <span ng-if="envvar.value">{{ envvar.value }}</span>
-                      <span ng-if="envvar.valueFrom.configMapKeyRef"><i class="fa fa-key" aria-hidden="true"></i> {{ envvar.valueFrom.configMapKeyRef.key }}</span>
-                      <span ng-if="envvar.valueFrom.secretKeyRef"><i class="fa fa-key" aria-hidden="true"></i> {{ envvar.valueFrom.secretKeyRef.key }}</span>
-                      <span ng-if="envvar.valueFrom.fieldRef"
-                        ><i class="fa fa-asterisk" aria-hidden="true"></i> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
-                          href="https://kubernetes.io/docs/tasks/inject-data-application/downward-api-volume-expose-pod-information/#capabilities-of-the-downward-api"
-                          target="_blank"
-                          >downward API</a
-                        >)</span
-                      >
-                      <span ng-if="!envvar.value && !envvar.valueFrom.secretKeyRef && !envvar.valueFrom.configMapKeyRef && !envvar.valueFrom.fieldRef">-</span>
-                    </td>
-                    <td>
-                      <span ng-if="envvar.value || envvar.valueFrom.fieldRef || (!envvar.valueFrom.secretKeyRef && !envvar.valueFrom.configMapKeyRef)">-</span>
-                      <span ng-if="envvar.valueFrom.configMapKeyRef"
-                        ><a ui-sref="kubernetes.configurations.configuration({ name: envvar.valueFrom.configMapKeyRef.name, namespace: ctrl.application.ResourcePool })"
-                          ><i class="fa fa-file-code" aria-hidden="true"></i> {{ envvar.valueFrom.configMapKeyRef.name }}</a
-                        ></span
-                      >
-                      <span ng-if="envvar.valueFrom.secretKeyRef"
-                        ><a ui-sref="kubernetes.configurations.configuration({ name: envvar.valueFrom.secretKeyRef.name, namespace: ctrl.application.ResourcePool })"
-                          ><i class="fa fa-file-code" aria-hidden="true"></i> {{ envvar.valueFrom.secretKeyRef.name }}</a
-                        ></span
-                      >
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <table class="table" ng-if="ctrl.application.Env.length > 0">
+            <tr class="text-muted">
+              <td style="width: 25%;">Container</td>
+              <td style="width: 25%;">Environment variable</td>
+              <td style="width: 25%;">Value</td>
+              <td style="width: 25%;">Configuration</td>
+            </tr>
+            <tbody ng-repeat="container in ctrl.application.Containers" style="border-top: 0;">
+              <tr ng-repeat="envvar in container.Env track by $index">
+                <td>
+                  {{ container.Name }}
+                  <span ng-if="container.Type === ctrl.KubernetesPodContainerTypes.INIT"
+                    ><i class="fa fa-asterisk" aria-hidden="true"></i> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
+                      href="https://kubernetes.io/docs/concepts/workloads/pods/init-containers/"
+                      target="_blank"
+                      >init container</a
+                    >)</span
+                  >
+                </td>
+                <td>{{ envvar.name }}</td>
+                <td>
+                  <span ng-if="envvar.value">{{ envvar.value }}</span>
+                  <span ng-if="envvar.valueFrom.configMapKeyRef"><i class="fa fa-key" aria-hidden="true"></i> {{ envvar.valueFrom.configMapKeyRef.key }}</span>
+                  <span ng-if="envvar.valueFrom.secretKeyRef"><i class="fa fa-key" aria-hidden="true"></i> {{ envvar.valueFrom.secretKeyRef.key }}</span>
+                  <span ng-if="envvar.valueFrom.fieldRef"
+                    ><i class="fa fa-asterisk" aria-hidden="true"></i> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
+                      href="https://kubernetes.io/docs/tasks/inject-data-application/downward-api-volume-expose-pod-information/#capabilities-of-the-downward-api"
+                      target="_blank"
+                      >downward API</a
+                    >)</span
+                  >
+                  <span ng-if="!envvar.value && !envvar.valueFrom.secretKeyRef && !envvar.valueFrom.configMapKeyRef && !envvar.valueFrom.fieldRef">-</span>
+                </td>
+                <td>
+                  <span ng-if="envvar.value || envvar.valueFrom.fieldRef || (!envvar.valueFrom.secretKeyRef && !envvar.valueFrom.configMapKeyRef)">-</span>
+                  <span ng-if="envvar.valueFrom.configMapKeyRef"
+                    ><a ui-sref="kubernetes.configurations.configuration({ name: envvar.valueFrom.configMapKeyRef.name, namespace: ctrl.application.ResourcePool })"
+                      ><i class="fa fa-file-code" aria-hidden="true"></i> {{ envvar.valueFrom.configMapKeyRef.name }}</a
+                    ></span
+                  >
+                  <span ng-if="envvar.valueFrom.secretKeyRef"
+                    ><a ui-sref="kubernetes.configurations.configuration({ name: envvar.valueFrom.secretKeyRef.name, namespace: ctrl.application.ResourcePool })"
+                      ><i class="fa fa-file-code" aria-hidden="true"></i> {{ envvar.valueFrom.secretKeyRef.name }}</a
+                    ></span
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
 
-          <div ng-if="ctrl.hasVolumeConfiguration()">
-            <table class="table">
-              <tbody>
-                <tr class="text-muted">
-                  <td style="width: 33%;">Configuration path</td>
-                  <td style="width: 33%;">Value</td>
-                  <td style="width: 33%;">Configuration</td>
-                </tr>
-
-                <tr ng-repeat="volume in ctrl.application.ConfigurationVolumes track by $index" style="border-top: 0;">
-                  <td>
-                    {{ volume.fileMountPath }}
-                  </td>
-                  <td> <i class="fa fa-key" ng-if="volume.configurationKey" aria-hidden="true"></i> {{ volume.configurationKey ? volume.configurationKey : '-' }} </td>
-                  <td>
-                    <a ui-sref="kubernetes.configurations.configuration({ name: volume.configurationName, namespace: ctrl.application.ResourcePool })"
-                      ><i class="fa fa-file-code" aria-hidden="true"></i> {{ volume.configurationName }}</a
-                    >
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <table class="table" ng-if="ctrl.hasVolumeConfiguration()">
+            <tr class="text-muted">
+              <td style="width: 25%;">Container</td>
+              <td style="width: 25%;">Configuration path</td>
+              <td style="width: 25%;">Value</td>
+              <td style="width: 25%;">Configuration</td>
+            </tr>
+            <tbody ng-repeat="container in ctrl.application.Containers" style="border-top: 0;">
+              <tr ng-repeat="volume in container.ConfigurationVolumes track by $index" style="border-top: 0;">
+                <td>
+                  {{ container.Name }}
+                  <span ng-if="container.Type === ctrl.KubernetesPodContainerTypes.INIT"
+                    ><i class="fa fa-asterisk" aria-hidden="true"></i> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
+                      href="https://kubernetes.io/docs/concepts/workloads/pods/init-containers/"
+                      target="_blank"
+                      >init container</a
+                    >)</span
+                  >
+                </td>
+                <td>
+                  {{ volume.fileMountPath }}
+                </td>
+                <td> <i class="fa fa-key" ng-if="volume.configurationKey" aria-hidden="true"></i> {{ volume.configurationKey ? volume.configurationKey : '-' }} </td>
+                <td>
+                  <a ui-sref="kubernetes.configurations.configuration({ name: volume.configurationName, namespace: ctrl.application.ResourcePool })"
+                    ><i class="fa fa-file-code" aria-hidden="true"></i> {{ volume.configurationName }}</a
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
           <!-- !CONFIGURATIONS -->
 
           <!-- DATA PERSISTENCE -->
@@ -457,12 +472,12 @@
             </div>
 
             <table class="table" ng-if="ctrl.application.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.SHARED">
-              <tbody>
-                <tr class="text-muted">
-                  <td style="width: 50%;">Persisted folder</td>
-                  <td style="width: 50%;">Persistence</td>
-                </tr>
-                <tr ng-repeat="volume in ctrl.application.PersistedFolders track by $index">
+              <tr class="text-muted">
+                <td style="width: 33%;">Persisted folder</td>
+                <td style="width: 66%;">Persistence</td>
+              </tr>
+              <tbody ng-repeat="container in ctrl.application.Containers" style="border-top: 0;">
+                <tr ng-repeat="volume in container.PersistedFolders track by $index">
                   <td>
                     {{ volume.MountPath }}
                   </td>
@@ -479,22 +494,31 @@
             <table class="table" ng-if="ctrl.application.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.ISOLATED">
               <thead>
                 <tr class="text-muted">
-                  <td style="width: 33%;">Pod</td>
-                  <td style="width: 33%;">Persisted folder</td>
-                  <td style="width: 33%;">Persistence</td>
+                  <td style="width: 25%;">Container name</td>
+                  <td style="width: 25%;">Pod name</td>
+                  <td style="width: 25%;">Persisted folder</td>
+                  <td style="width: 25%;">Persistence</td>
                 </tr>
               </thead>
-              <tbody ng-repeat="pod in ctrl.application.Pods track by $index" style="border-top: none;">
-                <tr ng-repeat="volume in ctrl.application.PersistedFolders track by $index">
+              <tbody ng-repeat="container in ctrl.allContainers track by $index" style="border-top: none;">
+                <tr ng-repeat="volume in container.PersistedFolders track by $index">
                   <td>
-                    {{ pod.Name }}
+                    {{ container.Name }}
+                    <span ng-if="container.Type === ctrl.KubernetesPodContainerTypes.INIT"
+                      ><i class="fa fa-asterisk" aria-hidden="true"></i> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
+                        href="https://kubernetes.io/docs/concepts/workloads/pods/init-containers/"
+                        target="_blank"
+                        >init container</a
+                      >)</span
+                    >
                   </td>
+                  <td>{{ container.PodName }}</td>
                   <td>
                     {{ volume.MountPath }}
                   </td>
                   <td ng-if="volume.PersistentVolumeClaimName">
-                    <a ui-sref="kubernetes.volumes.volume({ name: volume.PersistentVolumeClaimName + '-' + pod.Name, namespace: ctrl.application.ResourcePool })">
-                      <i class="fa fa-database" aria-hidden="true"></i> {{ volume.PersistentVolumeClaimName + '-' + pod.Name }}</a
+                    <a ui-sref="kubernetes.volumes.volume({ name: volume.PersistentVolumeClaimName + '-' + container.PodName, namespace: ctrl.application.ResourcePool })">
+                      <i class="fa fa-database" aria-hidden="true"></i> {{ volume.PersistentVolumeClaimName + '-' + container.PodName }}</a
                     >
                   </td>
                   <td ng-if="volume.HostPath"> {{ volume.HostPath }} on host filesystem </td>
@@ -510,8 +534,14 @@
 
   <div class="row">
     <div class="col-sm-12">
-      <kubernetes-pods-datatable title-text="Application pods" title-icon="fa-server" dataset="ctrl.application.Pods" table-key="kubernetes.application.pods" order-by="Name">
-      </kubernetes-pods-datatable>
+      <kubernetes-containers-datatable
+        title-text="Application containers"
+        title-icon="fa-server"
+        dataset="ctrl.allContainers"
+        table-key="kubernetes.application.containers"
+        order-by="Name"
+      >
+      </kubernetes-containers-datatable>
     </div>
   </div>
 </div>

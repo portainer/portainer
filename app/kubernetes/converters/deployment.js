@@ -29,6 +29,7 @@ class KubernetesDeploymentConverter {
     res.CpuLimit = formValues.CpuLimit;
     res.MemoryLimit = KubernetesResourceReservationHelper.bytesValue(formValues.MemoryLimit);
     res.Env = KubernetesApplicationHelper.generateEnvFromEnvVariables(formValues.EnvironmentVariables);
+    res.Containers = formValues.Containers;
     KubernetesApplicationHelper.generateVolumesFromPersistentVolumClaims(res, volumeClaims);
     KubernetesApplicationHelper.generateEnvOrVolumesFromConfigurations(res, formValues.Configurations);
     return res;
