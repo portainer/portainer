@@ -380,7 +380,16 @@
             </tr>
             <tbody ng-repeat="container in ctrl.application.Containers" style="border-top: 0;">
               <tr ng-repeat="envvar in container.Env track by $index">
-                <td><i class="fa {{ container.Type | kubernetesPodContainerTypeIcon }}" aria-hidden="true"></i> {{ container.Name }}</td>
+                <td>
+                  {{ container.Name }}
+                  <span ng-if="container.Type === ctrl.KubernetesPodContainerTypes.INIT"
+                    ><i class="fa fa-asterisk" aria-hidden="true"></i> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
+                      href="https://kubernetes.io/docs/concepts/workloads/pods/init-containers/"
+                      target="_blank"
+                      >init container</a
+                    >)</span
+                  >
+                </td>
                 <td>{{ envvar.name }}</td>
                 <td>
                   <span ng-if="envvar.value">{{ envvar.value }}</span>
@@ -421,7 +430,16 @@
             </tr>
             <tbody ng-repeat="container in ctrl.application.Containers" style="border-top: 0;">
               <tr ng-repeat="volume in container.ConfigurationVolumes track by $index" style="border-top: 0;">
-                <td><i class="fa {{ container.Type | kubernetesPodContainerTypeIcon }}" aria-hidden="true"></i> {{ container.Name }}</td>
+                <td>
+                  {{ container.Name }}
+                  <span ng-if="container.Type === ctrl.KubernetesPodContainerTypes.INIT"
+                    ><i class="fa fa-asterisk" aria-hidden="true"></i> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
+                      href="https://kubernetes.io/docs/concepts/workloads/pods/init-containers/"
+                      target="_blank"
+                      >init container</a
+                    >)</span
+                  >
+                </td>
                 <td>
                   {{ volume.fileMountPath }}
                 </td>
@@ -461,7 +479,16 @@
               </tr>
               <tbody ng-repeat="container in ctrl.application.Containers" style="border-top: 0;">
                 <tr ng-repeat="volume in container.PersistedFolders track by $index">
-                  <td><i class="fa {{ container.Type | kubernetesPodContainerTypeIcon }}" aria-hidden="true"></i> {{ container.Name }}</td>
+                  <td>
+                    {{ container.Name }}
+                    <span ng-if="container.Type === ctrl.KubernetesPodContainerTypes.INIT"
+                      ><i class="fa fa-asterisk" aria-hidden="true"></i> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
+                        href="https://kubernetes.io/docs/concepts/workloads/pods/init-containers/"
+                        target="_blank"
+                        >init container</a
+                      >)</span
+                    >
+                  </td>
                   <td>
                     {{ volume.MountPath }}
                   </td>
@@ -476,16 +503,23 @@
             </table>
 
             <table class="table" ng-if="ctrl.application.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.ISOLATED">
-              <thead>
-                <tr class="text-muted">
-                  <td style="width: 33%;">Container name</td>
-                  <td style="width: 33%;">Persisted folder</td>
-                  <td style="width: 33%;">Persistence</td>
-                </tr>
-              </thead>
+              <tr class="text-muted">
+                <td style="width: 33%;">Container name</td>
+                <td style="width: 33%;">Persisted folder</td>
+                <td style="width: 33%;">Persistence</td>
+              </tr>
               <tbody ng-repeat="container in ctrl.application.Containers track by $index" style="border-top: none;">
                 <tr ng-repeat="volume in ctrl.application.PersistedFolders track by $index">
-                  <td><i class="fa {{ container.Type | kubernetesPodContainerTypeIcon }}" aria-hidden="true"></i> {{ container.Name }}</td>
+                  <td>
+                    {{ container.Name }}
+                    <span ng-if="container.Type === ctrl.KubernetesPodContainerTypes.INIT"
+                      ><i class="fa fa-asterisk" aria-hidden="true"></i> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
+                        href="https://kubernetes.io/docs/concepts/workloads/pods/init-containers/"
+                        target="_blank"
+                        >init container</a
+                      >)</span
+                    >
+                  </td>
                   <td>
                     {{ volume.MountPath }}
                   </td>
