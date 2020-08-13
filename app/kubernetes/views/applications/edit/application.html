@@ -473,22 +473,11 @@
 
             <table class="table" ng-if="ctrl.application.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.SHARED">
               <tr class="text-muted">
-                <td style="width: 33%;">Container</td>
                 <td style="width: 33%;">Persisted folder</td>
-                <td style="width: 33%;">Persistence</td>
+                <td style="width: 66%;">Persistence</td>
               </tr>
               <tbody ng-repeat="container in ctrl.application.Containers" style="border-top: 0;">
                 <tr ng-repeat="volume in container.PersistedFolders track by $index">
-                  <td>
-                    {{ container.Name }}
-                    <span ng-if="container.Type === ctrl.KubernetesPodContainerTypes.INIT"
-                      ><i class="fa fa-asterisk" aria-hidden="true"></i> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
-                        href="https://kubernetes.io/docs/concepts/workloads/pods/init-containers/"
-                        target="_blank"
-                        >init container</a
-                      >)</span
-                    >
-                  </td>
                   <td>
                     {{ volume.MountPath }}
                   </td>
@@ -504,7 +493,7 @@
 
             <table class="table" ng-if="ctrl.application.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.ISOLATED">
               <tr class="text-muted">
-                <td style="width: 33%;">Container name</td>
+                <td style="width: 33%;">Container</td>
                 <td style="width: 33%;">Persisted folder</td>
                 <td style="width: 33%;">Persistence</td>
               </tr>
