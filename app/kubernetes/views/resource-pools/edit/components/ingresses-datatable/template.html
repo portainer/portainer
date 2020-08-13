@@ -93,8 +93,11 @@
                 <a style="margin-left: 25px;" ng-href="http://{{ path.Host ? path.Host : path.IP }}{{ path.Path }}" target="_blank">
                   {{ path.Host ? path.Host : path.IP }}{{ path.Path }}
                 </a>
-                <i class="fas fa-long-arrow-alt-right" style="margin: 2px;"></i>
-                <a ui-sref="kubernetes.applications.application({ name: path.ApplicationName, namespace: item.Namespace })">{{ path.ApplicationName }}</a>
+                <span ng-if="path.ApplicationName !== '-'">
+                  <i class="fas fa-long-arrow-alt-right" style="margin: 2px;"></i>
+                  <a ui-sref="kubernetes.applications.application({ name: path.ApplicationName, namespace: item.Namespace })">{{ path.ApplicationName }}</a>
+                </span>
+                <span class="label label-warning image-tag label-margins" ng-if="path.ApplicationName === '-'">unused</span>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
