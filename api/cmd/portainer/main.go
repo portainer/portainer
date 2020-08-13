@@ -357,7 +357,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-	} else if err == nil {
+	} else if err != nil {
 		log.Fatal(err)
 	}
 
