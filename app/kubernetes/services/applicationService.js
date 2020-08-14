@@ -2,14 +2,18 @@ import * as _ from 'lodash-es';
 import angular from 'angular';
 import PortainerError from 'Portainer/error';
 
-import { KubernetesApplicationTypes, KubernetesApplicationPublishingTypes } from 'Kubernetes/models/application/models';
+import {
+  KubernetesApplication,
+  KubernetesApplicationDeploymentTypes,
+  KubernetesApplicationPublishingTypes,
+  KubernetesApplicationTypes,
+} from 'Kubernetes/models/application/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import KubernetesApplicationRollbackHelper from 'Kubernetes/helpers/application/rollback';
 import KubernetesApplicationConverter from 'Kubernetes/converters/application';
 import { KubernetesDeployment } from 'Kubernetes/models/deployment/models';
 import { KubernetesStatefulSet } from 'Kubernetes/models/stateful-set/models';
 import { KubernetesDaemonSet } from 'Kubernetes/models/daemon-set/models';
-import { KubernetesApplication } from 'Kubernetes/models/application/models';
 import KubernetesServiceHelper from 'Kubernetes/helpers/serviceHelper';
 import { KubernetesHorizontalPodAutoScalerHelper } from 'Kubernetes/horizontal-pod-auto-scaler/helper';
 import { KubernetesHorizontalPodAutoScalerConverter } from 'Kubernetes/horizontal-pod-auto-scaler/converter';
@@ -226,7 +230,7 @@ class KubernetesApplicationService {
         await Promise.all(_.without(claimPromises, undefined));
       }
 
-      if (formValues.AutoScaler.IsUsed) {
+      if (formValues.AutoScaler.IsUsed && formValues.DeploymentType !== KubernetesApplicationDeploymentTypes.GLOBAL) {
         const kind = KubernetesHorizontalPodAutoScalerHelper.getApplicationTypeString(app);
         const autoScaler = KubernetesHorizontalPodAutoScalerConverter.applicationFormValuesToModel(formValues, kind);
         await this.KubernetesHorizontalPodAutoScalerService.create(autoScaler);

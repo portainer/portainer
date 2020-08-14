@@ -252,7 +252,9 @@
                 >
                   <i class="fa fa-undo" aria-hidden="true"></i> Auto
                 </button>
-                <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeConfiguration(index)" ng-if="ctrl.formValues.Containers.length <= 1"> <i class="fa fa-trash-alt" aria-hidden="true"></i> Remove </button>
+                <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeConfiguration(index)" ng-if="ctrl.formValues.Containers.length <= 1">
+                  <i class="fa fa-trash-alt" aria-hidden="true"></i> Remove
+                </button>
               </div>
               <!-- no-override -->
               <div class="col-sm-12" style="margin-top: 10px;" ng-if="config.SelectedConfiguration && !config.Overriden">
@@ -845,7 +847,7 @@
               </div>
             </div>
 
-            <div class="form-inline" ng-if="ctrl.formValues.AutoScaler.IsUsed">
+            <div class="form-inline" ng-if="ctrl.formValues.DeploymentType !== ctrl.ApplicationDeploymentTypes.GLOBAL && ctrl.formValues.AutoScaler.IsUsed">
               <table class="table" style="margin-bottom: 0px;">
                 <tbody>
                   <tr class="small">
