@@ -348,31 +348,6 @@ angular.module('portainer.app', ['portainer.oauth']).config([
       },
     };
 
-    var support = {
-      name: 'portainer.support',
-      url: '/support',
-      views: {
-        'content@': {
-          templateUrl: './views/support/support.html',
-          controller: 'SupportController',
-        },
-      },
-      params: {
-        product: {},
-      },
-    };
-
-    var supportProduct = {
-      name: 'portainer.support.product',
-      url: '/product',
-      views: {
-        'content@': {
-          templateUrl: './views/support/product/product.html',
-          controller: 'SupportProductController',
-        },
-      },
-    };
-
     var tags = {
       name: 'portainer.tags',
       url: '/tags',
@@ -454,8 +429,6 @@ angular.module('portainer.app', ['portainer.oauth']).config([
     $stateRegistryProvider.register(registryCreation);
     $stateRegistryProvider.register(settings);
     $stateRegistryProvider.register(settingsAuthentication);
-    $stateRegistryProvider.register(support);
-    $stateRegistryProvider.register(supportProduct);
     $stateRegistryProvider.register(tags);
     $stateRegistryProvider.register(users);
     $stateRegistryProvider.register(user);
