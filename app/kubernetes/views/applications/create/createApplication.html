@@ -948,13 +948,13 @@
                 </div>
 
                 <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-                  <div ng-repeat="placement in ctrl.formValues.Placements" style="margin-top: 2px;">
+                  <div ng-repeat-start="placement in ctrl.formValues.Placements" style="margin-top: 2px;">
                     <div class="col-sm-5 input-group" ng-class="{ striked: placement.NeedsDeletion }">
                       <select
                         class="form-control"
                         ng-model="placement.Label"
                         ng-options="label as (label.Key | kubernetesNodeLabelHumanReadbleText) for label in ctrl.nodesLabels"
-                        ng-change="ctrl.onPlacementLabelChange($index)"
+                        ng-change="ctrl.onChangePlacementLabel($index)"
                         ng-disabled="ctrl.isEditAndNotNewPlacement($index)"
                       >
                       </select>
@@ -976,6 +976,15 @@
                       <button ng-if="placement.NeedsDeletion" class="btn btn-sm btn-primary" type="button" ng-click="ctrl.restorePlacement($index)">
                         <i class="fa fa-trash-restore" aria-hidden="true"></i>
                       </button>
+                    </div>
+                  </div>
+                  <div ng-repeat-end ng-show="ctrl.state.duplicates.placements.refs[$index] !== undefined">
+                    <div class="col-sm-5 input-group">
+                      <div class="small text-warning" style="margin-top: 5px;" ng-if="ctrl.state.duplicates.placements.refs[$index] !== undefined">
+                        <p ng-if="ctrl.state.duplicates.placements.refs[$index] !== undefined">
+                          <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This label is already defined.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
