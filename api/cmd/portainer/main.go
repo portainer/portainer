@@ -6,10 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gofrs/uuid"
-
-	"github.com/portainer/portainer/api/bolt/errors"
-
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt"
 	"github.com/portainer/portainer/api/chisel"
@@ -344,23 +340,6 @@ func main() {
 	dataStore := initDataStore(*flags.Data, fileService)
 	defer dataStore.Close()
 
-	instanceID, err := dataStore.Version().InstanceID()
-	if err == errors.ErrObjectNotFound {
-		uid, err := uuid.NewV4()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		instanceID = uid.String()
-
-		err = dataStore.Version().StoreInstanceID(instanceID)
-		if err != nil {
-			log.Fatal(err)
-		}
-	} else if err != nil {
-		log.Fatal(err)
-	}
-
 	jwtService, err := initJWTService(dataStore)
 	if err != nil {
 		log.Fatal(err)
@@ -382,6 +361,11 @@ func main() {
 	}
 
 	reverseTunnelService := chisel.NewService(dataStore)
+
+	instanceID, err := dataStore.Version().InstanceID()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	dockerClientFactory := initDockerClientFactory(digitalSignatureService, reverseTunnelService)
 	kubernetesClientFactory := initKubernetesClientFactory(digitalSignatureService, reverseTunnelService, instanceID)

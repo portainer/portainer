@@ -1,13 +1,30 @@
 package bolt
 
 import (
+	"github.com/gofrs/uuid"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 )
 
 // Init creates the default data set.
 func (store *Store) Init() error {
-	_, err := store.SettingsService.Settings()
+	instanceID, err := store.VersionService.InstanceID()
+	if err == errors.ErrObjectNotFound {
+		uid, err := uuid.NewV4()
+		if err != nil {
+			return err
+		}
+
+		instanceID = uid.String()
+		err = store.VersionService.StoreInstanceID(instanceID)
+		if err != nil {
+			return err
+		}
+	} else if err != nil {
+		return err
+	}
+
+	_, err = store.SettingsService.Settings()
 	if err == errors.ErrObjectNotFound {
 		defaultSettings := &portainer.Settings{
 			AuthenticationMethod: portainer.AuthenticationInternal,
