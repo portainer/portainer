@@ -58,19 +58,16 @@
         <table class="table table-hover nowrap-cells">
           <thead>
             <tr>
-              <th style="width: 10%;">
-                <a ng-click="$ctrl.expandAll()" ng-if="$ctrl.hasExpandableItems()">
+              <th>
+                <a ng-click="$ctrl.expandAll()" ng-if="$ctrl.hasExpandableItems()" style="margin-right: 5px;">
                   <i ng-class="{ 'fas fa-angle-down': $ctrl.state.expandAll, 'fas fa-angle-right': !$ctrl.state.expandAll }" aria-hidden="true"></i>
                 </a>
-              </th>
-              <th style="width: 45%;">
                 <a ng-click="$ctrl.changeOrderBy('Name')">
                   Ingress
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th style="width: 45%;"></th>
             </tr>
           </thead>
           <tbody>
@@ -81,16 +78,15 @@
               ng-click="$ctrl.expandItem(item, !item.Expanded)"
               pagination-id="$ctrl.tableKey"
             >
-              <td>
-                <a ng-if="$ctrl.itemCanExpand(item)">
-                  <i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i>
-                </a>
+              <td colspan="3">
+                <a ng-if="$ctrl.itemCanExpand(item)" style="margin-right: 5px;">
+                  <i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i> </a
+                >{{ item.Name }}
               </td>
-              <td colspan="3">{{ item.Name }}</td>
             </tr>
             <tr dir-paginate-end ng-show="item.Expanded" ng-repeat="path in item.Paths" ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
-              <td colspan="3">
-                <a style="margin-left: 25px;" ng-href="http://{{ path.Host ? path.Host : path.IP }}{{ path.Path }}" target="_blank">
+              <td>
+                <a style="margin-left: 15px;" ng-href="http://{{ path.Host ? path.Host : path.IP }}{{ path.Path }}" target="_blank">
                   {{ path.Host ? path.Host : path.IP }}{{ path.Path }}
                 </a>
                 <span ng-if="path.ApplicationName !== '-'">
