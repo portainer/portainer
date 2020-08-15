@@ -71,6 +71,9 @@ class KubernetesConfigurationController {
     return this.state.isDataValid;
   }
 
+  // TODO: refactor
+  // It looks like we're still doing a create/delete process but we've decided to get rid of this
+  // approach.
   async updateConfigurationAsync() {
     try {
       this.state.actionInProgress = true;
