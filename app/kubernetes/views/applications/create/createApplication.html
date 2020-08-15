@@ -932,20 +932,19 @@
               <div class="col-sm-12 form-section-title">
                 Placement preferences and constraints
               </div>
+
               <!-- #region PLACEMENTS -->
               <div class="form-group">
-                <div class="col-sm-12 small text-muted">
-                  <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                  Deploy this application on nodes that respect all of the following placement rules.
-                </div>
-              </div>
-
-              <div class="form-group">
-                <div class="col-sm-12" style="margin-top: 5px;">
+                <div class="col-sm-12">
                   <label class="control-label text-left">Placement rules</label>
                   <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addPlacement()">
                     <i class="fa fa-plus-circle" aria-hidden="true"></i> add rule
                   </span>
+                </div>
+
+                <div class="col-sm-12 small text-muted" ng-if="ctrl.formValues.Placements.length > 0" style="margin-top: 10px;">
+                  <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  Deploy this application on nodes that respect <b>ALL</b> of the following placement rules.
                 </div>
 
                 <div class="col-sm-12 form-inline" style="margin-top: 10px;">
