@@ -20,6 +20,7 @@ import {
   KubernetesApplicationPersistedFolderFormValue,
   KubernetesApplicationPublishedPortFormValue,
   KubernetesApplicationPlacementFormValue,
+  KubernetesApplicationFormValidationDuplicate,
 } from 'Kubernetes/models/application/formValues';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import KubernetesApplicationConverter from 'Kubernetes/converters/application';
@@ -259,10 +260,12 @@ class KubernetesCreateApplicationController {
     placement.Label = label;
     placement.Value = label.Values[0];
     this.formValues.Placements.push(placement);
+    this.onChangePlacement();
   }
 
   restorePlacement(index) {
     this.formValues.Placements[index].NeedsDeletion = false;
+    this.onChangePlacement();
   }
 
   removePlacement(index) {
@@ -271,10 +274,25 @@ class KubernetesCreateApplicationController {
     } else {
       this.formValues.Placements.splice(index, 1);
     }
+    this.onChangePlacement();
   }
 
-  onPlacementLabelChange(index) {
+  // call all validation functions when a placement is added/removed/restored
+  onChangePlacement() {
+    this.onChangePlacementLabelValidate();
+  }
+
+  onChangePlacementLabel(index) {
     this.formValues.Placements[index].Value = this.formValues.Placements[index].Label.Values[0];
+    this.onChangePlacementLabelValidate();
+  }
+
+  onChangePlacementLabelValidate() {
+    const state = this.state.duplicates.placements;
+    const source = _.map(this.formValues.Placements, (p) => (p.NeedsDeletion ? undefined : p.Label.Key));
+    const duplicates = KubernetesFormValidationHelper.getDuplicates(source);
+    state.refs = duplicates;
+    state.hasDuplicates = Object.keys(duplicates).length > 0;
   }
 
   /* #endregion */
@@ -816,40 +834,17 @@ class KubernetesCreateApplicationController {
         availableSizeUnits: ['MB', 'GB', 'TB'],
         alreadyExists: false,
         duplicates: {
-          environmentVariables: {
-            refs: {},
-            hasDuplicates: false,
-          },
-          persistedFolders: {
-            refs: {},
-            hasDuplicates: false,
-          },
-          configurationPaths: {
-            refs: {},
-            hasDuplicates: false,
-          },
-          existingVolumes: {
-            refs: {},
-            hasDuplicates: false,
-          },
+          environmentVariables: new KubernetesApplicationFormValidationDuplicate(),
+          persistedFolders: new KubernetesApplicationFormValidationDuplicate(),
+          configurationPaths: new KubernetesApplicationFormValidationDuplicate(),
+          existingVolumes: new KubernetesApplicationFormValidationDuplicate(),
           publishedPorts: {
-            containerPorts: {
-              refs: {},
-              hasDuplicates: false,
-            },
-            nodePorts: {
-              refs: {},
-              hasDuplicates: false,
-            },
-            ingressRoutes: {
-              refs: {},
-              hasDuplicates: false,
-            },
-            loadBalancerPorts: {
-              refs: {},
-              hasDuplicates: false,
-            },
+            containerPorts: new KubernetesApplicationFormValidationDuplicate(),
+            nodePorts: new KubernetesApplicationFormValidationDuplicate(),
+            ingressRoutes: new KubernetesApplicationFormValidationDuplicate(),
+            loadBalancerPorts: new KubernetesApplicationFormValidationDuplicate(),
           },
+          placements: new KubernetesApplicationFormValidationDuplicate(),
         },
         isEdit: false,
         params: {

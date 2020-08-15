@@ -150,3 +150,10 @@ export class KubernetesApplicationAutoScalerFormValue {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesApplicationAutoScalerFormValue)));
   }
 }
+
+export function KubernetesApplicationFormValidationDuplicate() {
+  return {
+    refs: {},
+    hasDuplicates: false,
+  };
+}
