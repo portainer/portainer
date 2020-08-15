@@ -1123,8 +1123,6 @@ const (
 	MessageOfTheDayURL = AssetsServerURL + "/motd.json"
 	// VersionCheckURL represents the URL used to retrieve the latest version of Portainer
 	VersionCheckURL = "https://api.github.com/repos/portainer/portainer/releases/latest"
-	// SupportProductsURL represents the URL where Portainer support products can be retrieved
-	SupportProductsURL = AssetsServerURL + "/support.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
 	// PortainerAgentEdgeIDHeader represent the name of the header containing the Edge ID associated to an agent/agent cluster

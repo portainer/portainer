@@ -28,7 +28,6 @@ import (
 	"github.com/portainer/portainer/api/http/handler/settings"
 	"github.com/portainer/portainer/api/http/handler/stacks"
 	"github.com/portainer/portainer/api/http/handler/status"
-	"github.com/portainer/portainer/api/http/handler/support"
 	"github.com/portainer/portainer/api/http/handler/tags"
 	"github.com/portainer/portainer/api/http/handler/teammemberships"
 	"github.com/portainer/portainer/api/http/handler/teams"
@@ -173,8 +172,6 @@ func (server *Server) Start() error {
 
 	var statusHandler = status.NewHandler(requestBouncer, server.Status)
 
-	var supportHandler = support.NewHandler(requestBouncer)
-
 	var templatesHandler = templates.NewHandler(requestBouncer)
 	templatesHandler.DataStore = server.DataStore
 	templatesHandler.FileService = server.FileService
@@ -217,7 +214,6 @@ func (server *Server) Start() error {
 		SettingsHandler:        settingsHandler,
 		StatusHandler:          statusHandler,
 		StackHandler:           stackHandler,
-		SupportHandler:         supportHandler,
 		TagHandler:             tagHandler,
 		TeamHandler:            teamHandler,
 		TeamMembershipHandler:  teamMembershipHandler,

@@ -23,7 +23,6 @@ import (
 	"github.com/portainer/portainer/api/http/handler/settings"
 	"github.com/portainer/portainer/api/http/handler/stacks"
 	"github.com/portainer/portainer/api/http/handler/status"
-	"github.com/portainer/portainer/api/http/handler/support"
 	"github.com/portainer/portainer/api/http/handler/tags"
 	"github.com/portainer/portainer/api/http/handler/teammemberships"
 	"github.com/portainer/portainer/api/http/handler/teams"
@@ -55,7 +54,6 @@ type Handler struct {
 	SettingsHandler        *settings.Handler
 	StackHandler           *stacks.Handler
 	StatusHandler          *status.Handler
-	SupportHandler         *support.Handler
 	TagHandler             *tags.Handler
 	TeamMembershipHandler  *teammemberships.Handler
 	TeamHandler            *teams.Handler
@@ -116,8 +114,6 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.StackHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/status"):
 		http.StripPrefix("/api", h.StatusHandler).ServeHTTP(w, r)
-	case strings.HasPrefix(r.URL.Path, "/api/support"):
-		http.StripPrefix("/api", h.SupportHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/tags"):
 		http.StripPrefix("/api", h.TagHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/templates"):
