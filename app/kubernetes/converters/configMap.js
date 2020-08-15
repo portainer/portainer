@@ -52,6 +52,7 @@ class KubernetesConfigMapConverter {
     res.metadata.uid = data.Id;
     res.metadata.name = data.Name;
     res.metadata.namespace = data.Namespace;
+    res.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] = data.ConfigurationOwner;
     res.data = data.Data;
     return res;
   }

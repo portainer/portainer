@@ -87,21 +87,24 @@ class KubernetesConfigurationService {
   /**
    * UPDATE
    */
-  async updateAsync(formValues) {
+  async updateAsync(formValues, configuration) {
     try {
       if (formValues.Type === KubernetesConfigurationTypes.CONFIGMAP) {
         const configMap = KubernetesConfigMapConverter.configurationFormValuesToConfigMap(formValues);
+        configMap.ConfigurationOwner = configuration.ConfigurationOwner;
         await this.KubernetesConfigMapService.update(configMap);
       } else {
         const secret = KubernetesSecretConverter.configurationFormValuesToSecret(formValues);
+        secret.ConfigurationOwner = configuration.ConfigurationOwner;
         await this.KubernetesSecretService.update(secret);
       }
     } catch (err) {
       throw err;
     }
   }
-  update(config) {
-    return this.$async(this.updateAsync, config);
+
+  update(formValues, configuration) {
+    return this.$async(this.updateAsync, formValues, configuration);
   }
 
   /**

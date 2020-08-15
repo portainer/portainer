@@ -94,7 +94,7 @@ class KubernetesConfigurationController {
           { reload: true }
         );
       } else {
-        await this.KubernetesConfigurationService.update(this.formValues);
+        await this.KubernetesConfigurationService.update(this.formValues, this.configuration);
         this.Notifications.success('Configuration succesfully updated');
         this.$state.reload();
       }
