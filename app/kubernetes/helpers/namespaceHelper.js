@@ -2,6 +2,7 @@ import _ from 'lodash-es';
 import angular from 'angular';
 
 class KubernetesNamespaceHelper {
+  /* @ngInject */
   constructor(KUBERNETES_SYSTEM_NAMESPACES) {
     this.KUBERNETES_SYSTEM_NAMESPACES = KUBERNETES_SYSTEM_NAMESPACES;
   }
