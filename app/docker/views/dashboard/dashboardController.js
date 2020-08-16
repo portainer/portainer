@@ -1,3 +1,6 @@
+import angular from 'angular';
+import _ from 'lodash';
+
 angular.module('portainer.docker').controller('DashboardController', [
   '$scope',
   '$q',
@@ -13,6 +16,7 @@ angular.module('portainer.docker').controller('DashboardController', [
   'Notifications',
   'EndpointProvider',
   'StateManager',
+  'TagService',
   function (
     $scope,
     $q,
@@ -27,7 +31,8 @@ angular.module('portainer.docker').controller('DashboardController', [
     EndpointService,
     Notifications,
     EndpointProvider,
-    StateManager
+    StateManager,
+    TagService
   ) {
     $scope.dismissInformationPanel = function (id) {
       StateManager.dismissInformationPanel(id);
@@ -52,6 +57,7 @@ angular.module('portainer.docker').controller('DashboardController', [
         stacks: StackService.stacks(true, endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER', endpointId),
         info: SystemService.info(),
         endpoint: EndpointService.endpoint(endpointId),
+        tags: TagService.tags(),
       })
         .then(function success(data) {
           $scope.containers = data.containers;
@@ -62,6 +68,18 @@ angular.module('portainer.docker').controller('DashboardController', [
           $scope.stackCount = data.stacks.length;
           $scope.info = data.info;
           $scope.endpoint = data.endpoint;
+          $scope.endpointTags = $scope.endpoint.TagIds.length
+            ? _.join(
+                _.filter(
+                  _.map($scope.endpoint.TagIds, (id) => {
+                    const tag = data.tags.find((tag) => tag.Id === id);
+                    return tag ? tag.Name : '';
+                  }),
+                  Boolean
+                ),
+                ', '
+              )
+            : '-';
           $scope.offlineMode = EndpointProvider.offlineMode();
         })
         .catch(function error(err) {

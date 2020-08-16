@@ -57,14 +57,7 @@
             </tr>
             <tr>
               <td>Tags</td>
-              <td>
-                <span ng-if="endpoint.Tags.length === 0">
-                  -
-                </span>
-                <span ng-if="endpoint.Tags.length > 0">
-                  <span ng-repeat="tag in endpoint.Tags"> {{ tag }}{{ $last ? '' : ', ' }} </span>
-                </span>
-              </td>
+              <td>{{ endpointTags }}</td>
             </tr>
             <tr ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
               <td colspan="2">

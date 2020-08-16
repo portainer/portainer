@@ -24,14 +24,7 @@
               </tr>
               <tr>
                 <td>Tags</td>
-                <td>
-                  <span ng-if="ctrl.endpoint.Tags.length === 0">
-                    -
-                  </span>
-                  <span ng-if="ctrl.endpoint.Tags.length > 0">
-                    <span ng-repeat="tag in ctrl.endpoint.Tags"> {{ tag }}{{ $last ? '' : ', ' }} </span>
-                  </span>
-                </td>
+                <td>{{ endpointTags }}</td>
               </tr>
             </tbody>
           </table>
