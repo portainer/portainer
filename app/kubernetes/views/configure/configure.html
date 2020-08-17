@@ -9,7 +9,7 @@
     <div class="col-sm-12">
       <rd-widget>
         <rd-widget-body>
-          <form class="form-horizontal">
+          <form class="form-horizontal" name="kubernetesClusterSetupForm">
             <div class="col-sm-12 form-section-title">
               Networking
             </div>
@@ -22,8 +22,7 @@
                   Ensure that your cloud provider allows you to create load balancers if you want to use this feature. Might incur costs.
                 </p>
               </span>
-            </div>
-            <div class="form-group">
+
               <div class="col-sm-12">
                 <label class="control-label text-left">
                   Allow users to use external load balancer
@@ -41,8 +40,7 @@
                   cluster.
                 </p>
               </span>
-            </div>
-            <div class="form-group">
+
               <div class="col-sm-12">
                 <label class="control-label text-left">
                   Allow users to use ingress
@@ -50,17 +48,29 @@
                 <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.UseIngress" /><i></i> </label>
               </div>
             </div>
+
             <div class="form-group" ng-if="ctrl.formValues.UseIngress">
               <label for="ingress_classes" class="col-sm-3 col-lg-2 control-label text-left">
-                Ingress controllers
+                Ingress classes
+                <portainer-tooltip position="bottom" message="Provide a comma separated list of all the ingress classes available in your cluster."></portainer-tooltip>
               </label>
               <div class="col-sm-9 col-lg-10">
-                <input type="text" class="form-control" id="ingress_classes" ng-model="ctrl.formValues.IngressClasses" placeholder="nginx,gce,traefik" />
+                <input
+                  type="text"
+                  class="form-control"
+                  name="ingress_classes"
+                  id="ingress_classes"
+                  ng-model="ctrl.formValues.IngressClasses"
+                  placeholder="nginx,gce,traefik"
+                  required
+                />
               </div>
-              <span class="col-sm-12 text-muted small" style="margin-top: 12px;">
-                <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                Once configured, ingresses can be created at the resource pool level.
-              </span>
+
+              <div class="col-sm-12 small text-warning" ng-show="kubernetesClusterSetupForm.ingress_classes.$invalid">
+                <div ng-messages="kubernetesClusterSetupForm.ingress_classes.$error">
+                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
+              </div>
             </div>
 
             <div class="col-sm-12 form-section-title">
@@ -167,7 +177,7 @@
                   type="submit"
                   class="btn btn-primary btn-sm"
                   ng-click="ctrl.configure()"
-                  ng-disabled="ctrl.state.actionInProgress || !ctrl.hasValidStorageConfiguration()"
+                  ng-disabled="ctrl.state.actionInProgress || !kubernetesClusterSetupForm.$valid || !ctrl.hasValidStorageConfiguration()"
                   button-spinner="ctrl.state.actionInProgress"
                 >
                   <span ng-hide="ctrl.state.actionInProgress">Save configuration</span>
