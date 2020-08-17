@@ -14,7 +14,8 @@ class KubernetesDashboardController {
     KubernetesConfigurationService,
     KubernetesVolumeService,
     KubernetesNamespaceHelper,
-    Authentication
+    Authentication,
+    TagService
   ) {
     this.$async = $async;
     this.Notifications = Notifications;
@@ -26,6 +27,7 @@ class KubernetesDashboardController {
     this.KubernetesVolumeService = KubernetesVolumeService;
     this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
     this.Authentication = Authentication;
+    this.TagService = TagService;
 
     this.onInit = this.onInit.bind(this);
     this.getAll = this.getAll.bind(this);
@@ -37,16 +39,30 @@ class KubernetesDashboardController {
 
     try {
       const endpointId = this.EndpointProvider.endpointID();
-      const [endpoint, pools, applications, configurations, volumes] = await Promise.all([
+      const [endpoint, pools, applications, configurations, volumes, tags] = await Promise.all([
         this.EndpointService.endpoint(endpointId),
         this.KubernetesResourcePoolService.get(),
         this.KubernetesApplicationService.get(),
         this.KubernetesConfigurationService.get(),
         this.KubernetesVolumeService.get(),
+        this.TagService.tags(),
       ]);
       this.endpoint = endpoint;
       this.applications = applications;
       this.volumes = volumes;
+
+      this.endpointTags = this.endpoint.TagIds.length
+        ? _.join(
+            _.filter(
+              _.map(this.endpoint.TagIds, (id) => {
+                const tag = tags.find((tag) => tag.Id === id);
+                return tag ? tag.Name : '';
+              }),
+              Boolean
+            ),
+            ', '
+          )
+        : '-';
 
       if (!isAdmin) {
         this.pools = _.filter(pools, (pool) => {
