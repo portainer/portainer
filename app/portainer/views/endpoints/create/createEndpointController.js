@@ -56,10 +56,12 @@ angular
     };
 
     $scope.copyAgentCommand = function () {
-      if ($scope.state.deploymentTab === 1) {
+      if ($scope.state.deploymentTab === 2) {
         clipboard.copyText('curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent');
+      } else if ($scope.state.deploymentTab === 1) {
+        clipboard.copyText('curl -L https://downloads.portainer.io/portainer-agent-k8s-node.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml');
       } else {
-        clipboard.copyText('curl -L https://downloads.portainer.io/portainer-agent-k8s.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml');
+        clipboard.copyText('curl -L https://downloads.portainer.io/portainer-agent-k8s-lb.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml');
       }
       $('#copyNotification').show().fadeOut(2500);
     };

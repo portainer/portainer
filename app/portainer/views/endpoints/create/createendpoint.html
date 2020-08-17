@@ -76,13 +76,19 @@
                 Ensure that you have deployed the Portainer agent in your cluster first. Refer to the platform related command below to deploy it.
                 <div style="margin-top: 10px;">
                   <uib-tabset active="state.deploymentTab">
-                    <uib-tab index="0" heading="Kubernetes">
+                    <uib-tab index="0" heading="Kubernetes via load balancer">
                       <code style="display: block; white-space: pre-wrap; padding: 16px 90px;"
-                        >curl -L https://downloads.portainer.io/portainer-agent-k8s.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml</code
+                        >curl -L https://downloads.portainer.io/portainer-agent-k8s-lb.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml</code
                       >
                     </uib-tab>
 
-                    <uib-tab index="1" heading="Docker Swarm">
+                    <uib-tab index="1" heading="Kubernetes via node port">
+                      <code style="display: block; white-space: pre-wrap; padding: 16px 90px;"
+                        >curl -L https://downloads.portainer.io/portainer-agent-k8s-node.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml</code
+                      >
+                    </uib-tab>
+
+                    <uib-tab index="2" heading="Docker Swarm">
                       <code style="display: block; white-space: pre-wrap; padding: 16px 90px;"
                         >curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent</code
                       >
