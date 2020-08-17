@@ -20,7 +20,7 @@ import {
   KubernetesApplicationPersistedFolderFormValue,
   KubernetesApplicationPublishedPortFormValue,
   KubernetesApplicationPlacementFormValue,
-  KubernetesApplicationFormValidationDuplicate,
+  KubernetesFormValueDuplicate,
 } from 'Kubernetes/models/application/formValues';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import KubernetesApplicationConverter from 'Kubernetes/converters/application';
@@ -834,17 +834,17 @@ class KubernetesCreateApplicationController {
         availableSizeUnits: ['MB', 'GB', 'TB'],
         alreadyExists: false,
         duplicates: {
-          environmentVariables: new KubernetesApplicationFormValidationDuplicate(),
-          persistedFolders: new KubernetesApplicationFormValidationDuplicate(),
-          configurationPaths: new KubernetesApplicationFormValidationDuplicate(),
-          existingVolumes: new KubernetesApplicationFormValidationDuplicate(),
+          environmentVariables: new KubernetesFormValueDuplicate(),
+          persistedFolders: new KubernetesFormValueDuplicate(),
+          configurationPaths: new KubernetesFormValueDuplicate(),
+          existingVolumes: new KubernetesFormValueDuplicate(),
           publishedPorts: {
-            containerPorts: new KubernetesApplicationFormValidationDuplicate(),
-            nodePorts: new KubernetesApplicationFormValidationDuplicate(),
-            ingressRoutes: new KubernetesApplicationFormValidationDuplicate(),
-            loadBalancerPorts: new KubernetesApplicationFormValidationDuplicate(),
+            containerPorts: new KubernetesFormValueDuplicate(),
+            nodePorts: new KubernetesFormValueDuplicate(),
+            ingressRoutes: new KubernetesFormValueDuplicate(),
+            loadBalancerPorts: new KubernetesFormValueDuplicate(),
           },
-          placements: new KubernetesApplicationFormValidationDuplicate(),
+          placements: new KubernetesFormValueDuplicate(),
         },
         isEdit: false,
         params: {

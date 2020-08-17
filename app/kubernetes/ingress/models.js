@@ -24,3 +24,12 @@ export function KubernetesIngressRule() {
     Path: '',
   };
 }
+
+export function KubernetesIngressClass() {
+  return {
+    Name: '',
+    Type: undefined,
+    NeedsDeletion: false,
+    IsNew: true,
+  };
+}
