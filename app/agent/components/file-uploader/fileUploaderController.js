@@ -1,4 +1,5 @@
 export class FileUploaderController {
+  /* @ngInject */
   constructor($async) {
     Object.assign(this, { $async });
 

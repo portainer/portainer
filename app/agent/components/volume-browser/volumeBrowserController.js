@@ -1,6 +1,7 @@
 import _ from 'lodash-es';
 
 export class VolumeBrowserController {
+  /* @ngInject */
   constructor($async, HttpRequestHelper, VolumeBrowserService, FileSaver, Blob, ModalService, Notifications) {
     Object.assign(this, { $async, HttpRequestHelper, VolumeBrowserService, FileSaver, Blob, ModalService, Notifications });
     this.state = {

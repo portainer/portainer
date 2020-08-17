@@ -3,6 +3,7 @@ import _ from 'lodash-es';
 const ROOT_PATH = '/host';
 
 export class HostBrowserController {
+  /* @ngInject */
   constructor($async, HostBrowserService, Notifications, FileSaver, ModalService) {
     Object.assign(this, { $async, HostBrowserService, Notifications, FileSaver, ModalService });
 
