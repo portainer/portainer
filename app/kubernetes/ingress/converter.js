@@ -78,6 +78,7 @@ export class KubernetesIngressConverter {
     if (formValues.RewriteTarget) {
       _.extend(res.Annotations, KubernetesIngressClassRewriteTargetAnnotations[formValues.IngressClass.Type]);
     }
+    res.Annotations[KubernetesIngressClassAnnotation] = formValues.IngressClass.Name;
     res.Host = formValues.Host;
     return res;
   }
@@ -100,7 +101,7 @@ export class KubernetesIngressConverter {
         const annotations = _.map(_.toPairs(ingress.Annotations), ([key, value]) => {
           if (key === rewriteKey) {
             fv.RewriteTarget = true;
-          } else {
+          } else if (key !== KubernetesIngressClassAnnotation) {
             const annotation = new KubernetesResourcePoolIngressClassAnnotationFormValue();
             annotation.Key = key;
             annotation.Value = value;
