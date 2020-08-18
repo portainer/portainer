@@ -8,6 +8,7 @@ const (
 	defaultTunnelServerPort    = "8000"
 	defaultDataDirectory       = "/data"
 	defaultAssetsDirectory     = "./"
+	defaultCheckHeath          = "false"
 	defaultTLS                 = "false"
 	defaultTLSSkipVerify       = "false"
 	defaultTLSCACertPath       = "/certs/ca.pem"

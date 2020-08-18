@@ -334,7 +334,20 @@ func terminateIfNoAdminCreated(dataStore portainer.DataStore) {
 
 func main() {
 	flags := initCLI()
-
+    
+	if *flags.CheckHealth {
+		statuscode, err := http.HealthCheck(*flags.Addr)
+		if err == nil {
+				if statuscode == 200 {
+					log.Println(*flags.Addr, ": Online - response:", statuscode)
+					os.Exit(0)
+				} else {
+					log.Fatal(*flags.Addr, ": Error - response:", statuscode)
+				}
+			}
+			log.Fatal("Connection error:", err.Error())
+	}
+	
 	fileService := initFileService(*flags.Data)
 
 	dataStore := initDataStore(*flags.Data, fileService)

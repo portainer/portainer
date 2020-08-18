@@ -39,6 +39,7 @@ type (
 		AdminPassword             *string
 		AdminPasswordFile         *string
 		Assets                    *string
+		CheckHealth               *bool
 		Data                      *string
 		EnableEdgeComputeFeatures *bool
 		EndpointURL               *string
