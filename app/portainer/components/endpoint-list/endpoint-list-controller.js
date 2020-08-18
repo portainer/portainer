@@ -49,7 +49,10 @@ angular.module('portainer.app').controller('EndpointListController', [
             _.includes(endpoint.Name.toLowerCase(), lowerCaseKeyword) ||
             _.includes(endpoint.Group.Name.toLowerCase(), lowerCaseKeyword) ||
             _.includes(endpoint.URL.toLowerCase(), lowerCaseKeyword) ||
-            _.some(endpoint.TagIds, (tagId) => {
+            _.some(_.union(endpoint.TagIds, endpoint.Group.TagIds), (tagId) => {
+              if (!tags) {
+                return false;
+              }
               const tag = tags.find((t) => t.Id === tagId);
               if (!tag) {
                 return false;
