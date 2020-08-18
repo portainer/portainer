@@ -33,26 +33,25 @@
 
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
-                Enabling the ingress feature will allow users to expose application they deploy over a HTTP route.<br />
+                Adding ingress controllers will allow users to expose application they deploy over a HTTP route.<br />
                 <p style="margin-top: 2px;">
                   <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                  Ingress classes (controllers) must be manually specified for each one you want to use in the cluster. Make sure that each controller is running inside your
-                  cluster.
+                  Ingress classes must be manually specified for each controller you want to use in the cluster. Make sure that each controller is running inside your cluster.
                 </p>
               </span>
             </div>
             <div class="form-group">
               <div class="col-sm-12">
-                <label class="control-label text-left">Ingress classes</label>
+                <label class="control-label text-left">Ingress controller</label>
                 <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addIngressClass()">
-                  <i class="fa fa-plus-circle" aria-hidden="true"></i> add ingress class
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i> add ingress controller
                 </span>
               </div>
 
               <div class="col-sm-12 form-inline" style="margin-top: 10px;">
                 <div ng-repeat-start="ingressClass in ctrl.formValues.IngressClasses" style="margin-top: 2px;">
-                  <div class="col-sm-7 input-group" ng-class="{ striked: ingressClass.NeedsDeletion }">
-                    <span class="input-group-addon">Name</span>
+                  <div class="col-sm-7 input-group input-group-sm" ng-class="{ striked: ingressClass.NeedsDeletion }">
+                    <span class="input-group-addon">Ingress class</span>
                     <input
                       type="text"
                       class="form-control"
@@ -63,7 +62,7 @@
                       required
                     />
                   </div>
-                  <div class="col-sm-3 input-group" ng-class="{ striked: ingressClass.NeedsDeletion }">
+                  <div class="col-sm-3 input-group input-group-sm" ng-class="{ striked: ingressClass.NeedsDeletion }">
                     <span class="input-group-addon">Type</span>
                     <select
                       class="form-control"
@@ -75,7 +74,7 @@
                       <option selected disabled hidden value="">Select a type</option>
                     </select>
                   </div>
-                  <div class="col-sm-1 input-group">
+                  <div class="col-sm-1 input-group input-group-sm">
                     <button ng-if="!ingressClass.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeIngressClass($index)">
                       <i class="fa fa-trash-alt" aria-hidden="true"></i>
                     </button>

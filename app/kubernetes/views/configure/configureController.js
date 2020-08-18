@@ -1,6 +1,6 @@
 import * as _ from 'lodash-es';
 import angular from 'angular';
-import { KubernetesStorageClassAccessPolicies, KubernetesStorageClass } from 'Kubernetes/models/storage-class/models';
+import { KubernetesStorageClass, KubernetesStorageClassAccessPolicies } from 'Kubernetes/models/storage-class/models';
 import { KubernetesFormValueDuplicate } from 'Kubernetes/models/application/formValues';
 import { KubernetesIngressClass } from 'Kubernetes/ingress/models';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
@@ -146,7 +146,7 @@ class KubernetesConfigureController {
     const toDel = _.filter(this.formValues.IngressClasses, { NeedsDeletion: true });
     if (toDel.length) {
       this.ModalService.confirmUpdate(
-        `Removing storage classes will make them unavailable for future use.<br/>Existing resources linked to these ingress classes will continue to live in cluster but you will not be able to remove them from Portainer.<br/><br/>Do you wish to continue?`,
+        `Removing ingress controllers will make them unavailable for future use.<br/>Existing resources linked to these ingress controllers will continue to live in cluster but you will not be able to remove them from Portainer.<br/><br/>Do you wish to continue?`,
         (confirmed) => {
           if (confirmed) {
             return this.$async(this.configureAsync);
