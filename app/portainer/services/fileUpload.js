@@ -154,7 +154,7 @@ angular.module('portainer.app').factory('FileUploadService', [
         url: 'api/endpoints',
         data: {
           Name: name,
-          EndpointCreationType: PortainerEndpointCreationTypes.Azure,
+          EndpointCreationType: PortainerEndpointCreationTypes.AzureEnvironment,
           GroupID: groupId,
           TagIds: Upload.json(tagIds),
           AzureApplicationID: applicationId,
