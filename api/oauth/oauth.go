@@ -88,6 +88,13 @@ func getUsername(token string, configuration *portainer.OAuthSettings) (string, 
 		}
 
 		username := values.Get(configuration.UserIdentifier)
+		if username == "" {
+			return username, &oauth2.RetrieveError{
+				Response: resp,
+				Body:     body,
+			}
+		}
+
 		return username, nil
 	}
 
