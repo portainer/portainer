@@ -97,20 +97,18 @@ angular
         $scope.motd = data;
       });
 
-      getPaginatedEndpoints(0, 100).then((data) => {
-        const totalCount = data.totalCount;
+      try {
+        const [{ totalCount, endpoints }, tags] = await Promise.all([getPaginatedEndpoints(0, 100), TagService.tags()]);
+        $scope.tags = tags;
+
         $scope.totalCount = totalCount;
         if (totalCount > 100) {
           $scope.endpoints = [];
         } else {
-          $scope.endpoints = data.endpoints;
+          $scope.endpoints = endpoints;
         }
-      });
-
-      try {
-        $scope.tags = await TagService.tags();
-      } catch (e) {
-        Notifications.error('Failed loading tags', e);
+      } catch (err) {
+        Notifications.error('Failed loading page data', err);
       }
     }
 
