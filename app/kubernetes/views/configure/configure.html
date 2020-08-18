@@ -58,6 +58,7 @@
                       name="ingress_class_name_{{ $index }}"
                       ng-model="ingressClass.Name"
                       placeholder="nginx"
+                      ng-pattern="/^[a-z]([-a-z0-9]*[a-z0-9])?$/"
                       ng-change="ctrl.onChangeIngressClassName($index)"
                       required
                     />
@@ -100,6 +101,10 @@
                     >
                       <div ng-messages="kubernetesClusterSetupForm['ingress_class_name_'+$index].$error">
                         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Ingress class name is required.</p>
+                        <p ng-message="pattern"
+                          ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of lower case alphanumeric characters or '-', start with an
+                          alphabetic character, and end with an alphanumeric character (e.g. 'my-name', or 'abc-123').</p
+                        >
                       </div>
                       <p ng-if="ctrl.state.duplicates.ingressClasses.refs[$index] !== undefined">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This ingress class is already defined.
