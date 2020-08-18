@@ -35,8 +35,7 @@ func (handler *Handler) authenticateOAuth(code string, settings *portainer.OAuth
 
 	username, err := handler.OAuthService.Authenticate(code, settings)
 	if err != nil {
-		log.Printf("[DEBUG] - Unable to authenticate user via OAuth: %v", err)
-		return "", nil
+		return "", err
 	}
 
 	return username, nil
