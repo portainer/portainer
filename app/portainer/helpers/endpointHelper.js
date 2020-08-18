@@ -17,6 +17,7 @@ angular.module('portainer.app').factory('EndpointHelper', [
         var group = findAssociatedGroup(endpoint, groups);
         if (group) {
           endpoint.GroupName = group.Name;
+          endpoint.TagIds = _.union(endpoint.TagIds, group.TagIds);
         }
       }
     };
