@@ -212,11 +212,11 @@
                       <div ng-repeat="annotation in ic.Annotations track by $index" style="margin-top: 2px;">
                         <div class="input-group col-sm-5 input-group-sm">
                           <span class="input-group-addon">Key</span>
-                          <input type="text" class="form-control" ng-model="annotation.Key" placeholder="key" required />
+                          <input type="text" class="form-control" ng-model="annotation.Key" placeholder="nginx.ingress.kubernetes.io/rewrite-target" required />
                         </div>
                         <div class="input-group col-sm-5 input-group-sm">
                           <span class="input-group-addon">Value</span>
-                          <input type="text" class="form-control" ng-model="annotation.Value" placeholder="value" required />
+                          <input type="text" class="form-control" ng-model="annotation.Value" placeholder="/$1" required />
                         </div>
                         <div class="col-sm-1 input-group input-group-sm">
                           <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeAnnotation(ic, $index)">
