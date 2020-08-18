@@ -125,7 +125,7 @@
                     Ingresses
                   </div>
                   <!-- #region INGRESSES -->
-                  <div class="form-group">
+                  <div class="form-group" ng-if="ctrl.formValues.IngressClasses.length === 0">
                     <div class="col-sm-12 small text-muted">
                       The ingress feature must be enabled in the
                       <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: ctrl.endpoint.Id})">endpoint configuration view</a> to be able to register ingresses inside
@@ -133,10 +133,25 @@
                     </div>
                   </div>
 
+                  <div class="form-group" ng-if="ctrl.formValues.IngressClasses.length > 0">
+                    <div class="col-sm-12 small text-muted">
+                      <p>
+                        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                        Enable and configure ingresses available to users when deploying applications.
+                      </p>
+                    </div>
+                  </div>
+
                   <div class="form-group" ng-repeat-start="ic in ctrl.formValues.IngressClasses">
-                    <div class="col-sm-12">
+                    <div class="text-muted col-sm-12" style="width: 100%;">
+                      <div style="border-bottom: 1px solid #cdcdcd; padding-bottom: 5px;">
+                        <i class="fa fa-route" aria-hidden="true" style="margin-right: 2px;"></i> {{ ic.IngressClass.Name }}
+                      </div>
+                    </div>
+
+                    <div class="col-sm-12" style="margin-top: 10px;">
                       <label class="control-label text-left">
-                        {{ ic.IngressClass.Name }}
+                        Allow users to use this ingress
                       </label>
                       <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ic.Selected" /><i></i> </label>
                     </div>
@@ -144,44 +159,66 @@
 
                   <div ng-if="ic.Selected">
                     <div class="form-group">
-                      <div class="col-sm-4 col-lg-3">
-                        <label class="control-label text-left">
-                          Rewrite root URL
-                        </label>
-                        <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ic.RewriteTarget" /><i></i> </label>
-                      </div>
-                      <div class="input-group col-sm-7">
-                        <span class="input-group-addon"
-                          >Hostname
-                          <portainer-tooltip
-                            position="bottom"
-                            message="Optional hostname associated to the ingress inside this resource pool. Users will be able to expose and access their applications over the ingress via this hostname or via IP address directly if not defined."
-                          >
-                          </portainer-tooltip>
-                        </span>
+                      <label class="control-label text-left col-sm-2">
+                        Hostname
+                        <portainer-tooltip
+                          position="bottom"
+                          message="Optional hostname associated to the ingress inside this resource pool. Users will be able to expose and access their applications over the ingress via this hostname or via IP address directly if not defined."
+                        >
+                        </portainer-tooltip>
+                      </label>
+                      <div class="col-sm-10">
                         <input class="form-control" ng-model="ic.Host" placeholder="host.com" />
                       </div>
                     </div>
+
+                    <div class="form-group">
+                      <label class="control-label text-left col-sm-2">
+                        Rewrite URL to use root
+                        <portainer-tooltip position="bottom" message="Enable this option to automatically rewrite incoming URLs to /"> </portainer-tooltip>
+                      </label>
+                      <div class="col-sm-10">
+                        <label class="switch"> <input type="checkbox" ng-model="ic.RewriteTarget" /><i></i> </label>
+                      </div>
+                    </div>
                   </div>
-                  <div ng-repeat-end class="form-group" ng-if="ic.Selected">
+                  <div ng-repeat-end class="form-group" ng-if="ic.Selected" style="margin-bottom: 20px;">
                     <div class="col-sm-12">
+                      <p>
+                        <a class="small interactive" ng-if="!ic.AdvancedConfig" ng-click="ic.AdvancedConfig = true">
+                          <i class="fa fa-plus space-right" aria-hidden="true"></i> Advanced configuration
+                        </a>
+                        <a class="small interactive" ng-if="ic.AdvancedConfig" ng-click="ic.AdvancedConfig = false">
+                          <i class="fa fa-minus space-right" aria-hidden="true"></i> Hide configuration
+                        </a>
+                      </p>
+                    </div>
+
+                    <div class="col-sm-12 small text-muted" ng-if="ic.AdvancedConfig" style="margin-top: 5px;">
+                      <p>
+                        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                        You can specify a list of annotations that will be associated to the ingress.
+                      </p>
+                    </div>
+
+                    <div class="col-sm-12" ng-if="ic.AdvancedConfig">
                       <label class="control-label text-left">Annotations</label>
                       <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addAnnotation(ic)">
                         <i class="fa fa-plus-circle" aria-hidden="true"></i> add annotation
                       </span>
                     </div>
 
-                    <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                    <div class="col-sm-12 form-inline" style="margin-top: 10px;" ng-if="ic.AdvancedConfig">
                       <div ng-repeat="annotation in ic.Annotations track by $index" style="margin-top: 2px;">
-                        <div class="input-group col-sm-5">
+                        <div class="input-group col-sm-5 input-group-sm">
                           <span class="input-group-addon">Key</span>
                           <input type="text" class="form-control" ng-model="annotation.Key" placeholder="key" required />
                         </div>
-                        <div class="input-group col-sm-5">
+                        <div class="input-group col-sm-5 input-group-sm">
                           <span class="input-group-addon">Value</span>
                           <input type="text" class="form-control" ng-model="annotation.Value" placeholder="value" required />
                         </div>
-                        <div class="col-sm-1 input-group">
+                        <div class="col-sm-1 input-group input-group-sm">
                           <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeAnnotation(ic, $index)">
                             <i class="fa fa-trash-alt" aria-hidden="true"></i>
                           </button>

@@ -19,6 +19,7 @@ export function KubernetesResourcePoolIngressClassFormValue(ingressClass) {
     Host: undefined,
     Selected: false,
     WasSelected: false,
+    AdvancedConfig: false,
   };
 }
 

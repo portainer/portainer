@@ -2,8 +2,8 @@ import * as _ from 'lodash-es';
 import * as JsonPatch from 'fast-json-patch';
 
 import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
-import { KubernetesResourcePoolIngressClassFormValue, KubernetesResourcePoolIngressClassAnnotationFormValue } from 'Kubernetes/models/resource-pool/formValues';
-import { KubernetesIngressRule, KubernetesIngress } from './models';
+import { KubernetesResourcePoolIngressClassAnnotationFormValue, KubernetesResourcePoolIngressClassFormValue } from 'Kubernetes/models/resource-pool/formValues';
+import { KubernetesIngress, KubernetesIngressRule } from './models';
 import { KubernetesIngressCreatePayload, KubernetesIngressRuleCreatePayload, KubernetesIngressRulePathCreatePayload } from './payloads';
 import { KubernetesIngressClassAnnotation, KubernetesIngressClassRewriteTargetAnnotations } from './constants';
 
@@ -108,6 +108,9 @@ export class KubernetesIngressConverter {
           }
         });
         fv.Annotations = _.without(annotations, undefined);
+        if (fv.Annotations.length > 0) {
+          fv.AdvancedConfig = true;
+        }
       }
       return fv;
     });
