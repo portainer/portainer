@@ -814,7 +814,6 @@ class KubernetesCreateApplicationController {
         actionInProgress: false,
         useLoadBalancer: false,
         useServerMetrics: false,
-        canUseIngress: false,
         sliders: {
           cpu: {
             min: 0,

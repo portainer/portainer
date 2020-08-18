@@ -106,7 +106,7 @@ class KubernetesCreateResourcePoolController {
         sliderMaxCpu: 0,
         viewReady: false,
         isAlreadyExist: false,
-        canUseIngress: endpoint.Kubernetes.Configuration.UseIngress,
+        canUseIngress: endpoint.Kubernetes.Configuration.IngressClasses.length,
       };
 
       const nodes = await this.KubernetesNodeService.get();

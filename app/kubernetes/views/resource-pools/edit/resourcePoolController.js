@@ -264,7 +264,7 @@ class KubernetesResourcePoolController {
         ingressesLoading: true,
         viewReady: false,
         eventWarningCount: 0,
-        canUseIngress: endpoint.Kubernetes.Configuration.UseIngress,
+        canUseIngress: endpoint.Kubernetes.Configuration.IngressClasses.length,
       };
 
       this.state.activeTab = this.LocalStorage.getActiveTab('resourcePool');

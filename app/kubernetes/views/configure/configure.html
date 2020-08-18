@@ -40,16 +40,6 @@
                   cluster.
                 </p>
               </span>
-
-              <div class="col-sm-12">
-                <label class="control-label text-left">
-                  Allow users to use ingress
-                </label>
-                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.UseIngress" /><i></i> </label>
-              </div>
-              <div class="col-sm-12 small text-warning" style="margin-top: 5px;" ng-if="!ctrl.hasValidIngressConfiguration()">
-                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Add at least one ingress class.
-              </div>
             </div>
             <div class="form-group">
               <div class="col-sm-12">
@@ -232,7 +222,7 @@
                   type="submit"
                   class="btn btn-primary btn-sm"
                   ng-click="ctrl.configure()"
-                  ng-disabled="ctrl.state.actionInProgress || !kubernetesClusterSetupForm.$valid || !ctrl.hasValidStorageConfiguration() || !ctrl.hasValidIngressConfiguration()"
+                  ng-disabled="ctrl.state.actionInProgress || !kubernetesClusterSetupForm.$valid || !ctrl.hasValidStorageConfiguration()"
                   button-spinner="ctrl.state.actionInProgress"
                 >
                   <span ng-hide="ctrl.state.actionInProgress">Save configuration</span>
