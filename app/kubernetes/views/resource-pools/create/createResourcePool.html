@@ -129,54 +129,77 @@
             </div>
             <!-- #endregion -->
 
-            <div class="col-sm-12 form-section-title">
-              Ingresses
-            </div>
-            <!-- #region INGRESSES -->
-            <div class="form-group" ng-if="!ctrl.state.canUseIngress">
-              <div class="col-sm-12 small text-muted">
-                The ingress feature must be enabled in the
-                <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: ctrl.endpoint.Id})">endpoint configuration view</a> to be able to register ingresses inside this
-                resource pool.
+            <div ng-if="ctrl.state.canUseIngress">
+              <div class="col-sm-12 form-section-title">
+                Ingresses
               </div>
-            </div>
-            <div class="form-group" ng-if="ctrl.state.canUseIngress">
-              <div class="col-sm-12 small text-muted">
-                <p>
-                  <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                  You can enable one or multiple ingresses to be used when deploying an application inside this resource pool.
-                </p>
+              <!-- #region INGRESSES -->
+              <div class="form-group">
+                <div class="col-sm-12 small text-muted">
+                  The ingress feature must be enabled in the
+                  <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: ctrl.endpoint.Id})">endpoint configuration view</a> to be able to register ingresses inside this
+                  resource pool.
+                </div>
               </div>
-              <div class="col-sm-12">
-                <table class="table" style="table-layout: fixed;">
-                  <tbody>
-                    <tr class="text-muted">
-                      <td style="width: 33%;">Ingress controller</td>
-                      <td style="width: 66%;">
-                        Hostname
-                        <portainer-tooltip
-                          position="bottom"
-                          message="Optional hostname associated to the ingress inside this resource pool. Users will be able to expose and access their applications over the ingress via this hostname or via IP address directly if not defined."
-                        >
-                        </portainer-tooltip>
-                      </td>
-                    </tr>
-                    <tr ng-repeat="class in ctrl.formValues.IngressClasses">
-                      <td style="width: 33%;">
-                        <div style="margin: 5px;">
-                          <label class="switch" style="margin-right: 10px;"> <input type="checkbox" ng-model="class.Selected" /><i></i> </label>
-                          <span>{{ class.Name }}</span>
-                        </div>
-                      </td>
-                      <td style="width: 66%;">
-                        <input class="form-control" ng-model="class.Host" placeholder="host.com" />
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+
+              <div class="form-group" ng-repeat-start="ic in ctrl.formValues.IngressClasses">
+                <div class="col-sm-12">
+                  <label class="control-label text-left">
+                    {{ ic.IngressClass.Name }}
+                  </label>
+                  <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ic.Selected" /><i></i> </label>
+                </div>
               </div>
+
+              <div ng-if="ic.Selected">
+                <div class="form-group">
+                  <div class="col-sm-4 col-lg-3">
+                    <label class="control-label text-left">
+                      Rewrite root URL
+                    </label>
+                    <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ic.RewriteTarget" /><i></i> </label>
+                  </div>
+                  <div class="input-group col-sm-7">
+                    <span class="input-group-addon"
+                      >Hostname
+                      <portainer-tooltip
+                        position="bottom"
+                        message="Optional hostname associated to the ingress inside this resource pool. Users will be able to expose and access their applications over the ingress via this hostname or via IP address directly if not defined."
+                      >
+                      </portainer-tooltip>
+                    </span>
+                    <input class="form-control" ng-model="ic.Host" placeholder="host.com" />
+                  </div>
+                </div>
+              </div>
+              <div ng-repeat-end class="form-group" ng-if="ic.Selected">
+                <div class="col-sm-12">
+                  <label class="control-label text-left">Annotations</label>
+                  <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addAnnotation(ic)">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i> add annotation
+                  </span>
+                </div>
+
+                <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                  <div ng-repeat="annotation in ic.Annotations track by $index" style="margin-top: 2px;">
+                    <div class="input-group col-sm-5">
+                      <span class="input-group-addon">Key</span>
+                      <input type="text" class="form-control" ng-model="annotation.Key" placeholder="key" required />
+                    </div>
+                    <div class="input-group col-sm-5">
+                      <span class="input-group-addon">Value</span>
+                      <input type="text" class="form-control" ng-model="annotation.Value" placeholder="value" required />
+                    </div>
+                    <div class="col-sm-1 input-group">
+                      <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeAnnotation(ic, $index)">
+                        <i class="fa fa-trash-alt" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- #endregion -->
             </div>
-            <!-- #endregion -->
 
             <div class="col-sm-12 form-section-title">
               Actions

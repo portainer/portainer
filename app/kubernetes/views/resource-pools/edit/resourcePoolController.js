@@ -4,7 +4,8 @@ import filesizeParser from 'filesize-parser';
 import { KubernetesResourceQuota, KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resource-quota/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
-import { KubernetesResourcePoolFormValues, KubernetesResourcePoolIngressClassFormValue } from 'Kubernetes/models/resource-pool/formValues';
+import { KubernetesResourcePoolFormValues } from 'Kubernetes/models/resource-pool/formValues';
+import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
 
 class KubernetesResourcePoolController {
   /* @ngInject */
@@ -126,17 +127,15 @@ class KubernetesResourcePoolController {
 
       const promises = _.map(this.formValues.IngressClasses, (c) => {
         c.Namespace = namespace;
-        const original = _.find(this.savedIngressClasses, { Name: c.Name });
         if (c.WasSelected === false && c.Selected === true) {
           return this.KubernetesIngressService.create(c);
         } else if (c.WasSelected === true && c.Selected === false) {
           return this.KubernetesIngressService.delete(c);
-        } else if (c.Selected === true && original && original.Host !== c.Host) {
-          const oldIngress = _.find(this.ingresses, { Name: c.Name });
-          const newIngress = angular.copy(oldIngress);
-          newIngress.PreviousHost = original.Host;
-          newIngress.Host = c.Host;
-
+        } else if (c.Selected === true) {
+          const oldIngress = _.find(this.ingresses, { Name: c.IngressClass.Name });
+          const newIngress = KubernetesIngressConverter.resourcePoolIngressClassFormValueToIngress(c);
+          newIngress.Paths = angular.copy(oldIngress.Paths);
+          newIngress.PreviousHost = oldIngress.Host;
           return this.KubernetesIngressService.patch(oldIngress, newIngress);
         }
       });
@@ -304,17 +303,7 @@ class KubernetesResourcePoolController {
       if (this.state.canUseIngress) {
         await this.getIngresses();
         const ingressClasses = endpoint.Kubernetes.Configuration.IngressClasses;
-        this.formValues.IngressClasses = _.map(ingressClasses, (item) => {
-          const iClass = new KubernetesResourcePoolIngressClassFormValue(item);
-          const matchingIngress = _.find(this.ingresses, { Name: iClass.Name });
-          if (matchingIngress) {
-            iClass.Selected = true;
-            iClass.WasSelected = true;
-            iClass.Host = matchingIngress.Host;
-          }
-          return iClass;
-        });
-        this.savedIngressClasses = angular.copy(this.formValues.IngressClasses);
+        this.formValues.IngressClasses = KubernetesIngressConverter.ingressClassesToFormValues(ingressClasses, this.ingresses);
       }
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');

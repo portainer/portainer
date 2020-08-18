@@ -3,7 +3,8 @@ import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import { KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resource-quota/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
-import { KubernetesResourcePoolFormValues, KubernetesResourcePoolIngressClassFormValue } from 'Kubernetes/models/resource-pool/formValues';
+import { KubernetesResourcePoolFormValues, KubernetesResourcePoolIngressClassAnnotationFormValue } from 'Kubernetes/models/resource-pool/formValues';
+import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
 
 class KubernetesCreateResourcePoolController {
   /* @ngInject */
@@ -21,6 +22,16 @@ class KubernetesCreateResourcePoolController {
     this.createResourcePoolAsync = this.createResourcePoolAsync.bind(this);
     this.getResourcePoolsAsync = this.getResourcePoolsAsync.bind(this);
   }
+
+  /* #region  ANNOTATIONS MANAGEMENT */
+  addAnnotation(ingressClass) {
+    ingressClass.Annotations.push(new KubernetesResourcePoolIngressClassAnnotationFormValue());
+  }
+
+  removeAnnotation(ingressClass, index) {
+    ingressClass.Annotations.splice(index, 1);
+  }
+  /* #endregion */
 
   isValid() {
     return !this.state.isAlreadyExist;
@@ -108,7 +119,7 @@ class KubernetesCreateResourcePoolController {
       await this.getResourcePools();
       if (this.state.canUseIngress) {
         const ingressClasses = endpoint.Kubernetes.Configuration.IngressClasses;
-        this.formValues.IngressClasses = _.map(ingressClasses, (item) => new KubernetesResourcePoolIngressClassFormValue(item));
+        this.formValues.IngressClasses = KubernetesIngressConverter.ingressClassesToFormValues(ingressClasses);
       }
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');

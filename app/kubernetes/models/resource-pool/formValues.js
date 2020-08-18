@@ -8,15 +8,23 @@ export function KubernetesResourcePoolFormValues(defaults) {
 }
 
 /**
- * @param {string} ingressClassName
+ * @param {KubernetesIngressClass} ingressClass
  */
-export function KubernetesResourcePoolIngressClassFormValue(ingressClassName) {
+export function KubernetesResourcePoolIngressClassFormValue(ingressClass) {
   return {
-    Name: ingressClassName,
-    IngressClassName: ingressClassName,
+    Namespace: undefined, // will be filled inside ResourcePoolService.create
+    IngressClass: ingressClass,
+    RewriteTarget: false,
+    Annotations: [], // KubernetesResourcePoolIngressClassAnnotationFormValue
     Host: undefined,
     Selected: false,
     WasSelected: false,
-    Namespace: undefined, // will be filled inside ResourcePoolService.create
+  };
+}
+
+export function KubernetesResourcePoolIngressClassAnnotationFormValue() {
+  return {
+    Key: '',
+    Value: '',
   };
 }

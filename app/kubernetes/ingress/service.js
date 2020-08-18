@@ -55,10 +55,10 @@ class KubernetesIngressService {
   /**
    * CREATE
    */
-  async createAsync(formValues) {
+  async createAsync(ingress) {
     try {
       const params = {};
-      const payload = KubernetesIngressConverter.createPayload(formValues);
+      const payload = KubernetesIngressConverter.createPayload(ingress);
       const namespace = payload.metadata.namespace;
       const data = await this.KubernetesIngresses(namespace).create(params, payload).$promise;
       return data;
@@ -67,8 +67,8 @@ class KubernetesIngressService {
     }
   }
 
-  create(formValues) {
-    return this.$async(this.createAsync, formValues);
+  create(ingress) {
+    return this.$async(this.createAsync, ingress);
   }
 
   /**
