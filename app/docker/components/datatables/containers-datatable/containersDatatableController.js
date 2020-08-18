@@ -60,10 +60,6 @@ angular.module('portainer.docker').controller('ContainersDatatableController', [
           label: 'Created',
           display: true,
         },
-        ip: {
-          label: 'IP Address',
-          display: true,
-        },
         host: {
           label: 'Host',
           display: true,
