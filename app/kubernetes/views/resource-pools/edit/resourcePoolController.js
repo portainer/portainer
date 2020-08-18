@@ -4,7 +4,7 @@ import filesizeParser from 'filesize-parser';
 import { KubernetesResourceQuota, KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resource-quota/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
-import { KubernetesResourcePoolFormValues } from 'Kubernetes/models/resource-pool/formValues';
+import { KubernetesResourcePoolFormValues, KubernetesResourcePoolIngressClassAnnotationFormValue } from 'Kubernetes/models/resource-pool/formValues';
 import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
 
 class KubernetesResourcePoolController {
@@ -53,6 +53,16 @@ class KubernetesResourcePoolController {
     this.getIngresses = this.getIngresses.bind(this);
     this.getIngressesAsync = this.getIngressesAsync.bind(this);
   }
+
+  /* #region  ANNOTATIONS MANAGEMENT */
+  addAnnotation(ingressClass) {
+    ingressClass.Annotations.push(new KubernetesResourcePoolIngressClassAnnotationFormValue());
+  }
+
+  removeAnnotation(ingressClass, index) {
+    ingressClass.Annotations.splice(index, 1);
+  }
+  /* #endregion */
 
   selectTab(index) {
     this.LocalStorage.storeActiveTab('resourcePool', index);
