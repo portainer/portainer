@@ -75,8 +75,8 @@ angular.module('portainer.docker').controller('ContainersDatatableController', [
       },
     };
 
-    this.onColumnVisibilityChange = function () {
-      DatatableService.setColumnVisibilitySettings(this.tableKey, this.columnVisibility);
+    this.onColumnVisibilityChange = function (columnVisibility) {
+      DatatableService.setColumnVisibilitySettings(this.tableKey, columnVisibility);
     };
 
     this.onSelectionChanged = function () {
