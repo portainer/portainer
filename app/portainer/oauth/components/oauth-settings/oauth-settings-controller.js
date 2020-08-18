@@ -15,5 +15,9 @@ angular.module('portainer.oauth').controller('OAuthSettingsController', function
     if (ctrl.settings.AuthorizationURI !== '') {
       ctrl.state.provider.authUrl = ctrl.settings.AuthorizationURI;
     }
+
+    if (ctrl.settings.DefaultTeamID === 0) {
+      ctrl.settings.DefaultTeamID = null;
+    }
   }
 });
