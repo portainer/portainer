@@ -6,8 +6,11 @@ import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceRese
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import { KubernetesResourcePoolFormValues, KubernetesResourcePoolIngressClassAnnotationFormValue } from 'Kubernetes/models/resource-pool/formValues';
 import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
+import { KubernetesFormValueDuplicate } from 'Kubernetes/models/application/formValues';
+import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 
 class KubernetesResourcePoolController {
+  /* #region  CONSTRUCTOR */
   /* @ngInject */
   constructor(
     $async,
@@ -53,6 +56,23 @@ class KubernetesResourcePoolController {
     this.getIngresses = this.getIngresses.bind(this);
     this.getIngressesAsync = this.getIngressesAsync.bind(this);
   }
+  /* #endregion */
+
+  onChangeIngressHostname() {
+    const state = this.state.duplicates.ingressHosts;
+
+    const hosts = _.map(this.formValues.IngressClasses, 'Host');
+    const otherIngresses = _.without(this.allIngresses, ...this.ingresses);
+    const allHosts = _.map(otherIngresses, 'Host');
+    const duplicates = KubernetesFormValidationHelper.getDuplicates(hosts);
+    _.forEach(hosts, (host, idx) => {
+      if (_.includes(allHosts, host) && host !== undefined) {
+        duplicates[idx] = host;
+      }
+    });
+    state.refs = duplicates;
+    state.hasDuplicates = Object.keys(duplicates).length > 0;
+  }
 
   /* #region  ANNOTATIONS MANAGEMENT */
   addAnnotation(ingressClass) {
@@ -66,6 +86,10 @@ class KubernetesResourcePoolController {
 
   selectTab(index) {
     this.LocalStorage.storeActiveTab('resourcePool', index);
+  }
+
+  isUpdateButtonDisabled() {
+    return this.state.actionInProgress || (this.formValues.HasQuota && !this.isQuotaValid()) || this.state.duplicates.ingressHosts.hasDuplicates;
   }
 
   isQuotaValid() {
@@ -190,6 +214,7 @@ class KubernetesResourcePoolController {
     return this.state.eventWarningCount;
   }
 
+  /* #region  GET EVENTS */
   async getEventsAsync() {
     try {
       this.state.eventsLoading = true;
@@ -205,7 +230,9 @@ class KubernetesResourcePoolController {
   getEvents() {
     return this.$async(this.getEventsAsync);
   }
+  /* #endregion */
 
+  /* #region  GET APPLICATIONS */
   async getApplicationsAsync() {
     try {
       this.state.applicationsLoading = true;
@@ -226,12 +253,15 @@ class KubernetesResourcePoolController {
   getApplications() {
     return this.$async(this.getApplicationsAsync);
   }
+  /* #endregion */
 
+  /* #region  GET INGRESSES */
   async getIngressesAsync() {
     this.state.ingressesLoading = true;
     try {
       const namespace = this.pool.Namespace.Name;
-      this.ingresses = await this.KubernetesIngressService.get(namespace);
+      this.allIngresses = await this.KubernetesIngressService.get();
+      this.ingresses = _.filter(this.allIngresses, { Namespace: namespace });
       _.forEach(this.ingresses, (ing) => {
         ing.Namespace = namespace;
         _.forEach(ing.Paths, (path) => {
@@ -249,7 +279,9 @@ class KubernetesResourcePoolController {
   getIngresses() {
     return this.$async(this.getIngressesAsync);
   }
+  /* #endregion */
 
+  /* #region  ON INIT */
   async onInit() {
     try {
       const endpoint = this.EndpointProvider.currentEndpoint();
@@ -276,6 +308,9 @@ class KubernetesResourcePoolController {
         viewReady: false,
         eventWarningCount: 0,
         canUseIngress: endpoint.Kubernetes.Configuration.IngressClasses.length,
+        duplicates: {
+          ingressHosts: new KubernetesFormValueDuplicate(),
+        },
       };
 
       this.state.activeTab = this.LocalStorage.getActiveTab('resourcePool');
@@ -326,6 +361,7 @@ class KubernetesResourcePoolController {
   $onInit() {
     return this.$async(this.onInit);
   }
+  /* #endregion */
 
   $onDestroy() {
     if (this.state.currentName !== this.$state.$current.name) {

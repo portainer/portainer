@@ -5,10 +5,13 @@ import { KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resource-quot
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import { KubernetesResourcePoolFormValues, KubernetesResourcePoolIngressClassAnnotationFormValue } from 'Kubernetes/models/resource-pool/formValues';
 import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
+import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
+import { KubernetesFormValueDuplicate } from 'Kubernetes/models/application/formValues';
 
 class KubernetesCreateResourcePoolController {
+  /* #region  CONSTRUCTOR */
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesNodeService, KubernetesResourcePoolService, Authentication, EndpointProvider) {
+  constructor($async, $state, Notifications, KubernetesNodeService, KubernetesResourcePoolService, KubernetesIngressService, Authentication, EndpointProvider) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
@@ -17,10 +20,28 @@ class KubernetesCreateResourcePoolController {
 
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
+    this.KubernetesIngressService = KubernetesIngressService;
 
     this.onInit = this.onInit.bind(this);
     this.createResourcePoolAsync = this.createResourcePoolAsync.bind(this);
     this.getResourcePoolsAsync = this.getResourcePoolsAsync.bind(this);
+    this.getIngressesAsync = this.getIngressesAsync.bind(this);
+  }
+  /* #endregion */
+
+  onChangeIngressHostname() {
+    const state = this.state.duplicates.ingressHosts;
+
+    const hosts = _.map(this.formValues.IngressClasses, 'Host');
+    const allHosts = _.map(this.allIngresses, 'Host');
+    const duplicates = KubernetesFormValidationHelper.getDuplicates(hosts);
+    _.forEach(hosts, (host, idx) => {
+      if (_.includes(allHosts, host) && host !== undefined) {
+        duplicates[idx] = host;
+      }
+    });
+    state.refs = duplicates;
+    state.hasDuplicates = Object.keys(duplicates).length > 0;
   }
 
   /* #region  ANNOTATIONS MANAGEMENT */
@@ -33,8 +54,8 @@ class KubernetesCreateResourcePoolController {
   }
   /* #endregion */
 
-  isValid() {
-    return !this.state.isAlreadyExist;
+  isCreateButtonDisabled() {
+    return this.state.actionInProgress || (this.formValues.HasQuota && !this.isQuotaValid()) || this.state.isAlreadyExist || this.state.duplicates.ingressHosts.hasDuplicates;
   }
 
   onChangeName() {
@@ -61,6 +82,7 @@ class KubernetesCreateResourcePoolController {
     }
   }
 
+  /* #region  CREATE RESOURCE POOL */
   async createResourcePoolAsync() {
     this.state.actionInProgress = true;
     try {
@@ -80,7 +102,26 @@ class KubernetesCreateResourcePoolController {
   createResourcePool() {
     return this.$async(this.createResourcePoolAsync);
   }
+  /* #endregion */
 
+  /* #region  GET INGRESSES */
+  async getIngressesAsync() {
+    this.state.ingressesLoading = true;
+    try {
+      this.allIngresses = await this.KubernetesIngressService.get();
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve ingresses.');
+    } finally {
+      this.state.ingressesLoading = false;
+    }
+  }
+
+  getIngresses() {
+    return this.$async(this.getIngressesAsync);
+  }
+  /* #endregion */
+
+  /* #region  GET RESOURCE POOLS */
   async getResourcePoolsAsync() {
     try {
       this.resourcePools = await this.KubernetesResourcePoolService.get();
@@ -92,7 +133,9 @@ class KubernetesCreateResourcePoolController {
   getResourcePools() {
     return this.$async(this.getResourcePoolsAsync);
   }
+  /* #endregion */
 
+  /* #region  ON INIT */
   async onInit() {
     try {
       const endpoint = this.EndpointProvider.currentEndpoint();
@@ -107,6 +150,9 @@ class KubernetesCreateResourcePoolController {
         viewReady: false,
         isAlreadyExist: false,
         canUseIngress: endpoint.Kubernetes.Configuration.IngressClasses.length,
+        duplicates: {
+          ingressHosts: new KubernetesFormValueDuplicate(),
+        },
       };
 
       const nodes = await this.KubernetesNodeService.get();
@@ -118,6 +164,7 @@ class KubernetesCreateResourcePoolController {
       this.state.sliderMaxMemory = KubernetesResourceReservationHelper.megaBytesValue(this.state.sliderMaxMemory);
       await this.getResourcePools();
       if (this.state.canUseIngress) {
+        await this.getIngresses();
         const ingressClasses = endpoint.Kubernetes.Configuration.IngressClasses;
         this.formValues.IngressClasses = KubernetesIngressConverter.ingressClassesToFormValues(ingressClasses);
       }
@@ -131,6 +178,7 @@ class KubernetesCreateResourcePoolController {
   $onInit() {
     return this.$async(this.onInit);
   }
+  /* #endregion */
 }
 
 export default KubernetesCreateResourcePoolController;

@@ -109,9 +109,7 @@ export class KubernetesIngressConverter {
           }
         });
         fv.Annotations = _.without(annotations, undefined);
-        if (fv.Annotations.length > 0) {
-          fv.AdvancedConfig = true;
-        }
+        fv.AdvancedConfig = fv.Annotations.length > 0;
       }
       return fv;
     });
