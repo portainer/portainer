@@ -189,13 +189,17 @@
                   </div>
                 </div>
 
-                <div class="form-group">
-                  <label class="control-label text-left col-sm-2">
-                    Rewrite URL to use root
-                    <portainer-tooltip position="bottom" message="Enable this option to automatically rewrite incoming URLs to /"> </portainer-tooltip>
-                  </label>
-                  <div class="col-sm-10">
-                    <label class="switch"> <input type="checkbox" ng-model="ic.RewriteTarget" /><i></i> </label>
+                <div class="form-group" ng-if="ic.IngressClass.Type === 'nginx'">
+                  <div class="col-sm-12">
+                    <label class="control-label text-left">
+                      Redirect published routes to / in application
+                      <portainer-tooltip
+                        position="bottom"
+                        message="Enables the redirection of any route published via ingress to the root path of the application, e.g. /path remaps to /"
+                      >
+                      </portainer-tooltip>
+                    </label>
+                    <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ic.RewriteTarget" /><i></i> </label>
                   </div>
                 </div>
               </div>
