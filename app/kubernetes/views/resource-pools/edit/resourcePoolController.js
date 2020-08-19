@@ -138,7 +138,8 @@ class KubernetesResourcePoolController {
       const promises = _.map(this.formValues.IngressClasses, (c) => {
         c.Namespace = namespace;
         if (c.WasSelected === false && c.Selected === true) {
-          return this.KubernetesIngressService.create(c);
+          const ingress = KubernetesIngressConverter.resourcePoolIngressClassFormValueToIngress(c);
+          return this.KubernetesIngressService.create(ingress);
         } else if (c.WasSelected === true && c.Selected === false) {
           return this.KubernetesIngressService.delete(c);
         } else if (c.Selected === true) {
