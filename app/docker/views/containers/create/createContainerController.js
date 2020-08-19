@@ -121,7 +121,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         NetworkMode: 'bridge',
         Privileged: false,
         Init: false,
-        Runtime: '',
+        Runtime: null,
         ExtraHosts: [],
         Devices: [],
         CapAdd: [],
@@ -696,7 +696,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       SystemService.info()
         .then(function success(data) {
           $scope.availableRuntimes = data.Runtimes ? Object.keys(data.Runtimes) : [];
-          $scope.config.HostConfig.Runtime = '';
           $scope.state.sliderMaxCpu = 32;
           if (data.NCPU) {
             $scope.state.sliderMaxCpu = data.NCPU;
