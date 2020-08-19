@@ -63,7 +63,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       alwaysPull: true,
       Console: 'none',
       Volumes: [],
-      NetworkContainer: '',
+      NetworkContainer: null,
       Labels: [],
       ExtraHosts: [],
       MacAddress: '',
