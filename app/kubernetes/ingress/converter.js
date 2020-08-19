@@ -124,6 +124,11 @@ export class KubernetesIngressConverter {
     res.metadata.namespace = data.Namespace;
     res.metadata.annotations = data.Annotations;
     if (data.Paths && data.Paths.length) {
+      _.forEach(data.Paths, (p) => {
+        if (p.Host === 'undefined' || p.Host === undefined) {
+          p.Host = '';
+        }
+      });
       const groups = _.groupBy(data.Paths, 'Host');
       const rules = _.map(groups, (paths, host) => {
         const rule = new KubernetesIngressRuleCreatePayload();

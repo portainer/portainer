@@ -142,7 +142,7 @@ class KubernetesResourcePoolController {
           return this.KubernetesIngressService.create(ingress);
         } else if (c.WasSelected === true && c.Selected === false) {
           return this.KubernetesIngressService.delete(c);
-        } else if (c.Selected === true) {
+        } else if (c.WasSelected === true && c.Selected === true) {
           const oldIngress = _.find(this.ingresses, { Name: c.IngressClass.Name });
           const newIngress = KubernetesIngressConverter.resourcePoolIngressClassFormValueToIngress(c);
           newIngress.Paths = angular.copy(oldIngress.Paths);
