@@ -139,7 +139,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
     };
 
     $scope.addVolume = function () {
-      $scope.formValues.Volumes.push({ Source: '', Target: '', ReadOnly: false, Type: 'volume' });
+      $scope.formValues.Volumes.push({ Source: null, Target: '', ReadOnly: false, Type: 'volume' });
     };
 
     $scope.removeVolume = function (index) {

@@ -201,7 +201,7 @@ angular.module('portainer.docker').controller('ServiceController', [
       }
     };
     $scope.addMount = function addMount(service) {
-      service.ServiceMounts.push({ Type: 'volume', Source: '', Target: '', ReadOnly: false });
+      service.ServiceMounts.push({ Type: 'volume', Source: null, Target: '', ReadOnly: false });
       updateServiceArray(service, 'ServiceMounts', service.ServiceMounts);
     };
     $scope.removeMount = function removeMount(service, index) {
