@@ -367,14 +367,16 @@ class KubernetesCreateApplicationController {
     const publishedPort = this.formValues.PublishedPorts[index];
     const ingress = _.find(this.filteredIngresses, { Name: publishedPort.IngressName });
     publishedPort.IngressHost = ingress.Host;
+    this.onChangePublishedPorts();
   }
 
   onChangePortMappingIngressRoute() {
     const state = this.state.duplicates.publishedPorts.ingressRoutes;
+
     if (this.formValues.PublishingType === KubernetesApplicationPublishingTypes.INGRESS) {
-      const newRoutes = _.map(this.formValues.PublishedPorts, (p) => (p.IsNew ? p.IngressRoute : undefined));
-      const toDelRoutes = _.map(this.formValues.PublishedPorts, (p) => (p.NeedsDeletion ? p.IngressRoute : undefined));
-      const allRoutes = _.flatMapDeep(this.ingresses, (c) => _.map(c.Paths, 'Path'));
+      const newRoutes = _.map(this.formValues.PublishedPorts, (p) => (p.IsNew && p.IngressRoute ? (p.IngressHost || p.IngressName) + p.IngressRoute : undefined));
+      const toDelRoutes = _.map(this.formValues.PublishedPorts, (p) => (p.NeedsDeletion && p.IngressRoute ? (p.IngressHost || p.IngressName) + p.IngressRoute : undefined));
+      const allRoutes = _.flatMap(this.ingresses, (i) => _.map(i.Paths, (p) => (p.Host || i.Name) + p.Path));
       const duplicates = KubernetesFormValidationHelper.getDuplicates(newRoutes);
       _.forEach(newRoutes, (route, idx) => {
         if (_.includes(allRoutes, route) && !_.includes(toDelRoutes, route)) {

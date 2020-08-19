@@ -100,7 +100,7 @@ class KubernetesIngressService {
   async deleteAsync(ingress) {
     try {
       const params = new KubernetesCommonParams();
-      params.id = ingress.Name;
+      params.id = ingress.IngressClass.Name;
       const namespace = ingress.Namespace;
       await this.KubernetesIngresses(namespace).delete(params).$promise;
     } catch (err) {
