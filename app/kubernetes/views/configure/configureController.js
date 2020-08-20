@@ -79,6 +79,10 @@ class KubernetesConfigureController {
     }
     this.onChangeIngressClass();
   }
+
+  hasTraefikIngress() {
+    return _.find(this.formValues.IngressClasses, { Type: this.IngressClassTypes.TRAEFIK });
+  }
   /* #endregion */
 
   /* #region  CONFIGURE */
