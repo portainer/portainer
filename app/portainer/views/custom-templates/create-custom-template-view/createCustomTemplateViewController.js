@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
 
 class CreateCustomTemplateViewController {
@@ -29,6 +30,7 @@ class CreateCustomTemplateViewController {
       fromStack: false,
       loading: true,
     };
+    this.templates = [];
 
     this.createCustomTemplate = this.createCustomTemplate.bind(this);
     this.createCustomTemplateAsync = this.createCustomTemplateAsync.bind(this);
@@ -73,7 +75,7 @@ class CreateCustomTemplateViewController {
       this.Notifications.success('Custom template successfully created');
       this.$state.go('docker.templates.custom');
     } catch (err) {
-      this.Notifications.error('Deployment error', err, 'Unable to create custom template');
+      this.Notifications.error('Failure', err, 'A template with the same name already exists');
     } finally {
       this.state.actionInProgress = false;
     }
@@ -84,6 +86,13 @@ class CreateCustomTemplateViewController {
 
     if (method === 'editor' && this.formValues.FileContent === '') {
       this.state.formValidationError = 'Template file content must not be empty';
+      return false;
+    }
+
+    const title = this.formValues.Title;
+    const isNotUnique = _.some(this.templates, (template) => template.Title === title);
+    if (isNotUnique) {
+      this.state.formValidationError = 'A template with the same name already exists';
       return false;
     }
 
@@ -143,6 +152,12 @@ class CreateCustomTemplateViewController {
     this.formValues.FileContent = fileContent;
     if (type) {
       this.formValues.Type = +type;
+    }
+
+    try {
+      this.templates = await this.CustomTemplateService.customTemplates();
+    } catch (err) {
+      this.Notifications.error('Failure loading', err, 'Failed loading custom templates');
     }
 
     this.state.loading = false;
