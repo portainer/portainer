@@ -52,10 +52,8 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
 	}
 
-	for _, stack := range stacks {
-		if strings.EqualFold(stack.Name, payload.Name) {
-			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", errStackAlreadyExists}
-		}
+	if !handler.stackNameIsUnique(payload.Name, endpoint.ID, stacks) {
+		return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", errStackAlreadyExists}
 	}
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
@@ -138,10 +136,8 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
 	}
 
-	for _, stack := range stacks {
-		if strings.EqualFold(stack.Name, payload.Name) {
-			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", errStackAlreadyExists}
-		}
+	if !handler.stackNameIsUnique(payload.Name, endpoint.ID, stacks) {
+		return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", errStackAlreadyExists}
 	}
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
@@ -234,10 +230,8 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
 	}
 
-	for _, stack := range stacks {
-		if strings.EqualFold(stack.Name, payload.Name) {
-			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", errStackAlreadyExists}
-		}
+	if !handler.stackNameIsUnique(payload.Name, endpoint.ID, stacks) {
+		return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", errStackAlreadyExists}
 	}
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()

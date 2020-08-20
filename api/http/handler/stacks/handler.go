@@ -3,6 +3,7 @@ package stacks
 import (
 	"errors"
 	"net/http"
+	"strings"
 	"sync"
 
 	"github.com/gorilla/mux"
@@ -13,7 +14,7 @@ import (
 )
 
 var (
-	errStackAlreadyExists = errors.New("A stack already exists with this name")
+	errStackAlreadyExists = errors.New("A stack with this name already exists")
 	errStackNotExternal   = errors.New("Not an external stack")
 )
 
@@ -91,4 +92,13 @@ func (handler *Handler) userCanCreateStack(securityContext *security.RestrictedR
 	}
 
 	return handler.userIsAdminOrEndpointAdmin(user, endpointID)
+}
+
+func (handler *Handler) stackNameIsUnique(name string, endpointID portainer.EndpointID, stacks []portainer.Stack) bool {
+	for _, stack := range stacks {
+		if stack.EndpointID == endpointID && strings.EqualFold(stack.Name, name) {
+			return false
+		}
+	}
+	return true
 }
