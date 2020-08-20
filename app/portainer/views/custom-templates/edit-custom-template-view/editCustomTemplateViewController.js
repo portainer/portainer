@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
 import { ResourceControlViewModel } from 'Portainer/models/resourceControl/resourceControl';
 
@@ -10,6 +12,7 @@ class EditCustomTemplateViewController {
     this.state = {
       formValidationError: '',
     };
+    this.templates = [];
 
     this.getTemplate = this.getTemplate.bind(this);
     this.getTemplateAsync = this.getTemplateAsync.bind(this);
@@ -41,6 +44,14 @@ class EditCustomTemplateViewController {
 
     if (!this.formValues.FileContent) {
       this.state.formValidationError = 'Template file content must not be empty';
+      return false;
+    }
+
+    const title = this.formValues.Title;
+    const id = this.$state.params.id;
+    const isNotUnique = _.some(this.templates, (template) => template.Title === title && template.Id != id);
+    if (isNotUnique) {
+      this.state.formValidationError = `A template with the name ${title} already exists`;
       return false;
     }
 
@@ -85,8 +96,14 @@ class EditCustomTemplateViewController {
     this.formValues.fileContent = cm.getValue();
   }
 
-  $onInit() {
+  async $onInit() {
     this.getTemplate();
+
+    try {
+      this.templates = await this.CustomTemplateService.customTemplates();
+    } catch (err) {
+      this.Notifications.error('Failure loading', err, 'Failed loading custom templates');
+    }
   }
 }
 
