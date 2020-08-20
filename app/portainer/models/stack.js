@@ -13,6 +13,9 @@ export function StackViewModel(data) {
   }
   this.External = false;
   this.Status = data.Status;
+  if (this.Status === 2) {
+    this.Name = `stopped_${this.Name}`;
+  }
 }
 
 export function ExternalStackViewModel(name, type) {
