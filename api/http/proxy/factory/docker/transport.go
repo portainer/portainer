@@ -156,8 +156,14 @@ func (transport *Transport) proxyAgentRequest(r *http.Request) (*http.Response, 
 			return transport.administratorOperation(r)
 		}
 
+		agentTargetHeader := r.Header.Get(portainer.PortainerAgentTargetHeader)
+		resourceID, err := transport.getVolumeResourceID(agentTargetHeader, volumeIDParameter[0])
+		if err != nil {
+			return nil, err
+		}
+
 		// volume browser request
-		return transport.restrictedResourceOperation(r, volumeIDParameter[0], portainer.VolumeResourceControl, true)
+		return transport.restrictedResourceOperation(r, resourceID, portainer.VolumeResourceControl, true)
 	}
 
 	return transport.executeDockerRequest(r)
