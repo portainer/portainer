@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 angular.module('portainer.app').controller('StackController', [
   '$async',
   '$q',
@@ -220,7 +222,15 @@ angular.module('portainer.app').controller('StackController', [
     async function startStackAsync() {
       $scope.state.actionInProgress = true;
       const id = $scope.stack.Id;
+      const endpointMode = $scope.applicationState.endpoint.mode;
+      const endpointId = EndpointProvider.endpointID();
+
       try {
+        const stacks = await StackService.stacks(true, endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER', endpointId);
+        const nameCollision = _.some(stacks, (stack) => stack.Id !== id && stack.Name === $scope.stack.Name.replace('stopped_', ''));
+        if (nameCollision) {
+          throw { msg: 'Another stack with the same name exists', err: 'Another stack with the same name exists' };
+        }
         await StackService.start(id);
         $state.reload();
       } catch (err) {
