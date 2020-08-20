@@ -295,6 +295,10 @@ class KubernetesApplicationController {
         this.formValues.SelectedRevision = _.find(this.application.Revisions, { revision: this.application.CurrentRevision.revision });
       }
 
+      this.state.useIngress = _.find(application.PublishedPorts, (p) => {
+        return this.portHasIngressRules(p);
+      });
+
       this.placements = computePlacements(nodes, this.application);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve application details');
@@ -322,6 +326,7 @@ class KubernetesApplicationController {
       },
       eventWarningCount: 0,
       expandedNote: false,
+      useIngress: false,
     };
 
     this.state.activeTab = this.LocalStorage.getActiveTab('application');
