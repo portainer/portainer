@@ -3,12 +3,12 @@ import * as JsonPatch from 'fast-json-patch';
 
 import { KubernetesServiceCreatePayload } from 'Kubernetes/models/service/payloads';
 import {
-  KubernetesPortainerApplicationStackNameLabel,
+  KubernetesApplicationPublishingTypes,
   KubernetesPortainerApplicationNameLabel,
   KubernetesPortainerApplicationOwnerLabel,
+  KubernetesPortainerApplicationStackNameLabel,
 } from 'Kubernetes/models/application/models';
-import { KubernetesServiceHeadlessClusterIP, KubernetesService, KubernetesServicePort, KubernetesServiceTypes } from 'Kubernetes/models/service/models';
-import { KubernetesApplicationPublishingTypes } from 'Kubernetes/models/application/models';
+import { KubernetesService, KubernetesServiceHeadlessClusterIP, KubernetesServicePort, KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import KubernetesServiceHelper from 'Kubernetes/helpers/serviceHelper';
 
 function _publishedPortToServicePort(formValues, publishedPort, type) {
@@ -42,7 +42,7 @@ class KubernetesServiceConverter {
     res.StackName = formValues.StackName ? formValues.StackName : formValues.Name;
     res.ApplicationOwner = formValues.ApplicationOwner;
     res.ApplicationName = formValues.Name;
-    if (formValues.PublishingType === KubernetesApplicationPublishingTypes.CLUSTER || formValues.PublishingType === KubernetesApplicationPublishingTypes.INGRESS) {
+    if (formValues.PublishingType === KubernetesApplicationPublishingTypes.CLUSTER) {
       res.Type = KubernetesServiceTypes.NODE_PORT;
     } else if (formValues.PublishingType === KubernetesApplicationPublishingTypes.LOAD_BALANCER) {
       res.Type = KubernetesServiceTypes.LOAD_BALANCER;

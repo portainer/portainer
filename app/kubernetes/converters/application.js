@@ -7,6 +7,7 @@ import {
   KubernetesApplicationDataAccessPolicies,
   KubernetesApplicationDeploymentTypes,
   KubernetesApplicationPersistedFolder,
+  KubernetesApplicationPort,
   KubernetesApplicationPublishingTypes,
   KubernetesApplicationTypes,
   KubernetesPortainerApplicationNameLabel,
@@ -25,7 +26,6 @@ import KubernetesStatefulSetConverter from 'Kubernetes/converters/statefulSet';
 import KubernetesServiceConverter from 'Kubernetes/converters/service';
 import KubernetesPersistentVolumeClaimConverter from 'Kubernetes/converters/persistentVolumeClaim';
 import PortainerError from 'Portainer/error';
-import { KubernetesApplicationPort } from 'Kubernetes/models/application/models';
 import { KubernetesIngressHelper } from 'Kubernetes/ingress/helper';
 
 function _apiPortsToPublishedPorts(pList, pRefs) {
@@ -270,9 +270,9 @@ class KubernetesApplicationConverter {
     const isIngress = _.filter(res.PublishedPorts, (p) => p.IngressName).length;
     if (app.ServiceType === KubernetesServiceTypes.LOAD_BALANCER) {
       res.PublishingType = KubernetesApplicationPublishingTypes.LOAD_BALANCER;
-    } else if (app.ServiceType === KubernetesServiceTypes.NODE_PORT && !isIngress) {
+    } else if (app.ServiceType === KubernetesServiceTypes.NODE_PORT) {
       res.PublishingType = KubernetesApplicationPublishingTypes.CLUSTER;
-    } else if (app.ServiceType === KubernetesServiceTypes.NODE_PORT && isIngress) {
+    } else if (app.ServiceType === KubernetesServiceTypes.CLUSTER_IP && isIngress) {
       res.PublishingType = KubernetesApplicationPublishingTypes.INGRESS;
     } else {
       res.PublishingType = KubernetesApplicationPublishingTypes.INTERNAL;
