@@ -7,6 +7,7 @@ import { KubernetesResourcePoolFormValues, KubernetesResourcePoolIngressClassAnn
 import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import { KubernetesFormValueDuplicate } from 'Kubernetes/models/application/formValues';
+import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
 
 class KubernetesCreateResourcePoolController {
   /* #region  CONSTRUCTOR */
@@ -21,6 +22,8 @@ class KubernetesCreateResourcePoolController {
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesIngressService = KubernetesIngressService;
+
+    this.IngressClassTypes = KubernetesIngressClassTypes;
 
     this.onInit = this.onInit.bind(this);
     this.createResourcePoolAsync = this.createResourcePoolAsync.bind(this);
