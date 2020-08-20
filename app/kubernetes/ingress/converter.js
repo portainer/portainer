@@ -2,9 +2,10 @@ import * as _ from 'lodash-es';
 import * as JsonPatch from 'fast-json-patch';
 
 import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
-import { KubernetesIngressRule, KubernetesIngress } from './models';
+import { KubernetesResourcePoolIngressClassAnnotationFormValue, KubernetesResourcePoolIngressClassFormValue } from 'Kubernetes/models/resource-pool/formValues';
+import { KubernetesIngress, KubernetesIngressRule } from './models';
 import { KubernetesIngressCreatePayload, KubernetesIngressRuleCreatePayload, KubernetesIngressRulePathCreatePayload } from './payloads';
-import { KubernetesIngressClassAnnotation, KubernetesIngressClassMandatoryAnnotations } from './constants';
+import { KubernetesIngressClassAnnotation, KubernetesIngressClassRewriteTargetAnnotations } from './constants';
 
 export class KubernetesIngressConverter {
   // TODO: refactor @LP
@@ -64,17 +65,68 @@ export class KubernetesIngressConverter {
     return ingresses;
   }
 
+  /**
+   *
+   * @param {KubernetesResourcePoolIngressClassFormValue} formValues
+   */
+  static resourcePoolIngressClassFormValueToIngress(formValues) {
+    const res = new KubernetesIngress();
+    res.Name = formValues.IngressClass.Name;
+    res.Namespace = formValues.Namespace;
+    const pairs = _.map(formValues.Annotations, (a) => [a.Key, a.Value]);
+    res.Annotations = _.fromPairs(pairs);
+    if (formValues.RewriteTarget) {
+      _.extend(res.Annotations, KubernetesIngressClassRewriteTargetAnnotations[formValues.IngressClass.Type]);
+    }
+    res.Annotations[KubernetesIngressClassAnnotation] = formValues.IngressClass.Name;
+    res.Host = formValues.Host;
+    return res;
+  }
+
+  /**
+   *
+   * @param {KubernetesIngressClass} ics Ingress classes (saved in Portainer DB)
+   * @param {KubernetesIngress} ingresses Existing Kubernetes ingresses. Must be empty for RP CREATE VIEW and passed for RP EDIT VIEW
+   */
+  static ingressClassesToFormValues(ics, ingresses) {
+    const res = _.map(ics, (ic) => {
+      const fv = new KubernetesResourcePoolIngressClassFormValue();
+      fv.IngressClass = ic;
+      const ingress = _.find(ingresses, { Name: ic.Name });
+      if (ingress) {
+        fv.Selected = true;
+        fv.WasSelected = true;
+        fv.Host = ingress.Host;
+        const [[rewriteKey]] = _.toPairs(KubernetesIngressClassRewriteTargetAnnotations[ic.Type]);
+        const annotations = _.map(_.toPairs(ingress.Annotations), ([key, value]) => {
+          if (key === rewriteKey) {
+            fv.RewriteTarget = true;
+          } else if (key !== KubernetesIngressClassAnnotation) {
+            const annotation = new KubernetesResourcePoolIngressClassAnnotationFormValue();
+            annotation.Key = key;
+            annotation.Value = value;
+            return annotation;
+          }
+        });
+        fv.Annotations = _.without(annotations, undefined);
+        fv.AdvancedConfig = fv.Annotations.length > 0;
+      }
+      return fv;
+    });
+    return res;
+  }
+
   static createPayload(data) {
     const res = new KubernetesIngressCreatePayload();
     res.metadata.name = data.Name;
     res.metadata.namespace = data.Namespace;
-    res.metadata.annotations = data.Annotations || {};
-    res.metadata.annotations[KubernetesIngressClassAnnotation] = data.IngressClassName;
-    const annotations = KubernetesIngressClassMandatoryAnnotations[data.Name];
-    if (annotations) {
-      _.extend(res.metadata.annotations, annotations);
-    }
+    res.metadata.annotations = data.Annotations;
     if (data.Paths && data.Paths.length) {
+      _.forEach(data.Paths, (p) => {
+        if (p.Host === 'undefined' || p.Host === undefined) {
+          p.Host = '';
+        }
+      });
       const groups = _.groupBy(data.Paths, 'Host');
       const rules = _.map(groups, (paths, host) => {
         const rule = new KubernetesIngressRuleCreatePayload();

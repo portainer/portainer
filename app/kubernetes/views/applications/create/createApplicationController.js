@@ -20,7 +20,7 @@ import {
   KubernetesApplicationPersistedFolderFormValue,
   KubernetesApplicationPublishedPortFormValue,
   KubernetesApplicationPlacementFormValue,
-  KubernetesApplicationFormValidationDuplicate,
+  KubernetesFormValueDuplicate,
 } from 'Kubernetes/models/application/formValues';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import KubernetesApplicationConverter from 'Kubernetes/converters/application';
@@ -367,14 +367,16 @@ class KubernetesCreateApplicationController {
     const publishedPort = this.formValues.PublishedPorts[index];
     const ingress = _.find(this.filteredIngresses, { Name: publishedPort.IngressName });
     publishedPort.IngressHost = ingress.Host;
+    this.onChangePublishedPorts();
   }
 
   onChangePortMappingIngressRoute() {
     const state = this.state.duplicates.publishedPorts.ingressRoutes;
+
     if (this.formValues.PublishingType === KubernetesApplicationPublishingTypes.INGRESS) {
-      const newRoutes = _.map(this.formValues.PublishedPorts, (p) => (p.IsNew ? p.IngressRoute : undefined));
-      const toDelRoutes = _.map(this.formValues.PublishedPorts, (p) => (p.NeedsDeletion ? p.IngressRoute : undefined));
-      const allRoutes = _.flatMapDeep(this.ingresses, (c) => _.map(c.Paths, 'Path'));
+      const newRoutes = _.map(this.formValues.PublishedPorts, (p) => (p.IsNew && p.IngressRoute ? (p.IngressHost || p.IngressName) + p.IngressRoute : undefined));
+      const toDelRoutes = _.map(this.formValues.PublishedPorts, (p) => (p.NeedsDeletion && p.IngressRoute ? (p.IngressHost || p.IngressName) + p.IngressRoute : undefined));
+      const allRoutes = _.flatMap(this.ingresses, (i) => _.map(i.Paths, (p) => (p.Host || i.Name) + p.Path));
       const duplicates = KubernetesFormValidationHelper.getDuplicates(newRoutes);
       _.forEach(newRoutes, (route, idx) => {
         if (_.includes(allRoutes, route) && !_.includes(toDelRoutes, route)) {
@@ -814,7 +816,6 @@ class KubernetesCreateApplicationController {
         actionInProgress: false,
         useLoadBalancer: false,
         useServerMetrics: false,
-        canUseIngress: false,
         sliders: {
           cpu: {
             min: 0,
@@ -834,17 +835,17 @@ class KubernetesCreateApplicationController {
         availableSizeUnits: ['MB', 'GB', 'TB'],
         alreadyExists: false,
         duplicates: {
-          environmentVariables: new KubernetesApplicationFormValidationDuplicate(),
-          persistedFolders: new KubernetesApplicationFormValidationDuplicate(),
-          configurationPaths: new KubernetesApplicationFormValidationDuplicate(),
-          existingVolumes: new KubernetesApplicationFormValidationDuplicate(),
+          environmentVariables: new KubernetesFormValueDuplicate(),
+          persistedFolders: new KubernetesFormValueDuplicate(),
+          configurationPaths: new KubernetesFormValueDuplicate(),
+          existingVolumes: new KubernetesFormValueDuplicate(),
           publishedPorts: {
-            containerPorts: new KubernetesApplicationFormValidationDuplicate(),
-            nodePorts: new KubernetesApplicationFormValidationDuplicate(),
-            ingressRoutes: new KubernetesApplicationFormValidationDuplicate(),
-            loadBalancerPorts: new KubernetesApplicationFormValidationDuplicate(),
+            containerPorts: new KubernetesFormValueDuplicate(),
+            nodePorts: new KubernetesFormValueDuplicate(),
+            ingressRoutes: new KubernetesFormValueDuplicate(),
+            loadBalancerPorts: new KubernetesFormValueDuplicate(),
           },
-          placements: new KubernetesApplicationFormValidationDuplicate(),
+          placements: new KubernetesFormValueDuplicate(),
         },
         isEdit: false,
         params: {

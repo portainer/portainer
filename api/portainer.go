@@ -332,9 +332,8 @@ type (
 	KubernetesConfiguration struct {
 		UseLoadBalancer  bool                           `json:"UseLoadBalancer"`
 		UseServerMetrics bool                           `json:"UseServerMetrics"`
-		UseIngress       bool                           `json:"UseIngress"`
 		StorageClasses   []KubernetesStorageClassConfig `json:"StorageClasses"`
-		IngressClasses   []string                       `json:"IngressClasses"`
+		IngressClasses   []KubernetesIngressClassConfig `json:"IngressClasses"`
 	}
 
 	// KubernetesStorageClassConfig represents a Kubernetes Storage Class configuration
@@ -343,6 +342,12 @@ type (
 		AccessModes          []string `json:"AccessModes"`
 		Provisioner          string   `json:"Provisioner"`
 		AllowVolumeExpansion bool     `json:"AllowVolumeExpansion"`
+	}
+
+	// KubernetesIngressClassConfig represents a Kubernetes Ingress Class configuration
+	KubernetesIngressClassConfig struct {
+		Name string `json:"Name"`
+		Type string `json:"Type"`
 	}
 
 	// LDAPGroupSearchSettings represents settings used to search for groups in a LDAP server

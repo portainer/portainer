@@ -1329,10 +1329,10 @@
                       class="form-control"
                       name="ingress_route_{{ $index }}"
                       ng-model="publishedPort.IngressRoute"
-                      placeholder="foo"
+                      placeholder="route"
                       ng-required="!publishedPort.NeedsDeletion"
                       ng-change="ctrl.onChangePortMappingIngressRoute()"
-                      ng-pattern="/^\/?([a-zA-Z0-9]+[a-zA-Z0-9-/_]*[a-zA-Z0-9]|[a-zA-Z0-9]+)$/"
+                      ng-pattern="/^(\/?[a-zA-Z0-9]+([a-zA-Z0-9-/_]*[a-zA-Z0-9])?|[a-zA-Z0-9]+)|(\/){1}$/"
                       ng-disabled="ctrl.disableLoadBalancerEdit() || ctrl.isEditAndNotNewPublishedPort($index)"
                     />
                   </div>
