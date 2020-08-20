@@ -1,6 +1,7 @@
 package docker
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -155,9 +156,23 @@ func (transport *Transport) proxyAgentRequest(r *http.Request) (*http.Response, 
 		if !found || len(volumeIDParameter) < 1 {
 			return transport.administratorOperation(r)
 		}
+		agentTargetHeader := r.Header.Get(portainer.PortainerAgentTargetHeader)
+
+		dockerClient, err := transport.dockerClientFactory.CreateClient(transport.endpoint, agentTargetHeader)
+		if err != nil {
+			return nil, err
+		}
+		defer dockerClient.Close()
+
+		volume, err := dockerClient.VolumeInspect(context.Background(), volumeIDParameter[0])
+		if err != nil {
+			return nil, err
+		}
+
+		resourceID := volume.Name + volume.CreatedAt
 
 		// volume browser request
-		return transport.restrictedResourceOperation(r, volumeIDParameter[0], portainer.VolumeResourceControl, true)
+		return transport.restrictedResourceOperation(r, resourceID, portainer.VolumeResourceControl, true)
 	}
 
 	return transport.executeDockerRequest(r)
