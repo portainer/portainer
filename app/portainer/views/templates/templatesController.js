@@ -151,7 +151,7 @@ angular.module('portainer.app').controller('TemplatesController', [
           $state.go('docker.stacks');
         })
         .catch(function error(err) {
-          Notifications.warning('Deployment error', err.data.err);
+          Notifications.error('Deployment error', err);
         })
         .finally(function final() {
           $scope.state.actionInProgress = false;
@@ -189,7 +189,7 @@ angular.module('portainer.app').controller('TemplatesController', [
           $state.go('docker.stacks');
         })
         .catch(function error(err) {
-          Notifications.warning('Deployment error', err.data.err);
+          Notifications.error('Deployment error', err);
         })
         .finally(function final() {
           $scope.state.actionInProgress = false;
