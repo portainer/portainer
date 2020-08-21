@@ -33,10 +33,6 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a stack with the specified identifier inside the database", err}
 	}
 
-	if stack.Status == portainer.StackStatusActive {
-		return &httperror.HandlerError{http.StatusBadRequest, "Stack is already active", errors.New("Stack is already active")}
-	}
-
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(stack.EndpointID)
 	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
@@ -60,6 +56,10 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 	}
 	if !access {
 		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", httperrors.ErrResourceAccessDenied}
+	}
+
+	if stack.Status == portainer.StackStatusActive {
+		return &httperror.HandlerError{http.StatusBadRequest, "Stack is already active", errors.New("Stack is already active")}
 	}
 
 	err = handler.startStack(stack, endpoint)
