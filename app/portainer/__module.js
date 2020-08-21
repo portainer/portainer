@@ -85,16 +85,6 @@ angular.module('portainer.app', ['portainer.oauth']).config([
       abstract: true,
     };
 
-    var about = {
-      name: 'portainer.about',
-      url: '/about',
-      views: {
-        'content@': {
-          templateUrl: './views/about/about.html',
-        },
-      },
-    };
-
     var account = {
       name: 'portainer.account',
       url: '/account',
@@ -406,7 +396,6 @@ angular.module('portainer.app', ['portainer.oauth']).config([
     $stateRegistryProvider.register(root);
     $stateRegistryProvider.register(endpointRoot);
     $stateRegistryProvider.register(portainer);
-    $stateRegistryProvider.register(about);
     $stateRegistryProvider.register(account);
     $stateRegistryProvider.register(authentication);
     $stateRegistryProvider.register(logout);
