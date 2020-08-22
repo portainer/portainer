@@ -34,6 +34,7 @@ angular.module('portainer.app').controller('SettingsController', [
       enableEdgeComputeFeatures: false,
       restrictHostNamespaceForRegularUsers: false,
       allowDeviceMappingForRegularUsers: false,
+      allowSysctlSettingForRegularUsers: false,
       allowStackManagementForRegularUsers: false,
       disableContainerCapabilitiesForRegularUsers: false,
       enableTelemetry: false,
@@ -84,6 +85,7 @@ angular.module('portainer.app').controller('SettingsController', [
       settings.EnableEdgeComputeFeatures = $scope.formValues.enableEdgeComputeFeatures;
       settings.AllowHostNamespaceForRegularUsers = !$scope.formValues.restrictHostNamespaceForRegularUsers;
       settings.AllowDeviceMappingForRegularUsers = !$scope.formValues.disableDeviceMappingForRegularUsers;
+      settings.AllowSysctlSettingForRegularUsers = !$scope.formValues.disableSysctlSettingForRegularUsers;
       settings.AllowStackManagementForRegularUsers = !$scope.formValues.disableStackManagementForRegularUsers;
       settings.AllowContainerCapabilitiesForRegularUsers = !$scope.formValues.disableContainerCapabilitiesForRegularUsers;
       settings.EnableTelemetry = $scope.formValues.enableTelemetry;
@@ -103,6 +105,7 @@ angular.module('portainer.app').controller('SettingsController', [
           StateManager.updateAllowHostNamespaceForRegularUsers(settings.AllowHostNamespaceForRegularUsers);
           StateManager.updateEnableEdgeComputeFeatures(settings.EnableEdgeComputeFeatures);
           StateManager.updateAllowDeviceMappingForRegularUsers(settings.AllowDeviceMappingForRegularUsers);
+          StateManager.updateAllowSysctlSettingForRegularUsers(settings.AllowSysctlSettingForRegularUsers);
           StateManager.updateAllowStackManagementForRegularUsers(settings.AllowStackManagementForRegularUsers);
           StateManager.updateAllowContainerCapabilitiesForRegularUsers(settings.AllowContainerCapabilitiesForRegularUsers);
           StateManager.updateAllowPrivilegedModeForRegularUsers(settings.AllowPrivilegedModeForRegularUsers);
@@ -134,6 +137,7 @@ angular.module('portainer.app').controller('SettingsController', [
           $scope.formValues.enableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
           $scope.formValues.restrictHostNamespaceForRegularUsers = !settings.AllowHostNamespaceForRegularUsers;
           $scope.formValues.disableDeviceMappingForRegularUsers = !settings.AllowDeviceMappingForRegularUsers;
+          $scope.formValues.disableSysctlSettingForRegularUsers = !settings.AllowSysctlSettingForRegularUsers;
           $scope.formValues.disableStackManagementForRegularUsers = !settings.AllowStackManagementForRegularUsers;
           $scope.formValues.disableContainerCapabilitiesForRegularUsers = !settings.AllowContainerCapabilitiesForRegularUsers;
           $scope.formValues.enableTelemetry = settings.EnableTelemetry;

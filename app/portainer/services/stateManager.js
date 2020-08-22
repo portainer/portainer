@@ -96,6 +96,11 @@ angular.module('portainer.app').factory('StateManager', [
       LocalStorage.storeApplicationState(state.application);
     };
 
+    manager.updateAllowSysctlSettingForRegularUsers = function updateAllowSysctlSettingForRegularUsers(allowSysctlSettingForRegularUsers) {
+      state.application.allowSysctlSettingForRegularUsers = allowSysctlSettingForRegularUsers;
+      LocalStorage.storeApplicationState(state.application);
+    };
+
     manager.updateAllowStackManagementForRegularUsers = function updateAllowStackManagementForRegularUsers(allowStackManagementForRegularUsers) {
       state.application.allowStackManagementForRegularUsers = allowStackManagementForRegularUsers;
       LocalStorage.storeApplicationState(state.application);
@@ -131,6 +136,7 @@ angular.module('portainer.app').factory('StateManager', [
       state.application.enableVolumeBrowserForNonAdminUsers = settings.AllowVolumeBrowserForRegularUsers;
       state.application.enableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
       state.application.allowDeviceMappingForRegularUsers = settings.AllowDeviceMappingForRegularUsers;
+      state.application.allowSysctlSettingForRegularUsers = settings.AllowSysctlSettingForRegularUsers;
       state.application.allowStackManagementForRegularUsers = settings.AllowStackManagementForRegularUsers;
       state.application.allowContainerCapabilitiesForRegularUsers = settings.AllowContainerCapabilitiesForRegularUsers;
       state.application.allowBindMountsForRegularUsers = settings.AllowBindMountsForRegularUsers;

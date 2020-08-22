@@ -525,6 +525,7 @@ type (
 		AllowVolumeBrowserForRegularUsers         bool                 `json:"AllowVolumeBrowserForRegularUsers"`
 		AllowHostNamespaceForRegularUsers         bool                 `json:"AllowHostNamespaceForRegularUsers"`
 		AllowDeviceMappingForRegularUsers         bool                 `json:"AllowDeviceMappingForRegularUsers"`
+		AllowSysctlSettingForRegularUsers         bool                 `json:"AllowSysctlSettingForRegularUsers"`
 		AllowStackManagementForRegularUsers       bool                 `json:"AllowStackManagementForRegularUsers"`
 		AllowContainerCapabilitiesForRegularUsers bool                 `json:"AllowContainerCapabilitiesForRegularUsers"`
 		SnapshotInterval                          string               `json:"SnapshotInterval"`

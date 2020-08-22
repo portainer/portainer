@@ -10,6 +10,7 @@ func (m *Migrator) updateSettingsToDB24() error {
 
 	legacySettings.AllowHostNamespaceForRegularUsers = true
 	legacySettings.AllowDeviceMappingForRegularUsers = true
+	legacySettings.AllowSysctlSettingForRegularUsers = true
 	legacySettings.AllowStackManagementForRegularUsers = true
 
 	return m.settingsService.UpdateSettings(legacySettings)

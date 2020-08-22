@@ -155,6 +155,16 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
+              <label for="toggle_disableSysctlSettingForRegularUsers" class="control-label text-left">
+                Disable sysctl settings for non-administrators
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" name="toggle_disableSysctlSettingForRegularUsers" ng-model="formValues.disableSysctlSettingForRegularUsers" /><i></i>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
               <label for="toggle_disableContainerCapabilitiesForRegularUsers" class="control-label text-left">
                 Disable container capabilities for non-administrators
               </label>

@@ -46,6 +46,7 @@ func (store *Store) Init() error {
 			AllowVolumeBrowserForRegularUsers:         false,
 			AllowHostNamespaceForRegularUsers:         true,
 			AllowDeviceMappingForRegularUsers:         true,
+			AllowSysctlSettingForRegularUsers:         true,
 			AllowStackManagementForRegularUsers:       true,
 			AllowContainerCapabilitiesForRegularUsers: true,
 			EnableHostManagementFeatures:              false,
