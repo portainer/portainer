@@ -676,6 +676,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
       $scope.isAdmin = Authentication.isAdmin();
       $scope.showDeviceMapping = await shouldShowDevices();
+      $scope.showSysctls = await shouldShowSysctls();
       $scope.areContainerCapabilitiesEnabled = await checkIfContainerCapabilitiesEnabled();
       $scope.isAdminOrEndpointAdmin = Authentication.isAdmin();
 
@@ -966,6 +967,12 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       const { allowDeviceMappingForRegularUsers } = $scope.applicationState.application;
 
       return allowDeviceMappingForRegularUsers || Authentication.isAdmin();
+    }
+
+    async function shouldShowSysctls() {
+      const { allowSysctlSettingForRegularUsers } = $scope.applicationState.application;
+
+      return allowSysctlSettingForRegularUsers || Authentication.isAdmin();
     }
 
     async function checkIfContainerCapabilitiesEnabled() {

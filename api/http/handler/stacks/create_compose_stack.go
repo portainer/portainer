@@ -343,6 +343,7 @@ func (handler *Handler) deployComposeStack(config *composeStackDeploymentConfig)
 		!settings.AllowPrivilegedModeForRegularUsers ||
 		!settings.AllowHostNamespaceForRegularUsers ||
 		!settings.AllowDeviceMappingForRegularUsers ||
+		!settings.AllowSysctlSettingForRegularUsers ||
 		!settings.AllowContainerCapabilitiesForRegularUsers) &&
 		!isAdminOrEndpointAdmin {
 

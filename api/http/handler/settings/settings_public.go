@@ -17,6 +17,7 @@ type publicSettingsResponse struct {
 	AllowVolumeBrowserForRegularUsers         bool                           `json:"AllowVolumeBrowserForRegularUsers"`
 	AllowHostNamespaceForRegularUsers         bool                           `json:"AllowHostNamespaceForRegularUsers"`
 	AllowDeviceMappingForRegularUsers         bool                           `json:"AllowDeviceMappingForRegularUsers"`
+	AllowSysctlSettingForRegularUsers         bool                           `json:"AllowSysctlSettingForRegularUsers"`
 	AllowStackManagementForRegularUsers       bool                           `json:"AllowStackManagementForRegularUsers"`
 	AllowContainerCapabilitiesForRegularUsers bool                           `json:"AllowContainerCapabilitiesForRegularUsers"`
 	EnableHostManagementFeatures              bool                           `json:"EnableHostManagementFeatures"`
@@ -40,6 +41,7 @@ func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *
 		AllowVolumeBrowserForRegularUsers:         settings.AllowVolumeBrowserForRegularUsers,
 		AllowHostNamespaceForRegularUsers:         settings.AllowHostNamespaceForRegularUsers,
 		AllowDeviceMappingForRegularUsers:         settings.AllowDeviceMappingForRegularUsers,
+		AllowSysctlSettingForRegularUsers:         settings.AllowSysctlSettingForRegularUsers,
 		AllowStackManagementForRegularUsers:       settings.AllowStackManagementForRegularUsers,
 		AllowContainerCapabilitiesForRegularUsers: settings.AllowContainerCapabilitiesForRegularUsers,
 		EnableHostManagementFeatures:              settings.EnableHostManagementFeatures,

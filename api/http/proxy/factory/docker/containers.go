@@ -160,6 +160,7 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 			Privileged bool          `json:"Privileged"`
 			PidMode    string        `json:"PidMode"`
 			Devices    []interface{} `json:"Devices"`
+			Sysctls    map[string]interface{} `json:"Sysctls"`
 			CapAdd     []string      `json:"CapAdd"`
 			CapDrop    []string      `json:"CapDrop"`
 			Binds      []string      `json:"Binds"`
@@ -207,6 +208,10 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 
 		if !settings.AllowDeviceMappingForRegularUsers && len(partialContainer.HostConfig.Devices) > 0 {
 			return forbiddenResponse, errors.New("forbidden to use device mapping")
+		}
+
+		if !settings.AllowSysctlSettingForRegularUsers && len(partialContainer.HostConfig.Sysctls) > 0 {
+			return forbiddenResponse, errors.New("forbidden to use sysctl settings")
 		}
 
 		if !settings.AllowContainerCapabilitiesForRegularUsers && (len(partialContainer.HostConfig.CapAdd) > 0 || len(partialContainer.HostConfig.CapDrop) > 0) {

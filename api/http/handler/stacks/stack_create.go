@@ -174,6 +174,10 @@ func (handler *Handler) isValidStackFile(stackFileContent []byte, settings *port
 			return errors.New("device mapping disabled for non administrator users")
 		}
 
+		if !settings.AllowSysctlSettingForRegularUsers && service.Sysctls != nil && len(service.Sysctls) > 0 {
+			return errors.New("sysctl setting disabled for non administrator users")
+		}
+
 		if !settings.AllowContainerCapabilitiesForRegularUsers && (len(service.CapAdd) > 0 || len(service.CapDrop) > 0) {
 			return errors.New("container capabilities disabled for non administrator users")
 		}

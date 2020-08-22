@@ -102,6 +102,7 @@ angular.module('portainer.docker').controller('ContainerController', [
             allowContainerCapabilitiesForRegularUsers,
             allowHostNamespaceForRegularUsers,
             allowDeviceMappingForRegularUsers,
+            allowSysctlSettingForRegularUsers,
             allowBindMountsForRegularUsers,
             allowPrivilegedModeForRegularUsers,
           } = appState.application;
@@ -110,6 +111,7 @@ angular.module('portainer.docker').controller('ContainerController', [
             !allowContainerCapabilitiesForRegularUsers ||
             !allowBindMountsForRegularUsers ||
             !allowDeviceMappingForRegularUsers ||
+            !allowSysctlSettingForRegularUsers ||
             !allowHostNamespaceForRegularUsers ||
             !allowPrivilegedModeForRegularUsers;
 

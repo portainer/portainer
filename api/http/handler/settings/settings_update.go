@@ -24,6 +24,7 @@ type settingsUpdatePayload struct {
 	AllowHostNamespaceForRegularUsers         *bool
 	AllowVolumeBrowserForRegularUsers         *bool
 	AllowDeviceMappingForRegularUsers         *bool
+	AllowSysctlSettingForRegularUsers         *bool
 	AllowStackManagementForRegularUsers       *bool
 	AllowContainerCapabilitiesForRegularUsers *bool
 	EnableHostManagementFeatures              *bool
@@ -160,6 +161,10 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.AllowDeviceMappingForRegularUsers != nil {
 		settings.AllowDeviceMappingForRegularUsers = *payload.AllowDeviceMappingForRegularUsers
+	}
+
+	if payload.AllowSysctlSettingForRegularUsers != nil {
+		settings.AllowSysctlSettingForRegularUsers = *payload.AllowSysctlSettingForRegularUsers
 	}
 
 	if payload.EnableTelemetry != nil {
