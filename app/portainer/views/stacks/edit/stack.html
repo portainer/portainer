@@ -38,6 +38,7 @@
                 </div>
                 <div class="form-group">
                   {{ stackName }}
+                  <span ng-if="stack.Status == 2" style="margin-left: 10px;" class="label label-warning image-tag space-left">Stopped</span>
 
                   <a
                     ng-if="!state.externalStack && stackFileContent"
