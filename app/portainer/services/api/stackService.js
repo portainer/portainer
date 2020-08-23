@@ -169,10 +169,7 @@ angular.module('portainer.app').factory('StackService', [
           });
           var externalStacks = data.externalStacks;
 
-          var result = _.unionWith(stacks, externalStacks, function (a, b) {
-            return a.Name === b.Name;
-          });
-          deferred.resolve(result);
+          deferred.resolve(concatStacksAndExternalStacks(stacks, externalStacks));
         })
         .catch(function error(err) {
           deferred.reject({ msg: 'Unable to retrieve stacks', err: err });
@@ -201,10 +198,7 @@ angular.module('portainer.app').factory('StackService', [
           });
           var externalStacks = data.externalStacks;
 
-          var result = _.unionWith(stacks, externalStacks, function (a, b) {
-            return a.Name === b.Name;
-          });
-          deferred.resolve(result);
+          deferred.resolve(concatStacksAndExternalStacks(stacks, externalStacks));
         })
         .catch(function error(err) {
           deferred.reject({ msg: 'Unable to retrieve stacks', err: err });
@@ -362,3 +356,17 @@ angular.module('portainer.app').factory('StackService', [
     return service;
   },
 ]);
+
+function concatStacksAndExternalStacks(stacks, externalStacks) {
+  return _.unionWith(stacks, externalStacks, function (a, b) {
+    // if both external or both internal - they're not identical
+    if ((a.External && b.External) || (!a.External && !b.External)) {
+      return false;
+    }
+    // if ones is internal and stopped, stacks are not identical
+    if ((!a.External && a.Status === 2) || (!b.External && b.Status === 2)) {
+      return false;
+    }
+    return a.Name === b.Name;
+  });
+}

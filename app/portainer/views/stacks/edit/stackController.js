@@ -226,10 +226,11 @@ angular.module('portainer.app').controller('StackController', [
       const endpointId = EndpointProvider.endpointID();
 
       try {
+        const name = $scope.stack.Name;
         const stacks = await StackService.stacks(true, endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER', endpointId);
-        const nameCollision = _.some(stacks, (stack) => stack.Id !== id && stack.Name === $scope.stack.Name.replace('stopped_', ''));
+        const nameCollision = _.some(stacks, (stack) => stack.Id !== id && stack.Name === name);
         if (nameCollision) {
-          throw { msg: 'Another stack with the same name exists', err: 'Another stack with the same name exists' };
+          throw { msg: `Another stack with the name ${name} exists`, err: `Another stack with the name ${name} exists` };
         }
         await StackService.start(id);
         $state.reload();
@@ -258,6 +259,7 @@ angular.module('portainer.app').controller('StackController', [
           var stack = data.stack;
           $scope.groups = data.groups;
           $scope.stack = stack;
+          $scope.stackName = stack.Name;
 
           let resourcesPromise = Promise.resolve({});
           if (stack.Status === 1) {
@@ -333,7 +335,9 @@ angular.module('portainer.app').controller('StackController', [
       $scope.containers = resources.containers;
     }
 
-    function loadExternalStack(name) {
+    function loadExternalStack() {
+      const stackName = $transition$.params().name;
+      $scope.stackName = stackName;
       var stackType = $transition$.params().type;
       if (!stackType || (stackType !== '1' && stackType !== '2')) {
         Notifications.error('Failure', null, 'Invalid type URL parameter.');
@@ -370,14 +374,12 @@ angular.module('portainer.app').controller('StackController', [
     }
 
     function initView() {
-      var stackName = $transition$.params().name;
-      $scope.stackName = stackName;
       var external = $transition$.params().external;
       $scope.currentEndpointId = EndpointProvider.endpointID();
 
       if (external === 'true') {
         $scope.state.externalStack = true;
-        loadExternalStack(stackName);
+        loadExternalStack();
       } else {
         var stackId = $transition$.params().id;
         loadStack(stackId);
