@@ -64,7 +64,7 @@ angular.module('portainer.azure').controller('AzureCreateContainerInstanceContro
         return 'Image is required';
       }
 
-      if (!model.Ports || !model.Ports.length || model.Ports.some((port) => !port.host || !port.container)) {
+      if (!model.Ports || !model.Ports.length || model.Ports.every((port) => !port.host || !port.container)) {
         return 'At least one port binding is required';
       }
 

@@ -39,6 +39,9 @@ export function CreateContainerGroupRequest(model) {
   var addressPorts = [];
   for (var i = 0; i < model.Ports.length; i++) {
     var binding = model.Ports[i];
+    if (!binding.container || !binding.host) {
+      continue;
+    }
 
     containerPorts.push({
       port: binding.container,
