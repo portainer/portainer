@@ -287,7 +287,9 @@
                 type="button"
                 class="btn btn-primary btn-sm"
                 ng-disabled="state.actionInProgress
+              || (state.Method === 'editor' && !formValues.StackFileContent)
               || (state.Method === 'upload' && !formValues.StackFile)
+              || (state.Method === 'template' && (!formValues.StackFileContent || !selectedTemplate))
               || (state.Method === 'repository' && ((!formValues.RepositoryURL || !formValues.ComposeFilePathInRepository) || (formValues.RepositoryAuthentication && (!formValues.RepositoryUsername || !formValues.RepositoryPassword))))
               || !formValues.Name"
                 ng-click="deployStack()"
