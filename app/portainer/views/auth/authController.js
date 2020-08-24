@@ -147,6 +147,7 @@ class AuthenticationController {
   }
 
   async postLoginSteps() {
+    await this.StateManager.initialize();
     await this.checkForEndpointsAsync();
     await this.checkForLatestVersionAsync();
   }

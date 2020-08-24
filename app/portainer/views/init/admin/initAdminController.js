@@ -32,8 +32,10 @@ angular.module('portainer.app').controller('InitAdminController', [
           return Authentication.login(username, password);
         })
         .then(function success() {
-          StateManager.updateEnableTelemetry($scope.formValues.enableTelemetry);
           return SettingsService.update({ enableTelemetry: $scope.formValues.enableTelemetry });
+        })
+        .then(() => {
+          return StateManager.initialize();
         })
         .then(function () {
           return EndpointService.endpoints(0, 100);

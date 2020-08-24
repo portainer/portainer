@@ -59,6 +59,7 @@ angular.module('portainer.app').factory('StateManager', [
 
     manager.clean = function () {
       state.endpoint = {};
+      state.application = {};
     };
 
     manager.updateLogo = function (logoURL) {
