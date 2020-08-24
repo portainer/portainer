@@ -43,11 +43,10 @@ type (
 	}
 
 	restrictedDockerOperationContext struct {
-		isAdmin                bool
-		endpointResourceAccess bool
-		userID                 portainer.UserID
-		userTeamIDs            []portainer.TeamID
-		resourceControls       []portainer.ResourceControl
+		isAdmin          bool
+		userID           portainer.UserID
+		userTeamIDs      []portainer.TeamID
+		resourceControls []portainer.ResourceControl
 	}
 
 	operationExecutor struct {
@@ -650,24 +649,13 @@ func (transport *Transport) createOperationContext(request *http.Request) (*rest
 	}
 
 	operationContext := &restrictedDockerOperationContext{
-		isAdmin:                true,
-		userID:                 tokenData.ID,
-		resourceControls:       resourceControls,
-		endpointResourceAccess: false,
+		isAdmin:          true,
+		userID:           tokenData.ID,
+		resourceControls: resourceControls,
 	}
 
 	if tokenData.Role != portainer.AdministratorRole {
 		operationContext.isAdmin = false
-
-		user, err := transport.dataStore.User().User(operationContext.userID)
-		if err != nil {
-			return nil, err
-		}
-
-		_, ok := user.EndpointAuthorizations[transport.endpoint.ID][portainer.EndpointResourcesAccess]
-		if ok {
-			operationContext.endpointResourceAccess = true
-		}
 
 		teamMemberships, err := transport.dataStore.TeamMembership().TeamMembershipsByUserID(tokenData.ID)
 		if err != nil {
