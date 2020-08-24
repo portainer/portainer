@@ -56,14 +56,6 @@ angular.module('portainer.azure').controller('AzureCreateContainerInstanceContro
     };
 
     function validateForm(model) {
-      if (!model.Name) {
-        return 'Name is required';
-      }
-
-      if (!model.Image) {
-        return 'Image is required';
-      }
-
       if (!model.Ports || !model.Ports.length || model.Ports.every((port) => !port.host || !port.container)) {
         return 'At least one port binding is required';
       }
