@@ -14,6 +14,7 @@ angular.module('portainer.azure').controller('AzureCreateContainerInstanceContro
       actionInProgress: false,
       selectedSubscription: null,
       selectedResourceGroup: null,
+      formValidationError: '',
     };
 
     $scope.changeSubscription = function () {
@@ -34,6 +35,11 @@ angular.module('portainer.azure').controller('AzureCreateContainerInstanceContro
       var subscriptionId = $scope.state.selectedSubscription.Id;
       var resourceGroupName = $scope.state.selectedResourceGroup.Name;
 
+      $scope.state.formValidationError = validateForm(model);
+      if ($scope.state.formValidationError) {
+        return false;
+      }
+
       $scope.state.actionInProgress = true;
       AzureService.createContainerGroup(model, subscriptionId, resourceGroupName)
         .then(function success() {
@@ -41,12 +47,21 @@ angular.module('portainer.azure').controller('AzureCreateContainerInstanceContro
           $state.go('azure.containerinstances');
         })
         .catch(function error(err) {
+          err = err.data ? err.data.error : err;
           Notifications.error('Failure', err, 'Unable to create container');
         })
         .finally(function final() {
           $scope.state.actionInProgress = false;
         });
     };
+
+    function validateForm(model) {
+      if (!model.Ports || !model.Ports.length || model.Ports.every((port) => !port.host || !port.container)) {
+        return 'At least one port binding is required';
+      }
+
+      return null;
+    }
 
     function updateResourceGroupsAndLocations(subscription, resourceGroups, providers) {
       $scope.state.selectedResourceGroup = resourceGroups[subscription.Id][0];
