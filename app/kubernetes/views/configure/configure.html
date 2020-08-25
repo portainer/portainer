@@ -137,10 +137,10 @@
 
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
-                Enabling this feature will allow users to use specific features that leverage the server metrics component.
+                Enabling this feature will allow users to use specific features that leverage the metrics server component.
                 <p style="margin-top: 2px;">
                   <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                  Ensure that <a href="https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/#metrics-server" target="_blank">server metrics</a> is
+                  Ensure that <a href="https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/#metrics-server" target="_blank">metrics server</a> is
                   running inside your cluster.
                 </p>
               </span>
@@ -148,7 +148,7 @@
             <div class="form-group">
               <div class="col-sm-12">
                 <label class="control-label text-left">
-                  Enable features using server metrics
+                  Enable features using metrics server
                 </label>
                 <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.UseServerMetrics" /><i></i> </label>
               </div>
