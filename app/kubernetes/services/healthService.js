@@ -13,16 +13,16 @@ class KubernetesHealthService {
   /**
    * PING
    */
-  async pingAsync() {
+  async pingAsync(endpointID) {
     try {
-      return await this.KubernetesHealth.ping().$promise;
+      return await this.KubernetesHealth.ping({ id: endpointID }).$promise;
     } catch (err) {
       throw new PortainerError('Unable to retrieve environment health', err);
     }
   }
 
-  ping() {
-    return this.$async(this.pingAsync);
+  ping(endpointID) {
+    return this.$async(this.pingAsync, endpointID);
   }
 }
 

@@ -1,16 +1,13 @@
 angular.module('portainer.kubernetes').factory('KubernetesHealth', [
   '$resource',
   'API_ENDPOINT_ENDPOINTS',
-  'EndpointProvider',
-  function KubernetesHealthFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
+  function KubernetesHealthFactory($resource, API_ENDPOINT_ENDPOINTS) {
     'use strict';
     return $resource(
-      API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/healthz',
+      API_ENDPOINT_ENDPOINTS + '/:id/kubernetes/healthz',
+      {},
       {
-        endpointId: EndpointProvider.endpointID,
-      },
-      {
-        ping: { method: 'GET', timeout: 15000 },
+        ping: { method: 'GET', timeout: 15000, params: { id: 'id' } },
       }
     );
   },

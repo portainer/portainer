@@ -18,7 +18,7 @@ angular.module('portainer.kubernetes', ['portainer.app']).config([
           try {
             if (endpoint.Type === 7) {
               try {
-                await KubernetesHealthService.ping();
+                await KubernetesHealthService.ping(endpoint.Id);
                 endpoint.Status = 1;
               } catch (e) {
                 endpoint.Status = 2;
