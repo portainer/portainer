@@ -89,8 +89,8 @@ func (*Service) ValidateFlags(flags *portainer.CLIFlags) error {
 }
 
 func displayDeprecationWarnings(flags *portainer.CLIFlags) {
-	if flags.NoAnalytics != nil {
-		log.Println("Warning: The --no-analytics has been deprecated and will be removed in a future version of Portainer. It currently has no effect, telemetry settings are available in the Portainer settings.")
+	if *flags.NoAnalytics {
+		log.Println("Warning: The --no-analytics flag has been kept to allow migration of instances running a previous version of Portainer with this flag enabled, to version 2.0 where enabling this flag will have no effect.")
 	}
 }
 
