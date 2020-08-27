@@ -4,26 +4,22 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/portainer/portainer/api/http/handler/auth"
+	"github.com/portainer/portainer/api/http/handler/customtemplates"
+	"github.com/portainer/portainer/api/http/handler/dockerhub"
 	"github.com/portainer/portainer/api/http/handler/edgegroups"
+	"github.com/portainer/portainer/api/http/handler/edgejobs"
 	"github.com/portainer/portainer/api/http/handler/edgestacks"
 	"github.com/portainer/portainer/api/http/handler/edgetemplates"
 	"github.com/portainer/portainer/api/http/handler/endpointedge"
-	"github.com/portainer/portainer/api/http/handler/support"
-
-	"github.com/portainer/portainer/api/http/handler/schedules"
-
-	"github.com/portainer/portainer/api/http/handler/roles"
-
-	"github.com/portainer/portainer/api/http/handler/auth"
-	"github.com/portainer/portainer/api/http/handler/dockerhub"
 	"github.com/portainer/portainer/api/http/handler/endpointgroups"
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
 	"github.com/portainer/portainer/api/http/handler/endpoints"
-	"github.com/portainer/portainer/api/http/handler/extensions"
 	"github.com/portainer/portainer/api/http/handler/file"
 	"github.com/portainer/portainer/api/http/handler/motd"
 	"github.com/portainer/portainer/api/http/handler/registries"
 	"github.com/portainer/portainer/api/http/handler/resourcecontrols"
+	"github.com/portainer/portainer/api/http/handler/roles"
 	"github.com/portainer/portainer/api/http/handler/settings"
 	"github.com/portainer/portainer/api/http/handler/stacks"
 	"github.com/portainer/portainer/api/http/handler/status"
@@ -40,8 +36,10 @@ import (
 // Handler is a collection of all the service handlers.
 type Handler struct {
 	AuthHandler            *auth.Handler
+	CustomTemplatesHandler *customtemplates.Handler
 	DockerHubHandler       *dockerhub.Handler
 	EdgeGroupsHandler      *edgegroups.Handler
+	EdgeJobsHandler        *edgejobs.Handler
 	EdgeStacksHandler      *edgestacks.Handler
 	EdgeTemplatesHandler   *edgetemplates.Handler
 	EndpointEdgeHandler    *endpointedge.Handler
@@ -50,15 +48,12 @@ type Handler struct {
 	EndpointProxyHandler   *endpointproxy.Handler
 	FileHandler            *file.Handler
 	MOTDHandler            *motd.Handler
-	ExtensionHandler       *extensions.Handler
 	RegistryHandler        *registries.Handler
 	ResourceControlHandler *resourcecontrols.Handler
 	RoleHandler            *roles.Handler
-	SchedulesHanlder       *schedules.Handler
 	SettingsHandler        *settings.Handler
 	StackHandler           *stacks.Handler
 	StatusHandler          *status.Handler
-	SupportHandler         *support.Handler
 	TagHandler             *tags.Handler
 	TeamMembershipHandler  *teammemberships.Handler
 	TeamHandler            *teams.Handler
@@ -76,10 +71,16 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.AuthHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/dockerhub"):
 		http.StripPrefix("/api", h.DockerHubHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/custom_templates"):
+		http.StripPrefix("/api", h.CustomTemplatesHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/edge_stacks"):
 		http.StripPrefix("/api", h.EdgeStacksHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/edge_groups"):
 		http.StripPrefix("/api", h.EdgeGroupsHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/edge_jobs"):
+		http.StripPrefix("/api", h.EdgeJobsHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/edge_stacks"):
+		http.StripPrefix("/api", h.EdgeStacksHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/edge_templates"):
 		http.StripPrefix("/api", h.EdgeTemplatesHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/endpoint_groups"):
@@ -87,6 +88,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case strings.HasPrefix(r.URL.Path, "/api/endpoints"):
 		switch {
 		case strings.Contains(r.URL.Path, "/docker/"):
+			http.StripPrefix("/api/endpoints", h.EndpointProxyHandler).ServeHTTP(w, r)
+		case strings.Contains(r.URL.Path, "/kubernetes/"):
 			http.StripPrefix("/api/endpoints", h.EndpointProxyHandler).ServeHTTP(w, r)
 		case strings.Contains(r.URL.Path, "/storidge/"):
 			http.StripPrefix("/api/endpoints", h.EndpointProxyHandler).ServeHTTP(w, r)
@@ -97,8 +100,6 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		default:
 			http.StripPrefix("/api", h.EndpointHandler).ServeHTTP(w, r)
 		}
-	case strings.HasPrefix(r.URL.Path, "/api/extensions"):
-		http.StripPrefix("/api", h.ExtensionHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/motd"):
 		http.StripPrefix("/api", h.MOTDHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/registries"):
@@ -107,16 +108,12 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.ResourceControlHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/roles"):
 		http.StripPrefix("/api", h.RoleHandler).ServeHTTP(w, r)
-	case strings.HasPrefix(r.URL.Path, "/api/schedules"):
-		http.StripPrefix("/api", h.SchedulesHanlder).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/settings"):
 		http.StripPrefix("/api", h.SettingsHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/stacks"):
 		http.StripPrefix("/api", h.StackHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/status"):
 		http.StripPrefix("/api", h.StatusHandler).ServeHTTP(w, r)
-	case strings.HasPrefix(r.URL.Path, "/api/support"):
-		http.StripPrefix("/api", h.SupportHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/tags"):
 		http.StripPrefix("/api", h.TagHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/templates"):

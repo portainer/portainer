@@ -1,6 +1,5 @@
-import angular from 'angular';
-
-class EditEdgeStackFormController {
+export class EditEdgeStackFormController {
+  /* @ngInject */
   constructor() {
     this.editorUpdate = this.editorUpdate.bind(this);
   }
@@ -9,6 +8,3 @@ class EditEdgeStackFormController {
     this.model.StackFileContent = cm.getValue();
   }
 }
-
-angular.module('portainer.edge').controller('EditEdgeStackFormController', EditEdgeStackFormController);
-export default EditEdgeStackFormController;

@@ -1,12 +1,10 @@
-import angular from 'angular';
-
 const statusMap = {
   1: 'ok',
   2: 'error',
   3: 'acknowledged',
 };
 
-class EdgeStackStatusController {
+export class EdgeStackStatusController {
   $onChanges({ stackStatus }) {
     if (!stackStatus || !stackStatus.currentValue) {
       return;
@@ -20,6 +18,3 @@ class EdgeStackStatusController {
     this.status = aggregateStatus;
   }
 }
-
-angular.module('portainer.edge').controller('EdgeStackStatusController', EdgeStackStatusController);
-export default EdgeStackStatusController;

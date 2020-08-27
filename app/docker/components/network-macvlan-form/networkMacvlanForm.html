@@ -74,7 +74,7 @@
               state="$ctrl.data.DatatableState"
               order-by="Hostname"
               show-ip-address-column="$ctrl.applicationState.endpoint.apiVersion >= 1.25"
-              access-to-node-details="!$ctrl.applicationState.application.authentication || $ctrl.isAdmin"
+              access-to-node-details="$ctrl.isAdmin"
               name="node_selector"
               ng-model="tmp"
               ng-required="$ctrl.requiredNodeSelection()"

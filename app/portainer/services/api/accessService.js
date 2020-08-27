@@ -4,20 +4,14 @@ import { TeamAccessViewModel } from '../../models/access';
 
 angular.module('portainer.app').factory('AccessService', [
   '$q',
+  '$async',
   'UserService',
   'TeamService',
-  function AccessServiceFactory($q, UserService, TeamService) {
+  function AccessServiceFactory($q, $async, UserService, TeamService) {
     'use strict';
     var service = {};
 
-    function _getRole(roles, roleId) {
-      if (roles.length) {
-        const role = _.find(roles, (role) => role.Id === roleId);
-        return role ? role : { Id: 0, Name: '-' };
-      }
-    }
-
-    function _mapAccessData(accesses, authorizedPolicies, inheritedPolicies, roles) {
+    function _mapAccessData(accesses, authorizedPolicies, inheritedPolicies) {
       var availableAccesses = [];
       var authorizedAccesses = [];
 
@@ -28,14 +22,11 @@ angular.module('portainer.app').factory('AccessService', [
         const inherited = inheritedPolicies && inheritedPolicies[access.Id];
 
         if (authorized && inherited) {
-          access.Role = _getRole(roles, authorizedPolicies[access.Id].RoleId);
           access.Override = true;
           authorizedAccesses.push(access);
         } else if (authorized && !inherited) {
-          access.Role = _getRole(roles, authorizedPolicies[access.Id].RoleId);
           authorizedAccesses.push(access);
         } else if (!authorized && inherited) {
-          access.Role = _getRole(roles, inheritedPolicies[access.Id].RoleId);
           access.Inherited = true;
           authorizedAccesses.push(access);
           availableAccesses.push(access);
@@ -50,7 +41,7 @@ angular.module('portainer.app').factory('AccessService', [
       };
     }
 
-    service.accesses = function (authorizedUserPolicies, authorizedTeamPolicies, inheritedUserPolicies, inheritedTeamPolicies, roles) {
+    function getAccesses(authorizedUserPolicies, authorizedTeamPolicies, inheritedUserPolicies, inheritedTeamPolicies) {
       var deferred = $q.defer();
 
       $q.all({
@@ -65,8 +56,8 @@ angular.module('portainer.app').factory('AccessService', [
             return new TeamAccessViewModel(team);
           });
 
-          var userAccessData = _mapAccessData(userAccesses, authorizedUserPolicies, inheritedUserPolicies, roles);
-          var teamAccessData = _mapAccessData(teamAccesses, authorizedTeamPolicies, inheritedTeamPolicies, roles);
+          var userAccessData = _mapAccessData(userAccesses, authorizedUserPolicies, inheritedUserPolicies);
+          var teamAccessData = _mapAccessData(teamAccesses, authorizedTeamPolicies, inheritedTeamPolicies);
 
           var accessData = {
             availableUsersAndTeams: userAccessData.available.concat(teamAccessData.available),
@@ -80,7 +71,36 @@ angular.module('portainer.app').factory('AccessService', [
         });
 
       return deferred.promise;
-    };
+    }
+
+    async function accessesAsync(entity, parent) {
+      try {
+        if (!entity) {
+          throw { msg: 'Unable to retrieve accesses' };
+        }
+        if (!entity.UserAccessPolicies) {
+          entity.UserAccessPolicies = {};
+        }
+        if (!entity.TeamAccessPolicies) {
+          entity.TeamAccessPolicies = {};
+        }
+        if (parent && !parent.UserAccessPolicies) {
+          parent.UserAccessPolicies = {};
+        }
+        if (parent && !parent.TeamAccessPolicies) {
+          parent.TeamAccessPolicies = {};
+        }
+        return await getAccesses(entity.UserAccessPolicies, entity.TeamAccessPolicies, parent ? parent.UserAccessPolicies : {}, parent ? parent.TeamAccessPolicies : {});
+      } catch (err) {
+        throw err;
+      }
+    }
+
+    function accesses(entity, parent) {
+      return $async(accessesAsync, entity, parent);
+    }
+
+    service.accesses = accesses;
 
     service.generateAccessPolicies = function (userAccessPolicies, teamAccessPolicies, selectedUserAccesses, selectedTeamAccesses, selectedRoleId) {
       const newUserPolicies = _.clone(userAccessPolicies);

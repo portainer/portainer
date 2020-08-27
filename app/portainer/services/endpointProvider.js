@@ -24,6 +24,7 @@ angular.module('portainer.app').factory('EndpointProvider', [
     };
 
     service.clean = function () {
+      LocalStorage.cleanEndpointData();
       endpoint = {};
     };
 

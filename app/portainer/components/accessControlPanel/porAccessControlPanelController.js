@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 import { ResourceControlOwnership as RCO } from 'Portainer/models/resourceControl/resourceControlOwnership';
-import { ResourceControlTypeString as RCTS, ResourceControlTypeInt as RCTI } from 'Portainer/models/resourceControl/resourceControlTypes';
+import { ResourceControlTypeInt as RCTI, ResourceControlTypeString as RCTS } from 'Portainer/models/resourceControl/resourceControlTypes';
 import { AccessControlPanelData } from './porAccessControlPanelModel';
 
 angular.module('portainer.app').controller('porAccessControlPanelController', [
@@ -86,7 +86,8 @@ angular.module('portainer.app').controller('porAccessControlPanelController', [
         });
     }
 
-    function initComponent() {
+    this.$onInit = $onInit;
+    function $onInit() {
       var userDetails = Authentication.getUserDetails();
       var isAdmin = Authentication.isAdmin();
       var userId = userDetails.ID;
@@ -138,7 +139,5 @@ angular.module('portainer.app').controller('porAccessControlPanelController', [
           Notifications.error('Failure', err, 'Unable to retrieve access control information');
         });
     }
-
-    initComponent();
   },
 ]);

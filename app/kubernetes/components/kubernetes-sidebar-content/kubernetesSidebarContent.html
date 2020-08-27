@@ -1,0 +1,21 @@
+<li class="sidebar-list">
+  <a ui-sref="kubernetes.dashboard({endpointId: $ctrl.endpointId})" ui-sref-active="active">Dashboard <span class="menu-icon fa fa-tachometer-alt fa-fw"></span></a>
+</li>
+<li class="sidebar-list">
+  <a ui-sref="kubernetes.resourcePools({endpointId: $ctrl.endpointId})" ui-sref-active="active">Resource pools <span class="menu-icon fa fa-layer-group fa-fw"></span></a>
+</li>
+<li class="sidebar-list">
+  <a ui-sref="kubernetes.applications({endpointId: $ctrl.endpointId})" ui-sref-active="active">Applications <span class="menu-icon fa fa-laptop-code fa-fw"></span></a>
+</li>
+<li class="sidebar-list">
+  <a ui-sref="kubernetes.configurations({endpointId: $ctrl.endpointId})" ui-sref-active="active">Configurations <span class="menu-icon fa fa-file-code fa-fw"></span></a>
+</li>
+<li class="sidebar-list">
+  <a ui-sref="kubernetes.volumes({endpointId: $ctrl.endpointId})" ui-sref-active="active">Volumes <span class="menu-icon fa fa-database fa-fw"></span></a>
+</li>
+<li class="sidebar-list">
+  <a ui-sref="kubernetes.cluster({endpointId: $ctrl.endpointId})" ui-sref-active="active">Cluster <span class="menu-icon fa fa-server fa-fw"></span></a>
+  <div class="sidebar-sublist" ng-if="$ctrl.adminAccess && ($ctrl.currentState === 'kubernetes.cluster' || $ctrl.currentState === 'portainer.endpoints.endpoint.kubernetesConfig')">
+    <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: $ctrl.endpointId})">Setup</a>
+  </div>
+</li>

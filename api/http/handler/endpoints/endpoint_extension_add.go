@@ -3,6 +3,7 @@ package endpoints
 // TODO: legacy extension management
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -10,6 +11,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
 type endpointExtensionAddPayload struct {
@@ -19,10 +21,10 @@ type endpointExtensionAddPayload struct {
 
 func (payload *endpointExtensionAddPayload) Validate(r *http.Request) error {
 	if payload.Type != 1 {
-		return portainer.Error("Invalid type value. Value must be one of: 1 (Storidge)")
+		return errors.New("Invalid type value. Value must be one of: 1 (Storidge)")
 	}
 	if payload.Type == 1 && govalidator.IsNull(payload.URL) {
-		return portainer.Error("Invalid extension URL")
+		return errors.New("Invalid extension URL")
 	}
 	return nil
 }
@@ -34,8 +36,8 @@ func (handler *Handler) endpointExtensionAdd(w http.ResponseWriter, r *http.Requ
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint identifier route variable", err}
 	}
 
-	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
-	if err == portainer.ErrObjectNotFound {
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
@@ -66,7 +68,7 @@ func (handler *Handler) endpointExtensionAdd(w http.ResponseWriter, r *http.Requ
 		endpoint.Extensions = append(endpoint.Extensions, *extension)
 	}
 
-	err = handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)
+	err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint changes inside the database", err}
 	}

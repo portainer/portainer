@@ -47,7 +47,9 @@
             </tr>
             <tr ng-if="network.IPAM.IPV4Configs.length > 0" ng-repeat-end>
               <td>IPV4 IP range - {{ config.IPRange }}</td>
-              <td>IPV4 Excluded Ips - {{ config.AuxAddress }}</td>
+              <td
+                >IPV4 Excluded Ips<span ng-repeat="auxAddress in config.AuxiliaryAddresses"> - {{ auxAddress }}</span></td
+              >
             </tr>
             <tr ng-if="network.IPAM.IPV6Configs.length > 0" ng-repeat-start="config in network.IPAM.IPV6Configs">
               <td>IPV6 Subnet - {{ config.Subnet }}</td>
@@ -55,7 +57,9 @@
             </tr>
             <tr ng-if="network.IPAM.IPV6Configs.length > 0" ng-repeat-end>
               <td>IPV6 IP range - {{ config.IPRange }}</td>
-              <td>IPV6 Excluded Ips - {{ config.AuxAddress }}</td>
+              <td
+                >IPV6 Excluded Ips<span ng-repeat="auxAddress in config.AuxiliaryAddresses"> - {{ auxAddress }}</span></td
+              >
             </tr>
           </tbody>
         </table>
@@ -66,7 +70,7 @@
 
 <!-- access-control-panel -->
 <por-access-control-panel
-  ng-if="network && applicationState.application.authentication"
+  ng-if="network"
   resource-id="network.Id"
   resource-control="network.ResourceControl"
   resource-type="'network'"

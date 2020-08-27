@@ -1,0 +1,51 @@
+<div class="datatable">
+  <rd-widget>
+    <rd-widget-body classes="no-padding">
+      <div class="toolBar">
+        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
+      </div>
+      <div class="actionBar">
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.templates.custom.new">
+          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add Custom Template
+        </button>
+      </div>
+
+      <div class="searchBar" style="border-top: 2px solid #f6f6f6;">
+        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
+        <input
+          type="text"
+          class="searchInput"
+          ng-model="$ctrl.state.textFilter"
+          ng-change="$ctrl.onTextFilterChange()"
+          placeholder="Search..."
+          auto-focus
+          ng-model-options="{ debounce: 300 }"
+        />
+      </div>
+
+      <div class="blocklist">
+        <template-item
+          ng-repeat="template in $ctrl.templates | filter:$ctrl.state.textFilter"
+          model="template"
+          type-label="{{ template.Type === 1 ? 'swarm' : 'standalone' }}"
+          on-select="($ctrl.onSelectClick)"
+        >
+          <template-item-actions>
+            <div ng-if="$ctrl.isEditAllowed(template)" style="display: flex;">
+              <a ui-sref="docker.templates.custom.edit({id: template.Id})" ng-click="$event.stopPropagation();" class="btn btn-primary btn-xs" style="margin-right: 10px;">
+                Edit
+              </a>
+              <button class="btn btn-danger btn-xs" ng-click="$ctrl.onDeleteClick(template.Id); $event.stopPropagation();">Delete</button>
+            </div>
+          </template-item-actions>
+        </template-item>
+        <div ng-if="!$ctrl.templates" class="text-center text-muted">
+          Loading...
+        </div>
+        <div ng-if="($ctrl.templates | filter: $ctrl.state.textFilter).length === 0" class="text-center text-muted">
+          No templates available.
+        </div>
+      </div>
+    </rd-widget-body>
+  </rd-widget>
+</div>

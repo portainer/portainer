@@ -1,6 +1,7 @@
 package webhooks
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -9,6 +10,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
 type webhookCreatePayload struct {
@@ -19,13 +21,13 @@ type webhookCreatePayload struct {
 
 func (payload *webhookCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.ResourceID) {
-		return portainer.Error("Invalid ResourceID")
+		return errors.New("Invalid ResourceID")
 	}
 	if payload.EndpointID == 0 {
-		return portainer.Error("Invalid EndpointID")
+		return errors.New("Invalid EndpointID")
 	}
 	if payload.WebhookType != 1 {
-		return portainer.Error("Invalid WebhookType")
+		return errors.New("Invalid WebhookType")
 	}
 	return nil
 }
@@ -37,12 +39,12 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	webhook, err := handler.WebhookService.WebhookByResourceID(payload.ResourceID)
-	if err != nil && err != portainer.ErrObjectNotFound {
+	webhook, err := handler.DataStore.Webhook().WebhookByResourceID(payload.ResourceID)
+	if err != nil && err != bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "An error occurred retrieving webhooks from the database", err}
 	}
 	if webhook != nil {
-		return &httperror.HandlerError{http.StatusConflict, "A webhook for this resource already exists", portainer.ErrWebhookAlreadyExists}
+		return &httperror.HandlerError{http.StatusConflict, "A webhook for this resource already exists", errors.New("A webhook for this resource already exists")}
 	}
 
 	token, err := uuid.NewV4()
@@ -57,7 +59,7 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 		WebhookType: portainer.WebhookType(payload.WebhookType),
 	}
 
-	err = handler.WebhookService.CreateWebhook(webhook)
+	err = handler.DataStore.Webhook().CreateWebhook(webhook)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the webhook inside the database", err}
 	}

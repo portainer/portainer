@@ -37,7 +37,7 @@ func NewComposeStackManager(dataPath string, reverseTunnelService portainer.Reve
 func (manager *ComposeStackManager) createClient(endpoint *portainer.Endpoint) (client.Factory, error) {
 
 	endpointURL := endpoint.URL
-	if endpoint.Type == portainer.EdgeAgentEnvironment {
+	if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
 		tunnel := manager.reverseTunnelService.GetTunnelDetails(endpoint.ID)
 		endpointURL = fmt.Sprintf("tcp://127.0.0.1:%d", tunnel.Port)
 	}

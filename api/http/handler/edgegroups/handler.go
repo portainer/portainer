@@ -12,12 +12,7 @@ import (
 // Handler is the HTTP handler used to handle endpoint group operations.
 type Handler struct {
 	*mux.Router
-	EdgeGroupService        portainer.EdgeGroupService
-	EdgeStackService        portainer.EdgeStackService
-	EndpointService         portainer.EndpointService
-	EndpointGroupService    portainer.EndpointGroupService
-	EndpointRelationService portainer.EndpointRelationService
-	TagService              portainer.TagService
+	DataStore portainer.DataStore
 }
 
 // NewHandler creates a handler to manage endpoint group operations.
@@ -26,14 +21,14 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		Router: mux.NewRouter(),
 	}
 	h.Handle("/edge_groups",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeGroupCreate))).Methods(http.MethodPost)
+		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeGroupCreate)))).Methods(http.MethodPost)
 	h.Handle("/edge_groups",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeGroupList))).Methods(http.MethodGet)
+		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeGroupList)))).Methods(http.MethodGet)
 	h.Handle("/edge_groups/{id}",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeGroupInspect))).Methods(http.MethodGet)
+		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeGroupInspect)))).Methods(http.MethodGet)
 	h.Handle("/edge_groups/{id}",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeGroupUpdate))).Methods(http.MethodPut)
+		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeGroupUpdate)))).Methods(http.MethodPut)
 	h.Handle("/edge_groups/{id}",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeGroupDelete))).Methods(http.MethodDelete)
+		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeGroupDelete)))).Methods(http.MethodDelete)
 	return h
 }

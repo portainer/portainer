@@ -1,5 +1,5 @@
 const path = require('path');
-const { ProvidePlugin, IgnorePlugin, DefinePlugin } = require('webpack');
+const { ProvidePlugin, IgnorePlugin } = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackBuildNotifierPlugin = require('webpack-build-notifier');
 const CleanTerminalPlugin = require('clean-terminal-webpack-plugin');
@@ -92,9 +92,6 @@ module.exports = {
       collections: true,
       paths: true,
     }),
-    new DefinePlugin({
-      __CONFIG_GA_ID: JSON.stringify(pkg.config.GA_ID),
-    }),
   ],
   optimization: {
     splitChunks: {
@@ -114,8 +111,9 @@ module.exports = {
       Agent: path.resolve(projectRoot, 'app/agent'),
       Azure: path.resolve(projectRoot, 'app/azure'),
       Docker: path.resolve(projectRoot, 'app/docker'),
-      Extensions: path.resolve(projectRoot, 'app/extensions'),
+      Kubernetes: path.resolve(projectRoot, 'app/kubernetes'),
       Portainer: path.resolve(projectRoot, 'app/portainer'),
+      '@': path.resolve(projectRoot, 'app'),
     },
   },
 };

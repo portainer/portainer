@@ -1,0 +1,251 @@
+<kubernetes-view-header title="Kubernetes features configuration" state="portainer.endpoints.endpoint.kubernetesConfig" view-ready="ctrl.state.viewReady">
+  <a ui-sref="portainer.endpoints">Endpoints</a> &gt; <a ui-sref="portainer.endpoints.endpoint({id: ctrl.endpoint.Id})">{{ ctrl.endpoint.Name }}</a> &gt; Kubernetes configuration
+</kubernetes-view-header>
+
+<kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
+
+<div ng-if="ctrl.state.viewReady">
+  <div class="row">
+    <div class="col-sm-12">
+      <rd-widget>
+        <rd-widget-body>
+          <form class="form-horizontal" name="kubernetesClusterSetupForm">
+            <div class="col-sm-12 form-section-title">
+              Networking
+            </div>
+
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                Enabling the load balancer feature will allow users to expose application they deploy over an external IP address assigned by cloud provider.
+                <p style="margin-top: 2px;">
+                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  Ensure that your cloud provider allows you to create load balancers if you want to use this feature. Might incur costs.
+                </p>
+              </span>
+
+              <div class="col-sm-12">
+                <label class="control-label text-left">
+                  Allow users to use external load balancer
+                </label>
+                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.UseLoadBalancer" /><i></i> </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                Adding ingress controllers will allow users to expose application they deploy over a HTTP route.<br />
+                <p style="margin-top: 2px;">
+                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  Ingress classes must be manually specified for each controller you want to use in the cluster. Make sure that each controller is running inside your cluster.
+                </p>
+              </span>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label class="control-label text-left">Ingress controller</label>
+                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addIngressClass()">
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i> add ingress controller
+                </span>
+              </div>
+
+              <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                <div ng-repeat-start="ingressClass in ctrl.formValues.IngressClasses" style="margin-top: 2px;">
+                  <div class="col-sm-7 input-group input-group-sm" ng-class="{ striked: ingressClass.NeedsDeletion }">
+                    <span class="input-group-addon">Ingress class</span>
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="ingress_class_name_{{ $index }}"
+                      ng-model="ingressClass.Name"
+                      placeholder="nginx"
+                      ng-pattern="/^[a-z]([-a-z0-9]*[a-z0-9])?$/"
+                      ng-change="ctrl.onChangeIngressClassName($index)"
+                      required
+                    />
+                  </div>
+                  <div class="col-sm-3 input-group input-group-sm" ng-class="{ striked: ingressClass.NeedsDeletion }">
+                    <span class="input-group-addon">Type</span>
+                    <select
+                      class="form-control"
+                      name="ingress_class_type_{{ $index }}"
+                      ng-model="ingressClass.Type"
+                      ng-options="value as value for (key, value) in ctrl.IngressClassTypes"
+                      required
+                    >
+                      <option selected disabled hidden value="">Select a type</option>
+                    </select>
+                  </div>
+                  <div class="col-sm-1 input-group input-group-sm">
+                    <button ng-if="!ingressClass.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeIngressClass($index)">
+                      <i class="fa fa-trash-alt" aria-hidden="true"></i>
+                    </button>
+                    <button ng-if="ingressClass.NeedsDeletion" class="btn btn-sm btn-primary" type="button" ng-click="ctrl.restoreIngressClass($index)">
+                      <i class="fa fa-trash-restore" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div
+                  ng-repeat-end
+                  ng-show="
+                    kubernetesClusterSetupForm['ingress_class_name_' + $index].$invalid ||
+                    kubernetesClusterSetupForm['ingress_class_type_' + $index].$invalid ||
+                    ctrl.state.duplicates.ingressClasses.refs[$index] !== undefined
+                  "
+                >
+                  <div class="col-sm-7 input-group">
+                    <div
+                      class="small text-warning"
+                      style="margin-top: 5px;"
+                      ng-if="kubernetesClusterSetupForm['ingress_class_name_' + $index].$invalid || ctrl.state.duplicates.ingressClasses.refs[$index] !== undefined"
+                    >
+                      <div ng-messages="kubernetesClusterSetupForm['ingress_class_name_'+$index].$error">
+                        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Ingress class name is required.</p>
+                        <p ng-message="pattern"
+                          ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of lower case alphanumeric characters or '-', start with an
+                          alphabetic character, and end with an alphanumeric character (e.g. 'my-name', or 'abc-123').</p
+                        >
+                      </div>
+                      <p ng-if="ctrl.state.duplicates.ingressClasses.refs[$index] !== undefined">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This ingress class is already defined.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="col-sm-3 input-group">
+                    <div class="small text-warning" style="margin-top: 5px;" ng-if="kubernetesClusterSetupForm['ingress_class_type_' + $index].$invalid">
+                      <div ng-messages="kubernetesClusterSetupForm['ingress_class_type_'+$index].$error">
+                        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Ingress class type is required.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" ng-if="ctrl.hasTraefikIngress()">
+              <span class="col-sm-12 text-muted small">
+                <p>
+                  <i class="fa fa-flask blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  Traefik support is experimental.
+                </p>
+              </span>
+            </div>
+
+            <div class="col-sm-12 form-section-title">
+              Metrics
+            </div>
+
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                Enabling this feature will allow users to use specific features that leverage the metrics server component.
+                <p style="margin-top: 2px;">
+                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  Ensure that <a href="https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/#metrics-server" target="_blank">metrics server</a> is
+                  running inside your cluster.
+                </p>
+              </span>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label class="control-label text-left">
+                  Enable features using metrics server
+                </label>
+                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.UseServerMetrics" /><i></i> </label>
+              </div>
+            </div>
+
+            <div class="col-sm-12 form-section-title">
+              Available storage options
+            </div>
+
+            <div class="form-group" ng-if="!ctrl.storageClassAvailable()">
+              <div class="col-sm-12 small text-muted">
+                <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                Unable to detect any storage class available to persist data. Users won't be able to persist application data inside this cluster.
+              </div>
+            </div>
+
+            <div class="form-group" ng-if="ctrl.storageClassAvailable()">
+              <span class="col-sm-12 text-muted small">
+                <p>
+                  Select which storage options will be available for use when deploying applications. Have a look at your storage driver documentation to figure out which access
+                  policy to configure and if the volume expansion capability is supported.
+                </p>
+                <p>
+                  You can find more information about access modes
+                  <a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes" target="_blank">in the official Kubernetes documentation</a>.
+                </p>
+              </span>
+            </div>
+
+            <div class="form-group" ng-if="ctrl.storageClassAvailable()">
+              <div style="margin-top: 10px;" class="col-sm-12">
+                <table class="table" style="table-layout: fixed;">
+                  <tbody>
+                    <tr class="text-muted">
+                      <td>Storage</td>
+                      <td>Shared access policy</td>
+                      <td>Volume expansion</td>
+                    </tr>
+                    <tr ng-repeat="class in ctrl.StorageClasses">
+                      <td>
+                        <div style="margin: 5px;">
+                          <label class="switch" style="margin-right: 10px;"> <input type="checkbox" ng-model="class.selected" /><i></i> </label>
+                          <span>{{ class.Name }}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <span
+                          isteven-multi-select
+                          input-model="class.availableAccessModes"
+                          output-model="class.AccessModes"
+                          button-label="Name"
+                          item-label="Description"
+                          tick-property="selected"
+                          directive-id="{{ class.Name }}"
+                          helper-elements=""
+                          translation="{nothingSelected: 'Not configured'}"
+                        >
+                        </span>
+                      </td>
+                      <td>
+                        <div style="margin: 5px;">
+                          <label class="switch"><input type="checkbox" ng-model="class.AllowVolumeExpansion" /><i></i> </label>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="col-sm-12">
+                <span ng-if="!ctrl.hasValidStorageConfiguration()" style="margin-left: 5px;" class="text-muted small">
+                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  Shared access policy configuration required
+                </span>
+              </div>
+            </div>
+
+            <div class="col-sm-12 form-section-title">
+              Actions
+            </div>
+            <!-- actions -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-sm"
+                  ng-click="ctrl.configure()"
+                  ng-disabled="ctrl.state.actionInProgress || !kubernetesClusterSetupForm.$valid || !ctrl.hasValidStorageConfiguration()"
+                  button-spinner="ctrl.state.actionInProgress"
+                >
+                  <span ng-hide="ctrl.state.actionInProgress">Save configuration</span>
+                  <span ng-show="ctrl.state.actionInProgress">Saving configuration...</span>
+                </button>
+              </div>
+            </div>
+          </form>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+  </div>
+</div>

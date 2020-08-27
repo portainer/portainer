@@ -1,89 +1,42 @@
 package factory
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
+
+	"github.com/portainer/portainer/api/kubernetes/cli"
+
 	"github.com/portainer/portainer/api/docker"
 )
 
 const azureAPIBaseURL = "https://management.azure.com"
 
-var extensionPorts = map[portainer.ExtensionID]string{
-	portainer.RegistryManagementExtension:  "7001",
-	portainer.OAuthAuthenticationExtension: "7002",
-	portainer.RBACExtension:                "7003",
-}
-
 type (
-	// ProxyFactory is a factory to create reverse proxies to Docker endpoints and extensions
+	// ProxyFactory is a factory to create reverse proxies
 	ProxyFactory struct {
-		resourceControlService portainer.ResourceControlService
-		userService            portainer.UserService
-		teamService            portainer.TeamService
-		teamMembershipService  portainer.TeamMembershipService
-		settingsService        portainer.SettingsService
-		registryService        portainer.RegistryService
-		dockerHubService       portainer.DockerHubService
-		signatureService       portainer.DigitalSignatureService
-		reverseTunnelService   portainer.ReverseTunnelService
-		extensionService       portainer.ExtensionService
-		dockerClientFactory    *docker.ClientFactory
-	}
-
-	// ProxyFactoryParameters is used to create a new ProxyFactory
-	ProxyFactoryParameters struct {
-		ResourceControlService portainer.ResourceControlService
-		UserService            portainer.UserService
-		TeamService            portainer.TeamService
-		TeamMembershipService  portainer.TeamMembershipService
-		SettingsService        portainer.SettingsService
-		RegistryService        portainer.RegistryService
-		DockerHubService       portainer.DockerHubService
-		SignatureService       portainer.DigitalSignatureService
-		ReverseTunnelService   portainer.ReverseTunnelService
-		ExtensionService       portainer.ExtensionService
-		DockerClientFactory    *docker.ClientFactory
+		dataStore                   portainer.DataStore
+		signatureService            portainer.DigitalSignatureService
+		reverseTunnelService        portainer.ReverseTunnelService
+		dockerClientFactory         *docker.ClientFactory
+		kubernetesClientFactory     *cli.ClientFactory
+		kubernetesTokenCacheManager *kubernetes.TokenCacheManager
 	}
 )
 
 // NewProxyFactory returns a pointer to a new instance of a ProxyFactory
-func NewProxyFactory(parameters *ProxyFactoryParameters) *ProxyFactory {
+func NewProxyFactory(dataStore portainer.DataStore, signatureService portainer.DigitalSignatureService, tunnelService portainer.ReverseTunnelService, clientFactory *docker.ClientFactory, kubernetesClientFactory *cli.ClientFactory, kubernetesTokenCacheManager *kubernetes.TokenCacheManager) *ProxyFactory {
 	return &ProxyFactory{
-		resourceControlService: parameters.ResourceControlService,
-		userService:            parameters.UserService,
-		teamService:            parameters.TeamService,
-		teamMembershipService:  parameters.TeamMembershipService,
-		settingsService:        parameters.SettingsService,
-		registryService:        parameters.RegistryService,
-		dockerHubService:       parameters.DockerHubService,
-		signatureService:       parameters.SignatureService,
-		reverseTunnelService:   parameters.ReverseTunnelService,
-		extensionService:       parameters.ExtensionService,
-		dockerClientFactory:    parameters.DockerClientFactory,
+		dataStore:                   dataStore,
+		signatureService:            signatureService,
+		reverseTunnelService:        tunnelService,
+		dockerClientFactory:         clientFactory,
+		kubernetesClientFactory:     kubernetesClientFactory,
+		kubernetesTokenCacheManager: kubernetesTokenCacheManager,
 	}
-}
-
-// BuildExtensionURL returns the URL to an extension server
-func BuildExtensionURL(extensionID portainer.ExtensionID) string {
-	return fmt.Sprintf("http://%s:%s", portainer.ExtensionServer, extensionPorts[extensionID])
-}
-
-// NewExtensionProxy returns a new HTTP proxy to an extension server
-func (factory *ProxyFactory) NewExtensionProxy(extensionID portainer.ExtensionID) (http.Handler, error) {
-	address := "http://" + portainer.ExtensionServer + ":" + extensionPorts[extensionID]
-
-	extensionURL, err := url.Parse(address)
-	if err != nil {
-		return nil, err
-	}
-
-	extensionURL.Scheme = "http"
-	proxy := httputil.NewSingleHostReverseProxy(extensionURL)
-	return proxy, nil
 }
 
 // NewLegacyExtensionProxy returns a new HTTP proxy to a legacy extension server (Storidge)
@@ -103,6 +56,8 @@ func (factory *ProxyFactory) NewEndpointProxy(endpoint *portainer.Endpoint) (htt
 	switch endpoint.Type {
 	case portainer.AzureEnvironment:
 		return newAzureProxy(endpoint)
+	case portainer.EdgeAgentOnKubernetesEnvironment, portainer.AgentOnKubernetesEnvironment, portainer.KubernetesLocalEnvironment:
+		return factory.newKubernetesProxy(endpoint)
 	}
 
 	return factory.newDockerProxy(endpoint)

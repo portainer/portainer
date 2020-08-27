@@ -12,10 +12,8 @@ angular
     Notifications,
     EndpointProvider,
     StateManager,
-    LegacyExtensionManager,
     ModalService,
-    MotdService,
-    SystemService
+    MotdService
   ) {
     $scope.state = {
       connectingToEdgeEndpoint: false,
@@ -27,19 +25,21 @@ angular
 
     $scope.goToDashboard = function (endpoint) {
       if (endpoint.Type === 3) {
-        return switchToAzureEndpoint(endpoint);
-      } else if (endpoint.Type === 4) {
-        return switchToEdgeEndpoint(endpoint);
+        $state.go('azure.dashboard', { endpointId: endpoint.Id });
+        return;
       }
-
-      checkEndpointStatus(endpoint)
-        .then(function success(data) {
-          endpoint = data;
-          return switchToDockerEndpoint(endpoint);
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to verify endpoint status');
-        });
+      if (endpoint.Type === 4 || endpoint.Type === 7) {
+        if (!endpoint.EdgeID) {
+          $state.go('portainer.endpoints.endpoint', { id: endpoint.Id });
+          return;
+        }
+        $scope.state.connectingToEdgeEndpoint = true;
+      }
+      if (endpoint.Type === 5 || endpoint.Type === 6 || endpoint.Type === 7) {
+        $state.go('kubernetes.dashboard', { endpointId: endpoint.Id });
+        return;
+      }
+      $state.go('docker.dashboard', { endpointId: endpoint.Id });
     };
 
     $scope.dismissImportantInformation = function (hash) {
@@ -58,99 +58,6 @@ angular
         triggerSnapshot();
       });
     };
-
-    function checkEndpointStatus(endpoint) {
-      var deferred = $q.defer();
-
-      var status = 1;
-      SystemService.ping(endpoint.Id)
-        .then(function success() {
-          status = 1;
-        })
-        .catch(function error() {
-          status = 2;
-        })
-        .finally(function () {
-          if (endpoint.Status === status) {
-            deferred.resolve(endpoint);
-            return deferred.promise;
-          }
-
-          EndpointService.updateEndpoint(endpoint.Id, { Status: status })
-            .then(function success() {
-              endpoint.Status = status;
-              deferred.resolve(endpoint);
-            })
-            .catch(function error(err) {
-              deferred.reject({ msg: 'Unable to update endpoint status', err: err });
-            });
-        });
-
-      return deferred.promise;
-    }
-
-    function switchToAzureEndpoint(endpoint) {
-      EndpointProvider.setEndpointID(endpoint.Id);
-      EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
-      EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
-      StateManager.updateEndpointState(endpoint, [])
-        .then(function success() {
-          $state.go('azure.dashboard');
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to connect to the Azure endpoint');
-        });
-    }
-
-    function switchToEdgeEndpoint(endpoint) {
-      if (!endpoint.EdgeID) {
-        $state.go('portainer.endpoints.endpoint', { id: endpoint.Id });
-        return;
-      }
-
-      $scope.state.connectingToEdgeEndpoint = true;
-      SystemService.ping(endpoint.Id)
-        .then(function success() {
-          endpoint.Status = 1;
-        })
-        .catch(function error() {
-          endpoint.Status = 2;
-        })
-        .finally(function final() {
-          switchToDockerEndpoint(endpoint);
-        });
-    }
-
-    function switchToDockerEndpoint(endpoint) {
-      if (endpoint.Status === 2 && endpoint.Snapshots[0] && endpoint.Snapshots[0].Swarm === true) {
-        $scope.state.connectingToEdgeEndpoint = false;
-        Notifications.error('Failure', '', 'Endpoint is unreachable. Connect to another swarm manager.');
-        return;
-      } else if (endpoint.Status === 2 && !endpoint.Snapshots[0]) {
-        $scope.state.connectingToEdgeEndpoint = false;
-        Notifications.error('Failure', '', 'Endpoint is unreachable and there is no snapshot available for offline browsing.');
-        return;
-      }
-
-      EndpointProvider.setEndpointID(endpoint.Id);
-      EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
-      EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
-      LegacyExtensionManager.initEndpointExtensions(endpoint)
-        .then(function success(data) {
-          var extensions = data;
-          return StateManager.updateEndpointState(endpoint, extensions);
-        })
-        .then(function success() {
-          $state.go('docker.dashboard');
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
-          $state.reload();
-        })
-        .finally(function final() {
-          $scope.state.connectingToEdgeEndpoint = false;
-        });
-    }
 
     function triggerSnapshot() {
       EndpointService.snapshotEndpoints()
@@ -190,20 +97,18 @@ angular
         $scope.motd = data;
       });
 
-      getPaginatedEndpoints(0, 100).then((data) => {
-        const totalCount = data.totalCount;
+      try {
+        const [{ totalCount, endpoints }, tags] = await Promise.all([getPaginatedEndpoints(0, 100), TagService.tags()]);
+        $scope.tags = tags;
+
         $scope.totalCount = totalCount;
         if (totalCount > 100) {
           $scope.endpoints = [];
         } else {
-          $scope.endpoints = data.endpoints;
+          $scope.endpoints = endpoints;
         }
-      });
-
-      try {
-        $scope.tags = await TagService.tags();
-      } catch (e) {
-        Notifications.error('Failed loading tags', e);
+      } catch (err) {
+        Notifications.error('Failed loading page data', err);
       }
     }
 

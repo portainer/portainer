@@ -1,16 +1,21 @@
+import angular from 'angular';
+import _ from 'lodash-es';
+
 import { AccessControlFormData } from '../../../components/accessControlForm/porAccessControlFormModel';
 
-angular.module('portainer.app').controller('CreateStackController', [
-  '$scope',
-  '$state',
-  'StackService',
-  'Authentication',
-  'Notifications',
-  'FormValidator',
-  'ResourceControlService',
-  'FormHelper',
-  'EndpointProvider',
-  function ($scope, $state, StackService, Authentication, Notifications, FormValidator, ResourceControlService, FormHelper, EndpointProvider) {
+angular
+  .module('portainer.app')
+  .controller('CreateStackController', function (
+    $scope,
+    $state,
+    StackService,
+    Authentication,
+    Notifications,
+    FormValidator,
+    ResourceControlService,
+    FormHelper,
+    CustomTemplateService
+  ) {
     $scope.formValues = {
       Name: '',
       StackFileContent: '',
@@ -54,15 +59,19 @@ angular.module('portainer.app').controller('CreateStackController', [
 
     function createSwarmStack(name, method) {
       var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
-      var endpointId = EndpointProvider.endpointID();
+      const endpointId = +$state.params.endpointId;
 
-      if (method === 'editor') {
+      if (method === 'template' || method === 'editor') {
         var stackFileContent = $scope.formValues.StackFileContent;
         return StackService.createSwarmStackFromFileContent(name, stackFileContent, env, endpointId);
-      } else if (method === 'upload') {
+      }
+
+      if (method === 'upload') {
         var stackFile = $scope.formValues.StackFile;
         return StackService.createSwarmStackFromFileUpload(name, stackFile, env, endpointId);
-      } else if (method === 'repository') {
+      }
+
+      if (method === 'repository') {
         var repositoryOptions = {
           RepositoryURL: $scope.formValues.RepositoryURL,
           RepositoryReferenceName: $scope.formValues.RepositoryReferenceName,
@@ -77,9 +86,9 @@ angular.module('portainer.app').controller('CreateStackController', [
 
     function createComposeStack(name, method) {
       var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
-      var endpointId = EndpointProvider.endpointID();
+      const endpointId = +$state.params.endpointId;
 
-      if (method === 'editor') {
+      if (method === 'editor' || method === 'template') {
         var stackFileContent = $scope.formValues.StackFileContent;
         return StackService.createComposeStackFromFileContent(name, stackFileContent, env, endpointId);
       } else if (method === 'upload') {
@@ -132,7 +141,7 @@ angular.module('portainer.app').controller('CreateStackController', [
         })
         .then(function success() {
           Notifications.success('Stack successfully deployed');
-          $state.go('portainer.stacks');
+          $state.go('docker.stacks');
         })
         .catch(function error(err) {
           Notifications.error('Deployment error', err, 'Unable to deploy stack');
@@ -146,14 +155,29 @@ angular.module('portainer.app').controller('CreateStackController', [
       $scope.formValues.StackFileContent = cm.getValue();
     };
 
-    function initView() {
+    $scope.onChangeTemplate = async function onChangeTemplate(template) {
+      try {
+        $scope.selectedTemplate = template;
+        $scope.formValues.StackFileContent = await CustomTemplateService.customTemplateFile(template.Id);
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to retrieve Custom Template file');
+      }
+    };
+
+    async function initView() {
       var endpointMode = $scope.applicationState.endpoint.mode;
       $scope.state.StackType = 2;
       if (endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER') {
         $scope.state.StackType = 1;
       }
+
+      try {
+        const templates = await CustomTemplateService.customTemplates($scope.state.StackType);
+        $scope.templates = _.map(templates, (template) => ({ ...template, label: `${template.Title} - ${template.Description}` }));
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to retrieve Custom Templates');
+      }
     }
 
     initView();
-  },
-]);
+  });

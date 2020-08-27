@@ -5,7 +5,6 @@ angular.module('portainer.app').controller('TemplatesController', [
   '$scope',
   '$q',
   '$state',
-  '$transition$',
   '$anchorScroll',
   'ContainerService',
   'ImageService',
@@ -19,13 +18,10 @@ angular.module('portainer.app').controller('TemplatesController', [
   'FormValidator',
   'SettingsService',
   'StackService',
-  'EndpointProvider',
-  'ModalService',
   function (
     $scope,
     $q,
     $state,
-    $transition$,
     $anchorScroll,
     ContainerService,
     ImageService,
@@ -38,16 +34,13 @@ angular.module('portainer.app').controller('TemplatesController', [
     Authentication,
     FormValidator,
     SettingsService,
-    StackService,
-    EndpointProvider,
-    ModalService
+    StackService
   ) {
     $scope.state = {
       selectedTemplate: null,
       showAdvancedOptions: false,
       formValidationError: '',
       actionInProgress: false,
-      templateManagement: true,
     };
 
     $scope.formValues = {
@@ -147,7 +140,7 @@ angular.module('portainer.app').controller('TemplatesController', [
         ComposeFilePathInRepository: template.Repository.stackfile,
       };
 
-      var endpointId = EndpointProvider.endpointID();
+      const endpointId = +$state.params.endpointId;
       StackService.createComposeStackFromGitRepository(stackName, repositoryOptions, template.Env, endpointId)
         .then(function success(data) {
           const resourceControl = data.ResourceControl;
@@ -155,10 +148,10 @@ angular.module('portainer.app').controller('TemplatesController', [
         })
         .then(function success() {
           Notifications.success('Stack successfully deployed');
-          $state.go('portainer.stacks');
+          $state.go('docker.stacks');
         })
         .catch(function error(err) {
-          Notifications.warning('Deployment error', err.data.err);
+          Notifications.error('Deployment error', err);
         })
         .finally(function final() {
           $scope.state.actionInProgress = false;
@@ -184,7 +177,8 @@ angular.module('portainer.app').controller('TemplatesController', [
         ComposeFilePathInRepository: template.Repository.stackfile,
       };
 
-      var endpointId = EndpointProvider.endpointID();
+      const endpointId = +$state.params.endpointId;
+
       StackService.createSwarmStackFromGitRepository(stackName, repositoryOptions, env, endpointId)
         .then(function success(data) {
           const resourceControl = data.ResourceControl;
@@ -192,10 +186,10 @@ angular.module('portainer.app').controller('TemplatesController', [
         })
         .then(function success() {
           Notifications.success('Stack successfully deployed');
-          $state.go('portainer.stacks');
+          $state.go('docker.stacks');
         })
         .catch(function error(err) {
-          Notifications.warning('Deployment error', err.data.err);
+          Notifications.error('Deployment error', err);
         })
         .finally(function final() {
           $scope.state.actionInProgress = false;
@@ -255,27 +249,6 @@ angular.module('portainer.app').controller('TemplatesController', [
       return TemplateService.createTemplateConfiguration(template, name, network);
     }
 
-    $scope.deleteTemplate = function (template) {
-      ModalService.confirmDeletion('Do you want to delete this template?', function onConfirm(confirmed) {
-        if (!confirmed) {
-          return;
-        }
-        deleteTemplate(template);
-      });
-    };
-
-    function deleteTemplate(template) {
-      TemplateService.delete(template.Id)
-        .then(function success() {
-          Notifications.success('Template successfully deleted');
-          var idx = $scope.templates.indexOf(template);
-          $scope.templates.splice(idx, 1);
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to remove template');
-        });
-    }
-
     function initView() {
       $scope.isAdmin = Authentication.isAdmin();
 
@@ -300,7 +273,6 @@ angular.module('portainer.app').controller('TemplatesController', [
           $scope.availableNetworks = networks;
           var settings = data.settings;
           $scope.allowBindMounts = settings.AllowBindMountsForRegularUsers;
-          $scope.state.templateManagement = !settings.ExternalTemplates;
         })
         .catch(function error(err) {
           $scope.templates = [];

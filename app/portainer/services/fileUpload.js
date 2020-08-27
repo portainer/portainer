@@ -1,3 +1,4 @@
+import { PortainerEndpointCreationTypes } from 'Portainer/models/endpoint/models';
 import { genericHandler, jsonObjectsToArrayHandler } from '../../docker/rest/response/handlers';
 
 angular.module('portainer.app').factory('FileUploadService', [
@@ -91,12 +92,19 @@ angular.module('portainer.app').factory('FileUploadService', [
         data: {
           file: file,
           Name: stackName,
-          EdgeGroups: Upload.json(edgeGroups)
+          EdgeGroups: Upload.json(edgeGroups),
         },
-        ignoreLoadingBar: true
+        ignoreLoadingBar: true,
       });
     };
-  
+
+    service.createCustomTemplate = function createCustomTemplate(data) {
+      return Upload.upload({
+        url: 'api/custom_templates?method=file',
+        data,
+        ignoreLoadingBar: true,
+      });
+    };
 
     service.configureRegistry = function (registryId, registryManagementConfigurationModel) {
       return Upload.upload({
@@ -105,23 +113,26 @@ angular.module('portainer.app').factory('FileUploadService', [
       });
     };
 
-    service.executeEndpointJob = function (imageName, file, endpointId, nodeName) {
-      return Upload.upload({
-        url: 'api/endpoints/' + endpointId + '/job?method=file&nodeName=' + nodeName,
-        data: {
-          File: file,
-          Image: imageName,
-        },
-        ignoreLoadingBar: true,
-      });
-    };
-
-    service.createEndpoint = function (name, type, URL, PublicURL, groupID, tagIds, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
+    service.createEndpoint = function (
+      name,
+      creationType,
+      URL,
+      PublicURL,
+      groupID,
+      tagIds,
+      TLS,
+      TLSSkipVerify,
+      TLSSkipClientVerify,
+      TLSCAFile,
+      TLSCertFile,
+      TLSKeyFile,
+      checkinInterval
+    ) {
       return Upload.upload({
         url: 'api/endpoints',
         data: {
           Name: name,
-          EndpointType: type,
+          EndpointCreationType: creationType,
           URL: URL,
           PublicURL: PublicURL,
           GroupID: groupID,
@@ -132,6 +143,7 @@ angular.module('portainer.app').factory('FileUploadService', [
           TLSCACertFile: TLSCAFile,
           TLSCertFile: TLSCertFile,
           TLSKeyFile: TLSKeyFile,
+          CheckinInterval: checkinInterval,
         },
         ignoreLoadingBar: true,
       });
@@ -142,7 +154,7 @@ angular.module('portainer.app').factory('FileUploadService', [
         url: 'api/endpoints',
         data: {
           Name: name,
-          EndpointType: 3,
+          EndpointCreationType: PortainerEndpointCreationTypes.AzureEnvironment,
           GroupID: groupId,
           TagIds: Upload.json(tagIds),
           AzureApplicationID: applicationId,
@@ -183,19 +195,6 @@ angular.module('portainer.app').factory('FileUploadService', [
       }
 
       return $q.all(queue);
-    };
-
-    service.uploadExtension = function (license, extensionFile) {
-      const payload = {
-        License: license,
-        file: extensionFile,
-        ArchiveFileName: extensionFile.name,
-      };
-      return Upload.upload({
-        url: 'api/extensions/upload',
-        data: payload,
-        ignoreLoadingBar: true,
-      });
     };
 
     return service;

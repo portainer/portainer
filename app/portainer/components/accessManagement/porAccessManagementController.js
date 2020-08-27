@@ -4,11 +4,9 @@ import angular from 'angular';
 
 class PorAccessManagementController {
   /* @ngInject */
-  constructor(Notifications, ExtensionService, AccessService, RoleService) {
+  constructor(Notifications, AccessService) {
     this.Notifications = Notifications;
-    this.ExtensionService = ExtensionService;
     this.AccessService = AccessService;
-    this.RoleService = RoleService;
 
     this.unauthorizeAccess = this.unauthorizeAccess.bind(this);
     this.updateAction = this.updateAction.bind(this);
@@ -31,11 +29,10 @@ class PorAccessManagementController {
     const entity = this.accessControlledEntity;
     const oldUserAccessPolicies = entity.UserAccessPolicies;
     const oldTeamAccessPolicies = entity.TeamAccessPolicies;
-    const selectedRoleId = this.rbacEnabled ? this.formValues.selectedRole.Id : 0;
     const selectedUserAccesses = _.filter(this.formValues.multiselectOutput, (access) => access.Type === 'user');
     const selectedTeamAccesses = _.filter(this.formValues.multiselectOutput, (access) => access.Type === 'team');
 
-    const accessPolicies = this.AccessService.generateAccessPolicies(oldUserAccessPolicies, oldTeamAccessPolicies, selectedUserAccesses, selectedTeamAccesses, selectedRoleId);
+    const accessPolicies = this.AccessService.generateAccessPolicies(oldUserAccessPolicies, oldTeamAccessPolicies, selectedUserAccesses, selectedTeamAccesses, 0);
     this.accessControlledEntity.UserAccessPolicies = accessPolicies.userAccessPolicies;
     this.accessControlledEntity.TeamAccessPolicies = accessPolicies.teamAccessPolicies;
     this.updateAccess();
@@ -53,41 +50,11 @@ class PorAccessManagementController {
   }
 
   async $onInit() {
-    const entity = this.accessControlledEntity;
-    if (!entity) {
-      this.Notifications.error('Failure', 'Unable to retrieve accesses');
-      return;
-    }
-    if (!entity.UserAccessPolicies) {
-      entity.UserAccessPolicies = {};
-    }
-    if (!entity.TeamAccessPolicies) {
-      entity.TeamAccessPolicies = {};
-    }
-    const parent = this.inheritFrom;
-    if (parent && !parent.UserAccessPolicies) {
-      parent.UserAccessPolicies = {};
-    }
-    if (parent && !parent.TeamAccessPolicies) {
-      parent.TeamAccessPolicies = {};
-    }
-    this.roles = [];
-    this.rbacEnabled = false;
     try {
-      this.rbacEnabled = await this.ExtensionService.extensionEnabled(this.ExtensionService.EXTENSIONS.RBAC);
-      if (this.rbacEnabled) {
-        this.roles = await this.RoleService.roles();
-        this.formValues = {
-          selectedRole: this.roles[0],
-        };
-      }
-      const data = await this.AccessService.accesses(
-        entity.UserAccessPolicies,
-        entity.TeamAccessPolicies,
-        parent ? parent.UserAccessPolicies : {},
-        parent ? parent.TeamAccessPolicies : {},
-        this.roles
-      );
+      const entity = this.accessControlledEntity;
+      const parent = this.inheritFrom;
+
+      const data = await this.AccessService.accesses(entity, parent, this.roles);
       this.availableUsersAndTeams = _.orderBy(data.availableUsersAndTeams, 'Name', 'asc');
       this.authorizedUsersAndTeams = data.authorizedUsersAndTeams;
     } catch (err) {

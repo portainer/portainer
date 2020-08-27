@@ -126,11 +126,13 @@ angular
     return function (type) {
       if (type === 1) {
         return 'Docker';
-      } else if (type === 2) {
+      } else if (type === 2 || type === 6) {
         return 'Agent';
       } else if (type === 3) {
         return 'Azure ACI';
-      } else if (type === 4) {
+      } else if (type === 5) {
+        return 'Kubernetes';
+      } else if (type === 4 || type === 7) {
         return 'Edge Agent';
       }
       return '';
@@ -143,6 +145,8 @@ angular
         return 'fab fa-microsoft';
       } else if (type === 4) {
         return 'fa fa-cloud';
+      } else if (type === 5 || type === 6 || type === 7) {
+        return 'fas fa-dharmachakra';
       }
       return 'fab fa-docker';
     };

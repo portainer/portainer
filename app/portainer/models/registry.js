@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { RegistryTypes } from 'Extensions/registry-management/models/registryTypes';
+import { RegistryTypes } from '@/portainer/models/registryTypes';
 
 export function RegistryViewModel(data) {
   this.Id = data.Id;
@@ -51,6 +51,7 @@ export function RegistryCreateRequest(model) {
   this.Name = model.Name;
   this.Type = model.Type;
   this.URL = _.replace(model.URL, /^https?\:\/\//i, '');
+  this.URL = _.replace(this.URL, /\/$/, '');
   this.Authentication = model.Authentication;
   if (model.Authentication) {
     this.Username = model.Username;

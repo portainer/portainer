@@ -1,6 +1,7 @@
 package edgestacks
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -9,6 +10,8 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/internal/edge"
 )
 
 type updateEdgeStackPayload struct {
@@ -20,10 +23,10 @@ type updateEdgeStackPayload struct {
 
 func (payload *updateEdgeStackPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.StackFileContent) {
-		return portainer.Error("Invalid stack file content")
+		return errors.New("Invalid stack file content")
 	}
 	if payload.EdgeGroups != nil && len(payload.EdgeGroups) == 0 {
-		return portainer.Error("Edge Groups are mandatory for an Edge stack")
+		return errors.New("Edge Groups are mandatory for an Edge stack")
 	}
 	return nil
 }
@@ -34,8 +37,8 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid stack identifier route variable", err}
 	}
 
-	stack, err := handler.EdgeStackService.EdgeStack(portainer.EdgeStackID(stackID))
-	if err == portainer.ErrObjectNotFound {
+	stack, err := handler.DataStore.EdgeStack().EdgeStack(portainer.EdgeStackID(stackID))
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a stack with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a stack with the specified identifier inside the database", err}
@@ -48,27 +51,27 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if payload.EdgeGroups != nil {
-		endpoints, err := handler.EndpointService.Endpoints()
+		endpoints, err := handler.DataStore.Endpoint().Endpoints()
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from database", err}
 		}
 
-		endpointGroups, err := handler.EndpointGroupService.EndpointGroups()
+		endpointGroups, err := handler.DataStore.EndpointGroup().EndpointGroups()
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint groups from database", err}
 		}
 
-		edgeGroups, err := handler.EdgeGroupService.EdgeGroups()
+		edgeGroups, err := handler.DataStore.EdgeGroup().EdgeGroups()
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge groups from database", err}
 		}
 
-		oldRelated, err := portainer.EdgeStackRelatedEndpoints(stack.EdgeGroups, endpoints, endpointGroups, edgeGroups)
+		oldRelated, err := edge.EdgeStackRelatedEndpoints(stack.EdgeGroups, endpoints, endpointGroups, edgeGroups)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stack related endpoints from database", err}
 		}
 
-		newRelated, err := portainer.EdgeStackRelatedEndpoints(payload.EdgeGroups, endpoints, endpointGroups, edgeGroups)
+		newRelated, err := edge.EdgeStackRelatedEndpoints(payload.EdgeGroups, endpoints, endpointGroups, edgeGroups)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stack related endpoints from database", err}
 		}
@@ -84,14 +87,14 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 		}
 
 		for endpointID := range endpointsToRemove {
-			relation, err := handler.EndpointRelationService.EndpointRelation(endpointID)
+			relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpointID)
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find endpoint relation in database", err}
 			}
 
 			delete(relation.EdgeStacks, stack.ID)
 
-			err = handler.EndpointRelationService.UpdateEndpointRelation(endpointID, relation)
+			err = handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpointID, relation)
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint relation in database", err}
 			}
@@ -105,14 +108,14 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 		}
 
 		for endpointID := range endpointsToAdd {
-			relation, err := handler.EndpointRelationService.EndpointRelation(endpointID)
+			relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpointID)
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find endpoint relation in database", err}
 			}
 
 			relation.EdgeStacks[stack.ID] = true
 
-			err = handler.EndpointRelationService.UpdateEndpointRelation(endpointID, relation)
+			err = handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpointID, relation)
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint relation in database", err}
 			}
@@ -137,7 +140,7 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 		stack.Status = map[portainer.EndpointID]portainer.EdgeStackStatus{}
 	}
 
-	err = handler.EdgeStackService.UpdateEdgeStack(stack.ID, stack)
+	err = handler.DataStore.EdgeStack().UpdateEdgeStack(stack.ID, stack)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack changes inside the database", err}
 	}

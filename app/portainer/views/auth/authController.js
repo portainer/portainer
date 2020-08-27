@@ -8,12 +8,10 @@ class AuthenticationController {
     $scope,
     $state,
     $stateParams,
-    $sanitize,
     $window,
     Authentication,
     UserService,
     EndpointService,
-    ExtensionService,
     StateManager,
     Notifications,
     SettingsService,
@@ -26,11 +24,9 @@ class AuthenticationController {
     this.$state = $state;
     this.$stateParams = $stateParams;
     this.$window = $window;
-    this.$sanitize = $sanitize;
     this.Authentication = Authentication;
     this.UserService = UserService;
     this.EndpointService = EndpointService;
-    this.ExtensionService = ExtensionService;
     this.StateManager = StateManager;
     this.Notifications = Notifications;
     this.SettingsService = SettingsService;
@@ -49,13 +45,11 @@ class AuthenticationController {
       OAuthProvider: '',
     };
 
-    this.retrieveAndSaveEnabledExtensionsAsync = this.retrieveAndSaveEnabledExtensionsAsync.bind(this);
     this.checkForEndpointsAsync = this.checkForEndpointsAsync.bind(this);
     this.checkForLatestVersionAsync = this.checkForLatestVersionAsync.bind(this);
     this.postLoginSteps = this.postLoginSteps.bind(this);
 
     this.oAuthLoginAsync = this.oAuthLoginAsync.bind(this);
-    this.retryLoginSanitizeAsync = this.retryLoginSanitizeAsync.bind(this);
     this.internalLoginAsync = this.internalLoginAsync.bind(this);
 
     this.authenticateUserAsync = this.authenticateUserAsync.bind(this);
@@ -120,18 +114,10 @@ class AuthenticationController {
    * POST LOGIN STEPS SECTION
    */
 
-  async retrieveAndSaveEnabledExtensionsAsync() {
-    try {
-      await this.ExtensionService.retrieveAndSaveEnabledExtensions();
-    } catch (err) {
-      this.error(err, 'Unable to retrieve enabled extensions');
-    }
-  }
-
-  async checkForEndpointsAsync(noAuth) {
+  async checkForEndpointsAsync() {
     try {
       const endpoints = await this.EndpointService.endpoints(0, 1);
-      const isAdmin = noAuth || this.Authentication.isAdmin();
+      const isAdmin = this.Authentication.isAdmin();
 
       if (endpoints.value.length === 0 && isAdmin) {
         return this.$state.go('portainer.init.endpoint');
@@ -161,8 +147,8 @@ class AuthenticationController {
   }
 
   async postLoginSteps() {
-    await this.retrieveAndSaveEnabledExtensionsAsync();
-    await this.checkForEndpointsAsync(false);
+    await this.StateManager.initialize();
+    await this.checkForEndpointsAsync();
     await this.checkForLatestVersionAsync();
   }
   /**
@@ -179,15 +165,6 @@ class AuthenticationController {
       this.URLHelper.cleanParameters();
     } catch (err) {
       this.error(err, 'Unable to login via OAuth');
-    }
-  }
-
-  async retryLoginSanitizeAsync(username, password) {
-    try {
-      await this.internalLoginAsync(this.$sanitize(username), this.$sanitize(password));
-      this.$state.go('portainer.updatePassword');
-    } catch (err) {
-      this.error(err, 'Invalid credentials');
     }
   }
 
@@ -211,13 +188,7 @@ class AuthenticationController {
       this.state.loginInProgress = true;
       await this.internalLoginAsync(username, password);
     } catch (err) {
-      if (this.state.permissionsError) {
-        return;
-      }
-      // This login retry is necessary to avoid conflicts with databases
-      // containing users created before Portainer 1.19.2
-      // See https://github.com/portainer/portainer/issues/2199 for more info
-      await this.retryLoginSanitizeAsync(username, password);
+      this.error(err, 'Unable to login');
     }
   }
 
@@ -282,12 +253,7 @@ class AuthenticationController {
       }
       this.state.loginInProgress = false;
 
-      const authenticationEnabled = this.$scope.applicationState.application.authentication;
-      if (!authenticationEnabled) {
-        await this.checkForEndpointsAsync(true);
-      } else {
-        await this.authEnabledFlowAsync();
-      }
+      await this.authEnabledFlowAsync();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve public settings');
     }

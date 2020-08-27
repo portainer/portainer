@@ -3,6 +3,9 @@ package registries
 import (
 	"net/http"
 
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/http/errors"
+
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -16,8 +19,8 @@ func (handler *Handler) registryInspect(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid registry identifier route variable", err}
 	}
 
-	registry, err := handler.RegistryService.Registry(portainer.RegistryID(registryID))
-	if err == portainer.ErrObjectNotFound {
+	registry, err := handler.DataStore.Registry().Registry(portainer.RegistryID(registryID))
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a registry with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a registry with the specified identifier inside the database", err}
@@ -25,7 +28,7 @@ func (handler *Handler) registryInspect(w http.ResponseWriter, r *http.Request) 
 
 	err = handler.requestBouncer.RegistryAccess(r, registry)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access registry", portainer.ErrEndpointAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access registry", errors.ErrEndpointAccessDenied}
 	}
 
 	hideFields(registry)

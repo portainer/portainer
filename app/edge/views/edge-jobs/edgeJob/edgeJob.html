@@ -1,0 +1,52 @@
+<rd-header>
+  <rd-header-title title-text="Edge job details">
+    <a data-toggle="tooltip" title-text="Refresh" ui-sref="edge.jobs.job({id: $ctrl.edgeJob.Id, tab: $ctrl.state.activeTab})" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content> <a ui-sref="edge.jobs">Edge jobs</a> &gt; {{ ::$ctrl.edgeJob.Name }} </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <uib-tabset active="$ctrl.state.activeTab">
+          <uib-tab index="0" select="$ctrl.showEditor()">
+            <uib-tab-heading> <i class="fa fa-wrench" aria-hidden="true"></i> Configuration </uib-tab-heading>
+
+            <edge-job-form
+              ng-if="$ctrl.edgeJob && $ctrl.state.showEditorTab"
+              model="$ctrl.edgeJob"
+              endpoints="endpoints"
+              groups="$ctrl.groups"
+              tags="$ctrl.tags"
+              form-action="$ctrl.update"
+              form-action-label="Update Edge job"
+              action-in-progress="$ctrl.state.actionInProgress"
+            ></edge-job-form>
+          </uib-tab>
+
+          <uib-tab index="1">
+            <uib-tab-heading> <i class="fa fa-tasks" aria-hidden="true"></i> Results </uib-tab-heading>
+
+            <edge-job-results-datatable
+              style="display: block; margin-top: 10px;"
+              ng-if="$ctrl.results"
+              title-text="Results"
+              title-icon="fa-tasks"
+              dataset="$ctrl.results"
+              table-key="edge-job-results"
+              order-by="Status"
+              reverse-order="true"
+              refresh-callback="$ctrl.refresh"
+              on-download-logs-click="($ctrl.downloadLogs)"
+              on-collect-logs-click="($ctrl.collectLogs)"
+              on-clear-logs-click="($ctrl.clearLogs)"
+            ></edge-job-results-datatable>
+          </uib-tab>
+        </uib-tabset>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

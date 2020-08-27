@@ -10,6 +10,7 @@ export function NetworkViewModel(data) {
   this.IPAM = data.IPAM;
   this.Containers = data.Containers;
   this.Options = data.Options;
+  this.Ingress = data.Ingress;
 
   this.Labels = data.Labels;
   if (this.Labels && this.Labels['com.docker.compose.project']) {

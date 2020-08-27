@@ -63,7 +63,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       alwaysPull: true,
       Console: 'none',
       Volumes: [],
-      NetworkContainer: '',
+      NetworkContainer: null,
       Labels: [],
       ExtraHosts: [],
       MacAddress: '',
@@ -75,6 +75,8 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       CpuLimit: 0,
       MemoryLimit: 0,
       MemoryReservation: 0,
+      CmdMode: 'default',
+      EntrypointMode: 'default',
       NodeName: null,
       capabilities: [],
       LogDriverName: '',
@@ -87,6 +89,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     $scope.state = {
       formValidationError: '',
       actionInProgress: false,
+      mode: '',
     };
 
     $scope.refreshSlider = function () {
@@ -95,12 +98,18 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       });
     };
 
+    $scope.onImageNameChange = function () {
+      $scope.formValues.CmdMode = 'default';
+      $scope.formValues.EntrypointMode = 'default';
+    };
+
     $scope.config = {
       Image: '',
       Env: [],
       Cmd: '',
       MacAddress: '',
       ExposedPorts: {},
+      Entrypoint: '',
       HostConfig: {
         RestartPolicy: {
           Name: 'no',
@@ -112,7 +121,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         NetworkMode: 'bridge',
         Privileged: false,
         Init: false,
-        Runtime: '',
+        Runtime: null,
         ExtraHosts: [],
         Devices: [],
         CapAdd: [],
@@ -189,6 +198,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
     function preparePortBindings(config) {
       const bindings = ContainerHelper.preparePortBindings(config.HostConfig.PortBindings);
+      config.ExposedPorts = {};
       _.forEach(bindings, (_, key) => (config.ExposedPorts[key] = {}));
       config.HostConfig.PortBindings = bindings;
     }
@@ -207,6 +217,20 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       }
       config.OpenStdin = openStdin;
       config.Tty = tty;
+    }
+
+    function prepareCmd(config) {
+      if (_.isEmpty(config.Cmd) || $scope.formValues.CmdMode == 'default') {
+        delete config.Cmd;
+      } else {
+        config.Cmd = ContainerHelper.commandStringToArray(config.Cmd);
+      }
+    }
+
+    function prepareEntrypoint(config) {
+      if ($scope.formValues.EntrypointMode == 'default' || (_.isEmpty(config.Cmd) && _.isEmpty(config.Entrypoint))) {
+        config.Entrypoint = null;
+      }
     }
 
     function prepareEnvironmentVariables(config) {
@@ -277,11 +301,10 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       }
       config.HostConfig.Dns = dnsServers;
 
-      $scope.formValues.ExtraHosts.forEach(function (v) {
-        if (v.value) {
-          config.HostConfig.ExtraHosts.push(v.value);
-        }
-      });
+      config.HostConfig.ExtraHosts = _.map(
+        _.filter($scope.formValues.ExtraHosts, (v) => v.value),
+        'value'
+      );
     }
 
     function prepareLabels(config) {
@@ -313,19 +336,21 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
     function prepareResources(config) {
       // Memory Limit - Round to 0.125
-      var memoryLimit = (Math.round($scope.formValues.MemoryLimit * 8) / 8).toFixed(3);
-      memoryLimit *= 1024 * 1024;
-      if (memoryLimit > 0) {
+      if ($scope.formValues.MemoryLimit >= 0) {
+        var memoryLimit = (Math.round($scope.formValues.MemoryLimit * 8) / 8).toFixed(3);
+        memoryLimit *= 1024 * 1024;
         config.HostConfig.Memory = memoryLimit;
       }
+
       // Memory Resevation - Round to 0.125
-      var memoryReservation = (Math.round($scope.formValues.MemoryReservation * 8) / 8).toFixed(3);
-      memoryReservation *= 1024 * 1024;
-      if (memoryReservation > 0) {
+      if ($scope.formValues.MemoryReservation >= 0) {
+        var memoryReservation = (Math.round($scope.formValues.MemoryReservation * 8) / 8).toFixed(3);
+        memoryReservation *= 1024 * 1024;
         config.HostConfig.MemoryReservation = memoryReservation;
       }
+
       // CPU Limit
-      if ($scope.formValues.CpuLimit > 0) {
+      if ($scope.formValues.CpuLimit >= 0) {
         config.HostConfig.NanoCpus = $scope.formValues.CpuLimit * 1000000000;
       }
     }
@@ -364,7 +389,8 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
     function prepareConfiguration() {
       var config = angular.copy($scope.config);
-      config.Cmd = ContainerHelper.commandStringToArray(config.Cmd);
+      prepareCmd(config);
+      prepareEntrypoint(config);
       prepareNetworkConfig(config);
       prepareImageConfig(config);
       preparePortBindings(config);
@@ -382,8 +408,16 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     function loadFromContainerCmd() {
       if ($scope.config.Cmd) {
         $scope.config.Cmd = ContainerHelper.commandArrayToString($scope.config.Cmd);
-      } else {
-        $scope.config.Cmd = '';
+        $scope.formValues.CmdMode = 'override';
+      }
+    }
+
+    function loadFromContainerEntrypoint() {
+      if (_.has($scope.config, 'Entrypoint')) {
+        if ($scope.config.Entrypoint == null) {
+          $scope.config.Entrypoint = '';
+        }
+        $scope.formValues.EntrypointMode = 'override';
       }
     }
 
@@ -573,8 +607,10 @@ angular.module('portainer.docker').controller('CreateContainerController', [
             $scope.formValues.AccessControlData.AccessControlEnabled = false;
           }
           $scope.fromContainer = fromContainer;
+          $scope.state.mode = 'duplicate';
           $scope.config = ContainerHelper.configFromContainer(fromContainer.Model);
           loadFromContainerCmd(d);
+          loadFromContainerEntrypoint(d);
           loadFromContainerLogging(d);
           loadFromContainerPortBindings(d);
           loadFromContainerVolumes(d);
@@ -603,15 +639,22 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       });
     }
 
-    function initView() {
+    async function initView() {
       var nodeName = $transition$.params().nodeName;
       $scope.formValues.NodeName = nodeName;
       HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
 
+      $scope.isAdmin = Authentication.isAdmin();
+      $scope.showDeviceMapping = await shouldShowDevices();
+      $scope.areContainerCapabilitiesEnabled = await checkIfContainerCapabilitiesEnabled();
+      $scope.isAdminOrEndpointAdmin = Authentication.isAdmin();
+
       Volume.query(
         {},
         function (d) {
-          $scope.availableVolumes = d.Volumes;
+          $scope.availableVolumes = d.Volumes.sort((vol1, vol2) => {
+            return vol1.Name.localeCompare(vol2.Name);
+          });
         },
         function (e) {
           Notifications.error('Failure', e, 'Unable to retrieve volumes');
@@ -621,10 +664,9 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       var provider = $scope.applicationState.endpoint.mode.provider;
       var apiVersion = $scope.applicationState.endpoint.apiVersion;
       NetworkService.networks(provider === 'DOCKER_STANDALONE' || provider === 'DOCKER_SWARM_MODE', false, provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25)
-        .then(function success(data) {
-          var networks = data;
+        .then(function success(networks) {
           networks.push({ Name: 'container' });
-          $scope.availableNetworks = networks;
+          $scope.availableNetworks = networks.sort((a, b) => a.Name.localeCompare(b.Name));
 
           if (_.find(networks, { Name: 'nat' })) {
             $scope.config.HostConfig.NetworkMode = 'nat';
@@ -643,7 +685,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
             loadFromContainerSpec();
           } else {
             $scope.fromContainer = {};
-            $scope.formValues.capabilities = new ContainerCapabilities();
+            $scope.formValues.capabilities = $scope.areContainerCapabilitiesEnabled ? new ContainerCapabilities() : [];
           }
         },
         function (e) {
@@ -654,7 +696,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       SystemService.info()
         .then(function success(data) {
           $scope.availableRuntimes = data.Runtimes ? Object.keys(data.Runtimes) : [];
-          $scope.config.HostConfig.Runtime = '';
           $scope.state.sliderMaxCpu = 32;
           if (data.NCPU) {
             $scope.state.sliderMaxCpu = data.NCPU;
@@ -670,7 +711,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
       SettingsService.publicSettings()
         .then(function success(data) {
-          $scope.allowBindMounts = data.AllowBindMountsForRegularUsers;
+          $scope.allowBindMounts = $scope.isAdminOrEndpointAdmin || data.AllowBindMountsForRegularUsers;
           $scope.allowPrivilegedMode = data.AllowPrivilegedModeForRegularUsers;
         })
         .catch(function error(err) {
@@ -680,8 +721,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       PluginService.loggingPlugins(apiVersion < 1.25).then(function success(loggingDrivers) {
         $scope.availableLoggingDrivers = loggingDrivers;
       });
-
-      $scope.isAdmin = Authentication.isAdmin();
     }
 
     function validateForm(accessControlData, isAdmin) {
@@ -698,7 +737,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
     function create() {
       var oldContainer = null;
-
       HttpRequestHelper.setPortainerAgentTargetHeader($scope.formValues.NodeName);
       return findCurrentContainer().then(setOldContainer).then(confirmCreateContainer).then(startCreationProcess).catch(notifyOnError).finally(final);
 
@@ -892,6 +930,18 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         Notifications.success('Container successfully created');
         $state.go('docker.containers', {}, { reload: true });
       }
+    }
+
+    async function shouldShowDevices() {
+      const { allowDeviceMappingForRegularUsers } = $scope.applicationState.application;
+
+      return allowDeviceMappingForRegularUsers || Authentication.isAdmin();
+    }
+
+    async function checkIfContainerCapabilitiesEnabled() {
+      const { allowContainerCapabilitiesForRegularUsers } = $scope.applicationState.application;
+
+      return allowContainerCapabilitiesForRegularUsers || Authentication.isAdmin();
     }
 
     initView();

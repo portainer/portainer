@@ -11,7 +11,7 @@ func (handler *Handler) getEndpointsByTags(tagIDs []portainer.TagID, partialMatc
 		return []portainer.EndpointID{}, nil
 	}
 
-	endpoints, err := handler.EndpointService.Endpoints()
+	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {
 		return nil, err
 	}
@@ -20,7 +20,7 @@ func (handler *Handler) getEndpointsByTags(tagIDs []portainer.TagID, partialMatc
 
 	tags := []portainer.Tag{}
 	for _, tagID := range tagIDs {
-		tag, err := handler.TagService.Tag(tagID)
+		tag, err := handler.DataStore.Tag().Tag(tagID)
 		if err != nil {
 			return nil, err
 		}
@@ -38,7 +38,7 @@ func (handler *Handler) getEndpointsByTags(tagIDs []portainer.TagID, partialMatc
 
 	results := []portainer.EndpointID{}
 	for _, endpoint := range endpoints {
-		if _, ok := endpointSet[endpoint.ID]; ok && endpoint.Type == portainer.EdgeAgentEnvironment {
+		if _, ok := endpointSet[endpoint.ID]; ok && (endpoint.Type == portainer.EdgeAgentOnDockerEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment) {
 			results = append(results, endpoint.ID)
 		}
 	}

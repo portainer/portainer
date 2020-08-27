@@ -31,11 +31,11 @@ type composeStackFromFileContentPayload struct {
 
 func (payload *composeStackFromFileContentPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
-		return portainer.Error("Invalid stack name")
+		return errors.New("Invalid stack name")
 	}
 	payload.Name = normalizeStackName(payload.Name)
 	if govalidator.IsNull(payload.StackFileContent) {
-		return portainer.Error("Invalid stack file content")
+		return errors.New("Invalid stack file content")
 	}
 	return nil
 }
@@ -47,18 +47,18 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	stacks, err := handler.StackService.Stacks()
+	stacks, err := handler.DataStore.Stack().Stacks()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
 	}
 
 	for _, stack := range stacks {
 		if strings.EqualFold(stack.Name, payload.Name) {
-			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", portainer.ErrStackAlreadyExists}
+			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", errStackAlreadyExists}
 		}
 	}
 
-	stackID := handler.StackService.GetNextIdentifier()
+	stackID := handler.DataStore.Stack().GetNextIdentifier()
 	stack := &portainer.Stack{
 		ID:         portainer.StackID(stackID),
 		Name:       payload.Name,
@@ -66,6 +66,7 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 		EndpointID: endpoint.ID,
 		EntryPoint: filesystem.ComposeFileDefaultName,
 		Env:        payload.Env,
+		Status:     portainer.StackStatusActive,
 	}
 
 	stackFolder := strconv.Itoa(int(stack.ID))
@@ -88,7 +89,7 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
 
-	err = handler.StackService.CreateStack(stack)
+	err = handler.DataStore.Stack().CreateStack(stack)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack inside the database", err}
 	}
@@ -110,14 +111,14 @@ type composeStackFromGitRepositoryPayload struct {
 
 func (payload *composeStackFromGitRepositoryPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
-		return portainer.Error("Invalid stack name")
+		return errors.New("Invalid stack name")
 	}
 	payload.Name = normalizeStackName(payload.Name)
 	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
-		return portainer.Error("Invalid repository URL. Must correspond to a valid URL format")
+		return errors.New("Invalid repository URL. Must correspond to a valid URL format")
 	}
 	if payload.RepositoryAuthentication && (govalidator.IsNull(payload.RepositoryUsername) || govalidator.IsNull(payload.RepositoryPassword)) {
-		return portainer.Error("Invalid repository credentials. Username and password must be specified when authentication is enabled")
+		return errors.New("Invalid repository credentials. Username and password must be specified when authentication is enabled")
 	}
 	if govalidator.IsNull(payload.ComposeFilePathInRepository) {
 		payload.ComposeFilePathInRepository = filesystem.ComposeFileDefaultName
@@ -132,18 +133,18 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	stacks, err := handler.StackService.Stacks()
+	stacks, err := handler.DataStore.Stack().Stacks()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
 	}
 
 	for _, stack := range stacks {
 		if strings.EqualFold(stack.Name, payload.Name) {
-			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", portainer.ErrStackAlreadyExists}
+			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", errStackAlreadyExists}
 		}
 	}
 
-	stackID := handler.StackService.GetNextIdentifier()
+	stackID := handler.DataStore.Stack().GetNextIdentifier()
 	stack := &portainer.Stack{
 		ID:         portainer.StackID(stackID),
 		Name:       payload.Name,
@@ -151,6 +152,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		EndpointID: endpoint.ID,
 		EntryPoint: payload.ComposeFilePathInRepository,
 		Env:        payload.Env,
+		Status:     portainer.StackStatusActive,
 	}
 
 	projectPath := handler.FileService.GetStackProjectPath(strconv.Itoa(int(stack.ID)))
@@ -183,7 +185,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
 
-	err = handler.StackService.CreateStack(stack)
+	err = handler.DataStore.Stack().CreateStack(stack)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack inside the database", err}
 	}
@@ -201,20 +203,20 @@ type composeStackFromFileUploadPayload struct {
 func (payload *composeStackFromFileUploadPayload) Validate(r *http.Request) error {
 	name, err := request.RetrieveMultiPartFormValue(r, "Name", false)
 	if err != nil {
-		return portainer.Error("Invalid stack name")
+		return errors.New("Invalid stack name")
 	}
 	payload.Name = normalizeStackName(name)
 
 	composeFileContent, _, err := request.RetrieveMultiPartFormFile(r, "file")
 	if err != nil {
-		return portainer.Error("Invalid Compose file. Ensure that the Compose file is uploaded correctly")
+		return errors.New("Invalid Compose file. Ensure that the Compose file is uploaded correctly")
 	}
 	payload.StackFileContent = composeFileContent
 
 	var env []portainer.Pair
 	err = request.RetrieveMultiPartFormJSONValue(r, "Env", &env, true)
 	if err != nil {
-		return portainer.Error("Invalid Env parameter")
+		return errors.New("Invalid Env parameter")
 	}
 	payload.Env = env
 	return nil
@@ -227,18 +229,18 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	stacks, err := handler.StackService.Stacks()
+	stacks, err := handler.DataStore.Stack().Stacks()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
 	}
 
 	for _, stack := range stacks {
 		if strings.EqualFold(stack.Name, payload.Name) {
-			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", portainer.ErrStackAlreadyExists}
+			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", errStackAlreadyExists}
 		}
 	}
 
-	stackID := handler.StackService.GetNextIdentifier()
+	stackID := handler.DataStore.Stack().GetNextIdentifier()
 	stack := &portainer.Stack{
 		ID:         portainer.StackID(stackID),
 		Name:       payload.Name,
@@ -246,6 +248,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 		EndpointID: endpoint.ID,
 		EntryPoint: filesystem.ComposeFileDefaultName,
 		Env:        payload.Env,
+		Status:     portainer.StackStatusActive,
 	}
 
 	stackFolder := strconv.Itoa(int(stack.ID))
@@ -268,7 +271,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
 
-	err = handler.StackService.CreateStack(stack)
+	err = handler.DataStore.Stack().CreateStack(stack)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack inside the database", err}
 	}
@@ -283,6 +286,7 @@ type composeStackDeploymentConfig struct {
 	dockerhub  *portainer.DockerHub
 	registries []portainer.Registry
 	isAdmin    bool
+	user       *portainer.User
 }
 
 func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) (*composeStackDeploymentConfig, *httperror.HandlerError) {
@@ -291,16 +295,21 @@ func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portai
 		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
-	dockerhub, err := handler.DockerHubService.DockerHub()
+	dockerhub, err := handler.DataStore.DockerHub().DockerHub()
 	if err != nil {
 		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve DockerHub details from the database", err}
 	}
 
-	registries, err := handler.RegistryService.Registries()
+	registries, err := handler.DataStore.Registry().Registries()
 	if err != nil {
 		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
 	}
 	filteredRegistries := security.FilterRegistries(registries, securityContext)
+
+	user, err := handler.DataStore.User().User(securityContext.UserID)
+	if err != nil {
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to load user information from the database", err}
+	}
 
 	config := &composeStackDeploymentConfig{
 		stack:      stack,
@@ -308,6 +317,7 @@ func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portai
 		dockerhub:  dockerhub,
 		registries: filteredRegistries,
 		isAdmin:    securityContext.IsAdmin,
+		user:       user,
 	}
 
 	return config, nil
@@ -319,12 +329,23 @@ func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portai
 // clean it. Hence the use of the mutex.
 // We should contribute to libcompose to support authentication without using the config.json file.
 func (handler *Handler) deployComposeStack(config *composeStackDeploymentConfig) error {
-	settings, err := handler.SettingsService.Settings()
+	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return err
 	}
 
-	if !settings.AllowBindMountsForRegularUsers && !config.isAdmin {
+	isAdminOrEndpointAdmin, err := handler.userIsAdminOrEndpointAdmin(config.user, config.endpoint.ID)
+	if err != nil {
+		return err
+	}
+
+	if (!settings.AllowBindMountsForRegularUsers ||
+		!settings.AllowPrivilegedModeForRegularUsers ||
+		!settings.AllowHostNamespaceForRegularUsers ||
+		!settings.AllowDeviceMappingForRegularUsers ||
+		!settings.AllowContainerCapabilitiesForRegularUsers) &&
+		!isAdminOrEndpointAdmin {
+
 		composeFilePath := path.Join(config.stack.ProjectPath, config.stack.EntryPoint)
 
 		stackContent, err := handler.FileService.GetFileContent(composeFilePath)
@@ -332,12 +353,9 @@ func (handler *Handler) deployComposeStack(config *composeStackDeploymentConfig)
 			return err
 		}
 
-		valid, err := handler.isValidStackFile(stackContent)
+		err = handler.isValidStackFile(stackContent, settings)
 		if err != nil {
 			return err
-		}
-		if !valid {
-			return errors.New("bind-mount disabled for non administrator users")
 		}
 	}
 

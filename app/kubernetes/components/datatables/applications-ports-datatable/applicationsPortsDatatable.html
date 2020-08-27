@@ -1,0 +1,256 @@
+<div class="datatable">
+  <rd-widget>
+    <rd-widget-body classes="no-padding">
+      <div class="toolBar">
+        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
+        <span class="small text-muted" style="float: left; margin-top: 5px;" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
+          <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+          System resources are hidden, this can be changed in the table settings.
+        </span>
+        <div class="settings">
+          <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
+            <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Table settings</span>
+            <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
+              <div class="tableMenu">
+                <div class="menuHeader">
+                  Table settings
+                </div>
+                <div class="menuContent">
+                  <div>
+                    <div class="md-checkbox" ng-if="$ctrl.isAdmin">
+                      <input id="ports_setting_show_system" type="checkbox" ng-model="$ctrl.settings.showSystem" ng-change="$ctrl.onSettingsShowSystemChange()" />
+                      <label for="ports_setting_show_system">Show system resources</label>
+                    </div>
+                    <div class="md-checkbox">
+                      <input id="setting_auto_refresh" type="checkbox" ng-model="$ctrl.settings.repeater.autoRefresh" ng-change="$ctrl.onSettingsRepeaterChange()" />
+                      <label for="setting_auto_refresh">Auto refresh</label>
+                    </div>
+                    <div ng-if="$ctrl.settings.repeater.autoRefresh">
+                      <label for="settings_refresh_rate">
+                        Refresh rate
+                      </label>
+                      <select id="settings_refresh_rate" ng-model="$ctrl.settings.repeater.refreshRate" ng-change="$ctrl.onSettingsRepeaterChange()" class="small-select">
+                        <option value="10">10s</option>
+                        <option value="30">30s</option>
+                        <option value="60">1min</option>
+                        <option value="120">2min</option>
+                        <option value="300">5min</option>
+                      </select>
+                      <span>
+                        <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none;"></i>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.settings.open = false;">Close</a>
+                </div>
+              </div>
+            </div>
+          </span>
+        </div>
+      </div>
+      <div class="searchBar">
+        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
+        <input
+          type="text"
+          class="searchInput"
+          ng-model="$ctrl.state.textFilter"
+          ng-change="$ctrl.onTextFilterChange()"
+          placeholder="Search..."
+          auto-focus
+          ng-model-options="{ debounce: 300 }"
+        />
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover nowrap-cells">
+          <thead>
+            <tr>
+              <th>
+                <a ng-click="$ctrl.expandAll()" ng-if="$ctrl.hasExpandableItems()">
+                  <i ng-class="{ 'fas fa-angle-down': $ctrl.state.expandAll, 'fas fa-angle-right': !$ctrl.state.expandAll }" aria-hidden="true"></i>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('Name')">
+                  Application
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                Publishing mode
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('TargetPort')">
+                  Exposed port
+                  <i class="fa fa-sort-numeric-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'TargetPort' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-numeric-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'TargetPort' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('Port')">
+                  Container port
+                  <i class="fa fa-sort-numeric-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Port' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-numeric-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Port' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                HTTP route
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- main rows -->
+            <!-- dir-paginate-start track by $index -->
+            <tr
+              dir-paginate-start="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | filter: $ctrl.isDisplayed | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit: $ctrl.tableKey))"
+              ng-class="{ active: item.Checked }"
+              ng-style="{ background: item.Highlighted ? '#d5e8f3' : '' }"
+              ng-click="$ctrl.expandItem(item, !item.Expanded)"
+              pagination-id="$ctrl.tableKey"
+            >
+              <!-- expandable -->
+              <td>
+                <a ng-if="$ctrl.itemCanExpand(item)">
+                  <i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i>
+                </a>
+              </td>
+              <!-- Application -->
+              <td>
+                <a ui-sref="kubernetes.applications.application({ name: item.Name, namespace: item.ResourcePool })">{{ item.Name }}</a>
+                <span class="label label-info image-tag label-margins" ng-if="$ctrl.isSystemNamespace(item)">system</span>
+                <span class="label label-primary image-tag label-margins" ng-if="!$ctrl.isSystemNamespace(item) && $ctrl.isExternalApplication(item)">external</span>
+              </td>
+              <!-- Publishing mode -->
+              <td>
+                <!-- LB -->
+                <span ng-if="item.ServiceType === $ctrl.KubernetesServiceTypes.LOAD_BALANCER">
+                  <span> <i class="fa fa-project-diagram" aria-hidden="true" style="margin-right: 2px;"></i> Load balancer </span>
+                  <span class="text-muted small" style="margin-left: 5px;">
+                    <span ng-if="item.LoadBalancerIPAddress">{{ item.LoadBalancerIPAddress }}</span>
+                    <span ng-if="!item.LoadBalancerIPAddress">pending</span>
+                  </span>
+                </span>
+                <!-- Internal -->
+                <span ng-if="item.ServiceType === $ctrl.KubernetesServiceTypes.CLUSTER_IP">
+                  <i class="fa fa-list-alt" aria-hidden="true" style="margin-right: 2px;"></i> Internal
+                </span>
+                <!-- Cluster -->
+                <span ng-if="item.ServiceType === $ctrl.KubernetesServiceTypes.NODE_PORT"> <i class="fa fa-list" aria-hidden="true" style="margin-right: 2px;"></i> Cluster </span>
+              </td>
+              <!-- Exposed port -->
+              <td>
+                <span ng-if="!$ctrl.itemCanExpand(item)">
+                  {{ item.Ports[0].Port }}
+                  <a ng-if="item.LoadBalancerIPAddress" ng-href="http://{{ item.LoadBalancerIPAddress }}:{{ item.Ports[0].Port }}" target="_blank" style="margin-left: 5px;">
+                    <i class="fa fa-external-link-alt" aria-hidden="true"></i> access
+                  </a>
+                </span>
+              </td>
+              <!-- Container port -->
+              <td>
+                <span ng-if="!$ctrl.itemCanExpand(item)"> {{ item.Ports[0].TargetPort }}/{{ item.Ports[0].Protocol }} </span>
+              </td>
+              <!-- HTTP route -->
+              <td>
+                <span ng-if="!$ctrl.itemCanExpand(item)">
+                  <span ng-if="!$ctrl.portHasIngressRules(item.Ports[0])">-</span>
+                  <span ng-if="$ctrl.portHasIngressRules(item.Ports[0])">
+                    <span
+                      ng-if="!$ctrl.ruleCanBeDisplayed(item.Ports[0].IngressRules[0])"
+                      class="text-muted"
+                      tooltip-append-to-body="true"
+                      tooltip-placement="bottom"
+                      tooltip-class="portainer-tooltip"
+                      uib-tooltip="Ingress controller IP address not available yet"
+                      style="cursor: pointer;"
+                      >pending
+                    </span>
+                    <span ng-if="$ctrl.ruleCanBeDisplayed(item.Ports[0].IngressRules[0])">
+                      <a ng-href="{{ $ctrl.buildIngressRuleURL(item.Ports[0].IngressRules[0]) }}" target="_blank">
+                        {{ $ctrl.buildIngressRuleURL(item.Ports[0].IngressRules[0]) | stripprotocol }}
+                      </a>
+                    </span>
+                  </span>
+                </span>
+              </td>
+            </tr>
+            <!-- sub rows -->
+            <tr ng-show="item.Expanded" ng-repeat-start="port in item.Ports" ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
+              <td ng-if="!$ctrl.portHasIngressRules(port)"></td>
+              <td ng-if="!$ctrl.portHasIngressRules(port)">-</td>
+              <td ng-if="!$ctrl.portHasIngressRules(port)">-</td>
+              <td ng-if="!$ctrl.portHasIngressRules(port)">
+                {{ port.Port }}
+                <a ng-if="item.LoadBalancerIPAddress" ng-href="http://{{ item.LoadBalancerIPAddress }}:{{ port.Port }}" target="_blank" style="margin-left: 5px;">
+                  <i class="fa fa-external-link-alt" aria-hidden="true"></i> access
+                </a>
+              </td>
+              <td ng-if="!$ctrl.portHasIngressRules(port)">{{ port.TargetPort }}/{{ port.Protocol }}</td>
+              <td ng-if="!$ctrl.portHasIngressRules(port)">-</td>
+            </tr>
+            <tr ng-show="item.Expanded" ng-repeat-end ng-repeat="rule in port.IngressRules" ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
+              <td></td>
+              <td>-</td>
+              <td>-</td>
+              <td>
+                {{ port.Port }}
+                <a ng-if="item.LoadBalancerIPAddress" ng-href="http://{{ item.LoadBalancerIPAddress }}:{{ port.Port }}" target="_blank" style="margin-left: 5px;">
+                  <i class="fa fa-external-link-alt" aria-hidden="true"></i> access
+                </a>
+              </td>
+              <td>{{ port.TargetPort }}/{{ port.Protocol }}</td>
+              <td>
+                <span
+                  ng-if="!$ctrl.ruleCanBeDisplayed(rule)"
+                  class="text-muted"
+                  tooltip-append-to-body="true"
+                  tooltip-placement="bottom"
+                  tooltip-class="portainer-tooltip"
+                  uib-tooltip="Ingress controller IP address not available yet"
+                  style="cursor: pointer;"
+                  >pending
+                </span>
+                <span ng-if="$ctrl.ruleCanBeDisplayed(rule)">
+                  <a ng-href="{{ $ctrl.buildIngressRuleURL(rule) }}" target="_blank">
+                    {{ $ctrl.buildIngressRuleURL(rule) | stripprotocol }}
+                  </a>
+                </span>
+              </td>
+            </tr>
+            <tr dir-paginate-end></tr>
+            <!-- no dataset -->
+            <tr ng-if="!$ctrl.dataset">
+              <td colspan="6" class="text-center text-muted">Loading...</td>
+            </tr>
+            <!-- no values in filtered dataset -->
+            <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
+              <td colspan="6" class="text-center text-muted">No application port mapping available.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="footer" ng-if="$ctrl.dataset">
+        <div class="infoBar" ng-if="$ctrl.state.selectedItemCount !== 0"> {{ $ctrl.state.selectedItemCount }} item(s) selected </div>
+        <div class="paginationControls">
+          <form class="form-inline">
+            <span class="limitSelector">
+              <span style="margin-right: 5px;">
+                Items per page
+              </span>
+              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
+                <option value="0">All</option>
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </span>
+            <dir-pagination-controls max-size="5" pagination-id="$ctrl.tableKey"></dir-pagination-controls>
+          </form>
+        </div>
+      </div>
+    </rd-widget-body>
+  </rd-widget>
+</div>

@@ -57,14 +57,7 @@
             </tr>
             <tr>
               <td>Tags</td>
-              <td>
-                <span ng-if="endpoint.Tags.length === 0">
-                  -
-                </span>
-                <span ng-if="endpoint.Tags.length > 0">
-                  <span ng-repeat="tag in endpoint.Tags"> {{ tag }}{{ $last ? '' : ', ' }} </span>
-                </span>
-              </td>
+              <td>{{ endpointTags }}</td>
             </tr>
             <tr ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
               <td colspan="2">
@@ -81,8 +74,8 @@
 </div>
 
 <div class="row">
-  <div class="col-xs-12 col-md-6">
-    <a ui-sref="portainer.stacks">
+  <div class="col-xs-12 col-md-6" ng-if="showStacks">
+    <a ui-sref="docker.stacks">
       <rd-widget>
         <rd-widget-body>
           <div class="widget-icon blue pull-left">
@@ -112,7 +105,7 @@
       <rd-widget>
         <rd-widget-body>
           <div class="widget-icon blue pull-left">
-            <i class="fa fa-server"></i>
+            <i class="fa fa-cubes"></i>
           </div>
           <div class="pull-right" style="padding-left: 5px;">
             <div><i class="fa fa-power-off space-right green-icon"></i>{{ containers | runningcontainers }} running</div>
@@ -149,7 +142,7 @@
       <rd-widget>
         <rd-widget-body>
           <div class="widget-icon blue pull-left">
-            <i class="fa fa-cubes"></i>
+            <i class="fa fa-hdd"></i>
           </div>
           <div class="title">{{ volumeCount }}</div>
           <div class="comment">{{ volumeCount === 1 ? 'Volume' : 'Volumes' }}</div>

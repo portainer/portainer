@@ -12,7 +12,7 @@ import (
 // Handler is the HTTP handler used to handle role operations.
 type Handler struct {
 	*mux.Router
-	RoleService portainer.RoleService
+	DataStore portainer.DataStore
 }
 
 // NewHandler creates a handler to manage role operations.

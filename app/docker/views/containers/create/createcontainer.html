@@ -3,6 +3,16 @@
   <rd-header-content> <a ui-sref="docker.containers">Containers</a> &gt; Add container </rd-header-content>
 </rd-header>
 
+<information-panel title-text="Caution" ng-if="state.mode == 'duplicate'">
+  <span class="small">
+    <p class="text-muted">
+      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      The new container may fail to start if the image is changed, and settings from the previous container aren't compatible. Common causes include entrypoint, cmd or
+      <a href="http://portainer.readthedocs.io/en/stable/agent.html" target="_blank">other settings</a> set by an image.
+    </p>
+  </span>
+</information-panel>
+
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
@@ -35,6 +45,7 @@
               auto-complete="true"
               label-class="col-sm-1"
               input-class="col-sm-11"
+              on-image-change="onImageNameChange()"
             ></por-image-registry>
             <!-- !image-and-registry -->
             <!-- always-pull -->
@@ -126,11 +137,7 @@
             <!-- !node-selection -->
           </div>
           <!-- access-control -->
-          <por-access-control-form
-            form-data="formValues.AccessControlData"
-            resource-control="fromContainer.ResourceControl"
-            ng-if="applicationState.application.authentication && fromContainer"
-          ></por-access-control-form>
+          <por-access-control-form form-data="formValues.AccessControlData" resource-control="fromContainer.ResourceControl" ng-if="fromContainer"></por-access-control-form>
           <!-- !access-control -->
           <!-- actions -->
           <div class="col-sm-12 form-section-title">
@@ -185,7 +192,7 @@
           <li class="interactive"><a data-target="#labels" data-toggle="tab">Labels</a></li>
           <li class="interactive"><a data-target="#restart-policy" data-toggle="tab">Restart policy</a></li>
           <li class="interactive"><a data-target="#runtime-resources" ng-click="refreshSlider()" data-toggle="tab">Runtime & Resources</a></li>
-          <li class="interactive"><a data-target="#container-capabilities" data-toggle="tab">Capabilities</a></li>
+          <li ng-if="areContainerCapabilitiesEnabled" class="interactive"><a data-target="#container-capabilities" data-toggle="tab">Capabilities</a></li>
         </ul>
         <!-- tab-content -->
         <div class="tab-content">
@@ -196,15 +203,47 @@
               <div class="form-group">
                 <label for="container_command" class="col-sm-2 col-lg-1 control-label text-left">Command</label>
                 <div class="col-sm-9">
-                  <input type="text" class="form-control" ng-model="config.Cmd" id="container_command" placeholder="e.g. /usr/bin/nginx -t -c /mynginx.conf" />
+                  <div class="input-group">
+                    <div class="input-group-btn">
+                      <button class="btn btn-primary" ng-model="formValues.CmdMode" uib-btn-radio="'default'" style="margin-left: 0px;"> Default</button>
+                      <button class="btn btn-primary" ng-model="formValues.CmdMode" uib-btn-radio="'override'">Override</button>
+                    </div>
+                    <input
+                      type="text"
+                      class="form-control"
+                      ng-model="config.Cmd"
+                      ng-disabled="formValues.CmdMode === 'default'"
+                      id="container_command"
+                      placeholder="e.g. '-logtostderr' '--housekeeping_interval=5s' or /usr/bin/nginx -t -c /mynginx.conf"
+                    />
+                  </div>
                 </div>
               </div>
               <!-- !command-input -->
               <!-- entrypoint-input -->
               <div class="form-group">
-                <label for="container_entrypoint" class="col-sm-2 col-lg-1 control-label text-left">Entry Point</label>
+                <label for="container_entrypoint" class="col-sm-2 col-lg-1 control-label text-left">
+                  Entrypoint
+                  <portainer-tooltip
+                    position="bottom"
+                    message="When container entrypoint is entered as part of the Command field, set Entrypoint to Override mode and leave blank, else it will revert to default."
+                  ></portainer-tooltip>
+                </label>
                 <div class="col-sm-9">
-                  <input type="text" class="form-control" ng-model="config.Entrypoint" id="container_entrypoint" placeholder="e.g. /bin/sh -c" />
+                  <div class="input-group">
+                    <div class="input-group-btn">
+                      <label class="btn btn-primary" ng-model="formValues.EntrypointMode" uib-btn-radio="'default'" style="margin-left: 0px;"> Default</label>
+                      <label class="btn btn-primary" ng-model="formValues.EntrypointMode" uib-btn-radio="'override'">Override</label>
+                    </div>
+                    <input
+                      type="text"
+                      class="form-control"
+                      ng-model="config.Entrypoint"
+                      ng-disabled="formValues.EntrypointMode === 'default'"
+                      id="container_entrypoint"
+                      placeholder="e.g. /bin/sh -c"
+                    />
+                  </div>
                 </div>
               </div>
               <!-- !entrypoint-input -->
@@ -338,8 +377,8 @@
                       </div>
                       <!-- !container-path -->
                       <!-- volume-type -->
-                      <div class="input-group col-sm-5" style="margin-left: 5px;" ng-if="isAdmin || allowBindMounts">
-                        <div class="btn-group btn-group-sm">
+                      <div class="input-group col-sm-5" style="margin-left: 5px;">
+                        <div class="btn-group btn-group-sm" ng-if="allowBindMounts">
                           <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'volume'" ng-click="volume.name = ''">Volume</label>
                           <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'bind'" ng-click="volume.name = ''">Bind</label>
                         </div>
@@ -391,16 +430,21 @@
             <form class="form-horizontal" style="margin-top: 15px;">
               <div class="form-group" ng-if="globalNetworkCount === 0 && applicationState.endpoint.mode.provider !== 'DOCKER_SWARM_MODE'">
                 <div class="col-sm-12">
-                  <span class="small text-muted">You don't have any shared network. Head over the <a ui-sref="docker.networks">networks view</a> to create one.</span>
+                  <span class="small text-muted">You don't have any shared networks. Head over to the <a ui-sref="docker.networks">networks view</a> to create one.</span>
                 </div>
               </div>
               <!-- network-input -->
               <div class="form-group">
                 <label for="container_network" class="col-sm-2 col-lg-1 control-label text-left">Network</label>
                 <div class="col-sm-9">
-                  <select class="form-control" ng-model="config.HostConfig.NetworkMode" id="container_network" ng-change="resetNetworkConfig()">
+                  <select
+                    class="form-control"
+                    ng-options="net.Name as net.Name for net in availableNetworks"
+                    ng-model="config.HostConfig.NetworkMode"
+                    id="container_network"
+                    ng-change="resetNetworkConfig()"
+                  >
                     <option selected disabled hidden value="">Select a network</option>
-                    <option ng-repeat="net in availableNetworks | orderBy: 'Name'" ng-value="net.Name">{{ net.Name }}</option>
                   </select>
                 </div>
               </div>
@@ -629,7 +673,7 @@
             </form>
             <form class="form-horizontal" style="margin-top: 15px;">
               <!-- devices -->
-              <div class="form-group">
+              <div ng-if="showDeviceMapping" class="form-group">
                 <div class="col-sm-12" style="margin-top: 5px;">
                   <label class="control-label text-left">Devices</label>
                   <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addDevice()">

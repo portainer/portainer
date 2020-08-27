@@ -1,0 +1,135 @@
+<kubernetes-view-header title="Create configuration" state="kubernetes.configurations.new" view-ready="ctrl.state.viewReady">
+  <a ui-sref="kubernetes.configurations">Configurations</a> &gt; Create a configuration
+</kubernetes-view-header>
+
+<kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
+
+<div ng-if="ctrl.state.viewReady">
+  <div class="row">
+    <div class="col-xs-12">
+      <rd-widget>
+        <rd-widget-body>
+          <form class="form-horizontal" name="kubernetesConfigurationCreationForm" autocomplete="off">
+            <!-- name -->
+            <div class="form-group">
+              <label for="configuration_name" class="col-sm-1 control-label text-left">Name</label>
+              <div class="col-sm-11">
+                <input
+                  type="text"
+                  class="form-control"
+                  name="configuration_name"
+                  ng-model="ctrl.formValues.Name"
+                  ng-pattern="/^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/"
+                  ng-change="ctrl.onChangeName()"
+                  placeholder="my-configuration"
+                  auto-focus
+                  required
+                />
+              </div>
+            </div>
+            <div class="form-group" ng-show="kubernetesConfigurationCreationForm.configuration_name.$invalid || ctrl.state.alreadyExist">
+              <div class="col-sm-12 small text-warning">
+                <div ng-messages="kubernetesConfigurationCreationForm.configuration_name.$error">
+                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                  <p ng-message="pattern"
+                    ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of lower case alphanumeric characters, '-' or '.', and must start and end
+                    with an alphanumeric character.</p
+                  >
+                </div>
+                <p ng-if="ctrl.state.alreadyExist"
+                  ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A configuration with the same name already exists inside the selected resource pool.</p
+                >
+              </div>
+            </div>
+            <!-- !name -->
+
+            <div class="col-sm-12 form-section-title">
+              Resource pool
+            </div>
+
+            <!-- resource-pool -->
+            <div class="form-group">
+              <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Resource pool</label>
+              <div class="col-sm-11">
+                <select
+                  class="form-control"
+                  id="resource-pool-selector"
+                  ng-model="ctrl.formValues.ResourcePool"
+                  ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools"
+                  ng-change="ctrl.onResourcePoolSelectionChange()"
+                ></select>
+              </div>
+            </div>
+            <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
+              <div class="col-sm-12 small text-warning">
+                <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                This resource pool has exhausted its resource capacity and you will not be able to deploy the configuration. Contact your administrator to expand the capacity of
+                the resource pool.
+              </div>
+            </div>
+            <!-- !resource-pool -->
+
+            <div class="col-sm-12 form-section-title">
+              Configuration type
+            </div>
+
+            <div class="form-group">
+              <div class="col-sm-12 small text-muted">
+                Select the type of data that you want to save in the configuration.
+              </div>
+            </div>
+
+            <!-- type options -->
+            <div class="form-group" style="margin-bottom: 0;">
+              <div class="boxselector_wrapper">
+                <div>
+                  <input type="radio" id="type_basic" ng-value="ctrl.KubernetesConfigurationTypes.CONFIGMAP" ng-model="ctrl.formValues.Type" />
+                  <label for="type_basic">
+                    <div class="boxselector_header">
+                      <i class="fa fa-file-code" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Non-sensitive
+                    </div>
+                    <p>This configuration holds non-sensitive information</p>
+                  </label>
+                </div>
+                <div>
+                  <input type="radio" id="type_secret" ng-value="ctrl.KubernetesConfigurationTypes.SECRET" ng-model="ctrl.formValues.Type" />
+                  <label for="type_secret">
+                    <div class="boxselector_header">
+                      <i class="fa fa-user-secret" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Sensitive
+                    </div>
+                    <p>This configuration holds sensitive information</p>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <!-- !type options -->
+
+            <kubernetes-configuration-data ng-if="ctrl.formValues" form-values="ctrl.formValues" is-valid="ctrl.state.isDataValid"></kubernetes-configuration-data>
+
+            <!-- actions -->
+            <div class="col-sm-12 form-section-title" style="margin-top: 10px;">
+              Actions
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm"
+                  ng-disabled="!kubernetesConfigurationCreationForm.$valid || !ctrl.isFormValid() || ctrl.state.actionInProgress"
+                  ng-click="ctrl.createConfiguration()"
+                  button-spinner="ctrl.state.actionInProgress"
+                >
+                  <span ng-hide="ctrl.state.actionInProgress">Create configuration</span>
+                  <span ng-show="ctrl.state.actionInProgress">Creation in progress...</span>
+                </button>
+              </div>
+            </div>
+            <!-- !actions -->
+          </form>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+  </div>
+</div>

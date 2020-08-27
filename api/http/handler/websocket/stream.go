@@ -1,13 +1,15 @@
 package websocket
 
 import (
-	"bufio"
-	"github.com/gorilla/websocket"
-	"net"
+	"io"
 	"unicode/utf8"
+
+	"github.com/gorilla/websocket"
 )
 
-func streamFromWebsocketConnToTCPConn(websocketConn *websocket.Conn, tcpConn net.Conn, errorChan chan error) {
+const readerBufferSize = 2048
+
+func streamFromWebsocketToWriter(websocketConn *websocket.Conn, writer io.Writer, errorChan chan error) {
 	for {
 		_, in, err := websocketConn.ReadMessage()
 		if err != nil {
@@ -15,7 +17,7 @@ func streamFromWebsocketConnToTCPConn(websocketConn *websocket.Conn, tcpConn net
 			break
 		}
 
-		_, err = tcpConn.Write(in)
+		_, err = writer.Write(in)
 		if err != nil {
 			errorChan <- err
 			break
@@ -23,10 +25,10 @@ func streamFromWebsocketConnToTCPConn(websocketConn *websocket.Conn, tcpConn net
 	}
 }
 
-func streamFromTCPConnToWebsocketConn(websocketConn *websocket.Conn, br *bufio.Reader, errorChan chan error) {
+func streamFromReaderToWebsocket(websocketConn *websocket.Conn, reader io.Reader, errorChan chan error) {
 	for {
-		out := make([]byte, 2048)
-		_, err := br.Read(out)
+		out := make([]byte, readerBufferSize)
+		_, err := reader.Read(out)
 		if err != nil {
 			errorChan <- err
 			break

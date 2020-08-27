@@ -2,22 +2,12 @@ package migrator
 
 import (
 	"strings"
-
-	portainer "github.com/portainer/portainer/api"
 )
 
-func (m *Migrator) updateUsersToDBVersion20() error {
-	authorizationServiceParameters := &portainer.AuthorizationServiceParameters{
-		EndpointService:       m.endpointService,
-		EndpointGroupService:  m.endpointGroupService,
-		RegistryService:       m.registryService,
-		RoleService:           m.roleService,
-		TeamMembershipService: m.teamMembershipService,
-		UserService:           m.userService,
-	}
+const scheduleScriptExecutionJobType = 1
 
-	authorizationService := portainer.NewAuthorizationService(authorizationServiceParameters)
-	return authorizationService.UpdateUsersAuthorizations()
+func (m *Migrator) updateUsersToDBVersion20() error {
+	return m.authorizationService.UpdateUsersAuthorizations()
 }
 
 func (m *Migrator) updateSettingsToDBVersion20() error {
@@ -38,7 +28,7 @@ func (m *Migrator) updateSchedulesToDBVersion20() error {
 	}
 
 	for _, schedule := range legacySchedules {
-		if schedule.JobType == portainer.ScriptExecutionJobType {
+		if schedule.JobType == scheduleScriptExecutionJobType {
 			if schedule.CronExpression == "0 0 * * *" {
 				schedule.CronExpression = "0 * * * *"
 			} else if schedule.CronExpression == "0 0 0/2 * *" {

@@ -1,16 +1,18 @@
 package stacks
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
-
-	"github.com/portainer/portainer/api/http/security"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	httperrors "github.com/portainer/portainer/api/http/errors"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 type updateComposeStackPayload struct {
@@ -20,7 +22,7 @@ type updateComposeStackPayload struct {
 
 func (payload *updateComposeStackPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.StackFileContent) {
-		return portainer.Error("Invalid stack file content")
+		return errors.New("Invalid stack file content")
 	}
 	return nil
 }
@@ -33,7 +35,7 @@ type updateSwarmStackPayload struct {
 
 func (payload *updateSwarmStackPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.StackFileContent) {
-		return portainer.Error("Invalid stack file content")
+		return errors.New("Invalid stack file content")
 	}
 	return nil
 }
@@ -45,8 +47,8 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid stack identifier route variable", err}
 	}
 
-	stack, err := handler.StackService.Stack(portainer.StackID(stackID))
-	if err == portainer.ErrObjectNotFound {
+	stack, err := handler.DataStore.Stack().Stack(portainer.StackID(stackID))
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a stack with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a stack with the specified identifier inside the database", err}
@@ -63,19 +65,19 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 		stack.EndpointID = portainer.EndpointID(endpointID)
 	}
 
-	endpoint, err := handler.EndpointService.Endpoint(stack.EndpointID)
-	if err == portainer.ErrObjectNotFound {
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(stack.EndpointID)
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the endpoint associated to the stack inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the endpoint associated to the stack inside the database", err}
 	}
 
-	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint, true)
+	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
 	}
 
-	resourceControl, err := handler.ResourceControlService.ResourceControlByResourceIDAndType(stack.Name, portainer.StackResourceControl)
+	resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stack.Name, portainer.StackResourceControl)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the stack", err}
 	}
@@ -90,7 +92,7 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify user authorizations to validate stack access", err}
 	}
 	if !access {
-		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", httperrors.ErrResourceAccessDenied}
 	}
 
 	updateError := handler.updateAndDeployStack(r, stack, endpoint)
@@ -98,7 +100,7 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 		return updateError
 	}
 
-	err = handler.StackService.UpdateStack(stack.ID, stack)
+	err = handler.DataStore.Stack().UpdateStack(stack.ID, stack)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack changes inside the database", err}
 	}

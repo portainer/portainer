@@ -8,6 +8,8 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -42,8 +44,8 @@ func (handler *Handler) resourceControlUpdate(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	resourceControl, err := handler.ResourceControlService.ResourceControl(portainer.ResourceControlID(resourceControlID))
-	if err == portainer.ErrObjectNotFound {
+	resourceControl, err := handler.DataStore.ResourceControl().ResourceControl(portainer.ResourceControlID(resourceControlID))
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a resource control with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a resource control with with the specified identifier inside the database", err}
@@ -55,7 +57,7 @@ func (handler *Handler) resourceControlUpdate(w http.ResponseWriter, r *http.Req
 	}
 
 	if !security.AuthorizedResourceControlAccess(resourceControl, securityContext) {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access the resource control", portainer.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access the resource control", httperrors.ErrResourceAccessDenied}
 	}
 
 	resourceControl.Public = payload.Public
@@ -82,10 +84,10 @@ func (handler *Handler) resourceControlUpdate(w http.ResponseWriter, r *http.Req
 	resourceControl.TeamAccesses = teamAccesses
 
 	if !security.AuthorizedResourceControlUpdate(resourceControl, securityContext) {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update the resource control", portainer.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update the resource control", httperrors.ErrResourceAccessDenied}
 	}
 
-	err = handler.ResourceControlService.UpdateResourceControl(resourceControl.ID, resourceControl)
+	err = handler.DataStore.ResourceControl().UpdateResourceControl(resourceControl.ID, resourceControl)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist resource control changes inside the database", err}
 	}

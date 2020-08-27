@@ -147,10 +147,9 @@ angular.module('portainer.docker').controller('ImageController', [
 
     function initView() {
       HttpRequestHelper.setPortainerAgentTargetHeader($transition$.params().nodeName);
-      var endpointProvider = $scope.applicationState.endpoint.mode.provider;
       $q.all({
         image: ImageService.image($transition$.params().id),
-        history: endpointProvider !== 'VMWARE_VIC' ? ImageService.history($transition$.params().id) : [],
+        history: ImageService.history($transition$.params().id),
       })
         .then(function success(data) {
           $scope.image = data.image;

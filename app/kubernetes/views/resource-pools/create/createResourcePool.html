@@ -1,0 +1,281 @@
+<kubernetes-view-header title="Create a resource pool" state="kubernetes.resourcePools.new" view-ready="ctrl.state.viewReady">
+  <a ui-sref="kubernetes.resourcePools">Resource pools</a> &gt; Create a resource pool
+</kubernetes-view-header>
+
+<kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
+
+<div ng-if="ctrl.state.viewReady">
+  <div class="row">
+    <div class="col-lg-12 col-md-12 col-xs-12">
+      <rd-widget>
+        <rd-widget-body>
+          <form class="form-horizontal" autocomplete="off" name="resourcePoolCreationForm">
+            <!-- #region NAME INPUT -->
+            <div class="form-group">
+              <label for="pool_name" class="col-sm-1 control-label text-left">Name</label>
+              <div class="col-sm-11">
+                <input
+                  type="text"
+                  class="form-control"
+                  name="pool_name"
+                  ng-model="ctrl.formValues.Name"
+                  ng-pattern="/^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/"
+                  ng-change="ctrl.onChangeName()"
+                  placeholder="my-project"
+                  required
+                  auto-focus
+                />
+              </div>
+            </div>
+            <div class="form-group" ng-show="resourcePoolCreationForm.pool_name.$invalid || ctrl.state.isAlreadyExist">
+              <div class="col-sm-12 small text-warning">
+                <div ng-messages="resourcePoolCreationForm.pool_name.$error">
+                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                  <p ng-message="pattern"
+                    ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of lower case alphanumeric characters, '-' or '.', and must start and end
+                    with an alphanumeric character.</p
+                  >
+                </div>
+                <p ng-if="ctrl.state.isAlreadyExist"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A resource pool with the same name already exists.</p>
+              </div>
+            </div>
+            <!-- #endregion -->
+
+            <div class="col-sm-12 form-section-title">
+              Quota
+            </div>
+            <!-- #region QUOTA -->
+            <!-- quotas-switch -->
+            <div class="form-group">
+              <div class="col-sm-12 small text-muted">
+                <p>
+                  <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  A resource pool segments the underyling physical Kubernetes cluster into smaller virtual clusters. You should assign a capped limit of resources to this pool or
+                  disable for the safe operation of your platform.
+                </p>
+              </div>
+              <div class="col-sm-12">
+                <label class="control-label text-left">
+                  Resource assignment
+                </label>
+                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.HasQuota" /><i></i> </label>
+              </div>
+            </div>
+            <div class="form-group" ng-if="ctrl.formValues.HasQuota && !ctrl.isQuotaValid()">
+              <span class="col-sm-12 text-warning small">
+                <p> <i class="fa fa-exclamation-triangle" aria-hidden="true" style="margin-right: 2px;"></i> At least a single limit must be set for the quota to be valid. </p>
+              </span>
+            </div>
+            <!-- !quotas-switch -->
+            <div ng-if="ctrl.formValues.HasQuota">
+              <div class="col-sm-12 form-section-title">
+                Resource limits
+              </div>
+              <div>
+                <!-- memory-limit-input -->
+                <div class="form-group">
+                  <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
+                    Memory
+                  </label>
+                  <div class="col-sm-3">
+                    <slider model="ctrl.formValues.MemoryLimit" floor="ctrl.defaults.MemoryLimit" ceil="ctrl.state.sliderMaxMemory" step="128" ng-if="ctrl.state.sliderMaxMemory">
+                    </slider>
+                  </div>
+                  <div class="col-sm-2">
+                    <input
+                      name="memory_limit"
+                      type="number"
+                      min="{{ ctrl.defaults.MemoryLimit }}"
+                      max="{{ ctrl.state.sliderMaxMemory }}"
+                      class="form-control"
+                      ng-model="ctrl.formValues.MemoryLimit"
+                      id="memory-limit"
+                      required
+                    />
+                  </div>
+                  <div class="col-sm-4">
+                    <p class="small text-muted" style="margin-top: 7px;">
+                      Maximum memory usage (<b>MB</b>)
+                    </p>
+                  </div>
+                </div>
+                <div class="form-group" ng-show="resourcePoolCreationForm.memory_limit.$invalid">
+                  <div class="col-sm-12 small text-warning">
+                    <div ng-messages="resourcePoolCreationForm.pool_name.$error">
+                      <p
+                        ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value must be between {{ ctrl.defaults.MemoryLimit }} and {{ ctrl.state.sliderMaxMemory }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <!-- !memory-limit-input -->
+                <!-- cpu-limit-input -->
+                <div class="form-group">
+                  <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
+                    CPU
+                  </label>
+                  <div class="col-sm-5">
+                    <slider model="ctrl.formValues.CpuLimit" floor="ctrl.defaults.CpuLimit" ceil="ctrl.state.sliderMaxCpu" step="0.1" precision="2" ng-if="ctrl.state.sliderMaxCpu">
+                    </slider>
+                  </div>
+                  <div class="col-sm-4" style="margin-top: 20px;">
+                    <p class="small text-muted">
+                      Maximum CPU usage
+                    </p>
+                  </div>
+                </div>
+                <!-- !cpu-limit-input -->
+              </div>
+            </div>
+            <!-- #endregion -->
+
+            <div ng-if="ctrl.state.canUseIngress">
+              <div class="col-sm-12 form-section-title">
+                Ingresses
+              </div>
+              <!-- #region INGRESSES -->
+              <div class="form-group" ng-if="ctrl.formValues.IngressClasses.length === 0">
+                <div class="col-sm-12 small text-muted">
+                  The ingress feature must be enabled in the
+                  <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: ctrl.endpoint.Id})">endpoint configuration view</a> to be able to register ingresses inside this
+                  resource pool.
+                </div>
+              </div>
+
+              <div class="form-group" ng-if="ctrl.formValues.IngressClasses.length > 0">
+                <div class="col-sm-12 small text-muted">
+                  <p>
+                    <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Enable and configure ingresses available to users when deploying applications.
+                  </p>
+                </div>
+              </div>
+
+              <div class="form-group" ng-repeat-start="ic in ctrl.formValues.IngressClasses">
+                <div class="text-muted col-sm-12" style="width: 100%;">
+                  <div style="border-bottom: 1px solid #cdcdcd; padding-bottom: 5px;">
+                    <i class="fa fa-route" aria-hidden="true" style="margin-right: 2px;"></i> {{ ic.IngressClass.Name }}
+                  </div>
+                </div>
+
+                <div class="col-sm-12" style="margin-top: 10px;">
+                  <label class="control-label text-left">
+                    Allow users to use this ingress
+                  </label>
+                  <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ic.Selected" /><i></i> </label>
+                </div>
+              </div>
+
+              <div ng-if="ic.Selected">
+                <div class="form-group">
+                  <label class="control-label text-left col-sm-2">
+                    Hostname
+                    <portainer-tooltip
+                      position="bottom"
+                      message="Hostname associated to the ingress inside this resource pool. Users will be able to expose and access their applications over the ingress via this hostname."
+                    >
+                    </portainer-tooltip>
+                  </label>
+                  <div class="col-sm-10">
+                    <input class="form-control" name="ingress_host_{{ $index }}" ng-model="ic.Host" placeholder="host.com" ng-change="ctrl.onChangeIngressHostname()" required />
+                  </div>
+                </div>
+                <div class="form-group" ng-show="resourcePoolCreationForm['ingress_host_' + $index].$invalid || ctrl.state.duplicates.ingressHosts.refs[$index] !== undefined">
+                  <div class="col-sm-12 small text-warning">
+                    <div ng-messages="resourcePoolCreationForm['ingress_host_' + $index].$error">
+                      <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                    </div>
+                    <p ng-if="ctrl.state.duplicates.ingressHosts.refs[$index] !== undefined">
+                      <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                      This host is already used.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="form-group" ng-if="ic.IngressClass.Type === ctrl.IngressClassTypes.NGINX">
+                  <div class="col-sm-12">
+                    <label class="control-label text-left">
+                      Redirect published routes to / in application
+                      <portainer-tooltip
+                        position="bottom"
+                        message="Enables the redirection of any route published via ingress to the root path of the application, e.g. /path remaps to /"
+                      >
+                      </portainer-tooltip>
+                    </label>
+                    <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ic.RewriteTarget" /><i></i> </label>
+                  </div>
+                </div>
+              </div>
+              <div ng-repeat-end class="form-group" ng-if="ic.Selected" style="margin-bottom: 20px;">
+                <div class="col-sm-12">
+                  <p>
+                    <a class="small interactive" ng-if="!ic.AdvancedConfig" ng-click="ic.AdvancedConfig = true">
+                      <i class="fa fa-plus space-right" aria-hidden="true"></i> Advanced configuration
+                    </a>
+                    <a class="small interactive" ng-if="ic.AdvancedConfig" ng-click="ic.AdvancedConfig = false">
+                      <i class="fa fa-minus space-right" aria-hidden="true"></i> Hide configuration
+                    </a>
+                  </p>
+                </div>
+
+                <div class="col-sm-12 small text-muted" ng-if="ic.AdvancedConfig" style="margin-top: 5px;">
+                  <p>
+                    <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                    You can specify a list of annotations that will be associated to the ingress.
+                  </p>
+                </div>
+
+                <div class="col-sm-12" ng-if="ic.AdvancedConfig">
+                  <label class="control-label text-left">Annotations</label>
+                  <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addAnnotation(ic)">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i> add annotation
+                  </span>
+                </div>
+
+                <div class="col-sm-12 form-inline" style="margin-top: 10px;" ng-if="ic.AdvancedConfig">
+                  <div ng-repeat="annotation in ic.Annotations track by $index" style="margin-top: 2px;">
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">Key</span>
+                      <input type="text" class="form-control" ng-model="annotation.Key" placeholder="nginx.ingress.kubernetes.io/rewrite-target" required />
+                    </div>
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">Value</span>
+                      <input type="text" class="form-control" ng-model="annotation.Value" placeholder="/$1" required />
+                    </div>
+                    <div class="col-sm-1 input-group input-group-sm">
+                      <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeAnnotation(ic, $index)">
+                        <i class="fa fa-trash-alt" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- #endregion -->
+            </div>
+
+            <div class="col-sm-12 form-section-title">
+              Actions
+            </div>
+            <!-- #region ACTIONS -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm"
+                  ng-disabled="!resourcePoolCreationForm.$valid || ctrl.isCreateButtonDisabled()"
+                  ng-click="ctrl.createResourcePool()"
+                  button-spinner="ctrl.state.actionInProgress"
+                >
+                  <span ng-hide="ctrl.state.actionInProgress">Create resource pool</span>
+                  <span ng-show="ctrl.state.actionInProgress">Creation in progress...</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- #endregion -->
+          </form>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+  </div>
+</div>

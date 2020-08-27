@@ -3,6 +3,7 @@ package exec
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -103,7 +104,7 @@ func runCommandAndCaptureStdErr(command string, args []string, env []string, wor
 
 	err := cmd.Run()
 	if err != nil {
-		return portainer.Error(stderr.String())
+		return errors.New(stderr.String())
 	}
 
 	return nil
@@ -121,7 +122,7 @@ func (manager *SwarmStackManager) prepareDockerCommandAndArgs(binaryPath, dataPa
 	args = append(args, "--config", dataPath)
 
 	endpointURL := endpoint.URL
-	if endpoint.Type == portainer.EdgeAgentEnvironment {
+	if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
 		tunnel := manager.reverseTunnelService.GetTunnelDetails(endpoint.ID)
 		endpointURL = fmt.Sprintf("tcp://127.0.0.1:%d", tunnel.Port)
 	}

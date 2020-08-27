@@ -6,17 +6,39 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
   'SettingsService',
   'FileUploadService',
   'TeamService',
-  'ExtensionService',
-  function ($q, $scope, $state, Notifications, SettingsService, FileUploadService, TeamService, ExtensionService) {
+  function ($q, $scope, $state, Notifications, SettingsService, FileUploadService, TeamService) {
     $scope.state = {
       successfulConnectivityCheck: false,
       failedConnectivityCheck: false,
       uploadInProgress: false,
       connectivityCheckInProgress: false,
       actionInProgress: false,
+      availableUserSessionTimeoutOptions: [
+        {
+          key: '1 hour',
+          value: '1h',
+        },
+        {
+          key: '4 hours',
+          value: '4h',
+        },
+        {
+          key: '8 hours',
+          value: '8h',
+        },
+        {
+          key: '24 hours',
+          value: '24h',
+        },
+        { key: '1 week', value: `${24 * 7}h` },
+        { key: '1 month', value: `${24 * 30}h` },
+        { key: '6 months', value: `${24 * 30 * 6}h` },
+        { key: '1 year', value: `${24 * 30 * 12}h` },
+      ],
     };
 
     $scope.formValues = {
+      UserSessionTimeout: $scope.state.availableUserSessionTimeoutOptions[0],
       TLSCACert: '',
       LDAPSettings: {
         AnonymousMode: true,
@@ -43,10 +65,6 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
         ],
         AutoCreateUsers: true,
       },
-    };
-
-    $scope.goToOAuthExtensionView = function () {
-      $state.go('portainer.extensions.extension', { id: 2 });
     };
 
     $scope.isOauthEnabled = function isOauthEnabled() {
@@ -144,7 +162,6 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
       $q.all({
         settings: SettingsService.settings(),
         teams: TeamService.teams(),
-        oauthAuthentication: ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.OAUTH_AUTHENTICATION),
       })
         .then(function success(data) {
           var settings = data.settings;
@@ -153,7 +170,6 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
           $scope.formValues.LDAPSettings = settings.LDAPSettings;
           $scope.OAuthSettings = settings.OAuthSettings;
           $scope.formValues.TLSCACert = settings.LDAPSettings.TLSConfig.TLSCACert;
-          $scope.oauthAuthenticationAvailable = data.oauthAuthentication;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve application settings');

@@ -37,6 +37,13 @@ angular.module('portainer.app').factory('ModalService', [
       });
     };
 
+    service.confirmAsync = confirmAsync;
+    function confirmAsync(options) {
+      return new Promise((resolve) => {
+        service.confirm({ ...options, callback: (confirmed) => resolve(confirmed) });
+      });
+    }
+
     service.confirm = function (options) {
       var box = bootbox.confirm({
         title: options.title,
@@ -128,7 +135,47 @@ angular.module('portainer.app').factory('ModalService', [
       });
     };
 
+    service.confirmUpdate = function (message, callback) {
+      message = $sanitize(message);
+      service.confirm({
+        title: 'Are you sure ?',
+        message: message,
+        buttons: {
+          confirm: {
+            label: 'Update',
+            className: 'btn-warning',
+          },
+        },
+        callback: callback,
+      });
+    };
+
+    service.confirmRedeploy = function (message, callback) {
+      message = $sanitize(message);
+      service.confirm({
+        title: '',
+        message: message,
+        buttons: {
+          confirm: {
+            label: 'Redeploy the applications',
+            className: 'btn-primary',
+          },
+          cancel: {
+            label: "I'll do it later",
+          },
+        },
+        callback: callback,
+      });
+    };
+
+    service.confirmDeletionAsync = function confirmDeletionAsync(message) {
+      return new Promise((resolve) => {
+        service.confirmDeletion(message, (confirmed) => resolve(confirmed));
+      });
+    };
+
     service.confirmContainerDeletion = function (title, callback) {
+      title = $sanitize(title);
       prompt({
         title: title,
         inputType: 'checkbox',
@@ -202,6 +249,7 @@ angular.module('portainer.app').factory('ModalService', [
     };
 
     service.confirmServiceForceUpdate = function (message, callback) {
+      message = $sanitize(message);
       customPrompt(
         {
           title: 'Are you sure ?',

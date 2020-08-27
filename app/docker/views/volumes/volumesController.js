@@ -9,8 +9,7 @@ angular.module('portainer.docker').controller('VolumesController', [
   'HttpRequestHelper',
   'EndpointProvider',
   'Authentication',
-  'ExtensionService',
-  function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notifications, HttpRequestHelper, EndpointProvider, Authentication, ExtensionService) {
+  function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notifications, HttpRequestHelper, EndpointProvider, Authentication) {
     $scope.removeAction = function (selectedItems) {
       var actionCount = selectedItems.length;
       angular.forEach(selectedItems, function (volume) {
@@ -71,16 +70,8 @@ angular.module('portainer.docker').controller('VolumesController', [
     function initView() {
       getVolumes();
 
-      $scope.showBrowseAction = $scope.applicationState.endpoint.mode.agentProxy;
-
-      ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC).then(function success(extensionEnabled) {
-        if (!extensionEnabled) {
-          var isAdmin = Authentication.isAdmin();
-          if (!$scope.applicationState.application.enableVolumeBrowserForNonAdminUsers && !isAdmin) {
-            $scope.showBrowseAction = false;
-          }
-        }
-      });
+      $scope.showBrowseAction =
+        $scope.applicationState.endpoint.mode.agentProxy && (Authentication.isAdmin() || $scope.applicationState.application.enableVolumeBrowserForNonAdminUsers);
     }
 
     initView();

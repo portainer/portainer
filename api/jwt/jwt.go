@@ -1,6 +1,8 @@
 package jwt
 
 import (
+	"errors"
+
 	"github.com/portainer/portainer/api"
 
 	"fmt"
@@ -12,7 +14,8 @@ import (
 
 // Service represents a service for managing JWT tokens.
 type Service struct {
-	secret []byte
+	secret             []byte
+	userSessionTimeout time.Duration
 }
 
 type claims struct {
@@ -22,21 +25,33 @@ type claims struct {
 	jwt.StandardClaims
 }
 
+var (
+	errSecretGeneration = errors.New("Unable to generate secret key")
+	errInvalidJWTToken  = errors.New("Invalid JWT token")
+)
+
 // NewService initializes a new service. It will generate a random key that will be used to sign JWT tokens.
-func NewService() (*Service, error) {
+func NewService(userSessionDuration string) (*Service, error) {
+	userSessionTimeout, err := time.ParseDuration(userSessionDuration)
+	if err != nil {
+		return nil, err
+	}
+
 	secret := securecookie.GenerateRandomKey(32)
 	if secret == nil {
-		return nil, portainer.ErrSecretGeneration
+		return nil, errSecretGeneration
 	}
+
 	service := &Service{
 		secret,
+		userSessionTimeout,
 	}
 	return service, nil
 }
 
 // GenerateToken generates a new JWT token.
 func (service *Service) GenerateToken(data *portainer.TokenData) (string, error) {
-	expireToken := time.Now().Add(time.Hour * 8).Unix()
+	expireToken := time.Now().Add(service.userSessionTimeout).Unix()
 	cl := claims{
 		UserID:   int(data.ID),
 		Username: data.Username,
@@ -75,5 +90,10 @@ func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData,
 		}
 	}
 
-	return nil, portainer.ErrInvalidJWTToken
+	return nil, errInvalidJWTToken
+}
+
+// SetUserSessionDuration sets the user session duration
+func (service *Service) SetUserSessionDuration(userSessionDuration time.Duration) {
+	service.userSessionTimeout = userSessionDuration
 }

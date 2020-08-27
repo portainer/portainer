@@ -135,13 +135,7 @@
 </div>
 
 <!-- access-control-panel -->
-<por-access-control-panel
-  ng-if="container && applicationState.application.authentication"
-  resource-id="container.Id"
-  resource-control="container.ResourceControl"
-  resource-type="'container'"
->
-</por-access-control-panel>
+<por-access-control-panel ng-if="container" resource-id="container.Id" resource-control="container.ResourceControl" resource-type="'container'"> </por-access-control-panel>
 <!-- !access-control-panel -->
 
 <div ng-if="container.State.Health" class="row">
@@ -290,7 +284,7 @@
 <div class="row" ng-if="container.Mounts.length > 0">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-cubes" title-text="Volumes"></rd-widget-header>
+      <rd-widget-header icon="fa-hdd" title-text="Volumes"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <thead>

@@ -78,8 +78,7 @@
 </div>
 
 <!-- access-control-panel -->
-<por-access-control-panel ng-if="volume && applicationState.application.authentication" resource-id="volume.Id" resource-control="volume.ResourceControl" resource-type="'volume'">
-</por-access-control-panel>
+<por-access-control-panel ng-if="volume" resource-id="volume.Id + volume.CreatedAt" resource-control="volume.ResourceControl" resource-type="'volume'"> </por-access-control-panel>
 <!-- !access-control-panel -->
 
 <div class="row" ng-if="!(volume.Options | emptyobject)">
@@ -102,7 +101,7 @@
 <div class="row" ng-if="containersUsingVolume.length > 0">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-server" title-text="Containers using volume"></rd-widget-header>
+      <rd-widget-header icon="fa-cubes" title-text="Containers using volume"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <thead>

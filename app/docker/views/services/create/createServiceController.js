@@ -106,6 +106,8 @@ angular.module('portainer.docker').controller('CreateServiceController', [
       actionInProgress: false,
     };
 
+    $scope.allowBindMounts = false;
+
     $scope.refreshSlider = function () {
       $timeout(function () {
         $scope.$broadcast('rzSliderForceRender');
@@ -137,7 +139,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
     };
 
     $scope.addVolume = function () {
-      $scope.formValues.Volumes.push({ Source: '', Target: '', ReadOnly: false, Type: 'volume' });
+      $scope.formValues.Volumes.push({ Source: null, Target: '', ReadOnly: false, Type: 'volume' });
     };
 
     $scope.removeVolume = function (index) {
@@ -562,8 +564,8 @@ angular.module('portainer.docker').controller('CreateServiceController', [
         secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
         configs: apiVersion >= 1.3 ? ConfigService.configs() : [],
         nodes: NodeService.nodes(),
-        settings: SettingsService.publicSettings(),
         availableLoggingDrivers: PluginService.loggingPlugins(apiVersion < 1.25),
+        allowBindMounts: checkIfAllowedBindMounts(),
       })
         .then(function success(data) {
           $scope.availableVolumes = data.volumes;
@@ -572,8 +574,8 @@ angular.module('portainer.docker').controller('CreateServiceController', [
           $scope.availableConfigs = data.configs;
           $scope.availableLoggingDrivers = data.availableLoggingDrivers;
           initSlidersMaxValuesBasedOnNodeData(data.nodes);
-          $scope.allowBindMounts = data.settings.AllowBindMountsForRegularUsers;
           $scope.isAdmin = Authentication.isAdmin();
+          $scope.allowBindMounts = data.allowBindMounts;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to initialize view');
@@ -581,5 +583,14 @@ angular.module('portainer.docker').controller('CreateServiceController', [
     }
 
     initView();
+
+    async function checkIfAllowedBindMounts() {
+      const isAdmin = Authentication.isAdmin();
+
+      const settings = await SettingsService.publicSettings();
+      const { AllowBindMountsForRegularUsers } = settings;
+
+      return isAdmin || AllowBindMountsForRegularUsers;
+    }
   },
 ]);

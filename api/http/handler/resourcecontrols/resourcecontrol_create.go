@@ -21,6 +21,11 @@ type resourceControlCreatePayload struct {
 	SubResourceIDs     []string
 }
 
+var (
+	errResourceControlAlreadyExists = errors.New("A resource control is already applied on this resource") //http/resourceControl
+	errInvalidResourceControlType   = errors.New("Unsupported resource control type")                      //http/resourceControl
+)
+
 func (payload *resourceControlCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.ResourceID) {
 		return errors.New("invalid payload: invalid resource identifier")
@@ -65,15 +70,15 @@ func (handler *Handler) resourceControlCreate(w http.ResponseWriter, r *http.Req
 	case "config":
 		resourceControlType = portainer.ConfigResourceControl
 	default:
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid type value. Value must be one of: container, service, volume, network, secret, stack or config", portainer.ErrInvalidResourceControlType}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid type value. Value must be one of: container, service, volume, network, secret, stack or config", errInvalidResourceControlType}
 	}
 
-	rc, err := handler.ResourceControlService.ResourceControlByResourceIDAndType(payload.ResourceID, resourceControlType)
+	rc, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(payload.ResourceID, resourceControlType)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve resource controls from the database", err}
 	}
 	if rc != nil {
-		return &httperror.HandlerError{http.StatusConflict, "A resource control is already associated to this resource", portainer.ErrResourceControlAlreadyExists}
+		return &httperror.HandlerError{http.StatusConflict, "A resource control is already associated to this resource", errResourceControlAlreadyExists}
 	}
 
 	var userAccesses = make([]portainer.UserResourceAccess, 0)
@@ -104,7 +109,7 @@ func (handler *Handler) resourceControlCreate(w http.ResponseWriter, r *http.Req
 		TeamAccesses:       teamAccesses,
 	}
 
-	err = handler.ResourceControlService.CreateResourceControl(&resourceControl)
+	err = handler.DataStore.ResourceControl().CreateResourceControl(&resourceControl)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the resource control inside the database", err}
 	}

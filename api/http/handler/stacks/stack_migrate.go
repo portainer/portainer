@@ -1,12 +1,15 @@
 package stacks
 
 import (
+	"errors"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -18,7 +21,7 @@ type stackMigratePayload struct {
 
 func (payload *stackMigratePayload) Validate(r *http.Request) error {
 	if payload.EndpointID == 0 {
-		return portainer.Error("Invalid endpoint identifier. Must be a positive number")
+		return errors.New("Invalid endpoint identifier. Must be a positive number")
 	}
 	return nil
 }
@@ -36,26 +39,26 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	stack, err := handler.StackService.Stack(portainer.StackID(stackID))
-	if err == portainer.ErrObjectNotFound {
+	stack, err := handler.DataStore.Stack().Stack(portainer.StackID(stackID))
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a stack with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a stack with the specified identifier inside the database", err}
 	}
 
-	endpoint, err := handler.EndpointService.Endpoint(stack.EndpointID)
-	if err == portainer.ErrObjectNotFound {
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(stack.EndpointID)
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
-	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint, true)
+	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
 	}
 
-	resourceControl, err := handler.ResourceControlService.ResourceControlByResourceIDAndType(stack.Name, portainer.StackResourceControl)
+	resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stack.Name, portainer.StackResourceControl)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the stack", err}
 	}
@@ -70,7 +73,7 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify user authorizations to validate stack access", err}
 	}
 	if !access {
-		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", httperrors.ErrResourceAccessDenied}
 	}
 
 	// TODO: this is a work-around for stacks created with Portainer version >= 1.17.1
@@ -84,8 +87,8 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 		stack.EndpointID = portainer.EndpointID(endpointID)
 	}
 
-	targetEndpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(payload.EndpointID))
-	if err == portainer.ErrObjectNotFound {
+	targetEndpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(payload.EndpointID))
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
@@ -112,7 +115,7 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
 
-	err = handler.StackService.UpdateStack(stack.ID, stack)
+	err = handler.DataStore.Stack().UpdateStack(stack.ID, stack)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack changes inside the database", err}
 	}

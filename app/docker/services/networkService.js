@@ -41,7 +41,6 @@ angular.module('portainer.docker').factory('NetworkService', [
       Network.query({ filters: filters })
         .$promise.then(function success(data) {
           var networks = data;
-
           var filteredNetworks = networks
             .filter(function (network) {
               if (localNetworks && network.Scope === 'local') {

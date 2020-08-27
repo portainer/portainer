@@ -1,10 +1,15 @@
+import angular from 'angular';
+
+import './template-item.css';
+
 angular.module('portainer.app').component('templateItem', {
   templateUrl: './templateItem.html',
   bindings: {
-    model: '=',
+    model: '<',
+    typeLabel: '@',
     onSelect: '<',
-    onDelete: '<',
-    showUpdateAction: '<',
-    showDeleteAction: '<',
+  },
+  transclude: {
+    actions: '?templateItemActions',
   },
 });

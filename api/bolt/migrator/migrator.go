@@ -15,9 +15,9 @@ import (
 	"github.com/portainer/portainer/api/bolt/stack"
 	"github.com/portainer/portainer/api/bolt/tag"
 	"github.com/portainer/portainer/api/bolt/teammembership"
-	"github.com/portainer/portainer/api/bolt/template"
 	"github.com/portainer/portainer/api/bolt/user"
 	"github.com/portainer/portainer/api/bolt/version"
+	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 type (
@@ -37,10 +37,10 @@ type (
 		stackService            *stack.Service
 		tagService              *tag.Service
 		teamMembershipService   *teammembership.Service
-		templateService         *template.Service
 		userService             *user.Service
 		versionService          *version.Service
 		fileService             portainer.FileService
+		authorizationService    *authorization.Service
 	}
 
 	// Parameters represents the required parameters to create a new Migrator instance.
@@ -59,10 +59,10 @@ type (
 		StackService            *stack.Service
 		TagService              *tag.Service
 		TeamMembershipService   *teammembership.Service
-		TemplateService         *template.Service
 		UserService             *user.Service
 		VersionService          *version.Service
 		FileService             portainer.FileService
+		AuthorizationService    *authorization.Service
 	}
 )
 
@@ -82,17 +82,16 @@ func NewMigrator(parameters *Parameters) *Migrator {
 		settingsService:         parameters.SettingsService,
 		tagService:              parameters.TagService,
 		teamMembershipService:   parameters.TeamMembershipService,
-		templateService:         parameters.TemplateService,
 		stackService:            parameters.StackService,
 		userService:             parameters.UserService,
 		versionService:          parameters.VersionService,
 		fileService:             parameters.FileService,
+		authorizationService:    parameters.AuthorizationService,
 	}
 }
 
 // Migrate checks the database version and migrate the existing data to the most recent data model.
 func (m *Migrator) Migrate() error {
-
 	// Portainer < 1.12
 	if m.currentDBVersion < 1 {
 		err := m.updateAdminUserToDBVersion1()
@@ -317,6 +316,27 @@ func (m *Migrator) Migrate() error {
 		}
 
 		err = m.updateEndpointsAndEndpointGroupsToDBVersion23()
+		if err != nil {
+			return err
+		}
+	}
+
+	// Portainer 1.24.1
+	if m.currentDBVersion < 24 {
+		err := m.updateSettingsToDB24()
+		if err != nil {
+			return err
+		}
+	}
+
+	// Portainer 2.0.0
+	if m.currentDBVersion < 25 {
+		err := m.updateSettingsToDB25()
+		if err != nil {
+			return err
+		}
+
+		err = m.updateStacksToDB24()
 		if err != nil {
 			return err
 		}

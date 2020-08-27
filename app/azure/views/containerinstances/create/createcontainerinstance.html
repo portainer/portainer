@@ -7,7 +7,7 @@
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-body>
-        <form class="form-horizontal" autocomplete="off">
+        <form class="form-horizontal" autocomplete="off" name="aciForm">
           <div class="col-sm-12 form-section-title">
             Azure settings
           </div>
@@ -53,7 +53,14 @@
           <div class="form-group">
             <label for="container_name" class="col-sm-1 control-label text-left">Name</label>
             <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="model.Name" name="container_name" placeholder="e.g. myContainer" />
+              <input type="text" class="form-control" ng-model="model.Name" name="container_name" placeholder="e.g. myContainer" required />
+            </div>
+          </div>
+          <div class="form-group" ng-show="aciForm.container_name.$invalid">
+            <div class="col-sm-12 small text-warning">
+              <div ng-messages="aciForm.container_name.$error">
+                <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Name is required. </p>
+              </div>
             </div>
           </div>
           <!-- !name-input -->
@@ -61,7 +68,14 @@
           <div class="form-group">
             <label for="image_name" class="col-sm-1 control-label text-left">Image</label>
             <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="model.Image" name="image_name" placeholder="e.g. nginx:alpine" />
+              <input type="text" class="form-control" ng-model="model.Image" name="image_name" placeholder="e.g. nginx:alpine" required />
+            </div>
+          </div>
+          <div class="form-group" ng-show="aciForm.image_name.$invalid">
+            <div class="col-sm-12 small text-warning">
+              <div ng-messages="aciForm.image_name.$error">
+                <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Image is required. </p>
+              </div>
             </div>
           </div>
           <!-- !image-input -->
@@ -120,14 +134,10 @@
           <!-- !port-mapping -->
           <!-- public-ip -->
           <div class="form-group">
-            <div class="col-sm-12">
-              <label for="public_ip" class="control-label text-left">
-                Allocate public IP address
-              </label>
-              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="public_ip" ng-model="model.AllocatePublicIP" /><i></i> </label>
-            </div>
+            <div class="col-sm-12 small text-muted">This will automatically deploy a container with a public IP address</div>
           </div>
           <!-- public-ip -->
+
           <div class="col-sm-12 form-section-title">
             Container resources
           </div>
@@ -157,6 +167,7 @@
                 <span ng-hide="state.actionInProgress">Deploy the container</span>
                 <span ng-show="state.actionInProgress">Deployment in progress...</span>
               </button>
+              <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
             </div>
           </div>
           <!-- !actions -->

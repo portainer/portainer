@@ -82,9 +82,7 @@ angular.module('portainer.docker').controller('SwarmController', [
     }
 
     function initView() {
-      if (StateManager.getState().application.authentication) {
-        $scope.isAdmin = Authentication.isAdmin();
-      }
+      $scope.isAdmin = Authentication.isAdmin();
 
       var provider = $scope.applicationState.endpoint.mode.provider;
       $q.all({

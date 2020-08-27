@@ -73,15 +73,33 @@
             </div>
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
-                Ensure that you have deployed the Portainer agent in your cluster first. You can use execute the following command on any manager node to deploy it.
+                Ensure that you have deployed the Portainer agent in your cluster first. Refer to the platform related command below to deploy it.
                 <div style="margin-top: 10px;">
-                  <code>
-                    curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent
-                  </code>
-                  <span class="btn btn-primary btn-sm space-left" ng-click="copyAgentCommand()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy</span>
-                  <span>
-                    <i id="copyNotification" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none;"></i>
-                  </span>
+                  <uib-tabset active="state.deploymentTab">
+                    <uib-tab index="0" heading="Kubernetes via load balancer">
+                      <code style="display: block; white-space: pre-wrap; padding: 16px 90px;"
+                        >curl -L https://downloads.portainer.io/portainer-agent-k8s-lb.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml</code
+                      >
+                    </uib-tab>
+
+                    <uib-tab index="1" heading="Kubernetes via node port">
+                      <code style="display: block; white-space: pre-wrap; padding: 16px 90px;"
+                        >curl -L https://downloads.portainer.io/portainer-agent-k8s-nodeport.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml</code
+                      >
+                    </uib-tab>
+
+                    <uib-tab index="2" heading="Docker Swarm">
+                      <code style="display: block; white-space: pre-wrap; padding: 16px 90px;"
+                        >curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent</code
+                      >
+                    </uib-tab>
+                  </uib-tabset>
+                  <div style="margin-top: 10px;">
+                    <span class="btn btn-primary btn-sm space-left" ng-click="copyAgentCommand()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy command</span>
+                    <span>
+                      <i id="copyNotification" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none;"></i>
+                    </span>
+                  </div>
                 </div>
               </span>
             </div>
@@ -92,8 +110,11 @@
             </div>
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
-                Allows you to create an endpoint that can be registered with an Edge agent. The Edge agent will initiate the communications with the Portainer instance. All the
-                required information on how to connect an Edge agent to this endpoint will be available after endpoint creation.
+                <p>
+                  Allows you to create an endpoint that can be registered with an Edge agent. The Edge agent will initiate the communications with the Portainer instance. All the
+                  required information on how to connect an Edge agent to this endpoint will be available after endpoint creation.
+                </p>
+                <p> You can read more about the Edge agent in the userguide available <a href="https://downloads.portainer.io/edge_agent_guide.pdf">here.</a> </p>
               </span>
             </div>
           </div>
@@ -127,7 +148,15 @@
           <div class="form-group">
             <label for="container_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
             <div class="col-sm-9 col-lg-10">
-              <input type="text" class="form-control" name="container_name" ng-model="formValues.Name" placeholder="e.g. docker-prod01" required auto-focus />
+              <input
+                type="text"
+                class="form-control"
+                name="container_name"
+                ng-model="formValues.Name"
+                placeholder="e.g. docker-prod01 / kubernetes-cluster01"
+                required
+                auto-focus
+              />
             </div>
           </div>
           <div class="form-group" ng-show="endpointCreationForm.container_name.$invalid">
@@ -146,7 +175,8 @@
                 <portainer-tooltip
                   position="bottom"
                   message="URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it."
-                ></portainer-tooltip>
+                >
+                </portainer-tooltip>
               </label>
               <div class="col-sm-9 col-lg-10">
                 <input
@@ -196,8 +226,26 @@
                 </div>
               </div>
             </div>
+            <!-- !portainer-instance-input -->
+            <div class="form-group">
+              <label for="edge_checkin" class="col-sm-2 control-label text-left">
+                Poll frequency
+                <portainer-tooltip
+                  position="bottom"
+                  message="Interval used by this Edge agent to check in with the Portainer instance. Affects Edge endpoint management and Edge compute features."
+                >
+                </portainer-tooltip>
+              </label>
+              <div class="col-sm-10">
+                <select
+                  id="edge_checkin"
+                  class="form-control"
+                  ng-model="formValues.CheckinInterval"
+                  ng-options="+(opt.value) as opt.key for opt in state.availableEdgeAgentCheckinOptions"
+                ></select>
+              </div>
+            </div>
           </div>
-          <!-- !portainer-instance-input -->
           <!-- endpoint-public-url-input -->
           <div ng-if="state.EnvironmentType === 'docker' || state.EnvironmentType === 'agent'">
             <div class="form-group">
@@ -206,7 +254,8 @@
                 <portainer-tooltip
                   position="bottom"
                   message="URL or IP address where exposed containers will be reachable. This field is optional and will default to the endpoint URL."
-                ></portainer-tooltip>
+                >
+                </portainer-tooltip>
               </label>
               <div class="col-sm-9 col-lg-10">
                 <input type="text" class="form-control" id="endpoint_public_url" ng-model="formValues.PublicURL" placeholder="e.g. 10.0.0.10 or mydocker.mydomain.com" />
@@ -302,13 +351,8 @@
           <!-- !group -->
           <!-- tags -->
           <div class="form-group">
-            <tag-selector
-              ng-if="formValues && availableTags"
-              tags="availableTags"
-              model="formValues.TagIds"
-              allow-create="state.allowCreateTag"
-              on-create="(onCreateTag)"
-            ></tag-selector>
+            <tag-selector ng-if="formValues && availableTags" tags="availableTags" model="formValues.TagIds" allow-create="state.allowCreateTag" on-create="(onCreateTag)">
+            </tag-selector>
           </div>
           <!-- !tags -->
           <div class="col-sm-12 form-section-title">

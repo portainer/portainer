@@ -1,6 +1,7 @@
 package dockerhub
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -18,7 +19,7 @@ type dockerhubUpdatePayload struct {
 
 func (payload *dockerhubUpdatePayload) Validate(r *http.Request) error {
 	if payload.Authentication && (govalidator.IsNull(payload.Username) || govalidator.IsNull(payload.Password)) {
-		return portainer.Error("Invalid credentials. Username and password must be specified when authentication is enabled")
+		return errors.New("Invalid credentials. Username and password must be specified when authentication is enabled")
 	}
 	return nil
 }
@@ -43,7 +44,7 @@ func (handler *Handler) dockerhubUpdate(w http.ResponseWriter, r *http.Request) 
 		dockerhub.Password = payload.Password
 	}
 
-	err = handler.DockerHubService.UpdateDockerHub(dockerhub)
+	err = handler.DataStore.DockerHub().UpdateDockerHub(dockerhub)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the Dockerhub changes inside the database", err}
 	}

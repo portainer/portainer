@@ -12,13 +12,36 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
-func snapshot(cli *client.Client, endpoint *portainer.Endpoint) (*portainer.Snapshot, error) {
+// Snapshotter represents a service used to create endpoint snapshots
+type Snapshotter struct {
+	clientFactory *ClientFactory
+}
+
+// NewSnapshotter returns a new Snapshotter instance
+func NewSnapshotter(clientFactory *ClientFactory) *Snapshotter {
+	return &Snapshotter{
+		clientFactory: clientFactory,
+	}
+}
+
+// CreateSnapshot creates a snapshot of a specific Docker endpoint
+func (snapshotter *Snapshotter) CreateSnapshot(endpoint *portainer.Endpoint) (*portainer.DockerSnapshot, error) {
+	cli, err := snapshotter.clientFactory.CreateClient(endpoint, "")
+	if err != nil {
+		return nil, err
+	}
+	defer cli.Close()
+
+	return snapshot(cli, endpoint)
+}
+
+func snapshot(cli *client.Client, endpoint *portainer.Endpoint) (*portainer.DockerSnapshot, error) {
 	_, err := cli.Ping(context.Background())
 	if err != nil {
 		return nil, err
 	}
 
-	snapshot := &portainer.Snapshot{
+	snapshot := &portainer.DockerSnapshot{
 		StackCount: 0,
 	}
 
@@ -68,7 +91,7 @@ func snapshot(cli *client.Client, endpoint *portainer.Endpoint) (*portainer.Snap
 	return snapshot, nil
 }
 
-func snapshotInfo(snapshot *portainer.Snapshot, cli *client.Client) error {
+func snapshotInfo(snapshot *portainer.DockerSnapshot, cli *client.Client) error {
 	info, err := cli.Info(context.Background())
 	if err != nil {
 		return err
@@ -82,7 +105,7 @@ func snapshotInfo(snapshot *portainer.Snapshot, cli *client.Client) error {
 	return nil
 }
 
-func snapshotNodes(snapshot *portainer.Snapshot, cli *client.Client) error {
+func snapshotNodes(snapshot *portainer.DockerSnapshot, cli *client.Client) error {
 	nodes, err := cli.NodeList(context.Background(), types.NodeListOptions{})
 	if err != nil {
 		return err
@@ -98,7 +121,7 @@ func snapshotNodes(snapshot *portainer.Snapshot, cli *client.Client) error {
 	return nil
 }
 
-func snapshotSwarmServices(snapshot *portainer.Snapshot, cli *client.Client) error {
+func snapshotSwarmServices(snapshot *portainer.DockerSnapshot, cli *client.Client) error {
 	stacks := make(map[string]struct{})
 
 	services, err := cli.ServiceList(context.Background(), types.ServiceListOptions{})
@@ -119,7 +142,7 @@ func snapshotSwarmServices(snapshot *portainer.Snapshot, cli *client.Client) err
 	return nil
 }
 
-func snapshotContainers(snapshot *portainer.Snapshot, cli *client.Client) error {
+func snapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Client) error {
 	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{All: true})
 	if err != nil {
 		return err
@@ -159,7 +182,7 @@ func snapshotContainers(snapshot *portainer.Snapshot, cli *client.Client) error 
 	return nil
 }
 
-func snapshotImages(snapshot *portainer.Snapshot, cli *client.Client) error {
+func snapshotImages(snapshot *portainer.DockerSnapshot, cli *client.Client) error {
 	images, err := cli.ImageList(context.Background(), types.ImageListOptions{})
 	if err != nil {
 		return err
@@ -170,7 +193,7 @@ func snapshotImages(snapshot *portainer.Snapshot, cli *client.Client) error {
 	return nil
 }
 
-func snapshotVolumes(snapshot *portainer.Snapshot, cli *client.Client) error {
+func snapshotVolumes(snapshot *portainer.DockerSnapshot, cli *client.Client) error {
 	volumes, err := cli.VolumeList(context.Background(), filters.Args{})
 	if err != nil {
 		return err
@@ -181,7 +204,7 @@ func snapshotVolumes(snapshot *portainer.Snapshot, cli *client.Client) error {
 	return nil
 }
 
-func snapshotNetworks(snapshot *portainer.Snapshot, cli *client.Client) error {
+func snapshotNetworks(snapshot *portainer.DockerSnapshot, cli *client.Client) error {
 	networks, err := cli.NetworkList(context.Background(), types.NetworkListOptions{})
 	if err != nil {
 		return err
@@ -190,7 +213,7 @@ func snapshotNetworks(snapshot *portainer.Snapshot, cli *client.Client) error {
 	return nil
 }
 
-func snapshotVersion(snapshot *portainer.Snapshot, cli *client.Client) error {
+func snapshotVersion(snapshot *portainer.DockerSnapshot, cli *client.Client) error {
 	version, err := cli.ServerVersion(context.Background())
 	if err != nil {
 		return err

@@ -1,4 +1,5 @@
-import { TemplateViewModel, TemplateCreateRequest, TemplateUpdateRequest } from '../../models/template';
+import _ from 'lodash-es';
+import { TemplateViewModel } from '../../models/template';
 
 angular.module('portainer.app').factory('TemplateService', [
   '$q',
@@ -13,7 +14,7 @@ angular.module('portainer.app').factory('TemplateService', [
     var service = {};
 
     service.templates = function () {
-      var deferred = $q.defer();
+      const deferred = $q.defer();
 
       $q.all({
         templates: Templates.query().$promise,
@@ -21,12 +22,17 @@ angular.module('portainer.app').factory('TemplateService', [
         dockerhub: DockerHubService.dockerhub(),
       })
         .then(function success(data) {
-          const templates = data.templates.map(function (item) {
-            const res = new TemplateViewModel(item);
-            const registry = RegistryService.retrievePorRegistryModelFromRepositoryWithRegistries(res.RegistryModel.Registry.URL, data.registries, data.dockerhub);
-            registry.Image = res.RegistryModel.Image;
-            res.RegistryModel = registry;
-            return res;
+          const version = data.templates.version;
+          const templates = _.map(data.templates.templates, (item) => {
+            try {
+              const template = new TemplateViewModel(item, version);
+              const registry = RegistryService.retrievePorRegistryModelFromRepositoryWithRegistries(template.RegistryModel.Registry.URL, data.registries, data.dockerhub);
+              registry.Image = template.RegistryModel.Image;
+              template.RegistryModel = registry;
+              return template;
+            } catch (err) {
+              deferred.reject({ msg: 'Unable to retrieve templates', err: err });
+            }
           });
           deferred.resolve(templates);
         })
@@ -37,39 +43,10 @@ angular.module('portainer.app').factory('TemplateService', [
       return deferred.promise;
     };
 
-    service.template = function (id) {
-      var deferred = $q.defer();
-      let template;
-      Templates.get({ id: id })
-        .$promise.then(function success(data) {
-          template = new TemplateViewModel(data);
-          return RegistryService.retrievePorRegistryModelFromRepository(template.RegistryModel.Registry.URL);
-        })
-        .then((registry) => {
-          registry.Image = template.RegistryModel.Image;
-          template.RegistryModel = registry;
-          deferred.resolve(template);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve template details', err: err });
-        });
-
-      return deferred.promise;
-    };
-
-    service.delete = function (id) {
-      return Templates.remove({ id: id }).$promise;
-    };
-
-    service.create = function (model) {
-      var payload = new TemplateCreateRequest(model);
-      return Templates.create(payload).$promise;
-    };
-
-    service.update = function (model) {
-      var payload = new TemplateUpdateRequest(model);
-      return Templates.update(payload).$promise;
-    };
+    service.templateFile = templateFile;
+    function templateFile(repositoryUrl, composeFilePathInRepository) {
+      return Templates.file({ repositoryUrl, composeFilePathInRepository }).$promise;
+    }
 
     service.createTemplateConfiguration = function (template, containerName, network) {
       var imageConfiguration = ImageHelper.createImageConfigForContainer(template.RegistryModel);

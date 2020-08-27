@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/filesystem"
 )
 
 // POST request on /api/upload/tls/{certificate:(?:ca|cert|key)}?folder=<folder>
@@ -35,7 +36,7 @@ func (handler *Handler) uploadTLS(w http.ResponseWriter, r *http.Request) *httpe
 	case "key":
 		fileType = portainer.TLSFileKey
 	default:
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid certificate route value. Value must be one of: ca, cert or key", portainer.ErrUndefinedTLSFileType}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid certificate route value. Value must be one of: ca, cert or key", filesystem.ErrUndefinedTLSFileType}
 	}
 
 	_, err = handler.FileService.StoreTLSFileFromBytes(folder, fileType, file)

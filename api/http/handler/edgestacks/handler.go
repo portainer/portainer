@@ -12,14 +12,10 @@ import (
 // Handler is the HTTP handler used to handle endpoint group operations.
 type Handler struct {
 	*mux.Router
-	requestBouncer          *security.RequestBouncer
-	EdgeGroupService        portainer.EdgeGroupService
-	EdgeStackService        portainer.EdgeStackService
-	EndpointService         portainer.EndpointService
-	EndpointGroupService    portainer.EndpointGroupService
-	EndpointRelationService portainer.EndpointRelationService
-	FileService             portainer.FileService
-	GitService              portainer.GitService
+	requestBouncer *security.RequestBouncer
+	DataStore      portainer.DataStore
+	FileService    portainer.FileService
+	GitService     portainer.GitService
 }
 
 // NewHandler creates a handler to manage endpoint group operations.
@@ -29,17 +25,17 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		requestBouncer: bouncer,
 	}
 	h.Handle("/edge_stacks",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeStackCreate))).Methods(http.MethodPost)
+		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeStackCreate)))).Methods(http.MethodPost)
 	h.Handle("/edge_stacks",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeStackList))).Methods(http.MethodGet)
+		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeStackList)))).Methods(http.MethodGet)
 	h.Handle("/edge_stacks/{id}",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeStackInspect))).Methods(http.MethodGet)
+		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeStackInspect)))).Methods(http.MethodGet)
 	h.Handle("/edge_stacks/{id}",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeStackUpdate))).Methods(http.MethodPut)
+		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeStackUpdate)))).Methods(http.MethodPut)
 	h.Handle("/edge_stacks/{id}",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeStackDelete))).Methods(http.MethodDelete)
+		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeStackDelete)))).Methods(http.MethodDelete)
 	h.Handle("/edge_stacks/{id}/file",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeStackFile))).Methods(http.MethodGet)
+		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeStackFile)))).Methods(http.MethodGet)
 	h.Handle("/edge_stacks/{id}/status",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.edgeStackStatusUpdate))).Methods(http.MethodPut)
 	return h

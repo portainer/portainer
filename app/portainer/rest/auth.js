@@ -4,13 +4,11 @@ angular.module('portainer.app').factory('Auth', [
   function AuthFactory($resource, API_ENDPOINT_AUTH) {
     'use strict';
     return $resource(
-      API_ENDPOINT_AUTH,
+      API_ENDPOINT_AUTH + '/:action',
       {},
       {
-        login: {
-          method: 'POST',
-          ignoreLoadingBar: true,
-        },
+        login: { method: 'POST', ignoreLoadingBar: true },
+        logout: { method: 'POST', params: { action: 'logout' }, ignoreLoadingBar: true },
       }
     );
   },

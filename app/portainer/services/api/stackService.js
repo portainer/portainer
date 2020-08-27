@@ -1,17 +1,17 @@
 import _ from 'lodash-es';
-import { StackViewModel, ExternalStackViewModel } from '../../models/stack';
+import { ExternalStackViewModel, StackViewModel } from '../../models/stack';
 
 angular.module('portainer.app').factory('StackService', [
   '$q',
+  '$async',
   'Stack',
-  'ResourceControlService',
   'FileUploadService',
   'StackHelper',
   'ServiceService',
   'ContainerService',
   'SwarmService',
   'EndpointProvider',
-  function StackServiceFactory($q, Stack, ResourceControlService, FileUploadService, StackHelper, ServiceService, ContainerService, SwarmService, EndpointProvider) {
+  function StackServiceFactory($q, $async, Stack, FileUploadService, StackHelper, ServiceService, ContainerService, SwarmService, EndpointProvider) {
     'use strict';
     var service = {};
 
@@ -252,7 +252,6 @@ angular.module('portainer.app').factory('StackService', [
 
       return deferred.promise;
     };
-
     service.createComposeStackFromFileContent = function (name, stackFileContent, env, endpointId) {
       var payload = {
         Name: name,
@@ -332,6 +331,33 @@ angular.module('portainer.app').factory('StackService', [
       var action = type === 1 ? service.createSwarmStackFromFileContent : service.createComposeStackFromFileContent;
       return action(name, stackFileContent, env, endpointId);
     };
+
+    async function kubernetesDeployAsync(endpointId, namespace, content, compose) {
+      try {
+        const payload = {
+          StackFileContent: content,
+          ComposeFormat: compose,
+          Namespace: namespace,
+        };
+        await Stack.create({ method: 'undefined', type: 3, endpointId: endpointId }, payload).$promise;
+      } catch (err) {
+        throw { err: err };
+      }
+    }
+
+    service.kubernetesDeploy = function (endpointId, namespace, content, compose) {
+      return $async(kubernetesDeployAsync, endpointId, namespace, content, compose);
+    };
+
+    service.start = start;
+    function start(id) {
+      return Stack.start({ id }).$promise;
+    }
+
+    service.stop = stop;
+    function stop(id) {
+      return Stack.stop({ id }).$promise;
+    }
 
     return service;
   },

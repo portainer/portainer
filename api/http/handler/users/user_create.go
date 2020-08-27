@@ -1,6 +1,7 @@
 package users
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -8,6 +9,8 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -19,11 +22,11 @@ type userCreatePayload struct {
 
 func (payload *userCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Username) || govalidator.Contains(payload.Username, " ") {
-		return portainer.Error("Invalid username. Must not contain any whitespace")
+		return errors.New("Invalid username. Must not contain any whitespace")
 	}
 
 	if payload.Role != 1 && payload.Role != 2 {
-		return portainer.Error("Invalid role value. Value must be one of: 1 (administrator) or 2 (regular user)")
+		return errors.New("Invalid role value. Value must be one of: 1 (administrator) or 2 (regular user)")
 	}
 	return nil
 }
@@ -42,28 +45,27 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	if !securityContext.IsAdmin && !securityContext.IsTeamLeader {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to create user", portainer.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to create user", httperrors.ErrResourceAccessDenied}
 	}
 
 	if securityContext.IsTeamLeader && payload.Role == 1 {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to create administrator user", portainer.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to create administrator user", httperrors.ErrResourceAccessDenied}
 	}
 
-	user, err := handler.UserService.UserByUsername(payload.Username)
-	if err != nil && err != portainer.ErrObjectNotFound {
+	user, err := handler.DataStore.User().UserByUsername(payload.Username)
+	if err != nil && err != bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve users from the database", err}
 	}
 	if user != nil {
-		return &httperror.HandlerError{http.StatusConflict, "Another user with the same username already exists", portainer.ErrUserAlreadyExists}
+		return &httperror.HandlerError{http.StatusConflict, "Another user with the same username already exists", errUserAlreadyExists}
 	}
 
 	user = &portainer.User{
-		Username:                payload.Username,
-		Role:                    portainer.UserRole(payload.Role),
-		PortainerAuthorizations: portainer.DefaultPortainerAuthorizations(),
+		Username: payload.Username,
+		Role:     portainer.UserRole(payload.Role),
 	}
 
-	settings, err := handler.SettingsService.Settings()
+	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
 	}
@@ -71,11 +73,11 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 	if settings.AuthenticationMethod == portainer.AuthenticationInternal {
 		user.Password, err = handler.CryptoService.Hash(payload.Password)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to hash user password", portainer.ErrCryptoHashFailure}
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to hash user password", errCryptoHashFailure}
 		}
 	}
 
-	err = handler.UserService.CreateUser(user)
+	err = handler.DataStore.User().CreateUser(user)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist user inside the database", err}
 	}

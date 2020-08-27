@@ -1,12 +1,18 @@
 package docker
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"errors"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/docker/docker/client"
-	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
+	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 const (
@@ -21,7 +27,7 @@ func getInheritedResourceControlFromContainerLabels(dockerClient *client.Client,
 
 	serviceName := container.Config.Labels[resourceLabelForDockerServiceID]
 	if serviceName != "" {
-		serviceResourceControl := portainer.GetResourceControlByResourceIDAndType(serviceName, portainer.ServiceResourceControl, resourceControls)
+		serviceResourceControl := authorization.GetResourceControlByResourceIDAndType(serviceName, portainer.ServiceResourceControl, resourceControls)
 		if serviceResourceControl != nil {
 			return serviceResourceControl, nil
 		}
@@ -29,12 +35,12 @@ func getInheritedResourceControlFromContainerLabels(dockerClient *client.Client,
 
 	swarmStackName := container.Config.Labels[resourceLabelForDockerSwarmStackName]
 	if swarmStackName != "" {
-		return portainer.GetResourceControlByResourceIDAndType(swarmStackName, portainer.StackResourceControl, resourceControls), nil
+		return authorization.GetResourceControlByResourceIDAndType(swarmStackName, portainer.StackResourceControl, resourceControls), nil
 	}
 
 	composeStackName := container.Config.Labels[resourceLabelForDockerComposeStackName]
 	if composeStackName != "" {
-		return portainer.GetResourceControlByResourceIDAndType(composeStackName, portainer.StackResourceControl, resourceControls), nil
+		return authorization.GetResourceControlByResourceIDAndType(composeStackName, portainer.StackResourceControl, resourceControls), nil
 	}
 
 	return nil, nil
@@ -146,4 +152,82 @@ func containerHasBlackListedLabel(containerLabels map[string]interface{}, labelB
 	}
 
 	return false
+}
+
+func (transport *Transport) decorateContainerCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
+	type PartialContainer struct {
+		HostConfig struct {
+			Privileged bool          `json:"Privileged"`
+			PidMode    string        `json:"PidMode"`
+			Devices    []interface{} `json:"Devices"`
+			CapAdd     []string      `json:"CapAdd"`
+			CapDrop    []string      `json:"CapDrop"`
+			Binds      []string      `json:"Binds"`
+		} `json:"HostConfig"`
+	}
+
+	forbiddenResponse := &http.Response{
+		StatusCode: http.StatusForbidden,
+	}
+
+	tokenData, err := security.RetrieveTokenData(request)
+	if err != nil {
+		return nil, err
+	}
+
+	isAdminOrEndpointAdmin, err := transport.isAdminOrEndpointAdmin(request)
+	if err != nil {
+		return nil, err
+	}
+
+	if !isAdminOrEndpointAdmin {
+		settings, err := transport.dataStore.Settings().Settings()
+		if err != nil {
+			return nil, err
+		}
+
+		body, err := ioutil.ReadAll(request.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		partialContainer := &PartialContainer{}
+		err = json.Unmarshal(body, partialContainer)
+		if err != nil {
+			return nil, err
+		}
+
+		if !settings.AllowPrivilegedModeForRegularUsers && partialContainer.HostConfig.Privileged {
+			return forbiddenResponse, errors.New("forbidden to use privileged mode")
+		}
+
+		if !settings.AllowHostNamespaceForRegularUsers && partialContainer.HostConfig.PidMode == "host" {
+			return forbiddenResponse, errors.New("forbidden to use pid host namespace")
+		}
+
+		if !settings.AllowDeviceMappingForRegularUsers && len(partialContainer.HostConfig.Devices) > 0 {
+			return forbiddenResponse, errors.New("forbidden to use device mapping")
+		}
+
+		if !settings.AllowContainerCapabilitiesForRegularUsers && (len(partialContainer.HostConfig.CapAdd) > 0 || len(partialContainer.HostConfig.CapDrop) > 0) {
+			return nil, errors.New("forbidden to use container capabilities")
+		}
+
+		if !settings.AllowBindMountsForRegularUsers && (len(partialContainer.HostConfig.Binds) > 0) {
+			return forbiddenResponse, errors.New("forbidden to use bind mounts")
+		}
+
+		request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+	}
+
+	response, err := transport.executeDockerRequest(request)
+	if err != nil {
+		return response, err
+	}
+
+	if response.StatusCode == http.StatusCreated {
+		err = transport.decorateGenericResourceCreationResponse(response, resourceIdentifierAttribute, resourceType, tokenData.ID)
+	}
+
+	return response, err
 }

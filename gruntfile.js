@@ -16,8 +16,12 @@ module.exports = function (grunt) {
   grunt.initConfig({
     root: 'dist',
     distdir: 'dist/public',
-    shippedDockerVersion: '18.09.3',
-    shippedDockerVersionWindows: '17.09.0-ce',
+    binaries: {
+      dockerLinuxVersion: '18.09.3',
+      dockerWindowsVersion: '17.09.0-ce',
+      komposeVersion: 'v1.21.0',
+      kubectlVersion: 'v1.18.0',
+    },
     config: gruntfile_cfg.config,
     env: gruntfile_cfg.env,
     src: gruntfile_cfg.src,
@@ -30,7 +34,12 @@ module.exports = function (grunt) {
 
   grunt.registerTask('lint', ['eslint']);
 
-  grunt.registerTask('build:server', ['shell:build_binary:linux:' + arch, 'shell:download_docker_binary:linux:' + arch]);
+  grunt.registerTask('build:server', [
+    'shell:build_binary:linux:' + arch,
+    'shell:download_docker_binary:linux:' + arch,
+    'shell:download_kompose_binary:linux:' + arch,
+    'shell:download_kubectl_binary:linux:' + arch,
+  ]);
 
   grunt.registerTask('build:client', ['config:dev', 'env:dev', 'webpack:dev']);
 
@@ -38,12 +47,26 @@ module.exports = function (grunt) {
 
   grunt.registerTask('start:server', ['build:server', 'copy:assets', 'shell:run_container']);
 
-  grunt.registerTask('start:client', ['config:dev', 'env:dev', 'webpack:devWatch']);
+  grunt.registerTask('start:localserver', ['shell:build_binary:linux:' + arch, 'shell:run_localserver']);
+
+  grunt.registerTask('start:client', ['shell:install_yarndeps', 'config:dev', 'env:dev', 'webpack:devWatch']);
 
   grunt.registerTask('start', ['start:server', 'start:client']);
 
+  grunt.registerTask('start:toolkit', ['start:localserver', 'start:client']);
+
   grunt.task.registerTask('release', 'release:<platform>:<arch>', function (p = 'linux', a = arch) {
-    grunt.task.run(['config:prod', 'env:prod', 'clean:all', 'copy:assets', 'shell:build_binary:' + p + ':' + a, 'shell:download_docker_binary:' + p + ':' + a, 'webpack:prod']);
+    grunt.task.run([
+      'config:prod',
+      'env:prod',
+      'clean:all',
+      'copy:assets',
+      'shell:build_binary:' + p + ':' + a,
+      'shell:download_docker_binary:' + p + ':' + a,
+      'shell:download_kompose_binary:' + p + ':' + a,
+      'shell:download_kubectl_binary:' + p + ':' + a,
+      'webpack:prod',
+    ]);
   });
 
   grunt.task.registerTask('devopsbuild', 'devopsbuild:<platform>:<arch>', function (p, a) {
@@ -54,6 +77,8 @@ module.exports = function (grunt) {
       'copy:assets',
       'shell:build_binary_azuredevops:' + p + ':' + a,
       'shell:download_docker_binary:' + p + ':' + a,
+      'shell:download_kompose_binary:' + p + ':' + a,
+      'shell:download_kubectl_binary:' + p + ':' + a,
       'webpack:prod',
     ]);
   });
@@ -93,7 +118,6 @@ gruntfile_cfg.src = {
 gruntfile_cfg.clean = {
   server: ['<%= root %>/portainer'],
   client: ['<%= distdir %>/*'],
-  docker: ['<%= root %>/docker'],
   all: ['<%= root %>/*'],
 };
 
@@ -104,18 +128,7 @@ gruntfile_cfg.eslint = {
 
 gruntfile_cfg.copy = {
   assets: {
-    files: [
-      {
-        dest: '<%= root %>/',
-        src: 'templates.json',
-        cwd: '',
-      },
-      {
-        dest: '<%= root %>/',
-        src: 'extensions.json',
-        cwd: '',
-      },
-    ],
+    files: [],
   },
 };
 
@@ -123,7 +136,11 @@ gruntfile_cfg.shell = {
   build_binary: { command: shell_build_binary },
   build_binary_azuredevops: { command: shell_build_binary_azuredevops },
   download_docker_binary: { command: shell_download_docker_binary },
+  download_kompose_binary: { command: shell_download_kompose_binary },
+  download_kubectl_binary: { command: shell_download_kubectl_binary },
   run_container: { command: shell_run_container },
+  run_localserver: { command: shell_run_localserver, options: { async: true } },
+  install_yarndeps: { command: shell_install_yarndeps },
 };
 
 function shell_build_binary(p, a) {
@@ -154,8 +171,16 @@ function shell_run_container() {
     'docker rm -f portainer',
     'docker run -d -p 8000:8000 -p 9000:9000 -v $(pwd)/dist:/app -v ' +
       portainer_data +
-      ':/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer portainer/base /app/portainer --no-analytics --template-file /app/templates.json',
+      ':/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer portainer/base /app/portainer',
   ].join(';');
+}
+
+function shell_run_localserver() {
+  return './dist/portainer';
+}
+
+function shell_install_yarndeps() {
+  return 'yarn';
 }
 
 function shell_download_docker_binary(p, a) {
@@ -163,15 +188,48 @@ function shell_download_docker_binary(p, a) {
   var as = { amd64: 'x86_64', arm: 'armhf', arm64: 'aarch64' };
   var ip = ps[p] === undefined ? p : ps[p];
   var ia = as[a] === undefined ? a : as[a];
-  var binaryVersion = p === 'windows' ? '<%= shippedDockerVersionWindows %>' : '<%= shippedDockerVersion %>';
+  var binaryVersion = p === 'windows' ? '<%= binaries.dockerWindowsVersion %>' : '<%= binaries.dockerLinuxVersion %>';
+
   if (p === 'linux' || p === 'mac') {
-    return ['if [ -f dist/docker ]; then', 'echo "Docker binary exists";', 'else', 'build/download_docker_binary.sh ' + ip + ' ' + ia + ' ' + binaryVersion + ';', 'fi'].join(' ');
+    return ['if [ -f dist/docker ]; then', 'echo "docker binary exists";', 'else', 'build/download_docker_binary.sh ' + ip + ' ' + ia + ' ' + binaryVersion + ';', 'fi'].join(' ');
   } else {
     return [
       'powershell -Command "& {if (Get-Item -Path dist/docker.exe -ErrorAction:SilentlyContinue) {',
       'Write-Host "Docker binary exists"',
       '} else {',
       '& ".\\build\\download_docker_binary.ps1" -docker_version ' + binaryVersion + '',
+      '}}"',
+    ].join(' ');
+  }
+}
+
+function shell_download_kompose_binary(p, a) {
+  var binaryVersion = '<%= binaries.komposeVersion %>';
+
+  if (p === 'linux' || p === 'darwin') {
+    return ['if [ -f dist/kompose ]; then', 'echo "kompose binary exists";', 'else', 'build/download_kompose_binary.sh ' + p + ' ' + a + ' ' + binaryVersion + ';', 'fi'].join(' ');
+  } else {
+    return [
+      'powershell -Command "& {if (Get-Item -Path dist/kompose.exe -ErrorAction:SilentlyContinue) {',
+      'Write-Host "Docker binary exists"',
+      '} else {',
+      '& ".\\build\\download_kompose_binary.ps1" -docker_version ' + binaryVersion + '',
+      '}}"',
+    ].join(' ');
+  }
+}
+
+function shell_download_kubectl_binary(p, a) {
+  var binaryVersion = '<%= binaries.kubectlVersion %>';
+
+  if (p === 'linux' || p === 'darwin') {
+    return ['if [ -f dist/kubectl ]; then', 'echo "kubectl binary exists";', 'else', 'build/download_kubectl_binary.sh ' + p + ' ' + a + ' ' + binaryVersion + ';', 'fi'].join(' ');
+  } else {
+    return [
+      'powershell -Command "& {if (Get-Item -Path dist/kubectl.exe -ErrorAction:SilentlyContinue) {',
+      'Write-Host "Docker binary exists"',
+      '} else {',
+      '& ".\\build\\download_kubectl_binary.ps1" -docker_version ' + binaryVersion + '',
       '}}"',
     ].join(' ');
   }

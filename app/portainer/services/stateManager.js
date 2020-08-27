@@ -1,4 +1,3 @@
-import _ from 'lodash-es';
 import moment from 'moment';
 
 angular.module('portainer.app').factory('StateManager', [
@@ -11,7 +10,19 @@ angular.module('portainer.app').factory('StateManager', [
   'StatusService',
   'APPLICATION_CACHE_VALIDITY',
   'AgentPingService',
-  function StateManagerFactory($q, SystemService, InfoHelper, EndpointProvider, LocalStorage, SettingsService, StatusService, APPLICATION_CACHE_VALIDITY, AgentPingService) {
+  '$analytics',
+  function StateManagerFactory(
+    $q,
+    SystemService,
+    InfoHelper,
+    EndpointProvider,
+    LocalStorage,
+    SettingsService,
+    StatusService,
+    APPLICATION_CACHE_VALIDITY,
+    AgentPingService,
+    $analytics
+  ) {
     'use strict';
 
     var manager = {};
@@ -48,7 +59,7 @@ angular.module('portainer.app').factory('StateManager', [
 
     manager.clean = function () {
       state.endpoint = {};
-      state.extensions = [];
+      state.application = {};
     };
 
     manager.updateLogo = function (logoURL) {
@@ -76,17 +87,56 @@ angular.module('portainer.app').factory('StateManager', [
       LocalStorage.storeApplicationState(state.application);
     };
 
+    manager.updateAllowHostNamespaceForRegularUsers = function (allowHostNamespaceForRegularUsers) {
+      state.application.allowHostNamespaceForRegularUsers = allowHostNamespaceForRegularUsers;
+      LocalStorage.storeApplicationState(state.application);
+    };
+
+    manager.updateAllowDeviceMappingForRegularUsers = function updateAllowDeviceMappingForRegularUsers(allowDeviceMappingForRegularUsers) {
+      state.application.allowDeviceMappingForRegularUsers = allowDeviceMappingForRegularUsers;
+      LocalStorage.storeApplicationState(state.application);
+    };
+
+    manager.updateAllowStackManagementForRegularUsers = function updateAllowStackManagementForRegularUsers(allowStackManagementForRegularUsers) {
+      state.application.allowStackManagementForRegularUsers = allowStackManagementForRegularUsers;
+      LocalStorage.storeApplicationState(state.application);
+    };
+
+    manager.updateAllowContainerCapabilitiesForRegularUsers = function updateAllowContainerCapabilitiesForRegularUsers(allowContainerCapabilitiesForRegularUsers) {
+      state.application.allowContainerCapabilitiesForRegularUsers = allowContainerCapabilitiesForRegularUsers;
+      LocalStorage.storeApplicationState(state.application);
+    };
+
+    manager.updateAllowBindMountsForRegularUsers = function updateAllowBindMountsForRegularUsers(allowBindMountsForRegularUsers) {
+      state.application.allowBindMountsForRegularUsers = allowBindMountsForRegularUsers;
+      LocalStorage.storeApplicationState(state.application);
+    };
+
+    manager.updateAllowPrivilegedModeForRegularUsers = function (AllowPrivilegedModeForRegularUsers) {
+      state.application.allowPrivilegedModeForRegularUsers = AllowPrivilegedModeForRegularUsers;
+      LocalStorage.storeApplicationState(state.application);
+    };
+
+    manager.updateEnableTelemetry = function updateEnableTelemetry(enableTelemetry) {
+      state.application.enableTelemetry = enableTelemetry;
+      $analytics.setOptOut(!enableTelemetry);
+      LocalStorage.storeApplicationState(state.application);
+    };
+
     function assignStateFromStatusAndSettings(status, settings) {
-      state.application.authentication = status.Authentication;
-      state.application.analytics = status.Analytics;
-      state.application.endpointManagement = status.EndpointManagement;
-      state.application.snapshot = status.Snapshot;
       state.application.version = status.Version;
+      state.application.enableTelemetry = settings.EnableTelemetry;
       state.application.logo = settings.LogoURL;
       state.application.snapshotInterval = settings.SnapshotInterval;
       state.application.enableHostManagementFeatures = settings.EnableHostManagementFeatures;
       state.application.enableVolumeBrowserForNonAdminUsers = settings.AllowVolumeBrowserForRegularUsers;
       state.application.enableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
+      state.application.allowDeviceMappingForRegularUsers = settings.AllowDeviceMappingForRegularUsers;
+      state.application.allowStackManagementForRegularUsers = settings.AllowStackManagementForRegularUsers;
+      state.application.allowContainerCapabilitiesForRegularUsers = settings.AllowContainerCapabilitiesForRegularUsers;
+      state.application.allowBindMountsForRegularUsers = settings.AllowBindMountsForRegularUsers;
+      state.application.allowPrivilegedModeForRegularUsers = settings.AllowPrivilegedModeForRegularUsers;
+      state.application.allowHostNamespaceForRegularUsers = settings.AllowHostNamespaceForRegularUsers;
       state.application.validity = moment().unix();
     }
 
@@ -101,6 +151,7 @@ angular.module('portainer.app').factory('StateManager', [
           var status = data.status;
           var settings = data.settings;
           assignStateFromStatusAndSettings(status, settings);
+          $analytics.setOptOut(!settings.EnableTelemetry);
           LocalStorage.storeApplicationState(state.application);
           deferred.resolve(state);
         })
@@ -122,11 +173,6 @@ angular.module('portainer.app').factory('StateManager', [
         state.UI = UIState;
       }
 
-      const extensionState = LocalStorage.getExtensionState();
-      if (extensionState) {
-        state.extensions = extensionState;
-      }
-
       var endpointState = LocalStorage.getEndpointState();
       if (endpointState) {
         state.endpoint = endpointState;
@@ -143,6 +189,7 @@ angular.module('portainer.app').factory('StateManager', [
         } else {
           state.application = applicationState;
           state.loading = false;
+          $analytics.setOptOut(!state.application.enableTelemetry);
           deferred.resolve(state);
         }
       } else {
@@ -176,11 +223,19 @@ angular.module('portainer.app').factory('StateManager', [
         LocalStorage.storeEndpointState(state.endpoint);
         deferred.resolve();
         return deferred.promise;
+      } else if (endpoint.Type === 5 || endpoint.Type === 6 || endpoint.Type === 7) {
+        state.endpoint.name = endpoint.Name;
+        state.endpoint.mode = { provider: 'KUBERNETES' };
+        LocalStorage.storeEndpointState(state.endpoint);
+        deferred.resolve();
+        return deferred.promise;
       }
 
+      const reload = endpoint.Status === 1 || !endpoint.Snaphosts || !endpoint.Snaphosts.length || !endpoint.Snapshots[0].SnapshotRaw;
+
       $q.all({
-        version: endpoint.Status === 1 ? SystemService.version() : $q.when(endpoint.Snapshots[0].SnapshotRaw.Version),
-        info: endpoint.Status === 1 ? SystemService.info() : $q.when(endpoint.Snapshots[0].SnapshotRaw.Info),
+        version: reload ? SystemService.version() : $q.when(endpoint.Snapshots[0].SnapshotRaw.Version),
+        info: reload ? SystemService.info() : $q.when(endpoint.Snapshots[0].SnapshotRaw.Info),
       })
         .then(function success(data) {
           var endpointMode = InfoHelper.determineEndpointMode(data.info, endpoint.Type);
@@ -213,19 +268,6 @@ angular.module('portainer.app').factory('StateManager', [
 
     manager.getAgentApiVersion = function getAgentApiVersion() {
       return state.endpoint.agentApiVersion;
-    };
-
-    manager.saveExtensions = function (extensions) {
-      state.extensions = extensions;
-      LocalStorage.storeExtensionState(state.extensions);
-    };
-
-    manager.getExtensions = function () {
-      return state.extensions;
-    };
-
-    manager.getExtension = function (extensionId) {
-      return _.find(state.extensions, { Id: extensionId, Enabled: true });
     };
 
     return manager;

@@ -1,7 +1,12 @@
-import '../assets/css/app.css';
+import './assets/css';
+import '@babel/polyfill';
+
 import angular from 'angular';
 
-import './agent/_module';
+import './matomo-setup';
+import './assets/js/angulartics-matomo';
+
+import './agent';
 import './azure/_module';
 import './docker/__module';
 import './edge/__module';
@@ -12,7 +17,6 @@ angular.module('portainer', [
   'ui.router',
   'ui.select',
   'isteven-multi-select',
-  'ngCookies',
   'ngSanitize',
   'ngFileUpload',
   'ngMessages',
@@ -20,7 +24,6 @@ angular.module('portainer', [
   'angularUtils.directives.dirPagination',
   'LocalStorageModule',
   'angular-jwt',
-  'angular-google-analytics',
   'angular-json-tree',
   'angular-loading-bar',
   'angular-clipboard',
@@ -30,11 +33,13 @@ angular.module('portainer', [
   'portainer.agent',
   'portainer.azure',
   'portainer.docker',
+  'portainer.kubernetes',
   'portainer.edge',
-  'portainer.extensions',
   'portainer.integrations',
   'rzModule',
   'moment-picker',
+  'angulartics',
+  'angulartics.matomo',
 ]);
 
 if (require) {

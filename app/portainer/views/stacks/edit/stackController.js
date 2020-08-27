@@ -1,4 +1,5 @@
 angular.module('portainer.app').controller('StackController', [
+  '$async',
   '$q',
   '$scope',
   '$state',
@@ -17,6 +18,7 @@ angular.module('portainer.app').controller('StackController', [
   'GroupService',
   'ModalService',
   function (
+    $async,
     $q,
     $scope,
     $state,
@@ -56,7 +58,7 @@ angular.module('portainer.app').controller('StackController', [
 
       function onDuplicationSuccess() {
         Notifications.success('Stack successfully duplicated');
-        $state.go('portainer.stacks', {}, { reload: true });
+        $state.go('docker.stacks', {}, { reload: true });
         EndpointProvider.setEndpointID(stack.EndpointId);
       }
 
@@ -122,7 +124,7 @@ angular.module('portainer.app').controller('StackController', [
       return migrateRequest(stack, targetEndpointId, name)
         .then(function success() {
           Notifications.success('Stack successfully migrated', stack.Name);
-          $state.go('portainer.stacks', {}, { reload: true });
+          $state.go('docker.stacks', {}, { reload: true });
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to migrate stack');
@@ -133,13 +135,13 @@ angular.module('portainer.app').controller('StackController', [
     }
 
     function deleteStack() {
-      var endpointId = EndpointProvider.endpointID();
+      var endpointId = +$state.params.endpointId;
       var stack = $scope.stack;
 
       StackService.remove(stack, $transition$.params().external, endpointId)
         .then(function success() {
           Notifications.success('Stack successfully removed', stack.Name);
-          $state.go('portainer.stacks');
+          $state.go('docker.stacks');
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to remove stack ' + stack.Name);
@@ -187,6 +189,46 @@ angular.module('portainer.app').controller('StackController', [
       $scope.stackFileContent = cm.getValue();
     };
 
+    $scope.stopStack = stopStack;
+    function stopStack() {
+      return $async(stopStackAsync);
+    }
+    async function stopStackAsync() {
+      const confirmed = await ModalService.confirmAsync({
+        title: 'Are you sure?',
+        message: 'Are you sure you want to stop this stack?',
+        buttons: { confirm: { label: 'Stop', className: 'btn-danger' } },
+      });
+      if (!confirmed) {
+        return;
+      }
+
+      $scope.state.actionInProgress = true;
+      try {
+        await StackService.stop($scope.stack.Id);
+        $state.reload();
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to stop stack');
+      }
+      $scope.state.actionInProgress = false;
+    }
+
+    $scope.startStack = startStack;
+    function startStack() {
+      return $async(startStackAsync);
+    }
+    async function startStackAsync() {
+      $scope.state.actionInProgress = true;
+      const id = $scope.stack.Id;
+      try {
+        await StackService.start(id);
+        $state.reload();
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to start stack');
+      }
+      $scope.state.actionInProgress = false;
+    }
+
     function loadStack(id) {
       var agentProxy = $scope.applicationState.endpoint.mode.agentProxy;
 
@@ -207,17 +249,24 @@ angular.module('portainer.app').controller('StackController', [
           $scope.groups = data.groups;
           $scope.stack = stack;
 
+          let resourcesPromise = Promise.resolve({});
+          if (stack.Status === 1) {
+            resourcesPromise = stack.Type === 1 ? retrieveSwarmStackResources(stack.Name, agentProxy) : retrieveComposeStackResources(stack.Name);
+          }
+
           return $q.all({
             stackFile: StackService.getStackFile(id),
-            resources: stack.Type === 1 ? retrieveSwarmStackResources(stack.Name, agentProxy) : retrieveComposeStackResources(stack.Name),
+            resources: resourcesPromise,
           });
         })
         .then(function success(data) {
           $scope.stackFileContent = data.stackFile;
-          if ($scope.stack.Type === 1) {
-            assignSwarmStackResources(data.resources, agentProxy);
-          } else {
-            assignComposeStackResources(data.resources);
+          if ($scope.stack.Status === 1) {
+            if ($scope.stack.Type === 1) {
+              assignSwarmStackResources(data.resources, agentProxy);
+            } else {
+              assignComposeStackResources(data.resources);
+            }
           }
         })
         .catch(function error(err) {

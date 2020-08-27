@@ -1,6 +1,6 @@
 <rd-header>
   <rd-header-title title-text="Stacks list">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.stacks" ui-sref-opts="{reload: true}">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="docker.stacks" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
@@ -16,9 +16,9 @@
       table-key="stacks"
       order-by="Name"
       remove-action="removeAction"
-      show-ownership-column="applicationState.application.authentication"
       offline-mode="offlineMode"
       refresh-callback="getStacks"
+      create-enabled="createEnabled"
     ></stacks-datatable>
   </div>
 </div>

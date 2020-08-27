@@ -7,11 +7,10 @@ import (
 	"time"
 
 	"github.com/dchest/uniuri"
-
-	cmap "github.com/orcaman/concurrent-map"
-
 	chserver "github.com/jpillora/chisel/server"
-	portainer "github.com/portainer/portainer/api"
+	cmap "github.com/orcaman/concurrent-map"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt/errors"
 )
 
 const (
@@ -24,21 +23,19 @@ const (
 // It is used to start a reverse tunnel server and to manage the connection status of each tunnel
 // connected to the tunnel server.
 type Service struct {
-	serverFingerprint   string
-	serverPort          string
-	tunnelDetailsMap    cmap.ConcurrentMap
-	endpointService     portainer.EndpointService
-	tunnelServerService portainer.TunnelServerService
-	snapshotter         portainer.Snapshotter
-	chiselServer        *chserver.Server
+	serverFingerprint string
+	serverPort        string
+	tunnelDetailsMap  cmap.ConcurrentMap
+	dataStore         portainer.DataStore
+	snapshotService   portainer.SnapshotService
+	chiselServer      *chserver.Server
 }
 
 // NewService returns a pointer to a new instance of Service
-func NewService(endpointService portainer.EndpointService, tunnelServerService portainer.TunnelServerService) *Service {
+func NewService(dataStore portainer.DataStore) *Service {
 	return &Service{
-		tunnelDetailsMap:    cmap.New(),
-		endpointService:     endpointService,
-		tunnelServerService: tunnelServerService,
+		tunnelDetailsMap: cmap.New(),
+		dataStore:        dataStore,
 	}
 }
 
@@ -47,7 +44,7 @@ func NewService(endpointService portainer.EndpointService, tunnelServerService p
 // be found inside the database, it will generate a new one randomly and persist it.
 // It starts the tunnel status verification process in the background.
 // The snapshotter is used in the tunnel status verification process.
-func (service *Service) StartTunnelServer(addr, port string, snapshotter portainer.Snapshotter) error {
+func (service *Service) StartTunnelServer(addr, port string, snapshotService portainer.SnapshotService) error {
 	keySeed, err := service.retrievePrivateKeySeed()
 	if err != nil {
 		return err
@@ -80,7 +77,7 @@ func (service *Service) StartTunnelServer(addr, port string, snapshotter portain
 		return err
 	}
 
-	service.snapshotter = snapshotter
+	service.snapshotService = snapshotService
 	go service.startTunnelVerificationLoop()
 
 	return nil
@@ -89,15 +86,15 @@ func (service *Service) StartTunnelServer(addr, port string, snapshotter portain
 func (service *Service) retrievePrivateKeySeed() (string, error) {
 	var serverInfo *portainer.TunnelServerInfo
 
-	serverInfo, err := service.tunnelServerService.Info()
-	if err == portainer.ErrObjectNotFound {
+	serverInfo, err := service.dataStore.TunnelServer().Info()
+	if err == errors.ErrObjectNotFound {
 		keySeed := uniuri.NewLen(16)
 
 		serverInfo = &portainer.TunnelServerInfo{
 			PrivateKeySeed: keySeed,
 		}
 
-		err := service.tunnelServerService.UpdateInfo(serverInfo)
+		err := service.dataStore.TunnelServer().UpdateInfo(serverInfo)
 		if err != nil {
 			return "", err
 		}
@@ -157,7 +154,7 @@ func (service *Service) checkTunnels() {
 			}
 		}
 
-		if len(tunnel.Schedules) > 0 {
+		if len(tunnel.Jobs) > 0 {
 			endpointID, err := strconv.Atoi(item.Key)
 			if err != nil {
 				log.Printf("[ERROR] [chisel,conversion] Invalid endpoint identifier (id: %s): %s", item.Key, err)
@@ -173,19 +170,19 @@ func (service *Service) checkTunnels() {
 }
 
 func (service *Service) snapshotEnvironment(endpointID portainer.EndpointID, tunnelPort int) error {
-	endpoint, err := service.endpointService.Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := service.dataStore.Endpoint().Endpoint(endpointID)
 	if err != nil {
 		return err
 	}
 
 	endpointURL := endpoint.URL
+
 	endpoint.URL = fmt.Sprintf("tcp://127.0.0.1:%d", tunnelPort)
-	snapshot, err := service.snapshotter.CreateSnapshot(endpoint)
+	err = service.snapshotService.SnapshotEndpoint(endpoint)
 	if err != nil {
 		return err
 	}
 
-	endpoint.Snapshots = []portainer.Snapshot{*snapshot}
 	endpoint.URL = endpointURL
-	return service.endpointService.UpdateEndpoint(endpoint.ID, endpoint)
+	return service.dataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
 }

@@ -1,6 +1,8 @@
 package users
 
 import (
+	"errors"
+
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
@@ -10,6 +12,14 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var (
+	errUserAlreadyExists          = errors.New("User already exists")
+	errAdminAlreadyInitialized    = errors.New("An administrator user already exists")
+	errAdminCannotRemoveSelf      = errors.New("Cannot remove your own user account. Contact another administrator")
+	errCannotRemoveLastLocalAdmin = errors.New("Cannot remove the last local administrator account")
+	errCryptoHashFailure          = errors.New("Unable to hash data")
+)
+
 func hideFields(user *portainer.User) {
 	user.Password = ""
 }
@@ -17,13 +27,8 @@ func hideFields(user *portainer.User) {
 // Handler is the HTTP handler used to handle user operations.
 type Handler struct {
 	*mux.Router
-	UserService            portainer.UserService
-	TeamService            portainer.TeamService
-	TeamMembershipService  portainer.TeamMembershipService
-	ResourceControlService portainer.ResourceControlService
-	CryptoService          portainer.CryptoService
-	SettingsService        portainer.SettingsService
-	AuthorizationService   *portainer.AuthorizationService
+	DataStore     portainer.DataStore
+	CryptoService portainer.CryptoService
 }
 
 // NewHandler creates a handler to manage user operations.

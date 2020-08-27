@@ -10,6 +10,8 @@
 <motd-panel ng-if="motd && motd.Message !== '' && applicationState.UI.dismissedInfoHash !== motd.Hash" motd="motd" dismiss-action="dismissImportantInformation(motd.Hash)">
 </motd-panel>
 
+<kubernetes-feedback-panel></kubernetes-feedback-panel>
+
 <information-panel ng-if="!isAdmin && endpoints.length === 0" title-text="Information">
   <span class="small text-muted">
     <p>
@@ -37,7 +39,7 @@
       table-key="home_endpoints"
       tags="tags"
       dashboard-action="goToDashboard"
-      show-snapshot-action="!applicationState.application.authentication || isAdmin"
+      show-snapshot-action="isAdmin"
       snapshot-action="triggerSnapshot"
       edit-action="goToEdit"
       is-admin="isAdmin"

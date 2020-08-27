@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { RegistryTypes } from 'Extensions/registry-management/models/registryTypes';
+import { RegistryTypes } from '@/portainer/models/registryTypes';
 
 angular.module('portainer.docker').factory('ImageHelper', [
   function ImageHelperFactory() {

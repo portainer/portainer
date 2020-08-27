@@ -5,7 +5,7 @@ import (
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -17,10 +17,10 @@ func (handler *Handler) teamMembershipList(w http.ResponseWriter, r *http.Reques
 	}
 
 	if !securityContext.IsAdmin && !securityContext.IsTeamLeader {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to list team memberships", portainer.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to list team memberships", errors.ErrResourceAccessDenied}
 	}
 
-	memberships, err := handler.TeamMembershipService.TeamMemberships()
+	memberships, err := handler.DataStore.TeamMembership().TeamMemberships()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve team memberships from the database", err}
 	}

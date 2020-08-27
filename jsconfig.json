@@ -3,11 +3,12 @@
     "target": "es2017",
     "allowSyntheticDefaultImports": false,
     "baseUrl": "app",
+    "module": "commonjs",
     "paths": {
       "Agent/*": ["agent/*"],
       "Azure/*": ["azure/*"],
       "Docker/*": ["docker/*"],
-      "Extensions/*": ["extensions/*"],
+      "Kubernetes/*": ["kubernetes/*"],
       "Portainer/*": ["portainer/*"]
     }
   },

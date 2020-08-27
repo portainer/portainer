@@ -112,7 +112,7 @@
           </div>
           <!-- !create-webhook  -->
           <!-- access-control -->
-          <por-access-control-form form-data="formValues.AccessControlData" ng-if="applicationState.application.authentication"></por-access-control-form>
+          <por-access-control-form form-data="formValues.AccessControlData"></por-access-control-form>
           <!-- !access-control -->
           <!-- actions -->
           <div class="col-sm-12 form-section-title">
@@ -305,7 +305,7 @@
                         <!-- !container-path -->
                         <!-- volume-type -->
                         <div class="input-group col-sm-5" style="margin-left: 5px;">
-                          <div class="btn-group btn-group-sm" ng-if="isAdmin || allowBindMounts">
+                          <div class="btn-group btn-group-sm" ng-if="allowBindMounts">
                             <label class="btn btn-primary" ng-model="volume.Type" uib-btn-radio="'volume'" ng-click="volume.name = ''">Volume</label>
                             <label class="btn btn-primary" ng-model="volume.Type" uib-btn-radio="'bind'" ng-click="volume.Id = ''">Bind</label>
                           </div>

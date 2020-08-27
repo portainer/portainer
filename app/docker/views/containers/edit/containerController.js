@@ -1,4 +1,5 @@
 import moment from 'moment';
+import _ from 'lodash-es';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
 angular.module('portainer.docker').controller('ContainerController', [
@@ -8,7 +9,6 @@ angular.module('portainer.docker').controller('ContainerController', [
   '$transition$',
   '$filter',
   '$async',
-  'ExtensionService',
   'Commit',
   'ContainerHelper',
   'ContainerService',
@@ -21,6 +21,7 @@ angular.module('portainer.docker').controller('ContainerController', [
   'ImageService',
   'HttpRequestHelper',
   'Authentication',
+  'StateManager',
   function (
     $q,
     $scope,
@@ -28,7 +29,6 @@ angular.module('portainer.docker').controller('ContainerController', [
     $transition$,
     $filter,
     $async,
-    ExtensionService,
     Commit,
     ContainerHelper,
     ContainerService,
@@ -40,7 +40,8 @@ angular.module('portainer.docker').controller('ContainerController', [
     RegistryService,
     ImageService,
     HttpRequestHelper,
-    Authentication
+    Authentication,
+    StateManager
   ) {
     $scope.activityTime = 0;
     $scope.portBindings = [];
@@ -81,12 +82,14 @@ angular.module('portainer.docker').controller('ContainerController', [
 
           $scope.portBindings = [];
           if (container.NetworkSettings.Ports) {
-            angular.forEach(Object.keys(container.NetworkSettings.Ports), function (portMapping) {
-              if (container.NetworkSettings.Ports[portMapping]) {
-                var mapping = {};
-                mapping.container = portMapping;
-                mapping.host = container.NetworkSettings.Ports[portMapping][0].HostIp + ':' + container.NetworkSettings.Ports[portMapping][0].HostPort;
-                $scope.portBindings.push(mapping);
+            _.forEach(Object.keys(container.NetworkSettings.Ports), function (key) {
+              if (container.NetworkSettings.Ports[key]) {
+                _.forEach(container.NetworkSettings.Ports[key], (portMapping) => {
+                  const mapping = {};
+                  mapping.container = key;
+                  mapping.host = `${portMapping.HostIp}:${portMapping.HostPort}`;
+                  $scope.portBindings.push(mapping);
+                });
               }
             });
           }
@@ -94,10 +97,23 @@ angular.module('portainer.docker').controller('ContainerController', [
           const inSwarm = $scope.container.Config.Labels['com.docker.swarm.service.id'];
           const autoRemove = $scope.container.HostConfig.AutoRemove;
           const admin = Authentication.isAdmin();
+          const appState = StateManager.getState();
+          const {
+            allowContainerCapabilitiesForRegularUsers,
+            allowHostNamespaceForRegularUsers,
+            allowDeviceMappingForRegularUsers,
+            allowBindMountsForRegularUsers,
+            allowPrivilegedModeForRegularUsers,
+          } = appState.application;
 
-          ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC).then((rbacEnabled) => {
-            $scope.displayRecreateButton = !inSwarm && !autoRemove && (rbacEnabled ? admin : true);
-          });
+          const settingRestrictsRegularUsers =
+            !allowContainerCapabilitiesForRegularUsers ||
+            !allowBindMountsForRegularUsers ||
+            !allowDeviceMappingForRegularUsers ||
+            !allowHostNamespaceForRegularUsers ||
+            !allowPrivilegedModeForRegularUsers;
+
+          $scope.displayRecreateButton = !inSwarm && !autoRemove && (admin || !settingRestrictsRegularUsers);
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve container info');

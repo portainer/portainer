@@ -10,8 +10,11 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 func (handler *Handler) cleanUp(stack *portainer.Stack, doCleanUp *bool) error {
@@ -43,14 +46,37 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: endpointId", err}
 	}
 
-	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
-	if err == portainer.ErrObjectNotFound {
+	settings, err := handler.DataStore.Settings().Settings()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+	}
+
+	if !settings.AllowStackManagementForRegularUsers {
+		securityContext, err := security.RetrieveRestrictedRequestContext(r)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user info from request context", err}
+		}
+
+		canCreate, err := handler.userCanCreateStack(securityContext, portainer.EndpointID(endpointID))
+
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify user authorizations to validate stack creation", err}
+		}
+
+		if !canCreate {
+			errMsg := "Stack creation is disabled for non-admin users"
+			return &httperror.HandlerError{http.StatusForbidden, errMsg, errors.New(errMsg)}
+		}
+	}
+
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
-	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint, true)
+	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
 	}
@@ -65,6 +91,12 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 		return handler.createSwarmStack(w, r, method, endpoint, tokenData.ID)
 	case portainer.DockerComposeStack:
 		return handler.createComposeStack(w, r, method, endpoint, tokenData.ID)
+	case portainer.KubernetesStack:
+		if tokenData.Role != portainer.AdministratorRole {
+			return &httperror.HandlerError{http.StatusForbidden, "Access denied", httperrors.ErrUnauthorized}
+		}
+
+		return handler.createKubernetesStack(w, r, endpoint)
 	}
 
 	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: type. Value must be one of: 1 (Swarm stack) or 2 (Compose stack)", errors.New(request.ErrInvalidQueryParameter)}
@@ -97,10 +129,10 @@ func (handler *Handler) createSwarmStack(w http.ResponseWriter, r *http.Request,
 	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: method. Value must be one of: string, repository or file", errors.New(request.ErrInvalidQueryParameter)}
 }
 
-func (handler *Handler) isValidStackFile(stackFileContent []byte) (bool, error) {
+func (handler *Handler) isValidStackFile(stackFileContent []byte, settings *portainer.Settings) error {
 	composeConfigYAML, err := loader.ParseYAML(stackFileContent)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	composeConfigFile := types.ConfigFile{
@@ -117,25 +149,43 @@ func (handler *Handler) isValidStackFile(stackFileContent []byte) (bool, error) 
 		options.SkipInterpolation = true
 	})
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	for key := range composeConfig.Services {
 		service := composeConfig.Services[key]
-		for _, volume := range service.Volumes {
-			if volume.Type == "bind" {
-				return false, nil
+		if !settings.AllowBindMountsForRegularUsers {
+			for _, volume := range service.Volumes {
+				if volume.Type == "bind" {
+					return errors.New("bind-mount disabled for non administrator users")
+				}
 			}
+		}
+
+		if !settings.AllowPrivilegedModeForRegularUsers && service.Privileged == true {
+			return errors.New("privileged mode disabled for non administrator users")
+		}
+
+		if !settings.AllowHostNamespaceForRegularUsers && service.Pid == "host" {
+			return errors.New("pid host disabled for non administrator users")
+		}
+
+		if !settings.AllowDeviceMappingForRegularUsers && service.Devices != nil && len(service.Devices) > 0 {
+			return errors.New("device mapping disabled for non administrator users")
+		}
+
+		if !settings.AllowContainerCapabilitiesForRegularUsers && (len(service.CapAdd) > 0 || len(service.CapDrop) > 0) {
+			return errors.New("container capabilities disabled for non administrator users")
 		}
 	}
 
-	return true, nil
+	return nil
 }
 
 func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *portainer.Stack, userID portainer.UserID) *httperror.HandlerError {
-	resourceControl := portainer.NewPrivateResourceControl(stack.Name, portainer.StackResourceControl, userID)
+	resourceControl := authorization.NewPrivateResourceControl(stack.Name, portainer.StackResourceControl, userID)
 
-	err := handler.ResourceControlService.CreateResourceControl(resourceControl)
+	err := handler.DataStore.ResourceControl().CreateResourceControl(resourceControl)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist resource control inside the database", err}
 	}

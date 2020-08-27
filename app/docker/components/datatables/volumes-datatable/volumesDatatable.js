@@ -8,7 +8,6 @@ angular.module('portainer.docker').component('volumesDatatable', {
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
-    showOwnershipColumn: '<',
     showHostColumn: '<',
     removeAction: '<',
     showBrowseAction: '<',

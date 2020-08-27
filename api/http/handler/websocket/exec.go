@@ -3,6 +3,7 @@ package websocket
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/portainer/portainer/api/bolt/errors"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -39,14 +40,14 @@ func (handler *Handler) websocketExec(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: endpointId", err}
 	}
 
-	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
-	if err == portainer.ErrObjectNotFound {
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	if err == errors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the endpoint associated to the stack inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the endpoint associated to the stack inside the database", err}
 	}
 
-	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint, true)
+	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
 	}
@@ -70,7 +71,7 @@ func (handler *Handler) handleExecRequest(w http.ResponseWriter, r *http.Request
 
 	if params.endpoint.Type == portainer.AgentOnDockerEnvironment {
 		return handler.proxyAgentWebsocketRequest(w, r, params)
-	} else if params.endpoint.Type == portainer.EdgeAgentEnvironment {
+	} else if params.endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
 		return handler.proxyEdgeAgentWebsocketRequest(w, r, params)
 	}
 

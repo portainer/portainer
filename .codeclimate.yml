@@ -1,62 +1,44 @@
 version: "2"
 checks:
   argument-count:
-    enabled: true
-    config:
-      threshold: 4
+    enabled: false
   complex-logic:
-    enabled: true
-    config:
-      threshold: 4
+    enabled: false
   file-lines:
-    enabled: true
-    config:
-      threshold: 300
+    enabled: false
   method-complexity:
     enabled: false
   method-count:
-    enabled: true
-    config:
-      threshold: 20
+    enabled: false
   method-lines:
-    enabled: true
-    config:
-      threshold: 50
+    enabled: false
   nested-control-flow:
-    enabled: true
-    config:
-      threshold: 4
+    enabled: false
   return-statements:
     enabled: false
   similar-code:
-    enabled: true
-    config:
-      threshold: #language-specific defaults. overrides affect all languages.
+    enabled: false
   identical-code:
-    enabled: true
-    config:
-      threshold: #language-specific defaults. overrides affect all languages.
+    enabled: false
 plugins:
   gofmt:
     enabled: true
-  golint:
-    enabled: true
-  govet:
-    enabled: true
-  csslint:
-    enabled: true
-  duplication:
-    enabled: true
-    config:
-      languages:
-        javascript:
-          mass_threshold: 80
   eslint:
     enabled: true
     channel: "eslint-5"
     config:
       config: .eslintrc.yml
-  fixme:
-    enabled: true
 exclude_patterns:
+- assets/
+- build/
+- dist/
+- distribution/
+- node_modules
 - test/
+- webpack/
+- gruntfile.js
+- webpack.config.js
+- api/
+- "!app/kubernetes/**"
+- .github/
+- .tmp/

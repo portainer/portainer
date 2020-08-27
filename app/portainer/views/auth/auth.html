@@ -4,12 +4,12 @@
     <div class="col-sm-6 col-sm-offset-3">
       <!-- login box logo -->
       <div class="row">
-        <img ng-if="!ctrl.logo" src="../../../../assets/images/logo_alt.png" class="simple-box-logo" alt="Portainer" />
+        <img ng-if="!ctrl.logo" src="~@/assets/images/logo_alt.png" class="simple-box-logo" alt="Portainer" />
         <img ng-if="ctrl.logo" ng-src="{{ ctrl.logo }}" class="simple-box-logo" />
       </div>
       <!-- !login box logo -->
       <!-- login panel -->
-      <div class="panel panel-default" ng-show="!ctrl.state.loginInProgress">
+      <div class="panel panel-default" ng-if="!ctrl.state.loginInProgress">
         <div class="panel-body">
           <!-- login form -->
           <form class="simple-box-form form-horizontal">

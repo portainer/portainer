@@ -2,6 +2,7 @@ package user
 
 import (
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/internal"
 
 	"github.com/boltdb/bolt"
@@ -64,7 +65,7 @@ func (service *Service) UserByUsername(username string) (*portainer.User, error)
 		}
 
 		if user == nil {
-			return portainer.ErrObjectNotFound
+			return errors.ErrObjectNotFound
 		}
 		return nil
 	})

@@ -1,6 +1,9 @@
 package portainer
 
-import "time"
+import (
+	"io"
+	"time"
+)
 
 type (
 	// AccessPolicy represent a policy that can be associated to a user or team
@@ -8,12 +11,8 @@ type (
 		RoleID RoleID `json:"RoleId"`
 	}
 
-	// APIOperationAuthorizationRequest represent an request for the authorization to execute an API operation
-	APIOperationAuthorizationRequest struct {
-		Path           string
-		Method         string
-		Authorizations Authorizations
-	}
+	// AgentPlatform represents a platform type for an Agent
+	AgentPlatform int
 
 	// AuthenticationMethod represents the authentication method used to authenticate a user
 	AuthenticationMethod int
@@ -34,47 +33,50 @@ type (
 
 	// CLIFlags represents the available flags on the CLI
 	CLIFlags struct {
-		Addr              *string
-		TunnelAddr        *string
-		TunnelPort        *string
-		AdminPassword     *string
-		AdminPasswordFile *string
-		Assets            *string
-		Data              *string
-		EndpointURL       *string
-		ExternalEndpoints *string
-		Labels            *[]Pair
-		Logo              *string
-		NoAuth            *bool
-		NoAnalytics       *bool
-		Templates         *string
-		TemplateFile      *string
-		TLS               *bool
-		TLSSkipVerify     *bool
-		TLSCacert         *string
-		TLSCert           *string
-		TLSKey            *string
-		SSL               *bool
-		SSLCert           *string
-		SSLKey            *string
-		SyncInterval      *string
-		Snapshot          *bool
-		SnapshotInterval  *string
+		Addr                      *string
+		TunnelAddr                *string
+		TunnelPort                *string
+		AdminPassword             *string
+		AdminPasswordFile         *string
+		Assets                    *string
+		Data                      *string
+		EnableEdgeComputeFeatures *bool
+		EndpointURL               *string
+		Labels                    *[]Pair
+		Logo                      *string
+		NoAnalytics               *bool
+		Templates                 *string
+		TLS                       *bool
+		TLSSkipVerify             *bool
+		TLSCacert                 *string
+		TLSCert                   *string
+		TLSKey                    *string
+		SSL                       *bool
+		SSLCert                   *string
+		SSLKey                    *string
+		SnapshotInterval          *string
 	}
 
-	// CLIService represents a service for managing CLI
-	CLIService interface {
-		ParseFlags(version string) (*CLIFlags, error)
-		ValidateFlags(flags *CLIFlags) error
+	// CustomTemplate represents a custom template
+	CustomTemplate struct {
+		ID              CustomTemplateID       `json:"Id"`
+		Title           string                 `json:"Title"`
+		Description     string                 `json:"Description"`
+		ProjectPath     string                 `json:"ProjectPath"`
+		EntryPoint      string                 `json:"EntryPoint"`
+		CreatedByUserID UserID                 `json:"CreatedByUserId"`
+		Note            string                 `json:"Note"`
+		Platform        CustomTemplatePlatform `json:"Platform"`
+		Logo            string                 `json:"Logo"`
+		Type            StackType              `json:"Type"`
+		ResourceControl *ResourceControl       `json:"ResourceControl"`
 	}
 
-	// DataStore defines the interface to manage the data
-	DataStore interface {
-		Open() error
-		Init() error
-		Close() error
-		MigrateData() error
-	}
+	// CustomTemplateID represents a custom template identifier
+	CustomTemplateID int
+
+	// CustomTemplatePlatform represents a custom template platform
+	CustomTemplatePlatform int
 
 	// DockerHub represents all the required information to connect and use the
 	// Docker Hub
@@ -82,6 +84,34 @@ type (
 		Authentication bool   `json:"Authentication"`
 		Username       string `json:"Username"`
 		Password       string `json:"Password,omitempty"`
+	}
+
+	// DockerSnapshot represents a snapshot of a specific Docker endpoint at a specific time
+	DockerSnapshot struct {
+		Time                    int64             `json:"Time"`
+		DockerVersion           string            `json:"DockerVersion"`
+		Swarm                   bool              `json:"Swarm"`
+		TotalCPU                int               `json:"TotalCPU"`
+		TotalMemory             int64             `json:"TotalMemory"`
+		RunningContainerCount   int               `json:"RunningContainerCount"`
+		StoppedContainerCount   int               `json:"StoppedContainerCount"`
+		HealthyContainerCount   int               `json:"HealthyContainerCount"`
+		UnhealthyContainerCount int               `json:"UnhealthyContainerCount"`
+		VolumeCount             int               `json:"VolumeCount"`
+		ImageCount              int               `json:"ImageCount"`
+		ServiceCount            int               `json:"ServiceCount"`
+		StackCount              int               `json:"StackCount"`
+		SnapshotRaw             DockerSnapshotRaw `json:"DockerSnapshotRaw"`
+	}
+
+	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
+	DockerSnapshotRaw struct {
+		Containers interface{} `json:"Containers"`
+		Volumes    interface{} `json:"Volumes"`
+		Networks   interface{} `json:"Networks"`
+		Images     interface{} `json:"Images"`
+		Info       interface{} `json:"Info"`
+		Version    interface{} `json:"Version"`
 	}
 
 	// EdgeGroup represents an Edge group
@@ -97,7 +127,32 @@ type (
 	// EdgeGroupID represents an Edge group identifier
 	EdgeGroupID int
 
+	// EdgeJob represents a job that can run on Edge environments.
+	EdgeJob struct {
+		ID             EdgeJobID                          `json:"Id"`
+		Created        int64                              `json:"Created"`
+		CronExpression string                             `json:"CronExpression"`
+		Endpoints      map[EndpointID]EdgeJobEndpointMeta `json:"Endpoints"`
+		Name           string                             `json:"Name"`
+		ScriptPath     string                             `json:"ScriptPath"`
+		Recurring      bool                               `json:"Recurring"`
+		Version        int                                `json:"Version"`
+	}
+
+	// EdgeJobEndpointMeta represents a meta data object for an Edge job and Endpoint relation
+	EdgeJobEndpointMeta struct {
+		LogsStatus  EdgeJobLogsStatus
+		CollectLogs bool
+	}
+
+	// EdgeJobID represents an Edge job identifier
+	EdgeJobID int
+
+	// EdgeJobLogsStatus represent status of logs collection job
+	EdgeJobLogsStatus int
+
 	// EdgeSchedule represents a scheduled job that can run on Edge environments.
+	// Deprecated in favor of EdgeJob
 	EdgeSchedule struct {
 		ID             ScheduleID   `json:"Id"`
 		CronExpression string       `json:"CronExpression"`
@@ -135,22 +190,25 @@ type (
 	// Endpoint represents a Docker endpoint with all the info required
 	// to connect to it
 	Endpoint struct {
-		ID                 EndpointID          `json:"Id"`
-		Name               string              `json:"Name"`
-		Type               EndpointType        `json:"Type"`
-		URL                string              `json:"URL"`
-		GroupID            EndpointGroupID     `json:"GroupId"`
-		PublicURL          string              `json:"PublicURL"`
-		TLSConfig          TLSConfiguration    `json:"TLSConfig"`
-		Extensions         []EndpointExtension `json:"Extensions"`
-		AzureCredentials   AzureCredentials    `json:"AzureCredentials,omitempty"`
-		TagIDs             []TagID             `json:"TagIds"`
-		Status             EndpointStatus      `json:"Status"`
-		Snapshots          []Snapshot          `json:"Snapshots"`
-		UserAccessPolicies UserAccessPolicies  `json:"UserAccessPolicies"`
-		TeamAccessPolicies TeamAccessPolicies  `json:"TeamAccessPolicies"`
-		EdgeID             string              `json:"EdgeID,omitempty"`
-		EdgeKey            string              `json:"EdgeKey"`
+		ID                  EndpointID          `json:"Id"`
+		Name                string              `json:"Name"`
+		Type                EndpointType        `json:"Type"`
+		URL                 string              `json:"URL"`
+		GroupID             EndpointGroupID     `json:"GroupId"`
+		PublicURL           string              `json:"PublicURL"`
+		TLSConfig           TLSConfiguration    `json:"TLSConfig"`
+		Extensions          []EndpointExtension `json:"Extensions"`
+		AzureCredentials    AzureCredentials    `json:"AzureCredentials,omitempty"`
+		TagIDs              []TagID             `json:"TagIds"`
+		Status              EndpointStatus      `json:"Status"`
+		Snapshots           []DockerSnapshot    `json:"Snapshots"`
+		UserAccessPolicies  UserAccessPolicies  `json:"UserAccessPolicies"`
+		TeamAccessPolicies  TeamAccessPolicies  `json:"TeamAccessPolicies"`
+		EdgeID              string              `json:"EdgeID,omitempty"`
+		EdgeKey             string              `json:"EdgeKey"`
+		EdgeCheckinInterval int                 `json:"EdgeCheckinInterval"`
+		Kubernetes          KubernetesData      `json:"Kubernetes"`
+
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
 		TLS           bool   `json:"TLS,omitempty"`
@@ -210,6 +268,7 @@ type (
 	EndpointStatus int
 
 	// EndpointSyncJob represents a scheduled job that synchronize endpoints based on an external file
+	// Deprecated
 	EndpointSyncJob struct{}
 
 	// EndpointType represents the type of an endpoint
@@ -221,7 +280,7 @@ type (
 		EdgeStacks map[EdgeStackID]bool
 	}
 
-	// Extension represents a Portainer extension
+	// Extension represents a deprecated Portainer extension
 	Extension struct {
 		ID               ExtensionID        `json:"Id"`
 		Enabled          bool               `json:"Enabled"`
@@ -253,6 +312,43 @@ type (
 
 	// JobType represents a job type
 	JobType int
+
+	// KubernetesData contains all the Kubernetes related endpoint information
+	KubernetesData struct {
+		Snapshots     []KubernetesSnapshot    `json:"Snapshots"`
+		Configuration KubernetesConfiguration `json:"Configuration"`
+	}
+
+	// KubernetesSnapshot represents a snapshot of a specific Kubernetes endpoint at a specific time
+	KubernetesSnapshot struct {
+		Time              int64  `json:"Time"`
+		KubernetesVersion string `json:"KubernetesVersion"`
+		NodeCount         int    `json:"NodeCount"`
+		TotalCPU          int64  `json:"TotalCPU"`
+		TotalMemory       int64  `json:"TotalMemory"`
+	}
+
+	// KubernetesConfiguration represents the configuration of a Kubernetes endpoint
+	KubernetesConfiguration struct {
+		UseLoadBalancer  bool                           `json:"UseLoadBalancer"`
+		UseServerMetrics bool                           `json:"UseServerMetrics"`
+		StorageClasses   []KubernetesStorageClassConfig `json:"StorageClasses"`
+		IngressClasses   []KubernetesIngressClassConfig `json:"IngressClasses"`
+	}
+
+	// KubernetesStorageClassConfig represents a Kubernetes Storage Class configuration
+	KubernetesStorageClassConfig struct {
+		Name                 string   `json:"Name"`
+		AccessModes          []string `json:"AccessModes"`
+		Provisioner          string   `json:"Provisioner"`
+		AllowVolumeExpansion bool     `json:"AllowVolumeExpansion"`
+	}
+
+	// KubernetesIngressClassConfig represents a Kubernetes Ingress Class configuration
+	KubernetesIngressClassConfig struct {
+		Name string `json:"Name"`
+		Type string `json:"Type"`
+	}
 
 	// LDAPGroupSearchSettings represents settings used to search for groups in a LDAP server
 	LDAPGroupSearchSettings struct {
@@ -393,20 +489,19 @@ type (
 	// It only contains a pointer to one of the JobRunner implementations
 	// based on the JobType.
 	// NOTE: The Recurring option is only used by ScriptExecutionJob at the moment
+	// Deprecated in favor of EdgeJob
 	Schedule struct {
-		ID                 ScheduleID `json:"Id"`
-		Name               string
-		CronExpression     string
-		Recurring          bool
-		Created            int64
-		JobType            JobType
-		EdgeSchedule       *EdgeSchedule
-		ScriptExecutionJob *ScriptExecutionJob
-		SnapshotJob        *SnapshotJob
-		EndpointSyncJob    *EndpointSyncJob
+		ID             ScheduleID `json:"Id"`
+		Name           string
+		CronExpression string
+		Recurring      bool
+		Created        int64
+		JobType        JobType
+		EdgeSchedule   *EdgeSchedule
 	}
 
 	// ScheduleID represents a schedule identifier.
+	// Deprecated in favor of EdgeJob
 	ScheduleID int
 
 	// ScriptExecutionJob represents a scheduled job that can execute a script via a privileged container
@@ -420,55 +515,33 @@ type (
 
 	// Settings represents the application settings
 	Settings struct {
-		LogoURL                            string               `json:"LogoURL"`
-		BlackListedLabels                  []Pair               `json:"BlackListedLabels"`
-		AuthenticationMethod               AuthenticationMethod `json:"AuthenticationMethod"`
-		LDAPSettings                       LDAPSettings         `json:"LDAPSettings"`
-		OAuthSettings                      OAuthSettings        `json:"OAuthSettings"`
-		AllowBindMountsForRegularUsers     bool                 `json:"AllowBindMountsForRegularUsers"`
-		AllowPrivilegedModeForRegularUsers bool                 `json:"AllowPrivilegedModeForRegularUsers"`
-		AllowVolumeBrowserForRegularUsers  bool                 `json:"AllowVolumeBrowserForRegularUsers"`
-		SnapshotInterval                   string               `json:"SnapshotInterval"`
-		TemplatesURL                       string               `json:"TemplatesURL"`
-		EnableHostManagementFeatures       bool                 `json:"EnableHostManagementFeatures"`
-		EdgeAgentCheckinInterval           int                  `json:"EdgeAgentCheckinInterval"`
-		EnableEdgeComputeFeatures          bool                 `json:"EnableEdgeComputeFeatures"`
+		LogoURL                                   string               `json:"LogoURL"`
+		BlackListedLabels                         []Pair               `json:"BlackListedLabels"`
+		AuthenticationMethod                      AuthenticationMethod `json:"AuthenticationMethod"`
+		LDAPSettings                              LDAPSettings         `json:"LDAPSettings"`
+		OAuthSettings                             OAuthSettings        `json:"OAuthSettings"`
+		AllowBindMountsForRegularUsers            bool                 `json:"AllowBindMountsForRegularUsers"`
+		AllowPrivilegedModeForRegularUsers        bool                 `json:"AllowPrivilegedModeForRegularUsers"`
+		AllowVolumeBrowserForRegularUsers         bool                 `json:"AllowVolumeBrowserForRegularUsers"`
+		AllowHostNamespaceForRegularUsers         bool                 `json:"AllowHostNamespaceForRegularUsers"`
+		AllowDeviceMappingForRegularUsers         bool                 `json:"AllowDeviceMappingForRegularUsers"`
+		AllowStackManagementForRegularUsers       bool                 `json:"AllowStackManagementForRegularUsers"`
+		AllowContainerCapabilitiesForRegularUsers bool                 `json:"AllowContainerCapabilitiesForRegularUsers"`
+		SnapshotInterval                          string               `json:"SnapshotInterval"`
+		TemplatesURL                              string               `json:"TemplatesURL"`
+		EnableHostManagementFeatures              bool                 `json:"EnableHostManagementFeatures"`
+		EdgeAgentCheckinInterval                  int                  `json:"EdgeAgentCheckinInterval"`
+		EnableEdgeComputeFeatures                 bool                 `json:"EnableEdgeComputeFeatures"`
+		UserSessionTimeout                        string               `json:"UserSessionTimeout"`
+		EnableTelemetry                           bool                 `json:"EnableTelemetry"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
 		DisplayExternalContributors bool
 	}
 
-	// Snapshot represents a snapshot of a specific endpoint at a specific time
-	Snapshot struct {
-		Time                    int64       `json:"Time"`
-		DockerVersion           string      `json:"DockerVersion"`
-		Swarm                   bool        `json:"Swarm"`
-		TotalCPU                int         `json:"TotalCPU"`
-		TotalMemory             int64       `json:"TotalMemory"`
-		RunningContainerCount   int         `json:"RunningContainerCount"`
-		StoppedContainerCount   int         `json:"StoppedContainerCount"`
-		HealthyContainerCount   int         `json:"HealthyContainerCount"`
-		UnhealthyContainerCount int         `json:"UnhealthyContainerCount"`
-		VolumeCount             int         `json:"VolumeCount"`
-		ImageCount              int         `json:"ImageCount"`
-		ServiceCount            int         `json:"ServiceCount"`
-		StackCount              int         `json:"StackCount"`
-		SnapshotRaw             SnapshotRaw `json:"SnapshotRaw"`
-	}
-
 	// SnapshotJob represents a scheduled job that can create endpoint snapshots
 	SnapshotJob struct{}
-
-	// SnapshotRaw represents all the information related to a snapshot as returned by the Docker API
-	SnapshotRaw struct {
-		Containers interface{} `json:"Containers"`
-		Volumes    interface{} `json:"Volumes"`
-		Networks   interface{} `json:"Networks"`
-		Images     interface{} `json:"Images"`
-		Info       interface{} `json:"Info"`
-		Version    interface{} `json:"Version"`
-	}
 
 	// Stack represents a Docker stack created via docker stack deploy
 	Stack struct {
@@ -480,22 +553,22 @@ type (
 		EntryPoint      string           `json:"EntryPoint"`
 		Env             []Pair           `json:"Env"`
 		ResourceControl *ResourceControl `json:"ResourceControl"`
+		Status          StackStatus      `json:"Status"`
 		ProjectPath     string
 	}
 
 	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier)
 	StackID int
 
+	// StackStatus represent a status for a stack
+	StackStatus int
+
 	// StackType represents the type of the stack (compose v2, stack deploy v3)
 	StackType int
 
 	// Status represents the application status
 	Status struct {
-		Authentication     bool   `json:"Authentication"`
-		EndpointManagement bool   `json:"EndpointManagement"`
-		Snapshot           bool   `json:"Snapshot"`
-		Analytics          bool   `json:"Analytics"`
-		Version            string `json:"Version"`
+		Version string `json:"Version"`
 	}
 
 	// Tag represents a tag that can be associated to a resource
@@ -538,7 +611,8 @@ type (
 		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
 	}
 
-	// Template represents an application template
+	// Template represents an application template that can be used as an App Template
+	// or an Edge template
 	Template struct {
 		// Mandatory container/stack fields
 		ID                TemplateID   `json:"Id"`
@@ -553,7 +627,7 @@ type (
 		// Mandatory stack fields
 		Repository TemplateRepository `json:"repository"`
 
-		// Mandatory edge stack fields
+		// Mandatory Edge stack fields
 		StackFile string `json:"stackFile"`
 
 		// Optional stack/container fields
@@ -639,7 +713,7 @@ type (
 		Status       string
 		LastActivity time.Time
 		Port         int
-		Schedules    []EdgeSchedule
+		Jobs         []EdgeJob
 		Credentials  string
 	}
 
@@ -650,10 +724,13 @@ type (
 
 	// User represents a user account
 	User struct {
-		ID                      UserID                 `json:"Id"`
-		Username                string                 `json:"Username"`
-		Password                string                 `json:"Password,omitempty"`
-		Role                    UserRole               `json:"Role"`
+		ID       UserID   `json:"Id"`
+		Username string   `json:"Username"`
+		Password string   `json:"Password,omitempty"`
+		Role     UserRole `json:"Role"`
+
+		// Deprecated fields
+		// Deprecated in DBVersion == 25
 		PortainerAuthorizations Authorizations         `json:"PortainerAuthorizations"`
 		EndpointAuthorizations  EndpointAuthorizations `json:"EndpointAuthorizations"`
 	}
@@ -689,6 +766,12 @@ type (
 	// WebhookType represents the type of resource a webhook is related to
 	WebhookType int
 
+	// CLIService represents a service for managing CLI
+	CLIService interface {
+		ParseFlags(version string) (*CLIFlags, error)
+		ValidateFlags(flags *CLIFlags) error
+	}
+
 	// ComposeStackManager represents a service to manage Compose stacks
 	ComposeStackManager interface {
 		Up(stack *Stack, endpoint *Endpoint) error
@@ -699,6 +782,46 @@ type (
 	CryptoService interface {
 		Hash(data string) (string, error)
 		CompareHashAndData(hash string, data string) error
+	}
+
+	// CustomTemplateService represents a service to manage custom templates
+	CustomTemplateService interface {
+		GetNextIdentifier() int
+		CustomTemplates() ([]CustomTemplate, error)
+		CustomTemplate(ID CustomTemplateID) (*CustomTemplate, error)
+		CreateCustomTemplate(customTemplate *CustomTemplate) error
+		UpdateCustomTemplate(ID CustomTemplateID, customTemplate *CustomTemplate) error
+		DeleteCustomTemplate(ID CustomTemplateID) error
+	}
+
+	// DataStore defines the interface to manage the data
+	DataStore interface {
+		Open() error
+		Init() error
+		Close() error
+		IsNew() bool
+		MigrateData() error
+
+		DockerHub() DockerHubService
+		CustomTemplate() CustomTemplateService
+		EdgeGroup() EdgeGroupService
+		EdgeJob() EdgeJobService
+		EdgeStack() EdgeStackService
+		Endpoint() EndpointService
+		EndpointGroup() EndpointGroupService
+		EndpointRelation() EndpointRelationService
+		Registry() RegistryService
+		ResourceControl() ResourceControlService
+		Role() RoleService
+		Settings() SettingsService
+		Stack() StackService
+		Tag() TagService
+		TeamMembership() TeamMembershipService
+		Team() TeamService
+		TunnelServer() TunnelServerService
+		User() UserService
+		Version() VersionService
+		Webhook() WebhookService
 	}
 
 	// DigitalSignatureService represents a service to manage digital signatures
@@ -714,6 +837,40 @@ type (
 	DockerHubService interface {
 		DockerHub() (*DockerHub, error)
 		UpdateDockerHub(registry *DockerHub) error
+	}
+
+	// DockerSnapshotter represents a service used to create Docker endpoint snapshots
+	DockerSnapshotter interface {
+		CreateSnapshot(endpoint *Endpoint) (*DockerSnapshot, error)
+	}
+
+	// EdgeGroupService represents a service to manage Edge groups
+	EdgeGroupService interface {
+		EdgeGroups() ([]EdgeGroup, error)
+		EdgeGroup(ID EdgeGroupID) (*EdgeGroup, error)
+		CreateEdgeGroup(group *EdgeGroup) error
+		UpdateEdgeGroup(ID EdgeGroupID, group *EdgeGroup) error
+		DeleteEdgeGroup(ID EdgeGroupID) error
+	}
+
+	// EdgeJobService represents a service to manage Edge jobs
+	EdgeJobService interface {
+		EdgeJobs() ([]EdgeJob, error)
+		EdgeJob(ID EdgeJobID) (*EdgeJob, error)
+		CreateEdgeJob(edgeJob *EdgeJob) error
+		UpdateEdgeJob(ID EdgeJobID, edgeJob *EdgeJob) error
+		DeleteEdgeJob(ID EdgeJobID) error
+		GetNextIdentifier() int
+	}
+
+	// EdgeStackService represents a service to manage Edge stacks
+	EdgeStackService interface {
+		EdgeStacks() ([]EdgeStack, error)
+		EdgeStack(ID EdgeStackID) (*EdgeStack, error)
+		CreateEdgeStack(edgeStack *EdgeStack) error
+		UpdateEdgeStack(ID EdgeStackID, edgeStack *EdgeStack) error
+		DeleteEdgeStack(ID EdgeStackID) error
+		GetNextIdentifier() int
 	}
 
 	// EndpointService represents a service for managing endpoint data
@@ -744,24 +901,6 @@ type (
 		DeleteEndpointRelation(EndpointID EndpointID) error
 	}
 
-	// ExtensionManager represents a service used to manage extensions
-	ExtensionManager interface {
-		FetchExtensionDefinitions() ([]Extension, error)
-		InstallExtension(extension *Extension, licenseKey string, archiveFileName string, extensionArchive []byte) error
-		EnableExtension(extension *Extension, licenseKey string) error
-		DisableExtension(extension *Extension) error
-		UpdateExtension(extension *Extension, version string) error
-		StartExtensions() error
-	}
-
-	// ExtensionService represents a service for managing extension data
-	ExtensionService interface {
-		Extension(ID ExtensionID) (*Extension, error)
-		Extensions() ([]Extension, error)
-		Persist(extension *Extension) error
-		DeleteExtension(ID ExtensionID) error
-	}
-
 	// FileService represents a service for managing files
 	FileService interface {
 		GetFileContent(filePath string) ([]byte, error)
@@ -781,10 +920,15 @@ type (
 		LoadKeyPair() ([]byte, []byte, error)
 		WriteJSONToFile(path string, content interface{}) error
 		FileExists(path string) (bool, error)
-		StoreScheduledJobFileFromBytes(identifier string, data []byte) (string, error)
-		GetScheduleFolder(identifier string) string
-		ExtractExtensionArchive(data []byte) error
+		StoreEdgeJobFileFromBytes(identifier string, data []byte) (string, error)
+		GetEdgeJobFolder(identifier string) string
+		ClearEdgeJobTaskLogs(edgeJobID, taskID string) error
+		GetEdgeJobTaskLogFileContent(edgeJobID, taskID string) (string, error)
+		StoreEdgeJobTaskLogFileFromBytes(edgeJobID, taskID string, data []byte) error
 		GetBinaryFolder() string
+		StoreCustomTemplateFileFromBytes(identifier, fileName string, data []byte) (string, error)
+		GetCustomTemplateProjectPath(identifier string) string
+		GetTemporaryPath() (string, error)
 	}
 
 	// GitService represents a service for managing Git
@@ -793,30 +937,28 @@ type (
 		ClonePrivateRepositoryWithBasicAuth(repositoryURL, referenceName string, destination, username, password string) error
 	}
 
-	// JobRunner represents a service that can be used to run a job
-	JobRunner interface {
-		Run()
-		GetSchedule() *Schedule
-	}
-
-	// JobScheduler represents a service to run jobs on a periodic basis
-	JobScheduler interface {
-		ScheduleJob(runner JobRunner) error
-		UpdateJobSchedule(runner JobRunner) error
-		UpdateSystemJobSchedule(jobType JobType, newCronExpression string) error
-		UnscheduleJob(ID ScheduleID)
-		Start()
-	}
-
-	// JobService represents a service to manage job execution on hosts
-	JobService interface {
-		ExecuteScript(endpoint *Endpoint, nodeName, image string, script []byte, schedule *Schedule) error
-	}
-
 	// JWTService represents a service for managing JWT tokens
 	JWTService interface {
 		GenerateToken(data *TokenData) (string, error)
 		ParseAndVerifyToken(token string) (*TokenData, error)
+		SetUserSessionDuration(userSessionDuration time.Duration)
+	}
+
+	// KubeClient represents a service used to query a Kubernetes environment
+	KubeClient interface {
+		SetupUserServiceAccount(userID int, teamIDs []int) error
+		GetServiceAccountBearerToken(userID int) (string, error)
+		StartExecProcess(namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error
+	}
+
+	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes endpoint
+	KubernetesDeployer interface {
+		Deploy(endpoint *Endpoint, data string, composeFormat bool, namespace string) ([]byte, error)
+	}
+
+	// KubernetesSnapshotter represents a service used to create Kubernetes endpoint snapshots
+	KubernetesSnapshotter interface {
+		CreateSnapshot(endpoint *Endpoint) (*KubernetesSnapshot, error)
 	}
 
 	// LDAPService represents a service used to authenticate users against a LDAP/AD
@@ -824,6 +966,11 @@ type (
 		AuthenticateUser(username, password string, settings *LDAPSettings) error
 		TestConnectivity(settings *LDAPSettings) error
 		GetUserGroups(username string, settings *LDAPSettings) ([]string, error)
+	}
+
+	// OAuthService represents a service used to authenticate users using OAuth
+	OAuthService interface {
+		Authenticate(code string, configuration *OAuthSettings) (string, error)
 	}
 
 	// RegistryService represents a service for managing registry data
@@ -847,14 +994,14 @@ type (
 
 	// ReverseTunnelService represensts a service used to manage reverse tunnel connections.
 	ReverseTunnelService interface {
-		StartTunnelServer(addr, port string, snapshotter Snapshotter) error
+		StartTunnelServer(addr, port string, snapshotService SnapshotService) error
 		GenerateEdgeKey(url, host string, endpointIdentifier int) string
 		SetTunnelStatusToActive(endpointID EndpointID)
 		SetTunnelStatusToRequired(endpointID EndpointID) error
 		SetTunnelStatusToIdle(endpointID EndpointID)
 		GetTunnelDetails(endpointID EndpointID) *TunnelDetails
-		AddSchedule(endpointID EndpointID, schedule *EdgeSchedule)
-		RemoveSchedule(scheduleID ScheduleID)
+		AddEdgeJob(endpointID EndpointID, edgeJob *EdgeJob)
+		RemoveEdgeJob(edgeJobID EdgeJobID)
 	}
 
 	// RoleService represents a service for managing user roles
@@ -863,17 +1010,6 @@ type (
 		Roles() ([]Role, error)
 		CreateRole(role *Role) error
 		UpdateRole(ID RoleID, role *Role) error
-	}
-
-	// ScheduleService represents a service for managing schedule data
-	ScheduleService interface {
-		Schedule(ID ScheduleID) (*Schedule, error)
-		Schedules() ([]Schedule, error)
-		SchedulesByJobType(jobType JobType) ([]Schedule, error)
-		CreateSchedule(schedule *Schedule) error
-		UpdateSchedule(ID ScheduleID, schedule *Schedule) error
-		DeleteSchedule(ID ScheduleID) error
-		GetNextIdentifier() int
 	}
 
 	// SettingsService represents a service for managing application settings
@@ -887,11 +1023,6 @@ type (
 		Start() error
 	}
 
-	// Snapshotter represents a service used to create endpoint snapshots
-	Snapshotter interface {
-		CreateSnapshot(endpoint *Endpoint) (*Snapshot, error)
-	}
-
 	// StackService represents a service for managing stack data
 	StackService interface {
 		Stack(ID StackID) (*Stack, error)
@@ -901,6 +1032,13 @@ type (
 		UpdateStack(ID StackID, stack *Stack) error
 		DeleteStack(ID StackID) error
 		GetNextIdentifier() int
+	}
+
+	// StackService represents a service for managing endpoint snapshots
+	SnapshotService interface {
+		Start()
+		SetSnapshotInterval(snapshotInterval string) error
+		SnapshotEndpoint(endpoint *Endpoint) error
 	}
 
 	// SwarmStackManager represents a service to manage Swarm stacks
@@ -943,15 +1081,6 @@ type (
 		DeleteTeamMembershipByTeamID(teamID TeamID) error
 	}
 
-	// TemplateService represents a service for managing template data
-	TemplateService interface {
-		Templates() ([]Template, error)
-		Template(ID TemplateID) (*Template, error)
-		CreateTemplate(template *Template) error
-		UpdateTemplate(ID TemplateID, template *Template) error
-		DeleteTemplate(ID TemplateID) error
-	}
-
 	// TunnelServerService represents a service for managing data associated to the tunnel server
 	TunnelServerService interface {
 		Info() (*TunnelServerInfo, error)
@@ -973,6 +1102,8 @@ type (
 	VersionService interface {
 		DBVersion() (int, error)
 		StoreDBVersion(version int) error
+		InstanceID() (string, error)
+		StoreInstanceID(ID string) error
 	}
 
 	// WebhookService represents a service for managing webhook data.
@@ -984,63 +1115,42 @@ type (
 		WebhookByToken(token string) (*Webhook, error)
 		DeleteWebhook(serviceID WebhookID) error
 	}
-
-	// EdgeGroupService represents a service to manage Edge groups
-	EdgeGroupService interface {
-		EdgeGroups() ([]EdgeGroup, error)
-		EdgeGroup(ID EdgeGroupID) (*EdgeGroup, error)
-		CreateEdgeGroup(group *EdgeGroup) error
-		UpdateEdgeGroup(ID EdgeGroupID, group *EdgeGroup) error
-		DeleteEdgeGroup(ID EdgeGroupID) error
-	}
-
-	// EdgeStackService represents a service to manage Edge stacks
-	EdgeStackService interface {
-		EdgeStacks() ([]EdgeStack, error)
-		EdgeStack(ID EdgeStackID) (*EdgeStack, error)
-		CreateEdgeStack(edgeStack *EdgeStack) error
-		UpdateEdgeStack(ID EdgeStackID, edgeStack *EdgeStack) error
-		DeleteEdgeStack(ID EdgeStackID) error
-		GetNextIdentifier() int
-	}
 )
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "1.24.0"
+	APIVersion = "2.0.0"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 23
+	DBVersion = 25
 	// AssetsServerURL represents the URL of the Portainer asset server
 	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
 	MessageOfTheDayURL = AssetsServerURL + "/motd.json"
 	// VersionCheckURL represents the URL used to retrieve the latest version of Portainer
 	VersionCheckURL = "https://api.github.com/repos/portainer/portainer/releases/latest"
-	// ExtensionDefinitionsURL represents the URL where Portainer extension definitions can be retrieved
-	ExtensionDefinitionsURL = AssetsServerURL + "/extensions-" + APIVersion + ".json"
-	// SupportProductsURL represents the URL where Portainer support products can be retrieved
-	SupportProductsURL = AssetsServerURL + "/support.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
 	// PortainerAgentEdgeIDHeader represent the name of the header containing the Edge ID associated to an agent/agent cluster
 	PortainerAgentEdgeIDHeader = "X-PortainerAgent-EdgeID"
+	// HTTPResponseAgentPlatform represents the name of the header containing the Agent platform
+	HTTPResponseAgentPlatform = "Portainer-Agent-Platform"
 	// PortainerAgentTargetHeader represent the name of the header containing the target node name
 	PortainerAgentTargetHeader = "X-PortainerAgent-Target"
 	// PortainerAgentSignatureHeader represent the name of the header containing the digital signature
 	PortainerAgentSignatureHeader = "X-PortainerAgent-Signature"
 	// PortainerAgentPublicKeyHeader represent the name of the header containing the public key
 	PortainerAgentPublicKeyHeader = "X-PortainerAgent-PublicKey"
+	// PortainerAgentKubernetesSATokenHeader represent the name of the header containing a Kubernetes SA token
+	PortainerAgentKubernetesSATokenHeader = "X-PortainerAgent-SA-Token"
 	// PortainerAgentSignatureMessage represents the message used to create a digital signature
 	// to be used when communicating with an agent
 	PortainerAgentSignatureMessage = "Portainer-App"
-	// ExtensionServer represents the server used by Portainer to communicate with extensions
-	ExtensionServer = "127.0.0.1"
 	// DefaultEdgeAgentCheckinIntervalInSeconds represents the default interval (in seconds) used by Edge agents to checkin with the Portainer instance
 	DefaultEdgeAgentCheckinIntervalInSeconds = 5
-	// LocalExtensionManifestFile represents the name of the local manifest file for extensions
-	LocalExtensionManifestFile = "/extensions.json"
-	// EdgeTemplatesURL represents the URL used to retrieve Edge templates
-	EdgeTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates-1.20.0.json"
+	// DefaultTemplatesURL represents the URL to the official templates supported by Portainer
+	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates-2.0.json"
+	// DefaultUserSessionTimeout represents the default timeout after which the user session is cleared
+	DefaultUserSessionTimeout = "8h"
 )
 
 const (
@@ -1051,6 +1161,32 @@ const (
 	AuthenticationLDAP
 	//AuthenticationOAuth represents the OAuth authentication method (authentication against a authorization server)
 	AuthenticationOAuth
+)
+
+const (
+	_ AgentPlatform = iota
+	// AgentPlatformDocker represent the Docker platform (Standalone/Swarm)
+	AgentPlatformDocker
+	// AgentPlatformKubernetes represent the Kubernetes platform
+	AgentPlatformKubernetes
+)
+
+const (
+	_ EdgeJobLogsStatus = iota
+	// EdgeJobLogsStatusIdle represents an idle log collection job
+	EdgeJobLogsStatusIdle
+	// EdgeJobLogsStatusPending represents a pending log collection job
+	EdgeJobLogsStatusPending
+	// EdgeJobLogsStatusCollected represents a completed log collection job
+	EdgeJobLogsStatusCollected
+)
+
+const (
+	_ CustomTemplatePlatform = iota
+	// CustomTemplatePlatformLinux represents a custom template for linux
+	CustomTemplatePlatformLinux
+	// CustomTemplatePlatformWindows represents a custom template for windows
+	CustomTemplatePlatformWindows
 )
 
 const (
@@ -1085,30 +1221,20 @@ const (
 	AgentOnDockerEnvironment
 	// AzureEnvironment represents an endpoint connected to an Azure environment
 	AzureEnvironment
-	// EdgeAgentEnvironment represents an endpoint connected to an Edge agent
-	EdgeAgentEnvironment
-)
-
-const (
-	_ ExtensionID = iota
-	// RegistryManagementExtension represents the registry management extension
-	RegistryManagementExtension
-	// OAuthAuthenticationExtension represents the OAuth authentication extension
-	OAuthAuthenticationExtension
-	// RBACExtension represents the RBAC extension
-	RBACExtension
+	// EdgeAgentOnDockerEnvironment represents an endpoint connected to an Edge agent deployed on a Docker environment
+	EdgeAgentOnDockerEnvironment
+	// KubernetesLocalEnvironment represents an endpoint connected to a local Kubernetes environment
+	KubernetesLocalEnvironment
+	// AgentOnKubernetesEnvironment represents an endpoint connected to a Portainer agent deployed on a Kubernetes environment
+	AgentOnKubernetesEnvironment
+	// EdgeAgentOnKubernetesEnvironment represents an endpoint connected to an Edge agent deployed on a Kubernetes environment
+	EdgeAgentOnKubernetesEnvironment
 )
 
 const (
 	_ JobType = iota
-	// ScriptExecutionJobType is a non-system job used to execute a script against a list of
-	// endpoints via privileged containers
-	ScriptExecutionJobType
 	// SnapshotJobType is a system job used to create endpoint snapshots
-	SnapshotJobType
-	// EndpointSyncJobType is a system job used to synchronize endpoints from
-	// an external definition store
-	EndpointSyncJobType
+	SnapshotJobType = 2
 )
 
 const (
@@ -1153,6 +1279,8 @@ const (
 	StackResourceControl
 	// ConfigResourceControl represents a resource control associated to a Docker config
 	ConfigResourceControl
+	// CustomTemplateResourceControl  represents a resource control associated to a custom template
+	CustomTemplateResourceControl
 )
 
 const (
@@ -1161,6 +1289,15 @@ const (
 	DockerSwarmStack
 	// DockerComposeStack represents a stack managed via docker-compose
 	DockerComposeStack
+	// KubernetesStack represents a stack managed via kubectl
+	KubernetesStack
+)
+
+// StackStatus represents a status for a stack
+const (
+	_ StackStatus = iota
+	StackStatusActive
+	StackStatusInactive
 )
 
 const (

@@ -7,24 +7,33 @@ export function SettingsViewModel(data) {
   this.AllowBindMountsForRegularUsers = data.AllowBindMountsForRegularUsers;
   this.AllowPrivilegedModeForRegularUsers = data.AllowPrivilegedModeForRegularUsers;
   this.AllowVolumeBrowserForRegularUsers = data.AllowVolumeBrowserForRegularUsers;
+  this.AllowHostNamespaceForRegularUsers = data.AllowHostNamespaceForRegularUsers;
+  this.AllowDeviceMappingForRegularUsers = data.AllowDeviceMappingForRegularUsers;
+  this.AllowStackManagementForRegularUsers = data.AllowStackManagementForRegularUsers;
+  this.AllowContainerCapabilitiesForRegularUsers = data.AllowContainerCapabilitiesForRegularUsers;
   this.SnapshotInterval = data.SnapshotInterval;
   this.TemplatesURL = data.TemplatesURL;
-  this.ExternalTemplates = data.ExternalTemplates;
   this.EnableHostManagementFeatures = data.EnableHostManagementFeatures;
   this.EdgeAgentCheckinInterval = data.EdgeAgentCheckinInterval;
   this.EnableEdgeComputeFeatures = data.EnableEdgeComputeFeatures;
+  this.UserSessionTimeout = data.UserSessionTimeout;
+  this.EnableTelemetry = data.EnableTelemetry;
 }
 
 export function PublicSettingsViewModel(settings) {
   this.AllowBindMountsForRegularUsers = settings.AllowBindMountsForRegularUsers;
   this.AllowPrivilegedModeForRegularUsers = settings.AllowPrivilegedModeForRegularUsers;
   this.AllowVolumeBrowserForRegularUsers = settings.AllowVolumeBrowserForRegularUsers;
+  this.AllowDeviceMappingForRegularUsers = settings.AllowDeviceMappingForRegularUsers;
+  this.AllowStackManagementForRegularUsers = settings.AllowStackManagementForRegularUsers;
+  this.AllowContainerCapabilitiesForRegularUsers = settings.AllowContainerCapabilitiesForRegularUsers;
+  this.AllowHostNamespaceForRegularUsers = settings.AllowHostNamespaceForRegularUsers;
   this.AuthenticationMethod = settings.AuthenticationMethod;
   this.EnableHostManagementFeatures = settings.EnableHostManagementFeatures;
-  this.ExternalTemplates = settings.ExternalTemplates;
   this.EnableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
   this.LogoURL = settings.LogoURL;
   this.OAuthLoginURI = settings.OAuthLoginURI;
+  this.EnableTelemetry = settings.EnableTelemetry;
 }
 
 export function LDAPSettingsViewModel(data) {

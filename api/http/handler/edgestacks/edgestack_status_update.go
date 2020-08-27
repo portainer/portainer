@@ -1,6 +1,7 @@
 package edgestacks
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -8,6 +9,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
 type updateStatusPayload struct {
@@ -18,13 +20,13 @@ type updateStatusPayload struct {
 
 func (payload *updateStatusPayload) Validate(r *http.Request) error {
 	if payload.Status == nil {
-		return portainer.Error("Invalid status")
+		return errors.New("Invalid status")
 	}
 	if payload.EndpointID == nil {
-		return portainer.Error("Invalid EndpointID")
+		return errors.New("Invalid EndpointID")
 	}
 	if *payload.Status == portainer.StatusError && govalidator.IsNull(payload.Error) {
-		return portainer.Error("Error message is mandatory when status is error")
+		return errors.New("Error message is mandatory when status is error")
 	}
 	return nil
 }
@@ -35,8 +37,8 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid stack identifier route variable", err}
 	}
 
-	stack, err := handler.EdgeStackService.EdgeStack(portainer.EdgeStackID(stackID))
-	if err == portainer.ErrObjectNotFound {
+	stack, err := handler.DataStore.EdgeStack().EdgeStack(portainer.EdgeStackID(stackID))
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a stack with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a stack with the specified identifier inside the database", err}
@@ -48,8 +50,8 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(*payload.EndpointID))
-	if err == portainer.ErrObjectNotFound {
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(*payload.EndpointID))
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
@@ -66,7 +68,7 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 		EndpointID: *payload.EndpointID,
 	}
 
-	err = handler.EdgeStackService.UpdateEdgeStack(stack.ID, stack)
+	err = handler.DataStore.EdgeStack().UpdateEdgeStack(stack.ID, stack)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack changes inside the database", err}
 	}

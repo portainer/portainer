@@ -11,9 +11,8 @@ import (
 // Handler is the HTTP handler used to proxy requests to external APIs.
 type Handler struct {
 	*mux.Router
+	DataStore            portainer.DataStore
 	requestBouncer       *security.RequestBouncer
-	EndpointService      portainer.EndpointService
-	SettingsService      portainer.SettingsService
 	ProxyManager         *proxy.Manager
 	ReverseTunnelService portainer.ReverseTunnelService
 }
@@ -28,6 +27,8 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.proxyRequestsToAzureAPI)))
 	h.PathPrefix("/{id}/docker").Handler(
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.proxyRequestsToDockerAPI)))
+	h.PathPrefix("/{id}/kubernetes").Handler(
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.proxyRequestsToKubernetesAPI)))
 	h.PathPrefix("/{id}/storidge").Handler(
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.proxyRequestsToStoridgeAPI)))
 	return h

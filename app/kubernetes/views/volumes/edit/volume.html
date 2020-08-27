@@ -1,0 +1,155 @@
+<kubernetes-view-header title="Volume details" state="kubernetes.volumes.volume" view-ready="ctrl.state.viewReady">
+  <a ui-sref="kubernetes.resourcePools">Resource pools</a> &gt;
+  <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.volume.ResourcePool.Namespace.Name })">{{ ctrl.volume.ResourcePool.Namespace.Name }}</a> &gt;
+  <a ui-sref="kubernetes.volumes">Volumes</a> &gt; {{ ctrl.volume.PersistentVolumeClaim.Name }}
+</kubernetes-view-header>
+
+<kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
+
+<div ng-if="ctrl.state.viewReady">
+  <div class="row">
+    <div class="col-sm-12">
+      <rd-widget>
+        <rd-widget-body classes="no-padding">
+          <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
+            <uib-tab index="0" classes="btn-sm" select="ctrl.selectTab(0)">
+              <uib-tab-heading> <i class="fa fa-database space-right" aria-hidden="true"></i> Volume </uib-tab-heading>
+
+              <div style="padding: 20px;">
+                <table class="table">
+                  <tbody>
+                    <tr>
+                      <td>Name</td>
+                      <td>
+                        {{ ctrl.volume.PersistentVolumeClaim.Name }}
+                        <span class="label label-primary image-tag label-margins" ng-if="!ctrl.isSystemNamespace() && ctrl.isExternalVolume()">external</span>
+                        <span class="label label-warning image-tag label-margins" ng-if="!ctrl.isSystemNamespace() && !ctrl.isUsed()">unused</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Resource pool</td>
+                      <td>
+                        <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.volume.ResourcePool.Namespace.Name })">{{ ctrl.volume.ResourcePool.Namespace.Name }}</a>
+                        <span style="margin-left: 5px;" class="label label-info image-tag" ng-if="ctrl.isSystemNamespace(item)">system</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Storage</td>
+                      <td>{{ ctrl.volume.PersistentVolumeClaim.StorageClass.Name }}</td>
+                    </tr>
+                    <tr>
+                      <td>Provisioner</td>
+                      <td>{{ ctrl.volume.PersistentVolumeClaim.StorageClass.Provisioner ? ctrl.volume.PersistentVolumeClaim.StorageClass.Provisioner : '-' }}</td>
+                    </tr>
+                    <tr>
+                      <td>Creation date</td>
+                      <td>{{ ctrl.volume.PersistentVolumeClaim.CreationDate | getisodate }}</td>
+                    </tr>
+                    <tr>
+                      <td>Size</td>
+                      <td ng-if="!ctrl.state.increaseSize">
+                        {{ ctrl.volume.PersistentVolumeClaim.Storage }}
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-primary"
+                          ng-click="ctrl.state.increaseSize = true"
+                          ng-if="ctrl.volume.PersistentVolumeClaim.StorageClass.AllowVolumeExpansion"
+                          >Increase size</button
+                        >
+                      </td>
+                      <td ng-if="ctrl.state.increaseSize">
+                        <form name="kubernetesVolumeUpdateForm">
+                          <div class="form-inline">
+                            <div class="input-group input-group-sm">
+                              <input
+                                type="number"
+                                class="form-control"
+                                name="size"
+                                ng-model="ctrl.state.volumeSize"
+                                placeholder="20"
+                                ng-min="0"
+                                ng-change="ctrl.onChangeSize()"
+                                required
+                              />
+                              <span class="input-group-addon" style="padding: 0;">
+                                <select
+                                  ng-model="ctrl.state.volumeSizeUnit"
+                                  ng-change="ctrl.onChangeSize()"
+                                  ng-options="unit for unit in ctrl.state.availableSizeUnits"
+                                  style="width: 100%; height: 100%;"
+                                ></select>
+                              </span>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-primary" ng-disabled="!ctrl.sizeIsValid()" ng-click="ctrl.updateVolume()">
+                              Update size
+                            </button>
+                            <button type="button" class="btn btn-sm btn-default" ng-click="ctrl.state.increaseSize = false">
+                              Cancel
+                            </button>
+                          </div>
+
+                          <div class="form-inline">
+                            <div class="small text-warning" style="margin-top: 5px;" ng-show="ctrl.state.volumeSizeError || kubernetesVolumeUpdateForm.size.$invalid">
+                              <div ng-messages="kubernetesVolumeUpdateForm.size.$error">
+                                <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                              </div>
+                              <p ng-show="ctrl.state.volumeSizeError && !kubernetesVolumeUpdateForm.size.$invalid"
+                                ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> The new size must be greater than the actual size.</p
+                              >
+                            </div>
+                          </div>
+                        </form>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </uib-tab>
+
+            <uib-tab index="1" classes="btn-sm" select="ctrl.selectTab(1)">
+              <uib-tab-heading>
+                <i class="fa fa-history space-right" aria-hidden="true"></i> Events
+                <div ng-if="ctrl.hasEventWarnings()">
+                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  {{ ctrl.state.eventWarningCount }} warning(s)
+                </div>
+              </uib-tab-heading>
+              <kubernetes-events-datatable
+                title-text="Events"
+                title-icon="fa-history"
+                dataset="ctrl.events"
+                table-key="kubernetes.volume.events"
+                order-by="Date"
+                reverse-order="true"
+                loading="ctrl.state.eventsLoading"
+                refresh-callback="ctrl.getEvents"
+              >
+              </kubernetes-events-datatable>
+            </uib-tab>
+
+            <uib-tab index="2" ng-if="ctrl.volume.PersistentVolumeClaim.Yaml" select="ctrl.showEditor()" classes="btn-sm">
+              <uib-tab-heading> <i class="fa fa-code space-right" aria-hidden="true"></i> YAML </uib-tab-heading>
+              <div style="padding-right: 25px;" ng-if="ctrl.state.showEditorTab">
+                <kubernetes-yaml-inspector key="volume-yaml" data="ctrl.volume.PersistentVolumeClaim.Yaml"></kubernetes-yaml-inspector>
+              </div>
+            </uib-tab>
+          </uib-tabset>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+  </div>
+
+  <div class="row" ng-if="ctrl.isUsed(item)">
+    <div class="col-sm-12">
+      <kubernetes-integrated-applications-datatable
+        dataset="ctrl.volume.Applications"
+        table-key="kubernetes.volume.applications"
+        order-by="Name"
+        refresh-callback="ctrl.getVolume"
+        title-text="Applications using this volume"
+        title-icon="fa-laptop-code"
+      >
+      </kubernetes-integrated-applications-datatable>
+    </div>
+  </div>
+</div>

@@ -7,8 +7,7 @@ angular.module('portainer.app').factory('Authentication', [
   'LocalStorage',
   'StateManager',
   'EndpointProvider',
-  'UserService',
-  function AuthenticationFactory($async, $state, Auth, OAuth, jwtHelper, LocalStorage, StateManager, EndpointProvider, UserService) {
+  function AuthenticationFactory($async, $state, Auth, OAuth, jwtHelper, LocalStorage, StateManager, EndpointProvider) {
     'use strict';
 
     var service = {};
@@ -21,7 +20,6 @@ angular.module('portainer.app').factory('Authentication', [
     service.isAuthenticated = isAuthenticated;
     service.getUserDetails = getUserDetails;
     service.isAdmin = isAdmin;
-    service.hasAuthorizations = hasAuthorizations;
 
     async function initAsync() {
       try {
@@ -29,16 +27,25 @@ angular.module('portainer.app').factory('Authentication', [
         if (jwt) {
           await setUser(jwt);
         }
+        return !!jwt;
       } catch (error) {
-        throw error;
+        return false;
       }
     }
 
-    function logout() {
+    async function logoutAsync(performApiLogout) {
+      if (performApiLogout) {
+        await Auth.logout().$promise;
+      }
+
       StateManager.clean();
       EndpointProvider.clean();
-      LocalStorage.clean();
+      LocalStorage.cleanAuthData();
       LocalStorage.storeLoginStateUUID('');
+    }
+
+    function logout(performApiLogout) {
+      return $async(logoutAsync, performApiLogout);
     }
 
     function init() {
@@ -72,41 +79,17 @@ angular.module('portainer.app').factory('Authentication', [
       return user;
     }
 
-    async function retrievePermissions() {
-      const data = await UserService.user(user.ID);
-      user.endpointAuthorizations = data.EndpointAuthorizations;
-      user.portainerAuthorizations = data.PortainerAuthorizations;
-    }
-
     async function setUser(jwt) {
       LocalStorage.storeJWT(jwt);
       var tokenPayload = jwtHelper.decodeToken(jwt);
       user.username = tokenPayload.username;
       user.ID = tokenPayload.id;
       user.role = tokenPayload.role;
-      await retrievePermissions();
     }
 
     function isAdmin() {
       if (user.role === 1) {
         return true;
-      }
-      return false;
-    }
-
-    function hasAuthorizations(authorizations) {
-      const endpointId = EndpointProvider.endpointID();
-      if (isAdmin()) {
-        return true;
-      }
-      if (!user.endpointAuthorizations || (user.endpointAuthorizations && !user.endpointAuthorizations[endpointId])) {
-        return false;
-      }
-      for (var i = 0; i < authorizations.length; i++) {
-        var authorization = authorizations[i];
-        if (user.endpointAuthorizations[endpointId][authorization]) {
-          return true;
-        }
       }
       return false;
     }

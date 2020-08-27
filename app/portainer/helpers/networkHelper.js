@@ -2,6 +2,7 @@ import _ from 'lodash-es';
 import angular from 'angular';
 
 class NetworkHelper {
+  /* @ngInject */
   constructor(PREDEFINED_NETWORKS) {
     this.PREDEFINED_NETWORKS = PREDEFINED_NETWORKS;
   }

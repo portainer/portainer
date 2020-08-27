@@ -1,6 +1,7 @@
 package tags
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -16,7 +17,7 @@ type tagCreatePayload struct {
 
 func (payload *tagCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
-		return portainer.Error("Invalid tag name")
+		return errors.New("Invalid tag name")
 	}
 	return nil
 }
@@ -29,14 +30,14 @@ func (handler *Handler) tagCreate(w http.ResponseWriter, r *http.Request) *httpe
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	tags, err := handler.TagService.Tags()
+	tags, err := handler.DataStore.Tag().Tags()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve tags from the database", err}
 	}
 
 	for _, tag := range tags {
 		if tag.Name == payload.Name {
-			return &httperror.HandlerError{http.StatusConflict, "This name is already associated to a tag", portainer.ErrTagAlreadyExists}
+			return &httperror.HandlerError{http.StatusConflict, "This name is already associated to a tag", errors.New("A tag already exists with this name")}
 		}
 	}
 
@@ -46,7 +47,7 @@ func (handler *Handler) tagCreate(w http.ResponseWriter, r *http.Request) *httpe
 		Endpoints:      map[portainer.EndpointID]bool{},
 	}
 
-	err = handler.TagService.CreateTag(tag)
+	err = handler.DataStore.Tag().CreateTag(tag)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the tag inside the database", err}
 	}

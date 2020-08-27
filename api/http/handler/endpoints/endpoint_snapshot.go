@@ -7,6 +7,8 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/internal/snapshot"
 )
 
 // POST request on /api/endpoints/:id/snapshot
@@ -16,20 +18,20 @@ func (handler *Handler) endpointSnapshot(w http.ResponseWriter, r *http.Request)
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint identifier route variable", err}
 	}
 
-	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
-	if err == portainer.ErrObjectNotFound {
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	if err == errors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
-	if endpoint.Type == portainer.AzureEnvironment {
-		return &httperror.HandlerError{http.StatusBadRequest, "Snapshots not supported for Azure endpoints", err}
+	if !snapshot.SupportDirectSnapshot(endpoint) {
+		return &httperror.HandlerError{http.StatusBadRequest, "Snapshots not supported for this endpoint", err}
 	}
 
-	snapshot, snapshotError := handler.Snapshotter.CreateSnapshot(endpoint)
+	snapshotError := handler.SnapshotService.SnapshotEndpoint(endpoint)
 
-	latestEndpointReference, err := handler.EndpointService.Endpoint(endpoint.ID)
+	latestEndpointReference, err := handler.DataStore.Endpoint().Endpoint(endpoint.ID)
 	if latestEndpointReference == nil {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
@@ -39,11 +41,10 @@ func (handler *Handler) endpointSnapshot(w http.ResponseWriter, r *http.Request)
 		latestEndpointReference.Status = portainer.EndpointStatusDown
 	}
 
-	if snapshot != nil {
-		latestEndpointReference.Snapshots = []portainer.Snapshot{*snapshot}
-	}
+	latestEndpointReference.Snapshots = endpoint.Snapshots
+	latestEndpointReference.Kubernetes.Snapshots = endpoint.Kubernetes.Snapshots
 
-	err = handler.EndpointService.UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)
+	err = handler.DataStore.Endpoint().UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint changes inside the database", err}
 	}

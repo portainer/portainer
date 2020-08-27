@@ -1,0 +1,71 @@
+<kubernetes-view-header title="Application console" state="kubernetes.applications.application.console" view-ready="ctrl.state.viewReady">
+  <a ui-sref="kubernetes.resourcePools">Resource pools</a> &gt;
+  <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.application.ResourcePool })">{{ ctrl.application.ResourcePool }}</a> &gt;
+  <a ui-sref="kubernetes.applications">Applications</a> &gt;
+  <a ui-sref="kubernetes.applications.application({ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool })">{{ ctrl.application.Name }}</a> &gt; Pods &gt;
+  {{ ctrl.podName }} &gt; Containers &gt; {{ ctrl.containerName }} &gt; Console
+</kubernetes-view-header>
+
+<kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
+
+<div ng-if="ctrl.state.viewReady">
+  <div class="row">
+    <div class="col-sm-12">
+      <rd-widget>
+        <rd-widget-body>
+          <form class="form-horizontal" autocomplete="off">
+            <div class="col-sm-12 form-section-title">
+              Console
+            </div>
+            <!-- Command -->
+            <div class="form-group">
+              <label for="console_command" class="col-sm-1 control-label text-left">Command</label>
+              <div class="col-sm-10 input-group">
+                <span class="input-group-addon">
+                  <i class="fas fa-terminal" aria-hidden="true"></i>
+                </span>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="/bin/bash"
+                  ng-model="ctrl.state.command"
+                  name="console_command"
+                  uib-typeahead="command for command in ctrl.state.availableCommands | filter:$viewValue | limitTo:5"
+                  typeahead-show-hint="true"
+                  typeahead-min-length="0"
+                  auto-focus
+                />
+              </div>
+            </div>
+            <!-- !command -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm"
+                  style="margin: 0;"
+                  ng-if="!ctrl.state.connected"
+                  ng-disabled="!ctrl.state.command || ctrl.state.connected"
+                  ng-click="ctrl.connectConsole()"
+                  button-spinner="ctrl.state.actionInProgress"
+                >
+                  <span ng-hide="ctrl.state.actionInProgress">Connect</span>
+                  <span ng-show="ctrl.state.actionInProgress">Connection in progress...</span>
+                </button>
+                <button type="button" class="btn btn-primary btn-sm" style="margin: 0;" ng-if="ctrl.state.connected" ng-click="ctrl.disconnect()">
+                  Disconnect
+                </button>
+              </div>
+            </div>
+          </form>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <div id="terminal-container" class="terminal-container"></div>
+    </div>
+  </div>
+</div>

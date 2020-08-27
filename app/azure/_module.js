@@ -6,8 +6,25 @@ angular.module('portainer.azure', ['portainer.app']).config([
     var azure = {
       name: 'azure',
       url: '/azure',
-      parent: 'root',
+      parent: 'endpoint',
       abstract: true,
+      onEnter: /* @ngInject */ function onEnter($async, $state, endpoint, EndpointProvider, Notifications, StateManager) {
+        return $async(async () => {
+          if (endpoint.Type !== 3) {
+            $state.go('portainer.home');
+            return;
+          }
+          try {
+            EndpointProvider.setEndpointID(endpoint.Id);
+            EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
+            EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
+            await StateManager.updateEndpointState(endpoint, []);
+          } catch (e) {
+            Notifications.error('Failed loading endpoint', e);
+            $state.go('portainer.home', {}, { reload: true });
+          }
+        });
+      },
     };
 
     var containerInstances = {
@@ -17,6 +34,16 @@ angular.module('portainer.azure', ['portainer.app']).config([
         'content@': {
           templateUrl: './views/containerinstances/containerinstances.html',
           controller: 'AzureContainerInstancesController',
+        },
+      },
+    };
+
+    var containerInstance = {
+      name: 'azure.containerinstances.container',
+      url: '/:id',
+      views: {
+        'content@': {
+          component: 'containerInstanceDetails',
         },
       },
     };
@@ -45,6 +72,7 @@ angular.module('portainer.azure', ['portainer.app']).config([
 
     $stateRegistryProvider.register(azure);
     $stateRegistryProvider.register(containerInstances);
+    $stateRegistryProvider.register(containerInstance);
     $stateRegistryProvider.register(containerInstanceCreation);
     $stateRegistryProvider.register(dashboard);
   },

@@ -2,7 +2,6 @@ package edgetemplates
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -11,35 +10,39 @@ import (
 	"github.com/portainer/portainer/api/http/client"
 )
 
+type templateFileFormat struct {
+	Version   string               `json:"version"`
+	Templates []portainer.Template `json:"templates"`
+}
+
 // GET request on /api/edgetemplates
 func (handler *Handler) edgeTemplateList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	settings, err := handler.SettingsService.Settings()
+	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
 	}
 
-	url := portainer.EdgeTemplatesURL
+	url := portainer.DefaultTemplatesURL
 	if settings.TemplatesURL != "" {
 		url = settings.TemplatesURL
 	}
 
 	var templateData []byte
-	templateData, err = client.Get(url, 0)
+	templateData, err = client.Get(url, 10)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve external templates", err}
 	}
 
-	var templates []portainer.Template
+	var templateFile templateFileFormat
 
-	err = json.Unmarshal(templateData, &templates)
+	err = json.Unmarshal(templateData, &templateFile)
 	if err != nil {
-		log.Printf("[DEBUG] [http,edge,templates] [failed parsing edge templates] [body: %s]", templateData)
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to parse external templates", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to parse template file", err}
 	}
 
-	filteredTemplates := []portainer.Template{}
+	filteredTemplates := make([]portainer.Template, 0)
 
-	for _, template := range templates {
+	for _, template := range templateFile.Templates {
 		if template.Type == portainer.EdgeStackTemplate {
 			filteredTemplates = append(filteredTemplates, template)
 		}

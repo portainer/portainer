@@ -16,7 +16,9 @@ angular.module('portainer.app').factory('Notifications', [
 
     service.error = function (title, e, fallbackText) {
       var msg = fallbackText;
-      if (e.err && e.err.data && e.err.data.details) {
+      if (e.err && e.err.data && e.err.data.message) {
+        msg = e.err.data.message;
+      } else if (e.err && e.err.data && e.err.data.details) {
         msg = e.err.data.details;
       } else if (e.data && e.data.details) {
         msg = e.data.details;
@@ -26,8 +28,6 @@ angular.module('portainer.app').factory('Notifications', [
         msg = e.data.content;
       } else if (e.message) {
         msg = e.message;
-      } else if (e.err && e.err.data && e.err.data.message) {
-        msg = e.err.data.message;
       } else if (e.err && e.err.data && e.err.data.length > 0 && e.err.data[0].message) {
         msg = e.err.data[0].message;
       } else if (e.err && e.err.data && e.err.data.err) {

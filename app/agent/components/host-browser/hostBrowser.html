@@ -1,0 +1,16 @@
+<files-datatable
+  title-text="Host browser - {{ $ctrl.getRelativePath() }}"
+  title-icon="fa-file"
+  dataset="$ctrl.files"
+  table-key="host_browser"
+  order-by="Dir"
+  is-root="$ctrl.isRoot()"
+  go-to-parent="$ctrl.goToParent()"
+  browse="$ctrl.browse(name)"
+  rename="$ctrl.renameFile(name, newName)"
+  download="$ctrl.downloadFile(name)"
+  delete="$ctrl.confirmDeleteFile(name)"
+  is-upload-allowed="true"
+  on-file-selected-for-upload="($ctrl.onFileSelectedForUpload)"
+>
+</files-datatable>

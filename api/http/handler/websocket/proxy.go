@@ -33,7 +33,12 @@ func (handler *Handler) proxyEdgeAgentWebsocketRequest(w http.ResponseWriter, r 
 }
 
 func (handler *Handler) proxyAgentWebsocketRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {
-	agentURL, err := url.Parse(params.endpoint.URL)
+	endpointURL := params.endpoint.URL
+	if params.endpoint.Type == portainer.AgentOnKubernetesEnvironment {
+		endpointURL = fmt.Sprintf("http://%s", params.endpoint.URL)
+	}
+
+	agentURL, err := url.Parse(endpointURL)
 	if err != nil {
 		return err
 	}

@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"errors"
 	"log"
 	"time"
 
@@ -16,16 +17,11 @@ import (
 // Service implements the CLIService interface
 type Service struct{}
 
-const (
-	errInvalidEndpointProtocol       = portainer.Error("Invalid endpoint protocol: Portainer only supports unix://, npipe:// or tcp://")
-	errSocketOrNamedPipeNotFound     = portainer.Error("Unable to locate Unix socket or named pipe")
-	errEndpointsFileNotFound         = portainer.Error("Unable to locate external endpoints file")
-	errTemplateFileNotFound          = portainer.Error("Unable to locate template file on disk")
-	errInvalidSyncInterval           = portainer.Error("Invalid synchronization interval")
-	errInvalidSnapshotInterval       = portainer.Error("Invalid snapshot interval")
-	errEndpointExcludeExternal       = portainer.Error("Cannot use the -H flag mutually with --external-endpoints")
-	errNoAuthExcludeAdminPassword    = portainer.Error("Cannot use --no-auth with --admin-password or --admin-password-file")
-	errAdminPassExcludeAdminPassFile = portainer.Error("Cannot use --admin-password with --admin-password-file")
+var (
+	errInvalidEndpointProtocol       = errors.New("Invalid endpoint protocol: Portainer only supports unix://, npipe:// or tcp://")
+	errSocketOrNamedPipeNotFound     = errors.New("Unable to locate Unix socket or named pipe")
+	errInvalidSnapshotInterval       = errors.New("Invalid snapshot interval")
+	errAdminPassExcludeAdminPassFile = errors.New("Cannot use --admin-password with --admin-password-file")
 )
 
 // ParseFlags parse the CLI flags and return a portainer.Flags struct
@@ -33,32 +29,28 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 	kingpin.Version(version)
 
 	flags := &portainer.CLIFlags{
-		Addr:              kingpin.Flag("bind", "Address and port to serve Portainer").Default(defaultBindAddress).Short('p').String(),
-		TunnelAddr:        kingpin.Flag("tunnel-addr", "Address to serve the tunnel server").Default(defaultTunnelServerAddress).String(),
-		TunnelPort:        kingpin.Flag("tunnel-port", "Port to serve the tunnel server").Default(defaultTunnelServerPort).String(),
-		Assets:            kingpin.Flag("assets", "Path to the assets").Default(defaultAssetsDirectory).Short('a').String(),
-		Data:              kingpin.Flag("data", "Path to the folder where the data is stored").Default(defaultDataDirectory).Short('d').String(),
-		EndpointURL:       kingpin.Flag("host", "Endpoint URL").Short('H').String(),
-		ExternalEndpoints: kingpin.Flag("external-endpoints", "Path to a file defining available endpoints (deprecated)").String(),
-		NoAuth:            kingpin.Flag("no-auth", "Disable authentication (deprecated)").Default(defaultNoAuth).Bool(),
-		NoAnalytics:       kingpin.Flag("no-analytics", "Disable Analytics in app").Default(defaultNoAnalytics).Bool(),
-		TLS:               kingpin.Flag("tlsverify", "TLS support").Default(defaultTLS).Bool(),
-		TLSSkipVerify:     kingpin.Flag("tlsskipverify", "Disable TLS server verification").Default(defaultTLSSkipVerify).Bool(),
-		TLSCacert:         kingpin.Flag("tlscacert", "Path to the CA").Default(defaultTLSCACertPath).String(),
-		TLSCert:           kingpin.Flag("tlscert", "Path to the TLS certificate file").Default(defaultTLSCertPath).String(),
-		TLSKey:            kingpin.Flag("tlskey", "Path to the TLS key").Default(defaultTLSKeyPath).String(),
-		SSL:               kingpin.Flag("ssl", "Secure Portainer instance using SSL").Default(defaultSSL).Bool(),
-		SSLCert:           kingpin.Flag("sslcert", "Path to the SSL certificate used to secure the Portainer instance").Default(defaultSSLCertPath).String(),
-		SSLKey:            kingpin.Flag("sslkey", "Path to the SSL key used to secure the Portainer instance").Default(defaultSSLKeyPath).String(),
-		SyncInterval:      kingpin.Flag("sync-interval", "Duration between each synchronization via the external endpoints source (deprecated)").Default(defaultSyncInterval).String(),
-		Snapshot:          kingpin.Flag("snapshot", "Start a background job to create endpoint snapshots (deprecated)").Default(defaultSnapshot).Bool(),
-		SnapshotInterval:  kingpin.Flag("snapshot-interval", "Duration between each endpoint snapshot job").Default(defaultSnapshotInterval).String(),
-		AdminPassword:     kingpin.Flag("admin-password", "Hashed admin password").String(),
-		AdminPasswordFile: kingpin.Flag("admin-password-file", "Path to the file containing the password for the admin user").String(),
-		Labels:            pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l')),
-		Logo:              kingpin.Flag("logo", "URL for the logo displayed in the UI").String(),
-		Templates:         kingpin.Flag("templates", "URL to the templates definitions.").Short('t').String(),
-		TemplateFile:      kingpin.Flag("template-file", "Path to the App templates definitions on the filesystem (deprecated)").Default(defaultTemplateFile).String(),
+		Addr:                      kingpin.Flag("bind", "Address and port to serve Portainer").Default(defaultBindAddress).Short('p').String(),
+		TunnelAddr:                kingpin.Flag("tunnel-addr", "Address to serve the tunnel server").Default(defaultTunnelServerAddress).String(),
+		TunnelPort:                kingpin.Flag("tunnel-port", "Port to serve the tunnel server").Default(defaultTunnelServerPort).String(),
+		Assets:                    kingpin.Flag("assets", "Path to the assets").Default(defaultAssetsDirectory).Short('a').String(),
+		Data:                      kingpin.Flag("data", "Path to the folder where the data is stored").Default(defaultDataDirectory).Short('d').String(),
+		EndpointURL:               kingpin.Flag("host", "Endpoint URL").Short('H').String(),
+		EnableEdgeComputeFeatures: kingpin.Flag("edge-compute", "Enable Edge Compute features").Bool(),
+		NoAnalytics:               kingpin.Flag("no-analytics", "Disable Analytics in app (deprecated)").Bool(),
+		TLS:                       kingpin.Flag("tlsverify", "TLS support").Default(defaultTLS).Bool(),
+		TLSSkipVerify:             kingpin.Flag("tlsskipverify", "Disable TLS server verification").Default(defaultTLSSkipVerify).Bool(),
+		TLSCacert:                 kingpin.Flag("tlscacert", "Path to the CA").Default(defaultTLSCACertPath).String(),
+		TLSCert:                   kingpin.Flag("tlscert", "Path to the TLS certificate file").Default(defaultTLSCertPath).String(),
+		TLSKey:                    kingpin.Flag("tlskey", "Path to the TLS key").Default(defaultTLSKeyPath).String(),
+		SSL:                       kingpin.Flag("ssl", "Secure Portainer instance using SSL").Default(defaultSSL).Bool(),
+		SSLCert:                   kingpin.Flag("sslcert", "Path to the SSL certificate used to secure the Portainer instance").Default(defaultSSLCertPath).String(),
+		SSLKey:                    kingpin.Flag("sslkey", "Path to the SSL key used to secure the Portainer instance").Default(defaultSSLKeyPath).String(),
+		SnapshotInterval:          kingpin.Flag("snapshot-interval", "Duration between each endpoint snapshot job").Default(defaultSnapshotInterval).String(),
+		AdminPassword:             kingpin.Flag("admin-password", "Hashed admin password").String(),
+		AdminPasswordFile:         kingpin.Flag("admin-password-file", "Path to the file containing the password for the admin user").String(),
+		Labels:                    pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l')),
+		Logo:                      kingpin.Flag("logo", "URL for the logo displayed in the UI").String(),
+		Templates:                 kingpin.Flag("templates", "URL to the templates definitions.").Short('t').String(),
 	}
 
 	kingpin.Parse()
@@ -79,26 +71,7 @@ func (*Service) ValidateFlags(flags *portainer.CLIFlags) error {
 
 	displayDeprecationWarnings(flags)
 
-	if *flags.EndpointURL != "" && *flags.ExternalEndpoints != "" {
-		return errEndpointExcludeExternal
-	}
-
-	err := validateTemplateFile(*flags.TemplateFile)
-	if err != nil {
-		return err
-	}
-
-	err = validateEndpointURL(*flags.EndpointURL)
-	if err != nil {
-		return err
-	}
-
-	err = validateExternalEndpoints(*flags.ExternalEndpoints)
-	if err != nil {
-		return err
-	}
-
-	err = validateSyncInterval(*flags.SyncInterval)
+	err := validateEndpointURL(*flags.EndpointURL)
 	if err != nil {
 		return err
 	}
@@ -106,10 +79,6 @@ func (*Service) ValidateFlags(flags *portainer.CLIFlags) error {
 	err = validateSnapshotInterval(*flags.SnapshotInterval)
 	if err != nil {
 		return err
-	}
-
-	if *flags.NoAuth && (*flags.AdminPassword != "" || *flags.AdminPasswordFile != "") {
-		return errNoAuthExcludeAdminPassword
 	}
 
 	if *flags.AdminPassword != "" && *flags.AdminPasswordFile != "" {
@@ -120,24 +89,8 @@ func (*Service) ValidateFlags(flags *portainer.CLIFlags) error {
 }
 
 func displayDeprecationWarnings(flags *portainer.CLIFlags) {
-	if *flags.ExternalEndpoints != "" {
-		log.Println("Warning: the --external-endpoint flag is deprecated and will likely be removed in a future version of Portainer.")
-	}
-
-	if *flags.SyncInterval != defaultSyncInterval {
-		log.Println("Warning: the --sync-interval flag is deprecated and will likely be removed in a future version of Portainer.")
-	}
-
-	if *flags.NoAuth {
-		log.Println("Warning: the --no-auth flag is deprecated and will likely be removed in a future version of Portainer.")
-	}
-
-	if !*flags.Snapshot {
-		log.Println("Warning: the --no-snapshot flag is deprecated and will likely be removed in a future version of Portainer.")
-	}
-
-	if *flags.TemplateFile != "" {
-		log.Println("Warning: the --template-file flag is deprecated and will likely be removed in a future version of Portainer.")
+	if *flags.NoAnalytics {
+		log.Println("Warning: The --no-analytics flag has been kept to allow migration of instances running a previous version of Portainer with this flag enabled, to version 2.0 where enabling this flag will have no effect.")
 	}
 }
 
@@ -156,38 +109,6 @@ func validateEndpointURL(endpointURL string) error {
 				}
 				return err
 			}
-		}
-	}
-	return nil
-}
-
-func validateExternalEndpoints(externalEndpoints string) error {
-	if externalEndpoints != "" {
-		if _, err := os.Stat(externalEndpoints); err != nil {
-			if os.IsNotExist(err) {
-				return errEndpointsFileNotFound
-			}
-			return err
-		}
-	}
-	return nil
-}
-
-func validateTemplateFile(templateFile string) error {
-	if _, err := os.Stat(templateFile); err != nil {
-		if os.IsNotExist(err) {
-			return errTemplateFileNotFound
-		}
-		return err
-	}
-	return nil
-}
-
-func validateSyncInterval(syncInterval string) error {
-	if syncInterval != defaultSyncInterval {
-		_, err := time.ParseDuration(syncInterval)
-		if err != nil {
-			return errInvalidSyncInterval
 		}
 	}
 	return nil

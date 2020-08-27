@@ -8,9 +8,9 @@ angular.module('portainer.app').component('stacksDatatable', {
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
-    showOwnershipColumn: '<',
     removeAction: '<',
     offlineMode: '<',
     refreshCallback: '<',
+    createEnabled: '<',
   },
 });

@@ -25,7 +25,6 @@ angular.module('portainer.app').controller('SettingsController', [
 
     $scope.formValues = {
       customLogo: false,
-      externalTemplates: false,
       restrictBindMounts: false,
       restrictPrivilegedMode: false,
       labelName: '',
@@ -33,6 +32,24 @@ angular.module('portainer.app').controller('SettingsController', [
       enableHostManagementFeatures: false,
       enableVolumeBrowser: false,
       enableEdgeComputeFeatures: false,
+      restrictHostNamespaceForRegularUsers: false,
+      allowDeviceMappingForRegularUsers: false,
+      allowStackManagementForRegularUsers: false,
+      disableContainerCapabilitiesForRegularUsers: false,
+      enableTelemetry: false,
+    };
+
+    $scope.isContainerEditDisabled = function isContainerEditDisabled() {
+      const {
+        restrictBindMounts,
+        restrictHostNamespaceForRegularUsers,
+        restrictPrivilegedMode,
+        disableDeviceMappingForRegularUsers,
+        disableContainerCapabilitiesForRegularUsers,
+      } = this.formValues;
+      return (
+        restrictBindMounts || restrictHostNamespaceForRegularUsers || restrictPrivilegedMode || disableDeviceMappingForRegularUsers || disableContainerCapabilitiesForRegularUsers
+      );
     };
 
     $scope.removeFilteredContainerLabel = function (index) {
@@ -60,15 +77,16 @@ angular.module('portainer.app').controller('SettingsController', [
         settings.LogoURL = '';
       }
 
-      if (!$scope.formValues.externalTemplates) {
-        settings.TemplatesURL = '';
-      }
-
       settings.AllowBindMountsForRegularUsers = !$scope.formValues.restrictBindMounts;
       settings.AllowPrivilegedModeForRegularUsers = !$scope.formValues.restrictPrivilegedMode;
       settings.AllowVolumeBrowserForRegularUsers = $scope.formValues.enableVolumeBrowser;
       settings.EnableHostManagementFeatures = $scope.formValues.enableHostManagementFeatures;
       settings.EnableEdgeComputeFeatures = $scope.formValues.enableEdgeComputeFeatures;
+      settings.AllowHostNamespaceForRegularUsers = !$scope.formValues.restrictHostNamespaceForRegularUsers;
+      settings.AllowDeviceMappingForRegularUsers = !$scope.formValues.disableDeviceMappingForRegularUsers;
+      settings.AllowStackManagementForRegularUsers = !$scope.formValues.disableStackManagementForRegularUsers;
+      settings.AllowContainerCapabilitiesForRegularUsers = !$scope.formValues.disableContainerCapabilitiesForRegularUsers;
+      settings.EnableTelemetry = $scope.formValues.enableTelemetry;
 
       $scope.state.actionInProgress = true;
       updateSettings(settings);
@@ -82,7 +100,14 @@ angular.module('portainer.app').controller('SettingsController', [
           StateManager.updateSnapshotInterval(settings.SnapshotInterval);
           StateManager.updateEnableHostManagementFeatures(settings.EnableHostManagementFeatures);
           StateManager.updateEnableVolumeBrowserForNonAdminUsers(settings.AllowVolumeBrowserForRegularUsers);
+          StateManager.updateAllowHostNamespaceForRegularUsers(settings.AllowHostNamespaceForRegularUsers);
           StateManager.updateEnableEdgeComputeFeatures(settings.EnableEdgeComputeFeatures);
+          StateManager.updateAllowDeviceMappingForRegularUsers(settings.AllowDeviceMappingForRegularUsers);
+          StateManager.updateAllowStackManagementForRegularUsers(settings.AllowStackManagementForRegularUsers);
+          StateManager.updateAllowContainerCapabilitiesForRegularUsers(settings.AllowContainerCapabilitiesForRegularUsers);
+          StateManager.updateAllowPrivilegedModeForRegularUsers(settings.AllowPrivilegedModeForRegularUsers);
+          StateManager.updateAllowBindMountsForRegularUsers(settings.AllowBindMountsForRegularUsers);
+          StateManager.updateEnableTelemetry(settings.EnableTelemetry);
           $state.reload();
         })
         .catch(function error(err) {
@@ -98,17 +123,20 @@ angular.module('portainer.app').controller('SettingsController', [
         .then(function success(data) {
           var settings = data;
           $scope.settings = settings;
+
           if (settings.LogoURL !== '') {
             $scope.formValues.customLogo = true;
-          }
-          if (settings.TemplatesURL !== '') {
-            $scope.formValues.externalTemplates = true;
           }
           $scope.formValues.restrictBindMounts = !settings.AllowBindMountsForRegularUsers;
           $scope.formValues.restrictPrivilegedMode = !settings.AllowPrivilegedModeForRegularUsers;
           $scope.formValues.enableVolumeBrowser = settings.AllowVolumeBrowserForRegularUsers;
           $scope.formValues.enableHostManagementFeatures = settings.EnableHostManagementFeatures;
           $scope.formValues.enableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
+          $scope.formValues.restrictHostNamespaceForRegularUsers = !settings.AllowHostNamespaceForRegularUsers;
+          $scope.formValues.disableDeviceMappingForRegularUsers = !settings.AllowDeviceMappingForRegularUsers;
+          $scope.formValues.disableStackManagementForRegularUsers = !settings.AllowStackManagementForRegularUsers;
+          $scope.formValues.disableContainerCapabilitiesForRegularUsers = !settings.AllowContainerCapabilitiesForRegularUsers;
+          $scope.formValues.enableTelemetry = settings.EnableTelemetry;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve application settings');
