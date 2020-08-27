@@ -42,6 +42,11 @@
               <span class="small text-muted"> <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true"></i> Network stats are unavailable for this container. </span>
             </div>
           </div>
+          <div class="form-group" ng-if="state.ioStatsUnavailable">
+            <div class="col-sm-12">
+              <span class="small text-muted"> <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true"></i> I/O stats are unavailable for this container. </span>
+            </div>
+          </div>
         </form>
       </rd-widget-body>
     </rd-widget>
@@ -75,6 +80,17 @@
       <rd-widget-body>
         <div class="chart-container" style="position: relative;">
           <canvas id="networkChart" width="770" height="300"></canvas>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+
+  <div class="col-md-6 col-sm-12" ng-if="!state.ioStatsUnavailable">
+    <rd-widget>
+      <rd-widget-header icon="fa-chart-area" title-text="I/O usage (aggregate)"></rd-widget-header>
+      <rd-widget-body>
+        <div class="chart-container" style="position: relative;">
+          <canvas id="ioChart" width="770" height="300"></canvas>
         </div>
       </rd-widget-body>
     </rd-widget>
