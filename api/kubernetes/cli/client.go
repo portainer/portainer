@@ -96,8 +96,8 @@ type agentHeaderRoundTripper struct {
 // RoundTrip is the implementation of the http.RoundTripper interface.
 // It decorates the request with specific agent headers
 func (rt *agentHeaderRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
-	req.Header.Add(portainer.PortainerAgentPublicKeyHeader, rt.publicKeyHeader)
-	req.Header.Add(portainer.PortainerAgentSignatureHeader, rt.signatureHeader)
+	req.Header.Set(portainer.PortainerAgentPublicKeyHeader, rt.publicKeyHeader)
+	req.Header.Set(portainer.PortainerAgentSignatureHeader, rt.signatureHeader)
 
 	return rt.roundTripper.RoundTrip(req)
 }

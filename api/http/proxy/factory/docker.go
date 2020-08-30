@@ -99,7 +99,7 @@ func (proxy *dockerLocalProxy) ServeHTTP(w http.ResponseWriter, r *http.Request)
 
 	for k, vv := range res.Header {
 		for _, v := range vv {
-			w.Header().Add(k, v)
+			w.Header().Set(k, v)
 		}
 	}
 
