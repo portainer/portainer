@@ -132,7 +132,49 @@
             </div>
 
             <div class="col-sm-12 form-section-title">
-              Metrics
+              Resources and Metrics
+            </div>
+
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                Enabling this feature will allow administrator to create or edit resources pools which over-subscribe the cluster's total available resources.
+              </span>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label class="control-label text-left">
+                  Enable resource over-commit
+                </label>
+                <label class="switch" style="margin-left: 20px;">
+                  <input type="checkbox" ng-change="ctrl.onChangeEnableResourceOverCommit()" ng-model="ctrl.formValues.EnableResourceOverCommit" /><i></i>
+                </label>
+
+                <p class="small text" ng-if="!ctrl.formValues.EnableResourceOverCommit">Total cluster's resources usage percentage</p>
+                <div class="input-group input-group-sm" ng-if="!ctrl.formValues.EnableResourceOverCommit">
+                  <input
+                    type="number"
+                    class="form-control"
+                    style="width: 100px;"
+                    name="resource_over_commit_percentage"
+                    min="0"
+                    max="100"
+                    ng-model="ctrl.formValues.ResourceOverCommitPercentage"
+                    required
+                  />
+                </div>
+                <div
+                  class="input-group input-group-sm"
+                  ng-show="kubernetesClusterSetupForm['resource_over_commit_percentage'].$invalid && !ctrl.formValues.EnableResourceOverCommit"
+                >
+                  <div class="small text-warning" style="margin-top: 5px;">
+                    <ng-messages for="kubernetesClusterSetupForm['resource_over_commit_percentage'].$error">
+                      <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Total cluster's resources usage percentage is required.</p>
+                      <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Total cluster's resources usage percentage must be greater than 0.</p>
+                      <p ng-message="max"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Total cluster's resources usage percentage must be smaller than 100.</p>
+                    </ng-messages>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div class="form-group">

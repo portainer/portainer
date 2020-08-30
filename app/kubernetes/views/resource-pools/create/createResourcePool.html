@@ -61,13 +61,18 @@
                 <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.HasQuota" /><i></i> </label>
               </div>
             </div>
-            <div class="form-group" ng-if="ctrl.formValues.HasQuota && !ctrl.isQuotaValid()">
+            <div class="form-group" ng-if="ctrl.formValues.HasQuota && ctrl.state.sliderMaxCpu <= 0 && ctrl.state.sliderMaxMemory <= 0">
+              <div class="col-sm-12 small text-warning">
+                <p><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Not enough resources to use resource assignment </p>
+              </div>
+            </div>
+            <div class="form-group" ng-if="ctrl.formValues.HasQuota && !ctrl.isQuotaValid() && !(ctrl.state.sliderMaxCpu <= 0 && ctrl.state.sliderMaxMemory <= 0)">
               <span class="col-sm-12 text-warning small">
                 <p> <i class="fa fa-exclamation-triangle" aria-hidden="true" style="margin-right: 2px;"></i> At least a single limit must be set for the quota to be valid. </p>
               </span>
             </div>
             <!-- !quotas-switch -->
-            <div ng-if="ctrl.formValues.HasQuota">
+            <div ng-if="ctrl.formValues.HasQuota && !(ctrl.state.sliderMaxCpu <= 0 && ctrl.state.sliderMaxMemory <= 0)">
               <div class="col-sm-12 form-section-title">
                 Resource limits
               </div>
@@ -77,11 +82,11 @@
                   <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
                     Memory
                   </label>
-                  <div class="col-sm-3">
+                  <div class="col-sm-3" ng-if="ctrl.state.sliderMaxMemory > 0">
                     <slider model="ctrl.formValues.MemoryLimit" floor="ctrl.defaults.MemoryLimit" ceil="ctrl.state.sliderMaxMemory" step="128" ng-if="ctrl.state.sliderMaxMemory">
                     </slider>
                   </div>
-                  <div class="col-sm-2">
+                  <div class="col-sm-2" ng-if="ctrl.state.sliderMaxMemory > 0">
                     <input
                       name="memory_limit"
                       type="number"
@@ -93,18 +98,21 @@
                       required
                     />
                   </div>
-                  <div class="col-sm-4">
+                  <div class="col-sm-4" ng-if="ctrl.state.sliderMaxMemory > 0">
                     <p class="small text-muted" style="margin-top: 7px;">
                       Maximum memory usage (<b>MB</b>)
                     </p>
                   </div>
                 </div>
-                <div class="form-group" ng-show="resourcePoolCreationForm.memory_limit.$invalid">
+                <div class="form-group" ng-show="resourcePoolCreationForm.memory_limit.$invalid || ctrl.state.sliderMaxMemory <= 0">
                   <div class="col-sm-12 small text-warning">
-                    <div ng-messages="resourcePoolCreationForm.pool_name.$error">
+                    <div ng-messages="resourcePoolCreationForm.pool_name.$error" ng-if="ctrl.state.sliderMaxMemory > 0">
                       <p
                         ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value must be between {{ ctrl.defaults.MemoryLimit }} and {{ ctrl.state.sliderMaxMemory }}
                       </p>
+                    </div>
+                    <div ng-if="ctrl.state.sliderMaxMemory <= 0">
+                      <p><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Not enough memory available for reservation </p>
                     </div>
                   </div>
                 </div>
@@ -114,14 +122,19 @@
                   <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
                     CPU
                   </label>
-                  <div class="col-sm-5">
+                  <div class="col-sm-5" ng-if="ctrl.state.sliderMaxCpu > 0">
                     <slider model="ctrl.formValues.CpuLimit" floor="ctrl.defaults.CpuLimit" ceil="ctrl.state.sliderMaxCpu" step="0.1" precision="2" ng-if="ctrl.state.sliderMaxCpu">
                     </slider>
                   </div>
-                  <div class="col-sm-4" style="margin-top: 20px;">
+                  <div class="col-sm-4" style="margin-top: 20px;" ng-if="ctrl.state.sliderMaxCpu > 0">
                     <p class="small text-muted">
                       Maximum CPU usage
                     </p>
+                  </div>
+                </div>
+                <div class="form-group" ng-if="ctrl.state.sliderMaxCpu <= 0">
+                  <div class="col-sm-12 small text-warning">
+                    <p><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Not enough CPU available for reservation </p>
                   </div>
                 </div>
                 <!-- !cpu-limit-input -->

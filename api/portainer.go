@@ -330,10 +330,12 @@ type (
 
 	// KubernetesConfiguration represents the configuration of a Kubernetes endpoint
 	KubernetesConfiguration struct {
-		UseLoadBalancer  bool                           `json:"UseLoadBalancer"`
-		UseServerMetrics bool                           `json:"UseServerMetrics"`
-		StorageClasses   []KubernetesStorageClassConfig `json:"StorageClasses"`
-		IngressClasses   []KubernetesIngressClassConfig `json:"IngressClasses"`
+		UseLoadBalancer              bool                           `json:"UseLoadBalancer"`
+		UseServerMetrics             bool                           `json:"UseServerMetrics"`
+		EnableResourceOverCommit     bool                           `json:"EnableResourceOverCommit"`
+		ResourceOverCommitPercentage int                            `json:"ResourceOverCommitPercentage"`
+		StorageClasses               []KubernetesStorageClassConfig `json:"StorageClasses"`
+		IngressClasses               []KubernetesIngressClassConfig `json:"IngressClasses"`
 	}
 
 	// KubernetesStorageClassConfig represents a Kubernetes Storage Class configuration

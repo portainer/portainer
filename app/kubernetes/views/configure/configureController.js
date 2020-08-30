@@ -85,11 +85,23 @@ class KubernetesConfigureController {
   }
   /* #endregion */
 
+  /* #region RESOURCES AND METRICS */
+
+  onChangeEnableResourceOverCommit() {
+    if (this.formValues.EnableResourceOverCommit) {
+      this.formValues.ResourceOverCommitPercentage = 80;
+    }
+  }
+
+  /* #endregion */
+
   /* #region  CONFIGURE */
   assignFormValuesToEndpoint(endpoint, storageClasses, ingressClasses) {
     endpoint.Kubernetes.Configuration.StorageClasses = storageClasses;
     endpoint.Kubernetes.Configuration.UseLoadBalancer = this.formValues.UseLoadBalancer;
     endpoint.Kubernetes.Configuration.UseServerMetrics = this.formValues.UseServerMetrics;
+    endpoint.Kubernetes.Configuration.EnableResourceOverCommit = this.formValues.EnableResourceOverCommit;
+    endpoint.Kubernetes.Configuration.ResourceOverCommitPercentage = this.formValues.ResourceOverCommitPercentage;
     endpoint.Kubernetes.Configuration.IngressClasses = ingressClasses;
   }
 
@@ -178,6 +190,8 @@ class KubernetesConfigureController {
     this.formValues = {
       UseLoadBalancer: false,
       UseServerMetrics: false,
+      EnableResourceOverCommit: false,
+      ResourceOverCommitPercentage: 80,
       IngressClasses: [],
     };
 
@@ -201,6 +215,8 @@ class KubernetesConfigureController {
 
       this.formValues.UseLoadBalancer = this.endpoint.Kubernetes.Configuration.UseLoadBalancer;
       this.formValues.UseServerMetrics = this.endpoint.Kubernetes.Configuration.UseServerMetrics;
+      this.formValues.EnableResourceOverCommit = this.endpoint.Kubernetes.Configuration.EnableResourceOverCommit;
+      this.formValues.ResourceOverCommitPercentage = this.endpoint.Kubernetes.Configuration.ResourceOverCommitPercentage;
       this.formValues.IngressClasses = _.map(this.endpoint.Kubernetes.Configuration.IngressClasses, (ic) => {
         ic.IsNew = false;
         ic.NeedsDeletion = false;

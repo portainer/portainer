@@ -153,6 +153,8 @@ class KubernetesCreateResourcePoolController {
         viewReady: false,
         isAlreadyExist: false,
         canUseIngress: endpoint.Kubernetes.Configuration.IngressClasses.length,
+        resourceOverCommitEnable: endpoint.Kubernetes.Configuration.EnableResourceOverCommit,
+        resourceOverCommitPercentage: endpoint.Kubernetes.Configuration.ResourceOverCommitPercentage,
         duplicates: {
           ingressHosts: new KubernetesFormValueDuplicate(),
         },
@@ -165,7 +167,28 @@ class KubernetesCreateResourcePoolController {
         this.state.sliderMaxCpu += item.CPU;
       });
       this.state.sliderMaxMemory = KubernetesResourceReservationHelper.megaBytesValue(this.state.sliderMaxMemory);
+
       await this.getResourcePools();
+
+      if (!this.state.resourceOverCommitEnable) {
+        const reservedResources = _.reduce(
+          this.resourcePools,
+          (acc, pool) => {
+            if (pool.Quota) {
+              acc.CPU += pool.Quota.CpuLimit;
+              acc.Memory += pool.Quota.MemoryLimit;
+            }
+            return acc;
+          },
+          { CPU: 0, Memory: 0 }
+        );
+        if (reservedResources.Memory) {
+          reservedResources.Memory = KubernetesResourceReservationHelper.megaBytesValue(reservedResources.Memory);
+        }
+        this.state.sliderMaxCpu = parseInt(((this.state.sliderMaxCpu * this.state.resourceOverCommitPercentage) / 100 - reservedResources.CPU) * 10) / 10;
+        this.state.sliderMaxMemory = parseInt((this.state.sliderMaxMemory * this.state.resourceOverCommitPercentage) / 100 - reservedResources.Memory);
+      }
+
       if (this.state.canUseIngress) {
         await this.getIngresses();
         const ingressClasses = endpoint.Kubernetes.Configuration.IngressClasses;
