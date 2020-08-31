@@ -3,14 +3,14 @@ import { KubernetesPortMapping, KubernetesPortMappingPort } from 'Kubernetes/mod
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
 import {
-  KubernetesApplicationConfigurationFormValueOverridenKeyTypes,
-  KubernetesApplicationEnvironmentVariableFormValue,
+  KubernetesApplicationAutoScalerFormValue,
   KubernetesApplicationConfigurationFormValue,
   KubernetesApplicationConfigurationFormValueOverridenKey,
+  KubernetesApplicationConfigurationFormValueOverridenKeyTypes,
+  KubernetesApplicationEnvironmentVariableFormValue,
   KubernetesApplicationPersistedFolderFormValue,
-  KubernetesApplicationPublishedPortFormValue,
-  KubernetesApplicationAutoScalerFormValue,
   KubernetesApplicationPlacementFormValue,
+  KubernetesApplicationPublishedPortFormValue,
 } from 'Kubernetes/models/application/formValues';
 import {
   KubernetesApplicationEnvConfigMapPayload,
@@ -23,13 +23,13 @@ import {
   KubernetesApplicationVolumeSecretPayload,
 } from 'Kubernetes/models/application/payloads';
 import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
-import { KubernetesApplicationPlacementTypes, KubernetesApplicationDeploymentTypes } from 'Kubernetes/models/application/models';
-import { KubernetesPodNodeAffinityNodeSelectorRequirementOperators, KubernetesPodAffinity } from 'Kubernetes/pod/models';
+import { KubernetesApplicationDeploymentTypes, KubernetesApplicationPlacementTypes } from 'Kubernetes/models/application/models';
+import { KubernetesPodAffinity, KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'Kubernetes/pod/models';
 import {
-  KubernetesNodeSelectorTermPayload,
-  KubernetesPreferredSchedulingTermPayload,
-  KubernetesPodNodeAffinityPayload,
   KubernetesNodeSelectorRequirementPayload,
+  KubernetesNodeSelectorTermPayload,
+  KubernetesPodNodeAffinityPayload,
+  KubernetesPreferredSchedulingTermPayload,
 } from 'Kubernetes/pod/payloads/affinities';
 
 class KubernetesApplicationHelper {
@@ -65,7 +65,7 @@ class KubernetesApplicationHelper {
   }
 
   static associateContainersAndApplication(app) {
-    if (!app.Pods) {
+    if (!app.Pods || app.Pods.length === 0) {
       return [];
     }
     const containers = app.Pods[0].Containers;
