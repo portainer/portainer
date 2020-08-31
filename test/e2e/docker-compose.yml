@@ -1,7 +1,7 @@
 version: '3'
 services:
   portainer:
-    image: portainerci/portainer:$PORTAINER_TAG
+    image: portainerci/portainer-ee:$PORTAINER_TAG
     container_name: e2e-portainer
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
