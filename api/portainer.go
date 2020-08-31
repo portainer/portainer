@@ -1124,8 +1124,8 @@ const (
 	DBVersion = 25
 	// AssetsServerURL represents the URL of the Portainer asset server
 	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
-	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
-	MessageOfTheDayURL = AssetsServerURL + "/motd.json"
+	// MessageOfTheDayURL represents the URL where Portainer EE MOTD message can be retrieved
+	MessageOfTheDayURL = AssetsServerURL + "/motd-ee.json"
 	// VersionCheckURL represents the URL used to retrieve the latest version of Portainer
 	VersionCheckURL = "https://api.github.com/repos/portainer/portainer/releases/latest"
 	// PortainerAgentHeader represents the name of the header available in any agent response
