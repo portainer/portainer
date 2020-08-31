@@ -63,7 +63,7 @@
             </div>
             <div class="form-group" ng-if="ctrl.formValues.HasQuota && ctrl.state.sliderMaxCpu <= 0 && ctrl.state.sliderMaxMemory <= 0">
               <div class="col-sm-12 small text-warning">
-                <p><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Not enough resources to use resource assignment </p>
+                <p><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Not enough resources available in the cluster to apply a resource reservation.</p>
               </div>
             </div>
             <div class="form-group" ng-if="ctrl.formValues.HasQuota && !ctrl.isQuotaValid() && !(ctrl.state.sliderMaxCpu <= 0 && ctrl.state.sliderMaxMemory <= 0)">
@@ -103,6 +103,12 @@
                       Maximum memory usage (<b>MB</b>)
                     </p>
                   </div>
+                  <div class="col-sm-9" ng-if="ctrl.state.sliderMaxMemory <= 0">
+                    <p class="small text-muted" style="margin-top: 27px;">
+                      <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true"></i> Not enough memory available in the cluster to apply a reservation. Please contact
+                      your cluster administrator.
+                    </p>
+                  </div>
                 </div>
                 <div class="form-group" ng-show="resourcePoolCreationForm.memory_limit.$invalid || ctrl.state.sliderMaxMemory <= 0">
                   <div class="col-sm-12 small text-warning">
@@ -110,9 +116,6 @@
                       <p
                         ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value must be between {{ ctrl.defaults.MemoryLimit }} and {{ ctrl.state.sliderMaxMemory }}
                       </p>
-                    </div>
-                    <div ng-if="ctrl.state.sliderMaxMemory <= 0">
-                      <p><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Not enough memory available for reservation </p>
                     </div>
                   </div>
                 </div>
@@ -131,10 +134,11 @@
                       Maximum CPU usage
                     </p>
                   </div>
-                </div>
-                <div class="form-group" ng-if="ctrl.state.sliderMaxCpu <= 0">
-                  <div class="col-sm-12 small text-warning">
-                    <p><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Not enough CPU available for reservation </p>
+                  <div class="col-sm-9" ng-if="ctrl.state.sliderMaxCpu <= 0">
+                    <p class="small text-muted" style="margin-top: 27px;">
+                      <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true"></i> Not enough CPU available in the cluster to apply a reservation. Please contact your
+                      cluster administrator.
+                    </p>
                   </div>
                 </div>
                 <!-- !cpu-limit-input -->
