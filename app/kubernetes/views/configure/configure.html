@@ -132,7 +132,52 @@
             </div>
 
             <div class="col-sm-12 form-section-title">
-              Metrics
+              Resources and Metrics
+            </div>
+
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                By disabling resource over-commit, you can specify a maximum amount of resource that can be reserved inside this cluster.
+                <p style="margin-top: 2px;">
+                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  Enabling resource over-commit will allow you to reserve more than the actual cluster capacity when creating resource pools.
+                </p>
+              </span>
+
+              <div class="col-sm-12">
+                <label class="control-label text-left">
+                  Enable resource over-commit
+                </label>
+                <label class="switch" style="margin-left: 20px;">
+                  <input type="checkbox" ng-change="ctrl.onChangeEnableResourceOverCommit()" ng-model="ctrl.formValues.EnableResourceOverCommit" /><i></i>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group" ng-if="!ctrl.formValues.EnableResourceOverCommit">
+              <label for="cluster_resource" class="col-sm-2 control-label text-left">Resource reservation limit (%)</label>
+              <div class="col-sm-10">
+                <input
+                  type="number"
+                  class="form-control"
+                  style="width: 100px;"
+                  name="resource_over_commit_percentage"
+                  min="0"
+                  max="100"
+                  ng-model="ctrl.formValues.ResourceOverCommitPercentage"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-group" ng-show="kubernetesClusterSetupForm['resource_over_commit_percentage'].$invalid && !ctrl.formValues.EnableResourceOverCommit">
+              <div class="col-sm-12 small text-warning">
+                <ng-messages for="kubernetesClusterSetupForm['resource_over_commit_percentage'].$error">
+                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Resource reservation limit is required.</p>
+                  <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Resource reservation limit must be greater than 0.</p>
+                  <p ng-message="max"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Resource reservation limit must be smaller than 100.</p>
+                </ng-messages>
+              </div>
             </div>
 
             <div class="form-group">

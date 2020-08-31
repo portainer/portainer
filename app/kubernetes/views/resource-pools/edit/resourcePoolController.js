@@ -311,6 +311,8 @@ class KubernetesResourcePoolController {
         viewReady: false,
         eventWarningCount: 0,
         canUseIngress: endpoint.Kubernetes.Configuration.IngressClasses.length,
+        resourceOverCommitEnable: endpoint.Kubernetes.Configuration.EnableResourceOverCommit,
+        resourceOverCommitPercentage: endpoint.Kubernetes.Configuration.ResourceOverCommitPercentage,
         duplicates: {
           ingressHosts: new KubernetesFormValueDuplicate(),
         },
@@ -320,9 +322,9 @@ class KubernetesResourcePoolController {
 
       const name = this.$transition$.params().id;
 
-      const [nodes, pool] = await Promise.all([this.KubernetesNodeService.get(), this.KubernetesResourcePoolService.get(name)]);
+      const [nodes, pools] = await Promise.all([this.KubernetesNodeService.get(), this.KubernetesResourcePoolService.get()]);
 
-      this.pool = pool;
+      this.pool = _.find(pools, { Namespace: { Name: name } });
 
       _.forEach(nodes, (item) => {
         this.state.sliderMaxMemory += filesizeParser(item.Memory);
@@ -330,7 +332,26 @@ class KubernetesResourcePoolController {
       });
       this.state.sliderMaxMemory = KubernetesResourceReservationHelper.megaBytesValue(this.state.sliderMaxMemory);
 
-      const quota = pool.Quota;
+      if (!this.state.resourceOverCommitEnable) {
+        const reservedResources = _.reduce(
+          pools,
+          (acc, pool) => {
+            if (pool.Quota && pool.Namespace.Name !== this.pool.Namespace.Name) {
+              acc.CPU += pool.Quota.CpuLimit;
+              acc.Memory += pool.Quota.MemoryLimit;
+            }
+            return acc;
+          },
+          { CPU: 0, Memory: 0 }
+        );
+        if (reservedResources.Memory) {
+          reservedResources.Memory = KubernetesResourceReservationHelper.megaBytesValue(reservedResources.Memory);
+        }
+        this.state.sliderMaxCpu = parseInt(((this.state.sliderMaxCpu * this.state.resourceOverCommitPercentage) / 100 - reservedResources.CPU) * 10) / 10;
+        this.state.sliderMaxMemory = parseInt((this.state.sliderMaxMemory * this.state.resourceOverCommitPercentage) / 100 - reservedResources.Memory);
+      }
+
+      const quota = this.pool.Quota;
       if (quota) {
         this.oldQuota = angular.copy(quota);
         this.formValues.HasQuota = true;
