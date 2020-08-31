@@ -33,7 +33,7 @@ class KubernetesVolumesDatatableController {
   }
 
   isDisplayed(item) {
-    return !this.isSystemNamespace(item) || this.showSystem;
+    return !this.isSystemNamespace(item) || this.settings.showSystem;
   }
 
   isExternalVolume(item) {
@@ -48,6 +48,7 @@ class KubernetesVolumesDatatableController {
     this.setDefaults();
     this.prepareTableFromDataset();
     this.isAdmin = this.Authentication.isAdmin();
+    this.settings.showSystem = false;
 
     this.state.orderBy = this.orderBy;
     var storedOrder = this.DatatableService.getDataTableOrder(this.tableKey);
@@ -76,8 +77,6 @@ class KubernetesVolumesDatatableController {
       this.settings.open = false;
     }
     this.onSettingsRepeaterChange();
-
-    this.settings.showSystem = false;
   }
 
   $onInit() {
