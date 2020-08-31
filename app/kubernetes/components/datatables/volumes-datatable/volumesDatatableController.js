@@ -33,7 +33,7 @@ class KubernetesVolumesDatatableController {
   }
 
   isDisplayed(item) {
-    return !this.isSystemNamespace(item) || this.showSystem;
+    return !this.isSystemNamespace(item) || this.settings.showSystem;
   }
 
   isExternalVolume(item) {
