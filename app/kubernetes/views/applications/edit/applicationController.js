@@ -40,6 +40,10 @@ function computeTolerations(nodes, application) {
 // Some operators require empty "values" field, some only one element in "values" field, etc
 
 function computeAffinities(nodes, application) {
+  if (!application.Pods || application.Pods.length === 0) {
+    return nodes;
+  }
+
   const pod = application.Pods[0];
   _.forEach(nodes, (n) => {
     if (pod.NodeSelector) {
