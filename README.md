@@ -28,6 +28,7 @@ Unlike the public demo, the playground sessions are deleted after 4 hours. Apart
 
 ## Getting started
 
+
 - [Deploy Portainer](https://www.portainer.io/installation/)
 - [Documentation](https://www.portainer.io/documentation/)
 
