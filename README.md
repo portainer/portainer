@@ -50,6 +50,12 @@ For community support: You can find more information about Portainer's community
 
 - Here at Portainer, we believe in [responsible disclosure](https://en.wikipedia.org/wiki/Responsible_disclosure) of security issues. If you have found a security issue, please report it to <security@portainer.io>.
 
+## Privacy
+
+**To make sure we focus our development effort in the right places we need to know what features get used most often. To give us this information we use [Matamo Analytics](https://matomo.org/), which is hosted in Germany and fully GDPR compliant.**
+
+When Portainer first starts, you are given the option to DISABLE analytics. If you **don't** choose to disable it, we collect anonymous usage as per [our privacy policy](https://www.portainer.io/documentation/in-app-analytics-and-privacy-policy/). **Please note**, there is no personally identifiable information sent or stored at any time and we only use the data to help us improve Portainer.
+
 ## Limitations
 
 Portainer supports "Current - 2 docker versions only. Prior versions may operate, however these are not supported.
