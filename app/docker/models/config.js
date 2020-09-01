@@ -18,7 +18,12 @@ export function ConfigViewModel(data) {
   this.Version = data.Version.Index;
   this.Name = data.Spec.Name;
   this.Labels = data.Spec.Labels;
-  this.Data = b64DecodeUnicode(data.Spec.Data);
+  try {
+    this.Data = b64DecodeUnicode(data.Spec.Data);
+  } except (e) {
+    console.error("Failed to decode config data for", this.name, ":", e);
+    this.Data = "Failed to decode config data.";
+  }
 
   if (data.Portainer && data.Portainer.ResourceControl) {
     this.ResourceControl = new ResourceControlViewModel(data.Portainer.ResourceControl);
