@@ -545,6 +545,9 @@ type (
 	// SnapshotJob represents a scheduled job that can create endpoint snapshots
 	SnapshotJob struct{}
 
+	// SoftwareEdition represents an edition of Portainer
+	SoftwareEdition int
+
 	// Stack represents a Docker stack created via docker stack deploy
 	Stack struct {
 		ID              StackID          `json:"Id"`
@@ -1106,6 +1109,8 @@ type (
 		StoreDBVersion(version int) error
 		InstanceID() (string, error)
 		StoreInstanceID(ID string) error
+		Edition() (SoftwareEdition, error)
+		StoreEdition(SoftwareEdition) error
 	}
 
 	// WebhookService represents a service for managing webhook data.
@@ -1122,8 +1127,10 @@ type (
 const (
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "2.0.0"
-	// DBVersion is the version number of the Portainer database
+	// DBVersion is the version number of the Portainer CE database
 	DBVersion = 25
+	// DBVersionBE is the version number of the Portainer EE database
+	DBVersionBE = 1
 	// AssetsServerURL represents the URL of the Portainer asset server
 	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer EE MOTD message can be retrieved
@@ -1245,6 +1252,14 @@ const (
 	TeamLeader
 	// TeamMember represents a member role inside a team
 	TeamMember
+)
+
+const (
+	_ SoftwareEdition = iota
+	// PortainerCE represents the community edition of Portainer
+	PortainerCE
+	// PortainerBE represents the business edition of Portainer
+	PortainerBE
 )
 
 const (
