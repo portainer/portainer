@@ -1,5 +1,5 @@
 import { RegistryTypes } from '@/portainer/models/registryTypes';
-import { RegistryDefaultModel } from '../../../models/registry';
+import { RegistryDefaultModel } from '@/portainer/models/registry';
 
 angular.module('portainer.app').controller('CreateRegistryController', [
   '$scope',

@@ -58,7 +58,10 @@ angular.module('portainer.app').factory('RegistryGitlabService', [
           page: 1,
         };
         const data = await _getRepositoriesPage(params, []);
-        return _.map(data, (r) => new RegistryRepositoryGitlabViewModel(r));
+        return _.filter(
+          _.map(data, (r) => new RegistryRepositoryGitlabViewModel(r)),
+          (r) => r.TagsCount > 0
+        );
       } catch (error) {
         throw { msg: 'Unable to retrieve repositories', err: error };
       }
