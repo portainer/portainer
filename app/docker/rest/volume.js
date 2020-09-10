@@ -18,7 +18,7 @@ angular.module('portainer.docker').factory('Volume', [
         endpointId: EndpointProvider.endpointID,
       },
       {
-        query: { method: 'GET', interceptor: VolumesInterceptor, timeout: 15000 },
+        query: { method: 'GET', interceptor: VolumesInterceptor },
         get: { method: 'GET', params: { id: '@id' } },
         create: {
           method: 'POST',
