@@ -1,1 +1,7 @@
-{ "video": false }
+{ 
+    "baseUrl": "http://e2e-portainer:9000",
+    "testFiles": [
+      "portainer/init.spec.js", "portainer/rbac.spec.js"
+    ],
+    "video": false 
+}
