@@ -1,7 +1,7 @@
 version: '3'
 services:
   portainer:
-    image: portainerci/portainer-ee:$PORTAINER_TAG
+    image: wconquest/portainer-$CODEBASE:$PORTAINER_TAG
     container_name: e2e-portainer
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -9,7 +9,7 @@ services:
       - e2e-ci
 
   cypress:
-    image: cypress/included:3.5.0
+    image: cypress/included:5.1.0
     container_name: e2e-cypress
     command: --browser chrome
     depends_on:

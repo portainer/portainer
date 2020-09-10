@@ -3,7 +3,7 @@ services:
   cypress:
     image: cypress/included:3.5.0
     container_name: e2e-cypress
-    command: --record --browser chrome
+    command: --browser chrome
     depends_on:
       - portainer
     working_dir: /e2e
