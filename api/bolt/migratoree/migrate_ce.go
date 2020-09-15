@@ -6,7 +6,7 @@ import (
 
 // MigrateFromCEdbv25 will migrate the db from latest ce version to latest ee version
 func (m *Migrator) MigrateFromCEdbv25() error {
-	err := m.versionService.StoreDBVersion(portainer.DBVersionBE)
+	err := m.versionService.StoreDBVersion(portainer.DBVersionEE)
 	if err != nil {
 		return err
 	}

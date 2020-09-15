@@ -171,7 +171,7 @@ func (store *Store) MigrateData() error {
 		version = portainer.DBVersion
 	}
 
-	if edition < portainer.PortainerBE {
+	if edition < portainer.PortainerEE {
 		migratorParams := &migratoree.Parameters{
 			CurrentEdition:  edition,
 			DB:              store.db,
@@ -180,18 +180,18 @@ func (store *Store) MigrateData() error {
 		}
 		migrator := migratoree.NewMigrator(migratorParams)
 
-		log.Printf("[INFO] [bolt, migrate] [message: Migrating CE database version %d to BE database version %d.]", version, portainer.DBVersionBE)
+		log.Printf("[INFO] [bolt, migrate] [message: Migrating CE database version %d to EE database version %d.]", version, portainer.DBVersionEE)
 		err = migrator.MigrateFromCEdbv25()
 		if err != nil {
 			log.Printf("[ERROR] [bolt, migrate] [message: An error occurred during database migration: %s]", err)
 			return err
 		}
 
-		version = portainer.DBVersionBE
-		edition = portainer.PortainerBE
+		version = portainer.DBVersionEE
+		edition = portainer.PortainerEE
 	}
 
-	if edition == portainer.PortainerBE && version < portainer.DBVersionBE {
+	if edition == portainer.PortainerBE && version < portainer.DBVersionEE {
 		migratorParams := &migratoree.Parameters{
 			CurrentEdition:  edition,
 			DB:              store.db,
@@ -200,14 +200,14 @@ func (store *Store) MigrateData() error {
 		}
 		migrator := migratoree.NewMigrator(migratorParams)
 
-		log.Printf("[INFO] [bolt, migrate] Migrating EE database from version %v to %v.", version, portainer.DBVersionBE)
+		log.Printf("[INFO] [bolt, migrate] Migrating EE database from version %v to %v.", version, portainer.DBVersionEE)
 		err = migrator.Migrate()
 		if err != nil {
 			log.Printf("[ERROR] [bolt, migrate] [message: An error occurred during database migration: %s]", err)
 			return err
 		}
 
-		version = portainer.DBVersionBE
+		version = portainer.DBVersionEE
 	}
 
 	return nil

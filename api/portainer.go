@@ -1127,8 +1127,8 @@ const (
 	APIVersion = "2.0.0"
 	// DBVersion is the version number of the Portainer CE database
 	DBVersion = 25
-	// DBVersionBE is the version number of the Portainer EE database
-	DBVersionBE = 1
+	// DBVersionEE is the version number of the Portainer EE database
+	DBVersionEE = 1
 	// AssetsServerURL represents the URL of the Portainer asset server
 	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
@@ -1258,6 +1258,8 @@ const (
 	PortainerCE
 	// PortainerBE represents the business edition of Portainer
 	PortainerBE
+	// PortainerEE represents the business edition of Portainer
+	PortainerEE
 )
 
 const (
