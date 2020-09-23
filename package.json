@@ -102,6 +102,8 @@
     "clean-webpack-plugin": "^0.1.19",
     "css-loader": "^1.0.0",
     "cssnano": "^3.10.0",
+    "cypress": "^5.2.0",
+    "cypress-wait-until": "^1.7.1",
     "eslint": "5.16.0",
     "eslint-config-prettier": "^6.10.1",
     "eslint-loader": "^2.1.2",
