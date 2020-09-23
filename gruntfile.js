@@ -211,9 +211,9 @@ function shell_download_kompose_binary(p, a) {
   } else {
     return [
       'powershell -Command "& {if (Get-Item -Path dist/kompose.exe) {',
-      'Write-Host "Docker binary exists"',
+      'Write-Host "Kompose binary exists"',
       '} else {',
-      '& ".\\build\\download_kompose_binary.ps1" -docker_version ' + binaryVersion + '',
+      '& ".\\build\\download_kompose_binary.ps1" -kompose_version ' + binaryVersion + '',
       '}}"',
     ].join(' ');
   }
@@ -227,9 +227,9 @@ function shell_download_kubectl_binary(p, a) {
   } else {
     return [
       'powershell -Command "& {if (Get-Item -Path dist/kubectl.exe) {',
-      'Write-Host "Docker binary exists"',
+      'Write-Host "Kubectl binary exists"',
       '} else {',
-      '& ".\\build\\download_kubectl_binary.ps1" -docker_version ' + binaryVersion + '',
+      '& ".\\build\\download_kubectl_binary.ps1" -kubectl_version ' + binaryVersion + '',
       '}}"',
     ].join(' ');
   }
