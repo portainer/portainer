@@ -194,7 +194,7 @@ function shell_download_docker_binary(p, a) {
     return ['if [ -f dist/docker ]; then', 'echo "docker binary exists";', 'else', 'build/download_docker_binary.sh ' + ip + ' ' + ia + ' ' + binaryVersion + ';', 'fi'].join(' ');
   } else {
     return [
-      'powershell -Command "& {if (Test-Path -Path "dist/docker.exe")) {',
+      'powershell -Command "& {if (Test-Path -Path "dist/docker.exe") {',
       'Write-Host "Skipping download, Docker binary exists"',
       'return',
       '} else {',
