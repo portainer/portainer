@@ -194,7 +194,7 @@ function shell_download_docker_binary(p, a) {
     return ['if [ -f dist/docker ]; then', 'echo "docker binary exists";', 'else', 'build/download_docker_binary.sh ' + ip + ' ' + ia + ' ' + binaryVersion + ';', 'fi'].join(' ');
   } else {
     return [
-      'powershell -Command "& {if (Test-Path(dist/docker.exe)) {',
+      'powershell -Command "& {if (Test-Path -Path "dist/docker.exe")) {',
       'Write-Host "Skipping download, Docker binary exists"',
       'return',
       '} else {',
@@ -211,7 +211,7 @@ function shell_download_kompose_binary(p, a) {
     return ['if [ -f dist/kompose ]; then', 'echo "kompose binary exists";', 'else', 'build/download_kompose_binary.sh ' + p + ' ' + a + ' ' + binaryVersion + ';', 'fi'].join(' ');
   } else {
     return [
-      'powershell -Command "& {if (Test-Path(dist/kompose.exe)) {',
+      'powershell -Command "& {if (Test-Path -Path "dist/kompose.exe") {',
       'Write-Host "Skipping download, Kompose binary exists"',
       '} else {',
       '& ".\\build\\download_kompose_binary.ps1" -kompose_version ' + binaryVersion + '',
@@ -227,7 +227,7 @@ function shell_download_kubectl_binary(p, a) {
     return ['if [ -f dist/kubectl ]; then', 'echo "kubectl binary exists";', 'else', 'build/download_kubectl_binary.sh ' + p + ' ' + a + ' ' + binaryVersion + ';', 'fi'].join(' ');
   } else {
     return [
-      'powershell -Command "& {if (Test-Path(dist/kubectl.exe)) {',
+      'powershell -Command "& {if (Test-Path -Path "dist/kubectl.exe")") {',
       'Write-Host "Skipping download, Kubectl binary exists"',
       '} else {',
       '& ".\\build\\download_kubectl_binary.ps1" -kubectl_version ' + binaryVersion + '',
