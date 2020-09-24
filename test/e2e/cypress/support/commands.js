@@ -564,7 +564,7 @@ Cypress.Commands.add('modifyResources', (location, action) => {
   }
 });
 
-Cypress.Commands.add('clickLink', () => {
+Cypress.Commands.add('clickLink', (label) => {
   cy.waitUntil(() => cy.contains('a', label)).click();
 });
 
