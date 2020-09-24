@@ -213,6 +213,7 @@ function shell_download_kompose_binary(p, a) {
     return [
       'powershell -Command "& {if (Test-Path -Path "dist/kompose.exe") {',
       'Write-Host "Skipping download, Kompose binary exists"',
+      'return',
       '} else {',
       '& ".\\build\\download_kompose_binary.ps1" -kompose_version ' + binaryVersion + '',
       '}}"',
@@ -227,8 +228,9 @@ function shell_download_kubectl_binary(p, a) {
     return ['if [ -f dist/kubectl ]; then', 'echo "kubectl binary exists";', 'else', 'build/download_kubectl_binary.sh ' + p + ' ' + a + ' ' + binaryVersion + ';', 'fi'].join(' ');
   } else {
     return [
-      'powershell -Command "& {if (Test-Path -Path "dist/kubectl.exe")") {',
+      'powershell -Command "& {if (Test-Path -Path "dist/kubectl.exe") {',
       'Write-Host "Skipping download, Kubectl binary exists"',
+      'return',
       '} else {',
       '& ".\\build\\download_kubectl_binary.ps1" -kubectl_version ' + binaryVersion + '',
       '}}"',
