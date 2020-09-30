@@ -29,7 +29,7 @@ Unlike the public demo, the playground sessions are deleted after 4 hours. Apart
 ## Getting started
 
 - [Deploy Portainer](https://www.portainer.io/installation/)
-- [Documentation](https://www.portainer.io/documentation/)
+- [Documentation](https://documentation.portainer.io)
 
 ## Getting help
 
@@ -38,7 +38,7 @@ For FORMAL Support, please purchase a support subscription from here: https://ww
 For community support: You can find more information about Portainer's community support framework policy here: https://www.portainer.io/2019/04/portainer-support-policy/
 
 - Issues: https://github.com/portainer/portainer/issues
-- FAQ: https://www.portainer.io/documentation/faqs/
+- FAQ: https://documentation.portainer.io
 - Slack (chat): https://portainer.io/slack/
 
 ## Reporting bugs and contributing
