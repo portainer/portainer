@@ -8,6 +8,8 @@ angular.module('portainer.app').controller('SidebarController', [
   'UserService',
   'EndpointProvider',
   function ($q, $scope, $transitions, StateManager, Notifications, Authentication, UserService, EndpointProvider) {
+    const defaultTitle = document.title;
+
     function checkPermissions(memberships) {
       var isLeader = false;
       angular.forEach(memberships, function (membership) {
@@ -52,6 +54,10 @@ angular.module('portainer.app').controller('SidebarController', [
 
     $transitions.onEnter({}, async () => {
       $scope.showStacks = await shouldShowStacks();
+
+      if ($scope.applicationState.endpoint.name) {
+        document.title = `${defaultTitle} | ${$scope.applicationState.endpoint.name}`;
+      }
     });
   },
 ]);
