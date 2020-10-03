@@ -8,13 +8,17 @@
             <div class="col-sm-12">
               <label for="tls" class="control-label text-left">
                 Auto-refresh logs
-                <portainer-tooltip position="bottom" message="Disabling this option allows you to pause the log collection process and the auto-scrolling."></portainer-tooltip>
+                <portainer-tooltip
+                  position="bottom"
+                  message="Disabling this option allows you to pause the log collection process and the auto-scrolling. If a container is not running, this will be disabled by default."
+                ></portainer-tooltip>
               </label>
               <label class="switch" style="margin-left: 20px;">
                 <input
                   type="checkbox"
+                  ng-init="$ctrl.state.logCollection = $ctrl.containerRunning"
                   ng-model="$ctrl.state.logCollection"
-                  ng-change="$ctrl.state.autoScroll = $ctrl.state.logCollection; $ctrl.logCollectionChange($ctrl.state.logCollection)"
+                  ng-change="$ctrl.state.logCollection = $ctrl.state.logCollection && $ctrl.containerRunning; $ctrl.state.autoScroll = $ctrl.state.logCollection; $ctrl.logCollectionChange($ctrl.state.logCollection)"
                 /><i></i>
               </label>
             </div>
