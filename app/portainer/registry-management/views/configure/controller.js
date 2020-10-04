@@ -2,6 +2,7 @@ import { RegistryTypes } from '@/portainer/registry-management/models/registryTy
 import { RegistryManagementConfigurationDefaultModel } from '@/portainer/models/registry';
 
 export class ConfigureRegistryController {
+  /* @ngInject */
   constructor($async, $state, RegistryService, RegistryServiceSelector, Notifications) {
     Object.assign(this, { $async, $state, RegistryService, RegistryServiceSelector, Notifications });
 
