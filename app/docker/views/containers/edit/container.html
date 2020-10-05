@@ -244,9 +244,9 @@
               <td>ENV</td>
               <td>
                 <table class="table table-bordered table-condensed">
-                  <tr ng-repeat="var in container.Config.Env track by $index">
-                    <td>{{ var|key: '=' }}</td>
-                    <td>{{ var|value: '=' }}</td>
+                  <tr ng-repeat="pair in containerEnv">
+                    <td>{{ pair.key }}</td>
+                    <td>{{ pair.value }}</td>
                   </tr>
                 </table>
               </td>

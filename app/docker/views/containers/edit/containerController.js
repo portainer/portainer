@@ -69,6 +69,10 @@ angular.module('portainer.docker').controller('ContainerController', [
         .then(function success(data) {
           var container = data;
           $scope.container = container;
+          $scope.containerEnv = container.Config.Env.map((pair) => {
+            const [key, value] = pair.split('=');
+            return { key, value };
+          });
           $scope.container.edit = false;
           $scope.container.newContainerName = $filter('trimcontainername')(container.Name);
 
