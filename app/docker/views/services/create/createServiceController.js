@@ -589,8 +589,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
 
       const settings = await SettingsService.publicSettings();
       const { AllowBindMountsForRegularUsers } = settings;
-
-      return isAdmin || AllowBindMountsForRegularUsers;
+      return isAdmin || AllowBindMountsForRegularUsers || Authentication.hasAuthorizations(['EndpointResourcesAccess']);
     }
   },
 ]);

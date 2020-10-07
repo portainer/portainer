@@ -91,7 +91,7 @@ angular.module('portainer.docker').controller('DashboardController', [
       const isAdmin = Authentication.isAdmin();
       const { allowStackManagementForRegularUsers } = $scope.applicationState.application;
 
-      return isAdmin || allowStackManagementForRegularUsers;
+      return isAdmin || allowStackManagementForRegularUsers || Authentication.hasAuthorizations(['EndpointResourcesAccess']);
     }
 
     initView();

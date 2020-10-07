@@ -7,7 +7,8 @@ angular.module('portainer.app').factory('Authentication', [
   'LocalStorage',
   'StateManager',
   'EndpointProvider',
-  function AuthenticationFactory($async, $state, Auth, OAuth, jwtHelper, LocalStorage, StateManager, EndpointProvider) {
+  'UserService',
+  function AuthenticationFactory($async, $state, Auth, OAuth, jwtHelper, LocalStorage, StateManager, EndpointProvider, UserService) {
     'use strict';
 
     var service = {};
@@ -20,6 +21,7 @@ angular.module('portainer.app').factory('Authentication', [
     service.isAuthenticated = isAuthenticated;
     service.getUserDetails = getUserDetails;
     service.isAdmin = isAdmin;
+    service.hasAuthorizations = hasAuthorizations;
 
     async function initAsync() {
       try {
@@ -79,12 +81,19 @@ angular.module('portainer.app').factory('Authentication', [
       return user;
     }
 
+    async function retrievePermissions() {
+      const data = await UserService.user(user.ID);
+      user.endpointAuthorizations = data.EndpointAuthorizations;
+      user.portainerAuthorizations = data.PortainerAuthorizations;
+    }
+
     async function setUser(jwt) {
       LocalStorage.storeJWT(jwt);
       var tokenPayload = jwtHelper.decodeToken(jwt);
       user.username = tokenPayload.username;
       user.ID = tokenPayload.id;
       user.role = tokenPayload.role;
+      await retrievePermissions();
     }
 
     function isAdmin() {
@@ -92,6 +101,18 @@ angular.module('portainer.app').factory('Authentication', [
         return true;
       }
       return false;
+    }
+
+    function hasAuthorizations(authorizations) {
+      const endpointId = EndpointProvider.endpointID();
+      if (isAdmin()) {
+        return true;
+      }
+      if (!user.endpointAuthorizations || !user.endpointAuthorizations[endpointId]) {
+        return false;
+      }
+      const userEndpointAuthorizations = user.endpointAuthorizations[endpointId];
+      return authorizations.some((authorization) => userEndpointAuthorizations[authorization]);
     }
 
     return service;

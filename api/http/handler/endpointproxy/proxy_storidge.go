@@ -27,7 +27,7 @@ func (handler *Handler) proxyRequestsToStoridgeAPI(w http.ResponseWriter, r *htt
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
-	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
+	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint, false)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
 	}

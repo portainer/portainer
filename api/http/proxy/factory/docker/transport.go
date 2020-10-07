@@ -406,6 +406,11 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 	}
 
 	if tokenData.Role != portainer.AdministratorRole {
+		user, err := transport.dataStore.User().User(tokenData.ID)
+		if err != nil {
+			return nil, err
+		}
+
 		if volumeBrowseRestrictionCheck {
 			settings, err := transport.dataStore.Settings().Settings()
 			if err != nil {
@@ -413,8 +418,18 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 			}
 
 			if !settings.AllowVolumeBrowserForRegularUsers {
-				return responseutils.WriteAccessDeniedResponse()
+				// Return access denied for all roles except endpoint-administrator
+				_, userCanBrowse := user.EndpointAuthorizations[transport.endpoint.ID][portainer.OperationDockerAgentBrowseList]
+				if !userCanBrowse {
+					return responseutils.WriteAccessDeniedResponse()
+				}
 			}
+		}
+
+		_, endpointResourceAccess := user.EndpointAuthorizations[transport.endpoint.ID][portainer.EndpointResourcesAccess]
+
+		if endpointResourceAccess {
+			return transport.executeDockerRequest(request)
 		}
 
 		teamMemberships, err := transport.dataStore.TeamMembership().TeamMembershipsByUserID(tokenData.ID)
@@ -678,5 +693,16 @@ func (transport *Transport) isAdminOrEndpointAdmin(request *http.Request) (bool,
 		return false, err
 	}
 
-	return tokenData.Role == portainer.AdministratorRole, nil
+	if tokenData.Role == portainer.AdministratorRole {
+		return true, nil
+	}
+
+	user, err := transport.dataStore.User().User(tokenData.ID)
+	if err != nil {
+		return false, err
+	}
+
+	_, endpointResourceAccess := user.EndpointAuthorizations[portainer.EndpointID(transport.endpoint.ID)][portainer.EndpointResourcesAccess]
+
+	return endpointResourceAccess, nil
 }

@@ -43,27 +43,20 @@ func (bouncer *RequestBouncer) PublicAccess(h http.Handler) http.Handler {
 	return h
 }
 
-// AdminAccess defines a security check for API endpoints that require an authorization check.
-// Authentication is required to access these endpoints.
-// The administrator role is required to use these endpoints.
-// The request context will be enhanced with a RestrictedRequestContext object
-// that might be used later to inside the API operation for extra authorization validation
-// and resource filtering.
+// AdminAccess is an alias for RestrictedAddress
+// It's not removed as it's used across our codebase and removing will cause conflicts with CE
 func (bouncer *RequestBouncer) AdminAccess(h http.Handler) http.Handler {
-	h = bouncer.mwUpgradeToRestrictedRequest(h)
-	h = bouncer.mwCheckPortainerAuthorizations(h, true)
-	h = bouncer.mwAuthenticatedUser(h)
-	return h
+	return bouncer.RestrictedAccess(h)
 }
 
 // RestrictedAccess defines a security check for restricted API endpoints.
-// Authentication is required to access these endpoints.
+// Authentication and authorizations are required to access these endpoints.
 // The request context will be enhanced with a RestrictedRequestContext object
 // that might be used later to inside the API operation for extra authorization validation
 // and resource filtering.
 func (bouncer *RequestBouncer) RestrictedAccess(h http.Handler) http.Handler {
 	h = bouncer.mwUpgradeToRestrictedRequest(h)
-	h = bouncer.mwCheckPortainerAuthorizations(h, false)
+	h = bouncer.mwCheckPortainerAuthorizations(h)
 	h = bouncer.mwAuthenticatedUser(h)
 	return h
 }
@@ -81,9 +74,10 @@ func (bouncer *RequestBouncer) AuthenticatedAccess(h http.Handler) http.Handler 
 
 // AuthorizedEndpointOperation retrieves the JWT token from the request context and verifies
 // that the user can access the specified endpoint.
+// If the authorizationCheck flag is set, it will also validate that the user can execute the specified operation.
 // An error is returned when access to the endpoint is denied or if the user do not have the required
 // authorization to execute the operation.
-func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endpoint *portainer.Endpoint) error {
+func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endpoint *portainer.Endpoint, authorizationCheck bool) error {
 	tokenData, err := RetrieveTokenData(r)
 	if err != nil {
 		return err
@@ -107,6 +101,13 @@ func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endp
 		return httperrors.ErrEndpointAccessDenied
 	}
 
+	if authorizationCheck {
+		err = bouncer.checkEndpointOperationAuthorization(r, endpoint)
+		if err != nil {
+			return ErrAuthorizationRequired
+		}
+	}
+
 	return nil
 }
 
@@ -123,6 +124,34 @@ func (bouncer *RequestBouncer) AuthorizedEdgeEndpointOperation(r *http.Request, 
 
 	if endpoint.EdgeID != "" && endpoint.EdgeID != edgeIdentifier {
 		return errors.New("invalid Edge identifier")
+	}
+
+	return nil
+}
+
+func (bouncer *RequestBouncer) checkEndpointOperationAuthorization(r *http.Request, endpoint *portainer.Endpoint) error {
+	tokenData, err := RetrieveTokenData(r)
+	if err != nil {
+		return err
+	}
+
+	if tokenData.Role == portainer.AdministratorRole {
+		return nil
+	}
+
+	user, err := bouncer.dataStore.User().User(tokenData.ID)
+	if err != nil {
+		return err
+	}
+
+	apiOperation := &portainer.APIOperationAuthorizationRequest{
+		Path:           r.URL.String(),
+		Method:         r.Method,
+		Authorizations: user.EndpointAuthorizations[endpoint.ID],
+	}
+
+	if !authorizedOperation(apiOperation) {
+		return errors.New("Unauthorized")
 	}
 
 	return nil
@@ -161,9 +190,7 @@ func (bouncer *RequestBouncer) mwAuthenticatedUser(h http.Handler) http.Handler 
 
 // mwCheckPortainerAuthorizations will verify that the user has the required authorization to access
 // a specific API endpoint.
-// If the administratorOnly flag is specified, this will prevent non-admin
-// users from accessing the endpoint.
-func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler, administratorOnly bool) http.Handler {
+func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokenData, err := RetrieveTokenData(r)
 		if err != nil {
@@ -176,17 +203,23 @@ func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler,
 			return
 		}
 
-		if administratorOnly {
-			httperror.WriteError(w, http.StatusForbidden, "Access denied", httperrors.ErrUnauthorized)
-			return
-		}
-
-		_, err = bouncer.dataStore.User().User(tokenData.ID)
+		user, err := bouncer.dataStore.User().User(tokenData.ID)
 		if err != nil && err == bolterrors.ErrObjectNotFound {
 			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", httperrors.ErrUnauthorized)
 			return
 		} else if err != nil {
 			httperror.WriteError(w, http.StatusInternalServerError, "Unable to retrieve user details from the database", err)
+			return
+		}
+
+		apiOperation := &portainer.APIOperationAuthorizationRequest{
+			Path:           r.URL.String(),
+			Method:         r.Method,
+			Authorizations: user.PortainerAuthorizations,
+		}
+
+		if !authorizedOperation(apiOperation) {
+			httperror.WriteError(w, http.StatusForbidden, "Access denied", ErrAuthorizationRequired)
 			return
 		}
 

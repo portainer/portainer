@@ -27,7 +27,14 @@
               </span>
             </div>
           </div>
-
+          <div class="form-group" ng-if="ctrl.entityType !== 'registry'">
+            <label class="col-sm-3 col-lg-2 control-label text-left">
+              Role
+            </label>
+            <div class="col-sm-9 col-lg-4">
+              <select class="form-control" ng-model="ctrl.formValues.selectedRole" ng-options="role.Name for role in ctrl.roles"> </select>
+            </div>
+          </div>
           <!-- actions -->
           <div class="form-group">
             <div class="col-sm-12">
@@ -57,6 +64,9 @@
       title-icon="fa-user-lock"
       table-key="{{ 'access_' + ctrl.entityType }}"
       order-by="Name"
+      is-update-enabled="ctrl.entityType !== 'registry'"
+      show-roles="ctrl.entityType !== 'registry'"
+      roles="ctrl.roles"
       inherit-from="ctrl.inheritFrom"
       dataset="ctrl.authorizedUsersAndTeams"
       update-action="ctrl.updateAction"

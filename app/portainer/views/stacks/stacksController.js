@@ -56,7 +56,7 @@ function StacksController($scope, $state, Notifications, StackService, ModalServ
 
   async function loadCreateEnabled() {
     const appState = StateManager.getState().application;
-    return appState.allowStackManagementForRegularUsers || Authentication.isAdmin();
+    return appState.allowStackManagementForRegularUsers || Authentication.isAdmin() || Authentication.hasAuthorizations(['EndpointResourcesAccess']);
   }
 
   async function initView() {

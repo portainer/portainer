@@ -11,6 +11,7 @@ import (
 	"github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
+	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 type oauthPayload struct {
@@ -74,8 +75,9 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 
 	if user == nil {
 		user = &portainer.User{
-			Username: username,
-			Role:     portainer.StandardUserRole,
+			Username:                username,
+			Role:                    portainer.StandardUserRole,
+			PortainerAuthorizations: authorization.DefaultPortainerAuthorizations(),
 		}
 
 		err = handler.DataStore.User().CreateUser(user)
@@ -96,6 +98,10 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 			}
 		}
 
+		err = handler.AuthorizationService.UpdateUsersAuthorizations()
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
+		}
 	}
 
 	return handler.writeToken(w, user)

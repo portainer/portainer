@@ -81,7 +81,9 @@ func (handler *Handler) userCanAccessStack(securityContext *security.RestrictedR
 func (handler *Handler) userIsAdminOrEndpointAdmin(user *portainer.User, endpointID portainer.EndpointID) (bool, error) {
 	isAdmin := user.Role == portainer.AdministratorRole
 
-	return isAdmin, nil
+	_, endpointResourceAccess := user.EndpointAuthorizations[portainer.EndpointID(endpointID)][portainer.EndpointResourcesAccess]
+
+	return isAdmin || endpointResourceAccess, nil
 }
 
 func (handler *Handler) userCanCreateStack(securityContext *security.RestrictedRequestContext, endpointID portainer.EndpointID) (bool, error) {

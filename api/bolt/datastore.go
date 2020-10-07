@@ -176,7 +176,12 @@ func (store *Store) MigrateData() error {
 			CurrentEdition:  edition,
 			DB:              store.db,
 			DatabaseVersion: version,
-			VersionService:  store.VersionService,
+
+			AuthorizationService: authorization.NewService(store),
+			EndpointGroupService: store.EndpointGroupService,
+			EndpointService:      store.EndpointService,
+			ExtensionService:     store.ExtensionService,
+			VersionService:       store.VersionService,
 		}
 		migrator := migratoree.NewMigrator(migratorParams)
 
@@ -196,7 +201,12 @@ func (store *Store) MigrateData() error {
 			CurrentEdition:  edition,
 			DB:              store.db,
 			DatabaseVersion: version,
-			VersionService:  store.VersionService,
+
+			AuthorizationService: authorization.NewService(store),
+			EndpointGroupService: store.EndpointGroupService,
+			EndpointService:      store.EndpointService,
+			ExtensionService:     store.ExtensionService,
+			VersionService:       store.VersionService,
 		}
 		migrator := migratoree.NewMigrator(migratorParams)
 

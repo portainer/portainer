@@ -7,6 +7,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 func hideFields(settings *portainer.Settings) {
@@ -17,11 +18,12 @@ func hideFields(settings *portainer.Settings) {
 // Handler is the HTTP handler used to handle settings operations.
 type Handler struct {
 	*mux.Router
-	DataStore       portainer.DataStore
-	FileService     portainer.FileService
-	JWTService      portainer.JWTService
-	LDAPService     portainer.LDAPService
-	SnapshotService portainer.SnapshotService
+	AuthorizationService *authorization.Service
+	DataStore            portainer.DataStore
+	FileService          portainer.FileService
+	JWTService           portainer.JWTService
+	LDAPService          portainer.LDAPService
+	SnapshotService      portainer.SnapshotService
 }
 
 // NewHandler creates a handler to manage settings operations.

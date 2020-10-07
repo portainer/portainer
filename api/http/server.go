@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"time"
 
-	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/handler"
@@ -39,6 +39,7 @@ import (
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
@@ -70,6 +71,7 @@ type Server struct {
 
 // Start starts the HTTP server
 func (server *Server) Start() error {
+	authorizationService := authorization.NewService(server.DataStore)
 	kubernetesTokenCacheManager := kubernetes.NewTokenCacheManager()
 	proxyManager := proxy.NewManager(server.DataStore, server.SignatureService, server.ReverseTunnelService, server.DockerClientFactory, server.KubernetesClientFactory, kubernetesTokenCacheManager)
 
@@ -78,6 +80,7 @@ func (server *Server) Start() error {
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
 
 	var authHandler = auth.NewHandler(requestBouncer, rateLimiter)
+	authHandler.AuthorizationService = authorizationService
 	authHandler.DataStore = server.DataStore
 	authHandler.CryptoService = server.CryptoService
 	authHandler.JWTService = server.JWTService
@@ -114,6 +117,7 @@ func (server *Server) Start() error {
 	edgeTemplatesHandler.DataStore = server.DataStore
 
 	var endpointHandler = endpoints.NewHandler(requestBouncer)
+	endpointHandler.AuthorizationService = authorizationService
 	endpointHandler.DataStore = server.DataStore
 	endpointHandler.FileService = server.FileService
 	endpointHandler.ProxyManager = proxyManager
@@ -127,6 +131,7 @@ func (server *Server) Start() error {
 	endpointEdgeHandler.ReverseTunnelService = server.ReverseTunnelService
 
 	var endpointGroupHandler = endpointgroups.NewHandler(requestBouncer)
+	endpointGroupHandler.AuthorizationService = authorizationService
 	endpointGroupHandler.DataStore = server.DataStore
 
 	var endpointProxyHandler = endpointproxy.NewHandler(requestBouncer)
@@ -147,6 +152,7 @@ func (server *Server) Start() error {
 	resourceControlHandler.DataStore = server.DataStore
 
 	var settingsHandler = settings.NewHandler(requestBouncer)
+	settingsHandler.AuthorizationService = authorizationService
 	settingsHandler.DataStore = server.DataStore
 	settingsHandler.FileService = server.FileService
 	settingsHandler.JWTService = server.JWTService
@@ -165,9 +171,11 @@ func (server *Server) Start() error {
 	tagHandler.DataStore = server.DataStore
 
 	var teamHandler = teams.NewHandler(requestBouncer)
+	teamHandler.AuthorizationService = authorizationService
 	teamHandler.DataStore = server.DataStore
 
 	var teamMembershipHandler = teammemberships.NewHandler(requestBouncer)
+	teamMembershipHandler.AuthorizationService = authorizationService
 	teamMembershipHandler.DataStore = server.DataStore
 
 	var statusHandler = status.NewHandler(requestBouncer, server.Status)
@@ -181,6 +189,7 @@ func (server *Server) Start() error {
 	uploadHandler.FileService = server.FileService
 
 	var userHandler = users.NewHandler(requestBouncer, rateLimiter)
+	userHandler.AuthorizationService = authorizationService
 	userHandler.DataStore = server.DataStore
 	userHandler.CryptoService = server.CryptoService
 

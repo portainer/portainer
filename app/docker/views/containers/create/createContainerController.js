@@ -645,9 +645,8 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
 
       $scope.isAdmin = Authentication.isAdmin();
-      $scope.showDeviceMapping = await shouldShowDevices();
-      $scope.areContainerCapabilitiesEnabled = await checkIfContainerCapabilitiesEnabled();
-      $scope.isAdminOrEndpointAdmin = Authentication.isAdmin();
+      $scope.showDeviceMapping = shouldShowDevices();
+      $scope.areContainerCapabilitiesEnabled = checkIfContainerCapabilitiesEnabled();
 
       Volume.query(
         {},
@@ -932,16 +931,20 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       }
     }
 
-    async function shouldShowDevices() {
+    function shouldShowDevices() {
       const { allowDeviceMappingForRegularUsers } = $scope.applicationState.application;
 
-      return allowDeviceMappingForRegularUsers || Authentication.isAdmin();
+      return allowDeviceMappingForRegularUsers || checkIfAdminOrEndpointAdmin();
     }
 
-    async function checkIfContainerCapabilitiesEnabled() {
+    function checkIfContainerCapabilitiesEnabled() {
       const { allowContainerCapabilitiesForRegularUsers } = $scope.applicationState.application;
 
-      return allowContainerCapabilitiesForRegularUsers || Authentication.isAdmin();
+      return allowContainerCapabilitiesForRegularUsers || checkIfAdminOrEndpointAdmin();
+    }
+
+    function checkIfAdminOrEndpointAdmin() {
+      return Authentication.isAdmin() || Authentication.hasAuthorizations(['EndpointResourcesAccess']);
     }
 
     initView();

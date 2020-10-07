@@ -1,4 +1,5 @@
 import _ from 'lodash-es';
+import './rbac';
 
 import './registry-management';
 
@@ -17,7 +18,7 @@ async function initAuthentication(authManager, Authentication, $rootScope, $stat
   return await Authentication.init();
 }
 
-angular.module('portainer.app', ['portainer.oauth', 'portainer.registrymanagement']).config([
+angular.module('portainer.app', ['portainer.oauth', 'portainer.rbac', 'portainer.registrymanagement']).config([
   '$stateRegistryProvider',
   function ($stateRegistryProvider) {
     'use strict';

@@ -123,6 +123,12 @@ func FilterAuthorizedStacks(stacks []portainer.Stack, user *portainer.User, user
 	authorizedStacks := make([]portainer.Stack, 0)
 
 	for _, stack := range stacks {
+		_, isEndpointAdmin := user.EndpointAuthorizations[stack.EndpointID][portainer.EndpointResourcesAccess]
+		if isEndpointAdmin {
+			authorizedStacks = append(authorizedStacks, stack)
+			continue
+		}
+
 		if stack.ResourceControl != nil && UserCanAccessResource(user.ID, userTeamIDs, stack.ResourceControl) {
 			authorizedStacks = append(authorizedStacks, stack)
 		}

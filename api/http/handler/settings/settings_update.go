@@ -115,8 +115,10 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		settings.AllowPrivilegedModeForRegularUsers = *payload.AllowPrivilegedModeForRegularUsers
 	}
 
+	updateAuthorizations := false
 	if payload.AllowVolumeBrowserForRegularUsers != nil {
 		settings.AllowVolumeBrowserForRegularUsers = *payload.AllowVolumeBrowserForRegularUsers
+		updateAuthorizations = true
 	}
 
 	if payload.EnableHostManagementFeatures != nil {
@@ -176,7 +178,28 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist settings changes inside the database", err}
 	}
 
+	if updateAuthorizations {
+		err := handler.updateVolumeBrowserSetting(settings)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update RBAC authorizations", err}
+		}
+	}
+
 	return response.JSON(w, settings)
+}
+
+func (handler *Handler) updateVolumeBrowserSetting(settings *portainer.Settings) error {
+	err := handler.AuthorizationService.UpdateVolumeBrowsingAuthorizations(settings.AllowVolumeBrowserForRegularUsers)
+	if err != nil {
+		return err
+	}
+
+	err = handler.AuthorizationService.UpdateUsersAuthorizations()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (handler *Handler) updateSnapshotInterval(settings *portainer.Settings, snapshotInterval string) error {

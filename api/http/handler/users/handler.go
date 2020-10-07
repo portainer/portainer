@@ -2,14 +2,13 @@ package users
 
 import (
 	"errors"
-
-	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/security"
-
 	"net/http"
 
 	"github.com/gorilla/mux"
+	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 var (
@@ -27,8 +26,9 @@ func hideFields(user *portainer.User) {
 // Handler is the HTTP handler used to handle user operations.
 type Handler struct {
 	*mux.Router
-	DataStore     portainer.DataStore
-	CryptoService portainer.CryptoService
+	AuthorizationService *authorization.Service
+	CryptoService        portainer.CryptoService
+	DataStore            portainer.DataStore
 }
 
 // NewHandler creates a handler to manage user operations.

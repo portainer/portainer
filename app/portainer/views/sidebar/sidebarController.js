@@ -47,7 +47,7 @@ angular.module('portainer.app').controller('SidebarController', [
       const isAdmin = Authentication.isAdmin();
       const { allowStackManagementForRegularUsers } = $scope.applicationState.application;
 
-      return isAdmin || allowStackManagementForRegularUsers;
+      return isAdmin || allowStackManagementForRegularUsers || Authentication.hasAuthorizations(['EndpointResourcesAccess']);
     }
 
     $transitions.onEnter({}, async () => {
