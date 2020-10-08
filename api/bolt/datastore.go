@@ -121,7 +121,17 @@ func (store *Store) IsNew() bool {
 // This process is only triggered on an existing database, not if the database was just created.
 func (store *Store) MigrateData() error {
 	if store.isNew {
-		return store.VersionService.StoreDBVersion(portainer.DBVersion)
+		err := store.VersionService.StoreDBVersion(portainer.DBVersionEE)
+		if err != nil {
+			return err
+		}
+
+		err = store.VersionService.StoreEdition(portainer.PortainerEE)
+		if err != nil {
+			return err
+		}
+
+		return nil
 	}
 
 	version, err := store.VersionService.DBVersion()
