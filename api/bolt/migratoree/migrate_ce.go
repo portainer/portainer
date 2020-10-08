@@ -11,7 +11,7 @@ func (m *Migrator) MigrateFromCEdbv25() error {
 		return err
 	}
 
-	err = m.versionService.StoreEdition(portainer.PortainerBE)
+	err = m.versionService.StoreEdition(portainer.PortainerEE)
 	if err != nil {
 		return err
 	}
