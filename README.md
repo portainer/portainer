@@ -10,7 +10,7 @@
 
 **_Portainer_** is a lightweight management UI which allows you to **easily** manage your different Docker environments (Docker hosts or Swarm clusters).
 **_Portainer_** is meant to be as **simple** to deploy as it is to use. It consists of a single container that can run on any Docker engine (can be deployed as Linux container or a Windows native container, supports other platforms too).
-**_Portainer_** allows you to manage all your Docker resources (containers, images, volumes, networks and more) ! It is compatible with the _standalone Docker_ engine and with _Docker Swarm mode_.
+**_Portainer_** allows you to manage all your Docker resources (containers, images, volumes, networks and more!) It is compatible with the _standalone Docker_ engine and with _Docker Swarm mode_.
 
 ## Demo
 
@@ -24,7 +24,7 @@ Alternatively, you can deploy a copy of the demo stack inside a [play-with-docke
 - Sign in with your [Docker ID](https://docs.docker.com/docker-id)
 - Follow [these](https://github.com/portainer/portainer-demo/blob/master/play-with-docker/docker-stack.yml#L5-L8) steps.
 
-Unlike the public demo, the playground sessions are deleted after 4 hours. Apart from that, all the settings are same, including default credentials.
+Unlike the public demo, the playground sessions are deleted after 4 hours. Apart from that, all the settings are the same, including default credentials.
 
 ## Getting started
 
@@ -52,7 +52,7 @@ For community support: You can find more information about Portainer's community
 
 ## Privacy
 
-**To make sure we focus our development effort in the right places we need to know what features get used most often. To give us this information we use [Matamo Analytics](https://matomo.org/), which is hosted in Germany and fully GDPR compliant.**
+**To make sure we focus our development effort in the right places we need to know which features get used most often. To give us this information we use [Matamo Analytics](https://matomo.org/), which is hosted in Germany and is fully GDPR compliant.**
 
 When Portainer first starts, you are given the option to DISABLE analytics. If you **don't** choose to disable it, we collect anonymous usage as per [our privacy policy](https://www.portainer.io/documentation/in-app-analytics-and-privacy-policy/). **Please note**, there is no personally identifiable information sent or stored at any time and we only use the data to help us improve Portainer.
 
