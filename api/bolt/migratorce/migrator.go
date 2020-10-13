@@ -1,4 +1,4 @@
-package migratoree
+package migratorce
 
 import (
 	"github.com/boltdb/bolt"
@@ -31,10 +31,4 @@ func NewMigrator(parameters *Parameters) *Migrator {
 		currentEdition:   parameters.CurrentEdition,
 		versionService:   parameters.VersionService,
 	}
-}
-
-// Migrate checks the database version and migrate the existing data to the most recent data model.
-func (m *Migrator) Migrate() error {
-
-	return nil
 }
