@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
 func hideFields(endpoint *portainer.Endpoint) {
@@ -21,13 +22,14 @@ func hideFields(endpoint *portainer.Endpoint) {
 // Handler is the HTTP handler used to handle endpoint operations.
 type Handler struct {
 	*mux.Router
-	requestBouncer       *security.RequestBouncer
-	AuthorizationService *authorization.Service
-	DataStore            portainer.DataStore
-	FileService          portainer.FileService
-	ProxyManager         *proxy.Manager
-	ReverseTunnelService portainer.ReverseTunnelService
-	SnapshotService      portainer.SnapshotService
+	requestBouncer          *security.RequestBouncer
+	AuthorizationService    *authorization.Service
+	DataStore               portainer.DataStore
+	FileService             portainer.FileService
+	ProxyManager            *proxy.Manager
+	ReverseTunnelService    portainer.ReverseTunnelService
+	SnapshotService         portainer.SnapshotService
+	KubernetesClientFactory *cli.ClientFactory
 }
 
 // NewHandler creates a handler to manage endpoint operations.

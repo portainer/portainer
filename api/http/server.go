@@ -124,6 +124,7 @@ func (server *Server) Start() error {
 	endpointHandler.SnapshotService = server.SnapshotService
 	endpointHandler.ProxyManager = proxyManager
 	endpointHandler.ReverseTunnelService = server.ReverseTunnelService
+	endpointHandler.KubernetesClientFactory = server.KubernetesClientFactory
 
 	var endpointEdgeHandler = endpointedge.NewHandler(requestBouncer)
 	endpointEdgeHandler.DataStore = server.DataStore

@@ -4,7 +4,8 @@ angular.module('portainer.docker').controller('KubernetesResourcePoolsDatatableC
   'Authentication',
   'KubernetesNamespaceHelper',
   'DatatableService',
-  function ($scope, $controller, Authentication, KubernetesNamespaceHelper, DatatableService) {
+  'EndpointProvider',
+  function ($scope, $controller, Authentication, KubernetesNamespaceHelper, DatatableService, EndpointProvider) {
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
 
     var ctrl = this;
@@ -18,7 +19,11 @@ angular.module('portainer.docker').controller('KubernetesResourcePoolsDatatableC
     };
 
     this.canManageAccess = function (item) {
-      return item.Namespace.Name !== 'default' && !this.isSystemNamespace(item);
+      if (!this.endpoint.Kubernetes.Configuration.RestrictDefaultNamespace) {
+        return item.Namespace.Name !== 'default' && !this.isSystemNamespace(item);
+      } else {
+        return !this.isSystemNamespace(item);
+      }
     };
 
     this.disableRemove = function (item) {
@@ -41,6 +46,7 @@ angular.module('portainer.docker').controller('KubernetesResourcePoolsDatatableC
     };
 
     this.$onInit = function () {
+      this.endpoint = EndpointProvider.currentEndpoint();
       this.isAdmin = Authentication.isAdmin();
       this.setDefaults();
       this.prepareTableFromDataset();

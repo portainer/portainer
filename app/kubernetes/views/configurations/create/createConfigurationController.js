@@ -28,9 +28,9 @@ class KubernetesCreateConfigurationController {
   isFormValid() {
     const uniqueCheck = !this.state.alreadyExist && this.state.isDataValid;
     if (this.formValues.IsSimple) {
-      return this.formValues.Data.length > 0 && uniqueCheck;
+      return this.formValues.Data.length > 0 && uniqueCheck && this.formValues.ResourcePool;
     }
-    return uniqueCheck;
+    return uniqueCheck && this.formValues.ResourcePool;
   }
 
   async createConfigurationAsync() {
@@ -79,6 +79,9 @@ class KubernetesCreateConfigurationController {
       this.resourcePools = _.filter(resourcePools, (resourcePool) => !this.KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name));
 
       this.formValues.ResourcePool = this.resourcePools[0];
+      if (!this.formValues.ResourcePool) {
+        return;
+      }
       await this.getConfigurations();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');

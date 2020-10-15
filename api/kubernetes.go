@@ -9,6 +9,7 @@ func KubernetesDefault() KubernetesData {
 			ResourceOverCommitPercentage: 80,
 			StorageClasses:               []KubernetesStorageClassConfig{},
 			IngressClasses:               []KubernetesIngressClassConfig{},
+			RestrictDefaultNamespace:     false,
 		},
 		Snapshots: []KubernetesSnapshot{},
 	}

@@ -131,6 +131,27 @@
               </span>
             </div>
 
+            <!-- #region SECURITY -->
+            <div class="col-sm-12 form-section-title">
+              Security
+            </div>
+
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                By default, all the users have access to the default namespace. Enable this option to set accesses on the default namespace.
+              </span>
+            </div>
+
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label class="control-label text-left">
+                  Restrict access to the default namespace
+                </label>
+                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.RestrictDefaultNamespace" /><i></i> </label>
+              </div>
+            </div>
+            <!-- #endregion -->
+
             <div class="col-sm-12 form-section-title">
               Resources and Metrics
             </div>

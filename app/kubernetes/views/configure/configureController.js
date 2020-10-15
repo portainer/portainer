@@ -103,6 +103,7 @@ class KubernetesConfigureController {
     endpoint.Kubernetes.Configuration.EnableResourceOverCommit = this.formValues.EnableResourceOverCommit;
     endpoint.Kubernetes.Configuration.ResourceOverCommitPercentage = this.formValues.ResourceOverCommitPercentage;
     endpoint.Kubernetes.Configuration.IngressClasses = ingressClasses;
+    endpoint.Kubernetes.Configuration.RestrictDefaultNamespace = this.formValues.RestrictDefaultNamespace;
   }
 
   transformFormValues() {
@@ -193,6 +194,7 @@ class KubernetesConfigureController {
       EnableResourceOverCommit: false,
       ResourceOverCommitPercentage: 80,
       IngressClasses: [],
+      RestrictDefaultNamespace: false,
     };
 
     try {
@@ -217,6 +219,7 @@ class KubernetesConfigureController {
       this.formValues.UseServerMetrics = this.endpoint.Kubernetes.Configuration.UseServerMetrics;
       this.formValues.EnableResourceOverCommit = this.endpoint.Kubernetes.Configuration.EnableResourceOverCommit;
       this.formValues.ResourceOverCommitPercentage = this.endpoint.Kubernetes.Configuration.ResourceOverCommitPercentage;
+      this.formValues.RestrictDefaultNamespace = this.endpoint.Kubernetes.Configuration.RestrictDefaultNamespace;
       this.formValues.IngressClasses = _.map(this.endpoint.Kubernetes.Configuration.IngressClasses, (ic) => {
         ic.IsNew = false;
         ic.NeedsDeletion = false;

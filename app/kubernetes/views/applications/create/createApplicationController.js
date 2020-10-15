@@ -589,7 +589,8 @@ class KubernetesCreateApplicationController {
     const hasNoChanges = this.isEditAndNoChangesMade();
     const nonScalable = this.isNonScalable();
     const notInternalNoPorts = this.isNotInternalAndHasNoPublishedPorts();
-    return overflow || autoScalerOverflow || inProgress || invalid || hasNoChanges || nonScalable || notInternalNoPorts;
+    const noResourcePool = !this.formValues.ResourcePool;
+    return overflow || autoScalerOverflow || inProgress || invalid || hasNoChanges || nonScalable || notInternalNoPorts || noResourcePool;
   }
 
   disableLoadBalancerEdit() {
@@ -879,7 +880,11 @@ class KubernetesCreateApplicationController {
       this.ingresses = ingresses;
 
       this.resourcePools = _.filter(resourcePools, (resourcePool) => !this.KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name));
+
       this.formValues.ResourcePool = this.resourcePools[0];
+      if (!this.formValues.ResourcePool) {
+        return;
+      }
 
       // TODO: refactor @Max
       // Don't pull all volumes and applications across all namespaces

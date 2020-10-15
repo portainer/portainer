@@ -48,7 +48,7 @@
             </div>
 
             <!-- resource-pool -->
-            <div class="form-group">
+            <div class="form-group" ng-if="ctrl.formValues.ResourcePool">
               <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Resource pool</label>
               <div class="col-sm-11">
                 <select
@@ -60,53 +60,61 @@
                 ></select>
               </div>
             </div>
-            <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
+            <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded() && ctrl.formValues.ResourcePool">
               <div class="col-sm-12 small text-warning">
                 <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                 This resource pool has exhausted its resource capacity and you will not be able to deploy the configuration. Contact your administrator to expand the capacity of
                 the resource pool.
               </div>
             </div>
+            <div class="form-group" ng-if="!ctrl.formValues.ResourcePool">
+              <div class="col-sm-12 small text-muted">
+                <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                You do not have access to any resource pool. Contact your administrator to get access to a resource pool.
+              </div>
+            </div>
             <!-- !resource-pool -->
 
-            <div class="col-sm-12 form-section-title">
-              Configuration type
-            </div>
-
-            <div class="form-group">
-              <div class="col-sm-12 small text-muted">
-                Select the type of data that you want to save in the configuration.
+            <div ng-if="ctrl.formValues.ResourcePool">
+              <div class="col-sm-12 form-section-title">
+                Configuration type
               </div>
-            </div>
 
-            <!-- type options -->
-            <div class="form-group" style="margin-bottom: 0;">
-              <div class="boxselector_wrapper">
-                <div>
-                  <input type="radio" id="type_basic" ng-value="ctrl.KubernetesConfigurationTypes.CONFIGMAP" ng-model="ctrl.formValues.Type" />
-                  <label for="type_basic">
-                    <div class="boxselector_header">
-                      <i class="fa fa-file-code" aria-hidden="true" style="margin-right: 2px;"></i>
-                      Non-sensitive
-                    </div>
-                    <p>This configuration holds non-sensitive information</p>
-                  </label>
-                </div>
-                <div>
-                  <input type="radio" id="type_secret" ng-value="ctrl.KubernetesConfigurationTypes.SECRET" ng-model="ctrl.formValues.Type" />
-                  <label for="type_secret">
-                    <div class="boxselector_header">
-                      <i class="fa fa-user-secret" aria-hidden="true" style="margin-right: 2px;"></i>
-                      Sensitive
-                    </div>
-                    <p>This configuration holds sensitive information</p>
-                  </label>
+              <div class="form-group">
+                <div class="col-sm-12 small text-muted">
+                  Select the type of data that you want to save in the configuration.
                 </div>
               </div>
-            </div>
-            <!-- !type options -->
 
-            <kubernetes-configuration-data ng-if="ctrl.formValues" form-values="ctrl.formValues" is-valid="ctrl.state.isDataValid"></kubernetes-configuration-data>
+              <!-- type options -->
+              <div class="form-group" style="margin-bottom: 0;">
+                <div class="boxselector_wrapper">
+                  <div>
+                    <input type="radio" id="type_basic" ng-value="ctrl.KubernetesConfigurationTypes.CONFIGMAP" ng-model="ctrl.formValues.Type" />
+                    <label for="type_basic">
+                      <div class="boxselector_header">
+                        <i class="fa fa-file-code" aria-hidden="true" style="margin-right: 2px;"></i>
+                        Non-sensitive
+                      </div>
+                      <p>This configuration holds non-sensitive information</p>
+                    </label>
+                  </div>
+                  <div>
+                    <input type="radio" id="type_secret" ng-value="ctrl.KubernetesConfigurationTypes.SECRET" ng-model="ctrl.formValues.Type" />
+                    <label for="type_secret">
+                      <div class="boxselector_header">
+                        <i class="fa fa-user-secret" aria-hidden="true" style="margin-right: 2px;"></i>
+                        Sensitive
+                      </div>
+                      <p>This configuration holds sensitive information</p>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <!-- !type options -->
+
+              <kubernetes-configuration-data ng-if="ctrl.formValues" form-values="ctrl.formValues" is-valid="ctrl.state.isDataValid"></kubernetes-configuration-data>
+            </div>
 
             <!-- actions -->
             <div class="col-sm-12 form-section-title" style="margin-top: 10px;">

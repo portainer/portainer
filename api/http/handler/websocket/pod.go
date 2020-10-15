@@ -98,7 +98,7 @@ func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request)
 	go streamFromWebsocketToWriter(websocketConn, stdinWriter, errorChan)
 	go streamFromReaderToWebsocket(websocketConn, stdoutReader, errorChan)
 
-	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
+	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint, handler.DataStore)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create Kubernetes client", err}
 	}

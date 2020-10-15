@@ -18,6 +18,18 @@ type (
 )
 
 func (kcl *KubeClient) setupNamespaceAccesses(userID int, teamIDs []int, serviceAccountName string) error {
+	endpoint, err := kcl.dataStore.Endpoint().Endpoint(portainer.EndpointID(kcl.endpointID))
+	if err != nil {
+		return err
+	}
+
+	if endpoint.Kubernetes.Configuration.RestrictDefaultNamespace {
+		err = kcl.removeNamespaceAccessForServiceAccount(serviceAccountName, defaultNamespace)
+		if err != nil {
+			return err
+		}
+	}
+
 	configMap, err := kcl.cli.CoreV1().ConfigMaps(portainerNamespace).Get(portainerConfigMapName, metav1.GetOptions{})
 	if k8serrors.IsNotFound(err) {
 		return nil
@@ -38,8 +50,23 @@ func (kcl *KubeClient) setupNamespaceAccesses(userID int, teamIDs []int, service
 		return err
 	}
 
+	if !endpoint.Kubernetes.Configuration.RestrictDefaultNamespace {
+		if _, ok := accessPolicies[defaultNamespace]; ok {
+			delete(accessPolicies, defaultNamespace)
+			data, err := json.Marshal(accessPolicies)
+			if err != nil {
+				return err
+			}
+			configMap.Data[portainerConfigMapAccessPoliciesKey] = string(data)
+			_, err = kcl.cli.CoreV1().ConfigMaps(portainerNamespace).Update(configMap)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
 	for _, namespace := range namespaces.Items {
-		if namespace.Name == defaultNamespace {
+		if namespace.Name == defaultNamespace && !endpoint.Kubernetes.Configuration.RestrictDefaultNamespace {
 			continue
 		}
 

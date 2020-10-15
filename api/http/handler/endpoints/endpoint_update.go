@@ -122,6 +122,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
+	oldRestrictDefaultNamespace := endpoint.Kubernetes.Configuration.RestrictDefaultNamespace
 	if payload.Kubernetes != nil {
 		endpoint.Kubernetes = *payload.Kubernetes
 	}
@@ -266,6 +267,33 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		err = handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpoint.ID, relation)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint relation changes inside the database", err}
+		}
+	}
+
+	if payload.Kubernetes != nil && payload.Kubernetes.Configuration.RestrictDefaultNamespace != oldRestrictDefaultNamespace {
+		users, err := handler.DataStore.User().Users()
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find users inside the database", err}
+		}
+		cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint, handler.DataStore)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create Kubernetes client", err}
+		}
+		for _, user := range users {
+			memberships, err := handler.DataStore.TeamMembership().TeamMembershipsByUserID(user.ID)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find memberships inside the database", err}
+			}
+
+			teamIds := make([]int, 0)
+			for _, membership := range memberships {
+				teamIds = append(teamIds, int(membership.TeamID))
+			}
+
+			err = cli.SetupUserServiceAccount(int(user.ID), teamIds)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update namespaces accesses", err}
+			}
 		}
 	}
 

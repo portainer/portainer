@@ -343,6 +343,7 @@ type (
 		ResourceOverCommitPercentage int                            `json:"ResourceOverCommitPercentage"`
 		StorageClasses               []KubernetesStorageClassConfig `json:"StorageClasses"`
 		IngressClasses               []KubernetesIngressClassConfig `json:"IngressClasses"`
+		RestrictDefaultNamespace     bool                           `json:"RestrictDefaultNamespace"`
 	}
 
 	// KubernetesStorageClassConfig represents a Kubernetes Storage Class configuration
