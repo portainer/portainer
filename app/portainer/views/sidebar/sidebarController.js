@@ -1,4 +1,5 @@
 angular.module('portainer.app').controller('SidebarController', [
+  '$rootScope',
   '$q',
   '$scope',
   '$transitions',
@@ -7,7 +8,7 @@ angular.module('portainer.app').controller('SidebarController', [
   'Authentication',
   'UserService',
   'EndpointProvider',
-  function ($q, $scope, $transitions, StateManager, Notifications, Authentication, UserService, EndpointProvider) {
+  function ($rootScope, $q, $scope, $transitions, StateManager, Notifications, Authentication, UserService, EndpointProvider) {
     function checkPermissions(memberships) {
       var isLeader = false;
       angular.forEach(memberships, function (membership) {
@@ -52,6 +53,10 @@ angular.module('portainer.app').controller('SidebarController', [
 
     $transitions.onEnter({}, async () => {
       $scope.showStacks = await shouldShowStacks();
+
+      if ($scope.applicationState.endpoint.name) {
+        document.title = `${$rootScope.defaultTitle} | ${$scope.applicationState.endpoint.name}`;
+      }
     });
   },
 ]);
