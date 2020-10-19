@@ -63,7 +63,7 @@
           </thead>
           <tbody>
             <tr
-              dir-paginate="item in $ctrl.state.filteredDataSet | itemsPerPage: $ctrl.state.paginatedItemLimit"
+              dir-paginate="item in $ctrl.state.filteredDataSet | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit"
               total-items="$ctrl.state.totalFilteredDataSet"
               ng-class="{ active: item.Checked }"
             >
