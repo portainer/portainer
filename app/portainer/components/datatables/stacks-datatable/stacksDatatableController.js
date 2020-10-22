@@ -23,7 +23,7 @@ angular.module('portainer.app').controller('StacksDatatableController', [
         return false;
       }
 
-      return !(item.External && !this.isAdmin);
+      return !(item.External && !this.isAdmin && !this.isEndpointAdmin);
     };
 
     this.applyFilters = applyFilters.bind(this);
@@ -41,6 +41,8 @@ angular.module('portainer.app').controller('StacksDatatableController', [
 
     this.$onInit = function () {
       this.isAdmin = Authentication.isAdmin();
+      this.isEndpointAdmin = Authentication.hasAuthorizations(['EndpointResourcesAccess']);
+
       this.setDefaults();
       this.prepareTableFromDataset();
 

@@ -155,11 +155,11 @@ func (transport *Transport) applyAccessControlOnResource(parameters *resourceOpe
 		return err
 	}
 
-	if resourceControl == nil && (executor.operationContext.isAdmin) {
+	if resourceControl == nil && (executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess) {
 		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
 
-	if executor.operationContext.isAdmin || (resourceControl != nil && authorization.UserCanAccessResource(executor.operationContext.userID, executor.operationContext.userTeamIDs, resourceControl)) {
+	if executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess || (resourceControl != nil && authorization.UserCanAccessResource(executor.operationContext.userID, executor.operationContext.userTeamIDs, resourceControl)) {
 		responseObject = decorateObject(responseObject, resourceControl)
 		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
@@ -168,7 +168,7 @@ func (transport *Transport) applyAccessControlOnResource(parameters *resourceOpe
 }
 
 func (transport *Transport) applyAccessControlOnResourceList(parameters *resourceOperationParameters, resourceData []interface{}, executor *operationExecutor) ([]interface{}, error) {
-	if executor.operationContext.isAdmin {
+	if executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess {
 		return transport.decorateResourceList(parameters, resourceData, executor.operationContext.resourceControls)
 	}
 
@@ -241,13 +241,13 @@ func (transport *Transport) filterResourceList(parameters *resourceOperationPara
 		}
 
 		if resourceControl == nil {
-			if context.isAdmin {
+			if context.isAdmin || context.endpointResourceAccess {
 				filteredResourceData = append(filteredResourceData, resourceObject)
 			}
 			continue
 		}
 
-		if context.isAdmin || authorization.UserCanAccessResource(context.userID, context.userTeamIDs, resourceControl) {
+		if context.isAdmin || context.endpointResourceAccess || authorization.UserCanAccessResource(context.userID, context.userTeamIDs, resourceControl) {
 			resourceObject = decorateObject(resourceObject, resourceControl)
 			filteredResourceData = append(filteredResourceData, resourceObject)
 		}
