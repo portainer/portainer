@@ -225,9 +225,10 @@ angular.module('portainer.docker').factory('ServiceHelper', [
       var ipHostEntries = [];
       if (entries) {
         entries.forEach(function (entry) {
-          if (entry.indexOf(' ') && entry.split(' ').length === 2) {
-            var keyValue = entry.split(' ');
-            ipHostEntries.push({ hostname: keyValue[1], ip: keyValue[0] });
+          var ipAndHost = entry.split(' ');
+          if (ipAndHost.length === 2) {
+            var keyValue = ipAndHost;
+            ipHostEntries.push({hostname: keyValue[1], ip: keyValue[0]});
           }
         });
       }

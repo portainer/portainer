@@ -330,10 +330,13 @@ angular.module('portainer.docker').controller('CreateServiceController', [
       var hostsEntries = [];
       if (input.HostsEntries) {
         input.HostsEntries.forEach(function (host_ip) {
-          if (host_ip.value && host_ip.value.indexOf(':') && host_ip.value.split(':').length === 2) {
-            var keyVal = host_ip.value.split(':');
-            // Hosts file format, IP_address canonical_hostname
-            hostsEntries.push(keyVal[1] + ' ' + keyVal[0]);
+          if (host_ip.value) {
+            var ipAndHost = host_ip.value.split(':');
+            if (ipAndHost.length === 2) {
+              var keyVal = ipAndHost;
+              // Hosts file format, IP_address canonical_hostname
+              hostsEntries.push(keyVal[1] + ' ' + keyVal[0]);
+            }
           }
         });
         if (hostsEntries.length > 0) {

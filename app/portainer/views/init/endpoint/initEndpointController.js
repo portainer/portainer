@@ -111,7 +111,10 @@ class InitEndpointController {
       this.state.actionInProgress = true;
       const name = this.formValues.Name;
       const URL = this.formValues.URL;
-      const PublicURL = URL.split(':')[0];
+      const idx = URL.indexOf(':');
+      const PublicURL = idx < 0
+        ? URL
+        : URL.substring(0, idx);
 
       const endpoint = await this.EndpointService.createRemoteEndpoint(
         name,

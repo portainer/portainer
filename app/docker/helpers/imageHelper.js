@@ -65,7 +65,11 @@ angular.module('portainer.docker').factory('ImageHelper', [
     }
 
     function removeDigestFromRepository(repository) {
-      return repository.split('@sha')[0];
+      var idx = repository.indexOf('@sha');
+      if (idx < 0) {
+        return repository;
+      }
+      return repository.substring(0, idx);
     }
 
     return helper;
