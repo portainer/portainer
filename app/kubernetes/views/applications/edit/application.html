@@ -43,16 +43,21 @@
                     </tr>
                     <tr>
                       <td>Status</td>
-                      <td>
+                      <td ng-if="ctrl.application.ApplicationType !== ctrl.KubernetesApplicationTypes.POD">
                         <span ng-if="ctrl.application.DeploymentType === ctrl.KubernetesApplicationDeploymentTypes.REPLICATED">Replicated</span>
                         <span ng-if="ctrl.application.DeploymentType === ctrl.KubernetesApplicationDeploymentTypes.GLOBAL">Global</span>
                         <code>{{ ctrl.application.RunningPodsCount }}</code> / <code>{{ ctrl.application.TotalPodsCount }}</code>
+                      </td>
+                      <td ng-if="ctrl.application.ApplicationType === ctrl.KubernetesApplicationTypes.POD">
+                        {{ ctrl.application.Pods[0].Status }}
                       </td>
                     </tr>
                     <tr ng-if="ctrl.application.Requests.Cpu || ctrl.application.Requests.Memory">
                       <td>
                         <div>Resource reservations</div>
-                        <div class="text-muted small">per instance</div>
+                        <div ng-if="ctrl.application.ApplicationType !== ctrl.KubernetesApplicationTypes.POD" class="text-muted small">
+                          per instance
+                        </div>
                       </td>
                       <td>
                         <div ng-if="ctrl.application.Requests.Cpu">CPU {{ ctrl.application.Requests.Cpu | kubernetesApplicationCPUValue }}</div>
@@ -557,7 +562,8 @@
         title-icon="fa-server"
         dataset="ctrl.allContainers"
         table-key="kubernetes.application.containers"
-        order-by="PodName"
+        is-pod="ctrl.application.ApplicationType === ctrl.KubernetesApplicationTypes.POD"
+        order-by="{{ ctrl.application.ApplicationType === ctrl.KubernetesApplicationTypes.POD ? 'Name' : 'PodName' }}"
       >
       </kubernetes-containers-datatable>
     </div>
