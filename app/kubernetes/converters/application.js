@@ -221,10 +221,6 @@ class KubernetesApplicationConverter {
     const res = new KubernetesApplication();
     KubernetesApplicationConverter.applicationCommon(res, data, pods, service, ingresses);
     res.ApplicationType = KubernetesApplicationTypes.POD;
-    // res.DeploymentType = KubernetesApplicationDeploymentTypes.REPLICATED;
-    // res.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.SHARED;
-    // res.RunningPodsCount = data.status.availableReplicas || data.status.replicas - data.status.unavailableReplicas || 0;
-    // res.TotalPodsCount = data.spec.replicas;
     return res;
   }
 
