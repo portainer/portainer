@@ -1,6 +1,8 @@
 package migratorce
 
 import (
+	"log"
+
 	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/endpoint"
@@ -98,6 +100,11 @@ func NewMigrator(parameters *Parameters) *Migrator {
 
 // Migrate checks the database version and migrate the existing data to the most recent data model.
 func (m *Migrator) Migrate() error {
+	if m.currentEdition != portainer.PortainerCE {
+		log.Printf("[INFO] [bolt, migrate] [message: Rolling EE database version %d back to CE database version %d.]", m.currentDBVersion, portainer.DBVersionCE)
+		return m.RollbackFromEEdbv1()
+	}
+
 	// Portainer < 1.12
 	if m.currentDBVersion < 1 {
 		err := m.updateAdminUserToDBVersion1()
@@ -355,5 +362,5 @@ func (m *Migrator) Migrate() error {
 		}
 	}
 
-	return m.versionService.StoreDBVersion(portainer.DBVersion)
+	return m.versionService.StoreDBVersion(portainer.DBVersionCE)
 }

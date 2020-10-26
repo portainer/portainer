@@ -1,6 +1,7 @@
 package bolt
 
 import (
+	"errors"
 	"log"
 	"path"
 	"time"
@@ -15,7 +16,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/endpoint"
 	"github.com/portainer/portainer/api/bolt/endpointgroup"
 	"github.com/portainer/portainer/api/bolt/endpointrelation"
-	"github.com/portainer/portainer/api/bolt/errors"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/extension"
 	"github.com/portainer/portainer/api/bolt/migratorce"
 	"github.com/portainer/portainer/api/bolt/registry"
@@ -120,12 +121,12 @@ func (store *Store) IsNew() bool {
 // This process is only triggered on an existing database, not if the database was just created.
 func (store *Store) MigrateData() error {
 	if store.isNew {
-		err := store.VersionService.StoreDBVersion(portainer.DBVersion)
+		err := store.VersionService.StoreDBVersion(portainer.DBVersionCE)
 		if err != nil {
 			return err
 		}
 
-		err = store.VersionService.StoreEdition(portainer.PortainerCE)
+		err = store.VersionService.StoreEdition(portainer.CodebaseEdition)
 		if err != nil {
 			return err
 		}
@@ -134,71 +135,64 @@ func (store *Store) MigrateData() error {
 	}
 
 	version, err := store.VersionService.DBVersion()
-	if err == errors.ErrObjectNotFound {
+	if err == bolterrors.ErrObjectNotFound {
 		version = 0
 	} else if err != nil {
 		return err
 	}
 
 	edition, err := store.VersionService.Edition()
-	if err == errors.ErrObjectNotFound {
+	if err == bolterrors.ErrObjectNotFound {
 		edition = portainer.PortainerCE
 	} else if err != nil {
 		return err
 	}
 
-	if edition == portainer.PortainerCE && version < portainer.DBVersion {
-		migratorParams := &migratorce.Parameters{
-			DB:                      store.db,
-			DatabaseVersion:         version,
-			EndpointGroupService:    store.EndpointGroupService,
-			EndpointService:         store.EndpointService,
-			EndpointRelationService: store.EndpointRelationService,
-			ExtensionService:        store.ExtensionService,
-			RegistryService:         store.RegistryService,
-			ResourceControlService:  store.ResourceControlService,
-			RoleService:             store.RoleService,
-			ScheduleService:         store.ScheduleService,
-			SettingsService:         store.SettingsService,
-			StackService:            store.StackService,
-			TagService:              store.TagService,
-			TeamMembershipService:   store.TeamMembershipService,
-			UserService:             store.UserService,
-			VersionService:          store.VersionService,
-			FileService:             store.fileService,
-			AuthorizationService:    authorization.NewService(store),
-		}
-		migrator := migratorce.NewMigrator(migratorParams)
-
-		log.Printf("[INFO] [bolt, migrate] [message: Migrating CE database from version %v to %v.]", version, portainer.DBVersion)
-		err = migrator.Migrate()
-		if err != nil {
-			log.Printf("[ERROR] [bolt, migrate] [message: An error occurred during database migration: %s]", err)
-			return err
-		}
-
-		version = portainer.DBVersion
+	migrator, err := buildMigrator(store, version, edition)
+	if err != nil {
+		return err
 	}
 
-	if edition > portainer.PortainerCE {
-		migratorParams := &migratorce.Parameters{
-			CurrentEdition:  edition,
-			DB:              store.db,
-			DatabaseVersion: version,
-			VersionService:  store.VersionService,
-		}
-		migrator := migratorce.NewMigrator(migratorParams)
-
-		log.Printf("[INFO] [bolt, migrate] [message: Rolling EE database version %d back to CE database version %d.]", version, portainer.DBVersion)
-		err = migrator.RollbackFromEEdbv1()
-		if err != nil {
-			log.Printf("[ERROR] [bolt, migrate] [message: An error occurred during database rollback: %s]", err)
-			return err
-		}
-
+	err = migrator.Migrate()
+	if err != nil {
+		log.Printf("[ERROR] [bolt, migrate] [message: An error occurred during database migration: %s]", err)
+		return err
 	}
 
 	return nil
+}
+
+func buildMigrator(store *Store, version int, currentEdition portainer.SoftwareEdition) (portainer.DataStoreMigrator, error) {
+	switch portainer.CodebaseEdition {
+	case portainer.PortainerCE:
+		return newMigratorCE(store, version, currentEdition), nil
+	}
+	return nil, errors.New("Codebase edition is not supported")
+}
+
+func newMigratorCE(store *Store, version int, currentEdition portainer.SoftwareEdition) portainer.DataStoreMigrator {
+	migratorParams := &migratorce.Parameters{
+		DB:              store.db,
+		DatabaseVersion: version,
+
+		EndpointGroupService:    store.EndpointGroupService,
+		EndpointService:         store.EndpointService,
+		EndpointRelationService: store.EndpointRelationService,
+		ExtensionService:        store.ExtensionService,
+		RegistryService:         store.RegistryService,
+		ResourceControlService:  store.ResourceControlService,
+		RoleService:             store.RoleService,
+		ScheduleService:         store.ScheduleService,
+		SettingsService:         store.SettingsService,
+		StackService:            store.StackService,
+		TagService:              store.TagService,
+		TeamMembershipService:   store.TeamMembershipService,
+		UserService:             store.UserService,
+		VersionService:          store.VersionService,
+		FileService:             store.fileService,
+		AuthorizationService:    authorization.NewService(store),
+	}
+	return migratorce.NewMigrator(migratorParams)
 }
 
 func (store *Store) initServices() error {

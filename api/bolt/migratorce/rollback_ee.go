@@ -6,7 +6,7 @@ import (
 
 // RollbackFromEEdbv1 will roll the db back from latest ee version to latest ce version
 func (m *Migrator) RollbackFromEEdbv1() error {
-	err := m.versionService.StoreDBVersion(portainer.DBVersion)
+	err := m.versionService.StoreDBVersion(portainer.DBVersionCE)
 	if err != nil {
 		return err
 	}

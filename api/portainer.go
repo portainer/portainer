@@ -827,6 +827,11 @@ type (
 		Webhook() WebhookService
 	}
 
+	// DataStoreMigrator represents a data store migrator
+	DataStoreMigrator interface {
+		Migrate() error
+	}
+
 	// DigitalSignatureService represents a service to manage digital signatures
 	DigitalSignatureService interface {
 		ParseKeyPair(private, public []byte) error
@@ -1125,10 +1130,12 @@ type (
 const (
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "2.0.0"
-	// DBVersion is the version number of the Portainer CE database
-	DBVersion = 25
+	// DBVersionCE is the version number of the Portainer CE database
+	DBVersionCE = 25
 	// DBVersionEE is the version number of the Portainer EE database
 	DBVersionEE = 1
+	// CodebaseEdition is the software edition of this codebase
+	CodebaseEdition = PortainerCE
 	// AssetsServerURL represents the URL of the Portainer asset server
 	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
