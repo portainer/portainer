@@ -131,7 +131,11 @@
               </td>
               <td>{{ item.CreationDate | getisodate }}</td>
               <td>
-                <a ng-if="item.Status === 'Running'" ui-sref="kubernetes.applications.application.stats({ pod: item.PodName, container: item.Name })" style="margin-right: 10px;">
+                <a
+                  ng-if="item.Status === 'Running' && $ctrl.useServerMetrics"
+                  ui-sref="kubernetes.applications.application.stats({ pod: item.PodName, container: item.Name })"
+                  style="margin-right: 10px;"
+                >
                   <i class="fa fa-chart-area" aria-hidden="true"></i> Stats
                 </a>
                 <a ui-sref="kubernetes.applications.application.logs({ pod: item.PodName, container: item.Name })"> <i class="fa fa-file-alt" aria-hidden="true"></i> Logs </a>

@@ -9,7 +9,7 @@ angular.module('portainer.kubernetes').factory('KubernetesPods', [
     'use strict';
     return function (namespace) {
       const url = API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/api/v1' + (namespace ? '/namespaces/:namespace' : '') + '/pods/:id/:action';
-      const metricsUrl = API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/apis/metrics.k8s.io/v1beta1' + (namespace ? '/namespaces/:namespace' : '') + '/pods/:id';
+      const metricsUrl = API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/apis/metrics.k8s.io/v1beta1' + (namespace ? '/namespaces/:namespace' : '') + '/pods/:id/';
       return $resource(
         url,
         {
