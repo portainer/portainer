@@ -127,6 +127,10 @@ angular.module('portainer.docker').factory('LogHelper', [
         }
       }
 
+      if (line) {
+        formattedLogs.push({ line, spans });
+      }
+
       return formattedLogs;
     };
 
