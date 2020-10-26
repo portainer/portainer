@@ -151,11 +151,14 @@
                 >{{ item.Image }} <span ng-if="item.Containers.length > 1">+ {{ item.Containers.length - 1 }}</span></td
               >
               <td>{{ item.ApplicationType | kubernetesApplicationTypeText }}</td>
-              <td>
+              <td ng-if="item.ApplicationType !== $ctrl.KubernetesApplicationTypes.POD">
                 <span ng-if="item.DeploymentType === $ctrl.KubernetesApplicationDeploymentTypes.REPLICATED">Replicated</span>
                 <span ng-if="item.DeploymentType === $ctrl.KubernetesApplicationDeploymentTypes.GLOBAL">Global</span>
-                <code>{{ item.RunningPodsCount }}</code> / <code>{{ item.TotalPodsCount }}</code></td
-              >
+                <code>{{ item.RunningPodsCount }}</code> / <code>{{ item.TotalPodsCount }}</code>
+              </td>
+              <td ng-if="item.ApplicationType === $ctrl.KubernetesApplicationTypes.POD">
+                {{ item.Pods[0].Status }}
+              </td>
               <td>
                 <span ng-if="item.PublishedPorts.length">
                   <span>
