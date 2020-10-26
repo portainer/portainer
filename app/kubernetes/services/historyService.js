@@ -32,13 +32,17 @@ class KubernetesHistoryService {
         case KubernetesApplicationTypes.STATEFULSET:
           rawRevisions = await this.KubernetesControllerRevisionService.get(namespace);
           break;
+        case KubernetesApplicationTypes.POD:
+          rawRevisions = [];
+          break;
         default:
-          throw new PortainerError('Unable to determine which association to use');
+          throw new PortainerError('Unable to determine which association to use for history');
       }
-
-      const [currentRevision, revisionsList] = KubernetesHistoryHelper.getRevisions(rawRevisions, application);
-      application.CurrentRevision = currentRevision;
-      application.Revisions = revisionsList;
+      if (rawRevisions.length) {
+        const [currentRevision, revisionsList] = KubernetesHistoryHelper.getRevisions(rawRevisions, application);
+        application.CurrentRevision = currentRevision;
+        application.Revisions = revisionsList;
+      }
       return application;
     } catch (err) {
       throw new PortainerError('', err);

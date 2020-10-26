@@ -50,7 +50,7 @@ function _apiPortsToPublishedPorts(pList, pRefs) {
 
 class KubernetesApplicationConverter {
   static applicationCommon(res, data, pods, service, ingresses) {
-    const containers = _.without(_.concat(data.spec.template.spec.containers, data.spec.template.spec.initContainers), undefined);
+    const containers = data.spec.template ? _.without(_.concat(data.spec.template.spec.containers, data.spec.template.spec.initContainers), undefined) : data.spec.containers;
     res.Id = data.metadata.uid;
     res.Name = data.metadata.name;
     res.StackName = data.metadata.labels ? data.metadata.labels[KubernetesPortainerApplicationStackNameLabel] || '-' : '-';
@@ -61,7 +61,7 @@ class KubernetesApplicationConverter {
     res.Image = containers[0].image;
     res.CreationDate = data.metadata.creationTimestamp;
     res.Env = _.without(_.flatMap(_.map(containers, 'env')), undefined);
-    res.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods, data);
+    res.Pods = data.spec.selector ? KubernetesApplicationHelper.associatePodsAndApplication(pods, data.spec.selector) : [data];
 
     const limits = {
       Cpu: 0,
@@ -118,7 +118,11 @@ class KubernetesApplicationConverter {
       res.PublishedPorts = ports;
     }
 
-    res.Volumes = data.spec.template.spec.volumes ? data.spec.template.spec.volumes : [];
+    if (data.spec.templates) {
+      res.Volumes = data.spec.template.spec.volumes ? data.spec.template.spec.volumes : [];
+    } else {
+      res.Volumes = data.spec.volumes;
+    }
 
     // TODO: review
     // this if() fixs direct use of PVC reference inside spec.template.spec.containers[0].volumeMounts
@@ -169,7 +173,7 @@ class KubernetesApplicationConverter {
     res.PersistedFolders = _.without(res.PersistedFolders, undefined);
 
     res.ConfigurationVolumes = _.reduce(
-      data.spec.template.spec.volumes,
+      res.Volumes,
       (acc, volume) => {
         if (volume.configMap || volume.secret) {
           const matchingVolumeMount = _.find(_.flatMap(_.map(containers, 'volumeMounts')), { name: volume.name });
@@ -211,6 +215,17 @@ class KubernetesApplicationConverter {
       },
       []
     );
+  }
+
+  static apiPodToApplication(data, pods, service, ingresses) {
+    const res = new KubernetesApplication();
+    KubernetesApplicationConverter.applicationCommon(res, data, pods, service, ingresses);
+    res.ApplicationType = KubernetesApplicationTypes.POD;
+    // res.DeploymentType = KubernetesApplicationDeploymentTypes.REPLICATED;
+    // res.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.SHARED;
+    // res.RunningPodsCount = data.status.availableReplicas || data.status.replicas - data.status.unavailableReplicas || 0;
+    // res.TotalPodsCount = data.spec.replicas;
+    return res;
   }
 
   static apiDeploymentToApplication(data, pods, service, ingresses) {
@@ -310,7 +325,7 @@ class KubernetesApplicationConverter {
     } else if (daemonSet) {
       app = KubernetesDaemonSetConverter.applicationFormValuesToDaemonSet(formValues, claims);
     } else {
-      throw new PortainerError('Unable to determine which association to use');
+      throw new PortainerError('Unable to determine which association to use to convert form');
     }
 
     let headlessService;
