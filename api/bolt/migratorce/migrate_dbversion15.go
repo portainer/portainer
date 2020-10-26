@@ -1,4 +1,4 @@
-package migrator
+package migratorce
 
 func (m *Migrator) updateSettingsToDBVersion16() error {
 	legacySettings, err := m.settingsService.Settings()

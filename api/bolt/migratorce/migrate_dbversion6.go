@@ -1,11 +1,11 @@
-package migrator
+package migratorce
 
-func (m *Migrator) updateSettingsToVersion5() error {
+func (m *Migrator) updateSettingsToVersion7() error {
 	legacySettings, err := m.settingsService.Settings()
 	if err != nil {
 		return err
 	}
+	legacySettings.DisplayDonationHeader = true
 
-	legacySettings.AllowBindMountsForRegularUsers = true
 	return m.settingsService.UpdateSettings(legacySettings)
 }

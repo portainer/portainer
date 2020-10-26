@@ -1,4 +1,4 @@
-package migrator
+package migratorce
 
 func (m *Migrator) updateExtensionsToDBVersion17() error {
 	legacyExtensions, err := m.extensionService.Extensions()

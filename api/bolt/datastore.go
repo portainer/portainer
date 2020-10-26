@@ -17,7 +17,6 @@ import (
 	"github.com/portainer/portainer/api/bolt/endpointrelation"
 	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/extension"
-	"github.com/portainer/portainer/api/bolt/migrator"
 	"github.com/portainer/portainer/api/bolt/migratorce"
 	"github.com/portainer/portainer/api/bolt/registry"
 	"github.com/portainer/portainer/api/bolt/resourcecontrol"
@@ -149,7 +148,7 @@ func (store *Store) MigrateData() error {
 	}
 
 	if edition == portainer.PortainerCE && version < portainer.DBVersion {
-		migratorParams := &migrator.Parameters{
+		migratorParams := &migratorce.Parameters{
 			DB:                      store.db,
 			DatabaseVersion:         version,
 			EndpointGroupService:    store.EndpointGroupService,
@@ -169,7 +168,7 @@ func (store *Store) MigrateData() error {
 			FileService:             store.fileService,
 			AuthorizationService:    authorization.NewService(store),
 		}
-		migrator := migrator.NewMigrator(migratorParams)
+		migrator := migratorce.NewMigrator(migratorParams)
 
 		log.Printf("[INFO] [bolt, migrate] [message: Migrating CE database from version %v to %v.]", version, portainer.DBVersion)
 		err = migrator.Migrate()

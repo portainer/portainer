@@ -1,11 +1,11 @@
-package migrator
+package migratorce
 
-func (m *Migrator) updateSettingsToVersion6() error {
+func (m *Migrator) updateSettingsToVersion5() error {
 	legacySettings, err := m.settingsService.Settings()
 	if err != nil {
 		return err
 	}
 
-	legacySettings.AllowPrivilegedModeForRegularUsers = true
+	legacySettings.AllowBindMountsForRegularUsers = true
 	return m.settingsService.UpdateSettings(legacySettings)
 }

@@ -1,4 +1,4 @@
-package migrator
+package migratorce
 
 func (m *Migrator) updateResourceControlsToDBVersion14() error {
 	resourceControls, err := m.resourceControlService.ResourceControls()

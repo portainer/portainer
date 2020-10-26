@@ -1,11 +1,11 @@
-package migrator
+package migratorce
 
-func (m *Migrator) updateSettingsToVersion7() error {
+func (m *Migrator) updateSettingsToVersion6() error {
 	legacySettings, err := m.settingsService.Settings()
 	if err != nil {
 		return err
 	}
-	legacySettings.DisplayDonationHeader = true
 
+	legacySettings.AllowPrivilegedModeForRegularUsers = true
 	return m.settingsService.UpdateSettings(legacySettings)
 }

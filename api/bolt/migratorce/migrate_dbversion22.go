@@ -1,4 +1,4 @@
-package migrator
+package migratorce
 
 import "github.com/portainer/portainer/api"
 
