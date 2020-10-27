@@ -165,12 +165,14 @@ func (store *Store) MigrateData() error {
 func buildMigrator(store *Store, version int, currentEdition portainer.SoftwareEdition) (portainer.DataStoreMigrator, error) {
 	switch portainer.CodebaseEdition {
 	case portainer.PortainerCE:
-		return newMigratorCE(store, version, currentEdition), nil
+		return newMigratorCE(store, version, currentEdition)
+	case portainer.PortainerEE, portainer.PortainerBE:
+		return nil, errors.New("Codebase edition is not supported")
 	}
 	return nil, errors.New("Codebase edition is not supported")
 }
 
-func newMigratorCE(store *Store, version int, currentEdition portainer.SoftwareEdition) portainer.DataStoreMigrator {
+func newMigratorCE(store *Store, version int, currentEdition portainer.SoftwareEdition) (portainer.DataStoreMigrator, error) {
 	migratorParams := &migratorce.Parameters{
 		DB:              store.db,
 		DatabaseVersion: version,
@@ -192,7 +194,7 @@ func newMigratorCE(store *Store, version int, currentEdition portainer.SoftwareE
 		FileService:             store.fileService,
 		AuthorizationService:    authorization.NewService(store),
 	}
-	return migratorce.NewMigrator(migratorParams)
+	return migratorce.NewMigrator(migratorParams), nil
 }
 
 func (store *Store) initServices() error {

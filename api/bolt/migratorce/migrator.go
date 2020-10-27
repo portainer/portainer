@@ -105,6 +105,11 @@ func (m *Migrator) Migrate() error {
 		return m.RollbackFromEEdbv1()
 	}
 
+	if m.currentDBVersion >= portainer.DBVersionCE {
+		return nil
+	}
+	log.Printf("[INFO] [bolt, migrate] [message: Migrating CE database from version %v to %v.]", m.currentDBVersion, portainer.DBVersionCE)
+
 	// Portainer < 1.12
 	if m.currentDBVersion < 1 {
 		err := m.updateAdminUserToDBVersion1()
