@@ -24,8 +24,8 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	}
 
 	h.Handle("/templates",
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.templateList))).Methods(http.MethodGet)
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.templateList))).Methods(http.MethodGet)
 	h.Handle("/templates/file",
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.templateFile))).Methods(http.MethodPost)
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.templateFile))).Methods(http.MethodPost)
 	return h
 }

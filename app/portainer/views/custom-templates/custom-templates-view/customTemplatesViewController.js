@@ -168,6 +168,10 @@ class CustomTemplatesViewController {
     return this.$async(this.selectTemplateAsync, template);
   }
   async selectTemplateAsync(template) {
+    if (!this.Authentication.isAdmin() && !this.Authentication.hasAuthorizations(['DockerContainerCreate', 'PortainerStackCreate'])) {
+      return;
+    }
+
     if (this.state.selectedTemplate) {
       await this.unselectTemplate(this.state.selectedTemplate);
     }

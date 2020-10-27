@@ -542,6 +542,9 @@ func portainerTemplatesOperationAuthorization(url, method string) portainer.Auth
 		if resource == "" && action == "" {
 			return portainer.OperationPortainerTemplateCreate
 		}
+		if resource == "file" && action == "" {
+			return portainer.OperationPortainerTemplateInspect
+		}
 	case http.MethodPut:
 		if resource != "" && action == "" {
 			return portainer.OperationPortainerTemplateUpdate

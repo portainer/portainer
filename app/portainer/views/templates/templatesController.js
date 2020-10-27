@@ -223,6 +223,10 @@ angular.module('portainer.app').controller('TemplatesController', [
     };
 
     $scope.selectTemplate = function (template) {
+      if (!Authentication.isAdmin() && !Authentication.hasAuthorizations(['DockerContainerCreate', 'PortainerStackCreate'])) {
+        return;
+      }
+
       if ($scope.state.selectedTemplate) {
         $scope.unselectTemplate($scope.state.selectedTemplate);
       }
