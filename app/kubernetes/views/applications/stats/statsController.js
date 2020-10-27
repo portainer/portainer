@@ -6,14 +6,14 @@ import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceRese
 
 class KubernetesApplicationStatsController {
   /* @ngInject */
-  constructor($async, $state, $interval, $document, Notifications, KubernetesApplicationService, KubernetesPodService, ChartService) {
+  constructor($async, $state, $interval, $document, Notifications, KubernetesPodService, KubernetesNodeService, ChartService) {
     this.$async = $async;
     this.$state = $state;
     this.$interval = $interval;
     this.$document = $document;
     this.Notifications = Notifications;
-    this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesPodService = KubernetesPodService;
+    this.KubernetesNodeService = KubernetesNodeService;
     this.ChartService = ChartService;
 
     this.onInit = this.onInit.bind(this);
@@ -29,16 +29,16 @@ class KubernetesApplicationStatsController {
     $('#refreshRateChange').fadeOut(1500);
   }
 
-  updateCPUChart(stats, chart) {
-    const label = moment(stats.read).format('HH:mm:ss');
+  updateCPUChart() {
+    const label = moment(this.stats.read).format('HH:mm:ss');
 
-    this.ChartService.UpdateCPUChart(label, stats.CPUUsage, chart);
+    this.ChartService.UpdateCPUChart(label, this.stats.CPUUsage, this.cpuChart);
   }
 
-  updateMemoryChart(stats, chart) {
-    const label = moment(stats.read).format('HH:mm:ss');
+  updateMemoryChart() {
+    const label = moment(this.stats.read).format('HH:mm:ss');
 
-    this.ChartService.UpdateMemoryChart(label, stats.MemoryUsage, stats.MemoryCache, chart);
+    this.ChartService.UpdateMemoryChart(label, this.stats.MemoryUsage, this.stats.MemoryCache, this.memoryChart);
   }
 
   stopRepeater() {
@@ -49,15 +49,15 @@ class KubernetesApplicationStatsController {
     }
   }
 
-  setUpdateRepeater(cpuChart, memoryChart) {
+  setUpdateRepeater() {
     const refreshRate = this.state.refreshRate;
 
     this.repeater = this.$interval(async () => {
       try {
         await this.getStats();
 
-        this.updateCPUChart(this.stats, cpuChart);
-        this.updateMemoryChart(this.stats, memoryChart);
+        this.updateCPUChart();
+        this.updateMemoryChart();
       } catch (error) {
         this.stopRepeater();
         this.Notifications.error('Failure', error);
@@ -74,16 +74,17 @@ class KubernetesApplicationStatsController {
     const memoryChart = this.ChartService.CreateMemoryChart(memoryChartCtx);
     this.memoryChart = memoryChart;
 
-    this.updateCPUChart(this.stats, this.cpuChart);
-    this.updateMemoryChart(this.stats, this.memoryChart);
-    this.setUpdateRepeater(this.cpuChart, this.memoryChart);
+    this.updateCPUChart();
+    this.updateMemoryChart();
+    this.setUpdateRepeater();
   }
 
   getStats() {
     return this.$async(async () => {
       try {
-        const stats = await this.KubernetesPodService.stats(this.namespace, this.podName);
-        const container = _.find(stats.containers, { name: this.containerName });
+        const stats = await this.KubernetesPodService.stats(this.state.transition.namespace, this.state.transition.podName);
+        const container = _.find(stats.containers, { name: this.state.transition.containerName });
+
         if (container) {
           const memory = filesizeParser(container.usage.memory);
           const cpu = KubernetesResourceReservationHelper.parseCPU(container.usage.cpu);
@@ -95,7 +96,7 @@ class KubernetesApplicationStatsController {
             NumProcs: '',
             isWindows: false,
             PreviousCPUTotalUsage: 0,
-            CPUUsage: cpu,
+            CPUUsage: (cpu / this.nodeCPU) * 100,
             CPUCores: 0,
           };
         }
@@ -114,19 +115,23 @@ class KubernetesApplicationStatsController {
       autoRefresh: false,
       refreshRate: '5',
       viewReady: false,
+      transition: {
+        podName: this.$transition$.params().pod,
+        containerName: this.$transition$.params().container,
+        namespace: this.$transition$.params().namespace,
+        applicationName: this.$transition$.params().name,
+      },
     };
 
-    const podName = this.$transition$.params().pod;
-    const containerName = this.$transition$.params().container;
-    const namespace = this.$transition$.params().namespace;
-    const applicationName = this.$transition$.params().name;
-
-    this.namespace = namespace;
-    this.podName = podName;
-    this.containerName = containerName;
-
     try {
-      this.application = await this.KubernetesApplicationService.get(namespace, applicationName);
+      const pods = await this.KubernetesPodService.get(this.state.transition.namespace);
+      const pod = _.find(pods, { Name: this.state.transition.podName });
+      if (pod) {
+        const node = await this.KubernetesNodeService.get(pod.Node);
+        this.nodeCPU = node.CPU;
+      } else {
+        this.nodeCPU = 0;
+      }
       await this.getStats();
 
       this.$document.ready(() => {
