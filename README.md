@@ -52,7 +52,7 @@ For community support: You can find more information about Portainer's community
 
 ## Privacy
 
-**To make sure we focus our development effort in the right places we need to know which features get used most often. To give us this information we use [Matamo Analytics](https://matomo.org/), which is hosted in Germany and is fully GDPR compliant.**
+**To make sure we focus our development effort in the right places we need to know which features get used most often. To give us this information we use [Matomo Analytics](https://matomo.org/), which is hosted in Germany and is fully GDPR compliant.**
 
 When Portainer first starts, you are given the option to DISABLE analytics. If you **don't** choose to disable it, we collect anonymous usage as per [our privacy policy](https://www.portainer.io/documentation/in-app-analytics-and-privacy-policy/). **Please note**, there is no personally identifiable information sent or stored at any time and we only use the data to help us improve Portainer.
 
