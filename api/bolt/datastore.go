@@ -191,6 +191,7 @@ func (store *Store) MigrateData() error {
 			EndpointGroupService: store.EndpointGroupService,
 			EndpointService:      store.EndpointService,
 			ExtensionService:     store.ExtensionService,
+			UserService:          store.UserService,
 			VersionService:       store.VersionService,
 		}
 		migrator := migratoree.NewMigrator(migratorParams)
@@ -216,6 +217,7 @@ func (store *Store) MigrateData() error {
 			EndpointGroupService: store.EndpointGroupService,
 			EndpointService:      store.EndpointService,
 			ExtensionService:     store.ExtensionService,
+			UserService:          store.UserService,
 			VersionService:       store.VersionService,
 		}
 		migrator := migratoree.NewMigrator(migratorParams)

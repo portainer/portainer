@@ -2,6 +2,7 @@ package migratoree
 
 import (
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 // MigrateFromCEdbv25 will migrate the db from latest ce version to latest ee version
@@ -25,6 +26,11 @@ func (m *Migrator) MigrateFromCEdbv25() error {
 }
 
 func (m *Migrator) updateAuthorizationsToEE() error {
+	err := m.updateUserAuthorizationToEE()
+	if err != nil {
+		return err
+	}
+
 	extensions, err := m.extensionService.Extensions()
 	for _, extension := range extensions {
 		if extension.ID == 3 && extension.Enabled {
@@ -73,6 +79,24 @@ func (m *Migrator) updateAuthorizationsToEE() error {
 	}
 
 	return m.authorizationService.UpdateUsersAuthorizations()
+}
+
+func (m *Migrator) updateUserAuthorizationToEE() error {
+	legacyUsers, err := m.userService.Users()
+	if err != nil {
+		return err
+	}
+
+	for _, user := range legacyUsers {
+		user.PortainerAuthorizations = authorization.DefaultPortainerAuthorizations()
+
+		err = m.userService.UpdateUser(user.ID, &user)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func updateUserAccessPolicyToNoRole(policies portainer.UserAccessPolicies, key portainer.UserID) {
