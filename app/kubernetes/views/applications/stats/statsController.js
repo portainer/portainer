@@ -6,7 +6,7 @@ import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceRese
 
 class KubernetesApplicationStatsController {
   /* @ngInject */
-  constructor($async, $state, $interval, $document, Notifications, KubernetesPodService, KubernetesNodeService, ChartService) {
+  constructor($async, $state, $interval, $document, Notifications, KubernetesPodService, KubernetesNodeService, KubernetesMetricsService, ChartService) {
     this.$async = $async;
     this.$state = $state;
     this.$interval = $interval;
@@ -14,6 +14,7 @@ class KubernetesApplicationStatsController {
     this.Notifications = Notifications;
     this.KubernetesPodService = KubernetesPodService;
     this.KubernetesNodeService = KubernetesNodeService;
+    this.KubernetesMetricsService = KubernetesMetricsService;
     this.ChartService = ChartService;
 
     this.onInit = this.onInit.bind(this);
@@ -82,7 +83,7 @@ class KubernetesApplicationStatsController {
   getStats() {
     return this.$async(async () => {
       try {
-        const stats = await this.KubernetesPodService.stats(this.state.transition.namespace, this.state.transition.podName);
+        const stats = await this.KubernetesMetricsService.getPod(this.state.transition.namespace, this.state.transition.podName);
         const container = _.find(stats.containers, { name: this.state.transition.containerName });
 
         if (container) {
@@ -101,6 +102,7 @@ class KubernetesApplicationStatsController {
           };
         }
       } catch (err) {
+        this.state.getMetrics = false;
         this.Notifications.error('Failure', err, 'Unable to retrieve application stats');
       }
     });
@@ -121,6 +123,7 @@ class KubernetesApplicationStatsController {
         namespace: this.$transition$.params().namespace,
         applicationName: this.$transition$.params().name,
       },
+      getMetrics: true,
     };
 
     try {
