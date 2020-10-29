@@ -20,7 +20,7 @@ angular.module('portainer.docker').controller('LogViewerController', [
     };
 
     this.copy = function () {
-      clipboard.copyText(this.state.filteredLogs);
+      clipboard.copyText(this.state.filteredLogs.map((log) => log.line));
       $('#refreshRateChange').show();
       $('#refreshRateChange').fadeOut(2000);
     };
