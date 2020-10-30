@@ -303,6 +303,12 @@ class KubernetesCreateApplicationController {
     const ingresses = this.filteredIngresses;
     p.IngressName = ingresses && ingresses.length ? ingresses[0].Name : undefined;
     p.IngressHost = ingresses && ingresses.length ? ingresses[0].Host : undefined;
+    if (this.formValues.PublishingType === KubernetesApplicationPublishingTypes.LOAD_BALANCER && this.state.isEdit) {
+      const oldPorts = _.filter(this.formValues.PublishedPorts, { IsNew: false });
+      if (oldPorts.length) {
+        p.Protocol = oldPorts[0].Protocol;
+      }
+    }
     this.formValues.PublishedPorts.push(p);
   }
 
@@ -335,6 +341,7 @@ class KubernetesCreateApplicationController {
     this.onChangePortMappingNodePort();
     this.onChangePortMappingIngressRoute();
     this.onChangePortMappingLoadBalancer();
+    this.onChangePortProtocol();
   }
 
   onChangePortMappingContainerPort() {
@@ -401,6 +408,16 @@ class KubernetesCreateApplicationController {
     } else {
       state.refs = {};
       state.hasDuplicates = false;
+    }
+  }
+
+  onChangePortProtocol(index) {
+    this.onChangePortMappingContainerPort();
+    if (this.formValues.PublishingType === KubernetesApplicationPublishingTypes.LOAD_BALANCER) {
+      const newPorts = _.filter(this.formValues.PublishedPorts, { IsNew: true });
+      _.forEach(newPorts, (port) => {
+        port.Protocol = index ? this.formValues.PublishedPorts[index].Protocol : newPorts[0].Protocol;
+      });
     }
   }
   /* #endregion */
@@ -606,8 +623,16 @@ class KubernetesCreateApplicationController {
     return this.state.isEdit && this.formValues.PublishedPorts.length > 0 && ports.length > 0;
   }
 
+  isEditLBWithPorts() {
+    return this.formValues.PublishingType === KubernetesApplicationPublishingTypes.LOAD_BALANCER && _.filter(this.formValues.PublishedPorts, { IsNew: false }).length;
+  }
+
   isProtocolOptionDisabled(index, protocol) {
-    return this.disableLoadBalancerEdit() || (this.isEditAndNotNewPublishedPort(index) && this.formValues.PublishedPorts[index].Protocol !== protocol);
+    return (
+      this.disableLoadBalancerEdit() ||
+      (this.isEditAndNotNewPublishedPort(index) && this.formValues.PublishedPorts[index].Protocol !== protocol) ||
+      (this.isEditLBWithPorts() && this.formValues.PublishedPorts[index].Protocol !== protocol)
+    );
   }
 
   /* #endregion */
