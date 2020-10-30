@@ -6,7 +6,7 @@ angular.module('portainer.kubernetes').factory('KubernetesMetrics', [
     'use strict';
     return function (namespace) {
       const url = API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/apis/metrics.k8s.io/v1beta1';
-      const podUrl = `${url}${namespace ? '/namespaces/:namespace' : ''}/pods/:id/`;
+      const podUrl = `${url}${namespace ? '/namespaces/:namespace' : ''}/pods/:id`;
 
       return $resource(
         url,

@@ -18,7 +18,7 @@
       configured.
     </span>
   </information-panel>
-  <div class="row">
+  <div class="row" ng-if="ctrl.state.getMetrics">
     <div class="col-md-12">
       <rd-widget>
         <rd-widget-header icon="fa-info-circle" title-text="About statistics"> </rd-widget-header>
@@ -61,7 +61,7 @@
     </div>
   </div>
 
-  <div class="row">
+  <div class="row" ng-if="ctrl.state.getMetrics">
     <div class="col-lg-6 col-md-12 col-sm-12">
       <rd-widget>
         <rd-widget-header icon="fa-chart-area" title-text="Memory usage"></rd-widget-header>

@@ -85,7 +85,6 @@ class KubernetesApplicationStatsController {
       try {
         const stats = await this.KubernetesMetricsService.getPod(this.state.transition.namespace, this.state.transition.podName);
         const container = _.find(stats.containers, { name: this.state.transition.containerName });
-
         if (container) {
           const memory = filesizeParser(container.usage.memory);
           const cpu = KubernetesResourceReservationHelper.parseCPU(container.usage.cpu);
@@ -102,7 +101,6 @@ class KubernetesApplicationStatsController {
           };
         }
       } catch (err) {
-        this.state.getMetrics = false;
         this.Notifications.error('Failure', err, 'Unable to retrieve application stats');
       }
     });
@@ -127,19 +125,26 @@ class KubernetesApplicationStatsController {
     };
 
     try {
-      const pods = await this.KubernetesPodService.get(this.state.transition.namespace);
-      const pod = _.find(pods, { Name: this.state.transition.podName });
-      if (pod) {
-        const node = await this.KubernetesNodeService.get(pod.Node);
-        this.nodeCPU = node.CPU;
-      } else {
-        this.nodeCPU = 0;
-      }
-      await this.getStats();
+      const podsMetrics = await this.KubernetesMetricsService.getPod(this.state.transition.namespace);
+      if (podsMetrics.items.length) {
+        const pods = await this.KubernetesPodService.get(this.state.transition.namespace);
+        const pod = _.find(pods, { Name: this.state.transition.podName });
+        if (pod) {
+          const node = await this.KubernetesNodeService.get(pod.Node);
+          this.nodeCPU = node.CPU;
+        } else {
+          this.nodeCPU = 0;
+        }
+        await this.getStats();
 
-      this.$document.ready(() => {
-        this.initCharts();
-      });
+        if (this.state.getMetrics) {
+          this.$document.ready(() => {
+            this.initCharts();
+          });
+        }
+      } else {
+        this.state.getMetrics = false;
+      }
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve application stats');
     } finally {
