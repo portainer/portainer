@@ -379,12 +379,15 @@ type (
 		AnonymousMode       bool                      `json:"AnonymousMode"`
 		ReaderDN            string                    `json:"ReaderDN"`
 		Password            string                    `json:"Password,omitempty"`
-		URL                 string                    `json:"URL"`
+		URLs                []string                  `json:"URLs"`
 		TLSConfig           TLSConfiguration          `json:"TLSConfig"`
 		StartTLS            bool                      `json:"StartTLS"`
 		SearchSettings      []LDAPSearchSettings      `json:"SearchSettings"`
 		GroupSearchSettings []LDAPGroupSearchSettings `json:"GroupSearchSettings"`
 		AutoCreateUsers     bool                      `json:"AutoCreateUsers"`
+
+		// Deprecated
+		URL string `json:"URL"`
 	}
 
 	// LicenseInformation represents information about an extension license

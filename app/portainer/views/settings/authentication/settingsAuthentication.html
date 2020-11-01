@@ -94,12 +94,29 @@
             </div>
 
             <div class="form-group">
-              <label for="ldap_url" class="col-sm-3 col-lg-2 control-label text-left">
+              <div class="col-sm-12 small text-muted">
+                <p>
+                  <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  You can configure multiple LDAP servers for authentication fallback. Make sure all servers are using the same configuration (i.e. if TLS is enabled, they should
+                  all use the same certificates).
+                </p>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="ldap_url" class="col-sm-3 col-lg-2 control-label text-left" style="display: flex; flex-wrap: wrap;">
                 LDAP Server
-                <portainer-tooltip position="bottom" message="URL or IP address of the LDAP server."></portainer-tooltip>
+                <button type="button" class="label label-default interactive" style="border: 0;" ng-click="addLDAPUrl()">
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i> Add additional server
+                </button>
               </label>
               <div class="col-sm-9 col-lg-10">
-                <input type="text" class="form-control" id="ldap_url" ng-model="formValues.LDAPSettings.URL" placeholder="e.g. 10.0.0.10:389 or myldap.domain.tld:389" />
+                <div ng-repeat="url in formValues.LDAPSettings.URLs track by $index" style="display: flex; margin-bottom: 10px;">
+                  <input type="text" class="form-control" id="ldap_url" ng-model="formValues.LDAPSettings.URLs[$index]" placeholder="e.g. 10.0.0.10:389 or myldap.domain.tld:389" />
+                  <button ng-if="$index > 0" class="btn btn-sm btn-danger" type="button" ng-click="removeLDAPUrl($index)">
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -153,7 +170,7 @@
                 <button
                   type="button"
                   class="btn btn-primary btn-sm"
-                  ng-disabled="(state.connectivityCheckInProgress) || (!formValues.LDAPSettings.URL) || ((!formValues.LDAPSettings.ReaderDN || !formValues.LDAPSettings.Password) && !formValues.LDAPSettings.AnonymousMode)"
+                  ng-disabled="state.connectivityCheckInProgress || !isLDAPFormValid()"
                   ng-click="LDAPConnectivityCheck()"
                   button-spinner="state.connectivityCheckInProgress"
                 >
@@ -232,13 +249,9 @@
                 <i class="fa fa-times red-icon" style="margin-left: 5px;" ng-if="state.failedConnectivityCheck"></i>
               </label>
               <div class="col-sm-9 col-lg-10">
-                <button
-                  type="button"
-                  class="btn btn-primary btn-sm"
-                  ng-click="LDAPConnectivityCheck()"
-                  ng-disabled="(!formValues.LDAPSettings.URL) || (!formValues.TLSCACert && !formValues.LDAPSettings.TLSConfig.TLSSkipVerify) || ((!formValues.LDAPSettings.ReaderDN || !formValues.LDAPSettings.Password) && !formValues.LDAPSettings.AnonymousMode)"
-                  >Test connectivity</button
-                >
+                <button type="button" class="btn btn-primary btn-sm" ng-click="LDAPConnectivityCheck()" ng-disabled="state.connectivityCheckInProgress || !isLDAPFormValid()">
+                  Test connectivity
+                </button>
                 <i id="connectivityCheckSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
               </div>
             </div>
@@ -374,7 +387,13 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-click="saveSettings()" ng-disabled="state.actionInProgress" button-spinner="state.actionInProgress">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                ng-click="saveSettings()"
+                ng-disabled="state.actionInProgress || (settings.AuthenticationMethod === 2 && !isLDAPFormValid())"
+                button-spinner="state.actionInProgress"
+              >
                 <span ng-hide="state.actionInProgress">Save settings</span>
                 <span ng-show="state.actionInProgress">Saving...</span>
               </button>

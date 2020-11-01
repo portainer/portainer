@@ -52,6 +52,15 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 		}
 	}
 
+	if payload.AuthenticationMethod != nil && *payload.AuthenticationMethod == 2 {
+		if payload.LDAPSettings == nil {
+			return errors.New("Invalid LDAP Configuration")
+		}
+		if len(payload.LDAPSettings.URLs) == 0 {
+			return errors.New("Invalid LDAP URLs. At least one URL is required")
+		}
+	}
+
 	return nil
 }
 

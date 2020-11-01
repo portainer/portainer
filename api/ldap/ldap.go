@@ -3,6 +3,7 @@ package ldap
 import (
 	"errors"
 	"fmt"
+	"log"
 	"strings"
 
 	ldap "github.com/go-ldap/ldap/v3"
@@ -56,19 +57,31 @@ func searchUser(username string, conn *ldap.Conn, settings []portainer.LDAPSearc
 }
 
 func createConnection(settings *portainer.LDAPSettings) (*ldap.Conn, error) {
+	for _, url := range settings.URLs {
+		conn, err := createConnectionForURL(url, settings)
+		if err != nil {
+			log.Printf("[DEBUG] [ldap] [message: failed creating LDAP connection] [error: %s]", err)
+		} else {
+			return conn, nil
+		}
+	}
 
+	return nil, errors.New("No valid connection")
+}
+
+func createConnectionForURL(url string, settings *portainer.LDAPSettings) (*ldap.Conn, error) {
 	if settings.TLSConfig.TLS || settings.StartTLS {
 		config, err := crypto.CreateTLSConfigurationFromDisk(settings.TLSConfig.TLSCACertPath, settings.TLSConfig.TLSCertPath, settings.TLSConfig.TLSKeyPath, settings.TLSConfig.TLSSkipVerify)
 		if err != nil {
 			return nil, err
 		}
-		config.ServerName = strings.Split(settings.URL, ":")[0]
+		config.ServerName = strings.Split(url, ":")[0]
 
 		if settings.TLSConfig.TLS {
-			return ldap.DialTLS("tcp", settings.URL, config)
+			return ldap.DialTLS("tcp", url, config)
 		}
 
-		conn, err := ldap.Dial("tcp", settings.URL)
+		conn, err := ldap.Dial("tcp", url)
 		if err != nil {
 			return nil, err
 		}
@@ -81,7 +94,7 @@ func createConnection(settings *portainer.LDAPSettings) (*ldap.Conn, error) {
 		return conn, nil
 	}
 
-	return ldap.Dial("tcp", settings.URL)
+	return ldap.Dial("tcp", url)
 }
 
 // AuthenticateUser is used to authenticate a user against a LDAP/AD.

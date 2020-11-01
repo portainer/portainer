@@ -6,6 +6,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/endpoint"
 	"github.com/portainer/portainer/api/bolt/endpointgroup"
 	"github.com/portainer/portainer/api/bolt/extension"
+	"github.com/portainer/portainer/api/bolt/settings"
 	"github.com/portainer/portainer/api/bolt/user"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
@@ -21,8 +22,8 @@ type (
 		endpointGroupService *endpointgroup.Service
 		endpointService      *endpoint.Service
 		extensionService     *extension.Service
+		settingsService      *settings.Service
 		userService          *user.Service
-		settingsService      portainer.SettingsService
 		versionService       portainer.VersionService
 	}
 
@@ -36,6 +37,7 @@ type (
 		EndpointGroupService *endpointgroup.Service
 		EndpointService      *endpoint.Service
 		ExtensionService     *extension.Service
+		SettingsService      *settings.Service
 		UserService          *user.Service
 		VersionService       portainer.VersionService
 	}
@@ -53,6 +55,7 @@ func NewMigrator(parameters *Parameters) *Migrator {
 		endpointService:      parameters.EndpointService,
 		extensionService:     parameters.ExtensionService,
 		userService:          parameters.UserService,
+		settingsService:      parameters.SettingsService,
 		versionService:       parameters.VersionService,
 	}
 }

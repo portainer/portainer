@@ -12,6 +12,11 @@ func (m *Migrator) MigrateFromCEdbv25() error {
 		return err
 	}
 
+	err = m.updateSettingsToEE()
+	if err != nil {
+		return err
+	}
+
 	err = m.versionService.StoreDBVersion(portainer.DBVersionEE)
 	if err != nil {
 		return err
@@ -23,6 +28,21 @@ func (m *Migrator) MigrateFromCEdbv25() error {
 	}
 
 	return nil
+}
+
+func (m *Migrator) updateSettingsToEE() error {
+	legacySettings, err := m.settingsService.Settings()
+	if err != nil {
+		return err
+	}
+
+	legacySettings.LDAPSettings.URLs = []string{}
+	url := legacySettings.LDAPSettings.URL
+	if url != "" {
+		legacySettings.LDAPSettings.URLs = append(legacySettings.LDAPSettings.URLs, url)
+	}
+
+	return m.settingsService.UpdateSettings(legacySettings)
 }
 
 func (m *Migrator) updateAuthorizationsToEE() error {

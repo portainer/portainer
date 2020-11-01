@@ -1,6 +1,7 @@
 package settings
 
 import (
+	"errors"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -15,6 +16,10 @@ type settingsLDAPCheckPayload struct {
 }
 
 func (payload *settingsLDAPCheckPayload) Validate(r *http.Request) error {
+	if len(payload.LDAPSettings.URLs) == 0 {
+		return errors.New("Invalid LDAP URLs. At least one URL is required")
+	}
+
 	return nil
 }
 

@@ -34,6 +34,7 @@ func (store *Store) Init() error {
 				AnonymousMode:   true,
 				AutoCreateUsers: true,
 				TLSConfig:       portainer.TLSConfiguration{},
+				URLs:            []string{},
 				SearchSettings: []portainer.LDAPSearchSettings{
 					portainer.LDAPSearchSettings{},
 				},

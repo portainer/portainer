@@ -1,3 +1,6 @@
+import angular from 'angular';
+import _ from 'lodash';
+
 angular.module('portainer.app').controller('SettingsAuthenticationController', [
   '$q',
   '$scope',
@@ -89,6 +92,9 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
 
     $scope.LDAPConnectivityCheck = function () {
       var settings = angular.copy($scope.settings);
+      settings.LDAPSettings = angular.copy(settings.LDAPSettings);
+      settings.LDAPSettings.URLs = settings.LDAPSettings.URLs.filter(Boolean);
+
       var TLSCAFile = $scope.formValues.TLSCACert !== settings.LDAPSettings.TLSConfig.TLSCACert ? $scope.formValues.TLSCACert : null;
 
       if ($scope.formValues.LDAPSettings.AnonymousMode) {
@@ -123,6 +129,9 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
 
     $scope.saveSettings = function () {
       var settings = angular.copy($scope.settings);
+      settings.LDAPSettings = angular.copy(settings.LDAPSettings);
+      settings.LDAPSettings.URLs = settings.LDAPSettings.URLs.filter(Boolean);
+
       var TLSCAFile = $scope.formValues.TLSCACert !== settings.LDAPSettings.TLSConfig.TLSCACert ? $scope.formValues.TLSCACert : null;
 
       if ($scope.formValues.LDAPSettings.AnonymousMode) {
@@ -151,6 +160,26 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
         });
     };
 
+    $scope.addLDAPUrl = function addLDAPUrl() {
+      $scope.formValues.LDAPSettings.URLs.push('');
+    };
+
+    $scope.removeLDAPUrl = function (index) {
+      $scope.formValues.LDAPSettings.URLs.splice(index, 1);
+    };
+
+    $scope.isLDAPFormValid = isLDAPFormValid;
+    function isLDAPFormValid() {
+      const ldapSettings = $scope.formValues.LDAPSettings;
+      const isTLSMode = ldapSettings.TLSConfig.TLS || ldapSettings.StartTLS;
+
+      return (
+        _.compact(ldapSettings.URLs).length &&
+        (ldapSettings.AnonymousMode || (ldapSettings.ReaderDN && ldapSettings.Password)) &&
+        (!isTLSMode || $scope.formValues.TLSCACert || ldapSettings.TLSConfig.TLSSkipVerify)
+      );
+    }
+
     // Add default port if :port is not defined in URL
     function addLDAPDefaultPort(settings, tlsEnabled) {
       if (settings.LDAPSettings.URL.indexOf(':') === -1) {
@@ -168,6 +197,9 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
           $scope.teams = data.teams;
           $scope.settings = settings;
           $scope.formValues.LDAPSettings = settings.LDAPSettings;
+          if (settings.LDAPSettings.URLs.length === 0) {
+            $scope.formValues.LDAPSettings.URLs = [''];
+          }
           $scope.OAuthSettings = settings.OAuthSettings;
           $scope.formValues.TLSCACert = settings.LDAPSettings.TLSConfig.TLSCACert;
         })
