@@ -125,6 +125,7 @@ angular.module('portainer.app').factory('StateManager', [
 
     function assignStateFromStatusAndSettings(status, settings) {
       state.application.version = status.Version;
+      state.application.edition = status.Edition;
       state.application.enableTelemetry = settings.EnableTelemetry;
       state.application.logo = settings.LogoURL;
       state.application.snapshotInterval = settings.SnapshotInterval;

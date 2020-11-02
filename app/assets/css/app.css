@@ -399,7 +399,7 @@ ul.sidebar .sidebar-list a.active {
   color: #fff;
   text-indent: 22px;
   border-left: 3px solid #fff;
-  background: #2d3e63;
+  background: #5b9bd5;
 }
 
 .sidebar-header {
@@ -407,7 +407,7 @@ ul.sidebar .sidebar-list a.active {
   list-style: none;
   text-indent: 20px;
   font-size: 18px;
-  background: #2d3e63;
+  background: #5b9bd5;
 }
 
 .sidebar-header a {
@@ -453,6 +453,12 @@ ul.sidebar .sidebar-list a.active {
   color: #fff;
 }
 
+.sidebar-footer-content .edition-version {
+  font-size: 10px;
+  margin-bottom: 8px;
+  color: #fff;
+}
+
 #sidebar-wrapper {
   display: flex;
   flex-flow: column;
@@ -487,7 +493,7 @@ ul.sidebar .sidebar-list a.active .menu-icon {
 ul.sidebar .sidebar-list .sidebar-sublist a {
   text-indent: 35px;
   font-size: 12px;
-  color: #b2bfdc;
+  color: #fff;
   line-height: 36px;
 }
 
@@ -515,7 +521,7 @@ ul.sidebar .sidebar-list .menu-icon {
 ul.sidebar .sidebar-list .sidebar-sublist a.active {
   color: #fff;
   border-left: 3px solid #fff;
-  background: #2d3e63;
+  background: #5b9bd5;
 }
 
 @media (max-height: 785px) {

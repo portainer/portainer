@@ -21,6 +21,8 @@ angular.module('portainer.app').controller('SidebarController', [
 
     async function initView() {
       $scope.uiVersion = StateManager.getState().application.version;
+      //$scope.edition = StateManager.getState().application.edition;
+      $scope.edition = 'Business Edition';
       $scope.logo = StateManager.getState().application.logo;
       $scope.showStacks = await shouldShowStacks();
 
