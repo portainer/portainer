@@ -420,22 +420,23 @@ type (
 
 	// Settings represents the application settings
 	Settings struct {
-		LogoURL                             string               `json:"LogoURL"`
-		BlackListedLabels                   []Pair               `json:"BlackListedLabels"`
-		AuthenticationMethod                AuthenticationMethod `json:"AuthenticationMethod"`
-		LDAPSettings                        LDAPSettings         `json:"LDAPSettings"`
-		OAuthSettings                       OAuthSettings        `json:"OAuthSettings"`
-		AllowBindMountsForRegularUsers      bool                 `json:"AllowBindMountsForRegularUsers"`
-		AllowPrivilegedModeForRegularUsers  bool                 `json:"AllowPrivilegedModeForRegularUsers"`
-		AllowVolumeBrowserForRegularUsers   bool                 `json:"AllowVolumeBrowserForRegularUsers"`
-		SnapshotInterval                    string               `json:"SnapshotInterval"`
-		TemplatesURL                        string               `json:"TemplatesURL"`
-		EnableHostManagementFeatures        bool                 `json:"EnableHostManagementFeatures"`
-		EdgeAgentCheckinInterval            int                  `json:"EdgeAgentCheckinInterval"`
-		EnableEdgeComputeFeatures           bool                 `json:"EnableEdgeComputeFeatures"`
-		AllowStackManagementForRegularUsers bool                 `json:"AllowStackManagementForRegularUsers"`
-		AllowHostNamespaceForRegularUsers   bool                 `json:"AllowHostNamespaceForRegularUsers"`
-		AllowDeviceMappingForRegularUsers   bool                 `json:"AllowDeviceMappingForRegularUsers"`
+		LogoURL                                   string               `json:"LogoURL"`
+		BlackListedLabels                         []Pair               `json:"BlackListedLabels"`
+		AuthenticationMethod                      AuthenticationMethod `json:"AuthenticationMethod"`
+		LDAPSettings                              LDAPSettings         `json:"LDAPSettings"`
+		OAuthSettings                             OAuthSettings        `json:"OAuthSettings"`
+		AllowBindMountsForRegularUsers            bool                 `json:"AllowBindMountsForRegularUsers"`
+		AllowPrivilegedModeForRegularUsers        bool                 `json:"AllowPrivilegedModeForRegularUsers"`
+		AllowVolumeBrowserForRegularUsers         bool                 `json:"AllowVolumeBrowserForRegularUsers"`
+		SnapshotInterval                          string               `json:"SnapshotInterval"`
+		TemplatesURL                              string               `json:"TemplatesURL"`
+		EnableHostManagementFeatures              bool                 `json:"EnableHostManagementFeatures"`
+		EdgeAgentCheckinInterval                  int                  `json:"EdgeAgentCheckinInterval"`
+		EnableEdgeComputeFeatures                 bool                 `json:"EnableEdgeComputeFeatures"`
+		AllowStackManagementForRegularUsers       bool                 `json:"AllowStackManagementForRegularUsers"`
+		AllowContainerCapabilitiesForRegularUsers bool                 `json:"AllowContainerCapabilitiesForRegularUsers"`
+		AllowHostNamespaceForRegularUsers         bool                 `json:"AllowHostNamespaceForRegularUsers"`
+		AllowDeviceMappingForRegularUsers         bool                 `json:"AllowDeviceMappingForRegularUsers"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
@@ -1010,9 +1011,9 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "1.24.1"
+	APIVersion = "1.24.2"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 24
+	DBVersion = 25
 	// AssetsServerURL represents the URL of the Portainer asset server
 	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
@@ -1044,6 +1045,10 @@ const (
 	LocalExtensionManifestFile = "/extensions.json"
 	// EdgeTemplatesURL represents the URL used to retrieve Edge templates
 	EdgeTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates-1.20.0.json"
+	// DefaultTemplatesURL represents the URL to the official templates supported by Portainer
+	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates-2.0.json"
+	// DefaultUserSessionTimeout represents the default timeout after which the user session is cleared
+	DefaultUserSessionTimeout = "8h"
 )
 
 const (

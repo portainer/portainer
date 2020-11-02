@@ -101,6 +101,11 @@ angular.module('portainer.app').factory('StateManager', [
       LocalStorage.storeApplicationState(state.application);
     };
 
+    manager.updateAllowContainerCapabilitiesForRegularUsers = function updateAllowContainerCapabilitiesForRegularUsers(allowContainerCapabilitiesForRegularUsers) {
+      state.application.allowContainerCapabilitiesForRegularUsers = allowContainerCapabilitiesForRegularUsers;
+      LocalStorage.storeApplicationState(state.application);
+    };
+
     function assignStateFromStatusAndSettings(status, settings) {
       state.application.authentication = status.Authentication;
       state.application.analytics = status.Analytics;
@@ -117,6 +122,7 @@ angular.module('portainer.app').factory('StateManager', [
       state.application.allowPrivilegedModeForRegularUsers = settings.AllowPrivilegedModeForRegularUsers;
       state.application.allowDeviceMappingForRegularUsers = settings.AllowDeviceMappingForRegularUsers;
       state.application.allowHostNamespaceForRegularUsers = settings.AllowHostNamespaceForRegularUsers;
+      state.application.allowContainerCapabilitiesForRegularUsers = settings.AllowContainerCapabilitiesForRegularUsers;
       state.application.validity = moment().unix();
     }
 

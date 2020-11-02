@@ -35,17 +35,16 @@
               auto-complete="true"
               label-class="col-sm-1"
               input-class="col-sm-11"
-            ></por-image-registry>
+            >
+            </por-image-registry>
             <!-- !image-and-registry -->
             <!-- always-pull -->
             <div class="form-group">
               <div class="col-sm-12">
                 <label for="ownership" class="control-label text-left">
                   Always pull the image
-                  <portainer-tooltip
-                    position="bottom"
-                    message="When enabled, Portainer will automatically try to pull the specified image before creating the container."
-                  ></portainer-tooltip>
+                  <portainer-tooltip position="bottom" message="When enabled, Portainer will automatically try to pull the specified image before creating the container.">
+                  </portainer-tooltip>
                 </label>
                 <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.alwaysPull" /><i></i> </label>
               </div>
@@ -63,7 +62,8 @@
                 <portainer-tooltip
                   position="bottom"
                   message="When enabled, Portainer will let Docker automatically map a random port on the host to each one defined in the image Dockerfile."
-                ></portainer-tooltip>
+                >
+                </portainer-tooltip>
               </label>
               <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="config.HostConfig.PublishAllPorts" /><i></i> </label>
             </div>
@@ -77,7 +77,8 @@
                 <portainer-tooltip
                   position="bottom"
                   message="When a range of ports on the host and a single port on the container is specified, Docker will randomly choose a single available port in the defined range and forward that to the container port."
-                ></portainer-tooltip>
+                >
+                </portainer-tooltip>
               </label>
               <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addPortBinding()">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> publish a new network port
@@ -130,7 +131,8 @@
             form-data="formValues.AccessControlData"
             resource-control="fromContainer.ResourceControl"
             ng-if="applicationState.application.authentication && fromContainer"
-          ></por-access-control-form>
+          >
+          </por-access-control-form>
           <!-- !access-control -->
           <!-- actions -->
           <div class="col-sm-12 form-section-title">
@@ -144,7 +146,8 @@
                 <portainer-tooltip
                   position="bottom"
                   message="When enabled, Portainer will automatically remove the container when it exits. This is useful when you want to use the container only once."
-                ></portainer-tooltip>
+                >
+                </portainer-tooltip>
               </label>
               <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="config.HostConfig.AutoRemove" /><i></i> </label>
             </div>
@@ -185,7 +188,7 @@
           <li class="interactive"><a data-target="#labels" data-toggle="tab">Labels</a></li>
           <li class="interactive"><a data-target="#restart-policy" data-toggle="tab">Restart policy</a></li>
           <li class="interactive"><a data-target="#runtime-resources" ng-click="refreshSlider()" data-toggle="tab">Runtime & Resources</a></li>
-          <li class="interactive"><a data-target="#container-capabilities" data-toggle="tab">Capabilities</a></li>
+          <li ng-if="areContainerCapabilitiesEnabled" class="interactive"><a data-target="#container-capabilities" data-toggle="tab">Capabilities</a></li>
         </ul>
         <!-- tab-content -->
         <div class="tab-content">
@@ -263,7 +266,7 @@
                 <div class="col-sm-4">
                   <select class="form-control" ng-model="formValues.LogDriverName" id="log-driver">
                     <option selected value="">Default logging driver</option>
-                    <option ng-repeat="driver in availableLoggingDrivers" ng-value="driver">{{ driver }}</option>
+                    <option ng-repeat="driver in availableLoggingDrivers" ng-value="driver"> {{ driver }}</option>
                     <option value="none">none</option>
                   </select>
                 </div>
@@ -283,7 +286,8 @@
                     <portainer-tooltip
                       position="top"
                       message="Add button is disabled unless a driver other than none or default is selected. Options are specific to the selected driver, refer to the driver documentation."
-                    ></portainer-tooltip>
+                    >
+                    </portainer-tooltip>
                   </label>
                   <span
                     class="label label-default interactive"
@@ -358,7 +362,7 @@
                         <span class="input-group-addon">volume</span>
                         <select class="form-control" ng-model="volume.name">
                           <option selected disabled hidden value="">Select a volume</option>
-                          <option ng-repeat="vol in availableVolumes" ng-value="vol.Name">{{ vol.Name | truncate: 30 }} - {{ vol.Driver | truncate: 30 }}</option>
+                          <option ng-repeat="vol in availableVolumes" ng-value="vol.Name"> {{ vol.Name | truncate: 30 }} - {{ vol.Driver | truncate: 30 }}</option>
                         </select>
                       </div>
                       <!-- !volume -->

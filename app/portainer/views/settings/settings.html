@@ -50,7 +50,7 @@
             <div class="col-sm-12">
               <label for="toggle_templates" class="control-label text-left">
                 Use external templates
-                <portainer-tooltip position="bottom" message="When using external templates, in-app template management will be disabled."></portainer-tooltip>
+                <portainer-tooltip position="bottom" message="When using external templates, in-app template management will be disabled."> </portainer-tooltip>
               </label>
               <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="toggle_templates" ng-model="formValues.externalTemplates" /><i></i> </label>
             </div>
@@ -80,7 +80,7 @@
             <div class="col-sm-12">
               <label for="toggle_allowbindmounts" class="control-label text-left">
                 Disable bind mounts for non-administrators
-                <portainer-tooltip position="bottom" message="When enabled, regular users will not be able to use bind mounts when creating containers."></portainer-tooltip>
+                <portainer-tooltip position="bottom" message="When enabled, regular users will not be able to use bind mounts when creating containers."> </portainer-tooltip>
               </label>
               <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="toggle_allowbindmounts" ng-model="formValues.restrictBindMounts" /><i></i> </label>
             </div>
@@ -89,7 +89,7 @@
             <div class="col-sm-12">
               <label for="toggle_allowbindmounts" class="control-label text-left">
                 Disable privileged mode for non-administrators
-                <portainer-tooltip position="bottom" message="When enabled, regular users will not be able to use privileged mode when creating containers."></portainer-tooltip>
+                <portainer-tooltip position="bottom" message="When enabled, regular users will not be able to use privileged mode when creating containers."> </portainer-tooltip>
               </label>
               <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="toggle_allowbindmounts" ng-model="formValues.restrictPrivilegedMode" /><i></i> </label>
             </div>
@@ -101,7 +101,8 @@
                 <portainer-tooltip
                   position="bottom"
                   message="When enabled, non-admin users & users with helpdesk, standard and read-only roles from the RBAC extension will be able to use Portainer volume management features."
-                ></portainer-tooltip>
+                >
+                </portainer-tooltip>
               </label>
               <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="toggle_allowvolumebrowser" ng-model="formValues.enableVolumeBrowser" /><i></i> </label>
             </div>
@@ -113,7 +114,8 @@
                 <portainer-tooltip
                   position="bottom"
                   message="Enables host management features: host scheduler, host browsing and command execution. You'll need to set the CAP_HOST_MANAGEMENT variable when deploying the Portainer agent to use some of these features."
-                ></portainer-tooltip>
+                >
+                </portainer-tooltip>
               </label>
               <label class="switch" style="margin-left: 20px;">
                 <input type="checkbox" name="toggle_enableHostManagementFeatures" ng-model="formValues.enableHostManagementFeatures" /><i></i>
@@ -134,7 +136,7 @@
             <div class="col-sm-12">
               <label for="toggle_allowHostNamespaceForRegularUsers" class="control-label text-left">
                 Disable the use of host PID 1 for non-administrators
-                <portainer-tooltip position="bottom" message="Prevent users from accessing the host filesystem through the host PID namespace."></portainer-tooltip>
+                <portainer-tooltip position="bottom" message="Prevent users from accessing the host filesystem through the host PID namespace."> </portainer-tooltip>
               </label>
               <label class="switch" style="margin-left: 20px;">
                 <input type="checkbox" name="toggle_allowHostNamespaceForRegularUsers" ng-model="formValues.restrictHostNamespaceForRegularUsers" /><i></i>
@@ -153,6 +155,17 @@
             </div>
           </div>
 
+          <div class="form-group">
+            <div class="col-sm-12">
+              <label for="toggle_disableContainerCapabilitiesForRegularUsers" class="control-label text-left">
+                Disable container capabilities for non-administrators
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" name="toggle_disableContainerCapabilitiesForRegularUsers" ng-model="formValues.disableContainerCapabilitiesForRegularUsers" /><i></i>
+              </label>
+            </div>
+          </div>
+
           <div class="form-group" ng-if="isContainerEditDisabled()">
             <span class="col-sm-12 text-muted small">
               Note: The recreate/duplicate/edit feature is currently disabled (for non-admin users) by one or more security settings.
@@ -166,7 +179,7 @@
           <div class="form-group">
             <label for="edge_checkin" class="col-sm-2 control-label text-left">
               Edge agent poll frequency
-              <portainer-tooltip position="bottom" message="Specify the interval used by each Edge agent to checkin with the Portainer instance"></portainer-tooltip>
+              <portainer-tooltip position="bottom" message="Specify the interval used by each Edge agent to checkin with the Portainer instance"> </portainer-tooltip>
             </label>
             <div class="col-sm-10">
               <select
@@ -251,8 +264,8 @@
                     <td
                       ><button type="button" class="btn btn-danger btn-xs" ng-click="removeFilteredContainerLabel($index)"
                         ><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove</button
-                      ></td
-                    >
+                      >
+                    </td>
                   </tr>
                   <tr ng-if="settings.BlackListedLabels.length === 0">
                     <td colspan="3" class="text-center text-muted">No filter available.</td>

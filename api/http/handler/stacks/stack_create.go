@@ -164,6 +164,10 @@ func (handler *Handler) isValidStackFile(stackFileContent []byte, settings *port
 		if !settings.AllowDeviceMappingForRegularUsers && service.Devices != nil && len(service.Devices) > 0 {
 			return errors.New("device mapping disabled for non administrator users")
 		}
+
+		if !settings.AllowContainerCapabilitiesForRegularUsers && (len(service.CapAdd) > 0 || len(service.CapDrop) > 0) {
+			return errors.New("container capabilities disabled for non administrator users")
+		}
 	}
 
 	return nil
