@@ -9,6 +9,7 @@ angular.module('portainer.app').factory('Status', [
       {
         get: { method: 'GET' },
         version: { method: 'GET', params: { action: 'version' } },
+        nodesCount: { method: 'GET', params: { action: 'nodes' } },
       }
     );
   },

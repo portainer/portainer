@@ -1,7 +1,9 @@
 import _ from 'lodash-es';
+
 import './rbac';
 
 import './registry-management';
+import licenseManagementModule from './license-management';
 
 async function initAuthentication(authManager, Authentication, $rootScope, $state) {
   authManager.checkAuthOnRefresh();
@@ -18,7 +20,7 @@ async function initAuthentication(authManager, Authentication, $rootScope, $stat
   return await Authentication.init();
 }
 
-angular.module('portainer.app', ['portainer.oauth', 'portainer.rbac', 'portainer.registrymanagement']).config([
+angular.module('portainer.app', ['portainer.oauth', 'portainer.rbac', 'portainer.registrymanagement', licenseManagementModule]).config([
   '$stateRegistryProvider',
   function ($stateRegistryProvider) {
     'use strict';
@@ -251,6 +253,32 @@ angular.module('portainer.app', ['portainer.oauth', 'portainer.rbac', 'portainer
       },
     };
 
+    const initLicense = {
+      name: 'portainer.init.license',
+      url: '/license',
+      views: {
+        'content@': {
+          component: 'initLicenseView',
+        },
+      },
+      onEnter: /* @ngInject */ function onEnter($async, $state, Authentication, LicenseService, Notifications) {
+        return $async(async () => {
+          if (!Authentication.isAdmin()) {
+            return $state.go('portainer.home');
+          }
+
+          try {
+            const info = await LicenseService.info();
+            if (info.valid) {
+              return $state.go('portainer.init.endpoint');
+            }
+          } catch (err) {
+            Notifications.error('Failure', err, 'Failed loading license info');
+          }
+        });
+      },
+    };
+
     var initEndpoint = {
       name: 'portainer.init.endpoint',
       url: '/endpoint',
@@ -260,6 +288,32 @@ angular.module('portainer.app', ['portainer.oauth', 'portainer.rbac', 'portainer
           controller: 'InitEndpointController',
           controllerAs: 'ctrl',
         },
+      },
+      onEnter: /* @ngInject */ function onEnter($async, $state, Authentication, EndpointService, LicenseService, Notifications) {
+        return $async(async () => {
+          if (!Authentication.isAdmin()) {
+            return $state.go('portainer.home');
+          }
+
+          try {
+            const info = await LicenseService.info();
+            if (!info.valid) {
+              return $state.go('portainer.init.license');
+            }
+          } catch (err) {
+            Notifications.error('Failure', err, 'Failed loading license info');
+          }
+
+          try {
+            const endpoints = await EndpointService.endpoints(0, 1);
+
+            if (endpoints.value.length > 0) {
+              return $state.go('portainer.home');
+            }
+          } catch (err) {
+            Notifications.error(err, 'Unable to retrieve endpoints');
+          }
+        });
       },
     };
 
@@ -414,6 +468,7 @@ angular.module('portainer.app', ['portainer.oauth', 'portainer.rbac', 'portainer
     $stateRegistryProvider.register(init);
     $stateRegistryProvider.register(initEndpoint);
     $stateRegistryProvider.register(initAdmin);
+    $stateRegistryProvider.register(initLicense);
     $stateRegistryProvider.register(registries);
     $stateRegistryProvider.register(registry);
     $stateRegistryProvider.register(registryAccess);

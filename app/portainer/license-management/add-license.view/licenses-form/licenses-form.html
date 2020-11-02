@@ -1,0 +1,46 @@
+<rd-widget>
+  <rd-widget-body>
+    <form class="form-horizontal" name="$ctrl.form" novalidate>
+      <div class="form-group">
+        <div class="col-sm-12">
+          <div class="col-sm-12 form-section-title">
+            License registration
+          </div>
+
+          <div class="small text-muted">
+            Please input your license keys.
+          </div>
+          <button class="label label-default interactive" style="border: 0; margin-left: 0; margin-top: 10px;" ng-click="$ctrl.addLicense()">
+            <i class="fa fa-plus-circle" aria-hidden="true"></i> add license
+          </button>
+        </div>
+      </div>
+
+      <license-form-item
+        ng-repeat="license in $ctrl.licenses track by $index"
+        key-validation="$ctrl.keyValidations[license]"
+        value="license"
+        index="$index"
+        on-change="$ctrl.onLicenseChange(license, index)"
+        on-remove-click="$ctrl.removeLicense(index)"
+      ></license-form-item>
+
+      <div class="form-group">
+        <div class="col-sm-12">
+          <button
+            type="button"
+            class="btn btn-primary btn-sm"
+            ng-click="$ctrl.submit()"
+            ng-disabled="$ctrl.state.actionInProgress || !$ctrl.isFormValid()"
+            button-spinner="$ctrl.state.actionInProgress"
+            style="margin-left: 0;"
+          >
+            <span ng-hide="$ctrl.state.actionInProgress">Submit</span>
+            <span ng-show="$ctrl.state.actionInProgress">In progress...</span>
+          </button>
+          <span class="text-danger" ng-if="$ctrl.state.formError" style="margin-left: 5px;">{{ $ctrl.state.formError }}</span>
+        </div>
+      </div>
+    </form>
+  </rd-widget-body>
+</rd-widget>

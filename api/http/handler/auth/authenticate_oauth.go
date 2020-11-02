@@ -104,5 +104,14 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 		}
 	}
 
+	info, err := handler.LicenseService.Info()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to fetch license information", err}
+	}
+
+	if user.Role != portainer.AdministratorRole && !info.Valid {
+		return &httperror.HandlerError{http.StatusForbidden, "License is not valid", httperrors.ErrUnauthorized}
+	}
+
 	return handler.writeToken(w, user)
 }

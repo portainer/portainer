@@ -1,0 +1,26 @@
+<ng-form name="$ctrl.form">
+  <div class="form-group">
+    <div class="col-sm-12 license-item">
+      <div class="license-input-wrapper">
+        <div class="license-input">
+          <input type="text" name="licenseInput" class="form-control" ng-model="$ctrl.value" required ng-change="$ctrl.onChange({license:$ctrl.value, index:$ctrl.index})" />
+          <i class="fa license-validation fa-check green-icon space-left" ng-if="$ctrl.keyValidation && $ctrl.keyValidation.status"></i>
+        </div>
+        <div class="small text-warning" style="margin-top: 5px;" ng-if="$ctrl.isInvalid()">
+          <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+          <span ng-if="$ctrl.keyValidation && !$ctrl.keyValidation.status"> {{ $ctrl.keyValidation.message }}</span>
+
+          <span ng-if="$ctrl.form.licenseInput.$invalid">
+            <span ng-messages="$ctrl.form.licenseInput.$error">
+              <span ng-message="required">license is required.</span>
+            </span>
+          </span>
+        </div>
+        <div class="small text-warning" ng-show=""> </div>
+      </div>
+      <button class="btn btn-sm btn-danger" ng-disabled="$first && $last" ng-click="$ctrl.onRemoveClick({index:$ctrl.index})">
+        <i class="fa fa-trash-alt"></i>
+      </button>
+    </div>
+  </div>
+</ng-form>

@@ -1,0 +1,18 @@
+<rd-header>
+  <rd-header-title title-text="Licenses">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.licenses" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>Licenses</rd-header-content>
+</rd-header>
+
+<div class="row" ng-if="$ctrl.info">
+  <license-info info="$ctrl.info"></license-info>
+</div>
+
+<div class="row" ng-if="$ctrl.licenses">
+  <div class="col-sm-12">
+    <licenses-datatable title-icon="fa-file-signature" table-key="Licenses" order-by="company" dataset="$ctrl.licenses" remove-action="$ctrl.removeAction"></licenses-datatable>
+  </div>
+</div>

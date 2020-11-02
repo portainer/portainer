@@ -17,7 +17,8 @@ class AuthenticationController {
     SettingsService,
     URLHelper,
     LocalStorage,
-    StatusService
+    StatusService,
+    LicenseService
   ) {
     this.$async = $async;
     this.$scope = $scope;
@@ -33,7 +34,7 @@ class AuthenticationController {
     this.URLHelper = URLHelper;
     this.LocalStorage = LocalStorage;
     this.StatusService = StatusService;
-
+    this.LicenseService = LicenseService;
     this.logo = this.StateManager.getState().application.logo;
     this.formValues = {
       Username: '',
@@ -46,6 +47,7 @@ class AuthenticationController {
     };
 
     this.checkForEndpointsAsync = this.checkForEndpointsAsync.bind(this);
+    this.checkForLicensesAsync = this.checkForLicensesAsync.bind(this);
     this.checkForLatestVersionAsync = this.checkForLatestVersionAsync.bind(this);
     this.postLoginSteps = this.postLoginSteps.bind(this);
 
@@ -117,15 +119,25 @@ class AuthenticationController {
   async checkForEndpointsAsync() {
     try {
       const endpoints = await this.EndpointService.endpoints(0, 1);
-      const isAdmin = this.Authentication.isAdmin();
 
-      if (endpoints.value.length === 0 && isAdmin) {
-        return this.$state.go('portainer.init.endpoint');
-      } else {
-        return this.$state.go('portainer.home');
+      if (endpoints.value.length === 0) {
+        return 'portainer.init.endpoint';
       }
     } catch (err) {
       this.error(err, 'Unable to retrieve endpoints');
+    }
+    return 'portainer.home';
+  }
+
+  async checkForLicensesAsync() {
+    try {
+      const info = await this.LicenseService.info();
+
+      if (!info.valid) {
+        return 'portainer.init.license';
+      }
+    } catch (err) {
+      this.error(err, 'Unable to retrieve licenses info');
     }
   }
 
@@ -148,8 +160,18 @@ class AuthenticationController {
 
   async postLoginSteps() {
     await this.StateManager.initialize();
-    await this.checkForEndpointsAsync();
+
+    const isAdmin = this.Authentication.isAdmin();
+    let path = 'portainer.home';
+    if (isAdmin) {
+      path = await this.checkForLicensesAsync();
+      if (!path) {
+        path = await this.checkForEndpointsAsync();
+      }
+    }
+
     await this.checkForLatestVersionAsync();
+    this.$state.go(path);
   }
   /**
    * END POST LOGIN STEPS SECTION

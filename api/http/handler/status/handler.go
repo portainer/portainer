@@ -12,7 +12,8 @@ import (
 // Handler is the HTTP handler used to handle status operations.
 type Handler struct {
 	*mux.Router
-	Status *portainer.Status
+	Status    *portainer.Status
+	DataStore portainer.DataStore
 }
 
 // NewHandler creates a handler to manage status operations.
@@ -25,6 +26,8 @@ func NewHandler(bouncer *security.RequestBouncer, status *portainer.Status) *Han
 		bouncer.PublicAccess(httperror.LoggerHandler(h.statusInspect))).Methods(http.MethodGet)
 	h.Handle("/status/version",
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.statusInspectVersion))).Methods(http.MethodGet)
+	h.Handle("/status/nodes",
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.statusNodesCount))).Methods(http.MethodGet)
 
 	return h
 }

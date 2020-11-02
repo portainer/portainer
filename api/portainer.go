@@ -1,6 +1,7 @@
 package portainer
 
 import (
+	"github.com/portainer/liblicense"
 	"io"
 	"time"
 )
@@ -109,6 +110,7 @@ type (
 		ServiceCount            int               `json:"ServiceCount"`
 		StackCount              int               `json:"StackCount"`
 		SnapshotRaw             DockerSnapshotRaw `json:"DockerSnapshotRaw"`
+		NodeCount               int               `json:"NodeCount"`
 	}
 
 	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
@@ -289,26 +291,34 @@ type (
 
 	// Extension represents a deprecated Portainer extension
 	Extension struct {
-		ID               ExtensionID        `json:"Id"`
-		Enabled          bool               `json:"Enabled"`
-		Name             string             `json:"Name,omitempty"`
-		ShortDescription string             `json:"ShortDescription,omitempty"`
-		Description      string             `json:"Description,omitempty"`
-		DescriptionURL   string             `json:"DescriptionURL,omitempty"`
-		Price            string             `json:"Price,omitempty"`
-		PriceDescription string             `json:"PriceDescription,omitempty"`
-		Deal             bool               `json:"Deal,omitempty"`
-		Available        bool               `json:"Available,omitempty"`
-		License          LicenseInformation `json:"License,omitempty"`
-		Version          string             `json:"Version"`
-		UpdateAvailable  bool               `json:"UpdateAvailable"`
-		ShopURL          string             `json:"ShopURL,omitempty"`
-		Images           []string           `json:"Images,omitempty"`
-		Logo             string             `json:"Logo,omitempty"`
+		ID               ExtensionID                 `json:"Id"`
+		Enabled          bool                        `json:"Enabled"`
+		Name             string                      `json:"Name,omitempty"`
+		ShortDescription string                      `json:"ShortDescription,omitempty"`
+		Description      string                      `json:"Description,omitempty"`
+		DescriptionURL   string                      `json:"DescriptionURL,omitempty"`
+		Price            string                      `json:"Price,omitempty"`
+		PriceDescription string                      `json:"PriceDescription,omitempty"`
+		Deal             bool                        `json:"Deal,omitempty"`
+		Available        bool                        `json:"Available,omitempty"`
+		License          ExtensionLicenseInformation `json:"License,omitempty"`
+		Version          string                      `json:"Version"`
+		UpdateAvailable  bool                        `json:"UpdateAvailable"`
+		ShopURL          string                      `json:"ShopURL,omitempty"`
+		Images           []string                    `json:"Images,omitempty"`
+		Logo             string                      `json:"Logo,omitempty"`
 	}
 
 	// ExtensionID represents a extension identifier
 	ExtensionID int
+
+	// ExtensionLicenseInformation represents information about an extension license
+	ExtensionLicenseInformation struct {
+		LicenseKey string `json:"LicenseKey,omitempty"`
+		Company    string `json:"Company,omitempty"`
+		Expiration string `json:"Expiration,omitempty"`
+		Valid      bool   `json:"Valid,omitempty"`
+	}
 
 	// GitlabRegistryData represents data required for gitlab registry to work
 	GitlabRegistryData struct {
@@ -390,12 +400,16 @@ type (
 		URL string `json:"URL"`
 	}
 
-	// LicenseInformation represents information about an extension license
-	LicenseInformation struct {
-		LicenseKey string `json:"LicenseKey,omitempty"`
-		Company    string `json:"Company,omitempty"`
-		Expiration string `json:"Expiration,omitempty"`
-		Valid      bool   `json:"Valid,omitempty"`
+	// LicenseInfo represents aggregated information about an instance license
+	LicenseInfo struct {
+		ProductEdition liblicense.ProductEdition       `json:"productEdition"`
+		Company        string                          `json:"company"`
+		Email          string                          `json:"email"`
+		CreatedAt      int64                           `json:"createdAt"`
+		ExpiresAt      int64                           `json:"expiresAt"`
+		Nodes          int                             `json:"nodes"`
+		Type           liblicense.PortainerLicenseType `json:"type"`
+		Valid          bool                            `json:"valid"`
 	}
 
 	// MembershipRole represents the role of a user within a team
@@ -823,6 +837,7 @@ type (
 		Endpoint() EndpointService
 		EndpointGroup() EndpointGroupService
 		EndpointRelation() EndpointRelationService
+		License() LicenseRepository
 		Registry() RegistryService
 		ResourceControl() ResourceControlService
 		Role() RoleService
@@ -979,6 +994,22 @@ type (
 		AuthenticateUser(username, password string, settings *LDAPSettings) error
 		TestConnectivity(settings *LDAPSettings) error
 		GetUserGroups(username string, settings *LDAPSettings) ([]string, error)
+	}
+
+	// LicenseService represents a service used to manage licenses
+	LicenseService interface {
+		Info() (*LicenseInfo, error)
+		Licenses() ([]liblicense.PortainerLicense, error)
+		AddLicense(licenseKey string) (*liblicense.PortainerLicense, error)
+		DeleteLicense(licenseKey string) error
+	}
+
+	// LicenseRepository represents a service used to manage licenses store
+	LicenseRepository interface {
+		Licenses() ([]liblicense.PortainerLicense, error)
+		License(licenseKey string) (*liblicense.PortainerLicense, error)
+		AddLicense(licenseKey string, license *liblicense.PortainerLicense) error
+		DeleteLicense(licenseKey string) error
 	}
 
 	// OAuthService represents a service used to authenticate users using OAuth

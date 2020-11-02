@@ -10,6 +10,8 @@
 <motd-panel ng-if="motd && motd.Message !== '' && applicationState.UI.dismissedInfoHash !== motd.Hash" motd="motd" dismiss-action="dismissImportantInformation(motd.Hash)">
 </motd-panel>
 
+<license-node-panel></license-node-panel>
+
 <kubernetes-feedback-panel></kubernetes-feedback-panel>
 
 <information-panel ng-if="!isAdmin && endpoints.length === 0" title-text="Information">

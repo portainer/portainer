@@ -1,0 +1,10 @@
+<rd-header>
+  <rd-header-title title-text="Add License"> </rd-header-title>
+  <rd-header-content><a ui-sref="portainer.licenses">Licenses</a> &gt; Add Licenses</rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <licenses-form licenses="$ctrl.licenses" on-submit-success="($ctrl.onSubmitSuccess)"></licenses-form>
+  </div>
+</div>

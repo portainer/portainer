@@ -37,6 +37,11 @@ angular.module('portainer.app').factory('StatusService', [
       return deferred.promise;
     };
 
+    service.nodesCount = async function nodesCount() {
+      const response = await Status.nodesCount().$promise;
+      return response.nodes;
+    };
+
     return service;
   },
 ]);

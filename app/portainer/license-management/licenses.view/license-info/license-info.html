@@ -1,0 +1,15 @@
+<information-panel title-text="License information">
+  <p class="text-muted small">
+    Portainer {{ $ctrl.productEdition() }} licensed to {{ $ctrl.info.company }}
+    <span ng-if="$ctrl.info.type !== 1"> for up to {{ $ctrl.info.nodes }} {{ $ctrl.info.nodes !== 1 ? 'Nodes' : 'Node' }}</span>
+  </p>
+  <p class="text-muted small">
+    {{ $ctrl.info.type === 1 ? 'Trial' : 'License' }} expires on <b>{{ $ctrl.expiresAt() }}</b></p
+  >
+
+  <div>
+    <a class="btn btn-primary btn-sm">
+      Buy/renew license
+    </a>
+  </div>
+</information-panel>

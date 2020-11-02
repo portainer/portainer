@@ -234,6 +234,12 @@ github.com/portainer/libcrypto v0.0.0-20190723020515-23ebe86ab2c2 h1:0PfgGLys9yH
 github.com/portainer/libcrypto v0.0.0-20190723020515-23ebe86ab2c2/go.mod h1:/wIeGwJOMYc1JplE/OvYMO5korce39HddIfI8VKGyAM=
 github.com/portainer/libhttp v0.0.0-20190806161843-ba068f58be33 h1:H8HR2dHdBf8HANSkUyVw4o8+4tegGcd+zyKZ3e599II=
 github.com/portainer/libhttp v0.0.0-20190806161843-ba068f58be33/go.mod h1:Y2TfgviWI4rT2qaOTHr+hq6MdKIE5YjgQAu7qwptTV0=
+github.com/portainer/liblicense v0.0.0-20200926131517-4c35b5b3a96f h1:YrLxuK4YNS46rMSooaYUI33i7PiobPQ0KBMlhum36cc=
+github.com/portainer/liblicense v0.0.0-20200926131517-4c35b5b3a96f/go.mod h1:6OSugUz07QF1WwrMmRNIMhgiq+drVMIZ98UTu5LVZP8=
+github.com/portainer/liblicense v0.0.0-20201008102752-a2860d99d01b h1:fQAHzTior2Kk15U6Bz79slXo+oJqUjq2c2vh4MFuXXM=
+github.com/portainer/liblicense v0.0.0-20201008102752-a2860d99d01b/go.mod h1:6OSugUz07QF1WwrMmRNIMhgiq+drVMIZ98UTu5LVZP8=
+github.com/portainer/liblicense v0.0.0-20201014034501-91f389a90f8b h1:XAEZw/lhkoM2aKjq2TPg0LvSYmnzzTdgmLjMbjScfEU=
+github.com/portainer/liblicense v0.0.0-20201014034501-91f389a90f8b/go.mod h1:6OSugUz07QF1WwrMmRNIMhgiq+drVMIZ98UTu5LVZP8=
 github.com/prometheus/client_golang v0.9.1/go.mod h1:7SWBe2y4D6OKWSNQJUaRYU/AaXPKyh/dDVn+NZz0KFw=
 github.com/prometheus/client_golang v1.0.0/go.mod h1:db9x61etRT2tGnBNRi70OPL5FsnadC4Ky3P0J6CfImo=
 github.com/prometheus/client_golang v1.1.0 h1:BQ53HtBmfOitExawJ6LokA4x8ov/z0SYYb0+HxJfRI8=

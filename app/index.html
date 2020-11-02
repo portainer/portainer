@@ -25,8 +25,10 @@
     <div
       id="page-wrapper"
       ng-class="{
-        open: toggle && ['portainer.auth', 'portainer.init.admin', 'portainer.init.endpoint'].indexOf($state.current.name) === -1,
-        nopadding: ['portainer.auth', 'portainer.init.admin', 'portainer.init.endpoint', 'portainer.logout'].indexOf($state.current.name) > -1 || applicationState.loading
+        open: toggle && ['portainer.auth', 'portainer.init.admin', 'portainer.init.endpoint', 'portainer.init.license'].indexOf($state.current.name) === -1,
+        nopadding:
+          ['portainer.auth', 'portainer.init.admin', 'portainer.init.endpoint', 'portainer.init.license', 'portainer.logout'].indexOf($state.current.name) > -1 ||
+          applicationState.loading
       }"
       ng-cloak
     >

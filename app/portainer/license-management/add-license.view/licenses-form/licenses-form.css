@@ -1,0 +1,22 @@
+.license-input {
+  position: relative;
+}
+
+.license-input .license-validation {
+  position: absolute;
+  top: calc(50% - 7px);
+  right: 10px;
+  background: white;
+}
+
+.license-item {
+  display: flex;
+}
+
+.license-item button {
+  height: 34px;
+}
+
+.license-input-wrapper {
+  flex: 1;
+}

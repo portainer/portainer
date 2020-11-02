@@ -187,6 +187,9 @@
         <a ui-sref="portainer.registries" ui-sref-active="active">Registries <span class="menu-icon fa fa-database fa-fw"></span></a>
       </li>
       <li class="sidebar-list" ng-if="isAdmin">
+        <a ui-sref="portainer.licenses" ui-sref-active="active">Licenses <span class="menu-icon fa fa-file-signature fa-fw"></span></a>
+      </li>
+      <li class="sidebar-list" ng-if="isAdmin">
         <a ui-sref="portainer.settings" ui-sref-active="active">Settings <span class="menu-icon fa fa-cogs fa-fw"></span></a>
         <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'portainer.settings' || $state.current.name === 'portainer.settings.authentication') && isAdmin">
           <a ui-sref="portainer.settings.authentication" ui-sref-active="active">Authentication</a></div

@@ -84,6 +84,15 @@ func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
 	}
 
+	info, err := handler.LicenseService.Info()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to fetch license information", err}
+	}
+
+	if user.Role != portainer.AdministratorRole && !info.Valid {
+		return &httperror.HandlerError{http.StatusForbidden, "License is not valid", httperrors.ErrUnauthorized}
+	}
+
 	return handler.writeToken(w, user)
 }
 
@@ -91,6 +100,15 @@ func (handler *Handler) authenticateInternal(w http.ResponseWriter, user *portai
 	err := handler.CryptoService.CompareHashAndData(user.Password, password)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid credentials", httperrors.ErrUnauthorized}
+	}
+
+	info, err := handler.LicenseService.Info()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to fetch license information", err}
+	}
+
+	if user.Role != portainer.AdministratorRole && !info.Valid {
+		return &httperror.HandlerError{http.StatusForbidden, "License is not valid", httperrors.ErrUnauthorized}
 	}
 
 	return handler.writeToken(w, user)
@@ -121,6 +139,15 @@ func (handler *Handler) authenticateLDAPAndCreateUser(w http.ResponseWriter, use
 	err = handler.AuthorizationService.UpdateUsersAuthorizations()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
+	}
+
+	info, err := handler.LicenseService.Info()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to fetch license information", err}
+	}
+
+	if !info.Valid {
+		return &httperror.HandlerError{http.StatusForbidden, "License is not valid", httperrors.ErrUnauthorized}
 	}
 
 	return handler.writeToken(w, user)

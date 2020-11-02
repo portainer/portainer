@@ -7,8 +7,7 @@ angular.module('portainer.app').controller('InitAdminController', [
   'StateManager',
   'SettingsService',
   'UserService',
-  'EndpointService',
-  function ($async, $scope, $state, Notifications, Authentication, StateManager, SettingsService, UserService, EndpointService) {
+  function ($async, $scope, $state, Notifications, Authentication, StateManager, SettingsService, UserService) {
     $scope.logo = StateManager.getState().application.logo;
 
     $scope.formValues = {
@@ -38,14 +37,7 @@ angular.module('portainer.app').controller('InitAdminController', [
           return StateManager.initialize();
         })
         .then(function () {
-          return EndpointService.endpoints(0, 100);
-        })
-        .then(function success(data) {
-          if (data.value.length === 0) {
-            $state.go('portainer.init.endpoint');
-          } else {
-            $state.go('portainer.home');
-          }
+          return $state.go('portainer.init.license');
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to create administrator user');

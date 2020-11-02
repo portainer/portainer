@@ -24,6 +24,7 @@ import (
 	kubecli "github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/ldap"
 	"github.com/portainer/portainer/api/libcompose"
+	"github.com/portainer/portainer/api/license"
 	"github.com/portainer/portainer/api/oauth"
 )
 
@@ -346,6 +347,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	licenseService := license.NewService(dataStore.License())
+
 	ldapService := initLDAPService()
 
 	oauthService := initOAuthService()
@@ -455,6 +458,7 @@ func main() {
 		BindAddress:             *flags.Addr,
 		AssetsPath:              *flags.Assets,
 		DataStore:               dataStore,
+		LicenseService:          licenseService,
 		SwarmStackManager:       swarmStackManager,
 		ComposeStackManager:     composeStackManager,
 		KubernetesDeployer:      kubernetesDeployer,

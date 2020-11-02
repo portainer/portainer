@@ -21,6 +21,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
 	"github.com/portainer/portainer/api/http/handler/endpoints"
 	"github.com/portainer/portainer/api/http/handler/file"
+	"github.com/portainer/portainer/api/http/handler/licenses"
 	"github.com/portainer/portainer/api/http/handler/motd"
 	"github.com/portainer/portainer/api/http/handler/registries"
 	"github.com/portainer/portainer/api/http/handler/resourcecontrols"
@@ -51,6 +52,7 @@ type Server struct {
 	ReverseTunnelService    portainer.ReverseTunnelService
 	ComposeStackManager     portainer.ComposeStackManager
 	CryptoService           portainer.CryptoService
+	LicenseService          portainer.LicenseService
 	SignatureService        portainer.DigitalSignatureService
 	SnapshotService         portainer.SnapshotService
 	FileService             portainer.FileService
@@ -75,7 +77,7 @@ func (server *Server) Start() error {
 	kubernetesTokenCacheManager := kubernetes.NewTokenCacheManager()
 	proxyManager := proxy.NewManager(server.DataStore, server.SignatureService, server.ReverseTunnelService, server.DockerClientFactory, server.KubernetesClientFactory, kubernetesTokenCacheManager)
 
-	requestBouncer := security.NewRequestBouncer(server.DataStore, server.JWTService)
+	requestBouncer := security.NewRequestBouncer(server.DataStore, server.LicenseService, server.JWTService)
 
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
 
@@ -85,6 +87,7 @@ func (server *Server) Start() error {
 	authHandler.CryptoService = server.CryptoService
 	authHandler.JWTService = server.JWTService
 	authHandler.LDAPService = server.LDAPService
+	authHandler.LicenseService = server.LicenseService
 	authHandler.ProxyManager = proxyManager
 	authHandler.KubernetesTokenCacheManager = kubernetesTokenCacheManager
 	authHandler.OAuthService = server.OAuthService
@@ -140,6 +143,9 @@ func (server *Server) Start() error {
 	endpointProxyHandler.ProxyManager = proxyManager
 	endpointProxyHandler.ReverseTunnelService = server.ReverseTunnelService
 
+	var licenseHandler = licenses.NewHandler(requestBouncer)
+	licenseHandler.LicenseService = server.LicenseService
+
 	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"))
 
 	var motdHandler = motd.NewHandler(requestBouncer)
@@ -168,6 +174,9 @@ func (server *Server) Start() error {
 	stackHandler.KubernetesDeployer = server.KubernetesDeployer
 	stackHandler.GitService = server.GitService
 
+	var statusHandler = status.NewHandler(requestBouncer, server.Status)
+	statusHandler.DataStore = server.DataStore
+
 	var tagHandler = tags.NewHandler(requestBouncer)
 	tagHandler.DataStore = server.DataStore
 
@@ -178,8 +187,6 @@ func (server *Server) Start() error {
 	var teamMembershipHandler = teammemberships.NewHandler(requestBouncer)
 	teamMembershipHandler.AuthorizationService = authorizationService
 	teamMembershipHandler.DataStore = server.DataStore
-
-	var statusHandler = status.NewHandler(requestBouncer, server.Status)
 
 	var templatesHandler = templates.NewHandler(requestBouncer)
 	templatesHandler.DataStore = server.DataStore
@@ -218,6 +225,7 @@ func (server *Server) Start() error {
 		EndpointEdgeHandler:    endpointEdgeHandler,
 		EndpointProxyHandler:   endpointProxyHandler,
 		FileHandler:            fileHandler,
+		LicenseHandler:         licenseHandler,
 		MOTDHandler:            motdHandler,
 		RegistryHandler:        registryHandler,
 		ResourceControlHandler: resourceControlHandler,

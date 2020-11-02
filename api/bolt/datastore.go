@@ -1,6 +1,7 @@
 package bolt
 
 import (
+	"github.com/portainer/portainer/api/bolt/license"
 	"log"
 	"path"
 	"time"
@@ -55,6 +56,7 @@ type Store struct {
 	EndpointService         *endpoint.Service
 	EndpointRelationService *endpointrelation.Service
 	ExtensionService        *extension.Service
+	LicenseService          *license.Service
 	RegistryService         *registry.Service
 	ResourceControlService  *resourcecontrol.Service
 	RoleService             *role.Service
@@ -297,6 +299,12 @@ func (store *Store) initServices() error {
 	}
 	store.ExtensionService = extensionService
 
+	licenseService, err := license.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.LicenseService = licenseService
+
 	registryService, err := registry.NewService(store.db)
 	if err != nil {
 		return err
@@ -410,6 +418,11 @@ func (store *Store) EndpointGroup() portainer.EndpointGroupService {
 // EndpointRelation gives access to the EndpointRelation data management layer
 func (store *Store) EndpointRelation() portainer.EndpointRelationService {
 	return store.EndpointRelationService
+}
+
+// License provides access to the License data management layer
+func (store *Store) License() portainer.LicenseRepository {
+	return store.LicenseService
 }
 
 // Registry gives access to the Registry data management layer

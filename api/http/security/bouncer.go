@@ -2,6 +2,7 @@ package security
 
 import (
 	"errors"
+	"log"
 	"net/http"
 	"strings"
 
@@ -14,8 +15,9 @@ import (
 type (
 	// RequestBouncer represents an entity that manages API request accesses
 	RequestBouncer struct {
-		dataStore  portainer.DataStore
-		jwtService portainer.JWTService
+		dataStore      portainer.DataStore
+		jwtService     portainer.JWTService
+		licenseService portainer.LicenseService
 	}
 
 	// RestrictedRequestContext is a data structure containing information
@@ -29,10 +31,11 @@ type (
 )
 
 // NewRequestBouncer initializes a new RequestBouncer
-func NewRequestBouncer(dataStore portainer.DataStore, jwtService portainer.JWTService) *RequestBouncer {
+func NewRequestBouncer(dataStore portainer.DataStore, licenseService portainer.LicenseService, jwtService portainer.JWTService) *RequestBouncer {
 	return &RequestBouncer{
-		dataStore:  dataStore,
-		jwtService: jwtService,
+		dataStore:      dataStore,
+		jwtService:     jwtService,
+		licenseService: licenseService,
 	}
 }
 
@@ -186,6 +189,26 @@ func (bouncer *RequestBouncer) mwAuthenticatedUser(h http.Handler) http.Handler 
 	h = bouncer.mwCheckAuthentication(h)
 	h = mwSecureHeaders(h)
 	return h
+}
+
+// mwCheckLicense will verify that the instance license is valid
+func (bouncer *RequestBouncer) mwCheckLicense(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		info, err := bouncer.licenseService.Info()
+		if err != nil {
+			log.Printf("[ERROR] [http,security,bouncer] [err: %s] [msg: Failed fetching license info]", err)
+			httperror.WriteError(w, http.StatusForbidden, "Access denied", httperrors.ErrUnauthorized)
+			return
+		}
+
+		if !info.Valid {
+			log.Printf("[INFO] [http,security,bouncer] [msg: licenses are invalid]")
+			httperror.WriteError(w, http.StatusForbidden, "Access denied", httperrors.ErrUnauthorized)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }
 
 // mwCheckPortainerAuthorizations will verify that the user has the required authorization to access
