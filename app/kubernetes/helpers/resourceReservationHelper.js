@@ -40,5 +40,34 @@ class KubernetesResourceReservationHelper {
   static bytesValue(mem) {
     return filesizeParser(mem) * 1000 * 1000;
   }
+
+  static computeSliderMaxResources(nodes, pools, name, resourceOverCommitEnable, resourceOverCommitPercent) {
+    let maxResources = { CPU: 0, Memory: 0 };
+    _.forEach(nodes, (item) => {
+      maxResources.CPU += item.CPU;
+      maxResources.Memory += filesizeParser(item.Memory);
+    });
+    maxResources.Memory = KubernetesResourceReservationHelper.megaBytesValue(maxResources.Memory);
+
+    if (!resourceOverCommitEnable) {
+      const reservedResources = _.reduce(
+        pools,
+        (acc, pool) => {
+          if (pool.Quota && pool.Namespace.Name !== name) {
+            acc.CPU += pool.Quota.CpuLimit;
+            acc.Memory += pool.Quota.MemoryLimit;
+          }
+          return acc;
+        },
+        { CPU: 0, Memory: 0 }
+      );
+      if (reservedResources.Memory) {
+        reservedResources.Memory = KubernetesResourceReservationHelper.megaBytesValue(reservedResources.Memory);
+      }
+      maxResources.CPU = parseInt((maxResources.CPU - (maxResources.CPU * resourceOverCommitPercent) / 100 - reservedResources.CPU) * 10) / 10;
+      maxResources.Memory = parseInt(maxResources.Memory - (maxResources.Memory * resourceOverCommitPercent) / 100 - reservedResources.Memory);
+    }
+    return maxResources;
+  }
 }
 export default KubernetesResourceReservationHelper;

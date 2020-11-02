@@ -89,7 +89,7 @@ class KubernetesConfigureController {
 
   onChangeEnableResourceOverCommit() {
     if (this.formValues.EnableResourceOverCommit) {
-      this.formValues.ResourceOverCommitPercentage = 80;
+      this.formValues.ResourceOverCommitPercentage = 20;
     }
   }
 
@@ -191,8 +191,8 @@ class KubernetesConfigureController {
     this.formValues = {
       UseLoadBalancer: false,
       UseServerMetrics: false,
-      EnableResourceOverCommit: false,
-      ResourceOverCommitPercentage: 80,
+      EnableResourceOverCommit: true,
+      ResourceOverCommitPercentage: 20,
       IngressClasses: [],
       RestrictDefaultNamespace: false,
     };

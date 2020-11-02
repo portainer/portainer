@@ -1,6 +1,5 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import filesizeParser from 'filesize-parser';
 import { KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resource-quota/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import { KubernetesResourcePoolFormValues, KubernetesResourcePoolIngressClassAnnotationFormValue } from 'Kubernetes/models/resource-pool/formValues';
@@ -161,32 +160,19 @@ class KubernetesCreateResourcePoolController {
       };
 
       const nodes = await this.KubernetesNodeService.get();
-
-      _.forEach(nodes, (item) => {
-        this.state.sliderMaxMemory += filesizeParser(item.Memory);
-        this.state.sliderMaxCpu += item.CPU;
-      });
-      this.state.sliderMaxMemory = KubernetesResourceReservationHelper.megaBytesValue(this.state.sliderMaxMemory);
-
       await this.getResourcePools();
 
-      if (!this.state.resourceOverCommitEnable) {
-        const reservedResources = _.reduce(
-          this.resourcePools,
-          (acc, pool) => {
-            if (pool.Quota) {
-              acc.CPU += pool.Quota.CpuLimit;
-              acc.Memory += pool.Quota.MemoryLimit;
-            }
-            return acc;
-          },
-          { CPU: 0, Memory: 0 }
-        );
-        if (reservedResources.Memory) {
-          reservedResources.Memory = KubernetesResourceReservationHelper.megaBytesValue(reservedResources.Memory);
-        }
-        this.state.sliderMaxCpu = parseInt(((this.state.sliderMaxCpu * this.state.resourceOverCommitPercentage) / 100 - reservedResources.CPU) * 10) / 10;
-        this.state.sliderMaxMemory = parseInt((this.state.sliderMaxMemory * this.state.resourceOverCommitPercentage) / 100 - reservedResources.Memory);
+      const sliderMaxResources = KubernetesResourceReservationHelper.computeSliderMaxResources(
+        nodes,
+        this.resourcePools,
+        '',
+        this.state.resourceOverCommitEnable,
+        this.state.resourceOverCommitPercentage
+      );
+      this.state.sliderMaxCpu = sliderMaxResources.CPU;
+      this.state.sliderMaxMemory = sliderMaxResources.Memory;
+      if (this.state.resourceOverCommitEnable) {
+        this.formValues.HasQuota = true;
       }
 
       if (this.state.canUseIngress) {

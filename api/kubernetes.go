@@ -5,8 +5,8 @@ func KubernetesDefault() KubernetesData {
 		Configuration: KubernetesConfiguration{
 			UseLoadBalancer:              false,
 			UseServerMetrics:             false,
-			EnableResourceOverCommit:     false,
-			ResourceOverCommitPercentage: 80,
+			EnableResourceOverCommit:     true,
+			ResourceOverCommitPercentage: 20,
 			StorageClasses:               []KubernetesStorageClassConfig{},
 			IngressClasses:               []KubernetesIngressClassConfig{},
 			RestrictDefaultNamespace:     false,

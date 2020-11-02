@@ -1,6 +1,5 @@
 import angular from 'angular';
 import * as _ from 'lodash-es';
-import filesizeParser from 'filesize-parser';
 import { KubernetesResourceQuota, KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resource-quota/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
@@ -326,30 +325,15 @@ class KubernetesResourcePoolController {
 
       this.pool = _.find(pools, { Namespace: { Name: name } });
 
-      _.forEach(nodes, (item) => {
-        this.state.sliderMaxMemory += filesizeParser(item.Memory);
-        this.state.sliderMaxCpu += item.CPU;
-      });
-      this.state.sliderMaxMemory = KubernetesResourceReservationHelper.megaBytesValue(this.state.sliderMaxMemory);
-
-      if (!this.state.resourceOverCommitEnable) {
-        const reservedResources = _.reduce(
-          pools,
-          (acc, pool) => {
-            if (pool.Quota && pool.Namespace.Name !== this.pool.Namespace.Name) {
-              acc.CPU += pool.Quota.CpuLimit;
-              acc.Memory += pool.Quota.MemoryLimit;
-            }
-            return acc;
-          },
-          { CPU: 0, Memory: 0 }
-        );
-        if (reservedResources.Memory) {
-          reservedResources.Memory = KubernetesResourceReservationHelper.megaBytesValue(reservedResources.Memory);
-        }
-        this.state.sliderMaxCpu = parseInt(((this.state.sliderMaxCpu * this.state.resourceOverCommitPercentage) / 100 - reservedResources.CPU) * 10) / 10;
-        this.state.sliderMaxMemory = parseInt((this.state.sliderMaxMemory * this.state.resourceOverCommitPercentage) / 100 - reservedResources.Memory);
-      }
+      const sliderMaxResources = KubernetesResourceReservationHelper.computeSliderMaxResources(
+        nodes,
+        pools,
+        name,
+        this.state.resourceOverCommitEnable,
+        this.state.resourceOverCommitPercentage
+      );
+      this.state.sliderMaxCpu = sliderMaxResources.CPU;
+      this.state.sliderMaxMemory = sliderMaxResources.Memory;
 
       const quota = this.pool.Quota;
       if (quota) {
@@ -365,6 +349,10 @@ class KubernetesResourcePoolController {
       this.isEditable = !this.KubernetesNamespaceHelper.isSystemNamespace(this.pool.Namespace.Name);
       if (this.pool.Namespace.Name === 'default') {
         this.isEditable = false;
+      }
+
+      if (this.isEditable && !this.state.ResourceOverCommitEnable) {
+        this.formValues.HasQuota = true;
       }
 
       await this.getEvents();
