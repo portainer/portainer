@@ -50,7 +50,7 @@ func initFileService(dataStorePath string) portainer.FileService {
 	return fileService
 }
 
-func initDataStore(dataStorePath string, fileService portainer.FileService) portainer.DataStore {
+func initDataStore(dataStorePath string, rollback bool, fileService portainer.FileService) portainer.DataStore {
 	store, err := bolt.NewStore(dataStorePath, fileService)
 	if err != nil {
 		log.Fatal(err)
@@ -64,6 +64,17 @@ func initDataStore(dataStorePath string, fileService portainer.FileService) port
 	err = store.Init()
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	if rollback {
+		err := store.RollbackToCE()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		log.Println("Exiting rollback")
+		os.Exit(0)
+		return nil
 	}
 
 	err = store.MigrateData()
@@ -339,7 +350,7 @@ func main() {
 
 	fileService := initFileService(*flags.Data)
 
-	dataStore := initDataStore(*flags.Data, fileService)
+	dataStore := initDataStore(*flags.Data, *flags.RollbackDB, fileService)
 	defer dataStore.Close()
 
 	jwtService, err := initJWTService(dataStore)

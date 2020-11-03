@@ -59,6 +59,7 @@ type (
 		TLSCacert                 *string
 		TLSCert                   *string
 		TLSKey                    *string
+		RollbackDB                *bool
 		SSL                       *bool
 		SSLCert                   *string
 		SSLKey                    *string
@@ -828,6 +829,7 @@ type (
 		Close() error
 		IsNew() bool
 		MigrateData() error
+		RollbackToCE() error
 
 		DockerHub() DockerHubService
 		CustomTemplate() CustomTemplateService
@@ -932,6 +934,7 @@ type (
 	// FileService represents a service for managing files
 	FileService interface {
 		GetFileContent(filePath string) ([]byte, error)
+		Copy(fromFilePath string, toFilePath string, deleteIfExists bool) error
 		Rename(oldPath, newPath string) error
 		RemoveDirectory(directoryPath string) error
 		StoreTLSFileFromBytes(folder string, fileType TLSFileType, data []byte) (string, error)

@@ -1,13 +1,15 @@
 package bolt
 
 import (
-	"github.com/portainer/portainer/api/bolt/license"
+	"errors"
 	"log"
 	"path"
 	"time"
 
+	"github.com/portainer/portainer/api/bolt/license"
+
 	"github.com/boltdb/bolt"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/customtemplate"
 	"github.com/portainer/portainer/api/bolt/dockerhub"
 	"github.com/portainer/portainer/api/bolt/edgegroup"
@@ -16,7 +18,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/endpoint"
 	"github.com/portainer/portainer/api/bolt/endpointgroup"
 	"github.com/portainer/portainer/api/bolt/endpointrelation"
-	"github.com/portainer/portainer/api/bolt/errors"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/extension"
 	"github.com/portainer/portainer/api/bolt/migrator"
 	"github.com/portainer/portainer/api/bolt/migratoree"
@@ -33,6 +35,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/user"
 	"github.com/portainer/portainer/api/bolt/version"
 	"github.com/portainer/portainer/api/bolt/webhook"
+	"github.com/portainer/portainer/api/cli"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
 
@@ -137,14 +140,14 @@ func (store *Store) MigrateData() error {
 	}
 
 	version, err := store.VersionService.DBVersion()
-	if err == errors.ErrObjectNotFound {
+	if err == bolterrors.ErrObjectNotFound {
 		version = 0
 	} else if err != nil {
 		return err
 	}
 
 	edition, err := store.VersionService.Edition()
-	if err == errors.ErrObjectNotFound {
+	if err == bolterrors.ErrObjectNotFound {
 		edition = portainer.PortainerCE
 	} else if err != nil {
 		return err
@@ -236,6 +239,103 @@ func (store *Store) MigrateData() error {
 	}
 
 	return nil
+}
+
+func (store *Store) backupDBAndRestoreIfFailed(action func() error) error {
+	databasePath := path.Join(store.path, databaseFileName)
+	backupPath := databasePath + ".old"
+	log.Printf("[INFO] [bolt, backup] [message: creating db backup at %s]", backupPath)
+
+	err := store.fileService.Copy(databasePath, backupPath, true)
+	if err != nil {
+		return err
+	}
+
+	err = action()
+	if err != nil {
+		databasePath := path.Join(store.path, databaseFileName)
+		backupPath := databasePath + ".old"
+		log.Printf("[INFO] [bolt, backup] [message: restoring db backup from %s after failure] [error: %s]", backupPath, err)
+
+		copyErr := store.fileService.Copy(backupPath, databasePath, true)
+		if copyErr != nil {
+			log.Printf("[ERROR] [bolt, backup] [message: failed restoring db backup from %s] [error: %s]", backupPath, copyErr)
+			return copyErr
+		}
+
+		return err
+	}
+
+	return nil
+}
+
+// RollbackToCE rollbacks the store to the current ce version
+func (store *Store) RollbackToCE() error {
+	version, err := store.Version().DBVersion()
+	if err == bolterrors.ErrObjectNotFound {
+		version = 0
+	} else if err != nil {
+		return err
+	}
+
+	edition, err := store.Version().Edition()
+	if err == bolterrors.ErrObjectNotFound {
+		edition = portainer.PortainerCE
+	} else if err != nil {
+		return err
+	}
+
+	log.Printf("Current Software Edition: %s\n", getEditionLabel(edition))
+	log.Printf("Current DB Version: %d\n", version)
+
+	if edition == portainer.PortainerCE {
+		return errors.New("DB is already on CE edition")
+	}
+
+	confirmed, err := cli.Confirm("Are you sure you want to rollback your database?")
+	if err != nil {
+		return err
+	}
+
+	if !confirmed {
+		return nil
+	}
+
+	err = store.backupDBAndRestoreIfFailed(func() error {
+		migratorParams := &migratoree.Parameters{
+			CurrentEdition:  edition,
+			DB:              store.db,
+			DatabaseVersion: version,
+
+			AuthorizationService: authorization.NewService(store),
+			EndpointGroupService: store.EndpointGroupService,
+			EndpointService:      store.EndpointService,
+			ExtensionService:     store.ExtensionService,
+			UserService:          store.UserService,
+			VersionService:       store.VersionService,
+		}
+		migrator := migratoree.NewMigrator(migratorParams)
+
+		return migrator.Rollback()
+	})
+
+	if err != nil {
+		return err
+	}
+
+	log.Printf("Rolled back to CE Edition, DB Version %d\n", portainer.DBVersion)
+	return nil
+}
+
+func getEditionLabel(edition portainer.SoftwareEdition) string {
+	switch edition {
+	case portainer.PortainerCE:
+		return "CE"
+	case portainer.PortainerEE:
+		return "EE"
+	}
+
+	return ""
 }
 
 func (store *Store) initServices() error {
