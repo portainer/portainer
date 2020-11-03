@@ -79,12 +79,18 @@ class KubernetesResourcePoolService {
       namespace.ResourcePoolName = formValues.Name;
       namespace.ResourcePoolOwner = formValues.Owner;
       await this.KubernetesNamespaceService.create(namespace);
-      if (formValues.HasQuota) {
+      if (formValues.HasQuota || formValues.UseLoadBalancersQuota) {
         const quota = new KubernetesResourceQuota(formValues.Name);
-        quota.CpuLimit = formValues.CpuLimit;
-        quota.MemoryLimit = KubernetesResourceReservationHelper.bytesValue(formValues.MemoryLimit);
-        quota.ResourcePoolName = formValues.Name;
-        quota.ResourcePoolOwner = formValues.Owner;
+        if (formValues.HasQuota) {
+          quota.CpuLimit = formValues.CpuLimit;
+          quota.MemoryLimit = KubernetesResourceReservationHelper.bytesValue(formValues.MemoryLimit);
+          quota.ResourcePoolName = formValues.Name;
+          quota.ResourcePoolOwner = formValues.Owner;
+        }
+        quota.LoadBalancers = null;
+        if (formValues.UseLoadBalancersQuota) {
+          quota.LoadBalancers = formValues.LoadBalancers;
+        }
         await this.KubernetesResourceQuotaService.create(quota);
       }
       const ingressPromises = _.map(formValues.IngressClasses, (c) => {

@@ -30,6 +30,12 @@ class KubernetesResourceQuotaConverter {
     if (data.status.used && data.status.used['limits.cpu']) {
       res.CpuLimitUsed = KubernetesResourceReservationHelper.parseCPU(data.status.used['limits.cpu']);
     }
+
+    res.LoadBalancers = null;
+    if (data.spec.hard && data.spec.hard['services.loadbalancers']) {
+      res.LoadBalancers = parseInt(data.spec.hard['services.loadbalancers']);
+    }
+
     res.Yaml = yaml ? yaml.data : '';
     res.ResourcePoolName = data.metadata.labels ? data.metadata.labels[KubernetesPortainerResourcePoolNameLabel] : '';
     res.ResourcePoolOwner = data.metadata.labels ? data.metadata.labels[KubernetesPortainerResourcePoolOwnerLabel] : '';
@@ -44,6 +50,7 @@ class KubernetesResourceQuotaConverter {
     res.spec.hard['requests.memory'] = quota.MemoryLimit;
     res.spec.hard['limits.cpu'] = quota.CpuLimit;
     res.spec.hard['limits.memory'] = quota.MemoryLimit;
+    res.spec.hard['services.loadbalancers'] = quota.LoadBalancers;
     res.metadata.labels[KubernetesPortainerResourcePoolNameLabel] = quota.ResourcePoolName;
     if (quota.ResourcePoolOwner) {
       res.metadata.labels[KubernetesPortainerResourcePoolOwnerLabel] = quota.ResourcePoolOwner;
@@ -55,6 +62,9 @@ class KubernetesResourceQuotaConverter {
     if (!quota.MemoryLimit || quota.MemoryLimit === 0) {
       delete res.spec.hard['requests.memory'];
       delete res.spec.hard['limits.memory'];
+    }
+    if (quota.LoadBalancers === null) {
+      delete res.spec.hard['services.loadbalancers'];
     }
     return res;
   }
@@ -68,6 +78,7 @@ class KubernetesResourceQuotaConverter {
     res.spec.hard['requests.memory'] = quota.MemoryLimit;
     res.spec.hard['limits.cpu'] = quota.CpuLimit;
     res.spec.hard['limits.memory'] = quota.MemoryLimit;
+    res.spec.hard['services.loadbalancers'] = quota.LoadBalancers;
     res.metadata.labels[KubernetesPortainerResourcePoolNameLabel] = quota.ResourcePoolName;
     if (quota.ResourcePoolOwner) {
       res.metadata.labels[KubernetesPortainerResourcePoolOwnerLabel] = quota.ResourcePoolOwner;
@@ -79,6 +90,9 @@ class KubernetesResourceQuotaConverter {
     if (!quota.MemoryLimit || quota.MemoryLimit === 0) {
       delete res.spec.hard['requests.memory'];
       delete res.spec.hard['limits.memory'];
+    }
+    if (quota.LoadBalancers === null) {
+      delete res.spec.hard['services.loadbalancers'];
     }
     return res;
   }

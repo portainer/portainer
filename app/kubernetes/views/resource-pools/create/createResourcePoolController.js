@@ -154,6 +154,7 @@ class KubernetesCreateResourcePoolController {
         canUseIngress: endpoint.Kubernetes.Configuration.IngressClasses.length,
         resourceOverCommitEnable: endpoint.Kubernetes.Configuration.EnableResourceOverCommit,
         resourceOverCommitPercentage: endpoint.Kubernetes.Configuration.ResourceOverCommitPercentage,
+        useLoadBalancer: endpoint.Kubernetes.Configuration.UseLoadBalancer,
         duplicates: {
           ingressHosts: new KubernetesFormValueDuplicate(),
         },

@@ -5,6 +5,7 @@ export const KubernetesPortainerResourceQuotaPrefix = 'portainer-rq-';
 export const KubernetesResourceQuotaDefaults = {
   CpuLimit: 0,
   MemoryLimit: 0,
+  LoadBalancers: 0,
 };
 
 /**
@@ -18,6 +19,7 @@ const _KubernetesResourceQuota = Object.freeze({
   MemoryLimit: KubernetesResourceQuotaDefaults.MemoryLimit,
   CpuLimitUsed: KubernetesResourceQuotaDefaults.CpuLimit,
   MemoryLimitUsed: KubernetesResourceQuotaDefaults.MemoryLimit,
+  LoadBalancers: KubernetesResourceQuotaDefaults.LoadBalancers,
   Yaml: '',
   ResourcePoolName: '',
   ResourcePoolOwner: '',

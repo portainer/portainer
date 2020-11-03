@@ -535,7 +535,7 @@ class KubernetesCreateApplicationController {
   }
 
   publishViaLoadBalancerEnabled() {
-    return this.state.useLoadBalancer;
+    return this.state.useLoadBalancer && this.state.maxLoadBalancersQuota !== 0;
   }
 
   publishViaIngressEnabled() {
@@ -581,6 +581,16 @@ class KubernetesCreateApplicationController {
     return res;
   }
 
+  isMaxLoadBalancerOverflow() {
+    if (!this.state.useLoadBalancer || this.formValues.PublishingType !== this.ApplicationPublishingTypes.LOAD_BALANCER) {
+      return false;
+    }
+    if (this.state.maxLoadBalancers <= 0 && this.state.maxLoadBalancers !== null) {
+      return true;
+    }
+    return false;
+  }
+
   isDeployUpdateButtonDisabled() {
     const overflow = this.resourceReservationsOverflow();
     const autoScalerOverflow = this.autoScalerOverflow();
@@ -590,7 +600,8 @@ class KubernetesCreateApplicationController {
     const nonScalable = this.isNonScalable();
     const notInternalNoPorts = this.isNotInternalAndHasNoPublishedPorts();
     const noResourcePool = !this.formValues.ResourcePool;
-    return overflow || autoScalerOverflow || inProgress || invalid || hasNoChanges || nonScalable || notInternalNoPorts || noResourcePool;
+    const maxLoadBalancersOverflow = this.isMaxLoadBalancerOverflow();
+    return overflow || autoScalerOverflow || inProgress || invalid || hasNoChanges || nonScalable || notInternalNoPorts || noResourcePool || maxLoadBalancersOverflow;
   }
 
   disableLoadBalancerEdit() {
@@ -622,7 +633,7 @@ class KubernetesCreateApplicationController {
         minMemory,
         maxMemory = 0;
       if (quota) {
-        this.state.resourcePoolHasQuota = true;
+        this.state.resourcePoolHasResourceLimits = quota.CpuLimit || quota.MemoryLimit;
         if (quota.CpuLimit) {
           minCpu = KubernetesApplicationQuotaDefaults.CpuLimit;
           maxCpu = quota.CpuLimit - quota.CpuLimitUsed;
@@ -694,6 +705,21 @@ class KubernetesCreateApplicationController {
   async refreshApplicationsAsync(namespace) {
     try {
       this.applications = await this.KubernetesApplicationService.get(namespace);
+      this.state.maxLoadBalancers = null;
+      this.state.maxLoadBalancersQuota = null;
+      if (this.formValues.ResourcePool.Quota) {
+        this.state.maxLoadBalancersQuota = this.formValues.ResourcePool.Quota.LoadBalancers;
+        if (this.state.maxLoadBalancersQuota !== null) {
+          let appsUsingLoadBalancers = _.filter(this.applications, { ServiceType: 'LoadBalancer' });
+          if (this.state.isEdit) {
+            appsUsingLoadBalancers = _.filter(appsUsingLoadBalancers, (app) => {
+              return app.ResourcePool !== this.formValues.ResourcePool.Namespace.Name;
+            });
+          }
+          const appsUsingLoadBalancersLength = appsUsingLoadBalancers.length;
+          this.state.maxLoadBalancers = this.state.maxLoadBalancersQuota - appsUsingLoadBalancersLength;
+        }
+      }
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve applications');
     }
@@ -716,7 +742,11 @@ class KubernetesCreateApplicationController {
   refreshIngresses(namespace) {
     this.filteredIngresses = _.filter(this.ingresses, { Namespace: namespace });
     if (!this.publishViaIngressEnabled()) {
-      this.formValues.PublishingType = KubernetesApplicationPublishingTypes.INTERNAL;
+      if (this.savedFormValues) {
+        this.formValues.PublishingType = this.savedFormValues.PublishingType;
+      } else {
+        this.formValues.PublishingType = this.ApplicationPublishingTypes.INTERNAL;
+      }
     }
     this.formValues.OriginalIngresses = this.filteredIngresses;
   }
@@ -831,7 +861,9 @@ class KubernetesCreateApplicationController {
           memory: 0,
           cpu: 0,
         },
-        resourcePoolHasQuota: false,
+        maxLoadBalancers: null,
+        maxLoadBalancersQuota: null,
+        resourcePoolHasResourceLimits: false,
         viewReady: false,
         availableSizeUnits: ['MB', 'GB', 'TB'],
         alreadyExists: false,
@@ -904,9 +936,6 @@ class KubernetesCreateApplicationController {
       });
       this.nodesLabels = KubernetesNodeHelper.generateNodeLabelsFromNodes(nodes);
 
-      const namespace = this.state.isEdit ? this.state.params.namespace : this.formValues.ResourcePool.Namespace.Name;
-      await this.refreshNamespaceData(namespace);
-
       if (this.state.isEdit) {
         await this.getApplication();
         this.formValues = KubernetesApplicationConverter.applicationToFormValues(
@@ -934,6 +963,8 @@ class KubernetesCreateApplicationController {
         this.formValues.OriginalIngressClasses = angular.copy(this.ingresses);
       }
 
+      const namespace = this.state.isEdit ? this.state.params.namespace : this.formValues.ResourcePool.Namespace.Name;
+      await this.refreshNamespaceData(namespace);
       await this.updateSliders();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');

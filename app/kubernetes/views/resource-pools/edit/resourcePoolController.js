@@ -91,7 +91,12 @@ class KubernetesResourcePoolController {
   }
 
   isUpdateButtonDisabled() {
-    return this.state.actionInProgress || (this.formValues.HasQuota && !this.isQuotaValid()) || this.state.duplicates.ingressHosts.hasDuplicates;
+    return (
+      this.state.actionInProgress ||
+      (this.formValues.HasQuota && !this.isQuotaValid()) ||
+      this.state.duplicates.ingressHosts.hasDuplicates ||
+      this.state.loadBalancersUsed > this.formValues.LoadBalancers
+    );
   }
 
   isQuotaValid() {
@@ -125,6 +130,10 @@ class KubernetesResourcePoolController {
     quota.MemoryLimit = memoryLimit;
     quota.ResourcePoolName = namespace;
     quota.ResourcePoolOwner = owner;
+    quota.LoadBalancers = null;
+    if (this.formValues.UseLoadBalancersQuota) {
+      quota.LoadBalancers = this.formValues.LoadBalancers;
+    }
     await this.KubernetesResourceQuotaService.create(quota);
   }
 
@@ -149,10 +158,19 @@ class KubernetesResourcePoolController {
       const owner = this.pool.Namespace.ResourcePoolOwner;
       const quota = this.pool.Quota;
 
-      if (this.formValues.HasQuota) {
+      if (this.formValues.HasQuota || this.formValues.UseLoadBalancersQuota) {
         if (quota) {
-          quota.CpuLimit = cpuLimit;
-          quota.MemoryLimit = memoryLimit;
+          if (this.formValues.HasQuota) {
+            quota.CpuLimit = cpuLimit;
+            quota.MemoryLimit = memoryLimit;
+          } else {
+            quota.CpuLimit = 0;
+            quota.MemoryLimit = 0;
+          }
+          quota.LoadBalancers = null;
+          if (this.formValues.UseLoadBalancersQuota) {
+            quota.LoadBalancers = this.formValues.LoadBalancers;
+          }
           await this.KubernetesResourceQuotaService.update(quota);
         } else {
           await this.createResourceQuotaAsync(namespace, owner, cpuLimit, memoryLimit);
@@ -243,8 +261,14 @@ class KubernetesResourcePoolController {
         const resourceReservation = KubernetesResourceReservationHelper.computeResourceReservation(app.Pods);
         app.CPU = resourceReservation.CPU;
         app.Memory = resourceReservation.Memory;
+        if (this.formValues.LoadBalancers > 0 && app.ServiceType === 'LoadBalancer') {
+          this.state.loadBalancersUsed++;
+        }
         return app;
       });
+      if (this.formValues.LoadBalancers > 0) {
+        this.state.loadBalancersUsage = (this.state.loadBalancersUsed / this.formValues.LoadBalancers) * 100;
+      }
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve applications.');
     } finally {
@@ -312,6 +336,9 @@ class KubernetesResourcePoolController {
         canUseIngress: endpoint.Kubernetes.Configuration.IngressClasses.length,
         resourceOverCommitEnable: endpoint.Kubernetes.Configuration.EnableResourceOverCommit,
         resourceOverCommitPercentage: endpoint.Kubernetes.Configuration.ResourceOverCommitPercentage,
+        useLoadBalancer: endpoint.Kubernetes.Configuration.UseLoadBalancer,
+        loadBalancersUsed: 0,
+        loadBalancersUsage: 0,
         duplicates: {
           ingressHosts: new KubernetesFormValueDuplicate(),
         },
@@ -338,10 +365,15 @@ class KubernetesResourcePoolController {
       const quota = this.pool.Quota;
       if (quota) {
         this.oldQuota = angular.copy(quota);
-        this.formValues.HasQuota = true;
-        this.formValues.CpuLimit = quota.CpuLimit;
-        this.formValues.MemoryLimit = KubernetesResourceReservationHelper.megaBytesValue(quota.MemoryLimit);
-
+        if (quota.CpuLimit || quota.MemoryLimit) {
+          this.formValues.HasQuota = true;
+          this.formValues.CpuLimit = quota.CpuLimit;
+          this.formValues.MemoryLimit = KubernetesResourceReservationHelper.megaBytesValue(quota.MemoryLimit);
+        }
+        if (quota.LoadBalancers !== null) {
+          this.formValues.LoadBalancers = quota.LoadBalancers;
+          this.formValues.UseLoadBalancersQuota = true;
+        }
         this.state.cpuUsed = quota.CpuLimitUsed;
         this.state.memoryUsed = KubernetesResourceReservationHelper.megaBytesValue(quota.MemoryLimitUsed);
       }

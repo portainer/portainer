@@ -2,6 +2,8 @@ export function KubernetesResourcePoolFormValues(defaults) {
   return {
     MemoryLimit: defaults.MemoryLimit,
     CpuLimit: defaults.CpuLimit,
+    LoadBalancers: defaults.LoadBalancers,
+    UseLoadBalancersQuota: false,
     HasQuota: true,
     IngressClasses: [], // KubernetesResourcePoolIngressClassFormValue
   };

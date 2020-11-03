@@ -91,7 +91,7 @@
                 ></select>
               </div>
             </div>
-            <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded() && ctrl.formValues.ResourcePool">
+            <div class="form-group" ng-if="ctrl.state.resourcePoolHasResourceLimits && ctrl.resourceQuotaCapacityExceeded() && ctrl.formValues.ResourcePool">
               <div class="col-sm-12 small text-warning">
                 <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                 This resource pool has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the
@@ -625,14 +625,14 @@
                 Resource reservations
               </div>
               <!-- #region RESOURCE RESERVATIONS -->
-              <div class="form-group" ng-if="!ctrl.state.resourcePoolHasQuota">
+              <div class="form-group" ng-if="!ctrl.state.resourcePoolHasResourceLimits">
                 <div class="col-sm-12 small text-muted">
                   <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                   Resource reservations are applied per instance of the application.
                 </div>
               </div>
 
-              <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded()">
+              <div class="form-group" ng-if="ctrl.state.resourcePoolHasResourceLimits && !ctrl.resourceQuotaCapacityExceeded()">
                 <div class="col-sm-12 small text-muted">
                   <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                   A resource quota is set on this resource pool, you must specify resource reservations. Resource reservations are applied per instance of the application. Maximums
@@ -640,7 +640,7 @@
                 </div>
               </div>
 
-              <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
+              <div class="form-group" ng-if="ctrl.state.resourcePoolHasResourceLimits && ctrl.resourceQuotaCapacityExceeded()">
                 <div class="col-sm-12 small text-muted">
                   <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                   This resource pool has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of
@@ -651,7 +651,10 @@
               <!-- memory-limit-input -->
               <div
                 class="form-group"
-                ng-if="(!ctrl.state.resourcePoolHasQuota || (ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded())) && ctrl.formValues.Containers.length <= 1"
+                ng-if="
+                  (!ctrl.state.resourcePoolHasResourceLimits || (ctrl.state.resourcePoolHasResourceLimits && !ctrl.resourceQuotaCapacityExceeded())) &&
+                  ctrl.formValues.Containers.length <= 1
+                "
               >
                 <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
                   Memory
@@ -686,8 +689,7 @@
                 <div class="col-sm-12 small text-warning">
                   <div ng-messages="kubernetesApplicationCreationForm.memory_limit.$error">
                     <p
-                      ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value must be between {{ ctrl.state.sliders.memory.min }} and
-                      {{ ctrl.state.sliders.memory.max }}
+                      ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value must be between {{ ctrl.state.sliders.memory.min }} and {{ ctrl.state.sliders.memory.max }}
                     </p>
                   </div>
                 </div>
@@ -696,7 +698,10 @@
               <!-- cpu-limit-input -->
               <div
                 class="form-group"
-                ng-if="(!ctrl.state.resourcePoolHasQuota || (ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded())) && ctrl.formValues.Containers.length <= 1"
+                ng-if="
+                  (!ctrl.state.resourcePoolHasResourceLimits || (ctrl.state.resourcePoolHasResourceLimits && !ctrl.resourceQuotaCapacityExceeded())) &&
+                  ctrl.formValues.Containers.length <= 1
+                "
               >
                 <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
                   CPU
@@ -1176,7 +1181,7 @@
                       ng-value="ctrl.ApplicationPublishingTypes.LOAD_BALANCER"
                       ng-model="ctrl.formValues.PublishingType"
                       ng-change="ctrl.onChangePublishedPorts()"
-                      ng-disabled="ctrl.isPublishingTypeEditDisabled()"
+                      ng-disabled="ctrl.isPublishingTypeEditDisabled() || ctrl.state.maxLoadBalancersQuota === 0"
                     />
                     <label
                       for="publishing_loadbalancer"
@@ -1212,7 +1217,20 @@
               <!-- #endregion -->
 
               <!-- #region PUBLISHED PORTS -->
-              <div class="form-group">
+              <div
+                class="form-group"
+                ng-if="ctrl.state.maxLoadBalancers <= 0 && ctrl.state.maxLoadBalancers !== null && ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.LOAD_BALANCER"
+              >
+                <div class="col-sm-12 small text-muted" ng-if="ctrl.state.maxLoadBalancers <= 0 && ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.LOAD_BALANCER">
+                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  This resource pool has exhausted its load balancer capacity and you will not be able to use this publishing method. Contact your administrator to expand the load
+                  balancer capacity.
+                </div>
+              </div>
+              <div
+                class="form-group"
+                ng-if="ctrl.state.maxLoadBalancers > 0 || ctrl.state.maxLoadBalancers === null || ctrl.formValues.PublishingType !== ctrl.ApplicationPublishingTypes.LOAD_BALANCER"
+              >
                 <div class="col-sm-12" style="margin-top: 5px;">
                   <label class="control-label text-left">Published ports</label>
                   <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addPublishedPort()" ng-if="!ctrl.disableLoadBalancerEdit()">
@@ -1226,8 +1244,8 @@
                   ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER && ctrl.formValues.PublishedPorts.length > 0"
                 >
                   <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                  When publishing a port in cluster mode, the node port is optional. If left empty Kubernetes will use a random port number. If you wish to specify a port, use a
-                  port number inside the default range <code>30000-32767</code>.
+                  When publishing a port in cluster mode, the node port is optional. If left empty Kubernetes will use a random port number. If you wish to specify a port, use a port
+                  number inside the default range <code>30000-32767</code>.
                 </div>
                 <div ng-if="ctrl.isNotInternalAndHasNoPublishedPorts()" class="col-sm-12 small text-muted text-warning" style="margin-top: 12px;">
                   <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> At least one published port must be defined.
