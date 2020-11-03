@@ -2,10 +2,11 @@ package migratoree
 
 import (
 	"github.com/boltdb/bolt"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/endpoint"
 	"github.com/portainer/portainer/api/bolt/endpointgroup"
 	"github.com/portainer/portainer/api/bolt/extension"
+	"github.com/portainer/portainer/api/bolt/role"
 	"github.com/portainer/portainer/api/bolt/settings"
 	"github.com/portainer/portainer/api/bolt/user"
 	"github.com/portainer/portainer/api/internal/authorization"
@@ -25,6 +26,7 @@ type (
 		settingsService      *settings.Service
 		userService          *user.Service
 		versionService       portainer.VersionService
+		roleService          *role.Service
 	}
 
 	// Parameters represents the required parameters to create a new Migrator instance.
@@ -40,6 +42,7 @@ type (
 		SettingsService      *settings.Service
 		UserService          *user.Service
 		VersionService       portainer.VersionService
+		RoleService          *role.Service
 	}
 )
 
@@ -57,6 +60,7 @@ func NewMigrator(parameters *Parameters) *Migrator {
 		settingsService:      parameters.SettingsService,
 		userService:          parameters.UserService,
 		versionService:       parameters.VersionService,
+		roleService:          parameters.RoleService,
 	}
 }
 

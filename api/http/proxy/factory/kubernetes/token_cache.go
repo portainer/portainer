@@ -3,7 +3,7 @@ package kubernetes
 import (
 	"strconv"
 
-	"github.com/orcaman/concurrent-map"
+	cmap "github.com/orcaman/concurrent-map"
 )
 
 type (
@@ -40,6 +40,18 @@ func (manager *TokenCacheManager) RemoveUserFromCache(userID int) {
 	for cache := range manager.tokenCaches.IterBuffered() {
 		cache.Val.(*tokenCache).removeToken(userID)
 	}
+}
+
+// remove all user's token when all users' auth are updated
+func (manager *TokenCacheManager) HandleUsersAuthUpdate() {
+	for cache := range manager.tokenCaches.IterBuffered() {
+		cache.Val.(*tokenCache).userTokenCache = cmap.New()
+	}
+}
+
+// remove a single user token when his auth is updated
+func (manager *TokenCacheManager) HandleUserAuthDelete(userID int) {
+	manager.RemoveUserFromCache(userID)
 }
 
 func newTokenCache() *tokenCache {

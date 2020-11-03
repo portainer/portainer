@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
 // Handler is the HTTP handler used to handle team operations.
@@ -15,6 +16,7 @@ type Handler struct {
 	*mux.Router
 	AuthorizationService *authorization.Service
 	DataStore            portainer.DataStore
+	K8sClientFactory     *cli.ClientFactory
 }
 
 // NewHandler creates a handler to manage team operations.

@@ -8,7 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/internal/edge"
@@ -122,12 +122,16 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
-	oldRestrictDefaultNamespace := endpoint.Kubernetes.Configuration.RestrictDefaultNamespace
+	updateAuthorizations := false
 	if payload.Kubernetes != nil {
 		endpoint.Kubernetes = *payload.Kubernetes
+
+		if payload.Kubernetes.Configuration.RestrictDefaultNamespace !=
+			endpoint.Kubernetes.Configuration.RestrictDefaultNamespace {
+			updateAuthorizations = true
+		}
 	}
 
-	updateAuthorizations := false
 	if payload.UserAccessPolicies != nil && !reflect.DeepEqual(payload.UserAccessPolicies, endpoint.UserAccessPolicies) {
 		updateAuthorizations = true
 		endpoint.UserAccessPolicies = payload.UserAccessPolicies
@@ -267,33 +271,6 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		err = handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpoint.ID, relation)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint relation changes inside the database", err}
-		}
-	}
-
-	if payload.Kubernetes != nil && payload.Kubernetes.Configuration.RestrictDefaultNamespace != oldRestrictDefaultNamespace {
-		users, err := handler.DataStore.User().Users()
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find users inside the database", err}
-		}
-		cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint, handler.DataStore)
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create Kubernetes client", err}
-		}
-		for _, user := range users {
-			memberships, err := handler.DataStore.TeamMembership().TeamMembershipsByUserID(user.ID)
-			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find memberships inside the database", err}
-			}
-
-			teamIds := make([]int, 0)
-			for _, membership := range memberships {
-				teamIds = append(teamIds, int(membership.TeamID))
-			}
-
-			err = cli.SetupUserServiceAccount(int(user.ID), teamIds)
-			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update namespaces accesses", err}
-			}
 		}
 	}
 

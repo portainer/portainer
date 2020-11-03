@@ -28,18 +28,18 @@ func (factory *ProxyFactory) newKubernetesLocalProxy(endpoint *portainer.Endpoin
 		return nil, err
 	}
 
-	kubecli, err := factory.kubernetesClientFactory.GetKubeClient(endpoint, factory.dataStore)
+	kubecli, err := factory.kubernetesClientFactory.GetKubeClient(endpoint)
 	if err != nil {
 		return nil, err
 	}
 
 	tokenCache := factory.kubernetesTokenCacheManager.CreateTokenCache(int(endpoint.ID))
-	tokenManager, err := kubernetes.NewTokenManager(kubecli, factory.dataStore, tokenCache, true)
+	tokenManager, err := kubernetes.NewTokenManager(kubecli, factory.dataStore, tokenCache, true, factory.authService)
 	if err != nil {
 		return nil, err
 	}
 
-	transport, err := kubernetes.NewLocalTransport(tokenManager)
+	transport, err := kubernetes.NewLocalTransport(tokenManager, endpoint.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -59,13 +59,13 @@ func (factory *ProxyFactory) newKubernetesEdgeHTTPProxy(endpoint *portainer.Endp
 		return nil, err
 	}
 
-	kubecli, err := factory.kubernetesClientFactory.GetKubeClient(endpoint, factory.dataStore)
+	kubecli, err := factory.kubernetesClientFactory.GetKubeClient(endpoint)
 	if err != nil {
 		return nil, err
 	}
 
 	tokenCache := factory.kubernetesTokenCacheManager.CreateTokenCache(int(endpoint.ID))
-	tokenManager, err := kubernetes.NewTokenManager(kubecli, factory.dataStore, tokenCache, false)
+	tokenManager, err := kubernetes.NewTokenManager(kubecli, factory.dataStore, tokenCache, false, factory.authService)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func (factory *ProxyFactory) newKubernetesAgentHTTPSProxy(endpoint *portainer.En
 
 	remoteURL.Scheme = "https"
 
-	kubecli, err := factory.kubernetesClientFactory.GetKubeClient(endpoint, factory.dataStore)
+	kubecli, err := factory.kubernetesClientFactory.GetKubeClient(endpoint)
 	if err != nil {
 		return nil, err
 	}
@@ -97,13 +97,14 @@ func (factory *ProxyFactory) newKubernetesAgentHTTPSProxy(endpoint *portainer.En
 	}
 
 	tokenCache := factory.kubernetesTokenCacheManager.CreateTokenCache(int(endpoint.ID))
-	tokenManager, err := kubernetes.NewTokenManager(kubecli, factory.dataStore, tokenCache, false)
+	tokenManager, err := kubernetes.NewTokenManager(kubecli, factory.dataStore, tokenCache, false, factory.authService)
 	if err != nil {
 		return nil, err
 	}
 
 	proxy := newSingleHostReverseProxyWithHostHeader(remoteURL)
-	proxy.Transport = kubernetes.NewAgentTransport(factory.signatureService, tlsConfig, tokenManager)
+	proxy.Transport = kubernetes.NewAgentTransport(factory.signatureService,
+		tlsConfig, tokenManager, endpoint.ID)
 
 	return proxy, nil
 }

@@ -5,7 +5,7 @@
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
 <div ng-if="ctrl.state.viewReady">
-  <div class="row" ng-if="ctrl.isAdmin">
+  <div class="row" authorization="K8sClusterR">
     <div class="col-sm-12">
       <rd-widget>
         <rd-widget-body>
@@ -87,8 +87,8 @@
         dataset="ctrl.nodes"
         table-key="kubernetes.nodes"
         order-by="Name"
+        has-k8s-cluster-node-r="ctrl.state.hasK8sClusterNodeR"
         refresh-callback="ctrl.getNodes"
-        is-admin="ctrl.isAdmin"
       ></kubernetes-nodes-datatable>
     </div>
   </div>

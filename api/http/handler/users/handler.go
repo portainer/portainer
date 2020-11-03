@@ -6,9 +6,10 @@ import (
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
 var (
@@ -29,6 +30,7 @@ type Handler struct {
 	AuthorizationService *authorization.Service
 	CryptoService        portainer.CryptoService
 	DataStore            portainer.DataStore
+	K8sClientFactory     *cli.ClientFactory
 }
 
 // NewHandler creates a handler to manage user operations.
@@ -54,6 +56,8 @@ func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimi
 		bouncer.PublicAccess(httperror.LoggerHandler(h.adminCheck))).Methods(http.MethodGet)
 	h.Handle("/users/admin/init",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.adminInit))).Methods(http.MethodPost)
+	h.Handle("/users/{id}/namespaces",
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.userNamespaces))).Methods(http.MethodGet)
 
 	return h
 }

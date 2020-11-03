@@ -248,7 +248,9 @@ type (
 	// one extension of each type can be associated to an endpoint
 	EndpointExtensionType int
 
-	// EndpointGroup represents a group of endpoints
+	// EndpointGroup represents a group of endpoints.
+	//
+	// An endpoint may belong to only 1 endpoint group.
 	EndpointGroup struct {
 		ID                 EndpointGroupID    `json:"Id"`
 		Name               string             `json:"Name"`
@@ -330,6 +332,19 @@ type (
 
 	// JobType represents a job type
 	JobType int
+
+	K8sNamespaceInfo struct {
+		IsSystem  bool
+		IsDefault bool
+	}
+
+	K8sNamespaceAccessPolicy struct {
+		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
+		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
+	}
+
+	// K8sRole represents a K8s role name
+	K8sRole string
 
 	// KubernetesData contains all the Kubernetes related endpoint information
 	KubernetesData struct {
@@ -635,7 +650,9 @@ type (
 	// TeamID represents a team identifier
 	TeamID int
 
-	// TeamMembership represents a membership association between a user and a team
+	// TeamMembership represents a membership association between a user and a team.
+	//
+	// A user may belong to multiple teams.
 	TeamMembership struct {
 		ID     TeamMembershipID `json:"Id"`
 		UserID UserID           `json:"UserID"`
@@ -803,6 +820,12 @@ type (
 
 	// WebhookType represents the type of resource a webhook is related to
 	WebhookType int
+
+	// AuthEventHandler represents an handler for an auth event
+	AuthEventHandler interface {
+		HandleUsersAuthUpdate()
+		HandleUserAuthDelete(userID int)
+	}
 
 	// CLIService represents a service for managing CLI
 	CLIService interface {
@@ -987,9 +1010,20 @@ type (
 
 	// KubeClient represents a service used to query a Kubernetes environment
 	KubeClient interface {
-		SetupUserServiceAccount(userID int, teamIDs []int) error
+		SetupUserServiceAccount(
+			user User,
+			endpointRoleID RoleID,
+			namespaces map[string]K8sNamespaceInfo,
+			namespaceRoles map[string]Role,
+		) error
 		GetServiceAccountBearerToken(userID int) (string, error)
 		StartExecProcess(namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error
+		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
+		GetNamespaces() (map[string]K8sNamespaceInfo, error)
+		RemoveUserServiceAccount(userID int) error
+		UpdateNamespaceAccessPolicies(
+			accessPolicies map[string]K8sNamespaceAccessPolicy,
+		) error
 	}
 
 	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes endpoint
@@ -1410,6 +1444,18 @@ const (
 )
 
 const (
+	_ RoleID = iota
+	// RoleIDEndpointAdmin represents endpoint admin role id
+	RoleIDEndpointAdmin
+	// RoleIDHelpdesk represents help desk role id
+	RoleIDHelpdesk
+	// RoleIDStandardUser represents standard user role id
+	RoleIDStandardUser
+	// RoleIDReadonly represents readonly role id
+	RoleIDReadonly
+)
+
+const (
 	_ WebhookType = iota
 	// ServiceWebhook is a webhook for restarting a docker service
 	ServiceWebhook
@@ -1422,6 +1468,19 @@ const (
 	EdgeAgentManagementRequired string = "REQUIRED"
 	// EdgeAgentActive represents an active state for a tunnel connected to an Edge endpoint
 	EdgeAgentActive string = "ACTIVE"
+)
+
+const (
+	// K8sRoleClusterAdmin is a built in k8s role
+	K8sRoleClusterAdmin K8sRole = "cluster-admin"
+	// K8sRolePortainerBasic is a portainer k8s role at cluster level
+	K8sRolePortainerBasic K8sRole = "portainer-basic"
+	// K8sRolePortainerReadonly is a portainer k8s role at cluster level
+	K8sRolePortainerHelpdesk K8sRole = "portainer-helpdesk"
+	// K8sRolePortainerView is a portainer k8s role at namespace level
+	K8sRolePortainerView K8sRole = "portainer-view"
+	// K8sRolePortainerEdit is a portainer k8s role at namespace level
+	K8sRolePortainerEdit K8sRole = "portainer-edit"
 )
 
 const (
@@ -1635,4 +1694,40 @@ const (
 	OperationPortainerUndefined   Authorization = "PortainerUndefined"
 
 	EndpointResourcesAccess Authorization = "EndpointResourcesAccess"
+
+	OperationK8sUndefined Authorization = "K8sUndefined"
+	// OperationK8sAccessAllNamespaces allows to access all namespaces across cluster.
+	// Setting this flag ignores other namespace specific settings.
+	OperationK8sAccessAllNamespaces Authorization = "K8sAccessAllNamespaces"
+	// OperationK8sAccessSystemNamespaces allow to access system namespaces
+	// if the namespace is assigned
+	OperationK8sAccessSystemNamespaces Authorization = "K8sAccessSystemNamespaces"
+	// k8s namespace operations
+	OperationK8sAccessNamespaceRead  Authorization = "K8sAccessNamespaceRead"
+	OperationK8sAccessNamespaceWrite Authorization = "K8sAccessNamespaceWrite"
+	// k8s cluster operations
+	OperationK8sResourcePoolsR                   Authorization = "K8sResourcePoolsR"
+	OperationK8sResourcePoolsW                   Authorization = "K8sResourcePoolsW"
+	OperationK8sResourcePoolDetailsR             Authorization = "K8sResourcePoolDetailsR"
+	OperationK8sResourcePoolDetailsW             Authorization = "K8sResourcePoolDetailsW"
+	OperationK8sResourcePoolsAccessManagementRW  Authorization = "K8sResourcePoolsAccessManagementRW"
+	OperationK8sApplicationsR                    Authorization = "K8sApplicationsR"
+	OperationK8sApplicationsW                    Authorization = "K8sApplicationsW"
+	OperationK8sApplicationDetailsR              Authorization = "K8sApplicationDetailsR"
+	OperationK8sApplicationDetailsW              Authorization = "K8sApplicationDetailsW"
+	OperationK8sApplicationConsoleRW             Authorization = "K8sApplicationConsoleRW"
+	OperationK8sApplicationsAdvancedDeploymentRW Authorization = "K8sApplicationsAdvancedDeploymentRW"
+	OperationK8sConfigurationsR                  Authorization = "K8sConfigurationsR"
+	OperationK8sConfigurationsW                  Authorization = "K8sConfigurationsW"
+	OperationK8sConfigurationsDetailsR           Authorization = "K8sConfigurationsDetailsR"
+	OperationK8sConfigurationsDetailsW           Authorization = "K8sConfigurationsDetailsW"
+	OperationK8sVolumesR                         Authorization = "K8sVolumesR"
+	OperationK8sVolumesW                         Authorization = "K8sVolumesW"
+	OperationK8sVolumeDetailsR                   Authorization = "K8sVolumeDetailsR"
+	OperationK8sVolumeDetailsW                   Authorization = "K8sVolumeDetailsW"
+	OperationK8sClusterR                         Authorization = "K8sClusterR"
+	OperationK8sClusterW                         Authorization = "K8sClusterW"
+	OperationK8sClusterNodeR                     Authorization = "K8sClusterNodeR"
+	OperationK8sClusterNodeW                     Authorization = "K8sClusterNodeW"
+	OperationK8sClusterSetupRW                   Authorization = "K8sClusterSetupRW"
 )

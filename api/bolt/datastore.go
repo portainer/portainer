@@ -199,6 +199,7 @@ func (store *Store) MigrateData() error {
 			SettingsService:      store.SettingsService,
 			UserService:          store.UserService,
 			VersionService:       store.VersionService,
+			RoleService:          store.RoleService,
 		}
 		migrator := migratoree.NewMigrator(migratorParams)
 
@@ -226,6 +227,7 @@ func (store *Store) MigrateData() error {
 			SettingsService:      store.SettingsService,
 			UserService:          store.UserService,
 			VersionService:       store.VersionService,
+			RoleService:          store.RoleService,
 		}
 		migrator := migratoree.NewMigrator(migratorParams)
 

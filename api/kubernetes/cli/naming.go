@@ -1,14 +1,16 @@
 package cli
 
-import "fmt"
+import (
+	"fmt"
+	"regexp"
+)
 
 const (
 	defaultNamespace                    = "default"
 	portainerNamespace                  = "portainer"
-	portainerUserCRName                 = "portainer-cr-user"
-	portainerUserCRBName                = "portainer-crb-user"
 	portainerUserServiceAccountPrefix   = "portainer-sa-user"
 	portainerRBPrefix                   = "portainer-rb"
+	portainerCRBPrefix                  = "portainer-crb"
 	portainerConfigMapName              = "portainer-config"
 	portainerConfigMapAccessPoliciesKey = "NamespaceAccessPolicies"
 )
@@ -21,6 +23,22 @@ func userServiceAccountTokenSecretName(serviceAccountName string, instanceID str
 	return fmt.Sprintf("%s-%s-secret", instanceID, serviceAccountName)
 }
 
-func namespaceClusterRoleBindingName(namespace string, instanceID string) string {
-	return fmt.Sprintf("%s-%s-%s", portainerRBPrefix, instanceID, namespace)
+func clusterRoleBindingName(roleName string, instanceID string) string {
+	return fmt.Sprintf("%s-%s-%s", portainerCRBPrefix, instanceID, roleName)
+}
+
+func namespaceRoleBindingName(roleName string, namespace string, instanceID string) string {
+	return fmt.Sprintf("%s-%s-%s-%s", portainerRBPrefix, instanceID, namespace, roleName)
+}
+
+// match with a portainer role binding for any role name
+func matchRoleBindingName(target string, namespace string, instanceID string) bool {
+	return regexp.MustCompile("^" + namespaceRoleBindingName("(.*)", namespace, instanceID) + "$").
+		MatchString(target)
+}
+
+// match with a portainer cluster role binding for any role name
+func matchClusterRoleBindingName(target string, instanceID string) bool {
+	return regexp.MustCompile("^" + clusterRoleBindingName("(.*)", instanceID) + "$").
+		MatchString(target)
 }

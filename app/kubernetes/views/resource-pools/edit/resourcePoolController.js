@@ -15,7 +15,6 @@ class KubernetesResourcePoolController {
   constructor(
     $async,
     $state,
-    Authentication,
     Notifications,
     LocalStorage,
     EndpointProvider,
@@ -32,7 +31,6 @@ class KubernetesResourcePoolController {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
-    this.Authentication = Authentication;
     this.LocalStorage = LocalStorage;
     this.EndpointProvider = EndpointProvider;
     this.ModalService = ModalService;
@@ -312,7 +310,6 @@ class KubernetesResourcePoolController {
     try {
       const endpoint = this.EndpointProvider.currentEndpoint();
       this.endpoint = endpoint;
-      this.isAdmin = this.Authentication.isAdmin();
       this.defaults = KubernetesResourceQuotaDefaults;
       this.formValues = new KubernetesResourcePoolFormValues(this.defaults);
       this.formValues.HasQuota = false;

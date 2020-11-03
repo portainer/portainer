@@ -13,6 +13,7 @@ class KubernetesConfigurationController {
     clipboard,
     Notifications,
     LocalStorage,
+    Authentication,
     KubernetesConfigurationService,
     KubernetesResourcePoolService,
     ModalService,
@@ -26,6 +27,7 @@ class KubernetesConfigurationController {
     this.Notifications = Notifications;
     this.LocalStorage = LocalStorage;
     this.ModalService = ModalService;
+    this.Authentication = Authentication;
     this.KubernetesConfigurationService = KubernetesConfigurationService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesApplicationService = KubernetesApplicationService;
@@ -201,6 +203,7 @@ class KubernetesConfigurationController {
         activeTab: 0,
         currentName: this.$state.$current.name,
         isDataValid: true,
+        isAuthorized: this.Authentication.hasAuthorizations(['K8sConfigurationsDetailsW']),
       };
 
       this.state.activeTab = this.LocalStorage.getActiveTab('configuration');

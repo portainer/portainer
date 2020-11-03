@@ -21,9 +21,9 @@
                   </div>
                 </div>
                 <!-- !name-input -->
-                <div ng-if="ctrl.isAdmin && ctrl.isEditable" class="col-sm-12 form-section-title">Resource quota</div>
+                <div authorization="K8sResourcePoolDetailsW" ng-if="ctrl.isEditable" class="col-sm-12 form-section-title">Resource quota</div>
                 <!-- quotas-switch -->
-                <div ng-if="ctrl.isAdmin && ctrl.isEditable" class="form-group">
+                <div authorization="K8sResourcePoolDetailsW" ng-if="ctrl.isEditable" class="form-group">
                   <div class="col-sm-12 small text-muted" ng-if="ctrl.state.resourceOverCommitEnable">
                     <p>
                       <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -50,7 +50,7 @@
                     <p><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Not enough resources available in the cluster to apply a resource reservation.</p>
                   </div>
                 </div>
-                <div class="form-group" ng-if="ctrl.formValues.HasQuota && ctrl.isAdmin && ctrl.isEditable && !ctrl.isQuotaValid()">
+                <div class="form-group" authorization="K8sResourcePoolDetailsW" ng-if="ctrl.formValues.HasQuota && ctrl.isEditable && !ctrl.isQuotaValid()">
                   <span class="col-sm-12 text-warning small">
                     <p> <i class="fa fa-exclamation-triangle" aria-hidden="true" style="margin-right: 2px;"></i> At least a single limit must be set for the quota to be valid. </p>
                   </span>
@@ -67,7 +67,7 @@
                   </kubernetes-resource-reservation>
                 </div>
                 <!-- !quotas-switch -->
-                <div ng-if="ctrl.formValues.HasQuota && ctrl.isAdmin && ctrl.isEditable">
+                <div authorization="K8sResourcePoolDetailsW" ng-if="ctrl.formValues.HasQuota && ctrl.isEditable">
                   <div class="col-sm-12 form-section-title">
                     Resource limits
                   </div>
@@ -201,7 +201,7 @@
                   </div>
                 </div>
                 <!-- #endregion -->
-                <div ng-if="ctrl.isAdmin && ctrl.isEditable && ctrl.state.canUseIngress">
+                <div authorization="K8sResourcePoolDetailsW" ng-if="ctrl.isEditable && ctrl.state.canUseIngress">
                   <div class="col-sm-12 form-section-title">
                     Ingresses
                   </div>
@@ -332,10 +332,10 @@
                   <!-- #endregion -->
                 </div>
                 <!-- actions -->
-                <div ng-if="ctrl.isAdmin && ctrl.isEditable" class="col-sm-12 form-section-title">
+                <div authorization="K8sResourcePoolDetailsW" ng-if="ctrl.isEditable" class="col-sm-12 form-section-title">
                   Actions
                 </div>
-                <div ng-if="ctrl.isAdmin && ctrl.isEditable" class="form-group">
+                <div authorization="K8sResourcePoolDetailsW" ng-if="ctrl.isEditable" class="form-group">
                   <div class="col-sm-12">
                     <button
                       type="button"

@@ -11,7 +11,7 @@ require (
 	github.com/dchest/uniuri v0.0.0-20160212164326-8902c56451e9
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/docker/cli v0.0.0-20191126203649-54d085b857e9
-	github.com/docker/docker v0.0.0-00010101000000-000000000000
+	github.com/docker/docker v0.7.3-0.20190327010347-be7ac8be2ae0
 	github.com/g07cha/defender v0.0.0-20180505193036-5665c627c814
 	github.com/go-ldap/ldap/v3 v3.1.8
 	github.com/gofrs/uuid v3.2.0+incompatible
@@ -20,7 +20,7 @@ require (
 	github.com/gorilla/websocket v1.4.1
 	github.com/imdario/mergo v0.3.8 // indirect
 	github.com/jpillora/chisel v0.0.0-20190724232113-f3a8df20e389
-	github.com/json-iterator/go v1.1.8
+	github.com/json-iterator/go v1.1.10
 	github.com/koding/websocketproxy v0.0.0-20181220232114-7ed82d81a28c
 	github.com/mattn/go-shellwords v1.0.6 // indirect
 	github.com/mitchellh/mapstructure v1.1.2 // indirect

@@ -17,6 +17,7 @@ class KubernetesNodeController {
     Notifications,
     LocalStorage,
     ModalService,
+    Authentication,
     KubernetesNodeService,
     KubernetesEventService,
     KubernetesPodService,
@@ -28,6 +29,7 @@ class KubernetesNodeController {
     this.Notifications = Notifications;
     this.LocalStorage = LocalStorage;
     this.ModalService = ModalService;
+    this.Authentication = Authentication;
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesEventService = KubernetesEventService;
     this.KubernetesPodService = KubernetesPodService;
@@ -328,6 +330,7 @@ class KubernetesNodeController {
       hasDuplicateTaintKeys: false,
       duplicateLabelKeys: [],
       hasDuplicateLabelKeys: false,
+      isAuthorized: this.Authentication.hasAuthorizations(['K8sClusterNodeW']),
     };
 
     this.state.activeTab = this.LocalStorage.getActiveTab('node');

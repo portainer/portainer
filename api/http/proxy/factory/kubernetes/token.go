@@ -5,28 +5,37 @@ import (
 	"sync"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 const defaultServiceAccountTokenFile = "/var/run/secrets/kubernetes.io/serviceaccount/token"
 
 type tokenManager struct {
-	tokenCache *tokenCache
-	kubecli    portainer.KubeClient
-	dataStore  portainer.DataStore
-	mutex      sync.Mutex
-	adminToken string
+	tokenCache  *tokenCache
+	kubecli     portainer.KubeClient
+	dataStore   portainer.DataStore
+	mutex       sync.Mutex
+	adminToken  string
+	authService *authorization.Service
 }
 
 // NewTokenManager returns a pointer to a new instance of tokenManager.
 // If the useLocalAdminToken parameter is set to true, it will search for the local admin service account
 // and associate it to the manager.
-func NewTokenManager(kubecli portainer.KubeClient, dataStore portainer.DataStore, cache *tokenCache, setLocalAdminToken bool) (*tokenManager, error) {
+func NewTokenManager(
+	kubecli portainer.KubeClient,
+	dataStore portainer.DataStore,
+	cache *tokenCache,
+	setLocalAdminToken bool,
+	authService *authorization.Service,
+) (*tokenManager, error) {
 	tokenManager := &tokenManager{
-		tokenCache: cache,
-		kubecli:    kubecli,
-		dataStore:  dataStore,
-		mutex:      sync.Mutex{},
-		adminToken: "",
+		tokenCache:  cache,
+		kubecli:     kubecli,
+		dataStore:   dataStore,
+		mutex:       sync.Mutex{},
+		adminToken:  "",
+		authService: authService,
 	}
 
 	if setLocalAdminToken {
@@ -45,23 +54,61 @@ func (manager *tokenManager) getAdminServiceAccountToken() string {
 	return manager.adminToken
 }
 
-func (manager *tokenManager) getUserServiceAccountToken(userID int) (string, error) {
+// setup a user's service account if not exist, then retrieve its token
+func (manager *tokenManager) getUserServiceAccountToken(
+	userID int, endpointID int,
+) (string, error) {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
 
 	token, ok := manager.tokenCache.getToken(userID)
 	if !ok {
-		memberships, err := manager.dataStore.TeamMembership().TeamMembershipsByUserID(portainer.UserID(userID))
+		user, err := manager.dataStore.User().User(portainer.UserID(userID))
+		if err != nil || user == nil {
+			return "", err
+		}
+
+		endpointRole, err := manager.authService.GetUserEndpointRole(userID, endpointID)
+		if err != nil || endpointRole == nil {
+			return "", err
+		}
+
+		endpoint, err := manager.dataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 		if err != nil {
 			return "", err
 		}
 
-		teamIds := make([]int, 0)
-		for _, membership := range memberships {
-			teamIds = append(teamIds, int(membership.TeamID))
+		namespaces, err := manager.kubecli.GetNamespaces()
+		if err != nil {
+			return "", err
 		}
 
-		err = manager.kubecli.SetupUserServiceAccount(userID, teamIds)
+		accessPolicies, err := manager.kubecli.GetNamespaceAccessPolicies()
+		if err != nil {
+			return "", err
+		}
+		// update the namespace access policies based on user's role, also in configmap.
+		accessPolicies, hasChange, err := manager.authService.UpdateUserNamespaceAccessPolicies(
+			userID, endpoint, accessPolicies,
+		)
+		if hasChange {
+			err = manager.kubecli.UpdateNamespaceAccessPolicies(accessPolicies)
+			if err != nil {
+				return "", err
+			}
+		}
+
+		namespaceRoles, err := manager.authService.GetUserNamespaceRoles(
+			userID, endpointID, accessPolicies, namespaces, endpointRole.Authorizations,
+			endpoint.Kubernetes.Configuration,
+		)
+		if err != nil {
+			return "", err
+		}
+
+		err = manager.kubecli.SetupUserServiceAccount(
+			*user, endpointRole.ID, namespaces, namespaceRoles,
+		)
 		if err != nil {
 			return "", err
 		}

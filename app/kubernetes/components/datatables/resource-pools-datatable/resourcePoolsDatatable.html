@@ -3,7 +3,7 @@
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
         <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
-        <span class="small text-muted" style="float: left; margin-top: 5px;" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
+        <span class="small text-muted" style="float: left; margin-top: 5px;" ng-if="!$ctrl.settings.showSystem" authorization="K8sAccessSystemNamespaces">
           <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
           System resources are hidden, this can be changed in the table settings.
         </span>
@@ -17,7 +17,7 @@
                 </div>
                 <div class="menuContent">
                   <div>
-                    <div class="md-checkbox" ng-if="$ctrl.isAdmin">
+                    <div class="md-checkbox" authorization="K8sAccessSystemNamespaces">
                       <input id="setting_show_system" type="checkbox" ng-model="$ctrl.settings.showSystem" ng-change="$ctrl.onSettingsShowSystemChange()" />
                       <label for="setting_show_system">Show system resources</label>
                     </div>
@@ -50,7 +50,7 @@
           </span>
         </div>
       </div>
-      <div ng-if="$ctrl.isAdmin" class="actionBar">
+      <div authorization="K8sResourcePoolDetailsW" class="actionBar">
         <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
@@ -75,7 +75,7 @@
           <thead>
             <tr>
               <th>
-                <span ng-if="$ctrl.isAdmin" class="md-checkbox">
+                <span authorization="K8sResourcePoolDetailsW" class="md-checkbox">
                   <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                   <label for="select_all"></label>
                 </span>
@@ -99,7 +99,7 @@
                   <i class="fa fa-sort-numeric-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreationDate' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th ng-if="$ctrl.isAdmin">
+              <th authorization="K8sResourcePoolsAccessManagementRW">
                 Actions
               </th>
             </tr>
@@ -110,7 +110,7 @@
               ng-class="{ active: item.Checked }"
             >
               <td>
-                <span ng-if="$ctrl.isAdmin" class="md-checkbox">
+                <span authorization="K8sResourcePoolDetailsW" class="md-checkbox">
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="$ctrl.disableRemove(item)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
@@ -119,7 +119,7 @@
               </td>
               <td> <i class="fa {{ item.Quota ? 'fa-toggle-on' : 'fa-toggle-off' }}" aria-hidden="true" style="margin-right: 2px;"></i> {{ item.Quota ? 'Yes' : 'No' }} </td>
               <td>{{ item.CreationDate | getisodate }} {{ item.Namespace.ResourcePoolOwner ? 'by ' + item.Namespace.ResourcePoolOwner : '' }}</td>
-              <td ng-if="$ctrl.isAdmin">
+              <td authorization="K8sResourcePoolsAccessManagementRW">
                 <a ng-if="$ctrl.canManageAccess(item)" ui-sref="kubernetes.resourcePools.resourcePool.access({id: item.Namespace.Name})">
                   <i class="fa fa-users" aria-hidden="true"></i> Manage access
                 </a>

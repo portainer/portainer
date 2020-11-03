@@ -13,14 +13,16 @@ import (
 
 type (
 	localTransport struct {
-		httpTransport *http.Transport
-		tokenManager  *tokenManager
+		httpTransport      *http.Transport
+		tokenManager       *tokenManager
+		endpointIdentifier portainer.EndpointID
 	}
 
 	agentTransport struct {
-		httpTransport    *http.Transport
-		tokenManager     *tokenManager
-		signatureService portainer.DigitalSignatureService
+		httpTransport      *http.Transport
+		tokenManager       *tokenManager
+		signatureService   portainer.DigitalSignatureService
+		endpointIdentifier portainer.EndpointID
 	}
 
 	edgeTransport struct {
@@ -32,7 +34,8 @@ type (
 )
 
 // NewLocalTransport returns a new transport that can be used to send requests to the local Kubernetes API
-func NewLocalTransport(tokenManager *tokenManager) (*localTransport, error) {
+func NewLocalTransport(tokenManager *tokenManager,
+	endpointIdentifier portainer.EndpointID) (*localTransport, error) {
 	config, err := crypto.CreateTLSConfigurationFromBytes(nil, nil, nil, true, true)
 	if err != nil {
 		return nil, err
@@ -42,7 +45,8 @@ func NewLocalTransport(tokenManager *tokenManager) (*localTransport, error) {
 		httpTransport: &http.Transport{
 			TLSClientConfig: config,
 		},
-		tokenManager: tokenManager,
+		tokenManager:       tokenManager,
+		endpointIdentifier: endpointIdentifier,
 	}
 
 	return transport, nil
@@ -59,7 +63,8 @@ func (transport *localTransport) RoundTrip(request *http.Request) (*http.Respons
 	if tokenData.Role == portainer.AdministratorRole {
 		token = transport.tokenManager.getAdminServiceAccountToken()
 	} else {
-		token, err = transport.tokenManager.getUserServiceAccountToken(int(tokenData.ID))
+		token, err = transport.tokenManager.getUserServiceAccountToken(
+			int(tokenData.ID), int(transport.endpointIdentifier))
 		if err != nil {
 			return nil, err
 		}
@@ -71,13 +76,15 @@ func (transport *localTransport) RoundTrip(request *http.Request) (*http.Respons
 }
 
 // NewAgentTransport returns a new transport that can be used to send signed requests to a Portainer agent
-func NewAgentTransport(signatureService portainer.DigitalSignatureService, tlsConfig *tls.Config, tokenManager *tokenManager) *agentTransport {
+func NewAgentTransport(signatureService portainer.DigitalSignatureService, tlsConfig *tls.Config,
+	tokenManager *tokenManager, endpointIdentifier portainer.EndpointID) *agentTransport {
 	transport := &agentTransport{
 		httpTransport: &http.Transport{
 			TLSClientConfig: tlsConfig,
 		},
-		tokenManager:     tokenManager,
-		signatureService: signatureService,
+		tokenManager:       tokenManager,
+		signatureService:   signatureService,
+		endpointIdentifier: endpointIdentifier,
 	}
 
 	return transport
@@ -94,7 +101,8 @@ func (transport *agentTransport) RoundTrip(request *http.Request) (*http.Respons
 	if tokenData.Role == portainer.AdministratorRole {
 		token = transport.tokenManager.getAdminServiceAccountToken()
 	} else {
-		token, err = transport.tokenManager.getUserServiceAccountToken(int(tokenData.ID))
+		token, err = transport.tokenManager.getUserServiceAccountToken(
+			int(tokenData.ID), int(transport.endpointIdentifier))
 		if err != nil {
 			return nil, err
 		}
@@ -136,7 +144,8 @@ func (transport *edgeTransport) RoundTrip(request *http.Request) (*http.Response
 	if tokenData.Role == portainer.AdministratorRole {
 		token = transport.tokenManager.getAdminServiceAccountToken()
 	} else {
-		token, err = transport.tokenManager.getUserServiceAccountToken(int(tokenData.ID))
+		token, err = transport.tokenManager.getUserServiceAccountToken(
+			int(tokenData.ID), int(transport.endpointIdentifier))
 		if err != nil {
 			return nil, err
 		}

@@ -8,9 +8,11 @@ import $allSettled from 'Portainer/services/allSettled';
 
 class KubernetesNamespaceService {
   /* @ngInject */
-  constructor($async, KubernetesNamespaces) {
+  constructor($async, KubernetesNamespaces, Authentication, KubernetesNamespaceHelper) {
     this.$async = $async;
     this.KubernetesNamespaces = KubernetesNamespaces;
+    this.Authentication = Authentication;
+    this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
 
     this.getAsync = this.getAsync.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
@@ -38,9 +40,17 @@ class KubernetesNamespaceService {
       const data = await this.KubernetesNamespaces().get().$promise;
       const promises = _.map(data.items, (item) => this.KubernetesNamespaces().status({ id: item.metadata.name }).$promise);
       const namespaces = await $allSettled(promises);
+      const hasK8sAccessSystemNamespaces = this.Authentication.hasAuthorizations(['K8sAccessSystemNamespaces']);
       const visibleNamespaces = _.map(namespaces.fulfilled, (item) => {
         if (item.status.phase !== 'Terminating') {
-          return KubernetesNamespaceConverter.apiToNamespace(item);
+          const namespace = KubernetesNamespaceConverter.apiToNamespace(item);
+          if (this.KubernetesNamespaceHelper.isSystemNamespace(namespace.Name)) {
+            if (hasK8sAccessSystemNamespaces) {
+              return namespace;
+            }
+          } else {
+            return namespace;
+          }
         }
       });
       return _.without(visibleNamespaces, undefined);

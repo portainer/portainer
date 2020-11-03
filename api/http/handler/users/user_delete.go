@@ -7,7 +7,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -79,6 +79,40 @@ func (handler *Handler) deleteUser(w http.ResponseWriter, user *portainer.User) 
 	err = handler.DataStore.TeamMembership().DeleteTeamMembershipByUserID(user.ID)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove user memberships from the database", err}
+	}
+
+	endpoints, err := handler.DataStore.Endpoint().Endpoints()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to get user endpoint access", err}
+	}
+
+	// removes user's k8s service account and all related resources
+	for _, endpoint := range endpoints {
+		if endpoint.Type != portainer.KubernetesLocalEnvironment &&
+			endpoint.Type != portainer.AgentOnKubernetesEnvironment &&
+			endpoint.Type != portainer.EdgeAgentOnKubernetesEnvironment {
+			continue
+		}
+		kcl, err := handler.K8sClientFactory.GetKubeClient(&endpoint)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to get k8s endpoint access", err}
+		}
+		kcl.RemoveUserServiceAccount(int(user.ID))
+
+		accessPolicies, err := kcl.GetNamespaceAccessPolicies()
+		if err != nil {
+			break
+		}
+
+		accessPolicies, hasChange, err := handler.AuthorizationService.RemoveUserNamespaceAccessPolicies(
+			int(user.ID), int(endpoint.ID), accessPolicies,
+		)
+		if hasChange {
+			err = kcl.UpdateNamespaceAccessPolicies(accessPolicies)
+			if err != nil {
+				break
+			}
+		}
 	}
 
 	err = handler.AuthorizationService.RemoveUserAccessPolicies(user.ID)

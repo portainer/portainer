@@ -4,12 +4,12 @@ import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
 // TODO: review - refactor to use `extends GenericDatatableController`
 class KubernetesVolumesDatatableController {
   /* @ngInject */
-  constructor($async, $controller, Authentication, KubernetesNamespaceHelper, DatatableService) {
+  constructor($async, $controller, KubernetesNamespaceHelper, DatatableService, Authentication) {
     this.$async = $async;
     this.$controller = $controller;
-    this.Authentication = Authentication;
     this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
     this.DatatableService = DatatableService;
+    this.Authentication = Authentication;
 
     this.onInit = this.onInit.bind(this);
     this.allowSelection = this.allowSelection.bind(this);
@@ -47,7 +47,6 @@ class KubernetesVolumesDatatableController {
   async onInit() {
     this.setDefaults();
     this.prepareTableFromDataset();
-    this.isAdmin = this.Authentication.isAdmin();
     this.settings.showSystem = false;
 
     this.state.orderBy = this.orderBy;
@@ -75,6 +74,10 @@ class KubernetesVolumesDatatableController {
     if (storedSettings !== null) {
       this.settings = storedSettings;
       this.settings.open = false;
+    }
+    if (!this.Authentication.hasAuthorizations(['K8sAccessSystemNamespaces']) && this.settings.showSystem) {
+      this.settings.showSystem = false;
+      this.DatatableService.setDataTableSettings(this.tableKey, this.settings);
     }
     this.onSettingsRepeaterChange();
   }

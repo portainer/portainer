@@ -39,5 +39,38 @@ func (handler *Handler) teamDelete(w http.ResponseWriter, r *http.Request) *http
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to clean-up team access policies", err}
 	}
 
+	endpoints, err := handler.DataStore.Endpoint().Endpoints()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to get user endpoint access", err}
+	}
+
+	for _, endpoint := range endpoints {
+		if endpoint.Type != portainer.KubernetesLocalEnvironment &&
+			endpoint.Type != portainer.AgentOnKubernetesEnvironment &&
+			endpoint.Type != portainer.EdgeAgentOnKubernetesEnvironment {
+			continue
+		}
+
+		kcl, err := handler.K8sClientFactory.GetKubeClient(&endpoint)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to get k8s endpoint access", err}
+		}
+
+		accessPolicies, err := kcl.GetNamespaceAccessPolicies()
+		if err != nil {
+			break
+		}
+
+		accessPolicies, hasChange, err := handler.AuthorizationService.RemoveTeamNamespaceAccessPolicies(
+			teamID, int(endpoint.ID), accessPolicies,
+		)
+		if hasChange {
+			err = kcl.UpdateNamespaceAccessPolicies(accessPolicies)
+			if err != nil {
+				break
+			}
+		}
+	}
+
 	return response.Empty(w)
 }

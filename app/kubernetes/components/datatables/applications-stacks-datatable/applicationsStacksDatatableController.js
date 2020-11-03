@@ -73,7 +73,6 @@ angular.module('portainer.docker').controller('KubernetesApplicationsStacksDatat
     };
 
     this.$onInit = function () {
-      this.isAdmin = Authentication.isAdmin();
       this.KubernetesApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
       this.setDefaults();
       this.prepareTableFromDataset();
@@ -103,6 +102,10 @@ angular.module('portainer.docker').controller('KubernetesApplicationsStacksDatat
       if (storedSettings !== null) {
         this.settings = storedSettings;
         this.settings.open = false;
+      }
+      if (!Authentication.hasAuthorizations(['K8sAccessSystemNamespaces']) && this.settings.showSystem) {
+        this.settings.showSystem = false;
+        DatatableService.setDataTableSettings(this.tableKey, this.settings);
       }
       this.onSettingsRepeaterChange();
     };

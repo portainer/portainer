@@ -15,7 +15,11 @@
 </li>
 <li class="sidebar-list">
   <a ui-sref="kubernetes.cluster({endpointId: $ctrl.endpointId})" ui-sref-active="active">Cluster <span class="menu-icon fa fa-server fa-fw"></span></a>
-  <div class="sidebar-sublist" ng-if="$ctrl.adminAccess && ($ctrl.currentState === 'kubernetes.cluster' || $ctrl.currentState === 'portainer.endpoints.endpoint.kubernetesConfig')">
+  <div
+    class="sidebar-sublist"
+    authorization="K8sClusterSetupRW"
+    ng-if="$ctrl.adminAccess && ($ctrl.currentState === 'kubernetes.cluster' || $ctrl.currentState === 'portainer.endpoints.endpoint.kubernetesConfig')"
+  >
     <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: $ctrl.endpointId})">Setup</a>
   </div>
 </li>

@@ -27,8 +27,6 @@ type (
 	KubeClient struct {
 		cli        *kubernetes.Clientset
 		instanceID string
-		endpointID portainer.EndpointID
-		dataStore  portainer.DataStore
 	}
 )
 
@@ -44,11 +42,11 @@ func NewClientFactory(signatureService portainer.DigitalSignatureService, revers
 
 // GetKubeClient checks if an existing client is already registered for the endpoint and returns it if one is found.
 // If no client is registered, it will create a new client, register it, and returns it.
-func (factory *ClientFactory) GetKubeClient(endpoint *portainer.Endpoint, dataStore portainer.DataStore) (portainer.KubeClient, error) {
+func (factory *ClientFactory) GetKubeClient(endpoint *portainer.Endpoint) (portainer.KubeClient, error) {
 	key := strconv.Itoa(int(endpoint.ID))
 	client, ok := factory.endpointClients.Get(key)
 	if !ok {
-		client, err := factory.createKubeClient(endpoint, dataStore)
+		client, err := factory.createKubeClient(endpoint)
 		if err != nil {
 			return nil, err
 		}
@@ -60,7 +58,7 @@ func (factory *ClientFactory) GetKubeClient(endpoint *portainer.Endpoint, dataSt
 	return client.(portainer.KubeClient), nil
 }
 
-func (factory *ClientFactory) createKubeClient(endpoint *portainer.Endpoint, dataStore portainer.DataStore) (portainer.KubeClient, error) {
+func (factory *ClientFactory) createKubeClient(endpoint *portainer.Endpoint) (portainer.KubeClient, error) {
 	cli, err := factory.CreateClient(endpoint)
 	if err != nil {
 		return nil, err
@@ -69,8 +67,6 @@ func (factory *ClientFactory) createKubeClient(endpoint *portainer.Endpoint, dat
 	kubecli := &KubeClient{
 		cli:        cli,
 		instanceID: factory.instanceID,
-		endpointID: endpoint.ID,
-		dataStore:  dataStore,
 	}
 
 	return kubecli, nil

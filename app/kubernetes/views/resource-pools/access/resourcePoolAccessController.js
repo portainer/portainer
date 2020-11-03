@@ -3,10 +3,22 @@ import _ from 'lodash-es';
 import { KubernetesPortainerConfigMapConfigName, KubernetesPortainerConfigMapNamespace, KubernetesPortainerConfigMapAccessKey } from 'Kubernetes/models/config-map/models';
 import { UserAccessViewModel, TeamAccessViewModel } from 'Portainer/models/access';
 import KubernetesConfigMapHelper from 'Kubernetes/helpers/configMapHelper';
+import { RoleTypes } from 'Portainer/rbac/models/role';
 
 class KubernetesResourcePoolAccessController {
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesResourcePoolService, KubernetesConfigMapService, EndpointProvider, EndpointService, GroupService, AccessService) {
+  constructor(
+    $async,
+    $state,
+    Notifications,
+    KubernetesResourcePoolService,
+    KubernetesConfigMapService,
+    EndpointProvider,
+    EndpointService,
+    GroupService,
+    AccessService,
+    RoleService
+  ) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
@@ -17,6 +29,7 @@ class KubernetesResourcePoolAccessController {
     this.EndpointService = EndpointService;
     this.GroupService = GroupService;
     this.AccessService = AccessService;
+    this.RoleService = RoleService;
 
     this.onInit = this.onInit.bind(this);
     this.authorizeAccessAsync = this.authorizeAccessAsync.bind(this);
@@ -55,7 +68,7 @@ class KubernetesResourcePoolAccessController {
         this.KubernetesConfigMapService.get(KubernetesPortainerConfigMapNamespace, KubernetesPortainerConfigMapConfigName),
       ]);
       const group = await this.GroupService.group(endpoint.GroupId);
-      const roles = [];
+      const roles = await this.RoleService.roles();
       const endpointAccesses = await this.AccessService.accesses(endpoint, group, roles);
       this.pool = pool;
       if (configMap.Id === 0) {
@@ -77,6 +90,7 @@ class KubernetesResourcePoolAccessController {
         });
       }
       this.availableUsersAndTeams = _.without(endpointAccesses.authorizedUsersAndTeams, ...this.authorizedUsersAndTeams);
+      this.availableUsersAndTeams = _.filter(this.availableUsersAndTeams, (item) => item.Role.Id > RoleTypes.HELPDESK);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve resource pool information');
     } finally {

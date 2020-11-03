@@ -1,24 +1,30 @@
 package authorization
 
-import "github.com/portainer/portainer/api"
+import (
+	portainer "github.com/portainer/portainer/api"
+)
 
 // Service represents a service used to
 // update authorizations associated to a user or team.
-type Service struct {
-	dataStore portainer.DataStore
-}
+type (
+	Service struct {
+		dataStore         portainer.DataStore
+		authEventHandlers map[string]portainer.AuthEventHandler
+	}
+)
 
 // NewService returns a point to a new Service instance.
 func NewService(dataStore portainer.DataStore) *Service {
 	return &Service{
-		dataStore: dataStore,
+		dataStore:         dataStore,
+		authEventHandlers: make(map[string]portainer.AuthEventHandler),
 	}
 }
 
 // DefaultEndpointAuthorizationsForEndpointAdministratorRole returns the default endpoint authorizations
 // associated to the endpoint administrator role.
 func DefaultEndpointAuthorizationsForEndpointAdministratorRole() portainer.Authorizations {
-	return map[portainer.Authorization]bool{
+	return unionAuthorizations(map[portainer.Authorization]bool{
 		portainer.OperationDockerContainerArchiveInfo:         true,
 		portainer.OperationDockerContainerList:                true,
 		portainer.OperationDockerContainerExport:              true,
@@ -149,13 +155,13 @@ func DefaultEndpointAuthorizationsForEndpointAdministratorRole() portainer.Autho
 		portainer.OperationPortainerWebhookDelete:             true,
 		portainer.OperationIntegrationStoridgeAdmin:           true,
 		portainer.EndpointResourcesAccess:                     true,
-	}
+	}, DefaultK8sClusterAuthorizations()[portainer.RoleIDEndpointAdmin])
 }
 
 // DefaultEndpointAuthorizationsForHelpDeskRole returns the default endpoint authorizations
 // associated to the helpdesk role.
 func DefaultEndpointAuthorizationsForHelpDeskRole(volumeBrowsingAuthorizations bool) portainer.Authorizations {
-	authorizations := map[portainer.Authorization]bool{
+	authorizations := unionAuthorizations(map[portainer.Authorization]bool{
 		portainer.OperationDockerContainerArchiveInfo: true,
 		portainer.OperationDockerContainerList:        true,
 		portainer.OperationDockerContainerChanges:     true,
@@ -201,7 +207,7 @@ func DefaultEndpointAuthorizationsForHelpDeskRole(volumeBrowsingAuthorizations b
 		portainer.OperationPortainerStackFile:         true,
 		portainer.OperationPortainerWebhookList:       true,
 		portainer.EndpointResourcesAccess:             true,
-	}
+	}, DefaultK8sClusterAuthorizations()[portainer.RoleIDHelpdesk])
 
 	if volumeBrowsingAuthorizations {
 		authorizations[portainer.OperationDockerAgentBrowseGet] = true
@@ -214,7 +220,7 @@ func DefaultEndpointAuthorizationsForHelpDeskRole(volumeBrowsingAuthorizations b
 // DefaultEndpointAuthorizationsForStandardUserRole returns the default endpoint authorizations
 // associated to the standard user role.
 func DefaultEndpointAuthorizationsForStandardUserRole(volumeBrowsingAuthorizations bool) portainer.Authorizations {
-	authorizations := map[portainer.Authorization]bool{
+	authorizations := unionAuthorizations(map[portainer.Authorization]bool{
 		portainer.OperationDockerContainerArchiveInfo:         true,
 		portainer.OperationDockerContainerList:                true,
 		portainer.OperationDockerContainerExport:              true,
@@ -332,7 +338,7 @@ func DefaultEndpointAuthorizationsForStandardUserRole(volumeBrowsingAuthorizatio
 		portainer.OperationPortainerWebsocketExec:             true,
 		portainer.OperationPortainerWebhookList:               true,
 		portainer.OperationPortainerWebhookCreate:             true,
-	}
+	}, DefaultK8sClusterAuthorizations()[portainer.RoleIDStandardUser])
 
 	if volumeBrowsingAuthorizations {
 		authorizations[portainer.OperationDockerAgentBrowseGet] = true
@@ -348,7 +354,7 @@ func DefaultEndpointAuthorizationsForStandardUserRole(volumeBrowsingAuthorizatio
 // DefaultEndpointAuthorizationsForReadOnlyUserRole returns the default endpoint authorizations
 // associated to the readonly user role.
 func DefaultEndpointAuthorizationsForReadOnlyUserRole(volumeBrowsingAuthorizations bool) portainer.Authorizations {
-	authorizations := map[portainer.Authorization]bool{
+	authorizations := unionAuthorizations(map[portainer.Authorization]bool{
 		portainer.OperationDockerContainerArchiveInfo: true,
 		portainer.OperationDockerContainerList:        true,
 		portainer.OperationDockerContainerChanges:     true,
@@ -393,7 +399,7 @@ func DefaultEndpointAuthorizationsForReadOnlyUserRole(volumeBrowsingAuthorizatio
 		portainer.OperationPortainerStackInspect:      true,
 		portainer.OperationPortainerStackFile:         true,
 		portainer.OperationPortainerWebhookList:       true,
-	}
+	}, DefaultK8sClusterAuthorizations()[portainer.RoleIDReadonly])
 
 	if volumeBrowsingAuthorizations {
 		authorizations[portainer.OperationDockerAgentBrowseGet] = true
@@ -406,13 +412,15 @@ func DefaultEndpointAuthorizationsForReadOnlyUserRole(volumeBrowsingAuthorizatio
 // DefaultPortainerAuthorizations returns the default Portainer authorizations used by non-admin users.
 func DefaultPortainerAuthorizations() portainer.Authorizations {
 	return map[portainer.Authorization]bool{
-		portainer.OperationPortainerDockerHubInspect:        true,
+		portainer.OperationPortainerEndpointGroupInspect:    true,
 		portainer.OperationPortainerEndpointGroupList:       true,
+		portainer.OperationPortainerDockerHubInspect:        true,
 		portainer.OperationPortainerEndpointList:            true,
 		portainer.OperationPortainerEndpointInspect:         true,
 		portainer.OperationPortainerEndpointExtensionAdd:    true,
 		portainer.OperationPortainerEndpointExtensionRemove: true,
 		portainer.OperationPortainerMOTD:                    true,
+		portainer.OperationPortainerRoleList:                true,
 		portainer.OperationPortainerRegistryList:            true,
 		portainer.OperationPortainerRegistryInspect:         true,
 		portainer.OperationPortainerTeamList:                true,
@@ -421,6 +429,23 @@ func DefaultPortainerAuthorizations() portainer.Authorizations {
 		portainer.OperationPortainerUserList:                true,
 		portainer.OperationPortainerUserInspect:             true,
 		portainer.OperationPortainerUserMemberships:         true,
+	}
+}
+
+// RegisterEventHandler upserts event handler by id
+func (service *Service) RegisterEventHandler(id string, handler portainer.AuthEventHandler) {
+	service.authEventHandlers[id] = handler
+}
+
+func (service *Service) triggerUsersAuthUpdate() {
+	for _, handler := range service.authEventHandlers {
+		handler.HandleUsersAuthUpdate()
+	}
+}
+
+func (service *Service) triggerUserAuthDelete(userID int) {
+	for _, handler := range service.authEventHandlers {
+		handler.HandleUserAuthDelete(userID)
 	}
 }
 
@@ -597,6 +622,8 @@ func (service *Service) RemoveUserAccessPolicies(userID portainer.UserID) error 
 		}
 	}
 
+	service.triggerUserAuthDelete(int(userID))
+
 	return nil
 }
 
@@ -613,6 +640,8 @@ func (service *Service) UpdateUsersAuthorizations() error {
 			return err
 		}
 	}
+
+	service.triggerUsersAuthUpdate()
 
 	return nil
 }
@@ -664,93 +693,560 @@ func (service *Service) getAuthorizations(user *portainer.User) (portainer.Endpo
 	return endpointAuthorizations, nil
 }
 
-func getUserEndpointAuthorizations(user *portainer.User, endpoints []portainer.Endpoint, endpointGroups []portainer.EndpointGroup, roles []portainer.Role, userMemberships []portainer.TeamMembership) portainer.EndpointAuthorizations {
-	endpointAuthorizations := make(portainer.EndpointAuthorizations)
+func getUserEndpointAuthorizations(user *portainer.User, endpoints []portainer.Endpoint,
+	endpointGroups []portainer.EndpointGroup, roles []portainer.Role,
+	userMemberships []portainer.TeamMembership) portainer.EndpointAuthorizations {
 
+	endpointAuthorizations := make(portainer.EndpointAuthorizations)
+	for endpointID, role := range getUserEndpointRoles(user, endpoints,
+		endpointGroups, roles, userMemberships) {
+		endpointAuthorizations[endpointID] = role.Authorizations
+	}
+
+	return endpointAuthorizations
+}
+
+// get the user and team policies from the endpoint group definitions
+func getGroupPolicies(endpointGroups []portainer.EndpointGroup) (
+	map[portainer.EndpointGroupID]portainer.UserAccessPolicies,
+	map[portainer.EndpointGroupID]portainer.TeamAccessPolicies,
+) {
 	groupUserAccessPolicies := map[portainer.EndpointGroupID]portainer.UserAccessPolicies{}
 	groupTeamAccessPolicies := map[portainer.EndpointGroupID]portainer.TeamAccessPolicies{}
 	for _, endpointGroup := range endpointGroups {
 		groupUserAccessPolicies[endpointGroup.ID] = endpointGroup.UserAccessPolicies
 		groupTeamAccessPolicies[endpointGroup.ID] = endpointGroup.TeamAccessPolicies
 	}
+	return groupUserAccessPolicies, groupTeamAccessPolicies
+}
 
-	for _, endpoint := range endpoints {
-		authorizations := getAuthorizationsFromUserEndpointPolicy(user, &endpoint, roles)
-		if len(authorizations) > 0 {
-			endpointAuthorizations[endpoint.ID] = authorizations
+// UpdateUserNamespaceAccessPolicies takes an input accessPolicies
+// and updates it with the user and his team's endpoint roles.
+// Returns the updated policies and whether there is any update.
+func (service *Service) UpdateUserNamespaceAccessPolicies(
+	userID int, endpoint *portainer.Endpoint,
+	policiesToUpdate map[string]portainer.K8sNamespaceAccessPolicy,
+) (map[string]portainer.K8sNamespaceAccessPolicy, bool, error) {
+	endpointID := int(endpoint.ID)
+	restrictDefaultNamespace := endpoint.Kubernetes.Configuration.RestrictDefaultNamespace
+
+	userRole, err := service.GetUserEndpointRole(userID, endpointID)
+	if err != nil {
+		return nil, false, err
+	}
+	usersEndpointRole := make(map[int]int)
+	teamsEndpointRole := make(map[int]int)
+	if userRole != nil {
+		usersEndpointRole[userID] = int(userRole.ID)
+	} else {
+		usersEndpointRole[userID] = -1
+	}
+
+	userMemberships, err := service.dataStore.TeamMembership().
+		TeamMembershipsByUserID(portainer.UserID(userID))
+	if err != nil {
+		return nil, false, err
+	}
+	teamIDs := make([]int, 0)
+	for _, membership := range userMemberships {
+		teamRole, err := service.GetTeamEndpointRole(int(membership.TeamID), endpointID)
+		if err != nil {
+			return nil, false, err
+		}
+		if teamRole != nil {
+			teamsEndpointRole[int(membership.TeamID)] = int(teamRole.ID)
+			teamIDs = append(teamIDs, int(membership.TeamID))
+		}
+	}
+	return service.updateNamespaceAccessPolicies(userID, teamIDs, usersEndpointRole, teamsEndpointRole,
+		policiesToUpdate, restrictDefaultNamespace)
+}
+
+// updateNamespaceAccessPolicies takes an input accessPolicies
+// and updates it with the endpoint users/teams roles.
+func (service *Service) updateNamespaceAccessPolicies(
+	selectedUserID int, selectedTeamIDs []int,
+	usersEndpointRole map[int]int, teamsEndpointRole map[int]int,
+	policiesToUpdate map[string]portainer.K8sNamespaceAccessPolicy,
+	restrictDefaultNamespace bool,
+) (map[string]portainer.K8sNamespaceAccessPolicy, bool, error) {
+	hasChange := false
+	if !restrictDefaultNamespace {
+		delete(policiesToUpdate, "default")
+		hasChange = true
+	}
+	for ns, nsPolicies := range policiesToUpdate {
+		for userID, policy := range nsPolicies.UserAccessPolicies {
+			if int(userID) == selectedUserID {
+				iRoleID, ok := usersEndpointRole[int(userID)]
+				if !ok {
+					delete(nsPolicies.UserAccessPolicies, userID)
+					hasChange = true
+				} else if int(policy.RoleID) != iRoleID {
+					nsPolicies.UserAccessPolicies[userID] = portainer.AccessPolicy{
+						RoleID: portainer.RoleID(iRoleID),
+					}
+					hasChange = true
+				}
+			}
+		}
+		for teamID, policy := range nsPolicies.TeamAccessPolicies {
+			for _, selectedTeamID := range selectedTeamIDs {
+				if int(teamID) == selectedTeamID {
+					iRoleID, ok := teamsEndpointRole[int(teamID)]
+					if !ok {
+						delete(nsPolicies.TeamAccessPolicies, teamID)
+						hasChange = true
+					} else if int(policy.RoleID) != iRoleID {
+						nsPolicies.TeamAccessPolicies[teamID] = portainer.AccessPolicy{
+							RoleID: portainer.RoleID(iRoleID),
+						}
+						hasChange = true
+					}
+				}
+			}
+		}
+		policiesToUpdate[ns] = nsPolicies
+	}
+	return policiesToUpdate, hasChange, nil
+}
+
+// RemoveUserNamespaceAccessPolicies takes an input accessPolicies
+// and remove users/teams in it.
+// Returns the updated policies and whether there is any update.
+func (service *Service) RemoveUserNamespaceAccessPolicies(
+	userID int, endpointID int,
+	policiesToUpdate map[string]portainer.K8sNamespaceAccessPolicy,
+) (map[string]portainer.K8sNamespaceAccessPolicy, bool, error) {
+	userRole, err := service.GetUserEndpointRole(userID, endpointID)
+	if err != nil {
+		return nil, false, err
+	}
+	usersEndpointRole := make(map[int]int)
+	if userRole != nil {
+		usersEndpointRole[userID] = int(userRole.ID)
+	}
+	return service.removeUserInNamespaceAccessPolicies(usersEndpointRole, policiesToUpdate)
+}
+
+// removeUserInNamespaceAccessPolicies takes an input accessPolicies
+// and remove users/teams in it.
+func (service *Service) removeUserInNamespaceAccessPolicies(
+	usersEndpointRole map[int]int,
+	policiesToUpdate map[string]portainer.K8sNamespaceAccessPolicy,
+) (map[string]portainer.K8sNamespaceAccessPolicy, bool, error) {
+	hasChange := false
+	for ns, nsPolicies := range policiesToUpdate {
+		for userID := range nsPolicies.UserAccessPolicies {
+			_, ok := usersEndpointRole[int(userID)]
+			if ok {
+				delete(nsPolicies.UserAccessPolicies, userID)
+				hasChange = true
+			}
+		}
+		if len(nsPolicies.UserAccessPolicies) == 0 && len(nsPolicies.TeamAccessPolicies) == 0 {
+			delete(policiesToUpdate, ns)
+		} else {
+			policiesToUpdate[ns] = nsPolicies
+		}
+	}
+	return policiesToUpdate, hasChange, nil
+}
+
+// RemoveTeamsNamespaceAccessPolicies takes an input accessPolicies
+// and remove teams in it.
+// Returns the updated policies and whether there is any update.
+func (service *Service) RemoveTeamNamespaceAccessPolicies(
+	teamID int, endpointID int,
+	policiesToUpdate map[string]portainer.K8sNamespaceAccessPolicy,
+) (map[string]portainer.K8sNamespaceAccessPolicy, bool, error) {
+	teamRole, err := service.GetTeamEndpointRole(teamID, endpointID)
+	if err != nil {
+		return nil, false, err
+	}
+	teamsEndpointRole := make(map[int]int)
+	teamsEndpointRole[teamID] = int(teamRole.ID)
+
+	hasChange := false
+	for ns, nsPolicies := range policiesToUpdate {
+		for teamID := range nsPolicies.TeamAccessPolicies {
+			_, ok := teamsEndpointRole[int(teamID)]
+			if ok {
+				delete(nsPolicies.TeamAccessPolicies, teamID)
+				hasChange = true
+			}
+		}
+		if len(nsPolicies.UserAccessPolicies) == 0 && len(nsPolicies.TeamAccessPolicies) == 0 {
+			delete(policiesToUpdate, ns)
+		} else {
+			policiesToUpdate[ns] = nsPolicies
+		}
+	}
+	return policiesToUpdate, hasChange, nil
+}
+
+// GetUserEndpointRole returns the endpoint role of the user.
+// It returns nil if there is no role assigned to the user at the endpoint.
+func (service *Service) GetUserEndpointRole(
+	userID int,
+	endpointID int,
+) (*portainer.Role, error) {
+	user, err := service.dataStore.User().User(portainer.UserID(userID))
+	if err != nil {
+		return nil, err
+	}
+
+	userMemberships, err := service.dataStore.TeamMembership().TeamMembershipsByUserID(user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	endpoint, err := service.dataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	if err != nil {
+		return nil, err
+	}
+
+	endpointGroups, err := service.dataStore.EndpointGroup().EndpointGroups()
+	if err != nil {
+		return nil, err
+	}
+
+	roles, err := service.dataStore.Role().Roles()
+	if err != nil {
+		return nil, err
+	}
+
+	groupUserAccessPolicies, groupTeamAccessPolicies := getGroupPolicies(endpointGroups)
+
+	return getUserEndpointRole(user, *endpoint, groupUserAccessPolicies,
+		groupTeamAccessPolicies, roles, userMemberships), nil
+}
+
+// GetUserNamespaceAuthorizations returns authorizations of a user's namespaces
+func (service *Service) GetUserNamespaceAuthorizations(
+	userID int,
+	endpointID int,
+	accessPolicies map[string]portainer.K8sNamespaceAccessPolicy,
+	namespaces map[string]portainer.K8sNamespaceInfo,
+	endpointAuthorizations portainer.Authorizations,
+	endpointConfiguration portainer.KubernetesConfiguration,
+) (map[string]portainer.Authorizations, error) {
+	namespaceRoles, err := service.GetUserNamespaceRoles(userID, endpointID,
+		accessPolicies, namespaces, endpointAuthorizations, endpointConfiguration)
+	if err != nil {
+		return nil, err
+	}
+
+	defaultAuthorizations := DefaultK8sNamespaceAuthorizations()
+
+	namespaceAuthorizations := make(map[string]portainer.Authorizations)
+	for namespace, role := range namespaceRoles {
+		namespaceAuthorizations[namespace] = defaultAuthorizations[role.ID]
+	}
+
+	return namespaceAuthorizations, nil
+}
+
+// GetUserNamespaceRoles returns the endpoint role of the user.
+func (service *Service) GetUserNamespaceRoles(
+	userID int,
+	endpointID int,
+	accessPolicies map[string]portainer.K8sNamespaceAccessPolicy,
+	namespaces map[string]portainer.K8sNamespaceInfo,
+	endpointAuthorizations portainer.Authorizations,
+	endpointConfiguration portainer.KubernetesConfiguration,
+) (map[string]portainer.Role, error) {
+
+	// does an early check if user can access all namespaces to skip db calls
+	accessAllNamespaces := endpointAuthorizations[portainer.OperationK8sAccessAllNamespaces]
+	if accessAllNamespaces {
+		return make(map[string]portainer.Role), nil
+	}
+
+	user, err := service.dataStore.User().User(portainer.UserID(userID))
+	if err != nil {
+		return nil, err
+	}
+
+	userMemberships, err := service.dataStore.TeamMembership().TeamMembershipsByUserID(user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	roles, err := service.dataStore.Role().Roles()
+	if err != nil {
+		return nil, err
+	}
+
+	accessSystemNamespaces := endpointAuthorizations[portainer.OperationK8sAccessSystemNamespaces]
+
+	return getUserNamespaceRoles(user, roles, userMemberships,
+		accessPolicies, namespaces, accessAllNamespaces, accessSystemNamespaces,
+		endpointConfiguration.RestrictDefaultNamespace)
+}
+
+func getUserNamespaceRoles(
+	user *portainer.User,
+	roles []portainer.Role,
+	userMemberships []portainer.TeamMembership,
+	accessPolicies map[string]portainer.K8sNamespaceAccessPolicy,
+	namespaces map[string]portainer.K8sNamespaceInfo,
+	accessAllNamespaces bool,
+	accessSystemNamespaces bool,
+	restrictDefaultNamespace bool,
+) (map[string]portainer.Role, error) {
+
+	results := make(map[string]portainer.Role)
+
+	if accessAllNamespaces {
+		return results, nil
+	}
+
+	for namespace, info := range namespaces {
+		// skip default namespace or system namespace (when user don't have access)
+		if !accessSystemNamespaces && info.IsSystem {
 			continue
 		}
 
-		authorizations = getAuthorizationsFromUserEndpointGroupPolicy(user, &endpoint, roles, groupUserAccessPolicies)
-		if len(authorizations) > 0 {
-			endpointAuthorizations[endpoint.ID] = authorizations
-			continue
+		if !restrictDefaultNamespace && info.IsDefault {
+			results[namespace] = roles[int(user.Role)]
 		}
 
-		authorizations = getAuthorizationsFromTeamEndpointPolicies(userMemberships, &endpoint, roles)
-		if len(authorizations) > 0 {
-			endpointAuthorizations[endpoint.ID] = authorizations
-			continue
-		}
-
-		authorizations = getAuthorizationsFromTeamEndpointGroupPolicies(userMemberships, &endpoint, roles, groupTeamAccessPolicies)
-		if len(authorizations) > 0 {
-			endpointAuthorizations[endpoint.ID] = authorizations
+		// if there is an access policy for the current namespace
+		if policies, ok := accessPolicies[namespace]; ok {
+			role := getUserNamespaceRole(
+				user,
+				policies.UserAccessPolicies,
+				policies.TeamAccessPolicies,
+				roles,
+				userMemberships,
+			)
+			if role != nil {
+				results[namespace] = *role
+			}
 		}
 	}
 
-	return endpointAuthorizations
+	return results, nil
 }
 
-func getAuthorizationsFromUserEndpointPolicy(user *portainer.User, endpoint *portainer.Endpoint, roles []portainer.Role) portainer.Authorizations {
+// For each namespace, first calculate the role(s) of a user
+// based on the sequence of searching:
+//  - His namespace role (single)
+//  - His teams namespace role (multiple, 1 user has n teams)
+//
+// If roles are found in any of the step, the search stops.
+// Then the role with the hightest priority is returned.
+func getUserNamespaceRole(
+	user *portainer.User,
+	userAccessPolicies portainer.UserAccessPolicies,
+	teamAccessPolicies portainer.TeamAccessPolicies,
+	roles []portainer.Role,
+	userMemberships []portainer.TeamMembership,
+) *portainer.Role {
+
+	role := getRoleFromUserAccessPolicies(user, userAccessPolicies, roles)
+	if role != nil {
+		return role
+	}
+
+	role = getRoleFromTeamAccessPolicies(userMemberships, teamAccessPolicies, roles)
+	return role
+}
+
+// For each endpoint, first calculate the role(s) of a team
+// based on the sequence of searching:
+//  - Team's endpoint role (multiple, 1 user has n teams)
+//  - Team's roles in all the assigned endpoint groups (multiple, 1 user has n teams, 1 team has 1 endpoint group)
+//
+// If roles are found in any of the step, the search stops.
+// Then the role with the hightest priority is returned.
+func (service *Service) GetTeamEndpointRole(
+	teamID int, endpointID int,
+) (*portainer.Role, error) {
+
+	memberships, err := service.dataStore.TeamMembership().TeamMembershipsByTeamID(portainer.TeamID(teamID))
+	if err != nil {
+		return nil, err
+	}
+
+	endpoint, err := service.dataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	if err != nil {
+		return nil, err
+	}
+
+	endpointGroups, err := service.dataStore.EndpointGroup().EndpointGroups()
+	if err != nil {
+		return nil, err
+	}
+
+	roles, err := service.dataStore.Role().Roles()
+	if err != nil {
+		return nil, err
+	}
+
+	_, groupTeamAccessPolicies := getGroupPolicies(endpointGroups)
+
+	role := getRoleFromTeamAccessPolicies(memberships,
+		endpoint.TeamAccessPolicies, roles)
+	if role != nil {
+		return role, nil
+	}
+
+	role = getRoleFromTeamEndpointGroupPolicies(memberships, endpoint,
+		roles, groupTeamAccessPolicies)
+	return role, nil
+}
+
+// For each endpoint, first calculate the role(s) of a user
+// based on the sequence of searching:
+//  - His endpoint role (single)
+//  - His endpoint group role (single, 1 endpoint has 1 endpoint group)
+//  - His teams endpoint role (multiple, 1 user has n teams)
+//  - His teams roles in all the assigned endpoint groups (multiple, 1 user has n teams, 1 team has 1 endpoint group)
+//
+// If roles are found in any of the step, the search stops.
+// Then the role with the hightest priority is returned.
+func getUserEndpointRole(user *portainer.User, endpoint portainer.Endpoint,
+	groupUserAccessPolicies map[portainer.EndpointGroupID]portainer.UserAccessPolicies,
+	groupTeamAccessPolicies map[portainer.EndpointGroupID]portainer.TeamAccessPolicies,
+	roles []portainer.Role,
+	userMemberships []portainer.TeamMembership,
+) *portainer.Role {
+
+	role := getRoleFromUserAccessPolicies(user, endpoint.UserAccessPolicies, roles)
+	if role != nil {
+		return role
+	}
+
+	role = getRoleFromUserEndpointGroupPolicy(user, &endpoint, roles, groupUserAccessPolicies)
+	if role != nil {
+		return role
+	}
+
+	role = getRoleFromTeamAccessPolicies(userMemberships, endpoint.TeamAccessPolicies, roles)
+	if role != nil {
+		return role
+	}
+
+	role = getRoleFromTeamEndpointGroupPolicies(userMemberships, &endpoint, roles, groupTeamAccessPolicies)
+	return role
+}
+
+func getUserEndpointRoles(user *portainer.User, endpoints []portainer.Endpoint,
+	endpointGroups []portainer.EndpointGroup, roles []portainer.Role,
+	userMemberships []portainer.TeamMembership) map[portainer.EndpointID]portainer.Role {
+	results := make(map[portainer.EndpointID]portainer.Role)
+
+	groupUserAccessPolicies, groupTeamAccessPolicies := getGroupPolicies(endpointGroups)
+
+	for _, endpoint := range endpoints {
+		role := getUserEndpointRole(user, endpoint, groupUserAccessPolicies,
+			groupTeamAccessPolicies, roles, userMemberships)
+		if role != nil {
+			results[endpoint.ID] = *role
+			continue
+		}
+	}
+
+	return results
+}
+
+// A user may have 1 role in each assigned Endpoints.
+func getRoleFromUserAccessPolicies(
+	user *portainer.User,
+	userAccessPolicies portainer.UserAccessPolicies,
+	roles []portainer.Role,
+) *portainer.Role {
 	policyRoles := make([]portainer.RoleID, 0)
 
-	policy, ok := endpoint.UserAccessPolicies[user.ID]
+	policy, ok := userAccessPolicies[user.ID]
 	if ok {
 		policyRoles = append(policyRoles, policy.RoleID)
 	}
+	if len(policyRoles) == 0 {
+		return nil
+	}
 
-	return getAuthorizationsFromRoles(policyRoles, roles)
+	return getKeyRole(policyRoles, roles)
 }
 
-func getAuthorizationsFromUserEndpointGroupPolicy(user *portainer.User, endpoint *portainer.Endpoint, roles []portainer.Role, groupAccessPolicies map[portainer.EndpointGroupID]portainer.UserAccessPolicies) portainer.Authorizations {
+// An endpoint can only have 1 EndpointGroup.
+//
+// A user may have 1 role in each assigned EndpointGroups.
+func getRoleFromUserEndpointGroupPolicy(user *portainer.User,
+	endpoint *portainer.Endpoint, roles []portainer.Role,
+	groupAccessPolicies map[portainer.EndpointGroupID]portainer.UserAccessPolicies) *portainer.Role {
 	policyRoles := make([]portainer.RoleID, 0)
 
 	policy, ok := groupAccessPolicies[endpoint.GroupID][user.ID]
 	if ok {
 		policyRoles = append(policyRoles, policy.RoleID)
 	}
+	if len(policyRoles) == 0 {
+		return nil
+	}
 
-	return getAuthorizationsFromRoles(policyRoles, roles)
+	return getKeyRole(policyRoles, roles)
 }
 
-func getAuthorizationsFromTeamEndpointPolicies(memberships []portainer.TeamMembership, endpoint *portainer.Endpoint, roles []portainer.Role) portainer.Authorizations {
+// A team may have 1 role in each assigned Endpoints
+func getRoleFromTeamAccessPolicies(
+	memberships []portainer.TeamMembership,
+	teamAccessPolicies portainer.TeamAccessPolicies,
+	roles []portainer.Role,
+) *portainer.Role {
 	policyRoles := make([]portainer.RoleID, 0)
 
 	for _, membership := range memberships {
-		policy, ok := endpoint.TeamAccessPolicies[membership.TeamID]
+		policy, ok := teamAccessPolicies[membership.TeamID]
 		if ok {
 			policyRoles = append(policyRoles, policy.RoleID)
 		}
 	}
+	if len(policyRoles) == 0 {
+		return nil
+	}
 
-	return getAuthorizationsFromRoles(policyRoles, roles)
+	return getKeyRole(policyRoles, roles)
 }
 
-func getAuthorizationsFromTeamEndpointGroupPolicies(memberships []portainer.TeamMembership, endpoint *portainer.Endpoint, roles []portainer.Role, groupAccessPolicies map[portainer.EndpointGroupID]portainer.TeamAccessPolicies) portainer.Authorizations {
+// An endpoint can only have 1 EndpointGroup.
+//
+// A team may have 1 role in each assigned EndpointGroups.
+func getRoleFromTeamEndpointGroupPolicies(memberships []portainer.TeamMembership,
+	endpoint *portainer.Endpoint, roles []portainer.Role,
+	groupTeamAccessPolicies map[portainer.EndpointGroupID]portainer.TeamAccessPolicies) *portainer.Role {
 	policyRoles := make([]portainer.RoleID, 0)
 
 	for _, membership := range memberships {
-		policy, ok := groupAccessPolicies[endpoint.GroupID][membership.TeamID]
+		policy, ok := groupTeamAccessPolicies[endpoint.GroupID][membership.TeamID]
 		if ok {
 			policyRoles = append(policyRoles, policy.RoleID)
 		}
 	}
+	if len(policyRoles) == 0 {
+		return nil
+	}
 
-	return getAuthorizationsFromRoles(policyRoles, roles)
+	return getKeyRole(policyRoles, roles)
 }
 
+// for each role in the roleIdentifiers,
+// find the highest priority role and returns its authorizations
 func getAuthorizationsFromRoles(roleIdentifiers []portainer.RoleID, roles []portainer.Role) portainer.Authorizations {
+	keyRole := getKeyRole(roleIdentifiers, roles)
+
+	if keyRole == nil {
+		return portainer.Authorizations{}
+	}
+
+	return keyRole.Authorizations
+}
+
+// for each role in the roleIdentifiers,
+// find the highest priority role
+func getKeyRole(roleIdentifiers []portainer.RoleID, roles []portainer.Role) *portainer.Role {
 	var associatedRoles []portainer.Role
 
 	for _, id := range roleIdentifiers {
@@ -762,12 +1258,28 @@ func getAuthorizationsFromRoles(roleIdentifiers []portainer.RoleID, roles []port
 		}
 	}
 
-	var authorizations portainer.Authorizations
-	highestPriority := 0
+	result := &portainer.Role{}
 	for _, role := range associatedRoles {
-		if role.Priority > highestPriority {
-			highestPriority = role.Priority
-			authorizations = role.Authorizations
+		if role.Priority > result.Priority {
+			result = &role
+		}
+	}
+
+	return result
+}
+
+// unionAuthorizations returns a union of all the input authorizations
+// using the "or" operator.
+func unionAuthorizations(auths ...portainer.Authorizations) portainer.Authorizations {
+	authorizations := make(portainer.Authorizations)
+
+	for _, auth := range auths {
+		for authKey, authVal := range auth {
+			if val, ok := authorizations[authKey]; ok {
+				authorizations[authKey] = val || authVal
+			} else {
+				authorizations[authKey] = authVal
+			}
 		}
 	}
 

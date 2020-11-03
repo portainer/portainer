@@ -1,8 +1,8 @@
 package cli
 
 import (
-	"k8s.io/api/core/v1"
-	rbacv1 "k8s.io/api/rbac/v1"
+	portainer "github.com/portainer/portainer/api"
+	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -17,28 +17,20 @@ func (kcl *KubeClient) GetServiceAccountBearerToken(userID int) (string, error) 
 // SetupUserServiceAccount will make sure that all the required resources are created inside the Kubernetes
 // cluster before creating a ServiceAccount and a ServiceAccountToken for the specified Portainer user.
 //It will also create required default RoleBinding and ClusterRoleBinding rules.
-func (kcl *KubeClient) SetupUserServiceAccount(userID int, teamIDs []int) error {
-	serviceAccountName := userServiceAccountName(userID, kcl.instanceID)
+func (kcl *KubeClient) SetupUserServiceAccount(
+	user portainer.User,
+	endpointRoleID portainer.RoleID,
+	namespaces map[string]portainer.K8sNamespaceInfo,
+	namespaceRoles map[string]portainer.Role,
+) error {
+	serviceAccountName := userServiceAccountName(int(user.ID), kcl.instanceID)
 
-	err := kcl.ensureRequiredResourcesExist()
+	err := kcl.createPortainerK8sClusterRoles()
 	if err != nil {
 		return err
 	}
 
-	err = kcl.ensureServiceAccountForUserExists(serviceAccountName)
-	if err != nil {
-		return err
-	}
-
-	return kcl.setupNamespaceAccesses(userID, teamIDs, serviceAccountName)
-}
-
-func (kcl *KubeClient) ensureRequiredResourcesExist() error {
-	return kcl.createPortainerUserClusterRole()
-}
-
-func (kcl *KubeClient) ensureServiceAccountForUserExists(serviceAccountName string) error {
-	err := kcl.createUserServiceAccount(portainerNamespace, serviceAccountName)
+	err = kcl.createUserServiceAccount(portainerNamespace, serviceAccountName)
 	if err != nil {
 		return err
 	}
@@ -48,12 +40,36 @@ func (kcl *KubeClient) ensureServiceAccountForUserExists(serviceAccountName stri
 		return err
 	}
 
-	err = kcl.ensureServiceAccountHasPortainerUserClusterRole(serviceAccountName)
+	err = kcl.ensureServiceAccountHasPortainerClusterRoles(
+		serviceAccountName, user, endpointRoleID)
 	if err != nil {
 		return err
 	}
 
-	return kcl.ensureNamespaceAccessForServiceAccount(serviceAccountName, defaultNamespace)
+	return kcl.ensureServiceAccountHasPortainerRoles(
+		serviceAccountName, namespaces, namespaceRoles)
+}
+
+// RemoveUserServiceAccount removes the service account and its
+// role binding, cluster role binding.
+func (kcl *KubeClient) RemoveUserServiceAccount(
+	userID int,
+) error {
+	serviceAccountName := userServiceAccountName(userID, kcl.instanceID)
+
+	err := kcl.removeRoleBindings(serviceAccountName)
+	if err != nil {
+		return err
+	}
+
+	err = kcl.removeClusterRoleBindings(serviceAccountName)
+	if err != nil {
+		return err
+	}
+
+	err = kcl.removeUserServiceAccount(portainerNamespace, serviceAccountName)
+
+	return err
 }
 
 func (kcl *KubeClient) createUserServiceAccount(namespace, serviceAccountName string) error {
@@ -71,112 +87,78 @@ func (kcl *KubeClient) createUserServiceAccount(namespace, serviceAccountName st
 	return nil
 }
 
-func (kcl *KubeClient) ensureServiceAccountHasPortainerUserClusterRole(serviceAccountName string) error {
-	clusterRoleBinding, err := kcl.cli.RbacV1().ClusterRoleBindings().Get(portainerUserCRBName, metav1.GetOptions{})
-	if k8serrors.IsNotFound(err) {
-		clusterRoleBinding = &rbacv1.ClusterRoleBinding{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: portainerUserCRBName,
-			},
-			Subjects: []rbacv1.Subject{
-				{
-					Kind:      "ServiceAccount",
-					Name:      serviceAccountName,
-					Namespace: portainerNamespace,
-				},
-			},
-			RoleRef: rbacv1.RoleRef{
-				Kind: "ClusterRole",
-				Name: portainerUserCRName,
-			},
-		}
-
-		_, err := kcl.cli.RbacV1().ClusterRoleBindings().Create(clusterRoleBinding)
-		return err
-	} else if err != nil {
+func (kcl *KubeClient) removeUserServiceAccount(namespace, serviceAccountName string) error {
+	err := kcl.cli.CoreV1().ServiceAccounts(namespace).Delete(serviceAccountName, &metav1.DeleteOptions{})
+	if err != nil && !k8serrors.IsNotFound(err) {
 		return err
 	}
 
-	for _, subject := range clusterRoleBinding.Subjects {
-		if subject.Name == serviceAccountName {
-			return nil
-		}
-	}
-
-	clusterRoleBinding.Subjects = append(clusterRoleBinding.Subjects, rbacv1.Subject{
-		Kind:      "ServiceAccount",
-		Name:      serviceAccountName,
-		Namespace: portainerNamespace,
-	})
-
-	_, err = kcl.cli.RbacV1().ClusterRoleBindings().Update(clusterRoleBinding)
-	return err
+	return nil
 }
 
-func (kcl *KubeClient) removeNamespaceAccessForServiceAccount(serviceAccountName, namespace string) error {
-	roleBindingName := namespaceClusterRoleBindingName(namespace, kcl.instanceID)
+// setup cluster role binding for a service account
+func (kcl *KubeClient) ensureServiceAccountHasPortainerClusterRoles(
+	serviceAccountName string,
+	user portainer.User,
+	endpointRoleID portainer.RoleID,
+) error {
 
-	roleBinding, err := kcl.cli.RbacV1().RoleBindings(namespace).Get(roleBindingName, metav1.GetOptions{})
-	if k8serrors.IsNotFound(err) {
+	roleSet, ok := getPortainerK8sRoleMapping()[endpointRoleID]
+	if !ok {
 		return nil
-	} else if err != nil {
-		return err
 	}
 
-	updatedSubjects := roleBinding.Subjects[:0]
+	kcl.removeClusterRoleBindings(serviceAccountName)
 
-	for _, subject := range roleBinding.Subjects {
-		if subject.Name != serviceAccountName {
-			updatedSubjects = append(updatedSubjects, subject)
+	for _, role := range roleSet.k8sClusterRoles {
+		err := kcl.createClusterRoleBindings(serviceAccountName, string(role))
+		if err != nil {
+			return err
 		}
 	}
 
-	roleBinding.Subjects = updatedSubjects
-
-	_, err = kcl.cli.RbacV1().RoleBindings(namespace).Update(roleBinding)
-	return err
+	return nil
 }
 
-func (kcl *KubeClient) ensureNamespaceAccessForServiceAccount(serviceAccountName, namespace string) error {
-	roleBindingName := namespaceClusterRoleBindingName(namespace, kcl.instanceID)
+// setup role binding for a service account
+func (kcl *KubeClient) ensureServiceAccountHasPortainerRoles(
+	serviceAccountName string,
+	namespaces map[string]portainer.K8sNamespaceInfo,
+	namespaceRoles map[string]portainer.Role,
+) error {
+	rolesMapping := getPortainerK8sRoleMapping()
 
-	roleBinding, err := kcl.cli.RbacV1().RoleBindings(namespace).Get(roleBindingName, metav1.GetOptions{})
-	if k8serrors.IsNotFound(err) {
-		roleBinding = &rbacv1.RoleBinding{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: roleBindingName,
-			},
-			Subjects: []rbacv1.Subject{
-				{
-					Kind:      "ServiceAccount",
-					Name:      serviceAccountName,
-					Namespace: portainerNamespace,
-				},
-			},
-			RoleRef: rbacv1.RoleRef{
-				Kind: "ClusterRole",
-				Name: "edit",
-			},
+	for namespace := range namespaces {
+
+		// remove the namespace access from the service account
+		err := kcl.removeRoleBinding(serviceAccountName, namespace)
+		if err != nil {
+			return err
 		}
 
-		_, err = kcl.cli.RbacV1().RoleBindings(namespace).Create(roleBinding)
-		return err
-	} else if err != nil {
-		return err
-	}
+		// namespace roles should contain the default namespace access too
+		nsRole, ok := namespaceRoles[namespace]
+		if !ok {
+			continue
+		}
 
-	for _, subject := range roleBinding.Subjects {
-		if subject.Name == serviceAccountName {
-			return nil
+		// setup k8s role bindings for the namespace based on user's namespace role
+		roleSet := rolesMapping[nsRole.ID]
+		k8sRolesList, err := kcl.cli.RbacV1().Roles(namespace).List(metav1.ListOptions{})
+		if err != nil {
+			return err
+		}
+		if len(k8sRolesList.Items) == 0 {
+			kcl.createPortainerK8sRoles(namespace)
+		}
+
+		for _, role := range roleSet.k8sRoles {
+			err = kcl.createRoleBinding(serviceAccountName, string(role), namespace)
+			if err != nil && !k8serrors.IsAlreadyExists(err) {
+				return err
+			}
 		}
 	}
 
-	roleBinding.Subjects = append(roleBinding.Subjects, rbacv1.Subject{
-		Kind:      "ServiceAccount",
-		Name:      serviceAccountName,
-		Namespace: portainerNamespace,
-	})
-
-	_, err = kcl.cli.RbacV1().RoleBindings(namespace).Update(roleBinding)
-	return err
+	return nil
 }

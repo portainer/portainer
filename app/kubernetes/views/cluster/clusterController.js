@@ -9,9 +9,9 @@ class KubernetesClusterController {
   constructor(
     $async,
     $state,
-    Authentication,
     Notifications,
     LocalStorage,
+    Authentication,
     KubernetesNodeService,
     KubernetesApplicationService,
     KubernetesComponentStatusService,
@@ -19,9 +19,9 @@ class KubernetesClusterController {
   ) {
     this.$async = $async;
     this.$state = $state;
-    this.Authentication = Authentication;
     this.Notifications = Notifications;
     this.LocalStorage = LocalStorage;
+    this.Authentication = Authentication;
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesComponentStatusService = KubernetesComponentStatusService;
@@ -120,16 +120,13 @@ class KubernetesClusterController {
       applicationsLoading: true,
       viewReady: false,
       hasUnhealthyComponentStatus: false,
+      hasK8sClusterNodeR: this.Authentication.hasAuthorizations(['K8sClusterNodeR']),
     };
 
-    this.isAdmin = this.Authentication.isAdmin();
-
     await this.getNodes();
-    if (this.isAdmin) {
-      await this.getEndpoints();
-      await this.getComponentStatus();
-      await this.getApplications();
-    }
+    await this.getEndpoints();
+    await this.getComponentStatus();
+    await this.getApplications();
 
     this.state.viewReady = true;
   }

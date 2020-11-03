@@ -50,6 +50,7 @@
                       <td ng-if="!ctrl.state.increaseSize">
                         {{ ctrl.volume.PersistentVolumeClaim.Storage }}
                         <button
+                          authorization="K8sVolumeDetailsW"
                           type="button"
                           class="btn btn-sm btn-primary"
                           ng-click="ctrl.state.increaseSize = true"
@@ -57,7 +58,7 @@
                           >Increase size</button
                         >
                       </td>
-                      <td ng-if="ctrl.state.increaseSize">
+                      <td ng-if="ctrl.state.increaseSize" authorization="K8sVolumeDetailsW">
                         <form name="kubernetesVolumeUpdateForm">
                           <div class="form-inline">
                             <div class="input-group input-group-sm">

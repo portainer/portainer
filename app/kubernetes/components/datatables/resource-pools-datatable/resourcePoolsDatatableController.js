@@ -35,7 +35,7 @@ angular.module('portainer.docker').controller('KubernetesResourcePoolsDatatableC
     };
 
     this.isDisplayed = function (item) {
-      return !ctrl.isSystemNamespace(item) || (ctrl.settings.showSystem && ctrl.isAdmin);
+      return !ctrl.isSystemNamespace(item) || ctrl.settings.showSystem;
     };
 
     /**
@@ -76,6 +76,10 @@ angular.module('portainer.docker').controller('KubernetesResourcePoolsDatatableC
       if (storedSettings !== null) {
         this.settings = storedSettings;
         this.settings.open = false;
+      }
+      if (!Authentication.hasAuthorizations(['K8sAccessSystemNamespaces']) && this.settings.showSystem) {
+        this.settings.showSystem = false;
+        DatatableService.setDataTableSettings(this.tableKey, this.settings);
       }
       this.onSettingsRepeaterChange();
     };

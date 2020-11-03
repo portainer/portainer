@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 )
@@ -57,6 +57,11 @@ func (bouncer *RequestBouncer) AdminAccess(h http.Handler) http.Handler {
 // The request context will be enhanced with a RestrictedRequestContext object
 // that might be used later to inside the API operation for extra authorization validation
 // and resource filtering.
+//
+// Bouncer operations are applied backwards:
+//  - Parse the JWT from the request and stored in context, user has to be authenticated
+//  - Authorize the user to the request from the token data
+//  - Upgrade to the restricted request
 func (bouncer *RequestBouncer) RestrictedAccess(h http.Handler) http.Handler {
 	h = bouncer.mwUpgradeToRestrictedRequest(h)
 	h = bouncer.mwCheckPortainerAuthorizations(h)
@@ -69,6 +74,10 @@ func (bouncer *RequestBouncer) RestrictedAccess(h http.Handler) http.Handler {
 // The request context will be enhanced with a RestrictedRequestContext object
 // that might be used later to inside the API operation for extra authorization validation
 // and resource filtering.
+//
+// Bouncer operations are applied backwards:
+//  - Parse the JWT from the request and stored in context, user has to be authenticated
+//  - Upgrade to the restricted request
 func (bouncer *RequestBouncer) AuthenticatedAccess(h http.Handler) http.Handler {
 	h = bouncer.mwUpgradeToRestrictedRequest(h)
 	h = bouncer.mwAuthenticatedUser(h)
@@ -185,6 +194,9 @@ func (bouncer *RequestBouncer) RegistryAccess(r *http.Request, registry *portain
 	return nil
 }
 
+// First parse the JWT token and put it into the http context.
+//
+// Then add secure headers to the http reponse.
 func (bouncer *RequestBouncer) mwAuthenticatedUser(h http.Handler) http.Handler {
 	h = bouncer.mwCheckAuthentication(h)
 	h = mwSecureHeaders(h)
@@ -272,6 +284,8 @@ func (bouncer *RequestBouncer) mwUpgradeToRestrictedRequest(next http.Handler) h
 }
 
 // mwCheckAuthentication provides Authentication middleware for handlers
+//
+// It parses the JWT token and add the parsed token data into the http context
 func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var tokenData *portainer.TokenData

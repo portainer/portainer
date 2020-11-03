@@ -8,6 +8,6 @@ angular.module('portainer.kubernetes').component('kubernetesNodesDatatable', {
     tableKey: '@',
     orderBy: '@',
     refreshCallback: '<',
-    isAdmin: '<',
+    hasK8sClusterNodeR: '<',
   },
 });

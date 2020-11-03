@@ -101,6 +101,7 @@ class KubernetesApplicationController {
     Notifications,
     LocalStorage,
     ModalService,
+    Authentication,
     KubernetesApplicationService,
     KubernetesEventService,
     KubernetesStackService,
@@ -114,6 +115,7 @@ class KubernetesApplicationController {
     this.Notifications = Notifications;
     this.LocalStorage = LocalStorage;
     this.ModalService = ModalService;
+    this.Authentication = Authentication;
 
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesEventService = KubernetesEventService;
@@ -331,6 +333,8 @@ class KubernetesApplicationController {
       eventWarningCount: 0,
       expandedNote: false,
       useIngress: false,
+      isAuthorized: this.Authentication.hasAuthorizations(['K8sApplicationDetailsW']),
+      canShowConsole: this.Authentication.hasAuthorizations(['K8sApplicationConsoleRW']),
     };
 
     this.state.activeTab = this.LocalStorage.getActiveTab('application');

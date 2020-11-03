@@ -5,13 +5,12 @@ import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 
 class KubernetesApplicationsController {
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesApplicationService, Authentication, ModalService, LocalStorage) {
+  constructor($async, $state, Notifications, KubernetesApplicationService, ModalService, LocalStorage) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
     this.KubernetesApplicationService = KubernetesApplicationService;
 
-    this.Authentication = Authentication;
     this.ModalService = ModalService;
     this.LocalStorage = LocalStorage;
 
@@ -113,7 +112,6 @@ class KubernetesApplicationsController {
     this.state = {
       activeTab: this.LocalStorage.getActiveTab('applications'),
       currentName: this.$state.$current.name,
-      isAdmin: this.Authentication.isAdmin(),
       viewReady: false,
     };
 

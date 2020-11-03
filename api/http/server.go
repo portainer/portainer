@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/handler"
@@ -76,7 +76,9 @@ type Server struct {
 func (server *Server) Start() error {
 	authorizationService := authorization.NewService(server.DataStore)
 	kubernetesTokenCacheManager := kubernetes.NewTokenCacheManager()
-	proxyManager := proxy.NewManager(server.DataStore, server.SignatureService, server.ReverseTunnelService, server.DockerClientFactory, server.KubernetesClientFactory, kubernetesTokenCacheManager)
+	authorizationService.RegisterEventHandler("kubernetesTokenCacheManager", kubernetesTokenCacheManager)
+	proxyManager := proxy.NewManager(server.DataStore, server.SignatureService, server.ReverseTunnelService,
+		server.DockerClientFactory, server.KubernetesClientFactory, kubernetesTokenCacheManager, authorizationService)
 
 	requestBouncer := security.NewRequestBouncer(server.DataStore, server.LicenseService, server.JWTService)
 
@@ -128,7 +130,6 @@ func (server *Server) Start() error {
 	endpointHandler.SnapshotService = server.SnapshotService
 	endpointHandler.ProxyManager = proxyManager
 	endpointHandler.ReverseTunnelService = server.ReverseTunnelService
-	endpointHandler.KubernetesClientFactory = server.KubernetesClientFactory
 
 	var endpointEdgeHandler = endpointedge.NewHandler(requestBouncer)
 	endpointEdgeHandler.DataStore = server.DataStore
@@ -190,6 +191,7 @@ func (server *Server) Start() error {
 	var teamHandler = teams.NewHandler(requestBouncer)
 	teamHandler.AuthorizationService = authorizationService
 	teamHandler.DataStore = server.DataStore
+	teamHandler.K8sClientFactory = server.KubernetesClientFactory
 
 	var teamMembershipHandler = teammemberships.NewHandler(requestBouncer)
 	teamMembershipHandler.AuthorizationService = authorizationService
@@ -207,6 +209,7 @@ func (server *Server) Start() error {
 	userHandler.AuthorizationService = authorizationService
 	userHandler.DataStore = server.DataStore
 	userHandler.CryptoService = server.CryptoService
+	userHandler.K8sClientFactory = server.KubernetesClientFactory
 
 	var websocketHandler = websocket.NewHandler(requestBouncer)
 	websocketHandler.DataStore = server.DataStore

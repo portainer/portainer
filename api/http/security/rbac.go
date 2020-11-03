@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 // AuthorizedOperation checks if operations is authorized
@@ -16,8 +16,7 @@ func authorizedOperation(operation *portainer.APIOperationAuthorizationRequest) 
 
 var dockerRule = regexp.MustCompile(`/(?P<identifier>\d+)/docker(?P<operation>/.*)`)
 var storidgeRule = regexp.MustCompile(`/(?P<identifier>\d+)/storidge(?P<operation>/.*)`)
-
-//var registryRule = regexp.MustCompile(`/registries/(?P<identifier>\d+)/v2(?P<operation>/.*)?`)
+var k8sRule = regexp.MustCompile(`/(?P<identifier>\d+)/kubernetes(?P<operation>/.*)`)
 
 func extractMatches(regex *regexp.Regexp, str string) map[string]string {
 	match := regex.FindStringSubmatch(str)
@@ -45,6 +44,11 @@ func getOperationAuthorization(url, method string) portainer.Authorization {
 		return getDockerOperationAuthorization(strings.TrimPrefix(url, "/"+match[1]+"/docker"), method)
 	} else if storidgeRule.MatchString(url) {
 		return portainer.OperationIntegrationStoridgeAdmin
+	} else if k8sRule.MatchString(url) {
+		// if the k8sRule is matched, only tests if the user can access
+		// the current endpoint. The namespace + resource authorization
+		// is done in the k8s level.
+		return portainer.OperationK8sResourcePoolsR
 	}
 
 	return getPortainerOperationAuthorization(url, method)

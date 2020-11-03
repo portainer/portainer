@@ -36,7 +36,7 @@ angular.module('portainer.docker').controller('KubernetesConfigurationsDatatable
     };
 
     this.isDisplayed = function (item) {
-      return !ctrl.isSystemConfig(item) || (ctrl.settings.showSystem && ctrl.isAdmin);
+      return !ctrl.isSystemConfig(item) || ctrl.settings.showSystem;
     };
 
     /**
@@ -47,7 +47,6 @@ angular.module('portainer.docker').controller('KubernetesConfigurationsDatatable
     };
 
     this.$onInit = function () {
-      this.isAdmin = Authentication.isAdmin();
       this.setDefaults();
       this.prepareTableFromDataset();
 
@@ -76,6 +75,10 @@ angular.module('portainer.docker').controller('KubernetesConfigurationsDatatable
       if (storedSettings !== null) {
         this.settings = storedSettings;
         this.settings.open = false;
+      }
+      if (!Authentication.hasAuthorizations(['K8sAccessSystemNamespaces']) && this.settings.showSystem) {
+        this.settings.showSystem = false;
+        DatatableService.setDataTableSettings(this.tableKey, this.settings);
       }
       this.onSettingsRepeaterChange();
     };

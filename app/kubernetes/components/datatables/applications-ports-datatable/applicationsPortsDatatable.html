@@ -3,7 +3,7 @@
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
         <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
-        <span class="small text-muted" style="float: left; margin-top: 5px;" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
+        <span class="small text-muted" style="float: left; margin-top: 5px;" authorization="K8sAccessSystemNamespaces" ng-if="!$ctrl.settings.showSystem">
           <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
           System resources are hidden, this can be changed in the table settings.
         </span>
@@ -17,7 +17,7 @@
                 </div>
                 <div class="menuContent">
                   <div>
-                    <div class="md-checkbox" ng-if="$ctrl.isAdmin">
+                    <div class="md-checkbox" authorization="K8sAccessSystemNamespaces">
                       <input id="ports_setting_show_system" type="checkbox" ng-model="$ctrl.settings.showSystem" ng-change="$ctrl.onSettingsShowSystemChange()" />
                       <label for="ports_setting_show_system">Show system resources</label>
                     </div>

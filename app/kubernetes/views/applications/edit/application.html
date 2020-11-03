@@ -72,7 +72,7 @@
                           <div class="form-group">
                             <div class="col-sm-12">
                               <i class="fa fa-edit" aria-hidden="true"></i> Note
-                              <button class="btn btn-xs btn-primary" ng-click="ctrl.state.expandedNote = !ctrl.state.expandedNote;"
+                              <button authorization="K8sApplicationDetailsW" class="btn btn-xs btn-primary" ng-click="ctrl.state.expandedNote = !ctrl.state.expandedNote;"
                                 >{{ ctrl.state.expandedNote ? 'Collapse' : 'Expand' }}
                                 <i class="fas {{ ctrl.state.expandedNote ? 'fa-angle-up' : 'fa-angle-down' }}" aria-hidden="true"></i
                               ></button>
@@ -81,6 +81,7 @@
                           <div class="form-group" ng-if="ctrl.state.expandedNote">
                             <div class="col-sm-12">
                               <textarea
+                                ng-disabled="!ctrl.state.isAuthorized"
                                 class="form-control"
                                 name="application_note"
                                 id="application_note"
@@ -90,7 +91,7 @@
                               ></textarea>
                             </div>
                           </div>
-                          <div class="form-group" ng-if="ctrl.state.expandedNote">
+                          <div class="form-group" ng-if="ctrl.state.expandedNote" authorization="K8sApplicationDetailsW">
                             <div class="col-sm-12">
                               <button
                                 class="btn btn-primary btn-sm"
@@ -181,7 +182,7 @@
     <div class="col-sm-12">
       <rd-widget>
         <rd-widget-body>
-          <div ng-if="!ctrl.isExternalApplication() && !ctrl.isSystemNamespace()" style="margin-bottom: 15px;">
+          <div authorization="K8sApplicationDetailsW" ng-if="!ctrl.isExternalApplication() && !ctrl.isSystemNamespace()" style="margin-bottom: 15px;">
             <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.applications.application.edit" style="margin-left: 0;">
               <i class="fa fa-file-code space-right" aria-hidden="true"></i>Edit this application
             </button>
@@ -558,6 +559,7 @@
         dataset="ctrl.allContainers"
         table-key="kubernetes.application.containers"
         order-by="PodName"
+        show-console="ctrl.state.canShowConsole"
       >
       </kubernetes-containers-datatable>
     </div>

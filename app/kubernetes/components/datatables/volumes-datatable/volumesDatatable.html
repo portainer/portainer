@@ -3,7 +3,7 @@
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
         <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
-        <span class="small text-muted" style="float: left; margin-top: 5px;" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
+        <span class="small text-muted" style="float: left; margin-top: 5px;" authorization="K8sAccessSystemNamespaces" ng-if="!$ctrl.settings.showSystem">
           <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
           System resources are hidden, this can be changed in the table settings.
         </span>
@@ -17,7 +17,7 @@
                 </div>
                 <div class="menuContent">
                   <div>
-                    <div class="md-checkbox" ng-if="$ctrl.isAdmin">
+                    <div class="md-checkbox" authorization="K8sAccessSystemNamespaces">
                       <input id="setting_show_system" type="checkbox" ng-model="$ctrl.settings.showSystem" ng-change="$ctrl.onSettingsShowSystemChange()" />
                       <label for="setting_show_system">Show system resources</label>
                     </div>
@@ -50,7 +50,7 @@
           </span>
         </div>
       </div>
-      <div class="actionBar">
+      <div class="actionBar" authorization="K8sVolumesW">
         <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
@@ -72,7 +72,7 @@
           <thead>
             <tr>
               <th>
-                <span class="md-checkbox">
+                <span class="md-checkbox" authorization="K8sVolumesW">
                   <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                   <label for="select_all"></label>
                 </span>
@@ -125,7 +125,7 @@
               ng-class="{ active: item.Checked }"
             >
               <td>
-                <span class="md-checkbox">
+                <span class="md-checkbox" authorization="K8sVolumesW">
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="$ctrl.disableRemove(item)" />
                   <label for="select_{{ $index }}"></label>
                 </span>

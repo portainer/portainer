@@ -11,6 +11,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/proxy/factory"
+	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 // TODO: contain code related to legacy extension management
@@ -25,11 +26,27 @@ type (
 )
 
 // NewManager initializes a new proxy Service
-func NewManager(dataStore portainer.DataStore, signatureService portainer.DigitalSignatureService, tunnelService portainer.ReverseTunnelService, clientFactory *docker.ClientFactory, kubernetesClientFactory *cli.ClientFactory, kubernetesTokenCacheManager *kubernetes.TokenCacheManager) *Manager {
+func NewManager(
+	dataStore portainer.DataStore,
+	signatureService portainer.DigitalSignatureService,
+	tunnelService portainer.ReverseTunnelService,
+	clientFactory *docker.ClientFactory,
+	kubernetesClientFactory *cli.ClientFactory,
+	kubernetesTokenCacheManager *kubernetes.TokenCacheManager,
+	authService *authorization.Service,
+) *Manager {
 	return &Manager{
 		endpointProxies:        cmap.New(),
 		legacyExtensionProxies: cmap.New(),
-		proxyFactory:           factory.NewProxyFactory(dataStore, signatureService, tunnelService, clientFactory, kubernetesClientFactory, kubernetesTokenCacheManager),
+		proxyFactory: factory.NewProxyFactory(
+			dataStore,
+			signatureService,
+			tunnelService,
+			clientFactory,
+			kubernetesClientFactory,
+			kubernetesTokenCacheManager,
+			authService,
+		),
 	}
 }
 
