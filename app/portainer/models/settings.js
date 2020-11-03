@@ -16,6 +16,7 @@ export function SettingsViewModel(data) {
   this.AllowStackManagementForRegularUsers = data.AllowStackManagementForRegularUsers;
   this.AllowHostNamespaceForRegularUsers = data.AllowHostNamespaceForRegularUsers;
   this.AllowDeviceMappingForRegularUsers = data.AllowDeviceMappingForRegularUsers;
+  this.AllowContainerCapabilitiesForRegularUsers = data.AllowContainerCapabilitiesForRegularUsers;
 }
 
 export function PublicSettingsViewModel(settings) {
@@ -29,6 +30,7 @@ export function PublicSettingsViewModel(settings) {
   this.LogoURL = settings.LogoURL;
   this.OAuthLoginURI = settings.OAuthLoginURI;
   this.AllowStackManagementForRegularUsers = settings.AllowStackManagementForRegularUsers;
+  this.AllowContainerCapabilitiesForRegularUsers = settings.AllowContainerCapabilitiesForRegularUsers;
   this.AllowDeviceMappingForRegularUsers = settings.AllowDeviceMappingForRegularUsers;
   this.AllowHostNamespaceForRegularUsers = settings.AllowHostNamespaceForRegularUsers;
 }

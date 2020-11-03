@@ -12,22 +12,23 @@ import (
 )
 
 type settingsUpdatePayload struct {
-	LogoURL                             *string
-	BlackListedLabels                   []portainer.Pair
-	AuthenticationMethod                *int
-	LDAPSettings                        *portainer.LDAPSettings
-	OAuthSettings                       *portainer.OAuthSettings
-	AllowBindMountsForRegularUsers      *bool
-	AllowPrivilegedModeForRegularUsers  *bool
-	AllowVolumeBrowserForRegularUsers   *bool
-	EnableHostManagementFeatures        *bool
-	SnapshotInterval                    *string
-	TemplatesURL                        *string
-	EdgeAgentCheckinInterval            *int
-	EnableEdgeComputeFeatures           *bool
-	AllowStackManagementForRegularUsers *bool
-	AllowHostNamespaceForRegularUsers   *bool
-	AllowDeviceMappingForRegularUsers   *bool
+	LogoURL                                   *string
+	BlackListedLabels                         []portainer.Pair
+	AuthenticationMethod                      *int
+	LDAPSettings                              *portainer.LDAPSettings
+	OAuthSettings                             *portainer.OAuthSettings
+	AllowBindMountsForRegularUsers            *bool
+	AllowPrivilegedModeForRegularUsers        *bool
+	AllowVolumeBrowserForRegularUsers         *bool
+	EnableHostManagementFeatures              *bool
+	SnapshotInterval                          *string
+	TemplatesURL                              *string
+	EdgeAgentCheckinInterval                  *int
+	EnableEdgeComputeFeatures                 *bool
+	AllowStackManagementForRegularUsers       *bool
+	AllowContainerCapabilitiesForRegularUsers *bool
+	AllowHostNamespaceForRegularUsers         *bool
+	AllowDeviceMappingForRegularUsers         *bool
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
@@ -123,6 +124,10 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.AllowHostNamespaceForRegularUsers != nil {
 		settings.AllowHostNamespaceForRegularUsers = *payload.AllowHostNamespaceForRegularUsers
+	}
+
+	if payload.AllowContainerCapabilitiesForRegularUsers != nil {
+		settings.AllowContainerCapabilitiesForRegularUsers = *payload.AllowContainerCapabilitiesForRegularUsers
 	}
 
 	if payload.SnapshotInterval != nil && *payload.SnapshotInterval != settings.SnapshotInterval {

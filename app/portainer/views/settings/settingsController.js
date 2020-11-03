@@ -36,6 +36,7 @@ angular.module('portainer.app').controller('SettingsController', [
       allowStackManagementForRegularUsers: false,
       restrictHostNamespaceForRegularUsers: false,
       allowDeviceMappingForRegularUsers: false,
+      disableContainerCapabilitiesForRegularUsers: false,
     };
 
     $scope.isContainerEditDisabled = function isContainerEditDisabled() {
@@ -80,6 +81,7 @@ angular.module('portainer.app').controller('SettingsController', [
       settings.AllowStackManagementForRegularUsers = !$scope.formValues.disableStackManagementForRegularUsers;
       settings.AllowHostNamespaceForRegularUsers = !$scope.formValues.restrictHostNamespaceForRegularUsers;
       settings.AllowDeviceMappingForRegularUsers = !$scope.formValues.disableDeviceMappingForRegularUsers;
+      settings.AllowContainerCapabilitiesForRegularUsers = !$scope.formValues.disableContainerCapabilitiesForRegularUsers;
 
       $scope.state.actionInProgress = true;
       updateSettings(settings);
@@ -99,6 +101,7 @@ angular.module('portainer.app').controller('SettingsController', [
           StateManager.updateAllowDeviceMappingForRegularUsers(settings.AllowDeviceMappingForRegularUsers);
           StateManager.updateAllowPrivilegedModeForRegularUsers(settings.AllowPrivilegedModeForRegularUsers);
           StateManager.updateAllowBindMountsForRegularUsers(settings.AllowBindMountsForRegularUsers);
+          StateManager.updateAllowContainerCapabilitiesForRegularUsers(settings.AllowContainerCapabilitiesForRegularUsers);
           $state.reload();
         })
         .catch(function error(err) {
@@ -128,6 +131,7 @@ angular.module('portainer.app').controller('SettingsController', [
           $scope.formValues.disableStackManagementForRegularUsers = !settings.AllowStackManagementForRegularUsers;
           $scope.formValues.restrictHostNamespaceForRegularUsers = !settings.AllowHostNamespaceForRegularUsers;
           $scope.formValues.disableDeviceMappingForRegularUsers = !settings.AllowDeviceMappingForRegularUsers;
+          $scope.formValues.disableContainerCapabilitiesForRegularUsers = !settings.AllowContainerCapabilitiesForRegularUsers;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve application settings');
