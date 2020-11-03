@@ -2,6 +2,7 @@ package stacks
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"path"
 	"regexp"
@@ -47,15 +48,12 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	stacks, err := handler.DataStore.Stack().Stacks()
+	isUnique, err := handler.checkUniqueName(endpoint, payload.Name, 0, false)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
 	}
-
-	for _, stack := range stacks {
-		if strings.EqualFold(stack.Name, payload.Name) {
-			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", errStackAlreadyExists}
-		}
+	if !isUnique {
+		return &httperror.HandlerError{http.StatusConflict, fmt.Sprintf("A stack with the name '%s' already exists", payload.Name), errStackAlreadyExists}
 	}
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
@@ -133,15 +131,12 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	stacks, err := handler.DataStore.Stack().Stacks()
+	isUnique, err := handler.checkUniqueName(endpoint, payload.Name, 0, false)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
 	}
-
-	for _, stack := range stacks {
-		if strings.EqualFold(stack.Name, payload.Name) {
-			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", errStackAlreadyExists}
-		}
+	if !isUnique {
+		return &httperror.HandlerError{http.StatusConflict, fmt.Sprintf("A stack with the name '%s' already exists", payload.Name), errStackAlreadyExists}
 	}
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
@@ -229,15 +224,12 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	stacks, err := handler.DataStore.Stack().Stacks()
+	isUnique, err := handler.checkUniqueName(endpoint, payload.Name, 0, false)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
 	}
-
-	for _, stack := range stacks {
-		if strings.EqualFold(stack.Name, payload.Name) {
-			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", errStackAlreadyExists}
-		}
+	if !isUnique {
+		return &httperror.HandlerError{http.StatusConflict, fmt.Sprintf("A stack with the name '%s' already exists", payload.Name), errStackAlreadyExists}
 	}
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
