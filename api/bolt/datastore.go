@@ -223,6 +223,7 @@ func (store *Store) MigrateData() error {
 			EndpointGroupService: store.EndpointGroupService,
 			EndpointService:      store.EndpointService,
 			ExtensionService:     store.ExtensionService,
+			SettingsService:      store.SettingsService,
 			UserService:          store.UserService,
 			VersionService:       store.VersionService,
 		}

@@ -357,6 +357,10 @@ a[ng-click] {
   margin-bottom: 10px;
 }
 
+.no-margin-last-child:last-child {
+  margin-bottom: 0;
+}
+
 .panel-body {
   padding-top: 30px;
   background-color: #ffffff;
@@ -688,7 +692,8 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   margin: 0.5rem;
 }
 
-.boxselector_wrapper > div {
+.boxselector_wrapper > div,
+.boxselector_wrapper box-selector-item {
   flex: 1;
   padding: 0.5rem;
 }

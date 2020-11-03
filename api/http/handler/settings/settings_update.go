@@ -96,12 +96,20 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	if payload.LDAPSettings != nil {
 		ldapReaderDN := settings.LDAPSettings.ReaderDN
 		ldapPassword := settings.LDAPSettings.Password
+
 		if payload.LDAPSettings.ReaderDN != "" {
 			ldapReaderDN = payload.LDAPSettings.ReaderDN
 		}
+
 		if payload.LDAPSettings.Password != "" {
 			ldapPassword = payload.LDAPSettings.Password
 		}
+
+		if payload.LDAPSettings.AnonymousMode {
+			ldapReaderDN = ""
+			ldapPassword = ""
+		}
+
 		settings.LDAPSettings = *payload.LDAPSettings
 		settings.LDAPSettings.ReaderDN = ldapReaderDN
 		settings.LDAPSettings.Password = ldapPassword

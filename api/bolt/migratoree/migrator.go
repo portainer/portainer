@@ -54,8 +54,8 @@ func NewMigrator(parameters *Parameters) *Migrator {
 		endpointGroupService: parameters.EndpointGroupService,
 		endpointService:      parameters.EndpointService,
 		extensionService:     parameters.ExtensionService,
-		userService:          parameters.UserService,
 		settingsService:      parameters.SettingsService,
+		userService:          parameters.UserService,
 		versionService:       parameters.VersionService,
 	}
 }

@@ -1,26 +1,19 @@
 <div>
-  <div class="col-sm-12 form-section-title">
-    Automatic user provisioning
-  </div>
-  <div class="form-group">
-    <span class="col-sm-12 text-muted small">
+  <auto-user-provision-toggle ng-model="$ctrl.settings.OAuthAutoCreateUsers">
+    <field-description>
       With automatic user provisioning enabled, Portainer will create user(s) automatically with the standard user role. If disabled, users must be created beforehand in Portainer
       in order to login.
-    </span>
-  </div>
-  <div class="form-group">
-    <label class="col-sm-3 col-lg-2 control-label text-left">Automatic user provisioning</label>
-    <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="$ctrl.settings.OAuthAutoCreateUsers" /><i></i> </label>
-  </div>
+    </field-description>
+  </auto-user-provision-toggle>
 
   <div ng-if="$ctrl.settings.OAuthAutoCreateUsers">
     <div class="form-group">
       <span class="col-sm-12 text-muted small">
         <p>The users created by the automatic provisioning feature can be added to a default team on creation.</p>
-        <p
-          >By assigning newly created users to a team, they will be able to access the environments associated to that team. This setting is optional and if not set, newly created
-          users won't be able to access any environments.</p
-        >
+        <p>
+          By assigning newly created users to a team, they will be able to access the environments associated to that team. This setting is optional and if not set, newly created
+          users won't be able to access any environments.
+        </p>
       </span>
     </div>
     <div class="form-group">
@@ -28,8 +21,8 @@
       <span class="small text-muted" style="margin-left: 20px;" ng-if="$ctrl.teams.length === 0">
         You have not yet created any teams. Head over to the <a ui-sref="portainer.teams">Teams view</a> to manage teams.
       </span>
-      <button type="button" class="btn btn-sm btn-danger" ng-click="$ctrl.settings.DefaultTeamID = null" ng-disabled="!$ctrl.settings.DefaultTeamID" ng-if="$ctrl.teams.length > 0"
-        ><i class="fa fa-times" aria-hidden="true"></i
+      <button type="button" class="btn btn-sm btn-danger" ng-click="$ctrl.settings.DefaultTeamID = null" ng-disabled="!$ctrl.settings.DefaultTeamID" ng-if="$ctrl.teams.length > 0">
+        <i class="fa fa-times" aria-hidden="true"> </i
       ></button>
       <div class="col-sm-9 col-lg-9" ng-if="$ctrl.teams.length > 0">
         <select class="form-control" ng-model="$ctrl.settings.DefaultTeamID" ng-options="team.Id as team.Name for team in $ctrl.teams">

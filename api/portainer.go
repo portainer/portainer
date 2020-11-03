@@ -385,6 +385,9 @@ type (
 		UserNameAttribute string `json:"UserNameAttribute"`
 	}
 
+	// LDAPServerType represents the type of the LDAP server
+	LDAPServerType int
+
 	// LDAPSettings represents the settings used to connect to a LDAP server
 	LDAPSettings struct {
 		AnonymousMode       bool                      `json:"AnonymousMode"`
@@ -396,9 +399,16 @@ type (
 		SearchSettings      []LDAPSearchSettings      `json:"SearchSettings"`
 		GroupSearchSettings []LDAPGroupSearchSettings `json:"GroupSearchSettings"`
 		AutoCreateUsers     bool                      `json:"AutoCreateUsers"`
+		ServerType          LDAPServerType            `json:"ServerType"`
 
 		// Deprecated
 		URL string `json:"URL"`
+	}
+
+	// LDAPUser represents a LDAP user
+	LDAPUser struct {
+		Name  string
+		Group string
 	}
 
 	// LicenseInfo represents aggregated information about an instance license
@@ -997,6 +1007,8 @@ type (
 		AuthenticateUser(username, password string, settings *LDAPSettings) error
 		TestConnectivity(settings *LDAPSettings) error
 		GetUserGroups(username string, settings *LDAPSettings) ([]string, error)
+		SearchGroups(settings *LDAPSettings) ([]LDAPUser, error)
+		SearchUsers(settings *LDAPSettings) ([]string, error)
 	}
 
 	// LicenseService represents a service used to manage licenses
@@ -1286,6 +1298,13 @@ const (
 	_ JobType = iota
 	// SnapshotJobType is a system job used to create endpoint snapshots
 	SnapshotJobType = 2
+)
+
+// LDAPServerType represents the type of LDAP server
+const (
+	LDAPServerCustom LDAPServerType = iota
+	LDAPServerOpenLDAP
+	LDAPServerAD
 )
 
 const (

@@ -21,6 +21,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
 	"github.com/portainer/portainer/api/http/handler/endpoints"
 	"github.com/portainer/portainer/api/http/handler/file"
+	"github.com/portainer/portainer/api/http/handler/ldap"
 	"github.com/portainer/portainer/api/http/handler/licenses"
 	"github.com/portainer/portainer/api/http/handler/motd"
 	"github.com/portainer/portainer/api/http/handler/registries"
@@ -148,6 +149,11 @@ func (server *Server) Start() error {
 
 	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"))
 
+	var ldapHandler = ldap.NewHandler(requestBouncer)
+	ldapHandler.DataStore = server.DataStore
+	ldapHandler.FileService = server.FileService
+	ldapHandler.LDAPService = server.LDAPService
+
 	var motdHandler = motd.NewHandler(requestBouncer)
 
 	var registryHandler = registries.NewHandler(requestBouncer)
@@ -225,6 +231,7 @@ func (server *Server) Start() error {
 		EndpointEdgeHandler:    endpointEdgeHandler,
 		EndpointProxyHandler:   endpointProxyHandler,
 		FileHandler:            fileHandler,
+		LDAPHandler:            ldapHandler,
 		LicenseHandler:         licenseHandler,
 		MOTDHandler:            motdHandler,
 		RegistryHandler:        registryHandler,

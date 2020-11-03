@@ -4,6 +4,7 @@ import './rbac';
 
 import './registry-management';
 import licenseManagementModule from './license-management';
+import settingsModule from './settings';
 
 async function initAuthentication(authManager, Authentication, $rootScope, $state) {
   authManager.checkAuthOnRefresh();
@@ -20,7 +21,7 @@ async function initAuthentication(authManager, Authentication, $rootScope, $stat
   return await Authentication.init();
 }
 
-angular.module('portainer.app', ['portainer.oauth', 'portainer.rbac', 'portainer.registrymanagement', licenseManagementModule]).config([
+angular.module('portainer.app', ['portainer.oauth', 'portainer.rbac', 'portainer.registrymanagement', licenseManagementModule, settingsModule]).config([
   '$stateRegistryProvider',
   function ($stateRegistryProvider) {
     'use strict';

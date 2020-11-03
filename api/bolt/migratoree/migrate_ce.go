@@ -7,7 +7,12 @@ import (
 
 // MigrateFromCEdbv25 will migrate the db from latest ce version to latest ee version
 func (m *Migrator) MigrateFromCEdbv25() error {
-	err := m.updateAuthorizationsToEE()
+	err := m.updateSettingsToEE()
+	if err != nil {
+		return err
+	}
+
+	err = m.updateAuthorizationsToEE()
 	if err != nil {
 		return err
 	}
@@ -41,6 +46,8 @@ func (m *Migrator) updateSettingsToEE() error {
 	if url != "" {
 		legacySettings.LDAPSettings.URLs = append(legacySettings.LDAPSettings.URLs, url)
 	}
+
+	legacySettings.LDAPSettings.ServerType = portainer.LDAPServerCustom
 
 	return m.settingsService.UpdateSettings(legacySettings)
 }
