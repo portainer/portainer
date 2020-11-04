@@ -2,22 +2,33 @@ package license
 
 import (
 	"errors"
-	"github.com/portainer/liblicense"
-	"github.com/portainer/liblicense/master"
-	"github.com/portainer/portainer/api"
 	"log"
 	"time"
+
+	"github.com/portainer/liblicense"
+	"github.com/portainer/liblicense/master"
+	portainer "github.com/portainer/portainer/api"
 )
 
 // Service represents a service for managing portainer licenses
 type Service struct {
 	repository portainer.LicenseRepository
 	info       *portainer.LicenseInfo
+	stopSignal chan struct{}
 }
 
 // NewService creates a new instance of Service
 func NewService(repository portainer.LicenseRepository) *Service {
-	return &Service{repository: repository, info: nil}
+	return &Service{
+		repository: repository,
+		info:       nil,
+		stopSignal: nil,
+	}
+}
+
+// Start starts the service
+func (service *Service) Start() error {
+	return service.startSyncLoop()
 }
 
 // Info returns aggregation of the information about the existing licenses
@@ -111,6 +122,30 @@ func (service *Service) DeleteLicense(licenseKey string) error {
 	}
 
 	licenses, err = service.Licenses()
+	if err != nil {
+		return err
+	}
+
+	service.info = aggregate(licenses)
+
+	return nil
+}
+
+// revokeLicense revokes the license
+func (service *Service) revokeLicense(licenseKey string) error {
+	license, err := service.repository.License(licenseKey)
+	if err != nil {
+		return err
+	}
+
+	license.Revoked = true
+
+	err = service.repository.UpdateLicense(licenseKey, license)
+	if err != nil {
+		return err
+	}
+
+	licenses, err := service.Licenses()
 	if err != nil {
 		return err
 	}

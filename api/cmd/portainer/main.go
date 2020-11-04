@@ -463,6 +463,11 @@ func main() {
 		log.Fatal(err)
 	}
 
+	err = licenseService.Start()
+	if err != nil {
+		log.Fatalf("failed starting license service: %w", err)
+	}
+
 	var server portainer.Server = &http.Server{
 		ReverseTunnelService:    reverseTunnelService,
 		Status:                  applicationStatus,

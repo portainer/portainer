@@ -1058,6 +1058,7 @@ type (
 		Licenses() ([]liblicense.PortainerLicense, error)
 		License(licenseKey string) (*liblicense.PortainerLicense, error)
 		AddLicense(licenseKey string, license *liblicense.PortainerLicense) error
+		UpdateLicense(licenseKey string, license *liblicense.PortainerLicense) error
 		DeleteLicense(licenseKey string) error
 	}
 

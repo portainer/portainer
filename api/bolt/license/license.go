@@ -79,6 +79,12 @@ func (service *Service) AddLicense(licenseKey string, license *liblicense.Portai
 	})
 }
 
+// UpdateLicense updates a license.
+func (service *Service) UpdateLicense(licenseKey string, license *liblicense.PortainerLicense) error {
+	identifier := []byte(licenseKey)
+	return internal.UpdateObject(service.db, BucketName, identifier, license)
+}
+
 // DeleteLicense deletes a License.
 func (service *Service) DeleteLicense(licenseKey string) error {
 	identifier := []byte(licenseKey)
