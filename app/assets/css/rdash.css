@@ -20,7 +20,7 @@
 
 /**
  * Hamburg Menu
- * When the class of 'hamburg' is applied to the body tag of the document, 
+ * When the class of 'hamburg' is applied to the body tag of the document,
  * the sidebar changes it's style to attempt to mimic a menu on a phone app,
  * where the content is overlaying the content, rather than push it.
  */
@@ -149,7 +149,7 @@ body {
   background: #23ae89 !important;
 }
 .blue {
-  background: #2361ae !important;
+  background: #546477 !important;
 }
 .orange {
   background: #d3a938 !important;
@@ -175,14 +175,15 @@ div.input-mask {
  * Sidebar
  */
 #sidebar-wrapper {
-  background: #5b9bd5;
+  /* background: #5b9bd5; */
+  background: #323c48;
 }
 ul.sidebar .sidebar-main a,
 .sidebar-footer,
 ul.sidebar .sidebar-list a:hover,
 #page-wrapper:not(.open) ul.sidebar .sidebar-title.separator {
   /* Sidebar header and footer color */
-  background: #5b9bd5;
+  background: #314252;
 }
 ul.sidebar {
   position: absolute;

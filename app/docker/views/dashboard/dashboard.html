@@ -81,8 +81,8 @@
           <div class="widget-icon blue pull-left">
             <i class="fa fa-th-list"></i>
           </div>
-          <div class="title">{{ stackCount }}</div>
-          <div class="comment">{{ stackCount === 1 ? 'Stack' : 'Stacks' }}</div>
+          <div class="title dashboard-item">{{ stackCount }}</div>
+          <div class="comment dashboard-item">{{ stackCount === 1 ? 'Stack' : 'Stacks' }}</div>
         </rd-widget-body>
       </rd-widget>
     </a>
@@ -94,8 +94,8 @@
           <div class="widget-icon blue pull-left">
             <i class="fa fa-list-alt"></i>
           </div>
-          <div class="title">{{ serviceCount }}</div>
-          <div class="comment">{{ serviceCount === 1 ? 'Service' : 'Services' }}</div>
+          <div class="title dashboard-item">{{ serviceCount }}</div>
+          <div class="comment dashboard-item">{{ serviceCount === 1 ? 'Service' : 'Services' }}</div>
         </rd-widget-body>
       </rd-widget>
     </a>
@@ -115,8 +115,8 @@
             <div><i class="fa fa-heartbeat space-right green-icon"></i>{{ containers | healthycontainers }} healthy</div>
             <div><i class="fa fa-heartbeat space-right orange-icon"></i>{{ containers | unhealthycontainers }} unhealthy</div>
           </div>
-          <div class="title">{{ containers.length }}</div>
-          <div class="comment">{{ containers.length === 1 ? 'Container' : 'Containers' }}</div>
+          <div class="title dashboard-item">{{ containers.length }}</div>
+          <div class="comment dashboard-item">{{ containers.length === 1 ? 'Container' : 'Containers' }}</div>
         </rd-widget-body>
       </rd-widget>
     </a>
@@ -131,8 +131,8 @@
           <div class="pull-right">
             <div><i class="fa fa-chart-pie space-right"></i>{{ images | imagestotalsize | humansize }}</div>
           </div>
-          <div class="title">{{ images.length }}</div>
-          <div class="comment">{{ images.length === 1 ? 'Image' : 'Images' }}</div>
+          <div class="title dashboard-item">{{ images.length }}</div>
+          <div class="comment dashboard-item">{{ images.length === 1 ? 'Image' : 'Images' }}</div>
         </rd-widget-body>
       </rd-widget>
     </a>
@@ -144,8 +144,8 @@
           <div class="widget-icon blue pull-left">
             <i class="fa fa-hdd"></i>
           </div>
-          <div class="title">{{ volumeCount }}</div>
-          <div class="comment">{{ volumeCount === 1 ? 'Volume' : 'Volumes' }}</div>
+          <div class="title dashboard-item">{{ volumeCount }}</div>
+          <div class="comment dashboard-item">{{ volumeCount === 1 ? 'Volume' : 'Volumes' }}</div>
         </rd-widget-body>
       </rd-widget>
     </a>
@@ -157,8 +157,8 @@
           <div class="widget-icon blue pull-left">
             <i class="fa fa-sitemap"></i>
           </div>
-          <div class="title">{{ networkCount }}</div>
-          <div class="comment">{{ networkCount === 1 ? 'Network' : 'Networks' }}</div>
+          <div class="title dashboard-item">{{ networkCount }}</div>
+          <div class="comment dashboard-item">{{ networkCount === 1 ? 'Network' : 'Networks' }}</div>
         </rd-widget-body>
       </rd-widget>
     </a>

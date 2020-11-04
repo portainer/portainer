@@ -403,7 +403,7 @@ ul.sidebar .sidebar-list a.active {
   color: #fff;
   text-indent: 22px;
   border-left: 3px solid #fff;
-  background: #5b9bd5;
+  background: #314252;
 }
 
 .sidebar-header {
@@ -411,7 +411,7 @@ ul.sidebar .sidebar-list a.active {
   list-style: none;
   text-indent: 20px;
   font-size: 18px;
-  background: #5b9bd5;
+  background: #323c48;
 }
 
 .sidebar-header a {
@@ -525,7 +525,7 @@ ul.sidebar .sidebar-list .menu-icon {
 ul.sidebar .sidebar-list .sidebar-sublist a.active {
   color: #fff;
   border-left: 3px solid #fff;
-  background: #5b9bd5;
+  background: #314252;
 }
 
 @media (max-height: 785px) {
@@ -1049,3 +1049,7 @@ json-tree .branch-preview {
   background-color: #337ab7;
 }
 /* !spinkit override */
+
+.dashboard-item {
+  color: #65798e;
+}
