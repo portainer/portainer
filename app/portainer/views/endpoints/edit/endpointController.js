@@ -82,7 +82,7 @@ angular
         );
       } else if ($scope.state.deploymentTab === 1 && $scope.state.platformType === 'windows') {
         clipboard.copyText(
-          'docker network create --driver overlay portainer_edge_agent_network; docker service create --name portainer_edge_agent --network portainer_edge_agent_network -e AGENT_CLUSTER_ADDR=tasks.portainer_edge_agent -e EDGE=1 -e EDGE_ID=' +
+          'docker network create --driver overlay portainer_edge_agent_network && docker service create --name portainer_edge_agent --network portainer_edge_agent_network -e AGENT_CLUSTER_ADDR=tasks.portainer_edge_agent -e EDGE=1 -e EDGE_ID=' +
             $scope.randomEdgeID +
             ' -e EDGE_KEY=' +
             $scope.endpoint.EdgeKey +
@@ -296,8 +296,7 @@ docker service create \\
     function buildWindowsSwarmCommand(edgeId, edgeKey) {
       return `docker network create \\
   --driver overlay \\
-  portainer_edge_agent_network;
-
+  portainer_edge_agent_network && \\
 docker service create \\
   --name portainer_edge_agent \\
   --network portainer_edge_agent_network \\
