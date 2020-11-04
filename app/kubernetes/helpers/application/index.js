@@ -1,4 +1,4 @@
-import * as _ from 'lodash-es';
+import _ from 'lodash-es';
 import { KubernetesPortMapping, KubernetesPortMappingPort } from 'Kubernetes/models/port/models';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
@@ -321,7 +321,7 @@ class KubernetesApplicationHelper {
       const pvc = _.find(persistentVolumeClaims, (item) => _.startsWith(item.Name, folder.PersistentVolumeClaimName));
       const res = new KubernetesApplicationPersistedFolderFormValue(pvc.StorageClass);
       res.PersistentVolumeClaimName = folder.PersistentVolumeClaimName;
-      res.Size = parseInt(pvc.Storage.slice(0, -2));
+      res.Size = parseInt(pvc.Storage, 10);
       res.SizeUnit = pvc.Storage.slice(-2);
       res.ContainerPath = folder.MountPath;
       return res;

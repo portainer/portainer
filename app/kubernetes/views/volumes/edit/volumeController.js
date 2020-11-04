@@ -16,6 +16,7 @@ class KubernetesVolumeController {
     KubernetesNamespaceHelper,
     KubernetesApplicationService,
     KubernetesPersistentVolumeClaimService,
+    KubernetesResourcePoolService,
     ModalService,
     KubernetesPodService
   ) {
@@ -29,6 +30,7 @@ class KubernetesVolumeController {
     this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesPersistentVolumeClaimService = KubernetesPersistentVolumeClaimService;
+    this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.ModalService = ModalService;
     this.KubernetesPodService = KubernetesPodService;
 
@@ -63,18 +65,30 @@ class KubernetesVolumeController {
 
   onChangeSize() {
     if (this.state.volumeSize) {
-      const size = filesizeParser(this.state.volumeSize + this.state.volumeSizeUnit);
+      const size = filesizeParser(this.state.volumeSize + this.state.volumeSizeUnit, { base: 10 });
       if (this.state.oldVolumeSize > size) {
-        this.state.volumeSizeError = true;
+        this.state.errors.volumeSize = true;
+        this.state.errors.quotaExceeded = false;
+      } else if (this.state.quota.hasQuota && size - this.state.oldVolumeSize > this.state.quota.availableSize) {
+        this.state.errors.volumeSize = false;
+        this.state.errors.quotaExceeded = true;
       } else {
-        this.volume.PersistentVolumeClaim.Storage = size;
-        this.state.volumeSizeError = false;
+        this.state.errors.volumeSize = false;
+        this.state.errors.quotaExceeded = false;
       }
+    } else {
+      this.state.errors.volumeSize = false;
+      this.state.errors.quotaExceeded = false;
     }
   }
 
   sizeIsValid() {
-    return !this.state.volumeSizeError && this.state.oldVolumeSize !== this.volume.PersistentVolumeClaim.Storage;
+    return (
+      !this.state.errors.quotaExceeded &&
+      !this.state.errors.volumeSize &&
+      this.state.volumeSize &&
+      this.state.oldVolumeSize !== filesizeParser(this.state.volumeSize + this.state.volumeSizeUnit, { base: 10 })
+    );
   }
 
   /**
@@ -83,7 +97,7 @@ class KubernetesVolumeController {
 
   async updateVolumeAsync(redeploy) {
     try {
-      this.volume.PersistentVolumeClaim.Storage = this.state.volumeSize + this.state.volumeSizeUnit.charAt(0) + 'i';
+      this.volume.PersistentVolumeClaim.Storage = this.state.volumeSize + this.state.volumeSizeUnit.charAt(0);
       await this.KubernetesPersistentVolumeClaimService.patch(this.oldVolume.PersistentVolumeClaim, this.volume.PersistentVolumeClaim);
       this.Notifications.success('Volume successfully updated');
 
@@ -118,16 +132,37 @@ class KubernetesVolumeController {
 
   async getVolumeAsync() {
     try {
-      const [volume, applications] = await Promise.all([
+      const [volume, applications, resourcePool, volumes] = await Promise.all([
         this.KubernetesVolumeService.get(this.state.namespace, this.state.name),
         this.KubernetesApplicationService.get(this.state.namespace),
+        this.KubernetesResourcePoolService.get(this.state.namespace),
+        this.KubernetesVolumeService.get(this.state.namespace),
       ]);
       volume.Applications = KubernetesVolumeHelper.getUsingApplications(volume, applications);
+
+      const quota = resourcePool.Quota;
+      this.state.quota = {
+        availableSize: 0,
+        hasQuota: false,
+        maxSize: 0,
+      };
+      if (quota && volume.PersistentVolumeClaim.StorageClass) {
+        const storageRequest = _.find(quota.StorageRequests, { Name: volume.PersistentVolumeClaim.StorageClass.Name });
+        if (storageRequest) {
+          this.state.quota.hasQuota = true;
+          const sameStorageVolumes = _.filter(volumes, ['PersistentVolumeClaim.StorageClass.Name', volume.PersistentVolumeClaim.StorageClass.Name]);
+          const used = _.reduce(sameStorageVolumes, (sum, v) => sum + filesizeParser(v.PersistentVolumeClaim.Storage, { base: 10 }), 0);
+          const quotaLimitSize = filesizeParser(`${storageRequest.Size}${storageRequest.SizeUnit}`, { base: 10 });
+          this.state.quota.availableSize = quotaLimitSize - used;
+        }
+      }
+
       this.volume = volume;
       this.oldVolume = angular.copy(volume);
-      this.state.volumeSize = parseInt(volume.PersistentVolumeClaim.Storage.slice(0, -2));
+      this.state.volumeSize = parseInt(volume.PersistentVolumeClaim.Storage.slice(0, -2), 10);
       this.state.volumeSizeUnit = volume.PersistentVolumeClaim.Storage.slice(-2);
-      this.state.oldVolumeSize = filesizeParser(volume.PersistentVolumeClaim.Storage);
+      this.state.oldVolumeSize = filesizeParser(volume.PersistentVolumeClaim.Storage, { base: 10 });
+      this.state.quota.maxSize = this.state.quota.availableSize + this.state.oldVolumeSize;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve volume');
     }
@@ -178,7 +213,10 @@ class KubernetesVolumeController {
       increaseSize: false,
       volumeSize: 0,
       volumeSizeUnit: 'GB',
-      volumeSizeError: false,
+      errors: {
+        volumeSize: false,
+        quotaExceeded: false,
+      },
     };
 
     this.state.activeTab = this.LocalStorage.getActiveTab('volume');

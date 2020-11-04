@@ -1,13 +1,17 @@
 import angular from 'angular';
-import * as _ from 'lodash-es';
+import _ from 'lodash-es';
+import filesizeParser from 'filesize-parser';
 import { KubernetesResourceQuota, KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resource-quota/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import { KubernetesResourcePoolFormValues, KubernetesResourcePoolIngressClassAnnotationFormValue } from 'Kubernetes/models/resource-pool/formValues';
 import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
-import { KubernetesFormValueDuplicate } from 'Kubernetes/models/application/formValues';
+import { KubernetesFormValidationReferences } from 'Kubernetes/models/application/formValues';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
+import KubernetesResourceQuotaConverter from 'Kubernetes/converters/resourceQuota';
+import KubernetesStorageClassConverter from 'Kubernetes/converters/storageClass';
+import KubernetesResourceQuotaHelper from 'Kubernetes/helpers/resourceQuotaHelper';
 
 class KubernetesResourcePoolController {
   /* #region  CONSTRUCTOR */
@@ -26,7 +30,8 @@ class KubernetesResourcePoolController {
     KubernetesPodService,
     KubernetesApplicationService,
     KubernetesNamespaceHelper,
-    KubernetesIngressService
+    KubernetesIngressService,
+    KubernetesVolumeService
   ) {
     this.$async = $async;
     this.$state = $state;
@@ -43,18 +48,17 @@ class KubernetesResourcePoolController {
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
     this.KubernetesIngressService = KubernetesIngressService;
+    this.KubernetesVolumeService = KubernetesVolumeService;
 
     this.IngressClassTypes = KubernetesIngressClassTypes;
+    this.ResourceQuotaDefaults = KubernetesResourceQuotaDefaults;
 
     this.onInit = this.onInit.bind(this);
     this.createResourceQuotaAsync = this.createResourceQuotaAsync.bind(this);
     this.updateResourcePoolAsync = this.updateResourcePoolAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
-    this.getEventsAsync = this.getEventsAsync.bind(this);
     this.getApplications = this.getApplications.bind(this);
-    this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
     this.getIngresses = this.getIngresses.bind(this);
-    this.getIngressesAsync = this.getIngressesAsync.bind(this);
   }
   /* #endregion */
 
@@ -71,7 +75,7 @@ class KubernetesResourcePoolController {
       }
     });
     state.refs = duplicates;
-    state.hasDuplicates = Object.keys(duplicates).length > 0;
+    state.hasRefs = Object.keys(duplicates).length > 0;
   }
 
   /* #region  ANNOTATIONS MANAGEMENT */
@@ -92,7 +96,7 @@ class KubernetesResourcePoolController {
     return (
       this.state.actionInProgress ||
       (this.formValues.HasQuota && !this.isQuotaValid()) ||
-      this.state.duplicates.ingressHosts.hasDuplicates ||
+      this.state.duplicates.ingressHosts.hasRefs ||
       this.state.loadBalancersUsed > this.formValues.LoadBalancers
     );
   }
@@ -109,11 +113,11 @@ class KubernetesResourcePoolController {
   }
 
   checkDefaults() {
-    if (this.formValues.CpuLimit < this.defaults.CpuLimit) {
-      this.formValues.CpuLimit = this.defaults.CpuLimit;
+    if (this.formValues.CpuLimit < KubernetesResourceQuotaDefaults.CpuLimit) {
+      this.formValues.CpuLimit = KubernetesResourceQuotaDefaults.CpuLimit;
     }
-    if (this.formValues.MemoryLimit < KubernetesResourceReservationHelper.megaBytesValue(this.defaults.MemoryLimit)) {
-      this.formValues.MemoryLimit = KubernetesResourceReservationHelper.megaBytesValue(this.defaults.MemoryLimit);
+    if (this.formValues.MemoryLimit < KubernetesResourceReservationHelper.megaBytesValue(KubernetesResourceQuotaDefaults.MemoryLimit)) {
+      this.formValues.MemoryLimit = KubernetesResourceReservationHelper.megaBytesValue(KubernetesResourceQuotaDefaults.MemoryLimit);
     }
   }
 
@@ -146,54 +150,12 @@ class KubernetesResourcePoolController {
     return false;
   }
 
+  /* #region  UPDATE RESOURCE POOL */
   async updateResourcePoolAsync() {
     this.state.actionInProgress = true;
     try {
       this.checkDefaults();
-      const namespace = this.pool.Namespace.Name;
-      const cpuLimit = this.formValues.CpuLimit;
-      const memoryLimit = KubernetesResourceReservationHelper.bytesValue(this.formValues.MemoryLimit);
-      const owner = this.pool.Namespace.ResourcePoolOwner;
-      const quota = this.pool.Quota;
-
-      if (this.formValues.HasQuota || this.formValues.UseLoadBalancersQuota) {
-        if (quota) {
-          if (this.formValues.HasQuota) {
-            quota.CpuLimit = cpuLimit;
-            quota.MemoryLimit = memoryLimit;
-          } else {
-            quota.CpuLimit = 0;
-            quota.MemoryLimit = 0;
-          }
-          quota.LoadBalancers = null;
-          if (this.formValues.UseLoadBalancersQuota) {
-            quota.LoadBalancers = this.formValues.LoadBalancers;
-          }
-          await this.KubernetesResourceQuotaService.update(quota);
-        } else {
-          await this.createResourceQuotaAsync(namespace, owner, cpuLimit, memoryLimit);
-        }
-      } else if (quota) {
-        await this.KubernetesResourceQuotaService.delete(quota);
-      }
-
-      const promises = _.map(this.formValues.IngressClasses, (c) => {
-        c.Namespace = namespace;
-        if (c.WasSelected === false && c.Selected === true) {
-          const ingress = KubernetesIngressConverter.resourcePoolIngressClassFormValueToIngress(c);
-          return this.KubernetesIngressService.create(ingress);
-        } else if (c.WasSelected === true && c.Selected === false) {
-          return this.KubernetesIngressService.delete(c);
-        } else if (c.WasSelected === true && c.Selected === true) {
-          const oldIngress = _.find(this.ingresses, { Name: c.IngressClass.Name });
-          const newIngress = KubernetesIngressConverter.resourcePoolIngressClassFormValueToIngress(c);
-          newIngress.Paths = angular.copy(oldIngress.Paths);
-          newIngress.PreviousHost = oldIngress.Host;
-          return this.KubernetesIngressService.patch(oldIngress, newIngress);
-        }
-      });
-      await Promise.all(promises);
-
+      this.KubernetesResourcePoolService.patch(this.savedFormValues, this.formValues);
       this.Notifications.success('Resource pool successfully updated', this.pool.Namespace.Name);
       this.$state.reload();
     } catch (err) {
@@ -227,92 +189,108 @@ class KubernetesResourcePoolController {
       return this.$async(this.updateResourcePoolAsync);
     }
   }
+  /* #endregion */
 
   hasEventWarnings() {
     return this.state.eventWarningCount;
   }
 
   /* #region  GET EVENTS */
-  async getEventsAsync() {
-    try {
-      this.state.eventsLoading = true;
-      this.events = await this.KubernetesEventService.get(this.pool.Namespace.Name);
-      this.state.eventWarningCount = KubernetesEventHelper.warningCount(this.events);
-    } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve resource pool related events');
-    } finally {
-      this.state.eventsLoading = false;
-    }
-  }
-
   getEvents() {
-    return this.$async(this.getEventsAsync);
+    return this.$async(async () => {
+      try {
+        this.state.eventsLoading = true;
+        this.events = await this.KubernetesEventService.get(this.pool.Namespace.Name);
+        this.state.eventWarningCount = KubernetesEventHelper.warningCount(this.events);
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to retrieve resource pool related events');
+      } finally {
+        this.state.eventsLoading = false;
+      }
+    });
   }
   /* #endregion */
 
   /* #region  GET APPLICATIONS */
-  async getApplicationsAsync() {
-    try {
-      this.state.applicationsLoading = true;
-      this.applications = await this.KubernetesApplicationService.get(this.pool.Namespace.Name);
-      this.applications = _.map(this.applications, (app) => {
-        const resourceReservation = KubernetesResourceReservationHelper.computeResourceReservation(app.Pods);
-        app.CPU = resourceReservation.CPU;
-        app.Memory = resourceReservation.Memory;
-        if (this.formValues.LoadBalancers > 0 && app.ServiceType === 'LoadBalancer') {
-          this.state.loadBalancersUsed++;
-        }
-        return app;
-      });
-      if (this.formValues.LoadBalancers > 0) {
-        this.state.loadBalancersUsage = (this.state.loadBalancersUsed / this.formValues.LoadBalancers) * 100;
-      }
-    } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve applications.');
-    } finally {
-      this.state.applicationsLoading = false;
-    }
-  }
-
   getApplications() {
-    return this.$async(this.getApplicationsAsync);
+    return this.$async(async () => {
+      try {
+        this.state.applicationsLoading = true;
+        this.applications = await this.KubernetesApplicationService.get(this.pool.Namespace.Name);
+        this.applications = _.map(this.applications, (app) => {
+          const resourceReservation = KubernetesResourceReservationHelper.computeResourceReservation(app.Pods);
+          app.CPU = resourceReservation.CPU;
+          app.Memory = resourceReservation.Memory;
+          if (this.formValues.LoadBalancers > 0 && app.ServiceType === 'LoadBalancer') {
+            this.state.loadBalancersUsed++;
+          }
+          return app;
+        });
+        if (this.formValues.LoadBalancers > 0) {
+          this.state.loadBalancersUsage = (this.state.loadBalancersUsed / this.formValues.LoadBalancers) * 100;
+        }
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to retrieve applications.');
+      } finally {
+        this.state.applicationsLoading = false;
+      }
+    });
   }
   /* #endregion */
 
   /* #region  GET INGRESSES */
-  async getIngressesAsync() {
-    this.state.ingressesLoading = true;
-    try {
-      const namespace = this.pool.Namespace.Name;
-      this.allIngresses = await this.KubernetesIngressService.get();
-      this.ingresses = _.filter(this.allIngresses, { Namespace: namespace });
-      _.forEach(this.ingresses, (ing) => {
-        ing.Namespace = namespace;
-        _.forEach(ing.Paths, (path) => {
-          const application = _.find(this.applications, { ServiceName: path.ServiceName });
-          path.ApplicationName = application && application.Name ? application.Name : '-';
-        });
-      });
-    } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve ingresses.');
-    } finally {
-      this.state.ingressesLoading = false;
-    }
-  }
-
   getIngresses() {
-    return this.$async(this.getIngressesAsync);
+    return this.$async(async () => {
+      this.state.ingressesLoading = true;
+      try {
+        const namespace = this.pool.Namespace.Name;
+        this.allIngresses = await this.KubernetesIngressService.get();
+        this.ingresses = _.filter(this.allIngresses, { Namespace: namespace });
+        _.forEach(this.ingresses, (ing) => {
+          ing.Namespace = namespace;
+          _.forEach(ing.Paths, (path) => {
+            const application = _.find(this.applications, { ServiceName: path.ServiceName });
+            path.ApplicationName = application && application.Name ? application.Name : '-';
+          });
+        });
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to retrieve ingresses.');
+      } finally {
+        this.state.ingressesLoading = false;
+      }
+    });
   }
   /* #endregion */
+
+  /* #region  GET VOLUMES */
+  getVolumes() {
+    return this.$async(async () => {
+      try {
+        const namespace = this.pool.Namespace.Name;
+        this.volumes = await this.KubernetesVolumeService.get(namespace);
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to retrieve volumes.');
+      }
+    });
+  }
+  /* #endregion */
+
+  computeStorageQuotaUsage(sc) {
+    if (!sc.Size) {
+      sc.Usage = 100;
+      return;
+    }
+    const used = filesizeParser(`${sc.Used.Size}${sc.Used.SizeUnit}`, { base: 10 });
+    const available = filesizeParser(`${sc.Size}${sc.SizeUnit}`, { base: 10 });
+    sc.Usage = Math.round((used / available) * 100);
+  }
 
   /* #region  ON INIT */
   async onInit() {
     try {
       const endpoint = this.EndpointProvider.currentEndpoint();
       this.endpoint = endpoint;
-      this.defaults = KubernetesResourceQuotaDefaults;
-      this.formValues = new KubernetesResourcePoolFormValues(this.defaults);
-      this.formValues.HasQuota = false;
+      this.isAdmin = this.Authentication.isAdmin();
 
       this.state = {
         actionInProgress: false,
@@ -336,8 +314,9 @@ class KubernetesResourcePoolController {
         useLoadBalancer: endpoint.Kubernetes.Configuration.UseLoadBalancer,
         loadBalancersUsed: 0,
         loadBalancersUsage: 0,
+        availableSizeUnits: ['MB', 'GB', 'TB'],
         duplicates: {
-          ingressHosts: new KubernetesFormValueDuplicate(),
+          ingressHosts: new KubernetesFormValidationReferences(),
         },
       };
 
@@ -348,6 +327,8 @@ class KubernetesResourcePoolController {
       const [nodes, pools] = await Promise.all([this.KubernetesNodeService.get(), this.KubernetesResourcePoolService.get()]);
 
       this.pool = _.find(pools, { Namespace: { Name: name } });
+      this.formValues = new KubernetesResourcePoolFormValues(KubernetesResourceQuotaDefaults);
+      this.formValues.Name = this.pool.Namespace.Name;
 
       const sliderMaxResources = KubernetesResourceReservationHelper.computeSliderMaxResources(
         nodes,
@@ -362,15 +343,8 @@ class KubernetesResourcePoolController {
       const quota = this.pool.Quota;
       if (quota) {
         this.oldQuota = angular.copy(quota);
-        if (quota.CpuLimit || quota.MemoryLimit) {
-          this.formValues.HasQuota = true;
-          this.formValues.CpuLimit = quota.CpuLimit;
-          this.formValues.MemoryLimit = KubernetesResourceReservationHelper.megaBytesValue(quota.MemoryLimit);
-        }
-        if (quota.LoadBalancers !== null) {
-          this.formValues.LoadBalancers = quota.LoadBalancers;
-          this.formValues.UseLoadBalancersQuota = true;
-        }
+        this.formValues = KubernetesResourceQuotaConverter.quotaToResourcePoolFormValues(quota);
+
         this.state.cpuUsed = quota.CpuLimitUsed;
         this.state.memoryUsed = KubernetesResourceReservationHelper.megaBytesValue(quota.MemoryLimitUsed);
       }
@@ -383,7 +357,6 @@ class KubernetesResourcePoolController {
       if (this.isEditable && !this.state.ResourceOverCommitEnable) {
         this.formValues.HasQuota = true;
       }
-
       await this.getEvents();
       await this.getApplications();
 
@@ -392,6 +365,26 @@ class KubernetesResourcePoolController {
         const ingressClasses = endpoint.Kubernetes.Configuration.IngressClasses;
         this.formValues.IngressClasses = KubernetesIngressConverter.ingressClassesToFormValues(ingressClasses, this.ingresses);
       }
+      if (this.isAdmin) {
+        await this.getVolumes();
+        const storageClasses = KubernetesStorageClassConverter.storageClassesToResourcePoolFormValues(endpoint.Kubernetes.Configuration.StorageClasses);
+        _.remove(storageClasses, (sc) => _.find(this.formValues.StorageClasses, { Name: sc.Name }));
+        this.formValues.StorageClasses = _.concat(this.formValues.StorageClasses, storageClasses);
+        _.forEach(this.formValues.StorageClasses, (sc) => {
+          const volumes = _.filter(this.volumes, ['ResourcePool.Namespace.Name', this.pool.Namespace.Name]);
+          const used = _.reduce(
+            volumes,
+            (sum, vol) => {
+              return sum + filesizeParser(vol.PersistentVolumeClaim.Storage, { base: 10 });
+            },
+            0
+          );
+          sc.Used = KubernetesResourceQuotaHelper.formatBytes(used);
+          this.computeStorageQuotaUsage(sc);
+        });
+      }
+
+      this.savedFormValues = angular.copy(this.formValues);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     } finally {

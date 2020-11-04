@@ -151,9 +151,9 @@ export class KubernetesApplicationAutoScalerFormValue {
   }
 }
 
-export function KubernetesFormValueDuplicate() {
+export function KubernetesFormValidationReferences() {
   return {
     refs: {},
-    hasDuplicates: false,
+    hasRefs: false,
   };
 }

@@ -1,4 +1,4 @@
-import * as _ from 'lodash-es';
+import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 
 import {

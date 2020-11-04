@@ -315,6 +315,62 @@
               <!-- #endregion -->
             </div>
 
+            <div ng-if="ctrl.formValues.StorageClasses.length">
+              <div class="col-sm-12 form-section-title">
+                Storages
+              </div>
+              <div class="form-group">
+                <div class="col-sm-12 small text-muted">
+                  <p>
+                    <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Quotas can be set on each storage option to prevent users from exceeding a specific threshold when deploying applications. You can set a quota to 0 to
+                    effectively prevent the usage of a specific storage option inside this resource pool.
+                  </p>
+                </div>
+              </div>
+
+              <div class="form-group" ng-repeat-start="sc in ctrl.formValues.StorageClasses">
+                <div class="text-muted col-sm-12" style="width: 100%;">
+                  <div style="border-bottom: 1px solid #cdcdcd; padding-bottom: 5px;">
+                    <i class="fa fa-route" aria-hidden="true" style="margin-right: 2px;"></i> {{ sc.Name }}
+                  </div>
+                </div>
+
+                <div class="col-sm-2" style="margin-top: 10px;">
+                  <label class="control-label text-left">
+                    Enable quota
+                  </label>
+                </div>
+                <div class="col-sm-10" style="margin-top: 10px;">
+                  <label class="switch"> <input type="checkbox" ng-model="sc.Selected" /><i></i> </label>
+                </div>
+              </div>
+
+              <div ng-repeat-end ng-if="sc.Selected">
+                <div class="form-group">
+                  <label class="control-label text-left col-sm-2">
+                    Maximum usage
+                  </label>
+                  <div class="col-sm-8">
+                    <input type="number" class="form-control" name="storage_class_size_{{ $index }}" ng-model="sc.Size" placeholder="20" min="0" ng-min="0" required />
+                  </div>
+                  <div class="col-sm-2">
+                    <select class="form-control" ng-model="sc.SizeUnit" ng-options="unit for unit in ctrl.state.availableSizeUnits"></select>
+                  </div>
+                </div>
+
+                <div class="form-group" ng-show="resourcePoolCreationForm['storage_class_size_' + $index].$invalid">
+                  <div class="col-sm-12 small text-warning">
+                    <div ng-messages="resourcePoolCreationForm['storage_class_size_' + $index].$error">
+                      <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Size is required.</p>
+                      <p ng-message="number"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Invalid number.</p>
+                      <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This value must be greater than zero.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div class="col-sm-12 form-section-title">
               Actions
             </div>

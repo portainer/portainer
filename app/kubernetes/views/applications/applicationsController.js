@@ -1,5 +1,5 @@
 import angular from 'angular';
-import * as _ from 'lodash-es';
+import _ from 'lodash-es';
 import KubernetesStackHelper from 'Kubernetes/helpers/stackHelper';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 
