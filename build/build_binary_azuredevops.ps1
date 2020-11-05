@@ -17,8 +17,11 @@ Copy-Item -Path "api" -Destination "$go_path\src\github.com\portainer\portainer\
 
 Set-Location -Path "api\cmd\portainer"
 
+go env
+git config --list
+
 go get -t -d -v ./...
 ## go build -v
-& cmd /c 'go build -v 2>&1'
+& cmd /c 'echo building && go build -v 2>&1'
 
 Copy-Item -Path "portainer.exe" -Destination "$($env:BUILD_SOURCESDIRECTORY)\dist\portainer.exe" -Force 
