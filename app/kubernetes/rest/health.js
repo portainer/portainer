@@ -7,7 +7,7 @@ angular.module('portainer.kubernetes').factory('KubernetesHealth', [
       API_ENDPOINT_ENDPOINTS + '/:id/kubernetes/healthz',
       {},
       {
-        ping: { method: 'GET', timeout: 15000, params: { id: 'id' } },
+        ping: { method: 'GET', params: { id: 'id' } },
       }
     );
   },

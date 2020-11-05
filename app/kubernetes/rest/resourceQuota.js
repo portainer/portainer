@@ -17,7 +17,6 @@ angular.module('portainer.kubernetes').factory('KubernetesResourceQuotas', [
         {
           get: {
             method: 'GET',
-            timeout: 15000,
             ignoreLoadingBar: true,
           },
           getYaml: {

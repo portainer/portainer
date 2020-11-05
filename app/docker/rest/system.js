@@ -18,10 +18,9 @@ angular.module('portainer.docker').factory('System', [
         info: {
           method: 'GET',
           params: { action: 'info' },
-          timeout: 15000,
           interceptor: InfoInterceptor,
         },
-        version: { method: 'GET', params: { action: 'version' }, timeout: 4500, interceptor: VersionInterceptor },
+        version: { method: 'GET', params: { action: 'version' }, interceptor: VersionInterceptor },
         events: {
           method: 'GET',
           params: { action: 'events', since: '@since', until: '@until' },
