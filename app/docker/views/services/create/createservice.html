@@ -289,6 +289,49 @@
                 <!-- logging-opts-input-list -->
               </div>
               <!-- !logging-opts -->
+              <div class="col-sm-12 form-section-title">
+                Healthcheck
+              </div>
+              <span class="text-muted small">
+                <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true"></i>
+                Configuring a healthcheck for this service will allow Swarm to automatically restart a container marked as failing.
+              </span>
+              <!-- healthcheck-input -->
+              <div class="form-group" style="margin-top: 20px;">
+                <label for="service_healthcheck" class="col-sm-2 col-lg-1 control-label text-left">Healthcheck</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" ng-model="formValues.Healthcheck" id="service_healthcheck" placeholder="curl --fail http://localhost:80/ || exit 1" />
+                </div>
+              </div>
+              <!-- !healthcheck-input -->
+              <!-- healthcheck-interval -->
+              <div class="form-group">
+                <label for="service_interval" class="col-sm-2 col-lg-1 control-label text-left">Interval</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" ng-model="formValues.Interval" id="service_interval" placeholder="30s" />
+                </div>
+              </div>
+              <!-- !healthcheck-interval -->
+              <!-- healthcheck-timeout -->
+              <div class="form-group">
+                <label for="service_timeout" class="col-sm-2 col-lg-1 control-label text-left">Timeout</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" ng-model="formValues.Timeout" id="service_timeout" placeholder="30s" />
+                </div>
+              </div>
+              <!-- !healthcheck-timeout -->
+              <!-- healthcheck-start-period-retries -->
+              <div class="form-group">
+                <label for="service_start_period" class="col-sm-2 col-lg-1 control-label text-left">Start period</label>
+                <div class="col-sm-4">
+                  <input type="text" class="form-control" ng-model="formValues.StartPeriod" id="service_start_period" placeholder="0s" />
+                </div>
+                <label for="service_retries" class="col-sm-2 col-lg-1 control-label text-left">Retries</label>
+                <div class="col-sm-4">
+                  <input type="number" class="form-control" ng-model="formValues.Retries" id="service_retries" placeholder="3" />
+                </div>
+              </div>
+              <!-- !healthcheck-start-period-retries -->
             </form>
           </div>
           <!-- !tab-command -->

@@ -2,6 +2,7 @@ import { ResourceControlViewModel } from 'Portainer/models/resourceControl/resou
 
 export function ServiceViewModel(data, runningTasks, allTasks) {
   this.Model = data;
+
   this.Id = data.ID;
   this.Tasks = [];
   this.Name = data.Spec.Name;
@@ -76,7 +77,10 @@ export function ServiceViewModel(data, runningTasks, allTasks) {
     this.Mounts = containerSpec.Mounts || [];
     this.StopSignal = containerSpec.StopSignal;
     this.StopGracePeriod = containerSpec.StopGracePeriod;
-    this.HealthCheck = containerSpec.HealthCheck || {};
+    // Docker service get returns with lowercase 'c' but update needs upercase 'c'.
+    this.Model.Spec.TaskTemplate.ContainerSpec.HealthCheck = containerSpec.Healthcheck;
+    delete this.Model.Spec.TaskTemplate.ContainerSpec.Healthcheck;
+    this.HealthCheck = containerSpec.HealthCheck;
     this.Hosts = containerSpec.Hosts;
     this.DNSConfig = containerSpec.DNSConfig;
     this.Secrets = containerSpec.Secrets;

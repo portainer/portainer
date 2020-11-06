@@ -185,6 +185,7 @@
           <li><a href ng-click="goToItem('service-placement-constraints')">Placement constraints</a></li>
           <li ng-if="applicationState.endpoint.apiVersion >= 1.3"><a href ng-click="goToItem('service-placement-preferences')">Placement preferences</a></li>
           <li><a href ng-click="goToItem('service-restart-policy')">Restart policy</a></li>
+          <li><a href ng-click="goToItem('service-healthcheck')">Healthcheck</a></li>
           <li><a href ng-click="goToItem('service-update-config')">Update configuration</a></li>
           <li><a href ng-click="goToItem('service-logging')">Logging</a></li>
           <li><a href ng-click="goToItem('service-labels')">Service labels</a></li>
@@ -236,6 +237,7 @@
       ng-include="'app/docker/views/services/edit/includes/placementPreferences.html'"
     ></div>
     <div id="service-restart-policy" class="padding-top" ng-include="'app/docker/views/services/edit/includes/restart.html'"></div>
+    <div id="service-healthcheck" class="padding-top" ng-include="'app/docker/views/services/edit/includes/healthcheck.html'"></div>
     <div id="service-update-config" class="padding-top" ng-include="'app/docker/views/services/edit/includes/updateconfig.html'"></div>
     <div id="service-logging" class="padding-top" ng-include="'app/docker/views/services/edit/includes/logging.html'"></div>
     <div id="service-labels" class="padding-top" ng-include="'app/docker/views/services/edit/includes/servicelabels.html'"></div>
