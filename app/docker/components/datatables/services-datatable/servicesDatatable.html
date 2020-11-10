@@ -174,7 +174,9 @@
                 </span>
               </td>
               <td>
-                <!-- <span ng-if="['healthy', 'unhealthy'].indexOf(item.Status) === -1" class="label label-{{ item.Status | containerstatusbadge }}">{{ item.Status }}</span> -->
+                <span ng-if="['healthy', 'unhealthy'].indexOf(item.HealthCheckStatus) !== -1" class="label label-{{ item.HealthCheckStatus | containerstatusbadge }}">{{
+                  item.HealthCheckStatus
+                }}</span>
                 <span ng-if="!item.HealthCheck">-</span>
               </td>
               <td>
