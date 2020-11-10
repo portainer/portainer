@@ -13,6 +13,11 @@ export default class LicensesViewController {
     this.licenses = null;
 
     this.removeAction = this.removeAction.bind(this);
+    this.copyLicenseKey = this.copyLicenseKey.bind(this);
+  }
+
+  copyLicenseKey(item) {
+    navigator.clipboard.writeText(item.licenseKey);
   }
 
   removeAction(licenses) {

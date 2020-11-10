@@ -13,6 +13,13 @@
 
 <div class="row" ng-if="$ctrl.licenses">
   <div class="col-sm-12">
-    <licenses-datatable title-icon="fa-file-signature" table-key="Licenses" order-by="company" dataset="$ctrl.licenses" remove-action="$ctrl.removeAction"></licenses-datatable>
+    <licenses-datatable
+      title-icon="fa-file-signature"
+      table-key="Licenses"
+      order-by="company"
+      dataset="$ctrl.licenses"
+      remove-action="$ctrl.removeAction"
+      copy-license-key="$ctrl.copyLicenseKey"
+    ></licenses-datatable>
   </div>
 </div>
