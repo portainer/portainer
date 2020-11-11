@@ -422,8 +422,8 @@ type (
 
 	// LDAPUser represents a LDAP user
 	LDAPUser struct {
-		Name  string
-		Group string
+		Name   string
+		Groups []string
 	}
 
 	// LicenseInfo represents aggregated information about an instance license

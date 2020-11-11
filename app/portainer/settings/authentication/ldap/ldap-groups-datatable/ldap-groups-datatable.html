@@ -28,11 +28,7 @@
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Name')">
-                  Group Name
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
-                </a>
+                Groups
               </th>
             </tr>
           </thead>
@@ -45,7 +41,7 @@
                 {{ item.Name }}
               </td>
               <td>
-                {{ item.Group }}
+                <p ng-repeat="group in item.Groups" style="margin: 0;">{{ group }}</p>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">

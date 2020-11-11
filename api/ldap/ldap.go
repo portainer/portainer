@@ -165,6 +165,7 @@ func (*Service) SearchUsers(settings *portainer.LDAPSettings) ([]string, error) 
 
 // SearchGroups searches for groups with the specified settings
 func (*Service) SearchGroups(settings *portainer.LDAPSettings) ([]portainer.LDAPUser, error) {
+	type groupSet map[string]bool
 
 	connection, err := createConnection(settings)
 	if err != nil {
@@ -179,7 +180,7 @@ func (*Service) SearchGroups(settings *portainer.LDAPSettings) ([]portainer.LDAP
 		}
 	}
 
-	users := []portainer.LDAPUser{}
+	userGroups := map[string]groupSet{}
 
 	for _, searchSettings := range settings.GroupSearchSettings {
 		searchRequest := ldap.NewSearchRequest(
@@ -190,23 +191,35 @@ func (*Service) SearchGroups(settings *portainer.LDAPSettings) ([]portainer.LDAP
 			nil,
 		)
 
-		// Deliberately skip errors on the search request so that we can jump to other search settings
-		// if any issue arise with the current one.
 		sr, err := connection.Search(searchRequest)
 		if err != nil {
-			return users, err
+			return nil, err
 		}
 
 		for _, entry := range sr.Entries {
 			members := entry.GetAttributeValues(searchSettings.GroupAttribute)
 			for _, username := range members {
-				user := portainer.LDAPUser{
-					Name:  username,
-					Group: entry.GetAttributeValue("cn"),
+				_, ok := userGroups[username]
+				if !ok {
+					userGroups[username] = groupSet{}
 				}
-				users = append(users, user)
+				userGroups[username][entry.GetAttributeValue("cn")] = true
 			}
 		}
+	}
+
+	users := []portainer.LDAPUser{}
+
+	for username, groups := range userGroups {
+		groupList := []string{}
+		for group := range groups {
+			groupList = append(groupList, group)
+		}
+		user := portainer.LDAPUser{
+			Name:   username,
+			Groups: groupList,
+		}
+		users = append(users, user)
 	}
 
 	return users, nil
