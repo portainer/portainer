@@ -41,7 +41,7 @@ class KubernetesResourceReservationHelper {
     return filesizeParser(mem) * 1000 * 1000;
   }
 
-  static computeSliderMaxResources(nodes, pools, name, resourceOverCommitEnable, resourceOverCommitPercent) {
+  static computeSliderMaxResources(nodes, pools, name, resourceOverCommitEnabled, resourceOverCommitPercent) {
     let maxResources = { CPU: 0, Memory: 0 };
     _.forEach(nodes, (item) => {
       maxResources.CPU += item.CPU;
@@ -49,7 +49,7 @@ class KubernetesResourceReservationHelper {
     });
     maxResources.Memory = KubernetesResourceReservationHelper.megaBytesValue(maxResources.Memory);
 
-    if (!resourceOverCommitEnable) {
+    if (!resourceOverCommitEnabled) {
       const reservedResources = _.reduce(
         pools,
         (acc, pool) => {

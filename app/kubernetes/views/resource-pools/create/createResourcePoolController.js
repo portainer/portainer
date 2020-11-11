@@ -153,7 +153,7 @@ class KubernetesCreateResourcePoolController {
         viewReady: false,
         isAlreadyExist: false,
         canUseIngress: endpoint.Kubernetes.Configuration.IngressClasses.length,
-        resourceOverCommitEnable: endpoint.Kubernetes.Configuration.EnableResourceOverCommit,
+        resourceOverCommitEnabled: endpoint.Kubernetes.Configuration.EnableResourceOverCommit,
         resourceOverCommitPercentage: endpoint.Kubernetes.Configuration.ResourceOverCommitPercentage,
         useLoadBalancer: endpoint.Kubernetes.Configuration.UseLoadBalancer,
         duplicates: {
@@ -168,12 +168,12 @@ class KubernetesCreateResourcePoolController {
         nodes,
         this.resourcePools,
         '',
-        this.state.resourceOverCommitEnable,
+        this.state.resourceOverCommitEnabled,
         this.state.resourceOverCommitPercentage
       );
       this.state.sliderMaxCpu = sliderMaxResources.CPU;
       this.state.sliderMaxMemory = sliderMaxResources.Memory;
-      if (this.state.resourceOverCommitEnable) {
+      if (this.state.resourceOverCommitEnabled) {
         this.formValues.HasQuota = true;
       }
 
