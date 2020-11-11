@@ -174,10 +174,10 @@
                 </span>
               </td>
               <td>
-                <span ng-if="['healthy', 'unhealthy'].indexOf(item.HealthCheckStatus) !== -1" class="label label-{{ item.HealthCheckStatus | containerstatusbadge }}">{{
-                  item.HealthCheckStatus
-                }}</span>
-                <span ng-if="!item.HealthCheck">-</span>
+                <span
+                  ><i class="fa {{ item.HealthCheck ? 'fa-toggle-on' : 'fa-toggle-off' }}" aria-hidden="true" style="margin-right: 2px;"></i>
+                  {{ item.HealthCheck ? 'Yes' : 'No' }}</span
+                >
               </td>
               <td>
                 <a

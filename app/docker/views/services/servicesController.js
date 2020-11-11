@@ -1,5 +1,3 @@
-import _ from 'lodash-es';
-
 angular.module('portainer.docker').controller('ServicesController', [
   '$q',
   '$scope',
@@ -25,9 +23,9 @@ angular.module('portainer.docker').controller('ServicesController', [
         .then(function success(data) {
           var services = data.services;
           var tasks = data.tasks;
-          var containers = data.containers;
 
           if (agentProxy) {
+            var containers = data.containers;
             for (var j = 0; j < tasks.length; j++) {
               var task = tasks[j];
               TaskHelper.associateContainerToTask(task, containers);
@@ -37,14 +35,6 @@ angular.module('portainer.docker').controller('ServicesController', [
           for (var i = 0; i < services.length; i++) {
             var service = services[i];
             ServiceHelper.associateTasksToService(service, tasks);
-          }
-
-          if (agentProxy) {
-            _.forEach(services, (service) => {
-              if (service.HealthCheck) {
-                ServiceHelper.computeHealthcheckStatus(service);
-              }
-            });
           }
 
           $scope.nodes = data.nodes;

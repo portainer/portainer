@@ -1,5 +1,4 @@
 import moment from 'moment';
-import _ from 'lodash-es';
 
 angular.module('portainer.docker').factory('ServiceHelper', [
   function ServiceHelperFactory() {
@@ -20,7 +19,6 @@ angular.module('portainer.docker').factory('ServiceHelper', [
       translateKeyValueToLogDriverOpts,
       translateHostsEntriesToHostnameIP,
       translateHostnameIPToHostsEntries,
-      computeHealthcheckStatus,
     };
 
     function associateTasksToService(service, tasks) {
@@ -261,22 +259,6 @@ angular.module('portainer.docker').factory('ServiceHelper', [
         });
       }
       return ipHostEntries;
-    }
-
-    function computeHealthcheckStatus(service) {
-      var healthyTasks = 0;
-      _.forEach(service.Tasks, (task) => {
-        if (task.Container) {
-          if (task.Container.Status === 'healthy') {
-            healthyTasks += 1;
-          }
-          if (healthyTasks === service.Tasks.length) {
-            service.HealthCheckStatus = 'healthy';
-          } else {
-            service.HealthCheckStatus = 'unhealthy';
-          }
-        }
-      });
     }
 
     return helper;
