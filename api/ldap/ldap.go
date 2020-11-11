@@ -131,7 +131,7 @@ func (*Service) SearchUsers(settings *portainer.LDAPSettings) ([]string, error) 
 		}
 	}
 
-	users := make([]string, 0)
+	users := map[string]bool{}
 
 	for _, searchSettings := range settings.SearchSettings {
 		searchRequest := ldap.NewSearchRequest(
@@ -144,15 +144,23 @@ func (*Service) SearchUsers(settings *portainer.LDAPSettings) ([]string, error) 
 
 		sr, err := connection.Search(searchRequest)
 		if err != nil {
-			return users, err
+			return nil, err
 		}
 
 		for _, user := range sr.Entries {
-			users = append(users, user.GetAttributeValue(searchSettings.UserNameAttribute))
+			username := user.GetAttributeValue(searchSettings.UserNameAttribute)
+			if username != "" {
+				users[username] = true
+			}
 		}
 	}
 
-	return users, nil
+	usersList := []string{}
+	for user := range users {
+		usersList = append(usersList, user)
+	}
+
+	return usersList, nil
 }
 
 // SearchGroups searches for groups with the specified settings
