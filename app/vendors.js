@@ -37,5 +37,6 @@ import 'angular-ui-bootstrap';
 import 'angular-moment-picker';
 import 'angular-multiselect/isteven-multi-select.js';
 import 'angulartics/dist/angulartics.min.js';
+import 'ng-rollbar/ng-rollbar';
 
 window.angular = angular;

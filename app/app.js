@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import './rollbar-setup';
 
 angular.module('portainer').run([
   '$rootScope',

@@ -40,6 +40,7 @@ angular.module('portainer', [
   'moment-picker',
   'angulartics',
   'angulartics.matomo',
+  'tandibar/ng-rollbar',
 ]);
 
 if (require) {
