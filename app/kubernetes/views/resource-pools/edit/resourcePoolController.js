@@ -311,7 +311,7 @@ class KubernetesResourcePoolController {
         viewReady: false,
         eventWarningCount: 0,
         canUseIngress: endpoint.Kubernetes.Configuration.IngressClasses.length,
-        resourceOverCommitEnable: endpoint.Kubernetes.Configuration.EnableResourceOverCommit,
+        resourceOverCommitEnabled: endpoint.Kubernetes.Configuration.EnableResourceOverCommit,
         resourceOverCommitPercentage: endpoint.Kubernetes.Configuration.ResourceOverCommitPercentage,
         useLoadBalancer: endpoint.Kubernetes.Configuration.UseLoadBalancer,
         loadBalancersUsed: 0,
@@ -336,7 +336,7 @@ class KubernetesResourcePoolController {
         nodes,
         pools,
         name,
-        this.state.resourceOverCommitEnable,
+        this.state.resourceOverCommitEnabled,
         this.state.resourceOverCommitPercentage
       );
       this.state.sliderMaxCpu = sliderMaxResources.CPU;
@@ -356,7 +356,7 @@ class KubernetesResourcePoolController {
         this.isEditable = false;
       }
 
-      if (this.isEditable && !this.state.ResourceOverCommitEnable) {
+      if (this.isEditable && !this.state.resourceOverCommitEnabled) {
         this.formValues.HasQuota = true;
       }
       await this.getEvents();

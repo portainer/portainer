@@ -24,21 +24,21 @@
                 <div authorization="K8sResourcePoolDetailsW" ng-if="ctrl.isEditable" class="col-sm-12 form-section-title">Resource quota</div>
                 <!-- quotas-switch -->
                 <div authorization="K8sResourcePoolDetailsW" ng-if="ctrl.isEditable" class="form-group">
-                  <div class="col-sm-12 small text-muted" ng-if="ctrl.state.resourceOverCommitEnable">
+                  <div class="col-sm-12 small text-muted" ng-if="ctrl.state.resourceOverCommitEnabled">
                     <p>
                       <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                       A resource pool is a logical abstraction of a Kubernetes cluster, to provide for more flexible management of resources. Best practice is to set a quota
                       assignment as this ensures greatest security/stability; alternatively, you can disable assigning a quota for unrestricted access (not recommended).
                     </p>
                   </div>
-                  <div class="col-sm-12 small text-muted" ng-if="!ctrl.state.resourceOverCommitEnable">
+                  <div class="col-sm-12 small text-muted" ng-if="!ctrl.state.resourceOverCommitEnabled">
                     <p>
                       <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                       A resource pool is a logical abstraction of a Kubernetes cluster, to provide for more flexible management of resources. Resource over-commit is disabled,
                       please assign a capped limit of resources to this pool.
                     </p>
                   </div>
-                  <div class="col-sm-12" ng-if="ctrl.state.resourceOverCommitEnable">
+                  <div class="col-sm-12" ng-if="ctrl.state.resourceOverCommitEnabled">
                     <label class="control-label text-left">
                       Resource assignment
                     </label>
