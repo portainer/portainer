@@ -710,8 +710,10 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
       SettingsService.publicSettings()
         .then(function success(data) {
-          $scope.allowBindMounts = $scope.isAdminOrEndpointAdmin || data.AllowBindMountsForRegularUsers;
-          $scope.allowPrivilegedMode = data.AllowPrivilegedModeForRegularUsers;
+          const isAdmin = $scope.isAdmin;
+          const isEndpointAdmin = Authentication.hasAuthorizations(['EndpointResourcesAccess']);
+          $scope.allowBindMounts = isAdmin || isEndpointAdmin || data.AllowBindMountsForRegularUsers;
+          $scope.allowPrivilegedMode = isAdmin || isEndpointAdmin || data.AllowPrivilegedModeForRegularUsers;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve application settings');
