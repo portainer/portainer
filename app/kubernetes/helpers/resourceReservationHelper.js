@@ -64,7 +64,7 @@ class KubernetesResourceReservationHelper {
       if (reservedResources.Memory) {
         reservedResources.Memory = KubernetesResourceReservationHelper.megaBytesValue(reservedResources.Memory);
       }
-      maxResources.CPU = parseInt((maxResources.CPU - (maxResources.CPU * resourceOverCommitPercent) / 100 - reservedResources.CPU, 10) * 10) / 10;
+      maxResources.CPU = Math.round(parseFloat(maxResources.CPU - (maxResources.CPU * resourceOverCommitPercent) / 100 - reservedResources.CPU) * 10) / 10;
       maxResources.Memory = parseInt(maxResources.Memory - (maxResources.Memory * resourceOverCommitPercent) / 100 - reservedResources.Memory, 10);
     }
     return maxResources;
