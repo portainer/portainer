@@ -4,6 +4,9 @@ const SERVER_TYPES = {
   AD: 2,
 };
 
+const DEFAULT_GROUP_FILTER = '(objectClass=groupOfNames)';
+const DEFAULT_USER_FILTER = '(objectClass=inetOrgPerson)';
+
 export default class LdapSettingsController {
   /* @ngInject */
   constructor(LDAPService) {
@@ -42,19 +45,27 @@ export default class LdapSettingsController {
   onChangeToOpenLDAP() {
     this.settings.SearchSettings.forEach((search) => {
       search.UserNameAttribute = 'uid';
-      search.Filter = search.Filter || '(objectClass=inetOrgPerson)';
+      search.Filter = search.Filter || DEFAULT_USER_FILTER;
     });
     this.settings.GroupSearchSettings.forEach((search) => {
       search.GroupAttribute = 'member';
-      search.GroupFilter = search.GroupFilter || '(objectClass=groupOfNames)';
+      search.GroupFilter = search.GroupFilter || DEFAULT_GROUP_FILTER;
     });
   }
 
   searchUsers() {
-    return this.LDAPService.users(this.settings);
+    const settings = {
+      ...this.settings,
+      SearchSettings: this.settings.SearchSettings.map((search) => ({ ...search, Filter: search.Filter || DEFAULT_USER_FILTER })),
+    };
+    return this.LDAPService.users(settings);
   }
 
   searchGroups() {
-    return this.LDAPService.groups(this.settings);
+    const settings = {
+      ...this.settings,
+      GroupSearchSettings: this.settings.GroupSearchSettings.map((search) => ({ ...search, GroupFilter: search.GroupFilter || DEFAULT_GROUP_FILTER })),
+    };
+    return this.LDAPService.groups(settings);
   }
 }
