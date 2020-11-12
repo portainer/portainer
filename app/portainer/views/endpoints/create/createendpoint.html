@@ -44,6 +44,16 @@
                   <p>Directly connect to the Docker API</p>
                 </label>
               </div>
+              <div ng-click="resetEndpointURL()">
+                <input type="radio" id="kubernetes_endpoint" ng-model="state.EnvironmentType" value="kubernetes" />
+                <label for="kubernetes_endpoint">
+                  <div class="boxselector_header">
+                    <i class="fas fa-dharmachakra" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Kubernetes
+                  </div>
+                  <p>Local Kubernetes environment</p>
+                </label>
+              </div>
               <div>
                 <input type="radio" id="azure_endpoint" ng-model="state.EnvironmentType" value="azure" />
                 <label for="azure_endpoint">
@@ -62,8 +72,16 @@
             </div>
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
-                The Docker API must be exposed over TCP. You can find more information about how to expose the Docker API over TCP
-                <a href="https://docs.docker.com/engine/security/https/" target="_blank">in the Docker documentation</a>.
+                You can connect Portainer to a Docker environment via socket or via TCP. You can find more information about how to expose the Docker API over TCP
+                <a href="https://docs.docker.com/engine/security/https/"> in the Docker documentation</a>.
+              </span>
+
+              <span class="col-sm-12 text-muted small">
+                When using the socket, ensure that you have started the Portainer container with the following Docker flag
+                <code> -v "/var/run/docker.sock:/var/run/docker.sock" </code>
+                (on Linux) or
+                <code> -v \.\pipe\docker_engine:\.\pipe\docker_engine </code>
+                (on Windows).
               </span>
             </div>
           </div>
@@ -118,6 +136,21 @@
               </span>
             </div>
           </div>
+          <div ng-if="state.EnvironmentType === 'kubernetes'">
+            <div class="col-sm-12 form-section-title">
+              Important notice
+            </div>
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                This will allow you to manage the Kubernetes environment where Portainer is running.
+              </span>
+
+              <span class="col-sm-12 text-muted small">
+                <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                In order to manage a remote Kubernetes environment, please use the Agent or Edge agent options.
+              </span>
+            </div>
+          </div>
           <div ng-if="state.EnvironmentType === 'azure'">
             <div class="col-sm-12 form-section-title">
               Information
@@ -167,8 +200,18 @@
             </div>
           </div>
           <!-- !name-input -->
+          <!-- connect-via-socket-input -->
+          <div ng-if="state.EnvironmentType === 'docker'">
+            <div class="form-group" style="padding-left: 15px;">
+              <label for="connect_socket" class="col-sm_12 control-label text-left">
+                Connect via socket
+              </label>
+              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.ConnectSocket" /><i></i> </label>
+            </div>
+          </div>
+          <!-- !connect-via-socket-input -->
           <!-- endpoint-url-input -->
-          <div ng-if="state.EnvironmentType === 'docker' || state.EnvironmentType === 'agent'">
+          <div ng-if="(state.EnvironmentType === 'docker' && !formValues.ConnectSocket) || state.EnvironmentType === 'agent'">
             <div class="form-group">
               <label for="endpoint_url" class="col-sm-3 col-lg-2 control-label text-left">
                 Endpoint URL
@@ -389,6 +432,17 @@
                 class="btn btn-primary btn-sm"
                 ng-disabled="state.actionInProgress || !endpointCreationForm.$valid"
                 ng-click="addEdgeAgentEndpoint()"
+                button-spinner="state.actionInProgress"
+              >
+                <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Add endpoint</span>
+                <span ng-show="state.actionInProgress">Creating endpoint...</span>
+              </button>
+              <button
+                ng-if="state.EnvironmentType === 'kubernetes'"
+                type="submit"
+                class="btn btn-primary btn-sm"
+                ng-disabled="state.actionInProgress || !endpointCreationForm.$valid"
+                ng-click="addKubernetesEndpoint()"
                 button-spinner="state.actionInProgress"
               >
                 <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Add endpoint</span>
