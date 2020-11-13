@@ -10,7 +10,7 @@ import { KubernetesIngressClassAnnotation, KubernetesIngressClassRewriteTargetAn
 export class KubernetesIngressConverter {
   // TODO: refactor @LP
   // currently only allows the first non-empty host to be used as the "configured" host.
-  // As we currently only allow a single host to be used for a Portianer-managed ingress
+  // As we currently only allow a single host to be used for a Portainer-managed ingress
   // it's working as the only non-empty host will be the one defined by the admin
   // but it will take a random existing host for non Portainer ingresses (CLI deployed)
   // Also won't support multiple hosts if we make it available in the future
@@ -42,6 +42,7 @@ export class KubernetesIngressConverter {
         : data.spec.ingressClassName;
     res.Paths = paths;
     res.Host = host;
+    res.Hosts = _.uniq(_.map(paths, 'Host'));
     return res;
   }
 
@@ -96,7 +97,7 @@ export class KubernetesIngressConverter {
       if (ingress) {
         fv.Selected = true;
         fv.WasSelected = true;
-        fv.Host = ingress.Host;
+        fv.Hosts = ingress.Hosts;
         const [[rewriteKey]] = _.toPairs(KubernetesIngressClassRewriteTargetAnnotations[ic.Type]);
         const annotations = _.map(_.toPairs(ingress.Annotations), ([key, value]) => {
           if (key === rewriteKey) {

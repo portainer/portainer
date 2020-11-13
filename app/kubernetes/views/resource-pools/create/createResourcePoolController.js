@@ -35,7 +35,7 @@ class KubernetesCreateResourcePoolController {
   onChangeIngressHostname() {
     const state = this.state.duplicates.ingressHosts;
 
-    const hosts = _.map(this.formValues.IngressClasses, 'Host');
+    const hosts = _.map(this.formValues.IngressClasses, 'Hosts');
     const allHosts = _.map(this.allIngresses, 'Host');
     const duplicates = KubernetesFormValidationHelper.getDuplicates(hosts);
     _.forEach(hosts, (host, idx) => {
@@ -45,6 +45,14 @@ class KubernetesCreateResourcePoolController {
     });
     state.refs = duplicates;
     state.hasRefs = Object.keys(duplicates).length > 0;
+  }
+
+  addHostname(ingressClass) {
+    ingressClass.Hosts.push('');
+  }
+
+  removeHostname(ingressClass, index) {
+    ingressClass.Hosts.splice(index, 1);
   }
 
   /* #region  ANNOTATIONS MANAGEMENT */
@@ -168,6 +176,11 @@ class KubernetesCreateResourcePoolController {
         const ingressClasses = endpoint.Kubernetes.Configuration.IngressClasses;
         this.formValues.IngressClasses = KubernetesIngressConverter.ingressClassesToFormValues(ingressClasses);
       }
+      _.forEach(this.formValues.IngressClasses, (ic) => {
+        if (ic.Hosts.length === 0) {
+          ic.Hosts.push('');
+        }
+      });
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     } finally {
