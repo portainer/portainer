@@ -23,12 +23,12 @@ export default class LicensesViewController {
   removeAction(licenses) {
     return this.$async(async () => {
       try {
-        if (this.licenses.length === 1) {
+        if (this.licenses.length === licenses.length) {
           this.Notifications.warning('At least one license is required');
           return;
         }
 
-        if (!(await this.ModalService.confirmDeletionAsync('Are you sure you want to remove this license?'))) {
+        if (!(await this.ModalService.confirmDeletionAsync('Are you sure you want to remove these licenses?'))) {
           return;
         }
 

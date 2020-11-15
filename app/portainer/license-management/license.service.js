@@ -17,7 +17,7 @@ export function LicenseService(License) {
 
   async function attach(licenseKeys) {
     const response = await License.attach({ licenseKeys }).$promise;
-    if (Object.keys(response.failedKeys).length) {
+    if (Object.keys(response.failedKeys).length === licenseKeys.length) {
       return response;
     }
 
@@ -28,7 +28,7 @@ export function LicenseService(License) {
 
   async function remove(licenseKeys) {
     const response = await License.remove({ licenseKeys }).$promise;
-    if (Object.keys(response.failedKeys).length) {
+    if (Object.keys(response.failedKeys).length === licenseKeys.length) {
       return response;
     }
 
