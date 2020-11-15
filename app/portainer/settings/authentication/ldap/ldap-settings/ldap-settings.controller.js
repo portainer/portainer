@@ -4,6 +4,8 @@ const SERVER_TYPES = {
   AD: 2,
 };
 
+import { buildLdapSettingsModel } from '@/portainer/settings/authentication/ldap/ldap-settings.model';
+
 const DEFAULT_GROUP_FILTER = '(objectClass=groupOfNames)';
 const DEFAULT_USER_FILTER = '(objectClass=inetOrgPerson)';
 
@@ -43,14 +45,7 @@ export default class LdapSettingsController {
   }
 
   onChangeToOpenLDAP() {
-    this.settings.SearchSettings.forEach((search) => {
-      search.UserNameAttribute = 'uid';
-      search.Filter = search.Filter || DEFAULT_USER_FILTER;
-    });
-    this.settings.GroupSearchSettings.forEach((search) => {
-      search.GroupAttribute = 'member';
-      search.GroupFilter = search.GroupFilter || DEFAULT_GROUP_FILTER;
-    });
+    this.settings = buildLdapSettingsModel();
   }
 
   searchUsers() {
