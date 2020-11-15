@@ -20,7 +20,7 @@ export default class LdapSettingsOpenLDAPController {
   }
 
   parseDomainSuffix(string = '') {
-    const index = string.indexOf('dc=');
+    const index = string.toLowerCase().indexOf('dc=');
     return index !== -1 ? string.substring(index) : '';
   }
 
