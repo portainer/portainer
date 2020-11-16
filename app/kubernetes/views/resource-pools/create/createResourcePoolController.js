@@ -3,7 +3,7 @@ import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import { KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resource-quota/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
-import { KubernetesResourcePoolFormValues, KubernetesResourcePoolIngressClassAnnotationFormValue } from 'Kubernetes/models/resource-pool/formValues';
+import { KubernetesResourcePoolFormValues, KubernetesResourcePoolIngressClassAnnotationFormValue, KubernetesResourcePoolIngressClassHostFormValue } from 'Kubernetes/models/resource-pool/formValues';
 import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import { KubernetesFormValidationReferences } from 'Kubernetes/models/application/formValues';
@@ -48,7 +48,7 @@ class KubernetesCreateResourcePoolController {
   }
 
   addHostname(ingressClass) {
-    ingressClass.Hosts.push('');
+    ingressClass.Hosts.push(new KubernetesResourcePoolIngressClassHostFormValue());
   }
 
   removeHostname(ingressClass, index) {
@@ -178,7 +178,7 @@ class KubernetesCreateResourcePoolController {
       }
       _.forEach(this.formValues.IngressClasses, (ic) => {
         if (ic.Hosts.length === 0) {
-          ic.Hosts.push('');
+          ic.Hosts.push(new KubernetesResourcePoolIngressClassHostFormValue());
         }
       });
     } catch (err) {

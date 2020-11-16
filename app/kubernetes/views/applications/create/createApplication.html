@@ -1356,6 +1356,28 @@
                       (!publishedPort.IsNew && ctrl.savedFormValues.PublishingType === ctrl.ApplicationPublishingTypes.INGRESS)
                     "
                   >
+                    <span class="input-group-addon">hostname</span>
+                    <select
+                      class="form-control"
+                      name="ingress_hostname_{{ $index }}"
+                      ng-model="publishedPort.IngressHost"
+                      ng-options="host for host in ctrl.ingressHostnames"
+                      ng-required="!publishedPort.NeedsDeletion"
+                      ng-change="ctrl.onChangePublishedPorts()"
+                      ng-disabled="ctrl.disableLoadBalancerEdit() || ctrl.isEditAndNotNewPublishedPort($index)"
+                    >
+                      <option selected disabled hidden value="">Select a hostname</option>
+                    </select>
+                  </div>
+
+                  <div
+                    class="col-sm-3 input-group input-group-sm"
+                    ng-class="{ striked: publishedPort.NeedsDeletion }"
+                    ng-if="
+                      (publishedPort.IsNew && ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INGRESS) ||
+                      (!publishedPort.IsNew && ctrl.savedFormValues.PublishingType === ctrl.ApplicationPublishingTypes.INGRESS)
+                    "
+                  >
                     <span class="input-group-addon">route</span>
                     <input
                       class="form-control"

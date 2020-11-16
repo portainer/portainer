@@ -4,7 +4,7 @@ import filesizeParser from 'filesize-parser';
 import { KubernetesResourceQuota, KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resource-quota/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
-import { KubernetesResourcePoolFormValues, KubernetesResourcePoolIngressClassAnnotationFormValue } from 'Kubernetes/models/resource-pool/formValues';
+import { KubernetesResourcePoolFormValues, KubernetesResourcePoolIngressClassAnnotationFormValue, KubernetesResourcePoolIngressClassHostFormValue } from 'Kubernetes/models/resource-pool/formValues';
 import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
 import { KubernetesFormValidationReferences } from 'Kubernetes/models/application/formValues';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
@@ -87,6 +87,27 @@ class KubernetesResourcePoolController {
     ingressClass.Annotations.splice(index, 1);
   }
   /* #endregion */
+
+  /* #region  INGRESS MANAGEMENT */
+  addHostname(ingressClass) {
+    ingressClass.Hosts.push(new KubernetesResourcePoolIngressClassHostFormValue());
+  }
+
+  removeHostname(ingressClass, index) {
+    if (!ingressClass.Hosts[index].IsNew) {
+      ingressClass.Hosts[index].NeedsDeletion = true;
+    } else {
+      ingressClass.Hosts.splice(index, 1);
+    }
+  }
+
+  restoreHostname(host) {
+    if (!host.IsNew) {
+      host.NeedsDeletion = false;
+    }
+  }
+  /* #endregion*/
+
 
   selectTab(index) {
     this.LocalStorage.storeActiveTab('resourcePool', index);
@@ -312,6 +333,13 @@ class KubernetesResourcePoolController {
         await this.getIngresses();
         const ingressClasses = endpoint.Kubernetes.Configuration.IngressClasses;
         this.formValues.IngressClasses = KubernetesIngressConverter.ingressClassesToFormValues(ingressClasses, this.ingresses);
+        /* _.map(this.formValues.IngressClasses, (ic) => {
+          if (ic.Hosts) {
+            _.map(ic.Hosts, (host) => {
+              host.IsNew = false;
+            });
+          }
+        }); */
       }
       this.savedFormValues = angular.copy(this.formValues);
     } catch (err) {

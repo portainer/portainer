@@ -31,3 +31,12 @@ export function KubernetesResourcePoolIngressClassAnnotationFormValue() {
     Value: '',
   };
 }
+
+export function KubernetesResourcePoolIngressClassHostFormValue() {
+  return {
+    Host: '',
+    PreviousHost: '',
+    NeedsDeletion: false,
+    IsNew: true,
+  };
+}
