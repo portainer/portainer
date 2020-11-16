@@ -830,7 +830,9 @@ class KubernetesCreateApplicationController {
   refreshStorageAvailabilities() {
     const quota = this.formValues.ResourcePool.Quota;
     this.state.storages.availabilities = {};
-    if (quota) {
+    this.state.storages.quotasComputed = false;
+    this.state.storages.allRestricted = false;
+    if (quota && quota.StorageRequests.length) {
       const availabilities = {};
       _.forEach(quota.StorageRequests, (sr) => {
         if (sr.Selected) {
@@ -1004,9 +1006,9 @@ class KubernetesCreateApplicationController {
             persistedFolders: new KubernetesFormValidationReferences(),
           },
           isEdit: false,
-            params: {
+          params: {
             namespace: this.$transition$.params().namespace,
-              name: this.$transition$.params().name,
+            name: this.$transition$.params().name,
           },
           persistedFoldersUseExistingVolumes: false,
         };
@@ -1084,10 +1086,10 @@ class KubernetesCreateApplicationController {
         this.state.viewReady = true;
       }
     });
-    }
+  }
 
   /* #endregion */
 }
 
-  export default KubernetesCreateApplicationController;
-  angular.module('portainer.kubernetes').controller('KubernetesCreateApplicationController', KubernetesCreateApplicationController);
+export default KubernetesCreateApplicationController;
+angular.module('portainer.kubernetes').controller('KubernetesCreateApplicationController', KubernetesCreateApplicationController);
