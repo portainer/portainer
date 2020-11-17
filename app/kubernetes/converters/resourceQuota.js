@@ -75,7 +75,7 @@ class KubernetesResourceQuotaConverter {
     KubernetesCommonHelper.assignOrDeleteIfEmptyOrZero(res, `spec.hard['${KubernetesPortainerResourceQuotaMemoryRequest}']`, quota.MemoryLimit);
     KubernetesCommonHelper.assignOrDeleteIfEmptyOrZero(res, `spec.hard['${KubernetesPortainerResourceQuotaCPULimit}']`, quota.CpuLimit);
     KubernetesCommonHelper.assignOrDeleteIfEmptyOrZero(res, `spec.hard['${KubernetesPortainerResourceQuotaMemoryLimit}']`, quota.MemoryLimit);
-    KubernetesCommonHelper.assignOrDeleteIfEmptyOrZero(res, `spec.hard['${KubernetesPortainerResourceQuotaLoadbalancers}']`, quota.LoadBalancers);
+    KubernetesCommonHelper.assignOrDeleteIfEmpty(res, `spec.hard['${KubernetesPortainerResourceQuotaLoadbalancers}']`, quota.LoadBalancers);
     if (quota.StorageRequests) {
       _.forEach(quota.StorageRequests, (sr) => {
         const key = KubernetesResourceQuotaHelper.generateResourceQuotaStorageKey(sr.Name);
