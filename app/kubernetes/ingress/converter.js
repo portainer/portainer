@@ -2,7 +2,11 @@ import _ from 'lodash-es';
 import * as JsonPatch from 'fast-json-patch';
 
 import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
-import { KubernetesResourcePoolIngressClassAnnotationFormValue, KubernetesResourcePoolIngressClassFormValue, KubernetesResourcePoolIngressClassHostFormValue } from 'Kubernetes/models/resource-pool/formValues';
+import {
+  KubernetesResourcePoolIngressClassAnnotationFormValue,
+  KubernetesResourcePoolIngressClassFormValue,
+  KubernetesResourcePoolIngressClassHostFormValue,
+} from 'Kubernetes/models/resource-pool/formValues';
 import { KubernetesIngress, KubernetesIngressRule } from './models';
 import { KubernetesIngressCreatePayload, KubernetesIngressRuleCreatePayload, KubernetesIngressRulePathCreatePayload } from './payloads';
 import { KubernetesIngressClassAnnotation, KubernetesIngressClassRewriteTargetAnnotations } from './constants';
@@ -15,9 +19,7 @@ export class KubernetesIngressConverter {
   // but it will take a random existing host for non Portainer ingresses (CLI deployed)
   // Also won't support multiple hosts if we make it available in the future
   static apiToModel(data) {
-    // let host = undefined;
     const paths = _.flatMap(data.spec.rules, (rule) => {
-      // host = host || rule.host; // TODO: refactor @LP - read above
       return !rule.http
         ? []
         : _.map(rule.http.paths, (path) => {
@@ -41,7 +43,6 @@ export class KubernetesIngressConverter {
         ? data.metadata.annotations[KubernetesIngressClassAnnotation]
         : data.spec.ingressClassName;
     res.Paths = paths;
-    // res.Host = host;
     res.Hosts = _.uniq(_.map(data.spec.rules, 'host'));
 
     return res;
@@ -131,19 +132,20 @@ export class KubernetesIngressConverter {
     res.metadata.namespace = data.Namespace;
     res.metadata.annotations = data.Annotations;
     if (data.Paths && data.Paths.length) {
-      console.log('host', data)
       _.forEach(data.Paths, (p) => {
         if (p.Host === 'undefined' || p.Host === undefined) {
           p.Host = '';
         }
       });
+      const hostsWithRules = [];
       const groups = _.groupBy(data.Paths, 'Host');
-      const rules = _.map(groups, (paths, host) => {
-        const rule = new KubernetesIngressRuleCreatePayload();
+      let rules = _.map(groups, (paths, host) => {
+        const updatedHost = _.find(data.Hosts, (h) => {
+          return h === host || h.PreviousHost === host;
+        });
+        host = updatedHost.Host || updatedHost;
 
-        if (host === data.PreviousHost && host !== data.Host) {
-          host = data.Host;
-        }
+        const rule = new KubernetesIngressRuleCreatePayload();
         KubernetesCommonHelper.assignOrDeleteIfEmpty(rule, 'host', host);
         rule.http.paths = _.map(paths, (p) => {
           const path = new KubernetesIngressRulePathCreatePayload();
@@ -152,8 +154,17 @@ export class KubernetesIngressConverter {
           path.backend.servicePort = p.Port;
           return path;
         });
+        hostsWithRules.push(host);
         return rule;
       });
+      const hostsWithoutRules = _.without(
+        _.map(data.Hosts, (h) => h.Host || h),
+        ...hostsWithRules
+      );
+      const emptyRules = _.map(hostsWithoutRules, (host) => {
+        return { host: host };
+      });
+      rules = _.concat(rules, emptyRules);
       KubernetesCommonHelper.assignOrDeleteIfEmpty(res, 'spec.rules', rules);
     } else if (data.Hosts) {
       res.spec.rules = [];
