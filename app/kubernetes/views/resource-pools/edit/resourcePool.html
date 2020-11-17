@@ -183,26 +183,6 @@
                   </div>
 
                   <div ng-if="ic.Selected">
-                    <!-- <div class="form-group">
-                      <label class="control-label text-left col-sm-2">
-                        Hostnames
-                        <portainer-tooltip
-                          position="bottom"
-                          message="Hostnames associated to the ingress inside this resource pool. Users will be able to expose and access their applications over the ingress via one of these hostname."
-                        >
-                        </portainer-tooltip>
-                      </label>
-                      <div class="col-sm-10">
-                        <input
-                          class="form-control"
-                          name="ingress_host_{{ $index }}"
-                          ng-model="ic.Host"
-                          placeholder="host.com"
-                          ng-change="ctrl.onChangeIngressHostname()"
-                          required
-                        />
-                      </div>
-                    </div> -->
                     <div class="form-group">
                       <div class="col-sm-12">
                         <label class="control-label text-left">
@@ -222,7 +202,15 @@
                           <div class="form-inline">
                             <div class="col-sm-10 input-group input-group-sm" ng-class="{ striked: item.NeedsDeletion }">
                               <span class="input-group-addon">Key</span>
-                              <input type="text" class="form-control" name="hostname_{{ $index }}" ng-model="item.Host" ng-change="onChangeIngressHostname()" placeholder="foo" required />
+                              <input
+                                type="text"
+                                class="form-control"
+                                name="hostname_{{ $index }}"
+                                ng-model="item.Host"
+                                ng-change="onChangeIngressHostname()"
+                                placeholder="foo"
+                                required
+                              />
                             </div>
                             <div class="col-sm-1 input-group input-group-sm" ng-if="$index > 0">
                               <button ng-if="!item.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeHostname(ic, $index)">
@@ -236,10 +224,9 @@
                           <div
                             class="small text-warning"
                             style="margin-top: 5px;"
-                            ng-show="
-                            resourcePoolCreationForm['hostname_' + $index].$invalid || ctrl.state.duplicates.ingressHosts.refs[$index] !== undefined"
+                            ng-show="resourcePoolEditForm['hostname_' + $index].$invalid || ctrl.state.duplicates.ingressHosts.refs[$index] !== undefined"
                           >
-                            <ng-messages for="resourcePoolCreationForm['hostname_' + $index].$error">
+                            <ng-messages for="resourcePoolEditForm['hostname_' + $index].$error">
                               <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Hostname is required.</p>
                             </ng-messages>
                           </div>

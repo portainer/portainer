@@ -12,12 +12,6 @@ import { KubernetesIngressCreatePayload, KubernetesIngressRuleCreatePayload, Kub
 import { KubernetesIngressClassAnnotation, KubernetesIngressClassRewriteTargetAnnotations } from './constants';
 
 export class KubernetesIngressConverter {
-  // TODO: refactor @LP
-  // currently only allows the first non-empty host to be used as the "configured" host.
-  // As we currently only allow a single host to be used for a Portainer-managed ingress
-  // it's working as the only non-empty host will be the one defined by the admin
-  // but it will take a random existing host for non Portainer ingresses (CLI deployed)
-  // Also won't support multiple hosts if we make it available in the future
   static apiToModel(data) {
     const paths = _.flatMap(data.spec.rules, (rule) => {
       return !rule.http
@@ -44,7 +38,10 @@ export class KubernetesIngressConverter {
         : data.spec.ingressClassName;
     res.Paths = paths;
     res.Hosts = _.uniq(_.map(data.spec.rules, 'host'));
-
+    const idx = _.findIndex(res.Hosts, (h) => h === undefined);
+    if (idx >= 0) {
+      res.Hosts.splice(idx, 1, '');
+    }
     return res;
   }
 
