@@ -21,7 +21,14 @@ angular.module('portainer.app').controller('RegistriesController', [
     const nonBrowsableUrls = ['quay.io'];
 
     $scope.canBrowse = function (item) {
-      return !_.includes(nonBrowsableUrls, item.URL);
+      let browse = true;
+      _.forEach(nonBrowsableUrls, (url) => {
+        if (_.includes(item.URL, url)) {
+          browse = false;
+          return false;
+        }
+      });
+      return browse;
     };
 
     $scope.updateDockerHub = function () {
