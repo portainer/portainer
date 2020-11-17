@@ -28,21 +28,11 @@ angular.module('portainer').config([
         },
       ],
     });
-
     $httpProvider.interceptors.push('jwtInterceptor');
     $httpProvider.interceptors.push('EndpointStatusInterceptor');
     $httpProvider.defaults.headers.post['Content-Type'] = 'application/json';
     $httpProvider.defaults.headers.put['Content-Type'] = 'application/json';
     $httpProvider.defaults.headers.patch['Content-Type'] = 'application/json';
-
-    if (!$httpProvider.defaults.headers.get) {
-      $httpProvider.defaults.headers.get = {};
-    }
-    //disable IE ajax request caching
-    $httpProvider.defaults.headers.get['If-Modified-Since'] = 'Mon, 26 Jul 1997 05:00:00 GMT';
-    // disable cache AB#160
-    $httpProvider.defaults.headers.get['Cache-Control'] = 'no-cache';
-    $httpProvider.defaults.headers.get['Pragma'] = 'no-cache';
 
     $httpProvider.interceptors.push([
       'HttpRequestHelper',
