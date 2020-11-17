@@ -76,7 +76,7 @@ class KubernetesClusterController {
       const nodes = await this.KubernetesNodeService.get();
       _.forEach(nodes, (node) => (node.Memory = filesizeParser(node.Memory)));
       this.nodes = nodes;
-      this.CPULimit = _.reduce(this.nodes, (acc, node) => node.CPU + acc, 0);
+      this.CPULimit = Math.trunc(_.reduce(this.nodes, (acc, node) => node.CPU + acc, 0) * 10) / 10;
       this.MemoryLimit = _.reduce(this.nodes, (acc, node) => KubernetesResourceReservationHelper.megaBytesValue(node.Memory) + acc, 0);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve nodes');

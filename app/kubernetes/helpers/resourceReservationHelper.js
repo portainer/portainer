@@ -47,6 +47,7 @@ class KubernetesResourceReservationHelper {
       maxResources.CPU += item.CPU;
       maxResources.Memory += filesizeParser(item.Memory);
     });
+    maxResources.CPU = Math.trunc(maxResources.CPU * 10) / 10;
     maxResources.Memory = KubernetesResourceReservationHelper.megaBytesValue(maxResources.Memory);
 
     if (!resourceOverCommitEnabled) {
@@ -64,7 +65,7 @@ class KubernetesResourceReservationHelper {
       if (reservedResources.Memory) {
         reservedResources.Memory = KubernetesResourceReservationHelper.megaBytesValue(reservedResources.Memory);
       }
-      maxResources.CPU = Math.round(parseFloat(maxResources.CPU - (maxResources.CPU * resourceOverCommitPercent) / 100 - reservedResources.CPU) * 10) / 10;
+      maxResources.CPU = Math.trunc(parseFloat(maxResources.CPU - (maxResources.CPU * resourceOverCommitPercent) / 100 - reservedResources.CPU) * 10) / 10;
       maxResources.Memory = parseInt(maxResources.Memory - (maxResources.Memory * resourceOverCommitPercent) / 100 - reservedResources.Memory, 10);
     }
     return maxResources;

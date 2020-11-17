@@ -305,6 +305,7 @@ class KubernetesNodeController {
       });
       this.resourceReservation.Memory = KubernetesResourceReservationHelper.megaBytesValue(this.resourceReservation.Memory);
       this.memoryLimit = KubernetesResourceReservationHelper.megaBytesValue(this.node.Memory);
+      this.node.CPU = Math.trunc(this.node.CPU * 10) / 10;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve applications');
     } finally {
