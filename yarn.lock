@@ -1327,6 +1327,7 @@ angular-moment-picker@^0.10.2:
   dependencies:
     angular-mocks "1.6.1"
     angular-sanitize "1.6.1"
+    lodash-es "^4.17.15"
 
 angular-resource@1.8.0:
   version "1.8.0"
@@ -7549,11 +7550,6 @@ ng-file-upload@~12.2.13:
   version "12.2.13"
   resolved "https://registry.yarnpkg.com/ng-file-upload/-/ng-file-upload-12.2.13.tgz#01800f3872e526f95310f8477e99e4f12d0d8d14"
   integrity sha1-AYAPOHLlJvlTEPhHfpnk8S0NjRQ=
-
-ng-rollbar@^2.4.2:
-  version "2.4.2"
-  resolved "https://registry.yarnpkg.com/ng-rollbar/-/ng-rollbar-2.4.2.tgz#c7f30d98ce05e46ad6f7e046acd0685c2bfb7a96"
-  integrity sha512-sGLWZ7usulGK0mSoAWx7me7JJHL5nNQTKfPO5ElVsn+aTAC7n6PjKJxBJVhsu81Z5PQeoS/UFrNVrChdhKyd+Q==
 
 ngtemplate-loader@^2.0.1, ngtemplate-loader@~2.0.1:
   version "2.0.1"
