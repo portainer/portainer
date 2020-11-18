@@ -18,7 +18,7 @@ export default class LicenseNodePanelController {
     if (days <= 0) {
       return 'Your license has expired.';
     }
-    return `Your license will expire in ${days === 1 ? '1 day' : `${days} days`}.`;
+    return `One or more of your licenses will expire in ${days === 1 ? '1 day' : `${days} days`}.`;
   }
 
   parseInfo(info) {
