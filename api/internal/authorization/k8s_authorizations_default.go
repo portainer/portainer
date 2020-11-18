@@ -64,7 +64,6 @@ func DefaultK8sClusterAuthorizations() map[portainer.RoleID]portainer.Authorizat
 			portainer.OperationK8sVolumesW:               true,
 			portainer.OperationK8sVolumeDetailsR:         true,
 			portainer.OperationK8sVolumeDetailsW:         true,
-			portainer.OperationK8sClusterR:               true,
 		},
 		portainer.RoleIDReadonly: {
 			portainer.OperationK8sResourcePoolsR:         true,
@@ -75,7 +74,6 @@ func DefaultK8sClusterAuthorizations() map[portainer.RoleID]portainer.Authorizat
 			portainer.OperationK8sConfigurationsDetailsR: true,
 			portainer.OperationK8sVolumesR:               true,
 			portainer.OperationK8sVolumeDetailsR:         true,
-			portainer.OperationK8sClusterR:               true,
 		},
 	}
 }
