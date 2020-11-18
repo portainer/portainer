@@ -334,7 +334,7 @@
                   </div>
                   <!-- #endregion -->
                 </div>
-                <div ng-if="ctrl.isEditable && ctrl.formValues.StorageClasses.length">
+                <div authorization="K8sResourcePoolDetailsW" ng-if="ctrl.isEditable && ctrl.formValues.StorageClasses.length">
                   <div class="col-sm-12 form-section-title">
                     Storages
                   </div>
@@ -355,7 +355,7 @@
                       </div>
                     </div>
 
-                    <div ng-if="ctrl.isAdmin">
+                    <div>
                       <div class="col-sm-2" style="margin-top: 10px;">
                         <label class="control-label text-left">
                           Enable quota
@@ -368,7 +368,7 @@
                   </div>
 
                   <div ng-repeat-end ng-if="sc.Selected">
-                    <div class="form-group" ng-if="ctrl.isAdmin">
+                    <div class="form-group">
                       <label class="control-label text-left col-sm-2">
                         Maximum usage
                       </label>
@@ -395,7 +395,7 @@
                       </div>
                     </div>
 
-                    <div class="form-group" ng-show="resourcePoolEditForm['storage_class_size_' + $index].$invalid" ng-if="ctrl.isAdmin">
+                    <div class="form-group" ng-show="resourcePoolEditForm['storage_class_size_' + $index].$invalid">
                       <div class="col-sm-12 small text-warning">
                         <div ng-messages="resourcePoolEditForm['storage_class_size_' + $index].$error">
                           <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Size is required.</p>

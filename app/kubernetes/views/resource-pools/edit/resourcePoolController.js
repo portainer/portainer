@@ -292,7 +292,6 @@ class KubernetesResourcePoolController {
     try {
       const endpoint = this.EndpointProvider.currentEndpoint();
       this.endpoint = endpoint;
-      this.isAdmin = this.Authentication.isAdmin();
 
       this.state = {
         actionInProgress: false,
@@ -367,24 +366,22 @@ class KubernetesResourcePoolController {
         const ingressClasses = endpoint.Kubernetes.Configuration.IngressClasses;
         this.formValues.IngressClasses = KubernetesIngressConverter.ingressClassesToFormValues(ingressClasses, this.ingresses);
       }
-      if (this.isAdmin) {
-        await this.getVolumes();
-        const storageClasses = KubernetesStorageClassConverter.storageClassesToResourcePoolFormValues(endpoint.Kubernetes.Configuration.StorageClasses);
-        _.remove(storageClasses, (sc) => _.find(this.formValues.StorageClasses, { Name: sc.Name }));
-        this.formValues.StorageClasses = _.concat(this.formValues.StorageClasses, storageClasses);
-        _.forEach(this.formValues.StorageClasses, (sc) => {
-          const volumes = _.filter(this.volumes, ['ResourcePool.Namespace.Name', this.pool.Namespace.Name]);
-          const used = _.reduce(
-            volumes,
-            (sum, vol) => {
-              return sum + filesizeParser(vol.PersistentVolumeClaim.Storage, { base: 10 });
-            },
-            0
-          );
-          sc.Used = KubernetesResourceQuotaHelper.formatBytes(used);
-          this.computeStorageQuotaUsage(sc);
-        });
-      }
+      await this.getVolumes();
+      const storageClasses = KubernetesStorageClassConverter.storageClassesToResourcePoolFormValues(endpoint.Kubernetes.Configuration.StorageClasses);
+      _.remove(storageClasses, (sc) => _.find(this.formValues.StorageClasses, { Name: sc.Name }));
+      this.formValues.StorageClasses = _.concat(this.formValues.StorageClasses, storageClasses);
+      _.forEach(this.formValues.StorageClasses, (sc) => {
+        const volumes = _.filter(this.volumes, ['ResourcePool.Namespace.Name', this.pool.Namespace.Name]);
+        const used = _.reduce(
+          volumes,
+          (sum, vol) => {
+            return sum + filesizeParser(vol.PersistentVolumeClaim.Storage, { base: 10 });
+          },
+          0
+        );
+        sc.Used = KubernetesResourceQuotaHelper.formatBytes(used);
+        this.computeStorageQuotaUsage(sc);
+      });
 
       this.savedFormValues = angular.copy(this.formValues);
     } catch (err) {
