@@ -2,12 +2,13 @@ import moment from 'moment';
 
 export default class LicensesViewController {
   /* @ngInject */
-  constructor($async, $state, LicenseService, ModalService, Notifications) {
+  constructor($async, $state, LicenseService, ModalService, Notifications, clipboard) {
     this.$async = $async;
     this.$state = $state;
     this.LicenseService = LicenseService;
     this.ModalService = ModalService;
     this.Notifications = Notifications;
+    this.clipboard = clipboard;
 
     this.info = null;
     this.licenses = null;
@@ -17,7 +18,7 @@ export default class LicensesViewController {
   }
 
   copyLicenseKey(item) {
-    navigator.clipboard.writeText(item.licenseKey);
+    this.clipboard.copyText(item.licenseKey);
   }
 
   removeAction(licenses) {
