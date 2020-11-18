@@ -1,9 +1,10 @@
 package portainer
 
 import (
-	"github.com/portainer/liblicense"
 	"io"
 	"time"
+
+	"github.com/portainer/liblicense"
 )
 
 type (
@@ -1128,7 +1129,7 @@ type (
 		GetNextIdentifier() int
 	}
 
-	// StackService represents a service for managing endpoint snapshots
+	// SnapshotService represents a service for managing endpoint snapshots
 	SnapshotService interface {
 		Start()
 		SetSnapshotInterval(snapshotInterval string) error
@@ -1476,7 +1477,7 @@ const (
 	K8sRoleClusterAdmin K8sRole = "cluster-admin"
 	// K8sRolePortainerBasic is a portainer k8s role at cluster level
 	K8sRolePortainerBasic K8sRole = "portainer-basic"
-	// K8sRolePortainerReadonly is a portainer k8s role at cluster level
+	// K8sRolePortainerHelpdesk is a portainer k8s role at cluster level
 	K8sRolePortainerHelpdesk K8sRole = "portainer-helpdesk"
 	// K8sRolePortainerView is a portainer k8s role at namespace level
 	K8sRolePortainerView K8sRole = "portainer-view"
