@@ -794,7 +794,7 @@ class KubernetesCreateApplicationController {
             let appsUsingLoadBalancers = _.filter(this.applications, { ServiceType: 'LoadBalancer' });
             if (this.state.isEdit) {
               appsUsingLoadBalancers = _.filter(appsUsingLoadBalancers, (app) => {
-                return app.ResourcePool !== this.formValues.ResourcePool.Namespace.Name;
+                return app.Name !== this.formValues.Name;
               });
             }
             const appsUsingLoadBalancersLength = appsUsingLoadBalancers.length;
@@ -1073,6 +1073,7 @@ class KubernetesCreateApplicationController {
               }
             });
           }
+          await this.refreshNamespaceData(namespace);
         } else {
           this.formValues.AutoScaler = KubernetesApplicationHelper.generateAutoScalerFormValueFromHorizontalPodAutoScaler(null, this.formValues.ReplicaCount);
           this.formValues.OriginalIngressClasses = angular.copy(this.ingresses);
