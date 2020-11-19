@@ -864,6 +864,9 @@ func (service *Service) RemoveTeamNamespaceAccessPolicies(
 	if err != nil {
 		return nil, false, err
 	}
+	if teamRole == nil {
+		return nil, false, nil
+	}
 	teamsEndpointRole := make(map[int]int)
 	teamsEndpointRole[teamID] = int(teamRole.ID)
 
