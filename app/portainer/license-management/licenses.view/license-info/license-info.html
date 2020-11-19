@@ -1,11 +1,18 @@
 <information-panel title-text="License information">
-  <div ng-if="$ctrl.info.valid">
-    <p class="text-muted small">
+  <div ng-if="$ctrl.info.valid" class="text-muted small">
+    <p>
       Portainer {{ $ctrl.productEdition() }} licensed to {{ $ctrl.info.company }}
       <span ng-if="$ctrl.info.type !== 1"> for up to {{ $ctrl.info.nodes }} {{ $ctrl.info.nodes !== 1 ? 'Nodes' : 'Node' }}</span>
     </p>
-    <p class="text-muted small">
-      {{ $ctrl.info.type === 1 ? 'Trial' : 'License' }} expires on <b>{{ $ctrl.expiresAt() }}</b>
+    <p>
+      Current Usage:
+      <b
+        ><span ng-class="{ 'text-danger': $ctrl.overUsage() }">{{ $ctrl.usedNodes }}</span
+        >/{{ $ctrl.info.nodes }}</b
+      >
+    </p>
+    <p>
+      One or more of you licenses will expire on <b>{{ $ctrl.expiresAt() }}</b>
     </p>
   </div>
   <p ng-if="!$ctrl.info.valid" class="text-danger small">
