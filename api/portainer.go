@@ -60,7 +60,7 @@ type (
 		TLSCacert                 *string
 		TLSCert                   *string
 		TLSKey                    *string
-		RollbackDB                *bool
+		RollbackToCE              *bool
 		SSL                       *bool
 		SSLCert                   *string
 		SSLKey                    *string
@@ -1220,7 +1220,9 @@ const (
 	// DBVersion is the version number of the Portainer CE database
 	DBVersion = 25
 	// DBVersionEE is the version number of the Portainer EE database
-	DBVersionEE = 1
+	DBVersionEE = 25
+	// Edition is the edition of the Portainer API
+	Edition = PortainerEE
 	// AssetsServerURL represents the URL of the Portainer asset server
 	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer EE MOTD message can be retrieved
@@ -1733,3 +1735,17 @@ const (
 	OperationK8sClusterNodeW                     Authorization = "K8sClusterNodeW"
 	OperationK8sClusterSetupRW                   Authorization = "K8sClusterSetupRW"
 )
+
+// GetEditionLabel returns the portainer edition label
+func (e SoftwareEdition) GetEditionLabel() string {
+	switch e {
+	case PortainerCE:
+		return "CE"
+	case PortainerBE:
+		return "BE"
+	case PortainerEE:
+		return "EE"
+	}
+
+	return "CE"
+}

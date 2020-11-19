@@ -1,53 +1,55 @@
-package migratoree
+package migrator
 
 import (
-	"log"
+	"fmt"
 
 	portainer "github.com/portainer/portainer/api"
+
 	"github.com/portainer/portainer/api/internal/authorization"
 )
 
-// MigrateFromCEdbv25 will migrate the db from latest ce version to latest ee version
-func (m *Migrator) MigrateFromCEdbv25() error {
-	log.Printf("[INFO] [bolt, migrate] Updating LDAP settings to EE.")
+// UpgradeToEE will migrate the db from latest ce version to latest ee version
+// Latest version is v25 on 06/11/2020
+func (m *Migrator) UpgradeToEE() error {
+
+	migrateLog.Info(fmt.Sprintf("Migrating CE database version %d to EE database version %d.", m.Version(), portainer.DBVersion))
+
+	migrateLog.Info("Updating LDAP settings to EE")
 	err := m.updateSettingsToEE()
 	if err != nil {
 		return err
 	}
 
-	log.Printf("[INFO] [bolt, migrate] Updating user roles to EE.")
+	migrateLog.Info("Updating user roles to EE")
 	err = m.updateUserRolesToEE()
 	if err != nil {
 		return err
 	}
-	log.Printf("[INFO] [bolt, migrate] Updating role authorizations to EE.")
+	migrateLog.Info("Updating role authorizations to EE")
 	err = m.updateRoleAuthorizationsToEE()
 	if err != nil {
 		return err
 	}
-	log.Printf("[INFO] [bolt, migrate] Updating user authorizations.")
+	migrateLog.Info("Updating user authorizations")
 	err = m.authorizationService.UpdateUsersAuthorizations()
 	if err != nil {
 		return err
 	}
 
-	log.Printf("[INFO] [bolt, migrate] Updating LDAP settings to EE.")
-	err = m.updateSettingsToEE()
-	if err != nil {
-		return err
-	}
-
-	log.Printf("[INFO] [bolt, migrate] Setting db version to %v.", portainer.DBVersionEE)
+	migrateLog.Info(fmt.Sprintf("Setting db version to %d", portainer.DBVersionEE))
 	err = m.versionService.StoreDBVersion(portainer.DBVersionEE)
 	if err != nil {
 		return err
 	}
 
-	log.Printf("[INFO] [bolt, migrate] Setting edition to %v.", portainer.PortainerEE)
+	migrateLog.Info(fmt.Sprintf("Setting edition to %s", portainer.PortainerEE.GetEditionLabel()))
 	err = m.versionService.StoreEdition(portainer.PortainerEE)
 	if err != nil {
 		return err
 	}
+
+	m.currentDBVersion = portainer.DBVersionEE
+	m.currentEdition = portainer.PortainerEE
 
 	return nil
 }
@@ -71,13 +73,13 @@ func (m *Migrator) updateSettingsToEE() error {
 
 // Updating role authorizations because of the new policies in Kube RBAC
 func (m *Migrator) updateRoleAuthorizationsToEE() error {
-	log.Printf("[DEBUG] [bolt, migrate] Retriving settings")
+	migrateLog.Debug("Retriving settings")
 	settings, err := m.settingsService.Settings()
 	if err != nil {
 		return err
 	}
 
-	log.Printf("[DEBUG] [bolt, migrate] Updating Endpoint Admin Role")
+	migrateLog.Debug("Updating Endpoint Admin Role")
 	endpointAdministratorRole, err := m.roleService.Role(portainer.RoleID(1))
 	if err != nil {
 		return err
@@ -87,7 +89,7 @@ func (m *Migrator) updateRoleAuthorizationsToEE() error {
 
 	err = m.roleService.UpdateRole(endpointAdministratorRole.ID, endpointAdministratorRole)
 
-	log.Printf("[DEBUG] [bolt, migrate] Updating Help Desk Role")
+	migrateLog.Debug("Updating Help Desk Role")
 	helpDeskRole, err := m.roleService.Role(portainer.RoleID(2))
 	if err != nil {
 		return err
@@ -97,7 +99,7 @@ func (m *Migrator) updateRoleAuthorizationsToEE() error {
 
 	err = m.roleService.UpdateRole(helpDeskRole.ID, helpDeskRole)
 
-	log.Printf("[DEBUG] [bolt, migrate] Updating Standard User Role")
+	migrateLog.Debug("Updating Standard User Role")
 	standardUserRole, err := m.roleService.Role(portainer.RoleID(3))
 	if err != nil {
 		return err
@@ -107,7 +109,7 @@ func (m *Migrator) updateRoleAuthorizationsToEE() error {
 
 	err = m.roleService.UpdateRole(standardUserRole.ID, standardUserRole)
 
-	log.Printf("[DEBUG] [bolt, migrate] Updating Read Only User Role")
+	migrateLog.Debug("Updating Read Only User Role")
 	readOnlyUserRole, err := m.roleService.Role(portainer.RoleID(4))
 	if err != nil {
 		return err
@@ -131,23 +133,23 @@ func (m *Migrator) updateUserRolesToEE() error {
 		return err
 	}
 
-	log.Printf("[DEBUG] [bolt, migrate] Retriving extension info")
+	migrateLog.Debug("Retriving extension info")
 	extensions, err := m.extensionService.Extensions()
 	for _, extension := range extensions {
 		if extension.ID == 3 && extension.Enabled {
-			log.Printf("[INFO] [bolt, migrate] RBAC extensions were enabled before; Skip updating User Roles")
+			migrateLog.Info("RBAC extensions were enabled before; Skip updating User Roles")
 			return nil
 		}
 	}
 
-	log.Printf("[DEBUG] [bolt, migrate] Retriving endpoint groups")
+	migrateLog.Debug("Retriving endpoint groups")
 	endpointGroups, err := m.endpointGroupService.EndpointGroups()
 	if err != nil {
 		return err
 	}
 
 	for _, endpointGroup := range endpointGroups {
-		log.Printf("[DEBUG] [bolt, migrate] Updating user policies for endpoint group %v", endpointGroup.ID)
+		migrateLog.Debug(fmt.Sprintf("Updating user policies for endpoint group %v", endpointGroup.ID))
 		for key := range endpointGroup.UserAccessPolicies {
 			updateUserAccessPolicyToReadOnlyRole(endpointGroup.UserAccessPolicies, key)
 		}
@@ -162,14 +164,14 @@ func (m *Migrator) updateUserRolesToEE() error {
 		}
 	}
 
-	log.Printf("[DEBUG] [bolt, migrate] Retriving endpoints")
+	migrateLog.Debug("Retriving endpoints")
 	endpoints, err := m.endpointService.Endpoints()
 	if err != nil {
 		return err
 	}
 
 	for _, endpoint := range endpoints {
-		log.Printf("[DEBUG] [bolt, migrate] Updating user policies for endpoint %v", endpoint.ID)
+		migrateLog.Debug(fmt.Sprintf("Updating user policies for endpoint %v", endpoint.ID))
 		for key := range endpoint.UserAccessPolicies {
 			updateUserAccessPolicyToReadOnlyRole(endpoint.UserAccessPolicies, key)
 		}

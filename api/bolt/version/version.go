@@ -4,17 +4,18 @@ import (
 	"strconv"
 
 	"github.com/boltdb/bolt"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/internal"
 )
 
 const (
 	// BucketName represents the name of the bucket where this service stores data.
-	BucketName  = "version"
-	versionKey  = "DB_VERSION"
-	instanceKey = "INSTANCE_ID"
-	editionKey  = "EDITION"
+	BucketName         = "version"
+	versionKey         = "DB_VERSION"
+	previousVersionKey = "PREVIOUS_DB_VERSION"
+	instanceKey        = "INSTANCE_ID"
+	editionKey         = "EDITION"
 )
 
 // Service represents a service to manage stored versions.
@@ -54,6 +55,16 @@ func (service *Service) StoreEdition(edition portainer.SoftwareEdition) error {
 	return service.setKey(editionKey, strconv.Itoa(int(edition)))
 }
 
+// PreviousDBVersion retrieves the stored database version.
+func (service *Service) PreviousDBVersion() (int, error) {
+	version, err := service.getKey(previousVersionKey)
+	if err != nil {
+		return 0, err
+	}
+
+	return strconv.Atoi(string(version))
+}
+
 // DBVersion retrieves the stored database version.
 func (service *Service) DBVersion() (int, error) {
 	version, err := service.getKey(versionKey)
@@ -62,6 +73,11 @@ func (service *Service) DBVersion() (int, error) {
 	}
 
 	return strconv.Atoi(string(version))
+}
+
+// StorePreviousDBVersion store the database version.
+func (service *Service) StorePreviousDBVersion(version int) error {
+	return service.setKey(previousVersionKey, strconv.Itoa(version))
 }
 
 // StoreDBVersion store the database version.

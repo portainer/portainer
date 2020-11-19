@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt"
 	"github.com/portainer/portainer/api/chisel"
 	"github.com/portainer/portainer/api/cli"
@@ -350,7 +350,7 @@ func main() {
 
 	fileService := initFileService(*flags.Data)
 
-	dataStore := initDataStore(*flags.Data, *flags.RollbackDB, fileService)
+	dataStore := initDataStore(*flags.Data, *flags.RollbackToCE, fileService)
 	defer dataStore.Close()
 
 	jwtService, err := initJWTService(dataStore)

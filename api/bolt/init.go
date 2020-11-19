@@ -2,7 +2,7 @@ package bolt
 
 import (
 	"github.com/gofrs/uuid"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
