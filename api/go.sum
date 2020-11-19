@@ -357,6 +357,8 @@ github.com/portainer/liblicense v0.0.0-20201014034501-91f389a90f8b h1:XAEZw/lhko
 github.com/portainer/liblicense v0.0.0-20201014034501-91f389a90f8b/go.mod h1:6OSugUz07QF1WwrMmRNIMhgiq+drVMIZ98UTu5LVZP8=
 github.com/portainer/liblicense v0.0.0-20201111015315-b6f7ece15609 h1:utfpVz2YlAEny2N/AEyTHqe+JR3mg5dc5N/mzTyx0xo=
 github.com/portainer/liblicense v0.0.0-20201111015315-b6f7ece15609/go.mod h1:6OSugUz07QF1WwrMmRNIMhgiq+drVMIZ98UTu5LVZP8=
+github.com/portainer/liblicense v0.0.0-20201119001105-ef9bc711a38f h1:EGucfIw9I7EpGVPRnRZwecRTcX8/tPIMax7Elhe1igk=
+github.com/portainer/liblicense v0.0.0-20201119001105-ef9bc711a38f/go.mod h1:6OSugUz07QF1WwrMmRNIMhgiq+drVMIZ98UTu5LVZP8=
 github.com/pquerna/cachecontrol v0.0.0-20171018203845-0dec1b30a021/go.mod h1:prYjPmNq4d1NPVmpShWobRqXY3q7Vp+80DqgxxUrUIA=
 github.com/prometheus/client_golang v0.9.1/go.mod h1:7SWBe2y4D6OKWSNQJUaRYU/AaXPKyh/dDVn+NZz0KFw=
 github.com/prometheus/client_golang v1.0.0/go.mod h1:db9x61etRT2tGnBNRi70OPL5FsnadC4Ky3P0J6CfImo=
