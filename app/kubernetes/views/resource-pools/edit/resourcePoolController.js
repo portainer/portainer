@@ -313,6 +313,7 @@ class KubernetesResourcePoolController {
         resourceOverCommitEnabled: endpoint.Kubernetes.Configuration.EnableResourceOverCommit,
         resourceOverCommitPercentage: endpoint.Kubernetes.Configuration.ResourceOverCommitPercentage,
         useLoadBalancer: endpoint.Kubernetes.Configuration.UseLoadBalancer,
+        hasWriteAuthorization: this.Authentication.hasAuthorizations(['K8sResourcePoolDetailsW']),
         loadBalancersUsed: 0,
         loadBalancersUsage: 0,
         availableSizeUnits: ['MB', 'GB', 'TB'],

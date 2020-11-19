@@ -152,7 +152,7 @@
                   </div>
                 </div>
                 <!-- #region LOADBALANCERS -->
-                <div ng-if="ctrl.state.useLoadBalancer">
+                <div ng-if="ctrl.state.useLoadBalancer && ((ctrl.isEditable && ctrl.state.hasWriteAuthorization) || (ctrl.oldQuota && ctrl.oldQuota.LoadBalancers > 0))">
                   <div class="col-sm-12 form-section-title">
                     Load balancers
                   </div>
