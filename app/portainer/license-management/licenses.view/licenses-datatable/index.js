@@ -1,3 +1,5 @@
+import './licenses-datatable.css';
+
 export const licensesDatatable = {
   templateUrl: './licenses-datatable.html',
   controller: 'GenericDatatableController',

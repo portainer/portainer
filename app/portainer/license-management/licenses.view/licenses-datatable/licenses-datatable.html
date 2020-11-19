@@ -1,4 +1,4 @@
-<div class="datatable">
+<div class="datatable licenses-datatable">
   <rd-widget>
     <rd-widget-header icon="{{ $ctrl.titleIcon }}" title-text="Licenses"> </rd-widget-header>
     <rd-widget-body classes="no-padding">
@@ -23,7 +23,7 @@
         <table class="table table-hover nowrap-cells">
           <thead>
             <tr>
-              <th style="width: 100px;">
+              <th>
                 <span class="md-checkbox">
                   <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                   <label for="select_all"></label>
@@ -41,24 +41,24 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'type' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th>
+              <th class="w-md">
                 <a ng-click="$ctrl.changeOrderBy('nodes')">
                   Nodes
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'nodes' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'nodes' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th>
+              <th class="w-md">
                 <a ng-click="$ctrl.changeOrderBy('expiresAt')">
                   Expires
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'expiresAt' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'expiresAt' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th>
+              <th class="w-sm">
                 Valid
               </th>
-              <th>Actions</th>
+              <th class="w-sm">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -76,7 +76,7 @@
               <td>{{ item.type === 1 ? 'Trial' : 'Subscription' }}</td>
               <td>{{ item.nodes ? item.nodes : '-' }}</td>
               <td>{{ item.expiresAt }}</td>
-              <td>
+              <td class="center">
                 <i
                   class="fa"
                   ng-class="{
@@ -85,7 +85,7 @@
                   }"
                 ></i>
               </td>
-              <td>
+              <td class="center">
                 <button ng-if="item.valid" type="button" class="btn btn-link" style="padding: 0;" ng-click="$ctrl.copyLicenseKey(item)" title="Copy License Key">
                   <i class="fa fa-copy"></i>
                 </button>
