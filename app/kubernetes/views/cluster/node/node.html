@@ -143,7 +143,11 @@
 
                   <!-- #region taints -->
 
-                  <div class="col-sm-12 form-section-title" style="margin-top: 20px;">
+                  <div
+                    class="col-sm-12 form-section-title"
+                    style="margin-top: 20px;"
+                    ng-if="ctrl.state.isAuthorized || (ctrl.formValues.Taints && ctrl.formValues.Taints.length > 0)"
+                  >
                     Taints
                   </div>
 
