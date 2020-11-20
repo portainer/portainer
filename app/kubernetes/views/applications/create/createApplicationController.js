@@ -257,6 +257,7 @@ class KubernetesCreateApplicationController {
 
   onChangeVolumeRequestedSize() {
     const quota = this.formValues.ResourcePool.Quota;
+    this.state.storages.quotaExceeded = false;
     if (quota) {
       const pfs = this.formValues.PersistedFolders;
       const groups = _.groupBy(pfs, 'StorageClass.Name');
@@ -270,6 +271,12 @@ class KubernetesCreateApplicationController {
               res[idx] = true;
             }
           });
+        }
+        if (
+          this.formValues.DataAccessPolicy === this.ApplicationDataAccessPolicies.ISOLATED &&
+          this.state.storages.availabilities[storageClassName] < requestedSize * this.formValues.ReplicaCount
+        ) {
+          this.state.storages.quotaExceeded = true;
         }
       });
       this.state.exceeded.persistedFolders.refs = res;
@@ -473,6 +480,7 @@ class KubernetesCreateApplicationController {
 
   resetDeploymentType() {
     this.formValues.DeploymentType = this.ApplicationDeploymentTypes.REPLICATED;
+    this.onChangeVolumeRequestedSize();
   }
 
   // The data access policy panel is not shown when:
@@ -968,6 +976,7 @@ class KubernetesCreateApplicationController {
             quotasComputed: false,
             allRestricted: false,
             availabilities: {},
+            quotaExceeded: false,
           },
           sliders: {
             cpu: {
