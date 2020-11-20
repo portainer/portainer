@@ -43,7 +43,8 @@ func (handler *Handler) statusInspectVersion(w http.ResponseWriter, r *http.Requ
 	currentVersion := semver.New(portainer.APIVersion)
 	latestVersion := semver.New(data.TagName)
 	if currentVersion.LessThan(*latestVersion) {
-		resp.UpdateAvailable = true
+		// disable update version available for EE
+		resp.UpdateAvailable = false
 		resp.LatestVersion = data.TagName
 	}
 
