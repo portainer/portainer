@@ -10,7 +10,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/internal/authorization"
@@ -90,7 +90,7 @@ func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.
 	}
 
 	if user.Role != portainer.AdministratorRole && !info.Valid {
-		return &httperror.HandlerError{http.StatusForbidden, "License is not valid", httperrors.ErrUnauthorized}
+		return &httperror.HandlerError{http.StatusForbidden, "License is not valid", httperrors.ErrNoValidLicense}
 	}
 
 	return handler.writeToken(w, user)
@@ -108,7 +108,7 @@ func (handler *Handler) authenticateInternal(w http.ResponseWriter, user *portai
 	}
 
 	if user.Role != portainer.AdministratorRole && !info.Valid {
-		return &httperror.HandlerError{http.StatusForbidden, "License is not valid", httperrors.ErrUnauthorized}
+		return &httperror.HandlerError{http.StatusForbidden, "License is not valid", httperrors.ErrNoValidLicense}
 	}
 
 	return handler.writeToken(w, user)
@@ -147,7 +147,7 @@ func (handler *Handler) authenticateLDAPAndCreateUser(w http.ResponseWriter, use
 	}
 
 	if !info.Valid {
-		return &httperror.HandlerError{http.StatusForbidden, "License is not valid", httperrors.ErrUnauthorized}
+		return &httperror.HandlerError{http.StatusForbidden, "License is not valid", httperrors.ErrNoValidLicense}
 	}
 
 	return handler.writeToken(w, user)

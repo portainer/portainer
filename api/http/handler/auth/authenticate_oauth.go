@@ -8,7 +8,7 @@ import (
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/internal/authorization"
@@ -110,7 +110,7 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	if user.Role != portainer.AdministratorRole && !info.Valid {
-		return &httperror.HandlerError{http.StatusForbidden, "License is not valid", httperrors.ErrUnauthorized}
+		return &httperror.HandlerError{http.StatusForbidden, "License is not valid", httperrors.ErrNoValidLicense}
 	}
 
 	return handler.writeToken(w, user)
