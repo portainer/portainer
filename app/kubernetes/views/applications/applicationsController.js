@@ -2,10 +2,11 @@ import angular from 'angular';
 import _ from 'lodash-es';
 import KubernetesStackHelper from 'Kubernetes/helpers/stackHelper';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
+import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
 
 class KubernetesApplicationsController {
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesApplicationService, ModalService, LocalStorage) {
+  constructor($async, $state, Notifications, KubernetesApplicationService, ModalService, LocalStorage, EndpointProvider) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
@@ -13,6 +14,7 @@ class KubernetesApplicationsController {
 
     this.ModalService = ModalService;
     this.LocalStorage = LocalStorage;
+    this.EndpointProvider = EndpointProvider;
 
     this.onInit = this.onInit.bind(this);
     this.getApplications = this.getApplications.bind(this);
@@ -108,11 +110,16 @@ class KubernetesApplicationsController {
     return this.$async(this.getApplicationsAsync);
   }
 
+  advancedDeploymentDisabled() {
+    return this.state.endpointType === PortainerEndpointTypes.AgentOnKubernetesEnvironment || this.state.endpointType === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment;
+  }
+
   async onInit() {
     this.state = {
       activeTab: this.LocalStorage.getActiveTab('applications'),
       currentName: this.$state.$current.name,
       viewReady: false,
+      endpointType: this.EndpointProvider.currentEndpoint().Type,
     };
 
     await this.getApplications();
