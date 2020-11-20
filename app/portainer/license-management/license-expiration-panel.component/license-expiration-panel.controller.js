@@ -14,17 +14,23 @@ export default class LicenseNodePanelController {
     this.parseInfo = this.parseInfo.bind(this);
   }
 
-  buildMessage(days) {
-    if (days <= 0) {
-      return 'Your license has expired.';
+  expiringText(days) {
+    if (days < 0) {
+      return 'has expired.';
+    } else if (days === 0) {
+      return 'expires TODAY.';
     }
-    return `One or more of your licenses will expire in ${days === 1 ? '1 day' : `${days} days`}.`;
+    return `will expire in ${days === 1 ? '1 day' : `${days} days`}.`;
+  }
+
+  buildMessage(days) {
+    return 'One or more of your licenses ' + this.expiringText(days);
   }
 
   parseInfo(info) {
     const expiresAt = moment.unix(info.expiresAt);
     const duration = moment.duration(expiresAt.diff(moment()));
-    this.remainingDays = Math.ceil(duration.asDays());
+    this.remainingDays = Math.floor(duration.asDays());
     this.expirationMessage = this.buildMessage(this.remainingDays);
   }
 
