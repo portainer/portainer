@@ -24,9 +24,13 @@ export default class LicensesViewController {
   removeAction(licenses) {
     return this.$async(async () => {
       try {
-        if (this.licenses.length === licenses.length) {
-          this.Notifications.warning('At least one license is required');
-          return;
+        const validLicensesToRemove = licenses.filter((l) => l.valid);
+        if (validLicensesToRemove.length) {
+          const validLicenses = this.licenses.filter((l) => l.valid);
+          if (validLicenses.length === validLicensesToRemove.length) {
+            this.Notifications.warning('At least one valid license is required');
+            return;
+          }
         }
 
         if (!(await this.ModalService.confirmDeletionAsync('Are you sure you want to remove these licenses?'))) {
@@ -50,7 +54,7 @@ export default class LicensesViewController {
         const licenses = await this.LicenseService.licenses();
         this.licenses = licenses.map((license) => {
           const createdAt = moment.unix(license.created);
-          const expiresAt = moment(createdAt).add(license.expiresAfter, 'days');
+          const expiresAt = createdAt.add(license.expiresAfter, 'days');
           const valid = !license.revoked && moment().isBefore(expiresAt);
 
           return {

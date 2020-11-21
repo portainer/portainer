@@ -107,13 +107,31 @@ func (service *Service) AddLicense(licenseKey string) (*liblicense.PortainerLice
 
 // DeleteLicense removes the license from instance
 func (service *Service) DeleteLicense(licenseKey string) error {
-	licenses, err := service.Licenses()
+
+	license, err := service.repository.License(licenseKey)
 	if err != nil {
 		return err
 	}
 
-	if len(licenses) == 1 {
-		return errors.New("At least one license is expected")
+	valid := isLicenseValid(*license)
+
+	if valid {
+		licenses, err := service.Licenses()
+		if err != nil {
+			return err
+		}
+
+		hasMoreValidLicenses := false
+		for _, otherLicense := range licenses {
+			if licenseKey != otherLicense.LicenseKey && isLicenseValid(otherLicense) {
+				hasMoreValidLicenses = true
+				break
+			}
+		}
+
+		if !hasMoreValidLicenses {
+			return errors.New("At least one valid license is expected")
+		}
 	}
 
 	err = service.repository.DeleteLicense(licenseKey)
@@ -121,7 +139,7 @@ func (service *Service) DeleteLicense(licenseKey string) error {
 		return err
 	}
 
-	licenses, err = service.Licenses()
+	licenses, err := service.Licenses()
 	if err != nil {
 		return err
 	}
@@ -166,16 +184,15 @@ func aggregate(licenses []liblicense.PortainerLicense) *portainer.LicenseInfo {
 		return &portainer.LicenseInfo{Valid: false}
 	}
 
-	valid := false
+	hasValidLicenses := false
 
 	for _, license := range licenses {
-		licenseExpiresAt := time.Unix(license.Created, 0).AddDate(0, 0, license.ExpiresAfter)
-		isInvalid := licenseExpiresAt.Before(time.Now()) || license.Revoked
-		if isInvalid {
+		valid := isLicenseValid(license)
+		if !valid {
 			continue
 		}
 
-		valid = true
+		hasValidLicenses = true
 
 		if license.Company != "" {
 			company = license.Company
@@ -183,6 +200,7 @@ func aggregate(licenses []liblicense.PortainerLicense) *portainer.LicenseInfo {
 
 		nodes = nodes + license.Nodes
 
+		licenseExpiresAt := licenseExpiresAt(license)
 		if licenseExpiresAt.Before(expiresAt) || expiresAt.IsZero() {
 			expiresAt = licenseExpiresAt
 		}
@@ -208,6 +226,15 @@ func aggregate(licenses []liblicense.PortainerLicense) *portainer.LicenseInfo {
 		Nodes:          nodes,
 		ExpiresAt:      expiresAtUnix,
 		Type:           licenseType,
-		Valid:          valid,
+		Valid:          hasValidLicenses,
 	}
+}
+
+func licenseExpiresAt(license liblicense.PortainerLicense) time.Time {
+	return time.Unix(license.Created, 0).AddDate(0, 0, license.ExpiresAfter)
+}
+
+func isLicenseValid(license liblicense.PortainerLicense) bool {
+	licenseExpiresAt := licenseExpiresAt(license)
+	return licenseExpiresAt.After(time.Now()) && !license.Revoked
 }
