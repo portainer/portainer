@@ -138,12 +138,7 @@ angular
         AzureAuthenticationKey: endpoint.AzureCredentials.AuthenticationKey,
       };
 
-      if (
-        $scope.endpointType !== 'local' &&
-        endpoint.Type !== PortainerEndpointTypes.AzureEnvironment &&
-        endpoint.Type !== PortainerEndpointTypes.KubernetesLocalEnvironment &&
-        endpoint.Type !== PortainerEndpointTypes.AgentOnKubernetesEnvironment
-      ) {
+      if ($scope.endpointType !== 'local' && endpoint.Type !== PortainerEndpointTypes.AzureEnvironment && endpoint.Type !== PortainerEndpointTypes.KubernetesLocalEnvironment) {
         payload.URL = 'tcp://' + endpoint.URL;
       }
 
