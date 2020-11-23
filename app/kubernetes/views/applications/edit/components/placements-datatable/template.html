@@ -91,23 +91,33 @@
                 {{ item.Name }}
               </td>
             </tr>
-            <!-- ADMIN + UNMET TAINTS -->
-            <tr ng-if="$ctrl.isAdmin" ng-show="item.Expanded" ng-repeat="taint in item.UnmetTaints" ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
+            <!-- (ADMIN|ENDPOINT_ADMIN|HELPDESK) + UNMET TAINTS -->
+            <tr
+              authorization="K8sApplicationErrorDetailsR"
+              ng-show="item.Expanded"
+              ng-repeat="taint in item.UnmetTaints"
+              ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }"
+            >
               <td colspan="2">
                 This application is missing a toleration for the taint <code>{{ taint.Key }}{{ taint.Value ? '=' + taint.Value : '' }}:{{ taint.Effect }}</code>
               </td>
             </tr>
-            <!-- !ADMIN + UNMET TAINTS -->
-            <!-- USER + UNMET TAINTS -->
-            <tr ng-if="!$ctrl.isAdmin && item.UnmetTaints.length" ng-show="item.Expanded" ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
+            <!-- !(ADMIN|ENDPOINT_ADMIN|HELPDESK) + UNMET TAINTS -->
+            <!-- (STANDARD|READ_ONLY) + UNMET TAINTS -->
+            <tr
+              exclude-authorization="K8sApplicationErrorDetailsR"
+              ng-if="item.UnmetTaints.length"
+              ng-show="item.Expanded"
+              ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }"
+            >
               <td colspan="2">
                 Placement constraint not respected for that node.
               </td>
             </tr>
-            <!-- ! USER + UNMET TAINTS -->
-            <!-- ADMIN + UNMET NODE SELECTOR LABELS -->
+            <!-- !(STANDARD|READ_ONLY) + UNMET TAINTS -->
+            <!-- (ADMIN|ENDPOINT_ADMIN|HELPDESK) + UNMET NODE SELECTOR LABELS -->
             <tr
-              ng-if="$ctrl.isAdmin"
+              authorization="K8sApplicationErrorDetailsR"
               ng-show="item.Expanded"
               ng-repeat="label in item.UnmatchedNodeSelectorLabels"
               ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }"
@@ -116,10 +126,11 @@
                 This application can only be scheduled on a node where the label <code>{{ label.key }}</code> is set to <code>{{ label.value }}</code>
               </td>
             </tr>
-            <!-- ! ADMIN + UNMET NODE SELECTOR LABELS -->
-            <!-- USER + UNMET NODE SELECTOR LABELS || UNMET NODE AFFINITIES -->
+            <!-- !(ADMIN|ENDPOINT_ADMIN|HELPDESK) + UNMET NODE SELECTOR LABELS -->
+            <!-- (STANDARD|READ_ONLY) + UNMET NODE SELECTOR LABELS || UNMET NODE AFFINITIES -->
             <tr
-              ng-if="!$ctrl.isAdmin && (item.UnmatchedNodeSelectorLabels.length || item.UnmatchedNodeAffinities.length)"
+              exclude-authorization="K8sApplicationErrorDetailsR"
+              ng-if="item.UnmatchedNodeSelectorLabels.length || item.UnmatchedNodeAffinities.length"
               ng-show="item.Expanded"
               ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }"
             >
@@ -127,16 +138,20 @@
                 Placement label not respected for that node.
               </td>
             </tr>
-            <!-- ! USER + UNMET NODE SELECTOR LABELS || UNMET NODE AFFINITIES -->
-            <!-- ADMIN + UNMET NODE AFFINITIES -->
-            <tr ng-if="$ctrl.isAdmin" ng-show="item.Expanded && item.UnmatchedNodeAffinities.length" ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
+            <!-- !(STANDARD|READ_ONLY) + UNMET NODE SELECTOR LABELS || UNMET NODE AFFINITIES -->
+            <!-- (ADMIN|ENDPOINT_ADMIN|HELPDESK) + UNMET NODE AFFINITIES -->
+            <tr
+              authorization="K8sApplicationErrorDetailsR"
+              ng-show="item.Expanded && item.UnmatchedNodeAffinities.length"
+              ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }"
+            >
               <td colspan="2">
                 This application can only be scheduled on nodes respecting one of the following labels combination:
               </td>
             </tr>
             <tr
               dir-paginate-end
-              ng-if="$ctrl.isAdmin"
+              authorization="K8sApplicationErrorDetailsR"
               ng-show="item.Expanded"
               ng-repeat="aff in item.UnmatchedNodeAffinities"
               ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }"
@@ -149,7 +164,7 @@
                 <span ng-repeat-end>{{ $last ? '' : ' + ' }}</span>
               </td>
             </tr>
-            <!-- ! ADMIN + UNMET NODE AFFINITIES -->
+            <!-- !(ADMIN|ENDPOINT_ADMIN|HELPDESK) + UNMET NODE AFFINITIES -->
             <tr ng-if="$ctrl.loading">
               <td colspan="2" class="text-center text-muted">Loading...</td>
             </tr>
