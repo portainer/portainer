@@ -22,6 +22,7 @@ type (
 		proxyFactory           *factory.ProxyFactory
 		endpointProxies        cmap.ConcurrentMap
 		legacyExtensionProxies cmap.ConcurrentMap
+		k8sClientFactory       *cli.ClientFactory
 	}
 )
 
@@ -38,6 +39,7 @@ func NewManager(
 	return &Manager{
 		endpointProxies:        cmap.New(),
 		legacyExtensionProxies: cmap.New(),
+		k8sClientFactory:       kubernetesClientFactory,
 		proxyFactory: factory.NewProxyFactory(
 			dataStore,
 			signatureService,
@@ -73,8 +75,11 @@ func (manager *Manager) GetEndpointProxy(endpoint *portainer.Endpoint) http.Hand
 }
 
 // DeleteEndpointProxy deletes the proxy associated to a key
+// and cleans the k8s endpoint client cache. DeleteEndpointProxy
+// is currently only called for edge connection clean up.
 func (manager *Manager) DeleteEndpointProxy(endpoint *portainer.Endpoint) {
 	manager.endpointProxies.Remove(string(endpoint.ID))
+	manager.k8sClientFactory.RemoveKubeClient(endpoint)
 }
 
 // CreateLegacyExtensionProxy creates a new HTTP reverse proxy for a legacy extension and adds it to the registered proxies
