@@ -82,13 +82,13 @@
                 </div>
                 <div style="margin-top: 10px;">
                   <uib-tabset active="state.deploymentTab">
-                    <uib-tab index="0" heading="Kubernetes via load balancer">
+                    <uib-tab index="0" heading="Kubernetes via load balancer" ng-if="state.PlatformType === 'linux'">
                       <code style="display: block; white-space: pre-wrap; padding: 16px 90px;"
                         >curl -L https://downloads.portainer.io/portainer-agent-k8s-lb.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml</code
                       >
                     </uib-tab>
 
-                    <uib-tab index="1" heading="Kubernetes via node port">
+                    <uib-tab index="1" heading="Kubernetes via node port" ng-if="state.PlatformType === 'linux'">
                       <code style="display: block; white-space: pre-wrap; padding: 16px 90px;"
                         >curl -L https://downloads.portainer.io/portainer-agent-k8s-nodeport.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml</code
                       >
