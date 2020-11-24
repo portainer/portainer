@@ -283,6 +283,8 @@ class KubernetesApplicationConverter {
   }
 
   static applicationFormValuesToApplication(formValues) {
+    formValues.ApplicationOwner = _.replace(formValues.ApplicationOwner, /[^-A-Za-z0-9_.]/, '.');
+
     const claims = KubernetesPersistentVolumeClaimConverter.applicationFormValuesToVolumeClaims(formValues);
     const rwx = _.find(claims, (item) => _.includes(item.StorageClass.AccessModes, 'RWX')) !== undefined;
 
