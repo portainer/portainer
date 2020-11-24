@@ -21,13 +21,25 @@ function computeSize(volumes) {
 
 class KubernetesVolumesController {
   /* @ngInject */
-  constructor($async, $state, Notifications, ModalService, LocalStorage, EndpointProvider, KubernetesStorageService, KubernetesVolumeService, KubernetesApplicationService) {
+  constructor(
+    $async,
+    $state,
+    Notifications,
+    ModalService,
+    LocalStorage,
+    EndpointProvider,
+    Authentication,
+    KubernetesStorageService,
+    KubernetesVolumeService,
+    KubernetesApplicationService
+  ) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
     this.ModalService = ModalService;
     this.LocalStorage = LocalStorage;
     this.EndpointProvider = EndpointProvider;
+    this.Authentication = Authentication;
     this.KubernetesStorageService = KubernetesStorageService;
     this.KubernetesVolumeService = KubernetesVolumeService;
     this.KubernetesApplicationService = KubernetesApplicationService;
@@ -82,7 +94,14 @@ class KubernetesVolumesController {
         volume.Applications = KubernetesVolumeHelper.getUsingApplications(volume, applications);
         return volume;
       });
-      this.storages = buildStorages(storages, volumes);
+      const tempStorages = buildStorages(storages, volumes);
+      const activatedStoragesClasses = this.EndpointProvider.currentEndpoint().Kubernetes.Configuration.StorageClasses;
+      this.storages = _.filter(tempStorages, (item) => {
+        const storage = _.find(activatedStoragesClasses, (sc) => sc.Name === item.Name);
+        if (storage || this.Authentication.hasAuthorizations(['K8sStorageClassDisabledR'])) {
+          return item;
+        }
+      });
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retreive resource pools');
     }

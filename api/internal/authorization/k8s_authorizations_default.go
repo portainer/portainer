@@ -36,6 +36,7 @@ func DefaultK8sClusterAuthorizations() map[portainer.RoleID]portainer.Authorizat
 			portainer.OperationK8sClusterNodeW:                     true,
 			portainer.OperationK8sClusterSetupRW:                   true,
 			portainer.OperationK8sApplicationErrorDetailsR:         true,
+			portainer.OperationK8sStorageClassDisabledR:						true,
 		},
 		portainer.RoleIDHelpdesk: {
 			portainer.OperationK8sResourcePoolsR:           true,
@@ -49,6 +50,8 @@ func DefaultK8sClusterAuthorizations() map[portainer.RoleID]portainer.Authorizat
 			portainer.OperationK8sClusterR:                 true,
 			portainer.OperationK8sClusterNodeR:             true,
 			portainer.OperationK8sApplicationErrorDetailsR: true,
+			portainer.OperationK8sStorageClassDisabledR:		true,
+
 		},
 		portainer.RoleIDStandardUser: {
 			portainer.OperationK8sResourcePoolsR:         true,

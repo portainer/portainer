@@ -1735,6 +1735,7 @@ const (
 	OperationK8sClusterNodeW                     Authorization = "K8sClusterNodeW"
 	OperationK8sClusterSetupRW                   Authorization = "K8sClusterSetupRW"
 	OperationK8sApplicationErrorDetailsR         Authorization = "K8sApplicationErrorDetailsR"
+	OperationK8sStorageClassDisabledR						 Authorization = "K8sStorageClassDisabledR"
 )
 
 // GetEditionLabel returns the portainer edition label
