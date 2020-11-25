@@ -41,7 +41,7 @@
       </div>
       <div style="margin-top: 10px;">
         <uib-tabset active="state.deploymentTab">
-          <uib-tab index="0" heading="Kubernetes">
+          <uib-tab index="0" ng-if="state.platformType === 'linux'" heading="Kubernetes">
             <code style="display: block; white-space: pre-wrap; padding: 16px 90px;"
               >curl https://downloads.portainer.io/portainer-edge-agent-setup.sh | sudo bash -s -- {{ randomEdgeID }} {{ endpoint.EdgeKey }}</code
             >
