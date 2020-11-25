@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"log"
+
 	portainer "github.com/portainer/portainer/api"
 	rbacv1 "k8s.io/api/rbac/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -29,7 +31,6 @@ func getPortainerK8sRoleMapping() map[portainer.RoleID]k8sRoleSet {
 		portainer.RoleIDHelpdesk: k8sRoleSet{
 			k8sClusterRoles: []portainer.K8sRole{
 				portainer.K8sRolePortainerHelpdesk,
-				portainer.K8sRolePortainerView,
 			},
 			k8sRoles: []portainer.K8sRole{
 				portainer.K8sRolePortainerView,
@@ -65,7 +66,7 @@ func getPortainerDefaultK8sRoles() map[portainer.K8sRole]k8sRoleConfig {
 			rules: []rbacv1.PolicyRule{
 				{
 					Verbs:     []string{"list"},
-					Resources: []string{"componentstatuses", "endpoints", "namespaces", "nodes"},
+					Resources: []string{"namespaces", "nodes"},
 					APIGroups: []string{""},
 				},
 				{
@@ -85,7 +86,7 @@ func getPortainerDefaultK8sRoles() map[portainer.K8sRole]k8sRoleConfig {
 			rules: []rbacv1.PolicyRule{
 				{
 					Verbs:     []string{"get", "list", "watch"},
-					Resources: []string{"namespaces", "nodes"},
+					Resources: []string{"componentstatuses", "endpoints", "namespaces", "nodes"},
 					APIGroups: []string{""},
 				},
 				{
@@ -195,6 +196,7 @@ func (kcl *KubeClient) createPortainerK8sClusterRoles() error {
 		if roleConfig.isSystem {
 			continue
 		}
+		log.Printf("[DEBUG][RBAC] creating cluster role %s", roleName)
 		// creates roles as available across cluster.
 		// NOTE: the roles API are namespaced, thus use the clusterRoles instead.
 		clusterRole := &rbacv1.ClusterRole{
@@ -204,29 +206,6 @@ func (kcl *KubeClient) createPortainerK8sClusterRoles() error {
 			Rules: roleConfig.rules,
 		}
 		_, err := kcl.cli.RbacV1().ClusterRoles().Create(clusterRole)
-		// ignore error if role exists
-		if err != nil && !k8serrors.IsAlreadyExists(err) {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// create all portainer k8s roles (cluster and non-cluster)
-func (kcl *KubeClient) createPortainerK8sRoles(namespace string) error {
-	for roleName, roleConfig := range getPortainerDefaultK8sRoles() {
-		// skip the system roles
-		if roleConfig.isSystem {
-			continue
-		}
-		role := &rbacv1.Role{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: string(roleName),
-			},
-			Rules: roleConfig.rules,
-		}
-		_, err := kcl.cli.RbacV1().Roles(namespace).Create(role)
 		// ignore error if role exists
 		if err != nil && !k8serrors.IsAlreadyExists(err) {
 			return err
@@ -258,6 +237,7 @@ func (kcl *KubeClient) removeRoleBinding(
 	serviceAccountName,
 	namespace string,
 ) error {
+	log.Printf("[DEBUG][RBAC] removing role binding of sa %s in %s", serviceAccountName, namespace)
 	rbList, err := kcl.cli.RbacV1().RoleBindings(namespace).List(metav1.ListOptions{})
 	if k8serrors.IsNotFound(err) {
 		return nil
@@ -271,11 +251,12 @@ func (kcl *KubeClient) removeRoleBinding(
 				subject.Name == serviceAccountName &&
 				subject.Namespace == portainerNamespace &&
 				matchRoleBindingName(rb.Name, namespace, kcl.instanceID) {
+				log.Printf("[DEBUG][RBAC] found role binding %s for sa %s", rb.Name, serviceAccountName)
 				// swap out the element for deletion
 				rb.Subjects[i] = rb.Subjects[len(rb.Subjects)-1]
 				rb.Subjects = rb.Subjects[:len(rb.Subjects)-1]
 				kcl.cli.RbacV1().RoleBindings(namespace).Update(&rb)
-				continue
+				break
 			}
 		}
 	}
@@ -287,11 +268,17 @@ func (kcl *KubeClient) createRoleBinding(
 	serviceAccountName,
 	k8sRole string,
 	namespace string,
+	isClusterRole bool,
 ) error {
 	roleBindingName := namespaceRoleBindingName(k8sRole, namespace, kcl.instanceID)
+	log.Printf("[DEBUG][RBAC] creating role binding of sa %s to %s in %s", serviceAccountName, k8sRole, namespace)
 	// try find the role binding
 	roleBinding, err := kcl.cli.RbacV1().RoleBindings(namespace).Get(roleBindingName, metav1.GetOptions{})
 	if k8serrors.IsNotFound(err) {
+		roleKind := "Role"
+		if isClusterRole {
+			roleKind = "ClusterRole"
+		}
 		// create the rolebinding if not exist
 		roleBinding = &rbacv1.RoleBinding{
 			ObjectMeta: metav1.ObjectMeta{
@@ -305,7 +292,7 @@ func (kcl *KubeClient) createRoleBinding(
 				},
 			},
 			RoleRef: rbacv1.RoleRef{
-				Kind: "Role",
+				Kind: roleKind,
 				Name: k8sRole,
 			},
 		}
@@ -330,6 +317,7 @@ func (kcl *KubeClient) createRoleBinding(
 		Name:      serviceAccountName,
 		Namespace: portainerNamespace,
 	})
+	log.Printf("[DEBUG][RBAC] updating role binding of sa %s to %s in %s", serviceAccountName, k8sRole, namespace)
 
 	// update the role binding to include the service account
 	_, err = kcl.cli.RbacV1().RoleBindings(namespace).Update(roleBinding)
@@ -340,6 +328,7 @@ func (kcl *KubeClient) createRoleBinding(
 func (kcl *KubeClient) removeClusterRoleBindings(
 	serviceAccountName string,
 ) error {
+	log.Printf("[DEBUG][RBAC] removing all cluster binding for sa %s", serviceAccountName)
 	crbList, err := kcl.cli.RbacV1().ClusterRoleBindings().List(metav1.ListOptions{})
 	if err != nil {
 		return err
@@ -351,11 +340,12 @@ func (kcl *KubeClient) removeClusterRoleBindings(
 				subject.Name == serviceAccountName &&
 				subject.Namespace == portainerNamespace &&
 				matchClusterRoleBindingName(crb.Name, kcl.instanceID) {
+				log.Printf("[DEBUG][RBAC] found cluster binding %s for sa %s", crb.Name, serviceAccountName)
 				// swap out the element for deletion
 				crb.Subjects[i] = crb.Subjects[len(crb.Subjects)-1]
 				crb.Subjects = crb.Subjects[:len(crb.Subjects)-1]
 				kcl.cli.RbacV1().ClusterRoleBindings().Update(&crb)
-				continue
+				break
 			}
 		}
 	}
@@ -365,6 +355,7 @@ func (kcl *KubeClient) removeClusterRoleBindings(
 // create or update the cluster role bindings related to a service account
 func (kcl *KubeClient) createClusterRoleBindings(serviceAccountName string,
 	k8sRole string) error {
+	log.Printf("[DEBUG][RBAC] creating cluster binding for sa %s to %s", serviceAccountName, k8sRole)
 	crbName := clusterRoleBindingName(k8sRole, kcl.instanceID)
 	clusterRoleBinding, err := kcl.cli.RbacV1().ClusterRoleBindings().
 		Get(crbName, metav1.GetOptions{})
@@ -407,6 +398,7 @@ func (kcl *KubeClient) createClusterRoleBindings(serviceAccountName string,
 		Name:      serviceAccountName,
 		Namespace: portainerNamespace,
 	})
+	log.Printf("[DEBUG][RBAC] updating cluster binding for sa %s to %s", serviceAccountName, k8sRole)
 
 	_, err = kcl.cli.RbacV1().ClusterRoleBindings().Update(clusterRoleBinding)
 	return err

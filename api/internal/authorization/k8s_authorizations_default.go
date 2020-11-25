@@ -11,6 +11,7 @@ func DefaultK8sClusterAuthorizations() map[portainer.RoleID]portainer.Authorizat
 		portainer.RoleIDEndpointAdmin: {
 			portainer.OperationK8sAccessAllNamespaces:              true,
 			portainer.OperationK8sAccessSystemNamespaces:           true,
+			portainer.OperationK8sAccessUserNamespaces:             true,
 			portainer.OperationK8sResourcePoolsR:                   true,
 			portainer.OperationK8sResourcePoolsW:                   true,
 			portainer.OperationK8sResourcePoolDetailsR:             true,
@@ -39,6 +40,7 @@ func DefaultK8sClusterAuthorizations() map[portainer.RoleID]portainer.Authorizat
 			portainer.OperationK8sStorageClassDisabledR:						true,
 		},
 		portainer.RoleIDHelpdesk: {
+			portainer.OperationK8sAccessUserNamespaces:     true,
 			portainer.OperationK8sResourcePoolsR:           true,
 			portainer.OperationK8sResourcePoolDetailsR:     true,
 			portainer.OperationK8sApplicationsR:            true,

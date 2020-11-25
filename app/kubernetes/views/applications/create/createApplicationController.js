@@ -968,6 +968,8 @@ class KubernetesCreateApplicationController {
   $onInit() {
     return this.$async(async () => {
       try {
+        this.Authentication.redirectIfUnauthorized(['K8sApplicationDetailsW']);
+
         this.state = {
           actionInProgress: false,
           useLoadBalancer: false,

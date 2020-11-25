@@ -38,19 +38,9 @@ func (handler *Handler) userNamespaces(w http.ResponseWriter, r *http.Request) *
 	for _, endpoint := range endpoints {
 
 		// skip non k8s endpoints
-		if endpoint.Type != portainer.KubernetesLocalEnvironment ||
-			endpoint.Type != portainer.AgentOnKubernetesEnvironment ||
+		if endpoint.Type != portainer.KubernetesLocalEnvironment &&
+			endpoint.Type != portainer.AgentOnKubernetesEnvironment &&
 			endpoint.Type != portainer.EdgeAgentOnKubernetesEnvironment {
-			continue
-		}
-
-		endpointRole, err := handler.AuthorizationService.GetUserEndpointRole(userID, int(endpoint.ID))
-		if err != nil {
-			break
-		}
-
-		// no endpoint role for the user, continue
-		if endpointRole == nil {
 			continue
 		}
 
@@ -59,30 +49,7 @@ func (handler *Handler) userNamespaces(w http.ResponseWriter, r *http.Request) *
 			break
 		}
 
-		namespaces, err := kcl.GetNamespaces()
-		if err != nil {
-			break
-		}
-
-		accessPolicies, err := kcl.GetNamespaceAccessPolicies()
-		if err != nil {
-			break
-		}
-		// update the namespace access policies based on user's role, also in configmap.
-		accessPolicies, hasChange, err := handler.AuthorizationService.UpdateUserNamespaceAccessPolicies(
-			userID, &endpoint, accessPolicies,
-		)
-		if hasChange {
-			err = kcl.UpdateNamespaceAccessPolicies(accessPolicies)
-			if err != nil {
-				break
-			}
-		}
-
-		namespaceAuthorizations, err := handler.AuthorizationService.GetUserNamespaceAuthorizations(
-			userID, int(endpoint.ID), accessPolicies, namespaces, endpointRole.Authorizations,
-			endpoint.Kubernetes.Configuration,
-		)
+		namespaceAuthorizations, err := handler.AuthorizationService.GetNamespaceAuthorizations(userID, endpoint, kcl)
 		if err != nil {
 			break
 		}

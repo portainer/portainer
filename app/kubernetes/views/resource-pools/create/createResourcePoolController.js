@@ -138,6 +138,7 @@ class KubernetesCreateResourcePoolController {
   /* #region  ON INIT */
   async onInit() {
     try {
+      this.Authentication.redirectIfUnauthorized(['K8sResourcePoolDetailsW']);
       const endpoint = this.EndpointProvider.currentEndpoint();
       this.endpoint = endpoint;
       this.defaults = KubernetesResourceQuotaDefaults;

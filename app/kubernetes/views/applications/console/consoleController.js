@@ -3,10 +3,11 @@ import { Terminal } from 'xterm';
 
 class KubernetesApplicationConsoleController {
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesApplicationService, EndpointProvider, LocalStorage) {
+  constructor($async, $state, Notifications, Authentication, KubernetesApplicationService, EndpointProvider, LocalStorage) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
+    this.Authentication = Authentication;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.EndpointProvider = EndpointProvider;
     this.LocalStorage = LocalStorage;
@@ -77,6 +78,7 @@ class KubernetesApplicationConsoleController {
   }
 
   async onInit() {
+    this.Authentication.redirectIfUnauthorized(['K8sApplicationConsoleRW']);
     const availableCommands = ['/bin/bash', '/bin/sh'];
 
     this.state = {

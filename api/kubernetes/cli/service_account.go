@@ -1,6 +1,9 @@
 package cli
 
 import (
+	"fmt"
+	"log"
+
 	portainer "github.com/portainer/portainer/api"
 	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -78,11 +81,11 @@ func (kcl *KubeClient) createUserServiceAccount(namespace, serviceAccountName st
 			Name: serviceAccountName,
 		},
 	}
-
 	_, err := kcl.cli.CoreV1().ServiceAccounts(namespace).Create(serviceAccount)
 	if err != nil && !k8serrors.IsAlreadyExists(err) {
 		return err
 	}
+	log.Printf("[DEBUG][RBAC] created service account %s", serviceAccount)
 
 	return nil
 }
@@ -142,18 +145,16 @@ func (kcl *KubeClient) ensureServiceAccountHasPortainerRoles(
 			continue
 		}
 
+		debug := ""
+		for ns, r := range namespaceRoles {
+			debug = fmt.Sprintf("%s%s:%s;", debug, ns, r.Name)
+		}
+		log.Printf("[DEBUG][RBAC] binding roles (%v) for sa %s @ %s", debug, serviceAccountName, namespace)
+
 		// setup k8s role bindings for the namespace based on user's namespace role
 		roleSet := rolesMapping[nsRole.ID]
-		k8sRolesList, err := kcl.cli.RbacV1().Roles(namespace).List(metav1.ListOptions{})
-		if err != nil {
-			return err
-		}
-		if len(k8sRolesList.Items) == 0 {
-			kcl.createPortainerK8sRoles(namespace)
-		}
-
 		for _, role := range roleSet.k8sRoles {
-			err = kcl.createRoleBinding(serviceAccountName, string(role), namespace)
+			err = kcl.createRoleBinding(serviceAccountName, string(role), namespace, true)
 			if err != nil && !k8serrors.IsAlreadyExists(err) {
 				return err
 			}

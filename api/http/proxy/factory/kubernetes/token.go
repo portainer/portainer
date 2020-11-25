@@ -1,7 +1,9 @@
 package kubernetes
 
 import (
+	"fmt"
 	"io/ioutil"
+	"log"
 	"sync"
 
 	portainer "github.com/portainer/portainer/api"
@@ -99,12 +101,19 @@ func (manager *tokenManager) getUserServiceAccountToken(
 		}
 
 		namespaceRoles, err := manager.authService.GetUserNamespaceRoles(
-			userID, endpointID, accessPolicies, namespaces, endpointRole.Authorizations,
-			endpoint.Kubernetes.Configuration,
+			userID, int(endpointRole.ID), endpointID, accessPolicies, namespaces,
+			endpointRole.Authorizations, endpoint.Kubernetes.Configuration,
 		)
 		if err != nil {
 			return "", err
 		}
+
+		debug := ""
+		for ns, r := range namespaceRoles {
+			debug = fmt.Sprintf("%s%s:%s;", debug, ns, r.Name)
+		}
+
+		log.Printf("[DEBUG][RBAC] user %d has roles (%s) @ %d", userID, debug, endpointID)
 
 		err = manager.kubecli.SetupUserServiceAccount(
 			*user, endpointRole.ID, namespaces, namespaceRoles,

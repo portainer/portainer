@@ -1,6 +1,9 @@
 package authorization
 
 import (
+	"fmt"
+	"log"
+
 	portainer "github.com/portainer/portainer/api"
 )
 
@@ -925,16 +928,76 @@ func (service *Service) GetUserEndpointRole(
 		groupTeamAccessPolicies, roles, userMemberships), nil
 }
 
+func (service *Service) GetNamespaceAuthorizations(
+	userID int,
+	endpoint portainer.Endpoint,
+	kcl portainer.KubeClient,
+) (map[string]portainer.Authorizations, error) {
+	namespaceAuthorizations := make(map[string]portainer.Authorizations)
+
+	// skip non k8s endpoints
+	if endpoint.Type != portainer.KubernetesLocalEnvironment &&
+		endpoint.Type != portainer.AgentOnKubernetesEnvironment &&
+		endpoint.Type != portainer.EdgeAgentOnKubernetesEnvironment {
+		return namespaceAuthorizations, nil
+	}
+
+	log.Printf("[DEBUG][RBAC] getting user endpoint role %d @ %d", userID, int(endpoint.ID))
+	endpointRole, err := service.GetUserEndpointRole(userID, int(endpoint.ID))
+	if err != nil {
+		return nil, err
+	}
+
+	// no endpoint role for the user, continue
+	if endpointRole == nil {
+		return namespaceAuthorizations, nil
+	}
+
+	namespaces, err := kcl.GetNamespaces()
+	if err != nil {
+		return nil, err
+	}
+
+	accessPolicies, err := kcl.GetNamespaceAccessPolicies()
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("[DEBUG][RBAC] fetching user %d namespace policies to %+v @ %d", userID, accessPolicies, int(endpoint.ID))
+	// update the namespace access policies based on user's role, also in configmap.
+	accessPolicies, hasChange, err := service.UpdateUserNamespaceAccessPolicies(
+		userID, &endpoint, accessPolicies,
+	)
+	if hasChange {
+		log.Printf("[DEBUG][RBAC] updating user %d namespace policies to %+v @ %d", userID, accessPolicies, int(endpoint.ID))
+		err = kcl.UpdateNamespaceAccessPolicies(accessPolicies)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	log.Printf("[DEBUG][RBAC] get user %d namespace authorizations @ %d", userID, int(endpoint.ID))
+	namespaceAuthorizations, err = service.GetUserNamespaceAuthorizations(
+		userID, int(endpointRole.ID), int(endpoint.ID), accessPolicies, namespaces, endpointRole.Authorizations,
+		endpoint.Kubernetes.Configuration,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return namespaceAuthorizations, nil
+}
+
 // GetUserNamespaceAuthorizations returns authorizations of a user's namespaces
 func (service *Service) GetUserNamespaceAuthorizations(
 	userID int,
+	userEndpointRoleID int,
 	endpointID int,
 	accessPolicies map[string]portainer.K8sNamespaceAccessPolicy,
 	namespaces map[string]portainer.K8sNamespaceInfo,
 	endpointAuthorizations portainer.Authorizations,
 	endpointConfiguration portainer.KubernetesConfiguration,
 ) (map[string]portainer.Authorizations, error) {
-	namespaceRoles, err := service.GetUserNamespaceRoles(userID, endpointID,
+	namespaceRoles, err := service.GetUserNamespaceRoles(userID, userEndpointRoleID, endpointID,
 		accessPolicies, namespaces, endpointAuthorizations, endpointConfiguration)
 	if err != nil {
 		return nil, err
@@ -953,6 +1016,7 @@ func (service *Service) GetUserNamespaceAuthorizations(
 // GetUserNamespaceRoles returns the endpoint role of the user.
 func (service *Service) GetUserNamespaceRoles(
 	userID int,
+	userEndpointRoleID int,
 	endpointID int,
 	accessPolicies map[string]portainer.K8sNamespaceAccessPolicy,
 	namespaces map[string]portainer.K8sNamespaceInfo,
@@ -982,37 +1046,54 @@ func (service *Service) GetUserNamespaceRoles(
 	}
 
 	accessSystemNamespaces := endpointAuthorizations[portainer.OperationK8sAccessSystemNamespaces]
+	accessUserNamespaces := endpointAuthorizations[portainer.OperationK8sAccessUserNamespaces]
 
-	return getUserNamespaceRoles(user, roles, userMemberships,
+	return getUserNamespaceRoles(user, userEndpointRoleID, roles, userMemberships,
 		accessPolicies, namespaces, accessAllNamespaces, accessSystemNamespaces,
-		endpointConfiguration.RestrictDefaultNamespace)
+		accessUserNamespaces, endpointConfiguration.RestrictDefaultNamespace)
 }
 
 func getUserNamespaceRoles(
 	user *portainer.User,
+	userEndpointRoleID int,
 	roles []portainer.Role,
 	userMemberships []portainer.TeamMembership,
 	accessPolicies map[string]portainer.K8sNamespaceAccessPolicy,
 	namespaces map[string]portainer.K8sNamespaceInfo,
 	accessAllNamespaces bool,
 	accessSystemNamespaces bool,
+	accessUserNamespaces bool,
 	restrictDefaultNamespace bool,
 ) (map[string]portainer.Role, error) {
-
+	rolesMap := make(map[int]portainer.Role)
+	rolesDebug := ""
+	for _, role := range roles {
+		rolesMap[int(role.ID)] = role
+		rolesDebug = fmt.Sprintf("%s%d:%s;", rolesDebug, role.ID, role.Name)
+	}
+	log.Printf("[DEBUG][RBAC] getting namespace for %d of role %d from (%s)", int(user.ID), userEndpointRoleID, rolesDebug)
 	results := make(map[string]portainer.Role)
 
-	if accessAllNamespaces {
-		return results, nil
-	}
-
 	for namespace, info := range namespaces {
+		// user can access everything
+		if accessAllNamespaces {
+			results[namespace] = rolesMap[userEndpointRoleID]
+		}
+
 		// skip default namespace or system namespace (when user don't have access)
 		if !accessSystemNamespaces && info.IsSystem {
 			continue
 		}
 
+		// default namespace doesn't allow permission management so no role
+		// aggregation needed
 		if !restrictDefaultNamespace && info.IsDefault {
-			results[namespace] = roles[int(user.Role)]
+			results[namespace] = rolesMap[userEndpointRoleID]
+		}
+
+		// user can access user namespaces
+		if accessUserNamespaces && !info.IsSystem && !info.IsDefault {
+			results[namespace] = rolesMap[userEndpointRoleID]
 		}
 
 		// if there is an access policy for the current namespace

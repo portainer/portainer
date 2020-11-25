@@ -6,6 +6,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
@@ -16,16 +17,18 @@ type Handler struct {
 	SignatureService        portainer.DigitalSignatureService
 	ReverseTunnelService    portainer.ReverseTunnelService
 	KubernetesClientFactory *cli.ClientFactory
+	authorizationService    *authorization.Service
 	requestBouncer          *security.RequestBouncer
 	connectionUpgrader      websocket.Upgrader
 }
 
 // NewHandler creates a handler to manage websocket operations.
-func NewHandler(bouncer *security.RequestBouncer) *Handler {
+func NewHandler(bouncer *security.RequestBouncer, authorizationService *authorization.Service) *Handler {
 	h := &Handler{
-		Router:             mux.NewRouter(),
-		connectionUpgrader: websocket.Upgrader{},
-		requestBouncer:     bouncer,
+		Router:               mux.NewRouter(),
+		connectionUpgrader:   websocket.Upgrader{},
+		requestBouncer:       bouncer,
+		authorizationService: authorizationService,
 	}
 	h.PathPrefix("/websocket/exec").Handler(
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.websocketExec)))

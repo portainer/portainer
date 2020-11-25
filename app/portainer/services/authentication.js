@@ -22,6 +22,7 @@ angular.module('portainer.app').factory('Authentication', [
     service.getUserDetails = getUserDetails;
     service.isAdmin = isAdmin;
     service.hasAuthorizations = hasAuthorizations;
+    service.redirectIfUnauthorized = redirectIfUnauthorized;
 
     async function initAsync() {
       try {
@@ -113,6 +114,13 @@ angular.module('portainer.app').factory('Authentication', [
       }
       const userEndpointAuthorizations = user.endpointAuthorizations[endpointId];
       return authorizations.some((authorization) => userEndpointAuthorizations[authorization]);
+    }
+
+    function redirectIfUnauthorized(authorizations) {
+      const authorized = hasAuthorizations(authorizations);
+      if (!authorized) {
+        $state.go('portainer.home');
+      }
     }
 
     return service;

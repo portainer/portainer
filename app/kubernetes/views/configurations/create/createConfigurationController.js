@@ -64,6 +64,7 @@ class KubernetesCreateConfigurationController {
   }
 
   async onInit() {
+    this.Authentication.redirectIfUnauthorized(['K8sConfigurationsDetailsW']);
     this.state = {
       actionInProgress: false,
       viewReady: false,

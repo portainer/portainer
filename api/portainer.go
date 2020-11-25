@@ -783,9 +783,10 @@ type (
 
 	// User represents a user account
 	User struct {
-		ID                      UserID                 `json:"Id"`
-		Username                string                 `json:"Username"`
-		Password                string                 `json:"Password,omitempty"`
+		ID       UserID `json:"Id"`
+		Username string `json:"Username"`
+		Password string `json:"Password,omitempty"`
+		// Role is the user's role in portainer, either being an Admin or a User
 		Role                    UserRole               `json:"Role"`
 		PortainerAuthorizations Authorizations         `json:"PortainerAuthorizations"`
 		EndpointAuthorizations  EndpointAuthorizations `json:"EndpointAuthorizations"`
@@ -1706,6 +1707,8 @@ const (
 	// OperationK8sAccessSystemNamespaces allow to access system namespaces
 	// if the namespace is assigned
 	OperationK8sAccessSystemNamespaces Authorization = "K8sAccessSystemNamespaces"
+	// OperationK8sAccessUserNamespaces allows to access user namespaces
+	OperationK8sAccessUserNamespaces Authorization = "K8sAccessUserNamespaces"
 	// k8s namespace operations
 	OperationK8sAccessNamespaceRead  Authorization = "K8sAccessNamespaceRead"
 	OperationK8sAccessNamespaceWrite Authorization = "K8sAccessNamespaceWrite"

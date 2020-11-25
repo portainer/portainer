@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"errors"
 	"io"
 	"log"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 // websocketPodExec handles GET requests on /websocket/pod?token=<token>&endpointId=<endpointID>&namespace=<namespace>&podName=<podName>&containerName=<containerName>&command=<command>
@@ -56,9 +58,38 @@ func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request)
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the endpoint associated to the stack inside the database", err}
 	}
 
-	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint, false)
+	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create Kubernetes client", err}
+	}
+
+	permissionDeniedErr := "Permission denied to access endpoint"
+	tokenData, err := security.RetrieveTokenData(r)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusForbidden, permissionDeniedErr, err}
+	}
+
+	if tokenData.Role != portainer.AdministratorRole {
+		// check if the user has console RW access in the endpoint
+		endpointRole, err := handler.authorizationService.GetUserEndpointRole(int(tokenData.ID), int(endpoint.ID))
+		if err != nil {
+			return &httperror.HandlerError{http.StatusForbidden, permissionDeniedErr, err}
+		} else if !endpointRole.Authorizations[portainer.OperationK8sApplicationConsoleRW] {
+			err = errors.New(permissionDeniedErr)
+			return &httperror.HandlerError{http.StatusForbidden, permissionDeniedErr, err}
+		}
+		// will skip if user can access all namespaces
+		if !endpointRole.Authorizations[portainer.OperationK8sAccessAllNamespaces] {
+			// check if the user has RW access to the namespace
+			namespaceAuthorizations, err := handler.authorizationService.GetNamespaceAuthorizations(int(tokenData.ID), *endpoint, cli)
+			log.Printf("[DEBUG][RBAC] %d has namespace authorizations %+v @ %d, %s", int(tokenData.ID), namespaceAuthorizations, int(endpoint.ID), namespace)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusForbidden, permissionDeniedErr, err}
+			} else if auth, ok := namespaceAuthorizations[namespace]; !ok || !auth[portainer.OperationK8sAccessNamespaceWrite] {
+				err = errors.New(permissionDeniedErr)
+				return &httperror.HandlerError{http.StatusForbidden, permissionDeniedErr, err}
+			}
+		}
 	}
 
 	params := &webSocketRequestParams{
@@ -97,11 +128,6 @@ func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request)
 	errorChan := make(chan error, 1)
 	go streamFromWebsocketToWriter(websocketConn, stdinWriter, errorChan)
 	go streamFromReaderToWebsocket(websocketConn, stdoutReader, errorChan)
-
-	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create Kubernetes client", err}
-	}
 
 	err = cli.StartExecProcess(namespace, podName, containerName, commandArray, stdinReader, stdoutWriter)
 	if err != nil {
