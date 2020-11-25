@@ -71,18 +71,18 @@
               Important notice
             </div>
             <div class="form-group">
-              <span class="col-sm-12 text-muted small">
+              <p class="col-sm-12 text-muted small">
                 You can connect Portainer to a Docker environment via socket or via TCP. You can find more information about how to expose the Docker API over TCP
                 <a href="https://docs.docker.com/engine/security/https/"> in the Docker documentation</a>.
-              </span>
+              </p>
 
-              <span class="col-sm-12 text-muted small">
+              <p class="col-sm-12 text-muted small">
                 When using the socket, ensure that you have started the Portainer container with the following Docker flag
                 <code> -v "/var/run/docker.sock:/var/run/docker.sock" </code>
                 (on Linux) or
                 <code> -v \.\pipe\docker_engine:\.\pipe\docker_engine </code>
                 (on Windows).
-              </span>
+              </p>
             </div>
           </div>
           <div ng-if="state.EnvironmentType === 'agent'">
@@ -141,14 +141,14 @@
               Important notice
             </div>
             <div class="form-group">
-              <span class="col-sm-12 text-muted small">
+              <p class="col-sm-12 text-muted small">
                 This will allow you to manage the Kubernetes environment where Portainer is running.
-              </span>
+              </p>
 
-              <span class="col-sm-12 text-muted small">
+              <p class="col-sm-12 text-muted small">
                 <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                 In order to manage a remote Kubernetes environment, please use the Agent or Edge agent options.
-              </span>
+              </p>
             </div>
           </div>
           <div ng-if="state.EnvironmentType === 'azure'">
