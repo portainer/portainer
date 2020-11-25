@@ -34,27 +34,34 @@ func countNodes(endpoint *portainer.Endpoint) int {
 	case portainer.EdgeAgentOnKubernetesEnvironment, portainer.KubernetesLocalEnvironment, portainer.AgentOnKubernetesEnvironment:
 		return countKubernetesNodes(endpoint)
 	case portainer.AzureEnvironment:
-		return 0
+		return 1
 	}
-	return 0
+	return 1
 }
 
 func countDockerNodes(endpoint *portainer.Endpoint) int {
 	snapshots := endpoint.Snapshots
 	if len(snapshots) == 0 {
-		return 0
+		return 1
 	}
 
 	snapshot := snapshots[len(snapshots)-1]
-	return snapshot.NodeCount
+	return max(snapshot.NodeCount, 1)
 }
 
 func countKubernetesNodes(endpoint *portainer.Endpoint) int {
 	snapshots := endpoint.Kubernetes.Snapshots
 	if len(snapshots) == 0 {
-		return 0
+		return 1
 	}
 
 	snapshot := snapshots[len(snapshots)-1]
-	return snapshot.NodeCount
+	return max(snapshot.NodeCount, 1)
+}
+
+func max(a, b int) int {
+    if a > b {
+        return a
+    }
+    return b
 }
