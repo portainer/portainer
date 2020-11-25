@@ -43,7 +43,7 @@ func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimi
 	h.Handle("/users",
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.userList))).Methods(http.MethodGet)
 	h.Handle("/users/{id}",
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.userInspect))).Methods(http.MethodGet)
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.userInspect))).Methods(http.MethodGet)
 	h.Handle("/users/{id}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.userUpdate))).Methods(http.MethodPut)
 	h.Handle("/users/{id}",

@@ -60,11 +60,13 @@ func (bouncer *RequestBouncer) AdminAccess(h http.Handler) http.Handler {
 //
 // Bouncer operations are applied backwards:
 //  - Parse the JWT from the request and stored in context, user has to be authenticated
+//  - Validate the software license
 //  - Authorize the user to the request from the token data
 //  - Upgrade to the restricted request
 func (bouncer *RequestBouncer) RestrictedAccess(h http.Handler) http.Handler {
 	h = bouncer.mwUpgradeToRestrictedRequest(h)
 	h = bouncer.mwCheckPortainerAuthorizations(h)
+	h = bouncer.mwCheckLicense(h)
 	h = bouncer.mwAuthenticatedUser(h)
 	return h
 }
@@ -206,16 +208,27 @@ func (bouncer *RequestBouncer) mwAuthenticatedUser(h http.Handler) http.Handler 
 // mwCheckLicense will verify that the instance license is valid
 func (bouncer *RequestBouncer) mwCheckLicense(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		tokenData, err := RetrieveTokenData(r)
+		if err != nil {
+			httperror.WriteError(w, http.StatusForbidden, "Access denied", httperrors.ErrUnauthorized)
+			return
+		}
+
+		if tokenData.Role == portainer.AdministratorRole {
+			next.ServeHTTP(w, r)
+			return
+		}
+
 		info, err := bouncer.licenseService.Info()
 		if err != nil {
 			log.Printf("[ERROR] [http,security,bouncer] [err: %s] [msg: Failed fetching license info]", err)
-			httperror.WriteError(w, http.StatusForbidden, "Access denied", httperrors.ErrUnauthorized)
+			httperror.WriteError(w, http.StatusForbidden, "License is not valid", httperrors.ErrUnauthorized)
 			return
 		}
 
 		if !info.Valid {
 			log.Printf("[INFO] [http,security,bouncer] [msg: licenses are invalid]")
-			httperror.WriteError(w, http.StatusForbidden, "Access denied", httperrors.ErrUnauthorized)
+			httperror.WriteError(w, http.StatusForbidden, "License is not valid", httperrors.ErrUnauthorized)
 			return
 		}
 
