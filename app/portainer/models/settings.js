@@ -16,6 +16,7 @@ export function SettingsViewModel(data) {
   this.AllowStackManagementForRegularUsers = data.AllowStackManagementForRegularUsers;
   this.AllowHostNamespaceForRegularUsers = data.AllowHostNamespaceForRegularUsers;
   this.AllowDeviceMappingForRegularUsers = data.AllowDeviceMappingForRegularUsers;
+  this.AllowContainerCapabilitiesForRegularUsers = data.AllowContainerCapabilitiesForRegularUsers;
 }
 
 export function PublicSettingsViewModel(settings) {
@@ -31,6 +32,7 @@ export function PublicSettingsViewModel(settings) {
   this.AllowStackManagementForRegularUsers = settings.AllowStackManagementForRegularUsers;
   this.AllowDeviceMappingForRegularUsers = settings.AllowDeviceMappingForRegularUsers;
   this.AllowHostNamespaceForRegularUsers = settings.AllowHostNamespaceForRegularUsers;
+  this.AllowContainerCapabilitiesForRegularUsers = settings.AllowContainerCapabilitiesForRegularUsers;
 }
 
 export function LDAPSettingsViewModel(data) {

@@ -185,7 +185,7 @@
           <li class="interactive"><a data-target="#labels" data-toggle="tab">Labels</a></li>
           <li class="interactive"><a data-target="#restart-policy" data-toggle="tab">Restart policy</a></li>
           <li class="interactive"><a data-target="#runtime-resources" ng-click="refreshSlider()" data-toggle="tab">Runtime & Resources</a></li>
-          <li class="interactive"><a data-target="#container-capabilities" data-toggle="tab">Capabilities</a></li>
+          <li ng-if="areContainerCapabilitiesEnabled" class="interactive"><a data-target="#container-capabilities" data-toggle="tab">Capabilities</a></li>
         </ul>
         <!-- tab-content -->
         <div class="tab-content">
