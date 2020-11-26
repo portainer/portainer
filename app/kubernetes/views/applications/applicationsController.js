@@ -80,7 +80,11 @@ class KubernetesApplicationsController {
   }
 
   removeAction(selectedItems) {
-    return this.$async(this.removeActionAsync, selectedItems);
+    this.ModalService.confirmDeletion('Do you want to remove the selected application(s)?', (confirmed) => {
+      if (confirmed) {
+        return this.$async(this.removeActionAsync, selectedItems);
+      }
+    });
   }
 
   onPublishingModeClick(application) {
