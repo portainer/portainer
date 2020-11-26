@@ -86,7 +86,7 @@ func getPortainerDefaultK8sRoles() map[portainer.K8sRole]k8sRoleConfig {
 			rules: []rbacv1.PolicyRule{
 				{
 					Verbs:     []string{"get", "list", "watch"},
-					Resources: []string{"componentstatuses", "endpoints", "namespaces", "nodes"},
+					Resources: []string{"componentstatuses", "endpoints", "events", "namespaces", "nodes"},
 					APIGroups: []string{""},
 				},
 				{
