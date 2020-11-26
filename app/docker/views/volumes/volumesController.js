@@ -73,14 +73,16 @@ angular.module('portainer.docker').controller('VolumesController', [
 
       $scope.showBrowseAction = $scope.applicationState.endpoint.mode.agentProxy;
 
-      ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC).then(function success(extensionEnabled) {
-        if (!extensionEnabled) {
-          var isAdmin = Authentication.isAdmin();
-          if (!$scope.applicationState.application.enableVolumeBrowserForNonAdminUsers && !isAdmin) {
-            $scope.showBrowseAction = false;
+      if ($scope.applicationState.application.authentication) {
+        ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC).then(function success(extensionEnabled) {
+          if (!extensionEnabled) {
+            var isAdmin = Authentication.isAdmin();
+            if (!$scope.applicationState.application.enableVolumeBrowserForNonAdminUsers && !isAdmin) {
+              $scope.showBrowseAction = false;
+            }
           }
-        }
-      });
+        });
+      }
     }
 
     initView();
