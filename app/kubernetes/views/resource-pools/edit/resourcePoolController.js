@@ -326,9 +326,9 @@ class KubernetesResourcePoolController {
 
       const name = this.$transition$.params().id;
 
-      const [nodes, pools] = await Promise.all([this.KubernetesNodeService.get(), this.KubernetesResourcePoolService.get()]);
+      const [nodes, pools, pool] = await Promise.all([this.KubernetesNodeService.get(), this.KubernetesResourcePoolService.get(), this.KubernetesResourcePoolService.get(name)]);
 
-      this.pool = _.find(pools, { Namespace: { Name: name } });
+      this.pool = pool;
       this.formValues = new KubernetesResourcePoolFormValues(KubernetesResourceQuotaDefaults);
       this.formValues.Name = this.pool.Namespace.Name;
 
