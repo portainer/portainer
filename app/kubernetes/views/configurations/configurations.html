@@ -5,6 +5,19 @@
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
 <div ng-if="ctrl.state.viewReady">
+  <information-panel title-text="Advanced deployment" ng-if="ctrl.state.isAdmin">
+    <span class="small">
+      <p class="text-muted">
+        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+        As an administrator user, you have access to the advanced deployment feature allowing you to deploy any Kubernetes manifest inside your cluster.
+      </p>
+      <p>
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.deploy">
+          <i class="fa fa-file-code space-right" aria-hidden="true"></i>Advanced deployment
+        </button>
+      </p>
+    </span>
+  </information-panel>
   <div class="row">
     <div class="col-sm-12">
       <kubernetes-configurations-datatable
