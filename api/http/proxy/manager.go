@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/orcaman/concurrent-map"
-	"github.com/portainer/portainer/api"
+	cmap "github.com/orcaman/concurrent-map"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/proxy/factory"
 )
@@ -34,6 +34,7 @@ type (
 		ReverseTunnelService   portainer.ReverseTunnelService
 		ExtensionService       portainer.ExtensionService
 		DockerClientFactory    *docker.ClientFactory
+		AuthDisabled           bool
 	}
 )
 
@@ -51,6 +52,7 @@ func NewManager(parameters *ManagerParams) *Manager {
 		ReverseTunnelService:   parameters.ReverseTunnelService,
 		ExtensionService:       parameters.ExtensionService,
 		DockerClientFactory:    parameters.DockerClientFactory,
+		AuthDisabled:           parameters.AuthDisabled,
 	}
 
 	return &Manager{

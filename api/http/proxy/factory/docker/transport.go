@@ -38,6 +38,7 @@ type (
 		extensionService       portainer.ExtensionService
 		dockerClient           *client.Client
 		dockerClientFactory    *docker.ClientFactory
+		authDisabled           bool
 	}
 
 	// TransportParameters is used to create a new Transport
@@ -54,6 +55,7 @@ type (
 		ReverseTunnelService   portainer.ReverseTunnelService
 		ExtensionService       portainer.ExtensionService
 		DockerClientFactory    *docker.ClientFactory
+		AuthDisabled           bool
 	}
 
 	restrictedDockerOperationContext struct {
@@ -94,6 +96,7 @@ func NewTransport(parameters *TransportParameters, httpTransport *http.Transport
 		dockerClientFactory:    parameters.DockerClientFactory,
 		HTTPTransport:          httpTransport,
 		dockerClient:           dockerClient,
+		authDisabled:           parameters.AuthDisabled,
 	}
 
 	return transport, nil
@@ -655,7 +658,6 @@ func (transport *Transport) createRegistryAccessContext(request *http.Request) (
 	if err != nil {
 		return nil, err
 	}
-
 
 	accessContext := &registryAccessContext{
 		isAdmin: true,
