@@ -56,7 +56,7 @@ angular
     };
 
     $scope.copyEdgeAgentDeploymentCommand = function () {
-      if ($scope.state.deploymentTab === 2 && $scope.state.plaftormType === 'linux') {
+      if ($scope.state.deploymentTab === 2 && $scope.state.platformType === 'linux') {
         clipboard.copyText(
           'docker run -d -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker/volumes:/var/lib/docker/volumes -v /:/host -v portainer_agent_data:/data --restart always -e EDGE=1 -e EDGE_ID=' +
             $scope.randomEdgeID +
