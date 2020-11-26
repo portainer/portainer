@@ -659,9 +659,11 @@ angular.module('portainer.docker').controller('ServiceController', [
       service.RestartWindow = ServiceHelper.translateNanosToHumanDuration(service.RestartWindow) || '0s';
       service.UpdateDelay = ServiceHelper.translateNanosToHumanDuration(service.UpdateDelay) || '0s';
       service.StopGracePeriod = service.StopGracePeriod ? ServiceHelper.translateNanosToHumanDuration(service.StopGracePeriod) : '';
-      service.HealthCheck.Interval = ServiceHelper.translateNanosToHumanDuration(service.HealthCheck.Interval);
-      service.HealthCheck.Timeout = ServiceHelper.translateNanosToHumanDuration(service.HealthCheck.Timeout);
-      service.HealthCheck.StartPeriod = ServiceHelper.translateNanosToHumanDuration(service.HealthCheck.StartPeriod);
+      if (service.HealthCheck) {
+        service.HealthCheck.Interval = ServiceHelper.translateNanosToHumanDuration(service.HealthCheck.Interval);
+        service.HealthCheck.Timeout = ServiceHelper.translateNanosToHumanDuration(service.HealthCheck.Timeout);
+        service.HealthCheck.StartPeriod = ServiceHelper.translateNanosToHumanDuration(service.HealthCheck.StartPeriod);
+      }
     }
 
     function initView() {
