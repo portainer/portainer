@@ -311,9 +311,12 @@ func (handler *Handler) createSwarmDeployConfig(r *http.Request, stack *portaine
 	}
 	filteredRegistries := security.FilterRegistries(registries, securityContext)
 
-	user, err := handler.UserService.User(securityContext.UserID)
-	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to load user information from the database", err}
+	var user *portainer.User
+	if !handler.authDisabled {
+		user, err = handler.UserService.User(securityContext.UserID)
+		if err != nil {
+			return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to load user information from the database", err}
+		}
 	}
 
 	config := &swarmStackDeploymentConfig{
@@ -335,23 +338,25 @@ func (handler *Handler) deploySwarmStack(config *swarmStackDeploymentConfig) err
 		return err
 	}
 
-	isAdminOrEndpointAdmin, err := handler.userIsAdminOrEndpointAdmin(config.user, config.endpoint.ID)
-	if err != nil {
-		return err
-	}
-
-	if !settings.AllowBindMountsForRegularUsers && !isAdminOrEndpointAdmin {
-
-		composeFilePath := path.Join(config.stack.ProjectPath, config.stack.EntryPoint)
-
-		stackContent, err := handler.FileService.GetFileContent(composeFilePath)
+	if !handler.authDisabled {
+		isAdminOrEndpointAdmin, err := handler.userIsAdminOrEndpointAdmin(config.user, config.endpoint.ID)
 		if err != nil {
 			return err
 		}
 
-		err = handler.isValidStackFile(stackContent, settings)
-		if err != nil {
-			return err
+		if !settings.AllowBindMountsForRegularUsers && !isAdminOrEndpointAdmin {
+
+			composeFilePath := path.Join(config.stack.ProjectPath, config.stack.EntryPoint)
+
+			stackContent, err := handler.FileService.GetFileContent(composeFilePath)
+			if err != nil {
+				return err
+			}
+
+			err = handler.isValidStackFile(stackContent, settings)
+			if err != nil {
+				return err
+			}
 		}
 	}
 

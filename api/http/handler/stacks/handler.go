@@ -16,6 +16,8 @@ type Handler struct {
 	stackCreationMutex *sync.Mutex
 	stackDeletionMutex *sync.Mutex
 	requestBouncer     *security.RequestBouncer
+	authDisabled       bool
+
 	*mux.Router
 	FileService            portainer.FileService
 	GitService             portainer.GitService
@@ -32,9 +34,10 @@ type Handler struct {
 }
 
 // NewHandler creates a handler to manage stack operations.
-func NewHandler(bouncer *security.RequestBouncer) *Handler {
+func NewHandler(bouncer *security.RequestBouncer, authDisabled bool) *Handler {
 	h := &Handler{
 		Router:             mux.NewRouter(),
+		authDisabled:       authDisabled,
 		stackCreationMutex: &sync.Mutex{},
 		stackDeletionMutex: &sync.Mutex{},
 		requestBouncer:     bouncer,
@@ -57,7 +60,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 }
 
 func (handler *Handler) userCanAccessStack(securityContext *security.RestrictedRequestContext, endpointID portainer.EndpointID, resourceControl *portainer.ResourceControl) (bool, error) {
-	if securityContext.IsAdmin {
+	if securityContext.IsAdmin || handler.authDisabled {
 		return true, nil
 	}
 
@@ -90,7 +93,7 @@ func (handler *Handler) userCanAccessStack(securityContext *security.RestrictedR
 }
 
 func (handler *Handler) userCanCreateStack(securityContext *security.RestrictedRequestContext, endpointID portainer.EndpointID) (bool, error) {
-	if securityContext.IsAdmin {
+	if securityContext.IsAdmin || handler.authDisabled {
 		return true, nil
 	}
 
