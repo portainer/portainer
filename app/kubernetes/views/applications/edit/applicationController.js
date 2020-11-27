@@ -334,6 +334,7 @@ class KubernetesApplicationController {
       expandedNote: false,
       useIngress: false,
       isAuthorized: this.Authentication.hasAuthorizations(['K8sApplicationDetailsW']),
+      canAccessNode: this.Authentication.hasAuthorizations(['K8sClusterNodeR']),
       canShowConsole: this.Authentication.hasAuthorizations(['K8sApplicationConsoleRW']),
     };
 

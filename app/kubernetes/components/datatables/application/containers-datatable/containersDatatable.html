@@ -115,9 +115,10 @@
               >
               <td>
                 <span ng-if="item.Node">
-                  <a ui-sref="kubernetes.cluster.node({ name: item.Node })">
+                  <a ng-if="$ctrl.accessNode" ui-sref="kubernetes.cluster.node({ name: item.Node })">
                     {{ item.Node }}
                   </a>
+                  <span ng-if="!$ctrl.accessNode">{{ item.Node }}</span>
                 </span>
                 <span ng-if="!item.Node">-</span>
               </td>
