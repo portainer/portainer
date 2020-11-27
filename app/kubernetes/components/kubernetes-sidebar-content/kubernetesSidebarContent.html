@@ -18,7 +18,7 @@
   <div
     class="sidebar-sublist"
     authorization="K8sClusterSetupRW"
-    ng-if="$ctrl.adminAccess && ($ctrl.currentState === 'kubernetes.cluster' || $ctrl.currentState === 'portainer.endpoints.endpoint.kubernetesConfig')"
+    ng-if="$ctrl.currentState === 'kubernetes.cluster' || $ctrl.currentState === 'portainer.endpoints.endpoint.kubernetesConfig'"
   >
     <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: $ctrl.endpointId})">Setup</a>
   </div>
