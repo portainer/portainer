@@ -116,16 +116,19 @@ class KubernetesClusterController {
   }
 
   async onInit() {
+    const hasK8sClusterNodeR = this.Authentication.hasAuthorizations(['K8sClusterNodeR']) || false;
     this.state = {
       applicationsLoading: true,
       viewReady: false,
       hasUnhealthyComponentStatus: false,
-      hasK8sClusterNodeR: this.Authentication.hasAuthorizations(['K8sClusterNodeR']),
+      hasK8sClusterNodeR,
     };
 
     await this.getNodes();
-    await this.getEndpoints();
-    await this.getComponentStatus();
+    if (hasK8sClusterNodeR) {
+      await this.getEndpoints();
+      await this.getComponentStatus();
+    }
     await this.getApplications();
 
     this.state.viewReady = true;
