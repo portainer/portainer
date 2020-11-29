@@ -2,12 +2,13 @@ package stacks
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
@@ -101,6 +102,15 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 
 	oldName := stack.Name
 	if payload.Name != "" {
+		isUnique, err := handler.checkUniqueName(endpoint, payload.Name, stack.ID, stack.SwarmID != "")
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
+		}
+		if !isUnique {
+			errorMessage := fmt.Sprintf("A stack with the name '%s' is already running", stack.Name)
+			return &httperror.HandlerError{http.StatusConflict, errorMessage, errors.New(errorMessage)}
+		}
+
 		stack.Name = payload.Name
 	}
 

@@ -1,14 +1,18 @@
 package stacks
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 	"sync"
 
+	"github.com/docker/docker/api/types"
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
@@ -25,6 +29,7 @@ type Handler struct {
 	requestBouncer     *security.RequestBouncer
 	*mux.Router
 	DataStore           portainer.DataStore
+	DockerClientFactory *docker.ClientFactory
 	FileService         portainer.FileService
 	GitService          portainer.GitService
 	SwarmStackManager   portainer.SwarmStackManager
@@ -107,4 +112,51 @@ func (handler *Handler) userCanCreateStack(securityContext *security.RestrictedR
 
 func stackResourceID(stack *portainer.Stack) string {
 	return fmt.Sprintf("%d_%s", stack.EndpointID, stack.Name)
+}
+
+func (handler *Handler) checkUniqueName(endpoint *portainer.Endpoint, name string, stackID portainer.StackID, swarmMode bool) (bool, error) {
+	stacks, err := handler.DataStore.Stack().Stacks()
+	if err != nil {
+		return false, err
+	}
+
+	for _, stack := range stacks {
+		if strings.EqualFold(stack.Name, name) && (stackID == 0 || stackID != stack.ID) && stack.EndpointID == endpoint.ID {
+			return false, nil
+		}
+	}
+
+	dockerClient, err := handler.DockerClientFactory.CreateClient(endpoint, "")
+	if err != nil {
+		return false, err
+	}
+	defer dockerClient.Close()
+	if swarmMode {
+		services, err := dockerClient.ServiceList(context.Background(), types.ServiceListOptions{})
+		if err != nil {
+			return false, err
+		}
+
+		for _, service := range services {
+			serviceNS, ok := service.Spec.Labels["com.docker.stack.namespace"]
+			if ok && serviceNS == name {
+				return false, nil
+			}
+		}
+	}
+
+	containers, err := dockerClient.ContainerList(context.Background(), types.ContainerListOptions{All: true})
+	if err != nil {
+		return false, err
+	}
+
+	for _, container := range containers {
+		containerNS, ok := container.Labels["com.docker.compose.project"]
+
+		if ok && containerNS == name {
+			return false, nil
+		}
+	}
+
+	return true, nil
 }

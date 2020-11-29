@@ -2,6 +2,7 @@ package stacks
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
@@ -43,6 +44,15 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
+	}
+
+	isUnique, err := handler.checkUniqueName(endpoint, stack.Name, stack.ID, stack.SwarmID != "")
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
+	}
+	if !isUnique {
+		errorMessage := fmt.Sprintf("A stack with the name '%s' is already running", stack.Name)
+		return &httperror.HandlerError{http.StatusConflict, errorMessage, errors.New(errorMessage)}
 	}
 
 	resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stackResourceID(stack), portainer.StackResourceControl)

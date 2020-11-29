@@ -2,6 +2,7 @@ package stacks
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"path"
 	"strconv"
@@ -42,9 +43,13 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	err = handler.validateUniqueName(payload.Name, endpoint.ID)
+	isUnique, err := handler.checkUniqueName(endpoint, payload.Name, 0, true)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
+	}
+	if !isUnique {
+		errorMessage := fmt.Sprintf("A stack with the name '%s' is already running", payload.Name)
+		return &httperror.HandlerError{http.StatusConflict, errorMessage, errors.New(errorMessage)}
 	}
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
@@ -129,9 +134,13 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	err = handler.validateUniqueName(payload.Name, endpoint.ID)
+	isUnique, err := handler.checkUniqueName(endpoint, payload.Name, 0, true)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
+	}
+	if !isUnique {
+		errorMessage := fmt.Sprintf("A stack with the name '%s' is already running", payload.Name)
+		return &httperror.HandlerError{http.StatusConflict, errorMessage, errors.New(errorMessage)}
 	}
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
@@ -230,9 +239,13 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	err = handler.validateUniqueName(payload.Name, endpoint.ID)
+	isUnique, err := handler.checkUniqueName(endpoint, payload.Name, 0, true)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
+	}
+	if !isUnique {
+		errorMessage := fmt.Sprintf("A stack with the name '%s' is already running", payload.Name)
+		return &httperror.HandlerError{http.StatusConflict, errorMessage, errors.New(errorMessage)}
 	}
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
