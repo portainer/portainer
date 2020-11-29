@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/docker/cli/cli/compose/loader"
 	"github.com/docker/cli/cli/compose/types"
@@ -198,4 +199,19 @@ func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *port
 
 	stack.ResourceControl = resourceControl
 	return response.JSON(w, stack)
+}
+
+func (handler *Handler) validateUniqueName(name string) error {
+	stacks, err := handler.DataStore.Stack().Stacks()
+	if err != nil {
+		return err
+	}
+
+	for _, stack := range stacks {
+		if strings.EqualFold(stack.Name, name) {
+			return errStackAlreadyExists
+		}
+	}
+
+	return nil
 }
