@@ -201,14 +201,14 @@ func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *port
 	return response.JSON(w, stack)
 }
 
-func (handler *Handler) validateUniqueName(name string) error {
+func (handler *Handler) validateUniqueName(name string, endpointID portainer.EndpointID) error {
 	stacks, err := handler.DataStore.Stack().Stacks()
 	if err != nil {
 		return err
 	}
 
 	for _, stack := range stacks {
-		if strings.EqualFold(stack.Name, name) {
+		if strings.EqualFold(stack.Name, name) && stack.EndpointID == endpointID {
 			return errStackAlreadyExists
 		}
 	}

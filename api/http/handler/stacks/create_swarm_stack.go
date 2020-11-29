@@ -42,7 +42,7 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	err = handler.validateUniqueName(payload.Name)
+	err = handler.validateUniqueName(payload.Name, endpoint.ID)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", err}
 	}
@@ -129,7 +129,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	err = handler.validateUniqueName(payload.Name)
+	err = handler.validateUniqueName(payload.Name, endpoint.ID)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", err}
 	}
@@ -230,7 +230,7 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	err = handler.validateUniqueName(payload.Name)
+	err = handler.validateUniqueName(payload.Name, endpoint.ID)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", err}
 	}

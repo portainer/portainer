@@ -48,7 +48,7 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	err = handler.validateUniqueName(payload.Name)
+	err = handler.validateUniqueName(payload.Name, endpoint.ID)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", err}
 	}
@@ -131,7 +131,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	err = handler.validateUniqueName(payload.Name)
+	err = handler.validateUniqueName(payload.Name, endpoint.ID)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", err}
 	}
@@ -224,7 +224,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	err = handler.validateUniqueName(payload.Name)
+	err = handler.validateUniqueName(payload.Name, endpoint.ID)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", err}
 	}
