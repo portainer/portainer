@@ -2,6 +2,7 @@ package stacks
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"sync"
 
@@ -102,4 +103,8 @@ func (handler *Handler) userCanCreateStack(securityContext *security.RestrictedR
 	}
 
 	return handler.userIsAdminOrEndpointAdmin(user, endpointID)
+}
+
+func stackResourceID(stack *portainer.Stack) string {
+	return fmt.Sprintf("%d_%s", stack.EndpointID, stack.Name)
 }

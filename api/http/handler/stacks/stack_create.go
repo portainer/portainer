@@ -187,9 +187,9 @@ func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *port
 	}
 
 	if isAdmin {
-		resourceControl = authorization.NewAdministratorsOnlyResourceControl(stack.Name, portainer.StackResourceControl)
+		resourceControl = authorization.NewAdministratorsOnlyResourceControl(stackResourceID(stack), portainer.StackResourceControl)
 	} else {
-		resourceControl = authorization.NewPrivateResourceControl(stack.Name, portainer.StackResourceControl, userID)
+		resourceControl = authorization.NewPrivateResourceControl(stackResourceID(stack), portainer.StackResourceControl, userID)
 	}
 
 	err = handler.DataStore.ResourceControl().CreateResourceControl(resourceControl)
@@ -212,6 +212,8 @@ func (handler *Handler) validateUniqueName(name string) error {
 			return errStackAlreadyExists
 		}
 	}
+
+	// TODO: check external stacks
 
 	return nil
 }
