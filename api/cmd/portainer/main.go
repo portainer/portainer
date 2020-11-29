@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt"
 	"github.com/portainer/portainer/api/chisel"
 	"github.com/portainer/portainer/api/cli"
@@ -89,7 +89,11 @@ func initJWTService(dataStore portainer.DataStore) (portainer.JWTService, error)
 		return nil, err
 	}
 
-	jwtService, err := jwt.NewService(settings.UserSessionTimeout)
+	userSessionTimeout := settings.UserSessionTimeout
+	if userSessionTimeout == "" {
+		userSessionTimeout = portainer.DefaultUserSessionTimeout
+	}
+	jwtService, err := jwt.NewService(userSessionTimeout)
 	if err != nil {
 		return nil, err
 	}
