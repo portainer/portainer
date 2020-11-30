@@ -53,6 +53,18 @@ func (kcl *KubeClient) SetupUserServiceAccount(
 		serviceAccountName, namespaces, namespaceRoles)
 }
 
+// RemoveUserBindings removes k8s bindings of a user in a namespace
+func (kcl *KubeClient) RemoveUserNamespaceBindings(
+	userID int,
+	namespace string,
+) error {
+	serviceAccountName := userServiceAccountName(userID, kcl.instanceID)
+
+	err := kcl.removeRoleBinding(serviceAccountName, namespace)
+
+	return err
+}
+
 // RemoveUserServiceAccount removes the service account and its
 // role binding, cluster role binding.
 func (kcl *KubeClient) RemoveUserServiceAccount(

@@ -251,11 +251,16 @@ func (kcl *KubeClient) removeRoleBinding(
 				subject.Name == serviceAccountName &&
 				subject.Namespace == portainerNamespace &&
 				matchRoleBindingName(rb.Name, namespace, kcl.instanceID) {
-				log.Printf("[DEBUG][RBAC] found role binding %s for sa %s", rb.Name, serviceAccountName)
 				// swap out the element for deletion
 				rb.Subjects[i] = rb.Subjects[len(rb.Subjects)-1]
 				rb.Subjects = rb.Subjects[:len(rb.Subjects)-1]
-				kcl.cli.RbacV1().RoleBindings(namespace).Update(&rb)
+				if len(rb.Subjects) < 1 {
+					log.Printf("[DEBUG][RBAC] removing empty role binding %s for sa %s", rb.Name, serviceAccountName)
+					kcl.cli.RbacV1().RoleBindings(namespace).Delete(rb.Name, metav1.NewDeleteOptions(0))
+				} else {
+					log.Printf("[DEBUG][RBAC] removing role binding %s for sa %s", rb.Name, serviceAccountName)
+					kcl.cli.RbacV1().RoleBindings(namespace).Update(&rb)
+				}
 				break
 			}
 		}
@@ -340,11 +345,16 @@ func (kcl *KubeClient) removeClusterRoleBindings(
 				subject.Name == serviceAccountName &&
 				subject.Namespace == portainerNamespace &&
 				matchClusterRoleBindingName(crb.Name, kcl.instanceID) {
-				log.Printf("[DEBUG][RBAC] found cluster binding %s for sa %s", crb.Name, serviceAccountName)
 				// swap out the element for deletion
 				crb.Subjects[i] = crb.Subjects[len(crb.Subjects)-1]
 				crb.Subjects = crb.Subjects[:len(crb.Subjects)-1]
-				kcl.cli.RbacV1().ClusterRoleBindings().Update(&crb)
+				if len(crb.Subjects) < 1 {
+					log.Printf("[DEBUG][RBAC] removing empty cluster role binding %s for sa %s", crb.Name, serviceAccountName)
+					kcl.cli.RbacV1().ClusterRoleBindings().Delete(crb.Name, metav1.NewDeleteOptions(0))
+				} else {
+					log.Printf("[DEBUG][RBAC] removing cluster role binding %s for sa %s", crb.Name, serviceAccountName)
+					kcl.cli.RbacV1().ClusterRoleBindings().Update(&crb)
+				}
 				break
 			}
 		}

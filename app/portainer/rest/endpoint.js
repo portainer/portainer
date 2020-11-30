@@ -21,7 +21,7 @@ angular.module('portainer.app').factory('Endpoints', [
         snapshots: { method: 'POST', params: { action: 'snapshot' } },
         snapshot: { method: 'POST', params: { id: '@id', action: 'snapshot' } },
         status: { method: 'GET', params: { id: '@id', action: 'status' } },
-        deleteTokens: { method: 'DELETE', params: { id: '@id', action: 'delete-tokens' } },
+        updatePoolAccess: { url: API_ENDPOINT_ENDPOINTS + '/:id/pools/:rpn/access', method: 'PUT', params: { id: '@id', rpn: '@rpn' } },
       }
     );
   },

@@ -452,7 +452,7 @@ func (service *Service) TriggerUsersAuthUpdate() {
 // TriggerUserAuthUpdate triggers single user auth update event on the registered
 // event handlers (e.g. token cache manager)
 func (service *Service) TriggerUserAuthUpdate(userID int) {
-	log.Printf("[DEBUG][RBAC] single user auth update event is triggered")
+	log.Printf("[DEBUG][RBAC] single user auth update event is triggered for %d", userID)
 	for _, handler := range service.authEventHandlers {
 		handler.HandleUserAuthDelete(userID)
 	}

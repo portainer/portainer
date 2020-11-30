@@ -1026,6 +1026,10 @@ type (
 		UpdateNamespaceAccessPolicies(
 			accessPolicies map[string]K8sNamespaceAccessPolicy,
 		) error
+		RemoveUserNamespaceBindings(
+			userID int,
+			namespace string,
+		) error
 	}
 
 	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes endpoint

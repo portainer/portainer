@@ -3,6 +3,8 @@ package users
 import (
 	"errors"
 	"net/http"
+	"fmt"
+	"strings"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -88,6 +90,7 @@ func (handler *Handler) deleteUser(w http.ResponseWriter, user *portainer.User) 
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to get user endpoint access", err}
 	}
 
+	errs := []string{}
 	// removes user's k8s service account and all related resources
 	for _, endpoint := range endpoints {
 		if endpoint.Type != portainer.KubernetesLocalEnvironment &&
@@ -97,13 +100,15 @@ func (handler *Handler) deleteUser(w http.ResponseWriter, user *portainer.User) 
 		}
 		kcl, err := handler.K8sClientFactory.GetKubeClient(&endpoint)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to get k8s endpoint access", err}
+			errs = append(errs, fmt.Errorf("Unable to get k8s endpoint access @ %d: %w", int(endpoint.ID), err).Error())
+			continue
 		}
 		kcl.RemoveUserServiceAccount(int(user.ID))
 
 		accessPolicies, err := kcl.GetNamespaceAccessPolicies()
 		if err != nil {
-			break
+			errs = append(errs, fmt.Errorf("Unable to get endpoint namespace access @ %d: %w", int(endpoint.ID), err).Error())
+			continue
 		}
 
 		accessPolicies, hasChange, err := handler.AuthorizationService.RemoveUserNamespaceAccessPolicies(
@@ -112,14 +117,20 @@ func (handler *Handler) deleteUser(w http.ResponseWriter, user *portainer.User) 
 		if hasChange {
 			err = kcl.UpdateNamespaceAccessPolicies(accessPolicies)
 			if err != nil {
-				break
+				errs = append(errs, fmt.Errorf("Unable to update endpoint namespace access @ %d: %w", int(endpoint.ID), err).Error())
+				continue
 			}
 		}
 	}
 
 	err = handler.AuthorizationService.RemoveUserAccessPolicies(user.ID)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to clean-up user access policies", err}
+		errs = append(errs, fmt.Errorf("Unable to clean-up user access policies: %w", err).Error())
+	}
+
+	if len(errs) > 0 {
+		err = fmt.Errorf(strings.Join(errs, "\n"))
+		return &httperror.HandlerError{http.StatusInternalServerError, "There are 1 or more errors when deleting user", err}
 	}
 
 	return response.Empty(w)

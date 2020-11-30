@@ -145,8 +145,8 @@ angular.module('portainer.app').factory('EndpointService', [
       return deferred.promise;
     };
 
-    service.deleteTokens = function (endpointID) {
-      return Endpoints.deleteTokens({ id: endpointID }).$promise;
+    service.updatePoolAccess = function (endpointID, resourcePool, usersToAdd, usersToRemove) {
+      return Endpoints.updatePoolAccess({ id: endpointID, rpn: resourcePool }, { UsersToAdd: usersToAdd, UsersToRemove: usersToRemove }).$promise;
     };
 
     return service;
