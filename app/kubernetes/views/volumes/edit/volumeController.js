@@ -2,6 +2,7 @@ import angular from 'angular';
 import _ from 'lodash-es';
 import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
+import { KubernetesStorageClassAccessPolicies } from 'Kubernetes/models/storage-class/models';
 import filesizeParser from 'filesize-parser';
 
 class KubernetesVolumeController {
@@ -179,6 +180,7 @@ class KubernetesVolumeController {
       volumeSize: 0,
       volumeSizeUnit: 'GB',
       volumeSizeError: false,
+      volumeSharedAccessPolicyTooltip: '',
     };
 
     this.state.activeTab = this.LocalStorage.getActiveTab('volume');
@@ -191,6 +193,15 @@ class KubernetesVolumeController {
     } finally {
       this.state.viewReady = true;
     }
+
+    let volumeSharedAccessPolicy = this.volume.PersistentVolumeClaim.StorageClass.AccessModes[0];
+    let policies = KubernetesStorageClassAccessPolicies();
+
+    policies.forEach((policy) => {
+      if (policy.Name == volumeSharedAccessPolicy) {
+        this.state.volumeSharedAccessPolicyTooltip = policy.Description;
+      }
+    });
   }
 
   $onInit() {
