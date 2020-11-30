@@ -10,6 +10,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 type kubernetesStackPayload struct {
@@ -33,13 +34,46 @@ type createKubernetesStackResponse struct {
 }
 
 func (handler *Handler) createKubernetesStack(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint) *httperror.HandlerError {
+	permissionDeniedErr := "Permission denied to access endpoint"
+	tokenData, err := security.RetrieveTokenData(r)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusForbidden, permissionDeniedErr, err}
+	}
+	
 	var payload kubernetesStackPayload
-	err := request.DecodeAndValidateJSONPayload(r, &payload)
+	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	output, err := handler.deployKubernetesStack(endpoint, payload.StackFileContent, payload.ComposeFormat, payload.Namespace)
+	namespace := payload.Namespace
+	if tokenData.Role != portainer.AdministratorRole {
+		// check if the user has OperationK8sApplicationsAdvancedDeploymentRW access in the endpoint
+		endpointRole, err := handler.AuthorizationService.GetUserEndpointRole(int(tokenData.ID), int(endpoint.ID))
+		if err != nil {
+			return &httperror.HandlerError{http.StatusForbidden, permissionDeniedErr, err}
+		} else if !endpointRole.Authorizations[portainer.OperationK8sApplicationsAdvancedDeploymentRW] {
+			err = errors.New(permissionDeniedErr)
+			return &httperror.HandlerError{http.StatusForbidden, permissionDeniedErr, err}
+		}
+		// will skip if user can access all namespaces
+		if !endpointRole.Authorizations[portainer.OperationK8sAccessAllNamespaces] {
+			cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create Kubernetes client", err}
+			}
+			// check if the user has RW access to the namespace
+			namespaceAuthorizations, err := handler.AuthorizationService.GetNamespaceAuthorizations(int(tokenData.ID), *endpoint, cli)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusForbidden, permissionDeniedErr, err}
+			} else if auth, ok := namespaceAuthorizations[namespace]; !ok || !auth[portainer.OperationK8sAccessNamespaceWrite] {
+				err = errors.New(permissionDeniedErr)
+				return &httperror.HandlerError{http.StatusForbidden, permissionDeniedErr, err}
+			}
+		}
+	}
+
+	output, err := handler.deployKubernetesStack(endpoint, payload.StackFileContent, payload.ComposeFormat, namespace)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to deploy Kubernetes stack", err}
 	}

@@ -181,6 +181,8 @@ func (server *Server) Start() error {
 	stackHandler.KubernetesDeployer = server.KubernetesDeployer
 	stackHandler.GitService = server.GitService
 	stackHandler.DockerClientFactory = server.DockerClientFactory
+	stackHandler.KubernetesClientFactory = server.KubernetesClientFactory
+	stackHandler.AuthorizationService = authorizationService
 
 	var statusHandler = status.NewHandler(requestBouncer, server.Status)
 	statusHandler.DataStore = server.DataStore

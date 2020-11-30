@@ -14,6 +14,7 @@ import (
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
 var (
@@ -34,6 +35,8 @@ type Handler struct {
 	SwarmStackManager   portainer.SwarmStackManager
 	ComposeStackManager portainer.ComposeStackManager
 	KubernetesDeployer  portainer.KubernetesDeployer
+	KubernetesClientFactory *cli.ClientFactory
+	AuthorizationService    *authorization.Service
 }
 
 // NewHandler creates a handler to manage stack operations.
