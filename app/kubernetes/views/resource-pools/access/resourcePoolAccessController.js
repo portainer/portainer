@@ -111,6 +111,7 @@ class KubernetesResourcePoolAccessController {
       const newAccesses = _.concat(this.authorizedUsersAndTeams, this.formValues.multiselectOutput);
       const accessConfigMap = KubernetesConfigMapHelper.modifiyNamespaceAccesses(angular.copy(this.accessConfigMap), this.pool.Namespace.Name, newAccesses);
       await this.KubernetesConfigMapService.update(accessConfigMap);
+      await this.EndpointService.deleteTokens(this.endpointId);
       this.Notifications.success('Access successfully created');
       this.$state.reload();
     } catch (err) {

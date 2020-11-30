@@ -440,13 +440,19 @@ func (service *Service) RegisterEventHandler(id string, handler portainer.AuthEv
 	service.authEventHandlers[id] = handler
 }
 
-func (service *Service) triggerUsersAuthUpdate() {
+// TriggerUserAuthUpdate triggers all users auth update event on the registered
+// event handlers (e.g. token cache manager)
+func (service *Service) TriggerUsersAuthUpdate() {
+	log.Printf("[DEBUG][RBAC] all users auth update event is triggered")
 	for _, handler := range service.authEventHandlers {
 		handler.HandleUsersAuthUpdate()
 	}
 }
 
-func (service *Service) triggerUserAuthDelete(userID int) {
+// TriggerUserAuthUpdate triggers single user auth update event on the registered
+// event handlers (e.g. token cache manager)
+func (service *Service) TriggerUserAuthUpdate(userID int) {
+	log.Printf("[DEBUG][RBAC] single user auth update event is triggered")
 	for _, handler := range service.authEventHandlers {
 		handler.HandleUserAuthDelete(userID)
 	}
@@ -625,7 +631,7 @@ func (service *Service) RemoveUserAccessPolicies(userID portainer.UserID) error 
 		}
 	}
 
-	service.triggerUserAuthDelete(int(userID))
+	service.TriggerUserAuthUpdate(int(userID))
 
 	return nil
 }
@@ -644,7 +650,7 @@ func (service *Service) UpdateUsersAuthorizations() error {
 		}
 	}
 
-	service.triggerUsersAuthUpdate()
+	service.TriggerUsersAuthUpdate()
 
 	return nil
 }

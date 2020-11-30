@@ -71,6 +71,8 @@ func (handler *Handler) teamDelete(w http.ResponseWriter, r *http.Request) *http
 			}
 		}
 	}
+	
+	handler.AuthorizationService.TriggerUsersAuthUpdate()
 
 	return response.Empty(w)
 }

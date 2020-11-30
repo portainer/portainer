@@ -65,6 +65,7 @@ func (handler *Handler) teamMembershipUpdate(w http.ResponseWriter, r *http.Requ
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update the role of membership", httperrors.ErrResourceAccessDenied}
 	}
 
+	previousUserID := int(membership.UserID)
 	membership.UserID = portainer.UserID(payload.UserID)
 	membership.TeamID = portainer.TeamID(payload.TeamID)
 	membership.Role = portainer.MembershipRole(payload.Role)
@@ -73,6 +74,9 @@ func (handler *Handler) teamMembershipUpdate(w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist membership changes inside the database", err}
 	}
+
+	handler.AuthorizationService.TriggerUserAuthUpdate(payload.UserID)
+	handler.AuthorizationService.TriggerUserAuthUpdate(previousUserID)
 
 	return response.JSON(w, membership)
 }

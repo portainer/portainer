@@ -145,6 +145,10 @@ angular.module('portainer.app').factory('EndpointService', [
       return deferred.promise;
     };
 
+    service.deleteTokens = function (endpointID) {
+      return Endpoints.deleteTokens({ id: endpointID }).$promise;
+    };
+
     return service;
   },
 ]);

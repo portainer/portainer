@@ -6,6 +6,12 @@
         Access tagged as <code>inherited</code> are inherited from the group access. They cannot be removed or modified at the endpoint level but they can be overriden.
       </div>
       <div class="toolBar small" ng-if="$ctrl.inheritFrom"> Access tagged as <code>override</code> are overriding the group access for the related users/teams. </div>
+      <div class="toolBar small">
+        <span class="text-warning">
+          <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+          Updating user access will require the affected user(s) to logout and login for the changes to be taken into account.
+        </span>
+      </div>
       <div class="actionBar">
         <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove

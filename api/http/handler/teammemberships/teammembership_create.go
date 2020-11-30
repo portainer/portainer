@@ -76,6 +76,8 @@ func (handler *Handler) teamMembershipCreate(w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
 	}
+	
+	handler.AuthorizationService.TriggerUserAuthUpdate(payload.UserID)
 
 	return response.JSON(w, membership)
 }

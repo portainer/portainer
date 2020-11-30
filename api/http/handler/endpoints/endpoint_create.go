@@ -192,6 +192,8 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the relation object inside the database", err}
 	}
 
+	handler.AuthorizationService.TriggerUsersAuthUpdate()
+
 	return response.JSON(w, endpoint)
 }
 

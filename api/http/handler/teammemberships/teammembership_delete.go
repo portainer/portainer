@@ -45,5 +45,7 @@ func (handler *Handler) teamMembershipDelete(w http.ResponseWriter, r *http.Requ
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
 	}
 
+	handler.AuthorizationService.TriggerUserAuthUpdate(int(membership.UserID))
+
 	return response.Empty(w)
 }

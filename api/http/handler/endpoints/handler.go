@@ -49,6 +49,8 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointUpdate))).Methods(http.MethodPut)
 	h.Handle("/endpoints/{id}",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointDelete))).Methods(http.MethodDelete)
+	h.Handle("/endpoints/{id}/delete-tokens",
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointDeleteTokens))).Methods(http.MethodDelete)
 	h.Handle("/endpoints/{id}/extensions",
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointExtensionAdd))).Methods(http.MethodPost)
 	h.Handle("/endpoints/{id}/extensions/{extensionType}",

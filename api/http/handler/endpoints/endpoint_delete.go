@@ -98,6 +98,8 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 			}
 		}
 	}
+	
+	handler.AuthorizationService.TriggerUsersAuthUpdate()
 
 	return response.Empty(w)
 }

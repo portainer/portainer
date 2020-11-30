@@ -43,6 +43,8 @@ func (handler *Handler) userDelete(w http.ResponseWriter, r *http.Request) *http
 		return handler.deleteAdminUser(w, user)
 	}
 
+	handler.AuthorizationService.TriggerUserAuthUpdate(int(user.ID))
+
 	return handler.deleteUser(w, user)
 }
 
