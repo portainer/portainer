@@ -43,7 +43,7 @@
         <uib-tabset active="state.deploymentTab">
           <uib-tab index="0" heading="Kubernetes" ng-if="state.platformType === 'linux'">
             <code style="display: block; white-space: pre-wrap; padding: 16px 90px;"
-              >curl https://downloads.portainer.io/portainer-edge-agent-setup.sh | sudo bash -s -- {{ randomEdgeID }} {{ endpoint.EdgeKey }}</code
+              >curl https://downloads.portainer.io/portainer-ee20-edge-agent-setup.sh | sudo bash -s -- {{ randomEdgeID }} {{ endpoint.EdgeKey }}</code
             >
           </uib-tab>
           <uib-tab index="1" heading="Docker Swarm">

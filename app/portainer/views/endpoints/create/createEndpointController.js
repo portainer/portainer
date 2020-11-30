@@ -58,15 +58,15 @@ angular
 
     $scope.copyAgentCommand = function () {
       if ($scope.state.deploymentTab === 2 && $scope.state.PlatformType === 'linux') {
-        clipboard.copyText('curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent');
+        clipboard.copyText('curl -L https://downloads.portainer.io/agent-stack-ee20.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent');
       } else if ($scope.state.deploymentTab === 2 && $scope.state.PlatformType === 'windows') {
         clipboard.copyText(
-          'curl -L https://downloads.portainer.io/agent-stack-windows.yml -o agent-stack-windows.yml && docker stack deploy --compose-file=agent-stack-windows.yml portainer-agent'
+          'curl -L https://downloads.portainer.io/agent-stack-ee20-windows.yml -o agent-stack-windows.yml && docker stack deploy --compose-file=agent-stack-windows.yml portainer-agent'
         );
       } else if ($scope.state.deploymentTab === 1) {
-        clipboard.copyText('curl -L https://downloads.portainer.io/portainer-agent-k8s-nodeport.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml');
+        clipboard.copyText('curl -L https://downloads.portainer.io/portainer-agent-ee20-k8s-nodeport.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml');
       } else {
-        clipboard.copyText('curl -L https://downloads.portainer.io/portainer-agent-k8s-lb.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml');
+        clipboard.copyText('curl -L https://downloads.portainer.io/portainer-agent-ee20-k8s-lb.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml');
       }
       $('#copyNotification').show().fadeOut(2500);
     };
