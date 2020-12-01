@@ -1,8 +1,6 @@
 package cli
 
 import (
-	"log"
-
 	portainer "github.com/portainer/portainer/api"
 	rbacv1 "k8s.io/api/rbac/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -196,7 +194,6 @@ func (kcl *KubeClient) createPortainerK8sClusterRoles() error {
 		if roleConfig.isSystem {
 			continue
 		}
-		log.Printf("[DEBUG][RBAC] creating cluster role %s", roleName)
 		// creates roles as available across cluster.
 		// NOTE: the roles API are namespaced, thus use the clusterRoles instead.
 		clusterRole := &rbacv1.ClusterRole{
@@ -237,7 +234,6 @@ func (kcl *KubeClient) removeRoleBinding(
 	serviceAccountName,
 	namespace string,
 ) error {
-	log.Printf("[DEBUG][RBAC] removing role binding of sa %s in %s", serviceAccountName, namespace)
 	rbList, err := kcl.cli.RbacV1().RoleBindings(namespace).List(metav1.ListOptions{})
 	if k8serrors.IsNotFound(err) {
 		return nil
@@ -255,10 +251,8 @@ func (kcl *KubeClient) removeRoleBinding(
 				rb.Subjects[i] = rb.Subjects[len(rb.Subjects)-1]
 				rb.Subjects = rb.Subjects[:len(rb.Subjects)-1]
 				if len(rb.Subjects) < 1 {
-					log.Printf("[DEBUG][RBAC] removing empty role binding %s for sa %s", rb.Name, serviceAccountName)
 					kcl.cli.RbacV1().RoleBindings(namespace).Delete(rb.Name, metav1.NewDeleteOptions(0))
 				} else {
-					log.Printf("[DEBUG][RBAC] removing role binding %s for sa %s", rb.Name, serviceAccountName)
 					kcl.cli.RbacV1().RoleBindings(namespace).Update(&rb)
 				}
 				break
@@ -276,7 +270,6 @@ func (kcl *KubeClient) createRoleBinding(
 	isClusterRole bool,
 ) error {
 	roleBindingName := namespaceRoleBindingName(k8sRole, namespace, kcl.instanceID)
-	log.Printf("[DEBUG][RBAC] creating role binding of sa %s to %s in %s", serviceAccountName, k8sRole, namespace)
 	// try find the role binding
 	roleBinding, err := kcl.cli.RbacV1().RoleBindings(namespace).Get(roleBindingName, metav1.GetOptions{})
 	if k8serrors.IsNotFound(err) {
@@ -322,8 +315,6 @@ func (kcl *KubeClient) createRoleBinding(
 		Name:      serviceAccountName,
 		Namespace: portainerNamespace,
 	})
-	log.Printf("[DEBUG][RBAC] updating role binding of sa %s to %s in %s", serviceAccountName, k8sRole, namespace)
-
 	// update the role binding to include the service account
 	_, err = kcl.cli.RbacV1().RoleBindings(namespace).Update(roleBinding)
 	return err
@@ -333,7 +324,6 @@ func (kcl *KubeClient) createRoleBinding(
 func (kcl *KubeClient) removeClusterRoleBindings(
 	serviceAccountName string,
 ) error {
-	log.Printf("[DEBUG][RBAC] removing all cluster binding for sa %s", serviceAccountName)
 	crbList, err := kcl.cli.RbacV1().ClusterRoleBindings().List(metav1.ListOptions{})
 	if err != nil {
 		return err
@@ -349,10 +339,8 @@ func (kcl *KubeClient) removeClusterRoleBindings(
 				crb.Subjects[i] = crb.Subjects[len(crb.Subjects)-1]
 				crb.Subjects = crb.Subjects[:len(crb.Subjects)-1]
 				if len(crb.Subjects) < 1 {
-					log.Printf("[DEBUG][RBAC] removing empty cluster role binding %s for sa %s", crb.Name, serviceAccountName)
 					kcl.cli.RbacV1().ClusterRoleBindings().Delete(crb.Name, metav1.NewDeleteOptions(0))
 				} else {
-					log.Printf("[DEBUG][RBAC] removing cluster role binding %s for sa %s", crb.Name, serviceAccountName)
 					kcl.cli.RbacV1().ClusterRoleBindings().Update(&crb)
 				}
 				break
@@ -365,7 +353,6 @@ func (kcl *KubeClient) removeClusterRoleBindings(
 // create or update the cluster role bindings related to a service account
 func (kcl *KubeClient) createClusterRoleBindings(serviceAccountName string,
 	k8sRole string) error {
-	log.Printf("[DEBUG][RBAC] creating cluster binding for sa %s to %s", serviceAccountName, k8sRole)
 	crbName := clusterRoleBindingName(k8sRole, kcl.instanceID)
 	clusterRoleBinding, err := kcl.cli.RbacV1().ClusterRoleBindings().
 		Get(crbName, metav1.GetOptions{})
@@ -408,8 +395,7 @@ func (kcl *KubeClient) createClusterRoleBindings(serviceAccountName string,
 		Name:      serviceAccountName,
 		Namespace: portainerNamespace,
 	})
-	log.Printf("[DEBUG][RBAC] updating cluster binding for sa %s to %s", serviceAccountName, k8sRole)
-
+	
 	_, err = kcl.cli.RbacV1().ClusterRoleBindings().Update(clusterRoleBinding)
 	return err
 }

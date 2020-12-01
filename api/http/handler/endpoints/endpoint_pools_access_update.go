@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"errors"
 	"strings"
-	"log"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -70,8 +69,6 @@ func (handler *Handler) endpointPoolsAccessUpdate(w http.ResponseWriter, r *http
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
-
-	log.Printf("[DEBUG][RBAC] received resource pool access update request: %+v", payload)
 
 	errs := []string{}
 

@@ -1,9 +1,6 @@
 package authorization
 
 import (
-	"fmt"
-	"log"
-
 	portainer "github.com/portainer/portainer/api"
 )
 
@@ -443,7 +440,6 @@ func (service *Service) RegisterEventHandler(id string, handler portainer.AuthEv
 // TriggerUserAuthUpdate triggers all users auth update event on the registered
 // event handlers (e.g. token cache manager)
 func (service *Service) TriggerUsersAuthUpdate() {
-	log.Printf("[DEBUG][RBAC] all users auth update event is triggered")
 	for _, handler := range service.authEventHandlers {
 		handler.HandleUsersAuthUpdate()
 	}
@@ -452,7 +448,6 @@ func (service *Service) TriggerUsersAuthUpdate() {
 // TriggerUserAuthUpdate triggers single user auth update event on the registered
 // event handlers (e.g. token cache manager)
 func (service *Service) TriggerUserAuthUpdate(userID int) {
-	log.Printf("[DEBUG][RBAC] single user auth update event is triggered for %d", userID)
 	for _, handler := range service.authEventHandlers {
 		handler.HandleUserAuthDelete(userID)
 	}
@@ -948,7 +943,6 @@ func (service *Service) GetNamespaceAuthorizations(
 		return namespaceAuthorizations, nil
 	}
 
-	log.Printf("[DEBUG][RBAC] getting user endpoint role %d @ %d", userID, int(endpoint.ID))
 	endpointRole, err := service.GetUserEndpointRole(userID, int(endpoint.ID))
 	if err != nil {
 		return nil, err
@@ -968,20 +962,17 @@ func (service *Service) GetNamespaceAuthorizations(
 	if err != nil {
 		return nil, err
 	}
-	log.Printf("[DEBUG][RBAC] fetching user %d namespace policies to %+v @ %d", userID, accessPolicies, int(endpoint.ID))
 	// update the namespace access policies based on user's role, also in configmap.
 	accessPolicies, hasChange, err := service.UpdateUserNamespaceAccessPolicies(
 		userID, &endpoint, accessPolicies,
 	)
 	if hasChange {
-		log.Printf("[DEBUG][RBAC] updating user %d namespace policies to %+v @ %d", userID, accessPolicies, int(endpoint.ID))
 		err = kcl.UpdateNamespaceAccessPolicies(accessPolicies)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	log.Printf("[DEBUG][RBAC] get user %d namespace authorizations @ %d", userID, int(endpoint.ID))
 	namespaceAuthorizations, err = service.GetUserNamespaceAuthorizations(
 		userID, int(endpointRole.ID), int(endpoint.ID), accessPolicies, namespaces, endpointRole.Authorizations,
 		endpoint.Kubernetes.Configuration,
@@ -1072,12 +1063,6 @@ func getUserNamespaceRoles(
 	restrictDefaultNamespace bool,
 ) (map[string]portainer.Role, error) {
 	rolesMap := make(map[int]portainer.Role)
-	rolesDebug := ""
-	for _, role := range roles {
-		rolesMap[int(role.ID)] = role
-		rolesDebug = fmt.Sprintf("%s%d:%s;", rolesDebug, role.ID, role.Name)
-	}
-	log.Printf("[DEBUG][RBAC] getting namespace for %d of role %d from (%s)", int(user.ID), userEndpointRoleID, rolesDebug)
 	results := make(map[string]portainer.Role)
 
 	for namespace, info := range namespaces {

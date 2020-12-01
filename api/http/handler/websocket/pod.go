@@ -82,7 +82,6 @@ func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request)
 		if !endpointRole.Authorizations[portainer.OperationK8sAccessAllNamespaces] {
 			// check if the user has RW access to the namespace
 			namespaceAuthorizations, err := handler.authorizationService.GetNamespaceAuthorizations(int(tokenData.ID), *endpoint, cli)
-			log.Printf("[DEBUG][RBAC] %d has namespace authorizations %+v @ %d, %s", int(tokenData.ID), namespaceAuthorizations, int(endpoint.ID), namespace)
 			if err != nil {
 				return &httperror.HandlerError{http.StatusForbidden, permissionDeniedErr, err}
 			} else if auth, ok := namespaceAuthorizations[namespace]; !ok || !auth[portainer.OperationK8sAccessNamespaceWrite] {
