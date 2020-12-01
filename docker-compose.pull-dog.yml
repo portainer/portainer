@@ -46,6 +46,7 @@ services:
       - -c
       - |
         service docker start
+        sleep 3
         kind create cluster --config=/kind.yaml
         curl -L https://raw.githubusercontent.com/portainer/k8s/master/deploy/manifests/agent/portainer-agent-k8s-nodeport.yaml -o portainer-agent.yaml
         kubectl apply -f portainer-agent.yaml
