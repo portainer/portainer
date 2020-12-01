@@ -55,7 +55,7 @@ class AccessViewerController {
 
   getRoleFromUserEndpointPolicy(user, endpoint) {
     const policyRoles = [];
-    const policy = endpoint.UserAccessPolicies[user.Id];
+    const policy = (endpoint.UserAccessPolicies || {})[user.Id];
     if (policy) {
       const accessPolicy = new AccessViewerPolicyModel(policy, endpoint, this.roles, null, null);
       policyRoles.push(accessPolicy);
@@ -76,7 +76,7 @@ class AccessViewerController {
   getRoleFromTeamEndpointPolicies(memberships, endpoint) {
     const policyRoles = [];
     for (const membership of memberships) {
-      const policy = endpoint.TeamAccessPolicies[membership.TeamId];
+      const policy = (endpoint.TeamAccessPolicies || {})[membership.TeamId];
       if (policy) {
         const accessPolicy = new AccessViewerPolicyModel(policy, endpoint, this.roles, null, this.teams[membership.TeamId]);
         policyRoles.push(accessPolicy);

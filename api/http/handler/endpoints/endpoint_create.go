@@ -299,6 +299,8 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		},
 		AuthorizedUsers:     []portainer.UserID{},
 		AuthorizedTeams:     []portainer.TeamID{},
+		UserAccessPolicies:  portainer.UserAccessPolicies{},
+		TeamAccessPolicies:  portainer.TeamAccessPolicies{},
 		Extensions:          []portainer.EndpointExtension{},
 		TagIDs:              payload.TagIDs,
 		Status:              portainer.EndpointStatusUp,
