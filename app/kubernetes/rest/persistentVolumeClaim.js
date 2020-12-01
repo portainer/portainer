@@ -17,6 +17,7 @@ angular.module('portainer.kubernetes').factory('KubernetesPersistentVolumeClaims
         {
           get: {
             method: 'GET',
+            timeout: 15000,
             ignoreLoadingBar: true,
           },
           getYaml: {

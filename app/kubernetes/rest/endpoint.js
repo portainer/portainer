@@ -11,6 +11,7 @@ angular.module('portainer.kubernetes').factory('KubernetesEndpoints', function K
       {
         get: {
           method: 'GET',
+          timeout: 15000,
           ignoreLoadingBar: true,
         },
       }

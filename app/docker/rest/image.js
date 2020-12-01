@@ -16,7 +16,7 @@ angular.module('portainer.docker').factory('Image', [
         endpointId: EndpointProvider.endpointID,
       },
       {
-        query: { method: 'GET', params: { all: 0, action: 'json' }, isArray: true, interceptor: ImagesInterceptor },
+        query: { method: 'GET', params: { all: 0, action: 'json' }, isArray: true, interceptor: ImagesInterceptor, timeout: 15000 },
         get: { method: 'GET', params: { action: 'json' } },
         search: { method: 'GET', params: { action: 'search' } },
         history: { method: 'GET', params: { action: 'history' }, isArray: true },

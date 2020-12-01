@@ -18,6 +18,7 @@ angular.module('portainer.docker').factory('Network', [
           method: 'GET',
           isArray: true,
           interceptor: NetworksInterceptor,
+          timeout: 15000,
         },
         get: {
           method: 'GET',

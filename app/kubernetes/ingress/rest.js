@@ -15,6 +15,7 @@ function factory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
       {
         get: {
           method: 'GET',
+          timeout: 15000,
           ignoreLoadingBar: true,
         },
         getYaml: {

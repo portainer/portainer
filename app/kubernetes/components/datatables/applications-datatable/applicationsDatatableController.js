@@ -1,4 +1,4 @@
-import { KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
+import { KubernetesApplicationDeploymentTypes } from 'Kubernetes/models/application/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 
 angular.module('portainer.docker').controller('KubernetesApplicationsDatatableController', [
@@ -42,7 +42,6 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
     this.$onInit = function () {
       this.isAdmin = Authentication.isAdmin();
       this.KubernetesApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
-      this.KubernetesApplicationTypes = KubernetesApplicationTypes;
       this.setDefaults();
       this.prepareTableFromDataset();
 

@@ -16,6 +16,7 @@ angular.module('portainer.kubernetes').factory('KubernetesStorage', [
         {
           get: {
             method: 'GET',
+            timeout: 15000,
             ignoreLoadingBar: true,
           },
           getYaml: {

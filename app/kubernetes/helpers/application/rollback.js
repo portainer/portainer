@@ -20,7 +20,7 @@ class KubernetesApplicationRollbackHelper {
         result = KubernetesApplicationRollbackHelper._getStatefulSetPayload(application, targetRevision);
         break;
       default:
-        throw new PortainerError('Unable to determine which association to use to convert patch');
+        throw new PortainerError('Unable to determine which association to use');
     }
     return result;
   }

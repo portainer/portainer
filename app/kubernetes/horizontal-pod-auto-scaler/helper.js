@@ -18,8 +18,7 @@ export class KubernetesHorizontalPodAutoScalerHelper {
       return KubernetesApplicationTypeStrings.DAEMONSET;
     } else if ((app instanceof KubernetesApplication && app.ApplicationType === KubernetesApplicationTypes.STATEFULSET) || app instanceof KubernetesStatefulSet) {
       return KubernetesApplicationTypeStrings.STATEFULSET;
-    } else if (app instanceof KubernetesApplication && app.ApplicationType === KubernetesApplicationTypes.POD) {
-      return KubernetesApplicationTypeStrings.POD;
+      // } else if () { ---> TODO: refactor - handle bare pod type !
     } else {
       throw new PortainerError('Unable to determine application type');
     }

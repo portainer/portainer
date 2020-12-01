@@ -19,6 +19,7 @@ angular.module('portainer.docker').factory('Container', [
           params: { all: 0, action: 'json', filters: '@filters' },
           isArray: true,
           interceptor: ContainersInterceptor,
+          timeout: 15000,
         },
         get: {
           method: 'GET',
@@ -47,17 +48,20 @@ angular.module('portainer.docker').factory('Container', [
         logs: {
           method: 'GET',
           params: { id: '@id', action: 'logs' },
+          timeout: 4500,
           ignoreLoadingBar: true,
           transformResponse: logsHandler,
         },
         stats: {
           method: 'GET',
           params: { id: '@id', stream: false, action: 'stats' },
+          timeout: 4500,
           ignoreLoadingBar: true,
         },
         top: {
           method: 'GET',
           params: { id: '@id', action: 'top' },
+          timeout: 4500,
           ignoreLoadingBar: true,
         },
         start: {
