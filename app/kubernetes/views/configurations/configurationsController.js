@@ -1,3 +1,5 @@
+require('../../templates/advancedDeploymentPanel.html');
+
 import angular from 'angular';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 

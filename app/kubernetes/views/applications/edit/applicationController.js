@@ -1,3 +1,5 @@
+require('../../../templates/advancedDeploymentPanel.html');
+
 import angular from 'angular';
 import * as _ from 'lodash-es';
 import * as JsonPatch from 'fast-json-patch';
