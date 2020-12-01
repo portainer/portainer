@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	syncInterval = 5 * time.Minute
+	syncInterval = 24 * time.Hour
 )
 
 func (service *Service) startSyncLoop() error {
