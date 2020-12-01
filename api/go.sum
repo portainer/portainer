@@ -363,6 +363,8 @@ github.com/portainer/liblicense v0.0.0-20201120022501-31fd46081302 h1:8Ie7ayksic
 github.com/portainer/liblicense v0.0.0-20201120022501-31fd46081302/go.mod h1:6OSugUz07QF1WwrMmRNIMhgiq+drVMIZ98UTu5LVZP8=
 github.com/portainer/liblicense v0.0.0-20201125042600-8f1698c6d659 h1:+gLOMoESDIYS1hhx0ojL30AZQXvkLIpPW3e2KqLvx4Q=
 github.com/portainer/liblicense v0.0.0-20201125042600-8f1698c6d659/go.mod h1:6OSugUz07QF1WwrMmRNIMhgiq+drVMIZ98UTu5LVZP8=
+github.com/portainer/liblicense v0.0.0-20201201195053-bce2ea562e09 h1:tvXv0Xra6stNlNgBRDBZn6QE0TNopVdChG3m5ZpUhHE=
+github.com/portainer/liblicense v0.0.0-20201201195053-bce2ea562e09/go.mod h1:6OSugUz07QF1WwrMmRNIMhgiq+drVMIZ98UTu5LVZP8=
 github.com/portainer/liblicense v0.0.0-20201126042846-52dc041ff608 h1:dUopH6M5DiKcwrLAFepFNu0cIcdNsQiPmxvN/exq1lI=
 github.com/portainer/liblicense v0.0.0-20201126042846-52dc041ff608/go.mod h1:6OSugUz07QF1WwrMmRNIMhgiq+drVMIZ98UTu5LVZP8=
 github.com/portainer/liblicense v0.0.0-20201126202730-993637c8fcdb h1:okSNfGVGHid1lb24BUvwEXaLC7yPRylXpQSOxhWPjuc=
