@@ -28,7 +28,7 @@ require (
 	github.com/portainer/libcompose v0.5.3
 	github.com/portainer/libcrypto v0.0.0-20190723020515-23ebe86ab2c2
 	github.com/portainer/libhttp v0.0.0-20190806161843-ba068f58be33
-	github.com/portainer/liblicense v0.0.0-20201125042600-8f1698c6d659
+	github.com/portainer/liblicense v0.0.0-20201126214556-0dbbe130fb4c
 	golang.org/x/crypto v0.0.0-20191128160524-b544559bb6d1
 	golang.org/x/net v0.0.0-20191126235420-ef20fe5d7933 // indirect
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45

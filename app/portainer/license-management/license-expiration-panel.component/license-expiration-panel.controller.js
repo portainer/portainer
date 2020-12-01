@@ -29,8 +29,7 @@ export default class LicenseNodePanelController {
 
   parseInfo(info) {
     const expiresAt = moment.unix(info.expiresAt);
-    const duration = moment.duration(expiresAt.diff(moment()));
-    this.remainingDays = Math.floor(duration.asDays());
+    this.remainingDays = expiresAt.diff(moment().startOf('day'), 'days');
     this.expirationMessage = this.buildMessage(this.remainingDays);
   }
 

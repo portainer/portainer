@@ -53,13 +53,11 @@ export default class LicensesViewController {
       try {
         const licenses = await this.LicenseService.licenses();
         this.licenses = licenses.map((license) => {
-          const createdAt = moment.unix(license.created);
-          const expiresAt = createdAt.add(license.expiresAfter, 'days');
+          const expiresAt = moment.unix(license.expiresAt);
           const valid = !license.revoked && moment().isBefore(expiresAt);
-
           return {
             ...license,
-            expiresAt: expiresAt.format('YYYY-MM-DD'),
+            showExpiresAt: expiresAt.format('YYYY-MM-DD HH:mm'),
             valid,
           };
         });

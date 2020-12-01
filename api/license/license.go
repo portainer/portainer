@@ -231,10 +231,9 @@ func aggregate(licenses []liblicense.PortainerLicense) *portainer.LicenseInfo {
 }
 
 func licenseExpiresAt(license liblicense.PortainerLicense) time.Time {
-	return time.Unix(license.Created, 0).AddDate(0, 0, license.ExpiresAfter)
+	return master.ExpiresAt(license.Created, license.ExpiresAfter)
 }
 
 func isLicenseValid(license liblicense.PortainerLicense) bool {
-	licenseExpiresAt := licenseExpiresAt(license)
-	return licenseExpiresAt.After(time.Now()) && !license.Revoked
+	return !master.Expired(license.Created, license.ExpiresAfter) && !license.Revoked
 }
