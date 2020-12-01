@@ -500,14 +500,18 @@ function run($transitions, UserService, Authentication, LicenseService, Endpoint
 
   $transitions.onBefore({ to: (state) => !state.name.startsWith('portainer.init') && !UNAUTHENTICATED_ROUTES.includes(state.name) }, async function (transition) {
     const stateService = transition.router.stateService;
-    try {
-      const licenseInfo = await LicenseService.info();
-      if (!licenseInfo.valid) {
-        return stateService.target('portainer.init.license');
+
+    // Move the license check out of current JS event so that it does NOT block the transition, but still navigates to license page if license is invalid
+    setTimeout(async () => {
+      try {
+        const licenseInfo = await LicenseService.info();
+        if (!licenseInfo.valid) {
+          stateService.go('portainer.init.license');
+        }
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to retrieve license info');
+        throw err;
       }
-    } catch (err) {
-      Notifications.error('Failure', err, 'Unable to retrieve license info');
-      throw err;
-    }
+    }, 100);
   });
 }

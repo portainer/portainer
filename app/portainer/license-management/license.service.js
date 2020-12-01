@@ -38,6 +38,9 @@ export function LicenseService(License) {
   }
 
   async function info() {
+    if (!licenseStore.invalidated && Math.abs(licenseStore.lastLoaded - Date.now()) < 1000 * 30) {
+      return licenseStore.data;
+    }
     const info = await License.info().$promise;
     licenseStore.data = info;
     licenseStore.lastLoaded = Date.now();
