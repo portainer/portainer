@@ -106,6 +106,16 @@
             </div>
             <!-- !type options -->
 
+            <div class="col-sm-12 form-section-title" ng-if="ctrl.formValues.Type == ctrl.KubernetesConfigurationTypes.SECRET">
+              Information
+            </div>
+            <div class="form-group" ng-if="ctrl.formValues.Type == ctrl.KubernetesConfigurationTypes.SECRET">
+              <div class="col-sm-12 small text-muted">
+                Creating a sensitive configuration will create a Kubernetes Secret of type <code>Opaque</code>. You can find more information about this in the
+                <a href="https://kubernetes.io/docs/concepts/configuration/secret/#secret-types" target="_blank">official documentation</a>.
+              </div>
+            </div>
+
             <kubernetes-configuration-data ng-if="ctrl.formValues" form-values="ctrl.formValues" is-valid="ctrl.state.isDataValid"></kubernetes-configuration-data>
 
             <!-- actions -->
