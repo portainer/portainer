@@ -118,6 +118,7 @@ func snapshotNodes(snapshot *portainer.DockerSnapshot, cli *client.Client) error
 	}
 	snapshot.TotalCPU = int(nanoCpus / 1e9)
 	snapshot.TotalMemory = totalMem
+	snapshot.NodeCount = len(nodes)
 	return nil
 }
 

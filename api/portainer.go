@@ -101,6 +101,7 @@ type (
 		ImageCount              int               `json:"ImageCount"`
 		ServiceCount            int               `json:"ServiceCount"`
 		StackCount              int               `json:"StackCount"`
+		NodeCount               int               `json:"NodeCount"`
 		SnapshotRaw             DockerSnapshotRaw `json:"DockerSnapshotRaw"`
 	}
 
