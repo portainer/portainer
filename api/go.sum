@@ -363,8 +363,6 @@ github.com/portainer/liblicense v0.0.0-20201120022501-31fd46081302 h1:8Ie7ayksic
 github.com/portainer/liblicense v0.0.0-20201120022501-31fd46081302/go.mod h1:6OSugUz07QF1WwrMmRNIMhgiq+drVMIZ98UTu5LVZP8=
 github.com/portainer/liblicense v0.0.0-20201125042600-8f1698c6d659 h1:+gLOMoESDIYS1hhx0ojL30AZQXvkLIpPW3e2KqLvx4Q=
 github.com/portainer/liblicense v0.0.0-20201125042600-8f1698c6d659/go.mod h1:6OSugUz07QF1WwrMmRNIMhgiq+drVMIZ98UTu5LVZP8=
-github.com/portainer/liblicense v0.0.0-20201201195053-bce2ea562e09 h1:tvXv0Xra6stNlNgBRDBZn6QE0TNopVdChG3m5ZpUhHE=
-github.com/portainer/liblicense v0.0.0-20201201195053-bce2ea562e09/go.mod h1:6OSugUz07QF1WwrMmRNIMhgiq+drVMIZ98UTu5LVZP8=
 github.com/portainer/liblicense v0.0.0-20201126042846-52dc041ff608 h1:dUopH6M5DiKcwrLAFepFNu0cIcdNsQiPmxvN/exq1lI=
 github.com/portainer/liblicense v0.0.0-20201126042846-52dc041ff608/go.mod h1:6OSugUz07QF1WwrMmRNIMhgiq+drVMIZ98UTu5LVZP8=
 github.com/portainer/liblicense v0.0.0-20201126202730-993637c8fcdb h1:okSNfGVGHid1lb24BUvwEXaLC7yPRylXpQSOxhWPjuc=
@@ -375,6 +373,10 @@ github.com/portainer/liblicense v0.0.0-20201126203842-8f714c4c2e90 h1:S/xrLrvIgY
 github.com/portainer/liblicense v0.0.0-20201126203842-8f714c4c2e90/go.mod h1:6OSugUz07QF1WwrMmRNIMhgiq+drVMIZ98UTu5LVZP8=
 github.com/portainer/liblicense v0.0.0-20201126214556-0dbbe130fb4c h1:mAViXJoJLCLdGR6m2J+uuPnOkqnxTLr/V1cTxI49Scg=
 github.com/portainer/liblicense v0.0.0-20201126214556-0dbbe130fb4c/go.mod h1:6OSugUz07QF1WwrMmRNIMhgiq+drVMIZ98UTu5LVZP8=
+github.com/portainer/liblicense v0.0.0-20201201195053-bce2ea562e09 h1:tvXv0Xra6stNlNgBRDBZn6QE0TNopVdChG3m5ZpUhHE=
+github.com/portainer/liblicense v0.0.0-20201201195053-bce2ea562e09/go.mod h1:6OSugUz07QF1WwrMmRNIMhgiq+drVMIZ98UTu5LVZP8=
+github.com/portainer/liblicense v0.0.0-20201202013603-cc746081ef18 h1:EdVoQ4FlhFBt+bCgFN9Wn9JqnP8B9k8wqR9xPJGebdc=
+github.com/portainer/liblicense v0.0.0-20201202013603-cc746081ef18/go.mod h1:6OSugUz07QF1WwrMmRNIMhgiq+drVMIZ98UTu5LVZP8=
 github.com/pquerna/cachecontrol v0.0.0-20171018203845-0dec1b30a021/go.mod h1:prYjPmNq4d1NPVmpShWobRqXY3q7Vp+80DqgxxUrUIA=
 github.com/pquerna/cachecontrol v0.0.0-20171018203845-0dec1b30a021/go.mod h1:prYjPmNq4d1NPVmpShWobRqXY3q7Vp+80DqgxxUrUIA=
 github.com/prometheus/client_golang v0.9.1/go.mod h1:7SWBe2y4D6OKWSNQJUaRYU/AaXPKyh/dDVn+NZz0KFw=
