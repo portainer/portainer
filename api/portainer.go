@@ -827,6 +827,7 @@ type (
 	AuthEventHandler interface {
 		HandleUsersAuthUpdate()
 		HandleUserAuthDelete(userID int)
+		HandleEndpointAuthUpdate(endpointID int)
 	}
 
 	// CLIService represents a service for managing CLI

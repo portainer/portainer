@@ -16,7 +16,9 @@ import (
 
 type resourcePoolUpdatePayload struct {
 	UsersToAdd     []int
+	TeamsToAdd     []int
 	UsersToRemove  []int
+	TeamsToRemove  []int
 }
 
 func (payload *resourcePoolUpdatePayload) Validate(r *http.Request) error {
@@ -113,6 +115,11 @@ func (handler *Handler) endpointPoolsAccessUpdate(w http.ResponseWriter, r *http
 				}
 			}
 		}
+	}
+
+	if (payload.TeamsToAdd != nil && len(payload.TeamsToAdd) > 0) || 
+		(payload.TeamsToRemove != nil && len(payload.TeamsToRemove) > 0) {
+		handler.AuthorizationService.TriggerEndpointAuthUpdate(endpointID)
 	}
 
 	if len(errs) > 0 {

@@ -110,9 +110,17 @@ class KubernetesResourcePoolAccessController {
       this.state.actionInProgress = true;
       const newAccesses = _.concat(this.authorizedUsersAndTeams, this.formValues.multiselectOutput);
       const accessConfigMap = KubernetesConfigMapHelper.modifiyNamespaceAccesses(angular.copy(this.accessConfigMap), this.pool.Namespace.Name, newAccesses);
-      const usersToAdd = _.map(this.formValues.multiselectOutput || [], (user) => user.Id);
+      const usersToAdd = [],
+        teamsToAdd = [];
+      for (const item of this.formValues.multiselectOutput || []) {
+        if (item.Type === 'user') {
+          usersToAdd.push(item.Id);
+        } else if (item.Type === 'team') {
+          teamsToAdd.push(item.Id);
+        }
+      }
       await this.KubernetesConfigMapService.update(accessConfigMap);
-      await this.EndpointService.updatePoolAccess(this.endpointId, this.pool.Namespace.Name, usersToAdd, []);
+      await this.EndpointService.updatePoolAccess(this.endpointId, this.pool.Namespace.Name, usersToAdd, teamsToAdd, [], []);
       this.Notifications.success('Access successfully created');
       this.$state.reload();
     } catch (err) {
@@ -132,9 +140,17 @@ class KubernetesResourcePoolAccessController {
       this.state.actionInProgress = true;
       const newAccesses = _.without(this.authorizedUsersAndTeams, ...selectedItems);
       const accessConfigMap = KubernetesConfigMapHelper.modifiyNamespaceAccesses(angular.copy(this.accessConfigMap), this.pool.Namespace.Name, newAccesses);
-      const usersToRemove = _.map(selectedItems || [], (user) => user.Id);
+      const usersToRemove = [],
+        teamsToRemove = [];
+      for (const item of selectedItems || []) {
+        if (item.Type === 'user') {
+          usersToRemove.push(item.Id);
+        } else if (item.Type === 'team') {
+          teamsToRemove.push(item.Id);
+        }
+      }
       await this.KubernetesConfigMapService.update(accessConfigMap);
-      await this.EndpointService.updatePoolAccess(this.endpointId, this.pool.Namespace.Name, [], usersToRemove);
+      await this.EndpointService.updatePoolAccess(this.endpointId, this.pool.Namespace.Name, [], [], usersToRemove, teamsToRemove);
       this.Notifications.success('Access successfully removed');
       this.$state.reload();
     } catch (err) {

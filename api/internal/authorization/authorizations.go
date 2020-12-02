@@ -437,6 +437,14 @@ func (service *Service) RegisterEventHandler(id string, handler portainer.AuthEv
 	service.authEventHandlers[id] = handler
 }
 
+// TriggerEndpointAuthUpdate triggers endpoint auth update event on the registered
+// event handlers (e.g. token cache manager)
+func (service *Service) TriggerEndpointAuthUpdate(endpointID int) {
+	for _, handler := range service.authEventHandlers {
+		handler.HandleEndpointAuthUpdate(endpointID)
+	}
+}
+
 // TriggerUserAuthUpdate triggers all users auth update event on the registered
 // event handlers (e.g. token cache manager)
 func (service *Service) TriggerUsersAuthUpdate() {
@@ -1063,6 +1071,9 @@ func getUserNamespaceRoles(
 	restrictDefaultNamespace bool,
 ) (map[string]portainer.Role, error) {
 	rolesMap := make(map[int]portainer.Role)
+	for _, role := range roles {
+		rolesMap[int(role.ID)] = role
+	}
 	results := make(map[string]portainer.Role)
 
 	for namespace, info := range namespaces {

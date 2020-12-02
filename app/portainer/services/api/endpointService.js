@@ -145,8 +145,19 @@ angular.module('portainer.app').factory('EndpointService', [
       return deferred.promise;
     };
 
-    service.updatePoolAccess = function (endpointID, resourcePool, usersToAdd, usersToRemove) {
-      return Endpoints.updatePoolAccess({ id: endpointID, rpn: resourcePool }, { UsersToAdd: usersToAdd, UsersToRemove: usersToRemove }).$promise;
+    service.updatePoolAccess = function (endpointID, resourcePool, usersToAdd, teamsToAdd, usersToRemove, teamsToRemove) {
+      return Endpoints.updatePoolAccess(
+        {
+          id: endpointID,
+          rpn: resourcePool,
+        },
+        {
+          UsersToAdd: usersToAdd,
+          TeamsToAdd: teamsToAdd,
+          UsersToRemove: usersToRemove,
+          teamsToRemove: teamsToRemove,
+        }
+      ).$promise;
     };
 
     return service;

@@ -42,6 +42,14 @@ func (manager *TokenCacheManager) RemoveUserFromCache(userID int) {
 	}
 }
 
+// remove all tokens in an endpoint
+func (manager *TokenCacheManager) HandleEndpointAuthUpdate(endpointID int) {
+	key := strconv.Itoa(endpointID)
+	if epCache, ok := manager.tokenCaches.Get(key); ok {
+		epCache.(*tokenCache).userTokenCache = cmap.New()
+	}
+}
+
 // remove all user's token when all users' auth are updated
 func (manager *TokenCacheManager) HandleUsersAuthUpdate() {
 	for cache := range manager.tokenCaches.IterBuffered() {
