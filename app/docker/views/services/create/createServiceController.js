@@ -523,9 +523,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
     $scope.volumesAreValid = volumesAreValid;
     function volumesAreValid() {
       const volumes = $scope.formValues.Volumes;
-      return volumes.every((volume) => {
-        volume.Target && volume.Source;
-      });
+      return volumes.every((volume) => volume.Target && volume.Source);
     }
 
     $scope.create = function createService() {
