@@ -456,7 +456,7 @@ function isTransitionRequiresAuthentication(transition) {
 }
 
 /* @ngInject */
-function run($transitions, UserService, Authentication, LicenseService, EndpointService, Notifications) {
+function run($transitions, UserService, Authentication, LicenseService, EndpointService, Notifications, $timeout) {
   $transitions.onBefore({ to: 'portainer.init.*' }, async function (transition) {
     const to = transition.to();
     const stateService = transition.router.stateService;
@@ -498,20 +498,23 @@ function run($transitions, UserService, Authentication, LicenseService, Endpoint
     }
   });
 
-  $transitions.onBefore({ to: (state) => !state.name.startsWith('portainer.init') && !UNAUTHENTICATED_ROUTES.includes(state.name) }, async function (transition) {
+  $transitions.onBefore({ to: (state) => !state.name.startsWith('portainer.init') && !UNAUTHENTICATED_ROUTES.includes(state.name) }, function (transition) {
     const stateService = transition.router.stateService;
 
-    // Move the license check out of current JS event so that it does NOT block the transition, but still navigates to license page if license is invalid
-    setTimeout(async () => {
+    async function licenseCheckAsync() {
       try {
         const licenseInfo = await LicenseService.info();
         if (!licenseInfo.valid) {
-          stateService.go('portainer.init.license');
+          $timeout(() => {
+            stateService.go('portainer.init.license');
+          }, 100);
         }
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to retrieve license info');
         throw err;
       }
-    }, 100);
+    }
+
+    licenseCheckAsync();
   });
 }
