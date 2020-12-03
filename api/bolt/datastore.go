@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/boltdb/bolt"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/customtemplate"
 	"github.com/portainer/portainer/api/bolt/dockerhub"
 	"github.com/portainer/portainer/api/bolt/edgegroup"
@@ -69,6 +69,14 @@ type Store struct {
 	WebhookService          *webhook.Service
 }
 
+func (store *Store) edition() portainer.SoftwareEdition {
+	edition, err := store.VersionService.Edition()
+	if err == errors.ErrObjectNotFound {
+		edition = portainer.PortainerCE
+	}
+	return edition
+}
+
 // NewStore initializes a new Store and the associated services
 func NewStore(storePath string, fileService portainer.FileService) (*Store, error) {
 	store := &Store{
@@ -114,6 +122,14 @@ func (store *Store) Close() error {
 // existing data.
 func (store *Store) IsNew() bool {
 	return store.isNew
+}
+
+// CheckCurrentEdition checks if current edition is community edition
+func (store *Store) CheckCurrentEdition() error {
+	if store.edition() != portainer.PortainerCE {
+		return errors.ErrWrongDBEdition
+	}
+	return nil
 }
 
 // MigrateData automatically migrate the data based on the DBVersion.

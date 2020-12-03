@@ -375,6 +375,10 @@ func main() {
 	dataStore := initDataStore(*flags.Data, fileService)
 	defer dataStore.Close()
 
+	if err := dataStore.CheckCurrentEdition(); err != nil {
+		log.Fatal(err)
+	}
+
 	jwtService, err := initJWTService(dataStore)
 	if err != nil {
 		log.Fatal(err)
