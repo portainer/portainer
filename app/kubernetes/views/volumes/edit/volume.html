@@ -40,7 +40,7 @@
                     <tr>
                       <td>Shared Access Policy</td>
                       <td
-                        >{{ ctrl.volume.PersistentVolumeClaim.StorageClass.AccessModes[0] }}
+                        >{{ ctrl.state.volumeSharedAccessPolicy }}
                         <portainer-tooltip position="bottom" message="{{ ctrl.state.volumeSharedAccessPolicyTooltip }}"></portainer-tooltip
                       ></td>
                     </tr>

@@ -180,6 +180,7 @@ class KubernetesVolumeController {
       volumeSize: 0,
       volumeSizeUnit: 'GB',
       volumeSizeError: false,
+      volumeSharedAccessPolicy: '',
       volumeSharedAccessPolicyTooltip: '',
     };
 
@@ -189,11 +190,11 @@ class KubernetesVolumeController {
       await this.getVolume();
       await this.getEvents();
 
-      let volumeSharedAccessPolicy = this.volume.PersistentVolumeClaim.StorageClass.AccessModes[0];
+      this.state.volumeSharedAccessPolicy = this.volume.PersistentVolumeClaim.StorageClass.AccessModes[this.volume.PersistentVolumeClaim.StorageClass.AccessModes.length - 1];
       let policies = KubernetesStorageClassAccessPolicies();
 
       policies.forEach((policy) => {
-        if (policy.Name == volumeSharedAccessPolicy) {
+        if (policy.Name == this.state.volumeSharedAccessPolicy) {
           this.state.volumeSharedAccessPolicyTooltip = policy.Description;
         }
       });
