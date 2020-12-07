@@ -3,7 +3,11 @@ import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import { KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resource-quota/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
-import { KubernetesResourcePoolFormValues, KubernetesResourcePoolIngressClassAnnotationFormValue, KubernetesResourcePoolIngressClassHostFormValue } from 'Kubernetes/models/resource-pool/formValues';
+import {
+  KubernetesResourcePoolFormValues,
+  KubernetesResourcePoolIngressClassAnnotationFormValue,
+  KubernetesResourcePoolIngressClassHostFormValue,
+} from 'Kubernetes/models/resource-pool/formValues';
 import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import { KubernetesFormValidationReferences } from 'Kubernetes/models/application/formValues';
@@ -35,10 +39,11 @@ class KubernetesCreateResourcePoolController {
   onChangeIngressHostname() {
     const state = this.state.duplicates.ingressHosts;
 
-    const hosts = _.map(this.formValues.IngressClasses, 'Hosts');
-    const allHosts = _.map(this.allIngresses, 'Host');
-    const duplicates = KubernetesFormValidationHelper.getDuplicates(hosts);
-    _.forEach(hosts, (host, idx) => {
+    const hosts = _.flatMap(this.formValues.IngressClasses, 'Hosts');
+    const hostnames = _.map(hosts, 'Host');
+    const allHosts = _.flatMap(this.allIngresses, 'Hosts');
+    const duplicates = KubernetesFormValidationHelper.getDuplicates(hostnames);
+    _.forEach(hostnames, (host, idx) => {
       if (_.includes(allHosts, host) && host !== undefined) {
         duplicates[idx] = host;
       }

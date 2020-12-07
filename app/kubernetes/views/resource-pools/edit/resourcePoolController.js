@@ -69,11 +69,12 @@ class KubernetesResourcePoolController {
   onChangeIngressHostname() {
     const state = this.state.duplicates.ingressHosts;
 
-    const hosts = _.map(this.formValues.IngressClasses, 'Host');
+    const hosts = _.flatMap(this.formValues.IngressClasses, 'Hosts');
+    const hostnames = _.map(hosts, 'Host');
     const otherIngresses = _.without(this.allIngresses, ...this.ingresses);
-    const allHosts = _.map(otherIngresses, 'Host');
-    const duplicates = KubernetesFormValidationHelper.getDuplicates(hosts);
-    _.forEach(hosts, (host, idx) => {
+    const allHosts = _.flatMap(otherIngresses, 'Hosts');
+    const duplicates = KubernetesFormValidationHelper.getDuplicates(hostnames);
+    _.forEach(hostnames, (host, idx) => {
       if (_.includes(allHosts, host) && host !== undefined) {
         duplicates[idx] = host;
       }

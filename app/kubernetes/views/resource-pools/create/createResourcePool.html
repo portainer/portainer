@@ -242,8 +242,16 @@
                     <div ng-repeat="item in ic.Hosts track by $index" style="margin-top: 2px;">
                       <div class="form-inline">
                         <div class="col-sm-10 input-group input-group-sm">
-                          <span class="input-group-addon">Key</span>
-                          <input type="text" class="form-control" name="hostname_{{ $index }}" ng-model="item.Host" ng-change="onChangeIngressHostname()" placeholder="foo" required />
+                          <span class="input-group-addon">Hostname</span>
+                          <input
+                            type="text"
+                            class="form-control"
+                            name="hostname_{{ $index }}"
+                            ng-model="item.Host"
+                            ng-change="ctrl.onChangeIngressHostname()"
+                            placeholder="foo"
+                            required
+                          />
                         </div>
                         <div class="col-sm-1 input-group input-group-sm" ng-if="$index > 0">
                           <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeHostname(ic, $index)">
@@ -254,12 +262,14 @@
                       <div
                         class="small text-warning"
                         style="margin-top: 5px;"
-                        ng-show="
-                        resourcePoolCreationForm['hostname_' + $index].$invalid || ctrl.state.duplicates.ingressHosts.refs[$index] !== undefined"
+                        ng-show="resourcePoolCreationForm['hostname_' + $index].$invalid || ctrl.state.duplicates.ingressHosts.refs[$index] !== undefined"
                       >
                         <ng-messages for="resourcePoolCreationForm['hostname_' + $index].$error">
                           <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Hostname is required.</p>
                         </ng-messages>
+                        <p ng-if="ctrl.state.duplicates.ingressHosts.refs[$index] !== undefined">
+                          <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This hostname is already used.
+                        </p>
                       </div>
                     </div>
                   </div>
