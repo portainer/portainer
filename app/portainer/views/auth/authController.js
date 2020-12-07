@@ -40,6 +40,8 @@ class AuthenticationController {
       Password: '',
     };
     this.state = {
+      showOAuthLogin: false,
+      showStandardLogin: false,
       AuthenticationError: '',
       loginInProgress: true,
       OAuthProvider: '',
@@ -222,12 +224,17 @@ class AuthenticationController {
     }
   }
 
+  toggleStandardLogin() {
+    this.state.showStandardLogin = !this.state.showStandardLogin;
+  }
+
   async onInit() {
     try {
       const settings = await this.SettingsService.publicSettings();
-      this.AuthenticationMethod = settings.AuthenticationMethod;
-      this.state.OAuthProvider = this.determineOauthProvider(settings.OAuthLoginURI);
+      this.state.showOAuthLogin = settings.AuthenticationMethod === 3;
+      this.state.showStandardLogin = !this.state.showOAuthLogin;
       this.state.OAuthLoginURI = settings.OAuthLoginURI;
+      this.state.OAuthProvider = this.determineOauthProvider(settings.OAuthLoginURI);
 
       const code = this.URLHelper.getParameter('code');
       const state = this.URLHelper.getParameter('state');
