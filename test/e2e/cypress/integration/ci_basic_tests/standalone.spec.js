@@ -1,4 +1,4 @@
-context('Resting of minimum viable functionality against docker standalone', () => {
+context('Testing of minimum viable functionality against docker standalone', () => {
   before(() => {
     cy.visit('/');
   });

@@ -35,6 +35,54 @@ module.exports = function (plop) {
       },
     ], // array of actions
   });
+
+  plop.setGenerator('rbacTest', {
+    prompts: [
+      {
+        type: 'list',
+        name: 'testType',
+        message: 'Select the test type to run:',
+        choices: ['Basic', 'Full'],
+      },
+      {
+        type: 'list',
+        name: 'platform',
+        message: 'Select the platform the test will be run against:',
+        choices: ['Docker Swarm', 'Docker Standalone', 'Kubernetes'],
+      },
+      {
+        type: 'list',
+        name: 'connectionType',
+        message: 'Select the connection used to access the environment:',
+        choices: ['Local', 'Agent', 'Edge Agent'],
+      },
+      {
+        type: 'list',
+        name: 'resource',
+        message: 'Select the resource the test will be run against:',
+        choices: ['Endpoint', 'Endpoint Group'],
+      },
+      {
+        type: 'list',
+        name: 'authType',
+        message: 'Select the authentication type the test will be run with:',
+        choices: ['Internal', 'OAuth'],
+      },
+      {
+        type: 'list',
+        name: 'role',
+        message: 'Select the RBAC role the test will be run with:',
+        choices: ['Endpoint administrator', 'Helpdesk', 'Standard user', 'Read-only user'],
+      },
+    ], // array of inquirer prompts
+    actions: [
+      {
+        type: 'add',
+        path: `{{cwd}}/{{dashCase platform}}/{{dashCase connectionType}}-{{dashCase resource}}/{{camelCase role}}{{properCase authType}}.spec.js`,
+        templateFile: './plop-templates/rbacTest.spec.js.hbs',
+      },
+    ], // array of actions
+  });
 };
 
 function getCurrentPortainerModule(cwd) {

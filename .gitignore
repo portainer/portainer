@@ -8,3 +8,5 @@ api/cmd/portainer/portainer*
 **/.vscode/tasks.json
 
 .eslintcache
+.idea
+test/e2e/cypress/screenshots
