@@ -14,6 +14,7 @@ const _KubernetesNode = Object.freeze({
   Api: false,
   Taints: [],
   Port: 0,
+  Availability: '',
 });
 
 export class KubernetesNode {
@@ -57,6 +58,12 @@ export class KubernetesNodeTaint {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesNodeTaint)));
   }
 }
+
+export const KubernetesNodeAvailabilities = Object.freeze({
+  ACTIVE: 'Active',
+  PAUSE: 'Pause',
+  DRAIN: 'Drain',
+});
 
 export const KubernetesNodeTaintEffects = Object.freeze({
   NOSCHEDULE: 'NoSchedule',

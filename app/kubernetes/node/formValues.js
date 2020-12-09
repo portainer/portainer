@@ -1,6 +1,7 @@
 const _KubernetesNodeFormValues = Object.freeze({
   Taints: [],
   Labels: [],
+  Availability: '',
 });
 
 export class KubernetesNodeFormValues {

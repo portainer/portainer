@@ -52,6 +52,18 @@
                         </span>
                       </td>
                     </tr>
+                    <tr>
+                      <td>Availability</td>
+                      <td>
+                        <select
+                          class="form-control"
+                          name="availability"
+                          style="width: 16rem;"
+                          ng-model="ctrl.formValues.Availability"
+                          ng-options="availability for availability in ctrl.availabilities"
+                        ></select>
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
 

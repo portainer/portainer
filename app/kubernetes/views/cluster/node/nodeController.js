@@ -5,7 +5,7 @@ import { KubernetesResourceReservation } from 'Kubernetes/models/resource-reserv
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import KubernetesNodeConverter from 'Kubernetes/node/converter';
 import { KubernetesNodeLabelFormValues, KubernetesNodeTaintFormValues } from 'Kubernetes/node/formValues';
-import { KubernetesNodeTaintEffects } from 'Kubernetes/node/models';
+import { KubernetesNodeTaintEffects, KubernetesNodeAvailabilities } from 'Kubernetes/node/models';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import { KubernetesNodeHelper } from 'Kubernetes/node/helper';
 
@@ -41,6 +41,7 @@ class KubernetesNodeController {
     this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
     this.getEndpointsAsync = this.getEndpointsAsync.bind(this);
     this.updateNodeAsync = this.updateNodeAsync.bind(this);
+    this.drainNodeAsync = this.drainNodeAsync.bind(this);
   }
 
   selectTab(index) {
@@ -152,6 +153,44 @@ class KubernetesNodeController {
 
   /* #endregion */
 
+  /* #region cordon */
+
+  computeCordonWarning() {
+    return this.formValues.Availability === this.availabilities.PAUSE;
+  }
+
+  /* #endregion */
+
+  /* #region drain */
+
+  async drainNodeAsync() {
+    const pods = _.flatten(_.map(this.applications, (app) => app.Pods));
+    let actionCount = pods.length;
+    for (const pod of pods) {
+      try {
+        await this.KubernetesPodService.eviction(pod);
+        this.Notifications.success('Pod successfully evicted', pod.Name);
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to evict pod');
+      } finally {
+        --actionCount;
+        if (actionCount === 0) {
+          this.$state.reload();
+        }
+      }
+    }
+  }
+
+  drainNode() {
+    return this.$async(this.drainNodeAsync);
+  }
+
+  computeDrainWarning() {
+    return this.formValues.Availability === this.availabilities.DRAIN;
+  }
+
+  /* #endregion */
+
   /* #region actions */
 
   isNoChangesMade() {
@@ -197,6 +236,9 @@ class KubernetesNodeController {
   async updateNodeAsync() {
     try {
       await this.KubernetesNodeService.patch(this.node, this.formValues);
+      if (this.node.Availability !== 'Drain' && this.formValues.Availability === 'Drain') {
+        this.drainNode();
+      }
       this.Notifications.success('Node updated successfully');
       this.$state.reload();
     } catch (err) {
@@ -207,6 +249,8 @@ class KubernetesNodeController {
   updateNode() {
     const taintsWarning = this.computeTaintsWarning();
     const labelsWarning = this.computeLabelsWarning();
+    const cordonWarning = this.computeCordonWarning();
+    const drainWarning = this.computeDrainWarning();
 
     if (taintsWarning && !labelsWarning) {
       this.ModalService.confirmUpdate(
@@ -229,6 +273,24 @@ class KubernetesNodeController {
     } else if (taintsWarning && labelsWarning) {
       this.ModalService.confirmUpdate(
         'Changes to taints will immediately deschedule applications running on this node without the corresponding tolerations.<br/></br/>Removing or changing a label that is used might prevent applications from scheduling on this node in the future.\n\nDo you wish to continue?',
+        (confirmed) => {
+          if (confirmed) {
+            return this.$async(this.updateNodeAsync);
+          }
+        }
+      );
+    } else if (cordonWarning) {
+      this.ModalService.confirmUpdate(
+        'Marking this node as unschedulable will effectively cordon the node and prevent any new workload from being scheduled on that node. Are you sure?',
+        (confirmed) => {
+          if (confirmed) {
+            return this.$async(this.updateNodeAsync);
+          }
+        }
+      );
+    } else if (drainWarning) {
+      this.ModalService.confirmUpdate(
+        'Draining this node will cause all workloads to be evicted from that node. This might lead to some service interruption. Are you sure?',
         (confirmed) => {
           if (confirmed) {
             return this.$async(this.updateNodeAsync);
@@ -329,6 +391,8 @@ class KubernetesNodeController {
       duplicateLabelKeys: [],
       hasDuplicateLabelKeys: false,
     };
+
+    this.availabilities = KubernetesNodeAvailabilities;
 
     this.state.activeTab = this.LocalStorage.getActiveTab('node');
 
