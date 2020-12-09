@@ -610,6 +610,10 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       $scope.formValues.NodeName = nodeName;
       HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
 
+      $scope.isAdmin = Authentication.isAdmin();
+      $scope.showDeviceMapping = await shouldShowDevices();
+      $scope.areContainerCapabilitiesEnabled = await checkIfContainerCapabilitiesEnabled();
+
       Volume.query(
         {},
         function (d) {
@@ -645,7 +649,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
             loadFromContainerSpec();
           } else {
             $scope.fromContainer = {};
-            $scope.formValues.capabilities = new ContainerCapabilities();
+            $scope.formValues.capabilities = $scope.areContainerCapabilitiesEnabled ? new ContainerCapabilities() : [];
           }
         },
         function (e) {
@@ -682,9 +686,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       PluginService.loggingPlugins(apiVersion < 1.25).then(function success(loggingDrivers) {
         $scope.availableLoggingDrivers = loggingDrivers;
       });
-
-      $scope.isAdmin = Authentication.isAdmin();
-      $scope.showDeviceMapping = await shouldShowDevices();
     }
 
     function validateForm(accessControlData, isAdmin) {
@@ -897,17 +898,26 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       }
     }
 
-    async function shouldShowDevices() {
-      const isAdmin = !$scope.applicationState.application.authentication || Authentication.isAdmin();
-      const { allowDeviceMappingForRegularUsers } = $scope.applicationState.application;
-
-      if (isAdmin || allowDeviceMappingForRegularUsers) {
+    async function isAdminOrEndpointAdmin() {
+      const isAdmin = Authentication.isAdmin();
+      if (isAdmin) {
         return true;
       }
+
       const rbacEnabled = await ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC);
-      if (rbacEnabled) {
-        return Authentication.hasAuthorizations(['EndpointResourcesAccess']);
-      }
+      return rbacEnabled ? Authentication.hasAuthorizations(['EndpointResourcesAccess']) : false;
+    }
+
+    async function shouldShowDevices() {
+      const { allowDeviceMappingForRegularUsers } = $scope.applicationState.application;
+
+      return allowDeviceMappingForRegularUsers || isAdminOrEndpointAdmin();
+    }
+
+    async function checkIfContainerCapabilitiesEnabled() {
+      const { allowContainerCapabilitiesForRegularUsers } = $scope.applicationState.application;
+
+      return allowContainerCapabilitiesForRegularUsers || isAdminOrEndpointAdmin();
     }
 
     initView();

@@ -159,6 +159,8 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 			Privileged bool          `json:"Privileged"`
 			PidMode    string        `json:"PidMode"`
 			Devices    []interface{} `json:"Devices"`
+			CapAdd     []string      `json:"CapAdd"`
+			CapDrop    []string      `json:"CapDrop"`
 		} `json:"HostConfig"`
 	}
 
@@ -197,7 +199,8 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 
 		if !settings.AllowPrivilegedModeForRegularUsers ||
 			!settings.AllowHostNamespaceForRegularUsers ||
-			!settings.AllowDeviceMappingForRegularUsers {
+			!settings.AllowDeviceMappingForRegularUsers ||
+			!settings.AllowContainerCapabilitiesForRegularUsers {
 
 			body, err := ioutil.ReadAll(request.Body)
 			if err != nil {
@@ -210,16 +213,20 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 				return nil, err
 			}
 
-			if partialContainer.HostConfig.Privileged {
+			if !settings.AllowPrivilegedModeForRegularUsers && partialContainer.HostConfig.Privileged {
 				return forbiddenResponse, errors.New("forbidden to use privileged mode")
 			}
 
-			if partialContainer.HostConfig.PidMode == "host" {
+			if !settings.AllowHostNamespaceForRegularUsers && partialContainer.HostConfig.PidMode == "host" {
 				return forbiddenResponse, errors.New("forbidden to use pid host namespace")
 			}
 
-			if len(partialContainer.HostConfig.Devices) > 0 {
+			if !settings.AllowDeviceMappingForRegularUsers && len(partialContainer.HostConfig.Devices) > 0 {
 				return nil, errors.New("forbidden to use device mapping")
+			}
+
+			if !settings.AllowContainerCapabilitiesForRegularUsers && (len(partialContainer.HostConfig.CapAdd) > 0 || len(partialContainer.HostConfig.CapDrop) > 0) {
+				return nil, errors.New("forbidden to use container capabilities")
 			}
 
 			request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
