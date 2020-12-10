@@ -146,7 +146,7 @@ class KubernetesApplicationController {
 
   showEditor() {
     this.state.showEditorTab = true;
-    this.selectTab(2);
+    this.selectTab(3);
   }
 
   isSystemNamespace() {
