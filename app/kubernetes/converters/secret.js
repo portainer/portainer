@@ -18,6 +18,7 @@ class KubernetesSecretConverter {
     const res = new KubernetesSecretUpdatePayload();
     res.metadata.name = secret.Name;
     res.metadata.namespace = secret.Namespace;
+    res.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] = secret.ConfigurationOwner;
     res.stringData = secret.Data;
     return res;
   }
