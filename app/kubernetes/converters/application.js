@@ -118,7 +118,7 @@ class KubernetesApplicationConverter {
       res.PublishedPorts = ports;
     }
 
-    if (data.spec.templates) {
+    if (data.spec.template) {
       res.Volumes = data.spec.template.spec.volumes ? data.spec.template.spec.volumes : [];
     } else {
       res.Volumes = data.spec.volumes;
