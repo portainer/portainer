@@ -3,12 +3,13 @@ import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelpe
 
 class KubernetesConfigurationsController {
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesConfigurationService, KubernetesApplicationService) {
+  constructor($async, $state, Notifications, KubernetesConfigurationService, KubernetesApplicationService, ModalService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
     this.KubernetesConfigurationService = KubernetesConfigurationService;
     this.KubernetesApplicationService = KubernetesApplicationService;
+    this.ModalService = ModalService;
 
     this.onInit = this.onInit.bind(this);
     this.getConfigurations = this.getConfigurations.bind(this);
@@ -56,7 +57,11 @@ class KubernetesConfigurationsController {
   }
 
   removeAction(selectedItems) {
-    return this.$async(this.removeActionAsync, selectedItems);
+    this.ModalService.confirmDeletion('Do you want to remove the selected configuration(s)?', (confirmed) => {
+      if (confirmed) {
+        return this.$async(this.removeActionAsync, selectedItems);
+      }
+    });
   }
 
   async getApplicationsAsync() {
