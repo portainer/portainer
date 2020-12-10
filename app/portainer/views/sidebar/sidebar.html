@@ -127,7 +127,11 @@
         </div>
       </li>
       <li class="sidebar-list" ng-if="isAdmin">
-        <a ui-sref="portainer.endpoints" ui-sref-active="active">Endpoints <span class="menu-icon fa fa-plug fa-fw"></span></a>
+        <a
+          ui-sref="portainer.endpoints"
+          ng-class="{ active: $state.current.name.includes('portainer.endpoints') && $state.current.name !== 'portainer.endpoints.endpoint.kubernetesConfig' }"
+          >Endpoints <span class="menu-icon fa fa-plug fa-fw"></span
+        ></a>
         <div
           class="sidebar-sublist"
           ng-if="
@@ -136,7 +140,6 @@
               $state.current.name === 'portainer.endpoints.endpoint' ||
               $state.current.name === 'portainer.endpoints.new' ||
               $state.current.name === 'portainer.endpoints.endpoint.access' ||
-              $state.current.name === 'portainer.endpoints.endpoint.kubernetesConfig' ||
               $state.current.name === 'portainer.groups' ||
               $state.current.name === 'portainer.groups.group' ||
               $state.current.name === 'portainer.groups.group.access' ||
@@ -154,7 +157,6 @@
               $state.current.name === 'portainer.endpoints.endpoint' ||
               $state.current.name === 'portainer.endpoints.new' ||
               $state.current.name === 'portainer.endpoints.endpoint.access' ||
-              $state.current.name === 'portainer.endpoints.endpoint.kubernetesConfig' ||
               $state.current.name === 'portainer.groups' ||
               $state.current.name === 'portainer.groups.group' ||
               $state.current.name === 'portainer.groups.group.access' ||
