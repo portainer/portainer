@@ -29,6 +29,7 @@ angular
       kubernetesEndpoint: false,
       agentEndpoint: false,
       edgeEndpoint: false,
+      platformType: 'linux',
       allowCreate: Authentication.isAdmin(),
       availableEdgeAgentCheckinOptions: [
         { key: 'Use default interval', value: 0 },
@@ -55,21 +56,37 @@ angular
     };
 
     $scope.copyEdgeAgentDeploymentCommand = function () {
-      if ($scope.state.deploymentTab === 2) {
+      if ($scope.state.deploymentTab === 2 && $scope.state.platformType === 'linux') {
         clipboard.copyText(
-          'docker run -d -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker/volumes:/var/lib/docker/volumes -v /:/host --restart always -e EDGE=1 -e EDGE_ID=' +
+          'docker run -d -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker/volumes:/var/lib/docker/volumes -v /:/host -v portainer_agent_data:/data --restart always -e EDGE=1 -e EDGE_ID=' +
             $scope.randomEdgeID +
             ' -e EDGE_KEY=' +
             $scope.endpoint.EdgeKey +
-            ' -e CAP_HOST_MANAGEMENT=1 -v portainer_agent_data:/data --name portainer_edge_agent portainer/agent'
+            ' -e CAP_HOST_MANAGEMENT=1 --name portainer_edge_agent portainer/agent'
         );
-      } else if ($scope.state.deploymentTab === 1) {
+      } else if ($scope.state.deploymentTab === 2 && $scope.state.platformType === 'windows') {
+        clipboard.copyText(
+          'docker run -d --mount type=npipe,src=\\\\.\\pipe\\docker_engine,dst=\\\\.\\pipe\\docker_engine --mount type=bind,src=C:\\ProgramData\\docker\\volumes,dst=C:\\ProgramData\\docker\\volumes --mount type=volume,src=portainer_agent_data,dst=C:\\data -e EDGE=1 -e EDGE_ID=' +
+            $scope.randomEdgeID +
+            ' -e EDGE_KEY=' +
+            $scope.endpoint.EdgeKey +
+            ' -e CAP_HOST_MANAGEMENT=1 --name portainer_edge_agent portainer/agent'
+        );
+      } else if ($scope.state.deploymentTab === 1 && $scope.state.platformType === 'linux') {
         clipboard.copyText(
           'docker network create --driver overlay portainer_agent_network; docker service create --name portainer_edge_agent --network portainer_agent_network -e AGENT_CLUSTER_ADDR=tasks.portainer_edge_agent -e EDGE=1 -e EDGE_ID=' +
             $scope.randomEdgeID +
             ' -e EDGE_KEY=' +
             $scope.endpoint.EdgeKey +
             " -e CAP_HOST_MANAGEMENT=1 --mode global --constraint 'node.platform.os == linux' --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volumes --mount type=bind,src=//,dst=/host --mount type=volume,src=portainer_agent_data,dst=/data portainer/agent"
+        );
+      } else if ($scope.state.deploymentTab === 1 && $scope.state.platformType === 'windows') {
+        clipboard.copyText(
+          'docker network create --driver overlay portainer_edge_agent_network && docker service create --name portainer_edge_agent --network portainer_edge_agent_network -e AGENT_CLUSTER_ADDR=tasks.portainer_edge_agent -e EDGE=1 -e EDGE_ID=' +
+            $scope.randomEdgeID +
+            ' -e EDGE_KEY=' +
+            $scope.endpoint.EdgeKey +
+            ' -e CAP_HOST_MANAGEMENT=1 --mode global --constraint node.platform.os==windows --mount type=npipe,src=\\\\.\\pipe\\docker_engine,dst=\\\\.\\pipe\\docker_engine --mount type=bind,src=C:\\ProgramData\\docker\\volumes,dst=C:\\ProgramData\\docker\\volumes --mount type=volume,src=portainer_agent_data,dst=C:\\data portainer/agent'
         );
       } else {
         clipboard.copyText('curl https://downloads.portainer.io/portainer-edge-agent-setup.sh | bash -s -- ' + $scope.randomEdgeID + ' ' + $scope.endpoint.EdgeKey);
@@ -206,8 +223,10 @@ angular
             $scope.edgeKeyDetails = decodeEdgeKey(endpoint.EdgeKey);
             $scope.randomEdgeID = uuidv4();
             $scope.dockerCommands = {
-              standalone: buildStandaloneCommand($scope.randomEdgeID, endpoint.EdgeKey),
-              swarm: buildSwarmCommand($scope.randomEdgeID, endpoint.EdgeKey),
+              linuxStandalone: buildLinuxStandaloneCommand($scope.randomEdgeID, endpoint.EdgeKey),
+              windowsStandalone: buildWindowsStandaloneCommand($scope.randomEdgeID, endpoint.EdgeKey),
+              linuxSwarm: buildLinuxSwarmCommand($scope.randomEdgeID, endpoint.EdgeKey),
+              windowsSwarm: buildWindowsSwarmCommand($scope.randomEdgeID, endpoint.EdgeKey),
             };
 
             const settings = data.settings;
@@ -223,21 +242,36 @@ angular
         });
     }
 
-    function buildStandaloneCommand(edgeId, edgeKey) {
-      return `docker run -d -v /var/run/docker.sock:/var/run/docker.sock \\
+    function buildLinuxStandaloneCommand(edgeId, edgeKey) {
+      return `docker run -d \\
+  -v /var/run/docker.sock:/var/run/docker.sock \\
   -v /var/lib/docker/volumes:/var/lib/docker/volumes \\
   -v /:/host \\
+  -v portainer_agent_data:/data \\
   --restart always \\
   -e EDGE=1 \\
   -e EDGE_ID=${edgeId} \\
   -e EDGE_KEY=${edgeKey} \\
   -e CAP_HOST_MANAGEMENT=1 \\
-  -v portainer_agent_data:/data \\
+  --name portainer_edge_agent \\localhost
+  portainer/agent`;
+    }
+
+    function buildWindowsStandaloneCommand(edgeId, edgeKey) {
+      return `docker run -d \\
+  --mount type=npipe,src=\\\\.\\pipe\\docker_engine,dst=\\\\.\\pipe\\docker_engine \\
+  --mount type=bind,src=C:\\ProgramData\\docker\\volumes,dst=C:\\ProgramData\\docker\\volumes \\
+  --mount type=volume,src=portainer_agent_data,dst=C:\\data \\
+  --restart always \\
+  -e EDGE=1 \\
+  -e EDGE_ID=${edgeId} \\
+  -e EDGE_KEY=${edgeKey} \\
+  -e CAP_HOST_MANAGEMENT=1 \\
   --name portainer_edge_agent \\
   portainer/agent`;
     }
 
-    function buildSwarmCommand(edgeId, edgeKey) {
+    function buildLinuxSwarmCommand(edgeId, edgeKey) {
       return `docker network create \\
   --driver overlay \\
   portainer_agent_network;
@@ -256,6 +290,26 @@ docker service create \\
   --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volumes \\
   --mount type=bind,src=//,dst=/host \\
   --mount type=volume,src=portainer_agent_data,dst=/data \\
+  portainer/agent`;
+    }
+
+    function buildWindowsSwarmCommand(edgeId, edgeKey) {
+      return `docker network create \\
+  --driver overlay \\
+  portainer_edge_agent_network && \\
+docker service create \\
+  --name portainer_edge_agent \\
+  --network portainer_edge_agent_network \\
+  -e AGENT_CLUSTER_ADDR=tasks.portainer_edge_agent \\
+  -e EDGE=1 \\
+  -e EDGE_ID=${edgeId} \\
+  -e EDGE_KEY=${edgeKey} \\
+  -e CAP_HOST_MANAGEMENT=1 \\
+  --mode global \\
+  --constraint node.platform.os==windows \\
+  --mount type=npipe,src=\\\\.\\pipe\\docker_engine,dst=\\\\.\\pipe\\docker_engine \\
+  --mount type=bind,src=C:\\ProgramData\\docker\\volumes,dst=C:\\ProgramData\\docker\\volumes \\
+  --mount type=volume,src=portainer_agent_data,dst=C:\\data \\
   portainer/agent`;
     }
 
