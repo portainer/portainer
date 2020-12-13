@@ -74,23 +74,32 @@
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
                 Ensure that you have deployed the Portainer agent in your cluster first. Refer to the platform related command below to deploy it.
+                <div class="input-group input-group-sm" style="margin-top: 10px; margin-bottom: 10px;">
+                  <div class="btn-group btn-group-sm">
+                    <label class="btn btn-primary" ng-model="state.PlatformType" uib-btn-radio="'linux'"><i class="fab fa-linux" style="margin-right: 2px;"></i> Linux</label>
+                    <label class="btn btn-primary" ng-model="state.PlatformType" uib-btn-radio="'windows'"><i class="fab fa-windows" style="margin-right: 2px;"></i> Windows</label>
+                  </div>
+                </div>
                 <div style="margin-top: 10px;">
                   <uib-tabset active="state.deploymentTab">
-                    <uib-tab index="0" heading="Kubernetes via load balancer">
+                    <uib-tab index="0" ng-if="state.PlatformType === 'linux'" heading="Kubernetes via load balancer">
                       <code style="display: block; white-space: pre-wrap; padding: 16px 90px;"
                         >curl -L https://downloads.portainer.io/portainer-agent-k8s-lb.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml</code
                       >
                     </uib-tab>
 
-                    <uib-tab index="1" heading="Kubernetes via node port">
+                    <uib-tab index="1" ng-if="state.PlatformType === 'linux'" heading="Kubernetes via node port">
                       <code style="display: block; white-space: pre-wrap; padding: 16px 90px;"
                         >curl -L https://downloads.portainer.io/portainer-agent-k8s-nodeport.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml</code
                       >
                     </uib-tab>
 
                     <uib-tab index="2" heading="Docker Swarm">
-                      <code style="display: block; white-space: pre-wrap; padding: 16px 90px;"
+                      <code ng-if="state.PlatformType === 'linux'" style="display: block; white-space: pre-wrap; padding: 16px 90px;"
                         >curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent</code
+                      >
+                      <code ng-if="state.PlatformType === 'windows'" style="display: block; white-space: pre-wrap; padding: 16px 90px;"
+                        >curl -L https://downloads.portainer.io/agent-stack-windows.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack-windows.yml portainer-agent</code
                       >
                     </uib-tab>
                   </uib-tabset>
