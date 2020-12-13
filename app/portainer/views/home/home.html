@@ -30,6 +30,17 @@
   <i class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
 </div>
 
+<information-panel ng-if="isAdmin && endpoints.length === 0" title-text="Information">
+  <span class="small text-muted">
+    <p>
+      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      No environment available for management. Please head over the
+      <a ui-sref="portainer.endpoints.new"> endpoints view </a>
+      to add an endpoint.
+    </p>
+  </span>
+</information-panel>
+
 <div class="row" ng-if="!state.connectingToEdgeEndpoint">
   <div class="col-sm-12">
     <endpoint-list

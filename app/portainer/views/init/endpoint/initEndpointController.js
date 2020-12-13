@@ -65,6 +65,10 @@ class InitEndpointController {
     }
   }
 
+  skipEndpointCreation() {
+    this.$state.go('portainer.home');
+  }
+
   /**
    * DOCKER_LOCAL (1)
    */
