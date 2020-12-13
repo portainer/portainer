@@ -488,12 +488,6 @@ class KubernetesCreateApplicationController {
     return _.uniq(storageOptions).join(', ');
   }
 
-  enforceReplicaCountMinimum() {
-    if (this.formValues.ReplicaCount === null) {
-      this.formValues.ReplicaCount = 1;
-    }
-  }
-
   resourceQuotaCapacityExceeded() {
     return !this.state.sliders.memory.max || !this.state.sliders.cpu.max;
   }
