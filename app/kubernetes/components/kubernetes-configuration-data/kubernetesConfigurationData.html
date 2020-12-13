@@ -6,10 +6,10 @@
   <div class="form-group">
     <div class="col-sm-12">
       <p>
-        <a class="small interactive" ng-if="$ctrl.formValues.IsSimple" ng-click="$ctrl.formValues.IsSimple = false">
+        <a class="small interactive" ng-if="$ctrl.formValues.IsSimple" ng-click="$ctrl.showAdvancedMode()">
           <i class="fa fa-list-ol space-right" aria-hidden="true"></i> Advanced mode
         </a>
-        <a class="small interactive" ng-if="!$ctrl.formValues.IsSimple" ng-click="$ctrl.formValues.IsSimple = true">
+        <a class="small interactive" ng-if="!$ctrl.formValues.IsSimple" ng-click="$ctrl.showSimpleMode()">
           <i class="fa fa-edit space-right" aria-hidden="true"></i> Simple mode
         </a>
       </p>

@@ -2,6 +2,7 @@ import angular from 'angular';
 import _ from 'lodash-es';
 import { KubernetesConfigurationFormValuesDataEntry } from 'Kubernetes/models/configuration/formvalues';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
+import YAML from 'yaml';
 
 class KubernetesConfigurationDataController {
   /* @ngInject */
@@ -12,6 +13,8 @@ class KubernetesConfigurationDataController {
     this.editorUpdateAsync = this.editorUpdateAsync.bind(this);
     this.onFileLoad = this.onFileLoad.bind(this);
     this.onFileLoadAsync = this.onFileLoadAsync.bind(this);
+    this.showSimpleMode = this.showSimpleMode.bind(this);
+    this.showAdvancedMode = this.showAdvancedMode.bind(this);
   }
 
   onChangeKey() {
@@ -55,6 +58,31 @@ class KubernetesConfigurationDataController {
       temporaryFileReader.onload = this.onFileLoad;
       temporaryFileReader.readAsText(file);
     }
+  }
+
+  showSimpleMode() {
+    this.formValues.IsSimple = true;
+    YAML.defaultOptions.customTags = ['binary'];
+    const data = YAML.parse(this.formValues.DataYaml);
+    this.formValues.Data = _.map(data, (value, key) => {
+      const entry = new KubernetesConfigurationFormValuesDataEntry();
+      entry.Key = key;
+      entry.Value = value;
+      return entry;
+    });
+  }
+
+  showAdvancedMode() {
+    this.formValues.IsSimple = false;
+    const data = _.reduce(
+      this.formValues.Data,
+      (acc, entry) => {
+        acc[entry.Key] = entry.Value;
+        return acc;
+      },
+      {}
+    );
+    this.formValues.DataYaml = YAML.stringify(data);
   }
 
   $onInit() {
