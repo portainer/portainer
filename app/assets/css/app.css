@@ -927,11 +927,6 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   z-index: 2;
 }
 
-h1 {
-  overflow: hidden;
-  text-align: center;
-}
-
 .striketext:before,
 .striketext:after {
   background-color: #777777;
