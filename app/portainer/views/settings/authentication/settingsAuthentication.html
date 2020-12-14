@@ -366,6 +366,57 @@
             <!-- !group-search-settings -->
           </div>
 
+          <div ng-if="isOauthEnabled()">
+            <div class="col-sm-12 form-section-title">
+              Provider
+            </div>
+            <div class="form-group"></div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <div class="boxselector_wrapper">
+                <div data-toggle="tooltip" title="This feature is available in Portainer Business Edition" style="color: #767676;">
+                  <input type="radio" id="microsoft" disabled />
+                  <label for="microsoft" style="cursor: pointer; border-color: #767676;">
+                    <div class="boxselector_header">
+                      <i class="fab fa-microsoft" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Microsoft
+                    </div>
+                    <p>Microsoft OAuth provider</p>
+                  </label>
+                </div>
+                <div data-toggle="tooltip" title="This feature is available in Portainer Business Edition" style="color: #767676;">
+                  <input type="radio" id="google" disabled />
+                  <label for="google" style="cursor: pointer; border-color: #767676;">
+                    <div class="boxselector_header">
+                      <i class="fab fa-google" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Google
+                    </div>
+                    <p>Google OAuth provider</p>
+                  </label>
+                </div>
+                <div data-toggle="tooltip" title="This feature is available in Portainer Business Edition" style="color: #767676;">
+                  <input type="radio" id="registry_auth" disabled />
+                  <label for="Github" style="cursor: pointer; border-color: #767676;">
+                    <div class="boxselector_header">
+                      <i class="fab fa-github" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Github
+                    </div>
+                    <p>Github OAuth provider</p>
+                  </label>
+                </div>
+                <div>
+                  <input type="radio" id="custom" ng-model="settings.AuthenticationMethod" ng-value="3" />
+                  <label for="custom">
+                    <div class="boxselector_header">
+                      <i class="fa fa-user-check" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Custom
+                    </div>
+                    <p>Custom OAuth provider</p>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <oauth-settings ng-if="isOauthEnabled()" settings="OAuthSettings" teams="teams"></oauth-settings>
 
           <!-- actions -->
