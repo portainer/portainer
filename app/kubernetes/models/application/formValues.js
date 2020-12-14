@@ -35,6 +35,7 @@ export class KubernetesApplicationFormValues {
 }
 
 export const KubernetesApplicationConfigurationFormValueOverridenKeyTypes = Object.freeze({
+  NONE: 0,
   ENVIRONMENT: 1,
   FILESYSTEM: 2,
 });
