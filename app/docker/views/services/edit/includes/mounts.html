@@ -42,12 +42,14 @@
               <input
                 type="text"
                 class="form-control"
+                name=""
                 ng-model="mount.Source"
                 placeholder="e.g. /tmp/portainer/data"
                 ng-change="updateMount(service, mount)"
                 ng-disabled="isUpdating || (!isAdmin && !allowBindMounts && mount.Type === 'bind')"
                 ng-if="mount.Type === 'bind'"
               />
+              <div class="col-sm-12 small text-warning" ng-show="!mount.Source"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Source is required. </div>
             </td>
             <td>
               <input
@@ -59,6 +61,7 @@
                 ng-disabled="isUpdating"
                 disable-authorization="DockerServiceUpdate"
               />
+              <div class="col-sm-12 small text-warning" ng-show="!mount.Target"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Target is required. </div>
             </td>
             <td authorization="DockerServiceUpdate">
               <input type="checkbox" class="form-control" ng-model="mount.ReadOnly" ng-change="updateMount(service, mount)" ng-disabled="isUpdating" />
@@ -77,7 +80,9 @@
     <rd-widget-footer authorization="DockerServiceUpdate">
       <div class="btn-toolbar" role="toolbar">
         <div class="btn-group" role="group">
-          <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['ServiceMounts'])" ng-click="updateService(service)">Apply changes</button>
+          <button type="button" class="btn btn-primary btn-sm" ng-disabled="!mountsAreValid() || !hasChanges(service, ['ServiceMounts'])" ng-click="updateService(service)">
+            Apply changes
+          </button>
           <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="caret"></span>
           </button>
