@@ -1042,3 +1042,7 @@ json-tree .branch-preview {
   background-color: #337ab7;
 }
 /* !spinkit override */
+
+.w-full {
+  width: 100%;
+}
