@@ -96,7 +96,7 @@ class KubernetesApplicationStatsController {
             NumProcs: '',
             isWindows: false,
             PreviousCPUTotalUsage: 0,
-            CPUUsage: (cpu / this.nodeCPU) * 100,
+            CPUUsage: cpu / 10 / this.nodeCPU,
             CPUCores: 0,
           };
         }
@@ -126,6 +126,7 @@ class KubernetesApplicationStatsController {
 
     try {
       const podsMetrics = await this.KubernetesMetricsService.getPod(this.state.transition.namespace);
+      await this.KubernetesMetricsService.get();
       if (podsMetrics.items.length) {
         const pods = await this.KubernetesPodService.get(this.state.transition.namespace);
         const pod = _.find(pods, { Name: this.state.transition.podName });
@@ -146,6 +147,7 @@ class KubernetesApplicationStatsController {
         this.state.getMetrics = false;
       }
     } catch (err) {
+      this.state.getMetrics = false;
       this.Notifications.error('Failure', err, 'Unable to retrieve application stats');
     } finally {
       this.state.viewReady = true;
