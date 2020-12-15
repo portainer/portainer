@@ -96,7 +96,7 @@ class KubernetesApplicationStatsController {
             NumProcs: '',
             isWindows: false,
             PreviousCPUTotalUsage: 0,
-            CPUUsage: cpu / 10 / this.nodeCPU,
+            CPUUsage: (cpu / this.nodeCPU) * 100,
             CPUCores: 0,
           };
         }
