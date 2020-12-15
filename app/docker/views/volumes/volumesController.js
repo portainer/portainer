@@ -9,26 +9,31 @@ angular.module('portainer.docker').controller('VolumesController', [
   'HttpRequestHelper',
   'EndpointProvider',
   'Authentication',
-  function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notifications, HttpRequestHelper, EndpointProvider, Authentication) {
+  'ModalService',
+  function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notifications, HttpRequestHelper, EndpointProvider, Authentication, ModalService) {
     $scope.removeAction = function (selectedItems) {
-      var actionCount = selectedItems.length;
-      angular.forEach(selectedItems, function (volume) {
-        HttpRequestHelper.setPortainerAgentTargetHeader(volume.NodeName);
-        VolumeService.remove(volume)
-          .then(function success() {
-            Notifications.success('Volume successfully removed', volume.Id);
-            var index = $scope.volumes.indexOf(volume);
-            $scope.volumes.splice(index, 1);
-          })
-          .catch(function error(err) {
-            Notifications.error('Failure', err, 'Unable to remove volume');
-          })
-          .finally(function final() {
-            --actionCount;
-            if (actionCount === 0) {
-              $state.reload();
-            }
+      ModalService.confirmDeletion('Do you want to remove the selected volume(s)?', (confirmed) => {
+        if (confirmed) {
+          var actionCount = selectedItems.length;
+          angular.forEach(selectedItems, function (volume) {
+            HttpRequestHelper.setPortainerAgentTargetHeader(volume.NodeName);
+            VolumeService.remove(volume)
+              .then(function success() {
+                Notifications.success('Volume successfully removed', volume.Id);
+                var index = $scope.volumes.indexOf(volume);
+                $scope.volumes.splice(index, 1);
+              })
+              .catch(function error(err) {
+                Notifications.error('Failure', err, 'Unable to remove volume');
+              })
+              .finally(function final() {
+                --actionCount;
+                if (actionCount === 0) {
+                  $state.reload();
+                }
+              });
           });
+        }
       });
     };
 
