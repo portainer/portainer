@@ -14,6 +14,7 @@
                 ng-model="service.HealthCheck.Test[1]"
                 ng-change="updateServiceAttribute(service, 'HealthCheck.Test[1]')"
                 disable-authorization="DockerServiceUpdate"
+                placeholder="curl --fail http://localhost:80/ || exit 1"
               />
             </td>
           </tr>
@@ -27,6 +28,7 @@
                 ng-change="updateServiceAttribute(service, 'HealthCheck.Interval')"
                 ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i"
                 disable-authorization="DockerServiceUpdate"
+                placeholder="30s"
               />
             </td>
             <td>
@@ -44,11 +46,12 @@
                 ng-model="service.HealthCheck.Timeout"
                 ng-change="updateServiceAttribute(service, 'HealthCheck.Timeout')"
                 disable-authorization="DockerServiceUpdate"
+                placeholder="30s"
               />
             </td>
             <td>
               <p class="small text-muted" style="margin-top: 10px;">
-                Duration that Docker awaits for your health check command to return an exit code before declaring it as faimed.
+                Duration that Docker awaits for your health check command to return an exit code before declaring it as failed.
               </p>
             </td>
           </tr>
@@ -62,6 +65,7 @@
                 ng-change="updateServiceAttribute(service, 'HealthCheck.StartPeriod')"
                 ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i"
                 disable-authorization="DockerServiceUpdate"
+                placeholder="0s"
               />
             </td>
             <td>
@@ -79,6 +83,7 @@
                 ng-model="service.HealthCheck.Retries"
                 ng-change="updateServiceAttribute(service, 'HealthCheck.Retries')"
                 disable-authorization="DockerServiceUpdate"
+                placeholder="3"
               />
             </td>
             <td>

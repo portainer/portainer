@@ -163,24 +163,26 @@ angular.module('portainer.docker').factory('ServiceHelper', [
     function translateHumanDurationToNanos(humanDuration) {
       var nanos;
       var regex = /^([0-9]+)(h|m|s|ms|us|ns)$/i;
-      var matches = humanDuration.match(regex);
+      if (humanDuration) {
+        var matches = humanDuration.match(regex);
 
-      if (matches !== null && matches.length === 3) {
-        var duration = parseInt(matches[1], 10);
-        var unit = matches[2];
-        // Moment.js cannot use micro or nanoseconds
-        switch (unit) {
-          case 'ns':
-            nanos = duration;
-            break;
-          case 'us':
-            nanos = duration * 1000;
-            break;
-          default:
-            nanos = moment.duration(duration, unit).asMilliseconds() * 1000000;
+        if (matches !== null && matches.length === 3) {
+          var duration = parseInt(matches[1], 10);
+          var unit = matches[2];
+          // Moment.js cannot use micro or nanoseconds
+          switch (unit) {
+            case 'ns':
+              nanos = duration;
+              break;
+            case 'us':
+              nanos = duration * 1000;
+              break;
+            default:
+              nanos = moment.duration(duration, unit).asMilliseconds() * 1000000;
+          }
         }
+        return nanos;
       }
-      return nanos;
     }
 
     // Convert nanoseconds to the higher unit possible

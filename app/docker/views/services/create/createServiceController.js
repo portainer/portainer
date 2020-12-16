@@ -103,7 +103,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
       Interval: '',
       Timeout: '',
       StartPeriod: '',
-      Retries: 0,
+      Retries: 3,
     };
 
     $scope.state = {
