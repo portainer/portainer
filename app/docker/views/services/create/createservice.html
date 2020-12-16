@@ -20,7 +20,20 @@
             Image configuration
           </div>
           <!-- image-and-registry -->
-          <por-image-registry model="formValues.RegistryModel" auto-complete="true" label-class="col-sm-1" input-class="col-sm-11"></por-image-registry>
+          <por-image-registry
+            model="formValues.RegistryModel"
+            auto-complete="true"
+            label-class="col-sm-1"
+            input-class="col-sm-11"
+            endpoint="endpoint"
+            is-admin="isAdmin"
+            check-rate-limits="true"
+            set-validity="setPullImageValidity"
+          >
+            <por-image-registry-rate-limit-exceeded>
+              The service might stay in a pending state for an unknown amount of time.
+            </por-image-registry-rate-limit-exceeded>
+          </por-image-registry>
           <!-- !image-and-registry -->
           <div class="col-sm-12 form-section-title">
             Scheduling

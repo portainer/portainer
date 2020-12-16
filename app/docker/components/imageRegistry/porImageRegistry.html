@@ -105,10 +105,12 @@
     <div ng-if="$ctrl.pullRateLimits.remaining <= 0" class="text-warning">
       <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
       <span ng-if="$ctrl.model.Registry.Authentication">
-        Your authorized pull count quota as a free user is now exceeded. You will not be able to pull any image from the DockerHub registry.
+        Your authorized pull count quota as a free user is now exceeded.
+        <span ng-transclude="rateLimitExceeded">You will not be able to pull any image from the DockerHub registry.</span>
       </span>
       <span ng-if="!$ctrl.model.Registry.Authentication">
-        Your authorized pull count quota as an anonymous user is now exceeded. You will not be able to pull any image from the DockerHub registry.
+        Your authorized pull count quota as an anonymous user is now exceeded.
+        <span ng-transclude="rateLimitExceeded">You will not be able to pull any image from the DockerHub registry.</span>
       </span>
     </div>
   </div>

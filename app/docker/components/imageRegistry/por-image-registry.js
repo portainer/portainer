@@ -10,11 +10,13 @@ angular.module('portainer.docker').component('porImageRegistry', {
     endpoint: '<',
     isAdmin: '<',
     checkRateLimits: '<',
-
     onImageChange: '&',
     setValidity: '<',
   },
   require: {
     form: '^form',
+  },
+  transclude: {
+    rateLimitExceeded: '?porImageRegistryRateLimitExceeded',
   },
 });
