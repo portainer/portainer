@@ -8,24 +8,23 @@ class KubernetesMetricsService {
     this.$async = $async;
     this.KubernetesMetrics = KubernetesMetrics;
 
-    this.getAsync = this.getAsync.bind(this);
+    this.capabilitiesAsync = this.capabilitiesAsync.bind(this);
     this.getPodAsync = this.getPodAsync.bind(this);
   }
 
   /**
    * GET
    */
-  async getAsync() {
+  async capabilitiesAsync(endpointID) {
     try {
-      const data = await this.KubernetesMetrics().capabilities().$promise;
-      return data;
+      await this.KubernetesMetrics().capabilities({ endpointId: endpointID }).$promise;
     } catch (err) {
       throw new PortainerError('Unable to retrieve metrics', err);
     }
   }
 
-  get() {
-    return this.$async(this.getAsync);
+  capabilities(endpointID) {
+    return this.$async(this.capabilitiesAsync, endpointID);
   }
 
   /**

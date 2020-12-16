@@ -168,7 +168,7 @@ class KubernetesConfigureController {
     if (this.formValues.UseServerMetrics) {
       this.state.metrics.userClick = true;
       this.state.metrics.pending = true;
-      this.KubernetesMetricsService.get()
+      this.KubernetesMetricsService.capabilities(this.endpoint.Id)
         .then(() => {
           this.state.metrics.isServerRunning = true;
           this.state.metrics.pending = false;

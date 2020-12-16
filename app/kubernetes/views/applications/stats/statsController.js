@@ -126,7 +126,6 @@ class KubernetesApplicationStatsController {
 
     try {
       const podsMetrics = await this.KubernetesMetricsService.getPod(this.state.transition.namespace);
-      await this.KubernetesMetricsService.get();
       if (podsMetrics.items.length) {
         const pods = await this.KubernetesPodService.get(this.state.transition.namespace);
         const pod = _.find(pods, { Name: this.state.transition.podName });
