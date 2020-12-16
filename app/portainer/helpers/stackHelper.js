@@ -5,31 +5,31 @@ angular.module('portainer.app').factory('StackHelper', [
     'use strict';
     var helper = {};
 
-    helper.getExternalStackNamesFromContainers = function (containers) {
-      var stackNames = [];
+    helper.getExternalStacksFromContainers = function (containers) {
+      var stacks = [];
 
       for (var i = 0; i < containers.length; i++) {
         var container = containers[i];
         if (!container.Labels || !container.Labels['com.docker.compose.project']) continue;
         var stackName = container.Labels['com.docker.compose.project'];
-        stackNames.push(stackName);
+        stacks.push({ stackName, creationDate: container.Created });
       }
 
-      return _.uniq(stackNames);
+      return _.uniq(stacks);
     };
 
-    helper.getExternalStackNamesFromServices = function (services) {
-      var stackNames = [];
+    helper.getExternalStacksFromServices = function (services) {
+      var stacks = [];
 
       for (var i = 0; i < services.length; i++) {
         var service = services[i];
         if (!service.Labels || !service.Labels['com.docker.stack.namespace']) continue;
 
         var stackName = service.Labels['com.docker.stack.namespace'];
-        stackNames.push(stackName);
+        stacks.push({ stackName, creationDate: service.Created });
       }
 
-      return _.uniq(stackNames);
+      return _.uniq(stacks);
     };
 
     return helper;
