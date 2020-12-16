@@ -2,9 +2,9 @@ import _ from 'lodash-es';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
 angular.module('portainer.docker').controller('ImagesController', [
-  'Authentication',
   '$scope',
   '$state',
+  'Authentication',
   'ImageService',
   'Notifications',
   'ModalService',
