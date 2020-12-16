@@ -5,7 +5,8 @@ angular.module('portainer.app').factory('DockerHubService', [
   'DockerHub',
   'Endpoints',
   'AgentDockerhub',
-  function DockerHubServiceFactory($q, DockerHub, Endpoints, AgentDockerhub) {
+  'EndpointHelper',
+  function DockerHubServiceFactory($q, DockerHub, Endpoints, AgentDockerhub, EndpointHelper) {
     'use strict';
     var service = {};
 
@@ -30,18 +31,15 @@ angular.module('portainer.app').factory('DockerHubService', [
 
     service.checkRateLimits = checkRateLimits;
     function checkRateLimits(endpoint) {
+      if (EndpointHelper.isLocalEndpoint(endpoint)) {
+        return Endpoints.dockerhubLimits({ id: endpoint.Id }).$promise;
+      }
+
       switch (endpoint.Type) {
-        case 1: // DockerEnvironment
-          if (endpoint.URL.includes('unix://') || endpoint.URL.includes('npipe://')) {
-            return Endpoints.dockerhubLimits({ id: endpoint.Id }).$promise;
-          }
-          // query remote endpoint
-          return;
         case 2: //AgentOnDockerEnvironment
         case 4: //EdgeAgentOnDockerEnvironment
           return AgentDockerhub.limits({ endpointId: endpoint.Id, endpointType: 'docker' }).$promise;
-        case 5: //KubernetesLocalEnvironment
-          return Endpoints.dockerhubLimits({ id: endpoint.Id }).$promise;
+
         case 6: //AgentOnKubernetesEnvironment
         case 7: //EdgeAgentOnKubernetesEnvironment
           return AgentDockerhub.limits({ endpointId: endpoint.Id, endpointType: 'kubernetes' }).$promise;

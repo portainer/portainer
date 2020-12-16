@@ -5,12 +5,13 @@ import { RegistryTypes } from '@/portainer/models/registryTypes';
 
 class porImageRegistryController {
   /* @ngInject */
-  constructor($async, $scope, ImageHelper, RegistryService, DockerHubService, ImageService, Notifications) {
+  constructor($async, $scope, ImageHelper, RegistryService, DockerHubService, EndpointHelper, ImageService, Notifications) {
     this.$async = $async;
     this.$scope = $scope;
     this.ImageHelper = ImageHelper;
     this.RegistryService = RegistryService;
     this.DockerHubService = DockerHubService;
+    this.EndpointHelper = EndpointHelper;
     this.ImageService = ImageService;
     this.Notifications = Notifications;
 
@@ -54,16 +55,22 @@ class porImageRegistryController {
 
   async onRegistryChange() {
     this.prepareAutocomplete();
-    this.pullRateLimits = null;
     if (this.model.Registry.Type === RegistryTypes.GITLAB && this.model.Image) {
       this.model.Image = _.replace(this.model.Image, this.model.Registry.Gitlab.ProjectPath, '');
     }
 
-    if (this.isDockerhubRegistry()) {
-      this.pullRateLimits = await this.DockerHubService.checkRateLimits(this.endpoint);
-      this.setValidity(this.pullRateLimits.remaining >= 0);
-    } else {
-      this.setValidity(true);
+    if (this.checkRateLimits) {
+      this.pullRateLimits = null;
+      if (this.isDockerhubRegistry() && (this.EndpointHelper.isAgentEndpoint(this.endpoint) || this.EndpointHelper.isLocalEndpoint(this.endpoint))) {
+        try {
+          this.pullRateLimits = await this.DockerHubService.checkRateLimits(this.endpoint);
+          this.setValidity(this.pullRateLimits.remaining >= 0);
+        } catch (e) {
+          this.Notifications.error('Failed loading dockerhub pull rate limits', e);
+        }
+      } else {
+        this.setValidity(true);
+      }
     }
   }
 
