@@ -2,6 +2,7 @@ import _ from 'lodash-es';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
 angular.module('portainer.docker').controller('ImagesController', [
+  'Authentication',
   '$scope',
   '$state',
   'ImageService',
@@ -12,8 +13,9 @@ angular.module('portainer.docker').controller('ImagesController', [
   'Blob',
   'EndpointProvider',
   'endpoint',
-  function ($scope, $state, ImageService, Notifications, ModalService, HttpRequestHelper, FileSaver, Blob, EndpointProvider, endpoint) {
+  function ($scope, $state, Authentication, ImageService, Notifications, ModalService, HttpRequestHelper, FileSaver, Blob, EndpointProvider, endpoint) {
     $scope.endpoint = endpoint;
+    $scope.isAdmin = Authentication.isAdmin();
 
     $scope.state = {
       actionInProgress: false,
