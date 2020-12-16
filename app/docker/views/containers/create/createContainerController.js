@@ -58,6 +58,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     endpoint
   ) {
     $scope.create = create;
+    $scope.endpoint = endpoint;
 
     $scope.formValues = {
       alwaysPull: true,
@@ -90,6 +91,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       formValidationError: '',
       actionInProgress: false,
       mode: '',
+      pullImageValidity: false,
     };
 
     $scope.refreshSlider = function () {
@@ -102,6 +104,14 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       $scope.formValues.CmdMode = 'default';
       $scope.formValues.EntrypointMode = 'default';
     };
+
+    $scope.setPullImageValidity = setPullImageValidity;
+    function setPullImageValidity(validity) {
+      if (!validity) {
+        $scope.formValues.alwaysPull = false;
+      }
+      $scope.state.pullImageValidity = validity;
+    }
 
     $scope.config = {
       Image: '',

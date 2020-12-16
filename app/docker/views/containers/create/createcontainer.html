@@ -31,10 +31,10 @@
           </div>
           <div ng-if="!formValues.RegistryModel.Registry && fromContainer">
             <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true"></i>
-            <span class="small text-danger" style="margin-left: 5px;"
-              >The Docker registry for the <code>{{ config.Image }}</code> image is not registered inside Portainer, you will not be able to create a container. Please register
-              that registry first.</span
-            >
+            <span class="small text-danger" style="margin-left: 5px;">
+              The Docker registry for the <code>{{ config.Image }}</code> image is not registered inside Portainer, you will not be able to create a container. Please register that
+              registry first.
+            </span>
           </div>
           <div ng-if="formValues.RegistryModel.Registry || !fromContainer">
             <!-- image-and-registry -->
@@ -45,7 +45,10 @@
               auto-complete="true"
               label-class="col-sm-1"
               input-class="col-sm-11"
+              endpoint="endpoint"
+              is-admin="isAdmin"
               on-image-change="onImageNameChange()"
+              set-validity="setPullImageValidity"
             ></por-image-registry>
             <!-- !image-and-registry -->
             <!-- always-pull -->
@@ -58,7 +61,7 @@
                     message="When enabled, Portainer will automatically try to pull the specified image before creating the container."
                   ></portainer-tooltip>
                 </label>
-                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.alwaysPull" /><i></i> </label>
+                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.alwaysPull" ng-disabled="!state.pullImageValidity" /><i></i> </label>
               </div>
             </div>
             <!-- !always-pull -->

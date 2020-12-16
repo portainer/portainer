@@ -48,10 +48,22 @@ class porImageRegistryController {
     this.availableImages = images;
   }
 
-  onRegistryChange() {
+  isDockerhubRegistry() {
+    return this.model.UseRegistry && this.model.Registry.Name === 'DockerHub';
+  }
+
+  async onRegistryChange() {
     this.prepareAutocomplete();
+    this.pullRateLimits = null;
     if (this.model.Registry.Type === RegistryTypes.GITLAB && this.model.Image) {
       this.model.Image = _.replace(this.model.Image, this.model.Registry.Gitlab.ProjectPath, '');
+    }
+
+    if (this.isDockerhubRegistry()) {
+      this.pullRateLimits = await this.DockerHubService.checkRateLimits(this.endpoint);
+      this.setValidity(this.pullRateLimits.remaining >= 0);
+    } else {
+      this.setValidity(true);
     }
   }
 
