@@ -71,6 +71,8 @@ class KubernetesApplicationService {
       apiService = this.KubernetesDaemonSetService;
     } else if (app instanceof KubernetesStatefulSet || (app instanceof KubernetesApplication && app.ApplicationType === KubernetesApplicationTypes.STATEFULSET)) {
       apiService = this.KubernetesStatefulSetService;
+    } else if (app instanceof KubernetesApplication && app.ApplicationType === KubernetesApplicationTypes.POD) {
+      apiService = this.KubernetesPodService;
     } else {
       throw new PortainerError('Unable to determine which association to use to retrieve API Service');
     }
