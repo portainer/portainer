@@ -4,7 +4,6 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
@@ -124,7 +123,6 @@ func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Sta
 	}
 
 	stack.Env = payload.Env
-	stack.UpdateDate = time.Now().Unix()
 
 	stackFolder := strconv.Itoa(int(stack.ID))
 	_, err = handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
@@ -153,7 +151,6 @@ func (handler *Handler) updateSwarmStack(r *http.Request, stack *portainer.Stack
 	}
 
 	stack.Env = payload.Env
-	stack.UpdateDate = time.Now().Unix()
 
 	stackFolder := strconv.Itoa(int(stack.ID))
 	_, err = handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
