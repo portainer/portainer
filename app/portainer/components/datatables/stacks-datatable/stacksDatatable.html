@@ -118,20 +118,6 @@
               </th>
               <th>Control</th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('ResourceControl.CreationDate')">
-                  Created
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.CreationDate' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.CreationDate' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
-              <th>
-                <a ng-click="$ctrl.changeOrderBy('ResourceControl.UpdateDate')">
-                  Updated
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.UpdateDate' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.UpdateDate' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
-              <th>
                 <a ng-click="$ctrl.changeOrderBy('ResourceControl.Ownership')">
                   Ownership
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && !$ctrl.state.reverseOrder"></i>
@@ -169,14 +155,6 @@
                 <span ng-if="!item.External">Total</span>
               </td>
               <td>
-                <span ng-if="item.CreationDate">{{ item.CreationDate | getisodatefromtimestamp }}</span>
-                <span ng-if="!item.CreationDate"> - </span>
-              </td>
-              <td>
-                <span ng-if="item.UpdateDate">{{ item.UpdateDate | getisodatefromtimestamp }}</span>
-                <span ng-if="!item.UpdateDate"> - </span>
-              </td>
-              <td>
                 <span>
                   <i ng-class="item.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
                   {{ item.ResourceControl.Ownership ? item.ResourceControl.Ownership : item.ResourceControl.Ownership = $ctrl.RCO.ADMINISTRATORS }}
@@ -187,7 +165,7 @@
               <td colspan="4" class="text-center text-muted">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="6" class="text-center text-muted">No stack available.</td>
+              <td colspan="4" class="text-center text-muted">No stack available.</td>
             </tr>
           </tbody>
         </table>

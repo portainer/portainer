@@ -123,9 +123,9 @@ angular.module('portainer.app').factory('StackService', [
       ServiceService.services()
         .then(function success(data) {
           var services = data;
-          var stackDatas = StackHelper.getExternalStacksFromServices(services);
-          var stacks = stackDatas.map(function (stack) {
-            return new ExternalStackViewModel(stack.stackName, 1, stack.creationDate);
+          var stackNames = StackHelper.getExternalStackNamesFromServices(services);
+          var stacks = stackNames.map(function (name) {
+            return new ExternalStackViewModel(name, 1);
           });
           deferred.resolve(stacks);
         })
@@ -142,9 +142,9 @@ angular.module('portainer.app').factory('StackService', [
       ContainerService.containers(1)
         .then(function success(data) {
           var containers = data;
-          var stacksDatas = StackHelper.getExternalStacksFromContainers(containers);
-          var stacks = stacksDatas.map(function (stack) {
-            return new ExternalStackViewModel(stack.stackName, 2, stack.creationDate);
+          var stackNames = StackHelper.getExternalStackNamesFromContainers(containers);
+          var stacks = stackNames.map(function (name) {
+            return new ExternalStackViewModel(name, 2);
           });
           deferred.resolve(stacks);
         })

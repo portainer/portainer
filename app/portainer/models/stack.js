@@ -13,14 +13,11 @@ export function StackViewModel(data) {
   }
   this.External = false;
   this.Status = data.Status;
-  this.CreationDate = data.CreationDate;
-  this.UpdateDate = data.UpdateDate;
 }
 
-export function ExternalStackViewModel(name, type, creationDate) {
+export function ExternalStackViewModel(name, type) {
   this.Name = name;
   this.Type = type;
   this.External = true;
   this.Checked = false;
-  this.CreationDate = creationDate;
 }
