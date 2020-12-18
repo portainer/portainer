@@ -28,8 +28,19 @@ class KubernetesConfigMapService {
         this.KubernetesConfigMaps(namespace).get(params).$promise,
         this.KubernetesConfigMaps(namespace).getYaml(params).$promise,
       ]);
-      const configMap = KubernetesConfigMapConverter.apiToConfigMap(rawPromise.value, yamlPromise.value);
-      return configMap;
+
+      if (_.get(rawPromise, 'reason.status') == 404 && _.get(yamlPromise, 'reason.status') == 404) {
+        return KubernetesConfigMapConverter.defaultConfigMap(namespace, name);
+      }
+
+      // Currently, we keeps binary data in 'data' field of configMap. It causes getYaml() responses 500 error
+      // sometimes. Before we moving binary data from 'data' filed to 'binaryData' field of configMap, we just go
+      // without yaml (yamlPromise.value==undefined) as a workaround.
+      if (rawPromise.value) {
+        return KubernetesConfigMapConverter.apiToConfigMap(rawPromise.value, yamlPromise.value);
+      }
+
+      throw new PortainerError('Unable to retrieve config map ', name);
     } catch (err) {
       if (err.status === 404) {
         return KubernetesConfigMapConverter.defaultConfigMap(namespace, name);
