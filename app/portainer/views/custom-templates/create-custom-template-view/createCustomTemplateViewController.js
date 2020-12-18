@@ -75,7 +75,7 @@ class CreateCustomTemplateViewController {
       this.Notifications.success('Custom template successfully created');
       this.$state.go('docker.templates.custom');
     } catch (err) {
-      this.Notifications.error('Failure', err, 'A template with the same name already exists');
+      this.Notifications.error('Failure', err, 'A template with the same name already exists', this.Notifications.ApiTypes.DOCKER);
     } finally {
       this.state.actionInProgress = false;
     }
