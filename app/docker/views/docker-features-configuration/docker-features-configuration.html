@@ -11,6 +11,12 @@
           <div class="col-sm-12 form-section-title">
             Host and Filesystem
           </div>
+          <div ng-if="!$ctrl.isAgent" class="form-group">
+            <span class="col-sm-12 text-muted small">
+              <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              These features are only available for an Agent enabled endpoints.
+            </span>
+          </div>
           <div class="form-group">
             <div class="col-sm-12">
               <label for="toggle_enableHostManagementFeatures" class="control-label text-left">
@@ -18,7 +24,7 @@
                 <portainer-tooltip position="bottom" message="Enable host management features: host system browsing and advanced host details."></portainer-tooltip>
               </label>
               <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_enableHostManagementFeatures" ng-model="$ctrl.formValues.enableHostManagementFeatures" /><i></i>
+                <input type="checkbox" name="toggle_enableHostManagementFeatures" ng-model="$ctrl.formValues.enableHostManagementFeatures" ng-disabled="!$ctrl.isAgent" /><i></i>
               </label>
             </div>
           </div>
@@ -29,7 +35,12 @@
                 <portainer-tooltip position="bottom" message="When enabled, regular users will be able to use Portainer volume management features."></portainer-tooltip>
               </label>
               <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_allowVolumeBrowserForRegularUsers" ng-model="$ctrl.formValues.allowVolumeBrowserForRegularUsers" /><i></i>
+                <input
+                  type="checkbox"
+                  name="toggle_allowVolumeBrowserForRegularUsers"
+                  ng-model="$ctrl.formValues.allowVolumeBrowserForRegularUsers"
+                  ng-disabled="!$ctrl.isAgent"
+                /><i></i>
               </label>
             </div>
           </div>
@@ -104,6 +115,7 @@
 
           <div class="form-group" ng-if="isContainerEditDisabled()">
             <span class="col-sm-12 text-muted small">
+              <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
               Note: The recreate/duplicate/edit feature is currently disabled (for non-admin users) by one or more security settings.
             </span>
           </div>

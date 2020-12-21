@@ -17,16 +17,29 @@ func (m *Migrator) updateEndpointSettingsToDB25() error {
 
 	for i := range endpoints {
 		endpoint := endpoints[i]
-		endpoint.SecuritySettings = portainer.EndpointSecuritySettings{
-			AllowBindMountsForRegularUsers:            settings.AllowBindMountsForRegularUsers,
-			AllowContainerCapabilitiesForRegularUsers: settings.AllowContainerCapabilitiesForRegularUsers,
-			AllowDeviceMappingForRegularUsers:         settings.AllowDeviceMappingForRegularUsers,
-			AllowHostNamespaceForRegularUsers:         settings.AllowHostNamespaceForRegularUsers,
-			AllowPrivilegedModeForRegularUsers:        settings.AllowPrivilegedModeForRegularUsers,
-			AllowStackManagementForRegularUsers:       settings.AllowStackManagementForRegularUsers,
-			AllowVolumeBrowserForRegularUsers:         settings.AllowVolumeBrowserForRegularUsers,
-			EnableHostManagementFeatures:              settings.EnableHostManagementFeatures,
+
+		securitySettings := portainer.EndpointSecuritySettings{}
+
+		if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment ||
+			endpoint.Type == portainer.AgentOnDockerEnvironment ||
+			endpoint.Type == portainer.DockerEnvironment {
+
+			securitySettings = portainer.EndpointSecuritySettings{
+				AllowBindMountsForRegularUsers:            settings.AllowBindMountsForRegularUsers,
+				AllowContainerCapabilitiesForRegularUsers: settings.AllowContainerCapabilitiesForRegularUsers,
+				AllowDeviceMappingForRegularUsers:         settings.AllowDeviceMappingForRegularUsers,
+				AllowHostNamespaceForRegularUsers:         settings.AllowHostNamespaceForRegularUsers,
+				AllowPrivilegedModeForRegularUsers:        settings.AllowPrivilegedModeForRegularUsers,
+				AllowStackManagementForRegularUsers:       settings.AllowStackManagementForRegularUsers,
+			}
+
+			if endpoint.Type == portainer.AgentOnDockerEnvironment || endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
+				securitySettings.AllowVolumeBrowserForRegularUsers = settings.AllowVolumeBrowserForRegularUsers
+				securitySettings.EnableHostManagementFeatures = settings.EnableHostManagementFeatures
+			}
 		}
+
+		endpoint.SecuritySettings = securitySettings
 
 		err = m.endpointService.UpdateEndpoint(endpoint.ID, &endpoint)
 		if err != nil {

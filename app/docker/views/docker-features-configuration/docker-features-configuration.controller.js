@@ -1,8 +1,9 @@
 export default class DockerFeaturesConfigurationController {
-  constructor($async, EndpointService, Notifications) {
+  constructor($async, EndpointService, Notifications, StateManager) {
     this.$async = $async;
     this.EndpointService = EndpointService;
     this.Notifications = Notifications;
+    this.StateManager = StateManager;
 
     this.formValues = {
       enableHostManagementFeatures: false,
@@ -14,6 +15,8 @@ export default class DockerFeaturesConfigurationController {
       disableDeviceMappingForRegularUsers: false,
       disableContainerCapabilitiesForRegularUsers: false,
     };
+
+    this.isAgent = false;
 
     this.state = {
       actionInProgress: false,
@@ -58,12 +61,20 @@ export default class DockerFeaturesConfigurationController {
     });
   }
 
+  checkAgent() {
+    const applicationState = this.StateManager.getState();
+    return applicationState.endpoint.mode.agentProxy;
+  }
+
   $onInit() {
     const securitySettings = this.endpoint.SecuritySettings;
 
+    const isAgent = this.checkAgent();
+    this.isAgent = isAgent;
+
     this.formValues = {
-      enableHostManagementFeatures: securitySettings.enableHostManagementFeatures,
-      allowVolumeBrowserForRegularUsers: !securitySettings.allowVolumeBrowserForRegularUsers,
+      enableHostManagementFeatures: isAgent && securitySettings.enableHostManagementFeatures,
+      allowVolumeBrowserForRegularUsers: isAgent && !securitySettings.allowVolumeBrowserForRegularUsers,
       disableBindMountsForRegularUsers: !securitySettings.allowBindMountsForRegularUsers,
       disablePrivilegedModeForRegularUsers: !securitySettings.allowPrivilegedModeForRegularUsers,
       disableHostNamespaceForRegularUsers: !securitySettings.allowHostNamespaceForRegularUsers,
