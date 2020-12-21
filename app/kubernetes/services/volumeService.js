@@ -13,6 +13,7 @@ class KubernetesVolumeService {
 
     this.getAsync = this.getAsync.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
+    this.createAsync = this.createAsync.bind(this);
     this.deleteAsync = this.deleteAsync.bind(this);
   }
 
@@ -48,6 +49,23 @@ class KubernetesVolumeService {
       return this.$async(this.getAsync, namespace, name);
     }
     return this.$async(this.getAllAsync, namespace);
+  }
+
+  /**
+   * CREATE
+   */
+
+  async createAsync(volume) {
+    try {
+      // convert to KubernetesPersistentVolumeClaim
+      await this.KubernetesPersistentVolumeClaimService.create(volume);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  create(volume) {
+    return this.$async(this.createAsync, volume);
   }
 
   /**
