@@ -6,7 +6,9 @@ angular.module('portainer.app').factory('EndpointService', [
   'FileUploadService',
   function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     'use strict';
-    var service = {};
+    var service = {
+      updateSecuritySettings,
+    };
 
     service.endpoint = function (endpointID) {
       return Endpoints.get({ id: endpointID }).$promise;
@@ -146,5 +148,9 @@ angular.module('portainer.app').factory('EndpointService', [
     };
 
     return service;
+
+    function updateSecuritySettings(id, securitySettings) {
+      return Endpoints.updateSecuritySettings({ id }, securitySettings).$promise;
+    }
   },
 ]);

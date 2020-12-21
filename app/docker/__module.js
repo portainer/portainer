@@ -586,7 +586,7 @@ angular.module('portainer.docker', ['portainer.app']).config([
       url: '/feat-config',
       views: {
         'content@': {
-          components: 'dockerFeaturesConfigurationView',
+          component: 'dockerFeaturesConfigurationView',
         },
       },
     };
