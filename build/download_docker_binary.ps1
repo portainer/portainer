@@ -3,6 +3,7 @@ param (
 )
 
 $ErrorActionPreference = "Stop";
+$ProgressPreference = "SilentlyContinue";
 
 New-Item -Path "docker-binary" -ItemType Directory | Out-Null
 
