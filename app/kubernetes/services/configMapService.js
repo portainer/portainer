@@ -33,9 +33,9 @@ class KubernetesConfigMapService {
         return KubernetesConfigMapConverter.defaultConfigMap(namespace, name);
       }
 
-      // Currently, we keeps binary data in 'data' field of configMap. It causes getYaml() responses 500 error
-      // sometimes. Before we moving binary data from 'data' filed to 'binaryData' field of configMap, we just go
-      // without yaml (yamlPromise.value==undefined) as a workaround.
+      // Saving binary data to 'data' field in configMap Object is not allowed by kubernetes and getYaml() may get 
+      // an error. We should keep binary data to 'binaryData' field instead of 'data'. Before that, we 
+      // use response from get() and ignore 500 error as a workaround.
       if (rawPromise.value) {
         return KubernetesConfigMapConverter.apiToConfigMap(rawPromise.value, yamlPromise.value);
       }
