@@ -24,7 +24,14 @@
         <tbody>
           <tr ng-repeat="mount in service.ServiceMounts">
             <td ng-if="isAdmin || allowBindMounts">
-              <select name="mountType" class="form-control" ng-model="mount.Type" ng-disabled="isUpdating" disable-authorization="DockerServiceUpdate">
+              <select
+                name="mountType"
+                class="form-control"
+                ng-model="mount.Type"
+                ng-change="updateMount(service, mount)"
+                ng-disabled="isUpdating"
+                disable-authorization="DockerServiceUpdate"
+              >
                 <option value="volume">Volume</option>
                 <option value="bind">Bind</option>
               </select>
@@ -35,6 +42,7 @@
                 ng-model="mount.Source"
                 ng-options="vol.Id as ((vol.Id|truncate:30) + ' - ' + (vol.Driver|truncate:30))  for vol in availableVolumes"
                 ng-if="mount.Type === 'volume'"
+                ng-change="updateMount(service, mount)"
                 disable-authorization="DockerServiceUpdate"
               >
                 <option selected disabled hidden value="">Select a volume</option>
