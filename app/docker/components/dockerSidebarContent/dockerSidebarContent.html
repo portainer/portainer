@@ -38,14 +38,14 @@
 <li class="sidebar-list" ng-if="$ctrl.swarmManagement">
   <a ui-sref="docker.swarm({endpointId: $ctrl.endpointId})" ui-sref-active="active">Swarm <span class="menu-icon fa fa-object-group fa-fw"></span></a>
 
-  <div class="sidebar-sublist" ng-if="['docker.featuresConfiguration', 'docker.swarm'].includes($ctrl.currentRouteName)">
+  <div class="sidebar-sublist" ng-if="$ctrl.adminAccess && ['docker.featuresConfiguration', 'docker.swarm'].includes($ctrl.currentRouteName)">
     <a ui-sref="docker.featuresConfiguration({endpointId: $ctrl.endpointId})" ui-sref-active="active">Setup</a>
   </div>
 </li>
 <li class="sidebar-list" ng-if="$ctrl.standaloneManagement">
   <a ui-sref="docker.host({endpointId: $ctrl.endpointId})" ui-sref-active="active">Host <span class="menu-icon fa fa-th fa-fw"></span></a>
 
-  <div class="sidebar-sublist" ng-if="['docker.featuresConfiguration', 'docker.host'].includes($ctrl.currentRouteName)">
+  <div class="sidebar-sublist" ng-if="$ctrl.adminAccess && ['docker.featuresConfiguration', 'docker.host'].includes($ctrl.currentRouteName)">
     <a ui-sref="docker.featuresConfiguration({endpointId: $ctrl.endpointId})" ui-sref-active="active">Setup</a>
   </div>
 </li>
