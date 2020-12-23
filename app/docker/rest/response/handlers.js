@@ -18,6 +18,9 @@ function isJSON(jsonString) {
 // This handler wrap the JSON objects in an array.
 // Used by the API in: Image push, Image create, Events query.
 export function jsonObjectsToArrayHandler(data) {
+  if (!data) {
+    return [];
+  }
   var str = '[' + data.replace(/\n/g, ' ').replace(/\}\s*\{/g, '}, {') + ']';
   return angular.fromJson(str);
 }
