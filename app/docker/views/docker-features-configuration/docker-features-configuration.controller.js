@@ -21,6 +21,8 @@ export default class DockerFeaturesConfigurationController {
     this.state = {
       actionInProgress: false,
     };
+
+    this.save = this.save.bind(this);
   }
 
   isContainerEditDisabled() {
@@ -48,12 +50,13 @@ export default class DockerFeaturesConfigurationController {
           enableHostManagementFeatures: this.formValues.enableHostManagementFeatures,
           allowBindMountsForRegularUsers: !this.formValues.disableBindMountsForRegularUsers,
           allowPrivilegedModeForRegularUsers: !this.formValues.disablePrivilegedModeForRegularUsers,
-          allowVolumeBrowserForRegularUsers: !this.formValues.allowVolumeBrowserForRegularUsers,
+          allowVolumeBrowserForRegularUsers: this.formValues.allowVolumeBrowserForRegularUsers,
           allowHostNamespaceForRegularUsers: !this.formValues.disableHostNamespaceForRegularUsers,
           allowDeviceMappingForRegularUsers: !this.formValues.disableDeviceMappingForRegularUsers,
           allowStackManagementForRegularUsers: !this.formValues.disableStackManagementForRegularUsers,
           allowContainerCapabilitiesForRegularUsers: !this.formValues.disableContainerCapabilitiesForRegularUsers,
         });
+        this.Notifications.success('Saved settings successfully');
       } catch (e) {
         this.Notifications.error('Failure', e, 'Failed saving settings');
       }
@@ -74,7 +77,7 @@ export default class DockerFeaturesConfigurationController {
 
     this.formValues = {
       enableHostManagementFeatures: isAgent && securitySettings.enableHostManagementFeatures,
-      allowVolumeBrowserForRegularUsers: isAgent && !securitySettings.allowVolumeBrowserForRegularUsers,
+      allowVolumeBrowserForRegularUsers: isAgent && securitySettings.allowVolumeBrowserForRegularUsers,
       disableBindMountsForRegularUsers: !securitySettings.allowBindMountsForRegularUsers,
       disablePrivilegedModeForRegularUsers: !securitySettings.allowPrivilegedModeForRegularUsers,
       disableHostNamespaceForRegularUsers: !securitySettings.allowHostNamespaceForRegularUsers,
