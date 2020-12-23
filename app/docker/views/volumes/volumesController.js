@@ -10,7 +10,8 @@ angular.module('portainer.docker').controller('VolumesController', [
   'EndpointProvider',
   'Authentication',
   'ModalService',
-  function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notifications, HttpRequestHelper, EndpointProvider, Authentication, ModalService) {
+  'endpoint',
+  function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notifications, HttpRequestHelper, EndpointProvider, Authentication, ModalService, endpoint) {
     $scope.removeAction = function (selectedItems) {
       ModalService.confirmDeletion('Do you want to remove the selected volume(s)?', (confirmed) => {
         if (confirmed) {
@@ -75,8 +76,7 @@ angular.module('portainer.docker').controller('VolumesController', [
     function initView() {
       getVolumes();
 
-      $scope.showBrowseAction =
-        $scope.applicationState.endpoint.mode.agentProxy && (Authentication.isAdmin() || $scope.applicationState.application.enableVolumeBrowserForNonAdminUsers);
+      $scope.showBrowseAction = $scope.applicationState.endpoint.mode.agentProxy && (Authentication.isAdmin() || endpoint.SecuritySettings.allowVolumeBrowserForRegularUsers);
     }
 
     initView();
