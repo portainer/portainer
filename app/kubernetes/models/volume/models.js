@@ -24,6 +24,27 @@ export class KubernetesPersistentVolumeClaim {
 }
 
 /**
+ * KubernetesPV Model
+ */
+const _KubernetesPV = Object.freeze({
+  Name: '',
+  ResourcePool: {}, // KubernetesResourcePool
+  StorageClass: {}, // KubernetesStorageClass
+  Size: '',
+  NFS: false,
+  NFSAddress: '',
+  NFSVersion: '',
+  NFSMountPoint: '',
+  NFSOptions: '',
+});
+
+export class KubernetesPV {
+  constructor() {
+    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesPV)));
+  }
+}
+
+/**
  * KubernetesVolume Model (Composite)
  */
 const _KubernetesVolume = Object.freeze({

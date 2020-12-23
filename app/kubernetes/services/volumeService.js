@@ -57,7 +57,6 @@ class KubernetesVolumeService {
 
   async createAsync(volume) {
     try {
-      // convert to KubernetesPersistentVolumeClaim
       await this.KubernetesPersistentVolumeClaimService.create(volume);
     } catch (err) {
       throw err;

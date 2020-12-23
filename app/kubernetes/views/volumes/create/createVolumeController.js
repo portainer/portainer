@@ -4,7 +4,17 @@ import { KubernetesVolumeFormValues } from 'Kubernetes/models/volume/formValues'
 
 class KubernetesCreateVolumeController {
   /* @ngInject */
-  constructor($async, $state, Notifications, EndpointProvider, KubernetesNamespaceHelper, KubernetesResourcePoolService, Authentication, KubernetesVolumeService) {
+  constructor(
+    $async,
+    $state,
+    Notifications,
+    EndpointProvider,
+    KubernetesNamespaceHelper,
+    KubernetesResourcePoolService,
+    Authentication,
+    KubernetesVolumeService,
+    KubernetesPVService
+  ) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
@@ -13,6 +23,7 @@ class KubernetesCreateVolumeController {
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.Authentication = Authentication;
     this.KubernetesVolumeService = KubernetesVolumeService;
+    this.KubernetesPVService = KubernetesPVService;
 
     this.onInit = this.onInit.bind(this);
     this.createVolumeAsync = this.createVolumeAsync.bind(this);
@@ -49,7 +60,7 @@ class KubernetesCreateVolumeController {
   async createVolumeAsync() {
     this.state.actionInProgress = true;
     try {
-      await this.KubernetesVolumeService.create(this.formValues);
+      await this.KubernetesPVService.create(this.formValues);
       this.Notifications.success('Volume successfully created', this.formValues.Name);
       this.$state.go('kubernetes.volumes');
     } catch (err) {
