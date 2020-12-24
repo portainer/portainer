@@ -4,6 +4,32 @@
       <div class="toolBar">
         <div class="toolBarTitle"><i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
         <div class="settings">
+          <span
+            class="setting"
+            ng-class="{ 'setting-active': $ctrl.columnVisibility.state.open }"
+            uib-dropdown
+            dropdown-append-to-body
+            auto-close="disabled"
+            is-open="$ctrl.columnVisibility.state.open"
+          >
+            <span uib-dropdown-toggle><i class="fa fa-columns space-right" aria-hidden="true"></i>Columns</span>
+            <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
+              <div class="tableMenu">
+                <div class="menuHeader">
+                  Show / Hide Columns
+                </div>
+                <div class="menuContent">
+                  <div class="md-checkbox" ng-repeat="(key, value) in $ctrl.columnVisibility.columns">
+                    <input id="col_vis_state" ng-change="$ctrl.onColumnVisibilityChange($ctrl.columnVisibility)" type="checkbox" ng-model="value.display" />
+                    <label for="col_vis_state">{{ value.label }}</label>
+                  </div>
+                </div>
+                <div>
+                  <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.columnVisibility.state.open = false;">Close</a>
+                </div>
+              </div>
+            </div>
+          </span>
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
             <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Settings</span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
@@ -124,7 +150,7 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.CreationDate' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th>
+              <th ng-if="$ctrl.columnVisibility.columns.updated.display">
                 <a ng-click="$ctrl.changeOrderBy('ResourceControl.UpdateDate')">
                   Updated
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.UpdateDate' && !$ctrl.state.reverseOrder"></i>
@@ -184,7 +210,7 @@
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
-              <td colspan="4" class="text-center text-muted">Loading...</td>
+              <td colspan="6" class="text-center text-muted">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
               <td colspan="6" class="text-center text-muted">No stack available.</td>

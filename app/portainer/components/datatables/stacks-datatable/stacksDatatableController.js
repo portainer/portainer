@@ -15,6 +15,22 @@ angular.module('portainer.app').controller('StacksDatatableController', [
       },
     };
 
+    this.columnVisibility = {
+      state: {
+        open: false,
+      },
+      columns: {
+        updated: {
+          label: 'Updated',
+          display: false,
+        },
+      },
+    };
+
+    this.onColumnVisibilityChange = function (columnVisibility) {
+      DatatableService.setColumnVisibilitySettings(this.tableKey, columnVisibility);
+    };
+
     /**
      * Do not allow external items
      */
@@ -71,6 +87,12 @@ angular.module('portainer.app').controller('StacksDatatableController', [
         this.settings.open = false;
       }
       this.onSettingsRepeaterChange();
+
+      var storedColumnVisibility = DatatableService.getColumnVisibilitySettings(this.tableKey);
+      if (storedColumnVisibility !== null) {
+        this.columnVisibility = storedColumnVisibility;
+        this.columnVisibility.state.open = false;
+      }
     };
   },
 ]);
