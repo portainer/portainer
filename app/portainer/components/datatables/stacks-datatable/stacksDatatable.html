@@ -169,11 +169,11 @@
                 <span ng-if="!item.External">Total</span>
               </td>
               <td>
-                <span ng-if="item.CreationDate">{{ item.CreationDate | getisodatefromtimestamp }}</span>
+                <span ng-if="item.CreationDate">{{ item.CreationDate | getisodatefromtimestamp }} {{ item.CreatedBy ? 'by ' + item.CreatedBy : '' }}</span>
                 <span ng-if="!item.CreationDate"> - </span>
               </td>
-              <td>
-                <span ng-if="item.UpdateDate">{{ item.UpdateDate | getisodatefromtimestamp }}</span>
+              <td ng-if="$ctrl.columnVisibility.columns.updated.display">
+                <span ng-if="item.UpdateDate">{{ item.UpdateDate | getisodatefromtimestamp }} {{ item.UpdatedBy ? 'by ' + item.UpdatedBy : '' }}</span>
                 <span ng-if="!item.UpdateDate"> - </span>
               </td>
               <td>

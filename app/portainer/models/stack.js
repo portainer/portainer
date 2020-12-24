@@ -14,7 +14,9 @@ export function StackViewModel(data) {
   this.External = false;
   this.Status = data.Status;
   this.CreationDate = data.CreationDate;
+  this.CreatedBy = data.CreatedBy;
   this.UpdateDate = data.UpdateDate;
+  this.UpdatedBy = data.UpdatedBy;
 }
 
 export function ExternalStackViewModel(name, type, creationDate) {
