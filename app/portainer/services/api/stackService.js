@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { ExternalStackViewModel, StackViewModel } from '../../models/stack';
+import { StackViewModel } from '../../models/stack';
 
 angular.module('portainer.app').factory('StackService', [
   '$q',
@@ -121,13 +121,8 @@ angular.module('portainer.app').factory('StackService', [
       var deferred = $q.defer();
 
       ServiceService.services()
-        .then(function success(data) {
-          var services = data;
-          var stackDatas = StackHelper.getExternalStacksFromServices(services);
-          var stacks = stackDatas.map(function (stack) {
-            return new ExternalStackViewModel(stack.stackName, 1, stack.creationDate);
-          });
-          deferred.resolve(stacks);
+        .then(function success(services) {
+          deferred.resolve(StackHelper.getExternalStacksFromServices(services));
         })
         .catch(function error(err) {
           deferred.reject({ msg: 'Unable to retrieve external stacks', err: err });
@@ -140,13 +135,8 @@ angular.module('portainer.app').factory('StackService', [
       var deferred = $q.defer();
 
       ContainerService.containers(1)
-        .then(function success(data) {
-          var containers = data;
-          var stacksDatas = StackHelper.getExternalStacksFromContainers(containers);
-          var stacks = stacksDatas.map(function (stack) {
-            return new ExternalStackViewModel(stack.stackName, 2, stack.creationDate);
-          });
-          deferred.resolve(stacks);
+        .then(function success(containers) {
+          deferred.resolve(StackHelper.getExternalStacksFromContainers(containers));
         })
         .catch(function error(err) {
           deferred.reject({ msg: 'Unable to retrieve external stacks', err: err });

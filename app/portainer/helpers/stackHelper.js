@@ -1,36 +1,26 @@
 import _ from 'lodash-es';
 
+import { ExternalStackViewModel } from '@/portainer/models/stack';
+
 angular.module('portainer.app').factory('StackHelper', [
   function StackHelperFactory() {
     'use strict';
     var helper = {};
 
     helper.getExternalStacksFromContainers = function (containers) {
-      var stacks = [];
-
-      for (var i = 0; i < containers.length; i++) {
-        var container = containers[i];
-        if (!container.Labels || !container.Labels['com.docker.compose.project']) continue;
-        var stackName = container.Labels['com.docker.compose.project'];
-        stacks.push({ stackName, creationDate: container.Created });
-      }
-
-      return _.uniq(stacks);
+      return getExternalStacksFromLabel(containers, 'com.docker.compose.project', 2);
     };
 
     helper.getExternalStacksFromServices = function (services) {
-      var stacks = [];
-
-      for (var i = 0; i < services.length; i++) {
-        var service = services[i];
-        if (!service.Labels || !service.Labels['com.docker.stack.namespace']) continue;
-
-        var stackName = service.Labels['com.docker.stack.namespace'];
-        stacks.push({ stackName, creationDate: service.Created });
-      }
-
-      return _.uniq(stacks);
+      return getExternalStacksFromLabel(services, 'com.docker.stack.namespace', 1);
     };
+
+    function getExternalStacksFromLabel(items, label, type) {
+      return _.uniqBy(
+        items.filter((item) => item.Labels && item.Labels[label]).map((item) => new ExternalStackViewModel(item.Labels[label], type, item.Created)),
+        'Name'
+      );
+    }
 
     return helper;
   },
