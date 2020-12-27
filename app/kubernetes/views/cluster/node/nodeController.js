@@ -35,7 +35,7 @@ class KubernetesNodeController {
     this.KubernetesEndpointService = KubernetesEndpointService;
 
     this.onInit = this.onInit.bind(this);
-    this.getNodeAsync = this.getNodeAsync.bind(this);
+    this.getNodesAsync = this.getNodesAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
     this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
@@ -163,6 +163,10 @@ class KubernetesNodeController {
 
   /* #region drain */
 
+  computeDrainWarning() {
+    return this.formValues.Availability === this.availabilities.DRAIN;
+  }
+
   async drainNodeAsync() {
     const pods = _.flatten(_.map(this.applications, (app) => app.Pods));
     let actionCount = pods.length;
@@ -183,10 +187,6 @@ class KubernetesNodeController {
 
   drainNode() {
     return this.$async(this.drainNodeAsync);
-  }
-
-  computeDrainWarning() {
-    return this.formValues.Availability === this.availabilities.DRAIN;
   }
 
   /* #endregion */
@@ -302,11 +302,13 @@ class KubernetesNodeController {
     }
   }
 
-  async getNodeAsync() {
+  async getNodesAsync() {
     try {
       this.state.dataLoading = true;
       const nodeName = this.$transition$.params().name;
-      this.node = await this.KubernetesNodeService.get(nodeName);
+      this.nodes = await this.KubernetesNodeService.get();
+      this.node = _.find(this.nodes, { Name: nodeName });
+      this.state.isDrainOperation = _.find(this.nodes, { Availability: this.availabilities.DRAIN });
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve node');
     } finally {
@@ -314,8 +316,8 @@ class KubernetesNodeController {
     }
   }
 
-  getNode() {
-    return this.$async(this.getNodeAsync);
+  getNodes() {
+    return this.$async(this.getNodesAsync);
   }
 
   hasEventWarnings() {
@@ -390,13 +392,14 @@ class KubernetesNodeController {
       hasDuplicateTaintKeys: false,
       duplicateLabelKeys: [],
       hasDuplicateLabelKeys: false,
+      isDrainOperation: false,
     };
 
     this.availabilities = KubernetesNodeAvailabilities;
 
     this.state.activeTab = this.LocalStorage.getActiveTab('node');
 
-    await this.getNode();
+    await this.getNodes();
     await this.getEvents();
     await this.getApplications();
     await this.getEndpoints();

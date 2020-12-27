@@ -32,7 +32,7 @@ class KubernetesNodeConverter {
 
     res.Availability = KubernetesNodeAvailabilities.ACTIVE;
     if (data.spec.unschedulable === true) {
-      res.Availability = KubernetesNodeAvailabilities.PAUSE;
+      res.Availability = _.has(data.metadata.labels, 'io.portainer/node-status-drain') ? KubernetesNodeAvailabilities.DRAIN : KubernetesNodeAvailabilities.PAUSE;
     }
 
     if (ready.status === 'False') {
@@ -138,6 +138,9 @@ class KubernetesNodeConverter {
     payload.spec.taints = taints.length ? taints : undefined;
     if (node.Availability !== KubernetesNodeAvailabilities.ACTIVE) {
       payload.spec.unschedulable = true;
+      if (node.Availability === KubernetesNodeAvailabilities.DRAIN) {
+        payload.metadata.labels['io.portainer/node-status-drain'] = true;
+      }
     }
 
     payload.metadata.labels = node.Labels;
