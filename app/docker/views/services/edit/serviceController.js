@@ -209,6 +209,12 @@ angular.module('portainer.docker').controller('ServiceController', [
         updateServiceArray(service, 'ServiceMounts', service.ServiceMounts);
       }
     };
+
+    $scope.onChangeMountType = function onChangeMountType(service, mount) {
+      mount.Source = null;
+      $scope.updateMount(service, mount);
+    };
+
     $scope.updateMount = function updateMount(service) {
       updateServiceArray(service, 'ServiceMounts', service.ServiceMounts);
     };
