@@ -17,6 +17,7 @@ angular.module('portainer.kubernetes', ['portainer.app']).config([
           }
           try {
             if (endpoint.Type === 7) {
+              //edge
               try {
                 await KubernetesHealthService.ping(endpoint.Id);
                 endpoint.Status = 1;
@@ -27,6 +28,10 @@ angular.module('portainer.kubernetes', ['portainer.app']).config([
 
             EndpointProvider.setEndpointID(endpoint.Id);
             await StateManager.updateEndpointState(endpoint, []);
+
+            if (endpoint.Type === 7 && endpoint.Status === 2) {
+              throw new Error('Edge endpoint is down');
+            }
           } catch (e) {
             Notifications.error('Failed loading endpoint', e);
             $state.go('portainer.home', {}, { reload: true });
