@@ -1,26 +1,22 @@
 export default class porImageRegistryContainerController {
   /* @ngInject */
-  constructor($scope, EndpointHelper, DockerHubService) {
+  constructor(EndpointHelper, DockerHubService, Notifications) {
     this.EndpointHelper = EndpointHelper;
     this.DockerHubService = DockerHubService;
+    this.Notifications = Notifications;
 
-    $scope.$watch(
-      () => this.model,
-      (currentValue) => {
-        if (currentValue) {
-          this.fetchRateLimits();
-        }
-      },
-      true
-    );
+    this.pullRateLimits = null;
+  }
+
+  $onChanges({ isDockerHubRegistry }) {
+    if (isDockerHubRegistry && isDockerHubRegistry.currentValue) {
+      this.fetchRateLimits();
+    }
   }
 
   async fetchRateLimits() {
-    if (!this.checkRateLimits) {
-      return;
-    }
     this.pullRateLimits = null;
-    if (this.isDockerHubRegistry && (this.EndpointHelper.isAgentEndpoint(this.endpoint) || this.EndpointHelper.isLocalEndpoint(this.endpoint))) {
+    if (this.EndpointHelper.isAgentEndpoint(this.endpoint) || this.EndpointHelper.isLocalEndpoint(this.endpoint)) {
       try {
         this.pullRateLimits = await this.DockerHubService.checkRateLimits(this.endpoint);
         this.setValidity(this.pullRateLimits.remaining >= 0);

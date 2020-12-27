@@ -40,6 +40,7 @@ class KubernetesCreateApplicationController {
     Notifications,
     EndpointProvider,
     Authentication,
+    DockerHubService,
     ModalService,
     KubernetesResourcePoolService,
     KubernetesApplicationService,
@@ -56,6 +57,7 @@ class KubernetesCreateApplicationController {
     this.Notifications = Notifications;
     this.EndpointProvider = EndpointProvider;
     this.Authentication = Authentication;
+    this.DockerHubService = DockerHubService;
     this.ModalService = ModalService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesApplicationService = KubernetesApplicationService;
@@ -77,8 +79,13 @@ class KubernetesCreateApplicationController {
 
     this.updateApplicationAsync = this.updateApplicationAsync.bind(this);
     this.deployApplicationAsync = this.deployApplicationAsync.bind(this);
+    this.setPullImageValidity = this.setPullImageValidity.bind(this);
   }
   /* #endregion */
+
+  setPullImageValidity(validity) {
+    this.state.pullImageValidity = validity;
+  }
 
   onChangeName() {
     const existingApplication = _.find(this.applications, { Name: this.formValues.Name });
@@ -915,6 +922,7 @@ class KubernetesCreateApplicationController {
             name: this.$transition$.params().name,
           },
           persistedFoldersUseExistingVolumes: false,
+          pullImageValidity: false,
         };
 
         this.isAdmin = this.Authentication.isAdmin();
@@ -984,6 +992,9 @@ class KubernetesCreateApplicationController {
         }
 
         this.updateSliders();
+
+        const dockerHub = await this.DockerHubService.dockerhub();
+        this.state.isDockerAuthenticated = dockerHub.Authentication;
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to load view data');
       } finally {

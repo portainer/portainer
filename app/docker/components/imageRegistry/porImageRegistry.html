@@ -1,9 +1,8 @@
 <por-image-registry-container
   is-docker-hub-registry="$ctrl.isDockerHubRegistry()"
-  model="$ctrl.model"
   endpoint="$ctrl.endpoint"
-  check-rate-limits="$ctrl.checkRateLimits"
   set-validity="$ctrl.setValidity"
+  is-authenticated="$ctrl.model.Registry.Authentication"
 >
   <por-image-registry-fields>
     <!-- use registry -->

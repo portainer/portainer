@@ -4,11 +4,11 @@
   <div class="col-sm-12 small">
     <div ng-if="$ctrl.pullRateLimits.remaining > 0" class="text-muted">
       <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-      <span ng-if="$ctrl.model.Registry.Authentication">
+      <span ng-if="$ctrl.isAuthenticated">
         You are currently using a free account to pull images from DockerHub and will be limited to 200 pulls every 6 hours. Remaining pulls:
         <span style="font-weight: bold;">{{ $ctrl.pullRateLimits.remaining }}/{{ $ctrl.pullRateLimits.limit }}</span>
       </span>
-      <span ng-if="!$ctrl.model.Registry.Authentication">
+      <span ng-if="!$ctrl.isAuthenticated">
         <span ng-if="$ctrl.isAdmin">
           You are currently using an anonymous account to pull images from DockerHub and will be limited to 100 pulls every 6 hours. You can configure DockerHub authentication in
           the
@@ -23,11 +23,11 @@
     </div>
     <div ng-if="$ctrl.pullRateLimits.remaining <= 0" class="text-warning">
       <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-      <span ng-if="$ctrl.model.Registry.Authentication">
+      <span ng-if="$ctrl.isAuthenticated">
         Your authorized pull count quota as a free user is now exceeded.
         <span ng-transclude="rateLimitExceeded">You will not be able to pull any image from the DockerHub registry.</span>
       </span>
-      <span ng-if="!$ctrl.model.Registry.Authentication">
+      <span ng-if="!$ctrl.isAuthenticated">
         Your authorized pull count quota as an anonymous user is now exceeded.
         <span ng-transclude="rateLimitExceeded">You will not be able to pull any image from the DockerHub registry.</span>
       </span>

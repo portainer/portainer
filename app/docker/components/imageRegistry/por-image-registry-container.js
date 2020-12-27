@@ -8,8 +8,7 @@ angular.module('portainer.docker').component('porImageRegistryContainer', {
     setValidity: '<',
     isAdmin: '<',
     isDockerHubRegistry: '<',
-    model: '<',
-    checkRateLimits: '<',
+    isAuthenticated: '<',
   },
   controller,
   transclude: {
