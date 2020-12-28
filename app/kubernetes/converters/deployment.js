@@ -1,4 +1,5 @@
 import * as JsonPatch from 'fast-json-patch';
+import _ from 'lodash-es';
 import { KubernetesDeployment } from 'Kubernetes/models/deployment/models';
 import { KubernetesDeploymentCreatePayload } from 'Kubernetes/models/deployment/payloads';
 import {
@@ -46,7 +47,8 @@ class KubernetesDeploymentConverter {
     payload.metadata.namespace = deployment.Namespace;
     payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = deployment.StackName;
     payload.metadata.labels[KubernetesPortainerApplicationNameLabel] = deployment.ApplicationName;
-    payload.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = deployment.ApplicationOwner;
+    const applicationOwner = _.truncate(deployment.ApplicationOwner, { length: 63, omission: '' });
+    payload.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = applicationOwner;
     payload.metadata.annotations[KubernetesPortainerApplicationNote] = deployment.Note;
     payload.spec.replicas = deployment.ReplicaCount;
     payload.spec.selector.matchLabels.app = deployment.Name;

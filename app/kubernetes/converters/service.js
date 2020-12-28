@@ -69,7 +69,8 @@ class KubernetesServiceConverter {
     payload.metadata.namespace = service.Namespace;
     payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = service.StackName;
     payload.metadata.labels[KubernetesPortainerApplicationNameLabel] = service.ApplicationName;
-    payload.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = service.ApplicationOwner;
+    const applicationOwner = _.truncate(service.Application, { length: 63, omission: '' });
+    payload.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = applicationOwner;
     payload.spec.ports = service.Ports;
     payload.spec.selector.app = service.ApplicationName;
     if (service.Headless) {
