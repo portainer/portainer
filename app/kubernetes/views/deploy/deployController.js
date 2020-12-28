@@ -62,7 +62,17 @@ class KubernetesDeployController {
   async getNamespacesAsync() {
     try {
       const pools = await this.KubernetesResourcePoolService.get();
-      this.namespaces = _.map(pools, 'Namespace');
+      const namespaces = _.map(pools, 'Namespace').sort((a, b) => {
+        if (a.Name === 'default') {
+          return -1;
+        }
+        if (b.Name === 'default') {
+          return 1;
+        }
+        return 0;
+      });
+
+      this.namespaces = namespaces;
       this.formValues.Namespace = this.namespaces[0].Name;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load resource pools data');
