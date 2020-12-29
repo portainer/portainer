@@ -47,8 +47,7 @@ class KubernetesStatefulSetConverter {
     payload.metadata.namespace = statefulSet.Namespace;
     payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = statefulSet.StackName;
     payload.metadata.labels[KubernetesPortainerApplicationNameLabel] = statefulSet.ApplicationName;
-    const applicationOwner = _.truncate(statefulSet.ApplicationOwner, { length: 63, omission: '' });
-    payload.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = applicationOwner;
+    payload.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = statefulSet.ApplicationOwner;
     payload.metadata.annotations[KubernetesPortainerApplicationNote] = statefulSet.Note;
     payload.spec.replicas = statefulSet.ReplicaCount;
     payload.spec.serviceName = statefulSet.ServiceName;

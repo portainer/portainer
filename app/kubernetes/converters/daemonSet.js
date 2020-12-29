@@ -1,5 +1,4 @@
 import * as JsonPatch from 'fast-json-patch';
-import _ from 'lodash-es';
 import { KubernetesDaemonSet } from 'Kubernetes/models/daemon-set/models';
 import { KubernetesDaemonSetCreatePayload } from 'Kubernetes/models/daemon-set/payloads';
 import {
@@ -44,8 +43,7 @@ class KubernetesDaemonSetConverter {
     payload.metadata.namespace = daemonSet.Namespace;
     payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = daemonSet.StackName;
     payload.metadata.labels[KubernetesPortainerApplicationNameLabel] = daemonSet.ApplicationName;
-    const applicationOwner = _.truncate(daemonSet.ApplicationOwner, { length: 63, omission: '' });
-    payload.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = applicationOwner;
+    payload.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = daemonSet.ApplicationOwner;
     payload.metadata.annotations[KubernetesPortainerApplicationNote] = daemonSet.Note;
     payload.spec.replicas = daemonSet.ReplicaCount;
     payload.spec.selector.matchLabels.app = daemonSet.Name;
