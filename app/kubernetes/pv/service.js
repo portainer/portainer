@@ -53,7 +53,6 @@ class KubernetesPVService {
   async createAsync(formValues) {
     try {
       const pv = KubernetesPVConverter.formValuesToPV(formValues);
-      // convert from KubernetesPV to apiPayload
       const payload = KubernetesPVConverter.createPayload(pv);
       const data = await this.KubernetesPV().create(payload).$promise;
       return data;

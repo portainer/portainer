@@ -1,3 +1,4 @@
+import _ from 'lodash-es';
 import { KubernetesPV } from 'Kubernetes/models/volume/models';
 import { KubernetesPVCreatePayload } from 'Kubernetes/pv/payloads';
 class KubernetesPVConverter {
@@ -20,19 +21,16 @@ class KubernetesPVConverter {
     pv.Name = formValues.Name;
     pv.ResourcePool = formValues.ResourcePool;
     pv.StorageClass = formValues.StorageClass;
-    pv.NFS = formValues.NFS;
-
-    /*
-    Name: '',
-  ResourcePool: {}, // KubernetesResourcePool
-  StorageClass: {}, // KubernetesStorageClass
-  Size: '',
-  NFS: false,
-  NFSAddress: '',
-  NFSVersion: '',
-  NFSMountPoint: '',
-  NFSOptions: '',
-    */
+    pv.Size = formValues.Size + formValues.SizeUnit;
+    if (formValues.NFS) {
+      pv.NFS = formValues.NFS;
+      pv.NFSAddress = formValues.NFSAddress;
+      pv.NFSVersion = formValues.NFSVersion;
+      pv.NFSMountPoint = formValues.NFSMountPoint;
+      pv.NFSOptions = _.split(formValues.NFSOptions, ',');
+    } else {
+      // set volumeType (!= NFS)
+    }
     return pv;
   }
 
@@ -40,6 +38,19 @@ class KubernetesPVConverter {
     const res = new KubernetesPVCreatePayload();
     res.metadata.name = pv.Name;
     res.spec.storageClassName = pv.StorageClass.Name;
+    res.spec.capacity = {
+      storage: pv.Size.replace('B', 'i'),
+    };
+    if (pv.NFS) {
+      res.spec.nfs = {
+        path: pv.NFSMountPoint,
+        server: pv.NFSAddress,
+      };
+      res.spec.mountOptions = pv.NFSOptions;
+      res.spec.mountOptions.push('nfsvers=' + pv.NFSVersion);
+    } else {
+      // res.spec.
+    }
     return res;
   }
 }
