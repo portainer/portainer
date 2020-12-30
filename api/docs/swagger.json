@@ -145,11 +145,5 @@
                 }
             }
         }
-    },
-    "tags": [
-        {
-            "description": "API for handling Endpoints",
-            "name": "Endpoints"
-        }
-    ]
+    }
 }

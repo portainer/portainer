@@ -162,13 +162,7 @@ var doc = `{
                 }
             }
         }
-    },
-    "tags": [
-        {
-            "description": "API for handling Endpoints",
-            "name": "Endpoints"
-        }
-    ]
+    }
 }`
 
 type swaggerInfo struct {

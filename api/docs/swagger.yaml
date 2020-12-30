@@ -96,6 +96,3 @@ paths:
       tags:
       - Upload
 swagger: "2.0"
-tags:
-- description: API for handling Endpoints
-  name: Endpoints
