@@ -60,6 +60,90 @@ var doc = `{
             }
         },
         "/endpoints": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Endpoints"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Start searching from",
+                        "name": "start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search query",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "List endpoints of this group",
+                        "name": "groupId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit results to this value",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "List endpoints of this type",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "description": "search endpoints with these tags (depends on tagsPartialMatch)",
+                        "name": "tagIds",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "If true, will return endpoint which has one of tagIds, if false (or missing) will return only endpoints that has all the tags",
+                        "name": "tagsPartialMatch",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "description": "will return only these endpoints",
+                        "name": "endpointIds",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Endpoints",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/portainer.Endpoint"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
             "post": {
                 "consumes": [
                     "application/json"
@@ -99,6 +183,41 @@ var doc = `{
             }
         },
         "/endpoints/{id}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Endpoints"
+                ],
+                "summary": "Inspects an endpoint",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "endpoint id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Endpoint",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.Endpoint"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
             "delete": {
                 "consumes": [
                     "application/json"

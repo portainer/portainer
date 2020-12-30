@@ -312,6 +312,62 @@ paths:
       tags:
       - auth
   /endpoints:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Start searching from
+        in: query
+        name: start
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      - description: List endpoints of this group
+        in: query
+        name: groupId
+        type: integer
+      - description: Limit results to this value
+        in: query
+        name: limit
+        type: integer
+      - description: List endpoints of this type
+        in: query
+        name: type
+        type: integer
+      - description: search endpoints with these tags (depends on tagsPartialMatch)
+        in: query
+        items:
+          type: integer
+        name: tagIds
+        type: array
+      - description: If true, will return endpoint which has one of tagIds, if false
+          (or missing) will return only endpoints that has all the tags
+        in: query
+        name: tagsPartialMatch
+        type: boolean
+      - description: will return only these endpoints
+        in: query
+        items:
+          type: integer
+        name: endpointIds
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Endpoints
+          schema:
+            items:
+              $ref: '#/definitions/portainer.Endpoint'
+            type: array
+        "400":
+          description: ""
+        "500":
+          description: ""
+      tags:
+      - Endpoints
     post:
       consumes:
       - application/json
@@ -356,6 +412,29 @@ paths:
         "500":
           description: ""
       summary: Deletes an endpoint
+      tags:
+      - Endpoints
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: endpoint id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Endpoint
+          schema:
+            $ref: '#/definitions/portainer.Endpoint'
+        "400":
+          description: ""
+        "500":
+          description: ""
+      summary: Inspects an endpoint
       tags:
       - Endpoints
   /tags:
