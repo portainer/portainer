@@ -59,6 +59,45 @@ var doc = `{
                 }
             }
         },
+        "/endpoints": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Endpoints"
+                ],
+                "summary": "Creates an endpoint",
+                "parameters": [
+                    {
+                        "description": "endpoint data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/endpoints.endpointCreatePayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Endpoint",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.Endpoint"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/endpoints/{id}": {
             "delete": {
                 "consumes": [
@@ -189,6 +228,383 @@ var doc = `{
                 }
             }
         },
+        "endpoints.endpointCreatePayload": {
+            "type": "object",
+            "properties": {
+                "azureApplicationID": {
+                    "type": "string"
+                },
+                "azureAuthenticationKey": {
+                    "type": "string"
+                },
+                "azureTenantID": {
+                    "type": "string"
+                },
+                "edgeCheckinInterval": {
+                    "type": "integer"
+                },
+                "endpointCreationType": {
+                    "type": "integer"
+                },
+                "groupID": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "publicURL": {
+                    "type": "string"
+                },
+                "tagIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "tls": {
+                    "type": "boolean"
+                },
+                "tlscacertFile": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "tlscertFile": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "tlskeyFile": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "tlsskipClientVerify": {
+                    "type": "boolean"
+                },
+                "tlsskipVerify": {
+                    "type": "boolean"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "portainer.AccessPolicy": {
+            "type": "object",
+            "properties": {
+                "RoleId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "portainer.AzureCredentials": {
+            "type": "object",
+            "properties": {
+                "ApplicationID": {
+                    "type": "string"
+                },
+                "AuthenticationKey": {
+                    "type": "string"
+                },
+                "TenantID": {
+                    "type": "string"
+                }
+            }
+        },
+        "portainer.DockerSnapshot": {
+            "type": "object",
+            "properties": {
+                "DockerSnapshotRaw": {
+                    "$ref": "#/definitions/portainer.DockerSnapshotRaw"
+                },
+                "DockerVersion": {
+                    "type": "string"
+                },
+                "HealthyContainerCount": {
+                    "type": "integer"
+                },
+                "ImageCount": {
+                    "type": "integer"
+                },
+                "RunningContainerCount": {
+                    "type": "integer"
+                },
+                "ServiceCount": {
+                    "type": "integer"
+                },
+                "StackCount": {
+                    "type": "integer"
+                },
+                "StoppedContainerCount": {
+                    "type": "integer"
+                },
+                "Swarm": {
+                    "type": "boolean"
+                },
+                "Time": {
+                    "type": "integer"
+                },
+                "TotalCPU": {
+                    "type": "integer"
+                },
+                "TotalMemory": {
+                    "type": "integer"
+                },
+                "UnhealthyContainerCount": {
+                    "type": "integer"
+                },
+                "VolumeCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "portainer.DockerSnapshotRaw": {
+            "type": "object",
+            "properties": {
+                "Containers": {
+                    "type": "object"
+                },
+                "Images": {
+                    "type": "object"
+                },
+                "Info": {
+                    "type": "object"
+                },
+                "Networks": {
+                    "type": "object"
+                },
+                "Version": {
+                    "type": "object"
+                },
+                "Volumes": {
+                    "type": "object"
+                }
+            }
+        },
+        "portainer.Endpoint": {
+            "type": "object",
+            "properties": {
+                "AuthorizedTeams": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "AuthorizedUsers": {
+                    "description": "Deprecated in DBVersion == 18",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "AzureCredentials": {
+                    "$ref": "#/definitions/portainer.AzureCredentials"
+                },
+                "EdgeCheckinInterval": {
+                    "type": "integer"
+                },
+                "EdgeID": {
+                    "type": "string"
+                },
+                "EdgeKey": {
+                    "type": "string"
+                },
+                "Extensions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/portainer.EndpointExtension"
+                    }
+                },
+                "GroupId": {
+                    "type": "integer"
+                },
+                "Id": {
+                    "type": "integer"
+                },
+                "Kubernetes": {
+                    "$ref": "#/definitions/portainer.KubernetesData"
+                },
+                "Name": {
+                    "type": "string"
+                },
+                "PublicURL": {
+                    "type": "string"
+                },
+                "Snapshots": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/portainer.DockerSnapshot"
+                    }
+                },
+                "Status": {
+                    "type": "integer"
+                },
+                "TLS": {
+                    "description": "Deprecated fields\nDeprecated in DBVersion == 4",
+                    "type": "boolean"
+                },
+                "TLSCACert": {
+                    "type": "string"
+                },
+                "TLSCert": {
+                    "type": "string"
+                },
+                "TLSConfig": {
+                    "$ref": "#/definitions/portainer.TLSConfiguration"
+                },
+                "TLSKey": {
+                    "type": "string"
+                },
+                "TagIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "Tags": {
+                    "description": "Deprecated in DBVersion == 22",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "TeamAccessPolicies": {
+                    "$ref": "#/definitions/portainer.TeamAccessPolicies"
+                },
+                "Type": {
+                    "type": "integer"
+                },
+                "URL": {
+                    "type": "string"
+                },
+                "UserAccessPolicies": {
+                    "$ref": "#/definitions/portainer.UserAccessPolicies"
+                }
+            }
+        },
+        "portainer.EndpointExtension": {
+            "type": "object",
+            "properties": {
+                "Type": {
+                    "type": "integer"
+                },
+                "URL": {
+                    "type": "string"
+                }
+            }
+        },
+        "portainer.KubernetesConfiguration": {
+            "type": "object",
+            "properties": {
+                "IngressClasses": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/portainer.KubernetesIngressClassConfig"
+                    }
+                },
+                "StorageClasses": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/portainer.KubernetesStorageClassConfig"
+                    }
+                },
+                "UseLoadBalancer": {
+                    "type": "boolean"
+                },
+                "UseServerMetrics": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "portainer.KubernetesData": {
+            "type": "object",
+            "properties": {
+                "Configuration": {
+                    "$ref": "#/definitions/portainer.KubernetesConfiguration"
+                },
+                "Snapshots": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/portainer.KubernetesSnapshot"
+                    }
+                }
+            }
+        },
+        "portainer.KubernetesIngressClassConfig": {
+            "type": "object",
+            "properties": {
+                "Name": {
+                    "type": "string"
+                },
+                "Type": {
+                    "type": "string"
+                }
+            }
+        },
+        "portainer.KubernetesSnapshot": {
+            "type": "object",
+            "properties": {
+                "KubernetesVersion": {
+                    "type": "string"
+                },
+                "NodeCount": {
+                    "type": "integer"
+                },
+                "Time": {
+                    "type": "integer"
+                },
+                "TotalCPU": {
+                    "type": "integer"
+                },
+                "TotalMemory": {
+                    "type": "integer"
+                }
+            }
+        },
+        "portainer.KubernetesStorageClassConfig": {
+            "type": "object",
+            "properties": {
+                "AccessModes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "AllowVolumeExpansion": {
+                    "type": "boolean"
+                },
+                "Name": {
+                    "type": "string"
+                },
+                "Provisioner": {
+                    "type": "string"
+                }
+            }
+        },
+        "portainer.TLSConfiguration": {
+            "type": "object",
+            "properties": {
+                "TLS": {
+                    "type": "boolean"
+                },
+                "TLSCACert": {
+                    "type": "string"
+                },
+                "TLSCert": {
+                    "type": "string"
+                },
+                "TLSKey": {
+                    "type": "string"
+                },
+                "TLSSkipVerify": {
+                    "type": "boolean"
+                }
+            }
+        },
         "portainer.Tag": {
             "type": "object",
             "properties": {
@@ -210,6 +626,18 @@ var doc = `{
                 "id": {
                     "type": "integer"
                 }
+            }
+        },
+        "portainer.TeamAccessPolicies": {
+            "type": "object",
+            "additionalProperties": {
+                "$ref": "#/definitions/portainer.AccessPolicy"
+            }
+        },
+        "portainer.UserAccessPolicies": {
+            "type": "object",
+            "additionalProperties": {
+                "$ref": "#/definitions/portainer.AccessPolicy"
             }
         }
     }

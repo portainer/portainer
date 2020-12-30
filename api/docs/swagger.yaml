@@ -10,6 +10,256 @@ definitions:
       code:
         type: string
     type: object
+  endpoints.endpointCreatePayload:
+    properties:
+      azureApplicationID:
+        type: string
+      azureAuthenticationKey:
+        type: string
+      azureTenantID:
+        type: string
+      edgeCheckinInterval:
+        type: integer
+      endpointCreationType:
+        type: integer
+      groupID:
+        type: integer
+      name:
+        type: string
+      publicURL:
+        type: string
+      tagIDs:
+        items:
+          type: integer
+        type: array
+      tls:
+        type: boolean
+      tlscacertFile:
+        items:
+          type: integer
+        type: array
+      tlscertFile:
+        items:
+          type: integer
+        type: array
+      tlskeyFile:
+        items:
+          type: integer
+        type: array
+      tlsskipClientVerify:
+        type: boolean
+      tlsskipVerify:
+        type: boolean
+      url:
+        type: string
+    type: object
+  portainer.AccessPolicy:
+    properties:
+      RoleId:
+        type: integer
+    type: object
+  portainer.AzureCredentials:
+    properties:
+      ApplicationID:
+        type: string
+      AuthenticationKey:
+        type: string
+      TenantID:
+        type: string
+    type: object
+  portainer.DockerSnapshot:
+    properties:
+      DockerSnapshotRaw:
+        $ref: '#/definitions/portainer.DockerSnapshotRaw'
+      DockerVersion:
+        type: string
+      HealthyContainerCount:
+        type: integer
+      ImageCount:
+        type: integer
+      RunningContainerCount:
+        type: integer
+      ServiceCount:
+        type: integer
+      StackCount:
+        type: integer
+      StoppedContainerCount:
+        type: integer
+      Swarm:
+        type: boolean
+      Time:
+        type: integer
+      TotalCPU:
+        type: integer
+      TotalMemory:
+        type: integer
+      UnhealthyContainerCount:
+        type: integer
+      VolumeCount:
+        type: integer
+    type: object
+  portainer.DockerSnapshotRaw:
+    properties:
+      Containers:
+        type: object
+      Images:
+        type: object
+      Info:
+        type: object
+      Networks:
+        type: object
+      Version:
+        type: object
+      Volumes:
+        type: object
+    type: object
+  portainer.Endpoint:
+    properties:
+      AuthorizedTeams:
+        items:
+          type: integer
+        type: array
+      AuthorizedUsers:
+        description: Deprecated in DBVersion == 18
+        items:
+          type: integer
+        type: array
+      AzureCredentials:
+        $ref: '#/definitions/portainer.AzureCredentials'
+      EdgeCheckinInterval:
+        type: integer
+      EdgeID:
+        type: string
+      EdgeKey:
+        type: string
+      Extensions:
+        items:
+          $ref: '#/definitions/portainer.EndpointExtension'
+        type: array
+      GroupId:
+        type: integer
+      Id:
+        type: integer
+      Kubernetes:
+        $ref: '#/definitions/portainer.KubernetesData'
+      Name:
+        type: string
+      PublicURL:
+        type: string
+      Snapshots:
+        items:
+          $ref: '#/definitions/portainer.DockerSnapshot'
+        type: array
+      Status:
+        type: integer
+      TLS:
+        description: |-
+          Deprecated fields
+          Deprecated in DBVersion == 4
+        type: boolean
+      TLSCACert:
+        type: string
+      TLSCert:
+        type: string
+      TLSConfig:
+        $ref: '#/definitions/portainer.TLSConfiguration'
+      TLSKey:
+        type: string
+      TagIds:
+        items:
+          type: integer
+        type: array
+      Tags:
+        description: Deprecated in DBVersion == 22
+        items:
+          type: string
+        type: array
+      TeamAccessPolicies:
+        $ref: '#/definitions/portainer.TeamAccessPolicies'
+      Type:
+        type: integer
+      URL:
+        type: string
+      UserAccessPolicies:
+        $ref: '#/definitions/portainer.UserAccessPolicies'
+    type: object
+  portainer.EndpointExtension:
+    properties:
+      Type:
+        type: integer
+      URL:
+        type: string
+    type: object
+  portainer.KubernetesConfiguration:
+    properties:
+      IngressClasses:
+        items:
+          $ref: '#/definitions/portainer.KubernetesIngressClassConfig'
+        type: array
+      StorageClasses:
+        items:
+          $ref: '#/definitions/portainer.KubernetesStorageClassConfig'
+        type: array
+      UseLoadBalancer:
+        type: boolean
+      UseServerMetrics:
+        type: boolean
+    type: object
+  portainer.KubernetesData:
+    properties:
+      Configuration:
+        $ref: '#/definitions/portainer.KubernetesConfiguration'
+      Snapshots:
+        items:
+          $ref: '#/definitions/portainer.KubernetesSnapshot'
+        type: array
+    type: object
+  portainer.KubernetesIngressClassConfig:
+    properties:
+      Name:
+        type: string
+      Type:
+        type: string
+    type: object
+  portainer.KubernetesSnapshot:
+    properties:
+      KubernetesVersion:
+        type: string
+      NodeCount:
+        type: integer
+      Time:
+        type: integer
+      TotalCPU:
+        type: integer
+      TotalMemory:
+        type: integer
+    type: object
+  portainer.KubernetesStorageClassConfig:
+    properties:
+      AccessModes:
+        items:
+          type: string
+        type: array
+      AllowVolumeExpansion:
+        type: boolean
+      Name:
+        type: string
+      Provisioner:
+        type: string
+    type: object
+  portainer.TLSConfiguration:
+    properties:
+      TLS:
+        type: boolean
+      TLSCACert:
+        type: string
+      TLSCert:
+        type: string
+      TLSKey:
+        type: string
+      TLSSkipVerify:
+        type: boolean
+    type: object
   portainer.Tag:
     properties:
       EndpointGroups:
@@ -24,6 +274,14 @@ definitions:
         type: string
       id:
         type: integer
+    type: object
+  portainer.TeamAccessPolicies:
+    additionalProperties:
+      $ref: '#/definitions/portainer.AccessPolicy'
+    type: object
+  portainer.UserAccessPolicies:
+    additionalProperties:
+      $ref: '#/definitions/portainer.AccessPolicy'
     type: object
 info:
   contact: {}
@@ -53,6 +311,31 @@ paths:
       summary: Authenticate with OAuth
       tags:
       - auth
+  /endpoints:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: endpoint data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/endpoints.endpointCreatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Endpoint
+          schema:
+            $ref: '#/definitions/portainer.Endpoint'
+        "400":
+          description: ""
+        "500":
+          description: ""
+      summary: Creates an endpoint
+      tags:
+      - Endpoints
   /endpoints/{id}:
     delete:
       consumes:
