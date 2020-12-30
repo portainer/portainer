@@ -6,11 +6,21 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 )
 
-// POST request on /api/upload/tls/{certificate:(?:ca|cert|key)}?folder=<folder>
+// UploadTLS godoc
+// @Summary Upload TLS file
+// @Description
+// @Accept  multipart/form-data
+// @Produce  json
+// @Param certificate path string true "certificate type" Enums(ca,cert,key)
+// @Param folder query string true "folder name"
+// @Param file formData file true "file"
+// @Success 204
+// @Failure 400,500
+// @Router /upload/tls/{certificate} [post]
 func (handler *Handler) uploadTLS(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	certificate, err := request.RetrieveRouteVariableValue(r, "certificate")
 	if err != nil {

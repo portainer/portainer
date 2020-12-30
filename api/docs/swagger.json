@@ -1,0 +1,62 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "PortainerCE",
+        "contact": {},
+        "license": {},
+        "version": "2.0"
+    },
+    "basePath": "/api",
+    "paths": {
+        "/upload/tls/{certificate}": {
+            "post": {
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Upload TLS file",
+                "parameters": [
+                    {
+                        "enum": [
+                            "ca",
+                            "cert",
+                            "key"
+                        ],
+                        "type": "string",
+                        "description": "certificate type",
+                        "name": "certificate",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "folder name",
+                        "name": "folder",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "file",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        }
+    }
+}

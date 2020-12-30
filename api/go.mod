@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/Microsoft/go-winio v0.4.14
+	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a
 	github.com/boltdb/bolt v1.3.1
 	github.com/containerd/containerd v1.3.1 // indirect
@@ -28,9 +29,10 @@ require (
 	github.com/portainer/libcompose v0.5.3
 	github.com/portainer/libcrypto v0.0.0-20190723020515-23ebe86ab2c2
 	github.com/portainer/libhttp v0.0.0-20190806161843-ba068f58be33
-	github.com/stretchr/testify v1.6.1 // indirect
-	golang.org/x/crypto v0.0.0-20191128160524-b544559bb6d1
-	golang.org/x/net v0.0.0-20191126235420-ef20fe5d7933 // indirect
+	github.com/stretchr/testify v1.6.1
+	github.com/swaggo/http-swagger v1.0.0
+	github.com/swaggo/swag v1.7.0
+	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/src-d/go-git.v4 v4.13.1

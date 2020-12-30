@@ -1,0 +1,42 @@
+basePath: /api
+info:
+  contact: {}
+  license: {}
+  title: PortainerCE
+  version: "2.0"
+paths:
+  /upload/tls/{certificate}:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: certificate type
+        enum:
+        - ca
+        - cert
+        - key
+        in: path
+        name: certificate
+        required: true
+        type: string
+      - description: folder name
+        in: query
+        name: folder
+        required: true
+        type: string
+      - description: file
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+        "500":
+          description: ""
+      summary: Upload TLS file
+swagger: "2.0"
