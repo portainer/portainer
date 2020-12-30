@@ -25,6 +25,27 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/endpoints/snapshot": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Endpoints"
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/auth/oauth/validate": {
             "post": {
                 "consumes": [
@@ -218,6 +239,41 @@ var doc = `{
                     }
                 }
             },
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Endpoints"
+                ],
+                "summary": "Updates an endpoint",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "endpoint id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Endpoint",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.Endpoint"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
             "delete": {
                 "consumes": [
                     "application/json"
@@ -243,6 +299,43 @@ var doc = `{
                         "description": ""
                     },
                     "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/endpoints/{id}/snapshot": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Endpoints"
+                ],
+                "summary": "Snapshots an endpoint",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "endpoint id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "404": {
                         "description": ""
                     },
                     "500": {

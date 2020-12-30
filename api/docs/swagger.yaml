@@ -289,6 +289,19 @@ info:
   title: PortainerCE
   version: "2.0"
 paths:
+  /api/endpoints/snapshot:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "500":
+          description: ""
+      tags:
+      - Endpoints
   /auth/oauth/validate:
     post:
       consumes:
@@ -435,6 +448,53 @@ paths:
         "500":
           description: ""
       summary: Inspects an endpoint
+      tags:
+      - Endpoints
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: endpoint id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Endpoint
+          schema:
+            $ref: '#/definitions/portainer.Endpoint'
+        "400":
+          description: ""
+        "500":
+          description: ""
+      summary: Updates an endpoint
+      tags:
+      - Endpoints
+  /endpoints/{id}/snapshot:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: endpoint id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      summary: Snapshots an endpoint
       tags:
       - Endpoints
   /tags:

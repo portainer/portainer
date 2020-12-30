@@ -6,12 +6,21 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/internal/snapshot"
 )
 
-// POST request on /api/endpoints/:id/snapshot
+// Snapshot endpoint
+// @Summary Snapshots an endpoint
+// @Description
+// @Tags Endpoints
+// @Accept json
+// @Produce json
+// @Param id path int true "endpoint id"
+// @Success 204
+// @Failure 400,404,500
+// @Router /endpoints/{id}/snapshot [post]
 func (handler *Handler) endpointSnapshot(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
