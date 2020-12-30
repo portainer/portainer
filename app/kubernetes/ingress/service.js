@@ -1,30 +1,23 @@
-import * as _ from 'lodash-es';
+import _ from 'lodash-es';
 import angular from 'angular';
 import PortainerError from 'Portainer/error';
 import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
 import { KubernetesIngressConverter } from './converter';
 
-class KubernetesIngressService {
-  /* @ngInject */
-  constructor($async, KubernetesIngresses) {
-    this.$async = $async;
-    this.KubernetesIngresses = KubernetesIngresses;
+/* @ngInject */
+export function KubernetesIngressService($async, KubernetesIngresses) {
+  return {
+    get,
+    create,
+    patch,
+    delete: _delete,
+  };
 
-    this.getAsync = this.getAsync.bind(this);
-    this.getAllAsync = this.getAllAsync.bind(this);
-    this.createAsync = this.createAsync.bind(this);
-    this.patchAsync = this.patchAsync.bind(this);
-    this.deleteAsync = this.deleteAsync.bind(this);
-  }
-
-  /**
-   * GET
-   */
-  async getAsync(namespace, name) {
+  async function getOne(namespace, name) {
     try {
       const params = new KubernetesCommonParams();
       params.id = name;
-      const [raw, yaml] = await Promise.all([this.KubernetesIngresses(namespace).get(params).$promise, this.KubernetesIngresses(namespace).getYaml(params).$promise]);
+      const [raw, yaml] = await Promise.all([KubernetesIngresses(namespace).get(params).$promise, KubernetesIngresses(namespace).getYaml(params).$promise]);
       const res = {
         Raw: KubernetesIngressConverter.apiToModel(raw),
         Yaml: yaml.data,
@@ -35,9 +28,9 @@ class KubernetesIngressService {
     }
   }
 
-  async getAllAsync(namespace) {
+  async function getAll(namespace) {
     try {
-      const data = await this.KubernetesIngresses(namespace).get().$promise;
+      const data = await KubernetesIngresses(namespace).get().$promise;
       const res = _.reduce(data.items, (arr, item) => _.concat(arr, KubernetesIngressConverter.apiToModel(item)), []);
       return res;
     } catch (err) {
@@ -45,73 +38,57 @@ class KubernetesIngressService {
     }
   }
 
-  get(namespace, name) {
+  function get(namespace, name) {
     if (name) {
-      return this.$async(this.getAsync, namespace, name);
+      return $async(getOne, namespace, name);
     }
-    return this.$async(this.getAllAsync, namespace);
+    return $async(getAll, namespace);
   }
 
-  /**
-   * CREATE
-   */
-  async createAsync(ingress) {
-    try {
-      const params = {};
-      const payload = KubernetesIngressConverter.createPayload(ingress);
-      const namespace = payload.metadata.namespace;
-      const data = await this.KubernetesIngresses(namespace).create(params, payload).$promise;
-      return data;
-    } catch (err) {
-      throw new PortainerError('Unable to create ingress', err);
-    }
-  }
-
-  create(ingress) {
-    return this.$async(this.createAsync, ingress);
-  }
-
-  /**
-   * PATCH
-   */
-  async patchAsync(oldIngress, newIngress) {
-    try {
-      const params = new KubernetesCommonParams();
-      params.id = newIngress.Name;
-      const namespace = newIngress.Namespace;
-      const payload = KubernetesIngressConverter.patchPayload(oldIngress, newIngress);
-      if (!payload.length) {
-        return;
+  function create(ingress) {
+    return $async(async () => {
+      try {
+        const params = {};
+        const payload = KubernetesIngressConverter.createPayload(ingress);
+        const namespace = payload.metadata.namespace;
+        const data = await KubernetesIngresses(namespace).create(params, payload).$promise;
+        return data;
+      } catch (err) {
+        throw new PortainerError('Unable to create ingress', err);
       }
-      const data = await this.KubernetesIngresses(namespace).patch(params, payload).$promise;
-      return data;
-    } catch (err) {
-      throw new PortainerError('Unable to patch ingress', err);
-    }
+    });
   }
 
-  patch(oldIngress, newIngress) {
-    return this.$async(this.patchAsync, oldIngress, newIngress);
+  function patch(oldIngress, newIngress) {
+    return $async(async () => {
+      try {
+        const params = new KubernetesCommonParams();
+        params.id = newIngress.Name;
+        const namespace = newIngress.Namespace;
+        const payload = KubernetesIngressConverter.patchPayload(oldIngress, newIngress);
+        if (!payload.length) {
+          return;
+        }
+        const data = await KubernetesIngresses(namespace).patch(params, payload).$promise;
+        return data;
+      } catch (err) {
+        throw new PortainerError('Unable to patch ingress', err);
+      }
+    });
   }
 
-  /**
-   * DELETE
-   */
-  async deleteAsync(ingress) {
-    try {
-      const params = new KubernetesCommonParams();
-      params.id = ingress.IngressClass.Name;
-      const namespace = ingress.Namespace;
-      await this.KubernetesIngresses(namespace).delete(params).$promise;
-    } catch (err) {
-      throw new PortainerError('Unable to delete ingress', err);
-    }
-  }
-
-  delete(ingress) {
-    return this.$async(this.deleteAsync, ingress);
+  function _delete(ingress) {
+    return $async(async () => {
+      try {
+        const params = new KubernetesCommonParams();
+        params.id = ingress.Name;
+        const namespace = ingress.Namespace;
+        await this.KubernetesIngresses(namespace).delete(params).$promise;
+      } catch (err) {
+        throw new PortainerError('Unable to delete ingress', err);
+      }
+    });
   }
 }
 
-export default KubernetesIngressService;
 angular.module('portainer.kubernetes').service('KubernetesIngressService', KubernetesIngressService);

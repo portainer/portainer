@@ -30,7 +30,8 @@ class KubernetesVolumeService {
 
   async getAllAsync(namespace) {
     try {
-      const pools = await this.KubernetesResourcePoolService.get(namespace);
+      const data = await this.KubernetesResourcePoolService.get(namespace);
+      const pools = data instanceof Array ? data : [data];
       const res = await Promise.all(
         _.map(pools, async (pool) => {
           const pvcs = await this.KubernetesPersistentVolumeClaimService.get(pool.Namespace.Name);

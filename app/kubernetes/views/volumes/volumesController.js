@@ -1,9 +1,10 @@
 require('../../templates/advancedDeploymentPanel.html');
 
-import * as _ from 'lodash-es';
+import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import angular from 'angular';
 import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
+import KubernetesResourceQuotaHelper from 'Kubernetes/helpers/resourceQuotaHelper';
 
 function buildStorages(storages, volumes) {
   _.forEach(storages, (s) => {
@@ -15,28 +16,9 @@ function buildStorages(storages, volumes) {
 }
 
 function computeSize(volumes) {
-  let hasT,
-    hasG,
-    hasM = false;
-  const size = _.sumBy(volumes, (v) => {
-    const storage = v.PersistentVolumeClaim.Storage;
-    if (!hasT && _.endsWith(storage, 'TB')) {
-      hasT = true;
-    } else if (!hasG && _.endsWith(storage, 'GB')) {
-      hasG = true;
-    } else if (!hasM && _.endsWith(storage, 'MB')) {
-      hasM = true;
-    }
-    return filesizeParser(storage, { base: 10 });
-  });
-  if (hasT) {
-    return size / 1000 / 1000 / 1000 / 1000 + 'TB';
-  } else if (hasG) {
-    return size / 1000 / 1000 / 1000 + 'GB';
-  } else if (hasM) {
-    return size / 1000 / 1000 + 'MB';
-  }
-  return size;
+  const size = _.sumBy(volumes, (v) => filesizeParser(v.PersistentVolumeClaim.Storage, { base: 10 }));
+  const format = KubernetesResourceQuotaHelper.formatBytes(size);
+  return `${format.Size}${format.SizeUnit}`;
 }
 
 class KubernetesVolumesController {

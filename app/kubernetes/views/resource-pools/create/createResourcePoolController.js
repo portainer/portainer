@@ -6,8 +6,9 @@ import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceRese
 import { KubernetesResourcePoolFormValues, KubernetesResourcePoolIngressClassAnnotationFormValue } from 'Kubernetes/models/resource-pool/formValues';
 import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
-import { KubernetesFormValueDuplicate } from 'Kubernetes/models/application/formValues';
+import { KubernetesFormValidationReferences } from 'Kubernetes/models/application/formValues';
 import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
+import KubernetesStorageClassConverter from 'Kubernetes/converters/storageClass';
 
 class KubernetesCreateResourcePoolController {
   /* #region  CONSTRUCTOR */
@@ -44,7 +45,7 @@ class KubernetesCreateResourcePoolController {
       }
     });
     state.refs = duplicates;
-    state.hasDuplicates = Object.keys(duplicates).length > 0;
+    state.hasRefs = Object.keys(duplicates).length > 0;
   }
 
   /* #region  ANNOTATIONS MANAGEMENT */
@@ -58,7 +59,7 @@ class KubernetesCreateResourcePoolController {
   /* #endregion */
 
   isCreateButtonDisabled() {
-    return this.state.actionInProgress || (this.formValues.HasQuota && !this.isQuotaValid()) || this.state.isAlreadyExist || this.state.duplicates.ingressHosts.hasDuplicates;
+    return this.state.actionInProgress || (this.formValues.HasQuota && !this.isQuotaValid()) || this.state.isAlreadyExist || this.state.duplicates.ingressHosts.hasRefs;
   }
 
   onChangeName() {
@@ -109,13 +110,10 @@ class KubernetesCreateResourcePoolController {
 
   /* #region  GET INGRESSES */
   async getIngressesAsync() {
-    this.state.ingressesLoading = true;
     try {
       this.allIngresses = await this.KubernetesIngressService.get();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve ingresses.');
-    } finally {
-      this.state.ingressesLoading = false;
     }
   }
 
@@ -145,6 +143,7 @@ class KubernetesCreateResourcePoolController {
       this.endpoint = endpoint;
       this.defaults = KubernetesResourceQuotaDefaults;
       this.formValues = new KubernetesResourcePoolFormValues(this.defaults);
+      this.formValues.StorageClasses = KubernetesStorageClassConverter.storageClassesToResourcePoolFormValues(this.endpoint.Kubernetes.Configuration.StorageClasses);
 
       this.state = {
         actionInProgress: false,
@@ -154,7 +153,7 @@ class KubernetesCreateResourcePoolController {
         isAlreadyExist: false,
         canUseIngress: endpoint.Kubernetes.Configuration.IngressClasses.length,
         duplicates: {
-          ingressHosts: new KubernetesFormValueDuplicate(),
+          ingressHosts: new KubernetesFormValidationReferences(),
         },
       };
 

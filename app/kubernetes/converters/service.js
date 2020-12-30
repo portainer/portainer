@@ -1,4 +1,4 @@
-import * as _ from 'lodash-es';
+import _ from 'lodash-es';
 import * as JsonPatch from 'fast-json-patch';
 
 import { KubernetesServiceCreatePayload } from 'Kubernetes/models/service/payloads';

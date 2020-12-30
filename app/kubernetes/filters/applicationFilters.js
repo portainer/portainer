@@ -3,6 +3,7 @@ import { KubernetesApplicationDataAccessPolicies } from 'Kubernetes/models/appli
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import { KubernetesApplicationTypes, KubernetesApplicationTypeStrings } from 'Kubernetes/models/application/models';
 import { KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'Kubernetes/pod/models';
+import KubernetesResourceQuotaHelper from 'Kubernetes/helpers/resourceQuotaHelper';
 
 angular
   .module('portainer.kubernetes')
@@ -131,5 +132,12 @@ angular
         'kubernetes.io/hostname': 'Node',
       };
       return values[text] || text;
+    };
+  })
+  .filter('kubernetesAppStorageRequestSizeHumanReadable', function () {
+    'use strict';
+    return function (bytes) {
+      const format = KubernetesResourceQuotaHelper.formatBytes(bytes, 3);
+      return `${format.Size}${format.SizeUnit}`;
     };
   });

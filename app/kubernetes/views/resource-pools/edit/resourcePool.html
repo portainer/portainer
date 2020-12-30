@@ -50,7 +50,7 @@
                       <div class="col-sm-3">
                         <slider
                           model="ctrl.formValues.MemoryLimit"
-                          floor="ctrl.defaults.MemoryLimit"
+                          floor="ctrl.ResourceQuotaDefaults.MemoryLimit"
                           ceil="ctrl.state.sliderMaxMemory"
                           step="128"
                           ng-if="ctrl.state.sliderMaxMemory"
@@ -60,7 +60,7 @@
                         <input
                           name="memory_limit"
                           type="number"
-                          min="{{ ctrl.defaults.MemoryLimit }}"
+                          min="{{ ctrl.ResourceQuotaDefaults.MemoryLimit }}"
                           max="{{ ctrl.state.sliderMaxMemory }}"
                           class="form-control"
                           ng-model="ctrl.formValues.MemoryLimit"
@@ -78,7 +78,7 @@
                       <div class="col-sm-12 small text-warning">
                         <div ng-messages="resourcePoolEditForm.pool_name.$error">
                           <p
-                            ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value must be between {{ ctrl.defaults.MemoryLimit }} and
+                            ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value must be between {{ ctrl.ResourceQuotaDefaults.MemoryLimit }} and
                             {{ ctrl.state.sliderMaxMemory }}</p
                           >
                         </div>
@@ -93,7 +93,7 @@
                       <div class="col-sm-5">
                         <slider
                           model="ctrl.formValues.CpuLimit"
-                          floor="ctrl.defaults.CpuLimit"
+                          floor="ctrl.ResourceQuotaDefaults.CpuLimit"
                           ceil="ctrl.state.sliderMaxCpu"
                           step="0.1"
                           precision="2"
