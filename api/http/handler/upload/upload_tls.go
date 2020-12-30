@@ -13,6 +13,7 @@ import (
 // UploadTLS godoc
 // @Summary Upload TLS file
 // @Description
+// @Tags Upload
 // @Accept  multipart/form-data
 // @Produce  json
 // @Param certificate path string true "certificate type" Enums(ca,cert,key)

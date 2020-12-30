@@ -41,6 +41,8 @@ paths:
         "500":
           description: ""
       summary: Deletes an endpoint
+      tags:
+      - Endpoints
   /tags:
     get:
       produces:
@@ -55,6 +57,8 @@ paths:
         "500":
           description: ""
       summary: Fetches the list of tags
+      tags:
+      - Tags
   /upload/tls/{certificate}:
     post:
       consumes:
@@ -89,4 +93,9 @@ paths:
         "500":
           description: ""
       summary: Upload TLS file
+      tags:
+      - Upload
 swagger: "2.0"
+tags:
+- description: API for handling Endpoints
+  name: Endpoints

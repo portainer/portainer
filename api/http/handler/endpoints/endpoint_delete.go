@@ -14,6 +14,7 @@ import (
 // Delete endpoint
 // @Summary Deletes an endpoint
 // @Description
+// @Tags Endpoints
 // @Accept json
 // @Produce json
 // @Param id path int true "endpoint id"

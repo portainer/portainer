@@ -12,6 +12,7 @@ import (
 // @Description
 // @Produce json
 // @Success 200 {array} portainer.Tag
+// @tags Tags
 // @Failure 500
 // @Router /tags [get]
 func (handler *Handler) tagList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

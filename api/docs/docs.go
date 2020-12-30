@@ -33,6 +33,9 @@ var doc = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Endpoints"
+                ],
                 "summary": "Deletes an endpoint",
                 "parameters": [
                     {
@@ -61,6 +64,9 @@ var doc = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Tags"
+                ],
                 "summary": "Fetches the list of tags",
                 "responses": {
                     "200": {
@@ -85,6 +91,9 @@ var doc = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Upload"
                 ],
                 "summary": "Upload TLS file",
                 "parameters": [
@@ -153,7 +162,13 @@ var doc = `{
                 }
             }
         }
-    }
+    },
+    "tags": [
+        {
+            "description": "API for handling Endpoints",
+            "name": "Endpoints"
+        }
+    ]
 }`
 
 type swaggerInfo struct {
