@@ -7,11 +7,19 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 )
 
-// DELETE request on /api/endpoints/:id
+// Delete endpoint
+// @Summary Deletes an endpoint
+// @Description
+// @Accept json
+// @Produce json
+// @Param id path int true "endpoint id"
+// @Success 204
+// @Failure 400,500
+// @Router /endpoints/{id} [delete]
 func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

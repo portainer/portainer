@@ -1,10 +1,60 @@
 basePath: /api
+definitions:
+  portainer.Tag:
+    properties:
+      EndpointGroups:
+        additionalProperties:
+          type: boolean
+        type: object
+      Endpoints:
+        additionalProperties:
+          type: boolean
+        type: object
+      Name:
+        type: string
+      id:
+        type: integer
+    type: object
 info:
   contact: {}
   license: {}
   title: PortainerCE
   version: "2.0"
 paths:
+  /endpoints/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: endpoint id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+        "500":
+          description: ""
+      summary: Deletes an endpoint
+  /tags:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/portainer.Tag'
+            type: array
+        "500":
+          description: ""
+      summary: Fetches the list of tags
   /upload/tls/{certificate}:
     post:
       consumes:
