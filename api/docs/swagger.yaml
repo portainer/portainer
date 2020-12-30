@@ -1,5 +1,15 @@
 basePath: /api
 definitions:
+  auth.authenticateResponse:
+    properties:
+      jwt:
+        type: string
+    type: object
+  auth.oauthPayload:
+    properties:
+      code:
+        type: string
+    type: object
   portainer.Tag:
     properties:
       EndpointGroups:
@@ -21,6 +31,28 @@ info:
   title: PortainerCE
   version: "2.0"
 paths:
+  /auth/oauth/validate:
+    post:
+      consumes:
+      - application/json
+      operationId: authenticate_oauth
+      parameters:
+      - description: OAuth code
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/auth.oauthPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Token
+          schema:
+            $ref: '#/definitions/auth.authenticateResponse'
+      summary: Authenticate with OAuth
+      tags:
+      - auth
   /endpoints/{id}:
     delete:
       consumes:

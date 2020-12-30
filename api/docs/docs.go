@@ -25,6 +25,40 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/auth/oauth/validate": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Authenticate with OAuth",
+                "operationId": "authenticate_oauth",
+                "parameters": [
+                    {
+                        "description": "OAuth code",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.oauthPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Token",
+                        "schema": {
+                            "$ref": "#/definitions/auth.authenticateResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/endpoints/{id}": {
             "delete": {
                 "consumes": [
@@ -139,6 +173,22 @@ var doc = `{
         }
     },
     "definitions": {
+        "auth.authenticateResponse": {
+            "type": "object",
+            "properties": {
+                "jwt": {
+                    "type": "string"
+                }
+            }
+        },
+        "auth.oauthPayload": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                }
+            }
+        },
         "portainer.Tag": {
             "type": "object",
             "properties": {

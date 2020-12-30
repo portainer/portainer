@@ -8,7 +8,7 @@ import (
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 )
@@ -24,6 +24,15 @@ func (payload *oauthPayload) Validate(r *http.Request) error {
 	return nil
 }
 
+// AuthenticationOAuth godoc
+// @id authenticate_oauth
+// @summary Authenticate with OAuth
+// @tags auth
+// @accept json
+// @produce json
+// @param body body oauthPayload true "OAuth code"
+// @success 200 {object} authenticateResponse "Token"
+// @router /auth/oauth/validate [post]
 func (handler *Handler) authenticateOAuth(code string, settings *portainer.OAuthSettings) (string, error) {
 	if code == "" {
 		return "", errors.New("Invalid OAuth authorization code")
