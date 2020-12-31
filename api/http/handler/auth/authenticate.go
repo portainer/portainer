@@ -10,7 +10,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 )
@@ -34,6 +34,15 @@ func (payload *authenticatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
+// authentication godoc
+// @id authenticate
+// @summary Authenticate
+// @tags auth
+// @accept json
+// @produce json
+// @param body body authenticatePayload true "username and password"
+// @success 200 {object} authenticateResponse "Token"
+// @router /auth [post]
 func (handler *Handler) authenticate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload authenticatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)

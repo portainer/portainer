@@ -1,5 +1,12 @@
 basePath: /api
 definitions:
+  auth.authenticatePayload:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
   auth.authenticateResponse:
     properties:
       jwt:
@@ -427,6 +434,41 @@ paths:
           description: ""
       tags:
       - Endpoints
+  /auth:
+    post:
+      consumes:
+      - application/json
+      operationId: authenticate
+      parameters:
+      - description: username and password
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/auth.authenticatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Token
+          schema:
+            $ref: '#/definitions/auth.authenticateResponse'
+      summary: Authenticate
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      operationId: logout
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+      summary: Logout
+      tags:
+      - auth
   /auth/oauth/validate:
     post:
       consumes:
