@@ -2123,6 +2123,11 @@ var doc = `{
         },
         "/upload/tls/{certificate}": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "consumes": [
                     "multipart/form-data"
                 ],

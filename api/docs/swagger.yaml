@@ -2126,6 +2126,8 @@ paths:
           description: ""
         "500":
           description: ""
+      security:
+      - ApiKeyAuth: []
       summary: Upload TLS file
       tags:
       - Upload

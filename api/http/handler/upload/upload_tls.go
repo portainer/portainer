@@ -11,17 +11,18 @@ import (
 )
 
 // UploadTLS godoc
-// @Summary Upload TLS file
-// @Description
-// @Tags Upload
-// @Accept  multipart/form-data
-// @Produce  json
-// @Param certificate path string true "certificate type" Enums(ca,cert,key)
-// @Param folder query string true "folder name"
-// @Param file formData file true "file"
-// @Success 204
-// @Failure 400,500
-// @Router /upload/tls/{certificate} [post]
+// @summary Upload TLS file
+// @description
+// @tags Upload
+// @security ApiKeyAuth
+// @accept  multipart/form-data
+// @produce  json
+// @param certificate path string true "certificate type" Enums(ca,cert,key)
+// @param folder query string true "folder name"
+// @param file formData file true "file"
+// @success 204
+// @failure 400,500
+// @router /upload/tls/{certificate} [post]
 func (handler *Handler) uploadTLS(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	certificate, err := request.RetrieveRouteVariableValue(r, "certificate")
 	if err != nil {
