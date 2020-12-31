@@ -10,6 +10,21 @@ definitions:
       code:
         type: string
     type: object
+  endpointgroups.endpointGroupCreatePayload:
+    properties:
+      associatedEndpoints:
+        items:
+          type: integer
+        type: array
+      description:
+        type: string
+      name:
+        type: string
+      tagIDs:
+        items:
+          type: integer
+        type: array
+    type: object
   endpoints.endpointCreatePayload:
     properties:
       azureApplicationID:
@@ -190,6 +205,42 @@ definitions:
       URL:
         type: string
     type: object
+  portainer.EndpointGroup:
+    properties:
+      AuthorizedTeams:
+        items:
+          type: integer
+        type: array
+      AuthorizedUsers:
+        description: Deprecated in DBVersion == 18
+        items:
+          type: integer
+        type: array
+      Description:
+        type: string
+      Id:
+        type: integer
+      Labels:
+        description: Deprecated fields
+        items:
+          $ref: '#/definitions/portainer.Pair'
+        type: array
+      Name:
+        type: string
+      TagIds:
+        items:
+          type: integer
+        type: array
+      Tags:
+        description: Deprecated in DBVersion == 22
+        items:
+          type: string
+        type: array
+      TeamAccessPolicies:
+        $ref: '#/definitions/portainer.TeamAccessPolicies'
+      UserAccessPolicies:
+        $ref: '#/definitions/portainer.UserAccessPolicies'
+    type: object
   portainer.KubernetesConfiguration:
     properties:
       IngressClasses:
@@ -247,6 +298,13 @@ definitions:
       Provisioner:
         type: string
     type: object
+  portainer.Pair:
+    properties:
+      name:
+        type: string
+      value:
+        type: string
+    type: object
   portainer.TLSConfiguration:
     properties:
       TLS:
@@ -289,6 +347,73 @@ info:
   title: PortainerCE
   version: "2.0"
 paths:
+  /api/endpoint_groups:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Endpoint group
+          schema:
+            items:
+              $ref: '#/definitions/portainer.EndpointGroup'
+            type: array
+        "400":
+          description: ""
+        "500":
+          description: ""
+      summary: List Endpoint groups
+      tags:
+      - EndpointGroups
+  /api/endpoint_groups/:id:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: endpoint group id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Endpoint group
+          schema:
+            $ref: '#/definitions/portainer.EndpointGroup'
+        "400":
+          description: ""
+        "500":
+          description: ""
+      summary: Inspect an Endpoint group
+      tags:
+      - EndpointGroups
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: endpoint group id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Endpoint group
+          schema:
+            $ref: '#/definitions/portainer.EndpointGroup'
+        "400":
+          description: ""
+        "500":
+          description: ""
+      summary: Update Endpoint group
+      tags:
+      - EndpointGroups
   /api/endpoints/snapshot:
     post:
       consumes:
@@ -324,6 +449,108 @@ paths:
       summary: Authenticate with OAuth
       tags:
       - auth
+  /endpoint_groups:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: endpoint group data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/endpointgroups.endpointGroupCreatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Endpoint group
+          schema:
+            $ref: '#/definitions/portainer.EndpointGroup'
+        "400":
+          description: ""
+        "500":
+          description: ""
+      summary: Creates an endpoint group
+      tags:
+      - EndpointGroups
+  /endpoint_groups/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: endpoint group id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+        "500":
+          description: ""
+      summary: Deletes an endpoint group
+      tags:
+      - EndpointGroups
+  /endpoint_groups/{id}/endpoints/{endpointId}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: endpoint group id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: endpoint id
+        in: path
+        name: endpointId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      summary: Removes endpoint from an endpoint group
+      tags:
+      - EndpointGroups
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: endpoint group id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: endpoint id
+        in: path
+        name: endpointId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+        "500":
+          description: ""
+      summary: Attach an endpoint to an endpoint group
+      tags:
+      - EndpointGroups
   /endpoints:
     get:
       consumes:

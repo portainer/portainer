@@ -25,6 +25,109 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/endpoint_groups": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EndpointGroups"
+                ],
+                "summary": "List Endpoint groups",
+                "responses": {
+                    "200": {
+                        "description": "Endpoint group",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/portainer.EndpointGroup"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/endpoint_groups/:id": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EndpointGroups"
+                ],
+                "summary": "Inspect an Endpoint group",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "endpoint group id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Endpoint group",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.EndpointGroup"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EndpointGroups"
+                ],
+                "summary": "Update Endpoint group",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "endpoint group id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Endpoint group",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.EndpointGroup"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/endpoints/snapshot": {
             "post": {
                 "consumes": [
@@ -76,6 +179,162 @@ var doc = `{
                         "schema": {
                             "$ref": "#/definitions/auth.authenticateResponse"
                         }
+                    }
+                }
+            }
+        },
+        "/endpoint_groups": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EndpointGroups"
+                ],
+                "summary": "Creates an endpoint group",
+                "parameters": [
+                    {
+                        "description": "endpoint group data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/endpointgroups.endpointGroupCreatePayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Endpoint group",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.EndpointGroup"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/endpoint_groups/{id}": {
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EndpointGroups"
+                ],
+                "summary": "Deletes an endpoint group",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "endpoint group id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/endpoint_groups/{id}/endpoints/{endpointId}": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EndpointGroups"
+                ],
+                "summary": "Attach an endpoint to an endpoint group",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "endpoint group id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "endpoint id",
+                        "name": "endpointId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EndpointGroups"
+                ],
+                "summary": "Removes endpoint from an endpoint group",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "endpoint group id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "endpoint id",
+                        "name": "endpointId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
                     }
                 }
             }
@@ -440,6 +699,29 @@ var doc = `{
                 }
             }
         },
+        "endpointgroups.endpointGroupCreatePayload": {
+            "type": "object",
+            "properties": {
+                "associatedEndpoints": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "tagIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
         "endpoints.endpointCreatePayload": {
             "type": "object",
             "properties": {
@@ -709,6 +991,59 @@ var doc = `{
                 }
             }
         },
+        "portainer.EndpointGroup": {
+            "type": "object",
+            "properties": {
+                "AuthorizedTeams": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "AuthorizedUsers": {
+                    "description": "Deprecated in DBVersion == 18",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "Description": {
+                    "type": "string"
+                },
+                "Id": {
+                    "type": "integer"
+                },
+                "Labels": {
+                    "description": "Deprecated fields",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/portainer.Pair"
+                    }
+                },
+                "Name": {
+                    "type": "string"
+                },
+                "TagIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "Tags": {
+                    "description": "Deprecated in DBVersion == 22",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "TeamAccessPolicies": {
+                    "$ref": "#/definitions/portainer.TeamAccessPolicies"
+                },
+                "UserAccessPolicies": {
+                    "$ref": "#/definitions/portainer.UserAccessPolicies"
+                }
+            }
+        },
         "portainer.KubernetesConfiguration": {
             "type": "object",
             "properties": {
@@ -793,6 +1128,17 @@ var doc = `{
                     "type": "string"
                 },
                 "Provisioner": {
+                    "type": "string"
+                }
+            }
+        },
+        "portainer.Pair": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "value": {
                     "type": "string"
                 }
             }

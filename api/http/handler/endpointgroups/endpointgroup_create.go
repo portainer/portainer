@@ -8,7 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 type endpointGroupCreatePayload struct {
@@ -28,7 +28,16 @@ func (payload *endpointGroupCreatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// POST request on /api/endpoint_groups
+// Create endpoint group
+// @Summary Creates an endpoint group
+// @Description
+// @Tags EndpointGroups
+// @Accept json
+// @Produce json
+// @Param body body endpointGroupCreatePayload true "endpoint group data"
+// @Success 200 {object} portainer.EndpointGroup "Endpoint group"
+// @Failure 400,500
+// @Router /endpoint_groups [post]
 func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload endpointGroupCreatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
