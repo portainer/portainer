@@ -8,7 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 type tagCreatePayload struct {
@@ -22,7 +22,15 @@ func (payload *tagCreatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// POST request on /api/tags
+// tagCreate godoc
+// @Summary Create a tag
+// @Description
+// @Produce json
+// @param body body tagCreatePayload true "tag info"
+// @Success 200 {array} portainer.Tag
+// @tags Tags
+// @Failure 500
+// @Router /tags [post]
 func (handler *Handler) tagCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload tagCreatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)

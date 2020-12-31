@@ -6,12 +6,20 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/internal/edge"
 )
 
-// DELETE request on /api/tags/:id
+// tagDelete godoc
+// @Summary Delete a tag
+// @Description
+// @tags Tags
+// @Produce json
+// @param id path int true "tag id"
+// @Success 204
+// @Failure 500
+// @Router /tags/{id} [delete]
 func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	id, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

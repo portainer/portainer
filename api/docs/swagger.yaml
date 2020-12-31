@@ -512,6 +512,11 @@ definitions:
       UserId:
         type: integer
     type: object
+  tags.tagCreatePayload:
+    properties:
+      name:
+        type: string
+    type: object
 info:
   contact: {}
   license: {}
@@ -1131,6 +1136,46 @@ paths:
         "500":
           description: ""
       summary: Fetches the list of tags
+      tags:
+      - Tags
+    post:
+      parameters:
+      - description: tag info
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/tags.tagCreatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/portainer.Tag'
+            type: array
+        "500":
+          description: ""
+      summary: Create a tag
+      tags:
+      - Tags
+  /tags/{id}:
+    delete:
+      parameters:
+      - description: tag id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "500":
+          description: ""
+      summary: Delete a tag
       tags:
       - Tags
   /upload/tls/{certificate}:
