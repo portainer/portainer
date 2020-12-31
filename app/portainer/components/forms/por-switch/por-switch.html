@@ -1,14 +1,3 @@
-<label for="toggle_{{::$ctrl.name}}" class="control-label text-left">
-  {{::$ctrl.label}}
-  <portainer-tooltip ng-if="$ctrl.tooltip" position="bottom" message="{{::$ctrl.tooltip}}"></portainer-tooltip>
-</label>
-<label class="switch" style="margin-left: 20px;">
-  <input
-    type="checkbox"
-    name="toggle_{{::$ctrl.name}}"
-    id="toggle_{{::$ctrl.name}}"
-    ng-model="$ctrl.ngModel"
-    ng-disabled="$ctrl.disabled"
-    ng-change="$ctrl.onChange($ctrl.ngModel)"
-  /><i></i>
+<label class="switch" ng-class="$ctrl.className" style="margin-bottom: 0;">
+  <input type="checkbox" name="{{::$ctrl.name}}" id="{{::$ctrl.id}}" ng-model="$ctrl.ngModel" ng-disabled="$ctrl.disabled" ng-change="$ctrl.onChange($ctrl.ngModel)" /><i></i>
 </label>

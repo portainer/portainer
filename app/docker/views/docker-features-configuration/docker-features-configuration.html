@@ -19,86 +19,86 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <por-switch
+              <por-switch-field
                 ng-model="$ctrl.formValues.enableHostManagementFeatures"
                 name="enableHostManagementFeatures"
                 label="Enable host management features"
                 tooltip="Enable host management features: host system browsing and advanced host details."
                 disabled="!$ctrl.isAgent"
-              ></por-switch>
+              ></por-switch-field>
             </div>
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <por-switch
+              <por-switch-field
                 ng-model="$ctrl.formValues.allowVolumeBrowserForRegularUsers"
                 name="allowVolumeBrowserForRegularUsers"
                 label="Enable volume management for non-administrators"
                 tooltip="When enabled, regular users will be able to use Portainer volume management features."
                 disabled="!$ctrl.isAgent"
-              ></por-switch>
+              ></por-switch-field>
             </div>
           </div>
-          <!-- !host-filesystem -->
           <!-- security -->
           <div class="col-sm-12 form-section-title">
             Docker Endpoint Security Options
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <por-switch
+              <por-switch-field
                 ng-model="$ctrl.formValues.disableBindMountsForRegularUsers"
                 name="disableBindMountsForRegularUsers"
                 label="Disable bind mounts for non-administrators"
                 tooltip="When enabled, regular users will not be able to use bind mounts when creating containers."
-              ></por-switch>
+                on-change="($ctrl.onChangeSwitch)"
+              ></por-switch-field>
             </div>
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <por-switch
+              <por-switch-field
                 ng-model="$ctrl.formValues.disablePrivilegedModeForRegularUsers"
                 name="disablePrivilegedModeForRegularUsers"
                 label="Disable privileged mode for non-administrators"
                 tooltip="When enabled, regular users will not be able to use privileged mode when creating containers."
-              ></por-switch>
+              ></por-switch-field>
             </div>
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <por-switch
+              <por-switch-field
                 ng-model="$ctrl.formValues.disableHostNamespaceForRegularUsers"
                 name="disableHostNamespaceForRegularUsers"
                 label="Disable the use of host PID 1 for non-administrators"
                 tooltip="Prevent users from accessing the host filesystem through the host PID namespace."
-              ></por-switch>
+              ></por-switch-field>
             </div>
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <por-switch
+              <por-switch-field
                 ng-model="$ctrl.formValues.disableStackManagementForRegularUsers"
                 name="disableStackManagementForRegularUsers"
                 label="Disable the use of Stacks for non-administrators"
-              ></por-switch>
+              ></por-switch-field>
             </div>
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <por-switch
+              <por-switch-field
                 ng-model="$ctrl.formValues.disableDeviceMappingForRegularUsers"
                 name="disableDeviceMappingForRegularUsers"
                 label="Disable device mappings for non-administrators"
-              ></por-switch>
+              ></por-switch-field>
             </div>
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <por-switch
+              <por-switch-field
                 ng-model="$ctrl.formValues.disableContainerCapabilitiesForRegularUsers"
                 name="disableContainerCapabilitiesForRegularUsers"
                 label="Disable container capabilities for non-administrators"
-              ></por-switch>
+              ></por-switch-field>
             </div>
           </div>
 

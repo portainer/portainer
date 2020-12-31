@@ -3,9 +3,9 @@ import angular from 'angular';
 const porSwitch = {
   templateUrl: './por-switch.html',
   bindings: {
-    tooltip: '@',
     ngModel: '=',
-    label: '@',
+    id: '@',
+    className: '@',
     name: '@',
     disabled: '<',
     onChange: '<',
