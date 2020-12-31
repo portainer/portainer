@@ -9,14 +9,15 @@ import (
 )
 
 // List Endpoint groups
-// @Summary List Endpoint groups
-// @Description
-// @Tags EndpointGroups
-// @Accept json
-// @Produce json
-// @Success 200 {array} portainer.EndpointGroup "Endpoint group"
-// @Failure 400,500
-// @Router /api/endpoint_groups [get]
+// @summary List Endpoint groups
+// @description
+// @tags EndpointGroups
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @success 200 {array} portainer.EndpointGroup "Endpoint group"
+// @failure 400,500
+// @router /api/endpoint_groups [get]
 func (handler *Handler) endpointGroupList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointGroups, err := handler.DataStore.EndpointGroup().EndpointGroups()
 	if err != nil {

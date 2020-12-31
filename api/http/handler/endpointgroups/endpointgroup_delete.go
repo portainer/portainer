@@ -12,15 +12,16 @@ import (
 )
 
 // Delete endpoint group
-// @Summary Deletes an endpoint group
-// @Description
-// @Tags EndpointGroups
-// @Accept json
-// @Produce json
-// @Param id path int true "endpoint group id"
-// @Success 204
-// @Failure 400,500
-// @Router /endpoint_groups/{id} [delete]
+// @summary Deletes an endpoint group
+// @description
+// @tags EndpointGroups
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path int true "endpoint group id"
+// @success 204
+// @failure 400,500
+// @router /endpoint_groups/{id} [delete]
 func (handler *Handler) endpointGroupDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointGroupID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

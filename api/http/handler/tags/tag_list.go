@@ -8,13 +8,14 @@ import (
 )
 
 // List Tags
-// @Summary Fetches the list of tags
-// @Description
-// @Produce json
-// @Success 200 {array} portainer.Tag
+// @summary Fetches the list of tags
+// @description
+// @security ApiKeyAuth
+// @produce json
+// @success 200 {array} portainer.Tag
 // @tags Tags
-// @Failure 500
-// @Router /tags [get]
+// @failure 500
+// @router /tags [get]
 func (handler *Handler) tagList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	tags, err := handler.DataStore.Tag().Tags()
 	if err != nil {

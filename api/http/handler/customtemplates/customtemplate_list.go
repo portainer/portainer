@@ -12,15 +12,15 @@ import (
 )
 
 // Gets a list of custom templates
-// @Summary Gets a list of custom templates
-// @Description
-// @Tags CustomTemplates
-// @Security ApiKeyAuth
-// @Accept json
-// @Produce json
-// @Success 200 {array} portainer.CustomTemplate
-// @Failure 400,404,500
-// @Router /custom_templates [get]
+// @summary Gets a list of custom templates
+// @description
+// @tags CustomTemplates
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @success 200 {array} portainer.CustomTemplate
+// @failure 400,404,500
+// @router /custom_templates [get]
 func (handler *Handler) customTemplateList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	customTemplates, err := handler.DataStore.CustomTemplate().CustomTemplates()
 	if err != nil {

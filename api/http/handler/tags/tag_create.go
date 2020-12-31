@@ -23,14 +23,15 @@ func (payload *tagCreatePayload) Validate(r *http.Request) error {
 }
 
 // tagCreate godoc
-// @Summary Create a tag
-// @Description
-// @Produce json
+// @summary Create a tag
+// @description
+// @security ApiKeyAuth
+// @produce json
 // @param body body tagCreatePayload true "tag info"
-// @Success 200 {array} portainer.Tag
+// @success 200 {array} portainer.Tag
 // @tags Tags
-// @Failure 500
-// @Router /tags [post]
+// @failure 500
+// @router /tags [post]
 func (handler *Handler) tagCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload tagCreatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)

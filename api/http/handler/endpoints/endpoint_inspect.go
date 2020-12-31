@@ -11,15 +11,16 @@ import (
 )
 
 // Inspect endpoint
-// @Summary Inspects an endpoint
-// @Description
-// @Tags Endpoints
-// @Accept json
-// @Produce json
-// @Param id path int true "endpoint id"
-// @Success 200 {object} portainer.Endpoint "Endpoint"
-// @Failure 400,500
-// @Router /endpoints/{id} [get]
+// @summary Inspects an endpoint
+// @description
+// @tags Endpoints
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path int true "endpoint id"
+// @success 200 {object} portainer.Endpoint "Endpoint"
+// @failure 400,500
+// @router /endpoints/{id} [get]
 func (handler *Handler) endpointInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

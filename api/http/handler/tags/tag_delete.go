@@ -12,14 +12,15 @@ import (
 )
 
 // tagDelete godoc
-// @Summary Delete a tag
-// @Description
+// @summary Delete a tag
+// @description
 // @tags Tags
-// @Produce json
+// @security ApiKeyAuth
+// @produce json
 // @param id path int true "tag id"
-// @Success 204
-// @Failure 500
-// @Router /tags/{id} [delete]
+// @success 204
+// @failure 500
+// @router /tags/{id} [delete]
 func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	id, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

@@ -11,16 +11,17 @@ import (
 )
 
 // Attach an endpoint to an endpoint group
-// @Summary Attach an endpoint to an endpoint group
-// @Description
-// @Tags EndpointGroups
-// @Accept json
-// @Produce json
-// @Param id path int true "endpoint group id"
-// @Param endpointId path int true "endpoint id"
-// @Success 204
-// @Failure 400,500
-// @Router /endpoint_groups/{id}/endpoints/{endpointId} [post]
+// @summary Attach an endpoint to an endpoint group
+// @description
+// @tags EndpointGroups
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path int true "endpoint group id"
+// @param endpointId path int true "endpoint id"
+// @success 204
+// @failure 400,500
+// @router /endpoint_groups/{id}/endpoints/{endpointId} [post]
 func (handler *Handler) endpointGroupAddEndpoint(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointGroupID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

@@ -16,19 +16,19 @@ import (
 )
 
 // Create a custom template
-// @Summary Create a custom template
-// @Description
-// @Tags CustomTemplates
-// @Security ApiKeyAuth
-// @Accept json
-// @Produce json
-// @Param method query string true "method for creating template" Enums(string, file, repository)
+// @summary Create a custom template
+// @description
+// @tags CustomTemplates
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param method query string true "method for creating template" Enums(string, file, repository)
 // @param body_string body customTemplateFromFileContentPayload true "Required when using method=string"
 // @param body_file body customTemplateFromFileUploadPayload true "Required when using method=file"
 // @param body_repository body customTemplateFromGitRepositoryPayload true "Required when using method=repository"
-// @Success 200 {object} portainer.CustomTemplate
-// @Failure 400,404,500
-// @Router /custom_templates [post]
+// @success 200 {object} portainer.CustomTemplate
+// @failure 400,404,500
+// @router /custom_templates [post]
 func (handler *Handler) customTemplateCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	method, err := request.RetrieveQueryParameter(r, "method", false)
 	if err != nil {

@@ -12,15 +12,16 @@ import (
 )
 
 // Snapshot endpoint
-// @Summary Snapshots an endpoint
-// @Description
-// @Tags Endpoints
-// @Accept json
-// @Produce json
-// @Param id path int true "endpoint id"
-// @Success 204
-// @Failure 400,404,500
-// @Router /endpoints/{id}/snapshot [post]
+// @summary Snapshots an endpoint
+// @description
+// @tags Endpoints
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path int true "endpoint id"
+// @success 204
+// @failure 400,404,500
+// @router /endpoints/{id}/snapshot [post]
 func (handler *Handler) endpointSnapshot(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

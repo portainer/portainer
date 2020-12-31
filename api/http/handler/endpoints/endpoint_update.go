@@ -39,15 +39,16 @@ func (payload *endpointUpdatePayload) Validate(r *http.Request) error {
 }
 
 // Update endpoint
-// @Summary Updates an endpoint
-// @Description
-// @Tags Endpoints
-// @Accept json
-// @Produce json
-// @Param id path int true "endpoint id"
-// @Success 200 {object} portainer.Endpoint "Endpoint"
-// @Failure 400,500
-// @Router /endpoints/{id} [put]
+// @summary Updates an endpoint
+// @description
+// @security ApiKeyAuth
+// @tags Endpoints
+// @accept json
+// @produce json
+// @param id path int true "endpoint id"
+// @success 200 {object} portainer.Endpoint "Endpoint"
+// @failure 400,500
+// @router /endpoints/{id} [put]
 func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

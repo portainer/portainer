@@ -11,15 +11,16 @@ import (
 )
 
 // Inspect Endpoint group
-// @Summary Inspect an Endpoint group
-// @Description
-// @Tags EndpointGroups
-// @Accept json
-// @Produce json
-// @Param id path int true "endpoint group id"
-// @Success 200 {object} portainer.EndpointGroup "Endpoint group"
-// @Failure 400,500
-// @Router /api/endpoint_groups/:id [get]
+// @summary Inspect an Endpoint group
+// @description
+// @tags EndpointGroups
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path int true "endpoint group id"
+// @success 200 {object} portainer.EndpointGroup "Endpoint group"
+// @failure 400,500
+// @router /api/endpoint_groups/:id [get]
 func (handler *Handler) endpointGroupInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointGroupID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

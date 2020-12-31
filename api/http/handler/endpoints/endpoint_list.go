@@ -14,11 +14,12 @@ import (
 )
 
 // List endpoints
-// @Summary
-// @Description
-// @Tags Endpoints
-// @Accept json
-// @Produce json
+// @summary
+// @description
+// @tags Endpoints
+// @security ApiKeyAuth
+// @accept json
+// @produce json
 // @param start query int false "Start searching from"
 // @param search query string false "Search query"
 // @param groupId query int false "List endpoints of this group"
@@ -27,9 +28,9 @@ import (
 // @param tagIds query []int false "search endpoints with these tags (depends on tagsPartialMatch)"
 // @param tagsPartialMatch query bool false "If true, will return endpoint which has one of tagIds, if false (or missing) will return only endpoints that has all the tags"
 // @param endpointIds query []int false "will return only these endpoints"
-// @Success 200 {array} portainer.Endpoint "Endpoints"
-// @Failure 400,500
-// @Router /endpoints [get]
+// @success 200 {array} portainer.Endpoint "Endpoints"
+// @failure 400,500
+// @router /endpoints [get]
 // GET request on /api/endpoints?(start=<start>)&(limit=<limit>)&(search=<search>)&(groupId=<groupId)
 func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	start, _ := request.RetrieveNumericQueryParameter(r, "start", true)

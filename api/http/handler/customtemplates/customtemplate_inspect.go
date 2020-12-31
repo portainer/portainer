@@ -14,16 +14,16 @@ import (
 )
 
 // Gets a custom template
-// @Summary Gets a custom template
-// @Description
-// @Tags CustomTemplates
-// @Security ApiKeyAuth
-// @Accept json
-// @Produce json
-// @Param id path string true "template id"
-// @Success 200 {object} portainer.CustomTemplate
-// @Failure 400,404,500
-// @Router /custom_templates/{id} [get]
+// @summary Gets a custom template
+// @description
+// @tags CustomTemplates
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path string true "template id"
+// @success 200 {object} portainer.CustomTemplate
+// @failure 400,404,500
+// @router /custom_templates/{id} [get]
 func (handler *Handler) customTemplateInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	customTemplateID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

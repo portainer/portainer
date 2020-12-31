@@ -16,16 +16,16 @@ type fileResponse struct {
 }
 
 // Gets a custom template's file
-// @Summary Gets a custom template's file
-// @Description
-// @Tags CustomTemplates
-// @Security ApiKeyAuth
-// @Accept json
-// @Produce json
-// @Param id path string true "template id"
-// @Success 200 {object} fileResponse
-// @Failure 400,404,500
-// @Router /custom_templates/{id}/file [get]
+// @summary Gets a custom template's file
+// @description
+// @tags CustomTemplates
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path string true "template id"
+// @success 200 {object} fileResponse
+// @failure 400,404,500
+// @router /custom_templates/{id}/file [get]
 func (handler *Handler) customTemplateFile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	customTemplateID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

@@ -148,15 +148,16 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 }
 
 // Create endpoint
-// @Summary Creates an endpoint
-// @Description
-// @Tags Endpoints
-// @Accept json
-// @Produce json
-// @Param body body endpointCreatePayload true "endpoint data"
-// @Success 200 {object} portainer.Endpoint "Endpoint"
-// @Failure 400,500
-// @Router /endpoints [post]
+// @summary Creates an endpoint
+// @description
+// @tags Endpoints
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param body body endpointCreatePayload true "endpoint data"
+// @success 200 {object} portainer.Endpoint "Endpoint"
+// @failure 400,500
+// @router /endpoints [post]
 func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	payload := &endpointCreatePayload{}
 	err := payload.Validate(r)
