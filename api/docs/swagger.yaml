@@ -211,6 +211,69 @@ definitions:
       LogsStatus:
         type: integer
     type: object
+  edgestacks.stackFileResponse:
+    properties:
+      StackFileContent:
+        type: string
+    type: object
+  edgestacks.swarmStackFromFileContentPayload:
+    properties:
+      edgeGroups:
+        items:
+          type: integer
+        type: array
+      name:
+        type: string
+      stackFileContent:
+        type: string
+    type: object
+  edgestacks.swarmStackFromFileUploadPayload:
+    properties:
+      edgeGroups:
+        items:
+          type: integer
+        type: array
+      name:
+        type: string
+      stackFileContent:
+        items:
+          type: integer
+        type: array
+    type: object
+  edgestacks.swarmStackFromGitRepositoryPayload:
+    properties:
+      composeFilePathInRepository:
+        type: string
+      edgeGroups:
+        items:
+          type: integer
+        type: array
+      name:
+        type: string
+      repositoryAuthentication:
+        type: boolean
+      repositoryPassword:
+        type: string
+      repositoryReferenceName:
+        type: string
+      repositoryURL:
+        type: string
+      repositoryUsername:
+        type: string
+    type: object
+  edgestacks.updateEdgeStackPayload:
+    properties:
+      edgeGroups:
+        items:
+          type: integer
+        type: array
+      prune:
+        type: boolean
+      stackFileContent:
+        type: string
+      version:
+        type: integer
+    type: object
   endpointgroups.endpointGroupCreatePayload:
     properties:
       associatedEndpoints:
@@ -408,6 +471,40 @@ definitions:
       collectLogs:
         type: boolean
       logsStatus:
+        type: integer
+    type: object
+  portainer.EdgeStack:
+    properties:
+      CreationDate:
+        type: integer
+      EdgeGroups:
+        items:
+          type: integer
+        type: array
+      EntryPoint:
+        type: string
+      Id:
+        type: integer
+      Name:
+        type: string
+      ProjectPath:
+        type: string
+      Prune:
+        type: boolean
+      Status:
+        additionalProperties:
+          $ref: '#/definitions/portainer.EdgeStackStatus'
+        type: object
+      Version:
+        type: integer
+    type: object
+  portainer.EdgeStackStatus:
+    properties:
+      EndpointID:
+        type: integer
+      Error:
+        type: string
+      Type:
         type: integer
     type: object
   portainer.Endpoint:
@@ -1466,6 +1563,179 @@ paths:
       summary: Collect the log for a specifc task on an EdgeJob
       tags:
       - EdgeJobs
+  /edge_stacks:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/portainer.EdgeStack'
+            type: array
+        "400":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Fetches the list of EdgeStacks
+      tags:
+      - EdgeStacks
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Creation Method
+        enum:
+        - file
+        - string
+        - repository
+        in: query
+        name: method
+        required: true
+        type: string
+      - description: Required when using method=string
+        in: body
+        name: body_string
+        required: true
+        schema:
+          $ref: '#/definitions/edgestacks.swarmStackFromFileContentPayload'
+      - description: Required when using method=file
+        in: body
+        name: body_file
+        required: true
+        schema:
+          $ref: '#/definitions/edgestacks.swarmStackFromFileUploadPayload'
+      - description: Required when using method=repository
+        in: body
+        name: body_repository
+        required: true
+        schema:
+          $ref: '#/definitions/edgestacks.swarmStackFromGitRepositoryPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.EdgeStack'
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create an EdgeStack
+      tags:
+      - EdgeStacks
+  /edge_stacks/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: EdgeStack Id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete an EdgeStack
+      tags:
+      - EdgeStacks
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: EdgeStack Id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.EdgeStack'
+        "400":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Inspect an EdgeStack
+      tags:
+      - EdgeStacks
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: EdgeStack Id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: EdgeStack data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/edgestacks.updateEdgeStackPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.EdgeStack'
+        "400":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update an EdgeStack
+      tags:
+      - EdgeStacks
+  /edge_stacks/{id}/file:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: EdgeStack Id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/edgestacks.stackFileResponse'
+        "400":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Fetches the stack file for an EdgeStack
+      tags:
+      - EdgeStacks
   /endpoint_groups:
     post:
       consumes:

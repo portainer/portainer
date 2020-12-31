@@ -7,6 +7,16 @@ import (
 	"github.com/portainer/libhttp/response"
 )
 
+// edgeStackList
+// @summary Fetches the list of EdgeStacks
+// @description
+// @tags EdgeStacks
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @success 200 {array} portainer.EdgeStack
+// @failure 500,400
+// @router /edge_stacks [get]
 func (handler *Handler) edgeStackList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeStacks, err := handler.DataStore.EdgeStack().EdgeStacks()
 	if err != nil {

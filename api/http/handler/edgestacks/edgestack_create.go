@@ -11,12 +11,25 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/internal/edge"
 )
 
-// POST request on /api/endpoint_groups
+// edgeStackCreate
+// @summary Create an EdgeStack
+// @description
+// @tags EdgeStacks
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param method query string true "Creation Method" Enums(file,string,repository)
+// @param body_string body swarmStackFromFileContentPayload true "Required when using method=string"
+// @param body_file body swarmStackFromFileUploadPayload true "Required when using method=file"
+// @param body_repository body swarmStackFromGitRepositoryPayload true "Required when using method=repository"
+// @success 200 {object} portainer.EdgeStack
+// @failure 500
+// @router /edge_stacks [post]
 func (handler *Handler) edgeStackCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	method, err := request.RetrieveQueryParameter(r, "method", false)
 	if err != nil {

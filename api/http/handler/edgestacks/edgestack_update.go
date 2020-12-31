@@ -9,7 +9,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/internal/edge"
 )
@@ -31,6 +31,18 @@ func (payload *updateEdgeStackPayload) Validate(r *http.Request) error {
 	return nil
 }
 
+// edgeStackUpdate
+// @summary Update an EdgeStack
+// @description
+// @tags EdgeStacks
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path string true "EdgeStack Id"
+// @param body body updateEdgeStackPayload true "EdgeStack data"
+// @success 200 {object} portainer.EdgeStack
+// @failure 500,400
+// @router /edge_stacks/{id} [put]
 func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

@@ -1257,6 +1257,281 @@
                 }
             }
         },
+        "/edge_stacks": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EdgeStacks"
+                ],
+                "summary": "Fetches the list of EdgeStacks",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/portainer.EdgeStack"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EdgeStacks"
+                ],
+                "summary": "Create an EdgeStack",
+                "parameters": [
+                    {
+                        "enum": [
+                            "file",
+                            "string",
+                            "repository"
+                        ],
+                        "type": "string",
+                        "description": "Creation Method",
+                        "name": "method",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "Required when using method=string",
+                        "name": "body_string",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/edgestacks.swarmStackFromFileContentPayload"
+                        }
+                    },
+                    {
+                        "description": "Required when using method=file",
+                        "name": "body_file",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/edgestacks.swarmStackFromFileUploadPayload"
+                        }
+                    },
+                    {
+                        "description": "Required when using method=repository",
+                        "name": "body_repository",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/edgestacks.swarmStackFromGitRepositoryPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.EdgeStack"
+                        }
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/edge_stacks/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EdgeStacks"
+                ],
+                "summary": "Inspect an EdgeStack",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "EdgeStack Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.EdgeStack"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EdgeStacks"
+                ],
+                "summary": "Update an EdgeStack",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "EdgeStack Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "EdgeStack data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/edgestacks.updateEdgeStackPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.EdgeStack"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EdgeStacks"
+                ],
+                "summary": "Delete an EdgeStack",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "EdgeStack Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/edge_stacks/{id}/file": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EdgeStacks"
+                ],
+                "summary": "Fetches the stack file for an EdgeStack",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "EdgeStack Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/edgestacks.stackFileResponse"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/endpoint_groups": {
             "post": {
                 "security": [
@@ -2209,6 +2484,103 @@
                 }
             }
         },
+        "edgestacks.stackFileResponse": {
+            "type": "object",
+            "properties": {
+                "StackFileContent": {
+                    "type": "string"
+                }
+            }
+        },
+        "edgestacks.swarmStackFromFileContentPayload": {
+            "type": "object",
+            "properties": {
+                "edgeGroups": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "stackFileContent": {
+                    "type": "string"
+                }
+            }
+        },
+        "edgestacks.swarmStackFromFileUploadPayload": {
+            "type": "object",
+            "properties": {
+                "edgeGroups": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "stackFileContent": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "edgestacks.swarmStackFromGitRepositoryPayload": {
+            "type": "object",
+            "properties": {
+                "composeFilePathInRepository": {
+                    "type": "string"
+                },
+                "edgeGroups": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "repositoryAuthentication": {
+                    "type": "boolean"
+                },
+                "repositoryPassword": {
+                    "type": "string"
+                },
+                "repositoryReferenceName": {
+                    "type": "string"
+                },
+                "repositoryURL": {
+                    "type": "string"
+                },
+                "repositoryUsername": {
+                    "type": "string"
+                }
+            }
+        },
+        "edgestacks.updateEdgeStackPayload": {
+            "type": "object",
+            "properties": {
+                "edgeGroups": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "prune": {
+                    "type": "boolean"
+                },
+                "stackFileContent": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "integer"
+                }
+            }
+        },
         "endpointgroups.endpointGroupCreatePayload": {
             "type": "object",
             "properties": {
@@ -2509,6 +2881,58 @@
                     "type": "boolean"
                 },
                 "logsStatus": {
+                    "type": "integer"
+                }
+            }
+        },
+        "portainer.EdgeStack": {
+            "type": "object",
+            "properties": {
+                "CreationDate": {
+                    "type": "integer"
+                },
+                "EdgeGroups": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "EntryPoint": {
+                    "type": "string"
+                },
+                "Id": {
+                    "type": "integer"
+                },
+                "Name": {
+                    "type": "string"
+                },
+                "ProjectPath": {
+                    "type": "string"
+                },
+                "Prune": {
+                    "type": "boolean"
+                },
+                "Status": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/portainer.EdgeStackStatus"
+                    }
+                },
+                "Version": {
+                    "type": "integer"
+                }
+            }
+        },
+        "portainer.EdgeStackStatus": {
+            "type": "object",
+            "properties": {
+                "EndpointID": {
+                    "type": "integer"
+                },
+                "Error": {
+                    "type": "string"
+                },
+                "Type": {
                     "type": "integer"
                 }
             }
