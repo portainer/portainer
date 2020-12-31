@@ -102,6 +102,15 @@ definitions:
       fileContent:
         type: string
     type: object
+  dockerhub.dockerhubUpdatePayload:
+    properties:
+      authentication:
+        type: boolean
+      password:
+        type: string
+      username:
+        type: string
+    type: object
   endpointgroups.endpointGroupCreatePayload:
     properties:
       associatedEndpoints:
@@ -198,6 +207,15 @@ definitions:
         type: string
       Type:
         type: integer
+    type: object
+  portainer.DockerHub:
+    properties:
+      Authentication:
+        type: boolean
+      Password:
+        type: string
+      Username:
+        type: string
     type: object
   portainer.DockerSnapshot:
     properties:
@@ -540,6 +558,8 @@ paths:
           description: ""
         "500":
           description: ""
+      security:
+      - ApiKeyAuth: []
       summary: List Endpoint groups
       tags:
       - EndpointGroups
@@ -564,6 +584,8 @@ paths:
           description: ""
         "500":
           description: ""
+      security:
+      - ApiKeyAuth: []
       summary: Inspect an Endpoint group
       tags:
       - EndpointGroups
@@ -587,6 +609,8 @@ paths:
           description: ""
         "500":
           description: ""
+      security:
+      - ApiKeyAuth: []
       summary: Update Endpoint group
       tags:
       - EndpointGroups
@@ -601,6 +625,8 @@ paths:
           description: ""
         "500":
           description: ""
+      security:
+      - ApiKeyAuth: []
       tags:
       - Endpoints
   /auth:
@@ -635,6 +661,8 @@ paths:
       responses:
         "204":
           description: ""
+      security:
+      - ApiKeyAuth: []
       summary: Logout
       tags:
       - auth
@@ -847,6 +875,46 @@ paths:
       summary: Gets a custom template's file
       tags:
       - CustomTemplates
+  /dockerhub:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.DockerHub'
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Gets the dockerhub settings
+      tags:
+      - DockerHub
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: DockerHub settings
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dockerhub.dockerhubUpdatePayload'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Updates the dockerhub settings
+      tags:
+      - DockerHub
   /endpoint_groups:
     post:
       consumes:
@@ -869,6 +937,8 @@ paths:
           description: ""
         "500":
           description: ""
+      security:
+      - ApiKeyAuth: []
       summary: Creates an endpoint group
       tags:
       - EndpointGroups
@@ -891,6 +961,8 @@ paths:
           description: ""
         "500":
           description: ""
+      security:
+      - ApiKeyAuth: []
       summary: Deletes an endpoint group
       tags:
       - EndpointGroups
@@ -920,6 +992,8 @@ paths:
           description: ""
         "500":
           description: ""
+      security:
+      - ApiKeyAuth: []
       summary: Removes endpoint from an endpoint group
       tags:
       - EndpointGroups
@@ -946,6 +1020,8 @@ paths:
           description: ""
         "500":
           description: ""
+      security:
+      - ApiKeyAuth: []
       summary: Attach an endpoint to an endpoint group
       tags:
       - EndpointGroups
@@ -1004,6 +1080,8 @@ paths:
           description: ""
         "500":
           description: ""
+      security:
+      - ApiKeyAuth: []
       tags:
       - Endpoints
     post:
@@ -1027,6 +1105,8 @@ paths:
           description: ""
         "500":
           description: ""
+      security:
+      - ApiKeyAuth: []
       summary: Creates an endpoint
       tags:
       - Endpoints
@@ -1049,6 +1129,8 @@ paths:
           description: ""
         "500":
           description: ""
+      security:
+      - ApiKeyAuth: []
       summary: Deletes an endpoint
       tags:
       - Endpoints
@@ -1072,6 +1154,8 @@ paths:
           description: ""
         "500":
           description: ""
+      security:
+      - ApiKeyAuth: []
       summary: Inspects an endpoint
       tags:
       - Endpoints
@@ -1095,6 +1179,8 @@ paths:
           description: ""
         "500":
           description: ""
+      security:
+      - ApiKeyAuth: []
       summary: Updates an endpoint
       tags:
       - Endpoints
@@ -1119,6 +1205,8 @@ paths:
           description: ""
         "500":
           description: ""
+      security:
+      - ApiKeyAuth: []
       summary: Snapshots an endpoint
       tags:
       - Endpoints
@@ -1135,6 +1223,8 @@ paths:
             type: array
         "500":
           description: ""
+      security:
+      - ApiKeyAuth: []
       summary: Fetches the list of tags
       tags:
       - Tags
@@ -1157,6 +1247,8 @@ paths:
             type: array
         "500":
           description: ""
+      security:
+      - ApiKeyAuth: []
       summary: Create a tag
       tags:
       - Tags
@@ -1175,6 +1267,8 @@ paths:
           description: ""
         "500":
           description: ""
+      security:
+      - ApiKeyAuth: []
       summary: Delete a tag
       tags:
       - Tags

@@ -8,7 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 type dockerhubUpdatePayload struct {
@@ -24,7 +24,17 @@ func (payload *dockerhubUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// PUT request on /api/dockerhub
+// dockerhubUpdate
+// @summary Updates the dockerhub settings
+// @description
+// @tags DockerHub
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param body body dockerhubUpdatePayload true "DockerHub settings"
+// @success 204
+// @failure 500
+// @router /dockerhub [put]
 func (handler *Handler) dockerhubUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload dockerhubUpdatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
