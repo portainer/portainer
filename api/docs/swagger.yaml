@@ -145,6 +145,72 @@ definitions:
           type: integer
         type: array
     type: object
+  edgejobs.edgeJobCreateFromFileContentPayload:
+    properties:
+      cronExpression:
+        type: string
+      endpoints:
+        items:
+          type: integer
+        type: array
+      fileContent:
+        type: string
+      name:
+        type: string
+      recurring:
+        type: boolean
+    type: object
+  edgejobs.edgeJobCreateFromFilePayload:
+    properties:
+      cronExpression:
+        type: string
+      endpoints:
+        items:
+          type: integer
+        type: array
+      file:
+        items:
+          type: integer
+        type: array
+      name:
+        type: string
+      recurring:
+        type: boolean
+    type: object
+  edgejobs.edgeJobFileResponse:
+    properties:
+      FileContent:
+        type: string
+    type: object
+  edgejobs.edgeJobUpdatePayload:
+    properties:
+      cronExpression:
+        type: string
+      endpoints:
+        items:
+          type: integer
+        type: array
+      fileContent:
+        type: string
+      name:
+        type: string
+      recurring:
+        type: boolean
+    type: object
+  edgejobs.fileResponse:
+    properties:
+      FileContent:
+        type: string
+    type: object
+  edgejobs.taskContainer:
+    properties:
+      EndpointId:
+        type: integer
+      Id:
+        type: string
+      LogsStatus:
+        type: integer
+    type: object
   endpointgroups.endpointGroupCreatePayload:
     properties:
       associatedEndpoints:
@@ -315,6 +381,34 @@ definitions:
         items:
           type: integer
         type: array
+    type: object
+  portainer.EdgeJob:
+    properties:
+      Created:
+        type: integer
+      CronExpression:
+        type: string
+      Endpoints:
+        additionalProperties:
+          $ref: '#/definitions/portainer.EdgeJobEndpointMeta'
+        type: object
+      Id:
+        type: integer
+      Name:
+        type: string
+      Recurring:
+        type: boolean
+      ScriptPath:
+        type: string
+      Version:
+        type: integer
+    type: object
+  portainer.EdgeJobEndpointMeta:
+    properties:
+      collectLogs:
+        type: boolean
+      logsStatus:
+        type: integer
     type: object
   portainer.Endpoint:
     properties:
@@ -1091,6 +1185,287 @@ paths:
       summary: Updates an EdgeGroup
       tags:
       - EdgeGroups
+  /edge_jobs:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/portainer.EdgeJob'
+            type: array
+        "400":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Fetch EdgeJobs list
+      tags:
+      - EdgeJobs
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Creation Method
+        enum:
+        - file
+        - string
+        in: query
+        name: method
+        required: true
+        type: string
+      - description: EdgeGroup data when method is string
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/edgejobs.edgeJobCreateFromFileContentPayload'
+      - description: EdgeGroup data when method is file
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/edgejobs.edgeJobCreateFromFilePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.EdgeGroup'
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create an EdgeJob
+      tags:
+      - EdgeJobs
+  /edge_jobs/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: EdgeJob Id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete an EdgeJob
+      tags:
+      - EdgeJobs
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: EdgeJob Id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.EdgeJob'
+        "400":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Inspect an EdgeJob
+      tags:
+      - EdgeJobs
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: EdgeJob Id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: EdgeGroup data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/edgejobs.edgeJobUpdatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.EdgeJob'
+        "400":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update an EdgeJob
+      tags:
+      - EdgeJobs
+  /edge_jobs/{id}/file:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: EdgeJob Id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/edgejobs.edgeJobFileResponse'
+        "400":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Fetch a file of an EdgeJob
+      tags:
+      - EdgeJobs
+  /edge_jobs/{id}/tasks:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: EdgeJob Id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/edgejobs.taskContainer'
+            type: array
+        "400":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Fetch the list of tasks on an EdgeJob
+      tags:
+      - EdgeJobs
+  /edge_jobs/{id}/tasks/{taskID}/logs:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: EdgeJob Id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Task Id
+        in: path
+        name: taskID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Clear the log for a specifc task on an EdgeJob
+      tags:
+      - EdgeJobs
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: EdgeJob Id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Task Id
+        in: path
+        name: taskID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/edgejobs.fileResponse'
+        "400":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Fetch the log for a specifc task on an EdgeJob
+      tags:
+      - EdgeJobs
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: EdgeJob Id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Task Id
+        in: path
+        name: taskID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Collect the log for a specifc task on an EdgeJob
+      tags:
+      - EdgeJobs
   /endpoint_groups:
     post:
       consumes:

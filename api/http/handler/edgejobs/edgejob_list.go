@@ -7,6 +7,16 @@ import (
 	"github.com/portainer/libhttp/response"
 )
 
+// edgeJobList
+// @summary Fetch EdgeJobs list
+// @description
+// @tags EdgeJobs
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @success 200 {array} portainer.EdgeJob
+// @failure 500,400
+// @router /edge_jobs [get]
 // GET request on /api/edge_jobs
 func (handler *Handler) edgeJobList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeJobs, err := handler.DataStore.EdgeJob().EdgeJobs()

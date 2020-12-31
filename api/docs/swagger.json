@@ -810,6 +810,453 @@
                 }
             }
         },
+        "/edge_jobs": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EdgeJobs"
+                ],
+                "summary": "Fetch EdgeJobs list",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/portainer.EdgeJob"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EdgeJobs"
+                ],
+                "summary": "Create an EdgeJob",
+                "parameters": [
+                    {
+                        "enum": [
+                            "file",
+                            "string"
+                        ],
+                        "type": "string",
+                        "description": "Creation Method",
+                        "name": "method",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "EdgeGroup data when method is string",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/edgejobs.edgeJobCreateFromFileContentPayload"
+                        }
+                    },
+                    {
+                        "description": "EdgeGroup data when method is file",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/edgejobs.edgeJobCreateFromFilePayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.EdgeGroup"
+                        }
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/edge_jobs/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EdgeJobs"
+                ],
+                "summary": "Inspect an EdgeJob",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "EdgeJob Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.EdgeJob"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EdgeJobs"
+                ],
+                "summary": "Update an EdgeJob",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "EdgeJob Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "EdgeGroup data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/edgejobs.edgeJobUpdatePayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.EdgeJob"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EdgeJobs"
+                ],
+                "summary": "Delete an EdgeJob",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "EdgeJob Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/edge_jobs/{id}/file": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EdgeJobs"
+                ],
+                "summary": "Fetch a file of an EdgeJob",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "EdgeJob Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/edgejobs.edgeJobFileResponse"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/edge_jobs/{id}/tasks": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EdgeJobs"
+                ],
+                "summary": "Fetch the list of tasks on an EdgeJob",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "EdgeJob Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/edgejobs.taskContainer"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/edge_jobs/{id}/tasks/{taskID}/logs": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EdgeJobs"
+                ],
+                "summary": "Fetch the log for a specifc task on an EdgeJob",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "EdgeJob Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Task Id",
+                        "name": "taskID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/edgejobs.fileResponse"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EdgeJobs"
+                ],
+                "summary": "Collect the log for a specifc task on an EdgeJob",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "EdgeJob Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Task Id",
+                        "name": "taskID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EdgeJobs"
+                ],
+                "summary": "Clear the log for a specifc task on an EdgeJob",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "EdgeJob Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Task Id",
+                        "name": "taskID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/endpoint_groups": {
             "post": {
                 "security": [
@@ -1660,6 +2107,108 @@
                 }
             }
         },
+        "edgejobs.edgeJobCreateFromFileContentPayload": {
+            "type": "object",
+            "properties": {
+                "cronExpression": {
+                    "type": "string"
+                },
+                "endpoints": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "fileContent": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "recurring": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "edgejobs.edgeJobCreateFromFilePayload": {
+            "type": "object",
+            "properties": {
+                "cronExpression": {
+                    "type": "string"
+                },
+                "endpoints": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "file": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "recurring": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "edgejobs.edgeJobFileResponse": {
+            "type": "object",
+            "properties": {
+                "FileContent": {
+                    "type": "string"
+                }
+            }
+        },
+        "edgejobs.edgeJobUpdatePayload": {
+            "type": "object",
+            "properties": {
+                "cronExpression": {
+                    "type": "string"
+                },
+                "endpoints": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "fileContent": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "recurring": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "edgejobs.fileResponse": {
+            "type": "object",
+            "properties": {
+                "FileContent": {
+                    "type": "string"
+                }
+            }
+        },
+        "edgejobs.taskContainer": {
+            "type": "object",
+            "properties": {
+                "EndpointId": {
+                    "type": "integer"
+                },
+                "Id": {
+                    "type": "string"
+                },
+                "LogsStatus": {
+                    "type": "integer"
+                }
+            }
+        },
         "endpointgroups.endpointGroupCreatePayload": {
             "type": "object",
             "properties": {
@@ -1918,6 +2467,49 @@
                     "items": {
                         "type": "integer"
                     }
+                }
+            }
+        },
+        "portainer.EdgeJob": {
+            "type": "object",
+            "properties": {
+                "Created": {
+                    "type": "integer"
+                },
+                "CronExpression": {
+                    "type": "string"
+                },
+                "Endpoints": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/portainer.EdgeJobEndpointMeta"
+                    }
+                },
+                "Id": {
+                    "type": "integer"
+                },
+                "Name": {
+                    "type": "string"
+                },
+                "Recurring": {
+                    "type": "boolean"
+                },
+                "ScriptPath": {
+                    "type": "string"
+                },
+                "Version": {
+                    "type": "integer"
+                }
+            }
+        },
+        "portainer.EdgeJobEndpointMeta": {
+            "type": "object",
+            "properties": {
+                "collectLogs": {
+                    "type": "boolean"
+                },
+                "logsStatus": {
+                    "type": "integer"
                 }
             }
         },

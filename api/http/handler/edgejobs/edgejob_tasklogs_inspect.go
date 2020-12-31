@@ -13,7 +13,18 @@ type fileResponse struct {
 	FileContent string `json:"FileContent"`
 }
 
-// GET request on /api/edge_jobs/:id/tasks/:taskID/logs
+// edgeJobTaskLogsInspect
+// @summary Fetch the log for a specifc task on an EdgeJob
+// @description
+// @tags EdgeJobs
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path string true "EdgeJob Id"
+// @param taskID path string true "Task Id"
+// @success 200 {object} fileResponse
+// @failure 500,400
+// @router /edge_jobs/{id}/tasks/{taskID}/logs [get]
 func (handler *Handler) edgeJobTaskLogsInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeJobID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

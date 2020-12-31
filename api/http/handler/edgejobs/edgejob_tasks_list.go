@@ -7,7 +7,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
@@ -17,7 +17,17 @@ type taskContainer struct {
 	LogsStatus portainer.EdgeJobLogsStatus `json:"LogsStatus"`
 }
 
-// GET request on /api/edge_jobs/:id/tasks
+// edgeJobTasksList
+// @summary Fetch the list of tasks on an EdgeJob
+// @description
+// @tags EdgeJobs
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path string true "EdgeJob Id"
+// @success 200 {array} taskContainer
+// @failure 500,400
+// @router /edge_jobs/{id}/tasks [get]
 func (handler *Handler) edgeJobTasksList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeJobID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

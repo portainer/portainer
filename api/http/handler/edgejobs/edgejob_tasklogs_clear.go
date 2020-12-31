@@ -7,11 +7,22 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
-// DELETE request on /api/edge_jobs/:id/tasks/:taskID/logs
+// edgeJobTasksClear
+// @summary Clear the log for a specifc task on an EdgeJob
+// @description
+// @tags EdgeJobs
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path string true "EdgeJob Id"
+// @param taskID path string true "Task Id"
+// @success 204
+// @failure 500,400
+// @router /edge_jobs/{id}/tasks/{taskID}/logs [delete]
 func (handler *Handler) edgeJobTasksClear(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeJobID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
