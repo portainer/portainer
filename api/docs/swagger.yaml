@@ -17,6 +17,91 @@ definitions:
       code:
         type: string
     type: object
+  customtemplates.customTemplateFromFileContentPayload:
+    properties:
+      description:
+        type: string
+      fileContent:
+        type: string
+      logo:
+        type: string
+      note:
+        type: string
+      platform:
+        type: integer
+      title:
+        type: string
+      type:
+        type: integer
+    type: object
+  customtemplates.customTemplateFromFileUploadPayload:
+    properties:
+      description:
+        type: string
+      fileContent:
+        items:
+          type: integer
+        type: array
+      logo:
+        type: string
+      note:
+        type: string
+      platform:
+        type: integer
+      title:
+        type: string
+      type:
+        type: integer
+    type: object
+  customtemplates.customTemplateFromGitRepositoryPayload:
+    properties:
+      composeFilePathInRepository:
+        type: string
+      description:
+        type: string
+      logo:
+        type: string
+      note:
+        type: string
+      platform:
+        type: integer
+      repositoryAuthentication:
+        type: boolean
+      repositoryPassword:
+        type: string
+      repositoryReferenceName:
+        type: string
+      repositoryURL:
+        type: string
+      repositoryUsername:
+        type: string
+      title:
+        type: string
+      type:
+        type: integer
+    type: object
+  customtemplates.customTemplateUpdatePayload:
+    properties:
+      description:
+        type: string
+      fileContent:
+        type: string
+      logo:
+        type: string
+      note:
+        type: string
+      platform:
+        type: integer
+      title:
+        type: string
+      type:
+        type: integer
+    type: object
+  customtemplates.fileResponse:
+    properties:
+      fileContent:
+        type: string
+    type: object
   endpointgroups.endpointGroupCreatePayload:
     properties:
       associatedEndpoints:
@@ -89,6 +174,31 @@ definitions:
       TenantID:
         type: string
     type: object
+  portainer.CustomTemplate:
+    properties:
+      CreatedByUserId:
+        type: integer
+      Description:
+        type: string
+      EntryPoint:
+        type: string
+      Id:
+        type: integer
+      Logo:
+        type: string
+      Note:
+        type: string
+      Platform:
+        type: integer
+      ProjectPath:
+        type: string
+      ResourceControl:
+        $ref: '#/definitions/portainer.ResourceControl'
+      Title:
+        type: string
+      Type:
+        type: integer
+    type: object
   portainer.DockerSnapshot:
     properties:
       DockerSnapshotRaw:
@@ -144,6 +254,9 @@ definitions:
       AuthorizedUsers:
         description: Deprecated in DBVersion == 18
         items:
+          description: |-
+            Deprecated fields
+            Deprecated in DBVersion == 2
           type: integer
         type: array
       AzureCredentials:
@@ -221,6 +334,9 @@ definitions:
       AuthorizedUsers:
         description: Deprecated in DBVersion == 18
         items:
+          description: |-
+            Deprecated fields
+            Deprecated in DBVersion == 2
           type: integer
         type: array
       Description:
@@ -312,6 +428,40 @@ definitions:
       value:
         type: string
     type: object
+  portainer.ResourceControl:
+    properties:
+      AccessLevel:
+        type: integer
+      AdministratorsOnly:
+        type: boolean
+      Id:
+        type: integer
+      OwnerId:
+        description: |-
+          Deprecated fields
+          Deprecated in DBVersion == 2
+        type: integer
+      Public:
+        type: boolean
+      ResourceId:
+        type: string
+      SubResourceIds:
+        items:
+          type: string
+        type: array
+      System:
+        type: boolean
+      TeamAccesses:
+        items:
+          $ref: '#/definitions/portainer.TeamResourceAccess'
+        type: array
+      Type:
+        type: integer
+      UserAccesses:
+        items:
+          $ref: '#/definitions/portainer.UserResourceAccess'
+        type: array
+    type: object
   portainer.TLSConfiguration:
     properties:
       TLS:
@@ -344,9 +494,23 @@ definitions:
     additionalProperties:
       $ref: '#/definitions/portainer.AccessPolicy'
     type: object
+  portainer.TeamResourceAccess:
+    properties:
+      AccessLevel:
+        type: integer
+      TeamId:
+        type: integer
+    type: object
   portainer.UserAccessPolicies:
     additionalProperties:
       $ref: '#/definitions/portainer.AccessPolicy'
+    type: object
+  portainer.UserResourceAccess:
+    properties:
+      AccessLevel:
+        type: integer
+      UserId:
+        type: integer
     type: object
 info:
   contact: {}
@@ -492,6 +656,29 @@ paths:
       tags:
       - auth
   /custom_templates:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/portainer.CustomTemplate'
+            type: array
+        "400":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Gets a list of custom templates
+      tags:
+      - CustomTemplates
     post:
       consumes:
       - application/json
@@ -503,6 +690,52 @@ paths:
         - repository
         in: query
         name: method
+        required: true
+        type: string
+      - description: Required when using method=string
+        in: body
+        name: body_string
+        required: true
+        schema:
+          $ref: '#/definitions/customtemplates.customTemplateFromFileContentPayload'
+      - description: Required when using method=file
+        in: body
+        name: body_file
+        required: true
+        schema:
+          $ref: '#/definitions/customtemplates.customTemplateFromFileUploadPayload'
+      - description: Required when using method=repository
+        in: body
+        name: body_repository
+        required: true
+        schema:
+          $ref: '#/definitions/customtemplates.customTemplateFromGitRepositoryPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.CustomTemplate'
+        "400":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create a custom template
+      tags:
+      - CustomTemplates
+  /custom_templates/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: template id
+        in: path
+        name: id
         required: true
         type: string
       produces:
@@ -518,7 +751,95 @@ paths:
           description: ""
       security:
       - ApiKeyAuth: []
-      summary: Create a custom template
+      summary: Delete a custom template
+      tags:
+      - CustomTemplates
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: template id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.CustomTemplate'
+        "400":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Gets a custom template
+      tags:
+      - CustomTemplates
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: template id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/customtemplates.customTemplateUpdatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.CustomTemplate'
+        "400":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Updates a custom template
+      tags:
+      - CustomTemplates
+  /custom_templates/{id}/file:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: template id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/customtemplates.fileResponse'
+        "400":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Gets a custom template's file
       tags:
       - CustomTemplates
   /endpoint_groups:

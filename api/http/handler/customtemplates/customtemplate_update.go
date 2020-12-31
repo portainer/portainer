@@ -45,6 +45,18 @@ func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
+// Updates a custom template
+// @Summary Updates a custom template
+// @Description
+// @Tags CustomTemplates
+// @Security ApiKeyAuth
+// @Accept json
+// @Produce json
+// @Param id path string true "template id"
+// @param body body customTemplateUpdatePayload true "Update data"
+// @Success 200 {object} portainer.CustomTemplate
+// @Failure 400,404,500
+// @Router /custom_templates/{id} [put]
 func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	customTemplateID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

@@ -238,6 +238,43 @@ var doc = `{
             }
         },
         "/custom_templates": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CustomTemplates"
+                ],
+                "summary": "Gets a list of custom templates",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/portainer.CustomTemplate"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -266,11 +303,223 @@ var doc = `{
                         "name": "method",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "description": "Required when using method=string",
+                        "name": "body_string",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/customtemplates.customTemplateFromFileContentPayload"
+                        }
+                    },
+                    {
+                        "description": "Required when using method=file",
+                        "name": "body_file",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/customtemplates.customTemplateFromFileUploadPayload"
+                        }
+                    },
+                    {
+                        "description": "Required when using method=repository",
+                        "name": "body_repository",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/customtemplates.customTemplateFromGitRepositoryPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.CustomTemplate"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/custom_templates/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CustomTemplates"
+                ],
+                "summary": "Gets a custom template",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "template id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.CustomTemplate"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CustomTemplates"
+                ],
+                "summary": "Updates a custom template",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "template id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/customtemplates.customTemplateUpdatePayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.CustomTemplate"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CustomTemplates"
+                ],
+                "summary": "Delete a custom template",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "template id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "204": {
                         "description": ""
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/custom_templates/{id}/file": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CustomTemplates"
+                ],
+                "summary": "Gets a custom template's file",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "template id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/customtemplates.fileResponse"
+                        }
                     },
                     "400": {
                         "description": ""
@@ -811,6 +1060,136 @@ var doc = `{
                 }
             }
         },
+        "customtemplates.customTemplateFromFileContentPayload": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "fileContent": {
+                    "type": "string"
+                },
+                "logo": {
+                    "type": "string"
+                },
+                "note": {
+                    "type": "string"
+                },
+                "platform": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "customtemplates.customTemplateFromFileUploadPayload": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "fileContent": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "logo": {
+                    "type": "string"
+                },
+                "note": {
+                    "type": "string"
+                },
+                "platform": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "customtemplates.customTemplateFromGitRepositoryPayload": {
+            "type": "object",
+            "properties": {
+                "composeFilePathInRepository": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "logo": {
+                    "type": "string"
+                },
+                "note": {
+                    "type": "string"
+                },
+                "platform": {
+                    "type": "integer"
+                },
+                "repositoryAuthentication": {
+                    "type": "boolean"
+                },
+                "repositoryPassword": {
+                    "type": "string"
+                },
+                "repositoryReferenceName": {
+                    "type": "string"
+                },
+                "repositoryURL": {
+                    "type": "string"
+                },
+                "repositoryUsername": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "customtemplates.customTemplateUpdatePayload": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "fileContent": {
+                    "type": "string"
+                },
+                "logo": {
+                    "type": "string"
+                },
+                "note": {
+                    "type": "string"
+                },
+                "platform": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "customtemplates.fileResponse": {
+            "type": "object",
+            "properties": {
+                "fileContent": {
+                    "type": "string"
+                }
+            }
+        },
         "endpointgroups.endpointGroupCreatePayload": {
             "type": "object",
             "properties": {
@@ -921,6 +1300,44 @@ var doc = `{
                 }
             }
         },
+        "portainer.CustomTemplate": {
+            "type": "object",
+            "properties": {
+                "CreatedByUserId": {
+                    "type": "integer"
+                },
+                "Description": {
+                    "type": "string"
+                },
+                "EntryPoint": {
+                    "type": "string"
+                },
+                "Id": {
+                    "type": "integer"
+                },
+                "Logo": {
+                    "type": "string"
+                },
+                "Note": {
+                    "type": "string"
+                },
+                "Platform": {
+                    "type": "integer"
+                },
+                "ProjectPath": {
+                    "type": "string"
+                },
+                "ResourceControl": {
+                    "$ref": "#/definitions/portainer.ResourceControl"
+                },
+                "Title": {
+                    "type": "string"
+                },
+                "Type": {
+                    "type": "integer"
+                }
+            }
+        },
         "portainer.DockerSnapshot": {
             "type": "object",
             "properties": {
@@ -1004,6 +1421,7 @@ var doc = `{
                     "description": "Deprecated in DBVersion == 18",
                     "type": "array",
                     "items": {
+                        "description": "Deprecated fields\nDeprecated in DBVersion == 2",
                         "type": "integer"
                     }
                 },
@@ -1116,6 +1534,7 @@ var doc = `{
                     "description": "Deprecated in DBVersion == 18",
                     "type": "array",
                     "items": {
+                        "description": "Deprecated fields\nDeprecated in DBVersion == 2",
                         "type": "integer"
                     }
                 },
@@ -1255,6 +1674,54 @@ var doc = `{
                 }
             }
         },
+        "portainer.ResourceControl": {
+            "type": "object",
+            "properties": {
+                "AccessLevel": {
+                    "type": "integer"
+                },
+                "AdministratorsOnly": {
+                    "type": "boolean"
+                },
+                "Id": {
+                    "type": "integer"
+                },
+                "OwnerId": {
+                    "description": "Deprecated fields\nDeprecated in DBVersion == 2",
+                    "type": "integer"
+                },
+                "Public": {
+                    "type": "boolean"
+                },
+                "ResourceId": {
+                    "type": "string"
+                },
+                "SubResourceIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "System": {
+                    "type": "boolean"
+                },
+                "TeamAccesses": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/portainer.TeamResourceAccess"
+                    }
+                },
+                "Type": {
+                    "type": "integer"
+                },
+                "UserAccesses": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/portainer.UserResourceAccess"
+                    }
+                }
+            }
+        },
         "portainer.TLSConfiguration": {
             "type": "object",
             "properties": {
@@ -1304,10 +1771,32 @@ var doc = `{
                 "$ref": "#/definitions/portainer.AccessPolicy"
             }
         },
+        "portainer.TeamResourceAccess": {
+            "type": "object",
+            "properties": {
+                "AccessLevel": {
+                    "type": "integer"
+                },
+                "TeamId": {
+                    "type": "integer"
+                }
+            }
+        },
         "portainer.UserAccessPolicies": {
             "type": "object",
             "additionalProperties": {
                 "$ref": "#/definitions/portainer.AccessPolicy"
+            }
+        },
+        "portainer.UserResourceAccess": {
+            "type": "object",
+            "properties": {
+                "AccessLevel": {
+                    "type": "integer"
+                },
+                "UserId": {
+                    "type": "integer"
+                }
             }
         }
     },

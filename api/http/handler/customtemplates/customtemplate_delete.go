@@ -13,6 +13,17 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
+// Delete a custom template
+// @Summary Delete a custom template
+// @Description
+// @Tags CustomTemplates
+// @Security ApiKeyAuth
+// @Accept json
+// @Produce json
+// @Param id path string true "template id"
+// @Success 204
+// @Failure 400,404,500
+// @Router /custom_templates/{id} [delete]
 func (handler *Handler) customTemplateDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	customTemplateID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

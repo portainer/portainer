@@ -23,7 +23,10 @@ import (
 // @Accept json
 // @Produce json
 // @Param method query string true "method for creating template" Enums(string, file, repository)
-// @Success 204
+// @param body_string body customTemplateFromFileContentPayload true "Required when using method=string"
+// @param body_file body customTemplateFromFileUploadPayload true "Required when using method=file"
+// @param body_repository body customTemplateFromGitRepositoryPayload true "Required when using method=repository"
+// @Success 200 {object} portainer.CustomTemplate
 // @Failure 400,404,500
 // @Router /custom_templates [post]
 func (handler *Handler) customTemplateCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
