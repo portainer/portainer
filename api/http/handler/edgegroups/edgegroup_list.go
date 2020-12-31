@@ -5,7 +5,7 @@ import (
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 type decoratedEdgeGroup struct {
@@ -13,6 +13,16 @@ type decoratedEdgeGroup struct {
 	HasEdgeStack bool `json:"HasEdgeStack"`
 }
 
+// edgeGroupList godoc
+// @summary list EdgeGroups
+// @description
+// @tags EdgeGroups
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @success 200 {array} portainer.EdgeGroup{HasEdgeStack=bool} "EdgeGroups"
+// @failure 500
+// @router /edge_groups [get]
 func (handler *Handler) edgeGroupList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeGroups, err := handler.DataStore.EdgeGroup().EdgeGroups()
 	if err != nil {

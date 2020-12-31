@@ -6,10 +6,21 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 )
 
+// edgeGroupInspect godoc
+// @summary Inspects an EdgeGroup
+// @description
+// @tags EdgeGroups
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path int true "EdgeGroup Id"
+// @success 200 {object} portainer.EdgeGroup
+// @failure 500
+// @router /edge_groups/{id} [get]
 func (handler *Handler) edgeGroupInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeGroupID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

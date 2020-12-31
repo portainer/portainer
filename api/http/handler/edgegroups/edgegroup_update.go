@@ -8,7 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/internal/edge"
 )
@@ -34,6 +34,18 @@ func (payload *edgeGroupUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
+// edgeGroupUpdate godoc
+// @summary Updates an EdgeGroup
+// @description
+// @tags EdgeGroups
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path int true "EdgeGroup Id"
+// @param body body edgeGroupUpdatePayload true "EdgeGroup data"
+// @success 200 {object} portainer.EdgeGroup
+// @failure 500
+// @router /edge_groups/{id} [put]
 func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeGroupID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

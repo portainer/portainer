@@ -8,7 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 type edgeGroupCreatePayload struct {
@@ -32,6 +32,17 @@ func (payload *edgeGroupCreatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
+// edgeGroupCreate
+// @summary Create an EdgeGroup
+// @description
+// @tags EdgeGroups
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param body body edgeGroupCreatePayload true "EdgeGroup data"
+// @success 200 {object} portainer.EdgeGroup
+// @failure 500
+// @router /edge_groups [post]
 func (handler *Handler) edgeGroupCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload edgeGroupCreatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)

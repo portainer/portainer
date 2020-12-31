@@ -111,6 +111,40 @@ definitions:
       username:
         type: string
     type: object
+  edgegroups.edgeGroupCreatePayload:
+    properties:
+      dynamic:
+        type: boolean
+      endpoints:
+        items:
+          type: integer
+        type: array
+      name:
+        type: string
+      partialMatch:
+        type: boolean
+      tagIDs:
+        items:
+          type: integer
+        type: array
+    type: object
+  edgegroups.edgeGroupUpdatePayload:
+    properties:
+      dynamic:
+        type: boolean
+      endpoints:
+        items:
+          type: integer
+        type: array
+      name:
+        type: string
+      partialMatch:
+        type: boolean
+      tagIDs:
+        items:
+          type: integer
+        type: array
+    type: object
   endpointgroups.endpointGroupCreatePayload:
     properties:
       associatedEndpoints:
@@ -262,6 +296,25 @@ definitions:
         type: object
       Volumes:
         type: object
+    type: object
+  portainer.EdgeGroup:
+    properties:
+      Dynamic:
+        type: boolean
+      Endpoints:
+        items:
+          type: integer
+        type: array
+      Id:
+        type: integer
+      Name:
+        type: string
+      PartialMatch:
+        type: boolean
+      TagIds:
+        items:
+          type: integer
+        type: array
     type: object
   portainer.Endpoint:
     properties:
@@ -915,6 +968,129 @@ paths:
       summary: Updates the dockerhub settings
       tags:
       - DockerHub
+  /edge_groups:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: EdgeGroups
+          schema:
+            items:
+              allOf:
+              - $ref: '#/definitions/portainer.EdgeGroup'
+              - properties:
+                  HasEdgeStack:
+                    type: boolean
+                type: object
+            type: array
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: list EdgeGroups
+      tags:
+      - EdgeGroups
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: EdgeGroup data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/edgegroups.edgeGroupCreatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.EdgeGroup'
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create an EdgeGroup
+      tags:
+      - EdgeGroups
+  /edge_groups/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: EdgeGroup Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Deletes an EdgeGroup
+      tags:
+      - EdgeGroups
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: EdgeGroup Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.EdgeGroup'
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Inspects an EdgeGroup
+      tags:
+      - EdgeGroups
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: EdgeGroup Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: EdgeGroup data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/edgegroups.edgeGroupUpdatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.EdgeGroup'
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Updates an EdgeGroup
+      tags:
+      - EdgeGroups
   /endpoint_groups:
     post:
       consumes:

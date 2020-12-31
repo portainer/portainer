@@ -607,6 +607,209 @@
                 }
             }
         },
+        "/edge_groups": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EdgeGroups"
+                ],
+                "summary": "list EdgeGroups",
+                "responses": {
+                    "200": {
+                        "description": "EdgeGroups",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "allOf": [
+                                    {
+                                        "$ref": "#/definitions/portainer.EdgeGroup"
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "HasEdgeStack": {
+                                                "type": "boolean"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EdgeGroups"
+                ],
+                "summary": "Create an EdgeGroup",
+                "parameters": [
+                    {
+                        "description": "EdgeGroup data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/edgegroups.edgeGroupCreatePayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.EdgeGroup"
+                        }
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/edge_groups/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EdgeGroups"
+                ],
+                "summary": "Inspects an EdgeGroup",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "EdgeGroup Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.EdgeGroup"
+                        }
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EdgeGroups"
+                ],
+                "summary": "Updates an EdgeGroup",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "EdgeGroup Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "EdgeGroup data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/edgegroups.edgeGroupUpdatePayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.EdgeGroup"
+                        }
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EdgeGroups"
+                ],
+                "summary": "Deletes an EdgeGroup",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "EdgeGroup Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/endpoint_groups": {
             "post": {
                 "security": [
@@ -1405,6 +1608,58 @@
                 }
             }
         },
+        "edgegroups.edgeGroupCreatePayload": {
+            "type": "object",
+            "properties": {
+                "dynamic": {
+                    "type": "boolean"
+                },
+                "endpoints": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "partialMatch": {
+                    "type": "boolean"
+                },
+                "tagIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "edgegroups.edgeGroupUpdatePayload": {
+            "type": "object",
+            "properties": {
+                "dynamic": {
+                    "type": "boolean"
+                },
+                "endpoints": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "partialMatch": {
+                    "type": "boolean"
+                },
+                "tagIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
         "endpointgroups.endpointGroupCreatePayload": {
             "type": "object",
             "properties": {
@@ -1634,6 +1889,35 @@
                 },
                 "Volumes": {
                     "type": "object"
+                }
+            }
+        },
+        "portainer.EdgeGroup": {
+            "type": "object",
+            "properties": {
+                "Dynamic": {
+                    "type": "boolean"
+                },
+                "Endpoints": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "Id": {
+                    "type": "integer"
+                },
+                "Name": {
+                    "type": "string"
+                },
+                "PartialMatch": {
+                    "type": "boolean"
+                },
+                "TagIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },
