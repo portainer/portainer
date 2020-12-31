@@ -15,9 +15,10 @@
     "url": "https://raw.githubusercontent.com/portainer/portainer/develop/LICENSE"
   }],
   "scripts": {
-    "build": "grunt clean:all && grunt build",
+    "build": "grunt clean:all && grunt build && yarn build:docs",
     "build:server": "grunt clean:server && grunt build:server",
     "build:client": "grunt clean:client && grunt build:client",
+    "build:docs": "cd api && swag init -g ./http/handler/handler.go",
     "clean": "grunt clean:all",
     "start": "grunt start",
     "start:clean": "grunt clean:all && grunt start",
@@ -35,6 +36,7 @@
     "build": "Build the entire app (backend/frontend) in development mode",
     "build:server": "Build the backend",
     "build:client": "Build the frontend (development mode)",
+    "build:docs": "builds API docs",
     "clean": "Clean the entire dist folder",
     "start": "Build the entire app (backend/frontend) in development mode, run backend inside a container and start a watch process locally for the frontend files",
     "start:server": "Build the backend and run it inside a container",
