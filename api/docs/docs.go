@@ -237,6 +237,53 @@ var doc = `{
                 }
             }
         },
+        "/custom_templates": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CustomTemplates"
+                ],
+                "summary": "Create a custom template",
+                "parameters": [
+                    {
+                        "enum": [
+                            "string",
+                            "file",
+                            "repository"
+                        ],
+                        "type": "string",
+                        "description": "method for creating template",
+                        "name": "method",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/endpoint_groups": {
             "post": {
                 "consumes": [
@@ -1262,6 +1309,13 @@ var doc = `{
             "additionalProperties": {
                 "$ref": "#/definitions/portainer.AccessPolicy"
             }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

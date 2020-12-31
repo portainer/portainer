@@ -15,6 +15,17 @@ import (
 	"github.com/portainer/portainer/api/internal/authorization"
 )
 
+// Create a custom template
+// @Summary Create a custom template
+// @Description
+// @Tags CustomTemplates
+// @Security ApiKeyAuth
+// @Accept json
+// @Produce json
+// @Param method query string true "method for creating template" Enums(string, file, repository)
+// @Success 204
+// @Failure 400,404,500
+// @Router /custom_templates [post]
 func (handler *Handler) customTemplateCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	method, err := request.RetrieveQueryParameter(r, "method", false)
 	if err != nil {

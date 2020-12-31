@@ -80,6 +80,10 @@ type Handler struct {
 // @host
 // @BasePath /api
 
+// @securitydefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+
 // ServeHTTP delegates a request to the appropriate subhandler.
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch {

@@ -491,6 +491,36 @@ paths:
       summary: Authenticate with OAuth
       tags:
       - auth
+  /custom_templates:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: method for creating template
+        enum:
+        - string
+        - file
+        - repository
+        in: query
+        name: method
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create a custom template
+      tags:
+      - CustomTemplates
   /endpoint_groups:
     post:
       consumes:
@@ -818,4 +848,9 @@ paths:
       summary: Upload TLS file
       tags:
       - Upload
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
