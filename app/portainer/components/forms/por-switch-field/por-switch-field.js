@@ -7,6 +7,7 @@ const porSwitchField = {
     ngModel: '=',
     label: '@',
     name: '@',
+    labelClass: '@',
     disabled: '<',
     onChange: '<',
   },

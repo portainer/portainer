@@ -1,4 +1,8 @@
 <label style="display: flex; align-items: center; margin: 0;">
+  <span for="toggle_{{::$ctrl.name}}" class="control-label text-left space-right" ng-class="$ctrl.labelClass" style="padding: 0;">
+    {{::$ctrl.label}}
+    <portainer-tooltip ng-if="$ctrl.tooltip" position="bottom" message="{{::$ctrl.tooltip}}"></portainer-tooltip>
+  </span>
   <por-switch
     class-name="space-right"
     name="toggle_{{::$ctrl.name}}"
@@ -7,8 +11,4 @@
     disabled="$ctrl.disabled"
     on-change="($ctrl.onChange)"
   ></por-switch>
-  <span for="toggle_{{::$ctrl.name}}" class="control-label text-left space-left" style="padding: 0;">
-    {{::$ctrl.label}}
-    <portainer-tooltip ng-if="$ctrl.tooltip" position="bottom" message="{{::$ctrl.tooltip}}"></portainer-tooltip>
-  </span>
 </label>
