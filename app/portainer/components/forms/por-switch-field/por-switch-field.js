@@ -1,6 +1,8 @@
 import angular from 'angular';
 
-const porSwitchField = {
+import './por-switch-field.css';
+
+export const porSwitchField = {
   templateUrl: './por-switch-field.html',
   bindings: {
     tooltip: '@',
