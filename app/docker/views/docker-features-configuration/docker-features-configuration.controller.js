@@ -1,4 +1,5 @@
 export default class DockerFeaturesConfigurationController {
+  /* @ngInject */
   constructor($async, EndpointService, Notifications, StateManager) {
     this.$async = $async;
     this.EndpointService = EndpointService;
