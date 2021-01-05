@@ -1,21 +1,20 @@
 ---
 name: Feature request
 about: Suggest a feature/enhancement that should be added in Portainer
-
 ---
 
 <!--
 
 Thanks for opening a feature request for Portainer !
 
-Do you need help or have a question? Come chat with us on Slack http://portainer.io/slack/
+Do you need help or have a question? Come chat with us on Slack http://portainer.slack.com/
 
 Before opening a new issue, make sure that we do not have any duplicates
 already open. You can ensure this by searching the issue list for this
 repository. If there is a duplicate, please close your issue and add a comment
 to the existing issue instead.
 
-Also, be sure to check our FAQ and documentation first: https://portainer.readthedocs.io
+Also, be sure to check our FAQ and documentation first: https://documentation.portainer.io/
 -->
 
 **Is your feature request related to a problem? Please describe.**
