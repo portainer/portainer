@@ -17,7 +17,18 @@ type configResponse struct {
 	Name             string
 }
 
-// GET request on api/endpoints/:id/edge/stacks/:stackId
+// endpointEdgeStackInspect
+// @summary Inspect an Edge Stack for an Endpoint
+// @description
+// @tags Edge, Endpoints, EdgeStacks
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path string true "Endpoint Id"
+// @param stackID path string true "EdgeStack Id"
+// @success 200 {object} configResponse
+// @failure 500,400,404
+// @router /endpoints/{id}/edge/stacks/{stackId} [get]
 func (handler *Handler) endpointEdgeStackInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

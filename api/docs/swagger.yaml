@@ -274,6 +274,15 @@ definitions:
       version:
         type: integer
     type: object
+  endpointedge.configResponse:
+    properties:
+      name:
+        type: string
+      prune:
+        type: boolean
+      stackFileContent:
+        type: string
+    type: object
   endpointgroups.endpointGroupCreatePayload:
     properties:
       associatedEndpoints:
@@ -2134,6 +2143,71 @@ paths:
       summary: Updates an endpoint
       tags:
       - Endpoints
+  /endpoints/{id}/edge/jobs/{jobID}/logs:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Endpoint Id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Job Id
+        in: path
+        name: jobID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Inspect an EdgeJob Log
+      tags:
+      - Edge
+      - Endpoints
+  /endpoints/{id}/edge/stacks/{stackId}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Endpoint Id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: EdgeStack Id
+        in: path
+        name: stackID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/endpointedge.configResponse'
+        "400":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Inspect an Edge Stack for an Endpoint
+      tags:
+      - Edge
+      - Endpoints
+      - EdgeStacks
   /endpoints/{id}/snapshot:
     post:
       consumes:

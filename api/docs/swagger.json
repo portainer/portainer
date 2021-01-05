@@ -1993,6 +1993,107 @@
                 }
             }
         },
+        "/endpoints/{id}/edge/jobs/{jobID}/logs": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Edge",
+                    "Endpoints"
+                ],
+                "summary": "Inspect an EdgeJob Log",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Endpoint Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Job Id",
+                        "name": "jobID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/endpoints/{id}/edge/stacks/{stackId}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Edge",
+                    "Endpoints",
+                    "EdgeStacks"
+                ],
+                "summary": "Inspect an Edge Stack for an Endpoint",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Endpoint Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "EdgeStack Id",
+                        "name": "stackID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/endpointedge.configResponse"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/endpoints/{id}/snapshot": {
             "post": {
                 "security": [
@@ -2616,6 +2717,20 @@
                 },
                 "version": {
                     "type": "integer"
+                }
+            }
+        },
+        "endpointedge.configResponse": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "prune": {
+                    "type": "boolean"
+                },
+                "stackFileContent": {
+                    "type": "string"
                 }
             }
         },
