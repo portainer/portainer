@@ -2334,6 +2334,266 @@ var doc = `{
                 }
             }
         },
+        "/registries": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Registries"
+                ],
+                "summary": "List Registries",
+                "responses": {
+                    "200": {
+                        "description": "Registry",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/portainer.Registry"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Registries"
+                ],
+                "summary": "Creates a registry",
+                "parameters": [
+                    {
+                        "description": "registry data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/registries.registryCreatePayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Registry",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.Registry"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/registries/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Registries"
+                ],
+                "summary": "Inspects a registry",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "registry id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.Registry"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Registries"
+                ],
+                "summary": "Updates a registry",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "registry id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "registry data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/registries.registryUpdatePayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.Registry"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Registries"
+                ],
+                "summary": "Deletes a registry",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "registry id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/registries/{id}/configure": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Registries"
+                ],
+                "summary": "Configures a registry",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "registry id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "registry configurations",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/registries.registryConfigurePayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/tags": {
             "get": {
                 "security": [
@@ -3552,6 +3812,20 @@ var doc = `{
                 }
             }
         },
+        "portainer.GitlabRegistryData": {
+            "type": "object",
+            "properties": {
+                "InstanceURL": {
+                    "type": "string"
+                },
+                "ProjectId": {
+                    "type": "integer"
+                },
+                "ProjectPath": {
+                    "type": "string"
+                }
+            }
+        },
         "portainer.KubernetesConfiguration": {
             "type": "object",
             "properties": {
@@ -3647,6 +3921,78 @@ var doc = `{
                     "type": "string"
                 },
                 "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "portainer.Registry": {
+            "type": "object",
+            "properties": {
+                "Authentication": {
+                    "type": "boolean"
+                },
+                "AuthorizedTeams": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "AuthorizedUsers": {
+                    "description": "Deprecated fields\nDeprecated in DBVersion == 18",
+                    "type": "array",
+                    "items": {
+                        "description": "Deprecated fields\nDeprecated in DBVersion == 2",
+                        "type": "integer"
+                    }
+                },
+                "Gitlab": {
+                    "$ref": "#/definitions/portainer.GitlabRegistryData"
+                },
+                "Id": {
+                    "type": "integer"
+                },
+                "ManagementConfiguration": {
+                    "$ref": "#/definitions/portainer.RegistryManagementConfiguration"
+                },
+                "Name": {
+                    "type": "string"
+                },
+                "Password": {
+                    "type": "string"
+                },
+                "TeamAccessPolicies": {
+                    "$ref": "#/definitions/portainer.TeamAccessPolicies"
+                },
+                "Type": {
+                    "type": "integer"
+                },
+                "URL": {
+                    "type": "string"
+                },
+                "UserAccessPolicies": {
+                    "$ref": "#/definitions/portainer.UserAccessPolicies"
+                },
+                "Username": {
+                    "type": "string"
+                }
+            }
+        },
+        "portainer.RegistryManagementConfiguration": {
+            "type": "object",
+            "properties": {
+                "Authentication": {
+                    "type": "boolean"
+                },
+                "Password": {
+                    "type": "string"
+                },
+                "TLSConfig": {
+                    "$ref": "#/definitions/portainer.TLSConfiguration"
+                },
+                "Type": {
+                    "type": "integer"
+                },
+                "Username": {
                     "type": "string"
                 }
             }
@@ -3936,6 +4282,96 @@ var doc = `{
                 },
                 "UserId": {
                     "type": "integer"
+                }
+            }
+        },
+        "registries.registryConfigurePayload": {
+            "type": "object",
+            "properties": {
+                "authentication": {
+                    "type": "boolean"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "tls": {
+                    "type": "boolean"
+                },
+                "tlscacertFile": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "tlscertFile": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "tlskeyFile": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "tlsskipVerify": {
+                    "type": "boolean"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "registries.registryCreatePayload": {
+            "type": "object",
+            "properties": {
+                "authentication": {
+                    "type": "boolean"
+                },
+                "gitlab": {
+                    "$ref": "#/definitions/portainer.GitlabRegistryData"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                },
+                "url": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "registries.registryUpdatePayload": {
+            "type": "object",
+            "properties": {
+                "authentication": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "teamAccessPolicies": {
+                    "$ref": "#/definitions/portainer.TeamAccessPolicies"
+                },
+                "url": {
+                    "type": "string"
+                },
+                "userAccessPolicies": {
+                    "$ref": "#/definitions/portainer.UserAccessPolicies"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         },

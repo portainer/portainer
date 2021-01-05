@@ -8,7 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
@@ -67,7 +67,18 @@ func (payload *registryConfigurePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// POST request on /api/registries/:id/configure
+// @summary Configures a registry
+// @description
+// @tags Registries
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path int true "registry id"
+// @param body body registryConfigurePayload true "registry configurations"
+// @success 204
+// @failure 400,500
+// @router /registries/{id}/configure [post]
+// POST request on /api
 func (handler *Handler) registryConfigure(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	registryID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

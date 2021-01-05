@@ -8,7 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 type registryCreatePayload struct {
@@ -37,6 +37,16 @@ func (payload *registryCreatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
+// @summary Creates a registry
+// @description
+// @tags Registries
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param body body registryCreatePayload true "registry data"
+// @success 200 {object} portainer.Registry "Registry"
+// @failure 400,500
+// @router /registries [post]
 func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload registryCreatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)

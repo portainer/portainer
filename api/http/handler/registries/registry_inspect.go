@@ -3,16 +3,25 @@ package registries
 import (
 	"net/http"
 
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/errors"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
 )
 
-// GET request on /api/registries/:id
+// @summary Inspects a registry
+// @description
+// @tags Registries
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path int true "registry id"
+// @success 200 {object} portainer.Registry
+// @failure 400,404,500,403
+// @router /registries/{id} [get]
 func (handler *Handler) registryInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	registryID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

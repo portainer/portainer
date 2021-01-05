@@ -6,11 +6,20 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 )
 
-// DELETE request on /api/registries/:id
+// @summary Deletes a registry
+// @description
+// @tags Registries
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path int true "registry id"
+// @success 204
+// @failure 400,404,500
+// @router /registries/{id} [delete]
 func (handler *Handler) registryDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	registryID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

@@ -25,7 +25,17 @@ func (payload *registryUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// PUT request on /api/registries/:id
+// @summary Updates a registry
+// @description
+// @tags Registries
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path int true "registry id"
+// @param body body registryUpdatePayload true "registry data"
+// @success 200 {object} portainer.Registry
+// @failure 400,500
+// @router /registries/{id} [put]
 func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	registryID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

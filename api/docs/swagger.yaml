@@ -698,6 +698,15 @@ definitions:
       UserAccessPolicies:
         $ref: '#/definitions/portainer.UserAccessPolicies'
     type: object
+  portainer.GitlabRegistryData:
+    properties:
+      InstanceURL:
+        type: string
+      ProjectId:
+        type: integer
+      ProjectPath:
+        type: string
+    type: object
   portainer.KubernetesConfiguration:
     properties:
       IngressClasses:
@@ -760,6 +769,58 @@ definitions:
       name:
         type: string
       value:
+        type: string
+    type: object
+  portainer.Registry:
+    properties:
+      Authentication:
+        type: boolean
+      AuthorizedTeams:
+        items:
+          type: integer
+        type: array
+      AuthorizedUsers:
+        description: |-
+          Deprecated fields
+          Deprecated in DBVersion == 18
+        items:
+          description: |-
+            Deprecated fields
+            Deprecated in DBVersion == 2
+          type: integer
+        type: array
+      Gitlab:
+        $ref: '#/definitions/portainer.GitlabRegistryData'
+      Id:
+        type: integer
+      ManagementConfiguration:
+        $ref: '#/definitions/portainer.RegistryManagementConfiguration'
+      Name:
+        type: string
+      Password:
+        type: string
+      TeamAccessPolicies:
+        $ref: '#/definitions/portainer.TeamAccessPolicies'
+      Type:
+        type: integer
+      URL:
+        type: string
+      UserAccessPolicies:
+        $ref: '#/definitions/portainer.UserAccessPolicies'
+      Username:
+        type: string
+    type: object
+  portainer.RegistryManagementConfiguration:
+    properties:
+      Authentication:
+        type: boolean
+      Password:
+        type: string
+      TLSConfig:
+        $ref: '#/definitions/portainer.TLSConfiguration'
+      Type:
+        type: integer
+      Username:
         type: string
     type: object
   portainer.ResourceControl:
@@ -954,6 +1015,65 @@ definitions:
         type: integer
       UserId:
         type: integer
+    type: object
+  registries.registryConfigurePayload:
+    properties:
+      authentication:
+        type: boolean
+      password:
+        type: string
+      tls:
+        type: boolean
+      tlscacertFile:
+        items:
+          type: integer
+        type: array
+      tlscertFile:
+        items:
+          type: integer
+        type: array
+      tlskeyFile:
+        items:
+          type: integer
+        type: array
+      tlsskipVerify:
+        type: boolean
+      username:
+        type: string
+    type: object
+  registries.registryCreatePayload:
+    properties:
+      authentication:
+        type: boolean
+      gitlab:
+        $ref: '#/definitions/portainer.GitlabRegistryData'
+      name:
+        type: string
+      password:
+        type: string
+      type:
+        type: integer
+      url:
+        type: string
+      username:
+        type: string
+    type: object
+  registries.registryUpdatePayload:
+    properties:
+      authentication:
+        type: boolean
+      name:
+        type: string
+      password:
+        type: string
+      teamAccessPolicies:
+        $ref: '#/definitions/portainer.TeamAccessPolicies'
+      url:
+        type: string
+      userAccessPolicies:
+        $ref: '#/definitions/portainer.UserAccessPolicies'
+      username:
+        type: string
     type: object
   tags.tagCreatePayload:
     properties:
@@ -2411,6 +2531,168 @@ paths:
       summary: fetches the message of the day
       tags:
       - MOTD
+  /registries:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Registry
+          schema:
+            items:
+              $ref: '#/definitions/portainer.Registry'
+            type: array
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: List Registries
+      tags:
+      - Registries
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: registry data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/registries.registryCreatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Registry
+          schema:
+            $ref: '#/definitions/portainer.Registry'
+        "400":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Creates a registry
+      tags:
+      - Registries
+  /registries/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: registry id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Deletes a registry
+      tags:
+      - Registries
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: registry id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.Registry'
+        "400":
+          description: ""
+        "403":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Inspects a registry
+      tags:
+      - Registries
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: registry id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: registry data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/registries.registryUpdatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.Registry'
+        "400":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Updates a registry
+      tags:
+      - Registries
+  /registries/{id}/configure:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: registry id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: registry configurations
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/registries.registryConfigurePayload'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Configures a registry
+      tags:
+      - Registries
   /tags:
     get:
       produces:

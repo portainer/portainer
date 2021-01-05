@@ -8,7 +8,15 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// GET request on /api/registries
+// @summary List Registries
+// @description
+// @tags Registries
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @success 200 {array} portainer.Registry "Registry"
+// @failure 500
+// @router /registries [get]
 func (handler *Handler) registryList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	registries, err := handler.DataStore.Registry().Registries()
 	if err != nil {
