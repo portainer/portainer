@@ -159,8 +159,55 @@ var doc = `{
                 "tags": [
                     "Endpoints"
                 ],
+                "summary": "Snapshot all endpoints",
                 "responses": {
                     "204": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/endpoints/{id}/status": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Endpoints",
+                    "Edge"
+                ],
+                "summary": "Get endpoint status (for edge)",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Endpoint ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/endpoints.endpointStatusInspectResponse"
+                        }
+                    },
+                    "403": {
+                        "description": ""
+                    },
+                    "404": {
                         "description": ""
                     },
                     "500": {
@@ -1777,6 +1824,7 @@ var doc = `{
                 "tags": [
                     "Endpoints"
                 ],
+                "summary": "List endpoints",
                 "parameters": [
                     {
                         "type": "integer",
@@ -2100,6 +2148,112 @@ var doc = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/endpointedge.configResponse"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/endpoints/{id}/extensions": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Endpoints"
+                ],
+                "summary": "Add an extension to an Endpoint",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "endpoint id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/endpoints.endpointExtensionAddPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Endpoint Extension",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.EndpointExtension"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/endpoints/{id}/extensions/{extensionType}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Endpoints"
+                ],
+                "summary": "Removes an extension to an Endpoint",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "endpoint id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "extension type",
+                        "name": "extensionType",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Endpoint Extension",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.EndpointExtension"
                         }
                     },
                     "400": {
@@ -2777,6 +2931,26 @@ var doc = `{
                 }
             }
         },
+        "endpoints.edgeJobResponse": {
+            "type": "object",
+            "properties": {
+                "CollectLogs": {
+                    "type": "boolean"
+                },
+                "CronExpression": {
+                    "type": "string"
+                },
+                "Id": {
+                    "type": "integer"
+                },
+                "Script": {
+                    "type": "string"
+                },
+                "Version": {
+                    "type": "integer"
+                }
+            }
+        },
         "endpoints.endpointCreatePayload": {
             "type": "object",
             "properties": {
@@ -2839,6 +3013,57 @@ var doc = `{
                 },
                 "url": {
                     "type": "string"
+                }
+            }
+        },
+        "endpoints.endpointExtensionAddPayload": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "integer"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "endpoints.endpointStatusInspectResponse": {
+            "type": "object",
+            "properties": {
+                "checkin": {
+                    "type": "integer"
+                },
+                "credentials": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "integer"
+                },
+                "schedules": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/endpoints.edgeJobResponse"
+                    }
+                },
+                "stacks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/endpoints.stackStatusResponse"
+                    }
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "endpoints.stackStatusResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "version": {
+                    "type": "integer"
                 }
             }
         },

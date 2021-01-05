@@ -9,7 +9,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
@@ -35,7 +35,16 @@ type endpointStatusInspectResponse struct {
 	Stacks          []stackStatusResponse `json:"stacks"`
 }
 
-// GET request on /api/endpoints/:id/status
+// @summary Get endpoint status (for edge)
+// @description
+// @tags Endpoints, Edge
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path int true "Endpoint ID"
+// @success 200 {object} endpointStatusInspectResponse
+// @failure 500,404,403
+// @router /api/endpoints/{id}/status [get]
 func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

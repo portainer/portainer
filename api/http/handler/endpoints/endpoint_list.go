@@ -13,8 +13,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// List endpoints
-// @summary
+// @summary List endpoints
 // @description
 // @tags Endpoints
 // @security ApiKeyAuth
@@ -31,7 +30,6 @@ import (
 // @success 200 {array} portainer.Endpoint "Endpoints"
 // @failure 400,500
 // @router /endpoints [get]
-// GET request on /api/endpoints?(start=<start>)&(limit=<limit>)&(search=<search>)&(groupId=<groupId)
 func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	start, _ := request.RetrieveNumericQueryParameter(r, "start", true)
 	if start != 0 {

@@ -8,11 +8,21 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 )
 
-// DELETE request on /api/endpoints/:id/extensions/:extensionType
+// @summary Removes an extension to an Endpoint
+// @description
+// @tags Endpoints
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path int true "endpoint id"
+// @param extensionType path int true "extension type"
+// @success 200 {object} portainer.EndpointExtension "Endpoint Extension"
+// @failure 400,500,404
+// @router /endpoints/{id}/extensions/{extensionType} [delete]
 func (handler *Handler) endpointExtensionRemove(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

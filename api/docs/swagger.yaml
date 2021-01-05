@@ -298,6 +298,19 @@ definitions:
           type: integer
         type: array
     type: object
+  endpoints.edgeJobResponse:
+    properties:
+      CollectLogs:
+        type: boolean
+      CronExpression:
+        type: string
+      Id:
+        type: integer
+      Script:
+        type: string
+      Version:
+        type: integer
+    type: object
   endpoints.endpointCreatePayload:
     properties:
       azureApplicationID:
@@ -340,6 +353,39 @@ definitions:
         type: boolean
       url:
         type: string
+    type: object
+  endpoints.endpointExtensionAddPayload:
+    properties:
+      type:
+        type: integer
+      url:
+        type: string
+    type: object
+  endpoints.endpointStatusInspectResponse:
+    properties:
+      checkin:
+        type: integer
+      credentials:
+        type: string
+      port:
+        type: integer
+      schedules:
+        items:
+          $ref: '#/definitions/endpoints.edgeJobResponse'
+        type: array
+      stacks:
+        items:
+          $ref: '#/definitions/endpoints.stackStatusResponse'
+        type: array
+      status:
+        type: string
+    type: object
+  endpoints.stackStatusResponse:
+    properties:
+      id:
+        type: integer
+      version:
+        type: integer
     type: object
   portainer.AccessPolicy:
     properties:
@@ -976,6 +1022,35 @@ paths:
       summary: Update Endpoint group
       tags:
       - EndpointGroups
+  /api/endpoints/{id}/status:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Endpoint ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoints.endpointStatusInspectResponse'
+        "403":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Get endpoint status (for edge)
+      tags:
+      - Endpoints
+      - Edge
   /api/endpoints/snapshot:
     post:
       consumes:
@@ -989,6 +1064,7 @@ paths:
           description: ""
       security:
       - ApiKeyAuth: []
+      summary: Snapshot all endpoints
       tags:
       - Endpoints
   /auth:
@@ -2043,6 +2119,7 @@ paths:
           description: ""
       security:
       - ApiKeyAuth: []
+      summary: List endpoints
       tags:
       - Endpoints
     post:
@@ -2210,6 +2287,73 @@ paths:
       - Edge
       - Endpoints
       - EdgeStacks
+  /endpoints/{id}/extensions:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: endpoint id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/endpoints.endpointExtensionAddPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Endpoint Extension
+          schema:
+            $ref: '#/definitions/portainer.EndpointExtension'
+        "400":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Add an extension to an Endpoint
+      tags:
+      - Endpoints
+  /endpoints/{id}/extensions/{extensionType}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: endpoint id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: extension type
+        in: path
+        name: extensionType
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Endpoint Extension
+          schema:
+            $ref: '#/definitions/portainer.EndpointExtension'
+        "400":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Removes an extension to an Endpoint
+      tags:
+      - Endpoints
   /endpoints/{id}/snapshot:
     post:
       consumes:

@@ -10,8 +10,7 @@ import (
 	"github.com/portainer/portainer/api/internal/snapshot"
 )
 
-// Snapshot all endpoints
-// @summary
+// @summary Snapshot all endpoints
 // @description
 // @tags Endpoints
 // @security ApiKeyAuth
