@@ -8,7 +8,6 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// List Endpoint groups
 // @summary List Endpoint groups
 // @description
 // @tags EndpointGroups

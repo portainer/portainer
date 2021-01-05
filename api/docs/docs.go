@@ -1598,7 +1598,7 @@ var doc = `{
                 "tags": [
                     "EndpointGroups"
                 ],
-                "summary": "Creates an endpoint group",
+                "summary": "Creates an Endpoint Group",
                 "parameters": [
                     {
                         "description": "endpoint group data",
@@ -1642,11 +1642,11 @@ var doc = `{
                 "tags": [
                     "EndpointGroups"
                 ],
-                "summary": "Deletes an endpoint group",
+                "summary": "Deletes an Endpoint Group",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "endpoint group id",
+                        "description": "Endpoint Group Id",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1703,6 +1703,9 @@ var doc = `{
                         "description": ""
                     },
                     "400": {
+                        "description": ""
+                    },
+                    "404": {
                         "description": ""
                     },
                     "500": {

@@ -28,8 +28,7 @@ func (payload *endpointGroupCreatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// Create endpoint group
-// @summary Creates an endpoint group
+// @summary Creates an Endpoint Group
 // @description
 // @tags EndpointGroups
 // @security ApiKeyAuth

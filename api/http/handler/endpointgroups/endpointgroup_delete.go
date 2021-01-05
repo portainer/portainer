@@ -11,14 +11,13 @@ import (
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
-// Delete endpoint group
-// @summary Deletes an endpoint group
+// @summary Deletes an Endpoint Group
 // @description
 // @tags EndpointGroups
 // @security ApiKeyAuth
 // @accept json
 // @produce json
-// @param id path int true "endpoint group id"
+// @param id path int true "Endpoint Group Id"
 // @success 204
 // @failure 400,500
 // @router /endpoint_groups/{id} [delete]

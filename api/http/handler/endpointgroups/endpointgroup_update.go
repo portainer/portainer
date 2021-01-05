@@ -24,7 +24,6 @@ func (payload *endpointGroupUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// Update Endpoint group
 // @summary Update Endpoint group
 // @description
 // @tags EndpointGroups

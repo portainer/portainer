@@ -10,7 +10,6 @@ import (
 	"github.com/portainer/portainer/api/bolt/errors"
 )
 
-// Removes endpoint from an endpoint group
 // @summary Removes endpoint from an endpoint group
 // @description
 // @tags EndpointGroups

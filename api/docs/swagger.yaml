@@ -1898,7 +1898,7 @@ paths:
           description: ""
       security:
       - ApiKeyAuth: []
-      summary: Creates an endpoint group
+      summary: Creates an Endpoint Group
       tags:
       - EndpointGroups
   /endpoint_groups/{id}:
@@ -1906,7 +1906,7 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: endpoint group id
+      - description: Endpoint Group Id
         in: path
         name: id
         required: true
@@ -1922,7 +1922,7 @@ paths:
           description: ""
       security:
       - ApiKeyAuth: []
-      summary: Deletes an endpoint group
+      summary: Deletes an Endpoint Group
       tags:
       - EndpointGroups
   /endpoint_groups/{id}/endpoints/{endpointId}:
@@ -1976,6 +1976,8 @@ paths:
         "204":
           description: ""
         "400":
+          description: ""
+        "404":
           description: ""
         "500":
           description: ""

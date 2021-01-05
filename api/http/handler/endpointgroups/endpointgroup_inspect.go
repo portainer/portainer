@@ -10,7 +10,6 @@ import (
 	"github.com/portainer/portainer/api/bolt/errors"
 )
 
-// Inspect Endpoint group
 // @summary Inspect an Endpoint group
 // @description
 // @tags EndpointGroups
