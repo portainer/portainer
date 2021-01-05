@@ -7,7 +7,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
@@ -31,7 +31,17 @@ func (payload *resourceControlUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// PUT request on /api/resource_controls/:id
+// @summary Updates a resource control object
+// @description
+// @tags ResourceControl
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path int true "Resource control Id"
+// @param body body resourceControlUpdatePayload true "resource control data"
+// @success 200 {object} portainer.ResourceControl "Resource Control"
+// @failure 400,403,404,500
+// @router /resource_controls/{id} [put]
 func (handler *Handler) resourceControlUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	resourceControlID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

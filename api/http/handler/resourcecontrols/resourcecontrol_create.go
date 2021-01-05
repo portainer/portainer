@@ -8,7 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 type resourceControlCreatePayload struct {
@@ -45,7 +45,16 @@ func (payload *resourceControlCreatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// POST request on /api/resource_controls
+// @summary Creates a resource control object
+// @description
+// @tags ResourceControl
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param body body resourceControlCreatePayload true "resource control data"
+// @success 200 {object} portainer.ResourceControl "Resource Control"
+// @failure 400,409,500
+// @router /resource_controls [post]
 func (handler *Handler) resourceControlCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload resourceControlCreatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)

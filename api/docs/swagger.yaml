@@ -588,9 +588,6 @@ definitions:
       AuthorizedUsers:
         description: Deprecated in DBVersion == 18
         items:
-          description: |-
-            Deprecated fields
-            Deprecated in DBVersion == 2
           type: integer
         type: array
       AzureCredentials:
@@ -668,9 +665,6 @@ definitions:
       AuthorizedUsers:
         description: Deprecated in DBVersion == 18
         items:
-          description: |-
-            Deprecated fields
-            Deprecated in DBVersion == 2
           type: integer
         type: array
       Description:
@@ -784,9 +778,6 @@ definitions:
           Deprecated fields
           Deprecated in DBVersion == 18
         items:
-          description: |-
-            Deprecated fields
-            Deprecated in DBVersion == 2
           type: integer
         type: array
       Gitlab:
@@ -1074,6 +1065,44 @@ definitions:
         $ref: '#/definitions/portainer.UserAccessPolicies'
       username:
         type: string
+    type: object
+  resourcecontrols.resourceControlCreatePayload:
+    properties:
+      administratorsOnly:
+        type: boolean
+      public:
+        type: boolean
+      resourceID:
+        type: string
+      subResourceIDs:
+        items:
+          type: string
+        type: array
+      teams:
+        items:
+          type: integer
+        type: array
+      type:
+        type: string
+      users:
+        items:
+          type: integer
+        type: array
+    type: object
+  resourcecontrols.resourceControlUpdatePayload:
+    properties:
+      administratorsOnly:
+        type: boolean
+      public:
+        type: boolean
+      teams:
+        items:
+          type: integer
+        type: array
+      users:
+        items:
+          type: integer
+        type: array
     type: object
   tags.tagCreatePayload:
     properties:
@@ -2693,6 +2722,96 @@ paths:
       summary: Configures a registry
       tags:
       - Registries
+  /resource_controls:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: resource control data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/resourcecontrols.resourceControlCreatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Resource Control
+          schema:
+            $ref: '#/definitions/portainer.ResourceControl'
+        "400":
+          description: ""
+        "409":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Creates a resource control object
+      tags:
+      - ResourceControl
+  /resource_controls/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Resource control Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Deletes a resource control object
+      tags:
+      - ResourceControl
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Resource control Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: resource control data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/resourcecontrols.resourceControlUpdatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Resource Control
+          schema:
+            $ref: '#/definitions/portainer.ResourceControl'
+        "400":
+          description: ""
+        "403":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Updates a resource control object
+      tags:
+      - ResourceControl
   /tags:
     get:
       produces:

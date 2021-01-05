@@ -2594,6 +2594,150 @@ var doc = `{
                 }
             }
         },
+        "/resource_controls": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ResourceControl"
+                ],
+                "summary": "Creates a resource control object",
+                "parameters": [
+                    {
+                        "description": "resource control data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/resourcecontrols.resourceControlCreatePayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Resource Control",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.ResourceControl"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "409": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/resource_controls/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ResourceControl"
+                ],
+                "summary": "Updates a resource control object",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Resource control Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "resource control data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/resourcecontrols.resourceControlUpdatePayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Resource Control",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.ResourceControl"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ResourceControl"
+                ],
+                "summary": "Deletes a resource control object",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Resource control Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/tags": {
             "get": {
                 "security": [
@@ -3658,7 +3802,6 @@ var doc = `{
                     "description": "Deprecated in DBVersion == 18",
                     "type": "array",
                     "items": {
-                        "description": "Deprecated fields\nDeprecated in DBVersion == 2",
                         "type": "integer"
                     }
                 },
@@ -3771,7 +3914,6 @@ var doc = `{
                     "description": "Deprecated in DBVersion == 18",
                     "type": "array",
                     "items": {
-                        "description": "Deprecated fields\nDeprecated in DBVersion == 2",
                         "type": "integer"
                     }
                 },
@@ -3941,7 +4083,6 @@ var doc = `{
                     "description": "Deprecated fields\nDeprecated in DBVersion == 18",
                     "type": "array",
                     "items": {
-                        "description": "Deprecated fields\nDeprecated in DBVersion == 2",
                         "type": "integer"
                     }
                 },
@@ -4372,6 +4513,64 @@ var doc = `{
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "resourcecontrols.resourceControlCreatePayload": {
+            "type": "object",
+            "properties": {
+                "administratorsOnly": {
+                    "type": "boolean"
+                },
+                "public": {
+                    "type": "boolean"
+                },
+                "resourceID": {
+                    "type": "string"
+                },
+                "subResourceIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "teams": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "type": {
+                    "type": "string"
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "resourcecontrols.resourceControlUpdatePayload": {
+            "type": "object",
+            "properties": {
+                "administratorsOnly": {
+                    "type": "boolean"
+                },
+                "public": {
+                    "type": "boolean"
+                },
+                "teams": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },
