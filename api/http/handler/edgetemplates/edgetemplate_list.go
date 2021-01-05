@@ -6,7 +6,7 @@ import (
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/client"
 )
 
@@ -15,7 +15,16 @@ type templateFileFormat struct {
 	Templates []portainer.Template `json:"templates"`
 }
 
-// GET request on /api/edgetemplates
+// edgeTemplateList
+// @summary Fetches the list of Edge Templates
+// @description
+// @tags EdgeTemplates
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @success 200 {array} portainer.Template
+// @failure 500
+// @router /edgetemplates [get]
 func (handler *Handler) edgeTemplateList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {

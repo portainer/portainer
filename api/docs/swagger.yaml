@@ -763,6 +763,115 @@ definitions:
       TeamId:
         type: integer
     type: object
+  portainer.Template:
+    properties:
+      Id:
+        description: Mandatory container/stack fields
+        type: integer
+      administrator_only:
+        type: boolean
+      categories:
+        items:
+          type: string
+        type: array
+      command:
+        type: string
+      description:
+        type: string
+      env:
+        items:
+          $ref: '#/definitions/portainer.TemplateEnv'
+        type: array
+      hostname:
+        type: string
+      image:
+        description: Mandatory container fields
+        type: string
+      interactive:
+        type: boolean
+      labels:
+        items:
+          $ref: '#/definitions/portainer.Pair'
+        type: array
+      logo:
+        type: string
+      name:
+        description: Optional stack/container fields
+        type: string
+      network:
+        type: string
+      note:
+        type: string
+      platform:
+        type: string
+      ports:
+        items:
+          type: string
+        type: array
+      privileged:
+        type: boolean
+      registry:
+        description: Optional container fields
+        type: string
+      repository:
+        $ref: '#/definitions/portainer.TemplateRepository'
+        description: Mandatory stack fields
+      restart_policy:
+        type: string
+      stackFile:
+        description: Mandatory Edge stack fields
+        type: string
+      title:
+        type: string
+      type:
+        type: integer
+      volumes:
+        items:
+          $ref: '#/definitions/portainer.TemplateVolume'
+        type: array
+    type: object
+  portainer.TemplateEnv:
+    properties:
+      default:
+        type: string
+      description:
+        type: string
+      label:
+        type: string
+      name:
+        type: string
+      preset:
+        type: boolean
+      select:
+        items:
+          $ref: '#/definitions/portainer.TemplateEnvSelect'
+        type: array
+    type: object
+  portainer.TemplateEnvSelect:
+    properties:
+      default:
+        type: boolean
+      text:
+        type: string
+      value:
+        type: string
+    type: object
+  portainer.TemplateRepository:
+    properties:
+      stackfile:
+        type: string
+      url:
+        type: string
+    type: object
+  portainer.TemplateVolume:
+    properties:
+      bind:
+        type: string
+      container:
+        type: string
+      readonly:
+        type: boolean
+    type: object
   portainer.UserAccessPolicies:
     additionalProperties:
       $ref: '#/definitions/portainer.AccessPolicy'
@@ -1736,6 +1845,26 @@ paths:
       summary: Fetches the stack file for an EdgeStack
       tags:
       - EdgeStacks
+  /edgetemplates:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/portainer.Template'
+            type: array
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Fetches the list of Edge Templates
+      tags:
+      - EdgeTemplates
   /endpoint_groups:
     post:
       consumes:

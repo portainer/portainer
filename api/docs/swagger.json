@@ -1532,6 +1532,39 @@
                 }
             }
         },
+        "/edgetemplates": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EdgeTemplates"
+                ],
+                "summary": "Fetches the list of Edge Templates",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/portainer.Template"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/endpoint_groups": {
             "post": {
                 "security": [
@@ -3313,6 +3346,169 @@
                 },
                 "TeamId": {
                     "type": "integer"
+                }
+            }
+        },
+        "portainer.Template": {
+            "type": "object",
+            "properties": {
+                "Id": {
+                    "description": "Mandatory container/stack fields",
+                    "type": "integer"
+                },
+                "administrator_only": {
+                    "type": "boolean"
+                },
+                "categories": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "command": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "env": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/portainer.TemplateEnv"
+                    }
+                },
+                "hostname": {
+                    "type": "string"
+                },
+                "image": {
+                    "description": "Mandatory container fields",
+                    "type": "string"
+                },
+                "interactive": {
+                    "type": "boolean"
+                },
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/portainer.Pair"
+                    }
+                },
+                "logo": {
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Optional stack/container fields",
+                    "type": "string"
+                },
+                "network": {
+                    "type": "string"
+                },
+                "note": {
+                    "type": "string"
+                },
+                "platform": {
+                    "type": "string"
+                },
+                "ports": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "privileged": {
+                    "type": "boolean"
+                },
+                "registry": {
+                    "description": "Optional container fields",
+                    "type": "string"
+                },
+                "repository": {
+                    "description": "Mandatory stack fields",
+                    "$ref": "#/definitions/portainer.TemplateRepository"
+                },
+                "restart_policy": {
+                    "type": "string"
+                },
+                "stackFile": {
+                    "description": "Mandatory Edge stack fields",
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                },
+                "volumes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/portainer.TemplateVolume"
+                    }
+                }
+            }
+        },
+        "portainer.TemplateEnv": {
+            "type": "object",
+            "properties": {
+                "default": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "preset": {
+                    "type": "boolean"
+                },
+                "select": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/portainer.TemplateEnvSelect"
+                    }
+                }
+            }
+        },
+        "portainer.TemplateEnvSelect": {
+            "type": "object",
+            "properties": {
+                "default": {
+                    "type": "boolean"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "portainer.TemplateRepository": {
+            "type": "object",
+            "properties": {
+                "stackfile": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "portainer.TemplateVolume": {
+            "type": "object",
+            "properties": {
+                "bind": {
+                    "type": "string"
+                },
+                "container": {
+                    "type": "string"
+                },
+                "readonly": {
+                    "type": "boolean"
                 }
             }
         },
