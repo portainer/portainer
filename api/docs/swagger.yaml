@@ -387,6 +387,23 @@ definitions:
       version:
         type: integer
     type: object
+  motd.motdResponse:
+    properties:
+      ContentLayout:
+        additionalProperties:
+          type: string
+        type: object
+      Hash:
+        items:
+          type: integer
+        type: array
+      Message:
+        type: string
+      Style:
+        type: string
+      Title:
+        type: string
+    type: object
   portainer.AccessPolicy:
     properties:
       RoleId:
@@ -2380,6 +2397,20 @@ paths:
       summary: Snapshots an endpoint
       tags:
       - Endpoints
+  /motd:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/motd.motdResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: fetches the message of the day
+      tags:
+      - MOTD
   /tags:
     get:
       produces:

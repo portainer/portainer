@@ -2310,6 +2310,30 @@ var doc = `{
                 }
             }
         },
+        "/motd": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "MOTD"
+                ],
+                "summary": "fetches the message of the day",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/motd.motdResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/tags": {
             "get": {
                 "security": [
@@ -3064,6 +3088,32 @@ var doc = `{
                 },
                 "version": {
                     "type": "integer"
+                }
+            }
+        },
+        "motd.motdResponse": {
+            "type": "object",
+            "properties": {
+                "ContentLayout": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "Hash": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "Message": {
+                    "type": "string"
+                },
+                "Style": {
+                    "type": "string"
+                },
+                "Title": {
+                    "type": "string"
                 }
             }
         },
