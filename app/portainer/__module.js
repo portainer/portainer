@@ -392,6 +392,16 @@ angular.module('portainer.app', ['portainer.oauth']).config([
       },
     };
 
+    var roles = {
+      name: 'portainer.roles',
+      url: '/roles',
+      views: {
+        'content@': {
+          templateUrl: './views/roles/roles.html',
+        },
+      },
+    };
+
     $stateRegistryProvider.register(root);
     $stateRegistryProvider.register(endpointRoot);
     $stateRegistryProvider.register(portainer);
@@ -422,6 +432,7 @@ angular.module('portainer.app', ['portainer.oauth']).config([
     $stateRegistryProvider.register(user);
     $stateRegistryProvider.register(teams);
     $stateRegistryProvider.register(team);
+    $stateRegistryProvider.register(roles);
   },
 ]);
 

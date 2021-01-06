@@ -1,14 +1,18 @@
 import { ResourceControlViewModel } from 'Portainer/models/resourceControl/resourceControl';
 
 function b64DecodeUnicode(str) {
-  return decodeURIComponent(
-    atob(str)
-      .split('')
-      .map(function (c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      })
-      .join('')
-  );
+  try {
+    return decodeURIComponent(
+      atob(str)
+        .split('')
+        .map(function (c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join('')
+    );
+  } catch (err) {
+    return atob(str);
+  }
 }
 
 export function ConfigViewModel(data) {

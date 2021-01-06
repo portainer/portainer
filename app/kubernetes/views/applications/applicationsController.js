@@ -79,7 +79,11 @@ class KubernetesApplicationsController {
   }
 
   removeAction(selectedItems) {
-    return this.$async(this.removeActionAsync, selectedItems);
+    this.ModalService.confirmDeletion('Do you want to remove the selected application(s)?', (confirmed) => {
+      if (confirmed) {
+        return this.$async(this.removeActionAsync, selectedItems);
+      }
+    });
   }
 
   onPublishingModeClick(application) {
@@ -87,7 +91,7 @@ class KubernetesApplicationsController {
     _.forEach(this.ports, (item) => {
       item.Expanded = false;
       item.Highlighted = false;
-      if (item.Name === application.Name) {
+      if (item.Name === application.Name && item.Ports.length > 1) {
         item.Expanded = true;
         item.Highlighted = true;
       }

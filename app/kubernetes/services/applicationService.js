@@ -18,6 +18,7 @@ import KubernetesServiceHelper from 'Kubernetes/helpers/serviceHelper';
 import { KubernetesHorizontalPodAutoScalerHelper } from 'Kubernetes/horizontal-pod-auto-scaler/helper';
 import { KubernetesHorizontalPodAutoScalerConverter } from 'Kubernetes/horizontal-pod-auto-scaler/converter';
 import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
+import KubernetesPodConverter from 'Kubernetes/pod/converter';
 
 class KubernetesApplicationService {
   /* #region  CONSTRUCTOR */
@@ -70,8 +71,10 @@ class KubernetesApplicationService {
       apiService = this.KubernetesDaemonSetService;
     } else if (app instanceof KubernetesStatefulSet || (app instanceof KubernetesApplication && app.ApplicationType === KubernetesApplicationTypes.STATEFULSET)) {
       apiService = this.KubernetesStatefulSetService;
+    } else if (app instanceof KubernetesApplication && app.ApplicationType === KubernetesApplicationTypes.POD) {
+      apiService = this.KubernetesPodService;
     } else {
-      throw new PortainerError('Unable to determine which association to use');
+      throw new PortainerError('Unable to determine which association to use to retrieve API Service');
     }
     return apiService;
   }
@@ -87,14 +90,17 @@ class KubernetesApplicationService {
   /* #region  GET */
   async getAsync(namespace, name) {
     try {
-      const [deployment, daemonSet, statefulSet, pods, autoScalers, ingresses] = await Promise.allSettled([
+      const [deployment, daemonSet, statefulSet, pod, pods, autoScalers, ingresses] = await Promise.allSettled([
         this.KubernetesDeploymentService.get(namespace, name),
         this.KubernetesDaemonSetService.get(namespace, name),
         this.KubernetesStatefulSetService.get(namespace, name),
+        this.KubernetesPodService.get(namespace, name),
         this.KubernetesPodService.get(namespace),
         this.KubernetesHorizontalPodAutoScalerService.get(namespace),
         this.KubernetesIngressService.get(namespace),
       ]);
+
+      // const pod = _.find(pods.value, ['metadata.namespace', namespace, 'metadata.name', name]);
 
       let rootItem;
       let converterFunc;
@@ -107,8 +113,11 @@ class KubernetesApplicationService {
       } else if (statefulSet.status === 'fulfilled') {
         rootItem = statefulSet;
         converterFunc = KubernetesApplicationConverter.apiStatefulSetToapplication;
+      } else if (pod.status === 'fulfilled') {
+        rootItem = pod;
+        converterFunc = KubernetesApplicationConverter.apiPodToApplication;
       } else {
-        throw new PortainerError('Unable to determine which association to use');
+        throw new PortainerError('Unable to determine which association to use to convert application');
       }
 
       const services = await this.KubernetesServiceService.get(namespace);
@@ -118,6 +127,7 @@ class KubernetesApplicationService {
       const application = converterFunc(rootItem.value.Raw, pods.value, service.Raw, ingresses.value);
       application.Yaml = rootItem.value.Yaml;
       application.Raw = rootItem.value.Raw;
+      application.Pods = _.map(application.Pods, (item) => KubernetesPodConverter.apiToModel(item));
       application.Containers = KubernetesApplicationHelper.associateContainersAndApplication(application);
 
       const boundScaler = KubernetesHorizontalPodAutoScalerHelper.findApplicationBoundScaler(autoScalers.value, application);
@@ -173,7 +183,14 @@ class KubernetesApplicationService {
             convertToApplication(item, KubernetesApplicationConverter.apiStatefulSetToapplication, services, pods, ingresses)
           );
 
-          const applications = _.concat(deploymentApplications, daemonSetApplications, statefulSetApplications);
+          const boundPods = _.concat(_.flatMap(deploymentApplications, 'Pods'), _.flatMap(daemonSetApplications, 'Pods'), _.flatMap(statefulSetApplications, 'Pods'));
+          const unboundPods = _.without(pods, ...boundPods);
+          const nakedPodsApplications = _.map(unboundPods, (item) => convertToApplication(item, KubernetesApplicationConverter.apiPodToApplication, services, pods, ingresses));
+
+          const applications = _.concat(deploymentApplications, daemonSetApplications, statefulSetApplications, nakedPodsApplications);
+          _.forEach(applications, (app) => {
+            app.Pods = _.map(app.Pods, (item) => KubernetesPodConverter.apiToModel(item));
+          });
           await Promise.all(
             _.forEach(applications, async (application) => {
               const boundScaler = KubernetesHorizontalPodAutoScalerHelper.findApplicationBoundScaler(autoScalers, application);

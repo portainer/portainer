@@ -1,7 +1,7 @@
 import angular from 'angular';
 import * as _ from 'lodash-es';
 import * as JsonPatch from 'fast-json-patch';
-import { KubernetesApplicationDataAccessPolicies, KubernetesApplicationDeploymentTypes } from 'Kubernetes/models/application/models';
+import { KubernetesApplicationDataAccessPolicies, KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
@@ -123,6 +123,8 @@ class KubernetesApplicationController {
 
     this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
 
+    this.KubernetesApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
+    this.KubernetesApplicationTypes = KubernetesApplicationTypes;
     this.ApplicationDataAccessPolicies = KubernetesApplicationDataAccessPolicies;
     this.KubernetesServiceTypes = KubernetesServiceTypes;
     this.KubernetesPodContainerTypes = KubernetesPodContainerTypes;
@@ -144,7 +146,7 @@ class KubernetesApplicationController {
 
   showEditor() {
     this.state.showEditorTab = true;
-    this.selectTab(2);
+    this.selectTab(3);
   }
 
   isSystemNamespace() {
@@ -340,7 +342,6 @@ class KubernetesApplicationController {
       SelectedRevision: undefined,
     };
 
-    this.KubernetesApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
     await this.getApplication();
     await this.getEvents();
     this.state.viewReady = true;

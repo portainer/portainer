@@ -57,7 +57,7 @@
         <table class="table table-hover nowrap-cells">
           <thead>
             <tr>
-              <th>
+              <th ng-if="!$ctrl.isPod">
                 <a ng-click="$ctrl.changeOrderBy('PodName')">
                   Pod
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'PodName' && !$ctrl.state.reverseOrder"></i>
@@ -107,7 +107,7 @@
               dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit: $ctrl.tableKey))"
               pagination-id="$ctrl.tableKey"
             >
-              <td>{{ item.PodName }}</td>
+              <td ng-if="!$ctrl.isPod">{{ item.PodName }}</td>
               <td>{{ item.Name }}</td>
               <td>{{ item.Image }}</td>
               <td

@@ -559,15 +559,17 @@ func (transport *Transport) executeGenericResourceDeletionOperation(request *htt
 		return response, err
 	}
 
-	resourceControl, err := transport.dataStore.ResourceControl().ResourceControlByResourceIDAndType(resourceIdentifierAttribute, resourceType)
-	if err != nil {
-		return response, err
-	}
-
-	if resourceControl != nil {
-		err = transport.dataStore.ResourceControl().DeleteResourceControl(resourceControl.ID)
+	if response.StatusCode == http.StatusNoContent || response.StatusCode == http.StatusOK {
+		resourceControl, err := transport.dataStore.ResourceControl().ResourceControlByResourceIDAndType(resourceIdentifierAttribute, resourceType)
 		if err != nil {
 			return response, err
+		}
+
+		if resourceControl != nil {
+			err = transport.dataStore.ResourceControl().DeleteResourceControl(resourceControl.ID)
+			if err != nil {
+				return response, err
+			}
 		}
 	}
 

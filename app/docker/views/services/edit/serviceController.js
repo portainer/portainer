@@ -378,6 +378,12 @@ angular.module('portainer.docker').controller('ServiceController', [
       return hasChanges;
     };
 
+    $scope.mountsAreValid = mountsAreValid;
+    function mountsAreValid() {
+      const mounts = $scope.service.ServiceMounts;
+      return mounts.every((mount) => mount.Source && mount.Target);
+    }
+
     function buildChanges(service) {
       var config = ServiceHelper.serviceToConfig(service.Model);
       config.Name = service.Name;

@@ -74,3 +74,23 @@ Our contribution process is described below. Some of the steps can be visualized
 The feature request process is similar to the bug report process but has an extra functional validation before the technical validation as well as a documentation validation before the testing phase.
 
 ![portainer_featurerequest_workflow](https://user-images.githubusercontent.com/5485061/45727229-5ad39f00-bbf5-11e8-9550-16ba66c50615.png)
+
+## Build Portainer locally
+
+Ensure you have Docker, Node.js, yarn, and Golang installed in the correct versions.
+
+Install dependencies with yarn:
+
+```sh
+$ yarn
+```
+
+Then build and run the project:
+
+```sh
+$ yarn start
+```
+
+Portainer can now be accessed at <http://localhost:9000>.
+
+Find more detailed steps at <https://documentation.portainer.io/contributing/instructions/>.
