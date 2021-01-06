@@ -43,5 +43,9 @@ angular.module('portainer.docker').controller('LogViewerController', [
         this.state.selectedLines.splice(idx, 1);
       }
     };
+
+    this.hideLogSettings = function () {
+      $('#logsWidgetBody').toggle();
+    };
   },
 ]);
