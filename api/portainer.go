@@ -273,15 +273,6 @@ type (
 	// Deprecated
 	EndpointSyncJob struct{}
 
-	// EndpointType represents the type of an endpoint
-	EndpointType int
-
-	// EndpointRelation represnts a endpoint relation object
-	EndpointRelation struct {
-		EndpointID EndpointID
-		EdgeStacks map[EdgeStackID]bool
-	}
-
 	// EndpointSecuritySettings represents settings for an endpoint
 	EndpointSecuritySettings struct {
 		AllowBindMountsForRegularUsers            bool `json:"allowBindMountsForRegularUsers"`
@@ -292,6 +283,15 @@ type (
 		AllowStackManagementForRegularUsers       bool `json:"allowStackManagementForRegularUsers"`
 		AllowContainerCapabilitiesForRegularUsers bool `json:"allowContainerCapabilitiesForRegularUsers"`
 		EnableHostManagementFeatures              bool `json:"enableHostManagementFeatures"`
+	}
+
+	// EndpointType represents the type of an endpoint
+	EndpointType int
+
+	// EndpointRelation represnts a endpoint relation object
+	EndpointRelation struct {
+		EndpointID EndpointID
+		EdgeStacks map[EdgeStackID]bool
 	}
 
 	// Extension represents a deprecated Portainer extension
