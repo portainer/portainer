@@ -25,35 +25,24 @@ angular.module('portainer.app').factory('Notifications', [
     };
 
     service.error = function (title, e, fallbackText, APIType = service.ApiTypes.KUBERNETES) {
-      var msg = fallbackText;
+      var msg = undefined;
+
       if (APIType === service.ApiTypes.DOCKER) {
         if (e.err && e.err.data && e.err.data.details) {
           msg = e.err.data.details;
         } else if (e.err && e.err.data && e.err.data.message) {
           msg = e.err.data.message;
-        } else if (e.data && e.data.details) {
-          msg = e.data.details;
-        } else if (e.data && e.data.message) {
-          msg = e.data.message;
-        } else if (e.data && e.data.content) {
-          msg = e.data.content;
-        } else if (e.message) {
-          msg = e.message;
-        } else if (e.err && e.err.data && e.err.data.length > 0 && e.err.data[0].message) {
-          msg = e.err.data[0].message;
-        } else if (e.err && e.err.data && e.err.data.err) {
-          msg = e.err.data.err;
-        } else if (e.data && e.data.err) {
-          msg = e.data.err;
-        } else if (e.msg) {
-          msg = e.msg;
         }
-      } else {
+      }
+      if (APIType !== service.ApiTypes.DOCKER) {
         if (e.err && e.err.data && e.err.data.message) {
           msg = e.err.data.message;
         } else if (e.err && e.err.data && e.err.data.details) {
           msg = e.err.data.details;
-        } else if (e.data && e.data.details) {
+        }
+      }
+      if (msg === undefined) {
+        if (e.data && e.data.details) {
           msg = e.data.details;
         } else if (e.data && e.data.message) {
           msg = e.data.message;
@@ -69,6 +58,8 @@ angular.module('portainer.app').factory('Notifications', [
           msg = e.data.err;
         } else if (e.msg) {
           msg = e.msg;
+        } else {
+          msg = fallbackText;
         }
       }
 
