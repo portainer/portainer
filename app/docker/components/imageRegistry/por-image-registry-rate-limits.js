@@ -1,8 +1,8 @@
 import angular from 'angular';
 
-import controller from './por-image-registry-container.controller';
+import controller from './por-image-registry-rate-limits.controller';
 
-angular.module('portainer.docker').component('porImageRegistryContainer', {
+angular.module('portainer.docker').component('porImageRegistryRateLimits', {
   bindings: {
     endpoint: '<',
     setValidity: '<',
@@ -13,7 +13,6 @@ angular.module('portainer.docker').component('porImageRegistryContainer', {
   controller,
   transclude: {
     rateLimitExceeded: '?porImageRegistryRateLimitExceeded',
-    fields: 'porImageRegistryFields',
   },
-  templateUrl: './por-image-registry-container.html',
+  templateUrl: './por-image-registry-rate-limits.html',
 });

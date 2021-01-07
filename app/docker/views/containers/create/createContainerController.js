@@ -91,7 +91,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       formValidationError: '',
       actionInProgress: false,
       mode: '',
-      pullImageValidity: false,
+      pullImageValidity: true,
     };
 
     $scope.refreshSlider = function () {

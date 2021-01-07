@@ -47,25 +47,28 @@
               input-class="col-sm-11"
               endpoint="endpoint"
               is-admin="isAdmin"
-              check-rate-limits="true"
+              check-rate-limits="formValues.alwaysPull"
               on-image-change="onImageNameChange()"
               set-validity="setPullImageValidity"
-            ></por-image-registry>
-            <!-- !image-and-registry -->
-            <!-- always-pull -->
-            <div class="form-group">
-              <div class="col-sm-12">
-                <label for="ownership" class="control-label text-left">
-                  Always pull the image
-                  <portainer-tooltip
-                    position="bottom"
-                    message="When enabled, Portainer will automatically try to pull the specified image before creating the container."
-                  ></portainer-tooltip>
-                </label>
-                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.alwaysPull" ng-disabled="!state.pullImageValidity" /><i></i> </label>
+            >
+              <!-- always-pull -->
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <label for="ownership" class="control-label text-left">
+                    Always pull the image
+                    <portainer-tooltip
+                      position="bottom"
+                      message="When enabled, Portainer will automatically try to pull the specified image before creating the container."
+                    ></portainer-tooltip>
+                  </label>
+                  <label class="switch" style="margin-left: 20px;">
+                    <input type="checkbox" ng-model="formValues.alwaysPull" ng-disabled="!state.pullImageValidity" /><i></i>
+                  </label>
+                </div>
               </div>
-            </div>
-            <!-- !always-pull -->
+              <!-- !always-pull -->
+            </por-image-registry>
+            <!-- !image-and-registry -->
           </div>
           <div class="col-sm-12 form-section-title">
             Network ports configuration

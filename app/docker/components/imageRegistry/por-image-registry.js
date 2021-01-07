@@ -1,5 +1,5 @@
 angular.module('portainer.docker').component('porImageRegistry', {
-  templateUrl: './porImageRegistry.html',
+  templateUrl: './por-image-registry.html',
   controller: 'porImageRegistryController',
   bindings: {
     model: '=', // must be of type PorImageRegistryModel
@@ -16,7 +16,5 @@ angular.module('portainer.docker').component('porImageRegistry', {
   require: {
     form: '^form',
   },
-  transclude: {
-    rateLimitExceeded: '?porImageRegistryRateLimitExceeded',
-  },
+  transclude: true,
 });
