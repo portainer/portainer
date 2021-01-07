@@ -51,37 +51,36 @@
             <!-- #endregion -->
 
             <!-- #region IMAGE FIELD -->
-            <por-image-registry-container
+
+            <div class="form-group">
+              <label for="container_image" class="col-sm-1 control-label text-left">Image</label>
+              <div class="col-sm-11">
+                <input
+                  type="text"
+                  class="form-control"
+                  name="container_image"
+                  ng-model="ctrl.formValues.Image"
+                  placeholder="nginx:latest"
+                  required
+                  ng-disabled="ctrl.formValues.Containers.length > 1"
+                />
+              </div>
+            </div>
+            <div class="form-group" ng-show="kubernetesApplicationCreationForm.container_image.$invalid">
+              <div class="col-sm-12 small text-warning">
+                <div ng-messages="kubernetesApplicationCreationForm.container_image.$error">
+                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
+              </div>
+            </div>
+            <por-image-registry-rate-limits
               is-docker-hub-registry="true"
               endpoint="ctrl.endpoint"
               is-authenticated="ctrl.state.isDockerAuthenticated"
               is-admin="ctrl.isAdmin"
               set-validity="ctrl.setPullImageValidity"
             >
-              <por-image-registry-fields>
-                <div class="form-group">
-                  <label for="container_image" class="col-sm-1 control-label text-left">Image</label>
-                  <div class="col-sm-11">
-                    <input
-                      type="text"
-                      class="form-control"
-                      name="container_image"
-                      ng-model="ctrl.formValues.Image"
-                      placeholder="nginx:latest"
-                      required
-                      ng-disabled="ctrl.formValues.Containers.length > 1"
-                    />
-                  </div>
-                </div>
-                <div class="form-group" ng-show="kubernetesApplicationCreationForm.container_image.$invalid">
-                  <div class="col-sm-12 small text-warning">
-                    <div ng-messages="kubernetesApplicationCreationForm.container_image.$error">
-                      <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
-                    </div>
-                  </div>
-                </div>
-              </por-image-registry-fields>
-            </por-image-registry-container>
+            </por-image-registry-rate-limits>
             <!-- #endregion -->
 
             <div class="col-sm-12 form-section-title">
