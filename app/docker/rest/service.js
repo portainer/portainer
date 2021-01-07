@@ -35,7 +35,6 @@ angular.module('portainer.docker').factory('Service', [
         logs: {
           method: 'GET',
           params: { id: '@id', action: 'logs' },
-          timeout: 4500,
           ignoreLoadingBar: true,
           transformResponse: logsHandler,
         },

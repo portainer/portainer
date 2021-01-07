@@ -70,7 +70,7 @@ angular.module('portainer.app').controller('GenericDatatableController', [
         item.Checked = !item.Checked;
         this.state.firstClickedItem = item;
       }
-      this.state.selectedItems = this.state.filteredDataSet.filter((i) => i.Checked);
+      this.state.selectedItems = _.uniq(_.concat(this.state.selectedItems, this.state.filteredDataSet)).filter((i) => i.Checked);
       if (event && this.state.selectAll && this.state.selectedItems.length !== this.state.filteredDataSet.length) {
         this.state.selectAll = false;
       }

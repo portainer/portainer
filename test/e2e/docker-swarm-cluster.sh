@@ -3,7 +3,7 @@
 exec_in() { docker-compose exec -T $@; }
 
 # Up all dinds nodes
-docker-compose up -d manager1 manager2 worker1 worker2
+docker-compose up -d
 
 # Manager1 init
 exec_in manager1 docker swarm init
@@ -19,11 +19,5 @@ exec_in worker1 docker swarm join --token $TOKEN_WORKER manager1:2377
 # Worker2 join
 exec_in worker2 docker swarm join --token $TOKEN_WORKER manager1:2377
 
-# Run portainer + cypress
-# Use export CI=1 to run in CI mode
-if [ -z "${CI}" ];
-then
-  docker-compose up --exit-code-from cypress
-else
-  docker-compose -f docker-compose.yml -f docker-compose.ci.yml up --exit-code-from cypress
-fi
+# Deploy agent within dind swarm
+exec_in manager1 docker stack deploy -c agent-stack.yml portainer-agent

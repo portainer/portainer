@@ -24,9 +24,23 @@ class KubernetesConfigMapService {
     try {
       const params = new KubernetesCommonParams();
       params.id = name;
-      const [raw, yaml] = await Promise.all([this.KubernetesConfigMaps(namespace).get(params).$promise, this.KubernetesConfigMaps(namespace).getYaml(params).$promise]);
-      const configMap = KubernetesConfigMapConverter.apiToConfigMap(raw, yaml);
-      return configMap;
+      const [rawPromise, yamlPromise] = await Promise.allSettled([
+        this.KubernetesConfigMaps(namespace).get(params).$promise,
+        this.KubernetesConfigMaps(namespace).getYaml(params).$promise,
+      ]);
+
+      if (_.get(rawPromise, 'reason.status') == 404 && _.get(yamlPromise, 'reason.status') == 404) {
+        return KubernetesConfigMapConverter.defaultConfigMap(namespace, name);
+      }
+
+      // Saving binary data to 'data' field in configMap Object is not allowed by kubernetes and getYaml() may get 
+      // an error. We should keep binary data to 'binaryData' field instead of 'data'. Before that, we 
+      // use response from get() and ignore 500 error as a workaround.
+      if (rawPromise.value) {
+        return KubernetesConfigMapConverter.apiToConfigMap(rawPromise.value, yamlPromise.value);
+      }
+
+      throw new PortainerError('Unable to retrieve config map ', name);
     } catch (err) {
       if (err.status === 404) {
         return KubernetesConfigMapConverter.defaultConfigMap(namespace, name);

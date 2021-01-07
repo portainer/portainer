@@ -778,6 +778,7 @@
                 </label>
                 <input
                   type="number"
+                  name="replica_count"
                   class="form-control"
                   min="1"
                   max="9999"
@@ -785,8 +786,17 @@
                   style="margin-left: 20px;"
                   ng-model="ctrl.formValues.ReplicaCount"
                   ng-disabled="!ctrl.supportScalableReplicaDeployment()"
-                  ng-change="ctrl.enforceReplicaCountMinimum()"
+                  ng-change="ctrl.onChangeVolumeRequestedSize()"
+                  required
                 />
+              </div>
+            </div>
+            <div class="form-group" ng-if="kubernetesApplicationCreationForm['replica_count'].$invalid">
+              <div class="col-sm-12 small text-warning">
+                <ng-messages for="kubernetesApplicationCreationForm['replica_count'].$error">
+                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Instance count is required.</p>
+                  <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Instance count must be greater than 0.</p>
+                </ng-messages>
               </div>
             </div>
             <!-- !replica count -->

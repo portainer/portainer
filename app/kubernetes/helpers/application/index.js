@@ -38,8 +38,8 @@ class KubernetesApplicationHelper {
     return !application.ApplicationOwner;
   }
 
-  static associatePodsAndApplication(pods, app) {
-    return _.filter(pods, { Labels: app.spec.selector.matchLabels });
+  static associatePodsAndApplication(pods, selector) {
+    return _.filter(pods, ['metadata.labels', selector.matchLabels]);
   }
 
   static associateContainerPersistedFoldersAndConfigurations(app, containers) {

@@ -7,6 +7,7 @@ import KubernetesResourceQuotaHelper from 'Kubernetes/helpers/resourceQuotaHelpe
 import { KubernetesNamespace } from 'Kubernetes/models/namespace/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
+import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
 
 class KubernetesResourcePoolService {
   /* @ngInject */
@@ -73,6 +74,8 @@ class KubernetesResourcePoolService {
    * @param {KubernetesResourcePoolFormValues} formValues
    */
   async createAsync(formValues) {
+    formValues.Owner = KubernetesCommonHelper.ownerToLabel(formValues.Owner);
+
     try {
       const namespace = new KubernetesNamespace();
       namespace.Name = formValues.Name;

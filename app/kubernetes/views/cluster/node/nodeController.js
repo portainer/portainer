@@ -339,8 +339,8 @@ class KubernetesNodeController {
 
     this.availableEffects = _.values(KubernetesNodeTaintEffects);
     this.formValues = KubernetesNodeConverter.nodeToFormValues(this.node);
-    this.formValues.Labels = KubernetesNodeHelper.reorderLabels(this.formValues.Labels);
     this.formValues.Labels = KubernetesNodeHelper.computeUsedLabels(this.applications, this.formValues.Labels);
+    this.formValues.Labels = KubernetesNodeHelper.reorderLabels(this.formValues.Labels);
 
     this.state.viewReady = true;
   }

@@ -178,6 +178,11 @@ a[ng-click] {
   word-break: break-word;
 }
 
+.widget .widget-body table.container-details-table > tbody > tr > td:first-child {
+  word-break: normal;
+  text-transform: uppercase;
+}
+
 .widget .widget-body table.description-table {
   table-layout: fixed;
 }
@@ -1037,3 +1042,7 @@ json-tree .branch-preview {
   background-color: #337ab7;
 }
 /* !spinkit override */
+
+.w-full {
+  width: 100%;
+}

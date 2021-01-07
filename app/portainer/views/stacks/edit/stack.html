@@ -89,7 +89,7 @@
           </uib-tab>
           <!-- !tab-info -->
           <!-- tab-file -->
-          <uib-tab index="1" ng-if="stackFileContent" select="showEditor()">
+          <uib-tab index="1" select="showEditor()" ng-if="!state.externalStack">
             <uib-tab-heading> <i class="fa fa-pencil-alt space-right" aria-hidden="true"></i> Editor </uib-tab-heading>
             <form class="form-horizontal" ng-if="state.showEditorTab" style="margin-top: 10px;">
               <div class="form-group">
@@ -165,7 +165,7 @@
                     <button
                       type="button"
                       class="btn btn-sm btn-primary"
-                      ng-disabled="state.actionInProgress || stack.Status === 2"
+                      ng-disabled="state.actionInProgress || stack.Status === 2 || !stackFileContent"
                       ng-click="deployStack()"
                       button-spinner="state.actionInProgress"
                     >
