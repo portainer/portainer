@@ -24,30 +24,31 @@
             is-admin="isAdmin"
             set-validity="setPullImageValidity"
             check-rate-limits="true"
-          ></por-image-registry>
+          >
+            <div ng-if="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
+              <div class="col-sm-12 form-section-title">
+                Deployment
+              </div>
+              <!-- node-selection -->
+              <node-selector model="formValues.NodeName"> </node-selector>
+              <!-- !node-selection -->
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm"
+                  ng-disabled="state.actionInProgress || !formValues.RegistryModel.Image || !state.pullRateValid"
+                  ng-click="pullImage()"
+                  button-spinner="state.actionInProgress"
+                >
+                  <span ng-hide="state.actionInProgress">Pull the image</span>
+                  <span ng-show="state.actionInProgress">Download in progress...</span>
+                </button>
+              </div>
+            </div>
+          </por-image-registry>
           <!-- !image-and-registry -->
-          <div ng-if="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
-            <div class="col-sm-12 form-section-title">
-              Deployment
-            </div>
-            <!-- node-selection -->
-            <node-selector model="formValues.NodeName"> </node-selector>
-            <!-- !node-selection -->
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <button
-                type="button"
-                class="btn btn-primary btn-sm"
-                ng-disabled="state.actionInProgress || !formValues.RegistryModel.Image || !state.pullRateValid"
-                ng-click="pullImage()"
-                button-spinner="state.actionInProgress"
-              >
-                <span ng-hide="state.actionInProgress">Pull the image</span>
-                <span ng-show="state.actionInProgress">Download in progress...</span>
-              </button>
-            </div>
-          </div>
         </form>
       </rd-widget-body>
     </rd-widget>
