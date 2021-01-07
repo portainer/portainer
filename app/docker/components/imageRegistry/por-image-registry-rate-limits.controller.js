@@ -21,7 +21,8 @@ export default class porImageRegistryContainerController {
         this.pullRateLimits = await this.DockerHubService.checkRateLimits(this.endpoint);
         this.setValidity(this.pullRateLimits.remaining >= 0);
       } catch (e) {
-        this.Notifications.error('Failed loading dockerhub pull rate limits', e);
+        // eslint-disable-next-line no-console
+        console.error('Failed loading DockerHub pull rate limits', e);
       }
     } else {
       this.setValidity(true);
