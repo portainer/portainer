@@ -17,6 +17,7 @@ class KubernetesConfigMapConverter {
     res.CreationDate = data.metadata.creationTimestamp;
     res.Yaml = yaml ? yaml.data : '';
     res.Data = data.data;
+    res.BinaryData = data.binaryData;
     return res;
   }
 
@@ -42,6 +43,7 @@ class KubernetesConfigMapConverter {
     const configurationOwner = _.truncate(data.ConfigurationOwner, { length: 63, omission: '' });
     res.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] = configurationOwner;
     res.data = data.Data;
+    res.binaryData = data.BinaryData;
     return res;
   }
 
@@ -55,6 +57,7 @@ class KubernetesConfigMapConverter {
     res.metadata.namespace = data.Namespace;
     res.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] = data.ConfigurationOwner;
     res.data = data.Data;
+    res.binaryData = data.BinaryData;
     return res;
   }
 
@@ -68,7 +71,19 @@ class KubernetesConfigMapConverter {
       res.Data = _.reduce(
         formValues.Data,
         (acc, entry) => {
-          acc[entry.Key] = entry.Value;
+          if (!entry.IsBinary) {
+            acc[entry.Key] = entry.Value;
+          }
+          return acc;
+        },
+        {}
+      );
+      res.BinaryData = _.reduce(
+        formValues.Data,
+        (acc, entry) => {
+          if (entry.IsBinary) {
+            acc[entry.Key] = entry.Value;
+          }
           return acc;
         },
         {}

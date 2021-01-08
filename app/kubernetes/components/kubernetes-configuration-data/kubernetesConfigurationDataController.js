@@ -1,5 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
+import chardet from 'chardet';
+import { Base64 } from 'js-base64';
 import { KubernetesConfigurationFormValuesDataEntry } from 'Kubernetes/models/configuration/formvalues';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 
@@ -39,7 +41,15 @@ class KubernetesConfigurationDataController {
   async onFileLoadAsync(event) {
     const entry = new KubernetesConfigurationFormValuesDataEntry();
     entry.Key = event.target.fileName;
-    entry.Value = event.target.result;
+    const encoding = chardet.detect(Buffer.from(event.target.result));
+    const decoder = new TextDecoder(encoding);
+    if (_.includes(encoding, 'ISO') || _.includes(encoding, 'UTF-8')) {
+      entry.Value = decoder.decode(event.target.result);
+    } else {
+      const stringValue = decoder.decode(event.target.result);
+      entry.Value = Base64.encode(stringValue);
+      entry.IsBinary = true;
+    }
     this.formValues.Data.push(entry);
     this.onChangeKey();
   }
@@ -53,7 +63,7 @@ class KubernetesConfigurationDataController {
       const temporaryFileReader = new FileReader();
       temporaryFileReader.fileName = file.name;
       temporaryFileReader.onload = this.onFileLoad;
-      temporaryFileReader.readAsText(file);
+      temporaryFileReader.readAsArrayBuffer(file);
     }
   }
 

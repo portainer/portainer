@@ -26,6 +26,7 @@ export class KubernetesConfigurationFormValues {
 const _KubernetesConfigurationFormValuesDataEntry = Object.freeze({
   Key: '',
   Value: '',
+  IsBinary: false,
 });
 
 export class KubernetesConfigurationFormValuesDataEntry {

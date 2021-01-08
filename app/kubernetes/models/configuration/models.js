@@ -13,6 +13,7 @@ const _KubernetesConfiguration = Object.freeze({
   Used: false,
   Applications: [],
   Data: {},
+  BinaryData: {},
 });
 
 export class KubernetesConfiguration {

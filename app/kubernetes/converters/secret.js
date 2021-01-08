@@ -2,6 +2,8 @@ import { KubernetesSecretCreatePayload, KubernetesSecretUpdatePayload } from 'Ku
 import { KubernetesApplicationSecret } from 'Kubernetes/models/secret/models';
 import YAML from 'yaml';
 import _ from 'lodash-es';
+import chardet from 'chardet';
+import { Base64 } from 'js-base64';
 import { KubernetesPortainerConfigurationOwnerLabel } from 'Kubernetes/models/configuration/models';
 
 class KubernetesSecretConverter {
@@ -12,6 +14,7 @@ class KubernetesSecretConverter {
     const configurationOwner = _.truncate(secret.configurationOwner, { length: 63, omission: '' });
     res.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] = configurationOwner;
     res.stringData = secret.Data;
+    res.data = secret.BinaryData;
     return res;
   }
 
@@ -21,6 +24,7 @@ class KubernetesSecretConverter {
     res.metadata.namespace = secret.Namespace;
     res.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] = secret.ConfigurationOwner;
     res.stringData = secret.Data;
+    res.data = secret.BinaryData;
     return res;
   }
 
@@ -32,7 +36,15 @@ class KubernetesSecretConverter {
     res.ConfigurationOwner = payload.metadata.labels ? payload.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] : '';
     res.CreationDate = payload.metadata.creationTimestamp;
     res.Yaml = yaml ? yaml.data : '';
-    res.Data = payload.data;
+
+    _.forEach(payload.data, (value, key) => {
+      const encoding = chardet.detect(Buffer.from(Base64.decode(value)));
+      if (_.includes(encoding, 'ISO') || _.includes(encoding, 'UTF-8')) {
+        res.Data[key] = value;
+      } else {
+        res.BinaryData[key] = value;
+      }
+    });
     return res;
   }
 

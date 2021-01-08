@@ -215,16 +215,30 @@ class KubernetesConfigurationController {
       this.formValues.Id = this.configuration.Id;
       this.formValues.Name = this.configuration.Name;
       this.formValues.Type = this.configuration.Type;
-      this.formValues.Data = _.map(this.configuration.Data, (value, key) => {
-        if (this.configuration.Type === KubernetesConfigurationTypes.SECRET) {
-          value = atob(value);
-        }
-        this.formValues.DataYaml += key + ': ' + value + '\n';
-        const entry = new KubernetesConfigurationFormValuesDataEntry();
-        entry.Key = key;
-        entry.Value = value;
-        return entry;
-      });
+      this.formValues.Data = _.concat(
+        _.map(this.configuration.Data, (value, key) => {
+          if (this.configuration.Type === KubernetesConfigurationTypes.SECRET) {
+            value = atob(value);
+          }
+          this.formValues.DataYaml += key + ': ' + value + '\n';
+          const entry = new KubernetesConfigurationFormValuesDataEntry();
+          entry.Key = key;
+          entry.Value = value;
+          entry.IsBinary = false;
+          return entry;
+        }),
+        _.map(this.configuration.BinaryData, (value, key) => {
+          if (this.configuration.Type === KubernetesConfigurationTypes.SECRET) {
+            value = atob(value);
+          }
+          this.formValues.DataYaml += key + ': ' + value + '\n';
+          const entry = new KubernetesConfigurationFormValuesDataEntry();
+          entry.Key = key;
+          entry.Value = value;
+          entry.IsBinary = true;
+          return entry;
+        })
+      );
       await this.getConfigurations();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
