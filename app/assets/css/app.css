@@ -927,6 +927,27 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   z-index: 2;
 }
 
+.striketext:before,
+.striketext:after {
+  background-color: #777777;
+  content: '';
+  display: inline-block;
+  height: 1px;
+  position: relative;
+  vertical-align: middle;
+  width: 50%;
+}
+
+.striketext:before {
+  right: 0.5em;
+  margin-left: -50%;
+}
+
+.striketext:after {
+  left: 0.5em;
+  margin-right: -50%;
+}
+
 /*bootbox override*/
 .modal-open {
   padding-right: 0 !important;
