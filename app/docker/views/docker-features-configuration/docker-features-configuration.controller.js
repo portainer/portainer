@@ -47,7 +47,7 @@ export default class DockerFeaturesConfigurationController {
     return this.$async(async () => {
       try {
         this.state.actionInProgress = true;
-        await this.EndpointService.updateSecuritySettings(this.endpoint.Id, {
+        const securitySettings = {
           enableHostManagementFeatures: this.formValues.enableHostManagementFeatures,
           allowBindMountsForRegularUsers: !this.formValues.disableBindMountsForRegularUsers,
           allowPrivilegedModeForRegularUsers: !this.formValues.disablePrivilegedModeForRegularUsers,
@@ -56,7 +56,11 @@ export default class DockerFeaturesConfigurationController {
           allowDeviceMappingForRegularUsers: !this.formValues.disableDeviceMappingForRegularUsers,
           allowStackManagementForRegularUsers: !this.formValues.disableStackManagementForRegularUsers,
           allowContainerCapabilitiesForRegularUsers: !this.formValues.disableContainerCapabilitiesForRegularUsers,
-        });
+        };
+
+        await this.EndpointService.updateSecuritySettings(this.endpoint.Id, securitySettings);
+
+        this.endpoint.SecuritySettings = securitySettings;
         this.Notifications.success('Saved settings successfully');
       } catch (e) {
         this.Notifications.error('Failure', e, 'Failed saving settings');
