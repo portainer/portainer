@@ -17,7 +17,15 @@ type publicSettingsResponse struct {
 	EnableTelemetry           bool                           `json:"EnableTelemetry"`
 }
 
-// GET request on /api/settings/public
+// @summary Inspect Public Settings
+// @description
+// @tags Settings
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @success 200 {object} publicSettingsResponse "Settings"
+// @failure 500
+// @router /settings/public [get]
 func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {

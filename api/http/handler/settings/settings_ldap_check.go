@@ -6,7 +6,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 )
 
@@ -18,7 +18,16 @@ func (payload *settingsLDAPCheckPayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// PUT request on /settings/ldap/check
+// @summary Check LDAP Connection
+// @description
+// @tags Settings
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param body body settingsLDAPCheckPayload true "ldap settings"
+// @success 204
+// @failure 500
+// @router /settings/ldap/check [put]
 func (handler *Handler) settingsLDAPCheck(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload settingsLDAPCheckPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)

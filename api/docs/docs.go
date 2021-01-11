@@ -2771,6 +2771,143 @@ var doc = `{
                 }
             }
         },
+        "/settings": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "Inspect Settings",
+                "responses": {
+                    "200": {
+                        "description": "Settings",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.Settings"
+                        }
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "Update Settings",
+                "parameters": [
+                    {
+                        "description": "settings",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/settings.settingsUpdatePayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Settings",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.Settings"
+                        }
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/settings/ldap/check": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "Check LDAP Connection",
+                "parameters": [
+                    {
+                        "description": "ldap settings",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/settings.settingsLDAPCheckPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/settings/public": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "Inspect Public Settings",
+                "responses": {
+                    "200": {
+                        "description": "Settings",
+                        "schema": {
+                            "$ref": "#/definitions/settings.publicSettingsResponse"
+                        }
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/tags": {
             "get": {
                 "security": [
@@ -3841,6 +3978,7 @@ var doc = `{
                     "description": "Deprecated in DBVersion == 18",
                     "type": "array",
                     "items": {
+                        "description": "Deprecated fields\nDeprecated in DBVersion == 2",
                         "type": "integer"
                     }
                 },
@@ -3953,6 +4091,7 @@ var doc = `{
                     "description": "Deprecated in DBVersion == 18",
                     "type": "array",
                     "items": {
+                        "description": "Deprecated fields\nDeprecated in DBVersion == 2",
                         "type": "integer"
                     }
                 },
@@ -4095,6 +4234,107 @@ var doc = `{
                 }
             }
         },
+        "portainer.LDAPGroupSearchSettings": {
+            "type": "object",
+            "properties": {
+                "GroupAttribute": {
+                    "type": "string"
+                },
+                "GroupBaseDN": {
+                    "type": "string"
+                },
+                "GroupFilter": {
+                    "type": "string"
+                }
+            }
+        },
+        "portainer.LDAPSearchSettings": {
+            "type": "object",
+            "properties": {
+                "BaseDN": {
+                    "type": "string"
+                },
+                "Filter": {
+                    "type": "string"
+                },
+                "UserNameAttribute": {
+                    "type": "string"
+                }
+            }
+        },
+        "portainer.LDAPSettings": {
+            "type": "object",
+            "properties": {
+                "AnonymousMode": {
+                    "type": "boolean"
+                },
+                "AutoCreateUsers": {
+                    "type": "boolean"
+                },
+                "GroupSearchSettings": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/portainer.LDAPGroupSearchSettings"
+                    }
+                },
+                "Password": {
+                    "type": "string"
+                },
+                "ReaderDN": {
+                    "type": "string"
+                },
+                "SearchSettings": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/portainer.LDAPSearchSettings"
+                    }
+                },
+                "StartTLS": {
+                    "type": "boolean"
+                },
+                "TLSConfig": {
+                    "$ref": "#/definitions/portainer.TLSConfiguration"
+                },
+                "URL": {
+                    "type": "string"
+                }
+            }
+        },
+        "portainer.OAuthSettings": {
+            "type": "object",
+            "properties": {
+                "AccessTokenURI": {
+                    "type": "string"
+                },
+                "AuthorizationURI": {
+                    "type": "string"
+                },
+                "ClientID": {
+                    "type": "string"
+                },
+                "ClientSecret": {
+                    "type": "string"
+                },
+                "DefaultTeamID": {
+                    "type": "integer"
+                },
+                "OAuthAutoCreateUsers": {
+                    "type": "boolean"
+                },
+                "RedirectURI": {
+                    "type": "string"
+                },
+                "ResourceURI": {
+                    "type": "string"
+                },
+                "Scopes": {
+                    "type": "string"
+                },
+                "UserIdentifier": {
+                    "type": "string"
+                }
+            }
+        },
         "portainer.Pair": {
             "type": "object",
             "properties": {
@@ -4122,6 +4362,7 @@ var doc = `{
                     "description": "Deprecated fields\nDeprecated in DBVersion == 18",
                     "type": "array",
                     "items": {
+                        "description": "Deprecated fields\nDeprecated in DBVersion == 2",
                         "type": "integer"
                     }
                 },
@@ -4242,6 +4483,78 @@ var doc = `{
                 },
                 "Priority": {
                     "type": "integer"
+                }
+            }
+        },
+        "portainer.Settings": {
+            "type": "object",
+            "properties": {
+                "AllowBindMountsForRegularUsers": {
+                    "type": "boolean"
+                },
+                "AllowContainerCapabilitiesForRegularUsers": {
+                    "type": "boolean"
+                },
+                "AllowDeviceMappingForRegularUsers": {
+                    "type": "boolean"
+                },
+                "AllowHostNamespaceForRegularUsers": {
+                    "type": "boolean"
+                },
+                "AllowPrivilegedModeForRegularUsers": {
+                    "type": "boolean"
+                },
+                "AllowStackManagementForRegularUsers": {
+                    "type": "boolean"
+                },
+                "AllowVolumeBrowserForRegularUsers": {
+                    "type": "boolean"
+                },
+                "AuthenticationMethod": {
+                    "type": "integer"
+                },
+                "BlackListedLabels": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/portainer.Pair"
+                    }
+                },
+                "EdgeAgentCheckinInterval": {
+                    "type": "integer"
+                },
+                "EnableEdgeComputeFeatures": {
+                    "type": "boolean"
+                },
+                "EnableHostManagementFeatures": {
+                    "type": "boolean"
+                },
+                "EnableTelemetry": {
+                    "type": "boolean"
+                },
+                "LDAPSettings": {
+                    "$ref": "#/definitions/portainer.LDAPSettings"
+                },
+                "LogoURL": {
+                    "type": "string"
+                },
+                "OAuthSettings": {
+                    "$ref": "#/definitions/portainer.OAuthSettings"
+                },
+                "SnapshotInterval": {
+                    "type": "string"
+                },
+                "TemplatesURL": {
+                    "type": "string"
+                },
+                "UserSessionTimeout": {
+                    "type": "string"
+                },
+                "displayDonationHeader": {
+                    "description": "Deprecated fields",
+                    "type": "boolean"
+                },
+                "displayExternalContributors": {
+                    "type": "boolean"
                 }
             }
         },
@@ -4630,6 +4943,123 @@ var doc = `{
                     "items": {
                         "type": "integer"
                     }
+                }
+            }
+        },
+        "settings.publicSettingsResponse": {
+            "type": "object",
+            "properties": {
+                "AllowBindMountsForRegularUsers": {
+                    "type": "boolean"
+                },
+                "AllowContainerCapabilitiesForRegularUsers": {
+                    "type": "boolean"
+                },
+                "AllowDeviceMappingForRegularUsers": {
+                    "type": "boolean"
+                },
+                "AllowHostNamespaceForRegularUsers": {
+                    "type": "boolean"
+                },
+                "AllowPrivilegedModeForRegularUsers": {
+                    "type": "boolean"
+                },
+                "AllowStackManagementForRegularUsers": {
+                    "type": "boolean"
+                },
+                "AllowVolumeBrowserForRegularUsers": {
+                    "type": "boolean"
+                },
+                "AuthenticationMethod": {
+                    "type": "integer"
+                },
+                "EnableEdgeComputeFeatures": {
+                    "type": "boolean"
+                },
+                "EnableHostManagementFeatures": {
+                    "type": "boolean"
+                },
+                "EnableTelemetry": {
+                    "type": "boolean"
+                },
+                "LogoURL": {
+                    "type": "string"
+                },
+                "OAuthLoginURI": {
+                    "type": "string"
+                }
+            }
+        },
+        "settings.settingsLDAPCheckPayload": {
+            "type": "object",
+            "properties": {
+                "ldapsettings": {
+                    "$ref": "#/definitions/portainer.LDAPSettings"
+                }
+            }
+        },
+        "settings.settingsUpdatePayload": {
+            "type": "object",
+            "properties": {
+                "allowBindMountsForRegularUsers": {
+                    "type": "boolean"
+                },
+                "allowContainerCapabilitiesForRegularUsers": {
+                    "type": "boolean"
+                },
+                "allowDeviceMappingForRegularUsers": {
+                    "type": "boolean"
+                },
+                "allowHostNamespaceForRegularUsers": {
+                    "type": "boolean"
+                },
+                "allowPrivilegedModeForRegularUsers": {
+                    "type": "boolean"
+                },
+                "allowStackManagementForRegularUsers": {
+                    "type": "boolean"
+                },
+                "allowVolumeBrowserForRegularUsers": {
+                    "type": "boolean"
+                },
+                "authenticationMethod": {
+                    "type": "integer"
+                },
+                "blackListedLabels": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/portainer.Pair"
+                    }
+                },
+                "edgeAgentCheckinInterval": {
+                    "type": "integer"
+                },
+                "enableEdgeComputeFeatures": {
+                    "type": "boolean"
+                },
+                "enableHostManagementFeatures": {
+                    "type": "boolean"
+                },
+                "enableTelemetry": {
+                    "type": "boolean"
+                },
+                "ldapsettings": {
+                    "$ref": "#/definitions/portainer.LDAPSettings"
+                },
+                "logoURL": {
+                    "type": "string"
+                },
+                "oauthSettings": {
+                    "$ref": "#/definitions/portainer.OAuthSettings"
+                },
+                "snapshotInterval": {
+                    "type": "string"
+                },
+                "templatesURL": {
+                    "type": "string"
+                },
+                "userSessionTimeout": {
+                    "type": "string"
                 }
             }
         },

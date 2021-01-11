@@ -47,7 +47,16 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// PUT request on /api/settings
+// @summary Update Settings
+// @description
+// @tags Settings
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param body body settingsUpdatePayload true "settings"
+// @success 200 {object} portainer.Settings "Settings"
+// @failure 500
+// @router /settings [put]
 func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload settingsUpdatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)

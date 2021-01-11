@@ -592,6 +592,9 @@ definitions:
       AuthorizedUsers:
         description: Deprecated in DBVersion == 18
         items:
+          description: |-
+            Deprecated fields
+            Deprecated in DBVersion == 2
           type: integer
         type: array
       AzureCredentials:
@@ -669,6 +672,9 @@ definitions:
       AuthorizedUsers:
         description: Deprecated in DBVersion == 18
         items:
+          description: |-
+            Deprecated fields
+            Deprecated in DBVersion == 2
           type: integer
         type: array
       Description:
@@ -762,6 +768,72 @@ definitions:
       Provisioner:
         type: string
     type: object
+  portainer.LDAPGroupSearchSettings:
+    properties:
+      GroupAttribute:
+        type: string
+      GroupBaseDN:
+        type: string
+      GroupFilter:
+        type: string
+    type: object
+  portainer.LDAPSearchSettings:
+    properties:
+      BaseDN:
+        type: string
+      Filter:
+        type: string
+      UserNameAttribute:
+        type: string
+    type: object
+  portainer.LDAPSettings:
+    properties:
+      AnonymousMode:
+        type: boolean
+      AutoCreateUsers:
+        type: boolean
+      GroupSearchSettings:
+        items:
+          $ref: '#/definitions/portainer.LDAPGroupSearchSettings'
+        type: array
+      Password:
+        type: string
+      ReaderDN:
+        type: string
+      SearchSettings:
+        items:
+          $ref: '#/definitions/portainer.LDAPSearchSettings'
+        type: array
+      StartTLS:
+        type: boolean
+      TLSConfig:
+        $ref: '#/definitions/portainer.TLSConfiguration'
+      URL:
+        type: string
+    type: object
+  portainer.OAuthSettings:
+    properties:
+      AccessTokenURI:
+        type: string
+      AuthorizationURI:
+        type: string
+      ClientID:
+        type: string
+      ClientSecret:
+        type: string
+      DefaultTeamID:
+        type: integer
+      OAuthAutoCreateUsers:
+        type: boolean
+      RedirectURI:
+        type: string
+      ResourceURI:
+        type: string
+      Scopes:
+        type: string
+      UserIdentifier:
+        type: string
+    type: object
   portainer.Pair:
     properties:
       name:
@@ -782,6 +854,9 @@ definitions:
           Deprecated fields
           Deprecated in DBVersion == 18
         items:
+          description: |-
+            Deprecated fields
+            Deprecated in DBVersion == 2
           type: integer
         type: array
       Gitlab:
@@ -864,6 +939,54 @@ definitions:
         type: string
       Priority:
         type: integer
+    type: object
+  portainer.Settings:
+    properties:
+      AllowBindMountsForRegularUsers:
+        type: boolean
+      AllowContainerCapabilitiesForRegularUsers:
+        type: boolean
+      AllowDeviceMappingForRegularUsers:
+        type: boolean
+      AllowHostNamespaceForRegularUsers:
+        type: boolean
+      AllowPrivilegedModeForRegularUsers:
+        type: boolean
+      AllowStackManagementForRegularUsers:
+        type: boolean
+      AllowVolumeBrowserForRegularUsers:
+        type: boolean
+      AuthenticationMethod:
+        type: integer
+      BlackListedLabels:
+        items:
+          $ref: '#/definitions/portainer.Pair'
+        type: array
+      EdgeAgentCheckinInterval:
+        type: integer
+      EnableEdgeComputeFeatures:
+        type: boolean
+      EnableHostManagementFeatures:
+        type: boolean
+      EnableTelemetry:
+        type: boolean
+      LDAPSettings:
+        $ref: '#/definitions/portainer.LDAPSettings'
+      LogoURL:
+        type: string
+      OAuthSettings:
+        $ref: '#/definitions/portainer.OAuthSettings'
+      SnapshotInterval:
+        type: string
+      TemplatesURL:
+        type: string
+      UserSessionTimeout:
+        type: string
+      displayDonationHeader:
+        description: Deprecated fields
+        type: boolean
+      displayExternalContributors:
+        type: boolean
     type: object
   portainer.TLSConfiguration:
     properties:
@@ -1120,6 +1243,83 @@ definitions:
         items:
           type: integer
         type: array
+    type: object
+  settings.publicSettingsResponse:
+    properties:
+      AllowBindMountsForRegularUsers:
+        type: boolean
+      AllowContainerCapabilitiesForRegularUsers:
+        type: boolean
+      AllowDeviceMappingForRegularUsers:
+        type: boolean
+      AllowHostNamespaceForRegularUsers:
+        type: boolean
+      AllowPrivilegedModeForRegularUsers:
+        type: boolean
+      AllowStackManagementForRegularUsers:
+        type: boolean
+      AllowVolumeBrowserForRegularUsers:
+        type: boolean
+      AuthenticationMethod:
+        type: integer
+      EnableEdgeComputeFeatures:
+        type: boolean
+      EnableHostManagementFeatures:
+        type: boolean
+      EnableTelemetry:
+        type: boolean
+      LogoURL:
+        type: string
+      OAuthLoginURI:
+        type: string
+    type: object
+  settings.settingsLDAPCheckPayload:
+    properties:
+      ldapsettings:
+        $ref: '#/definitions/portainer.LDAPSettings'
+    type: object
+  settings.settingsUpdatePayload:
+    properties:
+      allowBindMountsForRegularUsers:
+        type: boolean
+      allowContainerCapabilitiesForRegularUsers:
+        type: boolean
+      allowDeviceMappingForRegularUsers:
+        type: boolean
+      allowHostNamespaceForRegularUsers:
+        type: boolean
+      allowPrivilegedModeForRegularUsers:
+        type: boolean
+      allowStackManagementForRegularUsers:
+        type: boolean
+      allowVolumeBrowserForRegularUsers:
+        type: boolean
+      authenticationMethod:
+        type: integer
+      blackListedLabels:
+        items:
+          $ref: '#/definitions/portainer.Pair'
+        type: array
+      edgeAgentCheckinInterval:
+        type: integer
+      enableEdgeComputeFeatures:
+        type: boolean
+      enableHostManagementFeatures:
+        type: boolean
+      enableTelemetry:
+        type: boolean
+      ldapsettings:
+        $ref: '#/definitions/portainer.LDAPSettings'
+      logoURL:
+        type: string
+      oauthSettings:
+        $ref: '#/definitions/portainer.OAuthSettings'
+      snapshotInterval:
+        type: string
+      templatesURL:
+        type: string
+      userSessionTimeout:
+        type: string
     type: object
   tags.tagCreatePayload:
     properties:
@@ -2849,6 +3049,89 @@ paths:
       summary: List Roles
       tags:
       - Roles
+  /settings:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Settings
+          schema:
+            $ref: '#/definitions/portainer.Settings'
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Inspect Settings
+      tags:
+      - Settings
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: settings
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/settings.settingsUpdatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Settings
+          schema:
+            $ref: '#/definitions/portainer.Settings'
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update Settings
+      tags:
+      - Settings
+  /settings/ldap/check:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ldap settings
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/settings.settingsLDAPCheckPayload'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Check LDAP Connection
+      tags:
+      - Settings
+  /settings/public:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Settings
+          schema:
+            $ref: '#/definitions/settings.publicSettingsResponse'
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Inspect Public Settings
+      tags:
+      - Settings
   /tags:
     get:
       produces:
