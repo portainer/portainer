@@ -7,7 +7,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -31,7 +31,16 @@ func (payload *teamMembershipCreatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// POST request on /api/team_memberships
+// @summary Add user to team
+// @description
+// @tags TeamMembership
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param body body teamMembershipCreatePayload true "membership data"
+// @success 200 {object} portainer.TeamMembership "TeamMembership"
+// @failure 500
+// @router /team_memberships [post]
 func (handler *Handler) teamMembershipCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload teamMembershipCreatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)

@@ -6,13 +6,22 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// DELETE request on /api/team_memberships/:id
+// @summary Remove user from team
+// @description
+// @tags TeamMembership
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path string true "membership id"
+// @success 204
+// @failure 500,404,400,403
+// @router /team_memberships/{id} [delete]
 func (handler *Handler) teamMembershipDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	membershipID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

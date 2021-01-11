@@ -1016,6 +1016,17 @@ definitions:
     additionalProperties:
       $ref: '#/definitions/portainer.AccessPolicy'
     type: object
+  portainer.TeamMembership:
+    properties:
+      Id:
+        type: integer
+      Role:
+        type: integer
+      TeamID:
+        type: integer
+      UserID:
+        type: integer
+    type: object
   portainer.TeamResourceAccess:
     properties:
       AccessLevel:
@@ -1328,6 +1339,24 @@ definitions:
     properties:
       name:
         type: string
+    type: object
+  teammemberships.teamMembershipCreatePayload:
+    properties:
+      role:
+        type: integer
+      teamID:
+        type: integer
+      userID:
+        type: integer
+    type: object
+  teammemberships.teamMembershipUpdatePayload:
+    properties:
+      role:
+        type: integer
+      teamID:
+        type: integer
+      userID:
+        type: integer
     type: object
 info:
   contact: {}
@@ -3231,6 +3260,113 @@ paths:
       summary: Delete a tag
       tags:
       - Tags
+  /team_memberships:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/portainer.TeamMembership'
+            type: array
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: List team memberships
+      tags:
+      - TeamMembership
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: membership data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/teammemberships.teamMembershipCreatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: TeamMembership
+          schema:
+            $ref: '#/definitions/portainer.TeamMembership'
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Add user to team
+      tags:
+      - TeamMembership
+  /team_memberships/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: membership id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+        "403":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Remove user from team
+      tags:
+      - TeamMembership
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: membership id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: membership data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/teammemberships.teamMembershipUpdatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: TeamMembership
+          schema:
+            $ref: '#/definitions/portainer.TeamMembership'
+        "400":
+          description: ""
+        "403":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update team membership
+      tags:
+      - TeamMembership
   /upload/tls/{certificate}:
     post:
       consumes:

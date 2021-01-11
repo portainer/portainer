@@ -7,7 +7,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
@@ -32,7 +32,17 @@ func (payload *teamMembershipUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// PUT request on /api/team_memberships/:id
+// @summary Update team membership
+// @description
+// @tags TeamMembership
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path string true "membership id"
+// @param body body teamMembershipUpdatePayload true "membership data"
+// @success 200 {object} portainer.TeamMembership "TeamMembership"
+// @failure 500,400,403,404
+// @router /team_memberships/{id} [put]
 func (handler *Handler) teamMembershipUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	membershipID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

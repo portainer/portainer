@@ -9,7 +9,15 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// GET request on /api/team_memberships
+// @summary List team memberships
+// @description
+// @tags TeamMembership
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @success 200 {array} portainer.TeamMembership
+// @failure 500
+// @router /team_memberships [get]
 func (handler *Handler) teamMembershipList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
