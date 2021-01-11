@@ -13,16 +13,22 @@ import (
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
-// websocketPodExec handles GET requests on /websocket/pod?token=<token>&endpointId=<endpointID>&namespace=<namespace>&podName=<podName>&containerName=<containerName>&command=<command>
-// The request will be upgraded to the websocket protocol.
-// Authentication and access is controlled via the mandatory token query parameter.
-// The following parameters query parameters are mandatory:
-// * token: JWT token used for authentication against this endpoint
-// * endpointId: endpoint ID of the endpoint where the resource is located
-// * namespace: namespace where the container is located
-// * podName: name of the pod containing the container
-// * containerName: name of the container
-// * command: command to execute in the container
+// @summary Execute a websocket on pod
+// @description The request will be upgraded to the websocket protocol.
+// @description Authentication and access is controlled via the mandatory token query parameter.
+// @security ApiKeyAuth
+// @tags Websockets
+// @accept json
+// @produce json
+// @param endpointId query int true "endpoint ID of the endpoint where the resource is located"
+// @param namespace query string true "namespace where the container is located"
+// @param podName query string true "name of the pod containing the container"
+// @param containerName query string true "name of the container"
+// @param command query string true "command to execute in the container"
+// @param token query string true "JWT token used for authentication against this endpoint"
+// @success 200
+// @failure 400,403,404,500
+// @router /websocket/pod [get]
 func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)
 	if err != nil {

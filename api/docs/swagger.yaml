@@ -4091,6 +4091,144 @@ paths:
       summary: Execute a webhook
       tags:
       - Webhooks
+  /websocket/attach:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        If the nodeName query parameter is present, the request will be proxied to the underlying agent endpoint.
+        If the nodeName query parameter is not specified, the request will be upgraded to the websocket protocol and
+        an AttachStart operation HTTP request will be created and hijacked.
+        Authentication and access is controlled via the mandatory token query parameter.
+      parameters:
+      - description: endpoint ID of the endpoint where the resource is located
+        in: query
+        name: endpointId
+        required: true
+        type: integer
+      - description: node name
+        in: query
+        name: nodeName
+        type: string
+      - description: JWT token used for authentication against this endpoint
+        in: query
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: ""
+        "403":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Attach a websocket
+      tags:
+      - Websockets
+  /websocket/exec:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        If the nodeName query parameter is present, the request will be proxied to the underlying agent endpoint.
+        If the nodeName query parameter is not specified, the request will be upgraded to the websocket protocol and
+        an ExecStart operation HTTP request will be created and hijacked.
+        Authentication and access is controlled via the mandatory token query parameter.
+      parameters:
+      - description: endpoint ID of the endpoint where the resource is located
+        in: query
+        name: endpointId
+        required: true
+        type: integer
+      - description: node name
+        in: query
+        name: nodeName
+        type: string
+      - description: JWT token used for authentication against this endpoint
+        in: query
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: ""
+        "409":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Execute a websocket
+      tags:
+      - Websockets
+  /websocket/pod:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        The request will be upgraded to the websocket protocol.
+        Authentication and access is controlled via the mandatory token query parameter.
+      parameters:
+      - description: endpoint ID of the endpoint where the resource is located
+        in: query
+        name: endpointId
+        required: true
+        type: integer
+      - description: namespace where the container is located
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: name of the pod containing the container
+        in: query
+        name: podName
+        required: true
+        type: string
+      - description: name of the container
+        in: query
+        name: containerName
+        required: true
+        type: string
+      - description: command to execute in the container
+        in: query
+        name: command
+        required: true
+        type: string
+      - description: JWT token used for authentication against this endpoint
+        in: query
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: ""
+        "403":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Execute a websocket on pod
+      tags:
+      - Websockets
 securityDefinitions:
   ApiKeyAuth:
     in: header

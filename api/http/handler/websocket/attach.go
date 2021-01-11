@@ -10,15 +10,25 @@ import (
 	"github.com/gorilla/websocket"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 )
 
-// websocketAttach handles GET requests on /websocket/attach?id=<attachID>&endpointId=<endpointID>&nodeName=<nodeName>&token=<token>
-// If the nodeName query parameter is present, the request will be proxied to the underlying agent endpoint.
-// If the nodeName query parameter is not specified, the request will be upgraded to the websocket protocol and
-// an AttachStart operation HTTP request will be created and hijacked.
-// Authentication and access is controled via the mandatory token query parameter.
+// @summary Attach a websocket
+// @description If the nodeName query parameter is present, the request will be proxied to the underlying agent endpoint.
+// @description If the nodeName query parameter is not specified, the request will be upgraded to the websocket protocol and
+// @description an AttachStart operation HTTP request will be created and hijacked.
+// @description Authentication and access is controlled via the mandatory token query parameter.
+// @security ApiKeyAuth
+// @tags Websockets
+// @accept json
+// @produce json
+// @param endpointId query int true "endpoint ID of the endpoint where the resource is located"
+// @param nodeName query string false "node name"
+// @param token query string true "JWT token used for authentication against this endpoint"
+// @success 200
+// @failure 400,403,404,500
+// @router /websocket/attach [get]
 func (handler *Handler) websocketAttach(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	attachID, err := request.RetrieveQueryParameter(r, "id", false)
 	if err != nil {

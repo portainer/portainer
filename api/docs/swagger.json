@@ -4192,6 +4192,202 @@
                     }
                 }
             }
+        },
+        "/websocket/attach": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "If the nodeName query parameter is present, the request will be proxied to the underlying agent endpoint.\nIf the nodeName query parameter is not specified, the request will be upgraded to the websocket protocol and\nan AttachStart operation HTTP request will be created and hijacked.\nAuthentication and access is controlled via the mandatory token query parameter.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Websockets"
+                ],
+                "summary": "Attach a websocket",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "endpoint ID of the endpoint where the resource is located",
+                        "name": "endpointId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "node name",
+                        "name": "nodeName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "JWT token used for authentication against this endpoint",
+                        "name": "token",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/websocket/exec": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "If the nodeName query parameter is present, the request will be proxied to the underlying agent endpoint.\nIf the nodeName query parameter is not specified, the request will be upgraded to the websocket protocol and\nan ExecStart operation HTTP request will be created and hijacked.\nAuthentication and access is controlled via the mandatory token query parameter.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Websockets"
+                ],
+                "summary": "Execute a websocket",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "endpoint ID of the endpoint where the resource is located",
+                        "name": "endpointId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "node name",
+                        "name": "nodeName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "JWT token used for authentication against this endpoint",
+                        "name": "token",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "409": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/websocket/pod": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "The request will be upgraded to the websocket protocol.\nAuthentication and access is controlled via the mandatory token query parameter.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Websockets"
+                ],
+                "summary": "Execute a websocket on pod",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "endpoint ID of the endpoint where the resource is located",
+                        "name": "endpointId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "namespace where the container is located",
+                        "name": "namespace",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "name of the pod containing the container",
+                        "name": "podName",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "name of the container",
+                        "name": "containerName",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "command to execute in the container",
+                        "name": "command",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "JWT token used for authentication against this endpoint",
+                        "name": "token",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
         }
     },
     "definitions": {
