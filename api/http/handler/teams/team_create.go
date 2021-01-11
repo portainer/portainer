@@ -8,7 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
@@ -23,6 +23,16 @@ func (payload *teamCreatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
+// @summary Create Team
+// @description
+// @tags Teams
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param body body teamCreatePayload true "team data"
+// @success 200 {object} portainer.Team "Team"
+// @failure 500,400,409
+// @router /team [post]
 func (handler *Handler) teamCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload teamCreatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)

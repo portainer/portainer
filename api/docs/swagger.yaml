@@ -1012,6 +1012,13 @@ definitions:
       id:
         type: integer
     type: object
+  portainer.Team:
+    properties:
+      Id:
+        type: integer
+      Name:
+        type: string
+    type: object
   portainer.TeamAccessPolicies:
     additionalProperties:
       $ref: '#/definitions/portainer.AccessPolicy'
@@ -1357,6 +1364,16 @@ definitions:
         type: integer
       userID:
         type: integer
+    type: object
+  teams.teamCreatePayload:
+    properties:
+      name:
+        type: string
+    type: object
+  teams.teamUpdatePayload:
+    properties:
+      name:
+        type: string
     type: object
 info:
   contact: {}
@@ -3260,6 +3277,69 @@ paths:
       summary: Delete a tag
       tags:
       - Tags
+  /team:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: team data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/teams.teamCreatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Team
+          schema:
+            $ref: '#/definitions/portainer.Team'
+        "400":
+          description: ""
+        "409":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create Team
+      tags:
+      - Teams
+  /team/{id}:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: team id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: team data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/teams.teamUpdatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Team
+          schema:
+            $ref: '#/definitions/portainer.Team'
+        "400":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update Team
+      tags:
+      - Teams
   /team_memberships:
     get:
       consumes:
@@ -3367,6 +3447,111 @@ paths:
       summary: Update team membership
       tags:
       - TeamMembership
+  /teams:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Team
+          schema:
+            items:
+              $ref: '#/definitions/portainer.Team'
+            type: array
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: List teams
+      tags:
+      - Teams
+  /teams/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: team id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete team
+      tags:
+      - Teams
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: team id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Team
+          schema:
+            $ref: '#/definitions/portainer.Team'
+        "400":
+          description: ""
+        "403":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Inspect team
+      tags:
+      - Teams
+  /teams/{id}/memberships:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: team id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Team memberships
+          schema:
+            items:
+              $ref: '#/definitions/portainer.TeamMembership'
+            type: array
+        "400":
+          description: ""
+        "403":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: List team's memberships
+      tags:
+      - Teams
   /upload/tls/{certificate}:
     post:
       consumes:
