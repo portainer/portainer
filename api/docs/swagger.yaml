@@ -1375,6 +1375,27 @@ definitions:
       name:
         type: string
     type: object
+  templates.filePayload:
+    properties:
+      composeFilePathInRepository:
+        type: string
+      repositoryURL:
+        type: string
+    type: object
+  templates.fileResponse:
+    properties:
+      fileContent:
+        type: string
+    type: object
+  templates.listResponse:
+    properties:
+      templates:
+        items:
+          $ref: '#/definitions/portainer.Template'
+        type: array
+      version:
+        type: string
+    type: object
 info:
   contact: {}
   license: {}
@@ -3552,6 +3573,51 @@ paths:
       summary: List team's memberships
       tags:
       - Teams
+  /templates:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/templates.listResponse'
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: List templates
+      tags:
+      - Templates
+  /templates/file:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: File data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/templates.filePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/templates.fileResponse'
+        "400":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Get a template's file
+      tags:
+      - Templates
   /upload/tls/{certificate}:
     post:
       consumes:

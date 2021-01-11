@@ -3490,6 +3490,80 @@
                 }
             }
         },
+        "/templates": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Templates"
+                ],
+                "summary": "List templates",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/templates.listResponse"
+                        }
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/templates/file": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Templates"
+                ],
+                "summary": "Get a template's file",
+                "parameters": [
+                    {
+                        "description": "File data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/templates.filePayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/templates.fileResponse"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/upload/tls/{certificate}": {
             "post": {
                 "security": [
@@ -5635,6 +5709,39 @@
             "type": "object",
             "properties": {
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "templates.filePayload": {
+            "type": "object",
+            "properties": {
+                "composeFilePathInRepository": {
+                    "type": "string"
+                },
+                "repositoryURL": {
+                    "type": "string"
+                }
+            }
+        },
+        "templates.fileResponse": {
+            "type": "object",
+            "properties": {
+                "fileContent": {
+                    "type": "string"
+                }
+            }
+        },
+        "templates.listResponse": {
+            "type": "object",
+            "properties": {
+                "templates": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/portainer.Template"
+                    }
+                },
+                "version": {
                     "type": "string"
                 }
             }

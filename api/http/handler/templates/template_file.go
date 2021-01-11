@@ -33,6 +33,16 @@ func (payload *filePayload) Validate(r *http.Request) error {
 	return nil
 }
 
+// @summary Get a template's file
+// @description
+// @tags Templates
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param body body filePayload true "File data"
+// @success 200 {object} fileResponse
+// @failure 400,500
+// @router /templates/file [post]
 func (handler *Handler) templateFile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload filePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
