@@ -2908,6 +2908,61 @@ var doc = `{
                 }
             }
         },
+        "/status": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Status"
+                ],
+                "summary": "Inspect Status",
+                "responses": {
+                    "200": {
+                        "description": "Status info",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.Status"
+                        }
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/status/version": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Status"
+                ],
+                "summary": "Inspect Version",
+                "responses": {
+                    "200": {
+                        "description": "Version info",
+                        "schema": {
+                            "$ref": "#/definitions/status.inspectVersionResponse"
+                        }
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/tags": {
             "get": {
                 "security": [
@@ -3978,7 +4033,6 @@ var doc = `{
                     "description": "Deprecated in DBVersion == 18",
                     "type": "array",
                     "items": {
-                        "description": "Deprecated fields\nDeprecated in DBVersion == 2",
                         "type": "integer"
                     }
                 },
@@ -4091,7 +4145,6 @@ var doc = `{
                     "description": "Deprecated in DBVersion == 18",
                     "type": "array",
                     "items": {
-                        "description": "Deprecated fields\nDeprecated in DBVersion == 2",
                         "type": "integer"
                     }
                 },
@@ -4362,7 +4415,6 @@ var doc = `{
                     "description": "Deprecated fields\nDeprecated in DBVersion == 18",
                     "type": "array",
                     "items": {
-                        "description": "Deprecated fields\nDeprecated in DBVersion == 2",
                         "type": "integer"
                     }
                 },
@@ -4555,6 +4607,14 @@ var doc = `{
                 },
                 "displayExternalContributors": {
                     "type": "boolean"
+                }
+            }
+        },
+        "portainer.Status": {
+            "type": "object",
+            "properties": {
+                "Version": {
+                    "type": "string"
                 }
             }
         },
@@ -5060,6 +5120,17 @@ var doc = `{
                 },
                 "userSessionTimeout": {
                     "type": "string"
+                }
+            }
+        },
+        "status.inspectVersionResponse": {
+            "type": "object",
+            "properties": {
+                "LatestVersion": {
+                    "type": "string"
+                },
+                "UpdateAvailable": {
+                    "type": "boolean"
                 }
             }
         },

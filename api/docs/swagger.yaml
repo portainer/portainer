@@ -592,9 +592,6 @@ definitions:
       AuthorizedUsers:
         description: Deprecated in DBVersion == 18
         items:
-          description: |-
-            Deprecated fields
-            Deprecated in DBVersion == 2
           type: integer
         type: array
       AzureCredentials:
@@ -672,9 +669,6 @@ definitions:
       AuthorizedUsers:
         description: Deprecated in DBVersion == 18
         items:
-          description: |-
-            Deprecated fields
-            Deprecated in DBVersion == 2
           type: integer
         type: array
       Description:
@@ -854,9 +848,6 @@ definitions:
           Deprecated fields
           Deprecated in DBVersion == 18
         items:
-          description: |-
-            Deprecated fields
-            Deprecated in DBVersion == 2
           type: integer
         type: array
       Gitlab:
@@ -987,6 +978,11 @@ definitions:
         type: boolean
       displayExternalContributors:
         type: boolean
+    type: object
+  portainer.Status:
+    properties:
+      Version:
+        type: string
     type: object
   portainer.TLSConfiguration:
     properties:
@@ -1320,6 +1316,13 @@ definitions:
         type: string
       userSessionTimeout:
         type: string
+    type: object
+  status.inspectVersionResponse:
+    properties:
+      LatestVersion:
+        type: string
+      UpdateAvailable:
+        type: boolean
     type: object
   tags.tagCreatePayload:
     properties:
@@ -3132,6 +3135,40 @@ paths:
       summary: Inspect Public Settings
       tags:
       - Settings
+  /status:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Status info
+          schema:
+            $ref: '#/definitions/portainer.Status'
+        "500":
+          description: ""
+      summary: Inspect Status
+      tags:
+      - Status
+  /status/version:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Version info
+          schema:
+            $ref: '#/definitions/status.inspectVersionResponse'
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Inspect Version
+      tags:
+      - Status
   /tags:
     get:
       produces:

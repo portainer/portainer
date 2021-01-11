@@ -21,7 +21,15 @@ type githubData struct {
 	TagName string `json:"tag_name"`
 }
 
-// GET request on /api/status/version
+// @summary Inspect Version
+// @description
+// @tags Status
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @success 200 {object} inspectVersionResponse "Version info"
+// @failure 500
+// @router /status/version [get]
 func (handler *Handler) statusInspectVersion(w http.ResponseWriter, r *http.Request) {
 	motd, err := client.Get(portainer.VersionCheckURL, 5)
 	if err != nil {
