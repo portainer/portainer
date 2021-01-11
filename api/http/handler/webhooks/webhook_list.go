@@ -6,7 +6,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 type webhookListOperationFilters struct {
@@ -14,7 +14,17 @@ type webhookListOperationFilters struct {
 	EndpointID int    `json:"EndpointID"`
 }
 
-// GET request on /api/webhooks?(filters=<filters>)
+// @summary List webhooks
+// @description
+// @security ApiKeyAuth
+// @tags Webhooks
+// @accept json
+// @produce json
+// @param body body webhookCreatePayload true "Webhook data"
+// @param filters query webhookListOperationFilters false "Filters"
+// @success 200 {array} portainer.Webhook
+// @failure 400,500
+// @router /webhooks [get]
 func (handler *Handler) webhookList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var filters webhookListOperationFilters
 	err := request.RetrieveJSONQueryParameter(r, "filters", &filters, true)

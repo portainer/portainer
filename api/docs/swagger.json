@@ -4016,6 +4016,182 @@
                     }
                 }
             }
+        },
+        "/webhooks": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "List webhooks",
+                "parameters": [
+                    {
+                        "description": "Webhook data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/webhooks.webhookCreatePayload"
+                        }
+                    },
+                    {
+                        "type": "integer",
+                        "name": "EndpointID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "ResourceID",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/portainer.Webhook"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Create a webhook",
+                "parameters": [
+                    {
+                        "description": "Webhook data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/webhooks.webhookCreatePayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.Webhook"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "409": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/webhooks/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Delete a webhook",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Webhook id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Webhook deleted"
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/webhooks/{token}": {
+            "post": {
+                "description": "Acts on a passed in token UUID to restart the docker service",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Execute a webhook",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Webhook token",
+                        "name": "token",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Webhook executed"
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -5810,6 +5986,26 @@
                 }
             }
         },
+        "portainer.Webhook": {
+            "type": "object",
+            "properties": {
+                "EndpointId": {
+                    "type": "integer"
+                },
+                "Id": {
+                    "type": "integer"
+                },
+                "ResourceId": {
+                    "type": "string"
+                },
+                "Token": {
+                    "type": "string"
+                },
+                "Type": {
+                    "type": "integer"
+                }
+            }
+        },
         "registries.registryConfigurePayload": {
             "type": "object",
             "properties": {
@@ -6218,6 +6414,20 @@
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "webhooks.webhookCreatePayload": {
+            "type": "object",
+            "properties": {
+                "endpointID": {
+                    "type": "integer"
+                },
+                "resourceID": {
+                    "type": "string"
+                },
+                "webhookType": {
+                    "type": "integer"
                 }
             }
         }

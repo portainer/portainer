@@ -1183,6 +1183,19 @@ definitions:
       UserId:
         type: integer
     type: object
+  portainer.Webhook:
+    properties:
+      EndpointId:
+        type: integer
+      Id:
+        type: integer
+      ResourceId:
+        type: string
+      Token:
+        type: string
+      Type:
+        type: integer
+    type: object
   registries.registryConfigurePayload:
     properties:
       authentication:
@@ -1449,6 +1462,15 @@ definitions:
         type: integer
       username:
         type: string
+    type: object
+  webhooks.webhookCreatePayload:
+    properties:
+      endpointID:
+        type: integer
+      resourceID:
+        type: string
+      webhookType:
+        type: integer
     type: object
 info:
   contact: {}
@@ -3959,6 +3981,116 @@ paths:
       summary: Create an initial admin user
       tags:
       - Users
+  /webhooks:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Webhook data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/webhooks.webhookCreatePayload'
+      - in: query
+        name: EndpointID
+        type: integer
+      - in: query
+        name: ResourceID
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/portainer.Webhook'
+            type: array
+        "400":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: List webhooks
+      tags:
+      - Webhooks
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Webhook data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/webhooks.webhookCreatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.Webhook'
+        "400":
+          description: ""
+        "409":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create a webhook
+      tags:
+      - Webhooks
+  /webhooks/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Webhook id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Webhook deleted
+        "400":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a webhook
+      tags:
+      - Webhooks
+  /webhooks/{token}:
+    post:
+      consumes:
+      - application/json
+      description: Acts on a passed in token UUID to restart the docker service
+      parameters:
+      - description: Webhook token
+        in: path
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Webhook executed
+        "400":
+          description: ""
+        "500":
+          description: ""
+      summary: Execute a webhook
+      tags:
+      - Webhooks
 securityDefinitions:
   ApiKeyAuth:
     in: header

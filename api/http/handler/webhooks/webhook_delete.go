@@ -6,10 +6,19 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
-// DELETE request on /api/webhook/:serviceID
+// @summary Delete a webhook
+// @description
+// @security ApiKeyAuth
+// @tags Webhooks
+// @accept json
+// @produce json
+// @param id path int true "Webhook id"
+// @success 202 "Webhook deleted"
+// @failure 400,500
+// @router /webhooks/{id} [delete]
 func (handler *Handler) webhookDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	id, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
