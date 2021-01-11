@@ -8,7 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 type adminInitPayload struct {
@@ -26,7 +26,15 @@ func (payload *adminInitPayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// POST request on /api/users/admin/init
+// @summary Create an initial admin user
+// @description Creates a new admin user if not exists
+// @tags Users
+// @accept json
+// @produce json
+// @param body body adminInitPayload true "User data"
+// @success 200 {object} portainer.User
+// @failure 400,409,500
+// @router /users/admin/init [post]
 func (handler *Handler) adminInit(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload adminInitPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)

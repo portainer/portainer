@@ -8,7 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
@@ -31,6 +31,17 @@ func (payload *userUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
+// @summary Update a user
+// @description
+// @tags Users
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path int true "user id"
+// @param body body userUpdatePayload true "user password data"
+// @success 200 {object} portainer.User "User updated"
+// @failure 400,403,404,409,500
+// @router /users/{id} [put]
 // PUT request on /api/users/:id
 func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	userID, err := request.RetrieveNumericRouteVariableValue(r, "id")

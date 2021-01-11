@@ -8,7 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
@@ -29,7 +29,17 @@ func (payload *userUpdatePasswordPayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// PUT request on /api/users/:id/passwd
+// @summary Update a user's password
+// @description
+// @tags Users
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path int true "user id"
+// @param body body userUpdatePasswordPayload true "user password data"
+// @success 202 "Password updated"
+// @failure 400,403,404,500
+// @router /users/{id}/passwd [put]
 func (handler *Handler) userUpdatePassword(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	userID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

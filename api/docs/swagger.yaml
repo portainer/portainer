@@ -653,6 +653,10 @@ definitions:
       UserAccessPolicies:
         $ref: '#/definitions/portainer.UserAccessPolicies'
     type: object
+  portainer.EndpointAuthorizations:
+    additionalProperties:
+      $ref: '#/definitions/portainer.Authorizations'
+    type: object
   portainer.EndpointExtension:
     properties:
       Type:
@@ -1150,6 +1154,24 @@ definitions:
       readonly:
         type: boolean
     type: object
+  portainer.User:
+    properties:
+      EndpointAuthorizations:
+        $ref: '#/definitions/portainer.EndpointAuthorizations'
+      Id:
+        type: integer
+      Password:
+        type: string
+      PortainerAuthorizations:
+        $ref: '#/definitions/portainer.Authorizations'
+        description: |-
+          Deprecated fields
+          Deprecated in DBVersion == 25
+      Role:
+        type: integer
+      Username:
+        type: string
+    type: object
   portainer.UserAccessPolicies:
     additionalProperties:
       $ref: '#/definitions/portainer.AccessPolicy'
@@ -1394,6 +1416,38 @@ definitions:
           $ref: '#/definitions/portainer.Template'
         type: array
       version:
+        type: string
+    type: object
+  users.adminInitPayload:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  users.userCreatePayload:
+    properties:
+      password:
+        type: string
+      role:
+        type: integer
+      username:
+        type: string
+    type: object
+  users.userUpdatePasswordPayload:
+    properties:
+      newPassword:
+        type: string
+      password:
+        type: string
+    type: object
+  users.userUpdatePayload:
+    properties:
+      password:
+        type: string
+      role:
+        type: integer
+      username:
         type: string
     type: object
 info:
@@ -3656,6 +3710,255 @@ paths:
       summary: Upload TLS file
       tags:
       - Upload
+  /users:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/portainer.User'
+            type: array
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: List users
+      tags:
+      - Users
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: User data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/users.userCreatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.User'
+        "400":
+          description: ""
+        "403":
+          description: ""
+        "409":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create a user
+      tags:
+      - Users
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+        "403":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a user
+      tags:
+      - Users
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.User'
+        "400":
+          description: ""
+        "403":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Inspect a user
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: user password data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/users.userUpdatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User updated
+          schema:
+            $ref: '#/definitions/portainer.User'
+        "400":
+          description: ""
+        "403":
+          description: ""
+        "404":
+          description: ""
+        "409":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update a user
+      tags:
+      - Users
+  /users/{id}/memberships:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/portainer.TeamMembership'
+            type: array
+        "400":
+          description: ""
+        "403":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: List user's team memberships
+      tags:
+      - Users
+  /users/{id}/passwd:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: user password data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/users.userUpdatePasswordPayload'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Password updated
+        "400":
+          description: ""
+        "403":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update a user's password
+      tags:
+      - Users
+  /users/admin/check:
+    get:
+      consumes:
+      - application/json
+      description: Checks if admin user was created
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Admin exists
+        "404":
+          description: Admin does not exist
+        "500":
+          description: Failed
+      summary: Admin Check
+      tags:
+      - Users
+  /users/admin/init:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new admin user if not exists
+      parameters:
+      - description: User data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/users.adminInitPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.User'
+        "400":
+          description: ""
+        "409":
+          description: ""
+        "500":
+          description: ""
+      summary: Create an initial admin user
+      tags:
+      - Users
 securityDefinitions:
   ApiKeyAuth:
     in: header

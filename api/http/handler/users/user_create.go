@@ -8,7 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
@@ -31,7 +31,16 @@ func (payload *userCreatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// POST request on /api/users
+// @summary Create a user
+// @description
+// @security ApiKeyAuth
+// @tags Users
+// @accept json
+// @produce json
+// @param body body userCreatePayload true "User data"
+// @success 200 {object} portainer.User
+// @failure 400,403,409,500
+// @router /users [post]
 func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload userCreatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)

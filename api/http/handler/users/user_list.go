@@ -8,7 +8,15 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// GET request on /api/users
+// @summary List users
+// @description
+// @tags Users
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @success 200 {array} portainer.User
+// @failure 500
+// @router /users [get]
 func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	users, err := handler.DataStore.User().Users()
 	if err != nil {

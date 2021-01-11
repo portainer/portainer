@@ -6,12 +6,21 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// GET request on /api/users/:id/memberships
+// @summary List user's team memberships
+// @description
+// @tags Users
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path int true "user id"
+// @success 200 {array} portainer.TeamMembership
+// @failure 400,403,500
+// @router /users/{id}/memberships [get]
 func (handler *Handler) userMemberships(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	userID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
