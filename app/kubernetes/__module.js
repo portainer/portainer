@@ -30,7 +30,7 @@ angular.module('portainer.kubernetes', ['portainer.app']).config([
             await StateManager.updateEndpointState(endpoint, []);
 
             if (endpoint.Type === 7 && endpoint.Status === 2) {
-              throw new Error('Edge endpoint is down');
+              throw new Error('Unable to contact Edge agent, please ensure that the agent is properly running on the remote environment.');
             }
           } catch (e) {
             Notifications.error('Failed loading endpoint', e);
