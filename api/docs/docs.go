@@ -2738,6 +2738,39 @@ var doc = `{
                 }
             }
         },
+        "/roles": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "List Roles",
+                "responses": {
+                    "200": {
+                        "description": "Roles",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/portainer.Role"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/tags": {
             "get": {
                 "security": [
@@ -3529,6 +3562,12 @@ var doc = `{
                 }
             }
         },
+        "portainer.Authorizations": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "boolean"
+            }
+        },
         "portainer.AzureCredentials": {
             "type": "object",
             "properties": {
@@ -4183,6 +4222,26 @@ var doc = `{
                     "items": {
                         "$ref": "#/definitions/portainer.UserResourceAccess"
                     }
+                }
+            }
+        },
+        "portainer.Role": {
+            "type": "object",
+            "properties": {
+                "Authorizations": {
+                    "$ref": "#/definitions/portainer.Authorizations"
+                },
+                "Description": {
+                    "type": "string"
+                },
+                "Id": {
+                    "type": "integer"
+                },
+                "Name": {
+                    "type": "string"
+                },
+                "Priority": {
+                    "type": "integer"
                 }
             }
         },

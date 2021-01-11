@@ -409,6 +409,10 @@ definitions:
       RoleId:
         type: integer
     type: object
+  portainer.Authorizations:
+    additionalProperties:
+      type: boolean
+    type: object
   portainer.AzureCredentials:
     properties:
       ApplicationID:
@@ -847,6 +851,19 @@ definitions:
         items:
           $ref: '#/definitions/portainer.UserResourceAccess'
         type: array
+    type: object
+  portainer.Role:
+    properties:
+      Authorizations:
+        $ref: '#/definitions/portainer.Authorizations'
+      Description:
+        type: string
+      Id:
+        type: integer
+      Name:
+        type: string
+      Priority:
+        type: integer
     type: object
   portainer.TLSConfiguration:
     properties:
@@ -2812,6 +2829,26 @@ paths:
       summary: Updates a resource control object
       tags:
       - ResourceControl
+  /roles:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Roles
+          schema:
+            items:
+              $ref: '#/definitions/portainer.Role'
+            type: array
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: List Roles
+      tags:
+      - Roles
   /tags:
     get:
       produces:

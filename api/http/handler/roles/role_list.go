@@ -7,7 +7,15 @@ import (
 	"github.com/portainer/libhttp/response"
 )
 
-// GET request on /api/Role
+// @summary List Roles
+// @description
+// @tags Roles
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @success 200 {array} portainer.Role "Roles"
+// @failure 500
+// @router /roles [get]
 func (handler *Handler) roleList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	roles, err := handler.DataStore.Role().Roles()
 	if err != nil {
