@@ -7,7 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
@@ -28,6 +28,7 @@ type Handler struct {
 	GitService          portainer.GitService
 	SwarmStackManager   portainer.SwarmStackManager
 	ComposeStackManager portainer.ComposeStackManager
+	ComposeWrapper      portainer.ComposeStackManager
 	KubernetesDeployer  portainer.KubernetesDeployer
 }
 
@@ -91,4 +92,12 @@ func (handler *Handler) userCanCreateStack(securityContext *security.RestrictedR
 	}
 
 	return handler.userIsAdminOrEndpointAdmin(user, endpointID)
+}
+
+func (handler *Handler) pickComposeStackManager() portainer.ComposeStackManager {
+	if handler.ComposeWrapper != nil {
+		return handler.ComposeWrapper
+	}
+
+	return handler.ComposeStackManager
 }

@@ -11,7 +11,7 @@ import (
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -347,7 +347,6 @@ func (handler *Handler) deployComposeStack(config *composeStackDeploymentConfig)
 		!isAdminOrEndpointAdmin {
 
 		composeFilePath := path.Join(config.stack.ProjectPath, config.stack.EntryPoint)
-
 		stackContent, err := handler.FileService.GetFileContent(composeFilePath)
 		if err != nil {
 			return err
@@ -364,7 +363,7 @@ func (handler *Handler) deployComposeStack(config *composeStackDeploymentConfig)
 
 	handler.SwarmStackManager.Login(config.dockerhub, config.registries, config.endpoint)
 
-	err = handler.ComposeStackManager.Up(config.stack, config.endpoint)
+	err = handler.pickComposeStackManager().Up(config.stack, config.endpoint)
 	if err != nil {
 		return err
 	}

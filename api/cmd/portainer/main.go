@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt"
 	"github.com/portainer/portainer/api/chisel"
 	"github.com/portainer/portainer/api/cli"
@@ -383,6 +383,8 @@ func main() {
 
 	composeStackManager := initComposeStackManager(*flags.Data, reverseTunnelService)
 
+	composeWrapper := exec.NewComposeWrapper(*flags.Assets)
+
 	kubernetesDeployer := initKubernetesDeployer(*flags.Assets)
 
 	if dataStore.IsNew() {
@@ -455,6 +457,7 @@ func main() {
 		DataStore:               dataStore,
 		SwarmStackManager:       swarmStackManager,
 		ComposeStackManager:     composeStackManager,
+		ComposeWrapper:          composeWrapper,
 		KubernetesDeployer:      kubernetesDeployer,
 		CryptoService:           cryptoService,
 		JWTService:              jwtService,
