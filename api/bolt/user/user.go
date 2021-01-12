@@ -61,7 +61,7 @@ func (service *Service) UserByUsername(username string) (*portainer.User, error)
 				return err
 			}
 
-			if u.Username == username {
+			if strings.ToLower(u.Username) == username {
 				user = &u
 				break
 			}
