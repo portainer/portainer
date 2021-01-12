@@ -49,6 +49,7 @@ type Server struct {
 	Status                  *portainer.Status
 	ReverseTunnelService    portainer.ReverseTunnelService
 	ComposeStackManager     portainer.ComposeStackManager
+	ComposeWrapper          portainer.ComposeStackManager
 	CryptoService           portainer.CryptoService
 	SignatureService        portainer.DigitalSignatureService
 	SnapshotService         portainer.SnapshotService
@@ -158,6 +159,7 @@ func (server *Server) Start() error {
 	stackHandler.FileService = server.FileService
 	stackHandler.SwarmStackManager = server.SwarmStackManager
 	stackHandler.ComposeStackManager = server.ComposeStackManager
+	stackHandler.ComposeWrapper = server.ComposeWrapper
 	stackHandler.KubernetesDeployer = server.KubernetesDeployer
 	stackHandler.GitService = server.GitService
 

@@ -357,7 +357,6 @@ func (handler *Handler) deployComposeStack(config *composeStackDeploymentConfig)
 		!isAdminOrEndpointAdmin {
 
 		composeFilePath := path.Join(config.stack.ProjectPath, config.stack.EntryPoint)
-
 		stackContent, err := handler.FileService.GetFileContent(composeFilePath)
 		if err != nil {
 			return err
@@ -374,7 +373,7 @@ func (handler *Handler) deployComposeStack(config *composeStackDeploymentConfig)
 
 	handler.SwarmStackManager.Login(config.dockerhub, config.registries, config.endpoint)
 
-	err = handler.ComposeStackManager.Up(config.stack, config.endpoint)
+	err = handler.pickComposeStackManager().Up(config.stack, config.endpoint)
 	if err != nil {
 		return err
 	}

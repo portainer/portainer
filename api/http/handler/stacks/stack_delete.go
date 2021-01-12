@@ -155,5 +155,6 @@ func (handler *Handler) deleteStack(stack *portainer.Stack, endpoint *portainer.
 	if stack.Type == portainer.DockerSwarmStack {
 		return handler.SwarmStackManager.Remove(stack, endpoint)
 	}
-	return handler.ComposeStackManager.Down(stack, endpoint)
+
+	return handler.pickComposeStackManager().Down(stack, endpoint)
 }

@@ -387,6 +387,8 @@ func main() {
 
 	composeStackManager := initComposeStackManager(*flags.Data, reverseTunnelService)
 
+	composeWrapper := exec.NewComposeWrapper(*flags.Assets)
+
 	kubernetesDeployer := initKubernetesDeployer(*flags.Assets)
 
 	if dataStore.IsNew() {
@@ -459,6 +461,7 @@ func main() {
 		DataStore:               dataStore,
 		SwarmStackManager:       swarmStackManager,
 		ComposeStackManager:     composeStackManager,
+		ComposeWrapper:          composeWrapper,
 		KubernetesDeployer:      kubernetesDeployer,
 		CryptoService:           cryptoService,
 		JWTService:              jwtService,
