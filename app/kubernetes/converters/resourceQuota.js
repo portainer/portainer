@@ -1,4 +1,3 @@
-import _ from 'lodash-es';
 import * as JsonPatch from 'fast-json-patch';
 import filesizeParser from 'filesize-parser';
 
@@ -87,15 +86,11 @@ class KubernetesResourceQuotaConverter {
   }
 
   static resourcePoolFormValuesToResourceQuota(formValues) {
-    const storages = _.filter(formValues.StorageClasses, { Selected: true });
-    if (formValues.HasQuota || storages.length) {
+    if (formValues.HasQuota) {
       const quota = new KubernetesResourceQuota(formValues.Name);
       if (formValues.HasQuota) {
         quota.CpuLimit = formValues.CpuLimit;
         quota.MemoryLimit = KubernetesResourceReservationHelper.bytesValue(formValues.MemoryLimit);
-      }
-      if (storages.length) {
-        quota.StorageRequests = storages;
       }
       quota.ResourcePoolName = formValues.Name;
       quota.ResourcePoolOwner = formValues.Owner;

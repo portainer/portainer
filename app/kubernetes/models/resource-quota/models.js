@@ -23,6 +23,5 @@ export function KubernetesResourceQuota(namespace) {
     Yaml: '',
     ResourcePoolName: '',
     ResourcePoolOwner: '',
-    StorageRequests: [], // []KubernetesResourcePoolStorageClassFormValue
   };
 }

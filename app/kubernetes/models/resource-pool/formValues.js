@@ -5,7 +5,6 @@ export function KubernetesResourcePoolFormValues(defaults) {
     CpuLimit: defaults.CpuLimit,
     HasQuota: false,
     IngressClasses: [], // KubernetesResourcePoolIngressClassFormValue
-    StorageClasses: [], // KubernetesResourcePoolStorageClassFormValue
   };
 }
 
@@ -30,14 +29,5 @@ export function KubernetesResourcePoolIngressClassAnnotationFormValue() {
   return {
     Key: '',
     Value: '',
-  };
-}
-
-export function KubernetesResourcePoolStorageClassFormValue(name) {
-  return {
-    Name: name,
-    Size: 0,
-    SizeUnit: 'GB',
-    Selected: false,
   };
 }

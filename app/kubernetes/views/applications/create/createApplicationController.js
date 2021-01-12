@@ -888,9 +888,6 @@ class KubernetesCreateApplicationController {
             },
             placements: new KubernetesFormValidationReferences(),
           },
-          exceeded: {
-            persistedFolders: new KubernetesFormValidationReferences(),
-          },
           isEdit: false,
           params: {
             namespace: this.$transition$.params().namespace,

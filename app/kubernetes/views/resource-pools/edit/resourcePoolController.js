@@ -214,9 +214,6 @@ class KubernetesResourcePoolController {
           app.Memory = resourceReservation.Memory;
           return app;
         });
-        if (this.formValues.LoadBalancers > 0) {
-          this.state.loadBalancersUsage = (this.state.loadBalancersUsed / this.formValues.LoadBalancers) * 100;
-        }
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to retrieve applications.');
       } finally {
@@ -316,6 +313,7 @@ class KubernetesResourcePoolController {
         const ingressClasses = endpoint.Kubernetes.Configuration.IngressClasses;
         this.formValues.IngressClasses = KubernetesIngressConverter.ingressClassesToFormValues(ingressClasses, this.ingresses);
       }
+      this.savedFormValues = angular.copy(this.formValues);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     } finally {
