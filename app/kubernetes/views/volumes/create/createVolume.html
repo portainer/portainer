@@ -116,12 +116,12 @@
             <!-- #region NFS -->
             <div class="form-group" ng-if="!ctrl.storages">
               <label for="nfs" class="col-sm-1 control-label text-left">Use NFS volume</label>
-              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.NFS" /><i></i> </label>
+              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.isNFSVolume" /><i></i> </label>
             </div>
             <!-- #endregion -->
 
             <!-- #region NFS-SETTINGS -->
-            <div ng-if="ctrl.formValues.NFS">
+            <div ng-if="ctrl.formValues.isNFSVolume">
               <div class="col-sm-12 form-section-title">
                 NFS Settings
               </div>

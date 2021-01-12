@@ -7,7 +7,7 @@ const _KubernetesVolumeFormValues = Object.freeze({
   StorageClass: {},
   Size: '',
   SizeUnit: 'GB',
-  NFS: false,
+  isNFSVolume: false,
   NFSAddress: '',
   NFSVersion: '',
   NFSMountPoint: '',

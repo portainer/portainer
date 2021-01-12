@@ -8,7 +8,7 @@ class KubernetesPVConverter {
     res.ResourcePool = {};
     res.StorageClass = {};
     res.Size = '';
-    res.NFS = false;
+    res.isNFSVolume = false;
     res.NFSAddress = '';
     res.NFSVersion = '';
     res.NFSMountPoint = '';
@@ -22,14 +22,14 @@ class KubernetesPVConverter {
     pv.ResourcePool = formValues.ResourcePool;
     pv.StorageClass = formValues.StorageClass;
     pv.Size = formValues.Size + formValues.SizeUnit;
-    if (formValues.NFS) {
-      pv.NFS = formValues.NFS;
+    if (formValues.isNFSVolume) {
+      pv.isNFSVolume = formValues.isNFSVolume;
       pv.NFSAddress = formValues.NFSAddress;
       pv.NFSVersion = formValues.NFSVersion;
       pv.NFSMountPoint = formValues.NFSMountPoint;
       pv.NFSOptions = _.split(formValues.NFSOptions, ',');
     } else {
-      // set volumeType (!= NFS)
+      pv.isNFSVolume = formValues.isNFSVolume;
     }
     return pv;
   }
@@ -41,7 +41,7 @@ class KubernetesPVConverter {
     res.spec.capacity = {
       storage: pv.Size.replace('B', 'i'),
     };
-    if (pv.NFS) {
+    if (pv.isNFSVolume) {
       res.spec.nfs = {
         path: pv.NFSMountPoint,
         server: pv.NFSAddress,

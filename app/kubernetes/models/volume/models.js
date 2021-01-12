@@ -31,7 +31,7 @@ const _KubernetesPV = Object.freeze({
   ResourcePool: {}, // KubernetesResourcePool
   StorageClass: {}, // KubernetesStorageClass
   Size: '',
-  NFS: false,
+  isNFSVolume: false,
   NFSAddress: '',
   NFSVersion: '',
   NFSMountPoint: '',
