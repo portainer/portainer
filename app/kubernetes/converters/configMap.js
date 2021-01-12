@@ -39,7 +39,8 @@ class KubernetesConfigMapConverter {
     const res = new KubernetesConfigMapCreatePayload();
     res.metadata.name = data.Name;
     res.metadata.namespace = data.Namespace;
-    res.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] = data.ConfigurationOwner;
+    const configurationOwner = _.truncate(data.ConfigurationOwner, { length: 63, omission: '' });
+    res.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] = configurationOwner;
     res.data = data.Data;
     return res;
   }
