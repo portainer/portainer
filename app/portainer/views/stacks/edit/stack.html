@@ -39,14 +39,6 @@
                 <div class="form-group">
                   {{ stackName }}
 
-                  <a
-                    ng-if="!state.externalStack && stackFileContent"
-                    class="btn btn-primary btn-xs"
-                    ui-sref="docker.templates.custom.new({fileContent: stackFileContent, type: stack.Type})"
-                  >
-                    Create template from stack
-                  </a>
-
                   <button
                     authorization="PortainerStackUpdate"
                     ng-if="!state.externalStack && stack.Status === 2"
@@ -72,6 +64,15 @@
                   <button authorization="PortainerStackDelete" class="btn btn-xs btn-danger" ng-click="removeStack()" ng-if="!state.externalStack || stack.Type === 1">
                     <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>
                     Delete this stack
+                  </button>
+
+                  <button
+                    ng-if="!state.externalStack && stackFileContent"
+                    class="btn btn-primary btn-xs"
+                    ui-sref="docker.templates.custom.new({fileContent: stackFileContent, type: stack.Type})"
+                  >
+                    <i class="fa fa-plus space-right" aria-hidden="true"></i>
+                    Create template from stack
                   </button>
                 </div>
               </div>
