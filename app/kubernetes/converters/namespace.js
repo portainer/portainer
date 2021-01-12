@@ -1,3 +1,4 @@
+import _ from 'lodash-es';
 import { KubernetesNamespace } from 'Kubernetes/models/namespace/models';
 import { KubernetesNamespaceCreatePayload } from 'Kubernetes/models/namespace/payloads';
 import { KubernetesPortainerResourcePoolNameLabel, KubernetesPortainerResourcePoolOwnerLabel } from 'Kubernetes/models/resource-pool/models';
@@ -20,7 +21,8 @@ class KubernetesNamespaceConverter {
     res.metadata.name = namespace.Name;
     res.metadata.labels[KubernetesPortainerResourcePoolNameLabel] = namespace.ResourcePoolName;
     if (namespace.ResourcePoolOwner) {
-      res.metadata.labels[KubernetesPortainerResourcePoolOwnerLabel] = namespace.ResourcePoolOwner;
+      const resourcePoolOwner = _.truncate(namespace.ResourcePoolOwner, { length: 63, omission: '' });
+      res.metadata.labels[KubernetesPortainerResourcePoolOwnerLabel] = resourcePoolOwner;
     }
     return res;
   }
