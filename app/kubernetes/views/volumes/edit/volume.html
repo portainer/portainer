@@ -38,6 +38,17 @@
                       <td>{{ ctrl.volume.PersistentVolumeClaim.StorageClass.Name }}</td>
                     </tr>
                     <tr>
+                      <td>Shared Access Policy</td>
+                      <td
+                        >{{ ctrl.state.volumeSharedAccessPolicy }}
+                        <portainer-tooltip
+                          position="bottom"
+                          ng-if="ctrl.state.volumeSharedAccessPolicyTooltip"
+                          message="{{ ctrl.state.volumeSharedAccessPolicyTooltip }}"
+                        ></portainer-tooltip
+                      ></td>
+                    </tr>
+                    <tr>
                       <td>Provisioner</td>
                       <td>{{ ctrl.volume.PersistentVolumeClaim.StorageClass.Provisioner ? ctrl.volume.PersistentVolumeClaim.StorageClass.Provisioner : '-' }}</td>
                     </tr>
