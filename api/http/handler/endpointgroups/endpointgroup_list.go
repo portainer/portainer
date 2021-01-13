@@ -16,7 +16,7 @@ import (
 // @produce json
 // @success 200 {array} portainer.EndpointGroup "Endpoint group"
 // @failure 400,500
-// @router /api/endpoint_groups [get]
+// @router /endpoint_groups [get]
 func (handler *Handler) endpointGroupList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointGroups, err := handler.DataStore.EndpointGroup().EndpointGroups()
 	if err != nil {

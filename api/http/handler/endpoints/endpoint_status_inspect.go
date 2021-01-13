@@ -44,7 +44,7 @@ type endpointStatusInspectResponse struct {
 // @param id path int true "Endpoint ID"
 // @success 200 {object} endpointStatusInspectResponse
 // @failure 500,404,403
-// @router /api/endpoints/{id}/status [get]
+// @router /endpoints/{id}/status [get]
 func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

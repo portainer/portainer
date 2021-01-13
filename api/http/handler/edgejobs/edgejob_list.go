@@ -16,6 +16,7 @@ import (
 // @produce json
 // @success 200 {array} portainer.EdgeJob
 // @failure 500,400
+// @failure 503 Edge compute features are disabled
 // @router /edge_jobs [get]
 // GET request on /api/edge_jobs
 func (handler *Handler) edgeJobList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

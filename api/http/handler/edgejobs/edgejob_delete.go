@@ -21,6 +21,7 @@ import (
 // @param id path string true "EdgeJob Id"
 // @success 204
 // @failure 500,400
+// @failure 503 Edge compute features are disabled
 // @router /edge_jobs/{id} [delete]
 func (handler *Handler) edgeJobDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeJobID, err := request.RetrieveNumericRouteVariableValue(r, "id")

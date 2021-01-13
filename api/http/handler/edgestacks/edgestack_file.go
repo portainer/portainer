@@ -25,6 +25,7 @@ type stackFileResponse struct {
 // @param id path string true "EdgeStack Id"
 // @success 200 {object} stackFileResponse
 // @failure 500,400
+// @failure 503 Edge compute features are disabled
 // @router /edge_stacks/{id}/file [get]
 func (handler *Handler) edgeStackFile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")

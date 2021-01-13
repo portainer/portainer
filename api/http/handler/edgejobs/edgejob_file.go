@@ -24,6 +24,7 @@ type edgeJobFileResponse struct {
 // @param id path string true "EdgeJob Id"
 // @success 200 {object} edgeJobFileResponse
 // @failure 500,400
+// @failure 503 Edge compute features are disabled
 // @router /edge_jobs/{id}/file [get]
 func (handler *Handler) edgeJobFile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeJobID, err := request.RetrieveNumericRouteVariableValue(r, "id")

@@ -20,7 +20,7 @@ import (
 // @param endpointId path int true "endpoint id"
 // @success 204
 // @failure 400,404,500
-// @router /endpoint_groups/{id}/endpoints/{endpointId} [post]
+// @router /endpoint_groups/{id}/endpoints/{endpointId} [put]
 func (handler *Handler) endpointGroupAddEndpoint(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointGroupID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

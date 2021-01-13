@@ -1579,124 +1579,6 @@ info:
   title: PortainerCE
   version: "2.0"
 paths:
-  /api/endpoint_groups:
-    get:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Endpoint group
-          schema:
-            items:
-              $ref: '#/definitions/portainer.EndpointGroup'
-            type: array
-        "400":
-          description: ""
-        "500":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: List Endpoint groups
-      tags:
-      - EndpointGroups
-  /api/endpoint_groups/:id:
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - description: endpoint group id
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Endpoint group
-          schema:
-            $ref: '#/definitions/portainer.EndpointGroup'
-        "400":
-          description: ""
-        "500":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Inspect an Endpoint group
-      tags:
-      - EndpointGroups
-    put:
-      consumes:
-      - application/json
-      parameters:
-      - description: endpoint group id
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Endpoint group
-          schema:
-            $ref: '#/definitions/portainer.EndpointGroup'
-        "400":
-          description: ""
-        "500":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Update Endpoint group
-      tags:
-      - EndpointGroups
-  /api/endpoints/{id}/status:
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - description: Endpoint ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/endpoints.endpointStatusInspectResponse'
-        "403":
-          description: ""
-        "404":
-          description: ""
-        "500":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Get endpoint status (for edge)
-      tags:
-      - Endpoints
-      - Edge
-  /api/endpoints/snapshot:
-    post:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: ""
-        "500":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Snapshot all endpoints
-      tags:
-      - Endpoints
   /auth:
     post:
       consumes:
@@ -2581,6 +2463,27 @@ paths:
       tags:
       - EdgeTemplates
   /endpoint_groups:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Endpoint group
+          schema:
+            items:
+              $ref: '#/definitions/portainer.EndpointGroup'
+            type: array
+        "400":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: List Endpoint groups
+      tags:
+      - EndpointGroups
     post:
       consumes:
       - application/json
@@ -2605,6 +2508,57 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Creates an Endpoint Group
+      tags:
+      - EndpointGroups
+  /endpoint_groups/:id:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: endpoint group id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Endpoint group
+          schema:
+            $ref: '#/definitions/portainer.EndpointGroup'
+        "400":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Inspect an Endpoint group
+      tags:
+      - EndpointGroups
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: endpoint group id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Endpoint group
+          schema:
+            $ref: '#/definitions/portainer.EndpointGroup'
+        "400":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update Endpoint group
       tags:
       - EndpointGroups
   /endpoint_groups/{id}:
@@ -3010,6 +2964,51 @@ paths:
       summary: Snapshots an endpoint
       tags:
       - Endpoints
+  /endpoints/{id}/status:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Endpoint ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoints.endpointStatusInspectResponse'
+        "403":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Get endpoint status (for edge)
+      tags:
+      - Endpoints
+      - Edge
+  /endpoints/snapshot:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Snapshot all endpoints
+      tags:
+      - Endpoints
   /motd:
     get:
       produces:
@@ -3399,6 +3398,8 @@ paths:
             items:
               $ref: '#/definitions/portainer.Stack'
             type: array
+        "400":
+          description: ""
         "500":
           description: ""
       security:
@@ -3458,6 +3459,12 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/portainer.Stack'
+        "400":
+          description: ""
+        "403":
+          description: ""
+        "409":
+          description: ""
         "500":
           description: ""
       security:
@@ -3489,11 +3496,11 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/portainer.Stack'
+        "204":
+          description: ""
         "400":
+          description: ""
+        "401":
           description: ""
         "403":
           description: ""
@@ -3503,7 +3510,7 @@ paths:
           description: ""
       security:
       - ApiKeyAuth: []
-      summary: Inspect Stack
+      summary: Delete a Stack
       tags:
       - Stacks
     get:
@@ -3571,7 +3578,7 @@ paths:
           description: ""
       security:
       - ApiKeyAuth: []
-      summary: Inspect Stack
+      summary: Update a Stack
       tags:
       - Stacks
   /stacks/{id}/file:

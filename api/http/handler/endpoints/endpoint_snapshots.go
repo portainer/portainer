@@ -18,7 +18,7 @@ import (
 // @produce json
 // @success 204
 // @failure 500
-// @router /api/endpoints/snapshot [post]
+// @router /endpoints/snapshot [post]
 func (handler *Handler) endpointSnapshots(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {

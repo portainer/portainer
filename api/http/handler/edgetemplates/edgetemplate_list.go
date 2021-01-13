@@ -24,7 +24,7 @@ type templateFileFormat struct {
 // @produce json
 // @success 200 {array} portainer.Template
 // @failure 500
-// @router /edgetemplates [get]
+// @router /edge_templates [get]
 func (handler *Handler) edgeTemplateList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {

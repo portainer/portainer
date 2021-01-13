@@ -23,9 +23,9 @@ import (
 // @accept json
 // @produce json
 // @param method query string true "method for creating template" Enums(string, file, repository)
-// @param body_string body customTemplateFromFileContentPayload true "Required when using method=string"
-// @param body_file body customTemplateFromFileUploadPayload true "Required when using method=file"
-// @param body_repository body customTemplateFromGitRepositoryPayload true "Required when using method=repository"
+// @param body_string body customTemplateFromFileContentPayload false "Required when using method=string"
+// @param body_file body customTemplateFromFileUploadPayload false "Required when using method=file"
+// @param body_repository body customTemplateFromGitRepositoryPayload false "Required when using method=repository"
 // @success 200 {object} portainer.CustomTemplate
 // @failure 400,404,500
 // @router /custom_templates [post]

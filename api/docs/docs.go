@@ -25,197 +25,6 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/endpoint_groups": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "EndpointGroups"
-                ],
-                "summary": "List Endpoint groups",
-                "responses": {
-                    "200": {
-                        "description": "Endpoint group",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/portainer.EndpointGroup"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": ""
-                    },
-                    "500": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/endpoint_groups/:id": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "EndpointGroups"
-                ],
-                "summary": "Inspect an Endpoint group",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "endpoint group id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Endpoint group",
-                        "schema": {
-                            "$ref": "#/definitions/portainer.EndpointGroup"
-                        }
-                    },
-                    "400": {
-                        "description": ""
-                    },
-                    "500": {
-                        "description": ""
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "EndpointGroups"
-                ],
-                "summary": "Update Endpoint group",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "endpoint group id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Endpoint group",
-                        "schema": {
-                            "$ref": "#/definitions/portainer.EndpointGroup"
-                        }
-                    },
-                    "400": {
-                        "description": ""
-                    },
-                    "500": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/endpoints/snapshot": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Endpoints"
-                ],
-                "summary": "Snapshot all endpoints",
-                "responses": {
-                    "204": {
-                        "description": ""
-                    },
-                    "500": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/endpoints/{id}/status": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Endpoints",
-                    "Edge"
-                ],
-                "summary": "Get endpoint status (for edge)",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Endpoint ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/endpoints.endpointStatusInspectResponse"
-                        }
-                    },
-                    "403": {
-                        "description": ""
-                    },
-                    "404": {
-                        "description": ""
-                    },
-                    "500": {
-                        "description": ""
-                    }
-                }
-            }
-        },
         "/auth": {
             "post": {
                 "consumes": [
@@ -1630,6 +1439,40 @@ var doc = `{
             }
         },
         "/endpoint_groups": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EndpointGroups"
+                ],
+                "summary": "List Endpoint groups",
+                "responses": {
+                    "200": {
+                        "description": "Endpoint group",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/portainer.EndpointGroup"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -1655,6 +1498,88 @@ var doc = `{
                         "schema": {
                             "$ref": "#/definitions/endpointgroups.endpointGroupCreatePayload"
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Endpoint group",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.EndpointGroup"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/endpoint_groups/:id": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EndpointGroups"
+                ],
+                "summary": "Inspect an Endpoint group",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "endpoint group id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Endpoint group",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.EndpointGroup"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EndpointGroups"
+                ],
+                "summary": "Update Endpoint group",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "endpoint group id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -1934,6 +1859,33 @@ var doc = `{
                         }
                     },
                     "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/endpoints/snapshot": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Endpoints"
+                ],
+                "summary": "Snapshot all endpoints",
+                "responses": {
+                    "204": {
                         "description": ""
                     },
                     "500": {
@@ -2299,6 +2251,52 @@ var doc = `{
                         "description": ""
                     },
                     "400": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/endpoints/{id}/status": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Endpoints",
+                    "Edge"
+                ],
+                "summary": "Get endpoint status (for edge)",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Endpoint ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/endpoints.endpointStatusInspectResponse"
+                        }
+                    },
+                    "403": {
                         "description": ""
                     },
                     "404": {
@@ -2947,6 +2945,9 @@ var doc = `{
                             }
                         }
                     },
+                    "400": {
+                        "description": ""
+                    },
                     "500": {
                         "description": ""
                     }
@@ -3035,6 +3036,15 @@ var doc = `{
                             "$ref": "#/definitions/portainer.Stack"
                         }
                     },
+                    "400": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": ""
+                    },
+                    "409": {
+                        "description": ""
+                    },
                     "500": {
                         "description": ""
                     }
@@ -3103,7 +3113,7 @@ var doc = `{
                 "tags": [
                     "Stacks"
                 ],
-                "summary": "Inspect Stack",
+                "summary": "Update a Stack",
                 "parameters": [
                     {
                         "type": "string",
@@ -3165,7 +3175,7 @@ var doc = `{
                 "tags": [
                     "Stacks"
                 ],
-                "summary": "Inspect Stack",
+                "summary": "Delete a Stack",
                 "parameters": [
                     {
                         "type": "string",
@@ -3188,13 +3198,13 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/portainer.Stack"
-                        }
+                    "204": {
+                        "description": ""
                     },
                     "400": {
+                        "description": ""
+                    },
+                    "401": {
                         "description": ""
                     },
                     "403": {

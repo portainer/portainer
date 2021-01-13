@@ -25,6 +25,7 @@ import (
 // @param body body edgeJobCreateFromFileContentPayload true "EdgeGroup data when method is string"
 // @param body body edgeJobCreateFromFilePayload true "EdgeGroup data when method is file"
 // @success 200 {object} portainer.EdgeGroup
+// @failure 503 Edge compute features are disabled
 // @failure 500
 // @router /edge_jobs [post]
 func (handler *Handler) edgeJobCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

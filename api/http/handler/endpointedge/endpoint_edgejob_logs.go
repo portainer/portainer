@@ -23,7 +23,6 @@ func (payload *logsPayload) Validate(r *http.Request) error {
 // @summary Inspect an EdgeJob Log
 // @description
 // @tags Edge, Endpoints
-// @security ApiKeyAuth
 // @accept json
 // @produce json
 // @param id path string true "Endpoint Id"

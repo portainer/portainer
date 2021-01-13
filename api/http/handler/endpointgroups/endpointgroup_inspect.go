@@ -19,7 +19,7 @@ import (
 // @param id path int true "endpoint group id"
 // @success 200 {object} portainer.EndpointGroup "Endpoint group"
 // @failure 400,500
-// @router /api/endpoint_groups/:id [get]
+// @router /endpoint_groups/:id [get]
 func (handler *Handler) endpointGroupInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointGroupID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

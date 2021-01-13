@@ -17,11 +17,9 @@ type configResponse struct {
 	Name             string
 }
 
-// endpointEdgeStackInspect
 // @summary Inspect an Edge Stack for an Endpoint
 // @description
 // @tags Edge, Endpoints, EdgeStacks
-// @security ApiKeyAuth
 // @accept json
 // @produce json
 // @param id path string true "Endpoint Id"

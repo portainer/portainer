@@ -16,6 +16,7 @@ import (
 // @produce json
 // @success 200 {array} portainer.EdgeStack
 // @failure 500,400
+// @failure 503 Edge compute features are disabled
 // @router /edge_stacks [get]
 func (handler *Handler) edgeStackList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeStacks, err := handler.DataStore.EdgeStack().EdgeStacks()
