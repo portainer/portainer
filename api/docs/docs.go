@@ -2908,6 +2908,514 @@ var doc = `{
                 }
             }
         },
+        "/stacks": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Stacks"
+                ],
+                "summary": "List Stacks",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "EndpointID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "SwarmID",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/portainer.Stack"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Stacks"
+                ],
+                "summary": "Create a Stack",
+                "parameters": [
+                    {
+                        "enum": [
+                            "file",
+                            "string",
+                            "repository"
+                        ],
+                        "type": "string",
+                        "description": "Creation Method",
+                        "name": "method",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            1,
+                            2,
+                            3
+                        ],
+                        "type": "integer",
+                        "description": "Stack Type 1 - swarm, 2 - compose, 3 - kubernetes",
+                        "name": "type",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Endpoint id",
+                        "name": "endpointId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "Required when using method=string",
+                        "name": "body_string",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/stacks.swarmStackFromFileContentPayload"
+                        }
+                    },
+                    {
+                        "description": "Required when using method=file",
+                        "name": "body_file",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/stacks.swarmStackFromFileUploadPayload"
+                        }
+                    },
+                    {
+                        "description": "Required when using method=repository",
+                        "name": "body_repository",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/stacks.swarmStackFromGitRepositoryPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.Stack"
+                        }
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/stacks/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Stacks"
+                ],
+                "summary": "Inspect Stack",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Stack Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.Stack"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Stacks"
+                ],
+                "summary": "Inspect Stack",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Stack Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Endpoint Id",
+                        "name": "endpointId",
+                        "in": "query"
+                    },
+                    {
+                        "description": "Stack data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/stacks.updateSwarmStackPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.Stack"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "If the external query parameter is set to true, the id route variable is expected to be\nthe name of an external stack as a string.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Stacks"
+                ],
+                "summary": "Inspect Stack",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Stack Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Provide if stack is external",
+                        "name": "external",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Endpoint Id",
+                        "name": "endpointId",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.Stack"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/stacks/{id}/file": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Stacks"
+                ],
+                "summary": "Inspect Stack's file",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Stack Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/stacks.stackFileResponse"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/stacks/{id}/migrate": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Stacks"
+                ],
+                "summary": "Migrates a Stack to another endpoint",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Stack Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Endpoint Id",
+                        "name": "endpointId",
+                        "in": "query"
+                    },
+                    {
+                        "description": "Stack data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/stacks.stackMigratePayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.Stack"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/stacks/{id}/start": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Stacks"
+                ],
+                "summary": "Starts a stopped Stack",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Stack Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.Stack"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/stacks/{id}/stop": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Stacks"
+                ],
+                "summary": "Stops a Stack",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Stack Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.Stack"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/status": {
             "get": {
                 "consumes": [
@@ -5899,6 +6407,44 @@ var doc = `{
                 }
             }
         },
+        "portainer.Stack": {
+            "type": "object",
+            "properties": {
+                "EndpointId": {
+                    "type": "integer"
+                },
+                "EntryPoint": {
+                    "type": "string"
+                },
+                "Env": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/portainer.Pair"
+                    }
+                },
+                "Id": {
+                    "type": "integer"
+                },
+                "Name": {
+                    "type": "string"
+                },
+                "ResourceControl": {
+                    "$ref": "#/definitions/portainer.ResourceControl"
+                },
+                "Status": {
+                    "type": "integer"
+                },
+                "SwarmId": {
+                    "type": "string"
+                },
+                "Type": {
+                    "type": "integer"
+                },
+                "projectPath": {
+                    "type": "string"
+                }
+            }
+        },
         "portainer.Status": {
             "type": "object",
             "properties": {
@@ -6480,6 +7026,123 @@ var doc = `{
                     "type": "string"
                 },
                 "userSessionTimeout": {
+                    "type": "string"
+                }
+            }
+        },
+        "stacks.stackFileResponse": {
+            "type": "object",
+            "properties": {
+                "StackFileContent": {
+                    "type": "string"
+                }
+            }
+        },
+        "stacks.stackMigratePayload": {
+            "type": "object",
+            "properties": {
+                "endpointID": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "swarmID": {
+                    "type": "string"
+                }
+            }
+        },
+        "stacks.swarmStackFromFileContentPayload": {
+            "type": "object",
+            "properties": {
+                "env": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/portainer.Pair"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "stackFileContent": {
+                    "type": "string"
+                },
+                "swarmID": {
+                    "type": "string"
+                }
+            }
+        },
+        "stacks.swarmStackFromFileUploadPayload": {
+            "type": "object",
+            "properties": {
+                "env": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/portainer.Pair"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "stackFileContent": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "swarmID": {
+                    "type": "string"
+                }
+            }
+        },
+        "stacks.swarmStackFromGitRepositoryPayload": {
+            "type": "object",
+            "properties": {
+                "composeFilePathInRepository": {
+                    "type": "string"
+                },
+                "env": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/portainer.Pair"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "repositoryAuthentication": {
+                    "type": "boolean"
+                },
+                "repositoryPassword": {
+                    "type": "string"
+                },
+                "repositoryReferenceName": {
+                    "type": "string"
+                },
+                "repositoryURL": {
+                    "type": "string"
+                },
+                "repositoryUsername": {
+                    "type": "string"
+                },
+                "swarmID": {
+                    "type": "string"
+                }
+            }
+        },
+        "stacks.updateSwarmStackPayload": {
+            "type": "object",
+            "properties": {
+                "env": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/portainer.Pair"
+                    }
+                },
+                "prune": {
+                    "type": "boolean"
+                },
+                "stackFileContent": {
                     "type": "string"
                 }
             }

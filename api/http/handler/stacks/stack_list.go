@@ -6,7 +6,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
@@ -16,7 +16,16 @@ type stackListOperationFilters struct {
 	EndpointID int    `json:"EndpointID"`
 }
 
-// GET request on /api/stacks?(filters=<filters>)
+// @summary List Stacks
+// @description
+// @tags Stacks
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param filters query stackListOperationFilters false "Stack filters"
+// @success 200 {array} portainer.Stack
+// @failure 400,500
+// @router /stacks [get]
 func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var filters stackListOperationFilters
 	err := request.RetrieveJSONQueryParameter(r, "filters", &filters, true)

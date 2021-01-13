@@ -7,7 +7,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
@@ -26,7 +26,17 @@ func (payload *stackMigratePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// POST request on /api/stacks/:id/migrate?endpointId=<endpointId>
+// @summary Migrates a Stack to another endpoint
+// @tags Stacks
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path string true "Stack Id"
+// @param endpointId query int false "Endpoint Id"
+// @param body body stackMigratePayload true "Stack data"
+// @success 200 {object} portainer.Stack
+// @failure 400,403,404,500
+// @router /stacks/{id}/migrate [post]
 func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

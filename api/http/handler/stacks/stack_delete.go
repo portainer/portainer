@@ -14,9 +14,19 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// DELETE request on /api/stacks/:id?external=<external>&endpointId=<endpointId>
-// If the external query parameter is set to true, the id route variable is expected to be
-// the name of an external stack as a string.
+// @summary Delete a Stack
+// @description If the external query parameter is set to true, the id route variable is expected to be
+// @description the name of an external stack as a string.
+// @tags Stacks
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path string true "Stack Id"
+// @param external query boolean false "Provide if stack is external"
+// @param endpointId query int false "Endpoint Id"
+// @success 204
+// @failure 400,401,403,404,500
+// @router /stacks/{id} [delete]
 func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveRouteVariableValue(r, "id")
 	if err != nil {

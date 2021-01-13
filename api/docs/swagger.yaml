@@ -983,6 +983,31 @@ definitions:
       displayExternalContributors:
         type: boolean
     type: object
+  portainer.Stack:
+    properties:
+      EndpointId:
+        type: integer
+      EntryPoint:
+        type: string
+      Env:
+        items:
+          $ref: '#/definitions/portainer.Pair'
+        type: array
+      Id:
+        type: integer
+      Name:
+        type: string
+      ResourceControl:
+        $ref: '#/definitions/portainer.ResourceControl'
+      Status:
+        type: integer
+      SwarmId:
+        type: string
+      Type:
+        type: integer
+      projectPath:
+        type: string
+    type: object
   portainer.Status:
     properties:
       Version:
@@ -1368,6 +1393,82 @@ definitions:
       templatesURL:
         type: string
       userSessionTimeout:
+        type: string
+    type: object
+  stacks.stackFileResponse:
+    properties:
+      StackFileContent:
+        type: string
+    type: object
+  stacks.stackMigratePayload:
+    properties:
+      endpointID:
+        type: integer
+      name:
+        type: string
+      swarmID:
+        type: string
+    type: object
+  stacks.swarmStackFromFileContentPayload:
+    properties:
+      env:
+        items:
+          $ref: '#/definitions/portainer.Pair'
+        type: array
+      name:
+        type: string
+      stackFileContent:
+        type: string
+      swarmID:
+        type: string
+    type: object
+  stacks.swarmStackFromFileUploadPayload:
+    properties:
+      env:
+        items:
+          $ref: '#/definitions/portainer.Pair'
+        type: array
+      name:
+        type: string
+      stackFileContent:
+        items:
+          type: integer
+        type: array
+      swarmID:
+        type: string
+    type: object
+  stacks.swarmStackFromGitRepositoryPayload:
+    properties:
+      composeFilePathInRepository:
+        type: string
+      env:
+        items:
+          $ref: '#/definitions/portainer.Pair'
+        type: array
+      name:
+        type: string
+      repositoryAuthentication:
+        type: boolean
+      repositoryPassword:
+        type: string
+      repositoryReferenceName:
+        type: string
+      repositoryURL:
+        type: string
+      repositoryUsername:
+        type: string
+      swarmID:
+        type: string
+    type: object
+  stacks.updateSwarmStackPayload:
+    properties:
+      env:
+        items:
+          $ref: '#/definitions/portainer.Pair'
+        type: array
+      prune:
+        type: boolean
+      stackFileContent:
         type: string
     type: object
   status.inspectVersionResponse:
@@ -3278,6 +3379,331 @@ paths:
       summary: Inspect Public Settings
       tags:
       - Settings
+  /stacks:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - in: query
+        name: EndpointID
+        type: integer
+      - in: query
+        name: SwarmID
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/portainer.Stack'
+            type: array
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: List Stacks
+      tags:
+      - Stacks
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Creation Method
+        enum:
+        - file
+        - string
+        - repository
+        in: query
+        name: method
+        required: true
+        type: string
+      - description: Stack Type 1 - swarm, 2 - compose, 3 - kubernetes
+        enum:
+        - 1
+        - 2
+        - 3
+        in: query
+        name: type
+        required: true
+        type: integer
+      - description: Endpoint id
+        in: query
+        name: endpointId
+        required: true
+        type: integer
+      - description: Required when using method=string
+        in: body
+        name: body_string
+        required: true
+        schema:
+          $ref: '#/definitions/stacks.swarmStackFromFileContentPayload'
+      - description: Required when using method=file
+        in: body
+        name: body_file
+        required: true
+        schema:
+          $ref: '#/definitions/stacks.swarmStackFromFileUploadPayload'
+      - description: Required when using method=repository
+        in: body
+        name: body_repository
+        required: true
+        schema:
+          $ref: '#/definitions/stacks.swarmStackFromGitRepositoryPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.Stack'
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create a Stack
+      tags:
+      - Stacks
+  /stacks/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: |-
+        If the external query parameter is set to true, the id route variable is expected to be
+        the name of an external stack as a string.
+      parameters:
+      - description: Stack Id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Provide if stack is external
+        in: query
+        name: external
+        type: boolean
+      - description: Endpoint Id
+        in: query
+        name: endpointId
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.Stack'
+        "400":
+          description: ""
+        "403":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Inspect Stack
+      tags:
+      - Stacks
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Stack Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.Stack'
+        "400":
+          description: ""
+        "403":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Inspect Stack
+      tags:
+      - Stacks
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Stack Id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Endpoint Id
+        in: query
+        name: endpointId
+        type: integer
+      - description: Stack data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/stacks.updateSwarmStackPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.Stack'
+        "400":
+          description: ""
+        "403":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Inspect Stack
+      tags:
+      - Stacks
+  /stacks/{id}/file:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Stack Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/stacks.stackFileResponse'
+        "400":
+          description: ""
+        "403":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Inspect Stack's file
+      tags:
+      - Stacks
+  /stacks/{id}/migrate:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Stack Id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Endpoint Id
+        in: query
+        name: endpointId
+        type: integer
+      - description: Stack data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/stacks.stackMigratePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.Stack'
+        "400":
+          description: ""
+        "403":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Migrates a Stack to another endpoint
+      tags:
+      - Stacks
+  /stacks/{id}/start:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Stack Id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.Stack'
+        "400":
+          description: ""
+        "403":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Starts a stopped Stack
+      tags:
+      - Stacks
+  /stacks/{id}/stop:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Stack Id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.Stack'
+        "400":
+          description: ""
+        "403":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Stops a Stack
+      tags:
+      - Stacks
   /status:
     get:
       consumes:

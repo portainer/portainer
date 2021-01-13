@@ -29,7 +29,21 @@ func (handler *Handler) cleanUp(stack *portainer.Stack, doCleanUp *bool) error {
 	return nil
 }
 
-// POST request on /api/stacks?type=<type>&method=<method>&endpointId=<endpointId>
+// @summary Create a Stack
+// @description
+// @tags Stacks
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param method query string true "Creation Method" Enums(file,string,repository)
+// @param type query int true "Stack Type 1 - swarm, 2 - compose, 3 - kubernetes" Enums(1,2,3)
+// @param endpointId query int true "Endpoint id"
+// @param body_string body swarmStackFromFileContentPayload true "Required when using method=string"
+// @param body_file body swarmStackFromFileUploadPayload true "Required when using method=file"
+// @param body_repository body swarmStackFromGitRepositoryPayload true "Required when using method=repository"
+// @success 200 {object} portainer.Stack
+// @failure 400,403,409,500
+// @router /stacks [post]
 func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackType, err := request.RetrieveNumericQueryParameter(r, "type", false)
 	if err != nil {

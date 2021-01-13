@@ -7,7 +7,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
@@ -17,7 +17,16 @@ type stackFileResponse struct {
 	StackFileContent string `json:"StackFileContent"`
 }
 
-// GET request on /api/stacks/:id/file
+// @summary Inspect Stack's file
+// @description
+// @tags Stacks
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path int true "Stack Id"
+// @success 200 {object} stackFileResponse
+// @failure 400,403,404,500
+// @router /stacks/{id}/file [get]
 func (handler *Handler) stackFile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
