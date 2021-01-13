@@ -18,6 +18,7 @@ function isJSON(jsonString) {
 // This handler wrap the JSON objects in an array.
 // Used by the API in: Image push, Image create, Events query.
 export function jsonObjectsToArrayHandler(data) {
+  // catching empty data helps the function not to fail and prevents unwanted error message to user.
   if (!data) {
     return [];
   }
