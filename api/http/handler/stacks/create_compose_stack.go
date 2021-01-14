@@ -373,7 +373,7 @@ func (handler *Handler) deployComposeStack(config *composeStackDeploymentConfig)
 
 	handler.SwarmStackManager.Login(config.dockerhub, config.registries, config.endpoint)
 
-	err = handler.pickComposeStackManager().Up(config.stack, config.endpoint)
+	err = handler.ComposeStackManager.Up(config.stack, config.endpoint)
 	if err != nil {
 		return err
 	}

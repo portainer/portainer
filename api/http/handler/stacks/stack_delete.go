@@ -156,5 +156,5 @@ func (handler *Handler) deleteStack(stack *portainer.Stack, endpoint *portainer.
 		return handler.SwarmStackManager.Remove(stack, endpoint)
 	}
 
-	return handler.pickComposeStackManager().Down(stack, endpoint)
+	return handler.ComposeStackManager.Down(stack, endpoint)
 }

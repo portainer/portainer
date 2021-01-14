@@ -71,7 +71,12 @@ func initDataStore(dataStorePath string, fileService portainer.FileService) port
 	return store
 }
 
-func initComposeStackManager(dataStorePath string, reverseTunnelService portainer.ReverseTunnelService) portainer.ComposeStackManager {
+func initComposeStackManager(assetsPath string, dataStorePath string, reverseTunnelService portainer.ReverseTunnelService) portainer.ComposeStackManager {
+	composeWrapper := exec.NewComposeWrapper(assetsPath)
+	if composeWrapper != nil {
+		return composeWrapper
+	}
+
 	return libcompose.NewComposeStackManager(dataStorePath, reverseTunnelService)
 }
 
@@ -385,9 +390,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	composeStackManager := initComposeStackManager(*flags.Data, reverseTunnelService)
-
-	composeWrapper := exec.NewComposeWrapper(*flags.Assets)
+	composeStackManager := initComposeStackManager(*flags.Assets, *flags.Data, reverseTunnelService)
 
 	kubernetesDeployer := initKubernetesDeployer(*flags.Assets)
 
@@ -461,7 +464,6 @@ func main() {
 		DataStore:               dataStore,
 		SwarmStackManager:       swarmStackManager,
 		ComposeStackManager:     composeStackManager,
-		ComposeWrapper:          composeWrapper,
 		KubernetesDeployer:      kubernetesDeployer,
 		CryptoService:           cryptoService,
 		JWTService:              jwtService,

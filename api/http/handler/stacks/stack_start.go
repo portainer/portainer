@@ -79,7 +79,7 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 func (handler *Handler) startStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	switch stack.Type {
 	case portainer.DockerComposeStack:
-		return handler.pickComposeStackManager().Up(stack, endpoint)
+		return handler.ComposeStackManager.Up(stack, endpoint)
 	case portainer.DockerSwarmStack:
 		return handler.SwarmStackManager.Deploy(stack, true, endpoint)
 	}
