@@ -3,8 +3,20 @@ import { AccessControlFormData } from 'Portainer/components/accessControlForm/po
 
 class CreateCustomTemplateViewController {
   /* @ngInject */
-  constructor($async, $state, Authentication, CustomTemplateService, FormValidator, Notifications, ResourceControlService, StackService, StateManager) {
-    Object.assign(this, { $async, $state, Authentication, CustomTemplateService, FormValidator, Notifications, ResourceControlService, StackService, StateManager });
+  constructor($async, $state, $window, Authentication, ModalService, CustomTemplateService, FormValidator, Notifications, ResourceControlService, StackService, StateManager) {
+    Object.assign(this, {
+      $async,
+      $state,
+      $window,
+      Authentication,
+      ModalService,
+      CustomTemplateService,
+      FormValidator,
+      Notifications,
+      ResourceControlService,
+      StackService,
+      StateManager,
+    });
 
     this.formValues = {
       Title: '',
@@ -29,6 +41,7 @@ class CreateCustomTemplateViewController {
       actionInProgress: false,
       fromStack: false,
       loading: true,
+      isEditorDirty: false,
     };
     this.templates = [];
 
@@ -73,6 +86,7 @@ class CreateCustomTemplateViewController {
       await this.ResourceControlService.applyResourceControl(userId, accessControlData, customTemplate.ResourceControl);
 
       this.Notifications.success('Custom template successfully created');
+      this.state.isEditorDirty = false;
       this.$state.go('docker.templates.custom');
     } catch (err) {
       this.Notifications.error('Failure', err, 'A template with the same name already exists');
@@ -133,6 +147,7 @@ class CreateCustomTemplateViewController {
 
   editorUpdate(cm) {
     this.formValues.FileContent = cm.getValue();
+    this.state.isEditorDirty = true;
   }
 
   async $onInit() {
@@ -161,6 +176,27 @@ class CreateCustomTemplateViewController {
     }
 
     this.state.loading = false;
+
+    this.$window.onbeforeunload = () => {
+      if (this.state.Method === 'editor' && this.formValues.FileContent && this.state.isEditorDirty) {
+        return '';
+      }
+    };
+  }
+
+  async uiCanExit() {
+    if (this.state.Method === 'editor' && this.formValues.FileContent && this.state.isEditorDirty) {
+      return this.ModalService.confirmAsync({
+        title: 'Are you sure ?',
+        message: 'You currently have unsaved changes in the editor. Are you sure you want to leave?',
+        buttons: {
+          confirm: {
+            label: 'Yes',
+            className: 'btn-danger',
+          },
+        },
+      });
+    }
   }
 }
 

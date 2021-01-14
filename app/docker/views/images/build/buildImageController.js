@@ -1,14 +1,16 @@
 angular.module('portainer.docker').controller('BuildImageController', [
   '$scope',
-  '$state',
+  '$window',
+  'ModalService',
   'BuildService',
   'Notifications',
   'HttpRequestHelper',
-  function ($scope, $state, BuildService, Notifications, HttpRequestHelper) {
+  function ($scope, $window, ModalService, BuildService, Notifications, HttpRequestHelper) {
     $scope.state = {
       BuildType: 'editor',
       actionInProgress: false,
       activeTab: 0,
+      isEditorDirty: false,
     };
 
     $scope.formValues = {
@@ -18,6 +20,12 @@ angular.module('portainer.docker').controller('BuildImageController', [
       URL: '',
       Path: 'Dockerfile',
       NodeName: null,
+    };
+
+    $window.onbeforeunload = () => {
+      if ($scope.state.BuildType === 'editor' && $scope.formValues.DockerFileContent && $scope.state.isEditorDirty) {
+        return '';
+      }
     };
 
     $scope.addImageName = function () {
@@ -93,6 +101,22 @@ angular.module('portainer.docker').controller('BuildImageController', [
 
     $scope.editorUpdate = function (cm) {
       $scope.formValues.DockerFileContent = cm.getValue();
+      $scope.state.isEditorDirty = true;
+    };
+
+    this.uiCanExit = async function () {
+      if ($scope.state.BuildType === 'editor' && $scope.formValues.DockerFileContent && $scope.state.isEditorDirty) {
+        return ModalService.confirmAsync({
+          title: 'Are you sure ?',
+          message: 'You currently have unsaved changes in the editor. Are you sure you want to leave?',
+          buttons: {
+            confirm: {
+              label: 'Yes',
+              className: 'btn-danger',
+            },
+          },
+        });
+      }
     };
   },
 ]);
