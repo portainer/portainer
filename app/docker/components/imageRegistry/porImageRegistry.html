@@ -36,10 +36,13 @@
 <!-- don't use registry -->
 <div ng-if="!$ctrl.model.UseRegistry">
   <div class="form-group">
-    <label for="image_name" ng-class="$ctrl.labelClass" class="control-label text-left"
-      >Image
-      <portainer-tooltip position="bottom" message="Image and repository should be publicly available."></portainer-tooltip>
-    </label>
+    <span class="small">
+      <p class="text-muted" style="margin-left: 15px;">
+        <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+        When using advanced mode, image and repository <b>must be</b> publicly available.
+      </p>
+    </span>
+    <label for="image_name" ng-class="$ctrl.labelClass" class="control-label text-left">Image </label>
     <div ng-class="$ctrl.inputClass">
       <input type="text" class="form-control" ng-model="$ctrl.model.Image" name="image_name" placeholder="e.g. registry:port/myImage:myTag" required />
     </div>
