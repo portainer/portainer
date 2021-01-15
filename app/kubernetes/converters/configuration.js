@@ -10,7 +10,6 @@ class KubernetesConfigurationConverter {
     res.CreationDate = secret.CreationDate;
     res.Yaml = secret.Yaml;
     res.Data = secret.Data;
-    res.BinaryData = secret.BinaryData;
     res.ConfigurationOwner = secret.ConfigurationOwner;
     return res;
   }
@@ -24,7 +23,6 @@ class KubernetesConfigurationConverter {
     res.CreationDate = configMap.CreationDate;
     res.Yaml = configMap.Yaml;
     res.Data = configMap.Data;
-    res.BinaryData = configMap.BinaryData;
     res.ConfigurationOwner = configMap.ConfigurationOwner;
     return res;
   }

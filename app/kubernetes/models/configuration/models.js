@@ -1,4 +1,5 @@
 export const KubernetesPortainerConfigurationOwnerLabel = 'io.portainer.kubernetes.configuration.owner';
+export const KubernetesPortainerConfigurationDataAnnotation = 'io.portainer.kubernetes.configuration.data';
 
 /**
  * Configuration Model (Composite)
@@ -12,8 +13,7 @@ const _KubernetesConfiguration = Object.freeze({
   ConfigurationOwner: '',
   Used: false,
   Applications: [],
-  Data: {},
-  BinaryData: {},
+  Data: [],
 });
 
 export class KubernetesConfiguration {
@@ -26,3 +26,15 @@ export const KubernetesConfigurationTypes = Object.freeze({
   CONFIGMAP: 1,
   SECRET: 2,
 });
+
+const _KubernetesConfigurationEntry = Object.freeze({
+  Key: '',
+  Value: '',
+  IsBinary: false,
+});
+
+export class KubernetesConfigurationEntry {
+  constructor() {
+    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesConfigurationEntry)));
+  }
+}

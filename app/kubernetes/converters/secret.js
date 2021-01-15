@@ -1,9 +1,7 @@
 import { KubernetesSecretCreatePayload, KubernetesSecretUpdatePayload } from 'Kubernetes/models/secret/payloads';
 import { KubernetesApplicationSecret } from 'Kubernetes/models/secret/models';
-import YAML from 'yaml';
+import { KubernetesConfigurationEntry, KubernetesPortainerConfigurationDataAnnotation } from 'Kubernetes/models/configuration/models';
 import _ from 'lodash-es';
-import chardet from 'chardet';
-import { Base64 } from 'js-base64';
 import { KubernetesPortainerConfigurationOwnerLabel } from 'Kubernetes/models/configuration/models';
 
 class KubernetesSecretConverter {
@@ -13,8 +11,19 @@ class KubernetesSecretConverter {
     res.metadata.namespace = secret.Namespace;
     const configurationOwner = _.truncate(secret.configurationOwner, { length: 63, omission: '' });
     res.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] = configurationOwner;
-    res.stringData = secret.Data;
-    res.data = secret.BinaryData;
+
+    let annotation = '';
+    _.forEach(secret.Data, (entry) => {
+      if (entry.IsBinary) {
+        res.data[entry.Key] = entry.Value;
+        annotation += annotation !== '' ? '|' + entry.Key : entry.Key;
+      } else {
+        res.stringData[entry.Key] = entry.Value;
+      }
+    });
+    if (annotation !== '') {
+      res.metadata.annotations[KubernetesPortainerConfigurationDataAnnotation] = annotation;
+    }
     return res;
   }
 
@@ -23,8 +32,19 @@ class KubernetesSecretConverter {
     res.metadata.name = secret.Name;
     res.metadata.namespace = secret.Namespace;
     res.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] = secret.ConfigurationOwner;
-    res.stringData = secret.Data;
-    res.data = secret.BinaryData;
+
+    let annotation = '';
+    _.forEach(secret.Data, (entry) => {
+      if (entry.IsBinary) {
+        res.data[entry.Key] = entry.Value;
+        annotation += annotation !== '' ? '|' + entry.Key : entry.Key;
+      } else {
+        res.stringData[entry.Key] = entry.Value;
+      }
+    });
+    if (annotation !== '') {
+      res.metadata.annotations[KubernetesPortainerConfigurationDataAnnotation] = annotation;
+    }
     return res;
   }
 
@@ -37,14 +57,20 @@ class KubernetesSecretConverter {
     res.CreationDate = payload.metadata.creationTimestamp;
     res.Yaml = yaml ? yaml.data : '';
 
-    _.forEach(payload.data, (value, key) => {
-      const encoding = chardet.detect(Buffer.from(Base64.decode(value)));
-      if (_.includes(encoding, 'ISO') || _.includes(encoding, 'UTF-8')) {
-        res.Data[key] = value;
+    res.Data = _.map(payload.data, (value, key) => {
+      const annotations = payload.metadata.annotations ? payload.metadata.annotations[KubernetesPortainerConfigurationDataAnnotation] : '';
+      const entry = new KubernetesConfigurationEntry();
+      entry.Key = key;
+      entry.IsBinary = _.includes(annotations, entry.Key);
+
+      if (!entry.IsBinary) {
+        entry.Value = atob(value);
       } else {
-        res.BinaryData[key] = value;
+        entry.Value = value;
       }
+      return entry;
     });
+
     return res;
   }
 
@@ -53,18 +79,7 @@ class KubernetesSecretConverter {
     res.Name = formValues.Name;
     res.Namespace = formValues.ResourcePool.Namespace.Name;
     res.ConfigurationOwner = formValues.ConfigurationOwner;
-    if (formValues.IsSimple) {
-      res.Data = _.reduce(
-        formValues.Data,
-        (acc, entry) => {
-          acc[entry.Key] = entry.Value;
-          return acc;
-        },
-        {}
-      );
-    } else {
-      res.Data = YAML.parse(formValues.DataYaml);
-    }
+    res.Data = formValues.Data;
     return res;
   }
 }

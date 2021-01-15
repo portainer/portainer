@@ -1,5 +1,5 @@
 import angular from 'angular';
-import { KubernetesConfigurationFormValues, KubernetesConfigurationFormValuesDataEntry } from 'Kubernetes/models/configuration/formvalues';
+import { KubernetesConfigurationFormValues } from 'Kubernetes/models/configuration/formvalues';
 import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
@@ -215,30 +215,7 @@ class KubernetesConfigurationController {
       this.formValues.Id = this.configuration.Id;
       this.formValues.Name = this.configuration.Name;
       this.formValues.Type = this.configuration.Type;
-      this.formValues.Data = _.concat(
-        _.map(this.configuration.Data, (value, key) => {
-          if (this.configuration.Type === KubernetesConfigurationTypes.SECRET) {
-            value = atob(value);
-          }
-          this.formValues.DataYaml += key + ': ' + value + '\n';
-          const entry = new KubernetesConfigurationFormValuesDataEntry();
-          entry.Key = key;
-          entry.Value = value;
-          entry.IsBinary = false;
-          return entry;
-        }),
-        _.map(this.configuration.BinaryData, (value, key) => {
-          if (this.configuration.Type === KubernetesConfigurationTypes.SECRET) {
-            value = atob(value);
-          }
-          this.formValues.DataYaml += key + ': ' + value + '\n';
-          const entry = new KubernetesConfigurationFormValuesDataEntry();
-          entry.Key = key;
-          entry.Value = value;
-          entry.IsBinary = true;
-          return entry;
-        })
-      );
+      this.formValues.Data = this.configuration.Data;
       await this.getConfigurations();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');

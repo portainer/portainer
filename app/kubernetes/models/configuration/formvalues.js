@@ -19,18 +19,3 @@ export class KubernetesConfigurationFormValues {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesConfigurationFormValues)));
   }
 }
-
-/**
- * KubernetesConfigurationEntry Model
- */
-const _KubernetesConfigurationFormValuesDataEntry = Object.freeze({
-  Key: '',
-  Value: '',
-  IsBinary: false,
-});
-
-export class KubernetesConfigurationFormValuesDataEntry {
-  constructor() {
-    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesConfigurationFormValuesDataEntry)));
-  }
-}

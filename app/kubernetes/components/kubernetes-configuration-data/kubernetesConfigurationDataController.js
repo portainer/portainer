@@ -2,8 +2,9 @@ import angular from 'angular';
 import _ from 'lodash-es';
 import chardet from 'chardet';
 import { Base64 } from 'js-base64';
-import { KubernetesConfigurationFormValuesDataEntry } from 'Kubernetes/models/configuration/formvalues';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
+import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
+import { KubernetesConfigurationEntry } from 'Kubernetes/models/configuration/models';
 
 class KubernetesConfigurationDataController {
   /* @ngInject */
@@ -22,7 +23,7 @@ class KubernetesConfigurationDataController {
   }
 
   addEntry() {
-    this.formValues.Data.push(new KubernetesConfigurationFormValuesDataEntry());
+    this.formValues.Data.push(new KubernetesConfigurationEntry());
   }
 
   removeEntry(index) {
@@ -39,17 +40,20 @@ class KubernetesConfigurationDataController {
   }
 
   async onFileLoadAsync(event) {
-    const entry = new KubernetesConfigurationFormValuesDataEntry();
-    entry.Key = event.target.fileName;
+    const entry = new KubernetesConfigurationEntry();
     const encoding = chardet.detect(Buffer.from(event.target.result));
     const decoder = new TextDecoder(encoding);
-    if (_.includes(encoding, 'ISO') || _.includes(encoding, 'UTF-8')) {
+
+    entry.Key = event.target.fileName;
+    entry.IsBinary = KubernetesConfigurationHelper.isBinary(encoding);
+
+    if (!entry.IsBinary) {
       entry.Value = decoder.decode(event.target.result);
     } else {
       const stringValue = decoder.decode(event.target.result);
       entry.Value = Base64.encode(stringValue);
-      entry.IsBinary = true;
     }
+
     this.formValues.Data.push(entry);
     this.onChangeKey();
   }

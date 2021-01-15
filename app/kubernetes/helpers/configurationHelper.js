@@ -21,6 +21,10 @@ class KubernetesConfigurationHelper {
     return _.startsWith(config.Name, 'default-token-');
   }
 
+  static isBinary(encoding) {
+    return encoding !== '' && !_.includes(encoding, 'ISO') && !_.includes(encoding, 'UTF');
+  }
+
   static setConfigurationUsed(config) {
     config.Used = config.Applications && config.Applications.length !== 0;
   }
