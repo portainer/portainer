@@ -2,6 +2,7 @@ import angular from 'angular';
 import _ from 'lodash-es';
 import { KubernetesConfigurationFormValues } from 'Kubernetes/models/configuration/formvalues';
 import { KubernetesConfigurationTypes, KubernetesConfigurationEntry } from 'Kubernetes/models/configuration/models';
+import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 
 class KubernetesCreateConfigurationController {
   /* @ngInject */
@@ -41,6 +42,9 @@ class KubernetesCreateConfigurationController {
     try {
       this.state.actionInProgress = true;
       this.formValues.ConfigurationOwner = this.Authentication.getUserDetails().username;
+      if (!this.formValues.IsSimple) {
+        this.formValues.Data = KubernetesConfigurationHelper.parseYaml(this.formValues);
+      }
       await this.KubernetesConfigurationService.create(this.formValues);
       this.Notifications.success('Configuration succesfully created');
       this.$state.go('kubernetes.configurations');

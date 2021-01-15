@@ -1,5 +1,6 @@
-import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
+import { KubernetesConfigurationTypes, KubernetesConfigurationEntry } from 'Kubernetes/models/configuration/models';
 import _ from 'lodash-es';
+import YAML from 'yaml';
 
 class KubernetesConfigurationHelper {
   static getUsingApplications(config, applications) {
@@ -34,6 +35,31 @@ class KubernetesConfigurationHelper {
       config.Applications = KubernetesConfigurationHelper.getUsingApplications(config, applications);
       KubernetesConfigurationHelper.setConfigurationUsed(config);
     });
+  }
+
+  static parseYaml(formValues) {
+    YAML.defaultOptions.customTags = ['binary'];
+    const data = _.map(YAML.parse(formValues.DataYaml), (value, key) => {
+      const entry = new KubernetesConfigurationEntry();
+      entry.Key = key;
+      entry.Value = value;
+      const oldEntry = _.find(formValues.Data, { Key: entry.Key });
+      entry.IsBinary = oldEntry ? oldEntry.IsBinary : false;
+      return entry;
+    });
+    return data;
+  }
+
+  static parseData(formValues) {
+    const data = _.reduce(
+      formValues.Data,
+      (acc, entry) => {
+        acc[entry.Key] = entry.Value;
+        return acc;
+      },
+      {}
+    );
+    return YAML.stringify(data);
   }
 
   static isExternalConfiguration(configuration) {
