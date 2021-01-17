@@ -211,7 +211,7 @@ function shell_download_docker_binary(p, a) {
 
 function shell_download_docker_compose_binary(p, a) {
   var ps = { windows: 'win', darwin: 'mac' };
-  var as = { amd64: 'x86_64', arm: 'armhf', arm64: 'aarch64' };
+  var as = { arm: 'armhf', arm64: 'aarch64' };
   var ip = ps[p] === undefined ? p : ps[p];
   var ia = as[a] === undefined ? a : as[a];
   var binaryVersion = '<%= binaries.dockerComposeVersion %>';
