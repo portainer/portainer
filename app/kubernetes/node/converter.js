@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 
-import { KubernetesNode, KubernetesNodeDetails, KubernetesNodeTaint, KubernetesNodeAvailabilities } from 'Kubernetes/node/models';
+import { KubernetesNode, KubernetesNodeDetails, KubernetesNodeTaint, KubernetesNodeAvailabilities, KubernetesPortainerNodeDrainLabel } from 'Kubernetes/node/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import { KubernetesNodeFormValues, KubernetesNodeTaintFormValues, KubernetesNodeLabelFormValues } from 'Kubernetes/node/formValues';
 import { KubernetesNodeCreatePayload, KubernetesNodeTaintPayload } from 'Kubernetes/node/payload';
@@ -32,7 +32,7 @@ class KubernetesNodeConverter {
 
     res.Availability = KubernetesNodeAvailabilities.ACTIVE;
     if (data.spec.unschedulable === true) {
-      res.Availability = _.has(data.metadata.labels, 'io.portainer/node-status-drain') ? KubernetesNodeAvailabilities.DRAIN : KubernetesNodeAvailabilities.PAUSE;
+      res.Availability = _.has(data.metadata.labels, KubernetesPortainerNodeDrainLabel) ? KubernetesNodeAvailabilities.DRAIN : KubernetesNodeAvailabilities.PAUSE;
     }
 
     if (ready.status === 'False') {
@@ -142,9 +142,9 @@ class KubernetesNodeConverter {
     if (node.Availability !== KubernetesNodeAvailabilities.ACTIVE) {
       payload.spec.unschedulable = true;
       if (node.Availability === KubernetesNodeAvailabilities.DRAIN) {
-        payload.metadata.labels['io.portainer/node-status-drain'] = '';
+        payload.metadata.labels[KubernetesPortainerNodeDrainLabel] = '';
       } else {
-        delete payload.metadata.labels['io.portainer/node-status-drain'];
+        delete payload.metadata.labels[KubernetesPortainerNodeDrainLabel];
       }
     }
 

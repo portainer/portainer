@@ -1,3 +1,5 @@
+export const KubernetesPortainerNodeDrainLabel = 'io.portainer/node-status-drain';
+
 /**
  * KubernetesNode Model
  */
