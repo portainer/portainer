@@ -302,9 +302,12 @@ func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portai
 	}
 	filteredRegistries := security.FilterRegistries(registries, securityContext)
 
-	user, err := handler.UserService.User(securityContext.UserID)
-	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to load user information from the database", err}
+	var user *portainer.User
+	if !handler.authDisabled {
+		user, err = handler.UserService.User(securityContext.UserID)
+		if err != nil {
+			return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to load user information from the database", err}
+		}
 	}
 
 	config := &composeStackDeploymentConfig{
@@ -330,28 +333,29 @@ func (handler *Handler) deployComposeStack(config *composeStackDeploymentConfig)
 		return err
 	}
 
-	isAdminOrEndpointAdmin, err := handler.userIsAdminOrEndpointAdmin(config.user, config.endpoint.ID)
-	if err != nil {
-		return err
-	}
-
-	if (!settings.AllowBindMountsForRegularUsers ||
-		!settings.AllowPrivilegedModeForRegularUsers ||
-		!settings.AllowHostNamespaceForRegularUsers ||
-		!settings.AllowDeviceMappingForRegularUsers ||
-		!settings.AllowContainerCapabilitiesForRegularUsers) &&
-		!isAdminOrEndpointAdmin {
-
-		composeFilePath := path.Join(config.stack.ProjectPath, config.stack.EntryPoint)
-
-		stackContent, err := handler.FileService.GetFileContent(composeFilePath)
+	if !handler.authDisabled {
+		isAdminOrEndpointAdmin, err := handler.userIsAdminOrEndpointAdmin(config.user, config.endpoint.ID)
 		if err != nil {
 			return err
 		}
 
-		err = handler.isValidStackFile(stackContent, settings)
-		if err != nil {
-			return err
+		if (!settings.AllowBindMountsForRegularUsers ||
+			!settings.AllowPrivilegedModeForRegularUsers ||
+			!settings.AllowHostNamespaceForRegularUsers ||
+			!settings.AllowDeviceMappingForRegularUsers ||
+			!settings.AllowContainerCapabilitiesForRegularUsers) && !isAdminOrEndpointAdmin {
+
+			composeFilePath := path.Join(config.stack.ProjectPath, config.stack.EntryPoint)
+
+			stackContent, err := handler.FileService.GetFileContent(composeFilePath)
+			if err != nil {
+				return err
+			}
+
+			err = handler.isValidStackFile(stackContent, settings)
+			if err != nil {
+				return err
+			}
 		}
 	}
 

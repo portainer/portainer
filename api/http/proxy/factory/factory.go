@@ -6,7 +6,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
 )
 
@@ -32,6 +32,7 @@ type (
 		reverseTunnelService   portainer.ReverseTunnelService
 		extensionService       portainer.ExtensionService
 		dockerClientFactory    *docker.ClientFactory
+		authDisabled           bool
 	}
 
 	// ProxyFactoryParameters is used to create a new ProxyFactory
@@ -47,6 +48,7 @@ type (
 		ReverseTunnelService   portainer.ReverseTunnelService
 		ExtensionService       portainer.ExtensionService
 		DockerClientFactory    *docker.ClientFactory
+		AuthDisabled           bool
 	}
 )
 
@@ -64,6 +66,7 @@ func NewProxyFactory(parameters *ProxyFactoryParameters) *ProxyFactory {
 		reverseTunnelService:   parameters.ReverseTunnelService,
 		extensionService:       parameters.ExtensionService,
 		dockerClientFactory:    parameters.DockerClientFactory,
+		authDisabled:           parameters.AuthDisabled,
 	}
 }
 

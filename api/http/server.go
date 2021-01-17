@@ -104,6 +104,7 @@ func (server *Server) Start() error {
 		ReverseTunnelService:   server.ReverseTunnelService,
 		ExtensionService:       server.ExtensionService,
 		DockerClientFactory:    server.DockerClientFactory,
+		AuthDisabled:           server.AuthDisabled,
 	}
 	proxyManager := proxy.NewManager(proxyManagerParameters)
 
@@ -247,7 +248,7 @@ func (server *Server) Start() error {
 	settingsHandler.ExtensionService = server.ExtensionService
 	settingsHandler.AuthorizationService = authorizationService
 
-	var stackHandler = stacks.NewHandler(requestBouncer)
+	var stackHandler = stacks.NewHandler(requestBouncer, server.AuthDisabled)
 	stackHandler.FileService = server.FileService
 	stackHandler.StackService = server.StackService
 	stackHandler.EndpointService = server.EndpointService
