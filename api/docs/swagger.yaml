@@ -1678,19 +1678,16 @@ paths:
       - description: Required when using method=string
         in: body
         name: body_string
-        required: true
         schema:
           $ref: '#/definitions/customtemplates.customTemplateFromFileContentPayload'
       - description: Required when using method=file
         in: body
         name: body_file
-        required: true
         schema:
           $ref: '#/definitions/customtemplates.customTemplateFromFileUploadPayload'
       - description: Required when using method=repository
         in: body
         name: body_repository
-        required: true
         schema:
           $ref: '#/definitions/customtemplates.customTemplateFromGitRepositoryPayload'
       produces:
@@ -1885,6 +1882,10 @@ paths:
             type: array
         "500":
           description: ""
+        "503":
+          description: Service Unavailable
+          schema:
+            type: Edge
       security:
       - ApiKeyAuth: []
       summary: list EdgeGroups
@@ -1909,6 +1910,10 @@ paths:
             $ref: '#/definitions/portainer.EdgeGroup'
         "500":
           description: ""
+        "503":
+          description: Service Unavailable
+          schema:
+            type: Edge
       security:
       - ApiKeyAuth: []
       summary: Create an EdgeGroup
@@ -1931,6 +1936,10 @@ paths:
           description: ""
         "500":
           description: ""
+        "503":
+          description: Service Unavailable
+          schema:
+            type: Edge
       security:
       - ApiKeyAuth: []
       summary: Deletes an EdgeGroup
@@ -1954,6 +1963,10 @@ paths:
             $ref: '#/definitions/portainer.EdgeGroup'
         "500":
           description: ""
+        "503":
+          description: Service Unavailable
+          schema:
+            type: Edge
       security:
       - ApiKeyAuth: []
       summary: Inspects an EdgeGroup
@@ -1983,6 +1996,10 @@ paths:
             $ref: '#/definitions/portainer.EdgeGroup'
         "500":
           description: ""
+        "503":
+          description: Service Unavailable
+          schema:
+            type: Edge
       security:
       - ApiKeyAuth: []
       summary: Updates an EdgeGroup
@@ -2005,6 +2022,10 @@ paths:
           description: ""
         "500":
           description: ""
+        "503":
+          description: Service Unavailable
+          schema:
+            type: Edge
       security:
       - ApiKeyAuth: []
       summary: Fetch EdgeJobs list
@@ -2043,6 +2064,10 @@ paths:
             $ref: '#/definitions/portainer.EdgeGroup'
         "500":
           description: ""
+        "503":
+          description: Service Unavailable
+          schema:
+            type: Edge
       security:
       - ApiKeyAuth: []
       summary: Create an EdgeJob
@@ -2067,6 +2092,10 @@ paths:
           description: ""
         "500":
           description: ""
+        "503":
+          description: Service Unavailable
+          schema:
+            type: Edge
       security:
       - ApiKeyAuth: []
       summary: Delete an EdgeJob
@@ -2092,6 +2121,10 @@ paths:
           description: ""
         "500":
           description: ""
+        "503":
+          description: Service Unavailable
+          schema:
+            type: Edge
       security:
       - ApiKeyAuth: []
       summary: Inspect an EdgeJob
@@ -2123,6 +2156,10 @@ paths:
           description: ""
         "500":
           description: ""
+        "503":
+          description: Service Unavailable
+          schema:
+            type: Edge
       security:
       - ApiKeyAuth: []
       summary: Update an EdgeJob
@@ -2149,6 +2186,10 @@ paths:
           description: ""
         "500":
           description: ""
+        "503":
+          description: Service Unavailable
+          schema:
+            type: Edge
       security:
       - ApiKeyAuth: []
       summary: Fetch a file of an EdgeJob
@@ -2177,6 +2218,10 @@ paths:
           description: ""
         "500":
           description: ""
+        "503":
+          description: Service Unavailable
+          schema:
+            type: Edge
       security:
       - ApiKeyAuth: []
       summary: Fetch the list of tasks on an EdgeJob
@@ -2206,6 +2251,10 @@ paths:
           description: ""
         "500":
           description: ""
+        "503":
+          description: Service Unavailable
+          schema:
+            type: Edge
       security:
       - ApiKeyAuth: []
       summary: Clear the log for a specifc task on an EdgeJob
@@ -2236,6 +2285,10 @@ paths:
           description: ""
         "500":
           description: ""
+        "503":
+          description: Service Unavailable
+          schema:
+            type: Edge
       security:
       - ApiKeyAuth: []
       summary: Fetch the log for a specifc task on an EdgeJob
@@ -2264,6 +2317,10 @@ paths:
           description: ""
         "500":
           description: ""
+        "503":
+          description: Service Unavailable
+          schema:
+            type: Edge
       security:
       - ApiKeyAuth: []
       summary: Collect the log for a specifc task on an EdgeJob
@@ -2286,6 +2343,10 @@ paths:
           description: ""
         "500":
           description: ""
+        "503":
+          description: Service Unavailable
+          schema:
+            type: Edge
       security:
       - ApiKeyAuth: []
       summary: Fetches the list of EdgeStacks
@@ -2331,6 +2392,10 @@ paths:
             $ref: '#/definitions/portainer.EdgeStack'
         "500":
           description: ""
+        "503":
+          description: Service Unavailable
+          schema:
+            type: Edge
       security:
       - ApiKeyAuth: []
       summary: Create an EdgeStack
@@ -2355,6 +2420,10 @@ paths:
           description: ""
         "500":
           description: ""
+        "503":
+          description: Service Unavailable
+          schema:
+            type: Edge
       security:
       - ApiKeyAuth: []
       summary: Delete an EdgeStack
@@ -2380,6 +2449,10 @@ paths:
           description: ""
         "500":
           description: ""
+        "503":
+          description: Service Unavailable
+          schema:
+            type: Edge
       security:
       - ApiKeyAuth: []
       summary: Inspect an EdgeStack
@@ -2411,6 +2484,10 @@ paths:
           description: ""
         "500":
           description: ""
+        "503":
+          description: Service Unavailable
+          schema:
+            type: Edge
       security:
       - ApiKeyAuth: []
       summary: Update an EdgeStack
@@ -2437,12 +2514,45 @@ paths:
           description: ""
         "500":
           description: ""
+        "503":
+          description: Service Unavailable
+          schema:
+            type: Edge
       security:
       - ApiKeyAuth: []
       summary: Fetches the stack file for an EdgeStack
       tags:
       - EdgeStacks
-  /edgetemplates:
+  /edge_stacks/{id}/status:
+    put:
+      consumes:
+      - application/json
+      description: Authorized only if the request is done by an Edge Endpoint
+      parameters:
+      - description: EdgeStack Id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portainer.EdgeStack'
+        "400":
+          description: ""
+        "403":
+          description: ""
+        "404":
+          description: ""
+        "500":
+          description: ""
+      summary: Update an EdgeStack status
+      tags:
+      - EdgeStacks
+  /edge_templates:
     get:
       consumes:
       - application/json
@@ -2616,7 +2726,7 @@ paths:
       summary: Removes endpoint from an endpoint group
       tags:
       - EndpointGroups
-    post:
+    put:
       consumes:
       - application/json
       parameters:
@@ -2830,8 +2940,6 @@ paths:
           description: ""
         "500":
           description: ""
-      security:
-      - ApiKeyAuth: []
       summary: Inspect an EdgeJob Log
       tags:
       - Edge
@@ -2864,8 +2972,6 @@ paths:
           description: ""
         "500":
           description: ""
-      security:
-      - ApiKeyAuth: []
       summary: Inspect an Edge Stack for an Endpoint
       tags:
       - Edge

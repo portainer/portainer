@@ -189,7 +189,6 @@ var doc = `{
                         "description": "Required when using method=string",
                         "name": "body_string",
                         "in": "body",
-                        "required": true,
                         "schema": {
                             "$ref": "#/definitions/customtemplates.customTemplateFromFileContentPayload"
                         }
@@ -198,7 +197,6 @@ var doc = `{
                         "description": "Required when using method=file",
                         "name": "body_file",
                         "in": "body",
-                        "required": true,
                         "schema": {
                             "$ref": "#/definitions/customtemplates.customTemplateFromFileUploadPayload"
                         }
@@ -207,7 +205,6 @@ var doc = `{
                         "description": "Required when using method=repository",
                         "name": "body_repository",
                         "in": "body",
-                        "required": true,
                         "schema": {
                             "$ref": "#/definitions/customtemplates.customTemplateFromGitRepositoryPayload"
                         }
@@ -521,6 +518,12 @@ var doc = `{
                     },
                     "500": {
                         "description": ""
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "Edge"
+                        }
                     }
                 }
             },
@@ -560,6 +563,12 @@ var doc = `{
                     },
                     "500": {
                         "description": ""
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "Edge"
+                        }
                     }
                 }
             }
@@ -599,6 +608,12 @@ var doc = `{
                     },
                     "500": {
                         "description": ""
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "Edge"
+                        }
                     }
                 }
             },
@@ -645,6 +660,12 @@ var doc = `{
                     },
                     "500": {
                         "description": ""
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "Edge"
+                        }
                     }
                 }
             },
@@ -679,6 +700,12 @@ var doc = `{
                     },
                     "500": {
                         "description": ""
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "Edge"
+                        }
                     }
                 }
             }
@@ -715,6 +742,12 @@ var doc = `{
                     },
                     "500": {
                         "description": ""
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "Edge"
+                        }
                     }
                 }
             },
@@ -774,6 +807,12 @@ var doc = `{
                     },
                     "500": {
                         "description": ""
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "Edge"
+                        }
                     }
                 }
             }
@@ -816,6 +855,12 @@ var doc = `{
                     },
                     "500": {
                         "description": ""
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "Edge"
+                        }
                     }
                 }
             },
@@ -865,6 +910,12 @@ var doc = `{
                     },
                     "500": {
                         "description": ""
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "Edge"
+                        }
                     }
                 }
             },
@@ -902,6 +953,12 @@ var doc = `{
                     },
                     "500": {
                         "description": ""
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "Edge"
+                        }
                     }
                 }
             }
@@ -944,6 +1001,12 @@ var doc = `{
                     },
                     "500": {
                         "description": ""
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "Edge"
+                        }
                     }
                 }
             }
@@ -989,6 +1052,12 @@ var doc = `{
                     },
                     "500": {
                         "description": ""
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "Edge"
+                        }
                     }
                 }
             }
@@ -1038,6 +1107,12 @@ var doc = `{
                     },
                     "500": {
                         "description": ""
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "Edge"
+                        }
                     }
                 }
             },
@@ -1082,6 +1157,12 @@ var doc = `{
                     },
                     "500": {
                         "description": ""
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "Edge"
+                        }
                     }
                 }
             },
@@ -1126,6 +1207,12 @@ var doc = `{
                     },
                     "500": {
                         "description": ""
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "Edge"
+                        }
                     }
                 }
             }
@@ -1162,6 +1249,12 @@ var doc = `{
                     },
                     "500": {
                         "description": ""
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "Edge"
+                        }
                     }
                 }
             },
@@ -1231,6 +1324,12 @@ var doc = `{
                     },
                     "500": {
                         "description": ""
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "Edge"
+                        }
                     }
                 }
             }
@@ -1273,6 +1372,12 @@ var doc = `{
                     },
                     "500": {
                         "description": ""
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "Edge"
+                        }
                     }
                 }
             },
@@ -1322,6 +1427,12 @@ var doc = `{
                     },
                     "500": {
                         "description": ""
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "Edge"
+                        }
                     }
                 }
             },
@@ -1359,6 +1470,12 @@ var doc = `{
                     },
                     "500": {
                         "description": ""
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "Edge"
+                        }
                     }
                 }
             }
@@ -1401,11 +1518,61 @@ var doc = `{
                     },
                     "500": {
                         "description": ""
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "Edge"
+                        }
                     }
                 }
             }
         },
-        "/edgetemplates": {
+        "/edge_stacks/{id}/status": {
+            "put": {
+                "description": "Authorized only if the request is done by an Edge Endpoint",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "EdgeStacks"
+                ],
+                "summary": "Update an EdgeStack status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "EdgeStack Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.EdgeStack"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/edge_templates": {
             "get": {
                 "security": [
                     {
@@ -1638,7 +1805,7 @@ var doc = `{
             }
         },
         "/endpoint_groups/{id}/endpoints/{endpointId}": {
-            "post": {
+            "put": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -2015,11 +2182,6 @@ var doc = `{
         },
         "/endpoints/{id}/edge/jobs/{jobID}/logs": {
             "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -2062,11 +2224,6 @@ var doc = `{
         },
         "/endpoints/{id}/edge/stacks/{stackId}": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "consumes": [
                     "application/json"
                 ],
