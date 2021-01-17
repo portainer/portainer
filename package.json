@@ -15,7 +15,7 @@
     "url": "https://raw.githubusercontent.com/portainer/portainer/develop/LICENSE"
   }],
   "scripts": {
-    "build": "grunt clean:all && grunt build && yarn build:docs",
+    "build": "grunt clean:all && grunt build",
     "build:server": "grunt clean:server && grunt build:server",
     "build:client": "grunt clean:client && grunt build:client",
     "build:docs": "cd api && swag init -g ./http/handler/handler.go",
