@@ -8,7 +8,8 @@ import (
 type (
 	// AccessPolicy represent a policy that can be associated to a user or team
 	AccessPolicy struct {
-		RoleID RoleID `json:"RoleId"`
+		// Role identifier. Reference the role that will be associated to this access policy
+		RoleID RoleID `json:"RoleId" example:"1"`
 	}
 
 	// AgentPlatform represents a platform type for an Agent
@@ -85,9 +86,12 @@ type (
 	// DockerHub represents all the required information to connect and use the
 	// Docker Hub
 	DockerHub struct {
-		Authentication bool   `json:"Authentication"`
-		Username       string `json:"Username"`
-		Password       string `json:"Password,omitempty"`
+		// Is authentication against DockerHub enabled
+		Authentication bool `json:"Authentication" example:"true"`
+		// Username used to authenticate against the DockerHub
+		Username string `json:"Username" example:"user"`
+		// Password used to authenticate against the DockerHub
+		Password string `json:"Password,omitempty" example:"passwd"`
 	}
 
 	// DockerSnapshot represents a snapshot of a specific Docker endpoint at a specific time
@@ -199,26 +203,42 @@ type (
 	// to connect to it
 	Endpoint struct {
 		// Endpoint Identifier
-		ID                      EndpointID          `json:"Id" example:"1"`
-		Name                    string              `json:"Name"`
-		Type                    EndpointType        `json:"Type"`
-		URL                     string              `json:"URL"`
-		GroupID                 EndpointGroupID     `json:"GroupId"`
-		PublicURL               string              `json:"PublicURL"`
-		TLSConfig               TLSConfiguration    `json:"TLSConfig"`
-		Extensions              []EndpointExtension `json:"Extensions"`
-		AzureCredentials        AzureCredentials    `json:"AzureCredentials,omitempty"`
-		TagIDs                  []TagID             `json:"TagIds"`
-		Status                  EndpointStatus      `json:"Status"`
-		Snapshots               []DockerSnapshot    `json:"Snapshots"`
-		UserAccessPolicies      UserAccessPolicies  `json:"UserAccessPolicies"`
-		TeamAccessPolicies      TeamAccessPolicies  `json:"TeamAccessPolicies"`
-		EdgeID                  string              `json:"EdgeID,omitempty"`
-		EdgeKey                 string              `json:"EdgeKey"`
-		EdgeCheckinInterval     int                 `json:"EdgeCheckinInterval"`
-		Kubernetes              KubernetesData      `json:"Kubernetes"`
-		ComposeSyntaxMaxVersion string              `json:"ComposeSyntaxMaxVersion"`
-		SecuritySettings        EndpointSecuritySettings
+		ID EndpointID `json:"Id" example:"1"`
+		// Endpoint name
+		Name string `json:"Name" example:"my-endpoint"`
+		// Endpoint environment type. 1 for a Docker environment, 2 for an agent on Docker environment or 3 for an Azure environment.
+		Type EndpointType `json:"Type" example:"1"`
+		// URL or IP address of the Docker host associated to this endpoint
+		URL string `json:"URL" example:"docker.mydomain.tld:2375"`
+		// Endpoint group identifier
+		GroupID EndpointGroupID `json:"GroupId" example:"1"`
+		// URL or IP address where exposed containers will be reachable
+		PublicURL        string              `json:"PublicURL" example:"docker.mydomain.tld:2375"`
+		TLSConfig        TLSConfiguration    `json:"TLSConfig"`
+		Extensions       []EndpointExtension `json:"Extensions" example:""`
+		AzureCredentials AzureCredentials    `json:"AzureCredentials,omitempty" example:""`
+		// List of tag identifiers to which this endpoint is associated
+		TagIDs []TagID `json:"TagIds"`
+		// The status of the endpoint (1 - up, 2 - down)
+		Status EndpointStatus `json:"Status" example:"1"`
+		// List of snapshots
+		Snapshots []DockerSnapshot `json:"Snapshots" example:""`
+		// List of user identifiers authorized to connect to this endpoint
+		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
+		// List of team identifiers authorized to connect to this endpoint
+		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies" example:""`
+		// The identifier of the edge agent associated with this endpoint
+		EdgeID string `json:"EdgeID,omitempty" example:""`
+		// The key which is used to map the agent to Portainer
+		EdgeKey string `json:"EdgeKey" example:""`
+		// The default check in interval for edge agent (in seconds)
+		EdgeCheckinInterval int `json:"EdgeCheckinInterval" example:"5"`
+		// Associated Kubernetes data
+		Kubernetes KubernetesData `json:"Kubernetes" example:""`
+		// Maximum version of docker-compose
+		ComposeSyntaxMaxVersion string `json:"ComposeSyntaxMaxVersion" example:"3.8"`
+		// Endpoint specific security settings
+		SecuritySettings EndpointSecuritySettings
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
@@ -251,13 +271,16 @@ type (
 
 	// EndpointGroup represents a group of endpoints
 	EndpointGroup struct {
-		// EndpointGroup Identifier
-		ID                 EndpointGroupID    `json:"Id" example:"1"`
-		Name               string             `json:"Name"`
-		Description        string             `json:"Description"`
-		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
-		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
-		TagIDs             []TagID            `json:"TagIds"`
+		// Endpoint group Identifier
+		ID EndpointGroupID `json:"Id" example:"1"`
+		// Endpoint group name
+		Name string `json:"Name" example:"my-endpoint-group"`
+		// Description associated to the endpoint group
+		Description        string             `json:"Description" example:"Endpoint group description"`
+		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies" example:""`
+		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies" example:""`
+		// List of tags associated to this endpoint group
+		TagIDs []TagID `json:"TagIds"`
 
 		// Deprecated fields
 		Labels []Pair `json:"Labels"`
@@ -285,14 +308,22 @@ type (
 
 	// EndpointSecuritySettings represents settings for an endpoint
 	EndpointSecuritySettings struct {
-		AllowBindMountsForRegularUsers            bool `json:"allowBindMountsForRegularUsers"`
-		AllowPrivilegedModeForRegularUsers        bool `json:"allowPrivilegedModeForRegularUsers"`
-		AllowVolumeBrowserForRegularUsers         bool `json:"allowVolumeBrowserForRegularUsers"`
-		AllowHostNamespaceForRegularUsers         bool `json:"allowHostNamespaceForRegularUsers"`
-		AllowDeviceMappingForRegularUsers         bool `json:"allowDeviceMappingForRegularUsers"`
-		AllowStackManagementForRegularUsers       bool `json:"allowStackManagementForRegularUsers"`
-		AllowContainerCapabilitiesForRegularUsers bool `json:"allowContainerCapabilitiesForRegularUsers"`
-		EnableHostManagementFeatures              bool `json:"enableHostManagementFeatures"`
+		// Whether non-administrator should be able to use bind mounts when creating containers
+		AllowBindMountsForRegularUsers bool `json:"AllowBindMountsForRegularUsers" example:"false"`
+		// Whether non-administrator should be able to use privileged mode when creating containers
+		AllowPrivilegedModeForRegularUsers bool `json:"AllowPrivilegedModeForRegularUsers" example:"false"`
+		// Whether non-administrator should be able to browse volumes
+		AllowVolumeBrowserForRegularUsers bool `json:"AllowVolumeBrowserForRegularUsers" example:""`
+		// Whether non-administrator should be able to use the host pid
+		AllowHostNamespaceForRegularUsers bool `json:"AllowHostNamespaceForRegularUsers" example:""`
+		// Whether non-administrator should be able to use device mapping
+		AllowDeviceMappingForRegularUsers bool `json:"AllowDeviceMappingForRegularUsers" example:""`
+		// Whether non-administrator should be able to manage stacks
+		AllowStackManagementForRegularUsers bool `json:"AllowStackManagementForRegularUsers" example:""`
+		// Whether non-administrator should be able to use container capabilities
+		AllowContainerCapabilitiesForRegularUsers bool `json:"AllowContainerCapabilitiesForRegularUsers" example:""`
+		// Whether host management features are enabled
+		EnableHostManagementFeatures bool `json:"EnableHostManagementFeatures" example:""`
 	}
 
 	// EndpointType represents the type of an endpoint
@@ -397,15 +428,21 @@ type (
 
 	// LDAPSettings represents the settings used to connect to a LDAP server
 	LDAPSettings struct {
-		AnonymousMode       bool                      `json:"AnonymousMode"`
-		ReaderDN            string                    `json:"ReaderDN"`
-		Password            string                    `json:"Password,omitempty"`
-		URL                 string                    `json:"URL"`
-		TLSConfig           TLSConfiguration          `json:"TLSConfig"`
-		StartTLS            bool                      `json:"StartTLS"`
+		// Enable this option if the server is configured for Anonymous access. When enabled, ReaderDN and Password will not be used
+		AnonymousMode bool `json:"AnonymousMode" example:"true"`
+		// Account that will be used to search for users
+		ReaderDN string `json:"ReaderDN" example:"cn=readonly-account,dc=ldap,dc=domain,dc=tld"`
+		// Password of the account that will be used to search users
+		Password string `json:"Password,omitempty" example:"readonly-password"`
+		// URL or IP address of the LDAP server
+		URL       string           `json:"URL" example:"myldap.domain.tld:389"`
+		TLSConfig TLSConfiguration `json:"TLSConfig"`
+		// Whether LDAP connection should use StartTLS
+		StartTLS            bool                      `json:"StartTLS" example:"true"`
 		SearchSettings      []LDAPSearchSettings      `json:"SearchSettings"`
 		GroupSearchSettings []LDAPGroupSearchSettings `json:"GroupSearchSettings"`
-		AutoCreateUsers     bool                      `json:"AutoCreateUsers"`
+		// Automatically provision users and assign them to matching LDAP group names
+		AutoCreateUsers bool `json:"AutoCreateUsers" example:"true"`
 	}
 
 	// LicenseInformation represents information about an extension license
@@ -435,21 +472,27 @@ type (
 
 	// Pair defines a key/value string pair
 	Pair struct {
-		Name  string `json:"name"`
-		Value string `json:"value"`
+		Name  string `json:"name" example:"name"`
+		Value string `json:"value" example:"value"`
 	}
 
 	// Registry represents a Docker registry with all the info required
 	// to connect to it
 	Registry struct {
 		// Registry Identifier
-		ID                      RegistryID                       `json:"Id" example:"1"`
-		Type                    RegistryType                     `json:"Type"`
-		Name                    string                           `json:"Name"`
-		URL                     string                           `json:"URL"`
-		Authentication          bool                             `json:"Authentication"`
-		Username                string                           `json:"Username"`
-		Password                string                           `json:"Password,omitempty"`
+		ID RegistryID `json:"Id" example:"1"`
+		// Registry Type (1 - Quay, 2 - Azure, 3 - Custom, 4 - Gitlab)
+		Type RegistryType `json:"Type" enums:"1,2,3,4"`
+		// Registry Name
+		Name string `json:"Name" example:"my-registry"`
+		// URL or IP address of the Docker registry
+		URL string `json:"URL" example:"registry.mydomain.tld:2375"`
+		// Is authentication against this registry enabled
+		Authentication bool `json:"Authentication" example:"true"`
+		// Username used to authenticate against this registry
+		Username string `json:"Username" example:"registry user"`
+		// Password used to authenticate against this registry
+		Password                string                           `json:"Password,omitempty" example:"registry_password"`
 		ManagementConfiguration *RegistryManagementConfiguration `json:"ManagementConfiguration"`
 		Gitlab                  GitlabRegistryData               `json:"Gitlab"`
 		UserAccessPolicies      UserAccessPolicies               `json:"UserAccessPolicies"`
@@ -483,15 +526,22 @@ type (
 	// ResourceControl represent a reference to a Docker resource with specific access controls
 	ResourceControl struct {
 		// ResourceControl Identifier
-		ID                 ResourceControlID    `json:"Id" example:"1"`
-		ResourceID         string               `json:"ResourceId"`
-		SubResourceIDs     []string             `json:"SubResourceIds"`
-		Type               ResourceControlType  `json:"Type"`
-		UserAccesses       []UserResourceAccess `json:"UserAccesses"`
-		TeamAccesses       []TeamResourceAccess `json:"TeamAccesses"`
-		Public             bool                 `json:"Public"`
-		AdministratorsOnly bool                 `json:"AdministratorsOnly"`
-		System             bool                 `json:"System"`
+		ID ResourceControlID `json:"Id" example:"1"`
+		// Docker resource identifier on which access control will be applied.\
+		// In the case of a resource control applied to a stack, use the stack name as identifier
+		ResourceID string `json:"ResourceId" example:"617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08"`
+		// List of Docker resources that will inherit this access control
+		SubResourceIDs []string `json:"SubResourceIds" example:"617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08"`
+		// Type of Docker resource. Valid values are: 1- container, 2 -service
+		// 3 - volume, 4 - secret, 5 - stack, 6 - config or 7 - custom template
+		Type         ResourceControlType  `json:"Type" example:"1"`
+		UserAccesses []UserResourceAccess `json:"UserAccesses" example:""`
+		TeamAccesses []TeamResourceAccess `json:"TeamAccesses" example:""`
+		// Permit access to the associated resource to any user
+		Public bool `json:"Public" example:"true"`
+		// Permit access to resource only to admins
+		AdministratorsOnly bool `json:"AdministratorsOnly" example:"true"`
+		System             bool `json:"System" example:""`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 2
@@ -509,9 +559,12 @@ type (
 	// to a team.
 	Role struct {
 		// Role Identifier
-		ID             RoleID         `json:"Id" example:"1"`
-		Name           string         `json:"Name"`
-		Description    string         `json:"Description"`
+		ID RoleID `json:"Id" example:"1"`
+		// Role name
+		Name string `json:"Name" example:"HelpDesk"`
+		// Role description
+		Description string `json:"Description" example:"Read-only access of all resources in an endpoint"`
+		// Authorizations associated to a role
 		Authorizations Authorizations `json:"Authorizations"`
 		Priority       int            `json:"Priority"`
 	}
@@ -550,17 +603,26 @@ type (
 
 	// Settings represents the application settings
 	Settings struct {
-		LogoURL                   string               `json:"LogoURL"`
-		BlackListedLabels         []Pair               `json:"BlackListedLabels"`
-		AuthenticationMethod      AuthenticationMethod `json:"AuthenticationMethod"`
-		LDAPSettings              LDAPSettings         `json:"LDAPSettings"`
-		OAuthSettings             OAuthSettings        `json:"OAuthSettings"`
-		SnapshotInterval          string               `json:"SnapshotInterval"`
-		TemplatesURL              string               `json:"TemplatesURL"`
-		EdgeAgentCheckinInterval  int                  `json:"EdgeAgentCheckinInterval"`
-		EnableEdgeComputeFeatures bool                 `json:"EnableEdgeComputeFeatures"`
-		UserSessionTimeout        string               `json:"UserSessionTimeout"`
-		EnableTelemetry           bool                 `json:"EnableTelemetry"`
+		// URL to a logo that will be displayed on the login page as well as on top of the sidebar. Will use default Portainer logo when value is empty string
+		LogoURL string `json:"LogoURL" example:"https://mycompany.mydomain.tld/logo.png"`
+		// A list of label name & value that will be used to hide containers when querying containers
+		BlackListedLabels []Pair `json:"BlackListedLabels"`
+		// Active authentication method for the Portainer instance. Valid values are: 1 for internal, 2 for LDAP, or 3 for oauth
+		AuthenticationMethod AuthenticationMethod `json:"AuthenticationMethod" example:"1"`
+		LDAPSettings         LDAPSettings         `json:"LDAPSettings" example:""`
+		OAuthSettings        OAuthSettings        `json:"OAuthSettings" example:""`
+		// The interval in which endpoint snapshots are created
+		SnapshotInterval string `json:"SnapshotInterval" example:"5m"`
+		// URL to the templates that will be displayed in the UI when navigating to App Templates
+		TemplatesURL string `json:"TemplatesURL" example:"https://raw.githubusercontent.com/portainer/templates/master/templates.json"`
+		// The default check in interval for edge agent (in seconds)
+		EdgeAgentCheckinInterval int `json:"EdgeAgentCheckinInterval" example:"5"`
+		// Whether edge compute features are enabled
+		EnableEdgeComputeFeatures bool `json:"EnableEdgeComputeFeatures" example:""`
+		// The duration of a user session
+		UserSessionTimeout string `json:"UserSessionTimeout" example:"5m"`
+		// Whether telemetry is enabled
+		EnableTelemetry bool `json:"EnableTelemetry" example:"false"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
@@ -583,20 +645,33 @@ type (
 	// Stack represents a Docker stack created via docker stack deploy
 	Stack struct {
 		// Stack Identifier
-		ID              StackID          `json:"Id" example:"1"`
-		Name            string           `json:"Name"`
-		Type            StackType        `json:"Type"`
-		EndpointID      EndpointID       `json:"EndpointId"`
-		SwarmID         string           `json:"SwarmId"`
-		EntryPoint      string           `json:"EntryPoint"`
-		Env             []Pair           `json:"Env"`
-		ResourceControl *ResourceControl `json:"ResourceControl"`
-		Status          StackStatus      `json:"Status"`
-		CreationDate    int64
-		CreatedBy       string
-		UpdateDate      int64
-		UpdatedBy       string
-		ProjectPath     string
+		ID StackID `json:"Id" example:"1"`
+		// Stack name
+		Name string `json:"Name" example:"myStack"`
+		// Stack type. 1 for a Swarm stack, 2 for a Compose stack
+		Type StackType `json:"Type" example:"2"`
+		// Endpoint identifier. Reference the endpoint that will be used for deployment
+		EndpointID EndpointID `json:"EndpointId" example:"1"`
+		// Cluster identifier of the Swarm cluster where the stack is deployed
+		SwarmID string `json:"SwarmId" example:"jpofkc0i9uo9wtx1zesuk649w"`
+		// Path to the Stack file
+		EntryPoint string `json:"EntryPoint" example:"docker-compose.yml"`
+		// A list of environment variables used during stack deployment
+		Env []Pair `json:"Env" example:""`
+		//
+		ResourceControl *ResourceControl `json:"ResourceControl" example:""`
+		// Stack status (1 - active, 2 - inactive)
+		Status StackStatus `json:"Status" example:"1"`
+		// Path on disk to the repository hosting the Stack file
+		ProjectPath string `example:"/data/compose/myStack_jpofkc0i9uo9wtx1zesuk649w"`
+		// The date in unix time when stack was created
+		CreationDate int64 `example:"1587399600"`
+		// The username which created this stack
+		CreatedBy string `example:"admin"`
+		// The date in unix time when stack was last updated
+		UpdateDate int64 `example:"1587399600"`
+		// The username which last updated this stack
+		UpdatedBy string `example:"bob"`
 	}
 
 	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier)
@@ -619,8 +694,10 @@ type (
 		// Tag identifier
 		ID TagID `example:"1"`
 		// Tag name
-		Name           string                   `json:"Name" example:"org/acme"`
-		Endpoints      map[EndpointID]bool      `json:"Endpoints"`
+		Name string `json:"Name" example:"org/acme"`
+		// A set of endpoint ids that have this tag
+		Endpoints map[EndpointID]bool `json:"Endpoints"`
+		// A set of endpoint group ids that have this tag
 		EndpointGroups map[EndpointGroupID]bool `json:"EndpointGroups"`
 	}
 
@@ -667,58 +744,91 @@ type (
 	Template struct {
 		// Mandatory container/stack fields
 		// Template Identifier
-		ID                TemplateID   `json:"Id" example:"1"`
-		Type              TemplateType `json:"type"`
-		Title             string       `json:"title"`
-		Description       string       `json:"description"`
-		AdministratorOnly bool         `json:"administrator_only"`
+		ID TemplateID `json:"Id" example:"1"`
+		// Template type. Valid values are: 1 (container), 2 (Swarm stack) or 3 (Compose stack)
+		Type TemplateType `json:"type" example:"1"`
+		// Title of the template
+		Title string `json:"title" example:"Nginx"`
+		// Description of the template
+		Description string `json:"description" example:"High performance web server"`
+		// Whether the template should be available to administrators only
+		AdministratorOnly bool `json:"administrator_only" example:"true"`
 
 		// Mandatory container fields
-		Image string `json:"image"`
+		// Image associated to a container template. Mandatory for a container template
+		Image string `json:"image" example:"nginx:latest"`
 
 		// Mandatory stack fields
-		Repository TemplateRepository `json:"repository"`
+		Repository TemplateRepository `json:"repository" example:""`
 
 		// Mandatory Edge stack fields
+		// Stack file used for this template
 		StackFile string `json:"stackFile"`
 
 		// Optional stack/container fields
-		Name       string        `json:"name,omitempty"`
-		Logo       string        `json:"logo,omitempty"`
-		Env        []TemplateEnv `json:"env,omitempty"`
-		Note       string        `json:"note,omitempty"`
-		Platform   string        `json:"platform,omitempty"`
-		Categories []string      `json:"categories,omitempty"`
+		// Default name for the stack/container to be used on deployment
+		Name string `json:"name,omitempty" example:"mystackname"`
+		// URL of the template's logo
+		Logo string `json:"logo,omitempty" example:"https://cloudinovasi.id/assets/img/logos/nginx.png"`
+		// A list of environment variables used during the template deployment
+		Env []TemplateEnv `json:"env,omitempty"`
+		// A note that will be displayed in the UI. Supports HTML content
+		Note string `json:"note,omitempty" example:"This is my <b>custom</b> template"`
+		// Platform associated to the template.
+		// Valid values are: 'linux', 'windows' or leave empty for multi-platform
+		Platform string `json:"platform,omitempty" example:"linux"`
+		// A list of categories associated to the template
+		Categories []string `json:"categories,omitempty" example:"database"`
 
 		// Optional container fields
-		Registry      string           `json:"registry,omitempty"`
-		Command       string           `json:"command,omitempty"`
-		Network       string           `json:"network,omitempty"`
-		Volumes       []TemplateVolume `json:"volumes,omitempty"`
-		Ports         []string         `json:"ports,omitempty"`
-		Labels        []Pair           `json:"labels,omitempty"`
-		Privileged    bool             `json:"privileged,omitempty"`
-		Interactive   bool             `json:"interactive,omitempty"`
-		RestartPolicy string           `json:"restart_policy,omitempty"`
-		Hostname      string           `json:"hostname,omitempty"`
+		// The URL of a registry associated to the image for a container template
+		Registry string `json:"registry,omitempty" example:"quay.io"`
+		// The command that will be executed in a container template
+		Command string `json:"command,omitempty" example:"ls -lah"`
+		// Name of a network that will be used on container deployment if it exists inside the environment
+		Network string `json:"network,omitempty" example:"mynet"`
+		// A list of volumes used during the container template deployment
+		Volumes []TemplateVolume `json:"volumes,omitempty"`
+		// A list of ports exposed by the container
+		Ports []string `json:"ports,omitempty" example:"8080:80/tcp"`
+		// Container labels
+		Labels []Pair `json:"labels,omitempty" example:""`
+		// Whether the container should be started in privileged mode
+		Privileged bool `json:"privileged,omitempty" example:"true"`
+		// Whether the container should be started in
+		// interactive mode (-i -t equivalent on the CLI)
+		Interactive bool `json:"interactive,omitempty" example:"true"`
+		// Container restart policy
+		RestartPolicy string `json:"restart_policy,omitempty" example:"on-failure"`
+		// Container hostname
+		Hostname string `json:"hostname,omitempty" example:"mycontainer"`
 	}
 
 	// TemplateEnv represents a template environment variable configuration
 	TemplateEnv struct {
-		Name        string              `json:"name"`
-		Label       string              `json:"label,omitempty"`
-		Description string              `json:"description,omitempty"`
-		Default     string              `json:"default,omitempty"`
-		Preset      bool                `json:"preset,omitempty"`
-		Select      []TemplateEnvSelect `json:"select,omitempty"`
+		// name of the environment variable
+		Name string `json:"name" example:"MYSQL_ROOT_PASSWORD"`
+		// Text for the label that will be generated in the UI
+		Label string `json:"label,omitempty" example:"Root password"`
+		// Content of the tooltip that will be generated in the UI
+		Description string `json:"description,omitempty" example:"MySQL root account password"`
+		// Default value that will be set for the variable
+		Default string `json:"default,omitempty" example:"default_value"`
+		// If set to true, will not generate any input for this variable in the UI
+		Preset bool `json:"preset,omitempty" example:"false"`
+		// A list of name/value that will be used to generate a dropdown in the UI
+		Select []TemplateEnvSelect `json:"select,omitempty"`
 	}
 
 	// TemplateEnvSelect represents text/value pair that will be displayed as a choice for the
 	// template user
 	TemplateEnvSelect struct {
-		Text    string `json:"text"`
-		Value   string `json:"value"`
-		Default bool   `json:"default"`
+		// Some text that will displayed as a choice
+		Text string `json:"text" example:"text value"`
+		// A value that will be associated to the choice
+		Value string `json:"value" example:"value"`
+		// Will set this choice as the default choice
+		Default bool `json:"default" example:"false"`
 	}
 
 	// TemplateID represents a template identifier
@@ -726,8 +836,10 @@ type (
 
 	// TemplateRepository represents the git repository configuration for a template
 	TemplateRepository struct {
-		URL       string `json:"url"`
-		StackFile string `json:"stackfile"`
+		// URL of a git repository used to deploy a stack template. Mandatory for a Swarm/Compose stack template
+		URL string `json:"url" example:"https://github.com/portainer/portainer-compose"`
+		// Path to the stack file inside the git repository
+		StackFile string `json:"stackfile" example:"./subfolder/docker-compose.yml"`
 	}
 
 	// TemplateType represents the type of a template
@@ -735,9 +847,12 @@ type (
 
 	// TemplateVolume represents a template volume configuration
 	TemplateVolume struct {
-		Container string `json:"container"`
-		Bind      string `json:"bind,omitempty"`
-		ReadOnly  bool   `json:"readonly,omitempty"`
+		// Path inside the container
+		Container string `json:"container" example:"/data"`
+		// Path on the host
+		Bind string `json:"bind,omitempty" example:"/tmp"`
+		// Whether the volume used should be readonly
+		ReadOnly bool `json:"readonly,omitempty" example:"true"`
 	}
 
 	// TLSConfiguration represents a TLS configuration
@@ -1342,7 +1457,7 @@ const (
 	StackResourceControl
 	// ConfigResourceControl represents a resource control associated to a Docker config
 	ConfigResourceControl
-	// CustomTemplateResourceControl  represents a resource control associated to a custom template
+	// CustomTemplateResourceControl represents a resource control associated to a custom template
 	CustomTemplateResourceControl
 )
 
