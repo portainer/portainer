@@ -29,6 +29,7 @@ var doc = `{
     "paths": {
         "/auth": {
             "post": {
+                "description": "Use this endpoint to authenticate against Portainer using a username and password.",
                 "consumes": [
                     "application/json"
                 ],
@@ -39,10 +40,10 @@ var doc = `{
                     "auth"
                 ],
                 "summary": "Authenticate",
-                "operationId": "authenticate",
+                "operationId": "AuthenticateUser",
                 "parameters": [
                     {
-                        "description": "username and password",
+                        "description": "Credentials used for authentication",
                         "name": "body",
                         "in": "body",
                         "required": true,
@@ -53,10 +54,19 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Token",
+                        "description": "Success",
                         "schema": {
                             "$ref": "#/definitions/auth.authenticateResponse"
                         }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "422": {
+                        "description": "Invalid Credentials"
+                    },
+                    "500": {
+                        "description": "Server error"
                     }
                 }
             }
@@ -101,7 +111,7 @@ var doc = `{
                 "operationId": "authenticate_oauth",
                 "parameters": [
                     {
-                        "description": "OAuth code",
+                        "description": "OAuth Credentials used for authentication",
                         "name": "body",
                         "in": "body",
                         "required": true,
@@ -112,10 +122,19 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Token",
+                        "description": "Success",
                         "schema": {
                             "$ref": "#/definitions/auth.authenticateResponse"
                         }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "422": {
+                        "description": "Invalid Credentials"
+                    },
+                    "500": {
+                        "description": "Server error"
                     }
                 }
             }
@@ -420,16 +439,15 @@ var doc = `{
                         "jwt": []
                     }
                 ],
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "Use this endpoint to retrieve the information used to connect to the DockerHub\n**Access policy**: authenticated",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "dockerhub"
                 ],
-                "summary": "Gets the dockerhub settings",
+                "summary": "Retrieve DockerHub information",
+                "operationId": "DockerHubInspect",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -438,7 +456,7 @@ var doc = `{
                         }
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             },
@@ -448,6 +466,7 @@ var doc = `{
                         "jwt": []
                     }
                 ],
+                "description": "Use this endpoint to update the information used to connect to the DockerHub\n**Access policy**: administrator",
                 "consumes": [
                     "application/json"
                 ],
@@ -457,10 +476,11 @@ var doc = `{
                 "tags": [
                     "dockerhub"
                 ],
-                "summary": "Updates the dockerhub settings",
+                "summary": "Update DockerHub information",
+                "operationId": "DockerHubUpdate",
                 "parameters": [
                     {
-                        "description": "DockerHub settings",
+                        "description": "DockerHub information",
                         "name": "body",
                         "in": "body",
                         "required": true,
@@ -471,10 +491,13 @@ var doc = `{
                 ],
                 "responses": {
                     "204": {
-                        "description": ""
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Invalid request"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             }
@@ -1614,9 +1637,7 @@ var doc = `{
                         "jwt": []
                     }
                 ],
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "List all endpoint groups based on the current user authorizations. Will\nreturn all endpoint groups if using an administrator account otherwise it will\nonly return authorized endpoint groups.\n**Access policy**: restricted",
                 "produces": [
                     "application/json"
                 ],
@@ -1624,6 +1645,7 @@ var doc = `{
                     "endpoint_groups"
                 ],
                 "summary": "List Endpoint groups",
+                "operationId": "EndpointGroupList",
                 "responses": {
                     "200": {
                         "description": "Endpoint group",
@@ -1634,11 +1656,8 @@ var doc = `{
                             }
                         }
                     },
-                    "400": {
-                        "description": ""
-                    },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             },
@@ -1648,6 +1667,7 @@ var doc = `{
                         "jwt": []
                     }
                 ],
+                "description": "Create a new endpoint group.\n**Access policy**: administrator",
                 "consumes": [
                     "application/json"
                 ],
@@ -1657,10 +1677,10 @@ var doc = `{
                 "tags": [
                     "endpoint_groups"
                 ],
-                "summary": "Creates an Endpoint Group",
+                "summary": "Create an Endpoint Group",
                 "parameters": [
                     {
-                        "description": "endpoint group data",
+                        "description": "Endpoint Group details",
                         "name": "body",
                         "in": "body",
                         "required": true,
@@ -1671,16 +1691,16 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Endpoint group",
+                        "description": "Success",
                         "schema": {
                             "$ref": "#/definitions/portainer.EndpointGroup"
                         }
                     },
                     "400": {
-                        "description": ""
+                        "description": "Invalid request"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             }
@@ -1692,6 +1712,7 @@ var doc = `{
                         "jwt": []
                     }
                 ],
+                "description": "Retrieve details abont an endpoint group.\n**Access policy**: administrator",
                 "consumes": [
                     "application/json"
                 ],
@@ -1705,7 +1726,7 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "endpoint group id",
+                        "description": "Endpoint group identifier",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1713,16 +1734,19 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Endpoint group",
+                        "description": "Success",
                         "schema": {
                             "$ref": "#/definitions/portainer.EndpointGroup"
                         }
                     },
                     "400": {
-                        "description": ""
+                        "description": "Invalid request"
+                    },
+                    "404": {
+                        "description": "EndpointGroup not found"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             },
@@ -1732,6 +1756,7 @@ var doc = `{
                         "jwt": []
                     }
                 ],
+                "description": "Update an endpoint group.\n**Access policy**: administrator",
                 "consumes": [
                     "application/json"
                 ],
@@ -1741,28 +1766,41 @@ var doc = `{
                 "tags": [
                     "endpoint_groups"
                 ],
-                "summary": "Update Endpoint group",
+                "summary": "Update an endpoint group",
+                "operationId": "EndpointGroupUpdate",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "endpoint group id",
+                        "description": "EndpointGroup identifier",
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "EndpointGroup details",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/endpointgroups.endpointGroupUpdatePayload"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Endpoint group",
+                        "description": "Success",
                         "schema": {
                             "$ref": "#/definitions/portainer.EndpointGroup"
                         }
                     },
                     "400": {
-                        "description": ""
+                        "description": "Invalid request"
+                    },
+                    "404": {
+                        "description": "EndpointGroup not found"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             }
@@ -1774,6 +1812,7 @@ var doc = `{
                         "jwt": []
                     }
                 ],
+                "description": "Remove an endpoint group.\n**Access policy**: administrator",
                 "consumes": [
                     "application/json"
                 ],
@@ -1783,11 +1822,12 @@ var doc = `{
                 "tags": [
                     "endpoint_groups"
                 ],
-                "summary": "Deletes an Endpoint Group",
+                "summary": "Remove an endpoint group",
+                "operationId": "EndpointGroupDelete",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Endpoint Group Id",
+                        "description": "EndpointGroup identifier",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1795,13 +1835,16 @@ var doc = `{
                 ],
                 "responses": {
                     "204": {
-                        "description": ""
+                        "description": "Success"
                     },
                     "400": {
-                        "description": ""
+                        "description": "Invalid request"
+                    },
+                    "404": {
+                        "description": "EndpointGroup not found"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             }
@@ -1813,27 +1856,23 @@ var doc = `{
                         "jwt": []
                     }
                 ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
+                "description": "Add an endpoint to an endpoint group\n**Access policy**: administrator",
                 "tags": [
                     "endpoint_groups"
                 ],
-                "summary": "Attach an endpoint to an endpoint group",
+                "summary": "Add an endpoint to an endpoint group",
+                "operationId": "EndpointGroupAddEndpoint",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "endpoint group id",
+                        "description": "EndpointGroup identifier",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "integer",
-                        "description": "endpoint id",
+                        "description": "Endpoint identifier",
                         "name": "endpointId",
                         "in": "path",
                         "required": true
@@ -1841,16 +1880,16 @@ var doc = `{
                 ],
                 "responses": {
                     "204": {
-                        "description": ""
+                        "description": "Success"
                     },
                     "400": {
-                        "description": ""
+                        "description": "Invalid request"
                     },
                     "404": {
-                        "description": ""
+                        "description": "EndpointGroup not found"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             },
@@ -1860,27 +1899,23 @@ var doc = `{
                         "jwt": []
                     }
                 ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
+                "description": "**Access policy**: administrator",
                 "tags": [
                     "endpoint_groups"
                 ],
                 "summary": "Removes endpoint from an endpoint group",
+                "operationId": "EndpointGroupDeleteEndpoint",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "endpoint group id",
+                        "description": "EndpointGroup identifier",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "integer",
-                        "description": "endpoint id",
+                        "description": "Endpoint identifier",
                         "name": "endpointId",
                         "in": "path",
                         "required": true
@@ -1888,16 +1923,16 @@ var doc = `{
                 ],
                 "responses": {
                     "204": {
-                        "description": ""
+                        "description": "Success"
                     },
                     "400": {
-                        "description": ""
+                        "description": "Invalid request"
                     },
                     "404": {
-                        "description": ""
+                        "description": "EndpointGroup not found"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             }
@@ -1909,9 +1944,7 @@ var doc = `{
                         "jwt": []
                     }
                 ],
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "List all endpoints based on the current user authorizations. Will\nreturn all endpoints if using an administrator account otherwise it will\nonly return authorized endpoints.\n**Access policy**: restricted",
                 "produces": [
                     "application/json"
                 ],
@@ -1919,6 +1952,7 @@ var doc = `{
                     "endpoints"
                 ],
                 "summary": "List endpoints",
+                "operationId": "EndpointList",
                 "parameters": [
                     {
                         "type": "integer",
@@ -1985,11 +2019,11 @@ var doc = `{
                             }
                         }
                     },
-                    "400": {
-                        "description": ""
-                    },
                     "500": {
-                        "description": ""
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "Server"
+                        }
                     }
                 }
             },
@@ -1999,8 +2033,9 @@ var doc = `{
                         "jwt": []
                     }
                 ],
+                "description": "Create a new endpoint that will be used to manage an environment.\n**Access policy**: administrator",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -2008,30 +2043,123 @@ var doc = `{
                 "tags": [
                     "endpoints"
                 ],
-                "summary": "Creates an endpoint",
+                "summary": "Create a new endpoint",
+                "operationId": "EndpointCreate",
                 "parameters": [
                     {
-                        "description": "endpoint data",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/endpoints.endpointCreatePayload"
-                        }
+                        "type": "string",
+                        "description": "Name that will be used to identify this endpoint (example: my-endpoint)",
+                        "name": "Name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Environment type. Value must be one of: 1 (Local Docker environment), 2 (Agent environment), 3 (Azure environment), 4 (Edge agent environment) or 5 (Local Kubernetes Environment",
+                        "name": "EndpointType",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "URL or IP address of a Docker host (example: docker.mydomain.tld:2375). Defaults to local if not specified (Linux: /var/run/docker.sock, Windows: //./pipe/docker_engine)",
+                        "name": "URL",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "URL or IP address where exposed containers will be reachable. Defaults to URL if not specified (example: docker.mydomain.tld:2375)",
+                        "name": "PublicURL",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Endpoint group identifier. If not specified will default to 1 (unassigned).",
+                        "name": "GroupID",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Require TLS to connect against this endpoint",
+                        "name": "TLS",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Skip server verification when using TLS",
+                        "name": "TLSSkipVerify",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Skip client verification when using TLS",
+                        "name": "TLSSkipClientVerify",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "TLS CA certificate file",
+                        "name": "TLSCACertFile",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "TLS client certificate file",
+                        "name": "TLSCertFile",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "TLS client key file",
+                        "name": "TLSKeyFile",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Azure application ID. Required if endpoint type is set to 3",
+                        "name": "AzureApplicationID",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Azure tenant ID. Required if endpoint type is set to 3",
+                        "name": "AzureTenantID",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Azure authentication key. Required if endpoint type is set to 3",
+                        "name": "AzureAuthenticationKey",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "description": "List of tag identifiers to which this endpoint is associated",
+                        "name": "TagIDs",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "The check in interval for edge agent (in seconds)",
+                        "name": "EdgeCheckinInterval",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Endpoint",
+                        "description": "Success",
                         "schema": {
                             "$ref": "#/definitions/portainer.Endpoint"
                         }
                     },
                     "400": {
-                        "description": ""
+                        "description": "Invalid request"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             }
@@ -2043,22 +2171,18 @@ var doc = `{
                         "jwt": []
                     }
                 ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
+                "description": "Snapshot all endpoints\n**Access policy**: administrator",
                 "tags": [
                     "endpoints"
                 ],
                 "summary": "Snapshot all endpoints",
+                "operationId": "EndpointSnapshots",
                 "responses": {
                     "204": {
-                        "description": ""
+                        "description": "Success"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server Error"
                     }
                 }
             }
@@ -2070,20 +2194,19 @@ var doc = `{
                         "jwt": []
                     }
                 ],
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "Retrieve details about an endpoint.\n**Access policy**: restricted",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "endpoints"
                 ],
-                "summary": "Inspects an endpoint",
+                "summary": "Inspect an endpoint",
+                "operationId": "EndpointInspect",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "endpoint id",
+                        "description": "Endpoint identifier",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -2091,16 +2214,19 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Endpoint",
+                        "description": "Success",
                         "schema": {
                             "$ref": "#/definitions/portainer.Endpoint"
                         }
                     },
                     "400": {
-                        "description": ""
+                        "description": "Invalid request"
+                    },
+                    "404": {
+                        "description": "Endpoint not found"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             },
@@ -2110,6 +2236,7 @@ var doc = `{
                         "jwt": []
                     }
                 ],
+                "description": "Update an endpoint.\n**Access policy**: administrator",
                 "consumes": [
                     "application/json"
                 ],
@@ -2119,28 +2246,41 @@ var doc = `{
                 "tags": [
                     "endpoints"
                 ],
-                "summary": "Updates an endpoint",
+                "summary": "Update an endpoint",
+                "operationId": "EndpointUpdate",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "endpoint id",
+                        "description": "Endpoint identifier",
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "Endpoint details",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/endpoints.endpointUpdatePayload"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Endpoint",
+                        "description": "Success",
                         "schema": {
                             "$ref": "#/definitions/portainer.Endpoint"
                         }
                     },
                     "400": {
-                        "description": ""
+                        "description": "Invalid request"
+                    },
+                    "404": {
+                        "description": "Endpoint not found"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             },
@@ -2150,20 +2290,16 @@ var doc = `{
                         "jwt": []
                     }
                 ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
+                "description": "Remove an endpoint.\n**Access policy**: administrator",
                 "tags": [
                     "endpoints"
                 ],
-                "summary": "Deletes an endpoint",
+                "summary": "Remove an endpoint",
+                "operationId": "EndpointDelete",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "endpoint id",
+                        "description": "Endpoint identifier",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -2171,13 +2307,16 @@ var doc = `{
                 ],
                 "responses": {
                     "204": {
-                        "description": ""
+                        "description": "Success"
                     },
                     "400": {
-                        "description": ""
+                        "description": "Invalid request"
+                    },
+                    "404": {
+                        "description": "Endpoint not found"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             }
@@ -2386,20 +2525,16 @@ var doc = `{
                         "jwt": []
                     }
                 ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
+                "description": "Snapshots an endpoint\n**Access policy**: restricted",
                 "tags": [
                     "endpoints"
                 ],
                 "summary": "Snapshots an endpoint",
+                "operationId": "EndpointSnapshot",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "endpoint id",
+                        "description": "Endpoint identifier",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -2407,16 +2542,16 @@ var doc = `{
                 ],
                 "responses": {
                     "204": {
-                        "description": ""
+                        "description": "Success"
                     },
                     "400": {
-                        "description": ""
+                        "description": "Invalid request"
                     },
                     "404": {
-                        "description": ""
+                        "description": "Endpoint not found"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             }
@@ -2428,21 +2563,16 @@ var doc = `{
                         "jwt": []
                     }
                 ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
+                "description": "Endpoint for edge agent to check status of environment\n**Access policy**: restricted only to Edge endpoints",
                 "tags": [
-                    "endpoints",
-                    "edge"
+                    "endpoints"
                 ],
-                "summary": "Get endpoint status (for edge)",
+                "summary": "Get endpoint status",
+                "operationId": "EndpointStatusInspect",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Endpoint ID",
+                        "description": "Endpoint identifier",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -2450,19 +2580,22 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success",
                         "schema": {
                             "$ref": "#/definitions/endpoints.endpointStatusInspectResponse"
                         }
                     },
+                    "400": {
+                        "description": "Invalid request"
+                    },
                     "403": {
-                        "description": ""
+                        "description": "Permission denied to access endpoint"
                     },
                     "404": {
-                        "description": ""
+                        "description": "Endpoint not found"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             }
@@ -5087,12 +5220,20 @@ var doc = `{
     "definitions": {
         "auth.authenticatePayload": {
             "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
             "properties": {
                 "password": {
-                    "type": "string"
+                    "description": "Password",
+                    "type": "string",
+                    "example": "mypassword"
                 },
                 "username": {
-                    "type": "string"
+                    "description": "Username",
+                    "type": "string",
+                    "example": "admin"
                 }
             }
         },
@@ -5100,7 +5241,9 @@ var doc = `{
             "type": "object",
             "properties": {
                 "jwt": {
-                    "type": "string"
+                    "description": "JWT token used to authenticate against the API",
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGUiOjEsImV4cCI6MTQ5OTM3NjE1NH0.NJ6vE8FY1WG6jsRQzfMqeatJ4vh2TWAeeYfDhP71YEE"
                 }
             }
         },
@@ -5108,6 +5251,7 @@ var doc = `{
             "type": "object",
             "properties": {
                 "code": {
+                    "description": "OAuth code returned from OAuth Provided",
                     "type": "string"
                 }
             }
@@ -5244,15 +5388,26 @@ var doc = `{
         },
         "dockerhub.dockerhubUpdatePayload": {
             "type": "object",
+            "required": [
+                "authentication",
+                "password",
+                "username"
+            ],
             "properties": {
                 "authentication": {
-                    "type": "boolean"
+                    "description": "Enable authentication against DockerHub",
+                    "type": "boolean",
+                    "example": false
                 },
                 "password": {
-                    "type": "string"
+                    "description": "Password used to authenticate against the DockerHub",
+                    "type": "string",
+                    "example": "hub_password"
                 },
                 "username": {
-                    "type": "string"
+                    "description": "Username used to authenticate against the DockerHub",
+                    "type": "string",
+                    "example": "hub_user"
                 }
             }
         },
@@ -5535,26 +5690,77 @@ var doc = `{
         },
         "endpointgroups.endpointGroupCreatePayload": {
             "type": "object",
+            "required": [
+                "name"
+            ],
             "properties": {
                 "associatedEndpoints": {
+                    "description": "List of endpoint identifiers that will be part of this group",
                     "type": "array",
                     "items": {
                         "type": "integer"
-                    }
+                    },
+                    "example": [
+                        1,
+                        3
+                    ]
                 },
                 "description": {
-                    "type": "string"
+                    "description": "Endpoint group description",
+                    "type": "string",
+                    "example": "description"
                 },
                 "name": {
-                    "type": "string"
+                    "description": "Endpoint group name",
+                    "type": "string",
+                    "example": "my-endpoint-group"
                 },
                 "tagIDs": {
+                    "description": "List of tag identifiers to which this endpoint group is associated",
                     "type": "array",
                     "items": {
                         "description": "Tag identifier",
                         "type": "integer",
                         "example": 1
-                    }
+                    },
+                    "example": [
+                        1,
+                        2
+                    ]
+                }
+            }
+        },
+        "endpointgroups.endpointGroupUpdatePayload": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "description": "Endpoint group description",
+                    "type": "string",
+                    "example": "description"
+                },
+                "name": {
+                    "description": "Endpoint group name",
+                    "type": "string",
+                    "example": "my-endpoint-group"
+                },
+                "tagIDs": {
+                    "description": "List of tag identifiers associated to the endpoint group",
+                    "type": "array",
+                    "items": {
+                        "description": "Tag identifier",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "example": [
+                        3,
+                        4
+                    ]
+                },
+                "teamAccessPolicies": {
+                    "$ref": "#/definitions/portainer.TeamAccessPolicies"
+                },
+                "userAccessPolicies": {
+                    "$ref": "#/definitions/portainer.UserAccessPolicies"
                 }
             }
         },
@@ -5562,86 +5768,29 @@ var doc = `{
             "type": "object",
             "properties": {
                 "CollectLogs": {
-                    "type": "boolean"
+                    "description": "Whether to collect logs",
+                    "type": "boolean",
+                    "example": true
                 },
                 "CronExpression": {
-                    "type": "string"
+                    "description": "A cron expression to schedule this job",
+                    "type": "string",
+                    "example": "* * * * *"
                 },
                 "Id": {
-                    "type": "integer"
+                    "description": "EdgeJob Identifier",
+                    "type": "integer",
+                    "example": 2
                 },
                 "Script": {
-                    "type": "string"
+                    "description": "Script to run",
+                    "type": "string",
+                    "example": "echo hello"
                 },
                 "Version": {
-                    "type": "integer"
-                }
-            }
-        },
-        "endpoints.endpointCreatePayload": {
-            "type": "object",
-            "properties": {
-                "azureApplicationID": {
-                    "type": "string"
-                },
-                "azureAuthenticationKey": {
-                    "type": "string"
-                },
-                "azureTenantID": {
-                    "type": "string"
-                },
-                "edgeCheckinInterval": {
-                    "type": "integer"
-                },
-                "endpointCreationType": {
-                    "type": "integer"
-                },
-                "groupID": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "publicURL": {
-                    "type": "string"
-                },
-                "tagIDs": {
-                    "type": "array",
-                    "items": {
-                        "description": "Tag identifier",
-                        "type": "integer",
-                        "example": 1
-                    }
-                },
-                "tls": {
-                    "type": "boolean"
-                },
-                "tlscacertFile": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "tlscertFile": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "tlskeyFile": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "tlsskipClientVerify": {
-                    "type": "boolean"
-                },
-                "tlsskipVerify": {
-                    "type": "boolean"
-                },
-                "url": {
-                    "type": "string"
+                    "description": "Version of this EdgeJob",
+                    "type": "integer",
+                    "example": 2
                 }
             }
         },
@@ -5660,28 +5809,124 @@ var doc = `{
             "type": "object",
             "properties": {
                 "checkin": {
-                    "type": "integer"
+                    "description": "The current value of CheckinInterval",
+                    "type": "integer",
+                    "example": 5
                 },
                 "credentials": {
                     "type": "string"
                 },
                 "port": {
-                    "type": "integer"
+                    "description": "The tunnel port",
+                    "type": "integer",
+                    "example": 8732
                 },
                 "schedules": {
+                    "description": "List of requests for jobs to run on the endpoint",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/endpoints.edgeJobResponse"
                     }
                 },
                 "stacks": {
+                    "description": "List of stacks to be deployed on the endpoints",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/endpoints.stackStatusResponse"
                     }
                 },
                 "status": {
-                    "type": "string"
+                    "description": "Status represents the endpoint status",
+                    "type": "string",
+                    "example": "REQUIRED"
+                }
+            }
+        },
+        "endpoints.endpointUpdatePayload": {
+            "type": "object",
+            "properties": {
+                "azureApplicationID": {
+                    "description": "Azure application ID",
+                    "type": "string",
+                    "example": "eag7cdo9-o09l-9i83-9dO9-f0b23oe78db4"
+                },
+                "azureAuthenticationKey": {
+                    "description": "Azure authentication key",
+                    "type": "string",
+                    "example": "cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk="
+                },
+                "azureTenantID": {
+                    "description": "Azure tenant ID",
+                    "type": "string",
+                    "example": "34ddc78d-4fel-2358-8cc1-df84c8o839f5"
+                },
+                "edgeCheckinInterval": {
+                    "description": "The check in interval for edge agent (in seconds)",
+                    "type": "integer",
+                    "example": 5
+                },
+                "groupID": {
+                    "description": "Group identifier",
+                    "type": "integer",
+                    "example": 1
+                },
+                "kubernetes": {
+                    "description": "Associated Kubernetes data",
+                    "$ref": "#/definitions/portainer.KubernetesData"
+                },
+                "name": {
+                    "description": "Name that will be used to identify this endpoint",
+                    "type": "string",
+                    "example": "my-endpoint"
+                },
+                "publicURL": {
+                    "description": "URL or IP address where exposed containers will be reachable.\\\nDefaults to URL if not specified",
+                    "type": "string",
+                    "example": "docker.mydomain.tld:2375"
+                },
+                "status": {
+                    "description": "The status of the endpoint (1 - up, 2 - down)",
+                    "type": "integer",
+                    "example": 1
+                },
+                "tagIDs": {
+                    "description": "List of tag identifiers to which this endpoint is associated",
+                    "type": "array",
+                    "items": {
+                        "description": "Tag identifier",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "example": [
+                        1,
+                        2
+                    ]
+                },
+                "teamAccessPolicies": {
+                    "$ref": "#/definitions/portainer.TeamAccessPolicies"
+                },
+                "tls": {
+                    "description": "Require TLS to connect against this endpoint",
+                    "type": "boolean",
+                    "example": true
+                },
+                "tlsskipClientVerify": {
+                    "description": "Skip client verification when using TLS",
+                    "type": "boolean",
+                    "example": false
+                },
+                "tlsskipVerify": {
+                    "description": "Skip server verification when using TLS",
+                    "type": "boolean",
+                    "example": false
+                },
+                "url": {
+                    "description": "URL or IP address of a Docker host",
+                    "type": "string",
+                    "example": "docker.mydomain.tld:2375"
+                },
+                "userAccessPolicies": {
+                    "$ref": "#/definitions/portainer.UserAccessPolicies"
                 }
             }
         },
@@ -5689,10 +5934,14 @@ var doc = `{
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "integer"
+                    "description": "EdgeStack Identifier",
+                    "type": "integer",
+                    "example": 1
                 },
                 "version": {
-                    "type": "integer"
+                    "description": "Version of this stack",
+                    "type": "integer",
+                    "example": 3
                 }
             }
         },
@@ -5726,7 +5975,9 @@ var doc = `{
             "type": "object",
             "properties": {
                 "RoleId": {
-                    "type": "integer"
+                    "description": "Role identifier. Reference the role that will be associated to this access policy",
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -5800,13 +6051,19 @@ var doc = `{
             "type": "object",
             "properties": {
                 "Authentication": {
-                    "type": "boolean"
+                    "description": "Is authentication against DockerHub enabled",
+                    "type": "boolean",
+                    "example": true
                 },
                 "Password": {
-                    "type": "string"
+                    "description": "Password used to authenticate against the DockerHub",
+                    "type": "string",
+                    "example": "passwd"
                 },
                 "Username": {
-                    "type": "string"
+                    "description": "Username used to authenticate against the DockerHub",
+                    "type": "string",
+                    "example": "user"
                 }
             }
         },
@@ -6036,12 +6293,16 @@ var doc = `{
                     "$ref": "#/definitions/portainer.AzureCredentials"
                 },
                 "EdgeCheckinInterval": {
-                    "type": "integer"
+                    "description": "The check in interval for edge agent (in seconds)",
+                    "type": "integer",
+                    "example": 5
                 },
                 "EdgeID": {
+                    "description": "The identifier of the edge agent associated with this endpoint",
                     "type": "string"
                 },
                 "EdgeKey": {
+                    "description": "The key which is used to map the agent to Portainer",
                     "type": "string"
                 },
                 "Extensions": {
@@ -6051,7 +6312,9 @@ var doc = `{
                     }
                 },
                 "GroupId": {
-                    "type": "integer"
+                    "description": "Endpoint group identifier",
+                    "type": "integer",
+                    "example": 1
                 },
                 "Id": {
                     "description": "Endpoint Identifier",
@@ -6059,22 +6322,30 @@ var doc = `{
                     "example": 1
                 },
                 "Kubernetes": {
+                    "description": "Associated Kubernetes data",
                     "$ref": "#/definitions/portainer.KubernetesData"
                 },
                 "Name": {
-                    "type": "string"
+                    "description": "Endpoint name",
+                    "type": "string",
+                    "example": "my-endpoint"
                 },
                 "PublicURL": {
-                    "type": "string"
+                    "description": "URL or IP address where exposed containers will be reachable",
+                    "type": "string",
+                    "example": "docker.mydomain.tld:2375"
                 },
                 "Snapshots": {
+                    "description": "List of snapshots",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/portainer.DockerSnapshot"
                     }
                 },
                 "Status": {
-                    "type": "integer"
+                    "description": "The status of the endpoint (1 - up, 2 - down)",
+                    "type": "integer",
+                    "example": 1
                 },
                 "TLS": {
                     "description": "Deprecated fields\nDeprecated in DBVersion == 4",
@@ -6093,6 +6364,7 @@ var doc = `{
                     "type": "string"
                 },
                 "TagIds": {
+                    "description": "List of tag identifiers to which this endpoint is associated",
                     "type": "array",
                     "items": {
                         "description": "Tag identifier",
@@ -6108,15 +6380,21 @@ var doc = `{
                     }
                 },
                 "TeamAccessPolicies": {
+                    "description": "List of team identifiers authorized to connect to this endpoint",
                     "$ref": "#/definitions/portainer.TeamAccessPolicies"
                 },
                 "Type": {
-                    "type": "integer"
+                    "description": "Endpoint environment type. 1 for a Docker environment, 2 for an agent on Docker environment or 3 for an Azure environment.",
+                    "type": "integer",
+                    "example": 1
                 },
                 "URL": {
-                    "type": "string"
+                    "description": "URL or IP address of the Docker host associated to this endpoint",
+                    "type": "string",
+                    "example": "docker.mydomain.tld:2375"
                 },
                 "UserAccessPolicies": {
+                    "description": "List of user identifiers authorized to connect to this endpoint",
                     "$ref": "#/definitions/portainer.UserAccessPolicies"
                 }
             }
@@ -6157,10 +6435,12 @@ var doc = `{
                     }
                 },
                 "Description": {
-                    "type": "string"
+                    "description": "Description associated to the endpoint group",
+                    "type": "string",
+                    "example": "Endpoint group description"
                 },
                 "Id": {
-                    "description": "EndpointGroup Identifier",
+                    "description": "Endpoint group Identifier",
                     "type": "integer",
                     "example": 1
                 },
@@ -6172,9 +6452,12 @@ var doc = `{
                     }
                 },
                 "Name": {
-                    "type": "string"
+                    "description": "Endpoint group name",
+                    "type": "string",
+                    "example": "my-endpoint-group"
                 },
                 "TagIds": {
+                    "description": "List of tags associated to this endpoint group",
                     "type": "array",
                     "items": {
                         "description": "Tag identifier",
@@ -6303,13 +6586,19 @@ var doc = `{
             "type": "object",
             "properties": {
                 "GroupAttribute": {
-                    "type": "string"
+                    "description": "LDAP attribute which denotes the group membership",
+                    "type": "string",
+                    "example": "member"
                 },
                 "GroupBaseDN": {
-                    "type": "string"
+                    "description": "The distinguished name of the element from which the LDAP server will search for groups",
+                    "type": "string",
+                    "example": "dc=ldap,dc=domain,dc=tld"
                 },
                 "GroupFilter": {
-                    "type": "string"
+                    "description": "The LDAP search filter used to select group elements, optional",
+                    "type": "string",
+                    "example": "(objectClass=account"
                 }
             }
         },
@@ -6337,10 +6626,14 @@ var doc = `{
             "type": "object",
             "properties": {
                 "AnonymousMode": {
-                    "type": "boolean"
+                    "description": "Enable this option if the server is configured for Anonymous access. When enabled, ReaderDN and Password will not be used",
+                    "type": "boolean",
+                    "example": true
                 },
                 "AutoCreateUsers": {
-                    "type": "boolean"
+                    "description": "Automatically provision users and assign them to matching LDAP group names",
+                    "type": "boolean",
+                    "example": true
                 },
                 "GroupSearchSettings": {
                     "type": "array",
@@ -6349,10 +6642,14 @@ var doc = `{
                     }
                 },
                 "Password": {
-                    "type": "string"
+                    "description": "Password of the account that will be used to search users",
+                    "type": "string",
+                    "example": "readonly-password"
                 },
                 "ReaderDN": {
-                    "type": "string"
+                    "description": "Account that will be used to search for users",
+                    "type": "string",
+                    "example": "cn=readonly-account,dc=ldap,dc=domain,dc=tld"
                 },
                 "SearchSettings": {
                     "type": "array",
@@ -6361,13 +6658,17 @@ var doc = `{
                     }
                 },
                 "StartTLS": {
-                    "type": "boolean"
+                    "description": "Whether LDAP connection should use StartTLS",
+                    "type": "boolean",
+                    "example": true
                 },
                 "TLSConfig": {
                     "$ref": "#/definitions/portainer.TLSConfiguration"
                 },
                 "URL": {
-                    "type": "string"
+                    "description": "URL or IP address of the LDAP server",
+                    "type": "string",
+                    "example": "myldap.domain.tld:389"
                 }
             }
         },
@@ -6410,10 +6711,12 @@ var doc = `{
             "type": "object",
             "properties": {
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "name"
                 },
                 "value": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "value"
                 }
             }
         },
@@ -6421,7 +6724,9 @@ var doc = `{
             "type": "object",
             "properties": {
                 "Authentication": {
-                    "type": "boolean"
+                    "description": "Is authentication against this registry enabled",
+                    "type": "boolean",
+                    "example": true
                 },
                 "AuthorizedTeams": {
                     "type": "array",
@@ -6450,25 +6755,40 @@ var doc = `{
                     "$ref": "#/definitions/portainer.RegistryManagementConfiguration"
                 },
                 "Name": {
-                    "type": "string"
+                    "description": "Registry Name",
+                    "type": "string",
+                    "example": "my-registry"
                 },
                 "Password": {
-                    "type": "string"
+                    "description": "Password used to authenticate against this registry",
+                    "type": "string",
+                    "example": "registry_password"
                 },
                 "TeamAccessPolicies": {
                     "$ref": "#/definitions/portainer.TeamAccessPolicies"
                 },
                 "Type": {
-                    "type": "integer"
+                    "description": "Registry Type (1 - Quay, 2 - Azure, 3 - Custom, 4 - Gitlab)",
+                    "type": "integer",
+                    "enum": [
+                        1,
+                        2,
+                        3,
+                        4
+                    ]
                 },
                 "URL": {
-                    "type": "string"
+                    "description": "URL or IP address of the Docker registry",
+                    "type": "string",
+                    "example": "registry.mydomain.tld:2375"
                 },
                 "UserAccessPolicies": {
                     "$ref": "#/definitions/portainer.UserAccessPolicies"
                 },
                 "Username": {
-                    "type": "string"
+                    "description": "Username used to authenticate against this registry",
+                    "type": "string",
+                    "example": "registry user"
                 }
             }
         },
@@ -6499,7 +6819,9 @@ var doc = `{
                     "type": "integer"
                 },
                 "AdministratorsOnly": {
-                    "type": "boolean"
+                    "description": "Permit access to resource only to admins",
+                    "type": "boolean",
+                    "example": true
                 },
                 "Id": {
                     "description": "ResourceControl Identifier",
@@ -6511,16 +6833,24 @@ var doc = `{
                     "type": "integer"
                 },
                 "Public": {
-                    "type": "boolean"
+                    "description": "Permit access to the associated resource to any user",
+                    "type": "boolean",
+                    "example": true
                 },
                 "ResourceId": {
-                    "type": "string"
+                    "description": "Docker resource identifier on which access control will be applied.\\\nIn the case of a resource control applied to a stack, use the stack name as identifier",
+                    "type": "string",
+                    "example": "617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08"
                 },
                 "SubResourceIds": {
+                    "description": "List of Docker resources that will inherit this access control",
                     "type": "array",
                     "items": {
                         "type": "string"
-                    }
+                    },
+                    "example": [
+                        "617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08"
+                    ]
                 },
                 "System": {
                     "type": "boolean"
@@ -6532,7 +6862,9 @@ var doc = `{
                     }
                 },
                 "Type": {
-                    "type": "integer"
+                    "description": "Type of Docker resource. Valid values are: 1- container, 2 -service\n3 - volume, 4 - secret, 5 - stack, 6 - config or 7 - custom template",
+                    "type": "integer",
+                    "example": 1
                 },
                 "UserAccesses": {
                     "type": "array",
@@ -6546,10 +6878,13 @@ var doc = `{
             "type": "object",
             "properties": {
                 "Authorizations": {
+                    "description": "Authorizations associated to a role",
                     "$ref": "#/definitions/portainer.Authorizations"
                 },
                 "Description": {
-                    "type": "string"
+                    "description": "Role description",
+                    "type": "string",
+                    "example": "Read-only access of all resources in an endpoint"
                 },
                 "Id": {
                     "description": "Role Identifier",
@@ -6557,7 +6892,9 @@ var doc = `{
                     "example": 1
                 },
                 "Name": {
-                    "type": "string"
+                    "description": "Role name",
+                    "type": "string",
+                    "example": "HelpDesk"
                 },
                 "Priority": {
                     "type": "integer"
@@ -6568,64 +6905,90 @@ var doc = `{
             "type": "object",
             "properties": {
                 "AllowBindMountsForRegularUsers": {
-                    "type": "boolean"
+                    "description": "Whether non-administrator should be able to use bind mounts when creating containers",
+                    "type": "boolean",
+                    "example": false
                 },
                 "AllowContainerCapabilitiesForRegularUsers": {
+                    "description": "Whether non-administrator should be able to use container capabilities",
                     "type": "boolean"
                 },
                 "AllowDeviceMappingForRegularUsers": {
+                    "description": "Whether non-administrator should be able to use device mapping",
                     "type": "boolean"
                 },
                 "AllowHostNamespaceForRegularUsers": {
+                    "description": "Whether non-administrator should be able to use the host pid",
                     "type": "boolean"
                 },
                 "AllowPrivilegedModeForRegularUsers": {
-                    "type": "boolean"
+                    "description": "Whether non-administrator should be able to use privileged mode when creating containers",
+                    "type": "boolean",
+                    "example": false
                 },
                 "AllowStackManagementForRegularUsers": {
+                    "description": "Whether non-administrator should be able to manage stacks",
                     "type": "boolean"
                 },
                 "AllowVolumeBrowserForRegularUsers": {
+                    "description": "Whether non-administrator should be able to browse volumes",
                     "type": "boolean"
                 },
                 "AuthenticationMethod": {
-                    "type": "integer"
+                    "description": "Active authentication method for the Portainer instance. Valid values are: 1 for internal, 2 for LDAP, or 3 for oauth",
+                    "type": "integer",
+                    "example": 1
                 },
                 "BlackListedLabels": {
+                    "description": "A list of label name \u0026 value that will be used to hide containers when querying containers",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/portainer.Pair"
                     }
                 },
                 "EdgeAgentCheckinInterval": {
-                    "type": "integer"
+                    "description": "The default check in interval for edge agent (in seconds)",
+                    "type": "integer",
+                    "example": 5
                 },
                 "EnableEdgeComputeFeatures": {
+                    "description": "Whether edge compute features are enabled",
                     "type": "boolean"
                 },
                 "EnableHostManagementFeatures": {
+                    "description": "Whether host management features are enabled",
                     "type": "boolean"
                 },
                 "EnableTelemetry": {
-                    "type": "boolean"
+                    "description": "Whether telemetry is enabled",
+                    "type": "boolean",
+                    "example": false
                 },
                 "LDAPSettings": {
                     "$ref": "#/definitions/portainer.LDAPSettings"
                 },
                 "LogoURL": {
-                    "type": "string"
+                    "description": "URL to a logo that will be displayed on the login page as well as on top of the sidebar. Will use default Portainer logo when value is empty string",
+                    "type": "string",
+                    "example": "https://mycompany.mydomain.tld/logo.png"
                 },
                 "OAuthSettings": {
                     "$ref": "#/definitions/portainer.OAuthSettings"
                 },
                 "SnapshotInterval": {
-                    "type": "string"
+                    "description": "The interval in which endpoint snapshots are created",
+                    "type": "string",
+                    "example": "5m"
                 },
                 "TemplatesURL": {
-                    "type": "string"
+                    "description": "URL to the templates that will be displayed in the UI when navigating to App Templates",
+                    "type": "string",
+                    "example": "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
                 },
                 "UserSessionTimeout": {
-                    "type": "string"
+                    "description": "The duration of a user session",
+                    "type": "string",
+                    "example": "5m"
                 },
                 "displayDonationHeader": {
                     "description": "Deprecated fields",
@@ -6640,12 +7003,17 @@ var doc = `{
             "type": "object",
             "properties": {
                 "EndpointId": {
-                    "type": "integer"
+                    "description": "Endpoint identifier. Reference the endpoint that will be used for deployment",
+                    "type": "integer",
+                    "example": 1
                 },
                 "EntryPoint": {
-                    "type": "string"
+                    "description": "Path to the Stack file",
+                    "type": "string",
+                    "example": "docker-compose.yml"
                 },
                 "Env": {
+                    "description": "A list of environment variables used during stack deployment",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/portainer.Pair"
@@ -6657,22 +7025,32 @@ var doc = `{
                     "example": 1
                 },
                 "Name": {
-                    "type": "string"
+                    "description": "Stack name",
+                    "type": "string",
+                    "example": "myStack"
                 },
                 "ResourceControl": {
                     "$ref": "#/definitions/portainer.ResourceControl"
                 },
                 "Status": {
-                    "type": "integer"
+                    "description": "Stack status (1 - active, 2 - inactive)",
+                    "type": "integer",
+                    "example": 1
                 },
                 "SwarmId": {
-                    "type": "string"
+                    "description": "Cluster identifier of the Swarm cluster where the stack is deployed",
+                    "type": "string",
+                    "example": "jpofkc0i9uo9wtx1zesuk649w"
                 },
                 "Type": {
-                    "type": "integer"
+                    "description": "Stack type. 1 for a Swarm stack, 2 for a Compose stack",
+                    "type": "integer",
+                    "example": 2
                 },
                 "projectPath": {
-                    "type": "string"
+                    "description": "Path on disk to the repository hosting the Stack file",
+                    "type": "string",
+                    "example": "/data/compose/myStack_jpofkc0i9uo9wtx1zesuk649w"
                 }
             }
         },
@@ -6720,12 +7098,14 @@ var doc = `{
             "type": "object",
             "properties": {
                 "EndpointGroups": {
+                    "description": "A set of endpoint group ids that have this tag",
                     "type": "object",
                     "additionalProperties": {
                         "type": "boolean"
                     }
                 },
                 "Endpoints": {
+                    "description": "A set of endpoint ids that have this tag",
                     "type": "object",
                     "additionalProperties": {
                         "type": "boolean"
@@ -6809,89 +7189,129 @@ var doc = `{
                     "example": 1
                 },
                 "administrator_only": {
-                    "type": "boolean"
+                    "description": "Whether the template should be available to administrators only",
+                    "type": "boolean",
+                    "example": true
                 },
                 "categories": {
+                    "description": "A list of categories associated to the template",
                     "type": "array",
                     "items": {
                         "type": "string"
-                    }
+                    },
+                    "example": [
+                        "database"
+                    ]
                 },
                 "command": {
-                    "type": "string"
+                    "description": "The command that will be executed in a container template",
+                    "type": "string",
+                    "example": "ls -lah"
                 },
                 "description": {
-                    "type": "string"
+                    "description": "Description of the template",
+                    "type": "string",
+                    "example": "High performance web server"
                 },
                 "env": {
+                    "description": "A list of environment variables used during the template deployment",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/portainer.TemplateEnv"
                     }
                 },
                 "hostname": {
-                    "type": "string"
+                    "description": "Container hostname",
+                    "type": "string",
+                    "example": "mycontainer"
                 },
                 "image": {
-                    "description": "Mandatory container fields",
-                    "type": "string"
+                    "description": "Mandatory container fields\nImage associated to a container template. Mandatory for a container template",
+                    "type": "string",
+                    "example": "nginx:latest"
                 },
                 "interactive": {
-                    "type": "boolean"
+                    "description": "Whether the container should be started in\ninteractive mode (-i -t equivalent on the CLI)",
+                    "type": "boolean",
+                    "example": true
                 },
                 "labels": {
+                    "description": "Container labels",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/portainer.Pair"
                     }
                 },
                 "logo": {
-                    "type": "string"
+                    "description": "URL of the template's logo",
+                    "type": "string",
+                    "example": "https://cloudinovasi.id/assets/img/logos/nginx.png"
                 },
                 "name": {
-                    "description": "Optional stack/container fields",
-                    "type": "string"
+                    "description": "Optional stack/container fields\nDefault name for the stack/container to be used on deployment",
+                    "type": "string",
+                    "example": "mystackname"
                 },
                 "network": {
-                    "type": "string"
+                    "description": "Name of a network that will be used on container deployment if it exists inside the environment",
+                    "type": "string",
+                    "example": "mynet"
                 },
                 "note": {
-                    "type": "string"
+                    "description": "A note that will be displayed in the UI. Supports HTML content",
+                    "type": "string",
+                    "example": "This is my \u003cb\u003ecustom\u003c/b\u003e template"
                 },
                 "platform": {
-                    "type": "string"
+                    "description": "Platform associated to the template.\nValid values are: 'linux', 'windows' or leave empty for multi-platform",
+                    "type": "string",
+                    "example": "linux"
                 },
                 "ports": {
+                    "description": "A list of ports exposed by the container",
                     "type": "array",
                     "items": {
                         "type": "string"
-                    }
+                    },
+                    "example": [
+                        "8080:80/tcp"
+                    ]
                 },
                 "privileged": {
-                    "type": "boolean"
+                    "description": "Whether the container should be started in privileged mode",
+                    "type": "boolean",
+                    "example": true
                 },
                 "registry": {
-                    "description": "Optional container fields",
-                    "type": "string"
+                    "description": "Optional container fields\nThe URL of a registry associated to the image for a container template",
+                    "type": "string",
+                    "example": "quay.io"
                 },
                 "repository": {
                     "description": "Mandatory stack fields",
                     "$ref": "#/definitions/portainer.TemplateRepository"
                 },
                 "restart_policy": {
-                    "type": "string"
+                    "description": "Container restart policy",
+                    "type": "string",
+                    "example": "on-failure"
                 },
                 "stackFile": {
-                    "description": "Mandatory Edge stack fields",
+                    "description": "Mandatory Edge stack fields\nStack file used for this template",
                     "type": "string"
                 },
                 "title": {
-                    "type": "string"
+                    "description": "Title of the template",
+                    "type": "string",
+                    "example": "Nginx"
                 },
                 "type": {
-                    "type": "integer"
+                    "description": "Template type. Valid values are: 1 (container), 2 (Swarm stack) or 3 (Compose stack)",
+                    "type": "integer",
+                    "example": 1
                 },
                 "volumes": {
+                    "description": "A list of volumes used during the container template deployment",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/portainer.TemplateVolume"
@@ -6903,21 +7323,32 @@ var doc = `{
             "type": "object",
             "properties": {
                 "default": {
-                    "type": "string"
+                    "description": "Default value that will be set for the variable",
+                    "type": "string",
+                    "example": "default_value"
                 },
                 "description": {
-                    "type": "string"
+                    "description": "Content of the tooltip that will be generated in the UI",
+                    "type": "string",
+                    "example": "MySQL root account password"
                 },
                 "label": {
-                    "type": "string"
+                    "description": "Text for the label that will be generated in the UI",
+                    "type": "string",
+                    "example": "Root password"
                 },
                 "name": {
-                    "type": "string"
+                    "description": "name of the environment variable",
+                    "type": "string",
+                    "example": "MYSQL_ROOT_PASSWORD"
                 },
                 "preset": {
-                    "type": "boolean"
+                    "description": "If set to true, will not generate any input for this variable in the UI",
+                    "type": "boolean",
+                    "example": false
                 },
                 "select": {
+                    "description": "A list of name/value that will be used to generate a dropdown in the UI",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/portainer.TemplateEnvSelect"
@@ -6929,13 +7360,19 @@ var doc = `{
             "type": "object",
             "properties": {
                 "default": {
-                    "type": "boolean"
+                    "description": "Will set this choice as the default choice",
+                    "type": "boolean",
+                    "example": false
                 },
                 "text": {
-                    "type": "string"
+                    "description": "Some text that will displayed as a choice",
+                    "type": "string",
+                    "example": "text value"
                 },
                 "value": {
-                    "type": "string"
+                    "description": "A value that will be associated to the choice",
+                    "type": "string",
+                    "example": "value"
                 }
             }
         },
@@ -6943,10 +7380,14 @@ var doc = `{
             "type": "object",
             "properties": {
                 "stackfile": {
-                    "type": "string"
+                    "description": "Path to the stack file inside the git repository",
+                    "type": "string",
+                    "example": "./subfolder/docker-compose.yml"
                 },
                 "url": {
-                    "type": "string"
+                    "description": "URL of a git repository used to deploy a stack template. Mandatory for a Swarm/Compose stack template",
+                    "type": "string",
+                    "example": "https://github.com/portainer/portainer-compose"
                 }
             }
         },
@@ -6954,13 +7395,19 @@ var doc = `{
             "type": "object",
             "properties": {
                 "bind": {
-                    "type": "string"
+                    "description": "Path on the host",
+                    "type": "string",
+                    "example": "/tmp"
                 },
                 "container": {
-                    "type": "string"
+                    "description": "Path inside the container",
+                    "type": "string",
+                    "example": "/data"
                 },
                 "readonly": {
-                    "type": "boolean"
+                    "description": "Whether the volume used should be readonly",
+                    "type": "boolean",
+                    "example": true
                 }
             }
         },

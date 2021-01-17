@@ -11,15 +11,19 @@ import (
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
-// @summary Deletes an Endpoint Group
-// @description
+// @id EndpointGroupDelete
+// @summary Remove an endpoint group
+// @description Remove an endpoint group.
+// @description **Access policy**: administrator
 // @tags endpoint_groups
 // @security jwt
 // @accept json
 // @produce json
-// @param id path int true "Endpoint Group Id"
-// @success 204
-// @failure 400,500
+// @param id path int true "EndpointGroup identifier"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 404 "EndpointGroup not found"
+// @failure 500 "Server error"
 // @router /endpoint_groups/{id} [delete]
 func (handler *Handler) endpointGroupDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointGroupID, err := request.RetrieveNumericRouteVariableValue(r, "id")

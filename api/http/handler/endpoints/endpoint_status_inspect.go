@@ -14,36 +14,52 @@ import (
 )
 
 type stackStatusResponse struct {
-	ID      portainer.EdgeStackID
-	Version int
+	// EdgeStack Identifier
+	ID portainer.EdgeStackID `example:"1"`
+	// Version of this stack
+	Version int `example:"3"`
 }
 
 type edgeJobResponse struct {
-	ID             portainer.EdgeJobID `json:"Id"`
-	CollectLogs    bool                `json:"CollectLogs"`
-	CronExpression string              `json:"CronExpression"`
-	Script         string              `json:"Script"`
-	Version        int                 `json:"Version"`
+	// EdgeJob Identifier
+	ID portainer.EdgeJobID `json:"Id" example:"2"`
+	// Whether to collect logs
+	CollectLogs bool `json:"CollectLogs" example:"true"`
+	// A cron expression to schedule this job
+	CronExpression string `json:"CronExpression" example:"* * * * *"`
+	// Script to run
+	Script string `json:"Script" example:"echo hello"`
+	// Version of this EdgeJob
+	Version int `json:"Version" example:"2"`
 }
 
 type endpointStatusInspectResponse struct {
-	Status          string                `json:"status"`
-	Port            int                   `json:"port"`
-	Schedules       []edgeJobResponse     `json:"schedules"`
-	CheckinInterval int                   `json:"checkin"`
-	Credentials     string                `json:"credentials"`
-	Stacks          []stackStatusResponse `json:"stacks"`
+	// Status represents the endpoint status
+	Status string `json:"status" example:"REQUIRED"`
+	// The tunnel port
+	Port int `json:"port" example:"8732"`
+	// List of requests for jobs to run on the endpoint
+	Schedules []edgeJobResponse `json:"schedules"`
+	// The current value of CheckinInterval
+	CheckinInterval int `json:"checkin" example:"5"`
+	//
+	Credentials string `json:"credentials" example:""`
+	// List of stacks to be deployed on the endpoints
+	Stacks []stackStatusResponse `json:"stacks"`
 }
 
-// @summary Get endpoint status (for edge)
-// @description
-// @tags endpoints, edge
+// @id EndpointStatusInspect
+// @summary Get endpoint status
+// @description Endpoint for edge agent to check status of environment
+// @description **Access policy**: restricted only to Edge endpoints
+// @tags endpoints
 // @security jwt
-// @accept json
-// @produce json
-// @param id path int true "Endpoint ID"
-// @success 200 {object} endpointStatusInspectResponse
-// @failure 500,404,403
+// @param id path int true "Endpoint identifier"
+// @success 200 {object} endpointStatusInspectResponse "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied to access endpoint"
+// @failure 404 "Endpoint not found"
+// @failure 500 "Server error"
 // @router /endpoints/{id}/status [get]
 func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")

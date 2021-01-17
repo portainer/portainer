@@ -8,14 +8,17 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
+// @id EndpointGroupList
 // @summary List Endpoint groups
-// @description
+// @description List all endpoint groups based on the current user authorizations. Will
+// @description return all endpoint groups if using an administrator account otherwise it will
+// @description only return authorized endpoint groups.
+// @description **Access policy**: restricted
 // @tags endpoint_groups
 // @security jwt
-// @accept json
 // @produce json
 // @success 200 {array} portainer.EndpointGroup "Endpoint group"
-// @failure 400,500
+// @failure 500 "Server error"
 // @router /endpoint_groups [get]
 func (handler *Handler) endpointGroupList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointGroups, err := handler.DataStore.EndpointGroup().EndpointGroups()

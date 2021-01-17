@@ -11,16 +11,17 @@ import (
 	"github.com/portainer/portainer/api/bolt/errors"
 )
 
-// Delete endpoint
-// @summary Deletes an endpoint
-// @description
+// @id EndpointDelete
+// @summary Remove an endpoint
+// @description Remove an endpoint.
+// @description **Access policy**: administrator
 // @tags endpoints
 // @security jwt
-// @accept json
-// @produce json
-// @param id path int true "endpoint id"
-// @success 204
-// @failure 400,500
+// @param id path int true "Endpoint identifier"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 404 "Endpoint not found"
+// @failure 500 "Server error"
 // @router /endpoints/{id} [delete]
 func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")

@@ -12,9 +12,12 @@ import (
 )
 
 type dockerhubUpdatePayload struct {
-	Authentication bool
-	Username       string
-	Password       string
+	// Enable authentication against DockerHub
+	Authentication bool `validate:"required" example:"false"`
+	// Username used to authenticate against the DockerHub
+	Username string `validate:"required" example:"hub_user"`
+	// Password used to authenticate against the DockerHub
+	Password string `validate:"required" example:"hub_password"`
 }
 
 func (payload *dockerhubUpdatePayload) Validate(r *http.Request) error {
@@ -24,16 +27,18 @@ func (payload *dockerhubUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// dockerhubUpdate
-// @summary Updates the dockerhub settings
-// @description
+// @id DockerHubUpdate
+// @summary Update DockerHub information
+// @description Use this endpoint to update the information used to connect to the DockerHub
+// @description **Access policy**: administrator
 // @tags dockerhub
 // @security jwt
 // @accept json
 // @produce json
-// @param body body dockerhubUpdatePayload true "DockerHub settings"
-// @success 204
-// @failure 500
+// @param body body dockerhubUpdatePayload true "DockerHub information"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
 // @router /dockerhub [put]
 func (handler *Handler) dockerhubUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload dockerhubUpdatePayload

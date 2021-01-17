@@ -12,10 +12,14 @@ import (
 )
 
 type endpointGroupCreatePayload struct {
-	Name                string
-	Description         string
-	AssociatedEndpoints []portainer.EndpointID
-	TagIDs              []portainer.TagID
+	// Endpoint group name
+	Name string `validate:"required" example:"my-endpoint-group"`
+	// Endpoint group description
+	Description string `example:"description"`
+	// List of endpoint identifiers that will be part of this group
+	AssociatedEndpoints []portainer.EndpointID `example:"1,3"`
+	// List of tag identifiers to which this endpoint group is associated
+	TagIDs []portainer.TagID `example:"1,2"`
 }
 
 func (payload *endpointGroupCreatePayload) Validate(r *http.Request) error {
@@ -28,15 +32,17 @@ func (payload *endpointGroupCreatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// @summary Creates an Endpoint Group
-// @description
+// @summary Create an Endpoint Group
+// @description Create a new endpoint group.
+// @description **Access policy**: administrator
 // @tags endpoint_groups
 // @security jwt
 // @accept json
 // @produce json
-// @param body body endpointGroupCreatePayload true "endpoint group data"
-// @success 200 {object} portainer.EndpointGroup "Endpoint group"
-// @failure 400,500
+// @param body body endpointGroupCreatePayload true "Endpoint Group details"
+// @success 200 {object} portainer.EndpointGroup "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
 // @router /endpoint_groups [post]
 func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload endpointGroupCreatePayload

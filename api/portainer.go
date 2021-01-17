@@ -231,7 +231,7 @@ type (
 		EdgeID string `json:"EdgeID,omitempty" example:""`
 		// The key which is used to map the agent to Portainer
 		EdgeKey string `json:"EdgeKey" example:""`
-		// The default check in interval for edge agent (in seconds)
+		// The check in interval for edge agent (in seconds)
 		EdgeCheckinInterval int `json:"EdgeCheckinInterval" example:"5"`
 		// Associated Kubernetes data
 		Kubernetes KubernetesData `json:"Kubernetes" example:""`

@@ -13,9 +13,12 @@ import (
 )
 
 type endpointGroupUpdatePayload struct {
-	Name               string
-	Description        string
-	TagIDs             []portainer.TagID
+	// Endpoint group name
+	Name string `example:"my-endpoint-group"`
+	// Endpoint group description
+	Description string `example:"description"`
+	// List of tag identifiers associated to the endpoint group
+	TagIDs             []portainer.TagID `example:"3,4"`
 	UserAccessPolicies portainer.UserAccessPolicies
 	TeamAccessPolicies portainer.TeamAccessPolicies
 }
@@ -24,15 +27,20 @@ func (payload *endpointGroupUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// @summary Update Endpoint group
-// @description
+// @id EndpointGroupUpdate
+// @summary Update an endpoint group
+// @description Update an endpoint group.
+// @description **Access policy**: administrator
 // @tags endpoint_groups
 // @security jwt
 // @accept json
 // @produce json
-// @param id path int true "endpoint group id"
-// @success 200 {object} portainer.EndpointGroup "Endpoint group"
-// @failure 400,500
+// @param id path int true "EndpointGroup identifier"
+// @param body body endpointGroupUpdatePayload true "EndpointGroup details"
+// @success 200 {object} portainer.EndpointGroup "Success"
+// @failure 400 "Invalid request"
+// @failure 404 "EndpointGroup not found"
+// @failure 500 "Server error"
 // @router /endpoint_groups/:id [put]
 func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointGroupID, err := request.RetrieveNumericRouteVariableValue(r, "id")

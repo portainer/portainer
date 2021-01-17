@@ -10,16 +10,18 @@ import (
 	"github.com/portainer/portainer/api/bolt/errors"
 )
 
-// @summary Attach an endpoint to an endpoint group
-// @description
+// @id EndpointGroupAddEndpoint
+// @summary Add an endpoint to an endpoint group
+// @description Add an endpoint to an endpoint group
+// @description **Access policy**: administrator
 // @tags endpoint_groups
 // @security jwt
-// @accept json
-// @produce json
-// @param id path int true "endpoint group id"
-// @param endpointId path int true "endpoint id"
-// @success 204
-// @failure 400,404,500
+// @param id path int true "EndpointGroup identifier"
+// @param endpointId path int true "Endpoint identifier"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 404 "EndpointGroup not found"
+// @failure 500 "Server error"
 // @router /endpoint_groups/{id}/endpoints/{endpointId} [put]
 func (handler *Handler) endpointGroupAddEndpoint(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointGroupID, err := request.RetrieveNumericRouteVariableValue(r, "id")

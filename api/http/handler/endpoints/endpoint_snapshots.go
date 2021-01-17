@@ -10,14 +10,14 @@ import (
 	"github.com/portainer/portainer/api/internal/snapshot"
 )
 
+// @id EndpointSnapshots
 // @summary Snapshot all endpoints
-// @description
+// @description Snapshot all endpoints
+// @description **Access policy**: administrator
 // @tags endpoints
 // @security jwt
-// @accept json
-// @produce json
-// @success 204
-// @failure 500
+// @success 204 "Success"
+// @failure 500 "Server Error"
 // @router /endpoints/snapshot [post]
 func (handler *Handler) endpointSnapshots(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpoints, err := handler.DataStore.Endpoint().Endpoints()

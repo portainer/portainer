@@ -3,18 +3,28 @@ definitions:
   auth.authenticatePayload:
     properties:
       password:
+        description: Password
+        example: mypassword
         type: string
       username:
+        description: Username
+        example: admin
         type: string
+    required:
+    - password
+    - username
     type: object
   auth.authenticateResponse:
     properties:
       jwt:
+        description: JWT token used to authenticate against the API
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGUiOjEsImV4cCI6MTQ5OTM3NjE1NH0.NJ6vE8FY1WG6jsRQzfMqeatJ4vh2TWAeeYfDhP71YEE
         type: string
     type: object
   auth.oauthPayload:
     properties:
       code:
+        description: OAuth code returned from OAuth Provided
         type: string
     type: object
   customtemplates.customTemplateFromFileContentPayload:
@@ -105,11 +115,21 @@ definitions:
   dockerhub.dockerhubUpdatePayload:
     properties:
       authentication:
+        description: Enable authentication against DockerHub
+        example: false
         type: boolean
       password:
+        description: Password used to authenticate against the DockerHub
+        example: hub_password
         type: string
       username:
+        description: Username used to authenticate against the DockerHub
+        example: hub_user
         type: string
+    required:
+    - authentication
+    - password
+    - username
     type: object
   edgegroups.edgeGroupCreatePayload:
     properties:
@@ -298,77 +318,81 @@ definitions:
   endpointgroups.endpointGroupCreatePayload:
     properties:
       associatedEndpoints:
+        description: List of endpoint identifiers that will be part of this group
+        example:
+        - 1
+        - 3
         items:
           type: integer
         type: array
       description:
+        description: Endpoint group description
+        example: description
         type: string
       name:
+        description: Endpoint group name
+        example: my-endpoint-group
         type: string
       tagIDs:
+        description: List of tag identifiers to which this endpoint group is associated
+        example:
+        - 1
+        - 2
         items:
           description: Tag identifier
           example: 1
           type: integer
         type: array
+    required:
+    - name
+    type: object
+  endpointgroups.endpointGroupUpdatePayload:
+    properties:
+      description:
+        description: Endpoint group description
+        example: description
+        type: string
+      name:
+        description: Endpoint group name
+        example: my-endpoint-group
+        type: string
+      tagIDs:
+        description: List of tag identifiers associated to the endpoint group
+        example:
+        - 3
+        - 4
+        items:
+          description: Tag identifier
+          example: 1
+          type: integer
+        type: array
+      teamAccessPolicies:
+        $ref: '#/definitions/portainer.TeamAccessPolicies'
+      userAccessPolicies:
+        $ref: '#/definitions/portainer.UserAccessPolicies'
     type: object
   endpoints.edgeJobResponse:
     properties:
       CollectLogs:
+        description: Whether to collect logs
+        example: true
         type: boolean
       CronExpression:
+        description: A cron expression to schedule this job
+        example: '* * * * *'
         type: string
       Id:
+        description: EdgeJob Identifier
+        example: 2
         type: integer
       Script:
+        description: Script to run
+        example: echo hello
         type: string
       Version:
+        description: Version of this EdgeJob
+        example: 2
         type: integer
-    type: object
-  endpoints.endpointCreatePayload:
-    properties:
-      azureApplicationID:
-        type: string
-      azureAuthenticationKey:
-        type: string
-      azureTenantID:
-        type: string
-      edgeCheckinInterval:
-        type: integer
-      endpointCreationType:
-        type: integer
-      groupID:
-        type: integer
-      name:
-        type: string
-      publicURL:
-        type: string
-      tagIDs:
-        items:
-          description: Tag identifier
-          example: 1
-          type: integer
-        type: array
-      tls:
-        type: boolean
-      tlscacertFile:
-        items:
-          type: integer
-        type: array
-      tlscertFile:
-        items:
-          type: integer
-        type: array
-      tlskeyFile:
-        items:
-          type: integer
-        type: array
-      tlsskipClientVerify:
-        type: boolean
-      tlsskipVerify:
-        type: boolean
-      url:
-        type: string
     type: object
   endpoints.endpointExtensionAddPayload:
     properties:
@@ -380,27 +404,109 @@ definitions:
   endpoints.endpointStatusInspectResponse:
     properties:
       checkin:
+        description: The current value of CheckinInterval
+        example: 5
         type: integer
       credentials:
         type: string
       port:
+        description: The tunnel port
+        example: 8732
         type: integer
       schedules:
+        description: List of requests for jobs to run on the endpoint
         items:
           $ref: '#/definitions/endpoints.edgeJobResponse'
         type: array
       stacks:
+        description: List of stacks to be deployed on the endpoints
         items:
           $ref: '#/definitions/endpoints.stackStatusResponse'
         type: array
       status:
+        description: Status represents the endpoint status
+        example: REQUIRED
         type: string
+    type: object
+  endpoints.endpointUpdatePayload:
+    properties:
+      azureApplicationID:
+        description: Azure application ID
+        example: eag7cdo9-o09l-9i83-9dO9-f0b23oe78db4
+        type: string
+      azureAuthenticationKey:
+        description: Azure authentication key
+        example: cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk=
+        type: string
+      azureTenantID:
+        description: Azure tenant ID
+        example: 34ddc78d-4fel-2358-8cc1-df84c8o839f5
+        type: string
+      edgeCheckinInterval:
+        description: The check in interval for edge agent (in seconds)
+        example: 5
+        type: integer
+      groupID:
+        description: Group identifier
+        example: 1
+        type: integer
+      kubernetes:
+        $ref: '#/definitions/portainer.KubernetesData'
+        description: Associated Kubernetes data
+      name:
+        description: Name that will be used to identify this endpoint
+        example: my-endpoint
+        type: string
+      publicURL:
+        description: |-
+          URL or IP address where exposed containers will be reachable.\
+          Defaults to URL if not specified
+        example: docker.mydomain.tld:2375
+        type: string
+      status:
+        description: The status of the endpoint (1 - up, 2 - down)
+        example: 1
+        type: integer
+      tagIDs:
+        description: List of tag identifiers to which this endpoint is associated
+        example:
+        - 1
+        - 2
+        items:
+          description: Tag identifier
+          example: 1
+          type: integer
+        type: array
+      teamAccessPolicies:
+        $ref: '#/definitions/portainer.TeamAccessPolicies'
+      tls:
+        description: Require TLS to connect against this endpoint
+        example: true
+        type: boolean
+      tlsskipClientVerify:
+        description: Skip client verification when using TLS
+        example: false
+        type: boolean
+      tlsskipVerify:
+        description: Skip server verification when using TLS
+        example: false
+        type: boolean
+      url:
+        description: URL or IP address of a Docker host
+        example: docker.mydomain.tld:2375
+        type: string
+      userAccessPolicies:
+        $ref: '#/definitions/portainer.UserAccessPolicies'
     type: object
   endpoints.stackStatusResponse:
     properties:
       id:
+        description: EdgeStack Identifier
+        example: 1
         type: integer
       version:
+        description: Version of this stack
+        example: 3
         type: integer
     type: object
   motd.motdResponse:
@@ -423,6 +529,9 @@ definitions:
   portainer.AccessPolicy:
     properties:
       RoleId:
+        description: Role identifier. Reference the role that will be associated to
+          this access policy
+        example: 1
         type: integer
     type: object
   portainer.Authorizations:
@@ -474,10 +583,16 @@ definitions:
   portainer.DockerHub:
     properties:
       Authentication:
+        description: Is authentication against DockerHub enabled
+        example: true
         type: boolean
       Password:
+        description: Password used to authenticate against the DockerHub
+        example: passwd
         type: string
       Username:
+        description: Username used to authenticate against the DockerHub
+        example: user
         type: string
     type: object
   portainer.DockerSnapshot:
@@ -633,16 +748,22 @@ definitions:
       AzureCredentials:
         $ref: '#/definitions/portainer.AzureCredentials'
       EdgeCheckinInterval:
+        description: The check in interval for edge agent (in seconds)
+        example: 5
         type: integer
       EdgeID:
+        description: The identifier of the edge agent associated with this endpoint
         type: string
       EdgeKey:
+        description: The key which is used to map the agent to Portainer
         type: string
       Extensions:
         items:
           $ref: '#/definitions/portainer.EndpointExtension'
         type: array
       GroupId:
+        description: Endpoint group identifier
+        example: 1
         type: integer
       Id:
         description: Endpoint Identifier
@@ -650,15 +771,23 @@ definitions:
         type: integer
       Kubernetes:
         $ref: '#/definitions/portainer.KubernetesData'
+        description: Associated Kubernetes data
       Name:
+        description: Endpoint name
+        example: my-endpoint
         type: string
       PublicURL:
+        description: URL or IP address where exposed containers will be reachable
+        example: docker.mydomain.tld:2375
         type: string
       Snapshots:
+        description: List of snapshots
         items:
           $ref: '#/definitions/portainer.DockerSnapshot'
         type: array
       Status:
+        description: The status of the endpoint (1 - up, 2 - down)
+        example: 1
         type: integer
       TLS:
         description: |-
@@ -674,6 +803,7 @@ definitions:
       TLSKey:
         type: string
       TagIds:
+        description: List of tag identifiers to which this endpoint is associated
         items:
           description: Tag identifier
           example: 1
@@ -686,12 +816,19 @@ definitions:
         type: array
       TeamAccessPolicies:
         $ref: '#/definitions/portainer.TeamAccessPolicies'
+        description: List of team identifiers authorized to connect to this endpoint
       Type:
+        description: Endpoint environment type. 1 for a Docker environment, 2 for
+          an agent on Docker environment or 3 for an Azure environment.
+        example: 1
         type: integer
       URL:
+        description: URL or IP address of the Docker host associated to this endpoint
+        example: docker.mydomain.tld:2375
         type: string
       UserAccessPolicies:
         $ref: '#/definitions/portainer.UserAccessPolicies'
+        description: List of user identifiers authorized to connect to this endpoint
     type: object
   portainer.EndpointAuthorizations:
     additionalProperties:
@@ -718,9 +855,11 @@ definitions:
           type: integer
         type: array
       Description:
+        description: Description associated to the endpoint group
+        example: Endpoint group description
         type: string
       Id:
-        description: EndpointGroup Identifier
+        description: Endpoint group Identifier
         example: 1
         type: integer
       Labels:
@@ -729,8 +868,11 @@ definitions:
           $ref: '#/definitions/portainer.Pair'
         type: array
       Name:
+        description: Endpoint group name
+        example: my-endpoint-group
         type: string
       TagIds:
+        description: List of tags associated to this endpoint group
         items:
           description: Tag identifier
           example: 1
@@ -815,10 +957,17 @@ definitions:
   portainer.LDAPGroupSearchSettings:
     properties:
       GroupAttribute:
+        description: LDAP attribute which denotes the group membership
+        example: member
         type: string
       GroupBaseDN:
+        description: The distinguished name of the element from which the LDAP server
+          will search for groups
+        example: dc=ldap,dc=domain,dc=tld
         type: string
       GroupFilter:
+        description: The LDAP search filter used to select group elements, optional
+        example: (objectClass=account
         type: string
     type: object
   portainer.LDAPSearchSettings:
@@ -840,26 +989,40 @@ definitions:
   portainer.LDAPSettings:
     properties:
       AnonymousMode:
+        description: Enable this option if the server is configured for Anonymous
+          access. When enabled, ReaderDN and Password will not be used
+        example: true
         type: boolean
       AutoCreateUsers:
+        description: Automatically provision users and assign them to matching LDAP
+          group names
+        example: true
         type: boolean
       GroupSearchSettings:
         items:
           $ref: '#/definitions/portainer.LDAPGroupSearchSettings'
         type: array
       Password:
+        description: Password of the account that will be used to search users
+        example: readonly-password
         type: string
       ReaderDN:
+        description: Account that will be used to search for users
+        example: cn=readonly-account,dc=ldap,dc=domain,dc=tld
         type: string
       SearchSettings:
         items:
           $ref: '#/definitions/portainer.LDAPSearchSettings'
         type: array
       StartTLS:
+        description: Whether LDAP connection should use StartTLS
+        example: true
         type: boolean
       TLSConfig:
         $ref: '#/definitions/portainer.TLSConfiguration'
       URL:
+        description: URL or IP address of the LDAP server
+        example: myldap.domain.tld:389
         type: string
     type: object
   portainer.OAuthSettings:
@@ -888,13 +1051,17 @@ definitions:
   portainer.Pair:
     properties:
       name:
+        example: name
         type: string
       value:
+        example: value
         type: string
     type: object
   portainer.Registry:
     properties:
       Authentication:
+        description: Is authentication against this registry enabled
+        example: true
         type: boolean
       AuthorizedTeams:
         items:
@@ -918,18 +1085,32 @@ definitions:
       ManagementConfiguration:
         $ref: '#/definitions/portainer.RegistryManagementConfiguration'
       Name:
+        description: Registry Name
+        example: my-registry
         type: string
       Password:
+        description: Password used to authenticate against this registry
+        example: registry_password
         type: string
       TeamAccessPolicies:
         $ref: '#/definitions/portainer.TeamAccessPolicies'
       Type:
+        description: Registry Type (1 - Quay, 2 - Azure, 3 - Custom, 4 - Gitlab)
+        enum:
+        - 1
+        - 2
+        - 3
+        - 4
         type: integer
       URL:
+        description: URL or IP address of the Docker registry
+        example: registry.mydomain.tld:2375
         type: string
       UserAccessPolicies:
         $ref: '#/definitions/portainer.UserAccessPolicies'
       Username:
+        description: Username used to authenticate against this registry
+        example: registry user
         type: string
     type: object
   portainer.RegistryManagementConfiguration:
@@ -950,6 +1131,8 @@ definitions:
       AccessLevel:
         type: integer
       AdministratorsOnly:
+        description: Permit access to resource only to admins
+        example: true
         type: boolean
       Id:
         description: ResourceControl Identifier
@@ -961,10 +1144,19 @@ definitions:
           Deprecated in DBVersion == 2
         type: integer
       Public:
+        description: Permit access to the associated resource to any user
+        example: true
         type: boolean
       ResourceId:
+        description: |-
+          Docker resource identifier on which access control will be applied.\
+          In the case of a resource control applied to a stack, use the stack name as identifier
+        example: 617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08
         type: string
       SubResourceIds:
+        description: List of Docker resources that will inherit this access control
+        example:
+        - 617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08
         items:
           type: string
         type: array
@@ -975,6 +1167,10 @@ definitions:
           $ref: '#/definitions/portainer.TeamResourceAccess'
         type: array
       Type:
+        description: |-
+          Type of Docker resource. Valid values are: 1- container, 2 -service
+          3 - volume, 4 - secret, 5 - stack, 6 - config or 7 - custom template
+        example: 1
         type: integer
       UserAccesses:
         items:
@@ -985,13 +1181,18 @@ definitions:
     properties:
       Authorizations:
         $ref: '#/definitions/portainer.Authorizations'
+        description: Authorizations associated to a role
       Description:
+        description: Role description
+        example: Read-only access of all resources in an endpoint
         type: string
       Id:
         description: Role Identifier
         example: 1
         type: integer
       Name:
+        description: Role name
+        example: HelpDesk
         type: string
       Priority:
         type: integer
@@ -999,44 +1200,77 @@ definitions:
   portainer.Settings:
     properties:
       AllowBindMountsForRegularUsers:
+        description: Whether non-administrator should be able to use bind mounts when
+          creating containers
+        example: false
         type: boolean
       AllowContainerCapabilitiesForRegularUsers:
+        description: Whether non-administrator should be able to use container capabilities
         type: boolean
       AllowDeviceMappingForRegularUsers:
+        description: Whether non-administrator should be able to use device mapping
         type: boolean
       AllowHostNamespaceForRegularUsers:
+        description: Whether non-administrator should be able to use the host pid
         type: boolean
       AllowPrivilegedModeForRegularUsers:
+        description: Whether non-administrator should be able to use privileged mode
+          when creating containers
+        example: false
         type: boolean
       AllowStackManagementForRegularUsers:
+        description: Whether non-administrator should be able to manage stacks
         type: boolean
       AllowVolumeBrowserForRegularUsers:
+        description: Whether non-administrator should be able to browse volumes
         type: boolean
       AuthenticationMethod:
+        description: 'Active authentication method for the Portainer instance. Valid
+          values are: 1 for internal, 2 for LDAP, or 3 for oauth'
+        example: 1
         type: integer
       BlackListedLabels:
+        description: A list of label name & value that will be used to hide containers
+          when querying containers
         items:
           $ref: '#/definitions/portainer.Pair'
         type: array
       EdgeAgentCheckinInterval:
+        description: The default check in interval for edge agent (in seconds)
+        example: 5
         type: integer
       EnableEdgeComputeFeatures:
+        description: Whether edge compute features are enabled
         type: boolean
       EnableHostManagementFeatures:
+        description: Whether host management features are enabled
         type: boolean
       EnableTelemetry:
+        description: Whether telemetry is enabled
+        example: false
         type: boolean
       LDAPSettings:
         $ref: '#/definitions/portainer.LDAPSettings'
       LogoURL:
+        description: URL to a logo that will be displayed on the login page as well
+          as on top of the sidebar. Will use default Portainer logo when value is
+          empty string
+        example: https://mycompany.mydomain.tld/logo.png
         type: string
       OAuthSettings:
         $ref: '#/definitions/portainer.OAuthSettings'
       SnapshotInterval:
+        description: The interval in which endpoint snapshots are created
+        example: 5m
         type: string
       TemplatesURL:
+        description: URL to the templates that will be displayed in the UI when navigating
+          to App Templates
+        example: https://raw.githubusercontent.com/portainer/templates/master/templates.json
         type: string
       UserSessionTimeout:
+        description: The duration of a user session
+        example: 5m
         type: string
       displayDonationHeader:
         description: Deprecated fields
@@ -1047,10 +1281,16 @@ definitions:
   portainer.Stack:
     properties:
       EndpointId:
+        description: Endpoint identifier. Reference the endpoint that will be used
+          for deployment
+        example: 1
         type: integer
       EntryPoint:
+        description: Path to the Stack file
+        example: docker-compose.yml
         type: string
       Env:
+        description: A list of environment variables used during stack deployment
         items:
           $ref: '#/definitions/portainer.Pair'
         type: array
@@ -1059,16 +1299,26 @@ definitions:
         example: 1
         type: integer
       Name:
+        description: Stack name
+        example: myStack
         type: string
       ResourceControl:
         $ref: '#/definitions/portainer.ResourceControl'
       Status:
+        description: Stack status (1 - active, 2 - inactive)
+        example: 1
         type: integer
       SwarmId:
+        description: Cluster identifier of the Swarm cluster where the stack is deployed
+        example: jpofkc0i9uo9wtx1zesuk649w
         type: string
       Type:
+        description: Stack type. 1 for a Swarm stack, 2 for a Compose stack
+        example: 2
         type: integer
       projectPath:
+        description: Path on disk to the repository hosting the Stack file
+        example: /data/compose/myStack_jpofkc0i9uo9wtx1zesuk649w
         type: string
     type: object
   portainer.Status:
@@ -1106,10 +1356,12 @@ definitions:
       EndpointGroups:
         additionalProperties:
           type: boolean
+        description: A set of endpoint group ids that have this tag
         type: object
       Endpoints:
         additionalProperties:
           type: boolean
+        description: A set of endpoint ids that have this tag
         type: object
       Name:
         description: Tag name
@@ -1170,63 +1422,115 @@ definitions:
         example: 1
         type: integer
       administrator_only:
+        description: Whether the template should be available to administrators only
+        example: true
         type: boolean
       categories:
+        description: A list of categories associated to the template
+        example:
+        - database
         items:
           type: string
         type: array
       command:
+        description: The command that will be executed in a container template
+        example: ls -lah
         type: string
       description:
+        description: Description of the template
+        example: High performance web server
         type: string
       env:
+        description: A list of environment variables used during the template deployment
         items:
           $ref: '#/definitions/portainer.TemplateEnv'
         type: array
       hostname:
+        description: Container hostname
+        example: mycontainer
         type: string
       image:
-        description: Mandatory container fields
+        description: |-
+          Mandatory container fields
+          Image associated to a container template. Mandatory for a container template
+        example: nginx:latest
         type: string
       interactive:
+        description: |-
+          Whether the container should be started in
+          interactive mode (-i -t equivalent on the CLI)
+        example: true
         type: boolean
       labels:
+        description: Container labels
         items:
           $ref: '#/definitions/portainer.Pair'
         type: array
       logo:
+        description: URL of the template's logo
+        example: https://cloudinovasi.id/assets/img/logos/nginx.png
         type: string
       name:
-        description: Optional stack/container fields
+        description: |-
+          Optional stack/container fields
+          Default name for the stack/container to be used on deployment
+        example: mystackname
         type: string
       network:
+        description: Name of a network that will be used on container deployment if
+          it exists inside the environment
+        example: mynet
         type: string
       note:
+        description: A note that will be displayed in the UI. Supports HTML content
+        example: This is my <b>custom</b> template
         type: string
       platform:
+        description: |-
+          Platform associated to the template.
+          Valid values are: 'linux', 'windows' or leave empty for multi-platform
+        example: linux
         type: string
       ports:
+        description: A list of ports exposed by the container
+        example:
+        - 8080:80/tcp
         items:
           type: string
         type: array
       privileged:
+        description: Whether the container should be started in privileged mode
+        example: true
         type: boolean
       registry:
-        description: Optional container fields
+        description: |-
+          Optional container fields
+          The URL of a registry associated to the image for a container template
+        example: quay.io
         type: string
       repository:
         $ref: '#/definitions/portainer.TemplateRepository'
         description: Mandatory stack fields
       restart_policy:
+        description: Container restart policy
+        example: on-failure
         type: string
       stackFile:
-        description: Mandatory Edge stack fields
+        description: |-
+          Mandatory Edge stack fields
+          Stack file used for this template
         type: string
       title:
+        description: Title of the template
+        example: Nginx
         type: string
       type:
+        description: 'Template type. Valid values are: 1 (container), 2 (Swarm stack)
+          or 3 (Compose stack)'
+        example: 1
         type: integer
       volumes:
+        description: A list of volumes used during the container template deployment
         items:
           $ref: '#/definitions/portainer.TemplateVolume'
         type: array
@@ -1234,16 +1538,29 @@ definitions:
   portainer.TemplateEnv:
     properties:
       default:
+        description: Default value that will be set for the variable
+        example: default_value
         type: string
       description:
+        description: Content of the tooltip that will be generated in the UI
+        example: MySQL root account password
         type: string
       label:
+        description: Text for the label that will be generated in the UI
+        example: Root password
         type: string
       name:
+        description: name of the environment variable
+        example: MYSQL_ROOT_PASSWORD
         type: string
       preset:
+        description: If set to true, will not generate any input for this variable
+          in the UI
+        example: false
         type: boolean
       select:
+        description: A list of name/value that will be used to generate a dropdown
+          in the UI
         items:
           $ref: '#/definitions/portainer.TemplateEnvSelect'
         type: array
@@ -1251,26 +1568,43 @@ definitions:
   portainer.TemplateEnvSelect:
     properties:
       default:
+        description: Will set this choice as the default choice
+        example: false
         type: boolean
       text:
+        description: Some text that will displayed as a choice
+        example: text value
         type: string
       value:
+        description: A value that will be associated to the choice
+        example: value
         type: string
     type: object
   portainer.TemplateRepository:
     properties:
       stackfile:
+        description: Path to the stack file inside the git repository
+        example: ./subfolder/docker-compose.yml
         type: string
       url:
+        description: URL of a git repository used to deploy a stack template. Mandatory
+          for a Swarm/Compose stack template
+        example: https://github.com/portainer/portainer-compose
         type: string
     type: object
   portainer.TemplateVolume:
     properties:
       bind:
+        description: Path on the host
+        example: /tmp
         type: string
       container:
+        description: Path inside the container
+        example: /data
         type: string
       readonly:
+        description: Whether the volume used should be readonly
+        example: true
         type: boolean
     type: object
   portainer.User:
@@ -1740,9 +2074,11 @@ paths:
     post:
       consumes:
       - application/json
-      operationId: authenticate
+      description: Use this endpoint to authenticate against Portainer using a username
+        and password.
+      operationId: AuthenticateUser
       parameters:
-      - description: username and password
+      - description: Credentials used for authentication
         in: body
         name: body
         required: true
@@ -1752,9 +2088,15 @@ paths:
       - application/json
       responses:
         "200":
-          description: Token
+          description: Success
           schema:
             $ref: '#/definitions/auth.authenticateResponse'
+        "400":
+          description: Invalid request
+        "422":
+          description: Invalid Credentials
+        "500":
+          description: Server error
       summary: Authenticate
       tags:
       - auth
@@ -1779,7 +2121,7 @@ paths:
       - application/json
       operationId: authenticate_oauth
       parameters:
-      - description: OAuth code
+      - description: OAuth Credentials used for authentication
         in: body
         name: body
         required: true
@@ -1789,9 +2131,15 @@ paths:
       - application/json
       responses:
         "200":
-          description: Token
+          description: Success
           schema:
             $ref: '#/definitions/auth.authenticateResponse'
+        "400":
+          description: Invalid request
+        "422":
+          description: Invalid Credentials
+        "500":
+          description: Server error
       summary: Authenticate with OAuth
       tags:
       - auth
@@ -1981,8 +2329,10 @@ paths:
       - custom_templates
   /dockerhub:
     get:
-      consumes:
-      - application/json
+      description: |-
+        Use this endpoint to retrieve the information used to connect to the DockerHub
+        **Access policy**: authenticated
+      operationId: DockerHubInspect
       produces:
       - application/json
       responses:
@@ -1991,17 +2341,21 @@ paths:
           schema:
             $ref: '#/definitions/portainer.DockerHub'
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Gets the dockerhub settings
+      summary: Retrieve DockerHub information
       tags:
       - dockerhub
     put:
       consumes:
       - application/json
+      description: |-
+        Use this endpoint to update the information used to connect to the DockerHub
+        **Access policy**: administrator
+      operationId: DockerHubUpdate
       parameters:
-      - description: DockerHub settings
+      - description: DockerHub information
         in: body
         name: body
         required: true
@@ -2011,12 +2365,14 @@ paths:
       - application/json
       responses:
         "204":
-          description: ""
+          description: Success
+        "400":
+          description: Invalid request
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Updates the dockerhub settings
+      summary: Update DockerHub information
       tags:
       - dockerhub
   /edge_groups:
@@ -2731,8 +3087,12 @@ paths:
       - edge_templates
   /endpoint_groups:
     get:
-      consumes:
-      - application/json
+      description: |-
+        List all endpoint groups based on the current user authorizations. Will
+        return all endpoint groups if using an administrator account otherwise it will
+        only return authorized endpoint groups.
+        **Access policy**: restricted
+      operationId: EndpointGroupList
       produces:
       - application/json
       responses:
@@ -2742,10 +3102,8 @@ paths:
             items:
               $ref: '#/definitions/portainer.EndpointGroup'
             type: array
-        "400":
-          description: ""
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
       summary: List Endpoint groups
@@ -2754,8 +3112,11 @@ paths:
     post:
       consumes:
       - application/json
+      description: |-
+        Create a new endpoint group.
+        **Access policy**: administrator
       parameters:
-      - description: endpoint group data
+      - description: Endpoint Group details
         in: body
         name: body
         required: true
@@ -2765,24 +3126,27 @@ paths:
       - application/json
       responses:
         "200":
-          description: Endpoint group
+          description: Success
           schema:
             $ref: '#/definitions/portainer.EndpointGroup'
         "400":
-          description: ""
+          description: Invalid request
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Creates an Endpoint Group
+      summary: Create an Endpoint Group
       tags:
       - endpoint_groups
   /endpoint_groups/:id:
     get:
       consumes:
       - application/json
+      description: |-
+        Retrieve details abont an endpoint group.
+        **Access policy**: administrator
       parameters:
-      - description: endpoint group id
+      - description: Endpoint group identifier
         in: path
         name: id
         required: true
@@ -2791,13 +3155,15 @@ paths:
       - application/json
       responses:
         "200":
-          description: Endpoint group
+          description: Success
           schema:
             $ref: '#/definitions/portainer.EndpointGroup'
         "400":
-          description: ""
+          description: Invalid request
+        "404":
+          description: EndpointGroup not found
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
       summary: Inspect an Endpoint group
@@ -2806,34 +3172,50 @@ paths:
     put:
       consumes:
       - application/json
+      description: |-
+        Update an endpoint group.
+        **Access policy**: administrator
+      operationId: EndpointGroupUpdate
       parameters:
-      - description: endpoint group id
+      - description: EndpointGroup identifier
         in: path
         name: id
         required: true
         type: integer
+      - description: EndpointGroup details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/endpointgroups.endpointGroupUpdatePayload'
       produces:
       - application/json
       responses:
         "200":
-          description: Endpoint group
+          description: Success
           schema:
             $ref: '#/definitions/portainer.EndpointGroup'
         "400":
-          description: ""
+          description: Invalid request
+        "404":
+          description: EndpointGroup not found
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Update Endpoint group
+      summary: Update an endpoint group
       tags:
       - endpoint_groups
   /endpoint_groups/{id}:
     delete:
       consumes:
       - application/json
+      description: |-
+        Remove an endpoint group.
+        **Access policy**: administrator
+      operationId: EndpointGroupDelete
       parameters:
-      - description: Endpoint Group Id
+      - description: EndpointGroup identifier
         in: path
         name: id
         required: true
@@ -2842,81 +3224,85 @@ paths:
       - application/json
       responses:
         "204":
-          description: ""
+          description: Success
         "400":
-          description: ""
+          description: Invalid request
+        "404":
+          description: EndpointGroup not found
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Deletes an Endpoint Group
+      summary: Remove an endpoint group
       tags:
       - endpoint_groups
   /endpoint_groups/{id}/endpoints/{endpointId}:
     delete:
-      consumes:
-      - application/json
+      description: '**Access policy**: administrator'
+      operationId: EndpointGroupDeleteEndpoint
       parameters:
-      - description: endpoint group id
+      - description: EndpointGroup identifier
         in: path
         name: id
         required: true
         type: integer
-      - description: endpoint id
+      - description: Endpoint identifier
         in: path
         name: endpointId
         required: true
         type: integer
-      produces:
-      - application/json
       responses:
         "204":
-          description: ""
+          description: Success
         "400":
-          description: ""
+          description: Invalid request
         "404":
-          description: ""
+          description: EndpointGroup not found
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
       summary: Removes endpoint from an endpoint group
       tags:
       - endpoint_groups
     put:
-      consumes:
-      - application/json
+      description: |-
+        Add an endpoint to an endpoint group
+        **Access policy**: administrator
+      operationId: EndpointGroupAddEndpoint
       parameters:
-      - description: endpoint group id
+      - description: EndpointGroup identifier
         in: path
         name: id
         required: true
         type: integer
-      - description: endpoint id
+      - description: Endpoint identifier
         in: path
         name: endpointId
         required: true
         type: integer
-      produces:
-      - application/json
       responses:
         "204":
-          description: ""
+          description: Success
         "400":
-          description: ""
+          description: Invalid request
         "404":
-          description: ""
+          description: EndpointGroup not found
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Attach an endpoint to an endpoint group
+      summary: Add an endpoint to an endpoint group
       tags:
       - endpoint_groups
   /endpoints:
     get:
-      consumes:
-      - application/json
+      description: |-
+        List all endpoints based on the current user authorizations. Will
+        return all endpoints if using an administrator account otherwise it will
+        only return authorized endpoints.
+        **Access policy**: restricted
+      operationId: EndpointList
       parameters:
       - description: Start searching from
         in: query
@@ -2964,10 +3350,10 @@ paths:
             items:
               $ref: '#/definitions/portainer.Endpoint'
             type: array
-        "400":
-          description: ""
         "500":
-          description: ""
+          description: Internal Server Error
+          schema:
+            type: Server
       security:
       - jwt: []
       summary: List endpoints
@@ -2975,59 +3361,136 @@ paths:
       - endpoints
     post:
       consumes:
-      - application/json
+      - multipart/form-data
+      description: |-
+        Create a new endpoint that will be used to manage an environment.
+        **Access policy**: administrator
+      operationId: EndpointCreate
       parameters:
-      - description: endpoint data
-        in: body
-        name: body
+      - description: 'Name that will be used to identify this endpoint (example: my-endpoint)'
+        in: formData
+        name: Name
         required: true
-        schema:
-          $ref: '#/definitions/endpoints.endpointCreatePayload'
+        type: string
+      - description: 'Environment type. Value must be one of: 1 (Local Docker environment),
+          2 (Agent environment), 3 (Azure environment), 4 (Edge agent environment)
+          or 5 (Local Kubernetes Environment'
+        in: formData
+        name: EndpointType
+        required: true
+        type: integer
+      - description: 'URL or IP address of a Docker host (example: docker.mydomain.tld:2375).
+          Defaults to local if not specified (Linux: /var/run/docker.sock, Windows:
+          //./pipe/docker_engine)'
+        in: formData
+        name: URL
+        type: string
+      - description: 'URL or IP address where exposed containers will be reachable.
+          Defaults to URL if not specified (example: docker.mydomain.tld:2375)'
+        in: formData
+        name: PublicURL
+        type: string
+      - description: Endpoint group identifier. If not specified will default to 1
+          (unassigned).
+        in: formData
+        name: GroupID
+        type: integer
+      - description: Require TLS to connect against this endpoint
+        in: formData
+        name: TLS
+        type: boolean
+      - description: Skip server verification when using TLS
+        in: formData
+        name: TLSSkipVerify
+        type: boolean
+      - description: Skip client verification when using TLS
+        in: formData
+        name: TLSSkipClientVerify
+        type: boolean
+      - description: TLS CA certificate file
+        in: formData
+        name: TLSCACertFile
+        type: file
+      - description: TLS client certificate file
+        in: formData
+        name: TLSCertFile
+        type: file
+      - description: TLS client key file
+        in: formData
+        name: TLSKeyFile
+        type: file
+      - description: Azure application ID. Required if endpoint type is set to 3
+        in: formData
+        name: AzureApplicationID
+        type: string
+      - description: Azure tenant ID. Required if endpoint type is set to 3
+        in: formData
+        name: AzureTenantID
+        type: string
+      - description: Azure authentication key. Required if endpoint type is set to
+          3
+        in: formData
+        name: AzureAuthenticationKey
+        type: string
+      - description: List of tag identifiers to which this endpoint is associated
+        in: formData
+        items:
+          type: integer
+        name: TagIDs
+        type: array
+      - description: The check in interval for edge agent (in seconds)
+        in: formData
+        name: EdgeCheckinInterval
+        type: integer
       produces:
       - application/json
       responses:
         "200":
-          description: Endpoint
+          description: Success
           schema:
             $ref: '#/definitions/portainer.Endpoint'
         "400":
-          description: ""
+          description: Invalid request
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Creates an endpoint
+      summary: Create a new endpoint
       tags:
       - endpoints
   /endpoints/{id}:
     delete:
-      consumes:
-      - application/json
+      description: |-
+        Remove an endpoint.
+        **Access policy**: administrator
+      operationId: EndpointDelete
       parameters:
-      - description: endpoint id
+      - description: Endpoint identifier
         in: path
         name: id
         required: true
         type: integer
-      produces:
-      - application/json
       responses:
         "204":
-          description: ""
+          description: Success
         "400":
-          description: ""
+          description: Invalid request
+        "404":
+          description: Endpoint not found
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Deletes an endpoint
+      summary: Remove an endpoint
       tags:
       - endpoints
     get:
-      consumes:
-      - application/json
+      description: |-
+        Retrieve details about an endpoint.
+        **Access policy**: restricted
+      operationId: EndpointInspect
       parameters:
-      - description: endpoint id
+      - description: Endpoint identifier
         in: path
         name: id
         required: true
@@ -3036,41 +3499,55 @@ paths:
       - application/json
       responses:
         "200":
-          description: Endpoint
+          description: Success
           schema:
             $ref: '#/definitions/portainer.Endpoint'
         "400":
-          description: ""
+          description: Invalid request
+        "404":
+          description: Endpoint not found
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Inspects an endpoint
+      summary: Inspect an endpoint
       tags:
       - endpoints
     put:
       consumes:
       - application/json
+      description: |-
+        Update an endpoint.
+        **Access policy**: administrator
+      operationId: EndpointUpdate
       parameters:
-      - description: endpoint id
+      - description: Endpoint identifier
         in: path
         name: id
         required: true
         type: integer
+      - description: Endpoint details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/endpoints.endpointUpdatePayload'
       produces:
       - application/json
       responses:
         "200":
-          description: Endpoint
+          description: Success
           schema:
             $ref: '#/definitions/portainer.Endpoint'
         "400":
-          description: ""
+          description: Invalid request
+        "404":
+          description: Endpoint not found
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Updates an endpoint
+      summary: Update an endpoint
       tags:
       - endpoints
   /endpoints/{id}/edge/jobs/{jobID}/logs:
@@ -3203,25 +3680,25 @@ paths:
       - endpoints
   /endpoints/{id}/snapshot:
     post:
-      consumes:
-      - application/json
+      description: |-
+        Snapshots an endpoint
+        **Access policy**: restricted
+      operationId: EndpointSnapshot
       parameters:
-      - description: endpoint id
+      - description: Endpoint identifier
         in: path
         name: id
         required: true
         type: integer
-      produces:
-      - application/json
       responses:
         "204":
-          description: ""
+          description: Success
         "400":
-          description: ""
+          description: Invalid request
         "404":
-          description: ""
+          description: Endpoint not found
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
       summary: Snapshots an endpoint
@@ -3229,44 +3706,45 @@ paths:
       - endpoints
   /endpoints/{id}/status:
     get:
-      consumes:
-      - application/json
+      description: |-
+        Endpoint for edge agent to check status of environment
+        **Access policy**: restricted only to Edge endpoints
+      operationId: EndpointStatusInspect
       parameters:
-      - description: Endpoint ID
+      - description: Endpoint identifier
         in: path
         name: id
         required: true
         type: integer
-      produces:
-      - application/json
       responses:
         "200":
-          description: OK
+          description: Success
           schema:
             $ref: '#/definitions/endpoints.endpointStatusInspectResponse'
+        "400":
+          description: Invalid request
         "403":
-          description: ""
+          description: Permission denied to access endpoint
         "404":
-          description: ""
+          description: Endpoint not found
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Get endpoint status (for edge)
+      summary: Get endpoint status
       tags:
       - endpoints
-      - edge
   /endpoints/snapshot:
     post:
-      consumes:
-      - application/json
-      produces:
-      - application/json
+      description: |-
+        Snapshot all endpoints
+        **Access policy**: administrator
+      operationId: EndpointSnapshots
       responses:
         "204":
-          description: ""
+          description: Success
         "500":
-          description: ""
+          description: Server Error
       security:
       - jwt: []
       summary: Snapshot all endpoints
