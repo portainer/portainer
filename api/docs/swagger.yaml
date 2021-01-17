@@ -1661,7 +1661,7 @@ paths:
       - ApiKeyAuth: []
       summary: Gets a list of custom templates
       tags:
-      - CustomTemplates
+      - custom_templates
     post:
       consumes:
       - application/json
@@ -1707,7 +1707,7 @@ paths:
       - ApiKeyAuth: []
       summary: Create a custom template
       tags:
-      - CustomTemplates
+      - custom_templates
   /custom_templates/{id}:
     delete:
       consumes:
@@ -1733,7 +1733,7 @@ paths:
       - ApiKeyAuth: []
       summary: Delete a custom template
       tags:
-      - CustomTemplates
+      - custom_templates
     get:
       consumes:
       - application/json
@@ -1760,7 +1760,7 @@ paths:
       - ApiKeyAuth: []
       summary: Gets a custom template
       tags:
-      - CustomTemplates
+      - custom_templates
     put:
       consumes:
       - application/json
@@ -1793,7 +1793,7 @@ paths:
       - ApiKeyAuth: []
       summary: Updates a custom template
       tags:
-      - CustomTemplates
+      - custom_templates
   /custom_templates/{id}/file:
     get:
       consumes:
@@ -1821,7 +1821,7 @@ paths:
       - ApiKeyAuth: []
       summary: Gets a custom template's file
       tags:
-      - CustomTemplates
+      - custom_templates
   /dockerhub:
     get:
       consumes:
@@ -1839,7 +1839,7 @@ paths:
       - ApiKeyAuth: []
       summary: Gets the dockerhub settings
       tags:
-      - DockerHub
+      - dockerhub
     put:
       consumes:
       - application/json
@@ -1861,7 +1861,7 @@ paths:
       - ApiKeyAuth: []
       summary: Updates the dockerhub settings
       tags:
-      - DockerHub
+      - dockerhub
   /edge_groups:
     get:
       consumes:
@@ -1890,7 +1890,7 @@ paths:
       - ApiKeyAuth: []
       summary: list EdgeGroups
       tags:
-      - EdgeGroups
+      - edge_groups
     post:
       consumes:
       - application/json
@@ -1918,7 +1918,7 @@ paths:
       - ApiKeyAuth: []
       summary: Create an EdgeGroup
       tags:
-      - EdgeGroups
+      - edge_groups
   /edge_groups/{id}:
     delete:
       consumes:
@@ -1944,7 +1944,7 @@ paths:
       - ApiKeyAuth: []
       summary: Deletes an EdgeGroup
       tags:
-      - EdgeGroups
+      - edge_groups
     get:
       consumes:
       - application/json
@@ -1971,7 +1971,7 @@ paths:
       - ApiKeyAuth: []
       summary: Inspects an EdgeGroup
       tags:
-      - EdgeGroups
+      - edge_groups
     put:
       consumes:
       - application/json
@@ -2004,7 +2004,7 @@ paths:
       - ApiKeyAuth: []
       summary: Updates an EdgeGroup
       tags:
-      - EdgeGroups
+      - edge_groups
   /edge_jobs:
     get:
       consumes:
@@ -2030,7 +2030,7 @@ paths:
       - ApiKeyAuth: []
       summary: Fetch EdgeJobs list
       tags:
-      - EdgeJobs
+      - edge_jobs
     post:
       consumes:
       - application/json
@@ -2072,7 +2072,7 @@ paths:
       - ApiKeyAuth: []
       summary: Create an EdgeJob
       tags:
-      - EdgeJobs
+      - edge_jobs
   /edge_jobs/{id}:
     delete:
       consumes:
@@ -2100,7 +2100,7 @@ paths:
       - ApiKeyAuth: []
       summary: Delete an EdgeJob
       tags:
-      - EdgeJobs
+      - edge_jobs
     get:
       consumes:
       - application/json
@@ -2129,7 +2129,7 @@ paths:
       - ApiKeyAuth: []
       summary: Inspect an EdgeJob
       tags:
-      - EdgeJobs
+      - edge_jobs
     post:
       consumes:
       - application/json
@@ -2164,7 +2164,7 @@ paths:
       - ApiKeyAuth: []
       summary: Update an EdgeJob
       tags:
-      - EdgeJobs
+      - edge_jobs
   /edge_jobs/{id}/file:
     get:
       consumes:
@@ -2194,7 +2194,7 @@ paths:
       - ApiKeyAuth: []
       summary: Fetch a file of an EdgeJob
       tags:
-      - EdgeJobs
+      - edge_jobs
   /edge_jobs/{id}/tasks:
     get:
       consumes:
@@ -2226,7 +2226,7 @@ paths:
       - ApiKeyAuth: []
       summary: Fetch the list of tasks on an EdgeJob
       tags:
-      - EdgeJobs
+      - edge_jobs
   /edge_jobs/{id}/tasks/{taskID}/logs:
     delete:
       consumes:
@@ -2259,7 +2259,7 @@ paths:
       - ApiKeyAuth: []
       summary: Clear the log for a specifc task on an EdgeJob
       tags:
-      - EdgeJobs
+      - edge_jobs
     get:
       consumes:
       - application/json
@@ -2293,7 +2293,7 @@ paths:
       - ApiKeyAuth: []
       summary: Fetch the log for a specifc task on an EdgeJob
       tags:
-      - EdgeJobs
+      - edge_jobs
     post:
       consumes:
       - application/json
@@ -2325,7 +2325,7 @@ paths:
       - ApiKeyAuth: []
       summary: Collect the log for a specifc task on an EdgeJob
       tags:
-      - EdgeJobs
+      - edge_jobs
   /edge_stacks:
     get:
       consumes:
@@ -2351,7 +2351,7 @@ paths:
       - ApiKeyAuth: []
       summary: Fetches the list of EdgeStacks
       tags:
-      - EdgeStacks
+      - edge_stacks
     post:
       consumes:
       - application/json
@@ -2400,7 +2400,7 @@ paths:
       - ApiKeyAuth: []
       summary: Create an EdgeStack
       tags:
-      - EdgeStacks
+      - edge_stacks
   /edge_stacks/{id}:
     delete:
       consumes:
@@ -2428,7 +2428,7 @@ paths:
       - ApiKeyAuth: []
       summary: Delete an EdgeStack
       tags:
-      - EdgeStacks
+      - edge_stacks
     get:
       consumes:
       - application/json
@@ -2457,7 +2457,7 @@ paths:
       - ApiKeyAuth: []
       summary: Inspect an EdgeStack
       tags:
-      - EdgeStacks
+      - edge_stacks
     put:
       consumes:
       - application/json
@@ -2492,7 +2492,7 @@ paths:
       - ApiKeyAuth: []
       summary: Update an EdgeStack
       tags:
-      - EdgeStacks
+      - edge_stacks
   /edge_stacks/{id}/file:
     get:
       consumes:
@@ -2522,7 +2522,7 @@ paths:
       - ApiKeyAuth: []
       summary: Fetches the stack file for an EdgeStack
       tags:
-      - EdgeStacks
+      - edge_stacks
   /edge_stacks/{id}/status:
     put:
       consumes:
@@ -2551,7 +2551,7 @@ paths:
           description: ""
       summary: Update an EdgeStack status
       tags:
-      - EdgeStacks
+      - edge_stacks
   /edge_templates:
     get:
       consumes:
@@ -2571,7 +2571,7 @@ paths:
       - ApiKeyAuth: []
       summary: Fetches the list of Edge Templates
       tags:
-      - EdgeTemplates
+      - edge_templates
   /endpoint_groups:
     get:
       consumes:
@@ -2593,7 +2593,7 @@ paths:
       - ApiKeyAuth: []
       summary: List Endpoint groups
       tags:
-      - EndpointGroups
+      - endpoint_groups
     post:
       consumes:
       - application/json
@@ -2619,7 +2619,7 @@ paths:
       - ApiKeyAuth: []
       summary: Creates an Endpoint Group
       tags:
-      - EndpointGroups
+      - endpoint_groups
   /endpoint_groups/:id:
     get:
       consumes:
@@ -2645,7 +2645,7 @@ paths:
       - ApiKeyAuth: []
       summary: Inspect an Endpoint group
       tags:
-      - EndpointGroups
+      - endpoint_groups
     put:
       consumes:
       - application/json
@@ -2670,7 +2670,7 @@ paths:
       - ApiKeyAuth: []
       summary: Update Endpoint group
       tags:
-      - EndpointGroups
+      - endpoint_groups
   /endpoint_groups/{id}:
     delete:
       consumes:
@@ -2694,7 +2694,7 @@ paths:
       - ApiKeyAuth: []
       summary: Deletes an Endpoint Group
       tags:
-      - EndpointGroups
+      - endpoint_groups
   /endpoint_groups/{id}/endpoints/{endpointId}:
     delete:
       consumes:
@@ -2725,7 +2725,7 @@ paths:
       - ApiKeyAuth: []
       summary: Removes endpoint from an endpoint group
       tags:
-      - EndpointGroups
+      - endpoint_groups
     put:
       consumes:
       - application/json
@@ -2755,7 +2755,7 @@ paths:
       - ApiKeyAuth: []
       summary: Attach an endpoint to an endpoint group
       tags:
-      - EndpointGroups
+      - endpoint_groups
   /endpoints:
     get:
       consumes:
@@ -2815,7 +2815,7 @@ paths:
       - ApiKeyAuth: []
       summary: List endpoints
       tags:
-      - Endpoints
+      - endpoints
     post:
       consumes:
       - application/json
@@ -2841,7 +2841,7 @@ paths:
       - ApiKeyAuth: []
       summary: Creates an endpoint
       tags:
-      - Endpoints
+      - endpoints
   /endpoints/{id}:
     delete:
       consumes:
@@ -2865,7 +2865,7 @@ paths:
       - ApiKeyAuth: []
       summary: Deletes an endpoint
       tags:
-      - Endpoints
+      - endpoints
     get:
       consumes:
       - application/json
@@ -2890,7 +2890,7 @@ paths:
       - ApiKeyAuth: []
       summary: Inspects an endpoint
       tags:
-      - Endpoints
+      - endpoints
     put:
       consumes:
       - application/json
@@ -2915,7 +2915,7 @@ paths:
       - ApiKeyAuth: []
       summary: Updates an endpoint
       tags:
-      - Endpoints
+      - endpoints
   /endpoints/{id}/edge/jobs/{jobID}/logs:
     post:
       consumes:
@@ -2942,8 +2942,8 @@ paths:
           description: ""
       summary: Inspect an EdgeJob Log
       tags:
-      - Edge
-      - Endpoints
+      - edge
+      - endpoints
   /endpoints/{id}/edge/stacks/{stackId}:
     get:
       consumes:
@@ -2974,9 +2974,9 @@ paths:
           description: ""
       summary: Inspect an Edge Stack for an Endpoint
       tags:
-      - Edge
-      - Endpoints
-      - EdgeStacks
+      - edge
+      - endpoints
+      - edge_stacks
   /endpoints/{id}/extensions:
     post:
       consumes:
@@ -3010,7 +3010,7 @@ paths:
       - ApiKeyAuth: []
       summary: Add an extension to an Endpoint
       tags:
-      - Endpoints
+      - endpoints
   /endpoints/{id}/extensions/{extensionType}:
     delete:
       consumes:
@@ -3043,7 +3043,7 @@ paths:
       - ApiKeyAuth: []
       summary: Removes an extension to an Endpoint
       tags:
-      - Endpoints
+      - endpoints
   /endpoints/{id}/snapshot:
     post:
       consumes:
@@ -3069,7 +3069,7 @@ paths:
       - ApiKeyAuth: []
       summary: Snapshots an endpoint
       tags:
-      - Endpoints
+      - endpoints
   /endpoints/{id}/status:
     get:
       consumes:
@@ -3097,8 +3097,8 @@ paths:
       - ApiKeyAuth: []
       summary: Get endpoint status (for edge)
       tags:
-      - Endpoints
-      - Edge
+      - endpoints
+      - edge
   /endpoints/snapshot:
     post:
       consumes:
@@ -3114,7 +3114,7 @@ paths:
       - ApiKeyAuth: []
       summary: Snapshot all endpoints
       tags:
-      - Endpoints
+      - endpoints
   /motd:
     get:
       produces:
@@ -3128,7 +3128,7 @@ paths:
       - ApiKeyAuth: []
       summary: fetches the message of the day
       tags:
-      - MOTD
+      - motd
   /registries:
     get:
       consumes:
@@ -3148,7 +3148,7 @@ paths:
       - ApiKeyAuth: []
       summary: List Registries
       tags:
-      - Registries
+      - registries
     post:
       consumes:
       - application/json
@@ -3174,7 +3174,7 @@ paths:
       - ApiKeyAuth: []
       summary: Creates a registry
       tags:
-      - Registries
+      - registries
   /registries/{id}:
     delete:
       consumes:
@@ -3200,7 +3200,7 @@ paths:
       - ApiKeyAuth: []
       summary: Deletes a registry
       tags:
-      - Registries
+      - registries
     get:
       consumes:
       - application/json
@@ -3229,7 +3229,7 @@ paths:
       - ApiKeyAuth: []
       summary: Inspects a registry
       tags:
-      - Registries
+      - registries
     put:
       consumes:
       - application/json
@@ -3260,7 +3260,7 @@ paths:
       - ApiKeyAuth: []
       summary: Updates a registry
       tags:
-      - Registries
+      - registries
   /registries/{id}/configure:
     post:
       consumes:
@@ -3290,7 +3290,7 @@ paths:
       - ApiKeyAuth: []
       summary: Configures a registry
       tags:
-      - Registries
+      - registries
   /resource_controls:
     post:
       consumes:
@@ -3319,7 +3319,7 @@ paths:
       - ApiKeyAuth: []
       summary: Creates a resource control object
       tags:
-      - ResourceControl
+      - resource_controls
   /resource_controls/{id}:
     delete:
       consumes:
@@ -3345,7 +3345,7 @@ paths:
       - ApiKeyAuth: []
       summary: Deletes a resource control object
       tags:
-      - ResourceControl
+      - resource_controls
     put:
       consumes:
       - application/json
@@ -3380,7 +3380,7 @@ paths:
       - ApiKeyAuth: []
       summary: Updates a resource control object
       tags:
-      - ResourceControl
+      - resource_controls
   /roles:
     get:
       consumes:
@@ -3400,7 +3400,7 @@ paths:
       - ApiKeyAuth: []
       summary: List Roles
       tags:
-      - Roles
+      - roles
   /settings:
     get:
       consumes:
@@ -3418,7 +3418,7 @@ paths:
       - ApiKeyAuth: []
       summary: Inspect Settings
       tags:
-      - Settings
+      - settings
     put:
       consumes:
       - application/json
@@ -3442,7 +3442,7 @@ paths:
       - ApiKeyAuth: []
       summary: Update Settings
       tags:
-      - Settings
+      - settings
   /settings/ldap/check:
     put:
       consumes:
@@ -3465,7 +3465,7 @@ paths:
       - ApiKeyAuth: []
       summary: Check LDAP Connection
       tags:
-      - Settings
+      - settings
   /settings/public:
     get:
       consumes:
@@ -3483,7 +3483,7 @@ paths:
       - ApiKeyAuth: []
       summary: Inspect Public Settings
       tags:
-      - Settings
+      - settings
   /stacks:
     get:
       consumes:
@@ -3512,7 +3512,7 @@ paths:
       - ApiKeyAuth: []
       summary: List Stacks
       tags:
-      - Stacks
+      - stacks
     post:
       consumes:
       - application/json
@@ -3577,7 +3577,7 @@ paths:
       - ApiKeyAuth: []
       summary: Create a Stack
       tags:
-      - Stacks
+      - stacks
   /stacks/{id}:
     delete:
       consumes:
@@ -3618,7 +3618,7 @@ paths:
       - ApiKeyAuth: []
       summary: Delete a Stack
       tags:
-      - Stacks
+      - stacks
     get:
       consumes:
       - application/json
@@ -3647,7 +3647,7 @@ paths:
       - ApiKeyAuth: []
       summary: Inspect Stack
       tags:
-      - Stacks
+      - stacks
     put:
       consumes:
       - application/json
@@ -3686,7 +3686,7 @@ paths:
       - ApiKeyAuth: []
       summary: Update a Stack
       tags:
-      - Stacks
+      - stacks
   /stacks/{id}/file:
     get:
       consumes:
@@ -3716,7 +3716,7 @@ paths:
       - ApiKeyAuth: []
       summary: Inspect Stack's file
       tags:
-      - Stacks
+      - stacks
   /stacks/{id}/migrate:
     post:
       consumes:
@@ -3756,7 +3756,7 @@ paths:
       - ApiKeyAuth: []
       summary: Migrates a Stack to another endpoint
       tags:
-      - Stacks
+      - stacks
   /stacks/{id}/start:
     post:
       consumes:
@@ -3786,7 +3786,7 @@ paths:
       - ApiKeyAuth: []
       summary: Starts a stopped Stack
       tags:
-      - Stacks
+      - stacks
   /stacks/{id}/stop:
     post:
       consumes:
@@ -3816,7 +3816,7 @@ paths:
       - ApiKeyAuth: []
       summary: Stops a Stack
       tags:
-      - Stacks
+      - stacks
   /status:
     get:
       consumes:
@@ -3832,7 +3832,7 @@ paths:
           description: ""
       summary: Inspect Status
       tags:
-      - Status
+      - status
   /status/version:
     get:
       consumes:
@@ -3850,7 +3850,7 @@ paths:
       - ApiKeyAuth: []
       summary: Inspect Version
       tags:
-      - Status
+      - status
   /tags:
     get:
       produces:
@@ -3868,7 +3868,7 @@ paths:
       - ApiKeyAuth: []
       summary: Fetches the list of tags
       tags:
-      - Tags
+      - tags
     post:
       parameters:
       - description: tag info
@@ -3892,7 +3892,7 @@ paths:
       - ApiKeyAuth: []
       summary: Create a tag
       tags:
-      - Tags
+      - tags
   /tags/{id}:
     delete:
       parameters:
@@ -3912,7 +3912,7 @@ paths:
       - ApiKeyAuth: []
       summary: Delete a tag
       tags:
-      - Tags
+      - tags
   /team:
     post:
       consumes:
@@ -3941,7 +3941,7 @@ paths:
       - ApiKeyAuth: []
       summary: Create Team
       tags:
-      - Teams
+      - teams
   /team/{id}:
     post:
       consumes:
@@ -3975,7 +3975,7 @@ paths:
       - ApiKeyAuth: []
       summary: Update Team
       tags:
-      - Teams
+      - teams
   /team_memberships:
     get:
       consumes:
@@ -3995,7 +3995,7 @@ paths:
       - ApiKeyAuth: []
       summary: List team memberships
       tags:
-      - TeamMembership
+      - team_memberships
     post:
       consumes:
       - application/json
@@ -4019,7 +4019,7 @@ paths:
       - ApiKeyAuth: []
       summary: Add user to team
       tags:
-      - TeamMembership
+      - team_memberships
   /team_memberships/{id}:
     delete:
       consumes:
@@ -4047,7 +4047,7 @@ paths:
       - ApiKeyAuth: []
       summary: Remove user from team
       tags:
-      - TeamMembership
+      - team_memberships
     put:
       consumes:
       - application/json
@@ -4082,7 +4082,7 @@ paths:
       - ApiKeyAuth: []
       summary: Update team membership
       tags:
-      - TeamMembership
+      - team_memberships
   /teams:
     get:
       consumes:
@@ -4102,7 +4102,7 @@ paths:
       - ApiKeyAuth: []
       summary: List teams
       tags:
-      - Teams
+      - teams
   /teams/{id}:
     delete:
       consumes:
@@ -4128,7 +4128,7 @@ paths:
       - ApiKeyAuth: []
       summary: Delete team
       tags:
-      - Teams
+      - teams
     get:
       consumes:
       - application/json
@@ -4157,7 +4157,7 @@ paths:
       - ApiKeyAuth: []
       summary: Inspect team
       tags:
-      - Teams
+      - teams
   /teams/{id}/memberships:
     get:
       consumes:
@@ -4187,7 +4187,7 @@ paths:
       - ApiKeyAuth: []
       summary: List team's memberships
       tags:
-      - Teams
+      - teams
   /templates:
     get:
       consumes:
@@ -4205,7 +4205,7 @@ paths:
       - ApiKeyAuth: []
       summary: List templates
       tags:
-      - Templates
+      - templates
   /templates/file:
     post:
       consumes:
@@ -4232,7 +4232,7 @@ paths:
       - ApiKeyAuth: []
       summary: Get a template's file
       tags:
-      - Templates
+      - templates
   /upload/tls/{certificate}:
     post:
       consumes:
@@ -4270,7 +4270,7 @@ paths:
       - ApiKeyAuth: []
       summary: Upload TLS file
       tags:
-      - Upload
+      - upload
   /users:
     get:
       consumes:
@@ -4290,7 +4290,7 @@ paths:
       - ApiKeyAuth: []
       summary: List users
       tags:
-      - Users
+      - users
     post:
       consumes:
       - application/json
@@ -4320,7 +4320,7 @@ paths:
       - ApiKeyAuth: []
       summary: Create a user
       tags:
-      - Users
+      - users
   /users/{id}:
     delete:
       consumes:
@@ -4346,7 +4346,7 @@ paths:
       - ApiKeyAuth: []
       summary: Delete a user
       tags:
-      - Users
+      - users
     get:
       consumes:
       - application/json
@@ -4373,7 +4373,7 @@ paths:
       - ApiKeyAuth: []
       summary: Inspect a user
       tags:
-      - Users
+      - users
     put:
       consumes:
       - application/json
@@ -4410,7 +4410,7 @@ paths:
       - ApiKeyAuth: []
       summary: Update a user
       tags:
-      - Users
+      - users
   /users/{id}/memberships:
     get:
       consumes:
@@ -4440,7 +4440,7 @@ paths:
       - ApiKeyAuth: []
       summary: List user's team memberships
       tags:
-      - Users
+      - users
   /users/{id}/passwd:
     put:
       consumes:
@@ -4474,7 +4474,7 @@ paths:
       - ApiKeyAuth: []
       summary: Update a user's password
       tags:
-      - Users
+      - users
   /users/admin/check:
     get:
       consumes:
@@ -4491,7 +4491,7 @@ paths:
           description: Failed
       summary: Admin Check
       tags:
-      - Users
+      - users
   /users/admin/init:
     post:
       consumes:
@@ -4519,7 +4519,7 @@ paths:
           description: ""
       summary: Create an initial admin user
       tags:
-      - Users
+      - users
   /webhooks:
     get:
       consumes:
@@ -4554,7 +4554,7 @@ paths:
       - ApiKeyAuth: []
       summary: List webhooks
       tags:
-      - Webhooks
+      - webhooks
     post:
       consumes:
       - application/json
@@ -4582,7 +4582,7 @@ paths:
       - ApiKeyAuth: []
       summary: Create a webhook
       tags:
-      - Webhooks
+      - webhooks
   /webhooks/{id}:
     delete:
       consumes:
@@ -4606,7 +4606,7 @@ paths:
       - ApiKeyAuth: []
       summary: Delete a webhook
       tags:
-      - Webhooks
+      - webhooks
   /webhooks/{token}:
     post:
       consumes:
@@ -4629,7 +4629,7 @@ paths:
           description: ""
       summary: Execute a webhook
       tags:
-      - Webhooks
+      - webhooks
   /websocket/attach:
     get:
       consumes:
@@ -4671,7 +4671,7 @@ paths:
       - ApiKeyAuth: []
       summary: Attach a websocket
       tags:
-      - Websockets
+      - websocket
   /websocket/exec:
     get:
       consumes:
@@ -4711,7 +4711,7 @@ paths:
       - ApiKeyAuth: []
       summary: Execute a websocket
       tags:
-      - Websockets
+      - websocket
   /websocket/pod:
     get:
       consumes:
@@ -4767,10 +4767,63 @@ paths:
       - ApiKeyAuth: []
       summary: Execute a websocket on pod
       tags:
-      - Websockets
+      - websocket
 securityDefinitions:
   ApiKeyAuth:
     in: header
     name: Authorization
     type: apiKey
 swagger: "2.0"
+tags:
+- description: Authenticate against Portainer HTTP API
+  name: auth
+- description: Manage Custom Templates
+  name: custom_templates
+- description: Manage how Portainer connects to the DockerHub
+  name: dockerhub
+- description: Manage Edge Groups
+  name: edge_groups
+- description: Manage Edge Jobs
+  name: edge_jobs
+- description: Manage Edge Stacks
+  name: edge_stacks
+- description: Manage Edge Templates
+  name: edge_templates
+- description: Manage Edge related endpoint settings
+  name: edge
+- description: Manage Docker environments
+  name: endpoints
+- description: Manage endpoint groups
+  name: endpoint_groups
+- description: Fetch the message of the day
+  name: motd
+- description: Manage Docker registries
+  name: registries
+- description: Manage access control on Docker resources
+  name: resource_controls
+- description: Manage roles
+  name: roles
+- description: Manage Portainer settings
+  name: settings
+- description: Information about the Portainer instance
+  name: status
+- description: Manage Docker stacks
+  name: stacks
+- description: Manage users
+  name: users
+- description: Manage tags
+  name: tags
+- description: Manage teams
+  name: teams
+- description: Manage team memberships
+  name: team_memberships
+- description: Manage App Templates
+  name: templates
+- description: Manage stacks
+  name: stacks
+- description: Upload files
+  name: upload
+- description: Manage webhooks
+  name: webhooks
+- description: Create exec sessions using websockets
+  name: websocket

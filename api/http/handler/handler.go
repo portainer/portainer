@@ -84,6 +84,59 @@ type Handler struct {
 // @in header
 // @name Authorization
 
+// @tag.name auth
+// @tag.description Authenticate against Portainer HTTP API
+// @tag.name custom_templates
+// @tag.description Manage Custom Templates
+// @tag.name dockerhub
+// @tag.description Manage how Portainer connects to the DockerHub
+// @tag.name edge_groups
+// @tag.description Manage Edge Groups
+// @tag.name edge_jobs
+// @tag.description Manage Edge Jobs
+// @tag.name edge_stacks
+// @tag.description Manage Edge Stacks
+// @tag.name edge_templates
+// @tag.description Manage Edge Templates
+// @tag.name edge
+// @tag.description Manage Edge related endpoint settings
+// @tag.name endpoints
+// @tag.description Manage Docker environments
+// @tag.name endpoint_groups
+// @tag.description Manage endpoint groups
+// @tag.name motd
+// @tag.description Fetch the message of the day
+// @tag.name registries
+// @tag.description Manage Docker registries
+// @tag.name resource_controls
+// @tag.description Manage access control on Docker resources
+// @tag.name roles
+// @tag.description Manage roles
+// @tag.name settings
+// @tag.description Manage Portainer settings
+// @tag.name status
+// @tag.description Information about the Portainer instance
+// @tag.name stacks
+// @tag.description Manage Docker stacks
+// @tag.name users
+// @tag.description Manage users
+// @tag.name tags
+// @tag.description Manage tags
+// @tag.name teams
+// @tag.description Manage teams
+// @tag.name team_memberships
+// @tag.description Manage team memberships
+// @tag.name templates
+// @tag.description Manage App Templates
+// @tag.name stacks
+// @tag.description Manage stacks
+// @tag.name upload
+// @tag.description Upload files
+// @tag.name webhooks
+// @tag.description Manage webhooks
+// @tag.name websocket
+// @tag.description Create exec sessions using websockets
+
 // ServeHTTP delegates a request to the appropriate subhandler.
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch {

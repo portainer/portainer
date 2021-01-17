@@ -132,7 +132,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "CustomTemplates"
+                    "custom_templates"
                 ],
                 "summary": "Gets a list of custom templates",
                 "responses": {
@@ -169,7 +169,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "CustomTemplates"
+                    "custom_templates"
                 ],
                 "summary": "Create a custom template",
                 "parameters": [
@@ -243,7 +243,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "CustomTemplates"
+                    "custom_templates"
                 ],
                 "summary": "Gets a custom template",
                 "parameters": [
@@ -286,7 +286,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "CustomTemplates"
+                    "custom_templates"
                 ],
                 "summary": "Updates a custom template",
                 "parameters": [
@@ -338,7 +338,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "CustomTemplates"
+                    "custom_templates"
                 ],
                 "summary": "Delete a custom template",
                 "parameters": [
@@ -380,7 +380,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "CustomTemplates"
+                    "custom_templates"
                 ],
                 "summary": "Gets a custom template's file",
                 "parameters": [
@@ -425,7 +425,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "DockerHub"
+                    "dockerhub"
                 ],
                 "summary": "Gets the dockerhub settings",
                 "responses": {
@@ -453,7 +453,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "DockerHub"
+                    "dockerhub"
                 ],
                 "summary": "Updates the dockerhub settings",
                 "parameters": [
@@ -491,7 +491,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EdgeGroups"
+                    "edge_groups"
                 ],
                 "summary": "list EdgeGroups",
                 "responses": {
@@ -540,7 +540,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EdgeGroups"
+                    "edge_groups"
                 ],
                 "summary": "Create an EdgeGroup",
                 "parameters": [
@@ -587,7 +587,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EdgeGroups"
+                    "edge_groups"
                 ],
                 "summary": "Inspects an EdgeGroup",
                 "parameters": [
@@ -630,7 +630,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EdgeGroups"
+                    "edge_groups"
                 ],
                 "summary": "Updates an EdgeGroup",
                 "parameters": [
@@ -682,7 +682,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EdgeGroups"
+                    "edge_groups"
                 ],
                 "summary": "Deletes an EdgeGroup",
                 "parameters": [
@@ -724,7 +724,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EdgeJobs"
+                    "edge_jobs"
                 ],
                 "summary": "Fetch EdgeJobs list",
                 "responses": {
@@ -764,7 +764,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EdgeJobs"
+                    "edge_jobs"
                 ],
                 "summary": "Create an EdgeJob",
                 "parameters": [
@@ -831,7 +831,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EdgeJobs"
+                    "edge_jobs"
                 ],
                 "summary": "Inspect an EdgeJob",
                 "parameters": [
@@ -877,7 +877,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EdgeJobs"
+                    "edge_jobs"
                 ],
                 "summary": "Update an EdgeJob",
                 "parameters": [
@@ -932,7 +932,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EdgeJobs"
+                    "edge_jobs"
                 ],
                 "summary": "Delete an EdgeJob",
                 "parameters": [
@@ -977,7 +977,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EdgeJobs"
+                    "edge_jobs"
                 ],
                 "summary": "Fetch a file of an EdgeJob",
                 "parameters": [
@@ -1025,7 +1025,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EdgeJobs"
+                    "edge_jobs"
                 ],
                 "summary": "Fetch the list of tasks on an EdgeJob",
                 "parameters": [
@@ -1076,7 +1076,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EdgeJobs"
+                    "edge_jobs"
                 ],
                 "summary": "Fetch the log for a specifc task on an EdgeJob",
                 "parameters": [
@@ -1129,7 +1129,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EdgeJobs"
+                    "edge_jobs"
                 ],
                 "summary": "Collect the log for a specifc task on an EdgeJob",
                 "parameters": [
@@ -1179,7 +1179,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EdgeJobs"
+                    "edge_jobs"
                 ],
                 "summary": "Clear the log for a specifc task on an EdgeJob",
                 "parameters": [
@@ -1231,7 +1231,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EdgeStacks"
+                    "edge_stacks"
                 ],
                 "summary": "Fetches the list of EdgeStacks",
                 "responses": {
@@ -1271,7 +1271,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EdgeStacks"
+                    "edge_stacks"
                 ],
                 "summary": "Create an EdgeStack",
                 "parameters": [
@@ -1348,7 +1348,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EdgeStacks"
+                    "edge_stacks"
                 ],
                 "summary": "Inspect an EdgeStack",
                 "parameters": [
@@ -1394,7 +1394,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EdgeStacks"
+                    "edge_stacks"
                 ],
                 "summary": "Update an EdgeStack",
                 "parameters": [
@@ -1449,7 +1449,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EdgeStacks"
+                    "edge_stacks"
                 ],
                 "summary": "Delete an EdgeStack",
                 "parameters": [
@@ -1494,7 +1494,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EdgeStacks"
+                    "edge_stacks"
                 ],
                 "summary": "Fetches the stack file for an EdgeStack",
                 "parameters": [
@@ -1538,7 +1538,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EdgeStacks"
+                    "edge_stacks"
                 ],
                 "summary": "Update an EdgeStack status",
                 "parameters": [
@@ -1586,7 +1586,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EdgeTemplates"
+                    "edge_templates"
                 ],
                 "summary": "Fetches the list of Edge Templates",
                 "responses": {
@@ -1619,7 +1619,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EndpointGroups"
+                    "endpoint_groups"
                 ],
                 "summary": "List Endpoint groups",
                 "responses": {
@@ -1653,7 +1653,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EndpointGroups"
+                    "endpoint_groups"
                 ],
                 "summary": "Creates an Endpoint Group",
                 "parameters": [
@@ -1697,7 +1697,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EndpointGroups"
+                    "endpoint_groups"
                 ],
                 "summary": "Inspect an Endpoint group",
                 "parameters": [
@@ -1737,7 +1737,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EndpointGroups"
+                    "endpoint_groups"
                 ],
                 "summary": "Update Endpoint group",
                 "parameters": [
@@ -1779,7 +1779,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EndpointGroups"
+                    "endpoint_groups"
                 ],
                 "summary": "Deletes an Endpoint Group",
                 "parameters": [
@@ -1818,7 +1818,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EndpointGroups"
+                    "endpoint_groups"
                 ],
                 "summary": "Attach an endpoint to an endpoint group",
                 "parameters": [
@@ -1865,7 +1865,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "EndpointGroups"
+                    "endpoint_groups"
                 ],
                 "summary": "Removes endpoint from an endpoint group",
                 "parameters": [
@@ -1914,7 +1914,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Endpoints"
+                    "endpoints"
                 ],
                 "summary": "List endpoints",
                 "parameters": [
@@ -2004,7 +2004,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Endpoints"
+                    "endpoints"
                 ],
                 "summary": "Creates an endpoint",
                 "parameters": [
@@ -2048,7 +2048,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Endpoints"
+                    "endpoints"
                 ],
                 "summary": "Snapshot all endpoints",
                 "responses": {
@@ -2075,7 +2075,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Endpoints"
+                    "endpoints"
                 ],
                 "summary": "Inspects an endpoint",
                 "parameters": [
@@ -2115,7 +2115,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Endpoints"
+                    "endpoints"
                 ],
                 "summary": "Updates an endpoint",
                 "parameters": [
@@ -2155,7 +2155,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Endpoints"
+                    "endpoints"
                 ],
                 "summary": "Deletes an endpoint",
                 "parameters": [
@@ -2189,8 +2189,8 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Edge",
-                    "Endpoints"
+                    "edge",
+                    "endpoints"
                 ],
                 "summary": "Inspect an EdgeJob Log",
                 "parameters": [
@@ -2231,9 +2231,9 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Edge",
-                    "Endpoints",
-                    "EdgeStacks"
+                    "edge",
+                    "endpoints",
+                    "edge_stacks"
                 ],
                 "summary": "Inspect an Edge Stack for an Endpoint",
                 "parameters": [
@@ -2285,7 +2285,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Endpoints"
+                    "endpoints"
                 ],
                 "summary": "Add an extension to an Endpoint",
                 "parameters": [
@@ -2339,7 +2339,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Endpoints"
+                    "endpoints"
                 ],
                 "summary": "Removes an extension to an Endpoint",
                 "parameters": [
@@ -2391,7 +2391,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Endpoints"
+                    "endpoints"
                 ],
                 "summary": "Snapshots an endpoint",
                 "parameters": [
@@ -2433,8 +2433,8 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Endpoints",
-                    "Edge"
+                    "endpoints",
+                    "edge"
                 ],
                 "summary": "Get endpoint status (for edge)",
                 "parameters": [
@@ -2476,7 +2476,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "MOTD"
+                    "motd"
                 ],
                 "summary": "fetches the message of the day",
                 "responses": {
@@ -2503,7 +2503,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Registries"
+                    "registries"
                 ],
                 "summary": "List Registries",
                 "responses": {
@@ -2534,7 +2534,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Registries"
+                    "registries"
                 ],
                 "summary": "Creates a registry",
                 "parameters": [
@@ -2578,7 +2578,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Registries"
+                    "registries"
                 ],
                 "summary": "Inspects a registry",
                 "parameters": [
@@ -2624,7 +2624,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Registries"
+                    "registries"
                 ],
                 "summary": "Updates a registry",
                 "parameters": [
@@ -2673,7 +2673,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Registries"
+                    "registries"
                 ],
                 "summary": "Deletes a registry",
                 "parameters": [
@@ -2715,7 +2715,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Registries"
+                    "registries"
                 ],
                 "summary": "Configures a registry",
                 "parameters": [
@@ -2763,7 +2763,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "ResourceControl"
+                    "resource_controls"
                 ],
                 "summary": "Creates a resource control object",
                 "parameters": [
@@ -2810,7 +2810,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "ResourceControl"
+                    "resource_controls"
                 ],
                 "summary": "Updates a resource control object",
                 "parameters": [
@@ -2865,7 +2865,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "ResourceControl"
+                    "resource_controls"
                 ],
                 "summary": "Deletes a resource control object",
                 "parameters": [
@@ -2907,7 +2907,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Roles"
+                    "roles"
                 ],
                 "summary": "List Roles",
                 "responses": {
@@ -2940,7 +2940,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Settings"
+                    "settings"
                 ],
                 "summary": "Inspect Settings",
                 "responses": {
@@ -2968,7 +2968,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Settings"
+                    "settings"
                 ],
                 "summary": "Update Settings",
                 "parameters": [
@@ -3009,7 +3009,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Settings"
+                    "settings"
                 ],
                 "summary": "Check LDAP Connection",
                 "parameters": [
@@ -3047,7 +3047,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Settings"
+                    "settings"
                 ],
                 "summary": "Inspect Public Settings",
                 "responses": {
@@ -3077,7 +3077,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Stacks"
+                    "stacks"
                 ],
                 "summary": "List Stacks",
                 "parameters": [
@@ -3123,7 +3123,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Stacks"
+                    "stacks"
                 ],
                 "summary": "Create a Stack",
                 "parameters": [
@@ -3222,7 +3222,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Stacks"
+                    "stacks"
                 ],
                 "summary": "Inspect Stack",
                 "parameters": [
@@ -3268,7 +3268,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Stacks"
+                    "stacks"
                 ],
                 "summary": "Update a Stack",
                 "parameters": [
@@ -3330,7 +3330,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Stacks"
+                    "stacks"
                 ],
                 "summary": "Delete a Stack",
                 "parameters": [
@@ -3390,7 +3390,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Stacks"
+                    "stacks"
                 ],
                 "summary": "Inspect Stack's file",
                 "parameters": [
@@ -3438,7 +3438,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Stacks"
+                    "stacks"
                 ],
                 "summary": "Migrates a Stack to another endpoint",
                 "parameters": [
@@ -3501,7 +3501,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Stacks"
+                    "stacks"
                 ],
                 "summary": "Starts a stopped Stack",
                 "parameters": [
@@ -3549,7 +3549,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Stacks"
+                    "stacks"
                 ],
                 "summary": "Stops a Stack",
                 "parameters": [
@@ -3592,7 +3592,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Status"
+                    "status"
                 ],
                 "summary": "Inspect Status",
                 "responses": {
@@ -3622,7 +3622,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Status"
+                    "status"
                 ],
                 "summary": "Inspect Version",
                 "responses": {
@@ -3649,7 +3649,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Tags"
+                    "tags"
                 ],
                 "summary": "Fetches the list of tags",
                 "responses": {
@@ -3677,7 +3677,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Tags"
+                    "tags"
                 ],
                 "summary": "Create a tag",
                 "parameters": [
@@ -3718,7 +3718,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Tags"
+                    "tags"
                 ],
                 "summary": "Delete a tag",
                 "parameters": [
@@ -3754,7 +3754,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Teams"
+                    "teams"
                 ],
                 "summary": "Create Team",
                 "parameters": [
@@ -3801,7 +3801,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Teams"
+                    "teams"
                 ],
                 "summary": "Update Team",
                 "parameters": [
@@ -3855,7 +3855,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "TeamMembership"
+                    "team_memberships"
                 ],
                 "summary": "List team memberships",
                 "responses": {
@@ -3886,7 +3886,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "TeamMembership"
+                    "team_memberships"
                 ],
                 "summary": "Add user to team",
                 "parameters": [
@@ -3927,7 +3927,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "TeamMembership"
+                    "team_memberships"
                 ],
                 "summary": "Update team membership",
                 "parameters": [
@@ -3982,7 +3982,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "TeamMembership"
+                    "team_memberships"
                 ],
                 "summary": "Remove user from team",
                 "parameters": [
@@ -4027,7 +4027,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Teams"
+                    "teams"
                 ],
                 "summary": "List teams",
                 "responses": {
@@ -4060,7 +4060,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Teams"
+                    "teams"
                 ],
                 "summary": "Inspect team",
                 "parameters": [
@@ -4106,7 +4106,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Teams"
+                    "teams"
                 ],
                 "summary": "Delete team",
                 "parameters": [
@@ -4148,7 +4148,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Teams"
+                    "teams"
                 ],
                 "summary": "List team's memberships",
                 "parameters": [
@@ -4196,7 +4196,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Templates"
+                    "templates"
                 ],
                 "summary": "List templates",
                 "responses": {
@@ -4226,7 +4226,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Templates"
+                    "templates"
                 ],
                 "summary": "Get a template's file",
                 "parameters": [
@@ -4270,7 +4270,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Upload"
+                    "upload"
                 ],
                 "summary": "Upload TLS file",
                 "parameters": [
@@ -4328,7 +4328,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "users"
                 ],
                 "summary": "List users",
                 "responses": {
@@ -4359,7 +4359,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "users"
                 ],
                 "summary": "Create a user",
                 "parameters": [
@@ -4405,7 +4405,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "users"
                 ],
                 "summary": "Admin Check",
                 "responses": {
@@ -4431,7 +4431,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "users"
                 ],
                 "summary": "Create an initial admin user",
                 "parameters": [
@@ -4478,7 +4478,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "users"
                 ],
                 "summary": "Inspect a user",
                 "parameters": [
@@ -4521,7 +4521,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "users"
                 ],
                 "summary": "Update a user",
                 "parameters": [
@@ -4579,7 +4579,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "users"
                 ],
                 "summary": "Delete a user",
                 "parameters": [
@@ -4621,7 +4621,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "users"
                 ],
                 "summary": "List user's team memberships",
                 "parameters": [
@@ -4669,7 +4669,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "users"
                 ],
                 "summary": "Update a user's password",
                 "parameters": [
@@ -4723,7 +4723,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Webhooks"
+                    "webhooks"
                 ],
                 "summary": "List webhooks",
                 "parameters": [
@@ -4778,7 +4778,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Webhooks"
+                    "webhooks"
                 ],
                 "summary": "Create a webhook",
                 "parameters": [
@@ -4825,7 +4825,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Webhooks"
+                    "webhooks"
                 ],
                 "summary": "Delete a webhook",
                 "parameters": [
@@ -4860,7 +4860,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Webhooks"
+                    "webhooks"
                 ],
                 "summary": "Execute a webhook",
                 "parameters": [
@@ -4900,7 +4900,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Websockets"
+                    "websocket"
                 ],
                 "summary": "Attach a websocket",
                 "parameters": [
@@ -4959,7 +4959,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Websockets"
+                    "websocket"
                 ],
                 "summary": "Execute a websocket",
                 "parameters": [
@@ -5015,7 +5015,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Websockets"
+                    "websocket"
                 ],
                 "summary": "Execute a websocket on pod",
                 "parameters": [
@@ -7481,7 +7481,113 @@ var doc = `{
             "name": "Authorization",
             "in": "header"
         }
-    }
+    },
+    "tags": [
+        {
+            "description": "Authenticate against Portainer HTTP API",
+            "name": "auth"
+        },
+        {
+            "description": "Manage Custom Templates",
+            "name": "custom_templates"
+        },
+        {
+            "description": "Manage how Portainer connects to the DockerHub",
+            "name": "dockerhub"
+        },
+        {
+            "description": "Manage Edge Groups",
+            "name": "edge_groups"
+        },
+        {
+            "description": "Manage Edge Jobs",
+            "name": "edge_jobs"
+        },
+        {
+            "description": "Manage Edge Stacks",
+            "name": "edge_stacks"
+        },
+        {
+            "description": "Manage Edge Templates",
+            "name": "edge_templates"
+        },
+        {
+            "description": "Manage Edge related endpoint settings",
+            "name": "edge"
+        },
+        {
+            "description": "Manage Docker environments",
+            "name": "endpoints"
+        },
+        {
+            "description": "Manage endpoint groups",
+            "name": "endpoint_groups"
+        },
+        {
+            "description": "Fetch the message of the day",
+            "name": "motd"
+        },
+        {
+            "description": "Manage Docker registries",
+            "name": "registries"
+        },
+        {
+            "description": "Manage access control on Docker resources",
+            "name": "resource_controls"
+        },
+        {
+            "description": "Manage roles",
+            "name": "roles"
+        },
+        {
+            "description": "Manage Portainer settings",
+            "name": "settings"
+        },
+        {
+            "description": "Information about the Portainer instance",
+            "name": "status"
+        },
+        {
+            "description": "Manage Docker stacks",
+            "name": "stacks"
+        },
+        {
+            "description": "Manage users",
+            "name": "users"
+        },
+        {
+            "description": "Manage tags",
+            "name": "tags"
+        },
+        {
+            "description": "Manage teams",
+            "name": "teams"
+        },
+        {
+            "description": "Manage team memberships",
+            "name": "team_memberships"
+        },
+        {
+            "description": "Manage App Templates",
+            "name": "templates"
+        },
+        {
+            "description": "Manage stacks",
+            "name": "stacks"
+        },
+        {
+            "description": "Upload files",
+            "name": "upload"
+        },
+        {
+            "description": "Manage webhooks",
+            "name": "webhooks"
+        },
+        {
+            "description": "Create exec sessions using websockets",
+            "name": "websocket"
+        }
+    ]
 }`
 
 type swaggerInfo struct {
