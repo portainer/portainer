@@ -176,10 +176,13 @@ class KubernetesNodeController {
         this.Notifications.success('Pod successfully evicted', pod.Name);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to evict pod');
+        this.formValues.Availability = this.availabilities.PAUSE;
+        await this.KubernetesNodeService.patch(this.node, this.formValues);
       } finally {
         --actionCount;
         if (actionCount === 0) {
-          this.$state.reload();
+          this.formValues.Availability = this.availabilities.PAUSE;
+          await this.KubernetesNodeService.patch(this.node, this.formValues);
         }
       }
     }
@@ -199,8 +202,12 @@ class KubernetesNodeController {
     return !payload.length;
   }
 
+  isDrainError() {
+    return (this.state.isDrainOperation || this.state.isContainPortainer) && this.formValues.Availability === this.availabilities.DRAIN;
+  }
+
   isFormValid() {
-    return !this.state.hasDuplicateTaintKeys && !this.state.hasDuplicateLabelKeys && !this.isNoChangesMade();
+    return !this.state.hasDuplicateTaintKeys && !this.state.hasDuplicateLabelKeys && !this.isNoChangesMade() && !this.isDrainError();
   }
 
   resetFormValues() {
@@ -235,9 +242,9 @@ class KubernetesNodeController {
 
   async updateNodeAsync() {
     try {
-      await this.KubernetesNodeService.patch(this.node, this.formValues);
-      if (this.node.Availability !== 'Drain' && this.formValues.Availability === 'Drain') {
-        this.drainNode();
+      this.node = await this.KubernetesNodeService.patch(this.node, this.formValues);
+      if (this.formValues.Availability === 'Drain') {
+        await this.drainNode();
       }
       this.Notifications.success('Node updated successfully');
       this.$state.reload();
@@ -367,6 +374,7 @@ class KubernetesNodeController {
       });
       this.resourceReservation.Memory = KubernetesResourceReservationHelper.megaBytesValue(this.resourceReservation.Memory);
       this.memoryLimit = KubernetesResourceReservationHelper.megaBytesValue(this.node.Memory);
+      this.state.isContainPortainer = _.find(this.applications, { ApplicationName: 'portainer' });
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve applications');
     } finally {
@@ -393,6 +401,7 @@ class KubernetesNodeController {
       duplicateLabelKeys: [],
       hasDuplicateLabelKeys: false,
       isDrainOperation: false,
+      isContainPortainer: false,
     };
 
     this.availabilities = KubernetesNodeAvailabilities;

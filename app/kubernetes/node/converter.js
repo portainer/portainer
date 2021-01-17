@@ -136,14 +136,17 @@ class KubernetesNodeConverter {
     });
 
     payload.spec.taints = taints.length ? taints : undefined;
+
+    payload.metadata.labels = node.Labels;
+
     if (node.Availability !== KubernetesNodeAvailabilities.ACTIVE) {
       payload.spec.unschedulable = true;
       if (node.Availability === KubernetesNodeAvailabilities.DRAIN) {
-        payload.metadata.labels['io.portainer/node-status-drain'] = true;
+        payload.metadata.labels['io.portainer/node-status-drain'] = '';
+      } else {
+        delete payload.metadata.labels['io.portainer/node-status-drain'];
       }
     }
-
-    payload.metadata.labels = node.Labels;
 
     return payload;
   }
