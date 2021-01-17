@@ -125,6 +125,8 @@ definitions:
         type: boolean
       tagIDs:
         items:
+          description: Tag identifier
+          example: 1
           type: integer
         type: array
     type: object
@@ -142,6 +144,8 @@ definitions:
         type: boolean
       tagIDs:
         items:
+          description: Tag identifier
+          example: 1
           type: integer
         type: array
     type: object
@@ -220,6 +224,8 @@ definitions:
     properties:
       edgeGroups:
         items:
+          description: EdgeGroup Identifier
+          example: 1
           type: integer
         type: array
       name:
@@ -231,6 +237,8 @@ definitions:
     properties:
       edgeGroups:
         items:
+          description: EdgeGroup Identifier
+          example: 1
           type: integer
         type: array
       name:
@@ -246,6 +254,8 @@ definitions:
         type: string
       edgeGroups:
         items:
+          description: EdgeGroup Identifier
+          example: 1
           type: integer
         type: array
       name:
@@ -265,6 +275,8 @@ definitions:
     properties:
       edgeGroups:
         items:
+          description: EdgeGroup Identifier
+          example: 1
           type: integer
         type: array
       prune:
@@ -295,6 +307,8 @@ definitions:
         type: string
       tagIDs:
         items:
+          description: Tag identifier
+          example: 1
           type: integer
         type: array
     type: object
@@ -331,6 +345,8 @@ definitions:
         type: string
       tagIDs:
         items:
+          description: Tag identifier
+          example: 1
           type: integer
         type: array
       tls:
@@ -416,10 +432,16 @@ definitions:
   portainer.AzureCredentials:
     properties:
       ApplicationID:
+        description: Azure application ID
+        example: eag7cdo9-o09l-9i83-9dO9-f0b23oe78db4
         type: string
       AuthenticationKey:
+        description: Azure authentication key
+        example: cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk=
         type: string
       TenantID:
+        description: Azure tenant ID
+        example: 34ddc78d-4fel-2358-8cc1-df84c8o839f5
         type: string
     type: object
   portainer.CustomTemplate:
@@ -431,6 +453,8 @@ definitions:
       EntryPoint:
         type: string
       Id:
+        description: CustomTemplate Identifier
+        example: 1
         type: integer
       Logo:
         type: string
@@ -511,6 +535,8 @@ definitions:
           type: integer
         type: array
       Id:
+        description: EdgeGroup Identifier
+        example: 1
         type: integer
       Name:
         type: string
@@ -518,6 +544,8 @@ definitions:
         type: boolean
       TagIds:
         items:
+          description: Tag identifier
+          example: 1
           type: integer
         type: array
     type: object
@@ -532,6 +560,8 @@ definitions:
           $ref: '#/definitions/portainer.EdgeJobEndpointMeta'
         type: object
       Id:
+        description: EdgeJob Identifier
+        example: 1
         type: integer
       Name:
         type: string
@@ -555,11 +585,15 @@ definitions:
         type: integer
       EdgeGroups:
         items:
+          description: EdgeGroup Identifier
+          example: 1
           type: integer
         type: array
       EntryPoint:
         type: string
       Id:
+        description: EdgeStack Identifier
+        example: 1
         type: integer
       Name:
         type: string
@@ -592,6 +626,8 @@ definitions:
       AuthorizedUsers:
         description: Deprecated in DBVersion == 18
         items:
+          description: User Identifier
+          example: 1
           type: integer
         type: array
       AzureCredentials:
@@ -609,6 +645,8 @@ definitions:
       GroupId:
         type: integer
       Id:
+        description: Endpoint Identifier
+        example: 1
         type: integer
       Kubernetes:
         $ref: '#/definitions/portainer.KubernetesData'
@@ -637,6 +675,8 @@ definitions:
         type: string
       TagIds:
         items:
+          description: Tag identifier
+          example: 1
           type: integer
         type: array
       Tags:
@@ -673,11 +713,15 @@ definitions:
       AuthorizedUsers:
         description: Deprecated in DBVersion == 18
         items:
+          description: User Identifier
+          example: 1
           type: integer
         type: array
       Description:
         type: string
       Id:
+        description: EndpointGroup Identifier
+        example: 1
         type: integer
       Labels:
         description: Deprecated fields
@@ -688,6 +732,8 @@ definitions:
         type: string
       TagIds:
         items:
+          description: Tag identifier
+          example: 1
           type: integer
         type: array
       Tags:
@@ -778,10 +824,17 @@ definitions:
   portainer.LDAPSearchSettings:
     properties:
       BaseDN:
+        description: The distinguished name of the element from which the LDAP server
+          will search for users
+        example: dc=ldap,dc=domain,dc=tld
         type: string
       Filter:
+        description: Optional LDAP search filter used to select user elements
+        example: (objectClass=account)
         type: string
       UserNameAttribute:
+        description: LDAP attribute which denotes the username
+        example: uid
         type: string
     type: object
   portainer.LDAPSettings:
@@ -852,11 +905,15 @@ definitions:
           Deprecated fields
           Deprecated in DBVersion == 18
         items:
+          description: User Identifier
+          example: 1
           type: integer
         type: array
       Gitlab:
         $ref: '#/definitions/portainer.GitlabRegistryData'
       Id:
+        description: Registry Identifier
+        example: 1
         type: integer
       ManagementConfiguration:
         $ref: '#/definitions/portainer.RegistryManagementConfiguration'
@@ -895,6 +952,8 @@ definitions:
       AdministratorsOnly:
         type: boolean
       Id:
+        description: ResourceControl Identifier
+        example: 1
         type: integer
       OwnerId:
         description: |-
@@ -929,6 +988,8 @@ definitions:
       Description:
         type: string
       Id:
+        description: Role Identifier
+        example: 1
         type: integer
       Name:
         type: string
@@ -994,6 +1055,8 @@ definitions:
           $ref: '#/definitions/portainer.Pair'
         type: array
       Id:
+        description: Stack Identifier
+        example: 1
         type: integer
       Name:
         type: string
@@ -1011,19 +1074,31 @@ definitions:
   portainer.Status:
     properties:
       Version:
+        description: Portainer API version
+        example: 2.0.0
         type: string
     type: object
   portainer.TLSConfiguration:
     properties:
       TLS:
+        description: Use TLS
+        example: true
         type: boolean
       TLSCACert:
+        description: Path to the TLS CA certificate file
+        example: /data/tls/ca.pem
         type: string
       TLSCert:
+        description: Path to the TLS client certificate file
+        example: /data/tls/cert.pem
         type: string
       TLSKey:
+        description: Path to the TLS client key file
+        example: /data/tls/key.pem
         type: string
       TLSSkipVerify:
+        description: Skip the verification of the server TLS certificate
+        example: false
         type: boolean
     type: object
   portainer.Tag:
@@ -1037,15 +1112,23 @@ definitions:
           type: boolean
         type: object
       Name:
+        description: Tag name
+        example: org/acme
         type: string
       id:
+        description: Tag identifier
+        example: 1
         type: integer
     type: object
   portainer.Team:
     properties:
       Id:
+        description: Team Identifier
+        example: 1
         type: integer
       Name:
+        description: Team name
+        example: developers
         type: string
     type: object
   portainer.TeamAccessPolicies:
@@ -1055,12 +1138,20 @@ definitions:
   portainer.TeamMembership:
     properties:
       Id:
+        description: Membership Identifier
+        example: 1
         type: integer
       Role:
+        description: Team role (1 for team leader and 2 for team member)
+        example: 1
         type: integer
       TeamID:
+        description: Team identifier
+        example: 1
         type: integer
       UserID:
+        description: User identifier
+        example: 1
         type: integer
     type: object
   portainer.TeamResourceAccess:
@@ -1073,7 +1164,10 @@ definitions:
   portainer.Template:
     properties:
       Id:
-        description: Mandatory container/stack fields
+        description: |-
+          Mandatory container/stack fields
+          Template Identifier
+        example: 1
         type: integer
       administrator_only:
         type: boolean
@@ -1184,8 +1278,11 @@ definitions:
       EndpointAuthorizations:
         $ref: '#/definitions/portainer.EndpointAuthorizations'
       Id:
+        description: User Identifier
+        example: 1
         type: integer
       Password:
+        example: passwd
         type: string
       PortainerAuthorizations:
         $ref: '#/definitions/portainer.Authorizations'
@@ -1193,8 +1290,11 @@ definitions:
           Deprecated fields
           Deprecated in DBVersion == 25
       Role:
+        description: User role (1 for administrator account and 2 for regular account)
+        example: 1
         type: integer
       Username:
+        example: bob
         type: string
     type: object
   portainer.UserAccessPolicies:
@@ -1213,6 +1313,8 @@ definitions:
       EndpointId:
         type: integer
       Id:
+        description: Webhook Identifier
+        example: 1
         type: integer
       ResourceId:
         type: string

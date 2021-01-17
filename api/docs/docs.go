@@ -5277,7 +5277,9 @@ var doc = `{
                 "tagIDs": {
                     "type": "array",
                     "items": {
-                        "type": "integer"
+                        "description": "Tag identifier",
+                        "type": "integer",
+                        "example": 1
                     }
                 }
             }
@@ -5303,7 +5305,9 @@ var doc = `{
                 "tagIDs": {
                     "type": "array",
                     "items": {
-                        "type": "integer"
+                        "description": "Tag identifier",
+                        "type": "integer",
+                        "example": 1
                     }
                 }
             }
@@ -5424,7 +5428,9 @@ var doc = `{
                 "edgeGroups": {
                     "type": "array",
                     "items": {
-                        "type": "integer"
+                        "description": "EdgeGroup Identifier",
+                        "type": "integer",
+                        "example": 1
                     }
                 },
                 "name": {
@@ -5441,7 +5447,9 @@ var doc = `{
                 "edgeGroups": {
                     "type": "array",
                     "items": {
-                        "type": "integer"
+                        "description": "EdgeGroup Identifier",
+                        "type": "integer",
+                        "example": 1
                     }
                 },
                 "name": {
@@ -5464,7 +5472,9 @@ var doc = `{
                 "edgeGroups": {
                     "type": "array",
                     "items": {
-                        "type": "integer"
+                        "description": "EdgeGroup Identifier",
+                        "type": "integer",
+                        "example": 1
                     }
                 },
                 "name": {
@@ -5493,7 +5503,9 @@ var doc = `{
                 "edgeGroups": {
                     "type": "array",
                     "items": {
-                        "type": "integer"
+                        "description": "EdgeGroup Identifier",
+                        "type": "integer",
+                        "example": 1
                     }
                 },
                 "prune": {
@@ -5539,7 +5551,9 @@ var doc = `{
                 "tagIDs": {
                     "type": "array",
                     "items": {
-                        "type": "integer"
+                        "description": "Tag identifier",
+                        "type": "integer",
+                        "example": 1
                     }
                 }
             }
@@ -5594,7 +5608,9 @@ var doc = `{
                 "tagIDs": {
                     "type": "array",
                     "items": {
-                        "type": "integer"
+                        "description": "Tag identifier",
+                        "type": "integer",
+                        "example": 1
                     }
                 },
                 "tls": {
@@ -5724,13 +5740,19 @@ var doc = `{
             "type": "object",
             "properties": {
                 "ApplicationID": {
-                    "type": "string"
+                    "description": "Azure application ID",
+                    "type": "string",
+                    "example": "eag7cdo9-o09l-9i83-9dO9-f0b23oe78db4"
                 },
                 "AuthenticationKey": {
-                    "type": "string"
+                    "description": "Azure authentication key",
+                    "type": "string",
+                    "example": "cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk="
                 },
                 "TenantID": {
-                    "type": "string"
+                    "description": "Azure tenant ID",
+                    "type": "string",
+                    "example": "34ddc78d-4fel-2358-8cc1-df84c8o839f5"
                 }
             }
         },
@@ -5747,7 +5769,9 @@ var doc = `{
                     "type": "string"
                 },
                 "Id": {
-                    "type": "integer"
+                    "description": "CustomTemplate Identifier",
+                    "type": "integer",
+                    "example": 1
                 },
                 "Logo": {
                     "type": "string"
@@ -5869,7 +5893,9 @@ var doc = `{
                     }
                 },
                 "Id": {
-                    "type": "integer"
+                    "description": "EdgeGroup Identifier",
+                    "type": "integer",
+                    "example": 1
                 },
                 "Name": {
                     "type": "string"
@@ -5880,7 +5906,9 @@ var doc = `{
                 "TagIds": {
                     "type": "array",
                     "items": {
-                        "type": "integer"
+                        "description": "Tag identifier",
+                        "type": "integer",
+                        "example": 1
                     }
                 }
             }
@@ -5901,7 +5929,9 @@ var doc = `{
                     }
                 },
                 "Id": {
-                    "type": "integer"
+                    "description": "EdgeJob Identifier",
+                    "type": "integer",
+                    "example": 1
                 },
                 "Name": {
                     "type": "string"
@@ -5937,14 +5967,18 @@ var doc = `{
                 "EdgeGroups": {
                     "type": "array",
                     "items": {
-                        "type": "integer"
+                        "description": "EdgeGroup Identifier",
+                        "type": "integer",
+                        "example": 1
                     }
                 },
                 "EntryPoint": {
                     "type": "string"
                 },
                 "Id": {
-                    "type": "integer"
+                    "description": "EdgeStack Identifier",
+                    "type": "integer",
+                    "example": 1
                 },
                 "Name": {
                     "type": "string"
@@ -5993,7 +6027,9 @@ var doc = `{
                     "description": "Deprecated in DBVersion == 18",
                     "type": "array",
                     "items": {
-                        "type": "integer"
+                        "description": "User Identifier",
+                        "type": "integer",
+                        "example": 1
                     }
                 },
                 "AzureCredentials": {
@@ -6018,7 +6054,9 @@ var doc = `{
                     "type": "integer"
                 },
                 "Id": {
-                    "type": "integer"
+                    "description": "Endpoint Identifier",
+                    "type": "integer",
+                    "example": 1
                 },
                 "Kubernetes": {
                     "$ref": "#/definitions/portainer.KubernetesData"
@@ -6057,7 +6095,9 @@ var doc = `{
                 "TagIds": {
                     "type": "array",
                     "items": {
-                        "type": "integer"
+                        "description": "Tag identifier",
+                        "type": "integer",
+                        "example": 1
                     }
                 },
                 "Tags": {
@@ -6111,14 +6151,18 @@ var doc = `{
                     "description": "Deprecated in DBVersion == 18",
                     "type": "array",
                     "items": {
-                        "type": "integer"
+                        "description": "User Identifier",
+                        "type": "integer",
+                        "example": 1
                     }
                 },
                 "Description": {
                     "type": "string"
                 },
                 "Id": {
-                    "type": "integer"
+                    "description": "EndpointGroup Identifier",
+                    "type": "integer",
+                    "example": 1
                 },
                 "Labels": {
                     "description": "Deprecated fields",
@@ -6133,7 +6177,9 @@ var doc = `{
                 "TagIds": {
                     "type": "array",
                     "items": {
-                        "type": "integer"
+                        "description": "Tag identifier",
+                        "type": "integer",
+                        "example": 1
                     }
                 },
                 "Tags": {
@@ -6271,13 +6317,19 @@ var doc = `{
             "type": "object",
             "properties": {
                 "BaseDN": {
-                    "type": "string"
+                    "description": "The distinguished name of the element from which the LDAP server will search for users",
+                    "type": "string",
+                    "example": "dc=ldap,dc=domain,dc=tld"
                 },
                 "Filter": {
-                    "type": "string"
+                    "description": "Optional LDAP search filter used to select user elements",
+                    "type": "string",
+                    "example": "(objectClass=account)"
                 },
                 "UserNameAttribute": {
-                    "type": "string"
+                    "description": "LDAP attribute which denotes the username",
+                    "type": "string",
+                    "example": "uid"
                 }
             }
         },
@@ -6381,14 +6433,18 @@ var doc = `{
                     "description": "Deprecated fields\nDeprecated in DBVersion == 18",
                     "type": "array",
                     "items": {
-                        "type": "integer"
+                        "description": "User Identifier",
+                        "type": "integer",
+                        "example": 1
                     }
                 },
                 "Gitlab": {
                     "$ref": "#/definitions/portainer.GitlabRegistryData"
                 },
                 "Id": {
-                    "type": "integer"
+                    "description": "Registry Identifier",
+                    "type": "integer",
+                    "example": 1
                 },
                 "ManagementConfiguration": {
                     "$ref": "#/definitions/portainer.RegistryManagementConfiguration"
@@ -6446,7 +6502,9 @@ var doc = `{
                     "type": "boolean"
                 },
                 "Id": {
-                    "type": "integer"
+                    "description": "ResourceControl Identifier",
+                    "type": "integer",
+                    "example": 1
                 },
                 "OwnerId": {
                     "description": "Deprecated fields\nDeprecated in DBVersion == 2",
@@ -6494,7 +6552,9 @@ var doc = `{
                     "type": "string"
                 },
                 "Id": {
-                    "type": "integer"
+                    "description": "Role Identifier",
+                    "type": "integer",
+                    "example": 1
                 },
                 "Name": {
                     "type": "string"
@@ -6592,7 +6652,9 @@ var doc = `{
                     }
                 },
                 "Id": {
-                    "type": "integer"
+                    "description": "Stack Identifier",
+                    "type": "integer",
+                    "example": 1
                 },
                 "Name": {
                     "type": "string"
@@ -6618,7 +6680,9 @@ var doc = `{
             "type": "object",
             "properties": {
                 "Version": {
-                    "type": "string"
+                    "description": "Portainer API version",
+                    "type": "string",
+                    "example": "2.0.0"
                 }
             }
         },
@@ -6626,19 +6690,29 @@ var doc = `{
             "type": "object",
             "properties": {
                 "TLS": {
-                    "type": "boolean"
+                    "description": "Use TLS",
+                    "type": "boolean",
+                    "example": true
                 },
                 "TLSCACert": {
-                    "type": "string"
+                    "description": "Path to the TLS CA certificate file",
+                    "type": "string",
+                    "example": "/data/tls/ca.pem"
                 },
                 "TLSCert": {
-                    "type": "string"
+                    "description": "Path to the TLS client certificate file",
+                    "type": "string",
+                    "example": "/data/tls/cert.pem"
                 },
                 "TLSKey": {
-                    "type": "string"
+                    "description": "Path to the TLS client key file",
+                    "type": "string",
+                    "example": "/data/tls/key.pem"
                 },
                 "TLSSkipVerify": {
-                    "type": "boolean"
+                    "description": "Skip the verification of the server TLS certificate",
+                    "type": "boolean",
+                    "example": false
                 }
             }
         },
@@ -6658,10 +6732,14 @@ var doc = `{
                     }
                 },
                 "Name": {
-                    "type": "string"
+                    "description": "Tag name",
+                    "type": "string",
+                    "example": "org/acme"
                 },
                 "id": {
-                    "type": "integer"
+                    "description": "Tag identifier",
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -6669,10 +6747,14 @@ var doc = `{
             "type": "object",
             "properties": {
                 "Id": {
-                    "type": "integer"
+                    "description": "Team Identifier",
+                    "type": "integer",
+                    "example": 1
                 },
                 "Name": {
-                    "type": "string"
+                    "description": "Team name",
+                    "type": "string",
+                    "example": "developers"
                 }
             }
         },
@@ -6686,16 +6768,24 @@ var doc = `{
             "type": "object",
             "properties": {
                 "Id": {
-                    "type": "integer"
+                    "description": "Membership Identifier",
+                    "type": "integer",
+                    "example": 1
                 },
                 "Role": {
-                    "type": "integer"
+                    "description": "Team role (1 for team leader and 2 for team member)",
+                    "type": "integer",
+                    "example": 1
                 },
                 "TeamID": {
-                    "type": "integer"
+                    "description": "Team identifier",
+                    "type": "integer",
+                    "example": 1
                 },
                 "UserID": {
-                    "type": "integer"
+                    "description": "User identifier",
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -6714,8 +6804,9 @@ var doc = `{
             "type": "object",
             "properties": {
                 "Id": {
-                    "description": "Mandatory container/stack fields",
-                    "type": "integer"
+                    "description": "Mandatory container/stack fields\nTemplate Identifier",
+                    "type": "integer",
+                    "example": 1
                 },
                 "administrator_only": {
                     "type": "boolean"
@@ -6880,20 +6971,26 @@ var doc = `{
                     "$ref": "#/definitions/portainer.EndpointAuthorizations"
                 },
                 "Id": {
-                    "type": "integer"
+                    "description": "User Identifier",
+                    "type": "integer",
+                    "example": 1
                 },
                 "Password": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "passwd"
                 },
                 "PortainerAuthorizations": {
                     "description": "Deprecated fields\nDeprecated in DBVersion == 25",
                     "$ref": "#/definitions/portainer.Authorizations"
                 },
                 "Role": {
-                    "type": "integer"
+                    "description": "User role (1 for administrator account and 2 for regular account)",
+                    "type": "integer",
+                    "example": 1
                 },
                 "Username": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "bob"
                 }
             }
         },
@@ -6921,7 +7018,9 @@ var doc = `{
                     "type": "integer"
                 },
                 "Id": {
-                    "type": "integer"
+                    "description": "Webhook Identifier",
+                    "type": "integer",
+                    "example": 1
                 },
                 "ResourceId": {
                     "type": "string"

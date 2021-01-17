@@ -26,9 +26,12 @@ type (
 	// AzureCredentials represents the credentials used to connect to an Azure
 	// environment.
 	AzureCredentials struct {
-		ApplicationID     string `json:"ApplicationID"`
-		TenantID          string `json:"TenantID"`
-		AuthenticationKey string `json:"AuthenticationKey"`
+		// Azure application ID
+		ApplicationID string `json:"ApplicationID" example:"eag7cdo9-o09l-9i83-9dO9-f0b23oe78db4"`
+		// Azure tenant ID
+		TenantID string `json:"TenantID" example:"34ddc78d-4fel-2358-8cc1-df84c8o839f5"`
+		// Azure authentication key
+		AuthenticationKey string `json:"AuthenticationKey" example:"cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk="`
 	}
 
 	// CLIFlags represents the available flags on the CLI
@@ -59,7 +62,8 @@ type (
 
 	// CustomTemplate represents a custom template
 	CustomTemplate struct {
-		ID              CustomTemplateID       `json:"Id"`
+		// CustomTemplate Identifier
+		ID              CustomTemplateID       `json:"Id" example:"1"`
 		Title           string                 `json:"Title"`
 		Description     string                 `json:"Description"`
 		ProjectPath     string                 `json:"ProjectPath"`
@@ -116,7 +120,8 @@ type (
 
 	// EdgeGroup represents an Edge group
 	EdgeGroup struct {
-		ID           EdgeGroupID  `json:"Id"`
+		// EdgeGroup Identifier
+		ID           EdgeGroupID  `json:"Id" example:"1"`
 		Name         string       `json:"Name"`
 		Dynamic      bool         `json:"Dynamic"`
 		TagIDs       []TagID      `json:"TagIds"`
@@ -129,7 +134,8 @@ type (
 
 	// EdgeJob represents a job that can run on Edge environments.
 	EdgeJob struct {
-		ID             EdgeJobID                          `json:"Id"`
+		// EdgeJob Identifier
+		ID             EdgeJobID                          `json:"Id" example:"1"`
 		Created        int64                              `json:"Created"`
 		CronExpression string                             `json:"CronExpression"`
 		Endpoints      map[EndpointID]EdgeJobEndpointMeta `json:"Endpoints"`
@@ -154,7 +160,8 @@ type (
 	// EdgeSchedule represents a scheduled job that can run on Edge environments.
 	// Deprecated in favor of EdgeJob
 	EdgeSchedule struct {
-		ID             ScheduleID   `json:"Id"`
+		// EdgeSchedule Identifier
+		ID             ScheduleID   `json:"Id" example:"1"`
 		CronExpression string       `json:"CronExpression"`
 		Script         string       `json:"Script"`
 		Version        int          `json:"Version"`
@@ -163,7 +170,8 @@ type (
 
 	//EdgeStack represents an edge stack
 	EdgeStack struct {
-		ID           EdgeStackID                    `json:"Id"`
+		// EdgeStack Identifier
+		ID           EdgeStackID                    `json:"Id" example:"1"`
 		Name         string                         `json:"Name"`
 		Status       map[EndpointID]EdgeStackStatus `json:"Status"`
 		CreationDate int64                          `json:"CreationDate"`
@@ -190,7 +198,8 @@ type (
 	// Endpoint represents a Docker endpoint with all the info required
 	// to connect to it
 	Endpoint struct {
-		ID                      EndpointID          `json:"Id"`
+		// Endpoint Identifier
+		ID                      EndpointID          `json:"Id" example:"1"`
 		Name                    string              `json:"Name"`
 		Type                    EndpointType        `json:"Type"`
 		URL                     string              `json:"URL"`
@@ -242,7 +251,8 @@ type (
 
 	// EndpointGroup represents a group of endpoints
 	EndpointGroup struct {
-		ID                 EndpointGroupID    `json:"Id"`
+		// EndpointGroup Identifier
+		ID                 EndpointGroupID    `json:"Id" example:"1"`
 		Name               string             `json:"Name"`
 		Description        string             `json:"Description"`
 		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
@@ -296,7 +306,8 @@ type (
 
 	// Extension represents a deprecated Portainer extension
 	Extension struct {
-		ID               ExtensionID        `json:"Id"`
+		// Extension Identifier
+		ID               ExtensionID        `json:"Id" example:"1"`
 		Enabled          bool               `json:"Enabled"`
 		Name             string             `json:"Name,omitempty"`
 		ShortDescription string             `json:"ShortDescription,omitempty"`
@@ -366,16 +377,22 @@ type (
 
 	// LDAPGroupSearchSettings represents settings used to search for groups in a LDAP server
 	LDAPGroupSearchSettings struct {
-		GroupBaseDN    string `json:"GroupBaseDN"`
-		GroupFilter    string `json:"GroupFilter"`
-		GroupAttribute string `json:"GroupAttribute"`
+		// The distinguished name of the element from which the LDAP server will search for groups
+		GroupBaseDN string `json:"GroupBaseDN" example:"dc=ldap,dc=domain,dc=tld"`
+		// The LDAP search filter used to select group elements, optional
+		GroupFilter string `json:"GroupFilter" example:"(objectClass=account"`
+		// LDAP attribute which denotes the group membership
+		GroupAttribute string `json:"GroupAttribute" example:"member"`
 	}
 
 	// LDAPSearchSettings represents settings used to search for users in a LDAP server
 	LDAPSearchSettings struct {
-		BaseDN            string `json:"BaseDN"`
-		Filter            string `json:"Filter"`
-		UserNameAttribute string `json:"UserNameAttribute"`
+		// The distinguished name of the element from which the LDAP server will search for users
+		BaseDN string `json:"BaseDN" example:"dc=ldap,dc=domain,dc=tld"`
+		// Optional LDAP search filter used to select user elements
+		Filter string `json:"Filter" example:"(objectClass=account)"`
+		// LDAP attribute which denotes the username
+		UserNameAttribute string `json:"UserNameAttribute" example:"uid"`
 	}
 
 	// LDAPSettings represents the settings used to connect to a LDAP server
@@ -425,7 +442,8 @@ type (
 	// Registry represents a Docker registry with all the info required
 	// to connect to it
 	Registry struct {
-		ID                      RegistryID                       `json:"Id"`
+		// Registry Identifier
+		ID                      RegistryID                       `json:"Id" example:"1"`
 		Type                    RegistryType                     `json:"Type"`
 		Name                    string                           `json:"Name"`
 		URL                     string                           `json:"URL"`
@@ -464,7 +482,8 @@ type (
 
 	// ResourceControl represent a reference to a Docker resource with specific access controls
 	ResourceControl struct {
-		ID                 ResourceControlID    `json:"Id"`
+		// ResourceControl Identifier
+		ID                 ResourceControlID    `json:"Id" example:"1"`
 		ResourceID         string               `json:"ResourceId"`
 		SubResourceIDs     []string             `json:"SubResourceIds"`
 		Type               ResourceControlType  `json:"Type"`
@@ -489,7 +508,8 @@ type (
 	// Role represents a set of authorizations that can be associated to a user or
 	// to a team.
 	Role struct {
-		ID             RoleID         `json:"Id"`
+		// Role Identifier
+		ID             RoleID         `json:"Id" example:"1"`
 		Name           string         `json:"Name"`
 		Description    string         `json:"Description"`
 		Authorizations Authorizations `json:"Authorizations"`
@@ -505,7 +525,8 @@ type (
 	// NOTE: The Recurring option is only used by ScriptExecutionJob at the moment
 	// Deprecated in favor of EdgeJob
 	Schedule struct {
-		ID             ScheduleID `json:"Id"`
+		// Schedule Identifier
+		ID             ScheduleID `json:"Id" example:"1"`
 		Name           string
 		CronExpression string
 		Recurring      bool
@@ -561,7 +582,8 @@ type (
 
 	// Stack represents a Docker stack created via docker stack deploy
 	Stack struct {
-		ID              StackID          `json:"Id"`
+		// Stack Identifier
+		ID              StackID          `json:"Id" example:"1"`
 		Name            string           `json:"Name"`
 		Type            StackType        `json:"Type"`
 		EndpointID      EndpointID       `json:"EndpointId"`
@@ -588,13 +610,16 @@ type (
 
 	// Status represents the application status
 	Status struct {
-		Version string `json:"Version"`
+		// Portainer API version
+		Version string `json:"Version" example:"2.0.0"`
 	}
 
 	// Tag represents a tag that can be associated to a resource
 	Tag struct {
-		ID             TagID
-		Name           string                   `json:"Name"`
+		// Tag identifier
+		ID TagID `example:"1"`
+		// Tag name
+		Name           string                   `json:"Name" example:"org/acme"`
 		Endpoints      map[EndpointID]bool      `json:"Endpoints"`
 		EndpointGroups map[EndpointGroupID]bool `json:"EndpointGroups"`
 	}
@@ -604,8 +629,10 @@ type (
 
 	// Team represents a list of user accounts
 	Team struct {
-		ID   TeamID `json:"Id"`
-		Name string `json:"Name"`
+		// Team Identifier
+		ID TeamID `json:"Id" example:"1"`
+		// Team name
+		Name string `json:"Name" example:"developers"`
 	}
 
 	// TeamAccessPolicies represent the association of an access policy and a team
@@ -616,10 +643,14 @@ type (
 
 	// TeamMembership represents a membership association between a user and a team
 	TeamMembership struct {
-		ID     TeamMembershipID `json:"Id"`
-		UserID UserID           `json:"UserID"`
-		TeamID TeamID           `json:"TeamID"`
-		Role   MembershipRole   `json:"Role"`
+		// Membership Identifier
+		ID TeamMembershipID `json:"Id" example:"1"`
+		// User identifier
+		UserID UserID `json:"UserID" example:"1"`
+		// Team identifier
+		TeamID TeamID `json:"TeamID" example:"1"`
+		// Team role (1 for team leader and 2 for team member)
+		Role MembershipRole `json:"Role" example:"1"`
 	}
 
 	// TeamMembershipID represents a team membership identifier
@@ -635,7 +666,8 @@ type (
 	// or an Edge template
 	Template struct {
 		// Mandatory container/stack fields
-		ID                TemplateID   `json:"Id"`
+		// Template Identifier
+		ID                TemplateID   `json:"Id" example:"1"`
 		Type              TemplateType `json:"type"`
 		Title             string       `json:"title"`
 		Description       string       `json:"description"`
@@ -710,11 +742,16 @@ type (
 
 	// TLSConfiguration represents a TLS configuration
 	TLSConfiguration struct {
-		TLS           bool   `json:"TLS"`
-		TLSSkipVerify bool   `json:"TLSSkipVerify"`
-		TLSCACertPath string `json:"TLSCACert,omitempty"`
-		TLSCertPath   string `json:"TLSCert,omitempty"`
-		TLSKeyPath    string `json:"TLSKey,omitempty"`
+		// Use TLS
+		TLS bool `json:"TLS" example:"true"`
+		// Skip the verification of the server TLS certificate
+		TLSSkipVerify bool `json:"TLSSkipVerify" example:"false"`
+		// Path to the TLS CA certificate file
+		TLSCACertPath string `json:"TLSCACert,omitempty" example:"/data/tls/ca.pem"`
+		// Path to the TLS client certificate file
+		TLSCertPath string `json:"TLSCert,omitempty" example:"/data/tls/cert.pem"`
+		// Path to the TLS client key file
+		TLSKeyPath string `json:"TLSKey,omitempty" example:"/data/tls/key.pem"`
 	}
 
 	// TLSFileType represents a type of TLS file required to connect to a Docker endpoint.
@@ -744,10 +781,12 @@ type (
 
 	// User represents a user account
 	User struct {
-		ID       UserID   `json:"Id"`
-		Username string   `json:"Username"`
-		Password string   `json:"Password,omitempty"`
-		Role     UserRole `json:"Role"`
+		// User Identifier
+		ID       UserID `json:"Id" example:"1"`
+		Username string `json:"Username" example:"bob"`
+		Password string `json:"Password,omitempty" example:"passwd"`
+		// User role (1 for administrator account and 2 for regular account)
+		Role UserRole `json:"Role" example:"1"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 25
@@ -773,7 +812,8 @@ type (
 
 	// Webhook represents a url webhook that can be used to update a service
 	Webhook struct {
-		ID          WebhookID   `json:"Id"`
+		// Webhook Identifier
+		ID          WebhookID   `json:"Id" example:"1"`
 		Token       string      `json:"Token"`
 		ResourceID  string      `json:"ResourceId"`
 		EndpointID  EndpointID  `json:"EndpointId"`
