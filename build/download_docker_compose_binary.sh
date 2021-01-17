@@ -13,4 +13,3 @@ elif [ "${PLATFORM}" == 'mac' ]; then
 fi
 
 exit 0
-
