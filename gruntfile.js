@@ -218,13 +218,14 @@ function shell_download_docker_compose_binary(p, a) {
 
 	if (p === 'linux' || p === 'mac') {
 		return [
-			'if [ -f dist/docker ]; then',
+			'if [ -f dist/docker-compose ]; then',
 			'echo "Docker Compose binary exists";',
 			'else',
 			'build/download_docker_compose_binary.sh ' + ip + ' ' + ia + ' ' + binaryVersion + ';',
 			'fi',
 		].join(' ');
-	} else {
+	}
+	if (p === 'win') {
 		return [
 			'powershell -Command "& {if (Test-Path -Path "dist/docker-compose.exe") {',
 			'Write-Host "Skipping download, Docker Compose binary exists"',
