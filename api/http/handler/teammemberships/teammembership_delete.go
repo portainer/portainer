@@ -15,7 +15,7 @@ import (
 // @summary Remove user from team
 // @description
 // @tags team_memberships
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param id path string true "membership id"

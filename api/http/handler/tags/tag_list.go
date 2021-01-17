@@ -10,7 +10,7 @@ import (
 // List Tags
 // @summary Fetches the list of tags
 // @description
-// @security ApiKeyAuth
+// @security jwt
 // @produce json
 // @success 200 {array} portainer.Tag
 // @tags tags

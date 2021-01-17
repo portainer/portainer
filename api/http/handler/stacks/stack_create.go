@@ -32,7 +32,7 @@ func (handler *Handler) cleanUp(stack *portainer.Stack, doCleanUp *bool) error {
 // @summary Create a Stack
 // @description
 // @tags stacks
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param method query string true "Creation Method" Enums(file,string,repository)

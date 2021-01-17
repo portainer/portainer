@@ -11,7 +11,7 @@ import (
 // logout godoc
 // @id logout
 // @summary Logout
-// @security ApiKeyAuth
+// @security jwt
 // @tags auth
 // @accept json
 // @produce json

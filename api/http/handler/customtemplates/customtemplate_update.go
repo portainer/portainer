@@ -49,7 +49,7 @@ func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
 // @summary Updates a custom template
 // @description
 // @tags custom_templates
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param id path string true "template id"

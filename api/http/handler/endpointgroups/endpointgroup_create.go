@@ -31,7 +31,7 @@ func (payload *endpointGroupCreatePayload) Validate(r *http.Request) error {
 // @summary Creates an Endpoint Group
 // @description
 // @tags endpoint_groups
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param body body endpointGroupCreatePayload true "endpoint group data"

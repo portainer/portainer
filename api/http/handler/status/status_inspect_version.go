@@ -24,7 +24,7 @@ type githubData struct {
 // @summary Inspect Version
 // @description
 // @tags status
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @success 200 {object} inspectVersionResponse "Version info"

@@ -40,7 +40,7 @@ func (payload *registryCreatePayload) Validate(r *http.Request) error {
 // @summary Creates a registry
 // @description
 // @tags registries
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param body body registryCreatePayload true "registry data"

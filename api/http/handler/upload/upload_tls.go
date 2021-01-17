@@ -14,7 +14,7 @@ import (
 // @summary Upload TLS file
 // @description
 // @tags upload
-// @security ApiKeyAuth
+// @security jwt
 // @accept  multipart/form-data
 // @produce  json
 // @param certificate path string true "certificate type" Enums(ca,cert,key)

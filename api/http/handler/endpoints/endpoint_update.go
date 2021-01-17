@@ -41,7 +41,7 @@ func (payload *endpointUpdatePayload) Validate(r *http.Request) error {
 // Update endpoint
 // @summary Updates an endpoint
 // @description
-// @security ApiKeyAuth
+// @security jwt
 // @tags endpoints
 // @accept json
 // @produce json

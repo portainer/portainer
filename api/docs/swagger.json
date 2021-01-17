@@ -53,7 +53,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -112,7 +112,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -149,7 +149,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -223,7 +223,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -266,7 +266,7 @@
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -318,7 +318,7 @@
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -360,7 +360,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -405,7 +405,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -433,7 +433,7 @@
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -471,7 +471,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -520,7 +520,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -567,7 +567,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -610,7 +610,7 @@
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -662,7 +662,7 @@
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -704,7 +704,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -744,7 +744,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -811,7 +811,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -857,7 +857,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -912,7 +912,7 @@
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -957,7 +957,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1005,7 +1005,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1056,7 +1056,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1109,7 +1109,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1159,7 +1159,7 @@
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1211,7 +1211,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1251,7 +1251,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1328,7 +1328,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1374,7 +1374,7 @@
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1429,7 +1429,7 @@
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1474,7 +1474,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1566,7 +1566,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1599,7 +1599,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1633,7 +1633,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1677,7 +1677,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1717,7 +1717,7 @@
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1759,7 +1759,7 @@
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1798,7 +1798,7 @@
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1845,7 +1845,7 @@
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1894,7 +1894,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1984,7 +1984,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2028,7 +2028,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2055,7 +2055,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2095,7 +2095,7 @@
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2135,7 +2135,7 @@
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2265,7 +2265,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2319,7 +2319,7 @@
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2371,7 +2371,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2413,7 +2413,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2459,7 +2459,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "produces": [
@@ -2483,7 +2483,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2514,7 +2514,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2558,7 +2558,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2604,7 +2604,7 @@
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2653,7 +2653,7 @@
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2695,7 +2695,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2743,7 +2743,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2790,7 +2790,7 @@
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2845,7 +2845,7 @@
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2887,7 +2887,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2920,7 +2920,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2948,7 +2948,7 @@
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2989,7 +2989,7 @@
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3027,7 +3027,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3057,7 +3057,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3103,7 +3103,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3202,7 +3202,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3248,7 +3248,7 @@
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3309,7 +3309,7 @@
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "description": "If the external query parameter is set to true, the id route variable is expected to be\nthe name of an external stack as a string.",
@@ -3370,7 +3370,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3418,7 +3418,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3481,7 +3481,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3529,7 +3529,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3602,7 +3602,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3632,7 +3632,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "produces": [
@@ -3660,7 +3660,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "produces": [
@@ -3701,7 +3701,7 @@
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "produces": [
@@ -3734,7 +3734,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3781,7 +3781,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3835,7 +3835,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3866,7 +3866,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3907,7 +3907,7 @@
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3962,7 +3962,7 @@
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4007,7 +4007,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4040,7 +4040,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4086,7 +4086,7 @@
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4128,7 +4128,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4176,7 +4176,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4206,7 +4206,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4250,7 +4250,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4308,7 +4308,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4339,7 +4339,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4458,7 +4458,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4501,7 +4501,7 @@
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4559,7 +4559,7 @@
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4601,7 +4601,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4649,7 +4649,7 @@
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4703,7 +4703,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4758,7 +4758,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4805,7 +4805,7 @@
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4879,7 +4879,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "description": "If the nodeName query parameter is present, the request will be proxied to the underlying agent endpoint.\nIf the nodeName query parameter is not specified, the request will be upgraded to the websocket protocol and\nan AttachStart operation HTTP request will be created and hijacked.\nAuthentication and access is controlled via the mandatory token query parameter.",
@@ -4938,7 +4938,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "description": "If the nodeName query parameter is present, the request will be proxied to the underlying agent endpoint.\nIf the nodeName query parameter is not specified, the request will be upgraded to the websocket protocol and\nan ExecStart operation HTTP request will be created and hijacked.\nAuthentication and access is controlled via the mandatory token query parameter.",
@@ -4994,7 +4994,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "description": "The request will be upgraded to the websocket protocol.\nAuthentication and access is controlled via the mandatory token query parameter.",
@@ -7466,7 +7466,7 @@
         }
     },
     "securityDefinitions": {
-        "ApiKeyAuth": {
+        "jwt": {
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"

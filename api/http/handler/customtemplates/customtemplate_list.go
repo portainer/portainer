@@ -15,7 +15,7 @@ import (
 // @summary Gets a list of custom templates
 // @description
 // @tags custom_templates
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @success 200 {array} portainer.CustomTemplate

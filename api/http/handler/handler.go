@@ -79,7 +79,7 @@ type Handler struct {
 // @BasePath /api
 // @schemes http https
 
-// @securitydefinitions.apikey ApiKeyAuth
+// @securitydefinitions.apikey jwt
 // @in header
 // @name Authorization
 

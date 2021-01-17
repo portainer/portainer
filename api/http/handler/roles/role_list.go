@@ -10,7 +10,7 @@ import (
 // @summary List Roles
 // @description
 // @tags roles
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @success 200 {array} portainer.Role "Roles"

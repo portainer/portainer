@@ -19,7 +19,7 @@ type stackFileResponse struct {
 // @summary Fetches the stack file for an EdgeStack
 // @description
 // @tags edge_stacks
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param id path string true "EdgeStack Id"

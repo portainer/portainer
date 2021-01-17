@@ -17,7 +17,7 @@ type fileResponse struct {
 // @summary Fetch the log for a specifc task on an EdgeJob
 // @description
 // @tags edge_jobs
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param id path string true "EdgeJob Id"

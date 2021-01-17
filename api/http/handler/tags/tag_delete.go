@@ -15,7 +15,7 @@ import (
 // @summary Delete a tag
 // @description
 // @tags tags
-// @security ApiKeyAuth
+// @security jwt
 // @produce json
 // @param id path int true "tag id"
 // @success 204

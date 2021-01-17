@@ -12,7 +12,7 @@ import (
 // @summary List team memberships
 // @description
 // @tags team_memberships
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @success 200 {array} portainer.TeamMembership

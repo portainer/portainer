@@ -35,7 +35,7 @@ func (payload *teamMembershipUpdatePayload) Validate(r *http.Request) error {
 // @summary Update team membership
 // @description
 // @tags team_memberships
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param id path string true "membership id"

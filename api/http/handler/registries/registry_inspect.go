@@ -15,7 +15,7 @@ import (
 // @summary Inspects a registry
 // @description
 // @tags registries
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param id path int true "registry id"

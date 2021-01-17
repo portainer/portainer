@@ -14,7 +14,7 @@ import (
 // @summary List user's team memberships
 // @description
 // @tags users
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param id path int true "user id"

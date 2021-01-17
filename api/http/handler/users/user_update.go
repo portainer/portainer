@@ -34,7 +34,7 @@ func (payload *userUpdatePayload) Validate(r *http.Request) error {
 // @summary Update a user
 // @description
 // @tags users
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param id path int true "user id"

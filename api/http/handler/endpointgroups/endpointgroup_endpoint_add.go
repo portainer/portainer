@@ -13,7 +13,7 @@ import (
 // @summary Attach an endpoint to an endpoint group
 // @description
 // @tags endpoint_groups
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param id path int true "endpoint group id"

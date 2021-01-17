@@ -14,7 +14,7 @@ import (
 // @summary Inspects an EdgeGroup
 // @description
 // @tags edge_groups
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param id path int true "EdgeGroup Id"

@@ -28,7 +28,7 @@ func (payload *registryUpdatePayload) Validate(r *http.Request) error {
 // @summary Updates a registry
 // @description
 // @tags registries
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param id path int true "registry id"

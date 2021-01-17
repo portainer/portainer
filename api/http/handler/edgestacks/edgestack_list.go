@@ -11,7 +11,7 @@ import (
 // @summary Fetches the list of EdgeStacks
 // @description
 // @tags edge_stacks
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @success 200 {array} portainer.EdgeStack

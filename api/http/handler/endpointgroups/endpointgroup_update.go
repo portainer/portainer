@@ -27,7 +27,7 @@ func (payload *endpointGroupUpdatePayload) Validate(r *http.Request) error {
 // @summary Update Endpoint group
 // @description
 // @tags endpoint_groups
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param id path int true "endpoint group id"

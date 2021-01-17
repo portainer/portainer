@@ -13,7 +13,7 @@ import (
 // @summary Deletes a resource control object
 // @description
 // @tags resource_controls
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param id path int true "Resource control Id"

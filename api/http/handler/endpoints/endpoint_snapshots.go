@@ -13,7 +13,7 @@ import (
 // @summary Snapshot all endpoints
 // @description
 // @tags endpoints
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @success 204

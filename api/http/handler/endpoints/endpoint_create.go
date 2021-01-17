@@ -151,7 +151,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 // @summary Creates an endpoint
 // @description
 // @tags endpoints
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param body body endpointCreatePayload true "endpoint data"

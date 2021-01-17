@@ -15,7 +15,7 @@ import (
 // @summary Delete an EdgeJob
 // @description
 // @tags edge_jobs
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param id path string true "EdgeJob Id"

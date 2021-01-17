@@ -19,7 +19,7 @@ type fileResponse struct {
 // @summary Gets a custom template's file
 // @description
 // @tags custom_templates
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param id path string true "template id"

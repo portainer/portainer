@@ -38,7 +38,7 @@ func (payload *edgeGroupUpdatePayload) Validate(r *http.Request) error {
 // @summary Updates an EdgeGroup
 // @description
 // @tags edge_groups
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param id path int true "EdgeGroup Id"

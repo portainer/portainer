@@ -33,7 +33,7 @@ func (payload *userCreatePayload) Validate(r *http.Request) error {
 
 // @summary Create a user
 // @description
-// @security ApiKeyAuth
+// @security jwt
 // @tags users
 // @accept json
 // @produce json

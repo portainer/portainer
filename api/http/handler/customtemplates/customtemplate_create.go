@@ -19,7 +19,7 @@ import (
 // @summary Create a custom template
 // @description
 // @tags custom_templates
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param method query string true "method for creating template" Enums(string, file, repository)

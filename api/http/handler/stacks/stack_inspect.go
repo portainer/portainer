@@ -15,7 +15,7 @@ import (
 // @summary Inspect Stack
 // @description
 // @tags stacks
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param id path int true "Stack Id"

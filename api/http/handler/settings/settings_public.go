@@ -20,7 +20,7 @@ type publicSettingsResponse struct {
 // @summary Inspect Public Settings
 // @description
 // @tags settings
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @success 200 {object} publicSettingsResponse "Settings"

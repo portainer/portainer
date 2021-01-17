@@ -20,7 +20,7 @@ type stackFileResponse struct {
 // @summary Inspect Stack's file
 // @description
 // @tags stacks
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param id path int true "Stack Id"

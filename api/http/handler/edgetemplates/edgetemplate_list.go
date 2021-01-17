@@ -19,7 +19,7 @@ type templateFileFormat struct {
 // @summary Fetches the list of Edge Templates
 // @description
 // @tags edge_templates
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @success 200 {array} portainer.Template

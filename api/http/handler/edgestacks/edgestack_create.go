@@ -20,7 +20,7 @@ import (
 // @summary Create an EdgeStack
 // @description
 // @tags edge_stacks
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param method query string true "Creation Method" Enums(file,string,repository)

@@ -15,7 +15,7 @@ import (
 // @summary Snapshots an endpoint
 // @description
 // @tags endpoints
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param id path int true "endpoint id"

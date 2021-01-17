@@ -10,7 +10,7 @@ import (
 // @summary Inspect Settings
 // @description
 // @tags settings
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @success 200 {object} portainer.Settings "Settings"

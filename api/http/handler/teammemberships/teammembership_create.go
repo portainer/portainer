@@ -34,7 +34,7 @@ func (payload *teamMembershipCreatePayload) Validate(r *http.Request) error {
 // @summary Add user to team
 // @description
 // @tags team_memberships
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param body body teamMembershipCreatePayload true "membership data"

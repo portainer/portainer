@@ -11,7 +11,7 @@ import (
 // @summary Gets the dockerhub settings
 // @description
 // @tags dockerhub
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @success 200 {object} portainer.DockerHub

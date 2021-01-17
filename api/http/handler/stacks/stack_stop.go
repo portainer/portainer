@@ -15,7 +15,7 @@ import (
 
 // @summary Stops a Stack
 // @tags stacks
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param id path string true "Stack Id"

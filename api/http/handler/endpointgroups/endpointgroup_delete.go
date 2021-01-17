@@ -14,7 +14,7 @@ import (
 // @summary Deletes an Endpoint Group
 // @description
 // @tags endpoint_groups
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param id path int true "Endpoint Group Id"

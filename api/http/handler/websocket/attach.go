@@ -19,7 +19,7 @@ import (
 // @description If the nodeName query parameter is not specified, the request will be upgraded to the websocket protocol and
 // @description an AttachStart operation HTTP request will be created and hijacked.
 // @description Authentication and access is controlled via the mandatory token query parameter.
-// @security ApiKeyAuth
+// @security jwt
 // @tags websocket
 // @accept json
 // @produce json

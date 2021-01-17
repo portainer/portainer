@@ -1667,7 +1667,7 @@ paths:
         "204":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Logout
       tags:
       - auth
@@ -1713,7 +1713,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Gets a list of custom templates
       tags:
       - custom_templates
@@ -1759,7 +1759,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Create a custom template
       tags:
       - custom_templates
@@ -1785,7 +1785,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Delete a custom template
       tags:
       - custom_templates
@@ -1812,7 +1812,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Gets a custom template
       tags:
       - custom_templates
@@ -1845,7 +1845,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Updates a custom template
       tags:
       - custom_templates
@@ -1873,7 +1873,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Gets a custom template's file
       tags:
       - custom_templates
@@ -1891,7 +1891,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Gets the dockerhub settings
       tags:
       - dockerhub
@@ -1913,7 +1913,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Updates the dockerhub settings
       tags:
       - dockerhub
@@ -1942,7 +1942,7 @@ paths:
           schema:
             type: Edge
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: list EdgeGroups
       tags:
       - edge_groups
@@ -1970,7 +1970,7 @@ paths:
           schema:
             type: Edge
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Create an EdgeGroup
       tags:
       - edge_groups
@@ -1996,7 +1996,7 @@ paths:
           schema:
             type: Edge
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Deletes an EdgeGroup
       tags:
       - edge_groups
@@ -2023,7 +2023,7 @@ paths:
           schema:
             type: Edge
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Inspects an EdgeGroup
       tags:
       - edge_groups
@@ -2056,7 +2056,7 @@ paths:
           schema:
             type: Edge
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Updates an EdgeGroup
       tags:
       - edge_groups
@@ -2082,7 +2082,7 @@ paths:
           schema:
             type: Edge
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Fetch EdgeJobs list
       tags:
       - edge_jobs
@@ -2124,7 +2124,7 @@ paths:
           schema:
             type: Edge
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Create an EdgeJob
       tags:
       - edge_jobs
@@ -2152,7 +2152,7 @@ paths:
           schema:
             type: Edge
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Delete an EdgeJob
       tags:
       - edge_jobs
@@ -2181,7 +2181,7 @@ paths:
           schema:
             type: Edge
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Inspect an EdgeJob
       tags:
       - edge_jobs
@@ -2216,7 +2216,7 @@ paths:
           schema:
             type: Edge
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Update an EdgeJob
       tags:
       - edge_jobs
@@ -2246,7 +2246,7 @@ paths:
           schema:
             type: Edge
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Fetch a file of an EdgeJob
       tags:
       - edge_jobs
@@ -2278,7 +2278,7 @@ paths:
           schema:
             type: Edge
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Fetch the list of tasks on an EdgeJob
       tags:
       - edge_jobs
@@ -2311,7 +2311,7 @@ paths:
           schema:
             type: Edge
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Clear the log for a specifc task on an EdgeJob
       tags:
       - edge_jobs
@@ -2345,7 +2345,7 @@ paths:
           schema:
             type: Edge
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Fetch the log for a specifc task on an EdgeJob
       tags:
       - edge_jobs
@@ -2377,7 +2377,7 @@ paths:
           schema:
             type: Edge
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Collect the log for a specifc task on an EdgeJob
       tags:
       - edge_jobs
@@ -2403,7 +2403,7 @@ paths:
           schema:
             type: Edge
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Fetches the list of EdgeStacks
       tags:
       - edge_stacks
@@ -2452,7 +2452,7 @@ paths:
           schema:
             type: Edge
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Create an EdgeStack
       tags:
       - edge_stacks
@@ -2480,7 +2480,7 @@ paths:
           schema:
             type: Edge
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Delete an EdgeStack
       tags:
       - edge_stacks
@@ -2509,7 +2509,7 @@ paths:
           schema:
             type: Edge
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Inspect an EdgeStack
       tags:
       - edge_stacks
@@ -2544,7 +2544,7 @@ paths:
           schema:
             type: Edge
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Update an EdgeStack
       tags:
       - edge_stacks
@@ -2574,7 +2574,7 @@ paths:
           schema:
             type: Edge
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Fetches the stack file for an EdgeStack
       tags:
       - edge_stacks
@@ -2623,7 +2623,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Fetches the list of Edge Templates
       tags:
       - edge_templates
@@ -2645,7 +2645,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: List Endpoint groups
       tags:
       - endpoint_groups
@@ -2671,7 +2671,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Creates an Endpoint Group
       tags:
       - endpoint_groups
@@ -2697,7 +2697,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Inspect an Endpoint group
       tags:
       - endpoint_groups
@@ -2722,7 +2722,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Update Endpoint group
       tags:
       - endpoint_groups
@@ -2746,7 +2746,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Deletes an Endpoint Group
       tags:
       - endpoint_groups
@@ -2777,7 +2777,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Removes endpoint from an endpoint group
       tags:
       - endpoint_groups
@@ -2807,7 +2807,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Attach an endpoint to an endpoint group
       tags:
       - endpoint_groups
@@ -2867,7 +2867,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: List endpoints
       tags:
       - endpoints
@@ -2893,7 +2893,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Creates an endpoint
       tags:
       - endpoints
@@ -2917,7 +2917,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Deletes an endpoint
       tags:
       - endpoints
@@ -2942,7 +2942,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Inspects an endpoint
       tags:
       - endpoints
@@ -2967,7 +2967,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Updates an endpoint
       tags:
       - endpoints
@@ -3062,7 +3062,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Add an extension to an Endpoint
       tags:
       - endpoints
@@ -3095,7 +3095,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Removes an extension to an Endpoint
       tags:
       - endpoints
@@ -3121,7 +3121,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Snapshots an endpoint
       tags:
       - endpoints
@@ -3149,7 +3149,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Get endpoint status (for edge)
       tags:
       - endpoints
@@ -3166,7 +3166,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Snapshot all endpoints
       tags:
       - endpoints
@@ -3180,7 +3180,7 @@ paths:
           schema:
             $ref: '#/definitions/motd.motdResponse'
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: fetches the message of the day
       tags:
       - motd
@@ -3200,7 +3200,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: List Registries
       tags:
       - registries
@@ -3226,7 +3226,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Creates a registry
       tags:
       - registries
@@ -3252,7 +3252,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Deletes a registry
       tags:
       - registries
@@ -3281,7 +3281,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Inspects a registry
       tags:
       - registries
@@ -3312,7 +3312,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Updates a registry
       tags:
       - registries
@@ -3342,7 +3342,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Configures a registry
       tags:
       - registries
@@ -3371,7 +3371,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Creates a resource control object
       tags:
       - resource_controls
@@ -3397,7 +3397,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Deletes a resource control object
       tags:
       - resource_controls
@@ -3432,7 +3432,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Updates a resource control object
       tags:
       - resource_controls
@@ -3452,7 +3452,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: List Roles
       tags:
       - roles
@@ -3470,7 +3470,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Inspect Settings
       tags:
       - settings
@@ -3494,7 +3494,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Update Settings
       tags:
       - settings
@@ -3517,7 +3517,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Check LDAP Connection
       tags:
       - settings
@@ -3535,7 +3535,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Inspect Public Settings
       tags:
       - settings
@@ -3564,7 +3564,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: List Stacks
       tags:
       - stacks
@@ -3629,7 +3629,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Create a Stack
       tags:
       - stacks
@@ -3670,7 +3670,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Delete a Stack
       tags:
       - stacks
@@ -3699,7 +3699,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Inspect Stack
       tags:
       - stacks
@@ -3738,7 +3738,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Update a Stack
       tags:
       - stacks
@@ -3768,7 +3768,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Inspect Stack's file
       tags:
       - stacks
@@ -3808,7 +3808,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Migrates a Stack to another endpoint
       tags:
       - stacks
@@ -3838,7 +3838,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Starts a stopped Stack
       tags:
       - stacks
@@ -3868,7 +3868,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Stops a Stack
       tags:
       - stacks
@@ -3902,7 +3902,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Inspect Version
       tags:
       - status
@@ -3920,7 +3920,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Fetches the list of tags
       tags:
       - tags
@@ -3944,7 +3944,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Create a tag
       tags:
       - tags
@@ -3964,7 +3964,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Delete a tag
       tags:
       - tags
@@ -3993,7 +3993,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Create Team
       tags:
       - teams
@@ -4027,7 +4027,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Update Team
       tags:
       - teams
@@ -4047,7 +4047,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: List team memberships
       tags:
       - team_memberships
@@ -4071,7 +4071,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Add user to team
       tags:
       - team_memberships
@@ -4099,7 +4099,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Remove user from team
       tags:
       - team_memberships
@@ -4134,7 +4134,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Update team membership
       tags:
       - team_memberships
@@ -4154,7 +4154,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: List teams
       tags:
       - teams
@@ -4180,7 +4180,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Delete team
       tags:
       - teams
@@ -4209,7 +4209,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Inspect team
       tags:
       - teams
@@ -4239,7 +4239,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: List team's memberships
       tags:
       - teams
@@ -4257,7 +4257,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: List templates
       tags:
       - templates
@@ -4284,7 +4284,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Get a template's file
       tags:
       - templates
@@ -4322,7 +4322,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Upload TLS file
       tags:
       - upload
@@ -4342,7 +4342,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: List users
       tags:
       - users
@@ -4372,7 +4372,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Create a user
       tags:
       - users
@@ -4398,7 +4398,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Delete a user
       tags:
       - users
@@ -4425,7 +4425,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Inspect a user
       tags:
       - users
@@ -4462,7 +4462,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Update a user
       tags:
       - users
@@ -4492,7 +4492,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: List user's team memberships
       tags:
       - users
@@ -4526,7 +4526,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Update a user's password
       tags:
       - users
@@ -4606,7 +4606,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: List webhooks
       tags:
       - webhooks
@@ -4634,7 +4634,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Create a webhook
       tags:
       - webhooks
@@ -4658,7 +4658,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Delete a webhook
       tags:
       - webhooks
@@ -4723,7 +4723,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Attach a websocket
       tags:
       - websocket
@@ -4763,7 +4763,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Execute a websocket
       tags:
       - websocket
@@ -4819,7 +4819,7 @@ paths:
         "500":
           description: ""
       security:
-      - ApiKeyAuth: []
+      - jwt: []
       summary: Execute a websocket on pod
       tags:
       - websocket
@@ -4827,7 +4827,7 @@ schemes:
 - http
 - https
 securityDefinitions:
-  ApiKeyAuth:
+  jwt:
     in: header
     name: Authorization
     type: apiKey

@@ -11,7 +11,7 @@ import (
 // @summary List teams
 // @description
 // @tags teams
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @success 200 {array} portainer.Team "Team"

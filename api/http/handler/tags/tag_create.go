@@ -25,7 +25,7 @@ func (payload *tagCreatePayload) Validate(r *http.Request) error {
 // tagCreate godoc
 // @summary Create a tag
 // @description
-// @security ApiKeyAuth
+// @security jwt
 // @produce json
 // @param body body tagCreatePayload true "tag info"
 // @success 200 {array} portainer.Tag

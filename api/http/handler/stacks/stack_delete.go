@@ -18,7 +18,7 @@ import (
 // @description If the external query parameter is set to true, the id route variable is expected to be
 // @description the name of an external stack as a string.
 // @tags stacks
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param id path string true "Stack Id"

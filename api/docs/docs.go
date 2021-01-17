@@ -65,7 +65,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -124,7 +124,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -161,7 +161,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -235,7 +235,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -278,7 +278,7 @@ var doc = `{
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -330,7 +330,7 @@ var doc = `{
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -372,7 +372,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -417,7 +417,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -445,7 +445,7 @@ var doc = `{
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -483,7 +483,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -532,7 +532,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -579,7 +579,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -622,7 +622,7 @@ var doc = `{
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -674,7 +674,7 @@ var doc = `{
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -716,7 +716,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -756,7 +756,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -823,7 +823,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -869,7 +869,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -924,7 +924,7 @@ var doc = `{
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -969,7 +969,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1017,7 +1017,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1068,7 +1068,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1121,7 +1121,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1171,7 +1171,7 @@ var doc = `{
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1223,7 +1223,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1263,7 +1263,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1340,7 +1340,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1386,7 +1386,7 @@ var doc = `{
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1441,7 +1441,7 @@ var doc = `{
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1486,7 +1486,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1578,7 +1578,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1611,7 +1611,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1645,7 +1645,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1689,7 +1689,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1729,7 +1729,7 @@ var doc = `{
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1771,7 +1771,7 @@ var doc = `{
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1810,7 +1810,7 @@ var doc = `{
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1857,7 +1857,7 @@ var doc = `{
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1906,7 +1906,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -1996,7 +1996,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2040,7 +2040,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2067,7 +2067,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2107,7 +2107,7 @@ var doc = `{
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2147,7 +2147,7 @@ var doc = `{
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2277,7 +2277,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2331,7 +2331,7 @@ var doc = `{
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2383,7 +2383,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2425,7 +2425,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2471,7 +2471,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "produces": [
@@ -2495,7 +2495,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2526,7 +2526,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2570,7 +2570,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2616,7 +2616,7 @@ var doc = `{
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2665,7 +2665,7 @@ var doc = `{
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2707,7 +2707,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2755,7 +2755,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2802,7 +2802,7 @@ var doc = `{
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2857,7 +2857,7 @@ var doc = `{
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2899,7 +2899,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2932,7 +2932,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -2960,7 +2960,7 @@ var doc = `{
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3001,7 +3001,7 @@ var doc = `{
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3039,7 +3039,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3069,7 +3069,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3115,7 +3115,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3214,7 +3214,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3260,7 +3260,7 @@ var doc = `{
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3321,7 +3321,7 @@ var doc = `{
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "description": "If the external query parameter is set to true, the id route variable is expected to be\nthe name of an external stack as a string.",
@@ -3382,7 +3382,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3430,7 +3430,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3493,7 +3493,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3541,7 +3541,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3614,7 +3614,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3644,7 +3644,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "produces": [
@@ -3672,7 +3672,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "produces": [
@@ -3713,7 +3713,7 @@ var doc = `{
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "produces": [
@@ -3746,7 +3746,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3793,7 +3793,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3847,7 +3847,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3878,7 +3878,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3919,7 +3919,7 @@ var doc = `{
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -3974,7 +3974,7 @@ var doc = `{
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4019,7 +4019,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4052,7 +4052,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4098,7 +4098,7 @@ var doc = `{
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4140,7 +4140,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4188,7 +4188,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4218,7 +4218,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4262,7 +4262,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4320,7 +4320,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4351,7 +4351,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4470,7 +4470,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4513,7 +4513,7 @@ var doc = `{
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4571,7 +4571,7 @@ var doc = `{
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4613,7 +4613,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4661,7 +4661,7 @@ var doc = `{
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4715,7 +4715,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4770,7 +4770,7 @@ var doc = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4817,7 +4817,7 @@ var doc = `{
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "consumes": [
@@ -4891,7 +4891,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "description": "If the nodeName query parameter is present, the request will be proxied to the underlying agent endpoint.\nIf the nodeName query parameter is not specified, the request will be upgraded to the websocket protocol and\nan AttachStart operation HTTP request will be created and hijacked.\nAuthentication and access is controlled via the mandatory token query parameter.",
@@ -4950,7 +4950,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "description": "If the nodeName query parameter is present, the request will be proxied to the underlying agent endpoint.\nIf the nodeName query parameter is not specified, the request will be upgraded to the websocket protocol and\nan ExecStart operation HTTP request will be created and hijacked.\nAuthentication and access is controlled via the mandatory token query parameter.",
@@ -5006,7 +5006,7 @@ var doc = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "jwt": []
                     }
                 ],
                 "description": "The request will be upgraded to the websocket protocol.\nAuthentication and access is controlled via the mandatory token query parameter.",
@@ -7478,7 +7478,7 @@ var doc = `{
         }
     },
     "securityDefinitions": {
-        "ApiKeyAuth": {
+        "jwt": {
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"

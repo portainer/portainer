@@ -11,7 +11,7 @@ import (
 // @summary List users
 // @description
 // @tags users
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @success 200 {array} portainer.User

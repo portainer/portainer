@@ -11,7 +11,7 @@ import (
 // @summary List Endpoint groups
 // @description
 // @tags endpoint_groups
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @success 200 {array} portainer.EndpointGroup "Endpoint group"

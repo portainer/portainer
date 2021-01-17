@@ -14,7 +14,7 @@ import (
 // @summary List team's memberships
 // @description
 // @tags teams
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param id path string true "team id"

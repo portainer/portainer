@@ -19,7 +19,7 @@ type stackListOperationFilters struct {
 // @summary List Stacks
 // @description
 // @tags stacks
-// @security ApiKeyAuth
+// @security jwt
 // @accept json
 // @produce json
 // @param filters query stackListOperationFilters false "Stack filters"

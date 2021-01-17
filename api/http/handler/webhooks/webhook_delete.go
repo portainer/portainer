@@ -11,7 +11,7 @@ import (
 
 // @summary Delete a webhook
 // @description
-// @security ApiKeyAuth
+// @security jwt
 // @tags webhooks
 // @accept json
 // @produce json
