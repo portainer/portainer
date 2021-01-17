@@ -65,20 +65,19 @@ type Handler struct {
 	WebhookHandler         *webhooks.Handler
 }
 
-// @title PortainerCE
-// @version 2.0
-// @description
+// @title PortainerCE API
+// @version 2.0.0
+// @description.markdown api-description.md
 // @termsOfService
 
-// @contact.name
-// @contact.url
-// @contact.email
+// @contact.email info@portainer.io
 
 // @license.name
 // @license.url
 
 // @host
 // @BasePath /api
+// @schemes http https
 
 // @securitydefinitions.apikey ApiKeyAuth
 // @in header
