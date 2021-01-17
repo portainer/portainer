@@ -37,7 +37,7 @@ func (payload *edgeGroupUpdatePayload) Validate(r *http.Request) error {
 // edgeGroupUpdate godoc
 // @summary Updates an EdgeGroup
 // @description
-// @tags EdgeGroups
+// @tags edge_groups
 // @security ApiKeyAuth
 // @accept json
 // @produce json

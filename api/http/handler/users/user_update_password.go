@@ -31,7 +31,7 @@ func (payload *userUpdatePasswordPayload) Validate(r *http.Request) error {
 
 // @summary Update a user's password
 // @description
-// @tags Users
+// @tags users
 // @security ApiKeyAuth
 // @accept json
 // @produce json

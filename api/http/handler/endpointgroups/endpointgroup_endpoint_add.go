@@ -12,7 +12,7 @@ import (
 
 // @summary Attach an endpoint to an endpoint group
 // @description
-// @tags EndpointGroups
+// @tags endpoint_groups
 // @security ApiKeyAuth
 // @accept json
 // @produce json

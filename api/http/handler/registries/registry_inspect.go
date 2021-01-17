@@ -14,7 +14,7 @@ import (
 
 // @summary Inspects a registry
 // @description
-// @tags Registries
+// @tags registries
 // @security ApiKeyAuth
 // @accept json
 // @produce json

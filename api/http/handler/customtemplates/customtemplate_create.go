@@ -18,7 +18,7 @@ import (
 // Create a custom template
 // @summary Create a custom template
 // @description
-// @tags CustomTemplates
+// @tags custom_templates
 // @security ApiKeyAuth
 // @accept json
 // @produce json

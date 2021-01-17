@@ -12,7 +12,7 @@ import (
 
 // @summary Removes endpoint from an endpoint group
 // @description
-// @tags EndpointGroups
+// @tags endpoint_groups
 // @security ApiKeyAuth
 // @accept json
 // @produce json

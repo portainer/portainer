@@ -14,7 +14,7 @@ import (
 // Gets a list of custom templates
 // @summary Gets a list of custom templates
 // @description
-// @tags CustomTemplates
+// @tags custom_templates
 // @security ApiKeyAuth
 // @accept json
 // @produce json

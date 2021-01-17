@@ -17,7 +17,7 @@ import (
 // @summary Delete a Stack
 // @description If the external query parameter is set to true, the id route variable is expected to be
 // @description the name of an external stack as a string.
-// @tags Stacks
+// @tags stacks
 // @security ApiKeyAuth
 // @accept json
 // @produce json

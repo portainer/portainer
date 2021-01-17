@@ -28,7 +28,7 @@ func (payload *adminInitPayload) Validate(r *http.Request) error {
 
 // @summary Create an initial admin user
 // @description Creates a new admin user if not exists
-// @tags Users
+// @tags users
 // @accept json
 // @produce json
 // @param body body adminInitPayload true "User data"

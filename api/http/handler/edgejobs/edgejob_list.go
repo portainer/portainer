@@ -10,7 +10,7 @@ import (
 // edgeJobList
 // @summary Fetch EdgeJobs list
 // @description
-// @tags EdgeJobs
+// @tags edge_jobs
 // @security ApiKeyAuth
 // @accept json
 // @produce json

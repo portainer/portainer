@@ -9,7 +9,7 @@ import (
 
 // @summary Inspect Status
 // @description
-// @tags Status
+// @tags status
 // @accept json
 // @produce json
 // @success 200 {object} portainer.Status "Status info"

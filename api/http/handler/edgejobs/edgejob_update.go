@@ -31,7 +31,7 @@ func (payload *edgeJobUpdatePayload) Validate(r *http.Request) error {
 // edgeJobUpdate
 // @summary Update an EdgeJob
 // @description
-// @tags EdgeJobs
+// @tags edge_jobs
 // @security ApiKeyAuth
 // @accept json
 // @produce json

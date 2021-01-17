@@ -11,7 +11,7 @@ import (
 
 // @summary Admin Check
 // @description Checks if admin user was created
-// @tags Users
+// @tags users
 // @accept json
 // @produce json
 // @success 204 "Admin exists"

@@ -10,7 +10,7 @@ import (
 
 // @summary List Registries
 // @description
-// @tags Registries
+// @tags registries
 // @security ApiKeyAuth
 // @accept json
 // @produce json

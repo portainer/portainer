@@ -34,7 +34,7 @@ func (payload *userCreatePayload) Validate(r *http.Request) error {
 // @summary Create a user
 // @description
 // @security ApiKeyAuth
-// @tags Users
+// @tags users
 // @accept json
 // @produce json
 // @param body body userCreatePayload true "User data"

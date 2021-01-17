@@ -10,7 +10,7 @@ import (
 // dockerhubInspect
 // @summary Gets the dockerhub settings
 // @description
-// @tags DockerHub
+// @tags dockerhub
 // @security ApiKeyAuth
 // @accept json
 // @produce json

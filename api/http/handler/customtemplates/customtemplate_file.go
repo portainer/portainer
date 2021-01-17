@@ -18,7 +18,7 @@ type fileResponse struct {
 // Gets a custom template's file
 // @summary Gets a custom template's file
 // @description
-// @tags CustomTemplates
+// @tags custom_templates
 // @security ApiKeyAuth
 // @accept json
 // @produce json

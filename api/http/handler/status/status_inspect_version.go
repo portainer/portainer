@@ -23,7 +23,7 @@ type githubData struct {
 
 // @summary Inspect Version
 // @description
-// @tags Status
+// @tags status
 // @security ApiKeyAuth
 // @accept json
 // @produce json

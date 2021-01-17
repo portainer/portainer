@@ -35,7 +35,7 @@ func (payload *filePayload) Validate(r *http.Request) error {
 
 // @summary Get a template's file
 // @description
-// @tags Templates
+// @tags templates
 // @security ApiKeyAuth
 // @accept json
 // @produce json

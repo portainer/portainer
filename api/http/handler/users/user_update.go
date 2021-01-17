@@ -33,7 +33,7 @@ func (payload *userUpdatePayload) Validate(r *http.Request) error {
 
 // @summary Update a user
 // @description
-// @tags Users
+// @tags users
 // @security ApiKeyAuth
 // @accept json
 // @produce json

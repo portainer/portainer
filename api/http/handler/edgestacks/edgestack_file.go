@@ -18,7 +18,7 @@ type stackFileResponse struct {
 // edgeStackFile
 // @summary Fetches the stack file for an EdgeStack
 // @description
-// @tags EdgeStacks
+// @tags edge_stacks
 // @security ApiKeyAuth
 // @accept json
 // @produce json

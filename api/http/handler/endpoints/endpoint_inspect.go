@@ -13,7 +13,7 @@ import (
 // Inspect endpoint
 // @summary Inspects an endpoint
 // @description
-// @tags Endpoints
+// @tags endpoints
 // @security ApiKeyAuth
 // @accept json
 // @produce json

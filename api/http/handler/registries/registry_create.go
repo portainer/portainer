@@ -39,7 +39,7 @@ func (payload *registryCreatePayload) Validate(r *http.Request) error {
 
 // @summary Creates a registry
 // @description
-// @tags Registries
+// @tags registries
 // @security ApiKeyAuth
 // @accept json
 // @produce json

@@ -20,7 +20,7 @@ type taskContainer struct {
 // edgeJobTasksList
 // @summary Fetch the list of tasks on an EdgeJob
 // @description
-// @tags EdgeJobs
+// @tags edge_jobs
 // @security ApiKeyAuth
 // @accept json
 // @produce json

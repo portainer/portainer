@@ -13,7 +13,7 @@ import (
 
 // @summary List team's memberships
 // @description
-// @tags Teams
+// @tags teams
 // @security ApiKeyAuth
 // @accept json
 // @produce json

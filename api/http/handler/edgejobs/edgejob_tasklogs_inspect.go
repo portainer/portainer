@@ -16,7 +16,7 @@ type fileResponse struct {
 // edgeJobTaskLogsInspect
 // @summary Fetch the log for a specifc task on an EdgeJob
 // @description
-// @tags EdgeJobs
+// @tags edge_jobs
 // @security ApiKeyAuth
 // @accept json
 // @produce json

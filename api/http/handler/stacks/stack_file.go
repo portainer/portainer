@@ -19,7 +19,7 @@ type stackFileResponse struct {
 
 // @summary Inspect Stack's file
 // @description
-// @tags Stacks
+// @tags stacks
 // @security ApiKeyAuth
 // @accept json
 // @produce json

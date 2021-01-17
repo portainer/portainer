@@ -17,7 +17,7 @@ type webhookListOperationFilters struct {
 // @summary List webhooks
 // @description
 // @security ApiKeyAuth
-// @tags Webhooks
+// @tags webhooks
 // @accept json
 // @produce json
 // @param body body webhookCreatePayload true "Webhook data"

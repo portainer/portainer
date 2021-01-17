@@ -17,7 +17,7 @@ type edgeJobFileResponse struct {
 // edgeJobFile
 // @summary Fetch a file of an EdgeJob
 // @description
-// @tags EdgeJobs
+// @tags edge_jobs
 // @security ApiKeyAuth
 // @accept json
 // @produce json

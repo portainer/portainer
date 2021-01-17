@@ -20,7 +20,7 @@ import (
 // @description an AttachStart operation HTTP request will be created and hijacked.
 // @description Authentication and access is controlled via the mandatory token query parameter.
 // @security ApiKeyAuth
-// @tags Websockets
+// @tags websocket
 // @accept json
 // @produce json
 // @param endpointId query int true "endpoint ID of the endpoint where the resource is located"

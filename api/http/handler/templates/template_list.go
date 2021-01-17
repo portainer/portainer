@@ -16,7 +16,7 @@ type listResponse struct {
 
 // @summary List templates
 // @description
-// @tags Templates
+// @tags templates
 // @security ApiKeyAuth
 // @accept json
 // @produce json

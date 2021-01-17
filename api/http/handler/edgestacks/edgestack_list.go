@@ -10,7 +10,7 @@ import (
 // edgeStackList
 // @summary Fetches the list of EdgeStacks
 // @description
-// @tags EdgeStacks
+// @tags edge_stacks
 // @security ApiKeyAuth
 // @accept json
 // @produce json

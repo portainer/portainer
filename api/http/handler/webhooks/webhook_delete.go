@@ -12,7 +12,7 @@ import (
 // @summary Delete a webhook
 // @description
 // @security ApiKeyAuth
-// @tags Webhooks
+// @tags webhooks
 // @accept json
 // @produce json
 // @param id path int true "Webhook id"

@@ -18,7 +18,7 @@ type templateFileFormat struct {
 // edgeTemplateList
 // @summary Fetches the list of Edge Templates
 // @description
-// @tags EdgeTemplates
+// @tags edge_templates
 // @security ApiKeyAuth
 // @accept json
 // @produce json

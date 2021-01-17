@@ -33,7 +33,7 @@ func (payload *resourceControlUpdatePayload) Validate(r *http.Request) error {
 
 // @summary Updates a resource control object
 // @description
-// @tags ResourceControl
+// @tags resource_controls
 // @security ApiKeyAuth
 // @accept json
 // @produce json

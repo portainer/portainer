@@ -13,7 +13,7 @@ import (
 // UploadTLS godoc
 // @summary Upload TLS file
 // @description
-// @tags Upload
+// @tags upload
 // @security ApiKeyAuth
 // @accept  multipart/form-data
 // @produce  json

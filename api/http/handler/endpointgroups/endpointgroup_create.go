@@ -30,7 +30,7 @@ func (payload *endpointGroupCreatePayload) Validate(r *http.Request) error {
 
 // @summary Creates an Endpoint Group
 // @description
-// @tags EndpointGroups
+// @tags endpoint_groups
 // @security ApiKeyAuth
 // @accept json
 // @produce json

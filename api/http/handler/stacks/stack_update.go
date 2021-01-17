@@ -42,7 +42,7 @@ func (payload *updateSwarmStackPayload) Validate(r *http.Request) error {
 }
 
 // @summary Update a Stack
-// @tags Stacks
+// @tags stacks
 // @security ApiKeyAuth
 // @accept json
 // @produce json

@@ -27,7 +27,7 @@ func (payload *dockerhubUpdatePayload) Validate(r *http.Request) error {
 // dockerhubUpdate
 // @summary Updates the dockerhub settings
 // @description
-// @tags DockerHub
+// @tags dockerhub
 // @security ApiKeyAuth
 // @accept json
 // @produce json

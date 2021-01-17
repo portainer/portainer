@@ -14,7 +14,7 @@ import (
 // tagDelete godoc
 // @summary Delete a tag
 // @description
-// @tags Tags
+// @tags tags
 // @security ApiKeyAuth
 // @produce json
 // @param id path int true "tag id"

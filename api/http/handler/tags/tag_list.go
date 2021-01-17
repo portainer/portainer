@@ -13,7 +13,7 @@ import (
 // @security ApiKeyAuth
 // @produce json
 // @success 200 {array} portainer.Tag
-// @tags Tags
+// @tags tags
 // @failure 500
 // @router /tags [get]
 func (handler *Handler) tagList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

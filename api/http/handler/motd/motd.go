@@ -27,7 +27,7 @@ type motdData struct {
 }
 
 // @summary fetches the message of the day
-// @tags MOTD
+// @tags motd
 // @security ApiKeyAuth
 // @produce json
 // @success 200 {object} motdResponse

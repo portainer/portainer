@@ -14,7 +14,7 @@ import (
 )
 
 // @summary Stops a Stack
-// @tags Stacks
+// @tags stacks
 // @security ApiKeyAuth
 // @accept json
 // @produce json

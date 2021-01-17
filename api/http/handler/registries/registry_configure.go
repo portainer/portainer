@@ -69,7 +69,7 @@ func (payload *registryConfigurePayload) Validate(r *http.Request) error {
 
 // @summary Configures a registry
 // @description
-// @tags Registries
+// @tags registries
 // @security ApiKeyAuth
 // @accept json
 // @produce json

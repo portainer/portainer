@@ -49,7 +49,7 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 
 // @summary Update Settings
 // @description
-// @tags Settings
+// @tags settings
 // @security ApiKeyAuth
 // @accept json
 // @produce json

@@ -14,7 +14,7 @@ import (
 // Snapshot endpoint
 // @summary Snapshots an endpoint
 // @description
-// @tags Endpoints
+// @tags endpoints
 // @security ApiKeyAuth
 // @accept json
 // @produce json

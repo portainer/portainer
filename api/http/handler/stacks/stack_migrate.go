@@ -27,7 +27,7 @@ func (payload *stackMigratePayload) Validate(r *http.Request) error {
 }
 
 // @summary Migrates a Stack to another endpoint
-// @tags Stacks
+// @tags stacks
 // @security ApiKeyAuth
 // @accept json
 // @produce json

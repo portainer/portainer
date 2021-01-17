@@ -19,7 +19,7 @@ import (
 // edgeStackCreate
 // @summary Create an EdgeStack
 // @description
-// @tags EdgeStacks
+// @tags edge_stacks
 // @security ApiKeyAuth
 // @accept json
 // @produce json

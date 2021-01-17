@@ -47,7 +47,7 @@ func (payload *resourceControlCreatePayload) Validate(r *http.Request) error {
 
 // @summary Creates a resource control object
 // @description
-// @tags ResourceControl
+// @tags resource_controls
 // @security ApiKeyAuth
 // @accept json
 // @produce json

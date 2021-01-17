@@ -14,7 +14,7 @@ import (
 
 // @summary Inspect team
 // @description
-// @tags Teams
+// @tags teams
 // @security ApiKeyAuth
 // @accept json
 // @produce json

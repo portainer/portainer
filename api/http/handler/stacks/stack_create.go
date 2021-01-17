@@ -31,7 +31,7 @@ func (handler *Handler) cleanUp(stack *portainer.Stack, doCleanUp *bool) error {
 
 // @summary Create a Stack
 // @description
-// @tags Stacks
+// @tags stacks
 // @security ApiKeyAuth
 // @accept json
 // @produce json

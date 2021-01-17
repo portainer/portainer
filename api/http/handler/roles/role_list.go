@@ -9,7 +9,7 @@ import (
 
 // @summary List Roles
 // @description
-// @tags Roles
+// @tags roles
 // @security ApiKeyAuth
 // @accept json
 // @produce json

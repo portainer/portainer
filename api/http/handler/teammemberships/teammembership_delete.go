@@ -14,7 +14,7 @@ import (
 
 // @summary Remove user from team
 // @description
-// @tags TeamMembership
+// @tags team_memberships
 // @security ApiKeyAuth
 // @accept json
 // @produce json

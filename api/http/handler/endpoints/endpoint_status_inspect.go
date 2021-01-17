@@ -37,7 +37,7 @@ type endpointStatusInspectResponse struct {
 
 // @summary Get endpoint status (for edge)
 // @description
-// @tags Endpoints, Edge
+// @tags endpoints, edge
 // @security ApiKeyAuth
 // @accept json
 // @produce json

@@ -9,7 +9,7 @@ import (
 
 // @summary Inspect Settings
 // @description
-// @tags Settings
+// @tags settings
 // @security ApiKeyAuth
 // @accept json
 // @produce json

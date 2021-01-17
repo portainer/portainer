@@ -14,7 +14,7 @@ import (
 
 // @summary Removes an extension to an Endpoint
 // @description
-// @tags Endpoints
+// @tags endpoints
 // @security ApiKeyAuth
 // @accept json
 // @produce json

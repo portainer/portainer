@@ -14,7 +14,7 @@ import (
 // Delete endpoint
 // @summary Deletes an endpoint
 // @description
-// @tags Endpoints
+// @tags endpoints
 // @security ApiKeyAuth
 // @accept json
 // @produce json

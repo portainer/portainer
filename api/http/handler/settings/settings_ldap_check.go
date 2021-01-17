@@ -20,7 +20,7 @@ func (payload *settingsLDAPCheckPayload) Validate(r *http.Request) error {
 
 // @summary Check LDAP Connection
 // @description
-// @tags Settings
+// @tags settings
 // @security ApiKeyAuth
 // @accept json
 // @produce json

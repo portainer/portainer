@@ -29,7 +29,7 @@ func (payload *tagCreatePayload) Validate(r *http.Request) error {
 // @produce json
 // @param body body tagCreatePayload true "tag info"
 // @success 200 {array} portainer.Tag
-// @tags Tags
+// @tags tags
 // @failure 500
 // @router /tags [post]
 func (handler *Handler) tagCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

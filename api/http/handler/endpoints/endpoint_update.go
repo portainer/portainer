@@ -42,7 +42,7 @@ func (payload *endpointUpdatePayload) Validate(r *http.Request) error {
 // @summary Updates an endpoint
 // @description
 // @security ApiKeyAuth
-// @tags Endpoints
+// @tags endpoints
 // @accept json
 // @produce json
 // @param id path int true "endpoint id"

@@ -10,7 +10,7 @@ import (
 
 // @summary List users
 // @description
-// @tags Users
+// @tags users
 // @security ApiKeyAuth
 // @accept json
 // @produce json

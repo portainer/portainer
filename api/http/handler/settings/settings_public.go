@@ -19,7 +19,7 @@ type publicSettingsResponse struct {
 
 // @summary Inspect Public Settings
 // @description
-// @tags Settings
+// @tags settings
 // @security ApiKeyAuth
 // @accept json
 // @produce json

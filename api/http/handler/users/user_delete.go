@@ -14,7 +14,7 @@ import (
 
 // @summary Delete a user
 // @description
-// @tags Users
+// @tags users
 // @security ApiKeyAuth
 // @accept json
 // @produce json

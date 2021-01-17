@@ -13,7 +13,7 @@ import (
 // edgeGroupInspect godoc
 // @summary Inspects an EdgeGroup
 // @description
-// @tags EdgeGroups
+// @tags edge_groups
 // @security ApiKeyAuth
 // @accept json
 // @produce json

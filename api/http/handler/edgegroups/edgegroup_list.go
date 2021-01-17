@@ -16,7 +16,7 @@ type decoratedEdgeGroup struct {
 // edgeGroupList godoc
 // @summary list EdgeGroups
 // @description
-// @tags EdgeGroups
+// @tags edge_groups
 // @security ApiKeyAuth
 // @accept json
 // @produce json

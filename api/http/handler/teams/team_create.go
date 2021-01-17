@@ -25,7 +25,7 @@ func (payload *teamCreatePayload) Validate(r *http.Request) error {
 
 // @summary Create Team
 // @description
-// @tags Teams
+// @tags teams
 // @security ApiKeyAuth
 // @accept json
 // @produce json

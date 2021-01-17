@@ -11,7 +11,7 @@ import (
 
 // @summary List team memberships
 // @description
-// @tags TeamMembership
+// @tags team_memberships
 // @security ApiKeyAuth
 // @accept json
 // @produce json

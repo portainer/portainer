@@ -18,7 +18,7 @@ type edgeJobInspectResponse struct {
 // edgeJobInspect
 // @summary Inspect an EdgeJob
 // @description
-// @tags EdgeJobs
+// @tags edge_jobs
 // @security ApiKeyAuth
 // @accept json
 // @produce json

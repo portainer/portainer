@@ -16,7 +16,7 @@ import (
 
 // @summary Execute a webhook
 // @description Acts on a passed in token UUID to restart the docker service
-// @tags Webhooks
+// @tags webhooks
 // @accept json
 // @produce json
 // @param token path string true "Webhook token"

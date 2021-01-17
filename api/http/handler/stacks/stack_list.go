@@ -18,7 +18,7 @@ type stackListOperationFilters struct {
 
 // @summary List Stacks
 // @description
-// @tags Stacks
+// @tags stacks
 // @security ApiKeyAuth
 // @accept json
 // @produce json

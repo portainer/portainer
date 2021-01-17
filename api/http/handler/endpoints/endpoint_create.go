@@ -150,7 +150,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 // Create endpoint
 // @summary Creates an endpoint
 // @description
-// @tags Endpoints
+// @tags endpoints
 // @security ApiKeyAuth
 // @accept json
 // @produce json

@@ -14,7 +14,7 @@ import (
 // edgeJobDelete
 // @summary Delete an EdgeJob
 // @description
-// @tags EdgeJobs
+// @tags edge_jobs
 // @security ApiKeyAuth
 // @accept json
 // @produce json
