@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import moment from 'moment';
 import _ from 'lodash-es';
 
@@ -49,6 +50,11 @@ angular.module('portainer.docker').controller('LogViewerController', [
 
     this.hideLogSettings = function () {
       $('#logsWidgetBody').toggle();
+
+      var icon = '<i class="fa fa-eye" style="margin-right: 0;"></i>';
+      var currentText = $('#logSettingsToggleBtn').text().trim();
+      var updatedText = currentText === 'Hide panel' ? icon + '&nbsp;Show panel' : icon + '&nbsp;Hide panel';
+      $('#logSettingsToggleBtn').html(updatedText);
     };
 
     this.downloadLogs = function () {
