@@ -12,15 +12,20 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// @summary Inspect team
-// @description
+// @id TeamInspect
+// @summary Inspect a team
+// @description Retrieve details about a team. Access is only available for administrator and leaders of that team.
+// @description **Access policy**: restricted
 // @tags teams
 // @security jwt
-// @accept json
 // @produce json
-// @param id path string true "team id"
-// @success 200 {object} portainer.Team "Team"
-// @failure 500,404,400,403
+// @param id path int true "Team identifier"
+// @success 200 {object} portainer.Team "Success"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 "Team not found"
+// @failure 500 "Server error"
 // @router /teams/{id} [get]
 func (handler *Handler) teamInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	teamID, err := request.RetrieveNumericRouteVariableValue(r, "id")

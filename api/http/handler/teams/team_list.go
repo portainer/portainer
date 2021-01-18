@@ -8,14 +8,15 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
+// @id TeamList
 // @summary List teams
-// @description
+// @description List teams. For non-administrator users, will only list the teams they are member of.
+// @description **Access policy**: restricted
 // @tags teams
 // @security jwt
-// @accept json
 // @produce json
-// @success 200 {array} portainer.Team "Team"
-// @failure 500
+// @success 200 {array} portainer.Team "Success"
+// @failure 500 "Server error"
 // @router /teams [get]
 func (handler *Handler) teamList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	teams, err := handler.DataStore.Team().Teams()
