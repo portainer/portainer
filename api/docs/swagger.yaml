@@ -877,7 +877,7 @@ definitions:
       AuthorizedUsers:
         description: Deprecated in DBVersion == 18
         items:
-          description: User Identifier
+          description: User identifier
           example: 1
           type: integer
         type: array
@@ -993,7 +993,7 @@ definitions:
       AuthorizedUsers:
         description: Deprecated in DBVersion == 18
         items:
-          description: User Identifier
+          description: User identifier
           example: 1
           type: integer
         type: array
@@ -1246,7 +1246,7 @@ definitions:
           Deprecated fields
           Deprecated in DBVersion == 18
         items:
-          description: User Identifier
+          description: User identifier
           example: 1
           type: integer
         type: array
@@ -2162,20 +2162,48 @@ definitions:
   teammemberships.teamMembershipCreatePayload:
     properties:
       role:
+        description: Role for the user inside the team (1 for leader and 2 for regular
+          member)
+        enum:
+        - 1
+        - 2
+        example: 1
         type: integer
       teamID:
+        description: Team identifier
+        example: 1
         type: integer
       userID:
+        description: User identifier
+        example: 1
         type: integer
+    required:
+    - role
+    - teamID
+    - userID
     type: object
   teammemberships.teamMembershipUpdatePayload:
     properties:
       role:
+        description: Role for the user inside the team (1 for leader and 2 for regular
+          member)
+        enum:
+        - 1
+        - 2
+        example: 1
         type: integer
       teamID:
+        description: Team identifier
+        example: 1
         type: integer
       userID:
+        description: User identifier
+        example: 1
         type: integer
+    required:
+    - role
+    - teamID
+    - userID
     type: object
   teams.teamCreatePayload:
     properties:
@@ -4986,19 +5014,25 @@ paths:
       - teams
   /team_memberships:
     get:
-      consumes:
-      - application/json
+      description: |-
+        List team memberships. Access is only available to administrators and team leaders.
+        **Access policy**: admin
+      operationId: TeamMembershipList
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success
           schema:
             items:
               $ref: '#/definitions/portainer.TeamMembership'
             type: array
+        "400":
+          description: Invalid request
+        "403":
+          description: Permission denied
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
       summary: List team memberships
@@ -5007,8 +5041,12 @@ paths:
     post:
       consumes:
       - application/json
+      description: |-
+        Create a new team memberships. Access is only available to administrators leaders of the associated team.
+        **Access policy**: admin
+      operationId: TeamMembershipCreate
       parameters:
-      - description: membership data
+      - description: Team membership details
         in: body
         name: body
         required: true
@@ -5018,14 +5056,22 @@ paths:
       - application/json
       responses:
         "200":
-          description: TeamMembership
+          description: Success
           schema:
             $ref: '#/definitions/portainer.TeamMembership'
+        "204":
+          description: Success
+        "400":
+          description: Invalid request
+        "403":
+          description: Permission denied to manage memberships
+        "409":
+          description: Team membership already registered
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Add user to team
+      summary: Create a new team membership
       tags:
       - team_memberships
   /team_memberships/{id}:
@@ -5059,13 +5105,17 @@ paths:
     put:
       consumes:
       - application/json
+      description: |-
+        Update a team membership. Access is only available to administrators leaders of the associated team.
+        **Access policy**: restricted
+      operationId: TeamMembershipUpdate
       parameters:
-      - description: membership id
+      - description: Team membership identifier
         in: path
         name: id
         required: true
-        type: string
-      - description: membership data
+        type: integer
+      - description: Team membership details
         in: body
         name: body
         required: true
@@ -5075,20 +5125,22 @@ paths:
       - application/json
       responses:
         "200":
-          description: TeamMembership
+          description: Success
           schema:
             $ref: '#/definitions/portainer.TeamMembership'
+        "204":
+          description: Success
         "400":
-          description: ""
+          description: Invalid request
         "403":
-          description: ""
+          description: Permission denied
         "404":
-          description: ""
+          description: TeamMembership not found
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Update team membership
+      summary: Update a team membership
       tags:
       - team_memberships
   /teams:

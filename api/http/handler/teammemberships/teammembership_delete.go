@@ -12,15 +12,18 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// @summary Remove user from team
-// @description
+// @id TeamMembershipDelete
+// @summary Remove a team membership
+// @description Remove a team membership. Access is only available to administrators leaders of the associated team.
+// @description **Access policy**: restricted
 // @tags team_memberships
 // @security jwt
-// @accept json
-// @produce json
-// @param id path string true "membership id"
-// @success 204
-// @failure 500,404,400,403
+// @param id path int true "TeamMembership identifier"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 "TeamMembership not found"
+// @failure 500 "Server error"
 // @router /team_memberships/{id} [delete]
 func (handler *Handler) teamMembershipDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	membershipID, err := request.RetrieveNumericRouteVariableValue(r, "id")
