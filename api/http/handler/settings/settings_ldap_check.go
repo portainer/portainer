@@ -18,15 +18,17 @@ func (payload *settingsLDAPCheckPayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// @summary Check LDAP Connection
-// @description
+// @id SettingsLDAPCheck
+// @summary Test LDAP connectivity
+// @description Test LDAP connectivity using LDAP details
+// @description **Access policy**: administrator
 // @tags settings
 // @security jwt
 // @accept json
-// @produce json
-// @param body body settingsLDAPCheckPayload true "ldap settings"
-// @success 204
-// @failure 500
+// @param body body settingsLDAPCheckPayload true "details"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
 // @router /settings/ldap/check [put]
 func (handler *Handler) settingsLDAPCheck(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload settingsLDAPCheckPayload

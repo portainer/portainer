@@ -14,17 +14,26 @@ import (
 )
 
 type settingsUpdatePayload struct {
-	LogoURL                   *string
-	BlackListedLabels         []portainer.Pair
-	AuthenticationMethod      *int
-	LDAPSettings              *portainer.LDAPSettings
-	OAuthSettings             *portainer.OAuthSettings
-	SnapshotInterval          *string
-	TemplatesURL              *string
-	EdgeAgentCheckinInterval  *int
-	EnableEdgeComputeFeatures *bool
-	UserSessionTimeout        *string
-	EnableTelemetry           *bool
+	// URL to a logo that will be displayed on the login page as well as on top of the sidebar. Will use default Portainer logo when value is empty string
+	LogoURL *string `example:"https://mycompany.mydomain.tld/logo.png"`
+	// A list of label name & value that will be used to hide containers when querying containers
+	BlackListedLabels []portainer.Pair
+	// Active authentication method for the Portainer instance. Valid values are: 1 for internal, 2 for LDAP, or 3 for oauth
+	AuthenticationMethod *int                     `example:"1"`
+	LDAPSettings         *portainer.LDAPSettings  `example:""`
+	OAuthSettings        *portainer.OAuthSettings `example:""`
+	// The interval in which endpoint snapshots are created
+	SnapshotInterval *string `example:"5m"`
+	// URL to the templates that will be displayed in the UI when navigating to App Templates
+	TemplatesURL *string `example:"https://raw.githubusercontent.com/portainer/templates/master/templates.json"`
+	// The default check in interval for edge agent (in seconds)
+	EdgeAgentCheckinInterval *int `example:"5"`
+	// Whether edge compute features are enabled
+	EnableEdgeComputeFeatures *bool `example:"true"`
+	// The duration of a user session
+	UserSessionTimeout *string `example:"5m"`
+	// Whether telemetry is enabled
+	EnableTelemetry *bool `example:"false"`
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
@@ -47,15 +56,18 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// @summary Update Settings
-// @description
+// @id SettingsUpdate
+// @summary Update Portainer settings
+// @description Update Portainer settings.
+// @description **Access policy**: administrator
 // @tags settings
 // @security jwt
 // @accept json
 // @produce json
-// @param body body settingsUpdatePayload true "settings"
-// @success 200 {object} portainer.Settings "Settings"
-// @failure 500
+// @param body body settingsUpdatePayload true "New settings"
+// @success 200 {object} portainer.Settings "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
 // @router /settings [put]
 func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload settingsUpdatePayload

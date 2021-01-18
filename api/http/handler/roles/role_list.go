@@ -14,8 +14,6 @@ import (
 // @tags roles
 // @security jwt
 // @produce json
-// @param id path int true "identifier"
-// @param body body Object true "details"
 // @success 200 {array} portainer.Role "Success"
 // @failure 500 "Server error"
 // @router /roles [get]

@@ -27,6 +27,62 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/endpoints/:id/settings": {
+            "put": {
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ],
+                "description": "Update settings for an endpoint.\n**Access policy**: administrator",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "endpoints"
+                ],
+                "summary": "Update settings for an endpoint",
+                "operationId": "EndpointSettingsUpdate",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Endpoint identifier",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Endpoint details",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/endpoints.endpointSettingsUpdatePayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/portainer.Endpoint"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "404": {
+                        "description": "Endpoint not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
         "/auth": {
             "post": {
                 "description": "Use this endpoint to authenticate against Portainer using a username and password.",
@@ -3023,19 +3079,18 @@ var doc = `{
                         "jwt": []
                     }
                 ],
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "List all roles available for use\n**Access policy**: administrator",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "roles"
                 ],
-                "summary": "List Roles",
+                "summary": "List roles",
+                "operationId": "RoleList",
                 "responses": {
                     "200": {
-                        "description": "Roles",
+                        "description": "Success",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -3044,7 +3099,7 @@ var doc = `{
                         }
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             }
@@ -3056,25 +3111,24 @@ var doc = `{
                         "jwt": []
                     }
                 ],
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "Retrieve Portainer settings.\n**Access policy**: administrator",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "settings"
                 ],
-                "summary": "Inspect Settings",
+                "summary": "Retrieve Portainer settings",
+                "operationId": "SettingsInspect",
                 "responses": {
                     "200": {
-                        "description": "Settings",
+                        "description": "Success",
                         "schema": {
                             "$ref": "#/definitions/portainer.Settings"
                         }
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             },
@@ -3084,6 +3138,7 @@ var doc = `{
                         "jwt": []
                     }
                 ],
+                "description": "Update Portainer settings.\n**Access policy**: administrator",
                 "consumes": [
                     "application/json"
                 ],
@@ -3093,10 +3148,11 @@ var doc = `{
                 "tags": [
                     "settings"
                 ],
-                "summary": "Update Settings",
+                "summary": "Update Portainer settings",
+                "operationId": "SettingsUpdate",
                 "parameters": [
                     {
-                        "description": "settings",
+                        "description": "New settings",
                         "name": "body",
                         "in": "body",
                         "required": true,
@@ -3107,13 +3163,16 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Settings",
+                        "description": "Success",
                         "schema": {
                             "$ref": "#/definitions/portainer.Settings"
                         }
                     },
+                    "400": {
+                        "description": "Invalid request"
+                    },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             }
@@ -3125,19 +3184,18 @@ var doc = `{
                         "jwt": []
                     }
                 ],
+                "description": "Test LDAP connectivity using LDAP details\n**Access policy**: administrator",
                 "consumes": [
-                    "application/json"
-                ],
-                "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "settings"
                 ],
-                "summary": "Check LDAP Connection",
+                "summary": "Test LDAP connectivity",
+                "operationId": "SettingsLDAPCheck",
                 "parameters": [
                     {
-                        "description": "ldap settings",
+                        "description": "details",
                         "name": "body",
                         "in": "body",
                         "required": true,
@@ -3148,40 +3206,36 @@ var doc = `{
                 ],
                 "responses": {
                     "204": {
-                        "description": ""
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Invalid request"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             }
         },
         "/settings/public": {
             "get": {
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "Retrieve public settings. Returns a small set of settings that are not reserved to administrators only.\n**Access policy**: public",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "settings"
                 ],
-                "summary": "Inspect Public Settings",
+                "summary": "Retrieve Portainer public settings",
                 "responses": {
                     "200": {
-                        "description": "Settings",
+                        "description": "Success",
                         "schema": {
                             "$ref": "#/definitions/settings.publicSettingsResponse"
                         }
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             }
@@ -5793,6 +5847,51 @@ var doc = `{
                 }
             }
         },
+        "endpoints.endpointSettingsUpdatePayload": {
+            "type": "object",
+            "properties": {
+                "allowBindMountsForRegularUsers": {
+                    "description": "Whether non-administrator should be able to use bind mounts when creating containers",
+                    "type": "boolean",
+                    "example": false
+                },
+                "allowContainerCapabilitiesForRegularUsers": {
+                    "description": "Whether non-administrator should be able to use container capabilities",
+                    "type": "boolean",
+                    "example": true
+                },
+                "allowDeviceMappingForRegularUsers": {
+                    "description": "Whether non-administrator should be able to use device mapping",
+                    "type": "boolean",
+                    "example": true
+                },
+                "allowHostNamespaceForRegularUsers": {
+                    "description": "Whether non-administrator should be able to use the host pid",
+                    "type": "boolean",
+                    "example": true
+                },
+                "allowPrivilegedModeForRegularUsers": {
+                    "description": "Whether non-administrator should be able to use privileged mode when creating containers",
+                    "type": "boolean",
+                    "example": false
+                },
+                "allowStackManagementForRegularUsers": {
+                    "description": "Whether non-administrator should be able to manage stacks",
+                    "type": "boolean",
+                    "example": true
+                },
+                "allowVolumeBrowserForRegularUsers": {
+                    "description": "Whether non-administrator should be able to browse volumes",
+                    "type": "boolean",
+                    "example": true
+                },
+                "enableHostManagementFeatures": {
+                    "description": "Whether host management features are enabled",
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
         "endpoints.endpointStatusInspectResponse": {
             "type": "object",
             "properties": {
@@ -6280,6 +6379,11 @@ var doc = `{
                 "AzureCredentials": {
                     "$ref": "#/definitions/portainer.AzureCredentials"
                 },
+                "ComposeSyntaxMaxVersion": {
+                    "description": "Maximum version of docker-compose",
+                    "type": "string",
+                    "example": "3.8"
+                },
                 "EdgeCheckinInterval": {
                     "description": "The check in interval for edge agent (in seconds)",
                     "type": "integer",
@@ -6384,6 +6488,10 @@ var doc = `{
                 "UserAccessPolicies": {
                     "description": "List of user identifiers authorized to connect to this endpoint",
                     "$ref": "#/definitions/portainer.UserAccessPolicies"
+                },
+                "securitySettings": {
+                    "description": "Endpoint specific security settings",
+                    "$ref": "#/definitions/portainer.EndpointSecuritySettings"
                 }
             }
         },
@@ -6465,6 +6573,45 @@ var doc = `{
                 },
                 "UserAccessPolicies": {
                     "$ref": "#/definitions/portainer.UserAccessPolicies"
+                }
+            }
+        },
+        "portainer.EndpointSecuritySettings": {
+            "type": "object",
+            "properties": {
+                "AllowBindMountsForRegularUsers": {
+                    "description": "Whether non-administrator should be able to use bind mounts when creating containers",
+                    "type": "boolean",
+                    "example": false
+                },
+                "AllowContainerCapabilitiesForRegularUsers": {
+                    "description": "Whether non-administrator should be able to use container capabilities",
+                    "type": "boolean"
+                },
+                "AllowDeviceMappingForRegularUsers": {
+                    "description": "Whether non-administrator should be able to use device mapping",
+                    "type": "boolean"
+                },
+                "AllowHostNamespaceForRegularUsers": {
+                    "description": "Whether non-administrator should be able to use the host pid",
+                    "type": "boolean"
+                },
+                "AllowPrivilegedModeForRegularUsers": {
+                    "description": "Whether non-administrator should be able to use privileged mode when creating containers",
+                    "type": "boolean",
+                    "example": false
+                },
+                "AllowStackManagementForRegularUsers": {
+                    "description": "Whether non-administrator should be able to manage stacks",
+                    "type": "boolean"
+                },
+                "AllowVolumeBrowserForRegularUsers": {
+                    "description": "Whether non-administrator should be able to browse volumes",
+                    "type": "boolean"
+                },
+                "EnableHostManagementFeatures": {
+                    "description": "Whether host management features are enabled",
+                    "type": "boolean"
                 }
             }
         },
@@ -6893,33 +7040,24 @@ var doc = `{
             "type": "object",
             "properties": {
                 "AllowBindMountsForRegularUsers": {
-                    "description": "Whether non-administrator should be able to use bind mounts when creating containers",
-                    "type": "boolean",
-                    "example": false
+                    "type": "boolean"
                 },
                 "AllowContainerCapabilitiesForRegularUsers": {
-                    "description": "Whether non-administrator should be able to use container capabilities",
                     "type": "boolean"
                 },
                 "AllowDeviceMappingForRegularUsers": {
-                    "description": "Whether non-administrator should be able to use device mapping",
                     "type": "boolean"
                 },
                 "AllowHostNamespaceForRegularUsers": {
-                    "description": "Whether non-administrator should be able to use the host pid",
                     "type": "boolean"
                 },
                 "AllowPrivilegedModeForRegularUsers": {
-                    "description": "Whether non-administrator should be able to use privileged mode when creating containers",
-                    "type": "boolean",
-                    "example": false
+                    "type": "boolean"
                 },
                 "AllowStackManagementForRegularUsers": {
-                    "description": "Whether non-administrator should be able to manage stacks",
                     "type": "boolean"
                 },
                 "AllowVolumeBrowserForRegularUsers": {
-                    "description": "Whether non-administrator should be able to browse volumes",
                     "type": "boolean"
                 },
                 "AuthenticationMethod": {
@@ -6944,7 +7082,7 @@ var doc = `{
                     "type": "boolean"
                 },
                 "EnableHostManagementFeatures": {
-                    "description": "Whether host management features are enabled",
+                    "description": "Deprecated fields v26",
                     "type": "boolean"
                 },
                 "EnableTelemetry": {
@@ -7035,10 +7173,30 @@ var doc = `{
                     "type": "integer",
                     "example": 2
                 },
+                "createdBy": {
+                    "description": "The username which created this stack",
+                    "type": "string",
+                    "example": "admin"
+                },
+                "creationDate": {
+                    "description": "The date in unix time when stack was created",
+                    "type": "integer",
+                    "example": 1587399600
+                },
                 "projectPath": {
                     "description": "Path on disk to the repository hosting the Stack file",
                     "type": "string",
                     "example": "/data/compose/myStack_jpofkc0i9uo9wtx1zesuk649w"
+                },
+                "updateDate": {
+                    "description": "The date in unix time when stack was last updated",
+                    "type": "integer",
+                    "example": 1587399600
+                },
+                "updatedBy": {
+                    "description": "The username which last updated this stack",
+                    "type": "string",
+                    "example": "bob"
                 }
             }
         },
@@ -7661,44 +7819,30 @@ var doc = `{
         "settings.publicSettingsResponse": {
             "type": "object",
             "properties": {
-                "AllowBindMountsForRegularUsers": {
-                    "type": "boolean"
-                },
-                "AllowContainerCapabilitiesForRegularUsers": {
-                    "type": "boolean"
-                },
-                "AllowDeviceMappingForRegularUsers": {
-                    "type": "boolean"
-                },
-                "AllowHostNamespaceForRegularUsers": {
-                    "type": "boolean"
-                },
-                "AllowPrivilegedModeForRegularUsers": {
-                    "type": "boolean"
-                },
-                "AllowStackManagementForRegularUsers": {
-                    "type": "boolean"
-                },
-                "AllowVolumeBrowserForRegularUsers": {
-                    "type": "boolean"
-                },
                 "AuthenticationMethod": {
-                    "type": "integer"
+                    "description": "Active authentication method for the Portainer instance. Valid values are: 1 for internal, 2 for LDAP, or 3 for oauth",
+                    "type": "integer",
+                    "example": 1
                 },
                 "EnableEdgeComputeFeatures": {
-                    "type": "boolean"
-                },
-                "EnableHostManagementFeatures": {
-                    "type": "boolean"
+                    "description": "Whether edge compute features are enabled",
+                    "type": "boolean",
+                    "example": true
                 },
                 "EnableTelemetry": {
-                    "type": "boolean"
+                    "description": "Whether telemetry is enabled",
+                    "type": "boolean",
+                    "example": true
                 },
                 "LogoURL": {
-                    "type": "string"
+                    "description": "URL to a logo that will be displayed on the login page as well as on top of the sidebar. Will use default Portainer logo when value is empty string",
+                    "type": "string",
+                    "example": "https://mycompany.mydomain.tld/logo.png"
                 },
                 "OAuthLoginURI": {
-                    "type": "string"
+                    "description": "The URL used for oauth login",
+                    "type": "string",
+                    "example": "https://gitlab.com/oauth"
                 }
             }
         },
@@ -7713,65 +7857,58 @@ var doc = `{
         "settings.settingsUpdatePayload": {
             "type": "object",
             "properties": {
-                "allowBindMountsForRegularUsers": {
-                    "type": "boolean"
-                },
-                "allowContainerCapabilitiesForRegularUsers": {
-                    "type": "boolean"
-                },
-                "allowDeviceMappingForRegularUsers": {
-                    "type": "boolean"
-                },
-                "allowHostNamespaceForRegularUsers": {
-                    "type": "boolean"
-                },
-                "allowPrivilegedModeForRegularUsers": {
-                    "type": "boolean"
-                },
-                "allowStackManagementForRegularUsers": {
-                    "type": "boolean"
-                },
-                "allowVolumeBrowserForRegularUsers": {
-                    "type": "boolean"
-                },
                 "authenticationMethod": {
-                    "type": "integer"
+                    "description": "Active authentication method for the Portainer instance. Valid values are: 1 for internal, 2 for LDAP, or 3 for oauth",
+                    "type": "integer",
+                    "example": 1
                 },
                 "blackListedLabels": {
+                    "description": "A list of label name \u0026 value that will be used to hide containers when querying containers",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/portainer.Pair"
                     }
                 },
                 "edgeAgentCheckinInterval": {
-                    "type": "integer"
+                    "description": "The default check in interval for edge agent (in seconds)",
+                    "type": "integer",
+                    "example": 5
                 },
                 "enableEdgeComputeFeatures": {
-                    "type": "boolean"
-                },
-                "enableHostManagementFeatures": {
-                    "type": "boolean"
+                    "description": "Whether edge compute features are enabled",
+                    "type": "boolean",
+                    "example": true
                 },
                 "enableTelemetry": {
-                    "type": "boolean"
+                    "description": "Whether telemetry is enabled",
+                    "type": "boolean",
+                    "example": false
                 },
                 "ldapsettings": {
                     "$ref": "#/definitions/portainer.LDAPSettings"
                 },
                 "logoURL": {
-                    "type": "string"
+                    "description": "URL to a logo that will be displayed on the login page as well as on top of the sidebar. Will use default Portainer logo when value is empty string",
+                    "type": "string",
+                    "example": "https://mycompany.mydomain.tld/logo.png"
                 },
                 "oauthSettings": {
                     "$ref": "#/definitions/portainer.OAuthSettings"
                 },
                 "snapshotInterval": {
-                    "type": "string"
+                    "description": "The interval in which endpoint snapshots are created",
+                    "type": "string",
+                    "example": "5m"
                 },
                 "templatesURL": {
-                    "type": "string"
+                    "description": "URL to the templates that will be displayed in the UI when navigating to App Templates",
+                    "type": "string",
+                    "example": "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
                 },
                 "userSessionTimeout": {
-                    "type": "string"
+                    "description": "The duration of a user session",
+                    "type": "string",
+                    "example": "5m"
                 }
             }
         },

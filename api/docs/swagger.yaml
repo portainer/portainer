@@ -401,6 +401,43 @@ definitions:
       url:
         type: string
     type: object
+  endpoints.endpointSettingsUpdatePayload:
+    properties:
+      allowBindMountsForRegularUsers:
+        description: Whether non-administrator should be able to use bind mounts when
+          creating containers
+        example: false
+        type: boolean
+      allowContainerCapabilitiesForRegularUsers:
+        description: Whether non-administrator should be able to use container capabilities
+        example: true
+        type: boolean
+      allowDeviceMappingForRegularUsers:
+        description: Whether non-administrator should be able to use device mapping
+        example: true
+        type: boolean
+      allowHostNamespaceForRegularUsers:
+        description: Whether non-administrator should be able to use the host pid
+        example: true
+        type: boolean
+      allowPrivilegedModeForRegularUsers:
+        description: Whether non-administrator should be able to use privileged mode
+          when creating containers
+        example: false
+        type: boolean
+      allowStackManagementForRegularUsers:
+        description: Whether non-administrator should be able to manage stacks
+        example: true
+        type: boolean
+      allowVolumeBrowserForRegularUsers:
+        description: Whether non-administrator should be able to browse volumes
+        example: true
+        type: boolean
+      enableHostManagementFeatures:
+        description: Whether host management features are enabled
+        example: true
+        type: boolean
+    type: object
   endpoints.endpointStatusInspectResponse:
     properties:
       checkin:
@@ -747,6 +784,10 @@ definitions:
         type: array
       AzureCredentials:
         $ref: '#/definitions/portainer.AzureCredentials'
+      ComposeSyntaxMaxVersion:
+        description: Maximum version of docker-compose
+        example: "3.8"
+        type: string
       EdgeCheckinInterval:
         description: The check in interval for edge agent (in seconds)
         example: 5
@@ -829,6 +870,9 @@ definitions:
       UserAccessPolicies:
         $ref: '#/definitions/portainer.UserAccessPolicies'
         description: List of user identifiers authorized to connect to this endpoint
+      securitySettings:
+        $ref: '#/definitions/portainer.EndpointSecuritySettings'
+        description: Endpoint specific security settings
     type: object
   portainer.EndpointAuthorizations:
     additionalProperties:
@@ -887,6 +931,37 @@ definitions:
         $ref: '#/definitions/portainer.TeamAccessPolicies'
       UserAccessPolicies:
         $ref: '#/definitions/portainer.UserAccessPolicies'
+    type: object
+  portainer.EndpointSecuritySettings:
+    properties:
+      AllowBindMountsForRegularUsers:
+        description: Whether non-administrator should be able to use bind mounts when
+          creating containers
+        example: false
+        type: boolean
+      AllowContainerCapabilitiesForRegularUsers:
+        description: Whether non-administrator should be able to use container capabilities
+        type: boolean
+      AllowDeviceMappingForRegularUsers:
+        description: Whether non-administrator should be able to use device mapping
+        type: boolean
+      AllowHostNamespaceForRegularUsers:
+        description: Whether non-administrator should be able to use the host pid
+        type: boolean
+      AllowPrivilegedModeForRegularUsers:
+        description: Whether non-administrator should be able to use privileged mode
+          when creating containers
+        example: false
+        type: boolean
+      AllowStackManagementForRegularUsers:
+        description: Whether non-administrator should be able to manage stacks
+        type: boolean
+      AllowVolumeBrowserForRegularUsers:
+        description: Whether non-administrator should be able to browse volumes
+        type: boolean
+      EnableHostManagementFeatures:
+        description: Whether host management features are enabled
+        type: boolean
     type: object
   portainer.GitlabRegistryData:
     properties:
@@ -1200,29 +1275,18 @@ definitions:
   portainer.Settings:
     properties:
       AllowBindMountsForRegularUsers:
-        description: Whether non-administrator should be able to use bind mounts when
-          creating containers
-        example: false
         type: boolean
       AllowContainerCapabilitiesForRegularUsers:
-        description: Whether non-administrator should be able to use container capabilities
         type: boolean
       AllowDeviceMappingForRegularUsers:
-        description: Whether non-administrator should be able to use device mapping
         type: boolean
       AllowHostNamespaceForRegularUsers:
-        description: Whether non-administrator should be able to use the host pid
         type: boolean
       AllowPrivilegedModeForRegularUsers:
-        description: Whether non-administrator should be able to use privileged mode
-          when creating containers
-        example: false
         type: boolean
       AllowStackManagementForRegularUsers:
-        description: Whether non-administrator should be able to manage stacks
         type: boolean
       AllowVolumeBrowserForRegularUsers:
-        description: Whether non-administrator should be able to browse volumes
         type: boolean
       AuthenticationMethod:
         description: 'Active authentication method for the Portainer instance. Valid
@@ -1243,7 +1307,7 @@ definitions:
         description: Whether edge compute features are enabled
         type: boolean
       EnableHostManagementFeatures:
-        description: Whether host management features are enabled
+        description: Deprecated fields v26
         type: boolean
       EnableTelemetry:
         description: Whether telemetry is enabled
@@ -1316,9 +1380,25 @@ definitions:
         description: Stack type. 1 for a Swarm stack, 2 for a Compose stack
         example: 2
         type: integer
+      createdBy:
+        description: The username which created this stack
+        example: admin
+        type: string
+      creationDate:
+        description: The date in unix time when stack was created
+        example: 1587399600
+        type: integer
       projectPath:
         description: Path on disk to the repository hosting the Stack file
         example: /data/compose/myStack_jpofkc0i9uo9wtx1zesuk649w
+        type: string
+      updateDate:
+        description: The date in unix time when stack was last updated
+        example: 1587399600
+        type: integer
+      updatedBy:
+        description: The username which last updated this stack
+        example: bob
         type: string
     type: object
   portainer.Status:
@@ -1806,31 +1886,28 @@ definitions:
     type: object
   settings.publicSettingsResponse:
     properties:
-      AllowBindMountsForRegularUsers:
-        type: boolean
-      AllowContainerCapabilitiesForRegularUsers:
-        type: boolean
-      AllowDeviceMappingForRegularUsers:
-        type: boolean
-      AllowHostNamespaceForRegularUsers:
-        type: boolean
-      AllowPrivilegedModeForRegularUsers:
-        type: boolean
-      AllowStackManagementForRegularUsers:
-        type: boolean
-      AllowVolumeBrowserForRegularUsers:
-        type: boolean
       AuthenticationMethod:
+        description: 'Active authentication method for the Portainer instance. Valid
+          values are: 1 for internal, 2 for LDAP, or 3 for oauth'
+        example: 1
         type: integer
       EnableEdgeComputeFeatures:
-        type: boolean
-      EnableHostManagementFeatures:
+        description: Whether edge compute features are enabled
+        example: true
         type: boolean
       EnableTelemetry:
+        description: Whether telemetry is enabled
+        example: true
         type: boolean
       LogoURL:
+        description: URL to a logo that will be displayed on the login page as well
+          as on top of the sidebar. Will use default Portainer logo when value is
+          empty string
+        example: https://mycompany.mydomain.tld/logo.png
         type: string
       OAuthLoginURI:
+        description: The URL used for oauth login
+        example: https://gitlab.com/oauth
         type: string
     type: object
   settings.settingsLDAPCheckPayload:
@@ -1840,45 +1917,51 @@ definitions:
     type: object
   settings.settingsUpdatePayload:
     properties:
-      allowBindMountsForRegularUsers:
-        type: boolean
-      allowContainerCapabilitiesForRegularUsers:
-        type: boolean
-      allowDeviceMappingForRegularUsers:
-        type: boolean
-      allowHostNamespaceForRegularUsers:
-        type: boolean
-      allowPrivilegedModeForRegularUsers:
-        type: boolean
-      allowStackManagementForRegularUsers:
-        type: boolean
-      allowVolumeBrowserForRegularUsers:
-        type: boolean
       authenticationMethod:
+        description: 'Active authentication method for the Portainer instance. Valid
+          values are: 1 for internal, 2 for LDAP, or 3 for oauth'
+        example: 1
         type: integer
       blackListedLabels:
+        description: A list of label name & value that will be used to hide containers
+          when querying containers
         items:
           $ref: '#/definitions/portainer.Pair'
         type: array
       edgeAgentCheckinInterval:
+        description: The default check in interval for edge agent (in seconds)
+        example: 5
         type: integer
       enableEdgeComputeFeatures:
-        type: boolean
-      enableHostManagementFeatures:
+        description: Whether edge compute features are enabled
+        example: true
         type: boolean
       enableTelemetry:
+        description: Whether telemetry is enabled
+        example: false
         type: boolean
       ldapsettings:
         $ref: '#/definitions/portainer.LDAPSettings'
       logoURL:
+        description: URL to a logo that will be displayed on the login page as well
+          as on top of the sidebar. Will use default Portainer logo when value is
+          empty string
+        example: https://mycompany.mydomain.tld/logo.png
         type: string
       oauthSettings:
         $ref: '#/definitions/portainer.OAuthSettings'
       snapshotInterval:
+        description: The interval in which endpoint snapshots are created
+        example: 5m
         type: string
       templatesURL:
+        description: URL to the templates that will be displayed in the UI when navigating
+          to App Templates
+        example: https://raw.githubusercontent.com/portainer/templates/master/templates.json
         type: string
       userSessionTimeout:
+        description: The duration of a user session
+        example: 5m
         type: string
     type: object
   stacks.stackFileResponse:
@@ -2120,6 +2203,44 @@ info:
   title: PortainerCE API
   version: 2.0.0
 paths:
+  /api/endpoints/:id/settings:
+    put:
+      consumes:
+      - application/json
+      description: |-
+        Update settings for an endpoint.
+        **Access policy**: administrator
+      operationId: EndpointSettingsUpdate
+      parameters:
+      - description: Endpoint identifier
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Endpoint details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/endpoints.endpointSettingsUpdatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/portainer.Endpoint'
+        "400":
+          description: Invalid request
+        "404":
+          description: Endpoint not found
+        "500":
+          description: Server error
+      security:
+      - jwt: []
+      summary: Update settings for an endpoint
+      tags:
+      - endpoints
   /auth:
     post:
       consumes:
@@ -4080,47 +4201,55 @@ paths:
       - jwt: []
   /roles:
     get:
-      consumes:
-      - application/json
+      description: |-
+        List all roles available for use
+        **Access policy**: administrator
+      operationId: RoleList
       produces:
       - application/json
       responses:
         "200":
-          description: Roles
+          description: Success
           schema:
             items:
               $ref: '#/definitions/portainer.Role'
             type: array
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: List Roles
+      summary: List roles
       tags:
       - roles
   /settings:
     get:
-      consumes:
-      - application/json
+      description: |-
+        Retrieve Portainer settings.
+        **Access policy**: administrator
+      operationId: SettingsInspect
       produces:
       - application/json
       responses:
         "200":
-          description: Settings
+          description: Success
           schema:
             $ref: '#/definitions/portainer.Settings'
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Inspect Settings
+      summary: Retrieve Portainer settings
       tags:
       - settings
     put:
       consumes:
       - application/json
+      description: |-
+        Update Portainer settings.
+        **Access policy**: administrator
+      operationId: SettingsUpdate
       parameters:
-      - description: settings
+      - description: New settings
         in: body
         name: body
         required: true
@@ -4130,55 +4259,60 @@ paths:
       - application/json
       responses:
         "200":
-          description: Settings
+          description: Success
           schema:
             $ref: '#/definitions/portainer.Settings'
+        "400":
+          description: Invalid request
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Update Settings
+      summary: Update Portainer settings
       tags:
       - settings
   /settings/ldap/check:
     put:
       consumes:
       - application/json
+      description: |-
+        Test LDAP connectivity using LDAP details
+        **Access policy**: administrator
+      operationId: SettingsLDAPCheck
       parameters:
-      - description: ldap settings
+      - description: details
         in: body
         name: body
         required: true
         schema:
           $ref: '#/definitions/settings.settingsLDAPCheckPayload'
-      produces:
-      - application/json
       responses:
         "204":
-          description: ""
+          description: Success
+        "400":
+          description: Invalid request
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Check LDAP Connection
+      summary: Test LDAP connectivity
       tags:
       - settings
   /settings/public:
     get:
-      consumes:
-      - application/json
+      description: |-
+        Retrieve public settings. Returns a small set of settings that are not reserved to administrators only.
+        **Access policy**: public
       produces:
       - application/json
       responses:
         "200":
-          description: Settings
+          description: Success
           schema:
             $ref: '#/definitions/settings.publicSettingsResponse'
         "500":
-          description: ""
-      security:
-      - jwt: []
-      summary: Inspect Public Settings
+          description: Server error
+      summary: Retrieve Portainer public settings
       tags:
       - settings
   /stacks:
