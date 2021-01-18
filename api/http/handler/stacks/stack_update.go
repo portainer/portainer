@@ -17,8 +17,10 @@ import (
 )
 
 type updateComposeStackPayload struct {
-	StackFileContent string
-	Env              []portainer.Pair
+	// New content of the Stack file
+	StackFileContent string `example:"version: 3\n services:\n web:\n image:nginx"`
+	// A list of environment variables used during stack deployment
+	Env []portainer.Pair
 }
 
 func (payload *updateComposeStackPayload) Validate(r *http.Request) error {
@@ -29,9 +31,12 @@ func (payload *updateComposeStackPayload) Validate(r *http.Request) error {
 }
 
 type updateSwarmStackPayload struct {
-	StackFileContent string
-	Env              []portainer.Pair
-	Prune            bool
+	// New content of the Stack file
+	StackFileContent string `example:"version: 3\n services:\n web:\n image:nginx"`
+	// A list of environment variables used during stack deployment
+	Env []portainer.Pair
+	// Prune services that are no longer referenced (only available for Swarm stacks)
+	Prune bool `example:"true"`
 }
 
 func (payload *updateSwarmStackPayload) Validate(r *http.Request) error {
@@ -41,16 +46,22 @@ func (payload *updateSwarmStackPayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// @summary Update a Stack
+// @id StackUpdate
+// @summary Update a stack
+// @description Update a stack.
+// @description **Access policy**: restricted
 // @tags stacks
 // @security jwt
 // @accept json
 // @produce json
-// @param id path string true "Stack Id"
-// @param endpointId query int false "Endpoint Id"
-// @param body body updateSwarmStackPayload true "Stack data"
-// @success 200 {object} portainer.Stack
-// @failure 400,403,404,500
+// @param id path int true "Stack identifier"
+// @param endpointId query int false "Stacks created before version 1.18.0 might not have an associated endpoint identifier. Use this optional parameter to set the endpoint identifier used by the stack."
+// @param body body updateSwarmStackPayload true "Stack details"
+// @success 200 {object} portainer.Stack "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 " not found"
+// @failure 500 "Server error"
 // @router /stacks/{id} [put]
 func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")

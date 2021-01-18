@@ -14,9 +14,12 @@ import (
 )
 
 type stackMigratePayload struct {
-	EndpointID int
-	SwarmID    string
-	Name       string
+	// Endpoint identifier of the target endpoint where the stack will be relocated
+	EndpointID int `example:"2" validate:"required"`
+	// Swarm cluster identifier, must match the identifier of the cluster where the stack will be relocated
+	SwarmID string `example:"jpofkc0i9uo9wtx1zesuk649w"`
+	// If provided will rename the migrated stack
+	Name string `example:"new-stack"`
 }
 
 func (payload *stackMigratePayload) Validate(r *http.Request) error {
@@ -26,16 +29,21 @@ func (payload *stackMigratePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// @summary Migrates a Stack to another endpoint
+// @id StackMigrate
+// @summary Migrate a stack to another endpoint
+// @description  Migrate a stack from an endpoint to another endpoint. It will re-create the stack inside the target endpoint before removing the original stack.
+// @description **Access policy**: restricted
 // @tags stacks
 // @security jwt
-// @accept json
 // @produce json
-// @param id path string true "Stack Id"
-// @param endpointId query int false "Endpoint Id"
-// @param body body stackMigratePayload true "Stack data"
-// @success 200 {object} portainer.Stack
-// @failure 400,403,404,500
+// @param id path int true "Stack identifier"
+// @param endpointId query int false "Stacks created before version 1.18.0 might not have an associated endpoint identifier. Use this optional parameter to set the endpoint identifier used by the stack."
+// @param body body stackMigratePayload true "Stack migration details"
+// @success 200 {object} portainer.Stack "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 "Stack not found"
+// @failure 500 "Server error"
 // @router /stacks/{id}/migrate [post]
 func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")

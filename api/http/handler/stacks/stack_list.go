@@ -16,15 +16,19 @@ type stackListOperationFilters struct {
 	EndpointID int    `json:"EndpointID"`
 }
 
-// @summary List Stacks
-// @description
+// @id StackList
+// @summary List stacks
+// @description List all stacks based on the current user authorizations.
+// @description Will return all stacks if using an administrator account otherwise it
+// @description will only return the list of stacks the user have access to.
+// @description **Access policy**: restricted
 // @tags stacks
 // @security jwt
-// @accept json
-// @produce json
-// @param filters query stackListOperationFilters false "Stack filters"
-// @success 200 {array} portainer.Stack
-// @failure 400,500
+// @param filters query string false "Filters to process on the stack list. Encoded as JSON (a map[string]string). For example, {"SwarmID": "jpofkc0i9uo9wtx1zesuk649w"} will only return stacks that are part of the specified Swarm cluster. Available filters: EndpointID, SwarmID."
+// @success 200 {array} portainer.Stack "Success"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
 // @router /stacks [get]
 func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var filters stackListOperationFilters

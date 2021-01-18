@@ -25,9 +25,12 @@ func normalizeStackName(name string) string {
 }
 
 type composeStackFromFileContentPayload struct {
-	Name             string
-	StackFileContent string
-	Env              []portainer.Pair
+	// Name of the stack
+	Name string `example:"myStack" validate:"required"`
+	// Content of the Stack file
+	StackFileContent string `example:"version: 3\n services:\n web:\n image:nginx" validate:"required"`
+	// A list of environment variables used during stack deployment
+	Env []portainer.Pair `example:""`
 }
 
 func (payload *composeStackFromFileContentPayload) Validate(r *http.Request) error {
@@ -103,14 +106,24 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 }
 
 type composeStackFromGitRepositoryPayload struct {
-	Name                        string
-	RepositoryURL               string
-	RepositoryReferenceName     string
-	RepositoryAuthentication    bool
-	RepositoryUsername          string
-	RepositoryPassword          string
-	ComposeFilePathInRepository string
-	Env                         []portainer.Pair
+	// Name of the stack
+	Name string `example:"myStack" validate:"required"`
+
+	// URL of a Git repository hosting the Stack file
+	RepositoryURL string `example:"https://github.com/openfaas/faas" validate:"required"`
+	// Reference name of a Git repository hosting the Stack file
+	RepositoryReferenceName string `example:"refs/heads/master"`
+	// Use basic authentication to clone the Git repository
+	RepositoryAuthentication bool `example:"true"`
+	// Username used in basic authentication. Required when RepositoryAuthentication is true.
+	RepositoryUsername string `example:"myGitUsername"`
+	// Password used in basic authentication. Required when RepositoryAuthentication is true.
+	RepositoryPassword string `example:"myGitPassword"`
+	// Path to the Stack file inside the Git repository
+	ComposeFilePathInRepository string `example:"docker-compose.yml" default:"docker-compose.yml"`
+
+	// A list of environment variables used during stack deployment
+	Env []portainer.Pair
 }
 
 func (payload *composeStackFromGitRepositoryPayload) Validate(r *http.Request) error {

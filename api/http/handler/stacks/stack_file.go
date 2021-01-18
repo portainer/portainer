@@ -14,18 +14,23 @@ import (
 )
 
 type stackFileResponse struct {
-	StackFileContent string `json:"StackFileContent"`
+	// Content of the Stack file
+	StackFileContent string `json:"StackFileContent" example:"version: 3\n services:\n web:\n image:nginx"`
 }
 
-// @summary Inspect Stack's file
-// @description
+// @id StackFileInspect
+// @summary Retrieve the content of the Stack file for the specified stack
+// @description Get Stack file content.
+// @description **Access policy**: restricted
 // @tags stacks
 // @security jwt
-// @accept json
 // @produce json
-// @param id path int true "Stack Id"
-// @success 200 {object} stackFileResponse
-// @failure 400,403,404,500
+// @param id path int true "Stack identifier"
+// @success 200 {object} stackFileResponse "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 "Stack not found"
+// @failure 500 "Server error"
 // @router /stacks/{id}/file [get]
 func (handler *Handler) stackFile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
