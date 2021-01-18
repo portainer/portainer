@@ -13,22 +13,24 @@ import (
 )
 
 type inspectVersionResponse struct {
-	UpdateAvailable bool   `json:"UpdateAvailable"`
-	LatestVersion   string `json:"LatestVersion"`
+	// Whether portainer has an update available
+	UpdateAvailable bool `json:"UpdateAvailable" example:"false"`
+	// The latest version available
+	LatestVersion string `json:"LatestVersion" example:"2.0.0"`
 }
 
 type githubData struct {
 	TagName string `json:"tag_name"`
 }
 
-// @summary Inspect Version
-// @description
-// @tags status
+// @id StatusInspectVersion
+// @summary Check for portainer updates
+// @description Check if portainer has an update available
+// @description **Access policy**: authenticated
 // @security jwt
-// @accept json
+// @tags status
 // @produce json
-// @success 200 {object} inspectVersionResponse "Version info"
-// @failure 500
+// @success 200 {object} inspectVersionResponse "Success"
 // @router /status/version [get]
 func (handler *Handler) statusInspectVersion(w http.ResponseWriter, r *http.Request) {
 	motd, err := client.Get(portainer.VersionCheckURL, 5)

@@ -3762,25 +3762,21 @@ var doc = `{
         },
         "/status": {
             "get": {
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "Retrieve Portainer status\n**Access policy**: public",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "status"
                 ],
-                "summary": "Inspect Status",
+                "summary": "Check Portainer status",
+                "operationId": "StatusInspect",
                 "responses": {
                     "200": {
-                        "description": "Status info",
+                        "description": "Success",
                         "schema": {
                             "$ref": "#/definitions/portainer.Status"
                         }
-                    },
-                    "500": {
-                        "description": ""
                     }
                 }
             }
@@ -3792,25 +3788,21 @@ var doc = `{
                         "jwt": []
                     }
                 ],
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "Check if portainer has an update available\n**Access policy**: authenticated",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "status"
                 ],
-                "summary": "Inspect Version",
+                "summary": "Check for portainer updates",
+                "operationId": "StatusInspectVersion",
                 "responses": {
                     "200": {
-                        "description": "Version info",
+                        "description": "Success",
                         "schema": {
                             "$ref": "#/definitions/status.inspectVersionResponse"
                         }
-                    },
-                    "500": {
-                        "description": ""
                     }
                 }
             }
@@ -6371,9 +6363,7 @@ var doc = `{
                     "description": "Deprecated in DBVersion == 18",
                     "type": "array",
                     "items": {
-                        "description": "User identifier",
-                        "type": "integer",
-                        "example": 1
+                        "type": "integer"
                     }
                 },
                 "AzureCredentials": {
@@ -6525,9 +6515,7 @@ var doc = `{
                     "description": "Deprecated in DBVersion == 18",
                     "type": "array",
                     "items": {
-                        "description": "User identifier",
-                        "type": "integer",
-                        "example": 1
+                        "type": "integer"
                     }
                 },
                 "Description": {
@@ -6873,9 +6861,7 @@ var doc = `{
                     "description": "Deprecated fields\nDeprecated in DBVersion == 18",
                     "type": "array",
                     "items": {
-                        "description": "User identifier",
-                        "type": "integer",
-                        "example": 1
+                        "type": "integer"
                     }
                 },
                 "Gitlab": {
@@ -8033,10 +8019,14 @@ var doc = `{
             "type": "object",
             "properties": {
                 "LatestVersion": {
-                    "type": "string"
+                    "description": "The latest version available",
+                    "type": "string",
+                    "example": "2.0.0"
                 },
                 "UpdateAvailable": {
-                    "type": "boolean"
+                    "description": "Whether portainer has an update available",
+                    "type": "boolean",
+                    "example": false
                 }
             }
         },

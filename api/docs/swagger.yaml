@@ -778,8 +778,6 @@ definitions:
       AuthorizedUsers:
         description: Deprecated in DBVersion == 18
         items:
-          description: User identifier
-          example: 1
           type: integer
         type: array
       AzureCredentials:
@@ -894,8 +892,6 @@ definitions:
       AuthorizedUsers:
         description: Deprecated in DBVersion == 18
         items:
-          description: User identifier
-          example: 1
           type: integer
         type: array
       Description:
@@ -1147,8 +1143,6 @@ definitions:
           Deprecated fields
           Deprecated in DBVersion == 18
         items:
-          description: User identifier
-          example: 1
           type: integer
         type: array
       Gitlab:
@@ -2043,8 +2037,12 @@ definitions:
   status.inspectVersionResponse:
     properties:
       LatestVersion:
+        description: The latest version available
+        example: 2.0.0
         type: string
       UpdateAvailable:
+        description: Whether portainer has an update available
+        example: false
         type: boolean
     type: object
   tags.tagCreatePayload:
@@ -4650,36 +4648,36 @@ paths:
       - stacks
   /status:
     get:
-      consumes:
-      - application/json
+      description: |-
+        Retrieve Portainer status
+        **Access policy**: public
+      operationId: StatusInspect
       produces:
       - application/json
       responses:
         "200":
-          description: Status info
+          description: Success
           schema:
             $ref: '#/definitions/portainer.Status'
-        "500":
-          description: ""
-      summary: Inspect Status
+      summary: Check Portainer status
       tags:
       - status
   /status/version:
     get:
-      consumes:
-      - application/json
+      description: |-
+        Check if portainer has an update available
+        **Access policy**: authenticated
+      operationId: StatusInspectVersion
       produces:
       - application/json
       responses:
         "200":
-          description: Version info
+          description: Success
           schema:
             $ref: '#/definitions/status.inspectVersionResponse'
-        "500":
-          description: ""
       security:
       - jwt: []
-      summary: Inspect Version
+      summary: Check for portainer updates
       tags:
       - status
   /tags:
