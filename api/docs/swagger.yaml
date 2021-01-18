@@ -778,6 +778,8 @@ definitions:
       AuthorizedUsers:
         description: Deprecated in DBVersion == 18
         items:
+          description: User identifier
+          example: 1
           type: integer
         type: array
       AzureCredentials:
@@ -892,6 +894,8 @@ definitions:
       AuthorizedUsers:
         description: Deprecated in DBVersion == 18
         items:
+          description: User identifier
+          example: 1
           type: integer
         type: array
       Description:
@@ -1143,6 +1147,8 @@ definitions:
           Deprecated fields
           Deprecated in DBVersion == 18
         items:
+          description: User identifier
+          example: 1
           type: integer
         type: array
       Gitlab:
@@ -2048,7 +2054,11 @@ definitions:
   tags.tagCreatePayload:
     properties:
       name:
+        description: Name
+        example: org/acme
         type: string
+    required:
+    - name
     type: object
   teammemberships.teamMembershipCreatePayload:
     properties:
@@ -4682,25 +4692,33 @@ paths:
       - status
   /tags:
     get:
+      description: |-
+        List tags.
+        **Access policy**: administrator
+      operationId: TagList
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success
           schema:
             items:
               $ref: '#/definitions/portainer.Tag'
             type: array
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Fetches the list of tags
+      summary: List tags
       tags:
       - tags
     post:
+      description: |-
+        Create a new tag.
+        **Access policy**: administrator
+      operationId: TagCreate
       parameters:
-      - description: tag info
+      - description: Tag details
         in: body
         name: body
         required: true
@@ -4710,22 +4728,28 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success
           schema:
-            items:
-              $ref: '#/definitions/portainer.Tag'
-            type: array
+            $ref: '#/definitions/portainer.Tag'
+        "409":
+          description: Tag name exists
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Create a tag
+      summary: Create a new tag
       tags:
       - tags
   /tags/{id}:
     delete:
+      consumes:
+      - application/json
+      description: |-
+        Remove a tag.
+        **Access policy**: administrator
+      operationId: TagDelete
       parameters:
-      - description: tag id
+      - description: Tag identifier
         in: path
         name: id
         required: true
@@ -4734,12 +4758,18 @@ paths:
       - application/json
       responses:
         "204":
-          description: ""
+          description: Success
+        "400":
+          description: Invalid request
+        "403":
+          description: Permission denied
+        "404":
+          description: Tag not found
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Delete a tag
+      summary: Remove a tag
       tags:
       - tags
   /team:

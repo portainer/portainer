@@ -11,15 +11,20 @@ import (
 	"github.com/portainer/portainer/api/internal/edge"
 )
 
-// tagDelete godoc
-// @summary Delete a tag
-// @description
+// @id TagDelete
+// @summary Remove a tag
+// @description Remove a tag.
+// @description **Access policy**: administrator
 // @tags tags
 // @security jwt
+// @accept json
 // @produce json
-// @param id path int true "tag id"
-// @success 204
-// @failure 500
+// @param id path int true "Tag identifier"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 "Tag not found"
+// @failure 500 "Server error"
 // @router /tags/{id} [delete]
 func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	id, err := request.RetrieveNumericRouteVariableValue(r, "id")

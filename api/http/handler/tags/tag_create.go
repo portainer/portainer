@@ -12,7 +12,8 @@ import (
 )
 
 type tagCreatePayload struct {
-	Name string
+	// Name
+	Name string `validate:"required" example:"org/acme"`
 }
 
 func (payload *tagCreatePayload) Validate(r *http.Request) error {
@@ -22,15 +23,17 @@ func (payload *tagCreatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// tagCreate godoc
-// @summary Create a tag
-// @description
+// @id TagCreate
+// @summary Create a new tag
+// @description Create a new tag.
+// @description **Access policy**: administrator
+// @tags tags
 // @security jwt
 // @produce json
-// @param body body tagCreatePayload true "tag info"
-// @success 200 {array} portainer.Tag
-// @tags tags
-// @failure 500
+// @param body body tagCreatePayload true "Tag details"
+// @success 200 {object} portainer.Tag "Success"
+// @failure 409 "Tag name exists"
+// @failure 500 "Server error"
 // @router /tags [post]
 func (handler *Handler) tagCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload tagCreatePayload
