@@ -13,7 +13,7 @@ import (
 	"github.com/portainer/libcompose/lookup"
 	"github.com/portainer/libcompose/project"
 	"github.com/portainer/libcompose/project/options"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 const (
