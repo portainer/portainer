@@ -741,7 +741,7 @@ definitions:
       AuthorizedUsers:
         description: Deprecated in DBVersion == 18
         items:
-          description: User Identifier
+          description: User identifier
           example: 1
           type: integer
         type: array
@@ -850,7 +850,7 @@ definitions:
       AuthorizedUsers:
         description: Deprecated in DBVersion == 18
         items:
-          description: User Identifier
+          description: User identifier
           example: 1
           type: integer
         type: array
@@ -1072,7 +1072,7 @@ definitions:
           Deprecated fields
           Deprecated in DBVersion == 18
         items:
-          description: User Identifier
+          description: User identifier
           example: 1
           type: integer
         type: array
@@ -1685,74 +1685,124 @@ definitions:
   registries.registryCreatePayload:
     properties:
       authentication:
+        description: Is authentication against this registry enabled
+        example: false
         type: boolean
       gitlab:
         $ref: '#/definitions/portainer.GitlabRegistryData'
+        description: Gitlab specific details, required when type = 4
       name:
+        description: Name that will be used to identify this registry
+        example: my-registry
         type: string
       password:
+        description: Password used to authenticate against this registry. required
+          when Authentication is true
+        example: registry_password
         type: string
       type:
+        description: 'Registry Type. Valid values are: 1 (Quay.io), 2 (Azure container
+          registry), 3 (custom registry) or 4 (Gitlab registry)'
+        enum:
+        - 1
+        - 2
+        - 3
+        - 4
+        example: 1
         type: integer
       url:
+        description: URL or IP address of the Docker registry
+        example: registry.mydomain.tld:2375
         type: string
       username:
+        description: Username used to authenticate against this registry. Required
+          when Authentication is true
+        example: registry_user
         type: string
+    required:
+    - authentication
+    - name
+    - type
+    - url
     type: object
   registries.registryUpdatePayload:
     properties:
       authentication:
+        description: Is authentication against this registry enabled
+        example: false
         type: boolean
       name:
+        description: Name that will be used to identify this registry
+        example: my-registry
         type: string
       password:
+        description: Password used to authenticate against this registry. required
+          when Authentication is true
+        example: registry_password
         type: string
       teamAccessPolicies:
         $ref: '#/definitions/portainer.TeamAccessPolicies'
       url:
+        description: URL or IP address of the Docker registry
+        example: registry.mydomain.tld:2375
         type: string
       userAccessPolicies:
         $ref: '#/definitions/portainer.UserAccessPolicies'
       username:
+        description: Username used to authenticate against this registry. Required
+          when Authentication is true
+        example: registry_user
         type: string
+    required:
+    - authentication
+    - name
+    - url
     type: object
   resourcecontrols.resourceControlCreatePayload:
     properties:
       administratorsOnly:
+        description: Permit access to resource only to admins
+        example: true
         type: boolean
       public:
+        description: Permit access to the associated resource to any user
+        example: true
         type: boolean
       resourceID:
+        example: 617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08
         type: string
       subResourceIDs:
+        description: List of Docker resources that will inherit this access control
+        example:
+        - 617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08
         items:
           type: string
         type: array
       teams:
+        description: List of team identifiers with access to the associated resource
+        example:
+        - 56
+        - 7
         items:
           type: integer
         type: array
       type:
+        description: |-
+          Type of Docker resource. Valid values are: container, volume\
+          service, secret, config or stack
+        example: container
         type: string
       users:
+        description: List of user identifiers with access to the associated resource
+        example:
+        - 1
+        - 4
         items:
           type: integer
         type: array
-    type: object
-  resourcecontrols.resourceControlUpdatePayload:
-    properties:
-      administratorsOnly:
-        type: boolean
-      public:
-        type: boolean
-      teams:
-        items:
-          type: integer
-        type: array
-      users:
-        items:
-          type: integer
-        type: array
+    required:
+    - resourceID
+    - type
     type: object
   settings.publicSettingsResponse:
     properties:
@@ -3766,19 +3816,23 @@ paths:
       - motd
   /registries:
     get:
-      consumes:
-      - application/json
+      description: |-
+        List all registries based on the current user authorizations.
+        Will return all registries if using an administrator account otherwise it
+        will only return authorized registries.
+        **Access policy**: restricted
+      operationId: RegistryList
       produces:
       - application/json
       responses:
         "200":
-          description: Registry
+          description: Success
           schema:
             items:
               $ref: '#/definitions/portainer.Registry'
             type: array
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
       summary: List Registries
@@ -3787,8 +3841,12 @@ paths:
     post:
       consumes:
       - application/json
+      description: |-
+        Create a new registry.
+        **Access policy**: administrator
+      operationId: RegistryCreate
       parameters:
-      - description: registry data
+      - description: Registry details
         in: body
         name: body
         required: true
@@ -3798,49 +3856,51 @@ paths:
       - application/json
       responses:
         "200":
-          description: Registry
+          description: Success
           schema:
             $ref: '#/definitions/portainer.Registry'
         "400":
-          description: ""
+          description: Invalid request
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Creates a registry
+      summary: Create a new registry
       tags:
       - registries
   /registries/{id}:
     delete:
-      consumes:
-      - application/json
+      description: |-
+        Remove a registry
+        **Access policy**: administrator
+      operationId: RegistryDelete
       parameters:
-      - description: registry id
+      - description: Registry identifier
         in: path
         name: id
         required: true
         type: integer
-      produces:
-      - application/json
       responses:
         "204":
-          description: ""
+          description: Success
         "400":
-          description: ""
+          description: Invalid request
         "404":
-          description: ""
+          description: Registry not found
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Deletes a registry
+      summary: Remove a registry
       tags:
       - registries
     get:
-      consumes:
-      - application/json
+      description: |-
+        Retrieve details about a registry.
+        **Access policy**: administrator
+      operationId: RegistryInspect
       parameters:
-      - description: registry id
+      - description: Registry identifier
         in: path
         name: id
         required: true
@@ -3849,32 +3909,36 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success
           schema:
             $ref: '#/definitions/portainer.Registry'
         "400":
-          description: ""
+          description: Invalid request
         "403":
-          description: ""
+          description: Permission denied to access registry
         "404":
-          description: ""
+          description: Registry not found
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Inspects a registry
+      summary: Inspect a registry
       tags:
       - registries
     put:
       consumes:
       - application/json
+      description: |-
+        Update a registry
+        **Access policy**: administrator
+      operationId: RegistryUpdate
       parameters:
-      - description: registry id
+      - description: Registry identifier
         in: path
         name: id
         required: true
         type: integer
-      - description: registry data
+      - description: Registry details
         in: body
         name: body
         required: true
@@ -3884,16 +3948,20 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success
           schema:
             $ref: '#/definitions/portainer.Registry'
         "400":
-          description: ""
+          description: Invalid request
+        "404":
+          description: Registry not found
+        "409":
+          description: Another registry with the same URL already exists
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Updates a registry
+      summary: Update a registry
       tags:
       - registries
   /registries/{id}/configure:
@@ -3930,8 +3998,12 @@ paths:
     post:
       consumes:
       - application/json
+      description: |-
+        Create a new resource control to restrict access to a Docker resource.
+        **Access policy**: administrator
+      operationId: ResourceControlCreate
       parameters:
-      - description: resource control data
+      - description: Resource control details
         in: body
         name: body
         required: true
@@ -3941,44 +4013,43 @@ paths:
       - application/json
       responses:
         "200":
-          description: Resource Control
+          description: Success
           schema:
             $ref: '#/definitions/portainer.ResourceControl'
         "400":
-          description: ""
+          description: Invalid request
         "409":
-          description: ""
+          description: Resource control already exists
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Creates a resource control object
+      summary: Create a new resource control
       tags:
       - resource_controls
   /resource_controls/{id}:
     delete:
-      consumes:
-      - application/json
+      description: |-
+        Remove a resource control.
+        **Access policy**: administrator
       parameters:
-      - description: Resource control Id
+      - description: Resource control identifier
         in: path
         name: id
         required: true
         type: integer
-      produces:
-      - application/json
       responses:
         "204":
-          description: ""
+          description: Success
         "400":
-          description: ""
+          description: Invalid request
         "404":
-          description: ""
+          description: Resource control not found
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Deletes a resource control object
+      summary: Remove a resource control
       tags:
       - resource_controls
     put:
@@ -3990,12 +4061,6 @@ paths:
         name: id
         required: true
         type: integer
-      - description: resource control data
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/resourcecontrols.resourceControlUpdatePayload'
       produces:
       - application/json
       responses:
@@ -4013,9 +4078,6 @@ paths:
           description: ""
       security:
       - jwt: []
-      summary: Updates a resource control object
-      tags:
-      - resource_controls
   /roles:
     get:
       consumes:

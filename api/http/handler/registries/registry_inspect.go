@@ -12,15 +12,19 @@ import (
 	"github.com/portainer/libhttp/response"
 )
 
-// @summary Inspects a registry
-// @description
+// @id RegistryInspect
+// @summary Inspect a registry
+// @description Retrieve details about a registry.
+// @description **Access policy**: administrator
 // @tags registries
 // @security jwt
-// @accept json
 // @produce json
-// @param id path int true "registry id"
-// @success 200 {object} portainer.Registry
-// @failure 400,404,500,403
+// @param id path int true "Registry identifier"
+// @success 200 {object} portainer.Registry "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied to access registry"
+// @failure 404 "Registry not found"
+// @failure 500 "Server error"
 // @router /registries/{id} [get]
 func (handler *Handler) registryInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	registryID, err := request.RetrieveNumericRouteVariableValue(r, "id")

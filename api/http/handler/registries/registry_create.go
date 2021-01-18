@@ -12,13 +12,20 @@ import (
 )
 
 type registryCreatePayload struct {
-	Name           string
-	Type           portainer.RegistryType
-	URL            string
-	Authentication bool
-	Username       string
-	Password       string
-	Gitlab         portainer.GitlabRegistryData
+	// Name that will be used to identify this registry
+	Name string `example:"my-registry" validate:"required"`
+	// Registry Type. Valid values are: 1 (Quay.io), 2 (Azure container registry), 3 (custom registry) or 4 (Gitlab registry)
+	Type portainer.RegistryType `example:"1" validate:"required" enums:"1,2,3,4"`
+	// URL or IP address of the Docker registry
+	URL string `example:"registry.mydomain.tld:2375" validate:"required"`
+	// Is authentication against this registry enabled
+	Authentication bool `example:"false" validate:"required"`
+	// Username used to authenticate against this registry. Required when Authentication is true
+	Username string `example:"registry_user"`
+	// Password used to authenticate against this registry. required when Authentication is true
+	Password string `example:"registry_password"`
+	// Gitlab specific details, required when type = 4
+	Gitlab portainer.GitlabRegistryData
 }
 
 func (payload *registryCreatePayload) Validate(r *http.Request) error {
@@ -37,15 +44,18 @@ func (payload *registryCreatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// @summary Creates a registry
-// @description
+// @id RegistryCreate
+// @summary Create a new registry
+// @description Create a new registry.
+// @description **Access policy**: administrator
 // @tags registries
 // @security jwt
 // @accept json
 // @produce json
-// @param body body registryCreatePayload true "registry data"
-// @success 200 {object} portainer.Registry "Registry"
-// @failure 400,500
+// @param body body registryCreatePayload true "Registry details"
+// @success 200 {object} portainer.Registry "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
 // @router /registries [post]
 func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload registryCreatePayload

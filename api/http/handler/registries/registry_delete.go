@@ -10,15 +10,17 @@ import (
 	"github.com/portainer/portainer/api/bolt/errors"
 )
 
-// @summary Deletes a registry
-// @description
+// @id RegistryDelete
+// @summary Remove a registry
+// @description Remove a registry
+// @description **Access policy**: administrator
 // @tags registries
 // @security jwt
-// @accept json
-// @produce json
-// @param id path int true "registry id"
-// @success 204
-// @failure 400,404,500
+// @param id path int true "Registry identifier"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 404 "Registry not found"
+// @failure 500 "Server error"
 // @router /registries/{id} [delete]
 func (handler *Handler) registryDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	registryID, err := request.RetrieveNumericRouteVariableValue(r, "id")

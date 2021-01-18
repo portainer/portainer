@@ -12,11 +12,16 @@ import (
 )
 
 type registryUpdatePayload struct {
-	Name               *string
-	URL                *string
-	Authentication     *bool
-	Username           *string
-	Password           *string
+	// Name that will be used to identify this registry
+	Name *string `validate:"required" example:"my-registry"`
+	// URL or IP address of the Docker registry
+	URL *string `validate:"required" example:"registry.mydomain.tld:2375"`
+	// Is authentication against this registry enabled
+	Authentication *bool `example:"false" validate:"required"`
+	// Username used to authenticate against this registry. Required when Authentication is true
+	Username *string `example:"registry_user"`
+	// Password used to authenticate against this registry. required when Authentication is true
+	Password           *string `example:"registry_password"`
 	UserAccessPolicies portainer.UserAccessPolicies
 	TeamAccessPolicies portainer.TeamAccessPolicies
 }
@@ -25,16 +30,21 @@ func (payload *registryUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// @summary Updates a registry
-// @description
+// @id RegistryUpdate
+// @summary Update a registry
+// @description Update a registry
+// @description **Access policy**: administrator
 // @tags registries
 // @security jwt
 // @accept json
 // @produce json
-// @param id path int true "registry id"
-// @param body body registryUpdatePayload true "registry data"
-// @success 200 {object} portainer.Registry
-// @failure 400,500
+// @param id path int true "Registry identifier"
+// @param body body registryUpdatePayload true "Registry details"
+// @success 200 {object} portainer.Registry "Success"
+// @failure 400 "Invalid request"
+// @failure 404 "Registry not found"
+// @failure 409 "Another registry with the same URL already exists"
+// @failure 500 "Server error"
 // @router /registries/{id} [put]
 func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	registryID, err := request.RetrieveNumericRouteVariableValue(r, "id")

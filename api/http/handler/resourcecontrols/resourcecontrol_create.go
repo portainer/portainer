@@ -12,13 +12,21 @@ import (
 )
 
 type resourceControlCreatePayload struct {
-	ResourceID         string
-	Type               string
-	Public             bool
-	AdministratorsOnly bool
-	Users              []int
-	Teams              []int
-	SubResourceIDs     []string
+	//
+	ResourceID string `example:"617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08" validate:"required"`
+	// Type of Docker resource. Valid values are: container, volume\
+	// service, secret, config or stack
+	Type string `example:"container" validate:"required"`
+	// Permit access to the associated resource to any user
+	Public bool `example:"true"`
+	// Permit access to resource only to admins
+	AdministratorsOnly bool `example:"true"`
+	// List of user identifiers with access to the associated resource
+	Users []int `example:"1,4"`
+	// List of team identifiers with access to the associated resource
+	Teams []int `example:"56,7"`
+	// List of Docker resources that will inherit this access control
+	SubResourceIDs []string `example:"617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08"`
 }
 
 var (
@@ -45,15 +53,19 @@ func (payload *resourceControlCreatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// @summary Creates a resource control object
-// @description
+// @id ResourceControlCreate
+// @summary Create a new resource control
+// @description Create a new resource control to restrict access to a Docker resource.
+// @description **Access policy**: administrator
 // @tags resource_controls
 // @security jwt
 // @accept json
 // @produce json
-// @param body body resourceControlCreatePayload true "resource control data"
-// @success 200 {object} portainer.ResourceControl "Resource Control"
-// @failure 400,409,500
+// @param body body resourceControlCreatePayload true "Resource control details"
+// @success 200 {object} portainer.ResourceControl "Success"
+// @failure 400 "Invalid request"
+// @failure 409 "Resource control already exists"
+// @failure 500 "Server error"
 // @router /resource_controls [post]
 func (handler *Handler) resourceControlCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload resourceControlCreatePayload

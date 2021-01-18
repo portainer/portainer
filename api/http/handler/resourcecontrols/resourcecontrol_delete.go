@@ -10,15 +10,17 @@ import (
 	"github.com/portainer/portainer/api/bolt/errors"
 )
 
-// @summary Deletes a resource control object
-// @description
+// @id
+// @summary Remove a resource control
+// @description Remove a resource control.
+// @description **Access policy**: administrator
 // @tags resource_controls
 // @security jwt
-// @accept json
-// @produce json
-// @param id path int true "Resource control Id"
-// @success 204
-// @failure 400,404,500
+// @param id path int true "Resource control identifier"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 404 "Resource control not found"
+// @failure 500 "Server error"
 // @router /resource_controls/{id} [delete]
 func (handler *Handler) resourceControlDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	resourceControlID, err := request.RetrieveNumericRouteVariableValue(r, "id")

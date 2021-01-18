@@ -2631,9 +2631,7 @@ var doc = `{
                         "jwt": []
                     }
                 ],
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "List all registries based on the current user authorizations.\nWill return all registries if using an administrator account otherwise it\nwill only return authorized registries.\n**Access policy**: restricted",
                 "produces": [
                     "application/json"
                 ],
@@ -2641,9 +2639,10 @@ var doc = `{
                     "registries"
                 ],
                 "summary": "List Registries",
+                "operationId": "RegistryList",
                 "responses": {
                     "200": {
-                        "description": "Registry",
+                        "description": "Success",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -2652,7 +2651,7 @@ var doc = `{
                         }
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             },
@@ -2662,6 +2661,7 @@ var doc = `{
                         "jwt": []
                     }
                 ],
+                "description": "Create a new registry.\n**Access policy**: administrator",
                 "consumes": [
                     "application/json"
                 ],
@@ -2671,10 +2671,11 @@ var doc = `{
                 "tags": [
                     "registries"
                 ],
-                "summary": "Creates a registry",
+                "summary": "Create a new registry",
+                "operationId": "RegistryCreate",
                 "parameters": [
                     {
-                        "description": "registry data",
+                        "description": "Registry details",
                         "name": "body",
                         "in": "body",
                         "required": true,
@@ -2685,16 +2686,16 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Registry",
+                        "description": "Success",
                         "schema": {
                             "$ref": "#/definitions/portainer.Registry"
                         }
                     },
                     "400": {
-                        "description": ""
+                        "description": "Invalid request"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             }
@@ -2706,20 +2707,19 @@ var doc = `{
                         "jwt": []
                     }
                 ],
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "Retrieve details about a registry.\n**Access policy**: administrator",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "registries"
                 ],
-                "summary": "Inspects a registry",
+                "summary": "Inspect a registry",
+                "operationId": "RegistryInspect",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "registry id",
+                        "description": "Registry identifier",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -2727,22 +2727,22 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success",
                         "schema": {
                             "$ref": "#/definitions/portainer.Registry"
                         }
                     },
                     "400": {
-                        "description": ""
+                        "description": "Invalid request"
                     },
                     "403": {
-                        "description": ""
+                        "description": "Permission denied to access registry"
                     },
                     "404": {
-                        "description": ""
+                        "description": "Registry not found"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             },
@@ -2752,6 +2752,7 @@ var doc = `{
                         "jwt": []
                     }
                 ],
+                "description": "Update a registry\n**Access policy**: administrator",
                 "consumes": [
                     "application/json"
                 ],
@@ -2761,17 +2762,18 @@ var doc = `{
                 "tags": [
                     "registries"
                 ],
-                "summary": "Updates a registry",
+                "summary": "Update a registry",
+                "operationId": "RegistryUpdate",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "registry id",
+                        "description": "Registry identifier",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "registry data",
+                        "description": "Registry details",
                         "name": "body",
                         "in": "body",
                         "required": true,
@@ -2782,16 +2784,22 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success",
                         "schema": {
                             "$ref": "#/definitions/portainer.Registry"
                         }
                     },
                     "400": {
-                        "description": ""
+                        "description": "Invalid request"
+                    },
+                    "404": {
+                        "description": "Registry not found"
+                    },
+                    "409": {
+                        "description": "Another registry with the same URL already exists"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             },
@@ -2801,20 +2809,16 @@ var doc = `{
                         "jwt": []
                     }
                 ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
+                "description": "Remove a registry\n**Access policy**: administrator",
                 "tags": [
                     "registries"
                 ],
-                "summary": "Deletes a registry",
+                "summary": "Remove a registry",
+                "operationId": "RegistryDelete",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "registry id",
+                        "description": "Registry identifier",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -2822,16 +2826,16 @@ var doc = `{
                 ],
                 "responses": {
                     "204": {
-                        "description": ""
+                        "description": "Success"
                     },
                     "400": {
-                        "description": ""
+                        "description": "Invalid request"
                     },
                     "404": {
-                        "description": ""
+                        "description": "Registry not found"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             }
@@ -2891,6 +2895,7 @@ var doc = `{
                         "jwt": []
                     }
                 ],
+                "description": "Create a new resource control to restrict access to a Docker resource.\n**Access policy**: administrator",
                 "consumes": [
                     "application/json"
                 ],
@@ -2900,10 +2905,11 @@ var doc = `{
                 "tags": [
                     "resource_controls"
                 ],
-                "summary": "Creates a resource control object",
+                "summary": "Create a new resource control",
+                "operationId": "ResourceControlCreate",
                 "parameters": [
                     {
-                        "description": "resource control data",
+                        "description": "Resource control details",
                         "name": "body",
                         "in": "body",
                         "required": true,
@@ -2914,19 +2920,19 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Resource Control",
+                        "description": "Success",
                         "schema": {
                             "$ref": "#/definitions/portainer.ResourceControl"
                         }
                     },
                     "400": {
-                        "description": ""
+                        "description": "Invalid request"
                     },
                     "409": {
-                        "description": ""
+                        "description": "Resource control already exists"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             }
@@ -2944,10 +2950,6 @@ var doc = `{
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "resource_controls"
-                ],
-                "summary": "Updates a resource control object",
                 "parameters": [
                     {
                         "type": "integer",
@@ -2955,15 +2957,6 @@ var doc = `{
                         "name": "id",
                         "in": "path",
                         "required": true
-                    },
-                    {
-                        "description": "resource control data",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/resourcecontrols.resourceControlUpdatePayload"
-                        }
                     }
                 ],
                 "responses": {
@@ -2993,20 +2986,15 @@ var doc = `{
                         "jwt": []
                     }
                 ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
+                "description": "Remove a resource control.\n**Access policy**: administrator",
                 "tags": [
                     "resource_controls"
                 ],
-                "summary": "Deletes a resource control object",
+                "summary": "Remove a resource control",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Resource control Id",
+                        "description": "Resource control identifier",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -3014,16 +3002,16 @@ var doc = `{
                 ],
                 "responses": {
                     "204": {
-                        "description": ""
+                        "description": "Success"
                     },
                     "400": {
-                        "description": ""
+                        "description": "Invalid request"
                     },
                     "404": {
-                        "description": ""
+                        "description": "Resource control not found"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             }
@@ -6284,7 +6272,7 @@ var doc = `{
                     "description": "Deprecated in DBVersion == 18",
                     "type": "array",
                     "items": {
-                        "description": "User Identifier",
+                        "description": "User identifier",
                         "type": "integer",
                         "example": 1
                     }
@@ -6429,7 +6417,7 @@ var doc = `{
                     "description": "Deprecated in DBVersion == 18",
                     "type": "array",
                     "items": {
-                        "description": "User Identifier",
+                        "description": "User identifier",
                         "type": "integer",
                         "example": 1
                     }
@@ -6738,7 +6726,7 @@ var doc = `{
                     "description": "Deprecated fields\nDeprecated in DBVersion == 18",
                     "type": "array",
                     "items": {
-                        "description": "User Identifier",
+                        "description": "User identifier",
                         "type": "integer",
                         "example": 1
                     }
@@ -7520,111 +7508,153 @@ var doc = `{
         },
         "registries.registryCreatePayload": {
             "type": "object",
+            "required": [
+                "authentication",
+                "name",
+                "type",
+                "url"
+            ],
             "properties": {
                 "authentication": {
-                    "type": "boolean"
+                    "description": "Is authentication against this registry enabled",
+                    "type": "boolean",
+                    "example": false
                 },
                 "gitlab": {
+                    "description": "Gitlab specific details, required when type = 4",
                     "$ref": "#/definitions/portainer.GitlabRegistryData"
                 },
                 "name": {
-                    "type": "string"
+                    "description": "Name that will be used to identify this registry",
+                    "type": "string",
+                    "example": "my-registry"
                 },
                 "password": {
-                    "type": "string"
+                    "description": "Password used to authenticate against this registry. required when Authentication is true",
+                    "type": "string",
+                    "example": "registry_password"
                 },
                 "type": {
-                    "type": "integer"
+                    "description": "Registry Type. Valid values are: 1 (Quay.io), 2 (Azure container registry), 3 (custom registry) or 4 (Gitlab registry)",
+                    "type": "integer",
+                    "enum": [
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "example": 1
                 },
                 "url": {
-                    "type": "string"
+                    "description": "URL or IP address of the Docker registry",
+                    "type": "string",
+                    "example": "registry.mydomain.tld:2375"
                 },
                 "username": {
-                    "type": "string"
+                    "description": "Username used to authenticate against this registry. Required when Authentication is true",
+                    "type": "string",
+                    "example": "registry_user"
                 }
             }
         },
         "registries.registryUpdatePayload": {
             "type": "object",
+            "required": [
+                "authentication",
+                "name",
+                "url"
+            ],
             "properties": {
                 "authentication": {
-                    "type": "boolean"
+                    "description": "Is authentication against this registry enabled",
+                    "type": "boolean",
+                    "example": false
                 },
                 "name": {
-                    "type": "string"
+                    "description": "Name that will be used to identify this registry",
+                    "type": "string",
+                    "example": "my-registry"
                 },
                 "password": {
-                    "type": "string"
+                    "description": "Password used to authenticate against this registry. required when Authentication is true",
+                    "type": "string",
+                    "example": "registry_password"
                 },
                 "teamAccessPolicies": {
                     "$ref": "#/definitions/portainer.TeamAccessPolicies"
                 },
                 "url": {
-                    "type": "string"
+                    "description": "URL or IP address of the Docker registry",
+                    "type": "string",
+                    "example": "registry.mydomain.tld:2375"
                 },
                 "userAccessPolicies": {
                     "$ref": "#/definitions/portainer.UserAccessPolicies"
                 },
                 "username": {
-                    "type": "string"
+                    "description": "Username used to authenticate against this registry. Required when Authentication is true",
+                    "type": "string",
+                    "example": "registry_user"
                 }
             }
         },
         "resourcecontrols.resourceControlCreatePayload": {
             "type": "object",
+            "required": [
+                "resourceID",
+                "type"
+            ],
             "properties": {
                 "administratorsOnly": {
-                    "type": "boolean"
+                    "description": "Permit access to resource only to admins",
+                    "type": "boolean",
+                    "example": true
                 },
                 "public": {
-                    "type": "boolean"
+                    "description": "Permit access to the associated resource to any user",
+                    "type": "boolean",
+                    "example": true
                 },
                 "resourceID": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08"
                 },
                 "subResourceIDs": {
+                    "description": "List of Docker resources that will inherit this access control",
                     "type": "array",
                     "items": {
                         "type": "string"
-                    }
+                    },
+                    "example": [
+                        "617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08"
+                    ]
                 },
                 "teams": {
+                    "description": "List of team identifiers with access to the associated resource",
                     "type": "array",
                     "items": {
                         "type": "integer"
-                    }
+                    },
+                    "example": [
+                        56,
+                        7
+                    ]
                 },
                 "type": {
-                    "type": "string"
+                    "description": "Type of Docker resource. Valid values are: container, volume\\\nservice, secret, config or stack",
+                    "type": "string",
+                    "example": "container"
                 },
                 "users": {
+                    "description": "List of user identifiers with access to the associated resource",
                     "type": "array",
                     "items": {
                         "type": "integer"
-                    }
-                }
-            }
-        },
-        "resourcecontrols.resourceControlUpdatePayload": {
-            "type": "object",
-            "properties": {
-                "administratorsOnly": {
-                    "type": "boolean"
-                },
-                "public": {
-                    "type": "boolean"
-                },
-                "teams": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "users": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
+                    },
+                    "example": [
+                        1,
+                        4
+                    ]
                 }
             }
         },
