@@ -17,6 +17,7 @@ import (
 	"github.com/portainer/portainer/api/git"
 	"github.com/portainer/portainer/api/http"
 	"github.com/portainer/portainer/api/http/client"
+	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/internal/snapshot"
 	"github.com/portainer/portainer/api/jwt"
 	"github.com/portainer/portainer/api/kubernetes"
@@ -71,8 +72,8 @@ func initDataStore(dataStorePath string, fileService portainer.FileService) port
 	return store
 }
 
-func initComposeStackManager(assetsPath string, dataStorePath string, reverseTunnelService portainer.ReverseTunnelService) portainer.ComposeStackManager {
-	composeWrapper := exec.NewComposeWrapper(assetsPath)
+func initComposeStackManager(assetsPath string, dataStorePath string, reverseTunnelService portainer.ReverseTunnelService, proxyManager proxy.Manager) portainer.ComposeStackManager {
+	composeWrapper := exec.NewComposeWrapper(assetsPath, proxyManager)
 	if composeWrapper != nil {
 		return composeWrapper
 	}
