@@ -15,16 +15,18 @@ type fileResponse struct {
 	FileContent string
 }
 
-// Gets a custom template's file
-// @summary Gets a custom template's file
-// @description
+// @id CustomTemplateFile
+// @summary Get Template stack file content.
+// @description Retrieve the content of the Stack file for the specified custom template
+// @description **Access policy**: authorized
 // @tags custom_templates
 // @security jwt
-// @accept json
 // @produce json
-// @param id path string true "template id"
-// @success 200 {object} fileResponse
-// @failure 400,404,500
+// @param id path int true "Template identifier"
+// @success 200 {object} fileResponse "Success"
+// @failure 400 "Invalid request"
+// @failure 404 "Custom template not found"
+// @failure 500 "Server error"
 // @router /custom_templates/{id}/file [get]
 func (handler *Handler) customTemplateFile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	customTemplateID, err := request.RetrieveNumericRouteVariableValue(r, "id")

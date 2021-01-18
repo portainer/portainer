@@ -371,6 +371,7 @@
           description: 'Server error'
           schema:
             $ref: '#/definitions/GenericError'
+
   /users:
     get:
       tags:
@@ -623,7 +624,6 @@
           description: 'Server error'
           schema:
             $ref: '#/definitions/GenericError'
-
   /users/{id}/passwd:
     post:
       tags:
@@ -674,7 +674,6 @@
           description: 'Server error'
           schema:
             $ref: '#/definitions/GenericError'
-
   /users/admin/check:
     get:
       tags:
@@ -703,7 +702,6 @@
           description: 'Server error'
           schema:
             $ref: '#/definitions/GenericError'
-
   /users/admin/init:
     post:
       tags:
@@ -745,150 +743,6 @@
           examples:
             application/json:
               err: 'User already exists'
-        500:
-          description: 'Server error'
-          schema:
-            $ref: '#/definitions/GenericError'
-
-  /upload/tls/{certificate}:
-    post:
-      tags:
-        - 'upload'
-      summary: 'Upload TLS files'
-      description: |
-        Use this endpoint to upload TLS files.
-        **Access policy**: administrator
-      operationId: 'UploadTLS'
-      consumes:
-        - multipart/form-data
-      produces:
-        - 'application/json'
-      security:
-        - jwt: []
-      parameters:
-        - in: 'path'
-          name: 'certificate'
-          description: "TLS file type. Valid values are 'ca', 'cert' or 'key'."
-          required: true
-          type: 'string'
-        - in: 'query'
-          name: 'folder'
-          description: 'Folder where the TLS file will be stored. Will be created if not existing.'
-          required: true
-          type: 'string'
-        - in: 'formData'
-          name: 'file'
-          type: 'file'
-          description: 'The file to upload.'
-      responses:
-        200:
-          description: 'Success'
-        400:
-          description: 'Invalid request'
-          schema:
-            $ref: '#/definitions/GenericError'
-          examples:
-            application/json:
-              err: 'Invalid request data'
-        500:
-          description: 'Server error'
-          schema:
-            $ref: '#/definitions/GenericError'
-
-  /tags:
-    get:
-      tags:
-        - 'tags'
-      summary: 'List tags'
-      description: |
-        List tags.
-        **Access policy**: administrator
-      operationId: 'TagList'
-      produces:
-        - 'application/json'
-      security:
-        - jwt: []
-      parameters: []
-      responses:
-        200:
-          description: 'Success'
-          schema:
-            $ref: '#/definitions/TagListResponse'
-        500:
-          description: 'Server error'
-          schema:
-            $ref: '#/definitions/GenericError'
-    post:
-      tags:
-        - 'tags'
-      summary: 'Create a new tag'
-      description: |
-        Create a new tag.
-        **Access policy**: administrator
-      operationId: 'TagCreate'
-      consumes:
-        - 'application/json'
-      produces:
-        - 'application/json'
-      security:
-        - jwt: []
-      parameters:
-        - in: 'body'
-          name: 'body'
-          description: 'Tag details'
-          required: true
-          schema:
-            $ref: '#/definitions/TagCreateRequest'
-      responses:
-        200:
-          description: 'Success'
-          schema:
-            $ref: '#/definitions/Tag'
-        400:
-          description: 'Invalid request'
-          schema:
-            $ref: '#/definitions/GenericError'
-          examples:
-            application/json:
-              err: 'Invalid request data format'
-        409:
-          description: 'Conflict'
-          schema:
-            $ref: '#/definitions/GenericError'
-          examples:
-            application/json:
-              err: 'A tag with the specified name already exists'
-        500:
-          description: 'Server error'
-          schema:
-            $ref: '#/definitions/GenericError'
-  /tags/{id}:
-    delete:
-      tags:
-        - 'tags'
-      summary: 'Remove a tag'
-      description: |
-        Remove a tag.
-        **Access policy**: administrator
-      operationId: 'TagDelete'
-      security:
-        - jwt: []
-      parameters:
-        - name: 'id'
-          in: 'path'
-          description: 'Tag identifier'
-          required: true
-          type: 'integer'
-      responses:
-        204:
-          description: 'Success'
-        400:
-          description: 'Invalid request'
-          schema:
-            $ref: '#/definitions/GenericError'
-          examples:
-            application/json:
-              err: 'Invalid request'
         500:
           description: 'Server error'
           schema:
@@ -1101,7 +955,6 @@
           description: 'Server error'
           schema:
             $ref: '#/definitions/GenericError'
-
   /teams/{id}/memberships:
     get:
       tags:
@@ -1327,207 +1180,7 @@
           description: 'Server error'
           schema:
             $ref: '#/definitions/GenericError'
-  /templates:
-    get:
-      tags:
-        - 'templates'
-      summary: 'List available templates'
-      description: |
-        List available templates.
-        Administrator templates will not be listed for non-administrator users.
-        **Access policy**: restricted
-      operationId: 'TemplateList'
-      produces:
-        - 'application/json'
-      security:
-        - jwt: []
-      parameters: []
-      responses:
-        200:
-          description: 'Success'
-          schema:
-            $ref: '#/definitions/TemplateListResponse'
-        500:
-          description: 'Server error'
-          schema:
-            $ref: '#/definitions/GenericError'
-    post:
-      tags:
-        - 'templates'
-      summary: 'Create a new template'
-      description: |
-        Create a new template.
-        **Access policy**: administrator
-      operationId: 'TemplateCreate'
-      consumes:
-        - 'application/json'
-      produces:
-        - 'application/json'
-      security:
-        - jwt: []
-      parameters:
-        - in: 'body'
-          name: 'body'
-          description: 'Template details'
-          required: true
-          schema:
-            $ref: '#/definitions/TemplateCreateRequest'
-      responses:
-        200:
-          description: 'Success'
-          schema:
-            $ref: '#/definitions/Template'
-        400:
-          description: 'Invalid request'
-          schema:
-            $ref: '#/definitions/GenericError'
-          examples:
-            application/json:
-              err: 'Invalid request data format'
-        403:
-          description: 'Unauthorized'
-          schema:
-            $ref: '#/definitions/GenericError'
-          examples:
-            application/json:
-              err: 'Access denied to resource'
-        500:
-          description: 'Server error'
-          schema:
-            $ref: '#/definitions/GenericError'
-  /templates/{id}:
-    get:
-      tags:
-        - 'templates'
-      summary: 'Inspect a template'
-      description: |
-        Retrieve details about a template.
-        **Access policy**: administrator
-      operationId: 'TemplateInspect'
-      produces:
-        - 'application/json'
-      security:
-        - jwt: []
-      parameters:
-        - name: 'id'
-          in: 'path'
-          description: 'Template identifier'
-          required: true
-          type: 'integer'
-      responses:
-        200:
-          description: 'Success'
-          schema:
-            $ref: '#/definitions/Template'
-        400:
-          description: 'Invalid request'
-          schema:
-            $ref: '#/definitions/GenericError'
-          examples:
-            application/json:
-              err: 'Invalid request'
-        403:
-          description: 'Unauthorized'
-          schema:
-            $ref: '#/definitions/GenericError'
-          examples:
-            application/json:
-              err: 'Access denied to resource'
-        404:
-          description: 'Template not found'
-          schema:
-            $ref: '#/definitions/GenericError'
-          examples:
-            application/json:
-              err: 'Template not found'
-        500:
-          description: 'Server error'
-          schema:
-            $ref: '#/definitions/GenericError'
-    put:
-      tags:
-        - 'templates'
-      summary: 'Update a template'
-      description: |
-        Update a template.
-        **Access policy**: administrator
-      operationId: 'TemplateUpdate'
-      consumes:
-        - 'application/json'
-      produces:
-        - 'application/json'
-      security:
-        - jwt: []
-      parameters:
-        - name: 'id'
-          in: 'path'
-          description: 'Template identifier'
-          required: true
-          type: 'integer'
-        - in: 'body'
-          name: 'body'
-          description: 'Template details'
-          required: true
-          schema:
-            $ref: '#/definitions/TemplateUpdateRequest'
-      responses:
-        200:
-          description: 'Success'
-        400:
-          description: 'Invalid request'
-          schema:
-            $ref: '#/definitions/GenericError'
-          examples:
-            application/json:
-              err: 'Invalid request data format'
-        403:
-          description: 'Unauthorized'
-          schema:
-            $ref: '#/definitions/GenericError'
-          examples:
-            application/json:
-              err: 'Access denied to resource'
-        404:
-          description: 'Template not found'
-          schema:
-            $ref: '#/definitions/GenericError'
-          examples:
-            application/json:
-              err: 'Template not found'
-        500:
-          description: 'Server error'
-          schema:
-            $ref: '#/definitions/GenericError'
-    delete:
-      tags:
-        - 'templates'
-      summary: 'Remove a template'
-      description: |
-        Remove a template.
-        **Access policy**: administrator
-      operationId: 'TemplateDelete'
-      security:
-        - jwt: []
-      parameters:
-        - name: 'id'
-          in: 'path'
-          description: 'Template identifier'
-          required: true
-          type: 'integer'
-      responses:
-        204:
-          description: 'Success'
-        400:
-          description: 'Invalid request'
-          schema:
-            $ref: '#/definitions/GenericError'
-          examples:
-            application/json:
-              err: 'Invalid request'
-        500:
-          description: 'Server error'
-          schema:
-            $ref: '#/definitions/GenericError'
+
 securityDefinitions:
   jwt:
     type: 'apiKey'

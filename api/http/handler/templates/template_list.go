@@ -14,14 +14,15 @@ type listResponse struct {
 	Templates []portainer.Template
 }
 
-// @summary List templates
-// @description
+// @id TemplateList
+// @summary List available templates
+// @description List available templates.
+// @description **Access policy**: restricted
 // @tags templates
 // @security jwt
-// @accept json
 // @produce json
-// @success 200 {object} listResponse
-// @failure 500
+// @success 200 {object} listResponse "Success"
+// @failure 500 "Server error"
 // @router /templates [get]
 func (handler *Handler) templateList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	settings, err := handler.DataStore.Settings().Settings()

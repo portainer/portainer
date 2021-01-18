@@ -13,12 +13,15 @@ import (
 )
 
 type filePayload struct {
-	RepositoryURL               string
-	ComposeFilePathInRepository string
+	// URL of a git repository where the file is stored
+	RepositoryURL string `example:"https://github.com/portainer/portainer-compose" validate:"required"`
+	// Path to the file inside the git repository
+	ComposeFilePathInRepository string `example:"./subfolder/docker-compose.yml" validate:"required"`
 }
 
 type fileResponse struct {
-	FileContent string
+	// The requested file content
+	FileContent string `example: "version:2"`
 }
 
 func (payload *filePayload) Validate(r *http.Request) error {
@@ -33,15 +36,18 @@ func (payload *filePayload) Validate(r *http.Request) error {
 	return nil
 }
 
+// @id TemplateFile
 // @summary Get a template's file
-// @description
+// @description Get a template's file
+// @description **Access policy**: restricted
 // @tags templates
 // @security jwt
 // @accept json
 // @produce json
-// @param body body filePayload true "File data"
-// @success 200 {object} fileResponse
-// @failure 400,500
+// @param body body filePayload true "File details"
+// @success 200 {object} fileResponse "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
 // @router /templates/file [post]
 func (handler *Handler) templateFile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload filePayload

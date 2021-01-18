@@ -11,15 +11,15 @@ import (
 	"github.com/portainer/portainer/api/internal/authorization"
 )
 
-// Gets a list of custom templates
-// @summary Gets a list of custom templates
-// @description
+// @id CustomTemplateList
+// @summary List available custom templates
+// @description List available custom templates.
+// @description **Access policy**: authenticated
 // @tags custom_templates
 // @security jwt
-// @accept json
 // @produce json
-// @success 200 {array} portainer.CustomTemplate
-// @failure 400,404,500
+// @success 200 {array} portainer.CustomTemplate "Success"
+// @failure 500 "Server error"
 // @router /custom_templates [get]
 func (handler *Handler) customTemplateList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	customTemplates, err := handler.DataStore.CustomTemplate().CustomTemplates()

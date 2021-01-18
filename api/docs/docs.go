@@ -134,8 +134,10 @@ var doc = `{
                         "jwt": []
                     }
                 ],
+                "description": "Create a custom template.\n**Access policy**: authenticated",
                 "consumes": [
-                    "application/json"
+                    "application/json",
+                    " multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -202,19 +204,18 @@ var doc = `{
                         "jwt": []
                     }
                 ],
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "List available custom templates.\n**Access policy**: authenticated",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "custom_templates"
                 ],
-                "summary": "Gets a list of custom templates",
+                "summary": "List available custom templates",
+                "operationId": "CustomTemplateList",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -222,14 +223,8 @@ var doc = `{
                             }
                         }
                     },
-                    "400": {
-                        "description": ""
-                    },
-                    "404": {
-                        "description": ""
-                    },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             },
@@ -239,6 +234,7 @@ var doc = `{
                         "jwt": []
                     }
                 ],
+                "description": "Retrieve details about a template.\n**Access policy**: authenticated",
                 "consumes": [
                     "application/json"
                 ],
@@ -249,6 +245,7 @@ var doc = `{
                     "custom_templates"
                 ],
                 "summary": "Create a custom template",
+                "operationId": "CustomTemplateCreate",
                 "parameters": [
                     {
                         "enum": [
@@ -271,20 +268,56 @@ var doc = `{
                         }
                     },
                     {
-                        "description": "Required when using method=file",
-                        "name": "body_file",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/customtemplates.customTemplateFromFileUploadPayload"
-                        }
-                    },
-                    {
                         "description": "Required when using method=repository",
                         "name": "body_repository",
                         "in": "body",
                         "schema": {
                             "$ref": "#/definitions/customtemplates.customTemplateFromGitRepositoryPayload"
                         }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Title of the template. required when method is file",
+                        "name": "Title",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Description of the template. required when method is file",
+                        "name": "Description",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "A note that will be displayed in the UI. Supports HTML content",
+                        "name": "Note",
+                        "in": "formData"
+                    },
+                    {
+                        "enum": [
+                            1,
+                            2
+                        ],
+                        "type": "integer",
+                        "description": "Platform associated to the template (1 - 'linux', 2 - 'windows'). required when method is file",
+                        "name": "Platform",
+                        "in": "formData"
+                    },
+                    {
+                        "enum": [
+                            1,
+                            2
+                        ],
+                        "type": "integer",
+                        "description": "Type of created stack (1 - swarm, 2 - compose), required when method is file",
+                        "name": "Type",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "required when method is file",
+                        "name": "file",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -295,13 +328,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": ""
-                    },
-                    "404": {
-                        "description": ""
+                        "description": "Invalid request"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             }
@@ -313,6 +343,7 @@ var doc = `{
                         "jwt": []
                     }
                 ],
+                "description": "Update a template.\n**Access policy**: authenticated",
                 "consumes": [
                     "application/json"
                 ],
@@ -322,11 +353,12 @@ var doc = `{
                 "tags": [
                     "custom_templates"
                 ],
-                "summary": "Gets a custom template",
+                "summary": "Inspect a custom template",
+                "operationId": "CustomTemplateInspect",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "template id",
+                        "type": "integer",
+                        "description": "Template identifier",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -334,19 +366,19 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success",
                         "schema": {
                             "$ref": "#/definitions/portainer.CustomTemplate"
                         }
                     },
                     "400": {
-                        "description": ""
+                        "description": "Invalid request"
                     },
                     "404": {
-                        "description": ""
+                        "description": "Template not found"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             },
@@ -365,17 +397,18 @@ var doc = `{
                 "tags": [
                     "custom_templates"
                 ],
-                "summary": "Updates a custom template",
+                "summary": "Update a template",
+                "operationId": "CustomTemplateUpdate",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "template id",
+                        "type": "integer",
+                        "description": "Template identifier",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Update data",
+                        "description": "Template details",
                         "name": "body",
                         "in": "body",
                         "required": true,
@@ -386,19 +419,22 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success",
                         "schema": {
                             "$ref": "#/definitions/portainer.CustomTemplate"
                         }
                     },
                     "400": {
-                        "description": ""
+                        "description": "Invalid request"
+                    },
+                    "403": {
+                        "description": "Permission denied to access template"
                     },
                     "404": {
-                        "description": ""
+                        "description": "Template not found"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             },
@@ -408,20 +444,16 @@ var doc = `{
                         "jwt": []
                     }
                 ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
+                "description": "Remove a template.\n**Access policy**: authorized",
                 "tags": [
                     "custom_templates"
                 ],
-                "summary": "Delete a custom template",
+                "summary": "Remove a template",
+                "operationId": "CustomTemplateDelete",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "template id",
+                        "type": "integer",
+                        "description": "Template identifier",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -429,16 +461,19 @@ var doc = `{
                 ],
                 "responses": {
                     "204": {
-                        "description": ""
+                        "description": "Success"
                     },
                     "400": {
-                        "description": ""
+                        "description": "Invalid request"
+                    },
+                    "403": {
+                        "description": "Access denied to resource"
                     },
                     "404": {
-                        "description": ""
+                        "description": "Template not found"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             }
@@ -450,20 +485,19 @@ var doc = `{
                         "jwt": []
                     }
                 ],
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "Retrieve the content of the Stack file for the specified custom template\n**Access policy**: authorized",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "custom_templates"
                 ],
-                "summary": "Gets a custom template's file",
+                "summary": "Get Template stack file content.",
+                "operationId": "CustomTemplateFile",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "template id",
+                        "type": "integer",
+                        "description": "Template identifier",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -471,19 +505,19 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success",
                         "schema": {
                             "$ref": "#/definitions/customtemplates.fileResponse"
                         }
                     },
                     "400": {
-                        "description": ""
+                        "description": "Invalid request"
                     },
                     "404": {
-                        "description": ""
+                        "description": "Custom template not found"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             }
@@ -4328,6 +4362,7 @@ var doc = `{
                         "jwt": []
                     }
                 ],
+                "description": "Get a template's file\n**Access policy**: restricted",
                 "consumes": [
                     "application/json"
                 ],
@@ -4376,25 +4411,24 @@ var doc = `{
                         "jwt": []
                     }
                 ],
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "List available templates.\n**Access policy**: restricted",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "templates"
                 ],
-                "summary": "List templates",
+                "summary": "List available templates",
+                "operationId": "TemplateList",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success",
                         "schema": {
                             "$ref": "#/definitions/templates.listResponse"
                         }
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             }
@@ -4416,9 +4450,10 @@ var doc = `{
                     "templates"
                 ],
                 "summary": "Get a template's file",
+                "operationId": "TemplateFile",
                 "parameters": [
                     {
-                        "description": "File data",
+                        "description": "File details",
                         "name": "body",
                         "in": "body",
                         "required": true,
@@ -4429,16 +4464,16 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success",
                         "schema": {
                             "$ref": "#/definitions/templates.fileResponse"
                         }
                     },
                     "400": {
-                        "description": ""
+                        "description": "Invalid request"
                     },
                     "500": {
-                        "description": ""
+                        "description": "Server error"
                     }
                 }
             }
@@ -5312,123 +5347,190 @@ var doc = `{
         },
         "customtemplates.customTemplateFromFileContentPayload": {
             "type": "object",
+            "required": [
+                "description",
+                "fileContent",
+                "platform",
+                "title",
+                "type"
+            ],
             "properties": {
                 "description": {
-                    "type": "string"
+                    "description": "Description of the template",
+                    "type": "string",
+                    "example": "High performance web server"
                 },
                 "fileContent": {
+                    "description": "Content of stack file",
                     "type": "string"
                 },
                 "logo": {
-                    "type": "string"
+                    "description": "URL of the template's logo",
+                    "type": "string",
+                    "example": "https://cloudinovasi.id/assets/img/logos/nginx.png"
                 },
                 "note": {
-                    "type": "string"
+                    "description": "A note that will be displayed in the UI. Supports HTML content",
+                    "type": "string",
+                    "example": "This is my \u003cb\u003ecustom\u003c/b\u003e template"
                 },
                 "platform": {
-                    "type": "integer"
+                    "description": "Platform associated to the template.\nValid values are: 1 - 'linux', 2 - 'windows'",
+                    "type": "integer",
+                    "enum": [
+                        1,
+                        2
+                    ],
+                    "example": 1
                 },
                 "title": {
-                    "type": "string"
+                    "description": "Title of the template",
+                    "type": "string",
+                    "example": "Nginx"
                 },
                 "type": {
-                    "type": "integer"
-                }
-            }
-        },
-        "customtemplates.customTemplateFromFileUploadPayload": {
-            "type": "object",
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "fileContent": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "logo": {
-                    "type": "string"
-                },
-                "note": {
-                    "type": "string"
-                },
-                "platform": {
-                    "type": "integer"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "integer"
+                    "description": "Type of created stack (1 - swarm, 2 - compose)",
+                    "type": "integer",
+                    "enum": [
+                        1,
+                        2
+                    ],
+                    "example": 1
                 }
             }
         },
         "customtemplates.customTemplateFromGitRepositoryPayload": {
             "type": "object",
+            "required": [
+                "description",
+                "platform",
+                "repositoryURL",
+                "title",
+                "type"
+            ],
             "properties": {
                 "composeFilePathInRepository": {
-                    "type": "string"
+                    "description": "Path to the Stack file inside the Git repository",
+                    "type": "string",
+                    "default": "docker-compose.yml",
+                    "example": "docker-compose.yml"
                 },
                 "description": {
-                    "type": "string"
+                    "description": "Description of the template",
+                    "type": "string",
+                    "example": "High performance web server"
                 },
                 "logo": {
-                    "type": "string"
+                    "description": "URL of the template's logo",
+                    "type": "string",
+                    "example": "https://cloudinovasi.id/assets/img/logos/nginx.png"
                 },
                 "note": {
-                    "type": "string"
+                    "description": "A note that will be displayed in the UI. Supports HTML content",
+                    "type": "string",
+                    "example": "This is my \u003cb\u003ecustom\u003c/b\u003e template"
                 },
                 "platform": {
-                    "type": "integer"
+                    "description": "Platform associated to the template.\nValid values are: 1 - 'linux', 2 - 'windows'",
+                    "type": "integer",
+                    "enum": [
+                        1,
+                        2
+                    ],
+                    "example": 1
                 },
                 "repositoryAuthentication": {
-                    "type": "boolean"
+                    "description": "Use basic authentication to clone the Git repository",
+                    "type": "boolean",
+                    "example": true
                 },
                 "repositoryPassword": {
-                    "type": "string"
+                    "description": "Password used in basic authentication. Required when RepositoryAuthentication is true.",
+                    "type": "string",
+                    "example": "myGitPassword"
                 },
                 "repositoryReferenceName": {
-                    "type": "string"
+                    "description": "Reference name of a Git repository hosting the Stack file",
+                    "type": "string",
+                    "example": "refs/heads/master"
                 },
                 "repositoryURL": {
-                    "type": "string"
+                    "description": "URL of a Git repository hosting the Stack file",
+                    "type": "string",
+                    "example": "https://github.com/openfaas/faas"
                 },
                 "repositoryUsername": {
-                    "type": "string"
+                    "description": "Username used in basic authentication. Required when RepositoryAuthentication is true.",
+                    "type": "string",
+                    "example": "myGitUsername"
                 },
                 "title": {
-                    "type": "string"
+                    "description": "Title of the template",
+                    "type": "string",
+                    "example": "Nginx"
                 },
                 "type": {
-                    "type": "integer"
+                    "description": "Type of created stack (1 - swarm, 2 - compose)",
+                    "type": "integer",
+                    "enum": [
+                        1,
+                        2
+                    ],
+                    "example": 1
                 }
             }
         },
         "customtemplates.customTemplateUpdatePayload": {
             "type": "object",
+            "required": [
+                "description",
+                "fileContent",
+                "platform",
+                "title",
+                "type"
+            ],
             "properties": {
                 "description": {
-                    "type": "string"
+                    "description": "Description of the template",
+                    "type": "string",
+                    "example": "High performance web server"
                 },
                 "fileContent": {
+                    "description": "Content of stack file",
                     "type": "string"
                 },
                 "logo": {
-                    "type": "string"
+                    "description": "URL of the template's logo",
+                    "type": "string",
+                    "example": "https://cloudinovasi.id/assets/img/logos/nginx.png"
                 },
                 "note": {
-                    "type": "string"
+                    "description": "A note that will be displayed in the UI. Supports HTML content",
+                    "type": "string",
+                    "example": "This is my \u003cb\u003ecustom\u003c/b\u003e template"
                 },
                 "platform": {
-                    "type": "integer"
+                    "description": "Platform associated to the template.\nValid values are: 1 - 'linux', 2 - 'windows'",
+                    "type": "integer",
+                    "enum": [
+                        1,
+                        2
+                    ],
+                    "example": 1
                 },
                 "title": {
-                    "type": "string"
+                    "description": "Title of the template",
+                    "type": "string",
+                    "example": "Nginx"
                 },
                 "type": {
-                    "type": "integer"
+                    "description": "Type of created stack (1 - swarm, 2 - compose)",
+                    "type": "integer",
+                    "enum": [
+                        1,
+                        2
+                    ],
+                    "example": 1
                 }
             }
         },
@@ -6110,13 +6212,19 @@ var doc = `{
             "type": "object",
             "properties": {
                 "CreatedByUserId": {
-                    "type": "integer"
+                    "description": "User identifier who created this template",
+                    "type": "integer",
+                    "example": 3
                 },
                 "Description": {
-                    "type": "string"
+                    "description": "Description of the template",
+                    "type": "string",
+                    "example": "High performance web server"
                 },
                 "EntryPoint": {
-                    "type": "string"
+                    "description": "Path to the Stack file",
+                    "type": "string",
+                    "example": "docker-compose.yml"
                 },
                 "Id": {
                     "description": "CustomTemplate Identifier",
@@ -6124,25 +6232,41 @@ var doc = `{
                     "example": 1
                 },
                 "Logo": {
-                    "type": "string"
+                    "description": "URL of the template's logo",
+                    "type": "string",
+                    "example": "https://cloudinovasi.id/assets/img/logos/nginx.png"
                 },
                 "Note": {
-                    "type": "string"
+                    "description": "A note that will be displayed in the UI. Supports HTML content",
+                    "type": "string",
+                    "example": "This is my \u003cb\u003ecustom\u003c/b\u003e template"
                 },
                 "Platform": {
-                    "type": "integer"
+                    "description": "Platform associated to the template.\nValid values are: 1 - 'linux', 2 - 'windows'",
+                    "type": "integer",
+                    "enum": [
+                        1,
+                        2
+                    ],
+                    "example": 1
                 },
                 "ProjectPath": {
-                    "type": "string"
+                    "description": "Path on disk to the repository hosting the Stack file",
+                    "type": "string",
+                    "example": "/data/custom_template/3"
                 },
                 "ResourceControl": {
                     "$ref": "#/definitions/portainer.ResourceControl"
                 },
                 "Title": {
-                    "type": "string"
+                    "description": "Title of the template",
+                    "type": "string",
+                    "example": "Nginx"
                 },
                 "Type": {
-                    "type": "integer"
+                    "description": "Type of created stack (1 - swarm, 2 - compose)",
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -6383,7 +6507,7 @@ var doc = `{
                     "description": "Deprecated in DBVersion == 18",
                     "type": "array",
                     "items": {
-                        "description": "User identifier",
+                        "description": "User Identifier",
                         "type": "integer",
                         "example": 1
                     }
@@ -6537,7 +6661,7 @@ var doc = `{
                     "description": "Deprecated in DBVersion == 18",
                     "type": "array",
                     "items": {
-                        "description": "User identifier",
+                        "description": "User Identifier",
                         "type": "integer",
                         "example": 1
                     }
@@ -6885,7 +7009,7 @@ var doc = `{
                     "description": "Deprecated fields\nDeprecated in DBVersion == 18",
                     "type": "array",
                     "items": {
-                        "description": "User identifier",
+                        "description": "User Identifier",
                         "type": "integer",
                         "example": 1
                     }
@@ -8115,12 +8239,20 @@ var doc = `{
         },
         "templates.filePayload": {
             "type": "object",
+            "required": [
+                "composeFilePathInRepository",
+                "repositoryURL"
+            ],
             "properties": {
                 "composeFilePathInRepository": {
-                    "type": "string"
+                    "description": "Path to the file inside the git repository",
+                    "type": "string",
+                    "example": "./subfolder/docker-compose.yml"
                 },
                 "repositoryURL": {
-                    "type": "string"
+                    "description": "URL of a git repository where the file is stored",
+                    "type": "string",
+                    "example": "https://github.com/portainer/portainer-compose"
                 }
             }
         },
@@ -8128,6 +8260,7 @@ var doc = `{
             "type": "object",
             "properties": {
                 "fileContent": {
+                    "description": "The requested file content",
                     "type": "string"
                 }
             }

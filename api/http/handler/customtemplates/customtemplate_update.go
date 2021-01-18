@@ -17,13 +17,21 @@ import (
 )
 
 type customTemplateUpdatePayload struct {
-	Logo        string
-	Title       string
-	Description string
-	Note        string
-	Platform    portainer.CustomTemplatePlatform
-	Type        portainer.StackType
-	FileContent string
+	// URL of the template's logo
+	Logo string `example:"https://cloudinovasi.id/assets/img/logos/nginx.png"`
+	// Title of the template
+	Title string `example:"Nginx" validate:"required"`
+	// Description of the template
+	Description string `example:"High performance web server" validate:"required"`
+	// A note that will be displayed in the UI. Supports HTML content
+	Note string `example:"This is my <b>custom</b> template"`
+	// Platform associated to the template.
+	// Valid values are: 1 - 'linux', 2 - 'windows'
+	Platform portainer.CustomTemplatePlatform `example:"1" enums:"1,2" validate:"required"`
+	// Type of created stack (1 - swarm, 2 - compose)
+	Type portainer.StackType `example:"1" enums:"1,2" validate:"required"`
+	// Content of stack file
+	FileContent string `validate:"required"`
 }
 
 func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
@@ -45,17 +53,21 @@ func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// Updates a custom template
-// @summary Updates a custom template
-// @description
+// @id CustomTemplateUpdate
+// @summary Update a template
+// @description Update a template.
+// @description **Access policy**: authenticated
 // @tags custom_templates
 // @security jwt
 // @accept json
 // @produce json
-// @param id path string true "template id"
-// @param body body customTemplateUpdatePayload true "Update data"
-// @success 200 {object} portainer.CustomTemplate
-// @failure 400,404,500
+// @param id path int true "Template identifier"
+// @param body body customTemplateUpdatePayload true "Template details"
+// @success 200 {object} portainer.CustomTemplate "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied to access template"
+// @failure 404 "Template not found"
+// @failure 500 "Server error"
 // @router /custom_templates/{id} [put]
 func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	customTemplateID, err := request.RetrieveNumericRouteVariableValue(r, "id")

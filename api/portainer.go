@@ -64,17 +64,27 @@ type (
 	// CustomTemplate represents a custom template
 	CustomTemplate struct {
 		// CustomTemplate Identifier
-		ID              CustomTemplateID       `json:"Id" example:"1"`
-		Title           string                 `json:"Title"`
-		Description     string                 `json:"Description"`
-		ProjectPath     string                 `json:"ProjectPath"`
-		EntryPoint      string                 `json:"EntryPoint"`
-		CreatedByUserID UserID                 `json:"CreatedByUserId"`
-		Note            string                 `json:"Note"`
-		Platform        CustomTemplatePlatform `json:"Platform"`
-		Logo            string                 `json:"Logo"`
-		Type            StackType              `json:"Type"`
-		ResourceControl *ResourceControl       `json:"ResourceControl"`
+		ID CustomTemplateID `json:"Id" example:"1"`
+		// Title of the template
+		Title string `json:"Title" example:"Nginx"`
+		// Description of the template
+		Description string `json:"Description" example:"High performance web server"`
+		// Path on disk to the repository hosting the Stack file
+		ProjectPath string `json:"ProjectPath" example:"/data/custom_template/3"`
+		// Path to the Stack file
+		EntryPoint string `json:"EntryPoint" example:"docker-compose.yml"`
+		// User identifier who created this template
+		CreatedByUserID UserID `json:"CreatedByUserId" example:"3"`
+		// A note that will be displayed in the UI. Supports HTML content
+		Note string `json:"Note" example:"This is my <b>custom</b> template"`
+		// Platform associated to the template.
+		// Valid values are: 1 - 'linux', 2 - 'windows'
+		Platform CustomTemplatePlatform `json:"Platform" example:"1" enums:"1,2"`
+		// URL of the template's logo
+		Logo string `json:"Logo" example:"https://cloudinovasi.id/assets/img/logos/nginx.png"`
+		// Type of created stack (1 - swarm, 2 - compose)
+		Type            StackType        `json:"Type" example:"1"`
+		ResourceControl *ResourceControl `json:"ResourceControl"`
 	}
 
 	// CustomTemplateID represents a custom template identifier
@@ -759,7 +769,7 @@ type (
 		Image string `json:"image" example:"nginx:latest"`
 
 		// Mandatory stack fields
-		Repository TemplateRepository `json:"repository" example:""`
+		Repository TemplateRepository `json:"repository"`
 
 		// Mandatory Edge stack fields
 		// Stack file used for this template

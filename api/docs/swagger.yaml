@@ -30,82 +30,158 @@ definitions:
   customtemplates.customTemplateFromFileContentPayload:
     properties:
       description:
+        description: Description of the template
+        example: High performance web server
         type: string
       fileContent:
+        description: Content of stack file
         type: string
       logo:
+        description: URL of the template's logo
+        example: https://cloudinovasi.id/assets/img/logos/nginx.png
         type: string
       note:
+        description: A note that will be displayed in the UI. Supports HTML content
+        example: This is my <b>custom</b> template
         type: string
       platform:
+        description: |-
+          Platform associated to the template.
+          Valid values are: 1 - 'linux', 2 - 'windows'
+        enum:
+        - 1
+        - 2
+        example: 1
         type: integer
       title:
+        description: Title of the template
+        example: Nginx
         type: string
       type:
+        description: Type of created stack (1 - swarm, 2 - compose)
+        enum:
+        - 1
+        - 2
+        example: 1
         type: integer
-    type: object
-  customtemplates.customTemplateFromFileUploadPayload:
-    properties:
-      description:
-        type: string
-      fileContent:
-        items:
-          type: integer
-        type: array
-      logo:
-        type: string
-      note:
-        type: string
-      platform:
-        type: integer
-      title:
-        type: string
-      type:
-        type: integer
+    required:
+    - description
+    - fileContent
+    - platform
+    - title
+    - type
     type: object
   customtemplates.customTemplateFromGitRepositoryPayload:
     properties:
       composeFilePathInRepository:
+        default: docker-compose.yml
+        description: Path to the Stack file inside the Git repository
+        example: docker-compose.yml
         type: string
       description:
+        description: Description of the template
+        example: High performance web server
         type: string
       logo:
+        description: URL of the template's logo
+        example: https://cloudinovasi.id/assets/img/logos/nginx.png
         type: string
       note:
+        description: A note that will be displayed in the UI. Supports HTML content
+        example: This is my <b>custom</b> template
         type: string
       platform:
+        description: |-
+          Platform associated to the template.
+          Valid values are: 1 - 'linux', 2 - 'windows'
+        enum:
+        - 1
+        - 2
+        example: 1
         type: integer
       repositoryAuthentication:
+        description: Use basic authentication to clone the Git repository
+        example: true
         type: boolean
       repositoryPassword:
+        description: Password used in basic authentication. Required when RepositoryAuthentication
+          is true.
+        example: myGitPassword
         type: string
       repositoryReferenceName:
+        description: Reference name of a Git repository hosting the Stack file
+        example: refs/heads/master
         type: string
       repositoryURL:
+        description: URL of a Git repository hosting the Stack file
+        example: https://github.com/openfaas/faas
         type: string
       repositoryUsername:
+        description: Username used in basic authentication. Required when RepositoryAuthentication
+          is true.
+        example: myGitUsername
         type: string
       title:
+        description: Title of the template
+        example: Nginx
         type: string
       type:
+        description: Type of created stack (1 - swarm, 2 - compose)
+        enum:
+        - 1
+        - 2
+        example: 1
         type: integer
+    required:
+    - description
+    - platform
+    - repositoryURL
+    - title
+    - type
     type: object
   customtemplates.customTemplateUpdatePayload:
     properties:
       description:
+        description: Description of the template
+        example: High performance web server
         type: string
       fileContent:
+        description: Content of stack file
         type: string
       logo:
+        description: URL of the template's logo
+        example: https://cloudinovasi.id/assets/img/logos/nginx.png
         type: string
       note:
+        description: A note that will be displayed in the UI. Supports HTML content
+        example: This is my <b>custom</b> template
         type: string
       platform:
+        description: |-
+          Platform associated to the template.
+          Valid values are: 1 - 'linux', 2 - 'windows'
+        enum:
+        - 1
+        - 2
+        example: 1
         type: integer
       title:
+        description: Title of the template
+        example: Nginx
         type: string
       type:
+        description: Type of created stack (1 - swarm, 2 - compose)
+        enum:
+        - 1
+        - 2
+        example: 1
         type: integer
+    required:
+    - description
+    - fileContent
+    - platform
+    - title
+    - type
     type: object
   customtemplates.fileResponse:
     properties:
@@ -593,28 +669,51 @@ definitions:
   portainer.CustomTemplate:
     properties:
       CreatedByUserId:
+        description: User identifier who created this template
+        example: 3
         type: integer
       Description:
+        description: Description of the template
+        example: High performance web server
         type: string
       EntryPoint:
+        description: Path to the Stack file
+        example: docker-compose.yml
         type: string
       Id:
         description: CustomTemplate Identifier
         example: 1
         type: integer
       Logo:
+        description: URL of the template's logo
+        example: https://cloudinovasi.id/assets/img/logos/nginx.png
         type: string
       Note:
+        description: A note that will be displayed in the UI. Supports HTML content
+        example: This is my <b>custom</b> template
         type: string
       Platform:
+        description: |-
+          Platform associated to the template.
+          Valid values are: 1 - 'linux', 2 - 'windows'
+        enum:
+        - 1
+        - 2
+        example: 1
         type: integer
       ProjectPath:
+        description: Path on disk to the repository hosting the Stack file
+        example: /data/custom_template/3
         type: string
       ResourceControl:
         $ref: '#/definitions/portainer.ResourceControl'
       Title:
+        description: Title of the template
+        example: Nginx
         type: string
       Type:
+        description: Type of created stack (1 - swarm, 2 - compose)
+        example: 1
         type: integer
     type: object
   portainer.DockerHub:
@@ -778,7 +877,7 @@ definitions:
       AuthorizedUsers:
         description: Deprecated in DBVersion == 18
         items:
-          description: User identifier
+          description: User Identifier
           example: 1
           type: integer
         type: array
@@ -894,7 +993,7 @@ definitions:
       AuthorizedUsers:
         description: Deprecated in DBVersion == 18
         items:
-          description: User identifier
+          description: User Identifier
           example: 1
           type: integer
         type: array
@@ -1147,7 +1246,7 @@ definitions:
           Deprecated fields
           Deprecated in DBVersion == 18
         items:
-          description: User identifier
+          description: User Identifier
           example: 1
           type: integer
         type: array
@@ -2091,13 +2190,21 @@ definitions:
   templates.filePayload:
     properties:
       composeFilePathInRepository:
+        description: Path to the file inside the git repository
+        example: ./subfolder/docker-compose.yml
         type: string
       repositoryURL:
+        description: URL of a git repository where the file is stored
+        example: https://github.com/portainer/portainer-compose
         type: string
+    required:
+    - composeFilePathInRepository
+    - repositoryURL
     type: object
   templates.fileResponse:
     properties:
       fileContent:
+        description: The requested file content
         type: string
     type: object
   templates.listResponse:
@@ -2324,31 +2431,34 @@ paths:
       - auth
   /custom_templates:
     get:
-      consumes:
-      - application/json
+      description: |-
+        List available custom templates.
+        **Access policy**: authenticated
+      operationId: CustomTemplateList
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success
           schema:
             items:
               $ref: '#/definitions/portainer.CustomTemplate'
             type: array
-        "400":
-          description: ""
-        "404":
-          description: ""
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Gets a list of custom templates
+      summary: List available custom templates
       tags:
       - custom_templates
     post:
       consumes:
       - application/json
+      - ' multipart/form-data'
+      description: |-
+        Create a custom template.
+        **Access policy**: authenticated
+      operationId: CustomTemplateCreate
       parameters:
       - description: method for creating template
         enum:
@@ -2364,16 +2474,43 @@ paths:
         name: body_string
         schema:
           $ref: '#/definitions/customtemplates.customTemplateFromFileContentPayload'
-      - description: Required when using method=file
-        in: body
-        name: body_file
-        schema:
-          $ref: '#/definitions/customtemplates.customTemplateFromFileUploadPayload'
       - description: Required when using method=repository
         in: body
         name: body_repository
         schema:
           $ref: '#/definitions/customtemplates.customTemplateFromGitRepositoryPayload'
+      - description: Title of the template. required when method is file
+        in: formData
+        name: Title
+        type: string
+      - description: Description of the template. required when method is file
+        in: formData
+        name: Description
+        type: string
+      - description: A note that will be displayed in the UI. Supports HTML content
+        in: formData
+        name: Note
+        type: string
+      - description: Platform associated to the template (1 - 'linux', 2 - 'windows').
+          required when method is file
+        enum:
+        - 1
+        - 2
+        in: formData
+        name: Platform
+        type: integer
+      - description: Type of created stack (1 - swarm, 2 - compose), required when
+          method is file
+        enum:
+        - 1
+        - 2
+        in: formData
+        name: Type
+        type: integer
+      - description: required when method is file
+        in: formData
+        name: file
+        type: file
       produces:
       - application/json
       responses:
@@ -2382,11 +2519,9 @@ paths:
           schema:
             $ref: '#/definitions/portainer.CustomTemplate'
         "400":
-          description: ""
-        "404":
-          description: ""
+          description: Invalid request
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
       summary: Create a custom template
@@ -2394,67 +2529,77 @@ paths:
       - custom_templates
   /custom_templates/{id}:
     delete:
-      consumes:
-      - application/json
+      description: |-
+        Remove a template.
+        **Access policy**: authorized
+      operationId: CustomTemplateDelete
       parameters:
-      - description: template id
+      - description: Template identifier
         in: path
         name: id
         required: true
-        type: string
-      produces:
-      - application/json
+        type: integer
       responses:
         "204":
-          description: ""
+          description: Success
         "400":
-          description: ""
+          description: Invalid request
+        "403":
+          description: Access denied to resource
         "404":
-          description: ""
+          description: Template not found
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Delete a custom template
+      summary: Remove a template
       tags:
       - custom_templates
     get:
       consumes:
       - application/json
+      description: |-
+        Retrieve details about a template.
+        **Access policy**: authenticated
+      operationId: CustomTemplateInspect
       parameters:
-      - description: template id
+      - description: Template identifier
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success
           schema:
             $ref: '#/definitions/portainer.CustomTemplate'
         "400":
-          description: ""
+          description: Invalid request
         "404":
-          description: ""
+          description: Template not found
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Gets a custom template
+      summary: Inspect a custom template
       tags:
       - custom_templates
     put:
       consumes:
       - application/json
+      description: |-
+        Update a template.
+        **Access policy**: authenticated
+      operationId: CustomTemplateUpdate
       parameters:
-      - description: template id
+      - description: Template identifier
         in: path
         name: id
         required: true
-        type: string
-      - description: Update data
+        type: integer
+      - description: Template details
         in: body
         name: body
         required: true
@@ -2464,46 +2609,50 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success
           schema:
             $ref: '#/definitions/portainer.CustomTemplate'
         "400":
-          description: ""
+          description: Invalid request
+        "403":
+          description: Permission denied to access template
         "404":
-          description: ""
+          description: Template not found
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Updates a custom template
+      summary: Update a template
       tags:
       - custom_templates
   /custom_templates/{id}/file:
     get:
-      consumes:
-      - application/json
+      description: |-
+        Retrieve the content of the Stack file for the specified custom template
+        **Access policy**: authorized
+      operationId: CustomTemplateFile
       parameters:
-      - description: template id
+      - description: Template identifier
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success
           schema:
             $ref: '#/definitions/customtemplates.fileResponse'
         "400":
-          description: ""
+          description: Invalid request
         "404":
-          description: ""
+          description: Custom template not found
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Gets a custom template's file
+      summary: Get Template stack file content.
       tags:
       - custom_templates
   /dockerhub:
@@ -5049,28 +5198,34 @@ paths:
       - teams
   /templates:
     get:
-      consumes:
-      - application/json
+      description: |-
+        List available templates.
+        **Access policy**: restricted
+      operationId: TemplateList
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success
           schema:
             $ref: '#/definitions/templates.listResponse'
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: List templates
+      summary: List available templates
       tags:
       - templates
   /templates/file:
     post:
       consumes:
       - application/json
+      description: |-
+        Get a template's file
+        **Access policy**: restricted
+      operationId: TemplateFile
       parameters:
-      - description: File data
+      - description: File details
         in: body
         name: body
         required: true
@@ -5080,13 +5235,13 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success
           schema:
             $ref: '#/definitions/templates.fileResponse'
         "400":
-          description: ""
+          description: Invalid request
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
       summary: Get a template's file

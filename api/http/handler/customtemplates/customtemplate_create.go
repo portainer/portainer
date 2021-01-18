@@ -15,19 +15,26 @@ import (
 	"github.com/portainer/portainer/api/internal/authorization"
 )
 
-// Create a custom template
+// @id CustomTemplateCreate
 // @summary Create a custom template
-// @description
+// @description Create a custom template.
+// @description **Access policy**: authenticated
 // @tags custom_templates
 // @security jwt
-// @accept json
+// @accept json, multipart/form-data
 // @produce json
 // @param method query string true "method for creating template" Enums(string, file, repository)
 // @param body_string body customTemplateFromFileContentPayload false "Required when using method=string"
-// @param body_file body customTemplateFromFileUploadPayload false "Required when using method=file"
 // @param body_repository body customTemplateFromGitRepositoryPayload false "Required when using method=repository"
+// @param Title formData string false "Title of the template. required when method is file"
+// @param Description formData string false "Description of the template. required when method is file"
+// @param Note formData string false "A note that will be displayed in the UI. Supports HTML content"
+// @param Platform formData int false "Platform associated to the template (1 - 'linux', 2 - 'windows'). required when method is file" Enums(1,2)
+// @param Type formData int false "Type of created stack (1 - swarm, 2 - compose), required when method is file" Enums(1,2)
+// @param file formData file false "required when method is file"
 // @success 200 {object} portainer.CustomTemplate
-// @failure 400,404,500
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
 // @router /custom_templates [post]
 func (handler *Handler) customTemplateCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	method, err := request.RetrieveQueryParameter(r, "method", false)
@@ -88,13 +95,21 @@ func (handler *Handler) createCustomTemplate(method string, r *http.Request) (*p
 }
 
 type customTemplateFromFileContentPayload struct {
-	Logo        string
-	Title       string
-	FileContent string
-	Description string
-	Note        string
-	Platform    portainer.CustomTemplatePlatform
-	Type        portainer.StackType
+	// URL of the template's logo
+	Logo string `example:"https://cloudinovasi.id/assets/img/logos/nginx.png"`
+	// Title of the template
+	Title string `example:"Nginx" validate:"required"`
+	// Description of the template
+	Description string `example:"High performance web server" validate:"required"`
+	// A note that will be displayed in the UI. Supports HTML content
+	Note string `example:"This is my <b>custom</b> template"`
+	// Platform associated to the template.
+	// Valid values are: 1 - 'linux', 2 - 'windows'
+	Platform portainer.CustomTemplatePlatform `example:"1" enums:"1,2" validate:"required"`
+	// Type of created stack (1 - swarm, 2 - compose)
+	Type portainer.StackType `example:"1" enums:"1,2" validate:"required"`
+	// Content of stack file
+	FileContent string `validate:"required"`
 }
 
 func (payload *customTemplateFromFileContentPayload) Validate(r *http.Request) error {
@@ -146,18 +161,32 @@ func (handler *Handler) createCustomTemplateFromFileContent(r *http.Request) (*p
 }
 
 type customTemplateFromGitRepositoryPayload struct {
-	Logo                        string
-	Title                       string
-	Description                 string
-	Note                        string
-	Platform                    portainer.CustomTemplatePlatform
-	Type                        portainer.StackType
-	RepositoryURL               string
-	RepositoryReferenceName     string
-	RepositoryAuthentication    bool
-	RepositoryUsername          string
-	RepositoryPassword          string
-	ComposeFilePathInRepository string
+	// URL of the template's logo
+	Logo string `example:"https://cloudinovasi.id/assets/img/logos/nginx.png"`
+	// Title of the template
+	Title string `example:"Nginx" validate:"required"`
+	// Description of the template
+	Description string `example:"High performance web server" validate:"required"`
+	// A note that will be displayed in the UI. Supports HTML content
+	Note string `example:"This is my <b>custom</b> template"`
+	// Platform associated to the template.
+	// Valid values are: 1 - 'linux', 2 - 'windows'
+	Platform portainer.CustomTemplatePlatform `example:"1" enums:"1,2" validate:"required"`
+	// Type of created stack (1 - swarm, 2 - compose)
+	Type portainer.StackType `example:"1" enums:"1,2" validate:"required"`
+
+	// URL of a Git repository hosting the Stack file
+	RepositoryURL string `example:"https://github.com/openfaas/faas" validate:"required"`
+	// Reference name of a Git repository hosting the Stack file
+	RepositoryReferenceName string `example:"refs/heads/master"`
+	// Use basic authentication to clone the Git repository
+	RepositoryAuthentication bool `example:"true"`
+	// Username used in basic authentication. Required when RepositoryAuthentication is true.
+	RepositoryUsername string `example:"myGitUsername"`
+	// Password used in basic authentication. Required when RepositoryAuthentication is true.
+	RepositoryPassword string `example:"myGitPassword"`
+	// Path to the Stack file inside the Git repository
+	ComposeFilePathInRepository string `example:"docker-compose.yml" default:"docker-compose.yml"`
 }
 
 func (payload *customTemplateFromGitRepositoryPayload) Validate(r *http.Request) error {
