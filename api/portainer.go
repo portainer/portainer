@@ -779,6 +779,7 @@ type (
 
 	// ComposeStackManager represents a service to manage Compose stacks
 	ComposeStackManager interface {
+		ComposeSyntaxMaxVersion() string
 		Up(stack *Stack, endpoint *Endpoint) error
 		Down(stack *Stack, endpoint *Endpoint) error
 	}

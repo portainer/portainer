@@ -27,6 +27,7 @@ type Handler struct {
 	ProxyManager         *proxy.Manager
 	ReverseTunnelService portainer.ReverseTunnelService
 	SnapshotService      portainer.SnapshotService
+	ComposeStackManager  portainer.ComposeStackManager
 }
 
 // NewHandler creates a handler to manage endpoint operations.

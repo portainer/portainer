@@ -30,7 +30,7 @@ func (handler *Handler) endpointInspect(w http.ResponseWriter, r *http.Request) 
 	}
 
 	hideFields(endpoint)
-	endpoint.ComposeSyntaxMaxVersion = portainer.ComposeSyntaxMaxVersion
+	endpoint.ComposeSyntaxMaxVersion = handler.ComposeStackManager.ComposeSyntaxMaxVersion()
 
 	return response.JSON(w, endpoint)
 }

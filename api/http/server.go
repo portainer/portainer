@@ -121,6 +121,7 @@ func (server *Server) Start() error {
 	endpointHandler.ProxyManager = server.ProxyManager
 	endpointHandler.SnapshotService = server.SnapshotService
 	endpointHandler.ReverseTunnelService = server.ReverseTunnelService
+	endpointHandler.ComposeStackManager = server.ComposeStackManager
 
 	var endpointEdgeHandler = endpointedge.NewHandler(requestBouncer)
 	endpointEdgeHandler.DataStore = server.DataStore
