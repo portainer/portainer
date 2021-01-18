@@ -190,24 +190,25 @@ type (
 	// Endpoint represents a Docker endpoint with all the info required
 	// to connect to it
 	Endpoint struct {
-		ID                  EndpointID          `json:"Id"`
-		Name                string              `json:"Name"`
-		Type                EndpointType        `json:"Type"`
-		URL                 string              `json:"URL"`
-		GroupID             EndpointGroupID     `json:"GroupId"`
-		PublicURL           string              `json:"PublicURL"`
-		TLSConfig           TLSConfiguration    `json:"TLSConfig"`
-		Extensions          []EndpointExtension `json:"Extensions"`
-		AzureCredentials    AzureCredentials    `json:"AzureCredentials,omitempty"`
-		TagIDs              []TagID             `json:"TagIds"`
-		Status              EndpointStatus      `json:"Status"`
-		Snapshots           []DockerSnapshot    `json:"Snapshots"`
-		UserAccessPolicies  UserAccessPolicies  `json:"UserAccessPolicies"`
-		TeamAccessPolicies  TeamAccessPolicies  `json:"TeamAccessPolicies"`
-		EdgeID              string              `json:"EdgeID,omitempty"`
-		EdgeKey             string              `json:"EdgeKey"`
-		EdgeCheckinInterval int                 `json:"EdgeCheckinInterval"`
-		Kubernetes          KubernetesData      `json:"Kubernetes"`
+		ID                      EndpointID          `json:"Id"`
+		Name                    string              `json:"Name"`
+		Type                    EndpointType        `json:"Type"`
+		URL                     string              `json:"URL"`
+		GroupID                 EndpointGroupID     `json:"GroupId"`
+		PublicURL               string              `json:"PublicURL"`
+		TLSConfig               TLSConfiguration    `json:"TLSConfig"`
+		Extensions              []EndpointExtension `json:"Extensions"`
+		AzureCredentials        AzureCredentials    `json:"AzureCredentials,omitempty"`
+		TagIDs                  []TagID             `json:"TagIds"`
+		Status                  EndpointStatus      `json:"Status"`
+		Snapshots               []DockerSnapshot    `json:"Snapshots"`
+		UserAccessPolicies      UserAccessPolicies  `json:"UserAccessPolicies"`
+		TeamAccessPolicies      TeamAccessPolicies  `json:"TeamAccessPolicies"`
+		EdgeID                  string              `json:"EdgeID,omitempty"`
+		EdgeKey                 string              `json:"EdgeKey"`
+		EdgeCheckinInterval     int                 `json:"EdgeCheckinInterval"`
+		Kubernetes              KubernetesData      `json:"Kubernetes"`
+		ComposeSyntaxMaxVersion string              `json:"ComposeSyntaxMaxVersion"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
@@ -1122,6 +1123,8 @@ const (
 	APIVersion = "2.0.1"
 	// DBVersion is the version number of the Portainer database
 	DBVersion = 25
+	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
+	ComposeSyntaxMaxVersion = "3.8"
 	// AssetsServerURL represents the URL of the Portainer asset server
 	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
