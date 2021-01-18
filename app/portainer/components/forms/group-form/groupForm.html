@@ -27,24 +27,13 @@
   </div>
   <!-- tags -->
   <div class="form-group">
-    <label for="group_name" class="col-sm-3 col-lg-2 control-label text-left">Tags</label>
-    <div>
-      <span
-        isteven-multi-select
-        ng-if="$ctrl.model && $ctrl.availableTags"
-        input-model="$ctrl.availableTags"
-        output-model="$ctrl.model.TagIds"
-        button-label="Name"
-        item-label="Name"
-        tick-property="ticked"
-        helper-elements="filter"
-        search-property="Name"
-        translation="{nothingSelected: 'Select tags...', search: 'Search...'}"
-        style="margin-left: 10px;"
-        max-height="300px"
-      >
-      </span>
-    </div>
+    <tag-selector
+      ng-if="$ctrl.model && $ctrl.availableTags"
+      tags="$ctrl.availableTags"
+      model="$ctrl.model.TagIds"
+      allow-create="$ctrl.state.allowCreateTag"
+      on-create="($ctrl.onCreateTag)"
+    ></tag-selector>
   </div>
   <!-- !tags -->
   <!-- endpoints -->
