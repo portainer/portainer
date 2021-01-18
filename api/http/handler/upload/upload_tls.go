@@ -10,18 +10,20 @@ import (
 	"github.com/portainer/portainer/api/filesystem"
 )
 
-// UploadTLS godoc
-// @summary Upload TLS file
-// @description
+// @id UploadTLS
+// @summary Upload TLS files
+// @description Use this endpoint to upload TLS files.
+// @description **Access policy**: administrator
 // @tags upload
 // @security jwt
-// @accept  multipart/form-data
-// @produce  json
-// @param certificate path string true "certificate type" Enums(ca,cert,key)
-// @param folder query string true "folder name"
-// @param file formData file true "file"
-// @success 204
-// @failure 400,500
+// @accept multipart/form-data
+// @produce json
+// @param certificate path string true "TLS file type. Valid values are 'ca', 'cert' or 'key'." Enums(ca,cert,key)
+// @param folder formData string true "Folder where the TLS file will be stored. Will be created if not existing"
+// @param file formData file true "The file to upload"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
 // @router /upload/tls/{certificate} [post]
 func (handler *Handler) uploadTLS(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	certificate, err := request.RetrieveRouteVariableValue(r, "certificate")

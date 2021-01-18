@@ -5066,8 +5066,12 @@ paths:
     post:
       consumes:
       - multipart/form-data
+      description: |-
+        Use this endpoint to upload TLS files.
+        **Access policy**: administrator
+      operationId: UploadTLS
       parameters:
-      - description: certificate type
+      - description: TLS file type. Valid values are 'ca', 'cert' or 'key'.
         enum:
         - ca
         - cert
@@ -5076,12 +5080,13 @@ paths:
         name: certificate
         required: true
         type: string
-      - description: folder name
-        in: query
+      - description: Folder where the TLS file will be stored. Will be created if
+          not existing
+        in: formData
         name: folder
         required: true
         type: string
-      - description: file
+      - description: The file to upload
         in: formData
         name: file
         required: true
@@ -5090,14 +5095,14 @@ paths:
       - application/json
       responses:
         "204":
-          description: ""
+          description: Success
         "400":
-          description: ""
+          description: Invalid request
         "500":
-          description: ""
+          description: Server error
       security:
       - jwt: []
-      summary: Upload TLS file
+      summary: Upload TLS files
       tags:
       - upload
   /users:
