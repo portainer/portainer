@@ -4,26 +4,32 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"log"
+	"net"
+	"net/http"
 	"os"
 	"os/exec"
 	"path"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/proxy"
 )
 
 // ComposeWrapper is a wrapper for docker-compose binary
 type ComposeWrapper struct {
-	binaryPath string
+	binaryPath   string
+	proxyManager proxy.Manager
 }
 
 // NewComposeWrapper returns a docker-compose wrapper if corresponding binary present, otherwise nil
-func NewComposeWrapper(binaryPath string) *ComposeWrapper {
+func NewComposeWrapper(binaryPath string, proxyManager proxy.Manager) *ComposeWrapper {
 	if !IsBinaryPresent(programPath(binaryPath, "docker-compose")) {
 		return nil
 	}
 
 	return &ComposeWrapper{
-		binaryPath: binaryPath,
+		binaryPath:   binaryPath,
+		proxyManager: proxyManager,
 	}
 }
 
@@ -43,12 +49,51 @@ func (w *ComposeWrapper) command(command []string, stack *portainer.Stack, endpo
 	program := programPath(w.binaryPath, "docker-compose")
 
 	options := setComposeFile(stack)
-	options = addConnectionOptions(options, endpoint)
+
 	options = addProjectNameOption(options, stack)
 	options, err := addEnvFileOption(options, stack)
 	if err != nil {
 		return nil, err
 	}
+
+	if endpoint != nil {
+
+		if endpoint.URL != "" {
+			proxy, err := w.proxyManager.CreateAndRegisterEndpointProxy(endpoint)
+
+			listener, err := net.Listen("tcp", ":0")
+			if err != nil {
+				return nil, err
+			}
+
+			server := http.Server{
+				Handler: proxy,
+			}
+
+			shutdownChan := make(chan error, 1)
+
+			go func() {
+				log.Print("Starting Proxy Server...")
+
+				// details are the same as for the `server.ListenAndServe()` section above
+				err := server.Serve(listener)
+				log.Printf("Proxy Server exited with '%v` error", err)
+
+				if err != http.ErrServerClosed {
+					log.Printf("Put '%v' error returned by Proxy Server to shutdown channel", err)
+					shutdownChan <- err
+				}
+			}()
+
+			defer server.Close()
+
+			port := listener.Addr().(*net.TCPAddr).Port
+			options = append(options, "-H", fmt.Sprintf("http://locahost:%d", port))
+		}
+
+	}
+
+	options = addTLSConnectionOptions(options, endpoint)
 
 	args := append(options, command...)
 
@@ -73,6 +118,22 @@ func setComposeFile(stack *portainer.Stack) []string {
 
 	composeFilePath := path.Join(stack.ProjectPath, stack.EntryPoint)
 	options = append(options, "-f", composeFilePath)
+	return options
+}
+
+func addTLSConnectionOptions(options []string, endpoint *portainer.Endpoint) []string {
+	if endpoint.TLSConfig.TLS {
+		options = append(options, "--tls")
+
+		if !endpoint.TLSConfig.TLSSkipVerify {
+			options = append(options, "--tlsverify", "--tlscacert", endpoint.TLSConfig.TLSCACertPath)
+		}
+
+		if endpoint.TLSConfig.TLSCertPath != "" && endpoint.TLSConfig.TLSKeyPath != "" {
+			options = append(options, "--tlscert", endpoint.TLSConfig.TLSCertPath, "--tlskey", endpoint.TLSConfig.TLSKeyPath)
+		}
+	}
+
 	return options
 }
 
