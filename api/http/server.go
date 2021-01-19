@@ -60,7 +60,7 @@ type Server struct {
 	LDAPService                 portainer.LDAPService
 	OAuthService                portainer.OAuthService
 	SwarmStackManager           portainer.SwarmStackManager
-	ProxyManager                proxy.Manager
+	ProxyManager                *proxy.Manager
 	KubernetesTokenCacheManager *kubernetes.TokenCacheManager
 	Handler                     *handler.Handler
 	SSL                         bool
@@ -84,7 +84,7 @@ func (server *Server) Start() error {
 	authHandler.CryptoService = server.CryptoService
 	authHandler.JWTService = server.JWTService
 	authHandler.LDAPService = server.LDAPService
-	authHandler.ProxyManager = &server.ProxyManager
+	authHandler.ProxyManager = server.ProxyManager
 	authHandler.KubernetesTokenCacheManager = kubernetesTokenCacheManager
 	authHandler.OAuthService = server.OAuthService
 
@@ -118,7 +118,7 @@ func (server *Server) Start() error {
 	var endpointHandler = endpoints.NewHandler(requestBouncer)
 	endpointHandler.DataStore = server.DataStore
 	endpointHandler.FileService = server.FileService
-	endpointHandler.ProxyManager = &server.ProxyManager
+	endpointHandler.ProxyManager = server.ProxyManager
 	endpointHandler.SnapshotService = server.SnapshotService
 	endpointHandler.ReverseTunnelService = server.ReverseTunnelService
 
@@ -132,7 +132,7 @@ func (server *Server) Start() error {
 
 	var endpointProxyHandler = endpointproxy.NewHandler(requestBouncer)
 	endpointProxyHandler.DataStore = server.DataStore
-	endpointProxyHandler.ProxyManager = &server.ProxyManager
+	endpointProxyHandler.ProxyManager = server.ProxyManager
 	endpointProxyHandler.ReverseTunnelService = server.ReverseTunnelService
 
 	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"))
@@ -142,7 +142,7 @@ func (server *Server) Start() error {
 	var registryHandler = registries.NewHandler(requestBouncer)
 	registryHandler.DataStore = server.DataStore
 	registryHandler.FileService = server.FileService
-	registryHandler.ProxyManager = &server.ProxyManager
+	registryHandler.ProxyManager = server.ProxyManager
 
 	var resourceControlHandler = resourcecontrols.NewHandler(requestBouncer)
 	resourceControlHandler.DataStore = server.DataStore

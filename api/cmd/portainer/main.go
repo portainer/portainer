@@ -475,7 +475,7 @@ func main() {
 		LDAPService:                 ldapService,
 		OAuthService:                oauthService,
 		GitService:                  gitService,
-		ProxyManager:                *proxyManager,
+		ProxyManager:                proxyManager,
 		KubernetesTokenCacheManager: kubernetesTokenCacheManager,
 		SignatureService:            digitalSignatureService,
 		SnapshotService:             snapshotService,
