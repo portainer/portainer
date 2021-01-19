@@ -85,53 +85,6 @@ func Test_addProjectNameOption(t *testing.T) {
 	}
 }
 
-func Test_addConnectionOptions(t *testing.T) {
-	tests := []struct {
-		name     string
-		endpoint *portainer.Endpoint
-		expected []string
-	}{
-		{
-			name:     "should not add options if endpoint is missing",
-			endpoint: nil,
-			expected: []string{},
-		},
-		{
-			name:     "should not add hostname if endpoint doesn't have url",
-			endpoint: &portainer.Endpoint{},
-			expected: []string{},
-		},
-		{
-			name: "should add hostname name option if endpoint has url",
-			endpoint: &portainer.Endpoint{
-				URL: "host:port",
-			},
-			expected: []string{"-H", "host:port"},
-		},
-		{
-			name: "should add tls options if endpoint has tls setup",
-			endpoint: &portainer.Endpoint{
-				TLSConfig: portainer.TLSConfiguration{
-					TLS:           true,
-					TLSSkipVerify: false,
-					TLSCACertPath: "ca-cert-path",
-					TLSCertPath:   "cert-path",
-					TLSKeyPath:    "key-path",
-				},
-			},
-			expected: []string{"--tls", "--tlsverify", "--tlscacert", "ca-cert-path", "--tlscert", "cert-path", "--tlskey", "key-path"},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			options := []string{"-a", "b"}
-			result := addConnectionOptions(options, tt.endpoint)
-			assert.ElementsMatch(t, append(options, tt.expected...), result)
-		})
-	}
-}
-
 func Test_addEnvFileOption(t *testing.T) {
 	dir := t.TempDir()
 

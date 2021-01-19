@@ -42,7 +42,7 @@ func Test_UpAndDown(t *testing.T) {
 
 	stack, endpoint := setup(t)
 
-	w := NewComposeWrapper("")
+	w := NewComposeWrapper("", nil)
 
 	err := w.Up(stack, endpoint)
 	if err != nil {
