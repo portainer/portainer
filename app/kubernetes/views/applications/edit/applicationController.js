@@ -310,13 +310,7 @@ class KubernetesApplicationController {
       });
 
       this.placements = computePlacements(nodes, this.application);
-      this.state.placementWarning = !_.reduce(
-        this.placements,
-        (acc, placement) => {
-          return acc && placement.AcceptsApplication;
-        },
-        true
-      );
+      this.state.placementWarning = _.find(this.placements, { AcceptsApplication: true }) ? false : true;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve application details');
     } finally {
