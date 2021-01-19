@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"strings"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy"
@@ -58,7 +59,7 @@ func (w *ComposeWrapper) command(command []string, stack *portainer.Stack, endpo
 
 	if endpoint != nil {
 
-		if endpoint.URL != "" {
+		if endpoint.URL != "" && !(strings.HasPrefix(endpoint.URL, "unix://") || strings.HasPrefix(endpoint.URL, "npipe://")) {
 			proxy, err := w.proxyManager.CreateAndRegisterComposeEndpointProxy(endpoint)
 
 			listener, err := net.Listen("tcp", ":0")
