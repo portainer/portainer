@@ -14,6 +14,7 @@ class KubernetesPersistentVolumeService {
     this.getAsync = this.getAsync.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
     this.createAsync = this.createAsync.bind(this);
+    this.deleteAsync = this.deleteAsync.bind(this);
   }
 
   /**
@@ -65,6 +66,23 @@ class KubernetesPersistentVolumeService {
 
   create(pv) {
     return this.$async(this.createAsync, pv);
+  }
+
+  /**
+   * DELETE
+   */
+  async deleteAsync(pv) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = pv.Name;
+      await this.KubernetesPersistentVolume().delete(params).$promise;
+    } catch (err) {
+      throw new PortainerError('Unable to delete persistent volume', err);
+    }
+  }
+
+  delete(pv) {
+    return this.$async(this.deleteAsync, pv);
   }
 }
 

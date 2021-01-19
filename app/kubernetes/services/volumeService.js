@@ -83,7 +83,11 @@ class KubernetesVolumeService {
    */
   async deleteAsync(volume) {
     try {
+      const pv = volume.PersistentVolumeClaim.PersistentVolume;
       await this.KubernetesPersistentVolumeClaimService.delete(volume.PersistentVolumeClaim);
+      if (pv) {
+        await this.KubernetesPersistentVolumeService.delete(pv);
+      }
     } catch (err) {
       throw err;
     }

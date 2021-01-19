@@ -15,6 +15,7 @@ angular.module('portainer.kubernetes').factory('KubernetesPersistentVolume', [
         {
           get: { method: 'GET' },
           create: { method: 'POST' },
+          delete: { method: 'DELETE' },
         }
       );
     };
