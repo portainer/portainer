@@ -60,6 +60,11 @@ func (manager *Manager) CreateAndRegisterComposeEndpointProxy(endpoint *portaine
 	return proxy, nil
 }
 
+// GetReverseTunnel returns the tunnel associated with the edge endpoint
+func (manager *Manager) GetReverseTunnel(endpoint *portainer.Endpoint) *portainer.TunnelDetails {
+	return manager.proxyFactory.GetReverseTunnel(endpoint)
+}
+
 // GetEndpointProxy returns the proxy associated to a key
 func (manager *Manager) GetEndpointProxy(endpoint *portainer.Endpoint) http.Handler {
 	proxy, ok := manager.endpointProxies.Get(fmt.Sprint(endpoint.ID))

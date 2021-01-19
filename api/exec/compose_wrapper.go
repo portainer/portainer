@@ -64,14 +64,11 @@ func (w *ComposeWrapper) command(command []string, stack *portainer.Stack, endpo
 	if endpoint.URL != "" && !strings.HasPrefix(endpoint.URL, "unix://") && !strings.HasPrefix(endpoint.URL, "npipe://") {
 		proxy, err := w.proxyManager.CreateAndRegisterComposeEndpointProxy(endpoint)
 
-		listener, err := net.Listen("tcp", ":0")
-		if err != nil {
-			return nil, err
-		}
-		log.Printf("Proxy Server: %v", proxy)
-		server := http.Server{
-			Handler: proxy,
-		}
+		if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
+			tunnel := w.proxyManager.GetReverseTunnel(endpoint)
+			options = append(options, "-H", fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port))
+		} else if endpoint.URL != "" && !(strings.HasPrefix(endpoint.URL, "unix://") || strings.HasPrefix(endpoint.URL, "npipe://")) {
+			proxy, err := w.proxyManager.CreateAndRegisterComposeEndpointProxy(endpoint)
 
 		shutdownChan := make(chan error, 1)
 		port := listener.Addr().(*net.TCPAddr).Port
@@ -85,9 +82,30 @@ func (w *ComposeWrapper) command(command []string, stack *portainer.Stack, endpo
 				log.Printf("Put '%v' error returned by Proxy Server to shutdown channel\n", err)
 				shutdownChan <- err
 			}
-		}()
+			log.Printf("Proxy Server: %v", proxy)
+			server := http.Server{
+				Handler: proxy,
+			}
 
-		defer server.Close()
+			shutdownChan := make(chan error, 1)
+			port := listener.Addr().(*net.TCPAddr).Port
+			go func() {
+				log.Printf("Starting Proxy server on %s...\n", fmt.Sprintf("http://127.0.0.1:%d", port))
+
+				err := server.Serve(listener)
+				log.Printf("Proxy Server exited with '%v' error\n", err)
+
+				if err != http.ErrServerClosed {
+					log.Printf("Put '%v' error returned by Proxy Server to shutdown channel\n", err)
+					shutdownChan <- err
+				}
+			}()
+
+			defer server.Close()
+			defer w.proxyManager.DeleteEndpointProxy(endpoint)
+
+			options = append(options, "-H", fmt.Sprintf("http://127.0.0.1:%d", port))
+		}
 
 		options = append(options, "-H", fmt.Sprintf("http://localhost:%d", port))
 	}

@@ -73,9 +73,9 @@ func (transport *AgentTransport) RoundTrip(request *http.Request) (*http.Respons
 }
 
 // NewAgentTransport returns a new transport that can be used to send signed requests to a Portainer Edge agent
-func NewEdgeTransport(reverseTunnelService portainer.ReverseTunnelService, endpointIdentifier portainer.EndpointID) *EdgeTransport {
+func NewEdgeTransport(reverseTunnelService portainer.ReverseTunnelService, endpointIdentifier portainer.EndpointID, httpTransport *http.Transport) *EdgeTransport {
 	transport := &EdgeTransport{
-		httpTransport:        &http.Transport{},
+		httpTransport:        httpTransport,
 		reverseTunnelService: reverseTunnelService,
 		endpointIdentifier:   endpointIdentifier,
 	}

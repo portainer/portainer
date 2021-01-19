@@ -29,9 +29,13 @@ func (factory *ProxyFactory) NewDockerComposeAgentProxy(endpoint *portainer.Endp
 		endpointURL.Scheme = "https"
 	}
 
-	dockerComposeTransport := dockercompose.NewAgentTransport(factory.signatureService, httpTransport)
-
 	proxy := newSingleHostReverseProxyWithHostHeader(endpointURL)
-	proxy.Transport = dockerComposeTransport
+
+	proxy.Transport = dockercompose.NewAgentTransport(factory.signatureService, httpTransport)
+
 	return proxy, nil
+}
+
+func (factory *ProxyFactory) GetReverseTunnel(endpoint *portainer.Endpoint) *portainer.TunnelDetails {
+	return factory.reverseTunnelService.GetTunnelDetails(endpoint.ID)
 }
