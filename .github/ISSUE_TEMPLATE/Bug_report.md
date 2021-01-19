@@ -1,6 +1,10 @@
 ---
 name: Bug report
 about: Create a bug report
+title: ''
+labels: bug/need-confirmation, kind/bug
+assignees: ''
+
 ---
 
 <!--

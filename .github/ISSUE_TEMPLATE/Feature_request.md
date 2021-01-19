@@ -1,6 +1,10 @@
 ---
 name: Feature request
 about: Suggest a feature/enhancement that should be added in Portainer
+title: ''
+labels: ''
+assignees: ''
+
 ---
 
 <!--
