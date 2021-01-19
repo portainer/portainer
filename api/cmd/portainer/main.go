@@ -73,7 +73,7 @@ func initDataStore(dataStorePath string, fileService portainer.FileService) port
 	return store
 }
 
-func initComposeStackManager(assetsPath string, dataStorePath string, reverseTunnelService portainer.ReverseTunnelService, proxyManager proxy.Manager) portainer.ComposeStackManager {
+func initComposeStackManager(assetsPath string, dataStorePath string, reverseTunnelService portainer.ReverseTunnelService, proxyManager *proxy.Manager) portainer.ComposeStackManager {
 	composeWrapper := exec.NewComposeWrapper(assetsPath, proxyManager)
 	if composeWrapper != nil {
 		return composeWrapper
@@ -394,7 +394,7 @@ func main() {
 	kubernetesTokenCacheManager := kubernetes.NewTokenCacheManager()
 	proxyManager := proxy.NewManager(dataStore, digitalSignatureService, reverseTunnelService, dockerClientFactory, kubernetesClientFactory, kubernetesTokenCacheManager)
 
-	composeStackManager := initComposeStackManager(*flags.Assets, *flags.Data, reverseTunnelService, *proxyManager)
+	composeStackManager := initComposeStackManager(*flags.Assets, *flags.Data, reverseTunnelService, proxyManager)
 
 	kubernetesDeployer := initKubernetesDeployer(*flags.Assets)
 
