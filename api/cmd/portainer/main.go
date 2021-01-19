@@ -18,9 +18,10 @@ import (
 	"github.com/portainer/portainer/api/http"
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/http/proxy"
+	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/internal/snapshot"
 	"github.com/portainer/portainer/api/jwt"
-	"github.com/portainer/portainer/api/kubernetes"
+	k8s "github.com/portainer/portainer/api/kubernetes"
 	kubecli "github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/ldap"
 	"github.com/portainer/portainer/api/libcompose"
@@ -136,7 +137,7 @@ func initKubernetesClientFactory(signatureService portainer.DigitalSignatureServ
 
 func initSnapshotService(snapshotInterval string, dataStore portainer.DataStore, dockerClientFactory *docker.ClientFactory, kubernetesClientFactory *kubecli.ClientFactory) (portainer.SnapshotService, error) {
 	dockerSnapshotter := docker.NewSnapshotter(dockerClientFactory)
-	kubernetesSnapshotter := kubernetes.NewSnapshotter(kubernetesClientFactory)
+	kubernetesSnapshotter := k8s.NewSnapshotter(kubernetesClientFactory)
 
 	snapshotService, err := snapshot.NewService(snapshotInterval, dataStore, dockerSnapshotter, kubernetesSnapshotter)
 	if err != nil {
@@ -390,8 +391,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	kubernetesTokenCacheManager := kubernetes.NewTokenCacheManager()
+	proxyManager := proxy.NewManager(dataStore, digitalSignatureService, reverseTunnelService, dockerClientFactory, kubernetesClientFactory, kubernetesTokenCacheManager)
 
-	composeStackManager := initComposeStackManager(*flags.Assets, *flags.Data, reverseTunnelService)
+	composeStackManager := initComposeStackManager(*flags.Assets, *flags.Data, reverseTunnelService, *proxyManager)
 
 	kubernetesDeployer := initKubernetesDeployer(*flags.Assets)
 
@@ -458,27 +461,29 @@ func main() {
 	}
 
 	var server portainer.Server = &http.Server{
-		ReverseTunnelService:    reverseTunnelService,
-		Status:                  applicationStatus,
-		BindAddress:             *flags.Addr,
-		AssetsPath:              *flags.Assets,
-		DataStore:               dataStore,
-		SwarmStackManager:       swarmStackManager,
-		ComposeStackManager:     composeStackManager,
-		KubernetesDeployer:      kubernetesDeployer,
-		CryptoService:           cryptoService,
-		JWTService:              jwtService,
-		FileService:             fileService,
-		LDAPService:             ldapService,
-		OAuthService:            oauthService,
-		GitService:              gitService,
-		SignatureService:        digitalSignatureService,
-		SnapshotService:         snapshotService,
-		SSL:                     *flags.SSL,
-		SSLCert:                 *flags.SSLCert,
-		SSLKey:                  *flags.SSLKey,
-		DockerClientFactory:     dockerClientFactory,
-		KubernetesClientFactory: kubernetesClientFactory,
+		ReverseTunnelService:        reverseTunnelService,
+		Status:                      applicationStatus,
+		BindAddress:                 *flags.Addr,
+		AssetsPath:                  *flags.Assets,
+		DataStore:                   dataStore,
+		SwarmStackManager:           swarmStackManager,
+		ComposeStackManager:         composeStackManager,
+		KubernetesDeployer:          kubernetesDeployer,
+		CryptoService:               cryptoService,
+		JWTService:                  jwtService,
+		FileService:                 fileService,
+		LDAPService:                 ldapService,
+		OAuthService:                oauthService,
+		GitService:                  gitService,
+		ProxyManager:                *proxyManager,
+		KubernetesTokenCacheManager: kubernetesTokenCacheManager,
+		SignatureService:            digitalSignatureService,
+		SnapshotService:             snapshotService,
+		SSL:                         *flags.SSL,
+		SSLCert:                     *flags.SSLCert,
+		SSLKey:                      *flags.SSLKey,
+		DockerClientFactory:         dockerClientFactory,
+		KubernetesClientFactory:     kubernetesClientFactory,
 	}
 
 	log.Printf("Starting Portainer %s on %s", portainer.APIVersion, *flags.Addr)

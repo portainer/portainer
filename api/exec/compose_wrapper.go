@@ -55,29 +55,28 @@ func (w *ComposeWrapper) command(command []string, stack *portainer.Stack, endpo
 	if err != nil {
 		return nil, err
 	}
-	log.Printf("Endpoint: %v\n", endpoint)
+
 	if endpoint != nil {
-		log.Println("Endpoint Exists, need a Proxy Server...")
+
 		if endpoint.URL != "" {
 			proxy, err := w.proxyManager.CreateAndRegisterEndpointProxy(endpoint)
-			log.Println("Endpoint has an URL, we create a proxy")
+
 			listener, err := net.Listen("tcp", ":0")
 			if err != nil {
 				return nil, err
 			}
-
+			log.Printf("Proxy Server: %v", proxy)
 			server := http.Server{
 				Handler: proxy,
 			}
 
 			shutdownChan := make(chan error, 1)
-			log.Println("Let's start a Proxy Server...")
+			port := listener.Addr().(*net.TCPAddr).Port
 			go func() {
-				log.Println("Starting Proxy Server...")
-
+				log.Printf("Starting Proxy server on %s...\n", fmt.Sprintf("http://localhost:%d", port))
 				// details are the same as for the `server.ListenAndServe()` section above
 				err := server.Serve(listener)
-				log.Printf("Proxy Server exited with '%v` error\n", err)
+				log.Printf("Proxy Server exited with '%v' error\n", err)
 
 				if err != http.ErrServerClosed {
 					log.Printf("Put '%v' error returned by Proxy Server to shutdown channel\n", err)
@@ -87,14 +86,12 @@ func (w *ComposeWrapper) command(command []string, stack *portainer.Stack, endpo
 
 			defer server.Close()
 
-			port := listener.Addr().(*net.TCPAddr).Port
-			log.Println("Add proxy server to options", fmt.Sprintf("http://locahost:%d", port))
-			options = append(options, "-H", fmt.Sprintf("http://locahost:%d", port))
+			options = append(options, "-H", fmt.Sprintf("http://localhost:%d", port))
 		}
 
 	}
 
-	options = addTLSConnectionOptions(options, endpoint)
+	// options = addTLSConnectionOptions(options, endpoint)
 
 	args := append(options, command...)
 
