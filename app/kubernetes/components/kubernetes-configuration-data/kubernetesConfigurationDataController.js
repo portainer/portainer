@@ -16,7 +16,8 @@ class KubernetesConfigurationDataController {
 
   onChangeKey() {
     this.state.duplicateKeys = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.Data, (data) => data.Key));
-    this.isValid = Object.keys(this.state.duplicateKeys).length === 0;
+    this.state.invalidKeys = KubernetesFormValidationHelper.getInvalidKeys(_.map(this.formValues.Data, (data) => data.Key));
+    this.isValid = Object.keys(this.state.duplicateKeys).length === 0 && Object.keys(this.state.invalidKeys).length === 0;
   }
 
   addEntry() {
@@ -60,6 +61,7 @@ class KubernetesConfigurationDataController {
   $onInit() {
     this.state = {
       duplicateKeys: {},
+      invalidKeys: {},
     };
   }
 }
