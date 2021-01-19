@@ -39,39 +39,41 @@ import (
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
+
 	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
 // Server implements the portainer.Server interface
 type Server struct {
-	BindAddress             string
-	AssetsPath              string
-	Status                  *portainer.Status
-	ReverseTunnelService    portainer.ReverseTunnelService
-	ComposeStackManager     portainer.ComposeStackManager
-	CryptoService           portainer.CryptoService
-	SignatureService        portainer.DigitalSignatureService
-	SnapshotService         portainer.SnapshotService
-	FileService             portainer.FileService
-	DataStore               portainer.DataStore
-	GitService              portainer.GitService
-	JWTService              portainer.JWTService
-	LDAPService             portainer.LDAPService
-	OAuthService            portainer.OAuthService
-	SwarmStackManager       portainer.SwarmStackManager
-	Handler                 *handler.Handler
-	SSL                     bool
-	SSLCert                 string
-	SSLKey                  string
-	DockerClientFactory     *docker.ClientFactory
-	KubernetesClientFactory *cli.ClientFactory
-	KubernetesDeployer      portainer.KubernetesDeployer
+	BindAddress                 string
+	AssetsPath                  string
+	Status                      *portainer.Status
+	ReverseTunnelService        portainer.ReverseTunnelService
+	ComposeStackManager         portainer.ComposeStackManager
+	CryptoService               portainer.CryptoService
+	SignatureService            portainer.DigitalSignatureService
+	SnapshotService             portainer.SnapshotService
+	FileService                 portainer.FileService
+	DataStore                   portainer.DataStore
+	GitService                  portainer.GitService
+	JWTService                  portainer.JWTService
+	LDAPService                 portainer.LDAPService
+	OAuthService                portainer.OAuthService
+	SwarmStackManager           portainer.SwarmStackManager
+	ProxyManager                proxy.Manager
+	KubernetesTokenCacheManager *kubernetes.TokenCacheManager
+	Handler                     *handler.Handler
+	SSL                         bool
+	SSLCert                     string
+	SSLKey                      string
+	DockerClientFactory         *docker.ClientFactory
+	KubernetesClientFactory     *cli.ClientFactory
+	KubernetesDeployer          portainer.KubernetesDeployer
 }
 
 // Start starts the HTTP server
 func (server *Server) Start() error {
-	kubernetesTokenCacheManager := kubernetes.NewTokenCacheManager()
-	proxyManager := proxy.NewManager(server.DataStore, server.SignatureService, server.ReverseTunnelService, server.DockerClientFactory, server.KubernetesClientFactory, kubernetesTokenCacheManager)
+	kubernetesTokenCacheManager := server.KubernetesTokenCacheManager
 
 	requestBouncer := security.NewRequestBouncer(server.DataStore, server.JWTService)
 
@@ -82,7 +84,7 @@ func (server *Server) Start() error {
 	authHandler.CryptoService = server.CryptoService
 	authHandler.JWTService = server.JWTService
 	authHandler.LDAPService = server.LDAPService
-	authHandler.ProxyManager = proxyManager
+	authHandler.ProxyManager = &server.ProxyManager
 	authHandler.KubernetesTokenCacheManager = kubernetesTokenCacheManager
 	authHandler.OAuthService = server.OAuthService
 
@@ -116,9 +118,8 @@ func (server *Server) Start() error {
 	var endpointHandler = endpoints.NewHandler(requestBouncer)
 	endpointHandler.DataStore = server.DataStore
 	endpointHandler.FileService = server.FileService
-	endpointHandler.ProxyManager = proxyManager
+	endpointHandler.ProxyManager = &server.ProxyManager
 	endpointHandler.SnapshotService = server.SnapshotService
-	endpointHandler.ProxyManager = proxyManager
 	endpointHandler.ReverseTunnelService = server.ReverseTunnelService
 
 	var endpointEdgeHandler = endpointedge.NewHandler(requestBouncer)
@@ -131,7 +132,7 @@ func (server *Server) Start() error {
 
 	var endpointProxyHandler = endpointproxy.NewHandler(requestBouncer)
 	endpointProxyHandler.DataStore = server.DataStore
-	endpointProxyHandler.ProxyManager = proxyManager
+	endpointProxyHandler.ProxyManager = &server.ProxyManager
 	endpointProxyHandler.ReverseTunnelService = server.ReverseTunnelService
 
 	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"))
@@ -141,7 +142,7 @@ func (server *Server) Start() error {
 	var registryHandler = registries.NewHandler(requestBouncer)
 	registryHandler.DataStore = server.DataStore
 	registryHandler.FileService = server.FileService
-	registryHandler.ProxyManager = proxyManager
+	registryHandler.ProxyManager = &server.ProxyManager
 
 	var resourceControlHandler = resourcecontrols.NewHandler(requestBouncer)
 	resourceControlHandler.DataStore = server.DataStore
