@@ -115,9 +115,9 @@ class KubernetesCreateApplicationController {
   overrideConfiguration(index) {
     const config = this.formValues.Configurations[index];
     config.Overriden = true;
-    config.OverridenKeys = _.map(_.keys(config.SelectedConfiguration.Data), (key) => {
+    config.OverridenKeys = _.map(config.SelectedConfiguration.Data, (entry) => {
       const res = new KubernetesApplicationConfigurationFormValueOverridenKey();
-      res.Key = key;
+      res.Key = entry.Key;
       return res;
     });
   }
