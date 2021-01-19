@@ -1,0 +1,213 @@
+<kubernetes-view-header ng-if="!ctrl.state.isEdit" title="Create volume" state="kubernetes.volumes.new" view-ready="ctrl.state.viewReady">
+  <a ui-sref="kubernetes.volume">Volumes</a> &gt; Create a volume
+</kubernetes-view-header>
+
+<kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
+
+<div ng-if="ctrl.state.viewReady">
+  <div class="row">
+    <div class="col-xs-12">
+      <rd-widget>
+        <rd-widget-body>
+          <form class="form-horizontal" name="kubernetesVolumeCreationForm" autocomplete="off">
+            <!-- #region NAME FIELD -->
+            <div class="form-group">
+              <label for="volume_name" class="col-sm-1 control-label text-left">Name</label>
+              <div class="col-sm-11">
+                <input
+                  type="text"
+                  class="form-control"
+                  name="volume_name"
+                  ng-model="ctrl.formValues.Name"
+                  ng-change="ctrl.onChangeName()"
+                  placeholder="my-volume"
+                  ng-pattern="/^[a-z]([-a-z0-9]*[a-z0-9])?$/"
+                  auto-focus
+                  required
+                />
+              </div>
+            </div>
+            <div class="form-group" ng-show="kubernetesVolumeCreationForm.volume_name.$invalid || ctrl.state.alreadyExists">
+              <div class="col-sm-12 small text-warning">
+                <div ng-messages="kubernetesVolumeCreationForm.volume_name.$error">
+                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                  <p ng-message="pattern"
+                    ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of lower case alphanumeric characters or '-', start with an alphabetic
+                    character, and end with an alphanumeric character (e.g. 'my-name', or 'abc-123').</p
+                  >
+                </div>
+              </div>
+            </div>
+            <!-- #endregion -->
+
+            <!-- #region RESOURCE POOL -->
+            <div class="col-sm-12 form-section-title">
+              Resource pool
+            </div>
+            <div class="form-group">
+              <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Resource pool</label>
+              <div class="col-sm-11">
+                <select
+                  class="form-control"
+                  id="resource-pool-selector"
+                  ng-model="ctrl.formValues.ResourcePool"
+                  ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools"
+                  ng-change="ctrl.onResourcePoolSelectionChange()"
+                  ng-disabled="ctrl.state.isEdit"
+                  required
+                ></select>
+              </div>
+            </div>
+            <!-- #endregion -->
+
+            <!-- #region VOLUME CONFIGURATION -->
+            <div class="col-sm-12 form-section-title">
+              Volume configuration
+            </div>
+            <div class="form-group" ng-if="!ctrl.storageClasses">
+              <div class="col-sm-12 small text-muted">
+                <p ng-if="!ctrl.isAdmin"
+                  ><i class="fa fa-info-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>No storage option is available to persist data, contact your
+                  administrator to enable a storage option.</p
+                >
+                <p ng-if="ctrl.isAdmin"
+                  ><i class="fa fa-info-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>No storage option is available to persist data, please head over the
+                  cluster <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: ctrl.endpoint.Id})">setup view</a> to configure a storage option.</p
+                >
+              </div>
+            </div>
+            <div ng-if="ctrl.storageClasses">
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <label for="storage-selector" class="col-sm-1 control-label text-left" style="padding-left: 0px;">Storage</label>
+                  <div class="col-sm-5" style="padding-left: 0px;">
+                    <select
+                      class="form-control"
+                      ng-if="ctrl.hasMultipleStorageClassesAvailable()"
+                      id="storage-selector"
+                      ng-model="ctrl.formValues.StorageClass"
+                      ng-options="storageClass as storageClass.Name for storageClass in ctrl.storageClasses"
+                      required
+                    ></select>
+                    <input ng-if="!ctrl.hasMultipleStorageClassesAvailable()" type="text" class="form-control" ng-model="ctrl.formValues.StorageClass.Name" disabled />
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="col-sm-12 form-inline">
+                  <label for="size" class="col-sm-1 control-label text-left" style="padding-left: 0px;">Size</label>
+                  <div class="col-sm-4" style="padding-left: 0px;">
+                    <input type="number" class="form-control" name="size" ng-model="ctrl.formValues.Size" placeholder="10" min="0" style="width: 100%;" required />
+                  </div>
+                  <div class="col-sm-1">
+                    <select
+                      class="form-control"
+                      ng-model="ctrl.formValues.SizeUnit"
+                      ng-options="unit for unit in ctrl.state.availableSizeUnits"
+                      ng-disabled="ctrl.isEditAndExistingPersistedFolder($index) || ctrl.formValues.Containers.length > 1"
+                      style="width: 100%;"
+                    ></select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- #endregion -->
+
+            <!-- #region NFS-SETTINGS -->
+            <div>
+              <div class="col-sm-12 form-section-title">
+                NFS Settings
+              </div>
+              <div class="form-group">
+                <label for="address" class="col-sm-1 control-label text-left">Address</label>
+                <div class="col-sm-11">
+                  <input type="text" class="form-control" name="address" ng-model="ctrl.formValues.NFSAddress" placeholder="e.g. my.nfs-server.com OR xxx.xxx.xxx.xxx" required />
+                </div>
+              </div>
+              <div class="form-group" ng-show="kubernetesVolumeCreationForm.address.$invalid">
+                <div class="col-sm-12 small text-warning">
+                  <div ng-messages="kubernetesVolumeCreationForm.address.$error">
+                    <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="nfs_version" class="col-sm-1 control-label text-left">NFS Version</label>
+                <div class="col-sm-11">
+                  <input type="text" class="form-control" name="nfs_version" ng-model="ctrl.formValues.NFSVersion" ng-change="ctrl.onChangeNFSVersion()" required />
+                </div>
+              </div>
+              <div class="form-group" ng-show="kubernetesVolumeCreationForm.nfs_version.$invalid">
+                <div class="col-sm-12 small text-warning">
+                  <div ng-messages="kubernetesVolumeCreationForm.nfs_version.$error">
+                    <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="mount_point" class="col-sm-1 control-label text-left">Mount point</label>
+                <div class="col-sm-11">
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="mount_point"
+                    ng-model="ctrl.formValues.NFSMountPoint"
+                    placeholder="e.g. /export/share, :/export/share, /share or :/share"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="form-group" ng-show="kubernetesVolumeCreationForm.mount_point.$invalid">
+                <div class="col-sm-12 small text-warning">
+                  <div ng-messages="kubernetesVolumeCreationForm.mount_point.$error">
+                    <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="nfs_options" class="col-sm-1 control-label text-left">
+                  Options
+                  <portainer-tooltip position="bottom" message="Comma separated list of options"></portainer-tooltip>
+                </label>
+                <div class="col-sm-11">
+                  <input type="text" class="form-control" name="nfs_options" ng-model="ctrl.formValues.NFSOptions" placeholder="e.g. rw, noatime, tcp..." required />
+                </div>
+              </div>
+              <div class="form-group" ng-show="kubernetesVolumeCreationForm.nfs_options.$invalid">
+                <div class="col-sm-12 small text-warning">
+                  <div ng-messages="kubernetesVolumeCreationForm.nfs_options.$error">
+                    <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- #endregion -->
+
+            <!-- #region ACTIONS -->
+            <div class="col-sm-12 form-section-title">
+              Actions
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm"
+                  ng-disabled="!kubernetesVolumeCreationForm.$valid || ctrl.isCreateButtonDisabled()"
+                  button-spinner="ctrl.state.actionInProgress"
+                  ng-click="ctrl.createVolume()"
+                >
+                  <span ng-show="!ctrl.state.isEdit && !ctrl.state.actionInProgress">Create volume</span>
+                  <span ng-show="!ctrl.state.isEdit && ctrl.state.actionInProgress">Creation in progress...</span>
+                </button>
+              </div>
+            </div>
+            <!-- #endregion -->
+          </form>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+  </div>
+</div>

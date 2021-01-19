@@ -2,14 +2,17 @@ import angular from 'angular';
 import _ from 'lodash-es';
 
 import KubernetesVolumeConverter from 'Kubernetes/converters/volume';
+import KubernetesPersistentVolumeConverter from 'Kubernetes/persistent-volume/converter';
+import KubernetesPersistentVolumeClaimConverter from 'Kubernetes/converters/persistentVolumeClaim';
 
 class KubernetesVolumeService {
   /* @ngInject */
-  constructor($async, KubernetesResourcePoolService, KubernetesApplicationService, KubernetesPersistentVolumeClaimService) {
+  constructor($async, KubernetesResourcePoolService, KubernetesApplicationService, KubernetesPersistentVolumeClaimService, KubernetesPersistentVolumeService) {
     this.$async = $async;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesPersistentVolumeClaimService = KubernetesPersistentVolumeClaimService;
+    this.KubernetesPersistentVolumeService = KubernetesPersistentVolumeService;
 
     this.getAsync = this.getAsync.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
@@ -35,6 +38,11 @@ class KubernetesVolumeService {
       const res = await Promise.all(
         _.map(pools, async (pool) => {
           const pvcs = await this.KubernetesPersistentVolumeClaimService.get(pool.Namespace.Name);
+          _.forEach(pvcs, async (pvc) => {
+            if (pvc.PersistentVolumeName) {
+              pvc.PersistentVolume = await this.KubernetesPersistentVolumeService.get(pvc.PersistentVolumeName);
+            }
+          });
           return _.map(pvcs, (pvc) => KubernetesVolumeConverter.pvcToVolume(pvc, pool));
         })
       );
@@ -49,6 +57,25 @@ class KubernetesVolumeService {
       return this.$async(this.getAsync, namespace, name);
     }
     return this.$async(this.getAllAsync, namespace);
+  }
+
+  /**
+   * CREATE
+   * fv = KubernetesPersistentVolume
+   */
+
+  create(fv) {
+    return this.$async(async () => {
+      try {
+        const pv = KubernetesPersistentVolumeConverter.formValuesToPersistentVolume(fv);
+        await this.KubernetesPersistentVolumeService.create(pv);
+        const pvc = KubernetesPersistentVolumeClaimConverter.volumesFormValuesToVolumeClaims(fv);
+        pvc.PersistentVolume = pv;
+        await this.KubernetesPersistentVolumeClaimService.create(pvc);
+      } catch (err) {
+        throw err;
+      }
+    });
   }
 
   /**

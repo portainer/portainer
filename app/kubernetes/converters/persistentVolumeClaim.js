@@ -17,6 +17,7 @@ class KubernetesPersistentVolumeClaimConverter {
     res.Yaml = yaml ? yaml.data : '';
     res.ApplicationOwner = data.metadata.labels ? data.metadata.labels[KubernetesPortainerApplicationOwnerLabel] : '';
     res.ApplicationName = data.metadata.labels ? data.metadata.labels[KubernetesPortainerApplicationNameLabel] : '';
+    res.PersistentVolumeName = data.spec.volumeName;
     return res;
   }
 
@@ -57,6 +58,20 @@ class KubernetesPersistentVolumeClaimConverter {
     return res;
   }
 
+  /**
+   * Generate KubernetesPersistentVolumeClaim list from KubernetesVolumeFormValues
+   * @param {KubernetesVolumeFormValues} formValues
+   */
+  static volumesFormValuesToVolumeClaims(formValues) {
+    const pvc = new KubernetesPersistentVolumeClaim();
+    pvc.Name = formValues.Name;
+    pvc.Storage = '' + formValues.Size + formValues.SizeUnit.charAt(0) + 'i';
+    pvc.StorageClass = formValues.StorageClass;
+    pvc.MountPath = formValues.NFSMountPoint;
+    pvc.Namespace = formValues.ResourcePool.Namespace.Name;
+    return pvc;
+  }
+
   static createPayload(pvc) {
     const res = new KubernetesPersistentVolumClaimCreatePayload();
     res.metadata.name = pvc.Name;
@@ -66,6 +81,9 @@ class KubernetesPersistentVolumeClaimConverter {
     res.metadata.labels.app = pvc.ApplicationName;
     res.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = pvc.ApplicationOwner;
     res.metadata.labels[KubernetesPortainerApplicationNameLabel] = pvc.ApplicationName;
+    if (pvc.PersistentVolume) {
+      res.spec.volumeName = pvc.PersistentVolume.Name;
+    }
     return res;
   }
 

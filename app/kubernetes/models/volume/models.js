@@ -13,6 +13,8 @@ const _KubernetesPersistentVolumeClaim = Object.freeze({
   ApplicationOwner: '',
   ApplicationName: '',
   MountPath: '', // used for Application creation from ApplicationFormValues | not used from API conversion
+  PersistentVolume: {}, // KubernetesPersistentVolume
+  PersistentVolumeName: '', // Name of KubernetesPersistentVolume
   Yaml: '',
 });
 
@@ -20,6 +22,26 @@ export class KubernetesPersistentVolumeClaim {
   constructor() {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesPersistentVolumeClaim)));
     this.Name = uuidv4();
+  }
+}
+
+/**
+ * KubernetesPersistentVolume Model
+ */
+const _KubernetesPersistentVolume = Object.freeze({
+  Id: '',
+  Name: '',
+  StorageClass: {}, // KubernetesStorageClass
+  Size: '',
+  NFSAddress: '',
+  NFSVersion: '',
+  NFSMountPoint: '',
+  NFSOptions: '',
+});
+
+export class KubernetesPersistentVolume {
+  constructor() {
+    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesPersistentVolume)));
   }
 }
 
