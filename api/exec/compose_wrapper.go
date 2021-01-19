@@ -59,7 +59,7 @@ func (w *ComposeWrapper) command(command []string, stack *portainer.Stack, endpo
 	if endpoint != nil {
 
 		if endpoint.URL != "" {
-			proxy, err := w.proxyManager.CreateAndRegisterEndpointProxy(endpoint)
+			proxy, err := w.proxyManager.CreateAndRegisterComposeEndpointProxy(endpoint)
 
 			listener, err := net.Listen("tcp", ":0")
 			if err != nil {
