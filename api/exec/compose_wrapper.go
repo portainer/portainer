@@ -11,10 +11,6 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
-const (
-	composeSyntaxMaxVersion = "3.8"
-)
-
 // ComposeWrapper is a wrapper for docker-compose binary
 type ComposeWrapper struct {
 	binaryPath string
@@ -33,7 +29,7 @@ func NewComposeWrapper(binaryPath string) *ComposeWrapper {
 
 // ComposeSyntaxMaxVersion returns the maximum supported version of the docker compose syntax
 func (w *ComposeWrapper) ComposeSyntaxMaxVersion() string {
-	return composeSyntaxMaxVersion
+	return portainer.ComposeSyntaxMaxVersion
 }
 
 // Up builds, (re)creates and starts containers in the background. Wraps `docker-compose up -d` command
