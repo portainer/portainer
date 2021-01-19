@@ -1,6 +1,10 @@
 ---
 name: Question
 about: Ask us a question about Portainer usage or deployment
+title: ''
+labels: ''
+assignees: ''
+
 ---
 
 <!--
