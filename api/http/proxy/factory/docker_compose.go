@@ -55,34 +55,32 @@ func (factory *ProxyFactory) NewDockerComposeAgentProxy(endpoint *portainer.Endp
 		0,
 	}
 
-	return proxyServer, proxyServer.Start()
+	return proxyServer, proxyServer.start()
 }
 
-func (proxy *ProxyServer) Start() error {
+func (proxy *ProxyServer) start() error {
 	listener, err := net.Listen("tcp", ":0")
 	if err != nil {
 		return err
 	}
 
-	shutdownChan := make(chan error, 1)
 	proxy.Port = listener.Addr().(*net.TCPAddr).Port
 	go func() {
-
-		log.Printf("Starting Proxy server on %s...\n", fmt.Sprintf("http://127.0.0.1:%d", proxy.Port))
+		proxyHost := fmt.Sprintf("127.0.0.1:%d", proxy.Port)
+		log.Printf("Starting Proxy server on %s...\n", proxyHost)
 
 		err := proxy.server.Serve(listener)
-		log.Printf("Proxy Server exited with '%v' error\n", err)
+		log.Printf("Exiting Proxy server %s\n", proxyHost)
 
 		if err != http.ErrServerClosed {
-			log.Printf("Put '%v' error returned by Proxy Server to shutdown channel\n", proxy.Port)
-			shutdownChan <- err
+			log.Printf("Proxy server %s exited with an error: %s\n", proxyHost, err)
 		}
 	}()
 
 	return nil
 }
 
-// Close the server proxy
+// Close shuts down the server
 func (proxy *ProxyServer) Close() {
 	if proxy.server != nil {
 		proxy.server.Close()
