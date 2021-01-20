@@ -7,6 +7,6 @@ import (
 )
 
 // ResourceControlID returns the stack resource control id
-func ResourceControlID(stack *portainer.Stack) string {
-	return fmt.Sprintf("%d_%s", stack.EndpointID, stack.Name)
+func ResourceControlID(endpointID portainer.EndpointID, name string) string {
+	return fmt.Sprintf("%d_%s", endpointID, name)
 }

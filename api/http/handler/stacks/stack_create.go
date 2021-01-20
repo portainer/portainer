@@ -187,9 +187,9 @@ func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *port
 	}
 
 	if isAdmin {
-		resourceControl = authorization.NewAdministratorsOnlyResourceControl(stackutils.ResourceControlID(stack), portainer.StackResourceControl)
+		resourceControl = authorization.NewAdministratorsOnlyResourceControl(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)
 	} else {
-		resourceControl = authorization.NewPrivateResourceControl(stackutils.ResourceControlID(stack), portainer.StackResourceControl, userID)
+		resourceControl = authorization.NewPrivateResourceControl(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl, userID)
 	}
 
 	err = handler.DataStore.ResourceControl().CreateResourceControl(resourceControl)
