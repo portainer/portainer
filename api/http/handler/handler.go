@@ -31,7 +31,6 @@ import (
 	"github.com/portainer/portainer/api/http/handler/users"
 	"github.com/portainer/portainer/api/http/handler/webhooks"
 	"github.com/portainer/portainer/api/http/handler/websocket"
-	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 // Handler is a collection of all the service handlers.
@@ -63,6 +62,8 @@ type Handler struct {
 	UserHandler            *users.Handler
 	WebSocketHandler       *websocket.Handler
 	WebhookHandler         *webhooks.Handler
+
+	EnableSwagger bool
 }
 
 // @title PortainerCE API
@@ -202,8 +203,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.WebSocketHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/webhooks"):
 		http.StripPrefix("/api", h.WebhookHandler).ServeHTTP(w, r)
-	case strings.HasPrefix(r.URL.Path, "/swagger"):
-		httpSwagger.WrapHandler.ServeHTTP(w, r)
+	// case strings.HasPrefix(r.URL.Path, "/swagger"):
+	// 	httpSwagger.WrapHandler.ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/"):
 		h.FileHandler.ServeHTTP(w, r)
 	}
