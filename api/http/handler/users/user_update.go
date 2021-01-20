@@ -15,9 +15,10 @@ import (
 )
 
 type userUpdatePayload struct {
-	Username string
-	Password string
-	Role     int
+	Username string `validate:"required" example:"bob"`
+	Password string `validate:"required" example:"cg9Wgky3"`
+	// User role (1 for administrator account and 2 for regular account)
+	Role int `validate:"required" enums:"1,2" example:"2"`
 }
 
 func (payload *userUpdatePayload) Validate(r *http.Request) error {
@@ -31,18 +32,23 @@ func (payload *userUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
+// @id UserUpdate
 // @summary Update a user
-// @description
+// @description Update user details. A regular user account can only update his details.
+// @description **Access policy**: authenticated
 // @tags users
 // @security jwt
 // @accept json
 // @produce json
-// @param id path int true "user id"
-// @param body body userUpdatePayload true "user password data"
-// @success 200 {object} portainer.User "User updated"
-// @failure 400,403,404,409,500
+// @param id path int true "User identifier"
+// @param body body userUpdatePayload true "User details"
+// @success 200 {object} portainer.User "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 "User not found"
+// @failure 409 "Username already exist"
+// @failure 500 "Server error"
 // @router /users/{id} [put]
-// PUT request on /api/users/:id
 func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	userID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

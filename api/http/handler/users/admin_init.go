@@ -12,8 +12,10 @@ import (
 )
 
 type adminInitPayload struct {
-	Username string
-	Password string
+	// Username for the admin user
+	Username string `validate:"required" example:"admin"`
+	// Password for the admin user
+	Password string `validate:"required" example:"admin-password"`
 }
 
 func (payload *adminInitPayload) Validate(r *http.Request) error {
@@ -26,14 +28,18 @@ func (payload *adminInitPayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// @summary Create an initial admin user
-// @description Creates a new admin user if not exists
-// @tags users
+// @id UserAdminInit
+// @summary Initialize administrator account
+// @description Initialize the 'admin' user account.
+// @description **Access policy**: public
+// @tags
 // @accept json
 // @produce json
-// @param body body adminInitPayload true "User data"
-// @success 200 {object} portainer.User
-// @failure 400,409,500
+// @param body body adminInitPayload true "User details"
+// @success 200 {object} portainer.User "Success"
+// @failure 400 "Invalid request"
+// @failure 409 "Admin user already initialized"
+// @failure 500 "Server error"
 // @router /users/admin/init [post]
 func (handler *Handler) adminInit(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload adminInitPayload

@@ -8,14 +8,17 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
+// @id UserList
 // @summary List users
-// @description
+// @description List Portainer users.
+// @description Non-administrator users will only be able to list other non-administrator user accounts.
+// @description **Access policy**: restricted
 // @tags users
 // @security jwt
-// @accept json
 // @produce json
-// @success 200 {array} portainer.User
-// @failure 500
+// @success 200 {array} portainer.User "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
 // @router /users [get]
 func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	users, err := handler.DataStore.User().Users()

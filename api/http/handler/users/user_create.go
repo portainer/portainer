@@ -15,9 +15,10 @@ import (
 )
 
 type userCreatePayload struct {
-	Username string
-	Password string
-	Role     int
+	Username string `validate:"required" example:"bob"`
+	Password string `validate:"required" example:"cg9Wgky3"`
+	// User role (1 for administrator account and 2 for regular account)
+	Role int `validate:"required" enums:"1,2" example:"2"`
 }
 
 func (payload *userCreatePayload) Validate(r *http.Request) error {
@@ -31,15 +32,22 @@ func (payload *userCreatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// @summary Create a user
-// @description
-// @security jwt
+// @id UserCreate
+// @summary Create a new user
+// @description Create a new Portainer user.
+// @description Only team leaders and administrators can create users.
+// @description Only administrators can create an administrator user account.
+// @description **Access policy**: restricted
 // @tags users
+// @security jwt
 // @accept json
 // @produce json
-// @param body body userCreatePayload true "User data"
-// @success 200 {object} portainer.User
-// @failure 400,403,409,500
+// @param body body userCreatePayload true "User details"
+// @success 200 {object} portainer.User "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 409 "User already exists"
+// @failure 500 "Server error"
 // @router /users [post]
 func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload userCreatePayload

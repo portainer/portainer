@@ -9,14 +9,13 @@ import (
 	"github.com/portainer/portainer/api/bolt/errors"
 )
 
-// @summary Admin Check
-// @description Checks if admin user was created
+// @id UserAdminCheck
+// @summary Check administrator account existence
+// @description Check if an administrator account exists in the database.
+// @description **Access policy**: public
 // @tags users
-// @accept json
-// @produce json
-// @success 204 "Admin exists"
-// @failure 404 "Admin does not exist"
-// @failure 500 "Failed"
+// @success 204 "Success"
+// @failure 404 "User not found"
 // @router /users/admin/check [get]
 func (handler *Handler) adminCheck(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	users, err := handler.DataStore.User().UsersByRole(portainer.AdministratorRole)

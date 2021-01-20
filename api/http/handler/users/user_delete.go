@@ -12,15 +12,20 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// @summary Delete a user
-// @description
+// @id UserDelete
+// @summary Remove a user
+// @description Remove a user.
+// @description **Access policy**: administrator
 // @tags users
 // @security jwt
 // @accept json
 // @produce json
-// @param id path int true "user id"
-// @success 204
-// @failure 400,403,500
+// @param id path int true "User identifier"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 "User not found"
+// @failure 500 "Server error"
 // @router /users/{id} [delete]
 func (handler *Handler) userDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	userID, err := request.RetrieveNumericRouteVariableValue(r, "id")
