@@ -14,7 +14,8 @@ angular
     FormValidator,
     ResourceControlService,
     FormHelper,
-    CustomTemplateService
+    CustomTemplateService,
+    EndpointService
   ) {
     $scope.formValues = {
       Name: '',
@@ -166,6 +167,7 @@ angular
 
     async function initView() {
       var endpointMode = $scope.applicationState.endpoint.mode;
+      const endpointId = +$state.params.endpointId;
       $scope.state.StackType = 2;
       if (endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER') {
         $scope.state.StackType = 1;
@@ -176,6 +178,13 @@ angular
         $scope.templates = _.map(templates, (template) => ({ ...template, label: `${template.Title} - ${template.Description}` }));
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to retrieve Custom Templates');
+      }
+
+      try {
+        const endpoint = await EndpointService.endpoint(endpointId);
+        $scope.composeSyntaxMaxVersion = endpoint.ComposeSyntaxMaxVersion;
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to retrieve the ComposeSyntaxMaxVersion');
       }
     }
 
