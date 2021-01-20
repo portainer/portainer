@@ -3,7 +3,6 @@ package stacks
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 	"sync"
@@ -108,10 +107,6 @@ func (handler *Handler) userCanCreateStack(securityContext *security.RestrictedR
 	}
 
 	return handler.userIsAdminOrEndpointAdmin(user, endpointID)
-}
-
-func stackResourceID(stack *portainer.Stack) string {
-	return fmt.Sprintf("%d_%s", stack.EndpointID, stack.Name)
 }
 
 func (handler *Handler) checkUniqueName(endpoint *portainer.Endpoint, name string, stackID portainer.StackID, swarmMode bool) (bool, error) {
