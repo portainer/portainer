@@ -15,13 +15,16 @@ require (
 	github.com/docker/docker v0.0.0-00010101000000-000000000000
 	github.com/g07cha/defender v0.0.0-20180505193036-5665c627c814
 	github.com/go-ldap/ldap/v3 v3.1.8
-	github.com/gofrs/uuid v3.2.0+incompatible
+	github.com/go-openapi/spec v0.20.1 // indirect
+	github.com/go-openapi/swag v0.19.13 // indirect
+	github.com/gofrs/uuid v3.3.0+incompatible
+	github.com/golang/protobuf v1.3.3 // indirect
 	github.com/gorilla/mux v1.7.3
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/websocket v1.4.1
 	github.com/imdario/mergo v0.3.8 // indirect
 	github.com/jpillora/chisel v0.0.0-20190724232113-f3a8df20e389
-	github.com/json-iterator/go v1.1.8
+	github.com/json-iterator/go v1.1.9
 	github.com/koding/websocketproxy v0.0.0-20181220232114-7ed82d81a28c
 	github.com/mattn/go-shellwords v1.0.6 // indirect
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
@@ -33,7 +36,10 @@ require (
 	github.com/swaggo/http-swagger v1.0.0
 	github.com/swaggo/swag v1.7.0
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+	golang.org/x/net v0.0.0-20210119194325-5f4716e94777 // indirect
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
+	golang.org/x/text v0.3.5 // indirect
+	golang.org/x/tools v0.1.0 // indirect
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/src-d/go-git.v4 v4.13.1
 	k8s.io/api v0.17.2
