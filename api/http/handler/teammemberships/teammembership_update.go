@@ -46,7 +46,6 @@ func (payload *teamMembershipUpdatePayload) Validate(r *http.Request) error {
 // @param id path int true "Team membership identifier"
 // @param body body teamMembershipUpdatePayload true "Team membership details"
 // @success 200 {object} portainer.TeamMembership "Success"
-// @success 204 "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
 // @failure 404 "TeamMembership not found"
