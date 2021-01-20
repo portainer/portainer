@@ -2,7 +2,7 @@ import angular from 'angular';
 import PortainerError from 'Portainer/error';
 
 import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
-import KubernetesDeploymentConverter from 'Kubernetes/converters/deployment';
+import KubernetesPodConverter from './converter';
 
 class KubernetesPodService {
   /* @ngInject */
@@ -84,7 +84,7 @@ class KubernetesPodService {
       const params = new KubernetesCommonParams();
       params.id = newPod.Name;
       const namespace = newPod.Namespace;
-      const payload = KubernetesDeploymentConverter.patchPayload(oldPod, newPod);
+      const payload = KubernetesPodConverter.patchPayload(oldPod, newPod);
       if (!payload.length) {
         return;
       }
