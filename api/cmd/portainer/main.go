@@ -27,8 +27,6 @@ import (
 	"github.com/portainer/portainer/api/ldap"
 	"github.com/portainer/portainer/api/libcompose"
 	"github.com/portainer/portainer/api/oauth"
-	// need to uncomment for swagger to work
-	// _ "github.com/portainer/portainer/api/docs"
 )
 
 func initCLI() *portainer.CLIFlags {
