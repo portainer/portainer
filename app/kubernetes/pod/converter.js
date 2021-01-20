@@ -131,7 +131,12 @@ function createPayload(pod) {
   payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = pod.StackName;
   payload.metadata.labels[KubernetesPortainerApplicationNameLabel] = pod.ApplicationName;
   payload.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = pod.ApplicationOwner;
-  payload.metadata.annotations[KubernetesPortainerApplicationNote] = pod.Note;
+  if (pod.Note) {
+    payload.metadata.annotations[KubernetesPortainerApplicationNote] = pod.Note;
+  } else {
+    payload.metadata.annotations = undefined;
+  }
+
   payload.spec.replicas = pod.ReplicaCount;
   payload.spec.selector.matchLabels.app = pod.Name;
   payload.spec.template.metadata.labels.app = pod.Name;
