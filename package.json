@@ -18,7 +18,7 @@
     "build": "grunt clean:all && grunt build",
     "build:server": "grunt clean:server && grunt build:server",
     "build:client": "grunt clean:client && grunt build:client",
-    "build:docs": "cd api && swag init -g ./http/handler/handler.go --markdownFiles ./docs",
+    "build:docs": "cd api && swag init -g ./http/handler/handler.go --markdownFiles ./",
     "clean": "grunt clean:all",
     "start": "grunt start",
     "start:clean": "grunt clean:all && grunt start",

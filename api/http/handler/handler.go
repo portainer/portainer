@@ -62,8 +62,6 @@ type Handler struct {
 	UserHandler            *users.Handler
 	WebSocketHandler       *websocket.Handler
 	WebhookHandler         *webhooks.Handler
-
-	EnableSwagger bool
 }
 
 // @title PortainerCE API
