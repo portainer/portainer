@@ -359,7 +359,7 @@ angular.module('portainer.app').controller('StackController', [
         });
     }
 
-    function initView() {
+    async function initView() {
       var stackName = $transition$.params().name;
       $scope.stackName = stackName;
       var external = $transition$.params().external;
@@ -372,6 +372,15 @@ angular.module('portainer.app').controller('StackController', [
         var stackId = $transition$.params().id;
         loadStack(stackId);
       }
+
+      try {
+        const endpoint = await EndpointService.endpoint($scope.currentEndpointId);
+        $scope.composeSyntaxMaxVersion = endpoint.ComposeSyntaxMaxVersion;
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to retrieve the ComposeSyntaxMaxVersion');
+      }
+
+      $scope.stackType = $transition$.params().type;
     }
 
     initView();
