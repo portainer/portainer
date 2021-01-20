@@ -142,6 +142,7 @@
   },
   "swagger-api-doc": {
     "prefix": "swapi",
+    "scope": "go",
     "description": "Snippet for a api doc",
     "body": [
       "// @id ",
