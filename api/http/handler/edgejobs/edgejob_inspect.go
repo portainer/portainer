@@ -24,7 +24,8 @@ type edgeJobInspectResponse struct {
 // @produce json
 // @param id path string true "EdgeJob Id"
 // @success 200 {object} portainer.EdgeJob
-// @failure 500,400
+// @failure 500
+// @failure 400
 // @failure 503 Edge compute features are disabled
 // @router /edge_jobs/{id} [get]
 func (handler *Handler) edgeJobInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

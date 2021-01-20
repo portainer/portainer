@@ -13,14 +13,23 @@ import (
 )
 
 type registryConfigurePayload struct {
-	Authentication bool
-	Username       string
-	Password       string
-	TLS            bool
-	TLSSkipVerify  bool
-	TLSCertFile    []byte
-	TLSKeyFile     []byte
-	TLSCACertFile  []byte
+	// Is authentication against this registry enabled
+	Authentication bool `example:"false" validate:"required"`
+	// Username used to authenticate against this registry. Required when Authentication is true
+	Username string `example:"registry_user"`
+	// Password used to authenticate against this registry. required when Authentication is true
+	Password string `example:"registry_password"`
+
+	// Use TLS
+	TLS bool `example:"true"`
+	// Skip the verification of the server TLS certificate
+	TLSSkipVerify bool `example:"false"`
+	// The TLS CA certificate file
+	TLSCACertFile []byte
+	// The TLS client certificate file
+	TLSCertFile []byte
+	// The TLS client key file
+	TLSKeyFile []byte
 }
 
 func (payload *registryConfigurePayload) Validate(r *http.Request) error {
@@ -67,18 +76,22 @@ func (payload *registryConfigurePayload) Validate(r *http.Request) error {
 	return nil
 }
 
+// @id RegistryConfigure
 // @summary Configures a registry
-// @description
+// @description Configures a registry.
+// @description **Access policy**: admin
 // @tags registries
 // @security jwt
 // @accept json
 // @produce json
-// @param id path int true "registry id"
-// @param body body registryConfigurePayload true "registry configurations"
-// @success 204
-// @failure 400,500
+// @param id path int true "Registry identifier"
+// @param body body registryConfigurePayload true "Registry configuration"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 "Registry not found"
+// @failure 500 "Server error"
 // @router /registries/{id}/configure [post]
-// POST request on /api
 func (handler *Handler) registryConfigure(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	registryID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

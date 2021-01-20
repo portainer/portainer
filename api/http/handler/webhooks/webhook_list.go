@@ -23,7 +23,8 @@ type webhookListOperationFilters struct {
 // @param body body webhookCreatePayload true "Webhook data"
 // @param filters query webhookListOperationFilters false "Filters"
 // @success 200 {array} portainer.Webhook
-// @failure 400,500
+// @failure 400
+// @failure 500
 // @router /webhooks [get]
 func (handler *Handler) webhookList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var filters webhookListOperationFilters

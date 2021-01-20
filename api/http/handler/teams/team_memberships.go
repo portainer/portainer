@@ -11,15 +11,17 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// @summary List team's memberships
-// @description
-// @tags teams
+// @id TeamMemberships
+// @summary List team memberships
+// @description List team memberships. Access is only available to administrators and team leaders.
+// @description **Access policy**: restricted
+// @tags team_memberships
 // @security jwt
-// @accept json
 // @produce json
-// @param id path string true "team id"
-// @success 200 {array} portainer.TeamMembership "Team memberships"
-// @failure 500,400,403
+// @success 200 {array} portainer.TeamMembership "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 500 "Server error"
 // @router /teams/{id}/memberships [get]
 func (handler *Handler) teamMemberships(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	teamID, err := request.RetrieveNumericRouteVariableValue(r, "id")

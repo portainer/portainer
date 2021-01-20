@@ -19,7 +19,8 @@ import (
 // @produce json
 // @param id path string true "EdgeStack Id"
 // @success 200 {object} portainer.EdgeStack
-// @failure 500,400
+// @failure 500
+// @failure 400
 // @failure 503 Edge compute features are disabled
 // @router /edge_stacks/{id} [get]
 func (handler *Handler) edgeStackInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

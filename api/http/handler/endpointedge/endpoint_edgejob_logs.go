@@ -28,7 +28,8 @@ func (payload *logsPayload) Validate(r *http.Request) error {
 // @param id path string true "Endpoint Id"
 // @param jobID path string true "Job Id"
 // @success 200
-// @failure 500,400
+// @failure 500
+// @failure 400
 // @router /endpoints/{id}/edge/jobs/{jobID}/logs [post]
 func (handler *Handler) endpointEdgeJobsLogs(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")

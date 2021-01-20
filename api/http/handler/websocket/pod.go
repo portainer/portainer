@@ -27,7 +27,10 @@ import (
 // @param command query string true "command to execute in the container"
 // @param token query string true "JWT token used for authentication against this endpoint"
 // @success 200
-// @failure 400,403,404,500
+// @failure 400
+// @failure 403
+// @failure 404
+// @failure 500
 // @router /websocket/pod [get]
 func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)

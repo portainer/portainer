@@ -23,7 +23,8 @@ type fileResponse struct {
 // @param id path string true "EdgeJob Id"
 // @param taskID path string true "Task Id"
 // @success 200 {object} fileResponse
-// @failure 500,400
+// @failure 500
+// @failure 400
 // @failure 503 Edge compute features are disabled
 // @router /edge_jobs/{id}/tasks/{taskID}/logs [get]
 func (handler *Handler) edgeJobTaskLogsInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

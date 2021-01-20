@@ -27,7 +27,10 @@ import (
 // @param nodeName query string false "node name"
 // @param token query string true "JWT token used for authentication against this endpoint"
 // @success 200
-// @failure 400,403,404,500
+// @failure 400
+// @failure 403
+// @failure 404
+// @failure 500
 // @router /websocket/attach [get]
 func (handler *Handler) websocketAttach(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	attachID, err := request.RetrieveQueryParameter(r, "id", false)

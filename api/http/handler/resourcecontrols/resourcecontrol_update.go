@@ -50,14 +50,6 @@ func (payload *resourceControlUpdatePayload) Validate(r *http.Request) error {
 // @failure 403 "Unauthorized"
 // @failure 404 "Resource control not found"
 // @failure 500 "Server error"
-// @router /{id} [get]
-
-// @security jwt
-// @accept json
-// @produce json
-// @param id path int true "Resource control Id"
-// @success 200 {object} portainer.ResourceControl "Resource Control"
-// @failure 400,403,404,500
 // @router /resource_controls/{id} [put]
 func (handler *Handler) resourceControlUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	resourceControlID, err := request.RetrieveNumericRouteVariableValue(r, "id")

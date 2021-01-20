@@ -25,7 +25,9 @@ type configResponse struct {
 // @param id path string true "Endpoint Id"
 // @param stackID path string true "EdgeStack Id"
 // @success 200 {object} configResponse
-// @failure 500,400,404
+// @failure 500
+// @failure 400
+// @failure 404
 // @router /endpoints/{id}/edge/stacks/{stackId} [get]
 func (handler *Handler) endpointEdgeStackInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")

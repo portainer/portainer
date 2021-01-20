@@ -29,17 +29,6 @@ func (payload *endpointExtensionAddPayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// @summary Add an extension to an Endpoint
-// @description
-// @tags endpoints
-// @security jwt
-// @accept json
-// @produce json
-// @param id path int true "endpoint id"
-// @param body body endpointExtensionAddPayload true "data"
-// @success 200 {object} portainer.EndpointExtension "Endpoint Extension"
-// @failure 400,500,404
-// @router /endpoints/{id}/extensions [post]
 func (handler *Handler) endpointExtensionAdd(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

@@ -38,7 +38,10 @@ func (payload *updateStatusPayload) Validate(r *http.Request) error {
 // @produce json
 // @param id path string true "EdgeStack Id"
 // @success 200 {object} portainer.EdgeStack
-// @failure 500,400,404,403
+// @failure 500
+// @failure 400
+// @failure 404
+// @failure 403
 // @router /edge_stacks/{id}/status [put]
 func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")

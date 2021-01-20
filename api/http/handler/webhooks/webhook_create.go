@@ -40,7 +40,9 @@ func (payload *webhookCreatePayload) Validate(r *http.Request) error {
 // @produce json
 // @param body body webhookCreatePayload true "Webhook data"
 // @success 200 {object} portainer.Webhook
-// @failure 400,409,500
+// @failure 400
+// @failure 409
+// @failure 500
 // @router /webhooks [post]
 func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload webhookCreatePayload
