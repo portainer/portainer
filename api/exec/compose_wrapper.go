@@ -58,23 +58,16 @@ func (w *ComposeWrapper) command(command []string, stack *portainer.Stack, endpo
 		return nil, err
 	}
 
-	if endpoint.URL != "" && !strings.HasPrefix(endpoint.URL, "unix://") && !strings.HasPrefix(endpoint.URL, "npipe://") {
+	if !(endpoint.URL == "" || strings.HasPrefix(endpoint.URL, "unix://") || strings.HasPrefix(endpoint.URL, "npipe://")) {
 
-		if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
-			tunnel := w.proxyManager.GetReverseTunnel(endpoint)
-			options = append(options, "-H", fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port))
-		} else if endpoint.URL != "" && !(strings.HasPrefix(endpoint.URL, "unix://") || strings.HasPrefix(endpoint.URL, "npipe://")) {
-
-			proxy, err := w.proxyManager.CreateComposeProxyServer(endpoint)
-			if err != nil {
-				return nil, err
-			}
-
-			defer proxy.Close()
-
-			options = append(options, "-H", fmt.Sprintf("http://127.0.0.1:%d", proxy.Port))
-
+		proxy, err := w.proxyManager.CreateComposeProxyServer(endpoint)
+		if err != nil {
+			return nil, err
 		}
+
+		defer proxy.Close()
+
+		options = append(options, "-H", fmt.Sprintf("http://127.0.0.1:%d", proxy.Port))
 	}
 
 	args := append(options, command...)

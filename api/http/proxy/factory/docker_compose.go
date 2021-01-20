@@ -14,11 +14,17 @@ import (
 
 // ProxyServer provide an extedned proxy with a local server to forward requests
 type ProxyServer struct {
-	server http.Server
+	server *http.Server
 	Port   int
 }
 
 func (factory *ProxyFactory) NewDockerComposeAgentProxy(endpoint *portainer.Endpoint) (*ProxyServer, error) {
+
+	if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
+		return &ProxyServer{
+			Port: factory.reverseTunnelService.GetTunnelDetails(endpoint.ID).Port,
+		}, nil
+	}
 
 	endpointURL, err := url.Parse(endpoint.URL)
 	if err != nil {
@@ -43,17 +49,13 @@ func (factory *ProxyFactory) NewDockerComposeAgentProxy(endpoint *portainer.Endp
 	proxy.Transport = dockercompose.NewAgentTransport(factory.signatureService, httpTransport)
 
 	proxyServer := &ProxyServer{
-		http.Server{
+		&http.Server{
 			Handler: proxy,
 		},
 		0,
 	}
 
 	return proxyServer, proxyServer.Start()
-}
-
-func (factory *ProxyFactory) GetReverseTunnel(endpoint *portainer.Endpoint) *portainer.TunnelDetails {
-	return factory.reverseTunnelService.GetTunnelDetails(endpoint.ID)
 }
 
 func (proxy *ProxyServer) Start() error {
@@ -82,5 +84,7 @@ func (proxy *ProxyServer) Start() error {
 
 // Close the server proxy
 func (proxy *ProxyServer) Close() {
-	proxy.server.Close()
+	if proxy.server != nil {
+		proxy.server.Close()
+	}
 }
