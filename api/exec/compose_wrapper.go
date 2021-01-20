@@ -4,9 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"log"
-	"net"
-	"net/http"
 	"os"
 	"os/exec"
 	"path"
@@ -67,39 +64,15 @@ func (w *ComposeWrapper) command(command []string, stack *portainer.Stack, endpo
 			tunnel := w.proxyManager.GetReverseTunnel(endpoint)
 			options = append(options, "-H", fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port))
 		} else if endpoint.URL != "" && !(strings.HasPrefix(endpoint.URL, "unix://") || strings.HasPrefix(endpoint.URL, "npipe://")) {
-			proxy, err := w.proxyManager.CreateAndRegisterComposeEndpointProxy(endpoint)
+
+			proxy, err := w.proxyManager.CreateComposeProxyServer(endpoint)
 			if err != nil {
 				return nil, err
 			}
 
-			listener, err := net.Listen("tcp", ":0")
-			if err != nil {
-				return nil, err
-			}
+			defer proxy.Close()
 
-			server := http.Server{
-				Handler: proxy,
-			}
-
-			shutdownChan := make(chan error, 1)
-			port := listener.Addr().(*net.TCPAddr).Port
-			go func() {
-
-				log.Printf("Starting Proxy server on %s...\n", fmt.Sprintf("http://127.0.0.1:%d", port))
-
-				err := server.Serve(listener)
-				log.Printf("Proxy Server exited with '%v' error\n", err)
-
-				if err != http.ErrServerClosed {
-					log.Printf("Put '%v' error returned by Proxy Server to shutdown channel\n", err)
-					shutdownChan <- err
-				}
-			}()
-
-			defer server.Close()
-			defer w.proxyManager.DeleteEndpointProxy(endpoint)
-
-			options = append(options, "-H", fmt.Sprintf("http://127.0.0.1:%d", port))
+			options = append(options, "-H", fmt.Sprintf("http://127.0.0.1:%d", proxy.Port))
 
 		}
 	}
