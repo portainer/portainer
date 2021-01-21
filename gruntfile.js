@@ -210,13 +210,16 @@ function shell_download_docker_binary(p, a) {
 }
 
 function shell_download_docker_compose_binary(p, a) {
+  grunt.log.writeln('request docker compose for ' + p + ':' + a);
   var ps = { windows: 'win', darwin: 'mac' };
   var as = { arm: 'armhf', arm64: 'aarch64' };
-  var ip = ps[p] === undefined ? p : ps[p];
-  var ia = as[a] === undefined ? a : as[a];
+  var ip = ps[p] || p;
+  var ia = as[a] || a;
+  grunt.log.writeln('download docker compose for ' + ip + ':' + ia);
   var binaryVersion = '<%= binaries.dockerComposeVersion %>';
+  grunt.log.writeln('download docker compose version ' + binaryVersion);
 
-  if (p === 'linux' || p === 'mac') {
+  if (ip === 'linux' || ip === 'mac') {
     return [
       'if [ -f dist/docker-compose ]; then',
       'echo "Docker Compose binary exists";',
@@ -224,8 +227,7 @@ function shell_download_docker_compose_binary(p, a) {
       'build/download_docker_compose_binary.sh ' + ip + ' ' + ia + ' ' + binaryVersion + ';',
       'fi',
     ].join(' ');
-  }
-  if (p === 'win') {
+  } else if (ip === 'win') {
     return [
       'powershell -Command "& {if (Test-Path -Path "dist/docker-compose.exe") {',
       'Write-Host "Skipping download, Docker Compose binary exists"',
@@ -235,6 +237,7 @@ function shell_download_docker_compose_binary(p, a) {
       '}}"',
     ].join(' ');
   }
+  grunt.log.writeln('docker compose is downloaded');
 }
 
 function shell_download_kompose_binary(p, a) {
