@@ -34,9 +34,7 @@ const _KubernetesPersistentVolume = Object.freeze({
   StorageClass: {}, // KubernetesStorageClass
   Size: '',
   NFSAddress: '',
-  NFSVersion: '',
   NFSMountPoint: '',
-  NFSOptions: '',
 });
 
 export class KubernetesPersistentVolume {

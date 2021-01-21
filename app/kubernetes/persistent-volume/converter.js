@@ -10,9 +10,7 @@ class KubernetesPersistentVolumeConverter {
     pv.Size = fv.Size + fv.SizeUnit;
     pv.isNFSVolume = fv.isNFSVolume;
     pv.NFSAddress = fv.NFSAddress;
-    pv.NFSVersion = fv.NFSVersion;
     pv.NFSMountPoint = fv.NFSMountPoint;
-    pv.NFSOptions = _.split(fv.NFSOptions, ',');
     return pv;
   }
 
@@ -22,12 +20,7 @@ class KubernetesPersistentVolumeConverter {
     pv.StorageClass = _.find(storageClasses, { Name: data.spec.storageClassName });
     pv.Size = data.spec.capacity.storage;
     pv.NFSAddress = data.spec.nfs.server;
-    const nfsVersion = _.remove(data.spec.mountOptions, (opt) => {
-      return _.startsWith(opt, 'nfsvers=');
-    });
-    pv.NFSVersion = nfsVersion[0] || '';
     pv.NFSMountPoint = data.spec.nfs.path;
-    pv.NFSOptions = data.spec.mountOptions;
     return pv;
   }
 
@@ -42,8 +35,6 @@ class KubernetesPersistentVolumeConverter {
       path: pv.NFSMountPoint,
       server: pv.NFSAddress,
     };
-    res.spec.mountOptions = pv.NFSOptions;
-    res.spec.mountOptions.push('nfsvers=' + pv.NFSVersion);
     return res;
   }
 }

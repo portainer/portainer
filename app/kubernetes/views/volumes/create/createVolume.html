@@ -133,20 +133,6 @@
               </div>
 
               <div class="form-group">
-                <label for="nfs_version" class="col-sm-1 control-label text-left">NFS Version</label>
-                <div class="col-sm-11">
-                  <input type="text" class="form-control" name="nfs_version" ng-model="ctrl.formValues.NFSVersion" ng-change="ctrl.onChangeNFSVersion()" required />
-                </div>
-              </div>
-              <div class="form-group" ng-show="kubernetesVolumeCreationForm.nfs_version.$invalid">
-                <div class="col-sm-12 small text-warning">
-                  <div ng-messages="kubernetesVolumeCreationForm.nfs_version.$error">
-                    <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-group">
                 <label for="mount_point" class="col-sm-1 control-label text-left">Mount point</label>
                 <div class="col-sm-11">
                   <input
@@ -162,23 +148,6 @@
               <div class="form-group" ng-show="kubernetesVolumeCreationForm.mount_point.$invalid">
                 <div class="col-sm-12 small text-warning">
                   <div ng-messages="kubernetesVolumeCreationForm.mount_point.$error">
-                    <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="nfs_options" class="col-sm-1 control-label text-left">
-                  Options
-                  <portainer-tooltip position="bottom" message="Comma separated list of options"></portainer-tooltip>
-                </label>
-                <div class="col-sm-11">
-                  <input type="text" class="form-control" name="nfs_options" ng-model="ctrl.formValues.NFSOptions" placeholder="e.g. rw, noatime, tcp..." required />
-                </div>
-              </div>
-              <div class="form-group" ng-show="kubernetesVolumeCreationForm.nfs_options.$invalid">
-                <div class="col-sm-12 small text-warning">
-                  <div ng-messages="kubernetesVolumeCreationForm.nfs_options.$error">
                     <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
                   </div>
                 </div>
