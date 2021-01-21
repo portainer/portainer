@@ -1129,7 +1129,7 @@ const (
 	// DBVersion is the version number of the Portainer database
 	DBVersion = 25
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
-	ComposeSyntaxMaxVersion = "3.8"
+	ComposeSyntaxMaxVersion = "3.9"
 	// AssetsServerURL represents the URL of the Portainer asset server
 	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
