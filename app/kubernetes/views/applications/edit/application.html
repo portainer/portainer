@@ -190,15 +190,21 @@
     <div class="col-sm-12">
       <rd-widget>
         <rd-widget-body>
-          <div ng-if="!ctrl.isSystemNamespace()" style="margin-bottom: 15px;">
-            <button ng-if="!ctrl.isExternalApplication()" type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.applications.application.edit" style="margin-left: 0;">
+          <div ng-if="!ctrl.isSystemNamespace()">
+            <button
+              ng-if="!ctrl.isExternalApplication()"
+              type="button"
+              class="btn btn-sm btn-primary"
+              ui-sref="kubernetes.applications.application.edit"
+              style="margin-left: 0; margin-bottom: 15px;"
+            >
               <i class="fa fa-file-code space-right" aria-hidden="true"></i>Edit this application
             </button>
             <button
               ng-if="ctrl.application.ApplicationType !== ctrl.KubernetesApplicationTypes.POD"
               type="button"
               class="btn btn-sm btn-primary"
-              style="margin-left: 0;"
+              style="margin-left: 0; margin-bottom: 15px;"
               ng-click="ctrl.redeployApplication()"
             >
               <i class="fa fa-redo space-right" aria-hidden="true"></i>Redeploy
@@ -207,7 +213,7 @@
               ng-if="!ctrl.isExternalApplication()"
               type="button"
               class="btn btn-sm btn-primary"
-              style="margin-left: 0;"
+              style="margin-left: 0; margin-bottom: 15px;"
               ng-click="ctrl.rollbackApplication()"
               ng-disabled="ctrl.application.Revisions.length < 2"
             >
