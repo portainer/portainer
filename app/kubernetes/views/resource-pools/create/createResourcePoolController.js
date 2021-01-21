@@ -58,6 +58,7 @@ class KubernetesCreateResourcePoolController {
 
   removeHostname(ingressClass, index) {
     ingressClass.Hosts.splice(index, 1);
+    this.onChangeIngressHostname();
   }
 
   /* #region  ANNOTATIONS MANAGEMENT */

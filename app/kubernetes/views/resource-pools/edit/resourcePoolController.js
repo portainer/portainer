@@ -66,6 +66,18 @@ class KubernetesResourcePoolController {
   }
   /* #endregion */
 
+  /* #region  ANNOTATIONS MANAGEMENT */
+  addAnnotation(ingressClass) {
+    ingressClass.Annotations.push(new KubernetesResourcePoolIngressClassAnnotationFormValue());
+  }
+
+  removeAnnotation(ingressClass, index) {
+    ingressClass.Annotations.splice(index, 1);
+    this.onChangeIngressHostname();
+  }
+  /* #endregion */
+
+  /* #region  INGRESS MANAGEMENT */
   onChangeIngressHostname() {
     const state = this.state.duplicates.ingressHosts;
 
@@ -83,17 +95,6 @@ class KubernetesResourcePoolController {
     state.hasRefs = Object.keys(duplicates).length > 0;
   }
 
-  /* #region  ANNOTATIONS MANAGEMENT */
-  addAnnotation(ingressClass) {
-    ingressClass.Annotations.push(new KubernetesResourcePoolIngressClassAnnotationFormValue());
-  }
-
-  removeAnnotation(ingressClass, index) {
-    ingressClass.Annotations.splice(index, 1);
-  }
-  /* #endregion */
-
-  /* #region  INGRESS MANAGEMENT */
   addHostname(ingressClass) {
     ingressClass.Hosts.push(new KubernetesResourcePoolIngressClassHostFormValue());
   }
@@ -104,6 +105,7 @@ class KubernetesResourcePoolController {
     } else {
       ingressClass.Hosts.splice(index, 1);
     }
+    this.onChangeIngressHostname();
   }
 
   restoreHostname(host) {
