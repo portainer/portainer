@@ -9,7 +9,7 @@ import {
   KubernetesPortainerApplicationNote,
 } from 'Kubernetes/models/application/models';
 
-import { CreatePayload } from './payloads/create';
+import { createPayloadFactory } from './payloads/create';
 import { KubernetesPod, KubernetesPodToleration, KubernetesPodAffinity, KubernetesPodContainer, KubernetesPodContainerTypes } from './models';
 
 function computeStatus(statuses) {
@@ -125,7 +125,7 @@ export default class KubernetesPodConverter {
 }
 
 function createPayload(pod) {
-  const payload = new CreatePayload();
+  const payload = createPayloadFactory();
   payload.metadata.name = pod.Name;
   payload.metadata.namespace = pod.Namespace;
   payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = pod.StackName;
