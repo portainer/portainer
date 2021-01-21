@@ -674,6 +674,9 @@ angular.module('portainer.docker').controller('ServiceController', [
       ServiceService.service($transition$.params().id)
         .then(function success(data) {
           service = data;
+          if (service.HealthCheck) {
+            service.HealthCheck.CustomHealthcheck = true;
+          }
           $scope.isUpdating = $scope.lastVersion >= service.Version;
           if (!$scope.isUpdating) {
             $scope.lastVersion = service.Version;

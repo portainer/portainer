@@ -5,6 +5,14 @@
       <table class="table">
         <tbody>
           <tr>
+            <td style="width: 15%;">Enable custom healthcheck</td>
+            <td colspan="2">
+              <label class="switch">
+                <input type="checkbox" ng-model="service.HealthCheck.CustomHealthcheck" ng-change="updateServiceAttribute(service, 'HealthCheck.CustomHealthcheck')" /><i></i>
+              </label>
+            </td>
+          </tr>
+          <tr ng-if="service.HealthCheck.CustomHealthcheck">
             <td>Healthcheck command</td>
             <td colspan="2">
               <input
@@ -18,7 +26,7 @@
               />
             </td>
           </tr>
-          <tr>
+          <tr ng-if="service.HealthCheck.CustomHealthcheck">
             <td>Interval</td>
             <td>
               <input
@@ -37,7 +45,7 @@
               </p>
             </td>
           </tr>
-          <tr>
+          <tr ng-if="service.HealthCheck.CustomHealthcheck">
             <td>Timeout</td>
             <td>
               <input
@@ -55,7 +63,7 @@
               </p>
             </td>
           </tr>
-          <tr>
+          <tr ng-if="service.HealthCheck.CustomHealthcheck">
             <td>Start period</td>
             <td>
               <input
@@ -74,7 +82,7 @@
               </p>
             </td>
           </tr>
-          <tr>
+          <tr ng-if="service.HealthCheck.CustomHealthcheck">
             <td>Retries</td>
             <td>
               <input
@@ -101,7 +109,7 @@
           <button
             type="button"
             class="btn btn-primary btn-sm"
-            ng-disabled="!hasChanges(service, ['HealthCheck.Test[1]', 'HealthCheck.Interval', 'HealthCheck.Timeout', 'HealthCheck.StartPeriod', 'HealthCheck.Retries'])"
+            ng-disabled="!hasChanges(service, ['HealthCheck.CustomHealthcheck', 'HealthCheck.Test[1]', 'HealthCheck.Interval', 'HealthCheck.Timeout', 'HealthCheck.StartPeriod', 'HealthCheck.Retries'])"
             ng-click="updateService(service)"
             >Apply changes</button
           >

@@ -458,11 +458,14 @@ angular.module('portainer.docker').controller('CreateServiceController', [
 
     function prepareHealthcheckConfig(config, input) {
       if (input.Healthcheck) {
+        const interval = input.Interval ? input.Interval : '30s';
+        const timeout = input.Timeout ? input.Timeout : '30s';
+        const startPeriod = input.StartPeriod ? input.StartPeriod : '0s';
         config.TaskTemplate.ContainerSpec.HealthCheck = {
           Test: ['CMD-SHELL', input.Healthcheck],
-          Interval: ServiceHelper.translateHumanDurationToNanos(input.Interval),
-          Timeout: ServiceHelper.translateHumanDurationToNanos(input.Timeout),
-          StartPeriod: ServiceHelper.translateHumanDurationToNanos(input.StartPeriod),
+          Interval: ServiceHelper.translateHumanDurationToNanos(interval),
+          Timeout: ServiceHelper.translateHumanDurationToNanos(timeout),
+          StartPeriod: ServiceHelper.translateHumanDurationToNanos(startPeriod),
           Retries: input.Retries,
         };
       }
@@ -548,6 +551,14 @@ angular.module('portainer.docker').controller('CreateServiceController', [
     function volumesAreValid() {
       const volumes = $scope.formValues.Volumes;
       return volumes.every((volume) => volume.Target && volume.Source);
+    }
+
+    $scope.healthcheckIsValid = healthcheckIsValid;
+    function healthcheckIsValid() {
+      if ($scope.formValues.CustomHealthcheck) {
+        return $scope.formValues.Healthcheck !== '' && $scope.formValues.Healthcheck !== undefined;
+      }
+      return true;
     }
 
     $scope.create = function createService() {
