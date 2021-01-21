@@ -210,14 +210,14 @@ function shell_download_docker_binary(p, a) {
 }
 
 function shell_download_docker_compose_binary(p, a) {
-  grunt.log.writeln('request docker compose for ' + p + ':' + a);
+  console.log('request docker compose for ' + p + ':' + a);
   var ps = { windows: 'win', darwin: 'mac' };
   var as = { arm: 'armhf', arm64: 'aarch64' };
   var ip = ps[p] || p;
   var ia = as[a] || a;
-  grunt.log.writeln('download docker compose for ' + ip + ':' + ia);
+  console.log('download docker compose for ' + ip + ':' + ia);
   var binaryVersion = '<%= binaries.dockerComposeVersion %>';
-  grunt.log.writeln('download docker compose version ' + binaryVersion);
+  console.log('download docker compose version ' + binaryVersion);
 
   if (ip === 'linux' || ip === 'mac') {
     return [
@@ -237,7 +237,7 @@ function shell_download_docker_compose_binary(p, a) {
       '}}"',
     ].join(' ');
   }
-  grunt.log.writeln('docker compose is downloaded');
+  console.log('docker compose is downloaded');
 }
 
 function shell_download_kompose_binary(p, a) {
