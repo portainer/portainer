@@ -1,7 +1,7 @@
 FROM alpine:latest as builder
 
 # required to run docker-compose
-RUN mkdir /tmp
+RUN mkdir /buildtmp
   
 FROM portainer/base
 
@@ -13,6 +13,6 @@ WORKDIR /
 EXPOSE 9000
 EXPOSE 8000
 
-COPY --from=builder /tmp /tmp
+COPY --from=builder /buildtmp /tmp
 
 ENTRYPOINT ["/portainer"]
