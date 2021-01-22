@@ -1,5 +1,3 @@
-require('../../../templates/advancedDeploymentPanel.html');
-
 import angular from 'angular';
 import * as _ from 'lodash-es';
 import * as JsonPatch from 'fast-json-patch';
@@ -103,7 +101,6 @@ class KubernetesApplicationController {
     Notifications,
     LocalStorage,
     ModalService,
-    Authentication,
     KubernetesApplicationService,
     KubernetesEventService,
     KubernetesStackService,
@@ -117,7 +114,6 @@ class KubernetesApplicationController {
     this.Notifications = Notifications;
     this.LocalStorage = LocalStorage;
     this.ModalService = ModalService;
-    this.Authentication = Authentication;
 
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesEventService = KubernetesEventService;
@@ -339,7 +335,6 @@ class KubernetesApplicationController {
       placementWarning: false,
       expandedNote: false,
       useIngress: false,
-      isAdmin: this.Authentication.isAdmin(),
     };
 
     this.state.activeTab = this.LocalStorage.getActiveTab('application');
