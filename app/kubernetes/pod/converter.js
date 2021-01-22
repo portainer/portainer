@@ -1,5 +1,16 @@
+import * as JsonPatch from 'fast-json-patch';
 import _ from 'lodash-es';
-import { KubernetesPod, KubernetesPodToleration, KubernetesPodAffinity, KubernetesPodContainer, KubernetesPodContainerTypes } from 'Kubernetes/pod/models';
+
+import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
+import {
+  KubernetesPortainerApplicationStackNameLabel,
+  KubernetesPortainerApplicationNameLabel,
+  KubernetesPortainerApplicationOwnerLabel,
+  KubernetesPortainerApplicationNote,
+} from 'Kubernetes/models/application/models';
+
+import { createPayloadFactory } from './payloads/create';
+import { KubernetesPod, KubernetesPodToleration, KubernetesPodAffinity, KubernetesPodContainer, KubernetesPodContainerTypes } from './models';
 
 function computeStatus(statuses) {
   const containerStatuses = _.map(statuses, 'state');
@@ -104,4 +115,48 @@ export default class KubernetesPodConverter {
     res.Tolerations = computeTolerations(data.spec.tolerations);
     return res;
   }
+
+  static patchPayload(oldPod, newPod) {
+    const oldPayload = createPayload(oldPod);
+    const newPayload = createPayload(newPod);
+    const payload = JsonPatch.compare(oldPayload, newPayload);
+    return payload;
+  }
+}
+
+function createPayload(pod) {
+  const payload = createPayloadFactory();
+  payload.metadata.name = pod.Name;
+  payload.metadata.namespace = pod.Namespace;
+  payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = pod.StackName;
+  payload.metadata.labels[KubernetesPortainerApplicationNameLabel] = pod.ApplicationName;
+  payload.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = pod.ApplicationOwner;
+  if (pod.Note) {
+    payload.metadata.annotations[KubernetesPortainerApplicationNote] = pod.Note;
+  } else {
+    payload.metadata.annotations = undefined;
+  }
+
+  payload.spec.replicas = pod.ReplicaCount;
+  payload.spec.selector.matchLabels.app = pod.Name;
+  payload.spec.template.metadata.labels.app = pod.Name;
+  payload.spec.template.metadata.labels[KubernetesPortainerApplicationNameLabel] = pod.ApplicationName;
+  payload.spec.template.spec.containers[0].name = pod.Name;
+  payload.spec.template.spec.containers[0].image = pod.Image;
+  payload.spec.template.spec.affinity = pod.Affinity;
+  KubernetesCommonHelper.assignOrDeleteIfEmpty(payload, 'spec.template.spec.containers[0].env', pod.Env);
+  KubernetesCommonHelper.assignOrDeleteIfEmpty(payload, 'spec.template.spec.containers[0].volumeMounts', pod.VolumeMounts);
+  KubernetesCommonHelper.assignOrDeleteIfEmpty(payload, 'spec.template.spec.volumes', pod.Volumes);
+  if (pod.MemoryLimit) {
+    payload.spec.template.spec.containers[0].resources.limits.memory = pod.MemoryLimit;
+    payload.spec.template.spec.containers[0].resources.requests.memory = pod.MemoryLimit;
+  }
+  if (pod.CpuLimit) {
+    payload.spec.template.spec.containers[0].resources.limits.cpu = pod.CpuLimit;
+    payload.spec.template.spec.containers[0].resources.requests.cpu = pod.CpuLimit;
+  }
+  if (!pod.CpuLimit && !pod.MemoryLimit) {
+    delete payload.spec.template.spec.containers[0].resources;
+  }
+  return payload;
 }
