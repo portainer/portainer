@@ -36,6 +36,17 @@
                     <p> <i class="fa fa-exclamation-triangle" aria-hidden="true" style="margin-right: 2px;"></i> At least a single limit must be set for the quota to be valid. </p>
                   </span>
                 </div>
+                <div ng-if="ctrl.formValues.HasQuota">
+                  <kubernetes-resource-reservation
+                    ng-if="ctrl.pool.Quota"
+                    description="Resource reservation represents the total amount of resource assigned to all the applications deployed inside this resource pool."
+                    cpu="ctrl.state.cpuUsed"
+                    memory="ctrl.state.memoryUsed"
+                    cpu-limit="ctrl.formValues.CpuLimit"
+                    memory-limit="ctrl.formValues.MemoryLimit"
+                  >
+                  </kubernetes-resource-reservation>
+                </div>
                 <!-- !quotas-switch -->
                 <div ng-if="ctrl.formValues.HasQuota && ctrl.isAdmin && ctrl.isEditable">
                   <div class="col-sm-12 form-section-title">
@@ -109,17 +120,31 @@
                     <!-- !cpu-limit-input -->
                   </div>
                 </div>
-                <div ng-if="ctrl.formValues.HasQuota">
-                  <kubernetes-resource-reservation
-                    ng-if="ctrl.pool.Quota"
-                    description="Resource reservation represents the total amount of resource assigned to all the applications deployed inside this resource pool."
-                    cpu="ctrl.state.cpuUsed"
-                    memory="ctrl.state.memoryUsed"
-                    cpu-limit="ctrl.formValues.CpuLimit"
-                    memory-limit="ctrl.formValues.MemoryLimit"
-                  >
-                  </kubernetes-resource-reservation>
+                <!-- #region LOADBALANCERS -->
+                <div class="col-sm-12 form-section-title">
+                  Load balancers
                 </div>
+
+                <div class="form-group">
+                  <span class="col-sm-12 text-muted small">
+                    <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                    You can set a quota on the amount of external load balancers that can be created inside this resource pool. Set this quota to 0 to effectively disable the use
+                    of load balancers in this resource pool.
+                  </span>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-12">
+                    <label class="control-label text-left">
+                      Load Balancer quota
+                    </label>
+                    <label class="switch" style="margin-left: 20px;"> <input type="checkbox" disabled /><i></i> </label>
+                    <span class="text-muted small" style="margin-left: 15px;">
+                      <i class="fa fa-user" aria-hidden="true"></i>
+                      This feature is available in <a href="https://www.portainer.io/business-upsell?from=k8s-resourcepool-lbquota" target="_blank"> Portainer Business Edition</a>.
+                    </span>
+                  </div>
+                </div>
+                <!-- #endregion -->
                 <div ng-if="ctrl.isAdmin && ctrl.isEditable && ctrl.state.canUseIngress">
                   <div class="col-sm-12 form-section-title">
                     Ingresses
@@ -250,33 +275,7 @@
                   </div>
                   <!-- #endregion -->
                 </div>
-                <!-- #region LOAD-BALANCERS -->
-                <div class="col-sm-12 form-section-title">
-                  Load balancers
-                </div>
-
-                <div class="form-group">
-                  <span class="col-sm-12 text-muted small">
-                    <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                    You can set a quota on the amount of external load balancers that can be created inside this resource pool. Set this quota to 0 to effectively disable the use
-                    of load balancers in this resource pool.
-                  </span>
-                </div>
-                <div class="form-group">
-                  <div class="col-sm-12">
-                    <label class="control-label text-left">
-                      Load Balancer quota
-                    </label>
-                    <label class="switch" style="margin-left: 20px;"> <input type="checkbox" disabled /><i></i> </label>
-                    <span class="text-muted small" style="margin-left: 15px;">
-                      <i class="fa fa-user" aria-hidden="true"></i>
-                      This feature is available in <a href="https://www.portainer.io/business-upsell?from=k8s-resourcepool-lbquota" target="_blank"> Portainer Business Edition</a>.
-                    </span>
-                  </div>
-                </div>
-                <!-- #endregion -->
-
-                <!-- #region LOAD-BALANCERS -->
+                <!-- #region STORAGES -->
                 <div class="col-sm-12 form-section-title">
                   Storages
                 </div>

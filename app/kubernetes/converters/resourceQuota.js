@@ -83,6 +83,7 @@ class KubernetesResourceQuotaConverter {
       res.HasQuota = true;
     }
     res.StorageClasses = quota.StorageRequests;
+    return res;
   }
 
   static resourcePoolFormValuesToResourceQuota(formValues) {

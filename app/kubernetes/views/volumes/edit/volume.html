@@ -101,11 +101,11 @@
                           </div>
 
                           <div class="form-inline">
-                            <div class="small text-warning" style="margin-top: 5px;" ng-show="ctrl.state.volumeSizeError || kubernetesVolumeUpdateForm.size.$invalid">
+                            <div class="small text-warning" style="margin-top: 5px;" ng-show="ctrl.state.errors.volumeSize || kubernetesVolumeUpdateForm.size.$invalid">
                               <div ng-messages="kubernetesVolumeUpdateForm.size.$error">
                                 <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
                               </div>
-                              <p ng-show="ctrl.state.volumeSizeError && !kubernetesVolumeUpdateForm.size.$invalid"
+                              <p ng-show="ctrl.state.errors.volumeSize && !kubernetesVolumeUpdateForm.size.$invalid"
                                 ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> The new size must be greater than the actual size.</p
                               >
                             </div>

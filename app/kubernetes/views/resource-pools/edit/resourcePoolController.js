@@ -146,7 +146,7 @@ class KubernetesResourcePoolController {
     this.state.actionInProgress = true;
     try {
       this.checkDefaults();
-      this.KubernetesResourcePoolService.patch(this.savedFormValues, this.formValues);
+      await this.KubernetesResourcePoolService.patch(this.savedFormValues, this.formValues);
       this.Notifications.success('Resource pool successfully updated', this.pool.Namespace.Name);
       this.$state.reload();
     } catch (err) {

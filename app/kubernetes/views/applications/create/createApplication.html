@@ -62,7 +62,6 @@
                   placeholder="nginx:latest"
                   required
                   ng-disabled="ctrl.formValues.Containers.length > 1"
-                  div
                 />
               </div>
             </div>
@@ -366,12 +365,7 @@
             <div class="form-group" ng-if="ctrl.storageClassAvailable()">
               <div class="col-sm-12" style="margin-top: 5px;">
                 <label class="control-label text-left">Persisted folders</label>
-                <span
-                  class="label label-default interactive"
-                  style="margin-left: 10px;"
-                  ng-click="ctrl.addPersistedFolder()"
-                  ng-if="!ctrl.isEditAndStatefulSet() && ctrl.formValues.Containers.length <= 1"
-                >
+                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addPersistedFolder()" ng-if="ctrl.isAddPersistentFolderButtonShowed()">
                   <i class="fa fa-plus-circle" aria-hidden="true"></i> add persisted folder
                 </span>
               </div>
@@ -407,7 +401,7 @@
                         ng-model="persistedFolder.UseNewVolume"
                         uib-btn-radio="true"
                         ng-change="ctrl.useNewVolume($index)"
-                        ng-disabled="ctrl.isEditAndExistingPersistedFolder($index)"
+                        ng-disabled="ctrl.isNewVolumeButtonDisabled($index)"
                         >New volume</label
                       >
                       <label
@@ -415,7 +409,7 @@
                         ng-model="persistedFolder.UseNewVolume"
                         uib-btn-radio="false"
                         ng-change="ctrl.useExistingVolume($index)"
-                        ng-disabled="ctrl.availableVolumes.length === 0 || ctrl.application.ApplicationType === ctrl.ApplicationTypes.STATEFULSET"
+                        ng-disabled="ctrl.isExistingVolumeButtonDisabled()"
                         >Existing volume</label
                       >
                     </span>
@@ -696,7 +690,8 @@
               <div class="col-sm-12 small text-warning">
                 <div ng-messages="kubernetesApplicationCreationForm.memory_limit.$error">
                   <p
-                    ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value must be between {{ ctrl.state.sliders.memory.min }} and {{ ctrl.state.sliders.memory.max }}
+                    ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value must be between {{ ctrl.state.sliders.memory.min }} and
+                    {{ ctrl.state.sliders.memory.max }}
                   </p>
                 </div>
               </div>
@@ -824,7 +819,8 @@
             >
               <div class="col-sm-12 small text-muted">
                 <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                This application will reserve the following resources: <b>{{ ctrl.formValues.CpuLimit * ctrl.formValues.ReplicaCount | kubernetesApplicationCPUValue }} CPU</b> and
+                This application will reserve the following resources:
+                <b>{{ ctrl.formValues.CpuLimit * ctrl.formValues.ReplicaCount | kubernetesApplicationCPUValue }} CPU</b> and
                 <b>{{ ctrl.formValues.MemoryLimit * ctrl.formValues.ReplicaCount }} MB</b> of memory.
               </div>
             </div>
