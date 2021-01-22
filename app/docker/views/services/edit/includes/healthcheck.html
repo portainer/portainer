@@ -24,6 +24,9 @@
                 disable-authorization="DockerServiceUpdate"
                 placeholder="curl --fail http://localhost:80/ || exit 1"
               />
+              <div class="col-sm-12 small text-warning" style="padding-left: 0px;" ng-show="!service.HealthCheck.Test[1]">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Healthcheck command is required.
+              </div>
             </td>
           </tr>
           <tr ng-if="service.HealthCheck.CustomHealthcheck">
@@ -109,7 +112,7 @@
           <button
             type="button"
             class="btn btn-primary btn-sm"
-            ng-disabled="!hasChanges(service, ['HealthCheck.CustomHealthcheck', 'HealthCheck.Test[1]', 'HealthCheck.Interval', 'HealthCheck.Timeout', 'HealthCheck.StartPeriod', 'HealthCheck.Retries'])"
+            ng-disabled="(service.HealthCheck.CustomHealthcheck && !service.HealthCheck.Test[1]) || !hasChanges(service, ['HealthCheck.CustomHealthcheck', 'HealthCheck.Test[1]', 'HealthCheck.Interval', 'HealthCheck.Timeout', 'HealthCheck.StartPeriod', 'HealthCheck.Retries'])"
             ng-click="updateService(service)"
             >Apply changes</button
           >
