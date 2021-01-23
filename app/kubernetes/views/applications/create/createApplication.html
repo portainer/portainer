@@ -261,8 +261,8 @@
                 <div class="col-md-1 col-sm-2"></div>
                 <div class="col-md-11 col-sm-10 small text-muted" style="padding-left: 5px;">
                   The following keys will be loaded from the <code>{{ config.SelectedConfiguration.Name }}</code> configuration as environment variables:
-                  <span ng-repeat="entry in config.SelectedConfiguration.Data">
-                    <code>{{ entry.Key }}</code
+                  <span ng-repeat="(key, _) in config.SelectedConfiguration.Data">
+                    <code>{{ key }}</code
                     >{{ $last ? '' : ', ' }}
                   </span>
                 </div>

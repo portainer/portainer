@@ -19,3 +19,15 @@ export class KubernetesConfigurationFormValues {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesConfigurationFormValues)));
   }
 }
+
+const _KubernetesConfigurationFormValuesEntry = Object.freeze({
+  Key: '',
+  Value: '',
+  IsBinary: false,
+});
+
+export class KubernetesConfigurationFormValuesEntry {
+  constructor() {
+    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesConfigurationFormValuesEntry)));
+  }
+}

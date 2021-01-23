@@ -1,7 +1,8 @@
 import _ from 'lodash-es';
 import { KubernetesConfigMap } from 'Kubernetes/models/config-map/models';
 import { KubernetesConfigMapCreatePayload, KubernetesConfigMapUpdatePayload } from 'Kubernetes/models/config-map/payloads';
-import { KubernetesConfigurationEntry, KubernetesPortainerConfigurationOwnerLabel } from 'Kubernetes/models/configuration/models';
+import { KubernetesPortainerConfigurationOwnerLabel } from 'Kubernetes/models/configuration/models';
+import { KubernetesConfigurationFormValuesEntry } from 'Kubernetes/models/configuration/formvalues';
 
 class KubernetesConfigMapConverter {
   /**
@@ -18,13 +19,13 @@ class KubernetesConfigMapConverter {
 
     res.Data = _.concat(
       _.map(data.data, (value, key) => {
-        const entry = new KubernetesConfigurationEntry();
+        const entry = new KubernetesConfigurationFormValuesEntry();
         entry.Key = key;
         entry.Value = value;
         return entry;
       }),
       _.map(data.binaryData, (value, key) => {
-        const entry = new KubernetesConfigurationEntry();
+        const entry = new KubernetesConfigurationFormValuesEntry();
         entry.Key = key;
         entry.Value = value;
         entry.IsBinary = true;

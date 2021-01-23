@@ -1,8 +1,9 @@
 import { KubernetesSecretCreatePayload, KubernetesSecretUpdatePayload } from 'Kubernetes/models/secret/payloads';
 import { KubernetesApplicationSecret } from 'Kubernetes/models/secret/models';
-import { KubernetesConfigurationEntry, KubernetesPortainerConfigurationDataAnnotation } from 'Kubernetes/models/configuration/models';
+import { KubernetesPortainerConfigurationDataAnnotation } from 'Kubernetes/models/configuration/models';
 import _ from 'lodash-es';
 import { KubernetesPortainerConfigurationOwnerLabel } from 'Kubernetes/models/configuration/models';
+import { KubernetesConfigurationFormValuesEntry } from 'Kubernetes/models/configuration/formvalues';
 
 class KubernetesSecretConverter {
   static createPayload(secret) {
@@ -59,7 +60,7 @@ class KubernetesSecretConverter {
 
     res.Data = _.map(payload.data, (value, key) => {
       const annotations = payload.metadata.annotations ? payload.metadata.annotations[KubernetesPortainerConfigurationDataAnnotation] : '';
-      const entry = new KubernetesConfigurationEntry();
+      const entry = new KubernetesConfigurationFormValuesEntry();
       entry.Key = key;
       entry.IsBinary = _.includes(annotations, entry.Key);
 

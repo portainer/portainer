@@ -4,7 +4,7 @@ import chardet from 'chardet';
 import { Base64 } from 'js-base64';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
-import { KubernetesConfigurationEntry } from 'Kubernetes/models/configuration/models';
+import { KubernetesConfigurationFormValuesEntry } from 'Kubernetes/models/configuration/formvalues';
 
 class KubernetesConfigurationDataController {
   /* @ngInject */
@@ -25,7 +25,7 @@ class KubernetesConfigurationDataController {
   }
 
   addEntry() {
-    this.formValues.Data.push(new KubernetesConfigurationEntry());
+    this.formValues.Data.push(new KubernetesConfigurationFormValuesEntry());
   }
 
   removeEntry(index) {
@@ -42,7 +42,7 @@ class KubernetesConfigurationDataController {
   }
 
   async onFileLoadAsync(event) {
-    const entry = new KubernetesConfigurationEntry();
+    const entry = new KubernetesConfigurationFormValuesEntry();
     const encoding = chardet.detect(Buffer.from(event.target.result));
     const decoder = new TextDecoder(encoding);
 

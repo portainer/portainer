@@ -1,7 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import { KubernetesConfigurationFormValues } from 'Kubernetes/models/configuration/formvalues';
-import { KubernetesConfigurationTypes, KubernetesConfigurationEntry } from 'Kubernetes/models/configuration/models';
+import { KubernetesConfigurationFormValues, KubernetesConfigurationFormValuesEntry } from 'Kubernetes/models/configuration/formvalues';
+import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 
 class KubernetesCreateConfigurationController {
@@ -80,7 +80,7 @@ class KubernetesCreateConfigurationController {
     };
 
     this.formValues = new KubernetesConfigurationFormValues();
-    this.formValues.Data.push(new KubernetesConfigurationEntry());
+    this.formValues.Data.push(new KubernetesConfigurationFormValuesEntry());
 
     try {
       const resourcePools = await this.KubernetesResourcePoolService.get();
