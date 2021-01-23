@@ -17,7 +17,7 @@ COPY --from=core /mingit /mingit
 
 COPY dist /
 
-RUN setx /M path "%path%;C:\mingit\cmd"
+RUN setx /M path "C:\mingit\cmd;%path%"
 
 WORKDIR /
 
