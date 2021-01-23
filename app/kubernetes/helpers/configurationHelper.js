@@ -1,4 +1,5 @@
-import { KubernetesConfigurationTypes, KubernetesConfigurationEntry } from 'Kubernetes/models/configuration/models';
+import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
+import { KubernetesConfigurationFormValuesEntry } from 'Kubernetes/models/configuration/formvalues';
 import _ from 'lodash-es';
 import YAML from 'yaml';
 
@@ -40,7 +41,7 @@ class KubernetesConfigurationHelper {
   static parseYaml(formValues) {
     YAML.defaultOptions.customTags = ['binary'];
     const data = _.map(YAML.parse(formValues.DataYaml), (value, key) => {
-      const entry = new KubernetesConfigurationEntry();
+      const entry = new KubernetesConfigurationFormValuesEntry();
       entry.Key = key;
       entry.Value = value;
       const oldEntry = _.find(formValues.Data, { Key: entry.Key });
