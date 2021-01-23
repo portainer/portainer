@@ -53,23 +53,23 @@
                       </td>
                     </tr>
                     <tr>
-                      <td>
+                      <td class="col-xs-3">
                         Availability
                       </td>
-                      <td>
-                        <select class="form-control" name="availability" style="width: 16rem;" ng-model="ctrl.formValues.Availability">
+                      <td class="col-xs-9">
+                        <select class="form-control" name="availability" style="display: inline-block; width: 16rem;" ng-model="ctrl.formValues.Availability">
                           <option>{{ ctrl.availabilities.ACTIVE }}</option>
                           <option>{{ ctrl.availabilities.PAUSE }}</option>
                           <option>{{ ctrl.availabilities.DRAIN }}</option>
                         </select>
-                        <div class="small text-warning" ng-if="ctrl.state.isDrainOperation && ctrl.formValues.Availability === ctrl.availabilities.DRAIN">
+                        <span class="small text-warning" ng-if="ctrl.state.isDrainOperation && ctrl.formValues.Availability === ctrl.availabilities.DRAIN">
                           <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                           Cannot use this action while another node is currently being drained.
-                        </div>
-                        <div class="small text-warning" ng-if="ctrl.state.isContainPortainer && ctrl.formValues.Availability === ctrl.availabilities.DRAIN">
+                        </span>
+                        <span class="small text-warning" ng-if="ctrl.state.isContainPortainer && ctrl.formValues.Availability === ctrl.availabilities.DRAIN">
                           <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                          You cannot drain a node that contains portainer.
-                        </div>
+                          Cannot drain a node where this Portainer instance is running.
+                        </span>
                       </td>
                     </tr>
                   </tbody>
