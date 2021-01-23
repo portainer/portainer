@@ -219,7 +219,7 @@ function shell_download_docker_compose_binary(p, a) {
   console.log('download docker compose for ' + ip + ':' + ia);
   var linuxBinaryVersion = '<%= binaries.dockerLinuxComposeVersion %>';
   var windowsBinaryVersion = '<%= binaries.dockerWindowsComposeVersion %>';
-  console.log('download docker compose version ' + binaryVersion);
+  console.log('download docker compose versions; Linux: ' + linuxBinaryVersion + ' Windows: ' + windowsBinaryVersion);
 
   if (ip === 'linux' || ip === 'mac') {
     return [
