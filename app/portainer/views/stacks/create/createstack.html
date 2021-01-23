@@ -90,6 +90,9 @@
               <span class="col-sm-12 text-muted small">
                 You can get more information about Compose file format in the <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>.
               </span>
+              <div class="col-sm-12" ng-if="state.yamlValidationError"
+                ><span class="text-danger small">{{ state.yamlValidationError }}</span></div
+              >
             </div>
             <div class="form-group">
               <div class="col-sm-12">
@@ -112,10 +115,17 @@
               <span class="col-sm-12 text-muted small">
                 You can upload a Compose file from your computer.
               </span>
+              <div class="col-sm-12" ng-if="state.yamlUploadError"
+                ><span class="text-danger small">{{ state.yamlUploadError }}</span></div
+              >
             </div>
             <div class="form-group">
               <div class="col-sm-12">
+<<<<<<< HEAD
                 <button type="button" class="btn btn-sm btn-primary" ngf-select ng-model="formValues.StackFile">Select file</button>
+=======
+                <button class="btn btn-sm btn-primary" ngf-select="uploadFile($file)">Select file</button>
+>>>>>>> feat(stack): prevent stack duplication if name already used
                 <span style="margin-left: 5px;">
                   {{ formValues.StackFile.name }}
                   <i class="fa fa-times red-icon" ng-if="!formValues.StackFile" aria-hidden="true"></i>
@@ -236,6 +246,11 @@
                 Web editor
               </div>
               <div class="form-group">
+                <div class="col-sm-12" ng-if="state.yamlValidationError"
+                  ><span class="text-danger small">{{ state.yamlValidationError }}</span></div
+                >
+              </div>
+              <div class="form-group">
                 <div class="col-sm-12">
                   <code-editor
                     identifier="template-content-editor"
@@ -292,9 +307,9 @@
                 type="button"
                 class="btn btn-primary btn-sm"
                 ng-disabled="state.actionInProgress
-              || (state.Method === 'editor' && !formValues.StackFileContent)
-              || (state.Method === 'upload' && !formValues.StackFile)
-              || (state.Method === 'template' && (!formValues.StackFileContent || !selectedTemplate))
+              || (state.Method === 'editor' && (!formValues.StackFileContent || state.yamlValidationError))
+              || (state.Method === 'upload' && (!formValues.StackFile || state.yamlUploadError))
+              || (state.Method === 'template' && (!formValues.StackFileContent || !selectedTemplate || state.yamlValidationError))
               || (state.Method === 'repository' && ((!formValues.RepositoryURL || !formValues.ComposeFilePathInRepository) || (formValues.RepositoryAuthentication && (!formValues.RepositoryUsername || !formValues.RepositoryPassword))))
               || !formValues.Name"
                 ng-click="deployStack()"

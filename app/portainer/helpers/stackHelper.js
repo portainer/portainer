@@ -22,6 +22,24 @@ angular.module('portainer.app').factory('StackHelper', [
       );
     }
 
+    function findDeepAll(obj, key) {
+      if (_.has(obj, key)) {
+        return [obj[key]];
+      }
+      return _.flatten(
+        _.map(obj, (v) => {
+          return typeof v === 'object' ? findDeepAll(v, key) : [];
+        }),
+        true
+      );
+    }
+
+    helper.getContainerNameDuplicates = function (yamlObject, containerNames) {
+      const key = 'container_name';
+      const names = findDeepAll(yamlObject, key);
+      return _.filter(containerNames, (containerName) => _.includes(names, containerName));
+    };
+
     return helper;
   },
 ]);
