@@ -19,7 +19,8 @@ module.exports = function (grunt) {
     binaries: {
       dockerLinuxVersion: '19.03.13',
       dockerWindowsVersion: '19-03-12',
-      dockerComposeVersion: '1.27.4',
+      dockerLinuxComposeVersion: '1.27.4',
+      dockerWindowsComposeVersion: '1.28.0',
       komposeVersion: 'v1.22.0',
       kubectlVersion: 'v1.18.0',
     },
@@ -216,7 +217,8 @@ function shell_download_docker_compose_binary(p, a) {
   var ip = ps[p] || p;
   var ia = as[a] || a;
   console.log('download docker compose for ' + ip + ':' + ia);
-  var binaryVersion = '<%= binaries.dockerComposeVersion %>';
+  var linuxBinaryVersion = '<%= binaries.dockerLinuxComposeVersion %>';
+  var windowsBinaryVersion = '<%= binaries.dockerWindowsComposeVersion %>';
   console.log('download docker compose version ' + binaryVersion);
 
   if (ip === 'linux' || ip === 'mac') {
@@ -224,7 +226,7 @@ function shell_download_docker_compose_binary(p, a) {
       'if [ -f dist/docker-compose ]; then',
       'echo "Docker Compose binary exists";',
       'else',
-      'build/download_docker_compose_binary.sh ' + ip + ' ' + ia + ' ' + binaryVersion + ';',
+      'build/download_docker_compose_binary.sh ' + ip + ' ' + ia + ' ' + linuxBinaryVersion + ';',
       'fi',
     ].join(' ');
   } else if (ip === 'win') {
@@ -233,7 +235,7 @@ function shell_download_docker_compose_binary(p, a) {
       'Write-Host "Skipping download, Docker Compose binary exists"',
       'return',
       '} else {',
-      '& ".\\build\\download_docker_compose_binary.ps1" -docker_compose_version ' + binaryVersion + '',
+      '& ".\\build\\download_docker_compose_binary.ps1" -docker_compose_version ' + windowsBinaryVersion + '',
       '}}"',
     ].join(' ');
   }
