@@ -1,4 +1,4 @@
-import { clear as clearSessionStorage } from './session-stoage';
+import { clear as clearSessionStorage } from './session-storage';
 
 angular.module('portainer.app').factory('Authentication', [
   '$async',

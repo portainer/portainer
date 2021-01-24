@@ -1,17 +1,11 @@
 import angular from 'angular';
 
-import { get, save } from './session-stoage';
+import * as sessionStorage from './session-storage';
 
 angular.module('portainer.app').factory('DatatableService', DatatableServiceFactory);
 
 const DATATABLE_PREFIX = 'datatable_';
-// const PAGINATION_KEY_PREFIX = `${DATATABLE_PREFIX}pagination_`;
-// const ORDER_KEY_PREFIX = `${DATATABLE_PREFIX}order_`;
 const TEXT_FILTER_KEY_PREFIX = `${DATATABLE_PREFIX}text_filter_`;
-// const FILTERS_KEY_PREFIX = `${DATATABLE_PREFIX}filters_`;
-// const SETTINGS_KEY_PREFIX = `${DATATABLE_PREFIX}settings_`;
-// const EXPANDED_ITEMS_KEY_PREFIX = `${DATATABLE_PREFIX}expanded_items_`;
-// const SELECTED_ITEMS_KEY_PREFIX = `${DATATABLE_PREFIX}selected_items_`;
 
 /* @ngInject */
 function DatatableServiceFactory(LocalStorage) {
@@ -41,11 +35,11 @@ function DatatableServiceFactory(LocalStorage) {
   }
 
   function setDataTableTextFilters(key, filters) {
-    save(TEXT_FILTER_KEY_PREFIX + key, filters);
+    sessionStorage.save(TEXT_FILTER_KEY_PREFIX + key, filters);
   }
 
   function getDataTableTextFilters(key) {
-    return get(TEXT_FILTER_KEY_PREFIX + key);
+    return sessionStorage.get(TEXT_FILTER_KEY_PREFIX + key);
   }
 
   function setDataTableFilters(key, filters) {
