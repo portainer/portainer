@@ -19,6 +19,6 @@ Set-Location -Path "api\cmd\portainer"
 
 go get -t -d -v ./...
 ## go build -v
-& cmd /c 'go build -v 2>&1'
+& cmd /c 'go build -v -ldflags="-s -X github.com/portainer/liblicense.LicenseServerBaseURL=https://api.portainer.io" 2>&1'
 
 Copy-Item -Path "portainer.exe" -Destination "$($env:BUILD_SOURCESDIRECTORY)\dist\portainer.exe" -Force 

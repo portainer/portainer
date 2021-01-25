@@ -12,6 +12,6 @@ New-Item -Name dist -Path "$project_path" -ItemType Directory | Out-Null
 Set-Location -Path "$project_path\api\cmd\portainer"
 
 C:\go\bin\go.exe get -t -d -v ./...
-C:\go\bin\go.exe build -v
+C:\go\bin\go.exe build -v -ldflags="-s -X github.com/portainer/liblicense.LicenseServerBaseURL=https://api.portainer.io"
 
 Move-Item -Path "$($binary)" -Destination "..\..\..\dist"
