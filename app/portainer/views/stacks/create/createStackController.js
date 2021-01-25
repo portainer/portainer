@@ -15,7 +15,7 @@ angular
     ResourceControlService,
     FormHelper,
     CustomTemplateService,
-    EndpointService
+    EndpointProvider
   ) {
     $scope.formValues = {
       Name: '',
@@ -181,7 +181,7 @@ angular
       }
 
       try {
-        const endpoint = await EndpointService.endpoint(endpointId);
+        const endpoint = EndpointProvider.currentEndpoint();
         $scope.composeSyntaxMaxVersion = endpoint.ComposeSyntaxMaxVersion;
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to retrieve the ComposeSyntaxMaxVersion');

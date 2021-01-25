@@ -374,7 +374,7 @@ angular.module('portainer.app').controller('StackController', [
       }
 
       try {
-        const endpoint = await EndpointService.endpoint($scope.currentEndpointId);
+        const endpoint = EndpointProvider.currentEndpoint();
         $scope.composeSyntaxMaxVersion = endpoint.ComposeSyntaxMaxVersion;
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to retrieve the ComposeSyntaxMaxVersion');
