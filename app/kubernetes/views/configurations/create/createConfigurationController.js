@@ -1,7 +1,8 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import { KubernetesConfigurationFormValues, KubernetesConfigurationFormValuesDataEntry } from 'Kubernetes/models/configuration/formvalues';
+import { KubernetesConfigurationFormValues, KubernetesConfigurationFormValuesEntry } from 'Kubernetes/models/configuration/formvalues';
 import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
+import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 
 class KubernetesCreateConfigurationController {
   /* @ngInject */
@@ -41,6 +42,9 @@ class KubernetesCreateConfigurationController {
     try {
       this.state.actionInProgress = true;
       this.formValues.ConfigurationOwner = this.Authentication.getUserDetails().username;
+      if (!this.formValues.IsSimple) {
+        this.formValues.Data = KubernetesConfigurationHelper.parseYaml(this.formValues);
+      }
       await this.KubernetesConfigurationService.create(this.formValues);
       this.Notifications.success('Configuration succesfully created');
       this.$state.go('kubernetes.configurations');
@@ -76,7 +80,7 @@ class KubernetesCreateConfigurationController {
     };
 
     this.formValues = new KubernetesConfigurationFormValues();
-    this.formValues.Data.push(new KubernetesConfigurationFormValuesDataEntry());
+    this.formValues.Data.push(new KubernetesConfigurationFormValuesEntry());
 
     try {
       const resourcePools = await this.KubernetesResourcePoolService.get();
