@@ -103,16 +103,17 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 
 	oldName := stack.Name
 	if payload.Name != "" {
-		isUnique, err := handler.checkUniqueName(endpoint, payload.Name, stack.ID, stack.SwarmID != "")
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
-		}
-		if !isUnique {
-			errorMessage := fmt.Sprintf("A stack with the name '%s' is already running", stack.Name)
-			return &httperror.HandlerError{http.StatusConflict, errorMessage, errors.New(errorMessage)}
-		}
-
 		stack.Name = payload.Name
+	}
+
+	isUnique, err := handler.checkUniqueName(targetEndpoint, stack.Name, stack.ID, stack.SwarmID != "")
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
+	}
+
+	if !isUnique {
+		errorMessage := fmt.Sprintf("A stack with the name '%s' is already running on endpoint '%s'", stack.Name, targetEndpoint.Name)
+		return &httperror.HandlerError{http.StatusConflict, errorMessage, errors.New(errorMessage)}
 	}
 
 	migrationError := handler.migrateStack(r, stack, targetEndpoint)
