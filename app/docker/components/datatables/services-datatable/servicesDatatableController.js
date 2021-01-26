@@ -24,6 +24,10 @@ angular.module('portainer.docker').controller('ServicesDatatableController', [
       }
     };
 
+    this.onSettingsRepeaterChange = function () {
+      DatatableService.setDataTableSettings(this.tableKey, this.settings);
+    };
+
     this.expandItem = function (item, expanded) {
       item.Expanded = expanded;
       if (item.Expanded) {
