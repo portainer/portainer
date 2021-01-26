@@ -126,25 +126,29 @@ class KubernetesApplicationStatsController {
     };
 
     try {
-      const podsMetrics = await this.KubernetesMetricsService.getPod(this.state.transition.namespace);
-      if (podsMetrics.items.length) {
-        const podRaw = await this.KubernetesPodService.get(this.state.transition.namespace, this.state.transition.podName);
-        const pod = KubernetesPodConverter.apiToModel(podRaw.Raw);
-        if (pod) {
-          const node = await this.KubernetesNodeService.get(pod.Node);
-          this.nodeCPU = node.CPU;
-        } else {
-          throw new Error('Unable to find pod');
-        }
-        await this.getStats();
-        this.state.getMetrics = true;
-
-        this.$document.ready(() => {
-          this.initCharts();
-        });
-      }
-    } catch (err) {
+      await this.KubernetesMetricsService.getPod(this.state.transition.namespace, this.state.transition.podName);
+    } catch (error) {
       this.state.getMetrics = false;
+      this.state.viewReady = true;
+      return;
+    }
+
+    try {
+      const podRaw = await this.KubernetesPodService.get(this.state.transition.namespace, this.state.transition.podName);
+      const pod = KubernetesPodConverter.apiToModel(podRaw.Raw);
+      if (pod) {
+        const node = await this.KubernetesNodeService.get(pod.Node);
+        this.nodeCPU = node.CPU;
+      } else {
+        throw new Error('Unable to find pod');
+      }
+      await this.getStats();
+      this.state.getMetrics = true;
+
+      this.$document.ready(() => {
+        this.initCharts();
+      });
+    } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve application stats');
     } finally {
       this.state.viewReady = true;
