@@ -7,7 +7,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
@@ -124,33 +124,24 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 }
 
 func (handler *Handler) migrateStack(r *http.Request, stack *portainer.Stack, next *portainer.Endpoint) *httperror.HandlerError {
-	if stack.Type == portainer.DockerSwarmStack {
-		return handler.migrateSwarmStack(r, stack, next)
-	}
-	return handler.migrateComposeStack(r, stack, next)
-}
+	isNextEndpointSwarm := len(next.Snapshots) > 0 && next.Snapshots[0].Swarm
+	isSwarmStack := stack.Type == portainer.DockerSwarmStack
 
-func (handler *Handler) migrateComposeStack(r *http.Request, stack *portainer.Stack, next *portainer.Endpoint) *httperror.HandlerError {
-	config, configErr := handler.createComposeDeployConfig(r, stack, next)
+	config, configErr := handler.createDeployConfig(r, stack, next, isNextEndpointSwarm)
 	if configErr != nil {
 		return configErr
 	}
 
-	err := handler.deployComposeStack(config)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
+	var err error
+	if isSwarmStack && isNextEndpointSwarm {
+		err = handler.deploySwarmStack(config)
+	} else {
+		if isSwarmStack {
+			stack.Type = portainer.DockerComposeStack
+		}
+		err = handler.deployComposeStack(config)
 	}
 
-	return nil
-}
-
-func (handler *Handler) migrateSwarmStack(r *http.Request, stack *portainer.Stack, next *portainer.Endpoint) *httperror.HandlerError {
-	config, configErr := handler.createSwarmDeployConfig(r, stack, next, true)
-	if configErr != nil {
-		return configErr
-	}
-
-	err := handler.deploySwarmStack(config)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
