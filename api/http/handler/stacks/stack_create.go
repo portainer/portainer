@@ -204,3 +204,48 @@ func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *port
 	stack.ResourceControl = resourceControl
 	return response.JSON(w, stack)
 }
+
+type stackDeploymentConfig struct {
+	stack      *portainer.Stack
+	endpoint   *portainer.Endpoint
+	dockerhub  *portainer.DockerHub
+	registries []portainer.Registry
+	isAdmin    bool
+	user       *portainer.User
+	prune      bool
+}
+
+func (handler *Handler) createDeployConfig(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint, prune bool) (*stackDeploymentConfig, *httperror.HandlerError) {
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+	}
+
+	dockerhub, err := handler.DataStore.DockerHub().DockerHub()
+	if err != nil {
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve DockerHub details from the database", err}
+	}
+
+	registries, err := handler.DataStore.Registry().Registries()
+	if err != nil {
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
+	}
+	filteredRegistries := security.FilterRegistries(registries, securityContext)
+
+	user, err := handler.DataStore.User().User(securityContext.UserID)
+	if err != nil {
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to load user information from the database", err}
+	}
+
+	config := &stackDeploymentConfig{
+		stack:      stack,
+		endpoint:   endpoint,
+		dockerhub:  dockerhub,
+		registries: filteredRegistries,
+		isAdmin:    securityContext.IsAdmin,
+		user:       user,
+		prune:      prune,
+	}
+
+	return config, nil
+}

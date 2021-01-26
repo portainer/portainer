@@ -131,7 +131,7 @@ func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Sta
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist updated Compose file on disk", err}
 	}
 
-	config, configErr := handler.createComposeDeployConfig(r, stack, endpoint)
+	config, configErr := handler.createDeployConfig(r, stack, endpoint, false)
 	if configErr != nil {
 		return configErr
 	}
@@ -162,7 +162,7 @@ func (handler *Handler) updateSwarmStack(r *http.Request, stack *portainer.Stack
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist updated Compose file on disk", err}
 	}
 
-	config, configErr := handler.createSwarmDeployConfig(r, stack, endpoint, payload.Prune)
+	config, configErr := handler.createDeployConfig(r, stack, endpoint, payload.Prune)
 	if configErr != nil {
 		return configErr
 	}

@@ -14,7 +14,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
-	"github.com/portainer/portainer/api/http/security"
 )
 
 // this is coming from libcompose
@@ -81,7 +80,7 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 	doCleanUp := true
 	defer handler.cleanUp(stack, &doCleanUp)
 
-	config, configErr := handler.createComposeDeployConfig(r, stack, endpoint)
+	config, configErr := handler.createDeployConfig(r, stack, endpoint, false)
 	if configErr != nil {
 		return configErr
 	}
@@ -180,7 +179,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to clone git repository", err}
 	}
 
-	config, configErr := handler.createComposeDeployConfig(r, stack, endpoint)
+	config, configErr := handler.createDeployConfig(r, stack, endpoint, false)
 	if configErr != nil {
 		return configErr
 	}
@@ -269,7 +268,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 	doCleanUp := true
 	defer handler.cleanUp(stack, &doCleanUp)
 
-	config, configErr := handler.createComposeDeployConfig(r, stack, endpoint)
+	config, configErr := handler.createDeployConfig(r, stack, endpoint, false)
 	if configErr != nil {
 		return configErr
 	}
@@ -290,55 +289,12 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 	return handler.decorateStackResponse(w, stack, userID)
 }
 
-type composeStackDeploymentConfig struct {
-	stack      *portainer.Stack
-	endpoint   *portainer.Endpoint
-	dockerhub  *portainer.DockerHub
-	registries []portainer.Registry
-	isAdmin    bool
-	user       *portainer.User
-}
-
-func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) (*composeStackDeploymentConfig, *httperror.HandlerError) {
-	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
-	}
-
-	dockerhub, err := handler.DataStore.DockerHub().DockerHub()
-	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve DockerHub details from the database", err}
-	}
-
-	registries, err := handler.DataStore.Registry().Registries()
-	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
-	}
-	filteredRegistries := security.FilterRegistries(registries, securityContext)
-
-	user, err := handler.DataStore.User().User(securityContext.UserID)
-	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to load user information from the database", err}
-	}
-
-	config := &composeStackDeploymentConfig{
-		stack:      stack,
-		endpoint:   endpoint,
-		dockerhub:  dockerhub,
-		registries: filteredRegistries,
-		isAdmin:    securityContext.IsAdmin,
-		user:       user,
-	}
-
-	return config, nil
-}
-
 // TODO: libcompose uses credentials store into a config.json file to pull images from
 // private registries. Right now the only solution is to re-use the embedded Docker binary
 // to login/logout, which will generate the required data in the config.json file and then
 // clean it. Hence the use of the mutex.
 // We should contribute to libcompose to support authentication without using the config.json file.
-func (handler *Handler) deployComposeStack(config *composeStackDeploymentConfig) error {
+func (handler *Handler) deployComposeStack(config *stackDeploymentConfig) error {
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return err

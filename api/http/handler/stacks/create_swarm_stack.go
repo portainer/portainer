@@ -13,7 +13,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
-	"github.com/portainer/portainer/api/http/security"
 )
 
 type swarmStackFromFileContentPayload struct {
@@ -77,7 +76,7 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 	doCleanUp := true
 	defer handler.cleanUp(stack, &doCleanUp)
 
-	config, configErr := handler.createSwarmDeployConfig(r, stack, endpoint, false)
+	config, configErr := handler.createDeployConfig(r, stack, endpoint, false)
 	if configErr != nil {
 		return configErr
 	}
@@ -180,7 +179,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to clone git repository", err}
 	}
 
-	config, configErr := handler.createSwarmDeployConfig(r, stack, endpoint, false)
+	config, configErr := handler.createDeployConfig(r, stack, endpoint, false)
 	if configErr != nil {
 		return configErr
 	}
@@ -277,7 +276,7 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 	doCleanUp := true
 	defer handler.cleanUp(stack, &doCleanUp)
 
-	config, configErr := handler.createSwarmDeployConfig(r, stack, endpoint, false)
+	config, configErr := handler.createDeployConfig(r, stack, endpoint, false)
 	if configErr != nil {
 		return configErr
 	}
@@ -298,52 +297,7 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 	return handler.decorateStackResponse(w, stack, userID)
 }
 
-type swarmStackDeploymentConfig struct {
-	stack      *portainer.Stack
-	endpoint   *portainer.Endpoint
-	dockerhub  *portainer.DockerHub
-	registries []portainer.Registry
-	prune      bool
-	isAdmin    bool
-	user       *portainer.User
-}
-
-func (handler *Handler) createSwarmDeployConfig(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint, prune bool) (*swarmStackDeploymentConfig, *httperror.HandlerError) {
-	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
-	}
-
-	dockerhub, err := handler.DataStore.DockerHub().DockerHub()
-	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve DockerHub details from the database", err}
-	}
-
-	registries, err := handler.DataStore.Registry().Registries()
-	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
-	}
-	filteredRegistries := security.FilterRegistries(registries, securityContext)
-
-	user, err := handler.DataStore.User().User(securityContext.UserID)
-	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to load user information from the database", err}
-	}
-
-	config := &swarmStackDeploymentConfig{
-		stack:      stack,
-		endpoint:   endpoint,
-		dockerhub:  dockerhub,
-		registries: filteredRegistries,
-		prune:      prune,
-		isAdmin:    securityContext.IsAdmin,
-		user:       user,
-	}
-
-	return config, nil
-}
-
-func (handler *Handler) deploySwarmStack(config *swarmStackDeploymentConfig) error {
+func (handler *Handler) deploySwarmStack(config *stackDeploymentConfig) error {
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return err
