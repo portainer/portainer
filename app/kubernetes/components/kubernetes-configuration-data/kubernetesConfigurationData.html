@@ -45,8 +45,9 @@
           id="configuration_data_key_{{ index }}"
           name="configuration_data_key_{{ index }}"
           ng-model="$ctrl.formValues.Data[index].Key"
+          ng-disabled="entry.Used"
           required
-          ng-change="$ctrl.onChangeKey()"
+          ng-change="$ctrl.onChangeKey(entry)"
         />
       </div>
       <div
@@ -90,9 +91,13 @@
     <div class="form-group" ng-if="$ctrl.formValues.IsSimple">
       <div class="col-sm-1"></div>
       <div class="col-sm-11">
-        <button type="button" class="btn btn-sm btn-danger" style="margin-left: 0;" ng-click="$ctrl.removeEntry(index)">
+        <button type="button" class="btn btn-sm btn-danger space-right" style="margin-left: 0;" ng-disabled="entry.Used" ng-click="$ctrl.removeEntry(index, entry)">
           <i class="fa fa-trash-alt" aria-hidden="true"></i> Remove entry
         </button>
+        <span class="small text-muted" ng-if="entry.Used">
+          <i class="fa fa-info-circle blue-icon space-right" aria-hidden="true"></i>
+          This key is currently used by one or more applications
+        </span>
       </div>
     </div>
   </div>

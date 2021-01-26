@@ -19,7 +19,11 @@ class KubernetesConfigurationDataController {
     this.showAdvancedMode = this.showAdvancedMode.bind(this);
   }
 
-  onChangeKey() {
+  onChangeKey(entry) {
+    if (entry.Used) {
+      return;
+    }
+
     this.state.duplicateKeys = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.Data, (data) => data.Key));
     this.isValid = Object.keys(this.state.duplicateKeys).length === 0;
   }
@@ -28,7 +32,11 @@ class KubernetesConfigurationDataController {
     this.formValues.Data.push(new KubernetesConfigurationFormValuesEntry());
   }
 
-  removeEntry(index) {
+  removeEntry(index, entry) {
+    if (entry.Used) {
+      return;
+    }
+
     this.formValues.Data.splice(index, 1);
     this.onChangeKey();
   }
