@@ -22,7 +22,17 @@ module.exports = {
       {
         test: /\.js$/,
         enforce: 'pre',
-        use: ['source-map-loader'],
+        use: [
+          {
+            loader: 'source-map-loader',
+            options: {
+              filterSourceMappingUrl: (_, resourcePath) => {
+                // ignores `chardet` missing sourcemaps
+                return !/node_modules\/chardet/i.test(resourcePath);
+              },
+            },
+          },
+        ],
       },
       {
         test: /\.js$/,
