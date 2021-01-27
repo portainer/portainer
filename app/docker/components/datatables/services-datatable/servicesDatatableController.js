@@ -24,10 +24,6 @@ angular.module('portainer.docker').controller('ServicesDatatableController', [
       }
     };
 
-    this.onSettingsRepeaterChange = function () {
-      DatatableService.setDataTableSettings(this.tableKey, this.settings);
-    };
-
     this.expandItem = function (item, expanded) {
       item.Expanded = expanded;
       if (item.Expanded) {
@@ -67,6 +63,13 @@ angular.module('portainer.docker').controller('ServicesDatatableController', [
 
       if (expandedItemCount === this.dataset.length) {
         this.state.expandAll = true;
+      }
+    };
+
+    this.onDataRefresh = function () {
+      var storedExpandedItems = DatatableService.getDataTableExpandedItems(this.tableKey);
+      if (storedExpandedItems !== null) {
+        this.expandItems(storedExpandedItems);
       }
     };
 
