@@ -10,6 +10,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	endpointutils "github.com/portainer/portainer/api/internal/endpoint"
 )
 
 type kubernetesStackPayload struct {
@@ -33,6 +34,10 @@ type createKubernetesStackResponse struct {
 }
 
 func (handler *Handler) createKubernetesStack(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint) *httperror.HandlerError {
+	if !endpointutils.IsKubernetesEndpoint(endpoint) {
+		return &httperror.HandlerError{http.StatusBadRequest, "Endpoint type does not match", errors.New("Endpoint type does not match")}
+	}
+
 	var payload kubernetesStackPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
@@ -51,9 +56,18 @@ func (handler *Handler) createKubernetesStack(w http.ResponseWriter, r *http.Req
 	return response.JSON(w, resp)
 }
 
-func (handler *Handler) deployKubernetesStack(endpoint *portainer.Endpoint, data string, composeFormat bool, namespace string) ([]byte, error) {
+func (handler *Handler) deployKubernetesStack(endpoint *portainer.Endpoint, stackConfig string, composeFormat bool, namespace string) ([]byte, error) {
 	handler.stackCreationMutex.Lock()
 	defer handler.stackCreationMutex.Unlock()
 
-	return handler.KubernetesDeployer.Deploy(endpoint, data, composeFormat, namespace)
+	if composeFormat {
+		convertedConfig, err := handler.KubernetesDeployer.ConvertCompose(stackConfig)
+		if err != nil {
+			return nil, err
+		}
+		stackConfig = string(convertedConfig)
+	}
+
+	return handler.KubernetesDeployer.Deploy(endpoint, stackConfig, namespace)
+
 }
