@@ -9,7 +9,19 @@ import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
 class KubernetesConfigureController {
   /* #region  CONSTRUCTOR */
   /* @ngInject */
-  constructor($async, $state, $stateParams, Notifications, KubernetesStorageService, EndpointService, EndpointProvider, ModalService) {
+  constructor(
+    $async,
+    $state,
+    $stateParams,
+    Notifications,
+    KubernetesStorageService,
+    EndpointService,
+    EndpointProvider,
+    ModalService,
+    KubernetesNamespaceHelper,
+    KubernetesResourcePoolService,
+    KubernetesIngressService
+  ) {
     this.$async = $async;
     this.$state = $state;
     this.$stateParams = $stateParams;
@@ -18,6 +30,9 @@ class KubernetesConfigureController {
     this.EndpointService = EndpointService;
     this.EndpointProvider = EndpointProvider;
     this.ModalService = ModalService;
+    this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
+    this.KubernetesResourcePoolService = KubernetesResourcePoolService;
+    this.KubernetesIngressService = KubernetesIngressService;
 
     this.IngressClassTypes = KubernetesIngressClassTypes;
 
@@ -115,10 +130,36 @@ class KubernetesConfigureController {
     return [storageClasses, ingressClasses];
   }
 
+  async removeIngressesAcrossNamespaces() {
+    const promises = [];
+    const ingressesToDel = _.filter(this.formValues.IngressClasses, { NeedsDeletion: true });
+    const allResourcePools = await this.KubernetesResourcePoolService.get();
+    const resourcePools = _.filter(
+      allResourcePools,
+      (resourcePool) =>
+        !this.KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name) && !this.KubernetesNamespaceHelper.isDefaultNamespace(resourcePool.Namespace.Name)
+    );
+
+    ingressesToDel.forEach((ingress) => {
+      resourcePools.forEach((resourcePool) => {
+        promises.push(this.KubernetesIngressService.delete({ IngressClass: ingress, Namespace: resourcePool.Namespace.Name }));
+      });
+    });
+
+    const responses = await Promise.allSettled(promises);
+    responses.forEach((respons) => {
+      if (respons.status == 'rejected' && respons.reason.err.status != 404) {
+        throw respons.reason;
+      }
+    });
+  }
+
   async configureAsync() {
     try {
       this.state.actionInProgress = true;
       const [storageClasses, ingressClasses] = this.transformFormValues();
+
+      await this.removeIngressesAcrossNamespaces();
 
       this.assignFormValuesToEndpoint(this.endpoint, storageClasses, ingressClasses);
       await this.EndpointService.updateEndpoint(this.endpoint.Id, this.endpoint);
@@ -150,7 +191,7 @@ class KubernetesConfigureController {
     const toDel = _.filter(this.formValues.IngressClasses, { NeedsDeletion: true });
     if (toDel.length) {
       this.ModalService.confirmUpdate(
-        `Removing ingress controllers will make them unavailable for future use.<br/>Existing resources linked to these ingress controllers will continue to live in cluster but you will not be able to remove them from Portainer.<br/><br/>Do you wish to continue?`,
+        `Removing ingress controllers may cause applications to be unaccessible. All ingress configurations from affected applications will be removed.<br/><br/>Do you wish to continue?`,
         (confirmed) => {
           if (confirmed) {
             return this.$async(this.configureAsync);
