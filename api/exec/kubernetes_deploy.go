@@ -38,11 +38,11 @@ func NewKubernetesDeployer(datastore portainer.DataStore, reverseTunnelService p
 
 // Deploy will deploy a Kubernetes manifest inside a specific namespace in a Kubernetes endpoint.
 // Otherwise it will use kubectl to deploy the manifest.
-func (deployer *KubernetesDeployer) Deploy(endpoint *portainer.Endpoint, stackConfig string, namespace string) ([]byte, error) {
+func (deployer *KubernetesDeployer) Deploy(endpoint *portainer.Endpoint, stackConfig string, namespace string) (string, error) {
 	if endpoint.Type == portainer.KubernetesLocalEnvironment {
 		token, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/token")
 		if err != nil {
-			return nil, err
+			return "", err
 		}
 
 		command := path.Join(deployer.binaryPath, "kubectl")
@@ -64,10 +64,10 @@ func (deployer *KubernetesDeployer) Deploy(endpoint *portainer.Endpoint, stackCo
 
 		output, err := cmd.Output()
 		if err != nil {
-			return nil, errors.New(stderr.String())
+			return "", errors.New(stderr.String())
 		}
 
-		return output, nil
+		return string(output), nil
 	}
 
 	// agent
@@ -79,12 +79,12 @@ func (deployer *KubernetesDeployer) Deploy(endpoint *portainer.Endpoint, stackCo
 
 			err := deployer.reverseTunnelService.SetTunnelStatusToRequired(endpoint.ID)
 			if err != nil {
-				return nil, err
+				return "", err
 			}
 
 			settings, err := deployer.dataStore.Settings().Settings()
 			if err != nil {
-				return nil, err
+				return "", err
 			}
 
 			waitForAgentToConnect := time.Duration(settings.EdgeAgentCheckinInterval) * time.Second
@@ -99,7 +99,7 @@ func (deployer *KubernetesDeployer) Deploy(endpoint *portainer.Endpoint, stackCo
 	if endpoint.TLSConfig.TLS {
 		tlsConfig, err := crypto.CreateTLSConfigurationFromDisk(endpoint.TLSConfig.TLSCACertPath, endpoint.TLSConfig.TLSCertPath, endpoint.TLSConfig.TLSKeyPath, endpoint.TLSConfig.TLSSkipVerify)
 		if err != nil {
-			return nil, err
+			return "", err
 		}
 		transport.TLSClientConfig = tlsConfig
 	}
@@ -114,7 +114,7 @@ func (deployer *KubernetesDeployer) Deploy(endpoint *portainer.Endpoint, stackCo
 
 	url, err := url.Parse(fmt.Sprintf("%s/v3/kubernetes/stack", endpointURL))
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	reqPayload, err := json.Marshal(
@@ -126,17 +126,17 @@ func (deployer *KubernetesDeployer) Deploy(endpoint *portainer.Endpoint, stackCo
 			Namespace:   namespace,
 		})
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	req, err := http.NewRequest(http.MethodPost, url.String(), bytes.NewReader(reqPayload))
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	signature, err := deployer.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	req.Header.Set(portainer.PortainerAgentPublicKeyHeader, deployer.signatureService.EncodedPublicKey())
@@ -144,7 +144,7 @@ func (deployer *KubernetesDeployer) Deploy(endpoint *portainer.Endpoint, stackCo
 
 	resp, err := httpCli.Do(req)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	defer resp.Body.Close()
 
@@ -157,20 +157,25 @@ func (deployer *KubernetesDeployer) Deploy(endpoint *portainer.Endpoint, stackCo
 		if err != nil {
 			output, parseStringErr := ioutil.ReadAll(resp.Body)
 			if parseStringErr != nil {
-				return nil, parseStringErr
+				return "", parseStringErr
 			}
 
-			return nil, fmt.Errorf("Failed parsing, body: %s, error: %w", output, err)
+			return "", fmt.Errorf("Failed parsing, body: %s, error: %w", output, err)
 
 		}
 
-		return nil, fmt.Errorf("Deployment to agent failed: %s", errorResponseData.Details)
+		return "", fmt.Errorf("Deployment to agent failed: %s", errorResponseData.Details)
 	}
 
-	var responseData struct{ Output []byte }
+	var responseData struct{ Output string }
 	err = json.NewDecoder(resp.Body).Decode(&responseData)
 	if err != nil {
-		return nil, err
+		parsedOutput, parseStringErr := ioutil.ReadAll(resp.Body)
+		if parseStringErr != nil {
+			return "", parseStringErr
+		}
+
+		return "", fmt.Errorf("Failed decoding, body: %s, err: %w", parsedOutput, err)
 	}
 
 	return responseData.Output, nil

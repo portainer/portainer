@@ -50,20 +50,20 @@ func (handler *Handler) createKubernetesStack(w http.ResponseWriter, r *http.Req
 	}
 
 	resp := &createKubernetesStackResponse{
-		Output: string(output),
+		Output: output,
 	}
 
 	return response.JSON(w, resp)
 }
 
-func (handler *Handler) deployKubernetesStack(endpoint *portainer.Endpoint, stackConfig string, composeFormat bool, namespace string) ([]byte, error) {
+func (handler *Handler) deployKubernetesStack(endpoint *portainer.Endpoint, stackConfig string, composeFormat bool, namespace string) (string, error) {
 	handler.stackCreationMutex.Lock()
 	defer handler.stackCreationMutex.Unlock()
 
 	if composeFormat {
 		convertedConfig, err := handler.KubernetesDeployer.ConvertCompose(stackConfig)
 		if err != nil {
-			return nil, err
+			return "", err
 		}
 		stackConfig = string(convertedConfig)
 	}
