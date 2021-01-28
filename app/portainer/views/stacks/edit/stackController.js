@@ -200,6 +200,9 @@ angular.module('portainer.app').controller('StackController', [
     };
 
     $scope.editorUpdate = function (cm) {
+      if ($scope.stackFileContent !== cm.getValue()) {
+        $scope.state.isEditorDirty = true;
+      }
       $scope.stackFileContent = cm.getValue();
       $scope.state.yamlError = StackHelper.validateYAML($scope.stackFileContent, $scope.containerNames);
       $scope.state.isEditorDirty = true;
