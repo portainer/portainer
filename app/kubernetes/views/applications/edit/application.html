@@ -52,6 +52,14 @@
                         {{ ctrl.application.Pods[0].Status }}
                       </td>
                     </tr>
+                    <tr>
+                      <td>
+                        Image Pull Policy
+                      </td>
+                      <td>
+                        {{ ctrl.application.ImagePullPolicy }}
+                      </td>
+                    </tr>
                     <tr ng-if="ctrl.application.Requests.Cpu || ctrl.application.Requests.Memory">
                       <td>
                         <div>Resource reservations</div>
