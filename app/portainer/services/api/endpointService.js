@@ -14,7 +14,14 @@ angular.module('portainer.app').factory('EndpointService', [
       return Endpoints.get({ id: endpointID }).$promise;
     };
 
-    service.endpoints = function (start, limit, { search, types, tagIds, endpointIds, tagsPartialMatch } = {}) {
+    service.endpoints = function (start, limit, query = {}) {
+      if (typeof start === 'object') {
+        query = start;
+        start = undefined;
+        limit = undefined;
+      }
+
+      const { search, types, tagIds, endpointIds, tagsPartialMatch } = query;
       if (tagIds && !tagIds.length) {
         return Promise.resolve({ value: [], totalCount: 0 });
       }
