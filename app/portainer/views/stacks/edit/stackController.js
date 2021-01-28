@@ -20,6 +20,7 @@ angular.module('portainer.app').controller('StackController', [
   'ModalService',
   'StackHelper',
   'ContainerHelper',
+  'endpoint',
   function (
     $async,
     $q,
@@ -41,7 +42,8 @@ angular.module('portainer.app').controller('StackController', [
     GroupService,
     ModalService,
     StackHelper,
-    ContainerHelper
+    ContainerHelper,
+    endpoint
   ) {
     $scope.state = {
       actionInProgress: false,
@@ -249,16 +251,20 @@ angular.module('portainer.app').controller('StackController', [
       $scope.state.actionInProgress = false;
     }
 
-    function loadStack(id) {
+    function isEndpointSwarm(endpoint) {
+      return endpoint.Snapshots.length ? endpoint.Snapshots[0].Swarm : false;
+    }
+
+    async function loadStack(id) {
       var agentProxy = $scope.applicationState.endpoint.mode.agentProxy;
 
-      EndpointService.endpoints()
-        .then(function success(data) {
-          $scope.endpoints = data.value;
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to retrieve endpoints');
-        });
+      try {
+        const isSwarm = isEndpointSwarm(endpoint);
+        const endpointsResponse = await EndpointService.endpoints({ types: [1, 2, 3] });
+        $scope.endpoints = endpointsResponse.value.filter((endpoint) => isSwarm === isEndpointSwarm(endpoint));
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to retrieve endpoints');
+      }
 
       $q.all({
         stack: StackService.stack(id),
@@ -394,7 +400,7 @@ angular.module('portainer.app').controller('StackController', [
       var stackName = $transition$.params().name;
       $scope.stackName = stackName;
       var external = $transition$.params().external;
-      $scope.currentEndpointId = EndpointProvider.endpointID();
+      $scope.currentEndpointId = endpoint.Id;
 
       if (external === 'true') {
         $scope.state.externalStack = true;
@@ -405,7 +411,6 @@ angular.module('portainer.app').controller('StackController', [
       }
 
       try {
-        const endpoint = EndpointProvider.currentEndpoint();
         $scope.composeSyntaxMaxVersion = endpoint.ComposeSyntaxMaxVersion;
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to retrieve the ComposeSyntaxMaxVersion');
