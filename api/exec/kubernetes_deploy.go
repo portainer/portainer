@@ -164,7 +164,7 @@ func (deployer *KubernetesDeployer) Deploy(endpoint *portainer.Endpoint, stackCo
 
 		}
 
-		return nil, fmt.Errorf("Deployment to agent failed: %s", errorResponseData.Message)
+		return nil, fmt.Errorf("Deployment to agent failed: %s", errorResponseData.Details)
 	}
 
 	var responseData struct{ Output []byte }
