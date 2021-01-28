@@ -158,6 +158,7 @@ angular
 
     $scope.onChangeTemplate = async function onChangeTemplate(template) {
       try {
+        $scope.formValues.StackFileContent = undefined;
         $scope.selectedTemplate = template;
         $scope.formValues.StackFileContent = await CustomTemplateService.customTemplateFile(template.Id);
       } catch (err) {
