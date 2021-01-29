@@ -13,12 +13,11 @@ ENV PATH "C:\mingit\cmd;C:\Windows\system32;C:\Windows;"
 
 COPY --from=downloader /mingit mingit/
 COPY --from=core /windows/system32/netapi32.dll /windows/system32/netapi32.dll
-
-USER ContainerAdministrator
-
 COPY dist /
 
 EXPOSE 9000
 EXPOSE 8000
+
+USER ContainerAdministrator
 
 ENTRYPOINT ["/portainer.exe"]
