@@ -47,6 +47,10 @@
               <i class="fa fa-th-list space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].StackCount }}
               {{ $ctrl.model.Snapshots[0].StackCount === 1 ? 'stack' : 'stacks' }}
             </span>
+            <span style="padding: 0 7px 0 0;" ng-if="$ctrl.model.Snapshots[0].Swarm">
+              <i class="fa fa-cube space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].NodeCount }}
+              {{ $ctrl.model.Snapshots[0].NodeCount === 1 ? 'node' : 'nodes' }}
+            </span>
             <span style="padding: 0 7px 0 7px;" ng-if="$ctrl.model.Snapshots[0].Swarm">
               <i class="fa fa-list-alt space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].ServiceCount }}
               {{ $ctrl.model.Snapshots[0].ServiceCount === 1 ? 'service' : 'services' }}
