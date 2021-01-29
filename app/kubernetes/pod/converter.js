@@ -70,6 +70,7 @@ function computeContainers(data) {
       res.PodName = data.metadata.name;
       res.Name = item.name;
       res.Image = item.image;
+      res.ImagePullPolicy = item.imagePullPolicy;
       res.Node = data.spec.nodeName;
       res.CreationDate = data.status.startTime;
       res.Status = computeContainerStatus(data.status.containerStatuses, item.name);

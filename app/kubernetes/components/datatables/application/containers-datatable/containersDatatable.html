@@ -79,6 +79,13 @@
                 </a>
               </th>
               <th>
+                <a ng-click="$ctrl.changeOrderBy('ImagePullPolicy')">
+                  Image Pull Policy
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ImagePullPolicy' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ImagePullPolicy' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
                 <a ng-click="$ctrl.changeOrderBy('Status')">
                   Status
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status' && !$ctrl.state.reverseOrder"></i>
@@ -110,6 +117,7 @@
               <td ng-if="!$ctrl.isPod">{{ item.PodName }}</td>
               <td>{{ item.Name }}</td>
               <td>{{ item.Image }}</td>
+              <td>{{ item.ImagePullPolicy }}</td>
               <td
                 ><span class="label label-{{ item.Status | kubernetesPodStatusColor }}">{{ item.Status }}</span></td
               >
