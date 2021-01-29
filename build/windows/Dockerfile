@@ -12,7 +12,7 @@ FROM mcr.microsoft.com/windows/nanoserver:${OSVERSION}
 ENV PATH "C:\mingit\cmd;C:\Windows\system32;C:\Windows;"
 
 COPY --from=downloader /mingit mingit/
-COPY --from=core /windows/system32/netapi32.dll /windows/system32/netapi32.dll
+COPY --from=core /Windows/System32/netapi32.dll /Windows/System32/netapi32.dll
 COPY dist /
 
 EXPOSE 9000
