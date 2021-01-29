@@ -274,6 +274,10 @@
                 </container-restart-policy>
               </td>
             </tr>
+            <tr ng-if="container.HostConfig.DeviceRequests.length">
+              <td>GPUS</td>
+              <td>{{ computeDockerGPUCommand() }}</td>
+            </tr>
           </tbody>
         </table>
       </rd-widget-body>
