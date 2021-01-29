@@ -61,7 +61,6 @@ class KubernetesApplicationConverter {
     res.ResourcePool = data.metadata.namespace;
     if (containers.length) {
       res.Image = containers[0].image;
-      res.ImagePullPolicy = containers[0].imagePullPolicy;
     }
     res.CreationDate = data.metadata.creationTimestamp;
     res.Env = _.without(_.flatMap(_.map(containers, 'env')), undefined);
