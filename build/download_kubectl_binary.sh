@@ -9,7 +9,7 @@ exit 0
 if [ "${PLATFORM}" == 'linux' ]; then
   wget -O "dist/kubectl" "https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/${PLATFORM}/${ARCH}/kubectl"
   chmod +x "dist/kubectl"
-elif [ "${PLATFORM}" == 'win' ]; then
+elif [ "${PLATFORM}" == 'windows' ]; then
   wget -O "dist/kubectl.exe" "https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/windows/amd64/kubectl.exe"
   chmod +x "dist/kubectl.exe"
 fi
