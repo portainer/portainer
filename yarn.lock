@@ -1346,9 +1346,9 @@ angular-moment-picker@^0.10.2:
     angular "^1.3"
     moment "^2.16.0"
 
-"angular-multiselect@github:portainer/angular-multi-select#semver:~v4.0.1":
+"angular-multiselect@github:portainer/angular-multi-select#semver:v4.0.x":
   version "4.0.0"
-  resolved "https://codeload.github.com/portainer/angular-multi-select/tar.gz/933b066e0aa9e8879967a35a9c5bf7e89c72f86d"
+  resolved "https://codeload.github.com/portainer/angular-multi-select/tar.gz/52e8ab9f2ece53db660893172f716346926c9ae8"
   dependencies:
     angular-mocks "1.6.1"
     angular-sanitize "1.6.1"
