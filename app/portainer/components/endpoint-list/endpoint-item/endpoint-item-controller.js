@@ -35,8 +35,9 @@ class EndpointItemController {
       return false;
     }
     const checkInInterval = this.model.EdgeCheckinInterval;
-    const now = Date.now() / 1000;
-    return now - this.model.LastCheckInDate < checkInInterval;
+    const now = Math.floor(Date.now() / 1000);
+
+    return now - this.model.LastCheckInDate <= checkInInterval * 2;
   }
 
   $onInit() {
