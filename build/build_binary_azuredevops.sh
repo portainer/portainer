@@ -1,3 +1,8 @@
+#!/usr/bin/env bash
+
+PLATFORM=$1
+ARCH=$2
+
 export GOPATH="/tmp/go"
 
 binary="portainer"
@@ -10,6 +15,10 @@ cp -R api ${GOPATH}/src/github.com/portainer/portainer/api
 cd 'api/cmd/portainer'
 
 go get -t -d -v ./...
-GOOS=$1 GOARCH=$2 CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags '-s'
+GOOS=${PLATFORM} GOARCH=${ARCH} CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags '-s'
 
-mv "$BUILD_SOURCESDIRECTORY/api/cmd/portainer/$binary" "$BUILD_SOURCESDIRECTORY/dist/portainer"
+if [ "${PLATFORM}" == 'windows' ]; then
+  mv "$BUILD_SOURCESDIRECTORY/api/cmd/portainer/${binary}.exe" "$BUILD_SOURCESDIRECTORY/dist/portainer"
+else  
+  mv "$BUILD_SOURCESDIRECTORY/api/cmd/portainer/$binary" "$BUILD_SOURCESDIRECTORY/dist/portainer"
+fi
