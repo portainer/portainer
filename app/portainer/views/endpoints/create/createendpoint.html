@@ -116,10 +116,10 @@
                       <code ng-if="state.PlatformType === 'linux'" style="display: block; white-space: pre-wrap; padding: 16px 90px;"
                         >curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent</code
                       >
-                      <code ng-if="state.PlatformType === 'windows'" style="display: block; white-space: pre-wrap; padding: 16px 90px;"
-                        >curl -L https://downloads.portainer.io/agent-stack-windows.yml -o agent-stack-windows.yml && docker stack deploy --compose-file=agent-stack-windows.yml
-                        portainer-agent</code
-                      >
+                      <code ng-if="state.PlatformType === 'windows'" style="display: block; white-space: pre-wrap; padding: 16px 90px;">
+                        curl -L https://downloads.portainer.io/agent-stack-windows.yml -o agent-stack-windows.yml && docker stack deploy --compose-file=agent-stack-windows.yml
+                        portainer-agent
+                      </code>
                     </uib-tab>
                   </uib-tabset>
                   <div style="margin-top: 10px;">
