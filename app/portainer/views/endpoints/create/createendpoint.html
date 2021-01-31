@@ -219,6 +219,28 @@
               <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.ConnectSocket" /><i></i> </label>
             </div>
           </div>
+
+          <div ng-if="state.EnvironmentType === 'docker' && formValues.ConnectSocket">
+            <div class="form-group">
+              <label for="socket_path" class="col-sm-3 col-lg-2 control-label text-left">
+                Socket path
+                <portainer-tooltip
+                  position="bottom"
+                  message="Path of your Docker socket. Remember to forward the socket, see the Important Notice above. This field is optional and will default to the standard socket path."
+                >
+                </portainer-tooltip>
+              </label>
+              <div class="col-sm-9 col-lg-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  name="socket_path"
+                  ng-model="formValues.URL"
+                  placeholder="e.g. /var/run/docker.sock (on Linux) or //./pipe/docker_engine (on Windows)"
+                />
+              </div>
+            </div>
+          </div>
           <!-- !connect-via-socket-input -->
           <!-- endpoint-url-input -->
           <div ng-if="(state.EnvironmentType === 'docker' && !formValues.ConnectSocket) || state.EnvironmentType === 'agent'">

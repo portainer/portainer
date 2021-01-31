@@ -102,7 +102,7 @@ angular
 
       if ($scope.formValues.ConnectSocket) {
         $scope.state.actionInProgress = true;
-        EndpointService.createLocalEndpoint(name, '', publicURL, groupId, tagIds)
+        EndpointService.createLocalEndpoint(name, URL, publicURL, groupId, tagIds)
           .then(function success() {
             Notifications.success('Endpoint created', name);
             $state.go('portainer.endpoints', {}, { reload: true });
