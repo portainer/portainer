@@ -10,6 +10,9 @@ if [ "${PLATFORM}" == 'linux' ] && [ "${ARCH}" == 'amd64' ]; then
 elif [ "${PLATFORM}" == 'mac' ]; then
   wget -O "dist/docker-compose" "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-Darwin-x86_64"
   chmod +x "dist/docker-compose"
+elif [ "${PLATFORM}" == 'win' ]; then
+  wget -O "dist/docker-compose.exe" "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-Windows-x86_64.exe"
+  chmod +x "dist/docker-compose.exe"
 fi
 
 exit 0
