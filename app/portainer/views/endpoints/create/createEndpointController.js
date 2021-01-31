@@ -94,12 +94,17 @@ angular
     }
 
     $scope.addDockerEndpoint = function () {
+      var name = $scope.formValues.Name;
+      var URL = $filter('stripprotocol')($scope.formValues.URL);
+      var publicURL = $scope.formValues.PublicURL;
+      var groupId = $scope.formValues.GroupId;
+      var tagIds = $scope.formValues.TagIds;
+
       if ($scope.formValues.ConnectSocket) {
-        var endpointName = $scope.formValues.Name;
         $scope.state.actionInProgress = true;
-        EndpointService.createLocalEndpoint(endpointName)
+        EndpointService.createLocalEndpoint(name, '', publicURL, groupId, tagIds)
           .then(function success() {
-            Notifications.success('Endpoint created', endpointName);
+            Notifications.success('Endpoint created', name);
             $state.go('portainer.endpoints', {}, { reload: true });
           })
           .catch(function error(err) {
@@ -109,11 +114,9 @@ angular
             $scope.state.actionInProgress = false;
           });
       } else {
-        var name = $scope.formValues.Name;
-        var URL = $filter('stripprotocol')($scope.formValues.URL);
-        var publicURL = $scope.formValues.PublicURL === '' ? URL.split(':')[0] : $scope.formValues.PublicURL;
-        var groupId = $scope.formValues.GroupId;
-        var tagIds = $scope.formValues.TagIds;
+        if (publicURL === '') {
+          publicURL = URL.split(':')[0];
+        }
 
         var securityData = $scope.formValues.SecurityFormData;
         var TLS = securityData.TLS;

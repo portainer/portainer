@@ -56,10 +56,10 @@ angular.module('portainer.app').factory('EndpointService', [
       return Endpoints.remove({ id: endpointID }).$promise;
     };
 
-    service.createLocalEndpoint = function (name = 'local') {
+    service.createLocalEndpoint = function (name = 'local', URL = '', PublicURL = '', groupID = 1, tagIds = []) {
       var deferred = $q.defer();
 
-      FileUploadService.createEndpoint(name, PortainerEndpointCreationTypes.LocalDockerEnvironment, '', '', 1, [], false)
+      FileUploadService.createEndpoint(name, PortainerEndpointCreationTypes.LocalDockerEnvironment, URL, PublicURL, groupID, tagIds, false)
         .then(function success(response) {
           deferred.resolve(response.data);
         })
