@@ -7,7 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
@@ -76,6 +76,17 @@ func (handler *Handler) userCanAccessStack(securityContext *security.RestrictedR
 	}
 
 	return handler.userIsAdminOrEndpointAdmin(user, endpointID)
+}
+
+func (handler *Handler) userIsAdmin(userID portainer.UserID) (bool, error) {
+	user, err := handler.DataStore.User().User(userID)
+	if err != nil {
+		return false, err
+	}
+
+	isAdmin := user.Role == portainer.AdministratorRole
+
+	return isAdmin, nil
 }
 
 func (handler *Handler) userIsAdminOrEndpointAdmin(user *portainer.User, endpointID portainer.EndpointID) (bool, error) {

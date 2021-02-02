@@ -1,12 +1,15 @@
+require('../../templates/advancedDeploymentPanel.html');
+
 import angular from 'angular';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 
 class KubernetesConfigurationsController {
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesConfigurationService, KubernetesApplicationService, ModalService) {
+  constructor($async, $state, Notifications, Authentication, KubernetesConfigurationService, KubernetesApplicationService, ModalService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
+    this.Authentication = Authentication;
     this.KubernetesConfigurationService = KubernetesConfigurationService;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.ModalService = ModalService;
@@ -93,6 +96,7 @@ class KubernetesConfigurationsController {
       configurationsLoading: true,
       applicationsLoading: true,
       viewReady: false,
+      isAdmin: this.Authentication.isAdmin(),
     };
 
     await this.getApplications();

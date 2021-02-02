@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt"
 	"github.com/portainer/portainer/api/chisel"
 	"github.com/portainer/portainer/api/cli"
@@ -17,6 +17,8 @@ import (
 	"github.com/portainer/portainer/api/git"
 	"github.com/portainer/portainer/api/http"
 	"github.com/portainer/portainer/api/http/client"
+	"github.com/portainer/portainer/api/http/proxy"
+	kubeproxy "github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/internal/snapshot"
 	"github.com/portainer/portainer/api/jwt"
 	"github.com/portainer/portainer/api/kubernetes"
@@ -71,7 +73,12 @@ func initDataStore(dataStorePath string, fileService portainer.FileService) port
 	return store
 }
 
-func initComposeStackManager(dataStorePath string, reverseTunnelService portainer.ReverseTunnelService) portainer.ComposeStackManager {
+func initComposeStackManager(assetsPath string, dataStorePath string, reverseTunnelService portainer.ReverseTunnelService, proxyManager *proxy.Manager) portainer.ComposeStackManager {
+	composeWrapper := exec.NewComposeWrapper(assetsPath, proxyManager)
+	if composeWrapper != nil {
+		return composeWrapper
+	}
+
 	return libcompose.NewComposeStackManager(dataStorePath, reverseTunnelService)
 }
 
@@ -89,6 +96,10 @@ func initJWTService(dataStore portainer.DataStore) (portainer.JWTService, error)
 		return nil, err
 	}
 
+	if settings.UserSessionTimeout == "" {
+		settings.UserSessionTimeout = portainer.DefaultUserSessionTimeout
+		dataStore.Settings().UpdateSettings(settings)
+	}
 	jwtService, err := jwt.NewService(settings.UserSessionTimeout)
 	if err != nil {
 		return nil, err
@@ -380,8 +391,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	kubernetesTokenCacheManager := kubeproxy.NewTokenCacheManager()
+	proxyManager := proxy.NewManager(dataStore, digitalSignatureService, reverseTunnelService, dockerClientFactory, kubernetesClientFactory, kubernetesTokenCacheManager)
 
-	composeStackManager := initComposeStackManager(*flags.Data, reverseTunnelService)
+	composeStackManager := initComposeStackManager(*flags.Assets, *flags.Data, reverseTunnelService, proxyManager)
 
 	kubernetesDeployer := initKubernetesDeployer(*flags.Assets)
 
@@ -448,27 +461,29 @@ func main() {
 	}
 
 	var server portainer.Server = &http.Server{
-		ReverseTunnelService:    reverseTunnelService,
-		Status:                  applicationStatus,
-		BindAddress:             *flags.Addr,
-		AssetsPath:              *flags.Assets,
-		DataStore:               dataStore,
-		SwarmStackManager:       swarmStackManager,
-		ComposeStackManager:     composeStackManager,
-		KubernetesDeployer:      kubernetesDeployer,
-		CryptoService:           cryptoService,
-		JWTService:              jwtService,
-		FileService:             fileService,
-		LDAPService:             ldapService,
-		OAuthService:            oauthService,
-		GitService:              gitService,
-		SignatureService:        digitalSignatureService,
-		SnapshotService:         snapshotService,
-		SSL:                     *flags.SSL,
-		SSLCert:                 *flags.SSLCert,
-		SSLKey:                  *flags.SSLKey,
-		DockerClientFactory:     dockerClientFactory,
-		KubernetesClientFactory: kubernetesClientFactory,
+		ReverseTunnelService:        reverseTunnelService,
+		Status:                      applicationStatus,
+		BindAddress:                 *flags.Addr,
+		AssetsPath:                  *flags.Assets,
+		DataStore:                   dataStore,
+		SwarmStackManager:           swarmStackManager,
+		ComposeStackManager:         composeStackManager,
+		KubernetesDeployer:          kubernetesDeployer,
+		CryptoService:               cryptoService,
+		JWTService:                  jwtService,
+		FileService:                 fileService,
+		LDAPService:                 ldapService,
+		OAuthService:                oauthService,
+		GitService:                  gitService,
+		ProxyManager:                proxyManager,
+		KubernetesTokenCacheManager: kubernetesTokenCacheManager,
+		SignatureService:            digitalSignatureService,
+		SnapshotService:             snapshotService,
+		SSL:                         *flags.SSL,
+		SSLCert:                     *flags.SSLCert,
+		SSLKey:                      *flags.SSLKey,
+		DockerClientFactory:         dockerClientFactory,
+		KubernetesClientFactory:     kubernetesClientFactory,
 	}
 
 	log.Printf("Starting Portainer %s on %s", portainer.APIVersion, *flags.Addr)

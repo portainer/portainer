@@ -7,7 +7,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
@@ -71,7 +71,7 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 				registry.Username = *payload.Username
 			}
 
-			if payload.Password != nil {
+			if payload.Password != nil && *payload.Password != "" {
 				registry.Password = *payload.Password
 			}
 

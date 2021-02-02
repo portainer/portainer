@@ -1,6 +1,10 @@
 ---
 name: Bug report
 about: Create a bug report
+title: ''
+labels: bug/need-confirmation, kind/bug
+assignees: ''
+
 ---
 
 <!--
@@ -9,7 +13,7 @@ Thanks for reporting a bug for Portainer !
 
 You can find more information about Portainer support framework policy here: https://www.portainer.io/2019/04/portainer-support-policy/
 
-Do you need help or have a question? Come chat with us on Slack http://portainer.io/slack/.
+Do you need help or have a question? Come chat with us on Slack http://portainer.slack.com/
 
 Before opening a new issue, make sure that we do not have any duplicates
 already open. You can ensure this by searching the issue list for this
@@ -40,6 +44,7 @@ You can see how [here](https://documentation.portainer.io/archive/1.23.2/faq/#ho
 
 - Portainer version:
 - Docker version (managed by Portainer):
+- Kubernetes version (managed by Portainer):
 - Platform (windows/linux):
 - Command used to start Portainer (`docker run -p 9000:9000 portainer/portainer`):
 - Browser:

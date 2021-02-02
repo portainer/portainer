@@ -3,6 +3,7 @@ package kubernetes
 import (
 	"crypto/tls"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/portainer/portainer/api/http/security"
@@ -13,14 +14,16 @@ import (
 
 type (
 	localTransport struct {
-		httpTransport *http.Transport
-		tokenManager  *tokenManager
+		httpTransport      *http.Transport
+		tokenManager       *tokenManager
+		endpointIdentifier portainer.EndpointID
 	}
 
 	agentTransport struct {
-		httpTransport    *http.Transport
-		tokenManager     *tokenManager
-		signatureService portainer.DigitalSignatureService
+		httpTransport      *http.Transport
+		tokenManager       *tokenManager
+		signatureService   portainer.DigitalSignatureService
+		endpointIdentifier portainer.EndpointID
 	}
 
 	edgeTransport struct {
@@ -50,19 +53,9 @@ func NewLocalTransport(tokenManager *tokenManager) (*localTransport, error) {
 
 // RoundTrip is the implementation of the the http.RoundTripper interface
 func (transport *localTransport) RoundTrip(request *http.Request) (*http.Response, error) {
-	tokenData, err := security.RetrieveTokenData(request)
+	token, err := getRoundTripToken(request, transport.tokenManager, transport.endpointIdentifier)
 	if err != nil {
 		return nil, err
-	}
-
-	var token string
-	if tokenData.Role == portainer.AdministratorRole {
-		token = transport.tokenManager.getAdminServiceAccountToken()
-	} else {
-		token, err = transport.tokenManager.getUserServiceAccountToken(int(tokenData.ID))
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
@@ -85,19 +78,9 @@ func NewAgentTransport(signatureService portainer.DigitalSignatureService, tlsCo
 
 // RoundTrip is the implementation of the the http.RoundTripper interface
 func (transport *agentTransport) RoundTrip(request *http.Request) (*http.Response, error) {
-	tokenData, err := security.RetrieveTokenData(request)
+	token, err := getRoundTripToken(request, transport.tokenManager, transport.endpointIdentifier)
 	if err != nil {
 		return nil, err
-	}
-
-	var token string
-	if tokenData.Role == portainer.AdministratorRole {
-		token = transport.tokenManager.getAdminServiceAccountToken()
-	} else {
-		token, err = transport.tokenManager.getUserServiceAccountToken(int(tokenData.ID))
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	request.Header.Set(portainer.PortainerAgentKubernetesSATokenHeader, token)
@@ -127,19 +110,9 @@ func NewEdgeTransport(reverseTunnelService portainer.ReverseTunnelService, endpo
 
 // RoundTrip is the implementation of the the http.RoundTripper interface
 func (transport *edgeTransport) RoundTrip(request *http.Request) (*http.Response, error) {
-	tokenData, err := security.RetrieveTokenData(request)
+	token, err := getRoundTripToken(request, transport.tokenManager, transport.endpointIdentifier)
 	if err != nil {
 		return nil, err
-	}
-
-	var token string
-	if tokenData.Role == portainer.AdministratorRole {
-		token = transport.tokenManager.getAdminServiceAccountToken()
-	} else {
-		token, err = transport.tokenManager.getUserServiceAccountToken(int(tokenData.ID))
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	request.Header.Set(portainer.PortainerAgentKubernetesSATokenHeader, token)
@@ -153,4 +126,28 @@ func (transport *edgeTransport) RoundTrip(request *http.Request) (*http.Response
 	}
 
 	return response, err
+}
+
+func getRoundTripToken(
+	request *http.Request,
+	tokenManager *tokenManager,
+	endpointIdentifier portainer.EndpointID,
+) (string, error) {
+	tokenData, err := security.RetrieveTokenData(request)
+	if err != nil {
+		return "", err
+	}
+
+	var token string
+	if tokenData.Role == portainer.AdministratorRole {
+		token = tokenManager.getAdminServiceAccountToken()
+	} else {
+		token, err = tokenManager.getUserServiceAccountToken(int(tokenData.ID))
+		if err != nil {
+			log.Printf("Failed retrieving service account token: %v", err)
+			return "", err
+		}
+	}
+
+	return token, nil
 }

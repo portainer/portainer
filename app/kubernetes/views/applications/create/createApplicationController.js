@@ -303,6 +303,9 @@ class KubernetesCreateApplicationController {
     const ingresses = this.filteredIngresses;
     p.IngressName = ingresses && ingresses.length ? ingresses[0].Name : undefined;
     p.IngressHost = ingresses && ingresses.length ? ingresses[0].Host : undefined;
+    if (this.formValues.PublishedPorts.length) {
+      p.Protocol = this.formValues.PublishedPorts[0].Protocol;
+    }
     this.formValues.PublishedPorts.push(p);
   }
 
@@ -335,6 +338,7 @@ class KubernetesCreateApplicationController {
     this.onChangePortMappingNodePort();
     this.onChangePortMappingIngressRoute();
     this.onChangePortMappingLoadBalancer();
+    this.onChangePortProtocol();
   }
 
   onChangePortMappingContainerPort() {
@@ -402,6 +406,17 @@ class KubernetesCreateApplicationController {
       state.refs = {};
       state.hasDuplicates = false;
     }
+  }
+
+  onChangePortProtocol(index) {
+    if (this.formValues.PublishingType === KubernetesApplicationPublishingTypes.LOAD_BALANCER) {
+      const newPorts = _.filter(this.formValues.PublishedPorts, { IsNew: true });
+      _.forEach(newPorts, (port) => {
+        port.Protocol = index ? this.formValues.PublishedPorts[index].Protocol : newPorts[0].Protocol;
+      });
+      this.onChangePortMappingLoadBalancer();
+    }
+    this.onChangePortMappingContainerPort();
   }
   /* #endregion */
 
@@ -561,6 +576,10 @@ class KubernetesCreateApplicationController {
     return this.state.isEdit && !this.formValues.Placements[index].IsNew;
   }
 
+  isNewAndNotFirst(index) {
+    return !this.state.isEdit && index !== 0;
+  }
+
   showPlacementPolicySection() {
     const placements = _.filter(this.formValues.Placements, { NeedsDeletion: false });
     return placements.length !== 0;
@@ -600,8 +619,17 @@ class KubernetesCreateApplicationController {
     return this.state.isEdit && this.formValues.PublishedPorts.length > 0 && ports.length > 0;
   }
 
+  isEditLBWithPorts() {
+    return this.formValues.PublishingType === KubernetesApplicationPublishingTypes.LOAD_BALANCER && _.filter(this.formValues.PublishedPorts, { IsNew: false }).length;
+  }
+
   isProtocolOptionDisabled(index, protocol) {
-    return this.disableLoadBalancerEdit() || (this.isEditAndNotNewPublishedPort(index) && this.formValues.PublishedPorts[index].Protocol !== protocol);
+    return (
+      this.disableLoadBalancerEdit() ||
+      (this.isEditAndNotNewPublishedPort(index) && this.formValues.PublishedPorts[index].Protocol !== protocol) ||
+      (this.isEditLBWithPorts() && this.formValues.PublishedPorts[index].Protocol !== protocol) ||
+      (this.isNewAndNotFirst(index) && this.formValues.PublishedPorts[index].Protocol !== protocol)
+    );
   }
 
   /* #endregion */

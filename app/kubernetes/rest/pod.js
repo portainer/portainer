@@ -31,6 +31,12 @@ angular.module('portainer.kubernetes').factory('KubernetesPods', [
           create: { method: 'POST' },
           update: { method: 'PUT' },
           delete: { method: 'DELETE' },
+          patch: {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json-patch+json',
+            },
+          },
           logs: {
             method: 'GET',
             params: { action: 'log' },

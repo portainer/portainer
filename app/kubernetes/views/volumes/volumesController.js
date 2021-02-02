@@ -1,3 +1,5 @@
+require('../../templates/advancedDeploymentPanel.html');
+
 import * as _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import angular from 'angular';
@@ -39,10 +41,22 @@ function computeSize(volumes) {
 
 class KubernetesVolumesController {
   /* @ngInject */
-  constructor($async, $state, Notifications, ModalService, LocalStorage, EndpointProvider, KubernetesStorageService, KubernetesVolumeService, KubernetesApplicationService) {
+  constructor(
+    $async,
+    $state,
+    Notifications,
+    Authentication,
+    ModalService,
+    LocalStorage,
+    EndpointProvider,
+    KubernetesStorageService,
+    KubernetesVolumeService,
+    KubernetesApplicationService
+  ) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
+    this.Authentication = Authentication;
     this.ModalService = ModalService;
     this.LocalStorage = LocalStorage;
     this.EndpointProvider = EndpointProvider;
@@ -117,6 +131,7 @@ class KubernetesVolumesController {
       currentName: this.$state.$current.name,
       endpointId: this.EndpointProvider.endpointID(),
       activeTab: this.LocalStorage.getActiveTab('volumes'),
+      isAdmin: this.Authentication.isAdmin(),
     };
 
     await this.getVolumes();

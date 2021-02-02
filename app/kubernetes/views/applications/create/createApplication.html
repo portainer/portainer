@@ -92,8 +92,8 @@
               </div>
             </div>
             <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
-              <div class="col-sm-12 small text-warning">
-                <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              <div class="col-sm-12 small text-danger">
+                <i class="fa fa-exclamation-circle red-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                 This resource pool has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the
                 resource pool.
               </div>
@@ -634,8 +634,8 @@
             </div>
 
             <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
-              <div class="col-sm-12 small text-muted">
-                <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              <div class="col-sm-12 small text-danger">
+                <i class="fa fa-exclamation-circle red-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                 This resource pool has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the
                 resource pool.
               </div>
@@ -813,8 +813,8 @@
             </div>
 
             <div class="form-group" ng-if="ctrl.resourceReservationsOverflow()">
-              <div class="col-sm-12 small text-muted">
-                <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              <div class="col-sm-12 small text-danger">
+                <i class="fa fa-exclamation-circle red-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                 This application would exceed available resources. Please review resource reservations or the instance count.
               </div>
             </div>
@@ -930,8 +930,8 @@
               </table>
 
               <div class="form-group" ng-if="ctrl.autoScalerOverflow()" style="margin-bottom: 10px;">
-                <div class="col-sm-12 small text-muted">
-                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                <div class="col-sm-12 small text-danger">
+                  <i class="fa fa-exclamation-circle red-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                   This application would exceed available resources. Please review resource reservations or the maximum instance count of the auto-scaling policy.
                 </div>
               </div>
@@ -1299,7 +1299,7 @@
                       ng-min="1"
                       ng-max="65535"
                       ng-required="!publishedPort.NeedsDeletion"
-                      ng-change="ctrl.onChangePortMappingLoadBalancerPort()"
+                      ng-change="ctrl.onChangePortMappingLoadBalancer()"
                       ng-disabled="ctrl.disableLoadBalancerEdit() || ctrl.isEditAndNotNewPublishedPort($index)"
                     />
                   </div>
@@ -1353,7 +1353,7 @@
                         class="btn btn-primary"
                         ng-model="publishedPort.Protocol"
                         uib-btn-radio="'TCP'"
-                        ng-change="ctrl.onChangePortMappingContainerPort()"
+                        ng-change="ctrl.onChangePortProtocol($index)"
                         ng-disabled="ctrl.isProtocolOptionDisabled($index, 'TCP')"
                         >TCP</label
                       >
@@ -1361,7 +1361,7 @@
                         class="btn btn-primary"
                         ng-model="publishedPort.Protocol"
                         uib-btn-radio="'UDP'"
-                        ng-change="ctrl.onChangePortMappingContainerPort()"
+                        ng-change="ctrl.onChangePortProtocol($index)"
                         ng-disabled="ctrl.isProtocolOptionDisabled($index, 'UDP')"
                         >UDP</label
                       >
