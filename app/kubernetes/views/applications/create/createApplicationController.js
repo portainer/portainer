@@ -409,13 +409,14 @@ class KubernetesCreateApplicationController {
   }
 
   onChangePortProtocol(index) {
-    this.onChangePortMappingContainerPort();
     if (this.formValues.PublishingType === KubernetesApplicationPublishingTypes.LOAD_BALANCER) {
       const newPorts = _.filter(this.formValues.PublishedPorts, { IsNew: true });
       _.forEach(newPorts, (port) => {
         port.Protocol = index ? this.formValues.PublishedPorts[index].Protocol : newPorts[0].Protocol;
       });
+      this.onChangePortMappingLoadBalancer();
     }
+    this.onChangePortMappingContainerPort();
   }
   /* #endregion */
 
