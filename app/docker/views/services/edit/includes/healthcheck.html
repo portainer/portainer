@@ -112,7 +112,7 @@
           <button
             type="button"
             class="btn btn-primary btn-sm"
-            ng-disabled="(service.HealthCheck.CustomHealthcheck && !service.HealthCheck.Test[1]) || !hasChanges(service, ['HealthCheck.CustomHealthcheck', 'HealthCheck.Test[1]', 'HealthCheck.Interval', 'HealthCheck.Timeout', 'HealthCheck.StartPeriod', 'HealthCheck.Retries'])"
+            ng-disabled="(service.HealthCheck.CustomHealthcheck && !service.HealthCheck.Test[1]) || !hasChanges(service, ['HealthCheck.CustomHealthcheck', 'HealthCheck.CustomHealthcheck', 'HealthCheck.Test[1]', 'HealthCheck.Interval', 'HealthCheck.Timeout', 'HealthCheck.StartPeriod', 'HealthCheck.Retries'])"
             ng-click="updateService(service)"
             >Apply changes</button
           >
@@ -121,7 +121,8 @@
           </button>
           <ul class="dropdown-menu">
             <li
-              ><a ng-click="cancelChanges(service, ['HealthCheck.Test[1]', 'HealthCheck.Interval', 'HealthCheck.Timeout', 'HealthCheck.StartPeriod', 'HealthCheck.Retries'])"
+              ><a
+                ng-click="cancelChanges(service, ['HealthCheck.CustomHealthcheck', 'HealthCheck.Test[1]', 'HealthCheck.Interval', 'HealthCheck.Timeout', 'HealthCheck.StartPeriod', 'HealthCheck.Retries'])"
                 >Reset changes</a
               ></li
             >

@@ -463,15 +463,27 @@ angular.module('portainer.docker').controller('ServiceController', [
           Window: ServiceHelper.translateHumanDurationToNanos(service.RestartWindow) || 0,
         };
       }
-
-      if ($scope.hasChanges(service, ['HealthCheck.Test[1]', 'HealthCheck.Interval', 'HealthCheck.Timeout', 'HealthCheck.StartPeriod', 'HealthCheck.Retries'])) {
-        config.TaskTemplate.ContainerSpec.HealthCheck = {
-          Test: ['CMD-SHELL', service.HealthCheck.Test[1]],
-          Interval: ServiceHelper.translateHumanDurationToNanos(service.HealthCheck.Interval),
-          Timeout: ServiceHelper.translateHumanDurationToNanos(service.HealthCheck.Timeout),
-          StartPeriod: ServiceHelper.translateHumanDurationToNanos(service.HealthCheck.StartPeriod),
-          Retries: service.HealthCheck.Retries || 3,
-        };
+      if (
+        $scope.hasChanges(service, [
+          'HealthCheck.CustomHealthcheck',
+          'HealthCheck.Test[1]',
+          'HealthCheck.Interval',
+          'HealthCheck.Timeout',
+          'HealthCheck.StartPeriod',
+          'HealthCheck.Retries',
+        ])
+      ) {
+        if (service.HealthCheck.CustomHealthcheck) {
+          config.TaskTemplate.ContainerSpec.HealthCheck = {
+            Test: ['CMD-SHELL', service.HealthCheck.Test[1]],
+            Interval: ServiceHelper.translateHumanDurationToNanos(service.HealthCheck.Interval),
+            Timeout: ServiceHelper.translateHumanDurationToNanos(service.HealthCheck.Timeout),
+            StartPeriod: ServiceHelper.translateHumanDurationToNanos(service.HealthCheck.StartPeriod),
+            Retries: service.HealthCheck.Retries || 3,
+          };
+        } else {
+          delete config.TaskTemplate.ContainerSpec.HealthCheck;
+        }
       }
 
       config.TaskTemplate.LogDriver = null;
@@ -660,9 +672,9 @@ angular.module('portainer.docker').controller('ServiceController', [
       service.UpdateDelay = ServiceHelper.translateNanosToHumanDuration(service.UpdateDelay) || '0s';
       service.StopGracePeriod = service.StopGracePeriod ? ServiceHelper.translateNanosToHumanDuration(service.StopGracePeriod) : '';
       if (service.HealthCheck) {
-        service.HealthCheck.Interval = ServiceHelper.translateNanosToHumanDuration(service.HealthCheck.Interval);
-        service.HealthCheck.Timeout = ServiceHelper.translateNanosToHumanDuration(service.HealthCheck.Timeout);
-        service.HealthCheck.StartPeriod = ServiceHelper.translateNanosToHumanDuration(service.HealthCheck.StartPeriod);
+        service.HealthCheck.Interval = service.HealthCheck.Interval ? ServiceHelper.translateNanosToHumanDuration(service.HealthCheck.Interval) : undefined;
+        service.HealthCheck.Timeout = service.HealthCheck.Timeout ? ServiceHelper.translateNanosToHumanDuration(service.HealthCheck.Timeout) : undefined;
+        service.HealthCheck.StartPeriod = service.HealthCheck.StartPeriod ? ServiceHelper.translateNanosToHumanDuration(service.HealthCheck.StartPeriod) : undefined;
       }
     }
 
