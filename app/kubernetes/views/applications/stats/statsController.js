@@ -114,7 +114,7 @@ class KubernetesApplicationStatsController {
   async onInit() {
     this.state = {
       autoRefresh: false,
-      refreshRate: '5',
+      refreshRate: '30',
       viewReady: false,
       transition: {
         podName: this.$transition$.params().pod,
