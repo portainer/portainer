@@ -23,6 +23,7 @@
                       <td>
                         {{ ctrl.volume.PersistentVolumeClaim.Name }}
                         <span class="label label-primary image-tag label-margins" ng-if="!ctrl.isSystemNamespace() && ctrl.isExternalVolume()">external</span>
+                        <span class="label label-primary image-tag label-margins" ng-if="!ctrl.isSystemNamespace() && ctrl.isNFSVolume()">NFS</span>
                         <span class="label label-warning image-tag label-margins" ng-if="!ctrl.isSystemNamespace() && !ctrl.isUsed()">unused</span>
                       </td>
                     </tr>
@@ -112,6 +113,14 @@
                           </div>
                         </form>
                       </td>
+                    </tr>
+                    <tr ng-if="ctrl.isNFSVolume()">
+                      <td>NFS Address</td>
+                      <td>{{ ctrl.volume.PersistentVolumeClaim.PersistentVolume.NFSAddress }}</td>
+                    </tr>
+                    <tr ng-if="ctrl.isNFSVolume()">
+                      <td>NFS Mount point</td>
+                      <td>{{ ctrl.volume.PersistentVolumeClaim.PersistentVolume.NFSMountPoint }}</td>
                     </tr>
                   </tbody>
                 </table>

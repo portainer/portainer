@@ -137,6 +137,7 @@
                 }}</a>
                 <span class="label label-info image-tag label-margins" ng-if="$ctrl.isSystemNamespace(item)">system</span>
                 <span class="label label-primary image-tag label-margins" ng-if="!$ctrl.isSystemNamespace(item) && $ctrl.isExternalVolume(item)">external</span>
+                <span class="label label-primary image-tag label-margins" ng-if="!$ctrl.isSystemNamespace(item) && $ctrl.isNFSVolume(item)">NFS</span>
                 <span class="label label-warning image-tag label-margins" ng-if="!$ctrl.isSystemNamespace(item) && !$ctrl.isUsed(item)">unused</span>
               </td>
               <td>

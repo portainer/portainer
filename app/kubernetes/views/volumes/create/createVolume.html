@@ -119,6 +119,12 @@
                 NFS Settings
               </div>
               <div class="form-group">
+                <span class="col-sm-12 text-muted small">
+                  <i class="fa fa-info-circle blue-icon space-right" aria-hidden="true"></i>
+                  Please ensure that your hosts are running either nfs-utils or nfs-common software before attempting to use NFS
+                </span>
+              </div>
+              <div class="form-group">
                 <label for="address" class="col-sm-1 control-label text-left">Address</label>
                 <div class="col-sm-11">
                   <input type="text" class="form-control" name="address" ng-model="ctrl.formValues.NFSAddress" placeholder="e.g. my.nfs-server.com OR xxx.xxx.xxx.xxx" required />

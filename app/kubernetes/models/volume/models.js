@@ -13,7 +13,6 @@ const _KubernetesPersistentVolumeClaim = Object.freeze({
   ApplicationOwner: '',
   ApplicationName: '',
   MountPath: '', // used for Application creation from ApplicationFormValues | not used from API conversion
-  PersistentVolume: {}, // KubernetesPersistentVolume
   PersistentVolumeName: '', // Name of KubernetesPersistentVolume
   Yaml: '',
 });

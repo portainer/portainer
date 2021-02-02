@@ -19,8 +19,10 @@ class KubernetesPersistentVolumeConverter {
     pv.Name = data.metadata.name;
     pv.StorageClass = _.find(storageClasses, { Name: data.spec.storageClassName });
     pv.Size = data.spec.capacity.storage;
-    pv.NFSAddress = data.spec.nfs.server;
-    pv.NFSMountPoint = data.spec.nfs.path;
+    if (data.spec.nfs) {
+      pv.NFSAddress = data.spec.nfs.server;
+      pv.NFSMountPoint = data.spec.nfs.path;
+    }
     return pv;
   }
 

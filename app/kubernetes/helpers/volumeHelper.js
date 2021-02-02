@@ -32,6 +32,10 @@ class KubernetesVolumeHelper {
   static isExternalVolume(volume) {
     return !volume.PersistentVolumeClaim.ApplicationOwner;
   }
+
+  static isNFSVolume(volume) {
+    return volume.PersistentVolumeClaim.PersistentVolume.NFSAddress;
+  }
 }
 
 export default KubernetesVolumeHelper;

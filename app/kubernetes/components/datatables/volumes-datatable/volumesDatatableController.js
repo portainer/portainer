@@ -45,6 +45,10 @@ class KubernetesVolumesDatatableController {
     return KubernetesVolumeHelper.isExternalVolume(item);
   }
 
+  isNFSVolume(item) {
+    return KubernetesVolumeHelper.isNFSVolume(item);
+  }
+
   allowSelection(item) {
     return !this.disableRemove(item);
   }
