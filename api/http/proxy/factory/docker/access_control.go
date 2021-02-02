@@ -1,6 +1,7 @@
 package docker
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -8,7 +9,7 @@ import (
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
 	"github.com/portainer/portainer/api/internal/authorization"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 const (
@@ -29,7 +30,25 @@ type (
 	}
 )
 
+func getUniqueElements(items string) []string {
+	result := []string{}
+	seen := make(map[string]struct{})
+	for _, item := range strings.Split(items, ",") {
+		v := strings.TrimSpace(item)
+		if v == "" {
+			continue
+		}
+		if _, ok := seen[v]; !ok {
+			result = append(result, v)
+			seen[v] = struct{}{}
+		}
+	}
+
+	return result
+}
+
 func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject map[string]interface{}, resourceID string, resourceType portainer.ResourceControlType) (*portainer.ResourceControl, error) {
+	fmt.Println(">> LABELS call:", labelsObject)
 	if labelsObject[resourceLabelForPortainerPublicResourceControl] != nil {
 		resourceControl := authorization.NewPublicResourceControl(resourceID, resourceType)
 
@@ -41,16 +60,22 @@ func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject m
 		return resourceControl, nil
 	}
 
+	fmt.Println(">> fetching users and names.\nteams:", labelsObject[resourceLabelForPortainerTeamResourceControl], "\n users: ", labelsObject[resourceLabelForPortainerUserResourceControl])
+
 	teamNames := make([]string, 0)
 	userNames := make([]string, 0)
 	if labelsObject[resourceLabelForPortainerTeamResourceControl] != nil {
+		fmt.Println("fetching teams")
 		concatenatedTeamNames := labelsObject[resourceLabelForPortainerTeamResourceControl].(string)
-		teamNames = strings.Split(concatenatedTeamNames, ",")
+		teamNames = getUniqueElements(concatenatedTeamNames)
+		fmt.Println(">> TEAM names:", teamNames)
 	}
 
 	if labelsObject[resourceLabelForPortainerUserResourceControl] != nil {
+		fmt.Println("fetching users")
 		concatenatedUserNames := labelsObject[resourceLabelForPortainerUserResourceControl].(string)
-		userNames = strings.Split(concatenatedUserNames, ",")
+		userNames = getUniqueElements(concatenatedUserNames)
+		fmt.Println(">> USERS names:", userNames)
 	}
 
 	if len(teamNames) > 0 || len(userNames) > 0 {
@@ -218,6 +243,7 @@ func (transport *Transport) filterResourceList(parameters *resourceOperationPara
 
 	for _, resource := range resourceData {
 		resourceObject := resource.(map[string]interface{})
+		fmt.Println(">>>> CONTAINERS RESOURCE OBJ ", resourceObject)
 		if resourceObject[parameters.resourceIdentifierAttribute] == nil {
 			log.Printf("[WARN] [http,proxy,docker,filter] [message: unable to find resource identifier property in resource list element] [identifier_attribute: %s]", parameters.resourceIdentifierAttribute)
 			continue
