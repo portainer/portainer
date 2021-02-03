@@ -16,17 +16,19 @@ import (
 // ComposeWrapper is a wrapper for docker-compose binary
 type ComposeWrapper struct {
 	binaryPath   string
+	dataPath     string
 	proxyManager *proxy.Manager
 }
 
 // NewComposeWrapper returns a docker-compose wrapper if corresponding binary present, otherwise nil
-func NewComposeWrapper(binaryPath string, proxyManager *proxy.Manager) *ComposeWrapper {
+func NewComposeWrapper(binaryPath, dataPath string, proxyManager *proxy.Manager) *ComposeWrapper {
 	if !IsBinaryPresent(programPath(binaryPath, "docker-compose")) {
 		return nil
 	}
 
 	return &ComposeWrapper{
 		binaryPath:   binaryPath,
+		dataPath:     dataPath,
 		proxyManager: proxyManager,
 	}
 }
@@ -79,6 +81,8 @@ func (w *ComposeWrapper) command(command []string, stack *portainer.Stack, endpo
 
 	var stderr bytes.Buffer
 	cmd := exec.Command(program, args...)
+	cmd.Env = os.Environ()
+	cmd.Env = append(cmd.Env, fmt.Sprintf("DOCKER_CONFIG=%s", w.dataPath))
 	cmd.Stderr = &stderr
 
 	out, err := cmd.Output()
