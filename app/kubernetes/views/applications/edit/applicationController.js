@@ -1,12 +1,13 @@
 import angular from 'angular';
-import * as _ from 'lodash-es';
-import * as JsonPatch from 'fast-json-patch';
+import _ from 'lodash-es';
+import JsonPatch from 'fast-json-patch';
 import { KubernetesApplicationDataAccessPolicies, KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import { KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'Kubernetes/pod/models';
 import { KubernetesPodContainerTypes } from 'Kubernetes/pod/models/index';
+import KubernetesYamlHelper from 'Kubernetes/helpers/yamlHelper';
 
 function computeTolerations(nodes, application) {
   const pod = application.Pods[0];
@@ -101,6 +102,7 @@ class KubernetesApplicationController {
     Notifications,
     LocalStorage,
     ModalService,
+    Authentication,
     KubernetesApplicationService,
     KubernetesEventService,
     KubernetesStackService,
@@ -114,6 +116,7 @@ class KubernetesApplicationController {
     this.Notifications = Notifications;
     this.LocalStorage = LocalStorage;
     this.ModalService = ModalService;
+    this.Authentication = Authentication;
 
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesEventService = KubernetesEventService;
@@ -138,6 +141,8 @@ class KubernetesApplicationController {
     this.redeployApplicationAsync = this.redeployApplicationAsync.bind(this);
     this.rollbackApplicationAsync = this.rollbackApplicationAsync.bind(this);
     this.copyLoadBalancerIP = this.copyLoadBalancerIP.bind(this);
+    this.updateFromYaml = this.updateFromYaml.bind(this);
+    this.onEditorChange = this.onEditorChange.bind(this);
   }
 
   selectTab(index) {
@@ -255,6 +260,35 @@ class KubernetesApplicationController {
     return this.$async(this.updateApplicationAsync);
   }
 
+  updateFromYaml() {
+    return this.$async(async() => {
+    });
+  }
+
+  onEditorChange(cm) {
+    console.log('oneditor change')
+    console.log(cm)
+    this.formValues.Yaml = cm.getValue();
+  }
+
+  yamlUpdateVisible() {
+    return this.canEditApplication() && this.state.isAdmin;
+  }
+
+  yamlUpdateDisabled() {
+    if (!this.application.Yaml || !this.formValues.Yaml) {
+      return true
+    }
+    const oldApp = KubernetesYamlHelper.parse(this.application.Yaml);
+    const newApp = KubernetesYamlHelper.parse(this.formValues.Yaml);
+    const payload = JsonPatch.compare(oldApp, newApp);
+    return !payload.length;
+  }
+
+  canEditApplication() {
+    return !this.isExternalApplication() && !this.isSystemNamespace()
+  }
+
   /**
    * EVENTS
    */
@@ -335,6 +369,7 @@ class KubernetesApplicationController {
       placementWarning: false,
       expandedNote: false,
       useIngress: false,
+      isAdmin: this.Authentication.isAdmin(),
     };
 
     this.state.activeTab = this.LocalStorage.getActiveTab('application');
@@ -342,6 +377,7 @@ class KubernetesApplicationController {
     this.formValues = {
       Note: '',
       SelectedRevision: undefined,
+      Yaml: '',
     };
 
     await this.getApplication();

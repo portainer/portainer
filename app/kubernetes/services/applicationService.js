@@ -360,13 +360,25 @@ class KubernetesApplicationService {
     }
   }
 
-  // accept either formValues or applications as parameters
-  // depending on partial value
-  // true = KubernetesApplication
-  // false = KubernetesApplicationFormValues
-  patch(oldValues, newValues, partial = false) {
+
+  // this function accepts Yaml as parameters
+  async patchFromYamlAsync(oldApp, newApp) {
+    const apiService = this._getApplicationApiService(oldApp);
+    
+  }
+
+  /**
+   * PATCH accepts different payloads depending on the options passed as 3rd parameter
+   * @param {KubernetesApplicationFormValue|KubernetesApplication|Yaml} oldValues Data of application before changes
+   * @param {KubernetesApplicationFormValue|KubernetesApplication|Yaml} newValues Data of application after changes
+   * @param {{partial=false, fromYaml=false}} options Options change the source format
+   */
+  patch(oldValues, newValues, {partial = false, fromYaml = false}) {
     if (partial) {
       return this.$async(this.patchPartialAsync, oldValues, newValues);
+    }
+    if (fromYaml) {
+      return this.$async(this.patchFromYamlAsync, oldValues, newValues);
     }
     return this.$async(this.patchAsync, oldValues, newValues);
   }

@@ -1,7 +1,14 @@
 <div>
-  <code-editor identifier="application-details-yaml" read-only="true" value="$ctrl.data"></code-editor>
+  <code-editor identifier="application-details-yaml" value="ctrl.data" on-change="(ctrl.onEditorChange)" yml="true"></code-editor>
   <div style="margin: 15px;">
-    <span class="btn btn-primary btn-sm" ng-click="$ctrl.copyYAML()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy to clipboard</span>
+    <button class="btn btn-primary btn-sm" ng-click="ctrl.copyYAML()">
+      <span><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy to clipboard</span>
+    </button>
     <span id="copyNotificationYAML" style="margin-left: 7px; display: none; color: #23ae89;" class="small"> <i class="fa fa-check" aria-hidden="true"></i> copied </span>
+    <button ng-if="ctrl.updateVisible" ng-disabled="ctrl.updateDisabled" type="button" class="btn btn-primary btn-sm" ng-click="ctrl.updateAction()"
+      button-spinner="ctrl.state.actionInProgress">
+      <span ng-show="!ctrl.state.actionInProgress">Update {{ctrl.resourceType}}</span>
+      <span ng-show="ctrl.state.actionInProgress">Update in progress...</span>
+    </button>
   </div>
 </div>

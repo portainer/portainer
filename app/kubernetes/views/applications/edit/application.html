@@ -177,7 +177,15 @@
             <uib-tab index="3" ng-if="ctrl.application.Yaml" select="ctrl.showEditor()" classes="btn-sm">
               <uib-tab-heading> <i class="fa fa-code space-right" aria-hidden="true"></i> YAML </uib-tab-heading>
               <div style="padding-right: 25px;" ng-if="ctrl.state.showEditorTab">
-                <kubernetes-yaml-inspector key="application-yaml" data="ctrl.application.Yaml"></kubernetes-yaml-inspector>
+                <kubernetes-yaml-inspector
+                  key="application-yaml"
+                  data="ctrl.application.Yaml"
+                  resource-type="application"
+                  update-action="ctrl.updateFromYaml"
+                  on-editor-change="(ctrl.onEditorChange)"
+                  update-visible="ctrl.yamlUpdateVisible()"
+                  update-disabled="ctrl.yamlUpdateDisabled()"
+                ></kubernetes-yaml-inspector>
               </div>
             </uib-tab>
           </uib-tabset>
@@ -190,7 +198,7 @@
     <div class="col-sm-12">
       <rd-widget>
         <rd-widget-body>
-          <div ng-if="!ctrl.isExternalApplication() && !ctrl.isSystemNamespace()" style="margin-bottom: 15px;">
+          <div ng-if="ctrl.canEditApplication()" style="margin-bottom: 15px;">
             <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.applications.application.edit" style="margin-left: 0;">
               <i class="fa fa-file-code space-right" aria-hidden="true"></i>Edit this application
             </button>
