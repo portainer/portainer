@@ -406,7 +406,7 @@
               <td style="width: 25%;">Configuration</td>
             </tr>
             <tbody ng-repeat="container in ctrl.application.Containers" style="border-top: 0;">
-              <tr ng-repeat="envvar in container.Env track by $index">
+              <tr ng-repeat="envvar in container.Env | orderBy: 'name'">
                 <td>
                   {{ container.Name }}
                   <span ng-if="container.Type === ctrl.KubernetesPodContainerTypes.INIT"

@@ -142,7 +142,7 @@
               </div>
 
               <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-                <div ng-repeat="envVar in ctrl.formValues.EnvironmentVariables" style="margin-top: 2px;">
+                <div ng-repeat="envVar in ctrl.formValues.EnvironmentVariables | orderBy: 'Name'" style="margin-top: 2px;">
                   <div class="col-sm-4 input-group input-group-sm" style="vertical-align: top;">
                     <div class="input-group col-sm-12 input-group-sm" ng-class="{ striked: envVar.NeedsDeletion }">
                       <span class="input-group-addon">name</span>

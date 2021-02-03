@@ -19,7 +19,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="var in service.EnvironmentVariables">
+          <tr ng-repeat="var in service.EnvironmentVariables | orderBy: 'key'">
             <td>
               <div class="input-group input-group-sm">
                 <span class="input-group-addon fit-text-size">name</span>
