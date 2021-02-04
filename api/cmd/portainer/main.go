@@ -74,7 +74,7 @@ func initDataStore(dataStorePath string, fileService portainer.FileService) port
 }
 
 func initComposeStackManager(assetsPath string, dataStorePath string, reverseTunnelService portainer.ReverseTunnelService, proxyManager *proxy.Manager) portainer.ComposeStackManager {
-	composeWrapper := exec.NewComposeWrapper(assetsPath, proxyManager)
+	composeWrapper := exec.NewComposeWrapper(assetsPath, dataStorePath, proxyManager)
 	if composeWrapper != nil {
 		return composeWrapper
 	}
