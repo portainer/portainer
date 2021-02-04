@@ -127,16 +127,7 @@ export class EdgeJobController {
 
   async uiCanExit() {
     if (this.edgeJob.FileContent !== this.oldFileContent && this.state.isEditorDirty) {
-      return this.ModalService.confirmAsync({
-        title: 'Are you sure ?',
-        message: 'You currently have unsaved changes in the editor. Are you sure you want to leave?',
-        buttons: {
-          confirm: {
-            label: 'Yes',
-            className: 'btn-danger',
-          },
-        },
-      });
+      return this.ModalService.confirmWebEditorDiscard();
     }
   }
 

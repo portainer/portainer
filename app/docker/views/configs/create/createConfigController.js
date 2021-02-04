@@ -64,16 +64,7 @@ class CreateConfigController {
 
   async uiCanExit() {
     if (this.formValues.displayCodeEditor && this.formValues.ConfigContent && this.state.isEditorDirty) {
-      return this.ModalService.confirmAsync({
-        title: 'Are you sure ?',
-        message: 'You currently have unsaved changes in the editor. Are you sure you want to leave?',
-        buttons: {
-          confirm: {
-            label: 'Yes',
-            className: 'btn-danger',
-          },
-        },
-      });
+      return this.ModalService.confirmWebEditorDiscard();
     }
   }
 
