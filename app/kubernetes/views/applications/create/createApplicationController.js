@@ -165,15 +165,19 @@ class KubernetesCreateApplicationController {
     this.formValues.EnvironmentVariables.push(new KubernetesApplicationEnvironmentVariableFormValue());
   }
 
-  restoreEnvironmentVariable(index) {
-    this.formValues.EnvironmentVariables[index].NeedsDeletion = false;
+  restoreEnvironmentVariable(item) {
+    item.NeedsDeletion = false;
   }
 
-  removeEnvironmentVariable(index) {
-    if (this.state.isEdit && !this.formValues.EnvironmentVariables[index].IsNew) {
-      this.formValues.EnvironmentVariables[index].NeedsDeletion = true;
-    } else {
-      this.formValues.EnvironmentVariables.splice(index, 1);
+  removeEnvironmentVariable(item) {
+    const index = this.formValues.EnvironmentVariables.indexOf(item);
+    if (index !== -1) {
+      const envVar = this.formValues.EnvironmentVariables[index];
+      if (!envVar.IsNew) {
+        envVar.NeedsDeletion = true;
+      } else {
+        this.formValues.EnvironmentVariables.splice(index, 1);
+      }
     }
     this.onChangeEnvironmentName();
   }

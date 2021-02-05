@@ -191,10 +191,10 @@
                   </div>
 
                   <div class="input-group col-sm-2 input-group-sm" ng-if="ctrl.formValues.Containers.length <= 1">
-                    <button ng-if="!envVar.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeEnvironmentVariable($index)">
+                    <button ng-if="!envVar.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeEnvironmentVariable(envVar)">
                       <i class="fa fa-trash-alt" aria-hidden="true"></i>
                     </button>
-                    <button ng-if="envVar.NeedsDeletion" class="btn btn-sm btn-primary" type="button" ng-click="ctrl.restoreEnvironmentVariable($index)">
+                    <button ng-if="envVar.NeedsDeletion" class="btn btn-sm btn-primary" type="button" ng-click="ctrl.restoreEnvironmentVariable(envVar)">
                       <i class="fa fa-trash-restore" aria-hidden="true"></i>
                     </button>
                   </div>
