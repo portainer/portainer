@@ -1,4 +1,5 @@
 import _ from 'lodash-es';
+import YAML from 'yaml';
 
 import { ExternalStackViewModel } from '@/portainer/models/stack';
 
@@ -22,22 +23,36 @@ angular.module('portainer.app').factory('StackHelper', [
       );
     }
 
-    function findDeepAll(obj, key) {
-      if (_.has(obj, key)) {
-        return [obj[key]];
+    function findDeepAll(obj, target, res = []) {
+      if (typeof obj === 'object') {
+        _.forEach(obj, (child, key) => {
+          if (key === target) res.push(child);
+          if (typeof child === 'object') findDeepAll(child, target, res);
+        });
       }
-      return _.flatten(
-        _.map(obj, (v) => {
-          return typeof v === 'object' ? findDeepAll(v, key) : [];
-        }),
-        true
-      );
+      return res;
     }
 
-    helper.getContainerNameDuplicates = function (yamlObject, containerNames) {
-      const key = 'container_name';
-      const names = findDeepAll(yamlObject, key);
-      return _.filter(containerNames, (containerName) => _.includes(names, containerName));
+    helper.validateYAML = function (yaml, containerNames) {
+      let yamlObject;
+
+      try {
+        yamlObject = YAML.parse(yaml);
+      } catch (err) {
+        return 'There is an error in the yaml syntax: ' + err;
+      }
+
+      const names = _.uniq(findDeepAll(yamlObject, 'container_name'));
+      const duplicateContainers = _.intersection(containerNames, names);
+
+      if (duplicateContainers.length === 0) return;
+
+      return (
+        (duplicateContainers.length === 1 ? 'This container name is' : 'These container names are') +
+        ' already used by another container running in this environment: ' +
+        _.join(duplicateContainers, ', ') +
+        '.'
+      );
     };
 
     return helper;

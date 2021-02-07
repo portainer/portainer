@@ -1,6 +1,5 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import YAML from 'yaml';
 
 import { AccessControlFormData } from '../../../components/accessControlForm/porAccessControlFormModel';
 
@@ -18,6 +17,7 @@ angular
     FormHelper,
     EndpointProvider,
     StackHelper,
+    ContainerHelper,
     CustomTemplateService,
     ContainerService
   ) {
@@ -40,8 +40,8 @@ angular
       formValidationError: '',
       actionInProgress: false,
       StackType: null,
-      yamlValidationError: '',
-      yamlUploadError: '',
+      editorYamlValidationError: '',
+      uploadYamlValidationError: '',
     };
 
     $scope.addEnvironmentVariable = function () {
@@ -62,28 +62,6 @@ angular
         return false;
       }
       return true;
-    }
-
-    function validateYAML(yaml) {
-      let yamlObject;
-      let error = '';
-      try {
-        yamlObject = YAML.parse(yaml);
-      } catch (err) {
-        error = 'There is an error in the yaml syntax';
-      }
-      if (yamlObject) {
-        const duplicateContainers = StackHelper.getContainerNameDuplicates(yamlObject, $scope.containerNames);
-        if (duplicateContainers.length > 0) {
-          const duplicateContainerStr = _.join(duplicateContainers, ', ');
-          if (duplicateContainers.length === 1) {
-            error = 'This container name is already used by another container running in this environment: ' + duplicateContainerStr + '.';
-          } else {
-            error = 'These container names are already used by another containers running in this environment: ' + duplicateContainerStr + '.';
-          }
-        }
-      }
-      return error;
     }
 
     function createSwarmStack(name, method) {
@@ -182,11 +160,11 @@ angular
 
     $scope.editorUpdate = function (cm) {
       $scope.formValues.StackFileContent = cm.getValue();
-      $scope.state.yamlValidationError = validateYAML($scope.formValues.StackFileContent);
+      $scope.state.editorYamlValidationError = StackHelper.validateYAML($scope.formValues.StackFileContent, $scope.containerNames);
     };
 
     async function onFileLoadAsync(event) {
-      $scope.state.yamlUploadError = validateYAML(event.target.result);
+      $scope.state.uploadYamlValidationError = StackHelper.validateYAML(event.target.result, $scope.containerNames);
     }
 
     function onFileLoad(event) {
@@ -237,7 +215,7 @@ angular
 
       try {
         $scope.containers = await ContainerService.containers();
-        $scope.containerNames = _.map(_.flatten(_.map($scope.containers, 'Names')), (name) => _.replace(name, '/', ''));
+        $scope.containerNames = ContainerHelper.getContainerNames($scope.containers);
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to retrieve Containers');
       }

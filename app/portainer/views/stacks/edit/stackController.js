@@ -1,6 +1,3 @@
-import _ from 'lodash-es';
-import YAML from 'yaml';
-
 angular.module('portainer.app').controller('StackController', [
   '$async',
   '$q',
@@ -40,7 +37,8 @@ angular.module('portainer.app').controller('StackController', [
     EndpointService,
     GroupService,
     ModalService,
-    StackHelper
+    StackHelper,
+    ContainerHelper
   ) {
     $scope.state = {
       actionInProgress: false,
@@ -193,7 +191,7 @@ angular.module('portainer.app').controller('StackController', [
 
     $scope.editorUpdate = function (cm) {
       $scope.stackFileContent = cm.getValue();
-      $scope.state.yamlError = validateYAML($scope.stackFileContent);
+      $scope.state.yamlError = StackHelper.validateYAML($scope.stackFileContent, $scope.containerNames);
     };
 
     $scope.stopStack = stopStack;
@@ -236,28 +234,6 @@ angular.module('portainer.app').controller('StackController', [
       $scope.state.actionInProgress = false;
     }
 
-    function validateYAML(yaml) {
-      let yamlObject;
-      let error = '';
-      try {
-        yamlObject = YAML.parse(yaml);
-      } catch (err) {
-        error = 'There is an error in the yaml syntax';
-      }
-      if (yamlObject) {
-        const duplicateContainers = StackHelper.getContainerNameDuplicates(yamlObject, $scope.containerNames);
-        if (duplicateContainers.length > 0) {
-          const duplicateContainerStr = _.join(duplicateContainers, ', ');
-          if (duplicateContainers.length === 1) {
-            error = 'This container name is already used by another container running in this environment: ' + duplicateContainerStr + '.';
-          } else {
-            error = 'These container names are already used by another containers running in this environment: ' + duplicateContainerStr + '.';
-          }
-        }
-      }
-      return error;
-    }
-
     function loadStack(id) {
       var agentProxy = $scope.applicationState.endpoint.mode.agentProxy;
 
@@ -279,7 +255,7 @@ angular.module('portainer.app').controller('StackController', [
           $scope.groups = data.groups;
           $scope.stack = stack;
           $scope.containers = data.containers;
-          $scope.containerNames = _.map(_.flatten(_.map($scope.containers, 'Names')), (name) => _.replace(name, '/', ''));
+          $scope.containerNames = ContainerHelper.getContainerNames($scope.containers);
 
           let resourcesPromise = Promise.resolve({});
           if (stack.Status === 1) {
@@ -301,7 +277,7 @@ angular.module('portainer.app').controller('StackController', [
             }
           }
 
-          $scope.state.yamlError = validateYAML($scope.stackFileContent);
+          $scope.state.yamlError = StackHelper.validateYAML($scope.stackFileContent, $scope.containerNames);
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve stack details');
