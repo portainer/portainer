@@ -61,6 +61,12 @@ jobs:
     steps:
       - name: Checkout Source
         uses: actions/checkout@v2
+      - name: pwd
+        run: pwd
+      - name: ls
+        run: ls -al
+      - name: Download dependencies
+        run: cd api && go get -d && cd ..
       - name: Run Gosec Security Scanner
         uses: securego/gosec@master
         with:
