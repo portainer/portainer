@@ -53,7 +53,7 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v1
-  gosec:
+  server-security:
     name: Server security check
     runs-on: ubuntu-latest
     env:
@@ -62,7 +62,7 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v2
       - name: Download dependencies
-        run: cd api && go get -v -d && cd ..
+        run: cd api && go get -v -d
       - name: Run Gosec Security Scanner
         uses: portainer/gosec@fix-sarif-format
         with:
@@ -73,3 +73,16 @@ jobs:
         with:
           # Path to SARIF file relative to the root of the repository
           sarif_file: results.sarif
+  server-dependencies:
+    name: Server dependency check
+    runs-on: ubuntu-latest
+    env:
+      GO111MODULE: on
+      NANCY_VERSION: v1.0.11
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v2
+      - name: Get Nancy binary
+        run: curl -s -L "https://github.com/sonatype-nexus-community/nancy/releases/download/$NANCY_VERSION/nancy-linux.amd64-$NANCY_VERSION" -o "/tmp/tools/nancy"
+      - name: Scan modules
+        run: cd api && go list -json -m all | /tmp/tools/nancy sleuth
