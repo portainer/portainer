@@ -51,7 +51,7 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v1
   server-security:
-    name: Server security check
+    name: Scan server code
     runs-on: ubuntu-latest
     env:
       GO111MODULE: on
@@ -71,7 +71,7 @@ jobs:
           # Path to SARIF file relative to the root of the repository
           sarif_file: results.sarif
   server-dependencies:
-    name: Server dependency check
+    name: Scan server dependencies
     runs-on: ubuntu-latest
     env:
       GO111MODULE: on
@@ -79,9 +79,7 @@ jobs:
     steps:
       - name: Checkout Source
         uses: actions/checkout@v2
-      - name: Get Nancy binary
+      - name: Download Nancy binary
         run: curl -L "https://github.com/sonatype-nexus-community/nancy/releases/download/$NANCY_VERSION/nancy-$NANCY_VERSION-linux-amd64" -o nancy && chmod +x nancy
-      - name: ls
-        run: ls -al
       - name: Scan modules
         run: cd api && go list -json -m all | ../nancy sleuth
