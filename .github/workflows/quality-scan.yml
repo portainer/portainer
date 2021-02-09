@@ -83,6 +83,6 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v2
       - name: Get Nancy binary
-        run: curl -s -L "https://github.com/sonatype-nexus-community/nancy/releases/download/$NANCY_VERSION/nancy-linux.amd64-$NANCY_VERSION" -o "/tmp/tools/nancy"
+        run: curl -s -L "https://github.com/sonatype-nexus-community/nancy/releases/download/$NANCY_VERSION/nancy-$NANCY_VERSION-linux-amd64" -o "/tmp/tools/nancy"
       - name: Scan modules
         run: cd api && go list -json -m all | /tmp/tools/nancy sleuth
