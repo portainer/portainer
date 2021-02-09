@@ -34,7 +34,6 @@ angular.module('portainer.docker').controller('ServiceController', [
   'SecretService',
   'ImageService',
   'SecretHelper',
-  'Service',
   'ServiceHelper',
   'LabelHelper',
   'TaskService',
@@ -45,7 +44,6 @@ angular.module('portainer.docker').controller('ServiceController', [
   'ModalService',
   'PluginService',
   'Authentication',
-  'SettingsService',
   'VolumeService',
   'ImageHelper',
   'WebhookService',
@@ -53,6 +51,7 @@ angular.module('portainer.docker').controller('ServiceController', [
   'clipboard',
   'WebhookHelper',
   'NetworkService',
+  'endpoint',
   function (
     $q,
     $scope,
@@ -67,7 +66,6 @@ angular.module('portainer.docker').controller('ServiceController', [
     SecretService,
     ImageService,
     SecretHelper,
-    Service,
     ServiceHelper,
     LabelHelper,
     TaskService,
@@ -78,14 +76,14 @@ angular.module('portainer.docker').controller('ServiceController', [
     ModalService,
     PluginService,
     Authentication,
-    SettingsService,
     VolumeService,
     ImageHelper,
     WebhookService,
     EndpointProvider,
     clipboard,
     WebhookHelper,
-    NetworkService
+    NetworkService,
+    endpoint
   ) {
     $scope.state = {
       updateInProgress: false,
@@ -666,7 +664,6 @@ angular.module('portainer.docker').controller('ServiceController', [
             availableImages: ImageService.images(),
             availableLoggingDrivers: PluginService.loggingPlugins(apiVersion < 1.25),
             availableNetworks: NetworkService.networks(true, true, apiVersion >= 1.25),
-            settings: SettingsService.publicSettings(),
             webhooks: WebhookService.webhooks(service.Id, EndpointProvider.endpointID()),
           });
         })
@@ -677,7 +674,7 @@ angular.module('portainer.docker').controller('ServiceController', [
           $scope.availableImages = ImageService.getUniqueTagListFromImages(data.availableImages);
           $scope.availableLoggingDrivers = data.availableLoggingDrivers;
           $scope.availableVolumes = data.volumes;
-          $scope.allowBindMounts = data.settings.AllowBindMountsForRegularUsers;
+          $scope.allowBindMounts = endpoint.SecuritySettings.allowBindMountsForRegularUsers;
           $scope.isAdmin = Authentication.isAdmin();
           $scope.availableNetworks = data.availableNetworks;
           $scope.swarmNetworks = _.filter($scope.availableNetworks, (network) => network.Scope === 'swarm');

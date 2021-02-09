@@ -248,6 +248,18 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, dataStore portainer.Dat
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.DockerSnapshot{},
 		Kubernetes:         portainer.KubernetesDefault(),
+
+		SecuritySettings: portainer.EndpointSecuritySettings{
+			AllowVolumeBrowserForRegularUsers: false,
+			EnableHostManagementFeatures:      false,
+
+			AllowBindMountsForRegularUsers:            true,
+			AllowPrivilegedModeForRegularUsers:        true,
+			AllowHostNamespaceForRegularUsers:         true,
+			AllowContainerCapabilitiesForRegularUsers: true,
+			AllowDeviceMappingForRegularUsers:         true,
+			AllowStackManagementForRegularUsers:       true,
+		},
 	}
 
 	if strings.HasPrefix(endpoint.URL, "tcp://") {
@@ -297,6 +309,18 @@ func createUnsecuredEndpoint(endpointURL string, dataStore portainer.DataStore, 
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.DockerSnapshot{},
 		Kubernetes:         portainer.KubernetesDefault(),
+
+		SecuritySettings: portainer.EndpointSecuritySettings{
+			AllowVolumeBrowserForRegularUsers: false,
+			EnableHostManagementFeatures:      false,
+
+			AllowBindMountsForRegularUsers:            true,
+			AllowPrivilegedModeForRegularUsers:        true,
+			AllowHostNamespaceForRegularUsers:         true,
+			AllowContainerCapabilitiesForRegularUsers: true,
+			AllowDeviceMappingForRegularUsers:         true,
+			AllowStackManagementForRegularUsers:       true,
+		},
 	}
 
 	err := snapshotService.SnapshotEndpoint(endpoint)

@@ -344,15 +344,12 @@ func (handler *Handler) createSwarmDeployConfig(r *http.Request, stack *portaine
 }
 
 func (handler *Handler) deploySwarmStack(config *swarmStackDeploymentConfig) error {
-	settings, err := handler.DataStore.Settings().Settings()
-	if err != nil {
-		return err
-	}
-
 	isAdminOrEndpointAdmin, err := handler.userIsAdminOrEndpointAdmin(config.user, config.endpoint.ID)
 	if err != nil {
 		return err
 	}
+
+	settings := &config.endpoint.SecuritySettings
 
 	if !settings.AllowBindMountsForRegularUsers && !isAdminOrEndpointAdmin {
 		composeFilePath := path.Join(config.stack.ProjectPath, config.stack.EntryPoint)

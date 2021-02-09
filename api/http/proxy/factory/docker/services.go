@@ -11,7 +11,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
@@ -111,7 +111,7 @@ func (transport *Transport) decorateServiceCreationOperation(request *http.Reque
 	}
 
 	if !isAdminOrEndpointAdmin {
-		settings, err := transport.dataStore.Settings().Settings()
+		securitySettings, err := transport.fetchEndpointSecuritySettings()
 		if err != nil {
 			return nil, err
 		}
@@ -127,7 +127,7 @@ func (transport *Transport) decorateServiceCreationOperation(request *http.Reque
 			return nil, err
 		}
 
-		if !settings.AllowBindMountsForRegularUsers && (len(partialService.TaskTemplate.ContainerSpec.Mounts) > 0) {
+		if !securitySettings.AllowBindMountsForRegularUsers && (len(partialService.TaskTemplate.ContainerSpec.Mounts) > 0) {
 			for _, mount := range partialService.TaskTemplate.ContainerSpec.Mounts {
 				if mount.Type == "bind" {
 					return forbiddenResponse, errors.New("forbidden to use bind mounts")
