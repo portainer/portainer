@@ -79,6 +79,10 @@ jobs:
     steps:
       - name: Checkout Source
         uses: actions/checkout@v2
+      - name: check url
+        run: echo "https://github.com/sonatype-nexus-community/nancy/releases/download/$NANCY_VERSION/nancy-$NANCY_VERSION-linux-amd64"
+      - name: test download
+        run: curl -s -L "https://github.com/sonatype-nexus-community/nancy/releases/download/$NANCY_VERSION/nancy-$NANCY_VERSION-linux-amd64" -v
       - name: Get Nancy binary
         run: curl -s -L "https://github.com/sonatype-nexus-community/nancy/releases/download/$NANCY_VERSION/nancy-$NANCY_VERSION-linux-amd64" -o "/tmp/tools/nancy"
       - name: Scan modules
