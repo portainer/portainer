@@ -232,7 +232,7 @@ class CustomTemplatesViewController {
       apiVersion,
     } = applicationState;
 
-    this.state.provider = endpointMode.provider === 'DOCKER_STANDALONE' ? 1 : 2;
+    this.state.provider = endpointMode.provider === 'DOCKER_STANDALONE' ? 2 : 1;
     this.getTemplates(endpointMode);
     this.getNetworks(endpointMode.provider, apiVersion);
 
