@@ -226,6 +226,8 @@ github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINE
 github.com/pmezard/go-difflib v0.0.0-20151028094244-d8ed2627bdf0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
+github.com/portainer/docker-compose-wrapper v0.0.0-20210107071118-d05a74a4b3f2 h1:53PCXhNlb+HXrPa4GCaoWeVEY7mElYjpFJwB6kQIu7w=
+github.com/portainer/docker-compose-wrapper v0.0.0-20210107071118-d05a74a4b3f2/go.mod h1:PF2O2O4UNYWdtPcp6n/mIKpKk+f1jhFTezS8txbf+XM=
 github.com/portainer/libcompose v0.5.3 h1:tE4WcPuGvo+NKeDkDWpwNavNLZ5GHIJ4RvuZXsI9uI8=
 github.com/portainer/libcompose v0.5.3/go.mod h1:7SKd/ho69rRKHDFSDUwkbMcol2TMKU5OslDsajr8Ro8=
 github.com/portainer/libcrypto v0.0.0-20190723020515-23ebe86ab2c2 h1:0PfgGLys9yHr4rtnirg0W0Cjvv6/DzxBIZk5sV59208=

@@ -75,12 +75,12 @@ func initDataStore(dataStorePath string, fileService portainer.FileService) port
 }
 
 func initComposeStackManager(assetsPath string, dataStorePath string, reverseTunnelService portainer.ReverseTunnelService, proxyManager *proxy.Manager) portainer.ComposeStackManager {
-	composeWrapper := exec.NewComposeWrapper(assetsPath, proxyManager)
-	if composeWrapper != nil {
-		return composeWrapper
+	composeWrapper, err := exec.NewComposeStackManager(assetsPath, proxyManager)
+	if err != nil {
+		return libcompose.NewComposeStackManager(dataStorePath, reverseTunnelService)
 	}
 
-	return libcompose.NewComposeStackManager(dataStorePath, reverseTunnelService)
+	return composeWrapper
 }
 
 func initSwarmStackManager(assetsPath string, dataStorePath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService, reverseTunnelService portainer.ReverseTunnelService) (portainer.SwarmStackManager, error) {
