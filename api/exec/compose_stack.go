@@ -1,6 +1,7 @@
 package exec
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path"
@@ -8,7 +9,10 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	wrapper "github.com/portainer/docker-compose-wrapper"
+
+	libstack "github.com/portainer/docker-compose-wrapper"
+	"github.com/portainer/docker-compose-wrapper/compose"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/proxy/factory"
@@ -16,33 +20,31 @@ import (
 
 // ComposeStackManager is a wrapper for docker-compose binary
 type ComposeStackManager struct {
-	wrapper      *wrapper.ComposeWrapper
-	configPath   string
+	deployer     libstack.Deployer
 	proxyManager *proxy.Manager
 }
 
 // NewComposeStackManager returns a docker-compose wrapper if corresponding binary present, otherwise nil
 func NewComposeStackManager(binaryPath string, configPath string, proxyManager *proxy.Manager) (*ComposeStackManager, error) {
-	wrap, err := wrapper.NewComposeWrapper(binaryPath)
+	deployer, err := compose.NewComposeDeployer(binaryPath, configPath)
 	if err != nil {
 		return nil, err
 	}
 
 	return &ComposeStackManager{
-		wrapper:      wrap,
+		deployer:     deployer,
 		proxyManager: proxyManager,
-		configPath:   configPath,
 	}, nil
 }
 
 // ComposeSyntaxMaxVersion returns the maximum supported version of the docker compose syntax
-func (w *ComposeStackManager) ComposeSyntaxMaxVersion() string {
+func (manager *ComposeStackManager) ComposeSyntaxMaxVersion() string {
 	return portainer.ComposeSyntaxMaxVersion
 }
 
 // Up builds, (re)creates and starts containers in the background. Wraps `docker-compose up -d` command
-func (w *ComposeStackManager) Up(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
-	url, proxy, err := w.fetchEndpointProxy(endpoint)
+func (manager *ComposeStackManager) Up(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+	url, proxy, err := manager.fetchEndpointProxy(endpoint)
 	if err != nil {
 		return errors.Wrap(err, "failed to featch endpoint proxy")
 	}
@@ -57,13 +59,13 @@ func (w *ComposeStackManager) Up(stack *portainer.Stack, endpoint *portainer.End
 	}
 
 	filePaths := append([]string{stack.EntryPoint}, stack.AdditionalFiles...)
-	_, err = w.wrapper.Up(filePaths, stack.ProjectPath, url, stack.Name, envFilePath, w.configPath)
+	return manager.deployer.Deploy(ctx, stack.ProjectPath, url, stack.Name, filePaths, envFilePath)
 	return errors.Wrap(err, "failed to deploy a stack")
 }
 
 // Down stops and removes containers, networks, images, and volumes. Wraps `docker-compose down --remove-orphans` command
-func (w *ComposeStackManager) Down(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
-	url, proxy, err := w.fetchEndpointProxy(endpoint)
+func (manager *ComposeStackManager) Down(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+	url, proxy, err := manager.fetchEndpointProxy(endpoint)
 	if err != nil {
 		return err
 	}
@@ -73,8 +75,7 @@ func (w *ComposeStackManager) Down(stack *portainer.Stack, endpoint *portainer.E
 
 	filePaths := append([]string{stack.EntryPoint}, stack.AdditionalFiles...)
 
-	_, err = w.wrapper.Down(filePaths, stack.ProjectPath, url, stack.Name)
-	return err
+	return manager.deployer.Remove(ctx, stack.ProjectPath, url, stack.Name, filePaths)
 }
 
 // NormalizeStackName returns a new stack name with unsupported characters replaced
@@ -83,17 +84,17 @@ func (w *ComposeStackManager) NormalizeStackName(name string) string {
 	return r.ReplaceAllString(strings.ToLower(name), "")
 }
 
-func (w *ComposeStackManager) fetchEndpointProxy(endpoint *portainer.Endpoint) (string, *factory.ProxyServer, error) {
+func (manager *ComposeStackManager) fetchEndpointProxy(endpoint *portainer.Endpoint) (string, *factory.ProxyServer, error) {
 	if strings.HasPrefix(endpoint.URL, "unix://") || strings.HasPrefix(endpoint.URL, "npipe://") {
 		return "", nil, nil
 	}
 
-	proxy, err := w.proxyManager.CreateComposeProxyServer(endpoint)
+	proxy, err := manager.proxyManager.CreateComposeProxyServer(endpoint)
 	if err != nil {
 		return "", nil, err
 	}
 
-	return fmt.Sprintf("http://127.0.0.1:%d", proxy.Port), proxy, nil
+	return fmt.Sprintf("tcp://127.0.0.1:%d", proxy.Port), proxy, nil
 }
 
 func createEnvFile(stack *portainer.Stack) (string, error) {

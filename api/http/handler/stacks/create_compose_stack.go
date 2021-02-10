@@ -1,6 +1,7 @@
 package stacks
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"path"
@@ -409,7 +410,7 @@ func (handler *Handler) deployComposeStack(config *composeStackDeploymentConfig)
 
 	handler.SwarmStackManager.Login(config.registries, config.endpoint)
 
-	err = handler.ComposeStackManager.Up(config.stack, config.endpoint)
+	err = handler.ComposeStackManager.Up(context.TODO(), config.stack, config.endpoint)
 	if err != nil {
 		return errors.Wrap(err, "failed to start up the stack")
 	}

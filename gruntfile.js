@@ -22,6 +22,7 @@ module.exports = function (grunt) {
       dockerWindowsVersion: '19-03-12',
       dockerLinuxComposeVersion: '1.27.4',
       dockerWindowsComposeVersion: '1.28.0',
+      dockerComposePluginVersion: '2.0.0-beta.6',
       komposeVersion: 'v1.22.0',
       kubectlVersion: 'v1.18.0',
     },
@@ -214,13 +215,24 @@ function shell_download_docker_compose_binary(p, a) {
   var ia = as[a] || a;
   var binaryVersion = p === 'windows' ? '<%= binaries.dockerWindowsComposeVersion %>' : '<%= binaries.dockerLinuxComposeVersion %>';
 
-  return [
-    'if [ -f dist/docker-compose ] || [ -f dist/docker-compose.exe ]; then',
-    'echo "Docker Compose binary exists";',
-    'else',
-    'build/download_docker_compose_binary.sh ' + ip + ' ' + ia + ' ' + binaryVersion + ';',
-    'fi',
-  ].join(' ');
+  // plugin
+  if (p === 'linux' && a !== 'amd64') {
+    if (a === 'arm64') {
+      ia = 'arm64';
+    }
+
+    if (a === 'arm') {
+      ia = 'armv7';
+    }
+    binaryVersion = '<%= binaries.dockerComposePluginVersion %>';
+  }
+
+  return `
+    if [ -f dist/docker-compose ] || [ -f dist/docker-compose.exe ] || [ -f dist/docker-compose.plugin ] || [ -f dist/docker-compose.plugin.exe ]; then
+      echo "Docker Compose binary exists";
+    else
+      build/download_docker_compose_binary.sh ${ip} ${ia} ${binaryVersion};
+    fi`;
 }
 
 function shell_download_kompose_binary(p, a) {
