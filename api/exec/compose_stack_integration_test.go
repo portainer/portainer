@@ -68,7 +68,7 @@ func Test_UpAndDown(t *testing.T) {
 }
 
 func containerExists(containerName string) bool {
-	cmd := exec.Command(osProgram("docker"), "ps", "-a", "-f", fmt.Sprintf("name=%s", containerName))
+	cmd := exec.Command("docker", "ps", "-a", "-f", fmt.Sprintf("name=%s", containerName))
 
 	out, err := cmd.Output()
 	if err != nil {
