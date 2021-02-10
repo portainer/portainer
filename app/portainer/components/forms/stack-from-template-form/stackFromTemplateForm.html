@@ -63,8 +63,10 @@
               <span ng-show="$ctrl.state.actionInProgress">Deployment in progress...</span>
             </button>
             <button type="button" class="btn btn-sm btn-default" ng-click="$ctrl.unselectTemplate($ctrl.template)">Hide</button>
-            <span class="text-danger" ng-if="$ctrl.state.formValidationError" style="margin-left: 5px;">{{ $ctrl.state.formValidationError }}</span>
-            <span class="text-danger" ng-if="$ctrl.state.provider !== $ctrl.template.Type" style="margin-left: 5px;">This template type cannot be deployed on this endpoint.</span>
+            <div class="cols-sm-12 small text-danger" ng-if="$ctrl.state.formValidationError" style="margin-left: 5px; margin-top: 5px;">{{ $ctrl.state.formValidationError }}</div>
+            <div class="cols-sm-12 small text-danger" ng-if="$ctrl.state.provider !== $ctrl.template.Type" style="margin-left: 5px; margin-top: 5px;"
+              >This template type cannot be deployed on this endpoint.</div
+            >
           </div>
         </div>
         <!-- !actions -->
