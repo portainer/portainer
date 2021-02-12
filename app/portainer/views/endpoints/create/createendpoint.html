@@ -221,23 +221,37 @@
           </div>
 
           <div ng-if="state.EnvironmentType === 'docker' && formValues.ConnectSocket">
-            <div class="form-group">
-              <label for="socket_path" class="col-sm-3 col-lg-2 control-label text-left">
-                Socket path
-                <portainer-tooltip
-                  position="bottom"
-                  message="Path of your Docker socket. Remember to forward the socket, see the Important Notice above. This field is optional and will default to the standard socket path."
-                >
-                </portainer-tooltip>
+            <div class="form-group" style="padding-left: 15px;">
+              <label for="override_socket" class="col-sm_12 control-label text-left">
+                Override default socket path
               </label>
-              <div class="col-sm-9 col-lg-10">
-                <input
-                  type="text"
-                  class="form-control"
-                  name="socket_path"
-                  ng-model="formValues.URL"
-                  placeholder="e.g. /var/run/docker.sock (on Linux) or //./pipe/docker_engine (on Windows)"
-                />
+              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.OverrideSocket" /><i></i> </label>
+            </div>
+
+            <div ng-if="formValues.OverrideSocket">
+              <div class="form-group">
+                <label for="socket_path" class="col-sm-3 col-lg-2 control-label text-left">
+                  Socket path
+                  <portainer-tooltip position="bottom" message="Path to the Docker socket. Remember to bind-mount the socket, see the important notice above for more information.">
+                  </portainer-tooltip>
+                </label>
+                <div class="col-sm-9 col-lg-10">
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="socket_path"
+                    ng-model="formValues.socketPath"
+                    placeholder="e.g. /var/run/docker.sock (on Linux) or //./pipe/docker_engine (on Windows)"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="form-group" ng-show="endpointCreationForm.socket_path.$invalid">
+                <div class="col-sm-12 small text-warning">
+                  <div ng-messages="endpointCreationForm.socket_path.$error">
+                    <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

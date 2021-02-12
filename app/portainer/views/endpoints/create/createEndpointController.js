@@ -101,6 +101,7 @@ angular
       var tagIds = $scope.formValues.TagIds;
 
       if ($scope.formValues.ConnectSocket) {
+        URL = $scope.formValues.socketPath;
         $scope.state.actionInProgress = true;
         EndpointService.createLocalEndpoint(name, URL, publicURL, groupId, tagIds)
           .then(function success() {
