@@ -75,8 +75,7 @@ func initDataStore(dataStorePath string, fileService portainer.FileService) port
 
 func initDemoData(
 	store portainer.DataStore, 
-	cryptoService portainer.CryptoService, 
-	licenseService portainer.LicenseService,
+	cryptoService portainer.CryptoService,
 ) error {
 	password, err := cryptoService.Hash("tryportainer")
 	if err != nil {
@@ -414,7 +413,7 @@ func main() {
 
 	cryptoService := initCryptoService()
 
-	err = initDemoData(dataStore, cryptoService, licenseService)
+	err = initDemoData(dataStore, cryptoService)
 	if err != nil {
 		log.Printf("error init demo: %v", err)
 	}
