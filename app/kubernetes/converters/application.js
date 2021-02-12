@@ -59,7 +59,9 @@ class KubernetesApplicationConverter {
     res.Note = data.metadata.annotations ? data.metadata.annotations[KubernetesPortainerApplicationNote] || '' : '';
     res.ApplicationName = data.metadata.labels ? data.metadata.labels[KubernetesPortainerApplicationNameLabel] || res.Name : res.Name;
     res.ResourcePool = data.metadata.namespace;
-    res.Image = containers[0].image;
+    if (containers.length) {
+      res.Image = containers[0].image;
+    }
     res.CreationDate = data.metadata.creationTimestamp;
     res.Env = _.without(_.flatMap(_.map(containers, 'env')), undefined);
     res.Pods = data.spec.selector ? KubernetesApplicationHelper.associatePodsAndApplication(pods, data.spec.selector) : [data];
