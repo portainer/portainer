@@ -68,6 +68,9 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve the settings from the database", err}
 	}
 
+	*payload.EnableTelemetry = false
+	*payload.LogoURL = ""
+
 	if payload.AuthenticationMethod != nil {
 		settings.AuthenticationMethod = portainer.AuthenticationMethod(*payload.AuthenticationMethod)
 	}

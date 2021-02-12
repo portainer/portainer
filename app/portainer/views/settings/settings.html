@@ -3,6 +3,17 @@
   <rd-header-content>Settings</rd-header-content>
 </rd-header>
 
+<div class="row" ng-if="UserId === 1">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-exclamation-triangle" title="Feature not available"> </rd-widget-header>
+      <rd-widget-body>
+        <span class="small text-muted">You cannot change the password of this account in the demo version of Portainer.</span>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
@@ -23,7 +34,10 @@
               <label for="toggle_logo" class="control-label text-left">
                 Use custom logo
               </label>
-              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="toggle_logo" ng-model="formValues.customLogo" /><i></i> </label>
+              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" disabled name="toggle_logo" ng-model="formValues.customLogo" /><i></i> </label>
+            </div>
+            <div class="col-sm-12">
+              <span class="small text-muted">You cannot use this feature in the demo version of Portainer.</span>
             </div>
           </div>
           <div class="form-group">
@@ -31,7 +45,12 @@
               <label for="toggle_enableTelemetry" class="control-label text-left">
                 Allow the collection of anonymous statistics
               </label>
-              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="toggle_enableTelemetry" ng-model="formValues.enableTelemetry" /><i></i> </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" disabled name="toggle_enableTelemetry" ng-model="formValues.enableTelemetry" /><i></i>
+              </label>
+            </div>
+            <div class="col-sm-12">
+              <span class="small text-muted">You cannot use this feature in the demo version of Portainer.</span>
             </div>
             <div class="col-sm-12 text-muted small" style="margin-top: 10px;">
               You can find more information about this in our

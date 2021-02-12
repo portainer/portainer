@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -26,6 +27,10 @@ func (handler *Handler) userDelete(w http.ResponseWriter, r *http.Request) *http
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user authentication token", err}
+	}
+
+	if userID == 1 {
+		return &httperror.HandlerError{http.StatusForbidden, "This feature is not available in the demo version of Portainer", httperrors.ErrNotAvailableInDemo}
 	}
 
 	if tokenData.ID == portainer.UserID(userID) {

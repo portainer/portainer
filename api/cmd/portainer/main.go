@@ -73,6 +73,56 @@ func initDataStore(dataStorePath string, fileService portainer.FileService) port
 	return store
 }
 
+func initDemoData(
+	store portainer.DataStore, 
+	cryptoService portainer.CryptoService, 
+	licenseService portainer.LicenseService,
+) error {
+	password, err := cryptoService.Hash("tryportainer")
+	if err != nil {
+		return err
+	}
+
+	admin := &portainer.User{
+		Username: "admin",
+		Password: password,
+		Role:     portainer.AdministratorRole,
+	}
+
+	err = store.User().CreateUser(admin)
+	if err != nil {
+		return err
+	}
+
+	localEndpoint := &portainer.Endpoint{
+		ID:                  portainer.EndpointID(1),
+		Name:                "local",
+		URL:                 "unix:///var/run/docker.sock",
+		PublicURL:           "demo.portainer.io",
+		Type:                portainer.DockerEnvironment,
+		GroupID:             portainer.EndpointGroupID(1),
+		TLSConfig:           portainer.TLSConfiguration{
+			TLS: false,
+		},
+		AuthorizedUsers:     []portainer.UserID{},
+		AuthorizedTeams:     []portainer.TeamID{},
+		UserAccessPolicies:  portainer.UserAccessPolicies{},
+		TeamAccessPolicies:  portainer.TeamAccessPolicies{},
+		Extensions:          []portainer.EndpointExtension{},
+		TagIDs:              []portainer.TagID{},
+		Status:              portainer.EndpointStatusUp,
+		Snapshots:           []portainer.DockerSnapshot{},
+		Kubernetes:          portainer.KubernetesDefault(),
+	}
+
+	err = store.Endpoint().CreateEndpoint(localEndpoint)
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
 func initComposeStackManager(assetsPath string, dataStorePath string, reverseTunnelService portainer.ReverseTunnelService, proxyManager *proxy.Manager) portainer.ComposeStackManager {
 	composeWrapper := exec.NewComposeWrapper(assetsPath, dataStorePath, proxyManager)
 	if composeWrapper != nil {
@@ -177,7 +227,7 @@ func updateSettingsFromFlags(dataStore portainer.DataStore, flags *portainer.CLI
 	settings.LogoURL = *flags.Logo
 	settings.SnapshotInterval = *flags.SnapshotInterval
 	settings.EnableEdgeComputeFeatures = *flags.EnableEdgeComputeFeatures
-	settings.EnableTelemetry = true
+	settings.EnableTelemetry = false
 
 	if *flags.Templates != "" {
 		settings.TemplatesURL = *flags.Templates
@@ -363,6 +413,11 @@ func main() {
 	gitService := initGitService()
 
 	cryptoService := initCryptoService()
+
+	err = initDemoData(dataStore, cryptoService, licenseService)
+	if err != nil {
+		log.Printf("error init demo: %v", err)
+	}
 
 	digitalSignatureService := initDigitalSignatureService()
 

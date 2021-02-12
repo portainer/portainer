@@ -36,6 +36,10 @@ func (handler *Handler) userUpdatePassword(w http.ResponseWriter, r *http.Reques
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid user identifier route variable", err}
 	}
 
+	if userID == 1 {
+		return &httperror.HandlerError{http.StatusForbidden, "This feature is not available in the demo version of Portainer", httperrors.ErrNotAvailableInDemo}
+	}
+
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user authentication token", err}

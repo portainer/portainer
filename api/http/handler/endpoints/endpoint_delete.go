@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 )
 
 // DELETE request on /api/endpoints/:id
@@ -16,6 +17,10 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint identifier route variable", err}
+	}
+
+	if endpointID == 1 || endpointID == 2 {
+		return &httperror.HandlerError{http.StatusForbidden, "This feature is not available in the demo version of Portainer", httperrors.ErrNotAvailableInDemo}
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
