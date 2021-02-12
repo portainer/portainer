@@ -105,7 +105,7 @@
     "clean-terminal-webpack-plugin": "^1.1.0",
     "clean-webpack-plugin": "^0.1.19",
     "css-loader": "^1.0.0",
-    "cssnano": "^3.10.0",
+    "cssnano": "^4.1.10",
     "cypress": "^5.2.0",
     "cypress-wait-until": "^1.7.1",
     "eslint": "5.16.0",
