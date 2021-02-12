@@ -52,6 +52,8 @@ class KubernetesConfigurationHelper {
   }
 
   static parseData(formValues) {
+    if (!formValues.Data.length) return '';
+
     const data = _.reduce(
       formValues.Data,
       (acc, entry) => {

@@ -21,6 +21,7 @@ angular.module('portainer.app').factory('Endpoints', [
         snapshots: { method: 'POST', params: { action: 'snapshot' } },
         snapshot: { method: 'POST', params: { id: '@id', action: 'snapshot' } },
         status: { method: 'GET', params: { id: '@id', action: 'status' } },
+        updateSecuritySettings: { method: 'PUT', params: { id: '@id', action: 'settings' } },
       }
     );
   },

@@ -27,9 +27,9 @@ angular.module('portainer.docker').controller('CreateContainerController', [
   'ModalService',
   'RegistryService',
   'SystemService',
-  'SettingsService',
   'PluginService',
   'HttpRequestHelper',
+  'endpoint',
   function (
     $q,
     $scope,
@@ -53,9 +53,9 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     ModalService,
     RegistryService,
     SystemService,
-    SettingsService,
     PluginService,
-    HttpRequestHelper
+    HttpRequestHelper,
+    endpoint
   ) {
     $scope.create = create;
 
@@ -709,14 +709,8 @@ angular.module('portainer.docker').controller('CreateContainerController', [
           Notifications.error('Failure', err, 'Unable to retrieve engine details');
         });
 
-      SettingsService.publicSettings()
-        .then(function success(data) {
-          $scope.allowBindMounts = $scope.isAdminOrEndpointAdmin || data.AllowBindMountsForRegularUsers;
-          $scope.allowPrivilegedMode = data.AllowPrivilegedModeForRegularUsers;
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to retrieve application settings');
-        });
+      $scope.allowBindMounts = $scope.isAdminOrEndpointAdmin || endpoint.SecuritySettings.allowBindMountsForRegularUsers;
+      $scope.allowPrivilegedMode = endpoint.SecuritySettings.allowPrivilegedModeForRegularUsers;
 
       PluginService.loggingPlugins(apiVersion < 1.25).then(function success(loggingDrivers) {
         $scope.availableLoggingDrivers = loggingDrivers;
@@ -933,15 +927,11 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     }
 
     async function shouldShowDevices() {
-      const { allowDeviceMappingForRegularUsers } = $scope.applicationState.application;
-
-      return allowDeviceMappingForRegularUsers || Authentication.isAdmin();
+      return endpoint.SecuritySettings.allowDeviceMappingForRegularUsers || Authentication.isAdmin();
     }
 
     async function checkIfContainerCapabilitiesEnabled() {
-      const { allowContainerCapabilitiesForRegularUsers } = $scope.applicationState.application;
-
-      return allowContainerCapabilitiesForRegularUsers || Authentication.isAdmin();
+      return endpoint.SecuritySettings.allowContainerCapabilitiesForRegularUsers || Authentication.isAdmin();
     }
 
     initView();

@@ -2,7 +2,7 @@
   "author": "Portainer.io",
   "name": "portainer",
   "homepage": "http://portainer.io",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "repository": {
     "type": "git",
     "url": "git@github.com:portainer/portainer.git"
@@ -77,10 +77,8 @@
     "chart.js": "~2.6.0",
     "codemirror": "~5.30.0",
     "fast-json-patch": "^3.0.0-1",
-    "file-system": "^2.2.2",
     "filesize": "~3.3.0",
     "filesize-parser": "^1.5.0",
-    "fs": "^0.0.1-security",
     "jquery": "^3.5.1",
     "js-base64": "^3.6.0",
     "js-yaml": "^3.14.0",

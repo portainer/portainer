@@ -253,7 +253,7 @@ angular
   -e EDGE_ID=${edgeId} \\
   -e EDGE_KEY=${edgeKey} \\
   -e CAP_HOST_MANAGEMENT=1 \\
-  --name portainer_edge_agent \\localhost
+  --name portainer_edge_agent \\
   portainer/agent`;
     }
 

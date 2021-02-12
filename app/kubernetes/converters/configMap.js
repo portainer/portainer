@@ -1,10 +1,32 @@
 import _ from 'lodash-es';
-import { KubernetesConfigMap } from 'Kubernetes/models/config-map/models';
+import { KubernetesConfigMap, KubernetesPortainerAccessConfigMap } from 'Kubernetes/models/config-map/models';
 import { KubernetesConfigMapCreatePayload, KubernetesConfigMapUpdatePayload } from 'Kubernetes/models/config-map/payloads';
 import { KubernetesPortainerConfigurationOwnerLabel } from 'Kubernetes/models/configuration/models';
 import { KubernetesConfigurationFormValuesEntry } from 'Kubernetes/models/configuration/formvalues';
 
 class KubernetesConfigMapConverter {
+  static apiToPortainerAccessConfigMap(data) {
+    const res = new KubernetesPortainerAccessConfigMap();
+    res.Id = data.metadata.uid;
+    res.Data = data.data;
+    return res;
+  }
+
+  static createAccessPayload(data) {
+    const res = new KubernetesConfigMapCreatePayload();
+    _.unset(res, 'binaryData');
+    res.metadata.name = data.Name;
+    res.metadata.namespace = data.Namespace;
+    res.data = data.Data;
+    return res;
+  }
+
+  static updateAccessPayload(data) {
+    const res = KubernetesConfigMapConverter.createAccessPayload(data);
+    res.metadata.uid = data.Id;
+    return res;
+  }
+
   /**
    * API ConfigMap to front ConfigMap
    */

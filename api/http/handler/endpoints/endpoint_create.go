@@ -14,7 +14,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/internal/edge"
@@ -440,6 +440,18 @@ func (handler *Handler) snapshotAndPersistEndpoint(endpoint *portainer.Endpoint)
 }
 
 func (handler *Handler) saveEndpointAndUpdateAuthorizations(endpoint *portainer.Endpoint) error {
+	endpoint.SecuritySettings = portainer.EndpointSecuritySettings{
+		AllowVolumeBrowserForRegularUsers: false,
+		EnableHostManagementFeatures:      false,
+
+		AllowBindMountsForRegularUsers:            true,
+		AllowPrivilegedModeForRegularUsers:        true,
+		AllowHostNamespaceForRegularUsers:         true,
+		AllowContainerCapabilitiesForRegularUsers: true,
+		AllowDeviceMappingForRegularUsers:         true,
+		AllowStackManagementForRegularUsers:       true,
+	}
+
 	err := handler.DataStore.Endpoint().CreateEndpoint(endpoint)
 	if err != nil {
 		return err
