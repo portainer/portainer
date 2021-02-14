@@ -183,8 +183,9 @@ angular.module('portainer.app').controller('GenericDatatableController', [
     };
 
     this.startRepeater = function () {
-      this.repeater = $interval(() => {
-        this.refreshCallback();
+      this.repeater = $interval(async () => {
+        await this.refreshCallback();
+        this.onDataRefresh();
       }, this.settings.repeater.refreshRate * 1000);
     };
 
@@ -197,6 +198,14 @@ angular.module('portainer.app').controller('GenericDatatableController', [
       }
       DatatableService.setDataTableSettings(this.tableKey, this.settings);
     };
+
+    /**
+     * Override this method to execute code after calling the refresh callback
+     */
+    this.onDataRefresh = function () {
+      return;
+    };
+
     /**
      * !REPEATER SECTION
      */

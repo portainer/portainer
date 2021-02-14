@@ -66,6 +66,13 @@ angular.module('portainer.docker').controller('ServicesDatatableController', [
       }
     };
 
+    this.onDataRefresh = function () {
+      var storedExpandedItems = DatatableService.getDataTableExpandedItems(this.tableKey);
+      if (storedExpandedItems !== null) {
+        this.expandItems(storedExpandedItems);
+      }
+    };
+
     this.$onInit = function () {
       this.setDefaults();
       this.prepareTableFromDataset();
