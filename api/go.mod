@@ -25,11 +25,11 @@ require (
 	github.com/mattn/go-shellwords v1.0.6 // indirect
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
 	github.com/orcaman/concurrent-map v0.0.0-20190826125027-8c72a8bb44f6
-	github.com/portainer/docker-compose-wrapper v0.0.0-20210107071118-d05a74a4b3f2
+	github.com/portainer/docker-compose-wrapper v0.0.0-20210214130111-fb78615516aa
 	github.com/portainer/libcompose v0.5.3
 	github.com/portainer/libcrypto v0.0.0-20190723020515-23ebe86ab2c2
 	github.com/portainer/libhttp v0.0.0-20190806161843-ba068f58be33
-	github.com/stretchr/testify v1.6.1
+	github.com/stretchr/testify v1.7.0
 	golang.org/x/crypto v0.0.0-20191128160524-b544559bb6d1
 	golang.org/x/net v0.0.0-20191126235420-ef20fe5d7933 // indirect
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
