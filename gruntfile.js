@@ -142,11 +142,7 @@ function shell_build_binary(p, a) {
 }
 
 function shell_build_binary_azuredevops(p, a) {
-  if (p === 'linux') {
-    return 'build/build_binary_azuredevops.sh ' + p + ' ' + a + ';';
-  } else {
-    return 'powershell -Command ".\\build\\build_binary_azuredevops.ps1 -platform ' + p + ' -arch ' + a + '"';
-  }
+  return 'build/build_binary_azuredevops.sh ' + p + ' ' + a + ';';
 }
 
 function shell_run_container() {
@@ -164,15 +160,12 @@ function shell_download_docker_binary(p, a) {
   var ip = ps[p] === undefined ? p : ps[p];
   var ia = as[a] === undefined ? a : as[a];
   var binaryVersion = p === 'windows' ? '<%= shippedDockerVersionWindows %>' : '<%= shippedDockerVersion %>';
-  if (p === 'linux' || p === 'mac') {
-    return ['if [ -f dist/docker ]; then', 'echo "Docker binary exists";', 'else', 'build/download_docker_binary.sh ' + ip + ' ' + ia + ' ' + binaryVersion + ';', 'fi'].join(' ');
-  } else {
-    return [
-      'powershell -Command "& {if (Get-Item -Path dist/docker.exe -ErrorAction:SilentlyContinue) {',
-      'Write-Host "Docker binary exists"',
-      '} else {',
-      '& ".\\build\\download_docker_binary.ps1" -docker_version ' + binaryVersion + '',
-      '}}"',
-    ].join(' ');
-  }
+  
+  return [
+    'if [ -f dist/docker ] || [ -f dist/docker.exe ]; then',
+    'echo "docker binary exists";',
+    'else',
+    'build/download_docker_binary.sh ' + ip + ' ' + ia + ' ' + binaryVersion + ';',
+    'fi',
+  ].join(' ');
 }
