@@ -13,7 +13,7 @@ class KubernetesYamlInspectorController {
     $('#copyNotificationYAML').show().fadeOut(2500);
   }
 
-  expandYAML() {
+  toggleYAMLInspectorExpansion() {
     let selector = 'kubernetes-yaml-inspector code-editor > div.CodeMirror';
     let height = this.expanded ? '500px' : '80vh';
     $(selector).css({ height: height });
