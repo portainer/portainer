@@ -123,9 +123,6 @@ class KubernetesApplicationHelper {
 
   static generateEnvVariablesFromEnv(env) {
     const envVariables = _.map(env, (item) => {
-      if (!item.value) {
-        return;
-      }
       const res = new KubernetesApplicationEnvironmentVariableFormValue();
       res.Name = item.name;
       res.Value = item.value;
