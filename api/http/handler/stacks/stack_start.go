@@ -64,7 +64,7 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 
 	err = handler.startStack(stack, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to stop stack", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to start stack", err}
 	}
 
 	stack.Status = portainer.StackStatusActive
