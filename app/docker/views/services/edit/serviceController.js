@@ -115,8 +115,9 @@ angular.module('portainer.docker').controller('ServiceController', [
       service.EnvironmentVariables.push({ key: '', value: '', originalValue: '' });
       updateServiceArray(service, 'EnvironmentVariables', service.EnvironmentVariables);
     };
-    $scope.removeEnvironmentVariable = function removeEnvironmentVariable(service, index) {
-      var removedElement = service.EnvironmentVariables.splice(index, 1);
+    $scope.removeEnvironmentVariable = function removeEnvironmentVariable(service, item) {
+      const index = service.EnvironmentVariables.indexOf(item);
+      const removedElement = service.EnvironmentVariables.splice(index, 1);
       if (removedElement !== null) {
         updateServiceArray(service, 'EnvironmentVariables', service.EnvironmentVariables);
       }
