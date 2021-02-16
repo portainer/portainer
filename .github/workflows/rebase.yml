@@ -1,4 +1,4 @@
-name: Automatic Rebase
+name: Manual Rebase
 on:
   issue_comment:
     types: [created]
