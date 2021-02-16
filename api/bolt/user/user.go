@@ -3,8 +3,6 @@ package user
 import (
 	"strings"
 
-	"strings"
-
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/internal"
