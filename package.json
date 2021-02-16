@@ -2,7 +2,7 @@
   "author": "Portainer.io",
   "name": "portainer",
   "homepage": "http://portainer.io",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "repository": {
     "type": "git",
     "url": "git@github.com:portainer/portainer.git"
@@ -10,12 +10,10 @@
   "bugs": {
     "url": "https://github.com/portainer/portainer/issues"
   },
-  "licenses": [
-    {
-      "type": "Zlib",
-      "url": "https://raw.githubusercontent.com/portainer/portainer/develop/LICENSE"
-    }
-  ],
+  "licenses": [{
+    "type": "Zlib",
+    "url": "https://raw.githubusercontent.com/portainer/portainer/develop/LICENSE"
+  }],
   "scripts": {
     "build": "grunt clean:all && grunt build",
     "build:server": "grunt clean:server && grunt build:server",
