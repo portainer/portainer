@@ -300,7 +300,7 @@ class KubernetesApplicationConverter {
     formValues.ApplicationOwner = KubernetesCommonHelper.ownerToLabel(formValues.ApplicationOwner);
 
     const claims = KubernetesPersistentVolumeClaimConverter.applicationFormValuesToVolumeClaims(formValues);
-    const rwx = _.find(claims, (item) => _.includes(item.StorageClass.AccessModes, 'RWX')) !== undefined;
+    const rwx = _.find(claims, (item) => item.StorageClass && _.includes(item.StorageClass.AccessModes, 'RWX')) !== undefined;
 
     const deployment =
       (formValues.DeploymentType === KubernetesApplicationDeploymentTypes.REPLICATED &&

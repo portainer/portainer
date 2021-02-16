@@ -458,7 +458,7 @@ class KubernetesCreateApplicationController {
   // * The data access policy is set to ISOLATED
   supportGlobalDeployment() {
     const hasFolders = this.formValues.PersistedFolders.length !== 0;
-    const hasRWOOnly = _.find(this.formValues.PersistedFolders, (item) => _.isEqual(item.StorageClass.AccessModes, ['RWO']));
+    const hasRWOOnly = _.find(this.formValues.PersistedFolders, (item) => item.StorageClass && _.isEqual(item.StorageClass.AccessModes, ['RWO']));
     const isIsolated = this.formValues.DataAccessPolicy === this.ApplicationDataAccessPolicies.ISOLATED;
 
     if ((hasFolders && hasRWOOnly) || isIsolated) {
@@ -479,7 +479,7 @@ class KubernetesCreateApplicationController {
   // * The access policy is set to isolated
   supportScalableReplicaDeployment() {
     const hasFolders = this.formValues.PersistedFolders.length !== 0;
-    const hasRWOOnly = _.find(this.formValues.PersistedFolders, (item) => _.isEqual(item.StorageClass.AccessModes, ['RWO']));
+    const hasRWOOnly = _.find(this.formValues.PersistedFolders, (item) => item.StorageClass && _.isEqual(item.StorageClass.AccessModes, ['RWO']));
     const isIsolated = this.formValues.DataAccessPolicy === this.ApplicationDataAccessPolicies.ISOLATED;
 
     if (!hasFolders || isIsolated || (hasFolders && !hasRWOOnly)) {
@@ -495,7 +495,7 @@ class KubernetesCreateApplicationController {
     for (let i = 0; i < this.formValues.PersistedFolders.length; i++) {
       const folder = this.formValues.PersistedFolders[i];
 
-      if (_.isEqual(folder.StorageClass.AccessModes, ['RWO'])) {
+      if (folder.StorageClass && _.isEqual(folder.StorageClass.AccessModes, ['RWO'])) {
         storageOptions.push(folder.StorageClass.Name);
       }
     }
