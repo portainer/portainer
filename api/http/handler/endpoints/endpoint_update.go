@@ -8,7 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/internal/edge"
@@ -208,6 +208,11 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove TLS files from disk", err}
 			}
+		}
+
+		if endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
+			endpoint.TLSConfig.TLS = true
+			endpoint.TLSConfig.TLSSkipVerify = true
 		}
 	}
 
