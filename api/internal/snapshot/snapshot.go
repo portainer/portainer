@@ -48,6 +48,7 @@ func (service *Service) stop() {
 		return
 	}
 
+	// clear refreshSignal to mark the service as disabled
 	close(service.refreshSignal)
 	service.refreshSignal = nil
 }
