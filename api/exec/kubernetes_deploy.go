@@ -2,10 +2,12 @@ package exec
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
+	"net/http"
+	"net/url"
 	"os/exec"
 	"path"
 	"runtime"
@@ -13,6 +15,7 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/crypto"
 )
 
 // KubernetesDeployer represents a service to deploy resources inside a Kubernetes environment.
@@ -36,6 +39,39 @@ func NewKubernetesDeployer(datastore portainer.DataStore, reverseTunnelService p
 // Deploy will deploy a Kubernetes manifest inside a specific namespace in a Kubernetes endpoint.
 // Otherwise it will use kubectl to deploy the manifest.
 func (deployer *KubernetesDeployer) Deploy(endpoint *portainer.Endpoint, stackConfig string, namespace string) (string, error) {
+	if endpoint.Type == portainer.KubernetesLocalEnvironment {
+		token, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/token")
+		if err != nil {
+			return "", err
+		}
+
+		command := path.Join(deployer.binaryPath, "kubectl")
+		if runtime.GOOS == "windows" {
+			command = path.Join(deployer.binaryPath, "kubectl.exe")
+		}
+
+		args := make([]string, 0)
+		args = append(args, "--server", endpoint.URL)
+		args = append(args, "--insecure-skip-tls-verify")
+		args = append(args, "--token", string(token))
+		args = append(args, "--namespace", namespace)
+		args = append(args, "apply", "-f", "-")
+
+		var stderr bytes.Buffer
+		cmd := exec.Command(command, args...)
+		cmd.Stderr = &stderr
+		cmd.Stdin = strings.NewReader(stackConfig)
+
+		output, err := cmd.Output()
+		if err != nil {
+			return "", errors.New(stderr.String())
+		}
+
+		return string(output), nil
+	}
+
+	// agent
+
 	endpointURL := endpoint.URL
 	if endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
 		tunnel := deployer.reverseTunnelService.GetTunnelDetails(endpoint.ID)
@@ -58,46 +94,92 @@ func (deployer *KubernetesDeployer) Deploy(endpoint *portainer.Endpoint, stackCo
 		endpointURL = fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port)
 	}
 
+	transport := &http.Transport{}
+
+	if endpoint.TLSConfig.TLS {
+		tlsConfig, err := crypto.CreateTLSConfigurationFromDisk(endpoint.TLSConfig.TLSCACertPath, endpoint.TLSConfig.TLSCertPath, endpoint.TLSConfig.TLSKeyPath, endpoint.TLSConfig.TLSSkipVerify)
+		if err != nil {
+			return "", err
+		}
+		transport.TLSClientConfig = tlsConfig
+	}
+
+	httpCli := &http.Client{
+		Transport: transport,
+	}
+
 	if !strings.HasPrefix(endpointURL, "http") {
 		endpointURL = fmt.Sprintf("https://%s", endpointURL)
 	}
 
-	endpointURL = endpointURL + "/kubernetes"
-
-	token, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/token")
+	url, err := url.Parse(fmt.Sprintf("%s/v3/kubernetes/stack", endpointURL))
 	if err != nil {
 		return "", err
 	}
 
-	command := path.Join(deployer.binaryPath, "kubectl")
-	if runtime.GOOS == "windows" {
-		command = path.Join(deployer.binaryPath, "kubectl.exe")
-	}
-
-	args := make([]string, 0)
-	args = append(args, "-v", "8")
-	args = append(args, "--server", endpointURL)
-	args = append(args, "--insecure-skip-tls-verify")
-	args = append(args, "--token", string(token))
-	args = append(args, "--namespace", namespace)
-	// args = append(args, "--certificate-authority", endpoint.TLSConfig.TLSCACertPath)
-	// args = append(args, "--client-certificate", endpoint.TLSConfig.TLSCertPath)
-	// args = append(args, "--client-key", endpoint.TLSConfig.TLSKeyPath)
-	args = append(args, "apply", "-f", "-")
-
-	var stderr bytes.Buffer
-	cmd := exec.Command(command, args...)
-	cmd.Stderr = &stderr
-	cmd.Stdin = strings.NewReader(stackConfig)
-
-	log.Printf("executing %s", cmd.String())
-
-	output, err := cmd.Output()
+	reqPayload, err := json.Marshal(
+		struct {
+			StackConfig string
+			Namespace   string
+		}{
+			StackConfig: stackConfig,
+			Namespace:   namespace,
+		})
 	if err != nil {
-		return "", errors.New(stderr.String())
+		return "", err
 	}
 
-	return string(output), nil
+	req, err := http.NewRequest(http.MethodPost, url.String(), bytes.NewReader(reqPayload))
+	if err != nil {
+		return "", err
+	}
+
+	signature, err := deployer.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Set(portainer.PortainerAgentPublicKeyHeader, deployer.signatureService.EncodedPublicKey())
+	req.Header.Set(portainer.PortainerAgentSignatureHeader, signature)
+
+	resp, err := httpCli.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		var errorResponseData struct {
+			Message string
+			Details string
+		}
+		err = json.NewDecoder(resp.Body).Decode(&errorResponseData)
+		if err != nil {
+			output, parseStringErr := ioutil.ReadAll(resp.Body)
+			if parseStringErr != nil {
+				return "", parseStringErr
+			}
+
+			return "", fmt.Errorf("Failed parsing, body: %s, error: %w", output, err)
+
+		}
+
+		return "", fmt.Errorf("Deployment to agent failed: %s", errorResponseData.Details)
+	}
+
+	var responseData struct{ Output string }
+	err = json.NewDecoder(resp.Body).Decode(&responseData)
+	if err != nil {
+		parsedOutput, parseStringErr := ioutil.ReadAll(resp.Body)
+		if parseStringErr != nil {
+			return "", parseStringErr
+		}
+
+		return "", fmt.Errorf("Failed decoding, body: %s, err: %w", parsedOutput, err)
+	}
+
+	return responseData.Output, nil
+
 }
 
 // ConvertCompose leverages the kompose binary to deploy a compose compliant manifest.
