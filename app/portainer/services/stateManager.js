@@ -1,5 +1,7 @@
 import moment from 'moment';
 
+const APPLICATION_CACHE_VALIDITY = 3600;
+
 angular.module('portainer.app').factory('StateManager', [
   '$q',
   'SystemService',
@@ -8,21 +10,9 @@ angular.module('portainer.app').factory('StateManager', [
   'LocalStorage',
   'SettingsService',
   'StatusService',
-  'APPLICATION_CACHE_VALIDITY',
   'AgentPingService',
   '$analytics',
-  function StateManagerFactory(
-    $q,
-    SystemService,
-    InfoHelper,
-    EndpointProvider,
-    LocalStorage,
-    SettingsService,
-    StatusService,
-    APPLICATION_CACHE_VALIDITY,
-    AgentPingService,
-    $analytics
-  ) {
+  function StateManagerFactory($q, SystemService, InfoHelper, EndpointProvider, LocalStorage, SettingsService, StatusService, AgentPingService, $analytics) {
     'use strict';
 
     var manager = {};
