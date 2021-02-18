@@ -23,7 +23,6 @@ export const API_ENDPOINT_TEAM_MEMBERSHIPS = 'api/team_memberships';
 export const API_ENDPOINT_TEMPLATES = 'api/templates';
 export const API_ENDPOINT_WEBHOOKS = 'api/webhooks';
 export const PAGINATION_MAX_ITEMS = 10;
-export const CONSOLE_COMMANDS_LABEL_PREFIX = 'io.portainer.commands.';
 export const PREDEFINED_NETWORKS = ['host', 'bridge', 'none'];
 export const KUBERNETES_SYSTEM_NAMESPACES = ['kube-system', 'kube-public', 'kube-node-lease', 'portainer'];
 
@@ -48,7 +47,6 @@ angular
   .constant('API_ENDPOINT_TEMPLATES', API_ENDPOINT_TEMPLATES)
   .constant('API_ENDPOINT_WEBHOOKS', API_ENDPOINT_WEBHOOKS)
   .constant('PAGINATION_MAX_ITEMS', PAGINATION_MAX_ITEMS)
-  .constant('CONSOLE_COMMANDS_LABEL_PREFIX', 'io.portainer.commands.')
   .constant('PREDEFINED_NETWORKS', ['host', 'bridge', 'none'])
   .constant('KUBERNETES_DEFAULT_NAMESPACE', 'default')
   .constant('KUBERNETES_SYSTEM_NAMESPACES', ['kube-system', 'kube-public', 'kube-node-lease', 'portainer']);

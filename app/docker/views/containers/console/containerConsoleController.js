@@ -1,5 +1,7 @@
 import { Terminal } from 'xterm';
 
+const CONSOLE_COMMANDS_LABEL_PREFIX = 'io.portainer.commands.';
+
 angular.module('portainer.docker').controller('ContainerConsoleController', [
   '$scope',
   '$transition$',
@@ -11,20 +13,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
   'ExecService',
   'HttpRequestHelper',
   'LocalStorage',
-  'CONSOLE_COMMANDS_LABEL_PREFIX',
-  function (
-    $scope,
-    $transition$,
-    ContainerService,
-    ImageService,
-    EndpointProvider,
-    Notifications,
-    ContainerHelper,
-    ExecService,
-    HttpRequestHelper,
-    LocalStorage,
-    CONSOLE_COMMANDS_LABEL_PREFIX
-  ) {
+  function ($scope, $transition$, ContainerService, ImageService, EndpointProvider, Notifications, ContainerHelper, ExecService, HttpRequestHelper, LocalStorage) {
     var socket, term;
 
     let states = Object.freeze({
