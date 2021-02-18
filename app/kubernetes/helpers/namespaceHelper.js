@@ -1,19 +1,16 @@
 import _ from 'lodash-es';
 import angular from 'angular';
 
-class KubernetesNamespaceHelper {
-  /* @ngInject */
-  constructor(KUBERNETES_SYSTEM_NAMESPACES, KUBERNETES_DEFAULT_NAMESPACE) {
-    this.KUBERNETES_SYSTEM_NAMESPACES = KUBERNETES_SYSTEM_NAMESPACES;
-    this.KUBERNETES_DEFAULT_NAMESPACE = KUBERNETES_DEFAULT_NAMESPACE;
-  }
+const KUBERNETES_SYSTEM_NAMESPACES = ['kube-system', 'kube-public', 'kube-node-lease', 'portainer'];
+const KUBERNETES_DEFAULT_NAMESPACE = 'default';
 
+class KubernetesNamespaceHelper {
   isSystemNamespace(namespace) {
-    return _.includes(this.KUBERNETES_SYSTEM_NAMESPACES, namespace);
+    return _.includes(KUBERNETES_SYSTEM_NAMESPACES, namespace);
   }
 
   isDefaultNamespace(namespace) {
-    return namespace === this.KUBERNETES_DEFAULT_NAMESPACE;
+    return namespace === KUBERNETES_DEFAULT_NAMESPACE;
   }
 }
 
