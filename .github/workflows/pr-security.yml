@@ -5,6 +5,7 @@ on:
 
 jobs:
   client-dependencies:
+    name: client dependency check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -13,7 +14,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
   server-dependencies:
-    name: Scan server dependencies
+    name: server dependency check
     runs-on: ubuntu-latest
     env:
       GO111MODULE: on
