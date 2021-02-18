@@ -1,14 +1,11 @@
 import _ from 'lodash-es';
 import angular from 'angular';
 
-class NetworkHelper {
-  /* @ngInject */
-  constructor(PREDEFINED_NETWORKS) {
-    this.PREDEFINED_NETWORKS = PREDEFINED_NETWORKS;
-  }
+const PREDEFINED_NETWORKS = ['host', 'bridge', 'none'];
 
+class NetworkHelper {
   isSystemNetwork(item) {
-    return _.includes(this.PREDEFINED_NETWORKS, item.Name);
+    return _.includes(PREDEFINED_NETWORKS, item.Name);
   }
 }
 
