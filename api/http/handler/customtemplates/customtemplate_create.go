@@ -251,7 +251,7 @@ func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) er
 	}
 	payload.Type = templateType
 
-	composeFileContent, _, err := request.RetrieveMultiPartFormFile(r, "file")
+	composeFileContent, _, err := request.RetrieveMultiPartFormFile(r, "File")
 	if err != nil {
 		return errors.New("Invalid Compose file. Ensure that the Compose file is uploaded correctly")
 	}

@@ -101,25 +101,16 @@
                 <div style="margin-top: 10px;">
                   <uib-tabset active="state.deploymentTab">
                     <uib-tab index="0" ng-if="state.PlatformType === 'linux'" heading="Kubernetes via load balancer">
-                      <code style="display: block; white-space: pre-wrap; padding: 16px 90px;"
-                        >curl -L https://downloads.portainer.io/portainer-agent-k8s-lb.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml</code
-                      >
+                      <code style="display: block; white-space: pre-wrap; padding: 16px 90px;">{{ deployCommands.kubeLoadBalancer }}</code>
                     </uib-tab>
 
                     <uib-tab index="1" ng-if="state.PlatformType === 'linux'" heading="Kubernetes via node port">
-                      <code style="display: block; white-space: pre-wrap; padding: 16px 90px;"
-                        >curl -L https://downloads.portainer.io/portainer-agent-k8s-nodeport.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml</code
-                      >
+                      <code style="display: block; white-space: pre-wrap; padding: 16px 90px;">{{ deployCommands.kubeNodePort }}</code>
                     </uib-tab>
 
                     <uib-tab index="2" heading="Docker Swarm">
-                      <code ng-if="state.PlatformType === 'linux'" style="display: block; white-space: pre-wrap; padding: 16px 90px;"
-                        >curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent</code
-                      >
-                      <code ng-if="state.PlatformType === 'windows'" style="display: block; white-space: pre-wrap; padding: 16px 90px;"
-                        >curl -L https://downloads.portainer.io/agent-stack-windows.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack-windows.yml
-                        portainer-agent</code
-                      >
+                      <code ng-if="state.PlatformType === 'linux'" style="display: block; white-space: pre-wrap; padding: 16px 90px;">{{ deployCommands.agentLinux }}</code>
+                      <code ng-if="state.PlatformType === 'windows'" style="display: block; white-space: pre-wrap; padding: 16px 90px;">{{ deployCommands.agentWindows }}</code>
                     </uib-tab>
                   </uib-tabset>
                   <div style="margin-top: 10px;">
