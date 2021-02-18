@@ -1,8 +1,7 @@
 on:
-  push:
-    branches: [develop, release/**, feat/ce-220-security-scan]
+  # runs on default branch
   schedule:
-    - cron: "24 11 * * *"
+    - cron: "0 11 * * *"
   workflow_dispatch:
 
 jobs:
