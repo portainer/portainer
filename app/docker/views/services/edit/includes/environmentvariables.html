@@ -19,7 +19,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="var in service.EnvironmentVariables">
+          <tr ng-repeat="var in service.EnvironmentVariables | orderBy: 'originalKey'">
             <td>
               <div class="input-group input-group-sm">
                 <span class="input-group-addon fit-text-size">name</span>
@@ -39,7 +39,7 @@
                   disable-authorization="DockerServiceUpdate"
                 />
                 <span class="input-group-btn" authorization="DockerServiceUpdate">
-                  <button class="btn btn-sm btn-danger" type="button" ng-click="removeEnvironmentVariable(service, $index)" ng-disabled="isUpdating">
+                  <button class="btn btn-sm btn-danger" type="button" ng-click="removeEnvironmentVariable(service, var)" ng-disabled="isUpdating">
                     <i class="fa fa-trash" aria-hidden="true"></i>
                   </button>
                 </span>

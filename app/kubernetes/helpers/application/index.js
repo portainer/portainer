@@ -130,6 +130,7 @@ class KubernetesApplicationHelper {
       res.Name = item.name;
       res.Value = item.value;
       res.IsNew = false;
+      res.NameIndex = item.name;
       return res;
     });
     return _.without(envVariables, undefined);
