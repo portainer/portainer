@@ -1,7 +1,8 @@
+export const API_ENDPOINT_MOTD = 'api/motd';
+
 angular.module('portainer.app').factory('Motd', [
   '$resource',
-  'API_ENDPOINT_MOTD',
-  function MotdFactory($resource, API_ENDPOINT_MOTD) {
+  function MotdFactory($resource) {
     'use strict';
     return $resource(
       API_ENDPOINT_MOTD,

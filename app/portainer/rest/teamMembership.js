@@ -1,7 +1,8 @@
+const API_ENDPOINT_TEAM_MEMBERSHIPS = 'api/team_memberships';
+
 angular.module('portainer.app').factory('TeamMemberships', [
   '$resource',
-  'API_ENDPOINT_TEAM_MEMBERSHIPS',
-  function TeamMembershipsFactory($resource, API_ENDPOINT_TEAM_MEMBERSHIPS) {
+  function TeamMembershipsFactory($resource) {
     'use strict';
     return $resource(
       API_ENDPOINT_TEAM_MEMBERSHIPS + '/:id/:action',

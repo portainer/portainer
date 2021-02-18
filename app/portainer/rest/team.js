@@ -1,7 +1,8 @@
+const API_ENDPOINT_TEAMS = 'api/teams';
+
 angular.module('portainer.app').factory('Teams', [
   '$resource',
-  'API_ENDPOINT_TEAMS',
-  function TeamsFactory($resource, API_ENDPOINT_TEAMS) {
+  function TeamsFactory($resource) {
     'use strict';
     return $resource(
       API_ENDPOINT_TEAMS + '/:id/:entity/:entityId',

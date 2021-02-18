@@ -1,7 +1,8 @@
+const API_ENDPOINT_DOCKERHUB = 'api/dockerhub';
+
 angular.module('portainer.app').factory('DockerHub', [
   '$resource',
-  'API_ENDPOINT_DOCKERHUB',
-  function DockerHubFactory($resource, API_ENDPOINT_DOCKERHUB) {
+  function DockerHubFactory($resource) {
     'use strict';
     return $resource(
       API_ENDPOINT_DOCKERHUB,

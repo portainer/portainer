@@ -1,7 +1,8 @@
+const API_ENDPOINT_SETTINGS = 'api/settings';
+
 angular.module('portainer.app').factory('Settings', [
   '$resource',
-  'API_ENDPOINT_SETTINGS',
-  function SettingsFactory($resource, API_ENDPOINT_SETTINGS) {
+  function SettingsFactory($resource) {
     'use strict';
     return $resource(
       API_ENDPOINT_SETTINGS + '/:subResource/:action',

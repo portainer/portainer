@@ -1,7 +1,8 @@
+const API_ENDPOINT_TEMPLATES = 'api/templates';
+
 angular.module('portainer.app').factory('Templates', [
   '$resource',
-  'API_ENDPOINT_TEMPLATES',
-  function TemplatesFactory($resource, API_ENDPOINT_TEMPLATES) {
+  function TemplatesFactory($resource) {
     return $resource(
       API_ENDPOINT_TEMPLATES + '/:action',
       {},

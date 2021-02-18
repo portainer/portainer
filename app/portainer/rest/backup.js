@@ -1,10 +1,11 @@
+const API_ENDPOINT_BACKUP = 'api/backup';
+
 angular.module('portainer.app').factory('Backup', [
   '$resource',
-  'API_ENDPOINT_BACKUP',
-  function BackupFactory($resource, API_ENDPOINT_BACKUP) {
+  function BackupFactory($resource) {
     'use strict';
     return $resource(
-      API_ENDPOINT_BACKUP + '/:subResource/:action',
+      `${API_ENDPOINT_BACKUP}/:subResource/:action`,
       {},
       {
         download: {

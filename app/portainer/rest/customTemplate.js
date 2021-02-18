@@ -1,8 +1,10 @@
 import angular from 'angular';
 
+export const API_ENDPOINT_CUSTOM_TEMPLATES = 'api/custom_templates';
+
 angular.module('portainer.app').factory('CustomTemplates', CustomTemplatesFactory);
 
-function CustomTemplatesFactory($resource, API_ENDPOINT_CUSTOM_TEMPLATES) {
+function CustomTemplatesFactory($resource) {
   return $resource(
     API_ENDPOINT_CUSTOM_TEMPLATES + '/:id/:action',
     {},

@@ -1,7 +1,8 @@
+const API_ENDPOINT_ENDPOINT_GROUPS = 'api/endpoint_groups';
+
 angular.module('portainer.app').factory('EndpointGroups', [
   '$resource',
-  'API_ENDPOINT_ENDPOINT_GROUPS',
-  function EndpointGroupsFactory($resource, API_ENDPOINT_ENDPOINT_GROUPS) {
+  function EndpointGroupsFactory($resource) {
     'use strict';
     return $resource(
       API_ENDPOINT_ENDPOINT_GROUPS + '/:id/:action',

@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-import { API_ENDPOINT_EDGE_TEMPLATES } from '@/constants';
+const API_ENDPOINT_EDGE_TEMPLATES = 'api/edge_templates';
 
 angular.module('portainer.edge').factory('EdgeTemplates', function EdgeStacksFactory($resource) {
   return $resource(

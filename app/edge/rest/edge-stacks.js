@@ -1,4 +1,4 @@
-import { API_ENDPOINT_EDGE_STACKS } from '@/constants';
+const API_ENDPOINT_EDGE_STACKS = 'api/edge_stacks';
 
 import angular from 'angular';
 

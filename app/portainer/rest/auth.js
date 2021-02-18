@@ -1,7 +1,8 @@
+const API_ENDPOINT_AUTH = 'api/auth';
+
 angular.module('portainer.app').factory('Auth', [
   '$resource',
-  'API_ENDPOINT_AUTH',
-  function AuthFactory($resource, API_ENDPOINT_AUTH) {
+  function AuthFactory($resource) {
     'use strict';
     return $resource(
       API_ENDPOINT_AUTH + '/:action',

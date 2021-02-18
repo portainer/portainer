@@ -1,7 +1,8 @@
+const API_ENDPOINT_STATUS = 'api/status';
+
 angular.module('portainer.app').factory('Status', [
   '$resource',
-  'API_ENDPOINT_STATUS',
-  function StatusFactory($resource, API_ENDPOINT_STATUS) {
+  function StatusFactory($resource) {
     'use strict';
     return $resource(
       API_ENDPOINT_STATUS + '/:action',

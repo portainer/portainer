@@ -1,7 +1,8 @@
+export const API_ENDPOINT_RESOURCE_CONTROLS = 'api/resource_controls';
+
 angular.module('portainer.app').factory('ResourceControl', [
   '$resource',
-  'API_ENDPOINT_RESOURCE_CONTROLS',
-  function ResourceControlFactory($resource, API_ENDPOINT_RESOURCE_CONTROLS) {
+  function ResourceControlFactory($resource) {
     'use strict';
     return $resource(
       API_ENDPOINT_RESOURCE_CONTROLS + '/:id',

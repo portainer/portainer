@@ -1,7 +1,8 @@
+const API_ENDPOINT_USERS = 'api/users';
+
 angular.module('portainer.app').factory('Users', [
   '$resource',
-  'API_ENDPOINT_USERS',
-  function UsersFactory($resource, API_ENDPOINT_USERS) {
+  function UsersFactory($resource) {
     'use strict';
     return $resource(
       API_ENDPOINT_USERS + '/:id/:entity/:entityId',

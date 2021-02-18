@@ -1,8 +1,8 @@
+const API_ENDPOINT_STACKS = 'api/stacks';
+
 angular.module('portainer.app').factory('Stack', [
   '$resource',
-  'EndpointProvider',
-  'API_ENDPOINT_STACKS',
-  function StackFactory($resource, EndpointProvider, API_ENDPOINT_STACKS) {
+  function StackFactory($resource) {
     'use strict';
     return $resource(
       API_ENDPOINT_STACKS + '/:id/:action',
