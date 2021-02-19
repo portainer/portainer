@@ -1016,3 +1016,10 @@ json-tree .branch-preview {
 .w-full {
   width: 100%;
 }
+
+/* uib-typeahead override */
+#scrollable-dropdown-menu .dropdown-menu {
+  max-height: 300px;
+  overflow-y: auto;
+}
+/* !uib-typeahead override */
