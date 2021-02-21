@@ -10,7 +10,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/errors"
 )
 
-// @id
+// @id ResourceControlDelete
 // @summary Remove a resource control
 // @description Remove a resource control.
 // @description **Access policy**: administrator

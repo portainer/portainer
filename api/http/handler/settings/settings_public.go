@@ -22,7 +22,7 @@ type publicSettingsResponse struct {
 	EnableTelemetry bool `json:"EnableTelemetry" example:"true"`
 }
 
-// @id
+// @id SettingsPublic
 // @summary Retrieve Portainer public settings
 // @description Retrieve public settings. Returns a small set of settings that are not reserved to administrators only.
 // @description **Access policy**: public
