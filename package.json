@@ -10,14 +10,17 @@
   "bugs": {
     "url": "https://github.com/portainer/portainer/issues"
   },
-  "licenses": [{
-    "type": "Zlib",
-    "url": "https://raw.githubusercontent.com/portainer/portainer/develop/LICENSE"
-  }],
+  "licenses": [
+    {
+      "type": "Zlib",
+      "url": "https://raw.githubusercontent.com/portainer/portainer/develop/LICENSE"
+    }
+  ],
   "scripts": {
     "build": "grunt clean:all && grunt build",
     "build:server": "grunt clean:server && grunt build:server",
     "build:client": "grunt clean:client && grunt build:client",
+    "prebuild:docs": "(! command -v swag &> /dev/null) && go get -u github.com/swaggo/swag/cmd/swag",
     "build:docs": "cd api && swag init -g ./http/handler/handler.go --markdownFiles ./",
     "clean": "grunt clean:all",
     "start": "grunt start",
