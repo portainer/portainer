@@ -25,7 +25,7 @@ func (payload *oauthPayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// @id authenticate_oauth
+// @id AuthenticateOauth
 // @summary Authenticate with OAuth
 // @tags auth
 // @accept json

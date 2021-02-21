@@ -8,7 +8,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// @id logout
+// @id Logout
 // @summary Logout
 // @security jwt
 // @tags auth
