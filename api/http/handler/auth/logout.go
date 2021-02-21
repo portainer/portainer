@@ -8,19 +8,17 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// logout godoc
 // @id logout
 // @summary Logout
 // @security jwt
 // @tags auth
-// @accept json
-// @produce json
-// @success 204
+// @success 204 "Success"
+// @failure 500 "Server error"
 // @router /auth/logout [post]
 func (handler *Handler) logout(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user details from logout token", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user details from authentication token", err}
 	}
 
 	handler.KubernetesTokenCacheManager.RemoveUserFromCache(int(tokenData.ID))
