@@ -27,6 +27,9 @@ import (
 	"github.com/portainer/portainer/api/ldap"
 	"github.com/portainer/portainer/api/libcompose"
 	"github.com/portainer/portainer/api/oauth"
+
+	// this makes swaggo required in the project
+	_ "github.com/swaggo/swag/cmd/swag"
 )
 
 func initCLI() *portainer.CLIFlags {
