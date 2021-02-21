@@ -13,7 +13,7 @@ type fileResponse struct {
 	FileContent string `json:"FileContent"`
 }
 
-// edgeJobTaskLogsInspect
+// @id EdgeJobTaskLogsInspect
 // @summary Fetch the log for a specifc task on an EdgeJob
 // @description
 // @tags edge_jobs

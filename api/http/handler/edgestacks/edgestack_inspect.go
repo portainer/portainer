@@ -10,7 +10,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/errors"
 )
 
-// edgeStackInspect
+// @id EdgeStackInspect
 // @summary Inspect an EdgeStack
 // @description
 // @tags edge_stacks

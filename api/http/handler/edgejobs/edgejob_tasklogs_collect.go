@@ -10,7 +10,7 @@ import (
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
-// edgeJobTasksCollect
+// @id EdgeJobTasksCollect
 // @summary Collect the log for a specifc task on an EdgeJob
 // @description
 // @tags edge_jobs

@@ -7,7 +7,7 @@ import (
 	"github.com/portainer/libhttp/response"
 )
 
-// edgeStackList
+// @id EdgeStackList
 // @summary Fetches the list of EdgeStacks
 // @description
 // @tags edge_stacks

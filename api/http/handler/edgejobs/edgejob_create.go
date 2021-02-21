@@ -14,7 +14,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
-// edgeJobCreate
+// @id EdgeJobCreate
 // @summary Create an EdgeJob
 // @description
 // @tags edge_jobs

@@ -15,7 +15,7 @@ type templateFileFormat struct {
 	Templates []portainer.Template `json:"templates"`
 }
 
-// edgeTemplateList
+// @id EdgeTemplateList
 // @summary Fetches the list of Edge Templates
 // @description
 // @tags edge_templates

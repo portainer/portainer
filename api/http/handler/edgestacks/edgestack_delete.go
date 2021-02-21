@@ -11,7 +11,7 @@ import (
 	"github.com/portainer/portainer/api/internal/edge"
 )
 
-// edgeStackDelete
+// @id EdgeStackDelete
 // @summary Delete an EdgeStack
 // @description
 // @tags edge_stacks

@@ -28,7 +28,7 @@ func (payload *edgeJobUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// edgeJobUpdate
+// @id EdgeJobUpdate
 // @summary Update an EdgeJob
 // @description
 // @tags edge_jobs

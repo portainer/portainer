@@ -16,7 +16,7 @@ import (
 	"github.com/portainer/portainer/api/internal/edge"
 )
 
-// edgeStackCreate
+// @id EdgeStackCreate
 // @summary Create an EdgeStack
 // @description
 // @tags edge_stacks

@@ -14,7 +14,7 @@ type edgeJobFileResponse struct {
 	FileContent string `json:"FileContent"`
 }
 
-// edgeJobFile
+// @id EdgeJobFile
 // @summary Fetch a file of an EdgeJob
 // @description
 // @tags edge_jobs

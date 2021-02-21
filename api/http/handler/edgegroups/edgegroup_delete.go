@@ -11,7 +11,7 @@ import (
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
-// edgeGroupDelete godoc
+// @id EdgeGroupDelete
 // @summary Deletes an EdgeGroup
 // @description
 // @tags edge_groups

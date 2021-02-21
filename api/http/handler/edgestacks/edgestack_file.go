@@ -15,7 +15,7 @@ type stackFileResponse struct {
 	StackFileContent string `json:"StackFileContent"`
 }
 
-// edgeStackFile
+// @id EdgeStackFile
 // @summary Fetches the stack file for an EdgeStack
 // @description
 // @tags edge_stacks

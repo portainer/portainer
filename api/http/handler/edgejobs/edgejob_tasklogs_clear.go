@@ -11,7 +11,7 @@ import (
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
-// edgeJobTasksClear
+// @id EdgeJobTasksClear
 // @summary Clear the log for a specifc task on an EdgeJob
 // @description
 // @tags edge_jobs

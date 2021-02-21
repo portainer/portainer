@@ -11,7 +11,7 @@ import (
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
-// edgeJobDelete
+// @id EdgeJobDelete
 // @summary Delete an EdgeJob
 // @description
 // @tags edge_jobs

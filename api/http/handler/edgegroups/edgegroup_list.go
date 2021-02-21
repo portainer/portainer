@@ -13,7 +13,7 @@ type decoratedEdgeGroup struct {
 	HasEdgeStack bool `json:"HasEdgeStack"`
 }
 
-// edgeGroupList godoc
+// @id EdgeGroupList
 // @summary list EdgeGroups
 // @description
 // @tags edge_groups

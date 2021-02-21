@@ -17,7 +17,7 @@ type taskContainer struct {
 	LogsStatus portainer.EdgeJobLogsStatus `json:"LogsStatus"`
 }
 
-// edgeJobTasksList
+// @id EdgeJobTasksList
 // @summary Fetch the list of tasks on an EdgeJob
 // @description
 // @tags edge_jobs

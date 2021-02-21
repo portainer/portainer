@@ -32,7 +32,7 @@ func (payload *edgeGroupCreatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// edgeGroupCreate
+// @id EdgeGroupCreate
 // @summary Create an EdgeGroup
 // @description
 // @tags edge_groups

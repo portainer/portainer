@@ -34,7 +34,7 @@ func (payload *edgeGroupUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// edgeGroupUpdate godoc
+// @id EgeGroupUpdate
 // @summary Updates an EdgeGroup
 // @description
 // @tags edge_groups

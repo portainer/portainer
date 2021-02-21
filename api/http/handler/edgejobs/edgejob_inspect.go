@@ -15,7 +15,7 @@ type edgeJobInspectResponse struct {
 	Endpoints []portainer.EndpointID
 }
 
-// edgeJobInspect
+// @id EdgeJobInspect
 // @summary Inspect an EdgeJob
 // @description
 // @tags edge_jobs

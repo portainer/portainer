@@ -7,7 +7,7 @@ import (
 	"github.com/portainer/libhttp/response"
 )
 
-// edgeJobList
+// @id EdgeJobList
 // @summary Fetch EdgeJobs list
 // @description
 // @tags edge_jobs

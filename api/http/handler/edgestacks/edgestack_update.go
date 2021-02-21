@@ -31,7 +31,7 @@ func (payload *updateEdgeStackPayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// edgeStackUpdate
+// @id EdgeStackUpdate
 // @summary Update an EdgeStack
 // @description
 // @tags edge_stacks

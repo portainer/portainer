@@ -10,7 +10,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/errors"
 )
 
-// edgeGroupInspect godoc
+// @id EdgeGroupInspect
 // @summary Inspects an EdgeGroup
 // @description
 // @tags edge_groups
