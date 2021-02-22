@@ -12,7 +12,7 @@ Have you reviewed our technical documentation and knowledge base? Yes/No
 
 <!--
 
-You can find more information about Portainer support framework policy here: https://www.portainer.io/2019/04/portainer-support-policy/
+You can find more information about Portainer support framework policy here: https://old.portainer.io/2019/04/portainer-support-policy/
 
 Do you need help or have a question? Come chat with us on Slack http://portainer.slack.com/
 
