@@ -559,6 +559,9 @@ type (
 	// SnapshotJob represents a scheduled job that can create endpoint snapshots
 	SnapshotJob struct{}
 
+	// SoftwareEdition represents an edition of Portainer
+	SoftwareEdition int
+
 	// Stack represents a Docker stack created via docker stack deploy
 	Stack struct {
 		ID              StackID          `json:"Id"`
@@ -822,6 +825,7 @@ type (
 		Close() error
 		IsNew() bool
 		MigrateData() error
+		CheckCurrentEdition() error
 
 		DockerHub() DockerHubService
 		CustomTemplate() CustomTemplateService
@@ -1122,8 +1126,9 @@ type (
 	// VersionService represents a service for managing version data
 	VersionService interface {
 		DBVersion() (int, error)
-		StoreDBVersion(version int) error
+		Edition() (SoftwareEdition, error)
 		InstanceID() (string, error)
+		StoreDBVersion(version int) error
 		StoreInstanceID(ID string) error
 	}
 
@@ -1266,6 +1271,16 @@ const (
 	TeamLeader
 	// TeamMember represents a member role inside a team
 	TeamMember
+)
+
+const (
+	_ SoftwareEdition = iota
+	// PortainerCE represents the community edition of Portainer
+	PortainerCE
+	// PortainerBE represents the business edition of Portainer
+	PortainerBE
+	// PortainerEE represents the business edition of Portainer
+	PortainerEE
 )
 
 const (
