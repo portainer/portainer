@@ -204,6 +204,23 @@ class KubernetesConfigurationController {
     return this.$async(this.getConfigurationsAsync);
   }
 
+  tagUsedDataKeys() {
+    const configName = this.$transition$.params().name;
+    const usedDataKeys = _.uniq(
+      this.configuration.Applications.flatMap((app) =>
+        app.Env.filter((e) => e.valueFrom && e.valueFrom.configMapKeyRef && e.valueFrom.configMapKeyRef.name === configName).map((e) => e.name)
+      )
+    );
+
+    this.formValues.Data = this.formValues.Data.map((variable) => {
+      if (!usedDataKeys.includes(variable.Key)) {
+        return variable;
+      }
+
+      return { ...variable, Used: true };
+    });
+  }
+
   async onInit() {
     try {
       this.state = {
@@ -228,6 +245,8 @@ class KubernetesConfigurationController {
       await this.getApplications(this.configuration.Namespace);
       await this.getEvents(this.configuration.Namespace);
       await this.getConfigurations();
+
+      this.tagUsedDataKeys();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     } finally {
