@@ -25,7 +25,7 @@ require (
 	github.com/mattn/go-shellwords v1.0.6 // indirect
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
 	github.com/orcaman/concurrent-map v0.0.0-20190826125027-8c72a8bb44f6
-	github.com/portainer/docker-compose-wrapper v0.0.0-20210214130111-fb78615516aa
+	github.com/portainer/docker-compose-wrapper v0.0.0-20210222063404-03b2b09b0a19
 	github.com/portainer/libcompose v0.5.3
 	github.com/portainer/libcrypto v0.0.0-20190723020515-23ebe86ab2c2
 	github.com/portainer/libhttp v0.0.0-20190806161843-ba068f58be33

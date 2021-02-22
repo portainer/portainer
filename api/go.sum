@@ -228,6 +228,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/portainer/docker-compose-wrapper v0.0.0-20210214130111-fb78615516aa h1:68p+i58sm7uvX5MG7PEDvyxQuUc4W/+tuqTktz/e23s=
 github.com/portainer/docker-compose-wrapper v0.0.0-20210214130111-fb78615516aa/go.mod h1:No8p8iZt9N2HOtDS9aWkh1ILxmQVoOTZZjHGlOij/ec=
+github.com/portainer/docker-compose-wrapper v0.0.0-20210222063404-03b2b09b0a19 h1:w+r2ay77hw8q/nsXR59QCZ2V4oN7et2fTJNz1SORw5c=
+github.com/portainer/docker-compose-wrapper v0.0.0-20210222063404-03b2b09b0a19/go.mod h1:No8p8iZt9N2HOtDS9aWkh1ILxmQVoOTZZjHGlOij/ec=
 github.com/portainer/libcompose v0.5.3 h1:tE4WcPuGvo+NKeDkDWpwNavNLZ5GHIJ4RvuZXsI9uI8=
 github.com/portainer/libcompose v0.5.3/go.mod h1:7SKd/ho69rRKHDFSDUwkbMcol2TMKU5OslDsajr8Ro8=
 github.com/portainer/libcrypto v0.0.0-20190723020515-23ebe86ab2c2 h1:0PfgGLys9yHr4rtnirg0W0Cjvv6/DzxBIZk5sV59208=
