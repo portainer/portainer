@@ -180,7 +180,7 @@ angular.module('portainer.app').factory('StateManager', [
       }
 
       var applicationState = LocalStorage.getApplicationState();
-      if (applicationState) {
+      if (applicationState && applicationState.validity) {
         var now = moment().unix();
         var cacheValidity = now - applicationState.validity;
         if (cacheValidity > APPLICATION_CACHE_VALIDITY) {
