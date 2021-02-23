@@ -6,13 +6,25 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// DELETE request on /api/team_memberships/:id
+// @id TeamMembershipDelete
+// @summary Remove a team membership
+// @description Remove a team membership. Access is only available to administrators leaders of the associated team.
+// @description **Access policy**: restricted
+// @tags team_memberships
+// @security jwt
+// @param id path int true "TeamMembership identifier"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 "TeamMembership not found"
+// @failure 500 "Server error"
+// @router /team_memberships/{id} [delete]
 func (handler *Handler) teamMembershipDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	membershipID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

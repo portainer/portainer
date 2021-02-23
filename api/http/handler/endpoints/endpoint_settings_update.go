@@ -11,21 +11,43 @@ import (
 )
 
 type endpointSettingsUpdatePayload struct {
-	AllowBindMountsForRegularUsers            *bool `json:"allowBindMountsForRegularUsers"`
-	AllowPrivilegedModeForRegularUsers        *bool `json:"allowPrivilegedModeForRegularUsers"`
-	AllowVolumeBrowserForRegularUsers         *bool `json:"allowVolumeBrowserForRegularUsers"`
-	AllowHostNamespaceForRegularUsers         *bool `json:"allowHostNamespaceForRegularUsers"`
-	AllowDeviceMappingForRegularUsers         *bool `json:"allowDeviceMappingForRegularUsers"`
-	AllowStackManagementForRegularUsers       *bool `json:"allowStackManagementForRegularUsers"`
-	AllowContainerCapabilitiesForRegularUsers *bool `json:"allowContainerCapabilitiesForRegularUsers"`
-	EnableHostManagementFeatures              *bool `json:"enableHostManagementFeatures"`
+	// Whether non-administrator should be able to use bind mounts when creating containers
+	AllowBindMountsForRegularUsers *bool `json:"allowBindMountsForRegularUsers" example:"false"`
+	// Whether non-administrator should be able to use privileged mode when creating containers
+	AllowPrivilegedModeForRegularUsers *bool `json:"allowPrivilegedModeForRegularUsers" example:"false"`
+	// Whether non-administrator should be able to browse volumes
+	AllowVolumeBrowserForRegularUsers *bool `json:"allowVolumeBrowserForRegularUsers" example:"true"`
+	// Whether non-administrator should be able to use the host pid
+	AllowHostNamespaceForRegularUsers *bool `json:"allowHostNamespaceForRegularUsers" example:"true"`
+	// Whether non-administrator should be able to use device mapping
+	AllowDeviceMappingForRegularUsers *bool `json:"allowDeviceMappingForRegularUsers" example:"true"`
+	// Whether non-administrator should be able to manage stacks
+	AllowStackManagementForRegularUsers *bool `json:"allowStackManagementForRegularUsers" example:"true"`
+	// Whether non-administrator should be able to use container capabilities
+	AllowContainerCapabilitiesForRegularUsers *bool `json:"allowContainerCapabilitiesForRegularUsers" example:"true"`
+	// Whether host management features are enabled
+	EnableHostManagementFeatures *bool `json:"enableHostManagementFeatures" example:"true"`
 }
 
 func (payload *endpointSettingsUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// PUT request on /api/endpoints/:id/settings
+// @id EndpointSettingsUpdate
+// @summary Update settings for an endpoint
+// @description Update settings for an endpoint.
+// @description **Access policy**: administrator
+// @security jwt
+// @tags endpoints
+// @accept json
+// @produce json
+// @param id path int true "Endpoint identifier"
+// @param body body endpointSettingsUpdatePayload true "Endpoint details"
+// @success 200 {object} portainer.Endpoint "Success"
+// @failure 400 "Invalid request"
+// @failure 404 "Endpoint not found"
+// @failure 500 "Server error"
+// @router /api/endpoints/:id/settings [put]
 func (handler *Handler) endpointSettingsUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

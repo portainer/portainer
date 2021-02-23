@@ -8,15 +8,17 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
 
 type userUpdatePasswordPayload struct {
-	Password    string
-	NewPassword string
+	// Current Password
+	Password string `example:"passwd" validate:"required"`
+	// New Password
+	NewPassword string `example:"new_passwd" validate:"required"`
 }
 
 func (payload *userUpdatePasswordPayload) Validate(r *http.Request) error {
@@ -29,7 +31,22 @@ func (payload *userUpdatePasswordPayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// PUT request on /api/users/:id/passwd
+// @id UserUpdatePassword
+// @summary Update password for a user
+// @description Update password for the specified user.
+// @description **Access policy**: authenticated
+// @tags users
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "identifier"
+// @param body body userUpdatePasswordPayload true "details"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 "User not found"
+// @failure 500 "Server error"
+// @router /users/{id}/passwd [put]
 func (handler *Handler) userUpdatePassword(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	userID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

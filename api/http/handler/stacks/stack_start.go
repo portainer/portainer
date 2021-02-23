@@ -14,7 +14,19 @@ import (
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
-// POST request on /api/stacks/:id/start
+// @id StackStart
+// @summary Starts a stopped Stack
+// @description Starts a stopped Stack.
+// @description **Access policy**: restricted
+// @tags stacks
+// @security jwt
+// @param id path int true "Stack identifier"
+// @success 200 {object} portainer.Stack "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 " not found"
+// @failure 500 "Server error"
+// @router /stacks/{id}/start [post]
 func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

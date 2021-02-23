@@ -7,12 +7,26 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
 
+// @id CustomTemplateInspect
+// @summary Inspect a custom template
+// @description Retrieve details about a template.
+// @description **Access policy**: authenticated
+// @tags custom_templates
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "Template identifier"
+// @success 200 {object} portainer.CustomTemplate "Success"
+// @failure 400 "Invalid request"
+// @failure 404 "Template not found"
+// @failure 500 "Server error"
+// @router /custom_templates/{id} [get]
 func (handler *Handler) customTemplateInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	customTemplateID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

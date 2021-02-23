@@ -14,9 +14,21 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// DELETE request on /api/stacks/:id?external=<external>&endpointId=<endpointId>
-// If the external query parameter is set to true, the id route variable is expected to be
-// the name of an external stack as a string.
+// @id StackDelete
+// @summary Remove a stack
+// @description Remove a stack.
+// @description **Access policy**: restricted
+// @tags stacks
+// @security jwt
+// @param id path int true "Stack identifier"
+// @param external query boolean false "Set to true to delete an external stack. Only external Swarm stacks are supported"
+// @param endpointId query int false "Endpoint identifier used to remove an external stack (required when external is set to true)"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 " not found"
+// @failure 500 "Server error"
+// @router /stacks/{id} [delete]
 func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveRouteVariableValue(r, "id")
 	if err != nil {

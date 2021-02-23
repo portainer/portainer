@@ -6,12 +6,26 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/internal/edge"
 )
 
-// DELETE request on /api/tags/:id
+// @id TagDelete
+// @summary Remove a tag
+// @description Remove a tag.
+// @description **Access policy**: administrator
+// @tags tags
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "Tag identifier"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 "Tag not found"
+// @failure 500 "Server error"
+// @router /tags/{id} [delete]
 func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	id, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
