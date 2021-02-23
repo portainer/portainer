@@ -9,6 +9,7 @@ assignees: ''
 Before you start, we need a little bit more information from you:
 
 Use Case (delete as appropriate): Using Portainer at Home, Using Portainer in a Commerical setup.
+
 Have you reviewed our technical documentation and knowledge base? Yes/No
 
 <!--
