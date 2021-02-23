@@ -15,6 +15,7 @@ import (
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/internal/stackutils"
 )
 
 func (handler *Handler) cleanUp(stack *portainer.Stack, doCleanUp *bool) error {
@@ -208,9 +209,9 @@ func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *port
 	}
 
 	if isAdmin {
-		resourceControl = authorization.NewAdministratorsOnlyResourceControl(stack.Name, portainer.StackResourceControl)
+		resourceControl = authorization.NewAdministratorsOnlyResourceControl(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)
 	} else {
-		resourceControl = authorization.NewPrivateResourceControl(stack.Name, portainer.StackResourceControl, userID)
+		resourceControl = authorization.NewPrivateResourceControl(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl, userID)
 	}
 
 	err = handler.DataStore.ResourceControl().CreateResourceControl(resourceControl)

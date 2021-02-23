@@ -225,5 +225,6 @@
 </div>
 
 <!-- access-control-panel -->
-<por-access-control-panel ng-if="stack" resource-id="stack.Name" resource-control="stack.ResourceControl" resource-type="'stack'"> </por-access-control-panel>
+<por-access-control-panel ng-if="stack" resource-id="stack.EndpointId + '_' + stack.Name" resource-control="stack.ResourceControl" resource-type="'stack'">
+</por-access-control-panel>
 <!-- !access-control-panel -->
