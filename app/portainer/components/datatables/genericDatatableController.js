@@ -33,6 +33,7 @@ angular.module('portainer.app').controller('GenericDatatableController', [
         refreshRate: '30',
       },
     };
+
     this.resetSelectionState = function () {
       this.state.selectAll = false;
       this.state.selectedItems = [];
@@ -158,6 +159,11 @@ angular.module('portainer.app').controller('GenericDatatableController', [
         this.settings.open = false;
       }
       this.onSettingsRepeaterChange();
+
+      var storedColumnVisibility = DatatableService.getColumnVisibilitySettings(this.tableKey);
+      if (storedColumnVisibility !== null) {
+        this.columnVisibility = storedColumnVisibility;
+      }
     };
 
     /**

@@ -611,6 +611,10 @@ type (
 		Env             []Pair           `json:"Env"`
 		ResourceControl *ResourceControl `json:"ResourceControl"`
 		Status          StackStatus      `json:"Status"`
+		CreationDate    int64
+		CreatedBy       string
+		UpdateDate      int64
+		UpdatedBy       string
 		ProjectPath     string
 	}
 

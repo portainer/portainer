@@ -8,11 +8,12 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -58,13 +59,14 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
 	stack := &portainer.Stack{
-		ID:         portainer.StackID(stackID),
-		Name:       payload.Name,
-		Type:       portainer.DockerComposeStack,
-		EndpointID: endpoint.ID,
-		EntryPoint: filesystem.ComposeFileDefaultName,
-		Env:        payload.Env,
-		Status:     portainer.StackStatusActive,
+		ID:           portainer.StackID(stackID),
+		Name:         payload.Name,
+		Type:         portainer.DockerComposeStack,
+		EndpointID:   endpoint.ID,
+		EntryPoint:   filesystem.ComposeFileDefaultName,
+		Env:          payload.Env,
+		Status:       portainer.StackStatusActive,
+		CreationDate: time.Now().Unix(),
 	}
 
 	stackFolder := strconv.Itoa(int(stack.ID))
@@ -86,6 +88,8 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
+
+	stack.CreatedBy = config.user.Username
 
 	err = handler.DataStore.Stack().CreateStack(stack)
 	if err != nil {
@@ -141,13 +145,14 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
 	stack := &portainer.Stack{
-		ID:         portainer.StackID(stackID),
-		Name:       payload.Name,
-		Type:       portainer.DockerComposeStack,
-		EndpointID: endpoint.ID,
-		EntryPoint: payload.ComposeFilePathInRepository,
-		Env:        payload.Env,
-		Status:     portainer.StackStatusActive,
+		ID:           portainer.StackID(stackID),
+		Name:         payload.Name,
+		Type:         portainer.DockerComposeStack,
+		EndpointID:   endpoint.ID,
+		EntryPoint:   payload.ComposeFilePathInRepository,
+		Env:          payload.Env,
+		Status:       portainer.StackStatusActive,
+		CreationDate: time.Now().Unix(),
 	}
 
 	projectPath := handler.FileService.GetStackProjectPath(strconv.Itoa(int(stack.ID)))
@@ -179,6 +184,8 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
+
+	stack.CreatedBy = config.user.Username
 
 	err = handler.DataStore.Stack().CreateStack(stack)
 	if err != nil {
@@ -234,13 +241,14 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
 	stack := &portainer.Stack{
-		ID:         portainer.StackID(stackID),
-		Name:       payload.Name,
-		Type:       portainer.DockerComposeStack,
-		EndpointID: endpoint.ID,
-		EntryPoint: filesystem.ComposeFileDefaultName,
-		Env:        payload.Env,
-		Status:     portainer.StackStatusActive,
+		ID:           portainer.StackID(stackID),
+		Name:         payload.Name,
+		Type:         portainer.DockerComposeStack,
+		EndpointID:   endpoint.ID,
+		EntryPoint:   filesystem.ComposeFileDefaultName,
+		Env:          payload.Env,
+		Status:       portainer.StackStatusActive,
+		CreationDate: time.Now().Unix(),
 	}
 
 	stackFolder := strconv.Itoa(int(stack.ID))
@@ -262,6 +270,8 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
+
+	stack.CreatedBy = config.user.Username
 
 	err = handler.DataStore.Stack().CreateStack(stack)
 	if err != nil {

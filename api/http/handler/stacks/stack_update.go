@@ -4,12 +4,13 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
@@ -135,6 +136,9 @@ func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Sta
 		return configErr
 	}
 
+	stack.UpdateDate = time.Now().Unix()
+	stack.UpdatedBy = config.user.Username
+
 	err = handler.deployComposeStack(config)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
@@ -162,6 +166,9 @@ func (handler *Handler) updateSwarmStack(r *http.Request, stack *portainer.Stack
 	if configErr != nil {
 		return configErr
 	}
+
+	stack.UpdateDate = time.Now().Unix()
+	stack.UpdatedBy = config.user.Username
 
 	err = handler.deploySwarmStack(config)
 	if err != nil {
