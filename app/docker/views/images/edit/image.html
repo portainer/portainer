@@ -128,6 +128,17 @@
               <td>Build</td>
               <td>Docker {{ image.DockerVersion }} on {{ image.Os }}, {{ image.Architecture }}</td>
             </tr>
+            <tr ng-if="!(image.Labels | emptyobject)">
+              <td>Labels</td>
+              <td>
+                <table class="table table-bordered table-condensed">
+                  <tr ng-repeat="(k, v) in image.Labels">
+                    <td>{{ k }}</td>
+                    <td>{{ v }}</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
             <tr ng-if="image.Author">
               <td>Author</td>
               <td>{{ image.Author }}</td>
