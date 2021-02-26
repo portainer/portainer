@@ -56,10 +56,10 @@ angular.module('portainer.app').factory('EndpointService', [
       return Endpoints.remove({ id: endpointID }).$promise;
     };
 
-    service.createLocalEndpoint = function () {
+    service.createLocalEndpoint = function (name = 'local') {
       var deferred = $q.defer();
 
-      FileUploadService.createEndpoint('local', PortainerEndpointCreationTypes.LocalDockerEnvironment, '', '', 1, [], false)
+      FileUploadService.createEndpoint(name, PortainerEndpointCreationTypes.LocalDockerEnvironment, '', '', 1, [], false)
         .then(function success(response) {
           deferred.resolve(response.data);
         })
@@ -117,10 +117,10 @@ angular.module('portainer.app').factory('EndpointService', [
       return deferred.promise;
     };
 
-    service.createLocalKubernetesEndpoint = function () {
+    service.createLocalKubernetesEndpoint = function (name = 'local') {
       var deferred = $q.defer();
 
-      FileUploadService.createEndpoint('local', PortainerEndpointCreationTypes.LocalKubernetesEnvironment, '', '', 1, [], true, true, true)
+      FileUploadService.createEndpoint(name, PortainerEndpointCreationTypes.LocalKubernetesEnvironment, '', '', 1, [], true, true, true)
         .then(function success(response) {
           deferred.resolve(response.data);
         })

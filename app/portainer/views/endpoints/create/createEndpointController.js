@@ -89,40 +89,71 @@ angular
         $scope.availableTags = $scope.availableTags.concat(tag);
         $scope.formValues.TagIds = $scope.formValues.TagIds.concat(tag.Id);
       } catch (err) {
-        Notifications.error('Failue', err, 'Unable to create tag');
+        Notifications.error('Failure', err, 'Unable to create tag');
       }
     }
 
     $scope.addDockerEndpoint = function () {
+      if ($scope.formValues.ConnectSocket) {
+        var endpointName = $scope.formValues.Name;
+        $scope.state.actionInProgress = true;
+        EndpointService.createLocalEndpoint(endpointName)
+          .then(function success() {
+            Notifications.success('Endpoint created', endpointName);
+            $state.go('portainer.endpoints', {}, { reload: true });
+          })
+          .catch(function error(err) {
+            Notifications.error('Failure', err, 'Unable to create endpoint');
+          })
+          .finally(function final() {
+            $scope.state.actionInProgress = false;
+          });
+      } else {
+        var name = $scope.formValues.Name;
+        var URL = $filter('stripprotocol')($scope.formValues.URL);
+        var publicURL = $scope.formValues.PublicURL === '' ? URL.split(':')[0] : $scope.formValues.PublicURL;
+        var groupId = $scope.formValues.GroupId;
+        var tagIds = $scope.formValues.TagIds;
+        var securityData = $scope.formValues.SecurityFormData;
+        var TLS = securityData.TLS;
+        var TLSMode = securityData.TLSMode;
+        var TLSSkipVerify = TLS && (TLSMode === 'tls_client_noca' || TLSMode === 'tls_only');
+        var TLSSkipClientVerify = TLS && (TLSMode === 'tls_ca' || TLSMode === 'tls_only');
+        var TLSCAFile = TLSSkipVerify ? null : securityData.TLSCACert;
+        var TLSCertFile = TLSSkipClientVerify ? null : securityData.TLSCert;
+        var TLSKeyFile = TLSSkipClientVerify ? null : securityData.TLSKey;
+
+        addEndpoint(
+          name,
+          PortainerEndpointCreationTypes.LocalDockerEnvironment,
+          URL,
+          publicURL,
+          groupId,
+          tagIds,
+          TLS,
+          TLSSkipVerify,
+          TLSSkipClientVerify,
+          TLSCAFile,
+          TLSCertFile,
+          TLSKeyFile
+        );
+      }
+    };
+
+    $scope.addKubernetesEndpoint = function () {
       var name = $scope.formValues.Name;
-      var URL = $filter('stripprotocol')($scope.formValues.URL);
-      var publicURL = $scope.formValues.PublicURL === '' ? URL.split(':')[0] : $scope.formValues.PublicURL;
-      var groupId = $scope.formValues.GroupId;
-      var tagIds = $scope.formValues.TagIds;
-
-      var securityData = $scope.formValues.SecurityFormData;
-      var TLS = securityData.TLS;
-      var TLSMode = securityData.TLSMode;
-      var TLSSkipVerify = TLS && (TLSMode === 'tls_client_noca' || TLSMode === 'tls_only');
-      var TLSSkipClientVerify = TLS && (TLSMode === 'tls_ca' || TLSMode === 'tls_only');
-      var TLSCAFile = TLSSkipVerify ? null : securityData.TLSCACert;
-      var TLSCertFile = TLSSkipClientVerify ? null : securityData.TLSCert;
-      var TLSKeyFile = TLSSkipClientVerify ? null : securityData.TLSKey;
-
-      addEndpoint(
-        name,
-        PortainerEndpointCreationTypes.LocalDockerEnvironment,
-        URL,
-        publicURL,
-        groupId,
-        tagIds,
-        TLS,
-        TLSSkipVerify,
-        TLSSkipClientVerify,
-        TLSCAFile,
-        TLSCertFile,
-        TLSKeyFile
-      );
+      $scope.state.actionInProgress = true;
+      EndpointService.createLocalKubernetesEndpoint(name)
+        .then(function success(result) {
+          Notifications.success('Endpoint created', name);
+          $state.go('portainer.endpoints.endpoint.kubernetesConfig', { id: result.Id });
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to create endpoint');
+        })
+        .finally(function final() {
+          $scope.state.actionInProgress = false;
+        });
     };
 
     $scope.addAgentEndpoint = function () {
