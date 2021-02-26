@@ -178,9 +178,20 @@ func (handler *Handler) isValidStackFile(stackFileContent []byte, settings *port
 }
 
 func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *portainer.Stack, userID portainer.UserID) *httperror.HandlerError {
-	resourceControl := authorization.NewPrivateResourceControl(stack.Name, portainer.StackResourceControl, userID)
+	var resourceControl *portainer.ResourceControl
 
-	err := handler.DataStore.ResourceControl().CreateResourceControl(resourceControl)
+	isAdmin, err := handler.userIsAdmin(userID)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to load user information from the database", err}
+	}
+
+	if isAdmin {
+		resourceControl = authorization.NewAdministratorsOnlyResourceControl(stack.Name, portainer.StackResourceControl)
+	} else {
+		resourceControl = authorization.NewPrivateResourceControl(stack.Name, portainer.StackResourceControl, userID)
+	}
+
+	err = handler.DataStore.ResourceControl().CreateResourceControl(resourceControl)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist resource control inside the database", err}
 	}

@@ -6,6 +6,21 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
+// NewAdministratorsOnlyResourceControl will create a new administrators only resource control associated to the resource specified by the
+// identifier and type parameters.
+func NewAdministratorsOnlyResourceControl(resourceIdentifier string, resourceType portainer.ResourceControlType) *portainer.ResourceControl {
+	return &portainer.ResourceControl{
+		Type:               resourceType,
+		ResourceID:         resourceIdentifier,
+		SubResourceIDs:     []string{},
+		UserAccesses:       []portainer.UserResourceAccess{},
+		TeamAccesses:       []portainer.TeamResourceAccess{},
+		AdministratorsOnly: true,
+		Public:             false,
+		System:             false,
+	}
+}
+
 // NewPrivateResourceControl will create a new private resource control associated to the resource specified by the
 // identifier and type parameters. It automatically assigns it to the user specified by the userID parameter.
 func NewPrivateResourceControl(resourceIdentifier string, resourceType portainer.ResourceControlType, userID portainer.UserID) *portainer.ResourceControl {

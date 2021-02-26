@@ -28,13 +28,13 @@ type Handler struct {
 	stackDeletionMutex *sync.Mutex
 	requestBouncer     *security.RequestBouncer
 	*mux.Router
-	DataStore           portainer.DataStore
-	DockerClientFactory *docker.ClientFactory
-	FileService         portainer.FileService
-	GitService          portainer.GitService
-	SwarmStackManager   portainer.SwarmStackManager
-	ComposeStackManager portainer.ComposeStackManager
-	KubernetesDeployer  portainer.KubernetesDeployer
+	DataStore               portainer.DataStore
+	DockerClientFactory     *docker.ClientFactory
+	FileService             portainer.FileService
+	GitService              portainer.GitService
+	SwarmStackManager       portainer.SwarmStackManager
+	ComposeStackManager     portainer.ComposeStackManager
+	KubernetesDeployer      portainer.KubernetesDeployer
 	KubernetesClientFactory *cli.ClientFactory
 	AuthorizationService    *authorization.Service
 }
@@ -84,6 +84,17 @@ func (handler *Handler) userCanAccessStack(securityContext *security.RestrictedR
 	}
 
 	return handler.userIsAdminOrEndpointAdmin(user, endpointID)
+}
+
+func (handler *Handler) userIsAdmin(userID portainer.UserID) (bool, error) {
+	user, err := handler.DataStore.User().User(userID)
+	if err != nil {
+		return false, err
+	}
+
+	isAdmin := user.Role == portainer.AdministratorRole
+
+	return isAdmin, nil
 }
 
 func (handler *Handler) userIsAdminOrEndpointAdmin(user *portainer.User, endpointID portainer.EndpointID) (bool, error) {
