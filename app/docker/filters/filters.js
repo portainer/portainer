@@ -201,7 +201,11 @@ angular
     'use strict';
     return function (imageName) {
       if (imageName) {
-        return imageName.split('@sha')[0];
+        var idx = imageName.indexOf('@sha');
+        if (idx < 0) {
+          return imageName;
+        }
+        return imageName.substring(0, idx);
       }
       return '';
     };
@@ -296,14 +300,18 @@ angular
   })
   .filter('trimshasum', function () {
     'use strict';
-    return function (imageName) {
+    return function trimshasum(imageName) {
       if (!imageName) {
         return;
       }
       if (imageName.indexOf('sha256:') === 0) {
         return imageName.substring(7, 19);
       }
-      return _.split(imageName, '@sha256')[0];
+      var idx = imageName.indexOf('@sha256');
+      if (idx < 0) {
+        return imageName;
+      }
+      return imageName.substring(0, idx);
     };
   })
   .filter('trimversiontag', function () {

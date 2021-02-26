@@ -38,11 +38,15 @@ function matchesLabel(labels, constraint) {
 }
 
 function extractValue(constraint, op) {
-  return constraint.split(op).pop().trim();
+  return constraint.substring(constraint.lastIndexOf(op) + 1).trim();
 }
 
 function extractCustomLabelKey(constraint, op, baseLabelKey) {
-  return constraint.split(op).shift().trim().replace(baseLabelKey, '');
+  var idx = constraint.indexOf(op);
+  if (idx >= 0) {
+    constraint = constraint.substring(0, idx);
+  }
+  return constraint.trim().replace(baseLabelKey, '');
 }
 
 angular.module('portainer.docker').factory('ConstraintsHelper', [

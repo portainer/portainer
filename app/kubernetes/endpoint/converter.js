@@ -10,8 +10,13 @@ class KubernetesEndpointConverter {
     const leaderAnnotation = data.metadata.annotations ? data.metadata.annotations[KubernetesEndpointAnnotationLeader] : '';
     if (leaderAnnotation) {
       const parsedJson = JSON.parse(leaderAnnotation);
-      const split = _.split(parsedJson.holderIdentity, '_');
-      res.HolderIdentity = split[0];
+      var holderIdentity = parsedJson.holderIdentity || '';
+      const idx = holderIdentity.indexOf('_');
+      if (idx < 0) {
+        res.HolderIdentity = holderIdentity;
+      } else {
+        res.HolderIdentity = holderIdentity.substring(0, idx);
+      }
     }
 
     if (data.subsets) {

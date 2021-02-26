@@ -60,6 +60,18 @@ function createPortRange(portRangeText, port) {
   }
 }
 
+function extractPort(portKey) {
+  if (!portKey) {
+    return;
+  }
+
+  var idx = portKey.indexOf('/');
+  if (idx < 0) {
+    return parseInt(portKey);
+  }
+  return parseInt(portKey.substring(0, idx));
+}
+
 angular.module('portainer.docker').factory('ContainerHelper', [
   function ContainerHelperFactory() {
     'use strict';
@@ -210,15 +222,12 @@ angular.module('portainer.docker').factory('ContainerHelper', [
 
         _.forEach(portBindingKeysByHostIp, (portBindingKeys, ip) => {
           // Sort by host port
-          const sortedPortBindingKeys = _.orderBy(portBindingKeys, (portKey) => {
-            return parseInt(_.split(portKey, '/')[0]);
-          });
+          const sortedPortBindingKeys = _.orderBy(portBindingKeys, (portKey) => extractPort(portKey));
 
           let previousHostPort = -1;
           let previousContainerPort = -1;
           _.forEach(sortedPortBindingKeys, (portKey) => {
-            const portKeySplit = _.split(portKey, '/');
-            const containerPort = parseInt(portKeySplit[0]);
+            const containerPort = extractPort(portKey);
             const portBinding = portBindings[portKey][0];
             portBindings[portKey].shift();
             const hostPort = parsePort(portBinding.HostPort);
