@@ -5,7 +5,7 @@ const portPattern = /^([1-9]|[1-5]?[0-9]{2,4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655
 
 function parsePort(port) {
   if (portPattern.test(port)) {
-    return parseInt(port);
+    return parseInt(port, 10);
   } else {
     return 0;
   }
@@ -211,14 +211,14 @@ angular.module('portainer.docker').factory('ContainerHelper', [
         _.forEach(portBindingKeysByHostIp, (portBindingKeys, ip) => {
           // Sort by host port
           const sortedPortBindingKeys = _.orderBy(portBindingKeys, (portKey) => {
-            return parseInt(_.split(portKey, '/')[0]);
+            return parseInt(_.split(portKey, '/')[0], 10);
           });
 
           let previousHostPort = -1;
           let previousContainerPort = -1;
           _.forEach(sortedPortBindingKeys, (portKey) => {
             const portKeySplit = _.split(portKey, '/');
-            const containerPort = parseInt(portKeySplit[0]);
+            const containerPort = parseInt(portKeySplit[0], 10);
             const portBinding = portBindings[portKey][0];
             portBindings[portKey].shift();
             const hostPort = parsePort(portBinding.HostPort);
