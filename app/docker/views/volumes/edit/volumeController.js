@@ -51,14 +51,18 @@ angular.module('portainer.docker').controller('VolumeController', [
     };
 
     $scope.removeVolume = function removeVolume() {
-      VolumeService.remove($scope.volume)
-        .then(function success() {
-          Notifications.success('Volume successfully removed', $transition$.params().id);
-          $state.go('docker.volumes', {});
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to remove volume');
-        });
+      ModalService.confirmDeletion('Do you want to remove this volume?', (confirmed) => {
+        if (confirmed) {
+          VolumeService.remove($scope.volume)
+            .then(function success() {
+              Notifications.success('Volume successfully removed', $transition$.params().id);
+              $state.go('docker.volumes', {});
+            })
+            .catch(function error(err) {
+              Notifications.error('Failure', err, 'Unable to remove volume');
+            });
+        }
+      });
     };
 
     function getVolumeDataFromContainer(container, volumeId) {
