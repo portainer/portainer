@@ -20,6 +20,6 @@
     authorization="K8sClusterSetupRW"
     ng-if="$ctrl.currentState === 'kubernetes.cluster' || $ctrl.currentState === 'portainer.endpoints.endpoint.kubernetesConfig'"
   >
-    <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: $ctrl.endpointId})">Setup</a>
+    <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: $ctrl.endpointId})" ui-sref-active="active">Setup</a>
   </div>
 </li>
