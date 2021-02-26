@@ -1,7 +1,7 @@
-import * as _ from 'lodash-es';
+import _ from 'lodash-es';
 import angular from 'angular';
 import { KubernetesStorageClass, KubernetesStorageClassAccessPolicies } from 'Kubernetes/models/storage-class/models';
-import { KubernetesFormValueDuplicate } from 'Kubernetes/models/application/formValues';
+import { KubernetesFormValidationReferences } from 'Kubernetes/models/application/formValues';
 import { KubernetesIngressClass } from 'Kubernetes/ingress/models';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
@@ -82,7 +82,7 @@ class KubernetesConfigureController {
     const source = _.map(this.formValues.IngressClasses, (ic) => (ic.NeedsDeletion ? undefined : ic.Name));
     const duplicates = KubernetesFormValidationHelper.getDuplicates(source);
     state.refs = duplicates;
-    state.hasDuplicates = Object.keys(duplicates).length > 0;
+    state.hasRefs = Object.keys(duplicates).length > 0;
   }
 
   onChangeIngressClassName(index) {
@@ -212,7 +212,7 @@ class KubernetesConfigureController {
       viewReady: false,
       endpointId: this.$stateParams.id,
       duplicates: {
-        ingressClasses: new KubernetesFormValueDuplicate(),
+        ingressClasses: new KubernetesFormValidationReferences(),
       },
     };
 
