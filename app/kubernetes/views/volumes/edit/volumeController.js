@@ -2,6 +2,7 @@ import angular from 'angular';
 import _ from 'lodash-es';
 import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
+import { KubernetesStorageClassAccessPolicies } from 'Kubernetes/models/storage-class/models';
 import filesizeParser from 'filesize-parser';
 
 class KubernetesVolumeController {
@@ -213,6 +214,8 @@ class KubernetesVolumeController {
       increaseSize: false,
       volumeSize: 0,
       volumeSizeUnit: 'GB',
+      volumeSharedAccessPolicy: '',
+      volumeSharedAccessPolicyTooltip: '',
       errors: {
         volumeSize: false,
         quotaExceeded: false,
@@ -224,6 +227,16 @@ class KubernetesVolumeController {
     try {
       await this.getVolume();
       await this.getEvents();
+      if (this.volume.PersistentVolumeClaim.StorageClass !== undefined) {
+        this.state.volumeSharedAccessPolicy = this.volume.PersistentVolumeClaim.StorageClass.AccessModes[this.volume.PersistentVolumeClaim.StorageClass.AccessModes.length - 1];
+        let policies = KubernetesStorageClassAccessPolicies();
+
+        policies.forEach((policy) => {
+          if (policy.Name == this.state.volumeSharedAccessPolicy) {
+            this.state.volumeSharedAccessPolicyTooltip = policy.Description;
+          }
+        });
+      }
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     } finally {
