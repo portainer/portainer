@@ -118,7 +118,11 @@ class KubernetesApplicationConverter {
       res.PublishedPorts = ports;
     }
 
-    res.Volumes = data.spec.template.spec.volumes ? data.spec.template.spec.volumes : [];
+    if (data.spec.template) {
+      res.Volumes = data.spec.template.spec.volumes ? data.spec.template.spec.volumes : [];
+    } else {
+      res.Volumes = data.spec.volumes;
+    }
 
     // TODO: review
     // this if() fixs direct use of PVC reference inside spec.template.spec.containers[0].volumeMounts
