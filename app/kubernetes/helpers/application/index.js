@@ -175,7 +175,10 @@ class KubernetesApplicationHelper {
           item.OverridenKeys = _.map(keys, (k) => {
             const fvKey = new KubernetesApplicationConfigurationFormValueOverridenKey();
             fvKey.Key = k.Key;
-            if (index < k.EnvCount) {
+            if (!k.Count) {
+              // !k.Count indicates k.Key is new added to the configuration and has not been loaded to the application yet
+              fvKey.Type = KubernetesApplicationConfigurationFormValueOverridenKeyTypes.NONE;
+            } else if (index < k.EnvCount) {
               fvKey.Type = KubernetesApplicationConfigurationFormValueOverridenKeyTypes.ENVIRONMENT;
             } else {
               fvKey.Type = KubernetesApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM;
