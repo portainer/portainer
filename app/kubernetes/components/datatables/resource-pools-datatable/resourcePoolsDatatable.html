@@ -118,7 +118,7 @@
                 <span style="margin-left: 5px;" class="label label-info image-tag" ng-if="$ctrl.isSystemNamespace(item)">system</span>
               </td>
               <td> <i class="fa {{ item.Quota ? 'fa-toggle-on' : 'fa-toggle-off' }}" aria-hidden="true" style="margin-right: 2px;"></i> {{ item.Quota ? 'Yes' : 'No' }} </td>
-              <td>{{ item.CreationDate | getisodate }} {{ item.Namespace.ResourcePoolOwner ? 'by ' + item.Namespace.ResourcePoolOwner : '' }}</td>
+              <td>{{ item.Namespace.CreationDate | getisodate }} {{ item.Namespace.ResourcePoolOwner ? 'by ' + item.Namespace.ResourcePoolOwner : '' }}</td>
               <td authorization="K8sResourcePoolsAccessManagementRW">
                 <a ng-if="$ctrl.canManageAccess(item)" ui-sref="kubernetes.resourcePools.resourcePool.access({id: item.Namespace.Name})">
                   <i class="fa fa-users" aria-hidden="true"></i> Manage access
