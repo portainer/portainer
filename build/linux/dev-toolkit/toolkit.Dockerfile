@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM ubuntu:20.04
 
 # Expose port for the Portainer UI and Edge server
 EXPOSE 9000
@@ -10,7 +10,7 @@ WORKDIR /src/portainer
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
 # Set default go version
-ARG GO_VERSION=go1.13.11.linux-amd64
+ARG GO_VERSION=go1.16.linux-amd64
 
 # Install packages
 RUN apt-get update --fix-missing && apt-get install -qq \
@@ -18,9 +18,26 @@ RUN apt-get update --fix-missing && apt-get install -qq \
     apt-utils \
     curl \
     build-essential \
-    nodejs \
     git \
-    wget
+    wget \
+    apt-transport-https \
+    ca-certificates \
+    gnupg-agent \
+    software-properties-common
+
+# Install Docker CLI
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - \
+    && add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable" \
+   && apt-get update \
+   && apt-get install docker-ce-cli
+
+
+# Install NodeJS
+RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash - \
+    && apt-get install -y nodejs
 
 # Install Yarn
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
@@ -34,7 +51,13 @@ RUN cd /tmp \
     && mv go /usr/local
 
 # Configure Go
-ENV PATH "$PATH:/usr/local/go/bin"
+# ENV PATH "$PATH:/usr/local/go/bin"
 
 # Confirm installation
-RUN go version && node -v && yarn -v
+# RUN go version && node -v && yarn -v
+
+# Copy run script
+COPY run.sh /
+RUN chmod +x /run.sh
+
+ENTRYPOINT ["/run.sh"]
