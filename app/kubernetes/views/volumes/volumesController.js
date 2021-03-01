@@ -1,8 +1,11 @@
+require('../../templates/advancedDeploymentPanel.html');
+
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import angular from 'angular';
 import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
 import KubernetesResourceQuotaHelper from 'Kubernetes/helpers/resourceQuotaHelper';
+import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
 
 function buildStorages(storages, volumes) {
   _.forEach(storages, (s) => {
@@ -109,6 +112,10 @@ class KubernetesVolumesController {
 
   getVolumes() {
     return this.$async(this.getVolumesAsync);
+  }
+
+  advancedDeploymentDisabled() {
+    return this.state.endpointType === PortainerEndpointTypes.AgentOnKubernetesEnvironment || this.state.endpointType === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment;
   }
 
   async onInit() {
