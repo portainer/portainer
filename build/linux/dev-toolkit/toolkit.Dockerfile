@@ -50,12 +50,6 @@ RUN cd /tmp \
     && tar -xf ${GO_VERSION}.tar.gz \
     && mv go /usr/local
 
-# Configure Go
-# ENV PATH "$PATH:/usr/local/go/bin"
-
-# Confirm installation
-# RUN go version && node -v && yarn -v
-
 # Copy run script
 COPY run.sh /
 RUN chmod +x /run.sh
