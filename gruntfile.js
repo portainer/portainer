@@ -7,6 +7,7 @@ var arch = os.arch();
 if (arch === 'x64') arch = 'amd64';
 
 var portainer_data = '/tmp/portainer';
+var portainer_root = process.env.PORTAINER_PROJECT ? process.env.PORTAINER_PROJECT : process.env.PWD;
 
 module.exports = function (grunt) {
   loadGruntTasks(grunt, {
