@@ -55,12 +55,6 @@ display_configuration() {
 }
 
 main() {
-    # if [[ $# -ne 3 ]]; then
-    #     error "Not enough arguments"
-    #     error "Usage: ${0} <USER> <UID> <GID>"
-    #     exit 1
-    # fi
-
     [[ -z $PUSER ]] && errorAndExit "Unable to find PUSER environment variable. Please ensure PUSER is set before running this script."
     [[ -z $PUID ]] && errorAndExit "Unable to find PUID environment variable. Please ensure PUID is set before running this script."
     [[ -z $PGID ]] && errorAndExit "Unable to find PGID environment variable. Please ensure PGID is set before running this script."
@@ -86,6 +80,14 @@ main() {
         info "Configuring Go..."
         echo "PATH=\"$PATH:/usr/local/go/bin\"" > /etc/environment
 
+        info "Configuring Git..."
+        su $PUSER -c "git config --global url.git@github.com:.insteadOf https://github.com/"
+
+        info "Configuring SSH..."
+        mkdir /home/$PUSER/.ssh
+        cp /host-ssh/* /home/$PUSER/.ssh/
+        chown -R $PUSER:$PUSER /home/$PUSER/.ssh
+
         touch "${SETUP_FILE}"
         success "Portainer dev-toolkit container successfully configured."
 
@@ -94,5 +96,4 @@ main() {
 }
 
 main
-# info "Exec $@"
 su $PUSER -s "$@"
