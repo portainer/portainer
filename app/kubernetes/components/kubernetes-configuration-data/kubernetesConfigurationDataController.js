@@ -20,7 +20,7 @@ class KubernetesConfigurationDataController {
   }
 
   onChangeKey(entry) {
-    if (entry.Used) {
+    if (entry && entry.Used) {
       return;
     }
 
@@ -84,6 +84,7 @@ class KubernetesConfigurationDataController {
   showSimpleMode() {
     this.formValues.IsSimple = true;
     this.formValues.Data = KubernetesConfigurationHelper.parseYaml(this.formValues);
+    this.onChangeKey();
   }
 
   showAdvancedMode() {
@@ -93,7 +94,7 @@ class KubernetesConfigurationDataController {
 
   $onInit() {
     this.state = {
-      duplicateKeys: {},
+      duplicateKeys: [],
     };
   }
 }
