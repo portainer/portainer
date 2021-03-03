@@ -456,7 +456,7 @@ angular.module('portainer.docker', ['portainer.app']).config([
 
     var stack = {
       name: 'docker.stacks.stack',
-      url: '/:name?id&type&external',
+      url: '/:name?id&type&regular&external&orphaned&orphanedRunning',
       views: {
         'content@': {
           templateUrl: '~Portainer/views/stacks/edit/stack.html',

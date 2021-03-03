@@ -1,6 +1,7 @@
 package stacks
 
 import (
+	httperrors "github.com/portainer/portainer/api/http/errors"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -12,8 +13,9 @@ import (
 )
 
 type stackListOperationFilters struct {
-	SwarmID    string `json:"SwarmID"`
-	EndpointID int    `json:"EndpointID"`
+	SwarmID               string `json:"SwarmID"`
+	EndpointID            int    `json:"EndpointID"`
+	IncludeOrphanedStacks bool   `json:"IncludeOrphanedStacks"`
 }
 
 // @id StackList
@@ -37,11 +39,16 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: filters", err}
 	}
 
+	endpoints, err := handler.DataStore.Endpoint().Endpoints()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from database", err}
+	}
+
 	stacks, err := handler.DataStore.Stack().Stacks()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
 	}
-	stacks = filterStacks(stacks, &filters)
+	stacks = filterStacks(stacks, &filters, endpoints)
 
 	resourceControls, err := handler.DataStore.ResourceControl().ResourceControls()
 	if err != nil {
@@ -56,6 +63,10 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 	stacks = authorization.DecorateStacks(stacks, resourceControls)
 
 	if !securityContext.IsAdmin {
+		if filters.IncludeOrphanedStacks {
+			return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access orphaned stacks", httperrors.ErrUnauthorized}
+		}
+
 		user, err := handler.DataStore.User().User(securityContext.UserID)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user information from the database", err}
@@ -72,13 +83,20 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 	return response.JSON(w, stacks)
 }
 
-func filterStacks(stacks []portainer.Stack, filters *stackListOperationFilters) []portainer.Stack {
+func filterStacks(stacks []portainer.Stack, filters *stackListOperationFilters, endpoints []portainer.Endpoint) []portainer.Stack {
 	if filters.EndpointID == 0 && filters.SwarmID == "" {
 		return stacks
 	}
 
 	filteredStacks := make([]portainer.Stack, 0, len(stacks))
 	for _, stack := range stacks {
+		if filters.IncludeOrphanedStacks && isOrphanedStack(stack, endpoints) {
+			if (stack.Type == portainer.DockerComposeStack && filters.SwarmID == "") || (stack.Type == portainer.DockerSwarmStack && filters.SwarmID != "") {
+				filteredStacks = append(filteredStacks, stack)
+			}
+			continue
+		}
+
 		if stack.Type == portainer.DockerComposeStack && stack.EndpointID == portainer.EndpointID(filters.EndpointID) {
 			filteredStacks = append(filteredStacks, stack)
 		}
@@ -88,4 +106,14 @@ func filterStacks(stacks []portainer.Stack, filters *stackListOperationFilters) 
 	}
 
 	return filteredStacks
+}
+
+func isOrphanedStack(stack portainer.Stack, endpoints []portainer.Endpoint) bool {
+	for _, endpoint := range endpoints {
+		if stack.EndpointID == endpoint.ID {
+			return false
+		}
+	}
+
+	return true
 }

@@ -8,5 +8,6 @@ angular.module('portainer.app').component('porAccessControlForm', {
     // Optional. An existing resource control object that will be used to set
     // the default values of the component.
     resourceControl: '<',
+    hideTitle: '<',
   },
 });

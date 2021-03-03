@@ -14,6 +14,10 @@
                 </div>
                 <div class="menuContent">
                   <div>
+                    <div class="md-checkbox" ng-if="$ctrl.isAdmin">
+                      <input id="setting_all_orphaned_stacks" type="checkbox" ng-model="$ctrl.settings.allOrphanedStacks" ng-change="$ctrl.onSettingsAllOrphanedStacksChange()" />
+                      <label for="setting_all_orphaned_stacks">Show all orphaned stacks</label>
+                    </div>
                     <div class="md-checkbox">
                       <input id="setting_auto_refresh" type="checkbox" ng-model="$ctrl.settings.repeater.autoRefresh" ng-change="$ctrl.onSettingsRepeaterChange()" />
                       <label for="setting_auto_refresh">Auto refresh</label>
@@ -151,12 +155,26 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="!$ctrl.allowSelection(item)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ng-if="!$ctrl.offlineMode" ui-sref="docker.stacks.stack({ name: item.Name, id: item.Id, type: item.Type, external: item.External })">{{ item.Name }}</a>
+                <a
+                  ng-if="!$ctrl.offlineMode"
+                  ui-sref="docker.stacks.stack({ name: item.Name, id: item.Id, type: item.Type, regular: item.Regular, external: item.External, orphaned: item.Orphaned, orphanedRunning: item.OrphanedRunning })"
+                  >{{ item.Name }}</a
+                >
                 <span ng-if="$ctrl.offlineMode">{{ item.Name }}</span>
-                <span ng-if="item.Status == 2" style="margin-left: 10px;" class="label label-warning image-tag space-left">Inactive</span>
+                <span ng-if="item.Regular && item.Status == 2" style="margin-left: 10px;" class="label label-warning image-tag space-left">Inactive</span>
               </td>
               <td>{{ item.Type === 1 ? 'Swarm' : 'Compose' }}</td>
               <td>
+                <span
+                  ng-if="item.Orphaned"
+                  class="interactive"
+                  tooltip-append-to-body="true"
+                  tooltip-placement="bottom"
+                  tooltip-class="portainer-tooltip"
+                  uib-tooltip="This stack was created inside an endpoint that is no longer registered inside Portainer."
+                >
+                  Orphaned <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-left: 2px;"></i>
+                </span>
                 <span
                   ng-if="item.External"
                   class="interactive"
@@ -167,7 +185,7 @@
                 >
                   Limited <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-left: 2px;"></i>
                 </span>
-                <span ng-if="!item.External">Total</span>
+                <span ng-if="item.Regular">Total</span>
               </td>
               <td>
                 <span ng-if="item.CreationDate">{{ item.CreationDate | getisodatefromtimestamp }} {{ item.CreatedBy ? 'by ' + item.CreatedBy : '' }}</span>

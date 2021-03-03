@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { StackViewModel } from '../../models/stack';
+import { StackViewModel, OrphanedStackViewModel } from '../../models/stack';
 
 angular.module('portainer.app').factory('StackService', [
   '$q',
@@ -88,15 +88,15 @@ angular.module('portainer.app').factory('StackService', [
       return deferred.promise;
     };
 
-    service.stacks = function (compose, swarm, endpointId) {
+    service.stacks = function (compose, swarm, endpointId, includeOrphanedStacks = false) {
       var deferred = $q.defer();
 
       var queries = [];
       if (compose) {
-        queries.push(service.composeStacks(true, { EndpointID: endpointId }));
+        queries.push(service.composeStacks(endpointId, true, { EndpointID: endpointId, IncludeOrphanedStacks: includeOrphanedStacks }));
       }
       if (swarm) {
-        queries.push(service.swarmStacks(true));
+        queries.push(service.swarmStacks(endpointId, true, { IncludeOrphanedStacks: includeOrphanedStacks }));
       }
 
       $q.all(queries)
@@ -145,7 +145,22 @@ angular.module('portainer.app').factory('StackService', [
       return deferred.promise;
     };
 
-    service.composeStacks = function (includeExternalStacks, filters) {
+    service.unionStacks = function (stacks, externalStacks) {
+      stacks.forEach((stack) => {
+        externalStacks.forEach((externalStack) => {
+          if (stack.Orphaned && stack.Name == externalStack.Name) {
+            stack.OrphanedRunning = true;
+          }
+        });
+      });
+      const result = _.unionWith(stacks, externalStacks, function (a, b) {
+        return a.Name === b.Name;
+      });
+
+      return result;
+    };
+
+    service.composeStacks = function (endpointId, includeExternalStacks, filters) {
       var deferred = $q.defer();
 
       $q.all({
@@ -154,14 +169,15 @@ angular.module('portainer.app').factory('StackService', [
       })
         .then(function success(data) {
           var stacks = data.stacks.map(function (item) {
-            item.External = false;
-            return new StackViewModel(item);
+            if (item.EndpointId == endpointId) {
+              return new StackViewModel(item);
+            } else {
+              return new OrphanedStackViewModel(item);
+            }
           });
-          var externalStacks = data.externalStacks;
 
-          var result = _.unionWith(stacks, externalStacks, function (a, b) {
-            return a.Name === b.Name;
-          });
+          var externalStacks = data.externalStacks;
+          const result = service.unionStacks(stacks, externalStacks);
           deferred.resolve(result);
         })
         .catch(function error(err) {
@@ -171,13 +187,13 @@ angular.module('portainer.app').factory('StackService', [
       return deferred.promise;
     };
 
-    service.swarmStacks = function (includeExternalStacks) {
+    service.swarmStacks = function (endpointId, includeExternalStacks, filters = {}) {
       var deferred = $q.defer();
 
       SwarmService.swarm()
         .then(function success(data) {
           var swarm = data;
-          var filters = { SwarmID: swarm.Id };
+          filters = { SwarmID: swarm.Id, ...filters };
 
           return $q.all({
             stacks: Stack.query({ filters: filters }).$promise,
@@ -186,14 +202,15 @@ angular.module('portainer.app').factory('StackService', [
         })
         .then(function success(data) {
           var stacks = data.stacks.map(function (item) {
-            item.External = false;
-            return new StackViewModel(item);
+            if (item.EndpointId == endpointId) {
+              return new StackViewModel(item);
+            } else {
+              return new OrphanedStackViewModel(item);
+            }
           });
-          var externalStacks = data.externalStacks;
 
-          var result = _.unionWith(stacks, externalStacks, function (a, b) {
-            return a.Name === b.Name;
-          });
+          var externalStacks = data.externalStacks;
+          const result = service.unionStacks(stacks, externalStacks);
           deferred.resolve(result);
         })
         .catch(function error(err) {
@@ -213,6 +230,34 @@ angular.module('portainer.app').factory('StackService', [
         .catch(function error(err) {
           deferred.reject({ msg: 'Unable to remove the stack', err: err });
         });
+
+      return deferred.promise;
+    };
+
+    service.associate = function (stack, endpointId, orphanedRunning) {
+      var deferred = $q.defer();
+
+      if (stack.Type == 1) {
+        SwarmService.swarm()
+          .then(function success(data) {
+            const swarm = data;
+            return Stack.associate({ id: stack.Id, endpointId: endpointId, swarmId: swarm.Id, orphanedRunning }).$promise;
+          })
+          .then(function success(data) {
+            deferred.resolve(data);
+          })
+          .catch(function error(err) {
+            deferred.reject({ msg: 'Unable to associate the stack', err: err });
+          });
+      } else {
+        Stack.associate({ id: stack.Id, endpointId: endpointId, orphanedRunning })
+          .$promise.then(function success(data) {
+            deferred.resolve(data);
+          })
+          .catch(function error(err) {
+            deferred.reject({ msg: 'Unable to associate the stack', err: err });
+          });
+      }
 
       return deferred.promise;
     };
