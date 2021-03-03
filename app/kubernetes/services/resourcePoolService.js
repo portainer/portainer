@@ -3,6 +3,7 @@ import _ from 'lodash-es';
 import angular from 'angular';
 import KubernetesResourcePoolConverter from 'Kubernetes/converters/resourcePool';
 import KubernetesResourceQuotaHelper from 'Kubernetes/helpers/resourceQuotaHelper';
+import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
 
 /* @ngInject */
 export function KubernetesResourcePoolService($async, KubernetesNamespaceService, KubernetesResourceQuotaService, KubernetesIngressService) {
@@ -57,6 +58,8 @@ export function KubernetesResourcePoolService($async, KubernetesNamespaceService
   }
 
   function create(formValues) {
+    formValues.Owner = KubernetesCommonHelper.ownerToLabel(formValues.Owner);
+
     return $async(async () => {
       try {
         const [namespace, quota, ingresses] = KubernetesResourcePoolConverter.formValuesToResourcePool(formValues);

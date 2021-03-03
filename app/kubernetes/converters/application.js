@@ -27,6 +27,7 @@ import KubernetesServiceConverter from 'Kubernetes/converters/service';
 import KubernetesPersistentVolumeClaimConverter from 'Kubernetes/converters/persistentVolumeClaim';
 import PortainerError from 'Portainer/error';
 import { KubernetesIngressHelper } from 'Kubernetes/ingress/helper';
+import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
 
 function _apiPortsToPublishedPorts(pList, pRefs) {
   const ports = _.map(pList, (item) => {
@@ -287,7 +288,7 @@ class KubernetesApplicationConverter {
   }
 
   static applicationFormValuesToApplication(formValues) {
-    formValues.ApplicationOwner = _.replace(formValues.ApplicationOwner, /[^-A-Za-z0-9_.]/, '.');
+    formValues.ApplicationOwner = KubernetesCommonHelper.ownerToLabel(formValues.ApplicationOwner);
 
     const claims = KubernetesPersistentVolumeClaimConverter.applicationFormValuesToVolumeClaims(formValues);
     const rwx = _.find(claims, (item) => _.includes(item.StorageClass.AccessModes, 'RWX')) !== undefined;
