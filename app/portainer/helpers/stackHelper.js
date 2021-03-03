@@ -1,5 +1,6 @@
 import _ from 'lodash-es';
-
+import YAML from 'yaml';
+import GenericHelper from '@/portainer/helpers/genericHelper';
 import { ExternalStackViewModel } from '@/portainer/models/stack';
 
 angular.module('portainer.app').factory('StackHelper', [
@@ -21,6 +22,28 @@ angular.module('portainer.app').factory('StackHelper', [
         'Name'
       );
     }
+
+    helper.validateYAML = function (yaml, containerNames) {
+      let yamlObject;
+
+      try {
+        yamlObject = YAML.parse(yaml);
+      } catch (err) {
+        return 'There is an error in the yaml syntax: ' + err;
+      }
+
+      const names = _.uniq(GenericHelper.findDeepAll(yamlObject, 'container_name'));
+      const duplicateContainers = _.intersection(containerNames, names);
+
+      if (duplicateContainers.length === 0) return;
+
+      return (
+        (duplicateContainers.length === 1 ? 'This container name is' : 'These container names are') +
+        ' already used by another container running in this environment: ' +
+        _.join(duplicateContainers, ', ') +
+        '.'
+      );
+    };
 
     return helper;
   },
