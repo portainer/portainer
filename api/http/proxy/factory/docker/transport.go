@@ -738,7 +738,7 @@ func (transport *Transport) createOperationContext(request *http.Request) (*rest
 }
 
 func (transport *Transport) isAdminOrEndpointAdmin(request *http.Request) (bool, error) {
-	if !transport.authDisabled {
+	if transport.authDisabled {
 		return true, nil
 	}
 
