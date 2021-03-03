@@ -1418,7 +1418,7 @@
                           class="btn btn-primary"
                           ng-model="publishedPort.Protocol"
                           uib-btn-radio="'TCP'"
-                          ng-change="ctrl.onChangePortMappingContainerPort()"
+                          ng-change="ctrl.onChangePortProtocol($index)"
                           ng-disabled="ctrl.isProtocolOptionDisabled($index, 'TCP')"
                           >TCP</label
                         >
@@ -1426,7 +1426,7 @@
                           class="btn btn-primary"
                           ng-model="publishedPort.Protocol"
                           uib-btn-radio="'UDP'"
-                          ng-change="ctrl.onChangePortMappingContainerPort()"
+                          ng-change="ctrl.onChangePortProtocol($index)"
                           ng-disabled="ctrl.isProtocolOptionDisabled($index, 'UDP')"
                           >UDP</label
                         >
