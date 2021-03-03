@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"path"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/asaskevich/govalidator"
