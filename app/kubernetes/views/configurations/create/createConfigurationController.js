@@ -25,6 +25,10 @@ class KubernetesCreateConfigurationController {
     this.state.alreadyExist = _.find(filteredConfigurations, (config) => config.Name === this.formValues.Name) !== undefined;
   }
 
+  onResourcePoolSelectionChange() {
+    this.onChangeName();
+  }
+
   isFormValid() {
     const uniqueCheck = !this.state.alreadyExist && this.state.isDataValid;
     if (this.formValues.IsSimple) {

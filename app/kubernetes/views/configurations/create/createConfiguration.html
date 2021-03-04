@@ -56,6 +56,7 @@
                   id="resource-pool-selector"
                   ng-model="ctrl.formValues.ResourcePool"
                   ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools"
+                  ng-change="ctrl.onResourcePoolSelectionChange()"
                 ></select>
               </div>
             </div>
