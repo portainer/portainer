@@ -161,6 +161,7 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 			Devices    []interface{} `json:"Devices"`
 			CapAdd     []string      `json:"CapAdd"`
 			CapDrop    []string      `json:"CapDrop"`
+			Binds      []string      `json:"Binds"`
 		} `json:"HostConfig"`
 	}
 
@@ -173,65 +174,55 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 		return nil, err
 	}
 
-	if !transport.authDisabled {
-		user, err := transport.userService.User(tokenData.ID)
+	isAdminOrEndpointAdmin, err := transport.isAdminOrEndpointAdmin(request)
+	if err != nil {
+		return nil, err
+	}
+
+	if !isAdminOrEndpointAdmin {
+		settings, err := transport.settingsService.Settings()
 		if err != nil {
 			return nil, err
 		}
 
-		rbacExtension, err := transport.extensionService.Extension(portainer.RBACExtension)
-		if err != nil && err != portainer.ErrObjectNotFound {
-			return nil, err
-		}
+		if !settings.AllowPrivilegedModeForRegularUsers ||
+			!settings.AllowHostNamespaceForRegularUsers ||
+			!settings.AllowDeviceMappingForRegularUsers ||
+			!settings.AllowContainerCapabilitiesForRegularUsers ||
+			!settings.AllowBindMountsForRegularUsers {
 
-		endpointResourceAccess := false
-		_, ok := user.EndpointAuthorizations[portainer.EndpointID(transport.endpoint.ID)][portainer.EndpointResourcesAccess]
-		if ok {
-			endpointResourceAccess = true
-		}
-
-		isAdmin := (rbacExtension != nil && endpointResourceAccess) || tokenData.Role == portainer.AdministratorRole
-
-		if !isAdmin {
-			settings, err := transport.settingsService.Settings()
+			body, err := ioutil.ReadAll(request.Body)
 			if err != nil {
 				return nil, err
 			}
 
-			if !settings.AllowPrivilegedModeForRegularUsers ||
-				!settings.AllowHostNamespaceForRegularUsers ||
-				!settings.AllowDeviceMappingForRegularUsers ||
-				!settings.AllowContainerCapabilitiesForRegularUsers {
-
-				body, err := ioutil.ReadAll(request.Body)
-				if err != nil {
-					return nil, err
-				}
-
-				partialContainer := &PartialContainer{}
-				err = json.Unmarshal(body, partialContainer)
-				if err != nil {
-					return nil, err
-				}
-
-				if !settings.AllowPrivilegedModeForRegularUsers && partialContainer.HostConfig.Privileged {
-					return forbiddenResponse, errors.New("forbidden to use privileged mode")
-				}
-
-				if !settings.AllowHostNamespaceForRegularUsers && partialContainer.HostConfig.PidMode == "host" {
-					return forbiddenResponse, errors.New("forbidden to use pid host namespace")
-				}
-
-				if !settings.AllowDeviceMappingForRegularUsers && len(partialContainer.HostConfig.Devices) > 0 {
-					return nil, errors.New("forbidden to use device mapping")
-				}
-
-				if !settings.AllowContainerCapabilitiesForRegularUsers && (len(partialContainer.HostConfig.CapAdd) > 0 || len(partialContainer.HostConfig.CapDrop) > 0) {
-					return nil, errors.New("forbidden to use container capabilities")
-				}
-
-				request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+			partialContainer := &PartialContainer{}
+			err = json.Unmarshal(body, partialContainer)
+			if err != nil {
+				return nil, err
 			}
+
+			if !settings.AllowPrivilegedModeForRegularUsers && partialContainer.HostConfig.Privileged {
+				return forbiddenResponse, errors.New("forbidden to use privileged mode")
+			}
+
+			if !settings.AllowHostNamespaceForRegularUsers && partialContainer.HostConfig.PidMode == "host" {
+				return forbiddenResponse, errors.New("forbidden to use pid host namespace")
+			}
+
+			if !settings.AllowDeviceMappingForRegularUsers && len(partialContainer.HostConfig.Devices) > 0 {
+				return nil, errors.New("forbidden to use device mapping")
+			}
+
+			if !settings.AllowContainerCapabilitiesForRegularUsers && (len(partialContainer.HostConfig.CapAdd) > 0 || len(partialContainer.HostConfig.CapDrop) > 0) {
+				return nil, errors.New("forbidden to use container capabilities")
+			}
+
+			if !settings.AllowBindMountsForRegularUsers && (len(partialContainer.HostConfig.Binds) > 0) {
+				return forbiddenResponse, errors.New("forbidden to use bind mounts")
+			}
+
+			request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 		}
 	}
 

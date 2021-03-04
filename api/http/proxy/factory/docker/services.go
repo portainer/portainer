@@ -1,7 +1,11 @@
 package docker
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"errors"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/docker/docker/api/types"
@@ -83,4 +87,55 @@ func selectorServiceLabels(responseObject map[string]interface{}) map[string]int
 		return responseutils.GetJSONObject(serviceSpecObject, "Labels")
 	}
 	return nil
+}
+
+func (transport *Transport) decorateServiceCreationOperation(request *http.Request) (*http.Response, error) {
+	type PartialService struct {
+		TaskTemplate struct {
+			ContainerSpec struct {
+				Mounts []struct {
+					Type string
+				}
+			}
+		}
+	}
+
+	forbiddenResponse := &http.Response{
+		StatusCode: http.StatusForbidden,
+	}
+
+	isAdminOrEndpointAdmin, err := transport.isAdminOrEndpointAdmin(request)
+	if err != nil {
+		return nil, err
+	}
+
+	if !isAdminOrEndpointAdmin {
+		settings, err := transport.settingsService.Settings()
+		if err != nil {
+			return nil, err
+		}
+
+		body, err := ioutil.ReadAll(request.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		partialService := &PartialService{}
+		err = json.Unmarshal(body, partialService)
+		if err != nil {
+			return nil, err
+		}
+
+		if !settings.AllowBindMountsForRegularUsers && (len(partialService.TaskTemplate.ContainerSpec.Mounts) > 0) {
+			for _, mount := range partialService.TaskTemplate.ContainerSpec.Mounts {
+				if mount.Type == "bind" {
+					return forbiddenResponse, errors.New("forbidden to use bind mounts")
+				}
+			}
+		}
+
+		request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+	}
+
+	return transport.replaceRegistryAuthenticationHeader(request)
 }

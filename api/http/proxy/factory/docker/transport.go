@@ -248,7 +248,7 @@ func (transport *Transport) proxyContainerRequest(request *http.Request) (*http.
 func (transport *Transport) proxyServiceRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/services/create":
-		return transport.replaceRegistryAuthenticationHeader(request)
+		return transport.decorateServiceCreationOperation(request)
 
 	case "/services":
 		return transport.rewriteOperation(request, transport.serviceListOperation)
@@ -735,4 +735,37 @@ func (transport *Transport) createOperationContext(request *http.Request) (*rest
 	}
 
 	return operationContext, nil
+}
+
+func (transport *Transport) isAdminOrEndpointAdmin(request *http.Request) (bool, error) {
+	if transport.authDisabled {
+		return true, nil
+	}
+
+	tokenData, err := security.RetrieveTokenData(request)
+	if err != nil {
+		return false, err
+	}
+
+	if tokenData.Role == portainer.AdministratorRole {
+		return true, nil
+	}
+
+	user, err := transport.userService.User(tokenData.ID)
+	if err != nil {
+		return false, err
+	}
+
+	rbacExtension, err := transport.extensionService.Extension(portainer.RBACExtension)
+	if err != nil && err != portainer.ErrObjectNotFound {
+		return false, err
+	}
+
+	if rbacExtension == nil {
+		return false, nil
+	}
+
+	_, endpointResourceAccess := user.EndpointAuthorizations[portainer.EndpointID(transport.endpoint.ID)][portainer.EndpointResourcesAccess]
+
+	return endpointResourceAccess, nil
 }

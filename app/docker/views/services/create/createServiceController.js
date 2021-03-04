@@ -33,6 +33,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
   'SettingsService',
   'WebhookService',
   'EndpointProvider',
+  'ExtensionService',
   function (
     $q,
     $scope,
@@ -58,7 +59,8 @@ angular.module('portainer.docker').controller('CreateServiceController', [
     NodeService,
     SettingsService,
     WebhookService,
-    EndpointProvider
+    EndpointProvider,
+    ExtensionService
   ) {
     $scope.formValues = {
       Name: '',
@@ -105,6 +107,8 @@ angular.module('portainer.docker').controller('CreateServiceController', [
       formValidationError: '',
       actionInProgress: false,
     };
+
+    $scope.allowBindMounts = false;
 
     $scope.refreshSlider = function () {
       $timeout(function () {
@@ -562,8 +566,8 @@ angular.module('portainer.docker').controller('CreateServiceController', [
         secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
         configs: apiVersion >= 1.3 ? ConfigService.configs() : [],
         nodes: NodeService.nodes(),
-        settings: SettingsService.publicSettings(),
         availableLoggingDrivers: PluginService.loggingPlugins(apiVersion < 1.25),
+        allowBindMounts: checkIfAllowedBindMounts(),
       })
         .then(function success(data) {
           $scope.availableVolumes = data.volumes;
@@ -572,8 +576,8 @@ angular.module('portainer.docker').controller('CreateServiceController', [
           $scope.availableConfigs = data.configs;
           $scope.availableLoggingDrivers = data.availableLoggingDrivers;
           initSlidersMaxValuesBasedOnNodeData(data.nodes);
-          $scope.allowBindMounts = data.settings.AllowBindMountsForRegularUsers;
           $scope.isAdmin = Authentication.isAdmin();
+          $scope.allowBindMounts = data.allowBindMounts;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to initialize view');
@@ -581,5 +585,22 @@ angular.module('portainer.docker').controller('CreateServiceController', [
     }
 
     initView();
+
+    async function checkIfAllowedBindMounts() {
+      const isAdmin = Authentication.isAdmin();
+
+      const settings = await SettingsService.publicSettings();
+      const { AllowBindMountsForRegularUsers } = settings;
+
+      if (isAdmin || AllowBindMountsForRegularUsers) {
+        return true;
+      }
+      const rbacEnabled = await ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC);
+      if (rbacEnabled) {
+        return Authentication.hasAuthorizations(['EndpointResourcesAccess']);
+      }
+
+      return false;
+    }
   },
 ]);
