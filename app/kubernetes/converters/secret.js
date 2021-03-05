@@ -9,7 +9,8 @@ class KubernetesSecretConverter {
     const res = new KubernetesSecretCreatePayload();
     res.metadata.name = secret.Name;
     res.metadata.namespace = secret.Namespace;
-    res.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] = secret.ConfigurationOwner;
+    const configurationOwner = _.truncate(secret.configurationOwner, { length: 63, omission: '' });
+    res.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] = configurationOwner;
     res.stringData = secret.Data;
     return res;
   }
