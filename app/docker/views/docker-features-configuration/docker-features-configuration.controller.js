@@ -15,6 +15,7 @@ export default class DockerFeaturesConfigurationController {
       disableStackManagementForRegularUsers: false,
       disableDeviceMappingForRegularUsers: false,
       disableContainerCapabilitiesForRegularUsers: false,
+      disableSysctlSettingForRegularUsers: false,
     };
 
     this.isAgent = false;
@@ -33,13 +34,15 @@ export default class DockerFeaturesConfigurationController {
       disablePrivilegedModeForRegularUsers,
       disableDeviceMappingForRegularUsers,
       disableContainerCapabilitiesForRegularUsers,
+      disableSysctlSettingForRegularUsers,
     } = this.formValues;
     return (
       disableBindMountsForRegularUsers ||
       disableHostNamespaceForRegularUsers ||
       disablePrivilegedModeForRegularUsers ||
       disableDeviceMappingForRegularUsers ||
-      disableContainerCapabilitiesForRegularUsers
+      disableContainerCapabilitiesForRegularUsers ||
+      disableSysctlSettingForRegularUsers
     );
   }
 
@@ -56,6 +59,7 @@ export default class DockerFeaturesConfigurationController {
           allowDeviceMappingForRegularUsers: !this.formValues.disableDeviceMappingForRegularUsers,
           allowStackManagementForRegularUsers: !this.formValues.disableStackManagementForRegularUsers,
           allowContainerCapabilitiesForRegularUsers: !this.formValues.disableContainerCapabilitiesForRegularUsers,
+          allowSysctlSettingForRegularUsers: !this.formValues.disableSysctlSettingForRegularUsers,
         };
 
         await this.EndpointService.updateSecuritySettings(this.endpoint.Id, securitySettings);
@@ -89,6 +93,7 @@ export default class DockerFeaturesConfigurationController {
       disableDeviceMappingForRegularUsers: !securitySettings.allowDeviceMappingForRegularUsers,
       disableStackManagementForRegularUsers: !securitySettings.allowStackManagementForRegularUsers,
       disableContainerCapabilitiesForRegularUsers: !securitySettings.allowContainerCapabilitiesForRegularUsers,
+      disableSysctlSettingForRegularUsers: !securitySettings.allowSysctlSettingForRegularUsers,
     };
   }
 }
