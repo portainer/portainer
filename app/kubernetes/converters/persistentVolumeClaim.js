@@ -59,16 +59,16 @@ class KubernetesPersistentVolumeClaimConverter {
   }
 
   /**
-   * Generate KubernetesPersistentVolumeClaim list from KubernetesVolumeFormValues
+   * Generate KubernetesPersistentVolumeClaim from KubernetesVolumeFormValues
    * @param {KubernetesVolumeFormValues} formValues
    */
-  static volumesFormValuesToVolumeClaims(formValues) {
+  static volumeFormValuesToVolumeClaim(formValues) {
     const pvc = new KubernetesPersistentVolumeClaim();
     pvc.Name = formValues.Name;
-    pvc.Storage = '' + formValues.Size + formValues.SizeUnit.charAt(0) + 'i';
-    pvc.StorageClass = formValues.StorageClass;
-    pvc.MountPath = formValues.NFSMountPoint;
     pvc.Namespace = formValues.ResourcePool.Namespace.Name;
+    pvc.Storage = '' + formValues.Size + formValues.SizeUnit.charAt(0) + 'i';
+    pvc.MountPath = formValues.NFSMountPoint;
+    pvc.ApplicationOwner = formValues.ApplicationOwner;
     return pvc;
   }
 
@@ -81,8 +81,8 @@ class KubernetesPersistentVolumeClaimConverter {
     res.metadata.labels.app = pvc.ApplicationName;
     res.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = pvc.ApplicationOwner;
     res.metadata.labels[KubernetesPortainerApplicationNameLabel] = pvc.ApplicationName;
-    if (pvc.PersistentVolume) {
-      res.spec.volumeName = pvc.PersistentVolume.Name;
+    if (pvc.PersistentVolumeName) {
+      res.spec.volumeName = pvc.PersistentVolumeName;
     }
     return res;
   }

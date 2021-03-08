@@ -1,5 +1,5 @@
 <kubernetes-view-header ng-if="!ctrl.state.isEdit" title="Create volume" state="kubernetes.volumes.new" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.volume">Volumes</a> &gt; Create a volume
+  <a ui-sref="kubernetes.volumes">Volumes</a> &gt; Create a volume
 </kubernetes-view-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
@@ -19,7 +19,7 @@
                   class="form-control"
                   name="volume_name"
                   ng-model="ctrl.formValues.Name"
-                  ng-change="ctrl.onChangeName()"
+                  ng-change="ctrl.onNameChange()"
                   placeholder="my-volume"
                   ng-pattern="/^[a-z]([-a-z0-9]*[a-z0-9])?$/"
                   auto-focus
@@ -36,6 +36,9 @@
                     character, and end with an alphanumeric character (e.g. 'my-name', or 'abc-123').</p
                   >
                 </div>
+                <p ng-if="ctrl.state.alreadyExists">
+                  <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A volume with the same name already exists in this resource pool.
+                </p>
               </div>
             </div>
             <!-- #endregion -->
@@ -56,59 +59,6 @@
                   ng-disabled="ctrl.state.isEdit"
                   required
                 ></select>
-              </div>
-            </div>
-            <!-- #endregion -->
-
-            <!-- #region VOLUME CONFIGURATION -->
-            <div class="col-sm-12 form-section-title">
-              Volume configuration
-            </div>
-            <div class="form-group" ng-if="!ctrl.storageClasses">
-              <div class="col-sm-12 small text-muted">
-                <p ng-if="!ctrl.isAdmin"
-                  ><i class="fa fa-info-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>No storage option is available to persist data, contact your
-                  administrator to enable a storage option.</p
-                >
-                <p ng-if="ctrl.isAdmin"
-                  ><i class="fa fa-info-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>No storage option is available to persist data, please head over the
-                  cluster <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: ctrl.endpoint.Id})">setup view</a> to configure a storage option.</p
-                >
-              </div>
-            </div>
-            <div ng-if="ctrl.storageClasses">
-              <div class="form-group">
-                <div class="col-sm-12">
-                  <label for="storage-selector" class="col-sm-1 control-label text-left" style="padding-left: 0px;">Storage</label>
-                  <div class="col-sm-5" style="padding-left: 0px;">
-                    <select
-                      class="form-control"
-                      ng-if="ctrl.hasMultipleStorageClassesAvailable()"
-                      id="storage-selector"
-                      ng-model="ctrl.formValues.StorageClass"
-                      ng-options="storageClass as storageClass.Name for storageClass in ctrl.storageClasses"
-                      required
-                    ></select>
-                    <input ng-if="!ctrl.hasMultipleStorageClassesAvailable()" type="text" class="form-control" ng-model="ctrl.formValues.StorageClass.Name" disabled />
-                  </div>
-                </div>
-              </div>
-              <div class="form-group">
-                <div class="col-sm-12 form-inline">
-                  <label for="size" class="col-sm-1 control-label text-left" style="padding-left: 0px;">Size</label>
-                  <div class="col-sm-4" style="padding-left: 0px;">
-                    <input type="number" class="form-control" name="size" ng-model="ctrl.formValues.Size" placeholder="10" min="0" style="width: 100%;" required />
-                  </div>
-                  <div class="col-sm-1">
-                    <select
-                      class="form-control"
-                      ng-model="ctrl.formValues.SizeUnit"
-                      ng-options="unit for unit in ctrl.state.availableSizeUnits"
-                      ng-disabled="ctrl.isEditAndExistingPersistedFolder($index) || ctrl.formValues.Containers.length > 1"
-                      style="width: 100%;"
-                    ></select>
-                  </div>
-                </div>
               </div>
             </div>
             <!-- #endregion -->
@@ -170,7 +120,7 @@
                 <button
                   type="button"
                   class="btn btn-primary btn-sm"
-                  ng-disabled="!kubernetesVolumeCreationForm.$valid || ctrl.isCreateButtonDisabled()"
+                  ng-disabled="!kubernetesVolumeCreationForm.$valid"
                   button-spinner="ctrl.state.actionInProgress"
                   ng-click="ctrl.createVolume()"
                 >

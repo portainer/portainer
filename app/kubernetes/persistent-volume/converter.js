@@ -1,14 +1,17 @@
 import _ from 'lodash-es';
 import { KubernetesPersistentVolume } from 'Kubernetes/models/volume/models';
 import { KubernetesPersistentVolumeCreatePayload } from 'Kubernetes/persistent-volume/payloads';
+import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
 
 class KubernetesPersistentVolumeConverter {
+  /**
+   * Converts KubernetesVolumeFormValues to KubernetesPersistentVolume
+   * @param {KubernetesVolumeFormValues} fv
+   */
   static formValuesToPersistentVolume(fv) {
     const pv = new KubernetesPersistentVolume();
-    pv.Name = fv.Name;
-    pv.StorageClass = fv.StorageClass;
+    pv.Name = KubernetesVolumeHelper.generateVolumeName(fv.Name);
     pv.Size = fv.Size + fv.SizeUnit;
-    pv.isNFSVolume = fv.isNFSVolume;
     pv.NFSAddress = fv.NFSAddress;
     pv.NFSMountPoint = fv.NFSMountPoint;
     return pv;
@@ -16,9 +19,12 @@ class KubernetesPersistentVolumeConverter {
 
   static apiToPersistentVolume(data, storageClasses) {
     const pv = new KubernetesPersistentVolume();
+    pv.Id = data.metadata.id;
     pv.Name = data.metadata.name;
-    pv.StorageClass = _.find(storageClasses, { Name: data.spec.storageClassName });
-    pv.Size = data.spec.capacity.storage;
+    pv.Size = data.spec.capacity.storage.replace('i', 'B');
+    if (data.spec.storageClassName) {
+      pv.StorageClass = _.find(storageClasses, { Name: data.spec.storageClassName });
+    }
     if (data.spec.nfs) {
       pv.NFSAddress = data.spec.nfs.server;
       pv.NFSMountPoint = data.spec.nfs.path;
@@ -29,14 +35,9 @@ class KubernetesPersistentVolumeConverter {
   static createPayload(pv) {
     const res = new KubernetesPersistentVolumeCreatePayload();
     res.metadata.name = pv.Name;
-    res.spec.storageClassName = pv.StorageClass.Name;
-    res.spec.capacity = {
-      storage: pv.Size.replace('B', 'i'),
-    };
-    res.spec.nfs = {
-      path: pv.NFSMountPoint,
-      server: pv.NFSAddress,
-    };
+    res.spec.capacity.storage = pv.Size.replace('B', 'i');
+    res.spec.nfs.path = pv.NFSMountPoint;
+    res.spec.nfs.server = pv.NFSAddress;
     return res;
   }
 }

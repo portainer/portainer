@@ -17,10 +17,6 @@ class KubernetesVolumesDatatableController {
     this.isDisplayed = this.isDisplayed.bind(this);
   }
 
-  storageClassAvailable() {
-    return this.storageClasses && this.storageClasses.length > 0;
-  }
-
   onSettingsShowSystemChange() {
     this.DatatableService.setDataTableSettings(this.tableKey, this.settings);
   }

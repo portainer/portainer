@@ -8,7 +8,7 @@ const _KubernetesPersistentVolumeClaim = Object.freeze({
   PreviousName: '',
   Namespace: '',
   Storage: 0,
-  StorageClass: {}, // KubernetesStorageClass
+  StorageClass: undefined, // KubernetesStorageClass
   CreationDate: '',
   ApplicationOwner: '',
   ApplicationName: '',
@@ -27,19 +27,15 @@ export class KubernetesPersistentVolumeClaim {
 /**
  * KubernetesPersistentVolume Model
  */
-const _KubernetesPersistentVolume = Object.freeze({
-  Id: '',
-  Name: '',
-  StorageClass: {}, // KubernetesStorageClass
-  Size: '',
-  NFSAddress: '',
-  NFSMountPoint: '',
-});
-
-export class KubernetesPersistentVolume {
-  constructor() {
-    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesPersistentVolume)));
-  }
+export function KubernetesPersistentVolume() {
+  return {
+    Id: '',
+    Name: '',
+    StorageClass: {}, // KubernetesStorageClass
+    Size: '',
+    NFSAddress: '',
+    NFSMountPoint: '',
+  };
 }
 
 /**
@@ -48,6 +44,7 @@ export class KubernetesPersistentVolume {
 const _KubernetesVolume = Object.freeze({
   ResourcePool: {}, // KubernetesResourcePool
   PersistentVolumeClaim: {}, // KubernetesPersistentVolumeClaim
+  PersistentVolume: undefined, // KubernetesPersistentVolume
   Applications: [], // KubernetesApplication
 });
 

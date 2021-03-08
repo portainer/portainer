@@ -54,9 +54,7 @@
         <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.volumes.new" ng-if="$ctrl.storageClassAvailable()">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add NFS volume
-        </button>
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.volumes.new"> <i class="fa fa-plus space-right" aria-hidden="true"></i>Add NFS volume </button>
       </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
@@ -153,7 +151,7 @@
                 <span ng-if="!item.Applications.length">-</span>
               </td>
               <td>
-                {{ item.PersistentVolumeClaim.StorageClass.Name }}
+                {{ item.PersistentVolumeClaim.StorageClass.Name || '-' }}
               </td>
               <td>
                 {{ item.PersistentVolumeClaim.Storage }}

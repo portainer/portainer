@@ -1,9 +1,10 @@
 import { KubernetesVolume } from 'Kubernetes/models/volume/models';
 
 class KubernetesVolumeConverter {
-  static pvcToVolume(claim, pool) {
+  static apiToVolume(pvc, pv, pool) {
     const res = new KubernetesVolume();
-    res.PersistentVolumeClaim = claim;
+    res.PersistentVolumeClaim = pvc;
+    res.PersistentVolume = pv;
     res.ResourcePool = pool;
     return res;
   }

@@ -39,7 +39,7 @@ class KubernetesPersistentVolumeService {
       const res = _.map(data.items, (item) => KubernetesPersistentVolumeConverter.apiToPersistentVolume(item, storageClasses));
       return res;
     } catch (err) {
-      throw new PortainerError('Unable to retrieve persistent volume', err);
+      throw new PortainerError('Unable to retrieve persistent volumes', err);
     }
   }
 

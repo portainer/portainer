@@ -3,17 +3,18 @@ import { KubernetesCommonMetadataPayload } from 'Kubernetes/models/common/payloa
 /**
  * KubernetesPersistentVolumeCreatePayload Model
  */
-const _KubernetesPersistentVolumeCreatePayload = Object.freeze({
-  metadata: new KubernetesCommonMetadataPayload(),
-  spec: {
-    accessModes: ['ReadWriteOnce'],
-    mountOptions: [],
-    storageClassName: '',
-  },
-});
-
-export class KubernetesPersistentVolumeCreatePayload {
-  constructor() {
-    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesPersistentVolumeCreatePayload)));
-  }
+export function KubernetesPersistentVolumeCreatePayload() {
+  return {
+    metadata: new KubernetesCommonMetadataPayload(),
+    spec: {
+      accessModes: ['ReadWriteOnce'],
+      capacity: {
+        storage: '',
+      },
+      nfs: {
+        path: '',
+        server: '',
+      },
+    },
+  };
 }
