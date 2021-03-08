@@ -22,6 +22,7 @@ angular.module('portainer.docker').controller('ContainerController', [
   'HttpRequestHelper',
   'Authentication',
   'StateManager',
+  'endpoint',
   function (
     $q,
     $scope,
@@ -41,7 +42,8 @@ angular.module('portainer.docker').controller('ContainerController', [
     ImageService,
     HttpRequestHelper,
     Authentication,
-    StateManager
+    StateManager,
+    endpoint
   ) {
     $scope.activityTime = 0;
     $scope.portBindings = [];
@@ -94,10 +96,10 @@ angular.module('portainer.docker').controller('ContainerController', [
             });
           }
 
+          $scope.container.Config.Env = _.sortBy($scope.container.Config.Env, _.toLower);
           const inSwarm = $scope.container.Config.Labels['com.docker.swarm.service.id'];
           const autoRemove = $scope.container.HostConfig.AutoRemove;
           const admin = Authentication.isAdmin();
-          const appState = StateManager.getState();
           const {
             allowContainerCapabilitiesForRegularUsers,
             allowHostNamespaceForRegularUsers,
@@ -105,7 +107,7 @@ angular.module('portainer.docker').controller('ContainerController', [
             allowSysctlSettingForRegularUsers,
             allowBindMountsForRegularUsers,
             allowPrivilegedModeForRegularUsers,
-          } = appState.application;
+          } = endpoint.SecuritySettings;
 
           const settingRestrictsRegularUsers =
             !allowContainerCapabilitiesForRegularUsers ||

@@ -58,19 +58,19 @@
         <table class="table table-hover nowrap-cells">
           <thead>
             <tr>
-              <th style="width: 10%;">
+              <th style="width: 20px;">
                 <a ng-click="$ctrl.expandAll()" ng-if="$ctrl.hasExpandableItems()">
                   <i ng-class="{ 'fas fa-angle-down': $ctrl.state.expandAll, 'fas fa-angle-right': !$ctrl.state.expandAll }" aria-hidden="true"></i>
                 </a>
               </th>
-              <th style="width: 55%;">
+              <th style="width: 60%;">
                 <a ng-click="$ctrl.changeOrderBy('Name')">
                   Storage
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th style="width: 35%;">
+              <th style="width: 38%;">
                 <a ng-click="$ctrl.changeOrderBy('Size')">
                   Usage
                   <i class="fa fa-sort-numeric-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Size' && !$ctrl.state.reverseOrder"></i>
@@ -96,8 +96,9 @@
               <td>{{ item.Size }}</td>
             </tr>
             <tr dir-paginate-end ng-show="item.Expanded" ng-repeat="vol in item.Volumes" ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
-              <td colspan="2">
-                <a ui-sref="kubernetes.volumes.volume({ name: vol.PersistentVolumeClaim.Name, namespace: vol.PersistentVolumeClaim.Namespace })" style="margin-left: 25px;">
+              <td></td>
+              <td>
+                <a ui-sref="kubernetes.volumes.volume({ name: vol.PersistentVolumeClaim.Name, namespace: vol.PersistentVolumeClaim.Namespace })">
                   {{ vol.PersistentVolumeClaim.Name }}
                 </a>
               </td>

@@ -1,5 +1,4 @@
 import * as JsonPatch from 'fast-json-patch';
-
 import { KubernetesDaemonSet } from 'Kubernetes/models/daemon-set/models';
 import { KubernetesDaemonSetCreatePayload } from 'Kubernetes/models/daemon-set/payloads';
 import {

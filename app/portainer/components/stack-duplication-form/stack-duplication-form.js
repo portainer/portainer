@@ -7,5 +7,6 @@ angular.module('portainer.app').component('stackDuplicationForm', {
     endpoints: '<',
     groups: '<',
     currentEndpointId: '<',
+    yamlError: '<',
   },
 });

@@ -62,7 +62,7 @@
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
                 You can specify the URL to your own template definitions file here. See
-                <a href="https://www.portainer.io/documentation/how-to-use-templates/" target="_blank">Portainer documentation</a> for more details.
+                <a href="https://documentation.portainer.io/v2.0/settings/apps/#build-and-host-your-own-templates" target="_blank">Portainer documentation</a> for more details.
               </span>
             </div>
             <div class="form-group">
@@ -76,110 +76,7 @@
           </div>
           <!-- !templates -->
           <!-- host-filesystem -->
-          <div class="col-sm-12 form-section-title">
-            Host and Filesystem
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="toggle_enableHostManagementFeatures" class="control-label text-left">
-                Enable host management features
-                <portainer-tooltip position="bottom" message="Enable host management features: host system browsing and advanced host details."></portainer-tooltip>
-              </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_enableHostManagementFeatures" ng-model="formValues.enableHostManagementFeatures" /><i></i>
-              </label>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="toggle_allowvolumebrowser" class="control-label text-left">
-                Enable volume management for non-administrators
-                <portainer-tooltip position="bottom" message="When enabled, regular users will be able to use Portainer volume management features."></portainer-tooltip>
-              </label>
-              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="toggle_allowvolumebrowser" ng-model="formValues.enableVolumeBrowser" /><i></i> </label>
-            </div>
-          </div>
-          <!-- !host-filesystem -->
-          <!-- security -->
-          <div class="col-sm-12 form-section-title">
-            Docker Endpoint Security Options
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="toggle_allowbindmounts" class="control-label text-left">
-                Disable bind mounts for non-administrators
-                <portainer-tooltip position="bottom" message="When enabled, regular users will not be able to use bind mounts when creating containers."></portainer-tooltip>
-              </label>
-              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="toggle_allowbindmounts" ng-model="formValues.restrictBindMounts" /><i></i> </label>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="toggle_allowbindmounts" class="control-label text-left">
-                Disable privileged mode for non-administrators
-                <portainer-tooltip position="bottom" message="When enabled, regular users will not be able to use privileged mode when creating containers."></portainer-tooltip>
-              </label>
-              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="toggle_allowbindmounts" ng-model="formValues.restrictPrivilegedMode" /><i></i> </label>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="toggle_allowHostNamespaceForRegularUsers" class="control-label text-left">
-                Disable the use of host PID 1 for non-administrators
-                <portainer-tooltip position="bottom" message="Prevent users from accessing the host filesystem through the host PID namespace."></portainer-tooltip>
-              </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_allowHostNamespaceForRegularUsers" ng-model="formValues.restrictHostNamespaceForRegularUsers" /><i></i>
-              </label>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="toggle_disableStackManagementForRegularUsers" class="control-label text-left">
-                Disable the use of Stacks for non-administrators
-              </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_disableStackManagementForRegularUsers" ng-model="formValues.disableStackManagementForRegularUsers" /><i></i>
-              </label>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="toggle_disableDeviceMappingForRegularUsers" class="control-label text-left">
-                Disable device mappings for non-administrators
-              </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_disableDeviceMappingForRegularUsers" ng-model="formValues.disableDeviceMappingForRegularUsers" /><i></i>
-              </label>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="toggle_disableSysctlSettingForRegularUsers" class="control-label text-left">
-                Disable sysctl settings for non-administrators
-              </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_disableSysctlSettingForRegularUsers" ng-model="formValues.disableSysctlSettingForRegularUsers" /><i></i>
-              </label>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="toggle_disableContainerCapabilitiesForRegularUsers" class="control-label text-left">
-                Disable container capabilities for non-administrators
-              </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_disableContainerCapabilitiesForRegularUsers" ng-model="formValues.disableContainerCapabilitiesForRegularUsers" /><i></i>
-              </label>
-            </div>
-          </div>
 
-          <div class="form-group" ng-if="isContainerEditDisabled()">
-            <span class="col-sm-12 text-muted small">
-              Note: The recreate/duplicate/edit feature is currently disabled (for non-admin users) by one or more security settings.
-            </span>
-          </div>
-          <!-- !security -->
           <!-- edge -->
           <div class="col-sm-12 form-section-title">
             Edge Compute

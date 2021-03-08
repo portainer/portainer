@@ -3,13 +3,13 @@
     Data
   </div>
 
-  <div class="form-group">
+  <div class="form-group" ng-if="$ctrl.isCreation">
     <div class="col-sm-12">
       <p>
-        <a class="small interactive" ng-if="$ctrl.formValues.IsSimple" ng-click="$ctrl.formValues.IsSimple = false">
+        <a class="small interactive" ng-if="$ctrl.formValues.IsSimple" ng-click="$ctrl.showAdvancedMode()">
           <i class="fa fa-list-ol space-right" aria-hidden="true"></i> Advanced mode
         </a>
-        <a class="small interactive" ng-if="!$ctrl.formValues.IsSimple" ng-click="$ctrl.formValues.IsSimple = true">
+        <a class="small interactive" ng-if="!$ctrl.formValues.IsSimple" ng-click="$ctrl.showSimpleMode()">
           <i class="fa fa-edit space-right" aria-hidden="true"></i> Simple mode
         </a>
       </p>
@@ -30,7 +30,7 @@
         <i class="fa fa-plus-circle" aria-hidden="true"></i> Create entry
       </button>
       <button type="button" class="btn btn-sm btn-default" ngf-select="$ctrl.addEntryFromFile($file)" style="margin-left: 0;">
-        <i class="fa fa-file-upload" aria-hidden="true"></i> Create entry from file
+        <i class="fa fa-file-upload" aria-hidden="true"></i> Create key/value from file
       </button>
     </div>
   </div>
@@ -45,23 +45,29 @@
           id="configuration_data_key_{{ index }}"
           name="configuration_data_key_{{ index }}"
           ng-model="$ctrl.formValues.Data[index].Key"
+          ng-disabled="entry.Used"
           required
-          ng-change="$ctrl.onChangeKey()"
+          ng-change="$ctrl.onChangeKey(entry)"
         />
       </div>
       <div
         class="col-sm-11 small text-warning"
         style="margin-top: 5px;"
-        ng-show="kubernetesConfigurationDataCreationForm['configuration_data_key_' + index].$invalid || $ctrl.state.duplicateKeys[index] !== undefined"
+        ng-show="
+          kubernetesConfigurationDataCreationForm['configuration_data_key_' + index].$invalid || $ctrl.state.duplicateKeys[index] !== undefined || $ctrl.state.invalidKeys[index]
+        "
       >
         <ng-messages for="kubernetesConfigurationDataCreationForm['configuration_data_key_' + index].$error">
           <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
         </ng-messages>
         <p ng-if="$ctrl.state.duplicateKeys[index] !== undefined"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This key is already defined.</p>
+        <p ng-if="$ctrl.state.invalidKeys[index]"
+          ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This key is invalid. A valid key must consist of alphanumeric characters, '-', '_' or '.'</p
+        >
       </div>
     </div>
 
-    <div class="form-group" ng-if="$ctrl.formValues.IsSimple">
+    <div class="form-group" ng-if="$ctrl.formValues.IsSimple && !entry.IsBinary">
       <label for="configuration_data_value_{{ index }}" class="col-sm-1 control-label text-left">Value</label>
       <div class="col-sm-11">
         <textarea
@@ -80,12 +86,23 @@
       </div>
     </div>
 
+    <div class="form-group" ng-if="$ctrl.formValues.IsSimple && entry.IsBinary">
+      <label for="configuration_data_value_{{ index }}" class="col-sm-1 control-label text-left">Value</label>
+      <div class="col-sm-11 control-label small text-muted text-left"
+        >Binary data <portainer-tooltip position="bottom" message="This key holds binary data and cannot be displayed."></portainer-tooltip
+      ></div>
+    </div>
+
     <div class="form-group" ng-if="$ctrl.formValues.IsSimple">
       <div class="col-sm-1"></div>
       <div class="col-sm-11">
-        <button type="button" class="btn btn-sm btn-danger" style="margin-left: 0;" ng-click="$ctrl.removeEntry(index)">
+        <button type="button" class="btn btn-sm btn-danger space-right" style="margin-left: 0;" ng-disabled="entry.Used" ng-click="$ctrl.removeEntry(index, entry)">
           <i class="fa fa-trash-alt" aria-hidden="true"></i> Remove entry
         </button>
+        <span class="small text-muted" ng-if="entry.Used">
+          <i class="fa fa-info-circle blue-icon space-right" aria-hidden="true"></i>
+          This key is currently used by one or more applications
+        </span>
       </div>
     </div>
   </div>

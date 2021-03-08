@@ -4,18 +4,29 @@ import (
 	"errors"
 	"net/http"
 
-	httperrors "github.com/portainer/portainer/api/http/errors"
-
-	"github.com/portainer/portainer/api/http/security"
-
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	httperrors "github.com/portainer/portainer/api/http/errors"
+	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/stackutils"
 )
 
-// POST request on /api/stacks/:id/stop
+// @id StackStop
+// @summary Stops a stopped Stack
+// @description Stops a stopped Stack.
+// @description **Access policy**: restricted
+// @tags stacks
+// @security jwt
+// @param id path int true "Stack identifier"
+// @success 200 {object} portainer.Stack "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 " not found"
+// @failure 500 "Server error"
+// @router /stacks/{id}/stop [post]
 func (handler *Handler) stackStop(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
@@ -46,7 +57,7 @@ func (handler *Handler) stackStop(w http.ResponseWriter, r *http.Request) *httpe
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
 	}
 
-	resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stack.Name, portainer.StackResourceControl)
+	resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the stack", err}
 	}

@@ -33,7 +33,7 @@
 
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
-                Adding ingress controllers will allow users to expose application they deploy over a HTTP route.<br />
+                Configuring ingress controllers will allow users to expose application they deploy over a HTTP route.<br />
                 <p style="margin-top: 2px;">
                   <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                   Ingress classes must be manually specified for each controller you want to use in the cluster. Make sure that each controller is running inside your cluster.
@@ -44,7 +44,7 @@
               <div class="col-sm-12">
                 <label class="control-label text-left">Ingress controller</label>
                 <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addIngressClass()">
-                  <i class="fa fa-plus-circle" aria-hidden="true"></i> add ingress controller
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i> configure ingress controller
                 </span>
               </div>
 
@@ -132,15 +132,61 @@
             </div>
 
             <div class="col-sm-12 form-section-title">
-              Metrics
+              Security
             </div>
 
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
-                Enabling this feature will allow users to use specific features that leverage the server metrics component.
+                By default, all the users have access to the default namespace. Enable this option to set accesses on the default namespace.
+              </span>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label class="control-label text-left">
+                  Restrict access to the default namespace
+                </label>
+                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" disabled /><i></i> </label>
+                <span class="text-muted small" style="margin-left: 15px;">
+                  <i class="fa fa-user" aria-hidden="true"></i>
+                  This feature is available in <a href="https://www.portainer.io/business-upsell?from=k8s-setup-default" target="_blank"> Portainer Business Edition</a>.
+                </span>
+              </div>
+            </div>
+
+            <div class="col-sm-12 form-section-title">
+              Resources and Metrics
+            </div>
+
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                By ENABLING resource over-commit, you are able to assign more resources to namespaces than is physically available in the cluster. This may lead to unexpected
+                deployment failures if there is insufficient resource to service demand.
                 <p style="margin-top: 2px;">
                   <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                  Ensure that <a href="https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/#metrics-server" target="_blank">server metrics</a> is
+                  By DISABLING resource over-commit (highly recommended), you are only able to assign resources to namespaces that are less (in aggregate) than the cluster total
+                  minus any system resource reservation.
+                </p>
+              </span>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label class="control-label text-left">
+                  Allow resource over-commit
+                </label>
+                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" checked disabled /><i></i> </label>
+                <span class="text-muted small" style="margin-left: 15px;">
+                  <i class="fa fa-user" aria-hidden="true"></i>
+                  This feature is available in <a href="https://www.portainer.io/business-upsell?from=k8s-setup-overcommit" target="_blank"> Portainer Business Edition</a>.
+                </span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                Enabling this feature will allow users to use specific features that leverage the metrics server component.
+                <p style="margin-top: 2px;">
+                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  Ensure that <a href="https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/#metrics-server" target="_blank">metrics server</a> is
                   running inside your cluster.
                 </p>
               </span>
@@ -148,7 +194,7 @@
             <div class="form-group">
               <div class="col-sm-12">
                 <label class="control-label text-left">
-                  Enable features using server metrics
+                  Enable features using metrics server
                 </label>
                 <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.UseServerMetrics" /><i></i> </label>
               </div>

@@ -178,6 +178,11 @@ a[ng-click] {
   word-break: break-word;
 }
 
+.widget .widget-body table.container-details-table > tbody > tr > td:first-child {
+  word-break: normal;
+  text-transform: uppercase;
+}
+
 .widget .widget-body table.description-table {
   table-layout: fixed;
 }
@@ -620,57 +625,6 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   margin-left: 21px;
 }
 
-/* switch box */
-:root {
-  --switch-size: 24px;
-}
-
-.switch input {
-  display: none;
-}
-
-.switch i,
-.bootbox-form .checkbox i {
-  display: inline-block;
-  vertical-align: middle;
-  cursor: pointer;
-  padding-right: var(--switch-size);
-  transition: all ease 0.2s;
-  -webkit-transition: all ease 0.2s;
-  -moz-transition: all ease 0.2s;
-  -o-transition: all ease 0.2s;
-  border-radius: var(--switch-size);
-  box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.5);
-}
-
-.switch i:before,
-.bootbox-form .checkbox i:before {
-  display: block;
-  content: '';
-  width: var(--switch-size);
-  height: var(--switch-size);
-  border-radius: var(--switch-size);
-  background: white;
-  box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.5);
-}
-
-.switch :checked + i,
-.bootbox-form .checkbox :checked ~ i {
-  padding-right: 0;
-  padding-left: var(--switch-size);
-  -webkit-box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.5), inset 0 0 40px #337ab7;
-  -moz-box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.5), inset 0 0 40px #337ab7;
-  box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.5), inset 0 0 40px #337ab7;
-}
-/* !switch box */
-
-/* small switch box */
-.switch.small {
-  --switch-size: 12px;
-}
-
-/* !small switch box */
-
 .boxselector_wrapper {
   display: flex;
   flex-flow: row wrap;
@@ -922,6 +876,27 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   z-index: 2;
 }
 
+.striketext:before,
+.striketext:after {
+  background-color: #777777;
+  content: '';
+  display: inline-block;
+  height: 1px;
+  position: relative;
+  vertical-align: middle;
+  width: 50%;
+}
+
+.striketext:before {
+  right: 0.5em;
+  margin-left: -50%;
+}
+
+.striketext:after {
+  left: 0.5em;
+  margin-right: -50%;
+}
+
 /*bootbox override*/
 .modal-open {
   padding-right: 0 !important;
@@ -1037,3 +1012,14 @@ json-tree .branch-preview {
   background-color: #337ab7;
 }
 /* !spinkit override */
+
+.w-full {
+  width: 100%;
+}
+
+/* uib-typeahead override */
+#scrollable-dropdown-menu .dropdown-menu {
+  max-height: 300px;
+  overflow-y: auto;
+}
+/* !uib-typeahead override */

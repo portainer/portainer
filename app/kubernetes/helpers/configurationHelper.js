@@ -1,5 +1,7 @@
 import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
+import { KubernetesConfigurationFormValuesEntry } from 'Kubernetes/models/configuration/formvalues';
 import _ from 'lodash-es';
+import YAML from 'yaml';
 
 class KubernetesConfigurationHelper {
   static getUsingApplications(config, applications) {
@@ -21,6 +23,10 @@ class KubernetesConfigurationHelper {
     return _.startsWith(config.Name, 'default-token-');
   }
 
+  static isBinary(encoding) {
+    return encoding !== '' && !_.includes(encoding, 'ISO') && !_.includes(encoding, 'UTF');
+  }
+
   static setConfigurationUsed(config) {
     config.Used = config.Applications && config.Applications.length !== 0;
   }
@@ -30,6 +36,33 @@ class KubernetesConfigurationHelper {
       config.Applications = KubernetesConfigurationHelper.getUsingApplications(config, applications);
       KubernetesConfigurationHelper.setConfigurationUsed(config);
     });
+  }
+
+  static parseYaml(formValues) {
+    YAML.defaultOptions.customTags = ['binary'];
+    const data = _.map(YAML.parse(formValues.DataYaml), (value, key) => {
+      const entry = new KubernetesConfigurationFormValuesEntry();
+      entry.Key = key;
+      entry.Value = value;
+      const oldEntry = _.find(formValues.Data, { Key: entry.Key });
+      entry.IsBinary = oldEntry ? oldEntry.IsBinary : false;
+      return entry;
+    });
+    return data;
+  }
+
+  static parseData(formValues) {
+    if (!formValues.Data.length) return '';
+
+    const data = _.reduce(
+      formValues.Data,
+      (acc, entry) => {
+        acc[entry.Key] = entry.Value;
+        return acc;
+      },
+      {}
+    );
+    return YAML.stringify(data);
   }
 
   static isExternalConfiguration(configuration) {

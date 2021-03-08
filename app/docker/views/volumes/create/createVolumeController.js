@@ -70,9 +70,12 @@ angular.module('portainer.docker').controller('CreateVolumeController', [
     function prepareNFSConfiguration(driverOptions) {
       var data = $scope.formValues.NFSData;
 
-      driverOptions.push({ name: 'type', value: data.version.toLowerCase() });
+      driverOptions.push({ name: 'type', value: 'nfs' });
 
       var options = 'addr=' + data.serverAddress + ',' + data.options;
+      if (data.version === 'NFS4') {
+        options = options + ',nfsvers=4';
+      }
       driverOptions.push({ name: 'o', value: options });
 
       var mountPoint = data.mountPoint[0] === ':' ? data.mountPoint : ':' + data.mountPoint;

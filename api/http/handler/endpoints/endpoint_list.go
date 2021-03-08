@@ -5,16 +5,34 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/portainer/portainer/api"
-
 	"github.com/portainer/libhttp/request"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// GET request on /api/endpoints?(start=<start>)&(limit=<limit>)&(search=<search>)&(groupId=<groupId)
+// @id EndpointList
+// @summary List endpoints
+// @description List all endpoints based on the current user authorizations. Will
+// @description return all endpoints if using an administrator account otherwise it will
+// @description only return authorized endpoints.
+// @description **Access policy**: restricted
+// @tags endpoints
+// @security jwt
+// @produce json
+// @param start query int false "Start searching from"
+// @param search query string false "Search query"
+// @param groupId query int false "List endpoints of this group"
+// @param limit query int false "Limit results to this value"
+// @param type query int false "List endpoints of this type"
+// @param tagIds query []int false "search endpoints with these tags (depends on tagsPartialMatch)"
+// @param tagsPartialMatch query bool false "If true, will return endpoint which has one of tagIds, if false (or missing) will return only endpoints that has all the tags"
+// @param endpointIds query []int false "will return only these endpoints"
+// @success 200 {array} portainer.Endpoint "Endpoints"
+// @failure 500 Server error
+// @router /endpoints [get]
 func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	start, _ := request.RetrieveNumericQueryParameter(r, "start", true)
 	if start != 0 {
@@ -89,6 +107,7 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 
 	for idx := range paginatedEndpoints {
 		hideFields(&paginatedEndpoints[idx])
+		paginatedEndpoints[idx].ComposeSyntaxMaxVersion = handler.ComposeStackManager.ComposeSyntaxMaxVersion()
 	}
 
 	w.Header().Set("X-Total-Count", strconv.Itoa(filteredEndpointCount))

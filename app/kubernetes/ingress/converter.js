@@ -1,4 +1,4 @@
-import * as _ from 'lodash-es';
+import _ from 'lodash-es';
 import * as JsonPatch from 'fast-json-patch';
 
 import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
@@ -80,18 +80,18 @@ export class KubernetesIngressConverter {
     }
     res.Annotations[KubernetesIngressClassAnnotation] = formValues.IngressClass.Name;
     res.Host = formValues.Host;
+    res.Paths = formValues.Paths;
     return res;
   }
 
   /**
    *
    * @param {KubernetesIngressClass} ics Ingress classes (saved in Portainer DB)
-   * @param {KubernetesIngress} ingresses Existing Kubernetes ingresses. Must be empty for RP CREATE VIEW and passed for RP EDIT VIEW
+   * @param {KubernetesIngress[]} ingresses Existing Kubernetes ingresses. Must be empty for RP CREATE VIEW and filled for RP EDIT VIEW
    */
   static ingressClassesToFormValues(ics, ingresses) {
     const res = _.map(ics, (ic) => {
-      const fv = new KubernetesResourcePoolIngressClassFormValue();
-      fv.IngressClass = ic;
+      const fv = new KubernetesResourcePoolIngressClassFormValue(ic);
       const ingress = _.find(ingresses, { Name: ic.Name });
       if (ingress) {
         fv.Selected = true;
@@ -110,6 +110,7 @@ export class KubernetesIngressConverter {
         });
         fv.Annotations = _.without(annotations, undefined);
         fv.AdvancedConfig = fv.Annotations.length > 0;
+        fv.Paths = ingress.Paths;
       }
       return fv;
     });

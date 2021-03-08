@@ -40,6 +40,11 @@ func NewClientFactory(signatureService portainer.DigitalSignatureService, revers
 	}
 }
 
+// Remove the cached kube client so a new one can be created
+func (factory *ClientFactory) RemoveKubeClient(endpoint *portainer.Endpoint) {
+	factory.endpointClients.Remove(strconv.Itoa(int(endpoint.ID)))
+}
+
 // GetKubeClient checks if an existing client is already registered for the endpoint and returns it if one is found.
 // If no client is registered, it will create a new client, register it, and returns it.
 func (factory *ClientFactory) GetKubeClient(endpoint *portainer.Endpoint) (portainer.KubeClient, error) {

@@ -1,7 +1,7 @@
 import angular from 'angular';
-import * as _ from 'lodash-es';
+import _ from 'lodash-es';
 import * as JsonPatch from 'fast-json-patch';
-import { KubernetesApplicationDataAccessPolicies, KubernetesApplicationDeploymentTypes } from 'Kubernetes/models/application/models';
+import { KubernetesApplicationDataAccessPolicies, KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
@@ -40,6 +40,10 @@ function computeTolerations(nodes, application) {
 // Some operators require empty "values" field, some only one element in "values" field, etc
 
 function computeAffinities(nodes, application) {
+  if (!application.Pods || application.Pods.length === 0) {
+    return nodes;
+  }
+
   const pod = application.Pods[0];
   _.forEach(nodes, (n) => {
     if (pod.NodeSelector) {
@@ -63,8 +67,8 @@ function computeAffinities(nodes, application) {
             (e.operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.DOES_NOT_EXIST && !exists) ||
             (e.operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.IN && isIn) ||
             (e.operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.NOT_IN && !isIn) ||
-            (e.operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.GREATER_THAN && exists && parseInt(n.Labels[e.key]) > parseInt(e.values[0])) ||
-            (e.operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.LOWER_THAN && exists && parseInt(n.Labels[e.key]) < parseInt(e.values[0]))
+            (e.operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.GREATER_THAN && exists && parseInt(n.Labels[e.key], 10) > parseInt(e.values[0], 10)) ||
+            (e.operator === KubernetesPodNodeAffinityNodeSelectorRequirementOperators.LOWER_THAN && exists && parseInt(n.Labels[e.key], 10) < parseInt(e.values[0], 10))
           ) {
             return;
           }
@@ -119,6 +123,8 @@ class KubernetesApplicationController {
 
     this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
 
+    this.KubernetesApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
+    this.KubernetesApplicationTypes = KubernetesApplicationTypes;
     this.ApplicationDataAccessPolicies = KubernetesApplicationDataAccessPolicies;
     this.KubernetesServiceTypes = KubernetesServiceTypes;
     this.KubernetesPodContainerTypes = KubernetesPodContainerTypes;
@@ -140,7 +146,7 @@ class KubernetesApplicationController {
 
   showEditor() {
     this.state.showEditorTab = true;
-    this.selectTab(2);
+    this.selectTab(3);
   }
 
   isSystemNamespace() {
@@ -300,6 +306,7 @@ class KubernetesApplicationController {
       });
 
       this.placements = computePlacements(nodes, this.application);
+      this.state.placementWarning = _.find(this.placements, { AcceptsApplication: true }) ? false : true;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve application details');
     } finally {
@@ -325,6 +332,7 @@ class KubernetesApplicationController {
         name: this.$transition$.params().name,
       },
       eventWarningCount: 0,
+      placementWarning: false,
       expandedNote: false,
       useIngress: false,
     };
@@ -336,7 +344,6 @@ class KubernetesApplicationController {
       SelectedRevision: undefined,
     };
 
-    this.KubernetesApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
     await this.getApplication();
     await this.getEvents();
     this.state.viewReady = true;

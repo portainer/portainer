@@ -7,17 +7,21 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
 
 type resourceControlUpdatePayload struct {
-	Public             bool
-	Users              []int
-	Teams              []int
-	AdministratorsOnly bool
+	// Permit access to the associated resource to any user
+	Public bool `example:"true"`
+	// List of user identifiers with access to the associated resource
+	Users []int `example:"4"`
+	// List of team identifiers with access to the associated resource
+	Teams []int `example:"7"`
+	// Permit access to resource only to admins
+	AdministratorsOnly bool `example:"true"`
 }
 
 func (payload *resourceControlUpdatePayload) Validate(r *http.Request) error {
@@ -31,7 +35,22 @@ func (payload *resourceControlUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// PUT request on /api/resource_controls/:id
+// @id ResourceControlUpdate
+// @summary Update a resource control
+// @description Update a resource control
+// @description **Access policy**: restricted
+// @tags resource_controls
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "Resource control identifier"
+// @param body body resourceControlUpdatePayload true "Resource control details"
+// @success 200 {object} portainer.ResourceControl "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Unauthorized"
+// @failure 404 "Resource control not found"
+// @failure 500 "Server error"
+// @router /resource_controls/{id} [put]
 func (handler *Handler) resourceControlUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	resourceControlID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

@@ -9,7 +9,7 @@ import (
 	"net/http"
 
 	"github.com/docker/docker/client"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
@@ -19,7 +19,7 @@ const (
 	containerObjectIdentifier = "Id"
 )
 
-func getInheritedResourceControlFromContainerLabels(dockerClient *client.Client, containerID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
+func getInheritedResourceControlFromContainerLabels(dockerClient *client.Client, endpointID portainer.EndpointID, containerID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
 	container, err := dockerClient.ContainerInspect(context.Background(), containerID)
 	if err != nil {
 		return nil, err
@@ -33,14 +33,9 @@ func getInheritedResourceControlFromContainerLabels(dockerClient *client.Client,
 		}
 	}
 
-	swarmStackName := container.Config.Labels[resourceLabelForDockerSwarmStackName]
-	if swarmStackName != "" {
-		return authorization.GetResourceControlByResourceIDAndType(swarmStackName, portainer.StackResourceControl, resourceControls), nil
-	}
-
-	composeStackName := container.Config.Labels[resourceLabelForDockerComposeStackName]
-	if composeStackName != "" {
-		return authorization.GetResourceControlByResourceIDAndType(composeStackName, portainer.StackResourceControl, resourceControls), nil
+	stackResourceID := getStackResourceIDFromLabels(container.Config.Labels, endpointID)
+	if stackResourceID != "" {
+		return authorization.GetResourceControlByResourceIDAndType(stackResourceID, portainer.StackResourceControl, resourceControls), nil
 	}
 
 	return nil, nil
@@ -157,13 +152,13 @@ func containerHasBlackListedLabel(containerLabels map[string]interface{}, labelB
 func (transport *Transport) decorateContainerCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
 	type PartialContainer struct {
 		HostConfig struct {
-			Privileged bool          `json:"Privileged"`
-			PidMode    string        `json:"PidMode"`
-			Devices    []interface{} `json:"Devices"`
+			Privileged bool                   `json:"Privileged"`
+			PidMode    string                 `json:"PidMode"`
+			Devices    []interface{}          `json:"Devices"`
 			Sysctls    map[string]interface{} `json:"Sysctls"`
-			CapAdd     []string      `json:"CapAdd"`
-			CapDrop    []string      `json:"CapDrop"`
-			Binds      []string      `json:"Binds"`
+			CapAdd     []string               `json:"CapAdd"`
+			CapDrop    []string               `json:"CapDrop"`
+			Binds      []string               `json:"Binds"`
 		} `json:"HostConfig"`
 	}
 
@@ -182,7 +177,7 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 	}
 
 	if !isAdminOrEndpointAdmin {
-		settings, err := transport.dataStore.Settings().Settings()
+		securitySettings, err := transport.fetchEndpointSecuritySettings()
 		if err != nil {
 			return nil, err
 		}
@@ -198,27 +193,27 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 			return nil, err
 		}
 
-		if !settings.AllowPrivilegedModeForRegularUsers && partialContainer.HostConfig.Privileged {
+		if !securitySettings.AllowPrivilegedModeForRegularUsers && partialContainer.HostConfig.Privileged {
 			return forbiddenResponse, errors.New("forbidden to use privileged mode")
 		}
 
-		if !settings.AllowHostNamespaceForRegularUsers && partialContainer.HostConfig.PidMode == "host" {
+		if !securitySettings.AllowHostNamespaceForRegularUsers && partialContainer.HostConfig.PidMode == "host" {
 			return forbiddenResponse, errors.New("forbidden to use pid host namespace")
 		}
 
-		if !settings.AllowDeviceMappingForRegularUsers && len(partialContainer.HostConfig.Devices) > 0 {
+		if !securitySettings.AllowDeviceMappingForRegularUsers && len(partialContainer.HostConfig.Devices) > 0 {
 			return forbiddenResponse, errors.New("forbidden to use device mapping")
 		}
 
-		if !settings.AllowSysctlSettingForRegularUsers && len(partialContainer.HostConfig.Sysctls) > 0 {
+		if !securitySettings.AllowSysctlSettingForRegularUsers && len(partialContainer.HostConfig.Sysctls) > 0 {
 			return forbiddenResponse, errors.New("forbidden to use sysctl settings")
 		}
 
-		if !settings.AllowContainerCapabilitiesForRegularUsers && (len(partialContainer.HostConfig.CapAdd) > 0 || len(partialContainer.HostConfig.CapDrop) > 0) {
+		if !securitySettings.AllowContainerCapabilitiesForRegularUsers && (len(partialContainer.HostConfig.CapAdd) > 0 || len(partialContainer.HostConfig.CapDrop) > 0) {
 			return nil, errors.New("forbidden to use container capabilities")
 		}
 
-		if !settings.AllowBindMountsForRegularUsers && (len(partialContainer.HostConfig.Binds) > 0) {
+		if !securitySettings.AllowBindMountsForRegularUsers && (len(partialContainer.HostConfig.Binds) > 0) {
 			return forbiddenResponse, errors.New("forbidden to use bind mounts")
 		}
 

@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/docker/docker/client"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
 	"github.com/portainer/portainer/api/http/security"
@@ -43,11 +43,10 @@ type (
 	}
 
 	restrictedDockerOperationContext struct {
-		isAdmin                bool
-		endpointResourceAccess bool
-		userID                 portainer.UserID
-		userTeamIDs            []portainer.TeamID
-		resourceControls       []portainer.ResourceControl
+		isAdmin          bool
+		userID           portainer.UserID
+		userTeamIDs      []portainer.TeamID
+		resourceControls []portainer.ResourceControl
 	}
 
 	operationExecutor struct {
@@ -408,12 +407,12 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 
 	if tokenData.Role != portainer.AdministratorRole {
 		if volumeBrowseRestrictionCheck {
-			settings, err := transport.dataStore.Settings().Settings()
+			securitySettings, err := transport.fetchEndpointSecuritySettings()
 			if err != nil {
 				return nil, err
 			}
 
-			if !settings.AllowVolumeBrowserForRegularUsers {
+			if !securitySettings.AllowVolumeBrowserForRegularUsers {
 				return responseutils.WriteAccessDeniedResponse()
 			}
 		}
@@ -560,15 +559,17 @@ func (transport *Transport) executeGenericResourceDeletionOperation(request *htt
 		return response, err
 	}
 
-	resourceControl, err := transport.dataStore.ResourceControl().ResourceControlByResourceIDAndType(resourceIdentifierAttribute, resourceType)
-	if err != nil {
-		return response, err
-	}
-
-	if resourceControl != nil {
-		err = transport.dataStore.ResourceControl().DeleteResourceControl(resourceControl.ID)
+	if response.StatusCode == http.StatusNoContent || response.StatusCode == http.StatusOK {
+		resourceControl, err := transport.dataStore.ResourceControl().ResourceControlByResourceIDAndType(resourceIdentifierAttribute, resourceType)
 		if err != nil {
 			return response, err
+		}
+
+		if resourceControl != nil {
+			err = transport.dataStore.ResourceControl().DeleteResourceControl(resourceControl.ID)
+			if err != nil {
+				return response, err
+			}
 		}
 	}
 
@@ -650,24 +651,13 @@ func (transport *Transport) createOperationContext(request *http.Request) (*rest
 	}
 
 	operationContext := &restrictedDockerOperationContext{
-		isAdmin:                true,
-		userID:                 tokenData.ID,
-		resourceControls:       resourceControls,
-		endpointResourceAccess: false,
+		isAdmin:          true,
+		userID:           tokenData.ID,
+		resourceControls: resourceControls,
 	}
 
 	if tokenData.Role != portainer.AdministratorRole {
 		operationContext.isAdmin = false
-
-		user, err := transport.dataStore.User().User(operationContext.userID)
-		if err != nil {
-			return nil, err
-		}
-
-		_, ok := user.EndpointAuthorizations[transport.endpoint.ID][portainer.EndpointResourcesAccess]
-		if ok {
-			operationContext.endpointResourceAccess = true
-		}
 
 		teamMemberships, err := transport.dataStore.TeamMembership().TeamMembershipsByUserID(tokenData.ID)
 		if err != nil {
@@ -691,4 +681,13 @@ func (transport *Transport) isAdminOrEndpointAdmin(request *http.Request) (bool,
 	}
 
 	return tokenData.Role == portainer.AdministratorRole, nil
+}
+
+func (transport *Transport) fetchEndpointSecuritySettings() (*portainer.EndpointSecuritySettings, error) {
+	endpoint, err := transport.dataStore.Endpoint().Endpoint(portainer.EndpointID(transport.endpoint.ID))
+	if err != nil {
+		return nil, err
+	}
+
+	return &endpoint.SecuritySettings, nil
 }

@@ -212,7 +212,7 @@
               <div class="form-group" ng-if="!formValues.LDAPSettings.TLSConfig.TLSSkipVerify">
                 <label class="col-sm-2 control-label text-left">TLS CA certificate</label>
                 <div class="col-sm-10">
-                  <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSCACert">Select file</button>
+                  <button type="button" class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSCACert">Select file</button>
                   <span style="margin-left: 5px;">
                     {{ formValues.TLSCACert.name }}
                     <i class="fa fa-check green-icon" ng-if="formValues.TLSCACert && formValues.TLSCACert === formValues.LDAPSettings.TLSConfig.TLSCACert" aria-hidden="true"></i>
@@ -364,6 +364,57 @@
               </div>
             </div>
             <!-- !group-search-settings -->
+          </div>
+
+          <div ng-if="isOauthEnabled()">
+            <div class="col-sm-12 form-section-title">
+              Provider
+            </div>
+            <div class="form-group"></div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <div class="boxselector_wrapper">
+                <div data-toggle="tooltip" title="This feature is available in Portainer Business Edition" style="color: #767676;">
+                  <input type="radio" id="microsoft" disabled />
+                  <label for="microsoft" style="cursor: pointer; border-color: #767676;">
+                    <div class="boxselector_header">
+                      <i class="fab fa-microsoft" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Microsoft
+                    </div>
+                    <p>Microsoft OAuth provider</p>
+                  </label>
+                </div>
+                <div data-toggle="tooltip" title="This feature is available in Portainer Business Edition" style="color: #767676;">
+                  <input type="radio" id="google" disabled />
+                  <label for="google" style="cursor: pointer; border-color: #767676;">
+                    <div class="boxselector_header">
+                      <i class="fab fa-google" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Google
+                    </div>
+                    <p>Google OAuth provider</p>
+                  </label>
+                </div>
+                <div data-toggle="tooltip" title="This feature is available in Portainer Business Edition" style="color: #767676;">
+                  <input type="radio" id="registry_auth" disabled />
+                  <label for="Github" style="cursor: pointer; border-color: #767676;">
+                    <div class="boxselector_header">
+                      <i class="fab fa-github" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Github
+                    </div>
+                    <p>Github OAuth provider</p>
+                  </label>
+                </div>
+                <div>
+                  <input type="radio" id="custom" ng-model="settings.AuthenticationMethod" ng-value="3" />
+                  <label for="custom">
+                    <div class="boxselector_header">
+                      <i class="fa fa-user-check" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Custom
+                    </div>
+                    <p>Custom OAuth provider</p>
+                  </label>
+                </div>
+              </div>
+            </div>
           </div>
 
           <oauth-settings ng-if="isOauthEnabled()" settings="OAuthSettings" teams="teams"></oauth-settings>

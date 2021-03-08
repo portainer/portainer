@@ -95,19 +95,21 @@
           </div>
           <!-- !port-mapping -->
           <!-- create-webhook -->
-          <div class="col-sm-12 form-section-title">
-            Webhooks
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label class="control-label text-left">
-                Create a service webhook
-                <portainer-tooltip
-                  position="top"
-                  message="Create a webhook (or callback URI) to automate the update of this service. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and re-deploy this service."
-                ></portainer-tooltip>
-              </label>
-              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.Webhook" /><i></i> </label>
+          <div ng-if="endpoint.Type !== 4">
+            <div class="col-sm-12 form-section-title">
+              Webhooks
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label class="control-label text-left">
+                  Create a service webhook
+                  <portainer-tooltip
+                    position="top"
+                    message="Create a webhook (or callback URI) to automate the update of this service. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and re-deploy this service."
+                  ></portainer-tooltip>
+                </label>
+                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.Webhook" /><i></i> </label>
+              </div>
             </div>
           </div>
           <!-- !create-webhook  -->
@@ -123,7 +125,7 @@
               <button
                 type="button"
                 class="btn btn-primary btn-sm"
-                ng-disabled="state.actionInProgress || !formValues.RegistryModel.Image"
+                ng-disabled="state.actionInProgress || !formValues.RegistryModel.Image || !volumesAreValid()"
                 ng-click="create()"
                 button-spinner="state.actionInProgress"
               >
@@ -298,16 +300,19 @@
                       <!-- volume-line1 -->
                       <div class="col-sm-12 form-inline">
                         <!-- container-path -->
-                        <div class="input-group input-group-sm col-sm-6">
-                          <span class="input-group-addon">container</span>
-                          <input type="text" class="form-control" ng-model="volume.Target" placeholder="e.g. /path/in/container" />
+                        <div class="input-group col-sm-6">
+                          <div class="input-group input-group-sm w-full">
+                            <span class="input-group-addon">container</span>
+                            <input type="text" class="form-control" ng-model="volume.Target" placeholder="e.g. /path/in/container" />
+                          </div>
+                          <div class="small text-warning" ng-show="!volume.Target"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Target is required. </div>
                         </div>
                         <!-- !container-path -->
                         <!-- volume-type -->
-                        <div class="input-group col-sm-5" style="margin-left: 5px;">
+                        <div class="input-group col-sm-5" style="margin-left: 5px; vertical-align: top;">
                           <div class="btn-group btn-group-sm" ng-if="allowBindMounts">
-                            <label class="btn btn-primary" ng-model="volume.Type" uib-btn-radio="'volume'" ng-click="volume.name = ''">Volume</label>
-                            <label class="btn btn-primary" ng-model="volume.Type" uib-btn-radio="'bind'" ng-click="volume.Id = ''">Bind</label>
+                            <label class="btn btn-primary" ng-model="volume.Type" uib-btn-radio="'volume'" ng-click="volume.Source = null">Volume</label>
+                            <label class="btn btn-primary" ng-model="volume.Type" uib-btn-radio="'bind'" ng-click="volume.Source = null">Bind</label>
                           </div>
                           <button class="btn btn-sm btn-danger" type="button" ng-click="removeVolume($index)">
                             <i class="fa fa-trash" aria-hidden="true"></i>
@@ -318,27 +323,35 @@
                       <!-- !volume-line1 -->
                       <!-- volume-line2 -->
                       <div class="col-sm-12 form-inline" style="margin-top: 5px;">
-                        <i class="fa fa-long-arrow-alt-right" aria-hidden="true"></i>
+                        <div style="height: 30px; display: inline-block; vertical-align: top; display: inline-flex; align-items: center;">
+                          <i class="fa fa-long-arrow-alt-right" aria-hidden="true"></i>
+                        </div>
                         <!-- volume -->
-                        <div class="input-group input-group-sm col-sm-6" ng-if="volume.Type === 'volume'">
-                          <span class="input-group-addon">volume</span>
-                          <select
-                            class="form-control"
-                            ng-model="volume.Source"
-                            ng-options="vol as ((vol.Id|truncate:30) + ' - ' + (vol.Driver|truncate:30)) for vol in availableVolumes"
-                          >
-                            <option selected disabled hidden value="">Select a volume</option>
-                          </select>
+                        <div class="col-sm-6 input-group" ng-if="volume.Type === 'volume'" style="float: none; padding: 0;">
+                          <div class="input-group input-group-sm w-full">
+                            <span class="input-group-addon">volume</span>
+                            <select
+                              class="form-control"
+                              ng-model="volume.Source"
+                              ng-options="vol as ((vol.Id|truncate:30) + ' - ' + (vol.Driver|truncate:30)) for vol in availableVolumes"
+                            >
+                              <option selected disabled value="">Select a volume</option>
+                            </select>
+                          </div>
+                          <div class="small text-warning" ng-show="!volume.Source"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Source is required. </div>
                         </div>
                         <!-- !volume -->
                         <!-- bind -->
                         <div class="input-group input-group-sm col-sm-6" ng-if="volume.Type === 'bind'">
-                          <span class="input-group-addon">host</span>
-                          <input type="text" class="form-control" ng-model="volume.Source" placeholder="e.g. /path/on/host" />
+                          <div class="input-group input-group-sm w-full">
+                            <span class="input-group-addon">host</span>
+                            <input type="text" class="form-control" ng-model="volume.Source" placeholder="e.g. /path/on/host" />
+                          </div>
+                          <div class="small text-warning" ng-show="!volume.Source"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Source is required. </div>
                         </div>
                         <!-- !bind -->
                         <!-- read-only -->
-                        <div class="input-group input-group-sm col-sm-5" style="margin-left: 5px;">
+                        <div class="input-group input-group-sm col-sm-5" style="margin-left: 5px; vertical-align: top;">
                           <div class="btn-group btn-group-sm">
                             <label class="btn btn-primary" ng-model="volume.ReadOnly" uib-btn-radio="false">Writable</label>
                             <label class="btn btn-primary" ng-model="volume.ReadOnly" uib-btn-radio="true">Read-only</label>

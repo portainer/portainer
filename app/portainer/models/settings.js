@@ -4,17 +4,8 @@ export function SettingsViewModel(data) {
   this.AuthenticationMethod = data.AuthenticationMethod;
   this.LDAPSettings = data.LDAPSettings;
   this.OAuthSettings = new OAuthSettingsViewModel(data.OAuthSettings);
-  this.AllowBindMountsForRegularUsers = data.AllowBindMountsForRegularUsers;
-  this.AllowPrivilegedModeForRegularUsers = data.AllowPrivilegedModeForRegularUsers;
-  this.AllowVolumeBrowserForRegularUsers = data.AllowVolumeBrowserForRegularUsers;
-  this.AllowHostNamespaceForRegularUsers = data.AllowHostNamespaceForRegularUsers;
-  this.AllowDeviceMappingForRegularUsers = data.AllowDeviceMappingForRegularUsers;
-  this.AllowSysctlSettingForRegularUsers = data.AllowSysctlSettingForRegularUsers;
-  this.AllowStackManagementForRegularUsers = data.AllowStackManagementForRegularUsers;
-  this.AllowContainerCapabilitiesForRegularUsers = data.AllowContainerCapabilitiesForRegularUsers;
   this.SnapshotInterval = data.SnapshotInterval;
   this.TemplatesURL = data.TemplatesURL;
-  this.EnableHostManagementFeatures = data.EnableHostManagementFeatures;
   this.EdgeAgentCheckinInterval = data.EdgeAgentCheckinInterval;
   this.EnableEdgeComputeFeatures = data.EnableEdgeComputeFeatures;
   this.UserSessionTimeout = data.UserSessionTimeout;
@@ -22,16 +13,7 @@ export function SettingsViewModel(data) {
 }
 
 export function PublicSettingsViewModel(settings) {
-  this.AllowBindMountsForRegularUsers = settings.AllowBindMountsForRegularUsers;
-  this.AllowPrivilegedModeForRegularUsers = settings.AllowPrivilegedModeForRegularUsers;
-  this.AllowVolumeBrowserForRegularUsers = settings.AllowVolumeBrowserForRegularUsers;
-  this.AllowDeviceMappingForRegularUsers = settings.AllowDeviceMappingForRegularUsers;
-  this.AllowSysctlSettingForRegularUsers = settings.AllowSysctlSettingForRegularUsers;
-  this.AllowStackManagementForRegularUsers = settings.AllowStackManagementForRegularUsers;
-  this.AllowContainerCapabilitiesForRegularUsers = settings.AllowContainerCapabilitiesForRegularUsers;
-  this.AllowHostNamespaceForRegularUsers = settings.AllowHostNamespaceForRegularUsers;
   this.AuthenticationMethod = settings.AuthenticationMethod;
-  this.EnableHostManagementFeatures = settings.EnableHostManagementFeatures;
   this.EnableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
   this.LogoURL = settings.LogoURL;
   this.OAuthLoginURI = settings.OAuthLoginURI;

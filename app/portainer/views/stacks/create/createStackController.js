@@ -8,13 +8,18 @@ angular
   .controller('CreateStackController', function (
     $scope,
     $state,
+    $async,
     StackService,
     Authentication,
     Notifications,
     FormValidator,
     ResourceControlService,
     FormHelper,
-    CustomTemplateService
+    EndpointProvider,
+    StackHelper,
+    ContainerHelper,
+    CustomTemplateService,
+    ContainerService
   ) {
     $scope.formValues = {
       Name: '',
@@ -35,6 +40,8 @@ angular
       formValidationError: '',
       actionInProgress: false,
       StackType: null,
+      editorYamlValidationError: '',
+      uploadYamlValidationError: '',
     };
 
     $scope.addEnvironmentVariable = function () {
@@ -153,10 +160,31 @@ angular
 
     $scope.editorUpdate = function (cm) {
       $scope.formValues.StackFileContent = cm.getValue();
+      $scope.state.editorYamlValidationError = StackHelper.validateYAML($scope.formValues.StackFileContent, $scope.containerNames);
+    };
+
+    async function onFileLoadAsync(event) {
+      $scope.state.uploadYamlValidationError = StackHelper.validateYAML(event.target.result, $scope.containerNames);
+    }
+
+    function onFileLoad(event) {
+      return $async(onFileLoadAsync, event);
+    }
+
+    $scope.uploadFile = function (file) {
+      $scope.formValues.StackFile = file;
+
+      if (file) {
+        const temporaryFileReader = new FileReader();
+        temporaryFileReader.fileName = file.name;
+        temporaryFileReader.onload = onFileLoad;
+        temporaryFileReader.readAsText(file);
+      }
     };
 
     $scope.onChangeTemplate = async function onChangeTemplate(template) {
       try {
+        $scope.formValues.StackFileContent = undefined;
         $scope.selectedTemplate = template;
         $scope.formValues.StackFileContent = await CustomTemplateService.customTemplateFile(template.Id);
       } catch (err) {
@@ -176,6 +204,20 @@ angular
         $scope.templates = _.map(templates, (template) => ({ ...template, label: `${template.Title} - ${template.Description}` }));
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to retrieve Custom Templates');
+      }
+
+      try {
+        const endpoint = EndpointProvider.currentEndpoint();
+        $scope.composeSyntaxMaxVersion = endpoint.ComposeSyntaxMaxVersion;
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to retrieve the ComposeSyntaxMaxVersion');
+      }
+
+      try {
+        $scope.containers = await ContainerService.containers();
+        $scope.containerNames = ContainerHelper.getContainerNames($scope.containers);
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to retrieve Containers');
       }
     }
 

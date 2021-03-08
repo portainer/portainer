@@ -19,6 +19,7 @@ angular
   ) {
     $scope.state = {
       EnvironmentType: 'agent',
+      PlatformType: 'linux',
       actionInProgress: false,
       deploymentTab: 0,
       allowCreateTag: Authentication.isAdmin(),
@@ -42,6 +43,14 @@ angular
       ],
     };
 
+    const deployCommands = {
+      kubeLoadBalancer: `curl -L https://downloads.portainer.io/portainer-agent-k8s-lb.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml`,
+      kubeNodePort: `curl -L https://downloads.portainer.io/portainer-agent-k8s-nodeport.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml`,
+      agentLinux: `curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent`,
+      agentWindows: `curl -L https://downloads.portainer.io/agent-stack-windows.yml -o agent-stack-windows.yml && docker stack deploy --compose-file=agent-stack-windows.yml portainer-agent`,
+    };
+    $scope.deployCommands = deployCommands;
+
     $scope.formValues = {
       Name: '',
       URL: '',
@@ -56,12 +65,14 @@ angular
     };
 
     $scope.copyAgentCommand = function () {
-      if ($scope.state.deploymentTab === 2) {
-        clipboard.copyText('curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent');
+      if ($scope.state.deploymentTab === 2 && $scope.state.PlatformType === 'linux') {
+        clipboard.copyText(deployCommands.agentLinux);
+      } else if ($scope.state.deploymentTab === 2 && $scope.state.PlatformType === 'windows') {
+        clipboard.copyText(deployCommands.agentWindows);
       } else if ($scope.state.deploymentTab === 1) {
-        clipboard.copyText('curl -L https://downloads.portainer.io/portainer-agent-k8s-node.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml');
+        clipboard.copyText(deployCommands.kubeNodePort);
       } else {
-        clipboard.copyText('curl -L https://downloads.portainer.io/portainer-agent-k8s-lb.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml');
+        clipboard.copyText(deployCommands.kubeLoadBalancer);
       }
       $('#copyNotification').show().fadeOut(2500);
     };
@@ -84,40 +95,76 @@ angular
         $scope.availableTags = $scope.availableTags.concat(tag);
         $scope.formValues.TagIds = $scope.formValues.TagIds.concat(tag.Id);
       } catch (err) {
-        Notifications.error('Failue', err, 'Unable to create tag');
+        Notifications.error('Failure', err, 'Unable to create tag');
       }
     }
 
     $scope.addDockerEndpoint = function () {
       var name = $scope.formValues.Name;
       var URL = $filter('stripprotocol')($scope.formValues.URL);
-      var publicURL = $scope.formValues.PublicURL === '' ? URL.split(':')[0] : $scope.formValues.PublicURL;
+      var publicURL = $scope.formValues.PublicURL;
       var groupId = $scope.formValues.GroupId;
       var tagIds = $scope.formValues.TagIds;
 
-      var securityData = $scope.formValues.SecurityFormData;
-      var TLS = securityData.TLS;
-      var TLSMode = securityData.TLSMode;
-      var TLSSkipVerify = TLS && (TLSMode === 'tls_client_noca' || TLSMode === 'tls_only');
-      var TLSSkipClientVerify = TLS && (TLSMode === 'tls_ca' || TLSMode === 'tls_only');
-      var TLSCAFile = TLSSkipVerify ? null : securityData.TLSCACert;
-      var TLSCertFile = TLSSkipClientVerify ? null : securityData.TLSCert;
-      var TLSKeyFile = TLSSkipClientVerify ? null : securityData.TLSKey;
+      if ($scope.formValues.ConnectSocket) {
+        URL = $scope.formValues.SocketPath;
+        $scope.state.actionInProgress = true;
+        EndpointService.createLocalEndpoint(name, URL, publicURL, groupId, tagIds)
+          .then(function success() {
+            Notifications.success('Endpoint created', name);
+            $state.go('portainer.endpoints', {}, { reload: true });
+          })
+          .catch(function error(err) {
+            Notifications.error('Failure', err, 'Unable to create endpoint');
+          })
+          .finally(function final() {
+            $scope.state.actionInProgress = false;
+          });
+      } else {
+        if (publicURL === '') {
+          publicURL = URL.split(':')[0];
+        }
 
-      addEndpoint(
-        name,
-        PortainerEndpointCreationTypes.LocalDockerEnvironment,
-        URL,
-        publicURL,
-        groupId,
-        tagIds,
-        TLS,
-        TLSSkipVerify,
-        TLSSkipClientVerify,
-        TLSCAFile,
-        TLSCertFile,
-        TLSKeyFile
-      );
+        var securityData = $scope.formValues.SecurityFormData;
+        var TLS = securityData.TLS;
+        var TLSMode = securityData.TLSMode;
+        var TLSSkipVerify = TLS && (TLSMode === 'tls_client_noca' || TLSMode === 'tls_only');
+        var TLSSkipClientVerify = TLS && (TLSMode === 'tls_ca' || TLSMode === 'tls_only');
+        var TLSCAFile = TLSSkipVerify ? null : securityData.TLSCACert;
+        var TLSCertFile = TLSSkipClientVerify ? null : securityData.TLSCert;
+        var TLSKeyFile = TLSSkipClientVerify ? null : securityData.TLSKey;
+
+        addEndpoint(
+          name,
+          PortainerEndpointCreationTypes.LocalDockerEnvironment,
+          URL,
+          publicURL,
+          groupId,
+          tagIds,
+          TLS,
+          TLSSkipVerify,
+          TLSSkipClientVerify,
+          TLSCAFile,
+          TLSCertFile,
+          TLSKeyFile
+        );
+      }
+    };
+
+    $scope.addKubernetesEndpoint = function () {
+      var name = $scope.formValues.Name;
+      $scope.state.actionInProgress = true;
+      EndpointService.createLocalKubernetesEndpoint(name)
+        .then(function success(result) {
+          Notifications.success('Endpoint created', name);
+          $state.go('portainer.endpoints.endpoint.kubernetesConfig', { id: result.Id });
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to create endpoint');
+        })
+        .finally(function final() {
+          $scope.state.actionInProgress = false;
+        });
     };
 
     $scope.addAgentEndpoint = function () {

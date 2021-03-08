@@ -74,3 +74,56 @@ Our contribution process is described below. Some of the steps can be visualized
 The feature request process is similar to the bug report process but has an extra functional validation before the technical validation as well as a documentation validation before the testing phase.
 
 ![portainer_featurerequest_workflow](https://user-images.githubusercontent.com/5485061/45727229-5ad39f00-bbf5-11e8-9550-16ba66c50615.png)
+
+## Build Portainer locally
+
+Ensure you have Docker, Node.js, yarn, and Golang installed in the correct versions.
+
+Install dependencies with yarn:
+
+```sh
+$ yarn
+```
+
+Then build and run the project:
+
+```sh
+$ yarn start
+```
+
+Portainer can now be accessed at <http://localhost:9000>.
+
+Find more detailed steps at <https://documentation.portainer.io/contributing/instructions/>.
+
+## Adding api docs
+
+When adding a new resource (or a route handler), we should add a new tag to api/http/handler/handler.go#L136 like this:
+
+```
+// @tag.name <Name of resource>
+// @tag.description a short description
+```
+
+When adding a new route to an existing handler use the following as a template (you can use `swapi` snippet if you're using vscode):
+
+```
+// @id
+// @summary
+// @description
+// @description **Access policy**:
+// @tags
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "identifier"
+// @param body body Object true "details"
+// @success 200 {object} portainer. "Success"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 " not found"
+// @failure 500 "Server error"
+// @router /{id} [get]
+```
+
+explanation about each line can be found (here)[https://github.com/swaggo/swag#api-operation]

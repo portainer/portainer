@@ -1,7 +1,8 @@
 import angular from 'angular';
-import { KubernetesConfigurationFormValues, KubernetesConfigurationFormValuesDataEntry } from 'Kubernetes/models/configuration/formvalues';
+import { KubernetesConfigurationFormValues } from 'Kubernetes/models/configuration/formvalues';
 import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
+import KubernetesConfigurationConverter from 'Kubernetes/converters/configuration';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import _ from 'lodash-es';
 
@@ -14,6 +15,8 @@ class KubernetesConfigurationController {
     Notifications,
     LocalStorage,
     KubernetesConfigurationService,
+    KubernetesConfigMapService,
+    KubernetesSecretService,
     KubernetesResourcePoolService,
     ModalService,
     KubernetesApplicationService,
@@ -32,6 +35,8 @@ class KubernetesConfigurationController {
     this.KubernetesEventService = KubernetesEventService;
     this.KubernetesConfigurationTypes = KubernetesConfigurationTypes;
     this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
+    this.KubernetesConfigMapService = KubernetesConfigMapService;
+    this.KubernetesSecretService = KubernetesSecretService;
 
     this.onInit = this.onInit.bind(this);
     this.getConfigurationAsync = this.getConfigurationAsync.bind(this);
@@ -126,7 +131,18 @@ class KubernetesConfigurationController {
       this.state.configurationLoading = true;
       const name = this.$transition$.params().name;
       const namespace = this.$transition$.params().namespace;
-      this.configuration = await this.KubernetesConfigurationService.get(namespace, name);
+      const [configMap, secret] = await Promise.allSettled([this.KubernetesConfigMapService.get(namespace, name), this.KubernetesSecretService.get(namespace, name)]);
+      if (secret.status === 'fulfilled') {
+        this.configuration = KubernetesConfigurationConverter.secretToConfiguration(secret.value);
+        this.formValues.Data = secret.value.Data;
+      } else {
+        this.configuration = KubernetesConfigurationConverter.configMapToConfiguration(configMap.value);
+        this.formValues.Data = configMap.value.Data;
+      }
+      this.formValues.ResourcePool = _.find(this.resourcePools, (resourcePool) => resourcePool.Namespace.Name === this.configuration.Namespace);
+      this.formValues.Id = this.configuration.Id;
+      this.formValues.Name = this.configuration.Name;
+      this.formValues.Type = this.configuration.Type;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve configuration');
     } finally {
@@ -188,6 +204,23 @@ class KubernetesConfigurationController {
     return this.$async(this.getConfigurationsAsync);
   }
 
+  tagUsedDataKeys() {
+    const configName = this.$transition$.params().name;
+    const usedDataKeys = _.uniq(
+      this.configuration.Applications.flatMap((app) =>
+        app.Env.filter((e) => e.valueFrom && e.valueFrom.configMapKeyRef && e.valueFrom.configMapKeyRef.name === configName).map((e) => e.name)
+      )
+    );
+
+    this.formValues.Data = this.formValues.Data.map((variable) => {
+      if (!usedDataKeys.includes(variable.Key)) {
+        return variable;
+      }
+
+      return { ...variable, Used: true };
+    });
+  }
+
   async onInit() {
     try {
       this.state = {
@@ -211,21 +244,9 @@ class KubernetesConfigurationController {
       await this.getConfiguration();
       await this.getApplications(this.configuration.Namespace);
       await this.getEvents(this.configuration.Namespace);
-      this.formValues.ResourcePool = _.find(this.resourcePools, (resourcePool) => resourcePool.Namespace.Name === this.configuration.Namespace);
-      this.formValues.Id = this.configuration.Id;
-      this.formValues.Name = this.configuration.Name;
-      this.formValues.Type = this.configuration.Type;
-      this.formValues.Data = _.map(this.configuration.Data, (value, key) => {
-        if (this.configuration.Type === KubernetesConfigurationTypes.SECRET) {
-          value = atob(value);
-        }
-        this.formValues.DataYaml += key + ': ' + value + '\n';
-        const entry = new KubernetesConfigurationFormValuesDataEntry();
-        entry.Key = key;
-        entry.Value = value;
-        return entry;
-      });
       await this.getConfigurations();
+
+      this.tagUsedDataKeys();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     } finally {

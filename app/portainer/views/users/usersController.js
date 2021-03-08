@@ -29,7 +29,7 @@ angular.module('portainer.app').controller('UsersController', [
     $scope.checkUsernameValidity = function () {
       var valid = true;
       for (var i = 0; i < $scope.users.length; i++) {
-        if ($scope.formValues.Username === $scope.users[i].Username) {
+        if ($scope.formValues.Username.toLocaleLowerCase() === $scope.users[i].Username.toLocaleLowerCase()) {
           valid = false;
           break;
         }

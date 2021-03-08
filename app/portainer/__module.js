@@ -7,7 +7,7 @@ async function initAuthentication(authManager, Authentication, $rootScope, $stat
   // authManager.redirectWhenUnauthenticated() + unauthenticatedRedirector
   // to have more controls on which URL should trigger the unauthenticated state.
   $rootScope.$on('unauthenticated', function (event, data) {
-    if (!_.includes(data.config.url, '/v2/') && !_.includes(data.config.url, '/api/v4/')) {
+    if (!_.includes(data.config.url, '/v2/') && !_.includes(data.config.url, '/api/v4/') && isTransitionRequiresAuthentication($state.transition)) {
       $state.go('portainer.logout', { error: 'Your session has expired' });
     }
   });
@@ -32,9 +32,8 @@ angular.module('portainer.app', ['portainer.oauth']).config([
           try {
             const loggedIn = await initAuthentication(authManager, Authentication, $rootScope, $state);
             await StateManager.initialize();
-            const nextTransition = $state.transition.to();
-            if (!loggedIn && !['portainer.logout', 'portainer.auth', 'portainer.init'].some((route) => nextTransition.name.startsWith(route))) {
-              $state.go('portainer.auth');
+            if (!loggedIn && isTransitionRequiresAuthentication($state.transition)) {
+              $state.go('portainer.logout');
               return Promise.reject('Unauthenticated');
             }
           } catch (err) {
@@ -393,6 +392,16 @@ angular.module('portainer.app', ['portainer.oauth']).config([
       },
     };
 
+    var roles = {
+      name: 'portainer.roles',
+      url: '/roles',
+      views: {
+        'content@': {
+          templateUrl: './views/roles/roles.html',
+        },
+      },
+    };
+
     $stateRegistryProvider.register(root);
     $stateRegistryProvider.register(endpointRoot);
     $stateRegistryProvider.register(portainer);
@@ -423,5 +432,16 @@ angular.module('portainer.app', ['portainer.oauth']).config([
     $stateRegistryProvider.register(user);
     $stateRegistryProvider.register(teams);
     $stateRegistryProvider.register(team);
+    $stateRegistryProvider.register(roles);
   },
 ]);
+
+function isTransitionRequiresAuthentication(transition) {
+  const UNAUTHENTICATED_ROUTES = ['portainer.logout', 'portainer.auth'];
+  if (!transition) {
+    return true;
+  }
+  const nextTransition = transition && transition.to();
+  const nextTransitionName = nextTransition ? nextTransition.name : '';
+  return !UNAUTHENTICATED_ROUTES.some((route) => nextTransitionName.startsWith(route));
+}

@@ -6,7 +6,9 @@ angular.module('portainer.app').factory('EndpointService', [
   'FileUploadService',
   function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     'use strict';
-    var service = {};
+    var service = {
+      updateSecuritySettings,
+    };
 
     service.endpoint = function (endpointID) {
       return Endpoints.get({ id: endpointID }).$promise;
@@ -56,10 +58,20 @@ angular.module('portainer.app').factory('EndpointService', [
       return Endpoints.remove({ id: endpointID }).$promise;
     };
 
-    service.createLocalEndpoint = function () {
+    service.createLocalEndpoint = function (name = 'local', URL = '', PublicURL = '', groupID = 1, tagIds = []) {
       var deferred = $q.defer();
 
-      FileUploadService.createEndpoint('local', PortainerEndpointCreationTypes.LocalDockerEnvironment, '', '', 1, [], false)
+      var endpointURL = URL;
+      if (endpointURL !== '') {
+        if (endpointURL.indexOf('//./pipe/') == 0) {
+          // Windows named pipe
+          endpointURL = 'npipe://' + URL;
+        } else {
+          endpointURL = 'unix://' + URL;
+        }
+      }
+
+      FileUploadService.createEndpoint(name, PortainerEndpointCreationTypes.LocalDockerEnvironment, endpointURL, PublicURL, groupID, tagIds, false)
         .then(function success(response) {
           deferred.resolve(response.data);
         })
@@ -117,10 +129,10 @@ angular.module('portainer.app').factory('EndpointService', [
       return deferred.promise;
     };
 
-    service.createLocalKubernetesEndpoint = function () {
+    service.createLocalKubernetesEndpoint = function (name = 'local') {
       var deferred = $q.defer();
 
-      FileUploadService.createEndpoint('local', PortainerEndpointCreationTypes.LocalKubernetesEnvironment, '', '', 1, [], true, true, true)
+      FileUploadService.createEndpoint(name, PortainerEndpointCreationTypes.LocalKubernetesEnvironment, '', '', 1, [], true, true, true)
         .then(function success(response) {
           deferred.resolve(response.data);
         })
@@ -146,5 +158,9 @@ angular.module('portainer.app').factory('EndpointService', [
     };
 
     return service;
+
+    function updateSecuritySettings(id, securitySettings) {
+      return Endpoints.updateSecuritySettings({ id }, securitySettings).$promise;
+    }
   },
 ]);

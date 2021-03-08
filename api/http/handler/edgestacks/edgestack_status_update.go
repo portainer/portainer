@@ -8,7 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
@@ -31,6 +31,19 @@ func (payload *updateStatusPayload) Validate(r *http.Request) error {
 	return nil
 }
 
+// @id EdgeStackStatusUpdate
+// @summary Update an EdgeStack status
+// @description Authorized only if the request is done by an Edge Endpoint
+// @tags edge_stacks
+// @accept json
+// @produce json
+// @param id path string true "EdgeStack Id"
+// @success 200 {object} portainer.EdgeStack
+// @failure 500
+// @failure 400
+// @failure 404
+// @failure 403
+// @router /edge_stacks/{id}/status [put]
 func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

@@ -16,8 +16,8 @@ angular.module('portainer.app').controller('TemplatesController', [
   'ResourceControlService',
   'Authentication',
   'FormValidator',
-  'SettingsService',
   'StackService',
+  'endpoint',
   function (
     $scope,
     $q,
@@ -33,8 +33,8 @@ angular.module('portainer.app').controller('TemplatesController', [
     ResourceControlService,
     Authentication,
     FormValidator,
-    SettingsService,
-    StackService
+    StackService,
+    endpoint
   ) {
     $scope.state = {
       selectedTemplate: null,
@@ -151,7 +151,7 @@ angular.module('portainer.app').controller('TemplatesController', [
           $state.go('docker.stacks');
         })
         .catch(function error(err) {
-          Notifications.warning('Deployment error', err.data.err);
+          Notifications.error('Deployment error', err);
         })
         .finally(function final() {
           $scope.state.actionInProgress = false;
@@ -189,7 +189,7 @@ angular.module('portainer.app').controller('TemplatesController', [
           $state.go('docker.stacks');
         })
         .catch(function error(err) {
-          Notifications.warning('Deployment error', err.data.err);
+          Notifications.error('Deployment error', err);
         })
         .finally(function final() {
           $scope.state.actionInProgress = false;
@@ -254,6 +254,7 @@ angular.module('portainer.app').controller('TemplatesController', [
 
       var endpointMode = $scope.applicationState.endpoint.mode;
       var apiVersion = $scope.applicationState.endpoint.apiVersion;
+      this.state.provider = endpointMode.provider === 'DOCKER_STANDALONE' ? 2 : 1;
 
       $q.all({
         templates: TemplateService.templates(),
@@ -263,7 +264,6 @@ angular.module('portainer.app').controller('TemplatesController', [
           false,
           endpointMode.provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25
         ),
-        settings: SettingsService.publicSettings(),
       })
         .then(function success(data) {
           var templates = data.templates;
@@ -271,8 +271,7 @@ angular.module('portainer.app').controller('TemplatesController', [
           $scope.availableVolumes = _.orderBy(data.volumes.Volumes, [(volume) => volume.Name.toLowerCase()], ['asc']);
           var networks = data.networks;
           $scope.availableNetworks = networks;
-          var settings = data.settings;
-          $scope.allowBindMounts = settings.AllowBindMountsForRegularUsers;
+          $scope.allowBindMounts = endpoint.SecuritySettings.allowBindMountsForRegularUsers;
         })
         .catch(function error(err) {
           $scope.templates = [];

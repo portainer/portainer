@@ -39,14 +39,6 @@
                 <div class="form-group">
                   {{ stackName }}
 
-                  <a
-                    ng-if="!state.externalStack && stackFileContent"
-                    class="btn btn-primary btn-xs"
-                    ui-sref="docker.templates.custom.new({fileContent: stackFileContent, type: stack.Type})"
-                  >
-                    Create template from stack
-                  </a>
-
                   <button
                     authorization="PortainerStackUpdate"
                     ng-if="!state.externalStack && stack.Status === 2"
@@ -73,6 +65,15 @@
                     <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>
                     Delete this stack
                   </button>
+
+                  <button
+                    ng-if="!state.externalStack && stackFileContent"
+                    class="btn btn-primary btn-xs"
+                    ui-sref="docker.templates.custom.new({fileContent: stackFileContent, type: stack.Type})"
+                  >
+                    <i class="fa fa-plus space-right" aria-hidden="true"></i>
+                    Create template from stack
+                  </button>
                 </div>
               </div>
               <!-- !stack-details -->
@@ -83,16 +84,23 @@
                 current-endpoint-id="currentEndpointId"
                 on-duplicate="duplicateStack(name, endpointId)"
                 on-migrate="migrateStack(name, endpointId)"
+                yaml-error="state.yamlError"
               >
               </stack-duplication-form>
             </div>
           </uib-tab>
           <!-- !tab-info -->
           <!-- tab-file -->
-          <uib-tab index="1" ng-if="stackFileContent" select="showEditor()">
+          <uib-tab index="1" select="showEditor()" ng-if="!state.externalStack">
             <uib-tab-heading> <i class="fa fa-pencil-alt space-right" aria-hidden="true"></i> Editor </uib-tab-heading>
             <form class="form-horizontal" ng-if="state.showEditorTab" style="margin-top: 10px;">
               <div class="form-group">
+                <span class="col-sm-12 text-muted small" style="margin-bottom: 7px;" ng-if="stackType == 2 && composeSyntaxMaxVersion == 2">
+                  This stack will be deployed using the equivalent of <code>docker-compose</code>. Only Compose file format version <b>2</b> is supported at the moment.
+                </span>
+                <span class="col-sm-12 text-muted small" style="margin-bottom: 7px;" ng-if="stackType == 2 && composeSyntaxMaxVersion > 2">
+                  This stack will be deployed using <code>docker-compose</code>.
+                </span>
                 <span class="col-sm-12 text-muted small">
                   You can get more information about Compose file format in the <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>.
                 </span>
@@ -165,7 +173,7 @@
                     <button
                       type="button"
                       class="btn btn-sm btn-primary"
-                      ng-disabled="state.actionInProgress || stack.Status === 2"
+                      ng-disabled="state.actionInProgress || stack.Status === 2 || !stackFileContent"
                       ng-click="deployStack()"
                       button-spinner="state.actionInProgress"
                     >
@@ -218,5 +226,6 @@
 </div>
 
 <!-- access-control-panel -->
-<por-access-control-panel ng-if="stack" resource-id="stack.Name" resource-control="stack.ResourceControl" resource-type="'stack'"> </por-access-control-panel>
+<por-access-control-panel ng-if="stack" resource-id="stack.EndpointId + '_' + stack.Name" resource-control="stack.ResourceControl" resource-type="'stack'">
+</por-access-control-panel>
 <!-- !access-control-panel -->

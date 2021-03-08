@@ -1,10 +1,32 @@
 import _ from 'lodash-es';
-import YAML from 'yaml';
-import { KubernetesConfigMap } from 'Kubernetes/models/config-map/models';
+import { KubernetesConfigMap, KubernetesPortainerAccessConfigMap } from 'Kubernetes/models/config-map/models';
 import { KubernetesConfigMapCreatePayload, KubernetesConfigMapUpdatePayload } from 'Kubernetes/models/config-map/payloads';
 import { KubernetesPortainerConfigurationOwnerLabel } from 'Kubernetes/models/configuration/models';
+import { KubernetesConfigurationFormValuesEntry } from 'Kubernetes/models/configuration/formvalues';
 
 class KubernetesConfigMapConverter {
+  static apiToPortainerAccessConfigMap(data) {
+    const res = new KubernetesPortainerAccessConfigMap();
+    res.Id = data.metadata.uid;
+    res.Data = data.data;
+    return res;
+  }
+
+  static createAccessPayload(data) {
+    const res = new KubernetesConfigMapCreatePayload();
+    _.unset(res, 'binaryData');
+    res.metadata.name = data.Name;
+    res.metadata.namespace = data.Namespace;
+    res.data = data.Data;
+    return res;
+  }
+
+  static updateAccessPayload(data) {
+    const res = KubernetesConfigMapConverter.createAccessPayload(data);
+    res.metadata.uid = data.Id;
+    return res;
+  }
+
   /**
    * API ConfigMap to front ConfigMap
    */
@@ -16,7 +38,23 @@ class KubernetesConfigMapConverter {
     res.ConfigurationOwner = data.metadata.labels ? data.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] : '';
     res.CreationDate = data.metadata.creationTimestamp;
     res.Yaml = yaml ? yaml.data : '';
-    res.Data = data.data;
+
+    res.Data = _.concat(
+      _.map(data.data, (value, key) => {
+        const entry = new KubernetesConfigurationFormValuesEntry();
+        entry.Key = key;
+        entry.Value = value;
+        return entry;
+      }),
+      _.map(data.binaryData, (value, key) => {
+        const entry = new KubernetesConfigurationFormValuesEntry();
+        entry.Key = key;
+        entry.Value = value;
+        entry.IsBinary = true;
+        return entry;
+      })
+    );
+
     return res;
   }
 
@@ -39,8 +77,16 @@ class KubernetesConfigMapConverter {
     const res = new KubernetesConfigMapCreatePayload();
     res.metadata.name = data.Name;
     res.metadata.namespace = data.Namespace;
-    res.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] = data.ConfigurationOwner;
-    res.data = data.Data;
+    const configurationOwner = _.truncate(data.ConfigurationOwner, { length: 63, omission: '' });
+    res.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] = configurationOwner;
+
+    _.forEach(data.Data, (entry) => {
+      if (entry.IsBinary) {
+        res.binaryData[entry.Key] = entry.Value;
+      } else {
+        res.data[entry.Key] = entry.Value;
+      }
+    });
     return res;
   }
 
@@ -53,7 +99,13 @@ class KubernetesConfigMapConverter {
     res.metadata.name = data.Name;
     res.metadata.namespace = data.Namespace;
     res.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] = data.ConfigurationOwner;
-    res.data = data.Data;
+    _.forEach(data.Data, (entry) => {
+      if (entry.IsBinary) {
+        res.binaryData[entry.Key] = entry.Value;
+      } else {
+        res.data[entry.Key] = entry.Value;
+      }
+    });
     return res;
   }
 
@@ -63,18 +115,7 @@ class KubernetesConfigMapConverter {
     res.Name = formValues.Name;
     res.Namespace = formValues.ResourcePool.Namespace.Name;
     res.ConfigurationOwner = formValues.ConfigurationOwner;
-    if (formValues.IsSimple) {
-      res.Data = _.reduce(
-        formValues.Data,
-        (acc, entry) => {
-          acc[entry.Key] = entry.Value;
-          return acc;
-        },
-        {}
-      );
-    } else {
-      res.Data = YAML.parse(formValues.DataYaml);
-    }
+    res.Data = formValues.Data;
     return res;
   }
 }

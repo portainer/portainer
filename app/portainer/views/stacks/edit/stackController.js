@@ -17,6 +17,7 @@ angular.module('portainer.app').controller('StackController', [
   'EndpointService',
   'GroupService',
   'ModalService',
+  'StackHelper',
   function (
     $async,
     $q,
@@ -35,13 +36,16 @@ angular.module('portainer.app').controller('StackController', [
     EndpointProvider,
     EndpointService,
     GroupService,
-    ModalService
+    ModalService,
+    StackHelper,
+    ContainerHelper
   ) {
     $scope.state = {
       actionInProgress: false,
       migrationInProgress: false,
       externalStack: false,
       showEditorTab: false,
+      yamlError: false,
     };
 
     $scope.formValues = {
@@ -187,6 +191,7 @@ angular.module('portainer.app').controller('StackController', [
 
     $scope.editorUpdate = function (cm) {
       $scope.stackFileContent = cm.getValue();
+      $scope.state.yamlError = StackHelper.validateYAML($scope.stackFileContent, $scope.containerNames);
     };
 
     $scope.stopStack = stopStack;
@@ -243,11 +248,14 @@ angular.module('portainer.app').controller('StackController', [
       $q.all({
         stack: StackService.stack(id),
         groups: GroupService.groups(),
+        containers: ContainerService.containers(),
       })
         .then(function success(data) {
           var stack = data.stack;
           $scope.groups = data.groups;
           $scope.stack = stack;
+          $scope.containers = data.containers;
+          $scope.containerNames = ContainerHelper.getContainerNames($scope.containers);
 
           let resourcesPromise = Promise.resolve({});
           if (stack.Status === 1) {
@@ -268,6 +276,8 @@ angular.module('portainer.app').controller('StackController', [
               assignComposeStackResources(data.resources);
             }
           }
+
+          $scope.state.yamlError = StackHelper.validateYAML($scope.stackFileContent, $scope.containerNames);
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve stack details');
@@ -359,7 +369,7 @@ angular.module('portainer.app').controller('StackController', [
         });
     }
 
-    function initView() {
+    async function initView() {
       var stackName = $transition$.params().name;
       $scope.stackName = stackName;
       var external = $transition$.params().external;
@@ -372,6 +382,15 @@ angular.module('portainer.app').controller('StackController', [
         var stackId = $transition$.params().id;
         loadStack(stackId);
       }
+
+      try {
+        const endpoint = EndpointProvider.currentEndpoint();
+        $scope.composeSyntaxMaxVersion = endpoint.ComposeSyntaxMaxVersion;
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to retrieve the ComposeSyntaxMaxVersion');
+      }
+
+      $scope.stackType = $transition$.params().type;
     }
 
     initView();

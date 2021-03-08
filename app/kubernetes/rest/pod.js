@@ -18,7 +18,6 @@ angular.module('portainer.kubernetes').factory('KubernetesPods', [
         {
           get: {
             method: 'GET',
-            timeout: 15000,
             ignoreLoadingBar: true,
           },
           getYaml: {
@@ -32,6 +31,12 @@ angular.module('portainer.kubernetes').factory('KubernetesPods', [
           create: { method: 'POST' },
           update: { method: 'PUT' },
           delete: { method: 'DELETE' },
+          patch: {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json-patch+json',
+            },
+          },
           logs: {
             method: 'GET',
             params: { action: 'log' },

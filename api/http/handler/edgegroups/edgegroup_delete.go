@@ -11,6 +11,18 @@ import (
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
+// @id EdgeGroupDelete
+// @summary Deletes an EdgeGroup
+// @description
+// @tags edge_groups
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "EdgeGroup Id"
+// @success 204
+// @failure 503 Edge compute features are disabled
+// @failure 500
+// @router /edge_groups/{id} [delete]
 func (handler *Handler) edgeGroupDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeGroupID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
