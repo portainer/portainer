@@ -25,12 +25,12 @@ module.exports = function (plop) {
       },
       {
         type: 'add',
-        path: `{{cwd}}/{{dashCase name}}/{{camelCase name}}Controller.js`,
+        path: `{{cwd}}/{{dashCase name}}/{{dashCase name}}.controller.js`,
         templateFile: './plop-templates/component-controller.js.hbs',
       },
       {
         type: 'add',
-        path: `{{cwd}}/{{dashCase name}}/{{camelCase name}}.html`,
+        path: `{{cwd}}/{{dashCase name}}/{{dashCase name}}.html`,
         templateFile: './plop-templates/component.html.hbs',
       },
     ], // array of actions
