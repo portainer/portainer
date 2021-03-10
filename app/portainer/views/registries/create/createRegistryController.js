@@ -12,6 +12,7 @@ angular.module('portainer.app').controller('CreateRegistryController', [
     $scope.selectAzureRegistry = selectAzureRegistry;
     $scope.selectCustomRegistry = selectCustomRegistry;
     $scope.selectGitlabRegistry = selectGitlabRegistry;
+    $scope.selectDockerHub = selectDockerHub;
     $scope.create = createRegistry;
     $scope.useDefaultGitlabConfiguration = useDefaultGitlabConfiguration;
     $scope.retrieveGitlabRegistries = retrieveGitlabRegistries;
@@ -56,6 +57,12 @@ angular.module('portainer.app').controller('CreateRegistryController', [
       $scope.model.Name = '';
       $scope.model.URL = '';
       $scope.model.Authentication = false;
+    }
+
+    function selectDockerHub() {
+      $scope.model.Name = '';
+      $scope.model.URL = 'docker.io';
+      $scope.model.Authentication = true;
     }
 
     function retrieveGitlabRegistries() {

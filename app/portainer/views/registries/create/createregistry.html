@@ -17,6 +17,16 @@
           <div class="form-group" style="margin-bottom: 0;">
             <div class="boxselector_wrapper">
               <div>
+                <input type="radio" id="registry_dockerhub" ng-model="model.Type" ng-value="RegistryTypes.DOCKERHUB" />
+                <label for="registry_dockerhub" ng-click="selectDockerHub()">
+                  <div class="boxselector_header">
+                    <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px;"></i>
+                    DockerHub
+                  </div>
+                  <p>DockerHub authenticated account</p>
+                </label>
+              </div>
+              <div>
                 <input type="radio" id="registry_quay" ng-model="model.Type" ng-value="RegistryTypes.QUAY" />
                 <label for="registry_quay" ng-click="selectQuayRegistry()">
                   <div class="boxselector_header">
@@ -93,6 +103,14 @@
             action-in-progress="state.actionInProgress"
             reset-defaults="useDefaultGitlabConfiguration"
           ></registry-form-gitlab>
+
+          <registry-form-dockerhub
+            ng-if="model.Type === RegistryTypes.DOCKERHUB"
+            model="model"
+            form-action="create"
+            form-action-label="Add registry"
+            action-in-progress="state.actionInProgress"
+          ></registry-form-dockerhub>
         </form>
       </rd-widget-body>
     </rd-widget>

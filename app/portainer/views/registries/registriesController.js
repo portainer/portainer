@@ -24,22 +24,6 @@ angular.module('portainer.app').controller('RegistriesController', [
       return !_.includes(nonBrowsableUrls, item.URL);
     };
 
-    $scope.updateDockerHub = function () {
-      var dockerhub = $scope.dockerhub;
-      dockerhub.Password = $scope.formValues.dockerHubPassword;
-      $scope.state.actionInProgress = true;
-      DockerHubService.update(dockerhub)
-        .then(function success() {
-          Notifications.success('DockerHub registry updated');
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to update DockerHub details');
-        })
-        .finally(function final() {
-          $scope.state.actionInProgress = false;
-        });
-    };
-
     $scope.removeAction = function (selectedItems) {
       ModalService.confirmDeletion('Do you want to remove the selected registries?', function onConfirm(confirmed) {
         if (!confirmed) {

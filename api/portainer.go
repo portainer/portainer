@@ -1461,6 +1461,8 @@ const (
 	CustomRegistry
 	// GitlabRegistry represents a gitlab registry
 	GitlabRegistry
+	// DockerHubRegistry represents a dockerhub registry
+	DockerHubRegistry
 )
 
 const (
