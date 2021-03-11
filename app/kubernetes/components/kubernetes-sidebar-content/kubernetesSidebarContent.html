@@ -18,4 +18,8 @@
   <div class="sidebar-sublist" ng-if="$ctrl.adminAccess && ($ctrl.currentState === 'kubernetes.cluster' || $ctrl.currentState === 'portainer.endpoints.endpoint.kubernetesConfig')">
     <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: $ctrl.endpointId})" ui-sref-active="active">Setup</a>
   </div>
+
+  <div class="sidebar-sublist" ng-if="$ctrl.adminAccess && $ctrl.currentState === 'kubernetes.cluster'">
+    <a ui-sref="kubernetes.registries({endpointId: $ctrl.endpointId})" ui-sref-active="active">Registries</a>
+  </div>
 </li>
