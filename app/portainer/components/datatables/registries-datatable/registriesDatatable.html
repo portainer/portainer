@@ -54,10 +54,11 @@
             >
               <td>
                 <span class="md-checkbox" ng-if="$ctrl.accessManagement">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
+                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="!$ctrl.allowSelection(item)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="portainer.registries.registry({id: item.Id})" ng-if="$ctrl.accessManagement">{{ item.Name }}</a>
+                <a ui-sref="portainer.registries.registry({id: item.Id})" ng-if="$ctrl.accessManagement && item.Id">{{ item.Name }}</a>
+                <span ng-if="$ctrl.accessManagement && !item.Id">{{ item.Name }} (anonymous)</span>
                 <span ng-if="!$ctrl.accessManagement">{{ item.Name }}</span>
                 <span ng-if="item.Authentication" style="margin-left: 5px;" class="label label-info image-tag">authentication-enabled</span>
               </td>
@@ -65,10 +66,13 @@
                 {{ item.URL }}
               </td>
               <td>
-                <a ui-sref="portainer.registries.registry.access({id: item.Id})" ng-if="$ctrl.accessManagement"> <i class="fa fa-users" aria-hidden="true"></i> Manage access </a>
-                <span class="text-muted space-left" style="cursor: pointer;" data-toggle="tooltip" title="This feature is available in Portainer Business Edition">
-                  <i class="fa fa-search" aria-hidden="true"></i> Browse</span
-                >
+                <span ng-if="item.Id">
+                  <a ui-sref="portainer.registries.registry.access({id: item.Id})" ng-if="$ctrl.accessManagement"> <i class="fa fa-users" aria-hidden="true"></i> Manage access </a>
+                  <span class="text-muted space-left" style="cursor: pointer;" data-toggle="tooltip" title="This feature is available in Portainer Business Edition">
+                    <i class="fa fa-search" aria-hidden="true"></i> Browse</span
+                  >
+                </span>
+                <span ng-if="!item.Id"> - </span>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">

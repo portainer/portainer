@@ -8,18 +8,14 @@ angular.module('portainer.app').factory('DockerHubService', [
     var service = {};
 
     service.dockerhub = function () {
-      var deferred = $q.defer();
+      const data = {
+        Authentication: false,
+        Password: undefined,
+        URL: 'docker.io',
+        Username: '',
+      };
 
-      DockerHub.get()
-        .$promise.then(function success(data) {
-          var dockerhub = new DockerHubViewModel(data);
-          deferred.resolve(dockerhub);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve DockerHub details', err: err });
-        });
-
-      return deferred.promise;
+      return new DockerHubViewModel(data);
     };
 
     service.update = function (dockerhub) {

@@ -72,6 +72,8 @@ class porImageRegistryController {
       const id = this.model.Registry.Id;
       if (!id) {
         this.model.Registry = dockerhub;
+        this.model.Registry.Name = 'DockerHub (anonymous)';
+        this.model.Registry.URL = '';
       } else {
         this.model.Registry = _.find(this.availableRegistries, { Id: id });
       }
