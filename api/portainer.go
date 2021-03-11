@@ -1226,7 +1226,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "2.0.1"
+	APIVersion = "2.0.2"
 	// DBVersion is the version number of the Portainer CE database
 	DBVersion = 25
 	// DBVersionEE is the version number of the Portainer EE database
@@ -1747,7 +1747,7 @@ const (
 	OperationK8sClusterNodeW                     Authorization = "K8sClusterNodeW"
 	OperationK8sClusterSetupRW                   Authorization = "K8sClusterSetupRW"
 	OperationK8sApplicationErrorDetailsR         Authorization = "K8sApplicationErrorDetailsR"
-	OperationK8sStorageClassDisabledR						 Authorization = "K8sStorageClassDisabledR"
+	OperationK8sStorageClassDisabledR            Authorization = "K8sStorageClassDisabledR"
 )
 
 // GetEditionLabel returns the portainer edition label
