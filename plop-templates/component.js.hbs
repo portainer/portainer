@@ -1,6 +1,9 @@
+import angular from 'angular';
 import controller from './{{dashCase name}}.controller.js'
 
-angular.module('portainer.{{module}}').component('{{camelCase name}}', {
+export const {{camelCase name}} = {
   templateUrl: './{{dashCase name}}.html',
   controller,
-});
+};
+
+angular.module('portainer.{{module}}').component('{{camelCase name}}', {{camelCase name}})
