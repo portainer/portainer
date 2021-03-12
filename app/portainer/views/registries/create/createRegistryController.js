@@ -28,10 +28,17 @@ angular.module('portainer.app').controller('CreateRegistryController', [
       },
     };
 
+    function useDefaultQuayConfiguration() {
+      $scope.model.Quay.useOrganisation = false;
+      $scope.model.Quay.organisationName = '';
+    }
+
     function selectQuayRegistry() {
       $scope.model.Name = 'Quay';
       $scope.model.URL = 'quay.io';
       $scope.model.Authentication = true;
+      $scope.model.Quay = {};
+      useDefaultQuayConfiguration();
     }
 
     function useDefaultGitlabConfiguration() {
