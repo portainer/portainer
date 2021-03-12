@@ -57,7 +57,7 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="portainer.registries.registry({id: item.Id})" ng-if="$ctrl.accessManagement">{{ item.Name }}</a>
+                <a ng-click="$ctrl.goToRegistry(item)" ng-if="$ctrl.accessManagement">{{ item.Name }}</a>
                 <span ng-if="!$ctrl.accessManagement">{{ item.Name }}</span>
                 <span ng-if="item.Authentication" style="margin-left: 5px;" class="label label-info image-tag">authentication-enabled</span>
               </td>
@@ -65,7 +65,9 @@
                 {{ item.URL }}
               </td>
               <td>
-                <a ui-sref="portainer.registries.registry.access({id: item.Id})" ng-if="$ctrl.accessManagement"> <i class="fa fa-users" aria-hidden="true"></i> Manage access </a>
+                <a ng-click="$ctrl.redirectToManageAccess(item)" ng-if="$ctrl.accessManagement && $ctrl.endpointType">
+                  <i class="fa fa-users" aria-hidden="true"></i> Manage access
+                </a>
                 <span class="text-muted space-left" style="cursor: pointer;" data-toggle="tooltip" title="This feature is available in Portainer Business Edition">
                   <i class="fa fa-search" aria-hidden="true"></i> Browse</span
                 >

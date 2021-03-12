@@ -304,17 +304,6 @@ angular.module('portainer.app', ['portainer.oauth']).config([
       },
     };
 
-    var registryAccess = {
-      name: 'portainer.registries.registry.access',
-      url: '/access',
-      views: {
-        'content@': {
-          templateUrl: './views/registries/access/registryAccess.html',
-          controller: 'RegistryAccessController',
-        },
-      },
-    };
-
     var settings = {
       name: 'portainer.settings',
       url: '/settings',
@@ -423,7 +412,6 @@ angular.module('portainer.app', ['portainer.oauth']).config([
     $stateRegistryProvider.register(initAdmin);
     $stateRegistryProvider.register(registries);
     $stateRegistryProvider.register(registry);
-    $stateRegistryProvider.register(registryAccess);
     $stateRegistryProvider.register(registryCreation);
     $stateRegistryProvider.register(settings);
     $stateRegistryProvider.register(settingsAuthentication);

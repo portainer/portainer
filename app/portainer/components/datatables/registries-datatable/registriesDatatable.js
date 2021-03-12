@@ -1,6 +1,6 @@
 angular.module('portainer.app').component('registriesDatatable', {
   templateUrl: './registriesDatatable.html',
-  controller: 'GenericDatatableController',
+  controller: 'RegistriesDatatableController',
   bindings: {
     titleText: '@',
     titleIcon: '@',
@@ -11,5 +11,6 @@ angular.module('portainer.app').component('registriesDatatable', {
     accessManagement: '<',
     removeAction: '<',
     canBrowse: '<',
+    endpointType: '<',
   },
 });
