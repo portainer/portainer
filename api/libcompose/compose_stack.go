@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"path"
 	"path/filepath"
+	"regexp"
+	"strings"
 
 	"github.com/portainer/libcompose/config"
 	"github.com/portainer/libcompose/docker"
@@ -62,6 +64,14 @@ func (manager *ComposeStackManager) createClient(endpoint *portainer.Endpoint) (
 // ComposeSyntaxMaxVersion returns the maximum supported version of the docker compose syntax
 func (manager *ComposeStackManager) ComposeSyntaxMaxVersion() string {
 	return composeSyntaxMaxVersion
+}
+
+// NormalizeStackName returns a new stack name with unsupported characters replaced
+func (manager *ComposeStackManager) NormalizeStackName(name string) string {
+	// this is coming from libcompose
+	// https://github.com/portainer/libcompose/blob/master/project/context.go#L117-L120
+	r := regexp.MustCompile("[^a-z0-9]+")
+	return r.ReplaceAllString(strings.ToLower(name), "")
 }
 
 // Up will deploy a compose stack (equivalent of docker-compose up)
