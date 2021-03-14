@@ -12,7 +12,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/client"
 )
@@ -261,13 +261,13 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		TLSConfig: portainer.TLSConfiguration{
 			TLS: false,
 		},
-		AuthorizedUsers: []portainer.UserID{},
-		AuthorizedTeams: []portainer.TeamID{},
-		Extensions:      []portainer.EndpointExtension{},
-		TagIDs:          payload.TagIDs,
-		Status:          portainer.EndpointStatusUp,
-		Snapshots:       []portainer.Snapshot{},
-		EdgeKey:         edgeKey,
+		UserAccessPolicies: portainer.UserAccessPolicies{},
+		TeamAccessPolicies: portainer.TeamAccessPolicies{},
+		Extensions:         []portainer.EndpointExtension{},
+		TagIDs:             payload.TagIDs,
+		Status:             portainer.EndpointStatusUp,
+		Snapshots:          []portainer.Snapshot{},
+		EdgeKey:            edgeKey,
 	}
 
 	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
