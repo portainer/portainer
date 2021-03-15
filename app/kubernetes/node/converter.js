@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 
-import { KubernetesNode, KubernetesNodeDetails, KubernetesNodeTaint } from 'Kubernetes/node/models';
+import { KubernetesNode, KubernetesNodeDetails, KubernetesNodeTaint, KubernetesNodeAvailabilities, KubernetesPortainerNodeDrainLabel } from 'Kubernetes/node/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import { KubernetesNodeFormValues, KubernetesNodeTaintFormValues, KubernetesNodeLabelFormValues } from 'Kubernetes/node/formValues';
 import { KubernetesNodeCreatePayload, KubernetesNodeTaintPayload } from 'Kubernetes/node/payload';
@@ -29,6 +29,11 @@ class KubernetesNodeConverter {
       DiskPressure: diskPressure && diskPressure.status === 'True',
       NetworkUnavailable: networkUnavailable && networkUnavailable.status === 'True',
     };
+
+    res.Availability = KubernetesNodeAvailabilities.ACTIVE;
+    if (data.spec.unschedulable === true) {
+      res.Availability = _.has(data.metadata.labels, KubernetesPortainerNodeDrainLabel) ? KubernetesNodeAvailabilities.DRAIN : KubernetesNodeAvailabilities.PAUSE;
+    }
 
     if (ready.status === 'False') {
       res.Status = 'Unhealthy';
@@ -67,6 +72,8 @@ class KubernetesNodeConverter {
   static nodeToFormValues(node) {
     const res = new KubernetesNodeFormValues();
 
+    res.Availability = node.Availability;
+
     res.Taints = _.map(node.Taints, (taint) => {
       const res = new KubernetesNodeTaintFormValues();
       res.Key = taint.Key;
@@ -91,6 +98,8 @@ class KubernetesNodeConverter {
 
   static formValuesToNode(node, formValues) {
     const res = angular.copy(node);
+
+    res.Availability = formValues.Availability;
 
     const filteredTaints = _.filter(formValues.Taints, (taint) => !taint.NeedsDeletion);
     res.Taints = _.map(filteredTaints, (item) => {
@@ -129,6 +138,15 @@ class KubernetesNodeConverter {
     payload.spec.taints = taints.length ? taints : undefined;
 
     payload.metadata.labels = node.Labels;
+
+    if (node.Availability !== KubernetesNodeAvailabilities.ACTIVE) {
+      payload.spec.unschedulable = true;
+      if (node.Availability === KubernetesNodeAvailabilities.DRAIN) {
+        payload.metadata.labels[KubernetesPortainerNodeDrainLabel] = '';
+      } else {
+        delete payload.metadata.labels[KubernetesPortainerNodeDrainLabel];
+      }
+    }
 
     return payload;
   }

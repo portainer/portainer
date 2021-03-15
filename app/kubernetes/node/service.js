@@ -57,7 +57,8 @@ class KubernetesNodeService {
       const newNode = KubernetesNodeConverter.formValuesToNode(node, nodeFormValues);
       const payload = KubernetesNodeConverter.patchPayload(node, newNode);
       const data = await this.KubernetesNodes().patch(params, payload).$promise;
-      return data;
+      const patchedNode = KubernetesNodeConverter.apiToNodeDetails(data);
+      return patchedNode;
     } catch (err) {
       throw { msg: 'Unable to patch node', err: err };
     }

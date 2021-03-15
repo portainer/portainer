@@ -2,7 +2,7 @@ import angular from 'angular';
 import PortainerError from 'Portainer/error';
 
 import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
-import KubernetesPodConverter from './converter';
+import KubernetesPodConverter from 'Kubernetes/pod/converter';
 
 class KubernetesPodService {
   /* @ngInject */
@@ -15,6 +15,7 @@ class KubernetesPodService {
     this.logsAsync = this.logsAsync.bind(this);
     this.deleteAsync = this.deleteAsync.bind(this);
     this.patchAsync = this.patchAsync.bind(this);
+    this.evictionAsync = this.evictionAsync.bind(this);
   }
 
   async getAsync(namespace, name) {
@@ -115,6 +116,26 @@ class KubernetesPodService {
 
   delete(pod) {
     return this.$async(this.deleteAsync, pod);
+  }
+
+  /**
+   * EVICT
+   */
+  async evictionAsync(pod) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = pod.Name;
+      params.action = 'eviction';
+      const namespace = pod.Namespace;
+      const podEvictionPayload = KubernetesPodConverter.evictionPayload(pod);
+      await this.KubernetesPods(namespace).evict(params, podEvictionPayload).$promise;
+    } catch (err) {
+      throw new PortainerError('Unable to evict pod', err);
+    }
+  }
+
+  eviction(pod) {
+    return this.$async(this.evictionAsync, pod);
   }
 }
 
