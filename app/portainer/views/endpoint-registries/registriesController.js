@@ -1,5 +1,3 @@
-import { RegistryViewModel } from '../../models/registry';
-
 class EndpointRegistriesController {
   /* @ngInject */
   constructor($async, Notifications, EndpointProvider, Authentication) {
@@ -16,25 +14,7 @@ class EndpointRegistriesController {
       };
 
       try {
-        // fake registry
-        const registry = {
-          Authentication: false,
-          AuthorizedTeams: null,
-          AuthorizedUsers: null,
-          Checked: false,
-          Gitlab: { ProjectId: 0, InstanceURL: '', ProjectPath: '' },
-          Id: 1,
-          Name: 'fake-registry',
-          Password: undefined,
-          TeamAccessPolicies: {},
-          Type: 3,
-          URL: 'docker.io',
-          UserAccessPolicies: {},
-          Username: '',
-        };
-        this.registries = [];
-        this.registries.push(new RegistryViewModel(registry));
-        // end fake registry
+        // get registries
         this.endpointType = this.EndpointProvider.currentEndpoint().Type;
         this.isAdmin = this.Authentication.isAdmin();
       } catch (err) {

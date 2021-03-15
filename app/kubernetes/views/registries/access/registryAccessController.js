@@ -1,6 +1,6 @@
 import { RegistryViewModel } from '../../../../portainer/models/registry';
 
-class DockerRegistryAccessController {
+class KubernetesRegistryAccessController {
   /* @ngInject */
   constructor($async, Notifications, RegistryService) {
     this.$async = $async;
@@ -38,5 +38,5 @@ class DockerRegistryAccessController {
   }
 }
 
-export default DockerRegistryAccessController;
-angular.module('portainer.docker').controller('DockerRegistryAccessController', DockerRegistryAccessController);
+export default KubernetesRegistryAccessController;
+angular.module('portainer.kubernetes').controller('KubernetesRegistryAccessController', KubernetesRegistryAccessController);

@@ -602,8 +602,8 @@ angular.module('portainer.docker', ['portainer.app']).config([
     };
 
     const registryAccess = {
-      name: 'docker.registries.registry.access',
-      url: '/access',
+      name: 'docker.registries.access',
+      url: '/:id/access',
       views: {
         'content@': {
           component: 'dockerRegistryAccessView',

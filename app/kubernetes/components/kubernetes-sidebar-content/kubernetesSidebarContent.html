@@ -20,7 +20,10 @@
     class="sidebar-sublist"
     ng-if="
       $ctrl.adminAccess &&
-      ($ctrl.currentState === 'kubernetes.cluster' || $ctrl.currentState === 'portainer.endpoints.endpoint.kubernetesConfig' || $ctrl.currentState === 'kubernetes.registries')
+      ($ctrl.currentState === 'kubernetes.cluster' ||
+        $ctrl.currentState === 'portainer.endpoints.endpoint.kubernetesConfig' ||
+        $ctrl.currentState === 'kubernetes.registries' ||
+        $ctrl.currentState === 'kubernetes.registries.access')
     "
   >
     <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: $ctrl.endpointId})" ui-sref-active="active">Setup</a>
@@ -30,7 +33,10 @@
     class="sidebar-sublist"
     ng-if="
       $ctrl.adminAccess &&
-      ($ctrl.currentState === 'kubernetes.cluster' || $ctrl.currentState === 'kubernetes.registries' || $ctrl.currentState === 'portainer.endpoints.endpoint.kubernetesConfig')
+      ($ctrl.currentState === 'kubernetes.cluster' ||
+        $ctrl.currentState === 'kubernetes.registries' ||
+        $ctrl.currentState === 'kubernetes.registries.access' ||
+        $ctrl.currentState === 'portainer.endpoints.endpoint.kubernetesConfig')
     "
   >
     <a ui-sref="kubernetes.registries({endpointId: $ctrl.endpointId})" ui-sref-active="active">Registries</a>

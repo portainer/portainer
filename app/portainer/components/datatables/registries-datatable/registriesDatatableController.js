@@ -36,9 +36,9 @@ angular.module('portainer.docker').controller('RegistriesDatatableController', [
         this.endpointType === PortainerEndpointTypes.AgentOnKubernetesEnvironment ||
         this.endpointType === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment
       ) {
-        $state.go('kubernetes.registries.registry.access', { id: item.Id });
+        $state.go('kubernetes.registries.access', { id: item.Id });
       } else {
-        $state.go('docker.registries.registry.access', { id: item.Id });
+        $state.go('docker.registries.access', { id: item.Id });
       }
     };
 
