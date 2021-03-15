@@ -8,14 +8,6 @@ import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
 
 class KubernetesConfigureController {
   /* #region  CONSTRUCTOR */
-
-  // TODO: technical debt
-  // $transition$ cannot be injected as bindings: { $transition$: '<' } inside app/portainer/__module.js
-  // because this view is not using a component (https://ui-router.github.io/guide/ng1/route-to-component#accessing-transition)
-  // and will cause
-  // >> Error: Cannot combine: component|bindings|componentProvider
-  // >> with: templateProvider|templateUrl|template|notify|async|controller|controllerProvider|controllerAs|resolveAs
-  // >> in stateview: 'content@@portainer.endpoints.endpoint.kubernetesConfig'
   /* @ngInject */
   constructor(
     $async,

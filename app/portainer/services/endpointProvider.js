@@ -43,26 +43,6 @@ angular.module('portainer.app').factory(
       return endpoint.ID;
     };
 
-    // TODO: technical debt
-    // Reference issue: JIRA CE-463
-    // Documentation (https://ui-router.github.io/ng1/docs/latest/modules/injectables.html) show the usage of either
-    // * $stateParams
-    // * $transition$
-    // * $uiRouterGlobals
-    // to retrieve the URL params
-    //
-    // * $stateParams: is deprecated and will cause a circular dependency injection error
-    // because EndpointProvider is used by EndpointStatusInterceptor which is injected inside $httpProvider
-    // >> [$injector:cdep] Circular dependency found: $uiRouter <- $stateParams <- EndpointProvider <- EndpointStatusInterceptor <- $http <- $uiRouter
-    // For more details, see https://stackoverflow.com/questions/20230691/injecting-state-ui-router-into-http-interceptor-causes-circular-dependency#20230786
-    //
-    // * $transition$: mentionned as the replacement of $stateParams (https://ui-router.github.io/guide/ng1/migrate-to-1_0#stateparams-deprecation)
-    // but is not injectable without tweaks inside a service
-    //
-    // * $uiRouterGlobal: per https://github.com/angular-ui/ui-router/issues/3237#issuecomment-271979688
-    // seems the recommanded way to retrieve params inside a service/factory
-    //
-    // We need this function to fallback on URL endpoint ID when no endpoint has been selected
     service.getUrlEndpointID = () => {
       return $uiRouterGlobals.params.id;
     };
