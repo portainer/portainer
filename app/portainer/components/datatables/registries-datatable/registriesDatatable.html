@@ -58,7 +58,7 @@
                   <label for="select_{{ $index }}"></label>
                 </span>
                 <a ui-sref="portainer.registries.registry({id: item.Id})" ng-if="$ctrl.accessManagement && item.Id">{{ item.Name }}</a>
-                <span ng-if="$ctrl.accessManagement && !item.Id">{{ item.Name }} (anonymous)</span>
+                <span ng-if="$ctrl.accessManagement && !item.Id">{{ item.Name }}</span>
                 <span ng-if="!$ctrl.accessManagement">{{ item.Name }}</span>
                 <span ng-if="item.Authentication" style="margin-left: 5px;" class="label label-info image-tag">authentication-enabled</span>
               </td>

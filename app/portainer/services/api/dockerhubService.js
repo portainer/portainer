@@ -8,14 +8,7 @@ angular.module('portainer.app').factory('DockerHubService', [
     var service = {};
 
     service.dockerhub = function () {
-      const data = {
-        Authentication: false,
-        Password: undefined,
-        URL: 'docker.io',
-        Username: '',
-      };
-
-      return new DockerHubViewModel(data);
+      return new DockerHubViewModel();
     };
 
     service.update = function (dockerhub) {
