@@ -56,12 +56,12 @@ func (m *Migrator) updateRegistriesToDB27() error {
 	for _, endpoint := range endpoints {
 		for _, registry := range registries {
 			userIDs := []portainer.UserID{}
-			for id := range registry.AuthorizedUsers {
+			for id := range registry.UserAccessPolicies {
 				userIDs = append(userIDs, portainer.UserID(id))
 			}
 
 			teamIDs := []portainer.TeamID{}
-			for id := range registry.AuthorizedTeams {
+			for id := range registry.TeamAccessPolicies {
 				teamIDs = append(teamIDs, portainer.TeamID(id))
 			}
 
