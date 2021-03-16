@@ -931,7 +931,6 @@ class KubernetesCreateApplicationController {
 
         this.editChanges = [];
 
-<<<<<<< HEAD
         if (this.state.params.namespace && this.state.params.name) {
           this.state.isEdit = true;
         }
@@ -956,16 +955,6 @@ class KubernetesCreateApplicationController {
         if (!this.formValues.ResourcePool) {
           return;
         }
-=======
-      const [resourcePools, nodes, ingresses] = await Promise.all([
-        this.KubernetesResourcePoolService.get(),
-        this.KubernetesNodeService.get(),
-        this.KubernetesIngressService.get(),
-      ]);
-      this.ingresses = ingresses;
-      this.resourcePools = _.filter(resourcePools, (resourcePool) => !this.KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name));
-      this.formValues.ResourcePool = this.resourcePools[0];
->>>>>>> 8771c5fc (feat(k8s/ingress): host selector in app create/edit)
 
         _.forEach(nodes, (item) => {
           this.state.nodes.memory += filesizeParser(item.Memory);
