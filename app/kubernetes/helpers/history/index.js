@@ -21,7 +21,7 @@ class KubernetesHistoryHelper {
         [currentRevision, revisionsList] = KubernetesHistoryHelper._getStatefulSetRevisions(rawRevisions, application.Raw);
         break;
       default:
-        throw new PortainerError('Unable to determine which association to use');
+        throw new PortainerError('Unable to determine which association to use to get revisions');
     }
     revisionsList = _.sortBy(revisionsList, 'revision');
     return [currentRevision, revisionsList];

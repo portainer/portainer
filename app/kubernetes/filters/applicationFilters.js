@@ -58,6 +58,8 @@ angular
           return KubernetesApplicationTypeStrings.DAEMONSET;
         case KubernetesApplicationTypes.STATEFULSET:
           return KubernetesApplicationTypeStrings.STATEFULSET;
+        case KubernetesApplicationTypes.POD:
+          return KubernetesApplicationTypeStrings.POD;
         default:
           return '-';
       }
