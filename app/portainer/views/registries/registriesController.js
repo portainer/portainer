@@ -77,7 +77,7 @@ angular.module('portainer.app').controller('RegistriesController', [
       })
         .then(function success(data) {
           $scope.registries = data.registries;
-          $scope.dockerhub = data.dockerhub;
+          $scope.registries.push(data.dockerhub);
           $scope.isAdmin = Authentication.isAdmin();
         })
         .catch(function error(err) {

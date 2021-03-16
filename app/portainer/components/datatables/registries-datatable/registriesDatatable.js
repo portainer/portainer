@@ -1,6 +1,6 @@
 angular.module('portainer.app').component('registriesDatatable', {
   templateUrl: './registriesDatatable.html',
-  controller: 'GenericDatatableController',
+  controller: 'RegistriesDatatableController',
   bindings: {
     titleText: '@',
     titleIcon: '@',
