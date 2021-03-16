@@ -247,6 +247,26 @@ angular.module('portainer.kubernetes', ['portainer.app']).config([
       },
     };
 
+    const registries = {
+      name: 'kubernetes.registries',
+      url: '/registries',
+      views: {
+        'content@': {
+          component: 'endpointRegistriesView',
+        },
+      },
+    };
+
+    const registriesAccess = {
+      name: 'kubernetes.registries.access',
+      url: '/:id/access',
+      views: {
+        'content@': {
+          component: 'kubernetesRegistryAccessView',
+        },
+      },
+    };
+
     $stateRegistryProvider.register(kubernetes);
     $stateRegistryProvider.register(applications);
     $stateRegistryProvider.register(applicationCreation);
@@ -270,5 +290,7 @@ angular.module('portainer.kubernetes', ['portainer.app']).config([
     $stateRegistryProvider.register(resourcePoolAccess);
     $stateRegistryProvider.register(volumes);
     $stateRegistryProvider.register(volume);
+    $stateRegistryProvider.register(registries);
+    $stateRegistryProvider.register(registriesAccess);
   },
 ]);
