@@ -72,7 +72,6 @@ class porImageRegistryController {
       const id = this.model.Registry.Id;
       if (!id) {
         this.model.Registry = dockerhub;
-        this.model.Registry = new DockerHubViewModel();
       } else {
         this.model.Registry = _.find(this.availableRegistries, { Id: id });
       }
