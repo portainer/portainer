@@ -19,6 +19,7 @@ angular.module('portainer.app').controller('StackController', [
   'GroupService',
   'ModalService',
   'StackHelper',
+  'ContainerHelper',
   function (
     $async,
     $q,
