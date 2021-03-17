@@ -14,6 +14,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/client"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 )
 
 type dockerhubStatusResponse struct {
@@ -35,7 +36,7 @@ func (handler *Handler) endpointDockerhubStatus(w http.ResponseWriter, r *http.R
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
-	if !strings.HasPrefix(endpoint.URL, "unix://") && !strings.HasPrefix(endpoint.URL, "npipe://") {
+	if !endpointutils.IsLocalEndpoint(endpoint) {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment type", errors.New("Invalid environment type")}
 	}
 
