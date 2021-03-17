@@ -33,7 +33,7 @@ angular.module('portainer.app').controller('RegistryController', [
 
     function initView() {
       var registryID = $transition$.params().id;
-      RegistryService.registry(registryID)
+      RegistryService.registry(0, registryID)
         .then(function success(data) {
           $scope.registry = data;
         })

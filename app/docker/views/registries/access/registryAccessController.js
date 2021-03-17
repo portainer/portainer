@@ -2,23 +2,11 @@ import { RegistryViewModel } from '../../../../portainer/models/registry';
 
 class DockerRegistryAccessController {
   /* @ngInject */
-  constructor($async, Notifications, RegistryService) {
+  constructor($async, Notifications, EndpointProvider, RegistryService) {
     this.$async = $async;
     this.Notifications = Notifications;
+    this.EndpointProvider = EndpointProvider;
     this.RegistryService = RegistryService;
-  }
-
-  updateAccess() {
-    this.state.actionInProgress = true;
-    this.RegistryService.updateRegistry(this.registry)
-      .then(() => {
-        this.Notifications.success('Access successfully updated');
-        this.reload();
-      })
-      .catch((err) => {
-        this.state.actionInProgress = false;
-        this.Notifications.error('Failure', err, 'Unable to update accesses');
-      });
   }
 
   $onInit() {
@@ -27,7 +15,9 @@ class DockerRegistryAccessController {
         this.state = {
           actionInProgress: false,
         };
-        const registry = await this.RegistryService.registry(this.$transition$.params().id);
+
+        const endpointId = this.EndpointProvider.currentEndpoint().Id;
+        const registry = await this.RegistryService.registry(endpointId, this.$transition$.params().id);
         this.registry = new RegistryViewModel(registry);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to retrieve registry details');

@@ -9,8 +9,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
-	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
 
@@ -67,18 +65,6 @@ func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: endpointId", err}
-	}
-
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == bolterrors.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
-	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
-	}
-
 	registry := &portainer.Registry{
 		Type:               portainer.RegistryType(payload.Type),
 		Name:               payload.Name,
@@ -91,52 +77,22 @@ func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *
 		Gitlab:             payload.Gitlab,
 	}
 
-	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user info from request context", err}
-	}
-
-	canCreate, err := handler.userCanCreateRegistry(securityContext, portainer.EndpointID(endpointID))
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify user authorizations to validate Registry creation", err}
-	}
-
-	if !canCreate {
-		errMsg := "Registry creation is disabled for non-admin users"
-		return &httperror.HandlerError{http.StatusForbidden, errMsg, errors.New(errMsg)}
-	}
-
-	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
-	}
-
-	tokenData, err := security.RetrieveTokenData(r)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user details from authentication token", err}
-	}
-
 	err = handler.DataStore.Registry().CreateRegistry(registry)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the registry inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create registry", err}
 	}
 
-	var resourceControl *portainer.ResourceControl
-
-	isAdmin, err := handler.userIsAdmin(tokenData.ID)
+	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to load user information from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints information inside the database", err}
 	}
 
-	if isAdmin {
-		resourceControl = authorization.NewAdministratorsOnlyResourceControl(handler.computeRegistryResourceControlID(registry.ID, endpoint.ID), portainer.RegistryResourceControl)
-	} else {
-		resourceControl = authorization.NewPrivateResourceControl(handler.computeRegistryResourceControlID(registry.ID, endpoint.ID), portainer.RegistryResourceControl, tokenData.ID)
-	}
-
-	err = handler.DataStore.ResourceControl().CreateResourceControl(resourceControl)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist resource control inside the database", err}
+	for _, endpoint := range endpoints {
+		resourceControl := authorization.NewAdministratorsOnlyResourceControl(handler.computeRegistryResourceControlID(registry.ID, endpoint.ID), portainer.RegistryResourceControl)
+		err = handler.DataStore.ResourceControl().CreateResourceControl(resourceControl)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist resource control inside the database", err}
+		}
 	}
 
 	hideFields(registry)

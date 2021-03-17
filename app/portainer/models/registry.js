@@ -13,6 +13,7 @@ export function RegistryViewModel(data) {
   this.AuthorizedTeams = data.AuthorizedTeams;
   this.UserAccessPolicies = data.UserAccessPolicies;
   this.TeamAccessPolicies = data.TeamAccessPolicies;
+  this.ResourceControl = data.ResourceControl;
   this.Checked = false;
   this.Gitlab = data.Gitlab;
 }

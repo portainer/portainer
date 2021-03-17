@@ -8,8 +8,8 @@ angular.module('portainer.app').factory('Registries', [
       {},
       {
         create: { method: 'POST', ignoreLoadingBar: true },
-        query: { method: 'GET', isArray: true },
-        get: { method: 'GET', params: { id: '@id' } },
+        query: { method: 'GET', params: { endpointId: '@endpointId' }, isArray: true },
+        get: { method: 'GET', params: { id: '@id', action: '', endpointId: '@endpointId' } },
         update: { method: 'PUT', params: { id: '@id' } },
         updateAccess: { method: 'PUT', params: { id: '@id', action: 'access' } },
         remove: { method: 'DELETE', params: { id: '@id' } },

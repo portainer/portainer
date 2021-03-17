@@ -72,7 +72,7 @@ angular.module('portainer.app').controller('RegistriesController', [
 
     function initView() {
       $q.all({
-        registries: RegistryService.registries(),
+        registries: RegistryService.registries(0),
         dockerhub: DockerHubService.dockerhub(),
       })
         .then(function success(data) {

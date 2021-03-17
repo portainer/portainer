@@ -7,7 +7,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
@@ -30,13 +29,6 @@ func (handler *Handler) registryList(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: endpointId", err}
 	}
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == bolterrors.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
-	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
-	}
-
 	registries, err := handler.DataStore.Registry().Registries()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
@@ -47,14 +39,12 @@ func (handler *Handler) registryList(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve resource controls from the database", err}
 	}
 
-	registries = handler.filterRegistries(registries, resourceControls, endpoint.ID)
-
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
-	registries = authorization.DecorateRegistries(registries, resourceControls)
+	registries = handler.filterAndDecorateRegistries(registries, resourceControls, portainer.EndpointID(endpointID))
 
 	if !securityContext.IsAdmin {
 		user, err := handler.DataStore.User().User(securityContext.UserID)

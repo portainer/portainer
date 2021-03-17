@@ -14,10 +14,10 @@ angular.module('portainer.app').factory('RegistryService', [
     'use strict';
     var service = {};
 
-    service.registries = function () {
+    service.registries = function (endpointId) {
       var deferred = $q.defer();
 
-      Registries.query()
+      Registries.query({ endpointId: endpointId })
         .$promise.then(function success(data) {
           var registries = data.map(function (item) {
             return new RegistryViewModel(item);
@@ -31,10 +31,10 @@ angular.module('portainer.app').factory('RegistryService', [
       return deferred.promise;
     };
 
-    service.registry = function (id) {
+    service.registry = function (endpointId, id) {
       var deferred = $q.defer();
 
-      Registries.get({ id: id })
+      Registries.get({ id: id, endpointId: endpointId })
         .$promise.then(function success(data) {
           var registry = new RegistryViewModel(data);
           deferred.resolve(registry);

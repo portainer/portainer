@@ -29,11 +29,14 @@
   </div>
 </div>
 
-<por-access-management
+<!-- access-control-panel -->
+<por-access-control-panel
   ng-if="ctrl.registry"
-  access-controlled-entity="registry"
-  entity-type="registry"
-  action-in-progress="ctrl.state.actionInProgress"
-  update-access="ctrl.updateAccess"
+  resource-id="ctrl.registry.ResourceControl.ResourceId"
+  resource-control="ctrl.registry.ResourceControl"
+  resource-type="'registry'"
+  disable-ownership-change="false"
 >
-</por-access-management>
+</por-access-control-panel>
+
+<!-- !access-control-panel -->

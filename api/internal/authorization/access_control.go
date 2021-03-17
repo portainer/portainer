@@ -1,7 +1,6 @@
 package authorization
 
 import (
-	"fmt"
 	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
@@ -105,20 +104,6 @@ func NewRestrictedResourceControl(resourceIdentifier string, resourceType portai
 		Public:             false,
 		System:             false,
 	}
-}
-
-// DecorateRegistries will iterate through a list of registries, check for an associated resource control for each
-// registry and decorate the registry element if a resource control is found.
-func DecorateRegistries(registries []portainer.Registry, resourceControls []portainer.ResourceControl) []portainer.Registry {
-	for idx, registry := range registries {
-
-		resourceControl := GetResourceControlByResourceIDAndType(fmt.Sprintf("%d", registry.ID), portainer.RegistryResourceControl, resourceControls)
-		if resourceControl != nil {
-			registries[idx].ResourceControl = resourceControl
-		}
-	}
-
-	return registries
 }
 
 // DecorateStacks will iterate through a list of stacks, check for an associated resource control for each

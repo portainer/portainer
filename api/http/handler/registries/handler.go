@@ -98,7 +98,7 @@ func (handler *Handler) computeRegistryResourceControlID(registryID portainer.Re
 	return fmt.Sprintf("%d-%d", int(registryID), int(endpointID))
 }
 
-func (handler *Handler) filterRegistries(registries []portainer.Registry, resourceControls []portainer.ResourceControl, endpointID portainer.EndpointID) []portainer.Registry {
+func (handler *Handler) filterAndDecorateRegistries(registries []portainer.Registry, resourceControls []portainer.ResourceControl, endpointID portainer.EndpointID) []portainer.Registry {
 	if endpointID == 0 {
 		return registries
 	}
@@ -107,6 +107,7 @@ func (handler *Handler) filterRegistries(registries []portainer.Registry, resour
 	for _, registry := range registries {
 		for _, resourceControl := range resourceControls {
 			if resourceControl.ResourceID == handler.computeRegistryResourceControlID(registry.ID, endpointID) {
+				registry.ResourceControl = &resourceControl
 				filteredRegistries = append(filteredRegistries, registry)
 			}
 		}

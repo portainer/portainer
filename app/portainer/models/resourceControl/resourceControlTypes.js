@@ -7,6 +7,7 @@ export const ResourceControlTypeString = Object.freeze({
   STACK: 'stack',
   VOLUME: 'volume',
   CUSTOM_TEMPLATE: 'custom-template',
+  REGISTRY: 'registry',
 });
 
 /**
@@ -21,4 +22,5 @@ export const ResourceControlTypeInt = Object.freeze({
   STACK: 6,
   CONFIG: 7,
   CUSTOM_TEMPLATE: 8,
+  REGISTRY: 9,
 });

@@ -356,6 +356,11 @@ func (m *Migrator) Migrate() error {
 		if err != nil {
 			return err
 		}
+
+		err = m.updateRegistriesToDB27()
+		if err != nil {
+			return err
+		}
 	}
 
 	return m.versionService.StoreDBVersion(portainer.DBVersion)
