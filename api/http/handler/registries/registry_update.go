@@ -9,6 +9,8 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	httperrors "github.com/portainer/portainer/api/http/errors"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 type registryUpdatePayload struct {
@@ -52,17 +54,52 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid registry identifier route variable", err}
 	}
 
-	var payload registryUpdatePayload
-	err = request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
-	}
-
 	registry, err := handler.DataStore.Registry().Registry(portainer.RegistryID(registryID))
 	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a registry with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a registry with the specified identifier inside the database", err}
+	}
+
+	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: endpointId", err}
+	}
+
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	if err == bolterrors.ErrObjectNotFound {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the endpoint associated to the registry inside the database", err}
+	} else if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the endpoint associated to the registry inside the database", err}
+	}
+
+	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
+	}
+
+	resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(handler.computeRegistryResourceControlID(registry.ID, endpoint.ID), portainer.RegistryResourceControl)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the registry", err}
+	}
+
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+	}
+
+	access, err := handler.userCanAccessRegistry(securityContext, endpoint.ID, resourceControl)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify user authorizations to validate registry access", err}
+	}
+	if !access {
+		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", httperrors.ErrResourceAccessDenied}
+	}
+
+	var payload registryUpdatePayload
+	err = request.DecodeAndValidateJSONPayload(r, &payload)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
 	if payload.Name != nil {
@@ -100,14 +137,6 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 			registry.Username = ""
 			registry.Password = ""
 		}
-	}
-
-	if payload.UserAccessPolicies != nil {
-		registry.UserAccessPolicies = payload.UserAccessPolicies
-	}
-
-	if payload.TeamAccessPolicies != nil {
-		registry.TeamAccessPolicies = payload.TeamAccessPolicies
 	}
 
 	err = handler.DataStore.Registry().UpdateRegistry(registry.ID, registry)

@@ -508,8 +508,12 @@ type (
 		Password                string                           `json:"Password,omitempty" example:"registry_password"`
 		ManagementConfiguration *RegistryManagementConfiguration `json:"ManagementConfiguration"`
 		Gitlab                  GitlabRegistryData               `json:"Gitlab"`
-		UserAccessPolicies      UserAccessPolicies               `json:"UserAccessPolicies"`
-		TeamAccessPolicies      TeamAccessPolicies               `json:"TeamAccessPolicies"`
+		ResourceControl         *ResourceControl                 `json:"ResourceControl"`
+
+		// Deprecated fields
+		// Deprecated in DBVersion == 26
+		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
+		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 18
@@ -546,7 +550,7 @@ type (
 		// List of Docker resources that will inherit this access control
 		SubResourceIDs []string `json:"SubResourceIds" example:"617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08"`
 		// Type of Docker resource. Valid values are: 1- container, 2 -service
-		// 3 - volume, 4 - secret, 5 - stack, 6 - config or 7 - custom template
+		// 3 - volume, 4 - secret, 5 - stack, 6 - config, 7 - custom template or 8 - registry
 		Type         ResourceControlType  `json:"Type" example:"1"`
 		UserAccesses []UserResourceAccess `json:"UserAccesses" example:""`
 		TeamAccesses []TeamResourceAccess `json:"TeamAccesses" example:""`
@@ -1487,6 +1491,8 @@ const (
 	ConfigResourceControl
 	// CustomTemplateResourceControl represents a resource control associated to a custom template
 	CustomTemplateResourceControl
+	// RegistryResourceControl represents a resource control associated to a registry
+	RegistryResourceControl
 )
 
 const (
