@@ -24,7 +24,7 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
     }
 
     function isFormValidForDuplication() {
-      return isFormValidForMigration() && ctrl.formValues.newName;
+      return isFormValidForMigration() && ctrl.formValues.newName && !ctrl.yamlError;
     }
 
     function duplicateStack() {

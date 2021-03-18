@@ -40,6 +40,11 @@ angular.module('portainer.docker').factory('ImageHelper', [
         if (registry.Registry.Type === RegistryTypes.GITLAB) {
           const slash = _.startsWith(registry.Image, ':') ? '' : '/';
           fullImageName = registry.Registry.URL + '/' + registry.Registry.Gitlab.ProjectPath + slash + registry.Image;
+        }
+        if (registry.Registry.Type === RegistryTypes.QUAY) {
+          const name = registry.Registry.Quay.UseOrganisation ? registry.Registry.Quay.OrganisationName : registry.Registry.Username;
+          const url = registry.Registry.URL ? registry.Registry.URL + '/' : '';
+          fullImageName = url + name + '/' + registry.Image;
         } else {
           const url = registry.Registry.URL ? registry.Registry.URL + '/' : '';
           fullImageName = url + registry.Image;

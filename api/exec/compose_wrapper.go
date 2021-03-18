@@ -36,6 +36,11 @@ func (w *ComposeWrapper) ComposeSyntaxMaxVersion() string {
 	return portainer.ComposeSyntaxMaxVersion
 }
 
+// NormalizeStackName returns a new stack name with unsupported characters replaced
+func (w *ComposeWrapper) NormalizeStackName(name string) string {
+	return name
+}
+
 // Up builds, (re)creates and starts containers in the background. Wraps `docker-compose up -d` command
 func (w *ComposeWrapper) Up(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	_, err := w.command([]string{"up", "-d"}, stack, endpoint)

@@ -60,6 +60,15 @@ module.exports = {
       },
     ],
   },
+  devServer: {
+    contentBase: path.join(__dirname, '.tmp'),
+    compress: true,
+    port: 8999,
+    proxy: {
+      '/api': 'http://localhost:9000',
+    },
+    open: true,
+  },
   plugins: [
     new HtmlWebpackPlugin({
       template: './app/index.html',

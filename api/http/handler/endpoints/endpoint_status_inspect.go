@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+	"time"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -100,11 +101,13 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 		} else if agentPlatform == portainer.AgentPlatformKubernetes {
 			endpoint.Type = portainer.EdgeAgentOnKubernetesEnvironment
 		}
+	}
 
-		err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to Unable to persist endpoint changes inside the database", err}
-		}
+	endpoint.LastCheckInDate = time.Now().Unix()
+
+	err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to Unable to persist endpoint changes inside the database", err}
 	}
 
 	settings, err := handler.DataStore.Settings().Settings()

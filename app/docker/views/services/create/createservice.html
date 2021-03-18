@@ -95,19 +95,21 @@
           </div>
           <!-- !port-mapping -->
           <!-- create-webhook -->
-          <div class="col-sm-12 form-section-title">
-            Webhooks
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label class="control-label text-left">
-                Create a service webhook
-                <portainer-tooltip
-                  position="top"
-                  message="Create a webhook (or callback URI) to automate the update of this service. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and re-deploy this service."
-                ></portainer-tooltip>
-              </label>
-              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.Webhook" /><i></i> </label>
+          <div ng-if="endpoint.Type !== 4">
+            <div class="col-sm-12 form-section-title">
+              Webhooks
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label class="control-label text-left">
+                  Create a service webhook
+                  <portainer-tooltip
+                    position="top"
+                    message="Create a webhook (or callback URI) to automate the update of this service. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and re-deploy this service."
+                  ></portainer-tooltip>
+                </label>
+                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.Webhook" /><i></i> </label>
+              </div>
             </div>
           </div>
           <!-- !create-webhook  -->

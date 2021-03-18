@@ -1,7 +1,9 @@
 package team
 
 import (
-	"github.com/portainer/portainer/api"
+	"strings"
+
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/internal"
 
@@ -58,7 +60,7 @@ func (service *Service) TeamByName(name string) (*portainer.Team, error) {
 				return err
 			}
 
-			if t.Name == name {
+			if strings.EqualFold(t.Name, name) {
 				team = &t
 				break
 			}

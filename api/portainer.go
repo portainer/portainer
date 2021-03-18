@@ -119,6 +119,7 @@ type (
 		ImageCount              int               `json:"ImageCount"`
 		ServiceCount            int               `json:"ServiceCount"`
 		StackCount              int               `json:"StackCount"`
+		NodeCount               int               `json:"NodeCount"`
 		SnapshotRaw             DockerSnapshotRaw `json:"DockerSnapshotRaw"`
 	}
 
@@ -249,6 +250,8 @@ type (
 		ComposeSyntaxMaxVersion string `json:"ComposeSyntaxMaxVersion" example:"3.8"`
 		// Endpoint specific security settings
 		SecuritySettings EndpointSecuritySettings
+		// LastCheckInDate mark last check-in date on checkin
+		LastCheckInDate int64
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
@@ -339,7 +342,7 @@ type (
 	// EndpointType represents the type of an endpoint
 	EndpointType int
 
-	// EndpointRelation represnts a endpoint relation object
+	// EndpointRelation represents a endpoint relation object
 	EndpointRelation struct {
 		EndpointID EndpointID
 		EdgeStacks map[EdgeStackID]bool
@@ -374,6 +377,12 @@ type (
 		ProjectID   int    `json:"ProjectId"`
 		InstanceURL string `json:"InstanceURL"`
 		ProjectPath string `json:"ProjectPath"`
+	}
+
+	// QuayRegistryData represents data required for Quay registry to work
+	QuayRegistryData struct {
+		UseOrganisation   bool   `json:"UseOrganisation"`
+		OrganisationName  string `json:"OrganisationName"`
 	}
 
 	// JobType represents a job type
@@ -505,6 +514,7 @@ type (
 		Password                string                           `json:"Password,omitempty" example:"registry_password"`
 		ManagementConfiguration *RegistryManagementConfiguration `json:"ManagementConfiguration"`
 		Gitlab                  GitlabRegistryData               `json:"Gitlab"`
+		Quay                    QuayRegistryData                 `json:"Quay"`
 		UserAccessPolicies      UserAccessPolicies               `json:"UserAccessPolicies"`
 		TeamAccessPolicies      TeamAccessPolicies               `json:"TeamAccessPolicies"`
 
@@ -963,6 +973,7 @@ type (
 	// ComposeStackManager represents a service to manage Compose stacks
 	ComposeStackManager interface {
 		ComposeSyntaxMaxVersion() string
+		NormalizeStackName(name string) string
 		Up(stack *Stack, endpoint *Endpoint) error
 		Down(stack *Stack, endpoint *Endpoint) error
 	}
@@ -1182,7 +1193,7 @@ type (
 		DeleteResourceControl(ID ResourceControlID) error
 	}
 
-	// ReverseTunnelService represensts a service used to manage reverse tunnel connections.
+	// ReverseTunnelService represents a service used to manage reverse tunnel connections.
 	ReverseTunnelService interface {
 		StartTunnelServer(addr, port string, snapshotService SnapshotService) error
 		GenerateEdgeKey(url, host string, endpointIdentifier int) string
@@ -1224,7 +1235,7 @@ type (
 		GetNextIdentifier() int
 	}
 
-	// StackService represents a service for managing endpoint snapshots
+	// SnapshotService represents a service for managing endpoint snapshots
 	SnapshotService interface {
 		Start()
 		SetSnapshotInterval(snapshotInterval string) error
@@ -1312,7 +1323,7 @@ const (
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "2.2.0"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 26
+	DBVersion = 27
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
 	ComposeSyntaxMaxVersion = "3.9"
 	// AssetsServerURL represents the URL of the Portainer asset server
@@ -1547,6 +1558,7 @@ const (
 	EdgeAgentActive string = "ACTIVE"
 )
 
+// represents an authorization type
 const (
 	OperationDockerContainerArchiveInfo         Authorization = "DockerContainerArchiveInfo"
 	OperationDockerContainerList                Authorization = "DockerContainerList"

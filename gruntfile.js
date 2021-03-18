@@ -173,7 +173,7 @@ function shell_run_container() {
     'docker rm -f portainer',
     'docker run -d -p 8000:8000 -p 9000:9000 -v $(pwd)/dist:/app -v ' +
       portainer_data +
-      ':/data -v /var/run/docker.sock:/var/run/docker.sock:z -v /tmp:/tmp --name portainer portainer/base /app/portainer',
+      ':/data -v /var/run/docker.sock:/var/run/docker.sock:z -v /var/run/docker.sock:/var/run/alternative.sock:z -v /tmp:/tmp --name portainer portainer/base /app/portainer',
   ].join(';');
 }
 

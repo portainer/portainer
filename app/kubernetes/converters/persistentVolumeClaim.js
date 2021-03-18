@@ -12,7 +12,7 @@ class KubernetesPersistentVolumeClaimConverter {
     res.Name = data.metadata.name;
     res.Namespace = data.metadata.namespace;
     res.CreationDate = data.metadata.creationTimestamp;
-    res.Storage = data.spec.resources.requests.storage.replace('i', 'B');
+    res.Storage = `${data.spec.resources.requests.storage}B`;
     res.StorageClass = _.find(storageClasses, { Name: data.spec.storageClassName });
     res.Yaml = yaml ? yaml.data : '';
     res.ApplicationOwner = data.metadata.labels ? data.metadata.labels[KubernetesPortainerApplicationOwnerLabel] : '';
@@ -35,7 +35,7 @@ class KubernetesPersistentVolumeClaimConverter {
           pvc.PreviousName = item.PersistentVolumeClaimName;
         }
         pvc.StorageClass = existantPVC.StorageClass;
-        pvc.Storage = existantPVC.Storage.charAt(0) + 'i';
+        pvc.Storage = existantPVC.Storage.charAt(0);
         pvc.CreationDate = existantPVC.CreationDate;
         pvc.Id = existantPVC.Id;
       } else {
@@ -45,7 +45,7 @@ class KubernetesPersistentVolumeClaimConverter {
         } else {
           pvc.Name = formValues.Name + '-' + pvc.Name;
         }
-        pvc.Storage = '' + item.Size + item.SizeUnit.charAt(0) + 'i';
+        pvc.Storage = '' + item.Size + item.SizeUnit.charAt(0);
         pvc.StorageClass = item.StorageClass;
       }
       pvc.MountPath = item.ContainerPath;

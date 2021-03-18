@@ -2,10 +2,10 @@ package stacks
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"path"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/asaskevich/govalidator"
@@ -47,15 +47,13 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	stacks, err := handler.DataStore.Stack().Stacks()
+	isUnique, err := handler.checkUniqueName(endpoint, payload.Name, 0, true)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
 	}
-
-	for _, stack := range stacks {
-		if strings.EqualFold(stack.Name, payload.Name) {
-			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", errStackAlreadyExists}
-		}
+	if !isUnique {
+		errorMessage := fmt.Sprintf("A stack with the name '%s' is already running", payload.Name)
+		return &httperror.HandlerError{http.StatusConflict, errorMessage, errors.New(errorMessage)}
 	}
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
@@ -150,15 +148,13 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	stacks, err := handler.DataStore.Stack().Stacks()
+	isUnique, err := handler.checkUniqueName(endpoint, payload.Name, 0, true)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
 	}
-
-	for _, stack := range stacks {
-		if strings.EqualFold(stack.Name, payload.Name) {
-			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", errStackAlreadyExists}
-		}
+	if !isUnique {
+		errorMessage := fmt.Sprintf("A stack with the name '%s' is already running", payload.Name)
+		return &httperror.HandlerError{http.StatusConflict, errorMessage, errors.New(errorMessage)}
 	}
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
@@ -257,15 +253,13 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	stacks, err := handler.DataStore.Stack().Stacks()
+	isUnique, err := handler.checkUniqueName(endpoint, payload.Name, 0, true)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
 	}
-
-	for _, stack := range stacks {
-		if strings.EqualFold(stack.Name, payload.Name) {
-			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", errStackAlreadyExists}
-		}
+	if !isUnique {
+		errorMessage := fmt.Sprintf("A stack with the name '%s' is already running", payload.Name)
+		return &httperror.HandlerError{http.StatusConflict, errorMessage, errors.New(errorMessage)}
 	}
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
