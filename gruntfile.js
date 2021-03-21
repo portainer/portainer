@@ -19,6 +19,8 @@ module.exports = function (grunt) {
     binaries: {
       dockerLinuxVersion: '18.09.3',
       dockerWindowsVersion: '17.09.0-ce',
+      dockerLinuxComposeVersion: '1.27.4',
+      dockerWindowsComposeVersion: '1.28.0',
       komposeVersion: 'v1.22.0',
       kubectlVersion: 'v1.18.0',
     },
@@ -37,6 +39,7 @@ module.exports = function (grunt) {
   grunt.registerTask('build:server', [
     'shell:build_binary:linux:' + arch,
     'shell:download_docker_binary:linux:' + arch,
+    'shell:download_docker_compose_binary:linux:' + arch,
     'shell:download_kompose_binary:linux:' + arch,
     'shell:download_kubectl_binary:linux:' + arch,
   ]);
@@ -63,6 +66,7 @@ module.exports = function (grunt) {
       'copy:assets',
       'shell:build_binary:' + p + ':' + a,
       'shell:download_docker_binary:' + p + ':' + a,
+      'shell:download_docker_compose_binary:' + p + ':' + a,
       'shell:download_kompose_binary:' + p + ':' + a,
       'shell:download_kubectl_binary:' + p + ':' + a,
       'webpack:prod',
@@ -77,6 +81,7 @@ module.exports = function (grunt) {
       'copy:assets',
       'shell:build_binary_azuredevops:' + p + ':' + a,
       'shell:download_docker_binary:' + p + ':' + a,
+      'shell:download_docker_compose_binary:' + p + ':' + a,
       'shell:download_kompose_binary:' + p + ':' + a,
       'shell:download_kubectl_binary:' + p + ':' + a,
       'webpack:prod',
@@ -138,6 +143,7 @@ gruntfile_cfg.shell = {
   download_docker_binary: { command: shell_download_docker_binary },
   download_kompose_binary: { command: shell_download_kompose_binary },
   download_kubectl_binary: { command: shell_download_kubectl_binary },
+  download_docker_compose_binary: { command: shell_download_docker_compose_binary },
   run_container: { command: shell_run_container },
   run_localserver: { command: shell_run_localserver, options: { async: true } },
   install_yarndeps: { command: shell_install_yarndeps },
@@ -191,6 +197,22 @@ function shell_download_docker_binary(p, a) {
     'echo "docker binary exists";',
     'else',
     'build/download_docker_binary.sh ' + ip + ' ' + ia + ' ' + binaryVersion + ';',
+    'fi',
+  ].join(' ');
+}
+
+function shell_download_docker_compose_binary(p, a) {
+  var ps = { windows: 'win', darwin: 'mac' };
+  var as = { arm: 'armhf', arm64: 'aarch64' };
+  var ip = ps[p] || p;
+  var ia = as[a] || a;
+  var binaryVersion = p === 'windows' ? '<%= binaries.dockerWindowsComposeVersion %>' : '<%= binaries.dockerLinuxComposeVersion %>';
+
+  return [
+    'if [ -f dist/docker-compose ] || [ -f dist/docker-compose.exe ]; then',
+    'echo "Docker Compose binary exists";',
+    'else',
+    'build/download_docker_compose_binary.sh ' + ip + ' ' + ia + ' ' + binaryVersion + ';',
     'fi',
   ].join(' ');
 }

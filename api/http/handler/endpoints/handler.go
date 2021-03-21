@@ -30,6 +30,7 @@ type Handler struct {
 	ReverseTunnelService portainer.ReverseTunnelService
 	SnapshotService      portainer.SnapshotService
 	K8sClientFactory     *cli.ClientFactory
+	ComposeStackManager  portainer.ComposeStackManager
 }
 
 // NewHandler creates a handler to manage endpoint operations.
@@ -61,6 +62,6 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.PublicAccess(httperror.LoggerHandler(h.endpointStatusInspect))).Methods(http.MethodGet)
 	h.Handle("/endpoints/{id}/pools/{rpn}/access",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointPoolsAccessUpdate))).Methods(http.MethodPut)
-	
+
 	return h
 }

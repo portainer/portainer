@@ -17,6 +17,7 @@ angular.module('portainer.app').controller('StackController', [
   'EndpointService',
   'GroupService',
   'ModalService',
+  'endpoint',
   function (
     $async,
     $q,
@@ -35,7 +36,8 @@ angular.module('portainer.app').controller('StackController', [
     EndpointProvider,
     EndpointService,
     GroupService,
-    ModalService
+    ModalService,
+    endpoint
   ) {
     $scope.state = {
       actionInProgress: false,
@@ -359,7 +361,7 @@ angular.module('portainer.app').controller('StackController', [
         });
     }
 
-    function initView() {
+    async function initView() {
       var stackName = $transition$.params().name;
       $scope.stackName = stackName;
       var external = $transition$.params().external;
@@ -372,6 +374,10 @@ angular.module('portainer.app').controller('StackController', [
         var stackId = $transition$.params().id;
         loadStack(stackId);
       }
+
+      $scope.composeSyntaxMaxVersion = endpoint.ComposeSyntaxMaxVersion;
+
+      $scope.stackType = $transition$.params().type;
     }
 
     initView();

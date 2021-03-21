@@ -14,7 +14,8 @@ angular
     FormValidator,
     ResourceControlService,
     FormHelper,
-    CustomTemplateService
+    CustomTemplateService,
+    endpoint
   ) {
     $scope.formValues = {
       Name: '',
@@ -176,6 +177,12 @@ angular
         $scope.templates = _.map(templates, (template) => ({ ...template, label: `${template.Title} - ${template.Description}` }));
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to retrieve Custom Templates');
+      }
+
+      try {
+        $scope.composeSyntaxMaxVersion = endpoint.ComposeSyntaxMaxVersion;
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to retrieve the ComposeSyntaxMaxVersion');
       }
     }
 
