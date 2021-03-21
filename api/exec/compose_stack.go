@@ -10,6 +10,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy"
+	"github.com/portainer/portainer/api/http/proxy/factory"
 )
 
 // ComposeStackManager is a wrapper for docker-compose binary
@@ -43,9 +44,13 @@ func (w *ComposeStackManager) ComposeSyntaxMaxVersion() string {
 
 // Up builds, (re)creates and starts containers in the background. Wraps `docker-compose up -d` command
 func (w *ComposeStackManager) Up(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
-	url, err := w.fetchEndpointURL(endpoint)
+	url, proxy, err := w.fetchEndpointProxy(endpoint)
 	if err != nil {
 		return err
+	}
+
+	if proxy != nil {
+		defer proxy.Close()
 	}
 
 	envFilePath, err := createEnvFile(stack)
@@ -61,9 +66,12 @@ func (w *ComposeStackManager) Up(stack *portainer.Stack, endpoint *portainer.End
 
 // Down stops and removes containers, networks, images, and volumes. Wraps `docker-compose down --remove-orphans` command
 func (w *ComposeStackManager) Down(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
-	url, err := w.fetchEndpointURL(endpoint)
+	url, proxy, err := w.fetchEndpointProxy(endpoint)
 	if err != nil {
 		return err
+	}
+	if proxy != nil {
+		defer proxy.Close()
 	}
 
 	filePath := stackFilePath(stack)
@@ -76,19 +84,17 @@ func stackFilePath(stack *portainer.Stack) string {
 	return path.Join(stack.ProjectPath, stack.EntryPoint)
 }
 
-func (w *ComposeStackManager) fetchEndpointURL(endpoint *portainer.Endpoint) (string, error) {
+func (w *ComposeStackManager) fetchEndpointProxy(endpoint *portainer.Endpoint) (string, *factory.ProxyServer, error) {
 	if strings.HasPrefix(endpoint.URL, "unix://") || strings.HasPrefix(endpoint.URL, "npipe://") {
-		return "", nil
+		return "", nil, nil
 	}
 
 	proxy, err := w.proxyManager.CreateComposeProxyServer(endpoint)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
-	defer proxy.Close()
-
-	return fmt.Sprintf("http://127.0.0.1:%d", proxy.Port), nil
+	return fmt.Sprintf("http://127.0.0.1:%d", proxy.Port), proxy, nil
 }
 
 func createEnvFile(stack *portainer.Stack) (string, error) {
