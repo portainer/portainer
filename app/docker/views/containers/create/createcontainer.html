@@ -53,10 +53,8 @@
               <div class="col-sm-12">
                 <label for="ownership" class="control-label text-left">
                   Always pull the image
-                  <portainer-tooltip
-                    position="bottom"
-                    message="When enabled, Portainer will automatically try to pull the specified image before creating the container."
-                  ></portainer-tooltip>
+                  <portainer-tooltip position="bottom" message="When enabled, Portainer will automatically try to pull the specified image before creating the container.">
+                  </portainer-tooltip>
                 </label>
                 <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.alwaysPull" /><i></i> </label>
               </div>
@@ -88,7 +86,8 @@
                 <portainer-tooltip
                   position="bottom"
                   message="When a range of ports on the host and a single port on the container is specified, Docker will randomly choose a single available port in the defined range and forward that to the container port."
-                ></portainer-tooltip>
+                >
+                </portainer-tooltip>
               </label>
               <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addPortBinding()">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> publish a new network port
@@ -151,7 +150,8 @@
                 <portainer-tooltip
                   position="bottom"
                   message="When enabled, Portainer will automatically remove the container when it exits. This is useful when you want to use the container only once."
-                ></portainer-tooltip>
+                >
+                </portainer-tooltip>
               </label>
               <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="config.HostConfig.AutoRemove" /><i></i> </label>
             </div>
@@ -227,7 +227,8 @@
                   <portainer-tooltip
                     position="bottom"
                     message="When container entrypoint is entered as part of the Command field, set Entrypoint to Override mode and leave blank, else it will revert to default."
-                  ></portainer-tooltip>
+                  >
+                  </portainer-tooltip>
                 </label>
                 <div class="col-sm-9">
                   <div class="input-group">
@@ -322,7 +323,8 @@
                     <portainer-tooltip
                       position="top"
                       message="Add button is disabled unless a driver other than none or default is selected. Options are specific to the selected driver, refer to the driver documentation."
-                    ></portainer-tooltip>
+                    >
+                    </portainer-tooltip>
                   </label>
                   <span
                     class="label label-default interactive"
@@ -670,8 +672,6 @@
                 </div>
               </div>
               <!-- !runtimes -->
-            </form>
-            <form class="form-horizontal" style="margin-top: 15px;">
               <!-- devices -->
               <div ng-if="showDeviceMapping" class="form-group">
                 <div class="col-sm-12" style="margin-top: 5px;">
@@ -699,6 +699,86 @@
                 <!-- !devices-input-list -->
               </div>
               <!-- !devices-->
+              <!-- #region GPU -->
+              <div class="col-sm-12 form-section-title">
+                GPU
+              </div>
+              <div class="form-group" ng-if="applicationState.endpoint.apiVersion >= 1.4">
+                <label class="col-xs-3 col-sm-3 col-lg-2 control-label text-left">
+                  Enable GPU
+                </label>
+                <div class="col-xs-9 col-sm-9 col-lg-4">
+                  <label class="switch" style="margin-left: 5px;"> <input type="checkbox" name="use_gpu" ng-model="formValues.GPU.enabled" /><i></i> </label>
+                </div>
+              </div>
+              <div ng-if="formValues.GPU.enabled">
+                <!-- #region GPU DEVICES -->
+                <div class="form-group">
+                  <label class="col-xs-3 col-sm-3 col-lg-2 control-label text-left">
+                    Use specific GPUs
+                    <portainer-tooltip
+                      position="top"
+                      message="By default all GPUs will be usable by the container. Enable this if you want to give access to only specific host GPUs. Accept GPU indexes or UUIDs."
+                    >
+                    </portainer-tooltip>
+                  </label>
+                  <div class="col-xs-9 col-lg-4">
+                    <label class="switch" style="margin-left: 5px;"> <input type="checkbox" name="use_gpu" ng-model="formValues.GPU.useSpecific" /><i></i> </label>
+                    <span class="label label-default interactive" style="margin-left: 10px;" ng-if="formValues.GPU.useSpecific" ng-click="addGPU()">
+                      <i class="fa fa-plus-circle" aria-hidden="true"></i> add gpu
+                    </span>
+                  </div>
+                  <div class="col-sm-12 form-inline" style="margin-top: 10px;" ng-if="formValues.GPU.useSpecific && formValues.GPU.selectedGPUs.length">
+                    <div ng-repeat="gpu in formValues.GPU.selectedGPUs track by $index" style="margin-top: 2px;">
+                      <div class="input-group col-sm-8 input-group-sm">
+                        <span class="input-group-addon">index or UUID</span>
+                        <input type="text" class="form-control" ng-model="gpu.key" placeholder="e.g. 0 or GPU-fef8089b" />
+                      </div>
+                      <button class="btn btn-sm btn-danger" type="button" ng-click="removeGPU($index)">
+                        <i class="fa fa-trash" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <!-- #endregion -->
+
+                <div class="form-group">
+                  <label class="col-xs-3 col-sm-3 col-lg-2 control-label text-left">
+                    Capabilities
+                    <portainer-tooltip
+                      position="top"
+                      message="'compute' and 'utility' capabilities are preselected by Portainer because they are used by default when you don't explicitly specify capabilities with docker CLI '--gpus' option."
+                    >
+                    </portainer-tooltip>
+                  </label>
+                  <div class="col-xs-12 col-sm-9 col-lg-4">
+                    <span
+                      isteven-multi-select
+                      input-model="state.nvidiaCapabilities"
+                      output-model="formValues.GPU.capabilities"
+                      output-properties="name"
+                      button-label="name"
+                      item-label="name - description"
+                      tick-property="selected"
+                      directive-id="nvidia_capabilities"
+                      helper-elements=""
+                      translation="{nothingSelected: 'No capabilities selected'}"
+                    >
+                    </span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-xs-3 col-sm-3 col-lg-2 control-label text-left">
+                    Control
+                    <portainer-tooltip position="top" message="This is the generated equivalent of the '--gpus' docker CLI parameter based on your settings."> </portainer-tooltip>
+                  </label>
+                  <label class="col-xs-12 col-sm-9 col-lg-4">
+                    <code>{{ computeDockerGPUCommand() }}</code>
+                  </label>
+                </div>
+              </div>
+
+              <!-- #endregion GPU -->
               <div class="col-sm-12 form-section-title">
                 Resources
               </div>

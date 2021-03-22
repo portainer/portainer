@@ -62,6 +62,21 @@ angular.module('portainer.docker').controller('ContainerController', [
 
     $scope.updateRestartPolicy = updateRestartPolicy;
 
+    $scope.computeDockerGPUCommand = () => {
+      const gpuOptions = _.find($scope.container.HostConfig.DeviceRequests, { Driver: 'nvidia' });
+      if (!gpuOptions) {
+        return 'No GPU config found';
+      }
+      let gpuStr = 'all';
+      if (gpuOptions.Count !== -1) {
+        gpuStr = `"device=${_.join(gpuOptions.DeviceIDs, ',')}"`;
+      }
+      // we only support a single set of capabilities for now
+      // creation UI needs to be reworked in order to support OR combinations of AND capabilities
+      const capStr = `"capabilities=${_.join(gpuOptions.Capabilities[0], ',')}"`;
+      return `${gpuStr},${capStr}`;
+    };
+
     var update = function () {
       var nodeName = $transition$.params().nodeName;
       HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
