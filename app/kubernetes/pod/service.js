@@ -2,6 +2,7 @@ import angular from 'angular';
 import PortainerError from 'Portainer/error';
 
 import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
+import KubernetesPodConverter from 'Kubernetes/pod/converter';
 
 class KubernetesPodService {
   /* @ngInject */
