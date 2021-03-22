@@ -1,8 +1,9 @@
 import _ from 'lodash-es';
 
-angular.module('portainer.app').factory('EndpointProvider', [
-  'LocalStorage',
-  function EndpointProviderFactory(LocalStorage) {
+angular.module('portainer.app').factory(
+  'EndpointProvider',
+  /* @ngInject */
+  function EndpointProviderFactory(LocalStorage, $uiRouterGlobals) {
     'use strict';
     var service = {};
     var endpoint = {};
@@ -36,7 +37,14 @@ angular.module('portainer.app').factory('EndpointProvider', [
       if (endpoint.ID === undefined) {
         endpoint.ID = LocalStorage.getEndpointID();
       }
+      if (endpoint.ID === null || endpoint.ID === undefined) {
+        return service.getUrlEndpointID();
+      }
       return endpoint.ID;
+    };
+
+    service.getUrlEndpointID = () => {
+      return $uiRouterGlobals.params.id;
     };
 
     service.setEndpointID = function (id) {
@@ -88,5 +96,5 @@ angular.module('portainer.app').factory('EndpointProvider', [
     };
 
     return service;
-  },
-]);
+  }
+);

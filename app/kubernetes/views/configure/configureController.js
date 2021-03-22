@@ -12,7 +12,7 @@ class KubernetesConfigureController {
   constructor(
     $async,
     $state,
-    $stateParams,
+    $transition$,
     Notifications,
     KubernetesStorageService,
     EndpointService,
@@ -24,7 +24,7 @@ class KubernetesConfigureController {
   ) {
     this.$async = $async;
     this.$state = $state;
-    this.$stateParams = $stateParams;
+    this.$transition$ = $transition$;
     this.Notifications = Notifications;
     this.KubernetesStorageService = KubernetesStorageService;
     this.EndpointService = EndpointService;
@@ -210,7 +210,7 @@ class KubernetesConfigureController {
       actionInProgress: false,
       displayConfigureClassPanel: {},
       viewReady: false,
-      endpointId: this.$stateParams.id,
+      endpointId: this.$transition$.params().id,
       duplicates: {
         ingressClasses: new KubernetesFormValidationReferences(),
       },
