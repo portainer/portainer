@@ -53,9 +53,7 @@
       <div
         class="col-sm-11 small text-warning"
         style="margin-top: 5px;"
-        ng-show="
-          kubernetesConfigurationDataCreationForm['configuration_data_key_' + index].$invalid || $ctrl.state.duplicateKeys[index] !== undefined || $ctrl.state.invalidKeys[index]
-        "
+        ng-show="kubernetesConfigurationDataCreationForm['configuration_data_key_' + index].$invalid || (!entry.Used && $ctrl.state.duplicateKeys[index] !== undefined) || $ctrl.state.invalidKeys[index]"
       >
         <ng-messages for="kubernetesConfigurationDataCreationForm['configuration_data_key_' + index].$error">
           <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>

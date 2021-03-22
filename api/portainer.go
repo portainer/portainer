@@ -322,21 +322,21 @@ type (
 	// EndpointSecuritySettings represents settings for an endpoint
 	EndpointSecuritySettings struct {
 		// Whether non-administrator should be able to use bind mounts when creating containers
-		AllowBindMountsForRegularUsers bool `json:"AllowBindMountsForRegularUsers" example:"false"`
+		AllowBindMountsForRegularUsers bool `json:"allowBindMountsForRegularUsers" example:"false"`
 		// Whether non-administrator should be able to use privileged mode when creating containers
-		AllowPrivilegedModeForRegularUsers bool `json:"AllowPrivilegedModeForRegularUsers" example:"false"`
+		AllowPrivilegedModeForRegularUsers bool `json:"allowPrivilegedModeForRegularUsers" example:"false"`
 		// Whether non-administrator should be able to browse volumes
-		AllowVolumeBrowserForRegularUsers bool `json:"AllowVolumeBrowserForRegularUsers" example:""`
+		AllowVolumeBrowserForRegularUsers bool `json:"allowVolumeBrowserForRegularUsers" example:"true"`
 		// Whether non-administrator should be able to use the host pid
-		AllowHostNamespaceForRegularUsers bool `json:"AllowHostNamespaceForRegularUsers" example:""`
+		AllowHostNamespaceForRegularUsers bool `json:"allowHostNamespaceForRegularUsers" example:"true"`
 		// Whether non-administrator should be able to use device mapping
-		AllowDeviceMappingForRegularUsers bool `json:"AllowDeviceMappingForRegularUsers" example:""`
+		AllowDeviceMappingForRegularUsers bool `json:"allowDeviceMappingForRegularUsers" example:"true"`
 		// Whether non-administrator should be able to manage stacks
-		AllowStackManagementForRegularUsers bool `json:"AllowStackManagementForRegularUsers" example:""`
+		AllowStackManagementForRegularUsers bool `json:"allowStackManagementForRegularUsers" example:"true"`
 		// Whether non-administrator should be able to use container capabilities
-		AllowContainerCapabilitiesForRegularUsers bool `json:"AllowContainerCapabilitiesForRegularUsers" example:""`
+		AllowContainerCapabilitiesForRegularUsers bool `json:"allowContainerCapabilitiesForRegularUsers" example:"true"`
 		// Whether host management features are enabled
-		EnableHostManagementFeatures bool `json:"EnableHostManagementFeatures" example:""`
+		EnableHostManagementFeatures bool `json:"enableHostManagementFeatures" example:"true"`
 	}
 
 	// EndpointType represents the type of an endpoint
