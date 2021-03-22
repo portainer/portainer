@@ -24,3 +24,9 @@ by Kyle Mitchell using [SPDX](https://spdx.dev/) from Linux Foundation licensed 
 ### [fontawesome-free](https://github.com/FortAwesome/Font-Awesome) Icons
 
 by [Fort Awesome](https://fortawesome.com/) is licensed under [CC BY 4.0 License](https://creativecommons.org/licenses/by/4.0/)
+
+Portainer also contains the following code, which is licensed under the [MIT license](https://opensource.org/licenses/MIT):
+
+UI For Docker: Copyright (c) 2013-2016 Michael Crosby (crosbymichael.com), Kevan Ahlquist (kevanahlquist.com), Anthony Lapenna (portainer.io)
+
+rdash-angular: Copyright (c) [2014][elliot hesp]
