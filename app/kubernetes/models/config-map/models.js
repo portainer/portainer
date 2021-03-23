@@ -11,7 +11,7 @@ const _KubernetesConfigMap = Object.freeze({
   Namespace: '',
   Yaml: '',
   ConfigurationOwner: '',
-  Data: {},
+  Data: [],
 });
 
 export class KubernetesConfigMap {

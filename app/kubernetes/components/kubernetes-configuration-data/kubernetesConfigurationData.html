@@ -3,13 +3,13 @@
     Data
   </div>
 
-  <div class="form-group">
+  <div class="form-group" ng-if="$ctrl.isCreation">
     <div class="col-sm-12">
       <p>
-        <a class="small interactive" ng-if="$ctrl.formValues.IsSimple" ng-click="$ctrl.formValues.IsSimple = false">
+        <a class="small interactive" ng-if="$ctrl.formValues.IsSimple" ng-click="$ctrl.showAdvancedMode()">
           <i class="fa fa-list-ol space-right" aria-hidden="true"></i> Advanced mode
         </a>
-        <a class="small interactive" ng-if="!$ctrl.formValues.IsSimple" ng-click="$ctrl.formValues.IsSimple = true">
+        <a class="small interactive" ng-if="!$ctrl.formValues.IsSimple" ng-click="$ctrl.showSimpleMode()">
           <i class="fa fa-edit space-right" aria-hidden="true"></i> Simple mode
         </a>
       </p>
@@ -61,7 +61,7 @@
       </div>
     </div>
 
-    <div class="form-group" ng-if="$ctrl.formValues.IsSimple">
+    <div class="form-group" ng-if="$ctrl.formValues.IsSimple && !entry.IsBinary">
       <label for="configuration_data_value_{{ index }}" class="col-sm-1 control-label text-left">Value</label>
       <div class="col-sm-11">
         <textarea
@@ -78,6 +78,13 @@
           <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
         </ng-messages>
       </div>
+    </div>
+
+    <div class="form-group" ng-if="$ctrl.formValues.IsSimple && entry.IsBinary">
+      <label for="configuration_data_value_{{ index }}" class="col-sm-1 control-label text-left">Value</label>
+      <div class="col-sm-11 control-label small text-muted text-left"
+        >Binary data <portainer-tooltip position="bottom" message="This key holds binary data and cannot be displayed."></portainer-tooltip
+      ></div>
     </div>
 
     <div class="form-group" ng-if="$ctrl.formValues.IsSimple">

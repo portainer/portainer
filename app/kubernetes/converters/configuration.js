@@ -1,3 +1,4 @@
+import _ from 'lodash-es';
 import { KubernetesConfiguration, KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
 
 class KubernetesConfigurationConverter {
@@ -9,7 +10,9 @@ class KubernetesConfigurationConverter {
     res.Namespace = secret.Namespace;
     res.CreationDate = secret.CreationDate;
     res.Yaml = secret.Yaml;
-    res.Data = secret.Data;
+    _.forEach(secret.Data, (entry) => {
+      res.Data[entry.Key] = entry.Value;
+    });
     res.ConfigurationOwner = secret.ConfigurationOwner;
     return res;
   }
@@ -22,7 +25,9 @@ class KubernetesConfigurationConverter {
     res.Namespace = configMap.Namespace;
     res.CreationDate = configMap.CreationDate;
     res.Yaml = configMap.Yaml;
-    res.Data = configMap.Data;
+    _.forEach(configMap.Data, (entry) => {
+      res.Data[entry.Key] = entry.Value;
+    });
     res.ConfigurationOwner = configMap.ConfigurationOwner;
     return res;
   }

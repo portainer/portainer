@@ -123,7 +123,12 @@
                 </div>
               </div>
 
-              <kubernetes-configuration-data ng-if="ctrl.formValues" form-values="ctrl.formValues" is-valid="ctrl.state.isDataValid"></kubernetes-configuration-data>
+              <kubernetes-configuration-data
+                ng-if="ctrl.formValues"
+                form-values="ctrl.formValues"
+                is-valid="ctrl.state.isDataValid"
+                is-creation="true"
+              ></kubernetes-configuration-data>
             </div>
 
             <!-- actions -->
