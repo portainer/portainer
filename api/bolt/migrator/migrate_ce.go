@@ -258,6 +258,19 @@ func (m *Migrator) MigrateCE() error {
 		}
 	}
 
+	// Portainer 2.1.0
+	if m.currentDBVersion < 26 {
+		err := m.updateEndpointSettingsToDB26()
+		if err != nil {
+			return err
+		}
+
+		err = m.updateRbacRolesToDB26()
+		if err != nil {
+			return err
+		}
+	}
+
 	// Portainer 2.2.0
 	if m.currentDBVersion < 27 {
 		err := m.updateStackResourceControlToDB27()

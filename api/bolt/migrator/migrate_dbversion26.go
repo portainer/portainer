@@ -2,7 +2,6 @@ package migrator
 
 import (
 	"fmt"
-
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 )

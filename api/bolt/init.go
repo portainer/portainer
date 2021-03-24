@@ -42,18 +42,10 @@ func (store *Store) Init() error {
 					portainer.LDAPGroupSearchSettings{},
 				},
 			},
-			OAuthSettings:                             portainer.OAuthSettings{},
-			AllowBindMountsForRegularUsers:            true,
-			AllowPrivilegedModeForRegularUsers:        true,
-			AllowVolumeBrowserForRegularUsers:         false,
-			AllowHostNamespaceForRegularUsers:         true,
-			AllowDeviceMappingForRegularUsers:         true,
-			AllowStackManagementForRegularUsers:       true,
-			AllowContainerCapabilitiesForRegularUsers: true,
-			EnableHostManagementFeatures:              false,
-			EdgeAgentCheckinInterval:                  portainer.DefaultEdgeAgentCheckinIntervalInSeconds,
-			TemplatesURL:                              portainer.DefaultTemplatesURL,
-			UserSessionTimeout:                        portainer.DefaultUserSessionTimeout,
+			OAuthSettings:            portainer.OAuthSettings{},
+			EdgeAgentCheckinInterval: portainer.DefaultEdgeAgentCheckinIntervalInSeconds,
+			TemplatesURL:             portainer.DefaultTemplatesURL,
+			UserSessionTimeout:       portainer.DefaultUserSessionTimeout,
 		}
 
 		err = store.SettingsService.UpdateSettings(defaultSettings)
@@ -123,7 +115,7 @@ func (store *Store) Init() error {
 			Name:           "Helpdesk",
 			Description:    "Read-only access of all resources in an endpoint",
 			Priority:       2,
-			Authorizations: authorization.DefaultEndpointAuthorizationsForHelpDeskRole(false),
+			Authorizations: authorization.DefaultEndpointAuthorizationsForHelpDeskRole(),
 		}
 
 		err = store.RoleService.CreateRole(environmentReadOnlyUserRole)
@@ -135,7 +127,7 @@ func (store *Store) Init() error {
 			Name:           "Standard user",
 			Description:    "Full control of assigned resources in an endpoint",
 			Priority:       3,
-			Authorizations: authorization.DefaultEndpointAuthorizationsForStandardUserRole(false),
+			Authorizations: authorization.DefaultEndpointAuthorizationsForStandardUserRole(),
 		}
 
 		err = store.RoleService.CreateRole(standardUserRole)
@@ -147,7 +139,7 @@ func (store *Store) Init() error {
 			Name:           "Read-only user",
 			Description:    "Read-only access of assigned resources in an endpoint",
 			Priority:       4,
-			Authorizations: authorization.DefaultEndpointAuthorizationsForReadOnlyUserRole(false),
+			Authorizations: authorization.DefaultEndpointAuthorizationsForReadOnlyUserRole(),
 		}
 
 		err = store.RoleService.CreateRole(readOnlyUserRole)

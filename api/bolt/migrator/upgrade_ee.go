@@ -74,10 +74,6 @@ func (m *Migrator) updateSettingsToEE() error {
 // Updating role authorizations because of the new policies in Kube RBAC
 func (m *Migrator) updateRoleAuthorizationsToEE() error {
 	migrateLog.Debug("Retriving settings")
-	settings, err := m.settingsService.Settings()
-	if err != nil {
-		return err
-	}
 
 	migrateLog.Debug("Updating Endpoint Admin Role")
 	endpointAdministratorRole, err := m.roleService.Role(portainer.RoleID(1))
@@ -95,7 +91,7 @@ func (m *Migrator) updateRoleAuthorizationsToEE() error {
 		return err
 	}
 	helpDeskRole.Priority = 2
-	helpDeskRole.Authorizations = authorization.DefaultEndpointAuthorizationsForHelpDeskRole(settings.AllowVolumeBrowserForRegularUsers)
+	helpDeskRole.Authorizations = authorization.DefaultEndpointAuthorizationsForHelpDeskRole()
 
 	err = m.roleService.UpdateRole(helpDeskRole.ID, helpDeskRole)
 
@@ -105,7 +101,7 @@ func (m *Migrator) updateRoleAuthorizationsToEE() error {
 		return err
 	}
 	standardUserRole.Priority = 3
-	standardUserRole.Authorizations = authorization.DefaultEndpointAuthorizationsForStandardUserRole(settings.AllowVolumeBrowserForRegularUsers)
+	standardUserRole.Authorizations = authorization.DefaultEndpointAuthorizationsForStandardUserRole()
 
 	err = m.roleService.UpdateRole(standardUserRole.ID, standardUserRole)
 
@@ -115,7 +111,7 @@ func (m *Migrator) updateRoleAuthorizationsToEE() error {
 		return err
 	}
 	readOnlyUserRole.Priority = 4
-	readOnlyUserRole.Authorizations = authorization.DefaultEndpointAuthorizationsForReadOnlyUserRole(settings.AllowVolumeBrowserForRegularUsers)
+	readOnlyUserRole.Authorizations = authorization.DefaultEndpointAuthorizationsForReadOnlyUserRole()
 
 	err = m.roleService.UpdateRole(readOnlyUserRole.ID, readOnlyUserRole)
 	if err != nil {

@@ -48,9 +48,17 @@ angular.module('portainer.app').controller('SidebarController', [
 
     async function shouldShowStacks() {
       const isAdmin = Authentication.isAdmin();
-      const { allowStackManagementForRegularUsers } = $scope.applicationState.application;
 
-      return isAdmin || allowStackManagementForRegularUsers || Authentication.hasAuthorizations(['EndpointResourcesAccess']);
+      if (isAdmin || Authentication.hasAuthorizations(['EndpointResourcesAccess'])) {
+        return true;
+      }
+
+      const endpoint = EndpointProvider.currentEndpoint();
+      if (!endpoint || !endpoint.SecuritySettings) {
+        return false;
+      }
+
+      return endpoint.SecuritySettings.allowStackManagementForRegularUsers;
     }
 
     $transitions.onEnter({}, async () => {

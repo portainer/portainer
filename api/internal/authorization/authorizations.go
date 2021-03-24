@@ -153,6 +153,7 @@ func DefaultEndpointAuthorizationsForEndpointAdministratorRole() portainer.Autho
 		portainer.OperationPortainerWebhookList:               true,
 		portainer.OperationPortainerWebhookCreate:             true,
 		portainer.OperationPortainerWebhookDelete:             true,
+		portainer.OperationPortainerEndpointUpdateSettings:    true,
 		portainer.OperationIntegrationStoridgeAdmin:           true,
 		portainer.EndpointResourcesAccess:                     true,
 	}, DefaultK8sClusterAuthorizations()[portainer.RoleIDEndpointAdmin])
@@ -160,7 +161,7 @@ func DefaultEndpointAuthorizationsForEndpointAdministratorRole() portainer.Autho
 
 // DefaultEndpointAuthorizationsForHelpDeskRole returns the default endpoint authorizations
 // associated to the helpdesk role.
-func DefaultEndpointAuthorizationsForHelpDeskRole(volumeBrowsingAuthorizations bool) portainer.Authorizations {
+func DefaultEndpointAuthorizationsForHelpDeskRole() portainer.Authorizations {
 	authorizations := unionAuthorizations(map[portainer.Authorization]bool{
 		portainer.OperationDockerContainerArchiveInfo: true,
 		portainer.OperationDockerContainerList:        true,
@@ -209,17 +210,12 @@ func DefaultEndpointAuthorizationsForHelpDeskRole(volumeBrowsingAuthorizations b
 		portainer.EndpointResourcesAccess:             true,
 	}, DefaultK8sClusterAuthorizations()[portainer.RoleIDHelpdesk])
 
-	if volumeBrowsingAuthorizations {
-		authorizations[portainer.OperationDockerAgentBrowseGet] = true
-		authorizations[portainer.OperationDockerAgentBrowseList] = true
-	}
-
 	return authorizations
 }
 
 // DefaultEndpointAuthorizationsForStandardUserRole returns the default endpoint authorizations
 // associated to the standard user role.
-func DefaultEndpointAuthorizationsForStandardUserRole(volumeBrowsingAuthorizations bool) portainer.Authorizations {
+func DefaultEndpointAuthorizationsForStandardUserRole() portainer.Authorizations {
 	authorizations := unionAuthorizations(map[portainer.Authorization]bool{
 		portainer.OperationDockerContainerArchiveInfo:         true,
 		portainer.OperationDockerContainerList:                true,
@@ -340,20 +336,12 @@ func DefaultEndpointAuthorizationsForStandardUserRole(volumeBrowsingAuthorizatio
 		portainer.OperationPortainerWebhookCreate:             true,
 	}, DefaultK8sClusterAuthorizations()[portainer.RoleIDStandardUser])
 
-	if volumeBrowsingAuthorizations {
-		authorizations[portainer.OperationDockerAgentBrowseGet] = true
-		authorizations[portainer.OperationDockerAgentBrowseList] = true
-		authorizations[portainer.OperationDockerAgentBrowseDelete] = true
-		authorizations[portainer.OperationDockerAgentBrowsePut] = true
-		authorizations[portainer.OperationDockerAgentBrowseRename] = true
-	}
-
 	return authorizations
 }
 
 // DefaultEndpointAuthorizationsForReadOnlyUserRole returns the default endpoint authorizations
 // associated to the readonly user role.
-func DefaultEndpointAuthorizationsForReadOnlyUserRole(volumeBrowsingAuthorizations bool) portainer.Authorizations {
+func DefaultEndpointAuthorizationsForReadOnlyUserRole() portainer.Authorizations {
 	authorizations := unionAuthorizations(map[portainer.Authorization]bool{
 		portainer.OperationDockerContainerArchiveInfo: true,
 		portainer.OperationDockerContainerList:        true,
@@ -400,11 +388,6 @@ func DefaultEndpointAuthorizationsForReadOnlyUserRole(volumeBrowsingAuthorizatio
 		portainer.OperationPortainerStackFile:         true,
 		portainer.OperationPortainerWebhookList:       true,
 	}, DefaultK8sClusterAuthorizations()[portainer.RoleIDReadonly])
-
-	if volumeBrowsingAuthorizations {
-		authorizations[portainer.OperationDockerAgentBrowseGet] = true
-		authorizations[portainer.OperationDockerAgentBrowseList] = true
-	}
 
 	return authorizations
 }
@@ -461,50 +444,19 @@ func (service *Service) TriggerUserAuthUpdate(userID int) {
 	}
 }
 
-// UpdateVolumeBrowsingAuthorizations will update all the volume browsing authorizations for each role (except endpoint administrator)
-// based on the specified removeAuthorizations parameter. If removeAuthorizations is set to true, all
-// the authorizations will be dropped for the each role. If removeAuthorizations is set to false, the authorizations
-// will be reset based for each role.
-func (service Service) UpdateVolumeBrowsingAuthorizations(remove bool) error {
-	roles, err := service.dataStore.Role().Roles()
-	if err != nil {
-		return err
-	}
-
-	for _, role := range roles {
-		// all roles except endpoint administrator
-		if role.ID != portainer.RoleID(1) {
-			updateRoleVolumeBrowsingAuthorizations(&role, remove)
-
-			err := service.dataStore.Role().UpdateRole(role.ID, &role)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
-}
-
-func updateRoleVolumeBrowsingAuthorizations(role *portainer.Role, removeAuthorizations bool) {
-	if !removeAuthorizations {
-		delete(role.Authorizations, portainer.OperationDockerAgentBrowseDelete)
-		delete(role.Authorizations, portainer.OperationDockerAgentBrowseGet)
-		delete(role.Authorizations, portainer.OperationDockerAgentBrowseList)
-		delete(role.Authorizations, portainer.OperationDockerAgentBrowsePut)
-		delete(role.Authorizations, portainer.OperationDockerAgentBrowseRename)
-		return
-	}
+func populateVolumeBrowsingAuthorizations(rolePointer *portainer.Role) portainer.Role {
+	role := *rolePointer
 
 	role.Authorizations[portainer.OperationDockerAgentBrowseGet] = true
 	role.Authorizations[portainer.OperationDockerAgentBrowseList] = true
 
-	// Standard-user
-	if role.ID == portainer.RoleID(3) {
+	if role.ID == portainer.RoleIDStandardUser {
 		role.Authorizations[portainer.OperationDockerAgentBrowseDelete] = true
 		role.Authorizations[portainer.OperationDockerAgentBrowsePut] = true
 		role.Authorizations[portainer.OperationDockerAgentBrowseRename] = true
 	}
+
+	return role
 }
 
 // RemoveTeamAccessPolicies will remove all existing access policies associated to the specified team
@@ -1201,21 +1153,21 @@ func getUserEndpointRole(user *portainer.User, endpoint portainer.Endpoint,
 ) *portainer.Role {
 
 	role := getRoleFromUserAccessPolicies(user, endpoint.UserAccessPolicies, roles)
-	if role != nil {
-		return role
+	if role == nil {
+		role = getRoleFromUserEndpointGroupPolicy(user, &endpoint, roles, groupUserAccessPolicies)
+	}
+	if role == nil {
+		role = getRoleFromTeamAccessPolicies(userMemberships, endpoint.TeamAccessPolicies, roles)
+	}
+	if role == nil {
+		role = getRoleFromTeamEndpointGroupPolicies(userMemberships, &endpoint, roles, groupTeamAccessPolicies)
 	}
 
-	role = getRoleFromUserEndpointGroupPolicy(user, &endpoint, roles, groupUserAccessPolicies)
-	if role != nil {
-		return role
+	if role != nil && endpoint.SecuritySettings.AllowVolumeBrowserForRegularUsers {
+		newRole := populateVolumeBrowsingAuthorizations(role)
+		role = &newRole
 	}
 
-	role = getRoleFromTeamAccessPolicies(userMemberships, endpoint.TeamAccessPolicies, roles)
-	if role != nil {
-		return role
-	}
-
-	role = getRoleFromTeamEndpointGroupPolicies(userMemberships, &endpoint, roles, groupTeamAccessPolicies)
 	return role
 }
 

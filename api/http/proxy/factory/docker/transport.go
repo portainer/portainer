@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/docker/docker/client"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
 	"github.com/portainer/portainer/api/http/security"
@@ -413,12 +413,12 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 		}
 
 		if volumeBrowseRestrictionCheck {
-			settings, err := transport.dataStore.Settings().Settings()
+			securitySettings, err := transport.fetchEndpointSecuritySettings()
 			if err != nil {
 				return nil, err
 			}
 
-			if !settings.AllowVolumeBrowserForRegularUsers {
+			if !securitySettings.AllowVolumeBrowserForRegularUsers {
 				// Return access denied for all roles except endpoint-administrator
 				_, userCanBrowse := user.EndpointAuthorizations[transport.endpoint.ID][portainer.OperationDockerAgentBrowseList]
 				if !userCanBrowse {
@@ -719,4 +719,13 @@ func (transport *Transport) isAdminOrEndpointAdmin(request *http.Request) (bool,
 	_, endpointResourceAccess := user.EndpointAuthorizations[portainer.EndpointID(transport.endpoint.ID)][portainer.EndpointResourcesAccess]
 
 	return endpointResourceAccess, nil
+}
+
+func (transport *Transport) fetchEndpointSecuritySettings() (*portainer.EndpointSecuritySettings, error) {
+	endpoint, err := transport.dataStore.Endpoint().Endpoint(portainer.EndpointID(transport.endpoint.ID))
+	if err != nil {
+		return nil, err
+	}
+
+	return &endpoint.SecuritySettings, nil
 }

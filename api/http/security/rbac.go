@@ -242,6 +242,8 @@ func portainerEndpointOperationAuthorization(url, method string) portainer.Autho
 			return portainer.OperationPortainerEndpointUpdate
 		} else if action == "access" {
 			return portainer.OperationPortainerEndpointUpdateAccess
+		} else if action == "settings" {
+			return portainer.OperationPortainerEndpointUpdateSettings
 		}
 	case http.MethodDelete:
 		if resource != "" && action == "" {

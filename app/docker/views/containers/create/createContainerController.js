@@ -27,9 +27,9 @@ angular.module('portainer.docker').controller('CreateContainerController', [
   'ModalService',
   'RegistryService',
   'SystemService',
-  'SettingsService',
   'PluginService',
   'HttpRequestHelper',
+  'endpoint',
   function (
     $q,
     $scope,
@@ -53,9 +53,9 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     ModalService,
     RegistryService,
     SystemService,
-    SettingsService,
     PluginService,
-    HttpRequestHelper
+    HttpRequestHelper,
+    endpoint
   ) {
     $scope.create = create;
 
@@ -708,16 +708,8 @@ angular.module('portainer.docker').controller('CreateContainerController', [
           Notifications.error('Failure', err, 'Unable to retrieve engine details');
         });
 
-      SettingsService.publicSettings()
-        .then(function success(data) {
-          const isAdmin = $scope.isAdmin;
-          const isEndpointAdmin = Authentication.hasAuthorizations(['EndpointResourcesAccess']);
-          $scope.allowBindMounts = isAdmin || isEndpointAdmin || data.AllowBindMountsForRegularUsers;
-          $scope.allowPrivilegedMode = isAdmin || isEndpointAdmin || data.AllowPrivilegedModeForRegularUsers;
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to retrieve application settings');
-        });
+      $scope.allowBindMounts = checkIfAdminOrEndpointAdmin() || endpoint.SecuritySettings.allowBindMountsForRegularUsers;
+      $scope.allowPrivilegedMode = checkIfAdminOrEndpointAdmin() || endpoint.SecuritySettings.allowPrivilegedModeForRegularUsers;
 
       PluginService.loggingPlugins(apiVersion < 1.25).then(function success(loggingDrivers) {
         $scope.availableLoggingDrivers = loggingDrivers;
@@ -934,15 +926,11 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     }
 
     function shouldShowDevices() {
-      const { allowDeviceMappingForRegularUsers } = $scope.applicationState.application;
-
-      return allowDeviceMappingForRegularUsers || checkIfAdminOrEndpointAdmin();
+      return endpoint.SecuritySettings.allowDeviceMappingForRegularUsers || checkIfAdminOrEndpointAdmin();
     }
 
     function checkIfContainerCapabilitiesEnabled() {
-      const { allowContainerCapabilitiesForRegularUsers } = $scope.applicationState.application;
-
-      return allowContainerCapabilitiesForRegularUsers || checkIfAdminOrEndpointAdmin();
+      return endpoint.SecuritySettings.allowContainerCapabilitiesForRegularUsers || checkIfAdminOrEndpointAdmin();
     }
 
     function checkIfAdminOrEndpointAdmin() {
