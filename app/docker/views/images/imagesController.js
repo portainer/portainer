@@ -4,6 +4,7 @@ import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 angular.module('portainer.docker').controller('ImagesController', [
   '$scope',
   '$state',
+  'Authentication',
   'ImageService',
   'Notifications',
   'ModalService',
@@ -11,10 +12,15 @@ angular.module('portainer.docker').controller('ImagesController', [
   'FileSaver',
   'Blob',
   'EndpointProvider',
-  function ($scope, $state, ImageService, Notifications, ModalService, HttpRequestHelper, FileSaver, Blob, EndpointProvider) {
+  'endpoint',
+  function ($scope, $state, Authentication, ImageService, Notifications, ModalService, HttpRequestHelper, FileSaver, Blob, EndpointProvider, endpoint) {
+    $scope.endpoint = endpoint;
+    $scope.isAdmin = Authentication.isAdmin();
+
     $scope.state = {
       actionInProgress: false,
       exportInProgress: false,
+      pullRateValid: false,
     };
 
     $scope.formValues = {
@@ -138,6 +144,11 @@ angular.module('portainer.docker').controller('ImagesController', [
           Notifications.error('Failure', err, 'Unable to retrieve images');
           $scope.images = [];
         });
+    }
+
+    $scope.setPullImageValidity = setPullImageValidity;
+    function setPullImageValidity(validity) {
+      $scope.state.pullRateValid = validity;
     }
 
     function initView() {

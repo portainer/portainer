@@ -104,6 +104,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
     $scope.state = {
       formValidationError: '',
       actionInProgress: false,
+      pullImageValidity: false,
     };
 
     $scope.allowBindMounts = false;
@@ -113,6 +114,11 @@ angular.module('portainer.docker').controller('CreateServiceController', [
         $scope.$broadcast('rzSliderForceRender');
       });
     };
+
+    $scope.setPullImageValidity = setPullImageValidity;
+    function setPullImageValidity(validity) {
+      $scope.state.pullImageValidity = validity;
+    }
 
     $scope.addPortBinding = function () {
       $scope.formValues.Ports.push({ PublishedPort: '', TargetPort: '', Protocol: 'tcp', PublishMode: 'ingress' });

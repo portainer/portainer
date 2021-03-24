@@ -51,6 +51,7 @@
             <!-- #endregion -->
 
             <!-- #region IMAGE FIELD -->
+
             <div class="form-group">
               <label for="container_image" class="col-sm-1 control-label text-left">Image</label>
               <div class="col-sm-11">
@@ -72,6 +73,14 @@
                 </div>
               </div>
             </div>
+            <por-image-registry-rate-limits
+              is-docker-hub-registry="true"
+              endpoint="ctrl.endpoint"
+              is-authenticated="ctrl.state.isDockerAuthenticated"
+              is-admin="ctrl.isAdmin"
+              set-validity="ctrl.setPullImageValidity"
+            >
+            </por-image-registry-rate-limits>
             <!-- #endregion -->
 
             <div class="col-sm-12 form-section-title">
@@ -1516,7 +1525,7 @@
                 <button
                   type="button"
                   class="btn btn-primary btn-sm"
-                  ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.isDeployUpdateButtonDisabled()"
+                  ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.isDeployUpdateButtonDisabled() || !ctrl.state.pullImageValidity"
                   ng-click="ctrl.deployApplication()"
                   button-spinner="ctrl.state.actionInProgress"
                 >
