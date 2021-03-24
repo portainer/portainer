@@ -172,7 +172,6 @@ class AuthenticationController {
       }
     }
 
-    await this.checkForLatestVersionAsync();
     this.$state.go(path);
   }
   /**
