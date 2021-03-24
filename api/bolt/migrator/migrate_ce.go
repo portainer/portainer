@@ -257,6 +257,15 @@ func (m *Migrator) MigrateCE() error {
 			return err
 		}
 	}
+
+	// Portainer 2.2.0
+	if m.currentDBVersion < 27 {
+		err := m.updateStackResourceControlToDB27()
+		if err != nil {
+			return err
+		}
+	}
+
 	log.Println("Update DB version to ", portainer.DBVersion)
 	return m.versionService.StoreDBVersion(portainer.DBVersion)
 }

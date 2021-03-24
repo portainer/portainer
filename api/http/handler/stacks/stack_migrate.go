@@ -2,15 +2,17 @@ package stacks
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/stackutils"
 )
 
 type stackMigratePayload struct {
@@ -58,7 +60,7 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
 	}
 
-	resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stack.Name, portainer.StackResourceControl)
+	resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the stack", err}
 	}
@@ -102,6 +104,15 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 	oldName := stack.Name
 	if payload.Name != "" {
 		stack.Name = payload.Name
+	}
+
+	isUnique, err := handler.checkUniqueName(targetEndpoint, stack.Name, stack.ID, stack.SwarmID != "")
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
+	}
+
+	if !isUnique {
+		return &httperror.HandlerError{http.StatusConflict, fmt.Sprintf("A stack with the name '%s' is already running on endpoint '%s'", stack.Name, targetEndpoint.Name), errStackAlreadyExists}
 	}
 
 	migrationError := handler.migrateStack(r, stack, targetEndpoint)

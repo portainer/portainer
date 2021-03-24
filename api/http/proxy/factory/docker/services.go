@@ -20,15 +20,15 @@ const (
 	serviceObjectIdentifier = "ID"
 )
 
-func getInheritedResourceControlFromServiceLabels(dockerClient *client.Client, serviceID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
+func getInheritedResourceControlFromServiceLabels(dockerClient *client.Client, endpointID portainer.EndpointID, serviceID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
 	service, _, err := dockerClient.ServiceInspectWithRaw(context.Background(), serviceID, types.ServiceInspectOptions{})
 	if err != nil {
 		return nil, err
 	}
 
-	swarmStackName := service.Spec.Labels[resourceLabelForDockerSwarmStackName]
-	if swarmStackName != "" {
-		return authorization.GetResourceControlByResourceIDAndType(swarmStackName, portainer.StackResourceControl, resourceControls), nil
+	stackResourceID := getStackResourceIDFromLabels(service.Spec.Labels, endpointID)
+	if stackResourceID != "" {
+		return authorization.GetResourceControlByResourceIDAndType(stackResourceID, portainer.StackResourceControl, resourceControls), nil
 	}
 
 	return nil, nil

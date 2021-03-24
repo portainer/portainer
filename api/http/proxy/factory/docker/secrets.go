@@ -15,15 +15,15 @@ const (
 	secretObjectIdentifier = "ID"
 )
 
-func getInheritedResourceControlFromSecretLabels(dockerClient *client.Client, secretID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
+func getInheritedResourceControlFromSecretLabels(dockerClient *client.Client, endpointID portainer.EndpointID, secretID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
 	secret, _, err := dockerClient.SecretInspectWithRaw(context.Background(), secretID)
 	if err != nil {
 		return nil, err
 	}
 
-	swarmStackName := secret.Spec.Labels[resourceLabelForDockerSwarmStackName]
-	if swarmStackName != "" {
-		return authorization.GetResourceControlByResourceIDAndType(swarmStackName, portainer.StackResourceControl, resourceControls), nil
+	stackResourceID := getStackResourceIDFromLabels(secret.Spec.Labels, endpointID)
+	if stackResourceID != "" {
+		return authorization.GetResourceControlByResourceIDAndType(stackResourceID, portainer.StackResourceControl, resourceControls), nil
 	}
 
 	return nil, nil

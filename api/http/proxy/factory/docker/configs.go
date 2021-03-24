@@ -15,15 +15,15 @@ const (
 	configObjectIdentifier = "ID"
 )
 
-func getInheritedResourceControlFromConfigLabels(dockerClient *client.Client, configID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
+func getInheritedResourceControlFromConfigLabels(dockerClient *client.Client, endpointID portainer.EndpointID, configID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
 	config, _, err := dockerClient.ConfigInspectWithRaw(context.Background(), configID)
 	if err != nil {
 		return nil, err
 	}
 
-	swarmStackName := config.Spec.Labels[resourceLabelForDockerSwarmStackName]
-	if swarmStackName != "" {
-		return authorization.GetResourceControlByResourceIDAndType(swarmStackName, portainer.StackResourceControl, resourceControls), nil
+	stackResourceID := getStackResourceIDFromLabels(config.Spec.Labels, endpointID)
+	if stackResourceID != "" {
+		return authorization.GetResourceControlByResourceIDAndType(stackResourceID, portainer.StackResourceControl, resourceControls), nil
 	}
 
 	return nil, nil

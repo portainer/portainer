@@ -8,7 +8,6 @@ import (
 	"sync"
 
 	"github.com/docker/docker/api/types"
-
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
@@ -122,7 +121,7 @@ func (handler *Handler) checkUniqueName(endpoint *portainer.Endpoint, name strin
 	}
 
 	for _, stack := range stacks {
-		if strings.EqualFold(stack.Name, name) && (stackID == 0 || stackID != stack.ID) {
+		if strings.EqualFold(stack.Name, name) && (stackID == 0 || stackID != stack.ID) && stack.EndpointID == endpoint.ID {
 			return false, nil
 		}
 	}
