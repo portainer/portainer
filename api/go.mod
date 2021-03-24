@@ -40,3 +40,5 @@ require (
 )
 
 replace github.com/docker/docker => github.com/docker/engine v1.4.2-0.20200204220554-5f6d6f3f2203
+
+replace golang.org/x/sys => golang.org/x/sys v0.0.0-20190826190057-c7b8b68b1456
