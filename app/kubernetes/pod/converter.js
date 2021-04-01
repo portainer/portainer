@@ -9,8 +9,8 @@ import {
   KubernetesPortainerApplicationNote,
 } from 'Kubernetes/models/application/models';
 
+import { KubernetesPod, KubernetesPodToleration, KubernetesPodAffinity, KubernetesPodContainer, KubernetesPodContainerTypes, KubernetesPodEviction } from 'Kubernetes/pod/models';
 import { createPayloadFactory } from './payloads/create';
-import { KubernetesPod, KubernetesPodToleration, KubernetesPodAffinity, KubernetesPodContainer, KubernetesPodContainerTypes } from './models';
 
 function computeStatus(statuses) {
   const containerStatuses = _.map(statuses, 'state');
@@ -114,6 +114,13 @@ export default class KubernetesPodConverter {
     res.Affinity = computeAffinity(data.spec.affinity);
     res.NodeSelector = data.spec.nodeSelector;
     res.Tolerations = computeTolerations(data.spec.tolerations);
+    return res;
+  }
+
+  static evictionPayload(pod) {
+    const res = new KubernetesPodEviction();
+    res.metadata.name = pod.Name;
+    res.metadata.namespace = pod.Namespace;
     return res;
   }
 

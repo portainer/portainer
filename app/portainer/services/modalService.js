@@ -37,6 +37,23 @@ angular.module('portainer.app').factory('ModalService', [
       });
     };
 
+    service.confirmWebEditorDiscard = confirmWebEditorDiscard;
+    function confirmWebEditorDiscard() {
+      const options = {
+        title: 'Are you sure ?',
+        message: 'You currently have unsaved changes in the editor. Are you sure you want to leave?',
+        buttons: {
+          confirm: {
+            label: 'Yes',
+            className: 'btn-danger',
+          },
+        },
+      };
+      return new Promise((resolve) => {
+        service.confirm({ ...options, callback: (confirmed) => resolve(confirmed) });
+      });
+    }
+
     service.confirmAsync = confirmAsync;
     function confirmAsync(options) {
       return new Promise((resolve) => {

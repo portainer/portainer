@@ -5,5 +5,6 @@ angular.module('portainer.kubernetes').component('kubernetesConfigurationData', 
     formValues: '=',
     isValid: '=',
     isCreation: '=',
+    isEditorDirty: '=',
   },
 });

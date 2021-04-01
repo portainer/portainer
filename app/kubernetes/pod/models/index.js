@@ -65,6 +65,21 @@ export class KubernetesPodContainer {
   }
 }
 
+const _KubernetesPodEviction = Object.freeze({
+  apiVersion: 'policy/v1beta1',
+  kind: 'Eviction',
+  metadata: {
+    name: '',
+    namespace: '',
+  },
+});
+
+export class KubernetesPodEviction {
+  constructor() {
+    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesPodEviction)));
+  }
+}
+
 export const KubernetesPodContainerTypes = {
   INIT: 1,
   APP: 2,

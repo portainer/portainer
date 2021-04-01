@@ -322,23 +322,23 @@ type (
 	// EndpointSecuritySettings represents settings for an endpoint
 	EndpointSecuritySettings struct {
 		// Whether non-administrator should be able to use bind mounts when creating containers
-		AllowBindMountsForRegularUsers bool `json:"AllowBindMountsForRegularUsers" example:"false"`
+		AllowBindMountsForRegularUsers bool `json:"allowBindMountsForRegularUsers" example:"false"`
 		// Whether non-administrator should be able to use privileged mode when creating containers
-		AllowPrivilegedModeForRegularUsers bool `json:"AllowPrivilegedModeForRegularUsers" example:"false"`
+		AllowPrivilegedModeForRegularUsers bool `json:"allowPrivilegedModeForRegularUsers" example:"false"`
 		// Whether non-administrator should be able to browse volumes
-		AllowVolumeBrowserForRegularUsers bool `json:"AllowVolumeBrowserForRegularUsers" example:""`
+		AllowVolumeBrowserForRegularUsers bool `json:"allowVolumeBrowserForRegularUsers" example:"true"`
 		// Whether non-administrator should be able to use the host pid
-		AllowHostNamespaceForRegularUsers bool `json:"AllowHostNamespaceForRegularUsers" example:""`
+		AllowHostNamespaceForRegularUsers bool `json:"allowHostNamespaceForRegularUsers" example:"true"`
 		// Whether non-administrator should be able to use device mapping
-		AllowDeviceMappingForRegularUsers bool `json:"AllowDeviceMappingForRegularUsers" example:""`
+		AllowDeviceMappingForRegularUsers bool `json:"allowDeviceMappingForRegularUsers" example:"true"`
 		// Whether non-administrator should be able to manage stacks
-		AllowStackManagementForRegularUsers bool `json:"AllowStackManagementForRegularUsers" example:""`
+		AllowStackManagementForRegularUsers bool `json:"allowStackManagementForRegularUsers" example:"true"`
 		// Whether non-administrator should be able to use container capabilities
-		AllowContainerCapabilitiesForRegularUsers bool `json:"AllowContainerCapabilitiesForRegularUsers" example:""`
+		AllowContainerCapabilitiesForRegularUsers bool `json:"allowContainerCapabilitiesForRegularUsers" example:"true"`
 		// Whether non-administrator should be able to use sysctl settings
-		AllowSysctlSettingForRegularUsers bool `json:"AllowSysctlSettingForRegularUsers" example:""`
+		AllowSysctlSettingForRegularUsers bool `json:"AllowSysctlSettingForRegularUsers" example:"true"`
 		// Whether host management features are enabled
-		EnableHostManagementFeatures bool `json:"EnableHostManagementFeatures" example:""`
+		EnableHostManagementFeatures bool `json:"enableHostManagementFeatures" example:"true"`
 	}
 
 	// EndpointType represents the type of an endpoint
@@ -379,6 +379,12 @@ type (
 		ProjectID   int    `json:"ProjectId"`
 		InstanceURL string `json:"InstanceURL"`
 		ProjectPath string `json:"ProjectPath"`
+	}
+
+	// QuayRegistryData represents data required for Quay registry to work
+	QuayRegistryData struct {
+		UseOrganisation   bool   `json:"UseOrganisation"`
+		OrganisationName  string `json:"OrganisationName"`
 	}
 
 	// JobType represents a job type
@@ -510,6 +516,7 @@ type (
 		Password                string                           `json:"Password,omitempty" example:"registry_password"`
 		ManagementConfiguration *RegistryManagementConfiguration `json:"ManagementConfiguration"`
 		Gitlab                  GitlabRegistryData               `json:"Gitlab"`
+		Quay                    QuayRegistryData                 `json:"Quay"`
 		UserAccessPolicies      UserAccessPolicies               `json:"UserAccessPolicies"`
 		TeamAccessPolicies      TeamAccessPolicies               `json:"TeamAccessPolicies"`
 
@@ -968,6 +975,7 @@ type (
 	// ComposeStackManager represents a service to manage Compose stacks
 	ComposeStackManager interface {
 		ComposeSyntaxMaxVersion() string
+		NormalizeStackName(name string) string
 		Up(stack *Stack, endpoint *Endpoint) error
 		Down(stack *Stack, endpoint *Endpoint) error
 	}

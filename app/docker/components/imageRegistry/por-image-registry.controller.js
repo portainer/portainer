@@ -48,7 +48,11 @@ class porImageRegistryController {
     this.availableImages = images;
   }
 
-  onRegistryChange() {
+  isDockerHubRegistry() {
+    return this.model.UseRegistry && this.model.Registry.Name === 'DockerHub';
+  }
+
+  async onRegistryChange() {
     this.prepareAutocomplete();
     if (this.model.Registry.Type === RegistryTypes.GITLAB && this.model.Image) {
       this.model.Image = _.replace(this.model.Image, this.model.Registry.Gitlab.ProjectPath, '');

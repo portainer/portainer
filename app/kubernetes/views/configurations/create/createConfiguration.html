@@ -114,11 +114,13 @@
                 <a href="https://kubernetes.io/docs/concepts/configuration/secret/#secret-types" target="_blank">official documentation</a>.
               </div>
             </div>
+
             <kubernetes-configuration-data
               ng-if="ctrl.formValues"
               form-values="ctrl.formValues"
               is-valid="ctrl.state.isDataValid"
               is-creation="true"
+              is-editor-dirty="ctrl.state.isEditorDirty"
             ></kubernetes-configuration-data>
 
             <!-- actions -->
