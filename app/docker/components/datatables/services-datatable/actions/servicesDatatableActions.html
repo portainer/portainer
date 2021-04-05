@@ -1,10 +1,10 @@
-<div class="actionBar" authorization="DockerServiceUpdate, DockerServiceDelete, DockerServiceCreate">
+<div class="actionBar" authorization="DockerServiceUpdate, DockerServiceForceUpdateService, DockerServiceDelete, DockerServiceCreate">
   <div class="btn-group" role="group" aria-label="...">
     <button
       ng-if="$ctrl.showUpdateAction"
       type="button"
       class="btn btn-sm btn-primary"
-      authorization="DockerServiceUpdate"
+      authorization="DockerServiceUpdate,DockerServiceForceUpdateService"
       ng-disabled="$ctrl.selectedItemCount === 0"
       ng-click="$ctrl.updateAction($ctrl.selectedItems)"
     >

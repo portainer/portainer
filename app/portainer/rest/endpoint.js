@@ -23,6 +23,7 @@ angular.module('portainer.app').factory('Endpoints', [
         status: { method: 'GET', params: { id: '@id', action: 'status' } },
         updateSecuritySettings: { method: 'PUT', params: { id: '@id', action: 'settings' } },
         updatePoolAccess: { url: API_ENDPOINT_ENDPOINTS + '/:id/pools/:rpn/access', method: 'PUT', params: { id: '@id', rpn: '@rpn' } },
+        forceUpdateService: { method: 'PUT', params: { id: '@id', action: 'forceupdateservice' } },
       }
     );
   },

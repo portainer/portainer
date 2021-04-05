@@ -1,4 +1,5 @@
 import angular from 'angular';
+import _ from 'lodash-es';
 
 class RolesController {
   /* @ngInject */
@@ -12,6 +13,7 @@ class RolesController {
 
     try {
       this.roles = await this.RoleService.roles();
+      this.roles = _.orderBy(this.roles, 'Priority', 'asc');
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve roles');
     }

@@ -50,7 +50,7 @@ class AccessViewerController {
   }
 
   findLowestRole(policies) {
-    return _.first(_.orderBy(policies, 'RoleId', 'desc'));
+    return _.first(_.orderBy(policies, 'RolePriority', 'desc'));
   }
 
   getRoleFromUserEndpointPolicy(user, endpoint) {

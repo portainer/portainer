@@ -132,6 +132,7 @@ func (server *Server) Start() error {
 	endpointHandler.ReverseTunnelService = server.ReverseTunnelService
 	endpointHandler.K8sClientFactory = server.KubernetesClientFactory
 	endpointHandler.ComposeStackManager = server.ComposeStackManager
+	endpointHandler.DockerClientFactory = server.DockerClientFactory
 
 	var endpointEdgeHandler = endpointedge.NewHandler(requestBouncer)
 	endpointEdgeHandler.DataStore = server.DataStore

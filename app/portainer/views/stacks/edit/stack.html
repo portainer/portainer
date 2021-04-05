@@ -112,6 +112,7 @@
                     yml="true"
                     on-change="(editorUpdate)"
                     value="stackFileContent"
+                    read-only="editorReadOnly"
                   ></code-editor>
                 </div>
               </div>
@@ -132,11 +133,11 @@
                     <div ng-repeat="variable in stack.Env" style="margin-top: 2px;">
                       <div class="input-group col-sm-5 input-group-sm">
                         <span class="input-group-addon">name</span>
-                        <input type="text" class="form-control" ng-model="variable.name" placeholder="e.g. FOO" />
+                        <input type="text" class="form-control" ng-model="variable.name" placeholder="e.g. FOO" disable-authorization="PortainerStackUpdate" />
                       </div>
                       <div class="input-group col-sm-5 input-group-sm">
                         <span class="input-group-addon">value</span>
-                        <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. bar" />
+                        <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. bar" disable-authorization="PortainerStackUpdate" />
                       </div>
                       <button class="btn btn-sm btn-danger" type="button" ng-click="removeEnvironmentVariable($index)" authorization="PortainerStackUpdate">
                         <i class="fa fa-trash" aria-hidden="true"></i>

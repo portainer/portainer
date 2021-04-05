@@ -34,6 +34,15 @@ func getPortainerK8sRoleMapping() map[portainer.RoleID]k8sRoleSet {
 				portainer.K8sRolePortainerView,
 			},
 		},
+		portainer.RoleIDOperator: k8sRoleSet{
+			k8sClusterRoles: []portainer.K8sRole{
+				portainer.K8sRolePortainerHelpdesk,
+				portainer.K8sRolePortainerOperator,
+			},
+			k8sRoles: []portainer.K8sRole{
+				portainer.K8sRolePortainerView,
+			},
+		},
 		portainer.RoleIDStandardUser: k8sRoleSet{
 			k8sClusterRoles: []portainer.K8sRole{
 				portainer.K8sRolePortainerBasic,
@@ -96,6 +105,26 @@ func getPortainerDefaultK8sRoles() map[portainer.K8sRole]k8sRoleConfig {
 					Verbs:     []string{"get", "list", "watch"},
 					Resources: []string{"ingresses"},
 					APIGroups: []string{"networking.k8s.io"},
+				},
+			},
+		},
+		portainer.K8sRolePortainerOperator: k8sRoleConfig{
+			isSystem: false,
+			rules: []rbacv1.PolicyRule{
+				{
+					Verbs:     []string{"update"},
+					Resources: []string{"configmaps", "secrets"},
+					APIGroups: []string{""},
+				},
+				{
+					Verbs:     []string{"delete"},
+					Resources: []string{"pods"},
+					APIGroups: []string{""},
+				},
+				{
+					Verbs:     []string{"patch"},
+					Resources: []string{"deployments"},
+					APIGroups: []string{"apps"},
 				},
 			},
 		},
@@ -395,7 +424,7 @@ func (kcl *KubeClient) createClusterRoleBindings(serviceAccountName string,
 		Name:      serviceAccountName,
 		Namespace: portainerNamespace,
 	})
-	
+
 	_, err = kcl.cli.RbacV1().ClusterRoleBindings().Update(clusterRoleBinding)
 	return err
 }

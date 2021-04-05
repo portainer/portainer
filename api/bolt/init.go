@@ -4,7 +4,6 @@ import (
 	"github.com/gofrs/uuid"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
-	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 // Init creates the default data set.
@@ -99,50 +98,7 @@ func (store *Store) Init() error {
 	}
 
 	if len(roles) == 0 {
-		environmentAdministratorRole := &portainer.Role{
-			Name:           "Endpoint administrator",
-			Description:    "Full control of all resources in an endpoint",
-			Priority:       1,
-			Authorizations: authorization.DefaultEndpointAuthorizationsForEndpointAdministratorRole(),
-		}
-
-		err = store.RoleService.CreateRole(environmentAdministratorRole)
-		if err != nil {
-			return err
-		}
-
-		environmentReadOnlyUserRole := &portainer.Role{
-			Name:           "Helpdesk",
-			Description:    "Read-only access of all resources in an endpoint",
-			Priority:       2,
-			Authorizations: authorization.DefaultEndpointAuthorizationsForHelpDeskRole(),
-		}
-
-		err = store.RoleService.CreateRole(environmentReadOnlyUserRole)
-		if err != nil {
-			return err
-		}
-
-		standardUserRole := &portainer.Role{
-			Name:           "Standard user",
-			Description:    "Full control of assigned resources in an endpoint",
-			Priority:       3,
-			Authorizations: authorization.DefaultEndpointAuthorizationsForStandardUserRole(),
-		}
-
-		err = store.RoleService.CreateRole(standardUserRole)
-		if err != nil {
-			return err
-		}
-
-		readOnlyUserRole := &portainer.Role{
-			Name:           "Read-only user",
-			Description:    "Read-only access of assigned resources in an endpoint",
-			Priority:       4,
-			Authorizations: authorization.DefaultEndpointAuthorizationsForReadOnlyUserRole(),
-		}
-
-		err = store.RoleService.CreateRole(readOnlyUserRole)
+		err := store.RoleService.CreateOrUpdatePredefinedRoles()
 		if err != nil {
 			return err
 		}

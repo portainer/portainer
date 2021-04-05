@@ -65,7 +65,7 @@
           <thead>
             <tr>
               <th style="width: 55px;">
-                <span class="md-checkbox" authorization="DockerServiceUpdate, DockerServiceDelete, DockerServiceCreate">
+                <span class="md-checkbox" authorization="DockerServiceUpdate, DockerServiceForceUpdateService, DockerServiceDelete, DockerServiceCreate">
                   <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                   <label for="select_all"></label>
                 </span>
@@ -132,7 +132,7 @@
               class="interactive"
             >
               <td>
-                <span class="md-checkbox" authorization="DockerServiceUpdate, DockerServiceDelete, DockerServiceCreate">
+                <span class="md-checkbox" authorization="DockerServiceUpdate, DockerServiceForceUpdateService, DockerServiceDelete, DockerServiceCreate">
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event); $event.stopPropagation()" />
                   <label for="select_{{ $index }}"></label>
                 </span>

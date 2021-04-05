@@ -1245,9 +1245,9 @@ const (
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "2.0.2"
 	// DBVersion is the version number of the Portainer CE database
-	DBVersion = 27
+	DBVersion = 28
 	// DBVersionEE is the version number of the Portainer EE database
-	DBVersionEE = 27
+	DBVersionEE = 28
 	// Edition is the edition of the Portainer API
 	Edition = PortainerEE
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
@@ -1486,6 +1486,8 @@ const (
 	RoleIDStandardUser
 	// RoleIDReadonly represents readonly role id
 	RoleIDReadonly
+	// RoleIDOperator represents operator role id
+	RoleIDOperator
 )
 
 const (
@@ -1510,6 +1512,8 @@ const (
 	K8sRolePortainerBasic K8sRole = "portainer-basic"
 	// K8sRolePortainerHelpdesk is a portainer k8s role at cluster level
 	K8sRolePortainerHelpdesk K8sRole = "portainer-helpdesk"
+	// K8sRolePortainerOperator is a portainer k8s role at cluster level
+	K8sRolePortainerOperator K8sRole = "portainer-operator"
 	// K8sRolePortainerView is a portainer k8s role at namespace level
 	K8sRolePortainerView K8sRole = "portainer-view"
 	// K8sRolePortainerEdit is a portainer k8s role at namespace level
@@ -1589,6 +1593,7 @@ const (
 	OperationDockerServiceCreate                Authorization = "DockerServiceCreate"
 	OperationDockerServiceUpdate                Authorization = "DockerServiceUpdate"
 	OperationDockerServiceDelete                Authorization = "DockerServiceDelete"
+	OperationDockerServiceForceUpdateService    Authorization = "DockerServiceForceUpdateService"
 	OperationDockerSecretList                   Authorization = "DockerSecretList"
 	OperationDockerSecretInspect                Authorization = "DockerSecretInspect"
 	OperationDockerSecretCreate                 Authorization = "DockerSecretCreate"
@@ -1751,6 +1756,7 @@ const (
 	OperationK8sApplicationsW                    Authorization = "K8sApplicationsW"
 	OperationK8sApplicationDetailsR              Authorization = "K8sApplicationDetailsR"
 	OperationK8sApplicationDetailsW              Authorization = "K8sApplicationDetailsW"
+	OperationK8sPodDelete                        Authorization = "K8sPodDelete"
 	OperationK8sApplicationConsoleRW             Authorization = "K8sApplicationConsoleRW"
 	OperationK8sApplicationsAdvancedDeploymentRW Authorization = "K8sApplicationsAdvancedDeploymentRW"
 	OperationK8sConfigurationsR                  Authorization = "K8sConfigurationsR"

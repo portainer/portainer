@@ -54,7 +54,8 @@ class PorAccessManagementController {
       const entity = this.accessControlledEntity;
       const parent = this.inheritFrom;
 
-      this.roles = await this.RoleService.roles();
+      const roles = await this.RoleService.roles();
+      this.roles = _.orderBy(roles, 'Priority', 'asc');
       this.formValues = {
         selectedRole: this.roles[0],
       };

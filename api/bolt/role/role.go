@@ -71,7 +71,9 @@ func (service *Service) CreateRole(role *portainer.Role) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		id, _ := bucket.NextSequence()
-		role.ID = portainer.RoleID(id)
+		if role.ID == 0 {
+			role.ID = portainer.RoleID(id)
+		}
 
 		data, err := internal.MarshalObject(role)
 		if err != nil {

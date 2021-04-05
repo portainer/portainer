@@ -52,6 +52,7 @@ angular.module('portainer.docker').controller('ServiceController', [
   'WebhookHelper',
   'NetworkService',
   'endpoint',
+  'EndpointService',
   function (
     $q,
     $scope,
@@ -83,7 +84,8 @@ angular.module('portainer.docker').controller('ServiceController', [
     clipboard,
     WebhookHelper,
     NetworkService,
-    endpoint
+    endpoint,
+    EndpointService,
   ) {
     $scope.state = {
       updateInProgress: false,
@@ -579,16 +581,8 @@ angular.module('portainer.docker').controller('ServiceController', [
     };
 
     function forceUpdateService(service, pullImage) {
-      var config = ServiceHelper.serviceToConfig(service.Model);
-      if (pullImage) {
-        config.TaskTemplate.ContainerSpec.Image = ImageHelper.removeDigestFromRepository(config.TaskTemplate.ContainerSpec.Image);
-      }
-
-      // As explained in https://github.com/docker/swarmkit/issues/2364 ForceUpdate can accept a random
-      // value or an increment of the counter value to force an update.
-      config.TaskTemplate.ForceUpdate++;
       $scope.state.updateInProgress = true;
-      ServiceService.update(service, config)
+      EndpointService.forceUpdateService(EndpointProvider.endpointID(), service.Id, pullImage)
         .then(function success() {
           Notifications.success('Service successfully updated', service.Name);
           $scope.cancelChanges({});

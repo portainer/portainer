@@ -21,6 +21,7 @@ func DefaultK8sClusterAuthorizations() map[portainer.RoleID]portainer.Authorizat
 			portainer.OperationK8sApplicationsW:                    true,
 			portainer.OperationK8sApplicationDetailsR:              true,
 			portainer.OperationK8sApplicationDetailsW:              true,
+			portainer.OperationK8sPodDelete:                        true,
 			portainer.OperationK8sApplicationConsoleRW:             true,
 			portainer.OperationK8sApplicationsAdvancedDeploymentRW: true,
 			portainer.OperationK8sConfigurationsR:                  true,
@@ -37,7 +38,25 @@ func DefaultK8sClusterAuthorizations() map[portainer.RoleID]portainer.Authorizat
 			portainer.OperationK8sClusterNodeW:                     true,
 			portainer.OperationK8sClusterSetupRW:                   true,
 			portainer.OperationK8sApplicationErrorDetailsR:         true,
-			portainer.OperationK8sStorageClassDisabledR:						true,
+			portainer.OperationK8sStorageClassDisabledR:            true,
+		},
+		portainer.RoleIDOperator: {
+			portainer.OperationK8sAccessUserNamespaces:     true,
+			portainer.OperationK8sResourcePoolsR:           true,
+			portainer.OperationK8sResourcePoolDetailsR:     true,
+			portainer.OperationK8sApplicationsR:            true,
+			portainer.OperationK8sApplicationDetailsR:      true,
+			portainer.OperationK8sPodDelete:                true,
+			portainer.OperationK8sApplicationConsoleRW:     true,
+			portainer.OperationK8sConfigurationsR:          true,
+			portainer.OperationK8sConfigurationsDetailsR:   true,
+			portainer.OperationK8sConfigurationsDetailsW:   true,
+			portainer.OperationK8sVolumesR:                 true,
+			portainer.OperationK8sVolumeDetailsR:           true,
+			portainer.OperationK8sClusterR:                 true,
+			portainer.OperationK8sClusterNodeR:             true,
+			portainer.OperationK8sApplicationErrorDetailsR: true,
+			portainer.OperationK8sStorageClassDisabledR:    true,
 		},
 		portainer.RoleIDHelpdesk: {
 			portainer.OperationK8sAccessUserNamespaces:     true,
@@ -52,8 +71,7 @@ func DefaultK8sClusterAuthorizations() map[portainer.RoleID]portainer.Authorizat
 			portainer.OperationK8sClusterR:                 true,
 			portainer.OperationK8sClusterNodeR:             true,
 			portainer.OperationK8sApplicationErrorDetailsR: true,
-			portainer.OperationK8sStorageClassDisabledR:		true,
-
+			portainer.OperationK8sStorageClassDisabledR:    true,
 		},
 		portainer.RoleIDStandardUser: {
 			portainer.OperationK8sResourcePoolsR:         true,
@@ -62,6 +80,7 @@ func DefaultK8sClusterAuthorizations() map[portainer.RoleID]portainer.Authorizat
 			portainer.OperationK8sApplicationsW:          true,
 			portainer.OperationK8sApplicationDetailsR:    true,
 			portainer.OperationK8sApplicationDetailsW:    true,
+			portainer.OperationK8sPodDelete:              true,
 			portainer.OperationK8sApplicationConsoleRW:   true,
 			portainer.OperationK8sConfigurationsR:        true,
 			portainer.OperationK8sConfigurationsW:        true,
@@ -95,6 +114,10 @@ func DefaultK8sNamespaceAuthorizations() map[portainer.RoleID]portainer.Authoriz
 		},
 		portainer.RoleIDHelpdesk: {
 			portainer.OperationK8sAccessNamespaceRead: true,
+		},
+		portainer.RoleIDOperator: {
+			portainer.OperationK8sAccessNamespaceRead:  true,
+			portainer.OperationK8sAccessNamespaceWrite: true,
 		},
 		portainer.RoleIDStandardUser: {
 			portainer.OperationK8sAccessNamespaceRead:  true,

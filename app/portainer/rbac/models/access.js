@@ -3,6 +3,7 @@ export default function AccessViewerPolicyModel(policy, endpoint, roles, group, 
   this.EndpointName = endpoint.Name;
   this.RoleId = policy.RoleId;
   this.RoleName = roles[policy.RoleId].Name;
+  this.RolePriority = roles[policy.RoleId].Priority;
   if (group) {
     this.GroupId = group.Id;
     this.GroupName = group.Name;

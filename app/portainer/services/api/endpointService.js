@@ -162,6 +162,18 @@ angular.module('portainer.app').factory('EndpointService', [
       ).$promise;
     };
 
+    service.forceUpdateService = function (endpointID, serviceID, pullImage) {
+      return Endpoints.forceUpdateService(
+        {
+          id: endpointID,
+        },
+        {
+          ServiceID: serviceID,
+          PullImage: pullImage,
+        }
+      ).$promise;
+    };
+
     return service;
 
     function updateSecuritySettings(id, securitySettings) {

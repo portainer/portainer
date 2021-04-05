@@ -18,6 +18,7 @@ angular.module('portainer.app').controller('StackController', [
   'GroupService',
   'ModalService',
   'endpoint',
+  'Authentication',
   function (
     $async,
     $q,
@@ -37,7 +38,8 @@ angular.module('portainer.app').controller('StackController', [
     EndpointService,
     GroupService,
     ModalService,
-    endpoint
+    endpoint,
+    Authentication,
   ) {
     $scope.state = {
       actionInProgress: false,
@@ -378,6 +380,8 @@ angular.module('portainer.app').controller('StackController', [
       $scope.composeSyntaxMaxVersion = endpoint.ComposeSyntaxMaxVersion;
 
       $scope.stackType = $transition$.params().type;
+
+      $scope.editorReadOnly = !Authentication.hasAuthorizations(['PortainerStackUpdate']);
     }
 
     initView();

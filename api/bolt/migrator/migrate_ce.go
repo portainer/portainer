@@ -279,6 +279,14 @@ func (m *Migrator) MigrateCE() error {
 		}
 	}
 
+	// Portainer EE-2.4.0
+	if m.currentDBVersion < 28 {
+		err := m.updateUsersAndRolesToDBVersion28()
+		if err != nil {
+			return err
+		}
+	}
+
 	log.Println("Update DB version to ", portainer.DBVersion)
 	return m.versionService.StoreDBVersion(portainer.DBVersion)
 }

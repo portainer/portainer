@@ -10,4 +10,5 @@ export const RoleTypes = Object.freeze({
   HELPDESK: 2,
   STANDARD: 3,
   READ_ONLY: 4,
+  OPERATOR: 5,
 });

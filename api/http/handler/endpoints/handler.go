@@ -1,6 +1,7 @@
 package endpoints
 
 import (
+	"github.com/portainer/portainer/api/docker"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -31,6 +32,7 @@ type Handler struct {
 	SnapshotService      portainer.SnapshotService
 	K8sClientFactory     *cli.ClientFactory
 	ComposeStackManager  portainer.ComposeStackManager
+	DockerClientFactory  *docker.ClientFactory
 }
 
 // NewHandler creates a handler to manage endpoint operations.
@@ -64,6 +66,8 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.PublicAccess(httperror.LoggerHandler(h.endpointStatusInspect))).Methods(http.MethodGet)
 	h.Handle("/endpoints/{id}/pools/{rpn}/access",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointPoolsAccessUpdate))).Methods(http.MethodPut)
+	h.Handle("/endpoints/{id}/forceupdateservice",
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointForceUpdateService))).Methods(http.MethodPut)
 
 	return h
 }

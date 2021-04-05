@@ -8,7 +8,8 @@ angular.module('portainer.docker').controller('ServicesDatatableActionsControlle
   'ImageHelper',
   'WebhookService',
   'EndpointProvider',
-  function ($q, $state, ServiceService, ServiceHelper, Notifications, ModalService, ImageHelper, WebhookService, EndpointProvider) {
+  'EndpointService',
+  function ($q, $state, ServiceService, ServiceHelper, Notifications, ModalService, ImageHelper, WebhookService, EndpointProvider, EndpointService) {
     this.scaleAction = function scaleService(service) {
       var config = ServiceHelper.serviceToConfig(service.Model);
       config.Mode.Replicated.Replicas = service.Replicas;
@@ -55,15 +56,7 @@ angular.module('portainer.docker').controller('ServicesDatatableActionsControlle
     function forceUpdateServices(services, pullImage) {
       var actionCount = services.length;
       angular.forEach(services, function (service) {
-        var config = ServiceHelper.serviceToConfig(service.Model);
-        if (pullImage) {
-          config.TaskTemplate.ContainerSpec.Image = ImageHelper.removeDigestFromRepository(config.TaskTemplate.ContainerSpec.Image);
-        }
-
-        // As explained in https://github.com/docker/swarmkit/issues/2364 ForceUpdate can accept a random
-        // value or an increment of the counter value to force an update.
-        config.TaskTemplate.ForceUpdate++;
-        ServiceService.update(service, config)
+        EndpointService.forceUpdateService(EndpointProvider.endpointID(), service.Id, pullImage)
           .then(function success() {
             Notifications.success('Service successfully updated', service.Name);
           })

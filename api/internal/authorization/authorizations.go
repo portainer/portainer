@@ -96,6 +96,7 @@ func DefaultEndpointAuthorizationsForEndpointAdministratorRole() portainer.Autho
 		portainer.OperationDockerServiceLogs:                  true,
 		portainer.OperationDockerServiceCreate:                true,
 		portainer.OperationDockerServiceUpdate:                true,
+		portainer.OperationDockerServiceForceUpdateService:    true,
 		portainer.OperationDockerServiceDelete:                true,
 		portainer.OperationDockerSecretList:                   true,
 		portainer.OperationDockerSecretInspect:                true,
@@ -213,6 +214,73 @@ func DefaultEndpointAuthorizationsForHelpDeskRole() portainer.Authorizations {
 	return authorizations
 }
 
+// DefaultEndpointAuthorizationsForOperatorRole returns the default endpoint authorizations
+// associated to the Operator role.
+func DefaultEndpointAuthorizationsForOperatorRole() portainer.Authorizations {
+	authorizations := unionAuthorizations(map[portainer.Authorization]bool{
+		portainer.OperationDockerContainerArchiveInfo:      true,
+		portainer.OperationDockerContainerList:             true,
+		portainer.OperationDockerContainerChanges:          true,
+		portainer.OperationDockerContainerInspect:          true,
+		portainer.OperationDockerContainerTop:              true,
+		portainer.OperationDockerContainerLogs:             true,
+		portainer.OperationDockerContainerStats:            true,
+		portainer.OperationDockerContainerKill:             true,
+		portainer.OperationDockerContainerPause:            true,
+		portainer.OperationDockerContainerUnpause:          true,
+		portainer.OperationDockerContainerRestart:          true,
+		portainer.OperationDockerContainerStart:            true,
+		portainer.OperationDockerContainerStop:             true,
+		portainer.OperationDockerContainerAttach:           true,
+		portainer.OperationDockerContainerExec:             true,
+		portainer.OperationDockerContainerResize:           true,
+		portainer.OperationDockerImageList:                 true,
+		portainer.OperationDockerImageSearch:               true,
+		portainer.OperationDockerImageGetAll:               true,
+		portainer.OperationDockerImageGet:                  true,
+		portainer.OperationDockerImageHistory:              true,
+		portainer.OperationDockerImageInspect:              true,
+		portainer.OperationDockerNetworkList:               true,
+		portainer.OperationDockerNetworkInspect:            true,
+		portainer.OperationDockerVolumeList:                true,
+		portainer.OperationDockerVolumeInspect:             true,
+		portainer.OperationDockerExecStart:                 true,
+		portainer.OperationDockerExecResize:                true,
+		portainer.OperationDockerSwarmInspect:              true,
+		portainer.OperationDockerNodeList:                  true,
+		portainer.OperationDockerNodeInspect:               true,
+		portainer.OperationDockerServiceList:               true,
+		portainer.OperationDockerServiceInspect:            true,
+		portainer.OperationDockerServiceLogs:               true,
+		portainer.OperationDockerServiceForceUpdateService: true,
+		portainer.OperationDockerSecretList:                true,
+		portainer.OperationDockerSecretInspect:             true,
+		portainer.OperationDockerConfigList:                true,
+		portainer.OperationDockerConfigInspect:             true,
+		portainer.OperationDockerTaskList:                  true,
+		portainer.OperationDockerTaskInspect:               true,
+		portainer.OperationDockerTaskLogs:                  true,
+		portainer.OperationDockerPluginList:                true,
+		portainer.OperationDockerDistributionInspect:       true,
+		portainer.OperationDockerPing:                      true,
+		portainer.OperationDockerInfo:                      true,
+		portainer.OperationDockerVersion:                   true,
+		portainer.OperationDockerEvents:                    true,
+		portainer.OperationDockerSystem:                    true,
+		portainer.OperationDockerAgentPing:                 true,
+		portainer.OperationDockerAgentList:                 true,
+		portainer.OperationDockerAgentHostInfo:             true,
+		portainer.OperationPortainerStackList:              true,
+		portainer.OperationPortainerStackInspect:           true,
+		portainer.OperationPortainerStackFile:              true,
+		portainer.OperationPortainerWebsocketExec:          true,
+		portainer.OperationPortainerWebhookList:            true,
+		portainer.EndpointResourcesAccess:                  true,
+	}, DefaultK8sClusterAuthorizations()[portainer.RoleIDOperator])
+
+	return authorizations
+}
+
 // DefaultEndpointAuthorizationsForStandardUserRole returns the default endpoint authorizations
 // associated to the standard user role.
 func DefaultEndpointAuthorizationsForStandardUserRole() portainer.Authorizations {
@@ -284,6 +352,7 @@ func DefaultEndpointAuthorizationsForStandardUserRole() portainer.Authorizations
 		portainer.OperationDockerServiceLogs:                  true,
 		portainer.OperationDockerServiceCreate:                true,
 		portainer.OperationDockerServiceUpdate:                true,
+		portainer.OperationDockerServiceForceUpdateService:    true,
 		portainer.OperationDockerServiceDelete:                true,
 		portainer.OperationDockerSecretList:                   true,
 		portainer.OperationDockerSecretInspect:                true,
