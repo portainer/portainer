@@ -885,8 +885,9 @@ type (
 		Init() error
 		Close() error
 		IsNew() bool
-		MigrateData() error
+		MigrateData(force bool) error
 		RollbackToCE() error
+		BackupTo(w io.Writer) error
 
 		DockerHub() DockerHubService
 		CustomTemplate() CustomTemplateService
@@ -1017,6 +1018,7 @@ type (
 		StoreCustomTemplateFileFromBytes(identifier, fileName string, data []byte) (string, error)
 		GetCustomTemplateProjectPath(identifier string) string
 		GetTemporaryPath() (string, error)
+		GetDatastorePath() string
 	}
 
 	// GitService represents a service for managing Git
@@ -1075,10 +1077,12 @@ type (
 
 	// LicenseService represents a service used to manage licenses
 	LicenseService interface {
-		Info() (*LicenseInfo, error)
-		Licenses() ([]liblicense.PortainerLicense, error)
 		AddLicense(licenseKey string) (*liblicense.PortainerLicense, error)
 		DeleteLicense(licenseKey string) error
+		Info() *LicenseInfo
+		Init() error
+		Licenses() ([]liblicense.PortainerLicense, error)
+		Start() error
 	}
 
 	// LicenseRepository represents a service used to manage licenses store
@@ -1117,6 +1121,7 @@ type (
 	// ReverseTunnelService represensts a service used to manage reverse tunnel connections.
 	ReverseTunnelService interface {
 		StartTunnelServer(addr, port string, snapshotService SnapshotService) error
+		StopTunnelServer() error
 		GenerateEdgeKey(url, host string, endpointIdentifier int) string
 		SetTunnelStatusToActive(endpointID EndpointID)
 		SetTunnelStatusToRequired(endpointID EndpointID) error
@@ -1159,6 +1164,7 @@ type (
 	// SnapshotService represents a service for managing endpoint snapshots
 	SnapshotService interface {
 		Start()
+		Stop()
 		SetSnapshotInterval(snapshotInterval string) error
 		SnapshotEndpoint(endpoint *Endpoint) error
 	}

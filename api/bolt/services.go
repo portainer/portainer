@@ -28,139 +28,139 @@ import (
 )
 
 func (store *Store) initServices() error {
-	authorizationsetService, err := role.NewService(store.db)
+	authorizationsetService, err := role.NewService(store.connection)
 	if err != nil {
 		return err
 	}
 	store.RoleService = authorizationsetService
 
-	customTemplateService, err := customtemplate.NewService(store.db)
+	customTemplateService, err := customtemplate.NewService(store.connection)
 	if err != nil {
 		return err
 	}
 	store.CustomTemplateService = customTemplateService
 
-	dockerhubService, err := dockerhub.NewService(store.db)
+	dockerhubService, err := dockerhub.NewService(store.connection)
 	if err != nil {
 		return err
 	}
 	store.DockerHubService = dockerhubService
 
-	edgeStackService, err := edgestack.NewService(store.db)
+	edgeStackService, err := edgestack.NewService(store.connection)
 	if err != nil {
 		return err
 	}
 	store.EdgeStackService = edgeStackService
 
-	edgeGroupService, err := edgegroup.NewService(store.db)
+	edgeGroupService, err := edgegroup.NewService(store.connection)
 	if err != nil {
 		return err
 	}
 	store.EdgeGroupService = edgeGroupService
 
-	edgeJobService, err := edgejob.NewService(store.db)
+	edgeJobService, err := edgejob.NewService(store.connection)
 	if err != nil {
 		return err
 	}
 	store.EdgeJobService = edgeJobService
 
-	endpointgroupService, err := endpointgroup.NewService(store.db)
+	endpointgroupService, err := endpointgroup.NewService(store.connection)
 	if err != nil {
 		return err
 	}
 	store.EndpointGroupService = endpointgroupService
 
-	endpointService, err := endpoint.NewService(store.db)
+	endpointService, err := endpoint.NewService(store.connection)
 	if err != nil {
 		return err
 	}
 	store.EndpointService = endpointService
 
-	endpointRelationService, err := endpointrelation.NewService(store.db)
+	endpointRelationService, err := endpointrelation.NewService(store.connection)
 	if err != nil {
 		return err
 	}
 	store.EndpointRelationService = endpointRelationService
 
-	extensionService, err := extension.NewService(store.db)
+	extensionService, err := extension.NewService(store.connection)
 	if err != nil {
 		return err
 	}
 	store.ExtensionService = extensionService
 
-	licenseService, err := license.NewService(store.db)
+	licenseService, err := license.NewService(store.connection)
 	if err != nil {
 		return err
 	}
 	store.LicenseService = licenseService
 
-	registryService, err := registry.NewService(store.db)
+	registryService, err := registry.NewService(store.connection)
 	if err != nil {
 		return err
 	}
 	store.RegistryService = registryService
 
-	resourcecontrolService, err := resourcecontrol.NewService(store.db)
+	resourcecontrolService, err := resourcecontrol.NewService(store.connection)
 	if err != nil {
 		return err
 	}
 	store.ResourceControlService = resourcecontrolService
 
-	settingsService, err := settings.NewService(store.db)
+	settingsService, err := settings.NewService(store.connection)
 	if err != nil {
 		return err
 	}
 	store.SettingsService = settingsService
 
-	stackService, err := stack.NewService(store.db)
+	stackService, err := stack.NewService(store.connection)
 	if err != nil {
 		return err
 	}
 	store.StackService = stackService
 
-	tagService, err := tag.NewService(store.db)
+	tagService, err := tag.NewService(store.connection)
 	if err != nil {
 		return err
 	}
 	store.TagService = tagService
 
-	teammembershipService, err := teammembership.NewService(store.db)
+	teammembershipService, err := teammembership.NewService(store.connection)
 	if err != nil {
 		return err
 	}
 	store.TeamMembershipService = teammembershipService
 
-	teamService, err := team.NewService(store.db)
+	teamService, err := team.NewService(store.connection)
 	if err != nil {
 		return err
 	}
 	store.TeamService = teamService
 
-	tunnelServerService, err := tunnelserver.NewService(store.db)
+	tunnelServerService, err := tunnelserver.NewService(store.connection)
 	if err != nil {
 		return err
 	}
 	store.TunnelServerService = tunnelServerService
 
-	userService, err := user.NewService(store.db)
+	userService, err := user.NewService(store.connection)
 	if err != nil {
 		return err
 	}
 	store.UserService = userService
 
-	versionService, err := version.NewService(store.db)
+	versionService, err := version.NewService(store.connection)
 	if err != nil {
 		return err
 	}
 	store.VersionService = versionService
 
-	webhookService, err := webhook.NewService(store.db)
+	webhookService, err := webhook.NewService(store.connection)
 	if err != nil {
 		return err
 	}
 	store.WebhookService = webhookService
 
-	scheduleService, err := schedule.NewService(store.db)
+	scheduleService, err := schedule.NewService(store.connection)
 	if err != nil {
 		return err
 	}

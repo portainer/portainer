@@ -189,3 +189,56 @@
     </rd-widget>
   </div>
 </div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-download" title-text="Backup Portainer"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal" ng-submit="backupPortainer()" name="backupPortainerForm">
+          <!-- Password protect -->
+          <div class="form-group">
+            <label for="password_protect" class="col-sm-1 control-label text-left">Password protect</label>
+            <div class="col-sm-1">
+              <label class="switch"> <input type="checkbox" id="password_protect" name="password_protect" ng-model="formValues.passwordProtect" /><i></i> </label>
+            </div>
+          </div>
+          <!-- !Password protect -->
+
+          <!-- Password -->
+          <div class="form-group" ng-if="formValues.passwordProtect">
+            <label for="password" class="col-sm-1 control-label text-left">Password</label>
+            <div class="col-sm-3">
+              <input type="password" class="form-control" ng-model="formValues.password" id="password" name="password" required />
+            </div>
+          </div>
+          <div class="form-group col-md-12" ng-show="backupPortainerForm.password.$invalid">
+            <div class="small text-warning">
+              <div ng-messages="backupPortainerForm.password.$error">
+                <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+              </div>
+            </div>
+          </div>
+          <!-- !Password -->
+
+          <!-- actions -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                ng-click="downloadBackup()"
+                ng-disabled="backupPortainerForm.$invalid || state.backupInProgress"
+                button-spinner="state.backupInProgress"
+              >
+                <span ng-hide="state.backupInProgress">Download backup</span>
+                <span ng-show="state.backupInProgress">Downloading backup</span>
+              </button>
+            </div>
+          </div>
+          <!-- !actions -->
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

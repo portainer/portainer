@@ -149,7 +149,7 @@ func getDockerOperationAuthorization(url, method string) portainer.Authorization
 		return portainer.OperationDockerVersion
 	case "events":
 		return portainer.OperationDockerEvents
-	case "system/df":
+	case "system/df": // TODO: this just cannot happen after strings.Split(url, "/"), can we use system instead?
 		return portainer.OperationDockerSystem
 	case "session":
 		return dockerSessionOperationAuthorization(url, method)

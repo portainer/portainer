@@ -1,6 +1,7 @@
 package license
 
 import (
+	"context"
 	"errors"
 	"log"
 	"time"
@@ -12,17 +13,17 @@ import (
 
 // Service represents a service for managing portainer licenses
 type Service struct {
-	repository portainer.LicenseRepository
-	info       *portainer.LicenseInfo
-	stopSignal chan struct{}
+	repository  portainer.LicenseRepository
+	info        *portainer.LicenseInfo
+	shutdownCtx context.Context
 }
 
 // NewService creates a new instance of Service
-func NewService(repository portainer.LicenseRepository) *Service {
+func NewService(repository portainer.LicenseRepository, shutdownCtx context.Context) *Service {
 	return &Service{
-		repository: repository,
-		info:       nil,
-		stopSignal: nil,
+		repository:  repository,
+		info:        nil,
+		shutdownCtx: shutdownCtx,
 	}
 }
 
@@ -31,18 +32,20 @@ func (service *Service) Start() error {
 	return service.startSyncLoop()
 }
 
-// Info returns aggregation of the information about the existing licenses
-func (service *Service) Info() (*portainer.LicenseInfo, error) {
-	if service.info == nil {
-		licenses, err := service.Licenses()
-		if err != nil {
-			return nil, err
-		}
-
-		service.info = aggregate(licenses)
+// Init initializes internal state
+func (service *Service) Init() error {
+	licenses, err := service.Licenses()
+	if err != nil {
+		return err
 	}
 
-	return service.info, nil
+	service.info = aggregate(licenses)
+	return nil
+}
+
+// Info returns aggregation of the information about the existing licenses
+func (service *Service) Info() *portainer.LicenseInfo {
+	return service.info
 }
 
 // Licenses returns the list of the existing licenses

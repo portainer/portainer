@@ -14,18 +14,18 @@ const (
 
 // Service represents a service for managing endpoint data.
 type Service struct {
-	db *bolt.DB
+	connection *internal.DbConnection
 }
 
 // NewService creates a new instance of a service.
-func NewService(db *bolt.DB) (*Service, error) {
-	err := internal.CreateBucket(db, BucketName)
+func NewService(connection *internal.DbConnection) (*Service, error) {
+	err := internal.CreateBucket(connection, BucketName)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Service{
-		db: db,
+		connection: connection,
 	}, nil
 }
 
@@ -34,7 +34,7 @@ func (service *Service) License(licenseKey string) (*liblicense.PortainerLicense
 	var license liblicense.PortainerLicense
 	identifier := []byte(licenseKey)
 
-	err := internal.GetObject(service.db, BucketName, identifier, &license)
+	err := internal.GetObject(service.connection, BucketName, identifier, &license)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (service *Service) License(licenseKey string) (*liblicense.PortainerLicense
 func (service *Service) Licenses() ([]liblicense.PortainerLicense, error) {
 	var licenses = make([]liblicense.PortainerLicense, 0)
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		cursor := bucket.Cursor()
@@ -67,7 +67,7 @@ func (service *Service) Licenses() ([]liblicense.PortainerLicense, error) {
 
 // AddLicense persists a license inside the database.
 func (service *Service) AddLicense(licenseKey string, license *liblicense.PortainerLicense) error {
-	return service.db.Update(func(tx *bolt.Tx) error {
+	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		data, err := internal.MarshalObject(license)
@@ -82,11 +82,11 @@ func (service *Service) AddLicense(licenseKey string, license *liblicense.Portai
 // UpdateLicense updates a license.
 func (service *Service) UpdateLicense(licenseKey string, license *liblicense.PortainerLicense) error {
 	identifier := []byte(licenseKey)
-	return internal.UpdateObject(service.db, BucketName, identifier, license)
+	return internal.UpdateObject(service.connection, BucketName, identifier, license)
 }
 
 // DeleteLicense deletes a License.
 func (service *Service) DeleteLicense(licenseKey string) error {
 	identifier := []byte(licenseKey)
-	return internal.DeleteObject(service.db, BucketName, identifier)
+	return internal.DeleteObject(service.connection, BucketName, identifier)
 }

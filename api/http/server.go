@@ -1,15 +1,20 @@
 package http
 
 import (
+	"context"
+	"fmt"
+	"log"
 	"net/http"
 	"path/filepath"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/adminmonitor"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/handler"
 	"github.com/portainer/portainer/api/http/handler/auth"
+	"github.com/portainer/portainer/api/http/handler/backup"
 	"github.com/portainer/portainer/api/http/handler/customtemplates"
 	"github.com/portainer/portainer/api/http/handler/dockerhub"
 	"github.com/portainer/portainer/api/http/handler/edgegroups"
@@ -38,6 +43,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/users"
 	"github.com/portainer/portainer/api/http/handler/webhooks"
 	"github.com/portainer/portainer/api/http/handler/websocket"
+	"github.com/portainer/portainer/api/http/offlinegate"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
@@ -73,17 +79,19 @@ type Server struct {
 	DockerClientFactory         *docker.ClientFactory
 	KubernetesClientFactory     *cli.ClientFactory
 	KubernetesDeployer          portainer.KubernetesDeployer
+	ShutdownCtx                 context.Context
+	ShutdownTrigger             context.CancelFunc
 }
 
 // Start starts the HTTP server
 func (server *Server) Start() error {
-
 	kubernetesTokenCacheManager := kubernetes.NewTokenCacheManager()
 	server.AuthorizationService.RegisterEventHandler("kubernetesTokenCacheManager", kubernetesTokenCacheManager)
 
 	requestBouncer := security.NewRequestBouncer(server.DataStore, server.LicenseService, server.JWTService)
 
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
+	offlineGate := offlinegate.NewOfflineGate()
 
 	var authHandler = auth.NewHandler(requestBouncer, rateLimiter)
 	authHandler.AuthorizationService = server.AuthorizationService
@@ -95,6 +103,11 @@ func (server *Server) Start() error {
 	authHandler.ProxyManager = server.ProxyManager
 	authHandler.KubernetesTokenCacheManager = kubernetesTokenCacheManager
 	authHandler.OAuthService = server.OAuthService
+
+	adminMonitor := adminmonitor.New(5*time.Minute, server.DataStore, server.ShutdownCtx)
+	adminMonitor.Start()
+
+	var backupHandler = backup.NewHandler(requestBouncer, server.DataStore, offlineGate, server.FileService.GetDatastorePath(), server.ShutdownTrigger, adminMonitor)
 
 	var roleHandler = roles.NewHandler(requestBouncer)
 	roleHandler.DataStore = server.DataStore
@@ -230,6 +243,7 @@ func (server *Server) Start() error {
 	server.Handler = &handler.Handler{
 		RoleHandler:            roleHandler,
 		AuthHandler:            authHandler,
+		BackupHandler:          backupHandler,
 		CustomTemplatesHandler: customTemplatesHandler,
 		DockerHubHandler:       dockerHubHandler,
 		EdgeGroupsHandler:      edgeGroupsHandler,
@@ -263,10 +277,28 @@ func (server *Server) Start() error {
 		Addr:    server.BindAddress,
 		Handler: server.Handler,
 	}
+	httpServer.Handler = offlineGate.WaitingMiddleware(time.Minute, httpServer.Handler)
 
 	if server.SSL {
 		httpServer.TLSConfig = crypto.CreateServerTLSConfiguration()
 		return httpServer.ListenAndServeTLS(server.SSLCert, server.SSLKey)
 	}
+
+	go server.shutdownListener(httpServer)
+
 	return httpServer.ListenAndServe()
+}
+
+func (server *Server) shutdownListener(httpServer *http.Server) {
+	<-server.ShutdownCtx.Done()
+
+	log.Println("[DEBUG] Shutting down http server")
+
+	shutdownTimeout, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	err := httpServer.Shutdown(shutdownTimeout)
+	if err != nil {
+		fmt.Printf("Failed shutdown http server: %s \n", err)
+	}
 }

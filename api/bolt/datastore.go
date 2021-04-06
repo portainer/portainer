@@ -1,10 +1,12 @@
 package bolt
 
 import (
+	"io"
 	"path"
 	"time"
 
 	"github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/bolt/internal"
 	"github.com/portainer/portainer/api/bolt/license"
 
 	"github.com/boltdb/bolt"
@@ -41,7 +43,7 @@ var (
 // BoltDB as the storage system.
 type Store struct {
 	path                    string
-	db                      *bolt.DB
+	connection              *internal.DbConnection
 	isNew                   bool
 	fileService             portainer.FileService
 	CustomTemplateService   *customtemplate.Service
@@ -91,6 +93,7 @@ func NewStore(storePath string, fileService portainer.FileService) (*Store, erro
 		path:        storePath,
 		fileService: fileService,
 		isNew:       true,
+		connection:  &internal.DbConnection{},
 	}
 
 	databasePath := path.Join(storePath, databaseFileName)
@@ -113,15 +116,15 @@ func (store *Store) Open() error {
 	if err != nil {
 		return err
 	}
-	store.db = db
+	store.connection.DB = db
 
 	return store.initServices()
 }
 
 // Close closes the BoltDB database.
 func (store *Store) Close() error {
-	if store.db != nil {
-		return store.db.Close()
+	if store.connection.DB != nil {
+		return store.connection.Close()
 	}
 	return nil
 }
@@ -130,4 +133,13 @@ func (store *Store) Close() error {
 // existing data.
 func (store *Store) IsNew() bool {
 	return store.isNew
+}
+
+// BackupTo backs up db to a provided writer.
+// It does hot backup and doesn't block other database reads and writes
+func (store *Store) BackupTo(w io.Writer) error {
+	return store.connection.View(func(tx *bolt.Tx) error {
+		_, err := tx.WriteTo(w)
+		return err
+	})
 }

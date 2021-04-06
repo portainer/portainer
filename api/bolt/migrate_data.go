@@ -28,9 +28,10 @@ func (store *Store) FailSafeMigrate(migrator *migrator.Migrator, version int) er
 
 // MigrateData automatically migrate the data based on the DBVersion.
 // This process is only triggered on an existing database, not if the database was just created.
-func (store *Store) MigrateData() error {
+// if force is true, then migrate regardless.
+func (store *Store) MigrateData(force bool) error {
 	// 0 – if DB is new then we don't need to migrate any data and just set version and edition to latest EE
-	if store.isNew {
+	if store.isNew && !force {
 		err := store.VersionService.StoreDBVersion(portainer.DBVersionEE)
 		if err != nil {
 			return err
@@ -163,7 +164,7 @@ func (store *Store) newMigrator() (*migrator.Migrator, error) {
 	edition := store.edition()
 
 	params := &migrator.Parameters{
-		DB:              store.db,
+		DB:              store.connection.DB,
 		DatabaseVersion: version,
 		CurrentEdition:  edition,
 

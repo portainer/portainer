@@ -37,7 +37,7 @@ func TestMigrateData(t *testing.T) {
 			log.Fatal(err)
 		}
 
-		store.MigrateData()
+		store.MigrateData(false)
 
 		testVersion(store, portainer.DBVersionEE, t)
 		testEdition(store, portainer.PortainerEE, t)
@@ -57,7 +57,7 @@ func TestMigrateData(t *testing.T) {
 	for _, tc := range tests {
 		store = NewTestStore(tc.edition, tc.version, true)
 		t.Run(fmt.Sprintf("MigrateData for %s version %d", tc.edition.GetEditionLabel(), tc.version), func(t *testing.T) {
-			store.MigrateData()
+			store.MigrateData(false)
 			testVersion(store, tc.expectedVersion, t)
 			testEdition(store, portainer.PortainerEE, t)
 		})
@@ -76,7 +76,7 @@ func TestMigrateData(t *testing.T) {
 		store = NewTestStore(portainer.PortainerCE, version, true)
 
 		deleteBucket(store.db, "settings")
-		store.MigrateData()
+		store.MigrateData(false)
 
 		testVersion(store, version, t)
 		testEdition(store, portainer.PortainerCE, t)

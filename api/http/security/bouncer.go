@@ -196,9 +196,9 @@ func (bouncer *RequestBouncer) RegistryAccess(r *http.Request, registry *portain
 	return nil
 }
 
-// First parse the JWT token and put it into the http context.
-//
-// Then add secure headers to the http reponse.
+// handlers are applied backwards to the incoming request:
+// - add secure handlers to the response
+// - parse the JWT token and put it into the http context.
 func (bouncer *RequestBouncer) mwAuthenticatedUser(h http.Handler) http.Handler {
 	h = bouncer.mwCheckAuthentication(h)
 	h = mwSecureHeaders(h)
@@ -219,12 +219,7 @@ func (bouncer *RequestBouncer) mwCheckLicense(next http.Handler) http.Handler {
 			return
 		}
 
-		info, err := bouncer.licenseService.Info()
-		if err != nil {
-			log.Printf("[ERROR] [http,security,bouncer] [err: %s] [msg: Failed fetching license info]", err)
-			httperror.WriteError(w, http.StatusForbidden, "License is not valid", httperrors.ErrUnauthorized)
-			return
-		}
+		info := bouncer.licenseService.Info()
 
 		if !info.Valid {
 			log.Printf("[INFO] [http,security,bouncer] [msg: licenses are invalid]")
@@ -298,7 +293,7 @@ func (bouncer *RequestBouncer) mwUpgradeToRestrictedRequest(next http.Handler) h
 
 // mwCheckAuthentication provides Authentication middleware for handlers
 //
-// It parses the JWT token and add the parsed token data into the http context
+// It parses the JWT token and adds the parsed token data to the http context
 func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var tokenData *portainer.TokenData
@@ -352,30 +347,31 @@ func mwSecureHeaders(next http.Handler) http.Handler {
 }
 
 func (bouncer *RequestBouncer) newRestrictedContextRequest(userID portainer.UserID, userRole portainer.UserRole) (*RestrictedRequestContext, error) {
-	requestContext := &RestrictedRequestContext{
-		IsAdmin: true,
-		UserID:  userID,
+	if userRole == portainer.AdministratorRole {
+		return &RestrictedRequestContext{
+			IsAdmin: true,
+			UserID:  userID,
+		}, nil
 	}
 
-	if userRole != portainer.AdministratorRole {
-		requestContext.IsAdmin = false
-		memberships, err := bouncer.dataStore.TeamMembership().TeamMembershipsByUserID(userID)
-		if err != nil {
-			return nil, err
-		}
-
-		isTeamLeader := false
-		for _, membership := range memberships {
-			if membership.Role == portainer.TeamLeader {
-				isTeamLeader = true
-			}
-		}
-
-		requestContext.IsTeamLeader = isTeamLeader
-		requestContext.UserMemberships = memberships
+	memberships, err := bouncer.dataStore.TeamMembership().TeamMembershipsByUserID(userID)
+	if err != nil {
+		return nil, err
 	}
 
-	return requestContext, nil
+	isTeamLeader := false
+	for _, membership := range memberships {
+		if membership.Role == portainer.TeamLeader {
+			isTeamLeader = true
+		}
+	}
+
+	return &RestrictedRequestContext{
+		IsAdmin:         false,
+		UserID:          userID,
+		IsTeamLeader:    isTeamLeader,
+		UserMemberships: memberships,
+	}, nil
 }
 
 // EdgeComputeOperation defines a restriced edge compute operation.

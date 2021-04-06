@@ -1,6 +1,7 @@
 package license
 
 import (
+	"log"
 	"time"
 
 	"github.com/portainer/liblicense/master"
@@ -11,22 +12,18 @@ const (
 )
 
 func (service *Service) startSyncLoop() error {
-	if service.stopSignal != nil {
-		return nil
-	}
-
 	err := service.syncLicenses()
 	if err != nil {
 		return err
 	}
 
-	service.stopSignal = make(chan struct{})
 	ticker := time.NewTicker(syncInterval)
 
 	go (func() {
 		for {
 			select {
-			case <-service.stopSignal:
+			case <-service.shutdownCtx.Done():
+				log.Println("[DEBUG] [internal,license] [message: shutting down License service]")
 				ticker.Stop()
 				return
 			case <-ticker.C:
