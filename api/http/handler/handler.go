@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/portainer/portainer/api/http/handler/auth"
+	"github.com/portainer/portainer/api/http/handler/backup"
 	"github.com/portainer/portainer/api/http/handler/customtemplates"
 	"github.com/portainer/portainer/api/http/handler/dockerhub"
 	"github.com/portainer/portainer/api/http/handler/edgegroups"
@@ -36,6 +37,7 @@ import (
 // Handler is a collection of all the service handlers.
 type Handler struct {
 	AuthHandler            *auth.Handler
+	BackupHandler          *backup.Handler
 	CustomTemplatesHandler *customtemplates.Handler
 	DockerHubHandler       *dockerhub.Handler
 	EdgeGroupsHandler      *edgegroups.Handler
@@ -140,6 +142,10 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case strings.HasPrefix(r.URL.Path, "/api/auth"):
 		http.StripPrefix("/api", h.AuthHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/backup"):
+		http.StripPrefix("/api", h.BackupHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/restore"):
+		http.StripPrefix("/api", h.BackupHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/dockerhub"):
 		http.StripPrefix("/api", h.DockerHubHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/custom_templates"):

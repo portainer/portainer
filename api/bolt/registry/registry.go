@@ -1,7 +1,7 @@
 package registry
 
 import (
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
 
 	"github.com/boltdb/bolt"
@@ -14,18 +14,18 @@ const (
 
 // Service represents a service for managing endpoint data.
 type Service struct {
-	db *bolt.DB
+	connection *internal.DbConnection
 }
 
 // NewService creates a new instance of a service.
-func NewService(db *bolt.DB) (*Service, error) {
-	err := internal.CreateBucket(db, BucketName)
+func NewService(connection *internal.DbConnection) (*Service, error) {
+	err := internal.CreateBucket(connection, BucketName)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Service{
-		db: db,
+		connection: connection,
 	}, nil
 }
 
@@ -34,7 +34,7 @@ func (service *Service) Registry(ID portainer.RegistryID) (*portainer.Registry, 
 	var registry portainer.Registry
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.db, BucketName, identifier, &registry)
+	err := internal.GetObject(service.connection, BucketName, identifier, &registry)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (service *Service) Registry(ID portainer.RegistryID) (*portainer.Registry, 
 func (service *Service) Registries() ([]portainer.Registry, error) {
 	var registries = make([]portainer.Registry, 0)
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		cursor := bucket.Cursor()
@@ -67,7 +67,7 @@ func (service *Service) Registries() ([]portainer.Registry, error) {
 
 // CreateRegistry creates a new registry.
 func (service *Service) CreateRegistry(registry *portainer.Registry) error {
-	return service.db.Update(func(tx *bolt.Tx) error {
+	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		id, _ := bucket.NextSequence()
@@ -85,11 +85,11 @@ func (service *Service) CreateRegistry(registry *portainer.Registry) error {
 // UpdateRegistry updates an registry.
 func (service *Service) UpdateRegistry(ID portainer.RegistryID, registry *portainer.Registry) error {
 	identifier := internal.Itob(int(ID))
-	return internal.UpdateObject(service.db, BucketName, identifier, registry)
+	return internal.UpdateObject(service.connection, BucketName, identifier, registry)
 }
 
 // DeleteRegistry deletes an registry.
 func (service *Service) DeleteRegistry(ID portainer.RegistryID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.db, BucketName, identifier)
+	return internal.DeleteObject(service.connection, BucketName, identifier)
 }

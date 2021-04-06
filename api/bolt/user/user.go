@@ -17,18 +17,18 @@ const (
 
 // Service represents a service for managing endpoint data.
 type Service struct {
-	db *bolt.DB
+	connection *internal.DbConnection
 }
 
 // NewService creates a new instance of a service.
-func NewService(db *bolt.DB) (*Service, error) {
-	err := internal.CreateBucket(db, BucketName)
+func NewService(connection *internal.DbConnection) (*Service, error) {
+	err := internal.CreateBucket(connection, BucketName)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Service{
-		db: db,
+		connection: connection,
 	}, nil
 }
 
@@ -37,7 +37,7 @@ func (service *Service) User(ID portainer.UserID) (*portainer.User, error) {
 	var user portainer.User
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.db, BucketName, identifier, &user)
+	err := internal.GetObject(service.connection, BucketName, identifier, &user)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (service *Service) UserByUsername(username string) (*portainer.User, error)
 
 	username = strings.ToLower(username)
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 		cursor := bucket.Cursor()
 
@@ -81,7 +81,7 @@ func (service *Service) UserByUsername(username string) (*portainer.User, error)
 func (service *Service) Users() ([]portainer.User, error) {
 	var users = make([]portainer.User, 0)
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		cursor := bucket.Cursor()
@@ -103,7 +103,7 @@ func (service *Service) Users() ([]portainer.User, error) {
 // UsersByRole return an array containing all the users with the specified role.
 func (service *Service) UsersByRole(role portainer.UserRole) ([]portainer.User, error) {
 	var users = make([]portainer.User, 0)
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		cursor := bucket.Cursor()
@@ -128,12 +128,12 @@ func (service *Service) UsersByRole(role portainer.UserRole) ([]portainer.User, 
 func (service *Service) UpdateUser(ID portainer.UserID, user *portainer.User) error {
 	identifier := internal.Itob(int(ID))
 	user.Username = strings.ToLower(user.Username)
-	return internal.UpdateObject(service.db, BucketName, identifier, user)
+	return internal.UpdateObject(service.connection, BucketName, identifier, user)
 }
 
 // CreateUser creates a new user.
 func (service *Service) CreateUser(user *portainer.User) error {
-	return service.db.Update(func(tx *bolt.Tx) error {
+	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		id, _ := bucket.NextSequence()
@@ -152,5 +152,5 @@ func (service *Service) CreateUser(user *portainer.User) error {
 // DeleteUser deletes a user.
 func (service *Service) DeleteUser(ID portainer.UserID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.db, BucketName, identifier)
+	return internal.DeleteObject(service.connection, BucketName, identifier)
 }

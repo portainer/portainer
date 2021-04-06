@@ -1,6 +1,7 @@
 package bolt
 
 import (
+	"io"
 	"log"
 	"path"
 	"time"
@@ -17,6 +18,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/endpointrelation"
 	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/extension"
+	"github.com/portainer/portainer/api/bolt/internal"
 	"github.com/portainer/portainer/api/bolt/migrator"
 	"github.com/portainer/portainer/api/bolt/registry"
 	"github.com/portainer/portainer/api/bolt/resourcecontrol"
@@ -42,7 +44,7 @@ const (
 // BoltDB as the storage system.
 type Store struct {
 	path                    string
-	db                      *bolt.DB
+	connection              *internal.DbConnection
 	isNew                   bool
 	fileService             portainer.FileService
 	CustomTemplateService   *customtemplate.Service
@@ -83,6 +85,7 @@ func NewStore(storePath string, fileService portainer.FileService) (*Store, erro
 		path:        storePath,
 		fileService: fileService,
 		isNew:       true,
+		connection:  &internal.DbConnection{},
 	}
 
 	databasePath := path.Join(storePath, databaseFileName)
@@ -105,15 +108,15 @@ func (store *Store) Open() error {
 	if err != nil {
 		return err
 	}
-	store.db = db
+	store.connection.DB = db
 
 	return store.initServices()
 }
 
 // Close closes the BoltDB database.
 func (store *Store) Close() error {
-	if store.db != nil {
-		return store.db.Close()
+	if store.connection.DB != nil {
+		return store.connection.Close()
 	}
 	return nil
 }
@@ -134,8 +137,9 @@ func (store *Store) CheckCurrentEdition() error {
 
 // MigrateData automatically migrate the data based on the DBVersion.
 // This process is only triggered on an existing database, not if the database was just created.
-func (store *Store) MigrateData() error {
-	if store.isNew {
+// if force is true, then migrate regardless.
+func (store *Store) MigrateData(force bool) error {
+	if store.isNew && !force {
 		return store.VersionService.StoreDBVersion(portainer.DBVersion)
 	}
 
@@ -148,7 +152,7 @@ func (store *Store) MigrateData() error {
 
 	if version < portainer.DBVersion {
 		migratorParams := &migrator.Parameters{
-			DB:                      store.db,
+			DB:                      store.connection.DB,
 			DatabaseVersion:         version,
 			EndpointGroupService:    store.EndpointGroupService,
 			EndpointService:         store.EndpointService,
@@ -180,238 +184,11 @@ func (store *Store) MigrateData() error {
 	return nil
 }
 
-func (store *Store) initServices() error {
-	authorizationsetService, err := role.NewService(store.db)
-	if err != nil {
+// BackupTo backs up db to a provided writer.
+// It does hot backup and doesn't block other database reads and writes
+func (store *Store) BackupTo(w io.Writer) error {
+	return store.connection.View(func(tx *bolt.Tx) error {
+		_, err := tx.WriteTo(w)
 		return err
-	}
-	store.RoleService = authorizationsetService
-
-	customTemplateService, err := customtemplate.NewService(store.db)
-	if err != nil {
-		return err
-	}
-	store.CustomTemplateService = customTemplateService
-
-	dockerhubService, err := dockerhub.NewService(store.db)
-	if err != nil {
-		return err
-	}
-	store.DockerHubService = dockerhubService
-
-	edgeStackService, err := edgestack.NewService(store.db)
-	if err != nil {
-		return err
-	}
-	store.EdgeStackService = edgeStackService
-
-	edgeGroupService, err := edgegroup.NewService(store.db)
-	if err != nil {
-		return err
-	}
-	store.EdgeGroupService = edgeGroupService
-
-	edgeJobService, err := edgejob.NewService(store.db)
-	if err != nil {
-		return err
-	}
-	store.EdgeJobService = edgeJobService
-
-	endpointgroupService, err := endpointgroup.NewService(store.db)
-	if err != nil {
-		return err
-	}
-	store.EndpointGroupService = endpointgroupService
-
-	endpointService, err := endpoint.NewService(store.db)
-	if err != nil {
-		return err
-	}
-	store.EndpointService = endpointService
-
-	endpointRelationService, err := endpointrelation.NewService(store.db)
-	if err != nil {
-		return err
-	}
-	store.EndpointRelationService = endpointRelationService
-
-	extensionService, err := extension.NewService(store.db)
-	if err != nil {
-		return err
-	}
-	store.ExtensionService = extensionService
-
-	registryService, err := registry.NewService(store.db)
-	if err != nil {
-		return err
-	}
-	store.RegistryService = registryService
-
-	resourcecontrolService, err := resourcecontrol.NewService(store.db)
-	if err != nil {
-		return err
-	}
-	store.ResourceControlService = resourcecontrolService
-
-	settingsService, err := settings.NewService(store.db)
-	if err != nil {
-		return err
-	}
-	store.SettingsService = settingsService
-
-	stackService, err := stack.NewService(store.db)
-	if err != nil {
-		return err
-	}
-	store.StackService = stackService
-
-	tagService, err := tag.NewService(store.db)
-	if err != nil {
-		return err
-	}
-	store.TagService = tagService
-
-	teammembershipService, err := teammembership.NewService(store.db)
-	if err != nil {
-		return err
-	}
-	store.TeamMembershipService = teammembershipService
-
-	teamService, err := team.NewService(store.db)
-	if err != nil {
-		return err
-	}
-	store.TeamService = teamService
-
-	tunnelServerService, err := tunnelserver.NewService(store.db)
-	if err != nil {
-		return err
-	}
-	store.TunnelServerService = tunnelServerService
-
-	userService, err := user.NewService(store.db)
-	if err != nil {
-		return err
-	}
-	store.UserService = userService
-
-	versionService, err := version.NewService(store.db)
-	if err != nil {
-		return err
-	}
-	store.VersionService = versionService
-
-	webhookService, err := webhook.NewService(store.db)
-	if err != nil {
-		return err
-	}
-	store.WebhookService = webhookService
-
-	scheduleService, err := schedule.NewService(store.db)
-	if err != nil {
-		return err
-	}
-	store.ScheduleService = scheduleService
-
-	return nil
-}
-
-// CustomTemplate gives access to the CustomTemplate data management layer
-func (store *Store) CustomTemplate() portainer.CustomTemplateService {
-	return store.CustomTemplateService
-}
-
-// DockerHub gives access to the DockerHub data management layer
-func (store *Store) DockerHub() portainer.DockerHubService {
-	return store.DockerHubService
-}
-
-// EdgeGroup gives access to the EdgeGroup data management layer
-func (store *Store) EdgeGroup() portainer.EdgeGroupService {
-	return store.EdgeGroupService
-}
-
-// EdgeJob gives access to the EdgeJob data management layer
-func (store *Store) EdgeJob() portainer.EdgeJobService {
-	return store.EdgeJobService
-}
-
-// EdgeStack gives access to the EdgeStack data management layer
-func (store *Store) EdgeStack() portainer.EdgeStackService {
-	return store.EdgeStackService
-}
-
-// Endpoint gives access to the Endpoint data management layer
-func (store *Store) Endpoint() portainer.EndpointService {
-	return store.EndpointService
-}
-
-// EndpointGroup gives access to the EndpointGroup data management layer
-func (store *Store) EndpointGroup() portainer.EndpointGroupService {
-	return store.EndpointGroupService
-}
-
-// EndpointRelation gives access to the EndpointRelation data management layer
-func (store *Store) EndpointRelation() portainer.EndpointRelationService {
-	return store.EndpointRelationService
-}
-
-// Registry gives access to the Registry data management layer
-func (store *Store) Registry() portainer.RegistryService {
-	return store.RegistryService
-}
-
-// ResourceControl gives access to the ResourceControl data management layer
-func (store *Store) ResourceControl() portainer.ResourceControlService {
-	return store.ResourceControlService
-}
-
-// Role gives access to the Role data management layer
-func (store *Store) Role() portainer.RoleService {
-	return store.RoleService
-}
-
-// Settings gives access to the Settings data management layer
-func (store *Store) Settings() portainer.SettingsService {
-	return store.SettingsService
-}
-
-// Stack gives access to the Stack data management layer
-func (store *Store) Stack() portainer.StackService {
-	return store.StackService
-}
-
-// Tag gives access to the Tag data management layer
-func (store *Store) Tag() portainer.TagService {
-	return store.TagService
-}
-
-// TeamMembership gives access to the TeamMembership data management layer
-func (store *Store) TeamMembership() portainer.TeamMembershipService {
-	return store.TeamMembershipService
-}
-
-// Team gives access to the Team data management layer
-func (store *Store) Team() portainer.TeamService {
-	return store.TeamService
-}
-
-// TunnelServer gives access to the TunnelServer data management layer
-func (store *Store) TunnelServer() portainer.TunnelServerService {
-	return store.TunnelServerService
-}
-
-// User gives access to the User data management layer
-func (store *Store) User() portainer.UserService {
-	return store.UserService
-}
-
-// Version gives access to the Version data management layer
-func (store *Store) Version() portainer.VersionService {
-	return store.VersionService
-}
-
-// Webhook gives access to the Webhook data management layer
-func (store *Store) Webhook() portainer.WebhookService {
-	return store.WebhookService
+	})
 }

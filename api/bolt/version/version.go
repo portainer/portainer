@@ -19,18 +19,18 @@ const (
 
 // Service represents a service to manage stored versions.
 type Service struct {
-	db *bolt.DB
+	connection *internal.DbConnection
 }
 
 // NewService creates a new instance of a service.
-func NewService(db *bolt.DB) (*Service, error) {
-	err := internal.CreateBucket(db, BucketName)
+func NewService(connection *internal.DbConnection) (*Service, error) {
+	err := internal.CreateBucket(connection, BucketName)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Service{
-		db: db,
+		connection: connection,
 	}, nil
 }
 
@@ -38,7 +38,7 @@ func NewService(db *bolt.DB) (*Service, error) {
 func (service *Service) DBVersion() (int, error) {
 	var data []byte
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		value := bucket.Get([]byte(versionKey))
@@ -75,7 +75,7 @@ func (service *Service) Edition() (portainer.SoftwareEdition, error) {
 
 // StoreDBVersion store the database version.
 func (service *Service) StoreDBVersion(version int) error {
-	return service.db.Update(func(tx *bolt.Tx) error {
+	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		data := []byte(strconv.Itoa(version))
@@ -87,7 +87,7 @@ func (service *Service) StoreDBVersion(version int) error {
 func (service *Service) InstanceID() (string, error) {
 	var data []byte
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		value := bucket.Get([]byte(instanceKey))
@@ -109,7 +109,7 @@ func (service *Service) InstanceID() (string, error) {
 
 // StoreInstanceID store the instance ID.
 func (service *Service) StoreInstanceID(ID string) error {
-	return service.db.Update(func(tx *bolt.Tx) error {
+	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		data := []byte(ID)
@@ -120,7 +120,7 @@ func (service *Service) StoreInstanceID(ID string) error {
 func (service *Service) getKey(key string) ([]byte, error) {
 	var data []byte
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		value := bucket.Get([]byte(key))
@@ -142,7 +142,7 @@ func (service *Service) getKey(key string) ([]byte, error) {
 }
 
 func (service *Service) setKey(key string, value string) error {
-	return service.db.Update(func(tx *bolt.Tx) error {
+	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		data := []byte(value)

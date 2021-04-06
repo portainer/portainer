@@ -2,7 +2,7 @@ package edgegroup
 
 import (
 	"github.com/boltdb/bolt"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
 )
 
@@ -13,18 +13,18 @@ const (
 
 // Service represents a service for managing Edge group data.
 type Service struct {
-	db *bolt.DB
+	connection *internal.DbConnection
 }
 
 // NewService creates a new instance of a service.
-func NewService(db *bolt.DB) (*Service, error) {
-	err := internal.CreateBucket(db, BucketName)
+func NewService(connection *internal.DbConnection) (*Service, error) {
+	err := internal.CreateBucket(connection, BucketName)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Service{
-		db: db,
+		connection: connection,
 	}, nil
 }
 
@@ -32,7 +32,7 @@ func NewService(db *bolt.DB) (*Service, error) {
 func (service *Service) EdgeGroups() ([]portainer.EdgeGroup, error) {
 	var groups = make([]portainer.EdgeGroup, 0)
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		cursor := bucket.Cursor()
@@ -56,7 +56,7 @@ func (service *Service) EdgeGroup(ID portainer.EdgeGroupID) (*portainer.EdgeGrou
 	var group portainer.EdgeGroup
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.db, BucketName, identifier, &group)
+	err := internal.GetObject(service.connection, BucketName, identifier, &group)
 	if err != nil {
 		return nil, err
 	}
@@ -67,18 +67,18 @@ func (service *Service) EdgeGroup(ID portainer.EdgeGroupID) (*portainer.EdgeGrou
 // UpdateEdgeGroup updates an Edge group.
 func (service *Service) UpdateEdgeGroup(ID portainer.EdgeGroupID, group *portainer.EdgeGroup) error {
 	identifier := internal.Itob(int(ID))
-	return internal.UpdateObject(service.db, BucketName, identifier, group)
+	return internal.UpdateObject(service.connection, BucketName, identifier, group)
 }
 
 // DeleteEdgeGroup deletes an Edge group.
 func (service *Service) DeleteEdgeGroup(ID portainer.EdgeGroupID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.db, BucketName, identifier)
+	return internal.DeleteObject(service.connection, BucketName, identifier)
 }
 
 // CreateEdgeGroup assign an ID to a new Edge group and saves it.
 func (service *Service) CreateEdgeGroup(group *portainer.EdgeGroup) error {
-	return service.db.Update(func(tx *bolt.Tx) error {
+	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		id, _ := bucket.NextSequence()
