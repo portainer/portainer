@@ -1474,6 +1474,8 @@ const (
 	ConfigResourceControl
 	// CustomTemplateResourceControl  represents a resource control associated to a custom template
 	CustomTemplateResourceControl
+	// ContainerGroupResourceControl represents a resource control associated to an Azure container group
+	ContainerGroupResourceControl
 )
 
 const (
@@ -1835,3 +1837,8 @@ func (e SoftwareEdition) GetEditionLabel() string {
 
 	return "CE"
 }
+
+const (
+	AzurePathContainerGroups = "/subscriptions/*/providers/Microsoft.ContainerInstance/containerGroups"
+	AzurePathContainerGroup  = "/subscriptions/*/resourceGroups/*/providers/Microsoft.ContainerInstance/containerGroups/*"
+)
