@@ -4,7 +4,10 @@ angular.module('portainer.app').controller('SettingsController', [
   'Notifications',
   'SettingsService',
   'StateManager',
-  function ($scope, $state, Notifications, SettingsService, StateManager) {
+  'BackupService',
+  'FileSaver',
+  'Blob',
+  function ($scope, $state, Notifications, SettingsService, StateManager, BackupService, FileSaver) {
     $scope.state = {
       actionInProgress: false,
       availableEdgeAgentCheckinOptions: [
@@ -21,6 +24,8 @@ angular.module('portainer.app').controller('SettingsController', [
           value: 30,
         },
       ],
+
+      backupInProgress: false,
     };
 
     $scope.formValues = {
@@ -29,6 +34,8 @@ angular.module('portainer.app').controller('SettingsController', [
       labelValue: '',
       enableEdgeComputeFeatures: false,
       enableTelemetry: false,
+      passwordProtect: false,
+      password: '',
     };
 
     $scope.removeFilteredContainerLabel = function (index) {
@@ -47,6 +54,28 @@ angular.module('portainer.app').controller('SettingsController', [
       settings.BlackListedLabels.push(label);
 
       updateSettings(settings);
+    };
+
+    $scope.downloadBackup = function () {
+      const payload = {};
+      if ($scope.formValues.passwordProtect) {
+        payload.password = $scope.formValues.password;
+      }
+
+      $scope.state.backupInProgress = true;
+
+      BackupService.downloadBackup(payload)
+        .then(function success(data) {
+          const downloadData = new Blob([data.file], { type: 'application/gzip' });
+          FileSaver.saveAs(downloadData, data.name);
+          Notifications.success('Backup successfully downloaded');
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to download backup');
+        })
+        .finally(function final() {
+          $scope.state.backupInProgress = false;
+        });
     };
 
     $scope.saveApplicationSettings = function () {

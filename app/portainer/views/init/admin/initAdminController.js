@@ -8,7 +8,9 @@ angular.module('portainer.app').controller('InitAdminController', [
   'SettingsService',
   'UserService',
   'EndpointService',
-  function ($async, $scope, $state, Notifications, Authentication, StateManager, SettingsService, UserService, EndpointService) {
+  'BackupService',
+  'StatusService',
+  function ($async, $scope, $state, Notifications, Authentication, StateManager, SettingsService, UserService, EndpointService, BackupService, StatusService) {
     $scope.logo = StateManager.getState().application.logo;
 
     $scope.formValues = {
@@ -20,6 +22,13 @@ angular.module('portainer.app').controller('InitAdminController', [
 
     $scope.state = {
       actionInProgress: false,
+      showInitPassword: true,
+      showRestorePortainer: false,
+    };
+
+    $scope.togglePanel = function () {
+      $scope.state.showInitPassword = !$scope.state.showInitPassword;
+      $scope.state.showRestorePortainer = !$scope.state.showRestorePortainer;
     };
 
     $scope.createAdminUser = function () {
@@ -55,17 +64,35 @@ angular.module('portainer.app').controller('InitAdminController', [
         });
     };
 
-    function createAdministratorFlow() {
-      UserService.administratorExists()
-        .then(function success(exists) {
-          if (exists) {
-            $state.go('portainer.home');
+    async function waitPortainerRestart() {
+      for (let i = 0; i < 10; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 5 * 1000));
+        try {
+          const status = await StatusService.status();
+          if (status && status.Version) {
+            return;
           }
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to verify administrator account existence');
-        });
+        } catch (e) {}
+      }
+      throw 'Timeout to wait for Portainer restarting';
     }
-    createAdministratorFlow();
+
+    $scope.uploadBackup = async function () {
+      $scope.state.backupInProgress = true;
+
+      const file = $scope.formValues.BackupFile;
+      const password = $scope.formValues.Password;
+
+      try {
+        await BackupService.uploadBackup(file, password);
+        await waitPortainerRestart();
+        Notifications.success('The backup has successfully been restored');
+        $state.go('portainer.auth');
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to restore the backup');
+      } finally {
+        $scope.state.backupInProgress = false;
+      }
+    };
   },
 ]);
