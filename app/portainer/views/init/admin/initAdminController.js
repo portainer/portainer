@@ -64,6 +64,19 @@ angular.module('portainer.app').controller('InitAdminController', [
         });
     };
 
+    function createAdministratorFlow() {
+      UserService.administratorExists()
+        .then(function success(exists) {
+          if (exists) {
+            $state.go('portainer.home');
+          }
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to verify administrator account existence');
+        });
+    }
+    createAdministratorFlow();
+
     async function waitPortainerRestart() {
       for (let i = 0; i < 10; i++) {
         await new Promise((resolve) => setTimeout(resolve, 5 * 1000));
