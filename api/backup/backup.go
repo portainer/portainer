@@ -2,7 +2,6 @@ package backup
 
 import (
 	"fmt"
-	"io/fs"
 	"os"
 	"path/filepath"
 	"time"
@@ -14,7 +13,7 @@ import (
 	"github.com/portainer/portainer/api/http/offlinegate"
 )
 
-const rwxr__r__ fs.FileMode = 0744
+const rwxr__r__ os.FileMode = 0744
 
 var filesToBackup = []string{"compose", "config.json", "custom_templates", "edge_jobs", "edge_stacks", "extensions", "portainer.key", "portainer.pub", "tls"}
 

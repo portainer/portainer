@@ -7,11 +7,12 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/docker/docker/pkg/ioutils"
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_encryptAndDecrypt_withTheSamePassword(t *testing.T) {
-	tmpdir, _ := os.MkdirTemp("", "encrypt")
+	tmpdir, _ := ioutils.TempDir("", "encrypt")
 	defer os.RemoveAll(tmpdir)
 
 	var (
@@ -51,7 +52,7 @@ func Test_encryptAndDecrypt_withTheSamePassword(t *testing.T) {
 }
 
 func Test_encryptAndDecrypt_withEmptyPassword(t *testing.T) {
-	tmpdir, _ := os.MkdirTemp("", "encrypt")
+	tmpdir, _ := ioutils.TempDir("", "encrypt")
 	defer os.RemoveAll(tmpdir)
 
 	var (
@@ -91,7 +92,7 @@ func Test_encryptAndDecrypt_withEmptyPassword(t *testing.T) {
 }
 
 func Test_decryptWithDifferentPassphrase_shouldProduceWrongResult(t *testing.T) {
-	tmpdir, _ := os.MkdirTemp("", "encrypt")
+	tmpdir, _ := ioutils.TempDir("", "encrypt")
 	defer os.RemoveAll(tmpdir)
 
 	var (

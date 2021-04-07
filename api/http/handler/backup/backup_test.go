@@ -15,6 +15,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/docker/docker/pkg/ioutils"
 	"github.com/portainer/portainer/api/adminmonitor"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/offlinegate"
@@ -54,7 +55,7 @@ func Test_backupHandlerWithoutPassword_shouldCreateATarballArchive(t *testing.T)
 	response := w.Result()
 	body, _ := io.ReadAll(response.Body)
 
-	tmpdir, _ := os.MkdirTemp("", "backup")
+	tmpdir, _ := ioutils.TempDir("", "backup")
 	defer os.RemoveAll(tmpdir)
 
 	archivePath := filepath.Join(tmpdir, "archive.tar.gz")
@@ -91,7 +92,7 @@ func Test_backupHandlerWithPassword_shouldCreateEncryptedATarballArchive(t *test
 	response := w.Result()
 	body, _ := io.ReadAll(response.Body)
 
-	tmpdir, _ := os.MkdirTemp("", "backup")
+	tmpdir, _ := ioutils.TempDir("", "backup")
 	defer os.RemoveAll(tmpdir)
 
 	dr, err := crypto.AesDecrypt(bytes.NewReader(body), []byte("secret"))
