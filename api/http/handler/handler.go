@@ -31,6 +31,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/teams"
 	"github.com/portainer/portainer/api/http/handler/templates"
 	"github.com/portainer/portainer/api/http/handler/upload"
+	"github.com/portainer/portainer/api/http/handler/useractivity"
 	"github.com/portainer/portainer/api/http/handler/users"
 	"github.com/portainer/portainer/api/http/handler/webhooks"
 	"github.com/portainer/portainer/api/http/handler/websocket"
@@ -66,6 +67,7 @@ type Handler struct {
 	TemplatesHandler       *templates.Handler
 	UploadHandler          *upload.Handler
 	UserHandler            *users.Handler
+	UserActivityHandler    *useractivity.Handler
 	WebSocketHandler       *websocket.Handler
 	WebhookHandler         *webhooks.Handler
 }
@@ -136,6 +138,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.UploadHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/users"):
 		http.StripPrefix("/api", h.UserHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/useractivity"):
+		http.StripPrefix("/api", h.UserActivityHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/teams"):
 		http.StripPrefix("/api", h.TeamHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/team_memberships"):

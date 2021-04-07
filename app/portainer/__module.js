@@ -1,10 +1,11 @@
 import _ from 'lodash-es';
 
 import './rbac';
-
 import './registry-management';
 import licenseManagementModule from './license-management';
 import settingsModule from './settings';
+import userActivityModule from './user-activity';
+import componentsModule from './components';
 
 async function initAuthentication(authManager, Authentication, $rootScope, $state) {
   authManager.checkAuthOnRefresh();
@@ -22,7 +23,16 @@ async function initAuthentication(authManager, Authentication, $rootScope, $stat
 }
 
 angular
-  .module('portainer.app', ['portainer.oauth', 'portainer.rbac', 'portainer.registrymanagement', licenseManagementModule, settingsModule])
+  .module('portainer.app', [
+    'portainer.oauth',
+    'portainer.rbac',
+    'portainer.registrymanagement',
+    licenseManagementModule,
+    componentsModule,
+    settingsModule,
+    userActivityModule,
+    'portainer.shared.datatable',
+  ])
   .config([
     '$stateRegistryProvider',
     function ($stateRegistryProvider) {

@@ -29,6 +29,7 @@ import (
 	"github.com/portainer/portainer/api/libcompose"
 	"github.com/portainer/portainer/api/license"
 	"github.com/portainer/portainer/api/oauth"
+	"github.com/portainer/portainer/api/useractivity"
 )
 
 func initCLI() *portainer.CLIFlags {
@@ -43,6 +44,15 @@ func initCLI() *portainer.CLIFlags {
 		log.Fatal(err)
 	}
 	return flags
+}
+
+func initUserActivityStore(dataStorePath string) portainer.UserActivityStore {
+	store, err := useractivity.NewUserActivityStore(dataStorePath)
+	if err != nil {
+		log.Fatalf("Failed initalizing user activity store: %s", err)
+	}
+
+	return store
 }
 
 func initFileService(dataStorePath string) portainer.FileService {
@@ -412,6 +422,8 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	kubernetesDeployer := initKubernetesDeployer(*flags.Assets)
 
+	userActivityStore := initUserActivityStore(*flags.Data)
+
 	if dataStore.IsNew() {
 		err = updateSettingsFromFlags(dataStore, flags)
 		if err != nil {
@@ -503,6 +515,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		SSLCert:                     *flags.SSLCert,
 		SSLKey:                      *flags.SSLKey,
 		DockerClientFactory:         dockerClientFactory,
+		UserActivityStore:           userActivityStore,
 		KubernetesClientFactory:     kubernetesClientFactory,
 		ShutdownCtx:                 shutdownCtx,
 		ShutdownTrigger:             shutdownTrigger,

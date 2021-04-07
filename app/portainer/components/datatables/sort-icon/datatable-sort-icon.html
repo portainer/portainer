@@ -1,0 +1,9 @@
+<i
+  class="fa fa-sort-alpha-down"
+  ng-class="{
+    'fa-sort-alpha-down': !$ctrl.reverseOrder,
+    'fa-sort-alpha-up': $ctrl.reverseOrder,
+  }"
+  aria-hidden="true"
+  ng-if="$ctrl.isCurrentSortOrder()"
+></i>

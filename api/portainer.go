@@ -23,6 +23,32 @@ type (
 		Authorizations Authorizations
 	}
 
+	// AuthActivityLog represents a log entry for user authentication activities
+	AuthActivityLog struct {
+		ID        int                        `json:"id" storm:"increment"`
+		Type      AuthenticationActivityType `json:"type" storm:"index"`
+		Timestamp int64                      `json:"timestamp" storm:"index"`
+		Origin    string                     `json:"origin" storm:"index"`
+		Context   AuthenticationMethod       `json:"context" storm:"index"`
+		Username  string                     `json:"username" storm:"index"`
+	}
+
+	// AuthLogsQuery represent the options used to get UserActivity logs
+	AuthLogsQuery struct {
+		Limit           int
+		Offset          int
+		BeforeTimestamp int64
+		AfterTimestamp  int64
+		SortBy          string
+		SortDesc        bool
+		Keyword         string
+		ContextTypes    []AuthenticationMethod
+		ActivityTypes   []AuthenticationActivityType
+	}
+
+	// AuthenticationActivityType represents the type of an authentication action
+	AuthenticationActivityType int
+
 	// AuthenticationMethod represents the authentication method used to authenticate a user
 	AuthenticationMethod int
 
@@ -1215,6 +1241,12 @@ type (
 		UpdateInfo(info *TunnelServerInfo) error
 	}
 
+	// UserActivityStore store all logs related to user activity: authentication, actions, ...
+	UserActivityStore interface {
+		GetAuthLogs(opts AuthLogsQuery) ([]*AuthActivityLog, int, error)
+		LogAuthActivity(username, origin string, context AuthenticationMethod, activityType AuthenticationActivityType) (*AuthActivityLog, error)
+	}
+
 	// UserService represents a service for managing user data
 	UserService interface {
 		User(ID UserID) (*User, error)
@@ -1297,6 +1329,14 @@ const (
 	AuthenticationLDAP
 	//AuthenticationOAuth represents the OAuth authentication method (authentication against a authorization server)
 	AuthenticationOAuth
+)
+
+// Represent different types of user activities
+const (
+	_ AuthenticationActivityType = iota
+	AuthenticationActivitySuccess
+	AuthenticationActivityFailure
+	AuthenticationActivityLogOut
 )
 
 const (

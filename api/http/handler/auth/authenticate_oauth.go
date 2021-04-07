@@ -42,35 +42,65 @@ func (handler *Handler) authenticateOAuth(code string, settings *portainer.OAuth
 	return username, nil
 }
 
-func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) (*authMiddlewareResponse, *httperror.HandlerError) {
+	resp := &authMiddlewareResponse{
+		Method: portainer.AuthenticationOAuth,
+	}
+
 	var payload oauthPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return resp, &httperror.HandlerError{
+			StatusCode: http.StatusBadRequest,
+			Message:    "Invalid request payload",
+			Err:        err,
+		}
 	}
 
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+		return resp, &httperror.HandlerError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    "Unable to retrieve settings from the database",
+			Err:        err,
+		}
 	}
 
 	if settings.AuthenticationMethod != 3 {
-		return &httperror.HandlerError{http.StatusForbidden, "OAuth authentication is not enabled", errors.New("OAuth authentication is not enabled")}
+		return resp, &httperror.HandlerError{
+			StatusCode: http.StatusForbidden,
+			Message:    "OAuth authentication is not enabled",
+			Err:        errors.New("OAuth authentication is not enabled"),
+		}
 	}
 
 	username, err := handler.authenticateOAuth(payload.Code, &settings.OAuthSettings)
 	if err != nil {
 		log.Printf("[DEBUG] - OAuth authentication error: %s", err)
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to authenticate through OAuth", httperrors.ErrUnauthorized}
+		return resp, &httperror.HandlerError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    "Unable to authenticate through OAuth",
+			Err:        httperrors.ErrUnauthorized,
+		}
 	}
+
+	resp.Username = username
 
 	user, err := handler.DataStore.User().UserByUsername(username)
 	if err != nil && err != bolterrors.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a user with the specified username from the database", err}
+		return resp, &httperror.HandlerError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    "Unable to retrieve a user with the specified username from the database",
+			Err:        err,
+		}
 	}
 
 	if user == nil && !settings.OAuthSettings.OAuthAutoCreateUsers {
-		return &httperror.HandlerError{http.StatusForbidden, "Account not created beforehand in Portainer and automatic user provisioning not enabled", httperrors.ErrUnauthorized}
+		return resp, &httperror.HandlerError{
+			StatusCode: http.StatusForbidden,
+			Message:    "Account not created beforehand in Portainer and automatic user provisioning not enabled",
+			Err:        httperrors.ErrUnauthorized,
+		}
 	}
 
 	if user == nil {
@@ -82,7 +112,11 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 
 		err = handler.DataStore.User().CreateUser(user)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist user inside the database", err}
+			return resp, &httperror.HandlerError{
+				StatusCode: http.StatusInternalServerError,
+				Message:    "Unable to persist user inside the database",
+				Err:        err,
+			}
 		}
 
 		if settings.OAuthSettings.DefaultTeamID != 0 {
@@ -94,21 +128,35 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 
 			err = handler.DataStore.TeamMembership().CreateTeamMembership(membership)
 			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist team membership inside the database", err}
+				return &authMiddlewareResponse{
+						Method: portainer.AuthenticationOAuth,
+					}, &httperror.HandlerError{
+						StatusCode: http.StatusInternalServerError,
+						Message:    "Unable to persist team membership inside the database",
+						Err:        err,
+					}
 			}
 		}
 
 		err = handler.AuthorizationService.UpdateUsersAuthorizations()
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
+			return resp, &httperror.HandlerError{
+				StatusCode: http.StatusInternalServerError,
+				Message:    "Unable to update user authorizations",
+				Err:        err,
+			}
 		}
 	}
 
 	info := handler.LicenseService.Info()
 
 	if user.Role != portainer.AdministratorRole && !info.Valid {
-		return &httperror.HandlerError{http.StatusForbidden, "License is not valid", httperrors.ErrNoValidLicense}
+		return resp, &httperror.HandlerError{
+			StatusCode: http.StatusForbidden,
+			Message:    "License is not valid",
+			Err:        httperrors.ErrNoValidLicense,
+		}
 	}
 
-	return handler.writeToken(w, user)
+	return handler.writeToken(w, user, portainer.AuthenticationOAuth)
 }

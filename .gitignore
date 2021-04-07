@@ -10,3 +10,5 @@ api/cmd/portainer/portainer*
 .eslintcache
 .idea
 test/e2e/cypress/screenshots
+*.db
+*.log

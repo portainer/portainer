@@ -1,0 +1,76 @@
+<div class="datatable">
+  <rd-widget>
+    <rd-widget-body classes="no-padding">
+      <datatable-titlebar title="Authentication Events" icon="fa-history"></datatable-titlebar>
+      <datatable-searchbar on-change="($ctrl.onChangeKeyword)" ng-model="$ctrl.keyword"></datatable-searchbar>
+      <div class="table-responsive">
+        <table class="table table-hover nowrap-cells">
+          <thead>
+            <tr>
+              <th>
+                <a ng-click="$ctrl.changeSort('Timestamp')">
+                  Time
+                  <datatable-sort-icon key="Timestamp" selected-sort-key="{{ $ctrl.sort.key }}" reverse-order="$ctrl.sort.desc"></datatable-sort-icon>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeSort('Origin')">
+                  Origin
+                  <datatable-sort-icon key="Origin" selected-sort-key="{{ $ctrl.sort.key }}" reverse-order="$ctrl.sort.desc"></datatable-sort-icon>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeSort('Context')">
+                  Context
+                  <datatable-sort-icon key="Context" selected-sort-key="{{ $ctrl.sort.key }}" reverse-order="$ctrl.sort.desc"></datatable-sort-icon>
+                </a>
+                <datatable-filter labels="$ctrl.contextFilterLabels" filter-key="context" state="$ctrl.contextFilter" on-change="($ctrl.onChangeContextFilter)"> </datatable-filter>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeSort('Username')">
+                  User
+                  <datatable-sort-icon key="Username" selected-sort-key="{{ $ctrl.sort.key }}" reverse-order="$ctrl.sort.desc"></datatable-sort-icon>
+                </a>
+              </th>
+              <th>
+                Result
+                <datatable-filter labels="$ctrl.typeFilterLabels" filter-key="type" state="$ctrl.typeFilter" on-change="($ctrl.onChangeTypeFilter)"> </datatable-filter>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr dir-paginate="item in $ctrl.logs | itemsPerPage: $ctrl.limit" total-items="$ctrl.totalItems" current-page="$ctrl.currentPage">
+              <td>
+                {{ item.timestamp | getisodatefromtimestamp }}
+              </td>
+              <td>{{ item.origin }}</td>
+              <td>{{ $ctrl.contextType(item.context) }}</td>
+              <td>{{ item.username }}</td>
+              <td>
+                {{ $ctrl.activityType(item.type) }}
+                <i
+                  class="fa"
+                  ng-class="{
+                    'fa-check text-success': $ctrl.isAuthSuccess(item.type),
+                    'fa-times text-danger': $ctrl.isAuthFailure(item.type)
+                  }"
+                ></i>
+              </td>
+            </tr>
+            <tr ng-if="!$ctrl.logs">
+              <td class="text-center text-muted" colspan="5">Loading...</td>
+            </tr>
+            <tr ng-if="$ctrl.state.logs.length === 0">
+              <td class="text-center text-muted" colspan="8">
+                No logs available.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="footer" ng-if="$ctrl.logs">
+        <datatable-pagination limit="$ctrl.limit" on-change-limit="($ctrl.handleChangeLimit)" on-change-page="($ctrl.onChangePage)"></datatable-pagination>
+      </div>
+    </rd-widget-body>
+  </rd-widget>
+</div>

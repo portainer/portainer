@@ -40,6 +40,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/teams"
 	"github.com/portainer/portainer/api/http/handler/templates"
 	"github.com/portainer/portainer/api/http/handler/upload"
+	"github.com/portainer/portainer/api/http/handler/useractivity"
 	"github.com/portainer/portainer/api/http/handler/users"
 	"github.com/portainer/portainer/api/http/handler/webhooks"
 	"github.com/portainer/portainer/api/http/handler/websocket"
@@ -70,6 +71,7 @@ type Server struct {
 	LDAPService                 portainer.LDAPService
 	OAuthService                portainer.OAuthService
 	SwarmStackManager           portainer.SwarmStackManager
+	UserActivityStore           portainer.UserActivityStore
 	ProxyManager                *proxy.Manager
 	KubernetesTokenCacheManager *kubernetes.TokenCacheManager
 	Handler                     *handler.Handler
@@ -103,6 +105,7 @@ func (server *Server) Start() error {
 	authHandler.ProxyManager = server.ProxyManager
 	authHandler.KubernetesTokenCacheManager = kubernetesTokenCacheManager
 	authHandler.OAuthService = server.OAuthService
+	authHandler.UserActivityStore = server.UserActivityStore
 
 	adminMonitor := adminmonitor.New(5*time.Minute, server.DataStore, server.ShutdownCtx)
 	adminMonitor.Start()
@@ -230,6 +233,9 @@ func (server *Server) Start() error {
 	userHandler.CryptoService = server.CryptoService
 	userHandler.K8sClientFactory = server.KubernetesClientFactory
 
+	var userActivityHandler = useractivity.NewHandler(requestBouncer)
+	userActivityHandler.UserActivityStore = server.UserActivityStore
+
 	var websocketHandler = websocket.NewHandler(requestBouncer, server.AuthorizationService)
 	websocketHandler.DataStore = server.DataStore
 	websocketHandler.SignatureService = server.SignatureService
@@ -269,6 +275,7 @@ func (server *Server) Start() error {
 		TemplatesHandler:       templatesHandler,
 		UploadHandler:          uploadHandler,
 		UserHandler:            userHandler,
+		UserActivityHandler:    userActivityHandler,
 		WebSocketHandler:       websocketHandler,
 		WebhookHandler:         webhookHandler,
 	}

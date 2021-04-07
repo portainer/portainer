@@ -5,6 +5,7 @@ go 1.13
 require (
 	github.com/Microsoft/go-winio v0.4.14
 	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a
+	github.com/asdine/storm/v3 v3.2.1
 	github.com/boltdb/bolt v1.3.1
 	github.com/containerd/containerd v1.3.1 // indirect
 	github.com/coreos/go-semver v0.3.0
@@ -31,9 +32,11 @@ require (
 	github.com/portainer/libhttp v0.0.0-20190806161843-ba068f58be33
 	github.com/portainer/liblicense v0.0.0-20201202013603-cc746081ef18
 	github.com/stretchr/testify v1.7.0
+	go.etcd.io/bbolt v1.3.5 // indirect
 	golang.org/x/crypto v0.0.0-20191128160524-b544559bb6d1
 	golang.org/x/net v0.0.0-20191126235420-ef20fe5d7933 // indirect
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
+	golang.org/x/sys v0.0.0-20210301091718-77cc2087c03b // indirect
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/src-d/go-git.v4 v4.13.1
 	k8s.io/api v0.17.2
