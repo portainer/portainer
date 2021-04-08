@@ -81,18 +81,22 @@ class KubernetesResourcePoolController {
   onChangeIngressHostname() {
     const state = this.state.duplicates.ingressHosts;
 
-    const hosts = _.flatMap(this.formValues.IngressClasses, 'Hosts');
-    const hostnames = _.map(hosts, 'Host');
-    const otherIngresses = _.without(this.allIngresses, ...this.ingresses);
-    const allHosts = _.flatMap(otherIngresses, 'Hosts');
-    const duplicates = KubernetesFormValidationHelper.getDuplicates(hostnames);
-    _.forEach(hostnames, (host, idx) => {
-      if (_.includes(allHosts, host) && host !== undefined) {
-        duplicates[idx] = host;
-      }
+    _.forEach(this.formValues.IngressClasses, (ic) => {
+      const hosts = ic.Hosts;
+      const hostnames = _.map(hosts, 'Host');
+      const hostsWithoutRemoved = _.filter(hosts, (h) => !h.NeedsDeletion);
+      const hostnamesWithoutRemoved = _.map(hostsWithoutRemoved, 'Host');
+      const otherIngresses = _.without(this.allIngresses, ...this.ingresses);
+      const allHosts = _.flatMap(otherIngresses, 'Hosts');
+      const duplicates = KubernetesFormValidationHelper.getDuplicates(hostnamesWithoutRemoved);
+      _.forEach(hostnames, (host, idx) => {
+        if (_.includes(allHosts, host) && host !== undefined) {
+          duplicates[idx] = host;
+        }
+      });
+      state.refs = duplicates;
+      state.hasRefs = Object.keys(duplicates).length > 0;
     });
-    state.refs = duplicates;
-    state.hasRefs = Object.keys(duplicates).length > 0;
   }
 
   addHostname(ingressClass) {

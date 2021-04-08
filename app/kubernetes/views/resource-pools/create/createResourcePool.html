@@ -246,7 +246,7 @@
                           <input
                             type="text"
                             class="form-control"
-                            name="hostname_{{ $index }}"
+                            name="hostname_{{ ic.IngressClass.Name }}_{{ $index }}"
                             ng-model="item.Host"
                             ng-change="ctrl.onChangeIngressHostname()"
                             placeholder="foo"
@@ -262,9 +262,11 @@
                       <div
                         class="small text-warning"
                         style="margin-top: 5px;"
-                        ng-show="resourcePoolCreationForm['hostname_' + $index].$invalid || ctrl.state.duplicates.ingressHosts.refs[$index] !== undefined"
+                        ng-show="
+                          resourcePoolCreationForm['hostname_' + ic.IngressClass.Name + '_' + $index].$invalid || ctrl.state.duplicates.ingressHosts.refs[$index] !== undefined
+                        "
                       >
-                        <ng-messages for="resourcePoolCreationForm['hostname_' + $index].$error">
+                        <ng-messages for="resourcePoolCreationForm['hostname_' + ic.IngressClass.Name + '_' + $index].$error">
                           <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Hostname is required.</p>
                         </ng-messages>
                         <p ng-if="ctrl.state.duplicates.ingressHosts.refs[$index] !== undefined">

@@ -41,8 +41,9 @@ class KubernetesCreateResourcePoolController {
 
     const hosts = _.flatMap(this.formValues.IngressClasses, 'Hosts');
     const hostnames = _.map(hosts, 'Host');
+    const hostnamesWithoutRemoved = _.filter(hostnames, (h) => !h.NeedsDeletion);
     const allHosts = _.flatMap(this.allIngresses, 'Hosts');
-    const duplicates = KubernetesFormValidationHelper.getDuplicates(hostnames);
+    const duplicates = KubernetesFormValidationHelper.getDuplicates(hostnamesWithoutRemoved);
     _.forEach(hostnames, (host, idx) => {
       if (_.includes(allHosts, host) && host !== undefined) {
         duplicates[idx] = host;
