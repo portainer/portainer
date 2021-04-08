@@ -68,6 +68,8 @@ angular.module('portainer.app').controller('InitAdminController', [
         });
     }
 
+    createAdministratorFlow();
+
     async function waitPortainerRestart() {
       for (let i = 0; i < 10; i++) {
         await new Promise((resolve) => setTimeout(resolve, 5 * 1000));

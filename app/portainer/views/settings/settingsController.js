@@ -7,7 +7,7 @@ angular.module('portainer.app').controller('SettingsController', [
   'BackupService',
   'FileSaver',
   'Blob',
-  function ($scope, $state, Notifications, SettingsService, StateManager, BackupService, FileSaver, Bloc) {
+  function ($scope, $state, Notifications, SettingsService, StateManager, BackupService, FileSaver, Blob) {
     $scope.state = {
       actionInProgress: false,
       availableEdgeAgentCheckinOptions: [

@@ -45,7 +45,7 @@ angular.module('portainer.azure').controller('AzureCreateContainerInstanceContro
       $scope.state.actionInProgress = true;
       AzureService.createContainerGroup(model, subscriptionId, resourceGroupName)
         .then(applyResourceControl)
-        .then((resourceControl) => {
+        .then(() => {
           Notifications.success('Container successfully created', model.Name);
           $state.go('azure.containerinstances');
         })
