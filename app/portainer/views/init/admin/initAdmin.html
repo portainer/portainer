@@ -131,6 +131,30 @@
               </div>
             </div>
             <!-- !note -->
+            <div class="form-group">
+              <div class="boxselector_wrapper">
+                <div>
+                  <input type="radio" id="restore_file" checked="checked" />
+                  <label for="restore_file" style="padding-bottom: 20px;">
+                    <div class="boxselector_header">
+                      <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Upload backup file
+                    </div>
+                    <p></p>
+                  </label>
+                </div>
+                <div>
+                  <input type="radio" id="restore_s3" disabled />
+                  <label for="restore_s3" class="boxselector_disabled" style="background-color: #ffffff;">
+                    <div class="boxselector_header">
+                      <i class="fa fa-download" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Retrieve from S3
+                    </div>
+                    <p>This feature is available in <a href="https://www.portainer.io/business-upsell?from=restore-s3-form" target="_blank"> Portainer Business Edition</a></p>
+                  </label>
+                </div>
+              </div>
+            </div>
             <!-- note -->
             <div class="form-group">
               <div class="col-sm-12">
