@@ -77,7 +77,7 @@ func (transport *Transport) containerListOperation(response *http.Response, exec
 func (transport *Transport) containerInspectOperation(response *http.Response, executor *operationExecutor) error {
 	//ContainerInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/ContainerInspect
-	responseObject, err := responseutils.GetResponseAsJSONOBject(response)
+	responseObject, err := responseutils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return err
 	}
