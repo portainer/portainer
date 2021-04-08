@@ -2,9 +2,10 @@ package azure
 
 import (
 	"errors"
+	"net/http"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
-	"net/http"
 )
 
 // proxy for /subscriptions/*/resourceGroups/*/providers/Microsoft.ContainerInstance/containerGroups/*
@@ -27,7 +28,7 @@ func (transport *Transport) proxyContainerGroupPutRequest(request *http.Request)
 		return response, err
 	}
 
-	responseObject, err := responseutils.GetResponseAsJSONOBject(response)
+	responseObject, err := responseutils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return response, err
 	}
@@ -63,7 +64,7 @@ func (transport *Transport) proxyContainerGroupGetRequest(request *http.Request)
 		return response, err
 	}
 
-	responseObject, err := responseutils.GetResponseAsJSONOBject(response)
+	responseObject, err := responseutils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +96,7 @@ func (transport *Transport) proxyContainerGroupDeleteRequest(request *http.Reque
 		return response, err
 	}
 
-	responseObject, err := responseutils.GetResponseAsJSONOBject(response)
+	responseObject, err := responseutils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return nil, err
 	}

@@ -63,7 +63,7 @@ func (transport *Transport) serviceListOperation(response *http.Response, execut
 func (transport *Transport) serviceInspectOperation(response *http.Response, executor *operationExecutor) error {
 	//ServiceInspect response is a JSON object
 	//https://docs.docker.com/engine/api/v1.28/#operation/ServiceInspect
-	responseObject, err := responseutils.GetResponseAsJSONOBject(response)
+	responseObject, err := responseutils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return err
 	}

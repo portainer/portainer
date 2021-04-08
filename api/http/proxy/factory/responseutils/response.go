@@ -11,8 +11,8 @@ import (
 	"strconv"
 )
 
-// GetResponseAsJSONOBject returns the response content as a generic JSON object
-func GetResponseAsJSONOBject(response *http.Response) (map[string]interface{}, error) {
+// GetResponseAsJSONObject returns the response content as a generic JSON object
+func GetResponseAsJSONObject(response *http.Response) (map[string]interface{}, error) {
 	responseData, err := getResponseBodyAsGenericJSON(response)
 	if err != nil {
 		return nil, err
