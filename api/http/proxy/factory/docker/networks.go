@@ -62,7 +62,7 @@ func (transport *Transport) networkListOperation(response *http.Response, execut
 func (transport *Transport) networkInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// NetworkInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/NetworkInspect
-	responseObject, err := responseutils.GetResponseAsJSONOBject(response)
+	responseObject, err := responseutils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return err
 	}

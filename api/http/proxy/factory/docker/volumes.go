@@ -37,7 +37,7 @@ func getInheritedResourceControlFromVolumeLabels(dockerClient *client.Client, en
 func (transport *Transport) volumeListOperation(response *http.Response, executor *operationExecutor) error {
 	// VolumeList response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/VolumeList
-	responseObject, err := responseutils.GetResponseAsJSONOBject(response)
+	responseObject, err := responseutils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return err
 	}
@@ -76,7 +76,7 @@ func (transport *Transport) volumeListOperation(response *http.Response, executo
 func (transport *Transport) volumeInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// VolumeInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/VolumeInspect
-	responseObject, err := responseutils.GetResponseAsJSONOBject(response)
+	responseObject, err := responseutils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return err
 	}
@@ -142,7 +142,7 @@ func (transport *Transport) decorateVolumeResourceCreationOperation(request *htt
 }
 
 func (transport *Transport) decorateVolumeCreationResponse(response *http.Response, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType, userID portainer.UserID) error {
-	responseObject, err := responseutils.GetResponseAsJSONOBject(response)
+	responseObject, err := responseutils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return err
 	}
