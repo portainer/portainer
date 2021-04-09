@@ -22,13 +22,21 @@ func (transport *Transport) createAzureRequestContext(request *http.Request) (*a
 	}
 
 	context := &azureRequestContext{
-		isAdmin:          true,
-		userID:           tokenData.ID,
-		resourceControls: resourceControls,
+		isAdmin:                true,
+		userID:                 tokenData.ID,
+		resourceControls:       resourceControls,
+		endpointResourceAccess: false,
 	}
 
 	if tokenData.Role != portainer.AdministratorRole {
 		context.isAdmin = false
+
+		user, err := transport.dataStore.User().User(context.userID)
+		if err != nil {
+			return nil, err
+		}
+
+		_, context.endpointResourceAccess = user.EndpointAuthorizations[transport.endpoint.ID][portainer.EndpointResourcesAccess]
 
 		teamMemberships, err := transport.dataStore.TeamMembership().TeamMembershipsByUserID(tokenData.ID)
 		if err != nil {
@@ -72,7 +80,7 @@ func (transport *Transport) createPrivateResourceControl(
 }
 
 func (transport *Transport) userCanDeleteContainerGroup(request *http.Request, context *azureRequestContext) bool {
-	if context.isAdmin {
+	if context.isAdmin || context.endpointResourceAccess {
 		return true
 	}
 	resourceIdentifier := request.URL.Path
@@ -119,7 +127,7 @@ func (transport *Transport) filterContainerGroups(containerGroups []interface{},
 			}
 		}
 
-		if context.isAdmin || userCanAccessResource {
+		if context.isAdmin || context.endpointResourceAccess || userCanAccessResource {
 			filteredContainerGroups = append(filteredContainerGroups, containerGroup)
 		}
 	}

@@ -157,7 +157,10 @@ func DefaultEndpointAuthorizationsForEndpointAdministratorRole() portainer.Autho
 		portainer.OperationPortainerEndpointUpdateSettings:    true,
 		portainer.OperationIntegrationStoridgeAdmin:           true,
 		portainer.EndpointResourcesAccess:                     true,
-	}, DefaultK8sClusterAuthorizations()[portainer.RoleIDEndpointAdmin])
+	},
+		DefaultK8sClusterAuthorizations()[portainer.RoleIDEndpointAdmin],
+		DefaultAzureAuthorizations()[portainer.RoleIDEndpointAdmin],
+	)
 }
 
 // DefaultEndpointAuthorizationsForHelpDeskRole returns the default endpoint authorizations
@@ -209,7 +212,10 @@ func DefaultEndpointAuthorizationsForHelpDeskRole() portainer.Authorizations {
 		portainer.OperationPortainerStackFile:         true,
 		portainer.OperationPortainerWebhookList:       true,
 		portainer.EndpointResourcesAccess:             true,
-	}, DefaultK8sClusterAuthorizations()[portainer.RoleIDHelpdesk])
+	},
+		DefaultK8sClusterAuthorizations()[portainer.RoleIDHelpdesk],
+		DefaultAzureAuthorizations()[portainer.RoleIDHelpdesk],
+	)
 
 	return authorizations
 }
@@ -276,7 +282,10 @@ func DefaultEndpointAuthorizationsForOperatorRole() portainer.Authorizations {
 		portainer.OperationPortainerWebsocketExec:          true,
 		portainer.OperationPortainerWebhookList:            true,
 		portainer.EndpointResourcesAccess:                  true,
-	}, DefaultK8sClusterAuthorizations()[portainer.RoleIDOperator])
+	},
+		DefaultK8sClusterAuthorizations()[portainer.RoleIDOperator],
+		DefaultAzureAuthorizations()[portainer.RoleIDOperator],
+	)
 
 	return authorizations
 }
@@ -403,7 +412,10 @@ func DefaultEndpointAuthorizationsForStandardUserRole() portainer.Authorizations
 		portainer.OperationPortainerWebsocketExec:             true,
 		portainer.OperationPortainerWebhookList:               true,
 		portainer.OperationPortainerWebhookCreate:             true,
-	}, DefaultK8sClusterAuthorizations()[portainer.RoleIDStandardUser])
+	},
+		DefaultK8sClusterAuthorizations()[portainer.RoleIDStandardUser],
+		DefaultAzureAuthorizations()[portainer.RoleIDStandardUser],
+	)
 
 	return authorizations
 }
@@ -456,7 +468,10 @@ func DefaultEndpointAuthorizationsForReadOnlyUserRole() portainer.Authorizations
 		portainer.OperationPortainerStackInspect:      true,
 		portainer.OperationPortainerStackFile:         true,
 		portainer.OperationPortainerWebhookList:       true,
-	}, DefaultK8sClusterAuthorizations()[portainer.RoleIDReadonly])
+	},
+		DefaultK8sClusterAuthorizations()[portainer.RoleIDReadonly],
+		DefaultAzureAuthorizations()[portainer.RoleIDReadonly],
+	)
 
 	return authorizations
 }

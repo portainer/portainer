@@ -1283,9 +1283,9 @@ const (
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "2.0.2"
 	// DBVersion is the version number of the Portainer CE database
-	DBVersion = 28
+	DBVersion = 30
 	// DBVersionEE is the version number of the Portainer EE database
-	DBVersionEE = 28
+	DBVersionEE = 30
 	// Edition is the edition of the Portainer API
 	Edition = PortainerEE
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
@@ -1685,6 +1685,16 @@ const (
 	OperationDockerAgentBrowsePut    Authorization = "DockerAgentBrowsePut"
 	OperationDockerAgentBrowseRename Authorization = "DockerAgentBrowseRename"
 
+	OperationAzureSubscriptionsList    Authorization = "AzureSubscriptionsList"
+	OperationAzureSubscriptionGet      Authorization = "AzureSubscriptionGet"
+	OperationAzureProviderGet          Authorization = "AzureProviderGet"
+	OperationAzureResourceGroupsList   Authorization = "AzureResourceGroupsList"
+	OperationAzureResourceGroupGet     Authorization = "AzureResourceGroupGet"
+	OperationAzureContainerGroupsList  Authorization = "AzureContainerGroupsList"
+	OperationAzureContainerGroupGet    Authorization = "AzureContainerGroupGet"
+	OperationAzureContainerGroupCreate Authorization = "AzureContainerGroupCreate"
+	OperationAzureContainerGroupDelete Authorization = "AzureContainerGroupDelete"
+
 	OperationPortainerDockerHubInspect        Authorization = "PortainerDockerHubInspect"
 	OperationPortainerDockerHubUpdate         Authorization = "PortainerDockerHubUpdate"
 	OperationPortainerEndpointGroupCreate     Authorization = "PortainerEndpointGroupCreate"
@@ -1777,6 +1787,7 @@ const (
 	OperationIntegrationStoridgeAdmin Authorization = "IntegrationStoridgeAdmin"
 
 	OperationDockerUndefined      Authorization = "DockerUndefined"
+	OperationAzureUndefined       Authorization = "AzureUndefined"
 	OperationDockerAgentUndefined Authorization = "DockerAgentUndefined"
 	OperationPortainerUndefined   Authorization = "PortainerUndefined"
 

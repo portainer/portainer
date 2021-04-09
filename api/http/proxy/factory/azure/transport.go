@@ -27,10 +27,11 @@ type (
 	}
 
 	azureRequestContext struct {
-		isAdmin          bool
-		userID           portainer.UserID
-		userTeamIDs      []portainer.TeamID
-		resourceControls []portainer.ResourceControl
+		isAdmin                bool
+		endpointResourceAccess bool
+		userID                 portainer.UserID
+		userTeamIDs            []portainer.TeamID
+		resourceControls       []portainer.ResourceControl
 	}
 )
 
