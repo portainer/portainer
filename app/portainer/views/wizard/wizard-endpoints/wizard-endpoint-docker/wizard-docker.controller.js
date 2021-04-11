@@ -1,8 +1,7 @@
-//import { getAgentShortVersion } from 'Portainer/views/endpoints/helpers';
 import { PortainerEndpointCreationTypes } from 'Portainer/models/endpoint/models';
-import { buildOption } from '@/portainer/components/box-selector';
 import { EndpointSecurityFormData } from 'Portainer/components/endpointSecurity/porEndpointSecurityModel';
 import { getAgentShortVersion } from 'Portainer/views/endpoints/helpers';
+import { buildOption } from '@/portainer/components/box-selector';
 
 export default class WizardDockerController {
   /* @ngInject */

@@ -37,7 +37,7 @@ module.exports = {
         ],
       },
       {
-        test: /\.js$/,
+        test: /\.(js|ts)(x)?$/,
         exclude: /node_modules/,
         use: ['babel-loader', 'auto-ngtemplate-loader'],
       },
@@ -61,7 +61,21 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, { loader: 'css-loader', options: { importLoaders: 1 } }, 'postcss-loader'],
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 1,
+              modules: {
+                localIdentName: '[path][name]__[local]',
+                auto: true,
+                exportLocalsConvention: 'camelCaseOnly',
+              },
+            },
+          },
+          'postcss-loader',
+        ],
       },
     ],
   },
@@ -103,7 +117,6 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: '[name].[hash].css',
       chunkFilename: '[name].[id].css',
-      sourceMap: true,
     }),
     new CleanWebpackPlugin(['dist/public']),
     new IgnorePlugin(/^\.\/locale$/, /moment$/),
@@ -136,5 +149,6 @@ module.exports = {
       Portainer: path.resolve(projectRoot, 'app/portainer'),
       '@': path.resolve(projectRoot, 'app'),
     },
+    extensions: ['.js', '.ts', '.tsx'],
   },
 };
