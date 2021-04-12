@@ -1084,7 +1084,8 @@ type (
 
 	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes endpoint
 	KubernetesDeployer interface {
-		Deploy(endpoint *Endpoint, data string, composeFormat bool, namespace string) ([]byte, error)
+		Deploy(endpoint *Endpoint, data string, namespace string) (string, error)
+		ConvertCompose(data string) ([]byte, error)
 	}
 
 	// KubernetesSnapshotter represents a service used to create Kubernetes endpoint snapshots

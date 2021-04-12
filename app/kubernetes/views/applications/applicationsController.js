@@ -116,10 +116,6 @@ class KubernetesApplicationsController {
     return this.$async(this.getApplicationsAsync);
   }
 
-  advancedDeploymentDisabled() {
-    return this.state.endpointType === PortainerEndpointTypes.AgentOnKubernetesEnvironment || this.state.endpointType === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment;
-  }
-
   async onInit() {
     this.state = {
       activeTab: this.LocalStorage.getActiveTab('applications'),

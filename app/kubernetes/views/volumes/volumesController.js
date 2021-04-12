@@ -114,10 +114,6 @@ class KubernetesVolumesController {
     return this.$async(this.getVolumesAsync);
   }
 
-  advancedDeploymentDisabled() {
-    return this.state.endpointType === PortainerEndpointTypes.AgentOnKubernetesEnvironment || this.state.endpointType === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment;
-  }
-
   async onInit() {
     this.state = {
       viewReady: false,

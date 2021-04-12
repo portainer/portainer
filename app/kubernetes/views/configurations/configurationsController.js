@@ -91,10 +91,6 @@ class KubernetesConfigurationsController {
     return this.$async(this.refreshCallbackAsync);
   }
 
-  advancedDeploymentDisabled() {
-    return this.state.endpointType === PortainerEndpointTypes.AgentOnKubernetesEnvironment || this.state.endpointType === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment;
-  }
-
   async onInit() {
     this.state = {
       configurationsLoading: true,
