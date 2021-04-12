@@ -706,6 +706,33 @@
                 <!-- !devices-input-list -->
               </div>
               <!-- !devices-->
+              <!-- sysctls -->
+              <div ng-if="showSysctls" class="form-group">
+                <div class="col-sm-12" style="margin-top: 5px;">
+                  <label class="control-label text-left">Sysctls</label>
+                  <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addSysctl()">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i> add sysctl
+                  </span>
+                </div>
+                <!-- sysctls-input-list -->
+                <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                  <div ng-repeat="sysctl in formValues.Sysctls" style="margin-top: 2px;">
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">name</span>
+                      <input type="text" class="form-control" ng-model="sysctl.name" placeholder="e.g. FOO" />
+                    </div>
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">value</span>
+                      <input type="text" class="form-control" ng-model="sysctl.value" placeholder="e.g. bar" />
+                    </div>
+                    <button class="btn btn-sm btn-danger" type="button" ng-click="removeSysctl($index)">
+                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- !sysctls-input-list -->
+              </div>
+              <!-- !sysctls -->
               <div class="col-sm-12 form-section-title">
                 Resources
               </div>

@@ -335,6 +335,8 @@ type (
 		AllowStackManagementForRegularUsers bool `json:"allowStackManagementForRegularUsers" example:"true"`
 		// Whether non-administrator should be able to use container capabilities
 		AllowContainerCapabilitiesForRegularUsers bool `json:"allowContainerCapabilitiesForRegularUsers" example:"true"`
+		// Whether non-administrator should be able to use sysctl settings
+		AllowSysctlSettingForRegularUsers bool `json:"AllowSysctlSettingForRegularUsers" example:"true"`
 		// Whether host management features are enabled
 		EnableHostManagementFeatures bool `json:"enableHostManagementFeatures" example:"true"`
 	}

@@ -80,6 +80,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       EntrypointMode: 'default',
       NodeName: null,
       capabilities: [],
+      Sysctls: [],
       LogDriverName: '',
       LogDriverOpts: [],
       RegistryModel: new PorImageRegistryModel(),
@@ -136,6 +137,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         Devices: [],
         CapAdd: [],
         CapDrop: [],
+        Sysctls: {},
       },
       NetworkingConfig: {
         EndpointsConfig: {},
@@ -189,6 +191,14 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
     $scope.removeDevice = function (index) {
       $scope.config.HostConfig.Devices.splice(index, 1);
+    };
+
+    $scope.addSysctl = function () {
+      $scope.formValues.Sysctls.push({ name: '', value: '' });
+    };
+
+    $scope.removeSysctl = function (index) {
+      $scope.formValues.Sysctls.splice(index, 1);
     };
 
     $scope.addLogDriverOpt = function () {
@@ -344,6 +354,16 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       config.HostConfig.Devices = path;
     }
 
+    function prepareSysctls(config) {
+      var sysctls = {};
+      $scope.formValues.Sysctls.forEach(function (sysctl) {
+        if (sysctl.name && sysctl.value) {
+          sysctls[sysctl.name] = sysctl.value;
+        }
+      });
+      config.HostConfig.Sysctls = sysctls;
+    }
+
     function prepareResources(config) {
       // Memory Limit - Round to 0.125
       if ($scope.formValues.MemoryLimit >= 0) {
@@ -412,6 +432,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       prepareResources(config);
       prepareLogDriver(config);
       prepareCapabilities(config);
+      prepareSysctls(config);
       return config;
     }
 
@@ -557,6 +578,14 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       $scope.config.HostConfig.Devices = path;
     }
 
+    function loadFromContainerSysctls() {
+      for (var s in $scope.config.HostConfig.Sysctls) {
+        if ({}.hasOwnProperty.call($scope.config.HostConfig.Sysctls, s)) {
+          $scope.formValues.Sysctls.push({ name: s, value: $scope.config.HostConfig.Sysctls[s] });
+        }
+      }
+    }
+
     function loadFromContainerImageConfig() {
       RegistryService.retrievePorRegistryModelFromRepository($scope.config.Image)
         .then((model) => {
@@ -632,6 +661,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
           loadFromContainerImageConfig(d);
           loadFromContainerResources(d);
           loadFromContainerCapabilities(d);
+          loadFromContainerSysctls(d);
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve container');
@@ -656,6 +686,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
       $scope.isAdmin = Authentication.isAdmin();
       $scope.showDeviceMapping = await shouldShowDevices();
+      $scope.showSysctls = await shouldShowSysctls();
       $scope.areContainerCapabilitiesEnabled = await checkIfContainerCapabilitiesEnabled();
       $scope.isAdminOrEndpointAdmin = Authentication.isAdmin();
 
@@ -938,6 +969,12 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
     async function shouldShowDevices() {
       return endpoint.SecuritySettings.allowDeviceMappingForRegularUsers || Authentication.isAdmin();
+    }
+
+    async function shouldShowSysctls() {
+      const { allowSysctlSettingForRegularUsers } = $scope.applicationState.application;
+
+      return allowSysctlSettingForRegularUsers || Authentication.isAdmin();
     }
 
     async function checkIfContainerCapabilitiesEnabled() {

@@ -9,8 +9,8 @@ import {
   KubernetesPortainerApplicationNote,
 } from 'Kubernetes/models/application/models';
 
-import { createPayloadFactory } from './payloads/create';
 import { KubernetesPod, KubernetesPodToleration, KubernetesPodAffinity, KubernetesPodContainer, KubernetesPodContainerTypes, KubernetesPodEviction } from 'Kubernetes/pod/models';
+import { createPayloadFactory } from './payloads/create';
 
 function computeStatus(statuses) {
   const containerStatuses = _.map(statuses, 'state');
