@@ -80,22 +80,29 @@ class KubernetesResourcePoolController {
   /* #region  INGRESS MANAGEMENT */
   onChangeIngressHostname() {
     const state = this.state.duplicates.ingressHosts;
+    const otherIngresses = _.without(this.allIngresses, ...this.ingresses);
+    const allHosts = _.flatMap(otherIngresses, 'Hosts');
 
+    const hosts = _.flatMap(this.formValues.IngressClasses, 'Hosts');
+    const hostsWithoutRemoved = _.filter(hosts, { NeedsDeletion: false });
+    const hostnames = _.map(hostsWithoutRemoved, 'Host');
+    const formDuplicates = KubernetesFormValidationHelper.getDuplicates(hostnames);
+    _.forEach(hostnames, (host, idx) => {
+      if (host !== undefined && _.includes(allHosts, host)) {
+        formDuplicates[idx] = host;
+      }
+    });
+    const duplicatedHostnames = Object.values(formDuplicates);
+    state.hasRefs = false;
     _.forEach(this.formValues.IngressClasses, (ic) => {
-      const hosts = ic.Hosts;
-      const hostnames = _.map(hosts, 'Host');
-      const hostsWithoutRemoved = _.filter(hosts, (h) => !h.NeedsDeletion);
-      const hostnamesWithoutRemoved = _.map(hostsWithoutRemoved, 'Host');
-      const otherIngresses = _.without(this.allIngresses, ...this.ingresses);
-      const allHosts = _.flatMap(otherIngresses, 'Hosts');
-      const duplicates = KubernetesFormValidationHelper.getDuplicates(hostnamesWithoutRemoved);
-      _.forEach(hostnames, (host, idx) => {
-        if (_.includes(allHosts, host) && host !== undefined) {
-          duplicates[idx] = host;
+      _.forEach(ic.Hosts, (hostFV) => {
+        if (_.includes(duplicatedHostnames, hostFV.Host) && hostFV.NeedsDeletion === false) {
+          hostFV.Duplicate = true;
+          state.hasRefs = true;
+        } else {
+          hostFV.Duplicate = false;
         }
       });
-      state.refs = duplicates;
-      state.hasRefs = Object.keys(duplicates).length > 0;
     });
   }
 

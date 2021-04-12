@@ -208,7 +208,7 @@
                 </div>
               </div>
 
-              <div class="form-group" ng-repeat-start="ic in ctrl.formValues.IngressClasses">
+              <div class="form-group" ng-repeat-start="ic in ctrl.formValues.IngressClasses track by ic.IngressClass.Name">
                 <div class="text-muted col-sm-12" style="width: 100%;">
                   <div style="border-bottom: 1px solid #cdcdcd; padding-bottom: 5px;">
                     <i class="fa fa-route" aria-hidden="true" style="margin-right: 2px;"></i> {{ ic.IngressClass.Name }}
@@ -263,13 +263,14 @@
                         class="small text-warning"
                         style="margin-top: 5px;"
                         ng-show="
-                          resourcePoolCreationForm['hostname_' + ic.IngressClass.Name + '_' + $index].$invalid || ctrl.state.duplicates.ingressHosts.refs[$index] !== undefined
+                          resourcePoolCreationForm['hostname_' + ic.IngressClass.Name + '_' + $index].$invalid ||
+                          ctrl.state.duplicates.ingressHosts.refs[ic.IngressClass.Name][$index] !== undefined
                         "
                       >
                         <ng-messages for="resourcePoolCreationForm['hostname_' + ic.IngressClass.Name + '_' + $index].$error">
                           <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Hostname is required.</p>
                         </ng-messages>
-                        <p ng-if="ctrl.state.duplicates.ingressHosts.refs[$index] !== undefined">
+                        <p ng-if="ctrl.state.duplicates.ingressHosts.refs[ic.IngressClass.Name][$index] !== undefined">
                           <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This hostname is already used.
                         </p>
                       </div>
