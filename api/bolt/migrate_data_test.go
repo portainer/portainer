@@ -75,7 +75,7 @@ func TestMigrateData(t *testing.T) {
 		version := 21
 		store = NewTestStore(portainer.PortainerCE, version, true)
 
-		deleteBucket(store.db, "settings")
+		deleteBucket(store.connection.DB, "settings")
 		store.MigrateData(false)
 
 		testVersion(store, version, t)
