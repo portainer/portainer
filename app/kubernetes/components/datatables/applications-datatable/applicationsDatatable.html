@@ -148,7 +148,7 @@
                 <a ui-sref="kubernetes.resourcePools.resourcePool({ id: item.ResourcePool })">{{ item.ResourcePool }}</a>
               </td>
               <td
-                >{{ item.Image }} <span ng-if="item.Containers.length > 1">+ {{ item.Containers.length - 1 }}</span></td
+                >{{ item.Image | truncate: 64 }} <span ng-if="item.Containers.length > 1">+ {{ item.Containers.length - 1 }}</span></td
               >
               <td>{{ item.ApplicationType | kubernetesApplicationTypeText }}</td>
               <td ng-if="item.ApplicationType !== $ctrl.KubernetesApplicationTypes.POD">
