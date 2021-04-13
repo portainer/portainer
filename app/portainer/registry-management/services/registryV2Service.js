@@ -157,8 +157,9 @@ angular.module('portainer.registrymanagement').factory('RegistryV2Service', [
       };
       $q.all(promises)
         .then(function success(data) {
-          var tag = RegistryV2Helper.manifestsToTag(data);
-          deferred.resolve(tag);
+          var tagDetails = RegistryV2Helper.manifestsToTag(data);
+          tagDetails.Name = tagDetails.Name || tag;
+          deferred.resolve(tagDetails);
         })
         .catch(function error(err) {
           deferred.reject({

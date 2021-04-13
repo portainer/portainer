@@ -17,7 +17,7 @@ angular.module('portainer.registrymanagement').factory('RegistryV2Helper', [
 
       var history = historyRawToParsed(v1.history);
       var name = v1.tag;
-      var os = history[0].os;
+      var os = _.get(history, '[0].os', '');
       var arch = v1.architecture;
       var size = v2.layers.reduce(function (a, b) {
         return {
