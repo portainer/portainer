@@ -30,7 +30,7 @@ require (
 	github.com/portainer/libcompose v0.5.3
 	github.com/portainer/libcrypto v0.0.0-20190723020515-23ebe86ab2c2
 	github.com/portainer/libhttp v0.0.0-20190806161843-ba068f58be33
-	github.com/portainer/liblicense v0.0.0-20201202013603-cc746081ef18
+	github.com/portainer/liblicense v0.0.0-20210409011001-c758dd044fbb
 	github.com/stretchr/testify v1.7.0
 	go.etcd.io/bbolt v1.3.5 // indirect
 	golang.org/x/crypto v0.0.0-20191128160524-b544559bb6d1
