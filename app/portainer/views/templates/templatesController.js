@@ -258,6 +258,7 @@ angular.module('portainer.app').controller('TemplatesController', [
 
       var endpointMode = $scope.applicationState.endpoint.mode;
       var apiVersion = $scope.applicationState.endpoint.apiVersion;
+      $scope.state.provider = endpointMode.provider === 'DOCKER_STANDALONE' ? 2 : 1;
 
       $q.all({
         templates: TemplateService.templates(),
