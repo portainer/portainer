@@ -55,7 +55,7 @@ func (factory *ProxyFactory) NewLegacyExtensionProxy(extensionAPIURL string) (ht
 func (factory *ProxyFactory) NewEndpointProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
 	switch endpoint.Type {
 	case portainer.AzureEnvironment:
-		return newAzureProxy(endpoint)
+		return newAzureProxy(endpoint, factory.dataStore)
 	case portainer.EdgeAgentOnKubernetesEnvironment, portainer.AgentOnKubernetesEnvironment, portainer.KubernetesLocalEnvironment:
 		return factory.newKubernetesProxy(endpoint)
 	}

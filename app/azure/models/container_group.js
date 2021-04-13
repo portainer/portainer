@@ -1,3 +1,6 @@
+import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
+import { ResourceControlViewModel } from 'Portainer/models/resourceControl/resourceControl';
+
 export function ContainerGroupDefaultModel() {
   this.Location = '';
   this.OSType = 'Linux';
@@ -13,6 +16,7 @@ export function ContainerGroupDefaultModel() {
   ];
   this.CPU = 1;
   this.Memory = 1;
+  this.AccessControlData = new AccessControlFormData();
 }
 
 export function ContainerGroupViewModel(data) {
@@ -30,6 +34,10 @@ export function ContainerGroupViewModel(data) {
   this.AllocatePublicIP = data.properties.ipAddress.type === 'Public';
   this.CPU = container.properties.resources.requests.cpu;
   this.Memory = container.properties.resources.requests.memoryInGB;
+
+  if (data.Portainer && data.Portainer.ResourceControl) {
+    this.ResourceControl = new ResourceControlViewModel(data.Portainer.ResourceControl);
+  }
 }
 
 export function CreateContainerGroupRequest(model) {
