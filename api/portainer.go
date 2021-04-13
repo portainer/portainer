@@ -1497,8 +1497,6 @@ const (
 	ConfigResourceControl
 	// CustomTemplateResourceControl represents a resource control associated to a custom template
 	CustomTemplateResourceControl
-	// ContainerGroupResourceControl represents a resource control associated to an Azure container group
-	ContainerGroupResourceControl
 )
 
 const (
@@ -1774,9 +1772,4 @@ const (
 	OperationPortainerUndefined   Authorization = "PortainerUndefined"
 
 	EndpointResourcesAccess Authorization = "EndpointResourcesAccess"
-)
-
-const (
-	AzurePathContainerGroups = "/subscriptions/*/providers/Microsoft.ContainerInstance/containerGroups"
-	AzurePathContainerGroup  = "/subscriptions/*/resourceGroups/*/providers/Microsoft.ContainerInstance/containerGroups/*"
 )

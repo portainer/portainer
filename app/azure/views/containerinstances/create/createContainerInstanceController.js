@@ -6,9 +6,7 @@ angular.module('portainer.azure').controller('AzureCreateContainerInstanceContro
   '$state',
   'AzureService',
   'Notifications',
-  'Authentication',
-  'ResourceControlService',
-  function ($q, $scope, $state, AzureService, Notifications, Authentication, ResourceControlService) {
+  function ($q, $scope, $state, AzureService, Notifications) {
     var allResourceGroups = [];
     var allProviders = [];
 
@@ -44,26 +42,18 @@ angular.module('portainer.azure').controller('AzureCreateContainerInstanceContro
 
       $scope.state.actionInProgress = true;
       AzureService.createContainerGroup(model, subscriptionId, resourceGroupName)
-        .then(applyResourceControl)
-        .then(() => {
+        .then(function success() {
           Notifications.success('Container successfully created', model.Name);
           $state.go('azure.containerinstances');
         })
         .catch(function error(err) {
+          err = err.data ? err.data.error : err;
           Notifications.error('Failure', err, 'Unable to create container');
         })
         .finally(function final() {
           $scope.state.actionInProgress = false;
         });
     };
-
-    function applyResourceControl(newResourceGroup) {
-      const userId = Authentication.getUserDetails().ID;
-      const resourceControl = newResourceGroup.Portainer.ResourceControl;
-      const accessControlData = $scope.model.AccessControlData;
-
-      return ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
-    }
 
     function validateForm(model) {
       if (!model.Ports || !model.Ports.length || model.Ports.every((port) => !port.host || !port.container)) {
@@ -83,7 +73,7 @@ angular.module('portainer.azure').controller('AzureCreateContainerInstanceContro
     }
 
     function initView() {
-      $scope.model = new ContainerGroupDefaultModel();
+      var model = new ContainerGroupDefaultModel();
 
       AzureService.subscriptions()
         .then(function success(data) {
@@ -102,6 +92,8 @@ angular.module('portainer.azure').controller('AzureCreateContainerInstanceContro
 
           var containerInstancesProviders = data.containerInstancesProviders;
           allProviders = containerInstancesProviders;
+
+          $scope.model = model;
 
           var selectedSubscription = $scope.state.selectedSubscription;
           updateResourceGroupsAndLocations(selectedSubscription, resourceGroups, containerInstancesProviders);
