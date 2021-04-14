@@ -119,7 +119,7 @@
     "cypress": "^5.2.0",
     "cypress-wait-until": "^1.7.1",
     "eslint": "^7.24.0",
-    "eslint-config-prettier": "^6.10.1",
+    "eslint-config-prettier": "^8.2.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-webpack-plugin": "^2.5.3",
     "file-loader": "^1.1.11",
