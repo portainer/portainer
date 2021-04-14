@@ -165,7 +165,7 @@
                   item.Id | truncate: 40
                 }}</a>
                 <span ng-if="$ctrl.offlineMode">{{ item.Id | truncate: 40 }}</span>
-                <span ng-if="!$ctrl.offlineMode">
+                <span ng-if="$ctrl.showBrowseAction && !$ctrl.offlineMode">
                   <btn authorization="DockerAgentBrowseList">
                     <a ui-sref="docker.volumes.volume.browse({ id: item.Id, nodeName: item.NodeName })" class="btn btn-xs btn-primary space-left">
                       <i class="fa fa-search"></i> browse
