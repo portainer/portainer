@@ -78,6 +78,29 @@ class KubernetesPodService {
   }
 
   /**
+   * PATCH
+   */
+  async patchAsync(oldPod, newPod) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = newPod.Name;
+      const namespace = newPod.Namespace;
+      const payload = KubernetesPodConverter.patchPayload(oldPod, newPod);
+      if (!payload.length) {
+        return;
+      }
+      const data = await this.KubernetesPods(namespace).patch(params, payload).$promise;
+      return data;
+    } catch (err) {
+      throw new PortainerError('Unable to patch pod', err);
+    }
+  }
+
+  patch(oldPod, newPod) {
+    return this.$async(this.patchAsync, oldPod, newPod);
+  }
+
+  /**
    * DELETE
    */
   async deleteAsync(pod) {
