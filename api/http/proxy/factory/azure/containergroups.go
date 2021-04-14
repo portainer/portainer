@@ -23,7 +23,7 @@ func (transport *Transport) proxyContainerGroupsGetRequest(request *http.Request
 		return nil, err
 	}
 
-	responseObject, err := responseutils.GetResponseAsJSONOBject(response)
+	responseObject, err := responseutils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return nil, err
 	}
