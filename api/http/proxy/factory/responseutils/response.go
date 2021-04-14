@@ -2,6 +2,7 @@ package responseutils
 
 import (
 	"bytes"
+	"compress/gzip"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
@@ -48,13 +49,21 @@ func getResponseBodyAsGenericJSON(response *http.Response) (interface{}, error) 
 		return nil, errors.New("unable to parse response: empty response body")
 	}
 
-	var data interface{}
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return nil, err
+	reader := response.Body
+
+	if response.Header.Get("Content-Encoding") == "gzip" {
+		response.Header.Del("Content-Encoding")
+		gzipReader, err := gzip.NewReader(response.Body)
+		if err != nil {
+			return nil, err
+		}
+		reader = gzipReader
 	}
 
-	err = response.Body.Close()
+	defer reader.Close()
+
+	var data interface{}
+	body, err := ioutil.ReadAll(reader)
 	if err != nil {
 		return nil, err
 	}
