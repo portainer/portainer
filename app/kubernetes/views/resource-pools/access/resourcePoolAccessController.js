@@ -65,7 +65,7 @@ class KubernetesResourcePoolAccessController {
       let [endpoint, pool, configMap] = await Promise.all([
         this.EndpointService.endpoint(this.endpointId),
         this.KubernetesResourcePoolService.get(name),
-        this.KubernetesConfigMapService.get(KubernetesPortainerConfigMapNamespace, KubernetesPortainerConfigMapConfigName),
+        this.KubernetesConfigMapService.getAccess(KubernetesPortainerConfigMapNamespace, KubernetesPortainerConfigMapConfigName),
       ]);
       const group = await this.GroupService.group(endpoint.GroupId);
       const roles = await this.RoleService.roles();
@@ -119,7 +119,7 @@ class KubernetesResourcePoolAccessController {
           teamsToAdd.push(item.Id);
         }
       }
-      await this.KubernetesConfigMapService.update(accessConfigMap);
+      await this.KubernetesConfigMapService.updateAccess(accessConfigMap);
       await this.EndpointService.updatePoolAccess(this.endpointId, this.pool.Namespace.Name, usersToAdd, teamsToAdd, [], []);
       this.Notifications.success('Access successfully created');
       this.$state.reload();
@@ -149,7 +149,7 @@ class KubernetesResourcePoolAccessController {
           teamsToRemove.push(item.Id);
         }
       }
-      await this.KubernetesConfigMapService.update(accessConfigMap);
+      await this.KubernetesConfigMapService.updateAccess(accessConfigMap);
       await this.EndpointService.updatePoolAccess(this.endpointId, this.pool.Namespace.Name, [], [], usersToRemove, teamsToRemove);
       this.Notifications.success('Access successfully removed');
       this.$state.reload();

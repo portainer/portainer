@@ -4,7 +4,6 @@ import angular from 'angular';
 import _ from 'lodash-es';
 import KubernetesStackHelper from 'Kubernetes/helpers/stackHelper';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
-import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
 
 class KubernetesApplicationsController {
   /* @ngInject */

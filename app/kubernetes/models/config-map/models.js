@@ -2,6 +2,15 @@ export const KubernetesPortainerConfigMapNamespace = 'portainer';
 export const KubernetesPortainerConfigMapConfigName = 'portainer-config';
 export const KubernetesPortainerConfigMapAccessKey = 'NamespaceAccessPolicies';
 
+export function KubernetesPortainerAccessConfigMap() {
+  return {
+    Id: 0,
+    Name: KubernetesPortainerConfigMapConfigName,
+    Namespace: KubernetesPortainerConfigMapNamespace,
+    Data: {},
+  };
+}
+
 /**
  * ConfigMap Model
  */

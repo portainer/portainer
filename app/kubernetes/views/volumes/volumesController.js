@@ -5,7 +5,6 @@ import filesizeParser from 'filesize-parser';
 import angular from 'angular';
 import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
 import KubernetesResourceQuotaHelper from 'Kubernetes/helpers/resourceQuotaHelper';
-import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
 
 function buildStorages(storages, volumes) {
   _.forEach(storages, (s) => {

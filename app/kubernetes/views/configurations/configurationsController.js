@@ -2,7 +2,6 @@ require('../../templates/advancedDeploymentPanel.html');
 
 import angular from 'angular';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
-import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
 
 class KubernetesConfigurationsController {
   /* @ngInject */
