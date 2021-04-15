@@ -288,8 +288,8 @@ func (m *Migrator) MigrateCE() error {
 	}
 
 	// Portainer EE-2.4.0
-	if m.currentDBVersion < 30 {
-		err := m.updateRbacRolesToDB30()
+	if m.currentDBVersion < 29 {
+		err := m.updateRbacRolesToDB29()
 		if err != nil {
 			return err
 		}

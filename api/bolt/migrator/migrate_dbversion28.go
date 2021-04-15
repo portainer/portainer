@@ -5,7 +5,7 @@ import (
 	"github.com/portainer/portainer/api/internal/authorization"
 )
 
-func (m *Migrator) updateRbacRolesToDB30() error {
+func (m *Migrator) updateRbacRolesToDB29() error {
 	defaultAuthorizationsOfRoles := map[portainer.RoleID]portainer.Authorizations{
 		portainer.RoleIDEndpointAdmin: authorization.DefaultEndpointAuthorizationsForEndpointAdministratorRole(),
 		portainer.RoleIDHelpdesk:      authorization.DefaultEndpointAuthorizationsForHelpDeskRole(),
