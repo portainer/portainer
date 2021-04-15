@@ -100,6 +100,7 @@ func initDataStore(dataStorePath string, rollback bool, fileService portainer.Fi
 func initComposeStackManager(assetsPath string, dataStorePath string, reverseTunnelService portainer.ReverseTunnelService, proxyManager *proxy.Manager) portainer.ComposeStackManager {
 	composeWrapper, err := exec.NewComposeStackManager(assetsPath, proxyManager)
 	if err != nil {
+		log.Printf("[INFO] [main,compose] [message: falling-back to libcompose] [error: %s]", err)
 		return libcompose.NewComposeStackManager(dataStorePath, reverseTunnelService)
 	}
 
