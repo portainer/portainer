@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/internal"
 	"github.com/portainer/portainer/api/bolt/license"
+	"github.com/portainer/portainer/api/bolt/s3backup"
 
 	"github.com/boltdb/bolt"
 	portainer "github.com/portainer/portainer/api"
@@ -59,6 +60,7 @@ type Store struct {
 	RegistryService         *registry.Service
 	ResourceControlService  *resourcecontrol.Service
 	RoleService             *role.Service
+	S3BackupService         *s3backup.Service
 	ScheduleService         *schedule.Service
 	SettingsService         *settings.Service
 	StackService            *stack.Service

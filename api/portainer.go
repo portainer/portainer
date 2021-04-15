@@ -579,6 +579,31 @@ type (
 	// RoleID represents a role identifier
 	RoleID int
 
+	// S3BackupSettings represents when and where to backup
+	S3BackupSettings struct {
+		CronRule        string
+		AccessKeyID     string
+		SecretAccessKey string
+		Region          string
+		BucketName      string
+		Password        string
+	}
+
+	// S3BackupStatus represents result of the scheduled s3 backup
+	S3BackupStatus struct {
+		Failed    bool
+		Timestamp time.Time
+	}
+
+	// S3Location represents s3 file localtion
+	S3Location struct {
+		AccessKeyID     string
+		SecretAccessKey string
+		Region          string
+		BucketName      string
+		Filename        string
+	}
+
 	// Schedule represents a scheduled job.
 	// It only contains a pointer to one of the JobRunner implementations
 	// based on the JobType.
@@ -927,6 +952,7 @@ type (
 		Registry() RegistryService
 		ResourceControl() ResourceControlService
 		Role() RoleService
+		S3Backup() S3BackupService
 		Settings() SettingsService
 		Stack() StackService
 		Tag() TagService
@@ -1164,6 +1190,15 @@ type (
 		Roles() ([]Role, error)
 		CreateRole(role *Role) error
 		UpdateRole(ID RoleID, role *Role) error
+	}
+
+	// S3BackupService represents a storage service for managing S3 backup settings and status
+	S3BackupService interface {
+		GetStatus() (S3BackupStatus, error)
+		DropStatus() error
+		UpdateStatus(status S3BackupStatus) error
+		UpdateSettings(settings S3BackupSettings) error
+		GetSettings() (S3BackupSettings, error)
 	}
 
 	// SettingsService represents a service for managing application settings

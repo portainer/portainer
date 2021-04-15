@@ -121,7 +121,7 @@
           <!-- !toggle -->
 
           <!-- restore form -->
-          <form class="simple-box-form form-horizontal" style="padding-left: 30px;" ng-if="state.showRestorePortainer">
+          <form class="simple-box-form form-horizontal" style="padding-left: 30px;" ng-if="state.showRestorePortainer" name="restorePortainerForm">
             <!-- note -->
             <div class="form-group">
               <div class="col-sm-9">
@@ -130,27 +130,95 @@
                 </span>
               </div>
             </div>
-            <!-- !note -->
-            <!-- note -->
             <div class="form-group">
-              <div class="col-sm-12">
-                <span class="small text-muted">
-                  You can upload a backup file from your computer.
-                </span>
+              <div class="boxselector_wrapper">
+                <div>
+                  <input type="radio" id="restore_file" ng-model="formValues.restoreFormType" value="file" />
+                  <label for="restore_file" style="padding-bottom: 20px;">
+                    <div class="boxselector_header">
+                      <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Upload backup file
+                    </div>
+                    <p></p>
+                  </label>
+                </div>
+                <div>
+                  <input type="radio" id="restore_s3" ng-model="formValues.restoreFormType" value="s3" />
+                  <label for="restore_s3" style="padding-bottom: 20px;">
+                    <div class="boxselector_header">
+                      <i class="fa fa-download" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Retrieve from S3
+                    </div>
+                    <p></p>
+                  </label>
+                </div>
               </div>
             </div>
             <!-- !note -->
-            <!-- select-file-input -->
-            <div class="form-group">
-              <div class="col-sm-12">
-                <button class="btn btn-sm btn-primary" ngf-select accept=".tar.gz,.encrypted" ng-model="formValues.BackupFile" auto-focus>Select file</button>
-                <span style="margin-left: 5px;">
-                  {{ formValues.BackupFile.name }}
-                  <i class="fa fa-times red-icon" ng-if="!formValues.BackupFile" aria-hidden="true"></i>
-                </span>
+            <div ng-if="formValues.restoreFormType === RESTORE_FORM_TYPES.FILE">
+              <!-- note -->
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <span class="small text-muted">
+                    You can upload a backup file from your computer.
+                  </span>
+                </div>
+              </div>
+              <!-- !note -->
+              <!-- select-file-input -->
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <button class="btn btn-sm btn-primary" ngf-select accept=".tar.gz,.encrypted" ng-model="formValues.BackupFile" auto-focus>Select file</button>
+                  <span style="margin-left: 5px;">
+                    {{ formValues.BackupFile.name }}
+                    <i class="fa fa-times red-icon" ng-if="!formValues.BackupFile" aria-hidden="true"></i>
+                  </span>
+                </div>
               </div>
             </div>
             <!-- !select-file-input -->
+            <div ng-if="formValues.restoreFormType === RESTORE_FORM_TYPES.S3">
+              <!-- Access key id  -->
+              <div class="form-group">
+                <label for="access_key_id" class="col-sm-3 control-label text-left">Access Key ID</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="access_key_id" name="access_key_id" ng-model="formValues.AccessKeyId" required />
+                </div>
+              </div>
+              <!-- !Access key id  -->
+              <!-- Secret access key -->
+              <div class="form-group">
+                <label for="secret_access_key" class="col-sm-3 control-label text-left">Secret Access Key</label>
+                <div class="col-sm-9">
+                  <input type="password" class="form-control" id="secret_access_key" name="secret_access_key" ng-model="formValues.SecretAccessKey" required />
+                </div>
+              </div>
+              <!-- !Secret access key -->
+              <!-- Region -->
+              <div class="form-group">
+                <label for="backup-s3-region" class="col-sm-3 control-label text-left">Region</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" placeholder="us-west-1" id="backup-s3-region" name="backup-s3-region" ng-model="formValues.Region" required />
+                </div>
+              </div>
+              <!-- !Region -->
+              <!-- Bucket name -->
+              <div class="form-group">
+                <label for="bucket_name" class="col-sm-3 control-label text-left">Bucket name</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="bucket_name" name="bucket_name" ng-model="formValues.BucketName" required />
+                </div>
+              </div>
+              <!-- !Bucket name -->
+              <!-- Filename -->
+              <div class="form-group">
+                <label for="backup-s3-filename" class="col-sm-3 control-label text-left">Filename</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="backup-s3-filename" name="backup-s3-filename" ng-model="formValues.Filename" required />
+                </div>
+              </div>
+              <!-- !Filename -->
+            </div>
             <!-- password-input -->
             <div class="form-group">
               <label for="password" class="col-sm-3 control-label text-left">
@@ -160,7 +228,7 @@
                   message="If the backup is password protected, provide the password in order to extract the backup file, otherwise this field can be left empty."
                 ></portainer-tooltip>
               </label>
-              <div class="col-sm-4">
+              <div ng-class="{ 'col-sm-4': formValues.restoreFormType === RESTORE_FORM_TYPES.FILE, 'col-sm-9': formValues.restoreFormType === RESTORE_FORM_TYPES.S3 }">
                 <input type="password" class="form-control" ng-model="formValues.Password" id="password" />
               </div>
             </div>
@@ -183,10 +251,22 @@
             <div class="form-group">
               <div class="col-sm-12">
                 <button
+                  ng-if="formValues.restoreFormType === RESTORE_FORM_TYPES.FILE"
                   type="submit"
                   class="btn btn-primary btn-sm"
                   ng-disabled="!formValues.BackupFile || state.backupInProgress"
                   ng-click="uploadBackup()"
+                  button-spinner="state.backupInProgress"
+                >
+                  <span ng-hide="state.backupInProgress">Restore Portainer</span>
+                  <span ng-show="state.backupInProgress">Restoring Portainer...</span>
+                </button>
+                <button
+                  ng-if="formValues.restoreFormType === RESTORE_FORM_TYPES.S3"
+                  type="submit"
+                  class="btn btn-primary btn-sm"
+                  ng-disabled="restorePortainerForm.$invalid ||state.backupInProgress"
+                  ng-click="restoreFromS3()"
                   button-spinner="state.backupInProgress"
                 >
                   <span ng-hide="state.backupInProgress">Restore Portainer</span>

@@ -7,6 +7,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_canLockAndUnlock(t *testing.T) {
@@ -211,8 +213,5 @@ func Test_waitingMiddleware_mayTimeout_whenLockedForTooLong(t *testing.T) {
 		w.Write([]byte("success"))
 	})).ServeHTTP(response, request)
 
-	body, _ := io.ReadAll(response.Body)
-	if string(body) != "success" {
-		t.Error("Didn't receive expected result from the hanlder")
-	}
+	assert.Equal(t, http.StatusRequestTimeout, response.Result().StatusCode, "Request support to timeout waiting for the gate")
 }

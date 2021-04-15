@@ -6,6 +6,7 @@ require (
 	github.com/Microsoft/go-winio v0.4.14
 	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a
 	github.com/asdine/storm/v3 v3.2.1
+	github.com/aws/aws-sdk-go v1.38.3
 	github.com/boltdb/bolt v1.3.1
 	github.com/containerd/containerd v1.3.1 // indirect
 	github.com/coreos/go-semver v0.3.0
@@ -26,15 +27,16 @@ require (
 	github.com/mattn/go-shellwords v1.0.6 // indirect
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
 	github.com/orcaman/concurrent-map v0.0.0-20190826125027-8c72a8bb44f6
+	github.com/pkg/errors v0.9.1
 	github.com/portainer/docker-compose-wrapper v0.0.0-20210222063404-03b2b09b0a19
 	github.com/portainer/libcompose v0.5.3
 	github.com/portainer/libcrypto v0.0.0-20190723020515-23ebe86ab2c2
 	github.com/portainer/libhttp v0.0.0-20190806161843-ba068f58be33
 	github.com/portainer/liblicense v0.0.0-20210409011001-c758dd044fbb
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/stretchr/testify v1.7.0
 	go.etcd.io/bbolt v1.3.5 // indirect
-	golang.org/x/crypto v0.0.0-20191128160524-b544559bb6d1
-	golang.org/x/net v0.0.0-20191126235420-ef20fe5d7933 // indirect
+	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 	golang.org/x/sys v0.0.0-20210301091718-77cc2087c03b // indirect
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6

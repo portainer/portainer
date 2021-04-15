@@ -10,8 +10,27 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func listFiles(dir string) []string {
+	items := make([]string, 0)
+	filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if path == dir {
+			return nil
+		}
+		items = append(items, path)
+		return nil
+	})
+
+	return items
+}
+
+func contains(t *testing.T, list []string, path string) {
+	assert.Contains(t, list, path)
+	copyContent, _ := ioutil.ReadFile(path)
+	assert.Equal(t, "content\n", string(copyContent))
+}
+
 func Test_copyFile_returnsError_whenSourceDoesNotExist(t *testing.T) {
-	tmpdir, _ := os.MkdirTemp("", "backup")
+	tmpdir, _ := ioutil.TempDir("", "backup")
 	defer os.RemoveAll(tmpdir)
 
 	err := copyFile("does-not-exist", tmpdir)
@@ -19,7 +38,7 @@ func Test_copyFile_returnsError_whenSourceDoesNotExist(t *testing.T) {
 }
 
 func Test_copyFile_shouldMakeAbackup(t *testing.T) {
-	tmpdir, _ := os.MkdirTemp("", "backup")
+	tmpdir, _ := ioutil.TempDir("", "backup")
 	defer os.RemoveAll(tmpdir)
 
 	content := []byte("content")
@@ -33,7 +52,7 @@ func Test_copyFile_shouldMakeAbackup(t *testing.T) {
 }
 
 func Test_copyDir_shouldCopyAllFilesAndDirectories(t *testing.T) {
-	destination, _ := os.MkdirTemp("", "destination")
+	destination, _ := ioutil.TempDir("", "destination")
 	defer os.RemoveAll(destination)
 	err := copyDir("./test_assets/copy_test", destination)
 	assert.Nil(t, err)
@@ -46,7 +65,7 @@ func Test_copyDir_shouldCopyAllFilesAndDirectories(t *testing.T) {
 }
 
 func Test_backupPath_shouldSkipWhenNotExist(t *testing.T) {
-	tmpdir, _ := os.MkdirTemp("", "backup")
+	tmpdir, _ := ioutil.TempDir("", "backup")
 	defer os.RemoveAll(tmpdir)
 
 	err := copyPath("does-not-exists", tmpdir)
@@ -56,7 +75,7 @@ func Test_backupPath_shouldSkipWhenNotExist(t *testing.T) {
 }
 
 func Test_backupPath_shouldCopyFile(t *testing.T) {
-	tmpdir, _ := os.MkdirTemp("", "backup")
+	tmpdir, _ := ioutil.TempDir("", "backup")
 	defer os.RemoveAll(tmpdir)
 
 	content := []byte("content")
@@ -72,7 +91,7 @@ func Test_backupPath_shouldCopyFile(t *testing.T) {
 }
 
 func Test_backupPath_shouldCopyDir(t *testing.T) {
-	destination, _ := os.MkdirTemp("", "destination")
+	destination, _ := ioutil.TempDir("", "destination")
 	defer os.RemoveAll(destination)
 	err := copyPath("./test_assets/copy_test", destination)
 	assert.Nil(t, err)

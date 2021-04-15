@@ -15,6 +15,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/registry"
 	"github.com/portainer/portainer/api/bolt/resourcecontrol"
 	"github.com/portainer/portainer/api/bolt/role"
+	"github.com/portainer/portainer/api/bolt/s3backup"
 	"github.com/portainer/portainer/api/bolt/schedule"
 	"github.com/portainer/portainer/api/bolt/settings"
 	"github.com/portainer/portainer/api/bolt/stack"
@@ -105,6 +106,12 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.ResourceControlService = resourcecontrolService
+
+	s3backupService, err := s3backup.NewService(store.connection)
+	if err != nil {
+		return nil
+	}
+	store.S3BackupService = s3backupService
 
 	settingsService, err := settings.NewService(store.connection)
 	if err != nil {
@@ -227,6 +234,11 @@ func (store *Store) ResourceControl() portainer.ResourceControlService {
 // Role gives access to the Role data management layer
 func (store *Store) Role() portainer.RoleService {
 	return store.RoleService
+}
+
+// S3Backup gives access to S3 backup settings and status
+func (store *Store) S3Backup() portainer.S3BackupService {
+	return store.S3BackupService
 }
 
 // Settings gives access to the Settings data management layer

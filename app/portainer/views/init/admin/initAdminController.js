@@ -11,12 +11,13 @@ angular.module('portainer.app').controller('InitAdminController', [
   'StatusService',
   function ($async, $scope, $state, Notifications, Authentication, StateManager, SettingsService, UserService, BackupService, StatusService) {
     $scope.logo = StateManager.getState().application.logo;
-
+    $scope.RESTORE_FORM_TYPES = { S3: 's3', FILE: 'file' }
     $scope.formValues = {
       Username: 'admin',
       Password: '',
       ConfirmPassword: '',
       enableTelemetry: true,
+      restoreFormType: $scope.RESTORE_FORM_TYPES.FILE
     };
 
     $scope.state = {
@@ -78,19 +79,43 @@ angular.module('portainer.app').controller('InitAdminController', [
           if (status && status.Version) {
             return;
           }
-        } catch (e) {}
+        } catch (e) { }
       }
       throw 'Timeout to wait for Portainer restarting';
     }
 
     $scope.uploadBackup = async function () {
       $scope.state.backupInProgress = true;
-
       const file = $scope.formValues.BackupFile;
       const password = $scope.formValues.Password;
 
       try {
         await BackupService.uploadBackup(file, password);
+        await waitPortainerRestart();
+        Notifications.success('The backup has successfully been restored');
+        $state.go('portainer.auth');
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to restore the backup');
+      } finally {
+        $scope.state.backupInProgress = false;
+      }
+    };
+
+    $scope.restoreFromS3 = async function () {
+      $scope.state.backupInProgress = true;
+
+      const payload = {
+        AccessKeyID: $scope.formValues.AccessKeyId,
+        CronRule: $scope.formValues.CronRule,
+        Password: $scope.formValues.Password,
+        SecretAccessKey: $scope.formValues.SecretAccessKey,
+        Region: $scope.formValues.Region,
+        BucketName: $scope.formValues.BucketName,
+        Filename: $scope.formValues.Filename
+      }
+
+      try {
+        await BackupService.restoreFromS3(payload);
         await waitPortainerRestart();
         Notifications.success('The backup has successfully been restored');
         $state.go('portainer.auth');

@@ -8,8 +8,10 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/adminmonitor"
+	backupOps "github.com/portainer/portainer/api/backup"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/handler"
@@ -110,7 +112,11 @@ func (server *Server) Start() error {
 	adminMonitor := adminmonitor.New(5*time.Minute, server.DataStore, server.ShutdownCtx)
 	adminMonitor.Start()
 
-	var backupHandler = backup.NewHandler(requestBouncer, server.DataStore, offlineGate, server.FileService.GetDatastorePath(), server.ShutdownTrigger, adminMonitor)
+	backupScheduler := backupOps.NewBackupScheduler(offlineGate, server.DataStore, server.FileService.GetDatastorePath())
+	if err := backupScheduler.Start(); err != nil {
+		return errors.Wrap(err, "failed to start backup scheduler")
+	}
+	var backupHandler = backup.NewHandler(requestBouncer, server.DataStore, offlineGate, server.FileService.GetDatastorePath(), backupScheduler, server.ShutdownTrigger, adminMonitor)
 
 	var roleHandler = roles.NewHandler(requestBouncer)
 	roleHandler.DataStore = server.DataStore
@@ -291,16 +297,17 @@ func (server *Server) Start() error {
 		return httpServer.ListenAndServeTLS(server.SSLCert, server.SSLKey)
 	}
 
-	go server.shutdownListener(httpServer)
+	go server.shutdown(httpServer, backupScheduler)
 
 	return httpServer.ListenAndServe()
 }
 
-func (server *Server) shutdownListener(httpServer *http.Server) {
+func (server *Server) shutdown(httpServer *http.Server, backupScheduler *backupOps.BackupScheduler) {
 	<-server.ShutdownCtx.Done()
 
-	log.Println("[DEBUG] Shutting down http server")
+	backupScheduler.Stop()
 
+	log.Println("[DEBUG] Shutting down http server")
 	shutdownTimeout, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 

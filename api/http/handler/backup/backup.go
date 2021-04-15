@@ -5,25 +5,54 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"time"
 
+	"github.com/pkg/errors"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/archive"
-	"github.com/portainer/portainer/api/crypto"
+	operations "github.com/portainer/portainer/api/backup"
 )
 
-var filesToBackup = []string{"compose", "config.json", "custom_templates", "edge_jobs", "edge_stacks", "extensions", "portainer.key", "portainer.pub", "tls"}
-
-type backupPayload struct {
-	Password string
-}
+type (
+	backupPayload struct {
+		Password string
+	}
+	s3BackupPayload struct {
+		portainer.S3BackupSettings
+	}
+)
 
 func (p *backupPayload) Validate(r *http.Request) error {
 	return nil
 }
 
+func (payload *s3BackupPayload) Validate(r *http.Request) error {
+	switch {
+	case payload.AccessKeyID == "":
+		return errors.New("missing AccessKeyID")
+	case payload.SecretAccessKey == "":
+		return errors.New("missing SecretAccessKey")
+	case payload.Region == "":
+		return errors.New("missing Region")
+	case payload.BucketName == "":
+		return errors.New("missing BucketName")
+	default:
+		return nil
+	}
+}
+
+// @id Backup
+// @summary Creates an archive with a system data snapshot that could be used to restore the system.
+// @description  Creates an archive with a system data snapshot that could be used to restore the system.
+// @description **Access policy**: admin
+// @tags backup
+// @security jwt
+// @produce octet-stream
+// @param Password body string false "Password to encrypt the backup with"
+// @success 200 "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /backup [post]
 func (h *Handler) backup(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload backupPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
@@ -31,37 +60,11 @@ func (h *Handler) backup(w http.ResponseWriter, r *http.Request) *httperror.Hand
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
 	}
 
-	unlock := h.gate.Lock()
-	defer unlock()
-
-	backupDirPath := filepath.Join(h.filestorePath, "backup", time.Now().Format("2006-01-02_15-04-05"))
-	if err := os.MkdirAll(backupDirPath, 0744); err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to create backup dir", Err: err}
-	}
-	defer os.RemoveAll(backupDirPath)
-
-	if err = backupDb(backupDirPath, h.dataStore); err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to backup database", Err: err}
-	}
-
-	for _, filename := range filesToBackup {
-		err := copyPath(filepath.Join(h.filestorePath, filename), backupDirPath)
-		if err != nil {
-			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to create backup file", Err: err}
-		}
-	}
-
-	archivePath, err := archive.TarGzDir(backupDirPath)
+	archivePath, err := operations.CreateBackupArchive(payload.Password, h.gate, h.dataStore, h.filestorePath)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to make an archive", Err: err}
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to create backup", Err: err}
 	}
-
-	if payload.Password != "" {
-		archivePath, err = encrypt(archivePath, payload.Password)
-		if err != nil {
-			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to encrypt backup with the password", Err: err}
-		}
-	}
+	defer os.RemoveAll(filepath.Dir(archivePath))
 
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", fmt.Sprintf("portainer-backup_%s", filepath.Base(archivePath))))
 	http.ServeFile(w, r, archivePath)
@@ -69,31 +72,25 @@ func (h *Handler) backup(w http.ResponseWriter, r *http.Request) *httperror.Hand
 	return nil
 }
 
-func backupDb(backupDirPath string, datastore portainer.DataStore) error {
-	backupWriter, err := os.Create(filepath.Join(backupDirPath, "portainer.db"))
-	if err != nil {
-		return err
+// @id BackupToS3
+// @summary Execute backup to AWS S3 Bucket
+// @description Creates an archive with a system data snapshot and upload it to the target S3 bucket
+// @description **Access policy**: admin
+// @tags backup
+// @security jwt
+// @param body body s3BackupPayload true "S3 backup settings"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /backup/s3/execute [post]
+func (h *Handler) backupToS3(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	var payload s3BackupPayload
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
 	}
-	if err = datastore.BackupTo(backupWriter); err != nil {
-		return err
+	if err := operations.BackupToS3(payload.S3BackupSettings, h.gate, h.dataStore, h.filestorePath); err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to execute S3 backup", Err: err}
 	}
-	return backupWriter.Close()
-}
-
-func encrypt(path string, passphrase string) (string, error) {
-	in, err := os.Open(path)
-	if err != nil {
-		return "", err
-	}
-	defer in.Close()
-
-	outFileName := fmt.Sprintf("%s.encrypted", path)
-	out, err := os.Create(outFileName)
-	if err != nil {
-		return "", err
-	}
-
-	err = crypto.AesEncrypt(in, out, []byte(passphrase))
-
-	return outFileName, err
+	w.WriteHeader(http.StatusNoContent)
+	return nil
 }

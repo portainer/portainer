@@ -1352,7 +1352,6 @@ angular-moment-picker@^0.10.2:
   dependencies:
     angular-mocks "1.6.1"
     angular-sanitize "1.6.1"
-    lodash-es "^4.17.15"
 
 angular-resource@1.8.0:
   version "1.8.0"
@@ -2973,6 +2972,11 @@ create-hmac@^1.1.0, create-hmac@^1.1.4, create-hmac@^1.1.7:
     ripemd160 "^2.0.0"
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
+
+cron-schedule@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/cron-schedule/-/cron-schedule-3.0.1.tgz#12a982912ce2948dfff9665d3ad1ff2261a3a54f"
+  integrity sha512-/SL4bdN4MCXi+TPH6AaSkEa0g8uByTtWZbFToy0OYl4I8za2UGuxlSMqsygLvcqHZQrvx3OaRYkDugrSbvmnVg==
 
 cross-spawn@^5.0.1:
   version "5.1.0"

@@ -20,6 +20,7 @@ type datastore struct {
 	resourceControl  portainer.ResourceControlService
 	role             portainer.RoleService
 	settings         portainer.SettingsService
+	s3backup         portainer.S3BackupService
 	stack            portainer.StackService
 	tag              portainer.TagService
 	teamMembership   portainer.TeamMembershipService
@@ -49,6 +50,7 @@ func (d *datastore) License() portainer.LicenseRepository                { retur
 func (d *datastore) Registry() portainer.RegistryService                 { return d.registry }
 func (d *datastore) ResourceControl() portainer.ResourceControlService   { return d.resourceControl }
 func (d *datastore) Role() portainer.RoleService                         { return d.role }
+func (d *datastore) S3Backup() portainer.S3BackupService                 { return d.s3backup }
 func (d *datastore) Settings() portainer.SettingsService                 { return d.settings }
 func (d *datastore) Stack() portainer.StackService                       { return d.stack }
 func (d *datastore) Tag() portainer.TagService                           { return d.tag }
@@ -111,5 +113,34 @@ func (s *stubEdgeJobService) GetNextIdentifier() int                     { retur
 func WithEdgeJobs(js []portainer.EdgeJob) datastoreOption {
 	return func(d *datastore) {
 		d.edgeJob = &stubEdgeJobService{jobs: js}
+	}
+}
+
+type stubS3BackupService struct {
+	status   *portainer.S3BackupStatus
+	settings *portainer.S3BackupSettings
+}
+
+func (s *stubS3BackupService) GetStatus() (portainer.S3BackupStatus, error) { return *s.status, nil }
+func (s *stubS3BackupService) DropStatus() error                            { *s.status = portainer.S3BackupStatus{}; return nil }
+func (s *stubS3BackupService) UpdateStatus(status portainer.S3BackupStatus) error {
+	s.status = &status
+	return nil
+}
+func (s *stubS3BackupService) UpdateSettings(settings portainer.S3BackupSettings) error {
+	*s.settings = settings
+	return nil
+}
+func (s *stubS3BackupService) GetSettings() (portainer.S3BackupSettings, error) {
+	return *s.settings, nil
+}
+
+// WithS3BackupService option will instruct datastore to use provide status and settins
+func WithS3BackupService(status *portainer.S3BackupStatus, settings *portainer.S3BackupSettings) datastoreOption {
+	return func(d *datastore) {
+		d.s3backup = &stubS3BackupService{
+			status:   status,
+			settings: settings,
+		}
 	}
 }

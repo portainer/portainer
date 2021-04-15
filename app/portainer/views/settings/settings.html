@@ -196,47 +196,230 @@
       <rd-widget-header icon="fa-download" title-text="Backup Portainer"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal" ng-submit="backupPortainer()" name="backupPortainerForm">
-          <!-- Password protect -->
+          <div class="col-sm-12 form-section-title">
+            Backup configuration
+          </div>
+          <div class="form-group"></div>
           <div class="form-group">
-            <label for="password_protect" class="col-sm-1 control-label text-left">Password protect</label>
-            <div class="col-sm-1">
-              <label class="switch"> <input type="checkbox" id="password_protect" name="password_protect" ng-model="formValues.passwordProtect" /><i></i> </label>
-            </div>
-          </div>
-          <!-- !Password protect -->
-
-          <!-- Password -->
-          <div class="form-group" ng-if="formValues.passwordProtect">
-            <label for="password" class="col-sm-1 control-label text-left">Password</label>
-            <div class="col-sm-3">
-              <input type="password" class="form-control" ng-model="formValues.password" id="password" name="password" required />
-            </div>
-          </div>
-          <div class="form-group col-md-12" ng-show="backupPortainerForm.password.$invalid">
-            <div class="small text-warning">
-              <div ng-messages="backupPortainerForm.password.$error">
-                <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+            <div class="boxselector_wrapper">
+              <div>
+                <input type="radio" id="backup_file" ng-model="formValues.backupFormType" value="file" />
+                <label for="backup_file" style="padding-bottom: 20px;">
+                  <div class="boxselector_header">
+                    <i class="fa fa-download" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Download backup file
+                  </div>
+                  <p></p>
+                </label>
+              </div>
+              <div>
+                <input type="radio" id="backup_s3" ng-model="formValues.backupFormType" value="s3" />
+                <label for="backup_s3">
+                  <div class="boxselector_header">
+                    <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Store in S3
+                  </div>
+                  <p>Define a cron schedule</p>
+                </label>
               </div>
             </div>
           </div>
-          <!-- !Password -->
-
-          <!-- actions -->
-          <div class="form-group">
-            <div class="col-sm-12">
-              <button
-                type="button"
-                class="btn btn-primary btn-sm"
-                ng-click="downloadBackup()"
-                ng-disabled="backupPortainerForm.$invalid || state.backupInProgress"
-                button-spinner="state.backupInProgress"
-              >
-                <span ng-hide="state.backupInProgress">Download backup</span>
-                <span ng-show="state.backupInProgress">Downloading backup</span>
-              </button>
+          <div ng-if="formValues.backupFormType === BACKUP_FORM_TYPES.S3">
+            <!-- Schedule automatic backups -->
+            <div class="form-group">
+              <label for="schedule_automatic_backups" class="col-sm-2 control-label text-left">Schedule automatic backups</label>
+              <div class="col-sm-10">
+                <label class="switch">
+                  <input type="checkbox" id="schedule_automatic_backups" name="schedule_automatic_backups" ng-model="formValues.scheduleAutomaticBackups" /><i></i>
+                </label>
+              </div>
+            </div>
+            <!-- !Schedule automatic backups -->
+            <!-- Cron rule  -->
+            <div class="form-group" ng-if="formValues.scheduleAutomaticBackups">
+              <label for="cron_rule" class="col-sm-2 col-lg-2 control-label text-left">Cron rule</label>
+              <div class="col-sm-10 col-lg-10">
+                <input type="text" class="form-control" placeholder="0 2 * * *" id="cron_rule" name="cron_rule" ng-model="formValues.cronRule" required cronRule />
+              </div>
+            </div>
+            <!-- !Cron rule  -->
+            <div class="form-group col-md-12" ng-show="backupPortainerForm.cron_rule.$invalid">
+              <div class="small text-warning">
+                <div ng-messages="backupPortainerForm.cron_rule.$error">
+                  <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                  <p ng-message="invalidCron"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Please enter a valid cron rule.</p>
+                </div>
+              </div>
+            </div>
+            <!-- Access key id  -->
+            <div class="form-group">
+              <label for="access_key_id" class="col-sm-2 col-lg-2 control-label text-left">Access Key ID</label>
+              <div class="col-sm-9 col-lg-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="access_key_id"
+                  name="access_key_id"
+                  ng-model="formValues.accessKeyId"
+                  ng-required="formValues.scheduleAutomaticBackups"
+                />
+              </div>
+            </div>
+            <div class="form-group col-md-12" ng-show="backupPortainerForm.access_key_id.$invalid">
+              <div class="small text-warning">
+                <div ng-messages="backupPortainerForm.access_key_id.$error">
+                  <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
+              </div>
+            </div>
+            <!-- !Access key id  -->
+            <!-- Secret access key -->
+            <div class="form-group">
+              <label for="secret_access_key" class="col-sm-3 col-lg-2 control-label text-left">Secret Access Key</label>
+              <div class="col-sm-9 col-lg-10">
+                <input
+                  type="password"
+                  class="form-control"
+                  id="secret_access_key"
+                  name="secret_access_key"
+                  ng-model="formValues.secretAccessKey"
+                  ng-required="formValues.scheduleAutomaticBackups"
+                />
+              </div>
+            </div>
+            <div class="form-group col-md-12" ng-show="backupPortainerForm.secret_access_key.$invalid">
+              <div class="small text-warning">
+                <div ng-messages="backupPortainerForm.secret_access_key.$error">
+                  <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
+              </div>
+            </div>
+            <!-- !Secret access key -->
+            <!-- Region -->
+            <div class="form-group">
+              <label for="region" class="col-sm-3 col-lg-2 control-label text-left">Region</label>
+              <div class="col-sm-9 col-lg-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="us-west-1"
+                  id="region"
+                  name="region"
+                  ng-model="formValues.region"
+                  ng-required="formValues.scheduleAutomaticBackups"
+                />
+              </div>
+            </div>
+            <div class="form-group col-md-12" ng-show="backupPortainerForm.region.$invalid">
+              <div class="small text-warning">
+                <div ng-messages="backupPortainerForm.region.$error">
+                  <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
+              </div>
+            </div>
+            <!-- !Region -->
+            <!-- Bucket name -->
+            <div class="form-group">
+              <label for="bucket_name" class="col-sm-3 col-lg-2 control-label text-left">Bucket name</label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="text" class="form-control" id="bucket_name" name="bucket_name" ng-model="formValues.bucketName" ng-required="formValues.scheduleAutomaticBackups" />
+              </div>
+            </div>
+            <div class="form-group col-md-12" ng-show="backupPortainerForm.bucket_name.$invalid">
+              <div class="small text-warning">
+                <div ng-messages="backupPortainerForm.bucket_name.$error">
+                  <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
+              </div>
+            </div>
+            <!-- !Bucket name -->
+            <div class="col-sm-12 form-section-title">
+              Security settings
+            </div>
+            <!-- Password protect S3 -->
+            <div class="form-group">
+              <label for="password_protect" class="col-sm-1 control-label text-left">Password protect</label>
+              <div class="col-sm-1">
+                <label class="switch"> <input type="checkbox" id="password_protect_s3" name="password_protect_s3" ng-model="formValues.passwordProtectS3" /><i></i> </label>
+              </div>
+            </div>
+            <!-- !Password protect S3 -->
+            <!-- Password S3 -->
+            <div class="form-group" ng-if="formValues.passwordProtectS3">
+              <label for="password" class="col-sm-1 control-label text-left">Password</label>
+              <div class="col-sm-3">
+                <input type="password" class="form-control" ng-model="formValues.passwordS3" id="password_S3" name="password_S3" required />
+              </div>
+            </div>
+            <div class="form-group col-md-12" ng-show="backupPortainerForm.password_S3.$invalid">
+              <div class="small text-warning">
+                <div ng-messages="backupPortainerForm.password_S3.$error">
+                  <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
+              </div>
+            </div>
+            <!-- !Password S3 -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <button type="button" class="btn btn-primary btn-sm" ng-disabled="backupPortainerForm.$invalid" ng-click="exportBackup()">
+                  <span><i class="fa fa-upload" aria-hidden="true"></i> Export backup</span>
+                </button>
+              </div>
+            </div>
+            <div class="form-group">
+              <hr />
+              <div class="col-sm-12">
+                <button type="submit" class="btn btn-primary btn-sm" ng-disabled="backupPortainerForm.$invalid ||state.backupInProgress" ng-click="saveS3BackupSettings()">
+                  <span>Save backup settings</span>
+                </button>
+              </div>
             </div>
           </div>
-          <!-- !actions -->
+          <div ng-if="formValues.backupFormType === BACKUP_FORM_TYPES.FILE">
+            <div class="col-sm-12 form-section-title">
+              Security settings
+            </div>
+            <!-- Password protect -->
+            <div class="form-group">
+              <label for="password_protect" class="col-sm-1 control-label text-left">Password protect</label>
+              <div class="col-sm-1">
+                <label class="switch"> <input type="checkbox" id="password_protect" name="password_protect" ng-model="formValues.passwordProtect" /><i></i> </label>
+              </div>
+            </div>
+            <!-- !Password protect -->
+
+            <!-- Password -->
+            <div class="form-group" ng-if="formValues.passwordProtect">
+              <label for="password" class="col-sm-1 control-label text-left">Password</label>
+              <div class="col-sm-3">
+                <input type="password" class="form-control" ng-model="formValues.password" id="password" name="password" required />
+              </div>
+            </div>
+            <div class="form-group col-md-12" ng-show="backupPortainerForm.password.$invalid">
+              <div class="small text-warning">
+                <div ng-messages="backupPortainerForm.password.$error">
+                  <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
+              </div>
+            </div>
+            <!-- !Password -->
+            <!-- actions -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm"
+                  ng-click="downloadBackup()"
+                  ng-disabled="backupPortainerForm.$invalid ||state.backupInProgress"
+                  button-spinner="state.backupInProgress"
+                >
+                  <span ng-hide="state.backupInProgress"><i class="fa fa-download" aria-hidden="true"></i> Download backup</span>
+                  <span ng-show="state.backupInProgress"><i class="fa fa-download" aria-hidden="true"></i> Downloading backup</span>
+                </button>
+              </div>
+            </div>
+            <!-- !actions -->
+          </div>
         </form>
       </rd-widget-body>
     </rd-widget>

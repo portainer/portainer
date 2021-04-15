@@ -4,7 +4,7 @@ angular.module('portainer.app').factory('Backup', [
   function BackupFactory($resource, API_ENDPOINT_BACKUP) {
     'use strict';
     return $resource(
-      API_ENDPOINT_BACKUP,
+      API_ENDPOINT_BACKUP + '/:subResource/:action',
       {},
       {
         download: {
@@ -16,6 +16,11 @@ angular.module('portainer.app').factory('Backup', [
             name: headersGetter('Content-Disposition').replace('attachment; filename=', ''),
           }),
         },
+        getS3Settings: { method: 'GET', params: { subResource: 's3', action: 'settings' } },
+        saveS3Settings: { method: 'POST', params: { subResource: 's3', action: 'settings' } },
+        exportS3Backup: { method: 'POST', params: { subResource: 's3', action: 'execute' } },
+        restoreS3Backup: { method: 'POST', params: { subResource: 's3', action: 'restore' } },
+        getBackupStatus: { method: 'GET', params: { subResource: 's3', action: 'status' } },
       }
     );
   },

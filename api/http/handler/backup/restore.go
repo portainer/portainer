@@ -2,20 +2,14 @@ package backup
 
 import (
 	"bytes"
-	"errors"
 	"io"
 	"net/http"
-	"os"
-	"path/filepath"
-	"time"
 
+	"github.com/pkg/errors"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
-	"github.com/portainer/portainer/api/archive"
-	"github.com/portainer/portainer/api/crypto"
+	operations "github.com/portainer/portainer/api/backup"
 )
-
-var filesToRestore = append(filesToBackup, "portainer.db")
 
 type restorePayload struct {
 	FileContent []byte
@@ -23,6 +17,18 @@ type restorePayload struct {
 	Password    string
 }
 
+// @id Restore
+// @summary Triggers a system restore using provided backup file
+// @description Triggers a system restore using provided backup file
+// @description **Access policy**: public
+// @tags backup
+// @param FileContent body []byte true "Content of the backup"
+// @param FileName body string true "File name"
+// @param Password body string false "Password to decrypt the backup with"
+// @success 200  "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /restore [post]
 func (h *Handler) restore(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	initialized, err := h.adminMonitor.WasInitialized()
 	if err != nil {
@@ -41,33 +47,10 @@ func (h *Handler) restore(w http.ResponseWriter, r *http.Request) *httperror.Han
 	}
 
 	var archiveReader io.Reader = bytes.NewReader(payload.FileContent)
-	if payload.Password != "" {
-		archiveReader, err = decrypt(archiveReader, payload.Password)
-		if err != nil {
-			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to decrypt the archive", Err: err}
-		}
-	}
-
-	restorePath := filepath.Join(h.filestorePath, "restore", time.Now().Format("20060102150405"))
-	defer os.RemoveAll(restorePath)
-
-	err = extractArchive(archiveReader, restorePath)
+	err = operations.RestoreArchive(archiveReader, payload.Password, h.filestorePath, h.gate, h.dataStore, h.shutdownTrigger)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Cannot extract files from the archive. Please ensure the password is correct and try again", Err: errors.New("Cannot extract files from the archive. Please ensure the password is correct and try again")}
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to restore the backup", Err: err}
 	}
-
-	unlock := h.gate.Lock()
-	defer unlock()
-
-	if err = h.dataStore.Close(); err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to stop db", Err: err}
-	}
-
-	if err = restoreFiles(restorePath, h.filestorePath); err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to restore the system state", Err: err}
-	}
-
-	h.shutdownTrigger()
 
 	return nil
 }
@@ -82,23 +65,5 @@ func decodeForm(r *http.Request, p *restorePayload) error {
 
 	password, _ := request.RetrieveMultiPartFormValue(r, "password", true)
 	p.Password = password
-	return nil
-}
-
-func decrypt(r io.Reader, password string) (io.Reader, error) {
-	return crypto.AesDecrypt(r, []byte(password))
-}
-
-func extractArchive(r io.Reader, destinationDirPath string) error {
-	return archive.ExtractTarGz(r, destinationDirPath)
-}
-
-func restoreFiles(srcDir string, destinationDir string) error {
-	for _, filename := range filesToRestore {
-		err := copyPath(filepath.Join(srcDir, filename), destinationDir)
-		if err != nil {
-			return err
-		}
-	}
 	return nil
 }

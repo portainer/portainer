@@ -43,6 +43,17 @@
   </span>
 </information-panel>
 
+<information-panel ng-if="backupStatus.Failed" title-text="Information">
+  <span class="small text-muted">
+    <p>
+      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      The latest automated backup has failed at {{ backupStatus.TimestampUTC | date: 'yyyy-MM-dd HH:mm:ss' }}. For details please see the log files and have a look at the
+      <a ui-sref="portainer.settings">settings</a>
+      to verify the backup configuration.
+    </p>
+  </span>
+</information-panel>
+
 <div class="row" ng-if="!state.connectingToEdgeEndpoint">
   <div class="col-sm-12">
     <endpoint-list

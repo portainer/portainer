@@ -13,7 +13,8 @@ angular
     EndpointProvider,
     StateManager,
     ModalService,
-    MotdService
+    MotdService,
+    BackupService
   ) {
     $scope.state = {
       connectingToEdgeEndpoint: false,
@@ -95,6 +96,10 @@ angular
 
       MotdService.motd().then(function success(data) {
         $scope.motd = data;
+      });
+
+      BackupService.getBackupStatus().then(function success(data) {
+        $scope.backupStatus = data;
       });
 
       try {
