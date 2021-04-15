@@ -7,9 +7,10 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/http/useractivity"
 )
 
 type teamMembershipCreatePayload struct {
@@ -76,8 +77,10 @@ func (handler *Handler) teamMembershipCreate(w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
 	}
-	
+
 	handler.AuthorizationService.TriggerUserAuthUpdate(payload.UserID)
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, handlerActivityContext, r, payload)
 
 	return response.JSON(w, membership)
 }

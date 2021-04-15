@@ -12,13 +12,14 @@ import (
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/http/useractivity"
 	"github.com/portainer/portainer/api/internal/stackutils"
 )
 
 type stackMigratePayload struct {
-	EndpointID int
-	SwarmID    string
-	Name       string
+	EndpointID int    `json:",omitempty"`
+	SwarmID    string `json:",omitempty"`
+	Name       string `json:",omitempty"`
 }
 
 func (payload *stackMigratePayload) Validate(r *http.Request) error {
@@ -130,6 +131,8 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack changes inside the database", err}
 	}
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, endpoint.Name, r, payload)
 
 	return response.JSON(w, stack)
 }

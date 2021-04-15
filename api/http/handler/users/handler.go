@@ -31,6 +31,7 @@ type Handler struct {
 	CryptoService        portainer.CryptoService
 	DataStore            portainer.DataStore
 	K8sClientFactory     *cli.ClientFactory
+	UserActivityStore    portainer.UserActivityStore
 }
 
 // NewHandler creates a handler to manage user operations.

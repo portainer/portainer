@@ -12,6 +12,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/http/useractivity"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
 
@@ -23,7 +24,7 @@ func (handler *Handler) customTemplateCreate(w http.ResponseWriter, r *http.Requ
 
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user details from authentication token", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "unable to retrieve user details from authentication token", err}
 	}
 
 	customTemplate, err := handler.createCustomTemplate(method, r)
@@ -128,6 +129,8 @@ func (handler *Handler) createCustomTemplateFromFileContent(r *http.Request) (*p
 	}
 	customTemplate.ProjectPath = projectPath
 
+	useractivity.LogHttpActivity(handler.UserActivityStore, handlerActivityContext, r, payload)
+
 	return customTemplate, nil
 }
 
@@ -207,6 +210,8 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 		return nil, err
 	}
 
+	useractivity.LogHttpActivity(handler.UserActivityStore, handlerActivityContext, r, payload)
+
 	return customTemplate, nil
 }
 
@@ -285,6 +290,8 @@ func (handler *Handler) createCustomTemplateFromFileUpload(r *http.Request) (*po
 		return nil, err
 	}
 	customTemplate.ProjectPath = projectPath
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, handlerActivityContext, r, payload)
 
 	return customTemplate, nil
 }

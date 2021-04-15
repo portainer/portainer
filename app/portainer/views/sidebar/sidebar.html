@@ -192,6 +192,10 @@
       </li>
       <li class="sidebar-list" ng-if="isAdmin">
         <a ui-sref="portainer.authLogs" ui-sref-active="active">Authentication logs<span class="menu-icon fa fa-history fa-fw"></span></a>
+
+        <div class="sidebar-sublist" ng-if="toggle && ($state.current.name == 'portainer.authLogs' || $state.current.name == 'portainer.activityLogs')">
+          <a ui-sref="portainer.activityLogs" ui-sref-active="active">Activity Logs</a>
+        </div>
       </li>
       <li class="sidebar-list" ng-if="isAdmin">
         <a ui-sref="portainer.settings" ui-sref-active="active">Settings <span class="menu-icon fa fa-cogs fa-fw"></span></a>

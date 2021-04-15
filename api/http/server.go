@@ -125,22 +125,27 @@ func (server *Server) Start() error {
 	customTemplatesHandler.DataStore = server.DataStore
 	customTemplatesHandler.FileService = server.FileService
 	customTemplatesHandler.GitService = server.GitService
+	customTemplatesHandler.UserActivityStore = server.UserActivityStore
 
 	var dockerHubHandler = dockerhub.NewHandler(requestBouncer)
 	dockerHubHandler.DataStore = server.DataStore
+	dockerHubHandler.UserActivityStore = server.UserActivityStore
 
 	var edgeGroupsHandler = edgegroups.NewHandler(requestBouncer)
 	edgeGroupsHandler.DataStore = server.DataStore
+	edgeGroupsHandler.UserActivityStore = server.UserActivityStore
 
 	var edgeJobsHandler = edgejobs.NewHandler(requestBouncer)
 	edgeJobsHandler.DataStore = server.DataStore
 	edgeJobsHandler.FileService = server.FileService
 	edgeJobsHandler.ReverseTunnelService = server.ReverseTunnelService
+	edgeJobsHandler.UserActivityStore = server.UserActivityStore
 
 	var edgeStacksHandler = edgestacks.NewHandler(requestBouncer)
 	edgeStacksHandler.DataStore = server.DataStore
 	edgeStacksHandler.FileService = server.FileService
 	edgeStacksHandler.GitService = server.GitService
+	edgeStacksHandler.UserActivityStore = server.UserActivityStore
 
 	var edgeTemplatesHandler = edgetemplates.NewHandler(requestBouncer)
 	edgeTemplatesHandler.DataStore = server.DataStore
@@ -155,6 +160,7 @@ func (server *Server) Start() error {
 	endpointHandler.K8sClientFactory = server.KubernetesClientFactory
 	endpointHandler.ComposeStackManager = server.ComposeStackManager
 	endpointHandler.DockerClientFactory = server.DockerClientFactory
+	endpointHandler.UserActivityStore = server.UserActivityStore
 
 	var endpointEdgeHandler = endpointedge.NewHandler(requestBouncer)
 	endpointEdgeHandler.DataStore = server.DataStore
@@ -164,6 +170,7 @@ func (server *Server) Start() error {
 	var endpointGroupHandler = endpointgroups.NewHandler(requestBouncer)
 	endpointGroupHandler.AuthorizationService = server.AuthorizationService
 	endpointGroupHandler.DataStore = server.DataStore
+	endpointGroupHandler.UserActivityStore = server.UserActivityStore
 
 	var endpointProxyHandler = endpointproxy.NewHandler(requestBouncer)
 	endpointProxyHandler.DataStore = server.DataStore
@@ -172,6 +179,7 @@ func (server *Server) Start() error {
 
 	var licenseHandler = licenses.NewHandler(requestBouncer)
 	licenseHandler.LicenseService = server.LicenseService
+	licenseHandler.UserActivityStore = server.UserActivityStore
 
 	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"))
 
@@ -182,13 +190,14 @@ func (server *Server) Start() error {
 
 	var motdHandler = motd.NewHandler(requestBouncer)
 
-	var registryHandler = registries.NewHandler(requestBouncer)
+	var registryHandler = registries.NewHandler(requestBouncer, server.UserActivityStore)
 	registryHandler.DataStore = server.DataStore
 	registryHandler.FileService = server.FileService
 	registryHandler.ProxyManager = server.ProxyManager
 
 	var resourceControlHandler = resourcecontrols.NewHandler(requestBouncer)
 	resourceControlHandler.DataStore = server.DataStore
+	resourceControlHandler.UserActivityStore = server.UserActivityStore
 
 	var settingsHandler = settings.NewHandler(requestBouncer)
 	settingsHandler.AuthorizationService = server.AuthorizationService
@@ -197,6 +206,7 @@ func (server *Server) Start() error {
 	settingsHandler.JWTService = server.JWTService
 	settingsHandler.LDAPService = server.LDAPService
 	settingsHandler.SnapshotService = server.SnapshotService
+	settingsHandler.UserActivityStore = server.UserActivityStore
 
 	var stackHandler = stacks.NewHandler(requestBouncer)
 	stackHandler.DataStore = server.DataStore
@@ -209,21 +219,25 @@ func (server *Server) Start() error {
 	stackHandler.DockerClientFactory = server.DockerClientFactory
 	stackHandler.KubernetesClientFactory = server.KubernetesClientFactory
 	stackHandler.AuthorizationService = server.AuthorizationService
+	stackHandler.UserActivityStore = server.UserActivityStore
 
 	var statusHandler = status.NewHandler(requestBouncer, server.Status)
 	statusHandler.DataStore = server.DataStore
 
 	var tagHandler = tags.NewHandler(requestBouncer)
 	tagHandler.DataStore = server.DataStore
+	tagHandler.UserActivityStore = server.UserActivityStore
 
 	var teamHandler = teams.NewHandler(requestBouncer)
 	teamHandler.AuthorizationService = server.AuthorizationService
 	teamHandler.DataStore = server.DataStore
 	teamHandler.K8sClientFactory = server.KubernetesClientFactory
+	teamHandler.UserActivityStore = server.UserActivityStore
 
 	var teamMembershipHandler = teammemberships.NewHandler(requestBouncer)
 	teamMembershipHandler.AuthorizationService = server.AuthorizationService
 	teamMembershipHandler.DataStore = server.DataStore
+	teamMembershipHandler.UserActivityStore = server.UserActivityStore
 
 	var templatesHandler = templates.NewHandler(requestBouncer)
 	templatesHandler.DataStore = server.DataStore
@@ -232,12 +246,14 @@ func (server *Server) Start() error {
 
 	var uploadHandler = upload.NewHandler(requestBouncer)
 	uploadHandler.FileService = server.FileService
+	uploadHandler.UserActivityStore = server.UserActivityStore
 
 	var userHandler = users.NewHandler(requestBouncer, rateLimiter)
 	userHandler.AuthorizationService = server.AuthorizationService
 	userHandler.DataStore = server.DataStore
 	userHandler.CryptoService = server.CryptoService
 	userHandler.K8sClientFactory = server.KubernetesClientFactory
+	userHandler.UserActivityStore = server.UserActivityStore
 
 	var userActivityHandler = useractivity.NewHandler(requestBouncer)
 	userActivityHandler.UserActivityStore = server.UserActivityStore
@@ -247,10 +263,12 @@ func (server *Server) Start() error {
 	websocketHandler.SignatureService = server.SignatureService
 	websocketHandler.ReverseTunnelService = server.ReverseTunnelService
 	websocketHandler.KubernetesClientFactory = server.KubernetesClientFactory
+	websocketHandler.UserActivityStore = server.UserActivityStore
 
 	var webhookHandler = webhooks.NewHandler(requestBouncer)
 	webhookHandler.DataStore = server.DataStore
 	webhookHandler.DockerClientFactory = server.DockerClientFactory
+	webhookHandler.UserActivityStore = server.UserActivityStore
 
 	server.Handler = &handler.Handler{
 		RoleHandler:            roleHandler,

@@ -10,8 +10,9 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/http/useractivity"
 )
 
 type endpointExtensionAddPayload struct {
@@ -72,6 +73,8 @@ func (handler *Handler) endpointExtensionAdd(w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint changes inside the database", err}
 	}
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, endpoint.Name, r, payload)
 
 	return response.JSON(w, extension)
 }

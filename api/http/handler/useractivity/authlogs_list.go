@@ -61,15 +61,17 @@ func (handler *Handler) authLogsList(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	opts := portainer.AuthLogsQuery{
-		Offset:          offset,
-		Limit:           limit,
-		BeforeTimestamp: int64(before),
-		AfterTimestamp:  int64(after),
-		SortBy:          sortBy,
-		SortDesc:        sortDesc,
-		Keyword:         keyword,
-		ContextTypes:    contextTypes,
-		ActivityTypes:   activityTypes,
+		UserActivityLogBaseQuery: portainer.UserActivityLogBaseQuery{
+			Offset:          offset,
+			Limit:           limit,
+			BeforeTimestamp: int64(before),
+			AfterTimestamp:  int64(after),
+			SortBy:          sortBy,
+			SortDesc:        sortDesc,
+			Keyword:         keyword,
+		},
+		ContextTypes:  contextTypes,
+		ActivityTypes: activityTypes,
 	}
 
 	logs, totalCount, err := handler.UserActivityStore.GetAuthLogs(opts)

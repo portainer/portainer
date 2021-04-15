@@ -8,7 +8,9 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/useractivity"
+	consts "github.com/portainer/portainer/api/useractivity"
 )
 
 type registryCreatePayload struct {
@@ -60,6 +62,9 @@ func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the registry inside the database", err}
 	}
+
+	payload.Password = consts.RedactedValue
+	useractivity.LogHttpActivity(handler.UserActivityStore, handlerActivityContext, r, payload)
 
 	hideFields(registry)
 	return response.JSON(w, registry)

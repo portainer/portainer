@@ -5,14 +5,19 @@ import (
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
+)
+
+const (
+	handlerActivityContext = "Portainer"
 )
 
 // Handler is the HTTP handler used to handle Edge job operations.
 type Handler struct {
 	*mux.Router
-	LicenseService portainer.LicenseService
+	LicenseService    portainer.LicenseService
+	UserActivityStore portainer.UserActivityStore
 }
 
 // NewHandler creates a handler to manage Edge job operations.

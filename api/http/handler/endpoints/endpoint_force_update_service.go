@@ -2,15 +2,17 @@ package endpoints
 
 import (
 	"context"
-	dockertypes "github.com/docker/docker/api/types"
 	"net/http"
 	"strings"
+
+	dockertypes "github.com/docker/docker/api/types"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/http/useractivity"
 )
 
 type forceUpdateServicePayload struct {
@@ -65,9 +67,11 @@ func (handler *Handler) endpointForceUpdateService(w http.ResponseWriter, r *htt
 	}
 
 	newService, err := dockerClient.ServiceUpdate(context.Background(), payload.ServiceID, service.Version, service.Spec, dockertypes.ServiceUpdateOptions{QueryRegistry: true})
-
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Error force update service", err}
 	}
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, endpoint.Name, r, payload)
+
 	return response.JSON(w, newService)
 }

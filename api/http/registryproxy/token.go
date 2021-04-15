@@ -6,12 +6,15 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/useractivity"
+	"github.com/portainer/portainer/api/http/utils"
 )
 
 type (
 	tokenSecuredTransport struct {
-		config *portainer.RegistryManagementConfiguration
-		client *http.Client
+		config            *portainer.RegistryManagementConfiguration
+		client            *http.Client
+		userActivityStore portainer.UserActivityStore
 	}
 
 	genericAuthenticationResponse struct {
@@ -23,7 +26,7 @@ type (
 	}
 )
 
-func newTokenSecuredRegistryProxy(uri string, config *portainer.RegistryManagementConfiguration) (http.Handler, error) {
+func newTokenSecuredRegistryProxy(uri string, config *portainer.RegistryManagementConfiguration, userActivityStore portainer.UserActivityStore) (http.Handler, error) {
 	url, err := url.Parse("https://" + uri)
 	if err != nil {
 		return nil, err
@@ -31,7 +34,8 @@ func newTokenSecuredRegistryProxy(uri string, config *portainer.RegistryManageme
 
 	proxy := newSingleHostReverseProxyWithHostHeader(url)
 	proxy.Transport = &tokenSecuredTransport{
-		config: config,
+		config:            config,
+		userActivityStore: userActivityStore,
 		client: &http.Client{
 			Timeout: time.Second * 10,
 		},
@@ -53,6 +57,11 @@ func (transport *tokenSecuredTransport) RoundTrip(request *http.Request) (*http.
 		return nil, err
 	}
 
+	body, err := utils.CopyBody(request)
+	if err != nil {
+		return nil, err
+	}
+
 	response, err := http.DefaultTransport.RoundTrip(requestCopy)
 	if err != nil {
 		return response, err
@@ -65,7 +74,16 @@ func (transport *tokenSecuredTransport) RoundTrip(request *http.Request) (*http.
 		}
 
 		request.Header.Set("Authorization", "Bearer "+*token)
-		return http.DefaultTransport.RoundTrip(request)
+		response, err = http.DefaultTransport.RoundTrip(request)
+		if err != nil {
+			return nil, err
+		}
+
+	}
+
+	// log if request is success
+	if 200 <= response.StatusCode && response.StatusCode < 300 {
+		useractivity.LogProxyActivity(transport.userActivityStore, "Portainer", request, body)
 	}
 
 	return response, nil

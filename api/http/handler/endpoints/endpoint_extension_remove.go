@@ -8,8 +8,9 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/http/useractivity"
 )
 
 // DELETE request on /api/endpoints/:id/extensions/:extensionType
@@ -41,6 +42,8 @@ func (handler *Handler) endpointExtensionRemove(w http.ResponseWriter, r *http.R
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint changes inside the database", err}
 	}
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, endpoint.Name, r, nil)
 
 	return response.Empty(w)
 }

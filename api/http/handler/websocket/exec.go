@@ -3,17 +3,19 @@ package websocket
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/portainer/portainer/api/bolt/errors"
 	"net"
 	"net/http"
 	"net/http/httputil"
 	"time"
 
+	"github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/http/useractivity"
+
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/websocket"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 type execStartOperationPayload struct {
@@ -62,6 +64,9 @@ func (handler *Handler) websocketExec(w http.ResponseWriter, r *http.Request) *h
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "An error occured during websocket exec operation", err}
 	}
+
+	params.endpoint = nil
+	useractivity.LogHttpActivity(handler.UserActivityStore, endpoint.Name, r, params)
 
 	return nil
 }

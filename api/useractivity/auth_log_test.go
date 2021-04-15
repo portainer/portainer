@@ -50,15 +50,6 @@ const (
 	testType = portainer.AuthenticationActivityType(0)
 )
 
-func setup(path string) (*Store, error) {
-	store, err := NewUserActivityStore(path)
-	if err != nil {
-		return nil, fmt.Errorf("Failed creating new store: %w", err)
-	}
-
-	return store, nil
-}
-
 func TestAddActivity(t *testing.T) {
 	store, err := setup(t.TempDir())
 	if err != nil {
@@ -80,7 +71,7 @@ func TestAddActivity(t *testing.T) {
 	assert.Equal(t, 1, count, "Store should have one element")
 }
 
-func TestGetLogs(t *testing.T) {
+func TestGetAuthLogs(t *testing.T) {
 	store, err := setup(t.TempDir())
 	if err != nil {
 		t.Fatalf("Failed setup: %s", err)
@@ -111,7 +102,7 @@ func TestGetLogs(t *testing.T) {
 	assert.Equal(t, []*portainer.AuthActivityLog{log1, log2, log3}, logs)
 }
 
-func TestGetLogsByTimestamp(t *testing.T) {
+func TestGetAuthLogsByTimestamp(t *testing.T) {
 	store, err := setup(t.TempDir())
 	if err != nil {
 		t.Fatalf("Failed setup: %s", err)
@@ -139,8 +130,10 @@ func TestGetLogsByTimestamp(t *testing.T) {
 	}
 
 	logs, _, err := store.GetAuthLogs(portainer.AuthLogsQuery{
-		BeforeTimestamp: log3.Timestamp - 1,
-		AfterTimestamp:  log1.Timestamp + 1,
+		UserActivityLogBaseQuery: portainer.UserActivityLogBaseQuery{
+			BeforeTimestamp: log3.Timestamp - 1,
+			AfterTimestamp:  log1.Timestamp + 1,
+		},
 	})
 
 	if err != nil {
@@ -150,7 +143,7 @@ func TestGetLogsByTimestamp(t *testing.T) {
 	assert.Equal(t, log2, logs[0], "logs are not equal")
 }
 
-func TestGetLogsByKeyword(t *testing.T) {
+func TestGetAuthLogsByKeyword(t *testing.T) {
 	store, err := setup(t.TempDir())
 	if err != nil {
 		t.Fatalf("Failed setup: %s", err)
@@ -175,7 +168,9 @@ func TestGetLogsByKeyword(t *testing.T) {
 
 	// like
 	shouldHaveAllLogs, _, err := store.GetAuthLogs(portainer.AuthLogsQuery{
-		Keyword: "username",
+		UserActivityLogBaseQuery: portainer.UserActivityLogBaseQuery{
+			Keyword: "username",
+		},
 	})
 
 	if err != nil {
@@ -186,7 +181,9 @@ func TestGetLogsByKeyword(t *testing.T) {
 
 	// username
 	shouldHaveOnlyLog1, _, err := store.GetAuthLogs(portainer.AuthLogsQuery{
-		Keyword: "username1",
+		UserActivityLogBaseQuery: portainer.UserActivityLogBaseQuery{
+			Keyword: "username1",
+		},
 	})
 
 	if err != nil {
@@ -197,7 +194,9 @@ func TestGetLogsByKeyword(t *testing.T) {
 
 	// origin
 	shouldHaveOnlyLog3, _, err := store.GetAuthLogs(portainer.AuthLogsQuery{
-		Keyword: "endpoint3",
+		UserActivityLogBaseQuery: portainer.UserActivityLogBaseQuery{
+			Keyword: "endpoint3",
+		},
 	})
 
 	if err != nil {
@@ -207,7 +206,7 @@ func TestGetLogsByKeyword(t *testing.T) {
 	assert.Equal(t, log3, shouldHaveOnlyLog3[0])
 }
 
-func TestGetLogsByContext(t *testing.T) {
+func TestGetAuthLogsByContext(t *testing.T) {
 	store, err := setup(t.TempDir())
 	if err != nil {
 		t.Fatalf("Failed setup: %s", err)
@@ -258,7 +257,7 @@ func TestGetLogsByContext(t *testing.T) {
 	assert.Equal(t, []*portainer.AuthActivityLog{log1, log3}, shouldHaveLog1And3)
 }
 
-func TestGetLogsByType(t *testing.T) {
+func TestGetAuthLogsByType(t *testing.T) {
 	store, err := setup(t.TempDir())
 	if err != nil {
 		t.Fatalf("Failed setup: %s", err)
@@ -309,7 +308,7 @@ func TestGetLogsByType(t *testing.T) {
 	assert.Equal(t, []*portainer.AuthActivityLog{log1, log3}, shouldHaveLog1And3)
 }
 
-func TestSortOrderAndPaginate(t *testing.T) {
+func TestGetAuthLogsSortOrderAndPaginate(t *testing.T) {
 	store, err := setup(t.TempDir())
 	if err != nil {
 		t.Fatalf("Failed setup: %s", err)
@@ -338,10 +337,12 @@ func TestSortOrderAndPaginate(t *testing.T) {
 	}
 
 	shouldBeLog4AndLog3, _, err := store.GetAuthLogs(portainer.AuthLogsQuery{
-		SortDesc: true,
-		SortBy:   "Username",
-		Offset:   0,
-		Limit:    2,
+		UserActivityLogBaseQuery: portainer.UserActivityLogBaseQuery{
+			SortDesc: true,
+			SortBy:   "Username",
+			Offset:   0,
+			Limit:    2,
+		},
 	})
 
 	if err != nil {
@@ -351,10 +352,12 @@ func TestSortOrderAndPaginate(t *testing.T) {
 	assert.Equal(t, []*portainer.AuthActivityLog{log4, log3}, shouldBeLog4AndLog3)
 
 	shouldBeLog2AndLog1, _, err := store.GetAuthLogs(portainer.AuthLogsQuery{
-		SortDesc: true,
-		SortBy:   "Username",
-		Offset:   2,
-		Limit:    2,
+		UserActivityLogBaseQuery: portainer.UserActivityLogBaseQuery{
+			SortDesc: true,
+			SortBy:   "Username",
+			Offset:   2,
+			Limit:    2,
+		},
 	})
 
 	if err != nil {
@@ -364,7 +367,7 @@ func TestSortOrderAndPaginate(t *testing.T) {
 	assert.Equal(t, []*portainer.AuthActivityLog{log2, log1}, shouldBeLog2AndLog1)
 }
 
-func TestGetLogsDesc(t *testing.T) {
+func TestGetAuthLogsDesc(t *testing.T) {
 	store, err := setup(t.TempDir())
 	if err != nil {
 		t.Fatalf("Failed setup: %s", err)
@@ -388,7 +391,9 @@ func TestGetLogsDesc(t *testing.T) {
 	}
 
 	logs, _, err := store.GetAuthLogs(portainer.AuthLogsQuery{
-		SortDesc: true,
+		UserActivityLogBaseQuery: portainer.UserActivityLogBaseQuery{
+			SortDesc: true,
+		},
 	})
 
 	if err != nil {

@@ -15,6 +15,7 @@ type Handler struct {
 	*mux.Router
 	DataStore           portainer.DataStore
 	DockerClientFactory *docker.ClientFactory
+	UserActivityStore   portainer.UserActivityStore
 }
 
 // NewHandler creates a handler to manage settings operations.

@@ -7,6 +7,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
+	"github.com/portainer/portainer/api/http/useractivity"
 )
 
 type (
@@ -45,6 +46,8 @@ func (handler *Handler) licensesDelete(w http.ResponseWriter, r *http.Request) *
 			resp.FailedKeys[licenseKey] = err.Error()
 		}
 	}
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, handlerActivityContext, r, payload)
 
 	return response.JSON(w, resp)
 }

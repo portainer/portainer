@@ -8,7 +8,9 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/useractivity"
+	consts "github.com/portainer/portainer/api/useractivity"
 )
 
 type dockerhubUpdatePayload struct {
@@ -48,6 +50,9 @@ func (handler *Handler) dockerhubUpdate(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the Dockerhub changes inside the database", err}
 	}
+
+	payload.Password = consts.RedactedValue
+	useractivity.LogHttpActivity(handler.UserActivityStore, "Portainer", r, payload)
 
 	return response.Empty(w)
 }

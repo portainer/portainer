@@ -6,8 +6,9 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/http/useractivity"
 )
 
 // POST request on /api/edge_jobs/:id/tasks/:taskID/logs
@@ -42,6 +43,8 @@ func (handler *Handler) edgeJobTasksCollect(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Edge job changes in the database", err}
 	}
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, "Portainer", r, nil)
 
 	return response.Empty(w)
 }

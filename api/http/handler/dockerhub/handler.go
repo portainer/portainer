@@ -5,7 +5,7 @@ import (
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -16,7 +16,8 @@ func hideFields(dockerHub *portainer.DockerHub) {
 // Handler is the HTTP handler used to handle DockerHub operations.
 type Handler struct {
 	*mux.Router
-	DataStore portainer.DataStore
+	DataStore         portainer.DataStore
+	UserActivityStore portainer.UserActivityStore
 }
 
 // NewHandler creates a handler to manage Dockerhub operations.

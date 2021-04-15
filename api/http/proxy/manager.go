@@ -36,6 +36,7 @@ func NewManager(
 	kubernetesClientFactory *cli.ClientFactory,
 	kubernetesTokenCacheManager *kubernetes.TokenCacheManager,
 	authService *authorization.Service,
+	userActivityStore portainer.UserActivityStore,
 ) *Manager {
 	return &Manager{
 		endpointProxies:        cmap.New(),
@@ -49,6 +50,7 @@ func NewManager(
 			kubernetesClientFactory,
 			kubernetesTokenCacheManager,
 			authService,
+			userActivityStore,
 		),
 	}
 }

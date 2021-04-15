@@ -8,8 +8,9 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/http/useractivity"
 	"github.com/portainer/portainer/api/internal/edge"
 )
 
@@ -114,6 +115,8 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Endpoint relation changes inside the database", err}
 		}
 	}
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, "Portainer", r, payload)
 
 	return response.JSON(w, edgeGroup)
 }

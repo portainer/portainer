@@ -14,6 +14,7 @@ import (
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/http/useractivity"
 	"github.com/portainer/portainer/api/internal/stackutils"
 )
 
@@ -145,6 +146,8 @@ func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Sta
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
 
+	useractivity.LogHttpActivity(handler.UserActivityStore, endpoint.Name, r, payload)
+
 	return nil
 }
 
@@ -175,6 +178,8 @@ func (handler *Handler) updateSwarmStack(r *http.Request, stack *portainer.Stack
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, endpoint.Name, r, payload)
 
 	return nil
 }

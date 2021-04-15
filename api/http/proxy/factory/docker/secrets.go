@@ -2,13 +2,19 @@ package docker
 
 import (
 	"context"
+	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/docker/docker/client"
+	"github.com/pkg/errors"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
+	useractivityhttp "github.com/portainer/portainer/api/http/useractivity"
+	"github.com/portainer/portainer/api/http/utils"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/useractivity"
 )
 
 const (
@@ -72,6 +78,21 @@ func (transport *Transport) secretInspectOperation(response *http.Response, exec
 	return transport.applyAccessControlOnResource(resourceOperationParameters, responseObject, response, executor)
 }
 
+func (transport *Transport) decorateSecretCreationOperation(request *http.Request) (*http.Response, error) {
+	body, err := utils.CopyBody(request)
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := transport.decorateGenericResourceCreationOperation(request, secretObjectIdentifier, portainer.SecretResourceControl, false)
+
+	if err == nil && (200 <= response.StatusCode && response.StatusCode < 300) {
+		transport.logCreateSecretOperation(request, body)
+	}
+
+	return response, err
+}
+
 // selectorSecretLabels retrieve the labels object associated to the secret object.
 // Labels are available under the "Spec.Labels" property.
 // API schema references:
@@ -84,4 +105,34 @@ func selectorSecretLabels(responseObject map[string]interface{}) map[string]inte
 		return secretLabelsObject
 	}
 	return nil
+}
+
+func (transport *Transport) logCreateSecretOperation(request *http.Request, body []byte) {
+	cleanBody, err := hideSecretInfo(body)
+	if err != nil {
+		log.Printf("[ERROR] [http,docker,secrets] [message: failed cleaning request body] [error: %s]", err)
+		return
+	}
+
+	useractivityhttp.LogHttpActivity(transport.userActivityStore, transport.endpoint.Name, request, cleanBody)
+}
+
+// hideSecretInfo removes the confidential properties from the secret payload and returns the new payload
+// it will read the request body and recreate it
+func hideSecretInfo(body []byte) (interface{}, error) {
+	type createSecretRequestPayload struct {
+		Data   string
+		Labels interface{}
+		Name   string
+	}
+
+	var payload createSecretRequestPayload
+	err := json.Unmarshal(body, &payload)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed parsing body")
+	}
+
+	payload.Data = useractivity.RedactedValue
+
+	return payload, nil
 }

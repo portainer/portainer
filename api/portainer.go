@@ -23,27 +23,18 @@ type (
 		Authorizations Authorizations
 	}
 
-	// AuthActivityLog represents a log entry for user authentication activities
 	AuthActivityLog struct {
-		ID        int                        `json:"id" storm:"increment"`
-		Type      AuthenticationActivityType `json:"type" storm:"index"`
-		Timestamp int64                      `json:"timestamp" storm:"index"`
-		Origin    string                     `json:"origin" storm:"index"`
-		Context   AuthenticationMethod       `json:"context" storm:"index"`
-		Username  string                     `json:"username" storm:"index"`
+		UserActivityLogBase `storm:"inline"`
+		Type                AuthenticationActivityType `json:"type" storm:"index"`
+		Origin              string                     `json:"origin" storm:"index"`
+		Context             AuthenticationMethod       `json:"context" storm:"index"`
 	}
 
-	// AuthLogsQuery represent the options used to get UserActivity logs
+	// AuthLogsQuery represent the options used to get AuthActivity logs
 	AuthLogsQuery struct {
-		Limit           int
-		Offset          int
-		BeforeTimestamp int64
-		AfterTimestamp  int64
-		SortBy          string
-		SortDesc        bool
-		Keyword         string
-		ContextTypes    []AuthenticationMethod
-		ActivityTypes   []AuthenticationActivityType
+		UserActivityLogBaseQuery
+		ContextTypes  []AuthenticationMethod
+		ActivityTypes []AuthenticationActivityType
 	}
 
 	// AuthenticationActivityType represents the type of an authentication action
@@ -866,6 +857,31 @@ type (
 	// UserAccessPolicies represent the association of an access policy and a user
 	UserAccessPolicies map[UserID]AccessPolicy
 
+	// AuthActivityLog represents a log entry for user authentication activities
+
+	UserActivityLogBase struct {
+		ID        int    `json:"id" storm:"increment"`
+		Timestamp int64  `json:"timestamp" storm:"index"`
+		Username  string `json:"username" storm:"index"`
+	}
+
+	UserActivityLogBaseQuery struct {
+		Limit           int
+		Offset          int
+		BeforeTimestamp int64
+		AfterTimestamp  int64
+		SortBy          string
+		SortDesc        bool
+		Keyword         string
+	}
+
+	UserActivityLog struct {
+		UserActivityLogBase `storm:"inline"`
+		Context             string `json:"context" storm:"index"`
+		Action              string `json:"action" storm:"index"`
+		Payload             []byte `json:"payload"`
+	}
+
 	// UserID represents a user identifier
 	UserID int
 
@@ -1281,6 +1297,9 @@ type (
 	UserActivityStore interface {
 		GetAuthLogs(opts AuthLogsQuery) ([]*AuthActivityLog, int, error)
 		LogAuthActivity(username, origin string, context AuthenticationMethod, activityType AuthenticationActivityType) (*AuthActivityLog, error)
+
+		GetUserActivityLogs(opts UserActivityLogBaseQuery) ([]*UserActivityLog, int, error)
+		LogUserActivity(username, context, action string, payload []byte) (*UserActivityLog, error)
 	}
 
 	// UserService represents a service for managing user data

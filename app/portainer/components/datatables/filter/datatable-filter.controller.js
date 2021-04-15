@@ -4,12 +4,16 @@ export default class DatatableFilterController {
   }
 
   onChangeItem(filterValue) {
-    if (this.state.includes(filterValue)) {
+    if (this.isChecked(filterValue)) {
       return this.onChange(
         this.filterKey,
         this.state.filter((v) => v !== filterValue)
       );
     }
     return this.onChange(this.filterKey, [...this.state, filterValue]);
+  }
+
+  isChecked(filterValue) {
+    return this.state.includes(filterValue);
   }
 }

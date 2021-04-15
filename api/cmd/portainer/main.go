@@ -416,13 +416,14 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Fatal(err)
 	}
 	kubernetesTokenCacheManager := kubeproxy.NewTokenCacheManager()
-	proxyManager := proxy.NewManager(dataStore, digitalSignatureService, reverseTunnelService, dockerClientFactory, kubernetesClientFactory, kubernetesTokenCacheManager, authorizationService)
+
+	userActivityStore := initUserActivityStore(*flags.Data)
+
+	proxyManager := proxy.NewManager(dataStore, digitalSignatureService, reverseTunnelService, dockerClientFactory, kubernetesClientFactory, kubernetesTokenCacheManager, authorizationService, userActivityStore)
 
 	composeStackManager := initComposeStackManager(*flags.Assets, *flags.Data, reverseTunnelService, proxyManager)
 
 	kubernetesDeployer := initKubernetesDeployer(dataStore, reverseTunnelService, digitalSignatureService, *flags.Assets)
-
-	userActivityStore := initUserActivityStore(*flags.Data)
 
 	if dataStore.IsNew() {
 		err = updateSettingsFromFlags(dataStore, flags)

@@ -2,7 +2,7 @@ package upload
 
 import (
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 
 	"net/http"
@@ -13,7 +13,8 @@ import (
 // Handler is the HTTP handler used to handle upload operations.
 type Handler struct {
 	*mux.Router
-	FileService portainer.FileService
+	FileService       portainer.FileService
+	UserActivityStore portainer.UserActivityStore
 }
 
 // NewHandler creates a handler to manage upload operations.

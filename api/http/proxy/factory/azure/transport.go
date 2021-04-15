@@ -7,8 +7,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/client"
+	"github.com/portainer/portainer/api/http/useractivity"
+	"github.com/portainer/portainer/api/http/utils"
 )
 
 type (
@@ -18,12 +20,13 @@ type (
 	}
 
 	Transport struct {
-		credentials *portainer.AzureCredentials
-		client      *client.HTTPClient
-		token       *azureAPIToken
-		mutex       sync.Mutex
-		dataStore   portainer.DataStore
-		endpoint    *portainer.Endpoint
+		credentials       *portainer.AzureCredentials
+		client            *client.HTTPClient
+		token             *azureAPIToken
+		mutex             sync.Mutex
+		dataStore         portainer.DataStore
+		endpoint          *portainer.Endpoint
+		userActivityStore portainer.UserActivityStore
 	}
 
 	azureRequestContext struct {
@@ -37,7 +40,7 @@ type (
 
 // NewTransport returns a pointer to a new instance of Transport that implements the HTTP Transport
 // interface for proxying requests to the Azure API.
-func NewTransport(credentials *portainer.AzureCredentials, dataStore portainer.DataStore, endpoint *portainer.Endpoint) *Transport {
+func NewTransport(credentials *portainer.AzureCredentials, userActivityStore portainer.UserActivityStore, dataStore portainer.DataStore, endpoint *portainer.Endpoint) *Transport {
 	return &Transport{
 		credentials: credentials,
 		client:      client.NewHTTPClient(),
@@ -67,7 +70,19 @@ func (transport *Transport) proxyAzureRequest(request *http.Request) (*http.Resp
 		return transport.proxyContainerGroupRequest(request)
 	}
 
-	return http.DefaultTransport.RoundTrip(request)
+	body, err := utils.CopyBody(request)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := http.DefaultTransport.RoundTrip(request)
+
+	// log if request is success
+	if err == nil && (200 <= resp.StatusCode && resp.StatusCode < 300) {
+		useractivity.LogProxyActivity(transport.userActivityStore, transport.endpoint.Name, request, body)
+	}
+
+	return resp, err
 }
 
 func (transport *Transport) authenticate() error {

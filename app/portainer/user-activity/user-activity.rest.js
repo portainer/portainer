@@ -7,15 +7,28 @@ export function UserActivity($resource, $http) {
     {},
     {
       authLogs: { method: 'GET', params: { action: 'authlogs' } },
+      logs: { method: 'GET', params: { action: 'logs' } },
     }
   );
 
-  return { authLogs: resource.authLogs, authLogsAsCSV };
+  return { authLogsAsCSV, logsAsCSV, ...resource };
 
   async function authLogsAsCSV(params) {
     return $http({
       method: 'GET',
       url: `${BASE_URL}/authlogs.csv`,
+      params,
+      responseType: 'blob',
+      headers: {
+        'Content-type': 'text/csv',
+      },
+    });
+  }
+
+  async function logsAsCSV(params) {
+    return $http({
+      method: 'GET',
+      url: `${BASE_URL}/logs.csv`,
       params,
       responseType: 'blob',
       headers: {

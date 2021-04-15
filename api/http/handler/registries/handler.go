@@ -5,10 +5,14 @@ import (
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/registryproxy"
 	"github.com/portainer/portainer/api/http/security"
+)
+
+const (
+	handlerActivityContext = "Portainer"
 )
 
 func hideFields(registry *portainer.Registry) {
@@ -22,17 +26,19 @@ type Handler struct {
 	requestBouncer       *security.RequestBouncer
 	registryProxyService *registryproxy.Service
 
-	DataStore    portainer.DataStore
-	FileService  portainer.FileService
-	ProxyManager *proxy.Manager
+	DataStore         portainer.DataStore
+	FileService       portainer.FileService
+	ProxyManager      *proxy.Manager
+	UserActivityStore portainer.UserActivityStore
 }
 
 // NewHandler creates a handler to manage registry operations.
-func NewHandler(bouncer *security.RequestBouncer) *Handler {
+func NewHandler(bouncer *security.RequestBouncer, userActivityStore portainer.UserActivityStore) *Handler {
 	h := &Handler{
 		Router:               mux.NewRouter(),
 		requestBouncer:       bouncer,
-		registryProxyService: registryproxy.NewService(),
+		registryProxyService: registryproxy.NewService(userActivityStore),
+		UserActivityStore:    userActivityStore,
 	}
 
 	h.Handle("/registries",

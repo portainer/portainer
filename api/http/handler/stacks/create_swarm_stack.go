@@ -14,6 +14,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/http/useractivity"
 )
 
 type swarmStackFromFileContentPayload struct {
@@ -90,6 +91,8 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack inside the database", err}
 	}
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, endpoint.Name, r, payload)
 
 	doCleanUp = false
 	return handler.decorateStackResponse(w, stack, userID)
@@ -191,6 +194,8 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack inside the database", err}
 	}
 
+	useractivity.LogHttpActivity(handler.UserActivityStore, endpoint.Name, r, payload)
+
 	doCleanUp = false
 	return handler.decorateStackResponse(w, stack, userID)
 }
@@ -284,6 +289,8 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack inside the database", err}
 	}
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, endpoint.Name, r, payload)
 
 	doCleanUp = false
 	return handler.decorateStackResponse(w, stack, userID)

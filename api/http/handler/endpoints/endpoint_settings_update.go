@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/http/useractivity"
 )
 
 type endpointSettingsUpdatePayload struct {
@@ -92,6 +93,8 @@ func (handler *Handler) endpointSettingsUpdate(w http.ResponseWriter, r *http.Re
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Failed persisting endpoint in database", err}
 	}
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, endpoint.Name, r, payload)
 
 	if updateAuthorizations {
 		err := handler.AuthorizationService.UpdateUsersAuthorizations()

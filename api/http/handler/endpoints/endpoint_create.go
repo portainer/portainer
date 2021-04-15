@@ -17,7 +17,9 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/client"
+	"github.com/portainer/portainer/api/http/useractivity"
 	"github.com/portainer/portainer/api/internal/edge"
+	consts "github.com/portainer/portainer/api/useractivity"
 )
 
 type endpointCreatePayload struct {
@@ -193,6 +195,9 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	handler.AuthorizationService.TriggerUsersAuthUpdate()
+
+	payload.AzureAuthenticationKey = consts.RedactedValue
+	useractivity.LogHttpActivity(handler.UserActivityStore, endpoint.Name, r, payload)
 
 	return response.JSON(w, endpoint)
 }

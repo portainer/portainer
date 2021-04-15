@@ -3,18 +3,21 @@ package docker
 import (
 	"encoding/base64"
 	"encoding/json"
-	"errors"
 	"log"
 	"net/http"
 	"path"
 	"regexp"
 	"strings"
 
+	"github.com/pkg/errors"
+
 	"github.com/docker/docker/client"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/http/useractivity"
+	"github.com/portainer/portainer/api/http/utils"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
 
@@ -31,6 +34,7 @@ type (
 		reverseTunnelService portainer.ReverseTunnelService
 		dockerClient         *client.Client
 		dockerClientFactory  *docker.ClientFactory
+		userActivityStore    portainer.UserActivityStore
 	}
 
 	// TransportParameters is used to create a new Transport
@@ -40,6 +44,7 @@ type (
 		SignatureService     portainer.DigitalSignatureService
 		ReverseTunnelService portainer.ReverseTunnelService
 		DockerClientFactory  *docker.ClientFactory
+		UserActivityStore    portainer.UserActivityStore
 	}
 
 	restrictedDockerOperationContext struct {
@@ -73,6 +78,7 @@ func NewTransport(parameters *TransportParameters, httpTransport *http.Transport
 		dockerClientFactory:  parameters.DockerClientFactory,
 		HTTPTransport:        httpTransport,
 		dockerClient:         dockerClient,
+		userActivityStore:    parameters.UserActivityStore,
 	}
 
 	return transport, nil
@@ -125,12 +131,28 @@ func (transport *Transport) ProxyDockerRequest(request *http.Request) (*http.Res
 	case strings.HasPrefix(requestPath, "/v2"):
 		return transport.proxyAgentRequest(request)
 	default:
-		return transport.executeDockerRequest(request)
+		return transport.executeDockerRequest(request, true)
 	}
 }
 
-func (transport *Transport) executeDockerRequest(request *http.Request) (*http.Response, error) {
+func (transport *Transport) executeDockerRequest(request *http.Request, shouldLog bool) (*http.Response, error) {
+	var body []byte
+
+	if shouldLog {
+		bodyBytes, err := utils.CopyBody(request)
+		if err != nil {
+			return nil, err
+		}
+
+		body = bodyBytes
+	}
+
 	response, err := transport.HTTPTransport.RoundTrip(request)
+
+	// log if request is success
+	if shouldLog && err == nil && (200 <= response.StatusCode && response.StatusCode < 300) {
+		useractivity.LogProxyActivity(transport.userActivityStore, transport.endpoint.Name, request, body)
+	}
 
 	if transport.endpoint.Type != portainer.EdgeAgentOnDockerEnvironment {
 		return response, err
@@ -166,13 +188,13 @@ func (transport *Transport) proxyAgentRequest(r *http.Request) (*http.Response, 
 		return transport.restrictedResourceOperation(r, resourceID, portainer.VolumeResourceControl, true)
 	}
 
-	return transport.executeDockerRequest(r)
+	return transport.executeDockerRequest(r, true)
 }
 
 func (transport *Transport) proxyConfigRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/configs/create":
-		return transport.decorateGenericResourceCreationOperation(request, configObjectIdentifier, portainer.ConfigResourceControl)
+		return transport.decorateConfigCreationOperation(request)
 
 	case "/configs":
 		return transport.rewriteOperation(request, transport.configListOperation)
@@ -223,7 +245,7 @@ func (transport *Transport) proxyContainerRequest(request *http.Request) (*http.
 
 			return transport.restrictedResourceOperation(request, containerID, portainer.ContainerResourceControl, false)
 		}
-		return transport.executeDockerRequest(request)
+		return transport.executeDockerRequest(request, true)
 	}
 }
 
@@ -253,7 +275,7 @@ func (transport *Transport) proxyServiceRequest(request *http.Request) (*http.Re
 			}
 			return transport.restrictedResourceOperation(request, serviceID, portainer.ServiceResourceControl, false)
 		}
-		return transport.executeDockerRequest(request)
+		return transport.executeDockerRequest(request, true)
 	}
 }
 
@@ -277,7 +299,7 @@ func (transport *Transport) proxyVolumeRequest(request *http.Request) (*http.Res
 func (transport *Transport) proxyNetworkRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/networks/create":
-		return transport.decorateGenericResourceCreationOperation(request, networkObjectIdentifier, portainer.NetworkResourceControl)
+		return transport.decorateGenericResourceCreationOperation(request, networkObjectIdentifier, portainer.NetworkResourceControl, true)
 
 	case "/networks":
 		return transport.rewriteOperation(request, transport.networkListOperation)
@@ -298,7 +320,7 @@ func (transport *Transport) proxyNetworkRequest(request *http.Request) (*http.Re
 func (transport *Transport) proxySecretRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/secrets/create":
-		return transport.decorateGenericResourceCreationOperation(request, secretObjectIdentifier, portainer.SecretResourceControl)
+		return transport.decorateSecretCreationOperation(request)
 
 	case "/secrets":
 		return transport.rewriteOperation(request, transport.secretListOperation)
@@ -324,7 +346,7 @@ func (transport *Transport) proxyNodeRequest(request *http.Request) (*http.Respo
 		return transport.administratorOperation(request)
 	}
 
-	return transport.executeDockerRequest(request)
+	return transport.executeDockerRequest(request, true)
 }
 
 func (transport *Transport) proxySwarmRequest(request *http.Request) (*http.Response, error) {
@@ -343,7 +365,7 @@ func (transport *Transport) proxyTaskRequest(request *http.Request) (*http.Respo
 		return transport.rewriteOperation(request, transport.taskListOperation)
 	default:
 		// assume /tasks/{id}
-		return transport.executeDockerRequest(request)
+		return transport.executeDockerRequest(request, true)
 	}
 }
 
@@ -359,7 +381,7 @@ func (transport *Transport) proxyImageRequest(request *http.Request) (*http.Resp
 		if path.Base(requestPath) == "push" && request.Method == http.MethodPost {
 			return transport.replaceRegistryAuthenticationHeader(request)
 		}
-		return transport.executeDockerRequest(request)
+		return transport.executeDockerRequest(request, true)
 	}
 }
 
@@ -396,7 +418,7 @@ func (transport *Transport) replaceRegistryAuthenticationHeader(request *http.Re
 		request.Header.Set("X-Registry-Auth", header)
 	}
 
-	return transport.decorateGenericResourceCreationOperation(request, serviceObjectIdentifier, portainer.ServiceResourceControl)
+	return transport.decorateGenericResourceCreationOperation(request, serviceObjectIdentifier, portainer.ServiceResourceControl, true)
 }
 
 func (transport *Transport) restrictedResourceOperation(request *http.Request, resourceID string, resourceType portainer.ResourceControlType, volumeBrowseRestrictionCheck bool) (*http.Response, error) {
@@ -430,7 +452,7 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 		_, endpointResourceAccess := user.EndpointAuthorizations[transport.endpoint.ID][portainer.EndpointResourcesAccess]
 
 		if endpointResourceAccess {
-			return transport.executeDockerRequest(request)
+			return transport.executeDockerRequest(request, true)
 		}
 
 		teamMemberships, err := transport.dataStore.TeamMembership().TeamMembershipsByUserID(tokenData.ID)
@@ -469,7 +491,7 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 		}
 	}
 
-	return transport.executeDockerRequest(request)
+	return transport.executeDockerRequest(request, true)
 }
 
 // rewriteOperationWithLabelFiltering will create a new operation context with data that will be used
@@ -515,7 +537,7 @@ func (transport *Transport) interceptAndRewriteRequest(request *http.Request, op
 		return nil, err
 	}
 
-	return transport.executeDockerRequest(request)
+	return transport.executeDockerRequest(request, true)
 }
 
 // decorateGenericResourceCreationResponse extracts the response as a JSON object, extracts the resource identifier from that object based
@@ -551,13 +573,13 @@ func (transport *Transport) decorateGenericResourceCreationResponse(response *ht
 	return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
 }
 
-func (transport *Transport) decorateGenericResourceCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
+func (transport *Transport) decorateGenericResourceCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType, log bool) (*http.Response, error) {
 	tokenData, err := security.RetrieveTokenData(request)
 	if err != nil {
 		return nil, err
 	}
 
-	response, err := transport.executeDockerRequest(request)
+	response, err := transport.executeDockerRequest(request, log)
 	if err != nil {
 		return response, err
 	}
@@ -593,7 +615,7 @@ func (transport *Transport) executeGenericResourceDeletionOperation(request *htt
 }
 
 func (transport *Transport) executeRequestAndRewriteResponse(request *http.Request, operation restrictedOperationRequest, executor *operationExecutor) (*http.Response, error) {
-	response, err := transport.executeDockerRequest(request)
+	response, err := transport.executeDockerRequest(request, true)
 	if err != nil {
 		return response, err
 	}
@@ -614,7 +636,7 @@ func (transport *Transport) administratorOperation(request *http.Request) (*http
 		return responseutils.WriteAccessDeniedResponse()
 	}
 
-	return transport.executeDockerRequest(request)
+	return transport.executeDockerRequest(request, true)
 }
 
 func (transport *Transport) createRegistryAccessContext(request *http.Request) (*registryAccessContext, error) {

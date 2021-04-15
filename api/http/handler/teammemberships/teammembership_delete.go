@@ -6,10 +6,11 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/http/useractivity"
 )
 
 // DELETE request on /api/team_memberships/:id
@@ -46,6 +47,8 @@ func (handler *Handler) teamMembershipDelete(w http.ResponseWriter, r *http.Requ
 	}
 
 	handler.AuthorizationService.TriggerUserAuthUpdate(int(membership.UserID))
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, handlerActivityContext, r, nil)
 
 	return response.Empty(w)
 }

@@ -1,24 +1,25 @@
 package endpoints
 
 import (
-	"net/http"
-	"fmt"
 	"errors"
+	"fmt"
+	"net/http"
 	"strings"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/http/useractivity"
 )
 
 type resourcePoolUpdatePayload struct {
-	UsersToAdd     []int
-	TeamsToAdd     []int
-	UsersToRemove  []int
-	TeamsToRemove  []int
+	UsersToAdd    []int
+	TeamsToAdd    []int
+	UsersToRemove []int
+	TeamsToRemove []int
 }
 
 func (payload *resourcePoolUpdatePayload) Validate(r *http.Request) error {
@@ -117,7 +118,7 @@ func (handler *Handler) endpointPoolsAccessUpdate(w http.ResponseWriter, r *http
 		}
 	}
 
-	if (payload.TeamsToAdd != nil && len(payload.TeamsToAdd) > 0) || 
+	if (payload.TeamsToAdd != nil && len(payload.TeamsToAdd) > 0) ||
 		(payload.TeamsToRemove != nil && len(payload.TeamsToRemove) > 0) {
 		handler.AuthorizationService.TriggerEndpointAuthUpdate(endpointID)
 	}
@@ -126,6 +127,8 @@ func (handler *Handler) endpointPoolsAccessUpdate(w http.ResponseWriter, r *http
 		err = fmt.Errorf(strings.Join(errs, "\n"))
 		return &httperror.HandlerError{http.StatusInternalServerError, "There are 1 or more errors when updating resource pool access", err}
 	}
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, endpoint.Name, r, payload)
 
 	return response.Empty(w)
 }

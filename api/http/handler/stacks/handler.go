@@ -37,6 +37,7 @@ type Handler struct {
 	KubernetesDeployer      portainer.KubernetesDeployer
 	KubernetesClientFactory *cli.ClientFactory
 	AuthorizationService    *authorization.Service
+	UserActivityStore       portainer.UserActivityStore
 }
 
 // NewHandler creates a handler to manage stack operations.

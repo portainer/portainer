@@ -8,6 +8,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/http/useractivity"
 	"github.com/portainer/portainer/api/internal/stackutils"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -83,6 +84,8 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update stack status", err}
 	}
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, endpoint.Name, r, nil)
 
 	return response.JSON(w, stack)
 }

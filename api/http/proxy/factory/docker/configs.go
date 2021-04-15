@@ -2,13 +2,19 @@ package docker
 
 import (
 	"context"
+	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/docker/docker/client"
+	"github.com/pkg/errors"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
+	useractivityhttp "github.com/portainer/portainer/api/http/useractivity"
+	"github.com/portainer/portainer/api/http/utils"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/useractivity"
 )
 
 const (
@@ -72,6 +78,31 @@ func (transport *Transport) configInspectOperation(response *http.Response, exec
 	return transport.applyAccessControlOnResource(resourceOperationParameters, responseObject, response, executor)
 }
 
+func (transport *Transport) decorateConfigCreationOperation(request *http.Request) (*http.Response, error) {
+	body, err := utils.CopyBody(request)
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := transport.decorateGenericResourceCreationOperation(request, configObjectIdentifier, portainer.ConfigResourceControl, false)
+
+	if err == nil && (200 <= response.StatusCode && response.StatusCode < 300) {
+		transport.logCreateConfigOperation(request, body)
+	}
+
+	return response, err
+}
+
+func (transport *Transport) logCreateConfigOperation(request *http.Request, body []byte) {
+	cleanBody, err := hideConfigInfo(body)
+	if err != nil {
+		log.Printf("[ERROR] [http,docker,config] [message: failed cleaning request body] [error: %s]", err)
+		return
+	}
+
+	useractivityhttp.LogHttpActivity(transport.userActivityStore, transport.endpoint.Name, request, cleanBody)
+}
+
 // selectorConfigLabels retrieve the labels object associated to the config object.
 // Labels are available under the "Spec.Labels" property.
 // API schema references:
@@ -84,4 +115,24 @@ func selectorConfigLabels(responseObject map[string]interface{}) map[string]inte
 		return secretLabelsObject
 	}
 	return nil
+}
+
+// hideConfigInfo removes the confidential properties from the secret payload and returns the new payload
+// it will read the request body and recreate it
+func hideConfigInfo(body []byte) (interface{}, error) {
+	type requestPayload struct {
+		Data   string
+		Labels interface{}
+		Name   string
+	}
+
+	var payload requestPayload
+	err := json.Unmarshal(body, &payload)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed parsing body")
+	}
+
+	payload.Data = useractivity.RedactedValue
+
+	return payload, nil
 }

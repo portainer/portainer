@@ -8,11 +8,13 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/http/useractivity"
 	"github.com/portainer/portainer/api/internal/authorization"
+	consts "github.com/portainer/portainer/api/useractivity"
 )
 
 type userCreatePayload struct {
@@ -83,6 +85,9 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist user inside the database", err}
 	}
+
+	payload.Password = consts.RedactedValue
+	useractivity.LogHttpActivity(handler.UserActivityStore, "", r, payload)
 
 	hideFields(user)
 	return response.JSON(w, user)

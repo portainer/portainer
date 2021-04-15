@@ -20,6 +20,7 @@ type Handler struct {
 	authorizationService    *authorization.Service
 	requestBouncer          *security.RequestBouncer
 	connectionUpgrader      websocket.Upgrader
+	UserActivityStore       portainer.UserActivityStore
 }
 
 // NewHandler creates a handler to manage websocket operations.

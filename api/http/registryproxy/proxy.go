@@ -4,19 +4,21 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/orcaman/concurrent-map"
+	cmap "github.com/orcaman/concurrent-map"
 	portainer "github.com/portainer/portainer/api"
 )
 
 // Service represents a service used to manage registry proxies.
 type Service struct {
-	proxies cmap.ConcurrentMap
+	proxies           cmap.ConcurrentMap
+	userActivityStore portainer.UserActivityStore
 }
 
 // NewService returns a pointer to a Service.
-func NewService() *Service {
+func NewService(userActivityStore portainer.UserActivityStore) *Service {
 	return &Service{
-		proxies: cmap.New(),
+		proxies:           cmap.New(),
+		userActivityStore: userActivityStore,
 	}
 }
 
@@ -37,15 +39,15 @@ func (service *Service) createProxy(key, uri string, config *portainer.RegistryM
 
 	switch config.Type {
 	case portainer.AzureRegistry:
-		proxy, err = newTokenSecuredRegistryProxy(uri, config)
+		proxy, err = newTokenSecuredRegistryProxy(uri, config, service.userActivityStore)
 	case portainer.GitlabRegistry:
 		if strings.Contains(key, "gitlab") {
-			proxy, err = newGitlabRegistryProxy(uri, config)
+			proxy, err = newGitlabRegistryProxy(uri, config, service.userActivityStore)
 		} else {
-			proxy, err = newTokenSecuredRegistryProxy(uri, config)
+			proxy, err = newTokenSecuredRegistryProxy(uri, config, service.userActivityStore)
 		}
 	default:
-		proxy, err = newCustomRegistryProxy(uri, config)
+		proxy, err = newCustomRegistryProxy(uri, config, service.userActivityStore)
 	}
 
 	if err != nil {

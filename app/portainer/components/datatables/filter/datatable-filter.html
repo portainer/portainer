@@ -11,13 +11,13 @@
       <div class="menuContent">
         <div class="md-checkbox" ng-repeat="filter in $ctrl.labels track by filter.value">
           <input
-            id="filter_valid_{{ $index }}"
+            id="filter_{{ $ctrl.filterKey }}_{{ $index }}"
             type="checkbox"
             ng-value="filter.value"
             ng-checked="$ctrl.state.includes(filter.value)"
             ng-click="$ctrl.onChangeItem(filter.value)"
           />
-          <label for="filter_valid_{{ $index }}">
+          <label for="filter_{{ $ctrl.filterKey }}_{{ $index }}">
             {{ filter.label }}
           </label>
         </div>

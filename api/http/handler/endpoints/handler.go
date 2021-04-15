@@ -1,8 +1,9 @@
 package endpoints
 
 import (
-	"github.com/portainer/portainer/api/docker"
 	"net/http"
+
+	"github.com/portainer/portainer/api/docker"
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
@@ -33,6 +34,7 @@ type Handler struct {
 	K8sClientFactory     *cli.ClientFactory
 	ComposeStackManager  portainer.ComposeStackManager
 	DockerClientFactory  *docker.ClientFactory
+	UserActivityStore    portainer.UserActivityStore
 }
 
 // NewHandler creates a handler to manage endpoint operations.

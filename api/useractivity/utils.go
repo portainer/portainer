@@ -68,3 +68,44 @@ func MarshalAuthLogsToCSV(w io.Writer, logs []*portainer.AuthActivityLog) error 
 
 	return csvw.Error()
 }
+
+// MarshalLogsToCSV converts a list of logs to a CSV string
+func MarshalLogsToCSV(w io.Writer, logs []*portainer.UserActivityLog) error {
+	var headers = []string{
+		"Time",
+		"Username",
+		"Endpoint",
+		"Action",
+		"Payload",
+	}
+
+	csvw := csv.NewWriter(w)
+
+	err := csvw.Write(headers)
+	if err != nil {
+		return err
+	}
+
+	for _, log := range logs {
+
+		timestamp := time.Unix(log.Timestamp, 0)
+		formattedTimestamp := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d",
+			timestamp.Year(), timestamp.Month(), timestamp.Day(),
+			timestamp.Hour(), timestamp.Minute(), timestamp.Second())
+
+		err := csvw.Write([]string{
+			formattedTimestamp,
+			log.Username,
+			log.Context,
+			log.Action,
+			string(log.Payload),
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	csvw.Flush()
+
+	return csvw.Error()
+}

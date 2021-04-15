@@ -6,8 +6,9 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/http/useractivity"
 	"github.com/portainer/portainer/api/internal/edge"
 )
 
@@ -98,6 +99,8 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the tag from the database", err}
 	}
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, handlerActivityContext, r, nil)
 
 	return response.Empty(w)
 }

@@ -8,10 +8,12 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/http/useractivity"
+	consts "github.com/portainer/portainer/api/useractivity"
 )
 
 type userUpdatePayload struct {
@@ -93,6 +95,9 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	handler.AuthorizationService.TriggerUserAuthUpdate(int(user.ID))
+
+	payload.Password = consts.RedactedValue
+	useractivity.LogHttpActivity(handler.UserActivityStore, "", r, payload)
 
 	return response.JSON(w, user)
 }

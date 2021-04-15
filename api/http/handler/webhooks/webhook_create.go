@@ -9,8 +9,9 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/http/useractivity"
 )
 
 type webhookCreatePayload struct {
@@ -47,6 +48,15 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusConflict, "A webhook for this resource already exists", errors.New("A webhook for this resource already exists")}
 	}
 
+	endpointID := portainer.EndpointID(payload.EndpointID)
+
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
+	if err == bolterrors.ErrObjectNotFound {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
+	} else if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
+	}
+
 	token, err := uuid.NewV4()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Error creating unique token", err}
@@ -55,7 +65,7 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 	webhook = &portainer.Webhook{
 		Token:       token.String(),
 		ResourceID:  payload.ResourceID,
-		EndpointID:  portainer.EndpointID(payload.EndpointID),
+		EndpointID:  endpointID,
 		WebhookType: portainer.WebhookType(payload.WebhookType),
 	}
 
@@ -63,6 +73,8 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the webhook inside the database", err}
 	}
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, endpoint.Name, r, payload)
 
 	return response.JSON(w, webhook)
 }

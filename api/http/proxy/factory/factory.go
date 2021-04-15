@@ -24,6 +24,7 @@ type (
 		kubernetesClientFactory     *cli.ClientFactory
 		kubernetesTokenCacheManager *kubernetes.TokenCacheManager
 		authService                 *authorization.Service
+		userActivityStore           portainer.UserActivityStore
 	}
 )
 
@@ -36,6 +37,7 @@ func NewProxyFactory(
 	kubernetesClientFactory *cli.ClientFactory,
 	kubernetesTokenCacheManager *kubernetes.TokenCacheManager,
 	authService *authorization.Service,
+	userActivityStore portainer.UserActivityStore,
 ) *ProxyFactory {
 	return &ProxyFactory{
 		dataStore:                   dataStore,
@@ -45,6 +47,7 @@ func NewProxyFactory(
 		kubernetesClientFactory:     kubernetesClientFactory,
 		kubernetesTokenCacheManager: kubernetesTokenCacheManager,
 		authService:                 authService,
+		userActivityStore:           userActivityStore,
 	}
 }
 
@@ -64,7 +67,7 @@ func (factory *ProxyFactory) NewLegacyExtensionProxy(extensionAPIURL string) (ht
 func (factory *ProxyFactory) NewEndpointProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
 	switch endpoint.Type {
 	case portainer.AzureEnvironment:
-		return newAzureProxy(endpoint, factory.dataStore)
+		return newAzureProxy(factory.userActivityStore, endpoint, factory.dataStore)
 	case portainer.EdgeAgentOnKubernetesEnvironment, portainer.AgentOnKubernetesEnvironment, portainer.KubernetesLocalEnvironment:
 		return factory.newKubernetesProxy(endpoint)
 	}
@@ -74,5 +77,5 @@ func (factory *ProxyFactory) NewEndpointProxy(endpoint *portainer.Endpoint) (htt
 
 // NewGitlabProxy returns a new HTTP proxy to a Gitlab API server
 func (factory *ProxyFactory) NewGitlabProxy(gitlabAPIUri string) (http.Handler, error) {
-	return newGitlabProxy(gitlabAPIUri)
+	return newGitlabProxy(gitlabAPIUri, factory.userActivityStore)
 }

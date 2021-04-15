@@ -13,8 +13,10 @@ import (
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/http/useractivity"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/tag"
+	consts "github.com/portainer/portainer/api/useractivity"
 )
 
 type endpointUpdatePayload struct {
@@ -305,6 +307,10 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint relation changes inside the database", err}
 		}
 	}
+
+	redacted := consts.RedactedValue
+	payload.AzureAuthenticationKey = &redacted
+	useractivity.LogHttpActivity(handler.UserActivityStore, endpoint.Name, r, payload)
 
 	return response.JSON(w, endpoint)
 }

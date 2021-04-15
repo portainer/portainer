@@ -6,14 +6,17 @@ import (
 	"net/url"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/useractivity"
+	"github.com/portainer/portainer/api/http/utils"
 )
 
 type gitlabTransport struct {
-	config        *portainer.RegistryManagementConfiguration
-	httpTransport *http.Transport
+	config            *portainer.RegistryManagementConfiguration
+	httpTransport     *http.Transport
+	userActivityStore portainer.UserActivityStore
 }
 
-func newGitlabRegistryProxy(uri string, config *portainer.RegistryManagementConfiguration) (http.Handler, error) {
+func newGitlabRegistryProxy(uri string, config *portainer.RegistryManagementConfiguration, userActivityStore portainer.UserActivityStore) (http.Handler, error) {
 	url, err := url.Parse(uri)
 	if err != nil {
 		return nil, err
@@ -21,8 +24,9 @@ func newGitlabRegistryProxy(uri string, config *portainer.RegistryManagementConf
 
 	proxy := newSingleHostReverseProxyWithHostHeader(url)
 	proxy.Transport = &gitlabTransport{
-		config:        config,
-		httpTransport: &http.Transport{},
+		config:            config,
+		httpTransport:     &http.Transport{},
+		userActivityStore: userActivityStore,
 	}
 
 	return proxy, nil
@@ -38,10 +42,25 @@ func (transport *gitlabTransport) RoundTrip(request *http.Request) (*http.Respon
 	if token == "" {
 		return nil, errors.New("No gitlab token provided")
 	}
+
 	r, err := http.NewRequest(request.Method, request.URL.String(), nil)
 	if err != nil {
 		return nil, err
 	}
+
 	r.Header.Set("Private-Token", token)
-	return transport.httpTransport.RoundTrip(r)
+
+	body, err := utils.CopyBody(request)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := transport.httpTransport.RoundTrip(r)
+
+	// log if request is success
+	if err == nil && (200 <= resp.StatusCode && resp.StatusCode < 300) {
+		useractivity.LogProxyActivity(transport.userActivityStore, "Portainer", r, body)
+	}
+
+	return resp, err
 }

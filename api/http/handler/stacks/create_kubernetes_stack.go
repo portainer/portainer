@@ -11,6 +11,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/http/useractivity"
 	endpointutils "github.com/portainer/portainer/api/internal/endpoint"
 )
 
@@ -86,6 +87,8 @@ func (handler *Handler) createKubernetesStack(w http.ResponseWriter, r *http.Req
 	resp := &createKubernetesStackResponse{
 		Output: output,
 	}
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, endpoint.Name, r, payload)
 
 	return response.JSON(w, resp)
 }

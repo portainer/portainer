@@ -12,6 +12,7 @@ import (
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/http/useractivity"
 	"github.com/portainer/portainer/api/internal/stackutils"
 )
 
@@ -105,6 +106,8 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove stack files from disk", err}
 	}
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, endpoint.Name, r, nil)
 
 	return response.Empty(w)
 }

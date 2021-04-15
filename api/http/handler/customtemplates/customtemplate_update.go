@@ -14,6 +14,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/http/useractivity"
 )
 
 type customTemplateUpdatePayload struct {
@@ -102,6 +103,8 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist custom template changes inside the database", err}
 	}
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, handlerActivityContext, r, payload)
 
 	return response.JSON(w, customTemplate)
 }

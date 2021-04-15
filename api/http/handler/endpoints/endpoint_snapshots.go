@@ -6,7 +6,8 @@ import (
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/useractivity"
 	"github.com/portainer/portainer/api/internal/snapshot"
 )
 
@@ -44,6 +45,8 @@ func (handler *Handler) endpointSnapshots(w http.ResponseWriter, r *http.Request
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint changes inside the database", err}
 		}
 	}
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, "Portainer", r, nil)
 
 	return response.Empty(w)
 }

@@ -17,6 +17,7 @@ func (factory ProxyFactory) newOSBasedLocalProxy(path string, endpoint *portaine
 		ReverseTunnelService: factory.reverseTunnelService,
 		SignatureService:     factory.signatureService,
 		DockerClientFactory:  factory.dockerClientFactory,
+		UserActivityStore:    factory.userActivityStore,
 	}
 
 	proxy := &dockerLocalProxy{}

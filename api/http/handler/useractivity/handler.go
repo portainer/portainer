@@ -26,5 +26,10 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h.Handle("/useractivity/authlogs.csv",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.authLogsCSV))).Methods(http.MethodGet)
 
+	h.Handle("/useractivity/logs",
+		bouncer.AdminAccess(httperror.LoggerHandler(h.logsList))).Methods(http.MethodGet)
+	h.Handle("/useractivity/logs.csv",
+		bouncer.AdminAccess(httperror.LoggerHandler(h.logsCSV))).Methods(http.MethodGet)
+
 	return h
 }

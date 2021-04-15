@@ -13,6 +13,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/http/useractivity"
 )
 
 // websocketPodExec handles GET requests on /websocket/pod?token=<token>&endpointId=<endpointID>&namespace=<namespace>&podName=<podName>&containerName=<containerName>&command=<command>
@@ -102,12 +103,18 @@ func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to proxy websocket request to agent", err}
 		}
+
+		useractivity.LogHttpActivity(handler.UserActivityStore, endpoint.Name, r, nil)
+
 		return nil
 	} else if endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
 		err := handler.proxyEdgeAgentWebsocketRequest(w, r, params)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to proxy websocket request to Edge agent", err}
 		}
+
+		useractivity.LogHttpActivity(handler.UserActivityStore, endpoint.Name, r, nil)
+
 		return nil
 	}
 
@@ -127,6 +134,8 @@ func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request)
 	errorChan := make(chan error, 1)
 	go streamFromWebsocketToWriter(websocketConn, stdinWriter, errorChan)
 	go streamFromReaderToWebsocket(websocketConn, stdoutReader, errorChan)
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, endpoint.Name, r, nil)
 
 	err = cli.StartExecProcess(namespace, podName, containerName, commandArray, stdinReader, stdoutWriter)
 	if err != nil {

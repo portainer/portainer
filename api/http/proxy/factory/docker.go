@@ -61,6 +61,7 @@ func (factory *ProxyFactory) newDockerHTTPProxy(endpoint *portainer.Endpoint) (h
 		ReverseTunnelService: factory.reverseTunnelService,
 		SignatureService:     factory.signatureService,
 		DockerClientFactory:  factory.dockerClientFactory,
+		UserActivityStore:    factory.userActivityStore,
 	}
 
 	dockerTransport, err := docker.NewTransport(transportParameters, httpTransport)

@@ -63,6 +63,12 @@ func (store *Store) cleanLogs() error {
 	}
 	log.Printf("[DEBUG] [message: removed %d old auth logs]", count)
 
+	count, err = store.cleanLogsByType(&portainer.UserActivityLog{})
+	if err != nil {
+		return fmt.Errorf("failed cleaning user activity logs: %w", err)
+	}
+	log.Printf("[DEBUG] [message: removed %d old user activity logs]", count)
+
 	return nil
 }
 

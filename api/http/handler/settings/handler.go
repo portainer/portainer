@@ -5,7 +5,7 @@ import (
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
@@ -14,6 +14,10 @@ func hideFields(settings *portainer.Settings) {
 	settings.LDAPSettings.Password = ""
 	settings.OAuthSettings.ClientSecret = ""
 }
+
+const (
+	handlerActivityContext = "Portainer"
+)
 
 // Handler is the HTTP handler used to handle settings operations.
 type Handler struct {
@@ -24,6 +28,7 @@ type Handler struct {
 	JWTService           portainer.JWTService
 	LDAPService          portainer.LDAPService
 	SnapshotService      portainer.SnapshotService
+	UserActivityStore    portainer.UserActivityStore
 }
 
 // NewHandler creates a handler to manage settings operations.

@@ -11,7 +11,8 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/useractivity"
 )
 
 // POST /api/edge_jobs?method=file|string
@@ -77,6 +78,8 @@ func (handler *Handler) createEdgeJobFromFileContent(w http.ResponseWriter, r *h
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to schedule Edge job", err}
 	}
 
+	useractivity.LogHttpActivity(handler.UserActivityStore, "Portainer", r, payload)
+
 	return response.JSON(w, edgeJob)
 }
 
@@ -134,6 +137,8 @@ func (handler *Handler) createEdgeJobFromFile(w http.ResponseWriter, r *http.Req
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to schedule Edge job", err}
 	}
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, "Portainer", r, payload)
 
 	return response.JSON(w, edgeJob)
 }

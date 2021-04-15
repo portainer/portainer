@@ -50,13 +50,15 @@ func (handler *Handler) authLogsCSV(w http.ResponseWriter, r *http.Request) *htt
 	}
 
 	opts := portainer.AuthLogsQuery{
-		BeforeTimestamp: int64(before),
-		AfterTimestamp:  int64(after),
-		SortBy:          sortBy,
-		SortDesc:        sortDesc,
-		Keyword:         keyword,
-		ContextTypes:    contextTypes,
-		ActivityTypes:   activityTypes,
+		UserActivityLogBaseQuery: portainer.UserActivityLogBaseQuery{
+			BeforeTimestamp: int64(before),
+			AfterTimestamp:  int64(after),
+			SortBy:          sortBy,
+			SortDesc:        sortDesc,
+			Keyword:         keyword,
+		},
+		ContextTypes:  contextTypes,
+		ActivityTypes: activityTypes,
 	}
 
 	logs, _, err := handler.UserActivityStore.GetAuthLogs(opts)

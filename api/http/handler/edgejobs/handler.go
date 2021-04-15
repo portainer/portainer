@@ -5,7 +5,7 @@ import (
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -15,6 +15,7 @@ type Handler struct {
 	DataStore            portainer.DataStore
 	FileService          portainer.FileService
 	ReverseTunnelService portainer.ReverseTunnelService
+	UserActivityStore    portainer.UserActivityStore
 }
 
 // NewHandler creates a handler to manage Edge job operations.

@@ -16,6 +16,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/http/useractivity"
 )
 
 // this is coming from libcompose
@@ -95,6 +96,8 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack inside the database", err}
 	}
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, endpoint.Name, r, payload)
 
 	doCleanUp = false
 	return handler.decorateStackResponse(w, stack, userID)
@@ -192,6 +195,8 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack inside the database", err}
 	}
 
+	useractivity.LogHttpActivity(handler.UserActivityStore, endpoint.Name, r, payload)
+
 	doCleanUp = false
 	return handler.decorateStackResponse(w, stack, userID)
 }
@@ -277,6 +282,8 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack inside the database", err}
 	}
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, endpoint.Name, r, payload)
 
 	doCleanUp = false
 	return handler.decorateStackResponse(w, stack, userID)

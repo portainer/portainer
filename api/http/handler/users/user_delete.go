@@ -2,8 +2,8 @@ package users
 
 import (
 	"errors"
-	"net/http"
 	"fmt"
+	"net/http"
 	"strings"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -12,6 +12,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/http/useractivity"
 )
 
 // DELETE request on /api/users/:id
@@ -42,12 +43,24 @@ func (handler *Handler) userDelete(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	if user.Role == portainer.AdministratorRole {
-		return handler.deleteAdminUser(w, user)
+		responseErr := handler.deleteAdminUser(w, user)
+		if responseErr != nil {
+			return responseErr
+		}
+
+		useractivity.LogHttpActivity(handler.UserActivityStore, "", r, nil)
+		return nil
 	}
 
 	handler.AuthorizationService.TriggerUserAuthUpdate(int(user.ID))
 
-	return handler.deleteUser(w, user)
+	responseErr := handler.deleteUser(w, user)
+	if err != nil {
+		return responseErr
+	}
+
+	useractivity.LogHttpActivity(handler.UserActivityStore, "", r, nil)
+	return nil
 }
 
 func (handler *Handler) deleteAdminUser(w http.ResponseWriter, user *portainer.User) *httperror.HandlerError {
