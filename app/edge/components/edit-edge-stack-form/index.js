@@ -10,5 +10,6 @@ angular.module('portainer.edge').component('editEdgeStackForm', {
     actionInProgress: '<',
     submitAction: '<',
     edgeGroups: '<',
+    isEditorDirty: '=',
   },
 });

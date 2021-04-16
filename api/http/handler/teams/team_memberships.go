@@ -6,12 +6,23 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// GET request on /api/teams/:id/memberships
+// @id TeamMemberships
+// @summary List team memberships
+// @description List team memberships. Access is only available to administrators and team leaders.
+// @description **Access policy**: restricted
+// @tags team_memberships
+// @security jwt
+// @produce json
+// @success 200 {array} portainer.TeamMembership "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 500 "Server error"
+// @router /teams/{id}/memberships [get]
 func (handler *Handler) teamMemberships(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	teamID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

@@ -2,19 +2,33 @@ package stacks
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
+	portainer "github.com/portainer/portainer/api"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/stackutils"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
-// POST request on /api/stacks/:id/start
+// @id StackStart
+// @summary Starts a stopped Stack
+// @description Starts a stopped Stack.
+// @description **Access policy**: restricted
+// @tags stacks
+// @security jwt
+// @param id path int true "Stack identifier"
+// @success 200 {object} portainer.Stack "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 " not found"
+// @failure 500 "Server error"
+// @router /stacks/{id}/start [post]
 func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
@@ -45,7 +59,16 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
 	}
 
-	resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stack.Name, portainer.StackResourceControl)
+	isUnique, err := handler.checkUniqueName(endpoint, stack.Name, stack.ID, stack.SwarmID != "")
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
+	}
+	if !isUnique {
+		errorMessage := fmt.Sprintf("A stack with the name '%s' is already running", stack.Name)
+		return &httperror.HandlerError{http.StatusConflict, errorMessage, errors.New(errorMessage)}
+	}
+
+	resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the stack", err}
 	}
@@ -64,7 +87,7 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 
 	err = handler.startStack(stack, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to stop stack", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to start stack", err}
 	}
 
 	stack.Status = portainer.StackStatusActive

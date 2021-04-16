@@ -11,6 +11,16 @@ angular.module('portainer.app').factory('EndpointHelper', [
       });
     }
 
+    helper.isLocalEndpoint = isLocalEndpoint;
+    function isLocalEndpoint(endpoint) {
+      return endpoint.URL.includes('unix://') || endpoint.URL.includes('npipe://') || endpoint.Type === 5;
+    }
+
+    helper.isAgentEndpoint = isAgentEndpoint;
+    function isAgentEndpoint(endpoint) {
+      return [2, 4, 6, 7].includes(endpoint.Type);
+    }
+
     helper.mapGroupNameToEndpoint = function (endpoints, groups) {
       for (var i = 0; i < endpoints.length; i++) {
         var endpoint = endpoints[i];

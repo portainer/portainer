@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"path"
 	"path/filepath"
+	"regexp"
+	"strings"
 
 	"github.com/portainer/libcompose/config"
 	"github.com/portainer/libcompose/docker"
@@ -13,11 +15,12 @@ import (
 	"github.com/portainer/libcompose/lookup"
 	"github.com/portainer/libcompose/project"
 	"github.com/portainer/libcompose/project/options"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 const (
-	dockerClientVersion = "1.24"
+	dockerClientVersion     = "1.24"
+	composeSyntaxMaxVersion = "2"
 )
 
 // ComposeStackManager represents a service for managing compose stacks.
@@ -56,6 +59,19 @@ func (manager *ComposeStackManager) createClient(endpoint *portainer.Endpoint) (
 	}
 
 	return client.NewDefaultFactory(clientOpts)
+}
+
+// ComposeSyntaxMaxVersion returns the maximum supported version of the docker compose syntax
+func (manager *ComposeStackManager) ComposeSyntaxMaxVersion() string {
+	return composeSyntaxMaxVersion
+}
+
+// NormalizeStackName returns a new stack name with unsupported characters replaced
+func (manager *ComposeStackManager) NormalizeStackName(name string) string {
+	// this is coming from libcompose
+	// https://github.com/portainer/libcompose/blob/master/project/context.go#L117-L120
+	r := regexp.MustCompile("[^a-z0-9]+")
+	return r.ReplaceAllString(strings.ToLower(name), "")
 }
 
 // Up will deploy a compose stack (equivalent of docker-compose up)

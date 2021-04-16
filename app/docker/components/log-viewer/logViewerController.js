@@ -1,8 +1,11 @@
 import moment from 'moment';
+import _ from 'lodash-es';
 
 angular.module('portainer.docker').controller('LogViewerController', [
   'clipboard',
-  function (clipboard) {
+  'Blob',
+  'FileSaver',
+  function (clipboard, Blob, FileSaver) {
     this.state = {
       availableSinceDatetime: [
         { desc: 'Last day', value: moment().subtract(1, 'days').format() },
@@ -42,6 +45,11 @@ angular.module('portainer.docker').controller('LogViewerController', [
       } else {
         this.state.selectedLines.splice(idx, 1);
       }
+    };
+
+    this.downloadLogs = function () {
+      const data = new Blob([_.reduce(this.state.filteredLogs, (acc, log) => acc + '\n' + log, '')]);
+      FileSaver.saveAs(data, this.resourceName + '_logs.txt');
     };
   },
 ]);

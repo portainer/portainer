@@ -8,11 +8,12 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 type tagCreatePayload struct {
-	Name string
+	// Name
+	Name string `validate:"required" example:"org/acme"`
 }
 
 func (payload *tagCreatePayload) Validate(r *http.Request) error {
@@ -22,7 +23,18 @@ func (payload *tagCreatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// POST request on /api/tags
+// @id TagCreate
+// @summary Create a new tag
+// @description Create a new tag.
+// @description **Access policy**: administrator
+// @tags tags
+// @security jwt
+// @produce json
+// @param body body tagCreatePayload true "Tag details"
+// @success 200 {object} portainer.Tag "Success"
+// @failure 409 "Tag name exists"
+// @failure 500 "Server error"
+// @router /tags [post]
 func (handler *Handler) tagCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload tagCreatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)

@@ -1,0 +1,147 @@
+<rd-header>
+  <rd-header-title title-text="Docker features configuration"></rd-header-title>
+  <rd-header-content>Docker configuration</rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <form class="form-horizontal" name="$ctrl.form">
+          <div class="col-sm-12 form-section-title">
+            Host and Filesystem
+          </div>
+          <div ng-if="!$ctrl.isAgent" class="form-group">
+            <span class="col-sm-12 text-muted small">
+              <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              These features are only available for an Agent enabled endpoints.
+            </span>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <por-switch-field
+                ng-model="$ctrl.formValues.enableHostManagementFeatures"
+                name="enableHostManagementFeatures"
+                label="Enable host management features"
+                tooltip="Enable host management features: host system browsing and advanced host details."
+                disabled="!$ctrl.isAgent"
+                label-class="col-sm-7 col-lg-4"
+              ></por-switch-field>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <por-switch-field
+                ng-model="$ctrl.formValues.allowVolumeBrowserForRegularUsers"
+                name="allowVolumeBrowserForRegularUsers"
+                label="Enable volume management for non-administrators"
+                tooltip="When enabled, regular users will be able to use Portainer volume management features."
+                disabled="!$ctrl.isAgent"
+                label-class="col-sm-7 col-lg-4"
+              ></por-switch-field>
+            </div>
+          </div>
+          <!-- security -->
+          <div class="col-sm-12 form-section-title">
+            Docker Security Settings
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <por-switch-field
+                ng-model="$ctrl.formValues.disableBindMountsForRegularUsers"
+                name="disableBindMountsForRegularUsers"
+                label="Disable bind mounts for non-administrators"
+                tooltip="When enabled, regular users will not be able to use bind mounts when creating containers."
+                label-class="col-sm-7 col-lg-4"
+              ></por-switch-field>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <por-switch-field
+                ng-model="$ctrl.formValues.disablePrivilegedModeForRegularUsers"
+                name="disablePrivilegedModeForRegularUsers"
+                label="Disable privileged mode for non-administrators"
+                tooltip="When enabled, regular users will not be able to use privileged mode when creating containers."
+                label-class="col-sm-7 col-lg-4"
+              ></por-switch-field>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <por-switch-field
+                ng-model="$ctrl.formValues.disableHostNamespaceForRegularUsers"
+                name="disableHostNamespaceForRegularUsers"
+                label="Disable the use of host PID 1 for non-administrators"
+                tooltip="Prevent users from accessing the host filesystem through the host PID namespace."
+                label-class="col-sm-7 col-lg-4"
+              ></por-switch-field>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <por-switch-field
+                ng-model="$ctrl.formValues.disableStackManagementForRegularUsers"
+                name="disableStackManagementForRegularUsers"
+                label="Disable the use of Stacks for non-administrators"
+                label-class="col-sm-7 col-lg-4"
+              ></por-switch-field>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <por-switch-field
+                ng-model="$ctrl.formValues.disableDeviceMappingForRegularUsers"
+                name="disableDeviceMappingForRegularUsers"
+                label="Disable device mappings for non-administrators"
+                label-class="col-sm-7 col-lg-4"
+              ></por-switch-field>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <por-switch-field
+                ng-model="$ctrl.formValues.disableContainerCapabilitiesForRegularUsers"
+                name="disableContainerCapabilitiesForRegularUsers"
+                label="Disable container capabilities for non-administrators"
+                label-class="col-sm-7 col-lg-4"
+              ></por-switch-field>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <por-switch-field
+                ng-model="$ctrl.formValues.disableSysctlSettingForRegularUsers"
+                name="disableSysctlSettingForRegularUsers"
+                label="Disable sysctl settings for non-administrators"
+                label-class="col-sm-7 col-lg-4"
+              ></por-switch-field>
+            </div>
+          </div>
+
+          <div class="form-group" ng-if="$ctrl.isContainerEditDisabled()">
+            <span class="col-sm-12 text-muted small">
+              <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              Note: The recreate/duplicate/edit feature is currently disabled (for non-admin users) by one or more security settings.
+            </span>
+          </div>
+          <!-- !security -->
+
+          <!-- actions -->
+          <div class="col-sm-12 form-section-title">
+            Actions
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-primary btn-sm" ng-click="$ctrl.save()" ng-disabled="$ctrl.state.actionInProgress" button-spinner="$ctrl.state.actionInProgress">
+                <span ng-hide="$ctrl.state.actionInProgress">Save configuration</span>
+                <span ng-show="$ctrl.state.actionInProgress">Saving...</span>
+              </button>
+            </div>
+          </div>
+          <!-- !actions -->
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

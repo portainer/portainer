@@ -17,7 +17,6 @@ angular.module('portainer.kubernetes').factory('KubernetesResourceQuotas', [
         {
           get: {
             method: 'GET',
-            timeout: 15000,
             ignoreLoadingBar: true,
           },
           getYaml: {
@@ -30,6 +29,12 @@ angular.module('portainer.kubernetes').factory('KubernetesResourceQuotas', [
           },
           create: { method: 'POST' },
           update: { method: 'PUT' },
+          patch: {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json-patch+json',
+            },
+          },
           delete: { method: 'DELETE' },
         }
       );

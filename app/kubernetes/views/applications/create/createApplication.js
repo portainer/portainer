@@ -4,5 +4,6 @@ angular.module('portainer.kubernetes').component('kubernetesCreateApplicationVie
   controllerAs: 'ctrl',
   bindings: {
     $transition$: '<',
+    endpoint: '<',
   },
 });

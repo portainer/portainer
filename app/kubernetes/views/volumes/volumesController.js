@@ -1,7 +1,10 @@
-import * as _ from 'lodash-es';
+require('../../templates/advancedDeploymentPanel.html');
+
+import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import angular from 'angular';
 import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
+import KubernetesResourceQuotaHelper from 'Kubernetes/helpers/resourceQuotaHelper';
 
 function buildStorages(storages, volumes) {
   _.forEach(storages, (s) => {
@@ -13,36 +16,29 @@ function buildStorages(storages, volumes) {
 }
 
 function computeSize(volumes) {
-  let hasT,
-    hasG,
-    hasM = false;
-  const size = _.sumBy(volumes, (v) => {
-    const storage = v.PersistentVolumeClaim.Storage;
-    if (!hasT && _.endsWith(storage, 'TB')) {
-      hasT = true;
-    } else if (!hasG && _.endsWith(storage, 'GB')) {
-      hasG = true;
-    } else if (!hasM && _.endsWith(storage, 'MB')) {
-      hasM = true;
-    }
-    return filesizeParser(storage, { base: 10 });
-  });
-  if (hasT) {
-    return size / 1000 / 1000 / 1000 / 1000 + 'TB';
-  } else if (hasG) {
-    return size / 1000 / 1000 / 1000 + 'GB';
-  } else if (hasM) {
-    return size / 1000 / 1000 + 'MB';
-  }
-  return size;
+  const size = _.sumBy(volumes, (v) => filesizeParser(v.PersistentVolumeClaim.Storage, { base: 10 }));
+  const format = KubernetesResourceQuotaHelper.formatBytes(size);
+  return `${format.Size}${format.SizeUnit}`;
 }
 
 class KubernetesVolumesController {
   /* @ngInject */
-  constructor($async, $state, Notifications, ModalService, LocalStorage, EndpointProvider, KubernetesStorageService, KubernetesVolumeService, KubernetesApplicationService) {
+  constructor(
+    $async,
+    $state,
+    Notifications,
+    Authentication,
+    ModalService,
+    LocalStorage,
+    EndpointProvider,
+    KubernetesStorageService,
+    KubernetesVolumeService,
+    KubernetesApplicationService
+  ) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
+    this.Authentication = Authentication;
     this.ModalService = ModalService;
     this.LocalStorage = LocalStorage;
     this.EndpointProvider = EndpointProvider;
@@ -117,6 +113,7 @@ class KubernetesVolumesController {
       currentName: this.$state.$current.name,
       endpointId: this.EndpointProvider.endpointID(),
       activeTab: this.LocalStorage.getActiveTab('volumes'),
+      isAdmin: this.Authentication.isAdmin(),
     };
 
     await this.getVolumes();

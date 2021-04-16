@@ -134,6 +134,8 @@ func (manager *SwarmStackManager) prepareDockerCommandAndArgs(binaryPath, dataPa
 
 		if !endpoint.TLSConfig.TLSSkipVerify {
 			args = append(args, "--tlsverify", "--tlscacert", endpoint.TLSConfig.TLSCACertPath)
+		} else {
+			args = append(args, "--tlscacert", "''")
 		}
 
 		if endpoint.TLSConfig.TLSCertPath != "" && endpoint.TLSConfig.TLSKeyPath != "" {

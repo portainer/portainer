@@ -7,6 +7,7 @@ const _KubernetesSecretCreatePayload = Object.freeze({
   metadata: new KubernetesCommonMetadataPayload(),
   type: 'Opaque',
   data: {},
+  stringData: {},
 });
 
 export class KubernetesSecretCreatePayload {
@@ -22,6 +23,7 @@ const _KubernetesSecretUpdatePayload = Object.freeze({
   metadata: new KubernetesCommonMetadataPayload(),
   type: 'Opaque',
   data: {},
+  stringData: {},
 });
 
 export class KubernetesSecretUpdatePayload {

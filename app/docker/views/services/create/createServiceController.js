@@ -30,9 +30,8 @@ angular.module('portainer.docker').controller('CreateServiceController', [
   'RegistryService',
   'HttpRequestHelper',
   'NodeService',
-  'SettingsService',
   'WebhookService',
-  'EndpointProvider',
+  'endpoint',
   function (
     $q,
     $scope,
@@ -56,10 +55,11 @@ angular.module('portainer.docker').controller('CreateServiceController', [
     RegistryService,
     HttpRequestHelper,
     NodeService,
-    SettingsService,
     WebhookService,
-    EndpointProvider
+    endpoint
   ) {
+    $scope.endpoint = endpoint;
+
     $scope.formValues = {
       Name: '',
       RegistryModel: new PorImageRegistryModel(),
@@ -104,6 +104,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
     $scope.state = {
       formValidationError: '',
       actionInProgress: false,
+      pullImageValidity: false,
     };
 
     $scope.allowBindMounts = false;
@@ -113,6 +114,11 @@ angular.module('portainer.docker').controller('CreateServiceController', [
         $scope.$broadcast('rzSliderForceRender');
       });
     };
+
+    $scope.setPullImageValidity = setPullImageValidity;
+    function setPullImageValidity(validity) {
+      $scope.state.pullImageValidity = validity;
+    }
 
     $scope.addPortBinding = function () {
       $scope.formValues.Ports.push({ PublishedPort: '', TargetPort: '', Protocol: 'tcp', PublishMode: 'ingress' });
@@ -493,7 +499,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
           const resourceControl = data.Portainer.ResourceControl;
           const userId = Authentication.getUserDetails().ID;
           const rcPromise = ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
-          const webhookPromise = $q.when($scope.formValues.Webhook && WebhookService.createServiceWebhook(serviceId, EndpointProvider.endpointID()));
+          const webhookPromise = $q.when(endpoint.Type !== 4 && $scope.formValues.Webhook && WebhookService.createServiceWebhook(serviceId, endpoint.ID));
           return $q.all([rcPromise, webhookPromise]);
         })
         .then(function success() {
@@ -518,6 +524,12 @@ angular.module('portainer.docker').controller('CreateServiceController', [
         return false;
       }
       return true;
+    }
+
+    $scope.volumesAreValid = volumesAreValid;
+    function volumesAreValid() {
+      const volumes = $scope.formValues.Volumes;
+      return volumes.every((volume) => volume.Target && volume.Source);
     }
 
     $scope.create = function createService() {
@@ -587,10 +599,9 @@ angular.module('portainer.docker').controller('CreateServiceController', [
     async function checkIfAllowedBindMounts() {
       const isAdmin = Authentication.isAdmin();
 
-      const settings = await SettingsService.publicSettings();
-      const { AllowBindMountsForRegularUsers } = settings;
+      const { allowBindMountsForRegularUsers } = endpoint.SecuritySettings;
 
-      return isAdmin || AllowBindMountsForRegularUsers;
+      return isAdmin || allowBindMountsForRegularUsers;
     }
   },
 ]);

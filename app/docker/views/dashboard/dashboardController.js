@@ -17,6 +17,7 @@ angular.module('portainer.docker').controller('DashboardController', [
   'EndpointProvider',
   'StateManager',
   'TagService',
+  'endpoint',
   function (
     $scope,
     $q,
@@ -32,7 +33,8 @@ angular.module('portainer.docker').controller('DashboardController', [
     Notifications,
     EndpointProvider,
     StateManager,
-    TagService
+    TagService,
+    endpoint
   ) {
     $scope.dismissInformationPanel = function (id) {
       StateManager.dismissInformationPanel(id);
@@ -89,9 +91,8 @@ angular.module('portainer.docker').controller('DashboardController', [
 
     async function shouldShowStacks() {
       const isAdmin = Authentication.isAdmin();
-      const { allowStackManagementForRegularUsers } = $scope.applicationState.application;
 
-      return isAdmin || allowStackManagementForRegularUsers;
+      return isAdmin || endpoint.SecuritySettings.allowStackManagementForRegularUsers;
     }
 
     initView();

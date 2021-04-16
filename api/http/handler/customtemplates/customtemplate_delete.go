@@ -13,6 +13,19 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
+// @id CustomTemplateDelete
+// @summary Remove a template
+// @description Remove a template.
+// @description **Access policy**: authorized
+// @tags custom_templates
+// @security jwt
+// @param id path int true "Template identifier"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Access denied to resource"
+// @failure 404 "Template not found"
+// @failure 500 "Server error"
+// @router /custom_templates/{id} [delete]
 func (handler *Handler) customTemplateDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	customTemplateID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

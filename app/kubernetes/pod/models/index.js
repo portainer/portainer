@@ -47,6 +47,7 @@ const _KubernetesPodContainer = Object.freeze({
   PodName: '',
   Name: '',
   Image: '',
+  ImagePullPolicy: '',
   Node: '',
   CreationDate: '',
   Status: '',
@@ -61,6 +62,21 @@ const _KubernetesPodContainer = Object.freeze({
 export class KubernetesPodContainer {
   constructor() {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesPodContainer)));
+  }
+}
+
+const _KubernetesPodEviction = Object.freeze({
+  apiVersion: 'policy/v1beta1',
+  kind: 'Eviction',
+  metadata: {
+    name: '',
+    namespace: '',
+  },
+});
+
+export class KubernetesPodEviction {
+  constructor() {
+    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesPodEviction)));
   }
 }
 

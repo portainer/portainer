@@ -4,6 +4,7 @@ import KubernetesConfigurationConverter from 'Kubernetes/converters/configuratio
 import KubernetesConfigMapConverter from 'Kubernetes/converters/configMap';
 import KubernetesSecretConverter from 'Kubernetes/converters/secret';
 import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
+import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
 
 class KubernetesConfigurationService {
   /* @ngInject */
@@ -67,6 +68,8 @@ class KubernetesConfigurationService {
    * CREATE
    */
   async createAsync(formValues) {
+    formValues.ConfigurationOwner = KubernetesCommonHelper.ownerToLabel(formValues.ConfigurationOwner);
+
     try {
       if (formValues.Type === KubernetesConfigurationTypes.CONFIGMAP) {
         const configMap = KubernetesConfigMapConverter.configurationFormValuesToConfigMap(formValues);

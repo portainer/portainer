@@ -1,7 +1,9 @@
 package user
 
 import (
-	"github.com/portainer/portainer/api"
+	"strings"
+
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/internal"
 
@@ -47,6 +49,8 @@ func (service *Service) User(ID portainer.UserID) (*portainer.User, error) {
 func (service *Service) UserByUsername(username string) (*portainer.User, error) {
 	var user *portainer.User
 
+	username = strings.ToLower(username)
+
 	err := service.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 		cursor := bucket.Cursor()
@@ -58,7 +62,7 @@ func (service *Service) UserByUsername(username string) (*portainer.User, error)
 				return err
 			}
 
-			if u.Username == username {
+			if strings.EqualFold(u.Username, username) {
 				user = &u
 				break
 			}
@@ -123,6 +127,7 @@ func (service *Service) UsersByRole(role portainer.UserRole) ([]portainer.User, 
 // UpdateUser saves a user.
 func (service *Service) UpdateUser(ID portainer.UserID, user *portainer.User) error {
 	identifier := internal.Itob(int(ID))
+	user.Username = strings.ToLower(user.Username)
 	return internal.UpdateObject(service.db, BucketName, identifier, user)
 }
 
@@ -133,6 +138,7 @@ func (service *Service) CreateUser(user *portainer.User) error {
 
 		id, _ := bucket.NextSequence()
 		user.ID = portainer.UserID(id)
+		user.Username = strings.ToLower(user.Username)
 
 		data, err := internal.MarshalObject(user)
 		if err != nil {

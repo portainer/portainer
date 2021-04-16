@@ -8,13 +8,20 @@ angular
   .controller('CreateStackController', function (
     $scope,
     $state,
+    $async,
+    $window,
+    ModalService,
     StackService,
     Authentication,
     Notifications,
     FormValidator,
     ResourceControlService,
     FormHelper,
-    CustomTemplateService
+    EndpointProvider,
+    StackHelper,
+    ContainerHelper,
+    CustomTemplateService,
+    ContainerService
   ) {
     $scope.formValues = {
       Name: '',
@@ -35,6 +42,15 @@ angular
       formValidationError: '',
       actionInProgress: false,
       StackType: null,
+      editorYamlValidationError: '',
+      uploadYamlValidationError: '',
+      isEditorDirty: false,
+    };
+
+    $window.onbeforeunload = () => {
+      if ($scope.state.Method === 'editor' && $scope.formValues.StackFileContent && $scope.state.isEditorDirty) {
+        return '';
+      }
     };
 
     $scope.addEnvironmentVariable = function () {
@@ -141,6 +157,7 @@ angular
         })
         .then(function success() {
           Notifications.success('Stack successfully deployed');
+          $scope.state.isEditorDirty = false;
           $state.go('docker.stacks');
         })
         .catch(function error(err) {
@@ -153,10 +170,32 @@ angular
 
     $scope.editorUpdate = function (cm) {
       $scope.formValues.StackFileContent = cm.getValue();
+      $scope.state.editorYamlValidationError = StackHelper.validateYAML($scope.formValues.StackFileContent, $scope.containerNames);
+      $scope.state.isEditorDirty = true;
+    };
+
+    async function onFileLoadAsync(event) {
+      $scope.state.uploadYamlValidationError = StackHelper.validateYAML(event.target.result, $scope.containerNames);
+    }
+
+    function onFileLoad(event) {
+      return $async(onFileLoadAsync, event);
+    }
+
+    $scope.uploadFile = function (file) {
+      $scope.formValues.StackFile = file;
+
+      if (file) {
+        const temporaryFileReader = new FileReader();
+        temporaryFileReader.fileName = file.name;
+        temporaryFileReader.onload = onFileLoad;
+        temporaryFileReader.readAsText(file);
+      }
     };
 
     $scope.onChangeTemplate = async function onChangeTemplate(template) {
       try {
+        $scope.formValues.StackFileContent = undefined;
         $scope.selectedTemplate = template;
         $scope.formValues.StackFileContent = await CustomTemplateService.customTemplateFile(template.Id);
       } catch (err) {
@@ -177,7 +216,27 @@ angular
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to retrieve Custom Templates');
       }
+
+      try {
+        const endpoint = EndpointProvider.currentEndpoint();
+        $scope.composeSyntaxMaxVersion = endpoint.ComposeSyntaxMaxVersion;
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to retrieve the ComposeSyntaxMaxVersion');
+      }
+
+      try {
+        $scope.containers = await ContainerService.containers();
+        $scope.containerNames = ContainerHelper.getContainerNames($scope.containers);
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to retrieve Containers');
+      }
     }
+
+    this.uiCanExit = async function () {
+      if ($scope.state.Method === 'editor' && $scope.formValues.StackFileContent && $scope.state.isEditorDirty) {
+        return ModalService.confirmWebEditorDiscard();
+      }
+    };
 
     initView();
   });

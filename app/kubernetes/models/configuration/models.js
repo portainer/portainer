@@ -1,4 +1,5 @@
 export const KubernetesPortainerConfigurationOwnerLabel = 'io.portainer.kubernetes.configuration.owner';
+export const KubernetesPortainerConfigurationDataAnnotation = 'io.portainer.kubernetes.configuration.data';
 
 /**
  * Configuration Model (Composite)

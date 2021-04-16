@@ -28,14 +28,15 @@ Unlike the public demo, the playground sessions are deleted after 4 hours. Apart
 
 ## Getting started
 
-- [Deploy Portainer](https://www.portainer.io/installation/)
+- [Deploy Portainer](https://documentation.portainer.io/quickstart/)
 - [Documentation](https://documentation.portainer.io)
+- [Building Portainer](https://documentation.portainer.io/contributing/instructions/)
 
 ## Getting help
 
-For FORMAL Support, please purchase a support subscription from here: https://www.portainer.io/products-services/portainer-business-support/
+For FORMAL Support, please purchase a support subscription from here: https://www.portainer.io/products/portainer-business
 
-For community support: You can find more information about Portainer's community support framework policy here: https://www.portainer.io/2019/04/portainer-support-policy/
+For community support: You can find more information about Portainer's community support framework policy here: https://www.portainer.io/products/community-edition/customer-success
 
 - Issues: https://github.com/portainer/portainer/issues
 - FAQ: https://documentation.portainer.io
@@ -44,7 +45,7 @@ For community support: You can find more information about Portainer's community
 ## Reporting bugs and contributing
 
 - Want to report a bug or request a feature? Please open [an issue](https://github.com/portainer/portainer/issues/new).
-- Want to help us build **_portainer_**? Follow our [contribution guidelines](https://www.portainer.io/documentation/how-to-contribute/) to build it locally and make a pull request. We need all the help we can get!
+- Want to help us build **_portainer_**? Follow our [contribution guidelines](https://documentation.portainer.io/contributing/instructions/) to build it locally and make a pull request. We need all the help we can get!
 
 ## Security
 
@@ -52,7 +53,7 @@ For community support: You can find more information about Portainer's community
 
 ## Privacy
 
-**To make sure we focus our development effort in the right places we need to know which features get used most often. To give us this information we use [Matamo Analytics](https://matomo.org/), which is hosted in Germany and is fully GDPR compliant.**
+**To make sure we focus our development effort in the right places we need to know which features get used most often. To give us this information we use [Matomo Analytics](https://matomo.org/), which is hosted in Germany and is fully GDPR compliant.**
 
 When Portainer first starts, you are given the option to DISABLE analytics. If you **don't** choose to disable it, we collect anonymous usage as per [our privacy policy](https://www.portainer.io/documentation/in-app-analytics-and-privacy-policy/). **Please note**, there is no personally identifiable information sent or stored at any time and we only use the data to help us improve Portainer.
 
@@ -64,8 +65,4 @@ Portainer supports "Current - 2 docker versions only. Prior versions may operate
 
 Portainer is licensed under the zlib license. See [LICENSE](./LICENSE) for reference.
 
-Portainer also contains the following code, which is licensed under the [MIT license](https://opensource.org/licenses/MIT):
-
-UI For Docker: Copyright (c) 2013-2016 Michael Crosby (crosbymichael.com), Kevan Ahlquist (kevanahlquist.com), Anthony Lapenna (portainer.io)
-
-rdash-angular: Copyright (c) [2014][elliot hesp]
+Portainer also contains code from open source projects. See [ATTRIBUTIONS.md](./ATTRIBUTIONS.md) for a list.

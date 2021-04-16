@@ -12,12 +12,14 @@ export const KubernetesApplicationTypes = Object.freeze({
   DEPLOYMENT: 1,
   DAEMONSET: 2,
   STATEFULSET: 3,
+  POD: 4,
 });
 
 export const KubernetesApplicationTypeStrings = Object.freeze({
   DEPLOYMENT: 'Deployment',
   DAEMONSET: 'DaemonSet',
   STATEFULSET: 'StatefulSet',
+  POD: 'Pod',
 });
 
 export const KubernetesApplicationPublishingTypes = Object.freeze({

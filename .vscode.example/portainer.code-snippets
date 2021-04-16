@@ -21,11 +21,11 @@
     "description": "Dummy Angularjs Component",
     "body": [
       "import angular from 'angular';",
-      "import ${TM_FILENAME_BASE/(.*)/${1:/capitalize}/}Controller from './${TM_FILENAME_BASE}Controller'",
+      "import controller from './${TM_FILENAME_BASE}Controller'",
       "",
       "angular.module('portainer.${TM_DIRECTORY/.*\\/app\\/([^\\/]*)(\\/.*)?$/$1/}').component('$TM_FILENAME_BASE', {",
       "  templateUrl: './$TM_FILENAME_BASE.html',",
-      "  controller: ${TM_FILENAME_BASE/(.*)/${1:/capitalize}/}Controller,",
+      "  controller,",
       "});",
       ""
     ]
@@ -43,25 +43,6 @@
       "export default ${TM_FILENAME_BASE/(.*)/${1:/capitalize}/};"
     ],
     "description": "Dummy ES6+ controller"
-  },
-  "Model": {
-    "scope": "javascript",
-    "prefix": "mymodel",
-    "description": "Dummy ES6+ model",
-    "body": [
-      "/**",
-      " * $1 Model",
-      " */",
-      "const _$1 = Object.freeze({",
-      "  $0",
-      "});",
-      "",
-      "export class $1 {",
-      "  constructor() {",
-      "    Object.assign(this, JSON.parse(JSON.stringify(_$1)));",
-      "  }",
-      "}"
-    ]
   },
   "Service": {
     "scope": "javascript",
@@ -157,6 +138,30 @@
       "",
       "export default $1;",
       "angular.module('portainer.${TM_DIRECTORY/.*\\/app\\/([^\\/]*)(\\/.*)?$/$1/}').service('$1', $1);"
+    ]
+  },
+  "swagger-api-doc": {
+    "prefix": "swapi",
+    "scope": "go",
+    "description": "Snippet for a api doc",
+    "body": [
+      "// @id ",
+      "// @summary ",
+      "// @description ",
+      "// @description **Access policy**: ",
+      "// @tags ",
+      "// @security jwt",
+      "// @accept json",
+      "// @produce json",
+      "// @param id path int true \"identifier\"",
+      "// @param body body Object true \"details\"",
+      "// @success 200 {object} portainer. \"Success\"",
+      "// @success 204 \"Success\"",
+      "// @failure 400 \"Invalid request\"",
+      "// @failure 403 \"Permission denied\"",
+      "// @failure 404 \" not found\"",
+      "// @failure 500 \"Server error\"",
+      "// @router /{id} [get]"
     ]
   }
 }

@@ -62,6 +62,9 @@
                   <span ng-hide="ctrl.state.actionInProgress"><i class="fa fa-bolt" aria-hidden="true"></i> Connect</span>
                   <span ng-show="ctrl.state.actionInProgress">Connecting...</span>
                 </button>
+                <button type="submit" class="btn btn-sm btn-default" ng-click="ctrl.skipEndpointCreation()" button-spinner="ctrl.state.actionInProgress">
+                  <span ng-hide="ctrl.state.actionInProgress"><i class="fa fa-share" aria-hidden="true"></i> Skip</span>
+                </button>
               </div>
             </div>
             <!-- !actions -->

@@ -52,7 +52,7 @@ class KubernetesResourcePoolAccessController {
       let [endpoint, pool, configMap] = await Promise.all([
         this.EndpointService.endpoint(this.endpointId),
         this.KubernetesResourcePoolService.get(name),
-        this.KubernetesConfigMapService.get(KubernetesPortainerConfigMapNamespace, KubernetesPortainerConfigMapConfigName),
+        this.KubernetesConfigMapService.getAccess(KubernetesPortainerConfigMapNamespace, KubernetesPortainerConfigMapConfigName),
       ]);
       const group = await this.GroupService.group(endpoint.GroupId);
       const roles = [];
@@ -96,7 +96,7 @@ class KubernetesResourcePoolAccessController {
       this.state.actionInProgress = true;
       const newAccesses = _.concat(this.authorizedUsersAndTeams, this.formValues.multiselectOutput);
       const accessConfigMap = KubernetesConfigMapHelper.modifiyNamespaceAccesses(angular.copy(this.accessConfigMap), this.pool.Namespace.Name, newAccesses);
-      await this.KubernetesConfigMapService.update(accessConfigMap);
+      await this.KubernetesConfigMapService.updateAccess(accessConfigMap);
       this.Notifications.success('Access successfully created');
       this.$state.reload();
     } catch (err) {
@@ -116,7 +116,7 @@ class KubernetesResourcePoolAccessController {
       this.state.actionInProgress = true;
       const newAccesses = _.without(this.authorizedUsersAndTeams, ...selectedItems);
       const accessConfigMap = KubernetesConfigMapHelper.modifiyNamespaceAccesses(angular.copy(this.accessConfigMap), this.pool.Namespace.Name, newAccesses);
-      await this.KubernetesConfigMapService.update(accessConfigMap);
+      await this.KubernetesConfigMapService.updateAccess(accessConfigMap);
       this.Notifications.success('Access successfully removed');
       this.$state.reload();
     } catch (err) {

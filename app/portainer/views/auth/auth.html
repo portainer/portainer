@@ -8,41 +8,62 @@
         <img ng-if="ctrl.logo" ng-src="{{ ctrl.logo }}" class="simple-box-logo" />
       </div>
       <!-- !login box logo -->
+
       <!-- login panel -->
       <div class="panel panel-default" ng-if="!ctrl.state.loginInProgress">
         <div class="panel-body">
           <!-- login form -->
           <form class="simple-box-form form-horizontal">
-            <!-- username input -->
-            <div class="input-group">
-              <span class="input-group-addon"><i class="fa fa-user" aria-hidden="true"></i></span>
-              <input id="username" type="text" class="form-control" name="username" ng-model="ctrl.formValues.Username" auto-focus />
-            </div>
-            <!-- !username input -->
-            <!-- password input -->
-            <div class="input-group">
-              <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
-              <input id="password" type="password" class="form-control" name="password" ng-model="ctrl.formValues.Password" />
-            </div>
-            <!-- !password input -->
-            <!-- login button -->
             <div class="form-group">
-              <div class="col-sm-12">
-                <a ng-href="{{ ctrl.OAuthLoginURI }}" ng-if="ctrl.AuthenticationMethod === 3">
-                  <div class="btn btn-primary btn-sm pull-left" style="margin-left: 2px;" ng-if="ctrl.state.OAuthProvider === 'Microsoft'">
+              <div class="col-sm-12" style="display: flex; justify-content: center;" ng-if="ctrl.state.showOAuthLogin">
+                <a ng-href="{{ ctrl.OAuthLoginURI }}">
+                  <div class="btn btn-primary pull-left" style="font-size: 120%; margin-left: 2px;" ng-if="ctrl.state.OAuthProvider === 'Microsoft'">
                     <i class="fab fa-microsoft" aria-hidden="true"></i> Login with Microsoft
                   </div>
-                  <div class="btn btn-primary btn-sm pull-left" style="margin-left: 2px;" ng-if="ctrl.state.OAuthProvider === 'Google'">
+                  <div class="btn btn-primary pull-left" style="font-size: 120%; margin-left: 2px;" ng-if="ctrl.state.OAuthProvider === 'Google'">
                     <i class="fab fa-google" aria-hidden="true"></i> Login with Google
                   </div>
-                  <div class="btn btn-primary btn-sm pull-left" style="margin-left: 2px;" ng-if="ctrl.state.OAuthProvider === 'Github'">
+                  <div class="btn btn-primary pull-left" style="font-size: 120%; margin-left: 2px;" ng-if="ctrl.state.OAuthProvider === 'Github'">
                     <i class="fab fa-github" aria-hidden="true"></i> Login with Github
                   </div>
-                  <div class="btn btn-primary btn-sm pull-left" style="margin-left: 2px;" ng-if="ctrl.state.OAuthProvider === 'OAuth'">
+                  <div class="btn btn-primary pull-left" style="font-size: 120%; margin-left: 2px;" ng-if="ctrl.state.OAuthProvider === 'OAuth'">
                     <i class="fa fa-sign-in-alt" aria-hidden="true"></i> Login with OAuth
                   </div>
                 </a>
+              </div>
+            </div>
 
+            <!-- divider -->
+            <div class="form-group" ng-if="ctrl.state.showOAuthLogin">
+              <div class="col-sm-12" style="display: flex; align-items: center; justify-content: center;">
+                <div class="striketext small text-muted" style="display: flex; align-items: center; justify-content: center; width: 90%;">or</div>
+              </div>
+            </div>
+
+            <!-- use internal auth button -->
+            <div class="form-group" ng-if="ctrl.state.showOAuthLogin && !ctrl.state.showStandardLogin">
+              <div class="col-sm-12" style="display: flex; justify-content: center;">
+                <div class="btn btn-sm btn-primary pull-left" style="margin-left: 2px;" ng-click="ctrl.toggleStandardLogin()">
+                  Use internal authentication
+                </div>
+              </div>
+            </div>
+
+            <!-- !username input -->
+            <div class="input-group" ng-if="ctrl.state.showStandardLogin">
+              <span class="input-group-addon"><i class="fa fa-user" aria-hidden="true"></i></span>
+              <input id="username" type="text" class="form-control" name="username" ng-model="ctrl.formValues.Username" auto-focus />
+            </div>
+
+            <!-- password input -->
+            <div class="input-group" ng-if="ctrl.state.showStandardLogin">
+              <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
+              <input id="password" type="password" class="form-control" name="password" ng-model="ctrl.formValues.Password" />
+            </div>
+
+            <div class="form-group" ng-if="ctrl.state.showStandardLogin">
+              <!-- login button -->
+              <div class="col-sm-12" style="display: flex; align-items: center; justify-content: center;">
                 <button
                   type="submit"
                   class="btn btn-primary btn-sm pull-right"
@@ -53,19 +74,19 @@
                   <span ng-hide="ctrl.state.loginInProgress"><i class="fa fa-sign-in-alt" aria-hidden="true"></i> Login</span>
                   <span ng-show="ctrl.state.loginInProgress">Login in progress...</span>
                 </button>
-
-                <span class="pull-right" style="margin: 5px;" ng-if="ctrl.state.AuthenticationError">
-                  <i class="fa fa-exclamation-triangle red-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                  <span class="small text-danger">{{ ctrl.state.AuthenticationError }}</span>
-                </span>
               </div>
             </div>
-
-            <!-- !login button -->
           </form>
           <!-- !login form -->
+
+          <!-- error message -->
+          <div class="pull-right" ng-if="ctrl.state.AuthenticationError">
+            <i class="fa fa-exclamation-triangle red-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+            <span class="small text-danger">{{ ctrl.state.AuthenticationError }}</span>
+          </div>
         </div>
       </div>
+
       <!-- !login panel -->
       <div class="panel panel-default" ng-show="ctrl.state.loginInProgress">
         <div class="panel-body">
