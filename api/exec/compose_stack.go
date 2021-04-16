@@ -16,11 +16,12 @@ import (
 // ComposeStackManager is a wrapper for docker-compose binary
 type ComposeStackManager struct {
 	wrapper      *wrapper.ComposeWrapper
+	dataPath     string
 	proxyManager *proxy.Manager
 }
 
 // NewComposeStackManager returns a docker-compose wrapper if corresponding binary present, otherwise nil
-func NewComposeStackManager(binaryPath string, proxyManager *proxy.Manager) (*ComposeStackManager, error) {
+func NewComposeStackManager(binaryPath string, dataPath string, proxyManager *proxy.Manager) (*ComposeStackManager, error) {
 	wrap, err := wrapper.NewComposeWrapper(binaryPath)
 	if err != nil {
 		return nil, err
@@ -29,6 +30,7 @@ func NewComposeStackManager(binaryPath string, proxyManager *proxy.Manager) (*Co
 	return &ComposeStackManager{
 		wrapper:      wrap,
 		proxyManager: proxyManager,
+		dataPath:     dataPath,
 	}, nil
 }
 
@@ -55,7 +57,7 @@ func (w *ComposeStackManager) Up(stack *portainer.Stack, endpoint *portainer.End
 
 	filePath := stackFilePath(stack)
 
-	_, err = w.wrapper.Up(filePath, url, stack.Name, envFilePath)
+	_, err = w.wrapper.Up(filePath, url, stack.Name, envFilePath, w.dataPath)
 	return err
 }
 

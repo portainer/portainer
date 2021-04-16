@@ -240,10 +240,10 @@ github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINE
 github.com/pmezard/go-difflib v0.0.0-20151028094244-d8ed2627bdf0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
-github.com/portainer/docker-compose-wrapper v0.0.0-20210415175447-0b5174bcf0fc h1:Th037sOSh61cHHH42XNWtEsplrf23jEaqwovpPerKXk=
-github.com/portainer/docker-compose-wrapper v0.0.0-20210415175447-0b5174bcf0fc/go.mod h1:No8p8iZt9N2HOtDS9aWkh1ILxmQVoOTZZjHGlOij/ec=
-github.com/portainer/docker-compose-wrapper v0.0.0-20210415201633-2bcbd377b1f4 h1:WDh1+o4V7Vl9+ttWzDs64hI883LpkfsEEhtpniDE42U=
-github.com/portainer/docker-compose-wrapper v0.0.0-20210415201633-2bcbd377b1f4/go.mod h1:No8p8iZt9N2HOtDS9aWkh1ILxmQVoOTZZjHGlOij/ec=
+github.com/portainer/docker-compose-wrapper v0.0.0-20210415231937-2c60ce1d9fc1 h1:wo86z2M4+d5NCpkefIVSPzH93l9kSiR8GWlOevoenJQ=
+github.com/portainer/docker-compose-wrapper v0.0.0-20210415231937-2c60ce1d9fc1/go.mod h1:No8p8iZt9N2HOtDS9aWkh1ILxmQVoOTZZjHGlOij/ec=
+github.com/portainer/docker-compose-wrapper v0.0.0-20210415235931-d457f9aba1cc h1:MvSEkOvhW3m2D3L0/Ymrjgg0t3CpHlHwpZfpgpIGNiw=
+github.com/portainer/docker-compose-wrapper v0.0.0-20210415235931-d457f9aba1cc/go.mod h1:No8p8iZt9N2HOtDS9aWkh1ILxmQVoOTZZjHGlOij/ec=
 github.com/portainer/libcompose v0.5.3 h1:tE4WcPuGvo+NKeDkDWpwNavNLZ5GHIJ4RvuZXsI9uI8=
 github.com/portainer/libcompose v0.5.3/go.mod h1:7SKd/ho69rRKHDFSDUwkbMcol2TMKU5OslDsajr8Ro8=
 github.com/portainer/libcrypto v0.0.0-20190723020515-23ebe86ab2c2 h1:0PfgGLys9yHr4rtnirg0W0Cjvv6/DzxBIZk5sV59208=

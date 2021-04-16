@@ -43,7 +43,7 @@ func Test_UpAndDown(t *testing.T) {
 
 	stack, endpoint := setup(t)
 
-	w, err := NewComposeStackManager("", nil)
+	w, err := NewComposeStackManager("", "", nil)
 	if err != nil {
 		t.Fatalf("Failed creating manager: %s", err)
 	}
