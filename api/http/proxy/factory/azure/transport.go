@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"sync"
 	"time"
-
+	"path"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/client"
 )
@@ -21,26 +21,50 @@ type (
 		client      *client.HTTPClient
 		token       *azureAPIToken
 		mutex       sync.Mutex
+		dataStore   portainer.DataStore
+		endpoint    *portainer.Endpoint
+	}
+
+	azureRequestContext struct {
+		isAdmin          bool
+		userID           portainer.UserID
+		userTeamIDs      []portainer.TeamID
+		resourceControls []portainer.ResourceControl
 	}
 )
 
 // NewTransport returns a pointer to a new instance of Transport that implements the HTTP Transport
 // interface for proxying requests to the Azure API.
-func NewTransport(credentials *portainer.AzureCredentials) *Transport {
+func NewTransport(credentials *portainer.AzureCredentials, dataStore portainer.DataStore, endpoint *portainer.Endpoint) *Transport {
 	return &Transport{
 		credentials: credentials,
 		client:      client.NewHTTPClient(),
+		dataStore:   dataStore,
+		endpoint:    endpoint,
 	}
 }
 
 // RoundTrip is the implementation of the the http.RoundTripper interface
 func (transport *Transport) RoundTrip(request *http.Request) (*http.Response, error) {
+	return transport.proxyAzureRequest(request)
+}
+
+func (transport *Transport) proxyAzureRequest(request *http.Request) (*http.Response, error) {
+	requestPath := request.URL.Path
+
 	err := transport.retrieveAuthenticationToken()
 	if err != nil {
 		return nil, err
 	}
 
 	request.Header.Set("Authorization", "Bearer "+transport.token.value)
+
+	if match, _ := path.Match(portainer.AzurePathContainerGroups, requestPath); match {
+		return transport.proxyContainerGroupsRequest(request)
+	} else if match, _ := path.Match(portainer.AzurePathContainerGroup, requestPath); match {
+		return transport.proxyContainerGroupRequest(request)
+	}
+
 	return http.DefaultTransport.RoundTrip(request)
 }
 
