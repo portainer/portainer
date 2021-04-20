@@ -112,7 +112,7 @@ func (deployer *KubernetesDeployer) Deploy(endpoint *portainer.Endpoint, stackCo
 		endpointURL = fmt.Sprintf("https://%s", endpointURL)
 	}
 
-	url, err := url.Parse(fmt.Sprintf("%s/v3/kubernetes/stack", endpointURL))
+	url, err := url.Parse(fmt.Sprintf("%s/v2/kubernetes/stack", endpointURL))
 	if err != nil {
 		return "", err
 	}
