@@ -383,8 +383,8 @@ type (
 
 	// QuayRegistryData represents data required for Quay registry to work
 	QuayRegistryData struct {
-		UseOrganisation   bool   `json:"UseOrganisation"`
-		OrganisationName  string `json:"OrganisationName"`
+		UseOrganisation  bool   `json:"UseOrganisation"`
+		OrganisationName string `json:"OrganisationName"`
 	}
 
 	// JobType represents a job type
@@ -1002,8 +1002,9 @@ type (
 		Init() error
 		Close() error
 		IsNew() bool
-		MigrateData() error
+		MigrateData(force bool) error
 		CheckCurrentEdition() error
+		BackupTo(w io.Writer) error
 
 		DockerHub() DockerHubService
 		CustomTemplate() CustomTemplateService
@@ -1132,6 +1133,7 @@ type (
 		StoreCustomTemplateFileFromBytes(identifier, fileName string, data []byte) (string, error)
 		GetCustomTemplateProjectPath(identifier string) string
 		GetTemporaryPath() (string, error)
+		GetDatastorePath() string
 	}
 
 	// GitService represents a service for managing Git
@@ -1198,6 +1200,7 @@ type (
 	// ReverseTunnelService represents a service used to manage reverse tunnel connections.
 	ReverseTunnelService interface {
 		StartTunnelServer(addr, port string, snapshotService SnapshotService) error
+		StopTunnelServer() error
 		GenerateEdgeKey(url, host string, endpointIdentifier int) string
 		SetTunnelStatusToActive(endpointID EndpointID)
 		SetTunnelStatusToRequired(endpointID EndpointID) error
@@ -1240,6 +1243,7 @@ type (
 	// SnapshotService represents a service for managing endpoint snapshots
 	SnapshotService interface {
 		Start()
+		Stop()
 		SetSnapshotInterval(snapshotInterval string) error
 		SnapshotEndpoint(endpoint *Endpoint) error
 	}

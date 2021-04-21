@@ -1,6 +1,7 @@
 package chisel
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
@@ -9,7 +10,7 @@ import (
 	"github.com/dchest/uniuri"
 	chserver "github.com/jpillora/chisel/server"
 	cmap "github.com/orcaman/concurrent-map"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 )
 
@@ -29,13 +30,15 @@ type Service struct {
 	dataStore         portainer.DataStore
 	snapshotService   portainer.SnapshotService
 	chiselServer      *chserver.Server
+	shutdownCtx       context.Context
 }
 
 // NewService returns a pointer to a new instance of Service
-func NewService(dataStore portainer.DataStore) *Service {
+func NewService(dataStore portainer.DataStore, shutdownCtx context.Context) *Service {
 	return &Service{
 		tunnelDetailsMap: cmap.New(),
 		dataStore:        dataStore,
+		shutdownCtx:      shutdownCtx,
 	}
 }
 
@@ -83,6 +86,11 @@ func (service *Service) StartTunnelServer(addr, port string, snapshotService por
 	return nil
 }
 
+// StopTunnelServer stops tunnel http server
+func (service *Service) StopTunnelServer() error {
+	return service.chiselServer.Close()
+}
+
 func (service *Service) retrievePrivateKeySeed() (string, error) {
 	var serverInfo *portainer.TunnelServerInfo
 
@@ -108,13 +116,16 @@ func (service *Service) retrievePrivateKeySeed() (string, error) {
 func (service *Service) startTunnelVerificationLoop() {
 	log.Printf("[DEBUG] [chisel, monitoring] [check_interval_seconds: %f] [message: starting tunnel management process]", tunnelCleanupInterval.Seconds())
 	ticker := time.NewTicker(tunnelCleanupInterval)
-	stopSignal := make(chan struct{})
 
 	for {
 		select {
 		case <-ticker.C:
 			service.checkTunnels()
-		case <-stopSignal:
+		case <-service.shutdownCtx.Done():
+			log.Println("[DEBUG] Shutting down tunnel service")
+			if err := service.StopTunnelServer(); err != nil {
+				log.Printf("Stopped tunnel service: %s", err)
+			}
 			ticker.Stop()
 			return
 		}

@@ -1,10 +1,8 @@
 package dockerhub
 
 import (
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
-
-	"github.com/boltdb/bolt"
 )
 
 const (
@@ -15,18 +13,18 @@ const (
 
 // Service represents a service for managing Dockerhub data.
 type Service struct {
-	db *bolt.DB
+	connection *internal.DbConnection
 }
 
 // NewService creates a new instance of a service.
-func NewService(db *bolt.DB) (*Service, error) {
-	err := internal.CreateBucket(db, BucketName)
+func NewService(connection *internal.DbConnection) (*Service, error) {
+	err := internal.CreateBucket(connection, BucketName)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Service{
-		db: db,
+		connection: connection,
 	}, nil
 }
 
@@ -34,7 +32,7 @@ func NewService(db *bolt.DB) (*Service, error) {
 func (service *Service) DockerHub() (*portainer.DockerHub, error) {
 	var dockerhub portainer.DockerHub
 
-	err := internal.GetObject(service.db, BucketName, []byte(dockerHubKey), &dockerhub)
+	err := internal.GetObject(service.connection, BucketName, []byte(dockerHubKey), &dockerhub)
 	if err != nil {
 		return nil, err
 	}
@@ -44,5 +42,5 @@ func (service *Service) DockerHub() (*portainer.DockerHub, error) {
 
 // UpdateDockerHub updates a DockerHub object.
 func (service *Service) UpdateDockerHub(dockerhub *portainer.DockerHub) error {
-	return internal.UpdateObject(service.db, BucketName, []byte(dockerHubKey), dockerhub)
+	return internal.UpdateObject(service.connection, BucketName, []byte(dockerHubKey), dockerhub)
 }

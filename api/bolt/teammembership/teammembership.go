@@ -1,7 +1,7 @@
 package teammembership
 
 import (
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
 
 	"github.com/boltdb/bolt"
@@ -14,18 +14,18 @@ const (
 
 // Service represents a service for managing endpoint data.
 type Service struct {
-	db *bolt.DB
+	connection *internal.DbConnection
 }
 
 // NewService creates a new instance of a service.
-func NewService(db *bolt.DB) (*Service, error) {
-	err := internal.CreateBucket(db, BucketName)
+func NewService(connection *internal.DbConnection) (*Service, error) {
+	err := internal.CreateBucket(connection, BucketName)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Service{
-		db: db,
+		connection: connection,
 	}, nil
 }
 
@@ -34,7 +34,7 @@ func (service *Service) TeamMembership(ID portainer.TeamMembershipID) (*portaine
 	var membership portainer.TeamMembership
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.db, BucketName, identifier, &membership)
+	err := internal.GetObject(service.connection, BucketName, identifier, &membership)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (service *Service) TeamMembership(ID portainer.TeamMembershipID) (*portaine
 func (service *Service) TeamMemberships() ([]portainer.TeamMembership, error) {
 	var memberships = make([]portainer.TeamMembership, 0)
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		cursor := bucket.Cursor()
@@ -69,7 +69,7 @@ func (service *Service) TeamMemberships() ([]portainer.TeamMembership, error) {
 func (service *Service) TeamMembershipsByUserID(userID portainer.UserID) ([]portainer.TeamMembership, error) {
 	var memberships = make([]portainer.TeamMembership, 0)
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		cursor := bucket.Cursor()
@@ -95,7 +95,7 @@ func (service *Service) TeamMembershipsByUserID(userID portainer.UserID) ([]port
 func (service *Service) TeamMembershipsByTeamID(teamID portainer.TeamID) ([]portainer.TeamMembership, error) {
 	var memberships = make([]portainer.TeamMembership, 0)
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		cursor := bucket.Cursor()
@@ -120,12 +120,12 @@ func (service *Service) TeamMembershipsByTeamID(teamID portainer.TeamID) ([]port
 // UpdateTeamMembership saves a TeamMembership object.
 func (service *Service) UpdateTeamMembership(ID portainer.TeamMembershipID, membership *portainer.TeamMembership) error {
 	identifier := internal.Itob(int(ID))
-	return internal.UpdateObject(service.db, BucketName, identifier, membership)
+	return internal.UpdateObject(service.connection, BucketName, identifier, membership)
 }
 
 // CreateTeamMembership creates a new TeamMembership object.
 func (service *Service) CreateTeamMembership(membership *portainer.TeamMembership) error {
-	return service.db.Update(func(tx *bolt.Tx) error {
+	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		id, _ := bucket.NextSequence()
@@ -143,12 +143,12 @@ func (service *Service) CreateTeamMembership(membership *portainer.TeamMembershi
 // DeleteTeamMembership deletes a TeamMembership object.
 func (service *Service) DeleteTeamMembership(ID portainer.TeamMembershipID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.db, BucketName, identifier)
+	return internal.DeleteObject(service.connection, BucketName, identifier)
 }
 
 // DeleteTeamMembershipByUserID deletes all the TeamMembership object associated to a UserID.
 func (service *Service) DeleteTeamMembershipByUserID(userID portainer.UserID) error {
-	return service.db.Update(func(tx *bolt.Tx) error {
+	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		cursor := bucket.Cursor()
@@ -173,7 +173,7 @@ func (service *Service) DeleteTeamMembershipByUserID(userID portainer.UserID) er
 
 // DeleteTeamMembershipByTeamID deletes all the TeamMembership object associated to a TeamID.
 func (service *Service) DeleteTeamMembershipByTeamID(teamID portainer.TeamID) error {
-	return service.db.Update(func(tx *bolt.Tx) error {
+	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		cursor := bucket.Cursor()
