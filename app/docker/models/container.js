@@ -63,6 +63,10 @@ export function ContainerViewModel(data) {
       this.NodeName = data.Portainer.Agent.NodeName;
     }
   }
+
+  if (data.Config && !_.isEmpty(data.Config.Hostname)) {
+      this.Hostname = data.Config.Hostname;
+  }
 }
 
 export function ContainerStatsViewModel(data) {
