@@ -183,11 +183,11 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IP' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th ng-if="$ctrl.showHostColumn" ng-show="$ctrl.columnVisibility.columns.host.display">
-                <a ng-click="$ctrl.changeOrderBy('NodeName')">
+              <th ng-if="$ctrl.columnVisibility" ng-show="$ctrl.columnVisibility.columns.host.display">
+                <a ng-click="$ctrl.changeOrderBy('Hostname')">
                   Host
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && $ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Hostname' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Hostname' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th ng-show="$ctrl.columnVisibility.columns.ports.display">
@@ -220,7 +220,7 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ng-if="!$ctrl.offlineMode" ui-sref="docker.containers.container({ id: item.Id, nodeName: item.NodeName })" title="{{ item | containername }}">{{
+                <a ng-if="!$ctrl.offlineMode" ui-sref="docker.containers.container({ id: item.Id, nodeName: item.Hostname })" title="{{ item | containername }}">{{
                   item | containername | truncate: $ctrl.settings.containerNameTruncateSize
                 }}</a>
                 <span ng-if="$ctrl.offlineMode">{{ item | containername | truncate: $ctrl.settings.containerNameTruncateSize }}</span>
@@ -246,7 +246,7 @@
                 ng-show="$ctrl.columnVisibility.columns.actions.display"
                 authorization="DockerContainerStats, DockerContainerLogs, DockerExecStart, DockerContainerInspect, DockerTaskInspect, DockerTaskLogs"
               >
-                <container-quick-actions container-id="item.Id" node-name="item.NodeName" status="item.Status" state="$ctrl.settings"></container-quick-actions>
+                <container-quick-actions container-id="item.Id" node-name="item.Hostname" status="item.Status" state="$ctrl.settings"></container-quick-actions>
               </td>
               <td ng-if="$ctrl.offlineMode"> </td>
               <td ng-show="$ctrl.columnVisibility.columns.stack.display">{{ item.StackName ? item.StackName : '-' }}</td>
@@ -258,7 +258,7 @@
                 {{ item.Created | getisodatefromtimestamp }}
               </td>
               <td ng-show="$ctrl.columnVisibility.columns.ip.display">{{ item.IP ? item.IP : '-' }}</td>
-              <td ng-if="$ctrl.showHostColumn" ng-show="$ctrl.columnVisibility.columns.host.display">{{ item.NodeName ? item.NodeName : '-' }}</td>
+              <td ng-if="$ctrl.columnVisibility" ng-show="$ctrl.columnVisibility.columns.host.display">{{ item.Hostname ? item.Hostname : '-' }}</td>
               <td ng-show="$ctrl.columnVisibility.columns.ports.display">
                 <a
                   ng-if="item.Ports.length > 0"
