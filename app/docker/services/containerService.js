@@ -30,6 +30,11 @@ angular.module('portainer.docker').factory('ContainerService', [
       Container.query({ all: all, filters: filters })
         .$promise.then(function success(data) {
           var containers = data.map(function (item) {
+            var container = service.container (item.Id);
+            container.then(function(containerFullData) {
+                $q.Config = containerFullData.Config;
+            });
+            item.Config = $q.Config;
             return new ContainerViewModel(item);
           });
           deferred.resolve(containers);
