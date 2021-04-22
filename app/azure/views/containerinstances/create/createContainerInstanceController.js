@@ -8,7 +8,8 @@ angular.module('portainer.azure').controller('AzureCreateContainerInstanceContro
   'Notifications',
   'Authentication',
   'ResourceControlService',
-  function ($q, $scope, $state, AzureService, Notifications, Authentication, ResourceControlService) {
+  'FormValidator',
+  function ($q, $scope, $state, AzureService, Notifications, Authentication, ResourceControlService, FormValidator) {
     var allResourceGroups = [];
     var allProviders = [];
 
@@ -68,6 +69,11 @@ angular.module('portainer.azure').controller('AzureCreateContainerInstanceContro
     function validateForm(model) {
       if (!model.Ports || !model.Ports.length || model.Ports.every((port) => !port.host || !port.container)) {
         return 'At least one port binding is required';
+      }
+
+      const error = FormValidator.validateAccessControl(model.AccessControlData, Authentication.isAdmin());
+      if (error !== '') {
+        return error;
       }
 
       return null;
