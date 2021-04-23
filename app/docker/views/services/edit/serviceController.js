@@ -85,7 +85,7 @@ angular.module('portainer.docker').controller('ServiceController', [
     WebhookHelper,
     NetworkService,
     endpoint,
-    EndpointService,
+    EndpointService
   ) {
     $scope.state = {
       updateInProgress: false,
@@ -210,6 +210,12 @@ angular.module('portainer.docker').controller('ServiceController', [
         updateServiceArray(service, 'ServiceMounts', service.ServiceMounts);
       }
     };
+
+    $scope.onChangeMountType = function onChangeMountType(service, mount) {
+      mount.Source = null;
+      $scope.updateMount(service, mount);
+    };
+
     $scope.updateMount = function updateMount(service) {
       updateServiceArray(service, 'ServiceMounts', service.ServiceMounts);
     };
@@ -377,6 +383,12 @@ angular.module('portainer.docker').controller('ServiceController', [
       });
       return hasChanges;
     };
+
+    $scope.mountsAreValid = mountsAreValid;
+    function mountsAreValid() {
+      const mounts = $scope.service.ServiceMounts;
+      return mounts.every((mount) => mount.Source && mount.Target);
+    }
 
     function buildChanges(service) {
       var config = ServiceHelper.serviceToConfig(service.Model);

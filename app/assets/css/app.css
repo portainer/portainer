@@ -1020,6 +1020,10 @@ json-tree .branch-preview {
 }
 /* !spinkit override */
 
+.w-full {
+  width: 100%;
+}
+
 .dashboard-item {
   color: #65798e;
 }
