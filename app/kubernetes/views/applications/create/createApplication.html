@@ -567,7 +567,7 @@
                         <i class="fa fa-cube" aria-hidden="true" style="margin-right: 2px;"></i>
                         Shared
                       </div>
-                      <p>All the instances of this application will use the same data</p>
+                      <p>Application will be deployed as a Deployment with a shared storage access</p>
                     </label>
                   </div>
                   <div style="color: #767676;" ng-if="ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.ISOLATED">
@@ -584,7 +584,7 @@
                         <i class="fa fa-cube" aria-hidden="true" style="margin-right: 2px;"></i>
                         Shared
                       </div>
-                      <p>All the instances of this application will use the same data</p>
+                      <p>Application will be deployed as a Deployment with a shared storage access</p>
                     </label>
                   </div>
                   <div
@@ -605,7 +605,7 @@
                         <i class="fa fa-cubes" aria-hidden="true" style="margin-right: 2px;"></i>
                         Isolated
                       </div>
-                      <p>Every instance of this application will use their own data</p>
+                      <p>Application will be deployed as a StatefulSet with each instantiating their own data</p>
                     </label>
                   </div>
                   <div
@@ -625,7 +625,7 @@
                         <i class="fa fa-cubes" aria-hidden="true" style="margin-right: 2px;"></i>
                         Isolated
                       </div>
-                      <p>Every instance of this application will use their own data</p>
+                      <p>Application will be deployed as a StatefulSet with each instantiating their own data</p>
                     </label>
                   </div>
                 </div>
@@ -768,7 +768,7 @@
                       <i class="fa fa-cubes" aria-hidden="true" style="margin-right: 2px;"></i>
                       Global
                     </div>
-                    <p>Deploy an instance of this container on each node of the cluster</p>
+                    <p>Application will be deployed as a DaemonSet with an instance on each node of the cluster</p>
                   </label>
                 </div>
                 <div ng-if="ctrl.supportGlobalDeployment()">
@@ -784,7 +784,7 @@
                       <i class="fa fa-cubes" aria-hidden="true" style="margin-right: 2px;"></i>
                       Global
                     </div>
-                    <p>Deploy an instance of this container on each node of the cluster</p>
+                    <p>Application will be deployed as a DaemonSet with an instance on each node of the cluster</p>
                   </label>
                 </div>
               </div>
