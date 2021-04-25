@@ -554,39 +554,6 @@
               <!-- access policy options -->
               <div class="form-group" style="margin-bottom: 0;">
                 <div class="boxselector_wrapper">
-                  <div ng-if="!ctrl.state.isEdit || (ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.SHARED)">
-                    <input
-                      type="radio"
-                      id="data_access_shared"
-                      ng-value="ctrl.ApplicationDataAccessPolicies.SHARED"
-                      ng-model="ctrl.formValues.DataAccessPolicy"
-                      ng-change="ctrl.resetDeploymentType()"
-                    />
-                    <label for="data_access_shared">
-                      <div class="boxselector_header">
-                        <i class="fa fa-cube" aria-hidden="true" style="margin-right: 2px;"></i>
-                        Shared
-                      </div>
-                      <p>Application will be deployed as a Deployment with a shared storage access</p>
-                    </label>
-                  </div>
-                  <div style="color: #767676;" ng-if="ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.ISOLATED">
-                    <input type="radio" id="data_access_shared" disabled />
-                    <label
-                      for="data_access_shared"
-                      tooltip-append-to-body="true"
-                      tooltip-placement="bottom"
-                      tooltip-class="portainer-tooltip"
-                      uib-tooltip="Changing the data access policy is not allowed"
-                      style="cursor: pointer; border-color: #767676;"
-                    >
-                      <div class="boxselector_header">
-                        <i class="fa fa-cube" aria-hidden="true" style="margin-right: 2px;"></i>
-                        Shared
-                      </div>
-                      <p>Application will be deployed as a Deployment with a shared storage access</p>
-                    </label>
-                  </div>
                   <div
                     ng-if="
                       (!ctrl.state.isEdit && !ctrl.state.persistedFoldersUseExistingVolumes) ||
@@ -626,6 +593,39 @@
                         Isolated
                       </div>
                       <p>Application will be deployed as a StatefulSet with each instantiating their own data</p>
+                    </label>
+                  </div>
+                  <div ng-if="!ctrl.state.isEdit || (ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.SHARED)">
+                    <input
+                      type="radio"
+                      id="data_access_shared"
+                      ng-value="ctrl.ApplicationDataAccessPolicies.SHARED"
+                      ng-model="ctrl.formValues.DataAccessPolicy"
+                      ng-change="ctrl.resetDeploymentType()"
+                    />
+                    <label for="data_access_shared">
+                      <div class="boxselector_header">
+                        <i class="fa fa-cube" aria-hidden="true" style="margin-right: 2px;"></i>
+                        Shared
+                      </div>
+                      <p>Application will be deployed as a Deployment with a shared storage access</p>
+                    </label>
+                  </div>
+                  <div style="color: #767676;" ng-if="ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.ISOLATED">
+                    <input type="radio" id="data_access_shared" disabled />
+                    <label
+                      for="data_access_shared"
+                      tooltip-append-to-body="true"
+                      tooltip-placement="bottom"
+                      tooltip-class="portainer-tooltip"
+                      uib-tooltip="Changing the data access policy is not allowed"
+                      style="cursor: pointer; border-color: #767676;"
+                    >
+                      <div class="boxselector_header">
+                        <i class="fa fa-cube" aria-hidden="true" style="margin-right: 2px;"></i>
+                        Shared
+                      </div>
+                      <p>Application will be deployed as a Deployment with a shared storage access</p>
                     </label>
                   </div>
                 </div>
