@@ -3,7 +3,11 @@ import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import { KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resource-quota/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
-import { KubernetesResourcePoolFormValues, KubernetesResourcePoolIngressClassAnnotationFormValue } from 'Kubernetes/models/resource-pool/formValues';
+import {
+  KubernetesResourcePoolFormValues,
+  KubernetesResourcePoolIngressClassAnnotationFormValue,
+  KubernetesResourcePoolIngressClassHostFormValue,
+} from 'Kubernetes/models/resource-pool/formValues';
 import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import { KubernetesFormValidationReferences } from 'Kubernetes/models/application/formValues';
@@ -34,17 +38,43 @@ class KubernetesCreateResourcePoolController {
 
   onChangeIngressHostname() {
     const state = this.state.duplicates.ingressHosts;
-
-    const hosts = _.map(this.formValues.IngressClasses, 'Host');
-    const allHosts = _.map(this.allIngresses, 'Host');
-    const duplicates = KubernetesFormValidationHelper.getDuplicates(hosts);
-    _.forEach(hosts, (host, idx) => {
-      if (_.includes(allHosts, host) && host !== undefined) {
-        duplicates[idx] = host;
+    const hosts = _.flatMap(this.formValues.IngressClasses, 'Hosts');
+    const hostnames = _.map(hosts, 'Host');
+    const hostnamesWithoutRemoved = _.filter(hostnames, (h) => !h.NeedsDeletion);
+    const allHosts = _.flatMap(this.allIngresses, 'Hosts');
+    const formDuplicates = KubernetesFormValidationHelper.getDuplicates(hostnamesWithoutRemoved);
+    _.forEach(hostnames, (host, idx) => {
+      if (host !== undefined && _.includes(allHosts, host)) {
+        formDuplicates[idx] = host;
       }
     });
+    const duplicates = {};
+    let count = 0;
+    _.forEach(this.formValues.IngressClasses, (ic) => {
+      duplicates[ic.IngressClass.Name] = {};
+      _.forEach(ic.Hosts, (hostFV, hostIdx) => {
+        if (hostFV.Host === formDuplicates[count]) {
+          duplicates[ic.IngressClass.Name][hostIdx] = hostFV.Host;
+        }
+        count++;
+      });
+    });
     state.refs = duplicates;
-    state.hasRefs = Object.keys(duplicates).length > 0;
+    state.hasRefs = false;
+    _.forIn(duplicates, (value) => {
+      if (Object.keys(value).length > 0) {
+        state.hasRefs = true;
+      }
+    });
+  }
+
+  addHostname(ingressClass) {
+    ingressClass.Hosts.push(new KubernetesResourcePoolIngressClassHostFormValue());
+  }
+
+  removeHostname(ingressClass, index) {
+    ingressClass.Hosts.splice(index, 1);
+    this.onChangeIngressHostname();
   }
 
   /* #region  ANNOTATIONS MANAGEMENT */
@@ -168,6 +198,11 @@ class KubernetesCreateResourcePoolController {
         const ingressClasses = endpoint.Kubernetes.Configuration.IngressClasses;
         this.formValues.IngressClasses = KubernetesIngressConverter.ingressClassesToFormValues(ingressClasses);
       }
+      _.forEach(this.formValues.IngressClasses, (ic) => {
+        if (ic.Hosts.length === 0) {
+          ic.Hosts.push(new KubernetesResourcePoolIngressClassHostFormValue());
+        }
+      });
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     } finally {

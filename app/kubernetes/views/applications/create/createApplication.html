@@ -1264,7 +1264,14 @@
                   tooltip-enable="ctrl.disableLoadBalancerEdit()"
                   uib-tooltip="Edition is not allowed while the Load Balancer is in 'Pending' state"
                 >
-                  <div class="col-sm-3 input-group input-group-sm" ng-class="{ striked: publishedPort.NeedsDeletion }">
+                  <div
+                    class="input-group input-group-sm"
+                    ng-class="{
+                      striked: publishedPort.NeedsDeletion,
+                      'col-sm-2': ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INGRESS,
+                      'col-sm-3': ctrl.formValues.PublishingType !== ctrl.ApplicationPublishingTypes.INGRESS
+                    }"
+                  >
                     <span class="input-group-addon">container port</span>
                     <input
                       type="number"
@@ -1327,7 +1334,7 @@
                   </div>
 
                   <div
-                    class="col-sm-3 input-group input-group-sm"
+                    class="col-sm-2 input-group input-group-sm"
                     ng-class="{ striked: publishedPort.NeedsDeletion }"
                     ng-if="
                       (publishedPort.IsNew && ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INGRESS) ||
@@ -1349,7 +1356,28 @@
                   </div>
 
                   <div
-                    class="col-sm-3 input-group input-group-sm"
+                    class="col-sm-2 input-group input-group-sm"
+                    ng-class="{ striked: publishedPort.NeedsDeletion }"
+                    ng-if="
+                      (publishedPort.IsNew && ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INGRESS) ||
+                      (!publishedPort.IsNew && ctrl.savedFormValues.PublishingType === ctrl.ApplicationPublishingTypes.INGRESS)
+                    "
+                  >
+                    <span class="input-group-addon">hostname</span>
+                    <select
+                      class="form-control"
+                      name="ingress_hostname_{{ $index }}"
+                      ng-model="publishedPort.IngressHost"
+                      ng-options="host as (host | kubernetesApplicationIngressEmptyHostname) for host in ctrl.ingressHostnames"
+                      ng-change="ctrl.onChangePublishedPorts()"
+                      ng-disabled="ctrl.disableLoadBalancerEdit() || ctrl.isEditAndNotNewPublishedPort($index)"
+                    >
+                      <option selected disabled hidden value="">Select a hostname</option>
+                    </select>
+                  </div>
+
+                  <div
+                    class="col-sm-2 input-group input-group-sm"
                     ng-class="{ striked: publishedPort.NeedsDeletion }"
                     ng-if="
                       (publishedPort.IsNew && ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INGRESS) ||

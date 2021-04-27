@@ -320,7 +320,7 @@ class KubernetesCreateApplicationController {
     const p = new KubernetesApplicationPublishedPortFormValue();
     const ingresses = this.filteredIngresses;
     p.IngressName = ingresses && ingresses.length ? ingresses[0].Name : undefined;
-    p.IngressHost = ingresses && ingresses.length ? ingresses[0].Host : undefined;
+    p.IngressHost = ingresses && ingresses.length ? ingresses[0].Hosts[0] : undefined;
     if (this.formValues.PublishedPorts.length) {
       p.Protocol = this.formValues.PublishedPorts[0].Protocol;
     }
@@ -331,7 +331,7 @@ class KubernetesCreateApplicationController {
     const ingresses = this.filteredIngresses;
     _.forEach(this.formValues.PublishedPorts, (p) => {
       p.IngressName = ingresses && ingresses.length ? ingresses[0].Name : undefined;
-      p.IngressHost = ingresses && ingresses.length ? ingresses[0].Host : undefined;
+      p.IngressHost = ingresses && ingresses.length ? ingresses[0].Hosts[0] : undefined;
     });
   }
 
@@ -388,7 +388,8 @@ class KubernetesCreateApplicationController {
   onChangePortMappingIngress(index) {
     const publishedPort = this.formValues.PublishedPorts[index];
     const ingress = _.find(this.filteredIngresses, { Name: publishedPort.IngressName });
-    publishedPort.IngressHost = ingress.Host;
+    this.ingressHostnames = ingress.Hosts;
+    publishedPort.IngressHost = this.ingressHostnames.length ? this.ingressHostnames[0] : [];
     this.onChangePublishedPorts();
   }
 
@@ -780,6 +781,7 @@ class KubernetesCreateApplicationController {
 
   refreshIngresses(namespace) {
     this.filteredIngresses = _.filter(this.ingresses, { Namespace: namespace });
+    this.ingressHostnames = this.filteredIngresses.length ? this.filteredIngresses[0].Hosts : [];
     if (!this.publishViaIngressEnabled()) {
       if (this.savedFormValues) {
         this.formValues.PublishingType = this.savedFormValues.PublishingType;

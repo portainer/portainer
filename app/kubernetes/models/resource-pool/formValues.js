@@ -17,7 +17,7 @@ export function KubernetesResourcePoolIngressClassFormValue(ingressClass) {
     IngressClass: ingressClass,
     RewriteTarget: false,
     Annotations: [], // KubernetesResourcePoolIngressClassAnnotationFormValue
-    Host: undefined,
+    Hosts: [],
     Selected: false,
     WasSelected: false,
     AdvancedConfig: false,
@@ -29,5 +29,14 @@ export function KubernetesResourcePoolIngressClassAnnotationFormValue() {
   return {
     Key: '',
     Value: '',
+  };
+}
+
+export function KubernetesResourcePoolIngressClassHostFormValue() {
+  return {
+    Host: '',
+    PreviousHost: '',
+    NeedsDeletion: false,
+    IsNew: true,
   };
 }
