@@ -134,6 +134,16 @@ angular
       return values[text] || text;
     };
   })
+  .filter('kubernetesApplicationIngressEmptyHostname', function () {
+    'use strict';
+    return function (value) {
+      if (value === '') {
+        return '<use IP>';
+      } else {
+        return value;
+      }
+    };
+  })
   .filter('kubernetesAppStorageRequestSizeHumanReadable', function () {
     'use strict';
     return function (bytes) {
