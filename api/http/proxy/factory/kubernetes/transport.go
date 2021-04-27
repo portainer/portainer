@@ -73,7 +73,9 @@ func (transport *baseTransport) proxyNamespacedRequest(request *http.Request, fu
 
 	switch {
 	case strings.HasPrefix(requestPath, "configmaps"):
-		return transport.proxyConfigRequest(request, requestPath)
+		return transport.proxyConfigMapsRequest(request, requestPath)
+	case strings.HasPrefix(requestPath, "secrets"):
+		return transport.proxySecretsRequest(request, requestPath)
 	default:
 		return transport.executeKubernetesRequest(request, true)
 	}
