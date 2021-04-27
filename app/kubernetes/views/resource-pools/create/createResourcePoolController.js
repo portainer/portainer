@@ -115,7 +115,7 @@ class KubernetesCreateResourcePoolController {
     }
   }
 
-  /* #region  CREATE RESOURCE POOL */
+  /* #region  CREATE NAMESPACE */
   async createResourcePoolAsync() {
     this.state.actionInProgress = true;
     try {
@@ -123,10 +123,10 @@ class KubernetesCreateResourcePoolController {
       const owner = this.Authentication.getUserDetails().username;
       this.formValues.Owner = owner;
       await this.KubernetesResourcePoolService.create(this.formValues);
-      this.Notifications.success('Resource pool successfully created', this.formValues.Name);
+      this.Notifications.success('Namespace successfully created', this.formValues.Name);
       this.$state.go('kubernetes.resourcePools');
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to create resource pool');
+      this.Notifications.error('Failure', err, 'Unable to create namespace');
     } finally {
       this.state.actionInProgress = false;
     }
@@ -151,12 +151,12 @@ class KubernetesCreateResourcePoolController {
   }
   /* #endregion */
 
-  /* #region  GET RESOURCE POOLS */
+  /* #region  GET NAMESPACES */
   async getResourcePoolsAsync() {
     try {
       this.resourcePools = await this.KubernetesResourcePoolService.get();
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve resource pools');
+      this.Notifications.error('Failure', err, 'Unable to retrieve namespaces');
     }
   }
 

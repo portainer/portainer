@@ -2,7 +2,7 @@
   <a ui-sref="kubernetes.applications">Applications</a> &gt; Create an application
 </kubernetes-view-header>
 <kubernetes-view-header ng-if="ctrl.state.isEdit" title="Edit application" state="kubernetes.applications.application.edit" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.resourcePools">Resource pools</a> &gt;
+  <a ui-sref="kubernetes.resourcePools">Namespaces</a> &gt;
   <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.application.ResourcePool })">{{ ctrl.application.ResourcePool }}</a> &gt;
   <a ui-sref="kubernetes.applications">Applications</a> &gt;
   <a ui-sref="kubernetes.applications.application({ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool })">{{ ctrl.application.Name }}</a> &gt; Edit
@@ -44,7 +44,7 @@
                   >
                 </div>
                 <p ng-if="ctrl.state.alreadyExists"
-                  ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> An application with the same name already exists inside the selected resource pool.</p
+                  ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> An application with the same name already exists inside the selected namespace.</p
                 >
               </div>
             </div>
@@ -84,11 +84,11 @@
             <!-- #endregion -->
 
             <div class="col-sm-12 form-section-title">
-              Resource pool
+              Namespace
             </div>
-            <!-- #region RESOURCE POOL -->
+            <!-- #region NAMESPACE -->
             <div class="form-group">
-              <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Resource pool</label>
+              <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Namespace</label>
               <div class="col-sm-11">
                 <select
                   class="form-control"
@@ -103,8 +103,8 @@
             <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
               <div class="col-sm-12 small text-danger">
                 <i class="fa fa-exclamation-circle red-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                This resource pool has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the
-                resource pool.
+                This namespace has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the
+                namespace.
               </div>
             </div>
             <!-- #endregion -->
@@ -648,16 +648,16 @@
             <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded()">
               <div class="col-sm-12 small text-muted">
                 <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                A resource quota is set on this resource pool, you must specify resource reservations. Resource reservations are applied per instance of the application. Maximums
-                are inherited from the resource pool quota.
+                A resource quota is set on this namespace, you must specify resource reservations. Resource reservations are applied per instance of the application. Maximums are
+                inherited from the namespace quota.
               </div>
             </div>
 
             <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
               <div class="col-sm-12 small text-danger">
                 <i class="fa fa-exclamation-circle red-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                This resource pool has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the
-                resource pool.
+                This namespace has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the
+                namespace.
               </div>
             </div>
 

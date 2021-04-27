@@ -179,16 +179,16 @@ class KubernetesResourcePoolController {
     return false;
   }
 
-  /* #region  UPDATE RESOURCE POOL */
+  /* #region  UPDATE NAMESPACE */
   async updateResourcePoolAsync() {
     this.state.actionInProgress = true;
     try {
       this.checkDefaults();
       await this.KubernetesResourcePoolService.patch(this.savedFormValues, this.formValues);
-      this.Notifications.success('Resource pool successfully updated', this.pool.Namespace.Name);
+      this.Notifications.success('Namespace successfully updated', this.pool.Namespace.Name);
       this.$state.reload();
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to create resource pool');
+      this.Notifications.error('Failure', err, 'Unable to create namespace');
     } finally {
       this.state.actionInProgress = false;
     }
@@ -204,7 +204,7 @@ class KubernetesResourcePoolController {
     if (warnings.quota || warnings.ingress) {
       const messages = {
         quota:
-          'Reducing the quota assigned to an "in-use" resource pool may have unintended consequences, including preventing running applications from functioning correctly and potentially even blocking them from running at all.',
+          'Reducing the quota assigned to an "in-use" namespace may have unintended consequences, including preventing running applications from functioning correctly and potentially even blocking them from running at all.',
         ingress: 'Deactivating ingresses may cause applications to be unaccessible. All ingress configurations from affected applications will be removed.',
       };
       const displayedMessage = `${warnings.quota ? messages.quota : ''}${warnings.quota && warnings.ingress ? '<br/><br/>' : ''}
@@ -232,7 +232,7 @@ class KubernetesResourcePoolController {
         this.events = await this.KubernetesEventService.get(this.pool.Namespace.Name);
         this.state.eventWarningCount = KubernetesEventHelper.warningCount(this.events);
       } catch (err) {
-        this.Notifications.error('Failure', err, 'Unable to retrieve resource pool related events');
+        this.Notifications.error('Failure', err, 'Unable to retrieve namespace related events');
       } finally {
         this.state.eventsLoading = false;
       }
