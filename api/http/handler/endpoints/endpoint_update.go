@@ -250,6 +250,11 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove TLS files from disk", err}
 				}
 			}
+
+			if endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
+				endpoint.TLSConfig.TLS = true
+				endpoint.TLSConfig.TLSSkipVerify = true
+			}
 		}
 
 		if payload.URL != nil || payload.TLS != nil || endpoint.Type == portainer.AzureEnvironment {
