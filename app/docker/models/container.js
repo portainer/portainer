@@ -93,8 +93,14 @@ export function ContainerStatsViewModel(data) {
   this.Networks = _.values(data.networks);
   if (data.blkio_stats !== undefined) {
     //TODO: take care of multiple block devices
-    this.BytesRead = data.blkio_stats.io_service_bytes_recursive[0].value;
-    this.BytesWrite = data.blkio_stats.io_service_bytes_recursive[1].value;
+    var readData = data.blkio_stats.io_service_bytes_recursive.find((d) => d.op === 'Read');
+    if (readData !== undefined) {
+      this.BytesRead = readData.value;
+    }
+    var writeData = data.blkio_stats.io_service_bytes_recursive.find((d) => d.op === 'Write');
+    if (writeData !== undefined) {
+      this.BytesWrite = writeData.value;
+    }
   } else {
     //no IO related data is available
     this.noIOdata = true;
