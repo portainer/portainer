@@ -307,14 +307,24 @@ type (
 
 	// EndpointSecuritySettings represents settings for an endpoint
 	EndpointSecuritySettings struct {
-		AllowBindMountsForRegularUsers            bool `json:"allowBindMountsForRegularUsers"`
-		AllowPrivilegedModeForRegularUsers        bool `json:"allowPrivilegedModeForRegularUsers"`
-		AllowVolumeBrowserForRegularUsers         bool `json:"allowVolumeBrowserForRegularUsers"`
-		AllowHostNamespaceForRegularUsers         bool `json:"allowHostNamespaceForRegularUsers"`
-		AllowDeviceMappingForRegularUsers         bool `json:"allowDeviceMappingForRegularUsers"`
-		AllowStackManagementForRegularUsers       bool `json:"allowStackManagementForRegularUsers"`
-		AllowContainerCapabilitiesForRegularUsers bool `json:"allowContainerCapabilitiesForRegularUsers"`
-		EnableHostManagementFeatures              bool `json:"enableHostManagementFeatures"`
+		// Whether non-administrator should be able to use bind mounts when creating containers
+		AllowBindMountsForRegularUsers bool `json:"allowBindMountsForRegularUsers" example:"false"`
+		// Whether non-administrator should be able to use privileged mode when creating containers
+		AllowPrivilegedModeForRegularUsers bool `json:"allowPrivilegedModeForRegularUsers" example:"false"`
+		// Whether non-administrator should be able to browse volumes
+		AllowVolumeBrowserForRegularUsers bool `json:"allowVolumeBrowserForRegularUsers" example:"true"`
+		// Whether non-administrator should be able to use the host pid
+		AllowHostNamespaceForRegularUsers bool `json:"allowHostNamespaceForRegularUsers" example:"true"`
+		// Whether non-administrator should be able to use device mapping
+		AllowDeviceMappingForRegularUsers bool `json:"allowDeviceMappingForRegularUsers" example:"true"`
+		// Whether non-administrator should be able to manage stacks
+		AllowStackManagementForRegularUsers bool `json:"allowStackManagementForRegularUsers" example:"true"`
+		// Whether non-administrator should be able to use container capabilities
+		AllowContainerCapabilitiesForRegularUsers bool `json:"allowContainerCapabilitiesForRegularUsers" example:"true"`
+		// Whether non-administrator should be able to use sysctl settings
+		AllowSysctlSettingForRegularUsers bool `json:"AllowSysctlSettingForRegularUsers" example:"true"`
+		// Whether host management features are enabled
+		EnableHostManagementFeatures bool `json:"enableHostManagementFeatures" example:"true"`
 	}
 
 	// EndpointType represents the type of an endpoint
