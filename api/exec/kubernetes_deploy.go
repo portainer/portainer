@@ -29,7 +29,7 @@ func NewKubernetesDeployer(binaryPath string) *KubernetesDeployer {
 // Otherwise it will use kubectl to deploy the manifest.
 func (deployer *KubernetesDeployer) Deploy(endpoint *portainer.Endpoint, data string, composeFormat bool, namespace string) ([]byte, error) {
 	if composeFormat {
-		convertedData, err := deployer.convertComposeData(data)
+		convertedData, err := deployer.ConvertCompose(data)
 		if err != nil {
 			return nil, err
 		}
@@ -66,7 +66,8 @@ func (deployer *KubernetesDeployer) Deploy(endpoint *portainer.Endpoint, data st
 	return output, nil
 }
 
-func (deployer *KubernetesDeployer) convertComposeData(data string) ([]byte, error) {
+// ConvertCompose leverages the kompose binary to deploy a compose compliant manifest.
+func (deployer *KubernetesDeployer) ConvertCompose(data string) ([]byte, error) {
 	command := path.Join(deployer.binaryPath, "kompose")
 	if runtime.GOOS == "windows" {
 		command = path.Join(deployer.binaryPath, "kompose.exe")

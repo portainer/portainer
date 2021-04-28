@@ -25,6 +25,7 @@ export class CreateEdgeStackViewController {
       actionInProgress: false,
       StackType: null,
       isEditorDirty: false,
+      hasKubeEndpoint: false,
     };
 
     this.edgeGroups = null;
@@ -40,6 +41,7 @@ export class CreateEdgeStackViewController {
     this.onChangeTemplate = this.onChangeTemplate.bind(this);
     this.onChangeTemplateAsync = this.onChangeTemplateAsync.bind(this);
     this.onChangeMethod = this.onChangeMethod.bind(this);
+    this.onChangeGroups = this.onChangeGroups.bind(this);
   }
 
   async uiCanExit() {
@@ -91,6 +93,23 @@ export class CreateEdgeStackViewController {
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve Template');
     }
+  }
+
+  onChangeGroups(groups) {
+    this.formValues.Groups = groups;
+
+    this.checkIfHasKubeEndpoint(groups);
+  }
+
+  checkIfHasKubeEndpoint(groups) {
+    if (!groups.length) {
+      this.state.hasKubeEndpoint = false;
+    }
+
+    const edgeGroups = groups.map((id) => this.edgeGroups.find((e) => e.Id === id));
+    const endpointTypes = edgeGroups.flatMap((group) => group.EndpointTypes);
+
+    this.state.hasKubeEndpoint = endpointTypes.includes(7);
   }
 
   async createStackAsync() {

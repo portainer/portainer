@@ -31,6 +31,8 @@ const (
 	ComposeStorePath = "compose"
 	// ComposeFileDefaultName represents the default name of a compose file.
 	ComposeFileDefaultName = "docker-compose.yml"
+	// KubeManifestFileDefaultName represents the default name of a compose file.
+	KubeManifestFileDefaultName = "kube-manifest.yml"
 	// EdgeStackStorePath represents the subfolder where edge stack files are stored in the file store folder.
 	EdgeStackStorePath = "edge_stacks"
 	// PrivateKeyFile represents the name on disk of the file containing the private key.

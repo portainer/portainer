@@ -5,17 +5,18 @@ import (
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 )
 
 // Handler is the HTTP handler used to handle endpoint group operations.
 type Handler struct {
 	*mux.Router
-	requestBouncer *security.RequestBouncer
-	DataStore      portainer.DataStore
-	FileService    portainer.FileService
-	GitService     portainer.GitService
+	requestBouncer     *security.RequestBouncer
+	DataStore          portainer.DataStore
+	FileService        portainer.FileService
+	GitService         portainer.GitService
+	KubernetesDeployer portainer.KubernetesDeployer
 }
 
 // NewHandler creates a handler to manage endpoint group operations.

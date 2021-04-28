@@ -194,7 +194,10 @@ type (
 		ProjectPath  string                         `json:"ProjectPath"`
 		EntryPoint   string                         `json:"EntryPoint"`
 		Version      int                            `json:"Version"`
-		Prune        bool                           `json:"Prune"`
+		ManifestPath string
+
+		// Deprecated
+		Prune bool `json:"Prune"`
 	}
 
 	//EdgeStackID represents an edge stack id
@@ -1159,6 +1162,7 @@ type (
 	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes endpoint
 	KubernetesDeployer interface {
 		Deploy(endpoint *Endpoint, data string, composeFormat bool, namespace string) ([]byte, error)
+		ConvertCompose(data string) ([]byte, error)
 	}
 
 	// KubernetesSnapshotter represents a service used to create Kubernetes endpoint snapshots
