@@ -1380,14 +1380,14 @@ func getKeyRole(roleIdentifiers []portainer.RoleID, roles []portainer.Role) *por
 		}
 	}
 
-	result := &portainer.Role{}
+	var result portainer.Role
 	for _, role := range associatedRoles {
 		if role.Priority > result.Priority {
-			result = &role
+			result = role
 		}
 	}
 
-	return result
+	return &result
 }
 
 // unionAuthorizations returns a union of all the input authorizations
