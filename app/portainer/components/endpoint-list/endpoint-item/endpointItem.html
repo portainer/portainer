@@ -19,18 +19,26 @@
             {{ $ctrl.model.Name }}
           </span>
           <span class="space-left blocklist-item-subtitle">
-            <span ng-if="$ctrl.model.Type === 4 || $ctrl.model.Type === 7" class="small text-muted">
-              <span ng-if="$ctrl.model.EdgeID"><i class="fas fa-link"></i> associated</span>
-              <span ng-if="!$ctrl.model.EdgeID"><i class="fas fa-unlink"></i> <s>associated</s></span>
+            <span ng-if="$ctrl.isEdgeEndpoint()">
+              <span ng-if="!$ctrl.model.EdgeID" class="label label-default"><s>associated</s></span>
+              <span ng-if="$ctrl.model.EdgeID">
+                <span class="label" ng-class="{ 'label-danger': !$ctrl.isCheckInValid, 'label-success': $ctrl.isCheckInValid }">heartbeat</span>
+                <span class="space-left small text-muted" ng-if="$ctrl.model.LastCheckInDate">
+                  {{ $ctrl.model.LastCheckInDate | getisodatefromtimestamp }}
+                </span>
+              </span>
             </span>
-            <span class="label label-{{ $ctrl.model.Status | endpointstatusbadge }}" ng-if="$ctrl.model.Type !== 4 && $ctrl.model.Type !== 7">
-              {{ $ctrl.model.Status === 1 ? 'up' : 'down' }}
-            </span>
-            <span class="space-left small text-muted" ng-if="$ctrl.model.Snapshots[0]">
-              {{ $ctrl.model.Snapshots[0].Time | getisodatefromtimestamp }}
-            </span>
-            <span class="space-left small text-muted" ng-if="$ctrl.model.Kubernetes.Snapshots[0]">
-              {{ $ctrl.model.Kubernetes.Snapshots[0].Time | getisodatefromtimestamp }}
+
+            <span ng-if="!$ctrl.isEdgeEndpoint()">
+              <span class="label label-{{ $ctrl.model.Status | endpointstatusbadge }}">
+                {{ $ctrl.model.Status === 1 ? 'up' : 'down' }}
+              </span>
+              <span class="space-left small text-muted" ng-if="$ctrl.model.Snapshots[0]">
+                {{ $ctrl.model.Snapshots[0].Time | getisodatefromtimestamp }}
+              </span>
+              <span class="space-left small text-muted" ng-if="$ctrl.model.Kubernetes.Snapshots[0]">
+                {{ $ctrl.model.Kubernetes.Snapshots[0].Time | getisodatefromtimestamp }}
+              </span>
             </span>
           </span>
         </span>

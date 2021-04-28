@@ -238,6 +238,8 @@ type (
 		Kubernetes              KubernetesData      `json:"Kubernetes"`
 		ComposeSyntaxMaxVersion string              `json:"ComposeSyntaxMaxVersion"`
 		SecuritySettings        EndpointSecuritySettings
+		// LastCheckInDate mark last check-in date on checkin
+		LastCheckInDate int64
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
@@ -318,7 +320,7 @@ type (
 	// EndpointType represents the type of an endpoint
 	EndpointType int
 
-	// EndpointRelation represnts a endpoint relation object
+	// EndpointRelation represents a endpoint relation object
 	EndpointRelation struct {
 		EndpointID EndpointID
 		EdgeStacks map[EdgeStackID]bool
@@ -1187,7 +1189,7 @@ type (
 		DeleteResourceControl(ID ResourceControlID) error
 	}
 
-	// ReverseTunnelService represensts a service used to manage reverse tunnel connections.
+	// ReverseTunnelService represents a service used to manage reverse tunnel connections.
 	ReverseTunnelService interface {
 		StartTunnelServer(addr, port string, snapshotService SnapshotService) error
 		StopTunnelServer() error
@@ -1623,6 +1625,7 @@ const (
 	K8sRolePortainerEdit K8sRole = "portainer-edit"
 )
 
+// represents an authorization type
 const (
 	OperationDockerContainerArchiveInfo         Authorization = "DockerContainerArchiveInfo"
 	OperationDockerContainerList                Authorization = "DockerContainerList"

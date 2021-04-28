@@ -14,7 +14,8 @@ angular
     StateManager,
     ModalService,
     MotdService,
-    BackupService
+    BackupService,
+    SettingsService
   ) {
     $scope.state = {
       connectingToEdgeEndpoint: false,
@@ -83,7 +84,7 @@ angular
           var groups = data.groups;
           EndpointHelper.mapGroupNameToEndpoint(endpoints, groups);
           EndpointProvider.setEndpoints(endpoints);
-          deferred.resolve({ endpoints: endpoints, totalCount: data.endpoints.totalCount });
+          deferred.resolve({ endpoints: decorateEndpoints(endpoints), totalCount: data.endpoints.totalCount });
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve endpoint information');
@@ -103,14 +104,15 @@ angular
       });
 
       try {
-        const [{ totalCount, endpoints }, tags] = await Promise.all([getPaginatedEndpoints(0, 100), TagService.tags()]);
+        const [{ totalCount, endpoints }, tags, settings] = await Promise.all([getPaginatedEndpoints(0, 100), TagService.tags(), SettingsService.settings()]);
         $scope.tags = tags;
+        $scope.defaultEdgeCheckInInterval = settings.EdgeAgentCheckinInterval;
 
         $scope.totalCount = totalCount;
         if (totalCount > 100) {
           $scope.endpoints = [];
         } else {
-          $scope.endpoints = endpoints;
+          $scope.endpoints = decorateEndpoints(endpoints);
         }
       } catch (err) {
         Notifications.error('Failed loading page data', err);
@@ -118,4 +120,10 @@ angular
     }
 
     initView();
+
+    function decorateEndpoints(endpoints) {
+      return endpoints.map((endpoint) => {
+        return { ...endpoint, EdgeCheckinInterval: endpoint.EdgeAgentCheckinInterval || $scope.defaultEdgeCheckInInterval };
+      });
+    }
   });
