@@ -51,9 +51,10 @@ func (service *Service) Stop() {
 		return
 	}
 
+	// clear refreshSignal to mark the service as disabled
 	close(service.refreshSignal)
+	service.refreshSignal = nil
 }
-
 // SetSnapshotInterval sets the snapshot interval and resets the service
 func (service *Service) SetSnapshotInterval(snapshotInterval string) error {
 	service.Stop()
