@@ -45,7 +45,7 @@
 <div class="form-group" ng-if="$ctrl.settings.TLSConfig.TLS || ($ctrl.settings.StartTLS && !$ctrl.settings.TLSConfig.TLSSkipVerify)">
   <label class="col-sm-3 control-label text-left">TLS CA certificate</label>
   <div class="col-sm-9">
-    <button class="btn btn-sm btn-primary" ngf-select="$ctrl.onTlscaCertChange($file)" ng-model="$ctrl.tlscaCert">Select file</button>
+    <button type="button" class="btn btn-sm btn-primary" ngf-select="$ctrl.onTlscaCertChange($file)" ng-model="$ctrl.tlscaCert">Select file</button>
     <span style="margin-left: 5px;">
       {{ $ctrl.tlscaCert.name }}
       <i class="fa fa-check green-icon" ng-if="$ctrl.tlscaCert && $ctrl.tlscaCert === $ctrl.settings.TLSConfig.TLSCACert" aria-hidden="true"></i>

@@ -97,7 +97,7 @@
               <div class="form-group">
                 <label for="tls_cert" class="col-sm-3 col-lg-2 control-label text-left">TLS CA certificate</label>
                 <div class="col-sm-9 col-lg-10">
-                  <button class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.model.TLSCACertFile">Select file</button>
+                  <button type="button" class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.model.TLSCACertFile">Select file</button>
                   <span style="margin-left: 5px;">
                     {{ $ctrl.model.TLSCACertFile.name }}
                     <i
@@ -114,7 +114,7 @@
               <div class="form-group">
                 <label for="tls_cert" class="col-sm-3 col-lg-2 control-label text-left">TLS certificate</label>
                 <div class="col-sm-9 col-lg-10">
-                  <button class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.model.TLSCertFile">Select file</button>
+                  <button type="button" class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.model.TLSCertFile">Select file</button>
                   <span style="margin-left: 5px;">
                     {{ $ctrl.model.TLSCertFile.name }}
                     <i
@@ -131,7 +131,7 @@
               <div class="form-group">
                 <label class="col-sm-3 col-lg-2 control-label text-left">TLS key</label>
                 <div class="col-sm-9 col-lg-10">
-                  <button class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.model.TLSKeyFile">Select file</button>
+                  <button type="button" class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.model.TLSKeyFile">Select file</button>
                   <span style="margin-left: 5px;">
                     {{ $ctrl.model.TLSKeyFile.name }}
                     <i
