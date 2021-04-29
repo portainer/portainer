@@ -47,6 +47,7 @@ const _KubernetesPodContainer = Object.freeze({
   PodName: '',
   Name: '',
   Image: '',
+  ImagePullPolicy: '',
   Node: '',
   CreationDate: '',
   Status: '',
