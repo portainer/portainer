@@ -11,5 +11,6 @@ angular.module('portainer.kubernetes').component('kubernetesContainersDatatable'
     showConsole: '<',
     accessNode: '<',
     isPod: '<',
+    useServerMetrics: '<',
   },
 });

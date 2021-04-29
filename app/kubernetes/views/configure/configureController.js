@@ -17,7 +17,7 @@ class KubernetesConfigureController {
   // >> with: templateProvider|templateUrl|template|notify|async|controller|controllerProvider|controllerAs|resolveAs
   // >> in stateview: 'content@@portainer.endpoints.endpoint.kubernetesConfig'
   /* @ngInject */
-  constructor($async, $state, $transition$, Notifications, KubernetesStorageService, EndpointService, EndpointProvider, ModalService) {
+  constructor($async, $state, $transition$, Notifications, KubernetesStorageService, EndpointService, EndpointProvider, ModalService, KubernetesMetricsService) {
     this.$async = $async;
     this.$state = $state;
     this.$transition$ = $transition$;
@@ -26,6 +26,7 @@ class KubernetesConfigureController {
     this.EndpointService = EndpointService;
     this.EndpointProvider = EndpointProvider;
     this.ModalService = ModalService;
+    this.KubernetesMetricsService = KubernetesMetricsService;
 
     this.IngressClassTypes = KubernetesIngressClassTypes;
 
@@ -136,6 +137,27 @@ class KubernetesConfigureController {
     return [storageClasses, ingressClasses];
   }
 
+  enableMetricsServer() {
+    if (this.formValues.UseServerMetrics) {
+      this.state.metrics.userClick = true;
+      this.state.metrics.pending = true;
+      this.KubernetesMetricsService.capabilities(this.endpoint.Id)
+        .then(() => {
+          this.state.metrics.isServerRunning = true;
+          this.state.metrics.pending = false;
+          this.formValues.UseServerMetrics = true;
+        })
+        .catch(() => {
+          this.state.metrics.isServerRunning = false;
+          this.state.metrics.pending = false;
+          this.formValues.UseServerMetrics = false;
+        });
+    } else {
+      this.state.metrics.userClick = false;
+      this.formValues.UseServerMetrics = false;
+    }
+  }
+
   async configureAsync() {
     try {
       this.state.actionInProgress = true;
@@ -193,6 +215,11 @@ class KubernetesConfigureController {
       endpointId: this.$transition$.params().id,
       duplicates: {
         ingressClasses: new KubernetesFormValidationReferences(),
+      },
+      metrics: {
+        pending: false,
+        isServerRunning: false,
+        userClick: false,
       },
     };
 

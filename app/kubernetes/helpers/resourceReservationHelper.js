@@ -29,6 +29,8 @@ class KubernetesResourceReservationHelper {
     let res = parseInt(cpu, 10);
     if (_.endsWith(cpu, 'm')) {
       res /= 1000;
+    } else if (_.endsWith(cpu, 'n')) {
+      res /= 1000000000;
     }
     return res;
   }
