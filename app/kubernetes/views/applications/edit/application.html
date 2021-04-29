@@ -587,6 +587,7 @@
         table-key="kubernetes.application.containers"
         is-pod="ctrl.application.ApplicationType === ctrl.KubernetesApplicationTypes.POD"
         order-by="{{ ctrl.application.ApplicationType === ctrl.KubernetesApplicationTypes.POD ? 'Name' : 'PodName' }}"
+        use-server-metrics="ctrl.state.useServerMetrics"
       >
       </kubernetes-containers-datatable>
     </div>
