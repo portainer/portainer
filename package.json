@@ -30,7 +30,9 @@
     "start:toolkit": "grunt start:toolkit",
     "build:server:offline": "cd ./api/cmd/portainer && CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags '-s' && mv -f portainer ../../../dist/portainer",
     "clean:all": "grunt clean:all",
-    "format": "prettier --loglevel warn --write \"**/*.{js,css,html}\""
+    "format": "prettier --loglevel warn --write \"**/*.{js,css,html}\"",
+    "snyk-protect": "snyk protect",
+    "prepare": "yarn run snyk-protect"
   },
   "scriptsComments": {
     "build": "Build the entire app (backend/frontend) in development mode",
@@ -72,8 +74,8 @@
     "babel-plugin-angularjs-annotate": "^0.10.0",
     "bootbox": "^5.4.0",
     "bootstrap": "^3.4.0",
-    "chart.js": "~2.6.0",
-    "codemirror": "~5.30.0",
+    "chart.js": "~2.9.4",
+    "codemirror": "~5.58.2",
     "fast-json-patch": "^3.0.0-1",
     "filesize": "~3.3.0",
     "filesize-parser": "^1.5.0",
@@ -90,7 +92,8 @@
     "ui-select": "^0.19.8",
     "uuid": "^3.3.2",
     "xterm": "^3.8.0",
-    "yaml": "^1.10.0"
+    "yaml": "^1.10.0",
+    "snyk": "^1.573.0"
   },
   "devDependencies": {
     "@babel/core": "^7.1.2",
@@ -162,5 +165,6 @@
   "lint-staged": {
     "*.js": "eslint --cache --fix",
     "*.{js,css,md,html}": "prettier --write"
-  }
+  },
+  "snyk": true
 }
