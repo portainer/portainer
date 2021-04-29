@@ -5,8 +5,6 @@ ignore: {}
 patch:
   SNYK-JS-LODASH-567746:
     - babel-plugin-angularjs-annotate > @babel/types > lodash:
-        patched: '2021-04-29T13:49:11.975Z'
-    - babel-plugin-angularjs-annotate > @babel/types > lodash:
         patched: '2021-04-29T14:20:03.131Z'
     - snyk > snyk-nodejs-lockfile-parser > @yarnpkg/core > lodash:
         patched: '2021-04-29T14:20:03.131Z'
