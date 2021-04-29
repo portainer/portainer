@@ -91,6 +91,20 @@ export function ContainerStatsViewModel(data) {
     this.CPUCores = data.cpu_stats.cpu_usage.percpu_usage.length;
   }
   this.Networks = _.values(data.networks);
+  if (data.blkio_stats !== undefined) {
+    //TODO: take care of multiple block devices
+    var readData = data.blkio_stats.io_service_bytes_recursive.find((d) => d.op === 'Read');
+    if (readData !== undefined) {
+      this.BytesRead = readData.value;
+    }
+    var writeData = data.blkio_stats.io_service_bytes_recursive.find((d) => d.op === 'Write');
+    if (writeData !== undefined) {
+      this.BytesWrite = writeData.value;
+    }
+  } else {
+    //no IO related data is available
+    this.noIOdata = true;
+  }
 }
 
 export function ContainerDetailsViewModel(data) {
