@@ -154,6 +154,7 @@ angular.module('portainer.docker').controller('ImageController', [
         .then(function success(data) {
           $scope.image = data.image;
           $scope.history = data.history;
+          $scope.image.Env = _.sortBy($scope.image.Env, _.toLower);
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve image details');
