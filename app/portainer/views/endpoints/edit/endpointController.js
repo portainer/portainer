@@ -89,7 +89,7 @@ angular
             ' -e CAP_HOST_MANAGEMENT=1 --mode global --constraint node.platform.os==windows --mount type=npipe,src=\\\\.\\pipe\\docker_engine,dst=\\\\.\\pipe\\docker_engine --mount type=bind,src=C:\\ProgramData\\docker\\volumes,dst=C:\\ProgramData\\docker\\volumes --mount type=volume,src=portainer_agent_data,dst=C:\\data portainer/agent:2.4.0'
         );
       } else {
-        clipboard.copyText('curl https://downloads.portainer.io/portainer-ee20-edge-agent-setup.sh | bash -s -- ' + $scope.randomEdgeID + ' ' + $scope.endpoint.EdgeKey);
+        clipboard.copyText('curl https://downloads.portainer.io/portainer-ee24-edge-agent-setup.sh | bash -s -- ' + $scope.randomEdgeID + ' ' + $scope.endpoint.EdgeKey);
       }
       $('#copyNotificationDeploymentCommand').show().fadeOut(2500);
     };
