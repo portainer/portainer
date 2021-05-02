@@ -875,6 +875,11 @@
     "@nodelib/fs.scandir" "2.1.3"
     fastq "^1.6.0"
 
+"@nxmix/tokenize-ansi@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@nxmix/tokenize-ansi/-/tokenize-ansi-3.0.0.tgz#9a7bdae1a0cf5317d5b9176038c026e374e62a58"
+  integrity sha512-37QMpFIiQ6J31tavjMFCuWs3YIqXIDCuGvPiDVofFqvgXq6vM+8LqU4sqibsvb9JX/1SIeDp+SedOqpq2qc7TA==
+
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/@samverschueren/stream-to-observable/-/stream-to-observable-0.3.1.tgz#a21117b19ee9be70c379ec1877537ef2e1c63301"
@@ -10976,6 +10981,11 @@ ws@^6.2.1:
   integrity sha512-GIyAXC2cB7LjvpgMt9EKS2ldqr0MTrORaleiOno6TweZ6r3TKtoFQWay/2PceJ3RuBasOHzXNn5Lrw1X0bEjqA==
   dependencies:
     async-limiter "~1.0.0"
+
+x256@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/x256/-/x256-0.0.2.tgz#c9af18876f7a175801d564fe70ad9e8317784934"
+  integrity sha1-ya8Yh296F1gB1WT+cK2egxd4STQ=
 
 xtend@^4.0.0, xtend@~4.0.1:
   version "4.0.2"
