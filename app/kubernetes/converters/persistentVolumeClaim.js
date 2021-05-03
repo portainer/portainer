@@ -62,7 +62,7 @@ class KubernetesPersistentVolumeClaimConverter {
     res.metadata.name = pvc.Name;
     res.metadata.namespace = pvc.Namespace;
     res.spec.resources.requests.storage = pvc.Storage;
-    res.spec.storageClassName = pvc.StorageClass.Name;
+    res.spec.storageClassName = pvc.StorageClass ? pvc.StorageClass.Name : '';
     res.metadata.labels.app = pvc.ApplicationName;
     res.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = pvc.ApplicationOwner;
     res.metadata.labels[KubernetesPortainerApplicationNameLabel] = pvc.ApplicationName;
