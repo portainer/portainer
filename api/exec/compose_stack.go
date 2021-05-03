@@ -77,6 +77,11 @@ func (w *ComposeStackManager) Down(stack *portainer.Stack, endpoint *portainer.E
 	return err
 }
 
+// NormalizeStackName returns the passed stack name, for interface implementation only
+func (w *ComposeStackManager) NormalizeStackName(name string) string {
+	return name
+}
+
 func stackFilePath(stack *portainer.Stack) string {
 	return path.Join(stack.ProjectPath, stack.EntryPoint)
 }

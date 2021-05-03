@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"path"
 	"path/filepath"
+	"regexp"
+	"strings"
 
 	"github.com/portainer/libcompose/config"
 	"github.com/portainer/libcompose/docker"
@@ -123,4 +125,10 @@ func (manager *ComposeStackManager) Down(stack *portainer.Stack, endpoint *porta
 	}
 
 	return proj.Down(context.Background(), options.Down{RemoveVolume: false, RemoveOrphans: true})
+}
+
+// NormalizeStackName returns a new stack name with unsupported characters replaced
+func (manager *ComposeStackManager) NormalizeStackName(name string) string {
+	r := regexp.MustCompile("[^a-z0-9]+")
+	return r.ReplaceAllString(strings.ToLower(name), "")
 }
