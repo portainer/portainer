@@ -40,6 +40,7 @@
               <select
                 class="form-control"
                 ng-model="mount.Source"
+                ng-change="updateMount(service, mount)"
                 ng-options="vol.Id as ((vol.Id|truncate:30) + ' - ' + (vol.Driver|truncate:30))  for vol in availableVolumes"
                 ng-if="mount.Type === 'volume'"
                 disable-authorization="DockerServiceUpdate"
