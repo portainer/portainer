@@ -47,6 +47,11 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
 	}
 
+	settings, err := handler.DataStore.Settings().Settings()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+	}
+
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
@@ -89,6 +94,9 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	for idx := range paginatedEndpoints {
 		hideFields(&paginatedEndpoints[idx])
 		paginatedEndpoints[idx].ComposeSyntaxMaxVersion = handler.ComposeStackManager.ComposeSyntaxMaxVersion()
+		if paginatedEndpoints[idx].EdgeCheckinInterval == 0 {
+			paginatedEndpoints[idx].EdgeCheckinInterval = settings.EdgeAgentCheckinInterval
+		}
 	}
 
 	w.Header().Set("X-Total-Count", strconv.Itoa(filteredEndpointCount))
