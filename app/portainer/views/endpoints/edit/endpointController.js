@@ -62,7 +62,7 @@ angular
             $scope.randomEdgeID +
             ' -e EDGE_KEY=' +
             $scope.endpoint.EdgeKey +
-            ' -e CAP_HOST_MANAGEMENT=1 --name portainer_edge_agent portainer/agent:2.4.0'
+            ' -e CAP_HOST_MANAGEMENT=1 --name portainer_edge_agent portainer/agent'
         );
       } else if ($scope.state.deploymentTab === 2 && $scope.state.platformType === 'windows') {
         clipboard.copyText(
@@ -70,7 +70,7 @@ angular
             $scope.randomEdgeID +
             ' -e EDGE_KEY=' +
             $scope.endpoint.EdgeKey +
-            ' -e CAP_HOST_MANAGEMENT=1 --name portainer_edge_agent portainer/agent:2.4.0'
+            ' -e CAP_HOST_MANAGEMENT=1 --name portainer_edge_agent portainer/agent'
         );
       } else if ($scope.state.deploymentTab === 1 && $scope.state.platformType === 'linux') {
         clipboard.copyText(
@@ -78,7 +78,7 @@ angular
             $scope.randomEdgeID +
             ' -e EDGE_KEY=' +
             $scope.endpoint.EdgeKey +
-            " -e CAP_HOST_MANAGEMENT=1 --mode global --constraint 'node.platform.os == linux' --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volumes --mount type=bind,src=//,dst=/host --mount type=volume,src=portainer_agent_data,dst=/data portainer/agent:2.4.0"
+            " -e CAP_HOST_MANAGEMENT=1 --mode global --constraint 'node.platform.os == linux' --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volumes --mount type=bind,src=//,dst=/host --mount type=volume,src=portainer_agent_data,dst=/data portainer/agent"
         );
       } else if ($scope.state.deploymentTab === 1 && $scope.state.platformType === 'windows') {
         clipboard.copyText(
@@ -86,7 +86,7 @@ angular
             $scope.randomEdgeID +
             ' -e EDGE_KEY=' +
             $scope.endpoint.EdgeKey +
-            ' -e CAP_HOST_MANAGEMENT=1 --mode global --constraint node.platform.os==windows --mount type=npipe,src=\\\\.\\pipe\\docker_engine,dst=\\\\.\\pipe\\docker_engine --mount type=bind,src=C:\\ProgramData\\docker\\volumes,dst=C:\\ProgramData\\docker\\volumes --mount type=volume,src=portainer_agent_data,dst=C:\\data portainer/agent:2.4.0'
+            ' -e CAP_HOST_MANAGEMENT=1 --mode global --constraint node.platform.os==windows --mount type=npipe,src=\\\\.\\pipe\\docker_engine,dst=\\\\.\\pipe\\docker_engine --mount type=bind,src=C:\\ProgramData\\docker\\volumes,dst=C:\\ProgramData\\docker\\volumes --mount type=volume,src=portainer_agent_data,dst=C:\\data portainer/agent'
         );
       } else {
         clipboard.copyText('curl https://downloads.portainer.io/portainer-edge-agent-setup.sh | bash -s -- ' + $scope.randomEdgeID + ' ' + $scope.endpoint.EdgeKey);
@@ -258,7 +258,7 @@ angular
   -e EDGE_KEY=${edgeKey} \\
   -e CAP_HOST_MANAGEMENT=1 \\
   --name portainer_edge_agent \\
-  portainer/agent:2.4.0`;
+  portainer/agent`;
     }
 
     function buildWindowsStandaloneCommand(edgeId, edgeKey) {
@@ -272,7 +272,7 @@ angular
   -e EDGE_KEY=${edgeKey} \\
   -e CAP_HOST_MANAGEMENT=1 \\
   --name portainer_edge_agent \\
-  portainer/agent:2.4.0`;
+  portainer/agent`;
     }
 
     function buildLinuxSwarmCommand(edgeId, edgeKey) {
@@ -294,7 +294,7 @@ docker service create \\
   --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volumes \\
   --mount type=bind,src=//,dst=/host \\
   --mount type=volume,src=portainer_agent_data,dst=/data \\
-  portainer/agent:2.4.0`;
+  portainer/agent`;
     }
 
     function buildWindowsSwarmCommand(edgeId, edgeKey) {
@@ -314,7 +314,7 @@ docker service create \\
   --mount type=npipe,src=\\\\.\\pipe\\docker_engine,dst=\\\\.\\pipe\\docker_engine \\
   --mount type=bind,src=C:\\ProgramData\\docker\\volumes,dst=C:\\ProgramData\\docker\\volumes \\
   --mount type=volume,src=portainer_agent_data,dst=C:\\data \\
-  portainer/agent:2.4.0`;
+  portainer/agent`;
     }
 
     initView();
