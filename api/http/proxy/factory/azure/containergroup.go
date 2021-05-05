@@ -2,6 +2,8 @@ package azure
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/http/useractivity"
+	"github.com/portainer/portainer/api/http/utils"
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
@@ -23,9 +25,19 @@ func (transport *Transport) proxyContainerGroupRequest(request *http.Request) (*
 }
 
 func (transport *Transport) proxyContainerGroupPutRequest(request *http.Request) (*http.Response, error) {
+	body, err := utils.CopyBody(request)
+	if err != nil {
+		return nil, err
+	}
+
 	response, err := http.DefaultTransport.RoundTrip(request)
 	if err != nil {
 		return response, err
+	}
+
+	// log if request is success
+	if 200 <= response.StatusCode && response.StatusCode < 300 {
+		useractivity.LogProxyActivity(transport.userActivityStore, transport.endpoint.Name, request, body)
 	}
 
 	responseObject, err := responseutils.GetResponseAsJSONObject(response)
@@ -82,6 +94,11 @@ func (transport *Transport) proxyContainerGroupGetRequest(request *http.Request)
 }
 
 func (transport *Transport) proxyContainerGroupDeleteRequest(request *http.Request) (*http.Response, error) {
+	body, err := utils.CopyBody(request)
+	if err != nil {
+		return nil, err
+	}
+
 	context, err := transport.createAzureRequestContext(request)
 	if err != nil {
 		return nil, err
@@ -94,6 +111,11 @@ func (transport *Transport) proxyContainerGroupDeleteRequest(request *http.Reque
 	response, err := http.DefaultTransport.RoundTrip(request)
 	if err != nil {
 		return response, err
+	}
+
+	// log if request is success
+	if 200 <= response.StatusCode && response.StatusCode < 300 {
+		useractivity.LogProxyActivity(transport.userActivityStore, transport.endpoint.Name, request, body)
 	}
 
 	responseObject, err := responseutils.GetResponseAsJSONObject(response)
