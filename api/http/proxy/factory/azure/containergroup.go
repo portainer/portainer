@@ -2,9 +2,7 @@ package azure
 
 import (
 	"errors"
-	"io/ioutil"
 	"net/http"
-	"strings"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
@@ -26,6 +24,7 @@ func (transport *Transport) proxyContainerGroupRequest(request *http.Request) (*
 
 func (transport *Transport) proxyContainerGroupPutRequest(request *http.Request) (*http.Response, error) {
 	//add a lock before processing existense check
+	//add a lock before processing existense check
 	transport.mutex.Lock()
 	defer transport.mutex.Unlock()
 
@@ -45,9 +44,14 @@ func (transport *Transport) proxyContainerGroupPutRequest(request *http.Request)
 	if err != nil {
 		return validationResponse, err
 	}
+
 	if validationResponse.StatusCode >= 200 && validationResponse.StatusCode < 300 {
-		respBody := ioutil.NopCloser(strings.NewReader("A container instance with the same already exist in that resource group"))
-		return &http.Response{StatusCode: http.StatusConflict, Body: respBody}, nil
+		resp := &http.Response{}
+		errObj := map[string]string{
+			"message": "A container instance with the same already exist in that resource group",
+		}
+		err = responseutils.RewriteResponse(resp, errObj, http.StatusConflict)
+		return resp, err
 	}
 
 	response, err := http.DefaultTransport.RoundTrip(request)
