@@ -47,7 +47,7 @@ func (transport *Transport) proxyContainerGroupPutRequest(request *http.Request)
 	if validationResponse.StatusCode >= 200 && validationResponse.StatusCode < 300 {
 		resp := &http.Response{}
 		errObj := map[string]string{
-			"message": "A container instance with the same name already exists in that resource group",
+			"message": "A container instance with the same name already exists inside the selected resource group",
 		}
 		err = responseutils.RewriteResponse(resp, errObj, http.StatusConflict)
 		return resp, err
