@@ -3,11 +3,12 @@ package git
 import (
 	"context"
 	"crypto/tls"
-	"github.com/pkg/errors"
 	"net/http"
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
@@ -27,7 +28,7 @@ type downloader interface {
 	download(ctx context.Context, dst string, opt cloneOptions) error
 }
 
-type gitClient struct{
+type gitClient struct {
 	preserveGitDirectory bool
 }
 
@@ -86,19 +87,9 @@ func NewService() *Service {
 	}
 }
 
-// ClonePublicRepository clones a public git repository using the specified URL in the specified
+// CloneRepository clones a git repository using the specified URL in the specified
 // destination folder.
-func (service *Service) ClonePublicRepository(repositoryURL, referenceName, destination string) error {
-	return service.cloneRepository(destination, cloneOptions{
-		repositoryUrl: repositoryURL,
-		referenceName: referenceName,
-		depth:         1,
-	})
-}
-
-// ClonePrivateRepositoryWithBasicAuth clones a private git repository using the specified URL in the specified
-// destination folder. It will use the specified Username and Password for basic HTTP authentication.
-func (service *Service) ClonePrivateRepositoryWithBasicAuth(repositoryURL, referenceName, destination, username, password string) error {
+func (service *Service) CloneRepository(repositoryURL, referenceName, destination, username, password string) error {
 	return service.cloneRepository(destination, cloneOptions{
 		repositoryUrl: repositoryURL,
 		username:      username,
