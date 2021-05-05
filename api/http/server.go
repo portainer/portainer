@@ -68,6 +68,7 @@ type Server struct {
 	ProxyManager                *proxy.Manager
 	KubernetesTokenCacheManager *kubernetes.TokenCacheManager
 	Handler                     *handler.Handler
+	DemoEnvironment             bool
 	SSL                         bool
 	SSLCert                     string
 	SSLKey                      string

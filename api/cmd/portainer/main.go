@@ -517,6 +517,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		BindAddress:                 *flags.Addr,
 		AssetsPath:                  *flags.Assets,
 		DataStore:                   dataStore,
+		DemoEnvironment:             *flags.DemoEnvironment,
 		SwarmStackManager:           swarmStackManager,
 		ComposeStackManager:         composeStackManager,
 		KubernetesDeployer:          kubernetesDeployer,
