@@ -77,12 +77,11 @@ export function KubernetesIngressService($async, KubernetesIngresses) {
     });
   }
 
-  function _delete(ingress) {
+  function _delete(namespace, ingressClassName) {
     return $async(async () => {
       try {
         const params = new KubernetesCommonParams();
-        params.id = ingress.Name;
-        const namespace = ingress.Namespace;
+        params.id = ingressClassName;
         await KubernetesIngresses(namespace).delete(params).$promise;
       } catch (err) {
         throw new PortainerError('Unable to delete ingress', err);
