@@ -2,7 +2,9 @@ package azure
 
 import (
 	"errors"
+	"io/ioutil"
 	"net/http"
+	"strings"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
@@ -39,8 +41,13 @@ func (transport *Transport) proxyContainerGroupPutRequest(request *http.Request)
 	//fire the request to Azure API to validate if there is an existing container instance with the same name
 	//positive - reject the request
 	//negative - continue the process
-	if validationResponse, err := http.DefaultTransport.RoundTrip(validationRequest); err == nil && validationResponse.StatusCode/100 == 2 {
-		return nil, errors.New("Container instance already exists")
+	validationResponse, err := http.DefaultTransport.RoundTrip(validationRequest)
+	if err != nil {
+		return validationResponse, err
+	}
+	if validationResponse.StatusCode >= 200 && validationResponse.StatusCode < 300 {
+		respBody := ioutil.NopCloser(strings.NewReader("A container instance with the same already exist in that resource group"))
+		return &http.Response{StatusCode: http.StatusConflict, Body: respBody}, nil
 	}
 
 	response, err := http.DefaultTransport.RoundTrip(request)
