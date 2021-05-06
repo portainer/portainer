@@ -150,7 +150,7 @@ class KubernetesConfigureController {
 
     ingressesToDel.forEach((ingress) => {
       resourcePools.forEach((resourcePool) => {
-        promises.push(this.KubernetesIngressService.delete({ IngressClass: ingress, Namespace: resourcePool.Namespace.Name }));
+        promises.push(this.KubernetesIngressService.delete(resourcePool.Namespace.Name, ingress.Name));
       });
     });
 
