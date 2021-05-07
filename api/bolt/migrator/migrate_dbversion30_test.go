@@ -50,7 +50,7 @@ func initSettingsService(dbConn *bolt.DB) (*settings.Service, error) {
 	return settingsService, nil
 }
 
-func TestUpdateSettingsToDB28(t *testing.T) {
+func TestUpdateSettingsToDB31(t *testing.T) {
 	dbConn, err := initDBConn()
 	if err != nil {
 		t.Errorf("failed to init testing bolt DB connection: %v", err)
@@ -65,7 +65,7 @@ func TestUpdateSettingsToDB28(t *testing.T) {
 		db:              dbConn,
 		settingsService: settingsService,
 	}
-	if err := m.updateSettingsToDB28(); err != nil {
+	if err := m.updateSettingsToDB31(); err != nil {
 		t.Errorf("failed to update settings: %v", err)
 	}
 	updatedSettings, err := m.settingsService.Settings()

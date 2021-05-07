@@ -1,6 +1,6 @@
 package migrator
 
-func (m *Migrator) updateSettingsToDB28() error {
+func (m *Migrator) updateSettingsToDB31() error {
 	legacySettings, err := m.settingsService.Settings()
 	if err != nil {
 		return err
