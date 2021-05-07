@@ -489,6 +489,8 @@ type (
 		Scopes               string `json:"Scopes"`
 		OAuthAutoCreateUsers bool   `json:"OAuthAutoCreateUsers"`
 		DefaultTeamID        TeamID `json:"DefaultTeamID"`
+		SSO                  bool   `json:"SSO"`
+		LogoutURI            string `json:"LogoutURI"`
 	}
 
 	// Pair defines a key/value string pair
