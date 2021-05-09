@@ -273,7 +273,7 @@ angular.module('portainer.app').controller('StackController', [
           $scope.containerNames = ContainerHelper.getContainerNames($scope.containers);
 
           let resourcesPromise = Promise.resolve({});
-          if (stack.Status === 1) {
+          if (!stack.Status || stack.Status === 1) {
             resourcesPromise = stack.Type === 1 ? retrieveSwarmStackResources(stack.Name, agentProxy) : retrieveComposeStackResources(stack.Name);
           }
 
@@ -283,9 +283,15 @@ angular.module('portainer.app').controller('StackController', [
           });
         })
         .then(function success(data) {
+          const isSwarm = $scope.stack.Type === 1;
           $scope.stackFileContent = data.stackFile;
+          // workaround for missing status, if stack has resources, set the status to 1 (active), otherwise to 2 (inactive) (https://github.com/portainer/portainer/issues/4422)
+          if (!$scope.stack.Status) {
+            $scope.stack.Status = data.resources && ((isSwarm && data.resources.services.length) || data.resources.containers.length) ? 1 : 2;
+          }
+
           if ($scope.stack.Status === 1) {
-            if ($scope.stack.Type === 1) {
+            if (isSwarm) {
               assignSwarmStackResources(data.resources, agentProxy);
             } else {
               assignComposeStackResources(data.resources);

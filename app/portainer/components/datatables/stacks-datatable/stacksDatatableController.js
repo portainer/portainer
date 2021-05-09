@@ -47,7 +47,7 @@ angular.module('portainer.app').controller('StacksDatatableController', [
     this.applyFilters = applyFilters.bind(this);
     function applyFilters(stack) {
       const { showActiveStacks, showUnactiveStacks } = this.filters.state;
-      return (stack.Status === 1 && showActiveStacks) || (stack.Status === 2 && showUnactiveStacks) || stack.External;
+      return (stack.Status === 1 && showActiveStacks) || (stack.Status === 2 && showUnactiveStacks) || stack.External || !stack.Status;
     }
 
     this.onFilterChange = onFilterChange.bind(this);
