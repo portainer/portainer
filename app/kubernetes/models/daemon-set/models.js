@@ -5,7 +5,7 @@ const _KubernetesDaemonSet = Object.freeze({
   Namespace: '',
   Name: '',
   StackName: '',
-  Image: '',
+  ImageModel: null,
   Env: [],
   CpuLimit: 0,
   MemoryLimit: 0,
