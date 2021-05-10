@@ -2,12 +2,9 @@ package migrator
 
 import (
 	"os"
-	"path"
 	"testing"
-	"time"
 
 	"github.com/boltdb/bolt"
-	"github.com/portainer/portainer/api/bolt/internal"
 	"github.com/portainer/portainer/api/bolt/settings"
 )
 
@@ -15,52 +12,35 @@ var (
 	testingDBStorePath string
 	testingDBFileName  string
 	dummyLogoURL       string
+	dbConn             *bolt.DB
+	settingsService    *settings.Service
 )
 
-func init() {
+func setup() error {
 	testingDBStorePath, _ = os.Getwd()
 	testingDBFileName = "portainer-ee-mig-30.db"
 	dummyLogoURL = "example.com"
-}
-
-func initDBConn() (*bolt.DB, error) {
-	databasePath := path.Join(testingDBStorePath, testingDBFileName)
-	dbConn, err := bolt.Open(databasePath, 0600, &bolt.Options{Timeout: 1 * time.Second})
+	var err error
+	dbConn, err = initTestingDBConn(testingDBStorePath, testingDBFileName)
 	if err != nil {
-		return nil, err
-	}
-
-	return dbConn, nil
-}
-
-func initSettingsService(dbConn *bolt.DB) (*settings.Service, error) {
-	internalDBConn := &internal.DbConnection{
-		DB: dbConn,
-	}
-	settingsService, err := settings.NewService(internalDBConn)
-	if err != nil {
-		return nil, err
+		return err
 	}
 	dummySettingsObj := map[string]interface{}{
 		"LogoURL": dummyLogoURL,
 	}
-	if err := internal.UpdateObject(internalDBConn, "settings", []byte("SETTINGS"), dummySettingsObj); err != nil {
-		return nil, err
+	settingsService, err = initTestingSettingsService(dbConn, dummySettingsObj)
+	if err != nil {
+		return err
 	}
-	return settingsService, nil
+	return nil
 }
 
 func TestUpdateSettingsToDB31(t *testing.T) {
-	dbConn, err := initDBConn()
-	if err != nil {
-		t.Errorf("failed to init testing bolt DB connection: %v", err)
+	if err := setup(); err != nil {
+		t.Errorf("failed to complete testing setups, err: %v", err)
 	}
 	defer dbConn.Close()
 	defer os.Remove(testingDBFileName)
-	settingsService, err := initSettingsService(dbConn)
-	if err != nil {
-		t.Errorf("failed to init testing settings service: %v", err)
-	}
 	m := &Migrator{
 		db:              dbConn,
 		settingsService: settingsService,
