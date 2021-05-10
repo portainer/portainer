@@ -21,7 +21,6 @@ angular.module('portainer.docker').controller('ContainerController', [
   'ImageService',
   'HttpRequestHelper',
   'Authentication',
-  'StateManager',
   'endpoint',
   function (
     $q,
@@ -42,9 +41,9 @@ angular.module('portainer.docker').controller('ContainerController', [
     ImageService,
     HttpRequestHelper,
     Authentication,
-    StateManager,
     endpoint
   ) {
+    $scope.endpoint = endpoint;
     $scope.activityTime = 0;
     $scope.portBindings = [];
     $scope.displayRecreateButton = false;
