@@ -8,6 +8,8 @@ angular.module('portainer.app').factory('EndpointService', [
     'use strict';
     var service = {
       updateSecuritySettings,
+      registries,
+      updateRegistryAccess,
     };
 
     service.endpoint = function (endpointID) {
@@ -156,6 +158,14 @@ angular.module('portainer.app').factory('EndpointService', [
 
       return deferred.promise;
     };
+
+    function updateRegistryAccess(id, registryId, endpointAccesses) {
+      return Endpoints.updateRegistryAccess({ registryId, id }, endpointAccesses).$promise;
+    }
+
+    function registries(id, namespace) {
+      return Endpoints.registries({ namespace, id }).$promise;
+    }
 
     return service;
 
