@@ -23,7 +23,7 @@ const _KubernetesApplicationFormValues = Object.freeze({
   Configurations: [], // KubernetesApplicationConfigurationFormValue list
   PublishingType: KubernetesApplicationPublishingTypes.INTERNAL,
   PublishedPorts: [], // KubernetesApplicationPublishedPortFormValue list
-  PlacementType: KubernetesApplicationPlacementTypes.PREFERRED,
+  PlacementType: KubernetesApplicationPlacementTypes.MANDATORY,
   Placements: [], // KubernetesApplicationPlacementFormValue list
   OriginalIngresses: undefined,
 });
