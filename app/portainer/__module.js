@@ -1,5 +1,7 @@
 import _ from 'lodash-es';
 
+import componentsModule from './components';
+
 async function initAuthentication(authManager, Authentication, $rootScope, $state) {
   authManager.checkAuthOnRefresh();
   // The unauthenticated event is broadcasted by the jwtInterceptor when
@@ -15,7 +17,7 @@ async function initAuthentication(authManager, Authentication, $rootScope, $stat
   return await Authentication.init();
 }
 
-angular.module('portainer.app', ['portainer.oauth']).config([
+angular.module('portainer.app', ['portainer.oauth', componentsModule]).config([
   '$stateRegistryProvider',
   function ($stateRegistryProvider) {
     'use strict';
