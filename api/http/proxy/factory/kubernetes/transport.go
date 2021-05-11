@@ -14,6 +14,8 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
+
+	"github.com/pkg/errors"
 )
 
 type (
@@ -37,6 +39,10 @@ type (
 		*baseTransport
 		reverseTunnelService portainer.ReverseTunnelService
 	}
+)
+
+var (
+	namespaceRegex = regexp.MustCompile(`^/namespaces/([^/]*)$`)
 )
 
 // RoundTrip is the implementation of the the http.RoundTripper interface
@@ -72,6 +78,8 @@ func (transport *baseTransport) proxyNamespacedRequest(request *http.Request, fu
 	requestPath := re.ReplaceAllString(fullRequestPath, "")
 
 	switch {
+	case isDeleteNamespaceRequest(request, fullRequestPath):
+		return transport.deleteNamespaceRequest(request, fullRequestPath)
 	case strings.HasPrefix(requestPath, "configmaps"):
 		return transport.proxyConfigMapsRequest(request, requestPath)
 	case strings.HasPrefix(requestPath, "secrets"):
@@ -79,6 +87,29 @@ func (transport *baseTransport) proxyNamespacedRequest(request *http.Request, fu
 	default:
 		return transport.executeKubernetesRequest(request, true)
 	}
+}
+
+// returns true if request intend to delete a namespace
+func isDeleteNamespaceRequest(request *http.Request, requestPath string) bool {
+	if request.Method != http.MethodDelete {
+		return false
+	}
+
+	return namespaceRegex.MatchString(requestPath)
+}
+
+func (transport *baseTransport) deleteNamespaceRequest(request *http.Request, requestPath string) (*http.Response, error) {
+	parts := namespaceRegex.FindStringSubmatch(requestPath)
+	if len(parts) < 2 {
+		return nil, errors.Errorf("cannot match a namespace in the url: %s", requestPath)
+	}
+
+	ns := parts[1]
+	if err := transport.tokenManager.kubecli.NamespaceAccessPoliciesDeleteNamespace(ns); err != nil {
+		return nil, errors.WithMessagef(err, "failed to delete a namespace [%s] from portainer config", ns)
+	}
+
+	return transport.executeKubernetesRequest(request, true)
 }
 
 func (transport *baseTransport) executeKubernetesRequest(request *http.Request, shouldLog bool) (*http.Response, error) {
