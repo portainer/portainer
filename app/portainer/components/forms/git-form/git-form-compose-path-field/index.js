@@ -1,0 +1,7 @@
+export const gitFormComposePathField = {
+  templateUrl: './git-form-compose-path-field.html',
+  bindings: {
+    value: '<',
+    onChange: '<',
+  },
+};

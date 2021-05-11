@@ -53,6 +53,8 @@ angular
       }
     };
 
+    $scope.onChangeFormValues = onChangeFormValues;
+
     $scope.addEnvironmentVariable = function () {
       $scope.formValues.Env.push({ name: '', value: '' });
     };
@@ -239,4 +241,8 @@ angular
     };
 
     initView();
+
+    function onChangeFormValues(newValues) {
+      $scope.formValues = newValues;
+    }
   });
