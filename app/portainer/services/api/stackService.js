@@ -13,7 +13,9 @@ angular.module('portainer.app').factory('StackService', [
   'EndpointProvider',
   function StackServiceFactory($q, $async, Stack, FileUploadService, StackHelper, ServiceService, ContainerService, SwarmService, EndpointProvider) {
     'use strict';
-    var service = {};
+    var service = {
+      updateGit,
+    };
 
     service.stack = function (id) {
       var deferred = $q.defer();
@@ -347,6 +349,20 @@ angular.module('portainer.app').factory('StackService', [
     service.stop = stop;
     function stop(id) {
       return Stack.stop({ id }).$promise;
+    }
+
+    function updateGit(id, endpointId, env, prune, gitConfig) {
+      return Stack.updateGit(
+        { endpointId, id },
+        {
+          env,
+          prune,
+          RepositoryReferenceName: gitConfig.RefName,
+          RepositoryAuthentication: gitConfig.RepositoryAuthentication,
+          RepositoryUsername: gitConfig.RepositoryUsername,
+          RepositoryPassword: gitConfig.RepositoryPassword,
+        }
+      ).$promise;
     }
 
     return service;
