@@ -7,22 +7,20 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
+const (
+	dummyOAuthClientID          = "1a2b3c4d"
+	dummyOAuthScopes            = "scopes"
+	dummyOAuthAuthenticationURI = "example.com/auth"
+	dummyOAuthRedirectURI       = "example.com/redirect"
+	dummyOAuthLogoutURI         = "example.com/logout"
+)
+
 var (
-	dummyOAuthAuthenticationURI string
-	dummyOAuthClientID          string
-	dummyOAuthRedirectURI       string
-	dummyOAuthScopes            string
-	dummyOAuthLogoutURI         string
-	dummyOAuthLoginURI          string
-	mockAppSettings             *portainer.Settings
+	dummyOAuthLoginURI string
+	mockAppSettings    *portainer.Settings
 )
 
 func setup() {
-	dummyOAuthClientID = "1a2b3c4d"
-	dummyOAuthScopes = "scopes"
-	dummyOAuthAuthenticationURI = "example.com/auth"
-	dummyOAuthRedirectURI = "example.com/redirect"
-	dummyOAuthLogoutURI = "example.com/logout"
 	dummyOAuthLoginURI = fmt.Sprintf("%s?response_type=code&client_id=%s&redirect_uri=%s&scope=%s",
 		dummyOAuthAuthenticationURI,
 		dummyOAuthClientID,
