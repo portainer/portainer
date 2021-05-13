@@ -110,6 +110,19 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 	}
 
 	if updateAuthorizations {
+		endpoints, err := handler.DataStore.Endpoint().Endpoints()
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
+		}
+
+		for _, endpoint := range endpoints {
+			if endpoint.GroupID == endpointGroup.ID {
+				err = handler.AuthorizationService.CleanupNamespaceAccessPolicies(int(endpoint.ID))
+				if err != nil {
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
+				}
+			}
+		}
 		err = handler.AuthorizationService.UpdateUsersAuthorizations()
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}

@@ -2,6 +2,7 @@ package authorization
 
 import (
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
 // Service represents a service used to
@@ -10,6 +11,7 @@ type (
 	Service struct {
 		dataStore         portainer.DataStore
 		authEventHandlers map[string]portainer.AuthEventHandler
+		K8sClientFactory  *cli.ClientFactory
 	}
 )
 
@@ -934,6 +936,79 @@ func (service *Service) RemoveTeamNamespaceAccessPolicies(
 		}
 	}
 	return policiesToUpdate, hasChange, nil
+}
+
+// CleanupNamespaceAccessPolicies removes cleanup policies where any user or team does not have
+// access to the namespace any more.
+func (service *Service) CleanupNamespaceAccessPolicies(endpointID int) error {
+	endpoint, err := service.dataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	if err != nil {
+		return err
+	}
+
+	kubecli, err := service.K8sClientFactory.GetKubeClient(endpoint)
+	if err != nil {
+		return err
+	}
+
+	accessPolicies, err := kubecli.GetNamespaceAccessPolicies()
+	if err != nil {
+		return err
+	}
+
+	users, err := service.dataStore.User().Users()
+	if err != nil {
+		return err
+	}
+
+	teams, err := service.dataStore.Team().Teams()
+	if err != nil {
+		return err
+	}
+
+	hasChange := false
+
+	for _, team := range teams {
+		for namespace, _ := range accessPolicies {
+			_, ok := accessPolicies[namespace].TeamAccessPolicies[team.ID]
+			if ok {
+				endpointRole, err := service.GetTeamEndpointRole(int(team.ID), endpointID)
+				if err != nil {
+					return err
+				}
+				if endpointRole == nil {
+					delete(accessPolicies[namespace].TeamAccessPolicies, team.ID)
+					hasChange = true
+				}
+			}
+		}
+	}
+
+	for _, user := range users {
+		for namespace, _ := range accessPolicies {
+			_, ok := accessPolicies[namespace].UserAccessPolicies[user.ID]
+			if ok {
+				endpointRole, err := service.GetUserEndpointRole(int(user.ID), endpointID)
+				if err != nil {
+					return err
+				}
+				if endpointRole == nil {
+					delete(accessPolicies[namespace].UserAccessPolicies, user.ID)
+					hasChange = true
+				}
+
+			}
+		}
+	}
+
+	if hasChange {
+		err = kubecli.UpdateNamespaceAccessPolicies(accessPolicies)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // GetUserEndpointRole returns the endpoint role of the user.
