@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
+	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 )
 
 // proxy for /subscriptions/*/providers/Microsoft.ContainerInstance/containerGroups
@@ -23,7 +23,7 @@ func (transport *Transport) proxyContainerGroupsGetRequest(request *http.Request
 		return nil, err
 	}
 
-	responseObject, err := responseutils.GetResponseAsJSONObject(response)
+	responseObject, err := utils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func (transport *Transport) proxyContainerGroupsGetRequest(request *http.Request
 		filteredValue := transport.filterContainerGroups(decoratedValue, context)
 		responseObject["value"] = filteredValue
 
-		responseutils.RewriteResponse(response, responseObject, http.StatusOK)
+		utils.RewriteResponse(response, responseObject, http.StatusOK)
 	} else {
 		return nil, fmt.Errorf("The container groups response has no value property")
 	}
