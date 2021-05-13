@@ -15,7 +15,7 @@ import (
 	"github.com/docker/docker/client"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
-	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
+	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
@@ -394,13 +394,13 @@ func (transport *Transport) replaceRegistryAuthenticationHeader(request *http.Re
 			return nil, err
 		}
 
-		var originalHeaderData registryAuthenticationHeader
+		var originalHeaderData portainerRegistryAuthenticationHeader
 		err = json.Unmarshal(decodedHeaderData, &originalHeaderData)
 		if err != nil {
 			return nil, err
 		}
 
-		authenticationHeader := createRegistryAuthenticationHeader(originalHeaderData.Serveraddress, accessContext)
+		authenticationHeader := createRegistryAuthenticationHeader(originalHeaderData.RegistryId, accessContext)
 
 		headerData, err := json.Marshal(authenticationHeader)
 		if err != nil {
@@ -430,7 +430,7 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 			}
 
 			if !securitySettings.AllowVolumeBrowserForRegularUsers {
-				return responseutils.WriteAccessDeniedResponse()
+				return utils.WriteAccessDeniedResponse()
 			}
 		}
 
@@ -461,12 +461,12 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 			}
 
 			if inheritedResourceControl == nil || !authorization.UserCanAccessResource(tokenData.ID, userTeamIDs, inheritedResourceControl) {
-				return responseutils.WriteAccessDeniedResponse()
+				return utils.WriteAccessDeniedResponse()
 			}
 		}
 
 		if resourceControl != nil && !authorization.UserCanAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
-			return responseutils.WriteAccessDeniedResponse()
+			return utils.WriteAccessDeniedResponse()
 		}
 	}
 
@@ -530,7 +530,7 @@ func (transport *Transport) interceptAndRewriteRequest(request *http.Request, op
 // https://docs.docker.com/engine/api/v1.37/#operation/SecretCreate
 // https://docs.docker.com/engine/api/v1.37/#operation/ConfigCreate
 func (transport *Transport) decorateGenericResourceCreationResponse(response *http.Response, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType, userID portainer.UserID) error {
-	responseObject, err := responseutils.GetResponseAsJSONObject(response)
+	responseObject, err := utils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return err
 	}
@@ -549,7 +549,7 @@ func (transport *Transport) decorateGenericResourceCreationResponse(response *ht
 
 	responseObject = decorateObject(responseObject, resourceControl)
 
-	return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
+	return utils.RewriteResponse(response, responseObject, http.StatusOK)
 }
 
 func (transport *Transport) decorateGenericResourceCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
@@ -612,7 +612,7 @@ func (transport *Transport) administratorOperation(request *http.Request) (*http
 	}
 
 	if tokenData.Role != portainer.AdministratorRole {
-		return responseutils.WriteAccessDeniedResponse()
+		return utils.WriteAccessDeniedResponse()
 	}
 
 	return transport.executeDockerRequest(request)
@@ -625,15 +625,15 @@ func (transport *Transport) createRegistryAccessContext(request *http.Request) (
 	}
 
 	accessContext := &registryAccessContext{
-		isAdmin: true,
-		userID:  tokenData.ID,
+		isAdmin:    true,
+		endpointID: transport.endpoint.ID,
 	}
 
-	hub, err := transport.dataStore.DockerHub().DockerHub()
+	user, err := transport.dataStore.User().User(tokenData.ID)
 	if err != nil {
 		return nil, err
 	}
-	accessContext.dockerHub = hub
+	accessContext.user = user
 
 	registries, err := transport.dataStore.Registry().Registries()
 	if err != nil {
@@ -641,7 +641,7 @@ func (transport *Transport) createRegistryAccessContext(request *http.Request) (
 	}
 	accessContext.registries = registries
 
-	if tokenData.Role != portainer.AdministratorRole {
+	if user.Role != portainer.AdministratorRole {
 		accessContext.isAdmin = false
 
 		teamMemberships, err := transport.dataStore.TeamMembership().TeamMembershipsByUserID(tokenData.ID)
