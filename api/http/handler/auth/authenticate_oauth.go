@@ -26,17 +26,6 @@ func (payload *oauthPayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// @id AuthenticateOauth
-// @summary Authenticate with OAuth
-// @tags auth
-// @accept json
-// @produce json
-// @param body body oauthPayload true "OAuth Credentials used for authentication"
-// @success 200 {object} authenticateResponse "Success"
-// @failure 400 "Invalid request"
-// @failure 422 "Invalid Credentials"
-// @failure 500 "Server error"
-// @router /auth/oauth/validate [post]
 func (handler *Handler) authenticateOAuth(code string, settings *portainer.OAuthSettings) (string, *time.Time, error) {
 	if code == "" {
 		return "", nil, errors.New("Invalid OAuth authorization code")
@@ -54,6 +43,17 @@ func (handler *Handler) authenticateOAuth(code string, settings *portainer.OAuth
 	return username, expiryTime, nil
 }
 
+// @id ValidateOAuth
+// @summary Authenticate with OAuth
+// @tags auth
+// @accept json
+// @produce json
+// @param body body oauthPayload true "OAuth Credentials used for authentication"
+// @success 200 {object} authenticateResponse "Success"
+// @failure 400 "Invalid request"
+// @failure 422 "Invalid Credentials"
+// @failure 500 "Server error"
+// @router /auth/oauth/validate [post]
 func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload oauthPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
