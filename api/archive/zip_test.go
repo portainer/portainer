@@ -16,8 +16,8 @@ func TestUnzipFile(t *testing.T) {
 		Archive structure.
 		├── 0
 		│	├── 1
-		│ 	│   └── 2.txt
-		│   └── 1.txt
+		│	│	└── 2.txt
+		│	└── 1.txt
 		└── 0.txt
 	*/
 
