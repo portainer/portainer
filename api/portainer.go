@@ -1147,6 +1147,7 @@ type (
 	// JWTService represents a service for managing JWT tokens
 	JWTService interface {
 		GenerateToken(data *TokenData) (string, error)
+		GenerateTokenForOAuth(data *TokenData, expiryTime *time.Time) (string, error)
 		ParseAndVerifyToken(token string) (*TokenData, error)
 		SetUserSessionDuration(userSessionDuration time.Duration)
 	}
@@ -1177,7 +1178,7 @@ type (
 
 	// OAuthService represents a service used to authenticate users using OAuth
 	OAuthService interface {
-		Authenticate(code string, configuration *OAuthSettings) (string, error)
+		Authenticate(code string, configuration *OAuthSettings) (string, *time.Time, error)
 	}
 
 	// RegistryService represents a service for managing registry data
