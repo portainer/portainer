@@ -35,7 +35,7 @@ func (handler *Handler) endpointPoolsAccessUpdate(w http.ResponseWriter, r *http
 
 	resourcePoolName, err := request.RetrieveRouteVariableValue(r, "rpn")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid resource pool identifier route variable", err}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid namespace identifier route variable", err}
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
@@ -109,7 +109,7 @@ func (handler *Handler) endpointPoolsAccessUpdate(w http.ResponseWriter, r *http
 					err := kcl.RemoveUserNamespaceBindings(userID, resourcePoolName)
 					handler.AuthorizationService.TriggerUserAuthUpdate(userID)
 					if err != nil {
-						errs = append(errs, fmt.Errorf("Unable to remove user resource pool bindings %d @ %d: %w", userID, endpointID, err).Error())
+						errs = append(errs, fmt.Errorf("Unable to remove user namespace bindings %d @ %d: %w", userID, endpointID, err).Error())
 					}
 				} else {
 					errs = append(errs, fmt.Errorf("Access of user %d cannot be updated by the current user @ %d: %w", userID, endpointID, err).Error())
@@ -125,7 +125,7 @@ func (handler *Handler) endpointPoolsAccessUpdate(w http.ResponseWriter, r *http
 
 	if len(errs) > 0 {
 		err = fmt.Errorf(strings.Join(errs, "\n"))
-		return &httperror.HandlerError{http.StatusInternalServerError, "There are 1 or more errors when updating resource pool access", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "There are 1 or more errors when updating namespace access", err}
 	}
 
 	useractivity.LogHttpActivity(handler.UserActivityStore, endpoint.Name, r, payload)

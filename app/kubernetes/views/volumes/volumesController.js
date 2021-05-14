@@ -105,7 +105,7 @@ class KubernetesVolumesController {
         }
       });
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retreive resource pools');
+      this.Notifications.error('Failure', err, 'Unable to retrieve namespaces');
     }
   }
 

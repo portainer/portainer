@@ -1,5 +1,5 @@
-<kubernetes-view-header title="Resource pool details" state="kubernetes.resourcePools.resourcePool" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.resourcePools">Resource pools</a> &gt; {{ ctrl.pool.Namespace.Name }}
+<kubernetes-view-header title="Namespace details" state="kubernetes.resourcePools.resourcePool" view-ready="ctrl.state.viewReady">
+  <a ui-sref="kubernetes.resourcePools">Namespaces</a> &gt; {{ ctrl.pool.Namespace.Name }}
 </kubernetes-view-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
@@ -11,7 +11,7 @@
         <rd-widget-body classes="no-padding">
           <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
             <uib-tab index="0" classes="btn-sm" select="ctrl.selectTab(0)">
-              <uib-tab-heading> <i class="fa fa-layer-group space-right" aria-hidden="true"></i> Resource pool </uib-tab-heading>
+              <uib-tab-heading> <i class="fa fa-layer-group space-right" aria-hidden="true"></i> Namespace </uib-tab-heading>
               <form class="form-horizontal" autocomplete="off" name="resourcePoolEditForm" style="padding: 20px; margin-top: 10px;">
                 <!-- name-input -->
                 <div class="form-group">
@@ -27,15 +27,15 @@
                   <div class="col-sm-12 small text-muted" ng-if="ctrl.state.resourceOverCommitEnabled">
                     <p>
                       <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                      A resource pool is a logical abstraction of a Kubernetes cluster, to provide for more flexible management of resources. Best practice is to set a quota
-                      assignment as this ensures greatest security/stability; alternatively, you can disable assigning a quota for unrestricted access (not recommended).
+                      A namespace is a logical abstraction of a Kubernetes cluster, to provide for more flexible management of resources. Best practice is to set a quota assignment
+                      as this ensures greatest security/stability; alternatively, you can disable assigning a quota for unrestricted access (not recommended).
                     </p>
                   </div>
                   <div class="col-sm-12 small text-muted" ng-if="!ctrl.state.resourceOverCommitEnabled">
                     <p>
                       <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                      A resource pool is a logical abstraction of a Kubernetes cluster, to provide for more flexible management of resources. Resource over-commit is disabled,
-                      please assign a capped limit of resources to this pool.
+                      A namespace is a logical abstraction of a Kubernetes cluster, to provide for more flexible management of resources. Resource over-commit is disabled, please
+                      assign a capped limit of resources to this pool.
                     </p>
                   </div>
                   <div class="col-sm-12" ng-if="ctrl.state.resourceOverCommitEnabled">
@@ -58,7 +58,7 @@
                 <div ng-if="ctrl.formValues.HasQuota && (ctrl.formValues.CpuLimit || ctrl.formValues.MemoryLimit)">
                   <kubernetes-resource-reservation
                     ng-if="ctrl.pool.Quota"
-                    description="Resource reservation represents the total amount of resource assigned to all the applications deployed inside this resource pool."
+                    description="Resource reservation represents the total amount of resource assigned to all the applications deployed inside this namespace."
                     cpu="ctrl.state.cpuUsed"
                     memory="ctrl.state.memoryUsed"
                     cpu-limit="ctrl.formValues.CpuLimit"
@@ -162,8 +162,8 @@
                       <div class="col-sm-12 small text-muted">
                         <p>
                           <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                          You can set a quota on the amount of external load balancers that can be created inside this resource pool. Set this quota to 0 to effectively disable the
-                          use of load balancers in this resource pool.
+                          You can set a quota on the amount of external load balancers that can be created inside this namespace. Set this quota to 0 to effectively disable the use
+                          of load balancers in this namespace.
                         </p>
                       </div>
                       <div class="col-sm-12">
@@ -185,7 +185,7 @@
                           <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Max load balancers value is required. </p>
                           <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Max load balancers value must be a positive number. </p>
                           <p ng-if="ctrl.state.loadBalancersUsed > ctrl.formValues.LoadBalancers && ctrl.formValues.LoadBalancers >= 0"
-                            >Max load balancers value must be greater than the existing number of load balancers inside this resource pool.</p
+                            >Max load balancers value must be greater than the existing number of load balancers inside this namespace.</p
                           >
                         </div>
                       </div>
@@ -213,7 +213,7 @@
                     <div class="col-sm-12 small text-muted">
                       The ingress feature must be enabled in the
                       <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: ctrl.endpoint.Id})">endpoint configuration view</a> to be able to register ingresses inside
-                      this resource pool.
+                      this namespace.
                     </div>
                   </div>
 
@@ -248,7 +248,7 @@
                           Hostnames
                           <portainer-tooltip
                             position="bottom"
-                            message="Hostnames associated to the ingress inside this resource pool. Users will be able to expose and access their applications over the ingress via one of these hostname."
+                            message="Hostnames associated to the ingress inside this namespace. Users will be able to expose and access their applications over the ingress via one of these hostname."
                           >
                           </portainer-tooltip>
                         </label>
@@ -366,7 +366,7 @@
                       <p>
                         <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                         Quotas can be set on each storage option to prevent users from exceeding a specific threshold when deploying applications. You can set a quota to 0 to
-                        effectively prevent the usage of a specific storage option inside this resource pool.
+                        effectively prevent the usage of a specific storage option inside this namespace.
                       </p>
                     </div>
                   </div>
@@ -453,7 +453,7 @@
                       ng-click="ctrl.updateResourcePool()"
                       button-spinner="ctrl.state.actionInProgress"
                     >
-                      <span ng-hide="ctrl.state.actionInProgress">Update resource pool</span>
+                      <span ng-hide="ctrl.state.actionInProgress">Update namespace</span>
                       <span ng-show="ctrl.state.actionInProgress">Update in progress...</span>
                     </button>
                   </div>
@@ -500,7 +500,7 @@
         order-by="Name"
         refresh-callback="ctrl.getApplications"
         loading="ctrl.state.applicationsLoading"
-        title-text="Applications running in this resource pool"
+        title-text="Applications running in this namespace"
         title-icon="fa-laptop-code"
       >
       </kubernetes-resource-pool-applications-datatable>

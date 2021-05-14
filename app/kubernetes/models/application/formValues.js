@@ -18,7 +18,7 @@ const _KubernetesApplicationFormValues = Object.freeze({
   AutoScaler: {},
   Containers: [],
   EnvironmentVariables: [], // KubernetesApplicationEnvironmentVariableFormValue list
-  DataAccessPolicy: KubernetesApplicationDataAccessPolicies.SHARED,
+  DataAccessPolicy: KubernetesApplicationDataAccessPolicies.ISOLATED,
   PersistedFolders: [], // KubernetesApplicationPersistedFolderFormValue list
   Configurations: [], // KubernetesApplicationConfigurationFormValue list
   PublishingType: KubernetesApplicationPublishingTypes.INTERNAL,

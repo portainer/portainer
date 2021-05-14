@@ -65,7 +65,7 @@ class KubernetesDeployController {
       this.namespaces = _.map(pools, 'Namespace');
       this.formValues.Namespace = this.namespaces[0].Name;
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to load resource pools data');
+      this.Notifications.error('Failure', err, 'Unable to load namespaces data');
     }
   }
 

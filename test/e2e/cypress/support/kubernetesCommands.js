@@ -3,10 +3,10 @@ import _ from 'lodash-es';
 import { STATEOBJECT } from './vars.js';
 
 /*
- * Resource Pool
+ * Namespace
  */
 
-// Create a Resource Pool (Kubernetes)
+// Create a Namespace (Kubernetes)
 Cypress.Commands.add('createResourcePool', (location, resourceName, waitForRedirection = true) => {
   if (location == 'frontend') {
     cy.visit(`/#!/${STATEOBJECT.ACTIVE_ENDPOINT_ID}/kubernetes/pools/new`);
@@ -18,24 +18,24 @@ Cypress.Commands.add('createResourcePool', (location, resourceName, waitForRedir
     cy.waitUntil(() => cy.get('input[name=memory_limit]'))
       .click()
       .type('512');
-    cy.contains('Create resource pool').click();
+    cy.contains('Create namespace').click();
     // Wait for redirection to applications view
-    if (waitForRedirection) cy.waitUntil(() => cy.contains('Resource pool list', { timeout: 120000 }));
+    if (waitForRedirection) cy.waitUntil(() => cy.contains('Namespace list', { timeout: 120000 }));
   }
 });
 
-// Delete a Resource Pool (Kubernetes)
+// Delete a Namespace (Kubernetes)
 Cypress.Commands.add('deleteResourcePool', (location, resourceNames) => {
   if (location == 'frontend') {
     cy.visit(`/#!/${STATEOBJECT.ACTIVE_ENDPOINT_ID}/kubernetes/pools`);
-    cy.waitUntil(() => cy.contains('Resource pool list', { timeout: 120000 })).showAllResources();
+    cy.waitUntil(() => cy.contains('Namespace list', { timeout: 120000 })).showAllResources();
     selectItem(resourceNames);
     cy.contains('Remove').click();
     cy.get('div.modal-dialog button').within(() => {
       cy.contains('Remove').click();
     });
 
-    cy.waitUntil(() => cy.contains('Resource pool successfully removed'));
+    cy.waitUntil(() => cy.contains('Namespace successfully removed'));
 
     // config page will reload after all configs removed. wait for the reload.
     cy.wait('@reloadConfigPage');
@@ -43,11 +43,11 @@ Cypress.Commands.add('deleteResourcePool', (location, resourceNames) => {
   }
 });
 
-// Add an access to a Resource Pool (Kubernetes)
+// Add an access to a Namespace (Kubernetes)
 Cypress.Commands.add('addResourcePoolAccess', (resourceName, entityName, entityType) => {
   cy.route2({ method: 'GET', path: '**/teams' }).as('addResourcePoolAccess:teams');
   cy.visit(`/#!/${STATEOBJECT.ACTIVE_ENDPOINT_ID}/kubernetes/pools`);
-  cy.waitUntil(() => cy.contains('Resource pool list', { timeout: 120000 })).showAllResources();
+  cy.waitUntil(() => cy.contains('Namespace list', { timeout: 120000 })).showAllResources();
   cy.contains(new RegExp('^' + resourceName + '$', 'g'))
     .closest('tr')
     .within(() => {
@@ -76,11 +76,11 @@ Cypress.Commands.add('addResourcePoolAccess', (resourceName, entityName, entityT
   cy.wait('@addResourcePoolAccess:teams');
 });
 
-// Remove access to a Resource Pool (Kubernetes)
+// Remove access to a Namespace (Kubernetes)
 Cypress.Commands.add('removeResourcePoolAccess', (resourceName, entityName) => {
   cy.route2({ method: 'GET', path: '**/teams' }).as('removeResourcePoolAccess:teams');
   cy.visit(`/#!/${STATEOBJECT.ACTIVE_ENDPOINT_ID}/kubernetes/pools`);
-  cy.waitUntil(() => cy.contains('Resource pool list', { timeout: 120000 })).showAllResources();
+  cy.waitUntil(() => cy.contains('Namespace list', { timeout: 120000 })).showAllResources();
   cy.contains(new RegExp('^' + resourceName + '$', 'g'))
     .closest('tr')
     .within(() => {
@@ -312,7 +312,7 @@ Cypress.Commands.add('deleteKubeVolume', (location, resourceName) => {
   }
 });
 
-// Helper function to select a resource pool in a resource creation view
+// Helper function to select a namespace in a resource creation view
 Cypress.Commands.add('selectResourcePool', (resourcePool) => {
   cy.get('.col-lg-11 > .form-control').select(resourcePool);
 });
@@ -320,7 +320,7 @@ Cypress.Commands.add('assertReadonlyVolume', () => {
   cy.visit(`/#!/${STATEOBJECT.ACTIVE_ENDPOINT_ID}/kubernetes/volumes`);
   cy.get('kubernetes-volumes-datatable').within(() => {
     cy.contains('Remove').should('not.visible');
-    cy.contains('Add resource pool').should('not.visible');
+    cy.contains('Add namespace').should('not.visible');
   });
 });
 
@@ -332,7 +332,7 @@ function assertReadonlyResourceTable(urlSuffix, dataTableTag) {
   cy.visit(`/#!/${STATEOBJECT.ACTIVE_ENDPOINT_ID}/kubernetes/${urlSuffix}`);
   cy.get(dataTableTag).within(() => {
     cy.contains('Remove').should('not.visible');
-    cy.contains('Add resource pool').should('not.visible');
+    cy.contains('Add namespace').should('not.visible');
   });
 }
 

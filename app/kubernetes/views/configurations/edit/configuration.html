@@ -1,5 +1,5 @@
 <kubernetes-view-header title="Configuration details" state="kubernetes.configurations.configuration" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.resourcePools">Resource pools</a> &gt;
+  <a ui-sref="kubernetes.resourcePools">Namespaces</a> &gt;
   <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.configuration.Namespace })">{{ ctrl.configuration.Namespace }}</a> &gt;
   <a ui-sref="kubernetes.configurations">Configurations</a> &gt; {{ ctrl.configuration.Name }}
 </kubernetes-view-header>
@@ -24,7 +24,7 @@
                       </td>
                     </tr>
                     <tr>
-                      <td>Resource Pool</td>
+                      <td>Namespace</td>
                       <td>
                         <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.configuration.Namespace })">{{ ctrl.configuration.Namespace }}</a>
                         <span style="margin-left: 5px;" class="label label-info image-tag" ng-if="ctrl.isSystemNamespace()">system</span>
