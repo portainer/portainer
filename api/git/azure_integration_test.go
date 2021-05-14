@@ -50,10 +50,11 @@ func TestService_ClonePublicRepository_Azure(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			dst := os.TempDir()
+			dst, err := ioutils.TempDir("", "clone")
+			assert.NoError(t, err)
 			defer os.RemoveAll(dst)
 			repositoryUrl := fmt.Sprintf(tt.args.repositoryURLFormat, tt.args.password)
-			err := service.ClonePublicRepository(repositoryUrl, tt.args.referenceName, dst)
+			err = service.ClonePublicRepository(repositoryUrl, tt.args.referenceName, dst)
 			assert.NoError(t, err)
 			assert.FileExists(t, filepath.Join(dst, "README.md"))
 		})
