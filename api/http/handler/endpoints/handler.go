@@ -5,6 +5,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/kubernetes/cli"
 
 	"net/http"
 
@@ -27,6 +28,7 @@ type Handler struct {
 	ProxyManager         *proxy.Manager
 	ReverseTunnelService portainer.ReverseTunnelService
 	SnapshotService      portainer.SnapshotService
+	K8sClientFactory     *cli.ClientFactory
 	ComposeStackManager  portainer.ComposeStackManager
 }
 

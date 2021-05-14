@@ -71,9 +71,6 @@ func (handler *Handler) endpointRegistriesList(w http.ResponseWriter, r *http.Re
 }
 
 func (handler *Handler) isNamespaceAuthorized(endpoint *portainer.Endpoint, namespace string, userId portainer.UserID, memberships []portainer.TeamMembership) (bool, error) {
-	if !endpoint.Kubernetes.Configuration.RestrictDefaultNamespace && namespace == "default" {
-		return true, nil
-	}
 
 	kcl, err := handler.K8sClientFactory.GetKubeClient(endpoint)
 	if err != nil {
