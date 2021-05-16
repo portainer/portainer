@@ -104,11 +104,6 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 		updateAuthorizations = true
 	}
 
-	err = handler.DataStore.EndpointGroup().UpdateEndpointGroup(endpointGroup.ID, endpointGroup)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint group changes inside the database", err}
-	}
-
 	if updateAuthorizations {
 		endpoints, err := handler.DataStore.Endpoint().Endpoints()
 		if err != nil {
@@ -117,12 +112,22 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 
 		for _, endpoint := range endpoints {
 			if endpoint.GroupID == endpointGroup.ID {
-				err = handler.AuthorizationService.CleanupNamespaceAccessPolicies(int(endpoint.ID))
-				if err != nil {
-					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
+				if endpoint.Type == portainer.KubernetesLocalEnvironment || endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
+					err = handler.AuthorizationService.CleanupNamespaceAccessPoliciesWithOverridePolicies(&endpoint, endpointGroup)
+					if err != nil {
+						return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
+					}
 				}
 			}
 		}
+	}
+
+	err = handler.DataStore.EndpointGroup().UpdateEndpointGroup(endpointGroup.ID, endpointGroup)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint group changes inside the database", err}
+	}
+
+	if updateAuthorizations {
 		err = handler.AuthorizationService.UpdateUsersAuthorizations()
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
