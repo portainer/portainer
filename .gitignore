@@ -2,7 +2,8 @@ node_modules
 bower_components
 dist
 portainer-checksum.txt
-api/cmd/portainer/portainer*
+api/cmd/portainer/*
+!api/cmd/portainer/main.go
 .tmp
 **/.vscode/settings.json
 **/.vscode/tasks.json

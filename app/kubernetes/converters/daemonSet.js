@@ -10,10 +10,11 @@ import {
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
+import { buildImageFullURI } from 'Docker/helpers/imageHelper';
 
 class KubernetesDaemonSetConverter {
   /**
-   * Generate KubernetesDaemonSet from KubenetesApplicationFormValues
+   * Generate KubernetesDaemonSet from KubernetesApplicationFormValues
    * @param {KubernetesApplicationFormValues} formValues
    */
   static applicationFormValuesToDaemonSet(formValues, volumeClaims) {
@@ -23,7 +24,7 @@ class KubernetesDaemonSetConverter {
     res.StackName = formValues.StackName ? formValues.StackName : formValues.Name;
     res.ApplicationOwner = formValues.ApplicationOwner;
     res.ApplicationName = formValues.Name;
-    res.Image = formValues.Image;
+    res.ImageModel = formValues.ImageModel;
     res.CpuLimit = formValues.CpuLimit;
     res.MemoryLimit = KubernetesResourceReservationHelper.bytesValue(formValues.MemoryLimit);
     res.Env = KubernetesApplicationHelper.generateEnvFromEnvVariables(formValues.EnvironmentVariables);
@@ -35,7 +36,7 @@ class KubernetesDaemonSetConverter {
 
   /**
    * Generate CREATE payload from DaemonSet
-   * @param {KubernetesDaemonSetPayload} model DaemonSet to genereate payload from
+   * @param {KubernetesDaemonSetPayload} model DaemonSet to generate payload from
    */
   static createPayload(daemonSet) {
     const payload = new KubernetesDaemonSetCreatePayload();
@@ -50,7 +51,10 @@ class KubernetesDaemonSetConverter {
     payload.spec.template.metadata.labels.app = daemonSet.Name;
     payload.spec.template.metadata.labels[KubernetesPortainerApplicationNameLabel] = daemonSet.ApplicationName;
     payload.spec.template.spec.containers[0].name = daemonSet.Name;
-    payload.spec.template.spec.containers[0].image = daemonSet.Image;
+    payload.spec.template.spec.containers[0].image = buildImageFullURI(daemonSet.ImageModel);
+    if (daemonSet.ImageModel.Registry && daemonSet.ImageModel.Registry.Authentication) {
+      payload.spec.template.spec.imagePullSecrets = [{ name: `registry-${daemonSet.ImageModel.Registry.Id}` }];
+    }
     payload.spec.template.spec.affinity = daemonSet.Affinity;
     KubernetesCommonHelper.assignOrDeleteIfEmpty(payload, 'spec.template.spec.containers[0].env', daemonSet.Env);
     KubernetesCommonHelper.assignOrDeleteIfEmpty(payload, 'spec.template.spec.containers[0].volumeMounts', daemonSet.VolumeMounts);

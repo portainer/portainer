@@ -1,6 +1,7 @@
 import _ from 'lodash-es';
 
 import angular from 'angular';
+import { TeamAccessViewModel, UserAccessViewModel } from 'Portainer/models/access';
 
 class PorAccessManagementController {
   /* @ngInject */
@@ -55,6 +56,20 @@ class PorAccessManagementController {
       const parent = this.inheritFrom;
 
       const data = await this.AccessService.accesses(entity, parent, this.roles);
+      if (this.entityType === 'registry' && this.endpoint) {
+        const endpointUsers = this.endpoint.UserAccessPolicies;
+        const endpointTeams = this.endpoint.TeamAccessPolicies;
+        data.availableUsersAndTeams = _.filter(data.availableUsersAndTeams, (userOrTeam) => {
+          const userRole = userOrTeam instanceof UserAccessViewModel && endpointUsers[userOrTeam.Id];
+          const teamRole = userOrTeam instanceof TeamAccessViewModel && endpointTeams[userOrTeam.Id];
+          if (!userRole && !teamRole) {
+            return false;
+          }
+          const roleId = (userRole && userRole.RoleId) || (teamRole && teamRole.RoleId);
+          const role = _.find(this.roles, { Id: roleId });
+          return role && (role.Authorizations['DockerImageCreate'] || role.Authorizations['DockerImagePush']) && !role.Authorizations['EndpointResourcesAccess'];
+        });
+      }
       this.availableUsersAndTeams = _.orderBy(data.availableUsersAndTeams, 'Name', 'asc');
       this.authorizedUsersAndTeams = data.authorizedUsersAndTeams;
     } catch (err) {

@@ -16,6 +16,40 @@
       <rd-widget>
         <rd-widget-body>
           <form class="form-horizontal" name="kubernetesApplicationCreationForm" autocomplete="off">
+            <div class="col-sm-12 form-section-title">
+              Namespace
+            </div>
+            <!-- #region RESOURCE POOL -->
+            <div class="form-group" ng-if="ctrl.formValues.ResourcePool">
+              <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Namespace</label>
+              <div class="col-sm-11">
+                <select
+                  class="form-control"
+                  id="resource-pool-selector"
+                  ng-model="ctrl.formValues.ResourcePool"
+                  ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools"
+                  ng-change="ctrl.onResourcePoolSelectionChange()"
+                  ng-disabled="ctrl.state.isEdit"
+                ></select>
+              </div>
+            </div>
+            <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded() && ctrl.formValues.ResourcePool">
+              <div class="col-sm-12 small text-danger">
+                <i class="fa fa-exclamation-circle red-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                This namespace has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the
+                namespace.
+              </div>
+            </div>
+            <div class="form-group" ng-if="!ctrl.formValues.ResourcePool">
+              <div class="col-sm-12 small text-muted">
+                <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                You do not have access to any namespace. Contact your administrator to get access to a namespace.
+              </div>
+            </div>
+            <!-- #endregion -->
+            <div class="col-sm-12 form-section-title">
+              Application
+            </div>
             <!-- #region NAME FIELD -->
             <div class="form-group">
               <label for="application_name" class="col-sm-1 control-label text-left">Name</label>
@@ -53,17 +87,15 @@
             <!-- #region IMAGE FIELD -->
 
             <div class="form-group">
-              <label for="container_image" class="col-sm-1 control-label text-left">Image</label>
-              <div class="col-sm-11">
-                <input
-                  type="text"
-                  class="form-control"
-                  name="container_image"
-                  ng-model="ctrl.formValues.Image"
-                  placeholder="nginx:latest"
-                  required
-                  ng-disabled="ctrl.formValues.Containers.length > 1"
-                />
+              <div class="col-sm-12">
+                <por-image-registry
+                  model="ctrl.formValues.ImageModel"
+                  auto-complete="false"
+                  label-class="col-sm-1"
+                  input-class="col-sm-11"
+                  endpoint-id="ctrl.endpoint.Id"
+                  namespace="ctrl.formValues.ResourcePool.Namespace.Name"
+                ></por-image-registry>
               </div>
             </div>
             <div class="form-group" ng-show="kubernetesApplicationCreationForm.container_image.$invalid">
@@ -81,32 +113,6 @@
               set-validity="ctrl.setPullImageValidity"
             >
             </por-image-registry-rate-limits>
-            <!-- #endregion -->
-
-            <div class="col-sm-12 form-section-title">
-              Namespace
-            </div>
-            <!-- #region NAMESPACE -->
-            <div class="form-group">
-              <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Namespace</label>
-              <div class="col-sm-11">
-                <select
-                  class="form-control"
-                  id="resource-pool-selector"
-                  ng-model="ctrl.formValues.ResourcePool"
-                  ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools"
-                  ng-change="ctrl.onResourcePoolSelectionChange()"
-                  ng-disabled="ctrl.state.isEdit"
-                ></select>
-              </div>
-            </div>
-            <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
-              <div class="col-sm-12 small text-danger">
-                <i class="fa fa-exclamation-circle red-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                This namespace has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the
-                namespace.
-              </div>
-            </div>
             <!-- #endregion -->
 
             <div class="col-sm-12 form-section-title">

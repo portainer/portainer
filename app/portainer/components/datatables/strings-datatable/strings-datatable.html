@@ -1,0 +1,65 @@
+<div class="datatable">
+  <rd-widget>
+    <rd-widget-header icon="{{ $ctrl.titleIcon }}" title-text="{{ $ctrl.titleText }}"> </rd-widget-header>
+    <rd-widget-body classes="no-padding">
+      <div class="actionBar">
+        <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.onRemove($ctrl.state.selectedItems)">
+          <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
+        </button>
+      </div>
+      <div class="searchBar">
+        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
+        <input
+          type="text"
+          class="searchInput"
+          ng-model="$ctrl.state.textFilter"
+          ng-change="$ctrl.onTextFilterChange()"
+          placeholder="Search..."
+          ng-model-options="{ debounce: 300 }"
+        />
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover nowrap-cells">
+          <thead>
+            <tr>
+              <th>
+                <span class="md-checkbox">
+                  <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
+                  <label for="select_all"></label>
+                </span>
+                <a ng-click="$ctrl.changeOrderBy('Name')">
+                  {{ $ctrl.columnHeader }}
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit)) track by $index"
+              ng-class="{ active: $ctrl.state.selectedItems.includes(item) }"
+            >
+              <td>
+                <span class="md-checkbox">
+                  <input
+                    id="select_{{ $index }}"
+                    type="checkbox"
+                    ng-checked="$ctrl.state.selectedItems.includes(item)"
+                    ng-disabled="$ctrl.disableRemove(item)"
+                    ng-click="$ctrl.selectItem(item, $event)"
+                  />
+                  <label for="select_{{ $index }}"></label>
+                </span>
+                {{ item.value }}
+              </td>
+            </tr>
+            <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
+              <td class="text-center text-muted">{{ $ctrl.emptyDatasetMessage }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </rd-widget-body>
+  </rd-widget>
+</div>
