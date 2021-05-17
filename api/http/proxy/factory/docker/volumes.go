@@ -9,7 +9,7 @@ import (
 	"github.com/docker/docker/client"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
+	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
@@ -37,7 +37,7 @@ func getInheritedResourceControlFromVolumeLabels(dockerClient *client.Client, en
 func (transport *Transport) volumeListOperation(response *http.Response, executor *operationExecutor) error {
 	// VolumeList response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/VolumeList
-	responseObject, err := responseutils.GetResponseAsJSONObject(response)
+	responseObject, err := utils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return err
 	}
@@ -68,7 +68,7 @@ func (transport *Transport) volumeListOperation(response *http.Response, executo
 		responseObject["Volumes"] = volumeData
 	}
 
-	return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
+	return utils.RewriteResponse(response, responseObject, http.StatusOK)
 }
 
 // volumeInspectOperation extracts the response as a JSON object, verify that the user
@@ -76,7 +76,7 @@ func (transport *Transport) volumeListOperation(response *http.Response, executo
 func (transport *Transport) volumeInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// VolumeInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/VolumeInspect
-	responseObject, err := responseutils.GetResponseAsJSONObject(response)
+	responseObject, err := utils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return err
 	}
@@ -101,7 +101,7 @@ func (transport *Transport) volumeInspectOperation(response *http.Response, exec
 // https://docs.docker.com/engine/api/v1.28/#operation/VolumeInspect
 // https://docs.docker.com/engine/api/v1.28/#operation/VolumeList
 func selectorVolumeLabels(responseObject map[string]interface{}) map[string]interface{} {
-	return responseutils.GetJSONObject(responseObject, "Labels")
+	return utils.GetJSONObject(responseObject, "Labels")
 }
 
 func (transport *Transport) decorateVolumeResourceCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
@@ -142,7 +142,7 @@ func (transport *Transport) decorateVolumeResourceCreationOperation(request *htt
 }
 
 func (transport *Transport) decorateVolumeCreationResponse(response *http.Response, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType, userID portainer.UserID) error {
-	responseObject, err := responseutils.GetResponseAsJSONObject(response)
+	responseObject, err := utils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return err
 	}
@@ -159,7 +159,7 @@ func (transport *Transport) decorateVolumeCreationResponse(response *http.Respon
 
 	responseObject = decorateObject(responseObject, resourceControl)
 
-	return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
+	return utils.RewriteResponse(response, responseObject, http.StatusOK)
 }
 
 func (transport *Transport) restrictedVolumeOperation(requestPath string, request *http.Request) (*http.Response, error) {

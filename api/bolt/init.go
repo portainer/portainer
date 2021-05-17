@@ -55,22 +55,6 @@ func (store *Store) Init() error {
 		return err
 	}
 
-	_, err = store.DockerHubService.DockerHub()
-	if err == errors.ErrObjectNotFound {
-		defaultDockerHub := &portainer.DockerHub{
-			Authentication: false,
-			Username:       "",
-			Password:       "",
-		}
-
-		err := store.DockerHubService.UpdateDockerHub(defaultDockerHub)
-		if err != nil {
-			return err
-		}
-	} else if err != nil {
-		return err
-	}
-
 	groups, err := store.EndpointGroupService.EndpointGroups()
 	if err != nil {
 		return err

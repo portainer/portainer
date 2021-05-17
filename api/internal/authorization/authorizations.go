@@ -1,6 +1,6 @@
 package authorization
 
-import "github.com/portainer/portainer/api"
+import portainer "github.com/portainer/portainer/api"
 
 // Service represents a service used to
 // update authorizations associated to a user or team.
@@ -136,6 +136,7 @@ func DefaultEndpointAuthorizationsForEndpointAdministratorRole() portainer.Autho
 		portainer.OperationDockerAgentUndefined:               true,
 		portainer.OperationPortainerResourceControlCreate:     true,
 		portainer.OperationPortainerResourceControlUpdate:     true,
+		portainer.OperationPortainerRegistryUpdateAccess:      true,
 		portainer.OperationPortainerStackList:                 true,
 		portainer.OperationPortainerStackInspect:              true,
 		portainer.OperationPortainerStackFile:                 true,
