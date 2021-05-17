@@ -9,7 +9,8 @@
       "Azure/*": ["azure/*"],
       "Docker/*": ["docker/*"],
       "Kubernetes/*": ["kubernetes/*"],
-      "Portainer/*": ["portainer/*"]
+      "Portainer/*": ["portainer/*"],
+      "@/*": ["../app/*"],
     }
   },
   "exclude": ["api", "build", "dist", "distribution", "node_modules", "test", "webpack"]

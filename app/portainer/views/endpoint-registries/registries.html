@@ -1,0 +1,21 @@
+<rd-header>
+  <rd-header-title title-text="Environment registries">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="docker.registries" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>Manage registry access inside this environment</rd-header-content>
+</rd-header>
+<div class="row">
+  <div class="col-sm-12">
+    <registries-datatable
+      title-text="Registries"
+      title-icon="fa-database"
+      dataset="$ctrl.registries"
+      table-key="endpointRegistries"
+      order-by="Name"
+      endpoint-type="$ctrl.endpointType"
+      can-manage-access="$ctrl.canManageAccess"
+    ></registries-datatable>
+  </div>
+</div>

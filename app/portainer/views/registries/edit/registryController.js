@@ -3,11 +3,9 @@ import { RegistryTypes } from '@/portainer/models/registryTypes';
 angular.module('portainer.app').controller('RegistryController', [
   '$scope',
   '$state',
-  '$transition$',
-  '$filter',
   'RegistryService',
   'Notifications',
-  function ($scope, $state, $transition$, $filter, RegistryService, Notifications) {
+  function ($scope, $state, RegistryService, Notifications) {
     $scope.state = {
       actionInProgress: false,
     };
@@ -36,7 +34,7 @@ angular.module('portainer.app').controller('RegistryController', [
     };
 
     function initView() {
-      var registryID = $transition$.params().id;
+      var registryID = $state.params.id;
       RegistryService.registry(registryID)
         .then(function success(data) {
           $scope.registry = data;
