@@ -16,7 +16,6 @@ import (
 	"github.com/portainer/portainer/api/http/handler/auth"
 	"github.com/portainer/portainer/api/http/handler/backup"
 	"github.com/portainer/portainer/api/http/handler/customtemplates"
-	"github.com/portainer/portainer/api/http/handler/dockerhub"
 	"github.com/portainer/portainer/api/http/handler/edgegroups"
 	"github.com/portainer/portainer/api/http/handler/edgejobs"
 	"github.com/portainer/portainer/api/http/handler/edgestacks"
@@ -109,9 +108,6 @@ func (server *Server) Start() error {
 	customTemplatesHandler.FileService = server.FileService
 	customTemplatesHandler.GitService = server.GitService
 
-	var dockerHubHandler = dockerhub.NewHandler(requestBouncer)
-	dockerHubHandler.DataStore = server.DataStore
-
 	var edgeGroupsHandler = edgegroups.NewHandler(requestBouncer)
 	edgeGroupsHandler.DataStore = server.DataStore
 
@@ -157,6 +153,7 @@ func (server *Server) Start() error {
 	registryHandler.DataStore = server.DataStore
 	registryHandler.FileService = server.FileService
 	registryHandler.ProxyManager = server.ProxyManager
+	registryHandler.K8sClientFactory = server.KubernetesClientFactory
 
 	var resourceControlHandler = resourcecontrols.NewHandler(requestBouncer)
 	resourceControlHandler.DataStore = server.DataStore
@@ -215,7 +212,6 @@ func (server *Server) Start() error {
 		AuthHandler:            authHandler,
 		BackupHandler:          backupHandler,
 		CustomTemplatesHandler: customTemplatesHandler,
-		DockerHubHandler:       dockerHubHandler,
 		EdgeGroupsHandler:      edgeGroupsHandler,
 		EdgeJobsHandler:        edgeJobsHandler,
 		EdgeStacksHandler:      edgeStacksHandler,
