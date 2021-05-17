@@ -6,7 +6,7 @@ angular.module('portainer.docker').controller('ImageController', [
   '$scope',
   '$transition$',
   '$state',
-  '$timeout',
+  'endpoint',
   'ImageService',
   'ImageHelper',
   'RegistryService',
@@ -15,7 +15,8 @@ angular.module('portainer.docker').controller('ImageController', [
   'ModalService',
   'FileSaver',
   'Blob',
-  function ($q, $scope, $transition$, $state, $timeout, ImageService, ImageHelper, RegistryService, Notifications, HttpRequestHelper, ModalService, FileSaver, Blob) {
+  function ($q, $scope, $transition$, $state, endpoint, ImageService, ImageHelper, RegistryService, Notifications, HttpRequestHelper, ModalService, FileSaver, Blob) {
+    $scope.endpoint = endpoint;
     $scope.formValues = {
       RegistryModel: new PorImageRegistryModel(),
     };

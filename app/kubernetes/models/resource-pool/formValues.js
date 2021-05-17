@@ -1,9 +1,13 @@
 export function KubernetesResourcePoolFormValues(defaults) {
-  this.Name = '';
-  this.MemoryLimit = defaults.MemoryLimit;
-  this.CpuLimit = defaults.CpuLimit;
-  this.HasQuota = false;
-  this.IngressClasses = []; // KubernetesResourcePoolIngressClassFormValue
+  return {
+    Name: '',
+    MemoryLimit: defaults.MemoryLimit,
+    CpuLimit: defaults.CpuLimit,
+    HasQuota: false,
+    IngressClasses: [], // KubernetesResourcePoolIngressClassFormValue
+    Registries: [], // RegistryViewModel
+    EndpointId: 0,
+  };
 }
 
 /**
