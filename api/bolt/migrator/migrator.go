@@ -3,10 +3,12 @@ package migrator
 import (
 	"github.com/boltdb/bolt"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt/dockerhub"
 	"github.com/portainer/portainer/api/bolt/endpoint"
 	"github.com/portainer/portainer/api/bolt/endpointgroup"
 	"github.com/portainer/portainer/api/bolt/endpointrelation"
 	"github.com/portainer/portainer/api/bolt/extension"
+	plog "github.com/portainer/portainer/api/bolt/log"
 	"github.com/portainer/portainer/api/bolt/registry"
 	"github.com/portainer/portainer/api/bolt/resourcecontrol"
 	"github.com/portainer/portainer/api/bolt/role"
@@ -19,6 +21,8 @@ import (
 	"github.com/portainer/portainer/api/bolt/version"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
+
+var migrateLog = plog.NewScopedLog("bolt, migrate")
 
 type (
 	// Migrator defines a service to migrate data after a Portainer version update.
@@ -41,6 +45,7 @@ type (
 		versionService          *version.Service
 		fileService             portainer.FileService
 		authorizationService    *authorization.Service
+		dockerhubService        *dockerhub.Service
 	}
 
 	// Parameters represents the required parameters to create a new Migrator instance.
@@ -63,6 +68,7 @@ type (
 		VersionService          *version.Service
 		FileService             portainer.FileService
 		AuthorizationService    *authorization.Service
+		DockerhubService        *dockerhub.Service
 	}
 )
 
@@ -87,6 +93,7 @@ func NewMigrator(parameters *Parameters) *Migrator {
 		versionService:          parameters.VersionService,
 		fileService:             parameters.FileService,
 		authorizationService:    parameters.AuthorizationService,
+		dockerhubService:        parameters.DockerhubService,
 	}
 }
 
@@ -364,6 +371,21 @@ func (m *Migrator) Migrate() error {
 		if err != nil {
 			return err
 		}
+	}
+
+	// Portainer CE-2.5.0
+	if m.currentDBVersion < 30 {
+		err := m.updateRegistriesToDB30()
+		if err != nil {
+			return err
+		}
+		migrateLog.Info("Successful migration of registries to DB version 30")
+
+		err = m.UpdateDockerhubToDB30()
+		if err != nil {
+			return err
+		}
+		migrateLog.Info("Successful migration of Dockerhub registry to DB version 30")
 	}
 
 	return m.versionService.StoreDBVersion(portainer.DBVersion)

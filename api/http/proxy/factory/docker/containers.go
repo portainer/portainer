@@ -10,7 +10,7 @@ import (
 
 	"github.com/docker/docker/client"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
+	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
@@ -46,7 +46,7 @@ func getInheritedResourceControlFromContainerLabels(dockerClient *client.Client,
 func (transport *Transport) containerListOperation(response *http.Response, executor *operationExecutor) error {
 	// ContainerList response is a JSON array
 	// https://docs.docker.com/engine/api/v1.28/#operation/ContainerList
-	responseArray, err := responseutils.GetResponseAsJSONArray(response)
+	responseArray, err := utils.GetResponseAsJSONArray(response)
 	if err != nil {
 		return err
 	}
@@ -69,7 +69,7 @@ func (transport *Transport) containerListOperation(response *http.Response, exec
 		}
 	}
 
-	return responseutils.RewriteResponse(response, responseArray, http.StatusOK)
+	return utils.RewriteResponse(response, responseArray, http.StatusOK)
 }
 
 // containerInspectOperation extracts the response as a JSON object, verify that the user
@@ -77,7 +77,7 @@ func (transport *Transport) containerListOperation(response *http.Response, exec
 func (transport *Transport) containerInspectOperation(response *http.Response, executor *operationExecutor) error {
 	//ContainerInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/ContainerInspect
-	responseObject, err := responseutils.GetResponseAsJSONObject(response)
+	responseObject, err := utils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return err
 	}
@@ -96,9 +96,9 @@ func (transport *Transport) containerInspectOperation(response *http.Response, e
 // Labels are available under the "Config.Labels" property.
 // API schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ContainerInspect
 func selectorContainerLabelsFromContainerInspectOperation(responseObject map[string]interface{}) map[string]interface{} {
-	containerConfigObject := responseutils.GetJSONObject(responseObject, "Config")
+	containerConfigObject := utils.GetJSONObject(responseObject, "Config")
 	if containerConfigObject != nil {
-		containerLabelsObject := responseutils.GetJSONObject(containerConfigObject, "Labels")
+		containerLabelsObject := utils.GetJSONObject(containerConfigObject, "Labels")
 		return containerLabelsObject
 	}
 	return nil
@@ -109,7 +109,7 @@ func selectorContainerLabelsFromContainerInspectOperation(responseObject map[str
 // Labels are available under the "Labels" property.
 // API schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ContainerList
 func selectorContainerLabelsFromContainerListOperation(responseObject map[string]interface{}) map[string]interface{} {
-	containerLabelsObject := responseutils.GetJSONObject(responseObject, "Labels")
+	containerLabelsObject := utils.GetJSONObject(responseObject, "Labels")
 	return containerLabelsObject
 }
 

@@ -1,39 +1,43 @@
 package docker
 
 import (
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 )
 
 type (
 	registryAccessContext struct {
 		isAdmin         bool
-		userID          portainer.UserID
+		user            *portainer.User
+		endpointID      portainer.EndpointID
 		teamMemberships []portainer.TeamMembership
 		registries      []portainer.Registry
-		dockerHub       *portainer.DockerHub
 	}
+
 	registryAuthenticationHeader struct {
 		Username      string `json:"username"`
 		Password      string `json:"password"`
 		Serveraddress string `json:"serveraddress"`
 	}
+
+	portainerRegistryAuthenticationHeader struct {
+		RegistryId portainer.RegistryID `json:"registryId"`
+	}
 )
 
-func createRegistryAuthenticationHeader(serverAddress string, accessContext *registryAccessContext) *registryAuthenticationHeader {
+func createRegistryAuthenticationHeader(registryId portainer.RegistryID, accessContext *registryAccessContext) *registryAuthenticationHeader {
 	var authenticationHeader *registryAuthenticationHeader
 
-	if serverAddress == "" {
+	if registryId == 0 { // dockerhub (anonymous)
 		authenticationHeader = &registryAuthenticationHeader{
-			Username:      accessContext.dockerHub.Username,
-			Password:      accessContext.dockerHub.Password,
 			Serveraddress: "docker.io",
 		}
-	} else {
+	} else { // any "custom" registry
 		var matchingRegistry *portainer.Registry
 		for _, registry := range accessContext.registries {
-			if registry.URL == serverAddress &&
-				(accessContext.isAdmin || (!accessContext.isAdmin && security.AuthorizedRegistryAccess(&registry, accessContext.userID, accessContext.teamMemberships))) {
+			if registry.ID == registryId &&
+				(accessContext.isAdmin ||
+					security.AuthorizedRegistryAccess(&registry, accessContext.user, accessContext.teamMemberships, accessContext.endpointID)) {
 				matchingRegistry = &registry
 				break
 			}
