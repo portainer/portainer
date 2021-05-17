@@ -5,17 +5,20 @@ import { RegistryTypes } from '@/portainer/models/registryTypes';
 
 class porImageRegistryController {
   /* @ngInject */
-  constructor($async, $scope, ImageHelper, RegistryService, DockerHubService, ImageService, Notifications) {
+  constructor($async, $scope, ImageHelper, RegistryService, EndpointService, ImageService, Notifications) {
     this.$async = $async;
     this.$scope = $scope;
     this.ImageHelper = ImageHelper;
     this.RegistryService = RegistryService;
-    this.DockerHubService = DockerHubService;
+    this.EndpointService = EndpointService;
     this.ImageService = ImageService;
     this.Notifications = Notifications;
 
-    this.onInit = this.onInit.bind(this);
     this.onRegistryChange = this.onRegistryChange.bind(this);
+
+    this.registries = [];
+    this.images = [];
+    this.defaultRegistry = new DockerHubViewModel();
 
     this.$scope.$watch(() => this.model.Registry, this.onRegistryChange);
   }
@@ -40,7 +43,7 @@ class porImageRegistryController {
       const registryImages = _.filter(this.images, (image) => _.includes(image, url));
       images = _.map(registryImages, (image) => _.replace(image, new RegExp(url + '/?'), ''));
     } else {
-      const registries = _.filter(this.availableRegistries, (reg) => this.isKnownRegistry(reg));
+      const registries = _.filter(this.registries, (reg) => this.isKnownRegistry(reg));
       const registryImages = _.flatMap(registries, (registry) => _.filter(this.images, (image) => _.includes(image, registry.URL)));
       const imagesWithoutKnown = _.difference(this.images, registryImages);
       images = _.filter(imagesWithoutKnown, (image) => !this.ImageHelper.imageContainsURL(image));
@@ -63,29 +66,49 @@ class porImageRegistryController {
     return this.getRegistryURL(this.model.Registry) || 'docker.io';
   }
 
-  async onInit() {
-    try {
-      const [registries, dockerhub, images] = await Promise.all([
-        this.RegistryService.registries(),
-        this.DockerHubService.dockerhub(),
-        this.autoComplete ? this.ImageService.images() : [],
-      ]);
-      this.images = this.ImageService.getUniqueTagListFromImages(images);
-      this.availableRegistries = _.concat(dockerhub, registries);
+  async reloadRegistries() {
+    return this.$async(async () => {
+      try {
+        const registries = await this.EndpointService.registries(this.endpointId, this.namespace);
+        this.registries = _.concat(this.defaultRegistry, registries);
 
-      const id = this.model.Registry.Id;
-      if (!id) {
-        this.model.Registry = dockerhub;
-      } else {
-        this.model.Registry = _.find(this.availableRegistries, { Id: id });
+        const id = this.model.Registry.Id;
+        const registry = _.find(this.registries, { Id: id });
+        if (!registry) {
+          this.model.Registry = this.defaultRegistry;
+        }
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to retrieve registries');
       }
-    } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve registries');
+    });
+  }
+
+  async loadImages() {
+    return this.$async(async () => {
+      try {
+        if (!this.autoComplete) {
+          this.images = [];
+          return;
+        }
+
+        const images = await this.ImageService.images();
+        this.images = this.ImageService.getUniqueTagListFromImages(images);
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to retrieve images');
+      }
+    });
+  }
+
+  $onChanges({ namespace, endpointId }) {
+    if ((namespace || endpointId) && this.endpointId) {
+      this.reloadRegistries();
     }
   }
 
   $onInit() {
-    return this.$async(this.onInit);
+    return this.$async(async () => {
+      await this.loadImages();
+    });
   }
 }
 

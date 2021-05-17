@@ -108,7 +108,7 @@
       <li class="sidebar-list" ng-if="isAdmin && applicationState.application.enableEdgeComputeFeatures">
         <a ui-sref="edge.jobs" ui-sref-active="active">Edge Jobs <span class="menu-icon fa fa-clock fa-fw"></span></a>
       </li>
-      <li class="sidebar-title">
+      <li class="sidebar-title" ng-if="isAdmin || isTeamLeader">
         <span>Settings</span>
       </li>
       <li class="sidebar-list" ng-if="isAdmin || isTeamLeader">
@@ -181,7 +181,7 @@
           <a ui-sref="portainer.tags" ui-sref-active="active">Tags</a>
         </div>
       </li>
-      <li class="sidebar-list">
+      <li class="sidebar-list" ng-if="isAdmin">
         <a ui-sref="portainer.registries" ui-sref-active="active">Registries <span class="menu-icon fa fa-database fa-fw"></span></a>
       </li>
       <li class="sidebar-list" ng-if="isAdmin">

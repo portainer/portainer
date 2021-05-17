@@ -1,43 +1,23 @@
 import _ from 'lodash-es';
+import { RegistryTypes } from 'Portainer/models/registryTypes';
+import { DockerHubViewModel } from 'Portainer/models/dockerhub';
 
 angular.module('portainer.app').controller('RegistriesController', [
   '$q',
   '$scope',
   '$state',
   'RegistryService',
-  'DockerHubService',
   'ModalService',
   'Notifications',
-  'Authentication',
-  function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, Notifications, Authentication) {
+  function ($q, $scope, $state, RegistryService, ModalService, Notifications) {
     $scope.state = {
       actionInProgress: false,
     };
 
-    $scope.formValues = {
-      dockerHubPassword: '',
-    };
-
-    const nonBrowsableUrls = ['quay.io'];
+    const nonBrowsableTypes = [RegistryTypes.ANONYMOUS, RegistryTypes.DOCKERHUB, RegistryTypes.QUAY];
 
     $scope.canBrowse = function (item) {
-      return !_.includes(nonBrowsableUrls, item.URL);
-    };
-
-    $scope.updateDockerHub = function () {
-      var dockerhub = $scope.dockerhub;
-      dockerhub.Password = $scope.formValues.dockerHubPassword;
-      $scope.state.actionInProgress = true;
-      DockerHubService.update(dockerhub)
-        .then(function success() {
-          Notifications.success('DockerHub registry updated');
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to update DockerHub details');
-        })
-        .finally(function final() {
-          $scope.state.actionInProgress = false;
-        });
+      return !_.includes(nonBrowsableTypes, item.Type);
     };
 
     $scope.removeAction = function (selectedItems) {
@@ -73,12 +53,10 @@ angular.module('portainer.app').controller('RegistriesController', [
     function initView() {
       $q.all({
         registries: RegistryService.registries(),
-        dockerhub: DockerHubService.dockerhub(),
       })
         .then(function success(data) {
           $scope.registries = data.registries;
-          $scope.dockerhub = data.dockerhub;
-          $scope.isAdmin = Authentication.isAdmin();
+          $scope.registries.push(new DockerHubViewModel());
         })
         .catch(function error(err) {
           $scope.registries = [];

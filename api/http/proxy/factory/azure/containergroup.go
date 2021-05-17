@@ -49,7 +49,7 @@ func (transport *Transport) proxyContainerGroupPutRequest(request *http.Request)
 		errObj := map[string]string{
 			"message": "A container instance with the same name already exists inside the selected resource group",
 		}
-		err = responseutils.RewriteResponse(resp, errObj, http.StatusConflict)
+		err = utils.RewriteResponse(resp, errObj, http.StatusConflict)
 		return resp, err
 	}
 

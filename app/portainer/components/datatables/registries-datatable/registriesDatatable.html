@@ -4,8 +4,14 @@
       <div class="toolBar">
         <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
       </div>
-      <div class="actionBar" ng-if="$ctrl.accessManagement">
-        <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
+      <div class="actionBar" ng-if="$ctrl.isAdmin">
+        <button
+          ng-if="!$ctrl.endpointType"
+          type="button"
+          class="btn btn-sm btn-danger"
+          ng-disabled="$ctrl.state.selectedItemCount === 0"
+          ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
+        >
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
         <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.registries.new"> <i class="fa fa-plus space-right" aria-hidden="true"></i>Add registry </button>
@@ -27,7 +33,7 @@
           <thead>
             <tr>
               <th>
-                <span class="md-checkbox" ng-if="$ctrl.accessManagement">
+                <span class="md-checkbox" ng-if="$ctrl.isAdmin && !$ctrl.endpointType">
                   <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                   <label for="select_all"></label>
                 </span>
@@ -53,22 +59,29 @@
               ng-class="{ active: item.Checked }"
             >
               <td>
-                <span class="md-checkbox" ng-if="$ctrl.accessManagement">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
+                <span class="md-checkbox" ng-if="$ctrl.isAdmin && !ĉtrl.endpointType">
+                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="!$ctrl.allowSelection(item)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="portainer.registries.registry({id: item.Id})" ng-if="$ctrl.accessManagement">{{ item.Name }}</a>
-                <span ng-if="!$ctrl.accessManagement">{{ item.Name }}</span>
+                <a ui-sref="portainer.registries.registry({id: item.Id})" ng-if="$ctrl.enableGoToLink(item)">{{ item.Name }}</a>
+                <span ng-if="!$ctrl.enableGoToLink(item)">{{ item.Name }}</span>
                 <span ng-if="item.Authentication" style="margin-left: 5px;" class="label label-info image-tag">authentication-enabled</span>
               </td>
               <td>
                 {{ item.URL }}
               </td>
               <td>
-                <a ui-sref="portainer.registries.registry.access({id: item.Id})" ng-if="$ctrl.accessManagement"> <i class="fa fa-users" aria-hidden="true"></i> Manage access </a>
-                <span class="text-muted space-left" style="cursor: pointer;" data-toggle="tooltip" title="This feature is available in Portainer Business Edition">
+                <a ng-if="$ctrl.canManageAccess(item)" ng-click="$ctrl.redirectToManageAccess(item)"> <i class="fa fa-users" aria-hidden="true"></i> Manage access </a>
+                <span
+                  ng-if="$ctrl.canBrowse(item)"
+                  class="text-muted space-left"
+                  style="cursor: pointer;"
+                  data-toggle="tooltip"
+                  title="This feature is available in Portainer Business Edition"
+                >
                   <i class="fa fa-search" aria-hidden="true"></i> Browse</span
                 >
+                <span ng-if="!$ctrl.canBrowse(item) && !$ctrl.canManageAccess(item)"> - </span>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
