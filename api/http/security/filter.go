@@ -1,7 +1,7 @@
 package security
 
 import (
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 // FilterUserTeams filters teams based on user role.
@@ -64,15 +64,16 @@ func FilterUsers(users []portainer.User, context *RestrictedRequestContext) []po
 
 // FilterRegistries filters registries based on user role and team memberships.
 // Non administrator users only have access to authorized registries.
-func FilterRegistries(registries []portainer.Registry, context *RestrictedRequestContext) []portainer.Registry {
-	filteredRegistries := registries
-	if !context.IsAdmin {
-		filteredRegistries = make([]portainer.Registry, 0)
+func FilterRegistries(registries []portainer.Registry, user *portainer.User, teamMemberships []portainer.TeamMembership, endpointID portainer.EndpointID) []portainer.Registry {
+	if user.Role == portainer.AdministratorRole {
+		return registries
+	}
 
-		for _, registry := range registries {
-			if AuthorizedRegistryAccess(&registry, context.UserID, context.UserMemberships) {
-				filteredRegistries = append(filteredRegistries, registry)
-			}
+	filteredRegistries := []portainer.Registry{}
+
+	for _, registry := range registries {
+		if AuthorizedRegistryAccess(&registry, user, teamMemberships, endpointID) {
+			filteredRegistries = append(filteredRegistries, registry)
 		}
 	}
 

@@ -2,153 +2,104 @@ package kubernetes
 
 import (
 	"bytes"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/kubernetes/cli"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/crypto"
 )
 
-type (
-	localTransport struct {
-		httpTransport      *http.Transport
-		tokenManager       *tokenManager
-		endpointIdentifier portainer.EndpointID
-	}
-
-	agentTransport struct {
-		dataStore          portainer.DataStore
-		httpTransport      *http.Transport
-		tokenManager       *tokenManager
-		signatureService   portainer.DigitalSignatureService
-		endpointIdentifier portainer.EndpointID
-	}
-
-	edgeTransport struct {
-		dataStore            portainer.DataStore
-		httpTransport        *http.Transport
-		tokenManager         *tokenManager
-		reverseTunnelService portainer.ReverseTunnelService
-		endpointIdentifier   portainer.EndpointID
-	}
-)
-
-// NewLocalTransport returns a new transport that can be used to send requests to the local Kubernetes API
-func NewLocalTransport(tokenManager *tokenManager) (*localTransport, error) {
-	config, err := crypto.CreateTLSConfigurationFromBytes(nil, nil, nil, true, true)
-	if err != nil {
-		return nil, err
-	}
-
-	transport := &localTransport{
-		httpTransport: &http.Transport{
-			TLSClientConfig: config,
-		},
-		tokenManager: tokenManager,
-	}
-
-	return transport, nil
+type baseTransport struct {
+	httpTransport    *http.Transport
+	tokenManager     *tokenManager
+	endpoint         *portainer.Endpoint
+	k8sClientFactory *cli.ClientFactory
+	dataStore        portainer.DataStore
 }
 
-// RoundTrip is the implementation of the the http.RoundTripper interface
-func (transport *localTransport) RoundTrip(request *http.Request) (*http.Response, error) {
-	token, err := getRoundTripToken(request, transport.tokenManager, transport.endpointIdentifier)
+func newBaseTransport(httpTransport *http.Transport, tokenManager *tokenManager, endpoint *portainer.Endpoint, k8sClientFactory *cli.ClientFactory, dataStore portainer.DataStore) *baseTransport {
+	return &baseTransport{
+		httpTransport:    httpTransport,
+		tokenManager:     tokenManager,
+		endpoint:         endpoint,
+		k8sClientFactory: k8sClientFactory,
+		dataStore:        dataStore,
+	}
+}
+
+// #region KUBERNETES PROXY
+
+// proxyKubernetesRequest intercepts a Kubernetes API request and apply logic based
+// on the requested operation.
+func (transport *baseTransport) proxyKubernetesRequest(request *http.Request) (*http.Response, error) {
+	apiVersionRe := regexp.MustCompile(`^(/kubernetes)?/api/v[0-9](\.[0-9])?`)
+	requestPath := apiVersionRe.ReplaceAllString(request.URL.Path, "")
+
+	switch {
+	case strings.EqualFold(requestPath, "/namespaces"):
+		return transport.executeKubernetesRequest(request, true)
+	case strings.HasPrefix(requestPath, "/namespaces"):
+		return transport.proxyNamespacedRequest(request, requestPath)
+	default:
+		return transport.executeKubernetesRequest(request, true)
+	}
+}
+
+func (transport *baseTransport) proxyNamespacedRequest(request *http.Request, fullRequestPath string) (*http.Response, error) {
+	requestPath := strings.TrimPrefix(fullRequestPath, "/namespaces/")
+	split := strings.SplitN(requestPath, "/", 2)
+	namespace := split[0]
+
+	requestPath = ""
+	if len(split) > 1 {
+		requestPath = split[1]
+	}
+
+	switch {
+	case strings.HasPrefix(requestPath, "secrets"):
+		return transport.proxySecretRequest(request, namespace, requestPath)
+	case requestPath == "" && request.Method == "DELETE":
+		return transport.proxyNamespaceDeleteOperation(request, namespace)
+	default:
+		return transport.executeKubernetesRequest(request, true)
+	}
+}
+
+func (transport *baseTransport) executeKubernetesRequest(request *http.Request, shouldLog bool) (*http.Response, error) {
+
+	resp, err := transport.httpTransport.RoundTrip(request)
+
+	return resp, err
+}
+
+// #endregion
+
+// #region ROUND TRIP
+
+func (transport *baseTransport) prepareRoundTrip(request *http.Request) (string, error) {
+	token, err := getRoundTripToken(request, transport.tokenManager)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 
-	return transport.httpTransport.RoundTrip(request)
-}
-
-// NewAgentTransport returns a new transport that can be used to send signed requests to a Portainer agent
-func NewAgentTransport(datastore portainer.DataStore, signatureService portainer.DigitalSignatureService, tlsConfig *tls.Config, tokenManager *tokenManager) *agentTransport {
-	transport := &agentTransport{
-		dataStore: datastore,
-		httpTransport: &http.Transport{
-			TLSClientConfig: tlsConfig,
-		},
-		tokenManager:     tokenManager,
-		signatureService: signatureService,
-	}
-
-	return transport
+	return token, nil
 }
 
 // RoundTrip is the implementation of the the http.RoundTripper interface
-func (transport *agentTransport) RoundTrip(request *http.Request) (*http.Response, error) {
-	token, err := getRoundTripToken(request, transport.tokenManager, transport.endpointIdentifier)
-	if err != nil {
-		return nil, err
-	}
-
-	request.Header.Set(portainer.PortainerAgentKubernetesSATokenHeader, token)
-
-	if strings.HasPrefix(request.URL.Path, "/v2") {
-		decorateAgentRequest(request, transport.dataStore)
-	}
-
-	signature, err := transport.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
-	if err != nil {
-		return nil, err
-	}
-
-	request.Header.Set(portainer.PortainerAgentPublicKeyHeader, transport.signatureService.EncodedPublicKey())
-	request.Header.Set(portainer.PortainerAgentSignatureHeader, signature)
-
-	return transport.httpTransport.RoundTrip(request)
+func (transport *baseTransport) RoundTrip(request *http.Request) (*http.Response, error) {
+	return transport.proxyKubernetesRequest(request)
 }
 
-// NewEdgeTransport returns a new transport that can be used to send signed requests to a Portainer Edge agent
-func NewEdgeTransport(datastore portainer.DataStore, reverseTunnelService portainer.ReverseTunnelService, endpointIdentifier portainer.EndpointID, tokenManager *tokenManager) *edgeTransport {
-	transport := &edgeTransport{
-		dataStore:            datastore,
-		httpTransport:        &http.Transport{},
-		tokenManager:         tokenManager,
-		reverseTunnelService: reverseTunnelService,
-		endpointIdentifier:   endpointIdentifier,
-	}
-
-	return transport
-}
-
-// RoundTrip is the implementation of the the http.RoundTripper interface
-func (transport *edgeTransport) RoundTrip(request *http.Request) (*http.Response, error) {
-	token, err := getRoundTripToken(request, transport.tokenManager, transport.endpointIdentifier)
-	if err != nil {
-		return nil, err
-	}
-
-	request.Header.Set(portainer.PortainerAgentKubernetesSATokenHeader, token)
-
-	if strings.HasPrefix(request.URL.Path, "/v2") {
-		decorateAgentRequest(request, transport.dataStore)
-	}
-
-	response, err := transport.httpTransport.RoundTrip(request)
-
-	if err == nil {
-		transport.reverseTunnelService.SetTunnelStatusToActive(transport.endpointIdentifier)
-	} else {
-		transport.reverseTunnelService.SetTunnelStatusToIdle(transport.endpointIdentifier)
-	}
-
-	return response, err
-}
-
-func getRoundTripToken(
-	request *http.Request,
-	tokenManager *tokenManager,
-	endpointIdentifier portainer.EndpointID,
-) (string, error) {
+func getRoundTripToken(request *http.Request, tokenManager *tokenManager) (string, error) {
 	tokenData, err := security.RetrieveTokenData(request)
 	if err != nil {
 		return "", err
@@ -167,6 +118,10 @@ func getRoundTripToken(
 
 	return token, nil
 }
+
+// #endregion
+
+// #region DECORATE FUNCTIONS
 
 func decorateAgentRequest(r *http.Request, dataStore portainer.DataStore) error {
 	requestPath := strings.TrimPrefix(r.URL.Path, "/v2")
@@ -197,3 +152,5 @@ func decorateAgentDockerHubRequest(r *http.Request, dataStore portainer.DataStor
 
 	return nil
 }
+
+// #endregion
