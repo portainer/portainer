@@ -6,7 +6,7 @@ const _KubernetesStatefulSet = Object.freeze({
   Name: '',
   StackName: '',
   ReplicaCount: 0,
-  Image: '',
+  ImageModel: null,
   Env: [],
   CpuLimit: '',
   MemoryLimit: '',

@@ -591,6 +591,26 @@ angular.module('portainer.docker', ['portainer.app']).config([
       },
     };
 
+    const registries = {
+      name: 'docker.registries',
+      url: '/registries',
+      views: {
+        'content@': {
+          component: 'endpointRegistriesView',
+        },
+      },
+    };
+
+    const registryAccess = {
+      name: 'docker.registries.access',
+      url: '/:id/access',
+      views: {
+        'content@': {
+          component: 'dockerRegistryAccessView',
+        },
+      },
+    };
+
     $stateRegistryProvider.register(configs);
     $stateRegistryProvider.register(config);
     $stateRegistryProvider.register(configCreation);
@@ -641,5 +661,7 @@ angular.module('portainer.docker', ['portainer.app']).config([
     $stateRegistryProvider.register(volumeBrowse);
     $stateRegistryProvider.register(volumeCreation);
     $stateRegistryProvider.register(dockerFeaturesConfiguration);
+    $stateRegistryProvider.register(registries);
+    $stateRegistryProvider.register(registryAccess);
   },
 ]);

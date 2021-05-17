@@ -1,3 +1,5 @@
+import EndpointHelper from 'Portainer/helpers/endpointHelper';
+
 angular
   .module('portainer.app')
   .controller('HomeController', function (
@@ -7,7 +9,6 @@ angular
     TagService,
     Authentication,
     EndpointService,
-    EndpointHelper,
     GroupService,
     Notifications,
     EndpointProvider,

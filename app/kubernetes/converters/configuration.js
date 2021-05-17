@@ -14,6 +14,7 @@ class KubernetesConfigurationConverter {
       res.Data[entry.Key] = entry.Value;
     });
     res.ConfigurationOwner = secret.ConfigurationOwner;
+    res.IsRegistrySecret = secret.IsRegistrySecret;
     return res;
   }
 
