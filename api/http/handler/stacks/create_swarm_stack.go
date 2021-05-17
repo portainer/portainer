@@ -300,7 +300,6 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 type swarmStackDeploymentConfig struct {
 	stack      *portainer.Stack
 	endpoint   *portainer.Endpoint
-	dockerhub  *portainer.DockerHub
 	registries []portainer.Registry
 	prune      bool
 	isAdmin    bool
@@ -313,26 +312,20 @@ func (handler *Handler) createSwarmDeployConfig(r *http.Request, stack *portaine
 		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
-	dockerhub, err := handler.DataStore.DockerHub().DockerHub()
+	user, err := handler.DataStore.User().User(securityContext.UserID)
 	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve DockerHub details from the database", err}
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to load user information from the database", err}
 	}
 
 	registries, err := handler.DataStore.Registry().Registries()
 	if err != nil {
 		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
 	}
-	filteredRegistries := security.FilterRegistries(registries, securityContext)
-
-	user, err := handler.DataStore.User().User(securityContext.UserID)
-	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to load user information from the database", err}
-	}
+	filteredRegistries := security.FilterRegistries(registries, user, securityContext.UserMemberships, endpoint.ID)
 
 	config := &swarmStackDeploymentConfig{
 		stack:      stack,
 		endpoint:   endpoint,
-		dockerhub:  dockerhub,
 		registries: filteredRegistries,
 		prune:      prune,
 		isAdmin:    securityContext.IsAdmin,
@@ -367,7 +360,7 @@ func (handler *Handler) deploySwarmStack(config *swarmStackDeploymentConfig) err
 	handler.stackCreationMutex.Lock()
 	defer handler.stackCreationMutex.Unlock()
 
-	handler.SwarmStackManager.Login(config.dockerhub, config.registries, config.endpoint)
+	handler.SwarmStackManager.Login(config.registries, config.endpoint)
 
 	err = handler.SwarmStackManager.Deploy(config.stack, config.prune, config.endpoint)
 	if err != nil {

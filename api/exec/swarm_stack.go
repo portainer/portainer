@@ -10,7 +10,7 @@ import (
 	"path"
 	"runtime"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 // SwarmStackManager represents a service for managing stacks.
@@ -42,18 +42,13 @@ func NewSwarmStackManager(binaryPath, dataPath string, signatureService portaine
 }
 
 // Login executes the docker login command against a list of registries (including DockerHub).
-func (manager *SwarmStackManager) Login(dockerhub *portainer.DockerHub, registries []portainer.Registry, endpoint *portainer.Endpoint) {
+func (manager *SwarmStackManager) Login(registries []portainer.Registry, endpoint *portainer.Endpoint) {
 	command, args := manager.prepareDockerCommandAndArgs(manager.binaryPath, manager.dataPath, endpoint)
 	for _, registry := range registries {
 		if registry.Authentication {
 			registryArgs := append(args, "login", "--username", registry.Username, "--password", registry.Password, registry.URL)
 			runCommandAndCaptureStdErr(command, registryArgs, nil, "")
 		}
-	}
-
-	if dockerhub.Authentication {
-		dockerhubArgs := append(args, "login", "--username", dockerhub.Username, "--password", dockerhub.Password)
-		runCommandAndCaptureStdErr(command, dockerhubArgs, nil, "")
 	}
 }
 

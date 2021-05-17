@@ -526,13 +526,25 @@ type (
 		ManagementConfiguration *RegistryManagementConfiguration `json:"ManagementConfiguration"`
 		Gitlab                  GitlabRegistryData               `json:"Gitlab"`
 		Quay                    QuayRegistryData                 `json:"Quay"`
-		UserAccessPolicies      UserAccessPolicies               `json:"UserAccessPolicies"`
-		TeamAccessPolicies      TeamAccessPolicies               `json:"TeamAccessPolicies"`
+		RegistryAccesses        RegistryAccesses                 `json:"RegistryAccesses"`
+
+		// Deprecated fields
+		// Deprecated in DBVersion == 28
+		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
+		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 18
 		AuthorizedUsers []UserID `json:"AuthorizedUsers"`
 		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
+	}
+
+	RegistryAccesses map[EndpointID]RegistryAccessPolicies
+
+	RegistryAccessPolicies struct {
+		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
+		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
+		Namespaces         []string           `json:"Namespaces"`
 	}
 
 	// RegistryID represents a registry identifier
@@ -1017,7 +1029,6 @@ type (
 		CheckCurrentEdition() error
 		BackupTo(w io.Writer) error
 
-		DockerHub() DockerHubService
 		CustomTemplate() CustomTemplateService
 		EdgeGroup() EdgeGroupService
 		EdgeJob() EdgeJobService
@@ -1046,12 +1057,6 @@ type (
 		EncodedPublicKey() string
 		PEMHeaders() (string, string)
 		CreateSignature(message string) (string, error)
-	}
-
-	// DockerHubService represents a service for managing the DockerHub object
-	DockerHubService interface {
-		DockerHub() (*DockerHub, error)
-		UpdateDockerHub(registry *DockerHub) error
 	}
 
 	// DockerSnapshotter represents a service used to create Docker endpoint snapshots
@@ -1167,6 +1172,9 @@ type (
 		StartExecProcess(namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error
 		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
 		UpdateNamespaceAccessPolicies(accessPolicies map[string]K8sNamespaceAccessPolicy) error
+		DeleteRegistrySecret(registry *Registry, namespace string) error
+		CreateRegistrySecret(registry *Registry, namespace string) error
+		IsRegistrySecret(namespace, secretName string) (bool, error)
 	}
 
 	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes endpoint
@@ -1264,7 +1272,7 @@ type (
 
 	// SwarmStackManager represents a service to manage Swarm stacks
 	SwarmStackManager interface {
-		Login(dockerhub *DockerHub, registries []Registry, endpoint *Endpoint)
+		Login(registries []Registry, endpoint *Endpoint)
 		Logout(endpoint *Endpoint) error
 		Deploy(stack *Stack, prune bool, endpoint *Endpoint) error
 		Remove(stack *Stack, endpoint *Endpoint) error
@@ -1489,6 +1497,8 @@ const (
 	CustomRegistry
 	// GitlabRegistry represents a gitlab registry
 	GitlabRegistry
+	// DockerHubRegistry represents a dockerhub registry
+	DockerHubRegistry
 )
 
 const (

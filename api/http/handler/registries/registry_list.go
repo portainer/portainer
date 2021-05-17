@@ -5,6 +5,7 @@ import (
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -21,21 +22,18 @@ import (
 // @failure 500 "Server error"
 // @router /registries [get]
 func (handler *Handler) registryList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+	}
+	if !securityContext.IsAdmin {
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to list registries, use /endpoints/:endpointId/registries route instead", httperrors.ErrResourceAccessDenied}
+	}
+
 	registries, err := handler.DataStore.Registry().Registries()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
 	}
 
-	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
-	}
-
-	filteredRegistries := security.FilterRegistries(registries, securityContext)
-
-	for idx := range filteredRegistries {
-		hideFields(&filteredRegistries[idx])
-	}
-
-	return response.JSON(w, filteredRegistries)
+	return response.JSON(w, registries)
 }
