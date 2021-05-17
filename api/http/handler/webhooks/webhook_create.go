@@ -9,7 +9,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
@@ -32,6 +32,18 @@ func (payload *webhookCreatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
+// @summary Create a webhook
+// @description
+// @security jwt
+// @tags webhooks
+// @accept json
+// @produce json
+// @param body body webhookCreatePayload true "Webhook data"
+// @success 200 {object} portainer.Webhook
+// @failure 400
+// @failure 409
+// @failure 500
+// @router /webhooks [post]
 func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload webhookCreatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)

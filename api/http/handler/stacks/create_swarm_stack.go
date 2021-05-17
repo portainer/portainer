@@ -2,10 +2,10 @@ package stacks
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"path"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/asaskevich/govalidator"
@@ -17,10 +17,14 @@ import (
 )
 
 type swarmStackFromFileContentPayload struct {
-	Name             string
-	SwarmID          string
-	StackFileContent string
-	Env              []portainer.Pair
+	// Name of the stack
+	Name string `example:"myStack" validate:"required"`
+	// Swarm cluster identifier
+	SwarmID string `example:"jpofkc0i9uo9wtx1zesuk649w" validate:"required"`
+	// Content of the Stack file
+	StackFileContent string `example:"version: 3\n services:\n web:\n image:nginx" validate:"required"`
+	// A list of environment variables used during stack deployment
+	Env []portainer.Pair
 }
 
 func (payload *swarmStackFromFileContentPayload) Validate(r *http.Request) error {
@@ -43,15 +47,13 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	stacks, err := handler.DataStore.Stack().Stacks()
+	isUnique, err := handler.checkUniqueName(endpoint, payload.Name, 0, true)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
 	}
-
-	for _, stack := range stacks {
-		if strings.EqualFold(stack.Name, payload.Name) {
-			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", errStackAlreadyExists}
-		}
+	if !isUnique {
+		errorMessage := fmt.Sprintf("A stack with the name '%s' is already running", payload.Name)
+		return &httperror.HandlerError{http.StatusConflict, errorMessage, errors.New(errorMessage)}
 	}
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
@@ -99,15 +101,25 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 }
 
 type swarmStackFromGitRepositoryPayload struct {
-	Name                        string
-	SwarmID                     string
-	Env                         []portainer.Pair
-	RepositoryURL               string
-	RepositoryReferenceName     string
-	RepositoryAuthentication    bool
-	RepositoryUsername          string
-	RepositoryPassword          string
-	ComposeFilePathInRepository string
+	// Name of the stack
+	Name string `example:"myStack" validate:"required"`
+	// Swarm cluster identifier
+	SwarmID string `example:"jpofkc0i9uo9wtx1zesuk649w" validate:"required"`
+	// A list of environment variables used during stack deployment
+	Env []portainer.Pair
+
+	// URL of a Git repository hosting the Stack file
+	RepositoryURL string `example:"https://github.com/openfaas/faas" validate:"required"`
+	// Reference name of a Git repository hosting the Stack file
+	RepositoryReferenceName string `example:"refs/heads/master"`
+	// Use basic authentication to clone the Git repository
+	RepositoryAuthentication bool `example:"true"`
+	// Username used in basic authentication. Required when RepositoryAuthentication is true.
+	RepositoryUsername string `example:"myGitUsername"`
+	// Password used in basic authentication. Required when RepositoryAuthentication is true.
+	RepositoryPassword string `example:"myGitPassword"`
+	// Path to the Stack file inside the Git repository
+	ComposeFilePathInRepository string `example:"docker-compose.yml" default:"docker-compose.yml"`
 }
 
 func (payload *swarmStackFromGitRepositoryPayload) Validate(r *http.Request) error {
@@ -136,15 +148,13 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	stacks, err := handler.DataStore.Stack().Stacks()
+	isUnique, err := handler.checkUniqueName(endpoint, payload.Name, 0, true)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
 	}
-
-	for _, stack := range stacks {
-		if strings.EqualFold(stack.Name, payload.Name) {
-			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", errStackAlreadyExists}
-		}
+	if !isUnique {
+		errorMessage := fmt.Sprintf("A stack with the name '%s' is already running", payload.Name)
+		return &httperror.HandlerError{http.StatusConflict, errorMessage, errors.New(errorMessage)}
 	}
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
@@ -243,15 +253,13 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	stacks, err := handler.DataStore.Stack().Stacks()
+	isUnique, err := handler.checkUniqueName(endpoint, payload.Name, 0, true)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
 	}
-
-	for _, stack := range stacks {
-		if strings.EqualFold(stack.Name, payload.Name) {
-			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", errStackAlreadyExists}
-		}
+	if !isUnique {
+		errorMessage := fmt.Sprintf("A stack with the name '%s' is already running", payload.Name)
+		return &httperror.HandlerError{http.StatusConflict, errorMessage, errors.New(errorMessage)}
 	}
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
@@ -344,15 +352,12 @@ func (handler *Handler) createSwarmDeployConfig(r *http.Request, stack *portaine
 }
 
 func (handler *Handler) deploySwarmStack(config *swarmStackDeploymentConfig) error {
-	settings, err := handler.DataStore.Settings().Settings()
-	if err != nil {
-		return err
-	}
-
 	isAdminOrEndpointAdmin, err := handler.userIsAdminOrEndpointAdmin(config.user, config.endpoint.ID)
 	if err != nil {
 		return err
 	}
+
+	settings := &config.endpoint.SecuritySettings
 
 	if !settings.AllowBindMountsForRegularUsers && !isAdminOrEndpointAdmin {
 		composeFilePath := path.Join(config.stack.ProjectPath, config.stack.EntryPoint)

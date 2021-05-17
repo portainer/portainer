@@ -1,7 +1,7 @@
 package endpointgroup
 
 import (
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
 
 	"github.com/boltdb/bolt"
@@ -14,18 +14,18 @@ const (
 
 // Service represents a service for managing endpoint data.
 type Service struct {
-	db *bolt.DB
+	connection *internal.DbConnection
 }
 
 // NewService creates a new instance of a service.
-func NewService(db *bolt.DB) (*Service, error) {
-	err := internal.CreateBucket(db, BucketName)
+func NewService(connection *internal.DbConnection) (*Service, error) {
+	err := internal.CreateBucket(connection, BucketName)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Service{
-		db: db,
+		connection: connection,
 	}, nil
 }
 
@@ -34,7 +34,7 @@ func (service *Service) EndpointGroup(ID portainer.EndpointGroupID) (*portainer.
 	var endpointGroup portainer.EndpointGroup
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.db, BucketName, identifier, &endpointGroup)
+	err := internal.GetObject(service.connection, BucketName, identifier, &endpointGroup)
 	if err != nil {
 		return nil, err
 	}
@@ -45,20 +45,20 @@ func (service *Service) EndpointGroup(ID portainer.EndpointGroupID) (*portainer.
 // UpdateEndpointGroup updates an endpoint group.
 func (service *Service) UpdateEndpointGroup(ID portainer.EndpointGroupID, endpointGroup *portainer.EndpointGroup) error {
 	identifier := internal.Itob(int(ID))
-	return internal.UpdateObject(service.db, BucketName, identifier, endpointGroup)
+	return internal.UpdateObject(service.connection, BucketName, identifier, endpointGroup)
 }
 
 // DeleteEndpointGroup deletes an endpoint group.
 func (service *Service) DeleteEndpointGroup(ID portainer.EndpointGroupID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.db, BucketName, identifier)
+	return internal.DeleteObject(service.connection, BucketName, identifier)
 }
 
 // EndpointGroups return an array containing all the endpoint groups.
 func (service *Service) EndpointGroups() ([]portainer.EndpointGroup, error) {
 	var endpointGroups = make([]portainer.EndpointGroup, 0)
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		cursor := bucket.Cursor()
@@ -79,7 +79,7 @@ func (service *Service) EndpointGroups() ([]portainer.EndpointGroup, error) {
 
 // CreateEndpointGroup assign an ID to a new endpoint group and saves it.
 func (service *Service) CreateEndpointGroup(endpointGroup *portainer.EndpointGroup) error {
-	return service.db.Update(func(tx *bolt.Tx) error {
+	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		id, _ := bucket.NextSequence()

@@ -1,4 +1,4 @@
-import * as _ from 'lodash-es';
+import _ from 'lodash-es';
 
 angular.module('portainer.docker').controller('KubernetesApplicationPlacementsDatatableController', function ($scope, $controller, DatatableService, Authentication) {
   angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));

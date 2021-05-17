@@ -8,13 +8,13 @@ import (
 	"github.com/portainer/portainer/api/http/proxy/factory/azure"
 )
 
-func newAzureProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
+func newAzureProxy(endpoint *portainer.Endpoint, dataStore portainer.DataStore) (http.Handler, error) {
 	remoteURL, err := url.Parse(azureAPIBaseURL)
 	if err != nil {
 		return nil, err
 	}
 
 	proxy := newSingleHostReverseProxyWithHostHeader(remoteURL)
-	proxy.Transport = azure.NewTransport(&endpoint.AzureCredentials)
+	proxy.Transport = azure.NewTransport(&endpoint.AzureCredentials, dataStore, endpoint)
 	return proxy, nil
 }

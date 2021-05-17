@@ -1,10 +1,11 @@
 package snapshot
 
 import (
+	"context"
 	"log"
 	"time"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 // Service repesents a service to manage endpoint snapshots.
@@ -16,10 +17,11 @@ type Service struct {
 	snapshotIntervalInSeconds float64
 	dockerSnapshotter         portainer.DockerSnapshotter
 	kubernetesSnapshotter     portainer.KubernetesSnapshotter
+	shutdownCtx               context.Context
 }
 
 // NewService creates a new instance of a service
-func NewService(snapshotInterval string, dataStore portainer.DataStore, dockerSnapshotter portainer.DockerSnapshotter, kubernetesSnapshotter portainer.KubernetesSnapshotter) (*Service, error) {
+func NewService(snapshotInterval string, dataStore portainer.DataStore, dockerSnapshotter portainer.DockerSnapshotter, kubernetesSnapshotter portainer.KubernetesSnapshotter, shutdownCtx context.Context) (*Service, error) {
 	snapshotFrequency, err := time.ParseDuration(snapshotInterval)
 	if err != nil {
 		return nil, err
@@ -30,6 +32,7 @@ func NewService(snapshotInterval string, dataStore portainer.DataStore, dockerSn
 		snapshotIntervalInSeconds: snapshotFrequency.Seconds(),
 		dockerSnapshotter:         dockerSnapshotter,
 		kubernetesSnapshotter:     kubernetesSnapshotter,
+		shutdownCtx:               shutdownCtx,
 	}, nil
 }
 
@@ -43,17 +46,19 @@ func (service *Service) Start() {
 	service.startSnapshotLoop()
 }
 
-func (service *Service) stop() {
+func (service *Service) Stop() {
 	if service.refreshSignal == nil {
 		return
 	}
 
+	// clear refreshSignal to mark the service as disabled
 	close(service.refreshSignal)
+	service.refreshSignal = nil
 }
 
 // SetSnapshotInterval sets the snapshot interval and resets the service
 func (service *Service) SetSnapshotInterval(snapshotInterval string) error {
-	service.stop()
+	service.Stop()
 
 	snapshotFrequency, err := time.ParseDuration(snapshotInterval)
 	if err != nil {
@@ -130,9 +135,12 @@ func (service *Service) startSnapshotLoop() error {
 				if err != nil {
 					log.Printf("[ERROR] [internal,snapshot] [message: background schedule error (endpoint snapshot).] [error: %s]", err)
 				}
-
+			case <-service.shutdownCtx.Done():
+				log.Println("[DEBUG] [internal,snapshot] [message: shutting down snapshotting]")
+				ticker.Stop()
+				return
 			case <-service.refreshSignal:
-				log.Println("[DEBUG] [internal,snapshot] [message: shutting down Snapshot service]")
+				log.Println("[DEBUG] [internal,snapshot] [message: shutting down snapshotting]")
 				ticker.Stop()
 				return
 			}

@@ -15,6 +15,7 @@ export function RegistryViewModel(data) {
   this.TeamAccessPolicies = data.TeamAccessPolicies;
   this.Checked = false;
   this.Gitlab = data.Gitlab;
+  this.Quay = data.Quay;
 }
 
 export function RegistryManagementConfigurationDefaultModel(registry) {
@@ -62,6 +63,12 @@ export function RegistryCreateRequest(model) {
       ProjectId: model.Gitlab.ProjectId,
       InstanceURL: model.Gitlab.InstanceURL,
       ProjectPath: model.Gitlab.ProjectPath,
+    };
+  }
+  if (model.Type === RegistryTypes.QUAY) {
+    this.Quay = {
+      useOrganisation: model.Quay.useOrganisation,
+      organisationName: model.Quay.organisationName,
     };
   }
 }

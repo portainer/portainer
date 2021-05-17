@@ -1,8 +1,9 @@
 export function KubernetesResourcePoolFormValues(defaults) {
   return {
+    Name: '',
     MemoryLimit: defaults.MemoryLimit,
     CpuLimit: defaults.CpuLimit,
-    HasQuota: true,
+    HasQuota: false,
     IngressClasses: [], // KubernetesResourcePoolIngressClassFormValue
   };
 }
@@ -20,6 +21,7 @@ export function KubernetesResourcePoolIngressClassFormValue(ingressClass) {
     Selected: false,
     WasSelected: false,
     AdvancedConfig: false,
+    Paths: [], // will be filled to save IngressClass.Paths inside ingressClassesToFormValues() on RP EDIT
   };
 }
 

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/portainer/portainer/api/http/handler/auth"
+	"github.com/portainer/portainer/api/http/handler/backup"
 	"github.com/portainer/portainer/api/http/handler/customtemplates"
 	"github.com/portainer/portainer/api/http/handler/dockerhub"
 	"github.com/portainer/portainer/api/http/handler/edgegroups"
@@ -36,6 +37,7 @@ import (
 // Handler is a collection of all the service handlers.
 type Handler struct {
 	AuthHandler            *auth.Handler
+	BackupHandler          *backup.Handler
 	CustomTemplatesHandler *customtemplates.Handler
 	DockerHubHandler       *dockerhub.Handler
 	EdgeGroupsHandler      *edgegroups.Handler
@@ -64,11 +66,86 @@ type Handler struct {
 	WebhookHandler         *webhooks.Handler
 }
 
+// @title PortainerCE API
+// @version 2.1.1
+// @description.markdown api-description.md
+// @termsOfService
+
+// @contact.email info@portainer.io
+
+// @license.name
+// @license.url
+
+// @host
+// @BasePath /api
+// @schemes http https
+
+// @securitydefinitions.apikey jwt
+// @in header
+// @name Authorization
+
+// @tag.name auth
+// @tag.description Authenticate against Portainer HTTP API
+// @tag.name custom_templates
+// @tag.description Manage Custom Templates
+// @tag.name dockerhub
+// @tag.description Manage how Portainer connects to the DockerHub
+// @tag.name edge_groups
+// @tag.description Manage Edge Groups
+// @tag.name edge_jobs
+// @tag.description Manage Edge Jobs
+// @tag.name edge_stacks
+// @tag.description Manage Edge Stacks
+// @tag.name edge_templates
+// @tag.description Manage Edge Templates
+// @tag.name edge
+// @tag.description Manage Edge related endpoint settings
+// @tag.name endpoints
+// @tag.description Manage Docker environments
+// @tag.name endpoint_groups
+// @tag.description Manage endpoint groups
+// @tag.name motd
+// @tag.description Fetch the message of the day
+// @tag.name registries
+// @tag.description Manage Docker registries
+// @tag.name resource_controls
+// @tag.description Manage access control on Docker resources
+// @tag.name roles
+// @tag.description Manage roles
+// @tag.name settings
+// @tag.description Manage Portainer settings
+// @tag.name status
+// @tag.description Information about the Portainer instance
+// @tag.name stacks
+// @tag.description Manage Docker stacks
+// @tag.name users
+// @tag.description Manage users
+// @tag.name tags
+// @tag.description Manage tags
+// @tag.name teams
+// @tag.description Manage teams
+// @tag.name team_memberships
+// @tag.description Manage team memberships
+// @tag.name templates
+// @tag.description Manage App Templates
+// @tag.name stacks
+// @tag.description Manage stacks
+// @tag.name upload
+// @tag.description Upload files
+// @tag.name webhooks
+// @tag.description Manage webhooks
+// @tag.name websocket
+// @tag.description Create exec sessions using websockets
+
 // ServeHTTP delegates a request to the appropriate subhandler.
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case strings.HasPrefix(r.URL.Path, "/api/auth"):
 		http.StripPrefix("/api", h.AuthHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/backup"):
+		http.StripPrefix("/api", h.BackupHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/restore"):
+		http.StripPrefix("/api", h.BackupHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/dockerhub"):
 		http.StripPrefix("/api", h.DockerHubHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/custom_templates"):

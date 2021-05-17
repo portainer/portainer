@@ -6,11 +6,23 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 )
 
-// GET request on /api/endpoint_groups/:id
+// @summary Inspect an Endpoint group
+// @description Retrieve details abont an endpoint group.
+// @description **Access policy**: administrator
+// @tags endpoint_groups
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "Endpoint group identifier"
+// @success 200 {object} portainer.EndpointGroup "Success"
+// @failure 400 "Invalid request"
+// @failure 404 "EndpointGroup not found"
+// @failure 500 "Server error"
+// @router /endpoint_groups/:id [get]
 func (handler *Handler) endpointGroupInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointGroupID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

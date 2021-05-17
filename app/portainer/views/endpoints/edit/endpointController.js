@@ -147,6 +147,10 @@ angular
         payload.URL = 'tcp://' + endpoint.URL;
       }
 
+      if (endpoint.Type === PortainerEndpointTypes.AgentOnKubernetesEnvironment) {
+        payload.URL = endpoint.URL;
+      }
+
       $scope.state.actionInProgress = true;
       EndpointService.updateEndpoint(endpoint.Id, payload).then(
         function success() {
@@ -253,7 +257,7 @@ angular
   -e EDGE_ID=${edgeId} \\
   -e EDGE_KEY=${edgeKey} \\
   -e CAP_HOST_MANAGEMENT=1 \\
-  --name portainer_edge_agent \\localhost
+  --name portainer_edge_agent \\
   portainer/agent`;
     }
 

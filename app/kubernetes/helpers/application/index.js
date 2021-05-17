@@ -1,4 +1,4 @@
-import * as _ from 'lodash-es';
+import _ from 'lodash-es';
 import { KubernetesPortMapping, KubernetesPortMappingPort } from 'Kubernetes/models/port/models';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
@@ -115,7 +115,11 @@ class KubernetesApplicationHelper {
     const env = _.map(envVariables, (item) => {
       const res = new KubernetesApplicationEnvPayload();
       res.name = item.Name;
-      res.value = item.Value;
+      if (item.Value === undefined) {
+        delete res.value;
+      } else {
+        res.value = item.Value;
+      }
       return res;
     });
     return env;
@@ -123,13 +127,14 @@ class KubernetesApplicationHelper {
 
   static generateEnvVariablesFromEnv(env) {
     const envVariables = _.map(env, (item) => {
-      if (!item.value) {
+      if (item.valueFrom) {
         return;
       }
       const res = new KubernetesApplicationEnvironmentVariableFormValue();
       res.Name = item.name;
       res.Value = item.value;
       res.IsNew = false;
+      res.NameIndex = item.name;
       return res;
     });
     return _.without(envVariables, undefined);
@@ -324,7 +329,7 @@ class KubernetesApplicationHelper {
       const pvc = _.find(persistentVolumeClaims, (item) => _.startsWith(item.Name, folder.PersistentVolumeClaimName));
       const res = new KubernetesApplicationPersistedFolderFormValue(pvc.StorageClass);
       res.PersistentVolumeClaimName = folder.PersistentVolumeClaimName;
-      res.Size = parseInt(pvc.Storage.slice(0, -2));
+      res.Size = parseInt(pvc.Storage, 10);
       res.SizeUnit = pvc.Storage.slice(-2);
       res.ContainerPath = folder.MountPath;
       return res;
@@ -347,6 +352,14 @@ class KubernetesApplicationHelper {
       volume.persistentVolumeClaim.claimName = name;
       app.Volumes.push(volume);
     });
+  }
+
+  static hasRWOOnly(formValues) {
+    return _.find(formValues.PersistedFolders, (item) => item.StorageClass && _.isEqual(item.StorageClass.AccessModes, ['RWO']));
+  }
+
+  static hasRWX(claims) {
+    return _.find(claims, (item) => item.StorageClass && _.includes(item.StorageClass.AccessModes, 'RWX')) !== undefined;
   }
   /* #endregion */
 

@@ -212,7 +212,7 @@
               <div class="form-group" ng-if="!formValues.LDAPSettings.TLSConfig.TLSSkipVerify">
                 <label class="col-sm-2 control-label text-left">TLS CA certificate</label>
                 <div class="col-sm-10">
-                  <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSCACert">Select file</button>
+                  <button type="button" class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSCACert">Select file</button>
                   <span style="margin-left: 5px;">
                     {{ formValues.TLSCACert.name }}
                     <i class="fa fa-check green-icon" ng-if="formValues.TLSCACert && formValues.TLSCACert === formValues.LDAPSettings.TLSConfig.TLSCACert" aria-hidden="true"></i>

@@ -43,6 +43,14 @@ angular
       ],
     };
 
+    const deployCommands = {
+      kubeLoadBalancer: `curl -L https://downloads.portainer.io/portainer-agent-k8s-lb.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml`,
+      kubeNodePort: `curl -L https://downloads.portainer.io/portainer-agent-k8s-nodeport.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml`,
+      agentLinux: `curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent`,
+      agentWindows: `curl -L https://downloads.portainer.io/agent-stack-windows.yml -o agent-stack-windows.yml && docker stack deploy --compose-file=agent-stack-windows.yml portainer-agent`,
+    };
+    $scope.deployCommands = deployCommands;
+
     $scope.formValues = {
       Name: '',
       URL: '',
@@ -58,15 +66,13 @@ angular
 
     $scope.copyAgentCommand = function () {
       if ($scope.state.deploymentTab === 2 && $scope.state.PlatformType === 'linux') {
-        clipboard.copyText('curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent');
+        clipboard.copyText(deployCommands.agentLinux);
       } else if ($scope.state.deploymentTab === 2 && $scope.state.PlatformType === 'windows') {
-        clipboard.copyText(
-          'curl -L https://downloads.portainer.io/agent-stack-windows.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack-windows.yml portainer-agent'
-        );
+        clipboard.copyText(deployCommands.agentWindows);
       } else if ($scope.state.deploymentTab === 1) {
-        clipboard.copyText('curl -L https://downloads.portainer.io/portainer-agent-k8s-nodeport.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml');
+        clipboard.copyText(deployCommands.kubeNodePort);
       } else {
-        clipboard.copyText('curl -L https://downloads.portainer.io/portainer-agent-k8s-lb.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml');
+        clipboard.copyText(deployCommands.kubeLoadBalancer);
       }
       $('#copyNotification').show().fadeOut(2500);
     };
@@ -94,12 +100,18 @@ angular
     }
 
     $scope.addDockerEndpoint = function () {
+      var name = $scope.formValues.Name;
+      var URL = $filter('stripprotocol')($scope.formValues.URL);
+      var publicURL = $scope.formValues.PublicURL;
+      var groupId = $scope.formValues.GroupId;
+      var tagIds = $scope.formValues.TagIds;
+
       if ($scope.formValues.ConnectSocket) {
-        var endpointName = $scope.formValues.Name;
+        URL = $scope.formValues.SocketPath;
         $scope.state.actionInProgress = true;
-        EndpointService.createLocalEndpoint(endpointName)
+        EndpointService.createLocalEndpoint(name, URL, publicURL, groupId, tagIds)
           .then(function success() {
-            Notifications.success('Endpoint created', endpointName);
+            Notifications.success('Endpoint created', name);
             $state.go('portainer.endpoints', {}, { reload: true });
           })
           .catch(function error(err) {
@@ -109,11 +121,9 @@ angular
             $scope.state.actionInProgress = false;
           });
       } else {
-        var name = $scope.formValues.Name;
-        var URL = $filter('stripprotocol')($scope.formValues.URL);
-        var publicURL = $scope.formValues.PublicURL === '' ? URL.split(':')[0] : $scope.formValues.PublicURL;
-        var groupId = $scope.formValues.GroupId;
-        var tagIds = $scope.formValues.TagIds;
+        if (publicURL === '') {
+          publicURL = URL.split(':')[0];
+        }
 
         var securityData = $scope.formValues.SecurityFormData;
         var TLS = securityData.TLS;

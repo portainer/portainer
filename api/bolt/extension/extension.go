@@ -1,7 +1,7 @@
 package extension
 
 import (
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
 
 	"github.com/boltdb/bolt"
@@ -14,18 +14,18 @@ const (
 
 // Service represents a service for managing endpoint data.
 type Service struct {
-	db *bolt.DB
+	connection *internal.DbConnection
 }
 
 // NewService creates a new instance of a service.
-func NewService(db *bolt.DB) (*Service, error) {
-	err := internal.CreateBucket(db, BucketName)
+func NewService(connection *internal.DbConnection) (*Service, error) {
+	err := internal.CreateBucket(connection, BucketName)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Service{
-		db: db,
+		connection: connection,
 	}, nil
 }
 
@@ -34,7 +34,7 @@ func (service *Service) Extension(ID portainer.ExtensionID) (*portainer.Extensio
 	var extension portainer.Extension
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.db, BucketName, identifier, &extension)
+	err := internal.GetObject(service.connection, BucketName, identifier, &extension)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (service *Service) Extension(ID portainer.ExtensionID) (*portainer.Extensio
 func (service *Service) Extensions() ([]portainer.Extension, error) {
 	var extensions = make([]portainer.Extension, 0)
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		cursor := bucket.Cursor()
@@ -67,7 +67,7 @@ func (service *Service) Extensions() ([]portainer.Extension, error) {
 
 // Persist persists a extension inside the database.
 func (service *Service) Persist(extension *portainer.Extension) error {
-	return service.db.Update(func(tx *bolt.Tx) error {
+	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		data, err := internal.MarshalObject(extension)
@@ -82,5 +82,5 @@ func (service *Service) Persist(extension *portainer.Extension) error {
 // DeleteExtension deletes a Extension.
 func (service *Service) DeleteExtension(ID portainer.ExtensionID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.db, BucketName, identifier)
+	return internal.DeleteObject(service.connection, BucketName, identifier)
 }

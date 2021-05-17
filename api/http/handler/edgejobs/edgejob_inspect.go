@@ -6,7 +6,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
@@ -15,6 +15,19 @@ type edgeJobInspectResponse struct {
 	Endpoints []portainer.EndpointID
 }
 
+// @id EdgeJobInspect
+// @summary Inspect an EdgeJob
+// @description
+// @tags edge_jobs
+// @security jwt
+// @accept json
+// @produce json
+// @param id path string true "EdgeJob Id"
+// @success 200 {object} portainer.EdgeJob
+// @failure 500
+// @failure 400
+// @failure 503 Edge compute features are disabled
+// @router /edge_jobs/{id} [get]
 func (handler *Handler) edgeJobInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeJobID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

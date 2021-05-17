@@ -8,17 +8,25 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 type resourceControlCreatePayload struct {
-	ResourceID         string
-	Type               string
-	Public             bool
-	AdministratorsOnly bool
-	Users              []int
-	Teams              []int
-	SubResourceIDs     []string
+	//
+	ResourceID string `example:"617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08" validate:"required"`
+	// Type of Docker resource. Valid values are: container, volume\
+	// service, secret, config or stack
+	Type string `example:"container" validate:"required"`
+	// Permit access to the associated resource to any user
+	Public bool `example:"true"`
+	// Permit access to resource only to admins
+	AdministratorsOnly bool `example:"true"`
+	// List of user identifiers with access to the associated resource
+	Users []int `example:"1,4"`
+	// List of team identifiers with access to the associated resource
+	Teams []int `example:"56,7"`
+	// List of Docker resources that will inherit this access control
+	SubResourceIDs []string `example:"617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08"`
 }
 
 var (
@@ -45,7 +53,20 @@ func (payload *resourceControlCreatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// POST request on /api/resource_controls
+// @id ResourceControlCreate
+// @summary Create a new resource control
+// @description Create a new resource control to restrict access to a Docker resource.
+// @description **Access policy**: administrator
+// @tags resource_controls
+// @security jwt
+// @accept json
+// @produce json
+// @param body body resourceControlCreatePayload true "Resource control details"
+// @success 200 {object} portainer.ResourceControl "Success"
+// @failure 400 "Invalid request"
+// @failure 409 "Resource control already exists"
+// @failure 500 "Server error"
+// @router /resource_controls [post]
 func (handler *Handler) resourceControlCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload resourceControlCreatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
@@ -57,6 +78,8 @@ func (handler *Handler) resourceControlCreate(w http.ResponseWriter, r *http.Req
 	switch payload.Type {
 	case "container":
 		resourceControlType = portainer.ContainerResourceControl
+	case "container-group":
+		resourceControlType = portainer.ContainerGroupResourceControl
 	case "service":
 		resourceControlType = portainer.ServiceResourceControl
 	case "volume":

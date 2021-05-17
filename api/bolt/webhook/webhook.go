@@ -1,7 +1,7 @@
 package webhook
 
 import (
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/internal"
 
@@ -15,18 +15,18 @@ const (
 
 // Service represents a service for managing webhook data.
 type Service struct {
-	db *bolt.DB
+	connection *internal.DbConnection
 }
 
 // NewService creates a new instance of a service.
-func NewService(db *bolt.DB) (*Service, error) {
-	err := internal.CreateBucket(db, BucketName)
+func NewService(connection *internal.DbConnection) (*Service, error) {
+	err := internal.CreateBucket(connection, BucketName)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Service{
-		db: db,
+		connection: connection,
 	}, nil
 }
 
@@ -34,7 +34,7 @@ func NewService(db *bolt.DB) (*Service, error) {
 func (service *Service) Webhooks() ([]portainer.Webhook, error) {
 	var webhooks = make([]portainer.Webhook, 0)
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		cursor := bucket.Cursor()
@@ -58,7 +58,7 @@ func (service *Service) Webhook(ID portainer.WebhookID) (*portainer.Webhook, err
 	var webhook portainer.Webhook
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.db, BucketName, identifier, &webhook)
+	err := internal.GetObject(service.connection, BucketName, identifier, &webhook)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func (service *Service) Webhook(ID portainer.WebhookID) (*portainer.Webhook, err
 func (service *Service) WebhookByResourceID(ID string) (*portainer.Webhook, error) {
 	var webhook *portainer.Webhook
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 		cursor := bucket.Cursor()
 
@@ -101,7 +101,7 @@ func (service *Service) WebhookByResourceID(ID string) (*portainer.Webhook, erro
 func (service *Service) WebhookByToken(token string) (*portainer.Webhook, error) {
 	var webhook *portainer.Webhook
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 		cursor := bucket.Cursor()
 
@@ -131,12 +131,12 @@ func (service *Service) WebhookByToken(token string) (*portainer.Webhook, error)
 // DeleteWebhook deletes a webhook.
 func (service *Service) DeleteWebhook(ID portainer.WebhookID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.db, BucketName, identifier)
+	return internal.DeleteObject(service.connection, BucketName, identifier)
 }
 
 // CreateWebhook assign an ID to a new webhook and saves it.
 func (service *Service) CreateWebhook(webhook *portainer.Webhook) error {
-	return service.db.Update(func(tx *bolt.Tx) error {
+	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		id, _ := bucket.NextSequence()

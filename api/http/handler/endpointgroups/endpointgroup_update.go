@@ -7,15 +7,18 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/internal/tag"
 )
 
 type endpointGroupUpdatePayload struct {
-	Name               string
-	Description        string
-	TagIDs             []portainer.TagID
+	// Endpoint group name
+	Name string `example:"my-endpoint-group"`
+	// Endpoint group description
+	Description string `example:"description"`
+	// List of tag identifiers associated to the endpoint group
+	TagIDs             []portainer.TagID `example:"3,4"`
 	UserAccessPolicies portainer.UserAccessPolicies
 	TeamAccessPolicies portainer.TeamAccessPolicies
 }
@@ -24,7 +27,21 @@ func (payload *endpointGroupUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// PUT request on /api/endpoint_groups/:id
+// @id EndpointGroupUpdate
+// @summary Update an endpoint group
+// @description Update an endpoint group.
+// @description **Access policy**: administrator
+// @tags endpoint_groups
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "EndpointGroup identifier"
+// @param body body endpointGroupUpdatePayload true "EndpointGroup details"
+// @success 200 {object} portainer.EndpointGroup "Success"
+// @failure 400 "Invalid request"
+// @failure 404 "EndpointGroup not found"
+// @failure 500 "Server error"
+// @router /endpoint_groups/:id [put]
 func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointGroupID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

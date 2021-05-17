@@ -22,7 +22,17 @@ module.exports = {
       {
         test: /\.js$/,
         enforce: 'pre',
-        use: ['source-map-loader'],
+        use: [
+          {
+            loader: 'source-map-loader',
+            options: {
+              filterSourceMappingUrl: (_, resourcePath) => {
+                // ignores `chardet` missing sourcemaps
+                return !/node_modules\/chardet/i.test(resourcePath);
+              },
+            },
+          },
+        ],
       },
       {
         test: /\.js$/,
@@ -59,6 +69,15 @@ module.exports = {
         use: [MiniCssExtractPlugin.loader, { loader: 'css-loader', options: { importLoaders: 1 } }, 'postcss-loader'],
       },
     ],
+  },
+  devServer: {
+    contentBase: path.join(__dirname, '.tmp'),
+    compress: true,
+    port: 8999,
+    proxy: {
+      '/api': 'http://localhost:9000',
+    },
+    open: true,
   },
   plugins: [
     new HtmlWebpackPlugin({

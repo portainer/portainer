@@ -1,10 +1,8 @@
 package tunnelserver
 
 import (
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
-
-	"github.com/boltdb/bolt"
 )
 
 const (
@@ -15,18 +13,18 @@ const (
 
 // Service represents a service for managing endpoint data.
 type Service struct {
-	db *bolt.DB
+	connection *internal.DbConnection
 }
 
 // NewService creates a new instance of a service.
-func NewService(db *bolt.DB) (*Service, error) {
-	err := internal.CreateBucket(db, BucketName)
+func NewService(connection *internal.DbConnection) (*Service, error) {
+	err := internal.CreateBucket(connection, BucketName)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Service{
-		db: db,
+		connection: connection,
 	}, nil
 }
 
@@ -34,7 +32,7 @@ func NewService(db *bolt.DB) (*Service, error) {
 func (service *Service) Info() (*portainer.TunnelServerInfo, error) {
 	var info portainer.TunnelServerInfo
 
-	err := internal.GetObject(service.db, BucketName, []byte(infoKey), &info)
+	err := internal.GetObject(service.connection, BucketName, []byte(infoKey), &info)
 	if err != nil {
 		return nil, err
 	}
@@ -44,5 +42,5 @@ func (service *Service) Info() (*portainer.TunnelServerInfo, error) {
 
 // UpdateInfo persists a TunnelServerInfo object.
 func (service *Service) UpdateInfo(settings *portainer.TunnelServerInfo) error {
-	return internal.UpdateObject(service.db, BucketName, []byte(infoKey), settings)
+	return internal.UpdateObject(service.connection, BucketName, []byte(infoKey), settings)
 }

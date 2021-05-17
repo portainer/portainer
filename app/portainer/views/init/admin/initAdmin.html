@@ -11,8 +11,17 @@
       <!-- init password panel -->
       <div class="panel panel-default">
         <div class="panel-body">
+          <!-- toggle -->
+          <div style="padding-bottom: 12px;">
+            <a ng-click="togglePanel()">
+              <i ng-class="{ true: 'glyphicon glyphicon-chevron-down', false: 'glyphicon glyphicon-chevron-right' }[state.showInitPassword]" aria-hidden="true"></i
+              ><span style="padding-left: 10px;">New Portainer installation</span>
+            </a>
+          </div>
+          <!-- !toggle -->
+
           <!-- init password form -->
-          <form class="simple-box-form form-horizontal">
+          <form class="simple-box-form form-horizontal" style="padding-left: 30px;" ng-if="state.showInitPassword">
             <!-- note -->
             <div class="form-group">
               <div class="col-sm-12">
@@ -98,6 +107,123 @@
         </div>
       </div>
       <!-- !init password panel -->
+
+      <!-- restore backup panel -->
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <!-- toggle -->
+          <div style="padding-bottom: 12px;">
+            <a ng-click="togglePanel()">
+              <i ng-class="{ true: 'glyphicon glyphicon-chevron-down', false: 'glyphicon glyphicon-chevron-right' }[state.showRestorePortainer]" aria-hidden="true"></i
+              ><span style="padding-left: 10px;">Restore Portainer from backup</span>
+            </a>
+          </div>
+          <!-- !toggle -->
+
+          <!-- restore form -->
+          <form class="simple-box-form form-horizontal" style="padding-left: 30px;" ng-if="state.showRestorePortainer">
+            <!-- note -->
+            <div class="form-group">
+              <div class="col-sm-9">
+                <span class="small text-muted">
+                  This will restore the Portainer metadata which contains information about the endpoints, stacks and applications, as well as the configured users.
+                </span>
+              </div>
+            </div>
+            <!-- !note -->
+            <div class="form-group">
+              <div class="boxselector_wrapper">
+                <div>
+                  <input type="radio" id="restore_file" checked="checked" />
+                  <label for="restore_file" style="padding-bottom: 20px;">
+                    <div class="boxselector_header">
+                      <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Upload backup file
+                    </div>
+                    <p></p>
+                  </label>
+                </div>
+                <div>
+                  <input type="radio" id="restore_s3" disabled />
+                  <label for="restore_s3" class="boxselector_disabled" style="background-color: #ffffff;">
+                    <div class="boxselector_header">
+                      <i class="fa fa-download" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Retrieve from S3
+                    </div>
+                    <p>This feature is available in <a href="https://www.portainer.io/business-upsell?from=restore-s3-form" target="_blank"> Portainer Business Edition</a></p>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <!-- note -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <span class="small text-muted">
+                  You can upload a backup file from your computer.
+                </span>
+              </div>
+            </div>
+            <!-- !note -->
+            <!-- select-file-input -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <button class="btn btn-sm btn-primary" ngf-select accept=".tar.gz,.encrypted" ng-model="formValues.BackupFile" auto-focus>Select file</button>
+                <span style="margin-left: 5px;">
+                  {{ formValues.BackupFile.name }}
+                  <i class="fa fa-times red-icon" ng-if="!formValues.BackupFile" aria-hidden="true"></i>
+                </span>
+              </div>
+            </div>
+            <!-- !select-file-input -->
+            <!-- password-input -->
+            <div class="form-group">
+              <label for="password" class="col-sm-3 control-label text-left">
+                Password
+                <portainer-tooltip
+                  position="bottom"
+                  message="If the backup is password protected, provide the password in order to extract the backup file, otherwise this field can be left empty."
+                ></portainer-tooltip>
+              </label>
+              <div class="col-sm-4">
+                <input type="password" class="form-control" ng-model="formValues.Password" id="password" />
+              </div>
+            </div>
+            <!-- !password-input -->
+            <!-- note -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <span class="small text-muted">
+                  You are about to restore Portainer from this backup.
+                </span>
+              </div>
+              <div class="col-sm-12">
+                <span class="small text-muted">
+                  After restoring has completed, please log in as a user that was known by the Portainer that was restored.
+                </span>
+              </div>
+            </div>
+            <!-- !note -->
+            <!-- actions -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-sm"
+                  ng-disabled="!formValues.BackupFile || state.backupInProgress"
+                  ng-click="uploadBackup()"
+                  button-spinner="state.backupInProgress"
+                >
+                  <span ng-hide="state.backupInProgress">Restore Portainer</span>
+                  <span ng-show="state.backupInProgress">Restoring Portainer...</span>
+                </button>
+              </div>
+            </div>
+            <!-- !actions -->
+          </form>
+          <!-- !restore backup form -->
+        </div>
+      </div>
+      <!-- !restore backup panel -->
     </div>
   </div>
   <!-- !simple box -->

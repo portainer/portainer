@@ -26,6 +26,8 @@ angular.module('portainer.app').factory('Notifications', [
         msg = e.data.message;
       } else if (e.data && e.data.content) {
         msg = e.data.content;
+      } else if (e.data && e.data.error) {
+        msg = e.data.error;
       } else if (e.message) {
         msg = e.message;
       } else if (e.err && e.err.data && e.err.data.length > 0 && e.err.data[0].message) {
