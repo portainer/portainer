@@ -128,31 +128,6 @@ func (bouncer *RequestBouncer) AuthorizedEdgeEndpointOperation(r *http.Request, 
 	return nil
 }
 
-// RegistryAccess retrieves the JWT token from the request context and verifies
-// that the user can access the specified registry.
-// An error is returned when access is denied.
-func (bouncer *RequestBouncer) RegistryAccess(r *http.Request, registry *portainer.Registry) error {
-	tokenData, err := RetrieveTokenData(r)
-	if err != nil {
-		return err
-	}
-
-	if tokenData.Role == portainer.AdministratorRole {
-		return nil
-	}
-
-	memberships, err := bouncer.dataStore.TeamMembership().TeamMembershipsByUserID(tokenData.ID)
-	if err != nil {
-		return err
-	}
-
-	if !AuthorizedRegistryAccess(registry, tokenData.ID, memberships) {
-		return httperrors.ErrEndpointAccessDenied
-	}
-
-	return nil
-}
-
 // handlers are applied backwards to the incoming request:
 // - add secure handlers to the response
 // - parse the JWT token and put it into the http context.

@@ -9,6 +9,8 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	httperrors "github.com/portainer/portainer/api/http/errors"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 type registryUpdatePayload struct {
@@ -21,10 +23,9 @@ type registryUpdatePayload struct {
 	// Username used to authenticate against this registry. Required when Authentication is true
 	Username *string `example:"registry_user"`
 	// Password used to authenticate against this registry. required when Authentication is true
-	Password           *string `example:"registry_password"`
-	UserAccessPolicies portainer.UserAccessPolicies
-	TeamAccessPolicies portainer.TeamAccessPolicies
-	Quay               *portainer.QuayRegistryData
+	Password         *string `example:"registry_password"`
+	RegistryAccesses *portainer.RegistryAccesses
+	Quay             *portainer.QuayRegistryData
 }
 
 func (payload *registryUpdatePayload) Validate(r *http.Request) error {
@@ -48,15 +49,17 @@ func (payload *registryUpdatePayload) Validate(r *http.Request) error {
 // @failure 500 "Server error"
 // @router /registries/{id} [put]
 func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+	}
+	if !securityContext.IsAdmin {
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update registry", httperrors.ErrResourceAccessDenied}
+	}
+
 	registryID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid registry identifier route variable", err}
-	}
-
-	var payload registryUpdatePayload
-	err = request.DecodeAndValidateJSONPayload(r, &payload)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
 	registry, err := handler.DataStore.Registry().Registry(portainer.RegistryID(registryID))
@@ -66,27 +69,22 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a registry with the specified identifier inside the database", err}
 	}
 
+	var payload registryUpdatePayload
+	err = request.DecodeAndValidateJSONPayload(r, &payload)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+	}
+
 	if payload.Name != nil {
 		registry.Name = *payload.Name
 	}
 
-	if payload.URL != nil {
-		registries, err := handler.DataStore.Registry().Registries()
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
-		}
-		for _, r := range registries {
-			if r.ID != registry.ID && hasSameURL(&r, registry) {
-				return &httperror.HandlerError{http.StatusConflict, "Another registry with the same URL already exists", errors.New("A registry is already defined for this URL")}
-			}
-		}
-
-		registry.URL = *payload.URL
-	}
+	shouldUpdateSecrets := false
 
 	if payload.Authentication != nil {
 		if *payload.Authentication {
 			registry.Authentication = true
+			shouldUpdateSecrets = shouldUpdateSecrets || (payload.Username != nil && *payload.Username != registry.Username) || (payload.Password != nil && *payload.Password != registry.Password)
 
 			if payload.Username != nil {
 				registry.Username = *payload.Username
@@ -103,12 +101,35 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
-	if payload.UserAccessPolicies != nil {
-		registry.UserAccessPolicies = payload.UserAccessPolicies
+	if payload.URL != nil {
+		shouldUpdateSecrets = shouldUpdateSecrets || (*payload.URL != registry.URL)
+
+		registry.URL = *payload.URL
+		registries, err := handler.DataStore.Registry().Registries()
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
+		}
+		for _, r := range registries {
+			if r.ID != registry.ID && handler.registriesHaveSameURLAndCredentials(&r, registry) {
+				return &httperror.HandlerError{http.StatusConflict, "Another registry with the same URL and credentials already exists", errors.New("A registry is already defined for this URL and credentials")}
+			}
+		}
 	}
 
-	if payload.TeamAccessPolicies != nil {
-		registry.TeamAccessPolicies = payload.TeamAccessPolicies
+	if shouldUpdateSecrets {
+		for endpointID, endpointAccess := range registry.RegistryAccesses {
+			endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update access to registry", err}
+			}
+
+			if endpoint.Type == portainer.KubernetesLocalEnvironment || endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
+				err = handler.updateEndpointRegistryAccess(endpoint, registry, endpointAccess)
+				if err != nil {
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update access to registry", err}
+				}
+			}
+		}
 	}
 
 	if payload.Quay != nil {
@@ -123,10 +144,24 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 	return response.JSON(w, registry)
 }
 
-func hasSameURL(r1, r2 *portainer.Registry) bool {
-	if r1.Type != portainer.GitlabRegistry || r2.Type != portainer.GitlabRegistry {
-		return r1.URL == r2.URL
+func (handler *Handler) updateEndpointRegistryAccess(endpoint *portainer.Endpoint, registry *portainer.Registry, endpointAccess portainer.RegistryAccessPolicies) error {
+
+	cli, err := handler.K8sClientFactory.GetKubeClient(endpoint)
+	if err != nil {
+		return err
 	}
 
-	return r1.URL == r2.URL && r1.Gitlab.ProjectPath == r2.Gitlab.ProjectPath
+	for _, namespace := range endpointAccess.Namespaces {
+		err := cli.DeleteRegistrySecret(registry, namespace)
+		if err != nil {
+			return err
+		}
+
+		err = cli.CreateRegistrySecret(registry, namespace)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

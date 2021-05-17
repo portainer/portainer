@@ -169,6 +169,7 @@ func (store *Store) MigrateData(force bool) error {
 			UserService:             store.UserService,
 			VersionService:          store.VersionService,
 			FileService:             store.fileService,
+			DockerhubService:        store.DockerHubService,
 			AuthorizationService:    authorization.NewService(store),
 		}
 		migrator := migrator.NewMigrator(migratorParams)
