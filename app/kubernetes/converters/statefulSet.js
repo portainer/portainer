@@ -12,6 +12,7 @@ import {
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
+import { buildImageFullURI } from 'Docker/helpers/imageHelper';
 import KubernetesPersistentVolumeClaimConverter from './persistentVolumeClaim';
 
 class KubernetesStatefulSetConverter {
@@ -27,7 +28,7 @@ class KubernetesStatefulSetConverter {
     res.ApplicationOwner = formValues.ApplicationOwner;
     res.ApplicationName = formValues.Name;
     res.ReplicaCount = formValues.ReplicaCount;
-    res.Image = formValues.Image;
+    res.ImageModel = formValues.ImageModel;
     res.CpuLimit = formValues.CpuLimit;
     res.MemoryLimit = KubernetesResourceReservationHelper.bytesValue(formValues.MemoryLimit);
     res.Env = KubernetesApplicationHelper.generateEnvFromEnvVariables(formValues.EnvironmentVariables);
@@ -56,7 +57,12 @@ class KubernetesStatefulSetConverter {
     payload.spec.template.metadata.labels.app = statefulSet.Name;
     payload.spec.template.metadata.labels[KubernetesPortainerApplicationNameLabel] = statefulSet.ApplicationName;
     payload.spec.template.spec.containers[0].name = statefulSet.Name;
-    payload.spec.template.spec.containers[0].image = statefulSet.Image;
+    if (statefulSet.ImageModel.Image) {
+      payload.spec.template.spec.containers[0].image = buildImageFullURI(statefulSet.ImageModel);
+      if (statefulSet.ImageModel.Registry && statefulSet.ImageModel.Registry.Authentication) {
+        payload.spec.template.spec.imagePullSecrets = [{ name: `registry-${statefulSet.ImageModel.Registry.Id}` }];
+      }
+    }
     payload.spec.template.spec.affinity = statefulSet.Affinity;
     KubernetesCommonHelper.assignOrDeleteIfEmpty(payload, 'spec.template.spec.containers[0].env', statefulSet.Env);
     KubernetesCommonHelper.assignOrDeleteIfEmpty(payload, 'spec.template.spec.containers[0].volumeMounts', statefulSet.VolumeMounts);

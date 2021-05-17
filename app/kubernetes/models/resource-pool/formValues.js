@@ -1,10 +1,12 @@
 export function KubernetesResourcePoolFormValues(defaults) {
   return {
+    EndpointId: 0,
     Name: '',
     MemoryLimit: defaults.MemoryLimit,
     CpuLimit: defaults.CpuLimit,
     HasQuota: false,
     IngressClasses: [], // KubernetesResourcePoolIngressClassFormValue
+    Registries: [], // RegistryViewModel
   };
 }
 
