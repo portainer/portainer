@@ -1,7 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
-import { KubernetesResourceQuota, KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resource-quota/models';
+import { KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resource-quota/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import {
@@ -26,6 +26,7 @@ class KubernetesResourcePoolController {
     LocalStorage,
     EndpointProvider,
     ModalService,
+    RegistryService,
     KubernetesNodeService,
     KubernetesResourceQuotaService,
     KubernetesResourcePoolService,
@@ -36,33 +37,31 @@ class KubernetesResourcePoolController {
     KubernetesIngressService,
     KubernetesVolumeService
   ) {
-    this.$async = $async;
-    this.$state = $state;
-    this.Notifications = Notifications;
-    this.Authentication = Authentication;
-    this.LocalStorage = LocalStorage;
-    this.EndpointProvider = EndpointProvider;
-    this.ModalService = ModalService;
-
-    this.KubernetesNodeService = KubernetesNodeService;
-    this.KubernetesResourceQuotaService = KubernetesResourceQuotaService;
-    this.KubernetesResourcePoolService = KubernetesResourcePoolService;
-    this.KubernetesEventService = KubernetesEventService;
-    this.KubernetesPodService = KubernetesPodService;
-    this.KubernetesApplicationService = KubernetesApplicationService;
-    this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
-    this.KubernetesIngressService = KubernetesIngressService;
-    this.KubernetesVolumeService = KubernetesVolumeService;
+    Object.assign(this, {
+      $async,
+      $state,
+      Authentication,
+      Notifications,
+      LocalStorage,
+      EndpointProvider,
+      ModalService,
+      RegistryService,
+      KubernetesNodeService,
+      KubernetesResourceQuotaService,
+      KubernetesResourcePoolService,
+      KubernetesEventService,
+      KubernetesPodService,
+      KubernetesApplicationService,
+      KubernetesNamespaceHelper,
+      KubernetesIngressService,
+      KubernetesVolumeService,
+    });
 
     this.IngressClassTypes = KubernetesIngressClassTypes;
     this.ResourceQuotaDefaults = KubernetesResourceQuotaDefaults;
 
-    this.onInit = this.onInit.bind(this);
-    this.createResourceQuotaAsync = this.createResourceQuotaAsync.bind(this);
     this.updateResourcePoolAsync = this.updateResourcePoolAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
-    this.getApplications = this.getApplications.bind(this);
-    this.getIngresses = this.getIngresses.bind(this);
   }
   /* #endregion */
 
@@ -157,15 +156,6 @@ class KubernetesResourcePoolController {
   showEditor() {
     this.state.showEditorTab = true;
     this.selectTab(2);
-  }
-
-  async createResourceQuotaAsync(namespace, owner, cpuLimit, memoryLimit) {
-    const quota = new KubernetesResourceQuota(namespace);
-    quota.CpuLimit = cpuLimit;
-    quota.MemoryLimit = memoryLimit;
-    quota.ResourcePoolName = namespace;
-    quota.ResourcePoolOwner = owner;
-    await this.KubernetesResourceQuotaService.create(quota);
   }
 
   hasResourceQuotaBeenReduced() {
@@ -285,88 +275,111 @@ class KubernetesResourcePoolController {
   }
   /* #endregion */
 
+  /* #region  GET REGISTRIES */
+  getRegistries() {
+    return this.$async(async () => {
+      try {
+        this.registries = await this.RegistryService.registries();
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to retrieve registries');
+      }
+    });
+  }
+  /* #endregion */
+
   /* #region  ON INIT */
-  async onInit() {
-    try {
-      const endpoint = this.EndpointProvider.currentEndpoint();
-      this.endpoint = endpoint;
-      this.isAdmin = this.Authentication.isAdmin();
+  $onInit() {
+    return this.$async(async () => {
+      try {
+        const endpoint = this.EndpointProvider.currentEndpoint();
+        this.endpoint = endpoint;
+        this.isAdmin = this.Authentication.isAdmin();
 
-      this.state = {
-        actionInProgress: false,
-        sliderMaxMemory: 0,
-        sliderMaxCpu: 0,
-        cpuUsage: 0,
-        cpuUsed: 0,
-        memoryUsage: 0,
-        memoryUsed: 0,
-        activeTab: 0,
-        currentName: this.$state.$current.name,
-        showEditorTab: false,
-        eventsLoading: true,
-        applicationsLoading: true,
-        ingressesLoading: true,
-        viewReady: false,
-        eventWarningCount: 0,
-        canUseIngress: endpoint.Kubernetes.Configuration.IngressClasses.length,
-        duplicates: {
-          ingressHosts: new KubernetesFormValidationReferences(),
-        },
-      };
+        this.state = {
+          actionInProgress: false,
+          sliderMaxMemory: 0,
+          sliderMaxCpu: 0,
+          cpuUsage: 0,
+          cpuUsed: 0,
+          memoryUsage: 0,
+          memoryUsed: 0,
+          activeTab: 0,
+          currentName: this.$state.$current.name,
+          showEditorTab: false,
+          eventsLoading: true,
+          applicationsLoading: true,
+          ingressesLoading: true,
+          viewReady: false,
+          eventWarningCount: 0,
+          canUseIngress: endpoint.Kubernetes.Configuration.IngressClasses.length,
+          duplicates: {
+            ingressHosts: new KubernetesFormValidationReferences(),
+          },
+        };
 
-      this.state.activeTab = this.LocalStorage.getActiveTab('resourcePool');
+        this.state.activeTab = this.LocalStorage.getActiveTab('resourcePool');
 
-      const name = this.$transition$.params().id;
+        const name = this.$state.params.id;
 
-      const [nodes, pools] = await Promise.all([this.KubernetesNodeService.get(), this.KubernetesResourcePoolService.get()]);
+        const [nodes, pools] = await Promise.all([this.KubernetesNodeService.get(), this.KubernetesResourcePoolService.get()]);
 
-      this.pool = _.find(pools, { Namespace: { Name: name } });
-      this.formValues = new KubernetesResourcePoolFormValues(KubernetesResourceQuotaDefaults);
-      this.formValues.Name = this.pool.Namespace.Name;
+        this.pool = _.find(pools, { Namespace: { Name: name } });
+        this.formValues = new KubernetesResourcePoolFormValues(KubernetesResourceQuotaDefaults);
+        this.formValues.Name = this.pool.Namespace.Name;
+        this.formValues.EndpointId = this.endpoint.Id;
 
-      _.forEach(nodes, (item) => {
-        this.state.sliderMaxMemory += filesizeParser(item.Memory);
-        this.state.sliderMaxCpu += item.CPU;
-      });
-      this.state.sliderMaxMemory = KubernetesResourceReservationHelper.megaBytesValue(this.state.sliderMaxMemory);
+        _.forEach(nodes, (item) => {
+          this.state.sliderMaxMemory += filesizeParser(item.Memory);
+          this.state.sliderMaxCpu += item.CPU;
+        });
+        this.state.sliderMaxMemory = KubernetesResourceReservationHelper.megaBytesValue(this.state.sliderMaxMemory);
 
-      const quota = this.pool.Quota;
-      if (quota) {
-        this.oldQuota = angular.copy(quota);
-        this.formValues = KubernetesResourceQuotaConverter.quotaToResourcePoolFormValues(quota);
-        this.state.cpuUsed = quota.CpuLimitUsed;
-        this.state.memoryUsed = KubernetesResourceReservationHelper.megaBytesValue(quota.MemoryLimitUsed);
-      }
+        const quota = this.pool.Quota;
+        if (quota) {
+          this.oldQuota = angular.copy(quota);
+          this.formValues = KubernetesResourceQuotaConverter.quotaToResourcePoolFormValues(quota);
+          this.formValues.EndpointId = this.endpoint.Id;
 
-      this.isEditable = !this.KubernetesNamespaceHelper.isSystemNamespace(this.pool.Namespace.Name);
-      if (this.pool.Namespace.Name === 'default') {
-        this.isEditable = false;
-      }
+          this.state.cpuUsed = quota.CpuLimitUsed;
+          this.state.memoryUsed = KubernetesResourceReservationHelper.megaBytesValue(quota.MemoryLimitUsed);
+        }
 
-      await this.getEvents();
-      await this.getApplications();
+        this.isEditable = !this.KubernetesNamespaceHelper.isSystemNamespace(this.pool.Namespace.Name);
+        if (this.pool.Namespace.Name === 'default') {
+          this.isEditable = false;
+        }
 
-      if (this.state.canUseIngress) {
-        await this.getIngresses();
-        const ingressClasses = endpoint.Kubernetes.Configuration.IngressClasses;
-        this.formValues.IngressClasses = KubernetesIngressConverter.ingressClassesToFormValues(ingressClasses, this.ingresses);
-        _.forEach(this.formValues.IngressClasses, (ic) => {
-          if (ic.Hosts.length === 0) {
-            ic.Hosts.push(new KubernetesResourcePoolIngressClassHostFormValue());
+        await this.getEvents();
+        await this.getApplications();
+
+        if (this.state.canUseIngress) {
+          await this.getIngresses();
+          const ingressClasses = endpoint.Kubernetes.Configuration.IngressClasses;
+          this.formValues.IngressClasses = KubernetesIngressConverter.ingressClassesToFormValues(ingressClasses, this.ingresses);
+          _.forEach(this.formValues.IngressClasses, (ic) => {
+            if (ic.Hosts.length === 0) {
+              ic.Hosts.push(new KubernetesResourcePoolIngressClassHostFormValue());
+            }
+          });
+        }
+
+        await this.getRegistries();
+        _.forEach(this.registries, (reg) => {
+          if (reg.RegistryAccesses && reg.RegistryAccesses[this.endpoint.Id] && reg.RegistryAccesses[this.endpoint.Id].Namespaces.includes(name)) {
+            reg.Checked = true;
+            this.formValues.Registries.push(reg);
           }
         });
+
+        this.savedFormValues = angular.copy(this.formValues);
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to load view data');
+      } finally {
+        this.state.viewReady = true;
       }
-      this.savedFormValues = angular.copy(this.formValues);
-    } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to load view data');
-    } finally {
-      this.state.viewReady = true;
-    }
+    });
   }
 
-  $onInit() {
-    return this.$async(this.onInit);
-  }
   /* #endregion */
 
   $onDestroy() {

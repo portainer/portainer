@@ -9,10 +9,7 @@ export function RegistryViewModel(data) {
   this.Authentication = data.Authentication;
   this.Username = data.Username;
   this.Password = data.Password;
-  this.AuthorizedUsers = data.AuthorizedUsers;
-  this.AuthorizedTeams = data.AuthorizedTeams;
-  this.UserAccessPolicies = data.UserAccessPolicies;
-  this.TeamAccessPolicies = data.TeamAccessPolicies;
+  this.RegistryAccesses = data.RegistryAccesses; // map[EndpointID]{UserAccessPolicies, TeamAccessPolicies, NamespaceAccessPolicies}
   this.Checked = false;
   this.Gitlab = data.Gitlab;
   this.Quay = data.Quay;
@@ -39,7 +36,7 @@ export function RegistryManagementConfigurationDefaultModel(registry) {
   }
 }
 
-export function RegistryDefaultModel() {
+export function RegistryCreateFormValues() {
   this.Type = RegistryTypes.CUSTOM;
   this.URL = '';
   this.Name = '';

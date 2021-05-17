@@ -6,10 +6,9 @@
     </label>
     <div ng-class="$ctrl.inputClass">
       <select
-        ng-options="registry as registry.Name for registry in $ctrl.availableRegistries track by registry.Name"
+        ng-options="registry as registry.Name for registry in $ctrl.registries track by registry.Name"
         ng-model="$ctrl.model.Registry"
         id="image_registry"
-        selected-item-id="ctrl.selectedItemId"
         class="form-control"
       ></select>
     </div>
