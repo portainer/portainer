@@ -1,9 +1,7 @@
-package responseutils
+package utils
 
 import (
 	"bytes"
-	"compress/gzip"
-	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"log"
@@ -13,7 +11,7 @@ import (
 
 // GetResponseAsJSONObject returns the response content as a generic JSON object
 func GetResponseAsJSONObject(response *http.Response) (map[string]interface{}, error) {
-	responseData, err := getResponseBodyAsGenericJSON(response)
+	responseData, err := getResponseBody(response)
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +22,7 @@ func GetResponseAsJSONObject(response *http.Response) (map[string]interface{}, e
 
 // GetResponseAsJSONArray returns the response content as an array of generic JSON object
 func GetResponseAsJSONArray(response *http.Response) ([]interface{}, error) {
-	responseData, err := getResponseBodyAsGenericJSON(response)
+	responseData, err := getResponseBody(response)
 	if err != nil {
 		return nil, err
 	}
@@ -44,72 +42,54 @@ func GetResponseAsJSONArray(response *http.Response) ([]interface{}, error) {
 	}
 }
 
-func getResponseBodyAsGenericJSON(response *http.Response) (interface{}, error) {
-	if response.Body == nil {
-		return nil, errors.New("unable to parse response: empty response body")
-	}
-
-	reader := response.Body
-
-	if response.Header.Get("Content-Encoding") == "gzip" {
-		response.Header.Del("Content-Encoding")
-		gzipReader, err := gzip.NewReader(response.Body)
-		if err != nil {
-			return nil, err
-		}
-		reader = gzipReader
-	}
-
-	defer reader.Close()
-
-	var data interface{}
-	body, err := ioutil.ReadAll(reader)
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal(body, &data)
-	if err != nil {
-		return nil, err
-	}
-
-	return data, nil
-}
-
-type dockerErrorResponse struct {
+type errorResponse struct {
 	Message string `json:"message,omitempty"`
 }
 
 // WriteAccessDeniedResponse will create a new access denied response
 func WriteAccessDeniedResponse() (*http.Response, error) {
 	response := &http.Response{}
-	err := RewriteResponse(response, dockerErrorResponse{Message: "access denied to resource"}, http.StatusForbidden)
+	err := RewriteResponse(response, errorResponse{Message: "access denied to resource"}, http.StatusForbidden)
 	return response, err
 }
 
 // RewriteAccessDeniedResponse will overwrite the existing response with an access denied response
 func RewriteAccessDeniedResponse(response *http.Response) error {
-	return RewriteResponse(response, dockerErrorResponse{Message: "access denied to resource"}, http.StatusForbidden)
+	return RewriteResponse(response, errorResponse{Message: "access denied to resource"}, http.StatusForbidden)
 }
 
 // RewriteResponse will replace the existing response body and status code with the one specified
 // in parameters
 func RewriteResponse(response *http.Response, newResponseData interface{}, statusCode int) error {
-	jsonData, err := json.Marshal(newResponseData)
+	data, err := marshal(getContentType(response.Header), newResponseData)
 	if err != nil {
 		return err
 	}
 
-	body := ioutil.NopCloser(bytes.NewReader(jsonData))
+	body := ioutil.NopCloser(bytes.NewReader(data))
 
 	response.StatusCode = statusCode
 	response.Body = body
-	response.ContentLength = int64(len(jsonData))
+	response.ContentLength = int64(len(data))
 
 	if response.Header == nil {
 		response.Header = make(http.Header)
 	}
-	response.Header.Set("Content-Length", strconv.Itoa(len(jsonData)))
+	response.Header.Set("Content-Length", strconv.Itoa(len(data)))
 
 	return nil
+}
+
+func getResponseBody(response *http.Response) (interface{}, error) {
+	isGzip := response.Header.Get("Content-Encoding") == "gzip"
+
+	if isGzip {
+		response.Header.Del("Content-Encoding")
+	}
+
+	return getBody(response.Body, getContentType(response.Header), isGzip)
+}
+
+func getContentType(headers http.Header) string {
+	return headers.Get("Content-type")
 }

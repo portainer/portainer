@@ -7,7 +7,6 @@ import (
 )
 
 type datastore struct {
-	dockerHub        portainer.DockerHubService
 	customTemplate   portainer.CustomTemplateService
 	edgeGroup        portainer.EdgeGroupService
 	edgeJob          portainer.EdgeJobService
@@ -37,7 +36,6 @@ func (d *datastore) CheckCurrentEdition() error                          { retur
 func (d *datastore) IsNew() bool                                         { return false }
 func (d *datastore) MigrateData(force bool) error                        { return nil }
 func (d *datastore) RollbackToCE() error                                 { return nil }
-func (d *datastore) DockerHub() portainer.DockerHubService               { return d.dockerHub }
 func (d *datastore) CustomTemplate() portainer.CustomTemplateService     { return d.customTemplate }
 func (d *datastore) EdgeGroup() portainer.EdgeGroupService               { return d.edgeGroup }
 func (d *datastore) EdgeJob() portainer.EdgeJobService                   { return d.edgeJob }

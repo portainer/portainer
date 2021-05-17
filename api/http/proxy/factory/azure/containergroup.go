@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
+	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 )
 
 // proxy for /subscriptions/*/resourceGroups/*/providers/Microsoft.ContainerInstance/containerGroups/*
@@ -58,7 +58,7 @@ func (transport *Transport) proxyContainerGroupPutRequest(request *http.Request)
 		return response, err
 	}
 
-	responseObject, err := responseutils.GetResponseAsJSONObject(response)
+	responseObject, err := utils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return response, err
 	}
@@ -80,7 +80,7 @@ func (transport *Transport) proxyContainerGroupPutRequest(request *http.Request)
 
 	responseObject = decorateObject(responseObject, resourceControl)
 
-	err = responseutils.RewriteResponse(response, responseObject, http.StatusOK)
+	err = utils.RewriteResponse(response, responseObject, http.StatusOK)
 	if err != nil {
 		return response, err
 	}
@@ -94,7 +94,7 @@ func (transport *Transport) proxyContainerGroupGetRequest(request *http.Request)
 		return response, err
 	}
 
-	responseObject, err := responseutils.GetResponseAsJSONObject(response)
+	responseObject, err := utils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +106,7 @@ func (transport *Transport) proxyContainerGroupGetRequest(request *http.Request)
 
 	responseObject = transport.decorateContainerGroup(responseObject, context)
 
-	responseutils.RewriteResponse(response, responseObject, http.StatusOK)
+	utils.RewriteResponse(response, responseObject, http.StatusOK)
 
 	return response, nil
 }
@@ -118,7 +118,7 @@ func (transport *Transport) proxyContainerGroupDeleteRequest(request *http.Reque
 	}
 
 	if !transport.userCanDeleteContainerGroup(request, context) {
-		return responseutils.WriteAccessDeniedResponse()
+		return utils.WriteAccessDeniedResponse()
 	}
 
 	response, err := http.DefaultTransport.RoundTrip(request)
@@ -126,14 +126,14 @@ func (transport *Transport) proxyContainerGroupDeleteRequest(request *http.Reque
 		return response, err
 	}
 
-	responseObject, err := responseutils.GetResponseAsJSONObject(response)
+	responseObject, err := utils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return nil, err
 	}
 
 	transport.removeResourceControl(responseObject, context)
 
-	responseutils.RewriteResponse(response, responseObject, http.StatusOK)
+	utils.RewriteResponse(response, responseObject, http.StatusOK)
 
 	return response, nil
 }
