@@ -28,32 +28,32 @@ func NewService() *Service {
 // On success, it will then return the username and token expiry time associated to authenticated user by fetching this information
 // from the resource server and matching it with the user identifier setting.
 func (*Service) Authenticate(code string, configuration *portainer.OAuthSettings) (string, *time.Time, error) {
-	tokenObj, err := getOAuthTokenObject(code, configuration)
+	token, err := getOAuthToken(code, configuration)
 	if err != nil {
 		log.Printf("[DEBUG] - Failed retrieving access token: %v", err)
 		return "", nil, err
 	}
-	username, err := getUsername(tokenObj.AccessToken, configuration)
+	username, err := getUsername(token.AccessToken, configuration)
 	if err != nil {
 		log.Printf("[DEBUG] - Failed retrieving oauth user name: %v", err)
 		return "", nil, err
 	}
-	return username, &tokenObj.Expiry, nil
+	return username, &token.Expiry, nil
 }
 
-func getOAuthTokenObject(code string, configuration *portainer.OAuthSettings) (*oauth2.Token, error) {
+func getOAuthToken(code string, configuration *portainer.OAuthSettings) (*oauth2.Token, error) {
 	unescapedCode, err := url.QueryUnescape(code)
 	if err != nil {
 		return nil, err
 	}
 
 	config := buildConfig(configuration)
-	tokenObj, err := config.Exchange(context.Background(), unescapedCode)
+	token, err := config.Exchange(context.Background(), unescapedCode)
 	if err != nil {
 		return nil, err
 	}
 
-	return tokenObj, nil
+	return token, nil
 }
 
 func getUsername(token string, configuration *portainer.OAuthSettings) (string, error) {

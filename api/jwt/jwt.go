@@ -54,7 +54,8 @@ func (service *Service) GenerateToken(data *portainer.TokenData) (string, error)
 	return service.generateSignedToken(data, nil)
 }
 
-// GenerateToken generates a new JWT token.
+// GenerateTokenForOAuth generates a new JWT for OAuth login
+// token expiry time from the OAuth provider is considered
 func (service *Service) GenerateTokenForOAuth(data *portainer.TokenData, expiryTime *time.Time) (string, error) {
 	return service.generateSignedToken(data, expiryTime)
 }
