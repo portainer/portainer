@@ -2,6 +2,7 @@ package settings
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -140,6 +141,35 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		}
 		settings.OAuthSettings = *payload.OAuthSettings
 		settings.OAuthSettings.ClientSecret = clientSecret
+
+		if !payload.OAuthSettings.OAuthAutoMapTeamMemberships || payload.OAuthSettings.TeamMemberships.OAuthClaimName == "" {
+			settings.OAuthSettings.TeamMemberships.OAuthClaimMappings = []portainer.OAuthClaimMappings{}
+		}
+
+		if payload.OAuthSettings.OAuthAutoMapTeamMemberships {
+			// throw errors on invalid values
+			if payload.OAuthSettings.TeamMemberships.OAuthClaimName == "" {
+				return &httperror.HandlerError{
+					StatusCode: http.StatusBadRequest,
+					Message:    "oauth claim name required",
+					Err:        errors.New("provided oauth team membership claim name is empty"),
+				}
+			}
+
+			for _, mapping := range payload.OAuthSettings.TeamMemberships.OAuthClaimMappings {
+				if mapping.ClaimValRegex == "" || mapping.Team == 0 {
+					return &httperror.HandlerError{
+						StatusCode: http.StatusBadRequest,
+						Message:    "invalid oauth mapping provided",
+						Err:        fmt.Errorf("invalid oauth team membership mapping; mapping=%v", mapping),
+					}
+				}
+			}
+		} else {
+			// clear out redundant values
+			settings.OAuthSettings.TeamMemberships.OAuthClaimName = ""
+			settings.OAuthSettings.TeamMemberships.OAuthClaimMappings = []portainer.OAuthClaimMappings{}
+		}
 	}
 
 	if payload.EnableEdgeComputeFeatures != nil {

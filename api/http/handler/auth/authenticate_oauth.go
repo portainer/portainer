@@ -4,7 +4,6 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
@@ -27,21 +26,32 @@ func (payload *oauthPayload) Validate(r *http.Request) error {
 	return nil
 }
 
-func (handler *Handler) authenticateOAuth(code string, settings *portainer.OAuthSettings) (string, *time.Time, error) {
+// @id AuthenticateOauth
+// @summary Authenticate with OAuth
+// @tags auth
+// @accept json
+// @produce json
+// @param body body oauthPayload true "OAuth Credentials used for authentication"
+// @success 200 {object} authenticateResponse "Success"
+// @failure 400 "Invalid request"
+// @failure 422 "Invalid Credentials"
+// @failure 500 "Server error"
+// @router /auth/oauth/validate [post]
+func (handler *Handler) authenticateOAuth(code string, settings *portainer.OAuthSettings) (*portainer.OAuthInfo, error) {
 	if code == "" {
-		return "", nil, errors.New("Invalid OAuth authorization code")
+		return nil, errors.New("Invalid OAuth authorization code")
 	}
 
 	if settings == nil {
-		return "", nil, errors.New("Invalid OAuth configuration")
+		return nil, errors.New("Invalid OAuth configuration")
 	}
 
-	username, expiryTime, err := handler.OAuthService.Authenticate(code, settings)
+	authInfo, err := handler.OAuthService.Authenticate(code, settings)
 	if err != nil {
-		return "", nil, err
+		return nil, err
 	}
 
-	return username, expiryTime, nil
+	return authInfo, nil
 }
 
 // @id ValidateOAuth
@@ -87,7 +97,7 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) (*
 		}
 	}
 
-	username, expiryTime, err := handler.authenticateOAuth(payload.Code, &settings.OAuthSettings)
+	authInfo, err := handler.authenticateOAuth(payload.Code, &settings.OAuthSettings)
 	if err != nil {
 		log.Printf("[DEBUG] - OAuth authentication error: %s", err)
 		return resp, &httperror.HandlerError{
@@ -97,9 +107,9 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) (*
 		}
 	}
 
-	resp.Username = username
+	resp.Username = authInfo.Username
 
-	user, err := handler.DataStore.User().UserByUsername(username)
+	user, err := handler.DataStore.User().UserByUsername(authInfo.Username)
 	if err != nil && err != bolterrors.ErrObjectNotFound {
 		return resp, &httperror.HandlerError{
 			StatusCode: http.StatusInternalServerError,
@@ -108,7 +118,7 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) (*
 		}
 	}
 
-	if user == nil && !settings.OAuthSettings.OAuthAutoCreateUsers {
+	if user == nil && !settings.OAuthSettings.OAuthAutoMapTeamMemberships && !settings.OAuthSettings.OAuthAutoCreateUsers {
 		return resp, &httperror.HandlerError{
 			StatusCode: http.StatusForbidden,
 			Message:    "Account not created beforehand in Portainer and automatic user provisioning not enabled",
@@ -118,7 +128,7 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) (*
 
 	if user == nil {
 		user = &portainer.User{
-			Username:                username,
+			Username:                authInfo.Username,
 			Role:                    portainer.StandardUserRole,
 			PortainerAuthorizations: authorization.DefaultPortainerAuthorizations(),
 		}
@@ -161,6 +171,25 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) (*
 		}
 	}
 
+	if settings.OAuthSettings.OAuthAutoMapTeamMemberships {
+		if settings.OAuthSettings.TeamMemberships.OAuthClaimName == "" {
+			return resp, &httperror.HandlerError{
+				StatusCode: http.StatusInternalServerError,
+				Message:    "Unable to process user oauth team memberships",
+				Err:        errors.New("empty value set for oauth team membership Claim name"),
+			}
+		}
+
+		err = updateOAuthTeamMemberships(handler.DataStore, settings.OAuthSettings.TeamMemberships.OAuthClaimMappings, *user, authInfo.Teams)
+		if err != nil {
+			return resp, &httperror.HandlerError{
+				StatusCode: http.StatusInternalServerError,
+				Message:    "Unable to update user oauth team memberships",
+				Err:        err,
+			}
+		}
+	}
+
 	info := handler.LicenseService.Info()
 
 	if user.Role != portainer.AdministratorRole && !info.Valid {
@@ -171,5 +200,5 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) (*
 		}
 	}
 
-	return handler.writeTokenForOAuth(w, user, expiryTime, portainer.AuthenticationOAuth)
+	return handler.writeTokenForOAuth(w, user, &authInfo.ExpiryTime, portainer.AuthenticationOAuth)
 }

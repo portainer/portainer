@@ -41,7 +41,11 @@ func (store *Store) Init() error {
 					portainer.LDAPGroupSearchSettings{},
 				},
 			},
-			OAuthSettings:            portainer.OAuthSettings{},
+			OAuthSettings: portainer.OAuthSettings{
+				TeamMemberships: portainer.TeamMemberships{
+					OAuthClaimMappings: make([]portainer.OAuthClaimMappings, 0),
+				},
+			},
 			EdgeAgentCheckinInterval: portainer.DefaultEdgeAgentCheckinIntervalInSeconds,
 			TemplatesURL:             portainer.DefaultTemplatesURL,
 			UserSessionTimeout:       portainer.DefaultUserSessionTimeout,
