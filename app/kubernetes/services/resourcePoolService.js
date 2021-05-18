@@ -93,7 +93,7 @@ export function KubernetesResourcePoolService($async, KubernetesNamespaceService
         const patch = _.without(newIngresses, ...create);
 
         const createPromises = _.map(create, (i) => KubernetesIngressService.create(i));
-        const delPromises = _.map(del, (i) => KubernetesIngressService.delete(i));
+        const delPromises = _.map(del, (i) => KubernetesIngressService.delete(i.Namespace, i.Name));
         const patchPromises = _.map(patch, (ing) => {
           const old = _.find(oldIngresses, { Name: ing.Name });
           ing.Paths = angular.copy(old.Paths);

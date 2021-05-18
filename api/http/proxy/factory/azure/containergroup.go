@@ -23,6 +23,36 @@ func (transport *Transport) proxyContainerGroupRequest(request *http.Request) (*
 }
 
 func (transport *Transport) proxyContainerGroupPutRequest(request *http.Request) (*http.Response, error) {
+	//add a lock before processing existense check
+	transport.mutex.Lock()
+	defer transport.mutex.Unlock()
+
+	//generate a temp http GET request based on the current PUT request
+	validationRequest := &http.Request{
+		Method: http.MethodGet,
+		URL:    request.URL,
+		Header: http.Header{
+			"Authorization": []string{request.Header.Get("Authorization")},
+		},
+	}
+
+	//fire the request to Azure API to validate if there is an existing container instance with the same name
+	//positive - reject the request
+	//negative - continue the process
+	validationResponse, err := http.DefaultTransport.RoundTrip(validationRequest)
+	if err != nil {
+		return validationResponse, err
+	}
+
+	if validationResponse.StatusCode >= 200 && validationResponse.StatusCode < 300 {
+		resp := &http.Response{}
+		errObj := map[string]string{
+			"message": "A container instance with the same name already exists inside the selected resource group",
+		}
+		err = responseutils.RewriteResponse(resp, errObj, http.StatusConflict)
+		return resp, err
+	}
+
 	response, err := http.DefaultTransport.RoundTrip(request)
 	if err != nil {
 		return response, err
