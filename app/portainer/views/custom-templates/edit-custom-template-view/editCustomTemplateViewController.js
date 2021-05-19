@@ -96,8 +96,10 @@ class EditCustomTemplateViewController {
   }
 
   editorUpdate(cm) {
-    this.formValues.FileContent = cm.getValue();
-    this.state.isEditorDirty = true;
+    if (this.formValues.FileContent.replace(/(\r\n|\n|\r)/gm, '') !== cm.getValue().replace(/(\r\n|\n|\r)/gm, '')) {
+      this.formValues.FileContent = cm.getValue();
+      this.state.isEditorDirty = true;
+    }
   }
 
   async uiCanExit() {
