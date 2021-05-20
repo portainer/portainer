@@ -262,7 +262,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if updateAuthorizations {
 		if endpoint.Type == portainer.KubernetesLocalEnvironment || endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
-			err = handler.AuthorizationService.CleanupNamespaceAccessPoliciesWithOverridePolicies(endpoint, nil)
+			err = handler.AuthorizationService.CleanNAPWithOverridePolicies(endpoint, nil)
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
 			}
