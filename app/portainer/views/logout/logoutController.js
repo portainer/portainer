@@ -6,6 +6,7 @@ class LogoutController {
     this.$async = $async;
     this.$state = $state;
     this.$transition$ = $transition$;
+    this.$window = $window;
 
     this.Authentication = Authentication;
     this.StateManager = StateManager;

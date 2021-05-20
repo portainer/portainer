@@ -53,4 +53,6 @@ export function OAuthSettingsViewModel(data) {
   this.Scopes = data.Scopes;
   this.OAuthAutoCreateUsers = data.OAuthAutoCreateUsers;
   this.DefaultTeamID = data.DefaultTeamID;
+  this.SSO = data.SSO;
+  this.LogoutURI = data.LogoutURI;
 }
