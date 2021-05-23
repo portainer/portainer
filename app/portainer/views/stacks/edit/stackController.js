@@ -201,12 +201,11 @@ angular.module('portainer.app').controller('StackController', [
     };
 
     $scope.editorUpdate = function (cm) {
-      if ($scope.stackFileContent !== cm.getValue()) {
+      if ($scope.stackFileContent.replace(/(\r\n|\n|\r)/gm, '') !== cm.getValue().replace(/(\r\n|\n|\r)/gm, '')) {
         $scope.state.isEditorDirty = true;
+        $scope.stackFileContent = cm.getValue();
+        $scope.state.yamlError = StackHelper.validateYAML($scope.stackFileContent, $scope.containerNames);
       }
-      $scope.stackFileContent = cm.getValue();
-      $scope.state.yamlError = StackHelper.validateYAML($scope.stackFileContent, $scope.containerNames);
-      $scope.state.isEditorDirty = true;
     };
 
     $scope.stopStack = stopStack;
@@ -269,8 +268,7 @@ angular.module('portainer.app').controller('StackController', [
           var stack = data.stack;
           $scope.groups = data.groups;
           $scope.stack = stack;
-          $scope.containers = data.containers;
-          $scope.containerNames = ContainerHelper.getContainerNames($scope.containers);
+          $scope.containerNames = ContainerHelper.getContainerNames(data.containers);
 
           let resourcesPromise = Promise.resolve({});
           if (stack.Status === 1) {
