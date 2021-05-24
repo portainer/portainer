@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -136,7 +137,7 @@ func (handler *Handler) cloneAndConvertGitRepoFile(gitInfo *kubernetesGitDeploym
 	if err != nil {
 		return "", err
 	}
-	content, err := ioutil.ReadFile(projectPath + "/" + gitInfo.FilePathInRepository)
+	content, err := ioutil.ReadFile(filepath.Join(projectPath, gitInfo.FilePathInRepository))
 	if err != nil {
 		return "", err
 	}
