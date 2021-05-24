@@ -1,61 +1,50 @@
 package stacks
 
 import (
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/portainer/portainer/api/archive"
 	"github.com/portainer/portainer/api/git"
 )
 
-const (
-	publicRepoURL = "https://github.com/portainer/test-public-repo"
-	publicRepoRef = "refs/heads/master"
-)
+func TestCloneAndConvertGitRepoFile(t *testing.T) {
+	dir, err := ioutil.TempDir("", "git-repo-")
+	if err != nil {
+		t.Fatalf("failed to create a temp repo directory, err: %v", err)
+	}
+	defer os.RemoveAll(dir)
 
-//init a test handler with git service
-//init a temp dir
-func setup() (*Handler, string) {
+	file, err := os.OpenFile("./testdata/test-clone-git-repo.tar.gz", os.O_RDONLY, 0755)
+	if err != nil {
+		t.Fatalf("failed to open an archive, err: %v", err)
+	}
+	err = archive.ExtractTarGz(file, dir)
+	if err != nil {
+		t.Fatalf("failed to extract file from the archive to a folder: err %v", err)
+	}
+
+	bareGITRepoDir := filepath.Join(dir, "test-clone.git")
+	tmpGITDir := os.TempDir()
+	defer os.RemoveAll(tmpGITDir)
+
 	h := &Handler{
 		GitService: git.NewService(),
 	}
-	return h, os.TempDir()
-}
-
-func Test_CloneAndConvertGitRepoFile_K8SManifest(t *testing.T) {
-	h, tmpGitDir := setup()
-	defer os.RemoveAll(tmpGitDir)
 	gitInfo := &kubernetesGitDeploymentPayload{
-		RepositoryURL:            publicRepoURL,
-		RepositoryReferenceName:  publicRepoRef,
+		RepositoryURL:            bareGITRepoDir,
+		RepositoryReferenceName:  "refs/heads/main",
 		RepositoryAuthentication: false,
-		FilePathInRepository:     "nginx-deployment-demo.yaml",
+		FilePathInRepository:     "nginx-deployment.yml",
 	}
-	t.Logf("Cloning to %s", tmpGitDir)
-	fileContent, err := h.cloneAndConvertGitRepoFile(gitInfo, tmpGitDir)
+	fileContent, err := h.cloneAndConvertGitRepoFile(gitInfo, tmpGITDir)
 	if err != nil {
 		t.Fatalf("failed to clone or convert the file from Git repo, err: %v", err)
 	}
 	if !strings.HasPrefix(fileContent, "apiVersion") {
-		t.Error("wrong manifest file content")
-	}
-}
-
-func Test_CloneAndConvertGitRepoFile_Compose(t *testing.T) {
-	h, tmpGitDir := setup()
-	defer os.RemoveAll(tmpGitDir)
-	gitInfo := &kubernetesGitDeploymentPayload{
-		RepositoryURL:            publicRepoURL,
-		RepositoryReferenceName:  publicRepoRef,
-		RepositoryAuthentication: false,
-		FilePathInRepository:     "kompose-demo.yaml",
-	}
-	t.Logf("Cloning to %s", tmpGitDir)
-	fileContent, err := h.cloneAndConvertGitRepoFile(gitInfo, tmpGitDir)
-	if err != nil {
-		t.Fatalf("failed to clone or convert the file from Git repo, err: %v", err)
-	}
-	if !strings.HasPrefix(fileContent, "version") {
-		t.Error("wrong docker compose file content")
+		t.Error("wrong k8s manifest file content")
 	}
 }
