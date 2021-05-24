@@ -41,10 +41,10 @@ angular.module('portainer.app').factory('RegistryService', [
       return deferred.promise;
     }
 
-    function registry(id) {
+    function registry(id, endpointId) {
       var deferred = $q.defer();
 
-      Registries.get({ id: id })
+      Registries.get({ id, endpointId })
         .$promise.then(function success(data) {
           var registry = new RegistryViewModel(data);
           deferred.resolve(registry);
@@ -58,7 +58,7 @@ angular.module('portainer.app').factory('RegistryService', [
 
     function encodedCredentials(registry) {
       var credentials = {
-        serveraddress: registry.URL,
+        registryId: registry.Id,
       };
       return btoa(JSON.stringify(credentials));
     }
