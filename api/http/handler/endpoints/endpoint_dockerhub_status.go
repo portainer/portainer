@@ -22,7 +22,7 @@ type dockerhubStatusResponse struct {
 	Limit     int `json:"limit"`
 }
 
-// GET request on /api/endpoints/{id}/dockerhub/status
+// GET request on /api/endpoints/{id}/dockerhub/{registryId}
 func (handler *Handler) endpointDockerhubStatus(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
@@ -40,13 +40,30 @@ func (handler *Handler) endpointDockerhubStatus(w http.ResponseWriter, r *http.R
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment type", errors.New("Invalid environment type")}
 	}
 
-	dockerhub, err := handler.DataStore.DockerHub().DockerHub()
+	registryID, err := request.RetrieveNumericRouteVariableValue(r, "registryId")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve DockerHub details from the database", err}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid registry identifier route variable", err}
+	}
+
+	var registry *portainer.Registry
+
+	if registryID == 0 {
+		registry = &portainer.Registry{}
+	} else {
+		registry, err = handler.DataStore.Registry().Registry(portainer.RegistryID(registryID))
+		if err == bolterrors.ErrObjectNotFound {
+			return &httperror.HandlerError{http.StatusNotFound, "Unable to find a registry with the specified identifier inside the database", err}
+		} else if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a registry with the specified identifier inside the database", err}
+		}
+
+		if registry.Type != portainer.DockerHubRegistry {
+			return &httperror.HandlerError{http.StatusBadRequest, "Invalid registry type", errors.New("Invalid registry type")}
+		}
 	}
 
 	httpClient := client.NewHTTPClient()
-	token, err := getDockerHubToken(httpClient, dockerhub)
+	token, err := getDockerHubToken(httpClient, registry)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve DockerHub token from DockerHub", err}
 	}
@@ -59,7 +76,7 @@ func (handler *Handler) endpointDockerhubStatus(w http.ResponseWriter, r *http.R
 	return response.JSON(w, resp)
 }
 
-func getDockerHubToken(httpClient *client.HTTPClient, dockerhub *portainer.DockerHub) (string, error) {
+func getDockerHubToken(httpClient *client.HTTPClient, registry *portainer.Registry) (string, error) {
 	type dockerhubTokenResponse struct {
 		Token string `json:"token"`
 	}
@@ -71,8 +88,8 @@ func getDockerHubToken(httpClient *client.HTTPClient, dockerhub *portainer.Docke
 		return "", err
 	}
 
-	if dockerhub.Authentication {
-		req.SetBasicAuth(dockerhub.Username, dockerhub.Password)
+	if registry.Authentication {
+		req.SetBasicAuth(registry.Username, registry.Password)
 	}
 
 	resp, err := httpClient.Do(req)

@@ -390,6 +390,11 @@ type (
 	// JobType represents a job type
 	JobType int
 
+	K8sNamespaceAccessPolicy struct {
+		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
+		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
+	}
+
 	// KubernetesData contains all the Kubernetes related endpoint information
 	KubernetesData struct {
 		Snapshots     []KubernetesSnapshot    `json:"Snapshots"`
@@ -1159,6 +1164,7 @@ type (
 		SetupUserServiceAccount(userID int, teamIDs []int) error
 		GetServiceAccountBearerToken(userID int) (string, error)
 		StartExecProcess(namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error
+		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
 		DeleteRegistrySecret(registry *Registry, namespace string) error
 		CreateRegistrySecret(registry *Registry, namespace string) error
 		IsRegistrySecret(namespace, secretName string) (bool, error)
