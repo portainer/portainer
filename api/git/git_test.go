@@ -74,7 +74,9 @@ func Test_ClonePublicRepository_NoGitDirectory(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create a temp dir")
 	}
+
 	defer os.RemoveAll(dir)
+
 	t.Logf("Cloning into %s", dir)
 	err = service.ClonePublicRepository(repositoryURL, referenceName, dir)
 	assert.NoError(t, err)
