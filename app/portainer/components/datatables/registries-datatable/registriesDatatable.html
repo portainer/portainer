@@ -59,7 +59,7 @@
               ng-class="{ active: item.Checked }"
             >
               <td>
-                <span class="md-checkbox" ng-if="$ctrl.isAdmin && !ĉtrl.endpointType">
+                <span class="md-checkbox" ng-if="$ctrl.isAdmin && !ctrl.endpointType">
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="!$ctrl.allowSelection(item)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
