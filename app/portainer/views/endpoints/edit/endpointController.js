@@ -138,6 +138,10 @@ angular
         AzureAuthenticationKey: endpoint.AzureCredentials.AuthenticationKey,
       };
 
+      if (!$scope.showSecurity) {
+        delete payload.TLS;
+      }
+
       if (
         $scope.endpointType !== 'local' &&
         endpoint.Type !== PortainerEndpointTypes.AzureEnvironment &&
@@ -236,6 +240,12 @@ angular
           $scope.groups = data.groups;
           $scope.availableTags = data.tags;
           configureState();
+          $scope.showSecurity =
+            $scope.endpointType === 'remote' &&
+            !$scope.state.azureEndpoint &&
+            !$scope.state.kubernetesEndpoint &&
+            !$scope.state.edgeEndpoint &&
+            endpoint.Type != PortainerEndpointTypes.AgentOnKubernetesEnvironment;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve endpoint details');
