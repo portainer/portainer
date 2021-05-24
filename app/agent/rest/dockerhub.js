@@ -4,10 +4,10 @@ angular.module('portainer.agent').factory('AgentDockerhub', AgentDockerhub);
 
 function AgentDockerhub($resource, API_ENDPOINT_ENDPOINTS) {
   return $resource(
-    `${API_ENDPOINT_ENDPOINTS}/:endpointId/:endpointType/v2/dockerhub`,
+    `${API_ENDPOINT_ENDPOINTS}/:endpointId/:endpointType/v2/dockerhub/:registryId`,
     {},
     {
-      limits: { method: 'GET' },
+      limits: { method: 'GET', params: { registryId: '@registryId' } },
     }
   );
 }
