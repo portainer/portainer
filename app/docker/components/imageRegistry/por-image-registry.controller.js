@@ -52,7 +52,7 @@ class porImageRegistryController {
   }
 
   isDockerHubRegistry() {
-    return this.model.UseRegistry && this.model.Registry.Name === 'DockerHub';
+    return this.model.UseRegistry && (this.model.Registry.Type === RegistryTypes.DOCKERHUB || this.model.Registry.Type === RegistryTypes.ANONYMOUS);
   }
 
   async onRegistryChange() {

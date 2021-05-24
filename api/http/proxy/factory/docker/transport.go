@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/docker/docker/client"
+	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
@@ -166,12 +167,21 @@ func (transport *Transport) proxyAgentRequest(r *http.Request) (*http.Response, 
 		// volume browser request
 		return transport.restrictedResourceOperation(r, resourceID, portainer.VolumeResourceControl, true)
 	case strings.HasPrefix(requestPath, "/dockerhub"):
-		dockerhub, err := transport.dataStore.DockerHub().DockerHub()
+		registryID, err := request.RetrieveNumericRouteVariableValue(r, "registryId")
 		if err != nil {
 			return nil, err
 		}
 
-		newBody, err := json.Marshal(dockerhub)
+		registry, err := transport.dataStore.Registry().Registry(portainer.RegistryID(registryID))
+		if err != nil {
+			return nil, err
+		}
+
+		if registry.Type != portainer.DockerHubRegistry {
+			return nil, errors.New("Invalid registry type")
+		}
+
+		newBody, err := json.Marshal(registry)
 		if err != nil {
 			return nil, err
 		}

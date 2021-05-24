@@ -39,7 +39,6 @@ class KubernetesCreateApplicationController {
     $state,
     Notifications,
     Authentication,
-    DockerHubService,
     ModalService,
     KubernetesResourcePoolService,
     KubernetesApplicationService,
@@ -56,7 +55,6 @@ class KubernetesCreateApplicationController {
     this.$state = $state;
     this.Notifications = Notifications;
     this.Authentication = Authentication;
-    this.DockerHubService = DockerHubService;
     this.ModalService = ModalService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesApplicationService = KubernetesApplicationService;
@@ -999,9 +997,6 @@ class KubernetesCreateApplicationController {
           this.formValues.OriginalIngressClasses = angular.copy(this.ingresses);
         }
         this.updateSliders();
-
-        const dockerHub = await this.DockerHubService.dockerhub();
-        this.state.isDockerAuthenticated = dockerHub.Authentication;
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to load view data');
       } finally {
