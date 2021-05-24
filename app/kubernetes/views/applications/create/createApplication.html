@@ -95,6 +95,10 @@
                   input-class="col-sm-11"
                   endpoint-id="ctrl.endpoint.Id"
                   namespace="ctrl.formValues.ResourcePool.Namespace.Name"
+                  endpoint="ctrl.endpoint"
+                  is-admin="ctrl.isAdmin"
+                  check-rate-limits="true"
+                  set-validity="ctrl.setPullImageValidity"
                 ></por-image-registry>
               </div>
             </div>
@@ -105,14 +109,6 @@
                 </div>
               </div>
             </div>
-            <por-image-registry-rate-limits
-              is-docker-hub-registry="true"
-              endpoint="ctrl.endpoint"
-              is-authenticated="ctrl.state.isDockerAuthenticated"
-              is-admin="ctrl.isAdmin"
-              set-validity="ctrl.setPullImageValidity"
-            >
-            </por-image-registry-rate-limits>
             <!-- #endregion -->
 
             <div class="col-sm-12 form-section-title">

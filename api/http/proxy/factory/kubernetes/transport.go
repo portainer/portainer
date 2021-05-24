@@ -3,6 +3,7 @@ package kubernetes
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -10,6 +11,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/portainer/libhttp/request"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 
@@ -135,12 +137,21 @@ func decorateAgentRequest(r *http.Request, dataStore portainer.DataStore) error 
 }
 
 func decorateAgentDockerHubRequest(r *http.Request, dataStore portainer.DataStore) error {
-	dockerhub, err := dataStore.DockerHub().DockerHub()
+	registryID, err := request.RetrieveNumericRouteVariableValue(r, "registryId")
 	if err != nil {
 		return err
 	}
 
-	newBody, err := json.Marshal(dockerhub)
+	registry, err := dataStore.Registry().Registry(portainer.RegistryID(registryID))
+	if err != nil {
+		return err
+	}
+
+	if registry.Type != portainer.DockerHubRegistry {
+		return errors.New("invalid registry type")
+	}
+
+	newBody, err := json.Marshal(registry)
 	if err != nil {
 		return err
 	}

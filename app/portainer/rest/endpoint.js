@@ -22,9 +22,22 @@ angular.module('portainer.app').factory('Endpoints', [
         snapshot: { method: 'POST', params: { id: '@id', action: 'snapshot' } },
         status: { method: 'GET', params: { id: '@id', action: 'status' } },
         updateSecuritySettings: { method: 'PUT', params: { id: '@id', action: 'settings' } },
-        dockerhubLimits: { method: 'GET', params: { id: '@id', action: 'dockerhub' } },
-        registries: { url: `${API_ENDPOINT_ENDPOINTS}/:id/registries`, method: 'GET', params: { id: '@id', namespace: '@namespace' }, isArray: true },
-        updateRegistryAccess: { url: `${API_ENDPOINT_ENDPOINTS}/:id/registries/:registryId`, method: 'PUT', params: { id: '@id', registryId: '@registryId' } },
+        dockerhubLimits: {
+          method: 'GET',
+          url: `${API_ENDPOINT_ENDPOINTS}/:id/dockerhub/:registryId`,
+          params: { id: '@id', registryId: '@registryId' },
+        },
+        registries: {
+          method: 'GET',
+          url: `${API_ENDPOINT_ENDPOINTS}/:id/registries`,
+          params: { id: '@id', namespace: '@namespace' },
+          isArray: true,
+        },
+        updateRegistryAccess: {
+          method: 'PUT',
+          url: `${API_ENDPOINT_ENDPOINTS}/:id/registries/:registryId`,
+          params: { id: '@id', registryId: '@registryId' },
+        },
       }
     );
   },
