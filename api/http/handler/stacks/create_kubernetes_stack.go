@@ -53,7 +53,7 @@ func (payload *kubernetesGitDeploymentPayload) Validate(r *http.Request) error {
 	if payload.RepositoryAuthentication && (govalidator.IsNull(payload.RepositoryUsername) || govalidator.IsNull(payload.RepositoryPassword)) {
 		return errors.New("Invalid repository credentials. Username and password must be specified when authentication is enabled")
 	}
-	if payload.FilePathInRepository == "" {
+	if govalidator.IsNull(payload.FilePathInRepository) {
 		return errors.New("Invalid file path in repository")
 	}
 	return nil
