@@ -12,3 +12,4 @@ api/cmd/portainer/portainer*
 test/e2e/cypress/screenshots
 *.db
 *.log
+.env
