@@ -3,48 +3,59 @@ package stacks
 import (
 	"io/ioutil"
 	"os"
-	"path/filepath"
-	"strings"
+	"path"
 	"testing"
 
-	"github.com/portainer/portainer/api/archive"
-	"github.com/portainer/portainer/api/git"
+	"github.com/stretchr/testify/assert"
 )
 
+type git struct {
+	content string
+}
+
+func (g *git) ClonePublicRepository(repositoryURL string, referenceName string, destination string) error {
+	return ioutil.WriteFile(path.Join(destination, "deployment.yml"), []byte(g.content), 0755)
+}
+func (g *git) ClonePrivateRepositoryWithBasicAuth(repositoryURL, referenceName string, destination, username, password string) error {
+	return g.ClonePublicRepository(repositoryURL, referenceName, destination)
+}
+
 func TestCloneAndConvertGitRepoFile(t *testing.T) {
-	dir, err := ioutil.TempDir("", "git-repo-")
-	if err != nil {
-		t.Fatalf("failed to create a temp repo directory, err: %v", err)
-	}
+	dir, err := os.MkdirTemp("", "kube-create-stack")
+	assert.NoError(t, err, "failed to create a tmp dir")
 	defer os.RemoveAll(dir)
 
-	file, err := os.OpenFile("./testdata/test-clone-git-repo.tar.gz", os.O_RDONLY, 0755)
-	if err != nil {
-		t.Fatalf("failed to open an archive, err: %v", err)
-	}
-	err = archive.ExtractTarGz(file, dir)
-	if err != nil {
-		t.Fatalf("failed to extract file from the archive to a folder: err %v", err)
-	}
-
-	bareGITRepoDir := filepath.Join(dir, "test-clone.git")
-	tmpGITDir := os.TempDir()
-	defer os.RemoveAll(tmpGITDir)
+	content := `apiVersion: apps/v1
+	kind: Deployment
+	metadata:
+		name: nginx-deployment
+		labels:
+			app: nginx
+	spec:
+		replicas: 3
+		selector:
+			matchLabels:
+				app: nginx
+		template:
+			metadata:
+				labels:
+					app: nginx
+			spec:
+				containers:
+				- name: nginx
+					image: nginx:1.14.2
+					ports:
+					- containerPort: 80`
 
 	h := &Handler{
-		GitService: git.NewService(),
+		GitService: &git{
+			content: content,
+		},
 	}
 	gitInfo := &kubernetesGitDeploymentPayload{
-		RepositoryURL:            bareGITRepoDir,
-		RepositoryReferenceName:  "refs/heads/main",
-		RepositoryAuthentication: false,
-		FilePathInRepository:     "nginx-deployment.yml",
+		FilePathInRepository: "deployment.yml",
 	}
-	fileContent, err := h.cloneAndConvertGitRepoFile(gitInfo, tmpGITDir)
-	if err != nil {
-		t.Fatalf("failed to clone or convert the file from Git repo, err: %v", err)
-	}
-	if !strings.HasPrefix(fileContent, "apiVersion") {
-		t.Error("wrong k8s manifest file content")
-	}
+	fileContent, err := h.cloneManifestContentFromGitRepo(gitInfo, dir)
+	assert.NoError(t, err, "failed to clone or convert the file from Git repo")
+	assert.Equal(t, content, fileContent)
 }
