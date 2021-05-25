@@ -63,10 +63,10 @@ func (handler *Handler) endpointEdgeStackInspect(w http.ResponseWriter, r *http.
 	fileName := edgeStack.EntryPoint
 	if endpointutils.IsDockerEndpoint(endpoint) {
 		if fileName == "" {
-			return &httperror.HandlerError{http.StatusBadRequest, "Docker is not supported by this stack", errors.New("Kubernetes is not supported by this stack")}
+			return &httperror.HandlerError{http.StatusBadRequest, "Docker is not supported by this stack", errors.New("Docker is not supported by this stack")}
 		}
 	}
-	
+
 	if endpointutils.IsKubernetesEndpoint(endpoint) {
 		fileName = edgeStack.ManifestPath
 

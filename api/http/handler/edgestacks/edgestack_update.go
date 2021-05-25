@@ -140,7 +140,7 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 		stack.Status = map[portainer.EndpointID]portainer.EdgeStackStatus{}
 	}
 
-	err = handler.convertAndStoreKubeManifestIfNeeded(relatedEndpointIds, stack)
+	err = handler.convertAndStoreKubeManifestIfNeeded(stack, relatedEndpointIds)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to convert and persist updated Kubernetes manifest file on disk", err}
 	}

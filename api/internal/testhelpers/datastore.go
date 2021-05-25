@@ -114,6 +114,46 @@ func WithEdgeJobs(js []portainer.EdgeJob) datastoreOption {
 	}
 }
 
+type stubEndpointRelationService struct {
+	relations []portainer.EndpointRelation
+}
+
+func (s *stubEndpointRelationService) EndpointRelations() ([]portainer.EndpointRelation, error) {
+	return s.relations, nil
+}
+func (s *stubEndpointRelationService) EndpointRelation(ID portainer.EndpointID) (*portainer.EndpointRelation, error) {
+	for _, relation := range s.relations {
+		if relation.EndpointID == ID {
+			return &relation, nil
+		}
+	}
+
+	return nil, errors.ErrObjectNotFound
+}
+func (s *stubEndpointRelationService) CreateEndpointRelation(EndpointRelation *portainer.EndpointRelation) error {
+	return nil
+}
+func (s *stubEndpointRelationService) UpdateEndpointRelation(ID portainer.EndpointID, relation *portainer.EndpointRelation) error {
+	for i, r := range s.relations {
+		if r.EndpointID == ID {
+			s.relations[i] = *relation
+		}
+	}
+
+	return nil
+}
+func (s *stubEndpointRelationService) DeleteEndpointRelation(ID portainer.EndpointID) error {
+	return nil
+}
+func (s *stubEndpointRelationService) GetNextIdentifier() int { return 0 }
+
+// WithEndpointRelations option will instruct datastore to return provided jobs
+func WithEndpointRelations(relations []portainer.EndpointRelation) datastoreOption {
+	return func(d *datastore) {
+		d.endpointRelation = &stubEndpointRelationService{relations: relations}
+	}
+}
+
 type stubEndpointService struct {
 	endpoints []portainer.Endpoint
 }
@@ -163,7 +203,7 @@ func (s *stubEndpointService) DeleteEndpoint(ID portainer.EndpointID) error {
 }
 
 func (s *stubEndpointService) Synchronize(toCreate []*portainer.Endpoint, toUpdate []*portainer.Endpoint, toDelete []*portainer.Endpoint) error {
-	panic("not implemented") // TODO: Implement
+	panic("not implemented")
 }
 
 func (s *stubEndpointService) GetNextIdentifier() int {

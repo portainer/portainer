@@ -86,7 +86,7 @@ func getEndpointTypes(endpointService portainer.EndpointService, endpointIds []p
 		typeSet[endpoint.Type] = true
 	}
 
-	endpointTypes := []portainer.EndpointType{}
+	endpointTypes := make([]portainer.EndpointType, 0, len(typeSet))
 	for endpointType := range typeSet {
 		endpointTypes = append(endpointTypes, endpointType)
 	}

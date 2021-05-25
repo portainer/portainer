@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"path"
 	"strconv"
 	"strings"
 	"time"
@@ -121,12 +120,12 @@ func (handler *Handler) createSwarmStackFromFileContent(r *http.Request) (*porta
 		return nil, fmt.Errorf("unable to retrieve related endpoints: %w", err)
 	}
 
-	err = handler.convertAndStoreKubeManifestIfNeeded(relatedEndpointIds, stack)
+	err = handler.convertAndStoreKubeManifestIfNeeded(stack, relatedEndpointIds)
 	if err != nil {
 		return nil, fmt.Errorf("Failed creating and storing kube manifest: %w", err)
 	}
 
-	err = handler.updateEndpointRelations(stack, relatedEndpointIds)
+	err = updateEndpointRelations(handler.DataStore.EndpointRelation(), stack.ID, relatedEndpointIds)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to update endpoint relations: %w", err)
 	}
@@ -227,12 +226,12 @@ func (handler *Handler) createSwarmStackFromGitRepository(r *http.Request) (*por
 		return nil, fmt.Errorf("unable to retrieve related endpoints: %w", err)
 	}
 
-	err = handler.convertAndStoreKubeManifestIfNeeded(relatedEndpointIds, stack)
+	err = handler.convertAndStoreKubeManifestIfNeeded(stack, relatedEndpointIds)
 	if err != nil {
 		return nil, fmt.Errorf("Failed creating and storing kube manifest: %w", err)
 	}
 
-	err = handler.updateEndpointRelations(stack, relatedEndpointIds)
+	err = updateEndpointRelations(handler.DataStore.EndpointRelation(), stack.ID, relatedEndpointIds)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to update endpoint relations: %w", err)
 	}
@@ -313,12 +312,12 @@ func (handler *Handler) createSwarmStackFromFileUpload(r *http.Request) (*portai
 		return nil, fmt.Errorf("unable to retrieve related endpoints: %w", err)
 	}
 
-	err = handler.convertAndStoreKubeManifestIfNeeded(relatedEndpointIds, stack)
+	err = handler.convertAndStoreKubeManifestIfNeeded(stack, relatedEndpointIds)
 	if err != nil {
 		return nil, fmt.Errorf("Failed creating and storing kube manifest: %w", err)
 	}
 
-	err = handler.updateEndpointRelations(stack, relatedEndpointIds)
+	err = updateEndpointRelations(handler.DataStore.EndpointRelation(), stack.ID, relatedEndpointIds)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to update endpoint relations: %w", err)
 	}
@@ -345,51 +344,21 @@ func (handler *Handler) validateUniqueName(name string) error {
 	return nil
 }
 
-func (handler *Handler) updateEndpointRelations(edgeStack *portainer.EdgeStack, relatedEndpointIds []portainer.EndpointID) error {
+// updateEndpointRelations adds a relation between the Edge Stack to the related endpoints
+func updateEndpointRelations(endpointRelationService portainer.EndpointRelationService, edgeStackID portainer.EdgeStackID, relatedEndpointIds []portainer.EndpointID) error {
 	for _, endpointID := range relatedEndpointIds {
-		relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpointID)
+		relation, err := endpointRelationService.EndpointRelation(endpointID)
 		if err != nil {
 			return fmt.Errorf("unable to find endpoint relation in database: %w", err)
 		}
 
-		relation.EdgeStacks[edgeStack.ID] = true
+		relation.EdgeStacks[edgeStackID] = true
 
-		err = handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpointID, relation)
+		err = endpointRelationService.UpdateEndpointRelation(endpointID, relation)
 		if err != nil {
 			return fmt.Errorf("unable to persist endpoint relation in database: %w", err)
 		}
 	}
-
-	return nil
-}
-
-func (handler *Handler) convertAndStoreKubeManifestIfNeeded(relatedEndpointIds []portainer.EndpointID, edgeStack *portainer.EdgeStack) error {
-	hasKubeEndpoint, err := hasKubeEndpoint(handler.DataStore.Endpoint(), relatedEndpointIds)
-	if err != nil {
-		return fmt.Errorf("unable to check if edge stack has kube endpoints: %w", err)
-	}
-
-	if !hasKubeEndpoint {
-		return nil
-	}
-
-	composeConfig, err := handler.FileService.GetFileContent(path.Join(edgeStack.ProjectPath, edgeStack.EntryPoint))
-	if err != nil {
-		return fmt.Errorf("unable to retrieve Compose file from disk: %w", err)
-	}
-
-	kompose, err := handler.KubernetesDeployer.ConvertCompose(string(composeConfig))
-	if err != nil {
-		return fmt.Errorf("failed converting compose file to kubernetes manifest: %w", err)
-	}
-
-	KomposeFileName := filesystem.KubeManifestFileDefaultName
-	_, err = handler.FileService.StoreEdgeStackFileFromBytes(strconv.Itoa(int(edgeStack.ID)), KomposeFileName, kompose)
-	if err != nil {
-		return fmt.Errorf("failed to store kube manifest file: %w", err)
-	}
-
-	edgeStack.ManifestPath = KomposeFileName
 
 	return nil
 }
