@@ -236,16 +236,7 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 	projectPath := handler.FileService.GetCustomTemplateProjectPath(strconv.Itoa(customTemplateID))
 	customTemplate.ProjectPath = projectPath
 
-	gitCloneParams := &cloneRepositoryParameters{
-		url:            payload.RepositoryURL,
-		referenceName:  payload.RepositoryReferenceName,
-		path:           projectPath,
-		authentication: payload.RepositoryAuthentication,
-		username:       payload.RepositoryUsername,
-		password:       payload.RepositoryPassword,
-	}
-
-	err = handler.cloneGitRepository(gitCloneParams)
+	err = handler.GitService.CloneRepository(projectPath, payload.RepositoryURL, payload.RepositoryReferenceName, payload.RepositoryUsername, payload.RepositoryPassword)
 	if err != nil {
 		return nil, err
 	}
