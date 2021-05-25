@@ -19,22 +19,34 @@ class KubernetesConfigurationDataController {
     this.showAdvancedMode = this.showAdvancedMode.bind(this);
   }
 
-  onChangeKey() {
+  onChangeKey(entry) {
+    if (entry && entry.Used) {
+      return;
+    }
+
     this.state.duplicateKeys = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.Data, (data) => data.Key));
-    this.isValid = Object.keys(this.state.duplicateKeys).length === 0;
+    this.state.invalidKeys = KubernetesFormValidationHelper.getInvalidKeys(_.map(this.formValues.Data, (data) => data.Key));
+    this.isValid = Object.keys(this.state.duplicateKeys).length === 0 && Object.keys(this.state.invalidKeys).length === 0;
   }
 
   addEntry() {
     this.formValues.Data.push(new KubernetesConfigurationFormValuesEntry());
   }
 
-  removeEntry(index) {
+  removeEntry(index, entry) {
+    if (entry.Used) {
+      return;
+    }
+
     this.formValues.Data.splice(index, 1);
     this.onChangeKey();
   }
 
   async editorUpdateAsync(cm) {
-    this.formValues.DataYaml = cm.getValue();
+    if (this.formValues.DataYaml !== cm.getValue()) {
+      this.formValues.DataYaml = cm.getValue();
+      this.isEditorDirty = true;
+    }
   }
 
   editorUpdate(cm) {
@@ -76,6 +88,7 @@ class KubernetesConfigurationDataController {
   showSimpleMode() {
     this.formValues.IsSimple = true;
     this.formValues.Data = KubernetesConfigurationHelper.parseYaml(this.formValues);
+    this.onChangeKey();
   }
 
   showAdvancedMode() {
@@ -85,7 +98,8 @@ class KubernetesConfigurationDataController {
 
   $onInit() {
     this.state = {
-      duplicateKeys: {},
+      duplicateKeys: [],
+      invalidKeys: {},
     };
   }
 }

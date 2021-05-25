@@ -28,7 +28,7 @@ Unlike the public demo, the playground sessions are deleted after 4 hours. Apart
 
 ## Getting started
 
-- [Deploy Portainer](https://www.portainer.io/installation/)
+- [Deploy Portainer](https://documentation.portainer.io/quickstart/)
 - [Documentation](https://documentation.portainer.io)
 - [Building Portainer](https://documentation.portainer.io/contributing/instructions/)
 
@@ -65,8 +65,4 @@ Portainer supports "Current - 2 docker versions only. Prior versions may operate
 
 Portainer is licensed under the zlib license. See [LICENSE](./LICENSE) for reference.
 
-Portainer also contains the following code, which is licensed under the [MIT license](https://opensource.org/licenses/MIT):
-
-UI For Docker: Copyright (c) 2013-2016 Michael Crosby (crosbymichael.com), Kevan Ahlquist (kevanahlquist.com), Anthony Lapenna (portainer.io)
-
-rdash-angular: Copyright (c) [2014][elliot hesp]
+Portainer also contains code from open source projects. See [ATTRIBUTIONS.md](./ATTRIBUTIONS.md) for a list.

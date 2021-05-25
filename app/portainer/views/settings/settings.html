@@ -81,7 +81,7 @@
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
                 You can specify the URL to your own template definitions file here. See
-                <a href="https://www.portainer.io/documentation/how-to-use-templates/" target="_blank">Portainer documentation</a> for more details.
+                <a href="https://documentation.portainer.io/v2.0/settings/apps/#build-and-host-your-own-templates" target="_blank">Portainer documentation</a> for more details.
               </span>
             </div>
             <div class="form-group">
@@ -95,100 +95,7 @@
           </div>
           <!-- !templates -->
           <!-- host-filesystem -->
-          <div class="col-sm-12 form-section-title">
-            Host and Filesystem
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="toggle_enableHostManagementFeatures" class="control-label text-left">
-                Enable host management features
-                <portainer-tooltip position="bottom" message="Enable host management features: host system browsing and advanced host details."></portainer-tooltip>
-              </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_enableHostManagementFeatures" ng-model="formValues.enableHostManagementFeatures" /><i></i>
-              </label>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="toggle_allowvolumebrowser" class="control-label text-left">
-                Enable volume management for non-administrators
-                <portainer-tooltip position="bottom" message="When enabled, regular users will be able to use Portainer volume management features."></portainer-tooltip>
-              </label>
-              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="toggle_allowvolumebrowser" ng-model="formValues.enableVolumeBrowser" /><i></i> </label>
-            </div>
-          </div>
-          <!-- !host-filesystem -->
-          <!-- security -->
-          <div class="col-sm-12 form-section-title">
-            Docker Endpoint Security Options
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="toggle_allowbindmounts" class="control-label text-left">
-                Disable bind mounts for non-administrators
-                <portainer-tooltip position="bottom" message="When enabled, regular users will not be able to use bind mounts when creating containers."></portainer-tooltip>
-              </label>
-              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="toggle_allowbindmounts" ng-model="formValues.restrictBindMounts" /><i></i> </label>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="toggle_allowbindmounts" class="control-label text-left">
-                Disable privileged mode for non-administrators
-                <portainer-tooltip position="bottom" message="When enabled, regular users will not be able to use privileged mode when creating containers."></portainer-tooltip>
-              </label>
-              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="toggle_allowbindmounts" ng-model="formValues.restrictPrivilegedMode" /><i></i> </label>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="toggle_allowHostNamespaceForRegularUsers" class="control-label text-left">
-                Disable the use of host PID 1 for non-administrators
-                <portainer-tooltip position="bottom" message="Prevent users from accessing the host filesystem through the host PID namespace."></portainer-tooltip>
-              </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_allowHostNamespaceForRegularUsers" ng-model="formValues.restrictHostNamespaceForRegularUsers" /><i></i>
-              </label>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="toggle_disableStackManagementForRegularUsers" class="control-label text-left">
-                Disable the use of Stacks for non-administrators
-              </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_disableStackManagementForRegularUsers" ng-model="formValues.disableStackManagementForRegularUsers" /><i></i>
-              </label>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="toggle_disableDeviceMappingForRegularUsers" class="control-label text-left">
-                Disable device mappings for non-administrators
-              </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_disableDeviceMappingForRegularUsers" ng-model="formValues.disableDeviceMappingForRegularUsers" /><i></i>
-              </label>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="toggle_disableContainerCapabilitiesForRegularUsers" class="control-label text-left">
-                Disable container capabilities for non-administrators
-              </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_disableContainerCapabilitiesForRegularUsers" ng-model="formValues.disableContainerCapabilitiesForRegularUsers" /><i></i>
-              </label>
-            </div>
-          </div>
 
-          <div class="form-group" ng-if="isContainerEditDisabled()">
-            <span class="col-sm-12 text-muted small">
-              Note: The recreate/duplicate/edit feature is currently disabled (for non-admin users) by one or more security settings.
-            </span>
-          </div>
-          <!-- !security -->
           <!-- edge -->
           <div class="col-sm-12 form-section-title">
             Edge Compute
@@ -298,6 +205,90 @@
             </div>
           </div>
           <!-- !filtered-labels -->
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-download" title-text="Backup Portainer"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal" ng-submit="backupPortainer()" name="backupPortainerForm">
+          <div class="col-sm-12 form-section-title">
+            Backup configuration
+          </div>
+          <div class="form-group"></div>
+          <div class="form-group">
+            <div class="boxselector_wrapper">
+              <div>
+                <input type="radio" id="backup_file" checked="checked" />
+                <label for="backup_file" style="padding-bottom: 20px;">
+                  <div class="boxselector_header">
+                    <i class="fa fa-download" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Download backup file
+                  </div>
+                  <p></p>
+                </label>
+              </div>
+              <div>
+                <input type="radio" id="backup_s3" disabled />
+                <label for="backup_s3" class="boxselector_disabled" style="background-color: #ffffff;">
+                  <div class="boxselector_header">
+                    <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Store in S3
+                  </div>
+                  <p>This feature is available in <a href="https://www.portainer.io/business-upsell?from=s3-backup-setting" target="_blank"> Portainer Business Edition</a></p>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-12 form-section-title">
+            Security settings
+          </div>
+          <!-- Password protect -->
+          <div class="form-group">
+            <label for="password_protect" class="col-sm-1 control-label text-left">Password protect</label>
+            <div class="col-sm-1">
+              <label class="switch"> <input type="checkbox" id="password_protect" name="password_protect" ng-model="formValues.passwordProtect" /><i></i> </label>
+            </div>
+          </div>
+          <!-- !Password protect -->
+
+          <!-- Password -->
+          <div class="form-group" ng-if="formValues.passwordProtect">
+            <label for="password" class="col-sm-1 control-label text-left">Password</label>
+            <div class="col-sm-3">
+              <input type="password" class="form-control" ng-model="formValues.password" id="password" name="password" required />
+            </div>
+          </div>
+          <div class="form-group col-md-12" ng-show="backupPortainerForm.password.$invalid">
+            <div class="small text-warning">
+              <div ng-messages="backupPortainerForm.password.$error">
+                <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+              </div>
+            </div>
+          </div>
+          <!-- !Password -->
+
+          <!-- actions -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                ng-click="downloadBackup()"
+                ng-disabled="backupPortainerForm.$invalid || state.backupInProgress"
+                button-spinner="state.backupInProgress"
+              >
+                <span ng-hide="state.backupInProgress">Download backup</span>
+                <span ng-show="state.backupInProgress">Downloading backup</span>
+              </button>
+            </div>
+          </div>
+          <!-- !actions -->
         </form>
       </rd-widget-body>
     </rd-widget>

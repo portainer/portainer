@@ -1,7 +1,7 @@
 package resourcecontrol
 
 import (
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
 
 	"github.com/boltdb/bolt"
@@ -14,18 +14,18 @@ const (
 
 // Service represents a service for managing endpoint data.
 type Service struct {
-	db *bolt.DB
+	connection *internal.DbConnection
 }
 
 // NewService creates a new instance of a service.
-func NewService(db *bolt.DB) (*Service, error) {
-	err := internal.CreateBucket(db, BucketName)
+func NewService(connection *internal.DbConnection) (*Service, error) {
+	err := internal.CreateBucket(connection, BucketName)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Service{
-		db: db,
+		connection: connection,
 	}, nil
 }
 
@@ -34,7 +34,7 @@ func (service *Service) ResourceControl(ID portainer.ResourceControlID) (*portai
 	var resourceControl portainer.ResourceControl
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.db, BucketName, identifier, &resourceControl)
+	err := internal.GetObject(service.connection, BucketName, identifier, &resourceControl)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (service *Service) ResourceControl(ID portainer.ResourceControlID) (*portai
 func (service *Service) ResourceControlByResourceIDAndType(resourceID string, resourceType portainer.ResourceControlType) (*portainer.ResourceControl, error) {
 	var resourceControl *portainer.ResourceControl
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 		cursor := bucket.Cursor()
 
@@ -82,7 +82,7 @@ func (service *Service) ResourceControlByResourceIDAndType(resourceID string, re
 func (service *Service) ResourceControls() ([]portainer.ResourceControl, error) {
 	var rcs = make([]portainer.ResourceControl, 0)
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		cursor := bucket.Cursor()
@@ -103,7 +103,7 @@ func (service *Service) ResourceControls() ([]portainer.ResourceControl, error) 
 
 // CreateResourceControl creates a new ResourceControl object
 func (service *Service) CreateResourceControl(resourceControl *portainer.ResourceControl) error {
-	return service.db.Update(func(tx *bolt.Tx) error {
+	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		id, _ := bucket.NextSequence()
@@ -121,11 +121,11 @@ func (service *Service) CreateResourceControl(resourceControl *portainer.Resourc
 // UpdateResourceControl saves a ResourceControl object.
 func (service *Service) UpdateResourceControl(ID portainer.ResourceControlID, resourceControl *portainer.ResourceControl) error {
 	identifier := internal.Itob(int(ID))
-	return internal.UpdateObject(service.db, BucketName, identifier, resourceControl)
+	return internal.UpdateObject(service.connection, BucketName, identifier, resourceControl)
 }
 
 // DeleteResourceControl deletes a ResourceControl object by ID
 func (service *Service) DeleteResourceControl(ID portainer.ResourceControlID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.db, BucketName, identifier)
+	return internal.DeleteObject(service.connection, BucketName, identifier)
 }

@@ -42,6 +42,7 @@ angular.module('portainer.kubernetes').factory('KubernetesPods', [
             params: { action: 'log' },
             transformResponse: logsHandler,
           },
+          evict: { method: 'POST' },
         }
       );
     };

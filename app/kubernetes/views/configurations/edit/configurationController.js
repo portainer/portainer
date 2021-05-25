@@ -11,6 +11,7 @@ class KubernetesConfigurationController {
   constructor(
     $async,
     $state,
+    $window,
     clipboard,
     Notifications,
     LocalStorage,
@@ -25,6 +26,7 @@ class KubernetesConfigurationController {
   ) {
     this.$async = $async;
     this.$state = $state;
+    this.$window = $window;
     this.clipboard = clipboard;
     this.Notifications = Notifications;
     this.LocalStorage = LocalStorage;
@@ -143,6 +145,7 @@ class KubernetesConfigurationController {
       this.formValues.Id = this.configuration.Id;
       this.formValues.Name = this.configuration.Name;
       this.formValues.Type = this.configuration.Type;
+      this.oldDataYaml = this.formValues.DataYaml;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve configuration');
     } finally {
@@ -204,6 +207,29 @@ class KubernetesConfigurationController {
     return this.$async(this.getConfigurationsAsync);
   }
 
+  tagUsedDataKeys() {
+    const configName = this.$transition$.params().name;
+    const usedDataKeys = _.uniq(
+      this.configuration.Applications.flatMap((app) =>
+        app.Env.filter((e) => e.valueFrom && e.valueFrom.configMapKeyRef && e.valueFrom.configMapKeyRef.name === configName).map((e) => e.name)
+      )
+    );
+
+    this.formValues.Data = this.formValues.Data.map((variable) => {
+      if (!usedDataKeys.includes(variable.Key)) {
+        return variable;
+      }
+
+      return { ...variable, Used: true };
+    });
+  }
+
+  async uiCanExit() {
+    if (!this.formValues.IsSimple && this.formValues.DataYaml !== this.oldDataYaml && this.state.isEditorDirty) {
+      return this.ModalService.confirmWebEditorDiscard();
+    }
+  }
+
   async onInit() {
     try {
       this.state = {
@@ -217,6 +243,7 @@ class KubernetesConfigurationController {
         activeTab: 0,
         currentName: this.$state.$current.name,
         isDataValid: true,
+        isEditorDirty: false,
       };
 
       this.state.activeTab = this.LocalStorage.getActiveTab('configuration');
@@ -228,11 +255,19 @@ class KubernetesConfigurationController {
       await this.getApplications(this.configuration.Namespace);
       await this.getEvents(this.configuration.Namespace);
       await this.getConfigurations();
+
+      this.tagUsedDataKeys();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     } finally {
       this.state.viewReady = true;
     }
+
+    this.$window.onbeforeunload = () => {
+      if (!this.formValues.IsSimple && this.formValues.DataYaml !== this.oldDataYaml && this.state.isEditorDirty) {
+        return '';
+      }
+    };
   }
 
   $onInit() {

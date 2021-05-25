@@ -3,17 +3,18 @@
     Container capabilities
   </div>
   <div class="form-group">
-    <div ng-repeat="cap in $ctrl.capabilities">
-      <div class="col-xs-8 col-sm-3 col-md-2">
-        <label for="capability" class="control-label text-left">
-          {{ cap.capability }}
-          <portainer-tooltip position="bottom" message="{{ cap.description }}"></portainer-tooltip>
-        </label>
+    <div ng-repeat="cap in $ctrl.capabilities" class="col-xs-12 col-sm-6 col-md-4">
+      <div class="row">
+        <div class="col-xs-8">
+          <label for="capability" class="control-label text-left" style="display: flex; padding: 0;">
+            {{ cap.capability }}
+            <portainer-tooltip position="bottom" message="{{ cap.description }}"></portainer-tooltip>
+          </label>
+        </div>
+        <div class="col-xs-4">
+          <label class="switch"> <input type="checkbox" name="capability" ng-model="cap.allowed" /><i></i> </label>
+        </div>
       </div>
-      <div class="col-xs-4 col-sm-2 col-md-1">
-        <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="capability" ng-model="cap.allowed" /><i></i> </label>
-      </div>
-      <div class="col-xs-0 col-sm-1 col-md-1"> </div>
     </div>
   </div>
 </form>

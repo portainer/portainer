@@ -581,6 +581,16 @@ angular.module('portainer.docker', ['portainer.app']).config([
       },
     };
 
+    const dockerFeaturesConfiguration = {
+      name: 'docker.featuresConfiguration',
+      url: '/feat-config',
+      views: {
+        'content@': {
+          component: 'dockerFeaturesConfigurationView',
+        },
+      },
+    };
+
     $stateRegistryProvider.register(configs);
     $stateRegistryProvider.register(config);
     $stateRegistryProvider.register(configCreation);
@@ -630,5 +640,6 @@ angular.module('portainer.docker', ['portainer.app']).config([
     $stateRegistryProvider.register(volume);
     $stateRegistryProvider.register(volumeBrowse);
     $stateRegistryProvider.register(volumeCreation);
+    $stateRegistryProvider.register(dockerFeaturesConfiguration);
   },
 ]);

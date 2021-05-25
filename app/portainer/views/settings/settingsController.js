@@ -4,7 +4,10 @@ angular.module('portainer.app').controller('SettingsController', [
   'Notifications',
   'SettingsService',
   'StateManager',
-  function ($scope, $state, Notifications, SettingsService, StateManager) {
+  'BackupService',
+  'FileSaver',
+  'Blob',
+  function ($scope, $state, Notifications, SettingsService, StateManager, BackupService, FileSaver) {
     $scope.state = {
       actionInProgress: false,
       availableEdgeAgentCheckinOptions: [
@@ -21,35 +24,18 @@ angular.module('portainer.app').controller('SettingsController', [
           value: 30,
         },
       ],
+
+      backupInProgress: false,
     };
 
     $scope.formValues = {
       customLogo: false,
-      restrictBindMounts: false,
-      restrictPrivilegedMode: false,
       labelName: '',
       labelValue: '',
-      enableHostManagementFeatures: false,
-      enableVolumeBrowser: false,
       enableEdgeComputeFeatures: false,
-      restrictHostNamespaceForRegularUsers: false,
-      allowDeviceMappingForRegularUsers: false,
-      allowStackManagementForRegularUsers: false,
-      disableContainerCapabilitiesForRegularUsers: false,
       enableTelemetry: false,
-    };
-
-    $scope.isContainerEditDisabled = function isContainerEditDisabled() {
-      const {
-        restrictBindMounts,
-        restrictHostNamespaceForRegularUsers,
-        restrictPrivilegedMode,
-        disableDeviceMappingForRegularUsers,
-        disableContainerCapabilitiesForRegularUsers,
-      } = this.formValues;
-      return (
-        restrictBindMounts || restrictHostNamespaceForRegularUsers || restrictPrivilegedMode || disableDeviceMappingForRegularUsers || disableContainerCapabilitiesForRegularUsers
-      );
+      passwordProtect: false,
+      password: '',
     };
 
     $scope.removeFilteredContainerLabel = function (index) {
@@ -70,6 +56,28 @@ angular.module('portainer.app').controller('SettingsController', [
       updateSettings(settings);
     };
 
+    $scope.downloadBackup = function () {
+      const payload = {};
+      if ($scope.formValues.passwordProtect) {
+        payload.password = $scope.formValues.password;
+      }
+
+      $scope.state.backupInProgress = true;
+
+      BackupService.downloadBackup(payload)
+        .then(function success(data) {
+          const downloadData = new Blob([data.file], { type: 'application/gzip' });
+          FileSaver.saveAs(downloadData, data.name);
+          Notifications.success('Backup successfully downloaded');
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to download backup');
+        })
+        .finally(function final() {
+          $scope.state.backupInProgress = false;
+        });
+    };
+
     $scope.saveApplicationSettings = function () {
       var settings = $scope.settings;
 
@@ -77,15 +85,7 @@ angular.module('portainer.app').controller('SettingsController', [
         settings.LogoURL = '';
       }
 
-      settings.AllowBindMountsForRegularUsers = !$scope.formValues.restrictBindMounts;
-      settings.AllowPrivilegedModeForRegularUsers = !$scope.formValues.restrictPrivilegedMode;
-      settings.AllowVolumeBrowserForRegularUsers = $scope.formValues.enableVolumeBrowser;
-      settings.EnableHostManagementFeatures = $scope.formValues.enableHostManagementFeatures;
       settings.EnableEdgeComputeFeatures = $scope.formValues.enableEdgeComputeFeatures;
-      settings.AllowHostNamespaceForRegularUsers = !$scope.formValues.restrictHostNamespaceForRegularUsers;
-      settings.AllowDeviceMappingForRegularUsers = !$scope.formValues.disableDeviceMappingForRegularUsers;
-      settings.AllowStackManagementForRegularUsers = !$scope.formValues.disableStackManagementForRegularUsers;
-      settings.AllowContainerCapabilitiesForRegularUsers = !$scope.formValues.disableContainerCapabilitiesForRegularUsers;
       settings.EnableTelemetry = $scope.formValues.enableTelemetry;
 
       $scope.state.actionInProgress = true;
@@ -98,15 +98,7 @@ angular.module('portainer.app').controller('SettingsController', [
           Notifications.success('Settings updated');
           StateManager.updateLogo(settings.LogoURL);
           StateManager.updateSnapshotInterval(settings.SnapshotInterval);
-          StateManager.updateEnableHostManagementFeatures(settings.EnableHostManagementFeatures);
-          StateManager.updateEnableVolumeBrowserForNonAdminUsers(settings.AllowVolumeBrowserForRegularUsers);
-          StateManager.updateAllowHostNamespaceForRegularUsers(settings.AllowHostNamespaceForRegularUsers);
           StateManager.updateEnableEdgeComputeFeatures(settings.EnableEdgeComputeFeatures);
-          StateManager.updateAllowDeviceMappingForRegularUsers(settings.AllowDeviceMappingForRegularUsers);
-          StateManager.updateAllowStackManagementForRegularUsers(settings.AllowStackManagementForRegularUsers);
-          StateManager.updateAllowContainerCapabilitiesForRegularUsers(settings.AllowContainerCapabilitiesForRegularUsers);
-          StateManager.updateAllowPrivilegedModeForRegularUsers(settings.AllowPrivilegedModeForRegularUsers);
-          StateManager.updateAllowBindMountsForRegularUsers(settings.AllowBindMountsForRegularUsers);
           StateManager.updateEnableTelemetry(settings.EnableTelemetry);
           $state.reload();
         })
@@ -127,15 +119,7 @@ angular.module('portainer.app').controller('SettingsController', [
           if (settings.LogoURL !== '') {
             $scope.formValues.customLogo = true;
           }
-          $scope.formValues.restrictBindMounts = !settings.AllowBindMountsForRegularUsers;
-          $scope.formValues.restrictPrivilegedMode = !settings.AllowPrivilegedModeForRegularUsers;
-          $scope.formValues.enableVolumeBrowser = settings.AllowVolumeBrowserForRegularUsers;
-          $scope.formValues.enableHostManagementFeatures = settings.EnableHostManagementFeatures;
           $scope.formValues.enableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
-          $scope.formValues.restrictHostNamespaceForRegularUsers = !settings.AllowHostNamespaceForRegularUsers;
-          $scope.formValues.disableDeviceMappingForRegularUsers = !settings.AllowDeviceMappingForRegularUsers;
-          $scope.formValues.disableStackManagementForRegularUsers = !settings.AllowStackManagementForRegularUsers;
-          $scope.formValues.disableContainerCapabilitiesForRegularUsers = !settings.AllowContainerCapabilitiesForRegularUsers;
           $scope.formValues.enableTelemetry = settings.EnableTelemetry;
         })
         .catch(function error(err) {

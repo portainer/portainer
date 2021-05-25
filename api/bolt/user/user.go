@@ -1,7 +1,9 @@
 package user
 
 import (
-	"github.com/portainer/portainer/api"
+	"strings"
+
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/internal"
 
@@ -15,18 +17,18 @@ const (
 
 // Service represents a service for managing endpoint data.
 type Service struct {
-	db *bolt.DB
+	connection *internal.DbConnection
 }
 
 // NewService creates a new instance of a service.
-func NewService(db *bolt.DB) (*Service, error) {
-	err := internal.CreateBucket(db, BucketName)
+func NewService(connection *internal.DbConnection) (*Service, error) {
+	err := internal.CreateBucket(connection, BucketName)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Service{
-		db: db,
+		connection: connection,
 	}, nil
 }
 
@@ -35,7 +37,7 @@ func (service *Service) User(ID portainer.UserID) (*portainer.User, error) {
 	var user portainer.User
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.db, BucketName, identifier, &user)
+	err := internal.GetObject(service.connection, BucketName, identifier, &user)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +49,9 @@ func (service *Service) User(ID portainer.UserID) (*portainer.User, error) {
 func (service *Service) UserByUsername(username string) (*portainer.User, error) {
 	var user *portainer.User
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	username = strings.ToLower(username)
+
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 		cursor := bucket.Cursor()
 
@@ -58,7 +62,7 @@ func (service *Service) UserByUsername(username string) (*portainer.User, error)
 				return err
 			}
 
-			if u.Username == username {
+			if strings.EqualFold(u.Username, username) {
 				user = &u
 				break
 			}
@@ -77,7 +81,7 @@ func (service *Service) UserByUsername(username string) (*portainer.User, error)
 func (service *Service) Users() ([]portainer.User, error) {
 	var users = make([]portainer.User, 0)
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		cursor := bucket.Cursor()
@@ -99,7 +103,7 @@ func (service *Service) Users() ([]portainer.User, error) {
 // UsersByRole return an array containing all the users with the specified role.
 func (service *Service) UsersByRole(role portainer.UserRole) ([]portainer.User, error) {
 	var users = make([]portainer.User, 0)
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		cursor := bucket.Cursor()
@@ -123,16 +127,18 @@ func (service *Service) UsersByRole(role portainer.UserRole) ([]portainer.User, 
 // UpdateUser saves a user.
 func (service *Service) UpdateUser(ID portainer.UserID, user *portainer.User) error {
 	identifier := internal.Itob(int(ID))
-	return internal.UpdateObject(service.db, BucketName, identifier, user)
+	user.Username = strings.ToLower(user.Username)
+	return internal.UpdateObject(service.connection, BucketName, identifier, user)
 }
 
 // CreateUser creates a new user.
 func (service *Service) CreateUser(user *portainer.User) error {
-	return service.db.Update(func(tx *bolt.Tx) error {
+	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		id, _ := bucket.NextSequence()
 		user.ID = portainer.UserID(id)
+		user.Username = strings.ToLower(user.Username)
 
 		data, err := internal.MarshalObject(user)
 		if err != nil {
@@ -146,5 +152,5 @@ func (service *Service) CreateUser(user *portainer.User) error {
 // DeleteUser deletes a user.
 func (service *Service) DeleteUser(ID portainer.UserID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.db, BucketName, identifier)
+	return internal.DeleteObject(service.connection, BucketName, identifier)
 }

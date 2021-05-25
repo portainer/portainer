@@ -13,12 +13,13 @@ angular.module('portainer.docker').controller('ServicesController', [
     function getServices() {
       var agentProxy = $scope.applicationState.endpoint.mode.agentProxy;
 
-      $q.all({
-        services: ServiceService.services(),
-        tasks: TaskService.tasks(),
-        containers: agentProxy ? ContainerService.containers(1) : [],
-        nodes: NodeService.nodes(),
-      })
+      return $q
+        .all({
+          services: ServiceService.services(),
+          tasks: TaskService.tasks(),
+          containers: agentProxy ? ContainerService.containers(1) : [],
+          nodes: NodeService.nodes(),
+        })
         .then(function success(data) {
           var services = data.services;
           var tasks = data.tasks;

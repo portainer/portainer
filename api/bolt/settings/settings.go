@@ -1,10 +1,8 @@
 package settings
 
 import (
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
-
-	"github.com/boltdb/bolt"
 )
 
 const (
@@ -15,18 +13,18 @@ const (
 
 // Service represents a service for managing endpoint data.
 type Service struct {
-	db *bolt.DB
+	connection *internal.DbConnection
 }
 
 // NewService creates a new instance of a service.
-func NewService(db *bolt.DB) (*Service, error) {
-	err := internal.CreateBucket(db, BucketName)
+func NewService(connection *internal.DbConnection) (*Service, error) {
+	err := internal.CreateBucket(connection, BucketName)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Service{
-		db: db,
+		connection: connection,
 	}, nil
 }
 
@@ -34,7 +32,7 @@ func NewService(db *bolt.DB) (*Service, error) {
 func (service *Service) Settings() (*portainer.Settings, error) {
 	var settings portainer.Settings
 
-	err := internal.GetObject(service.db, BucketName, []byte(settingsKey), &settings)
+	err := internal.GetObject(service.connection, BucketName, []byte(settingsKey), &settings)
 	if err != nil {
 		return nil, err
 	}
@@ -44,5 +42,5 @@ func (service *Service) Settings() (*portainer.Settings, error) {
 
 // UpdateSettings persists a Settings object.
 func (service *Service) UpdateSettings(settings *portainer.Settings) error {
-	return internal.UpdateObject(service.db, BucketName, []byte(settingsKey), settings)
+	return internal.UpdateObject(service.connection, BucketName, []byte(settingsKey), settings)
 }

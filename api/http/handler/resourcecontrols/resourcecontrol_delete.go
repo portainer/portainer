@@ -6,11 +6,22 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 )
 
-// DELETE request on /api/resource_controls/:id
+// @id ResourceControlDelete
+// @summary Remove a resource control
+// @description Remove a resource control.
+// @description **Access policy**: administrator
+// @tags resource_controls
+// @security jwt
+// @param id path int true "Resource control identifier"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 404 "Resource control not found"
+// @failure 500 "Server error"
+// @router /resource_controls/{id} [delete]
 func (handler *Handler) resourceControlDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	resourceControlID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

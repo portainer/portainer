@@ -7,6 +7,10 @@ import (
 	"github.com/portainer/portainer/api/bolt/errors"
 )
 
+type DbConnection struct {
+	*bolt.DB
+}
+
 // Itob returns an 8-byte big endian representation of v.
 // This function is typically used for encoding integer IDs to byte slices
 // so that they can be used as BoltDB keys.
@@ -17,8 +21,8 @@ func Itob(v int) []byte {
 }
 
 // CreateBucket is a generic function used to create a bucket inside a bolt database.
-func CreateBucket(db *bolt.DB, bucketName string) error {
-	return db.Update(func(tx *bolt.Tx) error {
+func CreateBucket(connection *DbConnection, bucketName string) error {
+	return connection.Update(func(tx *bolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte(bucketName))
 		if err != nil {
 			return err
@@ -28,10 +32,10 @@ func CreateBucket(db *bolt.DB, bucketName string) error {
 }
 
 // GetObject is a generic function used to retrieve an unmarshalled object from a bolt database.
-func GetObject(db *bolt.DB, bucketName string, key []byte, object interface{}) error {
+func GetObject(connection *DbConnection, bucketName string, key []byte, object interface{}) error {
 	var data []byte
 
-	err := db.View(func(tx *bolt.Tx) error {
+	err := connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
 		value := bucket.Get(key)
@@ -52,8 +56,8 @@ func GetObject(db *bolt.DB, bucketName string, key []byte, object interface{}) e
 }
 
 // UpdateObject is a generic function used to update an object inside a bolt database.
-func UpdateObject(db *bolt.DB, bucketName string, key []byte, object interface{}) error {
-	return db.Update(func(tx *bolt.Tx) error {
+func UpdateObject(connection *DbConnection, bucketName string, key []byte, object interface{}) error {
+	return connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
 		data, err := MarshalObject(object)
@@ -71,18 +75,18 @@ func UpdateObject(db *bolt.DB, bucketName string, key []byte, object interface{}
 }
 
 // DeleteObject is a generic function used to delete an object inside a bolt database.
-func DeleteObject(db *bolt.DB, bucketName string, key []byte) error {
-	return db.Update(func(tx *bolt.Tx) error {
+func DeleteObject(connection *DbConnection, bucketName string, key []byte) error {
+	return connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 		return bucket.Delete(key)
 	})
 }
 
 // GetNextIdentifier is a generic function that returns the specified bucket identifier incremented by 1.
-func GetNextIdentifier(db *bolt.DB, bucketName string) int {
+func GetNextIdentifier(connection *DbConnection, bucketName string) int {
 	var identifier int
 
-	db.Update(func(tx *bolt.Tx) error {
+	connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 		id, err := bucket.NextSequence()
 		if err != nil {

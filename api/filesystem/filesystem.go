@@ -9,7 +9,7 @@ import (
 	"io/ioutil"
 
 	"github.com/gofrs/uuid"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 
 	"io"
 	"os"
@@ -504,4 +504,9 @@ func (service *Service) GetTemporaryPath() (string, error) {
 	}
 
 	return path.Join(service.fileStorePath, TempPath, uid.String()), nil
+}
+
+// GetDataStorePath returns path to data folder
+func (service *Service) GetDatastorePath() string {
+	return service.dataStorePath
 }

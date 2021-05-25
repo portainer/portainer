@@ -8,12 +8,14 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 type adminInitPayload struct {
-	Username string
-	Password string
+	// Username for the admin user
+	Username string `validate:"required" example:"admin"`
+	// Password for the admin user
+	Password string `validate:"required" example:"admin-password"`
 }
 
 func (payload *adminInitPayload) Validate(r *http.Request) error {
@@ -26,7 +28,19 @@ func (payload *adminInitPayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// POST request on /api/users/admin/init
+// @id UserAdminInit
+// @summary Initialize administrator account
+// @description Initialize the 'admin' user account.
+// @description **Access policy**: public
+// @tags
+// @accept json
+// @produce json
+// @param body body adminInitPayload true "User details"
+// @success 200 {object} portainer.User "Success"
+// @failure 400 "Invalid request"
+// @failure 409 "Admin user already initialized"
+// @failure 500 "Server error"
+// @router /users/admin/init [post]
 func (handler *Handler) adminInit(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload adminInitPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)

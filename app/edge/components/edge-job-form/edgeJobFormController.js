@@ -72,6 +72,7 @@ export class EdgeJobFormController {
 
   editorUpdate(cm) {
     this.model.FileContent = cm.getValue();
+    this.isEditorDirty = true;
   }
 
   associateEndpoint(endpoint) {

@@ -1,7 +1,7 @@
 package tag
 
 import (
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
 
 	"github.com/boltdb/bolt"
@@ -14,18 +14,18 @@ const (
 
 // Service represents a service for managing endpoint data.
 type Service struct {
-	db *bolt.DB
+	connection *internal.DbConnection
 }
 
 // NewService creates a new instance of a service.
-func NewService(db *bolt.DB) (*Service, error) {
-	err := internal.CreateBucket(db, BucketName)
+func NewService(connection *internal.DbConnection) (*Service, error) {
+	err := internal.CreateBucket(connection, BucketName)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Service{
-		db: db,
+		connection: connection,
 	}, nil
 }
 
@@ -33,7 +33,7 @@ func NewService(db *bolt.DB) (*Service, error) {
 func (service *Service) Tags() ([]portainer.Tag, error) {
 	var tags = make([]portainer.Tag, 0)
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		cursor := bucket.Cursor()
@@ -57,7 +57,7 @@ func (service *Service) Tag(ID portainer.TagID) (*portainer.Tag, error) {
 	var tag portainer.Tag
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.db, BucketName, identifier, &tag)
+	err := internal.GetObject(service.connection, BucketName, identifier, &tag)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (service *Service) Tag(ID portainer.TagID) (*portainer.Tag, error) {
 
 // CreateTag creates a new tag.
 func (service *Service) CreateTag(tag *portainer.Tag) error {
-	return service.db.Update(func(tx *bolt.Tx) error {
+	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		id, _ := bucket.NextSequence()
@@ -85,11 +85,11 @@ func (service *Service) CreateTag(tag *portainer.Tag) error {
 // UpdateTag updates a tag.
 func (service *Service) UpdateTag(ID portainer.TagID, tag *portainer.Tag) error {
 	identifier := internal.Itob(int(ID))
-	return internal.UpdateObject(service.db, BucketName, identifier, tag)
+	return internal.UpdateObject(service.connection, BucketName, identifier, tag)
 }
 
 // DeleteTag deletes a tag.
 func (service *Service) DeleteTag(ID portainer.TagID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.db, BucketName, identifier)
+	return internal.DeleteObject(service.connection, BucketName, identifier)
 }

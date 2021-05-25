@@ -11,7 +11,7 @@ import (
 func swarmInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// SwarmInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.30/#operation/SwarmInspect
-	responseObject, err := responseutils.GetResponseAsJSONOBject(response)
+	responseObject, err := responseutils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return err
 	}

@@ -79,6 +79,7 @@ const _KubernetesApplicationEnvironmentVariableFormValue = Object.freeze({
   IsSecret: false,
   NeedsDeletion: false,
   IsNew: true,
+  NameIndex: '', // keep the original name for sorting
 });
 
 export class KubernetesApplicationEnvironmentVariableFormValue {
@@ -152,9 +153,9 @@ export class KubernetesApplicationAutoScalerFormValue {
   }
 }
 
-export function KubernetesFormValueDuplicate() {
+export function KubernetesFormValidationReferences() {
   return {
     refs: {},
-    hasDuplicates: false,
+    hasRefs: false,
   };
 }
