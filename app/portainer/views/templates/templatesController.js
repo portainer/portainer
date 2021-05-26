@@ -243,10 +243,6 @@ angular.module('portainer.app').controller('TemplatesController', [
 
       $scope.formValues.name = template.Name ? template.Name : '';
       $scope.state.selectedTemplate = template;
-      console.log(`$scope.applicationState.endpoint`)
-      console.log($scope.applicationState.endpoint)
-      console.log(`template`)
-      console.log(template)
       $scope.state.deployable = isDeployable($scope.applicationState.endpoint, template.Type);
       $anchorScroll('view-top');
     };
@@ -264,8 +260,6 @@ angular.module('portainer.app').controller('TemplatesController', [
           deployable = endpoint.mode.provider === DOCKER_STANDALONE;
           break;
       }
-      console.log(`deployable`)
-      console.log(deployable)
       return deployable;
     }
 
