@@ -55,7 +55,7 @@ func TestService_ClonePublicRepository_Azure(t *testing.T) {
 			assert.NoError(t, err)
 			defer os.RemoveAll(dst)
 			repositoryUrl := fmt.Sprintf(tt.args.repositoryURLFormat, tt.args.password)
-			err = service.CloneRepository(repositoryUrl, tt.args.referenceName, dst, "", "")
+			err = service.CloneRepository(dst, repositoryUrl, tt.args.referenceName, "", "")
 			assert.NoError(t, err)
 			assert.FileExists(t, filepath.Join(dst, "README.md"))
 		})
@@ -73,7 +73,7 @@ func TestService_ClonePrivateRepository_Azure(t *testing.T) {
 	defer os.RemoveAll(dst)
 
 	repositoryUrl := "https://portainer.visualstudio.com/Playground/_git/dev_integration"
-	err = service.CloneRepository(repositoryUrl, "refs/heads/main", dst, "", pat)
+	err = service.CloneRepository(dst, repositoryUrl, "refs/heads/main", "", pat)
 	assert.NoError(t, err)
 	assert.FileExists(t, filepath.Join(dst, "README.md"))
 }

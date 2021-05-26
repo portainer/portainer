@@ -89,7 +89,7 @@ func NewService() *Service {
 
 // CloneRepository clones a git repository using the specified URL in the specified
 // destination folder.
-func (service *Service) CloneRepository(repositoryURL, referenceName, destination, username, password string) error {
+func (service *Service) CloneRepository(destination, repositoryURL, referenceName, username, password string) error {
 	options := cloneOptions{
 		repositoryUrl: repositoryURL,
 		username:      username,
