@@ -260,7 +260,6 @@ angular.module('portainer.app').controller('TemplatesController', [
           deployable = endpoint.mode.provider === DOCKER_STANDALONE;
           break;
       }
-
       return deployable;
     }
 
