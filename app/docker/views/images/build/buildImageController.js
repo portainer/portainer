@@ -79,6 +79,7 @@ angular.module('portainer.docker').controller('BuildImageController', [
             Notifications.error('An error occured during build', { msg: 'Please check build logs output' });
           } else {
             Notifications.success('Image successfully built');
+            $scope.state.isEditorDirty = false;
           }
         })
         .catch(function error(err) {
