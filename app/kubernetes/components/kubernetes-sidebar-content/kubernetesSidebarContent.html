@@ -18,7 +18,7 @@
   <div
     ng-if="
       $ctrl.adminAccess &&
-      ['kubernetes.cluster', 'portainer.endpoints.endpoint.kubernetesConfig', 'kubernetes.registries', 'kubernetes.registries.access'].includes($ctrl.currentRouteName)
+      ['kubernetes.cluster', 'portainer.endpoints.endpoint.kubernetesConfig', 'kubernetes.registries', 'kubernetes.registries.access'].includes($ctrl.currentState)
     "
   >
     <div class="sidebar-sublist">

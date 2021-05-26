@@ -65,9 +65,7 @@ class PorAccessManagementController {
           if (!userRole && !teamRole) {
             return false;
           }
-          const roleId = (userRole && userRole.RoleId) || (teamRole && teamRole.RoleId);
-          const role = _.find(this.roles, { Id: roleId });
-          return role && (role.Authorizations['DockerImageCreate'] || role.Authorizations['DockerImagePush']) && !role.Authorizations['EndpointResourcesAccess'];
+          return userRole || teamRole;
         });
       }
       this.availableUsersAndTeams = _.orderBy(data.availableUsersAndTeams, 'Name', 'asc');
