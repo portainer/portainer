@@ -11,14 +11,14 @@ import (
 func Test_updateEndpointRelation_successfulRuns(t *testing.T) {
 	edgeStackID := portainer.EdgeStackID(5)
 	endpointRelations := []portainer.EndpointRelation{
-		{EndpointID: portainer.EndpointID(1), EdgeStacks: map[portainer.EdgeStackID]bool{}},
-		{EndpointID: portainer.EndpointID(2), EdgeStacks: map[portainer.EdgeStackID]bool{}},
-		{EndpointID: portainer.EndpointID(3), EdgeStacks: map[portainer.EdgeStackID]bool{}},
-		{EndpointID: portainer.EndpointID(4), EdgeStacks: map[portainer.EdgeStackID]bool{}},
-		{EndpointID: portainer.EndpointID(5), EdgeStacks: map[portainer.EdgeStackID]bool{}},
+		{EndpointID: 1, EdgeStacks: map[portainer.EdgeStackID]bool{}},
+		{EndpointID: 2, EdgeStacks: map[portainer.EdgeStackID]bool{}},
+		{EndpointID: 3, EdgeStacks: map[portainer.EdgeStackID]bool{}},
+		{EndpointID: 4, EdgeStacks: map[portainer.EdgeStackID]bool{}},
+		{EndpointID: 5, EdgeStacks: map[portainer.EdgeStackID]bool{}},
 	}
 
-	relatedIds := []portainer.EndpointID{portainer.EndpointID(2), portainer.EndpointID(3)}
+	relatedIds := []portainer.EndpointID{2, 3}
 
 	dataStore := testhelpers.NewDatastore(testhelpers.WithEndpointRelations(endpointRelations))
 
