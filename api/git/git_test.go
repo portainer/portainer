@@ -60,7 +60,7 @@ func Test_ClonePublicRepository_Shallow(t *testing.T) {
 	}
 	defer os.RemoveAll(dir)
 	t.Logf("Cloning into %s", dir)
-	err = service.CloneRepository(repositoryURL, referenceName, dir, "", "")
+	err = service.CloneRepository(dir, repositoryURL, referenceName, "", "")
 	assert.NoError(t, err)
 	assert.Equal(t, 1, getCommitHistoryLength(t, err, dir), "cloned repo has incorrect depth")
 }
@@ -79,7 +79,7 @@ func Test_ClonePublicRepository_NoGitDirectory(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	t.Logf("Cloning into %s", dir)
-	err = service.CloneRepository(repositoryURL, referenceName, dir, "", "")
+	err = service.CloneRepository(dir, repositoryURL, referenceName, "", "")
 	assert.NoError(t, err)
 	assert.NoDirExists(t, filepath.Join(dir, ".git"))
 }
