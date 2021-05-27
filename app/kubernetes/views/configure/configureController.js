@@ -139,8 +139,15 @@ class KubernetesConfigureController {
   }
 
   async removeIngressesAcrossNamespaces() {
-    const promises = [];
     const ingressesToDel = _.filter(this.formValues.IngressClasses, { NeedsDeletion: true });
+
+    if (!ingressesToDel.length) {
+      return;
+    }
+
+    const promises = [];
+    const oldEndpointID = this.EndpointProvider.endpointID();
+    this.EndpointProvider.setEndpointID(this.endpoint.Id);
     const allResourcePools = await this.KubernetesResourcePoolService.get();
     const resourcePools = _.filter(
       allResourcePools,
@@ -157,9 +164,12 @@ class KubernetesConfigureController {
     const responses = await Promise.allSettled(promises);
     responses.forEach((respons) => {
       if (respons.status == 'rejected' && respons.reason.err.status != 404) {
+        this.EndpointProvider.setEndpointID(oldEndpointID);
         throw respons.reason;
       }
     });
+
+    this.EndpointProvider.setEndpointID(oldEndpointID);
   }
 
   async configureAsync() {
