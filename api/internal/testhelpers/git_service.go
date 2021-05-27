@@ -7,6 +7,6 @@ func NewGitService() *gitService {
 	return &gitService{}
 }
 
-func (service *gitService) CloneRepository(destination string, repositoryURL, referenceName string, auth bool, username, password string) error {
+func (service *gitService) CloneRepository(destination string, repositoryURL, referenceName string, username, password string) error {
 	return nil
 }
