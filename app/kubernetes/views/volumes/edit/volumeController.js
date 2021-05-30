@@ -54,6 +54,10 @@ class KubernetesVolumeController {
     return KubernetesVolumeHelper.isExternalVolume(this.volume);
   }
 
+  isNFSVolume() {
+    return KubernetesVolumeHelper.isNFSVolume(this.volume);
+  }
+
   isSystemNamespace() {
     return this.KubernetesNamespaceHelper.isSystemNamespace(this.volume.ResourcePool.Namespace.Name);
   }

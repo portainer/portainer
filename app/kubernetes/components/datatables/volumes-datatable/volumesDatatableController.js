@@ -4,12 +4,13 @@ import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
 // TODO: review - refactor to use `extends GenericDatatableController`
 class KubernetesVolumesDatatableController {
   /* @ngInject */
-  constructor($async, $controller, Authentication, KubernetesNamespaceHelper, DatatableService) {
+  constructor($async, $controller, Authentication, KubernetesNamespaceHelper, DatatableService, EndpointProvider) {
     this.$async = $async;
     this.$controller = $controller;
     this.Authentication = Authentication;
     this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
     this.DatatableService = DatatableService;
+    this.EndpointProvider = EndpointProvider;
 
     this.onInit = this.onInit.bind(this);
     this.allowSelection = this.allowSelection.bind(this);
@@ -40,6 +41,10 @@ class KubernetesVolumesDatatableController {
     return KubernetesVolumeHelper.isExternalVolume(item);
   }
 
+  isNFSVolume(item) {
+    return KubernetesVolumeHelper.isNFSVolume(item);
+  }
+
   allowSelection(item) {
     return !this.disableRemove(item);
   }
@@ -49,6 +54,8 @@ class KubernetesVolumesDatatableController {
     this.prepareTableFromDataset();
     this.isAdmin = this.Authentication.isAdmin();
     this.settings.showSystem = false;
+    const endpoint = this.EndpointProvider.currentEndpoint();
+    this.storageClasses = endpoint.Kubernetes.Configuration.StorageClasses;
 
     this.state.orderBy = this.orderBy;
     var storedOrder = this.DatatableService.getDataTableOrder(this.tableKey);

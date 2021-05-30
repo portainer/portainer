@@ -91,14 +91,13 @@ class KubernetesVolumesController {
         this.KubernetesApplicationService.get(),
         this.KubernetesStorageService.get(this.state.endpointId),
       ]);
-
       this.volumes = _.map(volumes, (volume) => {
         volume.Applications = KubernetesVolumeHelper.getUsingApplications(volume, applications);
         return volume;
       });
       this.storages = buildStorages(storages, volumes);
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retreive resource pools');
+      this.Notifications.error('Failure', err, 'Unable to retrieve volumes');
     }
   }
 

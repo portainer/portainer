@@ -23,6 +23,7 @@
                       <td>
                         {{ ctrl.volume.PersistentVolumeClaim.Name }}
                         <span class="label label-primary image-tag label-margins" ng-if="!ctrl.isSystemNamespace() && ctrl.isExternalVolume()">external</span>
+                        <span class="label label-primary image-tag label-margins" ng-if="!ctrl.isSystemNamespace() && ctrl.isNFSVolume()">NFS</span>
                         <span class="label label-warning image-tag label-margins" ng-if="!ctrl.isSystemNamespace() && !ctrl.isUsed()">unused</span>
                       </td>
                     </tr>
@@ -33,11 +34,11 @@
                         <span style="margin-left: 5px;" class="label label-info image-tag" ng-if="ctrl.isSystemNamespace(item)">system</span>
                       </td>
                     </tr>
-                    <tr>
+                    <tr ng-if="ctrl.volume.PersistentVolumeClaim.StorageClass">
                       <td>Storage</td>
                       <td>{{ ctrl.volume.PersistentVolumeClaim.StorageClass.Name }}</td>
                     </tr>
-                    <tr>
+                    <tr ng-if="ctrl.volume.PersistentVolumeClaim.StorageClass">
                       <td>Shared Access Policy</td>
                       <td
                         >{{ ctrl.state.volumeSharedAccessPolicy }}
@@ -112,6 +113,14 @@
                           </div>
                         </form>
                       </td>
+                    </tr>
+                    <tr ng-if="ctrl.isNFSVolume()">
+                      <td>NFS Address</td>
+                      <td>{{ ctrl.volume.PersistentVolume.NFSAddress }}</td>
+                    </tr>
+                    <tr ng-if="ctrl.isNFSVolume()">
+                      <td>NFS Mount point</td>
+                      <td>{{ ctrl.volume.PersistentVolume.NFSMountPoint }}</td>
                     </tr>
                   </tbody>
                 </table>

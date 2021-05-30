@@ -54,6 +54,7 @@
         <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.volumes.new"> <i class="fa fa-plus space-right" aria-hidden="true"></i>Add NFS volume </button>
       </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
@@ -134,6 +135,7 @@
                 }}</a>
                 <span class="label label-info image-tag label-margins" ng-if="$ctrl.isSystemNamespace(item)">system</span>
                 <span class="label label-primary image-tag label-margins" ng-if="!$ctrl.isSystemNamespace(item) && $ctrl.isExternalVolume(item)">external</span>
+                <span class="label label-primary image-tag label-margins" ng-if="!$ctrl.isSystemNamespace(item) && $ctrl.isNFSVolume(item)">NFS</span>
                 <span class="label label-warning image-tag label-margins" ng-if="!$ctrl.isSystemNamespace(item) && !$ctrl.isUsed(item)">unused</span>
               </td>
               <td>
@@ -149,7 +151,7 @@
                 <span ng-if="!item.Applications.length">-</span>
               </td>
               <td>
-                {{ item.PersistentVolumeClaim.StorageClass.Name }}
+                {{ item.PersistentVolumeClaim.StorageClass.Name || '-' }}
               </td>
               <td>
                 {{ item.PersistentVolumeClaim.Storage }}

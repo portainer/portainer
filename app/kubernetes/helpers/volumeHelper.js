@@ -1,6 +1,7 @@
 import _ from 'lodash-es';
 import uuidv4 from 'uuid/v4';
 import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
+import KubernetesCommonHelper from './commonHelper';
 
 class KubernetesVolumeHelper {
   // TODO: review
@@ -31,6 +32,15 @@ class KubernetesVolumeHelper {
 
   static isExternalVolume(volume) {
     return !volume.PersistentVolumeClaim.ApplicationOwner;
+  }
+
+  static isNFSVolume(volume) {
+    return volume.PersistentVolume.NFSAddress;
+  }
+
+  static generateVolumeName(name) {
+    const n = `${name}-${uuidv4()}`;
+    return KubernetesCommonHelper.formatToDnsSubdomainName(n);
   }
 }
 
