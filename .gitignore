@@ -13,3 +13,4 @@ test/e2e/cypress/screenshots
 *.db
 *.log
 .env
+__debug_bin

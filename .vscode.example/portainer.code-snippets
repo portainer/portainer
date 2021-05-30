@@ -21,11 +21,11 @@
     "description": "Dummy Angularjs Component",
     "body": [
       "import angular from 'angular';",
-      "import ${TM_FILENAME_BASE/(.*)/${1:/capitalize}/}Controller from './${TM_FILENAME_BASE}Controller'",
+      "import controller from './${TM_FILENAME_BASE}Controller'",
       "",
       "angular.module('portainer.${TM_DIRECTORY/.*\\/app\\/([^\\/]*)(\\/.*)?$/$1/}').component('$TM_FILENAME_BASE', {",
       "  templateUrl: './$TM_FILENAME_BASE.html',",
-      "  controller: ${TM_FILENAME_BASE/(.*)/${1:/capitalize}/}Controller,",
+      "  controller,",
       "});",
       ""
     ]
@@ -43,25 +43,6 @@
       "export default ${TM_FILENAME_BASE/(.*)/${1:/capitalize}/};"
     ],
     "description": "Dummy ES6+ controller"
-  },
-  "Model": {
-    "scope": "javascript",
-    "prefix": "mymodel",
-    "description": "Dummy ES6+ model",
-    "body": [
-      "/**",
-      " * $1 Model",
-      " */",
-      "const _$1 = Object.freeze({",
-      "  $0",
-      "});",
-      "",
-      "export class $1 {",
-      "  constructor() {",
-      "    Object.assign(this, JSON.parse(JSON.stringify(_$1)));",
-      "  }",
-      "}"
-    ]
   },
   "Service": {
     "scope": "javascript",
