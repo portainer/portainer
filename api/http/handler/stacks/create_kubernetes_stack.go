@@ -5,9 +5,10 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
+	"strconv"
+	"time"
 
 	"github.com/asaskevich/govalidator"
-	"github.com/gofrs/uuid"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -85,13 +86,18 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
 	}
 
-	tmpDirName, err := uuid.NewV4()
-	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to create temp directory for Git clone", Err: err}
-	}
+	stackID := handler.DataStore.Stack().GetNextIdentifier()
 	stack := &portainer.Stack{
-		ProjectPath: handler.FileService.GetStackProjectPath(tmpDirName.String()),
+		ID:           portainer.StackID(stackID),
+		Type:         portainer.KubernetesStack,
+		EndpointID:   endpoint.ID,
+		EntryPoint:   payload.FilePathInRepository,
+		Status:       portainer.StackStatusActive,
+		CreationDate: time.Now().Unix(),
 	}
+
+	projectPath := handler.FileService.GetStackProjectPath(strconv.Itoa(int(stack.ID)))
+	stack.ProjectPath = projectPath
 
 	doCleanUp := true
 	defer handler.cleanUp(stack, &doCleanUp)
@@ -104,6 +110,11 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 	output, err := handler.deployKubernetesStack(endpoint, stackFileContent, payload.ComposeFormat, payload.Namespace)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to deploy Kubernetes stack", Err: err}
+	}
+
+	err = handler.DataStore.Stack().CreateStack(stack)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist the stack inside the database", Err: err}
 	}
 
 	resp := &createKubernetesStackResponse{
