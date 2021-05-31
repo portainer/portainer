@@ -42,7 +42,10 @@ func (transport *agentTransport) RoundTrip(request *http.Request) (*http.Respons
 	request.Header.Set(portainer.PortainerAgentKubernetesSATokenHeader, token)
 
 	if strings.HasPrefix(request.URL.Path, "/v2") {
-		decorateAgentRequest(request, transport.dataStore)
+		err := decorateAgentRequest(request, transport.dataStore)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	signature, err := transport.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)

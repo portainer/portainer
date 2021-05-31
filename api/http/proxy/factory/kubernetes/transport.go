@@ -8,10 +8,11 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"path"
 	"regexp"
+	"strconv"
 	"strings"
 
-	"github.com/portainer/libhttp/request"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 
@@ -130,21 +131,31 @@ func decorateAgentRequest(r *http.Request, dataStore portainer.DataStore) error 
 
 	switch {
 	case strings.HasPrefix(requestPath, "/dockerhub"):
-		decorateAgentDockerHubRequest(r, dataStore)
+		return decorateAgentDockerHubRequest(r, dataStore)
 	}
 
 	return nil
 }
 
 func decorateAgentDockerHubRequest(r *http.Request, dataStore portainer.DataStore) error {
-	registryID, err := request.RetrieveNumericRouteVariableValue(r, "registryId")
+	requestPath, registryIdString := path.Split(r.URL.Path)
+
+	registryID, err := strconv.Atoi(registryIdString)
 	if err != nil {
-		return err
+		return fmt.Errorf("missing registry id: %w", err)
 	}
 
-	registry, err := dataStore.Registry().Registry(portainer.RegistryID(registryID))
-	if err != nil {
-		return err
+	r.URL.Path = strings.TrimSuffix(requestPath, "/")
+
+	registry := &portainer.Registry{
+		Type: portainer.DockerHubRegistry,
+	}
+
+	if registryID != 0 {
+		registry, err = dataStore.Registry().Registry(portainer.RegistryID(registryID))
+		if err != nil {
+			return fmt.Errorf("failed fetching registry: %w", err)
+		}
 	}
 
 	if registry.Type != portainer.DockerHubRegistry {
@@ -153,11 +164,10 @@ func decorateAgentDockerHubRequest(r *http.Request, dataStore portainer.DataStor
 
 	newBody, err := json.Marshal(registry)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed marshaling registry: %w", err)
 	}
 
 	r.Method = http.MethodPost
-
 	r.Body = ioutil.NopCloser(bytes.NewReader(newBody))
 	r.ContentLength = int64(len(newBody))
 
