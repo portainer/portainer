@@ -39,7 +39,10 @@ func (transport *edgeTransport) RoundTrip(request *http.Request) (*http.Response
 	request.Header.Set(portainer.PortainerAgentKubernetesSATokenHeader, token)
 
 	if strings.HasPrefix(request.URL.Path, "/v2") {
-		decorateAgentRequest(request, transport.dataStore)
+		err := decorateAgentRequest(request, transport.dataStore)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	response, err := transport.baseTransport.RoundTrip(request)
