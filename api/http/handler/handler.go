@@ -121,8 +121,6 @@ type Handler struct {
 // @tag.description Manage Portainer settings
 // @tag.name status
 // @tag.description Information about the Portainer instance
-// @tag.name docker_stacks
-// @tag.description Manage Docker stacks
 // @tag.name users
 // @tag.description Manage users
 // @tag.name tags
