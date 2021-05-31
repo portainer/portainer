@@ -123,6 +123,12 @@
               is-editor-dirty="ctrl.state.isEditorDirty"
             ></kubernetes-configuration-data>
 
+            <!-- summary -->
+            <kubernetes-summary-view
+              ng-if="!(!kubernetesConfigurationCreationForm.$valid || !ctrl.isFormValid() || ctrl.state.actionInProgress)"
+              form-values="ctrl.formValues"
+            ></kubernetes-summary-view>
+
             <!-- actions -->
             <div class="col-sm-12 form-section-title" style="margin-top: 10px;">
               Actions

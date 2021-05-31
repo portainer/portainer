@@ -1543,6 +1543,13 @@
             </div>
             <!-- #endregion -->
 
+            <!-- summary -->
+            <kubernetes-summary-view
+              ng-if="!(!kubernetesApplicationCreationForm.$valid || ctrl.isDeployUpdateButtonDisabled() || !ctrl.state.pullImageValidity)"
+              form-values="ctrl.formValues"
+              old-form-values="ctrl.savedFormValues"
+            ></kubernetes-summary-view>
+
             <div class="col-sm-12 form-section-title">
               Actions
             </div>
