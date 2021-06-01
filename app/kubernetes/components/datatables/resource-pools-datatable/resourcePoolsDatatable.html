@@ -55,7 +55,7 @@
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
         <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.resourcePools.new">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add resource pool
+          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add namespace
         </button>
       </div>
       <div class="searchBar">
@@ -130,7 +130,7 @@
               <td colspan="4" class="text-center text-muted">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="4" class="text-center text-muted">No resource pool available.</td>
+              <td colspan="4" class="text-center text-muted">No namespace available.</td>
             </tr>
           </tbody>
         </table>
