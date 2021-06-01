@@ -86,7 +86,7 @@ function getUpdatedApplicationResources(oldFormValues, newFormValues) {
   const resources = [];
 
   const [oldApp, oldHeadlessService, oldService, oldClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(oldFormValues);
-  const [newApp /* newHeadlessService */, , newService, newClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(newFormValues);
+  const [newApp, /* newHeadlessService */, newService, newClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(newFormValues);
 
   const oldAppResourceType = getApplicationResourceType(oldApp);
   const newAppResourceType = getApplicationResourceType(newApp);
@@ -101,6 +101,7 @@ function getUpdatedApplicationResources(oldFormValues, newFormValues) {
     // re-creation of resources
     const createdApplicationResourceSummary = getCreatedApplicationResources(newFormValues);
     resources.push(...createdApplicationResourceSummary);
+    return resources;
   }
 
   if (newApp instanceof KubernetesStatefulSet) {
