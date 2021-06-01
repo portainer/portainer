@@ -17,8 +17,8 @@ module.exports = function (grunt) {
     root: 'dist',
     distdir: 'dist/public',
     binaries: {
-      dockerLinuxVersion: '18.09.3',
-      dockerWindowsVersion: '17.09.0-ce',
+      dockerLinuxVersion: '19.03.13',
+      dockerWindowsVersion: '19-03-12',
       dockerLinuxComposeVersion: '1.27.4',
       dockerWindowsComposeVersion: '1.28.0',
       komposeVersion: 'v1.22.0',
