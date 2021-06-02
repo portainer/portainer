@@ -279,12 +279,16 @@ angular.module('portainer.app').factory('StackService', [
         Name: name,
         RepositoryURL: repositoryOptions.RepositoryURL,
         RepositoryReferenceName: repositoryOptions.RepositoryReferenceName,
-        ComposeFilePathInRepository: repositoryOptions.ComposeFilePathInRepository,
+        ComposeFile: repositoryOptions.ComposeFilePathInRepository,
+        AdditionalFiles: repositoryOptions.AdditionalFiles,
         RepositoryAuthentication: repositoryOptions.RepositoryAuthentication,
         RepositoryUsername: repositoryOptions.RepositoryUsername,
         RepositoryPassword: repositoryOptions.RepositoryPassword,
         Env: env,
       };
+      if (repositoryOptions.AutoUpdate) {
+        payload.AutoUpdate = repositoryOptions.AutoUpdate;
+      }
       return Stack.create({ method: 'repository', type: 2, endpointId: endpointId }, payload).$promise;
     };
 
@@ -299,12 +303,16 @@ angular.module('portainer.app').factory('StackService', [
             SwarmID: swarm.Id,
             RepositoryURL: repositoryOptions.RepositoryURL,
             RepositoryReferenceName: repositoryOptions.RepositoryReferenceName,
-            ComposeFilePathInRepository: repositoryOptions.ComposeFilePathInRepository,
+            ComposeFile: repositoryOptions.ComposeFilePathInRepository,
+            AdditionalFiles: repositoryOptions.AdditionalFiles,
             RepositoryAuthentication: repositoryOptions.RepositoryAuthentication,
             RepositoryUsername: repositoryOptions.RepositoryUsername,
             RepositoryPassword: repositoryOptions.RepositoryPassword,
             Env: env,
           };
+          if (repositoryOptions.AutoUpdate) {
+            payload.AutoUpdate = repositoryOptions.AutoUpdate;
+          }
           return Stack.create({ method: 'repository', type: 1, endpointId: endpointId }, payload).$promise;
         })
         .then(function success(data) {

@@ -7,7 +7,7 @@
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-body>
-        <form class="form-horizontal">
+        <form class="form-horizontal" name="createStackForm">
           <!-- name-input -->
           <div class="form-group">
             <label for="stack_name" class="col-sm-1 control-label text-left">Name</label>
@@ -175,6 +175,32 @@
                 <input type="text" class="form-control" ng-model="formValues.ComposeFilePathInRepository" id="stack_repository_path" placeholder="docker-compose.yml" />
               </div>
             </div>
+            <!-- additional paths-variables -->
+            <div>
+              <div class="form-group">
+                <div class="col-sm-12" style="margin-top: 5px;">
+                  <label class="control-label text-left">Additional paths</label>
+                  <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addAdditionalFiles()">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i> add file
+                  </span>
+                </div>
+                <!-- additional-paths-variable-input-list -->
+                <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                  <div ng-repeat="variable in formValues.AdditionalFiles track by $index" style="margin-top: 2px;">
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">path</span>
+                      <input id="ipv6_network_auxaddr_{{ $index }}" type="text" class="form-control" ng-model="formValues.AdditionalFiles[$index]" />
+                    </div>
+                    <button class="btn btn-sm btn-danger" type="button" ng-click="removeAdditionalFiles($index)">
+                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- !additional-paths-variable-input-list -->
+              </div>
+            </div>
+            <!-- !additional-variables -->
+
             <div class="form-group">
               <div class="col-sm-12">
                 <label class="control-label text-left">
@@ -183,22 +209,99 @@
                 <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.RepositoryAuthentication" /><i></i> </label>
               </div>
             </div>
+
             <div class="form-group" ng-if="formValues.RepositoryAuthentication">
-              <span class="col-sm-12 text-muted small">
-                If your git account has 2FA enabled, you may receive an <code>authentication required</code> error when deploying your stack. In this case, you will need to provide
-                a personal-access token instead of your password.
-              </span>
+              <label for="repository_username" class="col-sm-2 control-label text-left">Username</label>
+              <div class="col-sm-3">
+                <input type="text" class="form-control" ng-model="formValues.RepositoryUsername" name="repository_username" placeholder="git username" />
+              </div>
             </div>
             <div class="form-group" ng-if="formValues.RepositoryAuthentication">
-              <label for="repository_username" class="col-sm-1 control-label text-left">Username</label>
-              <div class="col-sm-11 col-md-5">
-                <input type="text" class="form-control" ng-model="formValues.RepositoryUsername" name="repository_username" placeholder="myGitUser" />
-              </div>
-              <label for="repository_password" class="col-sm-1 control-label text-left">
-                Password
+              <label for="repository_personal_access_token" class="col-sm-2 control-label text-left">
+                Personal Access Token
+                <portainer-tooltip position="bottom" message="Provide a personal access token or password"></portainer-tooltip>
               </label>
-              <div class="col-sm-11 col-md-5">
-                <input type="password" class="form-control" ng-model="formValues.RepositoryPassword" name="repository_password" placeholder="myPassword" />
+              <div class="col-sm-3">
+                <input
+                  type="password"
+                  class="form-control"
+                  ng-model="formValues.RepositoryPersonalAccessToken"
+                  name="repository_personal_access_token"
+                  placeholder="personal access token"
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label class="control-label text-left">
+                  Automatic updates
+                </label>
+                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.RepositoryAutomaticUpdates" /><i></i> </label>
+              </div>
+            </div>
+            <div class="small text-warning" style="margin-top: 5px;" ng-if="formValues.RepositoryAutomaticUpdates">
+              <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+              <span class="text-muted">Enabling automatic updates will store the credentials and it is advisable to use a git service account.</span>
+            </div>
+            <div class="small text-warning" style="margin: 5px 0 10px 0;" ng-if="formValues.RepositoryAutomaticUpdates">
+              <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+              <span class="text-muted">Any changes to this stack made locally in Portainer will be overriden by the definition in git and may cause service interruption.</span>
+            </div>
+
+            <div class="form-group" ng-if="formValues.RepositoryAutomaticUpdates">
+              <label for="repository_mechanism" class="col-sm-2 control-label text-left">
+                Mechanism
+              </label>
+              <div class="col-sm-3">
+                <div class="input-group col-sm-10 input-group-sm">
+                  <div class="btn-group btn-group-sm">
+                    <label class="btn btn-primary" ng-model="formValues.RepositoryMechanism" uib-btn-radio="'Interval'">Polling</label>
+                    <label class="btn btn-primary" ng-model="formValues.RepositoryMechanism" uib-btn-radio="'Webhook'">Webhook</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" ng-if="formValues.RepositoryMechanism === 'Webhook'">
+              <label for="repository_mechanism" class="col-sm-2 control-label text-left">
+                Webhook
+              </label>
+              <div class="col-sm-3">
+                <span class="text-muted"> {{ formValues.RepositoryWebhookURL | truncatelr }} </span>
+                <button type="button" class="btn btn-sm btn-primary btn-sm space-left" ng-if="formValues.RepositoryWebhookURL" ng-click="copyWebhook()">
+                  <span><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy link</span>
+                </button>
+                <span>
+                  <i id="copyNotification" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none;"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="form-group" ng-if="formValues.RepositoryMechanism === 'Interval'">
+              <label for="repository_fetch_interval" class="col-sm-2 control-label text-left">
+                Fetch interval
+              </label>
+              <div class="col-sm-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="formValues.RepositoryFetchInterval"
+                  name="repository_fetch_interval"
+                  placeholder="5m"
+                  required
+                  intervalformat
+                  minimumInterval
+                />
+              </div>
+            </div>
+            <div class="form-group col-md-12" ng-show="createStackForm.repository_fetch_interval.$invalid">
+              <div class="small text-warning">
+                <div ng-messages="createStackForm.repository_fetch_interval.$error">
+                  <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                  <p ng-message="invalidIntervalFormat"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Please enter a valid time interval.</p>
+                  <p ng-message="minimumInterval"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Minimum interval is 1m</p>
+                </div>
               </div>
             </div>
           </div>
