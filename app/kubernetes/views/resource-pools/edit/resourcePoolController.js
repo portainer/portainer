@@ -24,7 +24,7 @@ class KubernetesResourcePoolController {
     Authentication,
     Notifications,
     LocalStorage,
-    EndpointProvider,
+    EndpointService,
     ModalService,
     RegistryService,
     KubernetesNodeService,
@@ -43,7 +43,7 @@ class KubernetesResourcePoolController {
       Authentication,
       Notifications,
       LocalStorage,
-      EndpointProvider,
+      EndpointService,
       ModalService,
       RegistryService,
       KubernetesNodeService,
@@ -279,7 +279,22 @@ class KubernetesResourcePoolController {
   getRegistries() {
     return this.$async(async () => {
       try {
-        this.registries = await this.RegistryService.registries();
+        const namespace = this.$state.params.id;
+
+        if (this.isAdmin) {
+          this.registries = await this.RegistryService.registries();
+          this.registries.forEach((reg) => {
+            if (reg.RegistryAccesses && reg.RegistryAccesses[this.endpoint.Id] && reg.RegistryAccesses[this.endpoint.Id].Namespaces.includes(namespace)) {
+              reg.Checked = true;
+              this.formValues.Registries.push(reg);
+            }
+          });
+
+          return;
+        }
+
+        const registries = await this.EndpointService.registries(this.endpoint.Id, namespace);
+        this.selectedRegistries = registries.map((r) => r.Name).join(', ');
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to retrieve registries');
       }
@@ -291,8 +306,7 @@ class KubernetesResourcePoolController {
   $onInit() {
     return this.$async(async () => {
       try {
-        const endpoint = this.EndpointProvider.currentEndpoint();
-        this.endpoint = endpoint;
+        const endpoint = this.endpoint;
         this.isAdmin = this.Authentication.isAdmin();
 
         this.state = {
@@ -364,12 +378,6 @@ class KubernetesResourcePoolController {
         }
 
         await this.getRegistries();
-        _.forEach(this.registries, (reg) => {
-          if (reg.RegistryAccesses && reg.RegistryAccesses[this.endpoint.Id] && reg.RegistryAccesses[this.endpoint.Id].Namespaces.includes(name)) {
-            reg.Checked = true;
-            this.formValues.Registries.push(reg);
-          }
-        });
 
         this.savedFormValues = angular.copy(this.formValues);
       } catch (err) {
