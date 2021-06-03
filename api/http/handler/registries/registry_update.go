@@ -14,11 +14,11 @@ import (
 )
 
 type registryUpdatePayload struct {
-	Name               *string                      `json:",omitempty"`
-	URL                *string                      `json:",omitempty"`
-	Authentication     *bool                        `json:",omitempty"`
-	Username           *string                      `json:",omitempty"`
-	Password           *string                      `json:",omitempty"`
+	Name               *string                      `json:",omitempty" example:"my-registry" validate:"required"`
+	URL                *string                      `json:",omitempty" example:"registry.mydomain.tld:2375" validate:"required"`
+	Authentication     *bool                        `json:",omitempty" example:"false" validate:"required"`
+	Username           *string                      `json:",omitempty" example:"registry_user"`
+	Password           *string                      `json:",omitempty" example:"registry_password"`
 	UserAccessPolicies portainer.UserAccessPolicies `json:",omitempty"`
 	TeamAccessPolicies portainer.TeamAccessPolicies `json:",omitempty"`
 }
@@ -27,7 +27,22 @@ func (payload *registryUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// PUT request on /api/registries/:id
+// @id RegistryUpdate
+// @summary Update a registry
+// @description Update a registry
+// @description **Access policy**: administrator
+// @tags registries
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "Registry identifier"
+// @param body body registryUpdatePayload true "Registry details"
+// @success 200 {object} portainer.Registry "Success"
+// @failure 400 "Invalid request"
+// @failure 404 "Registry not found"
+// @failure 409 "Another registry with the same URL already exists"
+// @failure 500 "Server error"
+// @router /registries/{id} [put]
 func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	registryID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

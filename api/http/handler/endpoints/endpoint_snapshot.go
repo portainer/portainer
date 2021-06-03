@@ -12,7 +12,18 @@ import (
 	"github.com/portainer/portainer/api/internal/snapshot"
 )
 
-// POST request on /api/endpoints/:id/snapshot
+// @id EndpointSnapshot
+// @summary Snapshots an endpoint
+// @description Snapshots an endpoint
+// @description **Access policy**: restricted
+// @tags endpoints
+// @security jwt
+// @param id path int true "Endpoint identifier"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 404 "Endpoint not found"
+// @failure 500 "Server error"
+// @router /endpoints/{id}/snapshot [post]
 func (handler *Handler) endpointSnapshot(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

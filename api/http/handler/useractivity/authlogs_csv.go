@@ -21,7 +21,7 @@ import (
 // @param sortBy query string false "Sort by this column" Enum("Type", "Timestamp", "Origin", "Context", "Username", "Result")
 // @param sortDesc query bool false "Sort order, if true will return results by descending order"
 // @param keyword query string false "Query logs by this keyword"
-// @success 200 string "Success"
+// @success 200 "Success"
 // @failure 500 "Server error"
 // @router /useractivity/authlogs.csv [get]
 func (handler *Handler) authLogsCSV(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

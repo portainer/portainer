@@ -30,7 +30,6 @@ func (payload *endpointExtensionAddPayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// POST request on /api/endpoints/:id/extensions
 func (handler *Handler) endpointExtensionAdd(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

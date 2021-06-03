@@ -33,6 +33,18 @@ func (payload *edgeGroupCreatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
+// @id EdgeGroupCreate
+// @summary Create an EdgeGroup
+// @description
+// @tags edge_groups
+// @security jwt
+// @accept json
+// @produce json
+// @param body body edgeGroupCreatePayload true "EdgeGroup data"
+// @success 200 {object} portainer.EdgeGroup
+// @failure 503 Edge compute features are disabled
+// @failure 500
+// @router /edge_groups [post]
 func (handler *Handler) edgeGroupCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload edgeGroupCreatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)

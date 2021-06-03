@@ -11,7 +11,18 @@ import (
 	"github.com/portainer/portainer/api/http/useractivity"
 )
 
-// DELETE request on /api/teams/:id
+// @id TeamDelete
+// @summary Remove a team
+// @description Remove a team.
+// @description **Access policy**: administrator
+// @tags teams
+// @security jwt
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 "Team not found"
+// @failure 500 "Server error"
+// @router /teams/{id} [delete]
 func (handler *Handler) teamDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	teamID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

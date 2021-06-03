@@ -11,7 +11,18 @@ import (
 	"github.com/portainer/portainer/api/http/useractivity"
 )
 
-// DELETE request on /api/registries/:id
+// @id RegistryDelete
+// @summary Remove a registry
+// @description Remove a registry
+// @description **Access policy**: administrator
+// @tags registries
+// @security jwt
+// @param id path int true "Registry identifier"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 404 "Registry not found"
+// @failure 500 "Server error"
+// @router /registries/{id} [delete]
 func (handler *Handler) registryDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	registryID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

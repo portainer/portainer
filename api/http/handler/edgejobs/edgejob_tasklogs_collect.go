@@ -11,7 +11,20 @@ import (
 	"github.com/portainer/portainer/api/http/useractivity"
 )
 
-// POST request on /api/edge_jobs/:id/tasks/:taskID/logs
+// @id EdgeJobTasksCollect
+// @summary Collect the log for a specifc task on an EdgeJob
+// @description
+// @tags edge_jobs
+// @security jwt
+// @accept json
+// @produce json
+// @param id path string true "EdgeJob Id"
+// @param taskID path string true "Task Id"
+// @success 204
+// @failure 500
+// @failure 400
+// @failure 503 Edge compute features are disabled
+// @router /edge_jobs/{id}/tasks/{taskID}/logs [post]
 func (handler *Handler) edgeJobTasksCollect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeJobID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

@@ -12,14 +12,31 @@ import (
 )
 
 type teamUpdatePayload struct {
-	Name string
+	// Name
+	Name string `example:"developers"`
 }
 
 func (payload *teamUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// PUT request on /api/teams/:id
+// @id TeamUpdate
+// @summary Update a team
+// @description Update a team.
+// @description **Access policy**: administrator
+// @tags
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "Team identifier"
+// @param body body teamUpdatePayload true "Team details"
+// @success 200 {object} portainer.Team "Success"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 "Team not found"
+// @failure 500 "Server error"
+// @router /team/{id} [put]
 func (handler *Handler) teamUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	teamID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

@@ -7,7 +7,16 @@ import (
 	"github.com/portainer/libhttp/response"
 )
 
-// GET request on /api/dockerhub
+// @id DockerHubInspect
+// @summary Retrieve DockerHub information
+// @description Use this endpoint to retrieve the information used to connect to the DockerHub
+// @description **Access policy**: authenticated
+// @tags dockerhub
+// @security jwt
+// @produce json
+// @success 200 {object} portainer.DockerHub
+// @failure 500 "Server error"
+// @router /dockerhub [get]
 func (handler *Handler) dockerhubInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	dockerhub, err := handler.DataStore.DockerHub().DockerHub()
 	if err != nil {

@@ -23,11 +23,23 @@ type execStartOperationPayload struct {
 	Detach bool
 }
 
-// websocketExec handles GET requests on /websocket/exec?id=<execID>&endpointId=<endpointID>&nodeName=<nodeName>&token=<token>
-// If the nodeName query parameter is present, the request will be proxied to the underlying agent endpoint.
-// If the nodeName query parameter is not specified, the request will be upgraded to the websocket protocol and
-// an ExecStart operation HTTP request will be created and hijacked.
-// Authentication and access is controled via the mandatory token query parameter.
+// @summary Execute a websocket
+// @description If the nodeName query parameter is present, the request will be proxied to the underlying agent endpoint.
+// @description If the nodeName query parameter is not specified, the request will be upgraded to the websocket protocol and
+// @description an ExecStart operation HTTP request will be created and hijacked.
+// @description Authentication and access is controlled via the mandatory token query parameter.
+// @security jwt
+// @tags websocket
+// @accept json
+// @produce json
+// @param endpointId query int true "endpoint ID of the endpoint where the resource is located"
+// @param nodeName query string false "node name"
+// @param token query string true "JWT token used for authentication against this endpoint"
+// @success 200
+// @failure 400
+// @failure 409
+// @failure 500
+// @router /websocket/exec [get]
 func (handler *Handler) websocketExec(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	execID, err := request.RetrieveQueryParameter(r, "id", false)
 	if err != nil {

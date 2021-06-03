@@ -17,12 +17,15 @@ import (
 )
 
 type authenticatePayload struct {
-	Username string
-	Password string
+	// Username
+	Username string `example:"admin" validate:"required"`
+	// Password
+	Password string `example:"mypassword" validate:"required"`
 }
 
 type authenticateResponse struct {
-	JWT string `json:"jwt"`
+	// JWT token used to authenticate against the API
+	JWT string `json:"jwt" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGUiOjEsImV4cCI6MTQ5OTM3NjE1NH0.NJ6vE8FY1WG6jsRQzfMqeatJ4vh2TWAeeYfDhP71YEE"`
 }
 
 func (payload *authenticatePayload) Validate(r *http.Request) error {
@@ -35,6 +38,18 @@ func (payload *authenticatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
+// @id AuthenticateUser
+// @summary Authenticate
+// @description Use this endpoint to authenticate against Portainer using a username and password.
+// @tags auth
+// @accept json
+// @produce json
+// @param body body authenticatePayload true "Credentials used for authentication"
+// @success 200 {object} authenticateResponse "Success"
+// @failure 400 "Invalid request"
+// @failure 422 "Invalid Credentials"
+// @failure 500 "Server error"
+// @router /auth [post]
 func (handler *Handler) authenticate(rw http.ResponseWriter, r *http.Request) (*authMiddlewareResponse, *httperror.HandlerError) {
 	resp := &authMiddlewareResponse{
 		Method: portainer.AuthenticationInternal,

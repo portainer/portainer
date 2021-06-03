@@ -32,6 +32,20 @@ func (payload *updateEdgeStackPayload) Validate(r *http.Request) error {
 	return nil
 }
 
+// @id EdgeStackUpdate
+// @summary Update an EdgeStack
+// @description
+// @tags edge_stacks
+// @security jwt
+// @accept json
+// @produce json
+// @param id path string true "EdgeStack Id"
+// @param body body updateEdgeStackPayload true "EdgeStack data"
+// @success 200 {object} portainer.EdgeStack
+// @failure 500
+// @failure 400
+// @failure 503 Edge compute features are disabled
+// @router /edge_stacks/{id} [put]
 func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

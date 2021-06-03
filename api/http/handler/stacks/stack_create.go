@@ -29,7 +29,29 @@ func (handler *Handler) cleanUp(stack *portainer.Stack, doCleanUp *bool) error {
 	return nil
 }
 
-// POST request on /api/stacks?type=<type>&method=<method>&endpointId=<endpointId>
+// @id StackCreate
+// @summary Deploy a new stack
+// @description Deploy a new stack into a Docker environment specified via the endpoint identifier.
+// @description **Access policy**: restricted
+// @tags stacks
+// @security jwt
+// @accept json, multipart/form-data
+// @produce json
+// @param type query int true "Stack deployment type. Possible values: 1 (Swarm stack) or 2 (Compose stack)." Enums(1,2)
+// @param method query string true "Stack deployment method. Possible values: file, string or repository." Enums(string, file, repository)
+// @param endpointId query int true "Identifier of the endpoint that will be used to deploy the stack"
+// @param body_swarm_string body swarmStackFromFileContentPayload false "Required when using method=string and type=1"
+// @param body_swarm_repository body swarmStackFromGitRepositoryPayload false "Required when using method=repository and type=1"
+// @param body_compose_string body composeStackFromFileContentPayload false "Required when using method=string and type=2"
+// @param body_compose_repository body composeStackFromGitRepositoryPayload false "Required when using method=repository and type=2"
+// @param Name formData string false "Name of the stack. required when method is file"
+// @param SwarmID formData string false "Swarm cluster identifier. Required when method equals file and type equals 1. required when method is file"
+// @param Env formData string false "Environment variables passed during deployment, represented as a JSON array [{'name': 'name', 'value': 'value'}]. Optional, used when method equals file and type equals 1."
+// @param file formData file false "Stack file. required when method is file"
+// @success 200 {object} portainer.CustomTemplate
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /stacks [post]
 func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackType, err := request.RetrieveNumericQueryParameter(r, "type", false)
 	if err != nil {

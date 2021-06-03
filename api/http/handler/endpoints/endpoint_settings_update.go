@@ -36,7 +36,21 @@ func (payload *endpointSettingsUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// PUT request on /api/endpoints/:id/settings
+// @id EndpointSettingsUpdate
+// @summary Update settings for an endpoint
+// @description Update settings for an endpoint.
+// @description **Access policy**: administrator
+// @security jwt
+// @tags endpoints
+// @accept json
+// @produce json
+// @param id path int true "Endpoint identifier"
+// @param body body endpointSettingsUpdatePayload true "Endpoint details"
+// @success 200 {object} portainer.Endpoint "Success"
+// @failure 400 "Invalid request"
+// @failure 404 "Endpoint not found"
+// @failure 500 "Server error"
+// @router /api/endpoints/:id/settings [put]
 func (handler *Handler) endpointSettingsUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

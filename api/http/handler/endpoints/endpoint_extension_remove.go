@@ -13,7 +13,6 @@ import (
 	"github.com/portainer/portainer/api/http/useractivity"
 )
 
-// DELETE request on /api/endpoints/:id/extensions/:extensionType
 func (handler *Handler) endpointExtensionRemove(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
