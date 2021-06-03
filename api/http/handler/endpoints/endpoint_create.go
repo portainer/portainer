@@ -453,6 +453,7 @@ func (handler *Handler) saveEndpointAndUpdateAuthorizations(endpoint *portainer.
 		AllowVolumeBrowserForRegularUsers: false,
 		EnableHostManagementFeatures:      false,
 
+		AllowSysctlSettingForRegularUsers:         true,
 		AllowBindMountsForRegularUsers:            true,
 		AllowPrivilegedModeForRegularUsers:        true,
 		AllowHostNamespaceForRegularUsers:         true,
