@@ -5,15 +5,16 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"path"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/docker/docker/client"
-	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
@@ -167,14 +168,24 @@ func (transport *Transport) proxyAgentRequest(r *http.Request) (*http.Response, 
 		// volume browser request
 		return transport.restrictedResourceOperation(r, resourceID, portainer.VolumeResourceControl, true)
 	case strings.HasPrefix(requestPath, "/dockerhub"):
-		registryID, err := request.RetrieveNumericRouteVariableValue(r, "registryId")
+		requestPath, registryIdString := path.Split(r.URL.Path)
+
+		registryID, err := strconv.Atoi(registryIdString)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("missing registry id: %w", err)
 		}
 
-		registry, err := transport.dataStore.Registry().Registry(portainer.RegistryID(registryID))
-		if err != nil {
-			return nil, err
+		r.URL.Path = strings.TrimSuffix(requestPath, "/")
+
+		registry := &portainer.Registry{
+			Type: portainer.DockerHubRegistry,
+		}
+
+		if registryID != 0 {
+			registry, err = transport.dataStore.Registry().Registry(portainer.RegistryID(registryID))
+			if err != nil {
+				return nil, fmt.Errorf("failed fetching registry: %w", err)
+			}
 		}
 
 		if registry.Type != portainer.DockerHubRegistry {
