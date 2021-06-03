@@ -2,14 +2,16 @@
   <div class="col-sm-12 form-section-title">
     Redeploy from git repository
   </div>
-  <div class="text-muted">
-    <p>
-      This stack was deployed from the git repository <code>{{ $ctrl.model.URL }}</code>
-      .
-    </p>
-    <p>
-      Update <code>{{ $ctrl.model.ConfigFilePath }}</code> in git and pull from here to update the stack.
-    </p>
+  <div class="text-muted small form-group">
+    <div class="col-sm-12">
+      <p>
+        This stack was deployed from the git repository <code>{{ $ctrl.model.URL }}</code>
+        .
+      </p>
+      <p>
+        Update <code>{{ $ctrl.model.ConfigFilePath }}</code> in git and pull from here to update the stack.
+      </p>
+    </div>
   </div>
 
   <git-form-ref-field value="$ctrl.formValues.RefName" on-change="($ctrl.onChangeRef)"></git-form-ref-field>
