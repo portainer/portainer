@@ -35,8 +35,6 @@ class StackRedployGitFormController {
   async submit() {
     return this.$async(async () => {
       try {
-        this.state.inProgress = true;
-
         const confirmed = await this.ModalService.confirmAsync({
           title: 'Are you sure?',
           message: 'Any changes to this stack made locally in Portainer will be overridden by the definition in git and may cause a service interruption. Do you wish to continue',
@@ -50,6 +48,8 @@ class StackRedployGitFormController {
         if (!confirmed) {
           return;
         }
+
+        this.state.inProgress = true;
 
         await this.StackService.updateGit(this.stack.Id, this.stack.EndpointId, [], false, this.formValues);
       } catch (err) {
