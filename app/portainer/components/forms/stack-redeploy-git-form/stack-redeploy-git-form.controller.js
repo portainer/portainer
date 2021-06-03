@@ -1,7 +1,8 @@
-class StackRedployGitFormController {
+class StackRedeployGitFormController {
   /* @ngInject */
-  constructor($async, StackService, ModalService, Notifications) {
+  constructor($async, $state, StackService, ModalService, Notifications) {
     this.$async = $async;
+    this.$state = $state;
     this.StackService = StackService;
     this.ModalService = ModalService;
     this.Notifications = Notifications;
@@ -52,6 +53,8 @@ class StackRedployGitFormController {
         this.state.inProgress = true;
 
         await this.StackService.updateGit(this.stack.Id, this.stack.EndpointId, [], false, this.formValues);
+
+        await this.$state.reload();
       } catch (err) {
         this.Notifications.error('Failure', err, 'Failed redeploying stack');
       } finally {
@@ -69,4 +72,4 @@ class StackRedployGitFormController {
   }
 }
 
-export default StackRedployGitFormController;
+export default StackRedeployGitFormController;
