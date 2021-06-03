@@ -6,7 +6,7 @@ const webpackProdConfig = require('./webpack/webpack.production');
 var arch = os.arch();
 if (arch === 'x64') arch = 'amd64';
 
-var portainer_data = '/tmp/portainer';
+var portainer_data = '${PORTAINER_DATA:-/tmp/portainer}';
 
 module.exports = function (grunt) {
   loadGruntTasks(grunt, {
