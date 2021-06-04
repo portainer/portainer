@@ -116,7 +116,7 @@
             >
               <td ng-if="!$ctrl.isPod">{{ item.PodName }}</td>
               <td>{{ item.Name }}</td>
-              <td>{{ item.Image }}</td>
+              <td title="{{ item.Image }}">{{ item.Image | truncate: 64 }}</td>
               <td>{{ item.ImagePullPolicy }}</td>
               <td
                 ><span class="label label-{{ item.Status | kubernetesPodStatusColor }}">{{ item.Status }}</span></td
