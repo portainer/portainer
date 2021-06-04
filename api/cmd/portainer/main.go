@@ -414,6 +414,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	snapshotService.Start()
 
 	authorizationService := authorization.NewService(dataStore)
+	authorizationService.K8sClientFactory = kubernetesClientFactory
 
 	swarmStackManager, err := initSwarmStackManager(*flags.Assets, *flags.Data, digitalSignatureService, fileService, reverseTunnelService)
 	if err != nil {

@@ -4,6 +4,9 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/portainer/portainer/api/http/useractivity"
+	"github.com/portainer/portainer/api/http/utils"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
 )
@@ -23,9 +26,49 @@ func (transport *Transport) proxyContainerGroupRequest(request *http.Request) (*
 }
 
 func (transport *Transport) proxyContainerGroupPutRequest(request *http.Request) (*http.Response, error) {
+	//add a lock before processing existense check
+	transport.mutex.Lock()
+	defer transport.mutex.Unlock()
+
+	//generate a temp http GET request based on the current PUT request
+	validationRequest := &http.Request{
+		Method: http.MethodGet,
+		URL:    request.URL,
+		Header: http.Header{
+			"Authorization": []string{request.Header.Get("Authorization")},
+		},
+	}
+
+	//fire the request to Azure API to validate if there is an existing container instance with the same name
+	//positive - reject the request
+	//negative - continue the process
+	validationResponse, err := http.DefaultTransport.RoundTrip(validationRequest)
+	if err != nil {
+		return validationResponse, err
+	}
+
+	if validationResponse.StatusCode >= 200 && validationResponse.StatusCode < 300 {
+		resp := &http.Response{}
+		errObj := map[string]string{
+			"message": "A container instance with the same name already exists inside the selected resource group",
+		}
+		err = responseutils.RewriteResponse(resp, errObj, http.StatusConflict)
+		return resp, err
+	}
+
+	body, err := utils.CopyBody(request)
+	if err != nil {
+		return nil, err
+	}
+
 	response, err := http.DefaultTransport.RoundTrip(request)
 	if err != nil {
 		return response, err
+	}
+
+	// log if request is success
+	if 200 <= response.StatusCode && response.StatusCode < 300 {
+		useractivity.LogProxyActivity(transport.userActivityStore, transport.endpoint.Name, request, body)
 	}
 
 	responseObject, err := responseutils.GetResponseAsJSONObject(response)
@@ -82,6 +125,11 @@ func (transport *Transport) proxyContainerGroupGetRequest(request *http.Request)
 }
 
 func (transport *Transport) proxyContainerGroupDeleteRequest(request *http.Request) (*http.Response, error) {
+	body, err := utils.CopyBody(request)
+	if err != nil {
+		return nil, err
+	}
+
 	context, err := transport.createAzureRequestContext(request)
 	if err != nil {
 		return nil, err
@@ -94,6 +142,11 @@ func (transport *Transport) proxyContainerGroupDeleteRequest(request *http.Reque
 	response, err := http.DefaultTransport.RoundTrip(request)
 	if err != nil {
 		return response, err
+	}
+
+	// log if request is success
+	if 200 <= response.StatusCode && response.StatusCode < 300 {
+		useractivity.LogProxyActivity(transport.userActivityStore, transport.endpoint.Name, request, body)
 	}
 
 	responseObject, err := responseutils.GetResponseAsJSONObject(response)

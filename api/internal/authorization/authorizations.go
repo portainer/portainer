@@ -2,6 +2,7 @@ package authorization
 
 import (
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
 // Service represents a service used to
@@ -10,6 +11,7 @@ type (
 	Service struct {
 		dataStore         portainer.DataStore
 		authEventHandlers map[string]portainer.AuthEventHandler
+		K8sClientFactory  *cli.ClientFactory
 	}
 )
 
@@ -1380,14 +1382,14 @@ func getKeyRole(roleIdentifiers []portainer.RoleID, roles []portainer.Role) *por
 		}
 	}
 
-	result := &portainer.Role{}
+	var result portainer.Role
 	for _, role := range associatedRoles {
 		if role.Priority > result.Priority {
-			result = &role
+			result = role
 		}
 	}
 
-	return result
+	return &result
 }
 
 // unionAuthorizations returns a union of all the input authorizations

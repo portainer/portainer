@@ -11,16 +11,16 @@ import (
 	"github.com/portainer/portainer/api/useractivity"
 )
 
-func (transport *baseTransport) proxyConfigRequest(request *http.Request, requestPath string) (*http.Response, error) {
+func (transport *baseTransport) proxySecretsRequest(request *http.Request, requestPath string) (*http.Response, error) {
 	switch {
 	case request.Method == "POST" || request.Method == "PUT": // create or update
-		return transport.decorateConfigWriteOperation(request)
+		return transport.decorateSecretsWriteOperation(request)
 	default:
 		return transport.executeKubernetesRequest(request, true)
 	}
 }
 
-func (transport *baseTransport) decorateConfigWriteOperation(request *http.Request) (*http.Response, error) {
+func (transport *baseTransport) decorateSecretsWriteOperation(request *http.Request) (*http.Response, error) {
 	body, err := utils.CopyBody(request)
 	if err != nil {
 		return nil, err
@@ -29,14 +29,14 @@ func (transport *baseTransport) decorateConfigWriteOperation(request *http.Reque
 	response, err := transport.executeKubernetesRequest(request, false)
 
 	if err == nil && (200 <= response.StatusCode && response.StatusCode < 300) {
-		transport.logCreateConfigOperation(request, body)
+		transport.logCreateSecretsOperation(request, body)
 	}
 
 	return response, err
 }
 
-func (transport *baseTransport) logCreateConfigOperation(request *http.Request, body []byte) {
-	cleanBody, err := hideConfigInfo(body)
+func (transport *baseTransport) logCreateSecretsOperation(request *http.Request, body []byte) {
+	cleanBody, err := hideSecretsInfo(body)
 	if err != nil {
 		log.Printf("[ERROR] [http,docker,config] [message: failed cleaning request body] [error: %s]", err)
 		return
@@ -45,13 +45,14 @@ func (transport *baseTransport) logCreateConfigOperation(request *http.Request, 
 	useractivityhttp.LogHttpActivity(transport.userActivityStore, transport.endpoint.Name, request, cleanBody)
 }
 
-// hideConfigInfo removes the confidential properties from the secret payload and returns the new payload
+// hideSecretsInfo removes the confidential properties from the secret payload and returns the new payload
 // it will read the request body and recreate it
-func hideConfigInfo(body []byte) (interface{}, error) {
+func hideSecretsInfo(body []byte) (interface{}, error) {
 	type requestPayload struct {
 		Metadata   interface{}       `json:"metadata"`
 		Data       map[string]string `json:"data"`
-		BinaryData interface{}       `json:"binaryData"`
+		StringData map[string]string `json:"stringData"`
+		Type       string            `json:"type"`
 	}
 
 	var payload requestPayload
@@ -64,7 +65,9 @@ func hideConfigInfo(body []byte) (interface{}, error) {
 		payload.Data[key] = useractivity.RedactedValue
 	}
 
-	payload.BinaryData = useractivity.RedactedValue
+	for key := range payload.StringData {
+		payload.StringData[key] = useractivity.RedactedValue
+	}
 
 	return payload, nil
 }

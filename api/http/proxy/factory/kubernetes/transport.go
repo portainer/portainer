@@ -14,6 +14,8 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
+
+	"github.com/pkg/errors"
 )
 
 type (
@@ -37,6 +39,10 @@ type (
 		*baseTransport
 		reverseTunnelService portainer.ReverseTunnelService
 	}
+)
+
+var (
+	namespaceRegex = regexp.MustCompile(`^/namespaces/([^/]*)$`)
 )
 
 // RoundTrip is the implementation of the the http.RoundTripper interface
@@ -72,11 +78,38 @@ func (transport *baseTransport) proxyNamespacedRequest(request *http.Request, fu
 	requestPath := re.ReplaceAllString(fullRequestPath, "")
 
 	switch {
+	case isDeleteNamespaceRequest(request, fullRequestPath):
+		return transport.deleteNamespaceRequest(request, fullRequestPath)
 	case strings.HasPrefix(requestPath, "configmaps"):
-		return transport.proxyConfigRequest(request, requestPath)
+		return transport.proxyConfigMapsRequest(request, requestPath)
+	case strings.HasPrefix(requestPath, "secrets"):
+		return transport.proxySecretsRequest(request, requestPath)
 	default:
 		return transport.executeKubernetesRequest(request, true)
 	}
+}
+
+// returns true if request intend to delete a namespace
+func isDeleteNamespaceRequest(request *http.Request, requestPath string) bool {
+	if request.Method != http.MethodDelete {
+		return false
+	}
+
+	return namespaceRegex.MatchString(requestPath)
+}
+
+func (transport *baseTransport) deleteNamespaceRequest(request *http.Request, requestPath string) (*http.Response, error) {
+	parts := namespaceRegex.FindStringSubmatch(requestPath)
+	if len(parts) < 2 {
+		return nil, errors.Errorf("cannot match a namespace in the url: %s", requestPath)
+	}
+
+	ns := parts[1]
+	if err := transport.tokenManager.kubecli.NamespaceAccessPoliciesDeleteNamespace(ns); err != nil {
+		return nil, errors.WithMessagef(err, "failed to delete a namespace [%s] from portainer config", ns)
+	}
+
+	return transport.executeKubernetesRequest(request, true)
 }
 
 func (transport *baseTransport) executeKubernetesRequest(request *http.Request, shouldLog bool) (*http.Response, error) {
@@ -155,10 +188,12 @@ func NewAgentTransport(signatureService portainer.DigitalSignatureService, tlsCo
 
 // RoundTrip is the implementation of the the http.RoundTripper interface
 func (transport *agentTransport) RoundTrip(request *http.Request) (*http.Response, error) {
-	err := transport.prepareRoundTrip(request)
+	token, err := getRoundTripToken(request, transport.tokenManager, transport.endpoint.ID)
 	if err != nil {
 		return nil, err
 	}
+
+	request.Header.Set(portainer.PortainerAgentKubernetesSATokenHeader, token)
 
 	signature, err := transport.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
 	if err != nil {
@@ -188,10 +223,12 @@ func NewEdgeTransport(reverseTunnelService portainer.ReverseTunnelService, endpo
 
 // RoundTrip is the implementation of the the http.RoundTripper interface
 func (transport *edgeTransport) RoundTrip(request *http.Request) (*http.Response, error) {
-	err := transport.prepareRoundTrip(request)
+	token, err := getRoundTripToken(request, transport.tokenManager, transport.endpoint.ID)
 	if err != nil {
 		return nil, err
 	}
+
+	request.Header.Set(portainer.PortainerAgentKubernetesSATokenHeader, token)
 
 	response, err := transport.baseTransport.RoundTrip(request)
 

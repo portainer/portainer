@@ -121,6 +121,24 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 		updateAuthorizations = true
 	}
 
+	if updateAuthorizations {
+		endpoints, err := handler.DataStore.Endpoint().Endpoints()
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
+		}
+
+		for _, endpoint := range endpoints {
+			if endpoint.GroupID == endpointGroup.ID {
+				if endpoint.Type == portainer.KubernetesLocalEnvironment || endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
+					err = handler.AuthorizationService.CleanNAPWithOverridePolicies(&endpoint, endpointGroup)
+					if err != nil {
+						return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
+					}
+				}
+			}
+		}
+	}
+
 	err = handler.DataStore.EndpointGroup().UpdateEndpointGroup(endpointGroup.ID, endpointGroup)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint group changes inside the database", err}

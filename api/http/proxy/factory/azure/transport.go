@@ -42,10 +42,11 @@ type (
 // interface for proxying requests to the Azure API.
 func NewTransport(credentials *portainer.AzureCredentials, userActivityStore portainer.UserActivityStore, dataStore portainer.DataStore, endpoint *portainer.Endpoint) *Transport {
 	return &Transport{
-		credentials: credentials,
-		client:      client.NewHTTPClient(),
-		dataStore:   dataStore,
-		endpoint:    endpoint,
+		credentials:       credentials,
+		client:            client.NewHTTPClient(),
+		dataStore:         dataStore,
+		endpoint:          endpoint,
+		userActivityStore: userActivityStore,
 	}
 }
 

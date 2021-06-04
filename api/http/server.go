@@ -89,8 +89,7 @@ type Server struct {
 
 // Start starts the HTTP server
 func (server *Server) Start() error {
-	kubernetesTokenCacheManager := kubernetes.NewTokenCacheManager()
-	server.AuthorizationService.RegisterEventHandler("kubernetesTokenCacheManager", kubernetesTokenCacheManager)
+	server.AuthorizationService.RegisterEventHandler("kubernetesTokenCacheManager", server.KubernetesTokenCacheManager)
 
 	requestBouncer := security.NewRequestBouncer(server.DataStore, server.LicenseService, server.JWTService)
 
@@ -105,7 +104,7 @@ func (server *Server) Start() error {
 	authHandler.LDAPService = server.LDAPService
 	authHandler.LicenseService = server.LicenseService
 	authHandler.ProxyManager = server.ProxyManager
-	authHandler.KubernetesTokenCacheManager = kubernetesTokenCacheManager
+	authHandler.KubernetesTokenCacheManager = server.KubernetesTokenCacheManager
 	authHandler.OAuthService = server.OAuthService
 	authHandler.UserActivityStore = server.UserActivityStore
 

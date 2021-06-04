@@ -1281,15 +1281,16 @@ type (
 		) error
 		GetServiceAccountBearerToken(userID int) (string, error)
 		StartExecProcess(namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error
-		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
 		GetNamespaces() (map[string]K8sNamespaceInfo, error)
 		RemoveUserServiceAccount(userID int) error
-		UpdateNamespaceAccessPolicies(
-			accessPolicies map[string]K8sNamespaceAccessPolicy,
-		) error
 		RemoveUserNamespaceBindings(
 			userID int,
 			namespace string,
+		) error
+		NamespaceAccessPoliciesDeleteNamespace(namespace string) error
+		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
+		UpdateNamespaceAccessPolicies(
+			accessPolicies map[string]K8sNamespaceAccessPolicy,
 		) error
 	}
 
