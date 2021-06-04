@@ -5,7 +5,7 @@ func (m *Migrator) updateSettingsToDB31() error {
 	if err != nil {
 		return err
 	}
-	legacySettings.OAuthSettings.SSO = true
+	legacySettings.OAuthSettings.SSO = false
 	legacySettings.OAuthSettings.LogoutURI = ""
 	return m.settingsService.UpdateSettings(legacySettings)
 }
