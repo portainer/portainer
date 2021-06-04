@@ -55,8 +55,8 @@ func TestUpdateSettingsToDB31(t *testing.T) {
 	if updatedSettings.LogoURL != dummyLogoURL {
 		t.Errorf("unexpected value changes in the updated settings, want LogoURL value: %s, got LogoURL value: %s", dummyLogoURL, updatedSettings.LogoURL)
 	}
-	if updatedSettings.OAuthSettings.SSO != false {
-		t.Errorf("unexpected default OAuth SSO setting, want: false, got: %t", updatedSettings.OAuthSettings.SSO)
+	if updatedSettings.OAuthSettings.SSO != true {
+		t.Errorf("unexpected default OAuth SSO setting, want: true, got: %t", updatedSettings.OAuthSettings.SSO)
 	}
 	if updatedSettings.OAuthSettings.LogoutURI != "" {
 		t.Errorf("unexpected default OAuth HideInternalAuth setting, want:, got: %s", updatedSettings.OAuthSettings.LogoutURI)
