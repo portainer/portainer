@@ -14,6 +14,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/filesystem"
 )
 
 type kubernetesStringDeploymentPayload struct {
@@ -68,9 +69,35 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
 	}
+
+	stackID := handler.DataStore.Stack().GetNextIdentifier()
+	stack := &portainer.Stack{
+		ID:           portainer.StackID(stackID),
+		Type:         portainer.KubernetesStack,
+		EndpointID:   endpoint.ID,
+		EntryPoint:   filesystem.ManifestFileDefaultName,
+		Status:       portainer.StackStatusActive,
+		CreationDate: time.Now().Unix(),
+	}
+
+	stackFolder := strconv.Itoa(int(stack.ID))
+	projectPath, err := handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist Kubernetes manifest file on disk", Err: err}
+	}
+	stack.ProjectPath = projectPath
+
+	doCleanUp := true
+	defer handler.cleanUp(stack, &doCleanUp)
+
 	output, err := handler.deployKubernetesStack(endpoint, payload.StackFileContent, payload.ComposeFormat, payload.Namespace)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to deploy Kubernetes stack", Err: err}
+	}
+
+	err = handler.DataStore.Stack().CreateStack(stack)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist the Kubernetes stack inside the database", Err: err}
 	}
 
 	resp := &createKubernetesStackResponse{
