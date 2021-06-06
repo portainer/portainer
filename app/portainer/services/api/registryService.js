@@ -107,7 +107,7 @@ angular.module('portainer.app').factory('RegistryService', [
       return url;
     }
 
-    function retrievePorRegistryModelFromRepositoryWithRegistries(repository, registries, registryId, dockerhub) {
+    function retrievePorRegistryModelFromRepositoryWithRegistries(repository, registries, registryId) {
       const model = new PorImageRegistryModel();
       const registry = registries.find((reg) => {
         if (registryId) {
@@ -132,7 +132,7 @@ angular.module('portainer.app').factory('RegistryService', [
         if (ImageHelper.imageContainsURL(repository)) {
           model.UseRegistry = false;
         }
-        model.Registry = dockerhub;
+        model.Registry = new DockerHubViewModel();
         model.Image = repository;
       }
       return model;
@@ -140,9 +140,8 @@ angular.module('portainer.app').factory('RegistryService', [
 
     async function retrievePorRegistryModelFromRepositoryAsync(repository, endpointId, registryId) {
       try {
-        const regs = await Promise.all([registries(endpointId)]);
-        const dockerhub = new DockerHubViewModel();
-        return retrievePorRegistryModelFromRepositoryWithRegistries(repository, regs, registryId, dockerhub);
+        const regs = await registries(endpointId);
+        return retrievePorRegistryModelFromRepositoryWithRegistries(repository, regs, registryId);
       } catch (err) {
         throw { msg: 'Unable to retrieve the registry associated to the repository', err: err };
       }
