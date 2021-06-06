@@ -138,6 +138,7 @@ func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, end
 
 		stack.UpdateDate = time.Now().Unix()
 		stack.UpdatedBy = config.user.Username
+		stack.Status = portainer.StackStatusActive
 
 		return nil
 	}
@@ -154,6 +155,7 @@ func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, end
 
 	stack.UpdateDate = time.Now().Unix()
 	stack.UpdatedBy = config.user.Username
+	stack.Status = portainer.StackStatusActive
 
 	return nil
 }
