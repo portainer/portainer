@@ -27,8 +27,8 @@ module.exports = {
             loader: 'source-map-loader',
             options: {
               filterSourceMappingUrl: (_, resourcePath) => {
-                // ignores `chardet` missing sourcemaps
-                return !/node_modules\/chardet/i.test(resourcePath);
+                // ignores pkgs missing sourcemaps
+                return ['chardet', 'tokenize-ansi'].every((pkg) => !resourcePath.includes(pkg));
               },
             },
           },
