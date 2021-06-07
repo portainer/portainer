@@ -32,7 +32,7 @@ class LogoutController {
       await this.Authentication.logout(performApiLogout);
     } finally {
       this.LocalStorage.storeLogoutReason(error);
-      if (settings.OAuthLogoutURI) {
+      if (settings.OAuthLogoutURI && this.Authentication.getUserDetails().ID !== 1) {
         this.$window.location.href = settings.OAuthLogoutURI;
       } else {
         this.$state.go('portainer.auth', { reload: true });
