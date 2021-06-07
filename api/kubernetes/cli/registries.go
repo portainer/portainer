@@ -30,7 +30,7 @@ type (
 
 func (kcl *KubeClient) DeleteRegistrySecret(registry *portainer.Registry, namespace string) error {
 	err := kcl.cli.CoreV1().Secrets(namespace).Delete(registrySecretName(registry), &metav1.DeleteOptions{})
-	if err != nil {
+	if err != nil && !k8serrors.IsNotFound(err) {
 		return errors.Wrap(err, "failed removing secret")
 	}
 
