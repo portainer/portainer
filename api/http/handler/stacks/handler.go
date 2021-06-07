@@ -11,14 +11,16 @@ import (
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
+	dberrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 var (
-	errStackAlreadyExists = errors.New("A stack already exists with this name")
-	errStackNotExternal   = errors.New("Not an external stack")
+	errStackAlreadyExists     = errors.New("A stack already exists with this name")
+	errWebhookIDAlreadyExists = errors.New("A webhook ID already exists")
+	errStackNotExternal       = errors.New("Not an external stack")
 )
 
 // Handler is the HTTP handler used to handle stack operations.
@@ -154,4 +156,12 @@ func (handler *Handler) checkUniqueName(endpoint *portainer.Endpoint, name strin
 	}
 
 	return true, nil
+}
+
+func (handler *Handler) checkUniqueWebhookID(webhookID string) (bool, error) {
+	_, err := handler.DataStore.Stack().StackByWebhookID(webhookID)
+	if err == dberrors.ErrObjectNotFound {
+		return true, nil
+	}
+	return false, err
 }

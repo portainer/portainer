@@ -86,12 +86,14 @@ func (manager *ComposeStackManager) Up(stack *portainer.Stack, endpoint *portain
 	for _, envvar := range stack.Env {
 		env[envvar.Name] = envvar.Value
 	}
-
-	composeFilePath := path.Join(stack.ProjectPath, stack.EntryPoint)
+	var composeFiles []string
+	for _, file := range append([]string{stack.EntryPoint}, stack.AdditionalFiles...) {
+		composeFiles = append(composeFiles, path.Join(stack.ProjectPath, file))
+	}
 	proj, err := docker.NewProject(&ctx.Context{
 		ConfigDir: manager.dataPath,
 		Context: project.Context{
-			ComposeFiles: []string{composeFilePath},
+			ComposeFiles: composeFiles,
 			EnvironmentLookup: &lookup.ComposableEnvLookup{
 				Lookups: []config.EnvironmentLookup{
 					&lookup.EnvfileLookup{
@@ -120,10 +122,13 @@ func (manager *ComposeStackManager) Down(stack *portainer.Stack, endpoint *porta
 		return err
 	}
 
-	composeFilePath := path.Join(stack.ProjectPath, stack.EntryPoint)
+	var composeFiles []string
+	for _, file := range append([]string{stack.EntryPoint}, stack.AdditionalFiles...) {
+		composeFiles = append(composeFiles, path.Join(stack.ProjectPath, file))
+	}
 	proj, err := docker.NewProject(&ctx.Context{
 		Context: project.Context{
-			ComposeFiles: []string{composeFilePath},
+			ComposeFiles: composeFiles,
 			ProjectName:  stack.Name,
 		},
 		ClientFactory: clientFactory,
@@ -133,4 +138,12 @@ func (manager *ComposeStackManager) Down(stack *portainer.Stack, endpoint *porta
 	}
 
 	return proj.Down(context.Background(), options.Down{RemoveVolume: false, RemoveOrphans: true})
+}
+
+func stackFilePaths(stack *portainer.Stack) []string {
+	var filePaths []string
+	for _, file := range append([]string{stack.EntryPoint}, stack.AdditionalFiles...) {
+		filePaths = append(filePaths, path.Join(stack.ProjectPath, file))
+	}
+	return filePaths
 }

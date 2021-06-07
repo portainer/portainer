@@ -112,8 +112,9 @@ type composeStackFromGitRepositoryPayload struct {
 	// Password used in basic authentication. Required when RepositoryAuthentication is true.
 	RepositoryPassword string `example:"myGitPassword"`
 	// Path to the Stack file inside the Git repository
-	ComposeFilePathInRepository string `example:"docker-compose.yml" default:"docker-compose.yml"`
-
+	ComposeFile     string `example:"docker-compose.yml" default:"docker-compose.yml"`
+	AdditionalFiles []string
+	AutoUpdate      *portainer.StackAutoUpdate
 	// A list of environment variables used during stack deployment
 	Env []portainer.Pair
 }
@@ -122,14 +123,15 @@ func (payload *composeStackFromGitRepositoryPayload) Validate(r *http.Request) e
 	if govalidator.IsNull(payload.Name) {
 		return errors.New("Invalid stack name")
 	}
-
 	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
 		return errors.New("Invalid repository URL. Must correspond to a valid URL format")
 	}
 	if payload.RepositoryAuthentication && (govalidator.IsNull(payload.RepositoryUsername) || govalidator.IsNull(payload.RepositoryPassword)) {
 		return errors.New("Invalid repository credentials. Username and password must be specified when authentication is enabled")
 	}
-
+	if err := validateStackAutoUpdate(payload.AutoUpdate); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -141,29 +143,41 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 	}
 
 	payload.Name = handler.ComposeStackManager.NormalizeStackName(payload.Name)
-	if payload.ComposeFilePathInRepository == "" {
-		payload.ComposeFilePathInRepository = filesystem.ComposeFileDefaultName
+	if payload.ComposeFile == "" {
+		payload.ComposeFile = filesystem.ComposeFileDefaultName
 	}
 
 	isUnique, err := handler.checkUniqueName(endpoint, payload.Name, 0, false)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to check for name collision", Err: err}
 	}
 	if !isUnique {
-		errorMessage := fmt.Sprintf("A stack with the name '%s' already exists", payload.Name)
-		return &httperror.HandlerError{http.StatusConflict, errorMessage, errors.New(errorMessage)}
+		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("A stack with the name '%s' already exists", payload.Name), Err: errStackAlreadyExists}
+	}
+
+	//make sure the webhook ID is unique
+	if payload.AutoUpdate.Webhook != "" {
+		isUnique, err := handler.checkUniqueWebhookID(payload.AutoUpdate.Webhook)
+		if err != nil {
+			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to check for webhook ID collision", Err: err}
+		}
+		if !isUnique {
+			return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("Webhook ID: %s already exists", payload.AutoUpdate.Webhook), Err: errWebhookIDAlreadyExists}
+		}
 	}
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
 	stack := &portainer.Stack{
-		ID:           portainer.StackID(stackID),
-		Name:         payload.Name,
-		Type:         portainer.DockerComposeStack,
-		EndpointID:   endpoint.ID,
-		EntryPoint:   payload.ComposeFilePathInRepository,
-		Env:          payload.Env,
-		Status:       portainer.StackStatusActive,
-		CreationDate: time.Now().Unix(),
+		ID:              portainer.StackID(stackID),
+		Name:            payload.Name,
+		Type:            portainer.DockerComposeStack,
+		EndpointID:      endpoint.ID,
+		EntryPoint:      payload.ComposeFile,
+		AdditionalFiles: payload.AdditionalFiles,
+		AutoUpdate:      payload.AutoUpdate,
+		Env:             payload.Env,
+		Status:          portainer.StackStatusActive,
+		CreationDate:    time.Now().Unix(),
 	}
 
 	projectPath := handler.FileService.GetStackProjectPath(strconv.Itoa(int(stack.ID)))
@@ -360,15 +374,17 @@ func (handler *Handler) deployComposeStack(config *composeStackDeploymentConfig)
 		!securitySettings.AllowContainerCapabilitiesForRegularUsers) &&
 		!isAdminOrEndpointAdmin {
 
-		composeFilePath := path.Join(config.stack.ProjectPath, config.stack.EntryPoint)
-		stackContent, err := handler.FileService.GetFileContent(composeFilePath)
-		if err != nil {
-			return err
-		}
+		for _, file := range append([]string{config.stack.EntryPoint}, config.stack.AdditionalFiles...) {
+			path := path.Join(config.stack.ProjectPath, file)
+			stackContent, err := handler.FileService.GetFileContent(path)
+			if err != nil {
+				return err
+			}
 
-		err = handler.isValidStackFile(stackContent, securitySettings)
-		if err != nil {
-			return err
+			err = handler.isValidStackFile(stackContent, securitySettings)
+			if err != nil {
+				return err
+			}
 		}
 	}
 

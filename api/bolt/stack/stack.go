@@ -133,3 +133,8 @@ func (service *Service) DeleteStack(ID portainer.StackID) error {
 	identifier := internal.Itob(int(ID))
 	return internal.DeleteObject(service.connection, BucketName, identifier)
 }
+
+// StackByWebhookID returns a stack via searching with webhook ID
+func (service *Service) StackByWebhookID(id string) (*portainer.Stack, error) {
+	return nil, errors.ErrObjectNotFound
+}

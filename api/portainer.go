@@ -681,6 +681,10 @@ type (
 		SwarmID string `json:"SwarmId" example:"jpofkc0i9uo9wtx1zesuk649w"`
 		// Path to the Stack file
 		EntryPoint string `json:"EntryPoint" example:"docker-compose.yml"`
+		// Additional Stack files
+		AdditionalFiles []string `json:"AdditionalFiles"`
+		// Stack auto update settings
+		AutoUpdate *StackAutoUpdate `json:"AutoUpdate"`
 		// A list of environment variables used during stack deployment
 		Env []Pair `json:"Env" example:""`
 		//
@@ -697,6 +701,12 @@ type (
 		UpdateDate int64 `example:"1587399600"`
 		// The username which last updated this stack
 		UpdatedBy string `example:"bob"`
+	}
+
+	//StackAutoUpdate represents the git auto sync config for stack deployment
+	StackAutoUpdate struct {
+		Interval string
+		Webhook  string //a UUID generated from client
 	}
 
 	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier)
@@ -1238,6 +1248,7 @@ type (
 		UpdateStack(ID StackID, stack *Stack) error
 		DeleteStack(ID StackID) error
 		GetNextIdentifier() int
+		StackByWebhookID(ID string) (*Stack, error)
 	}
 
 	// SnapshotService represents a service for managing endpoint snapshots
