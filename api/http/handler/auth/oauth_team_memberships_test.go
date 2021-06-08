@@ -9,7 +9,10 @@ import (
 )
 
 func Test_mapClaimValRegexToTeams(t *testing.T) {
-	store, teardown := bolttest.NewTestStore(false)
+	store, teardown, err := bolttest.NewTestStore(false)
+	if err != nil {
+		t.Errorf("failed to initialise test store")
+	}
 	defer teardown()
 
 	t.Run("returns no portainer teams if no oauth teams are present", func(t *testing.T) {
@@ -65,7 +68,10 @@ func Test_mapClaimValRegexToTeams(t *testing.T) {
 }
 
 func Test_mapAllClaimValuesToTeams(t *testing.T) {
-	store, teardown := bolttest.NewTestStore(false)
+	store, teardown, err := bolttest.NewTestStore(false)
+	if err != nil {
+		t.Errorf("failed to initialise test store")
+	}
 	defer teardown()
 
 	store.TeamService.CreateTeam(&portainer.Team{ID: 1, Name: "team-x"})
@@ -105,7 +111,10 @@ func Test_mapAllClaimValuesToTeams(t *testing.T) {
 }
 
 func Test_createOrUpdateMembership(t *testing.T) {
-	store, teardown := bolttest.NewTestStore(false)
+	store, teardown, err := bolttest.NewTestStore(false)
+	if err != nil {
+		t.Errorf("failed to initialise test store")
+	}
 	defer teardown()
 
 	t.Run("creates membership for new user-team", func(t *testing.T) {
@@ -146,7 +155,10 @@ func Test_createOrUpdateMembership(t *testing.T) {
 }
 
 func Test_removeMemberships(t *testing.T) {
-	store, teardown := bolttest.NewTestStore(false)
+	store, teardown, err := bolttest.NewTestStore(false)
+	if err != nil {
+		t.Errorf("failed to initialise test store")
+	}
 	defer teardown()
 
 	t.Run("removes nothing if no user team memberships exist", func(t *testing.T) {
@@ -202,7 +214,10 @@ func Test_removeMemberships(t *testing.T) {
 }
 
 func Test_updateOAuthTeamMemberships(t *testing.T) {
-	store, teardown := bolttest.NewTestStore(false)
+	store, teardown, err := bolttest.NewTestStore(false)
+	if err != nil {
+		t.Errorf("failed to initialise test store")
+	}
 	defer teardown()
 
 	t.Run("creates new team memberships based on claim val regex", func(t *testing.T) {
