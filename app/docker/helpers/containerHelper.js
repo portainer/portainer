@@ -259,6 +259,10 @@ angular.module('portainer.docker').factory('ContainerHelper', [
       return bindings;
     };
 
+    helper.getContainerNames = function (containers) {
+      return _.map(_.flatten(_.map(containers, 'Names')), (name) => _.trimStart(name, '/'));
+    };
+
     return helper;
   },
 ]);

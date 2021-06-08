@@ -8,13 +8,17 @@ angular
   .controller('CreateStackController', function (
     $scope,
     $state,
+    $async,
     StackService,
     Authentication,
     Notifications,
     FormValidator,
     ResourceControlService,
     FormHelper,
+    StackHelper,
+    ContainerHelper,
     CustomTemplateService,
+    ContainerService,
     endpoint
   ) {
     $scope.formValues = {
@@ -36,6 +40,8 @@ angular
       formValidationError: '',
       actionInProgress: false,
       StackType: null,
+      editorYamlValidationError: '',
+      uploadYamlValidationError: '',
     };
 
     $scope.addEnvironmentVariable = function () {
@@ -154,6 +160,26 @@ angular
 
     $scope.editorUpdate = function (cm) {
       $scope.formValues.StackFileContent = cm.getValue();
+      $scope.state.editorYamlValidationError = StackHelper.validateYAML($scope.formValues.StackFileContent, $scope.containerNames);
+    };
+
+    async function onFileLoadAsync(event) {
+      $scope.state.uploadYamlValidationError = StackHelper.validateYAML(event.target.result, $scope.containerNames);
+    }
+
+    function onFileLoad(event) {
+      return $async(onFileLoadAsync, event);
+    }
+
+    $scope.uploadFile = function (file) {
+      $scope.formValues.StackFile = file;
+
+      if (file) {
+        const temporaryFileReader = new FileReader();
+        temporaryFileReader.fileName = file.name;
+        temporaryFileReader.onload = onFileLoad;
+        temporaryFileReader.readAsText(file);
+      }
     };
 
     $scope.onChangeTemplate = async function onChangeTemplate(template) {
@@ -184,6 +210,13 @@ angular
         $scope.composeSyntaxMaxVersion = endpoint.ComposeSyntaxMaxVersion;
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to retrieve the ComposeSyntaxMaxVersion');
+      }
+
+      try {
+        const containers = await ContainerService.containers();
+        $scope.containerNames = ContainerHelper.getContainerNames(containers);
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to retrieve Containers');
       }
     }
 
