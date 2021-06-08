@@ -21,6 +21,16 @@ func GetJSONObject(jsonObject map[string]interface{}, property string) map[strin
 	return nil
 }
 
+// GetArrayObject will extract an array from a specific property of another JSON object.
+// Returns nil if nothing is associated to the specified key.
+func GetArrayObject(jsonObject map[string]interface{}, property string) []interface{} {
+	object := jsonObject[property]
+	if object != nil {
+		return object.([]interface{})
+	}
+	return nil
+}
+
 func getBody(body io.ReadCloser, contentType string, isGzip bool) (interface{}, error) {
 	if body == nil {
 		return nil, errors.New("unable to parse response: empty response body")
