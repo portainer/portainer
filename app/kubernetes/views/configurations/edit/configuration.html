@@ -21,6 +21,7 @@
                       <td>Name</td>
                       <td>
                         {{ ctrl.configuration.Name }}
+                        <span style="margin-left: 5px;" class="label label-info image-tag" ng-if="ctrl.configuration.IsRegistrySecret">system</span>
                       </td>
                     </tr>
                     <tr>
@@ -76,7 +77,7 @@
     <div class="col-sm-12">
       <rd-widget>
         <rd-widget-body>
-          <form ng-if="!ctrl.isSystemNamespace()" class="form-horizontal" name="kubernetesConfigurationCreationForm" autocomplete="off">
+          <form ng-if="!ctrl.isSystemConfig()" class="form-horizontal" name="kubernetesConfigurationCreationForm" autocomplete="off">
             <kubernetes-configuration-data
               ng-if="ctrl.formValues"
               form-values="ctrl.formValues"
@@ -111,7 +112,7 @@
             </div>
             <!-- !actions -->
           </form>
-          <div ng-if="ctrl.isSystemNamespace()">
+          <div ng-if="ctrl.isSystemConfig()">
             <div class="col-sm-12 form-section-title" style="margin-top: 10px;">
               Data
             </div>
