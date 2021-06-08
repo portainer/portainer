@@ -28,7 +28,7 @@ angular.module('portainer.docker').controller('KubernetesConfigurationsDatatable
     };
 
     this.isSystemConfig = function (item) {
-      return ctrl.isSystemNamespace(item) || ctrl.isSystemToken(item);
+      return ctrl.isSystemNamespace(item) || ctrl.isSystemToken(item) || item.IsRegistrySecret;
     };
 
     this.isExternalConfiguration = function (item) {

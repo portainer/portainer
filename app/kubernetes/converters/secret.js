@@ -56,6 +56,9 @@ class KubernetesSecretConverter {
     res.Namespace = payload.metadata.namespace;
     res.ConfigurationOwner = payload.metadata.labels ? payload.metadata.labels[KubernetesPortainerConfigurationOwnerLabel] : '';
     res.CreationDate = payload.metadata.creationTimestamp;
+
+    res.IsRegistrySecret = payload.metadata.annotations && !!payload.metadata.annotations['portainer.io/registry.id'];
+
     res.Yaml = yaml ? yaml.data : '';
 
     res.Data = _.map(payload.data, (value, key) => {
