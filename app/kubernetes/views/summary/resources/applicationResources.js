@@ -14,7 +14,9 @@ import {
 import { KubernetesHorizontalPodAutoScalerHelper } from 'Kubernetes/horizontal-pod-auto-scaler/helper';
 import { KubernetesHorizontalPodAutoScalerConverter } from 'Kubernetes/horizontal-pod-auto-scaler/converter';
 import KubernetesApplicationConverter from 'Kubernetes/converters/application';
+import KubernetesServiceConverter from 'Kubernetes/converters/service';
 import { KubernetesIngressConverter } from 'Kubernetes/ingress/converter';
+import KubernetesPersistentVolumeClaimConverter from 'Kubernetes/converters/persistentVolumeClaim';
 
 const { CREATE, UPDATE, DELETE } = KubernetesResourceActions;
 
@@ -86,7 +88,7 @@ function getUpdatedApplicationResources(oldFormValues, newFormValues) {
   const resources = [];
 
   const [oldApp, oldHeadlessService, oldService, oldClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(oldFormValues);
-  const [newApp, /* newHeadlessService */, newService, newClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(newFormValues);
+  const [newApp, newHeadlessService, newService, newClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(newFormValues);
 
   const oldAppResourceType = getApplicationResourceType(oldApp);
   const newAppResourceType = getApplicationResourceType(newApp);
@@ -105,18 +107,22 @@ function getUpdatedApplicationResources(oldFormValues, newFormValues) {
   }
 
   if (newApp instanceof KubernetesStatefulSet) {
-    // Service
-    resources.push({ action: UPDATE, kind: KubernetesResourceTypes.SERVICE, name: oldHeadlessService.Name, type: oldHeadlessService.Type || KubernetesServiceTypes.CLUSTER_IP });
+    const headlessServiceUpdateResourceSummary = getServiceUpdateResourceSummary(oldHeadlessService, newHeadlessService);
+    if (headlessServiceUpdateResourceSummary) {
+      resources.push(headlessServiceUpdateResourceSummary);
+    }
   } else {
     // Persistent volume claims
-    const claimSummaries = newClaims.map((pvc) => {
-      if (!pvc.PreviousName && !pvc.Id) {
-        resources.push({ action: CREATE, kind: KubernetesResourceTypes.PERSISTENT_VOLUME_CLAIM, name: pvc.Name });
-      } else if (!pvc.Id) {
-        const oldClaim = _.find(oldClaims, { Name: pvc.PreviousName });
-        resources.push({ action: UPDATE, kind: KubernetesResourceTypes.PERSISTENT_VOLUME_CLAIM, name: oldClaim.Name });
-      }
-    });
+    const claimSummaries = newClaims
+      .map((pvc) => {
+        if (!pvc.PreviousName && !pvc.Id) {
+          return { action: CREATE, kind: KubernetesResourceTypes.PERSISTENT_VOLUME_CLAIM, name: pvc.Name };
+        } else if (!pvc.Id) {
+          const oldClaim = _.find(oldClaims, { Name: pvc.PreviousName });
+          return getVolumeClaimUpdateResourceSummary(oldClaim, pvc);
+        }
+      })
+      .filter((pvc) => pvc); // remove nulls
     resources.push(...claimSummaries);
   }
 
@@ -125,7 +131,11 @@ function getUpdatedApplicationResources(oldFormValues, newFormValues) {
 
   if (oldService && newService) {
     // Service
-    resources.push({ action: UPDATE, kind: KubernetesResourceTypes.SERVICE, name: oldService.Name, type: oldService.Type || KubernetesServiceTypes.CLUSTER_IP });
+    const serviceUpdateResourceSummary = getServiceUpdateResourceSummary(oldService, newService);
+    if (serviceUpdateResourceSummary) {
+      resources.push(serviceUpdateResourceSummary);
+    }
+
     if (newFormValues.PublishingType === KubernetesApplicationPublishingTypes.INGRESS || oldFormValues.PublishingType === KubernetesApplicationPublishingTypes.INGRESS) {
       // Ingress
       const oldIngresses = KubernetesIngressConverter.applicationFormValuesToIngresses(oldFormValues, oldService.Name);
@@ -162,7 +172,10 @@ function getUpdatedApplicationResources(oldFormValues, newFormValues) {
     const oldKind = KubernetesHorizontalPodAutoScalerHelper.getApplicationTypeString(oldApp);
     const oldAutoScaler = KubernetesHorizontalPodAutoScalerConverter.applicationFormValuesToModel(oldFormValues, oldKind);
     if (newFormValues.AutoScaler.IsUsed) {
-      resources.push({ action: UPDATE, kind: KubernetesResourceTypes.HORIZONTAL_POD_AUTOSCALER, name: oldAutoScaler.Name });
+      const hpaUpdateSummary = getHorizontalPodAutoScalerUpdateResourceSummary(oldAutoScaler, newAutoScaler);
+      if (hpaUpdateSummary) {
+        resources.push(hpaUpdateSummary);
+      }
     } else {
       resources.push({ action: DELETE, kind: KubernetesResourceTypes.HORIZONTAL_POD_AUTOSCALER, name: oldAutoScaler.Name });
     }
@@ -183,8 +196,47 @@ function getApplicationResourceType(app) {
 }
 
 function getIngressUpdateSummary(oldIngresses, newIngresses) {
-  return _.map(newIngresses, (newIng) => {
-    const oldIng = _.find(oldIngresses, { Name: newIng.Name });
-    return { action: UPDATE, kind: KubernetesResourceTypes.INGRESS, name: oldIng.Name };
-  });
+  const ingressesSummaries = newIngresses
+    .map((newIng) => {
+      const oldIng = _.find(oldIngresses, { Name: newIng.Name });
+      return getIngressUpdateResourceSummary(oldIng, newIng);
+    })
+    .filter((s) => s); // remove nulls
+  return ingressesSummaries;
+}
+
+// getIngressUpdateResourceSummary replicates KubernetesIngressService.patch
+function getIngressUpdateResourceSummary(oldIngress, newIngress) {
+  const payload = KubernetesIngressConverter.patchPayload(oldIngress, newIngress);
+  if (payload.length) {
+    return { action: UPDATE, kind: KubernetesResourceTypes.INGRESS, name: oldIngress.Name };
+  }
+  return null;
+}
+
+// getVolumeClaimUpdateResourceSummary replicates KubernetesPersistentVolumeClaimService.patch
+function getVolumeClaimUpdateResourceSummary(oldPVC, newPVC) {
+  const payload = KubernetesPersistentVolumeClaimConverter.patchPayload(oldPVC, newPVC);
+  if (payload.length) {
+    return { action: UPDATE, kind: KubernetesResourceTypes.PERSISTENT_VOLUME_CLAIM, name: oldPVC.Name };
+  }
+  return null;
+}
+
+// getServiceUpdateResourceSummary replicates KubernetesServiceService.patch
+function getServiceUpdateResourceSummary(oldService, newService) {
+  const payload = KubernetesServiceConverter.patchPayload(oldService, newService);
+  if (payload.length) {
+    return { action: UPDATE, kind: KubernetesResourceTypes.SERVICE, name: oldService.Name, type: oldService.Type || KubernetesServiceTypes.CLUSTER_IP };
+  }
+  return null;
+}
+
+// getHorizontalPodAutoScalerUpdateResourceSummary replicates KubernetesHorizontalPodAutoScalerService.patch
+function getHorizontalPodAutoScalerUpdateResourceSummary(oldHorizontalPodAutoScaler, newHorizontalPodAutoScaler) {
+  const payload = KubernetesHorizontalPodAutoScalerConverter.patchPayload(oldHorizontalPodAutoScaler, newHorizontalPodAutoScaler);
+  if (payload.length) {
+    return { action: UPDATE, kind: KubernetesResourceTypes.HORIZONTAL_POD_AUTOSCALER, name: oldHorizontalPodAutoScaler.Name };
+  }
+  return null;
 }
