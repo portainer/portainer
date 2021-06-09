@@ -440,6 +440,15 @@
                     </div>
                   </div>
                 </div>
+
+                <!-- summary -->
+                <kubernetes-summary-view
+                  ng-if="resourcePoolEditForm.$valid && !ctrl.isUpdateButtonDisabled()"
+                  form-values="ctrl.formValues"
+                  old-form-values="ctrl.savedFormValues"
+                ></kubernetes-summary-view>
+                <!-- !summary -->
+
                 <!-- actions -->
                 <div authorization="K8sResourcePoolDetailsW" ng-if="ctrl.isEditable" class="col-sm-12 form-section-title">
                   Actions
