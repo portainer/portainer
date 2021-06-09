@@ -24,7 +24,7 @@ angular.module('portainer.docker').controller('BuildImageController', [
 
     $window.onbeforeunload = () => {
       if ($scope.state.BuildType === 'editor' && $scope.formValues.DockerFileContent && $scope.state.isEditorDirty) {
-        return '';
+        isEditorDirty = false;
       }
     };
 

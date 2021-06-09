@@ -166,7 +166,7 @@ export class EdgeJobController {
 
     this.$window.onbeforeunload = () => {
       if (this.edgeJob.FileContent !== this.oldFileContent && this.state.isEditorDirty) {
-        return '';
+        isEditorDirty = false;
       }
     };
   }

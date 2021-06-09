@@ -49,7 +49,7 @@ angular
 
     $window.onbeforeunload = () => {
       if ($scope.state.Method === 'editor' && $scope.formValues.StackFileContent && $scope.state.isEditorDirty) {
-        return '';
+        isEditorDirty = false;
       }
     };
 

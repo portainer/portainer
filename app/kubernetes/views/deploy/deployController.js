@@ -112,7 +112,7 @@ class KubernetesDeployController {
 
     this.$window.onbeforeunload = () => {
       if (this.formValues.EditorContent && this.state.isEditorDirty) {
-        return '';
+        isEditorDirty = false;
       }
     };
   }

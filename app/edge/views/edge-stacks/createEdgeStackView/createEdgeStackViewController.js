@@ -65,7 +65,7 @@ export class CreateEdgeStackViewController {
 
     this.$window.onbeforeunload = () => {
       if (this.state.Method === 'editor' && this.formValues.StackFileContent && this.state.isEditorDirty) {
-        return '';
+        isEditorDirty = false;
       }
     };
   }

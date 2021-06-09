@@ -73,7 +73,7 @@ export class CreateEdgeJobViewController {
 
     this.$window.onbeforeunload = () => {
       if (this.model.FileContent && this.state.isEditorDirty) {
-        return '';
+        isEditorDirty = false;
       }
     };
   }
