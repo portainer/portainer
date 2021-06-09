@@ -54,40 +54,39 @@
                 <!-- !deploy-type -->
 
                 <!-- build method -->
-                <div ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.KUBERNETES">
-                  <div class="col-sm-12 form-section-title">
-                    Build method
-                  </div>
-                  <div class="form-group"></div>
-                  <div class="form-group" style="margin-bottom: 0;">
-                    <div class="boxselector_wrapper">
-                      <div>
-                        <input type="radio" id="build_method_git" ng-model="ctrl.state.BuildMethod" ng-value="ctrl.BuildMethods.GIT" />
-                        <label for="build_method_git">
-                          <div class="boxselector_header">
-                            <i class="fab fa-github" aria-hidden="true" style="margin-right: 2px;"></i>
-                            Git Repository
-                          </div>
-                          <p>Use a git repository</p>
-                        </label>
-                      </div>
-                      <div>
-                        <input type="radio" id="build_method_web_editor" ng-model="ctrl.state.BuildMethod" ng-value="ctrl.BuildMethods.WEB_EDITOR" />
-                        <label for="build_method_web_editor">
-                          <div class="boxselector_header">
-                            <i class="fa fa-edit" aria-hidden="true" style="margin-right: 2px;"></i>
-                            Web editor
-                          </div>
-                          <p>Use our Web editor</p>
-                        </label>
-                      </div>
+                <div class="col-sm-12 form-section-title">
+                  Build method
+                </div>
+                <div class="form-group"></div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <div class="boxselector_wrapper">
+                    <div>
+                      <input type="radio" id="build_method_git" ng-model="ctrl.state.BuildMethod" ng-value="ctrl.BuildMethods.GIT" />
+                      <label for="build_method_git">
+                        <div class="boxselector_header">
+                          <i class="fab fa-github" aria-hidden="true" style="margin-right: 2px;"></i>
+                          Git Repository
+                        </div>
+                        <p>Use a git repository</p>
+                      </label>
+                    </div>
+                    <div>
+                      <input type="radio" id="build_method_web_editor" ng-model="ctrl.state.BuildMethod" ng-value="ctrl.BuildMethods.WEB_EDITOR" />
+                      <label for="build_method_web_editor">
+                        <div class="boxselector_header">
+                          <i class="fa fa-edit" aria-hidden="true" style="margin-right: 2px;"></i>
+                          Web editor
+                        </div>
+                        <p>Use our Web editor</p>
+                      </label>
                     </div>
                   </div>
                 </div>
+
                 <!-- !deploy-type -->
 
                 <!-- repository -->
-                <div ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.KUBERNETES && ctrl.state.BuildMethod === ctrl.BuildMethods.GIT">
+                <div ng-show="ctrl.state.BuildMethod === ctrl.BuildMethods.GIT">
                   <div class="col-sm-12 form-section-title">
                     Git repository
                   </div>
@@ -167,60 +166,48 @@
                 </div>
                 <!-- !repository -->
 
-                <!-- !editor -->
-
                 <!-- editor -->
-                <div
-                  class="col-sm-12 form-section-title"
-                  ng-show="
-                    ctrl.state.DeployType === ctrl.ManifestDeployTypes.COMPOSE ||
-                    (ctrl.state.DeployType === ctrl.ManifestDeployTypes.KUBERNETES && ctrl.state.BuildMethod === ctrl.BuildMethods.WEB_EDITOR)
-                  "
-                >
-                  Web editor
-                </div>
-                <div class="form-group">
-                  <span class="col-sm-12 text-muted small" ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.COMPOSE">
-                    <p>
-                      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                      Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary that not
-                      all the Compose format options are supported by Kompose at the moment.
-                    </p>
-                    <p>
-                      You can get more information about Compose file format in the
-                      <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>.
-                    </p>
-                  </span>
-                  <span
-                    class="col-sm-12 text-muted small"
-                    ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.KUBERNETES && ctrl.state.BuildMethod === ctrl.BuildMethods.WEB_EDITOR"
-                  >
-                    <p>
-                      <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                      This feature allows you to deploy any kind of Kubernetes resource in this environment (Deployment, Secret, ConfigMap...).
-                    </p>
-                    <p>
-                      You can get more information about Kubernetes file format in the
-                      <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/" target="_blank">official documentation</a>.
-                    </p>
-                  </span>
-                </div>
+                <div ng-if="ctrl.state.BuildMethod === ctrl.BuildMethods.WEB_EDITOR">
+                  <div class="col-sm-12 form-section-title">
+                    Web editor
+                  </div>
+                  <div class="form-group">
+                    <span class="col-sm-12 text-muted small" ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.COMPOSE">
+                      <p>
+                        <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                        Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary that
+                        not all the Compose format options are supported by Kompose at the moment.
+                      </p>
+                      <p>
+                        You can get more information about Compose file format in the
+                        <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>.
+                      </p>
+                    </span>
+                    <span
+                      class="col-sm-12 text-muted small"
+                      ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.KUBERNETES && ctrl.state.BuildMethod === ctrl.BuildMethods.WEB_EDITOR"
+                    >
+                      <p>
+                        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                        This feature allows you to deploy any kind of Kubernetes resource in this environment (Deployment, Secret, ConfigMap...).
+                      </p>
+                      <p>
+                        You can get more information about Kubernetes file format in the
+                        <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/" target="_blank">official documentation</a>.
+                      </p>
+                    </span>
+                  </div>
 
-                <div
-                  class="form-group"
-                  ng-if="
-                    ctrl.state.DeployType === ctrl.ManifestDeployTypes.COMPOSE ||
-                    (ctrl.state.DeployType === ctrl.ManifestDeployTypes.KUBERNETES && ctrl.state.BuildMethod === ctrl.BuildMethods.WEB_EDITOR)
-                  "
-                >
-                  <div class="col-sm-12">
-                    <code-editor
-                      identifier="kubernetes-deploy-editor"
-                      placeholder="# Define or paste the content of your manifest file here"
-                      yml="false"
-                      value="ctrl.formValues.EditorContent"
-                      on-change="(ctrl.editorUpdate)"
-                    ></code-editor>
+                  <div class="form-group">
+                    <div class="col-sm-12">
+                      <code-editor
+                        identifier="kubernetes-deploy-editor"
+                        placeholder="# Define or paste the content of your manifest file here"
+                        yml="false"
+                        value="ctrl.formValues.EditorContent"
+                        on-change="(ctrl.editorUpdate)"
+                      ></code-editor>
+                    </div>
                   </div>
                 </div>
                 <!-- !editor -->

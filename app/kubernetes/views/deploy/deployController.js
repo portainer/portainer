@@ -23,19 +23,15 @@ class KubernetesDeployController {
   }
 
   disableDeploy() {
-    return (
-      (this.state.DeployType === KubernetesDeployManifestTypes.KUBERNETES &&
-        this.state.BuildMethod === KubernetesDeployBuildMethods.GIT &&
-        (!this.formValues.RepositoryURL ||
-          !this.formValues.FilePathInRepository ||
-          (this.formValues.RepositoryAuthentication && (!this.formValues.RepositoryUsername || !this.formValues.RepositoryPassword)))) ||
-      (this.state.DeployType === KubernetesDeployManifestTypes.KUBERNETES &&
-        this.state.BuildMethod === KubernetesDeployBuildMethods.WEB_EDITOR &&
-        _.isEmpty(this.formValues.EditorContent)) ||
-      (this.state.DeployType === KubernetesDeployManifestTypes.COMPOSE && _.isEmpty(this.formValues.EditorContent)) ||
-      _.isEmpty(this.formValues.Namespace) ||
-      this.state.actionInProgress
-    );
+    const isGitFormValid =
+      this.state.BuildMethod === KubernetesDeployBuildMethods.GIT &&
+      (!this.formValues.RepositoryURL ||
+        !this.formValues.RepositoryReferenceName ||
+        !this.formValues.FilePathInRepository ||
+        (this.formValues.RepositoryAuthentication && (!this.formValues.RepositoryUsername || !this.formValues.RepositoryPassword)));
+    const isWebEditorValid = this.state.BuildMethod === KubernetesDeployBuildMethods.WEB_EDITOR && _.isEmpty(this.formValues.EditorContent);
+
+    return isGitFormValid || isWebEditorValid || _.isEmpty(this.formValues.Namespace) || this.state.actionInProgress;
   }
 
   async editorUpdateAsync(cm) {
@@ -58,10 +54,7 @@ class KubernetesDeployController {
     this.state.actionInProgress = true;
 
     try {
-      const method =
-        this.state.DeployType === this.ManifestDeployTypes.KUBERNETES && this.state.BuildMethod === this.BuildMethods.GIT
-          ? KubernetesDeployRequestMethods.REPOSITORY
-          : KubernetesDeployRequestMethods.STRING;
+      const method = this.state.BuildMethod === this.BuildMethods.GIT ? KubernetesDeployRequestMethods.REPOSITORY : KubernetesDeployRequestMethods.STRING;
 
       const payload = {
         ComposeFormat: this.state.DeployType === this.ManifestDeployTypes.COMPOSE,
