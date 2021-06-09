@@ -23,15 +23,15 @@ class KubernetesDeployController {
   }
 
   disableDeploy() {
-    const isGitFormValid =
+    const isGitFormInvalid =
       this.state.BuildMethod === KubernetesDeployBuildMethods.GIT &&
       (!this.formValues.RepositoryURL ||
         !this.formValues.RepositoryReferenceName ||
         !this.formValues.FilePathInRepository ||
         (this.formValues.RepositoryAuthentication && (!this.formValues.RepositoryUsername || !this.formValues.RepositoryPassword)));
-    const isWebEditorValid = this.state.BuildMethod === KubernetesDeployBuildMethods.WEB_EDITOR && _.isEmpty(this.formValues.EditorContent);
+    const isWebEditorInvalid = this.state.BuildMethod === KubernetesDeployBuildMethods.WEB_EDITOR && _.isEmpty(this.formValues.EditorContent);
 
-    return isGitFormValid || isWebEditorValid || _.isEmpty(this.formValues.Namespace) || this.state.actionInProgress;
+    return isGitFormInvalid || isWebEditorInvalid || _.isEmpty(this.formValues.Namespace) || this.state.actionInProgress;
   }
 
   async editorUpdateAsync(cm) {
