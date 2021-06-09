@@ -329,6 +329,14 @@
                 </div>
                 <!-- #endregion -->
 
+                <!-- summary -->
+                <kubernetes-summary-view
+                  ng-if="resourcePoolEditForm.$valid && !ctrl.isUpdateButtonDisabled()"
+                  form-values="ctrl.formValues"
+                  old-form-values="ctrl.savedFormValues"
+                ></kubernetes-summary-view>
+                <!-- !summary -->
+
                 <!-- actions -->
                 <div ng-if="ctrl.isAdmin && ctrl.isEditable" class="col-sm-12 form-section-title">
                   Actions
