@@ -8,7 +8,15 @@
   </div>
   <div class="col-sm-12 environment-variables-simple-mode--actions">
     <button type="button" class="btn btn-sm btn-default" ng-click="$ctrl.add()"> <i class="fa fa-plus-circle" aria-hidden="true"></i> Add an environment variable </button>
-    <button type="button" class="btn btn-sm btn-default" ngf-select="$ctrl.addFromFile($file)" ngf-accept="'.env'" ngf-max-size="1MB" ngf-model-invalid="errorFile">
+    <button
+      type="button"
+      class="btn btn-sm btn-default"
+      ngf-select="$ctrl.addFromFile($file)"
+      ngf-accept="'.env'"
+      ngf-pattern="'.env'"
+      ngf-max-size="1MB"
+      ngf-model-invalid="errorFile"
+    >
       <i class="fa fa-file-upload" aria-hidden="true"></i> Load variables from .env file
     </button>
     <span class="space-left" ng-if="errorFile.$error == 'maxSize'">
