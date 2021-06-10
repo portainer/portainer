@@ -20,9 +20,6 @@ import (
 )
 
 type updateStackGitPayload struct {
-	Env   []portainer.Pair
-	Prune bool
-
 	RepositoryReferenceName  string
 	RepositoryAuthentication bool
 	RepositoryUsername       string
@@ -101,7 +98,6 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	stack.Env = payload.Env
 	stack.GitConfig.ReferenceName = payload.RepositoryReferenceName
 
 	backupProjectPath := fmt.Sprintf("%s-old", stack.ProjectPath)
@@ -138,9 +134,9 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 	return response.JSON(w, stack)
 }
 
-func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint, prune bool) *httperror.HandlerError {
+func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) *httperror.HandlerError {
 	if stack.Type == portainer.DockerSwarmStack {
-		config, httpErr := handler.createSwarmDeployConfig(r, stack, endpoint, prune)
+		config, httpErr := handler.createSwarmDeployConfig(r, stack, endpoint, false)
 		if httpErr != nil {
 			return httpErr
 		}
