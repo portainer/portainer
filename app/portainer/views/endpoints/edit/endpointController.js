@@ -151,7 +151,7 @@ angular
         payload.URL = 'tcp://' + endpoint.URL;
       }
 
-      if (endpoint.Type === PortainerEndpointTypes.AgentOnKubernetesEnvironment) {
+      if (endpoint.Type === PortainerEndpointTypes.AgentOnKubernetesEnvironment || endpoint.Type === PortainerEndpointTypes.KubernetesLocalEnvironment) {
         payload.URL = endpoint.URL;
       }
 
