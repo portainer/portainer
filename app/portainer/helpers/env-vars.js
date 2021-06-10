@@ -1,6 +1,10 @@
 import _ from 'lodash-es';
 
-const KEYVAL_REGEX = /^\s*([\w.-]+)\s*=(.*)?\s*$/;
+export const KEY_REGEX = /[A-Za-z][\w.]+/.source;
+
+export const VALUE_REGEX = /(.*)?/.source;
+
+const KEY_VALUE_REGEX = new RegExp(`^(${KEY_REGEX})\\s*=${VALUE_REGEX}$`);
 const NEWLINES_REGEX = /\n|\r|\r\n/;
 
 /**
@@ -34,7 +38,7 @@ export function parseArrayOfStrings(array) {
         return { name: variableString };
       }
 
-      const parsedKeyValArr = variableString.match(KEYVAL_REGEX);
+      const parsedKeyValArr = variableString.trim().match(KEY_VALUE_REGEX);
       if (parsedKeyValArr != null && parsedKeyValArr.length > 2) {
         return { name: parsedKeyValArr[1], value: parsedKeyValArr[2] || '' };
       }

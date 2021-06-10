@@ -4,6 +4,9 @@ export default class EnvironmentVariablesSimpleModeController {
   /* @ngInject */
   constructor($async) {
     this.$async = $async;
+
+    this.onChangeVariable = this.onChangeVariable.bind(this);
+    this.remove = this.remove.bind(this);
   }
 
   add() {
@@ -12,14 +15,6 @@ export default class EnvironmentVariablesSimpleModeController {
 
   remove(index) {
     this.onChange(this.ngModel.filter((_, i) => i !== index));
-  }
-
-  removeValue(index) {
-    this.onChange(this.ngModel.map((e, i) => (i === index ? { name: e.name } : e)));
-  }
-
-  hasValue(env) {
-    return typeof env.value !== 'undefined';
   }
 
   addFromFile(file) {
@@ -42,11 +37,7 @@ export default class EnvironmentVariablesSimpleModeController {
     });
   }
 
-  onChangeName(index, name) {
-    this.onChange(this.ngModel.map((v, i) => (i !== index ? v : { ...v, name })));
-  }
-
-  onChangeValue(index, value) {
-    this.onChange(this.ngModel.map((v, i) => (i !== index ? v : { ...v, value })));
+  onChangeVariable(index, variable) {
+    this.onChange(this.ngModel.map((v, i) => (i !== index ? v : variable)));
   }
 }
