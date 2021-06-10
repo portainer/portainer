@@ -96,6 +96,9 @@ angular.module('portainer.app').factory('RegistryService', [
       let url = reg.URL;
       if (reg.Type === RegistryTypes.GITLAB) {
         url = reg.URL + '/' + reg.Gitlab.ProjectPath;
+      } else if (reg.Type === RegistryTypes.QUAY) {
+        const name = reg.Quay.UseOrganisation ? reg.Quay.OrganisationName : reg.Username;
+        url = reg.URL + '/' + name;
       }
       return url;
     }
