@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
@@ -26,7 +27,24 @@ func (payload *oauthPayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// @id AuthenticateOauth
+func (handler *Handler) authenticateOAuth(code string, settings *portainer.OAuthSettings) (string, *time.Time, error) {
+	if code == "" {
+		return "", nil, errors.New("Invalid OAuth authorization code")
+	}
+
+	if settings == nil {
+		return "", nil, errors.New("Invalid OAuth configuration")
+	}
+
+	username, expiryTime, err := handler.OAuthService.Authenticate(code, settings)
+	if err != nil {
+		return "", nil, err
+	}
+
+	return username, expiryTime, nil
+}
+
+// @id ValidateOAuth
 // @summary Authenticate with OAuth
 // @tags auth
 // @accept json
@@ -37,23 +55,6 @@ func (payload *oauthPayload) Validate(r *http.Request) error {
 // @failure 422 "Invalid Credentials"
 // @failure 500 "Server error"
 // @router /auth/oauth/validate [post]
-func (handler *Handler) authenticateOAuth(code string, settings *portainer.OAuthSettings) (string, error) {
-	if code == "" {
-		return "", errors.New("Invalid OAuth authorization code")
-	}
-
-	if settings == nil {
-		return "", errors.New("Invalid OAuth configuration")
-	}
-
-	username, err := handler.OAuthService.Authenticate(code, settings)
-	if err != nil {
-		return "", err
-	}
-
-	return username, nil
-}
-
 func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) (*authMiddlewareResponse, *httperror.HandlerError) {
 	resp := &authMiddlewareResponse{
 		Method: portainer.AuthenticationOAuth,
@@ -86,7 +87,7 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) (*
 		}
 	}
 
-	username, err := handler.authenticateOAuth(payload.Code, &settings.OAuthSettings)
+	username, expiryTime, err := handler.authenticateOAuth(payload.Code, &settings.OAuthSettings)
 	if err != nil {
 		log.Printf("[DEBUG] - OAuth authentication error: %s", err)
 		return resp, &httperror.HandlerError{
@@ -170,5 +171,5 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) (*
 		}
 	}
 
-	return handler.writeToken(w, user, portainer.AuthenticationOAuth)
+	return handler.writeTokenForOAuth(w, user, expiryTime, portainer.AuthenticationOAuth)
 }

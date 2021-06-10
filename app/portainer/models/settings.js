@@ -18,6 +18,8 @@ export function PublicSettingsViewModel(settings) {
   this.LogoURL = settings.LogoURL;
   this.OAuthLoginURI = settings.OAuthLoginURI;
   this.EnableTelemetry = settings.EnableTelemetry;
+  this.OAuthHideInternalAuth = settings.OAuthHideInternalAuth;
+  this.OAuthLogoutURI = settings.OAuthLogoutURI;
 }
 
 export function LDAPSettingsViewModel(data) {
@@ -52,4 +54,7 @@ export function OAuthSettingsViewModel(data) {
   this.Scopes = data.Scopes;
   this.OAuthAutoCreateUsers = data.OAuthAutoCreateUsers;
   this.DefaultTeamID = data.DefaultTeamID;
+  this.SSO = data.SSO;
+  this.HideInternalAuth = data.HideInternalAuth;
+  this.LogoutURI = data.LogoutURI;
 }

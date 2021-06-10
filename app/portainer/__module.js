@@ -128,6 +128,21 @@ angular
           'sidebar@': {},
         },
       };
+      var internalAuthentication = {
+        name: 'portainer.internal-auth',
+        url: '/internal-auth',
+        params: {
+          reload: false,
+        },
+        views: {
+          'content@': {
+            templateUrl: './views/internal-auth/internal-auth.html',
+            controller: 'InternalAuthenticationController',
+            controllerAs: 'ctrl',
+          },
+          'sidebar@': {},
+        },
+      };
       const logout = {
         name: 'portainer.logout',
         url: '/logout',
@@ -425,6 +440,7 @@ angular
       $stateRegistryProvider.register(portainer);
       $stateRegistryProvider.register(account);
       $stateRegistryProvider.register(authentication);
+      $stateRegistryProvider.register(internalAuthentication);
       $stateRegistryProvider.register(logout);
       $stateRegistryProvider.register(endpoints);
       $stateRegistryProvider.register(endpoint);
@@ -455,7 +471,7 @@ angular
   ])
   .run(run);
 
-const UNAUTHENTICATED_ROUTES = ['portainer.logout', 'portainer.auth', 'portainer.init.admin'];
+const UNAUTHENTICATED_ROUTES = ['portainer.logout', 'portainer.internal-auth', 'portainer.auth', 'portainer.init.admin'];
 function isTransitionRequiresAuthentication(transition) {
   if (!transition) {
     return true;

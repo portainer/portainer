@@ -295,6 +295,14 @@ func (m *Migrator) MigrateCE() error {
 		}
 	}
 
+	// Portainer EE-2.7.0
+	if m.currentDBVersion < 31 {
+		err := m.updateSettingsToDB31()
+		if err != nil {
+			return err
+		}
+	}
+
 	log.Println("Update DB version to ", portainer.DBVersion)
 	return m.versionService.StoreDBVersion(portainer.DBVersion)
 }

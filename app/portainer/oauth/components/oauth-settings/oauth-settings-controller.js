@@ -11,6 +11,7 @@ angular.module('portainer.oauth').controller('OAuthSettingsController', function
   this.onSelectProvider = onSelectProvider;
   this.onMicrosoftTenantIDChange = onMicrosoftTenantIDChange;
   this.useDefaultProviderConfiguration = useDefaultProviderConfiguration;
+  this.updateSSO = updateSSO;
 
   function onMicrosoftTenantIDChange() {
     const tenantID = ctrl.state.microsoftTenantID;
@@ -25,6 +26,7 @@ angular.module('portainer.oauth').controller('OAuthSettingsController', function
     ctrl.settings.AuthorizationURI = ctrl.state.provider.authUrl;
     ctrl.settings.AccessTokenURI = ctrl.state.provider.accessTokenUrl;
     ctrl.settings.ResourceURI = ctrl.state.provider.resourceUrl;
+    ctrl.settings.LogoutURI = ctrl.state.provider.logoutUrl;
     ctrl.settings.UserIdentifier = ctrl.state.provider.userIdentifier;
     ctrl.settings.Scopes = ctrl.state.provider.scopes;
 
@@ -38,6 +40,7 @@ angular.module('portainer.oauth').controller('OAuthSettingsController', function
     ctrl.settings.AuthorizationURI = ctrl.settings.AuthorizationURI || provider.authUrl;
     ctrl.settings.AccessTokenURI = ctrl.settings.AccessTokenURI || provider.accessTokenUrl;
     ctrl.settings.ResourceURI = ctrl.settings.ResourceURI || provider.resourceUrl;
+    ctrl.settings.LogoutURI = ctrl.settings.LogoutURI || ctrl.state.provider.logoutUrl;
     ctrl.settings.UserIdentifier = ctrl.settings.UserIdentifier || provider.userIdentifier;
     ctrl.settings.Scopes = ctrl.settings.Scopes || provider.scopes;
     if (provider.name === 'microsoft' && ctrl.state.microsoftTenantID !== '') {
@@ -53,6 +56,10 @@ angular.module('portainer.oauth').controller('OAuthSettingsController', function
     } else {
       useExistingConfiguration();
     }
+  }
+
+  function updateSSO() {
+    ctrl.settings.HideInternalAuth = ctrl.settings.SSO;
   }
 
   function $onInit() {

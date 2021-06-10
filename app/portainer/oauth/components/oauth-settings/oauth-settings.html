@@ -1,4 +1,31 @@
 <div>
+  <div class="col-sm-12 form-section-title">
+    Single Sign-On
+  </div>
+
+  <!-- SSO -->
+  <div class="form-group">
+    <label for="use-sso" class="control-label col-sm-2 text-left" style="padding-top: 0;">
+      Use SSO
+      <portainer-tooltip position="bottom" message="When using SSO the OAuth provider is not forced to prompt for credentials."></portainer-tooltip>
+    </label>
+    <div class="col-sm-9">
+      <label class="switch"> <input id="use-sso" type="checkbox" ng-model="$ctrl.settings.SSO" ng-change="$ctrl.updateSSO()" /><i></i> </label>
+    </div>
+  </div>
+  <!-- !SSO -->
+
+  <!-- HideInternalAuth -->
+  <div class="form-group" ng-if="$ctrl.settings.SSO">
+    <label for="hide-internal-auth" class="control-label col-sm-2 text-left" style="padding-top: 0;">
+      Hide internal authentication prompt
+    </label>
+    <div class="col-sm-9">
+      <label class="switch"> <input id="hide-internal-auth" type="checkbox" ng-model="$ctrl.settings.HideInternalAuth" /><i></i> </label>
+    </div>
+  </div>
+  <!-- !HideInternalAuth -->
+
   <auto-user-provision-toggle ng-model="$ctrl.settings.OAuthAutoCreateUsers">
     <field-description>
       With automatic user provisioning enabled, Portainer will create user(s) automatically with the standard user role. If disabled, users must be created beforehand in Portainer
@@ -118,7 +145,18 @@
         <input type="text" class="form-control" id="oauth_redirect_uri" ng-model="$ctrl.settings.RedirectURI" placeholder="http://yourportainer.com/" />
       </div>
     </div>
-
+    <div class="form-group">
+      <label for="oauth_logout_url" class="col-sm-3 col-lg-2 control-label text-left">
+        Logout URL
+        <portainer-tooltip
+          position="bottom"
+          message="URL used by Portainer to redirect the user to the OAuth provider in order to log the user out of the identity provider session."
+        ></portainer-tooltip>
+      </label>
+      <div class="col-sm-9 col-lg-10">
+        <input type="text" class="form-control" id="oauth_logout_url" ng-model="$ctrl.settings.LogoutURI" />
+      </div>
+    </div>
     <div class="form-group">
       <label for="oauth_user_identifier" class="col-sm-3 col-lg-2 control-label text-left">
         User identifier
