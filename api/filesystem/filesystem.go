@@ -515,3 +515,20 @@ func FileExists(filePath string) (bool, error) {
 	}
 	return true, nil
 }
+
+func MoveDirectory(originalPath, newPath string) error {
+	if _, err := os.Stat(originalPath); err != nil {
+		return err
+	}
+
+	alreadyExists, err := FileExists(newPath)
+	if err != nil {
+		return err
+	}
+
+	if alreadyExists {
+		return errors.New("Target path already exists")
+	}
+
+	return os.Rename(originalPath, newPath)
+}
