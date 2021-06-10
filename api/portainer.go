@@ -489,6 +489,8 @@ type (
 		Scopes               string `json:"Scopes"`
 		OAuthAutoCreateUsers bool   `json:"OAuthAutoCreateUsers"`
 		DefaultTeamID        TeamID `json:"DefaultTeamID"`
+		SSO                  bool   `json:"SSO"`
+		LogoutURI            string `json:"LogoutURI"`
 	}
 
 	// Pair defines a key/value string pair
@@ -1145,6 +1147,7 @@ type (
 	// JWTService represents a service for managing JWT tokens
 	JWTService interface {
 		GenerateToken(data *TokenData) (string, error)
+		GenerateTokenForOAuth(data *TokenData, expiryTime *time.Time) (string, error)
 		ParseAndVerifyToken(token string) (*TokenData, error)
 		SetUserSessionDuration(userSessionDuration time.Duration)
 	}
@@ -1176,7 +1179,7 @@ type (
 
 	// OAuthService represents a service used to authenticate users using OAuth
 	OAuthService interface {
-		Authenticate(code string, configuration *OAuthSettings) (string, error)
+		Authenticate(code string, configuration *OAuthSettings) (string, *time.Time, error)
 	}
 
 	// RegistryService represents a service for managing registry data
@@ -1330,7 +1333,7 @@ const (
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "2.5.1"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 27
+	DBVersion = 31
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
 	ComposeSyntaxMaxVersion = "3.9"
 	// AssetsServerURL represents the URL of the Portainer asset server
