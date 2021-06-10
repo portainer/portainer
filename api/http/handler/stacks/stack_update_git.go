@@ -2,6 +2,8 @@ package stacks
 
 import (
 	"errors"
+	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -11,6 +13,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/filesystem"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/stackutils"
@@ -101,17 +104,23 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 	stack.Env = payload.Env
 	stack.GitConfig.ReferenceName = payload.RepositoryReferenceName
 
-	err = handler.FileService.RemoveDirectory(stack.ProjectPath)
+	backupProjectPath := fmt.Sprintf("%s-old", stack.ProjectPath)
+	err = filesystem.MoveDirectory(stack.ProjectPath, backupProjectPath)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove git repository directory", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to move git repository directory", err}
 	}
 
 	err = handler.GitService.CloneRepository(stack.ProjectPath, stack.GitConfig.URL, payload.RepositoryReferenceName, payload.RepositoryUsername, payload.RepositoryPassword)
 	if err != nil {
+		restoreError := filesystem.MoveDirectory(backupProjectPath, stack.ProjectPath)
+		if restoreError != nil {
+			log.Printf("[WARN] [http,stacks,git] [error: %s] [message: failed restoring backup folder]", restoreError)
+		}
+
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to clone git repository", err}
 	}
 
-	httpErr := handler.deployStack(r, stack, endpoint, payload.Prune)
+	httpErr := handler.deployStack(r, stack, endpoint)
 	if httpErr != nil {
 		return httpErr
 	}
@@ -119,6 +128,11 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 	err = handler.DataStore.Stack().UpdateStack(stack.ID, stack)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack changes inside the database", err}
+	}
+
+	err = handler.FileService.RemoveDirectory(backupProjectPath)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove git repository directory", err}
 	}
 
 	return response.JSON(w, stack)
