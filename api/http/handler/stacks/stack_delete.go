@@ -58,29 +58,22 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a stack with the specified identifier inside the database", err}
 	}
 
-	// TODO: this is a work-around for stacks created with Portainer version >= 1.17.1
-	// The EndpointID property is not available for these stacks, this API endpoint
-	// can use the optional EndpointID query parameter to set a valid endpoint identifier to be
-	// used in the context of this request.
 	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", true)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: endpointId", err}
 	}
-	endpointIdentifier := stack.EndpointID
-	if endpointID != 0 {
-		endpointIdentifier = portainer.EndpointID(endpointID)
+
+	isOrphaned := portainer.EndpointID(endpointID) != stack.EndpointID
+
+	if isOrphaned && !securityContext.IsAdmin {
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to remove orphaned stack", errors.New("Permission denied to remove orphaned stack")}
 	}
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointIdentifier)
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the endpoint associated to the stack inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the endpoint associated to the stack inside the database", err}
-	}
-
-	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
 	}
 
 	resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)
@@ -88,12 +81,19 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the stack", err}
 	}
 
-	access, err := handler.userCanAccessStack(securityContext, endpoint.ID, resourceControl)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify user authorizations to validate stack access", err}
-	}
-	if !access {
-		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", httperrors.ErrResourceAccessDenied}
+	if !isOrphaned {
+		err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
+		}
+
+		access, err := handler.userCanAccessStack(securityContext, endpoint.ID, resourceControl)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify user authorizations to validate stack access", err}
+		}
+		if !access {
+			return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", httperrors.ErrResourceAccessDenied}
+		}
 	}
 
 	err = handler.deleteStack(stack, endpoint)

@@ -1,3 +1,5 @@
+import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
+
 angular.module('portainer.app').controller('StackController', [
   '$async',
   '$q',
@@ -19,6 +21,8 @@ angular.module('portainer.app').controller('StackController', [
   'GroupService',
   'ModalService',
   'StackHelper',
+  'ResourceControlService',
+  'Authentication',
   'ContainerHelper',
   function (
     $async,
@@ -41,12 +45,13 @@ angular.module('portainer.app').controller('StackController', [
     GroupService,
     ModalService,
     StackHelper,
+    ResourceControlService,
+    Authentication,
     ContainerHelper
   ) {
     $scope.state = {
       actionInProgress: false,
       migrationInProgress: false,
-      externalStack: false,
       showEditorTab: false,
       yamlError: false,
       isEditorDirty: false,
@@ -55,6 +60,7 @@ angular.module('portainer.app').controller('StackController', [
     $scope.formValues = {
       Prune: false,
       Endpoint: null,
+      AccessControlData: new AccessControlFormData(),
     };
 
     $window.onbeforeunload = () => {
@@ -161,6 +167,31 @@ angular.module('portainer.app').controller('StackController', [
           Notifications.error('Failure', err, 'Unable to remove stack ' + stack.Name);
         });
     }
+
+    $scope.associateStack = function () {
+      var endpointId = +$state.params.endpointId;
+      var stack = $scope.stack;
+      var accessControlData = $scope.formValues.AccessControlData;
+      $scope.state.actionInProgress = true;
+
+      StackService.associate(stack, endpointId, $scope.orphanedRunning)
+        .then(function success(data) {
+          const resourceControl = data.ResourceControl;
+          const userDetails = Authentication.getUserDetails();
+          const userId = userDetails.ID;
+          return ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
+        })
+        .then(function success() {
+          Notifications.success('Stack successfully associated', stack.Name);
+          $state.go('docker.stacks');
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to associate stack ' + stack.Name);
+        })
+        .finally(function final() {
+          $scope.state.actionInProgress = false;
+        });
+    };
 
     $scope.deployStack = function () {
       var stackFile = $scope.stackFileContent;
@@ -391,14 +422,27 @@ angular.module('portainer.app').controller('StackController', [
     async function initView() {
       var stackName = $transition$.params().name;
       $scope.stackName = stackName;
-      var external = $transition$.params().external;
+
       $scope.currentEndpointId = EndpointProvider.endpointID();
 
-      if (external === 'true') {
-        $scope.state.externalStack = true;
+      const regular = $transition$.params().regular == 'true';
+      $scope.regular = regular;
+
+      var external = $transition$.params().external == 'true';
+      $scope.external = external;
+
+      const orphaned = $transition$.params().orphaned == 'true';
+      $scope.orphaned = orphaned;
+
+      const orphanedRunning = $transition$.params().orphanedRunning == 'true';
+      $scope.orphanedRunning = orphanedRunning;
+
+      if (external || (orphaned && orphanedRunning)) {
         loadExternalStack(stackName);
-      } else {
-        var stackId = $transition$.params().id;
+      }
+
+      if (regular || orphaned) {
+        const stackId = $transition$.params().id;
         loadStack(stackId);
       }
 
