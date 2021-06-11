@@ -25,7 +25,7 @@ angular.module('portainer.docker').controller('ImportImageController', [
           Notifications.success('Images successfully uploaded');
         })
         .catch(function error(err) {
-          Notifications.error('Failure', err.message, 'Unable to upload image');
+          Notifications.error('Failure', err, 'Unable to upload image');
         })
         .finally(function final() {
           $scope.state.actionInProgress = false;
