@@ -200,5 +200,5 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) (*
 		}
 	}
 
-	return handler.writeTokenForOAuth(w, user, &authInfo.ExpiryTime, portainer.AuthenticationOAuth)
+	return handler.writeTokenForOAuth(w, user, authInfo.ExpiryTime, portainer.AuthenticationOAuth)
 }

@@ -24,17 +24,16 @@ func NewService() *Service {
 
 // Authenticate takes an access code and exchanges it for an access token from portainer OAuthSettings token endpoint.
 // On success, it will then return an OAuthInfo struct associated to authenticated user.
-// The OAuthInfo struct contains data that is obtained from the OAuth providers resource server.
-// // On success, it will then return the username and token expiry time associated to authenticated user by fetching this information
-// // from the resource server and matching it with the user identifier setting.
+// The OAuthInfo struct contains data associated to the authenticated user.
+// This data is obtained from the OAuth providers resource server and matched with the attributes of the user identifier(s).
 func (*Service) Authenticate(code string, configuration *portainer.OAuthSettings) (*portainer.OAuthInfo, error) {
-	token, err := getAccessToken(code, configuration)
+	token, err := getOAuthToken(code, configuration)
 	if err != nil {
-		log.Printf("[DEBUG] - Failed retrieving access token: %v", err)
+		log.Printf("[DEBUG] - Failed retrieving oauth token: %v", err)
 		return nil, err
 	}
 
-	resource, err := getResource(token, configuration)
+	resource, err := getResource(token.AccessToken, configuration)
 	if err != nil {
 		log.Printf("[DEBUG] - Failed retrieving resource: %v", err)
 		return nil, err
