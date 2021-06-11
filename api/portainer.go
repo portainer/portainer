@@ -579,7 +579,7 @@ type (
 	OAuthInfo struct {
 		Username   string
 		Teams      []string
-		ExpiryTime time.Time
+		ExpiryTime *time.Time
 	}
 
 	// Pair defines a key/value string pair
