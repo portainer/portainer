@@ -367,21 +367,16 @@ angular.module('portainer.app').factory('StackService', [
       return action(name, stackFileContent, env, endpointId);
     };
 
-    async function kubernetesDeployAsync(endpointId, namespace, content, compose) {
+    async function kubernetesDeployAsync(endpointId, method, payload) {
       try {
-        const payload = {
-          StackFileContent: content,
-          ComposeFormat: compose,
-          Namespace: namespace,
-        };
-        await Stack.create({ method: 'undefined', type: 3, endpointId: endpointId }, payload).$promise;
+        await Stack.create({ endpointId: endpointId, method: method, type: 3 }, payload).$promise;
       } catch (err) {
         throw { err: err };
       }
     }
 
-    service.kubernetesDeploy = function (endpointId, namespace, content, compose) {
-      return $async(kubernetesDeployAsync, endpointId, namespace, content, compose);
+    service.kubernetesDeploy = function (endpointId, method, payload) {
+      return $async(kubernetesDeployAsync, endpointId, method, payload);
     };
 
     service.start = start;
