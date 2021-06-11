@@ -1,4 +1,4 @@
-<div ng-if="service.EnvironmentVariables" id="service-env-variables">
+<ng-form ng-if="service.EnvironmentVariables" id="service-env-variables" name="serviceEnvForm">
   <rd-widget>
     <rd-widget-header icon="fa-tasks" title-text="Environment variables">
       <div class="nopadding" authorization="DockerServiceUpdate">
@@ -16,7 +16,14 @@
     <rd-widget-footer authorization="DockerServiceUpdate">
       <div class="btn-toolbar" role="toolbar">
         <div class="btn-group" role="group">
-          <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['EnvironmentVariables'])" ng-click="updateService(service)">Apply changes</button>
+          <button
+            type="button"
+            class="btn btn-primary btn-sm"
+            ng-disabled="!hasChanges(service, ['EnvironmentVariables']) || serviceEnvForm.$invalid"
+            ng-click="updateService(service)"
+          >
+            Apply changes
+          </button>
           <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="caret"></span>
           </button>
@@ -28,4 +35,4 @@
       </div>
     </rd-widget-footer>
   </rd-widget>
-</div>
+</ng-form>
