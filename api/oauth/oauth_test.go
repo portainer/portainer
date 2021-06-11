@@ -8,25 +8,25 @@ import (
 	"github.com/portainer/portainer/api/oauth/oauthtest"
 )
 
-func Test_getAccessToken(t *testing.T) {
+func Test_getOAuthToken(t *testing.T) {
 	validCode := "valid-code"
 	srv, config := oauthtest.RunOAuthServer(validCode, &portainer.OAuthSettings{})
 	defer srv.Close()
 
-	t.Run("getAccessToken fails upon invalid code", func(t *testing.T) {
+	t.Run("getOAuthToken fails upon invalid code", func(t *testing.T) {
 		code := ""
-		_, err := getAccessToken(code, config)
+		_, err := getOAuthToken(code, config)
 		if err == nil {
-			t.Errorf("getAccessToken should fail upon providing invalid code; code=%v", code)
+			t.Errorf("getOAuthToken should fail upon providing invalid code; code=%v", code)
 		}
 	})
 
-	t.Run("getAccessToken succeeds upon providing valid code", func(t *testing.T) {
+	t.Run("getOAuthToken succeeds upon providing valid code", func(t *testing.T) {
 		code := validCode
-		token, err := getAccessToken(code, config)
+		token, err := getOAuthToken(code, config)
 
-		if token == "" || err != nil {
-			t.Errorf("getAccessToken should successfully return access token upon providing valid code")
+		if token == nil || err != nil {
+			t.Errorf("getOAuthToken should successfully return access token upon providing valid code")
 		}
 	})
 }
