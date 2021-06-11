@@ -184,7 +184,7 @@
                     <button
                       type="button"
                       class="btn btn-sm btn-primary"
-                      ng-disabled="state.actionInProgress || stack.Status === 2 || !stackFileContent || orphaned"
+                      ng-disabled="state.actionInProgress || !stackUpdateForm.$valid || stack.Status === 2 || !stackFileContent || orphaned"
                       ng-click="deployStack()"
                       button-spinner="state.actionInProgress"
                     >
