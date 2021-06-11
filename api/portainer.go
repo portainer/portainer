@@ -1,6 +1,7 @@
 package portainer
 
 import (
+	"context"
 	"io"
 	"time"
 )
@@ -425,6 +426,14 @@ type (
 	KubernetesIngressClassConfig struct {
 		Name string `json:"Name"`
 		Type string `json:"Type"`
+	}
+
+	// KubernetesShellPod represents a Kubectl Shell details to facilitate pod exec functionality
+	KubernetesShellPod struct {
+		Namespace        string
+		PodName          string
+		ContainerName    string
+		ShellExecCommand string
 	}
 
 	// LDAPGroupSearchSettings represents settings used to search for groups in a LDAP server
@@ -1154,8 +1163,10 @@ type (
 
 	// KubeClient represents a service used to query a Kubernetes environment
 	KubeClient interface {
+		GetServiceAccountName(tokendata *TokenData) (string, error)
 		SetupUserServiceAccount(userID int, teamIDs []int) error
 		GetServiceAccountBearerToken(userID int) (string, error)
+		CreateUserShellPod(ctx context.Context, serviceAccountName string) (*KubernetesShellPod, error)
 		StartExecProcess(namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error
 	}
 
@@ -1569,6 +1580,9 @@ const (
 	// EdgeAgentActive represents an active state for a tunnel connected to an Edge endpoint
 	EdgeAgentActive string = "ACTIVE"
 )
+
+// K8sServiceAccountClusterAdmin is built in cluster admin service account
+const K8sServiceAccountClusterAdmin string = "portainer-sa-clusteradmin"
 
 // represents an authorization type
 const (

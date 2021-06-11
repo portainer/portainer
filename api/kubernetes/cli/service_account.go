@@ -1,11 +1,30 @@
 package cli
 
 import (
-	"k8s.io/api/core/v1"
+	portainer "github.com/portainer/portainer/api"
+	v1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
+
+// GetServiceAccountName returns the portainer ServiceAccountName associated to the specified user.
+func (kcl *KubeClient) GetServiceAccountName(tokenData *portainer.TokenData) (string, error) {
+	var portainerServiceAccountName string
+	if tokenData.Role == portainer.AdministratorRole {
+		portainerServiceAccountName = portainer.K8sServiceAccountClusterAdmin
+	} else {
+		portainerServiceAccountName = userServiceAccountName(int(tokenData.ID), kcl.instanceID)
+	}
+
+	// verify name exists as service account resource within portainer namespace
+	serviceAccountName, err := kcl.cli.CoreV1().ServiceAccounts(portainerNamespace).Get(portainerServiceAccountName, metav1.GetOptions{})
+	if err != nil {
+		return "", err
+	}
+
+	return serviceAccountName.Name, nil
+}
 
 // GetServiceAccountBearerToken returns the ServiceAccountToken associated to the specified user.
 func (kcl *KubeClient) GetServiceAccountBearerToken(userID int) (string, error) {
