@@ -4,9 +4,24 @@ angular.module('portainer.docker').factory('ServiceHelper', [
   function ServiceHelperFactory() {
     'use strict';
 
-    var helper = {};
+    var helper = {
+      associateTasksToService,
+      serviceToConfig,
+      translateKeyValueToPlacementPreferences,
+      translateKeyValueToPlacementConstraints,
+      translateEnvironmentVariables,
+      translateEnvironmentVariablesToEnv,
+      translatePreferencesToKeyValue,
+      translateConstraintsToKeyValue,
+      translateHumanDurationToNanos,
+      translateNanosToHumanDuration,
+      translateLogDriverOptsToKeyValue,
+      translateKeyValueToLogDriverOpts,
+      translateHostsEntriesToHostnameIP,
+      translateHostnameIPToHostsEntries,
+    };
 
-    helper.associateTasksToService = function (service, tasks) {
+    function associateTasksToService(service, tasks) {
       service.Tasks = [];
       var otherServicesTasks = [];
       for (var i = 0; i < tasks.length; i++) {
@@ -19,9 +34,9 @@ angular.module('portainer.docker').factory('ServiceHelper', [
         }
       }
       tasks = otherServicesTasks;
-    };
+    }
 
-    helper.serviceToConfig = function (service) {
+    function serviceToConfig(service) {
       return {
         Name: service.Spec.Name,
         Labels: service.Spec.Labels,
@@ -31,9 +46,9 @@ angular.module('portainer.docker').factory('ServiceHelper', [
         Networks: service.Spec.Networks,
         EndpointSpec: service.Spec.EndpointSpec,
       };
-    };
+    }
 
-    helper.translateKeyValueToPlacementPreferences = function (keyValuePreferences) {
+    function translateKeyValueToPlacementPreferences(keyValuePreferences) {
       if (keyValuePreferences) {
         var preferences = [];
         keyValuePreferences.forEach(function (preference) {
@@ -52,9 +67,9 @@ angular.module('portainer.docker').factory('ServiceHelper', [
         return preferences;
       }
       return [];
-    };
+    }
 
-    helper.translateKeyValueToPlacementConstraints = function (keyValueConstraints) {
+    function translateKeyValueToPlacementConstraints(keyValueConstraints) {
       if (keyValueConstraints) {
         var constraints = [];
         keyValueConstraints.forEach(function (constraint) {
@@ -65,9 +80,9 @@ angular.module('portainer.docker').factory('ServiceHelper', [
         return constraints;
       }
       return [];
-    };
+    }
 
-    helper.translateEnvironmentVariables = function (env) {
+    function translateEnvironmentVariables(env) {
       if (env) {
         var variables = [];
         env.forEach(function (variable) {
@@ -85,9 +100,9 @@ angular.module('portainer.docker').factory('ServiceHelper', [
         return variables;
       }
       return [];
-    };
+    }
 
-    helper.translateEnvironmentVariablesToEnv = function (env) {
+    function translateEnvironmentVariablesToEnv(env) {
       if (env) {
         var variables = [];
         env.forEach(function (variable) {
@@ -98,9 +113,9 @@ angular.module('portainer.docker').factory('ServiceHelper', [
         return variables;
       }
       return [];
-    };
+    }
 
-    helper.translatePreferencesToKeyValue = function (preferences) {
+    function translatePreferencesToKeyValue(preferences) {
       if (preferences) {
         var keyValuePreferences = [];
         preferences.forEach(function (preference) {
@@ -114,9 +129,9 @@ angular.module('portainer.docker').factory('ServiceHelper', [
         return keyValuePreferences;
       }
       return [];
-    };
+    }
 
-    helper.translateConstraintsToKeyValue = function (constraints) {
+    function translateConstraintsToKeyValue(constraints) {
       function getOperator(constraint) {
         var indexEquals = constraint.indexOf('==');
         if (indexEquals >= 0) {
@@ -143,30 +158,32 @@ angular.module('portainer.docker').factory('ServiceHelper', [
         });
         return keyValueConstraints;
       }
-    };
+    }
 
-    helper.translateHumanDurationToNanos = function (humanDuration) {
+    function translateHumanDurationToNanos(humanDuration) {
       var nanos;
       var regex = /^([0-9]+)(h|m|s|ms|us|ns)$/i;
-      var matches = humanDuration.match(regex);
+      if (humanDuration) {
+        var matches = humanDuration.match(regex);
 
-      if (matches !== null && matches.length === 3) {
-        var duration = parseInt(matches[1], 10);
-        var unit = matches[2];
-        // Moment.js cannot use micro or nanoseconds
-        switch (unit) {
-          case 'ns':
-            nanos = duration;
-            break;
-          case 'us':
-            nanos = duration * 1000;
-            break;
-          default:
-            nanos = moment.duration(duration, unit).asMilliseconds() * 1000000;
+        if (matches !== null && matches.length === 3) {
+          var duration = parseInt(matches[1], 10);
+          var unit = matches[2];
+          // Moment.js cannot use micro or nanoseconds
+          switch (unit) {
+            case 'ns':
+              nanos = duration;
+              break;
+            case 'us':
+              nanos = duration * 1000;
+              break;
+            default:
+              nanos = moment.duration(duration, unit).asMilliseconds() * 1000000;
+          }
         }
+        return nanos;
       }
-      return nanos;
-    };
+    }
 
     // Convert nanoseconds to the higher unit possible
     // e.g 1840 nanoseconds = 1804ns
@@ -175,7 +192,7 @@ angular.module('portainer.docker').factory('ServiceHelper', [
     // e.g 3540000000000 nanoseconds = 59m
     // e.g 3600000000000 nanoseconds = 1h
 
-    helper.translateNanosToHumanDuration = function (nanos) {
+    function translateNanosToHumanDuration(nanos) {
       var humanDuration = '0s';
       var conversionFromNano = {};
       conversionFromNano['ns'] = 1;
@@ -191,9 +208,9 @@ angular.module('portainer.docker').factory('ServiceHelper', [
         }
       });
       return humanDuration;
-    };
+    }
 
-    helper.translateLogDriverOptsToKeyValue = function (logOptions) {
+    function translateLogDriverOptsToKeyValue(logOptions) {
       var options = [];
       if (logOptions) {
         Object.keys(logOptions).forEach(function (key) {
@@ -207,9 +224,9 @@ angular.module('portainer.docker').factory('ServiceHelper', [
         });
       }
       return options;
-    };
+    }
 
-    helper.translateKeyValueToLogDriverOpts = function (keyValueLogDriverOpts) {
+    function translateKeyValueToLogDriverOpts(keyValueLogDriverOpts) {
       var options = {};
       if (keyValueLogDriverOpts) {
         keyValueLogDriverOpts.forEach(function (option) {
@@ -219,9 +236,9 @@ angular.module('portainer.docker').factory('ServiceHelper', [
         });
       }
       return options;
-    };
+    }
 
-    helper.translateHostsEntriesToHostnameIP = function (entries) {
+    function translateHostsEntriesToHostnameIP(entries) {
       var ipHostEntries = [];
       if (entries) {
         entries.forEach(function (entry) {
@@ -232,9 +249,9 @@ angular.module('portainer.docker').factory('ServiceHelper', [
         });
       }
       return ipHostEntries;
-    };
+    }
 
-    helper.translateHostnameIPToHostsEntries = function (entries) {
+    function translateHostnameIPToHostsEntries(entries) {
       var ipHostEntries = [];
       if (entries) {
         entries.forEach(function (entry) {
@@ -244,7 +261,7 @@ angular.module('portainer.docker').factory('ServiceHelper', [
         });
       }
       return ipHostEntries;
-    };
+    }
 
     return helper;
   },

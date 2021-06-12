@@ -102,6 +102,13 @@
                 </a>
               </th>
               <th>
+                <a ng-click="$ctrl.changeOrderBy('Healthcheck')">
+                  Healthcheck
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Healthcheck' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Healthcheck' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
                 <a ng-click="$ctrl.changeOrderBy('Ports')">
                   Published Ports
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Ports' && !$ctrl.state.reverseOrder"></i>
@@ -165,6 +172,12 @@
                   <a class="interactive" ng-click="item.Scale = false; $event.stopPropagation();"><i class="fa fa-times"></i></a>
                   <a class="interactive" ng-click="actionCtrl.scaleAction(item); $event.stopPropagation();"><i class="fa fa-check-square"></i></a>
                 </span>
+              </td>
+              <td>
+                <span
+                  ><i class="fa {{ item.HealthCheck ? 'fa-toggle-on' : 'fa-toggle-off' }}" aria-hidden="true" style="margin-right: 2px;"></i>
+                  {{ item.HealthCheck ? 'Yes' : 'No' }}</span
+                >
               </td>
               <td>
                 <a

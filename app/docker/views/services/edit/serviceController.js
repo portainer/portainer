@@ -12,6 +12,7 @@ require('./includes/placementPreferences.html');
 require('./includes/ports.html');
 require('./includes/resources.html');
 require('./includes/restart.html');
+require('./includes/healthcheck.html');
 require('./includes/secrets.html');
 require('./includes/servicelabels.html');
 require('./includes/tasks.html');
@@ -368,7 +369,7 @@ angular.module('portainer.docker').controller('ServiceController', [
         previousServiceValues = [];
       }
       keys.forEach(function (attribute) {
-        service[attribute] = originalService[attribute]; // reset service values
+        _.set(service, attribute, _.get(originalService, attribute));
       });
       service.hasChanges = false;
     };
@@ -462,6 +463,28 @@ angular.module('portainer.docker').controller('ServiceController', [
           Window: ServiceHelper.translateHumanDurationToNanos(service.RestartWindow) || 0,
         };
       }
+      if (
+        $scope.hasChanges(service, [
+          'HealthCheck.CustomHealthcheck',
+          'HealthCheck.Test[1]',
+          'HealthCheck.Interval',
+          'HealthCheck.Timeout',
+          'HealthCheck.StartPeriod',
+          'HealthCheck.Retries',
+        ])
+      ) {
+        if (service.HealthCheck.CustomHealthcheck) {
+          config.TaskTemplate.ContainerSpec.HealthCheck = {
+            Test: ['CMD-SHELL', service.HealthCheck.Test[1]],
+            Interval: ServiceHelper.translateHumanDurationToNanos(service.HealthCheck.Interval),
+            Timeout: ServiceHelper.translateHumanDurationToNanos(service.HealthCheck.Timeout),
+            StartPeriod: ServiceHelper.translateHumanDurationToNanos(service.HealthCheck.StartPeriod),
+            Retries: service.HealthCheck.Retries || undefined,
+          };
+        } else {
+          delete config.TaskTemplate.ContainerSpec.HealthCheck;
+        }
+      }
 
       config.TaskTemplate.LogDriver = null;
       if (service.LogDriverName) {
@@ -542,6 +565,7 @@ angular.module('portainer.docker').controller('ServiceController', [
     $scope.updateService = function updateService(service) {
       let config = {};
       service, (config = buildChanges(service));
+
       ServiceService.update(service, config).then(
         function (data) {
           if (data.message && data.message.match(/^rpc error:/)) {
@@ -647,6 +671,11 @@ angular.module('portainer.docker').controller('ServiceController', [
       service.RestartWindow = ServiceHelper.translateNanosToHumanDuration(service.RestartWindow) || '0s';
       service.UpdateDelay = ServiceHelper.translateNanosToHumanDuration(service.UpdateDelay) || '0s';
       service.StopGracePeriod = service.StopGracePeriod ? ServiceHelper.translateNanosToHumanDuration(service.StopGracePeriod) : '';
+      if (service.HealthCheck) {
+        service.HealthCheck.Interval = service.HealthCheck.Interval ? ServiceHelper.translateNanosToHumanDuration(service.HealthCheck.Interval) : undefined;
+        service.HealthCheck.Timeout = service.HealthCheck.Timeout ? ServiceHelper.translateNanosToHumanDuration(service.HealthCheck.Timeout) : undefined;
+        service.HealthCheck.StartPeriod = service.HealthCheck.StartPeriod ? ServiceHelper.translateNanosToHumanDuration(service.HealthCheck.StartPeriod) : undefined;
+      }
     }
 
     function initView() {
@@ -657,6 +686,9 @@ angular.module('portainer.docker').controller('ServiceController', [
       ServiceService.service($transition$.params().id)
         .then(function success(data) {
           service = data;
+          if (service.HealthCheck) {
+            service.HealthCheck.CustomHealthcheck = true;
+          }
           $scope.isUpdating = $scope.lastVersion >= service.Version;
           if (!$scope.isUpdating) {
             $scope.lastVersion = service.Version;
@@ -771,7 +803,7 @@ angular.module('portainer.docker').controller('ServiceController', [
 
     $scope.updateServiceAttribute = updateServiceAttribute;
     function updateServiceAttribute(service, name) {
-      if (service[name] !== originalService[name] || !(name in originalService)) {
+      if (_.get(service, name) !== _.get(originalService, name) || !_.has(originalService, name)) {
         service.hasChanges = true;
       }
       previousServiceValues.push(name);

@@ -99,6 +99,11 @@ angular.module('portainer.docker').controller('CreateServiceController', [
       LogDriverName: '',
       LogDriverOpts: [],
       Webhook: false,
+      Healthcheck: '',
+      Interval: '',
+      Timeout: '',
+      StartPeriod: '',
+      Retries: undefined,
     };
 
     $scope.state = {
@@ -451,6 +456,21 @@ angular.module('portainer.docker').controller('CreateServiceController', [
       }
     }
 
+    function prepareHealthcheckConfig(config, input) {
+      if (input.Healthcheck) {
+        const interval = input.Interval ? input.Interval : '30s';
+        const timeout = input.Timeout ? input.Timeout : '30s';
+        const startPeriod = input.StartPeriod ? input.StartPeriod : '0s';
+        config.TaskTemplate.ContainerSpec.HealthCheck = {
+          Test: ['CMD-SHELL', input.Healthcheck],
+          Interval: ServiceHelper.translateHumanDurationToNanos(interval),
+          Timeout: ServiceHelper.translateHumanDurationToNanos(timeout),
+          StartPeriod: ServiceHelper.translateHumanDurationToNanos(startPeriod),
+          Retries: input.Retries,
+        };
+      }
+    }
+
     function prepareConfiguration() {
       var input = $scope.formValues;
       var config = {
@@ -485,6 +505,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
       prepareResourcesMemoryConfig(config, input);
       prepareRestartPolicy(config, input);
       prepareLogDriverConfig(config, input);
+      prepareHealthcheckConfig(config, input);
       return config;
     }
 
@@ -530,6 +551,14 @@ angular.module('portainer.docker').controller('CreateServiceController', [
     function volumesAreValid() {
       const volumes = $scope.formValues.Volumes;
       return volumes.every((volume) => volume.Target && volume.Source);
+    }
+
+    $scope.healthcheckIsValid = healthcheckIsValid;
+    function healthcheckIsValid() {
+      if ($scope.formValues.CustomHealthcheck) {
+        return $scope.formValues.Healthcheck !== '' && $scope.formValues.Healthcheck !== undefined;
+      }
+      return true;
     }
 
     $scope.create = function createService() {
