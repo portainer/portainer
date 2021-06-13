@@ -15,6 +15,14 @@ export default class porImageRegistryContainerController {
     }
   }
 
+  $onInit() {
+    this.setValidity =
+      this.setValidity ||
+      (() => {
+        /* noop */
+      });
+  }
+
   async fetchRateLimits() {
     this.pullRateLimits = null;
     if (EndpointHelper.isAgentEndpoint(this.endpoint) || EndpointHelper.isLocalEndpoint(this.endpoint)) {
