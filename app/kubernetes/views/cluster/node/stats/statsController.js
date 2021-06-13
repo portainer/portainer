@@ -84,7 +84,7 @@ class KubernetesNodeStatsController {
           const memory = filesizeParser(stats.usage.memory);
           const cpu = KubernetesResourceReservationHelper.parseCPU(stats.usage.cpu);
           this.stats = {
-            read: stats.timestamp,
+            read: stats.creationTimestamp,
             MemoryUsage: memory,
             CPUUsage: (cpu / this.nodeCPU) * 100,
           };
