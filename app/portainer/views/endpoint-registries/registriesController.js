@@ -4,10 +4,10 @@ import { RegistryTypes } from 'Portainer/models/registryTypes';
 
 class EndpointRegistriesController {
   /* @ngInject */
-  constructor($async, Notifications, RegistryService) {
+  constructor($async, Notifications, EndpointService) {
     this.$async = $async;
     this.Notifications = Notifications;
-    this.RegistryService = RegistryService;
+    this.EndpointService = EndpointService;
 
     this.canManageAccess = this.canManageAccess.bind(this);
   }
@@ -20,7 +20,7 @@ class EndpointRegistriesController {
     return this.$async(async () => {
       try {
         const dockerhub = new DockerHubViewModel();
-        const registries = await this.RegistryService.registries();
+        const registries = await this.EndpointService.registries(this.endpointId);
         this.registries = _.concat(dockerhub, registries);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to retrieve registries');

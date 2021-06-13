@@ -26,7 +26,6 @@ class KubernetesResourcePoolController {
     LocalStorage,
     EndpointService,
     ModalService,
-    RegistryService,
     KubernetesNodeService,
     KubernetesResourceQuotaService,
     KubernetesResourcePoolService,
@@ -45,7 +44,6 @@ class KubernetesResourcePoolController {
       LocalStorage,
       EndpointService,
       ModalService,
-      RegistryService,
       KubernetesNodeService,
       KubernetesResourceQuotaService,
       KubernetesResourcePoolService,
@@ -282,7 +280,7 @@ class KubernetesResourcePoolController {
         const namespace = this.$state.params.id;
 
         if (this.isAdmin) {
-          this.registries = await this.RegistryService.registries();
+          this.registries = await this.EndpointService.registries(this.endpoint.Id);
           this.registries.forEach((reg) => {
             if (reg.RegistryAccesses && reg.RegistryAccesses[this.endpoint.Id] && reg.RegistryAccesses[this.endpoint.Id].Namespaces.includes(namespace)) {
               reg.Checked = true;
