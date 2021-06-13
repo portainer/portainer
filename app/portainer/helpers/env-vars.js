@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 
-export const KEY_REGEX = /[A-Za-z][\w.]+/.source;
+export const KEY_REGEX = /[a-zA-Z]([-_a-zA-Z0-9]*[a-zA-Z0-9])?/.source;
 
 export const VALUE_REGEX = /(.*)?/.source;
 
