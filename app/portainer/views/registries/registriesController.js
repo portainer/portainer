@@ -55,8 +55,7 @@ angular.module('portainer.app').controller('RegistriesController', [
         registries: RegistryService.registries(),
       })
         .then(function success(data) {
-          $scope.registries = data.registries;
-          $scope.registries.push(new DockerHubViewModel());
+          $scope.registries = _.concat(new DockerHubViewModel(), data.registries);
         })
         .catch(function error(err) {
           $scope.registries = [];

@@ -21,7 +21,7 @@ class EndpointRegistriesController {
       try {
         const dockerhub = new DockerHubViewModel();
         const registries = await this.RegistryService.registries();
-        this.registries = _.concat(registries, dockerhub);
+        this.registries = _.concat(dockerhub, registries);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to retrieve registries');
       }
