@@ -1,8 +1,19 @@
 package security
 
 import (
+	"net/http"
+
 	portainer "github.com/portainer/portainer/api"
 )
+
+func IsAdmin(request *http.Request) (bool, error) {
+	tokenData, err := RetrieveTokenData(request)
+	if err != nil {
+		return false, err
+	}
+
+	return tokenData.Role == portainer.AdministratorRole, nil
+}
 
 // AuthorizedResourceControlAccess checks whether the user can alter an existing resource control.
 func AuthorizedResourceControlAccess(resourceControl *portainer.ResourceControl, context *RestrictedRequestContext) bool {

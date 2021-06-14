@@ -84,7 +84,9 @@ angular.module('portainer.app').controller('InitAdminController', [
           if (status && status.Version) {
             return;
           }
-        } catch (e) {}
+        } catch (e) {
+          // pass
+        }
       }
       throw 'Timeout to wait for Portainer restarting';
     }

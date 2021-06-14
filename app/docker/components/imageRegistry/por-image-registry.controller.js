@@ -69,7 +69,7 @@ class porImageRegistryController {
   async reloadRegistries() {
     return this.$async(async () => {
       try {
-        const registries = await this.EndpointService.registries(this.endpointId, this.namespace);
+        const registries = await this.EndpointService.registries(this.endpoint.Id, this.namespace);
         this.registries = _.concat(this.defaultRegistry, registries);
 
         const id = this.model.Registry.Id;
@@ -99,8 +99,8 @@ class porImageRegistryController {
     });
   }
 
-  $onChanges({ namespace, endpointId }) {
-    if ((namespace || endpointId) && this.endpointId) {
+  $onChanges({ namespace, endpoint }) {
+    if ((namespace || endpoint) && this.endpoint.Id) {
       this.reloadRegistries();
     }
   }

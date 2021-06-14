@@ -11,7 +11,6 @@ angular.module('portainer.docker').component('porImageRegistry', {
     checkRateLimits: '<',
     onImageChange: '&',
     setValidity: '<',
-    endpointId: '<',
     namespace: '<',
   },
   require: {
