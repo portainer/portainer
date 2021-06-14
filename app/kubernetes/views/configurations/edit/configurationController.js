@@ -55,6 +55,10 @@ class KubernetesConfigurationController {
     return this.KubernetesNamespaceHelper.isSystemNamespace(this.configuration.Namespace);
   }
 
+  isSystemConfig() {
+    return this.isSystemNamespace() || this.configuration.IsRegistrySecret;
+  }
+
   selectTab(index) {
     this.LocalStorage.storeActiveTab('configuration', index);
   }

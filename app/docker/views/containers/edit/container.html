@@ -190,7 +190,7 @@
           </div>
           <!-- !tag-description -->
           <!-- image-and-registry -->
-          <por-image-registry model="config.RegistryModel" auto-complete="true" label-class="col-sm-1" input-class="col-sm-11" endpoint-id="endpoint.Id"></por-image-registry>
+          <por-image-registry model="config.RegistryModel" auto-complete="true" label-class="col-sm-1" input-class="col-sm-11" endpoint="endpoint"></por-image-registry>
           <!-- !image-and-registry -->
           <!-- tag-note -->
           <div class="form-group">
@@ -201,7 +201,7 @@
           <!-- !tag-note -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!config.RegistryModel.Image || config.commitInProgress" ng-click="commit()">Create</button>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!config.RegistryModel.Image || config.commitInProgress " ng-click="commit()">Create</button>
             </div>
           </div>
         </form>

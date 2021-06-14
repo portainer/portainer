@@ -15,7 +15,7 @@ import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
 class KubernetesCreateResourcePoolController {
   /* #region  CONSTRUCTOR */
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesNodeService, KubernetesResourcePoolService, KubernetesIngressService, Authentication, EndpointProvider, RegistryService) {
+  constructor($async, $state, Notifications, KubernetesNodeService, KubernetesResourcePoolService, KubernetesIngressService, Authentication, EndpointService) {
     Object.assign(this, {
       $async,
       $state,
@@ -24,8 +24,7 @@ class KubernetesCreateResourcePoolController {
       KubernetesResourcePoolService,
       KubernetesIngressService,
       Authentication,
-      EndpointProvider,
-      RegistryService,
+      EndpointService,
     });
 
     this.IngressClassTypes = KubernetesIngressClassTypes;
@@ -158,7 +157,7 @@ class KubernetesCreateResourcePoolController {
   getRegistries() {
     return this.$async(async () => {
       try {
-        this.registries = await this.RegistryService.registries();
+        this.registries = await this.EndpointService.registries(this.endpoint.Id);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to retrieve registries');
       }
@@ -170,8 +169,7 @@ class KubernetesCreateResourcePoolController {
   $onInit() {
     return this.$async(async () => {
       try {
-        const endpoint = this.EndpointProvider.currentEndpoint();
-        this.endpoint = endpoint;
+        const endpoint = this.endpoint;
         this.defaults = KubernetesResourceQuotaDefaults;
         this.formValues = new KubernetesResourcePoolFormValues(this.defaults);
         this.formValues.EndpointId = this.endpoint.Id;

@@ -5,6 +5,7 @@ import (
 	"path"
 
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
+	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes/privateregistries"
 	v1 "k8s.io/api/core/v1"
 )
@@ -51,19 +52,23 @@ func (transport *baseTransport) proxySecretListOperation(request *http.Request) 
 		return nil, err
 	}
 
+	isAdmin, err := security.IsAdmin(request)
+	if err != nil {
+		return nil, err
+	}
+
+	if isAdmin {
+		return response, nil
+	}
+
 	body, err := utils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return nil, err
 	}
 
-	if _, ok := body["items"]; !ok {
-		utils.RewriteResponse(response, body, response.StatusCode)
-		return response, nil
-	}
+	items := utils.GetArrayObject(body, "items")
 
-	items, ok := body["items"].([]interface{})
-
-	if !ok {
+	if items == nil {
 		utils.RewriteResponse(response, body, response.StatusCode)
 		return response, nil
 	}
@@ -83,10 +88,18 @@ func (transport *baseTransport) proxySecretListOperation(request *http.Request) 
 }
 
 func (transport *baseTransport) proxySecretInspectOperation(request *http.Request) (*http.Response, error) {
-
 	response, err := transport.executeKubernetesRequest(request, false)
 	if err != nil {
 		return nil, err
+	}
+
+	isAdmin, err := security.IsAdmin(request)
+	if err != nil {
+		return nil, err
+	}
+
+	if isAdmin {
+		return response, nil
 	}
 
 	body, err := utils.GetResponseAsJSONObject(response)
@@ -137,7 +150,6 @@ func (transport *baseTransport) proxySecretUpdateOperation(request *http.Request
 }
 
 func (transport *baseTransport) proxySecretDeleteOperation(request *http.Request, namespace string) (*http.Response, error) {
-
 	kcl, err := transport.k8sClientFactory.GetKubeClient(transport.endpoint)
 	if err != nil {
 		return nil, err
