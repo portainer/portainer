@@ -52,7 +52,7 @@ func Test_waitForPodStatus(t *testing.T) {
 
 		pod, err := k.cli.CoreV1().Pods(defaultNamespace).Create(podSpec)
 		if err != nil {
-			t.Errorf("failed to create service acount; err=%s", err)
+			t.Errorf("failed to create pod; err=%s", err)
 		}
 		defer k.cli.CoreV1().Pods(defaultNamespace).Delete(pod.Name, nil)
 
