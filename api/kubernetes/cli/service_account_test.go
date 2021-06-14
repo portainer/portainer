@@ -32,7 +32,7 @@ func Test_GetServiceAccountName(t *testing.T) {
 		tokenData := &portainer.TokenData{
 			ID:       1,
 			Role:     portainer.AdministratorRole,
-			Username: portainer.K8sServiceAccountClusterAdmin,
+			Username: portainerClusterAdminServiceAccountName,
 		}
 		serviceAccount := &v1.ServiceAccount{
 			ObjectMeta: metav1.ObjectMeta{

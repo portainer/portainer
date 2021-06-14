@@ -12,6 +12,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+const ShellPodImage = "zeeshans/k8s-shell"
+
 // CreateUserShellPod will create a kubectl based shell for the specified user by mounting their respective service account.
 // The lifecycle of the pod is managed in this function; this entails management of the following pod operations:
 // - The shell pod will be scoped to specified service accounts access permissions
@@ -23,29 +25,28 @@ func (kcl *KubeClient) CreateUserShellPod(ctx context.Context, serviceAccountNam
 	maxPodKeepAlive := 1 * time.Hour
 	maxPodKeepAliveSecondsStr := fmt.Sprintf("%d", int(maxPodKeepAlive.Seconds()))
 
-	podName, err := userShellPodName(serviceAccountName)
-	if err != nil {
-		return nil, err
-	}
+	podPrefix := userShellPodPrefix(serviceAccountName)
 
 	podSpec := &v1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      podName,
-			Namespace: portainerNamespace,
+			GenerateName: podPrefix,
+			Namespace:    portainerNamespace,
 			Annotations: map[string]string{
 				"kubernetes.io/pod.type": "kubectl-shell",
 			},
 		},
 		Spec: v1.PodSpec{
-			ServiceAccountName: serviceAccountName,
+			TerminationGracePeriodSeconds: new(int64),
+			ServiceAccountName:            serviceAccountName,
 			Containers: []v1.Container{
 				{
 					Name: "kubectl-shell-container",
 					// TODO update the image details
-					Image:   "zeeshans/k8s-shell",
+					Image:   ShellPodImage,
 					Command: []string{"sleep"},
 					// Specify sleep time to prevent zombie pods in case portainer process is terminated
-					Args: []string{maxPodKeepAliveSecondsStr},
+					Args:            []string{maxPodKeepAliveSecondsStr},
+					ImagePullPolicy: v1.PullIfNotPresent,
 				},
 			},
 			RestartPolicy: v1.RestartPolicyNever,

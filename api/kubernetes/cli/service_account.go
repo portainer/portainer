@@ -12,7 +12,7 @@ import (
 func (kcl *KubeClient) GetServiceAccountName(tokenData *portainer.TokenData) (string, error) {
 	var portainerServiceAccountName string
 	if tokenData.Role == portainer.AdministratorRole {
-		portainerServiceAccountName = portainer.K8sServiceAccountClusterAdmin
+		portainerServiceAccountName = portainerClusterAdminServiceAccountName
 	} else {
 		portainerServiceAccountName = userServiceAccountName(int(tokenData.ID), kcl.instanceID)
 	}

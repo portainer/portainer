@@ -1581,9 +1581,6 @@ const (
 	EdgeAgentActive string = "ACTIVE"
 )
 
-// K8sServiceAccountClusterAdmin is built in cluster admin service account
-const K8sServiceAccountClusterAdmin string = "portainer-sa-clusteradmin"
-
 // represents an authorization type
 const (
 	OperationDockerContainerArchiveInfo         Authorization = "DockerContainerArchiveInfo"
