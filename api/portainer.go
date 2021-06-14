@@ -392,6 +392,11 @@ type (
 	// JobType represents a job type
 	JobType int
 
+	K8sNamespaceAccessPolicy struct {
+		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
+		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
+	}
+
 	// KubernetesData contains all the Kubernetes related endpoint information
 	KubernetesData struct {
 		Snapshots     []KubernetesSnapshot    `json:"Snapshots"`
@@ -1160,6 +1165,8 @@ type (
 		SetupUserServiceAccount(userID int, teamIDs []int) error
 		GetServiceAccountBearerToken(userID int) (string, error)
 		StartExecProcess(namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error
+		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
+		UpdateNamespaceAccessPolicies(accessPolicies map[string]K8sNamespaceAccessPolicy) error
 	}
 
 	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes endpoint

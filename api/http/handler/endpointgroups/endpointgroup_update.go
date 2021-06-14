@@ -109,12 +109,33 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 		}
 	}
 
+	updateAuthorizations := false
 	if payload.UserAccessPolicies != nil && !reflect.DeepEqual(payload.UserAccessPolicies, endpointGroup.UserAccessPolicies) {
 		endpointGroup.UserAccessPolicies = payload.UserAccessPolicies
+		updateAuthorizations = true
 	}
 
 	if payload.TeamAccessPolicies != nil && !reflect.DeepEqual(payload.TeamAccessPolicies, endpointGroup.TeamAccessPolicies) {
 		endpointGroup.TeamAccessPolicies = payload.TeamAccessPolicies
+		updateAuthorizations = true
+	}
+
+	if updateAuthorizations {
+		endpoints, err := handler.DataStore.Endpoint().Endpoints()
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
+		}
+
+		for _, endpoint := range endpoints {
+			if endpoint.GroupID == endpointGroup.ID {
+				if endpoint.Type == portainer.KubernetesLocalEnvironment || endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
+					err = handler.AuthorizationService.CleanNAPWithOverridePolicies(&endpoint, endpointGroup)
+					if err != nil {
+						return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
+					}
+				}
+			}
+		}
 	}
 
 	err = handler.DataStore.EndpointGroup().UpdateEndpointGroup(endpointGroup.ID, endpointGroup)

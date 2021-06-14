@@ -9,12 +9,7 @@ import (
 )
 
 type (
-	accessPolicies struct {
-		UserAccessPolicies portainer.UserAccessPolicies `json:"UserAccessPolicies"`
-		TeamAccessPolicies portainer.TeamAccessPolicies `json:"TeamAccessPolicies"`
-	}
-
-	namespaceAccessPolicies map[string]accessPolicies
+	namespaceAccessPolicies map[string]portainer.K8sNamespaceAccessPolicy
 )
 
 func (kcl *KubeClient) setupNamespaceAccesses(userID int, teamIDs []int, serviceAccountName string) error {
@@ -69,7 +64,7 @@ func (kcl *KubeClient) setupNamespaceAccesses(userID int, teamIDs []int, service
 	return nil
 }
 
-func hasUserAccessToNamespace(userID int, teamIDs []int, policies accessPolicies) bool {
+func hasUserAccessToNamespace(userID int, teamIDs []int, policies portainer.K8sNamespaceAccessPolicy) bool {
 	_, userAccess := policies.UserAccessPolicies[portainer.UserID(userID)]
 	if userAccess {
 		return true
@@ -83,4 +78,51 @@ func hasUserAccessToNamespace(userID int, teamIDs []int, policies accessPolicies
 	}
 
 	return false
+}
+
+// GetNamespaceAccessPolicies gets the namespace access policies
+// from config maps in the portainer namespace
+func (kcl *KubeClient) GetNamespaceAccessPolicies() (map[string]portainer.K8sNamespaceAccessPolicy, error) {
+	configMap, err := kcl.cli.CoreV1().ConfigMaps(portainerNamespace).Get(portainerConfigMapName, metav1.GetOptions{})
+	if k8serrors.IsNotFound(err) {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	accessData := configMap.Data[portainerConfigMapAccessPoliciesKey]
+
+	var policies map[string]portainer.K8sNamespaceAccessPolicy
+	err = json.Unmarshal([]byte(accessData), &policies)
+	if err != nil {
+		return nil, err
+	}
+	return policies, nil
+}
+
+// UpdateNamespaceAccessPolicies updates the namespace access policies
+func (kcl *KubeClient) UpdateNamespaceAccessPolicies(accessPolicies map[string]portainer.K8sNamespaceAccessPolicy) error {
+	data, err := json.Marshal(accessPolicies)
+	if err != nil {
+		return err
+	}
+
+	configMap, err := kcl.cli.CoreV1().ConfigMaps(portainerNamespace).Get(portainerConfigMapName, metav1.GetOptions{})
+	if k8serrors.IsNotFound(err) {
+		return nil
+	}
+
+	if err != nil {
+		return err
+	}
+
+	configMap.Data[portainerConfigMapAccessPoliciesKey] = string(data)
+	_, err = kcl.cli.CoreV1().ConfigMaps(portainerNamespace).Update(configMap)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

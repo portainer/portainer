@@ -20,6 +20,7 @@ import (
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/http/proxy"
 	kubeproxy "github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
+	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/snapshot"
 	"github.com/portainer/portainer/api/jwt"
@@ -389,6 +390,9 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	}
 	snapshotService.Start()
 
+	authorizationService := authorization.NewService(dataStore)
+	authorizationService.K8sClientFactory = kubernetesClientFactory
+
 	swarmStackManager, err := initSwarmStackManager(*flags.Assets, *flags.Data, digitalSignatureService, fileService, reverseTunnelService)
 	if err != nil {
 		log.Fatalf("failed initializing swarm stack manager: %v", err)
@@ -461,6 +465,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	}
 
 	return &http.Server{
+		AuthorizationService:        authorizationService,
 		ReverseTunnelService:        reverseTunnelService,
 		Status:                      applicationStatus,
 		BindAddress:                 *flags.Addr,
