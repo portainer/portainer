@@ -25,7 +25,7 @@ func (service *Service) CleanNAPWithOverridePolicies(
 			if err != nil {
 				return err
 			}
-			if access == false {
+			if !access {
 				delete(accessPolicies[namespace].TeamAccessPolicies, teamID)
 				hasChange = true
 			}
@@ -36,7 +36,7 @@ func (service *Service) CleanNAPWithOverridePolicies(
 			if err != nil {
 				return err
 			}
-			if access == false {
+			if !access {
 				delete(accessPolicies[namespace].UserAccessPolicies, userID)
 				hasChange = true
 			}
@@ -129,9 +129,6 @@ func teamAccess(
 	teamID portainer.TeamID,
 	teamAccessPolicies portainer.TeamAccessPolicies,
 ) bool {
-	if _, ok := teamAccessPolicies[teamID]; ok {
-		return true
-	}
-
-	return false
+	_, ok := teamAccessPolicies[teamID];
+	return ok
 }
