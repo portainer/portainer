@@ -4,7 +4,7 @@ export const KEY_REGEX = /[a-zA-Z]([-_a-zA-Z0-9]*[a-zA-Z0-9])?/.source;
 
 export const VALUE_REGEX = /(.*)?/.source;
 
-const KEY_VALUE_REGEX = new RegExp(`^(${KEY_REGEX})\\s*=${VALUE_REGEX}$`);
+const KEY_VALUE_REGEX = new RegExp(`^(${KEY_REGEX})\\s*=(${VALUE_REGEX})$`);
 const NEWLINES_REGEX = /\n|\r|\r\n/;
 
 /**
@@ -39,8 +39,8 @@ export function parseArrayOfStrings(array) {
       }
 
       const parsedKeyValArr = variableString.trim().match(KEY_VALUE_REGEX);
-      if (parsedKeyValArr != null && parsedKeyValArr.length > 2) {
-        return { name: parsedKeyValArr[1], value: parsedKeyValArr[2] || '' };
+      if (parsedKeyValArr != null && parsedKeyValArr.length > 4) {
+        return { name: parsedKeyValArr[1], value: parsedKeyValArr[3] || '' };
       }
     })
   );
