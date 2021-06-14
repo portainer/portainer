@@ -10,6 +10,7 @@ class KubernetesMetricsService {
 
     this.capabilitiesAsync = this.capabilitiesAsync.bind(this);
     this.getPodAsync = this.getPodAsync.bind(this);
+    this.getNodeAsync = this.getNodeAsync.bind(this);
   }
 
   /**
@@ -25,6 +26,26 @@ class KubernetesMetricsService {
 
   capabilities(endpointID) {
     return this.$async(this.capabilitiesAsync, endpointID);
+  }
+
+  /**
+   * Stats of Node
+   *
+   * @param {string} nodeName
+   */
+  async getNodeAsync(nodeName) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = nodeName;
+      const data = await this.KubernetesMetrics().getNode(params).$promise;
+      return data;
+    } catch (err) {
+      throw new PortainerError('Unable to retrieve node stats', err);
+    }
+  }
+
+  getNode(nodeName) {
+    return this.$async(this.getNodeAsync, nodeName);
   }
 
   /**

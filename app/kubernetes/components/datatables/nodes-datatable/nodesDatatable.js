@@ -9,5 +9,6 @@ angular.module('portainer.kubernetes').component('kubernetesNodesDatatable', {
     orderBy: '@',
     refreshCallback: '<',
     hasK8sClusterNodeR: '<',
+    useServerMetrics: '<',
   },
 });

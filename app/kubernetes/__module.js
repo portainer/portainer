@@ -182,6 +182,16 @@ angular.module('portainer.kubernetes', ['portainer.app']).config([
       },
     };
 
+    const nodeStats = {
+      name: 'kubernetes.cluster.node.stats',
+      url: '/stats',
+      views: {
+        'content@': {
+          component: 'kubernetesNodeStatsView',
+        },
+      },
+    };
+
     const dashboard = {
       name: 'kubernetes.dashboard',
       url: '/dashboard',
@@ -280,6 +290,7 @@ angular.module('portainer.kubernetes', ['portainer.app']).config([
     $stateRegistryProvider.register(dashboard);
     $stateRegistryProvider.register(deploy);
     $stateRegistryProvider.register(node);
+    $stateRegistryProvider.register(nodeStats);
     $stateRegistryProvider.register(resourcePools);
     $stateRegistryProvider.register(resourcePoolCreation);
     $stateRegistryProvider.register(resourcePool);
