@@ -156,7 +156,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 // @accept multipart/form-data
 // @produce json
 // @param Name formData string true "Name that will be used to identify this endpoint (example: my-endpoint)"
-// @param EndpointType formData integer true "Environment type. Value must be one of: 1 (Local Docker environment), 2 (Agent environment), 3 (Azure environment), 4 (Edge agent environment) or 5 (Local Kubernetes Environment" Enum(1,2,3,4,5)
+// @param EndpointCreationType formData integer true "Environment type. Value must be one of: 1 (Local Docker environment), 2 (Agent environment), 3 (Azure environment), 4 (Edge agent environment) or 5 (Local Kubernetes Environment" Enum(1,2,3,4,5)
 // @param URL formData string false "URL or IP address of a Docker host (example: docker.mydomain.tld:2375). Defaults to local if not specified (Linux: /var/run/docker.sock, Windows: //./pipe/docker_engine)"
 // @param PublicURL formData string false "URL or IP address where exposed containers will be reachable. Defaults to URL if not specified (example: docker.mydomain.tld:2375)"
 // @param GroupID formData int false "Endpoint group identifier. If not specified will default to 1 (unassigned)."
