@@ -37,19 +37,19 @@
                   >
                 </div>
                 <p ng-if="ctrl.state.alreadyExist"
-                  ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A configuration with the same name already exists inside the selected resource pool.</p
+                  ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A configuration with the same name already exists inside the selected namespace.</p
                 >
               </div>
             </div>
             <!-- !name -->
 
             <div class="col-sm-12 form-section-title">
-              Resource pool
+              Namespace
             </div>
 
             <!-- resource-pool -->
             <div class="form-group">
-              <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Resource pool</label>
+              <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Namespace</label>
               <div class="col-sm-11">
                 <select
                   class="form-control"
@@ -62,8 +62,8 @@
             <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
               <div class="col-sm-12 small text-warning">
                 <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                This resource pool has exhausted its resource capacity and you will not be able to deploy the configuration. Contact your administrator to expand the capacity of
-                the resource pool.
+                This namespace has exhausted its resource capacity and you will not be able to deploy the configuration. Contact your administrator to expand the capacity of the
+                namespace.
               </div>
             </div>
             <!-- !resource-pool -->
@@ -122,6 +122,12 @@
               is-creation="true"
               is-editor-dirty="ctrl.state.isEditorDirty"
             ></kubernetes-configuration-data>
+
+            <!-- summary -->
+            <kubernetes-summary-view
+              ng-if="!(!kubernetesConfigurationCreationForm.$valid || !ctrl.isFormValid() || ctrl.state.actionInProgress)"
+              form-values="ctrl.formValues"
+            ></kubernetes-summary-view>
 
             <!-- actions -->
             <div class="col-sm-12 form-section-title" style="margin-top: 10px;">

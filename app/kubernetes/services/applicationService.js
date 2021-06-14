@@ -220,6 +220,11 @@ class KubernetesApplicationService {
   // resource creation flow
   // should we keep formValues > Resource_1 || Resource_2
   // or should we switch to formValues > Composite > Resource_1 || Resource_2
+  /**
+   * NOTE: Keep this method flow in sync with `getCreatedApplicationResources` method in the `applicationService` file
+   *    To synchronise with kubernetes resource creation summary output, any new resources created in this method should
+   *    also be displayed in the summary output (getCreatedApplicationResources)
+   */
   async createAsync(formValues) {
     try {
       let [app, headlessService, service, claims] = KubernetesApplicationConverter.applicationFormValuesToApplication(formValues);
@@ -266,6 +271,11 @@ class KubernetesApplicationService {
 
   /* #region  PATCH */
   // this function accepts KubernetesApplicationFormValues as parameters
+  /**
+   * NOTE: Keep this method flow in sync with `getUpdatedApplicationResources` method in the `applicationService` file
+   *    To synchronise with kubernetes resource creation, update and delete summary output, any new resources created
+   *    in this method should also be displayed in the summary output (getUpdatedApplicationResources)
+   */
   async patchAsync(oldFormValues, newFormValues) {
     try {
       const [oldApp, oldHeadlessService, oldService, oldClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(oldFormValues);

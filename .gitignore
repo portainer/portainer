@@ -11,3 +11,5 @@ api/cmd/portainer/portainer*
 __debug_bin
 
 api/docs
+.idea
+.env

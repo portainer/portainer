@@ -76,7 +76,7 @@ func initDataStore(dataStorePath string, fileService portainer.FileService) port
 }
 
 func initComposeStackManager(assetsPath string, dataStorePath string, reverseTunnelService portainer.ReverseTunnelService, proxyManager *proxy.Manager) portainer.ComposeStackManager {
-	composeWrapper := exec.NewComposeWrapper(assetsPath, proxyManager)
+	composeWrapper := exec.NewComposeWrapper(assetsPath, dataStorePath, proxyManager)
 	if composeWrapper != nil {
 		return composeWrapper
 	}
@@ -88,8 +88,8 @@ func initSwarmStackManager(assetsPath string, dataStorePath string, signatureSer
 	return exec.NewSwarmStackManager(assetsPath, dataStorePath, signatureService, fileService, reverseTunnelService)
 }
 
-func initKubernetesDeployer(assetsPath string) portainer.KubernetesDeployer {
-	return exec.NewKubernetesDeployer(assetsPath)
+func initKubernetesDeployer(dataStore portainer.DataStore, reverseTunnelService portainer.ReverseTunnelService, signatureService portainer.DigitalSignatureService, assetsPath string) portainer.KubernetesDeployer {
+	return exec.NewKubernetesDeployer(dataStore, reverseTunnelService, signatureService, assetsPath)
 }
 
 func initJWTService(dataStore portainer.DataStore) (portainer.JWTService, error) {
@@ -165,6 +165,7 @@ func updateSettingsFromFlags(dataStore portainer.DataStore, flags *portainer.CLI
 	settings.SnapshotInterval = *flags.SnapshotInterval
 	settings.EnableEdgeComputeFeatures = *flags.EnableEdgeComputeFeatures
 	settings.EnableTelemetry = true
+	settings.OAuthSettings.SSO = true
 
 	if *flags.Templates != "" {
 		settings.TemplatesURL = *flags.Templates
@@ -240,6 +241,7 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, dataStore portainer.Dat
 			AllowVolumeBrowserForRegularUsers: false,
 			EnableHostManagementFeatures:      false,
 
+			AllowSysctlSettingForRegularUsers:         true,
 			AllowBindMountsForRegularUsers:            true,
 			AllowPrivilegedModeForRegularUsers:        true,
 			AllowHostNamespaceForRegularUsers:         true,
@@ -301,6 +303,7 @@ func createUnsecuredEndpoint(endpointURL string, dataStore portainer.DataStore, 
 			AllowVolumeBrowserForRegularUsers: false,
 			EnableHostManagementFeatures:      false,
 
+			AllowSysctlSettingForRegularUsers:         true,
 			AllowBindMountsForRegularUsers:            true,
 			AllowPrivilegedModeForRegularUsers:        true,
 			AllowHostNamespaceForRegularUsers:         true,
@@ -395,7 +398,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	composeStackManager := initComposeStackManager(*flags.Assets, *flags.Data, reverseTunnelService, proxyManager)
 
-	kubernetesDeployer := initKubernetesDeployer(*flags.Assets)
+	kubernetesDeployer := initKubernetesDeployer(dataStore, reverseTunnelService, digitalSignatureService, *flags.Assets)
 
 	if dataStore.IsNew() {
 		err = updateSettingsFromFlags(dataStore, flags)

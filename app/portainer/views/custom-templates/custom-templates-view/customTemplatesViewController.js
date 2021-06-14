@@ -34,13 +34,16 @@ class CustomTemplatesViewController {
     this.StateManager = StateManager;
     this.StackService = StackService;
 
+    this.DOCKER_STANDALONE = 'DOCKER_STANDALONE';
+    this.DOCKER_SWARM_MODE = 'DOCKER_SWARM_MODE';
+
     this.state = {
       selectedTemplate: null,
       showAdvancedOptions: false,
       formValidationError: '',
       actionInProgress: false,
       isEditorVisible: false,
-      provider: 0,
+      deployable: false,
     };
 
     this.currentUser = {
@@ -182,7 +185,8 @@ class CustomTemplatesViewController {
     this.formValues.name = template.Title ? template.Title : '';
     this.state.selectedTemplate = template;
     this.$anchorScroll('view-top');
-
+    const applicationState = this.StateManager.getState();
+    this.state.deployable = this.isDeployable(applicationState.endpoint, template.Type);
     const file = await this.CustomTemplateService.customTemplateFile(template.Id);
     this.formValues.fileContent = file;
   }
@@ -224,6 +228,21 @@ class CustomTemplatesViewController {
     this.formValues.fileContent = cm.getValue();
   }
 
+  isDeployable(endpoint, templateType) {
+    let deployable = false;
+    switch (templateType) {
+      case 1:
+        deployable = endpoint.mode.provider === this.DOCKER_SWARM_MODE;
+        break;
+      case 2:
+        deployable = endpoint.mode.provider === this.DOCKER_STANDALONE;
+        break;
+
+    }
+
+    return deployable;
+  }
+
   $onInit() {
     const applicationState = this.StateManager.getState();
 
@@ -232,7 +251,6 @@ class CustomTemplatesViewController {
       apiVersion,
     } = applicationState;
 
-    this.state.provider = endpointMode.provider === 'DOCKER_STANDALONE' ? 2 : 1;
     this.getTemplates(endpointMode);
     this.getNetworks(endpointMode.provider, apiVersion);
 

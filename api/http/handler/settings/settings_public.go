@@ -18,6 +18,8 @@ type publicSettingsResponse struct {
 	EnableEdgeComputeFeatures bool `json:"EnableEdgeComputeFeatures" example:"true"`
 	// The URL used for oauth login
 	OAuthLoginURI string `json:"OAuthLoginURI" example:"https://gitlab.com/oauth"`
+	// The URL used for oauth logout
+	OAuthLogoutURI string `json:"OAuthLogoutURI" example:"https://gitlab.com/oauth/logout"`
 	// Whether telemetry is enabled
 	EnableTelemetry bool `json:"EnableTelemetry" example:"true"`
 }
@@ -34,20 +36,32 @@ type publicSettingsResponse struct {
 func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve the settings from the database", err}
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve the settings from the database", Err: err}
 	}
 
-	publicSettings := &publicSettingsResponse{
-		LogoURL:                   settings.LogoURL,
-		AuthenticationMethod:      settings.AuthenticationMethod,
-		EnableEdgeComputeFeatures: settings.EnableEdgeComputeFeatures,
-		EnableTelemetry:           settings.EnableTelemetry,
-		OAuthLoginURI: fmt.Sprintf("%s?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&prompt=login",
-			settings.OAuthSettings.AuthorizationURI,
-			settings.OAuthSettings.ClientID,
-			settings.OAuthSettings.RedirectURI,
-			settings.OAuthSettings.Scopes),
-	}
-
+	publicSettings := generatePublicSettings(settings)
 	return response.JSON(w, publicSettings)
+}
+
+func generatePublicSettings(appSettings *portainer.Settings) *publicSettingsResponse {
+	publicSettings := &publicSettingsResponse{
+		LogoURL:                   appSettings.LogoURL,
+		AuthenticationMethod:      appSettings.AuthenticationMethod,
+		EnableEdgeComputeFeatures: appSettings.EnableEdgeComputeFeatures,
+		EnableTelemetry:           appSettings.EnableTelemetry,
+	}
+	//if OAuth authentication is on, compose the related fields from application settings
+	if publicSettings.AuthenticationMethod == portainer.AuthenticationOAuth {
+		publicSettings.OAuthLogoutURI = appSettings.OAuthSettings.LogoutURI
+		publicSettings.OAuthLoginURI = fmt.Sprintf("%s?response_type=code&client_id=%s&redirect_uri=%s&scope=%s",
+			appSettings.OAuthSettings.AuthorizationURI,
+			appSettings.OAuthSettings.ClientID,
+			appSettings.OAuthSettings.RedirectURI,
+			appSettings.OAuthSettings.Scopes)
+		//control prompt=login param according to the SSO setting
+		if !appSettings.OAuthSettings.SSO {
+			publicSettings.OAuthLoginURI += "&prompt=login"
+		}
+	}
+	return publicSettings
 }

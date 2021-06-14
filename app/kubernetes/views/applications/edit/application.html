@@ -1,5 +1,5 @@
 <kubernetes-view-header title="Application details" state="kubernetes.applications.application" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.resourcePools">Resource pools</a> &gt;
+  <a ui-sref="kubernetes.resourcePools">Namespaces</a> &gt;
   <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.application.ResourcePool })">{{ ctrl.application.ResourcePool }}</a> &gt;
   <a ui-sref="kubernetes.applications">Applications</a> &gt; {{ ctrl.application.Name }}
 </kubernetes-view-header>
@@ -29,7 +29,7 @@
                       <td>{{ ctrl.application.StackName }}</td>
                     </tr>
                     <tr>
-                      <td>Resource pool</td>
+                      <td>Namespace</td>
                       <td>
                         <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.application.ResourcePool })">{{ ctrl.application.ResourcePool }}</a>
                         <span style="margin-left: 5px;" class="label label-info image-tag" ng-if="ctrl.isSystemNamespace(item)">system</span>

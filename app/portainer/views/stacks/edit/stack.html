@@ -17,7 +17,7 @@
             <uib-tab-heading> <i class="fa fa-th-list" aria-hidden="true"></i> Stack </uib-tab-heading>
             <div style="margin-top: 10px;">
               <!-- stack-information -->
-              <div ng-if="state.externalStack">
+              <div ng-if="external || orphaned">
                 <div class="col-sm-12 form-section-title">
                   Information
                 </div>
@@ -25,7 +25,8 @@
                   <span class="small">
                     <p class="text-muted">
                       <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                      This stack was created outside of Portainer. Control over this stack is limited.
+                      <span ng-if="external">This stack was created outside of Portainer. Control over this stack is limited.</span>
+                      <span ng-if="orphaned">This stack is orphaned. You can reassociate it with the current environment using the "Associate to this endpoint" feature.</span>
                     </p>
                   </span>
                 </div>
@@ -41,7 +42,7 @@
 
                   <button
                     authorization="PortainerStackUpdate"
-                    ng-if="!state.externalStack && stack.Status === 2"
+                    ng-if="regular && stack.Status === 2"
                     ng-disabled="state.actionInProgress"
                     class="btn btn-xs btn-success"
                     ng-click="startStack()"
@@ -51,7 +52,7 @@
                   </button>
 
                   <button
-                    ng-if="!state.externalStack && stack.Status === 1"
+                    ng-if="regular && stack.Status === 1"
                     authorization="PortainerStackUpdate"
                     ng-disabled="state.actionInProgress"
                     class="btn btn-xs btn-danger"
@@ -61,13 +62,13 @@
                     Stop this stack
                   </button>
 
-                  <button authorization="PortainerStackDelete" class="btn btn-xs btn-danger" ng-click="removeStack()" ng-if="!state.externalStack || stack.Type === 1">
+                  <button authorization="PortainerStackDelete" class="btn btn-xs btn-danger" ng-click="removeStack()" ng-if="!external || stack.Type == 1">
                     <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>
                     Delete this stack
                   </button>
 
                   <button
-                    ng-if="!state.externalStack && stackFileContent"
+                    ng-if="regular && stackFileContent"
                     class="btn btn-primary btn-xs"
                     ui-sref="docker.templates.custom.new({fileContent: stackFileContent, type: stack.Type})"
                   >
@@ -77,8 +78,40 @@
                 </div>
               </div>
               <!-- !stack-details -->
+
+              <!-- associate -->
+              <div ng-if="orphaned">
+                <div class="col-sm-12 form-section-title">
+                  Associate to this endpoint
+                </div>
+                <p class="small text-muted">
+                  This feature allows you to reassociate this stack to the current endpoint.
+                </p>
+                <form class="form-horizontal">
+                  <por-access-control-form form-data="formValues.AccessControlData" hide-title="true"></por-access-control-form>
+                  <div class="form-group">
+                    <div class="col-sm-12">
+                      <button
+                        type="button"
+                        class="btn btn-primary btn-sm"
+                        ng-disabled="state.actionInProgress"
+                        ng-click="associateStack()"
+                        button-spinner="state.actionInProgress"
+                        style="margin-left: -5px;"
+                      >
+                        <i class="fa fa-sync" aria-hidden="true" style="margin-right: 3px;"></i>
+                        <span ng-hide="state.actionInProgress">Associate</span>
+                        <span ng-show="state.actionInProgress">Association in progress...</span>
+                      </button>
+                      <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <!-- !associate -->
+
               <stack-duplication-form
-                ng-if="!state.externalStack && endpoints.length > 0"
+                ng-if="regular && endpoints.length > 0"
                 endpoints="endpoints"
                 groups="groups"
                 current-endpoint-id="currentEndpointId"
@@ -91,7 +124,7 @@
           </uib-tab>
           <!-- !tab-info -->
           <!-- tab-file -->
-          <uib-tab index="1" select="showEditor()" ng-if="!state.externalStack">
+          <uib-tab index="1" select="showEditor()" ng-if="!external">
             <uib-tab-heading> <i class="fa fa-pencil-alt space-right" aria-hidden="true"></i> Editor </uib-tab-heading>
             <form class="form-horizontal" ng-if="state.showEditorTab" style="margin-top: 10px;">
               <div class="form-group">
@@ -108,6 +141,7 @@
               <div class="form-group">
                 <div class="col-sm-12">
                   <code-editor
+                    read-only="orphaned"
                     identifier="stack-editor"
                     placeholder="# Define or paste the content of your docker-compose file here"
                     yml="true"
@@ -173,7 +207,7 @@
                     <button
                       type="button"
                       class="btn btn-sm btn-primary"
-                      ng-disabled="state.actionInProgress || stack.Status === 2 || !stackFileContent"
+                      ng-disabled="state.actionInProgress || stack.Status === 2 || !stackFileContent || orphaned"
                       ng-click="deployStack()"
                       button-spinner="state.actionInProgress"
                     >
@@ -192,7 +226,7 @@
   </div>
 </div>
 
-<div class="row" ng-if="containers">
+<div class="row" ng-if="containers && (!orphaned || orphanedRunning)">
   <div class="col-sm-12">
     <containers-datatable
       title-text="Containers"
@@ -206,7 +240,7 @@
   </div>
 </div>
 
-<div class="row" ng-if="services">
+<div class="row" ng-if="services && (!orphaned || orphanedRunning)">
   <div class="col-sm-12">
     <services-datatable
       title-text="Services"
@@ -226,6 +260,6 @@
 </div>
 
 <!-- access-control-panel -->
-<por-access-control-panel ng-if="stack" resource-id="stack.EndpointId + '_' + stack.Name" resource-control="stack.ResourceControl" resource-type="'stack'">
+<por-access-control-panel ng-if="stack && !orphaned" resource-id="stack.EndpointId + '_' + stack.Name" resource-control="stack.ResourceControl" resource-type="'stack'">
 </por-access-control-panel>
 <!-- !access-control-panel -->

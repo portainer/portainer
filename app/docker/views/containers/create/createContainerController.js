@@ -972,9 +972,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     }
 
     async function shouldShowSysctls() {
-      const { allowSysctlSettingForRegularUsers } = $scope.applicationState.application;
-
-      return allowSysctlSettingForRegularUsers || Authentication.isAdmin();
+      return endpoint.SecuritySettings.allowSysctlSettingForRegularUsers || Authentication.isAdmin();
     }
 
     async function checkIfContainerCapabilitiesEnabled() {

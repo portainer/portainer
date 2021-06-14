@@ -77,5 +77,5 @@ func (handler *Handler) proxyRequestsToKubernetesAPI(w http.ResponseWriter, r *h
 }
 
 func isKubernetesRequest(requestURL string) bool {
-	return strings.HasPrefix(requestURL, "/api")
+	return strings.HasPrefix(requestURL, "/api") || strings.HasPrefix(requestURL, "/healthz")
 }

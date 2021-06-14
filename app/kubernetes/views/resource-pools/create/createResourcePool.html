@@ -1,5 +1,5 @@
-<kubernetes-view-header title="Create a resource pool" state="kubernetes.resourcePools.new" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.resourcePools">Resource pools</a> &gt; Create a resource pool
+<kubernetes-view-header title="Create a namespace" state="kubernetes.resourcePools.new" view-ready="ctrl.state.viewReady">
+  <a ui-sref="kubernetes.resourcePools">Namespaces</a> &gt; Create a namespace
 </kubernetes-view-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
@@ -36,7 +36,7 @@
                     with an alphanumeric character.</p
                   >
                 </div>
-                <p ng-if="ctrl.state.isAlreadyExist"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A resource pool with the same name already exists.</p>
+                <p ng-if="ctrl.state.isAlreadyExist"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A namespace with the same name already exists.</p>
               </div>
             </div>
             <!-- #endregion -->
@@ -50,7 +50,7 @@
               <div class="col-sm-12 small text-muted">
                 <p>
                   <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                  A resource pool segments the underyling physical Kubernetes cluster into smaller virtual clusters. You should assign a capped limit of resources to this pool or
+                  A namespace segments the underlying physical Kubernetes cluster into smaller virtual clusters. You should assign a capped limit of resources to this namespace or
                   disable for the safe operation of your platform.
                 </p>
               </div>
@@ -137,8 +137,8 @@
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
                 <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                You can set a quota on the amount of external load balancers that can be created inside this resource pool. Set this quota to 0 to effectively disable the use of
-                load balancers in this resource pool.
+                You can set a quota on the amount of external load balancers that can be created inside this namespace. Set this quota to 0 to effectively disable the use of load
+                balancers in this namespace.
               </span>
             </div>
             <div class="form-group">
@@ -164,7 +164,7 @@
               <span class="col-sm-12 text-muted small">
                 <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                 Quotas can be set on each storage option to prevent users from exceeding a specific threshold when deploying applications. You can set a quota to 0 to effectively
-                prevent the usage of a specific storage option inside this resource pool.
+                prevent the usage of a specific storage option inside this namespace.
               </span>
             </div>
             <div class="col-sm-12 form-section-title">
@@ -195,7 +195,7 @@
                 <div class="col-sm-12 small text-muted">
                   The ingress feature must be enabled in the
                   <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: ctrl.endpoint.Id})">endpoint configuration view</a> to be able to register ingresses inside this
-                  resource pool.
+                  namespace.
                 </div>
               </div>
 
@@ -230,7 +230,7 @@
                       Hostnames
                       <portainer-tooltip
                         position="bottom"
-                        message="Hostnames associated to the ingress inside this resource pool. Users will be able to expose and access their applications over the ingress via one of these hostname."
+                        message="Hostnames associated to the ingress inside this namespace. Users will be able to expose and access their applications over the ingress via one of these hostname."
                       >
                       </portainer-tooltip>
                     </label>
@@ -338,6 +338,10 @@
               <!-- #endregion -->
             </div>
 
+            <!-- summary -->
+            <kubernetes-summary-view ng-if="resourcePoolCreationForm.$valid && !ctrl.isCreateButtonDisabled()" form-values="ctrl.formValues"></kubernetes-summary-view>
+            <!-- !summary -->
+
             <div class="col-sm-12 form-section-title">
               Actions
             </div>
@@ -351,7 +355,7 @@
                   ng-click="ctrl.createResourcePool()"
                   button-spinner="ctrl.state.actionInProgress"
                 >
-                  <span ng-hide="ctrl.state.actionInProgress">Create resource pool</span>
+                  <span ng-hide="ctrl.state.actionInProgress">Create namespace</span>
                   <span ng-show="ctrl.state.actionInProgress">Creation in progress...</span>
                 </button>
               </div>

@@ -30,3 +30,5 @@ angular
   .constant('PREDEFINED_NETWORKS', ['host', 'bridge', 'none'])
   .constant('KUBERNETES_DEFAULT_NAMESPACE', 'default')
   .constant('KUBERNETES_SYSTEM_NAMESPACES', ['kube-system', 'kube-public', 'kube-node-lease', 'portainer']);
+
+export const PORTAINER_FADEOUT = 1500;
