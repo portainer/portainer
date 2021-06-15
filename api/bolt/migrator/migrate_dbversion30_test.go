@@ -45,7 +45,7 @@ func TestUpdateSettingsToDB31(t *testing.T) {
 		db:              dbConn,
 		settingsService: settingsService,
 	}
-	if err := m.updateSettingsToDB31(); err != nil {
+	if err := m.updateSettingsToDB30(); err != nil {
 		t.Errorf("failed to update settings: %v", err)
 	}
 	updatedSettings, err := m.settingsService.Settings()
