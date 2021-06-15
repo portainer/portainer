@@ -10,6 +10,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/security"
+	endpointutils "github.com/portainer/portainer/api/internal/endpoint"
 )
 
 // GET request on /endpoints/{id}/registries
@@ -43,7 +44,7 @@ func (handler *Handler) endpointRegistriesList(w http.ResponseWriter, r *http.Re
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
 	}
 
-	if endpoint.Type == portainer.KubernetesLocalEnvironment || endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
+	if endpointutils.IsKubernetesEndpoint(endpoint) {
 		namespace, _ := request.RetrieveQueryParameter(r, "namespace", true)
 
 		if namespace == "" && !isAdmin {
@@ -51,15 +52,14 @@ func (handler *Handler) endpointRegistriesList(w http.ResponseWriter, r *http.Re
 		}
 
 		if namespace != "" {
-			if !isAdmin {
-				authorized, err := handler.isNamespaceAuthorized(endpoint, namespace, user.ID, securityContext.UserMemberships)
-				if err != nil {
-					return &httperror.HandlerError{http.StatusNotFound, "Unable to check for namespace authorization", err}
-				}
 
-				if !authorized {
-					return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "User is not authorized to use namespace", Err: errors.New("user is not authorized to use namespace")}
-				}
+			authorized, err := handler.isNamespaceAuthorized(endpoint, namespace, user.ID, securityContext.UserMemberships, isAdmin)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusNotFound, "Unable to check for namespace authorization", err}
+			}
+
+			if !authorized {
+				return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "User is not authorized to use namespace", Err: errors.New("user is not authorized to use namespace")}
 			}
 
 			registries = filterRegistriesByNamespace(registries, endpoint.ID, namespace)
@@ -76,7 +76,11 @@ func (handler *Handler) endpointRegistriesList(w http.ResponseWriter, r *http.Re
 	return response.JSON(w, registries)
 }
 
-func (handler *Handler) isNamespaceAuthorized(endpoint *portainer.Endpoint, namespace string, userId portainer.UserID, memberships []portainer.TeamMembership) (bool, error) {
+func (handler *Handler) isNamespaceAuthorized(endpoint *portainer.Endpoint, namespace string, userId portainer.UserID, memberships []portainer.TeamMembership, isAdmin bool) (bool, error) {
+	if isAdmin || namespace == "" {
+		return true, nil
+	}
+
 	if namespace == "default" {
 		return true, nil
 	}
@@ -100,6 +104,9 @@ func (handler *Handler) isNamespaceAuthorized(endpoint *portainer.Endpoint, name
 }
 
 func filterRegistriesByNamespace(registries []portainer.Registry, endpointId portainer.EndpointID, namespace string) []portainer.Registry {
+	if namespace == "" {
+		return registries
+	}
 
 	filteredRegistries := []portainer.Registry{}
 
