@@ -3,7 +3,6 @@ package stacks
 import (
 	"errors"
 	"net/http"
-	"time"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
@@ -111,38 +110,10 @@ func (handler *Handler) stackGitUpdate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Access denied to resource", Err: httperrors.ErrResourceAccessDenied}
 	}
 
-	//update retrieved stack data based on payload
+	//update retrieved stack data based on the payload
 	stack.GitConfig.ReferenceName = payload.RepositoryReferenceName
 	stack.AutoUpdate = payload.AutoUpdate
 	stack.Env = payload.Env
-
-	//compose git clone params based on stack info
-	gitCloneParams := &cloneRepositoryParameters{
-		url:           stack.GitConfig.URL,
-		referenceName: stack.GitConfig.ReferenceName,
-		path:          stack.ProjectPath,
-	}
-	if stack.GitConfig.Authentication != nil && stack.GitConfig.Authentication.Password != "" {
-		gitCloneParams.authentication = true
-		gitCloneParams.username = stack.GitConfig.Authentication.Username
-		gitCloneParams.password = stack.GitConfig.Authentication.Password
-	}
-
-	//distribute requests based on stack types
-	//use composed gitCloneParams
-	var updateError *httperror.HandlerError
-	switch stack.Type {
-	case portainer.DockerComposeStack:
-		updateError = handler.updateComposeStackFromGit(r, stack, endpoint, gitCloneParams)
-	case portainer.DockerSwarmStack:
-		updateError = handler.updateSwarmStackFromGit(r, stack, endpoint, gitCloneParams)
-	default:
-		msg := "Unsupported stack type"
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: msg, Err: errors.New(msg)}
-	}
-	if updateError != nil {
-		return updateError
-	}
 
 	//save the updated stack to DB
 	err = handler.DataStore.Stack().UpdateStack(stack.ID, stack)
@@ -151,56 +122,4 @@ func (handler *Handler) stackGitUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	return response.JSON(w, stack)
-}
-
-func (handler *Handler) updateComposeStackFromGit(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint, gitCloneParams *cloneRepositoryParameters) *httperror.HandlerError {
-	doCleanUp := true
-	defer handler.cleanUp(stack, &doCleanUp)
-
-	err := handler.cloneGitRepository(gitCloneParams)
-	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to clone git repository", Err: err}
-	}
-
-	config, configErr := handler.createComposeDeployConfig(r, stack, endpoint)
-	if configErr != nil {
-		return configErr
-	}
-
-	err = handler.deployComposeStack(config)
-	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: err.Error(), Err: err}
-	}
-
-	stack.UpdateDate = time.Now().Unix()
-	stack.UpdatedBy = config.user.Username
-
-	doCleanUp = false
-	return nil
-}
-
-func (handler *Handler) updateSwarmStackFromGit(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint, gitCloneParams *cloneRepositoryParameters) *httperror.HandlerError {
-	doCleanUp := true
-	defer handler.cleanUp(stack, &doCleanUp)
-
-	err := handler.cloneGitRepository(gitCloneParams)
-	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to clone git repository", Err: err}
-	}
-
-	config, configErr := handler.createSwarmDeployConfig(r, stack, endpoint, false)
-	if configErr != nil {
-		return configErr
-	}
-
-	err = handler.deploySwarmStack(config)
-	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: err.Error(), Err: err}
-	}
-
-	stack.UpdateDate = time.Now().Unix()
-	stack.UpdatedBy = config.user.Username
-
-	doCleanUp = false
-	return nil
 }
