@@ -35,7 +35,7 @@ func setup() error {
 	return nil
 }
 
-func TestUpdateSettingsToDB31(t *testing.T) {
+func TestUpdateSettingsToDB30(t *testing.T) {
 	if err := setup(); err != nil {
 		t.Errorf("failed to complete testing setups, err: %v", err)
 	}
