@@ -1,13 +1,17 @@
+import { TeamAccessViewModel, UserAccessViewModel } from 'Portainer/models/access';
+
 class DockerRegistryAccessController {
   /* @ngInject */
-  constructor($async, $state, Notifications, RegistryService, EndpointService) {
+  constructor($async, $state, Notifications, RegistryService, EndpointService, GroupService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
     this.EndpointService = EndpointService;
+    this.GroupService = GroupService;
     this.RegistryService = RegistryService;
 
     this.updateAccess = this.updateAccess.bind(this);
+    this.filterUsers = this.filterUsers.bind(this);
   }
 
   updateAccess() {
@@ -24,6 +28,21 @@ class DockerRegistryAccessController {
     });
   }
 
+  filterUsers(users) {
+    const endpointUsers = this.endpoint.UserAccessPolicies;
+    const endpointTeams = this.endpoint.TeamAccessPolicies;
+
+    const endpointGroupUsers = this.endpointGroup.UserAccessPolicies;
+    const endpointGroupTeams = this.endpointGroup.TeamAccessPolicies;
+
+    return users.filter((userOrTeam) => {
+      const userRole = userOrTeam instanceof UserAccessViewModel && (endpointUsers[userOrTeam.Id] || endpointGroupUsers[userOrTeam.Id]);
+      const teamRole = userOrTeam instanceof TeamAccessViewModel && (endpointTeams[userOrTeam.Id] || endpointGroupTeams[userOrTeam.Id]);
+
+      return userRole || teamRole;
+    });
+  }
+
   $onInit() {
     return this.$async(async () => {
       try {
@@ -35,6 +54,7 @@ class DockerRegistryAccessController {
         };
         this.registry = await this.RegistryService.registry(this.state.registryId, this.state.endpointId);
         this.registryEndpointAccesses = this.registry.RegistryAccesses[this.state.endpointId] || {};
+        this.endpointGroup = await this.GroupService.group(this.endpoint.GroupId);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to retrieve registry details');
       } finally {

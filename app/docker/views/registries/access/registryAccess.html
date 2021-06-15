@@ -6,11 +6,11 @@
 <registry-details registry="$ctrl.registry" ng-if="$ctrl.registry"></registry-details>
 
 <por-access-management
-  ng-if="$ctrl.registry"
+  ng-if="$ctrl.registry && $ctrl.endpointGroup"
   access-controlled-entity="$ctrl.registryEndpointAccesses"
   entity-type="registry"
-  endpoint="$ctrl.endpoint"
   action-in-progress="$ctrl.state.actionInProgress"
   update-access="$ctrl.updateAccess"
+  filter-users="$ctrl.filterUsers"
 >
 </por-access-management>

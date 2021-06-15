@@ -1,7 +1,6 @@
 import _ from 'lodash-es';
 
 import angular from 'angular';
-import { TeamAccessViewModel, UserAccessViewModel } from 'Portainer/models/access';
 
 class PorAccessManagementController {
   /* @ngInject */
@@ -45,6 +44,7 @@ class PorAccessManagementController {
     const teamAccessPolicies = entity.TeamAccessPolicies;
     const selectedUserAccesses = _.filter(selectedAccesses, (access) => access.Type === 'user');
     const selectedTeamAccesses = _.filter(selectedAccesses, (access) => access.Type === 'team');
+
     _.forEach(selectedUserAccesses, (access) => delete userAccessPolicies[access.Id]);
     _.forEach(selectedTeamAccesses, (access) => delete teamAccessPolicies[access.Id]);
     this.updateAccess();
@@ -56,18 +56,11 @@ class PorAccessManagementController {
       const parent = this.inheritFrom;
 
       const data = await this.AccessService.accesses(entity, parent, this.roles);
-      if (this.entityType === 'registry' && this.endpoint) {
-        const endpointUsers = this.endpoint.UserAccessPolicies;
-        const endpointTeams = this.endpoint.TeamAccessPolicies;
-        data.availableUsersAndTeams = _.filter(data.availableUsersAndTeams, (userOrTeam) => {
-          const userRole = userOrTeam instanceof UserAccessViewModel && endpointUsers[userOrTeam.Id];
-          const teamRole = userOrTeam instanceof TeamAccessViewModel && endpointTeams[userOrTeam.Id];
-          if (!userRole && !teamRole) {
-            return false;
-          }
-          return userRole || teamRole;
-        });
+
+      if (this.filterUsers) {
+        data.availableUsersAndTeams = this.filterUsers(data.availableUsersAndTeams);
       }
+
       this.availableUsersAndTeams = _.orderBy(data.availableUsersAndTeams, 'Name', 'asc');
       this.authorizedUsersAndTeams = data.authorizedUsersAndTeams;
     } catch (err) {

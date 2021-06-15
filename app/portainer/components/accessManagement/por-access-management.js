@@ -3,11 +3,11 @@ export const porAccessManagement = {
   controller: 'porAccessManagementController',
   controllerAs: 'ctrl',
   bindings: {
-    endpoint: '<',
     accessControlledEntity: '<',
     inheritFrom: '<',
     entityType: '@',
     updateAccess: '<',
     actionInProgress: '<',
+    filterUsers: '<',
   },
 };
