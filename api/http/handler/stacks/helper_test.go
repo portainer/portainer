@@ -12,9 +12,11 @@ func Test_ValidateStackAutoUpdate_Valid(t *testing.T) {
 		Webhook:  "8dce8c2f-9ca1-482b-ad20-271e86536ada",
 		Interval: "5h30m40s10ms",
 	}
-	if err := validateStackAutoUpdate(mock); err != nil {
-		t.Errorf("wrong validation, mock data: %v should be valid, but got error: %v", mock, err)
-	}
+	err := validateStackAutoUpdate(mock)
+	assert.NoError(t, err)
+	mock = nil
+	err = validateStackAutoUpdate(mock)
+	assert.NoError(t, err)
 }
 
 func Test_ValidateStackAutoUpdate_InValid(t *testing.T) {
