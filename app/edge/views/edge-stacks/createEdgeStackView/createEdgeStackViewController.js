@@ -40,6 +40,7 @@ export class CreateEdgeStackViewController {
     this.onChangeTemplate = this.onChangeTemplate.bind(this);
     this.onChangeTemplateAsync = this.onChangeTemplateAsync.bind(this);
     this.onChangeMethod = this.onChangeMethod.bind(this);
+    this.onChangeFormValues = this.onChangeFormValues.bind(this);
   }
 
   async uiCanExit() {
@@ -159,6 +160,10 @@ export class CreateEdgeStackViewController {
       RepositoryPassword: this.formValues.RepositoryPassword,
     };
     return this.EdgeStackService.createStackFromGitRepository(name, repositoryOptions, this.formValues.Groups);
+  }
+
+  onChangeFormValues(values) {
+    this.formValues = values;
   }
 
   editorUpdate(cm) {

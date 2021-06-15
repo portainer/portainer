@@ -53,6 +53,16 @@ angular
       }
     };
 
+    $scope.onChangeFormValues = onChangeFormValues;
+
+    $scope.addEnvironmentVariable = function () {
+      $scope.formValues.Env.push({ name: '', value: '' });
+    };
+
+    $scope.removeEnvironmentVariable = function (index) {
+      $scope.formValues.Env.splice(index, 1);
+    };
+
     function validateForm(accessControlData, isAdmin) {
       $scope.state.formValidationError = '';
       var error = '';
@@ -236,4 +246,8 @@ angular
     };
 
     initView();
+
+    function onChangeFormValues(newValues) {
+      $scope.formValues = newValues;
+    }
   });

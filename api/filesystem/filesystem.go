@@ -279,13 +279,7 @@ func (service *Service) WriteJSONToFile(path string, content interface{}) error 
 
 // FileExists checks for the existence of the specified file.
 func (service *Service) FileExists(filePath string) (bool, error) {
-	if _, err := os.Stat(filePath); err != nil {
-		if os.IsNotExist(err) {
-			return false, nil
-		}
-		return false, err
-	}
-	return true, nil
+	return FileExists(filePath)
 }
 
 // KeyPairFilesExist checks for the existence of the key files.
@@ -509,4 +503,32 @@ func (service *Service) GetTemporaryPath() (string, error) {
 // GetDataStorePath returns path to data folder
 func (service *Service) GetDatastorePath() string {
 	return service.dataStorePath
+}
+
+// FileExists checks for the existence of the specified file.
+func FileExists(filePath string) (bool, error) {
+	if _, err := os.Stat(filePath); err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}
+
+func MoveDirectory(originalPath, newPath string) error {
+	if _, err := os.Stat(originalPath); err != nil {
+		return err
+	}
+
+	alreadyExists, err := FileExists(newPath)
+	if err != nil {
+		return err
+	}
+
+	if alreadyExists {
+		return errors.New("Target path already exists")
+	}
+
+	return os.Rename(originalPath, newPath)
 }

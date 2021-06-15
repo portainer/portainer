@@ -1,11 +1,12 @@
 package git
 
 import (
-	"github.com/docker/docker/pkg/ioutils"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/docker/docker/pkg/ioutils"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestService_ClonePrivateRepository_GitHub(t *testing.T) {
@@ -20,7 +21,7 @@ func TestService_ClonePrivateRepository_GitHub(t *testing.T) {
 	defer os.RemoveAll(dst)
 
 	repositoryUrl := "https://github.com/portainer/private-test-repository.git"
-	err = service.ClonePrivateRepositoryWithBasicAuth(repositoryUrl, "refs/heads/main", dst, username, pat)
+	err = service.CloneRepository(dst, repositoryUrl, "refs/heads/main", username, pat)
 	assert.NoError(t, err)
 	assert.FileExists(t, filepath.Join(dst, "README.md"))
 }
