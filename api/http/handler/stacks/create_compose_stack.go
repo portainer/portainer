@@ -112,8 +112,9 @@ type composeStackFromGitRepositoryPayload struct {
 	// Password used in basic authentication. Required when RepositoryAuthentication is true.
 	RepositoryPassword string `example:"myGitPassword"`
 	// Path to the Stack file inside the Git repository
-	ComposeFilePathInRepository string `example:"docker-compose.yml" default:"docker-compose.yml"`
-
+	ComposeFile     string `example:"docker-compose.yml" default:"docker-compose.yml"`
+	AdditionalFiles []string
+	AutoUpdate      *portainer.StackAutoUpdate
 	// A list of environment variables used during stack deployment
 	Env []portainer.Pair
 }
@@ -126,8 +127,11 @@ func (payload *composeStackFromGitRepositoryPayload) Validate(r *http.Request) e
 	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
 		return errors.New("Invalid repository URL. Must correspond to a valid URL format")
 	}
-	if payload.RepositoryAuthentication && (govalidator.IsNull(payload.RepositoryUsername) || govalidator.IsNull(payload.RepositoryPassword)) {
-		return errors.New("Invalid repository credentials. Username and password must be specified when authentication is enabled")
+	if govalidator.IsNull(payload.RepositoryReferenceName) {
+		return errors.New("Invalid RepositoryReferenceName")
+	}
+	if payload.RepositoryAuthentication && govalidator.IsNull(payload.RepositoryPassword) {
+		return errors.New("Invalid repository credentials. Password must be specified when authentication is enabled")
 	}
 
 	return nil
@@ -141,8 +145,8 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 	}
 
 	payload.Name = handler.ComposeStackManager.NormalizeStackName(payload.Name)
-	if payload.ComposeFilePathInRepository == "" {
-		payload.ComposeFilePathInRepository = filesystem.ComposeFileDefaultName
+	if payload.ComposeFile == "" {
+		payload.ComposeFile = filesystem.ComposeFileDefaultName
 	}
 
 	isUnique, err := handler.checkUniqueName(endpoint, payload.Name, 0, false)
@@ -156,14 +160,27 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
 	stack := &portainer.Stack{
-		ID:           portainer.StackID(stackID),
-		Name:         payload.Name,
-		Type:         portainer.DockerComposeStack,
-		EndpointID:   endpoint.ID,
-		EntryPoint:   payload.ComposeFilePathInRepository,
-		Env:          payload.Env,
+		ID:              portainer.StackID(stackID),
+		Name:            payload.Name,
+		Type:            portainer.DockerComposeStack,
+		EndpointID:      endpoint.ID,
+		EntryPoint:      payload.ComposeFile,
+		AdditionalFiles: payload.AdditionalFiles,
+		AutoUpdate:      payload.AutoUpdate,
+		Env:             payload.Env,
+		GitConfig: &portainer.GitConfig{
+			URL:           payload.RepositoryURL,
+			ReferenceName: payload.RepositoryReferenceName,
+		},
 		Status:       portainer.StackStatusActive,
 		CreationDate: time.Now().Unix(),
+	}
+
+	if payload.RepositoryAuthentication {
+		stack.GitConfig.Authentication = &portainer.GitAuthentication{
+			Username: payload.RepositoryUsername,
+			Password: payload.RepositoryPassword,
+		}
 	}
 
 	projectPath := handler.FileService.GetStackProjectPath(strconv.Itoa(int(stack.ID)))

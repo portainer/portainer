@@ -119,7 +119,9 @@ type swarmStackFromGitRepositoryPayload struct {
 	// Password used in basic authentication. Required when RepositoryAuthentication is true.
 	RepositoryPassword string `example:"myGitPassword"`
 	// Path to the Stack file inside the Git repository
-	ComposeFilePathInRepository string `example:"docker-compose.yml" default:"docker-compose.yml"`
+	ComposeFile     string `example:"docker-compose.yml" default:"docker-compose.yml"`
+	AdditionalFiles []string
+	AutoUpdate      *portainer.StackAutoUpdate
 }
 
 func (payload *swarmStackFromGitRepositoryPayload) Validate(r *http.Request) error {
@@ -132,11 +134,14 @@ func (payload *swarmStackFromGitRepositoryPayload) Validate(r *http.Request) err
 	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
 		return errors.New("Invalid repository URL. Must correspond to a valid URL format")
 	}
-	if payload.RepositoryAuthentication && (govalidator.IsNull(payload.RepositoryUsername) || govalidator.IsNull(payload.RepositoryPassword)) {
-		return errors.New("Invalid repository credentials. Username and password must be specified when authentication is enabled")
+	if govalidator.IsNull(payload.RepositoryReferenceName) {
+		return errors.New("Invalid RepositoryReferenceName")
 	}
-	if govalidator.IsNull(payload.ComposeFilePathInRepository) {
-		payload.ComposeFilePathInRepository = filesystem.ComposeFileDefaultName
+	if payload.RepositoryAuthentication && govalidator.IsNull(payload.RepositoryPassword) {
+		return errors.New("Invalid repository credentials. Password must be specified when authentication is enabled")
+	}
+	if govalidator.IsNull(payload.ComposeFile) {
+		payload.ComposeFile = filesystem.ComposeFileDefaultName
 	}
 	return nil
 }
@@ -159,15 +164,28 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
 	stack := &portainer.Stack{
-		ID:           portainer.StackID(stackID),
-		Name:         payload.Name,
-		Type:         portainer.DockerSwarmStack,
-		SwarmID:      payload.SwarmID,
-		EndpointID:   endpoint.ID,
-		EntryPoint:   payload.ComposeFilePathInRepository,
+		ID:              portainer.StackID(stackID),
+		Name:            payload.Name,
+		Type:            portainer.DockerSwarmStack,
+		SwarmID:         payload.SwarmID,
+		EndpointID:      endpoint.ID,
+		EntryPoint:      payload.ComposeFile,
+		AdditionalFiles: payload.AdditionalFiles,
+		AutoUpdate:      payload.AutoUpdate,
+		GitConfig: &portainer.GitConfig{
+			URL:           payload.RepositoryURL,
+			ReferenceName: payload.RepositoryReferenceName,
+		},
 		Env:          payload.Env,
 		Status:       portainer.StackStatusActive,
 		CreationDate: time.Now().Unix(),
+	}
+
+	if payload.RepositoryAuthentication {
+		stack.GitConfig.Authentication = &portainer.GitAuthentication{
+			Username: payload.RepositoryUsername,
+			Password: payload.RepositoryPassword,
+		}
 	}
 
 	projectPath := handler.FileService.GetStackProjectPath(strconv.Itoa(int(stack.ID)))
