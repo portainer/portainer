@@ -480,7 +480,7 @@ class KubernetesCreateApplicationController {
     const hasRWOOnly = KubernetesApplicationHelper.hasRWOOnly(this.formValues);
     const isIsolated = this.formValues.DataAccessPolicy === this.ApplicationDataAccessPolicies.ISOLATED;
 
-    if ((hasFolders && hasRWOOnly) || isIsolated) {
+    if (hasFolders && (hasRWOOnly || isIsolated)) {
       return false;
     }
     return true;
