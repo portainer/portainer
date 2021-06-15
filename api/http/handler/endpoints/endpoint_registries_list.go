@@ -36,7 +36,7 @@ func (handler *Handler) endpointRegistriesList(w http.ResponseWriter, r *http.Re
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
-	isAdminOrEndpointAdmin := securityContext.IsAdmin
+	isAdmin := securityContext.IsAdmin
 
 	registries, err := handler.DataStore.Registry().Registries()
 	if err != nil {
@@ -46,25 +46,31 @@ func (handler *Handler) endpointRegistriesList(w http.ResponseWriter, r *http.Re
 	if endpoint.Type == portainer.KubernetesLocalEnvironment || endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
 		namespace, _ := request.RetrieveQueryParameter(r, "namespace", true)
 
-		if !isAdminOrEndpointAdmin {
-			authorized, err := handler.isNamespaceAuthorized(endpoint, namespace, user.ID, securityContext.UserMemberships)
-			if err != nil {
-				return &httperror.HandlerError{http.StatusNotFound, "Unable to check for namespace authorization", err}
-			}
-
-			if !authorized {
-				return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "User is not authorized to use namespace", Err: errors.New("user is not authorized to use namespace")}
-			}
+		if namespace == "" && !isAdmin {
+			return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Missing namespace query parameter", Err: errors.New("missing namespace query parameter")}
 		}
 
-		registries = filterRegistriesByNamespace(registries, endpoint.ID, namespace)
+		if namespace != "" {
+			if !isAdmin {
+				authorized, err := handler.isNamespaceAuthorized(endpoint, namespace, user.ID, securityContext.UserMemberships)
+				if err != nil {
+					return &httperror.HandlerError{http.StatusNotFound, "Unable to check for namespace authorization", err}
+				}
 
-	} else if !isAdminOrEndpointAdmin {
+				if !authorized {
+					return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "User is not authorized to use namespace", Err: errors.New("user is not authorized to use namespace")}
+				}
+			}
+
+			registries = filterRegistriesByNamespace(registries, endpoint.ID, namespace)
+		}
+
+	} else if !isAdmin {
 		registries = security.FilterRegistries(registries, user, securityContext.UserMemberships, endpoint.ID)
 	}
 
 	for idx := range registries {
-		hideRegistryFields(&registries[idx], !isAdminOrEndpointAdmin)
+		hideRegistryFields(&registries[idx], !isAdmin)
 	}
 
 	return response.JSON(w, registries)
