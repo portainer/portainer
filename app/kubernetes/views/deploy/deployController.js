@@ -26,7 +26,6 @@ class KubernetesDeployController {
     const isGitFormInvalid =
       this.state.BuildMethod === KubernetesDeployBuildMethods.GIT &&
       (!this.formValues.RepositoryURL ||
-        !this.formValues.RepositoryReferenceName ||
         !this.formValues.FilePathInRepository ||
         (this.formValues.RepositoryAuthentication && (!this.formValues.RepositoryUsername || !this.formValues.RepositoryPassword)));
     const isWebEditorInvalid = this.state.BuildMethod === KubernetesDeployBuildMethods.WEB_EDITOR && _.isEmpty(this.formValues.EditorContent);
