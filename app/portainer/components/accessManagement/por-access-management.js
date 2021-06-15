@@ -1,4 +1,4 @@
-angular.module('portainer.app').component('porAccessManagement', {
+export const porAccessManagement = {
   templateUrl: './porAccessManagement.html',
   controller: 'porAccessManagementController',
   controllerAs: 'ctrl',
@@ -10,4 +10,4 @@ angular.module('portainer.app').component('porAccessManagement', {
     updateAccess: '<',
     actionInProgress: '<',
   },
-});
+};
