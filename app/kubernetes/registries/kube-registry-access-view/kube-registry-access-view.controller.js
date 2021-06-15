@@ -1,10 +1,9 @@
 export default class KubernetesRegistryAccessController {
   /* @ngInject */
-  constructor($async, $state, EndpointService, Notifications, RegistryService, KubernetesResourcePoolService, KubernetesNamespaceHelper) {
+  constructor($async, $state, EndpointService, Notifications, KubernetesResourcePoolService, KubernetesNamespaceHelper) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
-    this.RegistryService = RegistryService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
     this.EndpointService = EndpointService;
@@ -49,7 +48,7 @@ export default class KubernetesRegistryAccessController {
         this.state = {
           registryId: this.$state.params.id,
         };
-        this.registry = await this.RegistryService.registry(this.state.registryId, this.endpoint.Id);
+        this.registry = await this.EndpointService.registry(this.endpoint.Id, this.state.registryId);
         if (this.registry.RegistryAccesses && this.registry.RegistryAccesses[this.endpoint.Id]) {
           this.savedResourcePools = this.registry.RegistryAccesses[this.endpoint.Id].Namespaces.map((value) => ({ value }));
         }

@@ -5,8 +5,6 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
-	httperrors "github.com/portainer/portainer/api/http/errors"
-	"github.com/portainer/portainer/api/http/security"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -28,10 +26,6 @@ import (
 // @failure 500 "Server error"
 // @router /registries/{id} [get]
 func (handler *Handler) registryInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
-	}
 
 	registryID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
@@ -45,24 +39,6 @@ func (handler *Handler) registryInspect(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a registry with the specified identifier inside the database", err}
 	}
 
-	// check user access for registry
-	if !securityContext.IsAdmin {
-		user, err := handler.DataStore.User().User(securityContext.UserID)
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user from the database", err}
-		}
-
-		endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)
-		if err != nil {
-			return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: endpointId", err}
-		}
-
-		if !security.AuthorizedRegistryAccess(registry, user, securityContext.UserMemberships, portainer.EndpointID(endpointID)) {
-			return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", httperrors.ErrResourceAccessDenied}
-		}
-	}
-
-	hideAccesses := !securityContext.IsAdmin
-	hideFields(registry, hideAccesses)
+	hideFields(registry, false)
 	return response.JSON(w, registry)
 }
