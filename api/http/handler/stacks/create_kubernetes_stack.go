@@ -17,6 +17,8 @@ import (
 	"github.com/portainer/portainer/api/filesystem"
 )
 
+const defaultReferenceName = "refs/heads/master"
+
 type kubernetesStringDeploymentPayload struct {
 	ComposeFormat    bool
 	Namespace        string
@@ -51,11 +53,14 @@ func (payload *kubernetesGitDeploymentPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
 		return errors.New("Invalid repository URL. Must correspond to a valid URL format")
 	}
-	if payload.RepositoryAuthentication && (govalidator.IsNull(payload.RepositoryUsername) || govalidator.IsNull(payload.RepositoryPassword)) {
-		return errors.New("Invalid repository credentials. Username and password must be specified when authentication is enabled")
+	if payload.RepositoryAuthentication && govalidator.IsNull(payload.RepositoryPassword) {
+		return errors.New("Invalid repository credentials. Password must be specified when authentication is enabled")
 	}
 	if govalidator.IsNull(payload.FilePathInRepository) {
 		return errors.New("Invalid file path in repository")
+	}
+	if govalidator.IsNull(payload.RepositoryReferenceName) {
+		payload.RepositoryReferenceName = defaultReferenceName
 	}
 	return nil
 }
