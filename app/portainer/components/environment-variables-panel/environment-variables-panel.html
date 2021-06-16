@@ -1,0 +1,30 @@
+<ng-form class="form-horizontal environment-variables-panel" name="$ctrl.envVarsForm">
+  <div class="form-group">
+    <div class="col-sm-12 form-section-title" style="margin-top: 10px; margin-left: 15px; width: 98%;">
+      Environment variables
+    </div>
+    <div class="col-sm-12 environment-variables-panel--explanation">
+      {{::$ctrl.explanation}}
+    </div>
+
+    <environment-variables-simple-mode
+      ng-if="$ctrl.mode == 'simple'"
+      ng-model="$ctrl.ngModel"
+      on-change="($ctrl.handleSimpleChange)"
+      on-switch-mode-click="($ctrl.switchEnvMode)"
+    ></environment-variables-simple-mode>
+
+    <div ng-if="$ctrl.mode == 'advanced'" class="environment-variables-panel--advanced">
+      <div class="col-sm-12">
+        <a class="small interactive" ng-click="$ctrl.switchEnvMode()"> <i class="fa fa-list-ol space-right" aria-hidden="true"></i> Simple mode </a>
+      </div>
+      <div class="col-sm-12 small text-muted">
+        <i class="fa fa-info-circle blue-icon space-right" aria-hidden="true"></i>
+        Switch to simple mode to define variables line by line, or load from .env file
+      </div>
+      <div class="form-group" style="margin-left: 1px;">
+        <code-editor identifier="environment-variables-editor" placeholder="e.g. key=value" value="$ctrl.editorText" yml="false" on-change="($ctrl.editorUpdate)"></code-editor>
+      </div>
+    </div>
+  </div>
+</ng-form>
