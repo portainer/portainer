@@ -104,6 +104,6 @@ func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the registry inside the database", err}
 	}
 
-	hideFields(registry, false)
+	hideFields(registry, true)
 	return response.JSON(w, registry)
 }
