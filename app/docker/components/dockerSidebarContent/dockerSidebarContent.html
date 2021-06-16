@@ -40,15 +40,14 @@
   <a ng-if="$ctrl.swarmManagement" ui-sref="docker.swarm({endpointId: $ctrl.endpointId})" ui-sref-active="active">Swarm <span class="menu-icon fa fa-object-group fa-fw"></span></a>
 
   <div
-    class="sidebar-sublist"
     ng-if="$ctrl.adminAccess && ['docker.swarm', 'docker.host', 'docker.registries', 'docker.registries.access', 'docker.featuresConfiguration'].includes($ctrl.currentRouteName)"
   >
-    <a ui-sref="docker.featuresConfiguration({endpointId: $ctrl.endpointId})" ui-sref-active="active">Setup</a>
-  </div>
-  <div
-    class="sidebar-sublist"
-    ng-if="$ctrl.adminAccess && ['docker.swarm', 'docker.host', 'docker.registries', 'docker.registries.access', 'docker.featuresConfiguration'].includes($ctrl.currentRouteName)"
-  >
-    <a ui-sref="docker.registries({endpointId: $ctrl.endpointId})" ui-sref-active="active">Registries</a>
+    <div class="sidebar-sublist">
+      <a ui-sref="docker.featuresConfiguration({endpointId: $ctrl.endpointId})" ui-sref-active="active">Setup</a>
+    </div>
+
+    <div class="sidebar-sublist">
+      <a ui-sref="docker.registries({endpointId: $ctrl.endpointId})" ui-sref-active="active">Registries</a>
+    </div>
   </div>
 </li>

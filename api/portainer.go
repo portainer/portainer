@@ -529,7 +529,7 @@ type (
 		RegistryAccesses        RegistryAccesses                 `json:"RegistryAccesses"`
 
 		// Deprecated fields
-		// Deprecated in DBVersion == 28
+		// Deprecated in DBVersion == 31
 		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
 		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
 

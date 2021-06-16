@@ -68,6 +68,8 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h.Handle("/endpoints/{id}/registries",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointRegistriesList))).Methods(http.MethodGet)
 	h.Handle("/endpoints/{id}/registries/{registryId}",
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointRegistryInspect))).Methods(http.MethodGet)
+	h.Handle("/endpoints/{id}/registries/{registryId}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointRegistryAccess))).Methods(http.MethodPut)
 	return h
 }

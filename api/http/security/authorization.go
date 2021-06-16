@@ -6,6 +6,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
+// IsAdmin returns true if the logged-in user is an admin
 func IsAdmin(request *http.Request) (bool, error) {
 	tokenData, err := RetrieveTokenData(request)
 	if err != nil {
@@ -120,10 +121,13 @@ func authorizedEndpointGroupAccess(endpointGroup *portainer.EndpointGroup, userI
 	return AuthorizedAccess(userID, memberships, endpointGroup.UserAccessPolicies, endpointGroup.TeamAccessPolicies)
 }
 
-// AuthorizedRegistryAccess ensure that the NON ADMIN user can access the specified registry.
+// AuthorizedRegistryAccess ensure that the user can access the specified registry.
 // It will check if the user is part of the authorized users or part of a team that is
 // listed in the authorized teams for a specified endpoint,
 func AuthorizedRegistryAccess(registry *portainer.Registry, user *portainer.User, teamMemberships []portainer.TeamMembership, endpointID portainer.EndpointID) bool {
+	if user.Role == portainer.AdministratorRole {
+		return true
+	}
 
 	registryEndpointAccesses := registry.RegistryAccesses[endpointID]
 

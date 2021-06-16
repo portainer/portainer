@@ -33,6 +33,11 @@ angular.module('portainer.app').factory('Endpoints', [
           params: { id: '@id', namespace: '@namespace' },
           isArray: true,
         },
+        registry: {
+          url: `${API_ENDPOINT_ENDPOINTS}/:id/registries/:registryId`,
+          method: 'GET',
+          params: { id: '@id', namespace: '@namespace', registryId: '@registryId' },
+        },
         updateRegistryAccess: {
           method: 'PUT',
           url: `${API_ENDPOINT_ENDPOINTS}/:id/registries/:registryId`,

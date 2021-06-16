@@ -23,11 +23,6 @@ func (payload *registryAccessPayload) Validate(r *http.Request) error {
 
 // PUT request on /endpoints/{id}/registries/{registryId}
 func (handler *Handler) endpointRegistryAccess(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
-	}
-
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid endpoint identifier route variable", Err: err}
@@ -35,7 +30,7 @@ func (handler *Handler) endpointRegistryAccess(w http.ResponseWriter, r *http.Re
 
 	registryID, err := request.RetrieveNumericRouteVariableValue(r, "registryId")
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid resource pool identifier route variable", Err: err}
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid registry identifier route variable", Err: err}
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
@@ -45,13 +40,17 @@ func (handler *Handler) endpointRegistryAccess(w http.ResponseWriter, r *http.Re
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to find an endpoint with the specified identifier inside the database", Err: err}
 	}
 
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+	}
+
 	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
 	}
 
-	isAdminOrEndpointAdmin := securityContext.IsAdmin
-	if !isAdminOrEndpointAdmin {
+	if !securityContext.IsAdmin {
 		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "User is not authorized", Err: err}
 	}
 

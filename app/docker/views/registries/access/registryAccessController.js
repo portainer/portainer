@@ -2,13 +2,12 @@ import { TeamAccessViewModel, UserAccessViewModel } from 'Portainer/models/acces
 
 class DockerRegistryAccessController {
   /* @ngInject */
-  constructor($async, $state, Notifications, RegistryService, EndpointService, GroupService) {
+  constructor($async, $state, Notifications, EndpointService, GroupService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
     this.EndpointService = EndpointService;
     this.GroupService = GroupService;
-    this.RegistryService = RegistryService;
 
     this.updateAccess = this.updateAccess.bind(this);
     this.filterUsers = this.filterUsers.bind(this);
@@ -52,7 +51,7 @@ class DockerRegistryAccessController {
           endpointId: this.$state.params.endpointId,
           registryId: this.$state.params.id,
         };
-        this.registry = await this.RegistryService.registry(this.state.registryId, this.state.endpointId);
+        this.registry = await this.EndpointService.registry(this.state.endpointId, this.state.registryId);
         this.registryEndpointAccesses = this.registry.RegistryAccesses[this.state.endpointId] || {};
         this.endpointGroup = await this.GroupService.group(this.endpoint.GroupId);
       } catch (err) {
