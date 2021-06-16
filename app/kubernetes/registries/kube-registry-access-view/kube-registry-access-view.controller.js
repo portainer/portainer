@@ -63,7 +63,7 @@ export default class KubernetesRegistryAccessController {
           .filter((pool) => !this.KubernetesNamespaceHelper.isSystemNamespace(pool.Namespace.Name) && !this.savedResourcePools.find(({ value }) => value === pool.Namespace.Name))
           .map((pool) => ({ name: pool.Namespace.Name, id: pool.Namespace.Id }));
       } catch (err) {
-        this.Notifications.error('Failure', err, 'Unable to retrieve resource pools');
+        this.Notifications.error('Failure', err, 'Unable to retrieve namespaces');
       }
     });
   }

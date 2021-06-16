@@ -36,7 +36,7 @@
                     with an alphanumeric character.</p
                   >
                 </div>
-                <p ng-if="$ctrl.state.isAlreadyExist"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A resource pool with the same name already exists.</p>
+                <p ng-if="$ctrl.state.isAlreadyExist"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A namespace with the same name already exists.</p>
               </div>
             </div>
             <!-- #endregion -->
@@ -208,7 +208,7 @@
                 <div class="col-sm-12 small text-muted">
                   The ingress feature must be enabled in the
                   <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: $ctrl.endpoint.Id})">endpoint configuration view</a> to be able to register ingresses inside this
-                  resource pool.
+                  namespace.
                 </div>
               </div>
 
@@ -359,7 +359,7 @@
               <div class="col-sm-12 small text-muted">
                 <p>
                   <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                  Define which registry can be used by users who have access to this resource pool.
+                  Define which registry can be used by users who have access to this namespace.
                 </p>
               </div>
             </div>
@@ -409,7 +409,7 @@
                   ng-click="$ctrl.createResourcePool()"
                   button-spinner="$ctrl.state.actionInProgress"
                 >
-                  <span ng-hide="$ctrl.state.actionInProgress">Create resource pool</span>
+                  <span ng-hide="$ctrl.state.actionInProgress">Create namespace</span>
                   <span ng-show="$ctrl.state.actionInProgress">Creation in progress...</span>
                 </button>
               </div>
