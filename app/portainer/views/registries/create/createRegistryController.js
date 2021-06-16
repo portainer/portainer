@@ -1,5 +1,5 @@
 import { RegistryTypes } from '@/portainer/models/registryTypes';
-import { RegistryDefaultModel } from '../../../models/registry';
+import { RegistryDefaultModel } from '@/portainer/models/registry';
 
 angular.module('portainer.app').controller('CreateRegistryController', [
   '$scope',
@@ -11,6 +11,7 @@ angular.module('portainer.app').controller('CreateRegistryController', [
     $scope.selectQuayRegistry = selectQuayRegistry;
     $scope.selectAzureRegistry = selectAzureRegistry;
     $scope.selectCustomRegistry = selectCustomRegistry;
+    $scope.selectProGetRegistry = selectProGetRegistry;
     $scope.selectGitlabRegistry = selectGitlabRegistry;
     $scope.create = createRegistry;
     $scope.useDefaultGitlabConfiguration = useDefaultGitlabConfiguration;
@@ -62,6 +63,13 @@ angular.module('portainer.app').controller('CreateRegistryController', [
     function selectCustomRegistry() {
       $scope.model.Name = '';
       $scope.model.URL = '';
+      $scope.model.Authentication = false;
+    }
+
+    function selectProGetRegistry() {
+      $scope.model.Name = '';
+      $scope.model.URL = '';
+      $scope.model.BaseURL = '';
       $scope.model.Authentication = false;
     }
 
