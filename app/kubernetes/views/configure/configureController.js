@@ -175,7 +175,7 @@ class KubernetesConfigureController {
       }
     });
   }
-  
+
   enableMetricsServer() {
     if (this.formValues.UseServerMetrics) {
       this.state.metrics.userClick = true;

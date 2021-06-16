@@ -14,6 +14,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	gittypes "github.com/portainer/portainer/api/git/types"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/endpointutils"
@@ -112,7 +113,11 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 	case portainer.DockerComposeStack:
 		return handler.createComposeStack(w, r, method, endpoint, tokenData.ID)
 	case portainer.KubernetesStack:
-		return handler.createKubernetesStack(w, r, endpoint)
+		if tokenData.Role != portainer.AdministratorRole {
+			return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Access denied", Err: httperrors.ErrUnauthorized}
+		}
+
+		return handler.createKubernetesStack(w, r, method, endpoint)
 	}
 
 	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: type. Value must be one of: 1 (Swarm stack) or 2 (Compose stack)", errors.New(request.ErrInvalidQueryParameter)}
@@ -143,6 +148,16 @@ func (handler *Handler) createSwarmStack(w http.ResponseWriter, r *http.Request,
 	}
 
 	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: method. Value must be one of: string, repository or file", errors.New(request.ErrInvalidQueryParameter)}
+}
+
+func (handler *Handler) createKubernetesStack(w http.ResponseWriter, r *http.Request, method string, endpoint *portainer.Endpoint) *httperror.HandlerError {
+	switch method {
+	case "string":
+		return handler.createKubernetesStackFromFileContent(w, r, endpoint)
+	case "repository":
+		return handler.createKubernetesStackFromGitRepository(w, r, endpoint)
+	}
+	return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid value for query parameter: method. Value must be one of: string or repository", Err: errors.New(request.ErrInvalidQueryParameter)}
 }
 
 func (handler *Handler) isValidStackFile(stackFileContent []byte, securitySettings *portainer.EndpointSecuritySettings) error {

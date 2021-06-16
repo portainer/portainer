@@ -207,8 +207,8 @@
                         <ng-messages for="kubernetesApplicationCreationForm['environment_variable_name_' + $index].$error">
                           <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Environment variable name is required.</p>
                           <p ng-message="pattern"
-                          ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of alphabetic characters, digits, '_', '-', or '.', and must
-                          not start with a digit (e.g. 'my.env-name', or 'MY_ENV.NAME', or 'MyEnvName1'.</p
+                            ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of alphabetic characters, digits, '_', '-', or '.', and must not
+                            start with a digit (e.g. 'my.env-name', or 'MY_ENV.NAME', or 'MyEnvName1'.</p
                           >
                         </ng-messages>
                         <p ng-if="ctrl.state.duplicates.environmentVariables.refs[$index] !== undefined"
