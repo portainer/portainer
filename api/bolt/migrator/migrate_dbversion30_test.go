@@ -76,7 +76,7 @@ func TestMigrateSettings(t *testing.T) {
 		db:              dbConn,
 		settingsService: settingsService,
 	}
-	if err := migrateSettings(m); err != nil {
+	if err := m.migrateSettings(); err != nil {
 		t.Errorf("failed to update settings: %v", err)
 	}
 	updatedSettings, err := m.settingsService.Settings()
