@@ -2,6 +2,7 @@ package stacks
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -12,9 +13,11 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	gittypes "github.com/portainer/portainer/api/git/types"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/internal/stackutils"
 )
 
@@ -76,7 +79,7 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
-	if !endpoint.SecuritySettings.AllowStackManagementForRegularUsers {
+	if endpointutils.IsDockerEndpoint(endpoint) && !endpoint.SecuritySettings.AllowStackManagementForRegularUsers {
 		securityContext, err := security.RetrieveRestrictedRequestContext(r)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user info from request context", err}
@@ -235,4 +238,19 @@ func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *port
 
 	stack.ResourceControl = resourceControl
 	return response.JSON(w, stack)
+}
+
+func (handler *Handler) cloneAndSaveConfig(stack *portainer.Stack, projectPath, repositoryURL, refName, configFilePath string, auth bool, username, password string) error {
+
+	err := handler.GitService.CloneRepository(projectPath, repositoryURL, refName, username, password)
+	if err != nil {
+		return fmt.Errorf("unable to clone git repository: %w", err)
+	}
+
+	stack.GitConfig = &gittypes.RepoConfig{
+		URL:            repositoryURL,
+		ReferenceName:  refName,
+		ConfigFilePath: configFilePath,
+	}
+	return nil
 }

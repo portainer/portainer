@@ -7,7 +7,7 @@
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-body>
-        <form class="form-horizontal">
+        <form class="form-horizontal" name="createStackForm">
           <!-- name-input -->
           <div class="form-group">
             <label for="stack_name" class="col-sm-1 control-label text-left">Name</label>
@@ -130,79 +130,7 @@
             </div>
           </div>
           <!-- !upload -->
-          <!-- repository -->
-          <div ng-show="state.Method === 'repository'">
-            <div class="col-sm-12 form-section-title">
-              Git repository
-            </div>
-            <div class="form-group">
-              <span class="col-sm-12 text-muted small">
-                You can use the URL of a git repository.
-              </span>
-            </div>
-            <div class="form-group">
-              <label for="stack_repository_url" class="col-sm-2 control-label text-left">Repository URL</label>
-              <div class="col-sm-10">
-                <input
-                  type="text"
-                  class="form-control"
-                  ng-model="formValues.RepositoryURL"
-                  id="stack_repository_url"
-                  placeholder="https://github.com/portainer/portainer-compose"
-                />
-              </div>
-            </div>
-            <div class="form-group">
-              <span class="col-sm-12 text-muted small">
-                Specify a reference of the repository using the following syntax: branches with <code>refs/heads/branch_name</code> or tags with <code>refs/tags/tag_name</code>. If
-                not specified, will use the default <code>HEAD</code> reference normally the <code>master</code> branch.
-              </span>
-            </div>
-            <div class="form-group">
-              <label for="stack_repository_url" class="col-sm-2 control-label text-left">Repository reference</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" ng-model="formValues.RepositoryReferenceName" id="stack_repository_reference_name" placeholder="refs/heads/master" />
-              </div>
-            </div>
-            <div class="form-group">
-              <span class="col-sm-12 text-muted small">
-                Indicate the path to the Compose file from the root of your repository.
-              </span>
-            </div>
-            <div class="form-group">
-              <label for="stack_repository_path" class="col-sm-2 control-label text-left">Compose path</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" ng-model="formValues.ComposeFilePathInRepository" id="stack_repository_path" placeholder="docker-compose.yml" />
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="col-sm-12">
-                <label class="control-label text-left">
-                  Authentication
-                </label>
-                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.RepositoryAuthentication" /><i></i> </label>
-              </div>
-            </div>
-            <div class="form-group" ng-if="formValues.RepositoryAuthentication">
-              <span class="col-sm-12 text-muted small">
-                If your git account has 2FA enabled, you may receive an <code>authentication required</code> error when deploying your stack. In this case, you will need to provide
-                a personal-access token instead of your password.
-              </span>
-            </div>
-            <div class="form-group" ng-if="formValues.RepositoryAuthentication">
-              <label for="repository_username" class="col-sm-1 control-label text-left">Username</label>
-              <div class="col-sm-11 col-md-5">
-                <input type="text" class="form-control" ng-model="formValues.RepositoryUsername" name="repository_username" placeholder="myGitUser" />
-              </div>
-              <label for="repository_password" class="col-sm-1 control-label text-left">
-                Password
-              </label>
-              <div class="col-sm-11 col-md-5">
-                <input type="password" class="form-control" ng-model="formValues.RepositoryPassword" name="repository_password" placeholder="myPassword" />
-              </div>
-            </div>
-          </div>
-          <!-- !repository -->
+          <git-form ng-if="state.Method === 'repository'" model="formValues" on-change="(onChangeFormValues)"></git-form>
           <!-- custom-template -->
           <div ng-show="state.Method === 'template'">
             <div class="form-group">
@@ -261,36 +189,8 @@
           </div>
           <!-- !custom-template -->
           <!-- environment-variables -->
-          <div>
-            <div class="col-sm-12 form-section-title">
-              Environment
-            </div>
-            <div class="form-group">
-              <div class="col-sm-12" style="margin-top: 5px;">
-                <label class="control-label text-left">Environment variables</label>
-                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addEnvironmentVariable()">
-                  <i class="fa fa-plus-circle" aria-hidden="true"></i> add environment variable
-                </span>
-              </div>
-              <!-- environment-variable-input-list -->
-              <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-                <div ng-repeat="variable in formValues.Env" style="margin-top: 2px;">
-                  <div class="input-group col-sm-5 input-group-sm">
-                    <span class="input-group-addon">name</span>
-                    <input type="text" class="form-control" ng-model="variable.name" placeholder="e.g. FOO" />
-                  </div>
-                  <div class="input-group col-sm-5 input-group-sm">
-                    <span class="input-group-addon">value</span>
-                    <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. bar" />
-                  </div>
-                  <button class="btn btn-sm btn-danger" type="button" ng-click="removeEnvironmentVariable($index)">
-                    <i class="fa fa-trash" aria-hidden="true"></i>
-                  </button>
-                </div>
-              </div>
-              <!-- !environment-variable-input-list -->
-            </div>
-          </div>
+          <environment-variables-panel ng-model="formValues.Env" explanation="These values will be used as substitutions in the stack file" on-change="(handleEnvVarChange)">
+          </environment-variables-panel>
           <!-- !environment-variables -->
           <por-access-control-form form-data="formValues.AccessControlData"></por-access-control-form>
           <!-- actions -->
@@ -303,6 +203,7 @@
                 type="button"
                 class="btn btn-primary btn-sm"
                 ng-disabled="state.actionInProgress
+              || !createStackForm.$valid
               || (state.Method === 'editor' && (!formValues.StackFileContent || state.editorYamlValidationError))
               || (state.Method === 'upload' && (!formValues.StackFile || state.uploadYamlValidationError))
               || (state.Method === 'template' && (!formValues.StackFileContent || !selectedTemplate || state.editorYamlValidationError))

@@ -191,6 +191,7 @@ func (handler *Handler) updateSwarmStack(r *http.Request, stack *portainer.Stack
 
 	stack.UpdateDate = time.Now().Unix()
 	stack.UpdatedBy = config.user.Username
+	stack.Status = portainer.StackStatusActive
 
 	err = handler.deploySwarmStack(config)
 	if err != nil {

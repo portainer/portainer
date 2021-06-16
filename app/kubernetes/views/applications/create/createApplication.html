@@ -162,7 +162,7 @@
                           class="form-control"
                           ng-model="envVar.Name"
                           ng-change="ctrl.onChangeEnvironmentName()"
-                          ng-pattern="/^[a-zA-Z]([-_a-zA-Z0-9]*[a-zA-Z0-9])?$/"
+                          ng-pattern="/^[-._a-zA-Z][-._a-zA-Z0-9]*$/"
                           placeholder="foo"
                           ng-disabled="ctrl.formValues.Containers.length > 1"
                           required
@@ -207,8 +207,8 @@
                         <ng-messages for="kubernetesApplicationCreationForm['environment_variable_name_' + $index].$error">
                           <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Environment variable name is required.</p>
                           <p ng-message="pattern"
-                            ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist alphanumeric characters, '-' or '_', start with an alphabetic
-                            character, and end with an alphanumeric character (e.g. 'my-var', or 'MY_VAR123').</p
+                            ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of alphabetic characters, digits, '_', '-', or '.', and must not
+                            start with a digit (e.g. 'my.env-name', or 'MY_ENV.NAME', or 'MyEnvName1'.</p
                           >
                         </ng-messages>
                         <p ng-if="ctrl.state.duplicates.environmentVariables.refs[$index] !== undefined"

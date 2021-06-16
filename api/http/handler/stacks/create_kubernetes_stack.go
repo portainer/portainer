@@ -172,15 +172,7 @@ func (handler *Handler) deployKubernetesStack(endpoint *portainer.Endpoint, stac
 }
 
 func (handler *Handler) cloneManifestContentFromGitRepo(gitInfo *kubernetesGitDeploymentPayload, projectPath string) (string, error) {
-	gitCloneParams := &cloneRepositoryParameters{
-		url:            gitInfo.RepositoryURL,
-		referenceName:  gitInfo.RepositoryReferenceName,
-		path:           projectPath,
-		authentication: gitInfo.RepositoryAuthentication,
-		username:       gitInfo.RepositoryUsername,
-		password:       gitInfo.RepositoryPassword,
-	}
-	err := handler.cloneGitRepository(gitCloneParams)
+	err := handler.GitService.CloneRepository(projectPath, gitInfo.RepositoryURL, gitInfo.RepositoryReferenceName, gitInfo.RepositoryUsername, gitInfo.RepositoryPassword)
 	if err != nil {
 		return "", err
 	}

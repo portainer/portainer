@@ -50,7 +50,7 @@ angular.module('portainer.app').controller('StacksDatatableController', [
       if (stack.Orphaned) {
         return stack.OrphanedRunning || this.settings.allOrphanedStacks;
       } else {
-        return (stack.Status === 1 && showActiveStacks) || (stack.Status === 2 && showUnactiveStacks) || stack.External;
+        return (stack.Status === 1 && showActiveStacks) || (stack.Status === 2 && showUnactiveStacks) || stack.External || !stack.Status;
       }
     }
 

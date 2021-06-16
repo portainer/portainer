@@ -13,6 +13,9 @@ type git struct {
 	content string
 }
 
+func (g *git) CloneRepository(destination string, repositoryURL, referenceName, username, password string) error {
+	return g.ClonePublicRepository(repositoryURL, referenceName, destination)
+}
 func (g *git) ClonePublicRepository(repositoryURL string, referenceName string, destination string) error {
 	return ioutil.WriteFile(path.Join(destination, "deployment.yml"), []byte(g.content), 0755)
 }

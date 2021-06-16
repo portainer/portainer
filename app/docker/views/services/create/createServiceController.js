@@ -1,4 +1,6 @@
 import _ from 'lodash-es';
+
+import * as envVarsUtils from '@/portainer/helpers/env-vars';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
 
@@ -109,6 +111,11 @@ angular.module('portainer.docker').controller('CreateServiceController', [
 
     $scope.allowBindMounts = false;
 
+    $scope.handleEnvVarChange = handleEnvVarChange;
+    function handleEnvVarChange(value) {
+      $scope.formValues.Env = value;
+    }
+
     $scope.refreshSlider = function () {
       $timeout(function () {
         $scope.$broadcast('rzSliderForceRender');
@@ -166,14 +173,6 @@ angular.module('portainer.docker').controller('CreateServiceController', [
 
     $scope.removeSecret = function (index) {
       $scope.formValues.Secrets.splice(index, 1);
-    };
-
-    $scope.addEnvironmentVariable = function () {
-      $scope.formValues.Env.push({ name: '', value: '' });
-    };
-
-    $scope.removeEnvironmentVariable = function (index) {
-      $scope.formValues.Env.splice(index, 1);
     };
 
     $scope.addPlacementConstraint = function () {
@@ -277,13 +276,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
     }
 
     function prepareEnvConfig(config, input) {
-      var env = [];
-      input.Env.forEach(function (v) {
-        if (v.name) {
-          env.push(v.name + '=' + v.value);
-        }
-      });
-      config.TaskTemplate.ContainerSpec.Env = env;
+      config.TaskTemplate.ContainerSpec.Env = envVarsUtils.convertToArrayOfStrings(input.Env);
     }
 
     function prepareLabelsConfig(config, input) {

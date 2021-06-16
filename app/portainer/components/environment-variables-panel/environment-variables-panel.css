@@ -1,0 +1,11 @@
+.environment-variables-panel {
+  margin-top: 15px;
+}
+
+.environment-variables-panel--explanation {
+  margin-bottom: 5px;
+}
+
+.environment-variables-panel--advanced > * + * {
+  margin-top: 5px;
+}
