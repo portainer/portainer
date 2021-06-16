@@ -14,9 +14,9 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	gittypes "github.com/portainer/portainer/api/git/types"
-	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/internal/stackutils"
 )
 
@@ -78,7 +78,7 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
-	if !endpoint.SecuritySettings.AllowStackManagementForRegularUsers {
+	if endpointutils.IsDockerEndpoint(endpoint) && !endpoint.SecuritySettings.AllowStackManagementForRegularUsers {
 		securityContext, err := security.RetrieveRestrictedRequestContext(r)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user info from request context", err}
@@ -112,10 +112,6 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 	case portainer.DockerComposeStack:
 		return handler.createComposeStack(w, r, method, endpoint, tokenData.ID)
 	case portainer.KubernetesStack:
-		if tokenData.Role != portainer.AdministratorRole {
-			return &httperror.HandlerError{http.StatusForbidden, "Access denied", httperrors.ErrUnauthorized}
-		}
-
 		return handler.createKubernetesStack(w, r, endpoint)
 	}
 
