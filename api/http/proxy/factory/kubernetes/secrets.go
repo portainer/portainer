@@ -24,7 +24,7 @@ func (transport *baseTransport) proxySecretRequest(request *http.Request, namesp
 	case "DELETE":
 		return transport.proxySecretDeleteOperation(request, namespace)
 	default:
-		return transport.executeKubernetesRequest(request, true)
+		return transport.executeKubernetesRequest(request)
 	}
 }
 
@@ -43,11 +43,11 @@ func (transport *baseTransport) proxySecretCreationOperation(request *http.Reque
 		return nil, err
 	}
 
-	return transport.executeKubernetesRequest(request, false)
+	return transport.executeKubernetesRequest(request)
 }
 
 func (transport *baseTransport) proxySecretListOperation(request *http.Request) (*http.Response, error) {
-	response, err := transport.executeKubernetesRequest(request, false)
+	response, err := transport.executeKubernetesRequest(request)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (transport *baseTransport) proxySecretListOperation(request *http.Request) 
 }
 
 func (transport *baseTransport) proxySecretInspectOperation(request *http.Request) (*http.Response, error) {
-	response, err := transport.executeKubernetesRequest(request, false)
+	response, err := transport.executeKubernetesRequest(request)
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +134,7 @@ func (transport *baseTransport) proxySecretUpdateOperation(request *http.Request
 		return nil, err
 	}
 
-	return transport.executeKubernetesRequest(request, false)
+	return transport.executeKubernetesRequest(request)
 }
 
 func (transport *baseTransport) proxySecretDeleteOperation(request *http.Request, namespace string) (*http.Response, error) {
@@ -154,7 +154,7 @@ func (transport *baseTransport) proxySecretDeleteOperation(request *http.Request
 		return utils.WriteAccessDeniedResponse()
 	}
 
-	return transport.executeKubernetesRequest(request, false)
+	return transport.executeKubernetesRequest(request)
 }
 
 func isSecretRepresentPrivateRegistry(secret map[string]interface{}) bool {

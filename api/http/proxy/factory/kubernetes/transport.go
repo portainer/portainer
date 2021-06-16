@@ -47,11 +47,11 @@ func (transport *baseTransport) proxyKubernetesRequest(request *http.Request) (*
 
 	switch {
 	case strings.EqualFold(requestPath, "/namespaces"):
-		return transport.executeKubernetesRequest(request, true)
+		return transport.executeKubernetesRequest(request)
 	case strings.HasPrefix(requestPath, "/namespaces"):
 		return transport.proxyNamespacedRequest(request, requestPath)
 	default:
-		return transport.executeKubernetesRequest(request, true)
+		return transport.executeKubernetesRequest(request)
 	}
 }
 
@@ -71,11 +71,11 @@ func (transport *baseTransport) proxyNamespacedRequest(request *http.Request, fu
 	case requestPath == "" && request.Method == "DELETE":
 		return transport.proxyNamespaceDeleteOperation(request, namespace)
 	default:
-		return transport.executeKubernetesRequest(request, true)
+		return transport.executeKubernetesRequest(request)
 	}
 }
 
-func (transport *baseTransport) executeKubernetesRequest(request *http.Request, shouldLog bool) (*http.Response, error) {
+func (transport *baseTransport) executeKubernetesRequest(request *http.Request) (*http.Response, error) {
 
 	resp, err := transport.httpTransport.RoundTrip(request)
 
