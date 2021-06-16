@@ -372,13 +372,13 @@ func (m *Migrator) Migrate() error {
 			return err
 		}
 
-		err = m.updateRegistriesToDB30()
+		err = m.updateRegistriesToDB31()
 		if err != nil {
 			return err
 		}
 		migrateLog.Info("Successful migration of registries to DB version 30")
 
-		err = m.updateDockerhubToDB30()
+		err = m.updateDockerhubToDB31()
 		if err != nil {
 			return err
 		}

@@ -15,7 +15,7 @@ func (m *Migrator) updateSettingsToDB31() error {
 	return m.settingsService.UpdateSettings(legacySettings)
 }
 
-func (m *Migrator) updateRegistriesToDB30() error {
+func (m *Migrator) updateRegistriesToDB31() error {
 	registries, err := m.registryService.Registries()
 	if err != nil {
 		return err
@@ -57,7 +57,7 @@ func (m *Migrator) updateRegistriesToDB30() error {
 	return nil
 }
 
-func (m *Migrator) updateDockerhubToDB30() error {
+func (m *Migrator) updateDockerhubToDB31() error {
 	dockerhub, err := m.dockerhubService.DockerHub()
 	if err == errors.ErrObjectNotFound {
 		return nil
