@@ -119,18 +119,6 @@ func (transport *baseTransport) proxySecretInspectOperation(request *http.Reques
 	return response, nil
 }
 
-func isSecretRepresentPrivateRegistry(secret map[string]interface{}) bool {
-	if secret["type"].(string) != string(v1.SecretTypeDockerConfigJson) {
-		return false
-	}
-
-	metadata := utils.GetJSONObject(secret, "metadata")
-	annotations := utils.GetJSONObject(metadata, "annotations")
-	_, ok := annotations[privateregistries.RegistryIDLabel]
-
-	return ok
-}
-
 func (transport *baseTransport) proxySecretUpdateOperation(request *http.Request) (*http.Response, error) {
 	body, err := utils.GetRequestAsMap(request)
 	if err != nil {
@@ -167,4 +155,16 @@ func (transport *baseTransport) proxySecretDeleteOperation(request *http.Request
 	}
 
 	return transport.executeKubernetesRequest(request, false)
+}
+
+func isSecretRepresentPrivateRegistry(secret map[string]interface{}) bool {
+	if secret["type"].(string) != string(v1.SecretTypeDockerConfigJson) {
+		return false
+	}
+
+	metadata := utils.GetJSONObject(secret, "metadata")
+	annotations := utils.GetJSONObject(metadata, "annotations")
+	_, ok := annotations[privateregistries.RegistryIDLabel]
+
+	return ok
 }
