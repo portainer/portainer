@@ -10,10 +10,6 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-const (
-	handlerActivityContext = "Portainer"
-)
-
 func hideFields(registry *portainer.Registry) {
 	registry.Password = ""
 	registry.ManagementConfiguration = nil
