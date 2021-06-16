@@ -2,9 +2,12 @@ package migrator
 
 import (
 	"os"
+	"path"
 	"testing"
+	"time"
 
 	"github.com/boltdb/bolt"
+	"github.com/portainer/portainer/api/bolt/internal"
 	"github.com/portainer/portainer/api/bolt/settings"
 )
 
@@ -15,6 +18,34 @@ var (
 	dbConn             *bolt.DB
 	settingsService    *settings.Service
 )
+
+// initTestingDBConn creates a raw bolt DB connection
+// for unit testing usage only since using NewStore will cause cycle import inside migrator pkg
+func initTestingDBConn(storePath, fileName string) (*bolt.DB, error) {
+	databasePath := path.Join(storePath, fileName)
+	dbConn, err := bolt.Open(databasePath, 0600, &bolt.Options{Timeout: 1 * time.Second})
+	if err != nil {
+		return nil, err
+	}
+	return dbConn, nil
+}
+
+// initTestingDBConn creates a settings service with raw bolt DB connection
+// for unit testing usage only since using NewStore will cause cycle import inside migrator pkg
+func initTestingSettingsService(dbConn *bolt.DB, preSetObj map[string]interface{}) (*settings.Service, error) {
+	internalDBConn := &internal.DbConnection{
+		DB: dbConn,
+	}
+	settingsService, err := settings.NewService(internalDBConn)
+	if err != nil {
+		return nil, err
+	}
+	//insert a obj
+	if err := internal.UpdateObject(internalDBConn, "settings", []byte("SETTINGS"), preSetObj); err != nil {
+		return nil, err
+	}
+	return settingsService, nil
+}
 
 func setup() error {
 	testingDBStorePath, _ = os.Getwd()
@@ -35,7 +66,7 @@ func setup() error {
 	return nil
 }
 
-func TestUpdateSettingsToDB31(t *testing.T) {
+func TestMigrateSettings(t *testing.T) {
 	if err := setup(); err != nil {
 		t.Errorf("failed to complete testing setups, err: %v", err)
 	}
@@ -45,7 +76,7 @@ func TestUpdateSettingsToDB31(t *testing.T) {
 		db:              dbConn,
 		settingsService: settingsService,
 	}
-	if err := m.updateSettingsToDB31(); err != nil {
+	if err := m.migrateSettings(); err != nil {
 		t.Errorf("failed to update settings: %v", err)
 	}
 	updatedSettings, err := m.settingsService.Settings()
