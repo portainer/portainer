@@ -6,6 +6,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
+// IsAdmin returns true if the logged-in user is an admin
 func IsAdmin(request *http.Request) (bool, error) {
 	tokenData, err := RetrieveTokenData(request)
 	if err != nil {
