@@ -155,11 +155,14 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		endpoint.Kubernetes = *payload.Kubernetes
 	}
 
+	updateAuthorizations := false
 	if payload.UserAccessPolicies != nil && !reflect.DeepEqual(payload.UserAccessPolicies, endpoint.UserAccessPolicies) {
+		updateAuthorizations = true
 		endpoint.UserAccessPolicies = payload.UserAccessPolicies
 	}
 
 	if payload.TeamAccessPolicies != nil && !reflect.DeepEqual(payload.TeamAccessPolicies, endpoint.TeamAccessPolicies) {
+		updateAuthorizations = true
 		endpoint.TeamAccessPolicies = payload.TeamAccessPolicies
 	}
 
@@ -249,6 +252,15 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		_, err = handler.ProxyManager.CreateAndRegisterEndpointProxy(endpoint)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to register HTTP proxy for the endpoint", err}
+		}
+	}
+
+	if updateAuthorizations {
+		if endpoint.Type == portainer.KubernetesLocalEnvironment || endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
+			err = handler.AuthorizationService.CleanNAPWithOverridePolicies(endpoint, nil)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
+			}
 		}
 	}
 

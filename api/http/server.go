@@ -45,11 +45,13 @@ import (
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
 // Server implements the portainer.Server interface
 type Server struct {
+	AuthorizationService 		*authorization.Service
 	BindAddress                 string
 	AssetsPath                  string
 	Status                      *portainer.Status
@@ -135,6 +137,7 @@ func (server *Server) Start() error {
 	endpointHandler.SnapshotService = server.SnapshotService
 	endpointHandler.ReverseTunnelService = server.ReverseTunnelService
 	endpointHandler.ComposeStackManager = server.ComposeStackManager
+	endpointHandler.AuthorizationService = server.AuthorizationService
 
 	var endpointEdgeHandler = endpointedge.NewHandler(requestBouncer)
 	endpointEdgeHandler.DataStore = server.DataStore
@@ -142,6 +145,7 @@ func (server *Server) Start() error {
 	endpointEdgeHandler.ReverseTunnelService = server.ReverseTunnelService
 
 	var endpointGroupHandler = endpointgroups.NewHandler(requestBouncer)
+	endpointGroupHandler.AuthorizationService = server.AuthorizationService
 	endpointGroupHandler.DataStore = server.DataStore
 
 	var endpointProxyHandler = endpointproxy.NewHandler(requestBouncer)
