@@ -4,6 +4,8 @@ import (
 	"context"
 	"io"
 	"time"
+
+	v1 "k8s.io/api/core/v1"
 )
 
 type (
@@ -1163,7 +1165,7 @@ type (
 
 	// KubeClient represents a service used to query a Kubernetes environment
 	KubeClient interface {
-		GetServiceAccountName(tokendata *TokenData) (string, error)
+		GetServiceAccount(tokendata *TokenData) (*v1.ServiceAccount, error)
 		SetupUserServiceAccount(userID int, teamIDs []int) error
 		GetServiceAccountBearerToken(userID int) (string, error)
 		CreateUserShellPod(ctx context.Context, serviceAccountName string) (*KubernetesShellPod, error)

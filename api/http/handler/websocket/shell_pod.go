@@ -40,12 +40,12 @@ func (handler *Handler) websocketShellPodExec(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create Kubernetes client", err}
 	}
 
-	serviceAccountName, err := cli.GetServiceAccountName(tokenData)
+	serviceAccount, err := cli.GetServiceAccount(tokenData)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find serviceaccount associated with user", err}
 	}
 
-	shellPod, err := cli.CreateUserShellPod(r.Context(), serviceAccountName)
+	shellPod, err := cli.CreateUserShellPod(r.Context(), serviceAccount.Name)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create user shell", err}
 	}

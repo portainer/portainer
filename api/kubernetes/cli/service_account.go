@@ -8,8 +8,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// GetServiceAccountName returns the portainer ServiceAccountName associated to the specified user.
-func (kcl *KubeClient) GetServiceAccountName(tokenData *portainer.TokenData) (string, error) {
+// GetServiceAccount returns the portainer ServiceAccountName associated to the specified user.
+func (kcl *KubeClient) GetServiceAccount(tokenData *portainer.TokenData) (*v1.ServiceAccount, error) {
 	var portainerServiceAccountName string
 	if tokenData.Role == portainer.AdministratorRole {
 		portainerServiceAccountName = portainerClusterAdminServiceAccountName
@@ -18,12 +18,12 @@ func (kcl *KubeClient) GetServiceAccountName(tokenData *portainer.TokenData) (st
 	}
 
 	// verify name exists as service account resource within portainer namespace
-	serviceAccountName, err := kcl.cli.CoreV1().ServiceAccounts(portainerNamespace).Get(portainerServiceAccountName, metav1.GetOptions{})
+	serviceAccount, err := kcl.cli.CoreV1().ServiceAccounts(portainerNamespace).Get(portainerServiceAccountName, metav1.GetOptions{})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return serviceAccountName.Name, nil
+	return serviceAccount, nil
 }
 
 // GetServiceAccountBearerToken returns the ServiceAccountToken associated to the specified user.
