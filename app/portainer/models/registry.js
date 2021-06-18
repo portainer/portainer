@@ -34,7 +34,7 @@ export function RegistryManagementConfigurationDefaultModel(registry) {
     this.TLS = true;
   }
 
-  if (registry.Type === RegistryTypes.CUSTOM && registry.Authentication) {
+  if ((registry.Type === RegistryTypes.CUSTOM || registry.Type === RegistryTypes.PROGET) && registry.Authentication) {
     this.Authentication = true;
     this.Username = registry.Username;
   }
