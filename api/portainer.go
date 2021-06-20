@@ -708,20 +708,6 @@ type (
 		UpdatedBy string `example:"bob"`
 	}
 
-	// GitConfig represents the Git settings for a stack
-	GitConfig struct {
-		URL            string
-		ReferenceName  string
-		Authentication *GitAuthentication
-		ConfigHash     []byte
-	}
-
-	// GitAuthentication represents the credentials for accessing privete Git repos
-	GitAuthentication struct {
-		Username string
-		Password string
-	}
-
 	// StackAutoUpdate represents the git auto sync config for stack deployment
 	StackAutoUpdate struct {
 		Interval string
