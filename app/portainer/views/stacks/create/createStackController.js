@@ -112,15 +112,21 @@ angular
           RepositoryUsername: $scope.formValues.RepositoryUsername,
           RepositoryPassword: $scope.formValues.RepositoryPersonalAccessToken,
         };
-        if ($scope.formValues.RepositoryAutomaticUpdates) {
-          repositoryOptions.AutoUpdate = {};
-          if ($scope.formValues.RepositoryMechanism === 'Interval') {
-            repositoryOptions.AutoUpdate.Interval = $scope.formValues.RepositoryFetchInterval;
-          } else if ($scope.formValues.RepositoryMechanism === 'Webhook') {
-            repositoryOptions.AutoUpdate.Webhook = $scope.formValues.RepositoryWebhookURL.split('/').reverse()[0];
-          }
-        }
+
+        getAutoUpdatesProperty(repositoryOptions);
+
         return StackService.createSwarmStackFromGitRepository(name, repositoryOptions, env, endpointId);
+      }
+    }
+
+    function getAutoUpdatesProperty(repositoryOptions) {
+      if ($scope.formValues.RepositoryAutomaticUpdates) {
+        repositoryOptions.AutoUpdate = {};
+        if ($scope.formValues.RepositoryMechanism === 'Interval') {
+          repositoryOptions.AutoUpdate.Interval = $scope.formValues.RepositoryFetchInterval;
+        } else if ($scope.formValues.RepositoryMechanism === 'Webhook') {
+          repositoryOptions.AutoUpdate.Webhook = $scope.formValues.RepositoryWebhookURL.split('/').reverse()[0];
+        }
       }
     }
 
@@ -144,14 +150,9 @@ angular
           RepositoryUsername: $scope.formValues.RepositoryUsername,
           RepositoryPassword: $scope.formValues.RepositoryPersonalAccessToken,
         };
-        if ($scope.formValues.RepositoryAutomaticUpdates) {
-          repositoryOptions.AutoUpdate = {};
-          if ($scope.formValues.RepositoryMechanism === 'Interval') {
-            repositoryOptions.AutoUpdate.Interval = $scope.formValues.RepositoryFetchInterval;
-          } else if ($scope.formValues.RepositoryMechanism === 'Webhook') {
-            repositoryOptions.AutoUpdate.Webhook = $scope.formValues.RepositoryWebhookURL.split('/').reverse()[0];
-          }
-        }
+
+        getAutoUpdatesProperty(repositoryOptions);
+
         return StackService.createComposeStackFromGitRepository(name, repositoryOptions, env, endpointId);
       }
     }

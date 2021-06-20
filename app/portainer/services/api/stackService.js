@@ -310,9 +310,11 @@ angular.module('portainer.app').factory('StackService', [
             RepositoryPassword: repositoryOptions.RepositoryPassword,
             Env: env,
           };
+
           if (repositoryOptions.AutoUpdate) {
             payload.AutoUpdate = repositoryOptions.AutoUpdate;
           }
+
           return Stack.create({ method: 'repository', type: 1, endpointId: endpointId }, payload).$promise;
         })
         .then(function success(data) {
