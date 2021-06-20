@@ -1,6 +1,6 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-
+import uuidv4 from 'uuid/v4';
 import { AccessControlFormData } from '../../../components/accessControlForm/porAccessControlFormModel';
 
 angular
@@ -21,7 +21,10 @@ angular
     StackHelper,
     ContainerHelper,
     CustomTemplateService,
-    ContainerService
+    ContainerService,
+    endpoint,
+    WebhookHelper,
+    clipboard
   ) {
     $scope.formValues = {
       Name: '',
@@ -29,10 +32,14 @@ angular
       StackFile: null,
       RepositoryURL: '',
       RepositoryReferenceName: '',
+      RepositoryAutomaticUpdates: true,
       RepositoryAuthentication: false,
       RepositoryUsername: '',
       RepositoryPassword: '',
+      RepositoryMechanism: 'Interval',
+      RepositoryWebhookURL: WebhookHelper.returnStackWebhookUrl(uuidv4()),
       Env: [],
+      AdditionalFiles: [],
       ComposeFilePathInRepository: 'docker-compose.yml',
       AccessControlData: new AccessControlFormData(),
     };
@@ -59,6 +66,14 @@ angular
 
     $scope.removeEnvironmentVariable = function (index) {
       $scope.formValues.Env.splice(index, 1);
+    };
+
+    $scope.addAdditionalFiles = function () {
+      $scope.formValues.AdditionalFiles.push('');
+    };
+
+    $scope.removeAdditionalFiles = function (index) {
+      $scope.formValues.AdditionalFiles.splice(index, 1);
     };
 
     function validateForm(accessControlData, isAdmin) {
@@ -89,14 +104,29 @@ angular
 
       if (method === 'repository') {
         var repositoryOptions = {
+          AdditionalFiles: $scope.formValues.AdditionalFiles,
           RepositoryURL: $scope.formValues.RepositoryURL,
           RepositoryReferenceName: $scope.formValues.RepositoryReferenceName,
           ComposeFilePathInRepository: $scope.formValues.ComposeFilePathInRepository,
           RepositoryAuthentication: $scope.formValues.RepositoryAuthentication,
           RepositoryUsername: $scope.formValues.RepositoryUsername,
-          RepositoryPassword: $scope.formValues.RepositoryPassword,
+          RepositoryPassword: $scope.formValues.RepositoryPersonalAccessToken,
         };
+
+        getAutoUpdatesProperty(repositoryOptions);
+
         return StackService.createSwarmStackFromGitRepository(name, repositoryOptions, env, endpointId);
+      }
+    }
+
+    function getAutoUpdatesProperty(repositoryOptions) {
+      if ($scope.formValues.RepositoryAutomaticUpdates) {
+        repositoryOptions.AutoUpdate = {};
+        if ($scope.formValues.RepositoryMechanism === 'Interval') {
+          repositoryOptions.AutoUpdate.Interval = $scope.formValues.RepositoryFetchInterval;
+        } else if ($scope.formValues.RepositoryMechanism === 'Webhook') {
+          repositoryOptions.AutoUpdate.Webhook = $scope.formValues.RepositoryWebhookURL.split('/').reverse()[0];
+        }
       }
     }
 
@@ -112,16 +142,26 @@ angular
         return StackService.createComposeStackFromFileUpload(name, stackFile, env, endpointId);
       } else if (method === 'repository') {
         var repositoryOptions = {
+          AdditionalFiles: $scope.formValues.AdditionalFiles,
           RepositoryURL: $scope.formValues.RepositoryURL,
           RepositoryReferenceName: $scope.formValues.RepositoryReferenceName,
           ComposeFilePathInRepository: $scope.formValues.ComposeFilePathInRepository,
           RepositoryAuthentication: $scope.formValues.RepositoryAuthentication,
           RepositoryUsername: $scope.formValues.RepositoryUsername,
-          RepositoryPassword: $scope.formValues.RepositoryPassword,
+          RepositoryPassword: $scope.formValues.RepositoryPersonalAccessToken,
         };
+
+        getAutoUpdatesProperty(repositoryOptions);
+
         return StackService.createComposeStackFromGitRepository(name, repositoryOptions, env, endpointId);
       }
     }
+
+    $scope.copyWebhook = function () {
+      clipboard.copyText($scope.formValues.RepositoryWebhookURL);
+      $('#copyNotification').show();
+      $('#copyNotification').fadeOut(2000);
+    };
 
     $scope.deployStack = function () {
       var name = $scope.formValues.Name;
