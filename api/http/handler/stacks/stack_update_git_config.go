@@ -15,13 +15,13 @@ import (
 	"github.com/portainer/portainer/api/internal/stackutils"
 )
 
-type stackGitUpdatePayload struct {
+type stackGitConfigUpdatePayload struct {
 	AutoUpdate              *portainer.StackAutoUpdate
 	Env                     []portainer.Pair
 	RepositoryReferenceName string
 }
 
-func (payload *stackGitUpdatePayload) Validate(r *http.Request) error {
+func (payload *stackGitConfigUpdatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.RepositoryReferenceName) {
 		return errors.New("Invalid RepositoryReferenceName")
 	}
@@ -40,7 +40,7 @@ func (payload *stackGitUpdatePayload) Validate(r *http.Request) error {
 // @produce json
 // @param id path int true "Stack identifier"
 // @param endpointId query int false "Stacks created before version 1.18.0 might not have an associated endpoint identifier. Use this optional parameter to set the endpoint identifier used by the stack."
-// @param body body stackGitUpdatePayload true "Stack Git config"
+// @param body body stackGitConfigUpdatePayload true "Stack Git config"
 // @success 200 {object} portainer.Stack "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
@@ -53,7 +53,7 @@ func (handler *Handler) stackGitConfigUpdate(w http.ResponseWriter, r *http.Requ
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid stack identifier route variable", Err: err}
 	}
 
-	var payload stackGitUpdatePayload
+	var payload stackGitConfigUpdatePayload
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
