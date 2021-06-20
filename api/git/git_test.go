@@ -2,16 +2,17 @@ package git
 
 import (
 	"context"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing/object"
-	"github.com/pkg/errors"
-	"github.com/portainer/portainer/api/archive"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/pkg/errors"
+	"github.com/portainer/portainer/api/archive"
+	"github.com/stretchr/testify/assert"
 )
 
 var bareRepoDir string

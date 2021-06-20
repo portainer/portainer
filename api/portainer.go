@@ -3,6 +3,9 @@ package portainer
 import (
 	"io"
 	"time"
+
+	"github.com/portainer/liblicense"
+	gittypes "github.com/portainer/portainer/api/git/types"
 )
 
 type (
@@ -686,7 +689,7 @@ type (
 		// Stack auto update settings
 		AutoUpdate *StackAutoUpdate `json:"AutoUpdate" example:""`
 		// Git settings
-		GitConfig *GitConfig `json:"GitConfig" example:""`
+		GitConfig *gittypes.RepoConfig `json:"GitConfig"`
 		// A list of environment variables used during stack deployment
 		Env []Pair `json:"Env" example:""`
 		//

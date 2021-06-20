@@ -13,6 +13,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
+	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -168,7 +169,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		AdditionalFiles: payload.AdditionalFiles,
 		AutoUpdate:      payload.AutoUpdate,
 		Env:             payload.Env,
-		GitConfig: &portainer.GitConfig{
+		GitConfig: &gittypes.RepoConfig{
 			URL:           payload.RepositoryURL,
 			ReferenceName: payload.RepositoryReferenceName,
 		},
@@ -177,7 +178,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 	}
 
 	if payload.RepositoryAuthentication {
-		stack.GitConfig.Authentication = &portainer.GitAuthentication{
+		stack.GitConfig.Authentication = &gittypes.GitAuthentication{
 			Username: payload.RepositoryUsername,
 			Password: payload.RepositoryPassword,
 		}
