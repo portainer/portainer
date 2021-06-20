@@ -3,7 +3,7 @@ on:
     branches:
       - develop
       - 'release/**'
-      - feat/EE-161/redeploy-stack-from-git
+      - chore/DTD-66/add-label-conflicts-workflow
 jobs:
   triage:
     runs-on: ubuntu-latest
