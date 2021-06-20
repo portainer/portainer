@@ -4,7 +4,6 @@ import (
 	"io"
 	"time"
 
-	"github.com/portainer/liblicense"
 	gittypes "github.com/portainer/portainer/api/git/types"
 )
 

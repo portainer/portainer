@@ -47,7 +47,7 @@ func (payload *stackGitUpdatePayload) Validate(r *http.Request) error {
 // @failure 404 "Not found"
 // @failure 500 "Server error"
 // @router /stacks/{id}/git [post]
-func (handler *Handler) stackGitUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) stackGitConfigUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid stack identifier route variable", Err: err}
