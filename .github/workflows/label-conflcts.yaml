@@ -1,8 +1,9 @@
 on:
   push:
     branches:
-      - master
       - develop
+      - 'release/**'
+      - feat/EE-161/redeploy-stack-from-git
 jobs:
   triage:
     runs-on: ubuntu-latest
