@@ -46,7 +46,7 @@ func (payload *stackGitUpdatePayload) Validate(r *http.Request) error {
 // @failure 403 "Permission denied"
 // @failure 404 "Not found"
 // @failure 500 "Server error"
-// @router /stacks/{id}/git
+// @router /stacks/{id}/git [post]
 func (handler *Handler) stackGitUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
