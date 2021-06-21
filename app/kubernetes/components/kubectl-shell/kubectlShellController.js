@@ -90,8 +90,6 @@ class KubectlShellController {
   }
 
   async onInit() {
-    this.Authentication.redirectIfUnauthorized(['K8sApplicationConsoleRW']);
-
     this.$scope.css = 'normal';
     this.$scope.checked = false;
     this.$scope.icon = 'fa-window-minimize';
@@ -101,6 +99,8 @@ class KubectlShellController {
       socket: null,
       term: null,
     };
+
+    this.Authentication.redirectIfUnauthorized(['K8sApplicationConsoleRW']);
   }
 
   $onInit() {
