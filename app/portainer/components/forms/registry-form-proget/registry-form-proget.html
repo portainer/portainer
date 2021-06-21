@@ -12,7 +12,7 @@
   <div class="form-group" ng-show="registryFormProGet.registry_name.$invalid">
     <div class="col-sm-12 small text-warning">
       <div ng-messages="registryFormProGet.registry_name.$error">
-        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i>This field is required.</p>
       </div>
     </div>
   </div>
@@ -38,7 +38,7 @@
   <!-- base-url-input -->
   <div class="form-group">
     <label for="registry_base_url" class="col-sm-3 col-lg-2 control-label text-left">
-      Base Registry URL
+      Base URL
       <portainer-tooltip position="bottom" message="The base URL of the ProGet registry"></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
@@ -52,19 +52,8 @@
       </div>
     </div>
   </div>
-  <!-- base-url-input -->
-  <!-- authentication-checkbox -->
-  <div class="form-group">
-    <div class="col-sm-12">
-      <label for="registry_auth" class="control-label text-left">
-        Authentication
-        <portainer-tooltip position="bottom" message="Enable this option if you need to specify credentials to connect to this registry."></portainer-tooltip>
-      </label>
-      <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="$ctrl.model.Authentication" /><i></i> </label>
-    </div>
-  </div>
-  <!-- !authentication-checkbox -->
-  <div ng-if="$ctrl.model.Authentication">
+  <!-- !base-url-input -->
+  <div>
     <!-- credentials-user -->
     <div class="form-group">
       <label for="registry_username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>

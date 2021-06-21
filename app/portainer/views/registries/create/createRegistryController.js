@@ -70,7 +70,7 @@ angular.module('portainer.app').controller('CreateRegistryController', [
       $scope.model.Name = '';
       $scope.model.URL = '';
       $scope.model.BaseURL = '';
-      $scope.model.Authentication = false;
+      $scope.model.Authentication = true;
     }
 
     function retrieveGitlabRegistries() {
