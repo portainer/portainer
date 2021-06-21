@@ -1,0 +1,112 @@
+import angular from 'angular';
+import { Terminal } from 'xterm';
+
+class KubectlShellController {
+  constructor($async, $scope, $state, Notifications, Authentication, EndpointProvider, LocalStorage) {
+    this.$scope = $scope;
+    this.$state = $state;
+    this.$async = $async;
+    this.Notifications = Notifications;
+    this.Authentication = Authentication;
+    this.EndpointProvider = EndpointProvider;
+    this.LocalStorage = LocalStorage;
+
+    this.onInit = this.onInit.bind(this);
+  }
+
+  disconnect() {
+    this.$scope.checked = false;
+    this.$scope.icon = 'fas fa-window-minimize';
+    this.state.socket.close();
+    this.state.term.dispose();
+  }
+
+  screenclear() {
+    this.state.term.clear();
+  }
+
+  mini_restore() {
+    if (this.$scope.css === 'mini') {
+      this.$scope.css = 'normal';
+      this.$scope.icon = 'fas fa-window-minimize';
+    } else {
+      this.$scope.css = 'mini';
+      this.$scope.icon = 'fas fa-window-restore';
+    }
+  }
+
+  configureSocketAndTerminal(socket, term) {
+    socket.onopen = function () {
+      const terminal_container = document.getElementById('terminal-container');
+      term.open(terminal_container);
+      term.setOption('cursorBlink', true);
+      term.focus();
+    };
+
+    term.on('data', function (data) {
+      socket.send(data);
+    });
+
+    socket.onmessage = function (msg) {
+      term.write(msg.data);
+    };
+
+    socket.onerror = function (err) {
+      this.disconnect();
+      this.Notifications.error('Failure', err, 'Websocket connection error');
+    }.bind(this);
+
+    this.state.socket.onclose = function () {
+      this.disconnect();
+    }.bind(this);
+
+    this.state.connected = true;
+  }
+
+  connectConsole() {
+    this.$scope.checked = true;
+
+    const params = {
+      token: this.LocalStorage.getJWT(),
+      endpointId: this.EndpointProvider.endpointID(),
+    };
+
+    let url =
+      window.location.href.split('#')[0] +
+      'api/websocket/kubernetes-shell?' +
+      Object.keys(params)
+        .map((k) => k + '=' + params[k])
+        .join('&');
+    if (url.indexOf('https') > -1) {
+      url = url.replace('https://', 'wss://');
+    } else {
+      url = url.replace('http://', 'ws://');
+    }
+
+    this.state.socket = new WebSocket(url);
+    this.state.term = new Terminal();
+
+    this.configureSocketAndTerminal(this.state.socket, this.state.term);
+  }
+
+  async onInit() {
+    this.Authentication.redirectIfUnauthorized(['K8sApplicationConsoleRW']);
+
+    this.$scope.css = 'normal';
+    this.$scope.checked = false;
+    this.$scope.icon = 'fa-window-minimize';
+
+    this.state = {
+      connected: false,
+      socket: null,
+      term: null,
+    };
+  }
+
+  $onInit() {
+    return this.$async(this.onInit);
+  }
+}
+
+export default KubectlShellController;
+angular.module('portainer.kubernetes').controller('KubectlShellController', KubectlShellController);
