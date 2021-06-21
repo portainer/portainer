@@ -100,7 +100,7 @@ class KubectlShellController {
       term: null,
     };
 
-    this.Authentication.redirectIfUnauthorized(['K8sApplicationConsoleRW']);
+    //this.Authentication.redirectIfUnauthorized(['K8sApplicationConsoleRW']);
   }
 
   $onInit() {
