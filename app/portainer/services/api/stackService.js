@@ -221,6 +221,14 @@ angular.module('portainer.app').factory('StackService', [
       return Stack.update({ endpointId: stack.EndpointId }, { id: stack.Id, StackFileContent: stackFile, Env: env, Prune: prune }).$promise;
     };
 
+    service.redeployGitStack = function (stackId, endpointId, payload) {
+      return Stack.redeployGitStack({ endpointId: endpointId, id: stackId }, payload).$promise;
+    };
+
+    service.updateGitStack = function (stackId, endpointId, payload) {
+      return Stack.updateGitStack({ endpointId: endpointId, id: stackId }, payload).$promise;
+    };
+
     service.createComposeStackFromFileUpload = function (name, stackFile, env, endpointId) {
       return FileUploadService.createComposeStack(name, stackFile, env, endpointId);
     };

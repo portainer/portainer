@@ -2,16 +2,20 @@
   <div class="col-sm-12 form-section-title">
     Stack duplication / migration
   </div>
+
   <div class="form-group">
-    <span class="small" style="margin-top: 10px;">
-      <p class="text-muted">
-        This feature allows you to duplicate or migrate this stack.
-      </p>
-    </span>
-    <div>
-      <div class="form-group">
-        <input class="form-control" placeholder="Stack name (optional for migration)" aria-placeholder="Stack name" ng-model="$ctrl.formValues.newName" />
-      </div>
+    <div class="col-sm-12">
+      <span class="small" style="margin-top: 10px;">
+        <p class="text-muted">
+          This feature allows you to duplicate or migrate this stack.
+        </p>
+      </span>
+      <input class="form-control" placeholder="Stack name (optional for migration)" aria-placeholder="Stack name" ng-model="$ctrl.formValues.newName" />
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-sm-12">
       <endpoint-selector ng-if="$ctrl.endpoints && $ctrl.groups" model="$ctrl.formValues.endpoint" endpoints="$ctrl.endpoints" groups="$ctrl.groups"></endpoint-selector>
       <button
         class="btn btn-sm btn-primary"
@@ -33,9 +37,9 @@
         <span ng-hide="$ctrl.state.duplicationInProgress"> <i class="fa fa-clone space-right" aria-hidden="true"></i> Duplicate </span>
         <span ng-show="$ctrl.state.duplicationInProgress">Duplication in progress...</span>
       </button>
-      <div ng-if="$ctrl.yamlError"
-        ><span class="text-danger small">{{ $ctrl.yamlError }}</span></div
-      >
+      <div ng-if="$ctrl.yamlError">
+        <span class="text-danger small">{{ $ctrl.yamlError }}</span>
+      </div>
     </div>
   </div>
 </div>

@@ -20,6 +20,8 @@ angular.module('portainer.app').controller('StackController', [
   'ModalService',
   'StackHelper',
   'ContainerHelper',
+  'WebhookHelper',
+  'clipboard',
   function (
     $async,
     $q,
@@ -41,20 +43,69 @@ angular.module('portainer.app').controller('StackController', [
     GroupService,
     ModalService,
     StackHelper,
-    ContainerHelper
+    ContainerHelper,
+    WebhookHelper,
+    clipboard
   ) {
     $scope.state = {
       actionInProgress: false,
       migrationInProgress: false,
+      redeployInProgress: false,
       externalStack: false,
       showEditorTab: false,
       yamlError: false,
       isEditorDirty: false,
+      showConfig: true,
+      isGitStack: false,
     };
 
     $scope.formValues = {
+      RepositoryAutomaticUpdates: false,
+      RepositoryAuthentication: true,
+      RepositoryMechanism: 'Interval',
+      RepositoryWebhookURL: '',
+      Env: [],
       Prune: false,
       Endpoint: null,
+    };
+
+    $scope.copyWebhook = function () {
+      clipboard.copyText($scope.formValues.RepositoryWebhookURL);
+      $('#copyNotification').show();
+      $('#copyNotification').fadeOut(2000);
+    };
+
+    $scope.saveGitSettings = function () {
+      const payload = {
+        AutoUpdate: {},
+        Env: FormHelper.removeInvalidEnvVars($scope.stack.Env),
+        RepositoryReferenceName: $scope.formValues.RepositoryReferenceName,
+      };
+
+      if ($scope.formValues.RepositoryMechanism === 'Interval') {
+        payload.AutoUpdate.Interval = $scope.formValues.RepositoryFetchInterval;
+      } else if ($scope.formValues.RepositoryMechanism === 'Webhook') {
+        payload.AutoUpdate.Webhook = $scope.formValues.RepositoryWebhookURL.split('/').reverse()[0];
+      }
+
+      StackService.updateGitStack($scope.stack.Id, $scope.stack.EndpointId, payload);
+    };
+
+    $scope.gitRedeploy = function () {
+      ModalService.confirmRedeployStackViaGit(function (confirmed) {
+        if (!confirmed) {
+          return;
+        }
+
+        const payload = {
+          RepositoryReferenceName: $scope.formValues.RepositoryReferenceName,
+          RepositoryAuthentication: $scope.formValues.RepositoryAuthentication,
+          RepositoryUsername: $scope.formValues.RepositoryUsername,
+          RepositoryPassword: $scope.formValues.RepositoryPersonalAccessToken,
+        };
+
+        StackService.redeployGitStack($scope.stack.Id, $scope.stack.EndpointId, payload);
+      });
     };
 
     $window.onbeforeunload = () => {
@@ -269,6 +320,22 @@ angular.module('portainer.app').controller('StackController', [
           $scope.groups = data.groups;
           $scope.stack = stack;
           $scope.containerNames = ContainerHelper.getContainerNames(data.containers);
+
+          if ($scope.stack.GitConfig && $scope.stack.GitConfig.URL) {
+            $scope.state.isGitStack = true;
+            $scope.formValues.RepositoryReferenceName = $scope.stack.GitConfig.ReferenceName;
+
+            if ($scope.stack.AutoUpdate && ($scope.stack.AutoUpdate.Interval || $scope.stack.AutoUpdate.Webhook)) {
+              $scope.formValues.RepositoryAutomaticUpdates = true;
+
+              if ($scope.stack.AutoUpdate.Interval) {
+                $scope.formValues.RepositoryMechanism = $scope.stack.AutoUpdate.Interval;
+              } else if ($scope.stack.AutoUpdate.Webhook) {
+                $scope.formValues.RepositoryMechanism = $scope.stack.AutoUpdate.Webhook;
+                $scope.formValues.RepositoryWebhookURL = WebhookHelper.returnStackWebhookUrl($scope.stack.AutoUpdate.Webhook);
+              }
+            }
+          }
 
           let resourcesPromise = Promise.resolve({});
           if (stack.Status === 1) {

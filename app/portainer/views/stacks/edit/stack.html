@@ -15,83 +15,275 @@
           <!-- tab-info -->
           <uib-tab index="0">
             <uib-tab-heading> <i class="fa fa-th-list" aria-hidden="true"></i> Stack </uib-tab-heading>
-            <div style="margin-top: 10px;">
-              <!-- stack-information -->
-              <div ng-if="state.externalStack">
-                <div class="col-sm-12 form-section-title">
-                  Information
+            <form class="form-horizontal" name="editStackForm">
+              <div style="margin-top: 10px;">
+                <!-- stack-information -->
+                <div ng-if="state.externalStack">
+                  <div class="col-sm-12 form-section-title">
+                    Information
+                  </div>
+                  <div class="form-group">
+                    <span class="small">
+                      <p class="text-muted">
+                        <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                        This stack was created outside of Portainer. Control over this stack is limited.
+                      </p>
+                    </span>
+                  </div>
                 </div>
-                <div class="form-group">
-                  <span class="small">
-                    <p class="text-muted">
-                      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                      This stack was created outside of Portainer. Control over this stack is limited.
-                    </p>
-                  </span>
+                <!-- !stack-information -->
+                <!-- stack-details -->
+                <div>
+                  <div class="col-sm-12 form-section-title">
+                    Stack details
+                  </div>
+                  <div class="form-group">
+                    <div class="col-sm-12">
+                      {{ stackName }}
+
+                      <button
+                        authorization="PortainerStackUpdate"
+                        ng-if="!state.externalStack && stack.Status === 2"
+                        ng-disabled="state.actionInProgress"
+                        class="btn btn-xs btn-success"
+                        ng-click="startStack()"
+                      >
+                        <i class="fa fa-play space-right" aria-hidden="true"></i>
+                        Start this stack
+                      </button>
+
+                      <button
+                        ng-if="!state.externalStack && stack.Status === 1"
+                        authorization="PortainerStackUpdate"
+                        ng-disabled="state.actionInProgress"
+                        class="btn btn-xs btn-danger"
+                        ng-click="stopStack()"
+                      >
+                        <i class="fa fa-stop space-right" aria-hidden="true"></i>
+                        Stop this stack
+                      </button>
+
+                      <button authorization="PortainerStackDelete" class="btn btn-xs btn-danger" ng-click="removeStack()" ng-if="!state.externalStack || stack.Type === 1">
+                        <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>
+                        Delete this stack
+                      </button>
+
+                      <button
+                        ng-if="!state.externalStack && stackFileContent"
+                        class="btn btn-primary btn-xs"
+                        ui-sref="docker.templates.custom.new({fileContent: stackFileContent, type: stack.Type})"
+                      >
+                        <i class="fa fa-plus space-right" aria-hidden="true"></i>
+                        Create template from stack
+                      </button>
+                    </div>
+                  </div>
                 </div>
+                <!-- !stack-details -->
+                <!-- git stack-details -->
+                <div ng-if="state.isGitStack">
+                  <div class="form-group">
+                    <span class="col-sm-12 text-muted small">
+                      This stack was deployed from the git repository <code>{{ stack.GitConfig.URL }}</code>
+                    </span>
+                    <span class="col-sm-12 text-muted small">
+                      Update <code>{{ stack.GitConfig.ConfigFilePath }}</code> in git and pull from here to update the stack
+                    </span>
+                  </div>
+                  <div class="col-sm-12 form-section-title">
+                    Redeploy from git repository
+                  </div>
+                  <div class="form-group">
+                    <span class="col-sm-12 text-muted small">
+                      Pull the latest Compose file from git and redeploy the stack
+                    </span>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-sm-12">
+                      <label class="control-label text-left">
+                        Automatic updates
+                      </label>
+                      <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.RepositoryAutomaticUpdates" /><i></i> </label>
+                    </div>
+                  </div>
+                  <div class="small text-warning" style="margin-top: 5px;" ng-if="formValues.RepositoryAutomaticUpdates">
+                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+                    <span class="text-muted">Enabling automatic updates will store the credentials and it is advisable to use a git service account.</span>
+                  </div>
+                  <div class="small text-warning" style="margin: 5px 0 10px 0;" ng-if="formValues.RepositoryAutomaticUpdates">
+                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+                    <span class="text-muted"
+                      >Any changes to this stack made locally in Portainer will be overriden by the definition in git and may cause service interruption.</span
+                    >
+                  </div>
+                  <div class="form-group" ng-if="formValues.RepositoryAutomaticUpdates">
+                    <label for="repository_mechanism" class="col-sm-2 control-label text-left">
+                      Mechanism
+                    </label>
+                    <div class="col-sm-10">
+                      <div class="input-group col-sm-10 input-group-sm">
+                        <div class="btn-group btn-group-sm">
+                          <label class="btn btn-primary" ng-model="formValues.RepositoryMechanism" uib-btn-radio="'Interval'">Polling</label>
+                          <label class="btn btn-primary" ng-model="formValues.RepositoryMechanism" uib-btn-radio="'Webhook'">Webhook</label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group" ng-if="formValues.RepositoryAutomaticUpdates && formValues.RepositoryMechanism === 'Webhook'">
+                    <label for="repository_mechanism" class="col-sm-2 control-label text-left">
+                      Webhook
+                    </label>
+                    <div class="col-sm-10">
+                      <span class="text-muted"> {{ formValues.RepositoryWebhookURL | truncatelr }} </span>
+                      <button type="button" class="btn btn-sm btn-primary btn-sm space-left" ng-if="formValues.RepositoryWebhookURL" ng-click="copyWebhook()">
+                        <span><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy link</span>
+                      </button>
+                      <span>
+                        <i id="copyNotification" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none;"></i>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="form-group" ng-if="formValues.RepositoryAutomaticUpdates && formValues.RepositoryMechanism === 'Interval'">
+                    <label for="repository_fetch_interval" class="col-sm-2 control-label text-left">
+                      Fetch interval
+                    </label>
+                    <div class="col-sm-10">
+                      <input
+                        type="text"
+                        class="form-control"
+                        ng-model="formValues.RepositoryFetchInterval"
+                        name="repository_fetch_interval"
+                        placeholder="5m"
+                        required
+                        interval-format
+                      />
+                    </div>
+                  </div>
+                  <div class="form-group col-md-12" ng-show="editStackForm.repository_fetch_interval.$invalid">
+                    <div class="small text-warning">
+                      <div ng-messages="editStackForm.repository_fetch_interval.$error">
+                        <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                        <p ng-message="invalidIntervalFormat"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Please enter a valid time interval.</p>
+                        <p ng-message="minimumInterval"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Minimum interval is 1m</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div ng-show="!formValues.RepositoryAutomaticUpdates">
+                    <div class="form-group">
+                      <div class="col-sm-12">
+                        <label class="control-label text-left">
+                          Authentication
+                        </label>
+                        <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.RepositoryAuthentication" /><i></i> </label>
+                      </div>
+                    </div>
+
+                    <div class="form-group" ng-if="formValues.RepositoryAuthentication">
+                      <label for="repository_username" class="col-sm-2 control-label text-left">Username</label>
+                      <div class="col-sm-3">
+                        <input type="text" class="form-control" ng-model="formValues.RepositoryUsername" name="repository_username" placeholder="git username" />
+                      </div>
+                    </div>
+                    <div class="form-group" ng-if="formValues.RepositoryAuthentication">
+                      <label for="repository_personal_access_token" class="col-sm-2 control-label text-left">
+                        Personal Access Token
+                        <portainer-tooltip position="bottom" message="Provide a personal access token or password"></portainer-tooltip>
+                      </label>
+                      <div class="col-sm-3">
+                        <input
+                          type="password"
+                          class="form-control"
+                          ng-model="formValues.RepositoryPersonalAccessToken"
+                          name="repository_personal_access_token"
+                          placeholder="personal access token"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-sm-12">
+                      <p>
+                        <a class="small interactive" ng-if="!state.showConfig" ng-click="state.showConfig = true">
+                          <i class="fa fa-plus space-right" aria-hidden="true"></i> Advanced configuration
+                        </a>
+                        <a class="small interactive" ng-if="state.showConfig" ng-click="state.showConfig = false">
+                          <i class="fa fa-minus space-right" aria-hidden="true"></i> Hide configuration
+                        </a>
+                      </p>
+                    </div>
+                  </div>
+                  <div class="form-group" ng-show="state.showConfig">
+                    <span class="col-sm-12 text-muted small">
+                      Specify a reference of the repository using the following syntax branches with <code>refs/heads/branch_name</code> or tags with
+                      <code>refs/tags/tag_name</code>
+                    </span>
+                    <span class="col-sm-12 text-muted small"> If not specified, will use the default <code>HEAD</code> reference normally the <code>master</code> branch.</span>
+                  </div>
+                  <div class="form-group" ng-show="state.showConfig">
+                    <label for="stack_repository_url" class="col-sm-2 control-label text-left">Repository reference</label>
+                    <div class="col-sm-10">
+                      <input type="text" class="form-control" ng-model="formValues.RepositoryReferenceName" id="stack_repository_reference_name" placeholder="refs/heads/master" />
+                    </div>
+                  </div>
+
+                  <!-- environment-variables -->
+                  <div class="col-sm-12 form-section-title">
+                    Environment
+                  </div>
+                  <div class="form-group">
+                    <div class="col-sm-12" style="margin-top: 5px;" authorization="PortainerStackUpdate">
+                      <label class="control-label text-left">Environment variables</label>
+                      <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addEnvironmentVariable()">
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i> add environment variable
+                      </span>
+                    </div>
+                    <!-- environment-variable-input-list -->
+                    <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                      <div ng-repeat="variable in stack.Env" style="margin-top: 2px;">
+                        <div class="input-group col-sm-5 input-group-sm">
+                          <span class="input-group-addon">name</span>
+                          <input type="text" class="form-control" ng-model="variable.name" placeholder="e.g. FOO" disable-authorization="PortainerStackUpdate" />
+                        </div>
+                        <div class="input-group col-sm-5 input-group-sm">
+                          <span class="input-group-addon">value</span>
+                          <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. bar" disable-authorization="PortainerStackUpdate" />
+                        </div>
+                        <button class="btn btn-sm btn-danger" type="button" ng-click="removeEnvironmentVariable($index)" authorization="PortainerStackUpdate">
+                          <i class="fa fa-trash" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <!-- !environment-variable-input-list -->
+                  </div>
+                  <!-- !environment-variables -->
+                  <div class="form-group">
+                    <div class="col-sm-12">
+                      <button ng-if="formValues.RepositoryAutomaticUpdates" ng-click="saveGitSettings()" class="btn btn-sm btn-primary" button-spinner="state.redeployInProgress">
+                        <span>Save settings</span>
+                      </button>
+                      <button ng-if="!formValues.RepositoryAutomaticUpdates" ng-click="gitRedeploy()" class="btn btn-sm btn-primary" button-spinner="state.redeployInProgress">
+                        <i class="fa fa-sync space-right" aria-hidden="true"></i>Pull and redeploy
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <!-- !git stack-details -->
+                <stack-duplication-form
+                  ng-if="!state.externalStack && endpoints.length > 0"
+                  endpoints="endpoints"
+                  groups="groups"
+                  current-endpoint-id="currentEndpointId"
+                  on-duplicate="duplicateStack(name, endpointId)"
+                  on-migrate="migrateStack(name, endpointId)"
+                  yaml-error="state.yamlError"
+                >
+                </stack-duplication-form>
               </div>
-              <!-- !stack-information -->
-              <!-- stack-details -->
-              <div>
-                <div class="col-sm-12 form-section-title">
-                  Stack details
-                </div>
-                <div class="form-group">
-                  {{ stackName }}
-
-                  <button
-                    authorization="PortainerStackUpdate"
-                    ng-if="!state.externalStack && stack.Status === 2"
-                    ng-disabled="state.actionInProgress"
-                    class="btn btn-xs btn-success"
-                    ng-click="startStack()"
-                  >
-                    <i class="fa fa-play space-right" aria-hidden="true"></i>
-                    Start this stack
-                  </button>
-
-                  <button
-                    ng-if="!state.externalStack && stack.Status === 1"
-                    authorization="PortainerStackUpdate"
-                    ng-disabled="state.actionInProgress"
-                    class="btn btn-xs btn-danger"
-                    ng-click="stopStack()"
-                  >
-                    <i class="fa fa-stop space-right" aria-hidden="true"></i>
-                    Stop this stack
-                  </button>
-
-                  <button authorization="PortainerStackDelete" class="btn btn-xs btn-danger" ng-click="removeStack()" ng-if="!state.externalStack || stack.Type === 1">
-                    <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>
-                    Delete this stack
-                  </button>
-
-                  <button
-                    ng-if="!state.externalStack && stackFileContent"
-                    class="btn btn-primary btn-xs"
-                    ui-sref="docker.templates.custom.new({fileContent: stackFileContent, type: stack.Type})"
-                  >
-                    <i class="fa fa-plus space-right" aria-hidden="true"></i>
-                    Create template from stack
-                  </button>
-                </div>
-              </div>
-              <!-- !stack-details -->
-              <stack-duplication-form
-                ng-if="!state.externalStack && endpoints.length > 0"
-                endpoints="endpoints"
-                groups="groups"
-                current-endpoint-id="currentEndpointId"
-                on-duplicate="duplicateStack(name, endpointId)"
-                on-migrate="migrateStack(name, endpointId)"
-                yaml-error="state.yamlError"
-              >
-              </stack-duplication-form>
-            </div>
+            </form>
           </uib-tab>
           <!-- !tab-info -->
           <!-- tab-file -->
-          <uib-tab index="1" select="showEditor()" ng-if="!state.externalStack">
+          <uib-tab index="1" select="showEditor()" ng-if="!state.externalStack && !state.isGitStack">
             <uib-tab-heading> <i class="fa fa-pencil-alt space-right" aria-hidden="true"></i> Editor </uib-tab-heading>
             <form class="form-horizontal" ng-if="state.showEditorTab" style="margin-top: 10px;">
               <div class="form-group">

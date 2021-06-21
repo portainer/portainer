@@ -290,6 +290,26 @@ angular.module('portainer.app').factory('ModalService', [
       );
     };
 
+    service.confirmRedeployStackViaGit = function (callback) {
+      const message = $sanitize(
+        'Any changes to this stack made locally in Portainer will be overriden by the definition in git and may cause service interruption. Do you wish to continue?'
+      );
+      service.confirm({
+        title: 'Are you sure?',
+        message: message,
+        buttons: {
+          confirm: {
+            label: 'Update',
+            className: 'btn-warning',
+          },
+          cancel: {
+            label: 'cancel',
+          },
+        },
+        callback: callback,
+      });
+    };
+
     return service;
   },
 ]);
