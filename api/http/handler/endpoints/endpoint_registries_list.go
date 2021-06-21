@@ -13,7 +13,7 @@ import (
 	endpointutils "github.com/portainer/portainer/api/internal/endpoint"
 )
 
-// GET request on /endpoints/{id}/registries
+// GET request on /endpoints/{id}/registries?namespace
 func (handler *Handler) endpointRegistriesList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {

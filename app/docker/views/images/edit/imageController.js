@@ -16,24 +16,7 @@ angular.module('portainer.docker').controller('ImageController', [
   'ModalService',
   'FileSaver',
   'Blob',
-  'EndpointService',
-  function (
-    $async,
-    $q,
-    $scope,
-    $transition$,
-    $state,
-    endpoint,
-    ImageService,
-    ImageHelper,
-    RegistryService,
-    Notifications,
-    HttpRequestHelper,
-    ModalService,
-    FileSaver,
-    Blob,
-    EndpointService
-  ) {
+  function ($async, $q, $scope, $transition$, $state, endpoint, ImageService, ImageHelper, RegistryService, Notifications, HttpRequestHelper, ModalService, FileSaver, Blob) {
     $scope.endpoint = endpoint;
     $scope.formValues = {
       RegistryModel: new PorImageRegistryModel(),
@@ -78,8 +61,7 @@ angular.module('portainer.docker').controller('ImageController', [
       return $async(async () => {
         $('#uploadResourceHint').show();
         try {
-          const registries = await EndpointService.registries(endpoint.Id);
-          const registryModel = await RegistryService.retrievePorRegistryModelFromRepositoryWithRegistries(repository, registries);
+          const registryModel = await RegistryService.retrievePorRegistryModelFromRepository(repository, endpoint.Id);
           await ImageService.pushImage(registryModel);
           Notifications.success('Image successfully pushed', repository);
         } catch (err) {
@@ -95,8 +77,7 @@ angular.module('portainer.docker').controller('ImageController', [
       return $async(async () => {
         $('#downloadResourceHint').show();
         try {
-          const registries = await EndpointService.registries(endpoint.Id);
-          const registryModel = await RegistryService.retrievePorRegistryModelFromRepositoryWithRegistries(repository, registries);
+          const registryModel = await RegistryService.retrievePorRegistryModelFromRepository(repository, endpoint.Id);
           await ImageService.pullImage(registryModel);
           Notifications.success('Image successfully pushed', repository);
         } catch (err) {

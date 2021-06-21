@@ -7,10 +7,11 @@ import { DockerHubViewModel } from 'Portainer/models/dockerhub';
 angular.module('portainer.app').factory('RegistryService', [
   '$q',
   '$async',
+  'EndpointService',
   'Registries',
   'ImageHelper',
   'FileUploadService',
-  function RegistryServiceFactory($q, $async, Registries, ImageHelper, FileUploadService) {
+  function RegistryServiceFactory($q, $async, EndpointService, Registries, ImageHelper, FileUploadService) {
     return {
       registries,
       registry,
@@ -21,7 +22,6 @@ angular.module('portainer.app').factory('RegistryService', [
       createRegistry,
       createGitlabRegistries,
       retrievePorRegistryModelFromRepository,
-      retrievePorRegistryModelFromRepositoryWithRegistries,
     };
 
     function registries() {
@@ -138,17 +138,15 @@ angular.module('portainer.app').factory('RegistryService', [
       return model;
     }
 
-    async function retrievePorRegistryModelFromRepositoryAsync(repository, endpointId, registryId) {
-      try {
-        const regs = await registries(endpointId);
-        return retrievePorRegistryModelFromRepositoryWithRegistries(repository, regs, registryId);
-      } catch (err) {
-        throw { msg: 'Unable to retrieve the registry associated to the repository', err: err };
-      }
-    }
-
-    function retrievePorRegistryModelFromRepository(repository, endpointId, registryId) {
-      return $async(retrievePorRegistryModelFromRepositoryAsync, repository, endpointId, registryId);
+    function retrievePorRegistryModelFromRepository(repository, endpointId, registryId, namespace) {
+      return $async(async () => {
+        try {
+          const regs = await EndpointService.registries(endpointId, namespace);
+          return retrievePorRegistryModelFromRepositoryWithRegistries(repository, regs, registryId);
+        } catch (err) {
+          throw { msg: 'Unable to retrieve the registry associated to the repository', err: err };
+        }
+      });
     }
   },
 ]);

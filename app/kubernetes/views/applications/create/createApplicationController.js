@@ -929,7 +929,7 @@ class KubernetesCreateApplicationController {
   async parseImageConfiguration(imageModel) {
     return this.$async(async () => {
       try {
-        return await this.RegistryService.retrievePorRegistryModelFromRepository(imageModel.Image, this.endpoint.Id, imageModel.Registry.Id);
+        return await this.RegistryService.retrievePorRegistryModelFromRepository(imageModel.Image, this.endpoint.Id, imageModel.Registry.Id, this.$state.params.namespace);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to retrieve registry');
         return imageModel;
