@@ -7,6 +7,7 @@ import (
 
 	gittypes "github.com/portainer/portainer/api/git/types"
 	v1 "k8s.io/api/core/v1"
+	clientV1 "k8s.io/client-go/tools/clientcmd/api/v1"
 )
 
 type (
@@ -1179,6 +1180,7 @@ type (
 		StartExecProcess(namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error
 		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
 		UpdateNamespaceAccessPolicies(accessPolicies map[string]K8sNamespaceAccessPolicy) error
+		GetKubeConfig(ctx context.Context, apiServerURL string, bearerToken string, tokenData *TokenData) (*clientV1.Config, error)
 	}
 
 	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes endpoint
