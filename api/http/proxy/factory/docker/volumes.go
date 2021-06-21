@@ -168,17 +168,18 @@ func (transport *Transport) restrictedVolumeOperation(requestPath string, reques
 		return transport.rewriteOperation(request, transport.volumeInspectOperation)
 	}
 
+	volumeName := path.Base(requestPath)
 	agentTargetHeader := request.Header.Get(portainer.PortainerAgentTargetHeader)
 
-	resourceID, err := transport.getVolumeResourceID(agentTargetHeader, path.Base(requestPath))
+	resourceID, err := transport.getVolumeResourceID(agentTargetHeader, volumeName)
 	if err != nil {
 		return nil, err
 	}
 
 	if request.Method == http.MethodDelete {
-		return transport.executeGenericResourceDeletionOperation(request, resourceID, portainer.VolumeResourceControl)
+		return transport.executeGenericResourceDeletionOperation(request, resourceID, volumeName, portainer.VolumeResourceControl)
 	}
-	return transport.restrictedResourceOperation(request, resourceID, portainer.VolumeResourceControl, false)
+	return transport.restrictedResourceOperation(request, resourceID, volumeName, portainer.VolumeResourceControl, false)
 }
 
 func (transport *Transport) getVolumeResourceID(nodename, volumeID string) (string, error) {
