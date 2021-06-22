@@ -47,7 +47,11 @@ angular.module('portainer.app').controller('StacksDatatableController', [
     this.applyFilters = applyFilters.bind(this);
     function applyFilters(stack) {
       const { showActiveStacks, showUnactiveStacks } = this.filters.state;
-      return (stack.Status === 1 && showActiveStacks) || (stack.Status === 2 && showUnactiveStacks) || stack.External;
+      if (stack.Orphaned) {
+        return stack.OrphanedRunning || this.settings.allOrphanedStacks;
+      } else {
+        return (stack.Status === 1 && showActiveStacks) || (stack.Status === 2 && showUnactiveStacks) || stack.External || !stack.Status;
+      }
     }
 
     this.onFilterChange = onFilterChange.bind(this);
@@ -56,6 +60,10 @@ angular.module('portainer.app').controller('StacksDatatableController', [
       this.filters.state.enabled = !showActiveStacks || !showUnactiveStacks;
       DatatableService.setDataTableFilters(this.tableKey, this.filters);
     }
+
+    this.onSettingsAllOrphanedStacksChange = function () {
+      DatatableService.setDataTableSettings(this.tableKey, this.settings);
+    };
 
     this.$onInit = function () {
       this.isAdmin = Authentication.isAdmin();
@@ -87,6 +95,7 @@ angular.module('portainer.app').controller('StacksDatatableController', [
       if (storedSettings !== null) {
         this.settings = storedSettings;
         this.settings.open = false;
+        this.settings.allOrphanedStacks = this.settings.allOrphanedStacks && this.isAdmin;
       }
       this.onSettingsRepeaterChange();
 

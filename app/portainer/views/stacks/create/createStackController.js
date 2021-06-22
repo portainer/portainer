@@ -53,6 +53,8 @@ angular
       }
     };
 
+    $scope.onChangeFormValues = onChangeFormValues;
+
     $scope.addEnvironmentVariable = function () {
       $scope.formValues.Env.push({ name: '', value: '' });
     };
@@ -121,6 +123,11 @@ angular
         };
         return StackService.createComposeStackFromGitRepository(name, repositoryOptions, env, endpointId);
       }
+    }
+
+    $scope.handleEnvVarChange = handleEnvVarChange;
+    function handleEnvVarChange(value) {
+      $scope.formValues.Env = value;
     }
 
     $scope.deployStack = function () {
@@ -239,4 +246,8 @@ angular
     };
 
     initView();
+
+    function onChangeFormValues(newValues) {
+      $scope.formValues = newValues;
+    }
   });

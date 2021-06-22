@@ -54,6 +54,7 @@ class CreateCustomTemplateViewController {
     this.createCustomTemplateFromGitRepository = this.createCustomTemplateFromGitRepository.bind(this);
     this.editorUpdate = this.editorUpdate.bind(this);
     this.onChangeMethod = this.onChangeMethod.bind(this);
+    this.onChangeFormValues = this.onChangeFormValues.bind(this);
   }
 
   createCustomTemplate() {
@@ -148,6 +149,10 @@ class CreateCustomTemplateViewController {
   editorUpdate(cm) {
     this.formValues.FileContent = cm.getValue();
     this.state.isEditorDirty = true;
+  }
+
+  onChangeFormValues(newValues) {
+    this.formValues = newValues;
   }
 
   async $onInit() {

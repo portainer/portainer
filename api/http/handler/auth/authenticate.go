@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
@@ -130,19 +131,21 @@ func (handler *Handler) authenticateLDAPAndCreateUser(w http.ResponseWriter, use
 }
 
 func (handler *Handler) writeToken(w http.ResponseWriter, user *portainer.User) *httperror.HandlerError {
-	tokenData := &portainer.TokenData{
-		ID:       user.ID,
-		Username: user.Username,
-		Role:     user.Role,
-	}
+	return handler.persistAndWriteToken(w, composeTokenData(user))
+}
 
-	return handler.persistAndWriteToken(w, tokenData)
+func (handler *Handler) writeTokenForOAuth(w http.ResponseWriter, user *portainer.User, expiryTime *time.Time) *httperror.HandlerError {
+	token, err := handler.JWTService.GenerateTokenForOAuth(composeTokenData(user), expiryTime)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to generate JWT token", Err: err}
+	}
+	return response.JSON(w, &authenticateResponse{JWT: token})
 }
 
 func (handler *Handler) persistAndWriteToken(w http.ResponseWriter, tokenData *portainer.TokenData) *httperror.HandlerError {
 	token, err := handler.JWTService.GenerateToken(tokenData)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to generate JWT token", err}
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to generate JWT token", Err: err}
 	}
 
 	return response.JSON(w, &authenticateResponse{JWT: token})
@@ -203,4 +206,12 @@ func teamMembershipExists(teamID portainer.TeamID, memberships []portainer.TeamM
 		}
 	}
 	return false
+}
+
+func composeTokenData(user *portainer.User) *portainer.TokenData {
+	return &portainer.TokenData{
+		ID:       user.ID,
+		Username: user.Username,
+		Role:     user.Role,
+	}
 }

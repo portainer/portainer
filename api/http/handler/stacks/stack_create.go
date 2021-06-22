@@ -2,6 +2,7 @@ package stacks
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -12,9 +13,11 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	gittypes "github.com/portainer/portainer/api/git/types"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 	"github.com/portainer/portainer/api/internal/stackutils"
 )
 
@@ -76,7 +79,7 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
-	if !endpoint.SecuritySettings.AllowStackManagementForRegularUsers {
+	if endpointutils.IsDockerEndpoint(endpoint) && !endpoint.SecuritySettings.AllowStackManagementForRegularUsers {
 		securityContext, err := security.RetrieveRestrictedRequestContext(r)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user info from request context", err}
@@ -111,10 +114,10 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 		return handler.createComposeStack(w, r, method, endpoint, tokenData.ID)
 	case portainer.KubernetesStack:
 		if tokenData.Role != portainer.AdministratorRole {
-			return &httperror.HandlerError{http.StatusForbidden, "Access denied", httperrors.ErrUnauthorized}
+			return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Access denied", Err: httperrors.ErrUnauthorized}
 		}
 
-		return handler.createKubernetesStack(w, r, endpoint)
+		return handler.createKubernetesStack(w, r, method, endpoint)
 	}
 
 	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: type. Value must be one of: 1 (Swarm stack) or 2 (Compose stack)", errors.New(request.ErrInvalidQueryParameter)}
@@ -145,6 +148,16 @@ func (handler *Handler) createSwarmStack(w http.ResponseWriter, r *http.Request,
 	}
 
 	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: method. Value must be one of: string, repository or file", errors.New(request.ErrInvalidQueryParameter)}
+}
+
+func (handler *Handler) createKubernetesStack(w http.ResponseWriter, r *http.Request, method string, endpoint *portainer.Endpoint) *httperror.HandlerError {
+	switch method {
+	case "string":
+		return handler.createKubernetesStackFromFileContent(w, r, endpoint)
+	case "repository":
+		return handler.createKubernetesStackFromGitRepository(w, r, endpoint)
+	}
+	return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid value for query parameter: method. Value must be one of: string or repository", Err: errors.New(request.ErrInvalidQueryParameter)}
 }
 
 func (handler *Handler) isValidStackFile(stackFileContent []byte, securitySettings *portainer.EndpointSecuritySettings) error {
@@ -225,4 +238,19 @@ func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *port
 
 	stack.ResourceControl = resourceControl
 	return response.JSON(w, stack)
+}
+
+func (handler *Handler) cloneAndSaveConfig(stack *portainer.Stack, projectPath, repositoryURL, refName, configFilePath string, auth bool, username, password string) error {
+
+	err := handler.GitService.CloneRepository(projectPath, repositoryURL, refName, username, password)
+	if err != nil {
+		return fmt.Errorf("unable to clone git repository: %w", err)
+	}
+
+	stack.GitConfig = &gittypes.RepoConfig{
+		URL:            repositoryURL,
+		ReferenceName:  refName,
+		ConfigFilePath: configFilePath,
+	}
+	return nil
 }

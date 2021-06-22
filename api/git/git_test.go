@@ -2,16 +2,17 @@ package git
 
 import (
 	"context"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing/object"
-	"github.com/pkg/errors"
-	"github.com/portainer/portainer/api/archive"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/pkg/errors"
+	"github.com/portainer/portainer/api/archive"
+	"github.com/stretchr/testify/assert"
 )
 
 var bareRepoDir string
@@ -59,7 +60,7 @@ func Test_ClonePublicRepository_Shallow(t *testing.T) {
 	}
 	defer os.RemoveAll(dir)
 	t.Logf("Cloning into %s", dir)
-	err = service.ClonePublicRepository(repositoryURL, referenceName, dir)
+	err = service.CloneRepository(dir, repositoryURL, referenceName, "", "")
 	assert.NoError(t, err)
 	assert.Equal(t, 1, getCommitHistoryLength(t, err, dir), "cloned repo has incorrect depth")
 }
@@ -74,9 +75,11 @@ func Test_ClonePublicRepository_NoGitDirectory(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create a temp dir")
 	}
+
 	defer os.RemoveAll(dir)
+
 	t.Logf("Cloning into %s", dir)
-	err = service.ClonePublicRepository(repositoryURL, referenceName, dir)
+	err = service.CloneRepository(dir, repositoryURL, referenceName, "", "")
 	assert.NoError(t, err)
 	assert.NoDirExists(t, filepath.Join(dir, ".git"))
 }
