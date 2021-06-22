@@ -236,6 +236,10 @@ func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *port
 }
 
 func (handler *Handler) cloneAndSaveConfig(stack *portainer.Stack, projectPath, repositoryURL, refName, configFilePath string, auth bool, username, password string) error {
+	if !auth {
+		username = ""
+		password = ""
+	}
 
 	err := handler.GitService.CloneRepository(projectPath, repositoryURL, refName, username, password)
 	if err != nil {
