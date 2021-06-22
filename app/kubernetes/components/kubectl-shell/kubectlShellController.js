@@ -1,13 +1,14 @@
 import angular from 'angular';
 import { Terminal } from 'xterm';
+import * as fit from 'xterm/lib/addons/fit/fit';
 
 class KubectlShellController {
-  constructor($async, $scope, $state, Notifications, Authentication, EndpointProvider, LocalStorage) {
+  constructor($window, $async, $scope, $state, Notifications, EndpointProvider, LocalStorage) {
     this.$scope = $scope;
     this.$state = $state;
     this.$async = $async;
+    this.$window = $window;
     this.Notifications = Notifications;
-    this.Authentication = Authentication;
     this.EndpointProvider = EndpointProvider;
     this.LocalStorage = LocalStorage;
 
@@ -41,11 +42,16 @@ class KubectlShellController {
       term.open(terminal_container);
       term.setOption('cursorBlink', true);
       term.focus();
+      term.fit();
     };
 
     term.on('data', function (data) {
       socket.send(data);
     });
+
+    this.$window.onresize = function() {
+      term.fit();
+    }
 
     socket.onmessage = function (msg) {
       term.write(msg.data);
@@ -83,6 +89,7 @@ class KubectlShellController {
       url = url.replace('http://', 'ws://');
     }
 
+    Terminal.applyAddon(fit);
     this.state.socket = new WebSocket(url);
     this.state.term = new Terminal();
 
@@ -100,7 +107,6 @@ class KubectlShellController {
       term: null,
     };
 
-    //this.Authentication.redirectIfUnauthorized(['K8sApplicationConsoleRW']);
   }
 
   $onInit() {
