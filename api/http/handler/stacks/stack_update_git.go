@@ -116,6 +116,13 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to clone git repository", err}
 	}
 
+	defer func() {
+		err = handler.FileService.RemoveDirectory(backupProjectPath)
+		if err != nil {
+			log.Printf("[WARN] [http,stacks,git] [error: %s] [message: unable to remove git repository directory]", err)
+		}
+	}()
+
 	httpErr := handler.deployStack(r, stack, endpoint)
 	if httpErr != nil {
 		return httpErr
@@ -124,11 +131,6 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 	err = handler.DataStore.Stack().UpdateStack(stack.ID, stack)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack changes inside the database", err}
-	}
-
-	err = handler.FileService.RemoveDirectory(backupProjectPath)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove git repository directory", err}
 	}
 
 	return response.JSON(w, stack)
