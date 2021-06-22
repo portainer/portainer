@@ -20,6 +20,7 @@ class KubectlShellController {
     this.$scope.icon = 'fas fa-window-minimize';
     this.state.socket.close();
     this.state.term.dispose();
+    this.state.connected = false;
   }
 
   screenclear() {
