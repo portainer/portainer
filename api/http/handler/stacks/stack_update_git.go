@@ -106,7 +106,14 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to move git repository directory", err}
 	}
 
-	err = handler.GitService.CloneRepository(stack.ProjectPath, stack.GitConfig.URL, payload.RepositoryReferenceName, payload.RepositoryUsername, payload.RepositoryPassword)
+	repositoryUsername := payload.RepositoryUsername
+	repositoryPassword := payload.RepositoryPassword
+	if !payload.RepositoryAuthentication {
+		repositoryUsername = ""
+		repositoryPassword = ""
+	}
+
+	err = handler.GitService.CloneRepository(stack.ProjectPath, stack.GitConfig.URL, payload.RepositoryReferenceName, repositoryUsername, repositoryPassword)
 	if err != nil {
 		restoreError := filesystem.MoveDirectory(backupProjectPath, stack.ProjectPath)
 		if restoreError != nil {
