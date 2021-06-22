@@ -103,7 +103,7 @@
           </div>
           <!-- !upload -->
           <!-- repository -->
-          <git-form ng-if="state.Method === 'repository'" model="$ctrl.formValues" on-change="($ctrl.onChangeFormValues)"></git-form>
+          <git-form ng-if="$ctrl.state.Method === 'repository'" model="$ctrl.formValues" on-change="($ctrl.onChangeFormValues)"></git-form>
           <!-- !repository -->
           <por-access-control-form form-data="$ctrl.formValues.AccessControlData"></por-access-control-form>
 
