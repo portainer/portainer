@@ -531,11 +531,12 @@ type (
 		// Deprecated fields
 		// Deprecated in DBVersion == 31
 		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
+		// Deprecated in DBVersion == 31
 		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
 
-		// Deprecated fields
 		// Deprecated in DBVersion == 18
 		AuthorizedUsers []UserID `json:"AuthorizedUsers"`
+		// Deprecated in DBVersion == 18
 		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
 	}
 
