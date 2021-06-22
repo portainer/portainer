@@ -50,9 +50,9 @@ class KubectlShellController {
       socket.send(data);
     });
 
-    this.$window.onresize = function() {
+    this.$window.onresize = function () {
       term.fit();
-    }
+    };
 
     socket.onmessage = function (msg) {
       term.write(msg.data);
@@ -107,7 +107,6 @@ class KubectlShellController {
       socket: null,
       term: null,
     };
-
   }
 
   $onInit() {
