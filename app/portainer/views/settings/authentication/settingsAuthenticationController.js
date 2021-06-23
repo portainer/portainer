@@ -119,6 +119,10 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
   $scope.saveSettings = function () {
     const settings = angular.copy($scope.settings);
 
+    if (!settings.OAuthSettings.AdminAutoPopulate) {
+      delete settings.OAuthSettings.AdminGroupClaimsRegexList;
+    }
+
     const { settings: ldapSettings, uploadRequired, tlscaFile } = prepareLDAPSettings();
     settings.LDAPSettings = ldapSettings;
     $scope.state.uploadInProgress = uploadRequired;
@@ -194,6 +198,18 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
         return false;
       }
     }
+    return true;
+  }
+
+  $scope.isOAuthAdminMappingFormValid = isOAuthAdminMappingFormValid;
+  function isOAuthAdminMappingFormValid() {
+    if ($scope.settings && $scope.settings.OAuthSettings.AdminGroupClaimsRegexList) {
+      const hasInvalidMapping = $scope.settings.OAuthSettings.AdminGroupClaimsRegexList.some((e) => e === '');
+      if (hasInvalidMapping) {
+        return false;
+      }
+    }
+
     return true;
   }
 

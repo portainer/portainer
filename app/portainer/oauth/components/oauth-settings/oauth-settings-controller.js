@@ -14,6 +14,8 @@ angular.module('portainer.oauth').controller('OAuthSettingsController', function
   this.updateSSO = updateSSO;
   this.addTeamMembershipMapping = addTeamMembershipMapping;
   this.removeTeamMembership = removeTeamMembership;
+  this.addAdminClaimRegex = addAdminClaimRegex;
+  this.removeAdminClaimRegex = removeAdminClaimRegex;
 
   function onMicrosoftTenantIDChange() {
     const tenantID = ctrl.state.microsoftTenantID;
@@ -63,13 +65,21 @@ angular.module('portainer.oauth').controller('OAuthSettingsController', function
   function updateSSO() {
     ctrl.settings.HideInternalAuth = ctrl.settings.SSO;
   }
-  
+
   function addTeamMembershipMapping() {
     ctrl.settings.TeamMemberships.OAuthClaimMappings.push({ ClaimValRegex: '', Team: ctrl.settings.DefaultTeamID });
   }
 
   function removeTeamMembership(index) {
     ctrl.settings.TeamMemberships.OAuthClaimMappings.splice(index, 1);
+  }
+
+  function addAdminClaimRegex() {
+    ctrl.settings.AdminGroupClaimsRegexList.push('');
+  }
+
+  function removeAdminClaimRegex(index) {
+    ctrl.settings.AdminGroupClaimsRegexList.splice(index, 1);
   }
 
   function $onInit() {
@@ -93,5 +103,7 @@ angular.module('portainer.oauth').controller('OAuthSettingsController', function
     if (ctrl.settings.TeamMemberships.OAuthClaimMappings === null) {
       ctrl.settings.TeamMemberships.OAuthClaimMappings = [];
     }
+
+    ctrl.settings.AdminGroupClaimsRegexList = [];
   }
 });
