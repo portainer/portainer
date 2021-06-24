@@ -14,6 +14,10 @@ func configureLogger(json *bool) {
 		logger.SetFormatter(&logrus.JSONFormatter{})
 		// configure explicit logrus usage
 		logrus.SetFormatter(&logrus.JSONFormatter{})
+	} else {
+		logger.SetFormatter(&logrus.TextFormatter{DisableTimestamp: true})
+		// configure explicit logrus usage
+		logrus.SetFormatter(&logrus.TextFormatter{DisableTimestamp: true})
 	}
 
 	logger.SetLevel(logrus.DebugLevel)
