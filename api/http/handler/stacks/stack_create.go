@@ -14,7 +14,6 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	gittypes "github.com/portainer/portainer/api/git/types"
-	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/endpointutils"
@@ -113,10 +112,6 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 	case portainer.DockerComposeStack:
 		return handler.createComposeStack(w, r, method, endpoint, tokenData.ID)
 	case portainer.KubernetesStack:
-		if tokenData.Role != portainer.AdministratorRole {
-			return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Access denied", Err: httperrors.ErrUnauthorized}
-		}
-
 		return handler.createKubernetesStack(w, r, method, endpoint)
 	}
 
@@ -241,6 +236,10 @@ func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *port
 }
 
 func (handler *Handler) cloneAndSaveConfig(stack *portainer.Stack, projectPath, repositoryURL, refName, configFilePath string, auth bool, username, password string) error {
+	if !auth {
+		username = ""
+		password = ""
+	}
 
 	err := handler.GitService.CloneRepository(projectPath, repositoryURL, refName, username, password)
 	if err != nil {
