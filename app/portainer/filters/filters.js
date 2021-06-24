@@ -79,12 +79,20 @@ angular
   .filter('key', function () {
     'use strict';
     return function (pair, separator) {
+      if (!pair.includes(separator)) {
+        return pair;
+      }
+
       return pair.slice(0, pair.indexOf(separator));
     };
   })
   .filter('value', function () {
     'use strict';
     return function (pair, separator) {
+      if (!pair.includes(separator)) {
+        return '';
+      }
+
       return pair.slice(pair.indexOf(separator) + 1);
     };
   })

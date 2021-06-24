@@ -3,7 +3,7 @@ package jwt
 import (
 	"errors"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 
 	"fmt"
 	"time"
@@ -51,23 +51,13 @@ func NewService(userSessionDuration string) (*Service, error) {
 
 // GenerateToken generates a new JWT token.
 func (service *Service) GenerateToken(data *portainer.TokenData) (string, error) {
-	expireToken := time.Now().Add(service.userSessionTimeout).Unix()
-	cl := claims{
-		UserID:   int(data.ID),
-		Username: data.Username,
-		Role:     int(data.Role),
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expireToken,
-		},
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, cl)
+	return service.generateSignedToken(data, nil)
+}
 
-	signedToken, err := token.SignedString(service.secret)
-	if err != nil {
-		return "", err
-	}
-
-	return signedToken, nil
+// GenerateTokenForOAuth generates a new JWT for OAuth login
+// token expiry time from the OAuth provider is considered
+func (service *Service) GenerateTokenForOAuth(data *portainer.TokenData, expiryTime *time.Time) (string, error) {
+	return service.generateSignedToken(data, expiryTime)
 }
 
 // ParseAndVerifyToken parses a JWT token and verify its validity. It returns an error if token is invalid.
@@ -96,4 +86,27 @@ func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData,
 // SetUserSessionDuration sets the user session duration
 func (service *Service) SetUserSessionDuration(userSessionDuration time.Duration) {
 	service.userSessionTimeout = userSessionDuration
+}
+
+func (service *Service) generateSignedToken(data *portainer.TokenData, expiryTime *time.Time) (string, error) {
+	expireToken := time.Now().Add(service.userSessionTimeout).Unix()
+	if expiryTime != nil && !expiryTime.IsZero() {
+		expireToken = expiryTime.Unix()
+	}
+	cl := claims{
+		UserID:   int(data.ID),
+		Username: data.Username,
+		Role:     int(data.Role),
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: expireToken,
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, cl)
+
+	signedToken, err := token.SignedString(service.secret)
+	if err != nil {
+		return "", err
+	}
+
+	return signedToken, nil
 }

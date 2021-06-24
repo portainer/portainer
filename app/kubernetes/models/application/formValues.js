@@ -18,12 +18,12 @@ const _KubernetesApplicationFormValues = Object.freeze({
   AutoScaler: {},
   Containers: [],
   EnvironmentVariables: [], // KubernetesApplicationEnvironmentVariableFormValue list
-  DataAccessPolicy: KubernetesApplicationDataAccessPolicies.SHARED,
+  DataAccessPolicy: KubernetesApplicationDataAccessPolicies.ISOLATED,
   PersistedFolders: [], // KubernetesApplicationPersistedFolderFormValue list
   Configurations: [], // KubernetesApplicationConfigurationFormValue list
   PublishingType: KubernetesApplicationPublishingTypes.INTERNAL,
   PublishedPorts: [], // KubernetesApplicationPublishedPortFormValue list
-  PlacementType: KubernetesApplicationPlacementTypes.PREFERRED,
+  PlacementType: KubernetesApplicationPlacementTypes.MANDATORY,
   Placements: [], // KubernetesApplicationPlacementFormValue list
   OriginalIngresses: undefined,
 });

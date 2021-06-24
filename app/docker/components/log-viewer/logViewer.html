@@ -71,13 +71,13 @@
               <button
                 class="btn btn-primary btn-sm"
                 ng-click="$ctrl.copy()"
-                ng-disabled="($ctrl.state.filteredLogs.length === 1 && !$ctrl.state.filteredLogs[0]) || !$ctrl.state.filteredLogs.length"
+                ng-disabled="($ctrl.state.filteredLogs.length === 1 && !$ctrl.state.filteredLogs[0].line) || !$ctrl.state.filteredLogs.length"
                 ><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy</button
               >
               <button
                 class="btn btn-primary btn-sm"
                 ng-click="$ctrl.copySelection()"
-                ng-disabled="($ctrl.state.filteredLogs.length === 1 && !$ctrl.state.filteredLogs[0]) || !$ctrl.state.filteredLogs.length || !$ctrl.state.selectedLines.length"
+                ng-disabled="($ctrl.state.filteredLogs.length === 1 && !$ctrl.state.filteredLogs[0].line) || !$ctrl.state.filteredLogs.length || !$ctrl.state.selectedLines.length"
                 ><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy selected lines</button
               >
               <button class="btn btn-primary btn-sm" ng-click="$ctrl.clearSelection()" ng-disabled="$ctrl.state.selectedLines.length === 0"
@@ -97,9 +97,9 @@
 <div class="row" style="height: 54%;">
   <div class="col-sm-12" style="height: 100%;">
     <pre ng-class="{ wrap_lines: $ctrl.state.wrapLines }" class="log_viewer" scroll-glue="$ctrl.state.autoScroll" force-glue>
-      <div ng-repeat="line in $ctrl.state.filteredLogs = ($ctrl.data | filter:$ctrl.state.search) track by $index" class="line" ng-if="line"><p class="inner_line" ng-click="$ctrl.selectLine(line)" ng-class="{ 'line_selected': $ctrl.state.selectedLines.indexOf(line) > -1 }">{{ line }}</p></div>
+      <div ng-repeat="log in $ctrl.state.filteredLogs = ($ctrl.data | filter:{ 'line': $ctrl.state.search }) track by $index" class="line" ng-if="log.line"><p class="inner_line" ng-click="$ctrl.selectLine(log.line)" ng-class="{ 'line_selected': $ctrl.state.selectedLines.indexOf(log.line) > -1 }"><span ng-repeat="span in log.spans" ng-style="{ 'color': span.foregroundColor, 'background-color': span.backgroundColor }">{{ span.text }}</span></p></div>
       <div ng-if="!$ctrl.state.filteredLogs.length" class="line"><p class="inner_line">No log line matching the '{{ $ctrl.state.search }}' filter</p></div>
-      <div ng-if="$ctrl.state.filteredLogs.length === 1 && !$ctrl.state.filteredLogs[0]" class="line"><p class="inner_line">No logs available</p></div>
+      <div ng-if="$ctrl.state.filteredLogs.length === 1 && !$ctrl.state.filteredLogs[0].line" class="line"><p class="inner_line">No logs available</p></div>
     </pre>
   </div>
 </div>

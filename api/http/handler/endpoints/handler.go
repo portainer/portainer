@@ -5,6 +5,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
 
 	"net/http"
 
@@ -28,6 +29,7 @@ type Handler struct {
 	ReverseTunnelService portainer.ReverseTunnelService
 	SnapshotService      portainer.SnapshotService
 	ComposeStackManager  portainer.ComposeStackManager
+	AuthorizationService *authorization.Service
 }
 
 // NewHandler creates a handler to manage endpoint operations.

@@ -15,7 +15,8 @@ class KubernetesClusterController {
     KubernetesNodeService,
     KubernetesApplicationService,
     KubernetesComponentStatusService,
-    KubernetesEndpointService
+    KubernetesEndpointService,
+    EndpointProvider
   ) {
     this.$async = $async;
     this.$state = $state;
@@ -26,6 +27,7 @@ class KubernetesClusterController {
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesComponentStatusService = KubernetesComponentStatusService;
     this.KubernetesEndpointService = KubernetesEndpointService;
+    this.EndpointProvider = EndpointProvider;
 
     this.onInit = this.onInit.bind(this);
     this.getNodes = this.getNodes.bind(this);
@@ -132,6 +134,7 @@ class KubernetesClusterController {
     }
 
     this.state.viewReady = true;
+    this.state.useServerMetrics = this.EndpointProvider.currentEndpoint().Kubernetes.Configuration.UseServerMetrics;
   }
 
   $onInit() {

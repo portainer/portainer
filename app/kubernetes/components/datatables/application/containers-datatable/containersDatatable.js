@@ -9,5 +9,6 @@ angular.module('portainer.kubernetes').component('kubernetesContainersDatatable'
     orderBy: '@',
     refreshCallback: '<',
     isPod: '<',
+    useServerMetrics: '<',
   },
 });
