@@ -1,6 +1,24 @@
 import _ from 'lodash-es';
 
-angular.module('portainer.docker').controller('ContainersDatatableController', [
+var app = angular.module('portainer.docker');
+
+app.filter('unique', function () {
+  return function (collection, keyname) {
+    var output = [],
+      keys = [];
+
+    angular.forEach(collection, function (item) {
+      var key = item[keyname];
+      if (keys.indexOf(key) === -1) {
+        keys.push(key);
+        output.push(item);
+      }
+    });
+    return output;
+  };
+});
+
+app.controller('ContainersDatatableController', [
   '$scope',
   '$controller',
   'DatatableService',
