@@ -172,6 +172,7 @@ class KubernetesCreateResourcePoolController {
       this.endpoint = endpoint;
       this.defaults = KubernetesResourceQuotaDefaults;
       this.formValues = new KubernetesResourcePoolFormValues(this.defaults);
+      this.formValues.HasQuota = true;
 
       this.state = {
         actionInProgress: false,
