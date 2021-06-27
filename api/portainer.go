@@ -355,26 +355,34 @@ type (
 	// Extension represents a deprecated Portainer extension
 	Extension struct {
 		// Extension Identifier
-		ID               ExtensionID        `json:"Id" example:"1"`
-		Enabled          bool               `json:"Enabled"`
-		Name             string             `json:"Name,omitempty"`
-		ShortDescription string             `json:"ShortDescription,omitempty"`
-		Description      string             `json:"Description,omitempty"`
-		DescriptionURL   string             `json:"DescriptionURL,omitempty"`
-		Price            string             `json:"Price,omitempty"`
-		PriceDescription string             `json:"PriceDescription,omitempty"`
-		Deal             bool               `json:"Deal,omitempty"`
-		Available        bool               `json:"Available,omitempty"`
-		License          LicenseInformation `json:"License,omitempty"`
-		Version          string             `json:"Version"`
-		UpdateAvailable  bool               `json:"UpdateAvailable"`
-		ShopURL          string             `json:"ShopURL,omitempty"`
-		Images           []string           `json:"Images,omitempty"`
-		Logo             string             `json:"Logo,omitempty"`
+		ID               ExtensionID                 `json:"Id" example:"1"`
+		Enabled          bool                        `json:"Enabled"`
+		Name             string                      `json:"Name,omitempty"`
+		ShortDescription string                      `json:"ShortDescription,omitempty"`
+		Description      string                      `json:"Description,omitempty"`
+		DescriptionURL   string                      `json:"DescriptionURL,omitempty"`
+		Price            string                      `json:"Price,omitempty"`
+		PriceDescription string                      `json:"PriceDescription,omitempty"`
+		Deal             bool                        `json:"Deal,omitempty"`
+		Available        bool                        `json:"Available,omitempty"`
+		License          ExtensionLicenseInformation `json:"License,omitempty"`
+		Version          string                      `json:"Version"`
+		UpdateAvailable  bool                        `json:"UpdateAvailable"`
+		ShopURL          string                      `json:"ShopURL,omitempty"`
+		Images           []string                    `json:"Images,omitempty"`
+		Logo             string                      `json:"Logo,omitempty"`
 	}
 
 	// ExtensionID represents a extension identifier
 	ExtensionID int
+
+	// ExtensionLicenseInformation represents information about an extension license
+	ExtensionLicenseInformation struct {
+		LicenseKey string `json:"LicenseKey,omitempty"`
+		Company    string `json:"Company,omitempty"`
+		Expiration string `json:"Expiration,omitempty"`
+		Valid      bool   `json:"Valid,omitempty"`
+	}
 
 	// GitlabRegistryData represents data required for gitlab registry to work
 	GitlabRegistryData struct {
@@ -471,14 +479,6 @@ type (
 		GroupSearchSettings []LDAPGroupSearchSettings `json:"GroupSearchSettings"`
 		// Automatically provision users and assign them to matching LDAP group names
 		AutoCreateUsers bool `json:"AutoCreateUsers" example:"true"`
-	}
-
-	// LicenseInformation represents information about an extension license
-	LicenseInformation struct {
-		LicenseKey string `json:"LicenseKey,omitempty"`
-		Company    string `json:"Company,omitempty"`
-		Expiration string `json:"Expiration,omitempty"`
-		Valid      bool   `json:"Valid,omitempty"`
 	}
 
 	// MembershipRole represents the role of a user within a team
