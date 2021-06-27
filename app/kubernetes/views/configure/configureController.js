@@ -28,7 +28,8 @@ class KubernetesConfigureController {
     ModalService,
     KubernetesNamespaceHelper,
     KubernetesResourcePoolService,
-    KubernetesIngressService
+    KubernetesIngressService,
+    KubernetesMetricsService
   ) {
     this.$async = $async;
     this.$state = $state;
@@ -41,6 +42,7 @@ class KubernetesConfigureController {
     this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesIngressService = KubernetesIngressService;
+    this.KubernetesMetricsService = KubernetesMetricsService;
 
     this.IngressClassTypes = KubernetesIngressClassTypes;
 
@@ -139,20 +141,32 @@ class KubernetesConfigureController {
   }
 
   async removeIngressesAcrossNamespaces() {
-    const promises = [];
     const ingressesToDel = _.filter(this.formValues.IngressClasses, { NeedsDeletion: true });
-    const allResourcePools = await this.KubernetesResourcePoolService.get();
-    const resourcePools = _.filter(
-      allResourcePools,
-      (resourcePool) =>
-        !this.KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name) && !this.KubernetesNamespaceHelper.isDefaultNamespace(resourcePool.Namespace.Name)
-    );
 
-    ingressesToDel.forEach((ingress) => {
-      resourcePools.forEach((resourcePool) => {
-        promises.push(this.KubernetesIngressService.delete(resourcePool.Namespace.Name, ingress.Name));
+    if (!ingressesToDel.length) {
+      return;
+    }
+
+    const promises = [];
+    const oldEndpointID = this.EndpointProvider.endpointID();
+    this.EndpointProvider.setEndpointID(this.endpoint.Id);
+
+    try {
+      const allResourcePools = await this.KubernetesResourcePoolService.get();
+      const resourcePools = _.filter(
+        allResourcePools,
+        (resourcePool) =>
+          !this.KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name) && !this.KubernetesNamespaceHelper.isDefaultNamespace(resourcePool.Namespace.Name)
+      );
+
+      ingressesToDel.forEach((ingress) => {
+        resourcePools.forEach((resourcePool) => {
+          promises.push(this.KubernetesIngressService.delete(resourcePool.Namespace.Name, ingress.Name));
+        });
       });
-    });
+    } finally {
+      this.EndpointProvider.setEndpointID(oldEndpointID);
+    }
 
     const responses = await Promise.allSettled(promises);
     responses.forEach((respons) => {
@@ -160,6 +174,27 @@ class KubernetesConfigureController {
         throw respons.reason;
       }
     });
+  }
+
+  enableMetricsServer() {
+    if (this.formValues.UseServerMetrics) {
+      this.state.metrics.userClick = true;
+      this.state.metrics.pending = true;
+      this.KubernetesMetricsService.capabilities(this.endpoint.Id)
+        .then(() => {
+          this.state.metrics.isServerRunning = true;
+          this.state.metrics.pending = false;
+          this.formValues.UseServerMetrics = true;
+        })
+        .catch(() => {
+          this.state.metrics.isServerRunning = false;
+          this.state.metrics.pending = false;
+          this.formValues.UseServerMetrics = false;
+        });
+    } else {
+      this.state.metrics.userClick = false;
+      this.formValues.UseServerMetrics = false;
+    }
   }
 
   async configureAsync() {
@@ -221,6 +256,11 @@ class KubernetesConfigureController {
       endpointId: this.$transition$.params().id,
       duplicates: {
         ingressClasses: new KubernetesFormValidationReferences(),
+      },
+      metrics: {
+        pending: false,
+        isServerRunning: false,
+        userClick: false,
       },
     };
 

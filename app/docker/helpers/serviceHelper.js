@@ -67,39 +67,6 @@ angular.module('portainer.docker').factory('ServiceHelper', [
       return [];
     };
 
-    helper.translateEnvironmentVariables = function (env) {
-      if (env) {
-        var variables = [];
-        env.forEach(function (variable) {
-          var idx = variable.indexOf('=');
-          var keyValue = [variable.slice(0, idx), variable.slice(idx + 1)];
-          var originalValue = keyValue.length > 1 ? keyValue[1] : '';
-          variables.push({
-            key: keyValue[0],
-            value: originalValue,
-            originalKey: keyValue[0],
-            originalValue: originalValue,
-            added: true,
-          });
-        });
-        return variables;
-      }
-      return [];
-    };
-
-    helper.translateEnvironmentVariablesToEnv = function (env) {
-      if (env) {
-        var variables = [];
-        env.forEach(function (variable) {
-          if (variable.key && variable.key !== '') {
-            variables.push(variable.key + '=' + variable.value);
-          }
-        });
-        return variables;
-      }
-      return [];
-    };
-
     helper.translatePreferencesToKeyValue = function (preferences) {
       if (preferences) {
         var keyValuePreferences = [];

@@ -14,6 +14,7 @@ angular.module('portainer.docker').controller('ContainerStatsController', [
     $scope.state = {
       refreshRate: '5',
       networkStatsUnavailable: false,
+      ioStatsUnavailable: false,
     };
 
     $scope.$on('$destroy', function () {
@@ -42,6 +43,13 @@ angular.module('portainer.docker').controller('ContainerStatsController', [
       var label = moment(stats.read).format('HH:mm:ss');
 
       ChartService.UpdateMemoryChart(label, stats.MemoryUsage, stats.MemoryCache, chart);
+    }
+
+    function updateIOChart(stats, chart) {
+      var label = moment(stats.read).format('HH:mm:ss');
+      if (stats.noIOData !== true) {
+        ChartService.UpdateIOChart(label, stats.BytesRead, stats.BytesWrite, chart);
+      }
     }
 
     function updateCPUChart(stats, chart) {
@@ -77,14 +85,15 @@ angular.module('portainer.docker').controller('ContainerStatsController', [
       var networkChart = $scope.networkChart;
       var cpuChart = $scope.cpuChart;
       var memoryChart = $scope.memoryChart;
+      var ioChart = $scope.ioChart;
 
       stopRepeater();
-      setUpdateRepeater(networkChart, cpuChart, memoryChart);
+      setUpdateRepeater(networkChart, cpuChart, memoryChart, ioChart);
       $('#refreshRateChange').show();
       $('#refreshRateChange').fadeOut(1500);
     };
 
-    function startChartUpdate(networkChart, cpuChart, memoryChart) {
+    function startChartUpdate(networkChart, cpuChart, memoryChart, ioChart) {
       $q.all({
         stats: ContainerService.containerStats($transition$.params().id),
         top: ContainerService.containerTop($transition$.params().id),
@@ -95,10 +104,14 @@ angular.module('portainer.docker').controller('ContainerStatsController', [
           if (stats.Networks.length === 0) {
             $scope.state.networkStatsUnavailable = true;
           }
+          if (stats.noIOData === true) {
+            $scope.state.ioStatsUnavailable = true;
+          }
           updateNetworkChart(stats, networkChart);
           updateMemoryChart(stats, memoryChart);
           updateCPUChart(stats, cpuChart);
-          setUpdateRepeater(networkChart, cpuChart, memoryChart);
+          updateIOChart(stats, ioChart);
+          setUpdateRepeater(networkChart, cpuChart, memoryChart, ioChart);
         })
         .catch(function error(err) {
           stopRepeater();
@@ -106,7 +119,7 @@ angular.module('portainer.docker').controller('ContainerStatsController', [
         });
     }
 
-    function setUpdateRepeater(networkChart, cpuChart, memoryChart) {
+    function setUpdateRepeater(networkChart, cpuChart, memoryChart, ioChart) {
       var refreshRate = $scope.state.refreshRate;
       $scope.repeater = $interval(function () {
         $q.all({
@@ -119,6 +132,7 @@ angular.module('portainer.docker').controller('ContainerStatsController', [
             updateNetworkChart(stats, networkChart);
             updateMemoryChart(stats, memoryChart);
             updateCPUChart(stats, cpuChart);
+            updateIOChart(stats, ioChart);
           })
           .catch(function error(err) {
             stopRepeater();
@@ -140,7 +154,11 @@ angular.module('portainer.docker').controller('ContainerStatsController', [
       var memoryChart = ChartService.CreateMemoryChart(memoryChartCtx);
       $scope.memoryChart = memoryChart;
 
-      startChartUpdate(networkChart, cpuChart, memoryChart);
+      var ioChartCtx = $('#ioChart');
+      var ioChart = ChartService.CreateIOChart(ioChartCtx);
+      $scope.ioChart = ioChart;
+
+      startChartUpdate(networkChart, cpuChart, memoryChart, ioChart);
     }
 
     function initView() {

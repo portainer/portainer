@@ -78,7 +78,7 @@ class KubernetesResourcePoolAccessController {
       }
       this.availableUsersAndTeams = _.without(endpointAccesses.authorizedUsersAndTeams, ...this.authorizedUsersAndTeams);
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve resource pool information');
+      this.Notifications.error('Failure', err, 'Unable to retrieve namespace information');
     } finally {
       this.state.viewReady = true;
     }

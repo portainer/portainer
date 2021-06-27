@@ -52,8 +52,12 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackInspect))).Methods(http.MethodGet)
 	h.Handle("/stacks/{id}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackDelete))).Methods(http.MethodDelete)
+	h.Handle("/stacks/{id}/associate",
+		bouncer.AdminAccess(httperror.LoggerHandler(h.stackAssociate))).Methods(http.MethodPut)
 	h.Handle("/stacks/{id}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackUpdate))).Methods(http.MethodPut)
+	h.Handle("/stacks/{id}/git",
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackUpdateGit))).Methods(http.MethodPut)
 	h.Handle("/stacks/{id}/file",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackFile))).Methods(http.MethodGet)
 	h.Handle("/stacks/{id}/migrate",

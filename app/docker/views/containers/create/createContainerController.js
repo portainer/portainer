@@ -1,5 +1,8 @@
 import _ from 'lodash-es';
+
+import * as envVarsUtils from '@/portainer/helpers/env-vars';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
+
 import { ContainerCapabilities, ContainerCapability } from '../../../models/containerCapabilities';
 import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
 import { ContainerDetailsViewModel } from '../../../models/container';
@@ -78,6 +81,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       MemoryReservation: 0,
       CmdMode: 'default',
       EntrypointMode: 'default',
+      Env: [],
       NodeName: null,
       capabilities: [],
       Sysctls: [],
@@ -94,6 +98,11 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       mode: '',
       pullImageValidity: true,
     };
+
+    $scope.handleEnvVarChange = handleEnvVarChange;
+    function handleEnvVarChange(value) {
+      $scope.formValues.Env = value;
+    }
 
     $scope.refreshSlider = function () {
       $timeout(function () {
@@ -151,14 +160,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
     $scope.removeVolume = function (index) {
       $scope.formValues.Volumes.splice(index, 1);
-    };
-
-    $scope.addEnvironmentVariable = function () {
-      $scope.config.Env.push({ name: '', value: '' });
-    };
-
-    $scope.removeEnvironmentVariable = function (index) {
-      $scope.config.Env.splice(index, 1);
     };
 
     $scope.addPortBinding = function () {
@@ -254,13 +255,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     }
 
     function prepareEnvironmentVariables(config) {
-      var env = [];
-      config.Env.forEach(function (v) {
-        if (v.name && v.value) {
-          env.push(v.name + '=' + v.value);
-        }
-      });
-      config.Env = env;
+      config.Env = envVarsUtils.convertToArrayOfStrings($scope.formValues.Env);
     }
 
     function prepareVolumes(config) {
@@ -537,14 +532,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     }
 
     function loadFromContainerEnvironmentVariables() {
-      var envArr = [];
-      for (var e in $scope.config.Env) {
-        if ({}.hasOwnProperty.call($scope.config.Env, e)) {
-          var arr = $scope.config.Env[e].split(/\=(.*)/);
-          envArr.push({ name: arr[0], value: arr[1] });
-        }
-      }
-      $scope.config.Env = envArr;
+      $scope.formValues.Env = envVarsUtils.parseArrayOfStrings($scope.config.Env);
     }
 
     function loadFromContainerLabels() {

@@ -42,7 +42,8 @@ function StacksController($scope, $state, Notifications, StackService, ModalServ
     var endpointMode = $scope.applicationState.endpoint.mode;
     var endpointId = EndpointProvider.endpointID();
 
-    StackService.stacks(true, endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER', endpointId)
+    const includeOrphanedStacks = Authentication.isAdmin();
+    StackService.stacks(true, endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER', endpointId, includeOrphanedStacks)
       .then(function success(data) {
         var stacks = data;
         $scope.stacks = stacks;

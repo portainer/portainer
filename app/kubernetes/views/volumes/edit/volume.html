@@ -1,5 +1,5 @@
 <kubernetes-view-header title="Volume details" state="kubernetes.volumes.volume" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.resourcePools">Resource pools</a> &gt;
+  <a ui-sref="kubernetes.resourcePools">Namespaces</a> &gt;
   <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.volume.ResourcePool.Namespace.Name })">{{ ctrl.volume.ResourcePool.Namespace.Name }}</a> &gt;
   <a ui-sref="kubernetes.volumes">Volumes</a> &gt; {{ ctrl.volume.PersistentVolumeClaim.Name }}
 </kubernetes-view-header>
@@ -27,7 +27,7 @@
                       </td>
                     </tr>
                     <tr>
-                      <td>Resource pool</td>
+                      <td>Namespace</td>
                       <td>
                         <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.volume.ResourcePool.Namespace.Name })">{{ ctrl.volume.ResourcePool.Namespace.Name }}</a>
                         <span style="margin-left: 5px;" class="label label-info image-tag" ng-if="ctrl.isSystemNamespace(item)">system</span>

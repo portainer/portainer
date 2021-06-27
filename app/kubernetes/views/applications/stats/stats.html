@@ -1,0 +1,82 @@
+<kubernetes-view-header title="Application stats" state="kubernetes.applications.application.stats" view-ready="ctrl.state.viewReady">
+  <a ui-sref="kubernetes.resourcePools">Namespaces</a> &gt;
+  <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.state.transition.namespace })">{{ ctrl.state.transition.namespace }}</a> &gt;
+  <a ui-sref="kubernetes.applications">Applications</a> &gt;
+  <a ui-sref="kubernetes.applications.application({ name: ctrl.state.transition.applicationName, namespace: ctrl.state.transition.namespace })">{{
+    ctrl.state.transition.applicationName
+  }}</a>
+  &gt; Pods &gt; {{ ctrl.state.transition.podName }} &gt; Containers &gt; {{ ctrl.state.transition.containerName }} &gt; Stats
+</kubernetes-view-header>
+
+<kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
+
+<div ng-if="ctrl.state.viewReady">
+  <information-panel ng-if="!ctrl.state.getMetrics" title-text="Unable to retrieve container metrics">
+    <span class="small text-muted">
+      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      Portainer was unable to retrieve any metrics associated to that container. Please contact your administrator to ensure that the Kubernetes metrics feature is properly
+      configured.
+    </span>
+  </information-panel>
+  <div class="row" ng-if="ctrl.state.getMetrics">
+    <div class="col-md-12">
+      <rd-widget>
+        <rd-widget-header icon="fa-info-circle" title-text="About statistics"> </rd-widget-header>
+        <rd-widget-body>
+          <form class="form-horizontal">
+            <div class="form-group">
+              <div class="col-sm-12">
+                <span class="small text-muted">
+                  This view displays real-time statistics about the container <b>{{ ctrl.state.transition.containerName | trimcontainername }}</b
+                  >.
+                </span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="refreshRate" class="col-sm-3 col-md-2 col-lg-2 margin-sm-top control-label text-left">
+                Refresh rate
+              </label>
+              <div class="col-sm-3 col-md-2">
+                <select id="refreshRate" ng-model="ctrl.state.refreshRate" ng-change="ctrl.changeUpdateRepeater()" class="form-control">
+                  <option value="30">30s</option>
+                  <option value="60">60s</option>
+                </select>
+              </div>
+              <span>
+                <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none;"></i>
+              </span>
+            </div>
+            <div class="form-group" ng-if="ctrl.state.networkStatsUnavailable">
+              <div class="col-sm-12">
+                <span class="small text-muted"> <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true"></i> Network stats are unavailable for this container. </span>
+              </div>
+            </div>
+          </form>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+  </div>
+
+  <div class="row" ng-if="ctrl.state.getMetrics">
+    <div class="col-lg-6 col-md-12 col-sm-12">
+      <rd-widget>
+        <rd-widget-header icon="fa-chart-area" title-text="Memory usage"></rd-widget-header>
+        <rd-widget-body>
+          <div class="chart-container" style="position: relative;">
+            <canvas id="memoryChart" width="770" height="300"></canvas>
+          </div>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+    <div class="col-lg-6 col-md-12 col-sm-12" ng-if="!ctrl.state.networkStatsUnavailable">
+      <rd-widget>
+        <rd-widget-header icon="fa-chart-area" title-text="CPU usage"></rd-widget-header>
+        <rd-widget-body>
+          <div class="chart-container" style="position: relative;">
+            <canvas id="cpuChart" width="770" height="300"></canvas>
+          </div>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+  </div>
+</div>

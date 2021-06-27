@@ -20,6 +20,7 @@ import (
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/http/proxy"
 	kubeproxy "github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
+	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/snapshot"
 	"github.com/portainer/portainer/api/jwt"
@@ -76,7 +77,7 @@ func initDataStore(dataStorePath string, fileService portainer.FileService) port
 }
 
 func initDemoData(
-	store portainer.DataStore, 
+	store portainer.DataStore,
 	cryptoService portainer.CryptoService,
 ) error {
 	password, err := cryptoService.Hash("tryportainer")
@@ -96,24 +97,24 @@ func initDemoData(
 	}
 
 	localEndpoint := &portainer.Endpoint{
-		ID:                  portainer.EndpointID(1),
-		Name:                "local",
-		URL:                 "unix:///var/run/docker.sock",
-		PublicURL:           "demo.portainer.io",
-		Type:                portainer.DockerEnvironment,
-		GroupID:             portainer.EndpointGroupID(1),
-		TLSConfig:           portainer.TLSConfiguration{
+		ID:        portainer.EndpointID(1),
+		Name:      "local",
+		URL:       "unix:///var/run/docker.sock",
+		PublicURL: "demo.portainer.io",
+		Type:      portainer.DockerEnvironment,
+		GroupID:   portainer.EndpointGroupID(1),
+		TLSConfig: portainer.TLSConfiguration{
 			TLS: false,
 		},
-		AuthorizedUsers:     []portainer.UserID{},
-		AuthorizedTeams:     []portainer.TeamID{},
-		UserAccessPolicies:  portainer.UserAccessPolicies{},
-		TeamAccessPolicies:  portainer.TeamAccessPolicies{},
-		Extensions:          []portainer.EndpointExtension{},
-		TagIDs:              []portainer.TagID{},
-		Status:              portainer.EndpointStatusUp,
-		Snapshots:           []portainer.DockerSnapshot{},
-		Kubernetes:          portainer.KubernetesDefault(),
+		AuthorizedUsers:    []portainer.UserID{},
+		AuthorizedTeams:    []portainer.TeamID{},
+		UserAccessPolicies: portainer.UserAccessPolicies{},
+		TeamAccessPolicies: portainer.TeamAccessPolicies{},
+		Extensions:         []portainer.EndpointExtension{},
+		TagIDs:             []portainer.TagID{},
+		Status:             portainer.EndpointStatusUp,
+		Snapshots:          []portainer.DockerSnapshot{},
+		Kubernetes:         portainer.KubernetesDefault(),
 	}
 
 	err = store.Endpoint().CreateEndpoint(localEndpoint)
@@ -137,8 +138,8 @@ func initSwarmStackManager(assetsPath string, dataStorePath string, signatureSer
 	return exec.NewSwarmStackManager(assetsPath, dataStorePath, signatureService, fileService, reverseTunnelService)
 }
 
-func initKubernetesDeployer(assetsPath string) portainer.KubernetesDeployer {
-	return exec.NewKubernetesDeployer(assetsPath)
+func initKubernetesDeployer(dataStore portainer.DataStore, reverseTunnelService portainer.ReverseTunnelService, signatureService portainer.DigitalSignatureService, assetsPath string) portainer.KubernetesDeployer {
+	return exec.NewKubernetesDeployer(dataStore, reverseTunnelService, signatureService, assetsPath)
 }
 
 func initJWTService(dataStore portainer.DataStore) (portainer.JWTService, error) {
@@ -214,6 +215,7 @@ func updateSettingsFromFlags(dataStore portainer.DataStore, flags *portainer.CLI
 	settings.SnapshotInterval = *flags.SnapshotInterval
 	settings.EnableEdgeComputeFeatures = *flags.EnableEdgeComputeFeatures
 	settings.EnableTelemetry = false
+	settings.OAuthSettings.SSO = true
 
 	if *flags.Templates != "" {
 		settings.TemplatesURL = *flags.Templates
@@ -289,6 +291,7 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, dataStore portainer.Dat
 			AllowVolumeBrowserForRegularUsers: false,
 			EnableHostManagementFeatures:      false,
 
+			AllowSysctlSettingForRegularUsers:         true,
 			AllowBindMountsForRegularUsers:            true,
 			AllowPrivilegedModeForRegularUsers:        true,
 			AllowHostNamespaceForRegularUsers:         true,
@@ -350,6 +353,7 @@ func createUnsecuredEndpoint(endpointURL string, dataStore portainer.DataStore, 
 			AllowVolumeBrowserForRegularUsers: false,
 			EnableHostManagementFeatures:      false,
 
+			AllowSysctlSettingForRegularUsers:         true,
 			AllowBindMountsForRegularUsers:            true,
 			AllowPrivilegedModeForRegularUsers:        true,
 			AllowHostNamespaceForRegularUsers:         true,
@@ -440,6 +444,9 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	}
 	snapshotService.Start()
 
+	authorizationService := authorization.NewService(dataStore)
+	authorizationService.K8sClientFactory = kubernetesClientFactory
+
 	swarmStackManager, err := initSwarmStackManager(*flags.Assets, *flags.Data, digitalSignatureService, fileService, reverseTunnelService)
 	if err != nil {
 		log.Fatalf("failed initializing swarm stack manager: %v", err)
@@ -449,7 +456,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	composeStackManager := initComposeStackManager(*flags.Assets, *flags.Data, reverseTunnelService, proxyManager)
 
-	kubernetesDeployer := initKubernetesDeployer(*flags.Assets)
+	kubernetesDeployer := initKubernetesDeployer(dataStore, reverseTunnelService, digitalSignatureService, *flags.Assets)
 
 	if dataStore.IsNew() {
 		err = updateSettingsFromFlags(dataStore, flags)
@@ -512,6 +519,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	}
 
 	return &http.Server{
+		AuthorizationService:        authorizationService,
 		ReverseTunnelService:        reverseTunnelService,
 		Status:                      applicationStatus,
 		BindAddress:                 *flags.Addr,
