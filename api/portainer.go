@@ -398,6 +398,13 @@ type (
 	// JobType represents a job type
 	JobType int
 
+	K8sNodeLimits struct {
+		CPU    int64 `json:"CPU"`
+		Memory int64 `json:"Memory"`
+	}
+
+	K8sNodesLimits map[string]*K8sNodeLimits
+
 	K8sNamespaceAccessPolicy struct {
 		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
 		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
@@ -1220,6 +1227,7 @@ type (
 		CreateUserShellPod(ctx context.Context, serviceAccountName string) (*KubernetesShellPod, error)
 		StartExecProcess(token string, useAdminToken bool, namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error
 		NamespaceAccessPoliciesDeleteNamespace(namespace string) error
+		GetNodesLimits() (K8sNodesLimits, error)
 		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
 		UpdateNamespaceAccessPolicies(accessPolicies map[string]K8sNamespaceAccessPolicy) error
 		DeleteRegistrySecret(registry *Registry, namespace string) error

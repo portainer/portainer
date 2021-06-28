@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	kube "github.com/portainer/portainer/api/http/handler/kubernetes"
 	"log"
 	"net/http"
 	"path/filepath"
