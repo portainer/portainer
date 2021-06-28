@@ -45,5 +45,29 @@ func (handler *Handler) teamDelete(w http.ResponseWriter, r *http.Request) *http
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to delete associated team memberships from the database", err}
 	}
 
+	// update default team if deleted team was default
+	err = handler.updateDefaultTeamIfDeleted(portainer.TeamID(teamID))
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to reset default team", err}
+	}
+
 	return response.Empty(w)
+}
+
+// updateDefaultTeamIfDeleted resets the default team to nil if default team was the deleted team
+func (handler *Handler) updateDefaultTeamIfDeleted(teamID portainer.TeamID) error {
+	settings, err := handler.DataStore.Settings().Settings()
+	if err != nil {
+		return err
+	}
+
+	if teamID == settings.OAuthSettings.DefaultTeamID {
+		settings.OAuthSettings.DefaultTeamID = 0
+		err = handler.DataStore.Settings().UpdateSettings(settings)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
