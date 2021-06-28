@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { RegistryTypes } from '@/portainer/models/registryTypes';
+import { RegistryTypes } from './registryTypes';
 
 export function RegistryViewModel(data) {
   this.Id = data.Id;
