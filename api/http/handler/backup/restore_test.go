@@ -51,7 +51,7 @@ func Test_restoreArchive_usingCombinationOfPasswords(t *testing.T) {
 			datastore := i.NewDatastore(i.WithUsers([]portainer.User{}), i.WithEdgeJobs([]portainer.EdgeJob{}))
 			adminMonitor := adminmonitor.New(time.Hour, datastore, context.Background())
 
-			h := NewHandler(nil, datastore, offlinegate.NewOfflineGate(), "./test_assets/handler_test", func() {}, adminMonitor)
+			h := NewHandler(nil, datastore, offlinegate.NewOfflineGate(), "./test_assets/handler_test", func() {}, adminMonitor, false)
 
 			//backup
 			archive := backup(t, h, test.backupPassword)
@@ -74,7 +74,7 @@ func Test_restoreArchive_shouldFailIfSystemWasAlreadyInitialized(t *testing.T) {
 	datastore := i.NewDatastore(i.WithUsers([]portainer.User{admin}), i.WithEdgeJobs([]portainer.EdgeJob{}))
 	adminMonitor := adminmonitor.New(time.Hour, datastore, context.Background())
 
-	h := NewHandler(nil, datastore, offlinegate.NewOfflineGate(), "./test_assets/handler_test", func() {}, adminMonitor)
+	h := NewHandler(nil, datastore, offlinegate.NewOfflineGate(), "./test_assets/handler_test", func() {}, adminMonitor, false)
 
 	//backup
 	archive := backup(t, h, "password")

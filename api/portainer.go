@@ -46,6 +46,7 @@ type (
 		AdminPasswordFile         *string
 		Assets                    *string
 		Data                      *string
+		DemoEnvironment           *bool
 		EnableEdgeComputeFeatures *bool
 		EndpointURL               *string
 		Labels                    *[]Pair
