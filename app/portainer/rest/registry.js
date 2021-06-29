@@ -1,10 +1,12 @@
+import angular from 'angular';
+
+import { API_ENDPOINT_REGISTRIES } from '@/constants';
+
 angular.module('portainer.app').factory('Registries', [
   '$resource',
-  'API_ENDPOINT_REGISTRIES',
-  function RegistriesFactory($resource, API_ENDPOINT_REGISTRIES) {
-    'use strict';
+  function RegistriesFactory($resource) {
     return $resource(
-      API_ENDPOINT_REGISTRIES + '/:id/:action',
+      `${API_ENDPOINT_REGISTRIES}/:id/:action`,
       {},
       {
         create: { method: 'POST', ignoreLoadingBar: true },

@@ -1,9 +1,12 @@
+import angular from 'angular';
+
+import { API_ENDPOINT_REGISTRIES } from '@/constants';
+
 import gitlabResponseGetLink from './transform/gitlabResponseGetLink';
 
 angular.module('portainer.app').factory('Gitlab', [
   '$resource',
-  'API_ENDPOINT_REGISTRIES',
-  function GitlabFactory($resource, API_ENDPOINT_REGISTRIES) {
+  function GitlabFactory($resource) {
     'use strict';
     return function (env) {
       const headers = {};
@@ -12,7 +15,7 @@ angular.module('portainer.app').factory('Gitlab', [
         headers['X-Gitlab-Domain'] = env.url;
       }
 
-      const baseUrl = API_ENDPOINT_REGISTRIES + '/:id/proxies/gitlab/api/v4/projects';
+      const baseUrl = `${API_ENDPOINT_REGISTRIES}/:id/proxies/gitlab/api/v4/projects`;
 
       return $resource(
         baseUrl,

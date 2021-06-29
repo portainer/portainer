@@ -1,10 +1,12 @@
+import angular from 'angular';
+
+import { API_ENDPOINT_WEBHOOKS } from '@/constants';
+
 angular.module('portainer.app').factory('Webhooks', [
   '$resource',
-  'API_ENDPOINT_WEBHOOKS',
-  function WebhooksFactory($resource, API_ENDPOINT_WEBHOOKS) {
-    'use strict';
+  function WebhooksFactory($resource) {
     return $resource(
-      API_ENDPOINT_WEBHOOKS + '/:id',
+      `${API_ENDPOINT_WEBHOOKS}/:id`,
       {},
       {
         query: { method: 'GET', isArray: true },

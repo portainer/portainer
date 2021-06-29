@@ -1,5 +1,9 @@
+import angular from 'angular';
 import _ from 'lodash-es';
+
 import './datatable.css';
+
+import { PAGINATION_MAX_ITEMS } from '@/constants';
 import { ResourceControlOwnership as RCO } from 'Portainer/models/resourceControl/resourceControlOwnership';
 
 function isBetween(value, a, b) {
@@ -11,8 +15,8 @@ angular.module('portainer.app').controller('GenericDatatableController', [
   '$interval',
   'PaginationService',
   'DatatableService',
-  'PAGINATION_MAX_ITEMS',
-  function ($interval, PaginationService, DatatableService, PAGINATION_MAX_ITEMS) {
+
+  function ($interval, PaginationService, DatatableService) {
     this.RCO = RCO;
 
     this.state = {
