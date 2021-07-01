@@ -2,8 +2,8 @@ import _ from 'lodash-es';
 
 export class CreateEdgeStackViewController {
   /* @ngInject */
-  constructor($state, EdgeStackService, EdgeGroupService, EdgeTemplateService, Notifications, FormHelper, $async) {
-    Object.assign(this, { $state, EdgeStackService, EdgeGroupService, EdgeTemplateService, Notifications, FormHelper, $async });
+  constructor($state, $window, ModalService, EdgeStackService, EdgeGroupService, EdgeTemplateService, Notifications, FormHelper, $async) {
+    Object.assign(this, { $state, $window, ModalService, EdgeStackService, EdgeGroupService, EdgeTemplateService, Notifications, FormHelper, $async });
 
     this.formValues = {
       Name: '',
@@ -24,6 +24,7 @@ export class CreateEdgeStackViewController {
       formValidationError: '',
       actionInProgress: false,
       StackType: null,
+      isEditorDirty: false,
     };
 
     this.edgeGroups = null;
@@ -39,6 +40,13 @@ export class CreateEdgeStackViewController {
     this.onChangeTemplate = this.onChangeTemplate.bind(this);
     this.onChangeTemplateAsync = this.onChangeTemplateAsync.bind(this);
     this.onChangeMethod = this.onChangeMethod.bind(this);
+    this.onChangeFormValues = this.onChangeFormValues.bind(this);
+  }
+
+  async uiCanExit() {
+    if (this.state.Method === 'editor' && this.formValues.StackFileContent && this.state.isEditorDirty) {
+      return this.ModalService.confirmWebEditorDiscard();
+    }
   }
 
   async $onInit() {
@@ -55,6 +63,12 @@ export class CreateEdgeStackViewController {
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve Templates');
     }
+
+    this.$window.onbeforeunload = () => {
+      if (this.state.Method === 'editor' && this.formValues.StackFileContent && this.state.isEditorDirty) {
+        return '';
+      }
+    };
   }
 
   createStack() {
@@ -97,6 +111,7 @@ export class CreateEdgeStackViewController {
       await this.createStackByMethod(name, method);
 
       this.Notifications.success('Stack successfully deployed');
+      this.state.isEditorDirty = false;
       this.$state.go('edge.stacks');
     } catch (err) {
       this.Notifications.error('Deployment error', err, 'Unable to deploy stack');
@@ -147,7 +162,12 @@ export class CreateEdgeStackViewController {
     return this.EdgeStackService.createStackFromGitRepository(name, repositoryOptions, this.formValues.Groups);
   }
 
+  onChangeFormValues(values) {
+    this.formValues = values;
+  }
+
   editorUpdate(cm) {
     this.formValues.StackFileContent = cm.getValue();
+    this.state.isEditorDirty = true;
   }
 }

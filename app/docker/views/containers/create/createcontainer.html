@@ -31,10 +31,10 @@
           </div>
           <div ng-if="!formValues.RegistryModel.Registry && fromContainer">
             <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true"></i>
-            <span class="small text-danger" style="margin-left: 5px;"
-              >The Docker registry for the <code>{{ config.Image }}</code> image is not registered inside Portainer, you will not be able to create a container. Please register
-              that registry first.</span
-            >
+            <span class="small text-danger" style="margin-left: 5px;">
+              The Docker registry for the <code>{{ config.Image }}</code> image is not registered inside Portainer, you will not be able to create a container. Please register that
+              registry first.
+            </span>
           </div>
           <div ng-if="formValues.RegistryModel.Registry || !fromContainer">
             <!-- image-and-registry -->
@@ -45,23 +45,30 @@
               auto-complete="true"
               label-class="col-sm-1"
               input-class="col-sm-11"
+              endpoint="endpoint"
+              is-admin="isAdmin"
+              check-rate-limits="formValues.alwaysPull"
               on-image-change="onImageNameChange()"
-            ></por-image-registry>
-            <!-- !image-and-registry -->
-            <!-- always-pull -->
-            <div class="form-group">
-              <div class="col-sm-12">
-                <label for="ownership" class="control-label text-left">
-                  Always pull the image
-                  <portainer-tooltip
-                    position="bottom"
-                    message="When enabled, Portainer will automatically try to pull the specified image before creating the container."
-                  ></portainer-tooltip>
-                </label>
-                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.alwaysPull" /><i></i> </label>
+              set-validity="setPullImageValidity"
+            >
+              <!-- always-pull -->
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <label for="ownership" class="control-label text-left">
+                    Always pull the image
+                    <portainer-tooltip
+                      position="bottom"
+                      message="When enabled, Portainer will automatically try to pull the specified image before creating the container."
+                    ></portainer-tooltip>
+                  </label>
+                  <label class="switch" style="margin-left: 20px;">
+                    <input type="checkbox" ng-model="formValues.alwaysPull" ng-disabled="!state.pullImageValidity" /><i></i>
+                  </label>
+                </div>
               </div>
-            </div>
-            <!-- !always-pull -->
+              <!-- !always-pull -->
+            </por-image-registry>
+            <!-- !image-and-registry -->
           </div>
           <div class="col-sm-12 form-section-title">
             Network ports configuration
@@ -576,37 +583,13 @@
           <!-- !tab-labels -->
           <!-- tab-env -->
           <div class="tab-pane" id="env">
-            <form class="form-horizontal" style="margin-top: 15px;">
-              <!-- environment-variables -->
-              <div class="form-group">
-                <div class="col-sm-12" style="margin-top: 5px;">
-                  <label class="control-label text-left">Environment variables</label>
-                  <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addEnvironmentVariable()">
-                    <i class="fa fa-plus-circle" aria-hidden="true"></i> add environment variable
-                  </span>
-                </div>
-                <!-- environment-variable-input-list -->
-                <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-                  <div ng-repeat="variable in config.Env" style="margin-top: 2px;">
-                    <div class="input-group col-sm-5 input-group-sm">
-                      <span class="input-group-addon">name</span>
-                      <input type="text" class="form-control" ng-model="variable.name" placeholder="e.g. FOO" />
-                    </div>
-                    <div class="input-group col-sm-5 input-group-sm">
-                      <span class="input-group-addon">value</span>
-                      <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. bar" />
-                    </div>
-                    <button class="btn btn-sm btn-danger" type="button" ng-click="removeEnvironmentVariable($index)">
-                      <i class="fa fa-trash" aria-hidden="true"></i>
-                    </button>
-                  </div>
-                </div>
-                <!-- !environment-variable-input-list -->
-              </div>
-              <!-- !environment-variables -->
-            </form>
+            <environment-variables-panel
+              ng-model="formValues.Env"
+              explanation="These values will be applied to the container when deployed"
+              on-change="(handleEnvVarChange)"
+            ></environment-variables-panel>
           </div>
-          <!-- !tab-labels -->
+          <!-- !tab-env -->
           <!-- tab-restart-policy -->
           <div class="tab-pane" id="restart-policy">
             <form class="form-horizontal" style="margin-top: 15px;">
@@ -699,6 +682,33 @@
                 <!-- !devices-input-list -->
               </div>
               <!-- !devices-->
+              <!-- sysctls -->
+              <div ng-if="showSysctls" class="form-group">
+                <div class="col-sm-12" style="margin-top: 5px;">
+                  <label class="control-label text-left">Sysctls</label>
+                  <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addSysctl()">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i> add sysctl
+                  </span>
+                </div>
+                <!-- sysctls-input-list -->
+                <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                  <div ng-repeat="sysctl in formValues.Sysctls" style="margin-top: 2px;">
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">name</span>
+                      <input type="text" class="form-control" ng-model="sysctl.name" placeholder="e.g. FOO" />
+                    </div>
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">value</span>
+                      <input type="text" class="form-control" ng-model="sysctl.value" placeholder="e.g. bar" />
+                    </div>
+                    <button class="btn btn-sm btn-danger" type="button" ng-click="removeSysctl($index)">
+                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- !sysctls-input-list -->
+              </div>
+              <!-- !sysctls -->
               <div class="col-sm-12 form-section-title">
                 Resources
               </div>

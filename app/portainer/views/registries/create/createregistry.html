@@ -27,6 +27,16 @@
                 </label>
               </div>
               <div>
+                <input type="radio" id="registry_proget" ng-model="model.Type" ng-value="RegistryTypes.PROGET" />
+                <label for="registry_proget" ng-click="selectProGetRegistry()">
+                  <div class="boxselector_header">
+                    <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px;"></i>
+                    ProGet
+                  </div>
+                  <p>ProGet container registry</p>
+                </label>
+              </div>
+              <div>
                 <input type="radio" id="registry_azure" ng-model="model.Type" ng-value="RegistryTypes.AZURE" />
                 <label for="registry_azure" ng-click="selectAzureRegistry()">
                   <div class="boxselector_header">
@@ -82,6 +92,14 @@
             form-action-label="Add registry"
             action-in-progress="state.actionInProgress"
           ></registry-form-custom>
+
+          <registry-form-proget
+            ng-if="model.Type === RegistryTypes.PROGET"
+            model="model"
+            form-action="create"
+            form-action-label="Add registry"
+            action-in-progress="state.actionInProgress"
+          ></registry-form-proget>
 
           <registry-form-gitlab
             ng-if="model.Type === RegistryTypes.GITLAB"

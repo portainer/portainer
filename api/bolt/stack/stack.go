@@ -1,7 +1,7 @@
 package stack
 
 import (
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/internal"
 
@@ -15,18 +15,18 @@ const (
 
 // Service represents a service for managing endpoint data.
 type Service struct {
-	db *bolt.DB
+	connection *internal.DbConnection
 }
 
 // NewService creates a new instance of a service.
-func NewService(db *bolt.DB) (*Service, error) {
-	err := internal.CreateBucket(db, BucketName)
+func NewService(connection *internal.DbConnection) (*Service, error) {
+	err := internal.CreateBucket(connection, BucketName)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Service{
-		db: db,
+		connection: connection,
 	}, nil
 }
 
@@ -35,7 +35,7 @@ func (service *Service) Stack(ID portainer.StackID) (*portainer.Stack, error) {
 	var stack portainer.Stack
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.db, BucketName, identifier, &stack)
+	err := internal.GetObject(service.connection, BucketName, identifier, &stack)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (service *Service) Stack(ID portainer.StackID) (*portainer.Stack, error) {
 func (service *Service) StackByName(name string) (*portainer.Stack, error) {
 	var stack *portainer.Stack
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 		cursor := bucket.Cursor()
 
@@ -78,7 +78,7 @@ func (service *Service) StackByName(name string) (*portainer.Stack, error) {
 func (service *Service) Stacks() ([]portainer.Stack, error) {
 	var stacks = make([]portainer.Stack, 0)
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		cursor := bucket.Cursor()
@@ -99,12 +99,12 @@ func (service *Service) Stacks() ([]portainer.Stack, error) {
 
 // GetNextIdentifier returns the next identifier for a stack.
 func (service *Service) GetNextIdentifier() int {
-	return internal.GetNextIdentifier(service.db, BucketName)
+	return internal.GetNextIdentifier(service.connection, BucketName)
 }
 
 // CreateStack creates a new stack.
 func (service *Service) CreateStack(stack *portainer.Stack) error {
-	return service.db.Update(func(tx *bolt.Tx) error {
+	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		// We manually manage sequences for stacks
@@ -125,11 +125,11 @@ func (service *Service) CreateStack(stack *portainer.Stack) error {
 // UpdateStack updates a stack.
 func (service *Service) UpdateStack(ID portainer.StackID, stack *portainer.Stack) error {
 	identifier := internal.Itob(int(ID))
-	return internal.UpdateObject(service.db, BucketName, identifier, stack)
+	return internal.UpdateObject(service.connection, BucketName, identifier, stack)
 }
 
 // DeleteStack deletes a stack.
 func (service *Service) DeleteStack(ID portainer.StackID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.db, BucketName, identifier)
+	return internal.DeleteObject(service.connection, BucketName, identifier)
 }

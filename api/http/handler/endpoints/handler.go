@@ -5,6 +5,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
 
 	"net/http"
 
@@ -28,6 +29,7 @@ type Handler struct {
 	ReverseTunnelService portainer.ReverseTunnelService
 	SnapshotService      portainer.SnapshotService
 	ComposeStackManager  portainer.ComposeStackManager
+	AuthorizationService *authorization.Service
 }
 
 // NewHandler creates a handler to manage endpoint operations.
@@ -51,6 +53,8 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointUpdate))).Methods(http.MethodPut)
 	h.Handle("/endpoints/{id}",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointDelete))).Methods(http.MethodDelete)
+	h.Handle("/endpoints/{id}/dockerhub",
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointDockerhubStatus))).Methods(http.MethodGet)
 	h.Handle("/endpoints/{id}/extensions",
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointExtensionAdd))).Methods(http.MethodPost)
 	h.Handle("/endpoints/{id}/extensions/{extensionType}",

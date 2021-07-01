@@ -147,6 +147,10 @@ angular
         payload.URL = 'tcp://' + endpoint.URL;
       }
 
+      if (endpoint.Type === PortainerEndpointTypes.AgentOnKubernetesEnvironment || endpoint.Type === PortainerEndpointTypes.KubernetesLocalEnvironment) {
+        payload.URL = endpoint.URL;
+      }
+
       $scope.state.actionInProgress = true;
       EndpointService.updateEndpoint(endpoint.Id, payload).then(
         function success() {

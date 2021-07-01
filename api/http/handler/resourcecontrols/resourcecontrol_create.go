@@ -78,6 +78,8 @@ func (handler *Handler) resourceControlCreate(w http.ResponseWriter, r *http.Req
 	switch payload.Type {
 	case "container":
 		resourceControlType = portainer.ContainerResourceControl
+	case "container-group":
+		resourceControlType = portainer.ContainerGroupResourceControl
 	case "service":
 		resourceControlType = portainer.ServiceResourceControl
 	case "volume":

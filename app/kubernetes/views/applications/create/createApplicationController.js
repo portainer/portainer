@@ -40,6 +40,7 @@ class KubernetesCreateApplicationController {
     Notifications,
     EndpointProvider,
     Authentication,
+    DockerHubService,
     ModalService,
     KubernetesResourcePoolService,
     KubernetesApplicationService,
@@ -56,6 +57,7 @@ class KubernetesCreateApplicationController {
     this.Notifications = Notifications;
     this.EndpointProvider = EndpointProvider;
     this.Authentication = Authentication;
+    this.DockerHubService = DockerHubService;
     this.ModalService = ModalService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesApplicationService = KubernetesApplicationService;
@@ -77,8 +79,13 @@ class KubernetesCreateApplicationController {
 
     this.updateApplicationAsync = this.updateApplicationAsync.bind(this);
     this.deployApplicationAsync = this.deployApplicationAsync.bind(this);
+    this.setPullImageValidity = this.setPullImageValidity.bind(this);
   }
   /* #endregion */
+
+  setPullImageValidity(validity) {
+    this.state.pullImageValidity = validity;
+  }
 
   onChangeName() {
     const existingApplication = _.find(this.applications, { Name: this.formValues.Name });
@@ -313,7 +320,7 @@ class KubernetesCreateApplicationController {
     const p = new KubernetesApplicationPublishedPortFormValue();
     const ingresses = this.filteredIngresses;
     p.IngressName = ingresses && ingresses.length ? ingresses[0].Name : undefined;
-    p.IngressHost = ingresses && ingresses.length ? ingresses[0].Host : undefined;
+    p.IngressHost = ingresses && ingresses.length ? ingresses[0].Hosts[0] : undefined;
     if (this.formValues.PublishedPorts.length) {
       p.Protocol = this.formValues.PublishedPorts[0].Protocol;
     }
@@ -324,7 +331,7 @@ class KubernetesCreateApplicationController {
     const ingresses = this.filteredIngresses;
     _.forEach(this.formValues.PublishedPorts, (p) => {
       p.IngressName = ingresses && ingresses.length ? ingresses[0].Name : undefined;
-      p.IngressHost = ingresses && ingresses.length ? ingresses[0].Host : undefined;
+      p.IngressHost = ingresses && ingresses.length ? ingresses[0].Hosts[0] : undefined;
     });
   }
 
@@ -381,7 +388,8 @@ class KubernetesCreateApplicationController {
   onChangePortMappingIngress(index) {
     const publishedPort = this.formValues.PublishedPorts[index];
     const ingress = _.find(this.filteredIngresses, { Name: publishedPort.IngressName });
-    publishedPort.IngressHost = ingress.Host;
+    this.ingressHostnames = ingress.Hosts;
+    publishedPort.IngressHost = this.ingressHostnames.length ? this.ingressHostnames[0] : [];
     this.onChangePublishedPorts();
   }
 
@@ -472,7 +480,7 @@ class KubernetesCreateApplicationController {
     const hasRWOOnly = KubernetesApplicationHelper.hasRWOOnly(this.formValues);
     const isIsolated = this.formValues.DataAccessPolicy === this.ApplicationDataAccessPolicies.ISOLATED;
 
-    if ((hasFolders && hasRWOOnly) || isIsolated) {
+    if (hasFolders && (hasRWOOnly || isIsolated)) {
       return false;
     }
     return true;
@@ -773,6 +781,7 @@ class KubernetesCreateApplicationController {
 
   refreshIngresses(namespace) {
     this.filteredIngresses = _.filter(this.ingresses, { Namespace: namespace });
+    this.ingressHostnames = this.filteredIngresses.length ? this.filteredIngresses[0].Hosts : [];
     if (!this.publishViaIngressEnabled()) {
       if (this.savedFormValues) {
         this.formValues.PublishingType = this.savedFormValues.PublishingType;
@@ -915,6 +924,7 @@ class KubernetesCreateApplicationController {
             name: this.$transition$.params().name,
           },
           persistedFoldersUseExistingVolumes: false,
+          pullImageValidity: false,
         };
 
         this.isAdmin = this.Authentication.isAdmin();
@@ -984,6 +994,9 @@ class KubernetesCreateApplicationController {
         }
 
         this.updateSliders();
+
+        const dockerHub = await this.DockerHubService.dockerhub();
+        this.state.isDockerAuthenticated = dockerHub.Authentication;
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to load view data');
       } finally {

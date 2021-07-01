@@ -1,10 +1,10 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 	"strings"
-	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt"
@@ -20,6 +20,8 @@ import (
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/http/proxy"
 	kubeproxy "github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
+	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/snapshot"
 	"github.com/portainer/portainer/api/jwt"
 	"github.com/portainer/portainer/api/kubernetes"
@@ -33,12 +35,12 @@ func initCLI() *portainer.CLIFlags {
 	var cliService portainer.CLIService = &cli.Service{}
 	flags, err := cliService.ParseFlags(portainer.APIVersion)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed parsing flags: %v", err)
 	}
 
 	err = cliService.ValidateFlags(flags)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed validating flags:%v", err)
 	}
 	return flags
 }
@@ -46,7 +48,7 @@ func initCLI() *portainer.CLIFlags {
 func initFileService(dataStorePath string) portainer.FileService {
 	fileService, err := filesystem.NewService(dataStorePath, "")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed creating file service: %v", err)
 	}
 	return fileService
 }
@@ -54,28 +56,28 @@ func initFileService(dataStorePath string) portainer.FileService {
 func initDataStore(dataStorePath string, fileService portainer.FileService) portainer.DataStore {
 	store, err := bolt.NewStore(dataStorePath, fileService)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed creating data store: %v", err)
 	}
 
 	err = store.Open()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed opening store: %v", err)
 	}
 
 	err = store.Init()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed initializing data store: %v", err)
 	}
 
-	err = store.MigrateData()
+	err = store.MigrateData(false)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed migration: %v", err)
 	}
 	return store
 }
 
 func initComposeStackManager(assetsPath string, dataStorePath string, reverseTunnelService portainer.ReverseTunnelService, proxyManager *proxy.Manager) portainer.ComposeStackManager {
-	composeWrapper := exec.NewComposeWrapper(assetsPath, proxyManager)
+	composeWrapper := exec.NewComposeWrapper(assetsPath, dataStorePath, proxyManager)
 	if composeWrapper != nil {
 		return composeWrapper
 	}
@@ -87,8 +89,8 @@ func initSwarmStackManager(assetsPath string, dataStorePath string, signatureSer
 	return exec.NewSwarmStackManager(assetsPath, dataStorePath, signatureService, fileService, reverseTunnelService)
 }
 
-func initKubernetesDeployer(assetsPath string) portainer.KubernetesDeployer {
-	return exec.NewKubernetesDeployer(assetsPath)
+func initKubernetesDeployer(dataStore portainer.DataStore, reverseTunnelService portainer.ReverseTunnelService, signatureService portainer.DigitalSignatureService, assetsPath string) portainer.KubernetesDeployer {
+	return exec.NewKubernetesDeployer(dataStore, reverseTunnelService, signatureService, assetsPath)
 }
 
 func initJWTService(dataStore portainer.DataStore) (portainer.JWTService, error) {
@@ -136,31 +138,16 @@ func initKubernetesClientFactory(signatureService portainer.DigitalSignatureServ
 	return kubecli.NewClientFactory(signatureService, reverseTunnelService, instanceID)
 }
 
-func initSnapshotService(snapshotInterval string, dataStore portainer.DataStore, dockerClientFactory *docker.ClientFactory, kubernetesClientFactory *kubecli.ClientFactory) (portainer.SnapshotService, error) {
+func initSnapshotService(snapshotInterval string, dataStore portainer.DataStore, dockerClientFactory *docker.ClientFactory, kubernetesClientFactory *kubecli.ClientFactory, shutdownCtx context.Context) (portainer.SnapshotService, error) {
 	dockerSnapshotter := docker.NewSnapshotter(dockerClientFactory)
 	kubernetesSnapshotter := kubernetes.NewSnapshotter(kubernetesClientFactory)
 
-	snapshotService, err := snapshot.NewService(snapshotInterval, dataStore, dockerSnapshotter, kubernetesSnapshotter)
+	snapshotService, err := snapshot.NewService(snapshotInterval, dataStore, dockerSnapshotter, kubernetesSnapshotter, shutdownCtx)
 	if err != nil {
 		return nil, err
 	}
 
 	return snapshotService, nil
-}
-
-func loadEdgeJobsFromDatabase(dataStore portainer.DataStore, reverseTunnelService portainer.ReverseTunnelService) error {
-	edgeJobs, err := dataStore.EdgeJob().EdgeJobs()
-	if err != nil {
-		return err
-	}
-
-	for _, edgeJob := range edgeJobs {
-		for endpointID := range edgeJob.Endpoints {
-			reverseTunnelService.AddEdgeJob(endpointID, &edgeJob)
-		}
-	}
-
-	return nil
 }
 
 func initStatus(flags *portainer.CLIFlags) *portainer.Status {
@@ -179,6 +166,7 @@ func updateSettingsFromFlags(dataStore portainer.DataStore, flags *portainer.CLI
 	settings.SnapshotInterval = *flags.SnapshotInterval
 	settings.EnableEdgeComputeFeatures = *flags.EnableEdgeComputeFeatures
 	settings.EnableTelemetry = true
+	settings.OAuthSettings.SSO = true
 
 	if *flags.Templates != "" {
 		settings.TemplatesURL = *flags.Templates
@@ -211,7 +199,7 @@ func generateAndStoreKeyPair(fileService portainer.FileService, signatureService
 func initKeyPair(fileService portainer.FileService, signatureService portainer.DigitalSignatureService) error {
 	existingKeyPair, err := fileService.KeyPairFilesExist()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed checking for existing key pair: %v", err)
 	}
 
 	if existingKeyPair {
@@ -254,6 +242,7 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, dataStore portainer.Dat
 			AllowVolumeBrowserForRegularUsers: false,
 			EnableHostManagementFeatures:      false,
 
+			AllowSysctlSettingForRegularUsers:         true,
 			AllowBindMountsForRegularUsers:            true,
 			AllowPrivilegedModeForRegularUsers:        true,
 			AllowHostNamespaceForRegularUsers:         true,
@@ -315,6 +304,7 @@ func createUnsecuredEndpoint(endpointURL string, dataStore portainer.DataStore, 
 			AllowVolumeBrowserForRegularUsers: false,
 			EnableHostManagementFeatures:      false,
 
+			AllowSysctlSettingForRegularUsers:         true,
 			AllowBindMountsForRegularUsers:            true,
 			AllowPrivilegedModeForRegularUsers:        true,
 			AllowHostNamespaceForRegularUsers:         true,
@@ -353,28 +343,12 @@ func initEndpoint(flags *portainer.CLIFlags, dataStore portainer.DataStore, snap
 	return createUnsecuredEndpoint(*flags.EndpointURL, dataStore, snapshotService)
 }
 
-func terminateIfNoAdminCreated(dataStore portainer.DataStore) {
-	timer1 := time.NewTimer(5 * time.Minute)
-	<-timer1.C
-
-	users, err := dataStore.User().UsersByRole(portainer.AdministratorRole)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if len(users) == 0 {
-		log.Fatal("No administrator account was created after 5 min. Shutting down the Portainer instance for security reasons.")
-		return
-	}
-}
-
-func main() {
-	flags := initCLI()
+func buildServer(flags *portainer.CLIFlags) portainer.Server {
+	shutdownCtx, shutdownTrigger := context.WithCancel(context.Background())
 
 	fileService := initFileService(*flags.Data)
 
 	dataStore := initDataStore(*flags.Data, fileService)
-	defer dataStore.Close()
 
 	if err := dataStore.CheckCurrentEdition(); err != nil {
 		log.Fatal(err)
@@ -382,7 +356,7 @@ func main() {
 
 	jwtService, err := initJWTService(dataStore)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed initializing JWT service: %v", err)
 	}
 
 	ldapService := initLDAPService()
@@ -397,64 +371,67 @@ func main() {
 
 	err = initKeyPair(fileService, digitalSignatureService)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed initializing key pai: %v", err)
 	}
 
-	reverseTunnelService := chisel.NewService(dataStore)
+	reverseTunnelService := chisel.NewService(dataStore, shutdownCtx)
 
 	instanceID, err := dataStore.Version().InstanceID()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed getting instance id: %v", err)
 	}
 
 	dockerClientFactory := initDockerClientFactory(digitalSignatureService, reverseTunnelService)
 	kubernetesClientFactory := initKubernetesClientFactory(digitalSignatureService, reverseTunnelService, instanceID)
 
-	snapshotService, err := initSnapshotService(*flags.SnapshotInterval, dataStore, dockerClientFactory, kubernetesClientFactory)
+	snapshotService, err := initSnapshotService(*flags.SnapshotInterval, dataStore, dockerClientFactory, kubernetesClientFactory, shutdownCtx)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed initializing snapshot service: %v", err)
 	}
 	snapshotService.Start()
 
+	authorizationService := authorization.NewService(dataStore)
+	authorizationService.K8sClientFactory = kubernetesClientFactory
+
 	swarmStackManager, err := initSwarmStackManager(*flags.Assets, *flags.Data, digitalSignatureService, fileService, reverseTunnelService)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed initializing swarm stack manager: %v", err)
 	}
 	kubernetesTokenCacheManager := kubeproxy.NewTokenCacheManager()
 	proxyManager := proxy.NewManager(dataStore, digitalSignatureService, reverseTunnelService, dockerClientFactory, kubernetesClientFactory, kubernetesTokenCacheManager)
 
 	composeStackManager := initComposeStackManager(*flags.Assets, *flags.Data, reverseTunnelService, proxyManager)
 
-	kubernetesDeployer := initKubernetesDeployer(*flags.Assets)
+	kubernetesDeployer := initKubernetesDeployer(dataStore, reverseTunnelService, digitalSignatureService, *flags.Assets)
 
 	if dataStore.IsNew() {
 		err = updateSettingsFromFlags(dataStore, flags)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("failed updating settings from flags: %v", err)
 		}
 	}
 
-	err = loadEdgeJobsFromDatabase(dataStore, reverseTunnelService)
+	err = edge.LoadEdgeJobs(dataStore, reverseTunnelService)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed loading edge jobs from database: %v", err)
 	}
 
 	applicationStatus := initStatus(flags)
 
 	err = initEndpoint(flags, dataStore, snapshotService)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed initializing endpoint: %v", err)
 	}
 
 	adminPasswordHash := ""
 	if *flags.AdminPasswordFile != "" {
 		content, err := fileService.GetFileContent(*flags.AdminPasswordFile)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("failed getting admin password file: %v", err)
 		}
 		adminPasswordHash, err = cryptoService.Hash(strings.TrimSuffix(string(content), "\n"))
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("failed hashing admin password: %v", err)
 		}
 	} else if *flags.AdminPassword != "" {
 		adminPasswordHash = *flags.AdminPassword
@@ -463,7 +440,7 @@ func main() {
 	if adminPasswordHash != "" {
 		users, err := dataStore.User().UsersByRole(portainer.AdministratorRole)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("failed getting admin user: %v", err)
 		}
 
 		if len(users) == 0 {
@@ -475,21 +452,20 @@ func main() {
 			}
 			err := dataStore.User().CreateUser(user)
 			if err != nil {
-				log.Fatal(err)
+				log.Fatalf("failed creating admin user: %v", err)
 			}
 		} else {
 			log.Println("Instance already has an administrator user defined. Skipping admin password related flags.")
 		}
 	}
 
-	go terminateIfNoAdminCreated(dataStore)
-
 	err = reverseTunnelService.StartTunnelServer(*flags.TunnelAddr, *flags.TunnelPort, snapshotService)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed starting license service: %s", err)
 	}
 
-	var server portainer.Server = &http.Server{
+	return &http.Server{
+		AuthorizationService:        authorizationService,
 		ReverseTunnelService:        reverseTunnelService,
 		Status:                      applicationStatus,
 		BindAddress:                 *flags.Addr,
@@ -513,11 +489,18 @@ func main() {
 		SSLKey:                      *flags.SSLKey,
 		DockerClientFactory:         dockerClientFactory,
 		KubernetesClientFactory:     kubernetesClientFactory,
+		ShutdownCtx:                 shutdownCtx,
+		ShutdownTrigger:             shutdownTrigger,
 	}
+}
 
-	log.Printf("Starting Portainer %s on %s", portainer.APIVersion, *flags.Addr)
-	err = server.Start()
-	if err != nil {
-		log.Fatal(err)
+func main() {
+	flags := initCLI()
+
+	for {
+		server := buildServer(flags)
+		log.Printf("Starting Portainer %s on %s\n", portainer.APIVersion, *flags.Addr)
+		err := server.Start()
+		log.Printf("Http server exited: %s\n", err)
 	}
 }

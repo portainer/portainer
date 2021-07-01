@@ -28,7 +28,7 @@
                 name="mountType"
                 class="form-control"
                 ng-model="mount.Type"
-                ng-change="updateMount(service, mount)"
+                ng-change="onChangeMountType(service, mount)"
                 ng-disabled="isUpdating"
                 disable-authorization="DockerServiceUpdate"
               >

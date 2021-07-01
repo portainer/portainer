@@ -3,6 +3,8 @@ package portainer
 import (
 	"io"
 	"time"
+
+	gittypes "github.com/portainer/portainer/api/git/types"
 )
 
 type (
@@ -119,6 +121,7 @@ type (
 		ImageCount              int               `json:"ImageCount"`
 		ServiceCount            int               `json:"ServiceCount"`
 		StackCount              int               `json:"StackCount"`
+		NodeCount               int               `json:"NodeCount"`
 		SnapshotRaw             DockerSnapshotRaw `json:"DockerSnapshotRaw"`
 	}
 
@@ -321,21 +324,23 @@ type (
 	// EndpointSecuritySettings represents settings for an endpoint
 	EndpointSecuritySettings struct {
 		// Whether non-administrator should be able to use bind mounts when creating containers
-		AllowBindMountsForRegularUsers bool `json:"AllowBindMountsForRegularUsers" example:"false"`
+		AllowBindMountsForRegularUsers bool `json:"allowBindMountsForRegularUsers" example:"false"`
 		// Whether non-administrator should be able to use privileged mode when creating containers
-		AllowPrivilegedModeForRegularUsers bool `json:"AllowPrivilegedModeForRegularUsers" example:"false"`
+		AllowPrivilegedModeForRegularUsers bool `json:"allowPrivilegedModeForRegularUsers" example:"false"`
 		// Whether non-administrator should be able to browse volumes
-		AllowVolumeBrowserForRegularUsers bool `json:"AllowVolumeBrowserForRegularUsers" example:""`
+		AllowVolumeBrowserForRegularUsers bool `json:"allowVolumeBrowserForRegularUsers" example:"true"`
 		// Whether non-administrator should be able to use the host pid
-		AllowHostNamespaceForRegularUsers bool `json:"AllowHostNamespaceForRegularUsers" example:""`
+		AllowHostNamespaceForRegularUsers bool `json:"allowHostNamespaceForRegularUsers" example:"true"`
 		// Whether non-administrator should be able to use device mapping
-		AllowDeviceMappingForRegularUsers bool `json:"AllowDeviceMappingForRegularUsers" example:""`
+		AllowDeviceMappingForRegularUsers bool `json:"allowDeviceMappingForRegularUsers" example:"true"`
 		// Whether non-administrator should be able to manage stacks
-		AllowStackManagementForRegularUsers bool `json:"AllowStackManagementForRegularUsers" example:""`
+		AllowStackManagementForRegularUsers bool `json:"allowStackManagementForRegularUsers" example:"true"`
 		// Whether non-administrator should be able to use container capabilities
-		AllowContainerCapabilitiesForRegularUsers bool `json:"AllowContainerCapabilitiesForRegularUsers" example:""`
+		AllowContainerCapabilitiesForRegularUsers bool `json:"allowContainerCapabilitiesForRegularUsers" example:"true"`
+		// Whether non-administrator should be able to use sysctl settings
+		AllowSysctlSettingForRegularUsers bool `json:"allowSysctlSettingForRegularUsers" example:"true"`
 		// Whether host management features are enabled
-		EnableHostManagementFeatures bool `json:"EnableHostManagementFeatures" example:""`
+		EnableHostManagementFeatures bool `json:"enableHostManagementFeatures" example:"true"`
 	}
 
 	// EndpointType represents the type of an endpoint
@@ -378,8 +383,19 @@ type (
 		ProjectPath string `json:"ProjectPath"`
 	}
 
+	// QuayRegistryData represents data required for Quay registry to work
+	QuayRegistryData struct {
+		UseOrganisation  bool   `json:"UseOrganisation"`
+		OrganisationName string `json:"OrganisationName"`
+	}
+
 	// JobType represents a job type
 	JobType int
+
+	K8sNamespaceAccessPolicy struct {
+		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
+		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
+	}
 
 	// KubernetesData contains all the Kubernetes related endpoint information
 	KubernetesData struct {
@@ -480,6 +496,8 @@ type (
 		Scopes               string `json:"Scopes"`
 		OAuthAutoCreateUsers bool   `json:"OAuthAutoCreateUsers"`
 		DefaultTeamID        TeamID `json:"DefaultTeamID"`
+		SSO                  bool   `json:"SSO"`
+		LogoutURI            string `json:"LogoutURI"`
 	}
 
 	// Pair defines a key/value string pair
@@ -493,12 +511,14 @@ type (
 	Registry struct {
 		// Registry Identifier
 		ID RegistryID `json:"Id" example:"1"`
-		// Registry Type (1 - Quay, 2 - Azure, 3 - Custom, 4 - Gitlab)
-		Type RegistryType `json:"Type" enums:"1,2,3,4"`
+		// Registry Type (1 - Quay, 2 - Azure, 3 - Custom, 4 - Gitlab, 5 - ProGet)
+		Type RegistryType `json:"Type" enums:"1,2,3,4,5"`
 		// Registry Name
 		Name string `json:"Name" example:"my-registry"`
 		// URL or IP address of the Docker registry
 		URL string `json:"URL" example:"registry.mydomain.tld:2375"`
+		// Base URL, introduced for ProGet registry
+		BaseURL string `json:"BaseURL" example:"registry.mydomain.tld:2375"`
 		// Is authentication against this registry enabled
 		Authentication bool `json:"Authentication" example:"true"`
 		// Username used to authenticate against this registry
@@ -507,6 +527,7 @@ type (
 		Password                string                           `json:"Password,omitempty" example:"registry_password"`
 		ManagementConfiguration *RegistryManagementConfiguration `json:"ManagementConfiguration"`
 		Gitlab                  GitlabRegistryData               `json:"Gitlab"`
+		Quay                    QuayRegistryData                 `json:"Quay"`
 		UserAccessPolicies      UserAccessPolicies               `json:"UserAccessPolicies"`
 		TeamAccessPolicies      TeamAccessPolicies               `json:"TeamAccessPolicies"`
 
@@ -687,6 +708,8 @@ type (
 		UpdateDate int64 `example:"1587399600"`
 		// The username which last updated this stack
 		UpdatedBy string `example:"bob"`
+		// The git config of this stack
+		GitConfig *gittypes.RepoConfig
 	}
 
 	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier)
@@ -965,6 +988,7 @@ type (
 	// ComposeStackManager represents a service to manage Compose stacks
 	ComposeStackManager interface {
 		ComposeSyntaxMaxVersion() string
+		NormalizeStackName(name string) string
 		Up(stack *Stack, endpoint *Endpoint) error
 		Down(stack *Stack, endpoint *Endpoint) error
 	}
@@ -991,8 +1015,9 @@ type (
 		Init() error
 		Close() error
 		IsNew() bool
-		MigrateData() error
+		MigrateData(force bool) error
 		CheckCurrentEdition() error
+		BackupTo(w io.Writer) error
 
 		DockerHub() DockerHubService
 		CustomTemplate() CustomTemplateService
@@ -1121,17 +1146,18 @@ type (
 		StoreCustomTemplateFileFromBytes(identifier, fileName string, data []byte) (string, error)
 		GetCustomTemplateProjectPath(identifier string) string
 		GetTemporaryPath() (string, error)
+		GetDatastorePath() string
 	}
 
 	// GitService represents a service for managing Git
 	GitService interface {
-		ClonePublicRepository(repositoryURL, referenceName string, destination string) error
-		ClonePrivateRepositoryWithBasicAuth(repositoryURL, referenceName string, destination, username, password string) error
+		CloneRepository(destination string, repositoryURL, referenceName, username, password string) error
 	}
 
 	// JWTService represents a service for managing JWT tokens
 	JWTService interface {
 		GenerateToken(data *TokenData) (string, error)
+		GenerateTokenForOAuth(data *TokenData, expiryTime *time.Time) (string, error)
 		ParseAndVerifyToken(token string) (*TokenData, error)
 		SetUserSessionDuration(userSessionDuration time.Duration)
 	}
@@ -1141,11 +1167,14 @@ type (
 		SetupUserServiceAccount(userID int, teamIDs []int) error
 		GetServiceAccountBearerToken(userID int) (string, error)
 		StartExecProcess(namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error
+		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
+		UpdateNamespaceAccessPolicies(accessPolicies map[string]K8sNamespaceAccessPolicy) error
 	}
 
 	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes endpoint
 	KubernetesDeployer interface {
-		Deploy(endpoint *Endpoint, data string, composeFormat bool, namespace string) ([]byte, error)
+		Deploy(endpoint *Endpoint, data string, namespace string) (string, error)
+		ConvertCompose(data string) ([]byte, error)
 	}
 
 	// KubernetesSnapshotter represents a service used to create Kubernetes endpoint snapshots
@@ -1162,7 +1191,7 @@ type (
 
 	// OAuthService represents a service used to authenticate users using OAuth
 	OAuthService interface {
-		Authenticate(code string, configuration *OAuthSettings) (string, error)
+		Authenticate(code string, configuration *OAuthSettings) (string, *time.Time, error)
 	}
 
 	// RegistryService represents a service for managing registry data
@@ -1187,6 +1216,7 @@ type (
 	// ReverseTunnelService represents a service used to manage reverse tunnel connections.
 	ReverseTunnelService interface {
 		StartTunnelServer(addr, port string, snapshotService SnapshotService) error
+		StopTunnelServer() error
 		GenerateEdgeKey(url, host string, endpointIdentifier int) string
 		SetTunnelStatusToActive(endpointID EndpointID)
 		SetTunnelStatusToRequired(endpointID EndpointID) error
@@ -1229,6 +1259,7 @@ type (
 	// SnapshotService represents a service for managing endpoint snapshots
 	SnapshotService interface {
 		Start()
+		Stop()
 		SetSnapshotInterval(snapshotInterval string) error
 		SnapshotEndpoint(endpoint *Endpoint) error
 	}
@@ -1312,9 +1343,9 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "2.2.0"
+	APIVersion = "2.6.0"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 27
+	DBVersion = 30
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
 	ComposeSyntaxMaxVersion = "3.9"
 	// AssetsServerURL represents the URL of the Portainer asset server
@@ -1460,6 +1491,8 @@ const (
 	CustomRegistry
 	// GitlabRegistry represents a gitlab registry
 	GitlabRegistry
+	// ProGetRegistry represents a proget registry
+	ProGetRegistry
 )
 
 const (
@@ -1486,6 +1519,8 @@ const (
 	ConfigResourceControl
 	// CustomTemplateResourceControl represents a resource control associated to a custom template
 	CustomTemplateResourceControl
+	// ContainerGroupResourceControl represents a resource control associated to an Azure container group
+	ContainerGroupResourceControl
 )
 
 const (
@@ -1761,4 +1796,9 @@ const (
 	OperationPortainerUndefined   Authorization = "PortainerUndefined"
 
 	EndpointResourcesAccess Authorization = "EndpointResourcesAccess"
+)
+
+const (
+	AzurePathContainerGroups = "/subscriptions/*/providers/Microsoft.ContainerInstance/containerGroups"
+	AzurePathContainerGroup  = "/subscriptions/*/resourceGroups/*/providers/Microsoft.ContainerInstance/containerGroups/*"
 )

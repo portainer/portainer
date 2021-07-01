@@ -18,6 +18,9 @@ require('./includes/tasks.html');
 require('./includes/updateconfig.html');
 
 import _ from 'lodash-es';
+
+import * as envVarsUtils from '@/portainer/helpers/env-vars';
+
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
 angular.module('portainer.docker').controller('ServiceController', [
@@ -85,6 +88,8 @@ angular.module('portainer.docker').controller('ServiceController', [
     NetworkService,
     endpoint
   ) {
+    $scope.endpoint = endpoint;
+
     $scope.state = {
       updateInProgress: false,
       deletionInProgress: false,
@@ -112,21 +117,25 @@ angular.module('portainer.docker').controller('ServiceController', [
     };
 
     $scope.addEnvironmentVariable = function addEnvironmentVariable(service) {
-      service.EnvironmentVariables.push({ key: '', value: '', originalValue: '' });
+      service.EnvironmentVariables.push({ name: '', value: '' });
       updateServiceArray(service, 'EnvironmentVariables', service.EnvironmentVariables);
     };
-    $scope.removeEnvironmentVariable = function removeEnvironmentVariable(service, item) {
-      const index = service.EnvironmentVariables.indexOf(item);
-      const removedElement = service.EnvironmentVariables.splice(index, 1);
-      if (removedElement !== null) {
-        updateServiceArray(service, 'EnvironmentVariables', service.EnvironmentVariables);
-      }
-    };
-    $scope.updateEnvironmentVariable = function updateEnvironmentVariable(service, variable) {
-      if (variable.value !== variable.originalValue || variable.key !== variable.originalKey) {
-        updateServiceArray(service, 'EnvironmentVariables', service.EnvironmentVariables);
-      }
-    };
+
+    $scope.onChangeEnvVars = onChangeEnvVars;
+
+    function onChangeEnvVars(env) {
+      const service = $scope.service;
+
+      const orgEnv = service.EnvironmentVariables;
+      service.EnvironmentVariables = env.map((v) => {
+        const orgVar = orgEnv.find(({ name }) => v.name === name);
+        const added = orgVar && orgVar.added;
+        return { ...v, added };
+      });
+
+      updateServiceArray(service, 'EnvironmentVariables', service.EnvironmentVariables);
+    }
+
     $scope.addConfig = function addConfig(service, config) {
       if (
         config &&
@@ -209,6 +218,12 @@ angular.module('portainer.docker').controller('ServiceController', [
         updateServiceArray(service, 'ServiceMounts', service.ServiceMounts);
       }
     };
+
+    $scope.onChangeMountType = function onChangeMountType(service, mount) {
+      mount.Source = null;
+      $scope.updateMount(service, mount);
+    };
+
     $scope.updateMount = function updateMount(service) {
       updateServiceArray(service, 'ServiceMounts', service.ServiceMounts);
     };
@@ -387,7 +402,7 @@ angular.module('portainer.docker').controller('ServiceController', [
       var config = ServiceHelper.serviceToConfig(service.Model);
       config.Name = service.Name;
       config.Labels = LabelHelper.fromKeyValueToLabelHash(service.ServiceLabels);
-      config.TaskTemplate.ContainerSpec.Env = ServiceHelper.translateEnvironmentVariablesToEnv(service.EnvironmentVariables);
+      config.TaskTemplate.ContainerSpec.Env = envVarsUtils.convertToArrayOfStrings(service.EnvironmentVariables);
       config.TaskTemplate.ContainerSpec.Labels = LabelHelper.fromKeyValueToLabelHash(service.ServiceContainerLabels);
 
       if ($scope.hasChanges(service, ['Image'])) {
@@ -526,6 +541,11 @@ angular.module('portainer.docker').controller('ServiceController', [
       });
     };
 
+    $scope.setPullImageValidity = setPullImageValidity;
+    function setPullImageValidity(validity) {
+      $scope.state.pullImageValidity = validity;
+    }
+
     $scope.updateService = function updateService(service) {
       let config = {};
       service, (config = buildChanges(service));
@@ -612,7 +632,10 @@ angular.module('portainer.docker').controller('ServiceController', [
     function translateServiceArrays(service) {
       service.ServiceSecrets = service.Secrets ? service.Secrets.map(SecretHelper.flattenSecret) : [];
       service.ServiceConfigs = service.Configs ? service.Configs.map(ConfigHelper.flattenConfig) : [];
-      service.EnvironmentVariables = ServiceHelper.translateEnvironmentVariables(service.Env);
+      service.EnvironmentVariables = envVarsUtils
+        .parseArrayOfStrings(service.Env)
+        .map((v) => ({ ...v, added: true }))
+        .sort((v1, v2) => (v1.name > v2.name ? 1 : -1));
       service.LogDriverOpts = ServiceHelper.translateLogDriverOptsToKeyValue(service.LogDriverOpts);
       service.ServiceLabels = LabelHelper.fromLabelHashToKeyValue(service.Labels);
       service.ServiceContainerLabels = LabelHelper.fromLabelHashToKeyValue(service.ContainerLabels);

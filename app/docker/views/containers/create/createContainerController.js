@@ -1,5 +1,8 @@
 import _ from 'lodash-es';
+
+import * as envVarsUtils from '@/portainer/helpers/env-vars';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
+
 import { ContainerCapabilities, ContainerCapability } from '../../../models/containerCapabilities';
 import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
 import { ContainerDetailsViewModel } from '../../../models/container';
@@ -58,6 +61,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     endpoint
   ) {
     $scope.create = create;
+    $scope.endpoint = endpoint;
 
     $scope.formValues = {
       alwaysPull: true,
@@ -77,8 +81,10 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       MemoryReservation: 0,
       CmdMode: 'default',
       EntrypointMode: 'default',
+      Env: [],
       NodeName: null,
       capabilities: [],
+      Sysctls: [],
       LogDriverName: '',
       LogDriverOpts: [],
       RegistryModel: new PorImageRegistryModel(),
@@ -90,7 +96,13 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       formValidationError: '',
       actionInProgress: false,
       mode: '',
+      pullImageValidity: true,
     };
+
+    $scope.handleEnvVarChange = handleEnvVarChange;
+    function handleEnvVarChange(value) {
+      $scope.formValues.Env = value;
+    }
 
     $scope.refreshSlider = function () {
       $timeout(function () {
@@ -102,6 +114,14 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       $scope.formValues.CmdMode = 'default';
       $scope.formValues.EntrypointMode = 'default';
     };
+
+    $scope.setPullImageValidity = setPullImageValidity;
+    function setPullImageValidity(validity) {
+      if (!validity) {
+        $scope.formValues.alwaysPull = false;
+      }
+      $scope.state.pullImageValidity = validity;
+    }
 
     $scope.config = {
       Image: '',
@@ -126,6 +146,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         Devices: [],
         CapAdd: [],
         CapDrop: [],
+        Sysctls: {},
       },
       NetworkingConfig: {
         EndpointsConfig: {},
@@ -139,14 +160,6 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
     $scope.removeVolume = function (index) {
       $scope.formValues.Volumes.splice(index, 1);
-    };
-
-    $scope.addEnvironmentVariable = function () {
-      $scope.config.Env.push({ name: '', value: '' });
-    };
-
-    $scope.removeEnvironmentVariable = function (index) {
-      $scope.config.Env.splice(index, 1);
     };
 
     $scope.addPortBinding = function () {
@@ -179,6 +192,14 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
     $scope.removeDevice = function (index) {
       $scope.config.HostConfig.Devices.splice(index, 1);
+    };
+
+    $scope.addSysctl = function () {
+      $scope.formValues.Sysctls.push({ name: '', value: '' });
+    };
+
+    $scope.removeSysctl = function (index) {
+      $scope.formValues.Sysctls.splice(index, 1);
     };
 
     $scope.addLogDriverOpt = function () {
@@ -234,13 +255,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     }
 
     function prepareEnvironmentVariables(config) {
-      var env = [];
-      config.Env.forEach(function (v) {
-        if (v.name && v.value) {
-          env.push(v.name + '=' + v.value);
-        }
-      });
-      config.Env = env;
+      config.Env = envVarsUtils.convertToArrayOfStrings($scope.formValues.Env);
     }
 
     function prepareVolumes(config) {
@@ -334,6 +349,16 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       config.HostConfig.Devices = path;
     }
 
+    function prepareSysctls(config) {
+      var sysctls = {};
+      $scope.formValues.Sysctls.forEach(function (sysctl) {
+        if (sysctl.name && sysctl.value) {
+          sysctls[sysctl.name] = sysctl.value;
+        }
+      });
+      config.HostConfig.Sysctls = sysctls;
+    }
+
     function prepareResources(config) {
       // Memory Limit - Round to 0.125
       if ($scope.formValues.MemoryLimit >= 0) {
@@ -402,6 +427,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       prepareResources(config);
       prepareLogDriver(config);
       prepareCapabilities(config);
+      prepareSysctls(config);
       return config;
     }
 
@@ -506,14 +532,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     }
 
     function loadFromContainerEnvironmentVariables() {
-      var envArr = [];
-      for (var e in $scope.config.Env) {
-        if ({}.hasOwnProperty.call($scope.config.Env, e)) {
-          var arr = $scope.config.Env[e].split(/\=(.*)/);
-          envArr.push({ name: arr[0], value: arr[1] });
-        }
-      }
-      $scope.config.Env = envArr;
+      $scope.formValues.Env = envVarsUtils.parseArrayOfStrings($scope.config.Env);
     }
 
     function loadFromContainerLabels() {
@@ -545,6 +564,14 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         }
       }
       $scope.config.HostConfig.Devices = path;
+    }
+
+    function loadFromContainerSysctls() {
+      for (var s in $scope.config.HostConfig.Sysctls) {
+        if ({}.hasOwnProperty.call($scope.config.HostConfig.Sysctls, s)) {
+          $scope.formValues.Sysctls.push({ name: s, value: $scope.config.HostConfig.Sysctls[s] });
+        }
+      }
     }
 
     function loadFromContainerImageConfig() {
@@ -622,6 +649,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
           loadFromContainerImageConfig(d);
           loadFromContainerResources(d);
           loadFromContainerCapabilities(d);
+          loadFromContainerSysctls(d);
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve container');
@@ -646,6 +674,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
       $scope.isAdmin = Authentication.isAdmin();
       $scope.showDeviceMapping = await shouldShowDevices();
+      $scope.showSysctls = await shouldShowSysctls();
       $scope.areContainerCapabilitiesEnabled = await checkIfContainerCapabilitiesEnabled();
       $scope.isAdminOrEndpointAdmin = Authentication.isAdmin();
 
@@ -928,6 +957,10 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
     async function shouldShowDevices() {
       return endpoint.SecuritySettings.allowDeviceMappingForRegularUsers || Authentication.isAdmin();
+    }
+
+    async function shouldShowSysctls() {
+      return endpoint.SecuritySettings.allowSysctlSettingForRegularUsers || Authentication.isAdmin();
     }
 
     async function checkIfContainerCapabilitiesEnabled() {

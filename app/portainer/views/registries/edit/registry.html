@@ -33,7 +33,7 @@
           </div>
           <!-- !registry-url-input -->
           <!-- authentication-checkbox -->
-          <div class="form-group">
+          <div class="form-group" ng-if="registry.Type !== RegistryTypes.PROGET">
             <div class="col-sm-12">
               <label for="registry_auth" class="control-label text-left">
                 Authentication
@@ -63,12 +63,36 @@
             <!-- !credentials-password -->
           </div>
           <!-- !authentication-credentials -->
+
+          <div ng-if="registry.Type == RegistryTypes.QUAY">
+            <!-- organisation-checkbox -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label class="control-label text-left">
+                  Use organisation registry
+                </label>
+                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="registry.Quay.UseOrganisation" /><i></i> </label>
+              </div>
+            </div>
+            <!-- !organisation-checkbox -->
+            <div ng-if="registry.Quay.UseOrganisation">
+              <!-- organisation_name -->
+              <div class="form-group">
+                <label for="organisation_name" class="col-sm-3 col-lg-2 control-label text-left">Organisation name</label>
+                <div class="col-sm-9 col-lg-10">
+                  <input type="text" class="form-control" id="organisation_name" name="organisation_name" ng-model="registry.Quay.OrganisationName" required />
+                </div>
+              </div>
+              <!-- !organisation_name -->
+            </div>
+          </div>
+
           <div class="form-group">
             <div class="col-sm-12">
               <button
                 type="button"
                 class="btn btn-primary btn-sm"
-                ng-disabled="state.actionInProgress || !registry.Name || !registry.URL"
+                ng-disabled="state.actionInProgress || !registry.Name || !registry.URL || (registry.Type == RegistryTypes.QUAY && registry.Quay.UseOrganisation && !registry.Quay.OrganisationName)"
                 ng-click="updateRegistry()"
                 button-spinner="state.actionInProgress"
               >

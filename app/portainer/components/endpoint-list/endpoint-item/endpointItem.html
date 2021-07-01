@@ -84,6 +84,10 @@
         <span class="small text-muted">
           {{ $ctrl.model.Snapshots[0].Swarm ? 'Swarm' : 'Standalone' }} {{ $ctrl.model.Snapshots[0].DockerVersion }}
           <span ng-if="$ctrl.model.Type === 2">+ <i class="fa fa-bolt" aria-hidden="true"></i> Agent</span>
+          <span style="padding: 0 7px 0 0;" ng-if="$ctrl.model.Snapshots[0].Swarm">
+            <i class="fa fa-hdd space-left space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].NodeCount }}
+            {{ $ctrl.model.Snapshots[0].NodeCount === 1 ? 'node' : 'nodes' }}
+          </span>
         </span>
       </div>
 

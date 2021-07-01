@@ -1,8 +1,11 @@
+import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
+
 angular.module('portainer.app').controller('StackController', [
   '$async',
   '$q',
   '$scope',
   '$state',
+  '$window',
   '$transition$',
   'StackService',
   'NodeService',
@@ -17,11 +20,16 @@ angular.module('portainer.app').controller('StackController', [
   'EndpointService',
   'GroupService',
   'ModalService',
+  'StackHelper',
+  'ResourceControlService',
+  'Authentication',
+  'ContainerHelper',
   function (
     $async,
     $q,
     $scope,
     $state,
+    $window,
     $transition$,
     StackService,
     NodeService,
@@ -35,23 +43,41 @@ angular.module('portainer.app').controller('StackController', [
     EndpointProvider,
     EndpointService,
     GroupService,
-    ModalService
+    ModalService,
+    StackHelper,
+    ResourceControlService,
+    Authentication,
+    ContainerHelper
   ) {
     $scope.state = {
       actionInProgress: false,
       migrationInProgress: false,
-      externalStack: false,
       showEditorTab: false,
+      yamlError: false,
+      isEditorDirty: false,
     };
 
     $scope.formValues = {
       Prune: false,
       Endpoint: null,
+      AccessControlData: new AccessControlFormData(),
+      Env: [],
     };
+
+    $window.onbeforeunload = () => {
+      if ($scope.stackFileContent && $scope.state.isEditorDirty) {
+        return '';
+      }
+    };
+
+    $scope.handleEnvVarChange = handleEnvVarChange;
+    function handleEnvVarChange(value) {
+      $scope.formValues.Env = value;
+    }
 
     $scope.duplicateStack = function duplicateStack(name, endpointId) {
       var stack = $scope.stack;
-      var env = FormHelper.removeInvalidEnvVars(stack.Env);
+      var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
       EndpointProvider.setEndpointID(endpointId);
 
       return StackService.duplicateStack(name, $scope.stackFileContent, env, endpointId, stack.Type).then(onDuplicationSuccess).catch(notifyOnError);
@@ -148,9 +174,34 @@ angular.module('portainer.app').controller('StackController', [
         });
     }
 
+    $scope.associateStack = function () {
+      var endpointId = +$state.params.endpointId;
+      var stack = $scope.stack;
+      var accessControlData = $scope.formValues.AccessControlData;
+      $scope.state.actionInProgress = true;
+
+      StackService.associate(stack, endpointId, $scope.orphanedRunning)
+        .then(function success(data) {
+          const resourceControl = data.ResourceControl;
+          const userDetails = Authentication.getUserDetails();
+          const userId = userDetails.ID;
+          return ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
+        })
+        .then(function success() {
+          Notifications.success('Stack successfully associated', stack.Name);
+          $state.go('docker.stacks');
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to associate stack ' + stack.Name);
+        })
+        .finally(function final() {
+          $scope.state.actionInProgress = false;
+        });
+    };
+
     $scope.deployStack = function () {
       var stackFile = $scope.stackFileContent;
-      var env = FormHelper.removeInvalidEnvVars($scope.stack.Env);
+      var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
       var prune = $scope.formValues.Prune;
       var stack = $scope.stack;
 
@@ -167,6 +218,7 @@ angular.module('portainer.app').controller('StackController', [
       StackService.updateStack(stack, stackFile, env, prune)
         .then(function success() {
           Notifications.success('Stack successfully deployed');
+          $scope.state.isEditorDirty = false;
           $state.reload();
         })
         .catch(function error(err) {
@@ -177,16 +229,12 @@ angular.module('portainer.app').controller('StackController', [
         });
     };
 
-    $scope.addEnvironmentVariable = function () {
-      $scope.stack.Env.push({ name: '', value: '' });
-    };
-
-    $scope.removeEnvironmentVariable = function (index) {
-      $scope.stack.Env.splice(index, 1);
-    };
-
     $scope.editorUpdate = function (cm) {
-      $scope.stackFileContent = cm.getValue();
+      if ($scope.stackFileContent.replace(/(\r\n|\n|\r)/gm, '') !== cm.getValue().replace(/(\r\n|\n|\r)/gm, '')) {
+        $scope.state.isEditorDirty = true;
+        $scope.stackFileContent = cm.getValue();
+        $scope.state.yamlError = StackHelper.validateYAML($scope.stackFileContent, $scope.containerNames);
+      }
     };
 
     $scope.stopStack = stopStack;
@@ -243,14 +291,18 @@ angular.module('portainer.app').controller('StackController', [
       $q.all({
         stack: StackService.stack(id),
         groups: GroupService.groups(),
+        containers: ContainerService.containers(),
       })
         .then(function success(data) {
           var stack = data.stack;
           $scope.groups = data.groups;
           $scope.stack = stack;
+          $scope.containerNames = ContainerHelper.getContainerNames(data.containers);
+
+          $scope.formValues.Env = $scope.stack.Env;
 
           let resourcesPromise = Promise.resolve({});
-          if (stack.Status === 1) {
+          if (!stack.Status || stack.Status === 1) {
             resourcesPromise = stack.Type === 1 ? retrieveSwarmStackResources(stack.Name, agentProxy) : retrieveComposeStackResources(stack.Name);
           }
 
@@ -260,14 +312,22 @@ angular.module('portainer.app').controller('StackController', [
           });
         })
         .then(function success(data) {
+          const isSwarm = $scope.stack.Type === 1;
           $scope.stackFileContent = data.stackFile;
+          // workaround for missing status, if stack has resources, set the status to 1 (active), otherwise to 2 (inactive) (https://github.com/portainer/portainer/issues/4422)
+          if (!$scope.stack.Status) {
+            $scope.stack.Status = data.resources && ((isSwarm && data.resources.services.length) || data.resources.containers.length) ? 1 : 2;
+          }
+
           if ($scope.stack.Status === 1) {
-            if ($scope.stack.Type === 1) {
+            if (isSwarm) {
               assignSwarmStackResources(data.resources, agentProxy);
             } else {
               assignComposeStackResources(data.resources);
             }
           }
+
+          $scope.state.yamlError = StackHelper.validateYAML($scope.stackFileContent, $scope.containerNames);
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve stack details');
@@ -359,17 +419,36 @@ angular.module('portainer.app').controller('StackController', [
         });
     }
 
+    this.uiCanExit = async function () {
+      if ($scope.stackFileContent && $scope.state.isEditorDirty) {
+        return ModalService.confirmWebEditorDiscard();
+      }
+    };
+
     async function initView() {
       var stackName = $transition$.params().name;
       $scope.stackName = stackName;
-      var external = $transition$.params().external;
+
       $scope.currentEndpointId = EndpointProvider.endpointID();
 
-      if (external === 'true') {
-        $scope.state.externalStack = true;
+      const regular = $transition$.params().regular == 'true';
+      $scope.regular = regular;
+
+      var external = $transition$.params().external == 'true';
+      $scope.external = external;
+
+      const orphaned = $transition$.params().orphaned == 'true';
+      $scope.orphaned = orphaned;
+
+      const orphanedRunning = $transition$.params().orphanedRunning == 'true';
+      $scope.orphanedRunning = orphanedRunning;
+
+      if (external || (orphaned && orphanedRunning)) {
         loadExternalStack(stackName);
-      } else {
-        var stackId = $transition$.params().id;
+      }
+
+      if (regular || orphaned) {
+        const stackId = $transition$.params().id;
         loadStack(stackId);
       }
 

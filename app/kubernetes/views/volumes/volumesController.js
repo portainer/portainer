@@ -98,7 +98,7 @@ class KubernetesVolumesController {
       });
       this.storages = buildStorages(storages, volumes);
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retreive resource pools');
+      this.Notifications.error('Failure', err, 'Unable to retreive namespaces');
     }
   }
 

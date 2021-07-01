@@ -196,7 +196,27 @@
                 <label class="control-label text-left">
                   Enable features using metrics server
                 </label>
-                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.UseServerMetrics" /><i></i> </label>
+                <label class="switch" style="margin-left: 20px;">
+                  <input type="checkbox" ng-model="ctrl.formValues.UseServerMetrics" ng-change="ctrl.enableMetricsServer()" /><i></i>
+                </label>
+              </div>
+              <div ng-if="ctrl.state.metrics.pending && ctrl.state.metrics.userClick" class="col-sm-12 small text-muted" style="margin-top: 5px;">
+                Checking metrics API... <i class="fa fa-spinner fa-spin" style="margin-left: 2px;"></i>
+              </div>
+              <div
+                ng-if="!ctrl.state.metrics.pending && ctrl.state.metrics.isServerRunning && ctrl.state.metrics.userClick"
+                class="col-sm-12 small text-muted"
+                style="margin-top: 5px;"
+              >
+                <i class="fa fa-check green-icon" aria-hidden="true" style="margin-right: 2px;"></i> Successfully reached metrics API
+              </div>
+              <div
+                ng-if="!ctrl.state.metrics.pending && !ctrl.state.metrics.isServerRunning && ctrl.state.metrics.userClick"
+                class="col-sm-12 small text-muted"
+                style="margin-top: 5px;"
+              >
+                <i class="fa fa-times red-icon" aria-hidden="true" style="margin-right: 2px;"></i> Unable to reach metrics API, make sure metrics server is properly deployed inside
+                that cluster.
               </div>
             </div>
 

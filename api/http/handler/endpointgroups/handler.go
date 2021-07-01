@@ -1,6 +1,7 @@
 package endpointgroups
 
 import (
+	"github.com/portainer/portainer/api/internal/authorization"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -12,6 +13,7 @@ import (
 // Handler is the HTTP handler used to handle endpoint group operations.
 type Handler struct {
 	*mux.Router
+	AuthorizationService *authorization.Service
 	DataStore portainer.DataStore
 }
 

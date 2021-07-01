@@ -12,18 +12,15 @@ import (
 )
 
 type registryUpdatePayload struct {
-	// Name that will be used to identify this registry
-	Name *string `validate:"required" example:"my-registry"`
-	// URL or IP address of the Docker registry
-	URL *string `validate:"required" example:"registry.mydomain.tld:2375"`
-	// Is authentication against this registry enabled
-	Authentication *bool `example:"false" validate:"required"`
-	// Username used to authenticate against this registry. Required when Authentication is true
-	Username *string `example:"registry_user"`
-	// Password used to authenticate against this registry. required when Authentication is true
-	Password           *string `example:"registry_password"`
-	UserAccessPolicies portainer.UserAccessPolicies
-	TeamAccessPolicies portainer.TeamAccessPolicies
+	Name               *string                      `json:",omitempty" example:"my-registry" validate:"required"`
+	URL                *string                      `json:",omitempty" example:"registry.mydomain.tld:2375/feed" validate:"required"`
+	BaseURL            *string                      `json:",omitempty" example:"registry.mydomain.tld:2375"`
+	Authentication     *bool                        `json:",omitempty" example:"false" validate:"required"`
+	Username           *string                      `json:",omitempty" example:"registry_user"`
+	Password           *string                      `json:",omitempty" example:"registry_password"`
+	UserAccessPolicies portainer.UserAccessPolicies `json:",omitempty"`
+	TeamAccessPolicies portainer.TeamAccessPolicies `json:",omitempty"`
+	Quay               *portainer.QuayRegistryData
 }
 
 func (payload *registryUpdatePayload) Validate(r *http.Request) error {
@@ -83,6 +80,10 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 		registry.URL = *payload.URL
 	}
 
+	if registry.Type == portainer.ProGetRegistry && payload.BaseURL != nil {
+		registry.BaseURL = *payload.BaseURL
+	}
+
 	if payload.Authentication != nil {
 		if *payload.Authentication {
 			registry.Authentication = true
@@ -108,6 +109,10 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.TeamAccessPolicies != nil {
 		registry.TeamAccessPolicies = payload.TeamAccessPolicies
+	}
+
+	if payload.Quay != nil {
+		registry.Quay = *payload.Quay
 	}
 
 	err = handler.DataStore.Registry().UpdateRegistry(registry.ID, registry)

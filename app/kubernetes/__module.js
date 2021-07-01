@@ -17,6 +17,7 @@ angular.module('portainer.kubernetes', ['portainer.app']).config([
           }
           try {
             if (endpoint.Type === 7) {
+              //edge
               try {
                 await KubernetesHealthService.ping(endpoint.Id);
                 endpoint.Status = 1;
@@ -27,6 +28,10 @@ angular.module('portainer.kubernetes', ['portainer.app']).config([
 
             EndpointProvider.setEndpointID(endpoint.Id);
             await StateManager.updateEndpointState(endpoint, []);
+
+            if (endpoint.Type === 7 && endpoint.Status === 2) {
+              throw new Error('Unable to contact Edge agent, please ensure that the agent is properly running on the remote environment.');
+            }
           } catch (e) {
             Notifications.error('Failed loading endpoint', e);
             $state.go('portainer.home', {}, { reload: true });
@@ -91,6 +96,16 @@ angular.module('portainer.kubernetes', ['portainer.app']).config([
       views: {
         'content@': {
           component: 'kubernetesApplicationLogsView',
+        },
+      },
+    };
+
+    const applicationStats = {
+      name: 'kubernetes.applications.application.stats',
+      url: '/:pod/:container/stats',
+      views: {
+        'content@': {
+          component: 'kubernetesApplicationStatsView',
         },
       },
     };
@@ -163,6 +178,16 @@ angular.module('portainer.kubernetes', ['portainer.app']).config([
       views: {
         'content@': {
           component: 'kubernetesNodeView',
+        },
+      },
+    };
+
+    const nodeStats = {
+      name: 'kubernetes.cluster.node.stats',
+      url: '/stats',
+      views: {
+        'content@': {
+          component: 'kubernetesNodeStatsView',
         },
       },
     };
@@ -254,6 +279,7 @@ angular.module('portainer.kubernetes', ['portainer.app']).config([
     $stateRegistryProvider.register(applicationEdit);
     $stateRegistryProvider.register(applicationConsole);
     $stateRegistryProvider.register(applicationLogs);
+    $stateRegistryProvider.register(applicationStats);
     $stateRegistryProvider.register(stacks);
     $stateRegistryProvider.register(stack);
     $stateRegistryProvider.register(stackLogs);
@@ -264,6 +290,7 @@ angular.module('portainer.kubernetes', ['portainer.app']).config([
     $stateRegistryProvider.register(dashboard);
     $stateRegistryProvider.register(deploy);
     $stateRegistryProvider.register(node);
+    $stateRegistryProvider.register(nodeStats);
     $stateRegistryProvider.register(resourcePools);
     $stateRegistryProvider.register(resourcePoolCreation);
     $stateRegistryProvider.register(resourcePool);

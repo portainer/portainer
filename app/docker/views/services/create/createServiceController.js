@@ -1,4 +1,6 @@
 import _ from 'lodash-es';
+
+import * as envVarsUtils from '@/portainer/helpers/env-vars';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
 
@@ -104,15 +106,26 @@ angular.module('portainer.docker').controller('CreateServiceController', [
     $scope.state = {
       formValidationError: '',
       actionInProgress: false,
+      pullImageValidity: false,
     };
 
     $scope.allowBindMounts = false;
+
+    $scope.handleEnvVarChange = handleEnvVarChange;
+    function handleEnvVarChange(value) {
+      $scope.formValues.Env = value;
+    }
 
     $scope.refreshSlider = function () {
       $timeout(function () {
         $scope.$broadcast('rzSliderForceRender');
       });
     };
+
+    $scope.setPullImageValidity = setPullImageValidity;
+    function setPullImageValidity(validity) {
+      $scope.state.pullImageValidity = validity;
+    }
 
     $scope.addPortBinding = function () {
       $scope.formValues.Ports.push({ PublishedPort: '', TargetPort: '', Protocol: 'tcp', PublishMode: 'ingress' });
@@ -160,14 +173,6 @@ angular.module('portainer.docker').controller('CreateServiceController', [
 
     $scope.removeSecret = function (index) {
       $scope.formValues.Secrets.splice(index, 1);
-    };
-
-    $scope.addEnvironmentVariable = function () {
-      $scope.formValues.Env.push({ name: '', value: '' });
-    };
-
-    $scope.removeEnvironmentVariable = function (index) {
-      $scope.formValues.Env.splice(index, 1);
     };
 
     $scope.addPlacementConstraint = function () {
@@ -271,13 +276,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
     }
 
     function prepareEnvConfig(config, input) {
-      var env = [];
-      input.Env.forEach(function (v) {
-        if (v.name) {
-          env.push(v.name + '=' + v.value);
-        }
-      });
-      config.TaskTemplate.ContainerSpec.Env = env;
+      config.TaskTemplate.ContainerSpec.Env = envVarsUtils.convertToArrayOfStrings(input.Env);
     }
 
     function prepareLabelsConfig(config, input) {
@@ -493,7 +492,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
           const resourceControl = data.Portainer.ResourceControl;
           const userId = Authentication.getUserDetails().ID;
           const rcPromise = ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
-          const webhookPromise = $q.when(endpoint.Type !== 4 && $scope.formValues.Webhook && WebhookService.createServiceWebhook(serviceId, endpoint.ID));
+          const webhookPromise = $q.when(endpoint.Type !== 4 && $scope.formValues.Webhook && WebhookService.createServiceWebhook(serviceId, endpoint.Id));
           return $q.all([rcPromise, webhookPromise]);
         })
         .then(function success() {

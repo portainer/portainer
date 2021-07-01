@@ -116,7 +116,7 @@
             >
               <td ng-if="!$ctrl.isPod">{{ item.PodName }}</td>
               <td>{{ item.Name }}</td>
-              <td>{{ item.Image }}</td>
+              <td title="{{ item.Image }}">{{ item.Image | truncate: 64 }}</td>
               <td>{{ item.ImagePullPolicy }}</td>
               <td
                 ><span class="label label-{{ item.Status | kubernetesPodStatusColor }}">{{ item.Status }}</span></td
@@ -131,6 +131,13 @@
               </td>
               <td>{{ item.CreationDate | getisodate }}</td>
               <td>
+                <a
+                  ng-if="item.Status === 'Running' && $ctrl.useServerMetrics"
+                  ui-sref="kubernetes.applications.application.stats({ pod: item.PodName, container: item.Name })"
+                  style="margin-right: 10px;"
+                >
+                  <i class="fa fa-chart-area" aria-hidden="true"></i> Stats
+                </a>
                 <a ui-sref="kubernetes.applications.application.logs({ pod: item.PodName, container: item.Name })"> <i class="fa fa-file-alt" aria-hidden="true"></i> Logs </a>
                 <a ng-if="item.Status === 'Running'" ui-sref="kubernetes.applications.application.console({ pod: item.PodName, container: item.Name })" style="margin-left: 10px;">
                   <i class="fa fa-terminal" aria-hidden="true"></i> Console

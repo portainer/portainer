@@ -274,6 +274,17 @@
                 </container-restart-policy>
               </td>
             </tr>
+            <tr ng-if="!(container.HostConfig.Sysctls | emptyobject)">
+              <td>Sysctls</td>
+              <td>
+                <table class="table table-bordered table-condensed">
+                  <tr ng-repeat="(k, v) in container.HostConfig.Sysctls">
+                    <td>{{ k }}</td>
+                    <td>{{ v }}</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
           </tbody>
         </table>
       </rd-widget-body>

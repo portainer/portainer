@@ -22,6 +22,7 @@ angular
   .constant('API_ENDPOINT_TEAM_MEMBERSHIPS', 'api/team_memberships')
   .constant('API_ENDPOINT_TEMPLATES', 'api/templates')
   .constant('API_ENDPOINT_WEBHOOKS', 'api/webhooks')
+  .constant('API_ENDPOINT_BACKUP', 'api/backup')
   .constant('DEFAULT_TEMPLATES_URL', 'https://raw.githubusercontent.com/portainer/templates/master/templates.json')
   .constant('PAGINATION_MAX_ITEMS', 10)
   .constant('APPLICATION_CACHE_VALIDITY', 3600)
@@ -29,3 +30,5 @@ angular
   .constant('PREDEFINED_NETWORKS', ['host', 'bridge', 'none'])
   .constant('KUBERNETES_DEFAULT_NAMESPACE', 'default')
   .constant('KUBERNETES_SYSTEM_NAMESPACES', ['kube-system', 'kube-public', 'kube-node-lease', 'portainer']);
+
+export const PORTAINER_FADEOUT = 1500;

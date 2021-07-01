@@ -1,6 +1,7 @@
 /* switch box */
 
-.switch {
+.switch,
+.bootbox-checkbox-list > .checkbox > label {
   --switch-size: 24px;
 }
 

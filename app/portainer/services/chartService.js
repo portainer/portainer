@@ -98,8 +98,46 @@ angular.module('portainer.app').factory('ChartService', [
       });
     }
 
+    function CreateIOChart(context, tooltipCallback, scalesCallback) {
+      return new Chart(context, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: 'Read (Aggregate)',
+              data: [],
+              fill: true,
+              backgroundColor: 'rgba(151,187,205,0.4)',
+              borderColor: 'rgba(151,187,205,0.6)',
+              pointBackgroundColor: 'rgba(151,187,205,1)',
+              pointBorderColor: 'rgba(151,187,205,1)',
+              pointRadius: 2,
+              borderWidth: 2,
+            },
+            {
+              label: 'Write (Aggregate)',
+              data: [],
+              fill: true,
+              backgroundColor: 'rgba(255,180,174,0.4)',
+              borderColor: 'rgba(255,180,174,0.6)',
+              pointBackgroundColor: 'rgba(255,180,174,1)',
+              pointBorderColor: 'rgba(255,180,174,1)',
+              pointRadius: 2,
+              borderWidth: 2,
+            },
+          ],
+        },
+        options: defaultChartOptions('nearest', tooltipCallback, scalesCallback, true),
+      });
+    }
+
     service.CreateCPUChart = function (context) {
       return CreateChart(context, 'CPU', percentageBasedTooltipLabel, percentageBasedAxisLabel);
+    };
+
+    service.CreateIOChart = function (context) {
+      return CreateIOChart(context, byteBasedTooltipLabel, byteBasedAxisLabel);
     };
 
     service.CreateMemoryChart = function (context) {
@@ -176,6 +214,13 @@ angular.module('portainer.app').factory('ChartService', [
       chart.update(0);
     };
     service.UpdateCPUChart = UpdateChart;
+    service.UpdateIOChart = function (label, read, write, chart) {
+      chart.data.labels.push(label);
+      chart.data.datasets[0].data.push(read);
+      chart.data.datasets[1].data.push(write);
+      LimitChartItems(chart);
+      chart.update(0);
+    };
 
     service.UpdateNetworkChart = function (label, rx, tx, chart) {
       chart.data.labels.push(label);

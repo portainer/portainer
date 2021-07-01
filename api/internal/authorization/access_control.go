@@ -160,9 +160,13 @@ func FilterAuthorizedCustomTemplates(customTemplates []portainer.CustomTemplate,
 	return authorizedTemplates
 }
 
-// UserCanAccessResource will valide that a user has permissions defined in the specified resource control
+// UserCanAccessResource will valid that a user has permissions defined in the specified resource control
 // based on its identifier and the team(s) he is part of.
 func UserCanAccessResource(userID portainer.UserID, userTeamIDs []portainer.TeamID, resourceControl *portainer.ResourceControl) bool {
+	if resourceControl == nil {
+		return false
+	}
+
 	for _, authorizedUserAccess := range resourceControl.UserAccesses {
 		if userID == authorizedUserAccess.UserID {
 			return true

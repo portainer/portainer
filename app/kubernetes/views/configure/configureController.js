@@ -8,11 +8,19 @@ import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
 
 class KubernetesConfigureController {
   /* #region  CONSTRUCTOR */
+
+  // TODO: technical debt
+  // $transition$ cannot be injected as bindings: { $transition$: '<' } inside app/portainer/__module.js
+  // because this view is not using a component (https://ui-router.github.io/guide/ng1/route-to-component#accessing-transition)
+  // and will cause
+  // >> Error: Cannot combine: component|bindings|componentProvider
+  // >> with: templateProvider|templateUrl|template|notify|async|controller|controllerProvider|controllerAs|resolveAs
+  // >> in stateview: 'content@@portainer.endpoints.endpoint.kubernetesConfig'
   /* @ngInject */
   constructor(
     $async,
     $state,
-    $stateParams,
+    $transition$,
     Notifications,
     KubernetesStorageService,
     EndpointService,
@@ -20,11 +28,12 @@ class KubernetesConfigureController {
     ModalService,
     KubernetesNamespaceHelper,
     KubernetesResourcePoolService,
-    KubernetesIngressService
+    KubernetesIngressService,
+    KubernetesMetricsService
   ) {
     this.$async = $async;
     this.$state = $state;
-    this.$stateParams = $stateParams;
+    this.$transition$ = $transition$;
     this.Notifications = Notifications;
     this.KubernetesStorageService = KubernetesStorageService;
     this.EndpointService = EndpointService;
@@ -33,6 +42,7 @@ class KubernetesConfigureController {
     this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesIngressService = KubernetesIngressService;
+    this.KubernetesMetricsService = KubernetesMetricsService;
 
     this.IngressClassTypes = KubernetesIngressClassTypes;
 
@@ -131,20 +141,32 @@ class KubernetesConfigureController {
   }
 
   async removeIngressesAcrossNamespaces() {
-    const promises = [];
     const ingressesToDel = _.filter(this.formValues.IngressClasses, { NeedsDeletion: true });
-    const allResourcePools = await this.KubernetesResourcePoolService.get();
-    const resourcePools = _.filter(
-      allResourcePools,
-      (resourcePool) =>
-        !this.KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name) && !this.KubernetesNamespaceHelper.isDefaultNamespace(resourcePool.Namespace.Name)
-    );
 
-    ingressesToDel.forEach((ingress) => {
-      resourcePools.forEach((resourcePool) => {
-        promises.push(this.KubernetesIngressService.delete({ IngressClass: ingress, Namespace: resourcePool.Namespace.Name }));
+    if (!ingressesToDel.length) {
+      return;
+    }
+
+    const promises = [];
+    const oldEndpointID = this.EndpointProvider.endpointID();
+    this.EndpointProvider.setEndpointID(this.endpoint.Id);
+
+    try {
+      const allResourcePools = await this.KubernetesResourcePoolService.get();
+      const resourcePools = _.filter(
+        allResourcePools,
+        (resourcePool) =>
+          !this.KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name) && !this.KubernetesNamespaceHelper.isDefaultNamespace(resourcePool.Namespace.Name)
+      );
+
+      ingressesToDel.forEach((ingress) => {
+        resourcePools.forEach((resourcePool) => {
+          promises.push(this.KubernetesIngressService.delete(resourcePool.Namespace.Name, ingress.Name));
+        });
       });
-    });
+    } finally {
+      this.EndpointProvider.setEndpointID(oldEndpointID);
+    }
 
     const responses = await Promise.allSettled(promises);
     responses.forEach((respons) => {
@@ -152,6 +174,27 @@ class KubernetesConfigureController {
         throw respons.reason;
       }
     });
+  }
+
+  enableMetricsServer() {
+    if (this.formValues.UseServerMetrics) {
+      this.state.metrics.userClick = true;
+      this.state.metrics.pending = true;
+      this.KubernetesMetricsService.capabilities(this.endpoint.Id)
+        .then(() => {
+          this.state.metrics.isServerRunning = true;
+          this.state.metrics.pending = false;
+          this.formValues.UseServerMetrics = true;
+        })
+        .catch(() => {
+          this.state.metrics.isServerRunning = false;
+          this.state.metrics.pending = false;
+          this.formValues.UseServerMetrics = false;
+        });
+    } else {
+      this.state.metrics.userClick = false;
+      this.formValues.UseServerMetrics = false;
+    }
   }
 
   async configureAsync() {
@@ -210,9 +253,14 @@ class KubernetesConfigureController {
       actionInProgress: false,
       displayConfigureClassPanel: {},
       viewReady: false,
-      endpointId: this.$stateParams.id,
+      endpointId: this.$transition$.params().id,
       duplicates: {
         ingressClasses: new KubernetesFormValidationReferences(),
+      },
+      metrics: {
+        pending: false,
+        isServerRunning: false,
+        userClick: false,
       },
     };
 

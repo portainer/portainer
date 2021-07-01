@@ -63,7 +63,7 @@
           </div>
           <!-- !os-input -->
           <!-- port-mapping -->
-          <div class="form-group">
+          <div class="form-group" ng-if="$ctrl.container.Ports.length > 0">
             <div class="col-sm-12">
               <label class="control-label text-left">Port mapping</label>
             </div>
@@ -131,4 +131,8 @@
       </rd-widget-body>
     </rd-widget>
   </div>
+  <!-- access-control-panel -->
+  <por-access-control-panel ng-if="$ctrl.container" resource-id="$ctrl.container.Id" resource-control="$ctrl.container.ResourceControl" resource-type="'container-group'">
+  </por-access-control-panel>
+  <!-- !access-control-panel -->
 </div>

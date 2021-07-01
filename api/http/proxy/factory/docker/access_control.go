@@ -31,6 +31,23 @@ type (
 	}
 )
 
+func getUniqueElements(items string) []string {
+	result := []string{}
+	seen := make(map[string]struct{})
+	for _, item := range strings.Split(items, ",") {
+		v := strings.TrimSpace(item)
+		if v == "" {
+			continue
+		}
+		if _, ok := seen[v]; !ok {
+			result = append(result, v)
+			seen[v] = struct{}{}
+		}
+	}
+
+	return result
+}
+
 func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject map[string]interface{}, resourceID string, resourceType portainer.ResourceControlType) (*portainer.ResourceControl, error) {
 	if labelsObject[resourceLabelForPortainerPublicResourceControl] != nil {
 		resourceControl := authorization.NewPublicResourceControl(resourceID, resourceType)
@@ -47,12 +64,12 @@ func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject m
 	userNames := make([]string, 0)
 	if labelsObject[resourceLabelForPortainerTeamResourceControl] != nil {
 		concatenatedTeamNames := labelsObject[resourceLabelForPortainerTeamResourceControl].(string)
-		teamNames = strings.Split(concatenatedTeamNames, ",")
+		teamNames = getUniqueElements(concatenatedTeamNames)
 	}
 
 	if labelsObject[resourceLabelForPortainerUserResourceControl] != nil {
 		concatenatedUserNames := labelsObject[resourceLabelForPortainerUserResourceControl].(string)
-		userNames = strings.Split(concatenatedUserNames, ",")
+		userNames = getUniqueElements(concatenatedUserNames)
 	}
 
 	if len(teamNames) > 0 || len(userNames) > 0 {

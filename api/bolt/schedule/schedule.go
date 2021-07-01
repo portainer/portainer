@@ -1,7 +1,7 @@
 package schedule
 
 import (
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
 
 	"github.com/boltdb/bolt"
@@ -14,18 +14,18 @@ const (
 
 // Service represents a service for managing schedule data.
 type Service struct {
-	db *bolt.DB
+	connection *internal.DbConnection
 }
 
 // NewService creates a new instance of a service.
-func NewService(db *bolt.DB) (*Service, error) {
-	err := internal.CreateBucket(db, BucketName)
+func NewService(connection *internal.DbConnection) (*Service, error) {
+	err := internal.CreateBucket(connection, BucketName)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Service{
-		db: db,
+		connection: connection,
 	}, nil
 }
 
@@ -34,7 +34,7 @@ func (service *Service) Schedule(ID portainer.ScheduleID) (*portainer.Schedule, 
 	var schedule portainer.Schedule
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.db, BucketName, identifier, &schedule)
+	err := internal.GetObject(service.connection, BucketName, identifier, &schedule)
 	if err != nil {
 		return nil, err
 	}
@@ -45,20 +45,20 @@ func (service *Service) Schedule(ID portainer.ScheduleID) (*portainer.Schedule, 
 // UpdateSchedule updates a schedule.
 func (service *Service) UpdateSchedule(ID portainer.ScheduleID, schedule *portainer.Schedule) error {
 	identifier := internal.Itob(int(ID))
-	return internal.UpdateObject(service.db, BucketName, identifier, schedule)
+	return internal.UpdateObject(service.connection, BucketName, identifier, schedule)
 }
 
 // DeleteSchedule deletes a schedule.
 func (service *Service) DeleteSchedule(ID portainer.ScheduleID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.db, BucketName, identifier)
+	return internal.DeleteObject(service.connection, BucketName, identifier)
 }
 
 // Schedules return a array containing all the schedules.
 func (service *Service) Schedules() ([]portainer.Schedule, error) {
 	var schedules = make([]portainer.Schedule, 0)
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		cursor := bucket.Cursor()
@@ -82,7 +82,7 @@ func (service *Service) Schedules() ([]portainer.Schedule, error) {
 func (service *Service) SchedulesByJobType(jobType portainer.JobType) ([]portainer.Schedule, error) {
 	var schedules = make([]portainer.Schedule, 0)
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		cursor := bucket.Cursor()
@@ -105,7 +105,7 @@ func (service *Service) SchedulesByJobType(jobType portainer.JobType) ([]portain
 
 // CreateSchedule assign an ID to a new schedule and saves it.
 func (service *Service) CreateSchedule(schedule *portainer.Schedule) error {
-	return service.db.Update(func(tx *bolt.Tx) error {
+	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		// We manually manage sequences for schedules
@@ -125,5 +125,5 @@ func (service *Service) CreateSchedule(schedule *portainer.Schedule) error {
 
 // GetNextIdentifier returns the next identifier for a schedule.
 func (service *Service) GetNextIdentifier() int {
-	return internal.GetNextIdentifier(service.db, BucketName)
+	return internal.GetNextIdentifier(service.connection, BucketName)
 }

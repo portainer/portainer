@@ -13,18 +13,18 @@ const (
 
 // Service represents a service for managing endpoint relation data.
 type Service struct {
-	db *bolt.DB
+	connection *internal.DbConnection
 }
 
 // NewService creates a new instance of a service.
-func NewService(db *bolt.DB) (*Service, error) {
-	err := internal.CreateBucket(db, BucketName)
+func NewService(connection *internal.DbConnection) (*Service, error) {
+	err := internal.CreateBucket(connection, BucketName)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Service{
-		db: db,
+		connection: connection,
 	}, nil
 }
 
@@ -33,7 +33,7 @@ func (service *Service) EndpointRelation(endpointID portainer.EndpointID) (*port
 	var endpointRelation portainer.EndpointRelation
 	identifier := internal.Itob(int(endpointID))
 
-	err := internal.GetObject(service.db, BucketName, identifier, &endpointRelation)
+	err := internal.GetObject(service.connection, BucketName, identifier, &endpointRelation)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func (service *Service) EndpointRelation(endpointID portainer.EndpointID) (*port
 
 // CreateEndpointRelation saves endpointRelation
 func (service *Service) CreateEndpointRelation(endpointRelation *portainer.EndpointRelation) error {
-	return service.db.Update(func(tx *bolt.Tx) error {
+	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		data, err := internal.MarshalObject(endpointRelation)
@@ -58,11 +58,11 @@ func (service *Service) CreateEndpointRelation(endpointRelation *portainer.Endpo
 // UpdateEndpointRelation updates an Endpoint relation object
 func (service *Service) UpdateEndpointRelation(EndpointID portainer.EndpointID, endpointRelation *portainer.EndpointRelation) error {
 	identifier := internal.Itob(int(EndpointID))
-	return internal.UpdateObject(service.db, BucketName, identifier, endpointRelation)
+	return internal.UpdateObject(service.connection, BucketName, identifier, endpointRelation)
 }
 
 // DeleteEndpointRelation deletes an Endpoint relation object
 func (service *Service) DeleteEndpointRelation(EndpointID portainer.EndpointID) error {
 	identifier := internal.Itob(int(EndpointID))
-	return internal.DeleteObject(service.db, BucketName, identifier)
+	return internal.DeleteObject(service.connection, BucketName, identifier)
 }

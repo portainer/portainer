@@ -213,6 +213,7 @@ describe('startContainerController', function () {
               CgroupPermissions: 'mrw',
             },
           ],
+          Sysctls: { 'net.ipv6.conf.all.disable_ipv6': '0' },
           LxcConf: { 'lxc.utsname': 'docker' },
           ExtraHosts: ['hostname:127.0.0.1'],
           RestartPolicy: { name: 'always', MaximumRetryCount: 5 },
@@ -255,6 +256,7 @@ describe('startContainerController', function () {
           CgroupPermissions: 'mrw',
         },
       ];
+      scope.config.HostConfig.Sysctls = [{ name: 'net.ipv6.conf.all.disable_ipv6', value: '0' }];
       scope.config.HostConfig.LxcConf = [{ name: 'lxc.utsname', value: 'docker' }];
       scope.config.HostConfig.ExtraHosts = [{ host: 'hostname', ip: '127.0.0.1' }];
 

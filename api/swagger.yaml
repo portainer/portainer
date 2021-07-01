@@ -1187,15 +1187,20 @@ definitions:
       TeamAccessPolicies:
         $ref: '#/definitions/portainer.TeamAccessPolicies'
       Type:
-        description: Registry Type (1 - Quay, 2 - Azure, 3 - Custom, 4 - Gitlab)
+        description: Registry Type (1 - Quay, 2 - Azure, 3 - Custom, 4 - Gitlab, 5 - ProGet)
         enum:
         - 1
         - 2
         - 3
         - 4
+        - 5
         type: integer
       URL:
         description: URL or IP address of the Docker registry
+        example: registry.mydomain.tld:2375
+        type: string
+      BaseURL:
+        description: Base URL or IP address of the ProGet registry
         example: registry.mydomain.tld:2375
         type: string
       UserAccessPolicies:
@@ -1827,16 +1832,21 @@ definitions:
         type: string
       type:
         description: 'Registry Type. Valid values are: 1 (Quay.io), 2 (Azure container
-          registry), 3 (custom registry) or 4 (Gitlab registry)'
+          registry), 3 (custom registry), 4 (Gitlab registry) or 5 (ProGet registry)'
         enum:
         - 1
         - 2
         - 3
         - 4
+        - 5
         example: 1
         type: integer
       url:
         description: URL or IP address of the Docker registry
+        example: registry.mydomain.tld:2375
+        type: string
+      baseUrl:
+        description: Base URL or IP address of the ProGet registry
         example: registry.mydomain.tld:2375
         type: string
       username:
@@ -1869,6 +1879,10 @@ definitions:
         $ref: '#/definitions/portainer.TeamAccessPolicies'
       url:
         description: URL or IP address of the Docker registry
+        example: registry.mydomain.tld:2375
+        type: string
+      baseUrl:
+        description: Base URL or IP address of the ProGet registry
         example: registry.mydomain.tld:2375
         type: string
       userAccessPolicies:

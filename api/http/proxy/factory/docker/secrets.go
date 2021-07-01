@@ -58,7 +58,7 @@ func (transport *Transport) secretListOperation(response *http.Response, executo
 func (transport *Transport) secretInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// SecretInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/SecretInspect
-	responseObject, err := responseutils.GetResponseAsJSONOBject(response)
+	responseObject, err := responseutils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return err
 	}

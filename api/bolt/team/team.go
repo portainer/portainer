@@ -1,7 +1,9 @@
 package team
 
 import (
-	"github.com/portainer/portainer/api"
+	"strings"
+
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/internal"
 
@@ -15,18 +17,18 @@ const (
 
 // Service represents a service for managing endpoint data.
 type Service struct {
-	db *bolt.DB
+	connection *internal.DbConnection
 }
 
 // NewService creates a new instance of a service.
-func NewService(db *bolt.DB) (*Service, error) {
-	err := internal.CreateBucket(db, BucketName)
+func NewService(connection *internal.DbConnection) (*Service, error) {
+	err := internal.CreateBucket(connection, BucketName)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Service{
-		db: db,
+		connection: connection,
 	}, nil
 }
 
@@ -35,7 +37,7 @@ func (service *Service) Team(ID portainer.TeamID) (*portainer.Team, error) {
 	var team portainer.Team
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.db, BucketName, identifier, &team)
+	err := internal.GetObject(service.connection, BucketName, identifier, &team)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +49,7 @@ func (service *Service) Team(ID portainer.TeamID) (*portainer.Team, error) {
 func (service *Service) TeamByName(name string) (*portainer.Team, error) {
 	var team *portainer.Team
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		cursor := bucket.Cursor()
@@ -58,7 +60,7 @@ func (service *Service) TeamByName(name string) (*portainer.Team, error) {
 				return err
 			}
 
-			if t.Name == name {
+			if strings.EqualFold(t.Name, name) {
 				team = &t
 				break
 			}
@@ -78,7 +80,7 @@ func (service *Service) TeamByName(name string) (*portainer.Team, error) {
 func (service *Service) Teams() ([]portainer.Team, error) {
 	var teams = make([]portainer.Team, 0)
 
-	err := service.db.View(func(tx *bolt.Tx) error {
+	err := service.connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		cursor := bucket.Cursor()
@@ -100,12 +102,12 @@ func (service *Service) Teams() ([]portainer.Team, error) {
 // UpdateTeam saves a Team.
 func (service *Service) UpdateTeam(ID portainer.TeamID, team *portainer.Team) error {
 	identifier := internal.Itob(int(ID))
-	return internal.UpdateObject(service.db, BucketName, identifier, team)
+	return internal.UpdateObject(service.connection, BucketName, identifier, team)
 }
 
 // CreateTeam creates a new Team.
 func (service *Service) CreateTeam(team *portainer.Team) error {
-	return service.db.Update(func(tx *bolt.Tx) error {
+	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		id, _ := bucket.NextSequence()
@@ -123,5 +125,5 @@ func (service *Service) CreateTeam(team *portainer.Team) error {
 // DeleteTeam deletes a Team.
 func (service *Service) DeleteTeam(ID portainer.TeamID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.db, BucketName, identifier)
+	return internal.DeleteObject(service.connection, BucketName, identifier)
 }

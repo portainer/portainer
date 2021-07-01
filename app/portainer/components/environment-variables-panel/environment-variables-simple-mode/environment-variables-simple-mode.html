@@ -1,0 +1,36 @@
+<div class="environment-variables-simple-mode">
+  <div class="col-sm-12">
+    <a class="small interactive" ng-click="$ctrl.onSwitchModeClick()"> <i class="fa fa-list-ol space-right" aria-hidden="true"></i> Advanced mode </a>
+  </div>
+  <div class="col-sm-12 small text-muted">
+    <i class="fa fa-info-circle blue-icon space-right" aria-hidden="true"></i>
+    Switch to advanced mode to copy & paste multiple variables
+  </div>
+  <div class="col-sm-12 environment-variables-simple-mode--actions">
+    <button type="button" class="btn btn-sm btn-default" ng-click="$ctrl.add()"> <i class="fa fa-plus-circle" aria-hidden="true"></i> Add an environment variable </button>
+    <button
+      type="button"
+      class="btn btn-sm btn-default"
+      ngf-select="$ctrl.addFromFile($file)"
+      ngf-accept="'.env'"
+      ngf-pattern="'.env'"
+      ngf-max-size="1MB"
+      ngf-model-invalid="errorFile"
+    >
+      <i class="fa fa-file-upload" aria-hidden="true"></i> Load variables from .env file
+    </button>
+    <span class="space-left" ng-if="errorFile.$error == 'maxSize'">
+      <i class="fa fa-times red-icon space-right" aria-hidden="true"></i>
+      File too large! Try uploading a file smaller than 1MB
+    </span>
+  </div>
+  <div class="col-sm-12 form-inline env-items-list">
+    <environment-variables-simple-mode-item
+      ng-repeat="variable in $ctrl.ngModel"
+      variable="variable"
+      index="$index"
+      on-change="($ctrl.onChangeVariable)"
+      on-remove="($ctrl.remove)"
+    ></environment-variables-simple-mode-item>
+  </div>
+</div>
