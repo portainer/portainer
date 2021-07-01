@@ -19,7 +19,7 @@ function BuildImageController($scope, $async, $window, ModalService, BuildServic
 
   $window.onbeforeunload = () => {
     if ($scope.state.BuildType === 'editor' && $scope.formValues.DockerFileContent && $scope.state.isEditorDirty) {
-      return '';
+      this.state.isEditorDirty = false;
     }
   };
 
