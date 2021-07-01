@@ -2,6 +2,7 @@ package registries
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -14,10 +15,12 @@ import (
 type registryCreatePayload struct {
 	// Name that will be used to identify this registry
 	Name string `example:"my-registry" validate:"required"`
-	// Registry Type. Valid values are: 1 (Quay.io), 2 (Azure container registry), 3 (custom registry) or 4 (Gitlab registry)
-	Type portainer.RegistryType `example:"1" validate:"required" enums:"1,2,3,4"`
+	// Registry Type. Valid values are: 1 (Quay.io), 2 (Azure container registry), 3 (custom registry), 4 (Gitlab registry) or 5 (ProGet registry)
+	Type portainer.RegistryType `example:"1" validate:"required" enums:"1,2,3,4,5"`
 	// URL or IP address of the Docker registry
-	URL string `example:"registry.mydomain.tld:2375" validate:"required"`
+	URL string `example:"registry.mydomain.tld:2375/feed" validate:"required"`
+	// BaseURL required for ProGet registry
+	BaseURL string `example:"registry.mydomain.tld:2375"`
 	// Is authentication against this registry enabled
 	Authentication bool `example:"false" validate:"required"`
 	// Username used to authenticate against this registry. Required when Authentication is true
@@ -30,7 +33,7 @@ type registryCreatePayload struct {
 	Quay portainer.QuayRegistryData
 }
 
-func (payload *registryCreatePayload) Validate(r *http.Request) error {
+func (payload *registryCreatePayload) Validate(_ *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
 		return errors.New("Invalid registry name")
 	}
@@ -40,9 +43,17 @@ func (payload *registryCreatePayload) Validate(r *http.Request) error {
 	if payload.Authentication && (govalidator.IsNull(payload.Username) || govalidator.IsNull(payload.Password)) {
 		return errors.New("Invalid credentials. Username and password must be specified when authentication is enabled")
 	}
-	if payload.Type != portainer.QuayRegistry && payload.Type != portainer.AzureRegistry && payload.Type != portainer.CustomRegistry && payload.Type != portainer.GitlabRegistry {
-		return errors.New("Invalid registry type. Valid values are: 1 (Quay.io), 2 (Azure container registry), 3 (custom registry) or 4 (Gitlab registry)")
+
+	switch payload.Type {
+	case portainer.QuayRegistry, portainer.AzureRegistry, portainer.CustomRegistry, portainer.GitlabRegistry, portainer.ProGetRegistry:
+	default:
+		return errors.New("invalid registry type. Valid values are: 1 (Quay.io), 2 (Azure container registry), 3 (custom registry), 4 (Gitlab registry) or 5 (ProGet registry)")
 	}
+
+	if payload.Type == portainer.ProGetRegistry && payload.BaseURL == "" {
+		return fmt.Errorf("BaseURL is required for registry type %d (ProGet)", portainer.ProGetRegistry)
+	}
+
 	return nil
 }
 
@@ -70,6 +81,7 @@ func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *
 		Type:               portainer.RegistryType(payload.Type),
 		Name:               payload.Name,
 		URL:                payload.URL,
+		BaseURL:            payload.BaseURL,
 		Authentication:     payload.Authentication,
 		Username:           payload.Username,
 		Password:           payload.Password,

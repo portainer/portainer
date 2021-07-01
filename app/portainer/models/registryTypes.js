@@ -3,4 +3,5 @@ export const RegistryTypes = Object.freeze({
   AZURE: 2,
   CUSTOM: 3,
   GITLAB: 4,
+  PROGET: 5,
 });
