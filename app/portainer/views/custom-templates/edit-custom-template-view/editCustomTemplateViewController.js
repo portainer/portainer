@@ -119,7 +119,7 @@ class EditCustomTemplateViewController {
 
     this.$window.onbeforeunload = () => {
       if (this.formValues.FileContent !== this.oldFileContent && this.state.isEditorDirty) {
-        isEditorDirty = false;
+        this.state.isEditorDirty = false;
       }
     };
   }

@@ -66,7 +66,7 @@ angular.module('portainer.app').controller('StackController', [
 
     $window.onbeforeunload = () => {
       if ($scope.stackFileContent && $scope.state.isEditorDirty) {
-        isEditorDirty = false;
+        this.state.isEditorDirty = false;
       }
     };
 

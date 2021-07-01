@@ -106,7 +106,7 @@ class KubernetesCreateConfigurationController {
 
     this.$window.onbeforeunload = () => {
       if (!this.formValues.IsSimple && this.formValues.DataYaml && this.state.isEditorDirty) {
-        isEditorDirty = false;
+        this.state.isEditorDirty = false;
       }
     };
   }

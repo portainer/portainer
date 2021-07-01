@@ -36,7 +36,7 @@ class CreateConfigController {
   async $onInit() {
     this.$window.onbeforeunload = () => {
       if (this.formValues.displayCodeEditor && this.formValues.ConfigContent && this.state.isEditorDirty) {
-        isEditorDirty = false;
+        this.state.isEditorDirty = false;
       }
     };
 
