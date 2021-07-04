@@ -1,3 +1,82 @@
+:root {
+  --main: #181818;
+  --txt-second: #aaa;
+}
+
+.form-control {
+  background-color: #181818 !important;
+  border: 1px solid rgb(54, 54, 54) !important;
+  color: #aaa !important;
+}
+.switch i:before,
+.bootbox-form .checkbox i:before {
+  background: var(--txt-second) !important;
+}
+
+.boxselector_wrapper label {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.modal-content {
+  background: #212121 !important;
+}
+
+.modal-header {
+  border-bottom: 1px solid #212121 !important;
+}
+
+.modal-footer {
+  border-top: 1px solid #212121 !important;
+}
+
+.table > thead > tr > th {
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.table-hover > tbody > tr:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.input-group-addon {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid #212121 !important;
+}
+
+.text-muted {
+  color: #fff;
+}
+
+.table > thead > tr > th,
+.table > tbody > tr > th,
+.table > tfoot > tr > th,
+.table > thead > tr > td,
+.table > tbody > tr > td,
+.table > tfoot > tr > td {
+  border-top: 0px !important;
+}
+.panel {
+  border: 0px !important;
+}
+.panel-body {
+  background: #212121 !important;
+}
+ul.sidebar .sidebar-list a {
+  color: #aaa;
+}
+
+.blocklist-item {
+  border: 1px solid #666 !important;
+}
+
+.blocklist-item:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+}
+
+ul.sidebar .sidebar-list .sidebar-sublist a {
+  color: #aaa !important;
+}
+
 html,
 body,
 #page-wrapper,
