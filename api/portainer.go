@@ -486,18 +486,20 @@ type (
 
 	// OAuthSettings represents the settings used to authorize with an authorization server
 	OAuthSettings struct {
-		ClientID             string `json:"ClientID"`
-		ClientSecret         string `json:"ClientSecret,omitempty"`
-		AccessTokenURI       string `json:"AccessTokenURI"`
-		AuthorizationURI     string `json:"AuthorizationURI"`
-		ResourceURI          string `json:"ResourceURI"`
-		RedirectURI          string `json:"RedirectURI"`
-		UserIdentifier       string `json:"UserIdentifier"`
-		Scopes               string `json:"Scopes"`
-		OAuthAutoCreateUsers bool   `json:"OAuthAutoCreateUsers"`
-		DefaultTeamID        TeamID `json:"DefaultTeamID"`
-		SSO                  bool   `json:"SSO"`
-		LogoutURI            string `json:"LogoutURI"`
+		ClientID                  string   `json:"ClientID"`
+		ClientSecret              string   `json:"ClientSecret,omitempty"`
+		AccessTokenURI            string   `json:"AccessTokenURI"`
+		AuthorizationURI          string   `json:"AuthorizationURI"`
+		ResourceURI               string   `json:"ResourceURI"`
+		RedirectURI               string   `json:"RedirectURI"`
+		UserIdentifier            string   `json:"UserIdentifier"`
+		Scopes                    string   `json:"Scopes"`
+		OAuthAutoCreateUsers      bool     `json:"OAuthAutoCreateUsers"`
+		DefaultTeamID             TeamID   `json:"DefaultTeamID"`
+		SSO                       bool     `json:"SSO"`
+		LogoutURI                 string   `json:"LogoutURI"`
+		AdminAutoPopulate         bool     `json:"AdminAutoPopulate"`
+		AdminGroupClaimsRegexList []string `json:"AdminGroupClaimsRegexList"`
 	}
 
 	// Pair defines a key/value string pair
