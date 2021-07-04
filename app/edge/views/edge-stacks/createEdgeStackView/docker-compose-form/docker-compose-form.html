@@ -4,10 +4,11 @@
 <box-selector radio-name="method" ng-model="$ctrl.state.Method" options="$ctrl.methodOptions" on-change="($ctrl.onChangeMethod)"></box-selector>
 
 <web-editor-form
-  ng-show="$ctrl.state.Method === 'editor'"
+  ng-if="$ctrl.state.Method === 'editor'"
   identifier="stack-creation-editor"
   value="$ctrl.formValues.StackFileContent"
   on-change="($ctrl.onChangeFileContent)"
+  ng-required="true"
   yml="true"
   placeholder="# Define or paste the content of your docker-compose file here"
 >
@@ -20,16 +21,16 @@
   </editor-description>
 </web-editor-form>
 
-<file-upload-form ng-show="$ctrl.state.Method === 'upload'" file="$ctrl.formValues.StackFile" on-change="($ctrl.onChangeFile)">
+<file-upload-form ng-if="$ctrl.state.Method === 'upload'" file="$ctrl.formValues.StackFile" on-change="($ctrl.onChangeFile)" ng-required="true">
   <file-upload-description>
     You can upload a Compose file from your computer.
   </file-upload-description>
 </file-upload-form>
 
-<git-form ng-show="$ctrl.state.Method === 'repository'" model="$ctrl.formValues" on-change="($ctrl.onChangeFormValues)"></git-form>
+<git-form ng-if="$ctrl.state.Method === 'repository'" model="$ctrl.formValues" on-change="($ctrl.onChangeFormValues)"></git-form>
 
 <!-- template -->
-<div ng-show="$ctrl.state.Method === 'template'">
+<div ng-if="$ctrl.state.Method === 'template'">
   <div class="form-group">
     <label for="stack_template" class="col-sm-1 control-label text-left">
       Template
@@ -65,6 +66,7 @@
     on-change="($ctrl.onChangeFileContent)"
     yml="true"
     placeholder="# Define or paste the content of your docker-compose file here"
+    ng-required="true"
   >
   </web-editor-form>
 

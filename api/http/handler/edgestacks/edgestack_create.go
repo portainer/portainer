@@ -242,17 +242,6 @@ func (handler *Handler) createSwarmStackFromGitRepository(r *http.Request) (*por
 		repositoryPassword = ""
 	}
 
-	if stack.DeploymentType == portainer.EdgeStackDeploymentCompose {
-		stack.EntryPoint = payload.FilePathInRepository
-	} else {
-		stack.ManifestPath = payload.FilePathInRepository
-	}
-
-	err = handler.GitService.CloneRepository(projectPath, payload.RepositoryURL, payload.RepositoryReferenceName, repositoryUsername, repositoryPassword)
-	if err != nil {
-		return nil, err
-	}
-
 	relationConfig, err := fetchEndpointRelationsConfig(handler.DataStore)
 	if err != nil {
 		return nil, fmt.Errorf("failed fetching relations config: %w", err)
@@ -263,9 +252,20 @@ func (handler *Handler) createSwarmStackFromGitRepository(r *http.Request) (*por
 		return nil, fmt.Errorf("unable to retrieve related endpoints: %w", err)
 	}
 
-	err = handler.convertAndStoreKubeManifestIfNeeded(stack, relatedEndpointIds)
+	if stack.DeploymentType == portainer.EdgeStackDeploymentCompose {
+		stack.EntryPoint = payload.FilePathInRepository
+
+		err = handler.convertAndStoreKubeManifestIfNeeded(stack, relatedEndpointIds)
+		if err != nil {
+			return nil, fmt.Errorf("Failed creating and storing kube manifest: %w", err)
+		}
+	} else {
+		stack.ManifestPath = payload.FilePathInRepository
+	}
+
+	err = handler.GitService.CloneRepository(projectPath, payload.RepositoryURL, payload.RepositoryReferenceName, repositoryUsername, repositoryPassword)
 	if err != nil {
-		return nil, fmt.Errorf("Failed creating and storing kube manifest: %w", err)
+		return nil, err
 	}
 
 	err = updateEndpointRelations(handler.DataStore.EndpointRelation(), stack.ID, relatedEndpointIds)

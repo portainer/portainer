@@ -17,6 +17,8 @@ export class EditEdgeStackFormController {
     this.hasDockerEndpoint = this.hasDockerEndpoint.bind(this);
     this.hasKubeEndpoint = this.hasKubeEndpoint.bind(this);
     this.onChangeDeploymentType = this.onChangeDeploymentType.bind(this);
+    this.removeLineBreaks = this.removeLineBreaks.bind(this);
+    this.onChangeFileContent = this.onChangeFileContent.bind(this);
   }
 
   hasKubeEndpoint() {
@@ -38,11 +40,16 @@ export class EditEdgeStackFormController {
     this.state.endpointTypes = edgeGroups.flatMap((group) => group.EndpointTypes);
   }
 
+  removeLineBreaks(value) {
+    return value.replace(/(\r\n|\n|\r)/gm, '');
+  }
+
   onChangeFileContent(type, value) {
-    if (this.fileContents[type].replace(/(\r\n|\n|\r)/gm, '') !== value.replace(/(\r\n|\n|\r)/gm, '')) {
-      this.isEditorDirty = true;
-      this.fileContents[type] = value;
+    const oldValue = this.fileContents[type];
+    if (this.removeLineBreaks(oldValue) !== this.removeLineBreaks(value)) {
       this.model.StackFileContent = value;
+      this.fileContents[type] = value;
+      this.isEditorDirty = true;
     }
   }
 

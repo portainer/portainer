@@ -7,14 +7,14 @@
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-body>
-        <form class="form-horizontal">
+        <form class="form-horizontal" name="$ctrl.form">
           <!-- name-input -->
           <div class="form-group">
             <label for="stack_name" class="col-sm-1 control-label text-left">
               Name
             </label>
             <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="$ctrl.formValues.Name" id="stack_name" placeholder="e.g. mystack" auto-focus />
+              <input type="text" class="form-control" ng-model="$ctrl.formValues.Name" id="stack_name" name="nameField" placeholder="e.g. mystack" auto-focus required />
             </div>
           </div>
           <!-- !name-input -->
@@ -65,11 +65,7 @@
               <button
                 type="button"
                 class="btn btn-primary btn-sm"
-                ng-disabled="$ctrl.state.actionInProgress || !$ctrl.formValues.Groups.length
-              || ($ctrl.state.Method === 'editor' && !$ctrl.formValues.StackFileContent)
-              || ($ctrl.state.Method === 'upload' && !$ctrl.formValues.StackFile)
-              || ($ctrl.state.Method === 'repository' && ((!$ctrl.formValues.RepositoryURL || !$ctrl.formValues.FilePathInRepository) || ($ctrl.formValues.RepositoryAuthentication && (!$ctrl.formValues.RepositoryUsername || !$ctrl.formValues.RepositoryPassword))))
-              || !$ctrl.formValues.Name"
+                ng-disabled="$ctrl.state.actionInProgress || $ctrl.formIsInvalid()"
                 ng-click="$ctrl.createStack()"
                 button-spinner="$ctrl.state.actionInProgress"
               >

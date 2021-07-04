@@ -3,6 +3,7 @@ export const fileUploadForm = {
 
   bindings: {
     file: '<',
+    ngRequired: '<',
     onChange: '<',
   },
 

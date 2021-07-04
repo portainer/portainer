@@ -10,13 +10,14 @@
   on-change="($ctrl.onChangeFileContent)"
   yml="true"
   placeholder="# Define or paste the content of your manifest here"
+  ng-required="true"
 >
   <editor-description>
     <kube-deploy-description></kube-deploy-description>
   </editor-description>
 </web-editor-form>
 
-<file-upload-form ng-show="$ctrl.state.Method === 'upload'" file="$ctrl.formValues.StackFile" on-change="($ctrl.onChangeFile)">
+<file-upload-form ng-show="$ctrl.state.Method === 'upload'" file="$ctrl.formValues.StackFile" on-change="($ctrl.onChangeFile)" ng-required="true">
   <file-upload-description>
     <kube-deploy-description></kube-deploy-description>
   </file-upload-description>
