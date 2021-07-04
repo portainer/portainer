@@ -19,9 +19,13 @@ function BuildImageController($scope, $async, $window, ModalService, BuildServic
 
   $window.onbeforeunload = () => {
     if ($scope.state.BuildType === 'editor' && $scope.formValues.DockerFileContent && $scope.state.isEditorDirty) {
-      this.state.isEditorDirty = false;
+      return '';
     }
   };
+
+  $scope.$on('$destroy', function () {
+    $scope.state.isEditorDirty = false;
+  });
 
   $scope.addImageName = function () {
     $scope.formValues.ImageNames.push({ Name: '' });
