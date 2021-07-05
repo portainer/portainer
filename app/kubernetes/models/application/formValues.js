@@ -124,6 +124,7 @@ export function KubernetesApplicationPublishedPortFormValue() {
     IngressName: undefined,
     IngressRoute: undefined,
     IngressHost: undefined,
+    IngressHosts: [],
   };
 }
 
