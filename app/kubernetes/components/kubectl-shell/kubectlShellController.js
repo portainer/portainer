@@ -22,19 +22,35 @@ class KubectlShellController {
     this.state.socket.close();
     this.state.term.dispose();
     this.state.connected = false;
+    this.shelloff();
   }
 
   screenclear() {
     this.state.term.clear();
   }
 
+  shellon() {
+    var currentheight_content = document.getElementById('content-wrapper').offsetHeight;
+    var newheight_content = currentheight_content - 480;
+    document.getElementById('content-wrapper').style.height = newheight_content + 'px';
+    document.getElementById('sidebar-wrapper').style.height = newheight_content + 'px';
+    document.getElementById('content-wrapper').style.overflowY = 'scroll';
+  }
+
+  shelloff() {
+    document.getElementById('content-wrapper').style.height = '100%';
+    document.getElementById('sidebar-wrapper').style.height = '100%';
+  }
+
   mini_restore() {
     if (this.$scope.css === 'mini') {
       this.$scope.css = 'normal';
       this.$scope.icon = 'fas fa-window-minimize';
+      this.shellon();
     } else {
       this.$scope.css = 'mini';
       this.$scope.icon = 'fas fa-window-restore';
+      this.shelloff();
     }
   }
 
@@ -45,6 +61,9 @@ class KubectlShellController {
       term.setOption('cursorBlink', true);
       term.focus();
       term.fit();
+      term.writeln('#Run kubectl commands inside here');
+      term.writeln('#e.g. kubectl get all');
+      term.writeln('');
     };
 
     term.on('data', function (data) {
@@ -95,6 +114,7 @@ class KubectlShellController {
     this.state.socket = new WebSocket(url);
     this.state.term = new Terminal();
 
+    this.shellon();
     this.configureSocketAndTerminal(this.state.socket, this.state.term);
   }
 
