@@ -82,36 +82,6 @@
     </span>
   </div>
 
-  <div class="form-group">
-    <label class="col-sm-12 control-label text-left">Admin mapping</label>
-  </div>
-  <div class="form-group">
-    <div class="col-sm-12">
-      <label for="admin-auto-populate" class="text-muted small" style="margin-bottom: 0.5em; vertical-align: top;">
-        Assign admin rights to group(s) <portainer-tooltip position="bottom" message="Complete OAuth configuration below"></portainer-tooltip
-      ></label>
-      <label class="switch" style="margin: 0 30px; vertical-align: top;">
-        <input id="admin-auto-populate" type="checkbox" ng-model="$ctrl.settings.AdminAutoPopulate" /><i></i>
-      </label>
-      <div style="display: inline-block;" ng-if="$ctrl.settings.AdminAutoPopulate">
-        <span class="label label-default interactive" style="margin-left: 1.4em;" ng-click="$ctrl.addAdminClaimRegex()">
-          <i class="fa fa-plus-circle" aria-hidden="true"></i> add admin mapping
-        </span>
-
-        <div class="form-inline" ng-repeat="mapping in $ctrl.settings.AdminGroupClaimsRegexList track by $index" style="margin-top: 0.75em;">
-          <div class="input-group input-group-sm">
-            <span class="input-group-addon">claim value regex</span>
-            <input style="min-width: 300px;" id="admin-claims_regex_{{ $index }}" type="text" class="form-control" ng-model="$ctrl.settings.AdminGroupClaimsRegexList[$index]" />
-          </div>
-          <button type="button" class="btn btn-sm btn-danger" ng-click="$ctrl.removeAdminClaimRegex($index)"> <i class="fa fa-trash" aria-hidden="true"> </i></button>
-          <div class="small text-warning" ng-show="!$ctrl.settings.AdminGroupClaimsRegexList[$index]" style="margin-top: 0.4em;">
-            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Claim value regex is required.
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div class="col-sm-12 form-section-title">OAuth Configuration</div>
 
   <div class="form-group">

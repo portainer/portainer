@@ -123,11 +123,6 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
 
     $scope.saveSettings = function () {
       var settings = angular.copy($scope.settings);
-
-      if (!settings.OAuthSettings.AdminAutoPopulate) {
-        delete settings.OAuthSettings.AdminGroupClaimsRegexList;
-      }
-
       var TLSCAFile = $scope.formValues.TLSCACert !== settings.LDAPSettings.TLSConfig.TLSCACert ? $scope.formValues.TLSCACert : null;
 
       if ($scope.formValues.LDAPSettings.AnonymousMode) {
@@ -154,18 +149,6 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
           $scope.state.uploadInProgress = false;
           $scope.state.actionInProgress = false;
         });
-    };
-
-    $scope.isOAuthAdminMappingFormValid = function () {
-      if ($scope.settings && $scope.settings.OAuthSettings.AdminAutoPopulate && $scope.settings.OAuthSettings.AdminGroupClaimsRegexList) {
-        const hasInvalidMapping =
-          $scope.settings.OAuthSettings.AdminGroupClaimsRegexList.length === 0 || $scope.settings.OAuthSettings.AdminGroupClaimsRegexList.some((e) => e === '');
-        if (hasInvalidMapping) {
-          return false;
-        }
-      }
-
-      return true;
     };
 
     // Add default port if :port is not defined in URL
