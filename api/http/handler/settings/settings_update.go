@@ -53,7 +53,7 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 		}
 	}
 	if payload.LDAPSettings.AdminAutoPopulate && len(payload.LDAPSettings.AdminGroupSearchSettings) == 0 {
-		return errors.New("Invalid GroupSearchSettings")
+		return errors.New("Invalid AdminGroupSearchSettings")
 	}
 
 	return nil
