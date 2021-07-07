@@ -92,6 +92,7 @@ class KubectlShellController {
 
   connectConsole() {
     this.$scope.checked = true;
+    this.$scope.css = 'normal';
 
     const params = {
       token: this.LocalStorage.getJWT(),
