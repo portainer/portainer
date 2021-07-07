@@ -173,7 +173,7 @@ export class KubernetesIngressConverter {
       res.spec.rules = [];
       _.forEach(data.Hosts, (host) => {
         if (!host.NeedsDeletion) {
-          res.spec.rules.push({ host: host.Host });
+          res.spec.rules.push({ host: host.Host || host });
         }
       });
     } else {
