@@ -1189,7 +1189,7 @@ type (
 
 	// OAuthService represents a service used to authenticate users using OAuth
 	OAuthService interface {
-		Authenticate(code string, configuration *OAuthSettings) (string, *time.Time, error)
+		Authenticate(code string, configuration *OAuthSettings) (string, error)
 	}
 
 	// RegistryService represents a service for managing registry data
@@ -1341,7 +1341,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "2.6.0"
+	APIVersion = "2.6.1"
 	// DBVersion is the version number of the Portainer database
 	DBVersion = 30
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
