@@ -36,7 +36,7 @@ class CreateConfigController {
   async $onInit() {
     this.$window.onbeforeunload = () => {
       if (this.formValues.displayCodeEditor && this.formValues.ConfigContent && this.state.isEditorDirty) {
-        this.state.isEditorDirty = false;
+        return '';
       }
     };
 
@@ -66,6 +66,10 @@ class CreateConfigController {
     if (this.formValues.displayCodeEditor && this.formValues.ConfigContent && this.state.isEditorDirty) {
       return this.ModalService.confirmWebEditorDiscard();
     }
+  }
+
+  $onDestroy() {
+    this.state.isEditorDirty = false;
   }
 
   addLabel() {

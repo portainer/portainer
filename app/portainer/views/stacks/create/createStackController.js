@@ -49,9 +49,13 @@ angular
 
     $window.onbeforeunload = () => {
       if ($scope.state.Method === 'editor' && $scope.formValues.StackFileContent && $scope.state.isEditorDirty) {
-        this.state.isEditorDirty = false;
+        return '';
       }
     };
+
+    $scope.$on('$destroy', function() {
+      $scope.state.isEditorDirty = false;
+    })
 
     $scope.onChangeFormValues = onChangeFormValues;
 

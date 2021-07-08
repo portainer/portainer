@@ -184,9 +184,13 @@ class CreateCustomTemplateViewController {
 
     this.$window.onbeforeunload = () => {
       if (this.state.Method === 'editor' && this.formValues.FileContent && this.state.isEditorDirty) {
-        this.state.isEditorDirty = false;
+        return '';
       }
     };
+  }
+
+  $onDestroy() {
+    this.state.isEditorDirty = false;
   }
 
   async uiCanExit() {

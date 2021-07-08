@@ -62,6 +62,10 @@ export class CreateEdgeJobViewController {
     }
   }
 
+  $onDestroy() {
+    this.state.isEditorDirty = false;
+  }
+
   async $onInit() {
     try {
       const [groups, tags] = await Promise.all([this.GroupService.groups(), this.TagService.tags()]);
@@ -73,7 +77,7 @@ export class CreateEdgeJobViewController {
 
     this.$window.onbeforeunload = () => {
       if (this.model.FileContent && this.state.isEditorDirty) {
-        this.state.isEditorDirty = false;
+        return '';
       }
     };
   }

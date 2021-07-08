@@ -66,9 +66,13 @@ angular.module('portainer.app').controller('StackController', [
 
     $window.onbeforeunload = () => {
       if ($scope.stackFileContent && $scope.state.isEditorDirty) {
-        this.state.isEditorDirty = false;
+        return '';
       }
     };
+
+    $scope.$on('$destroy', function() {
+      $scope.state.isEditorDirty = false;
+    })
 
     $scope.handleEnvVarChange = handleEnvVarChange;
     function handleEnvVarChange(value) {

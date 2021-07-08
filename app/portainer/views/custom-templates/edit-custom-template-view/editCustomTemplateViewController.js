@@ -108,6 +108,10 @@ class EditCustomTemplateViewController {
     }
   }
 
+  $onDestroy() {
+    this.state.isEditorDirty = false;
+  }
+
   async $onInit() {
     this.getTemplate();
 
@@ -119,7 +123,7 @@ class EditCustomTemplateViewController {
 
     this.$window.onbeforeunload = () => {
       if (this.formValues.FileContent !== this.oldFileContent && this.state.isEditorDirty) {
-        this.state.isEditorDirty = false;
+        return '';
       }
     };
   }

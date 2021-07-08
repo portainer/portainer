@@ -48,9 +48,13 @@ export class EditEdgeStackViewController {
 
     this.$window.onbeforeunload = () => {
       if (this.formValues.StackFileContent !== this.oldFileContent && this.state.isEditorDirty) {
-        this.state.isEditorDirty = false;
+        return '';
       }
     };
+  }
+
+  $onDestroy() {
+    this.state.isEditorDirty = false;
   }
 
   async uiCanExit() {
