@@ -22,35 +22,35 @@ class KubectlShellController {
     this.state.socket.close();
     this.state.term.dispose();
     this.state.connected = false;
-    this.shelloff();
+    this.shellOff();
   }
 
-  screenclear() {
+  screenClear() {
     this.state.term.clear();
   }
 
-  shellon() {
-    var currentheight_content = document.getElementById('content-wrapper').offsetHeight;
-    var newheight_content = currentheight_content - 480;
-    document.getElementById('content-wrapper').style.height = newheight_content + 'px';
-    document.getElementById('sidebar-wrapper').style.height = newheight_content + 'px';
-    document.getElementById('content-wrapper').style.overflowY = 'scroll';
+  shellOn() {
+    var currentheightContent = document.getElementById('content-wrapper').offsetHeight;
+    var newheightContent = currentheightContent - 480;
+    document.getElementById('content-wrapper').style.height = newheightContent + 'px';
+    document.getElementById('sidebar-wrapper').style.height = newheightContent + 'px';
+    document.getElementById('content-wrapper').style.overflow = 'auto';
   }
 
-  shelloff() {
-    document.getElementById('content-wrapper').style.height = '100%';
-    document.getElementById('sidebar-wrapper').style.height = '100%';
+  shellOff() {
+    document.getElementById('content-wrapper').style.height = this.$scope.initialHeight;
+    document.getElementById('sidebar-wrapper').style.height = this.$scope.initialHeight;
   }
 
-  mini_restore() {
+  miniRestore() {
     if (this.$scope.css === 'mini') {
       this.$scope.css = 'normal';
       this.$scope.icon = 'fas fa-window-minimize';
-      this.shellon();
+      this.shellOn();
     } else {
       this.$scope.css = 'mini';
       this.$scope.icon = 'fas fa-window-restore';
-      this.shelloff();
+      this.shellOff();
     }
   }
 
@@ -115,7 +115,7 @@ class KubectlShellController {
     this.state.socket = new WebSocket(url);
     this.state.term = new Terminal();
 
-    this.shellon();
+    this.shellOn();
     this.configureSocketAndTerminal(this.state.socket, this.state.term);
   }
 
@@ -127,6 +127,7 @@ class KubectlShellController {
     this.$scope.css = 'normal';
     this.$scope.checked = false;
     this.$scope.icon = 'fa-window-minimize';
+    this.$scope.initialHeight = '100%';
     this.$scope.isHTTPS = this.$window.location.protocol === 'https:';
 
     this.state = {

@@ -73,13 +73,3 @@ ul.sidebar li .shell-item-center a:hover {
   height: 35px;
   z-index: 1000;
 }
-
-.fullscreen-kubectl-shell {
-  position: fixed;
-  background: #000;
-  bottom: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 1000;
-}
