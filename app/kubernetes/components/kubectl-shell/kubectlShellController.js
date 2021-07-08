@@ -30,16 +30,17 @@ class KubectlShellController {
   }
 
   shellOn() {
-    var currentheightContent = document.getElementById('content-wrapper').offsetHeight;
-    var newheightContent = currentheightContent - 480;
-    document.getElementById('content-wrapper').style.height = newheightContent + 'px';
-    document.getElementById('sidebar-wrapper').style.height = newheightContent + 'px';
-    document.getElementById('content-wrapper').style.overflow = 'auto';
+    const contentWrapperHeight = document.getElementById('content-wrapper').offsetHeight;
+    const newContentWrapperHeight = contentWrapperHeight - 480;
+    document.getElementById('content-wrapper').style.height = newContentWrapperHeight + 'px';
+    document.getElementById('content-wrapper').style.overflowY = 'auto';
+    document.getElementById('sidebar-wrapper').style.height = newContentWrapperHeight + 'px';
   }
 
   shellOff() {
-    document.getElementById('content-wrapper').style.height = this.$scope.initialHeight;
-    document.getElementById('sidebar-wrapper').style.height = this.$scope.initialHeight;
+    document.getElementById('content-wrapper').style.height = this.$scope.wrapperCSS.height;
+    document.getElementById('content-wrapper').style.overflowY = this.$scope.wrapperCSS.overflowY;
+    document.getElementById('sidebar-wrapper').style.height = this.$scope.wrapperCSS.height;
   }
 
   miniRestore() {
@@ -127,7 +128,7 @@ class KubectlShellController {
     this.$scope.css = 'normal';
     this.$scope.checked = false;
     this.$scope.icon = 'fa-window-minimize';
-    this.$scope.initialHeight = '100%';
+    this.$scope.wrapperCSS = { height: '100%', overflowY: 'initial' };
     this.$scope.isHTTPS = this.$window.location.protocol === 'https:';
 
     this.state = {
