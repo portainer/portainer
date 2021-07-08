@@ -3,19 +3,7 @@ import _ from 'lodash-es';
 var app = angular.module('portainer.docker');
 
 app.filter('unique', function () {
-  return function (collection, keyname) {
-    var output = [],
-      keys = [];
-
-    angular.forEach(collection, function (item) {
-      var key = item[keyname];
-      if (keys.indexOf(key) === -1) {
-        keys.push(key);
-        output.push(item);
-      }
-    });
-    return output;
-  };
+  return _.uniqBy;
 });
 
 app.controller('ContainersDatatableController', [
