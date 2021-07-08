@@ -108,10 +108,6 @@ class EditCustomTemplateViewController {
     }
   }
 
-  $onDestroy() {
-    this.state.isEditorDirty = false;
-  }
-
   async $onInit() {
     this.getTemplate();
 
@@ -126,6 +122,10 @@ class EditCustomTemplateViewController {
         return '';
       }
     };
+  }
+
+  $onDestroy() {
+    this.state.isEditorDirty = false;
   }
 }
 

@@ -62,10 +62,6 @@ export class CreateEdgeJobViewController {
     }
   }
 
-  $onDestroy() {
-    this.state.isEditorDirty = false;
-  }
-
   async $onInit() {
     try {
       const [groups, tags] = await Promise.all([this.GroupService.groups(), this.TagService.tags()]);
@@ -80,5 +76,9 @@ export class CreateEdgeJobViewController {
         return '';
       }
     };
+  }
+
+  $onDestroy() {
+    this.state.isEditorDirty = false;
   }
 }

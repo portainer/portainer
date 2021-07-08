@@ -131,10 +131,6 @@ export class EdgeJobController {
     }
   }
 
-  $onDestroy() {
-    this.state.isEditorDirty = false;
-  }
-
   async $onInit() {
     const { id, tab } = this.$state.params;
     this.state.activeTab = tab;
@@ -173,5 +169,9 @@ export class EdgeJobController {
         return '';
       }
     };
+  }
+
+  $onDestroy() {
+    this.state.isEditorDirty = false;
   }
 }

@@ -62,14 +62,14 @@ class CreateConfigController {
     }
   }
 
+  $onDestroy() {
+    this.state.isEditorDirty = false;
+  }
+
   async uiCanExit() {
     if (this.formValues.displayCodeEditor && this.formValues.ConfigContent && this.state.isEditorDirty) {
       return this.ModalService.confirmWebEditorDiscard();
     }
-  }
-
-  $onDestroy() {
-    this.state.isEditorDirty = false;
   }
 
   addLabel() {
