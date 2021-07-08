@@ -1368,7 +1368,7 @@
                       class="form-control"
                       name="ingress_hostname_{{ $index }}"
                       ng-model="publishedPort.IngressHost"
-                      ng-options="host as (host | kubernetesApplicationIngressEmptyHostname) for host in ctrl.ingressHostnames"
+                      ng-options="host as (host | kubernetesApplicationIngressEmptyHostname) for host in publishedPort.IngressHosts"
                       ng-change="ctrl.onChangePublishedPorts()"
                       ng-disabled="ctrl.disableLoadBalancerEdit() || ctrl.isEditAndNotNewPublishedPort($index)"
                     >
