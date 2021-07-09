@@ -1,7 +1,6 @@
 import _ from 'lodash-es';
 
-export const KEY_REGEX = /[a-zA-Z]([-_a-zA-Z0-9]*[a-zA-Z0-9])?/.source;
-
+export const KEY_REGEX = /(.+)/.source;
 export const VALUE_REGEX = /(.*)?/.source;
 
 const KEY_VALUE_REGEX = new RegExp(`^(${KEY_REGEX})\\s*=(${VALUE_REGEX})$`);
@@ -16,7 +15,7 @@ export function parseDotEnvFile(src) {
   return parseArrayOfStrings(
     _.compact(src.split(NEWLINES_REGEX))
       .map((v) => v.trim())
-      .filter((v) => !v.startsWith('#'))
+      .filter((v) => !v.startsWith('#') && v !== '')
   );
 }
 
@@ -40,7 +39,7 @@ export function parseArrayOfStrings(array) {
 
       const parsedKeyValArr = variableString.trim().match(KEY_VALUE_REGEX);
       if (parsedKeyValArr != null && parsedKeyValArr.length > 4) {
-        return { name: parsedKeyValArr[1], value: parsedKeyValArr[3] || '' };
+        return { name: parsedKeyValArr[1].trim(), value: parsedKeyValArr[3].trim() || '' };
       }
     })
   );

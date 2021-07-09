@@ -321,6 +321,7 @@ class KubernetesCreateApplicationController {
     const ingresses = this.filteredIngresses;
     p.IngressName = ingresses && ingresses.length ? ingresses[0].Name : undefined;
     p.IngressHost = ingresses && ingresses.length ? ingresses[0].Hosts[0] : undefined;
+    p.IngressHosts = ingresses && ingresses.length ? ingresses[0].Hosts : undefined;
     if (this.formValues.PublishedPorts.length) {
       p.Protocol = this.formValues.PublishedPorts[0].Protocol;
     }
@@ -388,6 +389,7 @@ class KubernetesCreateApplicationController {
   onChangePortMappingIngress(index) {
     const publishedPort = this.formValues.PublishedPorts[index];
     const ingress = _.find(this.filteredIngresses, { Name: publishedPort.IngressName });
+    publishedPort.IngressHosts = ingress.Hosts;
     this.ingressHostnames = ingress.Hosts;
     publishedPort.IngressHost = this.ingressHostnames.length ? this.ingressHostnames[0] : [];
     this.onChangePublishedPorts();
@@ -972,7 +974,8 @@ class KubernetesCreateApplicationController {
             this.resourcePools,
             this.configurations,
             this.persistentVolumeClaims,
-            this.nodesLabels
+            this.nodesLabels,
+            this.filteredIngresses
           );
           this.formValues.OriginalIngresses = this.filteredIngresses;
           this.savedFormValues = angular.copy(this.formValues);
