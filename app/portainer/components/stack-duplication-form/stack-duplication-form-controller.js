@@ -65,11 +65,7 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
     }
 
     function isEndpointSelected() {
-      if(ctrl.formValues.endpoint && ctrl.formValues.endpoint.Id) {
-        return true;
-      } else {
-        return false;
-      }
+      return ctrl.formValues.endpoint && ctrl.formValues.endpoint.Id;
     }
   },
 ]);
