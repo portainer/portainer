@@ -1,12 +1,6 @@
 import _ from 'lodash-es';
 
-var app = angular.module('portainer.docker');
-
-app.filter('unique', function () {
-  return _.uniqBy;
-});
-
-app.controller('ContainersDatatableController', [
+angular.module('portainer.docker').controller('ContainersDatatableController', [
   '$scope',
   '$controller',
   'DatatableService',

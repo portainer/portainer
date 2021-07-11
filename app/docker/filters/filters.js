@@ -322,4 +322,8 @@ angular
       }
       return fullName.substring(0, versionIdx);
     };
+  })
+  .filter('containerportfilter', function () {
+    'use strict';
+    return _.uniqBy;
   });
