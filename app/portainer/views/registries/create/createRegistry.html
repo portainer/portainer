@@ -104,11 +104,11 @@
           ></registry-form-custom>
 
           <registry-form-proget
-            ng-if="model.Type === RegistryTypes.PROGET"
-            model="model"
-            form-action="create"
+            ng-if="$ctrl.model.Type === $ctrl.RegistryTypes.PROGET"
+            model="$ctrl.model"
+            form-action="$ctrl.createRegistry"
             form-action-label="Add registry"
-            action-in-progress="state.actionInProgress"
+            action-in-progress="$ctrl.state.actionInProgress"
           ></registry-form-proget>
 
           <registry-form-gitlab
