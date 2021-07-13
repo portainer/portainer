@@ -373,19 +373,12 @@ func (m *Migrator) Migrate() error {
 		}
 	}
 
-	// Portainer 2.7.0
-	if m.currentDBVersion < 31 {
-		err := m.updateRegistriesToDB31()
+	// Portainer 2.9.0
+	if m.currentDBVersion < 32 {
+		err := m.migrateDBVersionTo32()
 		if err != nil {
 			return err
 		}
-		migrateLog.Info("Successful migration of registries to DB version 30")
-
-		err = m.updateDockerhubToDB31()
-		if err != nil {
-			return err
-		}
-		migrateLog.Info("Successful migration of Dockerhub registry to DB version 30")
 	}
 
 	return m.versionService.StoreDBVersion(portainer.DBVersion)
