@@ -470,7 +470,10 @@ type (
 		SearchSettings      []LDAPSearchSettings      `json:"SearchSettings"`
 		GroupSearchSettings []LDAPGroupSearchSettings `json:"GroupSearchSettings"`
 		// Automatically provision users and assign them to matching LDAP group names
-		AutoCreateUsers bool `json:"AutoCreateUsers" example:"true"`
+		AutoCreateUsers          bool                      `json:"AutoCreateUsers" example:"true"`
+		AdminAutoPopulate        bool                      `json:"AdminAutoPopulate" example:"true"`
+		AdminGroupSearchSettings []LDAPGroupSearchSettings `json:"AdminGroupSearchSettings"`
+		AdminGroups              []string                  `json:"AdminGroups"`
 	}
 
 	// LicenseInformation represents information about an extension license
@@ -1187,6 +1190,7 @@ type (
 		AuthenticateUser(username, password string, settings *LDAPSettings) error
 		TestConnectivity(settings *LDAPSettings) error
 		GetUserGroups(username string, settings *LDAPSettings) ([]string, error)
+		SearchAdminGroups(settings *LDAPSettings) ([]string, error)
 	}
 
 	// OAuthService represents a service used to authenticate users using OAuth
@@ -1345,7 +1349,7 @@ const (
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "2.6.0"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 30
+	DBVersion = 32
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
 	ComposeSyntaxMaxVersion = "3.9"
 	// AssetsServerURL represents the URL of the Portainer asset server
