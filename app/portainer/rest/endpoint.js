@@ -25,7 +25,6 @@ angular.module('portainer.app').factory('Endpoints', [
         dockerhubLimits: {
           method: 'GET',
           url: `${API_ENDPOINT_ENDPOINTS}/:id/dockerhub/:registryId`,
-          params: { id: '@id', registryId: '@registryId' },
         },
         registries: {
           method: 'GET',

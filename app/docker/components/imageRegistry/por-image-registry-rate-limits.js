@@ -10,6 +10,7 @@ angular.module('portainer.docker').component('porImageRegistryRateLimits', {
     isAdmin: '<',
     isDockerHubRegistry: '<',
     isAuthenticated: '<',
+    registryId: '<',
   },
   controller,
   transclude: {
