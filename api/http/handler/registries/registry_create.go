@@ -47,7 +47,7 @@ func (payload *registryCreatePayload) Validate(_ *http.Request) error {
 	}
 
 	switch payload.Type {
-	case portainer.QuayRegistry, portainer.AzureRegistry, portainer.CustomRegistry, portainer.GitlabRegistry, portainer.ProGetRegistry:
+	case portainer.QuayRegistry, portainer.AzureRegistry, portainer.CustomRegistry, portainer.GitlabRegistry, portainer.ProGetRegistry, portainer.DockerHubRegistry:
 	default:
 		return errors.New("invalid registry type. Valid values are: 1 (Quay.io), 2 (Azure container registry), 3 (custom registry), 4 (Gitlab registry), 5 (ProGet registry) or 6 (DockerHub)")
 	}
