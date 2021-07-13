@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/security"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -47,6 +48,14 @@ func TestHandler_registryUpdate(t *testing.T) {
 	registry := portainer.Registry{Type: portainer.ProGetRegistry, ID: 5}
 	r := httptest.NewRequest(http.MethodPut, "/registries/5", bytes.NewReader(payloadBytes))
 	w := httptest.NewRecorder()
+
+	restrictedContext := &security.RestrictedRequestContext{
+		IsAdmin: true,
+		UserID:  portainer.UserID(1),
+	}
+
+	ctx := security.StoreRestrictedRequestContext(r, restrictedContext)
+	r = r.WithContext(ctx)
 
 	updatedRegistry := portainer.Registry{}
 	handler := newHandler(nil)

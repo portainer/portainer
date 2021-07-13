@@ -188,7 +188,7 @@ func (bouncer *RequestBouncer) mwUpgradeToRestrictedRequest(next http.Handler) h
 			return
 		}
 
-		ctx := storeRestrictedRequestContext(r, requestContext)
+		ctx := StoreRestrictedRequestContext(r, requestContext)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
