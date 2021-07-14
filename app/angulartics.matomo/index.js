@@ -1,5 +1,5 @@
 import angular from 'angular';
-// TODO move to build env-var?
+
 const basePath = 'http://portainer-ce.app';
 
 const dimensions = {
