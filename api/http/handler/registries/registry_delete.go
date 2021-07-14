@@ -8,6 +8,8 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
+	httperrors "github.com/portainer/portainer/api/http/errors"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 // @id RegistryDelete
@@ -23,6 +25,14 @@ import (
 // @failure 500 "Server error"
 // @router /registries/{id} [delete]
 func (handler *Handler) registryDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+	}
+	if !securityContext.IsAdmin {
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to delete registry", httperrors.ErrResourceAccessDenied}
+	}
+
 	registryID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid registry identifier route variable", err}

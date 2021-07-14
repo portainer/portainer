@@ -290,7 +290,6 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 type composeStackDeploymentConfig struct {
 	stack      *portainer.Stack
 	endpoint   *portainer.Endpoint
-	dockerhub  *portainer.DockerHub
 	registries []portainer.Registry
 	isAdmin    bool
 	user       *portainer.User
@@ -302,26 +301,20 @@ func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portai
 		return nil, &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve info from request context", Err: err}
 	}
 
-	dockerhub, err := handler.DataStore.DockerHub().DockerHub()
+	user, err := handler.DataStore.User().User(securityContext.UserID)
 	if err != nil {
-		return nil, &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve DockerHub details from the database", Err: err}
+		return nil, &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to load user information from the database", Err: err}
 	}
 
 	registries, err := handler.DataStore.Registry().Registries()
 	if err != nil {
 		return nil, &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve registries from the database", Err: err}
 	}
-	filteredRegistries := security.FilterRegistries(registries, securityContext)
-
-	user, err := handler.DataStore.User().User(securityContext.UserID)
-	if err != nil {
-		return nil, &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to load user information from the database", Err: err}
-	}
+	filteredRegistries := security.FilterRegistries(registries, user, securityContext.UserMemberships, endpoint.ID)
 
 	config := &composeStackDeploymentConfig{
 		stack:      stack,
 		endpoint:   endpoint,
-		dockerhub:  dockerhub,
 		registries: filteredRegistries,
 		isAdmin:    securityContext.IsAdmin,
 		user:       user,
@@ -366,7 +359,7 @@ func (handler *Handler) deployComposeStack(config *composeStackDeploymentConfig)
 	handler.stackCreationMutex.Lock()
 	defer handler.stackCreationMutex.Unlock()
 
-	handler.SwarmStackManager.Login(config.dockerhub, config.registries, config.endpoint)
+	handler.SwarmStackManager.Login(config.registries, config.endpoint)
 
 	err = handler.ComposeStackManager.Up(config.stack, config.endpoint)
 	if err != nil {

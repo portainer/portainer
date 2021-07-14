@@ -12,7 +12,7 @@ import (
 	"github.com/docker/docker/client"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
+	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
 
@@ -39,7 +39,7 @@ func getInheritedResourceControlFromServiceLabels(dockerClient *client.Client, e
 func (transport *Transport) serviceListOperation(response *http.Response, executor *operationExecutor) error {
 	// ServiceList response is a JSON array
 	// https://docs.docker.com/engine/api/v1.28/#operation/ServiceList
-	responseArray, err := responseutils.GetResponseAsJSONArray(response)
+	responseArray, err := utils.GetResponseAsJSONArray(response)
 	if err != nil {
 		return err
 	}
@@ -55,7 +55,7 @@ func (transport *Transport) serviceListOperation(response *http.Response, execut
 		return err
 	}
 
-	return responseutils.RewriteResponse(response, responseArray, http.StatusOK)
+	return utils.RewriteResponse(response, responseArray, http.StatusOK)
 }
 
 // serviceInspectOperation extracts the response as a JSON object, verify that the user
@@ -63,7 +63,7 @@ func (transport *Transport) serviceListOperation(response *http.Response, execut
 func (transport *Transport) serviceInspectOperation(response *http.Response, executor *operationExecutor) error {
 	//ServiceInspect response is a JSON object
 	//https://docs.docker.com/engine/api/v1.28/#operation/ServiceInspect
-	responseObject, err := responseutils.GetResponseAsJSONObject(response)
+	responseObject, err := utils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return err
 	}
@@ -83,9 +83,9 @@ func (transport *Transport) serviceInspectOperation(response *http.Response, exe
 // https://docs.docker.com/engine/api/v1.28/#operation/ServiceInspect
 // https://docs.docker.com/engine/api/v1.28/#operation/ServiceList
 func selectorServiceLabels(responseObject map[string]interface{}) map[string]interface{} {
-	serviceSpecObject := responseutils.GetJSONObject(responseObject, "Spec")
+	serviceSpecObject := utils.GetJSONObject(responseObject, "Spec")
 	if serviceSpecObject != nil {
-		return responseutils.GetJSONObject(serviceSpecObject, "Labels")
+		return utils.GetJSONObject(serviceSpecObject, "Labels")
 	}
 	return nil
 }

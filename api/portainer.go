@@ -511,8 +511,8 @@ type (
 	Registry struct {
 		// Registry Identifier
 		ID RegistryID `json:"Id" example:"1"`
-		// Registry Type (1 - Quay, 2 - Azure, 3 - Custom, 4 - Gitlab, 5 - ProGet)
-		Type RegistryType `json:"Type" enums:"1,2,3,4,5"`
+		// Registry Type (1 - Quay, 2 - Azure, 3 - Custom, 4 - Gitlab, 5 - ProGet, 6 - DockerHub)
+		Type RegistryType `json:"Type" enums:"1,2,3,4,5,6"`
 		// Registry Name
 		Name string `json:"Name" example:"my-registry"`
 		// URL or IP address of the Docker registry
@@ -528,13 +528,26 @@ type (
 		ManagementConfiguration *RegistryManagementConfiguration `json:"ManagementConfiguration"`
 		Gitlab                  GitlabRegistryData               `json:"Gitlab"`
 		Quay                    QuayRegistryData                 `json:"Quay"`
-		UserAccessPolicies      UserAccessPolicies               `json:"UserAccessPolicies"`
-		TeamAccessPolicies      TeamAccessPolicies               `json:"TeamAccessPolicies"`
+		RegistryAccesses        RegistryAccesses                 `json:"RegistryAccesses"`
 
 		// Deprecated fields
+		// Deprecated in DBVersion == 31
+		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
+		// Deprecated in DBVersion == 31
+		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
+
 		// Deprecated in DBVersion == 18
 		AuthorizedUsers []UserID `json:"AuthorizedUsers"`
+		// Deprecated in DBVersion == 18
 		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
+	}
+
+	RegistryAccesses map[EndpointID]RegistryAccessPolicies
+
+	RegistryAccessPolicies struct {
+		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
+		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
+		Namespaces         []string           `json:"Namespaces"`
 	}
 
 	// RegistryID represents a registry identifier
@@ -1019,7 +1032,6 @@ type (
 		CheckCurrentEdition() error
 		BackupTo(w io.Writer) error
 
-		DockerHub() DockerHubService
 		CustomTemplate() CustomTemplateService
 		EdgeGroup() EdgeGroupService
 		EdgeJob() EdgeJobService
@@ -1048,12 +1060,6 @@ type (
 		EncodedPublicKey() string
 		PEMHeaders() (string, string)
 		CreateSignature(message string) (string, error)
-	}
-
-	// DockerHubService represents a service for managing the DockerHub object
-	DockerHubService interface {
-		DockerHub() (*DockerHub, error)
-		UpdateDockerHub(registry *DockerHub) error
 	}
 
 	// DockerSnapshotter represents a service used to create Docker endpoint snapshots
@@ -1169,6 +1175,9 @@ type (
 		StartExecProcess(namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error
 		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
 		UpdateNamespaceAccessPolicies(accessPolicies map[string]K8sNamespaceAccessPolicy) error
+		DeleteRegistrySecret(registry *Registry, namespace string) error
+		CreateRegistrySecret(registry *Registry, namespace string) error
+		IsRegistrySecret(namespace, secretName string) (bool, error)
 	}
 
 	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes endpoint
@@ -1266,7 +1275,7 @@ type (
 
 	// SwarmStackManager represents a service to manage Swarm stacks
 	SwarmStackManager interface {
-		Login(dockerhub *DockerHub, registries []Registry, endpoint *Endpoint)
+		Login(registries []Registry, endpoint *Endpoint)
 		Logout(endpoint *Endpoint) error
 		Deploy(stack *Stack, prune bool, endpoint *Endpoint) error
 		Remove(stack *Stack, endpoint *Endpoint) error
@@ -1345,7 +1354,7 @@ const (
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "2.6.0"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 30
+	DBVersion = 32
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
 	ComposeSyntaxMaxVersion = "3.9"
 	// AssetsServerURL represents the URL of the Portainer asset server
@@ -1493,6 +1502,8 @@ const (
 	GitlabRegistry
 	// ProGetRegistry represents a proget registry
 	ProGetRegistry
+	// DockerHubRegistry represents a dockerhub registry
+	DockerHubRegistry
 )
 
 const (

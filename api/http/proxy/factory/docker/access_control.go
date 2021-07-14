@@ -7,7 +7,7 @@ import (
 
 	"github.com/portainer/portainer/api/internal/stackutils"
 
-	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
+	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 	"github.com/portainer/portainer/api/internal/authorization"
 
 	portainer "github.com/portainer/portainer/api"
@@ -162,7 +162,7 @@ func (transport *Transport) applyAccessControlOnResource(parameters *resourceOpe
 		systemResourceControl := findSystemNetworkResourceControl(responseObject)
 		if systemResourceControl != nil {
 			responseObject = decorateObject(responseObject, systemResourceControl)
-			return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
+			return utils.RewriteResponse(response, responseObject, http.StatusOK)
 		}
 	}
 
@@ -175,15 +175,15 @@ func (transport *Transport) applyAccessControlOnResource(parameters *resourceOpe
 	}
 
 	if resourceControl == nil && (executor.operationContext.isAdmin) {
-		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
+		return utils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
 
 	if executor.operationContext.isAdmin || (resourceControl != nil && authorization.UserCanAccessResource(executor.operationContext.userID, executor.operationContext.userTeamIDs, resourceControl)) {
 		responseObject = decorateObject(responseObject, resourceControl)
-		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
+		return utils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
 
-	return responseutils.RewriteAccessDeniedResponse(response)
+	return utils.RewriteAccessDeniedResponse(response)
 }
 
 func (transport *Transport) applyAccessControlOnResourceList(parameters *resourceOperationParameters, resourceData []interface{}, executor *operationExecutor) ([]interface{}, error) {
