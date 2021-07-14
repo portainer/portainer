@@ -470,7 +470,10 @@ type (
 		SearchSettings      []LDAPSearchSettings      `json:"SearchSettings"`
 		GroupSearchSettings []LDAPGroupSearchSettings `json:"GroupSearchSettings"`
 		// Automatically provision users and assign them to matching LDAP group names
-		AutoCreateUsers bool `json:"AutoCreateUsers" example:"true"`
+		AutoCreateUsers          bool                      `json:"AutoCreateUsers" example:"true"`
+		AdminAutoPopulate        bool                      `json:"AdminAutoPopulate" example:"true"`
+		AdminGroupSearchSettings []LDAPGroupSearchSettings `json:"AdminGroupSearchSettings"`
+		AdminGroups              []string                  `json:"AdminGroups"`
 	}
 
 	// LicenseInformation represents information about an extension license
