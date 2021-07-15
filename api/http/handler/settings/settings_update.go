@@ -52,6 +52,9 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 			return errors.New("Invalid user session timeout")
 		}
 	}
+	if payload.LDAPSettings.AdminAutoPopulate && len(payload.LDAPSettings.AdminGroupSearchSettings) == 0 {
+		return errors.New("Invalid AdminGroupSearchSettings")
+	}
 
 	return nil
 }
