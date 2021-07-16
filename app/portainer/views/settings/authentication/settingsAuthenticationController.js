@@ -166,6 +166,10 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
         settings.LDAPSettings.AdminGroups = [];
       }
 
+      if ($scope.formValues.selectedAdminGroups && $scope.formValues.selectedAdminGroups.length === 0) {
+        settings.LDAPSettings.AdminAutoPopulate = false;
+      }
+
       var TLSCAFile = $scope.formValues.TLSCACert !== settings.LDAPSettings.TLSConfig.TLSCACert ? $scope.formValues.TLSCACert : null;
 
       if ($scope.formValues.LDAPSettings.AnonymousMode) {
