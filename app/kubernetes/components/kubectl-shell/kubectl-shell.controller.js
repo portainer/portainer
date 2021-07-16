@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { Terminal } from 'xterm';
 import * as fit from 'xterm/lib/addons/fit/fit';
 
@@ -11,8 +10,6 @@ export default class KubectlShellController {
     this.EndpointProvider = EndpointProvider;
     this.LocalStorage = LocalStorage;
     this.KubernetesConfigService = KubernetesConfigService;
-
-    this.onInit = this.onInit.bind(this);
   }
 
   disconnect() {
@@ -102,18 +99,20 @@ export default class KubectlShellController {
     await this.KubernetesConfigService.downloadConfig();
   }
 
-  async onInit() {
-    this.state = {
-      css: 'normal',
-      checked: false,
-      icon: 'fa-window-minimize',
-      isHTTPS: this.$window.location.protocol === 'https:',
-      shell: {
-        connected: false,
-        socket: null,
-        term: null,
-      },
-    };
+  $onInit() {
+    return this.$async(async () => {
+      this.state = {
+        css: 'normal',
+        checked: false,
+        icon: 'fa-window-minimize',
+        isHTTPS: this.$window.location.protocol === 'https:',
+        shell: {
+          connected: false,
+          socket: null,
+          term: null,
+        },
+      };
+    });
   }
 
   $onDestroy() {
@@ -122,10 +121,4 @@ export default class KubectlShellController {
       this.$window.onresize = null;
     }
   }
-
-  $onInit() {
-    return this.$async(this.onInit);
-  }
 }
-
-angular.module('portainer.kubernetes').controller('KubectlShellController', KubectlShellController);
