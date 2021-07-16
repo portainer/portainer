@@ -1,3 +1,4 @@
+import _ from 'lodash-es';
 angular.module('portainer.app').controller('SettingsAuthenticationController', [
   '$q',
   '$scope',
@@ -6,8 +7,8 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
   'SettingsService',
   'FileUploadService',
   'TeamService',
-
-  function ($q, $scope, $state, Notifications, SettingsService, FileUploadService, TeamService) {
+  'LDAPService',
+  function ($q, $scope, $state, Notifications, SettingsService, FileUploadService, TeamService, LDAPService) {
     const DEFAULT_GROUP_FILTER = '(objectClass=groupOfNames)';
 
     $scope.state = {
@@ -38,6 +39,7 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
         { key: '6 months', value: `${24 * 30 * 6}h` },
         { key: '1 year', value: `${24 * 30 * 12}h` },
       ],
+      enableAssignAdminGroup: false,
     };
 
     $scope.formValues = {
@@ -76,15 +78,22 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
         AdminAutoPopulate: false,
         AutoCreateUsers: true,
       },
+      selectedAdminGroups: '',
     };
 
-    $scope.searchGroups = function searchGroups() {
+    $scope.groups = [];
+
+    $scope.searchAdminGroups = async function () {
       const settings = {
         ...$scope.settings.LDAPSettings,
-        GroupSearchSettings: $scope.settings.LDAPSettings.GroupSearchSettings.map((search) => ({ ...search, GroupFilter: search.GroupFilter || DEFAULT_GROUP_FILTER })),
+        AdminGroupSearchSettings: $scope.settings.LDAPSettings.AdminGroupSearchSettings.map((search) => ({ ...search, GroupFilter: search.GroupFilter || DEFAULT_GROUP_FILTER })),
       };
 
-      return SettingsService.searchLDAPGroups(settings);
+      $scope.groups = await LDAPService.adminGroups(settings);
+
+      if ($scope.groups && $scope.groups.length > 0) {
+        $scope.state.enableAssignAdminGroup = true;
+      }
     };
 
     $scope.isOauthEnabled = function isOauthEnabled() {
@@ -151,6 +160,12 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
 
     $scope.saveSettings = function () {
       var settings = angular.copy($scope.settings);
+      if ($scope.formValues.LDAPSettings.AdminAutoPopulate && $scope.formValues.selectedAdminGroups && $scope.formValues.selectedAdminGroups.length > 0) {
+        settings.LDAPSettings.AdminGroups = _.map($scope.formValues.selectedAdminGroups, (team) => team.Name);
+      } else {
+        settings.LDAPSettings.AdminGroups = [];
+      }
+
       var TLSCAFile = $scope.formValues.TLSCACert !== settings.LDAPSettings.TLSConfig.TLSCACert ? $scope.formValues.TLSCACert : null;
 
       if ($scope.formValues.LDAPSettings.AnonymousMode) {
@@ -186,6 +201,23 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
       }
     }
 
+    async function prelodaAdminGroup() {
+      if ($scope.settings.LDAPSettings.AdminAutoPopulate && $scope.settings.LDAPSettings.AdminGroups && $scope.settings.LDAPSettings.AdminGroups.length > 0) {
+        const settings = {
+          ...$scope.settings.LDAPSettings,
+          AdminGroupSearchSettings: $scope.settings.LDAPSettings.AdminGroupSearchSettings.map((search) => ({
+            ...search,
+            GroupFilter: search.GroupFilter || '(objectClass=groupOfNames)',
+          })),
+        };
+
+        $scope.groups = await LDAPService.adminGroups(settings);
+      }
+
+      if ($scope.groups && $scope.groups.length > 0) {
+        $scope.state.enableAssignAdminGroup = true;
+      }
+    }
     function initView() {
       $q.all({
         settings: SettingsService.settings(),
@@ -198,6 +230,7 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
           $scope.formValues.LDAPSettings = settings.LDAPSettings;
           $scope.OAuthSettings = settings.OAuthSettings;
           $scope.formValues.TLSCACert = settings.LDAPSettings.TLSConfig.TLSCACert;
+          prelodaAdminGroup();
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve application settings');

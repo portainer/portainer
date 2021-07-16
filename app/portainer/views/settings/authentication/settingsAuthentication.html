@@ -371,7 +371,7 @@
             </div>
 
             <div
-              ng-repeat="config in formValues.LDAPSettings.AdminAutoPoputateGroupFilter | limitTo: (1 - formValues.LDAPSettings.AdminAutoPoputateGroupFilter)"
+              ng-repeat="config in formValues.LDAPSettings.AdminGroupSearchSettings | limitTo: (1 - formValues.LDAPSettings.AdminGroupSearchSettings)"
               style="display: block; margin-bottom: 10px;"
             >
               <div class="form-group" ng-if="$index > 0" style="margin-bottom: 10px;">
@@ -420,10 +420,10 @@
                 </button>
               </div>
               <div class="col-sm-12" style="margin-top: 10px;">
-                <button class="btn btm-sm btn-primary" type="button" ng-click="searchGroups()">
+                <button class="btn btm-sm btn-primary" type="button" ng-click="searchAdminGroups()">
                   Fetch Admin Group(s)
                 </button>
-                <span ng-if="formValues..groups && formValues.groups.length === 0" style="margin-left: 30px;">
+                <span ng-if="formValues.groups && formValues.groups.length === 0" style="margin-left: 30px;">
                   <i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i> No groups found</span
                 >
               </div>
@@ -432,7 +432,7 @@
             <div class="form-group">
               <div class="col-sm-12">
                 <por-switch-field
-                  ng-model="settings.LDAPSettings.AdminAutoPopulate"
+                  ng-model="formValues.LDAPSettings.AdminAutoPopulate"
                   name="admin-auto-populate"
                   label="Assign admin rights to group(s)"
                   label-class="col-sm-2 text-muted small"
@@ -441,7 +441,7 @@
               </div>
             </div>
 
-            <div class="form-group" ng-if="formValues.settings.LDAPSettings.AdminAutoPopulate">
+            <div class="form-group" ng-if="formValues.LDAPSettings.AdminAutoPopulate">
               <div class="col-sm-12">
                 <label for="group-access" class="control-label text-left">
                   Select Group(s)
@@ -450,7 +450,7 @@
                   isteven-multi-select
                   ng-if="groups.length > 0 || groups.length > 1"
                   input-model="groups"
-                  output-model="formValues.LDAPSettings.AdminAutoPopulateGroups"
+                  output-model="formValues.selectedAdminGroups"
                   button-label="Name"
                   item-label="Name"
                   tick-property="selected"
