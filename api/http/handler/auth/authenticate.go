@@ -94,32 +94,39 @@ func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.
 	}
 
 	if ldapSettings.AdminAutoPopulate {
-		userGroups, err := handler.LDAPService.GetUserGroups(user.Username, ldapSettings)
+		matched, err := handler.isLDAPAdmin(user.Username, ldapSettings)
 		if err != nil {
 			return &httperror.HandlerError{
 				StatusCode: http.StatusUnprocessableEntity,
-				Message:    "Failed to retrieve user groups from LDAP server",
+				Message:    "Failed to search and match LDAP admin groups",
 				Err:        err,
 			}
 		}
-		adminGroupsMap := make(map[string]bool)
-		for _, adminGroup := range ldapSettings.AdminGroups {
-			adminGroupsMap[adminGroup] = true
-		}
-
-		for _, userGroup := range userGroups {
-			if adminGroupsMap[userGroup] {
-				user.Role = portainer.AdministratorRole
-				if err := handler.DataStore.User().UpdateUser(user.ID, user); err != nil {
-					return &httperror.HandlerError{
-						StatusCode: http.StatusInternalServerError,
-						Message:    "Unable to update user role inside the database",
-						Err:        err,
-					}
-
+		if matched && user.Role != portainer.AdministratorRole {
+			if err := handler.updateUserRole(user, portainer.AdministratorRole); err != nil {
+				return &httperror.HandlerError{
+					StatusCode: http.StatusUnprocessableEntity,
+					Message:    "Failed to assign admin role to the user",
+					Err:        err,
 				}
-				break
 			}
+		}
+		if !matched && user.Role == portainer.AdministratorRole {
+			if err := handler.updateUserRole(user, portainer.StandardUserRole); err != nil {
+				return &httperror.HandlerError{
+					StatusCode: http.StatusUnprocessableEntity,
+					Message:    "Failed to remove admin role from the user",
+					Err:        err,
+				}
+			}
+		}
+		if err := handler.DataStore.User().UpdateUser(user.ID, user); err != nil {
+			return &httperror.HandlerError{
+				StatusCode: http.StatusInternalServerError,
+				Message:    "Unable to update user role inside the database",
+				Err:        err,
+			}
+
 		}
 	}
 
@@ -152,24 +159,16 @@ func (handler *Handler) authenticateLDAPAndCreateUser(w http.ResponseWriter, use
 	}
 
 	if ldapSettings.AdminAutoPopulate {
-		userGroups, err := handler.LDAPService.GetUserGroups(username, ldapSettings)
+		matched, err := handler.isLDAPAdmin(username, ldapSettings)
 		if err != nil {
 			return &httperror.HandlerError{
 				StatusCode: http.StatusUnprocessableEntity,
-				Message:    "Failed to retrieve user groups from LDAP server",
+				Message:    "Failed to search and match LDAP admin groups",
 				Err:        err,
 			}
 		}
-		adminGroupsMap := make(map[string]bool)
-		for _, adminGroup := range ldapSettings.AdminGroups {
-			adminGroupsMap[adminGroup] = true
-		}
-
-		for _, userGroup := range userGroups {
-			if adminGroupsMap[userGroup] {
-				user.Role = portainer.AdministratorRole
-				break
-			}
+		if matched {
+			user.Role = portainer.AdministratorRole
 		}
 	}
 
@@ -243,6 +242,32 @@ func (handler *Handler) addUserIntoTeams(user *portainer.User, settings *portain
 		}
 	}
 
+	return nil
+}
+
+func (handler *Handler) isLDAPAdmin(username string, ldapSettings *portainer.LDAPSettings) (bool, error) {
+	adminUserGroups, err := handler.LDAPService.GetUserAdminGroups(username, ldapSettings)
+	if err != nil {
+		return false, errors.New("Failed to retrieve user groups from LDAP server")
+	}
+	adminGroupsMap := make(map[string]bool)
+	for _, adminGroup := range ldapSettings.AdminGroups {
+		adminGroupsMap[adminGroup] = true
+	}
+
+	for _, userGroup := range adminUserGroups {
+		if adminGroupsMap[userGroup] {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func (handler *Handler) updateUserRole(user *portainer.User, role portainer.UserRole) error {
+	user.Role = role
+	if err := handler.DataStore.User().UpdateUser(user.ID, user); err != nil {
+		return errors.New("Unable to update user role inside the database")
+	}
 	return nil
 }
 

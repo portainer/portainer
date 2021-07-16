@@ -24,6 +24,19 @@ func (payload *adminGroupsPayload) Validate(r *http.Request) error {
 	return nil
 }
 
+// @id LDAPAdminGroups
+// @summary Fetch LDAP admin groups
+// @description Fetch LDAP admin groups from LDAP server based on AdminGroupSearchSettings
+// @description **Access policy**: administrator
+// @tags ldap
+// @security jwt
+// @accept json
+// @produce json
+// @param body body adminGroupsPayload true "LDAPSettings"
+// @success 200 {array} string "Success"
+// @failure 400 "Invalid request"
+// @failure 500 "Server error"
+// @router /ldap/admin-groups [post]
 func (handler *Handler) ldapAdminGroups(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload adminGroupsPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)

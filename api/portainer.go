@@ -1190,6 +1190,7 @@ type (
 		AuthenticateUser(username, password string, settings *LDAPSettings) error
 		TestConnectivity(settings *LDAPSettings) error
 		GetUserGroups(username string, settings *LDAPSettings) ([]string, error)
+		GetUserAdminGroups(username string, settings *LDAPSettings) ([]string, error)
 		SearchAdminGroups(settings *LDAPSettings) ([]string, error)
 	}
 
