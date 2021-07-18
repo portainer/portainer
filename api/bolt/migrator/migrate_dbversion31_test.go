@@ -11,7 +11,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/settings"
 )
 
-func TestMigrateStackEntryPoint(t *testing.T) {
+func TestMigrateAdminGroupSearchSettings(t *testing.T) {
 	testingDBStorePath, _ = os.Getwd()
 	testingDBFileName = "portainer-ee-mig-32.db"
 	databasePath := path.Join(testingDBStorePath, testingDBFileName)
