@@ -164,53 +164,6 @@ func (*Service) GetUserAdminGroups(username string, settings *portainer.LDAPSett
 	return userGroups, nil
 }
 
-// SearchUsers searches for users with the specified settings
-func (*Service) SearchUsers(settings *portainer.LDAPSettings) ([]string, error) {
-	connection, err := createConnection(settings)
-	if err != nil {
-		return nil, err
-	}
-	defer connection.Close()
-
-	if !settings.AnonymousMode {
-		err = connection.Bind(settings.ReaderDN, settings.Password)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	users := map[string]bool{}
-
-	for _, searchSettings := range settings.SearchSettings {
-		searchRequest := ldap.NewSearchRequest(
-			searchSettings.BaseDN,
-			ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
-			searchSettings.Filter,
-			[]string{"dn", searchSettings.UserNameAttribute},
-			nil,
-		)
-
-		sr, err := connection.Search(searchRequest)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, user := range sr.Entries {
-			username := user.GetAttributeValue(searchSettings.UserNameAttribute)
-			if username != "" {
-				users[username] = true
-			}
-		}
-	}
-
-	usersList := []string{}
-	for user := range users {
-		usersList = append(usersList, user)
-	}
-
-	return usersList, nil
-}
-
 // SearchGroups searches for groups with the specified settings
 func (*Service) SearchAdminGroups(settings *portainer.LDAPSettings) ([]string, error) {
 	type groupSet map[string]bool
@@ -272,6 +225,23 @@ func (*Service) SearchAdminGroups(settings *portainer.LDAPSettings) ([]string, e
 	return groups, nil
 }
 
+// TestConnectivity is used to test a connection against the LDAP server using the credentials
+// specified in the LDAPSettings.
+func (*Service) TestConnectivity(settings *portainer.LDAPSettings) error {
+
+	connection, err := createConnection(settings)
+	if err != nil {
+		return err
+	}
+	defer connection.Close()
+
+	err = connection.Bind(settings.ReaderDN, settings.Password)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // Get a list of group names for specified user from LDAP/AD
 func getGroups(userDN string, conn *ldap.Conn, settings []portainer.LDAPGroupSearchSettings) []string {
 	groups := make([]string, 0)
@@ -301,23 +271,6 @@ func getGroups(userDN string, conn *ldap.Conn, settings []portainer.LDAPGroupSea
 	}
 
 	return groups
-}
-
-// TestConnectivity is used to test a connection against the LDAP server using the credentials
-// specified in the LDAPSettings.
-func (*Service) TestConnectivity(settings *portainer.LDAPSettings) error {
-
-	connection, err := createConnection(settings)
-	if err != nil {
-		return err
-	}
-	defer connection.Close()
-
-	err = connection.Bind(settings.ReaderDN, settings.Password)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 // Get a list of group names for specified user from LDAP/AD

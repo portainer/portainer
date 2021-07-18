@@ -25,11 +25,6 @@ func (service *ldapService) GetUserAdminGroups(username string, settings *portai
 	return []string{"manager", "lead"}, nil
 }
 
-// SearchUsers searches for users with the specified settings
-func (service *ldapService) SearchUsers(settings *portainer.LDAPSettings) ([]string, error) {
-	return nil, nil
-}
-
 // SearchGroups searches for groups with the specified settings
 func (service *ldapService) SearchAdminGroups(settings *portainer.LDAPSettings) ([]string, error) {
 	return nil, nil
