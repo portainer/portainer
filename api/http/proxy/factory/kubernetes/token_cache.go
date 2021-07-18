@@ -2,6 +2,7 @@ package kubernetes
 
 import (
 	"strconv"
+	"sync"
 
 	"github.com/orcaman/concurrent-map"
 )
@@ -14,6 +15,7 @@ type (
 
 	tokenCache struct {
 		userTokenCache cmap.ConcurrentMap
+		mutex          sync.Mutex
 	}
 )
 
@@ -45,6 +47,7 @@ func (manager *TokenCacheManager) RemoveUserFromCache(userID int) {
 func newTokenCache() *tokenCache {
 	return &tokenCache{
 		userTokenCache: cmap.New(),
+		mutex:          sync.Mutex{},
 	}
 }
 
