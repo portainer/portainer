@@ -47,7 +47,7 @@ import (
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/scheduler"
-	stackdeloyer "github.com/portainer/portainer/api/stacks"
+	stackdeployer "github.com/portainer/portainer/api/stacks"
 )
 
 // Server implements the portainer.Server interface
@@ -80,7 +80,7 @@ type Server struct {
 	Scheduler                   *scheduler.Scheduler
 	ShutdownCtx                 context.Context
 	ShutdownTrigger             context.CancelFunc
-	StackDeployer               stackdeloyer.StackDeployer
+	StackDeployer               stackdeployer.StackDeployer
 }
 
 // Start starts the HTTP server

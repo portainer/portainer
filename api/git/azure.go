@@ -131,7 +131,7 @@ func (a *azureDownloader) latestCommitID(ctx context.Context, options fetchOptio
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("failed to get reporitory refs with a status \"%v\"", resp.Status)
+		return "", fmt.Errorf("failed to get repository refs with a status \"%v\"", resp.Status)
 	}
 
 	var refs struct {

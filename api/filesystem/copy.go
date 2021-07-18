@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// CopyPath copies file or directory defined by the path to the toDir path
 func CopyPath(path string, toDir string) error {
 	info, err := os.Stat(path)
 	if err != nil && errors.Is(err, os.ErrNotExist) {

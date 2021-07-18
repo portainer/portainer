@@ -19,7 +19,7 @@ func TestMigrateStackEntryPoint(t *testing.T) {
 	defer dbConn.Close()
 
 	stackService, err := stack.NewService(&internal.DbConnection{DB: dbConn})
-	assert.NoError(t, err, "failed t init testing Stack service")
+	assert.NoError(t, err, "failed to init testing Stack service")
 
 	stacks := []*portainer.Stack{
 		{
