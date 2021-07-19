@@ -57,7 +57,9 @@ export class KubernetesIngressConverter {
         rule.IngressName = ingress.Name;
         rule.ServiceName = serviceName;
         rule.Port = p.ContainerPort;
-        rule.Path = _.startsWith(p.IngressRoute, '/') ? p.IngressRoute : '/' + p.IngressRoute;
+        if (p.IngressRoute) {
+          rule.Path = _.startsWith(p.IngressRoute, '/') ? p.IngressRoute : '/' + p.IngressRoute;
+        }
         rule.Host = p.IngressHost;
         ingress.Paths.push(rule);
       }
