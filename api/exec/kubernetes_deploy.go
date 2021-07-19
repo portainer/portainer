@@ -54,18 +54,18 @@ func (deployer *KubernetesDeployer) getToken(request *http.Request, endpoint *po
 		return "", err
 	}
 
-	tokenCache := deployer.kubernetesTokenCacheManager.CreateTokenCache(int(endpoint.ID))
+	tokenCache := deployer.kubernetesTokenCacheManager.GetOrCreateTokenCache(int(endpoint.ID))
 
 	tokenManager, err := kubernetes.NewTokenManager(kubecli, deployer.dataStore, tokenCache, setLocalAdminToken)
 	if err != nil {
 		return "", err
 	}
 
-	if tokenData.Role == portainer.StandardUserRole {
-		return tokenManager.GetUserServiceAccountToken(int(tokenData.ID))
+	if tokenData.Role == portainer.AdministratorRole {
+		return tokenManager.GetAdminServiceAccountToken(), nil
 	}
 
-	return tokenManager.GetAdminServiceAccountToken(), nil
+	return tokenManager.GetUserServiceAccountToken(int(tokenData.ID))
 }
 
 // Deploy will deploy a Kubernetes manifest inside a specific namespace in a Kubernetes endpoint.
