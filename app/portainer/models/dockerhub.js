@@ -1,7 +1,8 @@
-export function DockerHubViewModel(data) {
-  this.Name = 'DockerHub';
-  this.URL = '';
-  this.Authentication = data.Authentication;
-  this.Username = data.Username;
-  this.Password = data.Password;
+import { RegistryTypes } from './registryTypes';
+
+export function DockerHubViewModel() {
+  this.Id = 0;
+  this.Type = RegistryTypes.ANONYMOUS;
+  this.Name = 'DockerHub (anonymous)';
+  this.URL = 'docker.io';
 }

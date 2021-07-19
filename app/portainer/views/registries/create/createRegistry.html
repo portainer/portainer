@@ -1,0 +1,136 @@
+<rd-header>
+  <rd-header-title title-text="Create registry"></rd-header-title>
+  <rd-header-content> <a ui-sref="portainer.registries">Registries</a> &gt; Add registry </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <div class="col-sm-12 form-section-title">
+            Registry provider
+          </div>
+
+          <div class="form-group"></div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <div class="boxselector_wrapper">
+              <div>
+                <input type="radio" id="registry_dockerhub" ng-model="$ctrl.model.Type" ng-value="$ctrl.RegistryTypes.DOCKERHUB" />
+                <label for="registry_dockerhub" ng-click="$ctrl.selectDockerHub()">
+                  <div class="boxselector_header">
+                    <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px;"></i>
+                    DockerHub
+                  </div>
+                  <p>DockerHub authenticated account</p>
+                </label>
+              </div>
+              <div>
+                <input type="radio" id="registry_quay" ng-model="$ctrl.model.Type" ng-value="$ctrl.RegistryTypes.QUAY" />
+                <label for="registry_quay" ng-click="$ctrl.selectQuayRegistry()">
+                  <div class="boxselector_header">
+                    <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Quay.io
+                  </div>
+                  <p>Quay container registry</p>
+                </label>
+              </div>
+              <div>
+                <input type="radio" id="registry_proget" ng-model="$ctrl.model.Type" ng-value="$ctrl.RegistryTypes.PROGET" />
+                <label for="registry_proget" ng-click="$ctrl.selectProGetRegistry()">
+                  <div class="boxselector_header">
+                    <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px;"></i>
+                    ProGet
+                  </div>
+                  <p>ProGet container registry</p>
+                </label>
+              </div>
+              <div>
+                <input type="radio" id="registry_azure" ng-model="$ctrl.model.Type" ng-value="$ctrl.RegistryTypes.AZURE" />
+                <label for="registry_azure" ng-click="$ctrl.selectAzureRegistry()">
+                  <div class="boxselector_header">
+                    <i class="fab fa-microsoft" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Azure
+                  </div>
+                  <p>Azure container registry</p>
+                </label>
+              </div>
+              <div>
+                <input type="radio" id="registry_gitlab" ng-model="$ctrl.model.Type" ng-value="$ctrl.RegistryTypes.GITLAB" />
+                <label for="registry_gitlab" ng-click="$ctrl.selectGitlabRegistry()">
+                  <div class="boxselector_header">
+                    <i class="fab fa-gitlab" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Gitlab
+                  </div>
+                  <p>Gitlab container registry</p>
+                </label>
+              </div>
+              <div>
+                <input type="radio" id="registry_custom" ng-model="$ctrl.model.Type" ng-value="$ctrl.RegistryTypes.CUSTOM" />
+                <label for="registry_custom" ng-click="$ctrl.selectCustomRegistry()">
+                  <div class="boxselector_header">
+                    <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Custom registry
+                  </div>
+                  <p>Define your own registry</p>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <registry-form-quay
+            ng-if="$ctrl.model.Type === $ctrl.RegistryTypes.QUAY"
+            model="$ctrl.model"
+            form-action="$ctrl.createRegistry"
+            form-action-label="Add registry"
+            action-in-progress="$ctrl.state.actionInProgress"
+          ></registry-form-quay>
+
+          <registry-form-azure
+            ng-if="$ctrl.model.Type === $ctrl.RegistryTypes.AZURE"
+            model="$ctrl.model"
+            form-action="$ctrl.createRegistry"
+            form-action-label="Add registry"
+            action-in-progress="$ctrl.state.actionInProgress"
+          ></registry-form-azure>
+
+          <registry-form-custom
+            ng-if="$ctrl.model.Type === $ctrl.RegistryTypes.CUSTOM"
+            model="$ctrl.model"
+            form-action="$ctrl.createRegistry"
+            form-action-label="Add registry"
+            action-in-progress="$ctrl.state.actionInProgress"
+          ></registry-form-custom>
+
+          <registry-form-proget
+            ng-if="$ctrl.model.Type === $ctrl.RegistryTypes.PROGET"
+            model="$ctrl.model"
+            form-action="$ctrl.createRegistry"
+            form-action-label="Add registry"
+            action-in-progress="$ctrl.state.actionInProgress"
+          ></registry-form-proget>
+
+          <registry-form-gitlab
+            ng-if="$ctrl.model.Type === $ctrl.RegistryTypes.GITLAB"
+            model="$ctrl.model"
+            retrieve-registries="$ctrl.retrieveGitlabRegistries"
+            create-registries="$ctrl.createGitlabRegistries"
+            projects="$ctrl.gitlabProjects"
+            state="$ctrl.state"
+            action-in-progress="$ctrl.state.actionInProgress"
+            reset-defaults="$ctrl.useDefaultGitlabConfiguration"
+          ></registry-form-gitlab>
+
+          <registry-form-dockerhub
+            ng-if="$ctrl.model.Type === $ctrl.RegistryTypes.DOCKERHUB"
+            model="$ctrl.model"
+            form-action="$ctrl.createRegistry"
+            form-action-label="Add registry"
+            action-in-progress="$ctrl.state.actionInProgress"
+          ></registry-form-dockerhub>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

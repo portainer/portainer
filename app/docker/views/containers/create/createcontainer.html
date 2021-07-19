@@ -40,15 +40,14 @@
             <!-- image-and-registry -->
             <por-image-registry
               model="formValues.RegistryModel"
-              pull-warning="formValues.alwaysPull"
               ng-if="formValues.RegistryModel.Registry"
               auto-complete="true"
               label-class="col-sm-1"
               input-class="col-sm-11"
+              on-image-change="onImageNameChange()"
               endpoint="endpoint"
               is-admin="isAdmin"
               check-rate-limits="formValues.alwaysPull"
-              on-image-change="onImageNameChange()"
               set-validity="setPullImageValidity"
             >
               <!-- always-pull -->

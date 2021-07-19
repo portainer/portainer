@@ -10,6 +10,8 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	httperrors "github.com/portainer/portainer/api/http/errors"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 type registryConfigurePayload struct {
@@ -93,15 +95,23 @@ func (payload *registryConfigurePayload) Validate(r *http.Request) error {
 // @failure 500 "Server error"
 // @router /registries/{id}/configure [post]
 func (handler *Handler) registryConfigure(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	registryID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid registry identifier route variable", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+	}
+	if !securityContext.IsAdmin {
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to configure registry", httperrors.ErrResourceAccessDenied}
 	}
 
 	payload := &registryConfigurePayload{}
 	err = payload.Validate(r)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+	}
+
+	registryID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid registry identifier route variable", err}
 	}
 
 	registry, err := handler.DataStore.Registry().Registry(portainer.RegistryID(registryID))

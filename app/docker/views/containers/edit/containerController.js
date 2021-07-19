@@ -21,7 +21,6 @@ angular.module('portainer.docker').controller('ContainerController', [
   'ImageService',
   'HttpRequestHelper',
   'Authentication',
-  'StateManager',
   'endpoint',
   function (
     $q,
@@ -42,9 +41,9 @@ angular.module('portainer.docker').controller('ContainerController', [
     ImageService,
     HttpRequestHelper,
     Authentication,
-    StateManager,
     endpoint
   ) {
+    $scope.endpoint = endpoint;
     $scope.activityTime = 0;
     $scope.portBindings = [];
     $scope.displayRecreateButton = false;
@@ -295,7 +294,7 @@ angular.module('portainer.docker').controller('ContainerController', [
         if (!pullImage) {
           return $q.when();
         }
-        return RegistryService.retrievePorRegistryModelFromRepository(container.Config.Image).then(function pullImage(registryModel) {
+        return RegistryService.retrievePorRegistryModelFromRepository(container.Config.Image, endpoint.Id).then((registryModel) => {
           return ImageService.pullImage(registryModel, true);
         });
       }

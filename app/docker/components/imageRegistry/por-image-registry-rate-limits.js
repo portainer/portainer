@@ -5,10 +5,12 @@ import controller from './por-image-registry-rate-limits.controller';
 angular.module('portainer.docker').component('porImageRegistryRateLimits', {
   bindings: {
     endpoint: '<',
+    registry: '<',
     setValidity: '<',
     isAdmin: '<',
     isDockerHubRegistry: '<',
     isAuthenticated: '<',
+    registryId: '<',
   },
   controller,
   transclude: {

@@ -282,7 +282,7 @@ class KubernetesApplicationHelper {
         res.IngressName = rule.IngressName;
         res.IngressRoute = rule.Path;
         res.IngressHost = rule.Host;
-        res.IngressHosts = ingress.find((i) => i.Name === rule.IngressName).Hosts;
+        res.IngressHosts = ingress && ingress.find((i) => i.Name === rule.IngressName).Hosts;
       }
       res.Protocol = port.Protocol;
       res.ContainerPort = port.TargetPort;

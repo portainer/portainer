@@ -10,7 +10,7 @@ import (
 
 	"github.com/docker/docker/client"
 
-	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
+	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
 
@@ -38,7 +38,7 @@ func getInheritedResourceControlFromNetworkLabels(dockerClient *client.Client, e
 func (transport *Transport) networkListOperation(response *http.Response, executor *operationExecutor) error {
 	// NetworkList response is a JSON array
 	// https://docs.docker.com/engine/api/v1.28/#operation/NetworkList
-	responseArray, err := responseutils.GetResponseAsJSONArray(response)
+	responseArray, err := utils.GetResponseAsJSONArray(response)
 	if err != nil {
 		return err
 	}
@@ -54,7 +54,7 @@ func (transport *Transport) networkListOperation(response *http.Response, execut
 		return err
 	}
 
-	return responseutils.RewriteResponse(response, responseArray, http.StatusOK)
+	return utils.RewriteResponse(response, responseArray, http.StatusOK)
 }
 
 // networkInspectOperation extracts the response as a JSON object, verify that the user
@@ -62,7 +62,7 @@ func (transport *Transport) networkListOperation(response *http.Response, execut
 func (transport *Transport) networkInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// NetworkInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/NetworkInspect
-	responseObject, err := responseutils.GetResponseAsJSONObject(response)
+	responseObject, err := utils.GetResponseAsJSONObject(response)
 	if err != nil {
 		return err
 	}
@@ -99,5 +99,5 @@ func findSystemNetworkResourceControl(networkObject map[string]interface{}) *por
 // https://docs.docker.com/engine/api/v1.28/#operation/NetworkInspect
 // https://docs.docker.com/engine/api/v1.28/#operation/NetworkList
 func selectorNetworkLabels(responseObject map[string]interface{}) map[string]interface{} {
-	return responseutils.GetJSONObject(responseObject, "Labels")
+	return utils.GetJSONObject(responseObject, "Labels")
 }

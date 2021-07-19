@@ -62,6 +62,9 @@ class KubernetesApplicationConverter {
     if (containers.length) {
       res.Image = containers[0].image;
     }
+    if (data.spec.template && data.spec.template.spec && data.spec.template.spec.imagePullSecrets && data.spec.template.spec.imagePullSecrets.length) {
+      res.RegistryId = parseInt(data.spec.template.spec.imagePullSecrets[0].name.replace('registry-', ''), 10);
+    }
     res.CreationDate = data.metadata.creationTimestamp;
     res.Env = _.without(_.flatMap(_.map(containers, 'env')), undefined);
     res.Pods = data.spec.selector ? KubernetesApplicationHelper.associatePodsAndApplication(pods, data.spec.selector) : [data];
@@ -268,7 +271,8 @@ class KubernetesApplicationConverter {
     res.Name = app.Name;
     res.StackName = app.StackName;
     res.ApplicationOwner = app.ApplicationOwner;
-    res.Image = app.Image;
+    res.ImageModel.Image = app.Image;
+    res.ImageModel.Registry.Id = app.RegistryId;
     res.ReplicaCount = app.TotalPodsCount;
     res.MemoryLimit = KubernetesResourceReservationHelper.megaBytesValue(app.Limits.Memory);
     res.CpuLimit = app.Limits.Cpu;
@@ -292,7 +296,10 @@ class KubernetesApplicationConverter {
       res.PublishingType = KubernetesApplicationPublishingTypes.INTERNAL;
     }
 
-    KubernetesApplicationHelper.generatePlacementsFormValuesFromAffinity(res, app.Pods[0].Affinity, nodesLabels);
+    if (app.Pods && app.Pods.length) {
+      KubernetesApplicationHelper.generatePlacementsFormValuesFromAffinity(res, app.Pods[0].Affinity, nodesLabels);
+    }
+
     return res;
   }
 
