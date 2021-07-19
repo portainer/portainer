@@ -39,7 +39,7 @@ func (factory *ProxyFactory) newKubernetesLocalProxy(endpoint *portainer.Endpoin
 		return nil, err
 	}
 
-	transport, err := kubernetes.NewLocalTransport(tokenManager)
+	transport, err := kubernetes.NewLocalTransport(tokenManager, endpoint.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +103,7 @@ func (factory *ProxyFactory) newKubernetesAgentHTTPSProxy(endpoint *portainer.En
 	}
 
 	proxy := newSingleHostReverseProxyWithHostHeader(remoteURL)
-	proxy.Transport = kubernetes.NewAgentTransport(factory.dataStore, factory.signatureService, tlsConfig, tokenManager)
+	proxy.Transport = kubernetes.NewAgentTransport(factory.dataStore, factory.signatureService, tlsConfig, tokenManager, endpoint.ID)
 
 	return proxy, nil
 }
