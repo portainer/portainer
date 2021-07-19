@@ -12,7 +12,7 @@ type (
 	namespaceAccessPolicies map[string]portainer.K8sNamespaceAccessPolicy
 )
 
-func (kcl *KubeClient) setupNamespaceAccesses(userID int, teamIDs []int, serviceAccountName string) error {
+func (kcl *KubeClient) setupNamespaceAccesses(userID int, teamIDs []int, serviceAccountName string, restrictDefaultNamespace bool) error {
 	configMap, err := kcl.cli.CoreV1().ConfigMaps(portainerNamespace).Get(portainerConfigMapName, metav1.GetOptions{})
 	if k8serrors.IsNotFound(err) {
 		return nil
@@ -34,7 +34,7 @@ func (kcl *KubeClient) setupNamespaceAccesses(userID int, teamIDs []int, service
 	}
 
 	for _, namespace := range namespaces.Items {
-		if namespace.Name == defaultNamespace {
+		if namespace.Name == defaultNamespace && !restrictDefaultNamespace {
 			continue
 		}
 
