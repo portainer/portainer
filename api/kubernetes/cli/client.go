@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 
 	cmap "github.com/orcaman/concurrent-map"
@@ -27,8 +28,9 @@ type (
 
 	// KubeClient represent a service used to execute Kubernetes operations
 	KubeClient struct {
-		cli        *kubernetes.Clientset
+		cli        kubernetes.Interface
 		instanceID string
+		lock       *sync.Mutex
 	}
 )
 
@@ -75,6 +77,7 @@ func (factory *ClientFactory) createKubeClient(endpoint *portainer.Endpoint) (po
 	kubecli := &KubeClient{
 		cli:        cli,
 		instanceID: factory.instanceID,
+		lock:       &sync.Mutex{},
 	}
 
 	return kubecli, nil

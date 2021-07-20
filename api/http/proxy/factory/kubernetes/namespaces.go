@@ -3,10 +3,15 @@ package kubernetes
 import (
 	"net/http"
 
+	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 )
 
 func (transport *baseTransport) proxyNamespaceDeleteOperation(request *http.Request, namespace string) (*http.Response, error) {
+	if err := transport.tokenManager.kubecli.NamespaceAccessPoliciesDeleteNamespace(namespace); err != nil {
+		return nil, errors.WithMessagef(err, "failed to delete a namespace [%s] from portainer config", namespace)
+	}
+
 	registries, err := transport.dataStore.Registry().Registries()
 	if err != nil {
 		return nil, err
