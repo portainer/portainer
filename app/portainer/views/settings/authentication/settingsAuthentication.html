@@ -423,7 +423,7 @@
                 <button class="btn btm-sm btn-primary" type="button" ng-click="searchAdminGroups()">
                   Fetch Admin Group(s)
                 </button>
-                <span ng-if="formValues.groups && formValues.groups.length === 0" style="margin-left: 30px;">
+                <span ng-if="groups && groups.length === 0" style="margin-left: 30px;">
                   <i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i> No groups found</span
                 >
               </div>
@@ -435,8 +435,8 @@
                   ng-model="formValues.LDAPSettings.AdminAutoPopulate"
                   name="admin-auto-populate"
                   label="Assign admin rights to group(s)"
-                  label-class="col-sm-2 text-muted small"
-                  disabled="groups === null || groups.length === 0"
+                  label-class="{{ state.enableAssignAdminGroup ? 'col-sm-2 small' : 'col-sm-2 small text-muted' }}"
+                  disabled="!state.enableAssignAdminGroup"
                 ></por-switch-field>
               </div>
             </div>
@@ -448,7 +448,7 @@
                 </label>
                 <span
                   isteven-multi-select
-                  ng-if="groups.length > 0 || groups.length > 1"
+                  ng-if="state.enableAssignAdminGroup"
                   input-model="groups"
                   output-model="formValues.selectedAdminGroups"
                   button-label="Name"

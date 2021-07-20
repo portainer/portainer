@@ -81,7 +81,7 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
       selectedAdminGroups: '',
     };
 
-    $scope.groups = [];
+    $scope.groups = null;
 
     $scope.searchAdminGroups = async function () {
       const settings = {
@@ -90,10 +90,7 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
       };
 
       $scope.groups = await LDAPService.adminGroups(settings);
-
-      if ($scope.groups && $scope.groups.length > 0) {
-        $scope.state.enableAssignAdminGroup = true;
-      }
+      $scope.state.enableAssignAdminGroup = $scope.groups && $scope.groups.length > 0;
     };
 
     $scope.isOauthEnabled = function isOauthEnabled() {
@@ -216,10 +213,7 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
         };
 
         $scope.groups = await LDAPService.adminGroups(settings);
-      }
-
-      if ($scope.groups && $scope.groups.length > 0) {
-        $scope.state.enableAssignAdminGroup = true;
+        $scope.state.enableAssignAdminGroup = $scope.groups && $scope.groups.length > 0;
       }
     }
     function initView() {
