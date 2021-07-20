@@ -14,18 +14,23 @@ type (
 
 func (kcl *KubeClient) setupNamespaceAccesses(userID int, teamIDs []int, serviceAccountName string, restrictDefaultNamespace bool) error {
 	configMap, err := kcl.cli.CoreV1().ConfigMaps(portainerNamespace).Get(portainerConfigMapName, metav1.GetOptions{})
-	if k8serrors.IsNotFound(err) {
-		return nil
-	} else if err != nil {
-		return err
+	found := true
+	if err != nil {
+		if k8serrors.IsNotFound(err) {
+			found = false
+		} else {
+			return err
+		}
 	}
 
-	accessData := configMap.Data[portainerConfigMapAccessPoliciesKey]
-
 	var accessPolicies namespaceAccessPolicies
-	err = json.Unmarshal([]byte(accessData), &accessPolicies)
-	if err != nil {
-		return err
+	if found {
+		accessData := configMap.Data[portainerConfigMapAccessPoliciesKey]
+
+		err = json.Unmarshal([]byte(accessData), &accessPolicies)
+		if err != nil {
+			return err
+		}
 	}
 
 	namespaces, err := kcl.cli.CoreV1().Namespaces().List(metav1.ListOptions{})
