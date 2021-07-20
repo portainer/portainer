@@ -40,13 +40,6 @@ func (kcl *KubeClient) SetupUserServiceAccount(userID int, teamIDs []int, restri
 		return err
 	}
 
-	if !restrictDefaultNamespace {
-		err = kcl.ensureNamespaceAccessForServiceAccount(serviceAccountName, defaultNamespace)
-		if err != nil {
-			return err
-		}
-	}
-
 	return kcl.setupNamespaceAccesses(userID, teamIDs, serviceAccountName, restrictDefaultNamespace)
 }
 

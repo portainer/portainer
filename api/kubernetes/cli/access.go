@@ -57,19 +57,15 @@ func (kcl *KubeClient) setupNamespaceAccesses(userID int, teamIDs []int, service
 
 	for _, namespace := range namespaces.Items {
 		if namespace.Name == defaultNamespace && !restrictDefaultNamespace {
-			continue
-		}
-
-		policies, ok := accessPolicies[namespace.Name]
-		if !ok {
-			err = kcl.removeNamespaceAccessForServiceAccount(serviceAccountName, namespace.Name)
+			err = kcl.ensureNamespaceAccessForServiceAccount(serviceAccountName, defaultNamespace)
 			if err != nil {
 				return err
 			}
 			continue
 		}
 
-		if !hasUserAccessToNamespace(userID, teamIDs, policies) {
+		policies, ok := accessPolicies[namespace.Name]
+		if !ok || !hasUserAccessToNamespace(userID, teamIDs, policies) {
 			err = kcl.removeNamespaceAccessForServiceAccount(serviceAccountName, namespace.Name)
 			if err != nil {
 				return err
