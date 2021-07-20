@@ -37,10 +37,9 @@ angular.module('portainer.docker').controller('ImagesController', [
       $scope.state.actionInProgress = true;
       ImageService.pullImage(registryModel, false)
         .then(function success(data) {
-          var err = data[data.length - 1].hasOwnProperty('errorDetail');
+          var err = data[data.length - 1].errorDetail;
           if (err) {
-            var detail = data[data.length - 1].errorDetail;
-            return Notifications.error('Failure', detail, 'Unable to pull image');
+            return Notifications.error('Failure', err, 'Unable to pull image');
           }
           Notifications.success('Image successfully pulled', registryModel.Image);
           $state.reload();
