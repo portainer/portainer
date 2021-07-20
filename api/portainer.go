@@ -1171,7 +1171,7 @@ type (
 
 	// KubeClient represents a service used to query a Kubernetes environment
 	KubeClient interface {
-		SetupUserServiceAccount(userID int, teamIDs []int) error
+		SetupUserServiceAccount(userID int, teamIDs []int, restrictDefaultNamespace bool) error
 		GetServiceAccountBearerToken(userID int) (string, error)
 		StartExecProcess(namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error
 		NamespaceAccessPoliciesDeleteNamespace(namespace string) error
