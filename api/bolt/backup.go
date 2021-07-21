@@ -95,6 +95,35 @@ func (store *Store) BackupWithOptions(options *BackupOptions) (string, error) {
 	return options.BackupPath, store.copyDBFile(store.databasePath(), options.BackupPath)
 }
 
+// RestoreWithOptions previously saved backup for the current Edition  with options
+// Restore strategies:
+// - default: restore latest from current edition
+// - restore a specific
+func (store *Store) RestoreWithOptions(options *BackupOptions) error {
+	options = store.setupOptions(options)
+
+	// Check if backup file exist before restoring
+	_, err := os.Stat(options.BackupPath)
+	if os.IsNotExist(err) {
+		backupLog.Error(fmt.Sprintf("Backup file to restore does not exist %s", options.BackupPath), err)
+		return err
+	}
+
+	err = store.Close()
+	if err != nil {
+		backupLog.Error("Error while closing store before restore", err)
+		return err
+	}
+
+	backupLog.Info("Restoring db backup")
+	err = store.copyDBFile(options.BackupPath, store.databasePath())
+	if err != nil {
+		return err
+	}
+
+	return store.Open()
+}
+
 // RemoveWithOptions removes backup database based on supplied options
 func (store *Store) RemoveWithOptions(options *BackupOptions) error {
 	backupLog.Info("Removing db backup")
