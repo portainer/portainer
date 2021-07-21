@@ -1183,6 +1183,7 @@ type (
 	FileService interface {
 		GetDockerConfigPath() string
 		GetFileContent(filePath string) ([]byte, error)
+		Copy(fromFilePath string, toFilePath string, deleteIfExists bool) error
 		Rename(oldPath, newPath string) error
 		RemoveDirectory(directoryPath string) error
 		StoreTLSFileFromBytes(folder string, fileType TLSFileType, data []byte) (string, error)
