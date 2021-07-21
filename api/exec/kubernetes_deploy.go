@@ -65,7 +65,15 @@ func (deployer *KubernetesDeployer) getToken(request *http.Request, endpoint *po
 		return tokenManager.GetAdminServiceAccountToken(), nil
 	}
 
-	return tokenManager.GetUserServiceAccountToken(int(tokenData.ID))
+	token, err := tokenManager.GetUserServiceAccountToken(int(tokenData.ID))
+	if err != nil {
+		return "", err
+	}
+
+	if token == "" {
+		return "", fmt.Errorf("can not get a valid user service account token")
+	}
+	return token, nil
 }
 
 // Deploy will deploy a Kubernetes manifest inside a specific namespace in a Kubernetes endpoint.
