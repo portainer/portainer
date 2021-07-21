@@ -1,12 +1,19 @@
 package bolt
 
 import (
-	"log"
+	"fmt"
 
+	werrors "github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt/errors"
+	plog "github.com/portainer/portainer/api/bolt/log"
 	"github.com/portainer/portainer/api/bolt/migrator"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
+
+const beforePortainerVersionUpgradeBackup = "portainer.db.bak"
+
+var migrateLog = plog.NewScopedLog("bolt, migrate")
 
 // MigrateData automatically migrate the data based on the DBVersion.
 // This process is only triggered on an existing database, not if the database was just created.
@@ -21,16 +28,29 @@ func (store *Store) MigrateData(force bool) error {
 		return err
 	}
 
+	// backup db file before upgrading DB to support rollback
+	isUpdating, err := store.VersionService.IsUpdating()
+	if err != nil && err != errors.ErrObjectNotFound {
+		return err
+	}
+
+	if !isUpdating && migrator.Version() != portainer.DBVersion {
+		err = store.backupVersion(migrator)
+		if err != nil {
+			return werrors.Wrapf(err, "failed to backup database")
+		}
+	}
+
 	if migrator.Version() < portainer.DBVersion {
 		migrator, err := store.newMigrator()
 		if err != nil {
 			return err
 		}
 
-		log.Printf("Migrating database from version %v to %v.\n", migrator.Version(), portainer.DBVersion)
+		migrateLog.Info(fmt.Sprintf("Migrating database from version %v to %v.\n", migrator.Version(), portainer.DBVersion))
 		err = migrator.MigrateCE()
 		if err != nil {
-			log.Printf("An error occurred during database migration: %s\n", err)
+			migrateLog.Error("An error occurred during database migration", err)
 			return err
 		}
 	}
@@ -66,4 +86,30 @@ func (store *Store) newMigrator() (*migrator.Migrator, error) {
 		AuthorizationService:    authorization.NewService(store),
 	}
 	return migrator.NewMigrator(migratorParams), nil
+}
+
+// getBackupRestoreOptions returns options to store db at common backup dir location; used by:
+// - db backup prior to version upgrade
+// - db rollback
+func getBackupRestoreOptions(store *Store) *BackupOptions {
+	return &BackupOptions{
+		BackupDir:      store.commonBackupDir(),
+		BackupFileName: beforePortainerVersionUpgradeBackup,
+	}
+}
+
+// backupVersion will backup the database or panic if any errors occur
+func (store *Store) backupVersion(migrator *migrator.Migrator) error {
+	migrateLog.Info("Backing up database prior to version upgrade...")
+
+	options := getBackupRestoreOptions(store)
+
+	_, err := store.BackupWithOptions(options)
+	if err != nil {
+		migrateLog.Error("An error occurred during database backup", err)
+		store.RemoveWithOptions(options)
+		return err
+	}
+
+	return nil
 }
