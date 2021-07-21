@@ -1,9 +1,19 @@
 package migrator
 
-import portainer "github.com/portainer/portainer/api"
+import (
+	"log"
+
+	portainer "github.com/portainer/portainer/api"
+)
 
 // Migrate checks the database version and migrate the existing data to the most recent data model.
 func (m *Migrator) MigrateCE() error {
+	// set DB to updating status
+	err := m.versionService.StoreIsUpdating(true)
+	if err != nil {
+		return err
+	}
+
 	// Portainer < 1.12
 	if m.currentDBVersion < 1 {
 		err := m.updateAdminUserToDBVersion1()
@@ -286,5 +296,12 @@ func (m *Migrator) MigrateCE() error {
 		}
 	}
 
-	return m.versionService.StoreDBVersion(portainer.DBVersion)
+	log.Println("Updated DB version to ", portainer.DBVersion)
+	err = m.versionService.StoreDBVersion(portainer.DBVersion)
+	if err != nil {
+		return err
+	}
+
+	// reset DB updating status
+	return m.versionService.StoreIsUpdating(false)
 }
