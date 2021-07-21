@@ -6,7 +6,6 @@ import (
 	"path"
 	"time"
 
-	portainer "github.com/portainer/portainer/api"
 	plog "github.com/portainer/portainer/api/bolt/log"
 )
 
@@ -56,7 +55,6 @@ func (store *Store) copyDBFile(from string, to string) error {
 
 // BackupOptions provide a helper to inject backup options
 type BackupOptions struct {
-	Edition        portainer.SoftwareEdition
 	Version        int
 	BackupDir      string
 	BackupFileName string
@@ -66,9 +64,6 @@ type BackupOptions struct {
 func (store *Store) setupOptions(options *BackupOptions) *BackupOptions {
 	if options == nil {
 		options = &BackupOptions{}
-	}
-	if options.Edition == 0 {
-		options.Edition = store.edition()
 	}
 	if options.Version == 0 {
 		options.Version, _ = store.version()
