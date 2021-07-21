@@ -3,6 +3,8 @@ package bolt
 import (
 	"fmt"
 
+	"github.com/portainer/portainer/api/cli"
+
 	werrors "github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
@@ -112,4 +114,24 @@ func (store *Store) backupVersion(migrator *migrator.Migrator) error {
 	}
 
 	return nil
+}
+
+// Rollback to a pre-upgrade backup copy/snapshot of portainer.db
+func (store *Store) Rollback(force bool) error {
+
+	if !force {
+		confirmed, err := cli.Confirm("Are you sure you want to rollback your database to the previous backup?")
+		if err != nil || !confirmed {
+			return err
+		}
+	}
+
+	options := getBackupRestoreOptions(store)
+
+	err := store.RestoreWithOptions(options)
+	if err != nil {
+		return err
+	}
+
+	return store.Close()
 }

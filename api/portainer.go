@@ -66,6 +66,7 @@ type (
 		SSL                       *bool
 		SSLCert                   *string
 		SSLKey                    *string
+		Rollback                  *bool
 		SnapshotInterval          *string
 	}
 
@@ -1083,6 +1084,7 @@ type (
 		Close() error
 		IsNew() bool
 		MigrateData(force bool) error
+		Rollback(force bool) error
 		CheckCurrentEdition() error
 		BackupTo(w io.Writer) error
 
