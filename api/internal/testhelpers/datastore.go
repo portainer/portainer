@@ -36,7 +36,7 @@ func (d *datastore) Close() error                                        { retur
 func (d *datastore) CheckCurrentEdition() error                          { return nil }
 func (d *datastore) IsNew() bool                                         { return false }
 func (d *datastore) MigrateData(force bool) error                        { return nil }
-func (d *datastore) RollbackToCE() error                                 { return nil }
+func (d *datastore) Rollback(force bool) error                           { return nil }
 func (d *datastore) CustomTemplate() portainer.CustomTemplateService     { return d.customTemplate }
 func (d *datastore) EdgeGroup() portainer.EdgeGroupService               { return d.edgeGroup }
 func (d *datastore) EdgeJob() portainer.EdgeJobService                   { return d.edgeJob }
