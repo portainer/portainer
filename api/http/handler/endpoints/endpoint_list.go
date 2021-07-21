@@ -26,7 +26,7 @@ import (
 // @param search query string false "Search query"
 // @param groupId query int false "List endpoints of this group"
 // @param limit query int false "Limit results to this value"
-// @param type query int false "List endpoints of this type"
+// @param types query []int false "List endpoints of this type"
 // @param tagIds query []int false "search endpoints with these tags (depends on tagsPartialMatch)"
 // @param tagsPartialMatch query bool false "If true, will return endpoint which has one of tagIds, if false (or missing) will return only endpoints that has all the tags"
 // @param endpointIds query []int false "will return only these endpoints"
