@@ -115,8 +115,18 @@ func getDockerHubLimits(httpClient *client.HTTPClient, token string) (*dockerhub
 		return nil, errors.New("failed fetching dockerhub limits")
 	}
 
+	// An error with rateLimit-Limit or RateLimit-Remaining is likely for dockerhub pro accounts where there is no rate limit.
+	// In that specific case the headers will not be present.  Don't bubble up the error as its normal
+	// See: https://docs.docker.com/docker-hub/download-rate-limit/
 	rateLimit, err := parseRateLimitHeader(resp.Header, "RateLimit-Limit")
+	if err != nil {
+		return nil, nil
+	}
+
 	rateLimitRemaining, err := parseRateLimitHeader(resp.Header, "RateLimit-Remaining")
+	if err != nil {
+		return nil, nil
+	}
 
 	return &dockerhubStatusResponse{
 		Limit:     rateLimit,

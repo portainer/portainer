@@ -19,7 +19,7 @@ export default class porImageRegistryContainerController {
     if (this.EndpointHelper.isAgentEndpoint(this.endpoint) || this.EndpointHelper.isLocalEndpoint(this.endpoint)) {
       try {
         this.pullRateLimits = await this.DockerHubService.checkRateLimits(this.endpoint);
-        this.setValidity(this.pullRateLimits.remaining >= 0);
+        this.setValidity(!this.pullRateLimits.limit || (this.pullRateLimits.limit && this.pullRateLimits.remaining >= 0));
       } catch (e) {
         // eslint-disable-next-line no-console
         console.error('Failed loading DockerHub pull rate limits', e);
