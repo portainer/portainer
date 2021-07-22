@@ -18,7 +18,7 @@ import (
 var errInvalidResponseStatus = errors.New("Invalid response status (expecting 200)")
 
 const (
-	defaultHTTPTimeout = 5
+	defaultHTTPTimeout = 30
 )
 
 // HTTPClient represents a client to send HTTP requests.
