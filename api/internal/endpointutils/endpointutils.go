@@ -6,6 +6,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
+// IsLocalEndpoint returns true if this is a local endpoint
 func IsLocalEndpoint(endpoint *portainer.Endpoint) bool {
 	return strings.HasPrefix(endpoint.URL, "unix://") || strings.HasPrefix(endpoint.URL, "npipe://") || endpoint.Type == 5
 }

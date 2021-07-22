@@ -25,6 +25,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
 	"github.com/portainer/portainer/api/http/handler/endpoints"
 	"github.com/portainer/portainer/api/http/handler/file"
+	kubehandler "github.com/portainer/portainer/api/http/handler/kubernetes"
 	"github.com/portainer/portainer/api/http/handler/motd"
 	"github.com/portainer/portainer/api/http/handler/registries"
 	"github.com/portainer/portainer/api/http/handler/resourcecontrols"
@@ -50,7 +51,7 @@ import (
 
 // Server implements the portainer.Server interface
 type Server struct {
-	AuthorizationService 		*authorization.Service
+	AuthorizationService        *authorization.Service
 	BindAddress                 string
 	AssetsPath                  string
 	Status                      *portainer.Status
@@ -150,6 +151,8 @@ func (server *Server) Start() error {
 	endpointProxyHandler.ProxyManager = server.ProxyManager
 	endpointProxyHandler.ReverseTunnelService = server.ReverseTunnelService
 
+	var kubernetesHandler = kubehandler.NewHandler(requestBouncer, server.AuthorizationService, server.DataStore, server.KubernetesClientFactory)
+
 	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"))
 
 	var motdHandler = motd.NewHandler(requestBouncer)
@@ -225,6 +228,7 @@ func (server *Server) Start() error {
 		EndpointHandler:        endpointHandler,
 		EndpointEdgeHandler:    endpointEdgeHandler,
 		EndpointProxyHandler:   endpointProxyHandler,
+		KubernetesHandler:      kubernetesHandler,
 		FileHandler:            fileHandler,
 		MOTDHandler:            motdHandler,
 		RegistryHandler:        registryHandler,

@@ -207,20 +207,35 @@ class KubernetesResourcePoolController {
     }
   }
 
-  markUnmarkAsSystem() {
-    const copySavedFormValues = angular.copy(this.savedFormValues);
-    if (!this.isSystem) {
+  async confirmMarkAsSystem() {
+    return new Promise((resolve) => {
       const message = 'Marking this resource pool as a system resource pool will prevent non administrator users from managing it and the resources it contains. Are you sure?';
-      this.ModalService.confirmUpdate(message, (confirmed) => {
-        if (confirmed) {
-          copySavedFormValues.IsSystem = true;
-          return this.$async(this.updateResourcePoolAsync, this.savedFormValues, copySavedFormValues);
+      this.ModalService.confirmUpdate(message, resolve);
+    });
+  }
+
+  markUnmarkAsSystem() {
+    return this.$async(async () => {
+      try {
+        const namespaceName = this.$state.params.id;
+        this.state.actionInProgress = true;
+
+        if (!this.isSystem) {
+          const confirmed = await this.confirmMarkAsSystem();
+          if (!confirmed) {
+            return;
+          }
         }
-      });
-    } else {
-      copySavedFormValues.IsSystem = false;
-      return this.$async(this.updateResourcePoolAsync, this.savedFormValues, copySavedFormValues);
-    }
+        await this.KubernetesResourcePoolService.toggleSystem(this.endpoint.Id, namespaceName, !this.isSystem);
+
+        this.Notifications.success('Namespace successfully updated', namespaceName);
+        this.$state.reload();
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to create namespace');
+      } finally {
+        this.state.actionInProgress = false;
+      }
+    });
   }
   /* #endregion */
 
