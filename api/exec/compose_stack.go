@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"regexp"
 	"strings"
 
 	wrapper "github.com/portainer/docker-compose-wrapper"
@@ -36,7 +37,8 @@ func NewComposeStackManager(binaryPath string, configPath string, proxyManager *
 
 // NormalizeStackName returns a new stack name with unsupported characters replaced
 func (w *ComposeStackManager) NormalizeStackName(name string) string {
-	return name
+	r := regexp.MustCompile("[^a-z0-9]+")
+	return r.ReplaceAllString(strings.ToLower(name), "")
 }
 
 // ComposeSyntaxMaxVersion returns the maximum supported version of the docker compose syntax
