@@ -990,6 +990,8 @@ type (
 		ID       UserID `json:"Id" example:"1"`
 		Username string `json:"Username" example:"bob"`
 		Password string `json:"Password,omitempty" example:"passwd"`
+		// User Theme
+		Usertheme string `json:"Usertheme" example:"dark"`
 		// User role (1 for administrator account and 2 for regular account)
 		Role UserRole `json:"Role" example:"1"`
 
