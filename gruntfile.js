@@ -20,8 +20,8 @@ module.exports = function (grunt) {
     binaries: {
       dockerLinuxVersion: '19.03.13',
       dockerWindowsVersion: '19-03-12',
-      dockerLinuxComposeVersion: '1.27.4',
-      dockerWindowsComposeVersion: '1.28.0',
+      dockerLinuxComposeVersion: '1.29.2',
+      dockerWindowsComposeVersion: '1.29.2',
       dockerComposePluginVersion: '2.0.0-beta.6',
       helmVersion: 'v3.6.3',
       komposeVersion: 'v1.22.0',
