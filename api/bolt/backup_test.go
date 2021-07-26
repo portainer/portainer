@@ -30,7 +30,7 @@ func TestCreateBackupFolders(t *testing.T) {
 	}
 
 	store.createBackupFolders()
-	if exists, _ := store.fileService.FileExists(backupPath); !exists {
+	if !isFileExist(backupPath) {
 		t.Error("Expect backups folder to exist")
 	}
 }
