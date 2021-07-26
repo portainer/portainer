@@ -66,7 +66,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h.Handle("/stacks/{id}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackUpdate))).Methods(http.MethodPut)
 	h.Handle("/stacks/{id}/git",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackGitUpdate))).Methods(http.MethodPost)
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackUpdateGit))).Methods(http.MethodPost)
 	h.Handle("/stacks/{id}/git/redeploy",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.stackGitRedeploy))).Methods(http.MethodPut)
 	h.Handle("/stacks/{id}/file",

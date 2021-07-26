@@ -414,10 +414,11 @@ type (
 
 	// KubernetesConfiguration represents the configuration of a Kubernetes endpoint
 	KubernetesConfiguration struct {
-		UseLoadBalancer  bool                           `json:"UseLoadBalancer"`
-		UseServerMetrics bool                           `json:"UseServerMetrics"`
-		StorageClasses   []KubernetesStorageClassConfig `json:"StorageClasses"`
-		IngressClasses   []KubernetesIngressClassConfig `json:"IngressClasses"`
+		UseLoadBalancer          bool                           `json:"UseLoadBalancer"`
+		UseServerMetrics         bool                           `json:"UseServerMetrics"`
+		StorageClasses           []KubernetesStorageClassConfig `json:"StorageClasses"`
+		IngressClasses           []KubernetesIngressClassConfig `json:"IngressClasses"`
+		RestrictDefaultNamespace bool                           `json:"RestrictDefaultNamespace"`
 	}
 
 	// KubernetesStorageClassConfig represents a Kubernetes Storage Class configuration
@@ -1182,7 +1183,7 @@ type (
 
 	// KubeClient represents a service used to query a Kubernetes environment
 	KubeClient interface {
-		SetupUserServiceAccount(userID int, teamIDs []int) error
+		SetupUserServiceAccount(userID int, teamIDs []int, restrictDefaultNamespace bool) error
 		GetServiceAccountBearerToken(userID int) (string, error)
 		StartExecProcess(namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error
 		NamespaceAccessPoliciesDeleteNamespace(namespace string) error
@@ -1294,6 +1295,7 @@ type (
 		Logout(endpoint *Endpoint) error
 		Deploy(stack *Stack, prune bool, endpoint *Endpoint) error
 		Remove(stack *Stack, endpoint *Endpoint) error
+		NormalizeStackName(name string) string
 	}
 
 	// TagService represents a service for managing tag data
