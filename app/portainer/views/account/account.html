@@ -78,5 +78,45 @@
         </form>
       </rd-widget-body>
     </rd-widget>
+    <br />
+    <rd-widget>
+      <rd-widget-header icon="fa-palette" title-text="Change user theme"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal" style="margin-top: 15px;">
+          <!-- Theme -->
+          <div class="boxselector_wrapper">
+            <div>
+              <input type="radio" id="backup_file" ng-model="formValues.userTheme" value="light" ng-click="setTheme('light')" />
+              <label for="backup_file">
+                <div class="boxselector_header">
+                  Light Theme
+                </div>
+                <div><i class="fas fa-sun" style="font-size: 50px; padding: 20px;"></i></div>
+              </label>
+            </div>
+            <div>
+              <input type="radio" id="backup_s3" ng-model="formValues.userTheme" value="dark" ng-click="setTheme('dark')" />
+              <label for="backup_s3">
+                <div class="boxselector_header">
+                  Dark Theme
+                </div>
+                <div><i class="fas fa-moon" style="font-size: 50px; padding: 20px;"></i></div>
+              </label>
+            </div>
+            <div>
+              <input type="radio" id="backup_s4" ng-model="formValues.userTheme" value="highcontrast" ng-click="setTheme('highcontrast')" />
+              <label for="backup_s4">
+                <div class="boxselector_header">
+                  High Contrast Theme
+                </div>
+                <div><i class="fas fa-adjust" style="font-size: 50px; padding: 20px;"></i></div>
+              </label>
+            </div>
+          </div>
+          <button ng-click="updateTheme()" class="btn btn-primary btn-sm">update theme</button>
+          <!-- !Theme -->
+        </form>
+      </rd-widget-body>
+    </rd-widget>
   </div>
 </div>

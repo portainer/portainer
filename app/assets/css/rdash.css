@@ -52,7 +52,8 @@
  * Header
  */
 .row.header {
-  background: #fff;
+  height: 60px;
+  background: var(--bg-row-header-color);
   margin-bottom: 15px;
 }
 .row.header > div:last-child {
@@ -202,9 +203,9 @@ html {
   overflow-y: scroll;
 }
 body {
-  background: #f3f3f3;
+  background: var(--bg-body-color);
   font-family: 'Montserrat';
-  color: #333333 !important;
+  color: var(--text-body-color) !important;
 }
 .row {
   margin-left: 0 !important;
@@ -236,7 +237,7 @@ body {
   background: #23ae89 !important;
 }
 .blue {
-  background: #2361ae !important;
+  background: var(--blue-color) !important;
 }
 .orange {
   background: #d3a938 !important;
@@ -258,20 +259,20 @@ div.input-mask {
   -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
   -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
-  background: #ffffff;
+  background: var(--bg-widget-color);
   border: 1px solid transparent;
   border-radius: 2px;
-  border-color: #e9e9e9;
+  border-color: var(--border-widget-color);
 }
 .widget .widget-header .pagination,
 .widget .widget-footer .pagination {
   margin: 0;
 }
 .widget .widget-header {
-  color: #767676;
-  background-color: #f6f6f6;
+  color: var(--text-widget-header-color);
+  background-color: var(--bg-widget-header-color);
   padding: 10px 15px;
-  border-bottom: 1px solid #e9e9e9;
+  border-bottom: 1px solid var(--border-widget-color);
   line-height: 30px;
 }
 .widget .widget-header i {
@@ -281,7 +282,7 @@ div.input-mask {
   padding: 20px;
 }
 .widget .widget-body table thead {
-  background: #fafafa;
+  background: var(--bg-widget-table-color);
 }
 .widget .widget-body table thead * {
   font-size: 14px !important;

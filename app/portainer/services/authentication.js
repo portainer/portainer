@@ -9,7 +9,9 @@ angular.module('portainer.app').factory('Authentication', [
   'LocalStorage',
   'StateManager',
   'EndpointProvider',
-  function AuthenticationFactory($async, $state, Auth, OAuth, jwtHelper, LocalStorage, StateManager, EndpointProvider) {
+  'UserService',
+  'ThemeManager',
+  function AuthenticationFactory($async, $state, Auth, OAuth, jwtHelper, LocalStorage, StateManager, EndpointProvider, UserService, ThemeManager) {
     'use strict';
 
     var service = {};
@@ -82,12 +84,29 @@ angular.module('portainer.app').factory('Authentication', [
       return user;
     }
 
+    async function setDefaultTheme() {
+      const data = await UserService.user(user.ID);
+
+      ThemeManager.setTheme('light');
+      if (!data.Usertheme || data.Usertheme === 'light') {
+        ThemeManager.setTheme('light');
+        StateManager.updateTheme('light');
+      } else if (data.Usertheme === 'dark') {
+        ThemeManager.setTheme('dark');
+        StateManager.updateTheme('dark');
+      } else if (data.Usertheme === 'highcontrast') {
+        ThemeManager.setTheme('highcontrast');
+        StateManager.updateTheme('highcontrast');
+      }
+    }
+
     async function setUser(jwt) {
       LocalStorage.storeJWT(jwt);
       var tokenPayload = jwtHelper.decodeToken(jwt);
       user.username = tokenPayload.username;
       user.ID = tokenPayload.id;
       user.role = tokenPayload.role;
+      await setDefaultTheme();
     }
 
     function isAdmin() {

@@ -91,6 +91,14 @@ angular.module('portainer.app').factory('UserService', [
       return Users.updatePassword({ id: id }, payload).$promise;
     };
 
+    service.updateUserTheme = function (id, userTheme) {
+      var payload = {
+        Usertheme: userTheme,
+      };
+
+      return Users.updateTheme({ id: id }, payload).$promise;
+    };
+
     service.userMemberships = function (id) {
       var deferred = $q.defer();
 

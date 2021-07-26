@@ -13,7 +13,7 @@
  * Sidebar
  */
 #sidebar-wrapper {
-  background: #30426a;
+  background: var(--bg-sidebar-color);
 }
 
 ul.sidebar .sidebar-main a,
@@ -63,7 +63,7 @@ ul.sidebar .sidebar-main .menu-icon {
 }
 
 ul.sidebar .sidebar-title {
-  color: #738bc0;
+  color: var(--text-sidebar-title-color);
   font-size: 12px;
   height: 35px;
   line-height: 40px;
@@ -172,8 +172,8 @@ ul.sidebar .sidebar-list a {
 
 ul.sidebar .sidebar-list a.active {
   color: #fff;
-  border-left-color: #fff;
-  background: #2d3e63;
+  border-left-color: var(--border-sidebar-color);
+  background: var(--hover-sidebar-color);
 }
 
 .sidebar-header {
@@ -181,7 +181,7 @@ ul.sidebar .sidebar-list a.active {
   list-style: none;
   text-indent: 20px;
   font-size: 18px;
-  background: #2d3e63;
+  background: var(--bg-sidebar-color);
 }
 
 .sidebar-header a {
