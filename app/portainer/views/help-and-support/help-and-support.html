@@ -1,0 +1,53 @@
+<rd-header>
+  <rd-header-title title-text="Help & Support"></rd-header-title>
+  <rd-header-content>Video walkthroughs</rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <form class="form-horizontal" name="$ctrl.form">
+          <h2 class="col-sm-12 form-section-title color-portainer-black">
+            Getting started
+          </h2>
+          <div class="form-group">
+            <span class="col-sm-12 text-muted">
+              Select an area of interest for a video walkthrough
+            </span>
+          </div>
+
+          <h4 class="col-sm-12 form-section-title color-portainer-black" ng-if="$ctrl.isAdmin">
+            Setting up Portainer
+          </h4>
+          <div class="form-group" ng-if="$ctrl.isAdmin">
+            <por-help-image-link data="$ctrl.links.admin" copy-link="$ctrl.copyLink" on-link-clicked="($ctrl.onLinkClicked)"> </por-help-image-link>
+          </div>
+
+          <h4 class="col-sm-12 form-section-title color-portainer-black">
+            Using Portainer
+          </h4>
+          <div class="form-group">
+            <por-help-image-link data="$ctrl.links.engineer" copy-link="$ctrl.copyLink" on-link-clicked="($ctrl.onLinkClicked)"> </por-help-image-link>
+            <por-help-image-link data="$ctrl.links.developer" copy-link="$ctrl.copyLink" on-link-clicked="($ctrl.onLinkClicked)"> </por-help-image-link>
+          </div>
+
+          <h4 class="col-sm-12 form-section-title color-portainer-black">
+            Learn more...
+          </h4>
+          <div class="form-group">
+            <por-help-image-link data="$ctrl.links.youtube" copy-link="$ctrl.copyLink" on-link-clicked="($ctrl.onLinkClicked)"> </por-help-image-link>
+          </div>
+
+          <div class="form-group" ng-if="$ctrl.state.firstLogin">
+            <div class="col-lg-12 col-md-12 col-xs-12">
+              <button type="button" class="btn btn-primary btn-sm" ng-click="$ctrl.closeHelpView()">
+                <span>{{ $ctrl.state.linkClicked ? 'Done' : 'Skip' }}</span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

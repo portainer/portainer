@@ -1,0 +1,17 @@
+<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6" style="text-align: center;">
+  <div class="portainer-image-link">
+    <a id="{{ $ctrl.data.linkId }}" ng-href="{{ $ctrl.data.redirectUrl }}" target="_blank" ng-click="$ctrl.onLinkClicked($ctrl.data.matomoAction)">
+      <img ng-src="{{ $ctrl.data.image }}" alt="{{ $ctrl.data.imageAltText }}" />
+      <i class="fa fa-external-link-alt color-portainer-black"></i>
+    </a>
+  </div>
+  <div style="margin-top: 10px;">
+    <label>{{ $ctrl.data.description }}</label>
+    <div>
+      <span id="copy{{ $ctrl.data.linkId }}" class="btn btn-sm text-blue" ng-click="$ctrl.copyLink($ctrl.data.redirectUrl, $ctrl.data.linkId)">
+        <i class="fa fa-copy space-right" aria-hidden="true"></i>Copy link</span
+      >
+      <span id="copy{{ $ctrl.data.linkId }}Notification" style="margin-left: 7px; display: none; color: #23ae89;"> <i class="fa fa-check" aria-hidden="true"></i> copied </span>
+    </div>
+  </div>
+</div>

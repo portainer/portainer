@@ -19,9 +19,10 @@ type Service struct {
 }
 
 type claims struct {
-	UserID   int    `json:"id"`
-	Username string `json:"username"`
-	Role     int    `json:"role"`
+	UserID               int    `json:"id"`
+	Username             string `json:"username"`
+	Role                 int    `json:"role"`
+	HasAuthenticatedOnce bool   `json:"hasAuthenticatedOnce"`
 	jwt.StandardClaims
 }
 
@@ -94,9 +95,10 @@ func (service *Service) generateSignedToken(data *portainer.TokenData, expiryTim
 		expireToken = expiryTime.Unix()
 	}
 	cl := claims{
-		UserID:   int(data.ID),
-		Username: data.Username,
-		Role:     int(data.Role),
+		UserID:               int(data.ID),
+		Username:             data.Username,
+		Role:                 int(data.Role),
+		HasAuthenticatedOnce: bool(data.HasAuthenticatedOnce),
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expireToken,
 		},

@@ -139,6 +139,7 @@ func (service *Service) CreateUser(user *portainer.User) error {
 		id, _ := bucket.NextSequence()
 		user.ID = portainer.UserID(id)
 		user.Username = strings.ToLower(user.Username)
+		user.HasAuthenticatedOnce = false
 
 		data, err := internal.MarshalObject(user)
 		if err != nil {

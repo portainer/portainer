@@ -194,16 +194,21 @@
         </div>
       </li>
     </ul>
-    <div class="sidebar-footer-content">
-      <div class="update-notification" ng-if="applicationState.application.versionStatus.UpdateAvailable">
-        <a target="_blank" href="https://github.com/portainer/portainer/releases/tag/{{ applicationState.application.versionStatus.LatestVersion }}" style="color: #091e5d;">
-          <i class="fa-lg fas fa-cloud-download-alt" style="margin-right: 2px;"></i> A new version is available
-        </a>
-      </div>
-      <div>
-        <img src="~@/assets/images/logo_small.png" class="img-responsive logo" alt="Portainer" />
-        <span class="version">{{ uiVersion }}</span>
-      </div>
+  </div>
+  <div class="sidebar-footer-content">
+    <ul class="sidebar">
+      <li class="sidebar-list">
+        <a ui-sref="portainer.help" ui-sref-active="active" style="text-indent: 0px;">Help & support</a>
+      </li>
+    </ul>
+    <div class="update-notification" ng-if="applicationState.application.versionStatus.UpdateAvailable">
+      <a target="_blank" href="https://github.com/portainer/portainer/releases/tag/{{ applicationState.application.versionStatus.LatestVersion }}" style="color: #091e5d;">
+        <i class="fa-lg fas fa-cloud-download-alt" style="margin-right: 2px;"></i> A new version is available
+      </a>
+    </div>
+    <div>
+      <img src="~@/assets/images/logo_small.png" class="img-responsive logo" alt="Portainer" />
+      <span class="version">{{ uiVersion }}</span>
     </div>
   </div>
 </div>

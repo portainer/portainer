@@ -14,9 +14,10 @@ func TestGenerateSignedToken(t *testing.T) {
 	assert.NoError(t, err, "failed to create a copy of service")
 
 	token := &portainer.TokenData{
-		Username: "Joe",
-		ID:       1,
-		Role:     1,
+		Username:             "Joe",
+		ID:                   1,
+		Role:                 1,
+		HasAuthenticatedOnce: true,
 	}
 	expirtationTime := time.Now().Add(1 * time.Hour)
 
@@ -34,5 +35,6 @@ func TestGenerateSignedToken(t *testing.T) {
 	assert.Equal(t, token.Username, tokenClaims.Username)
 	assert.Equal(t, int(token.ID), tokenClaims.UserID)
 	assert.Equal(t, int(token.Role), tokenClaims.Role)
+	assert.Equal(t, bool(token.HasAuthenticatedOnce), tokenClaims.HasAuthenticatedOnce)
 	assert.Equal(t, expirtationTime.Unix(), tokenClaims.ExpiresAt)
 }

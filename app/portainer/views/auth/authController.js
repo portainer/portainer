@@ -120,8 +120,13 @@ class AuthenticationController {
     try {
       const endpoints = await this.EndpointService.endpoints(0, 1);
       const isAdmin = this.Authentication.isAdmin();
+      const firstLogin = this.Authentication.getUserDetails().firstLogin;
 
-      if (endpoints.value.length === 0 && isAdmin) {
+      const shouldInitFirstEndpoint = isAdmin && endpoints.value.length === 0;
+
+      if (firstLogin) {
+        return this.$state.go('portainer.help', { firstLogin: true, initFirstEndpoint: shouldInitFirstEndpoint });
+      } else if (shouldInitFirstEndpoint) {
         return this.$state.go('portainer.init.endpoint');
       } else {
         return this.$state.go('portainer.home');
@@ -150,8 +155,8 @@ class AuthenticationController {
 
   async postLoginSteps() {
     await this.StateManager.initialize();
-    await this.checkForEndpointsAsync();
     await this.checkForLatestVersionAsync();
+    await this.checkForEndpointsAsync();
   }
   /**
    * END POST LOGIN STEPS SECTION

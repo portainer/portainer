@@ -93,11 +93,6 @@ a[ng-click] {
   margin-left: 5px;
 }
 
-.portainer-disabled-link {
-  color: gray;
-  pointer-events: none;
-}
-
 .portainer-disabled-datatable {
   color: gray;
 }
@@ -126,6 +121,10 @@ a[ng-click] {
   font-size: 1.3em;
 }
 
+.color-portainer-black {
+  color: #333333;
+}
+
 .fa.green-icon {
   color: #23ae89;
 }
@@ -149,6 +148,10 @@ a[ng-click] {
 
 .text-warning {
   color: #f0ad4e;
+}
+
+.text-blue {
+  color: #337ab7;
 }
 
 .widget .widget-body table tbody .image-tag {

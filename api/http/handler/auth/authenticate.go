@@ -131,7 +131,16 @@ func (handler *Handler) authenticateLDAPAndCreateUser(w http.ResponseWriter, use
 }
 
 func (handler *Handler) writeToken(w http.ResponseWriter, user *portainer.User) *httperror.HandlerError {
-	return handler.persistAndWriteToken(w, composeTokenData(user))
+
+	tokenData := composeTokenData(user)
+
+	user.HasAuthenticatedOnce = true
+	err := handler.DataStore.User().UpdateUser(user.ID, user)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist user inside the database", err}
+	}
+
+	return handler.persistAndWriteToken(w, tokenData)
 }
 
 func (handler *Handler) writeTokenForOAuth(w http.ResponseWriter, user *portainer.User, expiryTime *time.Time) *httperror.HandlerError {
@@ -139,6 +148,14 @@ func (handler *Handler) writeTokenForOAuth(w http.ResponseWriter, user *portaine
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to generate JWT token", Err: err}
 	}
+
+	user.HasAuthenticatedOnce = true
+
+	err = handler.DataStore.User().UpdateUser(user.ID, user)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist user inside the database", err}
+	}
+
 	return response.JSON(w, &authenticateResponse{JWT: token})
 }
 
@@ -210,8 +227,9 @@ func teamMembershipExists(teamID portainer.TeamID, memberships []portainer.TeamM
 
 func composeTokenData(user *portainer.User) *portainer.TokenData {
 	return &portainer.TokenData{
-		ID:       user.ID,
-		Username: user.Username,
-		Role:     user.Role,
+		ID:                   user.ID,
+		Username:             user.Username,
+		Role:                 user.Role,
+		HasAuthenticatedOnce: user.HasAuthenticatedOnce,
 	}
 }

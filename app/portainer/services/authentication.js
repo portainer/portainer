@@ -88,6 +88,7 @@ angular.module('portainer.app').factory('Authentication', [
       user.username = tokenPayload.username;
       user.ID = tokenPayload.id;
       user.role = tokenPayload.role;
+      user.firstLogin = !(tokenPayload.hasAuthenticatedOnce ? tokenPayload.hasAuthenticatedOnce : false);
     }
 
     function isAdmin() {

@@ -49,10 +49,17 @@ angular.module('portainer.app').controller('InitAdminController', [
           return EndpointService.endpoints(0, 100);
         })
         .then(function success(data) {
-          if (data.value.length === 0) {
-            $state.go('portainer.init.endpoint');
+          const firstLogin = Authentication.getUserDetails().firstLogin;
+          const initFirstEndpoint = data.value.length === 0;
+
+          if (firstLogin) {
+            return $state.go('portainer.help', { firstLogin: true, initFirstEndpoint: initFirstEndpoint });
+          }
+
+          if (initFirstEndpoint) {
+            return $state.go('portainer.init.endpoint');
           } else {
-            $state.go('portainer.home');
+            return $state.go('portainer.home');
           }
         })
         .catch(function error(err) {

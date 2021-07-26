@@ -927,9 +927,10 @@ type (
 
 	// TokenData represents the data embedded in a JWT token
 	TokenData struct {
-		ID       UserID
-		Username string
-		Role     UserRole
+		ID                   UserID
+		Username             string
+		Role                 UserRole
+		HasAuthenticatedOnce bool
 	}
 
 	// TunnelDetails represents information associated to a tunnel
@@ -953,7 +954,8 @@ type (
 		Username string `json:"Username" example:"bob"`
 		Password string `json:"Password,omitempty" example:"passwd"`
 		// User role (1 for administrator account and 2 for regular account)
-		Role UserRole `json:"Role" example:"1"`
+		Role                 UserRole `json:"Role" example:"1"`
+		HasAuthenticatedOnce bool     `json:"HasAuthenticatedOnce" example:"true"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 25

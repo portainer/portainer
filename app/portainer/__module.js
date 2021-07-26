@@ -163,6 +163,20 @@ angular.module('portainer.app', ['portainer.oauth', componentsModule]).config([
       },
     };
 
+    const helpAndSupport = {
+      name: 'portainer.help',
+      url: '/help',
+      views: {
+        'content@': {
+          component: 'helpAndSupportView',
+        },
+      },
+      params: {
+        firstLogin: false,
+        initFirstEndpoint: false,
+      },
+    };
+
     var endpointCreation = {
       name: 'portainer.endpoints.new',
       url: '/new',
@@ -407,6 +421,7 @@ angular.module('portainer.app', ['portainer.oauth', componentsModule]).config([
     $stateRegistryProvider.register(group);
     $stateRegistryProvider.register(groupAccess);
     $stateRegistryProvider.register(groupCreation);
+    $stateRegistryProvider.register(helpAndSupport);
     $stateRegistryProvider.register(home);
     $stateRegistryProvider.register(init);
     $stateRegistryProvider.register(initEndpoint);

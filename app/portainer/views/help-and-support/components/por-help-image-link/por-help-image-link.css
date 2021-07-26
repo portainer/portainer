@@ -1,0 +1,21 @@
+.portainer-image-link {
+  position: relative;
+  padding: 0;
+}
+
+.portainer-image-link img {
+  display: block;
+  max-width: 100%;
+  box-shadow: 0 2px 4px 0 rgba(34, 36, 38, 0.12), 0 2px 10px 0 rgba(34, 36, 38, 0.15);
+}
+
+.portainer-image-link i {
+  position: absolute;
+  bottom: 1%;
+  right: 1%;
+}
+
+.portainer-disabled-link {
+  color: gray;
+  pointer-events: none;
+}
