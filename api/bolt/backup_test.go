@@ -25,7 +25,7 @@ func TestCreateBackupFolders(t *testing.T) {
 
 	backupPath := path.Join(store.path, backupDefaults.backupDir)
 
-	if exists, _ := store.fileService.FileExists(backupPath); exists {
+	if isFileExist(backupPath) {
 		t.Error("Expect backups folder to not exist")
 	}
 
