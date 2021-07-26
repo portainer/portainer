@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"mime"
 
 	"gopkg.in/yaml.v3"
 )
@@ -69,7 +70,13 @@ func getBody(body io.ReadCloser, contentType string, isGzip bool) (interface{}, 
 }
 
 func marshal(contentType string, data interface{}) ([]byte, error) {
-	switch contentType {
+	// Note: contentType can look like: "application/json" or "application/json; charset=utf-8"
+	mediaType, _, err := mime.ParseMediaType(contentType)
+	if err != nil {
+		return nil, err
+	}
+
+	switch mediaType {
 	case "application/yaml":
 		return yaml.Marshal(data)
 	case "application/json", "":
@@ -80,7 +87,13 @@ func marshal(contentType string, data interface{}) ([]byte, error) {
 }
 
 func unmarshal(contentType string, body []byte, returnBody interface{}) error {
-	switch contentType {
+	// Note: contentType can look look like: "application/json" or "application/json; charset=utf-8"
+	mediaType, _, err := mime.ParseMediaType(contentType)
+	if err != nil {
+		return err
+	}
+
+	switch mediaType {
 	case "application/yaml":
 		return yaml.Unmarshal(body, returnBody)
 	case "application/json", "":
