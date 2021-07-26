@@ -568,7 +568,7 @@ body,
 }
 
 .form-section-title {
-  border-bottom: 1px soli var(--border-form-section-title-color);
+  border-bottom: 1px solid var(--border-form-section-title-color);
   margin-top: 5px;
   margin-bottom: 15px;
   color: var(--text-form-section-title-color);
