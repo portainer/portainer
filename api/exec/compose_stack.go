@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"regexp"
 	"strings"
 
 	wrapper "github.com/portainer/docker-compose-wrapper"
@@ -17,12 +18,12 @@ import (
 // ComposeStackManager is a wrapper for docker-compose binary
 type ComposeStackManager struct {
 	wrapper      *wrapper.ComposeWrapper
-	dataPath     string
+	configPath   string
 	proxyManager *proxy.Manager
 }
 
 // NewComposeStackManager returns a docker-compose wrapper if corresponding binary present, otherwise nil
-func NewComposeStackManager(binaryPath string, dataPath string, proxyManager *proxy.Manager) (*ComposeStackManager, error) {
+func NewComposeStackManager(binaryPath string, configPath string, proxyManager *proxy.Manager) (*ComposeStackManager, error) {
 	wrap, err := wrapper.NewComposeWrapper(binaryPath)
 	if err != nil {
 		return nil, err
@@ -31,7 +32,7 @@ func NewComposeStackManager(binaryPath string, dataPath string, proxyManager *pr
 	return &ComposeStackManager{
 		wrapper:      wrap,
 		proxyManager: proxyManager,
-		dataPath:     dataPath,
+		configPath:   configPath,
 	}, nil
 }
 
@@ -57,7 +58,7 @@ func (w *ComposeStackManager) Up(stack *portainer.Stack, endpoint *portainer.End
 	}
 
 	filePaths := stackutils.GetStackFilePaths(stack)
-	_, err = w.wrapper.Up(filePaths, url, stack.Name, envFilePath, w.dataPath)
+	_, err = w.wrapper.Up(filePaths, url, stack.Name, envFilePath, w.configPath)
 	return err
 }
 
@@ -77,9 +78,10 @@ func (w *ComposeStackManager) Down(stack *portainer.Stack, endpoint *portainer.E
 	return err
 }
 
-// NormalizeStackName returns the passed stack name, for interface implementation only
+// NormalizeStackName returns a new stack name with unsupported characters replaced
 func (w *ComposeStackManager) NormalizeStackName(name string) string {
-	return name
+	r := regexp.MustCompile("[^a-z0-9]+")
+	return r.ReplaceAllString(strings.ToLower(name), "")
 }
 
 func (w *ComposeStackManager) fetchEndpointProxy(endpoint *portainer.Endpoint) (string, *factory.ProxyServer, error) {
