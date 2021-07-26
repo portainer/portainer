@@ -115,7 +115,10 @@ func (store *Store) backupVersion(migrator *migrator.Migrator) error {
 	_, err := store.BackupWithOptions(options)
 	if err != nil {
 		migrateLog.Error("An error occurred during database backup", err)
-		store.RemoveWithOptions(options)
+		removalErr := store.RemoveWithOptions(options)
+		if removalErr != nil {
+			migrateLog.Error("An error occurred during store removal prior to backup", err)
+		}
 		return err
 	}
 
