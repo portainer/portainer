@@ -132,8 +132,6 @@
   --border-sidebar-color: #3ea6ff;
   --border-form-control-color: rgb(54, 54, 54);
   --bg-header-color: #000;
-  --text-form-control-color: #aaa;
-  --text-muted-color: #aaa;
   --border-table-color: rgba(255, 255, 255, 0.8);
   --bg-hover-table-color: rgba(255, 255, 255, 0.1);
   --bg-switch-box-color: rgba(255, 255, 255, 0.6);
@@ -144,6 +142,10 @@
   --hover-sidebar-color: #000;
   --border-sidebar-high-contrast: 1px solid #3ea6ff;
   --text-danger-color: #ff00e0;
+  --text-code-color: #fff;
+  --text-form-control-color: #fff;
+  --border-code-high-contrast: 1px solid #fff;
+  --text-blocklist-hover-color: #3ea5ff;
 }
 
 :root[theme='light'] {
@@ -371,6 +373,7 @@ fieldset[disabled] .form-control {
 code {
   color: var(--text-code-color);
   background-color: var(--bg-code-color);
+  border: var(--border-code-high-contrast);
 }
 
 .nav-tabs > li.active > a,
