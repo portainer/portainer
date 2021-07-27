@@ -15,9 +15,18 @@
               <form class="form-horizontal" autocomplete="off" name="resourcePoolEditForm" style="padding: 20px; margin-top: 10px;">
                 <!-- name-input -->
                 <div class="form-group">
-                  <label for="pool_name" class="col-sm-1 control-label text-left">Name</label>
-                  <div class="col-sm-11">
-                    <input type="text" class="form-control" name="pool_name" ng-model="ctrl.pool.Namespace.Name" disabled />
+                  <div class="col-sm-12">
+                    <table class="table">
+                      <tbody>
+                        <tr>
+                          <td>Name</td>
+                          <td>
+                            {{ ctrl.pool.Namespace.Name }}
+                            <span class="label label-info image-tag label-margins" ng-if="ctrl.isSystem">system</span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
                 <!-- !name-input -->
@@ -396,13 +405,14 @@
                 <!-- !summary -->
 
                 <!-- actions -->
-                <div ng-if="ctrl.isAdmin && ctrl.isEditable" class="col-sm-12 form-section-title">
+                <div ng-if="ctrl.isAdmin && ctrl.pool.Namespace.Name !== 'default'" class="col-sm-12 form-section-title">
                   Actions
                 </div>
-                <div ng-if="ctrl.isAdmin && ctrl.isEditable" class="form-group">
+                <div ng-if="ctrl.isAdmin && ctrl.pool.Namespace.Name !== 'default'" class="form-group">
                   <div class="col-sm-12">
                     <button
                       type="button"
+                      ng-if="ctrl.isEditable"
                       class="btn btn-primary btn-sm"
                       ng-disabled="!resourcePoolEditForm.$valid || ctrl.isUpdateButtonDisabled()"
                       ng-click="ctrl.updateResourcePool()"
@@ -410,6 +420,10 @@
                     >
                       <span ng-hide="ctrl.state.actionInProgress">Update namespace</span>
                       <span ng-show="ctrl.state.actionInProgress">Update in progress...</span>
+                    </button>
+                    <button type="button" class="btn btn-primary btn-sm" ng-click="ctrl.markUnmarkAsSystem()" button-spinner="ctrl.state.actionInProgress">
+                      <span ng-if="ctrl.isSystem">Unmark as system</span>
+                      <span ng-if="!ctrl.isSystem">Mark as system</span>
                     </button>
                   </div>
                 </div>

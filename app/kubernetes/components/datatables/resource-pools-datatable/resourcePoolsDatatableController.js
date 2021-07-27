@@ -26,11 +26,11 @@ angular.module('portainer.docker').controller('KubernetesResourcePoolsDatatableC
     };
 
     this.disableRemove = function (item) {
-      return KubernetesNamespaceHelper.isSystemNamespace(item.Namespace.Name) || item.Namespace.Name === 'default';
+      return KubernetesNamespaceHelper.isSystemNamespace(item.Namespace) || item.Namespace.Name === 'default';
     };
 
     this.isSystemNamespace = function (item) {
-      return KubernetesNamespaceHelper.isSystemNamespace(item.Namespace.Name);
+      return KubernetesNamespaceHelper.isSystemNamespace(item.Namespace);
     };
 
     this.isDisplayed = function (item) {

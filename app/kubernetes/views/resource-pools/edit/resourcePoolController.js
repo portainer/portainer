@@ -171,11 +171,11 @@ class KubernetesResourcePoolController {
   }
 
   /* #region  UPDATE NAMESPACE */
-  async updateResourcePoolAsync() {
+  async updateResourcePoolAsync(oldFormValues, newFormValues) {
     this.state.actionInProgress = true;
     try {
       this.checkDefaults();
-      await this.KubernetesResourcePoolService.patch(this.savedFormValues, this.formValues);
+      await this.KubernetesResourcePoolService.patch(oldFormValues, newFormValues);
       this.Notifications.success('Namespace successfully updated', this.pool.Namespace.Name);
       this.$state.reload();
     } catch (err) {
@@ -202,12 +202,44 @@ class KubernetesResourcePoolController {
       ${warnings.ingress ? messages.ingress : ''}<br/><br/>Do you wish to continue?`;
       this.ModalService.confirmUpdate(displayedMessage, (confirmed) => {
         if (confirmed) {
-          return this.$async(this.updateResourcePoolAsync);
+          return this.$async(this.updateResourcePoolAsync, this.savedFormValues, this.formValues);
         }
       });
     } else {
-      return this.$async(this.updateResourcePoolAsync);
+      return this.$async(this.updateResourcePoolAsync, this.savedFormValues, this.formValues);
     }
+  }
+
+  async confirmMarkUnmarkAsSystem() {
+    const message = this.isSystem
+      ? 'Unmarking this namespace as system will allow non administrator users to manage it and the resources in contains depending on the access control settings. Are you sure?'
+      : 'Marking this namespace as a system namespace will prevent non administrator users from managing it and the resources it contains. Are you sure?';
+
+    return new Promise((resolve) => {
+      this.ModalService.confirmUpdate(message, resolve);
+    });
+  }
+
+  markUnmarkAsSystem() {
+    return this.$async(async () => {
+      try {
+        const namespaceName = this.$state.params.id;
+        this.state.actionInProgress = true;
+
+        const confirmed = await this.confirmMarkUnmarkAsSystem();
+        if (!confirmed) {
+          return;
+        }
+        await this.KubernetesResourcePoolService.toggleSystem(this.endpoint.Id, namespaceName, !this.isSystem);
+
+        this.Notifications.success('Namespace successfully updated', namespaceName);
+        this.$state.reload();
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to create namespace');
+      } finally {
+        this.state.actionInProgress = false;
+      }
+    });
   }
   /* #endregion */
 
@@ -361,6 +393,8 @@ class KubernetesResourcePoolController {
         this.formValues = new KubernetesResourcePoolFormValues(KubernetesResourceQuotaDefaults);
         this.formValues.Name = this.pool.Namespace.Name;
         this.formValues.EndpointId = this.endpoint.Id;
+        this.formValues.IsSystem = this.pool.Namespace.IsSystem;
+        this.formValues.NamespaceSystemLabel = this.pool.Namespace.NamespaceSystemLabel;
 
         _.forEach(nodes, (item) => {
           this.state.sliderMaxMemory += filesizeParser(item.Memory);
@@ -378,7 +412,8 @@ class KubernetesResourcePoolController {
           this.state.resourceReservation.Memory = KubernetesResourceReservationHelper.megaBytesValue(quota.MemoryLimitUsed);
         }
 
-        this.isEditable = !this.KubernetesNamespaceHelper.isSystemNamespace(this.pool.Namespace.Name);
+        this.isSystem = this.KubernetesNamespaceHelper.isSystemNamespace(this.pool.Namespace);
+        this.isEditable = !this.KubernetesNamespaceHelper.isSystemNamespace(this.pool.Namespace);
         if (this.pool.Namespace.Name === 'default') {
           this.isEditable = false;
         }

@@ -10,7 +10,7 @@ angular.module('portainer.docker').controller('KubernetesNodeApplicationsDatatab
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
 
     this.isSystemNamespace = function (item) {
-      return KubernetesNamespaceHelper.isSystemNamespace(item.ResourcePool);
+      return KubernetesNamespaceHelper.isSystemNamespace(item);
     };
 
     this.isExternalApplication = function (item) {

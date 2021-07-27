@@ -29,7 +29,7 @@ class KubernetesVolumesDatatableController {
   }
 
   isSystemNamespace(item) {
-    return this.KubernetesNamespaceHelper.isSystemNamespace(item.ResourcePool.Namespace.Name);
+    return this.KubernetesNamespaceHelper.isSystemNamespace(item.ResourcePool.Namespace);
   }
 
   isDisplayed(item) {

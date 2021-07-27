@@ -5,12 +5,20 @@ import KubernetesResourcePoolConverter from 'Kubernetes/converters/resourcePool'
 import KubernetesResourceQuotaHelper from 'Kubernetes/helpers/resourceQuotaHelper';
 
 /* @ngInject */
-export function KubernetesResourcePoolService($async, EndpointService, KubernetesNamespaceService, KubernetesResourceQuotaService, KubernetesIngressService) {
+export function KubernetesResourcePoolService(
+  $async,
+  EndpointService,
+  KubernetesNamespaceService,
+  KubernetesResourceQuotaService,
+  KubernetesIngressService,
+  KubernetesPortainerNamespaces
+) {
   return {
     get,
     create,
     patch,
     delete: _delete,
+    toggleSystem,
   };
 
   async function getOne(name) {
@@ -113,6 +121,10 @@ export function KubernetesResourcePoolService($async, EndpointService, Kubernete
     return $async(async () => {
       await KubernetesNamespaceService.delete(pool.Namespace);
     });
+  }
+
+  function toggleSystem(endpointId, namespaceName, system) {
+    return KubernetesPortainerNamespaces.toggleSystem({ namespaceName, endpointId }, { system }).$promise;
   }
 }
 

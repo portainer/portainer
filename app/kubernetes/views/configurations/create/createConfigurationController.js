@@ -94,7 +94,7 @@ class KubernetesCreateConfigurationController {
 
     try {
       const resourcePools = await this.KubernetesResourcePoolService.get();
-      this.resourcePools = _.filter(resourcePools, (resourcePool) => !this.KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name));
+      this.resourcePools = _.filter(resourcePools, (resourcePool) => !this.KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace));
 
       this.formValues.ResourcePool = this.resourcePools[0];
       await this.getConfigurations();

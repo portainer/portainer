@@ -66,7 +66,7 @@ class KubernetesDashboardController {
 
       if (!isAdmin) {
         this.pools = _.filter(pools, (pool) => {
-          return !this.KubernetesNamespaceHelper.isSystemNamespace(pool.Namespace.Name);
+          return !this.KubernetesNamespaceHelper.isSystemNamespace(pool.Namespace);
         });
 
         this.configurations = _.filter(configurations, (config) => {
