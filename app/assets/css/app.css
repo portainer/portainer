@@ -103,6 +103,13 @@
   --bg-item-highlighted-color: #181818;
   --bg-item-highlighted-null-color: #181818;
   --bg-row-header-color: #181818;
+  --text-multiselect-button-color: #fff;
+  --border-multiselect-button-color: #383838;
+  --bg-multiselect-button-color: #383838;
+  --bg-image-multiselect-button: none !important;
+  --bg-multiselect-checkbox-color: #383838;
+  --text-multiselect-item-color: #fff;
+  --border-searchbar-color: #212121;
 }
 
 :root[theme='highcontrast'] {
@@ -241,6 +248,12 @@
   --bg-item-highlighted-color: #d5e8f3;
   --bg-item-highlighted-null-color: #f5f5f5;
   --bg-row-header-color: #fff;
+  --text-multiselect-button-color: #555;
+  --border-multiselect-button-color: #c6c6c6;
+  --bg-image-multiselect-button: linear-gradient(#fff, #f7f7f7);
+  --bg-multiselect-checkbox-color: #fff;
+  --text-multiselect-item-color: #444;
+  --border-searchbar-color: #f6f6f6;
 }
 /* Overide Vendor CSS */
 .form-control {
@@ -497,6 +510,14 @@ json-tree .branch-preview {
 
 .motd-body {
   background-color: var(--bg-motd-body-color) !important;
+}
+
+.multiSelect .checkboxLayer {
+  background-color: var(--bg-multiselect-checkbox-color);
+}
+
+.multiSelect .multiSelectItem {
+  color: var(--text-multiselect-item-color);
 }
 
 /* Overide Vendor CSS */
@@ -1050,9 +1071,9 @@ a[ng-click] {
 .log_viewer {
   height: 100%;
   overflow-y: scroll;
-  color: black;
+  color: var(--text-log-viewer-color);
   font-size: 0.85em;
-  background-color: white;
+  background-color: var(--bg-log-viewer-color);
 }
 
 .log_viewer.wrap_lines {
@@ -1071,7 +1092,7 @@ a[ng-click] {
 }
 
 .log_viewer .line_selected {
-  background-color: #c5cae9;
+  background-color: var(--bg-log-line-selected-color);
 }
 
 .row.header .meta .page {
@@ -1162,6 +1183,13 @@ a[ng-click] {
   min-height: 30px !important;
   background-color: unset;
   background-image: unset;
+  color: var(--text-multiselect-button-color);
+  border: 1px solid var(--border-multiselect-button-color);
+}
+
+.multiSelect > button:hover {
+  background-image: var(--bg-image-multiselect-button);
+  background-color: var(--bg-multiselect-button-color);
 }
 
 .multiSelect .multiSelectItem:not(.multiSelectGroup).selected {
