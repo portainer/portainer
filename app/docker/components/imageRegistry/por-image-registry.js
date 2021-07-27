@@ -3,7 +3,6 @@ angular.module('portainer.docker').component('porImageRegistry', {
   controller: 'porImageRegistryController',
   bindings: {
     model: '=', // must be of type PorImageRegistryModel
-    pullWarning: '<',
     autoComplete: '<',
     labelClass: '@',
     inputClass: '@',
@@ -12,6 +11,7 @@ angular.module('portainer.docker').component('porImageRegistry', {
     checkRateLimits: '<',
     onImageChange: '&',
     setValidity: '<',
+    namespace: '<',
   },
   require: {
     form: '^form',

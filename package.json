@@ -2,7 +2,7 @@
   "author": "Portainer.io",
   "name": "portainer",
   "homepage": "http://portainer.io",
-  "version": "2.5.1",
+  "version": "2.6.0",
   "repository": {
     "type": "git",
     "url": "git@github.com:portainer/portainer.git"
@@ -34,7 +34,10 @@
     "start:toolkit": "grunt start:toolkit",
     "build:server:offline": "cd ./api/cmd/portainer && CGO_ENABLED=0 go build --installsuffix cgo --ldflags '-s' && mv -f portainer ../../../dist/portainer",
     "clean:all": "grunt clean:all",
-    "format": "prettier --loglevel warn --write \"**/*.{js,css,html}\""
+    "format": "prettier --loglevel warn --write \"**/*.{js,css,html}\"",
+    "lint": "yarn lint:client; yarn lint:server",
+    "lint:server": "cd api && golangci-lint run -E exportloopref",
+    "lint:client": "eslint --cache --fix ."
   },
   "scriptsComments": {
     "build": "Build the entire app (backend/frontend) in development mode",

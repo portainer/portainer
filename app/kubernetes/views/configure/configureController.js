@@ -9,18 +9,10 @@ import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
 class KubernetesConfigureController {
   /* #region  CONSTRUCTOR */
 
-  // TODO: technical debt
-  // $transition$ cannot be injected as bindings: { $transition$: '<' } inside app/portainer/__module.js
-  // because this view is not using a component (https://ui-router.github.io/guide/ng1/route-to-component#accessing-transition)
-  // and will cause
-  // >> Error: Cannot combine: component|bindings|componentProvider
-  // >> with: templateProvider|templateUrl|template|notify|async|controller|controllerProvider|controllerAs|resolveAs
-  // >> in stateview: 'content@@portainer.endpoints.endpoint.kubernetesConfig'
   /* @ngInject */
   constructor(
     $async,
     $state,
-    $transition$,
     Notifications,
     KubernetesStorageService,
     EndpointService,
@@ -33,7 +25,6 @@ class KubernetesConfigureController {
   ) {
     this.$async = $async;
     this.$state = $state;
-    this.$transition$ = $transition$;
     this.Notifications = Notifications;
     this.KubernetesStorageService = KubernetesStorageService;
     this.EndpointService = EndpointService;
@@ -116,6 +107,7 @@ class KubernetesConfigureController {
     endpoint.Kubernetes.Configuration.UseLoadBalancer = this.formValues.UseLoadBalancer;
     endpoint.Kubernetes.Configuration.UseServerMetrics = this.formValues.UseServerMetrics;
     endpoint.Kubernetes.Configuration.IngressClasses = ingressClasses;
+    endpoint.Kubernetes.Configuration.RestrictDefaultNamespace = this.formValues.RestrictDefaultNamespace;
   }
 
   transformFormValues() {
@@ -253,7 +245,7 @@ class KubernetesConfigureController {
       actionInProgress: false,
       displayConfigureClassPanel: {},
       viewReady: false,
-      endpointId: this.$transition$.params().id,
+      endpointId: this.$state.params.id,
       duplicates: {
         ingressClasses: new KubernetesFormValidationReferences(),
       },
@@ -268,6 +260,7 @@ class KubernetesConfigureController {
       UseLoadBalancer: false,
       UseServerMetrics: false,
       IngressClasses: [],
+      RestrictDefaultNamespace: false,
     };
 
     try {
@@ -290,6 +283,7 @@ class KubernetesConfigureController {
 
       this.formValues.UseLoadBalancer = this.endpoint.Kubernetes.Configuration.UseLoadBalancer;
       this.formValues.UseServerMetrics = this.endpoint.Kubernetes.Configuration.UseServerMetrics;
+      this.formValues.RestrictDefaultNamespace = this.endpoint.Kubernetes.Configuration.RestrictDefaultNamespace;
       this.formValues.IngressClasses = _.map(this.endpoint.Kubernetes.Configuration.IngressClasses, (ic) => {
         ic.IsNew = false;
         ic.NeedsDeletion = false;

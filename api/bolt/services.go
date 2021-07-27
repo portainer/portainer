@@ -167,11 +167,6 @@ func (store *Store) CustomTemplate() portainer.CustomTemplateService {
 	return store.CustomTemplateService
 }
 
-// DockerHub gives access to the DockerHub data management layer
-func (store *Store) DockerHub() portainer.DockerHubService {
-	return store.DockerHubService
-}
-
 // EdgeGroup gives access to the EdgeGroup data management layer
 func (store *Store) EdgeGroup() portainer.EdgeGroupService {
 	return store.EdgeGroupService

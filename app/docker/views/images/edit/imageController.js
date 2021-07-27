@@ -2,11 +2,12 @@ import _ from 'lodash-es';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
 angular.module('portainer.docker').controller('ImageController', [
+  '$async',
   '$q',
   '$scope',
   '$transition$',
   '$state',
-  '$timeout',
+  'endpoint',
   'ImageService',
   'ImageHelper',
   'RegistryService',
@@ -15,7 +16,8 @@ angular.module('portainer.docker').controller('ImageController', [
   'ModalService',
   'FileSaver',
   'Blob',
-  function ($q, $scope, $transition$, $state, $timeout, ImageService, ImageHelper, RegistryService, Notifications, HttpRequestHelper, ModalService, FileSaver, Blob) {
+  function ($async, $q, $scope, $transition$, $state, endpoint, ImageService, ImageHelper, RegistryService, Notifications, HttpRequestHelper, ModalService, FileSaver, Blob) {
+    $scope.endpoint = endpoint;
     $scope.formValues = {
       RegistryModel: new PorImageRegistryModel(),
     };
@@ -53,39 +55,38 @@ angular.module('portainer.docker').controller('ImageController', [
         });
     };
 
-    $scope.pushTag = function (repository) {
-      $('#uploadResourceHint').show();
-      RegistryService.retrievePorRegistryModelFromRepository(repository)
-        .then(function success(registryModel) {
-          return ImageService.pushImage(registryModel);
-        })
-        .then(function success() {
-          Notifications.success('Image successfully pushed', repository);
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to push image to repository');
-        })
-        .finally(function final() {
-          $('#uploadResourceHint').hide();
-        });
-    };
+    $scope.pushTag = pushTag;
 
-    $scope.pullTag = function (repository) {
-      $('#downloadResourceHint').show();
-      RegistryService.retrievePorRegistryModelFromRepository(repository)
-        .then(function success(registryModel) {
-          return ImageService.pullImage(registryModel, false);
-        })
-        .then(function success() {
-          Notifications.success('Image successfully pulled', repository);
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to pull image');
-        })
-        .finally(function final() {
+    async function pushTag(repository) {
+      return $async(async () => {
+        $('#uploadResourceHint').show();
+        try {
+          const registryModel = await RegistryService.retrievePorRegistryModelFromRepository(repository, endpoint.Id);
+          await ImageService.pushImage(registryModel);
+          Notifications.success('Image successfully pushed', repository);
+        } catch (err) {
+          Notifications.error('Failure', err, 'Unable to push image to repository');
+        } finally {
+          $('#uploadResourceHint').hide();
+        }
+      });
+    }
+
+    $scope.pullTag = pullTag;
+    async function pullTag(repository) {
+      return $async(async () => {
+        $('#downloadResourceHint').show();
+        try {
+          const registryModel = await RegistryService.retrievePorRegistryModelFromRepository(repository, endpoint.Id);
+          await ImageService.pullImage(registryModel);
+          Notifications.success('Image successfully pushed', repository);
+        } catch (err) {
+          Notifications.error('Failure', err, 'Unable to push image to repository');
+        } finally {
           $('#downloadResourceHint').hide();
-        });
-    };
+        }
+      });
+    }
 
     $scope.removeTag = function (repository) {
       ImageService.deleteImage(repository, false)

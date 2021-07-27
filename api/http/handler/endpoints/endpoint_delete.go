@@ -103,6 +103,22 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
+	registries, err := handler.DataStore.Registry().Registries()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
+	}
+
+	for idx := range registries {
+		registry := &registries[idx]
+		if _, ok := registry.RegistryAccesses[endpoint.ID]; ok {
+			delete(registry.RegistryAccesses, endpoint.ID)
+			err = handler.DataStore.Registry().UpdateRegistry(registry.ID, registry)
+			if err != nil {
+				return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to update registry accesses", Err: err}
+			}
+		}
+	}
+
 	return response.Empty(w)
 }
 

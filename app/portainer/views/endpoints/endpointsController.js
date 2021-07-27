@@ -1,8 +1,9 @@
 import angular from 'angular';
+import EndpointHelper from 'Portainer/helpers/endpointHelper';
 
 angular.module('portainer.app').controller('EndpointsController', EndpointsController);
 
-function EndpointsController($q, $scope, $state, $async, EndpointService, GroupService, EndpointHelper, Notifications) {
+function EndpointsController($q, $scope, $state, $async, EndpointService, GroupService, Notifications) {
   $scope.removeAction = removeAction;
 
   function removeAction(endpoints) {

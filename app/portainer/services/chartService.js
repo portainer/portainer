@@ -26,6 +26,11 @@ angular.module('portainer.app').factory('ChartService', [
             },
           },
         },
+        layout: {
+          padding: {
+            left: 15,
+          },
+        },
         hover: { animationDuration: 0 },
         scales: {
           yAxes: [

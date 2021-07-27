@@ -1,18 +1,16 @@
 import _ from 'lodash-es';
-import { RegistryTypes } from '@/portainer/models/registryTypes';
+import { RegistryTypes } from './registryTypes';
 
 export function RegistryViewModel(data) {
   this.Id = data.Id;
   this.Type = data.Type;
   this.Name = data.Name;
   this.URL = data.URL;
+  this.BaseURL = data.BaseURL;
   this.Authentication = data.Authentication;
   this.Username = data.Username;
   this.Password = data.Password;
-  this.AuthorizedUsers = data.AuthorizedUsers;
-  this.AuthorizedTeams = data.AuthorizedTeams;
-  this.UserAccessPolicies = data.UserAccessPolicies;
-  this.TeamAccessPolicies = data.TeamAccessPolicies;
+  this.RegistryAccesses = data.RegistryAccesses; // map[EndpointID]{UserAccessPolicies, TeamAccessPolicies, NamespaceAccessPolicies}
   this.Checked = false;
   this.Gitlab = data.Gitlab;
   this.Quay = data.Quay;
@@ -33,13 +31,13 @@ export function RegistryManagementConfigurationDefaultModel(registry) {
     this.TLS = true;
   }
 
-  if (registry.Type === RegistryTypes.CUSTOM && registry.Authentication) {
+  if ((registry.Type === RegistryTypes.CUSTOM || registry.Type === RegistryTypes.PROGET) && registry.Authentication) {
     this.Authentication = true;
     this.Username = registry.Username;
   }
 }
 
-export function RegistryDefaultModel() {
+export function RegistryCreateFormValues() {
   this.Type = RegistryTypes.CUSTOM;
   this.URL = '';
   this.Name = '';
@@ -70,5 +68,9 @@ export function RegistryCreateRequest(model) {
       useOrganisation: model.Quay.useOrganisation,
       organisationName: model.Quay.organisationName,
     };
+  }
+  if (model.Type === RegistryTypes.PROGET) {
+    this.BaseURL = _.replace(model.BaseURL, /^https?\:\/\//i, '');
+    this.BaseURL = _.replace(this.BaseURL, /\/$/, '');
   }
 }

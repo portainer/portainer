@@ -6,6 +6,7 @@ import (
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/kubernetes/cli"
 
 	"net/http"
 
@@ -28,6 +29,7 @@ type Handler struct {
 	ProxyManager         *proxy.Manager
 	ReverseTunnelService portainer.ReverseTunnelService
 	SnapshotService      portainer.SnapshotService
+	K8sClientFactory     *cli.ClientFactory
 	ComposeStackManager  portainer.ComposeStackManager
 	AuthorizationService *authorization.Service
 }
@@ -53,7 +55,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointUpdate))).Methods(http.MethodPut)
 	h.Handle("/endpoints/{id}",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointDelete))).Methods(http.MethodDelete)
-	h.Handle("/endpoints/{id}/dockerhub",
+	h.Handle("/endpoints/{id}/dockerhub/{registryId}",
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointDockerhubStatus))).Methods(http.MethodGet)
 	h.Handle("/endpoints/{id}/extensions",
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointExtensionAdd))).Methods(http.MethodPost)
@@ -63,5 +65,11 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointSnapshot))).Methods(http.MethodPost)
 	h.Handle("/endpoints/{id}/status",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.endpointStatusInspect))).Methods(http.MethodGet)
+	h.Handle("/endpoints/{id}/registries",
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointRegistriesList))).Methods(http.MethodGet)
+	h.Handle("/endpoints/{id}/registries/{registryId}",
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointRegistryInspect))).Methods(http.MethodGet)
+	h.Handle("/endpoints/{id}/registries/{registryId}",
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointRegistryAccess))).Methods(http.MethodPut)
 	return h
 }

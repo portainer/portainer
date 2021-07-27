@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	wrapper "github.com/portainer/docker-compose-wrapper"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt"
 	"github.com/portainer/portainer/api/chisel"
@@ -77,12 +78,17 @@ func initDataStore(dataStorePath string, fileService portainer.FileService) port
 }
 
 func initComposeStackManager(assetsPath string, dataStorePath string, reverseTunnelService portainer.ReverseTunnelService, proxyManager *proxy.Manager) portainer.ComposeStackManager {
-	composeWrapper := exec.NewComposeWrapper(assetsPath, dataStorePath, proxyManager)
-	if composeWrapper != nil {
-		return composeWrapper
+	composeWrapper, err := exec.NewComposeStackManager(assetsPath, dataStorePath, proxyManager)
+	if err != nil {
+		if err == wrapper.ErrBinaryNotFound {
+			log.Printf("[INFO] [message: docker-compose binary not found, falling back to libcompose]")
+			return libcompose.NewComposeStackManager(dataStorePath, reverseTunnelService)
+		}
+
+		log.Fatalf("failed initalizing compose stack manager; err=%s", err)
 	}
 
-	return libcompose.NewComposeStackManager(dataStorePath, reverseTunnelService)
+	return composeWrapper
 }
 
 func initSwarmStackManager(assetsPath string, dataStorePath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService, reverseTunnelService portainer.ReverseTunnelService) (portainer.SwarmStackManager, error) {
@@ -134,8 +140,8 @@ func initDockerClientFactory(signatureService portainer.DigitalSignatureService,
 	return docker.NewClientFactory(signatureService, reverseTunnelService)
 }
 
-func initKubernetesClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, instanceID string) *kubecli.ClientFactory {
-	return kubecli.NewClientFactory(signatureService, reverseTunnelService, instanceID)
+func initKubernetesClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, instanceID string, dataStore portainer.DataStore) *kubecli.ClientFactory {
+	return kubecli.NewClientFactory(signatureService, reverseTunnelService, instanceID, dataStore)
 }
 
 func initSnapshotService(snapshotInterval string, dataStore portainer.DataStore, dockerClientFactory *docker.ClientFactory, kubernetesClientFactory *kubecli.ClientFactory, shutdownCtx context.Context) (portainer.SnapshotService, error) {
@@ -382,7 +388,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	}
 
 	dockerClientFactory := initDockerClientFactory(digitalSignatureService, reverseTunnelService)
-	kubernetesClientFactory := initKubernetesClientFactory(digitalSignatureService, reverseTunnelService, instanceID)
+	kubernetesClientFactory := initKubernetesClientFactory(digitalSignatureService, reverseTunnelService, instanceID, dataStore)
 
 	snapshotService, err := initSnapshotService(*flags.SnapshotInterval, dataStore, dockerClientFactory, kubernetesClientFactory, shutdownCtx)
 	if err != nil {
