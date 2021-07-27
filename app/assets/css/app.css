@@ -531,7 +531,7 @@ json-tree .branch-preview {
 }
 
 .panel-body {
-  background-color: var(--bg-panel-body-color);
+  background-color: var(--bg-panel-body-color) !important;
 }
 
 /* Overide Vendor CSS */
