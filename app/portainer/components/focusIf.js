@@ -1,3 +1,5 @@
+import angular from 'angular';
+// ng-focus-if pkg from: https://github.com/hiebj/ng-focus-if
 angular.module('portainer.app').directive('focusIf', function ($timeout) {
   return {
     restrict: 'A',
