@@ -168,11 +168,11 @@ class KubernetesResourcePoolController {
   }
 
   /* #region  UPDATE NAMESPACE */
-  async updateResourcePoolAsync() {
+  async updateResourcePoolAsync(oldFormValues, newFormValues) {
     this.state.actionInProgress = true;
     try {
       this.checkDefaults();
-      await this.KubernetesResourcePoolService.patch(this.savedFormValues, this.formValues);
+      await this.KubernetesResourcePoolService.patch(oldFormValues, newFormValues);
       this.Notifications.success('Namespace successfully updated', this.pool.Namespace.Name);
       this.$state.reload();
     } catch (err) {
@@ -199,11 +199,27 @@ class KubernetesResourcePoolController {
       ${warnings.ingress ? messages.ingress : ''}<br/><br/>Do you wish to continue?`;
       this.ModalService.confirmUpdate(displayedMessage, (confirmed) => {
         if (confirmed) {
-          return this.$async(this.updateResourcePoolAsync);
+          return this.$async(this.updateResourcePoolAsync, this.savedFormValues, this.formValues);
         }
       });
     } else {
-      return this.$async(this.updateResourcePoolAsync);
+      return this.$async(this.updateResourcePoolAsync, this.savedFormValues, this.formValues);
+    }
+  }
+
+  markUnmarkAsSystem() {
+    const copySavedFormValues = angular.copy(this.savedFormValues);
+    if (!this.isSystem) {
+      const message = 'Marking this resource pool as a system resource pool will prevent non administrator users from managing it and the resources it contains. Are you sure?';
+      this.ModalService.confirmUpdate(message, (confirmed) => {
+        if (confirmed) {
+          copySavedFormValues.IsSystem = true;
+          return this.$async(this.updateResourcePoolAsync, this.savedFormValues, copySavedFormValues);
+        }
+      });
+    } else {
+      copySavedFormValues.IsSystem = false;
+      return this.$async(this.updateResourcePoolAsync, this.savedFormValues, copySavedFormValues);
     }
   }
   /* #endregion */
@@ -339,6 +355,8 @@ class KubernetesResourcePoolController {
         this.formValues = new KubernetesResourcePoolFormValues(KubernetesResourceQuotaDefaults);
         this.formValues.Name = this.pool.Namespace.Name;
         this.formValues.EndpointId = this.endpoint.Id;
+        this.formValues.IsSystem = this.pool.Namespace.IsSystem;
+        this.formValues.NamespaceSystemLabel = this.pool.Namespace.NamespaceSystemLabel;
 
         _.forEach(nodes, (item) => {
           this.state.sliderMaxMemory += filesizeParser(item.Memory);
@@ -356,7 +374,8 @@ class KubernetesResourcePoolController {
           this.state.memoryUsed = KubernetesResourceReservationHelper.megaBytesValue(quota.MemoryLimitUsed);
         }
 
-        this.isEditable = !this.KubernetesNamespaceHelper.isSystemNamespace(this.pool.Namespace.Name);
+        this.isSystem = this.KubernetesNamespaceHelper.isSystemNamespace(this.pool.Namespace);
+        this.isEditable = !this.KubernetesNamespaceHelper.isSystemNamespace(this.pool.Namespace);
         if (this.pool.Namespace.Name === 'default') {
           this.isEditable = false;
         }

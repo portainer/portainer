@@ -15,6 +15,7 @@ class KubernetesNamespaceService {
     this.getAsync = this.getAsync.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
     this.createAsync = this.createAsync.bind(this);
+    this.patchAsync = this.patchAsync.bind(this);
     this.deleteAsync = this.deleteAsync.bind(this);
   }
 
@@ -72,6 +73,29 @@ class KubernetesNamespaceService {
 
   create(namespace) {
     return this.$async(this.createAsync, namespace);
+  }
+
+  /**
+   * PATCH
+   */
+  async patchAsync(oldNamespace, newNamespace) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = newNamespace.Name;
+      const namespace = newNamespace.Namespace;
+      const payload = KubernetesNamespaceConverter.patchPayload(oldNamespace, newNamespace);
+      if (!payload.length) {
+        return;
+      }
+      const data = await this.KubernetesNamespaces(namespace).patch(params, payload).$promise;
+      return data;
+    } catch (err) {
+      throw new PortainerError('Unable to patch namespace', err);
+    }
+  }
+
+  patch(oldNamespace, newNamespace) {
+    return this.$async(this.patchAsync, oldNamespace, newNamespace);
   }
 
   /**

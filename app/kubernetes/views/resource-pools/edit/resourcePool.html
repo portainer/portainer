@@ -393,10 +393,10 @@
                 <!-- !summary -->
 
                 <!-- actions -->
-                <div ng-if="ctrl.isAdmin && ctrl.isEditable" class="col-sm-12 form-section-title">
+                <div ng-if="ctrl.isAdmin && ctrl.isEditable && ctrl.pool.Namespace.Name !== 'default'" class="col-sm-12 form-section-title">
                   Actions
                 </div>
-                <div ng-if="ctrl.isAdmin && ctrl.isEditable" class="form-group">
+                <div ng-if="ctrl.isAdmin && ctrl.isEditable && ctrl.pool.Namespace.Name !== 'default'" class="form-group">
                   <div class="col-sm-12">
                     <button
                       type="button"
@@ -407,6 +407,10 @@
                     >
                       <span ng-hide="ctrl.state.actionInProgress">Update namespace</span>
                       <span ng-show="ctrl.state.actionInProgress">Update in progress...</span>
+                    </button>
+                    <button type="button" class="btn btn-primary btn-sm" ng-click="ctrl.markUnmarkAsSystem()" button-spinner="ctrl.state.actionInProgress">
+                      <span ng-if="ctrl.isSystem">Unmark as system</span>
+                      <span ng-if="!ctrl.isSystem">Mark as system</span>
                     </button>
                   </div>
                 </div>

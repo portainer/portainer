@@ -25,7 +25,7 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
     };
 
     this.isSystemNamespace = function (item) {
-      return KubernetesNamespaceHelper.isSystemNamespace(item.ResourcePool);
+      return KubernetesNamespaceHelper.isSystemNamespace(item);
     };
 
     this.isDisplayed = function (item) {

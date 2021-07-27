@@ -20,7 +20,7 @@ angular.module('portainer.docker').controller('KubernetesConfigurationsDatatable
     };
 
     this.isSystemNamespace = function (item) {
-      return KubernetesNamespaceHelper.isSystemNamespace(item.Namespace);
+      return KubernetesNamespaceHelper.isSystemNamespace(item);
     };
 
     this.isSystemToken = function (item) {

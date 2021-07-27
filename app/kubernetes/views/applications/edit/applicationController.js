@@ -153,7 +153,7 @@ class KubernetesApplicationController {
   }
 
   isSystemNamespace() {
-    return this.KubernetesNamespaceHelper.isSystemNamespace(this.application.ResourcePool);
+    return this.KubernetesNamespaceHelper.isSystemNamespace(this.application);
   }
 
   isExternalApplication() {

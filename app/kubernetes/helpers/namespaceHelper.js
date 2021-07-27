@@ -1,4 +1,3 @@
-import _ from 'lodash-es';
 import angular from 'angular';
 
 class KubernetesNamespaceHelper {
@@ -9,7 +8,7 @@ class KubernetesNamespaceHelper {
   }
 
   isSystemNamespace(namespace) {
-    return _.includes(this.KUBERNETES_SYSTEM_NAMESPACES, namespace);
+    return namespace.IsSystem;
   }
 
   isDefaultNamespace(namespace) {

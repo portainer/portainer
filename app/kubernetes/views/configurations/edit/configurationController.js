@@ -52,7 +52,7 @@ class KubernetesConfigurationController {
   }
 
   isSystemNamespace() {
-    return this.KubernetesNamespaceHelper.isSystemNamespace(this.configuration.Namespace);
+    return this.KubernetesNamespaceHelper.isSystemNamespace(this.configuration);
   }
 
   isSystemConfig() {
