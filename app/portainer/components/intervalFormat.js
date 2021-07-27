@@ -1,4 +1,6 @@
+import angular from 'angular';
 import parse from 'parse-duration';
+
 angular.module('portainer.app').directive('intervalFormat', function () {
   return {
     restrict: 'A',
