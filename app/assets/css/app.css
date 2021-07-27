@@ -13,7 +13,6 @@
   --border-widget-color: #212121;
   --bg-widget-header-color: #212121;
   --text-widget-header-color: #ffffff;
-  --border-widget-color: #212121;
   --bg-widget-table-color: #212121;
   --border-sidebar-color: #3ea6ff;
   --border-form-control-color: rgb(54, 54, 54);
@@ -110,12 +109,14 @@
   --bg-multiselect-checkbox-color: #383838;
   --text-multiselect-item-color: #fff;
   --border-searchbar-color: #212121;
+  --text-sidebar-list-color: #fff;
+  --bg-sidebar-wrapper-color: #212121;
 }
 
 :root[theme='highcontrast'] {
   --bg-card-color: #000;
   --text-main-color: #fff;
-  --border-color: rgba(255, 255, 255, 0.1);
+  --border-color: rgba(255, 255, 255, 0.8);
   --bg-main-color: #000;
   --bg-body-color: #000;
   --text-body-color: #fff;
@@ -124,23 +125,25 @@
   --hover-sidebar-color: #3ea6ff;
   --text-sidebar-title-color: #aaa;
   --bg-widget-color: #000;
-  --border-widget-color: #212121;
+  --border-widget-color: #fff;
   --bg-widget-header-color: #000;
   --text-widget-header-color: #ffffff;
-  --border-widget-color: #212121;
   --bg-widget-table-color: #000;
   --border-sidebar-color: #3ea6ff;
   --border-form-control-color: rgb(54, 54, 54);
   --bg-header-color: #000;
   --text-form-control-color: #aaa;
   --text-muted-color: #aaa;
-  --border-table-color: rgba(255, 255, 255, 0.1);
+  --border-table-color: rgba(255, 255, 255, 0.8);
   --bg-hover-table-color: rgba(255, 255, 255, 0.1);
   --bg-switch-box-color: rgba(255, 255, 255, 0.6);
-  --border-table-top-color: rgba(255, 255, 255, 0.1);
-  --border-datatable-top-color: rgba(255, 255, 255, 0.1);
+  --border-table-top-color: rgba(255, 255, 255, 0.8);
+  --border-datatable-top-color: rgba(255, 255, 255, 0.8);
   --text-link-color: #3ea6ff;
-  --text-link-hover-color: #337ab7;
+  --text-link-hover-color: #3ea6ff;
+  --hover-sidebar-color: #000;
+  --border-sidebar-high-contrast: 1px solid #3ea6ff;
+  --text-danger-color: #ff00e0;
 }
 
 :root[theme='light'] {
@@ -158,7 +161,6 @@
   --border-widget-color: #e9e9e9;
   --bg-widget-header-color: #f6f6f6;
   --text-widget-header-color: #767676;
-  --border-widget-color: #e9e9e9;
   --bg-widget-table-color: #fafafa;
   --border-sidebar-color: #ffffff;
   --border-form-control-color: #ccc;
@@ -254,6 +256,8 @@
   --bg-multiselect-checkbox-color: #fff;
   --text-multiselect-item-color: #444;
   --border-searchbar-color: #f6f6f6;
+  --text-sidebar-list-color: #b2bfdc;
+  --bg-sidebar-wrapper-color: #30426a;
 }
 /* Overide Vendor CSS */
 .form-control {
