@@ -1,4 +1,3 @@
-import angular from 'angular';
 import controller from './git-form-additional-file-item.controller.js';
 
 export const gitFormAdditionalFileItem = {
@@ -13,5 +12,3 @@ export const gitFormAdditionalFileItem = {
     onRemove: '<',
   },
 };
-
-angular.module('portainer.app').component('gitFormAdditionalFileItem', gitFormAdditionalFileItem);
