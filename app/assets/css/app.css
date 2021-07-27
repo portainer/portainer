@@ -111,6 +111,7 @@
   --border-searchbar-color: #212121;
   --text-sidebar-list-color: #fff;
   --bg-sidebar-wrapper-color: #212121;
+  --bg-panel-body-color: #212121;
 }
 
 :root[theme='highcontrast'] {
@@ -146,6 +147,7 @@
   --text-form-control-color: #fff;
   --border-code-high-contrast: 1px solid #fff;
   --text-blocklist-hover-color: #3ea5ff;
+  --bg-panel-body-color: #000;
 }
 
 :root[theme='light'] {
@@ -260,6 +262,7 @@
   --border-searchbar-color: #f6f6f6;
   --text-sidebar-list-color: #b2bfdc;
   --bg-sidebar-wrapper-color: #30426a;
+  --bg-panel-body-color: #fff;
 }
 /* Overide Vendor CSS */
 .form-control {
@@ -525,6 +528,10 @@ json-tree .branch-preview {
 
 .multiSelect .multiSelectItem {
   color: var(--text-multiselect-item-color);
+}
+
+.panel-body {
+  background-color: var(--bg-panel-body-color);
 }
 
 /* Overide Vendor CSS */
