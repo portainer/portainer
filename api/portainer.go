@@ -732,9 +732,12 @@ type (
 
 	//StackAutoUpdate represents the git auto sync config for stack deployment
 	StackAutoUpdate struct {
-		Interval string
-		Webhook  string //a UUID generated from client
-		JobID    string
+		// Auto update interval
+		Interval string `example:"1m30s"`
+		// A UUID generated from client
+		Webhook string `example:"05de31a2-79fa-4644-9c12-faa67e5c49f0"`
+		// Autoupdate job id
+		JobID string `example:"15"`
 	}
 
 	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier)

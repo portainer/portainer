@@ -2,9 +2,7 @@ package stacks
 
 import (
 	"errors"
-	"log"
 	"net/http"
-	"time"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
@@ -16,7 +14,6 @@ import (
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/stackutils"
-	"github.com/portainer/portainer/api/stacks"
 )
 
 type stackGitUpdatePayload struct {
@@ -125,8 +122,8 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 	}
 
 	//stop the autoupdate job if there is any
-	if stack.AutoUpdate != nil && stack.AutoUpdate.JobID != "" {
-		handler.Scheduler.StopJob(stack.AutoUpdate.JobID)
+	if stack.AutoUpdate != nil {
+		stopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
 	}
 
 	//update retrieved stack data based on the payload
@@ -147,15 +144,10 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if payload.AutoUpdate != nil && payload.AutoUpdate.Interval != "" {
-		d, err := time.ParseDuration(payload.AutoUpdate.Interval)
-		if err != nil {
-			return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Unable to parse auto update interval", Err: err}
+		jobID, e := startAutoupdate(stack.ID, stack.AutoUpdate.Interval, handler.Scheduler, handler.StackDeployer, handler.DataStore, handler.GitService)
+		if e != nil {
+			return e
 		}
-		jobID := handler.Scheduler.StartJobEvery(d, func() {
-			if err := stacks.RedeployWhenChanged(stack.ID, handler.StackDeployer, handler.DataStore, handler.GitService); err != nil {
-				log.Printf("[ERROR] %s\n", err)
-			}
-		})
 
 		stack.AutoUpdate.JobID = jobID
 	}

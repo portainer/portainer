@@ -76,7 +76,7 @@ func (handler *Handler) stackStop(w http.ResponseWriter, r *http.Request) *httpe
 
 	// stop scheduler updates of the stack before stopping
 	if stack.AutoUpdate != nil && stack.AutoUpdate.JobID != "" {
-		handler.Scheduler.StopJob(stack.AutoUpdate.JobID)
+		stopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
 		stack.AutoUpdate.JobID = ""
 	}
 

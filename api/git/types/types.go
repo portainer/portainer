@@ -10,7 +10,8 @@ type RepoConfig struct {
 	ConfigFilePath string `example:"docker-compose.yml"`
 	// Git credentials
 	Authentication *GitAuthentication
-	ConfigHash     string
+	// Repository hash
+	ConfigHash string `example:"bc4c183d756879ea4d173315338110b31004b8e0"`
 }
 
 type GitAuthentication struct {

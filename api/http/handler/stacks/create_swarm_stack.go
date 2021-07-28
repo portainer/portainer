@@ -3,7 +3,6 @@ package stacks
 import (
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"path"
 	"strconv"
@@ -16,7 +15,6 @@ import (
 	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/stacks"
 )
 
 type swarmStackFromFileContentPayload struct {
@@ -124,9 +122,11 @@ type swarmStackFromGitRepositoryPayload struct {
 	// Password used in basic authentication. Required when RepositoryAuthentication is true.
 	RepositoryPassword string `example:"myGitPassword"`
 	// Path to the Stack file inside the Git repository
-	ComposeFile     string `example:"docker-compose.yml" default:"docker-compose.yml"`
-	AdditionalFiles []string
-	AutoUpdate      *portainer.StackAutoUpdate
+	ComposeFile string `example:"docker-compose.yml" default:"docker-compose.yml"`
+	// Applicable when deploying with multiple stack files
+	AdditionalFiles []string `example:"[nz.compose.yml, uat.compose.yml]"`
+	// Optional auto update configuration
+	AutoUpdate *portainer.StackAutoUpdate
 }
 
 func (payload *swarmStackFromGitRepositoryPayload) Validate(r *http.Request) error {
@@ -234,15 +234,10 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 	}
 
 	if payload.AutoUpdate != nil && payload.AutoUpdate.Interval != "" {
-		d, err := time.ParseDuration(payload.AutoUpdate.Interval)
-		if err != nil {
-			return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Unable to parse auto update interval", Err: err}
+		jobID, e := startAutoupdate(stack.ID, stack.AutoUpdate.Interval, handler.Scheduler, handler.StackDeployer, handler.DataStore, handler.GitService)
+		if e != nil {
+			return e
 		}
-		jobID := handler.Scheduler.StartJobEvery(d, func() {
-			if err := stacks.RedeployWhenChanged(stack.ID, handler.StackDeployer, handler.DataStore, handler.GitService); err != nil {
-				log.Printf("[ERROR] %s\n", err)
-			}
-		})
 
 		stack.AutoUpdate.JobID = jobID
 	}
