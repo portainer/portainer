@@ -3,15 +3,10 @@ import _ from 'lodash-es';
 /**
  * NodesLimits Model
  */
-const _KubernetesNodesLimits = Object.freeze({
-  MaxCPU: 0,
-  MaxMemory: 0,
-  nodesLimits: {},
-});
-
 export class KubernetesNodesLimits {
   constructor(nodesLimits) {
-    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesNodesLimits)));
+    this.MaxCPU = 0;
+    this.MaxMemory = 0;
     this.nodesLimits = this.convertCPU(nodesLimits);
 
     this.calculateMaxCPUMemory();
@@ -32,6 +27,7 @@ export class KubernetesNodesLimits {
     this.MaxMemory = _.maxBy(nodesLimitsArray, 'Memory').Memory;
   }
 
+  // check if there is enough cpu and memory to allocate containers in replica mode
   overflowForReplica(cpu, memory, instance) {
     const nodesLimits = _.cloneDeep(this.nodesLimits);
 
@@ -46,6 +42,7 @@ export class KubernetesNodesLimits {
     return !!instance;
   }
 
+  // check if there is enough cpu and memory to allocate containers in global mode
   overflowForGlobal(cpu, memory) {
     let overflow = false;
 

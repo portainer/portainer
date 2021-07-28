@@ -803,9 +803,7 @@ class KubernetesCreateApplicationController {
         this.state.resourcePoolHasQuota = true;
         maxCpu = quota.CpuLimit - quota.CpuLimitUsed;
         if (this.state.isEdit && this.savedFormValues.CpuLimit) {
-          const instance =
-            this.state.isEdit && this.savedFormValues.DeploymentType === this.ApplicationDeploymentTypes.GLOBAL ? this.nodeNumber : this.savedFormValues.ReplicaCount;
-          maxCpu += this.savedFormValues.CpuLimit * instance;
+          maxCpu += this.savedFormValues.CpuLimit * this.effectiveInstance();
         }
       }
 
@@ -813,9 +811,7 @@ class KubernetesCreateApplicationController {
         this.state.resourcePoolHasQuota = true;
         maxMemory = quota.MemoryLimit - quota.MemoryLimitUsed;
         if (this.state.isEdit && this.savedFormValues.MemoryLimit) {
-          const instance =
-            this.state.isEdit && this.savedFormValues.DeploymentType === this.ApplicationDeploymentTypes.GLOBAL ? this.nodeNumber : this.savedFormValues.ReplicaCount;
-          maxMemory += KubernetesResourceReservationHelper.bytesValue(this.savedFormValues.MemoryLimit) * instance;
+          maxMemory += KubernetesResourceReservationHelper.bytesValue(this.savedFormValues.MemoryLimit) * this.effectiveInstance();
         }
       }
     }
