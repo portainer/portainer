@@ -1,0 +1,38 @@
+<sidebar-menu-item path="kubernetes.dashboard" path-params="{ endpointId: $ctrl.endpointId }" icon-class="fa-tachometer-alt fa-fw" class-name="sidebar-list">
+  Dashboard
+</sidebar-menu-item>
+
+<sidebar-menu-item path="kubernetes.resourcePools" path-params="{ endpointId: $ctrl.endpointId }" icon-class="fa-layer-group fa-fw" class-name="sidebar-list">
+  Namespaces
+</sidebar-menu-item>
+
+<sidebar-menu-item path="kubernetes.applications" path-params="{ endpointId: $ctrl.endpointId }" icon-class="fa-laptop-code fa-fw" class-name="sidebar-list">
+  Applications
+</sidebar-menu-item>
+
+<sidebar-menu-item path="kubernetes.configurations" path-params="{ endpointId: $ctrl.endpointId }" icon-class="fa-file-code fa-fw" class-name="sidebar-list">
+  Configurations
+</sidebar-menu-item>
+
+<sidebar-menu-item path="kubernetes.volumes" path-params="{ endpointId: $ctrl.endpointId }" icon-class="fa-database fa-fw" class-name="sidebar-list">
+  Volumes
+</sidebar-menu-item>
+
+<sidebar-menu
+  icon-class="fa-server fa-fw"
+  label="Cluster"
+  path="kubernetes.cluster"
+  path-params="{ endpointId: $ctrl.endpointId }"
+  is-sidebar-open="$ctrl.isSidebarOpen"
+  children-paths="['kubernetes.cluster', 'portainer.endpoints.endpoint.kubernetesConfig', 'kubernetes.registries', 'kubernetes.registries.access']"
+>
+  <div ng-if="$ctrl.adminAccess">
+    <sidebar-menu-item authorization="K8sClusterSetupRW" path="portainer.endpoints.endpoint.kubernetesConfig" path-params="{ id: $ctrl.endpointId }" class-name="sidebar-sublist">
+      Setup
+    </sidebar-menu-item>
+
+    <sidebar-menu-item authorization="PortainerRegistryList" path="kubernetes.registries" path-params="{ endpointId: $ctrl.endpointId }" class-name="sidebar-sublist">
+      Registries
+    </sidebar-menu-item>
+  </div>
+</sidebar-menu>
