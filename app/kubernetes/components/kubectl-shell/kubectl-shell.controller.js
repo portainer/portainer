@@ -106,7 +106,7 @@ export default class KubectlShellController {
         css: 'normal',
         checked: false,
         icon: 'fa-window-minimize',
-        isHTTPS: true || this.$window.location.protocol === 'https:',
+        isHTTPS: this.$window.location.protocol === 'https:',
         shell: {
           connected: false,
           socket: null,
