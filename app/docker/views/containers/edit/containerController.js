@@ -21,7 +21,6 @@ angular.module('portainer.docker').controller('ContainerController', [
   'ImageService',
   'HttpRequestHelper',
   'Authentication',
-  'StateManager',
   'endpoint',
   function (
     $q,
@@ -42,9 +41,10 @@ angular.module('portainer.docker').controller('ContainerController', [
     ImageService,
     HttpRequestHelper,
     Authentication,
-    StateManager,
     endpoint
   ) {
+    $scope.endpoint = endpoint;
+    $scope.isAdmin = Authentication.isAdmin();
     $scope.activityTime = 0;
     $scope.portBindings = [];
     $scope.displayRecreateButton = false;
@@ -58,7 +58,13 @@ angular.module('portainer.docker').controller('ContainerController', [
       recreateContainerInProgress: false,
       joinNetworkInProgress: false,
       leaveNetworkInProgress: false,
+      pullImageValidity: false,
     };
+
+    $scope.setPullImageValidity = setPullImageValidity;
+    function setPullImageValidity(validity) {
+      $scope.state.pullImageValidity = validity;
+    }
 
     $scope.updateRestartPolicy = updateRestartPolicy;
 
