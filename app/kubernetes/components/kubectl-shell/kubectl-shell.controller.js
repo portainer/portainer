@@ -3,13 +3,14 @@ import * as fit from 'xterm/lib/addons/fit/fit';
 
 export default class KubectlShellController {
   /* @ngInject */
-  constructor(TerminalWindow, $window, $async, EndpointProvider, LocalStorage, KubernetesConfigService) {
+  constructor(TerminalWindow, $window, $async, EndpointProvider, LocalStorage, KubernetesConfigService, Notifications) {
     this.$async = $async;
     this.$window = $window;
     this.TerminalWindow = TerminalWindow;
     this.EndpointProvider = EndpointProvider;
     this.LocalStorage = LocalStorage;
     this.KubernetesConfigService = KubernetesConfigService;
+    this.Notifications = Notifications;
   }
 
   disconnect() {
@@ -105,7 +106,7 @@ export default class KubectlShellController {
         css: 'normal',
         checked: false,
         icon: 'fa-window-minimize',
-        isHTTPS: this.$window.location.protocol === 'https:',
+        isHTTPS: true || this.$window.location.protocol === 'https:',
         shell: {
           connected: false,
           socket: null,
