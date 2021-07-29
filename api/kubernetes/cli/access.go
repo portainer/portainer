@@ -3,6 +3,7 @@ package cli
 import (
 	"encoding/json"
 
+	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -78,6 +79,21 @@ func hasUserAccessToNamespace(userID int, teamIDs []int, policies portainer.K8sN
 	}
 
 	return false
+}
+
+// NamespaceAccessPoliciesDeleteNamespace removes stored policies associated with a given namespace
+func (kcl *KubeClient) NamespaceAccessPoliciesDeleteNamespace(ns string) error {
+	kcl.lock.Lock()
+	defer kcl.lock.Unlock()
+
+	policies, err := kcl.GetNamespaceAccessPolicies()
+	if err != nil {
+		return errors.WithMessage(err, "failed to fetch access policies")
+	}
+
+	delete(policies, ns)
+
+	return kcl.UpdateNamespaceAccessPolicies(policies)
 }
 
 // GetNamespaceAccessPolicies gets the namespace access policies
