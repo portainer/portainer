@@ -11,7 +11,7 @@ import (
 
 type namespacesToggleSystemPayload struct {
 	// Toggle the system state of this namespace to true or false
-	System *bool `example:"true"`
+	System bool `example:"true"`
 }
 
 func (payload *namespacesToggleSystemPayload) Validate(r *http.Request) error {
@@ -55,7 +55,7 @@ func (handler *Handler) namespacesToggleSystem(rw http.ResponseWriter, r *http.R
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create kubernetes client", err}
 	}
 
-	err = kubeClient.ToggleSystemState(namespaceName, *payload.System)
+	err = kubeClient.ToggleSystemState(namespaceName, payload.System)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to toggle system status", err}
 	}
