@@ -1,4 +1,3 @@
-import _ from 'lodash-es';
 angular.module('portainer.app').controller('SettingsAuthenticationController', [
   '$q',
   '$scope',
@@ -158,7 +157,7 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
     $scope.saveSettings = function () {
       var settings = angular.copy($scope.settings);
       if ($scope.formValues.LDAPSettings.AdminAutoPopulate && $scope.formValues.selectedAdminGroups && $scope.formValues.selectedAdminGroups.length > 0) {
-        settings.LDAPSettings.AdminGroups = _.map($scope.formValues.selectedAdminGroups, (team) => team.Name);
+        settings.LDAPSettings.AdminGroups = $scope.formValues.selectedAdminGroups.map((team) => team.name);
       } else {
         settings.LDAPSettings.AdminGroups = [];
       }
