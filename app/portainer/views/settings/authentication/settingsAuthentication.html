@@ -431,13 +431,18 @@
 
             <div class="form-group">
               <div class="col-sm-12">
-                <por-switch-field
-                  ng-model="formValues.LDAPSettings.AdminAutoPopulate"
-                  name="admin-auto-populate"
-                  label="Assign admin rights to group(s)"
-                  label-class="{{ state.enableAssignAdminGroup ? 'col-sm-2 small' : 'col-sm-2 small text-muted' }}"
-                  disabled="!state.enableAssignAdminGroup"
-                ></por-switch-field>
+                <label for="admin-auto-populate" class="control-label text-left text-muted" ng-class="{ 'text-muted': !state.enableAssignAdminGroup }">
+                  Assign admin rights to group(s)
+                </label>
+                <label class="switch" style="margin-left: 20px;">
+                  <input
+                    id="admin-auto-populate"
+                    ng-disabled="!state.enableAssignAdminGroup"
+                    name="admin-auto-populate"
+                    type="checkbox"
+                    ng-model="formValues.LDAPSettings.AdminAutoPopulate"
+                  /><i></i>
+                </label>
               </div>
             </div>
 
