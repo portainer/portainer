@@ -2,9 +2,10 @@ import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 
 export default class KubernetesRegistryAccessController {
   /* @ngInject */
-  constructor($async, $state, EndpointService, Notifications, KubernetesResourcePoolService) {
+  constructor($async, $state, ModalService, EndpointService, Notifications, KubernetesResourcePoolService) {
     this.$async = $async;
     this.$state = $state;
+    this.ModalService = ModalService;
     this.Notifications = Notifications;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.EndpointService = EndpointService;
@@ -26,8 +27,15 @@ export default class KubernetesRegistryAccessController {
 
   handleRemove(namespaces) {
     const removeNamespaces = namespaces.map(({ value }) => value);
+    const nsToUpdate = this.savedResourcePools.map(({ value }) => value).filter((value) => !removeNamespaces.includes(value));
 
-    return this.updateNamespaces(this.savedResourcePools.map(({ value }) => value).filter((value) => !removeNamespaces.includes(value)));
+    const displayedMessage =
+      'This registry might be used by one or more applications inside this environment. Removing the registry access could lead to a service interruption for these applications.<br/><br/>Do you wish to continue?';
+    this.ModalService.confirmDeletion(displayedMessage, (confirmed) => {
+      if (confirmed) {
+        return this.updateNamespaces(nsToUpdate);
+      }
+    });
   }
 
   updateNamespaces(namespaces) {
