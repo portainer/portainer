@@ -36,6 +36,7 @@ class KubernetesClusterController {
     this.getComponentStatus = this.getComponentStatus.bind(this);
     this.getComponentStatusAsync = this.getComponentStatusAsync.bind(this);
     this.getEndpointsAsync = this.getEndpointsAsync.bind(this);
+    this.hasResourceUsageAccess = this.hasResourceUsageAccess.bind(this);
   }
 
   async getComponentStatusAsync() {
@@ -107,7 +108,7 @@ class KubernetesClusterController {
       );
       this.resourceReservation.Memory = KubernetesResourceReservationHelper.megaBytesValue(this.resourceReservation.Memory);
 
-      if (this.state.displayResourceUsage) {
+      if (this.hasResourceUsageAccess()) {
         await this.getResourceUsage(this.endpoint.Id);
       }
     } catch (err) {
@@ -136,6 +137,14 @@ class KubernetesClusterController {
     }
   }
 
+  /**
+   * Check if resource usage stats can be displayed
+   * @returns {boolean}
+   */
+  hasResourceUsageAccess() {
+    return this.isAdmin && this.state.useServerMetrics;
+  }
+
   async onInit() {
     this.isAdmin = this.Authentication.isAdmin();
     const useServerMetrics = this.endpoint.Kubernetes.Configuration.UseServerMetrics;
@@ -145,7 +154,6 @@ class KubernetesClusterController {
       viewReady: false,
       hasUnhealthyComponentStatus: false,
       useServerMetrics,
-      displayResourceUsage: this.isAdmin && useServerMetrics,
     };
 
     await this.getNodes();

@@ -46,6 +46,7 @@ class KubernetesNodeController {
     this.getEndpointsAsync = this.getEndpointsAsync.bind(this);
     this.updateNodeAsync = this.updateNodeAsync.bind(this);
     this.drainNodeAsync = this.drainNodeAsync.bind(this);
+    this.hasResourceUsageAccess = this.hasResourceUsageAccess.bind(this);
     this.getNodeUsageAsync = this.getNodeUsageAsync.bind(this);
   }
 
@@ -332,6 +333,10 @@ class KubernetesNodeController {
     return this.$async(this.getNodesAsync);
   }
 
+  hasResourceUsageAccess() {
+    return this.state.isAdmin && this.state.useServerMetrics;
+  }
+
   async getNodeUsageAsync() {
     try {
       const nodeName = this.$transition$.params().name;
@@ -397,7 +402,7 @@ class KubernetesNodeController {
       this.memoryLimit = KubernetesResourceReservationHelper.megaBytesValue(this.node.Memory);
       this.state.isContainPortainer = _.find(this.applications, { ApplicationName: 'portainer' });
 
-      if (this.state.displayResourceUsage) {
+      if (this.hasResourceUsageAccess()) {
         await this.getNodeUsage();
       }
     } catch (err) {
@@ -413,11 +418,9 @@ class KubernetesNodeController {
 
   async onInit() {
     this.availabilities = KubernetesNodeAvailabilities;
-    const isAdmin = this.Authentication.isAdmin();
-    const useServerMetrics = this.endpoint.Kubernetes.Configuration.UseServerMetrics;
 
     this.state = {
-      isAdmin,
+      isAdmin: this.Authentication.isAdmin(),
       activeTab: this.LocalStorage.getActiveTab('node'),
       currentName: this.$state.$current.name,
       dataLoading: true,
@@ -432,8 +435,7 @@ class KubernetesNodeController {
       hasDuplicateLabelKeys: false,
       isDrainOperation: false,
       isContainPortainer: false,
-      useServerMetrics,
-      displayResourceUsage: isAdmin && useServerMetrics,
+      useServerMetrics: this.endpoint.Kubernetes.Configuration.UseServerMetrics,
     };
 
     await this.getNodes();
