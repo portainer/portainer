@@ -107,7 +107,7 @@ class KubernetesClusterController {
       );
       this.resourceReservation.Memory = KubernetesResourceReservationHelper.megaBytesValue(this.resourceReservation.Memory);
 
-      if (this.isAdmin) {
+      if (this.state.displayResourceUsage) {
         await this.getResourceUsage(this.endpoint.Id);
       }
     } catch (err) {
@@ -137,15 +137,16 @@ class KubernetesClusterController {
   }
 
   async onInit() {
+    this.isAdmin = this.Authentication.isAdmin();
+    const useServerMetrics = this.endpoint.Kubernetes.Configuration.UseServerMetrics;
+
     this.state = {
       applicationsLoading: true,
       viewReady: false,
       hasUnhealthyComponentStatus: false,
-      useServerMetrics: false,
+      useServerMetrics,
+      displayResourceUsage: this.isAdmin && useServerMetrics,
     };
-
-    this.isAdmin = this.Authentication.isAdmin();
-    this.state.useServerMetrics = this.endpoint.Kubernetes.Configuration.UseServerMetrics;
 
     await this.getNodes();
     if (this.isAdmin) {
