@@ -784,7 +784,7 @@ class KubernetesCreateApplicationController {
     this.state.sliders.memory.min = KubernetesResourceReservationHelper.megaBytesValue(minMemory);
     this.state.sliders.memory.max = KubernetesResourceReservationHelper.megaBytesValue(maxMemory);
     this.state.sliders.cpu.min = minCpu;
-    this.state.sliders.cpu.max = _.round(maxCpu, 2);
+    this.state.sliders.cpu.max = _.floor(maxCpu, 2);
     if (!this.state.isEdit) {
       this.formValues.CpuLimit = minCpu;
       this.formValues.MemoryLimit = KubernetesResourceReservationHelper.megaBytesValue(minMemory);
