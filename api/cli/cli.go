@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 
 	"os"
 	"path/filepath"
@@ -51,7 +51,6 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		Labels:                    pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l')),
 		Logo:                      kingpin.Flag("logo", "URL for the logo displayed in the UI").String(),
 		Templates:                 kingpin.Flag("templates", "URL to the templates definitions.").Short('t').String(),
-		JsonLogger:                kingpin.Flag("json-logger", "Use JSON logger if you do log aggregation with tools like Splunk or Logstash.").Bool(),
 	}
 
 	kingpin.Parse()

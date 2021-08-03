@@ -503,7 +503,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 func main() {
 	flags := initCLI()
 
-	configureLogger(flags.JsonLogger)
+	configureLogger()
 
 	for {
 		server := buildServer(flags)
