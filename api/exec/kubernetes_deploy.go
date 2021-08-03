@@ -65,7 +65,7 @@ func (deployer *KubernetesDeployer) getToken(request *http.Request, endpoint *po
 		return tokenManager.GetAdminServiceAccountToken(), nil
 	}
 
-	token, err := tokenManager.GetUserServiceAccountToken(int(tokenData.ID))
+	token, err := tokenManager.GetUserServiceAccountToken(int(tokenData.ID), endpoint.ID)
 	if err != nil {
 		return "", err
 	}

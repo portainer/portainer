@@ -156,7 +156,7 @@ func (handler *Handler) getToken(request *http.Request, endpoint *portainer.Endp
 		return tokenManager.GetAdminServiceAccountToken(), true, nil
 	}
 
-	token, err := tokenManager.GetUserServiceAccountToken(int(tokenData.ID))
+	token, err := tokenManager.GetUserServiceAccountToken(int(tokenData.ID), endpoint.ID)
 	if err != nil {
 		return "", false, err
 	}
