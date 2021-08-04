@@ -1216,6 +1216,7 @@ type (
 	KubeClient interface {
 		GetServiceAccount(tokendata *TokenData) (*v1.ServiceAccount, error)
 		SetupUserServiceAccount(userID int, teamIDs []int, restrictDefaultNamespace bool) error
+		GetServiceAccount(tokendata *TokenData) (*v1.ServiceAccount, error)
 		GetServiceAccountBearerToken(userID int) (string, error)
 		CreateUserShellPod(ctx context.Context, serviceAccountName string) (*KubernetesShellPod, error)
 		StartExecProcess(token string, useAdminToken bool, namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error
