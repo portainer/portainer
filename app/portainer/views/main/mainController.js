@@ -3,7 +3,8 @@ angular.module('portainer.app').controller('MainController', [
   'LocalStorage',
   'StateManager',
   'EndpointProvider',
-  function ($scope, LocalStorage, StateManager, EndpointProvider) {
+  'ThemeManager',
+  function ($scope, LocalStorage, StateManager, EndpointProvider, ThemeManager) {
     /**
      * Sidebar Toggle & Cookie Control
      */
@@ -11,6 +12,11 @@ angular.module('portainer.app').controller('MainController', [
     $scope.getWidth = function () {
       return window.innerWidth;
     };
+
+    // Portainer Default Theme
+    $scope.theme = 'light';
+
+    ThemeManager.setTheme($scope.theme);
 
     $scope.applicationState = StateManager.getState();
     $scope.endpointState = EndpointProvider.endpoint();

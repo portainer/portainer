@@ -27,12 +27,12 @@
 
 .boxselector_wrapper input[type='radio']:not(:disabled) ~ label {
   cursor: pointer;
-  border-bottom: var(--border-boxselector-wrapper);
+  background-color: var(--bg-boxselector-wrapper-disabled-color);
+  color: var(--bg-boxselector-wrapper-color);
 }
 
 .boxselector_wrapper input[type='radio']:not(:disabled):hover ~ label:hover {
   cursor: pointer;
-  border-bottom: var(--border-boxselector-wrapper-hover);
 }
 
 .boxselector_wrapper label {
@@ -41,7 +41,6 @@
   display: block;
   background: var(--bg-boxselector-color);
   border: 1px solid var(--border-boxselector-color);
-  color: var(--text-boxselector-color);
   border-radius: 2px;
   padding: 10px 10px 0 10px;
   text-align: center;

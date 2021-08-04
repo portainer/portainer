@@ -79,7 +79,26 @@ angular.module('portainer.app').controller('InitAdminController', [
         });
     }
 
+<<<<<<< HEAD
     async function uploadBackup() {
+=======
+    async function waitPortainerRestart() {
+      for (let i = 0; i < 10; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 5 * 1000));
+        try {
+          const status = await StatusService.status();
+          if (status && status.Version) {
+            return;
+          }
+        } catch (e) {
+          // pass
+        }
+      }
+      throw 'Timeout to wait for Portainer restarting';
+    }
+
+    $scope.uploadBackup = async function () {
+>>>>>>> dc9de212 (update fixed for po reviews - disable button color)
       $scope.state.backupInProgress = true;
 
       const file = $scope.formValues.BackupFile;
