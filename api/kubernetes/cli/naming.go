@@ -3,14 +3,15 @@ package cli
 import "fmt"
 
 const (
-	defaultNamespace                    = "default"
-	portainerNamespace                  = "portainer"
-	portainerUserCRName                 = "portainer-cr-user"
-	portainerUserCRBName                = "portainer-crb-user"
-	portainerUserServiceAccountPrefix   = "portainer-sa-user"
-	portainerRBPrefix                   = "portainer-rb"
-	portainerConfigMapName              = "portainer-config"
-	portainerConfigMapAccessPoliciesKey = "NamespaceAccessPolicies"
+	defaultNamespace                        = "default"
+	portainerNamespace                      = "portainer"
+	portainerUserCRName                     = "portainer-cr-user"
+	portainerUserCRBName                    = "portainer-crb-user"
+	portainerClusterAdminServiceAccountName = "portainer-sa-clusteradmin"
+	portainerUserServiceAccountPrefix       = "portainer-sa-user"
+	portainerRBPrefix                       = "portainer-rb"
+	portainerConfigMapName                  = "portainer-config"
+	portainerConfigMapAccessPoliciesKey     = "NamespaceAccessPolicies"
 )
 
 func userServiceAccountName(userID int, instanceID string) string {

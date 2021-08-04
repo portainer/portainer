@@ -77,5 +77,6 @@ func (handler *Handler) proxyRequestsToKubernetesAPI(w http.ResponseWriter, r *h
 }
 
 func isKubernetesRequest(requestURL string) bool {
-	return strings.HasPrefix(requestURL, "/api") || strings.HasPrefix(requestURL, "/healthz")
+	// prefix list can be retrieved from hitting k8s api server root url (/)
+	return strings.HasPrefix(requestURL, "/api") || strings.HasPrefix(requestURL, "/healthz") || strings.HasPrefix(requestURL, "/version")
 }

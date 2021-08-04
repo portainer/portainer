@@ -1,10 +1,13 @@
 package portainer
 
 import (
+	"context"
 	"io"
 	"time"
 
 	gittypes "github.com/portainer/portainer/api/git/types"
+	v1 "k8s.io/api/core/v1"
+	clientV1 "k8s.io/client-go/tools/clientcmd/api/v1"
 )
 
 type (
@@ -1172,6 +1175,7 @@ type (
 	// KubeClient represents a service used to query a Kubernetes environment
 	KubeClient interface {
 		SetupUserServiceAccount(userID int, teamIDs []int, restrictDefaultNamespace bool) error
+		GetServiceAccount(tokendata *TokenData) (*v1.ServiceAccount, error)
 		GetServiceAccountBearerToken(userID int) (string, error)
 		StartExecProcess(namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error
 		NamespaceAccessPoliciesDeleteNamespace(namespace string) error
@@ -1180,6 +1184,7 @@ type (
 		DeleteRegistrySecret(registry *Registry, namespace string) error
 		CreateRegistrySecret(registry *Registry, namespace string) error
 		IsRegistrySecret(namespace, secretName string) (bool, error)
+		GetKubeConfig(ctx context.Context, apiServerURL string, bearerToken string, tokenData *TokenData) (*clientV1.Config, error)
 	}
 
 	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes endpoint
