@@ -1,5 +1,5 @@
 <p align="center">
-  <img title="portainer" src='https://github.com/portainer/portainer/blob/develop/app/assets/images/logo_alt.png?raw=true' />
+  <img title="portainer" src='https://github.com/portainer/portainer/blob/develop/app/assets/images/portainer-github-banner.png?raw=true' />
 </p>
 
 **Portainer CE** is a lightweight ‘universal’ management GUI that can be used to **easily** manage Docker, Swarm, Kubernetes and ACI environments. It is designed to be as **simple** to deploy as it is to use.
