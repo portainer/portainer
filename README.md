@@ -2,15 +2,11 @@
   <img title="portainer" src='https://github.com/portainer/portainer/blob/develop/app/assets/images/logo_alt.png?raw=true' />
 </p>
 
-[![Docker Pulls](https://img.shields.io/docker/pulls/portainer/portainer.svg)](https://hub.docker.com/r/portainer/portainer/)
-[![Microbadger](https://images.microbadger.com/badges/image/portainer/portainer.svg)](http://microbadger.com/images/portainer/portainer 'Image size')
-[![Build Status](https://portainer.visualstudio.com/Portainer%20CI/_apis/build/status/Portainer%20CI?branchName=develop)](https://portainer.visualstudio.com/Portainer%20CI/_build/latest?definitionId=3&branchName=develop)
-[![Code Climate](https://codeclimate.com/github/portainer/portainer/badges/gpa.svg)](https://codeclimate.com/github/portainer/portainer)
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YHXZJQNJQ36H6)
+**Portainer CE** is a lightweight ‘universal’ management GUI that can be used to **easily** manage Docker, Swarm, Kubernetes and ACI environments. It is designed to be as **simple** to deploy as it is to use.
 
-**_Portainer_** is a lightweight management UI which allows you to **easily** manage your different Docker environments (Docker hosts or Swarm clusters).
-**_Portainer_** is meant to be as **simple** to deploy as it is to use. It consists of a single container that can run on any Docker engine (can be deployed as Linux container or a Windows native container, supports other platforms too).
-**_Portainer_** allows you to manage all your Docker resources (containers, images, volumes, networks and more!) It is compatible with the _standalone Docker_ engine and with _Docker Swarm mode_.
+Portainer consists of a single container that can run on any cluster. It can be deployed as a Linux container or a Windows native container.
+
+**Portainer** allows you to manage all your orchestrator resources (containers, images, volumes, networks and more) through a super-simple graphical interface.
 
 ## Demo
 
@@ -18,29 +14,37 @@ You can try out the public demo instance: http://demo.portainer.io/ (login with 
 
 Please note that the public demo cluster is **reset every 15min**.
 
-Alternatively, you can deploy a copy of the demo stack inside a [play-with-docker (PWD)](https://labs.play-with-docker.com) playground:
+## Latest Version
 
-- Browse [PWD/?stack=portainer-demo/play-with-docker/docker-stack.yml](http://play-with-docker.com/?stack=https://raw.githubusercontent.com/portainer/portainer-demo/master/play-with-docker/docker-stack.yml)
-- Sign in with your [Docker ID](https://docs.docker.com/docker-id)
-- Follow [these](https://github.com/portainer/portainer-demo/blob/master/play-with-docker/docker-stack.yml#L5-L8) steps.
+Portainer CE is updated regularly. We aim to do an update release every couple of months.
 
-Unlike the public demo, the playground sessions are deleted after 4 hours. Apart from that, all the settings are the same, including default credentials.
+**The latest version of Portainer is 2.6.x** And you can find the release notes [here.](https://www.portainer.io/blog/new-portainer-ce-2.6.0-release)
+Portainer is on version 2, the second number denotes the month of release.
 
 ## Getting started
 
 - [Deploy Portainer](https://documentation.portainer.io/quickstart/)
 - [Documentation](https://documentation.portainer.io)
-- [Building Portainer](https://documentation.portainer.io/contributing/instructions/)
+- [Contribute to the project](https://documentation.portainer.io/contributing/instructions/)
+
+## Features & Functions
+
+View [this](https://www.portainer.io/products) table to see all of the Portainer CE functionality and compare to Portainer Business.
+
+- [Portainer CE for Docker / Docker Swarm](https://www.portainer.io/solutions/docker)
+- [Portainer CE for Kubernetes](https://www.portainer.io/solutions/kubernetes-ui)
+- [Portainer CE for Azure ACI](https://www.portainer.io/solutions/serverless-containers)
 
 ## Getting help
 
-For FORMAL Support, please purchase a support subscription from here: https://www.portainer.io/products/portainer-business
+Portainer CE is an open source project and is supported by the community. You can buy a supported version of Portainer at portainer.io
 
-For community support: You can find more information about Portainer's community support framework policy here: https://www.portainer.io/products/community-edition/customer-success
+Learn more about Portainers community support channels [here.](https://www.portainer.io/help_about)
 
 - Issues: https://github.com/portainer/portainer/issues
-- FAQ: https://documentation.portainer.io
 - Slack (chat): https://portainer.io/slack/
+
+You can join the Portainer Community by visiting community.portainer.io. This will give you advance notice of events, content and other related Portainer content.
 
 ## Reporting bugs and contributing
 
