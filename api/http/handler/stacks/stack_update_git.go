@@ -27,9 +27,6 @@ type stackGitUpdatePayload struct {
 
 func (payload *stackGitUpdatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.RepositoryReferenceName) {
-		return errors.New("Invalid RepositoryReferenceName")
-	}
-	if govalidator.IsNull(payload.RepositoryReferenceName) {
 		payload.RepositoryReferenceName = defaultGitReferenceName
 	}
 	if payload.RepositoryAuthentication && govalidator.IsNull(payload.RepositoryPassword) {
