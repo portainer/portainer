@@ -40,7 +40,7 @@ angular
       AccessControlData: new AccessControlFormData(),
       RepositoryAutomaticUpdates: true,
       RepositoryMechanism: 'Interval',
-      RepositoryFetchInterval: '',
+      RepositoryFetchInterval: '5m',
       RepositoryWebhookURL: WebhookHelper.returnStackWebhookUrl(uuidv4()),
     };
 

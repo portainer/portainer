@@ -26,7 +26,7 @@ class StackRedeployGitFormController {
       AutoUpdate: {
         RepositoryAutomaticUpdates: false,
         RepositoryMechanism: 'Interval',
-        RepositoryFetchInterval: '',
+        RepositoryFetchInterval: '5m',
         RepositoryWebhookURL: '',
       },
     };
