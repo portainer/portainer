@@ -8,6 +8,8 @@ Portainer consists of a single container that can run on any cluster. It can be 
 
 **Portainer** allows you to manage all your orchestrator resources (containers, images, volumes, networks and more) through a super-simple graphical interface.
 
+A fully supported version of Portainer is available for business use. Visit http://www.portainer.io to learn more
+
 ## Demo
 
 You can try out the public demo instance: http://demo.portainer.io/ (login with the username **admin** and the password **tryportainer**).
