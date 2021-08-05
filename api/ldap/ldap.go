@@ -3,7 +3,6 @@ package ldap
 import (
 	"errors"
 	"fmt"
-	"sort"
 	"strings"
 
 	ldap "github.com/go-ldap/ldap/v3"
@@ -221,7 +220,7 @@ func (*Service) SearchAdminGroups(settings *portainer.LDAPSettings) ([]string, e
 	for group := range groupsMap {
 		groups = append(groups, group)
 	}
-	sort.Strings(groups)
+	
 	return groups, nil
 }
 

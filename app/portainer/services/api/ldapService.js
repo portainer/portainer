@@ -9,6 +9,7 @@ angular.module('portainer.app').factory('LDAPService', [
       var deferred = $q.defer();
       LDAP.adminGroups({ ldapSettings })
         .$promise.then(function success(data) {
+          data.sort();
           const userGroups = data.map((name) => ({ name, selected: ldapSettings.AdminGroups && ldapSettings.AdminGroups.includes(name) ? true : false }));
           deferred.resolve(userGroups);
         })
