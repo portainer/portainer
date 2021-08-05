@@ -32,8 +32,8 @@ func (payload *stackGitRedployPayload) Validate(r *http.Request) error {
 		payload.RepositoryReferenceName = defaultGitReferenceName
 	}
 
-	if payload.RepositoryAuthentication && (govalidator.IsNull(payload.RepositoryUsername) || govalidator.IsNull(payload.RepositoryPassword)) {
-		return errors.New("Invalid repository credentials. Username and password must be specified when authentication is enabled")
+	if payload.RepositoryAuthentication && govalidator.IsNull(payload.RepositoryPassword) {
+		return errors.New("invalid repository credentials. Username and password must be specified when authentication is enabled")
 	}
 	return nil
 }

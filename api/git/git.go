@@ -47,13 +47,7 @@ func (c gitClient) download(ctx context.Context, dst string, opt cloneOptions) e
 	gitOptions := git.CloneOptions{
 		URL:   opt.repositoryUrl,
 		Depth: opt.depth,
-	}
-
-	if opt.password != "" || opt.username != "" {
-		gitOptions.Auth = &githttp.BasicAuth{
-			Username: opt.username,
-			Password: opt.password,
-		}
+		Auth:  getAuth(opt.username, opt.password),
 	}
 
 	if opt.referenceName != "" {
@@ -79,12 +73,8 @@ func (c gitClient) latestCommitID(ctx context.Context, opt fetchOptions) (string
 		URLs: []string{opt.repositoryUrl},
 	})
 
-	listOptions := &git.ListOptions{}
-	if opt.password != "" || opt.username != "" {
-		listOptions.Auth = &githttp.BasicAuth{
-			Username: opt.username,
-			Password: opt.password,
-		}
+	listOptions := &git.ListOptions{
+		Auth: getAuth(opt.username, opt.password),
 	}
 
 	refs, err := remote.List(listOptions)
@@ -99,6 +89,20 @@ func (c gitClient) latestCommitID(ctx context.Context, opt fetchOptions) (string
 	}
 
 	return "", errors.Errorf("could not find ref %q in the repository", opt.referenceName)
+}
+
+func getAuth(username, password string) *githttp.BasicAuth {
+	if password != "" {
+		if username == "" {
+			username = "token"
+		}
+
+		return &githttp.BasicAuth{
+			Username: username,
+			Password: password,
+		}
+	}
+	return nil
 }
 
 // Service represents a service for managing Git.
