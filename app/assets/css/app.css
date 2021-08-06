@@ -110,6 +110,7 @@
   --border-pagination-hover-color: #383838;
   --border-multiselect-button-color: #383838;
   --border-searchbar-color: #212121;
+  --border-panel-color: #181818;
 
   --hover-sidebar-color: #383838;
   --blue-color: #337ab7;
@@ -156,6 +157,7 @@
   --border-datatable-top-color: rgba(255, 255, 255, 0.8);
   --border-sidebar-high-contrast: 1px solid #3ea6ff;
   --border-code-high-contrast: 1px solid #fff;
+  --border-panel-color: #fff;
 
   --hover-sidebar-color: #3ea6ff;
   --hover-sidebar-color: #000;
@@ -270,6 +272,7 @@
   --border-pagination-hover-color: #ddd;
   --border-multiselect-button-color: #c6c6c6;
   --border-searchbar-color: #f6f6f6;
+  --border-panel-color: #fff;
 
   --hover-sidebar-color: #2d3e63;
   --shadow-box-color: 0 3px 10px -2px rgba(161, 170, 166, 0.5);
@@ -552,6 +555,10 @@ json-tree .branch-preview {
 
 .panel-body {
   background-color: var(--bg-panel-body-color) !important;
+}
+
+.panel {
+  border: 1px solid var(--border-panel-color);
 }
 
 /* Overide Vendor CSS */
