@@ -36,7 +36,7 @@ angular.module('portainer.app').controller('AccountController', [
     $scope.updateTheme = function () {
       UserService.updateUserTheme($scope.userID, $scope.formValues.userTheme)
         .then(function success() {
-          Notifications.success('Success', 'User Theme successfully updated');
+          Notifications.success('Success', 'User theme successfully updated');
           $state.reload();
         })
         .catch(function error(err) {
