@@ -112,11 +112,14 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to move git repository directory", Err: err}
 	}
 
-	repositoryUsername := payload.RepositoryUsername
-	repositoryPassword := payload.RepositoryPassword
-	if !payload.RepositoryAuthentication {
-		repositoryUsername = ""
-		repositoryPassword = ""
+	repositoryUsername := ""
+	repositoryPassword := ""
+	if payload.RepositoryAuthentication {
+		repositoryPassword = payload.RepositoryPassword
+		if repositoryPassword == "" && stack.GitConfig != nil && stack.GitConfig.Authentication != nil {
+			repositoryPassword = stack.GitConfig.Authentication.Password
+		}
+		repositoryUsername = payload.RepositoryUsername
 	}
 
 	err = handler.GitService.CloneRepository(stack.ProjectPath, stack.GitConfig.URL, payload.RepositoryReferenceName, repositoryUsername, repositoryPassword)
@@ -144,6 +147,11 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 	err = handler.DataStore.Stack().UpdateStack(stack.ID, stack)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist the stack changes inside the database", Err: err}
+	}
+
+	if stack.GitConfig != nil && stack.GitConfig.Authentication != nil && stack.GitConfig.Authentication.Password != "" {
+		// sanitize password in the http response to minimise possible security leaks
+		stack.GitConfig.Authentication.Password = ""
 	}
 
 	return response.JSON(w, stack)

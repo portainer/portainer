@@ -121,8 +121,7 @@ class StackRedeployGitFormController {
 
     if (this.stack.GitConfig && this.stack.GitConfig.Authentication) {
       this.formValues.RepositoryUsername = this.stack.GitConfig.Authentication.Username;
-      this.formValues.RepositoryPassword = this.stack.GitConfig.Authentication.Password;
-      this.formValues.RepositoryAuthentication = this.formValues.RepositoryPassword !== '';
+      this.formValues.RepositoryAuthentication = true;
     }
   }
 }
