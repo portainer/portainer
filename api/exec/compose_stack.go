@@ -99,7 +99,7 @@ func (w *ComposeStackManager) fetchEndpointProxy(endpoint *portainer.Endpoint) (
 
 func createEnvFile(stack *portainer.Stack) (string, error) {
 	if stack.Env == nil || len(stack.Env) == 0 {
-		return "", nil
+		return path.Join(stack.ProjectPath, ".env"), nil
 	}
 
 	envFilePath := path.Join(stack.ProjectPath, "stack.env")
