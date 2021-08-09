@@ -29,9 +29,7 @@ func (payload *stackGitUpdatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.RepositoryReferenceName) {
 		payload.RepositoryReferenceName = defaultGitReferenceName
 	}
-	if payload.RepositoryAuthentication && govalidator.IsNull(payload.RepositoryPassword) {
-		return errors.New("Invalid repository credentials. Password must be specified when authentication is enabled")
-	}
+
 	if err := validateStackAutoUpdate(payload.AutoUpdate); err != nil {
 		return err
 	}
@@ -128,15 +126,15 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 	stack.AutoUpdate = payload.AutoUpdate
 	stack.Env = payload.Env
 
+	stack.GitConfig.Authentication = nil
 	if payload.RepositoryAuthentication {
+		password := payload.RepositoryPassword
+		if password == "" && stack.GitConfig != nil && stack.GitConfig.Authentication != nil {
+			password = stack.GitConfig.Authentication.Password
+		}
 		stack.GitConfig.Authentication = &gittypes.GitAuthentication{
 			Username: payload.RepositoryUsername,
-			Password: payload.RepositoryPassword,
-		}
-	} else {
-		stack.GitConfig.Authentication = &gittypes.GitAuthentication{
-			Username: "",
-			Password: "",
+			Password: password,
 		}
 	}
 
@@ -153,6 +151,11 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 	err = handler.DataStore.Stack().UpdateStack(stack.ID, stack)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist the stack changes inside the database", Err: err}
+	}
+
+	if stack.GitConfig != nil && stack.GitConfig.Authentication != nil && stack.GitConfig.Authentication.Password != "" {
+		// sanitize password in the http response to minimise possible security leaks
+		stack.GitConfig.Authentication.Password = ""
 	}
 
 	return response.JSON(w, stack)
