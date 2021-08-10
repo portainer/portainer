@@ -90,6 +90,7 @@ func (server *Server) Start() error {
 	offlineGate := offlinegate.NewOfflineGate()
 
 	var authHandler = auth.NewHandler(requestBouncer, rateLimiter)
+	authHandler.AuthorizationService = server.AuthorizationService
 	authHandler.DataStore = server.DataStore
 	authHandler.CryptoService = server.CryptoService
 	authHandler.JWTService = server.JWTService

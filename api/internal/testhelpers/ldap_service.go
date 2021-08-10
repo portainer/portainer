@@ -17,12 +17,11 @@ func (service *ldapService) AuthenticateUser(username, password string, settings
 }
 
 // GetUserGroups is used to retrieve user groups from LDAP/AD.
-func (service *ldapService) GetUserGroups(username string, settings *portainer.LDAPSettings) ([]string, error) {
+func (service *ldapService) GetUserGroups(username string, settings *portainer.LDAPSettings, useAutoAdminSearchSettings bool) ([]string, error) {
+	if useAutoAdminSearchSettings {
+		return []string{"stuff", "operator"}, nil
+	}
 	return []string{"stuff"}, nil
-}
-
-func (service *ldapService) GetUserAdminGroups(username string, settings *portainer.LDAPSettings) ([]string, error) {
-	return []string{"manager", "lead"}, nil
 }
 
 // SearchGroups searches for groups with the specified settings

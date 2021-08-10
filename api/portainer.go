@@ -473,7 +473,7 @@ type (
 		AutoCreateUsers          bool                      `json:"AutoCreateUsers" example:"true"`
 		AdminAutoPopulate        bool                      `json:"AdminAutoPopulate" example:"true"`
 		AdminGroupSearchSettings []LDAPGroupSearchSettings `json:"AdminGroupSearchSettings"`
-		AdminGroups              []string                  `json:"AdminGroups"`
+		AdminGroups              []string                  `json:"AdminGroups" example:"['manager','operator']"`
 	}
 
 	// LicenseInformation represents information about an extension license
@@ -1199,8 +1199,7 @@ type (
 	LDAPService interface {
 		AuthenticateUser(username, password string, settings *LDAPSettings) error
 		TestConnectivity(settings *LDAPSettings) error
-		GetUserGroups(username string, settings *LDAPSettings) ([]string, error)
-		GetUserAdminGroups(username string, settings *LDAPSettings) ([]string, error)
+		GetUserGroups(username string, settings *LDAPSettings, useAutoAdminSearchSettings bool) ([]string, error)
 		SearchAdminGroups(settings *LDAPSettings) ([]string, error)
 	}
 

@@ -20,7 +20,7 @@ func (m *Migrator) migrateDBVersionToDB32() error {
 		return err
 	}
 
-	err = m.migrateAdminGroupSearchSettings()
+	err = m.updateAdminGroupSearchSettingsToDB32()
 	if err != nil {
 		return err
 	}
@@ -218,7 +218,7 @@ func findResourcesToUpdateForDB32(dockerID string, volumesData map[string]interf
 	}
 }
 
-func (m *Migrator) migrateAdminGroupSearchSettings() error {
+func (m *Migrator) updateAdminGroupSearchSettingsToDB32() error {
 	legacySettings, err := m.settingsService.Settings()
 	if err != nil {
 		return err

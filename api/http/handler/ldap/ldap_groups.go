@@ -16,10 +16,10 @@ type adminGroupsPayload struct {
 
 func (payload *adminGroupsPayload) Validate(r *http.Request) error {
 	if len(payload.LDAPSettings.URL) == 0 {
-		return errors.New("Invalid LDAP URLs. At least one URL is required")
+		return errors.New("Invalid LDAP URL. Empty URL identified")
 	}
 	if len(payload.LDAPSettings.AdminGroupSearchSettings) == 0 {
-		return errors.New("Invalid AdminGroupSearchSettings. At least one search setting is required")
+		return errors.New("Invalid AdminGroupSearchSettings. When 'AdminAutoPopulate' is true, at least one search settings is required")
 	}
 	return nil
 }

@@ -1,9 +1,10 @@
 package ldap
 
 import (
-	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/pkg/errors"
 
 	ldap "github.com/go-ldap/ldap/v3"
 	portainer "github.com/portainer/portainer/api"
@@ -114,7 +115,7 @@ func (*Service) AuthenticateUser(username, password string, settings *portainer.
 }
 
 // GetUserGroups is used to retrieve user groups from LDAP/AD.
-func (*Service) GetUserGroups(username string, settings *portainer.LDAPSettings) ([]string, error) {
+func (*Service) GetUserGroups(username string, settings *portainer.LDAPSettings, useAutoAdminSearchSettings bool) ([]string, error) {
 	connection, err := createConnection(settings)
 	if err != nil {
 		return nil, err
@@ -133,94 +134,40 @@ func (*Service) GetUserGroups(username string, settings *portainer.LDAPSettings)
 		return nil, err
 	}
 
-	userGroups := getGroups(userDN, connection, settings.GroupSearchSettings)
-
-	return userGroups, nil
-}
-
-// GetUserGroups is used to retrieve user groups from LDAP/AD.
-func (*Service) GetUserAdminGroups(username string, settings *portainer.LDAPSettings) ([]string, error) {
-	connection, err := createConnection(settings)
-	if err != nil {
-		return nil, err
-	}
-	defer connection.Close()
-
-	if !settings.AnonymousMode {
-		err = connection.Bind(settings.ReaderDN, settings.Password)
-		if err != nil {
-			return nil, err
-		}
+	groupSearchSettings := settings.GroupSearchSettings
+	if useAutoAdminSearchSettings {
+		groupSearchSettings = settings.AdminGroupSearchSettings
 	}
 
-	userDN, err := searchUser(username, connection, settings.SearchSettings)
-	if err != nil {
-		return nil, err
-	}
-
-	userGroups := getGroupsByUser(userDN, connection, settings.AdminGroupSearchSettings)
+	userGroups := getGroupsByUser(userDN, connection, groupSearchSettings)
 
 	return userGroups, nil
 }
 
 // SearchGroups searches for groups with the specified settings
 func (*Service) SearchAdminGroups(settings *portainer.LDAPSettings) ([]string, error) {
-	type groupSet map[string]bool
-
 	connection, err := createConnection(settings)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithMessage(err, "failed to esteblish an LDAP connection")
 	}
 	defer connection.Close()
 
-	if !settings.AnonymousMode {
-		err = connection.Bind(settings.ReaderDN, settings.Password)
-		if err != nil {
-			return nil, err
-		}
+	userGroups, err := searchUserGroups(settings, true)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed searching user groups")
 	}
 
-	userGroups := map[string]groupSet{}
-
-	for _, searchSettings := range settings.AdminGroupSearchSettings {
-		searchRequest := ldap.NewSearchRequest(
-			searchSettings.GroupBaseDN,
-			ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
-			searchSettings.GroupFilter,
-			[]string{"cn", searchSettings.GroupAttribute},
-			nil,
-		)
-
-		sr, err := connection.Search(searchRequest)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, entry := range sr.Entries {
-			members := entry.GetAttributeValues(searchSettings.GroupAttribute)
-			for _, username := range members {
-				_, ok := userGroups[username]
-				if !ok {
-					userGroups[username] = groupSet{}
-				}
-				userGroups[username][entry.GetAttributeValue("cn")] = true
-			}
+	deduplicatedGroups := make(map[string]struct{})
+	for _, gs := range userGroups {
+		for _, group := range gs {
+			deduplicatedGroups[group] = struct{}{}
 		}
 	}
-
-	groupsMap := make(map[string]bool)
-
-	for _, groups := range userGroups {
-		for group := range groups {
-			groupsMap[group] = true
-		}
-	}
-
-	groups := make([]string, 0, len(groupsMap))
-	for group := range groupsMap {
+	groups := make([]string, 0, len(deduplicatedGroups))
+	for group := range deduplicatedGroups {
 		groups = append(groups, group)
 	}
-	
+
 	return groups, nil
 }
 
@@ -270,6 +217,51 @@ func getGroups(userDN string, conn *ldap.Conn, settings []portainer.LDAPGroupSea
 	}
 
 	return groups
+}
+
+func searchUserGroups(settings *portainer.LDAPSettings, useAutoAdminSearchSettings bool) (map[string][]string, error) {
+	connection, err := createConnection(settings)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed to esteblish an LDAP connection")
+	}
+	defer connection.Close()
+
+	if !settings.AnonymousMode {
+		if err := connection.Bind(settings.ReaderDN, settings.Password); err != nil {
+			return nil, errors.Wrap(err, "failed to bind an LDAP connection")
+		}
+	}
+
+	groupSearchSettings := settings.GroupSearchSettings
+	if useAutoAdminSearchSettings {
+		groupSearchSettings = settings.AdminGroupSearchSettings
+	}
+
+	userGroups := make(map[string][]string)
+
+	for _, searchSettings := range groupSearchSettings {
+		searchRequest := ldap.NewSearchRequest(
+			searchSettings.GroupBaseDN,
+			ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
+			searchSettings.GroupFilter,
+			[]string{"cn", searchSettings.GroupAttribute},
+			nil,
+		)
+
+		sr, err := connection.Search(searchRequest)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to perform a user groups search")
+		}
+
+		for _, entry := range sr.Entries {
+			members := entry.GetAttributeValues(searchSettings.GroupAttribute)
+			for _, username := range members {
+				userGroups[username] = append(userGroups[username], entry.GetAttributeValue("cn"))
+			}
+		}
+	}
+
+	return userGroups, nil
 }
 
 // Get a list of group names for specified user from LDAP/AD

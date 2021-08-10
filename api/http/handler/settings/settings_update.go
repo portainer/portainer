@@ -87,12 +87,12 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	var payload settingsUpdatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
 	}
 
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve the settings from the database", err}
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve the settings from the database", Err: err}
 	}
 
 	if payload.AuthenticationMethod != nil {
@@ -141,7 +141,7 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	if payload.SnapshotInterval != nil && *payload.SnapshotInterval != settings.SnapshotInterval {
 		err := handler.updateSnapshotInterval(settings, *payload.SnapshotInterval)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update snapshot interval", err}
+			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to update snapshot interval", Err: err}
 		}
 	}
 
@@ -168,7 +168,7 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 
 	err = handler.DataStore.Settings().UpdateSettings(settings)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist settings changes inside the database", err}
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist settings changes inside the database", Err: err}
 	}
 
 	return response.JSON(w, settings)

@@ -72,9 +72,10 @@ func (handler *Handler) authenticate(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	if settings.AuthenticationMethod == portainer.AuthenticationLDAP {
-		if u == nil && (settings.LDAPSettings.AutoCreateUsers || settings.LDAPSettings.AdminAutoPopulate) {
-			return handler.authenticateLDAPAndCreateUser(w, payload.Username, payload.Password, &settings.LDAPSettings)
-		} else if u == nil && !settings.LDAPSettings.AutoCreateUsers && !settings.LDAPSettings.AdminAutoPopulate {
+		if u == nil {
+			if settings.LDAPSettings.AutoCreateUsers || settings.LDAPSettings.AdminAutoPopulate {
+				return handler.authenticateLDAPAndCreateUser(w, payload.Username, payload.Password, &settings.LDAPSettings)
+			}
 			return &httperror.HandlerError{
 				StatusCode: http.StatusUnprocessableEntity,
 				Message:    "Invalid credentials",
@@ -94,7 +95,7 @@ func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.
 	}
 
 	if ldapSettings.AdminAutoPopulate {
-		matched, err := handler.isLDAPAdmin(user.Username, ldapSettings)
+		isLDAPAdmin, err := handler.isLDAPAdmin(user.Username, ldapSettings)
 		if err != nil {
 			return &httperror.HandlerError{
 				StatusCode: http.StatusUnprocessableEntity,
@@ -102,7 +103,7 @@ func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.
 				Err:        err,
 			}
 		}
-		if matched && user.Role != portainer.AdministratorRole {
+		if isLDAPAdmin && user.Role != portainer.AdministratorRole {
 			if err := handler.updateUserRole(user, portainer.AdministratorRole); err != nil {
 				return &httperror.HandlerError{
 					StatusCode: http.StatusUnprocessableEntity,
@@ -111,7 +112,7 @@ func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.
 				}
 			}
 		}
-		if !matched && user.Role == portainer.AdministratorRole {
+		if !isLDAPAdmin && user.Role == portainer.AdministratorRole {
 			if err := handler.updateUserRole(user, portainer.StandardUserRole); err != nil {
 				return &httperror.HandlerError{
 					StatusCode: http.StatusUnprocessableEntity,
@@ -133,6 +134,16 @@ func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.
 	err = handler.addUserIntoTeams(user, ldapSettings)
 	if err != nil {
 		log.Printf("Warning: unable to automatically add user into teams: %s\n", err.Error())
+	}
+
+	err = handler.AuthorizationService.UpdateUsersAuthorizations()
+	if err != nil {
+		return &httperror.HandlerError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    "Unable to update user authorizations",
+			Err:        err,
+		}
+
 	}
 
 	return handler.writeToken(w, user)
@@ -159,7 +170,7 @@ func (handler *Handler) authenticateLDAPAndCreateUser(w http.ResponseWriter, use
 	}
 
 	if ldapSettings.AdminAutoPopulate {
-		matched, err := handler.isLDAPAdmin(username, ldapSettings)
+		isLDAPAdmin, err := handler.isLDAPAdmin(username, ldapSettings)
 		if err != nil {
 			return &httperror.HandlerError{
 				StatusCode: http.StatusUnprocessableEntity,
@@ -167,7 +178,7 @@ func (handler *Handler) authenticateLDAPAndCreateUser(w http.ResponseWriter, use
 				Err:        err,
 			}
 		}
-		if matched {
+		if isLDAPAdmin {
 			user.Role = portainer.AdministratorRole
 		}
 	}
@@ -212,7 +223,7 @@ func (handler *Handler) addUserIntoTeams(user *portainer.User, settings *portain
 		return err
 	}
 
-	userGroups, err := handler.LDAPService.GetUserGroups(user.Username, settings)
+	userGroups, err := handler.LDAPService.GetUserGroups(user.Username, settings, false)
 	if err != nil {
 		return err
 	}
@@ -246,7 +257,7 @@ func (handler *Handler) addUserIntoTeams(user *portainer.User, settings *portain
 }
 
 func (handler *Handler) isLDAPAdmin(username string, ldapSettings *portainer.LDAPSettings) (bool, error) {
-	adminUserGroups, err := handler.LDAPService.GetUserAdminGroups(username, ldapSettings)
+	adminUserGroups, err := handler.LDAPService.GetUserGroups(username, ldapSettings, true)
 	if err != nil {
 		return false, errors.New("Failed to retrieve user groups from LDAP server")
 	}
