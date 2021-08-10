@@ -186,7 +186,6 @@ github.com/kisielk/errcheck v1.2.0/go.mod h1:/BMXB+zMLi60iA8Vv6Ksmxu/1UDYcXs4uQL
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
 github.com/koding/websocketproxy v0.0.0-20181220232114-7ed82d81a28c h1:N7A4JCA2G+j5fuFxCsJqjFU/sZe0mj8H0sSoSwbaikw=
 github.com/koding/websocketproxy v0.0.0-20181220232114-7ed82d81a28c/go.mod h1:Nn5wlyECw3iJrzi0AhIWg+AJUb4PlRQVW4/3XHH1LZA=
-github.com/konsorten/go-windows-terminal-sequences v1.0.1 h1:mweAR1A6xJ3oS2pRaGiHgQ4OO8tzTaLawm8vnODuwDk=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515/go.mod h1:+0opPa2QZZtGFBFZlji/RkVcI2GknAs/DXo4wKdlNEc=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
@@ -246,8 +245,8 @@ github.com/portainer/docker-compose-wrapper v0.0.0-20210527221011-0a1418224b92 h
 github.com/portainer/docker-compose-wrapper v0.0.0-20210527221011-0a1418224b92/go.mod h1:PF2O2O4UNYWdtPcp6n/mIKpKk+f1jhFTezS8txbf+XM=
 github.com/portainer/libcompose v0.5.3 h1:tE4WcPuGvo+NKeDkDWpwNavNLZ5GHIJ4RvuZXsI9uI8=
 github.com/portainer/libcompose v0.5.3/go.mod h1:7SKd/ho69rRKHDFSDUwkbMcol2TMKU5OslDsajr8Ro8=
-github.com/portainer/libcrypto v0.0.0-20190723020515-23ebe86ab2c2 h1:0PfgGLys9yHr4rtnirg0W0Cjvv6/DzxBIZk5sV59208=
-github.com/portainer/libcrypto v0.0.0-20190723020515-23ebe86ab2c2/go.mod h1:/wIeGwJOMYc1JplE/OvYMO5korce39HddIfI8VKGyAM=
+github.com/portainer/libcrypto v0.0.0-20210422035235-c652195c5c3a h1:qY8TbocN75n5PDl16o0uVr5MevtM5IhdwSelXEd4nFM=
+github.com/portainer/libcrypto v0.0.0-20210422035235-c652195c5c3a/go.mod h1:n54EEIq+MM0NNtqLeCby8ljL+l275VpolXO0ibHegLE=
 github.com/portainer/libhttp v0.0.0-20190806161843-ba068f58be33 h1:H8HR2dHdBf8HANSkUyVw4o8+4tegGcd+zyKZ3e599II=
 github.com/portainer/libhttp v0.0.0-20190806161843-ba068f58be33/go.mod h1:Y2TfgviWI4rT2qaOTHr+hq6MdKIE5YjgQAu7qwptTV0=
 github.com/prometheus/client_golang v0.9.1/go.mod h1:7SWBe2y4D6OKWSNQJUaRYU/AaXPKyh/dDVn+NZz0KFw=
@@ -267,8 +266,9 @@ github.com/prometheus/procfs v0.0.3/go.mod h1:4A/X28fw3Fc593LaREMrKMqOKvUAntwMDa
 github.com/sergi/go-diff v1.1.0 h1:we8PVUC3FE2uYfodKH/nBHMSetSfHDR6scGdBi+erh0=
 github.com/sergi/go-diff v1.1.0/go.mod h1:STckp+ISIX8hZLjrqAeVduY0gWCT9IjLuqbuNXdaHfM=
 github.com/sirupsen/logrus v1.2.0/go.mod h1:LxeOpSwHxABJmUn/MG1IvRgCAasNZTLOkJPxbbu5VWo=
-github.com/sirupsen/logrus v1.4.1 h1:GL2rEmy6nsikmW0r8opw9JIRScdMF5hA8cOYLH7In1k=
 github.com/sirupsen/logrus v1.4.1/go.mod h1:ni0Sbl8bgC9z8RoU9G6nDWqqs/fq4eDPysMBDgk/93Q=
+github.com/sirupsen/logrus v1.8.1 h1:dJKuHgqk1NNQlqoA6BTlM1Wf9DOH3NBjQyu0h9+AZZE=
+github.com/sirupsen/logrus v1.8.1/go.mod h1:yWOB1SBYBC5VeMP7gHvWumXLIWorT60ONWic61uBYv0=
 github.com/spf13/afero v1.2.2/go.mod h1:9ZxEEn6pIJ8Rxe320qSDBk6AsU0r9pR7Q4OcevTdifk=
 github.com/spf13/pflag v0.0.0-20170130214245-9ff6c6923cff/go.mod h1:DYY7MBk1bdzusC3SYhjObp+wFpr4gzcvqqNjLnInEg4=
 github.com/spf13/pflag v1.0.5 h1:iy+VFUOCP1a+8yFto/drg2CJ5u0yRoB7fZw3DKv/JXA=

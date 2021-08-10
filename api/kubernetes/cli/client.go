@@ -115,26 +115,8 @@ func (rt *agentHeaderRoundTripper) RoundTrip(req *http.Request) (*http.Response,
 
 func (factory *ClientFactory) buildAgentClient(endpoint *portainer.Endpoint) (*kubernetes.Clientset, error) {
 	endpointURL := fmt.Sprintf("https://%s/kubernetes", endpoint.URL)
-	signature, err := factory.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
-	if err != nil {
-		return nil, err
-	}
 
-	config, err := clientcmd.BuildConfigFromFlags(endpointURL, "")
-	if err != nil {
-		return nil, err
-	}
-	config.Insecure = true
-
-	config.Wrap(func(rt http.RoundTripper) http.RoundTripper {
-		return &agentHeaderRoundTripper{
-			signatureHeader: signature,
-			publicKeyHeader: factory.signatureService.EncodedPublicKey(),
-			roundTripper:    rt,
-		}
-	})
-
-	return kubernetes.NewForConfig(config)
+	return factory.createRemoteClient(endpointURL);
 }
 
 func (factory *ClientFactory) buildEdgeClient(endpoint *portainer.Endpoint) (*kubernetes.Clientset, error) {
@@ -163,11 +145,28 @@ func (factory *ClientFactory) buildEdgeClient(endpoint *portainer.Endpoint) (*ku
 
 	endpointURL := fmt.Sprintf("http://127.0.0.1:%d/kubernetes", tunnel.Port)
 
+	return factory.createRemoteClient(endpointURL);
+}
+
+func (factory *ClientFactory) createRemoteClient(endpointURL string) (*kubernetes.Clientset, error) {
+	signature, err := factory.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
+	if err != nil {
+		return nil, err
+	}
+
 	config, err := clientcmd.BuildConfigFromFlags(endpointURL, "")
 	if err != nil {
 		return nil, err
 	}
 	config.Insecure = true
+
+	config.Wrap(func(rt http.RoundTripper) http.RoundTripper {
+		return &agentHeaderRoundTripper{
+			signatureHeader: signature,
+			publicKeyHeader: factory.signatureService.EncodedPublicKey(),
+			roundTripper:    rt,
+		}
+	})
 
 	return kubernetes.NewForConfig(config)
 }

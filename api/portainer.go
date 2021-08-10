@@ -1,10 +1,14 @@
 package portainer
 
 import (
+	"context"
 	"io"
+	"net/http"
 	"time"
 
 	gittypes "github.com/portainer/portainer/api/git/types"
+	v1 "k8s.io/api/core/v1"
+	clientV1 "k8s.io/client-go/tools/clientcmd/api/v1"
 )
 
 type (
@@ -40,6 +44,7 @@ type (
 	// CLIFlags represents the available flags on the CLI
 	CLIFlags struct {
 		Addr                      *string
+		AddrHTTPS                 *string
 		TunnelAddr                *string
 		TunnelPort                *string
 		AdminPassword             *string
@@ -57,6 +62,7 @@ type (
 		TLSCacert                 *string
 		TLSCert                   *string
 		TLSKey                    *string
+		HTTPDisabled              *bool
 		SSL                       *bool
 		SSLCert                   *string
 		SSLKey                    *string
@@ -414,10 +420,11 @@ type (
 
 	// KubernetesConfiguration represents the configuration of a Kubernetes endpoint
 	KubernetesConfiguration struct {
-		UseLoadBalancer  bool                           `json:"UseLoadBalancer"`
-		UseServerMetrics bool                           `json:"UseServerMetrics"`
-		StorageClasses   []KubernetesStorageClassConfig `json:"StorageClasses"`
-		IngressClasses   []KubernetesIngressClassConfig `json:"IngressClasses"`
+		UseLoadBalancer          bool                           `json:"UseLoadBalancer"`
+		UseServerMetrics         bool                           `json:"UseServerMetrics"`
+		StorageClasses           []KubernetesStorageClassConfig `json:"StorageClasses"`
+		IngressClasses           []KubernetesIngressClassConfig `json:"IngressClasses"`
+		RestrictDefaultNamespace bool                           `json:"RestrictDefaultNamespace"`
 	}
 
 	// KubernetesStorageClassConfig represents a Kubernetes Storage Class configuration
@@ -432,6 +439,14 @@ type (
 	KubernetesIngressClassConfig struct {
 		Name string `json:"Name"`
 		Type string `json:"Type"`
+	}
+
+	// KubernetesShellPod represents a Kubectl Shell details to facilitate pod exec functionality
+	KubernetesShellPod struct {
+		Namespace        string
+		PodName          string
+		ContainerName    string
+		ShellExecCommand string
 	}
 
 	// LDAPGroupSearchSettings represents settings used to search for groups in a LDAP server
@@ -693,6 +708,14 @@ type (
 
 	// SoftwareEdition represents an edition of Portainer
 	SoftwareEdition int
+
+	// SSLSettings represents a pair of SSL certificate and key
+	SSLSettings struct {
+		CertPath    string `json:"certPath"`
+		KeyPath     string `json:"keyPath"`
+		SelfSigned  bool   `json:"selfSigned"`
+		HTTPEnabled bool   `json:"httpEnabled"`
+	}
 
 	// Stack represents a Docker stack created via docker stack deploy
 	Stack struct {
@@ -1046,6 +1069,7 @@ type (
 		ResourceControl() ResourceControlService
 		Role() RoleService
 		Settings() SettingsService
+		SSLSettings() SSLSettingsService
 		Stack() StackService
 		Tag() TagService
 		TeamMembership() TeamMembershipService
@@ -1156,6 +1180,9 @@ type (
 		GetCustomTemplateProjectPath(identifier string) string
 		GetTemporaryPath() (string, error)
 		GetDatastorePath() string
+		GetDefaultSSLCertsPath() (string, string)
+		StoreSSLCertPair(cert, key []byte) (string, string, error)
+		CopySSLCertPair(certPath, keyPath string) (string, string, error)
 	}
 
 	// GitService represents a service for managing Git
@@ -1173,20 +1200,23 @@ type (
 
 	// KubeClient represents a service used to query a Kubernetes environment
 	KubeClient interface {
-		SetupUserServiceAccount(userID int, teamIDs []int) error
+		GetServiceAccount(tokendata *TokenData) (*v1.ServiceAccount, error)
+		SetupUserServiceAccount(userID int, teamIDs []int, restrictDefaultNamespace bool) error
 		GetServiceAccountBearerToken(userID int) (string, error)
-		StartExecProcess(namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error
+		CreateUserShellPod(ctx context.Context, serviceAccountName string) (*KubernetesShellPod, error)
+		StartExecProcess(token string, useAdminToken bool, namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error
 		NamespaceAccessPoliciesDeleteNamespace(namespace string) error
 		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
 		UpdateNamespaceAccessPolicies(accessPolicies map[string]K8sNamespaceAccessPolicy) error
 		DeleteRegistrySecret(registry *Registry, namespace string) error
 		CreateRegistrySecret(registry *Registry, namespace string) error
 		IsRegistrySecret(namespace, secretName string) (bool, error)
+		GetKubeConfig(ctx context.Context, apiServerURL string, bearerToken string, tokenData *TokenData) (*clientV1.Config, error)
 	}
 
 	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes endpoint
 	KubernetesDeployer interface {
-		Deploy(endpoint *Endpoint, data string, namespace string) (string, error)
+		Deploy(request *http.Request, endpoint *Endpoint, data string, namespace string) (string, error)
 		ConvertCompose(data string) ([]byte, error)
 	}
 
@@ -1205,7 +1235,7 @@ type (
 
 	// OAuthService represents a service used to authenticate users using OAuth
 	OAuthService interface {
-		Authenticate(code string, configuration *OAuthSettings) (string, *time.Time, error)
+		Authenticate(code string, configuration *OAuthSettings) (string, error)
 	}
 
 	// RegistryService represents a service for managing registry data
@@ -1259,6 +1289,12 @@ type (
 		Start() error
 	}
 
+	// SSLSettingsService represents a service for managing application settings
+	SSLSettingsService interface {
+		Settings() (*SSLSettings, error)
+		UpdateSettings(settings *SSLSettings) error
+	}
+
 	// StackService represents a service for managing stack data
 	StackService interface {
 		Stack(ID StackID) (*Stack, error)
@@ -1284,6 +1320,7 @@ type (
 		Logout(endpoint *Endpoint) error
 		Deploy(stack *Stack, prune bool, endpoint *Endpoint) error
 		Remove(stack *Stack, endpoint *Endpoint) error
+		NormalizeStackName(name string) string
 	}
 
 	// TagService represents a service for managing tag data

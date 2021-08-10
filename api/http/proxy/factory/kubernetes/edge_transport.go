@@ -10,11 +10,12 @@ import (
 
 type edgeTransport struct {
 	*baseTransport
+	signatureService     portainer.DigitalSignatureService
 	reverseTunnelService portainer.ReverseTunnelService
 }
 
 // NewAgentTransport returns a new transport that can be used to send signed requests to a Portainer Edge agent
-func NewEdgeTransport(reverseTunnelService portainer.ReverseTunnelService, endpoint *portainer.Endpoint, tokenManager *tokenManager, k8sClientFactory *cli.ClientFactory, dataStore portainer.DataStore) *edgeTransport {
+func NewEdgeTransport(dataStore portainer.DataStore, signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, endpoint *portainer.Endpoint, tokenManager *tokenManager, k8sClientFactory *cli.ClientFactory) *edgeTransport {
 	transport := &edgeTransport{
 		baseTransport: newBaseTransport(
 			&http.Transport{},
@@ -24,6 +25,7 @@ func NewEdgeTransport(reverseTunnelService portainer.ReverseTunnelService, endpo
 			dataStore,
 		),
 		reverseTunnelService: reverseTunnelService,
+		signatureService:     signatureService,
 	}
 
 	return transport
@@ -31,7 +33,7 @@ func NewEdgeTransport(reverseTunnelService portainer.ReverseTunnelService, endpo
 
 // RoundTrip is the implementation of the the http.RoundTripper interface
 func (transport *edgeTransport) RoundTrip(request *http.Request) (*http.Response, error) {
-	token, err := getRoundTripToken(request, transport.tokenManager)
+	token, err := transport.getRoundTripToken(request, transport.tokenManager)
 	if err != nil {
 		return nil, err
 	}
@@ -44,6 +46,14 @@ func (transport *edgeTransport) RoundTrip(request *http.Request) (*http.Response
 			return nil, err
 		}
 	}
+
+	signature, err := transport.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header.Set(portainer.PortainerAgentPublicKeyHeader, transport.signatureService.EncodedPublicKey())
+	request.Header.Set(portainer.PortainerAgentSignatureHeader, signature)
 
 	response, err := transport.baseTransport.RoundTrip(request)
 

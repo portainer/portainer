@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"log"
 	"net/http"
@@ -25,12 +26,14 @@ import (
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
 	"github.com/portainer/portainer/api/http/handler/endpoints"
 	"github.com/portainer/portainer/api/http/handler/file"
+	kube "github.com/portainer/portainer/api/http/handler/kubernetes"
 	"github.com/portainer/portainer/api/http/handler/ldap"
 	"github.com/portainer/portainer/api/http/handler/motd"
 	"github.com/portainer/portainer/api/http/handler/registries"
 	"github.com/portainer/portainer/api/http/handler/resourcecontrols"
 	"github.com/portainer/portainer/api/http/handler/roles"
 	"github.com/portainer/portainer/api/http/handler/settings"
+	sslhandler "github.com/portainer/portainer/api/http/handler/ssl"
 	"github.com/portainer/portainer/api/http/handler/stacks"
 	"github.com/portainer/portainer/api/http/handler/status"
 	"github.com/portainer/portainer/api/http/handler/tags"
@@ -46,6 +49,7 @@ import (
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/internal/ssl"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
@@ -53,6 +57,8 @@ import (
 type Server struct {
 	AuthorizationService        *authorization.Service
 	BindAddress                 string
+	BindAddressHTTPS            string
+	HTTPEnabled                 bool
 	AssetsPath                  string
 	Status                      *portainer.Status
 	ReverseTunnelService        portainer.ReverseTunnelService
@@ -70,9 +76,7 @@ type Server struct {
 	ProxyManager                *proxy.Manager
 	KubernetesTokenCacheManager *kubernetes.TokenCacheManager
 	Handler                     *handler.Handler
-	SSL                         bool
-	SSLCert                     string
-	SSLKey                      string
+	SSLService                  *ssl.Service
 	DockerClientFactory         *docker.ClientFactory
 	KubernetesClientFactory     *cli.ClientFactory
 	KubernetesDeployer          portainer.KubernetesDeployer
@@ -159,6 +163,10 @@ func (server *Server) Start() error {
 	ldapHandler.FileService = server.FileService
 	ldapHandler.LDAPService = server.LDAPService
 
+	var kubernetesHandler = kube.NewHandler(requestBouncer)
+	kubernetesHandler.DataStore = server.DataStore
+	kubernetesHandler.KubernetesClientFactory = server.KubernetesClientFactory
+
 	var motdHandler = motd.NewHandler(requestBouncer)
 
 	var registryHandler = registries.NewHandler(requestBouncer)
@@ -176,6 +184,9 @@ func (server *Server) Start() error {
 	settingsHandler.JWTService = server.JWTService
 	settingsHandler.LDAPService = server.LDAPService
 	settingsHandler.SnapshotService = server.SnapshotService
+
+	var sslHandler = sslhandler.NewHandler(requestBouncer)
+	sslHandler.SSLService = server.SSLService
 
 	var stackHandler = stacks.NewHandler(requestBouncer)
 	stackHandler.DataStore = server.DataStore
@@ -209,7 +220,7 @@ func (server *Server) Start() error {
 	userHandler.DataStore = server.DataStore
 	userHandler.CryptoService = server.CryptoService
 
-	var websocketHandler = websocket.NewHandler(requestBouncer)
+	var websocketHandler = websocket.NewHandler(server.KubernetesTokenCacheManager, requestBouncer)
 	websocketHandler.DataStore = server.DataStore
 	websocketHandler.SignatureService = server.SignatureService
 	websocketHandler.ReverseTunnelService = server.ReverseTunnelService
@@ -234,10 +245,12 @@ func (server *Server) Start() error {
 		EndpointProxyHandler:   endpointProxyHandler,
 		FileHandler:            fileHandler,
 		LDAPHandler:            ldapHandler,
+		KubernetesHandler:      kubernetesHandler,
 		MOTDHandler:            motdHandler,
 		RegistryHandler:        registryHandler,
 		ResourceControlHandler: resourceControlHandler,
 		SettingsHandler:        settingsHandler,
+		SSLHandler:             sslHandler,
 		StatusHandler:          statusHandler,
 		StackHandler:           stackHandler,
 		TagHandler:             tagHandler,
@@ -250,31 +263,48 @@ func (server *Server) Start() error {
 		WebhookHandler:         webhookHandler,
 	}
 
-	httpServer := &http.Server{
-		Addr:    server.BindAddress,
-		Handler: server.Handler,
+	handler := offlineGate.WaitingMiddleware(time.Minute, server.Handler)
+
+	if server.HTTPEnabled {
+		go func() {
+			log.Printf("[INFO] [http,server] [message: starting HTTP server on port %s]", server.BindAddress)
+			httpServer := &http.Server{
+				Addr:    server.BindAddress,
+				Handler: handler,
+			}
+
+			go shutdown(server.ShutdownCtx, httpServer)
+			err := httpServer.ListenAndServe()
+			if err != nil && err != http.ErrServerClosed {
+				log.Printf("[ERROR] [message: http server failed] [error: %s]", err)
+			}
+		}()
 	}
-	httpServer.Handler = offlineGate.WaitingMiddleware(time.Minute, httpServer.Handler)
 
-	if server.SSL {
-		httpServer.TLSConfig = crypto.CreateServerTLSConfiguration()
-		return httpServer.ListenAndServeTLS(server.SSLCert, server.SSLKey)
+	log.Printf("[INFO] [http,server] [message: starting HTTPS server on port %s]", server.BindAddressHTTPS)
+	httpsServer := &http.Server{
+		Addr:    server.BindAddressHTTPS,
+		Handler: handler,
 	}
 
-	go server.shutdown(httpServer)
+	httpsServer.TLSConfig = crypto.CreateServerTLSConfiguration()
+	httpsServer.TLSConfig.GetCertificate = func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
+		return server.SSLService.GetRawCertificate(), nil
+	}
 
-	return httpServer.ListenAndServe()
+	go shutdown(server.ShutdownCtx, httpsServer)
+	return httpsServer.ListenAndServeTLS("", "")
 }
 
-func (server *Server) shutdown(httpServer *http.Server) {
-	<-server.ShutdownCtx.Done()
+func shutdown(shutdownCtx context.Context, httpServer *http.Server) {
+	<-shutdownCtx.Done()
 
-	log.Println("[DEBUG] Shutting down http server")
+	log.Println("[DEBUG] [http,server] [message: shutting down http server]")
 	shutdownTimeout, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	err := httpServer.Shutdown(shutdownTimeout)
 	if err != nil {
-		fmt.Printf("Failed shutdown http server: %s \n", err)
+		fmt.Printf("[ERROR] [http,server] [message: failed shutdown http server] [error: %s]", err)
 	}
 }
