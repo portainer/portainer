@@ -37,14 +37,14 @@ func NewHandler(bouncer *security.RequestBouncer, authorizationService *authoriz
 	kubeRouter.Use(middlewares.WithEndpoint(dataStore.Endpoint(), "id"))
 	kubeRouter.Use(kubeOnlyMiddleware)
 
+	kubeRouter.PathPrefix("/config").Handler(
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.getKubernetesConfig))).Methods(http.MethodGet)
+
 	// namespaces
 	// in the future this piece of code might be in another package (or a few different packages - namespaces/namespace?)
 	// to keep it simple, we've decided to leave it like this.
 	namespaceRouter := kubeRouter.PathPrefix("/namespaces/{namespace}").Subrouter()
 	namespaceRouter.Handle("/system", bouncer.RestrictedAccess(httperror.LoggerHandler(h.namespacesToggleSystem))).Methods(http.MethodPut)
-
-	kubeRouter.PathPrefix("/config").Handler(
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.getKubernetesConfig))).Methods(http.MethodGet)
 
 	return h
 }

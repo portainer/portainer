@@ -12,4 +12,5 @@ export function KubernetesNamespace() {
   };
 }
 
-export const KUBERNETES_SYSTEM_NAMESPACES = ['kube-system', 'kube-public', 'kube-node-lease', 'portainer'];
+export const KUBERNETES_DEFAULT_SYSTEM_NAMESPACES = ['kube-system', 'kube-public', 'kube-node-lease', 'portainer'];
+export const KUBERNETES_DEFAULT_NAMESPACE = 'default';
