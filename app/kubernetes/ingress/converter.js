@@ -57,7 +57,9 @@ export class KubernetesIngressConverter {
         rule.IngressName = ingress.Name;
         rule.ServiceName = serviceName;
         rule.Port = p.ContainerPort;
-        rule.Path = _.startsWith(p.IngressRoute, '/') ? p.IngressRoute : '/' + p.IngressRoute;
+        if (p.IngressRoute) {
+          rule.Path = _.startsWith(p.IngressRoute, '/') ? p.IngressRoute : '/' + p.IngressRoute;
+        }
         rule.Host = p.IngressHost;
         ingress.Paths.push(rule);
       }
@@ -171,7 +173,7 @@ export class KubernetesIngressConverter {
       res.spec.rules = [];
       _.forEach(data.Hosts, (host) => {
         if (!host.NeedsDeletion) {
-          res.spec.rules.push({ host: host.Host });
+          res.spec.rules.push({ host: host.Host || host });
         }
       });
     } else {

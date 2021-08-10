@@ -2,6 +2,7 @@ package portainer
 
 import (
 	"io"
+	"net/http"
 	"time"
 
 	gittypes "github.com/portainer/portainer/api/git/types"
@@ -1165,14 +1166,15 @@ type (
 	KubeClient interface {
 		SetupUserServiceAccount(userID int, teamIDs []int) error
 		GetServiceAccountBearerToken(userID int) (string, error)
-		StartExecProcess(namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error
+		StartExecProcess(token string, useAdminToken bool, namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error
+		NamespaceAccessPoliciesDeleteNamespace(namespace string) error
 		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
 		UpdateNamespaceAccessPolicies(accessPolicies map[string]K8sNamespaceAccessPolicy) error
 	}
 
 	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes endpoint
 	KubernetesDeployer interface {
-		Deploy(endpoint *Endpoint, data string, namespace string) (string, error)
+		Deploy(request *http.Request, endpoint *Endpoint, data string, namespace string) (string, error)
 		ConvertCompose(data string) ([]byte, error)
 	}
 
@@ -1190,7 +1192,7 @@ type (
 
 	// OAuthService represents a service used to authenticate users using OAuth
 	OAuthService interface {
-		Authenticate(code string, configuration *OAuthSettings) (string, *time.Time, error)
+		Authenticate(code string, configuration *OAuthSettings) (string, error)
 	}
 
 	// RegistryService represents a service for managing registry data
@@ -1342,7 +1344,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "2.6.0"
+	APIVersion = "2.6.2"
 	// DBVersion is the version number of the Portainer database
 	DBVersion = 30
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
