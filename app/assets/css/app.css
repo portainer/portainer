@@ -45,7 +45,6 @@
   --bg-panel-body-color: #212121;
   --bg-boxselector-wrapper-disabled-color: #194973;
   --bg-codemirror-selected-color: #383838;
-  --bg-information-color: #212121;
 
   --text-main-color: #fff;
   --text-body-color: #fff;
@@ -85,7 +84,6 @@
   --text-multiselect-button-color: #fff;
   --text-multiselect-item-color: #fff;
   --text-sidebar-list-color: #fff;
-  --text-information-color: #fff;
 
   --border-color: #383838;
   --border-widget-color: #212121;
@@ -113,7 +111,6 @@
   --border-multiselect-button-color: #383838;
   --border-searchbar-color: #212121;
   --border-panel-color: #181818;
-  --border-information-color: #212121;
 
   --hover-sidebar-color: #383838;
   --blue-color: #337ab7;
@@ -138,7 +135,6 @@
   --bg-boxselector-wrapper-disabled-color: #194973;
   --bg-dropdown-menu-color: #000;
   --bg-codemirror-selected-color: #383838;
-  --bg-information-color: #000;
 
   --text-main-color: #fff;
   --text-body-color: #fff;
@@ -151,7 +147,6 @@
   --text-blocklist-hover-color: #3ea5ff;
   --text-danger-color: #ff00e0;
   --text-dropdown-menu-color: #fff;
-  --text-information-color: #fff;
 
   --border-color: rgba(255, 255, 255, 0.8);
   --border-widget-color: #fff;
@@ -163,7 +158,6 @@
   --border-sidebar-high-contrast: 1px solid #3ea6ff;
   --border-code-high-contrast: 1px solid #fff;
   --border-panel-color: #fff;
-  --border-information-color: #fff;
 
   --hover-sidebar-color: #3ea6ff;
   --hover-sidebar-color: #000;
@@ -214,7 +208,6 @@
   --bg-panel-body-color: #fff;
   --bg-codemirror-color: #fff;
   --bg-codemirror-selected-color: #c3c3e4;
-  --bg-information-color: #fff;
 
   --text-main-color: #767676;
   --text-body-color: #333333;
@@ -254,11 +247,9 @@
   --text-multiselect-button-color: #555;
   --text-multiselect-item-color: #444;
   --text-sidebar-list-color: #b2bfdc;
-  --text-information-color: #777;
 
   --border-color: #d2d1d1;
   --border-widget-color: #e9e9e9;
-  --border-information-color: #e9e9e9;
   --border-sidebar-color: #ffffff;
   --border-form-control-color: #ccc;
   --border-table-color: #ddd;
@@ -570,12 +561,9 @@ json-tree .branch-preview {
   border: 1px solid var(--border-panel-color);
 }
 
-.theme-information {
-  border:1px solid var(--border-information-color);
-  padding: 15px;
-  margin-bottom: 15px;
-  background: var(--bg-information-color);
-  color: var(--text-information-color);
+.theme-information .col-sm-12 {
+  padding-left: 0px;
+  padding-right: 0px;
 }
 
 /* Overide Vendor CSS */
