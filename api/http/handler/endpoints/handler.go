@@ -32,6 +32,8 @@ type Handler struct {
 	K8sClientFactory     *cli.ClientFactory
 	ComposeStackManager  portainer.ComposeStackManager
 	AuthorizationService *authorization.Service
+	BindAddress          string
+	BindAddressHTTPS     string
 }
 
 // NewHandler creates a handler to manage endpoint operations.
