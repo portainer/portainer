@@ -5296,13 +5296,6 @@ grunt-cli@~1.2.0:
     nopt "~3.0.6"
     resolve "~1.1.0"
 
-grunt-config@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/grunt-config/-/grunt-config-1.0.0.tgz#e0a20e4cbadb8ae90843697a8afa05af8aeb860c"
-  integrity sha1-4KIOTLrbiukIQ2l6ivoFr4rrhgw=
-  dependencies:
-    chalk "^1.1.0"
-
 grunt-contrib-clean@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/grunt-contrib-clean/-/grunt-contrib-clean-2.0.0.tgz#3be7ca480da4b740aa5e9d863e2f7e8b24f8a68b"
