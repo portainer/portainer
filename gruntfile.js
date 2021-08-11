@@ -2,6 +2,7 @@ var os = require('os');
 var loadGruntTasks = require('load-grunt-tasks');
 const webpackDevConfig = require('./webpack/webpack.develop');
 const webpackProdConfig = require('./webpack/webpack.production');
+const webpackTestingConfig = require('./webpack/webpack.testing');
 
 var arch = os.arch();
 if (arch === 'x64') arch = 'amd64';
@@ -78,7 +79,7 @@ module.exports = function (grunt) {
     ]);
   });
 
-  grunt.task.registerTask('devopsbuild', 'devopsbuild:<platform>:<arch>:env', function (p, a, env = 'prod') {
+  grunt.task.registerTask('devopsbuild', 'devopsbuild:<platform>:<arch>:<env>', function (p, a, env = 'prod') {
     grunt.task.run([
       'config:prod',
       `env:${env}`,
@@ -90,7 +91,7 @@ module.exports = function (grunt) {
       'shell:download_helm_binary:' + p + ':' + a,
       'shell:download_kompose_binary:' + p + ':' + a,
       'shell:download_kubectl_binary:' + p + ':' + a,
-      'webpack:prod',
+      `webpack:${env}`,
     ]);
   });
 };
@@ -114,6 +115,7 @@ gruntfile_cfg.webpack = {
   dev: webpackDevConfig,
   devWatch: Object.assign({ watch: true }, webpackDevConfig),
   prod: webpackProdConfig,
+  testing: webpackTestingConfig,
 };
 
 gruntfile_cfg.config = {
