@@ -97,7 +97,7 @@ func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.
 		isLDAPAdmin, err := handler.isLDAPAdmin(user.Username, ldapSettings)
 		if err != nil {
 			return &httperror.HandlerError{
-				StatusCode: http.StatusUnprocessableEntity,
+				StatusCode: http.StatusInternalServerError,
 				Message:    "Failed to search and match LDAP admin groups",
 				Err:        err,
 			}
@@ -119,14 +119,6 @@ func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.
 					Err:        err,
 				}
 			}
-		}
-		if err := handler.DataStore.User().UpdateUser(user.ID, user); err != nil {
-			return &httperror.HandlerError{
-				StatusCode: http.StatusInternalServerError,
-				Message:    "Unable to update user role inside the database",
-				Err:        err,
-			}
-
 		}
 	}
 
