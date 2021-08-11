@@ -52,7 +52,7 @@ func Test_createEnvFile(t *testing.T) {
 			result, _ := createEnvFile(tt.stack)
 
 			if tt.expected != "" {
-				assert.Equal(t, path.Join(tt.stack.ProjectPath, "stack.env"), result)
+				assert.Equal(t, "stack.env", result)
 
 				f, _ := os.Open(path.Join(dir, "stack.env"))
 				content, _ := ioutil.ReadAll(f)
