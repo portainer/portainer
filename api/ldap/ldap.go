@@ -146,12 +146,6 @@ func (*Service) GetUserGroups(username string, settings *portainer.LDAPSettings,
 
 // SearchGroups searches for groups with the specified settings
 func (*Service) SearchAdminGroups(settings *portainer.LDAPSettings) ([]string, error) {
-	connection, err := createConnection(settings)
-	if err != nil {
-		return nil, errors.WithMessage(err, "failed to esteblish an LDAP connection")
-	}
-	defer connection.Close()
-
 	userGroups, err := searchUserGroups(settings, true)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed searching user groups")
@@ -186,37 +180,6 @@ func (*Service) TestConnectivity(settings *portainer.LDAPSettings) error {
 		return err
 	}
 	return nil
-}
-
-// Get a list of group names for specified user from LDAP/AD
-func getGroups(userDN string, conn *ldap.Conn, settings []portainer.LDAPGroupSearchSettings) []string {
-	groups := make([]string, 0)
-	userDNEscaped := ldap.EscapeFilter(userDN)
-
-	for _, searchSettings := range settings {
-		searchRequest := ldap.NewSearchRequest(
-			searchSettings.GroupBaseDN,
-			ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
-			fmt.Sprintf("(&%s(%s=%s))", searchSettings.GroupFilter, searchSettings.GroupAttribute, userDNEscaped),
-			[]string{"cn"},
-			nil,
-		)
-
-		// Deliberately skip errors on the search request so that we can jump to other search settings
-		// if any issue arise with the current one.
-		sr, err := conn.Search(searchRequest)
-		if err != nil {
-			continue
-		}
-
-		for _, entry := range sr.Entries {
-			for _, attr := range entry.Attributes {
-				groups = append(groups, attr.Values[0])
-			}
-		}
-	}
-
-	return groups
 }
 
 func searchUserGroups(settings *portainer.LDAPSettings, useAutoAdminSearchSettings bool) (map[string][]string, error) {
