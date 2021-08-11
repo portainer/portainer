@@ -60,7 +60,7 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 			return errors.New("Invalid LDAP URL")
 		}
 		if payload.LDAPSettings.AdminAutoPopulate && len(payload.LDAPSettings.AdminGroupSearchSettings) == 0 {
-			return errors.New("Invalid AdminGroupSearchSettings")
+			return errors.New("Missing Admin group Search settings. when AdminAutoPopulate is true, at least one settings is required")
 		}
 		if !payload.LDAPSettings.AdminAutoPopulate && len(payload.LDAPSettings.AdminGroups) > 0 {
 			payload.LDAPSettings.AdminGroups = []string{}
