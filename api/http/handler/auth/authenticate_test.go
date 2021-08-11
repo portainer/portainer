@@ -10,28 +10,25 @@ import (
 
 func TestIsLDAPAdmin_Match(t *testing.T) {
 
-	h := Handler{
-		LDAPService: testhelpers.NewLDAPService(),
-	}
+	ldapService := testhelpers.NewLDAPService()
+
 	mockLDAPSettings := &portainer.LDAPSettings{
-		AdminGroups: []string{"manager", "operator"},
+		AdminGroups: []string{"manager", "stuff"},
 	}
 
-	matched, err := h.isLDAPAdmin("username", mockLDAPSettings)
+	isLDAPAdmin, err := isLDAPAdmin("username", ldapService, mockLDAPSettings)
 	assert.NoError(t, err)
-	assert.Equal(t, true, matched)
+	assert.Equal(t, true, isLDAPAdmin)
 }
 
 func TestIsLDAPAdmin_NotMatch(t *testing.T) {
+	ldapService := testhelpers.NewLDAPService()
 
-	h := Handler{
-		LDAPService: testhelpers.NewLDAPService(),
-	}
 	mockLDAPSettings := &portainer.LDAPSettings{
-		AdminGroups: []string{"admin", "operator"},
+		AdminGroups: []string{"admin", "manager"},
 	}
 
-	matched, err := h.isLDAPAdmin("username", mockLDAPSettings)
+	isLDAPAdmin, err := isLDAPAdmin("username", ldapService, mockLDAPSettings)
 	assert.NoError(t, err)
-	assert.Equal(t, false, matched)
+	assert.Equal(t, false, isLDAPAdmin)
 }

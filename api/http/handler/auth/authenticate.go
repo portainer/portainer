@@ -1,10 +1,11 @@
 package auth
 
 import (
-	"errors"
 	"log"
 	"net/http"
 	"strings"
+
+	errors "github.com/pkg/errors"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
@@ -94,7 +95,7 @@ func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.
 	}
 
 	if ldapSettings.AdminAutoPopulate {
-		isLDAPAdmin, err := handler.isLDAPAdmin(user.Username, ldapSettings)
+		isLDAPAdmin, err := isLDAPAdmin(user.Username, handler.LDAPService, ldapSettings)
 		if err != nil {
 			return &httperror.HandlerError{
 				StatusCode: http.StatusInternalServerError,
@@ -161,10 +162,10 @@ func (handler *Handler) authenticateLDAPAndCreateUser(w http.ResponseWriter, use
 	}
 
 	if ldapSettings.AdminAutoPopulate {
-		isLDAPAdmin, err := handler.isLDAPAdmin(username, ldapSettings)
+		isLDAPAdmin, err := isLDAPAdmin(username, handler.LDAPService, ldapSettings)
 		if err != nil {
 			return &httperror.HandlerError{
-				StatusCode: http.StatusUnprocessableEntity,
+				StatusCode: http.StatusInternalServerError,
 				Message:    "Failed to search and match LDAP admin groups",
 				Err:        err,
 			}
@@ -249,17 +250,21 @@ func (handler *Handler) addUserIntoTeams(user *portainer.User, settings *portain
 	return nil
 }
 
-func (handler *Handler) isLDAPAdmin(username string, ldapSettings *portainer.LDAPSettings) (bool, error) {
-	adminUserGroups, err := handler.LDAPService.GetUserGroups(username, ldapSettings, true)
+func isLDAPAdmin(username string, ldapService portainer.LDAPService, ldapSettings *portainer.LDAPSettings) (bool, error) {
+	//get groups the user belongs to
+	userGroups, err := ldapService.GetUserGroups(username, ldapSettings, true)
 	if err != nil {
-		return false, errors.New("Failed to retrieve user groups from LDAP server")
+		return false, errors.Wrap(err, "failed to retrieve user groups from LDAP server")
 	}
+
+	//convert the AdminGroups recorded in LDAP Settings to a map
 	adminGroupsMap := make(map[string]bool)
 	for _, adminGroup := range ldapSettings.AdminGroups {
 		adminGroupsMap[adminGroup] = true
 	}
 
-	for _, userGroup := range adminUserGroups {
+	//check if any of the user groups matches the admin group records
+	for _, userGroup := range userGroups {
 		if adminGroupsMap[userGroup] {
 			return true, nil
 		}
