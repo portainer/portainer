@@ -24,6 +24,8 @@ type updateStackGitPayload struct {
 	RepositoryAuthentication bool
 	RepositoryUsername       string
 	RepositoryPassword       string
+	// A list of environment variables used during stack deployment
+	Env []portainer.Pair
 }
 
 func (payload *updateStackGitPayload) Validate(r *http.Request) error {
@@ -113,6 +115,8 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
+	
+	stack.Env = payload.Env
 
 	stack.GitConfig.ReferenceName = payload.RepositoryReferenceName
 
@@ -165,6 +169,8 @@ func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, end
 		if httpErr != nil {
 			return httpErr
 		}
+		
+		stack.Env = payload.Env
 
 		err := handler.deploySwarmStack(config)
 		if err != nil {
