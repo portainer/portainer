@@ -81,16 +81,12 @@ class CustomTemplatesViewController {
     return this.currentUser.isAdmin || this.currentUser.id === template.CreatedByUserId;
   }
 
-  getTemplates(endpointMode) {
-    return this.$async(this.getTemplatesAsync, endpointMode);
+  getTemplates() {
+    return this.$async(this.getTemplatesAsync);
   }
-  async getTemplatesAsync({ provider, role }) {
+  async getTemplatesAsync() {
     try {
-      let stackType = 2;
-      if (provider === 'DOCKER_SWARM_MODE' && role === 'MANAGER') {
-        stackType = 1;
-      }
-      this.templates = await this.CustomTemplateService.customTemplates(stackType);
+      this.templates = await this.CustomTemplateService.customTemplates([1, 2]);
     } catch (err) {
       this.Notifications.error('Failed loading templates', err, 'Unable to load custom templates');
     }
@@ -237,7 +233,6 @@ class CustomTemplatesViewController {
       case 2:
         deployable = endpoint.mode.provider === this.DOCKER_STANDALONE;
         break;
-
     }
 
     return deployable;
@@ -251,7 +246,7 @@ class CustomTemplatesViewController {
       apiVersion,
     } = applicationState;
 
-    this.getTemplates(endpointMode);
+    this.getTemplates();
     this.getNetworks(endpointMode.provider, apiVersion);
 
     this.currentUser.isAdmin = this.Authentication.isAdmin();

@@ -6,6 +6,7 @@ export const KubernetesDeployManifestTypes = Object.freeze({
 export const KubernetesDeployBuildMethods = Object.freeze({
   GIT: 1,
   WEB_EDITOR: 2,
+  CUSTOM_TEMPLATE: 3,
 });
 
 export const KubernetesDeployRequestMethods = Object.freeze({
