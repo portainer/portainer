@@ -9,7 +9,11 @@ class KubernetesConfigService {
 
   async downloadConfig() {
     const response = await this.KubernetesConfig.get();
-    return this.FileSaver.saveAs(response.data, 'config');
+
+    const headers = response.headers();
+    const contentDispositionHeader = headers['content-disposition'];
+    const filename = contentDispositionHeader.replace('attachment;', '').trim();
+    return this.FileSaver.saveAs(response.data, filename);
   }
 }
 
