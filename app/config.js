@@ -13,8 +13,7 @@ angular.module('portainer').config([
   function ($urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, $uibTooltipProvider, $compileProvider, cfpLoadingBarProvider) {
     'use strict';
 
-    var environment = '@@ENVIRONMENT';
-    if (environment === 'production') {
+    if (process.env.NODE_ENV === 'testing') {
       $compileProvider.debugInfoEnabled(false);
     }
 
