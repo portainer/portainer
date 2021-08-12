@@ -55,5 +55,5 @@ func newGuidString(t *testing.T) string {
 }
 
 func newRequest(webhookID string) *http.Request {
-	return httptest.NewRequest(http.MethodPost, "/stacks/webhook/"+webhookID, nil)
+	return httptest.NewRequest(http.MethodPost, "/stacks/webhooks/"+webhookID, nil)
 }
