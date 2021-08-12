@@ -28,6 +28,7 @@ import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceRese
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application/index';
 import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
+import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { KubernetesNodeHelper } from 'Kubernetes/node/helper';
 
 class KubernetesCreateApplicationController {
@@ -47,7 +48,6 @@ class KubernetesCreateApplicationController {
     KubernetesNodeService,
     KubernetesIngressService,
     KubernetesPersistentVolumeClaimService,
-    KubernetesNamespaceHelper,
     KubernetesVolumeService,
     RegistryService
   ) {
@@ -64,7 +64,6 @@ class KubernetesCreateApplicationController {
     this.KubernetesVolumeService = KubernetesVolumeService;
     this.KubernetesIngressService = KubernetesIngressService;
     this.KubernetesPersistentVolumeClaimService = KubernetesPersistentVolumeClaimService;
-    this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
     this.RegistryService = RegistryService;
 
     this.ApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
@@ -955,7 +954,7 @@ class KubernetesCreateApplicationController {
         ]);
         this.ingresses = ingresses;
 
-        this.resourcePools = _.filter(resourcePools, (resourcePool) => !this.KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace));
+        this.resourcePools = _.filter(resourcePools, (resourcePool) => !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace));
         this.formValues.ResourcePool = this.resourcePools[0];
         if (!this.formValues.ResourcePool) {
           return;

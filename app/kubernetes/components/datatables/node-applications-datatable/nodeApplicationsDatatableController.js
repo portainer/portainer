@@ -1,12 +1,12 @@
 import { KubernetesApplicationDeploymentTypes } from 'Kubernetes/models/application/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
+import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 
 angular.module('portainer.docker').controller('KubernetesNodeApplicationsDatatableController', [
   '$scope',
   '$controller',
-  'KubernetesNamespaceHelper',
   'DatatableService',
-  function ($scope, $controller, KubernetesNamespaceHelper, DatatableService) {
+  function ($scope, $controller, DatatableService) {
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
 
     this.isSystemNamespace = function (item) {

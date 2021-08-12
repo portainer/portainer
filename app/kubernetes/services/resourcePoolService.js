@@ -75,9 +75,8 @@ export function KubernetesResourcePoolService(
 
   function patch(oldFormValues, newFormValues) {
     return $async(async () => {
-      const [oldNamespace, oldQuota, oldIngresses, oldRegistries] = KubernetesResourcePoolConverter.formValuesToResourcePool(oldFormValues);
-      const [newNamespace, newQuota, newIngresses, newRegistries] = KubernetesResourcePoolConverter.formValuesToResourcePool(newFormValues);
-      void oldNamespace, newNamespace;
+      const [, oldQuota, oldIngresses, oldRegistries] = KubernetesResourcePoolConverter.formValuesToResourcePool(oldFormValues);
+      const [, newQuota, newIngresses, newRegistries] = KubernetesResourcePoolConverter.formValuesToResourcePool(newFormValues);
 
       if (oldQuota && newQuota) {
         await KubernetesResourceQuotaService.patch(oldQuota, newQuota);

@@ -19,7 +19,6 @@ class KubernetesResourcePoolConverter {
     namespace.ResourcePoolName = formValues.Name;
     namespace.ResourcePoolOwner = formValues.Owner;
     namespace.IsSystem = formValues.IsSystem;
-    namespace.NamespaceSystemLabel = formValues.NamespaceSystemLabel;
 
     const quota = KubernetesResourceQuotaConverter.resourcePoolFormValuesToResourceQuota(formValues);
 

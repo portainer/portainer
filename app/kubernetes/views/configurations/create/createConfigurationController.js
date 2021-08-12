@@ -3,10 +3,11 @@ import _ from 'lodash-es';
 import { KubernetesConfigurationFormValues, KubernetesConfigurationFormValuesEntry } from 'Kubernetes/models/configuration/formvalues';
 import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
+import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 
 class KubernetesCreateConfigurationController {
   /* @ngInject */
-  constructor($async, $state, $window, ModalService, Notifications, Authentication, KubernetesConfigurationService, KubernetesResourcePoolService, KubernetesNamespaceHelper) {
+  constructor($async, $state, $window, ModalService, Notifications, Authentication, KubernetesConfigurationService, KubernetesResourcePoolService) {
     this.$async = $async;
     this.$state = $state;
     this.$window = $window;
@@ -16,7 +17,6 @@ class KubernetesCreateConfigurationController {
     this.KubernetesConfigurationService = KubernetesConfigurationService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesConfigurationTypes = KubernetesConfigurationTypes;
-    this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
 
     this.onInit = this.onInit.bind(this);
     this.createConfigurationAsync = this.createConfigurationAsync.bind(this);
@@ -94,7 +94,7 @@ class KubernetesCreateConfigurationController {
 
     try {
       const resourcePools = await this.KubernetesResourcePoolService.get();
-      this.resourcePools = _.filter(resourcePools, (resourcePool) => !this.KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace));
+      this.resourcePools = _.filter(resourcePools, (resourcePool) => !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace));
 
       this.formValues.ResourcePool = this.resourcePools[0];
       await this.getConfigurations();

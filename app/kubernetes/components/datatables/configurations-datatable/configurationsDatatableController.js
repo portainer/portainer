@@ -1,12 +1,12 @@
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
+import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 
 angular.module('portainer.docker').controller('KubernetesConfigurationsDatatableController', [
   '$scope',
   '$controller',
-  'KubernetesNamespaceHelper',
   'DatatableService',
   'Authentication',
-  function ($scope, $controller, KubernetesNamespaceHelper, DatatableService, Authentication) {
+  function ($scope, $controller, DatatableService, Authentication) {
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
 
     const ctrl = this;

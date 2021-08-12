@@ -15,6 +15,7 @@ import { KubernetesFormValidationReferences } from 'Kubernetes/models/applicatio
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
 import KubernetesResourceQuotaConverter from 'Kubernetes/converters/resourceQuota';
+import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 
 class KubernetesResourcePoolController {
   /* #region  CONSTRUCTOR */
@@ -34,7 +35,6 @@ class KubernetesResourcePoolController {
     KubernetesEventService,
     KubernetesPodService,
     KubernetesApplicationService,
-    KubernetesNamespaceHelper,
     KubernetesIngressService,
     KubernetesVolumeService
   ) {
@@ -53,7 +53,6 @@ class KubernetesResourcePoolController {
       KubernetesEventService,
       KubernetesPodService,
       KubernetesApplicationService,
-      KubernetesNamespaceHelper,
       KubernetesIngressService,
       KubernetesVolumeService,
     });
@@ -394,7 +393,6 @@ class KubernetesResourcePoolController {
         this.formValues.Name = this.pool.Namespace.Name;
         this.formValues.EndpointId = this.endpoint.Id;
         this.formValues.IsSystem = this.pool.Namespace.IsSystem;
-        this.formValues.NamespaceSystemLabel = this.pool.Namespace.NamespaceSystemLabel;
 
         _.forEach(nodes, (item) => {
           this.state.sliderMaxMemory += filesizeParser(item.Memory);
@@ -412,8 +410,8 @@ class KubernetesResourcePoolController {
           this.state.resourceReservation.Memory = KubernetesResourceReservationHelper.megaBytesValue(quota.MemoryLimitUsed);
         }
 
-        this.isSystem = this.KubernetesNamespaceHelper.isSystemNamespace(this.pool.Namespace);
-        this.isEditable = !this.KubernetesNamespaceHelper.isSystemNamespace(this.pool.Namespace);
+        this.isSystem = KubernetesNamespaceHelper.isSystemNamespace(this.pool.Namespace);
+        this.isEditable = !KubernetesNamespaceHelper.isSystemNamespace(this.pool.Namespace);
         if (this.pool.Namespace.Name === 'default') {
           this.isEditable = false;
         }

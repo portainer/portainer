@@ -1,15 +1,15 @@
 import _ from 'lodash-es';
 import { KubernetesApplicationDeploymentTypes } from 'Kubernetes/models/application/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
+import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 
 angular.module('portainer.docker').controller('KubernetesApplicationsPortsDatatableController', [
   '$scope',
   '$controller',
-  'KubernetesNamespaceHelper',
   'DatatableService',
   'Authentication',
-  function ($scope, $controller, KubernetesNamespaceHelper, DatatableService, Authentication) {
+  function ($scope, $controller, DatatableService, Authentication) {
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
     this.state = Object.assign(this.state, {
       expandedItems: [],

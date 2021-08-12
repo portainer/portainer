@@ -6,7 +6,6 @@ export function KubernetesResourcePoolFormValues(defaults) {
   this.IngressClasses = []; // KubernetesResourcePoolIngressClassFormValue
   this.Registries = []; // RegistryViewModel
   this.EndpointId = 0;
-  this.NamespaceSystemLabel = '';
   this.IsSystem = false;
 }
 
