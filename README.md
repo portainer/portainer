@@ -57,9 +57,9 @@ You can join the Portainer Community by visiting community.portainer.io. This wi
 
 - Here at Portainer, we believe in [responsible disclosure](https://en.wikipedia.org/wiki/Responsible_disclosure) of security issues. If you have found a security issue, please report it to <security@portainer.io>.
 
-# WORK FOR US
+## WORK FOR US
 
-- If you are a developer, and our code in this repo makes sense to you, we would love to hear from you. We are always on the hunt for awesome devs, either freelance or employed. Drop us a line to info@portainer.io with your details and we will be in touch. 
+If you are a developer, and our code in this repo makes sense to you, we would love to hear from you. We are always on the hunt for awesome devs, either freelance or employed. Drop us a line to info@portainer.io with your details and we will be in touch. 
 
 ## Privacy
 
