@@ -7,7 +7,7 @@ angular.module('portainer.docker').controller('ImageController', [
   '$scope',
   '$transition$',
   '$state',
-  'endpoint',
+  'Authentication',
   'ImageService',
   'ImageHelper',
   'RegistryService',
@@ -16,14 +16,34 @@ angular.module('portainer.docker').controller('ImageController', [
   'ModalService',
   'FileSaver',
   'Blob',
-  function ($async, $q, $scope, $transition$, $state, endpoint, ImageService, ImageHelper, RegistryService, Notifications, HttpRequestHelper, ModalService, FileSaver, Blob) {
+  'endpoint',
+  function (
+    $async,
+    $q,
+    $scope,
+    $transition$,
+    $state,
+    Authentication,
+    ImageService,
+    ImageHelper,
+    RegistryService,
+    Notifications,
+    HttpRequestHelper,
+    ModalService,
+    FileSaver,
+    Blob,
+    endpoint
+  ) {
     $scope.endpoint = endpoint;
+    $scope.isAdmin = Authentication.isAdmin();
+
     $scope.formValues = {
       RegistryModel: new PorImageRegistryModel(),
     };
 
     $scope.state = {
       exportInProgress: false,
+      pullImageValidity: false,
     };
 
     $scope.sortType = 'Order';
@@ -39,6 +59,11 @@ angular.module('portainer.docker').controller('ImageController', [
       $('#layer-command-' + layerId + '-short').toggle();
       $('#layer-command-' + layerId + '-full').toggle();
     };
+
+    $scope.setPullImageValidity = setPullImageValidity;
+    function setPullImageValidity(validity) {
+      $scope.state.pullImageValidity = validity;
+    }
 
     $scope.tagImage = function () {
       const registryModel = $scope.formValues.RegistryModel;
