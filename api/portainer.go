@@ -684,6 +684,8 @@ type (
 		UserSessionTimeout string `json:"UserSessionTimeout" example:"5m"`
 		// Whether telemetry is enabled
 		EnableTelemetry bool `json:"EnableTelemetry" example:"false"`
+		// Helm repository URL, defaults to "https://charts.bitnami.com/bitnami"
+		HelmRepositoryURL string `json:"HelmRepositoryURL" example:"https://charts.bitnami.com/bitnami"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
