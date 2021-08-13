@@ -10,6 +10,7 @@ export function SettingsViewModel(data) {
   this.EnableEdgeComputeFeatures = data.EnableEdgeComputeFeatures;
   this.UserSessionTimeout = data.UserSessionTimeout;
   this.EnableTelemetry = data.EnableTelemetry;
+  this.KubeconfigExpiry = data.KubeconfigExpiry;
 }
 
 export function PublicSettingsViewModel(settings) {

@@ -20,6 +20,7 @@ type Handler struct {
 	dataStore               portainer.DataStore
 	kubernetesClientFactory *cli.ClientFactory
 	authorizationService    *authorization.Service
+	JwtService              portainer.JWTService
 }
 
 // NewHandler creates a handler to process pre-proxied requests to external APIs.

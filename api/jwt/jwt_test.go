@@ -10,7 +10,7 @@ import (
 )
 
 func TestGenerateSignedToken(t *testing.T) {
-	svc, err := NewService("24h")
+	svc, err := NewService("24h", nil)
 	assert.NoError(t, err, "failed to create a copy of service")
 
 	token := &portainer.TokenData{

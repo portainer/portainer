@@ -16,6 +16,7 @@ import (
 type Service struct {
 	secret             []byte
 	userSessionTimeout time.Duration
+	dataStore          portainer.DataStore
 }
 
 type claims struct {
@@ -31,7 +32,7 @@ var (
 )
 
 // NewService initializes a new service. It will generate a random key that will be used to sign JWT tokens.
-func NewService(userSessionDuration string) (*Service, error) {
+func NewService(userSessionDuration string, dataStore portainer.DataStore) (*Service, error) {
 	userSessionTimeout, err := time.ParseDuration(userSessionDuration)
 	if err != nil {
 		return nil, err
@@ -45,6 +46,7 @@ func NewService(userSessionDuration string) (*Service, error) {
 	service := &Service{
 		secret,
 		userSessionTimeout,
+		dataStore,
 	}
 	return service, nil
 }
@@ -93,12 +95,16 @@ func (service *Service) generateSignedToken(data *portainer.TokenData, expiryTim
 	if expiryTime != nil && !expiryTime.IsZero() {
 		expireToken = expiryTime.Unix()
 	}
+	return service.generateSignedTokenExpiresAt(data, expireToken)
+}
+
+func (service *Service) generateSignedTokenExpiresAt(data *portainer.TokenData, expiresAt int64) (string, error) {
 	cl := claims{
 		UserID:   int(data.ID),
 		Username: data.Username,
 		Role:     int(data.Role),
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expireToken,
+			ExpiresAt: expiresAt,
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, cl)

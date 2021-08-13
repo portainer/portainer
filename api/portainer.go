@@ -682,6 +682,8 @@ type (
 		EnableEdgeComputeFeatures bool `json:"EnableEdgeComputeFeatures" example:""`
 		// The duration of a user session
 		UserSessionTimeout string `json:"UserSessionTimeout" example:"5m"`
+		// The expiry of a Kubeconfig
+		KubeconfigExpiry string `json:"KubeconfigExpiry" example:"24h"`
 		// Whether telemetry is enabled
 		EnableTelemetry bool `json:"EnableTelemetry" example:"false"`
 
@@ -1208,6 +1210,7 @@ type (
 	JWTService interface {
 		GenerateToken(data *TokenData) (string, error)
 		GenerateTokenForOAuth(data *TokenData, expiryTime *time.Time) (string, error)
+		GenerateTokenForKubeconfig(data *TokenData) (string, error)
 		ParseAndVerifyToken(token string) (*TokenData, error)
 		SetUserSessionDuration(userSessionDuration time.Duration)
 	}
@@ -1444,6 +1447,8 @@ const (
 	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates-2.0.json"
 	// DefaultUserSessionTimeout represents the default timeout after which the user session is cleared
 	DefaultUserSessionTimeout = "8h"
+	// DefaultUserSessionTimeout represents the default timeout after which the user session is cleared
+	DefaultKubeconfigExpiry = "0"
 )
 
 const (

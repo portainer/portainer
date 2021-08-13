@@ -24,7 +24,28 @@ angular.module('portainer.app').controller('SettingsController', [
           value: 30,
         },
       ],
-
+      availableKubeconfigExpiryOptions: [
+        {
+          key: '1 day',
+          value: '24h',
+        },
+        {
+          key: '7 day',
+          value: `${24 * 7}h`,
+        },
+        {
+          key: '30 day',
+          value: `${24 * 30}h`,
+        },
+        {
+          key: '1 year',
+          value: `${24 * 30 * 12}h`,
+        },
+        {
+          key: 'No expiry',
+          value: '0',
+        },
+      ],
       backupInProgress: false,
     };
 
