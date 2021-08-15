@@ -684,6 +684,8 @@ type (
 		UserSessionTimeout string `json:"UserSessionTimeout" example:"5m"`
 		// Whether telemetry is enabled
 		EnableTelemetry bool `json:"EnableTelemetry" example:"false"`
+		// Helm repository URL, defaults to "https://charts.bitnami.com/bitnami"
+		HelmRepositoryURL string `json:"HelmRepositoryURL" example:"https://charts.bitnami.com/bitnami"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
@@ -1441,6 +1443,8 @@ const (
 	DefaultEdgeAgentCheckinIntervalInSeconds = 5
 	// DefaultTemplatesURL represents the URL to the official templates supported by Portainer
 	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates-2.0.json"
+	// DefaultHelmrepositoryURL represents the URL to the official templates supported by Bitnami
+	DefaultHelmRepositoryURL = "https://charts.bitnami.com/bitnami"
 	// DefaultUserSessionTimeout represents the default timeout after which the user session is cleared
 	DefaultUserSessionTimeout = "8h"
 )

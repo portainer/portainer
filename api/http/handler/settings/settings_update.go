@@ -34,6 +34,8 @@ type settingsUpdatePayload struct {
 	UserSessionTimeout *string `example:"5m"`
 	// Whether telemetry is enabled
 	EnableTelemetry *bool `example:"false"`
+	// Helm repository URL
+	HelmRepositoryURL *string `example:"https://charts.bitnami.com/bitnami"`
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
@@ -45,6 +47,9 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 	}
 	if payload.TemplatesURL != nil && *payload.TemplatesURL != "" && !govalidator.IsURL(*payload.TemplatesURL) {
 		return errors.New("Invalid external templates URL. Must correspond to a valid URL format")
+	}
+	if payload.HelmRepositoryURL != nil && *payload.HelmRepositoryURL != "" && !govalidator.IsURL(*payload.HelmRepositoryURL) {
+		return errors.New("Invalid Helm repository URL. Must correspond to a valid URL format")
 	}
 	if payload.UserSessionTimeout != nil {
 		_, err := time.ParseDuration(*payload.UserSessionTimeout)
@@ -91,6 +96,10 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.TemplatesURL != nil {
 		settings.TemplatesURL = *payload.TemplatesURL
+	}
+
+	if payload.HelmRepositoryURL != nil {
+		settings.HelmRepositoryURL = *payload.HelmRepositoryURL
 	}
 
 	if payload.BlackListedLabels != nil {

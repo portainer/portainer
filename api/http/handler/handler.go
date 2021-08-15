@@ -16,6 +16,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
 	"github.com/portainer/portainer/api/http/handler/endpoints"
 	"github.com/portainer/portainer/api/http/handler/file"
+	"github.com/portainer/portainer/api/http/handler/helm"
 	"github.com/portainer/portainer/api/http/handler/kubernetes"
 	"github.com/portainer/portainer/api/http/handler/motd"
 	"github.com/portainer/portainer/api/http/handler/registries"
@@ -29,6 +30,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/teammemberships"
 	"github.com/portainer/portainer/api/http/handler/teams"
 	"github.com/portainer/portainer/api/http/handler/templates"
+	"github.com/portainer/portainer/api/http/handler/helmcharts"
 	"github.com/portainer/portainer/api/http/handler/upload"
 	"github.com/portainer/portainer/api/http/handler/users"
 	"github.com/portainer/portainer/api/http/handler/webhooks"
@@ -47,8 +49,10 @@ type Handler struct {
 	EndpointEdgeHandler    *endpointedge.Handler
 	EndpointGroupHandler   *endpointgroups.Handler
 	EndpointHandler        *endpoints.Handler
+	EndpointHelmHandler    *helm.Handler
 	EndpointProxyHandler   *endpointproxy.Handler
 	FileHandler            *file.Handler
+	HelmTemplatesHandler   *helm.Handler
 	KubernetesHandler      *kubernetes.Handler
 	MOTDHandler            *motd.Handler
 	RegistryHandler        *registries.Handler
@@ -62,6 +66,7 @@ type Handler struct {
 	TeamMembershipHandler  *teammemberships.Handler
 	TeamHandler            *teams.Handler
 	TemplatesHandler       *templates.Handler
+	HelmchartsHandler      *helmcharts.Handler
 	UploadHandler          *upload.Handler
 	UserHandler            *users.Handler
 	WebSocketHandler       *websocket.Handler
@@ -166,6 +171,11 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.EndpointGroupHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/kubernetes"):
 		http.StripPrefix("/api", h.KubernetesHandler).ServeHTTP(w, r)
+
+	// Helm subpath under kubernetes -> /api/endpoints/{id}/kubernetes/helm
+	case strings.HasPrefix(r.URL.Path, "/api/endpoints/") && strings.Contains(r.URL.Path, "/kubernetes/helm"):
+		http.StripPrefix("/api/endpoints", h.EndpointHelmHandler).ServeHTTP(w, r)
+
 	case strings.HasPrefix(r.URL.Path, "/api/endpoints"):
 		switch {
 		case strings.Contains(r.URL.Path, "/docker/"):
@@ -199,8 +209,12 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.StatusHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/tags"):
 		http.StripPrefix("/api", h.TagHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/templates/helm"):
+		http.StripPrefix("/api", h.HelmTemplatesHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/templates"):
 		http.StripPrefix("/api", h.TemplatesHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/helmcharts"):
+		http.StripPrefix("/api", h.HelmchartsHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/upload"):
 		http.StripPrefix("/api", h.UploadHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/users"):
