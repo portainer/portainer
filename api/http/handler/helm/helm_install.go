@@ -86,9 +86,9 @@ func (handler *Handler) helmInstall(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusUnauthorized, "Unauthorized", err}
 	}
 
-	settings, err := handler.dataStore.Settings().Settings()
-	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve settings", Err: err}
+	repo, httperr := handler.getHelmRepositoryUrl()
+	if httperr != nil {
+		return httperr
 	}
 
 	payload, err := readPayload(r)
