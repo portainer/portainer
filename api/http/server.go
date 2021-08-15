@@ -28,6 +28,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/endpoints"
 	"github.com/portainer/portainer/api/http/handler/file"
 	helmhandler "github.com/portainer/portainer/api/http/handler/helm"
+	"github.com/portainer/portainer/api/http/handler/helmcharts"
 	kubehandler "github.com/portainer/portainer/api/http/handler/kubernetes"
 	"github.com/portainer/portainer/api/http/handler/motd"
 	"github.com/portainer/portainer/api/http/handler/registries"
@@ -222,6 +223,9 @@ func (server *Server) Start() error {
 	templatesHandler.FileService = server.FileService
 	templatesHandler.GitService = server.GitService
 
+	var helmchartsHandler = helmcharts.NewHandler(requestBouncer)
+	helmchartsHandler.DataStore = server.DataStore
+
 	var uploadHandler = upload.NewHandler(requestBouncer)
 	uploadHandler.FileService = server.FileService
 
@@ -267,6 +271,7 @@ func (server *Server) Start() error {
 		TeamHandler:            teamHandler,
 		TeamMembershipHandler:  teamMembershipHandler,
 		TemplatesHandler:       templatesHandler,
+		HelmchartsHandler:      helmchartsHandler,
 		UploadHandler:          uploadHandler,
 		UserHandler:            userHandler,
 		WebSocketHandler:       websocketHandler,
