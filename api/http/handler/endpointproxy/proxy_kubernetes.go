@@ -65,17 +65,18 @@ func (handler *Handler) proxyRequestsToKubernetesAPI(w http.ResponseWriter, r *h
 		}
 	}
 
+	//  For KubernetesLocalEnvironment
 	requestPrefix := fmt.Sprintf("/%d/kubernetes", endpointID)
+
 	if endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
-		if isKubernetesRequest(strings.TrimPrefix(r.URL.String(), requestPrefix)) {
-			requestPrefix = fmt.Sprintf("/%d", endpointID)
+		requestPrefix = fmt.Sprintf("/%d", endpointID)
+
+		agentPrefix := fmt.Sprintf("/%d/agent/kubernetes", endpointID)
+		if strings.HasPrefix(r.URL.Path, agentPrefix) {
+			requestPrefix = agentPrefix
 		}
 	}
 
 	http.StripPrefix(requestPrefix, proxy).ServeHTTP(w, r)
 	return nil
-}
-
-func isKubernetesRequest(requestURL string) bool {
-	return strings.HasPrefix(requestURL, "/api") || strings.HasPrefix(requestURL, "/healthz")
 }
