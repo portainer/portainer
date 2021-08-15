@@ -1,7 +1,4 @@
 class GitFormAdditionalFileItemController {
-  /* @ngInject */
-  constructor() {}
-
   onChangePath(value) {
     const fieldIsInvalid = typeof value === 'undefined';
     if (fieldIsInvalid) {

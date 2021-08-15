@@ -1,6 +1,6 @@
 import angular from 'angular';
-import _ from 'lodash-es';
 import uuidv4 from 'uuid/v4';
+
 import { AccessControlFormData } from '../../../components/accessControlForm/porAccessControlFormModel';
 
 angular
@@ -25,6 +25,8 @@ angular
     WebhookHelper,
     clipboard
   ) {
+    $scope.onChangeTemplateId = onChangeTemplateId;
+
     $scope.formValues = {
       Name: '',
       StackFileContent: '',
@@ -60,9 +62,9 @@ angular
       }
     };
 
-    $scope.$on('$destroy', function() {
+    $scope.$on('$destroy', function () {
       $scope.state.isEditorDirty = false;
-    })
+    });
 
     $scope.onChangeFormValues = onChangeFormValues;
 
@@ -219,8 +221,8 @@ angular
         });
     };
 
-    $scope.editorUpdate = function (cm) {
-      $scope.formValues.StackFileContent = cm.getValue();
+    $scope.onChangeFileContent = function onChangeFileContent(value) {
+      $scope.formValues.StackFileContent = value;
       $scope.state.editorYamlValidationError = StackHelper.validateYAML($scope.formValues.StackFileContent, $scope.containerNames);
       $scope.state.isEditorDirty = true;
     };
@@ -244,28 +246,24 @@ angular
       }
     };
 
-    $scope.onChangeTemplate = async function onChangeTemplate(template) {
-      try {
-        $scope.formValues.StackFileContent = undefined;
-        $scope.selectedTemplate = template;
-        $scope.formValues.StackFileContent = await CustomTemplateService.customTemplateFile(template.Id);
-      } catch (err) {
-        Notifications.error('Failure', err, 'Unable to retrieve Custom Template file');
-      }
-    };
+    function onChangeTemplateId(templateId) {
+      return $async(async () => {
+        try {
+          $scope.state.templateId = templateId;
+
+          const fileContent = await CustomTemplateService.customTemplateFile(templateId);
+          $scope.onChangeFileContent(fileContent);
+        } catch (err) {
+          this.Notifications.error('Failure', err, 'Unable to retrieve Custom Template file');
+        }
+      });
+    }
 
     async function initView() {
       var endpointMode = $scope.applicationState.endpoint.mode;
       $scope.state.StackType = 2;
       if (endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER') {
         $scope.state.StackType = 1;
-      }
-
-      try {
-        const templates = await CustomTemplateService.customTemplates($scope.state.StackType);
-        $scope.templates = _.map(templates, (template) => ({ ...template, label: `${template.Title} - ${template.Description}` }));
-      } catch (err) {
-        Notifications.error('Failure', err, 'Unable to retrieve Custom Templates');
       }
 
       try {
