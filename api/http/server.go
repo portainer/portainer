@@ -13,6 +13,7 @@ import (
 	"github.com/portainer/portainer/api/adminmonitor"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/docker"
+	"github.com/portainer/portainer/api/exec/helm"
 	"github.com/portainer/portainer/api/http/handler"
 	"github.com/portainer/portainer/api/http/handler/auth"
 	"github.com/portainer/portainer/api/http/handler/backup"
@@ -26,6 +27,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
 	"github.com/portainer/portainer/api/http/handler/endpoints"
 	"github.com/portainer/portainer/api/http/handler/file"
+	helmhandler "github.com/portainer/portainer/api/http/handler/helm"
 	kube "github.com/portainer/portainer/api/http/handler/kubernetes"
 	"github.com/portainer/portainer/api/http/handler/motd"
 	"github.com/portainer/portainer/api/http/handler/registries"
@@ -39,6 +41,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/teammemberships"
 	"github.com/portainer/portainer/api/http/handler/teams"
 	"github.com/portainer/portainer/api/http/handler/templates"
+	"github.com/portainer/portainer/api/http/handler/helmcharts"
 	"github.com/portainer/portainer/api/http/handler/upload"
 	"github.com/portainer/portainer/api/http/handler/users"
 	"github.com/portainer/portainer/api/http/handler/webhooks"
@@ -49,6 +52,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/ssl"
+	k8s "github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
@@ -74,11 +78,13 @@ type Server struct {
 	SwarmStackManager           portainer.SwarmStackManager
 	ProxyManager                *proxy.Manager
 	KubernetesTokenCacheManager *kubernetes.TokenCacheManager
+	KubeConfigService           k8s.KubeConfigService
 	Handler                     *handler.Handler
 	SSLService                  *ssl.Service
 	DockerClientFactory         *docker.ClientFactory
 	KubernetesClientFactory     *cli.ClientFactory
 	KubernetesDeployer          portainer.KubernetesDeployer
+	HelmPackageManager          helm.HelmPackageManager
 	ShutdownCtx                 context.Context
 	ShutdownTrigger             context.CancelFunc
 }
@@ -160,6 +166,14 @@ func (server *Server) Start() error {
 	kubernetesHandler.DataStore = server.DataStore
 	kubernetesHandler.KubernetesClientFactory = server.KubernetesClientFactory
 
+	var endpointHelmHandler = helmhandler.NewHandler(requestBouncer)
+	endpointHelmHandler.DataStore = server.DataStore
+	endpointHelmHandler.HelmPackageManager = server.HelmPackageManager
+
+	var helmTemplatesHandler = helmhandler.NewTemplateHandler(requestBouncer)
+	helmTemplatesHandler.DataStore = server.DataStore
+	helmTemplatesHandler.HelmPackageManager = server.HelmPackageManager
+
 	var motdHandler = motd.NewHandler(requestBouncer)
 
 	var registryHandler = registries.NewHandler(requestBouncer)
@@ -206,6 +220,9 @@ func (server *Server) Start() error {
 	templatesHandler.FileService = server.FileService
 	templatesHandler.GitService = server.GitService
 
+	var helmchartsHandler = helmcharts.NewHandler(requestBouncer)
+	helmchartsHandler.DataStore = server.DataStore
+
 	var uploadHandler = upload.NewHandler(requestBouncer)
 	uploadHandler.FileService = server.FileService
 
@@ -234,9 +251,11 @@ func (server *Server) Start() error {
 		EdgeTemplatesHandler:   edgeTemplatesHandler,
 		EndpointGroupHandler:   endpointGroupHandler,
 		EndpointHandler:        endpointHandler,
+		EndpointHelmHandler:    endpointHelmHandler,
 		EndpointEdgeHandler:    endpointEdgeHandler,
 		EndpointProxyHandler:   endpointProxyHandler,
 		FileHandler:            fileHandler,
+		HelmTemplatesHandler:   helmTemplatesHandler,
 		KubernetesHandler:      kubernetesHandler,
 		MOTDHandler:            motdHandler,
 		RegistryHandler:        registryHandler,
@@ -249,6 +268,7 @@ func (server *Server) Start() error {
 		TeamHandler:            teamHandler,
 		TeamMembershipHandler:  teamMembershipHandler,
 		TemplatesHandler:       templatesHandler,
+		HelmchartsHandler:      helmchartsHandler,
 		UploadHandler:          uploadHandler,
 		UserHandler:            userHandler,
 		WebSocketHandler:       websocketHandler,
