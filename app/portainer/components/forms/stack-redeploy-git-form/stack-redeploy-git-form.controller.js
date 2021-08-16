@@ -14,6 +14,7 @@ class StackRedeployGitFormController {
       inProgress: false,
       redeployInProgress: false,
       showConfig: false,
+      isEdit: false,
     };
 
     this.formValues = {
@@ -122,6 +123,7 @@ class StackRedeployGitFormController {
     if (this.stack.GitConfig && this.stack.GitConfig.Authentication) {
       this.formValues.RepositoryUsername = this.stack.GitConfig.Authentication.Username;
       this.formValues.RepositoryAuthentication = true;
+      this.state.isEdit = true;
     }
   }
 }
