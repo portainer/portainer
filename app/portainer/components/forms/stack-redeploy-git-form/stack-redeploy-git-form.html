@@ -30,7 +30,13 @@
     </div>
   </div>
   <git-form-ref-field ng-if="$ctrl.state.showConfig" value="$ctrl.formValues.RefName" on-change="($ctrl.onChangeRef)"></git-form-ref-field>
-  <git-form-auth-fieldset ng-if="$ctrl.state.showConfig" model="$ctrl.formValues" on-change="($ctrl.onChange)" show-auth-explanation="true"></git-form-auth-fieldset>
+  <git-form-auth-fieldset
+    ng-if="$ctrl.state.showConfig"
+    is-edit="$ctrl.state.isEdit"
+    model="$ctrl.formValues"
+    on-change="($ctrl.onChange)"
+    show-auth-explanation="true"
+  ></git-form-auth-fieldset>
   <environment-variables-panel
     ng-model="$ctrl.formValues.Env"
     explanation="These values will be used as substitutions in the stack file"
