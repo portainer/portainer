@@ -21,13 +21,13 @@ import (
 // @failure 500 "Server error"
 // @router /templates/helm [get]
 func (handler *Handler) helmRepoSearch(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	repo, httperr := handler.getHelmRepositoryUrl()
-	if httperr != nil {
-		return httperr
+	settings, err := handler.DataStore.Settings().Settings()
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve settings", Err: err}
 	}
 
 	searchOpts := helm.SearchRepoOptions{
-		Repo: repo,
+		Repo: settings.HelmRepositoryURL,
 	}
 
 	result, err := handler.HelmPackageManager.SearchRepo(searchOpts)

@@ -87,26 +87,6 @@ func (handler *Handler) GetEndpoint(r *http.Request) (*portainer.Endpoint, *http
 	return endpoint, nil
 }
 
-// getHelmRepositoryUrl gets the helm repository url from settings
-func (handler *Handler) getHelmRepositoryUrl() (string, *httperror.HandlerError) {
-
-	settings, err := handler.DataStore.Settings().Settings()
-	if err != nil {
-		return "", &httperror.HandlerError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    "Unable to retrieve settings",
-			Err:        err,
-		}
-	}
-
-	repo := settings.HelmRepositoryURL
-	if repo == "" {
-		repo = defaultHelmRepoURL
-	}
-
-	return repo, nil
-}
-
 // getProxyUrl generates portainer proxy url which acts as proxy to k8s api server
 func getProxyUrl(r *http.Request, endpointID portainer.EndpointID) string {
 	return fmt.Sprintf("https://%s/api/endpoints/%d/kubernetes", r.Host, endpointID)
