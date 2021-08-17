@@ -7,8 +7,8 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/pkg/errors"
 	wrapper "github.com/portainer/docker-compose-wrapper"
-
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/proxy/factory"
@@ -35,12 +35,6 @@ func NewComposeStackManager(binaryPath string, configPath string, proxyManager *
 	}, nil
 }
 
-// NormalizeStackName returns a new stack name with unsupported characters replaced
-func (w *ComposeStackManager) NormalizeStackName(name string) string {
-	r := regexp.MustCompile("[^a-z0-9]+")
-	return r.ReplaceAllString(strings.ToLower(name), "")
-}
-
 // ComposeSyntaxMaxVersion returns the maximum supported version of the docker compose syntax
 func (w *ComposeStackManager) ComposeSyntaxMaxVersion() string {
 	return portainer.ComposeSyntaxMaxVersion
@@ -50,7 +44,7 @@ func (w *ComposeStackManager) ComposeSyntaxMaxVersion() string {
 func (w *ComposeStackManager) Up(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	url, proxy, err := w.fetchEndpointProxy(endpoint)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to featch endpoint proxy")
 	}
 
 	if proxy != nil {
@@ -59,13 +53,12 @@ func (w *ComposeStackManager) Up(stack *portainer.Stack, endpoint *portainer.End
 
 	envFilePath, err := createEnvFile(stack)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to create env file")
 	}
 
-	filePath := stackFilePath(stack)
-
-	_, err = w.wrapper.Up([]string{filePath}, url, stack.Name, envFilePath, w.configPath)
-	return err
+	filePaths := append([]string{stack.EntryPoint}, stack.AdditionalFiles...)
+	_, err = w.wrapper.Up(filePaths, stack.ProjectPath, url, stack.Name, envFilePath, w.configPath)
+	return errors.Wrap(err, "failed to deploy a stack")
 }
 
 // Down stops and removes containers, networks, images, and volumes. Wraps `docker-compose down --remove-orphans` command
@@ -78,14 +71,16 @@ func (w *ComposeStackManager) Down(stack *portainer.Stack, endpoint *portainer.E
 		defer proxy.Close()
 	}
 
-	filePath := stackFilePath(stack)
+	filePaths := append([]string{stack.EntryPoint}, stack.AdditionalFiles...)
 
-	_, err = w.wrapper.Down([]string{filePath}, url, stack.Name)
+	_, err = w.wrapper.Down(filePaths, stack.ProjectPath, url, stack.Name)
 	return err
 }
 
-func stackFilePath(stack *portainer.Stack) string {
-	return path.Join(stack.ProjectPath, stack.EntryPoint)
+// NormalizeStackName returns a new stack name with unsupported characters replaced
+func (w *ComposeStackManager) NormalizeStackName(name string) string {
+	r := regexp.MustCompile("[^a-z0-9]+")
+	return r.ReplaceAllString(strings.ToLower(name), "")
 }
 
 func (w *ComposeStackManager) fetchEndpointProxy(endpoint *portainer.Endpoint) (string, *factory.ProxyServer, error) {
@@ -118,5 +113,5 @@ func createEnvFile(stack *portainer.Stack) (string, error) {
 	}
 	envfile.Close()
 
-	return envFilePath, nil
+	return "stack.env", nil
 }

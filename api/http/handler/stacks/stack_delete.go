@@ -96,6 +96,11 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 		}
 	}
 
+	// stop scheduler updates of the stack before removal
+	if stack.AutoUpdate != nil {
+		stopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
+	}
+
 	err = handler.deleteStack(stack, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
