@@ -143,6 +143,8 @@ func (server *Server) Start() error {
 	endpointHandler.ReverseTunnelService = server.ReverseTunnelService
 	endpointHandler.ComposeStackManager = server.ComposeStackManager
 	endpointHandler.AuthorizationService = server.AuthorizationService
+	endpointHandler.BindAddress = server.BindAddress
+	endpointHandler.BindAddressHTTPS = server.BindAddressHTTPS
 
 	var endpointEdgeHandler = endpointedge.NewHandler(requestBouncer)
 	endpointEdgeHandler.DataStore = server.DataStore
