@@ -1,0 +1,23 @@
+<div class="col-sm-12 form-section-title">
+  Redeploy from git repository
+</div>
+<div class="form-group text-muted">
+  <div class="col-sm-12">
+    <p>
+      Pull the latest manifest from git and redeploy the application.
+    </p>
+  </div>
+</div>
+
+<div class="form-group">
+  <div class="col-sm-12">
+    <p>
+      <a class="small interactive" ng-click="$ctrl.showConfig = !$ctrl.showConfig">
+        <i ng-class="{ 'fa fa-minus space-right': $ctrl.showConfig, 'fa fa-plus space-right': !$ctrl.showConfig }" aria-hidden="true"></i>
+        {{ $ctrl.showConfig ? 'Hide' : 'Advanced' }} configuration
+      </a>
+    </p>
+  </div>
+</div>
+<git-form-ref-field ng-if="$ctrl.showConfig" value="$ctrl.gitFormValues.RefName" on-change="($ctrl.onChangeRef)"></git-form-ref-field>
+<git-form-auth-fieldset ng-if="$ctrl.showConfig" model="$ctrl.gitFormValues" on-change="($ctrl.onChange)" show-auth-explanation="true"></git-form-auth-fieldset>

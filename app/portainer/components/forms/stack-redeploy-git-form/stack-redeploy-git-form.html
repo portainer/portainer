@@ -2,41 +2,24 @@
   <div class="col-sm-12 form-section-title">
     Redeploy from git repository
   </div>
-  <div class="text-muted small form-group">
-    <div class="col-sm-12">
-      <p>
-        This stack was deployed from the git repository <code>{{ $ctrl.model.URL }}</code>
-        .
-      </p>
-      <p>
-        Update
-        <code
-          >{{ $ctrl.model.ConfigFilePath }}<span ng-if="$ctrl.stack.AdditionalFiles.length > 0">,{{ $ctrl.stack.AdditionalFiles.join(',') }}</span></code
-        >
-        in git and pull from here to update the stack.
-      </p>
-    </div>
-  </div>
-
+  <git-form-info-panel
+    class-name="text-muted small"
+    url="$ctrl.model.URL"
+    config-file-path="$ctrl.model.ConfigFilePath"
+    additional-files="$ctrl.stack.AdditionalFiles"
+  ></git-form-info-panel>
   <git-form-auto-update-fieldset model="$ctrl.formValues.AutoUpdate" on-change="($ctrl.onChange)"></git-form-auto-update-fieldset>
   <div class="form-group">
     <div class="col-sm-12">
-      <p>
-        <a class="small interactive" ng-click="$ctrl.state.showConfig = !$ctrl.state.showConfig">
-          <i ng-class="{ 'fa fa-minus space-right': $ctrl.state.showConfig, 'fa fa-plus space-right': !$ctrl.state.showConfig }" aria-hidden="true"></i>
-          {{ $ctrl.state.showConfig ? 'Hide' : 'Advanced' }} configuration
-        </a>
-      </p>
+      <a class="small interactive" ng-click="$ctrl.state.showConfig = !$ctrl.state.showConfig">
+        <i ng-class="{ 'fa fa-minus space-right': $ctrl.state.showConfig, 'fa fa-plus space-right': !$ctrl.state.showConfig }" aria-hidden="true"></i>
+        {{ $ctrl.state.showConfig ? 'Hide' : 'Advanced' }} configuration
+      </a>
     </div>
   </div>
+
   <git-form-ref-field ng-if="$ctrl.state.showConfig" value="$ctrl.formValues.RefName" on-change="($ctrl.onChangeRef)"></git-form-ref-field>
-  <git-form-auth-fieldset
-    ng-if="$ctrl.state.showConfig"
-    is-edit="$ctrl.state.isEdit"
-    model="$ctrl.formValues"
-    on-change="($ctrl.onChange)"
-    show-auth-explanation="true"
-  ></git-form-auth-fieldset>
+  <git-form-auth-fieldset ng-if="$ctrl.state.showConfig" model="$ctrl.formValues" on-change="($ctrl.onChange)" show-auth-explanation="true"></git-form-auth-fieldset>
   <environment-variables-panel
     ng-model="$ctrl.formValues.Env"
     explanation="These values will be used as substitutions in the stack file"

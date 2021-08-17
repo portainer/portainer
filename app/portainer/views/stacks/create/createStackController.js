@@ -31,7 +31,7 @@ angular
       StackFile: null,
       RepositoryURL: '',
       RepositoryReferenceName: '',
-      RepositoryAuthentication: false,
+      RepositoryAuthentication: true,
       RepositoryUsername: '',
       RepositoryPassword: '',
       Env: [],
