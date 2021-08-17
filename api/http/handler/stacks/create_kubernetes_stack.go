@@ -70,20 +70,28 @@ type createKubernetesStackResponse struct {
 	Output string `json:"Output"`
 }
 
-func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint) *httperror.HandlerError {
+func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	var payload kubernetesStringDeploymentPayload
 	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
 	}
 
+	user, err := handler.DataStore.User().User(userID)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to load user information from the database", Err: err}
+	}
+
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
 	stack := &portainer.Stack{
-		ID:           portainer.StackID(stackID),
-		Type:         portainer.KubernetesStack,
-		EndpointID:   endpoint.ID,
-		EntryPoint:   filesystem.ManifestFileDefaultName,
-		Status:       portainer.StackStatusActive,
-		CreationDate: time.Now().Unix(),
+		ID:              portainer.StackID(stackID),
+		Type:            portainer.KubernetesStack,
+		EndpointID:      endpoint.ID,
+		EntryPoint:      filesystem.ManifestFileDefaultName,
+		Namespace:       payload.Namespace,
+		Status:          portainer.StackStatusActive,
+		CreationDate:    time.Now().Unix(),
+		CreatedBy:       user.Username,
+		IsComposeFormat: payload.ComposeFormat,
 	}
 
 	stackFolder := strconv.Itoa(int(stack.ID))
@@ -121,10 +129,15 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 	return response.JSON(w, resp)
 }
 
-func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint) *httperror.HandlerError {
+func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	var payload kubernetesGitDeploymentPayload
 	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
+	}
+
+	user, err := handler.DataStore.User().User(userID)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to load user information from the database", Err: err}
 	}
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
@@ -138,8 +151,11 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 			ReferenceName:  payload.RepositoryReferenceName,
 			ConfigFilePath: payload.FilePathInRepository,
 		},
-		Status:       portainer.StackStatusActive,
-		CreationDate: time.Now().Unix(),
+		Namespace:       payload.Namespace,
+		Status:          portainer.StackStatusActive,
+		CreationDate:    time.Now().Unix(),
+		CreatedBy:       user.Username,
+		IsComposeFormat: payload.ComposeFormat,
 	}
 
 	projectPath := handler.FileService.GetStackProjectPath(strconv.Itoa(int(stack.ID)))
