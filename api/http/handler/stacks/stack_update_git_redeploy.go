@@ -2,11 +2,14 @@ package stacks
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"path/filepath"
 	"time"
 
 	"github.com/asaskevich/govalidator"
+	"github.com/pkg/errors"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -16,6 +19,7 @@ import (
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/stackutils"
+	k "github.com/portainer/portainer/api/kubernetes"
 )
 
 type stackGitRedployPayload struct {
@@ -30,11 +34,26 @@ func (payload *stackGitRedployPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.RepositoryReferenceName) {
 		payload.RepositoryReferenceName = defaultGitReferenceName
 	}
-
 	return nil
 }
 
-// PUT request on /api/stacks/:id/git?endpointId=<endpointId>
+// @id StackGitRedeploy
+// @summary Redeploy a stack
+// @description Pull and redeploy a stack via Git
+// @description **Access policy**: restricted
+// @tags stacks
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "Stack identifier"
+// @param endpointId query int false "Stacks created before version 1.18.0 might not have an associated endpoint identifier. Use this optional parameter to set the endpoint identifier used by the stack."
+// @param body body stackGitRedployPayload true "Git configs for pull and redeploy a stack"
+// @success 200 {object} portainer.Stack "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 "Not found"
+// @failure 500 "Server error"
+// @router /stacks/:id/git/redeploy [put]
 func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
@@ -75,22 +94,26 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Permission denied to access endpoint", Err: err}
 	}
 
-	resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)
-	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve a resource control associated to the stack", Err: err}
-	}
-
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve info from request context", Err: err}
 	}
 
-	access, err := handler.userCanAccessStack(securityContext, endpoint.ID, resourceControl)
-	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to verify user authorizations to validate stack access", Err: err}
-	}
-	if !access {
-		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Access denied to resource", Err: httperrors.ErrResourceAccessDenied}
+	//only check resource control when it is a DockerSwarmStack or a DockerComposeStack
+	if stack.Type == portainer.DockerSwarmStack || stack.Type == portainer.DockerComposeStack {
+
+		resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)
+		if err != nil {
+			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve a resource control associated to the stack", Err: err}
+		}
+
+		access, err := handler.userCanAccessStack(securityContext, endpoint.ID, resourceControl)
+		if err != nil {
+			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to verify user authorizations to validate stack access", Err: err}
+		}
+		if !access {
+			return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Access denied to resource", Err: httperrors.ErrResourceAccessDenied}
+		}
 	}
 
 	var payload stackGitRedployPayload
@@ -140,6 +163,20 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		return httpErr
 	}
 
+	newHash, err := handler.GitService.LatestCommitID(stack.GitConfig.URL, stack.GitConfig.ReferenceName, repositoryUsername, repositoryPassword)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable get latest commit id", Err: errors.WithMessagef(err, "failed to fetch latest commit id of the stack %v", stack.ID)}
+	}
+	stack.GitConfig.ConfigHash = newHash
+
+	user, err := handler.DataStore.User().User(securityContext.UserID)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Cannot find context user", Err: errors.Wrap(err, "failed to fetch the user")}
+	}
+	stack.UpdatedBy = user.Username
+	stack.UpdateDate = time.Now().Unix()
+	stack.Status = portainer.StackStatusActive
+
 	err = handler.DataStore.Stack().UpdateStack(stack.ID, stack)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist the stack changes inside the database", Err: err}
@@ -154,37 +191,48 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 }
 
 func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) *httperror.HandlerError {
-	if stack.Type == portainer.DockerSwarmStack {
+	switch stack.Type {
+	case portainer.DockerSwarmStack:
 		config, httpErr := handler.createSwarmDeployConfig(r, stack, endpoint, false)
 		if httpErr != nil {
 			return httpErr
 		}
 
-		err := handler.deploySwarmStack(config)
-		if err != nil {
+		if err := handler.deploySwarmStack(config); err != nil {
 			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: err.Error(), Err: err}
 		}
 
-		stack.UpdateDate = time.Now().Unix()
-		stack.UpdatedBy = config.user.Username
-		stack.Status = portainer.StackStatusActive
+	case portainer.DockerComposeStack:
+		config, httpErr := handler.createComposeDeployConfig(r, stack, endpoint)
+		if httpErr != nil {
+			return httpErr
+		}
 
-		return nil
+		if err := handler.deployComposeStack(config); err != nil {
+			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: err.Error(), Err: err}
+		}
+
+	case portainer.KubernetesStack:
+		if stack.Namespace == "" {
+			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Invalid namespace", Err: errors.New("Namespace must not be empty when redeploying kubernetes stacks")}
+		}
+		content, err := ioutil.ReadFile(filepath.Join(stack.ProjectPath, stack.GitConfig.ConfigFilePath))
+		if err != nil {
+			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to read deployment.yml manifest file", Err: errors.Wrap(err, "failed to read manifest file")}
+		}
+		_, err = handler.deployKubernetesStack(r, endpoint, string(content), false, stack.Namespace, k.KubeAppLabels{
+			StackID: int(stack.ID),
+			Name:    stack.Name,
+			Owner:   stack.CreatedBy,
+			Kind:    "git",
+		})
+		if err != nil {
+			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to redeploy Kubernetes stack", Err: errors.WithMessage(err, "failed to deploy kube application")}
+		}
+
+	default:
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unsupported stack", Err: errors.Errorf("unsupported stack type: %v", stack.Type)}
 	}
-
-	config, httpErr := handler.createComposeDeployConfig(r, stack, endpoint)
-	if httpErr != nil {
-		return httpErr
-	}
-
-	err := handler.deployComposeStack(config)
-	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: err.Error(), Err: err}
-	}
-
-	stack.UpdateDate = time.Now().Unix()
-	stack.UpdatedBy = config.user.Username
-	stack.Status = portainer.StackStatusActive
 
 	return nil
 }
