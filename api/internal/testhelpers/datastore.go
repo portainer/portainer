@@ -112,3 +112,24 @@ func WithEdgeJobs(js []portainer.EdgeJob) datastoreOption {
 		d.edgeJob = &stubEdgeJobService{jobs: js}
 	}
 }
+
+type stubSettingsService struct {
+	settings *portainer.Settings
+}
+
+func (s *stubSettingsService) Settings() (*portainer.Settings, error) {
+	return s.settings, nil
+}
+
+func (s *stubSettingsService) UpdateSettings(settings *portainer.Settings) error {
+	s.settings = settings
+	return nil
+}
+
+func WithSettingsService(settings *portainer.Settings) datastoreOption {
+	return func(d *datastore) {
+		d.settings = &stubSettingsService{
+			settings: settings,
+		}
+	}
+}
