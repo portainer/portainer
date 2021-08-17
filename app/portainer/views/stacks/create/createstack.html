@@ -158,9 +158,8 @@
                 class="btn btn-primary btn-sm"
                 ng-disabled="state.actionInProgress
               || !createStackForm.$valid
-              || (state.Method === 'editor' && (!formValues.StackFileContent || state.editorYamlValidationError))
+              || ((state.Method === 'editor' || state.Method === 'template') && (!formValues.StackFileContent || state.editorYamlValidationError))
               || (state.Method === 'upload' && (!formValues.StackFile || state.uploadYamlValidationError))
-              || (state.Method === 'template' && (!formValues.StackFileContent || !selectedTemplate || state.editorYamlValidationError))
               || (state.Method === 'repository' && ((!formValues.RepositoryURL || !formValues.ComposeFilePathInRepository) || (formValues.RepositoryAuthentication && !formValues.RepositoryPassword)))
               || !formValues.Name"
                 ng-click="deployStack()"
