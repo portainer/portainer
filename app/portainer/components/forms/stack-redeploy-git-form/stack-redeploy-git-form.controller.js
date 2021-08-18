@@ -1,4 +1,6 @@
+import _ from 'lodash-es';
 import uuidv4 from 'uuid/v4';
+
 class StackRedeployGitFormController {
   /* @ngInject */
   constructor($async, $state, StackService, ModalService, Notifications, WebhookHelper, FormHelper) {
@@ -15,6 +17,7 @@ class StackRedeployGitFormController {
       redeployInProgress: false,
       showConfig: false,
       isEdit: false,
+      hasUnsavedChanges: false,
     };
 
     this.formValues = {
@@ -34,6 +37,7 @@ class StackRedeployGitFormController {
 
     this.onChange = this.onChange.bind(this);
     this.onChangeRef = this.onChangeRef.bind(this);
+    this.onChangeAutoUpdate = this.onChangeAutoUpdate.bind(this);
     this.handleEnvVarChange = this.handleEnvVarChange.bind(this);
   }
 
@@ -46,6 +50,15 @@ class StackRedeployGitFormController {
       ...this.formValues,
       ...values,
     };
+  }
+
+  onChangeAutoUpdate(values) {
+    this.onChange({
+      AutoUpdate: {
+        ...this.formValues.AutoUpdate,
+        ...values,
+      },
+    });
   }
 
   async submit() {
@@ -83,6 +96,8 @@ class StackRedeployGitFormController {
       try {
         this.state.inProgress = true;
         await this.StackService.updateGitStackSettings(this.stack.Id, this.stack.EndpointId, this.FormHelper.removeInvalidEnvVars(this.formValues.Env), this.formValues);
+        this.savedFormValues = angular.copy(this.formValues);
+        this.state.hasUnsavedChanges = false;
         this.Notifications.success('Save stack settings successfully');
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to save stack settings');
@@ -94,6 +109,11 @@ class StackRedeployGitFormController {
 
   isSubmitButtonDisabled() {
     return this.state.inProgress || this.state.redeployInProgress;
+  }
+
+  saveSettingsFormChanged() {
+    this.state.hasUnsavedChanges = !_.isEqual(this.savedFormValues, this.formValues);
+    return this.state.hasUnsavedChanges;
   }
 
   handleEnvVarChange(value) {
@@ -125,6 +145,8 @@ class StackRedeployGitFormController {
       this.formValues.RepositoryAuthentication = true;
       this.state.isEdit = true;
     }
+
+    this.savedFormValues = angular.copy(this.formValues);
   }
 }
 
