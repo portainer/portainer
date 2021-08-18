@@ -1,11 +1,9 @@
-package helm
+package test
 
 import (
-
-	// "errors"
-
 	"time"
 
+	"github.com/portainer/portainer/api/exec/helm"
 	"github.com/portainer/portainer/api/exec/helm/release"
 	"github.com/portainer/portainer/api/kubernetes"
 )
@@ -13,7 +11,7 @@ import (
 type helmMockPackageManager struct{}
 
 // NewMockHelmBinaryPackageManager initializes a new HelmPackageManager service (a mock instance)
-func NewMockHelmBinaryPackageManager(kubeConfigService kubernetes.KubeConfigService, binaryPath string) HelmPackageManager {
+func NewMockHelmBinaryPackageManager(kubeConfigService kubernetes.KubeConfigService, binaryPath string) helm.HelmPackageManager {
 	return &helmMockPackageManager{}
 }
 
@@ -33,7 +31,7 @@ type mockChart struct {
 
 var mock_charts = []*mockChart{}
 
-func newMockChart(installOpts InstallOptions) *mockChart {
+func newMockChart(installOpts helm.InstallOptions) *mockChart {
 	return &mockChart{
 		Name:       installOpts.Name,
 		Namespace:  installOpts.Namespace,
@@ -51,7 +49,7 @@ func mockChartAsRelease(mc *mockChart) *release.Release {
 	}
 }
 
-func (hpm *helmMockPackageManager) Install(installOpts InstallOptions, serverURL, authToken string) (*release.Release, error) {
+func (hpm *helmMockPackageManager) Install(installOpts helm.InstallOptions, serverURL, authToken string) (*release.Release, error) {
 
 	release := newMockChart(installOpts)
 
@@ -68,19 +66,19 @@ func (hpm *helmMockPackageManager) Install(installOpts InstallOptions, serverURL
 }
 
 // Show values/readme/chart etc
-func (hpm *helmMockPackageManager) Show(showOpts ShowOptions) (string, error) {
+func (hpm *helmMockPackageManager) Show(showOpts helm.ShowOptions) (string, error) {
 	switch showOpts.OutputFormat {
-	case ShowChart:
+	case helm.ShowChart:
 		return MockDataChart, nil
-	case ShowReadme:
+	case helm.ShowReadme:
 		return MockDataReadme, nil
-	case ShowValues:
+	case helm.ShowValues:
 		return MockDataValues, nil
 	}
 	return "", nil
 }
 
 // Show a mock index.yaml
-func (hpm *helmMockPackageManager) SearchRepo(searchOpts SearchRepoOptions) (string, error) {
+func (hpm *helmMockPackageManager) SearchRepo(searchOpts helm.SearchRepoOptions) (string, error) {
 	return MockDataIndex, nil
 }

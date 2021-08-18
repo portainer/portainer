@@ -1,4 +1,4 @@
-package helm
+package test
 
 const MockDataIndex = "mock-index"
 const MockDataChart = "mock-chart"

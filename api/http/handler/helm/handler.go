@@ -12,23 +12,26 @@ import (
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/exec/helm"
 	httperrors "github.com/portainer/portainer/api/http/errors"
-	"github.com/portainer/portainer/api/http/security"
 )
 
 const (
 	handlerActivityContext = "Kubernetes"
 )
 
+type requestBouncer interface {
+	AuthenticatedAccess(h http.Handler) http.Handler
+}
+
 // Handler is the HTTP handler used to handle endpoint group operations.
 type Handler struct {
 	*mux.Router
-	requestBouncer     *security.RequestBouncer
+	requestBouncer     requestBouncer
 	DataStore          portainer.DataStore
 	HelmPackageManager helm.HelmPackageManager
 }
 
 // NewHandler creates a handler to manage endpoint group operations.
-func NewHandler(bouncer *security.RequestBouncer) *Handler {
+func NewHandler(bouncer requestBouncer) *Handler {
 	h := &Handler{
 		Router:         mux.NewRouter(),
 		requestBouncer: bouncer,
@@ -54,7 +57,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 }
 
 // NewTemplateHandler creates a template handler to manage endpoint group operations.
-func NewTemplateHandler(bouncer *security.RequestBouncer) *Handler {
+func NewTemplateHandler(bouncer requestBouncer) *Handler {
 	h := &Handler{
 		Router:         mux.NewRouter(),
 		requestBouncer: bouncer,

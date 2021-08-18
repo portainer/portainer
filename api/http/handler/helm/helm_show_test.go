@@ -3,58 +3,48 @@ package helm
 import (
 	"fmt"
 	"io"
+	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gorilla/mux"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/exec/helm/test"
+	helper "github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/portainer/portainer/api/kubernetes"
 	"github.com/stretchr/testify/assert"
-
-	helm "github.com/portainer/portainer/api/exec/helm"
-	i "github.com/portainer/portainer/api/internal/testhelpers"
 )
 
 func Test_helmShow(t *testing.T) {
-
 	chartName := "test-nginx"
+	is := assert.New(t)
 
-	h := NewTemplateHandler(nil)
-	assert.NotNil(t, h, "Handler should not fail")
+	h := NewTemplateHandler(helper.NewTestRequestBouncer())
+	is.NotNil(h, "Handler should not fail")
 
 	defaultSettings := &portainer.Settings{
 		HelmRepositoryURL: portainer.DefaultHelmRepositoryURL,
 	}
-	h.DataStore = i.NewDatastore(i.WithSettingsService(defaultSettings))
-	h.HelmPackageManager = helm.NewMockHelmBinaryPackageManager(kubernetes.NewKubeConfigCAService(""), "")
-
-	path := fmt.Sprintf("/api/templates/helm/%s/values", chartName)
+	h.DataStore = helper.NewDatastore(helper.WithSettingsService(defaultSettings))
+	h.HelmPackageManager = test.NewMockHelmBinaryPackageManager(kubernetes.NewKubeConfigCAService(""), "")
 
 	commands := map[string]string{
-		"values": helm.MockDataValues,
-		"chart":  helm.MockDataChart,
-		"readme": helm.MockDataReadme,
+		"values": test.MockDataValues,
+		"chart":  test.MockDataChart,
+		"readme": test.MockDataReadme,
 	}
 
 	for cmd, expect := range commands {
 		t.Run(cmd, func(t *testing.T) {
 			is := assert.New(t)
+			is.NotNil(h, "Handler should not fail")
 
-			r := httptest.NewRequest("GET", path, nil)
-			w := httptest.NewRecorder()
-			// unfortunately mux.vars() is empty at this point. So we have to insert the path vars manually for testing
-			r = mux.SetURLVars(r, map[string]string{
-				"chart":   chartName,
-				"command": cmd,
-			})
+			req := httptest.NewRequest("GET", fmt.Sprintf("/templates/helm/%s/%s", chartName, cmd), nil)
+			rr := httptest.NewRecorder()
+			h.ServeHTTP(rr, req)
 
-			herr := h.helmShow(w, r)
-			if herr != nil {
-				is.NoError(herr.Err, "Should not return an error")
-			}
+			is.Equal(rr.Code, http.StatusOK, "Status should be 200 OK")
 
-			response := w.Result()
-			body, err := io.ReadAll(response.Body)
+			body, err := io.ReadAll(rr.Body)
 			is.NoError(err, "ReadAll should not return error")
 			is.EqualValues(string(body), expect, "Unexpected search response")
 		})
