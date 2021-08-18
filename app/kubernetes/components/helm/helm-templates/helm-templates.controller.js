@@ -27,8 +27,13 @@ export default class HelmTemplatesController {
   }
 
   editorUpdate(content) {
-    this.state.values = content.getValue();
-    this.state.isEditorDirty = true;
+    const contentvalues = content.getValue();
+    if (this.state.originalvalues === contentvalues) {
+      this.state.isEditorDirty = false;
+    } else {
+      this.state.values = contentvalues;
+      this.state.isEditorDirty = true;
+    }
   }
 
   async uiCanExit() {
@@ -56,6 +61,7 @@ export default class HelmTemplatesController {
     try {
       const { values } = await this.HelmService.values(this.state.template.name);
       this.state.values = values;
+      this.state.originalvalues = values;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve helm chart values.');
     } finally {
@@ -98,6 +104,7 @@ export default class HelmTemplatesController {
         resourcePools: [],
         resourcePool: '',
         values: null,
+        originalvalues: null,
         templates: [],
         loadingValues: false,
         isEditorDirty: false,
