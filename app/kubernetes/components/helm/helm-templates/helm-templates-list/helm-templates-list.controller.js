@@ -30,6 +30,10 @@ export default class HelmTemplatesListController {
     this.DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);
   }
 
+  clearCategory() {
+    this.state.selectedCategory = '';
+  }
+
   $onInit() {
     return this.$async(async () => {
       this.state = {
