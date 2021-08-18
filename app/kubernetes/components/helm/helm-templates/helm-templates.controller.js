@@ -1,6 +1,7 @@
 export default class HelmTemplatesController {
   /* @ngInject */
-  constructor($window, $async, $state, $anchorScroll, HelmService, KubernetesNamespaceHelper, KubernetesResourcePoolService, Notifications, ModalService) {
+  constructor($analytics, $window, $async, $state, $anchorScroll, HelmService, KubernetesNamespaceHelper, KubernetesResourcePoolService, Notifications, ModalService) {
+    this.$analytics = $analytics;
     this.$window = $window;
     this.$async = $async;
     this.$state = $state;
@@ -41,7 +42,7 @@ export default class HelmTemplatesController {
     try {
       await this.HelmService.install(this.state.appName, this.state.resourcePool.Namespace.Name, this.state.template.name, this.state.values);
       this.Notifications.success('Helm Chart successfully installed');
-      this.$window._paq.push(['trackEvent', 'kubernetes', 'kubernetes-helm-install']);
+      this.$analytics.eventTrack('kubernetes-helm-install', { category: 'kubernetes', metadata: { 'chart-name': this.state.template.name } });
       this.$state.go('kubernetes.applications');
     } catch (err) {
       this.Notifications.error('Installation error', err);
