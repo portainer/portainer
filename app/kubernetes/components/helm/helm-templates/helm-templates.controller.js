@@ -48,6 +48,7 @@ export default class HelmTemplatesController {
       await this.HelmService.install(this.state.appName, this.state.resourcePool.Namespace.Name, this.state.template.name, this.state.values);
       this.Notifications.success('Helm Chart successfully installed');
       this.$analytics.eventTrack('kubernetes-helm-install', { category: 'kubernetes', metadata: { 'chart-name': this.state.template.name } });
+      this.state.isEditorDirty = false;
       this.$state.go('kubernetes.applications');
     } catch (err) {
       this.Notifications.error('Installation error', err);
