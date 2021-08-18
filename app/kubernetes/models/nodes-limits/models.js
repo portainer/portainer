@@ -28,18 +28,12 @@ export class KubernetesNodesLimits {
   }
 
   // check if there is enough cpu and memory to allocate containers in replica mode
-  overflowForReplica(cpu, memory, instance) {
-    const nodesLimits = JSON.parse(JSON.stringify(this.nodesLimits));
-
-    _.forEach(nodesLimits, (value) => {
-      while (instance && cpu <= value.CPU && memory <= value.Memory) {
-        value.CPU -= cpu;
-        value.Memory -= memory;
-        instance--;
-      }
+  overflowForReplica(cpu, memory, instances) {
+    _.forEach(this.nodesLimits, (value) => {
+      instances -= Math.min(Math.floor(value.CPU / cpu), Math.floor(value.Memory / memory));
     });
 
-    return !!instance;
+    return instances > 0;
   }
 
   // check if there is enough cpu and memory to allocate containers in global mode

@@ -598,20 +598,19 @@ class KubernetesCreateApplicationController {
     return overflow;
   }
 
-  effectiveInstance() {
-    const instance = this.formValues.DeploymentType === this.ApplicationDeploymentTypes.GLOBAL ? this.nodeNumber : this.formValues.ReplicaCount;
-
-    return instance;
+  effectiveInstances() {
+    return this.formValues.DeploymentType === this.ApplicationDeploymentTypes.GLOBAL ? this.nodeNumber : this.formValues.ReplicaCount;
   }
 
   resourceReservationsOverflow() {
-    const instances = this.effectiveInstance();
+    const instances = this.effectiveInstances();
     const cpu = this.formValues.CpuLimit;
     const maxCpu = this.state.namespaceLimits.cpu;
     const memory = KubernetesResourceReservationHelper.bytesValue(this.formValues.MemoryLimit);
     const maxMemory = this.state.namespaceLimits.memory;
 
-    if (cpu * instances > maxCpu) {
+    // multiply 1000 can avoid 0.1 * 3 > 0.3
+    if (cpu * 1000 * instances > maxCpu * 1000) {
       return true;
     }
 
@@ -634,7 +633,8 @@ class KubernetesCreateApplicationController {
     const memory = KubernetesResourceReservationHelper.bytesValue(this.formValues.MemoryLimit);
     const maxMemory = this.state.namespaceLimits.memory;
 
-    if (cpu * instances > maxCpu) {
+    // multiply 1000 can avoid 0.1 * 3 > 0.3
+    if (cpu * 1000 * instances > maxCpu * 1000) {
       return true;
     }
 
@@ -773,8 +773,8 @@ class KubernetesCreateApplicationController {
       }
     }
 
-    maxCpu = _.min([maxCpu, this.nodesLimits.MaxCPU]);
-    maxMemory = _.min([maxMemory, this.nodesLimits.MaxMemory]);
+    maxCpu = Math.min(maxCpu, this.nodesLimits.MaxCPU);
+    maxMemory = Math.min(maxMemory, this.nodesLimits.MaxMemory);
 
     if (maxMemory < minMemory) {
       minMemory = 0;
@@ -803,7 +803,7 @@ class KubernetesCreateApplicationController {
         this.state.resourcePoolHasQuota = true;
         maxCpu = quota.CpuLimit - quota.CpuLimitUsed;
         if (this.state.isEdit && this.savedFormValues.CpuLimit) {
-          maxCpu += this.savedFormValues.CpuLimit * this.effectiveInstance();
+          maxCpu += this.savedFormValues.CpuLimit * this.effectiveInstances();
         }
       }
 
@@ -811,7 +811,7 @@ class KubernetesCreateApplicationController {
         this.state.resourcePoolHasQuota = true;
         maxMemory = quota.MemoryLimit - quota.MemoryLimitUsed;
         if (this.state.isEdit && this.savedFormValues.MemoryLimit) {
-          maxMemory += KubernetesResourceReservationHelper.bytesValue(this.savedFormValues.MemoryLimit) * this.effectiveInstance();
+          maxMemory += KubernetesResourceReservationHelper.bytesValue(this.savedFormValues.MemoryLimit) * this.effectiveInstances();
         }
       }
     }

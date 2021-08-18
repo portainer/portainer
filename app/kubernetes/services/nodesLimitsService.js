@@ -7,24 +7,18 @@ class KubernetesNodesLimitsService {
   constructor($async, KubernetesNodesLimits) {
     this.$async = $async;
     this.KubernetesNodesLimits = KubernetesNodesLimits;
-
-    this.getAsync = this.getAsync.bind(this);
   }
 
   /**
    * GET
    */
-  async getAsync() {
+  async get() {
     try {
       const nodesLimits = await this.KubernetesNodesLimits.get().$promise;
       return new KubernetesNodesLimits(nodesLimits.data);
     } catch (err) {
       throw new PortainerError('Unable to retrieve nodes limits', err);
     }
-  }
-
-  get() {
-    return this.$async(this.getAsync);
   }
 }
 
