@@ -8,17 +8,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const testValuesFile = `service:
-  port:  8081
-`
-
-func createValuesFile() (string, error) {
+func createValuesFile(values string) (string, error) {
 	file, err := os.CreateTemp("", "helm-values")
 	if err != nil {
 		return "", err
 	}
 
-	_, err = file.WriteString(testValuesFile)
+	_, err = file.WriteString(values)
 	if err != nil {
 		file.Close()
 		return "", err
@@ -66,7 +62,7 @@ func Test_Install(t *testing.T) {
 
 	t.Run("successfully installs nginx with values", func(t *testing.T) {
 		// helm install test-nginx-2 --repo https://charts.bitnami.com/bitnami nginx --values /tmp/helm-values3161785816
-		values, err := createValuesFile()
+		values, err := createValuesFile("service:\n  port:  8081")
 		is.NoError(err, "should create a values file")
 
 		defer os.Remove(values)
