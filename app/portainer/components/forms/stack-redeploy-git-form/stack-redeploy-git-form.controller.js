@@ -38,11 +38,7 @@ class StackRedeployGitFormController {
     this.onChange = this.onChange.bind(this);
     this.onChangeRef = this.onChangeRef.bind(this);
     this.onChangeAutoUpdate = this.onChangeAutoUpdate.bind(this);
-    this.handleEnvVarChange = this.handleEnvVarChange.bind(this);
-  }
-
-  onChangeRef(value) {
-    this.onChange({ RefName: value });
+    this.onChangeEnvVar = this.onChangeEnvVar.bind(this);
   }
 
   onChange(values) {
@@ -50,6 +46,12 @@ class StackRedeployGitFormController {
       ...this.formValues,
       ...values,
     };
+
+    this.state.hasUnsavedChanges = !_.isEqual(this.savedFormValues, this.formValues);
+  }
+
+  onChangeRef(value) {
+    this.onChange({ RefName: value });
   }
 
   onChangeAutoUpdate(values) {
@@ -59,6 +61,10 @@ class StackRedeployGitFormController {
         ...values,
       },
     });
+  }
+
+  onChangeEnvVar(value) {
+    this.onChange({ Env: value });
   }
 
   async submit() {
@@ -109,15 +115,6 @@ class StackRedeployGitFormController {
 
   isSubmitButtonDisabled() {
     return this.state.inProgress || this.state.redeployInProgress;
-  }
-
-  saveSettingsFormChanged() {
-    this.state.hasUnsavedChanges = !_.isEqual(this.savedFormValues, this.formValues);
-    return this.state.hasUnsavedChanges;
-  }
-
-  handleEnvVarChange(value) {
-    this.formValues.Env = value;
   }
 
   $onInit() {
