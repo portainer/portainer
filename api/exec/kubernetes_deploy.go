@@ -5,9 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
-	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/kubernetes/cli"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -16,6 +13,10 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
+	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/kubernetes/cli"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
@@ -80,7 +81,7 @@ func (deployer *KubernetesDeployer) getToken(request *http.Request, endpoint *po
 // Otherwise it will use kubectl to deploy the manifest.
 func (deployer *KubernetesDeployer) Deploy(request *http.Request, endpoint *portainer.Endpoint, stackConfig string, namespace string) (string, error) {
 	if endpoint.Type == portainer.KubernetesLocalEnvironment {
-		token, err := deployer.getToken(request, endpoint, true);
+		token, err := deployer.getToken(request, endpoint, true)
 		if err != nil {
 			return "", err
 		}
@@ -179,7 +180,7 @@ func (deployer *KubernetesDeployer) Deploy(request *http.Request, endpoint *port
 		return "", err
 	}
 
-	token, err := deployer.getToken(request, endpoint, false);
+	token, err := deployer.getToken(request, endpoint, false)
 	if err != nil {
 		return "", err
 	}
@@ -229,7 +230,7 @@ func (deployer *KubernetesDeployer) Deploy(request *http.Request, endpoint *port
 }
 
 // ConvertCompose leverages the kompose binary to deploy a compose compliant manifest.
-func (deployer *KubernetesDeployer) ConvertCompose(data string) ([]byte, error) {
+func (deployer *KubernetesDeployer) ConvertCompose(data []byte) ([]byte, error) {
 	command := path.Join(deployer.binaryPath, "kompose")
 	if runtime.GOOS == "windows" {
 		command = path.Join(deployer.binaryPath, "kompose.exe")
@@ -241,7 +242,7 @@ func (deployer *KubernetesDeployer) ConvertCompose(data string) ([]byte, error) 
 	var stderr bytes.Buffer
 	cmd := exec.Command(command, args...)
 	cmd.Stderr = &stderr
-	cmd.Stdin = strings.NewReader(data)
+	cmd.Stdin = bytes.NewReader(data)
 
 	output, err := cmd.Output()
 	if err != nil {
