@@ -22,7 +22,7 @@ func Test_helmRepoSearch(t *testing.T) {
 		HelmRepositoryURL: portainer.DefaultHelmRepositoryURL,
 	}
 	h.DataStore = helper.NewDatastore(helper.WithSettingsService(defaultSettings))
-	h.HelmPackageManager = test.NewMockHelmBinaryPackageManager(kubernetes.NewKubeConfigCAService(""), "")
+	h.HelmPackageManager = test.NewMockHelmBinaryPackageManager(kubernetes.NewKubeConfigCAService("", ""), "")
 
 	t.Run("helmRepoSearch", func(t *testing.T) {
 		is := assert.New(t)

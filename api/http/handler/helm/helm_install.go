@@ -128,7 +128,7 @@ func (handler *Handler) installChart(repo string, endpoint *portainer.Endpoint, 
 		installOpts.ValuesFile = file.Name()
 	}
 
-	release, err := handler.HelmPackageManager.Install(installOpts, serverURL, bearerToken)
+	release, err := handler.HelmPackageManager.Install(installOpts, endpoint.ID, bearerToken)
 	if err != nil {
 		return nil, err
 	}

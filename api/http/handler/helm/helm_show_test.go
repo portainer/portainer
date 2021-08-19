@@ -25,7 +25,7 @@ func Test_helmShow(t *testing.T) {
 		HelmRepositoryURL: portainer.DefaultHelmRepositoryURL,
 	}
 	h.DataStore = helper.NewDatastore(helper.WithSettingsService(defaultSettings))
-	h.HelmPackageManager = test.NewMockHelmBinaryPackageManager(kubernetes.NewKubeConfigCAService(""), "")
+	h.HelmPackageManager = test.NewMockHelmBinaryPackageManager(kubernetes.NewKubeConfigCAService("", ""), "")
 
 	commands := map[string]string{
 		"values": test.MockDataValues,

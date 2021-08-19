@@ -37,18 +37,6 @@ func NewHandler(bouncer requestBouncer) *Handler {
 		requestBouncer: bouncer,
 	}
 
-	// `helm list -o json`
-	h.Handle("/{id}/kubernetes/helm",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.helmList))).Methods(http.MethodGet)
-
-	// `helm get manifest RELEASE_NAME`
-	h.Handle("/{id}/kubernetes/helm/{release}",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.helmGet))).Methods(http.MethodGet)
-
-	// `helm delete RELEASE_NAME`
-	h.Handle("/{id}/kubernetes/helm/{release}",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.helmDelete))).Methods(http.MethodDelete)
-
 	// `helm install [NAME] [CHART] flags`
 	h.Handle("/{id}/kubernetes/helm",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.helmInstall))).Methods(http.MethodPost)

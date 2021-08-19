@@ -3,6 +3,7 @@ package test
 import (
 	"time"
 
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/exec/helm"
 	"github.com/portainer/portainer/api/exec/helm/release"
 	"github.com/portainer/portainer/api/kubernetes"
@@ -13,11 +14,6 @@ type helmMockPackageManager struct{}
 // NewMockHelmBinaryPackageManager initializes a new HelmPackageManager service (a mock instance)
 func NewMockHelmBinaryPackageManager(kubeConfigService kubernetes.KubeConfigService, binaryPath string) helm.HelmPackageManager {
 	return &helmMockPackageManager{}
-}
-
-// Run will execute helm command against the provided Kubernetes cluster.
-func (hpm *helmMockPackageManager) Run(command string, args []string, serverURL, authToken string) (string, error) {
-	return "", nil
 }
 
 type mockChart struct {
@@ -49,7 +45,7 @@ func mockChartAsRelease(mc *mockChart) *release.Release {
 	}
 }
 
-func (hpm *helmMockPackageManager) Install(installOpts helm.InstallOptions, serverURL, authToken string) (*release.Release, error) {
+func (hpm *helmMockPackageManager) Install(installOpts helm.InstallOptions, endpointId portainer.EndpointID, authToken string) (*release.Release, error) {
 
 	release := newMockChart(installOpts)
 
