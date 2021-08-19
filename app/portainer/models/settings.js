@@ -6,6 +6,7 @@ export function SettingsViewModel(data) {
   this.OAuthSettings = new OAuthSettingsViewModel(data.OAuthSettings);
   this.SnapshotInterval = data.SnapshotInterval;
   this.TemplatesURL = data.TemplatesURL;
+  this.HelmRepositoryURL = data.HelmRepositoryURL;
   this.EdgeAgentCheckinInterval = data.EdgeAgentCheckinInterval;
   this.EnableEdgeComputeFeatures = data.EnableEdgeComputeFeatures;
   this.UserSessionTimeout = data.UserSessionTimeout;
