@@ -1,9 +1,0 @@
-.template-item-details {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-}
-
-.template-item-details .template-item-details-sub {
-  width: 100%;
-}
