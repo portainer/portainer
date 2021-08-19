@@ -7,9 +7,10 @@
 
       <div class="actionBar">
         <div>
-          <span ng-class="{ 'pull-right': $ctrl.showAddAction }" style="width: 25%;">
-            <ui-select ng-model="$ctrl.state.selectedCategory">
-              <ui-select-match placeholder="Select a category" allow-clear="true">
+          <span style="width: 25%;">
+            <ui-select ng-model="$ctrl.state.selectedCategory" theme="bootstrap">
+              <ui-select-match placeholder="Select a category">
+                <a class="btn btn-xs btn-link pull-right" ng-click="$ctrl.clearCategory()"><i class="glyphicon glyphicon-remove"></i></a>
                 <span>{{ $select.selected }}</span>
               </ui-select-match>
               <ui-select-choices repeat="category in ($ctrl.state.categories | filter: $select.search)">
@@ -34,17 +35,20 @@
       </div>
 
       <div class="blocklist">
-        <helm-item
-          ng-repeat="template in $ctrl.templates | filter:$ctrl.filterByCategory | filter:$ctrl.state.textFilter"
+        <helm-templates-list-item
+          ng-repeat="template in $ctrl.templates | filter:$ctrl.state.textFilter | filter: $ctrl.state.selectedCategory "
           model="template"
-          type-label="{{ template.Type === 1 ? 'helm' : 'stack' }}"
+          type-label="helm"
           on-select="($ctrl.selectAction)"
         >
-        </helm-item>
-        <div ng-if="!$ctrl.templates" class="text-center text-muted">
+        </helm-templates-list-item>
+        <div ng-if="$ctrl.loading" class="text-center text-muted">
           Loading...
+          <div class="text-center text-muted">
+            Initial download of Helm Charts can take a few minutes
+          </div>
         </div>
-        <div ng-if="($ctrl.templates | filter: $ctrl.filterByType | filter: $ctrl.filterByCategory | filter: $ctrl.state.textFilter).length === 0" class="text-center text-muted">
+        <div ng-if="!$ctrl.loading && $ctrl.templates.length === 0" class="text-center text-muted">
           No helm charts available.
         </div>
       </div>
