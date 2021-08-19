@@ -1,13 +1,13 @@
 <rd-header id="view-top">
   <rd-header-title title-text="Helm">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="kubernetes.helms" ui-sref-opts="{reload: true}">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="kubernetes.templates" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
   <rd-header-content>Charts</rd-header-content>
 </rd-header>
 
-<information-panel title-text="Information" ng-if="!state.selectedTemplate">
+<information-panel title-text="Information" ng-if="!$ctrl.state.template">
   <span class="small text-muted">
     <p>
       <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -18,9 +18,9 @@
 
 <div class="row">
   <!-- helmchart-form -->
-  <div class="col-sm-12" ng-if="state.selectedTemplate">
+  <div class="col-sm-12" ng-if="$ctrl.state.template">
     <rd-widget>
-      <rd-widget-custom-header icon="state.selectedTemplateIcon" title-text="state.selectedTemmplateName"></rd-widget-custom-header>
+      <rd-widget-custom-header icon="$ctrl.state.template.icon" title-text="$ctrl.state.template.name"></rd-widget-custom-header>
       <rd-widget-body classes="padding">
         <form class="form-horizontal">
           <!-- description -->
@@ -30,7 +30,7 @@
             </div>
             <div class="form-group">
               <div class="col-sm-12">
-                <div class="template-note" ng-bind-html="state.selectedTemplateNote"></div>
+                <div class="template-note" ng-bind-html="$ctrl.state.template.description"></div>
               </div>
             </div>
           </div>
@@ -45,21 +45,21 @@
               <select
                 class="form-control"
                 id="resource-pool-selector"
-                ng-model="state.ResourcePool"
-                ng-options="resourcePool.Namespace.Name for resourcePool in state.resourcePools"
+                ng-model="$ctrl.state.resourcePool"
+                ng-options="resourcePool.Namespace.Name for resourcePool in $ctrl.state.resourcePools"
                 ng-change=""
-                ng-disabled="ctrl.state.isEdit"
+                ng-disabled="$ctrl.state.isEdit"
               ></select>
             </div>
           </div>
-          <div class="form-group" ng-if="!state.ResourcePool">
+          <div class="form-group" ng-if="!$ctrl.state.resourcePool">
             <div class="col-sm-12 small text-danger">
               <i class="fa fa-exclamation-circle red-icon" aria-hidden="true" style="margin-right: 2px;"></i>
               This namespace has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the
               namespace.
             </div>
           </div>
-          <div class="form-group" ng-if="!state.ResourcePool">
+          <div class="form-group" ng-if="!$ctrl.state.resourcePool">
             <div class="col-sm-12 small text-muted">
               <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
               You do not have access to any namespace. Contact your administrator to get access to a namespace.
@@ -70,22 +70,23 @@
           <div class="form-group">
             <label for="container_name" class="col-sm-2 control-label text-left">Name</label>
             <div class="col-sm-10">
-              <input type="text" name="container_name" class="form-control" ng-model="formValues.appname" placeholder="e.g. my-app" />
+              <input type="text" name="container_name" class="form-control" ng-model="$ctrl.state.appName" placeholder="e.g. my-app ( required )" />
             </div>
           </div>
           <!-- !name-input -->
           <div class="form-group">
             <div class="col-sm-12">
-              <a class="small interactive" ng-if="!state.showCustomValues" ng-click="state.showCustomValues = true;">
+              <a class="small interactive" ng-if="!$ctrl.state.showCustomValues && !$ctrl.state.loadingValues" ng-click="$ctrl.state.showCustomValues = true;">
                 <i class="fa fa-plus space-right" aria-hidden="true"></i> Show custom values
               </a>
-              <a class="small interactive" ng-if="state.showCustomValues" ng-click="state.showCustomValues = false;">
+              <span class="small interactive" ng-if="$ctrl.state.loadingValues"> <i class="fa fa-sync-alt space-right" aria-hidden="true"></i> Loading values.yaml... </span>
+              <a class="small interactive" ng-if="$ctrl.state.showCustomValues" ng-click="$ctrl.state.showCustomValues = false;">
                 <i class="fa fa-minus space-right" aria-hidden="true"></i> Hide custom values
               </a>
             </div>
           </div>
           <!-- values override -->
-          <div ng-if="state.showCustomValues">
+          <div ng-if="$ctrl.state.showCustomValues">
             <!-- web-editor -->
             <div>
               <div class="col-sm-12 form-section-title">
@@ -93,22 +94,18 @@
               </div>
               <div class="form-group">
                 <span class="col-sm-12 text-muted small">
-                  You can get more information about Kubernetes file format in the
+                  You can get more information about Helm values file format in the
                   <a href="https://helm.sh/docs/chart_template_guide/values_files/" target="_blank">official documentation</a>.
                 </span>
-                <div class="col-sm-12" ng-if="state.editorYamlValidationError"
-                  ><span class="text-danger small">{{ state.editorYamlValidationError }}</span></div
-                >
               </div>
               <div class="form-group">
                 <div class="col-sm-12">
-                  <!--                   <kubernetes-yaml-inspector key="application-yaml" data="state.values"> </kubernetes-yaml-inspector> -->
                   <code-editor
-                    identifier="stack-creation-editor"
+                    identifier="helm-app-creation-editor"
                     placeholder="# Define or paste the content of your values yaml file here"
                     yml="true"
-                    on-change="(editorUpdate)"
-                    value="state.values"
+                    on-change="($ctrl.editorUpdate)"
+                    value="$ctrl.state.values"
                   ></code-editor>
                 </div>
               </div>
@@ -122,12 +119,17 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.resourcePool" ng-click="installHelmchart()" button-spinner="state.actionInProgress">
-                <span ng-hide="state.actionInProgress">Install</span>
-                <span ng-show="state.actionInProgress">Helm installing in progress...</span>
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                ng-disabled="!($ctrl.state.appName && $ctrl.state.resourcePool && !$ctrl.state.loadingValues && !$ctrl.state.actionInProgress)"
+                ng-click="$ctrl.installHelmchart()"
+                button-spinner="$ctrl.state.actionInProgress"
+              >
+                <span ng-hide="$ctrl.state.actionInProgress">Install</span>
+                <span ng-hide="!$ctrl.state.actionInProgress">Helm installing in progress</span>
               </button>
-              <button type="button" class="btn btn-sm btn-default" ng-click="unselectTemplate(state.selectedTemplate)">Hide</button>
-              <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
+              <button type="button" class="btn btn-sm btn-default" ng-click="$ctrl.state.template = null">Hide</button>
             </div>
           </div>
           <!-- !helm actions -->
@@ -141,7 +143,15 @@
 <!-- Helm Charts Component -->
 <div class="row">
   <div class="col-sm-12">
-    <helm-list title-text="Charts" title-icon="fa-cog" templates="templates" table-key="templates" select-action="selectHelmChart"></helm-list>
+    <helm-templates-list
+      title-text="Charts"
+      title-icon="fa-rocket"
+      templates="$ctrl.state.templates"
+      table-key="$ctrl.state.templates"
+      select-action="$ctrl.selectHelmChart"
+      loading="$ctrl.state.templatesLoading"
+    >
+    </helm-templates-list>
   </div>
 </div>
 <!-- !Helm Charts Component -->
