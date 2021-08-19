@@ -43,6 +43,30 @@ export class CreateEdgeStackViewController {
     this.onChangeFormValues = this.onChangeFormValues.bind(this);
   }
 
+  buildAnalyticsProperties() {
+    const format = 'compose';
+    const metadata = { type: methodLabel(this.state.Method), format };
+
+    if (metadata.type === 'template') {
+      metadata.templateName = this.selectedTemplate.title;
+    }
+
+    return { metadata };
+
+    function methodLabel(method) {
+      switch (method) {
+        case 'editor':
+          return 'web-editor';
+        case 'repository':
+          return 'git';
+        case 'upload':
+          return 'file-upload';
+        case 'template':
+          return 'template';
+      }
+    }
+  }
+
   async uiCanExit() {
     if (this.state.Method === 'editor' && this.formValues.StackFileContent && this.state.isEditorDirty) {
       return this.ModalService.confirmWebEditorDiscard();

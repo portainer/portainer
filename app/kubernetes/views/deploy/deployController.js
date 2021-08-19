@@ -7,10 +7,11 @@ import { KubernetesDeployManifestTypes, KubernetesDeployBuildMethods, Kubernetes
 import { buildOption } from '@/portainer/components/box-selector';
 class KubernetesDeployController {
   /* @ngInject */
-  constructor($async, $state, $window, CustomTemplateService, ModalService, Notifications, EndpointProvider, KubernetesResourcePoolService, StackService) {
+  constructor($async, $state, $window, Authentication, CustomTemplateService, ModalService, Notifications, EndpointProvider, KubernetesResourcePoolService, StackService) {
     this.$async = $async;
     this.$state = $state;
     this.$window = $window;
+    this.Authentication = Authentication;
     this.CustomTemplateService = CustomTemplateService;
     this.ModalService = ModalService;
     this.Notifications = Notifications;
@@ -52,6 +53,47 @@ class KubernetesDeployController {
     this.onChangeFormValues = this.onChangeFormValues.bind(this);
     this.onRepoUrlChange = this.onRepoUrlChange.bind(this);
     this.onRepoRefChange = this.onRepoRefChange.bind(this);
+    this.buildAnalyticsProperties = this.buildAnalyticsProperties.bind(this);
+  }
+
+  buildAnalyticsProperties() {
+    const metadata = {
+      type: buildLabel(this.state.BuildMethod),
+      format: formatLabel(this.state.DeployType),
+      role: roleLabel(this.Authentication.isAdmin()),
+    };
+
+    if (this.state.BuildMethod === KubernetesDeployBuildMethods.GIT) {
+      metadata.auth = this.formValues.RepositoryAuthentication;
+    }
+
+    return { metadata };
+
+    function roleLabel(isAdmin) {
+      if (isAdmin) {
+        return 'admin';
+      }
+
+      return 'standard';
+    }
+
+    function buildLabel(buildMethod) {
+      switch (buildMethod) {
+        case KubernetesDeployBuildMethods.GIT:
+          return 'git';
+        case KubernetesDeployBuildMethods.WEB_EDITOR:
+          return 'web-editor';
+      }
+    }
+
+    function formatLabel(format) {
+      switch (format) {
+        case KubernetesDeployManifestTypes.COMPOSE:
+          return 'compose';
+        case KubernetesDeployManifestTypes.KUBERNETES:
+          return 'manifest';
+      }
+    }
   }
 
   disableDeploy() {
@@ -59,11 +101,13 @@ class KubernetesDeployController {
       this.state.BuildMethod === KubernetesDeployBuildMethods.GIT &&
       (!this.formValues.RepositoryURL ||
         !this.formValues.FilePathInRepository ||
-        (this.formValues.RepositoryAuthentication && (!this.formValues.RepositoryUsername || !this.formValues.RepositoryPassword))) && _.isEmpty(this.formValues.Namespace);
-    const isWebEditorInvalid = this.state.BuildMethod === KubernetesDeployBuildMethods.WEB_EDITOR && _.isEmpty(this.formValues.EditorContent) && _.isEmpty(this.formValues.Namespace);
+        (this.formValues.RepositoryAuthentication && (!this.formValues.RepositoryUsername || !this.formValues.RepositoryPassword))) &&
+      _.isEmpty(this.formValues.Namespace);
+    const isWebEditorInvalid =
+      this.state.BuildMethod === KubernetesDeployBuildMethods.WEB_EDITOR && _.isEmpty(this.formValues.EditorContent) && _.isEmpty(this.formValues.Namespace);
     const isURLFormInvalid = this.state.BuildMethod == KubernetesDeployBuildMethods.WEB_EDITOR.URL && _.isEmpty(this.formValues.ManifestURL);
 
-    return isGitFormInvalid || isWebEditorInvalid || isURLFormInvalid  || this.state.actionInProgress;
+    return isGitFormInvalid || isWebEditorInvalid || isURLFormInvalid || this.state.actionInProgress;
   }
 
   onChangeFormValues(values) {
@@ -127,7 +171,7 @@ class KubernetesDeployController {
         case KubernetesDeployBuildMethods.CUSTOM_TEMPLATE:
           method = KubernetesDeployRequestMethods.STRING;
           composeFormat = false;
-          break;          
+          break;
         case this.BuildMethods.URL:
           method = KubernetesDeployRequestMethods.URL;
           break;

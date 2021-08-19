@@ -151,6 +151,10 @@
                       ng-click="ctrl.deploy()"
                       button-spinner="ctrl.state.actionInProgress"
                       data-cy="k8sAppDeploy-deployButton"
+                      analytics-on
+                      analytics-category="kubernetes"
+                      analytics-event="kubernetes-application-advanced-deployment"
+                      analytics-properties="ctrl.buildAnalyticsProperties()"
                     >
                       <span ng-hide="ctrl.state.actionInProgress">Deploy</span>
                       <span ng-show="ctrl.state.actionInProgress">Deployment in progress...</span>
