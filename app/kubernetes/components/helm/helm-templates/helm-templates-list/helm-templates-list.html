@@ -44,6 +44,9 @@
         </helm-templates-list-item>
         <div ng-if="$ctrl.loading" class="text-center text-muted">
           Loading...
+          <div class="text-center text-muted">
+            Initial download of Helm Charts can take a few minutes
+          </div>
         </div>
         <div ng-if="!$ctrl.loading && $ctrl.templates.length === 0" class="text-center text-muted">
           No helm charts available.
