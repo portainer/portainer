@@ -128,6 +128,14 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 		return updateError
 	}
 
+	user, err := handler.DataStore.User().User(securityContext.UserID)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Cannot find context user", Err: errors.Wrap(err, "failed to fetch the user")}
+	}
+	stack.UpdatedBy = user.Username
+	stack.UpdateDate = time.Now().Unix()
+	stack.Status = portainer.StackStatusActive
+
 	err = handler.DataStore.Stack().UpdateStack(stack.ID, stack)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist the stack changes inside the database", Err: err}
@@ -173,10 +181,6 @@ func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Sta
 		return configErr
 	}
 
-	stack.UpdateDate = time.Now().Unix()
-	stack.UpdatedBy = config.user.Username
-	stack.Status = portainer.StackStatusActive
-
 	err = handler.deployComposeStack(config)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: err.Error(), Err: err}
@@ -204,10 +208,6 @@ func (handler *Handler) updateSwarmStack(r *http.Request, stack *portainer.Stack
 	if configErr != nil {
 		return configErr
 	}
-
-	stack.UpdateDate = time.Now().Unix()
-	stack.UpdatedBy = config.user.Username
-	stack.Status = portainer.StackStatusActive
 
 	err = handler.deploySwarmStack(config)
 	if err != nil {
