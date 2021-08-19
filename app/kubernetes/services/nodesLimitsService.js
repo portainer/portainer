@@ -4,8 +4,7 @@ import { KubernetesNodesLimits } from 'Kubernetes/models/nodes-limits/models';
 
 class KubernetesNodesLimitsService {
   /* @ngInject */
-  constructor($async, KubernetesNodesLimits) {
-    this.$async = $async;
+  constructor(KubernetesNodesLimits) {
     this.KubernetesNodesLimits = KubernetesNodesLimits;
   }
 
