@@ -405,10 +405,10 @@
                 <!-- !summary -->
 
                 <!-- actions -->
-                <div ng-if="ctrl.isAdmin && ctrl.pool.Namespace.Name !== 'default'" class="col-sm-12 form-section-title">
+                <div ng-if="ctrl.isAdmin && !ctrl.isDefaultNamespace" class="col-sm-12 form-section-title">
                   Actions
                 </div>
-                <div ng-if="ctrl.isAdmin && ctrl.pool.Namespace.Name !== 'default'" class="form-group">
+                <div ng-if="ctrl.isAdmin && !ctrl.isDefaultNamespace" class="form-group">
                   <div class="col-sm-12">
                     <button
                       type="button"

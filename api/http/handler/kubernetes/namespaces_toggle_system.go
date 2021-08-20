@@ -28,7 +28,7 @@ func (payload *namespacesToggleSystemPayload) Validate(r *http.Request) error {
 // @param id path int true "Endpoint identifier"
 // @param namespace path string true "Namespace name"
 // @param body body namespacesToggleSystemPayload true "Update details"
-// @success 20f "Success"
+// @success 200 "Success"
 // @failure 400 "Invalid request"
 // @failure 404 "Endpoint not found"
 // @failure 500 "Server error"

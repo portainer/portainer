@@ -20,7 +20,7 @@ angular.module('portainer.docker').controller('KubernetesResourcePoolsDatatableC
 
     this.canManageAccess = function (item) {
       if (!this.endpoint.Kubernetes.Configuration.RestrictDefaultNamespace) {
-        return item.Namespace.Name !== 'default' && !this.isSystemNamespace(item);
+        return !KubernetesNamespaceHelper.isDefaultNamespace(item.Namespace.Name) && !this.isSystemNamespace(item);
       } else {
         return !this.isSystemNamespace(item);
       }
@@ -31,7 +31,7 @@ angular.module('portainer.docker').controller('KubernetesResourcePoolsDatatableC
     };
 
     this.isSystemNamespace = function (item) {
-      return KubernetesNamespaceHelper.isSystemNamespace(item.Namespace);
+      return KubernetesNamespaceHelper.isSystemNamespace(item.Namespace.Name);
     };
 
     this.isDisplayed = function (item) {

@@ -33,15 +33,19 @@ angular.module('portainer.kubernetes').controller('KubernetesApplicationsStacksD
      * Do not allow applications in system namespaces to be selected
      */
     this.allowSelection = function (item) {
-      return !this.isSystemNamespace(item);
+      return !this.isSystemNamespace(item.ResourcePool);
     };
 
-    this.isSystemNamespace = function (item) {
-      return KubernetesNamespaceHelper.isSystemNamespace(item);
+    /**
+     * @param {String} namespace Namespace (string name)
+     * @returns Boolean
+     */
+    this.isSystemNamespace = function (namespace) {
+      return KubernetesNamespaceHelper.isSystemNamespace(namespace);
     };
 
     this.isDisplayed = function (item) {
-      return !ctrl.isSystemNamespace(item) || ctrl.settings.showSystem;
+      return !ctrl.isSystemNamespace(item.ResourcePool) || ctrl.settings.showSystem;
     };
 
     this.expandItem = function (item, expanded) {

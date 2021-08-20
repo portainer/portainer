@@ -409,12 +409,9 @@ class KubernetesResourcePoolController {
           this.state.resourceReservation.CPU = quota.CpuLimitUsed;
           this.state.resourceReservation.Memory = KubernetesResourceReservationHelper.megaBytesValue(quota.MemoryLimitUsed);
         }
-
-        this.isSystem = KubernetesNamespaceHelper.isSystemNamespace(this.pool.Namespace);
-        this.isEditable = !KubernetesNamespaceHelper.isSystemNamespace(this.pool.Namespace);
-        if (this.pool.Namespace.Name === 'default') {
-          this.isEditable = false;
-        }
+        this.isSystem = KubernetesNamespaceHelper.isSystemNamespace(this.pool.Namespace.Name);
+        this.isDefaultNamespace = KubernetesNamespaceHelper.isDefaultNamespace(this.pool.Namespace.Name);
+        this.isEditable = !this.isSystem && !this.isDefaultNamespace;
 
         await this.getEvents();
         await this.getApplications();

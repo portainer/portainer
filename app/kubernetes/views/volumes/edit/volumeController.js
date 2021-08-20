@@ -54,7 +54,7 @@ class KubernetesVolumeController {
   }
 
   isSystemNamespace() {
-    return KubernetesNamespaceHelper.isSystemNamespace(this.volume.ResourcePool.Namespace);
+    return KubernetesNamespaceHelper.isSystemNamespace(this.volume.ResourcePool.Namespace.Name);
   }
 
   isUsed() {

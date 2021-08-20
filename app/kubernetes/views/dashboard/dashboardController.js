@@ -64,13 +64,8 @@ class KubernetesDashboardController {
         : '-';
 
       if (!isAdmin) {
-        this.pools = _.filter(pools, (pool) => {
-          return !KubernetesNamespaceHelper.isSystemNamespace(pool.Namespace);
-        });
-
-        this.configurations = _.filter(configurations, (config) => {
-          return !KubernetesConfigurationHelper.isSystemToken(config);
-        });
+        this.pools = _.filter(pools, (pool) => !KubernetesNamespaceHelper.isSystemNamespace(pool.Namespace.Name));
+        this.configurations = _.filter(configurations, (config) => !KubernetesConfigurationHelper.isSystemToken(config));
       } else {
         this.pools = pools;
         this.configurations = configurations;

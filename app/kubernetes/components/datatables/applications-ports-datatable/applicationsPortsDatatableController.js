@@ -32,7 +32,7 @@ angular.module('portainer.docker').controller('KubernetesApplicationsPortsDatata
     };
 
     this.isSystemNamespace = function (item) {
-      return KubernetesNamespaceHelper.isSystemNamespace(item);
+      return KubernetesNamespaceHelper.isSystemNamespace(item.ResourcePool);
     };
 
     this.isDisplayed = function (item) {
