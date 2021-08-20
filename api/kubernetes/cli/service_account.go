@@ -63,7 +63,7 @@ func (kcl *KubeClient) SetupUserServiceAccount(userID int, teamIDs []int, restri
 }
 
 func (kcl *KubeClient) ensureRequiredResourcesExist() error {
-	return kcl.createPortainerUserClusterRole()
+	return kcl.upsertPortainerK8sClusterRoles()
 }
 
 func (kcl *KubeClient) createUserServiceAccount(namespace, serviceAccountName string) error {
