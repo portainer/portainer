@@ -1,18 +1,38 @@
 package helm
 
 import (
+	"os"
 	"testing"
 
 	"github.com/portainer/portainer/api/kubernetes"
 	"github.com/stretchr/testify/assert"
 )
 
+func createValuesFile(values string) (string, error) {
+	file, err := os.CreateTemp("", "helm-values")
+	if err != nil {
+		return "", err
+	}
+
+	_, err = file.WriteString(values)
+	if err != nil {
+		file.Close()
+		return "", err
+	}
+
+	err = file.Close()
+	if err != nil {
+		return "", err
+	}
+
+	return file.Name(), nil
+}
+
 func Test_Install(t *testing.T) {
+	ensureIntegrationTest(t)
 	is := assert.New(t)
 
-	kubeConfigService := kubernetes.NewKubeConfigCAService("")
-	// assume helm is in $PATH
-	hbpm := NewHelmBinaryPackageManager(kubeConfigService, "")
+	hbpm := NewHelmBinaryPackageManager(kubernetes.NewKubeConfigCAService("", ""), "")
 
 	t.Run("successfully installs nginx chart with name test-nginx", func(t *testing.T) {
 		// helm install test-nginx --repo https://charts.bitnami.com/bitnami nginx
@@ -21,8 +41,9 @@ func Test_Install(t *testing.T) {
 			Chart: "nginx",
 			Repo:  "https://charts.bitnami.com/bitnami",
 		}
-		release, err := hbpm.Install(installOpts, "", "")
-		defer hbpm.Run("uninstall", []string{"test-nginx"}, "", "")
+
+		release, err := hbpm.Install(installOpts, 1, "")
+		defer hbpm.run("uninstall", []string{"test-nginx"})
 
 		is.NoError(err, "should successfully install release", release)
 	})
@@ -33,21 +54,34 @@ func Test_Install(t *testing.T) {
 			Chart: "nginx",
 			Repo:  "https://charts.bitnami.com/bitnami",
 		}
-		release, err := hbpm.Install(installOpts, "", "")
-		defer hbpm.Run("uninstall", []string{release.Name}, "", "")
+		release, err := hbpm.Install(installOpts, 1, "")
+		defer hbpm.run("uninstall", []string{release.Name})
 
 		is.NoError(err, "should successfully install release", release)
 	})
 
-	// TODO
-	// t.Run("successfully installs nginx with values", func(t *testing.T) {
-	// 	installOpts := InstallOptions{
-	// 		Name: "test-nginx-2",
-	// 		ValuesFile: "tempfile",
-	// 	}
-	// 	release, err := hbpm.Install(installOpts, "", "")
-	// 	defer hbpm.Run("uninstall", []string{"test-nginx-2"}, "", "")
+	t.Run("successfully installs nginx with values", func(t *testing.T) {
+		// helm install test-nginx-2 --repo https://charts.bitnami.com/bitnami nginx --values /tmp/helm-values3161785816
+		values, err := createValuesFile("service:\n  port:  8081")
+		is.NoError(err, "should create a values file")
 
-	// 	is.NoError(err, "should successfully install release", release)
-	// })
+		defer os.Remove(values)
+
+		installOpts := InstallOptions{
+			Name:       "test-nginx-2",
+			Chart:      "nginx",
+			Repo:       "https://charts.bitnami.com/bitnami",
+			ValuesFile: values,
+		}
+		release, err := hbpm.Install(installOpts, 1, "")
+		defer hbpm.run("uninstall", []string{"test-nginx-2"})
+
+		is.NoError(err, "should successfully install release", release)
+	})
+}
+
+func ensureIntegrationTest(t *testing.T) {
+	if _, ok := os.LookupEnv("INTEGRATION_TEST"); !ok {
+		t.Skip("skip an integration test")
+	}
 }
