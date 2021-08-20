@@ -11,12 +11,8 @@ export default class HelmTemplatesListController {
 
   async updateCategories() {
     try {
-      // TODO - utilise templates prop
-      const templates = await this.HelmService.search();
-      const chartCategories = Object.values(templates.entries).map((charts) => charts[0]);
-
-      const annotationCategories = chartCategories
-        .flatMap((t) => t.annotations) // get annotations
+      const annotationCategories = this.templates
+        .map((t) => t.annotations) // get annotations
         .filter((a) => a) // filter out undefined/nulls
         .map((c) => c.category); // get annotation category
       const availableCategories = [...new Set(annotationCategories)].sort(); // unique and sort
@@ -34,6 +30,12 @@ export default class HelmTemplatesListController {
     this.state.selectedCategory = '';
   }
 
+  $onChanges() {
+    if (this.templates.length > 0) {
+      this.updateCategories();
+    }
+  }
+
   $onInit() {
     return this.$async(async () => {
       this.state = {
@@ -41,8 +43,6 @@ export default class HelmTemplatesListController {
         selectedCategory: '',
         categories: [],
       };
-
-      await this.updateCategories();
 
       const textFilter = this.DatatableService.getDataTableTextFilters(this.tableKey);
       if (textFilter !== null) {
