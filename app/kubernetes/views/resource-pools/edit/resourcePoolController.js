@@ -293,7 +293,7 @@ class KubernetesResourcePoolController {
       this.state.ingressesLoading = true;
       try {
         const namespace = this.pool.Namespace.Name;
-        this.allIngresses = await this.KubernetesIngressService.get();
+        this.allIngresses = await this.KubernetesIngressService.get(this.state.hasWriteAuthorization ? '' : namespace);
         this.ingresses = _.filter(this.allIngresses, { Namespace: namespace });
         _.forEach(this.ingresses, (ing) => {
           ing.Namespace = namespace;

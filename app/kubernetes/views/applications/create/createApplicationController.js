@@ -371,7 +371,7 @@ class KubernetesCreateApplicationController {
   /* #region  PUBLISHED PORTS UI MANAGEMENT */
   addPublishedPort() {
     const p = new KubernetesApplicationPublishedPortFormValue();
-    const ingresses = this.filteredIngresses;
+    const ingresses = this.ingresses;
     p.IngressName = ingresses && ingresses.length ? ingresses[0].Name : undefined;
     p.IngressHost = ingresses && ingresses.length ? ingresses[0].Hosts[0] : undefined;
     p.IngressHosts = ingresses && ingresses.length ? ingresses[0].Hosts : undefined;
@@ -382,7 +382,7 @@ class KubernetesCreateApplicationController {
   }
 
   resetPublishedPorts() {
-    const ingresses = this.filteredIngresses;
+    const ingresses = this.ingresses;
     _.forEach(this.formValues.PublishedPorts, (p) => {
       p.IngressName = ingresses && ingresses.length ? ingresses[0].Name : undefined;
       p.IngressHost = ingresses && ingresses.length ? ingresses[0].Hosts[0] : undefined;
@@ -441,7 +441,7 @@ class KubernetesCreateApplicationController {
 
   onChangePortMappingIngress(index) {
     const publishedPort = this.formValues.PublishedPorts[index];
-    const ingress = _.find(this.filteredIngresses, { Name: publishedPort.IngressName });
+    const ingress = _.find(this.ingresses, { Name: publishedPort.IngressName });
     publishedPort.IngressHosts = ingress.Hosts;
     this.ingressHostnames = ingress.Hosts;
     publishedPort.IngressHost = this.ingressHostnames.length ? this.ingressHostnames[0] : [];
@@ -650,7 +650,7 @@ class KubernetesCreateApplicationController {
   }
 
   publishViaIngressEnabled() {
-    return this.filteredIngresses.length;
+    return this.ingresses.length;
   }
 
   isEditAndNoChangesMade() {
@@ -871,16 +871,22 @@ class KubernetesCreateApplicationController {
   }
 
   refreshIngresses(namespace) {
-    this.filteredIngresses = _.filter(this.ingresses, { Namespace: namespace });
-    this.ingressHostnames = this.filteredIngresses.length ? this.filteredIngresses[0].Hosts : [];
-    if (!this.publishViaIngressEnabled()) {
-      if (this.savedFormValues) {
-        this.formValues.PublishingType = this.savedFormValues.PublishingType;
-      } else {
-        this.formValues.PublishingType = this.ApplicationPublishingTypes.INTERNAL;
+    return this.$async(async () => {
+      try {
+        this.ingresses = await this.KubernetesIngressService.get(namespace);
+        this.ingressHostnames = this.ingresses.length ? this.ingresses[0].Hosts : [];
+        if (!this.publishViaIngressEnabled()) {
+          if (this.savedFormValues) {
+            this.formValues.PublishingType = this.savedFormValues.PublishingType;
+          } else {
+            this.formValues.PublishingType = this.ApplicationPublishingTypes.INTERNAL;
+          }
+        }
+        this.formValues.OriginalIngresses = this.ingresses;
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to retrieve ingresses');
       }
-    }
-    this.formValues.OriginalIngresses = this.filteredIngresses;
+    });
   }
 
   refreshNamespaceData(namespace) {
@@ -990,13 +996,11 @@ class KubernetesCreateApplicationController {
         this.state.useLoadBalancer = this.endpoint.Kubernetes.Configuration.UseLoadBalancer;
         this.state.useServerMetrics = this.endpoint.Kubernetes.Configuration.UseServerMetrics;
 
-        const [resourcePools, nodes, ingresses, nodesLimits] = await Promise.all([
+        const [resourcePools, nodes, nodesLimits] = await Promise.all([
           this.KubernetesResourcePoolService.get(),
           this.KubernetesNodeService.get(),
-          this.KubernetesIngressService.get(),
           this.KubernetesNodesLimitsService.get(),
         ]);
-        this.ingresses = ingresses;
         this.nodesLimits = nodesLimits;
 
         this.resourcePools = _.filter(resourcePools, (resourcePool) => !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name));
@@ -1023,9 +1027,9 @@ class KubernetesCreateApplicationController {
             this.configurations,
             this.persistentVolumeClaims,
             this.nodesLabels,
-            this.filteredIngresses
+            this.ingresses
           );
-          this.formValues.OriginalIngresses = this.filteredIngresses;
+          this.formValues.OriginalIngresses = this.ingresses;
           this.formValues.ImageModel = await this.parseImageConfiguration(this.formValues.ImageModel);
           this.savedFormValues = angular.copy(this.formValues);
           delete this.formValues.ApplicationType;
@@ -1042,7 +1046,6 @@ class KubernetesCreateApplicationController {
           await this.refreshNamespaceData(namespace);
         } else {
           this.formValues.AutoScaler = KubernetesApplicationHelper.generateAutoScalerFormValueFromHorizontalPodAutoScaler(null, this.formValues.ReplicaCount);
-          this.formValues.OriginalIngressClasses = angular.copy(this.ingresses);
         }
 
         if (this.state.isEdit) {
