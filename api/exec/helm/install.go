@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/pkg/errors"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/exec/helm/release"
 )
 
@@ -18,7 +19,7 @@ type InstallOptions struct {
 
 // Install runs `helm install` with specified install options.
 // The install options translate to CLI arguments which are passed in to the helm binary when executing install.
-func (hbpm *helmBinaryPackageManager) Install(installOpts InstallOptions, serverURL, authToken string) (*release.Release, error) {
+func (hbpm *helmBinaryPackageManager) Install(installOpts InstallOptions, endpointId portainer.EndpointID, authToken string) (*release.Release, error) {
 	if installOpts.Name == "" {
 		installOpts.Name = "--generate-name"
 	}
@@ -35,7 +36,7 @@ func (hbpm *helmBinaryPackageManager) Install(installOpts InstallOptions, server
 		args = append(args, "--values", installOpts.ValuesFile)
 	}
 
-	result, err := hbpm.Run("install", args, serverURL, authToken)
+	result, err := hbpm.runWithKubeConfig("install", args, endpointId, authToken)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to run helm install on specified args")
 	}
