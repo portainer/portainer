@@ -425,6 +425,11 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Fatal(err)
 	}
 
+	sslSettings, err := sslService.GetSSLSettings()
+	if err != nil {
+		log.Fatalf("failed to get ssl settings: %s", err)
+	}
+
 	err = initKeyPair(fileService, digitalSignatureService)
 	if err != nil {
 		log.Fatalf("failed initializing key pai: %v", err)
@@ -451,7 +456,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	kubernetesTokenCacheManager := kubeproxy.NewTokenCacheManager()
 
-	kubeConfigService := kubernetes.NewKubeConfigCAService(*flags.SSLCert)
+	kubeConfigService := kubernetes.NewKubeConfigCAService(*flags.AddrHTTPS, sslSettings.CertPath)
 
 	proxyManager := proxy.NewManager(dataStore, digitalSignatureService, reverseTunnelService, dockerClientFactory, kubernetesClientFactory, kubernetesTokenCacheManager)
 
@@ -528,7 +533,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Fatalf("failed starting tunnel server: %s", err)
 	}
 
-	sslSettings, err := dataStore.SSLSettings().Settings()
+	sslDBSettings, err := dataStore.SSLSettings().Settings()
 	if err != nil {
 		log.Fatalf("failed to fetch ssl settings from DB")
 	}
@@ -543,7 +548,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		Status:                      applicationStatus,
 		BindAddress:                 *flags.Addr,
 		BindAddressHTTPS:            *flags.AddrHTTPS,
-		HTTPEnabled:                 sslSettings.HTTPEnabled,
+		HTTPEnabled:                 sslDBSettings.HTTPEnabled,
 		AssetsPath:                  *flags.Assets,
 		DataStore:                   dataStore,
 		SwarmStackManager:           swarmStackManager,

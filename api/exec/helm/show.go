@@ -40,7 +40,7 @@ func (hbpm *helmBinaryPackageManager) Show(showOpts ShowOptions) (string, error)
 		"--repo", showOpts.Repo,
 	}
 
-	result, err := hbpm.Run("show", args, "", "")
+	result, err := hbpm.run("show", args)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to run helm show on specified args")
 	}

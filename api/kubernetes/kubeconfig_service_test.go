@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-// SSL certificate can be generated using:
+// TLS certificate can be generated using:
 // openssl req -x509 -out localhost.crt -keyout localhost.key -newkey rsa:2048 -nodes -sha25 -subj '/CN=localhost' -extensions EXT -config <( \
 // printf "[dn]\nCN=localhost\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:localhost\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
 const certData = `-----BEGIN CERTIFICATE-----
@@ -48,30 +49,30 @@ func createTempFile(filename, content string) (string, func()) {
 func Test_getCertificateAuthorityData(t *testing.T) {
 	is := assert.New(t)
 
-	t.Run("getCertificateAuthorityData fails on ssl cert not provided", func(t *testing.T) {
+	t.Run("getCertificateAuthorityData fails on tls cert not provided", func(t *testing.T) {
 		_, err := getCertificateAuthorityData("")
-		is.ErrorIs(err, errSSLCertNotProvided, "getCertificateAuthorityData should fail with %w", errSSLCertNotProvided)
+		is.ErrorIs(err, errTLSCertNotProvided, "getCertificateAuthorityData should fail with %w", errTLSCertNotProvided)
 	})
 
-	t.Run("getCertificateAuthorityData fails on ssl cert provided but missing file", func(t *testing.T) {
+	t.Run("getCertificateAuthorityData fails on tls cert provided but missing file", func(t *testing.T) {
 		_, err := getCertificateAuthorityData("/tmp/non-existent.crt")
-		is.ErrorIs(err, errSSLCertFileMissing, "getCertificateAuthorityData should fail with %w", errSSLCertFileMissing)
+		is.ErrorIs(err, errTLSCertFileMissing, "getCertificateAuthorityData should fail with %w", errTLSCertFileMissing)
 	})
 
-	t.Run("getCertificateAuthorityData fails on ssl cert provided but invalid file data", func(t *testing.T) {
+	t.Run("getCertificateAuthorityData fails on tls cert provided but invalid file data", func(t *testing.T) {
 		filePath, teardown := createTempFile("invalid-cert.crt", "hello\ngo\n")
 		defer teardown()
 
 		_, err := getCertificateAuthorityData(filePath)
-		is.ErrorIs(err, errSSLCertIncorrectType, "getCertificateAuthorityData should fail with %w", errSSLCertIncorrectType)
+		is.ErrorIs(err, errTLSCertIncorrectType, "getCertificateAuthorityData should fail with %w", errTLSCertIncorrectType)
 	})
 
-	t.Run("getCertificateAuthorityData succeeds on valid ssl cert provided", func(t *testing.T) {
+	t.Run("getCertificateAuthorityData succeeds on valid tls cert provided", func(t *testing.T) {
 		filePath, teardown := createTempFile("valid-cert.crt", certData)
 		defer teardown()
 
 		certificateAuthorityData, err := getCertificateAuthorityData(filePath)
-		is.NoError(err, "getCertificateAuthorityData succeed with valid cert; err=%w", errSSLCertIncorrectType)
+		is.NoError(err, "getCertificateAuthorityData succeed with valid cert; err=%w", errTLSCertIncorrectType)
 
 		is.Equal(certificateAuthorityData, certDataString, "returned certificateAuthorityData should be %s", certDataString)
 	})
@@ -81,28 +82,46 @@ func TestKubeConfigService_IsSecure(t *testing.T) {
 	is := assert.New(t)
 
 	t.Run("IsSecure should be false", func(t *testing.T) {
-		kcs := NewKubeConfigCAService("")
-		is.False(kcs.IsSecure(), "should be false if SSL cert not provided")
+		kcs := NewKubeConfigCAService("", "")
+		is.False(kcs.IsSecure(), "should be false if TLS cert not provided")
 	})
 
 	t.Run("IsSecure should be false", func(t *testing.T) {
 		filePath, teardown := createTempFile("valid-cert.crt", certData)
 		defer teardown()
 
-		kcs := NewKubeConfigCAService(filePath)
-		is.True(kcs.IsSecure(), "should be true if valid SSL cert (path and content) provided")
+		kcs := NewKubeConfigCAService("", filePath)
+		is.True(kcs.IsSecure(), "should be true if valid TLS cert (path and content) provided")
 	})
 }
 
-func TestKubeConfigService_GetKubeConfigCore(t *testing.T) {
+func TestKubeConfigService_GetKubeConfigInternal(t *testing.T) {
 	is := assert.New(t)
 
-	t.Run("GetKubeConfigCore returns insecure cluster access config", func(t *testing.T) {
-		kcs := NewKubeConfigCAService("")
-		clusterAccessDetails := kcs.GetKubeConfigCore("http://portainer.com", "some-token")
+	t.Run("GetKubeConfigInternal returns localhost address", func(t *testing.T) {
+		kcs := NewKubeConfigCAService("", "")
+		clusterAccessDetails := kcs.GetKubeConfigInternal(1, "some-token")
+		is.True(strings.Contains(clusterAccessDetails.ClusterServerURL, "https://localhost"), "should contain localhost address")
+	})
 
-		wantClusterAccessDetails := KubernetesClusterAccess{
-			ClusterServerURL:         "http://portainer.com",
+	t.Run("GetKubeConfigInternal contains https bind address port", func(t *testing.T) {
+		kcs := NewKubeConfigCAService(":1010", "")
+		clusterAccessDetails := kcs.GetKubeConfigInternal(1, "some-token")
+		is.True(strings.Contains(clusterAccessDetails.ClusterServerURL, ":1010"), "should contain bind address port")
+	})
+
+	t.Run("GetKubeConfigInternal contains endpoint proxy url", func(t *testing.T) {
+		kcs := NewKubeConfigCAService("", "")
+		clusterAccessDetails := kcs.GetKubeConfigInternal(100, "some-token")
+		is.True(strings.Contains(clusterAccessDetails.ClusterServerURL, "api/endpoints/100/kubernetes"), "should contain endpoint proxy url")
+	})
+
+	t.Run("GetKubeConfigInternal returns insecure cluster access config", func(t *testing.T) {
+		kcs := NewKubeConfigCAService("", "")
+		clusterAccessDetails := kcs.GetKubeConfigInternal(1, "some-token")
+
+		wantClusterAccessDetails := kubernetesClusterAccess{
+			ClusterServerURL:         "https://localhost/api/endpoints/1/kubernetes",
 			AuthToken:                "some-token",
 			CertificateAuthorityFile: "",
 			CertificateAuthorityData: "",
@@ -111,15 +130,15 @@ func TestKubeConfigService_GetKubeConfigCore(t *testing.T) {
 		is.Equal(clusterAccessDetails, wantClusterAccessDetails)
 	})
 
-	t.Run("GetKubeConfigCore returns secure cluster access config", func(t *testing.T) {
+	t.Run("GetKubeConfigInternal returns secure cluster access config", func(t *testing.T) {
 		filePath, teardown := createTempFile("valid-cert.crt", certData)
 		defer teardown()
 
-		kcs := NewKubeConfigCAService(filePath)
-		clusterAccessDetails := kcs.GetKubeConfigCore("http://portainer.com", "some-token")
+		kcs := NewKubeConfigCAService("", filePath)
+		clusterAccessDetails := kcs.GetKubeConfigInternal(1, "some-token")
 
-		wantClusterAccessDetails := KubernetesClusterAccess{
-			ClusterServerURL:         "http://portainer.com",
+		wantClusterAccessDetails := kubernetesClusterAccess{
+			ClusterServerURL:         "https://localhost/api/endpoints/1/kubernetes",
 			AuthToken:                "some-token",
 			CertificateAuthorityFile: filePath,
 			CertificateAuthorityData: certDataString,
