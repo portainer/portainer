@@ -12,39 +12,30 @@ import (
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/exec/helm"
 	httperrors "github.com/portainer/portainer/api/http/errors"
-	"github.com/portainer/portainer/api/http/security"
 )
 
 const (
 	handlerActivityContext = "Kubernetes"
 )
 
+type requestBouncer interface {
+	AuthenticatedAccess(h http.Handler) http.Handler
+}
+
 // Handler is the HTTP handler used to handle endpoint group operations.
 type Handler struct {
 	*mux.Router
-	requestBouncer     *security.RequestBouncer
+	requestBouncer     requestBouncer
 	DataStore          portainer.DataStore
 	HelmPackageManager helm.HelmPackageManager
 }
 
 // NewHandler creates a handler to manage endpoint group operations.
-func NewHandler(bouncer *security.RequestBouncer) *Handler {
+func NewHandler(bouncer requestBouncer) *Handler {
 	h := &Handler{
 		Router:         mux.NewRouter(),
 		requestBouncer: bouncer,
 	}
-
-	// `helm list -o json`
-	h.Handle("/{id}/kubernetes/helm",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.helmList))).Methods(http.MethodGet)
-
-	// `helm get manifest RELEASE_NAME`
-	h.Handle("/{id}/kubernetes/helm/{release}",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.helmGet))).Methods(http.MethodGet)
-
-	// `helm delete RELEASE_NAME`
-	h.Handle("/{id}/kubernetes/helm/{release}",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.helmDelete))).Methods(http.MethodDelete)
 
 	// `helm install [NAME] [CHART] flags`
 	h.Handle("/{id}/kubernetes/helm",
@@ -54,7 +45,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 }
 
 // NewTemplateHandler creates a template handler to manage endpoint group operations.
-func NewTemplateHandler(bouncer *security.RequestBouncer) *Handler {
+func NewTemplateHandler(bouncer requestBouncer) *Handler {
 	h := &Handler{
 		Router:         mux.NewRouter(),
 		requestBouncer: bouncer,
@@ -85,26 +76,6 @@ func (handler *Handler) GetEndpoint(r *http.Request) (*portainer.Endpoint, *http
 	}
 
 	return endpoint, nil
-}
-
-// getHelmRepositoryUrl gets the helm repository url from settings
-func (handler *Handler) getHelmRepositoryUrl() (string, *httperror.HandlerError) {
-
-	settings, err := handler.DataStore.Settings().Settings()
-	if err != nil {
-		return "", &httperror.HandlerError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    "Unable to retrieve settings",
-			Err:        err,
-		}
-	}
-
-	repo := settings.HelmRepositoryURL
-	if repo == "" {
-		repo = defaultHelmRepoURL
-	}
-
-	return repo, nil
 }
 
 // getProxyUrl generates portainer proxy url which acts as proxy to k8s api server

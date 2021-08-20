@@ -24,6 +24,10 @@ func (m *Migrator) migrateDBVersionToDB32() error {
 		return err
 	}
 
+	if err := m.helmRepositoryURLToDB32(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -210,4 +214,13 @@ func findResourcesToUpdateForDB32(dockerID string, volumesData map[string]interf
 			toUpdate[resourceControl.ID] = fmt.Sprintf("%s_%s", volumeName, dockerID)
 		}
 	}
+}
+
+func (m *Migrator) helmRepositoryURLToDB32() error {
+	settings, err := m.settingsService.Settings()
+	if err != nil {
+		return err
+	}
+	settings.HelmRepositoryURL = portainer.DefaultHelmRepositoryURL
+	return m.settingsService.UpdateSettings(settings)
 }
