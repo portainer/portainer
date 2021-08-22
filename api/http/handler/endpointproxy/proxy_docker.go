@@ -3,6 +3,7 @@ package endpointproxy
 import (
 	"errors"
 	"strconv"
+	"strings"
 	"time"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -65,6 +66,12 @@ func (handler *Handler) proxyRequestsToDockerAPI(w http.ResponseWriter, r *http.
 	}
 
 	id := strconv.Itoa(endpointID)
-	http.StripPrefix("/"+id+"/docker", proxy).ServeHTTP(w, r)
+
+	prefix := "/" + id + "/agent/docker";
+	if !strings.HasPrefix(r.URL.Path, prefix) {
+		prefix = "/" + id + "/docker";
+	}
+
+	http.StripPrefix(prefix, proxy).ServeHTTP(w, r)
 	return nil
 }

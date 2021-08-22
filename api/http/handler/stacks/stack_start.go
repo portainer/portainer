@@ -85,6 +85,17 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 		return &httperror.HandlerError{http.StatusBadRequest, "Stack is already active", errors.New("Stack is already active")}
 	}
 
+	if stack.AutoUpdate != nil && stack.AutoUpdate.Interval != "" {
+		stopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
+
+		jobID, e := startAutoupdate(stack.ID, stack.AutoUpdate.Interval, handler.Scheduler, handler.StackDeployer, handler.DataStore, handler.GitService)
+		if e != nil {
+			return e
+		}
+
+		stack.AutoUpdate.JobID = jobID
+	}
+
 	err = handler.startStack(stack, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to start stack", err}
@@ -94,6 +105,11 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 	err = handler.DataStore.Stack().UpdateStack(stack.ID, stack)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update stack status", err}
+	}
+
+	if stack.GitConfig != nil && stack.GitConfig.Authentication != nil && stack.GitConfig.Authentication.Password != "" {
+		// sanitize password in the http response to minimise possible security leaks
+		stack.GitConfig.Authentication.Password = ""
 	}
 
 	return response.JSON(w, stack)

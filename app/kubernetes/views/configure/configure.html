@@ -179,18 +179,18 @@
 
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
-                Enabling this feature will allow users to use specific features that leverage the metrics server component.
+                Enabling this feature will allow users to use specific features like autoscaling and to see container and node resource usage.
                 <p style="margin-top: 2px;">
                   <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                  Ensure that <a href="https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/#metrics-server" target="_blank">metrics server</a> is
-                  running inside your cluster.
+                  Ensure that <a href="https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/#metrics-server" target="_blank">metrics server</a> or
+                  <a href="https://github.com/kubernetes-sigs/prometheus-adapter" target="_blank">prometheus</a> is running inside your cluster.
                 </p>
               </span>
             </div>
             <div class="form-group">
               <div class="col-sm-12">
                 <label class="control-label text-left">
-                  Enable features using metrics server
+                  Enable features using the metrics API
                 </label>
                 <label class="switch" style="margin-left: 20px;">
                   <input type="checkbox" ng-model="ctrl.formValues.UseServerMetrics" ng-change="ctrl.enableMetricsServer()" /><i></i>

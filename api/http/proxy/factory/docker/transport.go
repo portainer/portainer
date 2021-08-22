@@ -92,7 +92,7 @@ func (transport *Transport) ProxyDockerRequest(request *http.Request) (*http.Res
 	requestPath := apiVersionRe.ReplaceAllString(request.URL.Path, "")
 	request.URL.Path = requestPath
 
-	if transport.endpoint.Type == portainer.AgentOnDockerEnvironment {
+	if transport.endpoint.Type == portainer.AgentOnDockerEnvironment || transport.endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
 		signature, err := transport.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
 		if err != nil {
 			return nil, err

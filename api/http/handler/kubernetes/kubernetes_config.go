@@ -34,14 +34,6 @@ import (
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/config [get]
 func (handler *Handler) getKubernetesConfig(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	if r.TLS == nil {
-		return &httperror.HandlerError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    "Kubernetes config generation only supported on portainer instances running with TLS",
-			Err:        errors.New("missing request TLS config"),
-		}
-	}
-
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint identifier route variable", err}

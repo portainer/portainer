@@ -44,6 +44,7 @@ type (
 	// CLIFlags represents the available flags on the CLI
 	CLIFlags struct {
 		Addr                      *string
+		AddrHTTPS                 *string
 		TunnelAddr                *string
 		TunnelPort                *string
 		AdminPassword             *string
@@ -61,6 +62,7 @@ type (
 		TLSCacert                 *string
 		TLSCert                   *string
 		TLSKey                    *string
+		HTTPDisabled              *bool
 		SSL                       *bool
 		SSLCert                   *string
 		SSLKey                    *string
@@ -704,6 +706,14 @@ type (
 	// SoftwareEdition represents an edition of Portainer
 	SoftwareEdition int
 
+	// SSLSettings represents a pair of SSL certificate and key
+	SSLSettings struct {
+		CertPath    string `json:"certPath"`
+		KeyPath     string `json:"keyPath"`
+		SelfSigned  bool   `json:"selfSigned"`
+		HTTPEnabled bool   `json:"httpEnabled"`
+	}
+
 	// Stack represents a Docker stack created via docker stack deploy
 	Stack struct {
 		// Stack Identifier
@@ -734,8 +744,22 @@ type (
 		UpdateDate int64 `example:"1587399600"`
 		// The username which last updated this stack
 		UpdatedBy string `example:"bob"`
+		// Only applies when deploying stack with multiple files
+		AdditionalFiles []string `json:"AdditionalFiles"`
+		// The auto update settings of a git stack
+		AutoUpdate *StackAutoUpdate `json:"AutoUpdate"`
 		// The git config of this stack
 		GitConfig *gittypes.RepoConfig
+	}
+
+	//StackAutoUpdate represents the git auto sync config for stack deployment
+	StackAutoUpdate struct {
+		// Auto update interval
+		Interval string `example:"1m30s"`
+		// A UUID generated from client
+		Webhook string `example:"05de31a2-79fa-4644-9c12-faa67e5c49f0"`
+		// Autoupdate job id
+		JobID string `example:"15"`
 	}
 
 	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier)
@@ -751,6 +775,8 @@ type (
 	Status struct {
 		// Portainer API version
 		Version string `json:"Version" example:"2.0.0"`
+		// Server Instance ID
+		InstanceID string `example:"299ab403-70a8-4c05-92f7-bf7a994d50df"`
 	}
 
 	// Tag represents a tag that can be associated to a resource
@@ -1056,6 +1082,7 @@ type (
 		ResourceControl() ResourceControlService
 		Role() RoleService
 		Settings() SettingsService
+		SSLSettings() SSLSettingsService
 		Stack() StackService
 		Tag() TagService
 		TeamMembership() TeamMembershipService
@@ -1166,11 +1193,15 @@ type (
 		GetCustomTemplateProjectPath(identifier string) string
 		GetTemporaryPath() (string, error)
 		GetDatastorePath() string
+		GetDefaultSSLCertsPath() (string, string)
+		StoreSSLCertPair(cert, key []byte) (string, string, error)
+		CopySSLCertPair(certPath, keyPath string) (string, string, error)
 	}
 
 	// GitService represents a service for managing Git
 	GitService interface {
 		CloneRepository(destination string, repositoryURL, referenceName, username, password string) error
+		LatestCommitID(repositoryURL, referenceName, username, password string) (string, error)
 	}
 
 	// JWTService represents a service for managing JWT tokens
@@ -1271,6 +1302,12 @@ type (
 		Start() error
 	}
 
+	// SSLSettingsService represents a service for managing application settings
+	SSLSettingsService interface {
+		Settings() (*SSLSettings, error)
+		UpdateSettings(settings *SSLSettings) error
+	}
+
 	// StackService represents a service for managing stack data
 	StackService interface {
 		Stack(ID StackID) (*Stack, error)
@@ -1280,6 +1317,8 @@ type (
 		UpdateStack(ID StackID, stack *Stack) error
 		DeleteStack(ID StackID) error
 		GetNextIdentifier() int
+		StackByWebhookID(ID string) (*Stack, error)
+		RefreshableStacks() ([]Stack, error)
 	}
 
 	// SnapshotService represents a service for managing endpoint snapshots
@@ -1370,7 +1409,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "2.6.0"
+	APIVersion = "2.6.2"
 	// DBVersion is the version number of the Portainer database
 	DBVersion = 32
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax

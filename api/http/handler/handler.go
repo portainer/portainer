@@ -22,6 +22,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/resourcecontrols"
 	"github.com/portainer/portainer/api/http/handler/roles"
 	"github.com/portainer/portainer/api/http/handler/settings"
+	"github.com/portainer/portainer/api/http/handler/ssl"
 	"github.com/portainer/portainer/api/http/handler/stacks"
 	"github.com/portainer/portainer/api/http/handler/status"
 	"github.com/portainer/portainer/api/http/handler/tags"
@@ -54,6 +55,7 @@ type Handler struct {
 	ResourceControlHandler *resourcecontrols.Handler
 	RoleHandler            *roles.Handler
 	SettingsHandler        *settings.Handler
+	SSLHandler             *ssl.Handler
 	StackHandler           *stacks.Handler
 	StatusHandler          *status.Handler
 	TagHandler             *tags.Handler
@@ -130,6 +132,8 @@ type Handler struct {
 // @tag.description Manage App Templates
 // @tag.name stacks
 // @tag.description Manage stacks
+// @tag.name ssl
+// @tag.description Manage ssl settings
 // @tag.name upload
 // @tag.description Upload files
 // @tag.name webhooks
@@ -172,6 +176,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.StripPrefix("/api/endpoints", h.EndpointProxyHandler).ServeHTTP(w, r)
 		case strings.Contains(r.URL.Path, "/azure/"):
 			http.StripPrefix("/api/endpoints", h.EndpointProxyHandler).ServeHTTP(w, r)
+		case strings.Contains(r.URL.Path, "/agent/"):
+			http.StripPrefix("/api/endpoints", h.EndpointProxyHandler).ServeHTTP(w, r)
 		case strings.Contains(r.URL.Path, "/edge/"):
 			http.StripPrefix("/api/endpoints", h.EndpointEdgeHandler).ServeHTTP(w, r)
 		default:
@@ -199,6 +205,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.UploadHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/users"):
 		http.StripPrefix("/api", h.UserHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/ssl"):
+		http.StripPrefix("/api", h.SSLHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/teams"):
 		http.StripPrefix("/api", h.TeamHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/team_memberships"):

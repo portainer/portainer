@@ -81,31 +81,7 @@
             </div>
           </div>
           <!-- !build-method -->
-          <!-- web-editor -->
-          <div ng-show="state.Method === 'editor'">
-            <div class="col-sm-12 form-section-title">
-              Web editor
-            </div>
-            <div class="form-group">
-              <span class="col-sm-12 text-muted small">
-                You can get more information about Compose file format in the <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>.
-              </span>
-              <div class="col-sm-12" ng-if="state.editorYamlValidationError"
-                ><span class="text-danger small">{{ state.editorYamlValidationError }}</span></div
-              >
-            </div>
-            <div class="form-group">
-              <div class="col-sm-12">
-                <code-editor
-                  identifier="stack-creation-editor"
-                  placeholder="# Define or paste the content of your docker-compose file here"
-                  yml="true"
-                  on-change="(editorUpdate)"
-                ></code-editor>
-              </div>
-            </div>
-          </div>
-          <!-- !web-editor -->
+
           <!-- upload -->
           <div ng-show="state.Method === 'upload'">
             <div class="col-sm-12 form-section-title">
@@ -130,64 +106,42 @@
             </div>
           </div>
           <!-- !upload -->
-          <git-form ng-if="state.Method === 'repository'" model="formValues" on-change="(onChangeFormValues)"></git-form>
-          <!-- custom-template -->
-          <div ng-show="state.Method === 'template'">
-            <div class="form-group">
-              <label for="stack_template" class="col-sm-1 control-label text-left">
-                Template
-              </label>
-              <div class="col-sm-11">
-                <select
-                  ng-if="templates.length"
-                  class="form-control"
-                  ng-model="selectedTemplate"
-                  ng-options="template as template.label for template in templates"
-                  ng-change="onChangeTemplate(selectedTemplate)"
-                >
-                  <option value="" label="Select a Custom template" disabled selected="selected"> </option>
-                </select>
-                <span ng-if="!templates.length">
-                  No custom templates are available. Head over to the <a ui-sref="docker.templates.custom.new">custom template view</a> to create one.
-                </span>
+          <git-form
+            ng-if="state.Method === 'repository'"
+            model="formValues"
+            on-change="(onChangeFormValues)"
+            additional-file="true"
+            auto-update="true"
+            show-auth-explanation="true"
+          ></git-form>
+
+          <custom-template-selector
+            ng-show="state.Method === 'template'"
+            new-template-path="docker.templates.custom.new"
+            stack-type="state.StackType"
+            on-change="(onChangeTemplateId)"
+            value="state.templateId"
+          ></custom-template-selector>
+
+          <web-editor-form
+            ng-if="state.Method === 'editor' || (state.Method === 'template' && state.templateId)"
+            identifier="stack-creation-editor"
+            value="formValues.StackFileContent"
+            on-change="(onChangeFileContent)"
+            ng-required="true"
+            yml="true"
+            placeholder="# Define or paste the content of your docker-compose file here"
+          >
+            <editor-description>
+              <span class="col-sm-12 text-muted small">
+                You can get more information about Compose file format in the <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>.
+              </span>
+              <div class="col-sm-12" ng-if="state.editorYamlValidationError">
+                <span class="text-danger small">{{ state.editorYamlValidationError }}</span>
               </div>
-            </div>
-            <!-- description -->
-            <div ng-if="selectedTemplate.note">
-              <div class="col-sm-12 form-section-title">
-                Information
-              </div>
-              <div class="form-group">
-                <div class="col-sm-12">
-                  <div class="template-note" ng-bind-html="selectedTemplate.note"></div>
-                </div>
-              </div>
-            </div>
-            <!-- !description -->
-            <!-- editor -->
-            <div ng-if="selectedTemplate && formValues.StackFileContent">
-              <div class="col-sm-12 form-section-title">
-                Web editor
-              </div>
-              <div class="form-group">
-                <div class="col-sm-12" ng-if="state.editorYamlValidationError"
-                  ><span class="text-danger small">{{ state.editorYamlValidationError }}</span></div
-                >
-              </div>
-              <div class="form-group">
-                <div class="col-sm-12">
-                  <code-editor
-                    identifier="template-content-editor"
-                    placeholder="# Define or paste the content of your docker-compose file here"
-                    yml="true"
-                    value="formValues.StackFileContent"
-                    on-change="(editorUpdate)"
-                  ></code-editor>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- !custom-template -->
+            </editor-description>
+          </web-editor-form>
+
           <!-- environment-variables -->
           <environment-variables-panel ng-model="formValues.Env" explanation="These values will be used as substitutions in the stack file" on-change="(handleEnvVarChange)">
           </environment-variables-panel>
@@ -204,10 +158,9 @@
                 class="btn btn-primary btn-sm"
                 ng-disabled="state.actionInProgress
               || !createStackForm.$valid
-              || (state.Method === 'editor' && (!formValues.StackFileContent || state.editorYamlValidationError))
+              || ((state.Method === 'editor' || state.Method === 'template') && (!formValues.StackFileContent || state.editorYamlValidationError))
               || (state.Method === 'upload' && (!formValues.StackFile || state.uploadYamlValidationError))
-              || (state.Method === 'template' && (!formValues.StackFileContent || !selectedTemplate || state.editorYamlValidationError))
-              || (state.Method === 'repository' && ((!formValues.RepositoryURL || !formValues.ComposeFilePathInRepository) || (formValues.RepositoryAuthentication && (!formValues.RepositoryUsername || !formValues.RepositoryPassword))))
+              || (state.Method === 'repository' && ((!formValues.RepositoryURL || !formValues.ComposeFilePathInRepository) || (formValues.RepositoryAuthentication && !formValues.RepositoryPassword)))
               || !formValues.Name"
                 ng-click="deployStack()"
                 button-spinner="state.actionInProgress"
