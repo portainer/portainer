@@ -1,12 +1,13 @@
-angular.module('portainer.docker').component('dockerSidebarContent', {
-  templateUrl: './dockerSidebarContent.html',
+angular.module('portainer.docker').component('dockerSidebar', {
+  templateUrl: './docker-sidebar.html',
   bindings: {
+    isSidebarOpen: '<',
+
     endpointApiVersion: '<',
     swarmManagement: '<',
     standaloneManagement: '<',
     adminAccess: '<',
     offlineMode: '<',
-    toggle: '<',
     currentRouteName: '<',
     endpointId: '<',
     showStacks: '<',

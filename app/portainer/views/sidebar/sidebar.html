@@ -9,193 +9,92 @@
   </div>
   <div class="sidebar-content">
     <ul class="sidebar">
-      <li class="sidebar-list">
-        <a ui-sref="portainer.home" ui-sref-active="active">Home <span class="menu-icon fa fa-home fa-fw"></span></a>
-      </li>
+      <sidebar-menu-item path="portainer.home" icon-class="fa-home fa-fw" class-name="sidebar-list">Home</sidebar-menu-item>
+
       <li class="sidebar-title endpoint-name" ng-if="applicationState.endpoint.name">
         <span class="fa fa-plug space-right"></span>{{ applicationState.endpoint.name }}
         <kubectl-shell ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider === 'KUBERNETES'" class="kubectl-shell"></kubectl-shell>
       </li>
-      <kubernetes-sidebar-content
-        ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider === 'KUBERNETES'"
-        admin-access="isAdmin"
-        endpoint-id="endpointId"
-        current-state="$state.current.name"
-      >
-      </kubernetes-sidebar-content>
-      <azure-sidebar-content ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider === 'AZURE'" endpoint-id="endpointId"> </azure-sidebar-content>
-      <docker-sidebar-content
-        ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider !== 'AZURE' && applicationState.endpoint.mode.provider !== 'KUBERNETES'"
-        current-route-name="$state.current.name"
-        toggle="toggle"
-        show-stacks="showStacks"
-        endpoint-api-version="applicationState.endpoint.apiVersion"
-        swarm-management="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'"
-        standalone-management="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE'"
-        admin-access="isAdmin"
-        offline-mode="endpointState.OfflineMode"
-        endpoint-id="endpointId"
-      ></docker-sidebar-content>
-      <li class="sidebar-title" authorization="IntegrationStoridgeAdmin" ng-if="applicationState.endpoint.mode && applicationState.endpoint.extensions.length > 0">
-        <span>Integrations</span>
-      </li>
-      <li
-        authorization="IntegrationStoridgeAdmin"
-        class="sidebar-list"
-        ng-if="
-          applicationState.endpoint.mode &&
-          applicationState.endpoint.extensions.indexOf('storidge') !== -1 &&
-          applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' &&
-          applicationState.endpoint.mode.role === 'MANAGER'
-        "
-      >
-        <a ui-sref="storidge.cluster" ui-sref-active="active">Storidge <span class="menu-icon fa fa-bolt fa-fw"></span></a>
-        <div
-          class="sidebar-sublist"
+      <div ng-if="applicationState.endpoint.mode">
+        <kubernetes-sidebar ng-if="applicationState.endpoint.mode.provider === 'KUBERNETES'" is-sidebar-open="toggle" endpoint-id="endpointId"></kubernetes-sidebar>
+
+        <azure-sidebar ng-if="applicationState.endpoint.mode.provider === 'AZURE'" endpoint-id="endpointId"> </azure-sidebar>
+
+        <docker-sidebar
+          ng-if="applicationState.endpoint.mode.provider !== 'AZURE' && applicationState.endpoint.mode.provider !== 'KUBERNETES'"
+          current-route-name="$state.current.name"
+          is-sidebar-open="toggle"
+          show-stacks="showStacks"
+          endpoint-api-version="applicationState.endpoint.apiVersion"
+          swarm-management="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'"
+          standalone-management="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE'"
+          admin-access="isAdmin || isEndpointAdmin"
+          offline-mode="endpointState.OfflineMode"
+          endpoint-id="endpointId"
+        ></docker-sidebar>
+      </div>
+
+      <sidebar-section title="Integrations" ng-if="applicationState.endpoint.mode && applicationState.endpoint.extensions.length > 0" authorization="IntegrationStoridgeAdmin">
+        <sidebar-menu
           ng-if="
-            toggle &&
-            ($state.current.name === 'storidge.cluster' ||
-              $state.current.name === 'storidge.profiles' ||
-              $state.current.name === 'storidge.monitor' ||
-              $state.current.name === 'storidge.profiles.new' ||
-              $state.current.name === 'storidge.profiles.profile' ||
-              $state.current.name === 'storidge.drives' ||
-              $state.current.name === 'storidge.drives.drive' ||
-              $state.current.name === 'storidge.cluster.node')
+            applicationState.endpoint.mode &&
+            applicationState.endpoint.extensions.indexOf('storidge') !== -1 &&
+            applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' &&
+            applicationState.endpoint.mode.role === 'MANAGER'
           "
+          icon-class="fa-bolt fa-fw"
+          label="Storidge"
+          path="storidge.cluster"
+          is-sidebar-open="toggle"
+          children-paths="['storidge.cluster', 'storidge.profiles', 'storidge.monitor', 'storidge.profiles.new', 'storidge.profiles.profile', 'storidge.drives', 'storidge.drives.drive', 'storidge.cluster.node']"
         >
-          <a ui-sref="storidge.monitor" ui-sref-active="active">Monitor</a>
-        </div>
-        <div
-          class="sidebar-sublist"
-          ng-if="
-            toggle &&
-            ($state.current.name === 'storidge.cluster' ||
-              $state.current.name === 'storidge.profiles' ||
-              $state.current.name === 'storidge.monitor' ||
-              $state.current.name === 'storidge.profiles.new' ||
-              $state.current.name === 'storidge.profiles.profile' ||
-              $state.current.name === 'storidge.drives' ||
-              $state.current.name === 'storidge.drives.drive' ||
-              $state.current.name === 'storidge.cluster.node')
-          "
+          <sidebar-menu-item path="storidge.monitor" class-name="sidebar-sublist">Monitor</sidebar-menu-item>
+          <sidebar-menu-item path="storidge.profiles" class-name="sidebar-sublist">Profiles</sidebar-menu-item>
+          <sidebar-menu-item path="storidge.drives" class-name="sidebar-sublist">Drives</sidebar-menu-item>
+        </sidebar-menu>
+      </sidebar-section>
+
+      <sidebar-section title="Edge compute" ng-if="isAdmin && applicationState.application.enableEdgeComputeFeatures">
+        <sidebar-menu-item path="edge.groups" icon-class="fa-object-group fa-fw" class-name="sidebar-list">Edge Groups</sidebar-menu-item>
+        <sidebar-menu-item path="edge.stacks" icon-class="fa-layer-group fa-fw" class-name="sidebar-list">Edge Stacks</sidebar-menu-item>
+        <sidebar-menu-item path="edge.jobs" icon-class="fa-clock fa-fw" class-name="sidebar-list">Edge Jobs</sidebar-menu-item>
+      </sidebar-section>
+
+      <sidebar-section ng-if="isAdmin || isTeamLeader" title="Settings">
+        <sidebar-menu
+          icon-class="fa-users fa-fw"
+          label="Users"
+          path="portainer.users"
+          is-sidebar-open="toggle"
+          children-paths="['portainer.users.user' ,'portainer.teams' ,'portainer.teams.team' ,'portainer.roles' ,'portainer.roles.role' ,'portainer.roles.new']"
         >
-          <a ui-sref="storidge.profiles" ui-sref-active="active">Profiles</a>
+          <sidebar-menu-item path="portainer.teams" class-name="sidebar-sublist">Teams</sidebar-menu-item>
+          <sidebar-menu-item path="portainer.roles" class-name="sidebar-sublist">Roles</sidebar-menu-item>
+        </sidebar-menu>
+
+        <div ng-if="isAdmin">
+          <sidebar-menu
+            icon-class="fa-plug fa-fw"
+            label="Endpoints"
+            path="portainer.endpoints"
+            is-sidebar-open="toggle"
+            children-paths="['portainer.endpoints.endpoint', 'portainer.endpoints.new', 'portainer.endpoints.endpoint.access', 'portainer.groups', 'portainer.groups.group', 'portainer.groups.group.access', 'portainer.groups.new', 'portainer.tags']"
+          >
+            <sidebar-menu-item path="portainer.groups" class-name="sidebar-sublist">Groups</sidebar-menu-item>
+            <sidebar-menu-item path="portainer.tags" class-name="sidebar-sublist">Tags</sidebar-menu-item>
+          </sidebar-menu>
+
+          <sidebar-menu-item path="portainer.registries" icon-class="fa-database fa-fw" class-name="sidebar-list">Registries</sidebar-menu-item>
+
+          <sidebar-menu label="Settings" icon-class="fa-cogs fa-fw" path="portainer.settings" is-sidebar-open="toggle" children-paths="['portainer.settings.authentication']">
+            <sidebar-menu-item path="portainer.settings.authentication" class-name="sidebar-sublist">Authentication</sidebar-menu-item>
+
+            <div class="sidebar-sublist">
+              <a href="http://www.portainer.io/help_about" target="_blank">Help / About</a>
+            </div>
+          </sidebar-menu>
         </div>
-        <div
-          class="sidebar-sublist"
-          ng-if="
-            toggle &&
-            ($state.current.name === 'storidge.cluster' ||
-              $state.current.name === 'storidge.profiles' ||
-              $state.current.name === 'storidge.monitor' ||
-              $state.current.name === 'storidge.profiles.new' ||
-              $state.current.name === 'storidge.profiles.profile' ||
-              $state.current.name === 'storidge.drives' ||
-              $state.current.name === 'storidge.drives.drive' ||
-              $state.current.name === 'storidge.cluster.node')
-          "
-        >
-          <a ui-sref="storidge.drives" ui-sref-active="active">Drives</a>
-        </div>
-      </li>
-      <li class="sidebar-title" ng-if="isAdmin && applicationState.application.enableEdgeComputeFeatures">
-        <span>Edge Compute</span>
-      </li>
-      <li class="sidebar-list" ng-if="isAdmin && applicationState.application.enableEdgeComputeFeatures">
-        <a ui-sref="edge.groups" ui-sref-active="active">Edge Groups <span class="menu-icon fa fa-object-group fa-fw"></span></a>
-      </li>
-      <li class="sidebar-list" ng-if="isAdmin && applicationState.application.enableEdgeComputeFeatures">
-        <a ui-sref="edge.stacks" ui-sref-active="active">Edge Stacks <span class="menu-icon fa fa-layer-group fa-fw"></span></a>
-      </li>
-      <li class="sidebar-list" ng-if="isAdmin && applicationState.application.enableEdgeComputeFeatures">
-        <a ui-sref="edge.jobs" ui-sref-active="active">Edge Jobs <span class="menu-icon fa fa-clock fa-fw"></span></a>
-      </li>
-      <li class="sidebar-title" ng-if="isAdmin || isTeamLeader">
-        <span>Settings</span>
-      </li>
-      <li class="sidebar-list" ng-if="isAdmin || isTeamLeader">
-        <a ui-sref="portainer.users" ui-sref-active="active">Users <span class="menu-icon fa fa-users fa-fw"></span></a>
-        <div
-          class="sidebar-sublist"
-          ng-if="
-            toggle &&
-            ($state.current.name === 'portainer.users' ||
-              $state.current.name === 'portainer.users.user' ||
-              $state.current.name === 'portainer.teams' ||
-              $state.current.name === 'portainer.teams.team' ||
-              $state.current.name === 'portainer.roles')
-          "
-        >
-          <a ui-sref="portainer.teams" ui-sref-active="active">Teams</a>
-        </div>
-        <div
-          class="sidebar-sublist"
-          ng-if="
-            toggle &&
-            ($state.current.name === 'portainer.users' ||
-              $state.current.name === 'portainer.users.user' ||
-              $state.current.name === 'portainer.teams' ||
-              $state.current.name === 'portainer.teams.team' ||
-              $state.current.name === 'portainer.roles')
-          "
-        >
-          <a ui-sref="portainer.roles" ui-sref-active="active">Roles</a>
-        </div>
-      </li>
-      <li class="sidebar-list" ng-if="isAdmin">
-        <a
-          ui-sref="portainer.endpoints"
-          ng-class="{ active: $state.current.name.includes('portainer.endpoints') && $state.current.name !== 'portainer.endpoints.endpoint.kubernetesConfig' }"
-          >Endpoints <span class="menu-icon fa fa-plug fa-fw"></span
-        ></a>
-        <div
-          class="sidebar-sublist"
-          ng-if="
-            toggle &&
-            ($state.current.name === 'portainer.endpoints' ||
-              $state.current.name === 'portainer.endpoints.endpoint' ||
-              $state.current.name === 'portainer.endpoints.new' ||
-              $state.current.name === 'portainer.endpoints.endpoint.access' ||
-              $state.current.name === 'portainer.groups' ||
-              $state.current.name === 'portainer.groups.group' ||
-              $state.current.name === 'portainer.groups.group.access' ||
-              $state.current.name === 'portainer.groups.new' ||
-              $state.current.name === 'portainer.tags')
-          "
-        >
-          <a ui-sref="portainer.groups" ui-sref-active="active">Groups</a>
-        </div>
-        <div
-          class="sidebar-sublist"
-          ng-if="
-            toggle &&
-            ($state.current.name === 'portainer.endpoints' ||
-              $state.current.name === 'portainer.endpoints.endpoint' ||
-              $state.current.name === 'portainer.endpoints.new' ||
-              $state.current.name === 'portainer.endpoints.endpoint.access' ||
-              $state.current.name === 'portainer.groups' ||
-              $state.current.name === 'portainer.groups.group' ||
-              $state.current.name === 'portainer.groups.group.access' ||
-              $state.current.name === 'portainer.groups.new' ||
-              $state.current.name === 'portainer.tags')
-          "
-        >
-          <a ui-sref="portainer.tags" ui-sref-active="active">Tags</a>
-        </div>
-      </li>
-      <li class="sidebar-list" ng-if="isAdmin">
-        <a ui-sref="portainer.registries" ui-sref-active="active">Registries <span class="menu-icon fa fa-database fa-fw"></span></a>
-      </li>
-      <li class="sidebar-list" ng-if="isAdmin">
-        <a ui-sref="portainer.settings" ui-sref-active="active">Settings <span class="menu-icon fa fa-cogs fa-fw"></span></a>
-        <div class="sidebar-sublist" ng-if="toggle && $state.current.name.startsWith('portainer.settings') && isAdmin">
-          <a ui-sref="portainer.settings.authentication" ui-sref-active="active">Authentication</a>
-        </div>
-        <div class="sidebar-sublist" ng-if="toggle && $state.current.name.startsWith('portainer.settings')">
-          <a href="http://www.portainer.io/help_about" target="_blank">Help / About</a>
-        </div>
-      </li>
+      </sidebar-section>
     </ul>
     <div class="sidebar-footer-content">
       <div class="update-notification" ng-if="applicationState.application.versionStatus.UpdateAvailable">
