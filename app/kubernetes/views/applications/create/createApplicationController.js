@@ -10,6 +10,7 @@ import {
   KubernetesApplicationQuotaDefaults,
   KubernetesApplicationTypes,
   KubernetesApplicationPlacementTypes,
+  KubernetesDeploymentTypes,
 } from 'Kubernetes/models/application/models';
 import {
   KubernetesApplicationConfigurationFormValue,
@@ -49,7 +50,8 @@ class KubernetesCreateApplicationController {
     KubernetesPersistentVolumeClaimService,
     KubernetesNamespaceHelper,
     KubernetesVolumeService,
-    RegistryService
+    RegistryService,
+    StackService
   ) {
     this.$async = $async;
     this.$state = $state;
@@ -66,6 +68,7 @@ class KubernetesCreateApplicationController {
     this.KubernetesPersistentVolumeClaimService = KubernetesPersistentVolumeClaimService;
     this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
     this.RegistryService = RegistryService;
+    this.StackService = StackService;
 
     this.ApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
     this.ApplicationDataAccessPolicies = KubernetesApplicationDataAccessPolicies;
@@ -74,8 +77,14 @@ class KubernetesCreateApplicationController {
     this.ApplicationTypes = KubernetesApplicationTypes;
     this.ApplicationConfigurationFormValueOverridenKeyTypes = KubernetesApplicationConfigurationFormValueOverridenKeyTypes;
     this.ServiceTypes = KubernetesServiceTypes;
+    this.KubernetesDeploymentTypes = KubernetesDeploymentTypes;
 
     this.state = {
+      showConfig: true,
+      appType: this.KubernetesDeploymentTypes.APPLICATION_FORM,
+      redeployInProgress: false,
+      saveGitSettingsInProgress: false,
+      updateWebEditorInProgress: false,
       actionInProgress: false,
       useLoadBalancer: false,
       useServerMetrics: false,
@@ -124,12 +133,109 @@ class KubernetesCreateApplicationController {
     this.state.useServerMetrics = false;
 
     this.formValues = new KubernetesApplicationFormValues();
+    this.gitFormValues = {
+      RefName: '',
+      RepositoryAuthentication: false,
+      RepositoryUsername: '',
+      RepositoryPassword: '',
+    };
 
     this.updateApplicationAsync = this.updateApplicationAsync.bind(this);
     this.deployApplicationAsync = this.deployApplicationAsync.bind(this);
     this.setPullImageValidity = this.setPullImageValidity.bind(this);
+    this.onChange = this.onChange.bind(this);
+    this.onChangeRef = this.onChangeRef.bind(this);
+    this.onChangeFileContent = this.onChangeFileContent.bind(this);
   }
   /* #endregion */
+
+  onChangeRef(value) {
+    this.onChange({ RefName: value });
+  }
+
+  onChange(values) {
+    this.gitFormValues = {
+      ...this.gitFormValues,
+      ...values,
+    };
+  }
+
+  onChangeFileContent(value) {
+    if (this.stackFileContent.replace(/(\r\n|\n|\r)/gm, '') !== value.replace(/(\r\n|\n|\r)/gm, '')) {
+      this.state.isEditorDirty = true;
+      this.stackFileContent = value;
+    }
+  }
+
+  async redeployApplication() {
+    return this.$async(async () => {
+      try {
+        const confirmed = await this.ModalService.confirmAsync({
+          title: 'Are you sure?',
+          message: 'Any changes to this application will be overriden by the definition in git and may cause a service interruption. Do you wish to continue',
+          buttons: {
+            confirm: {
+              label: 'Update',
+              className: 'btn-warning',
+            },
+          },
+        });
+        if (!confirmed) {
+          return;
+        }
+        window._paq.push(['trackEvent', 'kubernetes', 'kubernetes-application-edit-git-pull']);
+        await this.StackService.updateGit(this.application.StackId, this.endpoint.Id, this.formValues.ResourcePool.Namespace.Name, this.gitFormValues);
+        this.state.redeployInProgress = true;
+        await this.$state.reload();
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Failed redeploying application');
+      } finally {
+        this.state.redeployInProgress = false;
+      }
+    });
+  }
+
+  async saveGitSettings() {
+    return this.$async(async () => {
+      try {
+        this.state.saveGitSettingsInProgress = true;
+        await this.StackService.updateKubeStack({ EndpointId: this.endpoint.Id, Id: this.application.StackId }, null, this.gitFormValues);
+        this.Notifications.success('Save stack settings successfully');
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to save application settings');
+      } finally {
+        this.state.saveGitSettingsInProgress = false;
+      }
+    });
+  }
+
+  async updateApplicationViaWebEditor() {
+    return this.$async(async () => {
+      try {
+        const confirmed = await this.ModalService.confirmAsync({
+          title: 'Are you sure?',
+          message: 'Any changes to this application will be overriden by the definition in git and may cause a service interruption. Do you wish to continue',
+          buttons: {
+            confirm: {
+              label: 'Update',
+              className: 'btn-warning',
+            },
+          },
+        });
+        if (!confirmed) {
+          return;
+        }
+
+        await this.StackService.updateKubeStack({ EndpointId: this.endpoint.Id, Id: this.application.StackId }, this.stackFileContent, null);
+        this.state.updateWebEditorInProgress = true;
+        await this.$state.reload();
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Failed redeploying application');
+      } finally {
+        this.state.updateWebEditorInProgress = false;
+      }
+    });
+  }
 
   setPullImageValidity(validity) {
     this.state.pullImageValidity = validity;
@@ -980,6 +1086,24 @@ class KubernetesCreateApplicationController {
             this.nodesLabels,
             this.filteredIngresses
           );
+
+          if (this.application.ApplicationKind) {
+            this.state.appType = this.KubernetesDeploymentTypes[this.application.ApplicationKind.toUpperCase()];
+            if (this.application.StackId) {
+              if (this.application.ApplicationKind === this.KubernetesDeploymentTypes.GIT) {
+                this.stack = await this.StackService.stack(this.application.StackId);
+                this.gitFormValues.RefName = this.stack.GitConfig.ReferenceName;
+                this.gitFormValues.RepositoryAuthentication = this.stack.GitConfig.Authentication && this.stack.GitConfig.Authentication.Password !== '' ? true : false;
+                if (this.gitFormValues.RepositoryAuthentication) {
+                  this.gitFormValues.RepositoryUsername = this.stack.GitConfig.Authentication.Username;
+                  this.gitFormValues.RepositoryPassword = this.stack.GitConfig.Authentication.Password;
+                }
+              } else if (this.application.ApplicationKind === this.KubernetesDeploymentTypes.CONTENT) {
+                this.stackFileContent = await this.StackService.getStackFile(this.application.StackId);
+              }
+            }
+          }
+
           this.formValues.OriginalIngresses = this.filteredIngresses;
           this.formValues.ImageModel = await this.parseImageConfiguration(this.formValues.ImageModel);
           this.savedFormValues = angular.copy(this.formValues);

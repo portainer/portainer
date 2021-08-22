@@ -2,21 +2,12 @@
   <div class="col-sm-12 form-section-title">
     Redeploy from git repository
   </div>
-  <div class="text-muted small form-group">
-    <div class="col-sm-12">
-      <p>
-        This stack was deployed from the git repository <code>{{ $ctrl.model.URL }}</code>
-        .
-      </p>
-      <p>
-        Update
-        <code
-          >{{ $ctrl.model.ConfigFilePath }}<span ng-if="$ctrl.stack.AdditionalFiles.length > 0">,{{ $ctrl.stack.AdditionalFiles.join(',') }}</span></code
-        >
-        in git and pull from here to update the stack.
-      </p>
-    </div>
-  </div>
+  <git-form-info-panel
+    class-name="text-muted small"
+    url="$ctrl.model.URL"
+    config-file-path="$ctrl.model.ConfigFilePath"
+    additional-files="$ctrl.stack.AdditionalFiles"
+  ></git-form-info-panel>
 
   <git-form-auto-update-fieldset model="$ctrl.formValues.AutoUpdate" on-change="($ctrl.onChange)"></git-form-auto-update-fieldset>
   <div class="form-group">
