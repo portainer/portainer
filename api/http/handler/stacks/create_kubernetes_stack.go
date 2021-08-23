@@ -217,7 +217,7 @@ func (handler *Handler) deployKubernetesStack(request *http.Request, endpoint *p
 		return "", errors.Wrap(err, "failed to add application labels")
 	}
 
-	return handler.KubernetesDeployer.Deploy(request, endpoint, stackConfig, namespace)
+	return handler.KubernetesDeployer.Deploy(request, endpoint, string(manifest), namespace)
 
 }
 
