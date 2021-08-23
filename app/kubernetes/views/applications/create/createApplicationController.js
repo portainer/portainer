@@ -186,6 +186,7 @@ class KubernetesCreateApplicationController {
         window._paq.push(['trackEvent', 'kubernetes', 'kubernetes-application-edit-git-pull']);
         await this.StackService.updateGit(this.application.StackId, this.endpoint.Id, this.formValues.ResourcePool.Namespace.Name, this.gitFormValues);
         this.state.redeployInProgress = true;
+        this.Notifications.success('Pulled and redeployed stack successfully');
         await this.$state.reload();
       } catch (err) {
         this.Notifications.error('Failure', err, 'Failed redeploying application');
@@ -1093,10 +1094,9 @@ class KubernetesCreateApplicationController {
               if (this.application.ApplicationKind === this.KubernetesDeploymentTypes.GIT) {
                 this.stack = await this.StackService.stack(this.application.StackId);
                 this.gitFormValues.RefName = this.stack.GitConfig.ReferenceName;
-                this.gitFormValues.RepositoryAuthentication = this.stack.GitConfig.Authentication && this.stack.GitConfig.Authentication.Password !== '' ? true : false;
-                if (this.gitFormValues.RepositoryAuthentication) {
+                if (this.stack.GitConfig && this.stack.GitConfig.Authentication) {
                   this.gitFormValues.RepositoryUsername = this.stack.GitConfig.Authentication.Username;
-                  this.gitFormValues.RepositoryPassword = this.stack.GitConfig.Authentication.Password;
+                  this.gitFormValues.RepositoryAuthentication = true;
                 }
               } else if (this.application.ApplicationKind === this.KubernetesDeploymentTypes.CONTENT) {
                 this.stackFileContent = await this.StackService.getStackFile(this.application.StackId);
