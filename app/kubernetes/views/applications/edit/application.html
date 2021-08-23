@@ -19,7 +19,7 @@
                   <tbody>
                     <tr>
                       <td>Name</td>
-                      <td>
+                      <td data-cy="k8sAppDetail-appName">
                         {{ ctrl.application.Name }}
                         <span class="label label-primary image-tag label-margins" ng-if="!ctrl.isSystemNamespace() && ctrl.isExternalApplication()">external</span>
                       </td>
@@ -30,7 +30,7 @@
                     </tr>
                     <tr>
                       <td>Namespace</td>
-                      <td>
+                      <td data-cy="k8sAppDetail-resourcePoolName">
                         <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.application.ResourcePool })">{{ ctrl.application.ResourcePool }}</a>
                         <span style="margin-left: 5px;" class="label label-info image-tag" ng-if="ctrl.isSystemNamespace(item)">system</span>
                       </td>
@@ -46,7 +46,8 @@
                       <td ng-if="ctrl.application.ApplicationType !== ctrl.KubernetesApplicationTypes.POD">
                         <span ng-if="ctrl.application.DeploymentType === ctrl.KubernetesApplicationDeploymentTypes.REPLICATED">Replicated</span>
                         <span ng-if="ctrl.application.DeploymentType === ctrl.KubernetesApplicationDeploymentTypes.GLOBAL">Global</span>
-                        <code>{{ ctrl.application.RunningPodsCount }}</code> / <code>{{ ctrl.application.TotalPodsCount }}</code>
+                        <code data-cy="k8sAppDetail-runningPods">{{ ctrl.application.RunningPodsCount }}</code> /
+                        <code data-cy="k8sAppDetail-totalPods">{{ ctrl.application.TotalPodsCount }}</code>
                       </td>
                       <td ng-if="ctrl.application.ApplicationType === ctrl.KubernetesApplicationTypes.POD">
                         {{ ctrl.application.Pods[0].Status }}
@@ -317,9 +318,9 @@
                     <td style="width: 50%;">HTTP route</td>
                   </tr>
                   <tr ng-repeat-start="port in ctrl.application.PublishedPorts">
-                    <td ng-if="!ctrl.portHasIngressRules(port)">{{ port.TargetPort }}/{{ port.Protocol }}</td>
+                    <td ng-if="!ctrl.portHasIngressRules(port)" data-cy="k8sAppDetail-containerPort">{{ port.TargetPort }}/{{ port.Protocol }}</td>
                     <td ng-if="!ctrl.portHasIngressRules(port)">
-                      <span ng-if="ctrl.application.ServiceType === ctrl.KubernetesServiceTypes.NODE_PORT">
+                      <span ng-if="ctrl.application.ServiceType === ctrl.KubernetesServiceTypes.NODE_PORT" data-cy="k8sAppDetail-nodePort">
                         {{ port.NodePort }}
                       </span>
                       <span ng-if="ctrl.application.ServiceType !== ctrl.KubernetesServiceTypes.NODE_PORT">

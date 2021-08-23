@@ -1,4 +1,4 @@
-<button type="button" class="btn btn-xs btn-primary" ng-click="$ctrl.connectConsole()" ng-disabled="$ctrl.state.shell.connected">
+<button type="button" class="btn btn-xs btn-primary" ng-click="$ctrl.connectConsole()" ng-disabled="$ctrl.state.shell.connected" data-cy="k8sSidebar-shellButton">
   <i class="fa fa-terminal" style="margin-right: 2px;"></i>
   kubectl shell
 </button>
@@ -10,9 +10,13 @@
       <a href="" ng-click="$ctrl.downloadKubeconfig()"><i class="fas fa-file-download" style="margin-right: 5px;"></i>Download Kubeconfig</a>
     </div>
     <div class="shell-item-right">
-      <i class="fas fa-redo-alt" ng-click="$ctrl.screenClear();"></i>
-      <i class="fas {{ $ctrl.state.icon }}" ng-click="$ctrl.miniRestore();"></i>
-      <i class="fas fa-times" ng-click="$ctrl.disconnect()"></i>
+      <i class="fas fa-redo-alt" ng-click="$ctrl.screenClear();" data-cy="k8sShell-refreshButton"></i>
+      <i
+        class="fas {{ $ctrl.state.icon }}"
+        ng-click="$ctrl.miniRestore();"
+        data-cy="{{ $ctrl.state.icon === '.fa-window-minimize' ? 'k8sShell-restore' : 'k8sShell-minimise' }}"
+      ></i>
+      <i class="fas fa-times" ng-click="$ctrl.disconnect()" data-cy="k8sShell-closeButton"></i>
     </div>
   </div>
   <div>

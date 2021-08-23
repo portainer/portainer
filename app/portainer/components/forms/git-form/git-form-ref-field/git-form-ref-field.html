@@ -7,6 +7,14 @@
 <div class="form-group">
   <label for="stack_repository_reference_name" class="col-sm-1 control-label text-left">Repository reference</label>
   <div class="col-sm-11">
-    <input type="text" class="form-control" ng-model="$ctrl.value" id="stack_repository_reference_name" placeholder="refs/heads/master" ng-change="$ctrl.onChange($ctrl.value)" />
+    <input
+      type="text"
+      class="form-control"
+      ng-model="$ctrl.value"
+      id="stack_repository_reference_name"
+      placeholder="refs/heads/master"
+      ng-change="$ctrl.onChange($ctrl.value)"
+      data-cy="component-gitRefInput"
+    />
   </div>
 </div>

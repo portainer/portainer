@@ -7,7 +7,7 @@
           <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
           System resources are hidden, this can be changed in the table settings.
         </span>
-        <div class="settings">
+        <div class="settings" data-cy="k8sApp-tableSettings">
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
             <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Table settings</span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
@@ -22,14 +22,26 @@
                       <label for="applications_setting_show_system">Show system resources</label>
                     </div>
                     <div class="md-checkbox">
-                      <input id="setting_auto_refresh" type="checkbox" ng-model="$ctrl.settings.repeater.autoRefresh" ng-change="$ctrl.onSettingsRepeaterChange()" />
+                      <input
+                        id="setting_auto_refresh"
+                        type="checkbox"
+                        ng-model="$ctrl.settings.repeater.autoRefresh"
+                        ng-change="$ctrl.onSettingsRepeaterChange()"
+                        data-cy="k8sApp-autoRefreshCheckbox"
+                      />
                       <label for="setting_auto_refresh">Auto refresh</label>
                     </div>
                     <div ng-if="$ctrl.settings.repeater.autoRefresh">
                       <label for="settings_refresh_rate">
                         Refresh rate
                       </label>
-                      <select id="settings_refresh_rate" ng-model="$ctrl.settings.repeater.refreshRate" ng-change="$ctrl.onSettingsRepeaterChange()" class="small-select">
+                      <select
+                        id="settings_refresh_rate"
+                        ng-model="$ctrl.settings.repeater.refreshRate"
+                        ng-change="$ctrl.onSettingsRepeaterChange()"
+                        class="small-select"
+                        data-cy="k8sApp-refreshRateDropdown"
+                      >
                         <option value="10">10s</option>
                         <option value="30">30s</option>
                         <option value="60">1min</option>
@@ -43,7 +55,7 @@
                   </div>
                 </div>
                 <div>
-                  <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.settings.open = false;">Close</a>
+                  <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.settings.open = false;" data-cy="k8sApp-tableSettingsCloseButton">Close</a>
                 </div>
               </div>
             </div>
@@ -51,10 +63,16 @@
         </div>
       </div>
       <div class="actionBar">
-        <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
+        <button
+          type="button"
+          class="btn btn-sm btn-danger"
+          ng-disabled="$ctrl.state.selectedItemCount === 0"
+          ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
+          data-cy="k8sApp-removeAppButton"
+        >
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.applications.new">
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.applications.new" data-cy="k8sApp-addApplicationButton">
           <i class="fa fa-plus space-right" aria-hidden="true"></i>Add application
         </button>
       </div>
@@ -68,15 +86,16 @@
           placeholder="Search..."
           auto-focus
           ng-model-options="{ debounce: 300 }"
+          data-cy="k8sApp-searchApplicationsInput"
         />
       </div>
       <div class="table-responsive">
-        <table class="table table-hover nowrap-cells">
+        <table class="table table-hover nowrap-cells" data-cy="k8sApp-appTable">
           <thead>
             <tr>
               <th>
                 <span class="md-checkbox">
-                  <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
+                  <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" data-cy="k8sApp-selectAllCheckbox" />
                   <label for="select_all"></label>
                 </span>
                 <a ng-click="$ctrl.changeOrderBy('Name')">

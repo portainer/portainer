@@ -9,6 +9,7 @@ const porSwitch = {
     name: '@',
     disabled: '<',
     onChange: '<',
+    datacy: '@',
   },
 };
 

@@ -4,7 +4,7 @@ const webpackDevConfig = require('./webpack/webpack.develop');
 const webpackProdConfig = require('./webpack/webpack.production');
 
 var arch = os.arch();
-if (arch === 'x64') arch = 'amd64';
+if (arch === 'x64') arch = 'arm64';
 
 var portainer_data = '${PORTAINER_DATA:-/tmp/portainer}';
 
@@ -194,7 +194,7 @@ function shell_download_docker_binary(p, a) {
   var ip = ps[p] === undefined ? p : ps[p];
   var ia = as[a] === undefined ? a : as[a];
   var binaryVersion = p === 'windows' ? '<%= binaries.dockerWindowsVersion %>' : '<%= binaries.dockerLinuxVersion %>';
-  
+
   return [
     'if [ -f dist/docker ] || [ -f dist/docker.exe ]; then',
     'echo "docker binary exists";',
@@ -210,7 +210,7 @@ function shell_download_docker_compose_binary(p, a) {
   var ip = ps[p] || p;
   var ia = as[a] || a;
   var binaryVersion = p === 'windows' ? '<%= binaries.dockerWindowsComposeVersion %>' : '<%= binaries.dockerLinuxComposeVersion %>';
-  
+
   return [
     'if [ -f dist/docker-compose ] || [ -f dist/docker-compose.exe ]; then',
     'echo "Docker Compose binary exists";',
@@ -222,7 +222,7 @@ function shell_download_docker_compose_binary(p, a) {
 
 function shell_download_kompose_binary(p, a) {
   var binaryVersion = '<%= binaries.komposeVersion %>';
-  
+
   return [
     'if [ -f dist/kompose ] || [ -f dist/kompose.exe ]; then',
     'echo "kompose binary exists";',
@@ -234,7 +234,7 @@ function shell_download_kompose_binary(p, a) {
 
 function shell_download_kubectl_binary(p, a) {
   var binaryVersion = '<%= binaries.kubectlVersion %>';
-  
+
   return [
     'if [ -f dist/kubectl ] || [ -f dist/kubectl.exe ]; then',
     'echo "kubectl binary exists";',

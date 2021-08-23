@@ -70,7 +70,15 @@
                 URL
               </label>
               <div class="col-sm-11">
-                <input type="text" class="form-control" ng-model="settings.TemplatesURL" id="templates_url" placeholder="https://myserver.mydomain/templates.json" required />
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="settings.TemplatesURL"
+                  id="templates_url"
+                  placeholder="https://myserver.mydomain/templates.json"
+                  required
+                  data-cy="settings-templateUrl"
+                />
               </div>
             </div>
           </div>
@@ -95,6 +103,7 @@
                 class="form-control"
                 ng-model="settings.EdgeAgentCheckinInterval"
                 ng-options="+(opt.value) as opt.key for opt in state.availableEdgeAgentCheckinOptions"
+                data-cy="settings-pollFrequencySelect"
               ></select>
             </div>
           </div>
@@ -103,7 +112,7 @@
               <label for="toggle_enableEdgeComputeFeatures" class="control-label text-left">
                 Enable edge compute features
               </label>
-              <label class="switch" style="margin-left: 20px;">
+              <label class="switch" style="margin-left: 20px;" data-cy="settings-edgeToggle">
                 <input type="checkbox" name="toggle_enableEdgeComputeFeatures" ng-model="formValues.enableEdgeComputeFeatures" /><i></i>
               </label>
             </div>
@@ -118,6 +127,7 @@
                 ng-click="saveApplicationSettings()"
                 ng-disabled="state.actionInProgress || !settings.TemplatesURL"
                 button-spinner="state.actionInProgress"
+                data-cy="settings-saveSettingsButton"
               >
                 <span ng-hide="state.actionInProgress">Save settings</span>
                 <span ng-show="state.actionInProgress">Saving...</span>

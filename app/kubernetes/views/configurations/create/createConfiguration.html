@@ -24,6 +24,7 @@
                   placeholder="my-configuration"
                   auto-focus
                   required
+                  data-cy="k8sConfigCreate-nameInput"
                 />
               </div>
             </div>
@@ -56,6 +57,7 @@
                   id="resource-pool-selector"
                   ng-model="ctrl.formValues.ResourcePool"
                   ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools"
+                  data-cy="k8sConfigCreate-namespaceDropdown"
                 ></select>
               </div>
             </div>
@@ -83,7 +85,7 @@
               <div class="boxselector_wrapper">
                 <div>
                   <input type="radio" id="type_basic" ng-value="ctrl.KubernetesConfigurationTypes.CONFIGMAP" ng-model="ctrl.formValues.Type" />
-                  <label for="type_basic">
+                  <label for="type_basic" data-cy="k8sConfigCreate-nonSensitiveButton">
                     <div class="boxselector_header">
                       <i class="fa fa-file-code" aria-hidden="true" style="margin-right: 2px;"></i>
                       Non-sensitive
@@ -93,7 +95,7 @@
                 </div>
                 <div>
                   <input type="radio" id="type_secret" ng-value="ctrl.KubernetesConfigurationTypes.SECRET" ng-model="ctrl.formValues.Type" />
-                  <label for="type_secret">
+                  <label for="type_secret" data-cy="k8sConfigCreate-sensitiveButton">
                     <div class="boxselector_header">
                       <i class="fa fa-user-secret" aria-hidden="true" style="margin-right: 2px;"></i>
                       Sensitive
@@ -141,6 +143,7 @@
                   ng-disabled="!kubernetesConfigurationCreationForm.$valid || !ctrl.isFormValid() || ctrl.state.actionInProgress"
                   ng-click="ctrl.createConfiguration()"
                   button-spinner="ctrl.state.actionInProgress"
+                  data-cy="k8sConfigCreate-CreateConfigButton"
                 >
                   <span ng-hide="ctrl.state.actionInProgress">Create configuration</span>
                   <span ng-show="ctrl.state.actionInProgress">Creation in progress...</span>
