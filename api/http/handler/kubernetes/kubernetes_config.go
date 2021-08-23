@@ -68,17 +68,19 @@ func (handler *Handler) getKubernetesConfig(w http.ResponseWriter, r *http.Reque
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to generate Kubeconfig", err}
 	}
 
+	filenameBase := fmt.Sprintf("%s-%s", tokenData.Username, endpoint.Name)
 	contentAcceptHeader := r.Header.Get("Accept")
 	if contentAcceptHeader == "text/yaml" {
 		yaml, err := kcli.GenerateYAML(config)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Failed to generate Kubeconfig", err}
 		}
-		w.Header().Set("Content-Disposition", `attachment; filename=config.yaml`)
+
+		w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; %s.yaml", filenameBase))
 		return YAML(w, yaml)
 	}
 
-	w.Header().Set("Content-Disposition", `attachment; filename="config.json"`)
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; %s.json", filenameBase))
 	return response.JSON(w, config)
 }
 
