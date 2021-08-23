@@ -16,7 +16,18 @@ import (
 
 const rwxr__r__ os.FileMode = 0744
 
-var filesToBackup = []string{"compose", "config.json", "custom_templates", "edge_jobs", "edge_stacks", "extensions", "portainer.key", "portainer.pub", "tls"}
+var filesToBackup = []string{
+	"compose",
+	"config.json",
+	"custom_templates",
+	"edge_jobs",
+	"edge_stacks",
+	"extensions",
+	"portainer.key",
+	"portainer.pub",
+	"tls",
+	"certs",
+}
 
 // Creates a tar.gz system archive and encrypts it if password is not empty. Returns a path to the archive file.
 func CreateBackupArchive(password string, gate *offlinegate.OfflineGate, datastore portainer.DataStore, filestorePath string) (string, error) {
