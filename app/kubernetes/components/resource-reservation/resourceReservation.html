@@ -14,7 +14,12 @@
       Memory reservation
     </label>
     <div class="col-sm-9" style="margin-top: 4px;">
-      <uib-progressbar animate="false" value="$ctrl.memoryReservationPercent" type="{{ $ctrl.memoryReservationPercent | kubernetesUsageLevelInfo }}">
+      <uib-progressbar
+        animate="false"
+        value="$ctrl.memoryReservationPercent"
+        type="{{ $ctrl.memoryReservationPercent | kubernetesUsageLevelInfo }}"
+        data-cy="k8sNamespaceDetail-memoryUsage"
+      >
         <b style="white-space: nowrap;"> {{ $ctrl.memoryReservation }} / {{ $ctrl.memoryLimit }} MB - {{ $ctrl.memoryReservationPercent }}% </b>
       </uib-progressbar>
     </div>

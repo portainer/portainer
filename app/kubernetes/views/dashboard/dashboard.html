@@ -34,7 +34,7 @@
   </div>
 
   <div class="row">
-    <div class="col-xs-12 col-md-6" ng-if="ctrl.pools">
+    <div class="col-xs-12 col-md-6" ng-if="ctrl.pools" data-cy="k8sDashboard-namespaces">
       <a ui-sref="kubernetes.resourcePools">
         <rd-widget>
           <rd-widget-body>
@@ -47,7 +47,7 @@
         </rd-widget>
       </a>
     </div>
-    <div class="col-xs-12 col-md-6" ng-if="ctrl.applications">
+    <div class="col-xs-12 col-md-6" ng-if="ctrl.applications" data-cy="k8sDashboard-applications">
       <a ui-sref="kubernetes.applications">
         <rd-widget>
           <rd-widget-body>
@@ -60,7 +60,7 @@
         </rd-widget>
       </a>
     </div>
-    <div class="col-xs-12 col-md-6" ng-if="ctrl.configurations">
+    <div class="col-xs-12 col-md-6" ng-if="ctrl.configurations" data-cy="k8sDashboard-configurations">
       <a ui-sref="kubernetes.configurations">
         <rd-widget>
           <rd-widget-body>
@@ -73,7 +73,7 @@
         </rd-widget>
       </a>
     </div>
-    <div class="col-xs-12 col-md-6" ng-if="ctrl.volumes">
+    <div class="col-xs-12 col-md-6" ng-if="ctrl.volumes" data-cy="k8sDashboard-volumes">
       <a ui-sref="kubernetes.volumes">
         <rd-widget>
           <rd-widget-body>

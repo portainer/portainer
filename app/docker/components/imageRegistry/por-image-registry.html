@@ -26,6 +26,7 @@
           placeholder="e.g. myImage:myTag"
           ng-change="$ctrl.onImageChange()"
           required
+          data-cy="component-imageInput"
         />
         <span ng-if="$ctrl.isDockerHubRegistry()" class="input-group-btn">
           <a

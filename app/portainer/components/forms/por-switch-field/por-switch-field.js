@@ -12,6 +12,7 @@ export const porSwitchField = {
     labelClass: '@',
     disabled: '<',
     onChange: '<',
+    datacy: '@',
   },
 };
 
