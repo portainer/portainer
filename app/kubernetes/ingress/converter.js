@@ -19,10 +19,10 @@ export class KubernetesIngressConverter {
         : _.map(rule.http.paths, (path) => {
             const ingRule = new KubernetesIngressRule();
             ingRule.IngressName = data.metadata.name;
-            ingRule.ServiceName = path.backend.serviceName;
+            ingRule.ServiceName = path.backend.service.name;
             ingRule.Host = rule.host || '';
             ingRule.IP = data.status.loadBalancer.ingress ? data.status.loadBalancer.ingress[0].ip : undefined;
-            ingRule.Port = path.backend.servicePort;
+            ingRule.Port = path.backend.service.port.number;
             ingRule.Path = path.path;
             return ingRule;
           });
@@ -151,8 +151,8 @@ export class KubernetesIngressConverter {
         rule.http.paths = _.map(paths, (p) => {
           const path = new KubernetesIngressRulePathCreatePayload();
           path.path = p.Path;
-          path.backend.serviceName = p.ServiceName;
-          path.backend.servicePort = p.Port;
+          path.backend.service.name = p.ServiceName;
+          path.backend.service.port.number = p.Port;
           return path;
         });
         hostsWithRules.push(host);
