@@ -3,8 +3,9 @@ package helm
 import (
 	"net/http"
 
+	"github.com/portainer/libhelm"
+	"github.com/portainer/libhelm/options"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api/exec/helm"
 )
 
 // @id HelmRepoSearch
@@ -26,11 +27,11 @@ func (handler *Handler) helmRepoSearch(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve settings", Err: err}
 	}
 
-	searchOpts := helm.SearchRepoOptions{
+	searchOpts := options.SearchRepoOptions{
 		Repo: settings.HelmRepositoryURL,
 	}
 
-	result, err := handler.HelmPackageManager.SearchRepo(searchOpts)
+	result, err := libhelm.SearchRepo(searchOpts)
 	if err != nil {
 		return &httperror.HandlerError{
 			StatusCode: http.StatusInternalServerError,
@@ -40,7 +41,7 @@ func (handler *Handler) helmRepoSearch(w http.ResponseWriter, r *http.Request) *
 	}
 
 	w.Header().Set("Content-Type", "text/plain")
-	w.Write([]byte(result))
+	w.Write(result)
 
 	return nil
 }
