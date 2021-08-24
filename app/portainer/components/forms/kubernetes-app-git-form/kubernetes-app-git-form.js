@@ -7,6 +7,7 @@ const kubernetesAppGitForm = {
     onChangeRef: '<',
     showConfig: '<',
     gitFormValues: '<',
+    isEdit: '<',
   },
 };
 
