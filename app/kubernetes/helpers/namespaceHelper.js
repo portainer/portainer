@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 
 import { KUBERNETES_DEFAULT_NAMESPACE, KUBERNETES_DEFAULT_SYSTEM_NAMESPACES } from 'Kubernetes/models/namespace/models';
-import KubernetesNamespaceStore from 'Kubernetes/store/namespace';
+import { isSystem } from 'Kubernetes/store/namespace';
 
 export default class KubernetesNamespaceHelper {
   /**
@@ -10,8 +10,7 @@ export default class KubernetesNamespaceHelper {
    * @returns Boolean
    */
   static isSystemNamespace(namespace) {
-    const found = KubernetesNamespaceStore.namespaces[namespace];
-    return found && found.IsSystem;
+    return isSystem(namespace);
   }
 
   /**
