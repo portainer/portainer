@@ -84,6 +84,7 @@
   --text-multiselect-button-color: #fff;
   --text-multiselect-item-color: #fff;
   --text-sidebar-list-color: #fff;
+  --text-boxselector-wrapper-color: #fff;
 
   --border-color: #383838;
   --border-widget-color: #212121;
@@ -117,6 +118,8 @@
   --button-close-color: #fff;
   --button-opacity: 0.6;
   --button-opacity-hover: 0.3;
+  --shadow-box-color: none;
+  --shadow-boxselector-color: none;
 }
 
 :root[theme='highcontrast'] {
@@ -135,6 +138,18 @@
   --bg-boxselector-wrapper-disabled-color: #194973;
   --bg-dropdown-menu-color: #000;
   --bg-codemirror-selected-color: #383838;
+  --bg-row-header-color: #000;
+  --bg-sidebar-wrapper-color: #000;
+  --bg-motd-body-color: #000;
+  --bg-blocklist-hover-color: #000;
+  --bg-blocklist-item-selected-color: #000;
+  --bg-input-group-addon-color: #000;
+  --bg-table-color: #000;
+  --bg-codemirror-gutters-color: #000;
+  --bg-codemirror-color: #000;
+  --bg-codemirror-selected-color: #383838;
+  --bg-log-viewer-color: #000;
+  --bg-log-line-selected-color: #383838;
 
   --text-main-color: #fff;
   --text-body-color: #fff;
@@ -142,11 +157,20 @@
   --text-widget-header-color: #ffffff;
   --text-link-color: #3ea6ff;
   --text-link-hover-color: #3ea6ff;
-  --text-code-color: #fff;
+  --text-danger-color: #ff00e0;
+  --text-code-color: #000;
   --text-form-control-color: #fff;
   --text-blocklist-hover-color: #3ea5ff;
-  --text-danger-color: #ff00e0;
-  --text-dropdown-menu-color: #fff;
+  --text-boxselector-wrapper-color: #fff;
+  --text-dashboard-item-color: #41a6ff;
+  --text-form-section-title-color: #fff;
+  --text-muted-color: #fff;
+  --text-tooltip-color: #fff;
+  --text-blocklist-item-selected-color: #3ea6ff;
+  --text-input-group-addon-color: #fff;
+  --text-sidebar-list-color: #fff;
+  --text-codemirror-color: #fff;
+  --text-log-viewer-color: #fff;
 
   --border-color: rgba(255, 255, 255, 0.8);
   --border-widget-color: #fff;
@@ -157,13 +181,18 @@
   --border-datatable-top-color: rgba(255, 255, 255, 0.8);
   --border-sidebar-high-contrast: 1px solid #3ea6ff;
   --border-code-high-contrast: 1px solid #fff;
+  --border-boxselector-wrapper: 3px solid #337ab7;
+  --border-boxselector-wrapper-hover: 3px solid #90ccff;
   --border-panel-color: #fff;
+  --border-input-group-addon-color: rgb(54, 54, 54);
 
   --hover-sidebar-color: #3ea6ff;
   --hover-sidebar-color: #000;
+  --shadow-box-color: none;
+  --shadow-boxselector-color: none;
 }
 
-:root[theme='light'] {
+:root {
   --bg-card-color: #f6f6f6;
   --bg-main-color: #fff;
   --bg-body-color: #f3f3f3;
@@ -395,7 +424,6 @@ fieldset[disabled] .form-control {
 code {
   color: var(--text-code-color);
   background-color: var(--bg-code-color);
-  border: var(--border-code-high-contrast);
 }
 
 .nav-tabs > li.active > a,
@@ -528,6 +556,12 @@ json-tree .branch-preview {
 .pagination > li > span:focus {
   background-color: var(--bg-pagination-hover-color);
   border-color: var(--border-pagination-hover-color);
+}
+
+.pagination > li > a:hover,
+.pagination > li > span:hover,
+.pagination > li > a:focus,
+.pagination > li > span:focus {
   color: var(--text-pagination-span-hover-color);
 }
 
@@ -545,14 +579,6 @@ json-tree .branch-preview {
   background-color: var(--bg-motd-body-color) !important;
 }
 
-.multiSelect .checkboxLayer {
-  background-color: var(--bg-multiselect-checkbox-color);
-}
-
-.multiSelect .multiSelectItem {
-  color: var(--text-multiselect-item-color);
-}
-
 .panel-body {
   background-color: var(--bg-panel-body-color) !important;
 }
@@ -564,6 +590,16 @@ json-tree .branch-preview {
 .theme-information .col-sm-12 {
   padding-left: 0px;
   padding-right: 0px;
+  margin-top: 15px;
+}
+
+.theme-panel {
+  margin-top: 15px;
+}
+
+.summary {
+  color: var(--text-summary-color);
+  font-weight: 700;
 }
 
 /* Overide Vendor CSS */

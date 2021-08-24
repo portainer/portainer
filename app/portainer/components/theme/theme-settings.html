@@ -1,0 +1,47 @@
+<information-panel class="theme-information" title-text="Information">
+  <span class="small text-muted">
+    <p>
+      <i class="fa fa-flask orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      Dark and High-contrast theme are experimental. Some UI components might not display properly.
+    </p>
+  </span>
+</information-panel>
+<rd-widget>
+  <rd-widget-header icon="fa-palette" title-text="Change user theme"></rd-widget-header>
+  <rd-widget-body>
+    <form class="theme-panel">
+      <!-- Theme -->
+      <div class="boxselector_wrapper">
+        <div>
+          <input type="radio" id="light_theme" ng-model="$ctrl.state.userTheme" value="light" ng-click="$ctrl.setTheme('light')" />
+          <label for="light_theme">
+            <div class="boxselector_header">
+              Light Theme
+            </div>
+            <div><i class="fas fa-sun" style="font-size: 50px; padding: 20px;"></i></div>
+          </label>
+        </div>
+        <div>
+          <input type="radio" id="dark_theme" ng-model="$ctrl.state.userTheme" value="dark" ng-click="$ctrl.setTheme('dark')" />
+          <label for="dark_theme">
+            <div class="boxselector_header">
+              Dark Theme
+            </div>
+            <div><i class="fas fa-moon" style="font-size: 50px; padding: 20px;"></i></div>
+          </label>
+        </div>
+        <div>
+          <input type="radio" id="highcontrast_theme" ng-model="$ctrl.state.userTheme" value="highcontrast" ng-click="$ctrl.setTheme('highcontrast')" />
+          <label for="highcontrast_theme">
+            <div class="boxselector_header">
+              High Contrast Theme
+            </div>
+            <div><i class="fas fa-adjust" style="font-size: 50px; padding: 20px;"></i></div>
+          </label>
+        </div>
+      </div>
+      <button ng-click="$ctrl.updateTheme()" class="btn btn-primary btn-sm">Update theme</button>
+      <!-- !Theme -->
+    </form>
+  </rd-widget-body>
+</rd-widget>

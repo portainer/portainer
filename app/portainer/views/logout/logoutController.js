@@ -29,7 +29,7 @@ class LogoutController {
     const performApiLogout = this.$transition$.params().performApiLogout;
     const settings = await this.SettingsService.publicSettings();
 
-    this.ThemeManager.setTheme('light');
+    this.ThemeManager.defaultTheme();
 
     try {
       await this.Authentication.logout(performApiLogout);

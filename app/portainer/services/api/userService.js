@@ -92,11 +92,7 @@ angular.module('portainer.app').factory('UserService', [
     };
 
     service.updateUserTheme = function (id, userTheme) {
-      var payload = {
-        Usertheme: userTheme,
-      };
-
-      return Users.updateTheme({ id: id }, payload).$promise;
+      return Users.updateTheme({ id }, { userTheme }).$promise;
     };
 
     service.userMemberships = function (id) {

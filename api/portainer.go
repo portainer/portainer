@@ -991,7 +991,7 @@ type (
 		Username string `json:"Username" example:"bob"`
 		Password string `json:"Password,omitempty" example:"passwd"`
 		// User Theme
-		Usertheme string `json:"Usertheme" example:"dark"`
+		UserTheme string `example:"dark"`
 		// User role (1 for administrator account and 2 for regular account)
 		Role UserRole `json:"Role" example:"1"`
 

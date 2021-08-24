@@ -84,20 +84,11 @@ angular.module('portainer.app').factory('Authentication', [
       return user;
     }
 
-    async function setDefaultTheme() {
+    async function setUserTheme() {
       const data = await UserService.user(user.ID);
-
-      ThemeManager.setTheme('light');
-      if (!data.Usertheme || data.Usertheme === 'light') {
-        ThemeManager.setTheme('light');
-        StateManager.updateTheme('light');
-      } else if (data.Usertheme === 'dark') {
-        ThemeManager.setTheme('dark');
-        StateManager.updateTheme('dark');
-      } else if (data.Usertheme === 'highcontrast') {
-        ThemeManager.setTheme('highcontrast');
-        StateManager.updateTheme('highcontrast');
-      }
+      // Initialize user theme base on Usertheme from database
+      const userTheme = data.UserTheme;
+      ThemeManager.setTheme(userTheme);
     }
 
     async function setUser(jwt) {
@@ -106,7 +97,7 @@ angular.module('portainer.app').factory('Authentication', [
       user.username = tokenPayload.username;
       user.ID = tokenPayload.id;
       user.role = tokenPayload.role;
-      await setDefaultTheme();
+      await setUserTheme();
     }
 
     function isAdmin() {

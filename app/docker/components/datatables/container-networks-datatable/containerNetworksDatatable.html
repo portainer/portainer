@@ -76,7 +76,7 @@
             <tr
               dir-paginate-end
               ng-show="$ctrl.itemCanExpand(value) && value.Expanded"
-              ng-style="{ background: value.Highlighted ? 'var(--bg-item-highlighted-color)' : 'var(--bg-item-highlighted-null-color)' }"
+              ng-class="{ 'datatable-highlighted': value.Highlighted, 'datatable-unhighlighted': !value.Highlighted }"
             >
               <td colspan="1"></td>
               <td colspan="1">

@@ -17,7 +17,7 @@ import (
 type userUpdatePayload struct {
 	Username string `validate:"required" example:"bob"`
 	Password string `validate:"required" example:"cg9Wgky3"`
-	Usertheme string `example:"dark"`
+	UserTheme string `example:"dark"`
 	// User role (1 for administrator account and 2 for regular account)
 	Role int `validate:"required" enums:"1,2" example:"2"`
 }
@@ -105,8 +105,8 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 		user.Role = portainer.UserRole(payload.Role)
 	}
 
-	if payload.Usertheme != "" {
-		user.Usertheme = payload.Usertheme
+	if payload.UserTheme != "" {
+		user.UserTheme = payload.UserTheme
 	}
 
 	err = handler.DataStore.User().UpdateUser(user.ID, user)
