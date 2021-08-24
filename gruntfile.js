@@ -4,7 +4,7 @@ const webpackDevConfig = require('./webpack/webpack.develop');
 const webpackProdConfig = require('./webpack/webpack.production');
 
 var arch = os.arch();
-if (arch === 'x64') arch = 'arm64';
+if (arch === 'x64') arch = 'amd64';
 
 var portainer_data = '${PORTAINER_DATA:-/tmp/portainer}';
 
