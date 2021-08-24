@@ -6,7 +6,9 @@
       </div>
 
       <div class="actionBar" ng-if="$ctrl.showSnapshotAction">
-        <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.snapshotAction()"> <i class="fa fa-sync space-right" aria-hidden="true"></i>Refresh </button>
+        <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.snapshotAction()" data-cy="home-refreshEndpointsButton">
+          <i class="fa fa-sync space-right" aria-hidden="true"></i>Refresh
+        </button>
       </div>
 
       <div class="searchBar">
@@ -19,10 +21,11 @@
           ng-model-options="{ debounce: 300 }"
           placeholder="Search by name, group, tag, status, URL..."
           auto-focus
+          data-cy="home-endpointsSearchInput"
         />
       </div>
 
-      <div class="blocklist">
+      <div class="blocklist" data-cy="home-endpointList">
         <endpoint-item
           ng-if="$ctrl.hasBackendPagination()"
           dir-paginate="endpoint in $ctrl.state.filteredEndpoints | itemsPerPage: $ctrl.state.paginatedItemLimit"
@@ -42,10 +45,10 @@
           is-admin="$ctrl.isAdmin"
           tags="$ctrl.tags"
         ></endpoint-item>
-        <div ng-if="$ctrl.state.loading" class="text-center text-muted">
+        <div ng-if="$ctrl.state.loading" class="text-center text-muted" data-cy="home-loadingEndpoints">
           Loading...
         </div>
-        <div ng-if="!$ctrl.state.loading && !$ctrl.state.filteredEndpoints.length" class="text-center text-muted">
+        <div ng-if="!$ctrl.state.loading && !$ctrl.state.filteredEndpoints.length" class="text-center text-muted" data-cy="home-noEndpoints">
           No endpoint available.
         </div>
       </div>
@@ -57,7 +60,7 @@
               <span style="margin-right: 5px;">
                 Items per page
               </span>
-              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
+              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="home-paginationSelect">
                 <option value="0" ng-if="!$ctrl.hasBackendPagination()">All</option>
                 <option value="10">10</option>
                 <option value="25">25</option>

@@ -14,7 +14,7 @@
               Name
             </label>
             <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="$ctrl.formValues.Name" id="stack_name" placeholder="e.g. mystack" auto-focus />
+              <input type="text" class="form-control" ng-model="$ctrl.formValues.Name" id="stack_name" placeholder="e.g. mystack" auto-focus data-cy="edgeStackCreate-nameInput" />
             </div>
           </div>
           <!-- !name-input -->
@@ -39,7 +39,7 @@
             <div class="boxselector_wrapper">
               <div>
                 <input type="radio" id="method_editor" ng-model="$ctrl.state.Method" value="editor" ng-change="$ctrl.onChangeMethod()" />
-                <label for="method_editor">
+                <label for="method_editor" data-cy="edgeStackCreate-webEditorButton">
                   <div class="boxselector_header">
                     <i class="fa fa-edit" aria-hidden="true" style="margin-right: 2px;"></i>
                     Web editor
@@ -49,7 +49,7 @@
               </div>
               <div>
                 <input type="radio" id="method_upload" ng-model="$ctrl.state.Method" value="upload" ng-change="$ctrl.onChangeMethod()" />
-                <label for="method_upload">
+                <label for="method_upload" data-cy="edgeStackCreate-uploadButton">
                   <div class="boxselector_header">
                     <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px;"></i>
                     Upload
@@ -59,7 +59,7 @@
               </div>
               <div>
                 <input type="radio" id="method_repository" ng-model="$ctrl.state.Method" value="repository" ng-change="$ctrl.onChangeMethod()" />
-                <label for="method_repository">
+                <label for="method_repository" data-cy="edgeStackCreate-repoButton">
                   <div class="boxselector_header">
                     <i class="fab fa-git" aria-hidden="true" style="margin-right: 2px;"></i>
                     Repository
@@ -69,7 +69,7 @@
               </div>
               <div>
                 <input type="radio" id="method_template" ng-model="$ctrl.state.Method" value="template" ng-change="$ctrl.onChangeMethod()" />
-                <label for="method_template">
+                <label for="method_template" data-cy="edgeStackCreate-templateButton">
                   <div class="boxselector_header">
                     <i class="fas fa-rocket" aria-hidden="true" style="margin-right: 2px;"></i>
                     Template
@@ -198,6 +198,7 @@
               || !$ctrl.formValues.Name"
                 ng-click="$ctrl.createStack()"
                 button-spinner="$ctrl.state.actionInProgress"
+                data-cy="edgeStackCreate-createStackButton"
               >
                 <span ng-hide="$ctrl.state.actionInProgress">Deploy the stack</span>
                 <span ng-show="$ctrl.state.actionInProgress">Deployment in progress...</span>
