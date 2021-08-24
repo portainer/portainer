@@ -28,7 +28,6 @@
 .boxselector_wrapper input[type='radio']:not(:disabled) ~ label {
   cursor: pointer;
   background-color: var(--bg-boxselector-wrapper-disabled-color);
-  color: var(--bg-boxselector-wrapper-color);
 }
 
 .boxselector_wrapper input[type='radio']:not(:disabled):hover ~ label:hover {

@@ -4,6 +4,7 @@
   --bg-body-color: #f3f3f3;
   --bg-checkbox-border-color: rgba(0, 0, 0, 0.54);
   --bg-sidebar-color: #2d3e63;
+  --bg-sidebar-header-color: #2d3e63;
   --bg-widget-color: #ffffff;
   --bg-widget-header-color: #f6f6f6;
   --bg-widget-table-color: #fafafa;
@@ -124,7 +125,7 @@
   --bg-main-color: #181818;
   --bg-body-color: #181818;
   --bg-checkbox-border-color: #aaa;
-  --bg-sidebar-color: #212121;
+  --bg-sidebar-color: #383838;
   --bg-widget-color: #212121;
   --bg-widget-header-color: #212121;
   --bg-widget-table-color: #212121;
@@ -166,6 +167,7 @@
   --bg-panel-body-color: #212121;
   --bg-boxselector-wrapper-disabled-color: #194973;
   --bg-codemirror-selected-color: #383838;
+  --bg-sidebar-header-color: #212121;
 
   --text-main-color: #fff;
   --text-body-color: #fff;
@@ -271,6 +273,7 @@
   --bg-codemirror-selected-color: #383838;
   --bg-log-viewer-color: #000;
   --bg-log-line-selected-color: #383838;
+  --bg-sidebar-header-color: #000;
 
   --text-main-color: #fff;
   --text-body-color: #fff;
