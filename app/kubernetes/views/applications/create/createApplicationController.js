@@ -183,10 +183,9 @@ class KubernetesCreateApplicationController {
         if (!confirmed) {
           return;
         }
-        window._paq.push(['trackEvent', 'kubernetes', 'kubernetes-application-edit-git-pull']);
-        await this.StackService.updateGit(this.application.StackId, this.endpoint.Id, this.formValues.ResourcePool.Namespace.Name, this.gitFormValues);
         this.state.redeployInProgress = true;
         this.Notifications.success('Pulled and redeployed stack successfully');
+        await this.StackService.updateGit(this.application.StackId, this.endpoint.Id, this.formValues.ResourcePool.Namespace.Name, this.gitFormValues);
         await this.$state.reload();
       } catch (err) {
         this.Notifications.error('Failure', err, 'Failed redeploying application');
@@ -226,9 +225,8 @@ class KubernetesCreateApplicationController {
         if (!confirmed) {
           return;
         }
-
-        await this.StackService.updateKubeStack({ EndpointId: this.endpoint.Id, Id: this.application.StackId }, this.stackFileContent, null);
         this.state.updateWebEditorInProgress = true;
+        await this.StackService.updateKubeStack({ EndpointId: this.endpoint.Id, Id: this.application.StackId }, this.stackFileContent, null);
         await this.$state.reload();
       } catch (err) {
         this.Notifications.error('Failure', err, 'Failed redeploying application');

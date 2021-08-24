@@ -1590,38 +1590,75 @@
                 form-values="ctrl.formValues"
                 old-form-values="ctrl.savedFormValues"
               ></kubernetes-summary-view>
-
-              <div class="col-sm-12 form-section-title">
-                Actions
-              </div>
-
-              <!-- #region ACTIONS -->
-              <div class="form-group">
-                <div class="col-sm-12">
-                  <button
-                    type="button"
-                    class="btn btn-primary btn-sm"
-                    ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.isDeployUpdateButtonDisabled() || !ctrl.state.pullImageValidity"
-                    ng-click="ctrl.deployApplication()"
-                    button-spinner="ctrl.state.actionInProgress"
-                  >
-                    <span ng-show="!ctrl.state.isEdit && !ctrl.state.actionInProgress">Deploy application</span>
-                    <span ng-show="!ctrl.state.isEdit && ctrl.state.actionInProgress">Deployment in progress...</span>
-                    <span ng-show="ctrl.state.isEdit && !ctrl.state.actionInProgress">Update application</span>
-                    <span ng-show="ctrl.state.isEdit && ctrl.state.actionInProgress">Update in progress...</span>
-                  </button>
-                  <button
-                    ng-if="ctrl.state.isEdit && !ctrl.state.actionInProgress"
-                    type="button"
-                    class="btn btn-sm btn-default"
-                    ui-sref="kubernetes.applications.application({ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool })"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-              <!-- #endregion -->
             </div>
+            <div class="col-sm-12 form-section-title">
+              Actions
+            </div>
+
+            <!-- #region ACTIONS -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <button
+                  ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"
+                  type="button"
+                  class="btn btn-primary btn-sm"
+                  ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.isDeployUpdateButtonDisabled() || !ctrl.state.pullImageValidity"
+                  ng-click="ctrl.deployApplication()"
+                  button-spinner="ctrl.state.actionInProgress"
+                >
+                  <span ng-show="!ctrl.state.isEdit && !ctrl.state.actionInProgress">Deploy application</span>
+                  <span ng-show="!ctrl.state.isEdit && ctrl.state.actionInProgress">Deployment in progress...</span>
+                  <span ng-show="ctrl.state.isEdit && !ctrl.state.actionInProgress">Update application</span>
+                  <span ng-show="ctrl.state.isEdit && ctrl.state.actionInProgress">Update in progress...</span>
+                </button>
+                <button
+                  ng-if="ctrl.state.isEdit && !ctrl.state.actionInProgress && ctrl.state.appType === ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"
+                  type="button"
+                  class="btn btn-sm btn-default"
+                  ui-sref="kubernetes.applications.application({ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool })"
+                >
+                  Cancel
+                </button>
+                <!-- #Git buttons -->
+                <button
+                  class="btn btn-sm btn-primary"
+                  ng-click="ctrl.redeployApplication()"
+                  ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.GIT"
+                  ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.state.saveGitSettingsInProgress || ctrl.state.redeployInProgress"
+                  style="margin-top: 7px; margin-left: 0;"
+                  button-spinner="ctrl.state.redeployInProgress"
+                  analytics-category="kubernetes"
+                  analytics-event="kubernetes-application-edit-git-pull"
+                >
+                  <span ng-show="!ctrl.state.redeployInProgress"> <i class="fa fa-sync space-right" aria-hidden="true"></i> Pull and update application </span>
+                  <span ng-show="ctrl.state.redeployInProgress">In progress...</span>
+                </button>
+                <button
+                  class="btn btn-sm btn-primary"
+                  ng-click="ctrl.saveGitSettings()"
+                  ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.GIT || ctrl.state.saveGitSettingsInProgress"
+                  ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.state.saveGitSettingsInProgress || ctrl.state.redeployInProgress"
+                  style="margin-top: 7px; margin-left: 0;"
+                  button-spinner="ctrl.state.saveGitSettingsInProgress"
+                >
+                  <span ng-show="!ctrl.state.saveGitSettingsInProgress"> Save settings </span>
+                  <span ng-show="ctrl.state.saveGitSettingsInProgress">In progress...</span>
+                </button>
+                <!-- #Web editor buttons -->
+                <button
+                  class="btn btn-sm btn-primary"
+                  ng-click="ctrl.updateApplicationViaWebEditor()"
+                  ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.CONTENT || ctrl.state.updateWebEditorInProgress"
+                  ng-disabled="!kubernetesApplicationCreationForm.$valid || !ctrl.state.isEditorDirty || ctrl.state.updateWebEditorInProgress"
+                  style="margin-top: 7px; margin-left: 0;"
+                  button-spinner="ctrl.state.updateWebEditorInProgress"
+                >
+                  <span ng-show="!ctrl.state.updateWebEditorInProgress">Update the application</span>
+                  <span ng-show="ctrl.state.updateWebEditorInProgress">Update in progress...</span>
+                </button>
+              </div>
+            </div>
+            <!-- #endregion -->
           </form>
         </rd-widget-body>
       </rd-widget>
