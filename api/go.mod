@@ -30,6 +30,7 @@ require (
 	github.com/portainer/docker-compose-wrapper v0.0.0-20210810234209-d01bc85eb481
 	github.com/portainer/libcompose v0.5.3
 	github.com/portainer/libcrypto v0.0.0-20210422035235-c652195c5c3a
+	github.com/portainer/libhelm v0.0.0-20210824223830-738c47ec0623
 	github.com/portainer/libhttp v0.0.0-20190806161843-ba068f58be33
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/sirupsen/logrus v1.8.1
@@ -37,7 +38,7 @@ require (
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
-	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	k8s.io/api v0.17.2
 	k8s.io/apimachinery v0.17.2
 	k8s.io/client-go v0.17.2

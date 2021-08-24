@@ -3,14 +3,12 @@ package kubernetes
 import (
 	"errors"
 	"fmt"
-	"strings"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
-	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	kcli "github.com/portainer/portainer/api/kubernetes/cli"
 
@@ -46,7 +44,7 @@ func (handler *Handler) getKubernetesConfig(w http.ResponseWriter, r *http.Reque
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
-	bearerToken, err := extractBearerToken(r)
+	bearerToken, err := security.ExtractBearerToken(r)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusUnauthorized, "Unauthorized", err}
 	}
@@ -82,20 +80,6 @@ func (handler *Handler) getKubernetesConfig(w http.ResponseWriter, r *http.Reque
 
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; %s.json", filenameBase))
 	return response.JSON(w, config)
-}
-
-// extractBearerToken extracts user's portainer bearer token from request auth header
-func extractBearerToken(r *http.Request) (string, error) {
-	token := ""
-	tokens := r.Header["Authorization"]
-	if len(tokens) >= 1 {
-		token = tokens[0]
-		token = strings.TrimPrefix(token, "Bearer ")
-	}
-	if token == "" {
-		return "", httperrors.ErrUnauthorized
-	}
-	return token, nil
 }
 
 // getProxyUrl generates portainer proxy url which acts as proxy to k8s api server

@@ -22,7 +22,7 @@
     <rd-widget>
       <rd-widget-custom-header icon="$ctrl.state.template.icon" title-text="$ctrl.state.template.name"></rd-widget-custom-header>
       <rd-widget-body classes="padding">
-        <form class="form-horizontal">
+        <form class="form-horizontal" name="$ctrl.helmTemplateCreationForm">
           <!-- description -->
           <div>
             <div class="col-sm-12 form-section-title">
@@ -68,9 +68,28 @@
           <!-- !namespace-input -->
           <!-- name-input -->
           <div class="form-group">
-            <label for="container_name" class="col-sm-2 control-label text-left">Name</label>
+            <label for="release_name" class="col-sm-2 control-label text-left">Name</label>
             <div class="col-sm-10">
-              <input type="text" name="container_name" class="form-control" ng-model="$ctrl.state.appName" placeholder="e.g. my-app ( required )" />
+              <input
+                type="text"
+                name="release_name"
+                class="form-control"
+                ng-model="$ctrl.state.appName"
+                placeholder="e.g. my-app"
+                required
+                ng-pattern="/^[a-z]([-a-z0-9]*[a-z0-9])?$/"
+              />
+            </div>
+          </div>
+          <div class="form-group" ng-show="$ctrl.helmTemplateCreationForm.release_name.$invalid">
+            <div class="col-sm-12 small text-warning">
+              <div ng-messages="$ctrl.helmTemplateCreationForm.release_name.$error">
+                <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                <p ng-message="pattern">
+                  <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of lower case alphanumeric characters or '-', start with an alphabetic
+                  character, and end with an alphanumeric character (e.g. 'my-name', or 'abc-123').
+                </p>
+              </div>
             </div>
           </div>
           <!-- !name-input -->
