@@ -13,8 +13,8 @@ import (
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/docker"
 
+	"github.com/portainer/libhelm"
 	"github.com/portainer/portainer/api/exec"
-	helmexec "github.com/portainer/portainer/api/exec/helm"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/git"
 	"github.com/portainer/portainer/api/http"
@@ -105,8 +105,8 @@ func initKubernetesDeployer(kubernetesTokenCacheManager *kubeproxy.TokenCacheMan
 	return exec.NewKubernetesDeployer(kubernetesTokenCacheManager, kubernetesClientFactory, dataStore, reverseTunnelService, signatureService, assetsPath)
 }
 
-func initHelmPackageManager(kubeConfigService kubernetes.KubeConfigService, assetsPath string) helmexec.HelmPackageManager {
-	return helmexec.NewHelmBinaryPackageManager(kubeConfigService, assetsPath)
+func initHelmPackageManager(assetsPath string) (libhelm.HelmPackageManager, error) {
+	return libhelm.NewHelmPackageManager(libhelm.HelmConfig{BinaryPath: assetsPath})
 }
 
 func initJWTService(dataStore portainer.DataStore) (portainer.JWTService, error) {
@@ -470,7 +470,10 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	kubernetesDeployer := initKubernetesDeployer(kubernetesTokenCacheManager, kubernetesClientFactory, dataStore, reverseTunnelService, digitalSignatureService, *flags.Assets)
 
-	helmPackageManager := initHelmPackageManager(kubeConfigService, *flags.Assets)
+	helmPackageManager, err := initHelmPackageManager(*flags.Assets)
+	if err != nil {
+		log.Fatalf("failed initializing helm package manager: %s", err)
+	}
 
 	if dataStore.IsNew() {
 		err = updateSettingsFromFlags(dataStore, flags)

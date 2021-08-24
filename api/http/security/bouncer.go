@@ -206,18 +206,12 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 		token = r.URL.Query().Get("token")
 
 		// Get token from the Authorization header
-		tokens, ok := r.Header["Authorization"]
-		if ok && len(tokens) >= 1 {
-			token = tokens[0]
-			token = strings.TrimPrefix(token, "Bearer ")
-		}
-
-		if token == "" {
-			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", httperrors.ErrUnauthorized)
+		token, err := ExtractBearerToken(r)
+		if err != nil {
+			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", err)
 			return
 		}
 
-		var err error
 		tokenData, err = bouncer.jwtService.ParseAndVerifyToken(token)
 		if err != nil {
 			httperror.WriteError(w, http.StatusUnauthorized, "Invalid JWT token", err)
@@ -237,6 +231,19 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 		next.ServeHTTP(w, r.WithContext(ctx))
 		return
 	})
+}
+
+func ExtractBearerToken(r *http.Request) (string, error) {
+	token := ""
+	tokens, ok := r.Header["Authorization"]
+	if ok && len(tokens) >= 1 {
+		token = tokens[0]
+		token = strings.TrimPrefix(token, "Bearer ")
+	}
+	if token == "" {
+		return "", httperrors.ErrUnauthorized
+	}
+	return token, nil
 }
 
 // mwSecureHeaders provides secure headers middleware for handlers.
