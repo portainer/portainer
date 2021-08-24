@@ -247,6 +247,8 @@ github.com/portainer/libcompose v0.5.3 h1:tE4WcPuGvo+NKeDkDWpwNavNLZ5GHIJ4RvuZXs
 github.com/portainer/libcompose v0.5.3/go.mod h1:7SKd/ho69rRKHDFSDUwkbMcol2TMKU5OslDsajr8Ro8=
 github.com/portainer/libcrypto v0.0.0-20210422035235-c652195c5c3a h1:qY8TbocN75n5PDl16o0uVr5MevtM5IhdwSelXEd4nFM=
 github.com/portainer/libcrypto v0.0.0-20210422035235-c652195c5c3a/go.mod h1:n54EEIq+MM0NNtqLeCby8ljL+l275VpolXO0ibHegLE=
+github.com/portainer/libhelm v0.0.0-20210824223830-738c47ec0623 h1:IdA+8irn6fxTXIJAgANLYSo9UwXXn0uNvnjgkc6FTVM=
+github.com/portainer/libhelm v0.0.0-20210824223830-738c47ec0623/go.mod h1:dL39owjMIeGKuSsSbbTrLCzZQfoB1zORhq0TAet7D5E=
 github.com/portainer/libhttp v0.0.0-20190806161843-ba068f58be33 h1:H8HR2dHdBf8HANSkUyVw4o8+4tegGcd+zyKZ3e599II=
 github.com/portainer/libhttp v0.0.0-20190806161843-ba068f58be33/go.mod h1:Y2TfgviWI4rT2qaOTHr+hq6MdKIE5YjgQAu7qwptTV0=
 github.com/prometheus/client_golang v0.9.1/go.mod h1:7SWBe2y4D6OKWSNQJUaRYU/AaXPKyh/dDVn+NZz0KFw=

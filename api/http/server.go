@@ -9,11 +9,11 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/portainer/libhelm"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/adminmonitor"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/docker"
-	"github.com/portainer/portainer/api/exec/helm"
 	"github.com/portainer/portainer/api/http/handler"
 	"github.com/portainer/portainer/api/http/handler/auth"
 	"github.com/portainer/portainer/api/http/handler/backup"
@@ -86,7 +86,7 @@ type Server struct {
 	DockerClientFactory         *docker.ClientFactory
 	KubernetesClientFactory     *cli.ClientFactory
 	KubernetesDeployer          portainer.KubernetesDeployer
-	HelmPackageManager          helm.HelmPackageManager
+	HelmPackageManager          libhelm.HelmPackageManager
 	Scheduler                   *scheduler.Scheduler
 	ShutdownCtx                 context.Context
 	ShutdownTrigger             context.CancelFunc
@@ -171,7 +171,7 @@ func (server *Server) Start() error {
 
 	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"))
 
-	var endpointHelmHandler = helmhandler.NewHandler(requestBouncer)
+	var endpointHelmHandler = helmhandler.NewHandler(requestBouncer, server.KubeConfigService)
 	endpointHelmHandler.DataStore = server.DataStore
 	endpointHelmHandler.HelmPackageManager = server.HelmPackageManager
 

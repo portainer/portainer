@@ -7,10 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/portainer/libhelm/binary/test"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/exec/helm/test"
 	helper "github.com/portainer/portainer/api/internal/testhelpers"
-	"github.com/portainer/portainer/api/kubernetes"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -25,7 +24,7 @@ func Test_helmShow(t *testing.T) {
 		HelmRepositoryURL: portainer.DefaultHelmRepositoryURL,
 	}
 	h.DataStore = helper.NewDatastore(helper.WithSettingsService(defaultSettings))
-	h.HelmPackageManager = test.NewMockHelmBinaryPackageManager(kubernetes.NewKubeConfigCAService("", ""), "")
+	h.HelmPackageManager = test.NewMockHelmBinaryPackageManager("")
 
 	commands := map[string]string{
 		"values": test.MockDataValues,

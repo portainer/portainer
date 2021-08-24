@@ -1,17 +1,15 @@
 package helm
 
 import (
-	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/gorilla/mux"
+	"github.com/portainer/libhelm"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
-	"github.com/portainer/portainer/api/exec/helm"
-	httperrors "github.com/portainer/portainer/api/http/errors"
+	"github.com/portainer/portainer/api/kubernetes"
 )
 
 const (
@@ -27,14 +25,16 @@ type Handler struct {
 	*mux.Router
 	requestBouncer     requestBouncer
 	DataStore          portainer.DataStore
-	HelmPackageManager helm.HelmPackageManager
+	kubeConfigService  kubernetes.KubeConfigService
+	HelmPackageManager libhelm.HelmPackageManager
 }
 
 // NewHandler creates a handler to manage endpoint group operations.
-func NewHandler(bouncer requestBouncer) *Handler {
+func NewHandler(bouncer requestBouncer, kubeConfigService kubernetes.KubeConfigService) *Handler {
 	h := &Handler{
-		Router:         mux.NewRouter(),
-		requestBouncer: bouncer,
+		Router:            mux.NewRouter(),
+		requestBouncer:    bouncer,
+		kubeConfigService: kubeConfigService,
 	}
 
 	// `helm install [NAME] [CHART] flags`
@@ -76,23 +76,4 @@ func (handler *Handler) GetEndpoint(r *http.Request) (*portainer.Endpoint, *http
 	}
 
 	return endpoint, nil
-}
-
-// getProxyUrl generates portainer proxy url which acts as proxy to k8s api server
-func getProxyUrl(r *http.Request, endpointID portainer.EndpointID) string {
-	return fmt.Sprintf("https://%s/api/endpoints/%d/kubernetes", r.Host, endpointID)
-}
-
-// extractBearerToken extracts user's portainer bearer token from request auth header
-func extractBearerToken(r *http.Request) (string, error) {
-	token := ""
-	tokens := r.Header["Authorization"]
-	if len(tokens) >= 1 {
-		token = tokens[0]
-		token = strings.TrimPrefix(token, "Bearer ")
-	}
-	if token == "" {
-		return "", httperrors.ErrUnauthorized
-	}
-	return token, nil
 }
