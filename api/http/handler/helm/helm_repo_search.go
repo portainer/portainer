@@ -3,8 +3,9 @@ package helm
 import (
 	"net/http"
 
+	"github.com/portainer/libhelm"
+	"github.com/portainer/libhelm/options"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api/exec/helm"
 )
 
 // @id HelmRepoSearch
@@ -26,11 +27,11 @@ func (handler *Handler) helmRepoSearch(w http.ResponseWriter, r *http.Request) *
 		return httperr
 	}
 
-	searchOpts := helm.SearchRepoOptions{
+	searchOpts := options.SearchRepoOptions{
 		Repo: repo,
 	}
 
-	result, err := handler.HelmPackageManager.SearchRepo(searchOpts)
+	result, err := libhelm.SearchRepo(searchOpts)
 	if err != nil {
 		return &httperror.HandlerError{
 			StatusCode: http.StatusInternalServerError,
