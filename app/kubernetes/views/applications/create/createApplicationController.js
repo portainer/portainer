@@ -144,14 +144,9 @@ class KubernetesCreateApplicationController {
     this.deployApplicationAsync = this.deployApplicationAsync.bind(this);
     this.setPullImageValidity = this.setPullImageValidity.bind(this);
     this.onChange = this.onChange.bind(this);
-    this.onChangeRef = this.onChangeRef.bind(this);
     this.onChangeFileContent = this.onChangeFileContent.bind(this);
   }
   /* #endregion */
-
-  onChangeRef(value) {
-    this.onChange({ RefName: value });
-  }
 
   onChange(values) {
     this.gitFormValues = {

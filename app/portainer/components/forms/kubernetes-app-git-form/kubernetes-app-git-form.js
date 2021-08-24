@@ -4,7 +4,6 @@ const kubernetesAppGitForm = {
   templateUrl: './kubernetes-app-git-form.html',
   bindings: {
     onChange: '<',
-    onChangeRef: '<',
     showConfig: '<',
     gitFormValues: '<',
     isEdit: '<',

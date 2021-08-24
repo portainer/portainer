@@ -60,7 +60,6 @@
               show-config="ctrl.state.showConfig"
               git-form-values="ctrl.gitFormValues"
               is-edit="ctrl.state.isEdit"
-              on-change-ref="(ctrl.onChangeRef)"
               on-change="(ctrl.onChange)"
             ></kubernetes-app-git-form>
             <!-- #endregion -->
@@ -69,7 +68,7 @@
             <web-editor-form
               ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.CONTENT"
               value="ctrl.stackFileContent"
-              yml="false"
+              yml="true"
               identifier="kubernetes-deploy-editor"
               placeholder="# Define or paste the content of your manifest file here"
               on-change="(ctrl.onChangeFileContent)"
