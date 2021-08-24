@@ -3,6 +3,8 @@ package kubernetes
 import (
 	"errors"
 	"fmt"
+	"net/http"
+
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -10,8 +12,6 @@ import (
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/security"
 	kcli "github.com/portainer/portainer/api/kubernetes/cli"
-
-	"net/http"
 )
 
 // @id GetKubernetesConfig

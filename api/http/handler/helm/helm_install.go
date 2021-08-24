@@ -1,27 +1,33 @@
 package helm
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
 	"strings"
 
+	"github.com/portainer/libhelm/options"
+	"github.com/portainer/libhelm/release"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/exec/helm"
-	"github.com/portainer/portainer/api/exec/helm/release"
+	"github.com/portainer/portainer/api/http/security"
+	validation "github.com/portainer/portainer/api/kubernetes/validation"
 )
 
-const defaultHelmRepoURL = "https://charts.bitnami.com/bitnami"
-
 type installChartPayload struct {
-	Namespace string `json:namespace`
+	Namespace string `json:"namespace"`
 	Name      string `json:"name"`
 	Chart     string `json:"chart"`
 	Values    string `json:"values"`
 }
+
+var errChartNameInvalid = errors.New("invalid chart name. " +
+	"Chart name must consist of lower case alphanumeric characters, '-' or '.'," +
+	" and must start and end with an alphanumeric character",
+)
 
 func (p *installChartPayload) Validate(_ *http.Request) error {
 	var required []string
@@ -37,6 +43,11 @@ func (p *installChartPayload) Validate(_ *http.Request) error {
 	if len(required) > 0 {
 		return fmt.Errorf("required field(s) missing: %s", strings.Join(required, ", "))
 	}
+
+	if errs := validation.IsDNS1123Subdomain(p.Name); len(errs) > 0 {
+		return errChartNameInvalid
+	}
+
 	return nil
 }
 
@@ -70,7 +81,7 @@ func (handler *Handler) helmInstall(w http.ResponseWriter, r *http.Request) *htt
 		return httperr
 	}
 
-	bearerToken, err := extractBearerToken(r)
+	bearerToken, err := security.ExtractBearerToken(r)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusUnauthorized, "Unauthorized", err}
 	}
@@ -89,7 +100,7 @@ func (handler *Handler) helmInstall(w http.ResponseWriter, r *http.Request) *htt
 		}
 	}
 
-	release, err := handler.installChart(settings.HelmRepositoryURL, endpoint, payload, getProxyUrl(r, endpoint.ID), bearerToken)
+	release, err := handler.installChart(settings.HelmRepositoryURL, endpoint, payload, bearerToken)
 	if err != nil {
 		return &httperror.HandlerError{
 			StatusCode: http.StatusInternalServerError,
@@ -102,12 +113,18 @@ func (handler *Handler) helmInstall(w http.ResponseWriter, r *http.Request) *htt
 	return response.JSON(w, release)
 }
 
-func (handler *Handler) installChart(repo string, endpoint *portainer.Endpoint, p *installChartPayload, serverURL, bearerToken string) (*release.Release, error) {
-	installOpts := helm.InstallOptions{
+func (handler *Handler) installChart(repo string, endpoint *portainer.Endpoint, p *installChartPayload, bearerToken string) (*release.Release, error) {
+	clusterAccess := handler.kubeConfigService.GetKubeConfigInternal(endpoint.ID, bearerToken)
+	installOpts := options.InstallOptions{
 		Name:      p.Name,
 		Chart:     p.Chart,
 		Namespace: p.Namespace,
 		Repo:      repo,
+		KubernetesClusterAccess: &options.KubernetesClusterAccess{
+			ClusterServerURL:         clusterAccess.ClusterServerURL,
+			CertificateAuthorityFile: clusterAccess.CertificateAuthorityFile,
+			AuthToken:                clusterAccess.AuthToken,
+		},
 	}
 
 	if p.Values != "" {
@@ -128,7 +145,7 @@ func (handler *Handler) installChart(repo string, endpoint *portainer.Endpoint, 
 		installOpts.ValuesFile = file.Name()
 	}
 
-	release, err := handler.HelmPackageManager.Install(installOpts, endpoint.ID, bearerToken)
+	release, err := handler.HelmPackageManager.Install(installOpts)
 	if err != nil {
 		return nil, err
 	}
