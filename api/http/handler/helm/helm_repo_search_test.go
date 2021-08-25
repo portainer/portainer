@@ -14,18 +14,18 @@ import (
 )
 
 func Test_helmRepoSearch(t *testing.T) {
-	h := NewTemplateHandler(helper.NewTestRequestBouncer())
-	assert.NotNil(t, h, "Handler should not fail")
+	is := assert.New(t)
 
 	defaultSettings := &portainer.Settings{
 		HelmRepositoryURL: portainer.DefaultHelmRepositoryURL,
 	}
-	h.DataStore = helper.NewDatastore(helper.WithSettingsService(defaultSettings))
-	h.HelmPackageManager = test.NewMockHelmBinaryPackageManager("")
+	store := helper.NewDatastore(helper.WithSettingsService(defaultSettings))
+	helmPackageManager := test.NewMockHelmBinaryPackageManager("")
+	h := NewTemplateHandler(helper.NewTestRequestBouncer(), store, helmPackageManager)
+
+	assert.NotNil(t, h, "Handler should not fail")
 
 	t.Run("helmRepoSearch", func(t *testing.T) {
-		is := assert.New(t)
-
 		req := httptest.NewRequest(http.MethodGet, "/templates/helm", nil)
 		rr := httptest.NewRecorder()
 		h.ServeHTTP(rr, req)

@@ -86,7 +86,7 @@ func (handler *Handler) helmInstall(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusUnauthorized, "Unauthorized", err}
 	}
 
-	settings, err := handler.DataStore.Settings().Settings()
+	settings, err := handler.dataStore.Settings().Settings()
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve settings", Err: err}
 	}
@@ -145,7 +145,7 @@ func (handler *Handler) installChart(repo string, endpoint *portainer.Endpoint, 
 		installOpts.ValuesFile = file.Name()
 	}
 
-	release, err := handler.HelmPackageManager.Install(installOpts)
+	release, err := handler.helmPackageManager.Install(installOpts)
 	if err != nil {
 		return nil, err
 	}
