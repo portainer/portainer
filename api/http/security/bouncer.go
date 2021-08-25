@@ -199,13 +199,8 @@ func (bouncer *RequestBouncer) mwUpgradeToRestrictedRequest(next http.Handler) h
 func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var tokenData *portainer.TokenData
-		var token string
 
-		// Optionally, token might be set via the "token" query parameter.
-		// For example, in websocket requests
-		token = r.URL.Query().Get("token")
-
-		// Get token from the Authorization header
+		// get token from the Authorization header or query parameter
 		token, err := ExtractBearerToken(r)
 		if err != nil {
 			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", err)
@@ -233,8 +228,12 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 	})
 }
 
+// ExtractBearerToken extracts the Bearer token from the request header or query parameter and returns the token.
 func ExtractBearerToken(r *http.Request) (string, error) {
-	token := ""
+	// Optionally, token might be set via the "token" query parameter.
+	// For example, in websocket requests
+	token := r.URL.Query().Get("token")
+
 	tokens, ok := r.Header["Authorization"]
 	if ok && len(tokens) >= 1 {
 		token = tokens[0]
