@@ -172,13 +172,9 @@ func (server *Server) Start() error {
 	kubernetesHandler.DataStore = server.DataStore
 	kubernetesHandler.KubernetesClientFactory = server.KubernetesClientFactory
 
-	var endpointHelmHandler = helmhandler.NewHandler(requestBouncer, server.KubeConfigService)
-	endpointHelmHandler.DataStore = server.DataStore
-	endpointHelmHandler.HelmPackageManager = server.HelmPackageManager
+	var endpointHelmHandler = helmhandler.NewHandler(requestBouncer, server.DataStore, server.HelmPackageManager, server.KubeConfigService)
 
-	var helmTemplatesHandler = helmhandler.NewTemplateHandler(requestBouncer)
-	helmTemplatesHandler.DataStore = server.DataStore
-	helmTemplatesHandler.HelmPackageManager = server.HelmPackageManager
+	var helmTemplatesHandler = helmhandler.NewTemplateHandler(requestBouncer, server.DataStore, server.HelmPackageManager)
 
 	var motdHandler = motd.NewHandler(requestBouncer)
 

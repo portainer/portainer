@@ -14,17 +14,16 @@ import (
 )
 
 func Test_helmShow(t *testing.T) {
-	chartName := "test-nginx"
 	is := assert.New(t)
-
-	h := NewTemplateHandler(helper.NewTestRequestBouncer())
-	is.NotNil(h, "Handler should not fail")
 
 	defaultSettings := &portainer.Settings{
 		HelmRepositoryURL: portainer.DefaultHelmRepositoryURL,
 	}
-	h.DataStore = helper.NewDatastore(helper.WithSettingsService(defaultSettings))
-	h.HelmPackageManager = test.NewMockHelmBinaryPackageManager("")
+	store := helper.NewDatastore(helper.WithSettingsService(defaultSettings))
+	helmPackageManager := test.NewMockHelmBinaryPackageManager("")
+	h := NewTemplateHandler(helper.NewTestRequestBouncer(), store, helmPackageManager)
+
+	is.NotNil(h, "Handler should not fail")
 
 	commands := map[string]string{
 		"values": test.MockDataValues,
@@ -32,9 +31,9 @@ func Test_helmShow(t *testing.T) {
 		"readme": test.MockDataReadme,
 	}
 
+	chartName := "test-nginx"
 	for cmd, expect := range commands {
 		t.Run(cmd, func(t *testing.T) {
-			is := assert.New(t)
 			is.NotNil(h, "Handler should not fail")
 
 			req := httptest.NewRequest("GET", fmt.Sprintf("/templates/helm/%s/%s", chartName, cmd), nil)
