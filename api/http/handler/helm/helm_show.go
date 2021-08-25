@@ -48,7 +48,7 @@ func (handler *Handler) helmShow(w http.ResponseWriter, r *http.Request) *httper
 		Chart:        chart,
 		Repo:         repo,
 	}
-	result, err := handler.HelmPackageManager.Show(showOptions)
+	result, err := handler.helmPackageManager.Show(showOptions)
 	if err != nil {
 		return &httperror.HandlerError{
 			StatusCode: http.StatusInternalServerError,
