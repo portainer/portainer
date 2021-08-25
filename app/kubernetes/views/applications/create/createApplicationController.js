@@ -80,10 +80,7 @@ class KubernetesCreateApplicationController {
     this.KubernetesDeploymentTypes = KubernetesDeploymentTypes;
 
     this.state = {
-      showConfig: true,
       appType: this.KubernetesDeploymentTypes.APPLICATION_FORM,
-      redeployInProgress: false,
-      saveGitSettingsInProgress: false,
       updateWebEditorInProgress: false,
       actionInProgress: false,
       useLoadBalancer: false,
