@@ -211,6 +211,7 @@ func (store *Store) EndpointRelation() portainer.EndpointRelationService {
 	return store.EndpointRelationService
 }
 
+// HelmUserRepository access the helm user repository settings
 func (store *Store) HelmUserRepository() portainer.HelmUserRepositoryService {
 	return store.HelmUserRepositoryService
 }
