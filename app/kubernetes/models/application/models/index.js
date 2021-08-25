@@ -7,6 +7,8 @@ const _KubernetesApplication = Object.freeze({
   Id: '',
   Name: '',
   StackName: '',
+  StackId: '',
+  ApplicationKind: '',
   ApplicationOwner: '',
   ApplicationName: '',
   ResourcePool: '',
@@ -91,3 +93,9 @@ export class KubernetesApplicationPort {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesApplicationPort)));
   }
 }
+
+export const KubernetesDeploymentTypes = Object.freeze({
+  GIT: 'git',
+  CONTENT: 'content',
+  APPLICATION_FORM: 'application form',
+});

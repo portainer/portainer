@@ -15,6 +15,7 @@ angular.module('portainer.app').factory('StackService', [
     'use strict';
     var service = {
       updateGit,
+      updateKubeGit,
     };
 
     service.stack = function (id) {
@@ -268,6 +269,25 @@ angular.module('portainer.app').factory('StackService', [
       return Stack.update({ endpointId: stack.EndpointId }, { id: stack.Id, StackFileContent: stackFile, Env: env, Prune: prune }).$promise;
     };
 
+    service.updateKubeStack = function (stack, stackFile, gitConfig) {
+      let payload = {};
+
+      if (stackFile) {
+        payload = {
+          StackFileContent: stackFile,
+        };
+      } else {
+        payload = {
+          RepositoryReferenceName: gitConfig.RefName,
+          RepositoryAuthentication: gitConfig.RepositoryAuthentication,
+          RepositoryUsername: gitConfig.RepositoryUsername,
+          RepositoryPassword: gitConfig.RepositoryPassword,
+        };
+      }
+
+      return Stack.update({ id: stack.Id, endpointId: stack.EndpointId }, payload).$promise;
+    };
+
     service.createComposeStackFromFileUpload = function (name, stackFile, env, endpointId) {
       return FileUploadService.createComposeStack(name, stackFile, env, endpointId);
     };
@@ -409,6 +429,19 @@ angular.module('portainer.app').factory('StackService', [
         {
           env,
           prune,
+          RepositoryReferenceName: gitConfig.RefName,
+          RepositoryAuthentication: gitConfig.RepositoryAuthentication,
+          RepositoryUsername: gitConfig.RepositoryUsername,
+          RepositoryPassword: gitConfig.RepositoryPassword,
+        }
+      ).$promise;
+    }
+
+    function updateKubeGit(id, endpointId, namespace, gitConfig) {
+      return Stack.updateGit(
+        { endpointId, id },
+        {
+          Namespace: namespace,
           RepositoryReferenceName: gitConfig.RefName,
           RepositoryAuthentication: gitConfig.RepositoryAuthentication,
           RepositoryUsername: gitConfig.RepositoryUsername,
