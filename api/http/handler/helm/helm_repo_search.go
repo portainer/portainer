@@ -22,7 +22,7 @@ import (
 // @failure 500 "Server error"
 // @router /templates/helm [get]
 func (handler *Handler) helmRepoSearch(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	settings, err := handler.DataStore.Settings().Settings()
+	settings, err := handler.dataStore.Settings().Settings()
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve settings", Err: err}
 	}

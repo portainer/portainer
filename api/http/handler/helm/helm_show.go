@@ -23,7 +23,7 @@ import (
 // @failure 500 "Server error"
 // @router /templates/helm/{chart}/{command} [get]
 func (handler *Handler) helmShow(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	settings, err := handler.DataStore.Settings().Settings()
+	settings, err := handler.dataStore.Settings().Settings()
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve settings", Err: err}
 	}
@@ -48,7 +48,7 @@ func (handler *Handler) helmShow(w http.ResponseWriter, r *http.Request) *httper
 		Chart:        chart,
 		Repo:         settings.HelmRepositoryURL,
 	}
-	result, err := handler.HelmPackageManager.Show(showOptions)
+	result, err := handler.helmPackageManager.Show(showOptions)
 	if err != nil {
 		return &httperror.HandlerError{
 			StatusCode: http.StatusInternalServerError,

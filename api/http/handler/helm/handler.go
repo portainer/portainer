@@ -24,17 +24,19 @@ type requestBouncer interface {
 type Handler struct {
 	*mux.Router
 	requestBouncer     requestBouncer
-	DataStore          portainer.DataStore
+	dataStore          portainer.DataStore
 	kubeConfigService  kubernetes.KubeConfigService
-	HelmPackageManager libhelm.HelmPackageManager
+	helmPackageManager libhelm.HelmPackageManager
 }
 
 // NewHandler creates a handler to manage endpoint group operations.
-func NewHandler(bouncer requestBouncer, kubeConfigService kubernetes.KubeConfigService) *Handler {
+func NewHandler(bouncer requestBouncer, dataStore portainer.DataStore, helmPackageManager libhelm.HelmPackageManager, kubeConfigService kubernetes.KubeConfigService) *Handler {
 	h := &Handler{
-		Router:            mux.NewRouter(),
-		requestBouncer:    bouncer,
-		kubeConfigService: kubeConfigService,
+		Router:             mux.NewRouter(),
+		requestBouncer:     bouncer,
+		dataStore:          dataStore,
+		helmPackageManager: helmPackageManager,
+		kubeConfigService:  kubeConfigService,
 	}
 
 	// `helm install [NAME] [CHART] flags`
@@ -45,10 +47,12 @@ func NewHandler(bouncer requestBouncer, kubeConfigService kubernetes.KubeConfigS
 }
 
 // NewTemplateHandler creates a template handler to manage endpoint group operations.
-func NewTemplateHandler(bouncer requestBouncer) *Handler {
+func NewTemplateHandler(bouncer requestBouncer, dataStore portainer.DataStore, helmPackageManager libhelm.HelmPackageManager) *Handler {
 	h := &Handler{
-		Router:         mux.NewRouter(),
-		requestBouncer: bouncer,
+		Router:             mux.NewRouter(),
+		dataStore:          dataStore,
+		helmPackageManager: helmPackageManager,
+		requestBouncer:     bouncer,
 	}
 	// `helm search [COMMAND] [CHART] flags`
 	h.Handle("/templates/helm",
@@ -68,7 +72,7 @@ func (handler *Handler) GetEndpoint(r *http.Request) (*portainer.Endpoint, *http
 		return nil, &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint identifier route variable", err}
 	}
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := handler.dataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == bolterrors.ErrObjectNotFound {
 		return nil, &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {
