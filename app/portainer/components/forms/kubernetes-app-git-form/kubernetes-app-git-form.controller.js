@@ -14,6 +14,13 @@ class KubernetesAppGitFormController {
       isEdit: false,
     };
 
+    this.formValues = {
+      RefName: '',
+      RepositoryAuthentication: false,
+      RepositoryUsername: '',
+      RepositoryPassword: '',
+    };
+
     this.onChange = this.onChange.bind(this);
     this.onChangeRef = this.onChangeRef.bind(this);
   }
@@ -23,8 +30,8 @@ class KubernetesAppGitFormController {
   }
 
   onChange(values) {
-    this.gitFormValues = {
-      ...this.gitFormValues,
+    this.formValues = {
+      ...this.formValues,
       ...values,
     };
   }
@@ -46,8 +53,8 @@ class KubernetesAppGitFormController {
           return;
         }
         this.state.redeployInProgress = true;
+        await this.StackService.updateKubeGit(this.stack.Id, this.stack.EndpointId, this.namespace, this.formValues);
         this.Notifications.success('Pulled and redeployed stack successfully');
-        await this.StackService.updateKubeGit(this.stack.Id, this.stack.EndpointId, this.namespace, this.gitFormValues);
         await this.$state.reload();
       } catch (err) {
         this.Notifications.error('Failure', err, 'Failed redeploying application');
@@ -61,7 +68,7 @@ class KubernetesAppGitFormController {
     return this.$async(async () => {
       try {
         this.state.saveGitSettingsInProgress = true;
-        await this.StackService.updateKubeStack({ EndpointId: this.stack.EndpointId, Id: this.stack.Id }, null, this.gitFormValues);
+        await this.StackService.updateKubeStack({ EndpointId: this.stack.EndpointId, Id: this.stack.Id }, null, this.formValues);
         this.Notifications.success('Save stack settings successfully');
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to save application settings');
@@ -76,6 +83,7 @@ class KubernetesAppGitFormController {
   }
 
   $onInit() {
+    this.formValues.RefName = this.stack.GitConfig.ReferenceName;
     if (this.stack.GitConfig && this.stack.GitConfig.Authentication) {
       this.formValues.RepositoryUsername = this.stack.GitConfig.Authentication.Username;
       this.formValues.RepositoryAuthentication = true;

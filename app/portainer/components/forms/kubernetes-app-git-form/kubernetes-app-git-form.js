@@ -5,10 +5,8 @@ const kubernetesAppGitForm = {
   templateUrl: './kubernetes-app-git-form.html',
   controller,
   bindings: {
-    gitFormValues: '<',
     namespace: '<',
     stack: '<',
-    isEdit: '<',
   },
 };
 

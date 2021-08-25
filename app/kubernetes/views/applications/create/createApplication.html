@@ -57,10 +57,8 @@
             <!-- #region Git repository -->
             <kubernetes-app-git-form
               ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.GIT"
-              git-form-values="ctrl.gitFormValues"
               stack="ctrl.stack"
               namespace="ctrl.formValues.ResourcePool.Namespace.Name"
-              is-edit="ctrl.state.isEdit"
             ></kubernetes-app-git-form>
             <!-- #endregion -->
 

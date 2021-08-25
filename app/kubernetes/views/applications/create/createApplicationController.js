@@ -130,12 +130,6 @@ class KubernetesCreateApplicationController {
     this.state.useServerMetrics = false;
 
     this.formValues = new KubernetesApplicationFormValues();
-    this.gitFormValues = {
-      RefName: '',
-      RepositoryAuthentication: false,
-      RepositoryUsername: '',
-      RepositoryPassword: '',
-    };
 
     this.updateApplicationAsync = this.updateApplicationAsync.bind(this);
     this.deployApplicationAsync = this.deployApplicationAsync.bind(this);
@@ -1033,11 +1027,6 @@ class KubernetesCreateApplicationController {
             if (this.application.StackId) {
               if (this.application.ApplicationKind === this.KubernetesDeploymentTypes.GIT) {
                 this.stack = await this.StackService.stack(this.application.StackId);
-                this.gitFormValues.RefName = this.stack.GitConfig.ReferenceName;
-                if (this.stack.GitConfig && this.stack.GitConfig.Authentication) {
-                  this.gitFormValues.RepositoryUsername = this.stack.GitConfig.Authentication.Username;
-                  this.gitFormValues.RepositoryAuthentication = true;
-                }
               } else if (this.application.ApplicationKind === this.KubernetesDeploymentTypes.CONTENT) {
                 this.stackFileContent = await this.StackService.getStackFile(this.application.StackId);
               }
