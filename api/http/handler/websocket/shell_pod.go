@@ -86,17 +86,12 @@ func (handler *Handler) websocketShellPodExec(w http.ResponseWriter, r *http.Req
 		return nil
 	}
 
-	serviceAccountToken, isAdminToken, err := handler.getToken(r, endpoint, false)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to get user service account token", err}
-	}
-
 	handlerErr := handler.hijackPodExecStartOperation(
 		w,
 		r,
 		cli,
-		serviceAccountToken,
-		isAdminToken,
+		"",
+		true,
 		endpoint,
 		shellPod.Namespace,
 		shellPod.PodName,
