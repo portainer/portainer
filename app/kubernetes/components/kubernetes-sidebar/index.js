@@ -5,5 +5,6 @@ angular.module('portainer.kubernetes').component('kubernetesSidebar', {
   bindings: {
     endpointId: '<',
     isSidebarOpen: '<',
+    adminAccess: '<',
   },
 });
