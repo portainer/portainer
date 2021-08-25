@@ -143,65 +143,15 @@ class KubernetesCreateApplicationController {
     this.updateApplicationAsync = this.updateApplicationAsync.bind(this);
     this.deployApplicationAsync = this.deployApplicationAsync.bind(this);
     this.setPullImageValidity = this.setPullImageValidity.bind(this);
-    this.onChange = this.onChange.bind(this);
     this.onChangeFileContent = this.onChangeFileContent.bind(this);
   }
   /* #endregion */
-
-  onChange(values) {
-    this.gitFormValues = {
-      ...this.gitFormValues,
-      ...values,
-    };
-  }
 
   onChangeFileContent(value) {
     if (this.stackFileContent.replace(/(\r\n|\n|\r)/gm, '') !== value.replace(/(\r\n|\n|\r)/gm, '')) {
       this.state.isEditorDirty = true;
       this.stackFileContent = value;
     }
-  }
-
-  async redeployApplication() {
-    return this.$async(async () => {
-      try {
-        const confirmed = await this.ModalService.confirmAsync({
-          title: 'Are you sure?',
-          message: 'Any changes to this application will be overriden by the definition in git and may cause a service interruption. Do you wish to continue',
-          buttons: {
-            confirm: {
-              label: 'Update',
-              className: 'btn-warning',
-            },
-          },
-        });
-        if (!confirmed) {
-          return;
-        }
-        this.state.redeployInProgress = true;
-        this.Notifications.success('Pulled and redeployed stack successfully');
-        await this.StackService.updateGit(this.application.StackId, this.endpoint.Id, this.formValues.ResourcePool.Namespace.Name, this.gitFormValues);
-        await this.$state.reload();
-      } catch (err) {
-        this.Notifications.error('Failure', err, 'Failed redeploying application');
-      } finally {
-        this.state.redeployInProgress = false;
-      }
-    });
-  }
-
-  async saveGitSettings() {
-    return this.$async(async () => {
-      try {
-        this.state.saveGitSettingsInProgress = true;
-        await this.StackService.updateKubeStack({ EndpointId: this.endpoint.Id, Id: this.application.StackId }, null, this.gitFormValues);
-        this.Notifications.success('Save stack settings successfully');
-      } catch (err) {
-        this.Notifications.error('Failure', err, 'Unable to save application settings');
-      } finally {
-        this.state.saveGitSettingsInProgress = false;
-      }
-    });
   }
 
   async updateApplicationViaWebEditor() {

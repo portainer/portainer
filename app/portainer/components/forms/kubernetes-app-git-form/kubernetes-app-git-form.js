@@ -1,11 +1,13 @@
 import angular from 'angular';
+import controller from './kubernetes-app-git-form.controller';
 
 const kubernetesAppGitForm = {
   templateUrl: './kubernetes-app-git-form.html',
+  controller,
   bindings: {
-    onChange: '<',
-    showConfig: '<',
     gitFormValues: '<',
+    namespace: '<',
+    stack: '<',
     isEdit: '<',
   },
 };

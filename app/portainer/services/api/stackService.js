@@ -15,6 +15,7 @@ angular.module('portainer.app').factory('StackService', [
     'use strict';
     var service = {
       updateGit,
+      updateKubeGit,
     };
 
     service.stack = function (id) {
@@ -422,7 +423,21 @@ angular.module('portainer.app').factory('StackService', [
       return Stack.stop({ id }).$promise;
     }
 
-    function updateGit(id, endpointId, namespace, gitConfig) {
+    function updateGit(id, endpointId, env, prune, gitConfig) {
+      return Stack.updateGit(
+        { endpointId, id },
+        {
+          env,
+          prune,
+          RepositoryReferenceName: gitConfig.RefName,
+          RepositoryAuthentication: gitConfig.RepositoryAuthentication,
+          RepositoryUsername: gitConfig.RepositoryUsername,
+          RepositoryPassword: gitConfig.RepositoryPassword,
+        }
+      ).$promise;
+    }
+
+    function updateKubeGit(id, endpointId, namespace, gitConfig) {
       return Stack.updateGit(
         { endpointId, id },
         {

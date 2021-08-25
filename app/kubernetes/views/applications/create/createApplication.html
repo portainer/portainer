@@ -57,10 +57,10 @@
             <!-- #region Git repository -->
             <kubernetes-app-git-form
               ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.GIT"
-              show-config="ctrl.state.showConfig"
               git-form-values="ctrl.gitFormValues"
+              stack="ctrl.stack"
+              namespace="ctrl.formValues.ResourcePool.Namespace.Name"
               is-edit="ctrl.state.isEdit"
-              on-change="(ctrl.onChange)"
             ></kubernetes-app-git-form>
             <!-- #endregion -->
 
@@ -1590,7 +1590,7 @@
                 old-form-values="ctrl.savedFormValues"
               ></kubernetes-summary-view>
             </div>
-            <div class="col-sm-12 form-section-title">
+            <div class="col-sm-12 form-section-title" ng-if="ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.GIT">
               Actions
             </div>
 
@@ -1617,31 +1617,6 @@
                   ui-sref="kubernetes.applications.application({ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool })"
                 >
                   Cancel
-                </button>
-                <!-- #Git buttons -->
-                <button
-                  class="btn btn-sm btn-primary"
-                  ng-click="ctrl.redeployApplication()"
-                  ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.GIT"
-                  ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.state.saveGitSettingsInProgress || ctrl.state.redeployInProgress"
-                  style="margin-top: 7px; margin-left: 0;"
-                  button-spinner="ctrl.state.redeployInProgress"
-                  analytics-category="kubernetes"
-                  analytics-event="kubernetes-application-edit-git-pull"
-                >
-                  <span ng-show="!ctrl.state.redeployInProgress"> <i class="fa fa-sync space-right" aria-hidden="true"></i> Pull and update application </span>
-                  <span ng-show="ctrl.state.redeployInProgress">In progress...</span>
-                </button>
-                <button
-                  class="btn btn-sm btn-primary"
-                  ng-click="ctrl.saveGitSettings()"
-                  ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.GIT || ctrl.state.saveGitSettingsInProgress"
-                  ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.state.saveGitSettingsInProgress || ctrl.state.redeployInProgress"
-                  style="margin-top: 7px; margin-left: 0;"
-                  button-spinner="ctrl.state.saveGitSettingsInProgress"
-                >
-                  <span ng-show="!ctrl.state.saveGitSettingsInProgress"> Save settings </span>
-                  <span ng-show="ctrl.state.saveGitSettingsInProgress">In progress...</span>
                 </button>
                 <!-- #Web editor buttons -->
                 <button
