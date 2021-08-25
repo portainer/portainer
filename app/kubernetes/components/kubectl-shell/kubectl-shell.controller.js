@@ -39,6 +39,7 @@ export default class KubectlShellController {
   }
 
   configureSocketAndTerminal(socket, term) {
+    var vm = this;
     socket.onopen = function () {
       const terminal_container = document.getElementById('terminal-container');
       term.open(terminal_container);
@@ -55,7 +56,7 @@ export default class KubectlShellController {
     });
 
     this.$window.onresize = function () {
-      term.fit();
+      vm.TerminalWindow.terminalresize();
     };
 
     socket.onmessage = function (msg) {

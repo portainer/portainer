@@ -68,14 +68,6 @@ angular
 
     $scope.onChangeFormValues = onChangeFormValues;
 
-    $scope.addEnvironmentVariable = function () {
-      $scope.formValues.Env.push({ name: '', value: '' });
-    };
-
-    $scope.removeEnvironmentVariable = function (index) {
-      $scope.formValues.Env.splice(index, 1);
-    };
-
     $scope.addAdditionalFiles = function () {
       $scope.formValues.AdditionalFiles.push('');
     };

@@ -2,7 +2,7 @@ angular.module('portainer.app').controller('CodeEditorController', function Code
   var ctrl = this;
 
   this.$onChanges = function $onChanges({ value }) {
-    if (value && value.currentValue && ctrl.editor) {
+    if (value && value.currentValue && ctrl.editor && ctrl.editor.getValue() !== value.currentValue) {
       ctrl.editor.setValue(value.currentValue);
     }
   };

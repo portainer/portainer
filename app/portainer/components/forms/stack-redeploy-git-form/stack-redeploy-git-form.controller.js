@@ -68,7 +68,7 @@ class StackRedeployGitFormController {
         this.state.redeployInProgress = true;
 
         await this.StackService.updateGit(this.stack.Id, this.stack.EndpointId, this.FormHelper.removeInvalidEnvVars(this.formValues.Env), false, this.formValues);
-
+        this.Notifications.success('Pulled and redeployed stack successfully');
         await this.$state.reload();
       } catch (err) {
         this.Notifications.error('Failure', err, 'Failed redeploying stack');
