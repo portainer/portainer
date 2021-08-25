@@ -1,0 +1,6 @@
+<li class="sidebar-menu-item" ng-class="$ctrl.className">
+  <a ui-state="$ctrl.path" ui-state-params="$ctrl.pathParams" ui-sref-active="active">
+    <ng-transclude></ng-transclude>
+    <span ng-if="$ctrl.iconClass" class="menu-icon fa" ng-class="$ctrl.iconClass"></span>
+  </a>
+</li>
