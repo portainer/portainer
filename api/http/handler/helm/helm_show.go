@@ -1,9 +1,12 @@
 package helm
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 
+	"github.com/pkg/errors"
 	"github.com/portainer/libhelm/options"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -14,6 +17,8 @@ import (
 // @description
 // @description **Access policy**: authorized
 // @tags helm_chart
+// @param repo helm repo url
+// @param chart helm chart in specified repo
 // @security jwt
 // @accept json
 // @produce text/plain
@@ -21,20 +26,20 @@ import (
 // @failure 401 "Unauthorized"
 // @failure 404 "Endpoint or ServiceAccount not found"
 // @failure 500 "Server error"
-// @router /templates/helm/{chart}/{command} [get]
+// @router /templates/helm/{command} [get]
 func (handler *Handler) helmShow(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	settings, err := handler.dataStore.Settings().Settings()
+	repo := r.URL.Query().Get("repo")
+	if repo == "" {
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Bad request", Err: errors.New("missing `repo` query parameter")}
+	}
+	_, err := url.ParseRequestURI(repo)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve settings", Err: err}
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Bad request", Err: errors.Wrap(err, fmt.Sprintf("provided URL %q is not valid", repo))}
 	}
 
-	chart, err := request.RetrieveRouteVariableValue(r, "chart")
-	if err != nil {
-		return &httperror.HandlerError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    "Missing chart name for show",
-			Err:        err,
-		}
+	chart := r.URL.Query().Get("chart")
+	if chart == "" {
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Bad request", Err: errors.New("missing `chart` query parameter")}
 	}
 
 	cmd, err := request.RetrieveRouteVariableValue(r, "command")
@@ -46,7 +51,7 @@ func (handler *Handler) helmShow(w http.ResponseWriter, r *http.Request) *httper
 	showOptions := options.ShowOptions{
 		OutputFormat: options.ShowOutputFormat(cmd),
 		Chart:        chart,
-		Repo:         settings.HelmRepositoryURL,
+		Repo:         repo,
 	}
 	result, err := handler.helmPackageManager.Show(showOptions)
 	if err != nil {

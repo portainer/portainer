@@ -11,6 +11,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/endpointgroup"
 	"github.com/portainer/portainer/api/bolt/endpointrelation"
 	"github.com/portainer/portainer/api/bolt/extension"
+	"github.com/portainer/portainer/api/bolt/helmuserrepository"
 	"github.com/portainer/portainer/api/bolt/registry"
 	"github.com/portainer/portainer/api/bolt/resourcecontrol"
 	"github.com/portainer/portainer/api/bolt/role"
@@ -87,6 +88,12 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.ExtensionService = extensionService
+
+	helmUserRepositoryService, err := helmuserrepository.NewService(store.connection)
+	if err != nil {
+		return err
+	}
+	store.HelmUserRepositoryService = helmUserRepositoryService
 
 	registryService, err := registry.NewService(store.connection)
 	if err != nil {
@@ -202,6 +209,10 @@ func (store *Store) EndpointGroup() portainer.EndpointGroupService {
 // EndpointRelation gives access to the EndpointRelation data management layer
 func (store *Store) EndpointRelation() portainer.EndpointRelationService {
 	return store.EndpointRelationService
+}
+
+func (store *Store) HelmUserRepository() portainer.HelmUserRepositoryService {
+	return store.HelmUserRepositoryService
 }
 
 // Registry gives access to the Registry data management layer

@@ -389,6 +389,18 @@ type (
 		ProjectPath string `json:"ProjectPath"`
 	}
 
+	HelmUserRepositoryID int
+
+	// HelmUserRepositories stores a Helm repository URL for the given user
+	HelmUserRepository struct {
+		// Membership Identifier
+		ID HelmUserRepositoryID `json:"Id" example:"1"`
+		// User identifier
+		UserID UserID `json:"UserID" example:"1"`
+		// Helm repository URL
+		URL string `json:"URL" example:"https://charts.bitnami.com/bitnami"`
+	}
+
 	// QuayRegistryData represents data required for Quay registry to work
 	QuayRegistryData struct {
 		UseOrganisation  bool   `json:"UseOrganisation"`
@@ -1080,6 +1092,7 @@ type (
 		Endpoint() EndpointService
 		EndpointGroup() EndpointGroupService
 		EndpointRelation() EndpointRelationService
+		HelmUserRepository() HelmUserRepositoryService
 		Registry() RegistryService
 		ResourceControl() ResourceControlService
 		Role() RoleService
@@ -1204,6 +1217,12 @@ type (
 	GitService interface {
 		CloneRepository(destination string, repositoryURL, referenceName, username, password string) error
 		LatestCommitID(repositoryURL, referenceName, username, password string) (string, error)
+	}
+
+	// HelmUserRepositoryService represents a service to manage HelmUserRepositories
+	HelmUserRepositoryService interface {
+		HelmUserRepositoryByUserID(userID UserID) ([]HelmUserRepository, error)
+		CreateHelmUserRepository(record *HelmUserRepository) error
 	}
 
 	// JWTService represents a service for managing JWT tokens
