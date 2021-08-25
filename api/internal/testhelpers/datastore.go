@@ -47,11 +47,9 @@ func (d *datastore) EndpointGroup() portainer.EndpointGroupService   { return d.
 func (d *datastore) HelmUserRepository() portainer.HelmUserRepositoryService {
 	return d.helmUserRepository
 }
-func (d *datastore) License() portainer.LicenseRepository              { return d.license }
 func (d *datastore) Registry() portainer.RegistryService               { return d.registry }
 func (d *datastore) ResourceControl() portainer.ResourceControlService { return d.resourceControl }
 func (d *datastore) Role() portainer.RoleService                       { return d.role }
-func (d *datastore) S3Backup() portainer.S3BackupService               { return d.s3backup }
 func (d *datastore) Settings() portainer.SettingsService               { return d.settings }
 func (d *datastore) SSLSettings() portainer.SSLSettingsService         { return d.sslSettings }
 func (d *datastore) Stack() portainer.StackService                     { return d.stack }
