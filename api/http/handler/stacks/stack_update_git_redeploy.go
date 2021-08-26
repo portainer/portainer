@@ -220,7 +220,7 @@ func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, end
 		if err != nil {
 			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to read deployment.yml manifest file", Err: errors.Wrap(err, "failed to read manifest file")}
 		}
-		_, err = handler.deployKubernetesStack(r, endpoint, string(content), false, stack.Namespace, k.KubeAppLabels{
+		_, err = handler.deployKubernetesStack(r, endpoint, string(content), stack.IsComposeFormat, stack.Namespace, k.KubeAppLabels{
 			StackID: int(stack.ID),
 			Name:    stack.Name,
 			Owner:   stack.CreatedBy,
