@@ -16,8 +16,8 @@ export default class HelmTemplatesController {
     ModalService
   ) {
     this.$analytics = $analytics;
-    this.$window = $window;
     this.$async = $async;
+    this.$window = $window;
     this.$state = $state;
     this.$anchorScroll = $anchorScroll;
     this.SettingsService = SettingsService;
@@ -92,7 +92,7 @@ export default class HelmTemplatesController {
   async selectHelmChart(chart) {
     this.$anchorScroll('view-top');
     this.state.showCustomValues = false;
-    this.state.template = chart;
+    this.state.chart = chart;
     await this.getHelmValues();
   }
 
@@ -173,7 +173,6 @@ export default class HelmTemplatesController {
         charts: [],
         loadingValues: false,
         isEditorDirty: false,
-
         chartsLoading: false,
         resourcePoolsLoading: false,
         userId: this.Authentication.getUserDetails().ID,
