@@ -8,7 +8,7 @@ angular.module('portainer.kubernetes').component('helmTemplatesList', {
     loading: '<',
     titleText: '@',
     titleIcon: '@',
-    templates: '<',
+    charts: '<',
     tableKey: '@',
     selectAction: '<',
   },

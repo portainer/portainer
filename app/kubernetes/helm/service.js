@@ -16,9 +16,9 @@ export function HelmService(HelmFactory, EndpointProvider) {
    * @returns {Promise} - Resolves with `index.yaml` of helm charts for a repo
    * @throws {PortainerError} - Rejects with error if searching for the `index.yaml` fails
    */
-  async function search() {
+  async function search(repo) {
     try {
-      return await HelmFactory.templates().$promise;
+      return await HelmFactory.templates({ repo }).$promise;
     } catch (err) {
       throw new PortainerError('Unable to retrieve helm charts', err);
     }
@@ -29,9 +29,9 @@ export function HelmService(HelmFactory, EndpointProvider) {
    * @returns {Promise} - Resolves with `values.yaml` of helm chart values for a repo
    * @throws {PortainerError} - Rejects with error if helm show fails
    */
-  async function values(chart) {
+  async function values(repo, chart) {
     try {
-      return await HelmFactory.show({ chart, type: 'values' }).$promise;
+      return await HelmFactory.show({ repo, chart, type: 'values' }).$promise;
     } catch (err) {
       throw new PortainerError('Unable to retrieve values from chart', err);
     }
