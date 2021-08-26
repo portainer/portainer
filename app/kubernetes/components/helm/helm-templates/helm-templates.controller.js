@@ -64,7 +64,7 @@ export default class HelmTemplatesController {
   async installHelmchart() {
     this.state.actionInProgress = true;
     try {
-      await this.HelmService.install(this.state.appName, this.state.resourcePool.Namespace.Name, this.state.chart.name, this.state.values);
+      await this.HelmService.install(this.state.appName, this.state.chart.repo, this.state.chart.name, this.state.values, this.state.resourcePool.Namespace.Name);
       this.Notifications.success('Helm Chart successfully installed');
       this.$analytics.eventTrack('kubernetes-helm-install', { category: 'kubernetes', metadata: { 'chart-name': this.state.chart.name } });
       this.state.isEditorDirty = false;
@@ -131,7 +131,7 @@ export default class HelmTemplatesController {
       const chartPromises = await Promise.allSettled(promiseList);
       const latestCharts = chartPromises
         .filter((tp) => tp.status === 'fulfilled') // remove failed promises
-        .map((tp, i) => ({ entries: tp.value.entries, repo: helmRepos[i] })) // extract chart entries with respective repo data
+        .map((tp) => ({ entries: tp.value.entries, repo: helmRepos[chartPromises.indexOf(tp)] })) // extract chart entries with respective repo data
         .flatMap(
           ({ entries, repo }) => Object.values(entries).map((charts) => ({ ...charts[0], repo })) // flatten chart entries to single array with respective repo
         );

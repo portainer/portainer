@@ -42,13 +42,14 @@ export function HelmService(HelmFactory, EndpointProvider) {
    * @returns {Promise} - Resolves with `values.yaml` of helm chart values for a repo
    * @throws {PortainerError} - Rejects with error if helm show fails
    */
-  async function install(appname, namespace, chart, values) {
+  async function install(appname, repo, chart, values, namespace) {
     const endpointId = EndpointProvider.currentEndpoint().Id;
     const payload = {
       Name: appname,
-      Namespace: namespace,
+      Repo: repo,
       Chart: chart,
       Values: values,
+      Namespace: namespace,
     };
     return await HelmFactory.install({ endpointId }, payload).$promise;
   }
