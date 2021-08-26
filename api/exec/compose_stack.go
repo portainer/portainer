@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -58,8 +59,8 @@ func (manager *ComposeStackManager) Up(ctx context.Context, stack *portainer.Sta
 		return errors.Wrap(err, "failed to create env file")
 	}
 
-	filePaths := append([]string{stack.EntryPoint}, stack.AdditionalFiles...)
-	return manager.deployer.Deploy(ctx, stack.ProjectPath, url, stack.Name, filePaths, envFilePath)
+	filePaths := getStackFiles(stack)
+	err = manager.deployer.Deploy(ctx, stack.ProjectPath, url, stack.Name, filePaths, envFilePath)
 	return errors.Wrap(err, "failed to deploy a stack")
 }
 
@@ -73,9 +74,9 @@ func (manager *ComposeStackManager) Down(ctx context.Context, stack *portainer.S
 		defer proxy.Close()
 	}
 
-	filePaths := append([]string{stack.EntryPoint}, stack.AdditionalFiles...)
-
-	return manager.deployer.Remove(ctx, stack.ProjectPath, url, stack.Name, filePaths)
+	filePaths := getStackFiles(stack)
+	err = manager.deployer.Remove(ctx, stack.ProjectPath, url, stack.Name, filePaths)
+	return errors.Wrap(err, "failed to remove a stack")
 }
 
 // NormalizeStackName returns a new stack name with unsupported characters replaced
@@ -115,4 +116,28 @@ func createEnvFile(stack *portainer.Stack) (string, error) {
 	envfile.Close()
 
 	return "stack.env", nil
+}
+
+// getStackFiles returns list of stack's confile file paths.
+// items in the list would be sanitized according to following criterias:
+// 1. no empty paths
+// 2. no "../xxx" paths that are trying to escape stack folder
+// 3. no dir paths
+// 4. root paths would be made relative
+func getStackFiles(stack *portainer.Stack) []string {
+	paths := make([]string, 0, len(stack.AdditionalFiles)+1)
+
+	for _, p := range append([]string{stack.EntryPoint}, stack.AdditionalFiles...) {
+		if strings.HasPrefix(p, "/") {
+			p = `.` + p
+		}
+
+		if p == `` || p == `.` || strings.HasPrefix(p, `..`) || strings.HasSuffix(p, string(filepath.Separator)) {
+			continue
+		}
+
+		paths = append(paths, p)
+	}
+
+	return paths
 }
