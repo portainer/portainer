@@ -25,6 +25,7 @@ import (
 // @failure 404 "Endpoint not found"
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/nodes_limits [get]
+// @returns {[{Cpu: int64, Memory: int64}]} array of {Cpu, Memory}
 func (handler *Handler) getKubernetesNodesLimits(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
