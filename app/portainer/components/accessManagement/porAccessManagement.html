@@ -27,6 +27,7 @@
                 ng-disabled="(ctrl.availableUsersAndTeams | filter:{ticked:true}).length === 0 || ctrl.actionInProgress"
                 ng-click="ctrl.authorizeAccess()"
                 button-spinner="ctrl.actionInProgress"
+                data-cy="access-createAccess"
               >
                 <span ng-hide="ctrl.state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Create access</span>
                 <span ng-show="ctrl.state.actionInProgress">Creating access...</span>

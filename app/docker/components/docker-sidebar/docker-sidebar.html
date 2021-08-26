@@ -1,4 +1,10 @@
-<sidebar-menu-item path="docker.dashboard" path-params="{ endpointId: $ctrl.endpointId }" icon-class="fa-tachometer-alt fa-fw" class-name="sidebar-list">
+<sidebar-menu-item
+  path="docker.dashboard"
+  path-params="{ endpointId: $ctrl.endpointId }"
+  icon-class="fa-tachometer-alt fa-fw"
+  class-name="sidebar-list"
+  data-cy="dockerSidebar-dashboard"
+>
   Dashboard
 </sidebar-menu-item>
 
@@ -11,32 +17,46 @@
   is-sidebar-open="$ctrl.isSidebarOpen"
   children-paths="[]"
 >
-  <sidebar-menu-item path="docker.templates.custom" path-params="{ endpointId: $ctrl.endpointId }" class-name="sidebar-sublist">
+  <sidebar-menu-item path="docker.templates.custom" path-params="{ endpointId: $ctrl.endpointId }" class-name="sidebar-sublist" data-cy="dockerSidebar-customTemplates">
     Custom Templates
   </sidebar-menu-item>
 </sidebar-menu>
 
-<sidebar-menu-item ng-if="$ctrl.showStacks" path="docker.stacks" path-params="{ endpointId: $ctrl.endpointId }" icon-class="fa-th-list fa-fw" class-name="sidebar-list">
+<sidebar-menu-item
+  ng-if="$ctrl.showStacks"
+  path="docker.stacks"
+  path-params="{ endpointId: $ctrl.endpointId }"
+  icon-class="fa-th-list fa-fw"
+  class-name="sidebar-list"
+  data-cy="dockerSidebar-stacks"
+>
   Stacks
 </sidebar-menu-item>
 
-<sidebar-menu-item ng-if="$ctrl.swarmManagement" path="docker.services" path-params="{ endpointId: $ctrl.endpointId }" icon-class="fa-list-alt fa-fw" class-name="sidebar-list">
+<sidebar-menu-item
+  ng-if="$ctrl.swarmManagement"
+  path="docker.services"
+  path-params="{ endpointId: $ctrl.endpointId }"
+  icon-class="fa-list-alt fa-fw"
+  class-name="sidebar-list"
+  data-cy="dockerSidebar-services"
+>
   Services
 </sidebar-menu-item>
 
-<sidebar-menu-item path="docker.containers" path-params="{ endpointId: $ctrl.endpointId }" icon-class="fa-cubes fa-fw" class-name="sidebar-list">
+<sidebar-menu-item path="docker.containers" path-params="{ endpointId: $ctrl.endpointId }" icon-class="fa-cubes fa-fw" class-name="sidebar-list" data-cy="dockerSidebar-containers">
   Containers
 </sidebar-menu-item>
 
-<sidebar-menu-item path="docker.images" path-params="{ endpointId: $ctrl.endpointId }" icon-class="fa-clone fa-fw" class-name="sidebar-list">
+<sidebar-menu-item path="docker.images" path-params="{ endpointId: $ctrl.endpointId }" icon-class="fa-clone fa-fw" class-name="sidebar-list" data-cy="dockerSidebar-images">
   Images
 </sidebar-menu-item>
 
-<sidebar-menu-item path="docker.networks" path-params="{ endpointId: $ctrl.endpointId }" icon-class="fa-sitemap fa-fw" class-name="sidebar-list">
+<sidebar-menu-item path="docker.networks" path-params="{ endpointId: $ctrl.endpointId }" icon-class="fa-sitemap fa-fw" class-name="sidebar-list" data-cy="dockerSidebar-networks">
   Networks
 </sidebar-menu-item>
 
-<sidebar-menu-item path="docker.volumes" path-params="{ endpointId: $ctrl.endpointId }" icon-class="fa-hdd fa-fw" class-name="sidebar-list">
+<sidebar-menu-item path="docker.volumes" path-params="{ endpointId: $ctrl.endpointId }" icon-class="fa-hdd fa-fw" class-name="sidebar-list" data-cy="dockerSidebar-volumes">
   Volumes
 </sidebar-menu-item>
 
@@ -46,6 +66,7 @@
   path-params="{ endpointId: $ctrl.endpointId }"
   icon-class="fa-file-code fa-fw"
   class-name="sidebar-list"
+  data-cy="dockerSidebar-configs"
 >
   Configs
 </sidebar-menu-item>
@@ -56,6 +77,7 @@
   path-params="{ endpointId: $ctrl.endpointId }"
   icon-class="fa-user-secret fa-fw"
   class-name="sidebar-list"
+  data-cy="dockerSidebar-secrets"
 >
   Secrets
 </sidebar-menu-item>
@@ -66,6 +88,7 @@
   path-params="{ endpointId: $ctrl.endpointId }"
   icon-class="fa-history fa-fw"
   class-name="sidebar-list"
+  data-cy="dockerSidebar-events"
 >
   Events
 </sidebar-menu-item>
@@ -85,11 +108,18 @@
       path="docker.featuresConfiguration"
       path-params="{ endpointId: $ctrl.endpointId }"
       class-name="sidebar-sublist"
+      data-cy="dockerSidebar-setup"
     >
       Setup
     </sidebar-menu-item>
 
-    <sidebar-menu-item authorization="PortainerRegistryList" path="docker.registries" path-params="{ endpointId: $ctrl.endpointId }" class-name="sidebar-sublist">
+    <sidebar-menu-item
+      authorization="PortainerRegistryList"
+      path="docker.registries"
+      path-params="{ endpointId: $ctrl.endpointId }"
+      class-name="sidebar-sublist"
+      data-cy="dockerSidebar-registries"
+    >
       Registries
     </sidebar-menu-item>
   </div>
@@ -110,11 +140,18 @@
       path="docker.featuresConfiguration"
       path-params="{ endpointId: $ctrl.endpointId }"
       class-name="sidebar-sublist"
+      data-cy="swarmSidebar-setup"
     >
       Setup
     </sidebar-menu-item>
 
-    <sidebar-menu-item authorization="PortainerRegistryList" path="docker.registries" path-params="{ endpointId: $ctrl.endpointId }" class-name="sidebar-sublist">
+    <sidebar-menu-item
+      authorization="PortainerRegistryList"
+      path="docker.registries"
+      path-params="{ endpointId: $ctrl.endpointId }"
+      class-name="sidebar-sublist"
+      data-cy="swarmSidebar-registries"
+    >
       Registries
     </sidebar-menu-item>
   </div>

@@ -26,12 +26,12 @@
                 <div class="col-sm-12 form-section-title">
                   Deployment type
                 </div>
-                <box-selector radio-name="deploy" ng-model="ctrl.state.DeployType" options="ctrl.deployOptions"></box-selector>
+                <box-selector radio-name="deploy" ng-model="ctrl.state.DeployType" options="ctrl.deployOptions" data-cy="k8sAppDeploy-deploymentSelector"></box-selector>
 
                 <div class="col-sm-12 form-section-title">
                   Build method
                 </div>
-                <box-selector radio-name="method" ng-model="ctrl.state.BuildMethod" options="ctrl.methodOptions"></box-selector>
+                <box-selector radio-name="method" ng-model="ctrl.state.BuildMethod" options="ctrl.methodOptions" data-cy="k8sAppDeploy-buildSelector"></box-selector>
 
                 <!-- repository -->
                 <div ng-show="ctrl.state.BuildMethod === ctrl.BuildMethods.GIT">
@@ -48,7 +48,14 @@
                   <div class="form-group">
                     <label for="stack_repository_path" class="col-sm-2 control-label text-left">Manifest path</label>
                     <div class="col-sm-10">
-                      <input type="text" class="form-control" ng-model="ctrl.formValues.FilePathInRepository" id="stack_manifest_path" placeholder="deployment.yml" />
+                      <input
+                        type="text"
+                        class="form-control"
+                        ng-model="ctrl.formValues.FilePathInRepository"
+                        id="stack_manifest_path"
+                        placeholder="deployment.yml"
+                        data-cy="k8sAppDeploy-gitManifestPath"
+                      />
                     </div>
                   </div>
                   <git-form-auth-fieldset model="ctrl.formValues" on-change="(ctrl.onChangeFormValues)"></git-form-auth-fieldset>
@@ -100,7 +107,14 @@
                 </div>
                 <div class="form-group">
                   <div class="col-sm-12">
-                    <button type="button" class="btn btn-primary btn-sm" ng-disabled="ctrl.disableDeploy()" ng-click="ctrl.deploy()" button-spinner="ctrl.state.actionInProgress">
+                    <button
+                      type="button"
+                      class="btn btn-primary btn-sm"
+                      ng-disabled="ctrl.disableDeploy()"
+                      ng-click="ctrl.deploy()"
+                      button-spinner="ctrl.state.actionInProgress"
+                      data-cy="k8sAppDeploy-deployButton"
+                    >
                       <span ng-hide="ctrl.state.actionInProgress">Deploy</span>
                       <span ng-show="ctrl.state.actionInProgress">Deployment in progress...</span>
                     </button>

@@ -12,10 +12,10 @@
       <rd-widget>
         <rd-widget-body classes="no-padding">
           <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
-            <uib-tab index="0" classes="btn-sm" select="ctrl.selectTab(0)">
+            <uib-tab index="0" classes="btn-sm" select="ctrl.selectTab(0)" data-cy="k8sConfigDetail-configTab">
               <uib-tab-heading> <i class="fa fa-file-code space-right" aria-hidden="true"></i> Configuration </uib-tab-heading>
               <div style="padding: 20px;">
-                <table class="table">
+                <table class="table" data-cy="k8sConfigDetail-configTable">
                   <tbody>
                     <tr>
                       <td>Name</td>
@@ -41,7 +41,7 @@
                 </table>
               </div>
             </uib-tab>
-            <uib-tab index="1" classes="btn-sm" select="ctrl.selectTab(1)">
+            <uib-tab index="1" classes="btn-sm" select="ctrl.selectTab(1)" data-cy="k8sConfigDetail-eventsTab">
               <uib-tab-heading>
                 <i class="fa fa-history space-right" aria-hidden="true"></i> Events
                 <div ng-if="ctrl.hasEventWarnings()">
@@ -61,7 +61,7 @@
               >
               </kubernetes-events-datatable>
             </uib-tab>
-            <uib-tab index="2" ng-if="ctrl.configuration.Yaml" classes="btn-sm" select="ctrl.showEditor()">
+            <uib-tab index="2" ng-if="ctrl.configuration.Yaml" classes="btn-sm" select="ctrl.showEditor()" data-cy="k8sConfigDetail-yamlTab">
               <uib-tab-heading> <i class="fa fa-code space-right" aria-hidden="true"></i> YAML </uib-tab-heading>
               <div style="padding-right: 25px;" ng-if="ctrl.state.showEditorTab">
                 <kubernetes-yaml-inspector key="configuration-yaml" data="ctrl.configuration.Yaml"> </kubernetes-yaml-inspector>
@@ -104,6 +104,7 @@
                   ng-disabled="!ctrl.isFormValid() || !kubernetesConfigurationCreationForm.$valid || ctrl.state.actionInProgress"
                   ng-click="ctrl.updateConfiguration()"
                   button-spinner="ctrl.state.actionInProgress"
+                  data-cy="k8sConfigDetail-updateConfig"
                 >
                   <span ng-hide="ctrl.state.actionInProgress">Update configuration</span>
                   <span ng-show="ctrl.state.actionInProgress">Update in progress...</span>

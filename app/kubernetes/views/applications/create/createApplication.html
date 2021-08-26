@@ -65,6 +65,7 @@
                   auto-focus
                   required
                   ng-disabled="ctrl.state.isEdit"
+                  data-cy="k8sAppCreate-applicationName"
                 />
               </div>
             </div>
@@ -1556,6 +1557,7 @@
                   ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.isDeployUpdateButtonDisabled() || !ctrl.state.pullImageValidity"
                   ng-click="ctrl.deployApplication()"
                   button-spinner="ctrl.state.actionInProgress"
+                  data-cy="k8sAppCreate-deployButton"
                 >
                   <span ng-show="!ctrl.state.isEdit && !ctrl.state.actionInProgress">Deploy application</span>
                   <span ng-show="!ctrl.state.isEdit && ctrl.state.actionInProgress">Deployment in progress...</span>

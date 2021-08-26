@@ -408,7 +408,7 @@
                       ng-click="ctrl.updateResourcePool()"
                       button-spinner="ctrl.state.actionInProgress"
                     >
-                      <span ng-hide="ctrl.state.actionInProgress">Update namespace</span>
+                      <span ng-hide="ctrl.state.actionInProgress" data-cy="k8sNamespaceEdit-updateNamespaceButton">Update namespace</span>
                       <span ng-show="ctrl.state.actionInProgress">Update in progress...</span>
                     </button>
                   </div>
