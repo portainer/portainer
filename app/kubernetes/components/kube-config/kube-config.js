@@ -1,7 +1,7 @@
 import angular from 'angular';
-import controller from './kubeconfig.controller';
+import controller from './kube-config.controller';
 
 angular.module('portainer.kubernetes').component('kubeConfig', {
-  templateUrl: './kubeconfig.html',
+  templateUrl: './kube-config.html',
   controller,
 });

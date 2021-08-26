@@ -1,4 +1,4 @@
-export default class KubeconfigController {
+export default class KubeConfigController {
   /* @ngInject */
   constructor($window, KubernetesConfigService) {
     this.$window = $window;
