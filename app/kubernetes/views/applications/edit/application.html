@@ -32,7 +32,7 @@
                       <td>Namespace</td>
                       <td data-cy="k8sAppDetail-resourcePoolName">
                         <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.application.ResourcePool })">{{ ctrl.application.ResourcePool }}</a>
-                        <span style="margin-left: 5px;" class="label label-info image-tag" ng-if="ctrl.isSystemNamespace(item)">system</span>
+                        <span style="margin-left: 5px;" class="label label-info image-tag" ng-if="ctrl.isSystemNamespace()">system</span>
                       </td>
                     </tr>
                     <tr>

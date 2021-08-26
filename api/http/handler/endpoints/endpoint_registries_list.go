@@ -10,7 +10,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/security"
-	endpointutils "github.com/portainer/portainer/api/internal/endpoint"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 )
 
 // GET request on /endpoints/{id}/registries?namespace

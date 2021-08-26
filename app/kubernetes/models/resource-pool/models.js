@@ -2,6 +2,8 @@ export const KubernetesPortainerResourcePoolNameLabel = 'io.portainer.kubernetes
 
 export const KubernetesPortainerResourcePoolOwnerLabel = 'io.portainer.kubernetes.resourcepool.owner';
 
+export const KubernetesPortainerNamespaceSystemLabel = 'io.portainer.kubernetes.namespace.system';
+
 /**
  * KubernetesResourcePool Model
  */

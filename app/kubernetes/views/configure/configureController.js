@@ -5,6 +5,7 @@ import { KubernetesFormValidationReferences } from 'Kubernetes/models/applicatio
 import { KubernetesIngressClass } from 'Kubernetes/ingress/models';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
+import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 
 class KubernetesConfigureController {
   /* #region  CONSTRUCTOR */
@@ -18,7 +19,6 @@ class KubernetesConfigureController {
     EndpointService,
     EndpointProvider,
     ModalService,
-    KubernetesNamespaceHelper,
     KubernetesResourcePoolService,
     KubernetesIngressService,
     KubernetesMetricsService
@@ -30,7 +30,6 @@ class KubernetesConfigureController {
     this.EndpointService = EndpointService;
     this.EndpointProvider = EndpointProvider;
     this.ModalService = ModalService;
-    this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesIngressService = KubernetesIngressService;
     this.KubernetesMetricsService = KubernetesMetricsService;
@@ -147,8 +146,7 @@ class KubernetesConfigureController {
       const allResourcePools = await this.KubernetesResourcePoolService.get();
       const resourcePools = _.filter(
         allResourcePools,
-        (resourcePool) =>
-          !this.KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name) && !this.KubernetesNamespaceHelper.isDefaultNamespace(resourcePool.Namespace.Name)
+        (resourcePool) => !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name) && !KubernetesNamespaceHelper.isDefaultNamespace(resourcePool.Namespace.Name)
       );
 
       ingressesToDel.forEach((ingress) => {
