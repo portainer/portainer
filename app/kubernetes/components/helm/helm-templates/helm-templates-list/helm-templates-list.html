@@ -36,8 +36,8 @@
 
       <div class="blocklist">
         <helm-templates-list-item
-          ng-repeat="template in $ctrl.templates | filter:$ctrl.state.textFilter | filter: $ctrl.state.selectedCategory "
-          model="template"
+          ng-repeat="chart in $ctrl.charts | filter:$ctrl.state.textFilter | filter: $ctrl.state.selectedCategory "
+          model="chart"
           type-label="helm"
           on-select="($ctrl.selectAction)"
         >
@@ -48,7 +48,7 @@
             Initial download of Helm Charts can take a few minutes
           </div>
         </div>
-        <div ng-if="!$ctrl.loading && $ctrl.templates.length === 0" class="text-center text-muted">
+        <div ng-if="!$ctrl.loading && $ctrl.charts.length === 0" class="text-center text-muted">
           No helm charts available.
         </div>
       </div>
