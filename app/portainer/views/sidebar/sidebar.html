@@ -16,7 +16,12 @@
         <kubectl-shell ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider === 'KUBERNETES'" class="kubectl-shell"></kubectl-shell>
       </li>
       <div ng-if="applicationState.endpoint.mode">
-        <kubernetes-sidebar ng-if="applicationState.endpoint.mode.provider === 'KUBERNETES'" is-sidebar-open="toggle" endpoint-id="endpointId"></kubernetes-sidebar>
+        <kubernetes-sidebar
+          ng-if="applicationState.endpoint.mode.provider === 'KUBERNETES'"
+          is-sidebar-open="toggle"
+          endpoint-id="endpointId"
+          admin-access="isAdmin"
+        ></kubernetes-sidebar>
 
         <azure-sidebar ng-if="applicationState.endpoint.mode.provider === 'AZURE'" endpoint-id="endpointId"> </azure-sidebar>
 
