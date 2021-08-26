@@ -5,8 +5,8 @@ ENV GIT_VERSION 2.30.0
 ENV GIT_PATCH_VERSION 2
 
 RUN mkdir mingit/ \
-&& wget https://github.com/git-for-windows/git/releases/download/v$GIT_VERSION.windows.$GIT_PATCH_VERSION/MinGit-$GIT_VERSION.$GIT_PATCH_VERSION-busybox-64-bit.zip \
-&& unzip MinGit-$GIT_VERSION.$GIT_PATCH_VERSION-busybox-64-bit.zip -d mingit/
+  && wget https://github.com/git-for-windows/git/releases/download/v$GIT_VERSION.windows.$GIT_PATCH_VERSION/MinGit-$GIT_VERSION.$GIT_PATCH_VERSION-busybox-64-bit.zip \
+  && unzip MinGit-$GIT_VERSION.$GIT_PATCH_VERSION-busybox-64-bit.zip -d mingit/
 
 FROM mcr.microsoft.com/windows/nanoserver:${OSVERSION}
 ENV PATH "C:\mingit\cmd;C:\Windows\system32;C:\Windows;"
@@ -18,7 +18,7 @@ USER ContainerAdministrator
 
 COPY dist /
 
-EXPOSE 9000
+EXPOSE 9000 9443
 EXPOSE 8000
 
 ENTRYPOINT ["/portainer.exe"]
