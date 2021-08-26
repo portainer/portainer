@@ -51,15 +51,23 @@ func NewService(userSessionDuration string, dataStore portainer.DataStore) (*Ser
 	return service, nil
 }
 
+func (service *Service) defaultExpireAt() (int64) {
+	return time.Now().Add(service.userSessionTimeout).Unix()
+}
+
 // GenerateToken generates a new JWT token.
 func (service *Service) GenerateToken(data *portainer.TokenData) (string, error) {
-	return service.generateSignedToken(data, nil)
+	return service.generateSignedToken(data, service.defaultExpireAt())
 }
 
 // GenerateTokenForOAuth generates a new JWT for OAuth login
 // token expiry time from the OAuth provider is considered
 func (service *Service) GenerateTokenForOAuth(data *portainer.TokenData, expiryTime *time.Time) (string, error) {
-	return service.generateSignedToken(data, expiryTime)
+	expireAt := service.defaultExpireAt()
+	if expiryTime != nil && !expiryTime.IsZero() {
+		expireAt = expiryTime.Unix()
+	}
+	return service.generateSignedToken(data, expireAt)
 }
 
 // ParseAndVerifyToken parses a JWT token and verify its validity. It returns an error if token is invalid.
@@ -90,15 +98,7 @@ func (service *Service) SetUserSessionDuration(userSessionDuration time.Duration
 	service.userSessionTimeout = userSessionDuration
 }
 
-func (service *Service) generateSignedToken(data *portainer.TokenData, expiryTime *time.Time) (string, error) {
-	expireToken := time.Now().Add(service.userSessionTimeout).Unix()
-	if expiryTime != nil && !expiryTime.IsZero() {
-		expireToken = expiryTime.Unix()
-	}
-	return service.generateSignedTokenExpiresAt(data, expireToken)
-}
-
-func (service *Service) generateSignedTokenExpiresAt(data *portainer.TokenData, expiresAt int64) (string, error) {
+func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt int64) (string, error) {
 	cl := claims{
 		UserID:   int(data.ID),
 		Username: data.Username,

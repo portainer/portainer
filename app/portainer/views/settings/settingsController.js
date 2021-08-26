@@ -30,11 +30,11 @@ angular.module('portainer.app').controller('SettingsController', [
           value: '24h',
         },
         {
-          key: '7 day',
+          key: '7 days',
           value: `${24 * 7}h`,
         },
         {
-          key: '30 day',
+          key: '30 days',
           value: `${24 * 30}h`,
         },
         {
