@@ -12,9 +12,6 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/middlewares"
-	"github.com/portainer/portainer/api/http/security"
 	validation "github.com/portainer/portainer/api/kubernetes/validation"
 )
 
@@ -22,6 +19,7 @@ type installChartPayload struct {
 	Namespace string `json:"namespace"`
 	Name      string `json:"name"`
 	Chart     string `json:"chart"`
+	Repo      string `json:"repo"`
 	Values    string `json:"values"`
 }
 
@@ -30,8 +28,49 @@ var errChartNameInvalid = errors.New("invalid chart name. " +
 	" and must start and end with an alphanumeric character",
 )
 
+// @id HelmInstall
+// @summary Install Helm Chart
+// @description
+// @description **Access policy**: authorized
+// @tags helm_chart
+// @security jwt
+// @accept json
+// @produce json
+// @param body installChartPayload true "EdgeGroup data when method is string"
+// @success 201 {object} helm.Release "Created"
+// @failure 401 "Unauthorized"
+// @failure 404 "Endpoint or ServiceAccount not found"
+// @failure 500 "Server error"
+// @router /kubernetes/helm/{release} [post]
+func (handler *Handler) helmInstall(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	var payload installChartPayload
+	err := request.DecodeAndValidateJSONPayload(r, &payload)
+	if err != nil {
+		return &httperror.HandlerError{
+			StatusCode: http.StatusBadRequest,
+			Message:    "Invalid Helm install payload",
+			Err:        err,
+		}
+	}
+
+	release, err := handler.installChart(r, payload)
+	if err != nil {
+		return &httperror.HandlerError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    "Unable to install a chart",
+			Err:        err,
+		}
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	return response.JSON(w, release)
+}
+
 func (p *installChartPayload) Validate(_ *http.Request) error {
 	var required []string
+	if p.Repo == "" {
+		required = append(required, "repo")
+	}
 	if p.Name == "" {
 		required = append(required, "name")
 	}
@@ -52,75 +91,16 @@ func (p *installChartPayload) Validate(_ *http.Request) error {
 	return nil
 }
 
-func readPayload(r *http.Request) (*installChartPayload, error) {
-	p := new(installChartPayload)
-	err := request.DecodeAndValidateJSONPayload(r, p)
-	if err != nil {
-		return nil, err
-	}
-
-	return p, nil
-}
-
-// @id HelmInstall
-// @summary Install Helm Chart
-// @description
-// @description **Access policy**: authorized
-// @tags helm_chart
-// @security jwt
-// @accept json
-// @produce json
-// @param body installChartPayload true "EdgeGroup data when method is string"
-// @success 201 {object} helm.Release "Created"
-// @failure 401 "Unauthorized"
-// @failure 404 "Endpoint or ServiceAccount not found"
-// @failure 500 "Server error"
-// @router /kubernetes/helm/{release} [post]
-func (handler *Handler) helmInstall(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpoint, err := middlewares.FetchEndpoint(r)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint on request context", err}
-	}
-
-	bearerToken, err := security.ExtractBearerToken(r)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusUnauthorized, "Unauthorized", err}
-	}
-
-	repo, httperr := handler.getHelmRepositoryUrl()
+func (handler *Handler) installChart(r *http.Request, p installChartPayload) (*release.Release, error) {
+	clusterAccess, httperr := handler.getHelmClusterAccess(r)
 	if httperr != nil {
-		return httperr
+		return nil, httperr.Err
 	}
-
-	payload, err := readPayload(r)
-	if err != nil {
-		return &httperror.HandlerError{
-			StatusCode: http.StatusBadRequest,
-			Message:    "Invalid Helm install payload",
-			Err:        err,
-		}
-	}
-
-	release, err := handler.installChart(settings.HelmRepositoryURL, endpoint, payload, bearerToken)
-	if err != nil {
-		return &httperror.HandlerError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    "Unable to install a chart",
-			Err:        err,
-		}
-	}
-
-	w.WriteHeader(http.StatusCreated)
-	return response.JSON(w, release)
-}
-
-func (handler *Handler) installChart(repo string, endpoint *portainer.Endpoint, p *installChartPayload, bearerToken string) (*release.Release, error) {
-	clusterAccess := handler.kubeConfigService.GetKubeConfigInternal(endpoint.ID, bearerToken)
 	installOpts := options.InstallOptions{
 		Name:      p.Name,
 		Chart:     p.Chart,
 		Namespace: p.Namespace,
-		Repo:      repo,
+		Repo:      p.Repo,
 		KubernetesClusterAccess: &options.KubernetesClusterAccess{
 			ClusterServerURL:         clusterAccess.ClusterServerURL,
 			CertificateAuthorityFile: clusterAccess.CertificateAuthorityFile,

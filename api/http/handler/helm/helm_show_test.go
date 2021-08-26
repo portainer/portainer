@@ -5,10 +5,10 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 
 	"github.com/portainer/libhelm/binary/test"
-	portainer "github.com/portainer/portainer/api"
 	helper "github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/stretchr/testify/assert"
 )
@@ -16,12 +16,8 @@ import (
 func Test_helmShow(t *testing.T) {
 	is := assert.New(t)
 
-	defaultSettings := &portainer.Settings{
-		HelmRepositoryURL: portainer.DefaultHelmRepositoryURL,
-	}
-	store := helper.NewDatastore(helper.WithSettingsService(defaultSettings))
 	helmPackageManager := test.NewMockHelmBinaryPackageManager("")
-	h := NewTemplateHandler(helper.NewTestRequestBouncer(), store, helmPackageManager)
+	h := NewTemplateHandler(helper.NewTestRequestBouncer(), helmPackageManager)
 
 	is.NotNil(h, "Handler should not fail")
 
@@ -31,12 +27,13 @@ func Test_helmShow(t *testing.T) {
 		"readme": test.MockDataReadme,
 	}
 
-	chartName := "test-nginx"
 	for cmd, expect := range commands {
 		t.Run(cmd, func(t *testing.T) {
 			is.NotNil(h, "Handler should not fail")
 
-			req := httptest.NewRequest("GET", fmt.Sprintf("/templates/helm/%s/%s", chartName, cmd), nil)
+			repoUrlEncoded := url.QueryEscape("https://charts.bitnami.com/bitnami")
+			chart := "nginx"
+			req := httptest.NewRequest("GET", fmt.Sprintf("/templates/helm/%s?repo=%s&chart=%s", cmd, repoUrlEncoded, chart), nil)
 			rr := httptest.NewRecorder()
 			h.ServeHTTP(rr, req)
 

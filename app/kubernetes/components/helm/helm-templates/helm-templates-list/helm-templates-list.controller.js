@@ -11,7 +11,7 @@ export default class HelmTemplatesListController {
 
   async updateCategories() {
     try {
-      const annotationCategories = this.templates
+      const annotationCategories = this.charts
         .map((t) => t.annotations) // get annotations
         .filter((a) => a) // filter out undefined/nulls
         .map((c) => c.category); // get annotation category
@@ -31,7 +31,7 @@ export default class HelmTemplatesListController {
   }
 
   $onChanges() {
-    if (this.templates.length > 0) {
+    if (this.charts.length > 0) {
       this.updateCategories();
     }
   }

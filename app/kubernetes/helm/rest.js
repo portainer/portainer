@@ -15,11 +15,13 @@ function HelmFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
       templates: {
         url: templatesUrl,
         method: 'GET',
+        params: { repo: '@repo' },
         cache: true,
       },
       show: {
-        url: `${templatesUrl}/:chart/:type`,
+        url: `${templatesUrl}/:type`,
         method: 'GET',
+        params: { repo: '@repo', chart: '@chart' },
         transformResponse: function (data) {
           return { values: data };
         },
