@@ -171,7 +171,7 @@ func (server *Server) Start() error {
 
 	var endpointHelmHandler = helmhandler.NewHandler(requestBouncer, server.DataStore, server.HelmPackageManager, server.KubeConfigService)
 
-	var helmTemplatesHandler = helmhandler.NewTemplateHandler(requestBouncer, server.DataStore, server.HelmPackageManager)
+	var helmTemplatesHandler = helmhandler.NewTemplateHandler(requestBouncer, server.HelmPackageManager)
 
 	var motdHandler = motd.NewHandler(requestBouncer)
 

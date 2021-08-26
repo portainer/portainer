@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 
 	"net/http"
@@ -54,6 +54,10 @@ func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimi
 		bouncer.PublicAccess(httperror.LoggerHandler(h.adminCheck))).Methods(http.MethodGet)
 	h.Handle("/users/admin/init",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.adminInit))).Methods(http.MethodPost)
+	h.Handle("/users/{id}/helm-repositories",
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.userGetHelmRepos))).Methods(http.MethodGet)
+	h.Handle("/users/{id}/helm-repositories",
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.userCreateHelmRepo))).Methods(http.MethodPost)
 
 	return h
 }

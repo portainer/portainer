@@ -5,10 +5,12 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/portainer/libhelm"
+	"github.com/portainer/libhelm/options"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes"
 )
 
@@ -47,26 +49,25 @@ func NewHandler(bouncer requestBouncer, dataStore portainer.DataStore, helmPacka
 }
 
 // NewTemplateHandler creates a template handler to manage endpoint group operations.
-func NewTemplateHandler(bouncer requestBouncer, dataStore portainer.DataStore, helmPackageManager libhelm.HelmPackageManager) *Handler {
+func NewTemplateHandler(bouncer requestBouncer, helmPackageManager libhelm.HelmPackageManager) *Handler {
 	h := &Handler{
 		Router:             mux.NewRouter(),
-		dataStore:          dataStore,
 		helmPackageManager: helmPackageManager,
 		requestBouncer:     bouncer,
 	}
-	// `helm search [COMMAND] [CHART] flags`
+
 	h.Handle("/templates/helm",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.helmRepoSearch))).Methods(http.MethodGet)
 
-	// `helm show [COMMAND] [CHART] flags`
-	h.Handle("/templates/helm/{chart}/{command:chart|values|readme}",
+	// helm show [COMMAND] [CHART] [REPO] flags
+	h.Handle("/templates/helm/{command:chart|values|readme}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.helmShow))).Methods(http.MethodGet)
 
 	return h
 }
 
-// GetEndpoint returns the portainer.Endpoint for the request
-func (handler *Handler) GetEndpoint(r *http.Request) (*portainer.Endpoint, *httperror.HandlerError) {
+// getEndpoint returns the portainer.Endpoint for the request
+func (handler *Handler) getEndpoint(r *http.Request) (*portainer.Endpoint, *httperror.HandlerError) {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return nil, &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint identifier route variable", err}
@@ -80,4 +81,26 @@ func (handler *Handler) GetEndpoint(r *http.Request) (*portainer.Endpoint, *http
 	}
 
 	return endpoint, nil
+}
+
+// getHelmClusterAccess obtains the core k8s cluster access details from request.
+// The cluster access includes the cluster server url, the user's bearer token and the tls certificate.
+// The cluster access is passed in as kube config CLI params to helm binary.
+func (handler *Handler) getHelmClusterAccess(r *http.Request) (*options.KubernetesClusterAccess, *httperror.HandlerError) {
+	endpoint, httperr := handler.getEndpoint(r)
+	if httperr != nil {
+		return nil, httperr
+	}
+
+	bearerToken, err := security.ExtractBearerToken(r)
+	if err != nil {
+		return nil, &httperror.HandlerError{http.StatusUnauthorized, "Unauthorized", err}
+	}
+
+	clusterAccess := handler.kubeConfigService.GetKubeConfigInternal(endpoint.ID, bearerToken)
+	return &options.KubernetesClusterAccess{
+		ClusterServerURL:         clusterAccess.ClusterServerURL,
+		CertificateAuthorityFile: clusterAccess.CertificateAuthorityFile,
+		AuthToken:                clusterAccess.AuthToken,
+	}, nil
 }
