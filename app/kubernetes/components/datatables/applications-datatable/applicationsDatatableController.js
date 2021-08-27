@@ -1,6 +1,7 @@
 import { KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
+import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
 
 angular.module('portainer.docker').controller('KubernetesApplicationsDatatableController', [
   '$scope',
@@ -10,11 +11,70 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
   function ($scope, $controller, DatatableService, Authentication) {
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
 
-    var ctrl = this;
+    const ctrl = this;
 
     this.settings = Object.assign(this.settings, {
       showSystem: false,
     });
+
+    this.state = Object.assign(this.state, {
+      expandAll: false,
+      expandedItems: [],
+    });
+
+    this.expandAll = function () {
+      this.state.expandAll = !this.state.expandAll;
+      for (let i = 0; i < this.state.filteredDataSet.length; i++) {
+        const item = this.state.filteredDataSet[i];
+        this.expandItem(item, this.state.expandAll);
+      }
+    };
+
+    this.expandItem = function (item, expanded) {
+      item.Expanded = expanded;
+      if (item.Expanded) {
+        if (this.state.expandedItems.indexOf(item.Id) === -1) {
+          this.state.expandedItems.push(item.Id);
+        }
+      } else {
+        var index = this.state.expandedItems.indexOf(item.Id);
+        if (index > -1) {
+          this.state.expandedItems.splice(index, 1);
+        }
+      }
+      DatatableService.setDataTableExpandedItems(this.tableKey, this.state.expandedItems);
+    };
+
+    function expandPreviouslyExpandedItem(item, storedExpandedItems) {
+      const expandedItem = storedExpandedItems.some((storedId) => storedId === item.Id);
+      if (expandedItem) {
+        ctrl.expandItem(item, true);
+      }
+    }
+
+    this.expandItems = function (storedExpandedItems) {
+      let expandedItemCount = 0;
+      this.state.expandedItems = storedExpandedItems;
+
+      for (let i = 0; i < this.dataset.length; i++) {
+        const item = this.dataset[i];
+        expandPreviouslyExpandedItem(item, storedExpandedItems);
+        if (item.Expanded) {
+          ++expandedItemCount;
+        }
+      }
+
+      if (expandedItemCount === this.dataset.length) {
+        this.state.expandAll = true;
+      }
+    };
+
+    this.onDataRefresh = function () {
+      const storedExpandedItems = DatatableService.getDataTableExpandedItems(this.tableKey);
+      if (storedExpandedItems !== null) {
+        this.expandItems(storedExpandedItems);
+      }
+    };
 
     this.onSettingsShowSystemChange = function () {
       DatatableService.setDataTableSettings(this.tableKey, this.settings);
@@ -25,11 +85,27 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
     };
 
     this.isSystemNamespace = function (item) {
+      // if all charts in a helm app/release are in the system namespace
+      if (item.KubernetesApplications && item.KubernetesApplications.length > 0) {
+        return item.KubernetesApplications.every((app) => KubernetesNamespaceHelper.isSystemNamespace(app.ResourcePool));
+      }
       return KubernetesNamespaceHelper.isSystemNamespace(item.ResourcePool);
     };
 
     this.isDisplayed = function (item) {
       return !ctrl.isSystemNamespace(item) || ctrl.settings.showSystem;
+    };
+
+    this.getPublishUrl = function (item) {
+      // Map all ingress rules in published ports to their respective URLs
+      const publishUrls = item.PublishedPorts.flatMap((pp) => pp.IngressRules).map(({ Host, IP, Path }) => `http://${Host || IP}${Path}`);
+
+      // Return the first URL
+      return publishUrls.length > 0 ? publishUrls[0] : '';
+    };
+
+    this.hasConfigurationSecrets = function (item) {
+      return item.Configurations && item.Configurations.some((config) => config.Data && config.Type === KubernetesConfigurationTypes.SECRET);
     };
 
     /**
