@@ -3,7 +3,10 @@ package helm
 import (
 	"net/http"
 
+	"github.com/portainer/libhelm/options"
 	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/request"
+	"github.com/portainer/libhttp/response"
 )
 
 // @id HelmDelete
@@ -14,13 +17,38 @@ import (
 // @security jwt
 // @accept json
 // @produce json
-// @param
-// @success 204 {object} portainer.Helm "Success" - TODO
+// @param namespace
+// @success 204 "Success"
+// @failure 400 "Invalid endpoint id or bad request"
 // @failure 401 "Unauthorized"
 // @failure 404 "Endpoint or ServiceAccount not found"
-// @failure 500 "Server error"
+// @failure 500 "Server error or helm error"
 // @router /kubernetes/helm/{release} [delete]
 func (handler *Handler) helmDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	w.Write([]byte("Helm Delete"))
-	return nil
+	release, err := request.RetrieveRouteVariableValue(r, "release")
+	if err != nil {
+		return &httperror.HandlerError{http.StatusBadRequest, "No release specified", err}
+	}
+
+	clusterAccess, httperr := handler.getHelmClusterAccess(r)
+	if httperr != nil {
+		return httperr
+	}
+
+	uninstallOpts := options.UninstallOptions{
+		Name:                    release,
+		KubernetesClusterAccess: clusterAccess,
+	}
+
+	q := r.URL.Query()
+	if namespace := q.Get("namespace"); namespace != "" {
+		uninstallOpts.Namespace = namespace
+	}
+
+	err = handler.helmPackageManager.Uninstall(uninstallOpts)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Helm returned an error", err}
+	}
+
+	return response.Empty(w)
 }

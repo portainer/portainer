@@ -76,7 +76,7 @@ func readPayload(r *http.Request) (*installChartPayload, error) {
 // @failure 500 "Server error"
 // @router /kubernetes/helm/{release} [post]
 func (handler *Handler) helmInstall(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpoint, httperr := handler.GetEndpoint(r)
+	endpoint, httperr := handler.getEndpoint(r)
 	if httperr != nil {
 		return httperr
 	}

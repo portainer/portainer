@@ -3,7 +3,9 @@ package helm
 import (
 	"net/http"
 
+	"github.com/portainer/libhelm/options"
 	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/response"
 )
 
 // @id HelmList
@@ -14,47 +16,50 @@ import (
 // @security jwt
 // @accept json
 // @produce json
-// @param
-// @success 200 {object} portainer.Helm "Success" - TODO
+// @param selector specify an optional selector
+// @param namespace specify an optional namespace
+// @param filter specify an optional filter
+// @success 200 {object} portainer.Helm "Success"
+// @failure 400 "Invalid endpoint identifier"
 // @failure 401 "Unauthorized"
 // @failure 404 "Endpoint or ServiceAccount not found"
 // @failure 500 "Server error"
-// @router /kubernetes/helm/list [get]
+// @router /kubernetes/helm [get]
 func (handler *Handler) helmList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-
-	// TODO read query params
-	// - namespace (default all-namespaces, no-query-param)
-	// - filter (release-name)
-	// - output (default JSON)
-
-	endpoint, httperr := handler.GetEndpoint(r)
+	clusterAccess, httperr := handler.getHelmClusterAccess(r)
 	if httperr != nil {
 		return httperr
 	}
 
-	proxyServerURL := getProxyUrl(r, endpoint.ID)
+	listOpts := options.ListOptions{
+		KubernetesClusterAccess: &options.KubernetesClusterAccess{
+			ClusterServerURL:         clusterAccess.ClusterServerURL,
+			CertificateAuthorityFile: clusterAccess.CertificateAuthorityFile,
+			AuthToken:                clusterAccess.AuthToken,
+		},
+	}
 
-	bearerToken, err := extractBearerToken(r)
+	params := r.URL.Query()
+
+	// optional namespace.  The library defaults to "default"
+	if namespace := params.Get("namespace"); namespace != "" {
+		listOpts.Namespace = namespace
+	}
+
+	// optional filter
+	if filter := params.Get("filter"); filter != "" {
+		listOpts.Filter = filter
+	}
+
+	// optional selector
+	if selector := params.Get("selector"); selector != "" {
+		listOpts.Selector = selector
+	}
+
+	releases, err := handler.helmPackageManager.List(listOpts)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusUnauthorized, "Unauthorized", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Helm returned an error", err}
 	}
 
-	v := r.URL.Query()
-	namespace := v.Get("namespace") // Optional
-
-	args := []string{"-o", "json"}
-
-	if namespace != "" {
-		args = append(args, "--namespace", namespace)
-	}
-
-	result, err := handler.HelmPackageManager.Run("list", args, proxyServerURL, bearerToken)
-	if err != nil {
-		return nil
-	}
-
-	// TODO - return struct - document type in swagger
-
-	w.Write([]byte(result))
-	return nil
+	return response.JSON(w, releases)
 }

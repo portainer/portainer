@@ -222,9 +222,8 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 			return
 		}
 
-		ctx := storeTokenData(r, tokenData)
+		ctx := StoreTokenData(r, tokenData)
 		next.ServeHTTP(w, r.WithContext(ctx))
-		return
 	})
 }
 
