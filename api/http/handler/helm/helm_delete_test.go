@@ -39,16 +39,6 @@ func Test_helmDelete(t *testing.T) {
 	options := options.InstallOptions{Name: "nginx-1", Chart: "nginx", Namespace: "default"}
 	h.helmPackageManager.Install(options)
 
-	t.Run("helmDelete fails for unauthorized user", func(t *testing.T) {
-		req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/1/kubernetes/helm/%s", options.Name), nil)
-		req.Header.Add("Authorization", "Bearer dummytoken")
-
-		rr := httptest.NewRecorder()
-		h.ServeHTTP(rr, req)
-
-		is.Equal(http.StatusForbidden, rr.Code, "Status should be 403")
-	})
-
 	t.Run("helmDelete succeeds with admin user", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/1/kubernetes/helm/%s", options.Name), nil)
 		ctx := security.StoreTokenData(req, &portainer.TokenData{ID: 1, Username: "admin", Role: 1})
