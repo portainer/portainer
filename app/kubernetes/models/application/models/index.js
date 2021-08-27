@@ -45,6 +45,29 @@ export class KubernetesApplication {
 }
 
 /**
+ * HelmApplication Model (Composite)
+ */
+const _HelmApplication = Object.freeze({
+  Id: '',
+  Name: '',
+  KubernetesApplications: [],
+  ApplicationOwner: '',
+  CreationDate: 0,
+  ApplicationType: 'Unknown',
+  Status: '',
+  StackName: '-',
+  ResourcePool: '-',
+  Image: '-',
+  PublishedPorts: [],
+});
+
+export class HelmApplication {
+  constructor() {
+    Object.assign(this, JSON.parse(JSON.stringify(_HelmApplication)));
+  }
+}
+
+/**
  * KubernetesApplicationPersistedFolder Model
  */
 const _KubernetesApplicationPersistedFolder = Object.freeze({
