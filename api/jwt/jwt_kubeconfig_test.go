@@ -44,7 +44,6 @@ func TestService_GenerateTokenForKubeconfig(t *testing.T) {
 		wantExpiresAt int64
 		wantErr       bool
 	}{
-		// TODO: Add test cases.
 		{
 			name:          "kubeconfig no expiry",
 			fields:        myFields,
