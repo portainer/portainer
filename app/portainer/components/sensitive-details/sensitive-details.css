@@ -1,0 +1,10 @@
+.sensitive-details-container {
+  display: grid;
+  grid-template-columns: 2fr 1fr 2fr;
+  grid-gap: 2rem;
+}
+
+.show-hide-container {
+  display: flex;
+  justify-content: space-between;
+}
