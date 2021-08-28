@@ -53,6 +53,10 @@ export class EditEdgeStackViewController {
     };
   }
 
+  $onDestroy() {
+    this.state.isEditorDirty = false;
+  }
+
   async uiCanExit() {
     if (this.formValues.StackFileContent !== this.oldFileContent && this.state.isEditorDirty) {
       return this.ModalService.confirmWebEditorDiscard();
@@ -95,7 +99,7 @@ export class EditEdgeStackViewController {
 
   async getPaginatedEndpointsAsync(lastId, limit, search) {
     try {
-      const query = { search, type: 4, endpointIds: this.stackEndpointIds };
+      const query = { search, types: [4], endpointIds: this.stackEndpointIds };
       const { value, totalCount } = await this.EndpointService.endpoints(lastId, limit, query);
       const endpoints = _.map(value, (endpoint) => {
         const status = this.stack.Status[endpoint.Id];

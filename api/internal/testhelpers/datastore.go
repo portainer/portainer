@@ -7,7 +7,6 @@ import (
 )
 
 type datastore struct {
-	dockerHub        portainer.DockerHubService
 	customTemplate   portainer.CustomTemplateService
 	edgeGroup        portainer.EdgeGroupService
 	edgeJob          portainer.EdgeJobService
@@ -18,6 +17,7 @@ type datastore struct {
 	registry         portainer.RegistryService
 	resourceControl  portainer.ResourceControlService
 	role             portainer.RoleService
+	sslSettings      portainer.SSLSettingsService
 	settings         portainer.SettingsService
 	stack            portainer.StackService
 	tag              portainer.TagService
@@ -37,7 +37,6 @@ func (d *datastore) CheckCurrentEdition() error                          { retur
 func (d *datastore) IsNew() bool                                         { return false }
 func (d *datastore) MigrateData(force bool) error                        { return nil }
 func (d *datastore) RollbackToCE() error                                 { return nil }
-func (d *datastore) DockerHub() portainer.DockerHubService               { return d.dockerHub }
 func (d *datastore) CustomTemplate() portainer.CustomTemplateService     { return d.customTemplate }
 func (d *datastore) EdgeGroup() portainer.EdgeGroupService               { return d.edgeGroup }
 func (d *datastore) EdgeJob() portainer.EdgeJobService                   { return d.edgeJob }
@@ -49,6 +48,7 @@ func (d *datastore) Registry() portainer.RegistryService                 { retur
 func (d *datastore) ResourceControl() portainer.ResourceControlService   { return d.resourceControl }
 func (d *datastore) Role() portainer.RoleService                         { return d.role }
 func (d *datastore) Settings() portainer.SettingsService                 { return d.settings }
+func (d *datastore) SSLSettings() portainer.SSLSettingsService           { return d.sslSettings }
 func (d *datastore) Stack() portainer.StackService                       { return d.stack }
 func (d *datastore) Tag() portainer.TagService                           { return d.tag }
 func (d *datastore) TeamMembership() portainer.TeamMembershipService     { return d.teamMembership }

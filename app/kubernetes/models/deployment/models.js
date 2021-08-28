@@ -6,7 +6,7 @@ const _KubernetesDeployment = Object.freeze({
   Name: '',
   StackName: '',
   ReplicaCount: 0,
-  Image: '',
+  ImageModel: null,
   Env: [],
   CpuLimit: 0,
   MemoryLimit: 0,

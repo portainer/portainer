@@ -1,4 +1,6 @@
-angular.module('portainer.kubernetes', ['portainer.app']).config([
+import registriesModule from './registries';
+
+angular.module('portainer.kubernetes', ['portainer.app', registriesModule]).config([
   '$stateRegistryProvider',
   function ($stateRegistryProvider) {
     'use strict';
@@ -9,7 +11,7 @@ angular.module('portainer.kubernetes', ['portainer.app']).config([
       parent: 'endpoint',
       abstract: true,
 
-      onEnter: /* @ngInject */ function onEnter($async, $state, endpoint, EndpointProvider, KubernetesHealthService, Notifications, StateManager) {
+      onEnter: /* @ngInject */ function onEnter($async, $state, endpoint, EndpointProvider, KubernetesHealthService, KubernetesNamespaceService, Notifications, StateManager) {
         return $async(async () => {
           if (![5, 6, 7].includes(endpoint.Type)) {
             $state.go('portainer.home');
@@ -32,6 +34,8 @@ angular.module('portainer.kubernetes', ['portainer.app']).config([
             if (endpoint.Type === 7 && endpoint.Status === 2) {
               throw new Error('Unable to contact Edge agent, please ensure that the agent is properly running on the remote environment.');
             }
+
+            await KubernetesNamespaceService.get();
           } catch (e) {
             Notifications.error('Failed loading endpoint', e);
             $state.go('portainer.home', {}, { reload: true });
@@ -272,6 +276,26 @@ angular.module('portainer.kubernetes', ['portainer.app']).config([
       },
     };
 
+    const registries = {
+      name: 'kubernetes.registries',
+      url: '/registries',
+      views: {
+        'content@': {
+          component: 'endpointRegistriesView',
+        },
+      },
+    };
+
+    const registriesAccess = {
+      name: 'kubernetes.registries.access',
+      url: '/:id/access',
+      views: {
+        'content@': {
+          component: 'kubernetesRegistryAccessView',
+        },
+      },
+    };
+
     $stateRegistryProvider.register(kubernetes);
     $stateRegistryProvider.register(applications);
     $stateRegistryProvider.register(applicationCreation);
@@ -297,5 +321,7 @@ angular.module('portainer.kubernetes', ['portainer.app']).config([
     $stateRegistryProvider.register(resourcePoolAccess);
     $stateRegistryProvider.register(volumes);
     $stateRegistryProvider.register(volume);
+    $stateRegistryProvider.register(registries);
+    $stateRegistryProvider.register(registriesAccess);
   },
 ]);

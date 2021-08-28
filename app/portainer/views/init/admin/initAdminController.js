@@ -1,5 +1,4 @@
 angular.module('portainer.app').controller('InitAdminController', [
-  '$async',
   '$scope',
   '$state',
   'Notifications',
@@ -10,7 +9,9 @@ angular.module('portainer.app').controller('InitAdminController', [
   'EndpointService',
   'BackupService',
   'StatusService',
-  function ($async, $scope, $state, Notifications, Authentication, StateManager, SettingsService, UserService, EndpointService, BackupService, StatusService) {
+  function ($scope, $state, Notifications, Authentication, StateManager, SettingsService, UserService, EndpointService, BackupService, StatusService) {
+    $scope.uploadBackup = uploadBackup;
+
     $scope.logo = StateManager.getState().application.logo;
 
     $scope.formValues = {
@@ -25,6 +26,8 @@ angular.module('portainer.app').controller('InitAdminController', [
       showInitPassword: true,
       showRestorePortainer: false,
     };
+
+    createAdministratorFlow();
 
     $scope.togglePanel = function () {
       $scope.state.showInitPassword = !$scope.state.showInitPassword;
@@ -75,37 +78,58 @@ angular.module('portainer.app').controller('InitAdminController', [
           Notifications.error('Failure', err, 'Unable to verify administrator account existence');
         });
     }
-    createAdministratorFlow();
 
-    async function waitPortainerRestart() {
-      for (let i = 0; i < 10; i++) {
-        await new Promise((resolve) => setTimeout(resolve, 5 * 1000));
-        try {
-          const status = await StatusService.status();
-          if (status && status.Version) {
-            return;
-          }
-        } catch (e) {}
-      }
-      throw 'Timeout to wait for Portainer restarting';
-    }
-
-    $scope.uploadBackup = async function () {
+    async function uploadBackup() {
       $scope.state.backupInProgress = true;
 
       const file = $scope.formValues.BackupFile;
       const password = $scope.formValues.Password;
 
+      restoreAndRefresh(() => BackupService.uploadBackup(file, password));
+    }
+
+    async function restoreAndRefresh(restoreAsyncFn) {
+      $scope.state.backupInProgress = true;
+
       try {
-        await BackupService.uploadBackup(file, password);
+        await restoreAsyncFn();
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to restore the backup');
+        $scope.state.backupInProgress = false;
+
+        return;
+      }
+
+      try {
         await waitPortainerRestart();
         Notifications.success('The backup has successfully been restored');
         $state.go('portainer.auth');
       } catch (err) {
-        Notifications.error('Failure', err, 'Unable to restore the backup');
-      } finally {
-        $scope.state.backupInProgress = false;
+        Notifications.error('Failure', err, 'Unable to check for status');
+        await wait(2);
+        location.reload();
       }
-    };
+
+      $scope.state.backupInProgress = false;
+    }
+
+    async function waitPortainerRestart() {
+      for (let i = 0; i < 10; i++) {
+        await wait(5);
+        try {
+          const status = await StatusService.status();
+          if (status && status.Version) {
+            return;
+          }
+        } catch (e) {
+          // pass
+        }
+      }
+      throw new Error('Timeout to wait for Portainer restarting');
+    }
   },
 ]);
+
+function wait(seconds = 0) {
+  return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+}

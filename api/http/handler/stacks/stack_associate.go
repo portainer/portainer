@@ -2,6 +2,9 @@ package stacks
 
 import (
 	"fmt"
+	"net/http"
+	"time"
+
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -9,8 +12,6 @@ import (
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/stackutils"
-	"net/http"
-	"time"
 )
 
 // PUT request on /api/stacks/:id/associate?endpointId=<endpointId>&swarmId=<swarmId>&orphanedRunning=<orphanedRunning>
@@ -86,6 +87,11 @@ func (handler *Handler) stackAssociate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	stack.ResourceControl = resourceControl
+
+	if stack.GitConfig != nil && stack.GitConfig.Authentication != nil && stack.GitConfig.Authentication.Password != "" {
+		// sanitize password in the http response to minimise possible security leaks
+		stack.GitConfig.Authentication.Password = ""
+	}
 
 	return response.JSON(w, stack)
 }

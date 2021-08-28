@@ -575,7 +575,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     }
 
     function loadFromContainerImageConfig() {
-      RegistryService.retrievePorRegistryModelFromRepository($scope.config.Image)
+      RegistryService.retrievePorRegistryModelFromRepository($scope.config.Image, endpoint.Id)
         .then((model) => {
           $scope.formValues.RegistryModel = model;
         })

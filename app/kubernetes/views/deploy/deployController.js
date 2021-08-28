@@ -1,8 +1,9 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import stripAnsi from 'strip-ansi';
-import { KubernetesDeployManifestTypes, KubernetesDeployBuildMethods, KubernetesDeployRequestMethods } from 'Kubernetes/models/deploy';
 
+import { KubernetesDeployManifestTypes, KubernetesDeployBuildMethods, KubernetesDeployRequestMethods } from 'Kubernetes/models/deploy';
+import { buildOption } from '@/portainer/components/box-selector';
 class KubernetesDeployController {
   /* @ngInject */
   constructor($async, $state, $window, ModalService, Notifications, EndpointProvider, KubernetesResourcePoolService, StackService) {
@@ -15,11 +16,37 @@ class KubernetesDeployController {
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.StackService = StackService;
 
+    this.deployOptions = [
+      buildOption('method_kubernetes', 'fa fa-cubes', 'Kubernetes', 'Kubernetes manifest format', KubernetesDeployManifestTypes.KUBERNETES),
+      buildOption('method_compose', 'fa fa-docker', 'Compose', 'docker-compose format', KubernetesDeployManifestTypes.COMPOSE),
+    ];
+
+    this.methodOptions = [
+      buildOption('method_repo', 'fab fa-github', 'Git Repository', 'Use a git repository', KubernetesDeployBuildMethods.GIT),
+      buildOption('method_editor', 'fa fa-edit', 'Web editor', 'Use our Web editor', KubernetesDeployBuildMethods.WEB_EDITOR),
+    ];
+
+    this.state = {
+      DeployType: KubernetesDeployManifestTypes.KUBERNETES,
+      BuildMethod: KubernetesDeployBuildMethods.GIT,
+      tabLogsDisabled: true,
+      activeTab: 0,
+      viewReady: false,
+      isEditorDirty: false,
+    };
+
+    this.formValues = {};
+    this.ManifestDeployTypes = KubernetesDeployManifestTypes;
+    this.BuildMethods = KubernetesDeployBuildMethods;
+    this.endpointId = this.EndpointProvider.endpointID();
+
     this.onInit = this.onInit.bind(this);
     this.deployAsync = this.deployAsync.bind(this);
-    this.editorUpdate = this.editorUpdate.bind(this);
-    this.editorUpdateAsync = this.editorUpdateAsync.bind(this);
+    this.onChangeFileContent = this.onChangeFileContent.bind(this);
     this.getNamespacesAsync = this.getNamespacesAsync.bind(this);
+    this.onChangeFormValues = this.onChangeFormValues.bind(this);
+    this.onRepoUrlChange = this.onRepoUrlChange.bind(this);
+    this.onRepoRefChange = this.onRepoRefChange.bind(this);
   }
 
   disableDeploy() {
@@ -33,13 +60,24 @@ class KubernetesDeployController {
     return isGitFormInvalid || isWebEditorInvalid || _.isEmpty(this.formValues.Namespace) || this.state.actionInProgress;
   }
 
-  async editorUpdateAsync(cm) {
-    this.formValues.EditorContent = cm.getValue();
-    this.state.isEditorDirty = true;
+  onChangeFormValues(values) {
+    this.formValues = {
+      ...this.formValues,
+      ...values,
+    };
   }
 
-  editorUpdate(cm) {
-    return this.$async(this.editorUpdateAsync, cm);
+  onRepoUrlChange(value) {
+    this.onChangeFormValues({ RepositoryURL: value });
+  }
+
+  onRepoRefChange(value) {
+    this.onChangeFormValues({ RepositoryReferenceName: value });
+  }
+
+  onChangeFileContent(value) {
+    this.formValues.EditorContent = value;
+    this.state.isEditorDirty = true;
   }
 
   displayErrorLog(log) {
@@ -120,20 +158,6 @@ class KubernetesDeployController {
     }
   }
   async onInit() {
-    this.state = {
-      DeployType: KubernetesDeployManifestTypes.KUBERNETES,
-      BuildMethod: KubernetesDeployBuildMethods.GIT,
-      tabLogsDisabled: true,
-      activeTab: 0,
-      viewReady: false,
-      isEditorDirty: false,
-    };
-
-    this.formValues = {};
-    this.ManifestDeployTypes = KubernetesDeployManifestTypes;
-    this.BuildMethods = KubernetesDeployBuildMethods;
-    this.endpointId = this.EndpointProvider.endpointID();
-
     await this.getNamespaces();
 
     this.state.viewReady = true;
@@ -147,6 +171,10 @@ class KubernetesDeployController {
 
   $onInit() {
     return this.$async(this.onInit);
+  }
+
+  $onDestroy() {
+    this.state.isEditorDirty = false;
   }
 }
 

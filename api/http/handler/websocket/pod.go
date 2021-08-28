@@ -1,16 +1,20 @@
 package websocket
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/portainer/portainer/api/http/security"
 
 	"github.com/gorilla/websocket"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 )
 
 // @summary Execute a websocket on pod
@@ -70,8 +74,14 @@ func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request)
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
 	}
 
+	serviceAccountToken, isAdminToken, err := handler.getToken(r, endpoint, false)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to get user service account token", err}
+	}
+
 	params := &webSocketRequestParams{
 		endpoint: endpoint,
+		token:    serviceAccountToken,
 	}
 
 	r.Header.Del("Origin")
@@ -90,6 +100,28 @@ func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request)
 		return nil
 	}
 
+	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create Kubernetes client", err}
+	}
+
+	handlerErr := handler.hijackPodExecStartOperation(w, r, cli, serviceAccountToken, isAdminToken, endpoint, namespace, podName, containerName, command)
+	if handlerErr != nil {
+		return handlerErr
+	}
+
+	return nil
+}
+
+func (handler *Handler) hijackPodExecStartOperation(
+	w http.ResponseWriter,
+	r *http.Request,
+	cli portainer.KubeClient,
+	serviceAccountToken string,
+	isAdminToken bool,
+	endpoint *portainer.Endpoint,
+	namespace, podName, containerName, command string,
+) *httperror.HandlerError {
 	commandArray := strings.Split(command, " ")
 
 	websocketConn, err := handler.connectionUpgrader.Upgrade(w, r, nil)
@@ -107,12 +139,7 @@ func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request)
 	go streamFromWebsocketToWriter(websocketConn, stdinWriter, errorChan)
 	go streamFromReaderToWebsocket(websocketConn, stdoutReader, errorChan)
 
-	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create Kubernetes client", err}
-	}
-
-	err = cli.StartExecProcess(namespace, podName, containerName, commandArray, stdinReader, stdoutWriter)
+	err = cli.StartExecProcess(serviceAccountToken, isAdminToken, namespace, podName, containerName, commandArray, stdinReader, stdoutWriter)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to start exec process inside container", err}
 	}
@@ -123,4 +150,38 @@ func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request)
 	}
 
 	return nil
+}
+
+func (handler *Handler) getToken(request *http.Request, endpoint *portainer.Endpoint, setLocalAdminToken bool) (string, bool, error) {
+	tokenData, err := security.RetrieveTokenData(request)
+	if err != nil {
+		return "", false, err
+	}
+
+	kubecli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
+	if err != nil {
+		return "", false, err
+	}
+
+	tokenCache := handler.kubernetesTokenCacheManager.GetOrCreateTokenCache(int(endpoint.ID))
+
+	tokenManager, err := kubernetes.NewTokenManager(kubecli, handler.DataStore, tokenCache, setLocalAdminToken)
+	if err != nil {
+		return "", false, err
+	}
+
+	if tokenData.Role == portainer.AdministratorRole {
+		return tokenManager.GetAdminServiceAccountToken(), true, nil
+	}
+
+	token, err := tokenManager.GetUserServiceAccountToken(int(tokenData.ID), endpoint.ID)
+	if err != nil {
+		return "", false, err
+	}
+
+	if token == "" {
+		return "", false, fmt.Errorf("can not get a valid user service account token")
+	}
+
+	return token, false, nil
 }

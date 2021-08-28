@@ -8,9 +8,12 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"regexp"
 	"runtime"
+	"strings"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/stackutils"
 )
 
 // SwarmStackManager represents a service for managing stacks.
@@ -42,18 +45,13 @@ func NewSwarmStackManager(binaryPath, dataPath string, signatureService portaine
 }
 
 // Login executes the docker login command against a list of registries (including DockerHub).
-func (manager *SwarmStackManager) Login(dockerhub *portainer.DockerHub, registries []portainer.Registry, endpoint *portainer.Endpoint) {
+func (manager *SwarmStackManager) Login(registries []portainer.Registry, endpoint *portainer.Endpoint) {
 	command, args := manager.prepareDockerCommandAndArgs(manager.binaryPath, manager.dataPath, endpoint)
 	for _, registry := range registries {
 		if registry.Authentication {
 			registryArgs := append(args, "login", "--username", registry.Username, "--password", registry.Password, registry.URL)
 			runCommandAndCaptureStdErr(command, registryArgs, nil, "")
 		}
-	}
-
-	if dockerhub.Authentication {
-		dockerhubArgs := append(args, "login", "--username", dockerhub.Username, "--password", dockerhub.Password)
-		runCommandAndCaptureStdErr(command, dockerhubArgs, nil, "")
 	}
 }
 
@@ -66,22 +64,23 @@ func (manager *SwarmStackManager) Logout(endpoint *portainer.Endpoint) error {
 
 // Deploy executes the docker stack deploy command.
 func (manager *SwarmStackManager) Deploy(stack *portainer.Stack, prune bool, endpoint *portainer.Endpoint) error {
-	stackFilePath := path.Join(stack.ProjectPath, stack.EntryPoint)
+	filePaths := stackutils.GetStackFilePaths(stack)
 	command, args := manager.prepareDockerCommandAndArgs(manager.binaryPath, manager.dataPath, endpoint)
 
 	if prune {
-		args = append(args, "stack", "deploy", "--prune", "--with-registry-auth", "--compose-file", stackFilePath, stack.Name)
+		args = append(args, "stack", "deploy", "--prune", "--with-registry-auth")
 	} else {
-		args = append(args, "stack", "deploy", "--with-registry-auth", "--compose-file", stackFilePath, stack.Name)
+		args = append(args, "stack", "deploy", "--with-registry-auth")
 	}
+
+	args = configureFilePaths(args, filePaths)
+	args = append(args, stack.Name)
 
 	env := make([]string, 0)
 	for _, envvar := range stack.Env {
 		env = append(env, envvar.Name+"="+envvar.Value)
 	}
-
-	stackFolder := path.Dir(stackFilePath)
-	return runCommandAndCaptureStdErr(command, args, env, stackFolder)
+	return runCommandAndCaptureStdErr(command, args, env, stack.ProjectPath)
 }
 
 // Remove executes the docker stack rm command.
@@ -188,4 +187,16 @@ func (manager *SwarmStackManager) retrieveConfigurationFromDisk(path string) (ma
 	}
 
 	return config, nil
+}
+
+func (manager *SwarmStackManager) NormalizeStackName(name string) string {
+	r := regexp.MustCompile("[^a-z0-9]+")
+	return r.ReplaceAllString(strings.ToLower(name), "")
+}
+
+func configureFilePaths(args []string, filePaths []string) []string {
+	for _, path := range filePaths {
+		args = append(args, "--compose-file", path)
+	}
+	return args
 }

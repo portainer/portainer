@@ -1,8 +1,9 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
-import { KubernetesResourceQuota, KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resource-quota/models';
+import { KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resource-quota/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
+import { KubernetesResourceReservation } from 'Kubernetes/models/resource-reservation/models';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import {
   KubernetesResourcePoolFormValues,
@@ -14,6 +15,7 @@ import { KubernetesFormValidationReferences } from 'Kubernetes/models/applicatio
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
 import KubernetesResourceQuotaConverter from 'Kubernetes/converters/resourceQuota';
+import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 
 class KubernetesResourcePoolController {
   /* #region  CONSTRUCTOR */
@@ -24,45 +26,42 @@ class KubernetesResourcePoolController {
     Authentication,
     Notifications,
     LocalStorage,
-    EndpointProvider,
+    EndpointService,
     ModalService,
     KubernetesNodeService,
+    KubernetesMetricsService,
     KubernetesResourceQuotaService,
     KubernetesResourcePoolService,
     KubernetesEventService,
     KubernetesPodService,
     KubernetesApplicationService,
-    KubernetesNamespaceHelper,
     KubernetesIngressService,
     KubernetesVolumeService
   ) {
-    this.$async = $async;
-    this.$state = $state;
-    this.Notifications = Notifications;
-    this.Authentication = Authentication;
-    this.LocalStorage = LocalStorage;
-    this.EndpointProvider = EndpointProvider;
-    this.ModalService = ModalService;
-
-    this.KubernetesNodeService = KubernetesNodeService;
-    this.KubernetesResourceQuotaService = KubernetesResourceQuotaService;
-    this.KubernetesResourcePoolService = KubernetesResourcePoolService;
-    this.KubernetesEventService = KubernetesEventService;
-    this.KubernetesPodService = KubernetesPodService;
-    this.KubernetesApplicationService = KubernetesApplicationService;
-    this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
-    this.KubernetesIngressService = KubernetesIngressService;
-    this.KubernetesVolumeService = KubernetesVolumeService;
+    Object.assign(this, {
+      $async,
+      $state,
+      Authentication,
+      Notifications,
+      LocalStorage,
+      EndpointService,
+      ModalService,
+      KubernetesNodeService,
+      KubernetesMetricsService,
+      KubernetesResourceQuotaService,
+      KubernetesResourcePoolService,
+      KubernetesEventService,
+      KubernetesPodService,
+      KubernetesApplicationService,
+      KubernetesIngressService,
+      KubernetesVolumeService,
+    });
 
     this.IngressClassTypes = KubernetesIngressClassTypes;
     this.ResourceQuotaDefaults = KubernetesResourceQuotaDefaults;
 
-    this.onInit = this.onInit.bind(this);
-    this.createResourceQuotaAsync = this.createResourceQuotaAsync.bind(this);
     this.updateResourcePoolAsync = this.updateResourcePoolAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
-    this.getApplications = this.getApplications.bind(this);
-    this.getIngresses = this.getIngresses.bind(this);
   }
   /* #endregion */
 
@@ -159,15 +158,6 @@ class KubernetesResourcePoolController {
     this.selectTab(2);
   }
 
-  async createResourceQuotaAsync(namespace, owner, cpuLimit, memoryLimit) {
-    const quota = new KubernetesResourceQuota(namespace);
-    quota.CpuLimit = cpuLimit;
-    quota.MemoryLimit = memoryLimit;
-    quota.ResourcePoolName = namespace;
-    quota.ResourcePoolOwner = owner;
-    await this.KubernetesResourceQuotaService.create(quota);
-  }
-
   hasResourceQuotaBeenReduced() {
     if (this.formValues.HasQuota && this.oldQuota) {
       const cpuLimit = this.formValues.CpuLimit;
@@ -180,11 +170,11 @@ class KubernetesResourcePoolController {
   }
 
   /* #region  UPDATE NAMESPACE */
-  async updateResourcePoolAsync() {
+  async updateResourcePoolAsync(oldFormValues, newFormValues) {
     this.state.actionInProgress = true;
     try {
       this.checkDefaults();
-      await this.KubernetesResourcePoolService.patch(this.savedFormValues, this.formValues);
+      await this.KubernetesResourcePoolService.patch(oldFormValues, newFormValues);
       this.Notifications.success('Namespace successfully updated', this.pool.Namespace.Name);
       this.$state.reload();
     } catch (err) {
@@ -211,12 +201,44 @@ class KubernetesResourcePoolController {
       ${warnings.ingress ? messages.ingress : ''}<br/><br/>Do you wish to continue?`;
       this.ModalService.confirmUpdate(displayedMessage, (confirmed) => {
         if (confirmed) {
-          return this.$async(this.updateResourcePoolAsync);
+          return this.$async(this.updateResourcePoolAsync, this.savedFormValues, this.formValues);
         }
       });
     } else {
-      return this.$async(this.updateResourcePoolAsync);
+      return this.$async(this.updateResourcePoolAsync, this.savedFormValues, this.formValues);
     }
+  }
+
+  async confirmMarkUnmarkAsSystem() {
+    const message = this.isSystem
+      ? 'Unmarking this namespace as system will allow non administrator users to manage it and the resources in contains depending on the access control settings. Are you sure?'
+      : 'Marking this namespace as a system namespace will prevent non administrator users from managing it and the resources it contains. Are you sure?';
+
+    return new Promise((resolve) => {
+      this.ModalService.confirmUpdate(message, resolve);
+    });
+  }
+
+  markUnmarkAsSystem() {
+    return this.$async(async () => {
+      try {
+        const namespaceName = this.$state.params.id;
+        this.state.actionInProgress = true;
+
+        const confirmed = await this.confirmMarkUnmarkAsSystem();
+        if (!confirmed) {
+          return;
+        }
+        await this.KubernetesResourcePoolService.toggleSystem(this.endpoint.Id, namespaceName, !this.isSystem);
+
+        this.Notifications.success('Namespace successfully updated', namespaceName);
+        this.$state.reload();
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to create namespace');
+      } finally {
+        this.state.actionInProgress = false;
+      }
+    });
   }
   /* #endregion */
 
@@ -252,6 +274,10 @@ class KubernetesResourcePoolController {
           app.Memory = resourceReservation.Memory;
           return app;
         });
+
+        if (this.state.useServerMetrics) {
+          await this.getResourceUsage(this.pool.Namespace.Name);
+        }
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to retrieve applications.');
       } finally {
@@ -285,88 +311,133 @@ class KubernetesResourcePoolController {
   }
   /* #endregion */
 
-  /* #region  ON INIT */
-  async onInit() {
+  /* #region  GET REGISTRIES */
+  getRegistries() {
+    return this.$async(async () => {
+      try {
+        const namespace = this.$state.params.id;
+
+        if (this.isAdmin) {
+          this.registries = await this.EndpointService.registries(this.endpoint.Id);
+          this.registries.forEach((reg) => {
+            if (reg.RegistryAccesses && reg.RegistryAccesses[this.endpoint.Id] && reg.RegistryAccesses[this.endpoint.Id].Namespaces.includes(namespace)) {
+              reg.Checked = true;
+              this.formValues.Registries.push(reg);
+            }
+          });
+
+          return;
+        }
+
+        const registries = await this.EndpointService.registries(this.endpoint.Id, namespace);
+        this.selectedRegistries = registries.map((r) => r.Name).join(', ');
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to retrieve registries');
+      }
+    });
+  }
+  /* #endregion */
+
+  async getResourceUsage(namespace) {
     try {
-      const endpoint = this.EndpointProvider.currentEndpoint();
-      this.endpoint = endpoint;
-      this.isAdmin = this.Authentication.isAdmin();
-
-      this.state = {
-        actionInProgress: false,
-        sliderMaxMemory: 0,
-        sliderMaxCpu: 0,
-        cpuUsage: 0,
-        cpuUsed: 0,
-        memoryUsage: 0,
-        memoryUsed: 0,
-        activeTab: 0,
-        currentName: this.$state.$current.name,
-        showEditorTab: false,
-        eventsLoading: true,
-        applicationsLoading: true,
-        ingressesLoading: true,
-        viewReady: false,
-        eventWarningCount: 0,
-        canUseIngress: endpoint.Kubernetes.Configuration.IngressClasses.length,
-        duplicates: {
-          ingressHosts: new KubernetesFormValidationReferences(),
-        },
-      };
-
-      this.state.activeTab = this.LocalStorage.getActiveTab('resourcePool');
-
-      const name = this.$transition$.params().id;
-
-      const [nodes, pools] = await Promise.all([this.KubernetesNodeService.get(), this.KubernetesResourcePoolService.get()]);
-
-      this.pool = _.find(pools, { Namespace: { Name: name } });
-      this.formValues = new KubernetesResourcePoolFormValues(KubernetesResourceQuotaDefaults);
-      this.formValues.Name = this.pool.Namespace.Name;
-
-      _.forEach(nodes, (item) => {
-        this.state.sliderMaxMemory += filesizeParser(item.Memory);
-        this.state.sliderMaxCpu += item.CPU;
-      });
-      this.state.sliderMaxMemory = KubernetesResourceReservationHelper.megaBytesValue(this.state.sliderMaxMemory);
-
-      const quota = this.pool.Quota;
-      if (quota) {
-        this.oldQuota = angular.copy(quota);
-        this.formValues = KubernetesResourceQuotaConverter.quotaToResourcePoolFormValues(quota);
-        this.state.cpuUsed = quota.CpuLimitUsed;
-        this.state.memoryUsed = KubernetesResourceReservationHelper.megaBytesValue(quota.MemoryLimitUsed);
-      }
-
-      this.isEditable = !this.KubernetesNamespaceHelper.isSystemNamespace(this.pool.Namespace.Name);
-      if (this.pool.Namespace.Name === 'default') {
-        this.isEditable = false;
-      }
-
-      await this.getEvents();
-      await this.getApplications();
-
-      if (this.state.canUseIngress) {
-        await this.getIngresses();
-        const ingressClasses = endpoint.Kubernetes.Configuration.IngressClasses;
-        this.formValues.IngressClasses = KubernetesIngressConverter.ingressClassesToFormValues(ingressClasses, this.ingresses);
-        _.forEach(this.formValues.IngressClasses, (ic) => {
-          if (ic.Hosts.length === 0) {
-            ic.Hosts.push(new KubernetesResourcePoolIngressClassHostFormValue());
-          }
-        });
-      }
-      this.savedFormValues = angular.copy(this.formValues);
+      const namespaceMetrics = await this.KubernetesMetricsService.getPods(namespace);
+      // extract resource usage of all containers within each pod of the namespace
+      const containerResourceUsageList = namespaceMetrics.items.flatMap((i) => i.containers.map((c) => c.usage));
+      const namespaceResourceUsage = containerResourceUsageList.reduce((total, u) => {
+        total.CPU += KubernetesResourceReservationHelper.parseCPU(u.cpu);
+        total.Memory += KubernetesResourceReservationHelper.megaBytesValue(u.memory);
+        return total;
+      }, new KubernetesResourceReservation());
+      this.state.resourceUsage = namespaceResourceUsage;
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to load view data');
-    } finally {
-      this.state.viewReady = true;
+      this.Notifications.error('Failure', 'Unable to retrieve namespace resource usage', err);
     }
   }
 
+  /* #region  ON INIT */
   $onInit() {
-    return this.$async(this.onInit);
+    return this.$async(async () => {
+      try {
+        this.isAdmin = this.Authentication.isAdmin();
+
+        this.state = {
+          actionInProgress: false,
+          sliderMaxMemory: 0,
+          sliderMaxCpu: 0,
+          cpuUsage: 0,
+          memoryUsage: 0,
+          resourceReservation: { CPU: 0, Memory: 0 },
+          activeTab: 0,
+          currentName: this.$state.$current.name,
+          showEditorTab: false,
+          eventsLoading: true,
+          applicationsLoading: true,
+          ingressesLoading: true,
+          viewReady: false,
+          eventWarningCount: 0,
+          canUseIngress: this.endpoint.Kubernetes.Configuration.IngressClasses.length,
+          useServerMetrics: this.endpoint.Kubernetes.Configuration.UseServerMetrics,
+          duplicates: {
+            ingressHosts: new KubernetesFormValidationReferences(),
+          },
+        };
+
+        this.state.activeTab = this.LocalStorage.getActiveTab('resourcePool');
+
+        const name = this.$state.params.id;
+
+        const [nodes, pools] = await Promise.all([this.KubernetesNodeService.get(), this.KubernetesResourcePoolService.get()]);
+
+        this.pool = _.find(pools, { Namespace: { Name: name } });
+        this.formValues = new KubernetesResourcePoolFormValues(KubernetesResourceQuotaDefaults);
+        this.formValues.Name = this.pool.Namespace.Name;
+        this.formValues.EndpointId = this.endpoint.Id;
+        this.formValues.IsSystem = this.pool.Namespace.IsSystem;
+
+        _.forEach(nodes, (item) => {
+          this.state.sliderMaxMemory += filesizeParser(item.Memory);
+          this.state.sliderMaxCpu += item.CPU;
+        });
+        this.state.sliderMaxMemory = KubernetesResourceReservationHelper.megaBytesValue(this.state.sliderMaxMemory);
+
+        const quota = this.pool.Quota;
+        if (quota) {
+          this.oldQuota = angular.copy(quota);
+          this.formValues = KubernetesResourceQuotaConverter.quotaToResourcePoolFormValues(quota);
+          this.formValues.EndpointId = this.endpoint.Id;
+
+          this.state.resourceReservation.CPU = quota.CpuLimitUsed;
+          this.state.resourceReservation.Memory = KubernetesResourceReservationHelper.megaBytesValue(quota.MemoryLimitUsed);
+        }
+        this.isSystem = KubernetesNamespaceHelper.isSystemNamespace(this.pool.Namespace.Name);
+        this.isDefaultNamespace = KubernetesNamespaceHelper.isDefaultNamespace(this.pool.Namespace.Name);
+        this.isEditable = !this.isSystem && !this.isDefaultNamespace;
+
+        await this.getEvents();
+        await this.getApplications();
+
+        if (this.state.canUseIngress) {
+          await this.getIngresses();
+          const ingressClasses = this.endpoint.Kubernetes.Configuration.IngressClasses;
+          this.formValues.IngressClasses = KubernetesIngressConverter.ingressClassesToFormValues(ingressClasses, this.ingresses);
+          _.forEach(this.formValues.IngressClasses, (ic) => {
+            if (ic.Hosts.length === 0) {
+              ic.Hosts.push(new KubernetesResourcePoolIngressClassHostFormValue());
+            }
+          });
+        }
+
+        await this.getRegistries();
+
+        this.savedFormValues = angular.copy(this.formValues);
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to load view data');
+      } finally {
+        this.state.viewReady = true;
+      }
+    });
   }
+
   /* #endregion */
 
   $onDestroy() {

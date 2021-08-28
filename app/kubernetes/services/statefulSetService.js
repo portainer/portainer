@@ -93,6 +93,7 @@ class KubernetesStatefulSetService {
       if (!payload.length) {
         return;
       }
+
       const data = await this.KubernetesStatefulSets(namespace).patch(params, payload).$promise;
       return data;
     } catch (err) {

@@ -4,6 +4,7 @@ import angular from 'angular';
 import PortainerError from 'Portainer/error';
 import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
 import KubernetesNamespaceConverter from 'Kubernetes/converters/namespace';
+import { updateNamespaces } from 'Kubernetes/store/namespace';
 import $allSettled from 'Portainer/services/allSettled';
 
 class KubernetesNamespaceService {
@@ -27,7 +28,9 @@ class KubernetesNamespaceService {
       params.id = name;
       await this.KubernetesNamespaces().status(params).$promise;
       const [raw, yaml] = await Promise.all([this.KubernetesNamespaces().get(params).$promise, this.KubernetesNamespaces().getYaml(params).$promise]);
-      return KubernetesNamespaceConverter.apiToNamespace(raw, yaml);
+      const ns = KubernetesNamespaceConverter.apiToNamespace(raw, yaml);
+      updateNamespaces([ns]);
+      return ns;
     } catch (err) {
       throw new PortainerError('Unable to retrieve namespace', err);
     }
@@ -43,7 +46,9 @@ class KubernetesNamespaceService {
           return KubernetesNamespaceConverter.apiToNamespace(item);
         }
       });
-      return _.without(visibleNamespaces, undefined);
+      const res = _.without(visibleNamespaces, undefined);
+      updateNamespaces(res);
+      return res;
     } catch (err) {
       throw new PortainerError('Unable to retrieve namespaces', err);
     }

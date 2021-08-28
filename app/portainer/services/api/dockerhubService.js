@@ -1,51 +1,27 @@
-import { DockerHubViewModel } from '../../models/dockerhub';
+import EndpointHelper from 'Portainer/helpers/endpointHelper';
+import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
 
-angular.module('portainer.app').factory('DockerHubService', [
-  '$q',
-  'DockerHub',
-  'Endpoints',
-  'AgentDockerhub',
-  'EndpointHelper',
-  function DockerHubServiceFactory($q, DockerHub, Endpoints, AgentDockerhub, EndpointHelper) {
-    'use strict';
-    var service = {};
+angular.module('portainer.app').factory('DockerHubService', DockerHubService);
 
-    service.dockerhub = function () {
-      var deferred = $q.defer();
+/* @ngInject */
+function DockerHubService(Endpoints, AgentDockerhub) {
+  return {
+    checkRateLimits,
+  };
 
-      DockerHub.get()
-        .$promise.then(function success(data) {
-          var dockerhub = new DockerHubViewModel(data);
-          deferred.resolve(dockerhub);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve DockerHub details', err: err });
-        });
-
-      return deferred.promise;
-    };
-
-    service.update = function (dockerhub) {
-      return DockerHub.update({}, dockerhub).$promise;
-    };
-
-    service.checkRateLimits = checkRateLimits;
-    function checkRateLimits(endpoint) {
-      if (EndpointHelper.isLocalEndpoint(endpoint)) {
-        return Endpoints.dockerhubLimits({ id: endpoint.Id }).$promise;
-      }
-
-      switch (endpoint.Type) {
-        case 2: //AgentOnDockerEnvironment
-        case 4: //EdgeAgentOnDockerEnvironment
-          return AgentDockerhub.limits({ endpointId: endpoint.Id, endpointType: 'docker' }).$promise;
-
-        case 6: //AgentOnKubernetesEnvironment
-        case 7: //EdgeAgentOnKubernetesEnvironment
-          return AgentDockerhub.limits({ endpointId: endpoint.Id, endpointType: 'kubernetes' }).$promise;
-      }
+  function checkRateLimits(endpoint, registryId) {
+    if (EndpointHelper.isLocalEndpoint(endpoint)) {
+      return Endpoints.dockerhubLimits({ id: endpoint.Id, registryId }).$promise;
     }
 
-    return service;
-  },
-]);
+    switch (endpoint.Type) {
+      case PortainerEndpointTypes.AgentOnDockerEnvironment:
+      case PortainerEndpointTypes.EdgeAgentOnDockerEnvironment:
+        return AgentDockerhub.limits({ endpointId: endpoint.Id, endpointType: 'docker', registryId }).$promise;
+
+      case PortainerEndpointTypes.AgentOnKubernetesEnvironment:
+      case PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment:
+        return AgentDockerhub.limits({ endpointId: endpoint.Id, endpointType: 'kubernetes', registryId }).$promise;
+    }
+  }
+}

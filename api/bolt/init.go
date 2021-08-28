@@ -55,20 +55,20 @@ func (store *Store) Init() error {
 		return err
 	}
 
-	_, err = store.DockerHubService.DockerHub()
-	if err == errors.ErrObjectNotFound {
-		defaultDockerHub := &portainer.DockerHub{
-			Authentication: false,
-			Username:       "",
-			Password:       "",
+	_, err = store.SSLSettings().Settings()
+	if err != nil {
+		if err != errors.ErrObjectNotFound {
+			return err
 		}
 
-		err := store.DockerHubService.UpdateDockerHub(defaultDockerHub)
+		defaultSSLSettings := &portainer.SSLSettings{
+			HTTPEnabled: true,
+		}
+
+		err = store.SSLSettings().UpdateSettings(defaultSSLSettings)
 		if err != nil {
 			return err
 		}
-	} else if err != nil {
-		return err
 	}
 
 	groups, err := store.EndpointGroupService.EndpointGroups()

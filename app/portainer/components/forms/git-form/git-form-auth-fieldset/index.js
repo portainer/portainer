@@ -6,5 +6,6 @@ export const gitFormAuthFieldset = {
   bindings: {
     model: '<',
     onChange: '<',
+    isEdit: '<',
   },
 };

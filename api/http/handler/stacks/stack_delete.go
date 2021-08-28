@@ -27,7 +27,7 @@ import (
 // @success 204 "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
-// @failure 404 " not found"
+// @failure 404 "Not found"
 // @failure 500 "Server error"
 // @router /stacks/{id} [delete]
 func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -94,6 +94,11 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 		if !access {
 			return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", httperrors.ErrResourceAccessDenied}
 		}
+	}
+
+	// stop scheduler updates of the stack before removal
+	if stack.AutoUpdate != nil {
+		stopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
 	}
 
 	err = handler.deleteStack(stack, endpoint)

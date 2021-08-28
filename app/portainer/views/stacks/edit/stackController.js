@@ -70,6 +70,10 @@ angular.module('portainer.app').controller('StackController', [
       }
     };
 
+    $scope.$on('$destroy', function() {
+      $scope.state.isEditorDirty = false;
+    })
+
     $scope.handleEnvVarChange = handleEnvVarChange;
     function handleEnvVarChange(value) {
       $scope.formValues.Env = value;
@@ -291,7 +295,7 @@ angular.module('portainer.app').controller('StackController', [
       $q.all({
         stack: StackService.stack(id),
         groups: GroupService.groups(),
-        containers: ContainerService.containers(),
+        containers: ContainerService.containers(true),
       })
         .then(function success(data) {
           var stack = data.stack;

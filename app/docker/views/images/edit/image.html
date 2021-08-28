@@ -63,7 +63,15 @@
       <rd-widget-body>
         <form class="form-horizontal">
           <!-- image-and-registry -->
-          <por-image-registry model="formValues.RegistryModel" label-class="col-sm-1" input-class="col-sm-11"></por-image-registry>
+          <por-image-registry
+            model="formValues.RegistryModel"
+            label-class="col-sm-1"
+            input-class="col-sm-11"
+            endpoint="endpoint"
+            is-admin="isAdmin"
+            set-validity="setPullImageValidity"
+            check-rate-limits="true"
+          ></por-image-registry>
           <!-- !image-and-registry -->
           <!-- tag-note -->
           <div class="form-group">
@@ -74,7 +82,7 @@
           <!-- !tag-note -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.RegistryModel.Image" ng-click="tagImage()">Tag</button>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!state.pullImageValidity || !formValues.RegistryModel.Image" ng-click="tagImage()">Tag</button>
             </div>
           </div>
         </form>

@@ -1,0 +1,16 @@
+<rd-header>
+  <rd-header-title title-text="Registry access"></rd-header-title>
+  <rd-header-content> <a ui-sref="docker.registries">Registries</a> &gt; {{ $ctrl.registry.Name }} &gt; Access management </rd-header-content>
+</rd-header>
+
+<registry-details registry="$ctrl.registry" ng-if="$ctrl.registry"></registry-details>
+
+<por-access-management
+  ng-if="$ctrl.registry && $ctrl.endpointGroup"
+  access-controlled-entity="$ctrl.registryEndpointAccesses"
+  entity-type="registry"
+  action-in-progress="$ctrl.state.actionInProgress"
+  update-access="$ctrl.updateAccess"
+  filter-users="$ctrl.filterUsers"
+>
+</por-access-management>

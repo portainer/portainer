@@ -28,6 +28,7 @@ import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceRese
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application/index';
 import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
+import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { KubernetesNodeHelper } from 'Kubernetes/node/helper';
 
 class KubernetesCreateApplicationController {
@@ -38,9 +39,7 @@ class KubernetesCreateApplicationController {
     $async,
     $state,
     Notifications,
-    EndpointProvider,
     Authentication,
-    DockerHubService,
     ModalService,
     KubernetesResourcePoolService,
     KubernetesApplicationService,
@@ -49,15 +48,13 @@ class KubernetesCreateApplicationController {
     KubernetesNodeService,
     KubernetesIngressService,
     KubernetesPersistentVolumeClaimService,
-    KubernetesNamespaceHelper,
-    KubernetesVolumeService
+    KubernetesVolumeService,
+    RegistryService
   ) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
-    this.EndpointProvider = EndpointProvider;
     this.Authentication = Authentication;
-    this.DockerHubService = DockerHubService;
     this.ModalService = ModalService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesApplicationService = KubernetesApplicationService;
@@ -67,7 +64,7 @@ class KubernetesCreateApplicationController {
     this.KubernetesVolumeService = KubernetesVolumeService;
     this.KubernetesIngressService = KubernetesIngressService;
     this.KubernetesPersistentVolumeClaimService = KubernetesPersistentVolumeClaimService;
-    this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
+    this.RegistryService = RegistryService;
 
     this.ApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
     this.ApplicationDataAccessPolicies = KubernetesApplicationDataAccessPolicies;
@@ -76,6 +73,56 @@ class KubernetesCreateApplicationController {
     this.ApplicationTypes = KubernetesApplicationTypes;
     this.ApplicationConfigurationFormValueOverridenKeyTypes = KubernetesApplicationConfigurationFormValueOverridenKeyTypes;
     this.ServiceTypes = KubernetesServiceTypes;
+
+    this.state = {
+      actionInProgress: false,
+      useLoadBalancer: false,
+      useServerMetrics: false,
+      sliders: {
+        cpu: {
+          min: 0,
+          max: 0,
+        },
+        memory: {
+          min: 0,
+          max: 0,
+        },
+      },
+      nodes: {
+        memory: 0,
+        cpu: 0,
+      },
+      resourcePoolHasQuota: false,
+      viewReady: false,
+      availableSizeUnits: ['MB', 'GB', 'TB'],
+      alreadyExists: false,
+      duplicates: {
+        environmentVariables: new KubernetesFormValidationReferences(),
+        persistedFolders: new KubernetesFormValidationReferences(),
+        configurationPaths: new KubernetesFormValidationReferences(),
+        existingVolumes: new KubernetesFormValidationReferences(),
+        publishedPorts: {
+          containerPorts: new KubernetesFormValidationReferences(),
+          nodePorts: new KubernetesFormValidationReferences(),
+          ingressRoutes: new KubernetesFormValidationReferences(),
+          loadBalancerPorts: new KubernetesFormValidationReferences(),
+        },
+        placements: new KubernetesFormValidationReferences(),
+      },
+      isEdit: this.$state.params.namespace && this.$state.params.name,
+      persistedFoldersUseExistingVolumes: false,
+      pullImageValidity: false,
+    };
+
+    this.isAdmin = this.Authentication.isAdmin();
+
+    this.editChanges = [];
+
+    this.storageClasses = [];
+    this.state.useLoadBalancer = false;
+    this.state.useServerMetrics = false;
+
+    this.formValues = new KubernetesApplicationFormValues();
 
     this.updateApplicationAsync = this.updateApplicationAsync.bind(this);
     this.deployApplicationAsync = this.deployApplicationAsync.bind(this);
@@ -321,6 +368,7 @@ class KubernetesCreateApplicationController {
     const ingresses = this.filteredIngresses;
     p.IngressName = ingresses && ingresses.length ? ingresses[0].Name : undefined;
     p.IngressHost = ingresses && ingresses.length ? ingresses[0].Hosts[0] : undefined;
+    p.IngressHosts = ingresses && ingresses.length ? ingresses[0].Hosts : undefined;
     if (this.formValues.PublishedPorts.length) {
       p.Protocol = this.formValues.PublishedPorts[0].Protocol;
     }
@@ -388,6 +436,7 @@ class KubernetesCreateApplicationController {
   onChangePortMappingIngress(index) {
     const publishedPort = this.formValues.PublishedPorts[index];
     const ingress = _.find(this.filteredIngresses, { Name: publishedPort.IngressName });
+    publishedPort.IngressHosts = ingress.Hosts;
     this.ingressHostnames = ingress.Hosts;
     publishedPort.IngressHost = this.ingressHostnames.length ? this.ingressHostnames[0] : [];
     this.onChangePublishedPorts();
@@ -867,13 +916,24 @@ class KubernetesCreateApplicationController {
   getApplication() {
     return this.$async(async () => {
       try {
-        const namespace = this.state.params.namespace;
+        const namespace = this.$state.params.namespace;
         [this.application, this.persistentVolumeClaims] = await Promise.all([
-          this.KubernetesApplicationService.get(namespace, this.state.params.name),
+          this.KubernetesApplicationService.get(namespace, this.$state.params.name),
           this.KubernetesPersistentVolumeClaimService.get(namespace),
         ]);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to retrieve application details');
+      }
+    });
+  }
+
+  async parseImageConfiguration(imageModel) {
+    return this.$async(async () => {
+      try {
+        return await this.RegistryService.retrievePorRegistryModelFromRepository(imageModel.Image, this.endpoint.Id, imageModel.Registry.Id, this.$state.params.namespace);
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to retrieve registry');
+        return imageModel;
       }
     });
   }
@@ -883,65 +943,9 @@ class KubernetesCreateApplicationController {
   $onInit() {
     return this.$async(async () => {
       try {
-        this.state = {
-          actionInProgress: false,
-          useLoadBalancer: false,
-          useServerMetrics: false,
-          sliders: {
-            cpu: {
-              min: 0,
-              max: 0,
-            },
-            memory: {
-              min: 0,
-              max: 0,
-            },
-          },
-          nodes: {
-            memory: 0,
-            cpu: 0,
-          },
-          resourcePoolHasQuota: false,
-          viewReady: false,
-          availableSizeUnits: ['MB', 'GB', 'TB'],
-          alreadyExists: false,
-          duplicates: {
-            environmentVariables: new KubernetesFormValidationReferences(),
-            persistedFolders: new KubernetesFormValidationReferences(),
-            configurationPaths: new KubernetesFormValidationReferences(),
-            existingVolumes: new KubernetesFormValidationReferences(),
-            publishedPorts: {
-              containerPorts: new KubernetesFormValidationReferences(),
-              nodePorts: new KubernetesFormValidationReferences(),
-              ingressRoutes: new KubernetesFormValidationReferences(),
-              loadBalancerPorts: new KubernetesFormValidationReferences(),
-            },
-            placements: new KubernetesFormValidationReferences(),
-          },
-          isEdit: false,
-          params: {
-            namespace: this.$transition$.params().namespace,
-            name: this.$transition$.params().name,
-          },
-          persistedFoldersUseExistingVolumes: false,
-          pullImageValidity: false,
-        };
-
-        this.isAdmin = this.Authentication.isAdmin();
-
-        this.editChanges = [];
-
-        if (this.state.params.namespace && this.state.params.name) {
-          this.state.isEdit = true;
-        }
-
-        const endpoint = this.EndpointProvider.currentEndpoint();
-        this.endpoint = endpoint;
-        this.storageClasses = endpoint.Kubernetes.Configuration.StorageClasses;
-        this.state.useLoadBalancer = endpoint.Kubernetes.Configuration.UseLoadBalancer;
-        this.state.useServerMetrics = endpoint.Kubernetes.Configuration.UseServerMetrics;
-
-        this.formValues = new KubernetesApplicationFormValues();
+        this.storageClasses = this.endpoint.Kubernetes.Configuration.StorageClasses;
+        this.state.useLoadBalancer = this.endpoint.Kubernetes.Configuration.UseLoadBalancer;
+        this.state.useServerMetrics = this.endpoint.Kubernetes.Configuration.UseServerMetrics;
 
         const [resourcePools, nodes, ingresses] = await Promise.all([
           this.KubernetesResourcePoolService.get(),
@@ -950,7 +954,7 @@ class KubernetesCreateApplicationController {
         ]);
         this.ingresses = ingresses;
 
-        this.resourcePools = _.filter(resourcePools, (resourcePool) => !this.KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name));
+        this.resourcePools = _.filter(resourcePools, (resourcePool) => !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name));
         this.formValues.ResourcePool = this.resourcePools[0];
         if (!this.formValues.ResourcePool) {
           return;
@@ -962,7 +966,7 @@ class KubernetesCreateApplicationController {
         });
         this.nodesLabels = KubernetesNodeHelper.generateNodeLabelsFromNodes(nodes);
 
-        const namespace = this.state.isEdit ? this.state.params.namespace : this.formValues.ResourcePool.Namespace.Name;
+        const namespace = this.state.isEdit ? this.$state.params.namespace : this.formValues.ResourcePool.Namespace.Name;
         await this.refreshNamespaceData(namespace);
 
         if (this.state.isEdit) {
@@ -972,9 +976,11 @@ class KubernetesCreateApplicationController {
             this.resourcePools,
             this.configurations,
             this.persistentVolumeClaims,
-            this.nodesLabels
+            this.nodesLabels,
+            this.filteredIngresses
           );
           this.formValues.OriginalIngresses = this.filteredIngresses;
+          this.formValues.ImageModel = await this.parseImageConfiguration(this.formValues.ImageModel);
           this.savedFormValues = angular.copy(this.formValues);
           delete this.formValues.ApplicationType;
 
@@ -992,11 +998,7 @@ class KubernetesCreateApplicationController {
           this.formValues.AutoScaler = KubernetesApplicationHelper.generateAutoScalerFormValueFromHorizontalPodAutoScaler(null, this.formValues.ReplicaCount);
           this.formValues.OriginalIngressClasses = angular.copy(this.ingresses);
         }
-
         this.updateSliders();
-
-        const dockerHub = await this.DockerHubService.dockerhub();
-        this.state.isDockerAuthenticated = dockerHub.Authentication;
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to load view data');
       } finally {

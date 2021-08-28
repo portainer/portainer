@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"log"
 	"net/http"
@@ -16,7 +17,6 @@ import (
 	"github.com/portainer/portainer/api/http/handler/auth"
 	"github.com/portainer/portainer/api/http/handler/backup"
 	"github.com/portainer/portainer/api/http/handler/customtemplates"
-	"github.com/portainer/portainer/api/http/handler/dockerhub"
 	"github.com/portainer/portainer/api/http/handler/edgegroups"
 	"github.com/portainer/portainer/api/http/handler/edgejobs"
 	"github.com/portainer/portainer/api/http/handler/edgestacks"
@@ -26,11 +26,13 @@ import (
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
 	"github.com/portainer/portainer/api/http/handler/endpoints"
 	"github.com/portainer/portainer/api/http/handler/file"
+	kubehandler "github.com/portainer/portainer/api/http/handler/kubernetes"
 	"github.com/portainer/portainer/api/http/handler/motd"
 	"github.com/portainer/portainer/api/http/handler/registries"
 	"github.com/portainer/portainer/api/http/handler/resourcecontrols"
 	"github.com/portainer/portainer/api/http/handler/roles"
 	"github.com/portainer/portainer/api/http/handler/settings"
+	sslhandler "github.com/portainer/portainer/api/http/handler/ssl"
 	"github.com/portainer/portainer/api/http/handler/stacks"
 	"github.com/portainer/portainer/api/http/handler/status"
 	"github.com/portainer/portainer/api/http/handler/tags"
@@ -46,13 +48,18 @@ import (
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/internal/ssl"
 	"github.com/portainer/portainer/api/kubernetes/cli"
+	"github.com/portainer/portainer/api/scheduler"
+	stackdeployer "github.com/portainer/portainer/api/stacks"
 )
 
 // Server implements the portainer.Server interface
 type Server struct {
-	AuthorizationService 		*authorization.Service
+	AuthorizationService        *authorization.Service
 	BindAddress                 string
+	BindAddressHTTPS            string
+	HTTPEnabled                 bool
 	AssetsPath                  string
 	Status                      *portainer.Status
 	ReverseTunnelService        portainer.ReverseTunnelService
@@ -70,14 +77,14 @@ type Server struct {
 	ProxyManager                *proxy.Manager
 	KubernetesTokenCacheManager *kubernetes.TokenCacheManager
 	Handler                     *handler.Handler
-	SSL                         bool
-	SSLCert                     string
-	SSLKey                      string
+	SSLService                  *ssl.Service
 	DockerClientFactory         *docker.ClientFactory
 	KubernetesClientFactory     *cli.ClientFactory
 	KubernetesDeployer          portainer.KubernetesDeployer
+	Scheduler                   *scheduler.Scheduler
 	ShutdownCtx                 context.Context
 	ShutdownTrigger             context.CancelFunc
+	StackDeployer               stackdeployer.StackDeployer
 }
 
 // Start starts the HTTP server
@@ -111,9 +118,6 @@ func (server *Server) Start() error {
 	customTemplatesHandler.FileService = server.FileService
 	customTemplatesHandler.GitService = server.GitService
 
-	var dockerHubHandler = dockerhub.NewHandler(requestBouncer)
-	dockerHubHandler.DataStore = server.DataStore
-
 	var edgeGroupsHandler = edgegroups.NewHandler(requestBouncer)
 	edgeGroupsHandler.DataStore = server.DataStore
 
@@ -135,9 +139,12 @@ func (server *Server) Start() error {
 	endpointHandler.FileService = server.FileService
 	endpointHandler.ProxyManager = server.ProxyManager
 	endpointHandler.SnapshotService = server.SnapshotService
+	endpointHandler.K8sClientFactory = server.KubernetesClientFactory
 	endpointHandler.ReverseTunnelService = server.ReverseTunnelService
 	endpointHandler.ComposeStackManager = server.ComposeStackManager
 	endpointHandler.AuthorizationService = server.AuthorizationService
+	endpointHandler.BindAddress = server.BindAddress
+	endpointHandler.BindAddressHTTPS = server.BindAddressHTTPS
 
 	var endpointEdgeHandler = endpointedge.NewHandler(requestBouncer)
 	endpointEdgeHandler.DataStore = server.DataStore
@@ -153,6 +160,8 @@ func (server *Server) Start() error {
 	endpointProxyHandler.ProxyManager = server.ProxyManager
 	endpointProxyHandler.ReverseTunnelService = server.ReverseTunnelService
 
+	var kubernetesHandler = kubehandler.NewHandler(requestBouncer, server.AuthorizationService, server.DataStore, server.KubernetesClientFactory)
+
 	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"))
 
 	var motdHandler = motd.NewHandler(requestBouncer)
@@ -161,6 +170,7 @@ func (server *Server) Start() error {
 	registryHandler.DataStore = server.DataStore
 	registryHandler.FileService = server.FileService
 	registryHandler.ProxyManager = server.ProxyManager
+	registryHandler.K8sClientFactory = server.KubernetesClientFactory
 
 	var resourceControlHandler = resourcecontrols.NewHandler(requestBouncer)
 	resourceControlHandler.DataStore = server.DataStore
@@ -172,14 +182,19 @@ func (server *Server) Start() error {
 	settingsHandler.LDAPService = server.LDAPService
 	settingsHandler.SnapshotService = server.SnapshotService
 
+	var sslHandler = sslhandler.NewHandler(requestBouncer)
+	sslHandler.SSLService = server.SSLService
+
 	var stackHandler = stacks.NewHandler(requestBouncer)
 	stackHandler.DataStore = server.DataStore
 	stackHandler.DockerClientFactory = server.DockerClientFactory
 	stackHandler.FileService = server.FileService
-	stackHandler.SwarmStackManager = server.SwarmStackManager
-	stackHandler.ComposeStackManager = server.ComposeStackManager
 	stackHandler.KubernetesDeployer = server.KubernetesDeployer
 	stackHandler.GitService = server.GitService
+	stackHandler.Scheduler = server.Scheduler
+	stackHandler.SwarmStackManager = server.SwarmStackManager
+	stackHandler.ComposeStackManager = server.ComposeStackManager
+	stackHandler.StackDeployer = server.StackDeployer
 
 	var tagHandler = tags.NewHandler(requestBouncer)
 	tagHandler.DataStore = server.DataStore
@@ -204,7 +219,7 @@ func (server *Server) Start() error {
 	userHandler.DataStore = server.DataStore
 	userHandler.CryptoService = server.CryptoService
 
-	var websocketHandler = websocket.NewHandler(requestBouncer)
+	var websocketHandler = websocket.NewHandler(server.KubernetesTokenCacheManager, requestBouncer)
 	websocketHandler.DataStore = server.DataStore
 	websocketHandler.SignatureService = server.SignatureService
 	websocketHandler.ReverseTunnelService = server.ReverseTunnelService
@@ -219,7 +234,6 @@ func (server *Server) Start() error {
 		AuthHandler:            authHandler,
 		BackupHandler:          backupHandler,
 		CustomTemplatesHandler: customTemplatesHandler,
-		DockerHubHandler:       dockerHubHandler,
 		EdgeGroupsHandler:      edgeGroupsHandler,
 		EdgeJobsHandler:        edgeJobsHandler,
 		EdgeStacksHandler:      edgeStacksHandler,
@@ -228,11 +242,13 @@ func (server *Server) Start() error {
 		EndpointHandler:        endpointHandler,
 		EndpointEdgeHandler:    endpointEdgeHandler,
 		EndpointProxyHandler:   endpointProxyHandler,
+		KubernetesHandler:      kubernetesHandler,
 		FileHandler:            fileHandler,
 		MOTDHandler:            motdHandler,
 		RegistryHandler:        registryHandler,
 		ResourceControlHandler: resourceControlHandler,
 		SettingsHandler:        settingsHandler,
+		SSLHandler:             sslHandler,
 		StatusHandler:          statusHandler,
 		StackHandler:           stackHandler,
 		TagHandler:             tagHandler,
@@ -245,31 +261,48 @@ func (server *Server) Start() error {
 		WebhookHandler:         webhookHandler,
 	}
 
-	httpServer := &http.Server{
-		Addr:    server.BindAddress,
-		Handler: server.Handler,
+	handler := offlineGate.WaitingMiddleware(time.Minute, server.Handler)
+
+	if server.HTTPEnabled {
+		go func() {
+			log.Printf("[INFO] [http,server] [message: starting HTTP server on port %s]", server.BindAddress)
+			httpServer := &http.Server{
+				Addr:    server.BindAddress,
+				Handler: handler,
+			}
+
+			go shutdown(server.ShutdownCtx, httpServer)
+			err := httpServer.ListenAndServe()
+			if err != nil && err != http.ErrServerClosed {
+				log.Printf("[ERROR] [message: http server failed] [error: %s]", err)
+			}
+		}()
 	}
-	httpServer.Handler = offlineGate.WaitingMiddleware(time.Minute, httpServer.Handler)
 
-	if server.SSL {
-		httpServer.TLSConfig = crypto.CreateServerTLSConfiguration()
-		return httpServer.ListenAndServeTLS(server.SSLCert, server.SSLKey)
+	log.Printf("[INFO] [http,server] [message: starting HTTPS server on port %s]", server.BindAddressHTTPS)
+	httpsServer := &http.Server{
+		Addr:    server.BindAddressHTTPS,
+		Handler: handler,
 	}
 
-	go server.shutdown(httpServer)
+	httpsServer.TLSConfig = crypto.CreateServerTLSConfiguration()
+	httpsServer.TLSConfig.GetCertificate = func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
+		return server.SSLService.GetRawCertificate(), nil
+	}
 
-	return httpServer.ListenAndServe()
+	go shutdown(server.ShutdownCtx, httpsServer)
+	return httpsServer.ListenAndServeTLS("", "")
 }
 
-func (server *Server) shutdown(httpServer *http.Server) {
-	<-server.ShutdownCtx.Done()
+func shutdown(shutdownCtx context.Context, httpServer *http.Server) {
+	<-shutdownCtx.Done()
 
-	log.Println("[DEBUG] Shutting down http server")
+	log.Println("[DEBUG] [http,server] [message: shutting down http server]")
 	shutdownTimeout, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	err := httpServer.Shutdown(shutdownTimeout)
 	if err != nil {
-		fmt.Printf("Failed shutdown http server: %s \n", err)
+		fmt.Printf("[ERROR] [http,server] [message: failed shutdown http server] [error: %s]", err)
 	}
 }

@@ -26,10 +26,10 @@
 
   <div class="form-group" ng-if="$ctrl.formValues.IsSimple">
     <div class="col-sm-12">
-      <button type="button" class="btn btn-sm btn-default" style="margin-left: 0;" ng-click="$ctrl.addEntry()">
+      <button type="button" class="btn btn-sm btn-default" style="margin-left: 0;" ng-click="$ctrl.addEntry()" data-cy="k8sConfigCreate-createEntryButton">
         <i class="fa fa-plus-circle" aria-hidden="true"></i> Create entry
       </button>
-      <button type="button" class="btn btn-sm btn-default" ngf-select="$ctrl.addEntryFromFile($file)" style="margin-left: 0;">
+      <button type="button" class="btn btn-sm btn-default" ngf-select="$ctrl.addEntryFromFile($file)" style="margin-left: 0;" data-cy="k8sConfigCreate-createConfigsFromFileButton">
         <i class="fa fa-file-upload" aria-hidden="true"></i> Create key/value from file
       </button>
     </div>
@@ -98,7 +98,14 @@
     <div class="form-group" ng-if="$ctrl.formValues.IsSimple">
       <div class="col-sm-1"></div>
       <div class="col-sm-11">
-        <button type="button" class="btn btn-sm btn-danger space-right" style="margin-left: 0;" ng-disabled="entry.Used" ng-click="$ctrl.removeEntry(index, entry)">
+        <button
+          type="button"
+          class="btn btn-sm btn-danger space-right"
+          style="margin-left: 0;"
+          ng-disabled="entry.Used"
+          ng-click="$ctrl.removeEntry(index, entry)"
+          data-cy="k8sConfigDetail-removeEntryButton{{ index }}"
+        >
           <i class="fa fa-trash-alt" aria-hidden="true"></i> Remove entry
         </button>
         <span class="small text-muted" ng-if="entry.Used">

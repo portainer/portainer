@@ -1,14 +1,14 @@
 import _ from 'lodash-es';
 import { KubernetesApplicationDeploymentTypes } from 'Kubernetes/models/application/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
+import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 
-angular.module('portainer.docker').controller('KubernetesApplicationsStacksDatatableController', [
+angular.module('portainer.kubernetes').controller('KubernetesApplicationsStacksDatatableController', [
   '$scope',
   '$controller',
-  'KubernetesNamespaceHelper',
   'DatatableService',
   'Authentication',
-  function ($scope, $controller, KubernetesNamespaceHelper, DatatableService, Authentication) {
+  function ($scope, $controller, DatatableService, Authentication) {
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
     this.state = Object.assign(this.state, {
       expandedItems: [],
@@ -33,15 +33,19 @@ angular.module('portainer.docker').controller('KubernetesApplicationsStacksDatat
      * Do not allow applications in system namespaces to be selected
      */
     this.allowSelection = function (item) {
-      return !this.isSystemNamespace(item);
+      return !this.isSystemNamespace(item.ResourcePool);
     };
 
-    this.isSystemNamespace = function (item) {
-      return KubernetesNamespaceHelper.isSystemNamespace(item.ResourcePool);
+    /**
+     * @param {String} namespace Namespace (string name)
+     * @returns Boolean
+     */
+    this.isSystemNamespace = function (namespace) {
+      return KubernetesNamespaceHelper.isSystemNamespace(namespace);
     };
 
     this.isDisplayed = function (item) {
-      return !ctrl.isSystemNamespace(item) || ctrl.settings.showSystem;
+      return !ctrl.isSystemNamespace(item.ResourcePool) || ctrl.settings.showSystem;
     };
 
     this.expandItem = function (item, expanded) {

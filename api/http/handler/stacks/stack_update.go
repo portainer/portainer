@@ -61,7 +61,7 @@ func (payload *updateSwarmStackPayload) Validate(r *http.Request) error {
 // @success 200 {object} portainer.Stack "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
-// @failure 404 " not found"
+// @failure 404 "Not found"
 // @failure 500 "Server error"
 // @router /stacks/{id} [put]
 func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -128,6 +128,11 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack changes inside the database", err}
 	}
 
+	if stack.GitConfig != nil && stack.GitConfig.Authentication != nil && stack.GitConfig.Authentication.Password != "" {
+		// sanitize password in the http response to minimise possible security leaks
+		stack.GitConfig.Authentication.Password = ""
+	}
+
 	return response.JSON(w, stack)
 }
 
@@ -160,6 +165,7 @@ func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Sta
 
 	stack.UpdateDate = time.Now().Unix()
 	stack.UpdatedBy = config.user.Username
+	stack.Status = portainer.StackStatusActive
 
 	err = handler.deployComposeStack(config)
 	if err != nil {
