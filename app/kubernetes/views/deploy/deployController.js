@@ -24,6 +24,7 @@ class KubernetesDeployController {
     this.methodOptions = [
       buildOption('method_repo', 'fab fa-github', 'Git Repository', 'Use a git repository', KubernetesDeployBuildMethods.GIT),
       buildOption('method_editor', 'fa fa-edit', 'Web editor', 'Use our Web editor', KubernetesDeployBuildMethods.WEB_EDITOR),
+      buildOption('method_url', 'fa fa-globe', 'URL', 'Specify a URL to a file', KubernetesDeployBuildMethods.URL),
     ];
 
     this.state = {
@@ -54,10 +55,11 @@ class KubernetesDeployController {
       this.state.BuildMethod === KubernetesDeployBuildMethods.GIT &&
       (!this.formValues.RepositoryURL ||
         !this.formValues.FilePathInRepository ||
-        (this.formValues.RepositoryAuthentication && (!this.formValues.RepositoryUsername || !this.formValues.RepositoryPassword)));
-    const isWebEditorInvalid = this.state.BuildMethod === KubernetesDeployBuildMethods.WEB_EDITOR && _.isEmpty(this.formValues.EditorContent);
+        (this.formValues.RepositoryAuthentication && (!this.formValues.RepositoryUsername || !this.formValues.RepositoryPassword))) && _.isEmpty(this.formValues.Namespace);
+    const isWebEditorInvalid = this.state.BuildMethod === KubernetesDeployBuildMethods.WEB_EDITOR && _.isEmpty(this.formValues.EditorContent) && _.isEmpty(this.formValues.Namespace);
+    const isURLFormInvalid = this.state.BuildMethod == KubernetesDeployBuildMethods.WEB_EDITOR.URL && _.isEmpty(this.formValues.ManifestURL);
 
-    return isGitFormInvalid || isWebEditorInvalid || _.isEmpty(this.formValues.Namespace) || this.state.actionInProgress;
+    return isGitFormInvalid || isWebEditorInvalid || isURLFormInvalid || this.state.actionInProgress;
   }
 
   onChangeFormValues(values) {
@@ -91,7 +93,20 @@ class KubernetesDeployController {
     this.state.actionInProgress = true;
 
     try {
-      const method = this.state.BuildMethod === this.BuildMethods.GIT ? KubernetesDeployRequestMethods.REPOSITORY : KubernetesDeployRequestMethods.STRING;
+      let method;
+      switch (this.state.BuildMethod) {
+        case this.BuildMethods.GIT:
+          method = KubernetesDeployRequestMethods.REPOSITORY;
+          break;
+        case this.BuildMethods.WEB_EDITOR:
+          method = KubernetesDeployRequestMethods.STRING;
+          break;
+        case this.BuildMethods.URL:
+          method = KubernetesDeployRequestMethods.URL;
+          break;
+        default:
+          throw new PortainerError('Unable to determine build method');
+      }
 
       const payload = {
         ComposeFormat: this.state.DeployType === this.ManifestDeployTypes.COMPOSE,
@@ -107,8 +122,11 @@ class KubernetesDeployController {
           payload.RepositoryPassword = this.formValues.RepositoryPassword;
         }
         payload.FilePathInRepository = this.formValues.FilePathInRepository;
-      } else {
+      } else if (method === KubernetesDeployRequestMethods.WEB_EDITOR) {
         payload.StackFileContent = this.formValues.EditorContent;
+      } else {
+        payload.ManifestURL = this.formValues.ManifestURL;
+        delete payload.Namespace;
       }
 
       await this.StackService.kubernetesDeploy(this.endpointId, method, payload);
