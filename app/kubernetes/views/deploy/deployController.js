@@ -1,6 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import stripAnsi from 'strip-ansi';
+import PortainerError from 'Portainer/error';
 
 import { KubernetesDeployManifestTypes, KubernetesDeployBuildMethods, KubernetesDeployRequestMethods } from 'Kubernetes/models/deploy';
 import { buildOption } from '@/portainer/components/box-selector';
