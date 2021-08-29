@@ -189,6 +189,10 @@ func (handler *Handler) deployKubernetesStack(r *http.Request, endpoint *portain
 		return "", errors.Wrap(err, "failed to add application labels")
 	}
 
+	if !composeFormat && namespace == "default" {
+		namespace = ""
+	}
+
 	return handler.KubernetesDeployer.Deploy(r, endpoint, string(manifest), namespace)
 }
 

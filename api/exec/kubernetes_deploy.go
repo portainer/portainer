@@ -95,7 +95,9 @@ func (deployer *KubernetesDeployer) Deploy(request *http.Request, endpoint *port
 		args = append(args, "--server", endpoint.URL)
 		args = append(args, "--insecure-skip-tls-verify")
 		args = append(args, "--token", token)
-		args = append(args, "--namespace", namespace)
+		if namespace != "" {
+			args = append(args, "--namespace", namespace)
+		}
 		args = append(args, "apply", "-f", "-")
 
 		var stderr bytes.Buffer
