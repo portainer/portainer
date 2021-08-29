@@ -39,7 +39,7 @@ func NewHandler(bouncer *security.RequestBouncer, authorizationService *authoriz
 
 	kubeRouter.PathPrefix("/config").Handler(
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.getKubernetesConfig))).Methods(http.MethodGet)
-	h.PathPrefix("/kubernetes/{id}/nodes_limits").Handler(
+	kubeRouter.PathPrefix("/nodes_limits").Handler(
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.getKubernetesNodesLimits))).Methods(http.MethodGet)
 
 	// namespaces
