@@ -149,6 +149,8 @@ func (handler *Handler) createKubernetesStack(w http.ResponseWriter, r *http.Req
 		return handler.createKubernetesStackFromFileContent(w, r, endpoint)
 	case "repository":
 		return handler.createKubernetesStackFromGitRepository(w, r, endpoint)
+	case "url":
+		return handler.createKubernetesStackFromManifestURL(w, r, endpoint)		
 	}
 	return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid value for query parameter: method. Value must be one of: string or repository", Err: errors.New(request.ErrInvalidQueryParameter)}
 }
