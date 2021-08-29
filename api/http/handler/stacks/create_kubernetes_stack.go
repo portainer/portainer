@@ -16,6 +16,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	k "github.com/portainer/portainer/api/kubernetes"
+	"github.com/portainer/portainer/api/http/client"
 )
 
 const defaultReferenceName = "refs/heads/master"
@@ -35,6 +36,12 @@ type kubernetesGitDeploymentPayload struct {
 	RepositoryUsername       string
 	RepositoryPassword       string
 	FilePathInRepository     string
+}
+
+type kubernetesManifestURLDeploymentPayload struct {
+	Namespace 		string
+	ComposeFormat 	bool
+	ManifestURL 	string
 }
 
 func (payload *kubernetesStringDeploymentPayload) Validate(r *http.Request) error {
@@ -62,6 +69,13 @@ func (payload *kubernetesGitDeploymentPayload) Validate(r *http.Request) error {
 	}
 	if govalidator.IsNull(payload.RepositoryReferenceName) {
 		payload.RepositoryReferenceName = defaultReferenceName
+	}
+	return nil
+}
+
+func (payload *kubernetesManifestURLDeploymentPayload) Validate(r *http.Request) error {
+	if govalidator.IsNull(payload.ManifestURL) || !govalidator.IsURL(payload.ManifestURL) {
+		return errors.New("Invalid manifest URL")
 	}
 	return nil
 }
@@ -167,6 +181,61 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 	}
 
 	doCleanUp = false
+
+	return response.JSON(w, resp)
+}
+
+
+func (handler *Handler) createKubernetesStackFromManifestURL(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint) *httperror.HandlerError {
+	var payload kubernetesManifestURLDeploymentPayload
+	if err := request.DecodeAndValidateJSONPayload(r, &payload); err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
+	}
+
+	stackID := handler.DataStore.Stack().GetNextIdentifier()
+	stack := &portainer.Stack{
+		ID:           portainer.StackID(stackID),
+		Type:         portainer.KubernetesStack,
+		EndpointID:   endpoint.ID,
+		EntryPoint:   filesystem.ManifestFileDefaultName,
+		Status:       portainer.StackStatusActive,
+		CreationDate: time.Now().Unix(),
+	}
+
+	var manifestContent []byte
+	manifestContent, err := client.Get(payload.ManifestURL, 30)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve manifest from URL", err}
+	}
+
+	stackFolder := strconv.Itoa(int(stack.ID))
+	projectPath, err := handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, manifestContent)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist Kubernetes manifest file on disk", Err: err}
+	}
+	stack.ProjectPath = projectPath
+
+	doCleanUp := true
+	defer handler.cleanUp(stack, &doCleanUp)
+
+	output, err := handler.deployKubernetesStack(r, endpoint, string(manifestContent), payload.ComposeFormat, payload.Namespace, k.KubeAppLabels{
+		StackID: stackID,
+		Name:    stack.Name,
+		Owner:   stack.CreatedBy,
+		Kind:    "url",
+	})
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to deploy Kubernetes stack", Err: err}
+	}
+
+	err = handler.DataStore.Stack().CreateStack(stack)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist the Kubernetes stack inside the database", Err: err}
+	}
+
+	resp := &createKubernetesStackResponse{
+		Output: output,
+	}
 
 	return response.JSON(w, resp)
 }
