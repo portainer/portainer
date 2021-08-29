@@ -1,13 +1,14 @@
+import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
+
 export default class HelmTemplatesController {
   /* @ngInject */
-  constructor($analytics, $window, $async, $state, $anchorScroll, HelmService, KubernetesNamespaceHelper, KubernetesResourcePoolService, Notifications, ModalService) {
+  constructor($analytics, $window, $async, $state, $anchorScroll, HelmService, KubernetesResourcePoolService, Notifications, ModalService) {
     this.$analytics = $analytics;
     this.$window = $window;
     this.$async = $async;
     this.$state = $state;
     this.$anchorScroll = $anchorScroll;
     this.HelmService = HelmService;
-    this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.Notifications = Notifications;
     this.ModalService = ModalService;
@@ -82,7 +83,7 @@ export default class HelmTemplatesController {
     try {
       const [resourcePools, templates] = await Promise.all([this.KubernetesResourcePoolService.get(), this.HelmService.search()]);
 
-      const nonSystemNamespaces = resourcePools.filter((resourcePool) => !this.KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name));
+      const nonSystemNamespaces = resourcePools.filter((resourcePool) => !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name));
       this.state.resourcePools = nonSystemNamespaces;
       this.state.resourcePool = nonSystemNamespaces[0];
 
