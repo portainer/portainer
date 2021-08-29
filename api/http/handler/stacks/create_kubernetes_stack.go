@@ -167,6 +167,10 @@ func (handler *Handler) deployKubernetesStack(request *http.Request, endpoint *p
 		stackConfig = string(convertedConfig)
 	}
 
+	if !composeFormat && namespace == "default" {
+		namespace = ""
+	}
+
 	return handler.KubernetesDeployer.Deploy(request, endpoint, stackConfig, namespace)
 
 }

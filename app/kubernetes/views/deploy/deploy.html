@@ -73,7 +73,7 @@
                   placeholder="# Define or paste the content of your manifest file here"
                 >
                   <editor-description>
-                    <span class="col-sm-12 text-muted small" ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.COMPOSE">
+                    <span class="col-sm-12" ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.COMPOSE">
                       <p>
                         <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                         Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary that
@@ -85,7 +85,7 @@
                       </p>
                     </span>
                     <span
-                      class="col-sm-12 text-muted small"
+                      class="col-sm-12"
                       ng-show="ctrl.state.DeployType === ctrl.ManifestDeployTypes.KUBERNETES && ctrl.state.BuildMethod === ctrl.BuildMethods.WEB_EDITOR"
                     >
                       <p>

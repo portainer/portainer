@@ -18,7 +18,7 @@ class KubernetesDeployController {
 
     this.deployOptions = [
       buildOption('method_kubernetes', 'fa fa-cubes', 'Kubernetes', 'Kubernetes manifest format', KubernetesDeployManifestTypes.KUBERNETES),
-      buildOption('method_compose', 'fa fa-docker', 'Compose', 'docker-compose format', KubernetesDeployManifestTypes.COMPOSE),
+      buildOption('method_compose', 'fab fa-docker', 'Compose', 'docker-compose format', KubernetesDeployManifestTypes.COMPOSE),
     ];
 
     this.methodOptions = [
