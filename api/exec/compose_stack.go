@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -56,7 +57,7 @@ func (w *ComposeStackManager) Up(stack *portainer.Stack, endpoint *portainer.End
 		return errors.Wrap(err, "failed to create env file")
 	}
 
-	filePaths := append([]string{stack.EntryPoint}, stack.AdditionalFiles...)
+	filePaths := getStackFiles(stack)
 	_, err = w.wrapper.Up(filePaths, stack.ProjectPath, url, stack.Name, envFilePath, w.configPath)
 	return errors.Wrap(err, "failed to deploy a stack")
 }
@@ -71,8 +72,7 @@ func (w *ComposeStackManager) Down(stack *portainer.Stack, endpoint *portainer.E
 		defer proxy.Close()
 	}
 
-	filePaths := append([]string{stack.EntryPoint}, stack.AdditionalFiles...)
-
+	filePaths := getStackFiles(stack)
 	_, err = w.wrapper.Down(filePaths, stack.ProjectPath, url, stack.Name)
 	return err
 }
@@ -114,4 +114,28 @@ func createEnvFile(stack *portainer.Stack) (string, error) {
 	envfile.Close()
 
 	return "stack.env", nil
+}
+
+// getStackFiles returns list of stack's confile file paths.
+// items in the list would be sanitized according to following criterias:
+// 1. no empty paths
+// 2. no "../xxx" paths that are trying to escape stack folder
+// 3. no dir paths
+// 4. root paths would be made relative
+func getStackFiles(stack *portainer.Stack) []string {
+	paths := make([]string, 0, len(stack.AdditionalFiles)+1)
+
+	for _, p := range append([]string{stack.EntryPoint}, stack.AdditionalFiles...) {
+		if strings.HasPrefix(p, "/") {
+			p = `.` + p
+		}
+
+		if p == `` || p == `.` || strings.HasPrefix(p, `..`) || strings.HasSuffix(p, string(filepath.Separator)) {
+			continue
+		}
+
+		paths = append(paths, p)
+	}
+
+	return paths
 }
