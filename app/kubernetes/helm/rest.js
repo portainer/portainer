@@ -25,7 +25,6 @@ function HelmFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
         },
       },
       list: {
-        url: helmUrl,
         method: 'GET',
         isArray: true,
       },

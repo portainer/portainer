@@ -5,6 +5,7 @@ import (
 
 	"github.com/portainer/libhelm/options"
 	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 )
 
@@ -24,7 +25,7 @@ import (
 // @failure 401 "Unauthorized"
 // @failure 404 "Endpoint or ServiceAccount not found"
 // @failure 500 "Server error"
-// @router /kubernetes/helm [get]
+// @router /api/endpoints/:id/kubernetes/helm [get]
 func (handler *Handler) helmList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	clusterAccess, httperr := handler.getHelmClusterAccess(r)
 	if httperr != nil {
@@ -32,17 +33,14 @@ func (handler *Handler) helmList(w http.ResponseWriter, r *http.Request) *httper
 	}
 
 	listOpts := options.ListOptions{
-		KubernetesClusterAccess: &options.KubernetesClusterAccess{
-			ClusterServerURL:         clusterAccess.ClusterServerURL,
-			CertificateAuthorityFile: clusterAccess.CertificateAuthorityFile,
-			AuthToken:                clusterAccess.AuthToken,
-		},
+		KubernetesClusterAccess: clusterAccess,
 	}
 
 	params := r.URL.Query()
 
 	// optional namespace.  The library defaults to "default"
-	if namespace := params.Get("namespace"); namespace != "" {
+	namespace, _ := request.RetrieveQueryParameter(r, "namespace", true)
+	if namespace != "" {
 		listOpts.Namespace = namespace
 	}
 

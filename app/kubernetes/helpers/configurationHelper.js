@@ -39,10 +39,7 @@ class KubernetesConfigurationHelper {
   }
 
   static getApplicationConfigurations(applications, configurations) {
-    const configurationsUsed = configurations.filter((config) => {
-      const configApplications = KubernetesConfigurationHelper.getUsingApplications(config, applications);
-      return configApplications && configApplications.length !== 0;
-    });
+    const configurationsUsed = configurations.filter((config) => KubernetesConfigurationHelper.getUsingApplications(config, applications).length !== 0);
     // set the configurations used for each application in the list
     const configuredApps = applications.map((app) => {
       const configMappedByName = configurationsUsed.filter((config) => app.ApplicationName === config.Name);

@@ -24,23 +24,15 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
 
     this.expandAll = function () {
       this.state.expandAll = !this.state.expandAll;
-      for (let i = 0; i < this.state.filteredDataSet.length; i++) {
-        const item = this.state.filteredDataSet[i];
-        this.expandItem(item, this.state.expandAll);
-      }
+      this.state.filteredDataSet.forEach((item) => this.expandItem(item, this.state.expandAll));
     };
 
     this.expandItem = function (item, expanded) {
       item.Expanded = expanded;
-      if (item.Expanded) {
-        if (this.state.expandedItems.indexOf(item.Id) === -1) {
-          this.state.expandedItems.push(item.Id);
-        }
+      if (item.Expanded && !this.state.expandedItems.includes(item.Id)) {
+        this.state.expandedItems = [...this.state.expandedItems, item.Id];
       } else {
-        var index = this.state.expandedItems.indexOf(item.Id);
-        if (index > -1) {
-          this.state.expandedItems.splice(index, 1);
-        }
+        this.state.expandedItems = this.state.expandedItems.filter((id) => id !== item.Id);
       }
       DatatableService.setDataTableExpandedItems(this.tableKey, this.state.expandedItems);
     };
@@ -87,7 +79,7 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
     this.isSystemNamespace = function (item) {
       // if all charts in a helm app/release are in the system namespace
       if (item.KubernetesApplications && item.KubernetesApplications.length > 0) {
-        return item.KubernetesApplications.every((app) => KubernetesNamespaceHelper.isSystemNamespace(app.ResourcePool));
+        return item.KubernetesApplications.some((app) => KubernetesNamespaceHelper.isSystemNamespace(app.ResourcePool));
       }
       return KubernetesNamespaceHelper.isSystemNamespace(item.ResourcePool);
     };

@@ -114,11 +114,15 @@ class KubernetesApplicationsController {
       const helmApplications = KubernetesApplicationHelper.getHelmApplications(configuredApplications);
 
       // filter out multi-chart helm managed applications
-      const singularApplications = configuredApplications.filter(
-        (app) => !app.Pods.flatMap((pod) => pod.Labels).some((label) => label && helmApplications.map((hma) => hma.Name).includes(label['app.kubernetes.io/instance']))
+      const helmAppNames = helmApplications.map((hma) => hma.Name);
+      const nonHelmApps = configuredApplications.filter(
+        (app) =>
+          !app.Pods.flatMap((pod) => pod.Labels) // flatten pod labels
+            .filter((label) => label) // filter out empty labels
+            .some((label) => helmAppNames.includes(label['app.kubernetes.io/instance'])) // check if label key is in helmAppNames
       );
 
-      this.applications = [...singularApplications, ...helmApplications];
+      this.applications = [...nonHelmApps, ...helmApplications];
       this.stacks = KubernetesStackHelper.stacksFromApplications(applications);
       this.ports = KubernetesApplicationHelper.portMappingsFromApplications(applications);
     } catch (err) {

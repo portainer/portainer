@@ -5,3 +5,12 @@
 .secondary-body {
   background-color: #f1f9fd;
 }
+
+.datatable-wide {
+  width: 55px;
+}
+
+.datatable-padding-vertical {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}

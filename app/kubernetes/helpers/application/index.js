@@ -442,7 +442,6 @@ class KubernetesApplicationHelper {
    * @param {KubernetesApplication[]} applications Application list
    * @returns {Object} { [releaseName]: [app1, app2, ...], [releaseName2]: [app3, app4, ...] }
    */
-
   static getHelmApplications(applications) {
     // filter out all the applications that are managed by helm
     // to identify the helm managed applications, we need to check if the applications pod labels include

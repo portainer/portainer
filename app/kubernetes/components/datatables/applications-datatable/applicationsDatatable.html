@@ -93,7 +93,7 @@
         <table class="table table-hover nowrap-cells" data-cy="k8sApp-appTable">
           <thead ng-class="{ 'secondary-heading': !$ctrl.isPrimary }">
             <tr>
-              <th style="width: 55px;">
+              <th class="datatable-wide">
                 <span ng-if="$ctrl.isPrimary">
                   <span class="md-checkbox">
                     <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" data-cy="k8sApp-selectAllCheckbox" />
@@ -220,7 +220,7 @@
             </tr>
             <tr dir-paginate-end ng-show="item.Expanded" ng-class="{ 'secondary-body': $ctrl.isPrimary && !item.KubernetesApplications }">
               <td></td>
-              <td colspan="8" style="padding-top: 1.5rem; padding-bottom: 1.5rem;">
+              <td colspan="8" class="datatable-padding-vertical">
                 <span ng-if="item.KubernetesApplications">
                   <kubernetes-applications-datatable
                     dataset="item.KubernetesApplications"
@@ -235,8 +235,10 @@
                 </span>
                 <span ng-if="!item.KubernetesApplications">
                   <kubernetes-applications-datatable-url ng-if="$ctrl.getPublishUrl(item)" published-url="{{ $ctrl.getPublishUrl(item) }}"> </kubernetes-applications-datatable-url>
-                  <kubernetes-applications-datatable-details ng-if="$ctrl.hasConfigurationSecrets(item)" configurations="item.Configurations">
-                  </kubernetes-applications-datatable-details>
+                  <kubernetes-applications-datatable-details
+                    ng-if="$ctrl.hasConfigurationSecrets(item)"
+                    configurations="item.Configurations"
+                  ></kubernetes-applications-datatable-details>
                   <div class="small text-muted" ng-if="!$ctrl.hasConfigurationSecrets(item) && !$ctrl.getPublishUrl(item)">
                     This application has not been exposed.
                   </div>
