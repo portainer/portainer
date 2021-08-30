@@ -25,7 +25,7 @@ import (
 // @failure 401 "Unauthorized"
 // @failure 404 "Endpoint or ServiceAccount not found"
 // @failure 500 "Server error"
-// @router /api/endpoints/:id/kubernetes/helm [get]
+// @router /endpoints/:id/kubernetes/helm [get]
 func (handler *Handler) helmList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	clusterAccess, httperr := handler.getHelmClusterAccess(r)
 	if httperr != nil {

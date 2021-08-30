@@ -32,6 +32,9 @@ import {
   KubernetesPreferredSchedulingTermPayload,
 } from 'Kubernetes/pod/payloads/affinities';
 
+export const PodKubernetesInstanceLabel = 'app.kubernetes.io/instance';
+export const PodManagedByLabel = 'app.kubernetes.io/managed-by';
+
 class KubernetesApplicationHelper {
   /* #region  UTILITY FUNCTIONS */
   static isExternalApplication(application) {
@@ -447,7 +450,7 @@ class KubernetesApplicationHelper {
     // to identify the helm managed applications, we need to check if the applications pod labels include
     // `app.kubernetes.io/instance` and `app.kubernetes.io/managed-by` = `helm`
     const helmManagedApps = applications.filter((app) =>
-      app.Pods.flatMap((pod) => pod.Labels).some((label) => label && label['app.kubernetes.io/instance'] && label['app.kubernetes.io/managed-by'] === 'Helm')
+      app.Pods.flatMap((pod) => pod.Labels).some((label) => label && label[PodKubernetesInstanceLabel] && label[PodManagedByLabel] === 'Helm')
     );
 
     // groups the helm managed applications by helm release name
@@ -455,7 +458,7 @@ class KubernetesApplicationHelper {
     // object structure `{ [releaseName]: [app1, app2, ...], [releaseName2]: [app3, app4, ...] }`
     const groupedHelmApps = helmManagedApps.reduce((acc, curr) => {
       curr.Pods.flatMap((p) => p.Labels)
-        .map((label) => label['app.kubernetes.io/instance'])
+        .map((label) => label[PodKubernetesInstanceLabel])
         .forEach((instanceStr) => (acc[instanceStr] = [...(acc[instanceStr] || []), curr]));
       return acc;
     }, {});

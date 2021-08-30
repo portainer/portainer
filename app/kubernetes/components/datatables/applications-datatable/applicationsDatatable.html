@@ -224,7 +224,7 @@
                 <span ng-if="item.KubernetesApplications">
                   <kubernetes-applications-datatable
                     dataset="item.KubernetesApplications"
-                    table-key="kubernetes.applications"
+                    table-key="{{ item.Id }}_table"
                     order-by="Name"
                     remove-action="$ctrl.removeAction"
                     refresh-callback="$ctrl.refreshCallback"

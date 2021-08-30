@@ -23,7 +23,7 @@ import (
 // @failure 401 "Unauthorized"
 // @failure 404 "Endpoint or ServiceAccount not found"
 // @failure 500 "Server error or helm error"
-// @router /api/endpoints/:id/kubernetes/helm/{release} [delete]
+// @router /endpoints/:id/kubernetes/helm/{release} [delete]
 func (handler *Handler) helmDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	release, err := request.RetrieveRouteVariableValue(r, "release")
 	if err != nil {

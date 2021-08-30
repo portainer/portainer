@@ -3,7 +3,7 @@ require('../../templates/advancedDeploymentPanel.html');
 import angular from 'angular';
 import _ from 'lodash-es';
 import KubernetesStackHelper from 'Kubernetes/helpers/stackHelper';
-import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
+import KubernetesApplicationHelper, { PodKubernetesInstanceLabel } from 'Kubernetes/helpers/application';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
 
@@ -119,7 +119,7 @@ class KubernetesApplicationsController {
         (app) =>
           !app.Pods.flatMap((pod) => pod.Labels) // flatten pod labels
             .filter((label) => label) // filter out empty labels
-            .some((label) => helmAppNames.includes(label['app.kubernetes.io/instance'])) // check if label key is in helmAppNames
+            .some((label) => helmAppNames.includes(label[PodKubernetesInstanceLabel])) // check if label key is in helmAppNames
       );
 
       this.applications = [...nonHelmApps, ...helmApplications];
