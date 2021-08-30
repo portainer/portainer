@@ -41,7 +41,7 @@ var errChartNameInvalid = errors.New("invalid chart name. " +
 // @failure 401 "Unauthorized"
 // @failure 404 "Endpoint or ServiceAccount not found"
 // @failure 500 "Server error"
-// @router /kubernetes/helm/{release} [post]
+// @router /endpoints/:id/kubernetes/helm/{release} [post]
 func (handler *Handler) helmInstall(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload installChartPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
