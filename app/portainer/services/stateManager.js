@@ -11,7 +11,8 @@ angular.module('portainer.app').factory('StateManager', [
   'APPLICATION_CACHE_VALIDITY',
   'AgentPingService',
   '$analytics',
-  function StateManagerFactory($q, $async, SystemService, InfoHelper, LocalStorage, SettingsService, StatusService, APPLICATION_CACHE_VALIDITY, AgentPingService, $analytics) {
+  '$cacheFactory',
+  function StateManagerFactory($q, $async, SystemService, InfoHelper, LocalStorage, SettingsService, StatusService, APPLICATION_CACHE_VALIDITY, AgentPingService, $analytics, $cacheFactory) {
     var manager = {};
 
     var state = {
@@ -23,6 +24,7 @@ angular.module('portainer.app').factory('StateManager', [
         dismissedInfoHash: '',
       },
       extensions: [],
+      helmRepoApi: '/api/templates/helm',
     };
 
     manager.setVersionInfo = function (versionInfo) {
@@ -53,6 +55,10 @@ angular.module('portainer.app').factory('StateManager', [
       state.application.logo = logoURL;
       LocalStorage.storeApplicationState(state.application);
     };
+
+    manager.refreshHelmRepo = function () {
+      $cacheFactory.get('$http').remove(state.helmRepoApi);
+    }
 
     manager.updateSnapshotInterval = function (interval) {
       state.application.snapshotInterval = interval;
