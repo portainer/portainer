@@ -17,6 +17,7 @@ import (
 const rwxr__r__ os.FileMode = 0744
 
 var filesToBackup = []string{
+	"certs",
 	"compose",
 	"config.json",
 	"custom_templates",
@@ -26,7 +27,6 @@ var filesToBackup = []string{
 	"portainer.key",
 	"portainer.pub",
 	"tls",
-	"certs",
 }
 
 // Creates a tar.gz system archive and encrypts it if password is not empty. Returns a path to the archive file.
