@@ -21,6 +21,8 @@
               class-name="text-muted"
               url="ctrl.stack.GitConfig.URL"
               config-file-path="ctrl.stack.GitConfig.ConfigFilePath"
+              additional-files="ctrl.stack.AdditionalFiles"
+              type="application"
             ></git-form-info-panel>
             <div class="col-sm-12 form-section-title" ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.APPLICATION_FORM">
               Namespace
@@ -55,11 +57,11 @@
             <!-- #endregion -->
 
             <!-- #region Git repository -->
-            <kubernetes-app-git-form
+            <kubernetes-redeploy-app-git-form
               ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.GIT"
               stack="ctrl.stack"
               namespace="ctrl.formValues.ResourcePool.Namespace.Name"
-            ></kubernetes-app-git-form>
+            ></kubernetes-redeploy-app-git-form>
             <!-- #endregion -->
 
             <!-- #region web editor -->
