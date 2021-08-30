@@ -100,6 +100,7 @@ angular.module('portainer.app').controller('SettingsController', [
           StateManager.updateSnapshotInterval(settings.SnapshotInterval);
           StateManager.updateEnableEdgeComputeFeatures(settings.EnableEdgeComputeFeatures);
           StateManager.updateEnableTelemetry(settings.EnableTelemetry);
+          StateManager.refreshHelmRepo();
           $state.reload();
         })
         .catch(function error(err) {
