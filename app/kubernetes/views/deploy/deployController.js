@@ -1,20 +1,22 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import stripAnsi from 'strip-ansi';
-
+import uuidv4 from 'uuid/v4';
 import { KubernetesDeployManifestTypes, KubernetesDeployBuildMethods, KubernetesDeployRequestMethods } from 'Kubernetes/models/deploy';
 import { buildOption } from '@/portainer/components/box-selector';
 class KubernetesDeployController {
   /* @ngInject */
-  constructor($async, $state, $window, ModalService, Notifications, EndpointProvider, KubernetesResourcePoolService, StackService) {
+  constructor($async, $state, $window, $analytics, ModalService, Notifications, EndpointProvider, KubernetesResourcePoolService, StackService, WebhookHelper) {
     this.$async = $async;
     this.$state = $state;
     this.$window = $window;
+    this.$analytics = $analytics;
     this.ModalService = ModalService;
     this.Notifications = Notifications;
     this.EndpointProvider = EndpointProvider;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.StackService = StackService;
+    this.WebhookHelper = WebhookHelper;
 
     this.deployOptions = [
       buildOption('method_kubernetes', 'fa fa-cubes', 'Kubernetes', 'Kubernetes manifest format', KubernetesDeployManifestTypes.KUBERNETES),
@@ -35,7 +37,19 @@ class KubernetesDeployController {
       isEditorDirty: false,
     };
 
-    this.formValues = {};
+    this.formValues = {
+      RepositoryURL: '',
+      RepositoryReferenceName: '',
+      RepositoryAuthentication: true,
+      RepositoryUsername: '',
+      RepositoryPassword: '',
+      AdditionalFiles: [],
+      ComposeFilePathInRepository: 'deployment.yml',
+      RepositoryAutomaticUpdates: true,
+      RepositoryMechanism: 'Interval',
+      RepositoryFetchInterval: '5m',
+      RepositoryWebhookURL: this.WebhookHelper.returnStackWebhookUrl(uuidv4()),
+    };
     this.ManifestDeployTypes = KubernetesDeployManifestTypes;
     this.BuildMethods = KubernetesDeployBuildMethods;
     this.endpointId = this.EndpointProvider.endpointID();
@@ -45,16 +59,12 @@ class KubernetesDeployController {
     this.onChangeFileContent = this.onChangeFileContent.bind(this);
     this.getNamespacesAsync = this.getNamespacesAsync.bind(this);
     this.onChangeFormValues = this.onChangeFormValues.bind(this);
-    this.onRepoUrlChange = this.onRepoUrlChange.bind(this);
-    this.onRepoRefChange = this.onRepoRefChange.bind(this);
   }
 
   disableDeploy() {
     const isGitFormInvalid =
       this.state.BuildMethod === KubernetesDeployBuildMethods.GIT &&
-      (!this.formValues.RepositoryURL ||
-        !this.formValues.FilePathInRepository ||
-        (this.formValues.RepositoryAuthentication && (!this.formValues.RepositoryUsername || !this.formValues.RepositoryPassword)));
+      (!this.formValues.RepositoryURL || !this.formValues.FilePathInRepository || (this.formValues.RepositoryAuthentication && !this.formValues.RepositoryPassword));
     const isWebEditorInvalid = this.state.BuildMethod === KubernetesDeployBuildMethods.WEB_EDITOR && _.isEmpty(this.formValues.EditorContent);
 
     return isGitFormInvalid || isWebEditorInvalid || _.isEmpty(this.formValues.Namespace) || this.state.actionInProgress;
@@ -65,14 +75,6 @@ class KubernetesDeployController {
       ...this.formValues,
       ...values,
     };
-  }
-
-  onRepoUrlChange(value) {
-    this.onChangeFormValues({ RepositoryURL: value });
-  }
-
-  onRepoRefChange(value) {
-    this.onChangeFormValues({ RepositoryReferenceName: value });
   }
 
   onChangeFileContent(value) {
@@ -91,6 +93,11 @@ class KubernetesDeployController {
     this.state.actionInProgress = true;
 
     try {
+      //Analytics
+      const metadata = {
+        format: this.state.DeployType === this.ManifestDeployTypes.COMPOSE ? 'compose' : 'manifest',
+      };
+
       const method = this.state.BuildMethod === this.BuildMethods.GIT ? KubernetesDeployRequestMethods.REPOSITORY : KubernetesDeployRequestMethods.STRING;
 
       const payload = {
@@ -99,6 +106,7 @@ class KubernetesDeployController {
       };
 
       if (method === KubernetesDeployRequestMethods.REPOSITORY) {
+        metadata.type = 'git';
         payload.RepositoryURL = this.formValues.RepositoryURL;
         payload.RepositoryReferenceName = this.formValues.RepositoryReferenceName;
         payload.RepositoryAuthentication = this.formValues.RepositoryAuthentication ? true : false;
@@ -106,11 +114,26 @@ class KubernetesDeployController {
           payload.RepositoryUsername = this.formValues.RepositoryUsername;
           payload.RepositoryPassword = this.formValues.RepositoryPassword;
         }
-        payload.FilePathInRepository = this.formValues.FilePathInRepository;
+        payload.ManifestFile = this.formValues.ComposeFilePathInRepository;
+        payload.AdditionalFiles = this.formValues.AdditionalFiles;
+        if (this.formValues.RepositoryAutomaticUpdates) {
+          payload.AutoUpdate = {};
+          if (this.formValues.RepositoryMechanism === `Interval`) {
+            payload.AutoUpdate.Interval = this.formValues.RepositoryFetchInterval;
+            metadata['automatic-updates'] = 'polling';
+          } else if (this.formValues.RepositoryMechanism === `Webhook`) {
+            payload.AutoUpdate.Webhook = this.formValues.RepositoryWebhookURL;
+            metadata['automatic-updates'] = 'webhook';
+          }
+        } else {
+          metadata['automatic-updates'] = 'off';
+        }
       } else {
+        metadata.type = 'web-editor';
         payload.StackFileContent = this.formValues.EditorContent;
       }
 
+      this.$analytics.eventTrack('kubernetes-application-advanced-deployment', { category: 'kubernetes', metadata: metadata });
       await this.StackService.kubernetesDeploy(this.endpointId, method, payload);
 
       this.Notifications.success('Manifest successfully deployed');
@@ -158,6 +181,19 @@ class KubernetesDeployController {
     }
   }
   async onInit() {
+    this.state = {
+      DeployType: KubernetesDeployManifestTypes.KUBERNETES,
+      BuildMethod: KubernetesDeployBuildMethods.GIT,
+      tabLogsDisabled: true,
+      activeTab: 0,
+      viewReady: false,
+      isEditorDirty: false,
+    };
+
+    this.ManifestDeployTypes = KubernetesDeployManifestTypes;
+    this.BuildMethods = KubernetesDeployBuildMethods;
+    this.endpointId = this.EndpointProvider.endpointID();
+
     await this.getNamespaces();
 
     this.state.viewReady = true;

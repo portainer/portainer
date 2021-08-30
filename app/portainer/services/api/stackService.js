@@ -277,7 +277,17 @@ angular.module('portainer.app').factory('StackService', [
           StackFileContent: stackFile,
         };
       } else {
+        const autoUpdate = {};
+        if (gitConfig.AutoUpdate && gitConfig.AutoUpdate.RepositoryAutomaticUpdates) {
+          if (gitConfig.AutoUpdate.RepositoryMechanism === 'Interval') {
+            autoUpdate.Interval = gitConfig.AutoUpdate.RepositoryFetchInterval;
+          } else if (gitConfig.AutoUpdate.RepositoryMechanism === 'Webhook') {
+            autoUpdate.Webhook = gitConfig.AutoUpdate.RepositoryWebhookURL.split('/').reverse()[0];
+          }
+        }
+
         payload = {
+          AutoUpdate: autoUpdate,
           RepositoryReferenceName: gitConfig.RefName,
           RepositoryAuthentication: gitConfig.RepositoryAuthentication,
           RepositoryUsername: gitConfig.RepositoryUsername,

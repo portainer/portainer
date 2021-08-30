@@ -4,6 +4,8 @@ export const gitForm = {
   templateUrl: './git-form.html',
   controller,
   bindings: {
+    pathTextTitle: '@',
+    pathPlaceholder: '@',
     model: '<',
     onChange: '<',
     additionalFile: '<',
