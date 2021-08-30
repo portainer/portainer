@@ -70,13 +70,6 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
 	}
 
-	stackFolder := strconv.Itoa(int(stack.ID))
-	projectPath, err := handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
-	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist Kubernetes manifest file on disk", Err: err}
-	}
-	stack.ProjectPath = projectPath
-
 	_, err = handler.deployKubernetesStack(r, endpoint, payload.StackFileContent, stack.IsComposeFormat, stack.Namespace, k.KubeAppLabels{
 		StackID: int(stack.ID),
 		Name:    stack.Name,
@@ -86,6 +79,12 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to deploy Kubernetes stack via file content", Err: err}
+	}
+
+	stackFolder := strconv.Itoa(int(stack.ID))
+	_, err = handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist Kubernetes manifest file on disk", Err: err}
 	}
 
 	return nil
