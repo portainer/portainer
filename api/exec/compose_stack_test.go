@@ -64,21 +64,3 @@ func Test_createEnvFile(t *testing.T) {
 		})
 	}
 }
-
-func Test_getStackFiles(t *testing.T) {
-	stack := &portainer.Stack{
-		EntryPoint: "./file", // picks entry point
-		AdditionalFiles: []string{
-			``,                  // ignores empty string
-			`.`,                 // ignores .
-			`..`,                // ignores ..
-			`./dir/`,            // ignrores paths that end with trailing /
-			`/with-root-prefix`, // replaces "root" based paths with relative
-			`./relative`,        // keeps relative paths
-			`../escape`,         // prevents dir escape
-		},
-	}
-
-	filePaths := getStackFiles(stack)
-	assert.ElementsMatch(t, filePaths, []string{`./file`, `./with-root-prefix`, `./relative`})
-}
