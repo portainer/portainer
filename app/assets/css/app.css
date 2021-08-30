@@ -118,6 +118,20 @@
   --button-opacity: 0.2;
   --button-opacity-hover: 0.5;
   --bg-boxselector-wrapper-color: #333333;
+
+  --bg-image-multiselect: linear-gradient(#337ab7, #337ab7);
+  --bg-image-multiselect-button: linear-gradient(#fff, #f7f7f7);
+  --bg-image-multiselect-hover: linear-gradient(#fff, #e9e9e9);
+  --border-multiselect: #c6c6c6;
+  --border-multiselect-checkboxlayer: rgba(0, 0, 0, 0.15);
+  --text-multiselect: #555;
+  --text-multiselect-selectitem: #fff;
+  --bg-multiselect-checkboxcontainer: #fff;
+  --text-multiselect-item: #444;
+  --bg-multiselect-helpercontainer: #fff;
+  --text-input-textarea: #fff;
+  --bg-service-datatable-thead: #e7f6ff;
+  --bg-service-datatable-tbody: #f1f9fd;
 }
 
 :root[theme='dark'] {
@@ -243,6 +257,19 @@
   --button-opacity-hover: 0.3;
   --shadow-box-color: none;
   --shadow-boxselector-color: none;
+
+  --bg-image-multiselect: linear-gradient(#434343, #434343);
+  --bg-image-multiselect-button: linear-gradient(#212121, #212121);
+  --bg-image-multiselect-hover: linear-gradient(#383838, #383838);
+  --border-multiselect: #383838;
+  --border-multiselect-checkboxlayer: #383838;
+  --text-multiselect: #fff;
+  --bg-multiselect-checkboxcontainer: #383838;
+  --text-multiselect-item: #fff;
+  --bg-multiselect-helpercontainer: #212121;
+  --text-input-textarea: #212121;
+  --bg-service-datatable-thead: #212121;
+  --bg-service-datatable-tbody: #212121;
 }
 
 :root[theme='highcontrast'] {
@@ -314,6 +341,32 @@
   --hover-sidebar-color: #000;
   --shadow-box-color: none;
   --shadow-boxselector-color: none;
+
+  --bg-image-multiselect: linear-gradient(#000, #000);
+  --bg-image-multiselect-button: linear-gradient(#212121, #212121);
+  --bg-image-multiselect-hover: linear-gradient(#383838, #383838);
+  --border-multiselect: #000;
+  --border-multiselect-checkboxlayer: #383838;
+  --text-multiselect: #fff;
+  --bg-multiselect-checkboxcontainer: #383838;
+  --text-multiselect-item: #fff;
+  --bg-multiselect-helpercontainer: #212121;
+  --text-input-textarea: #000;
+  --bg-item-highlighted-color: #000;
+  --bg-item-highlighted-null-color: #181818;
+  --bg-service-datatable-thead: #000;
+  --bg-service-datatable-tbody: #000;
+  --bg-form-control-disabled-color: #212121;
+  --border-pagination-span-color: #383838;
+  --border-pagination-color: #383838;
+  --text-pagination-color: #fff;
+  --bg-pagination-color: #383838;
+  --bg-pagination-span-color: #383838;
+  --text-cm-default-color: #3ea6ff;
+  --text-cm-meta-color: #fff;
+  --text-summary-color: #fff;
+  --text-cm-string-color: #f00;
+  --text-progress-bar-color: #000;
 }
 
 /* Overide Vendor CSS */
@@ -606,6 +659,25 @@ json-tree .branch-preview {
   font-weight: 700;
 }
 
+.input-sm {
+  background-color: var(--bg-input-sm-color);
+  border: 1px solid var(--border-input-sm-color);
+}
+
+.rzslider .rz-bubble {
+  color: var(--text-rzslider-color);
+}
+
+.rzslider .rz-bubble.rz-limit {
+  color: var(--text-rzslider-limit-color);
+}
+input,
+button,
+select,
+textarea {
+  background: var(--text-input-textarea);
+}
+
 /* Overide Vendor CSS */
 
 html,
@@ -716,6 +788,27 @@ a[ng-click] {
 .portainer-disabled-datatable a {
   color: gray;
   pointer-events: none;
+}
+
+.datatable-highlighted {
+  background-color: var(--bg-item-highlighted-color);
+}
+
+.datatable-unhighlighted {
+  background-color: var(--bg-item-highlighted-null-color);
+}
+
+.service-datatable {
+  background-color: var(--bg-item-highlighted-color);
+  padding: 2px;
+}
+
+.service-datatable thead {
+  background-color: var(--bg-service-datatable-thead) !important;
+}
+
+.service-datatable tbody {
+  background-color: var(--bg-service-datatable-tbody);
 }
 
 .tooltip.portainer-tooltip .tooltip-inner {
@@ -1342,7 +1435,7 @@ json-tree .branch-preview {
 
 /* uib-progressbar override */
 .progress-bar {
-  color: #4e4e4e;
+  color: var(--text-progress-bar-color);
 }
 /* !uib-progressbar override */
 
