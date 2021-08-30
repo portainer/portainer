@@ -5,10 +5,18 @@
         <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
       </div>
       <div class="actionBar">
-        <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
+        <button
+          type="button"
+          class="btn btn-sm btn-danger"
+          ng-disabled="$ctrl.state.selectedItemCount === 0"
+          ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
+          data-cy="endpoint-removeEndpointButton"
+        >
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.endpoints.new"> <i class="fa fa-plus space-right" aria-hidden="true"></i>Add endpoint </button>
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.endpoints.new" data-cy="endpoint-addEndpointButton">
+          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add endpoint
+        </button>
       </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
@@ -20,10 +28,11 @@
           ng-model="$ctrl.state.textFilter"
           ng-change="$ctrl.onTextFilterChange()"
           ng-model-options="{ debounce: 300 }"
+          data-cy="endpoint-searchInput"
         />
       </div>
       <div class="table-responsive">
-        <table class="table table-hover nowrap-cells">
+        <table class="table table-hover nowrap-cells" data-cy="endpoint-endpointTable">
           <thead>
             <tr>
               <th>

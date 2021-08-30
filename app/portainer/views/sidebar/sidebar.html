@@ -1,7 +1,7 @@
 <!-- Sidebar -->
 <div id="sidebar-wrapper">
   <div class="sidebar-header">
-    <a ui-sref="portainer.home">
+    <a ui-sref="portainer.home" data-cy="portainerSidebar-homeImage">
       <img ng-if="logo" ng-src="{{ logo }}" class="img-responsive logo" />
       <img ng-if="!logo" src="~@/assets/images/logo.png" class="img-responsive logo" alt="Portainer" />
     </a>
@@ -9,14 +9,19 @@
   </div>
   <div class="sidebar-content">
     <ul class="sidebar">
-      <sidebar-menu-item path="portainer.home" icon-class="fa-home fa-fw" class-name="sidebar-list">Home</sidebar-menu-item>
+      <sidebar-menu-item path="portainer.home" icon-class="fa-home fa-fw" class-name="sidebar-list" data-cy="portainerSidebar-home">Home</sidebar-menu-item>
 
       <li class="sidebar-title endpoint-name" ng-if="applicationState.endpoint.name">
         <span class="fa fa-plug space-right"></span>{{ applicationState.endpoint.name }}
         <kubectl-shell ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider === 'KUBERNETES'" class="kubectl-shell"></kubectl-shell>
       </li>
       <div ng-if="applicationState.endpoint.mode">
-        <kubernetes-sidebar ng-if="applicationState.endpoint.mode.provider === 'KUBERNETES'" is-sidebar-open="toggle" endpoint-id="endpointId"></kubernetes-sidebar>
+        <kubernetes-sidebar
+          ng-if="applicationState.endpoint.mode.provider === 'KUBERNETES'"
+          is-sidebar-open="toggle"
+          endpoint-id="endpointId"
+          admin-access="isAdmin"
+        ></kubernetes-sidebar>
 
         <azure-sidebar ng-if="applicationState.endpoint.mode.provider === 'AZURE'" endpoint-id="endpointId"> </azure-sidebar>
 
@@ -55,9 +60,9 @@
       </sidebar-section>
 
       <sidebar-section title="Edge compute" ng-if="isAdmin && applicationState.application.enableEdgeComputeFeatures">
-        <sidebar-menu-item path="edge.groups" icon-class="fa-object-group fa-fw" class-name="sidebar-list">Edge Groups</sidebar-menu-item>
-        <sidebar-menu-item path="edge.stacks" icon-class="fa-layer-group fa-fw" class-name="sidebar-list">Edge Stacks</sidebar-menu-item>
-        <sidebar-menu-item path="edge.jobs" icon-class="fa-clock fa-fw" class-name="sidebar-list">Edge Jobs</sidebar-menu-item>
+        <sidebar-menu-item path="edge.groups" icon-class="fa-object-group fa-fw" class-name="sidebar-list" data-cy="portainerSidebar-edgeGroups">Edge Groups</sidebar-menu-item>
+        <sidebar-menu-item path="edge.stacks" icon-class="fa-layer-group fa-fw" class-name="sidebar-list" data-cy="portainerSidebar-edgeStacks">Edge Stacks</sidebar-menu-item>
+        <sidebar-menu-item path="edge.jobs" icon-class="fa-clock fa-fw" class-name="sidebar-list" data-cy="portainerSidebar-edgeJobs">Edge Jobs</sidebar-menu-item>
       </sidebar-section>
 
       <sidebar-section ng-if="isAdmin || isTeamLeader" title="Settings">
@@ -68,8 +73,8 @@
           is-sidebar-open="toggle"
           children-paths="['portainer.users.user' ,'portainer.teams' ,'portainer.teams.team' ,'portainer.roles' ,'portainer.roles.role' ,'portainer.roles.new']"
         >
-          <sidebar-menu-item path="portainer.teams" class-name="sidebar-sublist">Teams</sidebar-menu-item>
-          <sidebar-menu-item path="portainer.roles" class-name="sidebar-sublist">Roles</sidebar-menu-item>
+          <sidebar-menu-item path="portainer.teams" class-name="sidebar-sublist" data-cy="portainerSidebar-teams">Teams</sidebar-menu-item>
+          <sidebar-menu-item path="portainer.roles" class-name="sidebar-sublist" data-cy="portainerSidebar-roles">Roles</sidebar-menu-item>
         </sidebar-menu>
 
         <div ng-if="isAdmin">
@@ -80,17 +85,19 @@
             is-sidebar-open="toggle"
             children-paths="['portainer.endpoints.endpoint', 'portainer.endpoints.new', 'portainer.endpoints.endpoint.access', 'portainer.groups', 'portainer.groups.group', 'portainer.groups.group.access', 'portainer.groups.new', 'portainer.tags']"
           >
-            <sidebar-menu-item path="portainer.groups" class-name="sidebar-sublist">Groups</sidebar-menu-item>
-            <sidebar-menu-item path="portainer.tags" class-name="sidebar-sublist">Tags</sidebar-menu-item>
+            <sidebar-menu-item path="portainer.groups" class-name="sidebar-sublist" data-cy="portainerSidebar-endpointGroups">Groups</sidebar-menu-item>
+            <sidebar-menu-item path="portainer.tags" class-name="sidebar-sublist" data-cy="portainerSidebar-endpointTags">Tags</sidebar-menu-item>
           </sidebar-menu>
 
-          <sidebar-menu-item path="portainer.registries" icon-class="fa-database fa-fw" class-name="sidebar-list">Registries</sidebar-menu-item>
+          <sidebar-menu-item path="portainer.registries" icon-class="fa-database fa-fw" class-name="sidebar-list" data-cy="portainerSidebar-registries">
+            Registries</sidebar-menu-item
+          >
 
           <sidebar-menu label="Settings" icon-class="fa-cogs fa-fw" path="portainer.settings" is-sidebar-open="toggle" children-paths="['portainer.settings.authentication']">
-            <sidebar-menu-item path="portainer.settings.authentication" class-name="sidebar-sublist">Authentication</sidebar-menu-item>
+            <sidebar-menu-item path="portainer.settings.authentication" class-name="sidebar-sublist" data-cy="portainerSidebar-authentication">Authentication</sidebar-menu-item>
 
             <div class="sidebar-sublist">
-              <a href="http://www.portainer.io/help_about" target="_blank">Help / About</a>
+              <a href="http://www.portainer.io/help_about" target="_blank" data-cy="portainerSidebar-help">Help / About</a>
             </div>
           </sidebar-menu>
         </div>
@@ -104,7 +111,7 @@
       </div>
       <div>
         <img src="~@/assets/images/logo_small.png" class="img-responsive logo" alt="Portainer" />
-        <span class="version">{{ uiVersion }}</span>
+        <span class="version" data-cy="portainerSidebar-versionNumber">{{ uiVersion }}</span>
       </div>
     </div>
   </div>

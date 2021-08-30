@@ -54,10 +54,18 @@
           authorization="PortainerStackDelete"
           ng-disabled="$ctrl.state.selectedItemCount === 0"
           ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
+          data-cy="stack-removeStackButton"
         >
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
-        <button ng-disabled="!$ctrl.createEnabled" type="button" class="btn btn-sm btn-primary" ui-sref="docker.stacks.newstack" authorization="PortainerStackCreate">
+        <button
+          ng-disabled="!$ctrl.createEnabled"
+          type="button"
+          class="btn btn-sm btn-primary"
+          ui-sref="docker.stacks.newstack"
+          authorization="PortainerStackCreate"
+          data-cy="stack-addStackButton"
+        >
           <i class="fa fa-plus space-right" aria-hidden="true"></i>Add stack
         </button>
       </div>
@@ -71,10 +79,11 @@
           placeholder="Search..."
           auto-focus
           ng-model-options="{ debounce: 300 }"
+          data-cy="stack-searchInput"
         />
       </div>
       <div class="table-responsive">
-        <table class="table table-hover nowrap-cells">
+        <table class="table table-hover nowrap-cells" data-cy="stack-stackTable">
           <thead>
             <tr>
               <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.state.open">
@@ -202,10 +211,10 @@
                 </span>
               </td>
             </tr>
-            <tr ng-if="!$ctrl.dataset">
+            <tr ng-if="!$ctrl.dataset" data-cy="stacks-loadingTableRow">
               <td colspan="6" class="text-center text-muted">Loading...</td>
             </tr>
-            <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
+            <tr ng-if="$ctrl.state.filteredDataSet.length === 0" data-cy="stacks-noStackTableRow">
               <td colspan="6" class="text-center text-muted">No stack available.</td>
             </tr>
           </tbody>

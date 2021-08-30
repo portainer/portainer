@@ -4,7 +4,7 @@
       Name
     </label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="group_name" name="group_name" ng-model="$ctrl.model.Name" required auto-focus />
+      <input type="text" class="form-control" id="group_name" name="group_name" ng-model="$ctrl.model.Name" required auto-focus data-cy="edgeGroupCreate-groupNameInput" />
     </div>
   </div>
   <div class="form-group" ng-show="EdgeGroupForm.group_name.$invalid">
@@ -138,6 +138,7 @@
         class="btn btn-primary btn-sm"
         ng-disabled="$ctrl.actionInProgress || !EdgeGroupForm.$valid || (!$ctrl.model.Dynamic && !$ctrl.model.Endpoints.length) || ($ctrl.model.Dynamic && !$ctrl.model.TagIds.length)"
         button-spinner="$ctrl.actionInProgress"
+        data-cy="edgeGroupCreate-addGroupButton"
       >
         <span ng-hide="$ctrl.actionInProgress">{{ $ctrl.formActionLabel }}</span>
         <span ng-show="$ctrl.actionInProgress">In progress...</span>

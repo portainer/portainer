@@ -1,5 +1,5 @@
 <li class="sidebar-list sidebar-menu">
-  <sidebar-menu-item path="{{::$ctrl.path }}" path-params="$ctrl.pathParams" icon-class="{{::$ctrl.iconClass}}">
+  <sidebar-menu-item path="{{::$ctrl.path }}" path-params="$ctrl.pathParams" icon-class="{{::$ctrl.iconClass}}" data-cy="portainerSidebar-{{ ::$ctrl.label }}">
     <div class="sidebar-menu-head">
       <button ng-click="$ctrl.onClickArrow($event)" class="small sidebar-menu-indicator">
         <i class="fas" ng-class="$ctrl.isOpen() ? 'fa-chevron-down' : 'fa-chevron-right'"></i>

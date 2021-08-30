@@ -27,6 +27,7 @@
                 placeholder="e.g. development"
                 auto-focus
                 required
+                data-cy="team-teamNameInput"
               />
             </div>
           </div>
@@ -61,6 +62,7 @@
                 search-property="Username"
                 translation="{nothingSelected: 'Select one or more team leaders', search: 'Search...'}"
                 style="margin-left: 20px;"
+                data-cy="team-teamLeaderSelect"
               >
               </span>
             </div>
@@ -74,6 +76,7 @@
                 ng-disabled="state.actionInProgress || !teamCreationForm.$valid"
                 ng-click="addTeam()"
                 button-spinner="state.actionInProgress"
+                data-cy="team-createTeamButton"
               >
                 <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Create team</span>
                 <span ng-show="state.actionInProgress">Creating team...</span>

@@ -22,6 +22,7 @@
                   ng-pattern="/^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/"
                   ng-change="$ctrl.onChangeName()"
                   placeholder="my-project"
+                  data-cy="k8sNamespaceCreate-namespaceNameInput"
                   required
                   auto-focus
                 />
@@ -58,7 +59,9 @@
                 <label class="control-label text-left">
                   Resource assignment
                 </label>
-                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="$ctrl.formValues.HasQuota" /><i></i> </label>
+                <label class="switch" style="margin-left: 20px;">
+                  <input type="checkbox" ng-model="$ctrl.formValues.HasQuota" /><i data-cy="k8sNamespaceCreate-resourceAssignmentToggle"></i>
+                </label>
               </div>
             </div>
             <div class="form-group" ng-if="$ctrl.formValues.HasQuota && !$ctrl.isQuotaValid()">
@@ -84,6 +87,7 @@
                       ceil="$ctrl.state.sliderMaxMemory"
                       step="128"
                       ng-if="$ctrl.state.sliderMaxMemory"
+                      data-cy="k8sNamespaceCreate-memoryLimitSlider"
                     >
                     </slider>
                   </div>
@@ -96,6 +100,7 @@
                       class="form-control"
                       ng-model="$ctrl.formValues.MemoryLimit"
                       id="memory-limit"
+                      data-cy="k8sNamespaceCreate-memoryLimitInput"
                       required
                     />
                   </div>
@@ -128,6 +133,7 @@
                       step="0.1"
                       precision="2"
                       ng-if="$ctrl.state.sliderMaxCpu"
+                      data-cy="k8sNamespaceCreate-cpuLimitSlider"
                     >
                     </slider>
                   </div>
@@ -159,7 +165,7 @@
                 <label class="control-label text-left">
                   Load Balancer quota
                 </label>
-                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" disabled /><i></i> </label>
+                <label class="switch" style="margin-left: 20px;" data-cy="k8sNamespaceCreate-loadBalancerQuotaToggle"> <input type="checkbox" disabled /><i></i> </label>
                 <span class="text-muted small" style="margin-left: 15px;">
                   <i class="fa fa-user" aria-hidden="true"></i>
                   This feature is available in <a href="https://www.portainer.io/business-upsell?from=k8s-resourcepool-lbquota" target="_blank"> Portainer Business Edition</a>.
@@ -189,7 +195,7 @@
                 <label class="control-label text-left">
                   Enable quota
                 </label>
-                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" disabled /><i></i> </label>
+                <label class="switch" style="margin-left: 20px;" data-cy="k8sNamespaceCreate-enableQuotaToggle"> <input type="checkbox" disabled /><i></i> </label>
                 <span class="text-muted small" style="margin-left: 15px;">
                   <i class="fa fa-user" aria-hidden="true"></i>
                   This feature is available in
@@ -409,7 +415,7 @@
                   ng-click="$ctrl.createResourcePool()"
                   button-spinner="$ctrl.state.actionInProgress"
                 >
-                  <span ng-hide="$ctrl.state.actionInProgress">Create namespace</span>
+                  <span ng-hide="$ctrl.state.actionInProgress" data-cy="k8sNamespace-createNamespaceButton">Create namespace</span>
                   <span ng-show="$ctrl.state.actionInProgress">Creation in progress...</span>
                 </button>
               </div>
