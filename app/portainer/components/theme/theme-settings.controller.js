@@ -11,8 +11,16 @@ export default class ThemeSettingsController {
   }
 
   /** Theme Settings Panel */
-  setTheme(theme) {
-    this.ThemeManager.setTheme(theme);
+  setLightTheme() {
+    this.ThemeManager.setTheme(this.state.availableTheme.light);
+  }
+
+  setDarkTheme() {
+    this.ThemeManager.setTheme(this.state.availableTheme.dark);
+  }
+
+  setHighContrastTheme() {
+    this.ThemeManager.setTheme(this.state.availableTheme.highContrast);
   }
 
   async updateTheme() {
@@ -32,9 +40,15 @@ export default class ThemeSettingsController {
         userTheme: '',
       };
 
+      this.state.availableTheme = {
+        light: 'light',
+        dark: 'dark',
+        highContrast: 'highcontrast',
+      };
+
       this.state.userId = await this.Authentication.getUserDetails().ID;
       const data = await this.UserService.user(this.state.userId);
-      this.state.userTheme = data.UserTheme || 'light';
+      this.state.userTheme = data.UserTheme || this.state.availableTheme.light;
     });
   }
 }
