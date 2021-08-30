@@ -8,11 +8,6 @@ export default class ThemeSettingsController {
     this.StateManager = StateManager;
     this.UserService = UserService;
     this.Notifications = Notifications;
-
-    this.state = {
-      userId: null,
-      userTheme: '',
-    };
   }
 
   /** Theme Settings Panel */
@@ -32,6 +27,11 @@ export default class ThemeSettingsController {
 
   $onInit() {
     return this.$async(async () => {
+      this.state = {
+        userId: null,
+        userTheme: '',
+      };
+
       this.state.userId = await this.Authentication.getUserDetails().ID;
       const data = await this.UserService.user(this.state.userId);
       this.state.userTheme = data.UserTheme || 'light';
