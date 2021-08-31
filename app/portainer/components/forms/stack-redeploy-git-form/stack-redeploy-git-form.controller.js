@@ -1,4 +1,5 @@
 import uuidv4 from 'uuid/v4';
+
 class StackRedeployGitFormController {
   /* @ngInject */
   constructor($async, $state, StackService, ModalService, Notifications, WebhookHelper, FormHelper) {
@@ -15,6 +16,7 @@ class StackRedeployGitFormController {
       redeployInProgress: false,
       showConfig: false,
       isEdit: false,
+      hasUnsavedChanges: false,
     };
 
     this.formValues = {
@@ -34,11 +36,8 @@ class StackRedeployGitFormController {
 
     this.onChange = this.onChange.bind(this);
     this.onChangeRef = this.onChangeRef.bind(this);
-    this.handleEnvVarChange = this.handleEnvVarChange.bind(this);
-  }
-
-  onChangeRef(value) {
-    this.onChange({ RefName: value });
+    this.onChangeAutoUpdate = this.onChangeAutoUpdate.bind(this);
+    this.onChangeEnvVar = this.onChangeEnvVar.bind(this);
   }
 
   onChange(values) {
@@ -46,6 +45,25 @@ class StackRedeployGitFormController {
       ...this.formValues,
       ...values,
     };
+
+    this.state.hasUnsavedChanges = angular.toJson(this.savedFormValues) !== angular.toJson(this.formValues);
+  }
+
+  onChangeRef(value) {
+    this.onChange({ RefName: value });
+  }
+
+  onChangeAutoUpdate(values) {
+    this.onChange({
+      AutoUpdate: {
+        ...this.formValues.AutoUpdate,
+        ...values,
+      },
+    });
+  }
+
+  onChangeEnvVar(value) {
+    this.onChange({ Env: value });
   }
 
   async submit() {
@@ -83,6 +101,8 @@ class StackRedeployGitFormController {
       try {
         this.state.inProgress = true;
         await this.StackService.updateGitStackSettings(this.stack.Id, this.stack.EndpointId, this.FormHelper.removeInvalidEnvVars(this.formValues.Env), this.formValues);
+        this.savedFormValues = angular.copy(this.formValues);
+        this.state.hasUnsavedChanges = false;
         this.Notifications.success('Save stack settings successfully');
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to save stack settings');
@@ -94,10 +114,6 @@ class StackRedeployGitFormController {
 
   isSubmitButtonDisabled() {
     return this.state.inProgress || this.state.redeployInProgress;
-  }
-
-  handleEnvVarChange(value) {
-    this.formValues.Env = value;
   }
 
   $onInit() {
@@ -125,6 +141,8 @@ class StackRedeployGitFormController {
       this.formValues.RepositoryAuthentication = true;
       this.state.isEdit = true;
     }
+
+    this.savedFormValues = angular.copy(this.formValues);
   }
 }
 
