@@ -1,4 +1,3 @@
-import _ from 'lodash-es';
 import uuidv4 from 'uuid/v4';
 
 class StackRedeployGitFormController {
@@ -47,7 +46,7 @@ class StackRedeployGitFormController {
       ...values,
     };
 
-    this.state.hasUnsavedChanges = !_.isEqual(this.savedFormValues, this.formValues);
+    this.state.hasUnsavedChanges = angular.toJson(this.savedFormValues) !== angular.toJson(this.formValues);
   }
 
   onChangeRef(value) {
