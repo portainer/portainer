@@ -36,7 +36,6 @@ var errChartNameInvalid = errors.New("invalid chart name. " +
 // @security jwt
 // @accept json
 // @produce json
-// @param body installChartPayload true "EdgeGroup data when method is string"
 // @success 201 {object} helm.Release "Created"
 // @failure 401 "Unauthorized"
 // @failure 404 "Endpoint or ServiceAccount not found"
