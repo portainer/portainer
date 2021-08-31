@@ -11,35 +11,7 @@
   <rd-widget-body>
     <form class="theme-panel">
       <!-- Theme -->
-      <div class="boxselector_wrapper">
-        <div>
-          <input type="radio" id="light_theme" ng-model="$ctrl.state.userTheme" value="light" ng-click="$ctrl.setLightTheme()" />
-          <label for="light_theme">
-            <div class="boxselector_header">
-              Light Theme
-            </div>
-            <div><i class="fas fa-sun" style="font-size: 50px; padding: 20px;"></i></div>
-          </label>
-        </div>
-        <div>
-          <input type="radio" id="dark_theme" ng-model="$ctrl.state.userTheme" value="dark" ng-click="$ctrl.setDarkTheme()" />
-          <label for="dark_theme">
-            <div class="boxselector_header">
-              Dark Theme
-            </div>
-            <div><i class="fas fa-moon" style="font-size: 50px; padding: 20px;"></i></div>
-          </label>
-        </div>
-        <div>
-          <input type="radio" id="highcontrast_theme" ng-model="$ctrl.state.userTheme" value="highcontrast" ng-click="$ctrl.setHighContrastTheme()" />
-          <label for="highcontrast_theme">
-            <div class="boxselector_header">
-              High Contrast Theme
-            </div>
-            <div><i class="fas fa-adjust" style="font-size: 50px; padding: 20px;"></i></div>
-          </label>
-        </div>
-      </div>
+      <box-selector radio-name="theme" ng-model="$ctrl.state.userTheme" options="$ctrl.state.availableThemes" on-change="($ctrl.setTheme)"></box-selector>
       <button ng-click="$ctrl.updateTheme()" class="btn btn-primary btn-sm">Update theme</button>
       <!-- !Theme -->
     </form>

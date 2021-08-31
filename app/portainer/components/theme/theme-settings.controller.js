@@ -1,3 +1,5 @@
+import { buildOption } from '@/portainer/components/box-selector';
+
 export default class ThemeSettingsController {
   /* @ngInject */
   constructor($async, $state, Authentication, ThemeManager, StateManager, UserService, Notifications) {
@@ -8,24 +10,15 @@ export default class ThemeSettingsController {
     this.StateManager = StateManager;
     this.UserService = UserService;
     this.Notifications = Notifications;
+
+    this.setTheme = this.setTheme.bind(this);
   }
 
   /** Theme Settings Panel */
-  setLightTheme() {
-    this.ThemeManager.setTheme(this.state.availableTheme.light);
-  }
-
-  setDarkTheme() {
-    this.ThemeManager.setTheme(this.state.availableTheme.dark);
-  }
-
-  setHighContrastTheme() {
-    this.ThemeManager.setTheme(this.state.availableTheme.highContrast);
-  }
-
   async updateTheme() {
     try {
       await this.UserService.updateUserTheme(this.state.userId, this.state.userTheme);
+      this.state.themeInProgress = false;
       this.Notifications.success('Success', 'User theme successfully updated');
       this.$state.reload();
     } catch (err) {
@@ -33,12 +26,26 @@ export default class ThemeSettingsController {
     }
   }
 
+  setTheme(theme) {
+    this.ThemeManager.setTheme(theme);
+    this.state.themeInProgress = true;
+  }
+
   $onInit() {
     return this.$async(async () => {
       this.state = {
         userId: null,
         userTheme: '',
+        initTheme: '',
+        defaultTheme: 'light',
+        themeInProgress: false,
       };
+
+      this.state.availableThemes = [
+        buildOption('light', 'fas fa-sun', 'Light Theme', 'Default color mode', 'light'),
+        buildOption('dark', 'fas fa-moon', 'Dark Theme', 'Dark color mode', 'dark'),
+        buildOption('highcontrast', 'fas fa-adjust', 'High Contrast', 'High contrast color mode', 'highcontrast'),
+      ];
 
       this.state.availableTheme = {
         light: 'light',
@@ -49,10 +56,17 @@ export default class ThemeSettingsController {
       try {
         this.state.userId = await this.Authentication.getUserDetails().ID;
         const data = await this.UserService.user(this.state.userId);
-        this.state.userTheme = data.UserTheme || this.state.availableTheme.light;
+        this.state.userTheme = data.UserTheme || this.state.defaultTheme;
+        this.state.initTheme = this.state.userTheme;
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to get user details');
       }
     });
+  }
+
+  $onDestroy() {
+    if (this.state.themeInProgress) {
+      this.ThemeManager.setTheme(this.state.initTheme);
+    }
   }
 }
