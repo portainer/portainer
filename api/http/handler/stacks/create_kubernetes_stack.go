@@ -1,6 +1,7 @@
 package stacks
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
@@ -97,7 +98,12 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 	stackFolder := strconv.Itoa(int(stack.ID))
 	projectPath, err := handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist Kubernetes manifest file on disk", Err: err}
+		fileType := "Manifest"
+		if stack.IsComposeFormat {
+			fileType = "Compose"
+		}
+		errMsg := fmt.Sprintf("Unable to persist Kubernetes %s file on disk", fileType)
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: errMsg, Err: err}
 	}
 	stack.ProjectPath = projectPath
 

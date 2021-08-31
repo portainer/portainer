@@ -1,6 +1,7 @@
 package stacks
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -84,7 +85,12 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 	stackFolder := strconv.Itoa(int(stack.ID))
 	_, err = handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist Kubernetes manifest file on disk", Err: err}
+		fileType := "Manifest"
+		if stack.IsComposeFormat {
+			fileType = "Compose"
+		}
+		errMsg := fmt.Sprintf("Unable to persist Kubernetes %s file on disk", fileType)
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: errMsg, Err: err}
 	}
 
 	return nil
