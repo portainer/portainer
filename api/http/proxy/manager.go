@@ -48,10 +48,10 @@ func (manager *Manager) CreateAndRegisterEndpointProxy(endpoint *portainer.Endpo
 	return proxy, nil
 }
 
-// CreateComposeProxyServer creates a new HTTP reverse proxy based on endpoint properties and and adds it to the registered proxies.
+// CreateAgentProxyServer creates a new HTTP reverse proxy based on endpoint properties and and adds it to the registered proxies.
 // It can also be used to create a new HTTP reverse proxy and replace an already registered proxy.
-func (manager *Manager) CreateComposeProxyServer(endpoint *portainer.Endpoint) (*factory.ProxyServer, error) {
-	return manager.proxyFactory.NewDockerComposeAgentProxy(endpoint)
+func (manager *Manager) CreateAgentProxyServer(endpoint *portainer.Endpoint) (*factory.ProxyServer, error) {
+	return manager.proxyFactory.NewAgentProxy(endpoint)
 }
 
 // GetEndpointProxy returns the proxy associated to a key

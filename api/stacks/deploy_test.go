@@ -35,6 +35,10 @@ func (s *noopDeployer) DeployComposeStack(stack *portainer.Stack, endpoint *port
 	return nil
 }
 
+func (s *noopDeployer) DeployKubernetesStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+	return nil
+}
+
 func Test_redeployWhenChanged_FailsWhenCannotFindStack(t *testing.T) {
 	store, teardown := bolt.MustNewTestStore(true)
 	defer teardown()
@@ -136,12 +140,12 @@ func Test_redeployWhenChanged(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-	t.Run("can NOT deploy kube stack", func(t *testing.T) {
+	t.Run("can deploy kube app", func(t *testing.T) {
 		stack.Type = portainer.KubernetesStack
 		store.Stack().UpdateStack(stack.ID, &stack)
 
 		err = RedeployWhenChanged(1, &noopDeployer{}, store, &gitService{nil, "newHash"})
-		assert.EqualError(t, err, "cannot update stack, type 3 is unsupported")
+		assert.NoError(t, err)
 	})
 }
 

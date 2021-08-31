@@ -56,6 +56,34 @@ func (service *Service) GetTunnelDetails(endpointID portainer.EndpointID) *porta
 	}
 }
 
+func (service *Service) GetActiveTunnel(endpoint *portainer.Endpoint) (*portainer.TunnelDetails, error) {
+	tunnel := service.GetTunnelDetails(endpoint.ID)
+	if tunnel.Status != portainer.EdgeAgentIdle {
+		return tunnel, nil
+	}
+
+	err := service.SetTunnelStatusToRequired(endpoint.ID)
+	if err != nil {
+		return nil, fmt.Errorf("failed opening tunnel to endpoint: %w", err)
+	}
+
+	if endpoint.EdgeCheckinInterval == 0 {
+		settings, err := service.dataStore.Settings().Settings()
+		if err != nil {
+			return nil, fmt.Errorf("failed fetching settings from db: %w", err)
+		}
+
+		endpoint.EdgeCheckinInterval = settings.EdgeAgentCheckinInterval
+	}
+
+	waitForAgentToConnect := time.Duration(endpoint.EdgeCheckinInterval) * time.Second
+	time.Sleep(waitForAgentToConnect * 2)
+
+	tunnel = service.GetTunnelDetails(endpoint.ID)
+
+	return tunnel, nil
+}
+
 // SetTunnelStatusToActive update the status of the tunnel associated to the specified endpoint.
 // It sets the status to ACTIVE.
 func (service *Service) SetTunnelStatusToActive(endpointID portainer.EndpointID) {

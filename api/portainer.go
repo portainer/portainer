@@ -1235,7 +1235,7 @@ type (
 
 	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes endpoint
 	KubernetesDeployer interface {
-		Deploy(request *http.Request, endpoint *Endpoint, data string, namespace string) (string, error)
+		Deploy(request *http.Request, endpoint *Endpoint, manifestFiles []string, namespace string, deployAsAdmin bool) (string, error)
 		ConvertCompose(data []byte) ([]byte, error)
 	}
 
@@ -1284,6 +1284,7 @@ type (
 		SetTunnelStatusToRequired(endpointID EndpointID) error
 		SetTunnelStatusToIdle(endpointID EndpointID)
 		GetTunnelDetails(endpointID EndpointID) *TunnelDetails
+		GetActiveTunnel(endpoint *Endpoint) (*TunnelDetails, error)
 		AddEdgeJob(endpointID EndpointID, edgeJob *EdgeJob)
 		RemoveEdgeJob(edgeJobID EdgeJobID)
 	}
