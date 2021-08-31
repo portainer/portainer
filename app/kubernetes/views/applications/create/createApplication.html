@@ -1347,7 +1347,7 @@
                       class="form-control"
                       name="ingress_class_{{ $index }}"
                       ng-model="publishedPort.IngressName"
-                      ng-options="ingress.Name as ingress.Name for ingress in ctrl.filteredIngresses"
+                      ng-options="ingress.Name as ingress.Name for ingress in ctrl.ingresses"
                       ng-required="!publishedPort.NeedsDeletion"
                       ng-change="ctrl.onChangePortMappingIngress($index)"
                       ng-disabled="ctrl.disableLoadBalancerEdit() || ctrl.isEditAndNotNewPublishedPort($index)"

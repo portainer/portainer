@@ -18,15 +18,10 @@ func getPortainerUserDefaultPolicies() []rbacv1.PolicyRule {
 			Resources: []string{"storageclasses"},
 			APIGroups: []string{"storage.k8s.io"},
 		},
-		{
-			Verbs:     []string{"list"},
-			Resources: []string{"ingresses"},
-			APIGroups: []string{"networking.k8s.io"},
-		},
 	}
 }
 
-func (kcl *KubeClient) createPortainerUserClusterRole() error {
+func (kcl *KubeClient) upsertPortainerK8sClusterRoles() error {
 	clusterRole := &rbacv1.ClusterRole{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: portainerUserCRName,
@@ -35,8 +30,13 @@ func (kcl *KubeClient) createPortainerUserClusterRole() error {
 	}
 
 	_, err := kcl.cli.RbacV1().ClusterRoles().Create(clusterRole)
-	if err != nil && !k8serrors.IsAlreadyExists(err) {
-		return err
+	if err != nil  {
+		if k8serrors.IsAlreadyExists(err) {
+			_, err = kcl.cli.RbacV1().ClusterRoles().Update(clusterRole)
+		}
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
