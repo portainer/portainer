@@ -1,372 +1,466 @@
+/* Color Variable */
+html {
+  --black-color: #000;
+  --white-color: #fff;
+
+  --grey-1: #212121;
+  --grey-2: #181818;
+  --grey-3: #383838;
+  --grey-4: #585858;
+  --grey-5: #323c48;
+  --grey-6: #333333;
+  --grey-7: #767676;
+  --grey-8: #aaa;
+  --grey-9: #f3f3f3;
+  --grey-10: #f6f6f6;
+  --grey-11: #eeeeee;
+  --grey-12: #ececec;
+  --grey-13: #fafafa;
+  --grey-14: #f5f5f5;
+  --grey-15: #f9f2f4;
+  --grey-16: #eee;
+  --grey-17: #f7f7f7;
+  --grey-18: #c5cae9;
+  --grey-19: #ddd;
+  --grey-20: #dae3f3;
+  --grey-21: #d5e8f3;
+  --grey-22: #c3c3e4;
+  --grey-23: #e7f6ff;
+  --grey-24: #f1f9fd;
+  --grey-25: #555555;
+  --grey-26: #777777;
+  --grey-27: #4e4e4e;
+  --grey-28: #262626;
+  --grey-29: #555;
+  --grey-30: #444;
+  --grey-31: #868686;
+  --grey-32: #65798e;
+  --grey-34: #314252;
+  --grey-35: #546477;
+  --grey-36: #55637d;
+  --grey-37: #2d3e63;
+  --grey-38: #434343;
+  --grey-39: #194973;
+  --grey-40: #cfddfc;
+  --grey-41: #b4b4b4;
+  --grey-42: #d2d1d1;
+  --grey-43: #e9e9e9;
+  --grey-44: #ccc;
+  --grey-45: #e5e5e5;
+  --grey-46: #bbbbbb;
+  --grey-47: #d4d4d5;
+  --grey-48: #c6c6c6;
+
+  --grey-49: rgba(0, 0, 0, 0.54);
+  --grey-50: rgba(161, 170, 166, 0.5);
+  --grey-51: rgba(0, 0, 0, 0.15);
+  --grey-52: rgba(255, 255, 255, 0.3);
+  --grey-53: rgba(255, 255, 255, 0.6);
+  --grey-54: rgb(54, 54, 54);
+  --grey-55: rgba(255, 255, 255, 0.8);
+  --grey-56: #b2bfdc;
+
+  --blue-1: #219;
+  --blue-2: #337ab7;
+  --blue-3: #738bc0;
+  --blue-4: #23527c;
+  --blue-5: #30426a;
+  --blue-6: #577bc9;
+  --blue-7: #6b9aff;
+  --blue-8: #90ccff;
+  --blue-9: #3ea6ff;
+  --blue-10: #61b6ff;
+  --blue-11: #3ea5ff;
+  --blue-12: #41a6ff;
+  --blue-13: #2361ae;
+
+  --red-color-1: #a94442;
+  --red-color-2: #c7254e;
+  --red-color-3: #a11;
+  --red-color-4: #d9534f;
+  --red-color-5: #ff2727;
+  --red-color-6: #ff00e0;
+  --red-color-7: #f00;
+
+  --green-1: #164;
+  --green-2: #1ec863;
+}
+
 :root {
-  --bg-card-color: #f6f6f6;
-  --bg-main-color: #fff;
-  --bg-body-color: #f3f3f3;
-  --bg-checkbox-border-color: rgba(0, 0, 0, 0.54);
-  --bg-sidebar-color: #2d3e63;
-  --bg-sidebar-header-color: #2d3e63;
-  --bg-widget-color: #ffffff;
-  --bg-widget-header-color: #f6f6f6;
-  --bg-widget-table-color: #fafafa;
-  --bg-header-color: #fff;
-  --bg-hover-table-color: #f5f5f5;
-  --bg-switch-box-color: #ffffff;
-  --bg-input-group-addon-color: #eeeeee;
-  --bg-btn-default-color: #fff;
-  --bg-blocklist-hover-color: #ececec;
-  --bg-boxselector-color: #fff;
-  --bg-table-color: #fff;
-  --bg-md-checkbox-color: #ececec;
-  --bg-form-control-disabled-color: #eeeeee;
-  --bg-modal-content-color: #fff;
-  --bg-code-color: #f9f2f4;
-  --bg-navtabs-color: #fff;
-  --bg-navtabs-hover-color: #eee;
-  --bg-table-selected-color: #f5f5f5;
-  --bg-codemirror-gutters-color: #f7f7f7;
-  --bg-dropdown-menu-color: #fff;
-  --bg-log-viewer-color: #fff;
-  --bg-log-line-selected-color: #c5cae9;
-  --bg-pre-color: #f5f5f5;
-  --bg-blocklist-item-selected-color: #ececec;
-  --bg-progress-color: #f5f5f5;
-  --bg-pagination-color: #fff;
-  --bg-pagination-span-color: #fff;
-  --bg-pagination-hover-color: #eeeeee;
-  --bg-ui-select-hover-color: #f5f5f5;
-  --bg-motd-body-color: #dae3f3;
-  --bg-item-highlighted-color: #d5e8f3;
-  --bg-item-highlighted-null-color: #f5f5f5;
-  --bg-row-header-color: #fff;
-  --bg-image-multiselect-button: linear-gradient(#fff, #f7f7f7);
-  --bg-multiselect-checkbox-color: #fff;
-  --bg-sidebar-wrapper-color: #30426a;
-  --bg-panel-body-color: #fff;
-  --bg-codemirror-color: #fff;
-  --bg-codemirror-selected-color: #c3c3e4;
+  --bg-card-color: var(--grey-10);
+  --bg-main-color: var(--white-color);
+  --bg-body-color: var(--grey-9);
+  --bg-checkbox-border-color: var(--grey-49);
+  --bg-sidebar-color: var(--grey-37);
+  --bg-sidebar-header-color: var(--grey-37);
+  --bg-widget-color: var(--white-color);
+  --bg-widget-header-color: var(--grey-10);
+  --bg-widget-table-color: var(--grey-13);
+  --bg-header-color: var(--white-color);
+  --bg-hover-table-color: var(--grey-14);
+  --bg-switch-box-color: var(--white-color);
+  --bg-input-group-addon-color: var(--grey-11);
+  --bg-btn-default-color: var(--white-color);
+  --bg-blocklist-hover-color: var(--grey-12);
+  --bg-boxselector-color: var(--white-color);
+  --bg-table-color: var(--white-color);
+  --bg-md-checkbox-color: var(--grey-12);
+  --bg-form-control-disabled-color: var(--grey-11);
+  --bg-modal-content-color: var(--white-color);
+  --bg-code-color: var(--grey-15);
+  --bg-navtabs-color: var(--white-color);
+  --bg-navtabs-hover-color: var(--grey-16);
+  --bg-table-selected-color: var(--grey-14);
+  --bg-codemirror-gutters-color: var(--grey-17);
+  --bg-dropdown-menu-color: var(--white-color);
+  --bg-log-viewer-color: var(--white-color);
+  --bg-log-line-selected-color: var(--grey-18);
+  --bg-pre-color: var(--grey-14);
+  --bg-blocklist-item-selected-color: var(--grey-12);
+  --bg-progress-color: var(--grey-14);
+  --bg-pagination-color: var(--white-color);
+  --bg-pagination-span-color: var(--white-color);
+  --bg-pagination-hover-color: var(--grey-11);
+  --bg-ui-select-hover-color: var(--grey-14);
+  --bg-motd-body-color: var(--grey-20);
+  --bg-item-highlighted-color: var(--grey-21);
+  --bg-item-highlighted-null-color: var(--grey-14);
+  --bg-row-header-color: var(--white-color);
+  --bg-image-multiselect-button: linear-gradient(var(--white-color), var(--grey-17));
+  --bg-multiselect-checkbox-color: var(--white-color);
+  --bg-sidebar-wrapper-color: var(--blue-5);
+  --bg-panel-body-color: var(--white-color);
+  --bg-codemirror-color: var(--white-color);
+  --bg-codemirror-selected-color: var(--grey-22);
 
-  --text-main-color: #767676;
-  --text-body-color: #333333;
-  --text-sidebar-title-color: #738bc0;
-  --text-widget-header-color: #767676;
-  --text-form-control-color: #555555;
-  --text-muted-color: #777777;
-  --text-link-color: #337ab7;
-  --text-link-hover-color: #23527c;
-  --text-input-group-addon-color: #555555;
-  --text-btn-default-color: #333;
-  --text-blocklist-hover-color: #2d3e63;
-  --text-dashboard-item-color: #65798e;
-  --text-danger-color: #a94442;
-  --text-code-color: #c7254e;
-  --text-navtabs-color: #555555;
-  --text-form-section-title-color: #777;
-  --text-cm-default-color: #219;
-  --text-cm-meta-color: #000;
-  --text-cm-string-color: #a11;
-  --text-cm-number-color: #164;
-  --text-codemirror-color: #000;
-  --text-dropdown-menu-color: #333333;
-  --text-log-viewer-color: #000;
-  --text-json-tree-color: #738bc0;
-  --text-json-tree-leaf-color: #30426a;
-  --text-json-tree-branch-preview-color: #30426a;
-  --text-pre-color: #333333;
-  --text-blocklist-item-selected-color: #2d3e63;
-  --text-progress-bar-color: #4e4e4e;
-  --text-pagination-color: #777777;
-  --text-pagination-span-color: #337ab7;
-  --text-pagination-span-hover-color: #23527c;
-  --text-ui-select-color: #333;
-  --text-ui-select-hover-color: #262626;
-  --text-summary-color: #000;
-  --text-multiselect-button-color: #555;
-  --text-multiselect-item-color: #444;
-  --text-sidebar-list-color: #b2bfdc;
+  --text-main-color: var(--grey-7);
+  --text-body-color: var(--grey-6);
+  --text-sidebar-title-color: var(--blue-3);
+  --text-widget-header-color: var(--grey-7);
+  --text-form-control-color: var(--grey-25);
+  --text-muted-color: var(--grey-26);
+  --text-link-color: var(--blue-2);
+  --text-link-hover-color: var(--blue-4);
+  --text-input-group-addon-color: var(--grey-25);
+  --text-btn-default-color: var(--grey-6);
+  --text-blocklist-hover-color: var(--grey-37);
+  --text-dashboard-item-color: var(--grey-32);
+  --text-danger-color: var(--red-color-1);
+  --text-code-color: var(--red-color-2);
+  --text-navtabs-color: var(--grey-25);
+  --text-form-section-title-color: var(--grey-26);
+  --text-cm-default-color: var(--blue-1);
+  --text-cm-meta-color: var(--black-color);
+  --text-cm-string-color: var(--red-color-3);
+  --text-cm-number-color: var(--green-1);
+  --text-codemirror-color: var(--black-color);
+  --text-dropdown-menu-color: var(--grey-6);
+  --text-log-viewer-color: var(--black-color);
+  --text-json-tree-color: var(--blue-3);
+  --text-json-tree-leaf-color: var(--blue-5);
+  --text-json-tree-branch-preview-color: var(--blue-5);
+  --text-pre-color: var(--grey-6);
+  --text-blocklist-item-selected-color: var(--grey-37);
+  --text-progress-bar-color: var(--grey-27);
+  --text-pagination-color: var(--grey-26);
+  --text-pagination-span-color: var(--blue-2);
+  --text-pagination-span-hover-color: var(--blue-4);
+  --text-ui-select-color: var(--grey-6);
+  --text-ui-select-hover-color: var(--grey-28);
+  --text-summary-color: var(--black-color);
+  --text-multiselect-button-color: var(--grey-29);
+  --text-multiselect-item-color: var(--grey-30);
+  --text-sidebar-list-color: var(--grey-56);
+  --text-rzslider-color: var(--grey-36);
+  --text-rzslider-limit-color: var(--grey-36);
 
-  --border-color: #d2d1d1;
-  --border-widget-color: #e9e9e9;
-  --border-sidebar-color: #ffffff;
-  --border-form-control-color: #ccc;
-  --border-table-color: #ddd;
-  --border-table-top-color: #ddd;
-  --border-datatable-top-color: #f6f6f6;
-  --border-blocklist-color: #cccccc;
-  --border-input-group-addon-color: #ccc;
-  --border-btn-default-color: #ccc;
-  --border-boxselector-color: #333333;
-  --border-md-checkbox-color: #ddd;
-  --border-modal-header-color: #e5e5e5;
-  --border-navtabs-color: #ddd;
-  --border-form-section-title-color: #777;
-  --border-codemirror-cursor-color: #000;
-  --border-codemirror-gutters-color: #ddd;
-  --border-pre-color: #e9e9e9;
-  --border-blocklist-item-selected-color: #bbbbbb;
-  --border-pagination-color: #ddd;
-  --border-pagination-span-color: #ddd;
-  --border-pagination-hover-color: #ddd;
-  --border-multiselect-button-color: #c6c6c6;
-  --border-searchbar-color: #f6f6f6;
-  --border-panel-color: #fff;
+  --border-color: var(--grey-42);
+  --border-widget-color: var(--grey-43);
+  --border-sidebar-color: var(--white-color);
+  --border-form-control-color: var(--grey-44);
+  --border-table-color: var(--grey-19);
+  --border-table-top-color: var(--grey-19);
+  --border-datatable-top-color: var(--grey-10);
+  --border-blocklist-color: var(--grey-44) ccc;
+  --border-input-group-addon-color: var(--grey-44);
+  --border-btn-default-color: var(--grey-44);
+  --border-boxselector-color: var(--grey-6);
+  --border-md-checkbox-color: var(--grey-19);
+  --border-modal-header-color: var(--grey-45);
+  --border-navtabs-color: var(--grey-19);
+  --border-form-section-title-color: var(--grey-26);
+  --border-codemirror-cursor-color: var(--black-color);
+  --border-codemirror-gutters-color: var(--grey-19);
+  --border-pre-color: var(--grey-43);
+  --border-blocklist-item-selected-color: var(--grey-46);
+  --border-pagination-color: var(--grey-19);
+  --border-pagination-span-color: var(--grey-19);
+  --border-pagination-hover-color: var(--grey-19);
+  --border-multiselect-button-color: var(--grey-48);
+  --border-searchbar-color: var(--grey-10);
+  --border-panel-color: var(--white-color);
 
-  --hover-sidebar-color: #2d3e63;
-  --shadow-box-color: 0 3px 10px -2px rgba(161, 170, 166, 0.5);
-  --shadow-boxselector-color: 0 3px 10px -2px rgba(161, 170, 166, 0.5);
-  --blue-color: #2361ae;
-  --button-close-color: #000;
+  --hover-sidebar-color: var(--grey-37);
+  --shadow-box-color: 0 3px 10px -2px var(--grey-50);
+  --shadow-boxselector-color: 0 3px 10px -2px var(--grey-50);
+  --blue-color: var(--blue-13);
+  --button-close-color: var(--black-color);
   --button-opacity: 0.2;
   --button-opacity-hover: 0.5;
-  --bg-boxselector-wrapper-color: #333333;
+  --bg-boxselector-wrapper-color: var(--grey-6);
 
-  --bg-image-multiselect: linear-gradient(#337ab7, #337ab7);
-  --bg-image-multiselect-button: linear-gradient(#fff, #f7f7f7);
-  --bg-image-multiselect-hover: linear-gradient(#fff, #e9e9e9);
-  --border-multiselect: #c6c6c6;
-  --border-multiselect-checkboxlayer: rgba(0, 0, 0, 0.15);
-  --text-multiselect: #555;
-  --text-multiselect-selectitem: #fff;
-  --bg-multiselect-checkboxcontainer: #fff;
-  --text-multiselect-item: #444;
-  --bg-multiselect-helpercontainer: #fff;
-  --text-input-textarea: #fff;
-  --bg-service-datatable-thead: #e7f6ff;
-  --bg-service-datatable-tbody: #f1f9fd;
+  --bg-image-multiselect: linear-gradient(var(--blue-2), var(--blue-2));
+  --bg-image-multiselect-button: linear-gradient(var(--white-color), var(--grey-17));
+  --bg-image-multiselect-hover: linear-gradient(var(--white-color), var(--grey-43));
+  --border-multiselect: var(--grey-48);
+  --border-multiselect-checkboxlayer: var(--grey-51);
+  --text-multiselect: var(--grey-29);
+  --text-multiselect-selectitem: var(--white-color);
+  --bg-multiselect-checkboxcontainer: var(--white-color);
+  --text-multiselect-item: var(--grey-30);
+  --bg-multiselect-helpercontainer: var(--white-color);
+  --text-input-textarea: var(--white-color);
+  --bg-service-datatable-thead: var(--grey-23);
+  --bg-service-datatable-tbody: var(--grey-24);
 }
 
 :root[theme='dark'] {
-  --bg-card-color: #212121;
-  --bg-main-color: #181818;
-  --bg-body-color: #181818;
-  --bg-checkbox-border-color: #aaa;
-  --bg-sidebar-color: #383838;
-  --bg-widget-color: #212121;
-  --bg-widget-header-color: #212121;
-  --bg-widget-table-color: #212121;
-  --bg-header-color: #181818;
-  --bg-hover-table-color: #383838;
-  --bg-switch-box-color: rgba(255, 255, 255, 0.6);
-  --bg-input-group-addon-color: #383838;
-  --bg-btn-default-color: #383838;
-  --bg-blocklist-hover-color: #383838;
-  --bg-boxselector-color: rgba(255, 255, 255, 0.3);
-  --bg-table-color: #212121;
-  --bg-md-checkbox-color: #868686;
-  --bg-form-control-disabled-color: #383838;
-  --bg-modal-content-color: #212121;
-  --bg-code-color: #d9534f;
-  --bg-navtabs-color: #383838;
-  --bg-navtabs-hover-color: #383838;
-  --bg-table-selected-color: #383838;
-  --bg-codemirror-color: #181818;
-  --bg-codemirror-gutters-color: #181818;
-  --bg-dropdown-menu-color: #212121;
-  --bg-log-viewer-color: #181818;
-  --bg-log-line-selected-color: #383838;
-  --bg-pre-color: #181818;
-  --bg-blocklist-item-selected-color: #383838;
-  --bg-progress-color: #383838;
-  --bg-pagination-color: #383838;
-  --bg-pagination-span-color: #383838;
-  --bg-pagination-hover-color: #585858;
-  --bg-ui-select-hover-color: #383838;
-  --bg-motd-body-color: #212121;
-  --bg-item-highlighted-color: #181818;
-  --bg-item-highlighted-null-color: #181818;
-  --bg-row-header-color: #181818;
-  --bg-multiselect-button-color: #383838;
+  --bg-card-color: var(--grey-1);
+  --bg-main-color: var(--grey-2);
+  --bg-body-color: var(--grey-2);
+  --bg-checkbox-border-color: var(--grey-8);
+  --bg-sidebar-color: var(--grey-3);
+  --bg-widget-color: var(--grey-1);
+  --bg-widget-header-color: var(--grey-1);
+  --bg-widget-table-color: var(--grey-1);
+  --bg-header-color: var(--grey-2);
+  --bg-hover-table-color: var(--grey-3);
+  --bg-switch-box-color: var(--grey-53);
+  --bg-input-group-addon-color: var(--grey-3);
+  --bg-btn-default-color: var(--grey-3);
+  --bg-blocklist-hover-color: var(--grey-3);
+  --bg-boxselector-color: var(--grey-52);
+  --bg-table-color: var(--grey-1);
+  --bg-md-checkbox-color: var(--grey-31);
+  --bg-form-control-disabled-color: var(--grey-3);
+  --bg-modal-content-color: var(--grey-1);
+  --bg-code-color: var(--red-color-4);
+  --bg-navtabs-color: var(--grey-3);
+  --bg-navtabs-hover-color: var(--grey-3);
+  --bg-table-selected-color: var(--grey-3);
+  --bg-codemirror-color: var(--grey-2);
+  --bg-codemirror-gutters-color: var(--grey-2);
+  --bg-dropdown-menu-color: var(--grey-1);
+  --bg-log-viewer-color: var(--grey-2);
+  --bg-log-line-selected-color: var(--grey-3);
+  --bg-pre-color: var(--grey-2);
+  --bg-blocklist-item-selected-color: var(--grey-3);
+  --bg-progress-color: var(--grey-3);
+  --bg-pagination-color: var(--grey-3);
+  --bg-pagination-span-color: var(--grey-3);
+  --bg-pagination-hover-color: var(--grey-4);
+  --bg-ui-select-hover-color: var(--grey-3);
+  --bg-motd-body-color: var(--grey-1);
+  --bg-item-highlighted-color: var(--grey-2);
+  --bg-item-highlighted-null-color: var(--grey-2);
+  --bg-row-header-color: var(--grey-2);
+  --bg-multiselect-button-color: var(--grey-3);
   --bg-image-multiselect-button: none !important;
-  --bg-multiselect-checkbox-color: #383838;
-  --bg-sidebar-wrapper-color: #212121;
-  --bg-panel-body-color: #212121;
-  --bg-boxselector-wrapper-disabled-color: #194973;
-  --bg-codemirror-selected-color: #383838;
-  --bg-sidebar-header-color: #212121;
+  --bg-multiselect-checkbox-color: var(--grey-3);
+  --bg-sidebar-wrapper-color: var(--grey-1);
+  --bg-panel-body-color: var(--grey-1);
+  --bg-boxselector-wrapper-disabled-color: var(--grey-39);
+  --bg-codemirror-selected-color: var(--grey-3);
+  --bg-sidebar-header-color: var(--grey-1);
 
-  --text-main-color: #fff;
-  --text-body-color: #fff;
-  --text-sidebar-title-color: #aaa;
-  --text-widget-header-color: #ffffff;
-  --text-form-control-color: #aaa;
-  --text-muted-color: #aaa;
-  --text-link-color: #3ea6ff;
-  --text-link-hover-color: #337ab7;
-  --text-input-group-addon-color: #aaa;
-  --text-btn-default-color: #aaa;
-  --text-blocklist-hover-color: #fff;
-  --text-dashboard-item-color: #337ab7;
-  --text-danger-color: #d9534f;
-  --text-code-color: #fff;
-  --text-navtabs-color: #ffffff;
-  --text-form-section-title-color: #aaa;
-  --text-cm-default-color: #61b6ff;
-  --text-cm-meta-color: #fff;
-  --text-cm-string-color: #ff2727;
-  --text-cm-number-color: #1ec863;
-  --text-codemirror-color: #fff;
-  --text-dropdown-menu-color: #fff;
-  --text-log-viewer-color: #fff;
-  --text-json-tree-color: #cfddfc;
-  --text-json-tree-leaf-color: #577bc9;
-  --text-json-tree-branch-preview-color: #6b9aff;
-  --text-pre-color: #fff;
-  --text-blocklist-item-selected-color: #fff;
-  --text-progress-bar-color: #fff;
-  --text-pagination-color: #fff;
-  --text-pagination-span-color: #fff;
-  --text-pagination-span-hover-color: #fff;
-  --text-ui-select-color: #fff;
-  --text-ui-select-hover-color: #fff;
-  --text-summary-color: #fff;
-  --text-multiselect-button-color: #fff;
-  --text-multiselect-item-color: #fff;
-  --text-sidebar-list-color: #fff;
-  --text-boxselector-wrapper-color: #fff;
+  --text-main-color: var(--white-color);
+  --text-body-color: var(--white-color);
+  --text-sidebar-title-color: var(--grey-8);
+  --text-widget-header-color: var(--white-color);
+  --text-form-control-color: var(--grey-8);
+  --text-muted-color: var(--grey-8);
+  --text-link-color: var(--blue-9);
+  --text-link-hover-color: var(--blue-2);
+  --text-input-group-addon-color: var(--grey-8);
+  --text-btn-default-color: var(--grey-8);
+  --text-blocklist-hover-color: var(--white-color);
+  --text-dashboard-item-color: var(--blue-2);
+  --text-danger-color: var(--red-color-4);
+  --text-code-color: var(--white-color);
+  --text-navtabs-color: var(--white-color);
+  --text-form-section-title-color: var(--grey-8);
+  --text-cm-default-color: var(--blue-10);
+  --text-cm-meta-color: var(--white-color);
+  --text-cm-string-color: var(--red-color-5);
+  --text-cm-number-color: var(--green-2);
+  --text-codemirror-color: var(--white-color);
+  --text-dropdown-menu-color: var(--white-color);
+  --text-log-viewer-color: var(--white-color);
+  --text-json-tree-color: var(--grey-40);
+  --text-json-tree-leaf-color: var(--blue-6);
+  --text-json-tree-branch-preview-color: var(--blue-7);
+  --text-pre-color: var(--white-color);
+  --text-blocklist-item-selected-color: var(--white-color);
+  --text-progress-bar-color: var(--white-color);
+  --text-pagination-color: var(--white-color);
+  --text-pagination-span-color: var(--white-color);
+  --text-pagination-span-hover-color: var(--white-color);
+  --text-ui-select-color: var(--white-color);
+  --text-ui-select-hover-color: var(--white-color);
+  --text-summary-color: var(--white-color);
+  --text-multiselect-button-color: var(--white-color);
+  --text-multiselect-item-color: var(--white-color);
+  --text-sidebar-list-color: var(--white-color);
+  --text-boxselector-wrapper-color: var(--white-color);
 
-  --border-color: #383838;
-  --border-widget-color: #212121;
-  --border-sidebar-color: #3ea6ff;
-  --border-form-control-color: rgb(54, 54, 54);
-  --border-table-color: #383838;
-  --border-table-top-color: #383838;
-  --border-datatable-top-color: #383838;
-  --border-blocklist-color: #383838;
-  --border-input-group-addon-color: #434343;
-  --border-btn-default-color: #434343;
-  --border-boxselector-color: #212121;
-  --border-md-checkbox-color: #b4b4b4;
-  --border-modal-header-color: #212121;
-  --border-navtabs-color: #434343;
-  --border-form-section-title-color: #aaa;
-  --border-codemirror-cursor-color: #fff;
-  --border-codemirror-gutters-color: #777;
-  --border-pre-color: #383838;
-  --border-blocklist-item-selected-color: #434343;
-  --border-pagination-color: #383838;
-  --border-pagination-span-color: #383838;
-  --border-pagination-hover-color: #383838;
-  --border-pagination-hover-color: #383838;
-  --border-multiselect-button-color: #383838;
-  --border-searchbar-color: #212121;
-  --border-panel-color: #181818;
+  --border-color: var(--grey-3);
+  --border-widget-color: var(--grey-1);
+  --border-sidebar-color: var(--blue-9);
+  --border-form-control-color: var(--grey-54);
+  --border-table-color: var(--grey-3);
+  --border-table-top-color: var(--grey-3);
+  --border-datatable-top-color: var(--grey-3);
+  --border-blocklist-color: var(--grey-3);
+  --border-input-group-addon-color: var(--grey-38);
+  --border-btn-default-color: var(--grey-38);
+  --border-boxselector-color: var(--grey-1);
+  --border-md-checkbox-color: var(--grey-41);
+  --border-modal-header-color: var(--grey-1);
+  --border-navtabs-color: var(--grey-38);
+  --border-form-section-title-color: var(--grey-8);
+  --border-codemirror-cursor-color: var(--white-color);
+  --border-codemirror-gutters-color: var(--grey-26);
+  --border-pre-color: var(--grey-3);
+  --border-blocklist-item-selected-color: var(--grey-38);
+  --border-pagination-color: var(--grey-3);
+  --border-pagination-span-color: var(--grey-3);
+  --border-pagination-hover-color: var(--grey-3);
+  --border-pagination-hover-color: var(--grey-3);
+  --border-multiselect-button-color: var(--grey-3);
+  --border-searchbar-color: var(--grey-1);
+  --border-panel-color: var(--grey-2);
 
-  --hover-sidebar-color: #383838;
-  --blue-color: #337ab7;
-  --button-close-color: #fff;
+  --hover-sidebar-color: var(--grey-3);
+  --blue-color: var(--blue-2);
+  --button-close-color: var(--white-color);
   --button-opacity: 0.6;
   --button-opacity-hover: 0.3;
   --shadow-box-color: none;
   --shadow-boxselector-color: none;
 
-  --bg-image-multiselect: linear-gradient(#434343, #434343);
-  --bg-image-multiselect-button: linear-gradient(#212121, #212121);
-  --bg-image-multiselect-hover: linear-gradient(#383838, #383838);
-  --border-multiselect: #383838;
-  --border-multiselect-checkboxlayer: #383838;
-  --text-multiselect: #fff;
-  --bg-multiselect-checkboxcontainer: #383838;
-  --text-multiselect-item: #fff;
-  --bg-multiselect-helpercontainer: #212121;
-  --text-input-textarea: #212121;
-  --bg-service-datatable-thead: #212121;
-  --bg-service-datatable-tbody: #212121;
+  --bg-image-multiselect: linear-gradient(var(--grey-38), var(--grey-38));
+  --bg-image-multiselect-button: linear-gradient(var(--grey-1), var(--grey-1));
+  --bg-image-multiselect-hover: linear-gradient(var(--grey-3), var(--grey-3));
+  --border-multiselect: var(--grey-3);
+  --border-multiselect-checkboxlayer: var(--grey-3);
+  --text-multiselect: var(--white-color);
+  --bg-multiselect-checkboxcontainer: var(--grey-3);
+  --text-multiselect-item: var(--white-color);
+  --bg-multiselect-helpercontainer: var(--grey-1);
+  --text-input-textarea: var(--grey-1);
+  --bg-service-datatable-thead: var(--grey-1);
+  --bg-service-datatable-tbody: var(--grey-1);
 }
 
 :root[theme='highcontrast'] {
-  --bg-card-color: #000;
-  --bg-main-color: #000;
-  --bg-body-color: #000;
-  --bg-checkbox-border-color: #aaa;
-  --bg-sidebar-color: #000;
-  --bg-widget-color: #000;
-  --bg-widget-header-color: #000;
-  --bg-widget-table-color: #000;
-  --bg-header-color: #000;
-  --bg-hover-table-color: #383838;
-  --bg-switch-box-color: rgba(255, 255, 255, 0.6);
-  --bg-panel-body-color: #000;
-  --bg-boxselector-wrapper-disabled-color: #194973;
-  --bg-dropdown-menu-color: #000;
-  --bg-codemirror-selected-color: #383838;
-  --bg-row-header-color: #000;
-  --bg-sidebar-wrapper-color: #000;
-  --bg-motd-body-color: #000;
-  --bg-blocklist-hover-color: #000;
-  --bg-blocklist-item-selected-color: #000;
-  --bg-input-group-addon-color: #000;
-  --bg-table-color: #000;
-  --bg-codemirror-gutters-color: #000;
-  --bg-codemirror-color: #000;
-  --bg-codemirror-selected-color: #383838;
-  --bg-log-viewer-color: #000;
-  --bg-log-line-selected-color: #383838;
-  --bg-sidebar-header-color: #000;
+  --bg-card-color: var(--black-color);
+  --bg-main-color: var(--black-color);
+  --bg-body-color: var(--black-color);
+  --bg-checkbox-border-color: var(--grey-8);
+  --bg-sidebar-color: var(--black-color);
+  --bg-widget-color: var(--black-color);
+  --bg-widget-header-color: var(--black-color);
+  --bg-widget-table-color: var(--black-color);
+  --bg-header-color: var(--black-color);
+  --bg-hover-table-color: var(--grey-3);
+  --bg-switch-box-color: var(--grey-53);
+  --bg-panel-body-color: var(--black-color);
+  --bg-boxselector-wrapper-disabled-color: var(--grey-39);
+  --bg-dropdown-menu-color: var(--black-color);
+  --bg-codemirror-selected-color: var(--grey-3);
+  --bg-row-header-color: var(--black-color);
+  --bg-sidebar-wrapper-color: var(--black-color);
+  --bg-motd-body-color: var(--black-color);
+  --bg-blocklist-hover-color: var(--black-color);
+  --bg-blocklist-item-selected-color: var(--black-color);
+  --bg-input-group-addon-color: var(--black-color);
+  --bg-table-color: var(--black-color);
+  --bg-codemirror-gutters-color: var(--black-color);
+  --bg-codemirror-color: var(--black-color);
+  --bg-codemirror-selected-color: var(--grey-3);
+  --bg-log-viewer-color: var(--black-color);
+  --bg-log-line-selected-color: var(--grey-3);
+  --bg-sidebar-header-color: var(--black-color);
 
-  --text-main-color: #fff;
-  --text-body-color: #fff;
-  --text-sidebar-title-color: #aaa;
-  --text-widget-header-color: #ffffff;
-  --text-link-color: #3ea6ff;
-  --text-link-hover-color: #3ea6ff;
-  --text-danger-color: #ff00e0;
-  --text-code-color: #000;
-  --text-form-control-color: #fff;
-  --text-blocklist-hover-color: #3ea5ff;
-  --text-boxselector-wrapper-color: #fff;
-  --text-dashboard-item-color: #41a6ff;
-  --text-form-section-title-color: #fff;
-  --text-muted-color: #fff;
-  --text-tooltip-color: #fff;
-  --text-blocklist-item-selected-color: #3ea6ff;
-  --text-input-group-addon-color: #fff;
-  --text-sidebar-list-color: #fff;
-  --text-codemirror-color: #fff;
-  --text-log-viewer-color: #fff;
+  --text-main-color: var(--white-color);
+  --text-body-color: var(--white-color);
+  --text-sidebar-title-color: var(--grey-8);
+  --text-widget-header-color: var(--white-color);
+  --text-link-color: var(--blue-9);
+  --text-link-hover-color: var(--blue-9);
+  --text-danger-color: var(--red-color-6);
+  --text-code-color: var(--black-color);
+  --text-form-control-color: var(--white-color);
+  --text-blocklist-hover-color: var(--blue-11);
+  --text-boxselector-wrapper-color: var(--white-color);
+  --text-dashboard-item-color: var(--blue-12);
+  --text-form-section-title-color: var(--white-color);
+  --text-muted-color: var(--white-color);
+  --text-tooltip-color: var(--white-color);
+  --text-blocklist-item-selected-color: var(--blue-9);
+  --text-input-group-addon-color: var(--white-color);
+  --text-sidebar-list-color: var(--white-color);
+  --text-codemirror-color: var(--white-color);
+  --text-log-viewer-color: var(--white-color);
+  --text-summary-color: var(--white-color);
+  --text-rzslider-color: var(--white-color);
+  --text-rzslider-limit-color: var(--white-color);
+  --text-pagination-color: var(--white-color);
 
-  --border-color: rgba(255, 255, 255, 0.8);
-  --border-widget-color: #fff;
-  --border-sidebar-color: #3ea6ff;
-  --border-form-control-color: rgb(54, 54, 54);
-  --border-table-color: rgba(255, 255, 255, 0.8);
-  --border-table-top-color: rgba(255, 255, 255, 0.8);
-  --border-datatable-top-color: rgba(255, 255, 255, 0.8);
-  --border-sidebar-high-contrast: 1px solid #3ea6ff;
-  --border-code-high-contrast: 1px solid #fff;
-  --border-boxselector-wrapper: 3px solid #337ab7;
-  --border-boxselector-wrapper-hover: 3px solid #90ccff;
-  --border-panel-color: #fff;
-  --border-input-group-addon-color: rgb(54, 54, 54);
+  --border-color: var(--grey-55);
+  --border-widget-color: var(--white-color);
+  --border-sidebar-color: var(--blue-9);
+  --border-form-control-color: var(--grey-54);
+  --border-table-color: var(--grey-55);
+  --border-table-top-color: var(--grey-55);
+  --border-datatable-top-color: var(--grey-55);
+  --border-sidebar-high-contrast: 1px solid var(--blue-9);
+  --border-code-high-contrast: 1px solid var(--white-color);
+  --border-boxselector-wrapper: 3px solid var(--blue-2);
+  --border-boxselector-wrapper-hover: 3px solid var(--blue-8);
+  --border-panel-color: var(--white-color);
+  --border-input-group-addon-color: var(--grey-54);
 
-  --hover-sidebar-color: #3ea6ff;
-  --hover-sidebar-color: #000;
+  --hover-sidebar-color: var(--blue-9);
+  --hover-sidebar-color: var(--black-color);
   --shadow-box-color: none;
   --shadow-boxselector-color: none;
 
-  --bg-image-multiselect: linear-gradient(#000, #000);
-  --bg-image-multiselect-button: linear-gradient(#212121, #212121);
-  --bg-image-multiselect-hover: linear-gradient(#383838, #383838);
-  --border-multiselect: #000;
-  --border-multiselect-checkboxlayer: #383838;
-  --text-multiselect: #fff;
-  --bg-multiselect-checkboxcontainer: #383838;
-  --text-multiselect-item: #fff;
-  --bg-multiselect-helpercontainer: #212121;
-  --text-input-textarea: #000;
-  --bg-item-highlighted-color: #000;
-  --bg-item-highlighted-null-color: #181818;
-  --bg-service-datatable-thead: #000;
-  --bg-service-datatable-tbody: #000;
-  --bg-form-control-disabled-color: #212121;
-  --border-pagination-span-color: #383838;
-  --border-pagination-color: #383838;
-  --text-pagination-color: #fff;
-  --bg-pagination-color: #383838;
-  --bg-pagination-span-color: #383838;
-  --text-cm-default-color: #3ea6ff;
-  --text-cm-meta-color: #fff;
-  --text-summary-color: #fff;
-  --text-cm-string-color: #f00;
-  --text-progress-bar-color: #000;
+  --bg-image-multiselect: linear-gradient(var(--black-color), var(--black-color));
+  --bg-image-multiselect-button: linear-gradient(var(--grey-1), var(--grey-1));
+  --bg-image-multiselect-hover: linear-gradient(var(--grey-3), var(--grey-3));
+  --border-multiselect: var(--black-color);
+  --border-multiselect-checkboxlayer: var(--grey-3);
+  --text-multiselect: var(--white-color);
+  --bg-multiselect-checkboxcontainer: var(--grey-3);
+  --text-multiselect-item: var(--white-color);
+  --bg-multiselect-helpercontainer: var(--grey-1);
+  --text-input-textarea: var(--black-color);
+  --bg-item-highlighted-color: var(--black-color);
+  --bg-item-highlighted-null-color: var(--grey-2);
+  --bg-service-datatable-thead: var(--black-color);
+  --bg-service-datatable-tbody: var(--black-color);
+  --bg-form-control-disabled-color: var(--grey-1);
+  --border-pagination-span-color: var(--grey-3);
+  --border-pagination-color: var(--grey-3);
+  --text-pagination-color: var(--white-color);
+  --bg-pagination-color: var(--grey-3);
+  --bg-pagination-span-color: var(--grey-3);
+  --text-cm-default-color: var(--blue-9);
+  --text-cm-meta-color: var(--white-color);
+  --text-summary-color: var(--white-color);
+  --text-cm-string-color: var(--red-color-7);
+  --text-progress-bar-color: var(--black-color);
 }
 
 /* Overide Vendor CSS */
@@ -813,10 +907,10 @@ a[ng-click] {
 
 .tooltip.portainer-tooltip .tooltip-inner {
   font-family: Montserrat;
-  background-color: #ffffff;
+  background-color: var(--white-color) fff;
   padding: 0.833em 1em;
-  color: #333333;
-  border: 1px solid #d4d4d5;
+  color: var(--grey-6);
+  border: 1px solid var(--grey-47);
   border-radius: 0.14285714rem;
   box-shadow: 0 2px 4px 0 rgba(34, 36, 38, 0.12), 0 2px 10px 0 rgba(34, 36, 38, 0.15);
 }
@@ -848,7 +942,7 @@ a[ng-click] {
 
 .fa.blue-icon,
 .fab.blue-icon {
-  color: #337ab7;
+  color: var(--blue-2);
 }
 
 .text-warning {
@@ -917,7 +1011,7 @@ a[ng-click] {
 
 .blocklist-item--disabled {
   cursor: auto;
-  background-color: #ececec;
+  background-color: var(--grey-12);
 }
 
 .blocklist-item--selected {
@@ -1063,7 +1157,7 @@ a[ng-click] {
 
 .panel-body {
   padding-top: 30px;
-  background-color: #ffffff;
+  background-color: var(--white-color) fff;
 }
 
 .pagination-controls {
@@ -1146,8 +1240,8 @@ a[ng-click] {
   display: inline-block;
   padding: 0px 6px;
   margin-left: 10px;
-  color: #555555;
-  background-color: #fff;
+  color: var(--grey-25);
+  background-color: var(--white-color);
   background-image: none;
   border-radius: 4px;
   font-size: 14px;
@@ -1165,11 +1259,11 @@ a[ng-click] {
 }
 
 .visualizer_container .node {
-  border: 1px dashed #337ab7;
+  border: 1px dashed var(--blue-2);
   background-color: rgb(51, 122, 183);
   background-color: rgba(51, 122, 183, 0.1);
   border-radius: 4px;
-  box-shadow: 0 3px 10px -2px rgba(161, 170, 166, 0.5);
+  box-shadow: 0 3px 10px -2px var(--grey-50);
   padding: 15px;
   margin: 5px;
 }
@@ -1179,7 +1273,7 @@ a[ng-click] {
   flex-direction: column;
   justify-content: center;
   text-align: center;
-  border-bottom: 1px solid #777;
+  border-bottom: 1px solid var(--grey-26);
   padding-bottom: 10px;
 }
 
@@ -1189,7 +1283,7 @@ a[ng-click] {
 }
 
 .visualizer_container .node .node_info .node_labels {
-  border-top: 1px solid #777;
+  border-top: 1px solid var(--grey-26);
   padding-top: 10px;
   margin-top: 10px;
 }
@@ -1206,9 +1300,9 @@ a[ng-click] {
 }
 
 .visualizer_container .node .tasks .task {
-  border: 1px solid #333333;
+  border: 1px solid var(--grey-6);
   border-radius: 2px;
-  box-shadow: 0 3px 10px -2px rgba(161, 170, 166, 0.5);
+  box-shadow: 0 3px 10px -2px var(--grey-50);
   padding: 10px;
   margin: 5px;
   font-size: 10px;
@@ -1281,7 +1375,7 @@ a[ng-click] {
 .tag {
   padding: 2px 6px;
   color: white;
-  background-color: #337ab7;
+  background-color: var(--blue-2);
   border: 1px solid #2e6da4;
   border-radius: 4px;
 }
@@ -1291,7 +1385,7 @@ a[ng-click] {
 }
 
 .line-separator {
-  border-bottom: 1px solid #777;
+  border-bottom: 1px solid var(--grey-26);
   width: 50%;
   margin: 20px auto 10px auto;
 }
@@ -1316,7 +1410,7 @@ a[ng-click] {
 }
 
 .striked::after {
-  border-bottom: 0.2em solid #777777;
+  border-bottom: 0.2em solid var(--grey-26);
   content: '';
   left: 0;
   margin-top: calc(0.2em / 2 * -1);
@@ -1328,7 +1422,7 @@ a[ng-click] {
 
 .striketext:before,
 .striketext:after {
-  background-color: #777777;
+  background-color: var(--grey-26);
   content: '';
   display: inline-block;
   height: 1px;
@@ -1372,15 +1466,15 @@ a[ng-click] {
 }
 
 .multiSelect .multiSelectItem:not(.multiSelectGroup).selected {
-  background-image: linear-gradient(#337ab7, #337ab7);
-  color: #fff;
+  background-image: linear-gradient(var(--blue-2), var(--blue-2));
+  color: var(--white-color);
   border: none;
 }
 
 .multiSelect .multiSelectItem:hover,
 .multiSelect .multiSelectGroup:hover {
-  background-image: linear-gradient(#337ab7, #337ab7) !important;
-  color: #fff !important;
+  background-image: linear-gradient(var(--blue-2), var(--blue-2)) !important;
+  color: var(--white-color) !important;
 }
 
 .multiSelect .tickMark,
@@ -1406,7 +1500,7 @@ a[ng-click] {
 #loading-bar .bar {
   position: relative;
   height: 3px;
-  background: #738bc0;
+  background: var(--blue-3);
 }
 /*!angular-loading-bar override*/
 
@@ -1418,11 +1512,11 @@ a[ng-click] {
 /* json-tree override */
 json-tree {
   font-size: 13px;
-  color: #30426a;
+  color: var(--blue-5);
 }
 
 json-tree .key {
-  color: #738bc0;
+  color: var(--blue-3);
   padding-right: 5px;
 }
 
@@ -1466,7 +1560,7 @@ json-tree .branch-preview {
 }
 
 .sk-fold-cube:before {
-  background-color: #337ab7;
+  background-color: var(--blue-2);
 }
 /* !spinkit override */
 
