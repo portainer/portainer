@@ -93,6 +93,13 @@
                 </a>
               </th>
               <th>
+                <a ng-click="$ctrl.changeOrderBy('Namespace.Status')">
+                  Status
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Namespace.Status' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Namespace.Status' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>  
+              <th>
                 <a ng-click="$ctrl.changeOrderBy('Quota')">
                   Quota
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Quota' && !$ctrl.state.reverseOrder"></i>
@@ -123,6 +130,9 @@
                 </span>
                 <a ui-sref="kubernetes.resourcePools.resourcePool({ id: item.Namespace.Name })">{{ item.Namespace.Name }}</a>
                 <span style="margin-left: 5px;" class="label label-info image-tag" ng-if="$ctrl.isSystemNamespace(item)">system</span>
+              </td>
+              <td>
+                <span class="label label-{{ $ctrl.namespaceStatusColor(item.Namespace.Status) }}">{{ item.Namespace.Status }}</span>
               </td>
               <td> <i class="fa {{ item.Quota ? 'fa-toggle-on' : 'fa-toggle-off' }}" aria-hidden="true" style="margin-right: 2px;"></i> {{ item.Quota ? 'Yes' : 'No' }} </td>
               <td>{{ item.Namespace.CreationDate | getisodate }} {{ item.Namespace.ResourcePoolOwner ? 'by ' + item.Namespace.ResourcePoolOwner : '' }}</td>
