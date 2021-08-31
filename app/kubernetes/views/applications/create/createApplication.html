@@ -72,14 +72,27 @@
               on-change="(ctrl.onChangeFileContent)"
             >
               <editor-description>
-                <p>
-                  <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                  This feature allows you to deploy any kind of Kubernetes resource in this environment (Deployment, Secret, ConfigMap...).
-                </p>
-                <p>
-                  You can get more information about Kubernetes file format in the
-                  <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/" target="_blank">official documentation</a>.
-                </p>
+                <span class="text-muted small" ng-show="ctrl.stack.IsComposeFormat">
+                  <p>
+                    <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Portainer uses <a href="https://kompose.io/" target="_blank">Kompose</a> to convert your Compose manifest to a Kubernetes compliant manifest. Be wary that not
+                    all the Compose format options are supported by Kompose at the moment.
+                  </p>
+                  <p>
+                    You can get more information about Compose file format in the
+                    <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>.
+                  </p>
+                </span>
+                <span class="text-muted small" ng-show="!ctrl.stack.IsComposeFormat">
+                  <p>
+                    <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                    This feature allows you to deploy any kind of Kubernetes resource in this environment (Deployment, Secret, ConfigMap...).
+                  </p>
+                  <p>
+                    You can get more information about Kubernetes file format in the
+                    <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/" target="_blank">official documentation</a>.
+                  </p>
+                </span>
               </editor-description>
             </web-editor-form>
             <!-- #endregion -->

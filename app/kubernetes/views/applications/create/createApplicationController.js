@@ -1024,9 +1024,8 @@ class KubernetesCreateApplicationController {
           if (this.application.ApplicationKind) {
             this.state.appType = this.KubernetesDeploymentTypes[this.application.ApplicationKind.toUpperCase()];
             if (this.application.StackId) {
-              if (this.application.ApplicationKind === this.KubernetesDeploymentTypes.GIT) {
-                this.stack = await this.StackService.stack(this.application.StackId);
-              } else if (this.application.ApplicationKind === this.KubernetesDeploymentTypes.CONTENT) {
+              this.stack = await this.StackService.stack(this.application.StackId);
+              if (this.application.ApplicationKind === this.KubernetesDeploymentTypes.CONTENT) {
                 this.stackFileContent = await this.StackService.getStackFile(this.application.StackId);
               }
             }
