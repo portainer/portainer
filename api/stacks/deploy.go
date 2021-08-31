@@ -7,9 +7,13 @@ import (
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
+	log "github.com/sirupsen/logrus"
 )
 
 func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, datastore portainer.DataStore, gitService portainer.GitService) error {
+	logger := log.WithFields(log.Fields{"stackID": stackID})
+	logger.Debug("redeploying stack")
+
 	stack, err := datastore.Stack().Stack(stackID)
 	if err != nil {
 		return errors.WithMessagef(err, "failed to get the stack %v", stackID)
@@ -74,6 +78,12 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 		err := deployer.DeploySwarmStack(stack, endpoint, registries, true)
 		if err != nil {
 			return errors.WithMessagef(err, "failed to deploy a docker compose stack %v", stackID)
+		}
+	case portainer.KubernetesStack:
+		logger.Debugf("deploying a kube app")
+		err := deployer.DeployKubernetesStack(stack, endpoint)
+		if err != nil {
+			return errors.WithMessagef(err, "failed to deploy a kubternetes app stack %v", stackID)
 		}
 	default:
 		return errors.Errorf("cannot update stack, type %v is unsupported", stack.Type)

@@ -1,9 +1,9 @@
 package stacks
 
 import (
-	"io/ioutil"
+	"fmt"
 	"net/http"
-	"path/filepath"
+	"os"
 	"strconv"
 	"time"
 
@@ -17,6 +17,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
+	"github.com/portainer/portainer/api/internal/stackutils"
 	k "github.com/portainer/portainer/api/kubernetes"
 )
 
@@ -34,7 +35,9 @@ type kubernetesGitDeploymentPayload struct {
 	RepositoryAuthentication bool
 	RepositoryUsername       string
 	RepositoryPassword       string
-	FilePathInRepository     string
+	ManifestFile             string
+	AdditionalFiles          []string
+	AutoUpdate               *portainer.StackAutoUpdate
 }
 
 func (payload *kubernetesStringDeploymentPayload) Validate(r *http.Request) error {
@@ -57,11 +60,14 @@ func (payload *kubernetesGitDeploymentPayload) Validate(r *http.Request) error {
 	if payload.RepositoryAuthentication && govalidator.IsNull(payload.RepositoryPassword) {
 		return errors.New("Invalid repository credentials. Password must be specified when authentication is enabled")
 	}
-	if govalidator.IsNull(payload.FilePathInRepository) {
-		return errors.New("Invalid file path in repository")
+	if govalidator.IsNull(payload.ManifestFile) {
+		return errors.New("Invalid manifest file in repository")
 	}
 	if govalidator.IsNull(payload.RepositoryReferenceName) {
 		payload.RepositoryReferenceName = defaultGitReferenceName
+	}
+	if err := validateStackAutoUpdate(payload.AutoUpdate); err != nil {
+		return err
 	}
 	return nil
 }
@@ -104,7 +110,7 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 	doCleanUp := true
 	defer handler.cleanUp(stack, &doCleanUp)
 
-	output, err := handler.deployKubernetesStack(r, endpoint, payload.StackFileContent, payload.ComposeFormat, payload.Namespace, k.KubeAppLabels{
+	output, err := handler.deployKubernetesStack(r, endpoint, stack, k.KubeAppLabels{
 		StackID: stackID,
 		Name:    stack.Name,
 		Owner:   stack.CreatedBy,
@@ -140,22 +146,34 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to load user information from the database", Err: err}
 	}
 
+	//make sure the webhook ID is unique
+	if payload.AutoUpdate != nil && payload.AutoUpdate.Webhook != "" {
+		isUnique, err := handler.checkUniqueWebhookID(payload.AutoUpdate.Webhook)
+		if err != nil {
+			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to check for webhook ID collision", Err: err}
+		}
+		if !isUnique {
+			return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("Webhook ID: %s already exists", payload.AutoUpdate.Webhook), Err: errWebhookIDAlreadyExists}
+		}
+	}
+
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
 	stack := &portainer.Stack{
 		ID:         portainer.StackID(stackID),
 		Type:       portainer.KubernetesStack,
 		EndpointID: endpoint.ID,
-		EntryPoint: payload.FilePathInRepository,
+		EntryPoint: payload.ManifestFile,
 		GitConfig: &gittypes.RepoConfig{
 			URL:            payload.RepositoryURL,
 			ReferenceName:  payload.RepositoryReferenceName,
-			ConfigFilePath: payload.FilePathInRepository,
+			ConfigFilePath: payload.ManifestFile,
 		},
 		Namespace:       payload.Namespace,
 		Status:          portainer.StackStatusActive,
 		CreationDate:    time.Now().Unix(),
 		CreatedBy:       user.Username,
 		IsComposeFormat: payload.ComposeFormat,
+		AutoUpdate:      payload.AutoUpdate,
 	}
 
 	projectPath := handler.FileService.GetStackProjectPath(strconv.Itoa(int(stack.ID)))
@@ -170,12 +188,19 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 	}
 	stack.GitConfig.ConfigHash = commitId
 
-	stackFileContent, err := handler.cloneManifestContentFromGitRepo(&payload, stack.ProjectPath)
-	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to process manifest from Git repository", Err: err}
+	repositoryUsername := payload.RepositoryUsername
+	repositoryPassword := payload.RepositoryPassword
+	if !payload.RepositoryAuthentication {
+		repositoryUsername = ""
+		repositoryPassword = ""
 	}
 
-	output, err := handler.deployKubernetesStack(r, endpoint, stackFileContent, payload.ComposeFormat, payload.Namespace, k.KubeAppLabels{
+	err = handler.GitService.CloneRepository(projectPath, payload.RepositoryURL, payload.RepositoryReferenceName, repositoryUsername, repositoryPassword)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to clone git repository", Err: err}
+	}
+
+	output, err := handler.deployKubernetesStack(r, endpoint, stack, k.KubeAppLabels{
 		StackID: stackID,
 		Name:    stack.Name,
 		Owner:   stack.CreatedBy,
@@ -184,6 +209,15 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to deploy Kubernetes stack", Err: err}
+	}
+
+	if payload.AutoUpdate != nil && payload.AutoUpdate.Interval != "" {
+		jobID, e := startAutoupdate(stack.ID, stack.AutoUpdate.Interval, handler.Scheduler, handler.StackDeployer, handler.DataStore, handler.GitService)
+		if e != nil {
+			return e
+		}
+
+		stack.AutoUpdate.JobID = jobID
 	}
 
 	err = handler.DataStore.Stack().CreateStack(stack)
@@ -199,43 +233,14 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 	return response.JSON(w, resp)
 }
 
-func (handler *Handler) deployKubernetesStack(request *http.Request, endpoint *portainer.Endpoint, stackConfig string, composeFormat bool, namespace string, appLabels k.KubeAppLabels) (string, error) {
+func (handler *Handler) deployKubernetesStack(r *http.Request, endpoint *portainer.Endpoint, stack *portainer.Stack, appLabels k.KubeAppLabels) (string, error) {
 	handler.stackCreationMutex.Lock()
 	defer handler.stackCreationMutex.Unlock()
 
-	manifest := []byte(stackConfig)
-	if composeFormat {
-		convertedConfig, err := handler.KubernetesDeployer.ConvertCompose(manifest)
-		if err != nil {
-			return "", errors.Wrap(err, "failed to convert docker compose file to a kube manifest")
-		}
-		manifest = convertedConfig
-	}
-
-	manifest, err := k.AddAppLabels(manifest, appLabels)
+	manifestFilePaths, tempDir, err := stackutils.CreateTempK8SDeploymentFiles(stack, handler.KubernetesDeployer, appLabels)
 	if err != nil {
-		return "", errors.Wrap(err, "failed to add application labels")
+		return "", errors.Wrap(err, "failed to create temp kub deployment files")
 	}
-
-	return handler.KubernetesDeployer.Deploy(request, endpoint, string(manifest), namespace)
-
-}
-
-func (handler *Handler) cloneManifestContentFromGitRepo(gitInfo *kubernetesGitDeploymentPayload, projectPath string) (string, error) {
-	repositoryUsername := gitInfo.RepositoryUsername
-	repositoryPassword := gitInfo.RepositoryPassword
-	if !gitInfo.RepositoryAuthentication {
-		repositoryUsername = ""
-		repositoryPassword = ""
-	}
-
-	err := handler.GitService.CloneRepository(projectPath, gitInfo.RepositoryURL, gitInfo.RepositoryReferenceName, repositoryUsername, repositoryPassword)
-	if err != nil {
-		return "", err
-	}
-	content, err := ioutil.ReadFile(filepath.Join(projectPath, gitInfo.FilePathInRepository))
-	if err != nil {
-		return "", err
-	}
-	return string(content), nil
+	defer os.RemoveAll(tempDir)
+	return handler.KubernetesDeployer.Deploy(r, endpoint, manifestFilePaths, stack.Namespace, false)
 }

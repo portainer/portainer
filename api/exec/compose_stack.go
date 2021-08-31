@@ -44,7 +44,7 @@ func (w *ComposeStackManager) ComposeSyntaxMaxVersion() string {
 func (w *ComposeStackManager) Up(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	url, proxy, err := w.fetchEndpointProxy(endpoint)
 	if err != nil {
-		return errors.Wrap(err, "failed to featch endpoint proxy")
+		return errors.Wrap(err, "failed to fetch endpoint proxy")
 	}
 
 	if proxy != nil {
@@ -88,7 +88,7 @@ func (w *ComposeStackManager) fetchEndpointProxy(endpoint *portainer.Endpoint) (
 		return "", nil, nil
 	}
 
-	proxy, err := w.proxyManager.CreateComposeProxyServer(endpoint)
+	proxy, err := w.proxyManager.CreateAgentProxyServer(endpoint)
 	if err != nil {
 		return "", nil, err
 	}

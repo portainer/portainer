@@ -2,10 +2,8 @@ package stacks
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"path/filepath"
 	"time"
 
 	"github.com/asaskevich/govalidator"
@@ -216,11 +214,7 @@ func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, end
 		if stack.Namespace == "" {
 			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Invalid namespace", Err: errors.New("Namespace must not be empty when redeploying kubernetes stacks")}
 		}
-		content, err := ioutil.ReadFile(filepath.Join(stack.ProjectPath, stack.GitConfig.ConfigFilePath))
-		if err != nil {
-			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to read deployment.yml manifest file", Err: errors.Wrap(err, "failed to read manifest file")}
-		}
-		_, err = handler.deployKubernetesStack(r, endpoint, string(content), stack.IsComposeFormat, stack.Namespace, k.KubeAppLabels{
+		_, err := handler.deployKubernetesStack(r, endpoint, stack, k.KubeAppLabels{
 			StackID: int(stack.ID),
 			Name:    stack.Name,
 			Owner:   stack.CreatedBy,
