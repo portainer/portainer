@@ -9,7 +9,6 @@
         placeholder="e.g. FOO"
         ng-model="$ctrl.variable.name"
         ng-disabled="$ctrl.variable.added"
-        ng-pattern="$ctrl.KEY_REGEX"
         ng-change="$ctrl.onChangeName($ctrl.variable.name)"
         required
       />
@@ -36,7 +35,6 @@
           ng-model="$ctrl.variable.value"
           placeholder="e.g. bar"
           ng-trim="false"
-          ng-pattern="$ctrl.VALUE_REGEX"
           name="value"
           ng-change="$ctrl.onChangeValue($ctrl.variable.value)"
         />

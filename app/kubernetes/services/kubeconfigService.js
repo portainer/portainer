@@ -9,7 +9,6 @@ class KubernetesConfigService {
 
   async downloadConfig() {
     const response = await this.KubernetesConfig.get();
-
     const headers = response.headers();
     const contentDispositionHeader = headers['content-disposition'];
     const filename = contentDispositionHeader.replace('attachment;', '').trim();

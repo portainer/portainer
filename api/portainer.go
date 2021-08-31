@@ -398,6 +398,13 @@ type (
 	// JobType represents a job type
 	JobType int
 
+	K8sNodeLimits struct {
+		CPU    int64 `json:"CPU"`
+		Memory int64 `json:"Memory"`
+	}
+
+	K8sNodesLimits map[string]*K8sNodeLimits
+
 	K8sNamespaceAccessPolicy struct {
 		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
 		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
@@ -682,6 +689,8 @@ type (
 		EnableEdgeComputeFeatures bool `json:"EnableEdgeComputeFeatures" example:""`
 		// The duration of a user session
 		UserSessionTimeout string `json:"UserSessionTimeout" example:"5m"`
+		// The expiry of a Kubeconfig
+		KubeconfigExpiry string `json:"KubeconfigExpiry" example:"24h"`
 		// Whether telemetry is enabled
 		EnableTelemetry bool `json:"EnableTelemetry" example:"false"`
 
@@ -1212,18 +1221,20 @@ type (
 	JWTService interface {
 		GenerateToken(data *TokenData) (string, error)
 		GenerateTokenForOAuth(data *TokenData, expiryTime *time.Time) (string, error)
+		GenerateTokenForKubeconfig(data *TokenData) (string, error)
 		ParseAndVerifyToken(token string) (*TokenData, error)
 		SetUserSessionDuration(userSessionDuration time.Duration)
 	}
 
 	// KubeClient represents a service used to query a Kubernetes environment
 	KubeClient interface {
-		GetServiceAccount(tokendata *TokenData) (*v1.ServiceAccount, error)
 		SetupUserServiceAccount(userID int, teamIDs []int, restrictDefaultNamespace bool) error
+		GetServiceAccount(tokendata *TokenData) (*v1.ServiceAccount, error)
 		GetServiceAccountBearerToken(userID int) (string, error)
 		CreateUserShellPod(ctx context.Context, serviceAccountName string) (*KubernetesShellPod, error)
 		StartExecProcess(token string, useAdminToken bool, namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error
 		NamespaceAccessPoliciesDeleteNamespace(namespace string) error
+		GetNodesLimits() (K8sNodesLimits, error)
 		GetNamespaceAccessPolicies() (map[string]K8sNamespaceAccessPolicy, error)
 		UpdateNamespaceAccessPolicies(accessPolicies map[string]K8sNamespaceAccessPolicy) error
 		DeleteRegistrySecret(registry *Registry, namespace string) error
@@ -1414,7 +1425,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "2.6.2"
+	APIVersion = "2.6.3"
 	// DBVersion is the version number of the Portainer database
 	DBVersion = 32
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
@@ -1448,6 +1459,8 @@ const (
 	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates-2.0.json"
 	// DefaultUserSessionTimeout represents the default timeout after which the user session is cleared
 	DefaultUserSessionTimeout = "8h"
+	// DefaultUserSessionTimeout represents the default timeout after which the user session is cleared
+	DefaultKubeconfigExpiry = "0"
 )
 
 const (
