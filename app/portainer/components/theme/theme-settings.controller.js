@@ -46,9 +46,13 @@ export default class ThemeSettingsController {
         highContrast: 'highcontrast',
       };
 
-      this.state.userId = await this.Authentication.getUserDetails().ID;
-      const data = await this.UserService.user(this.state.userId);
-      this.state.userTheme = data.UserTheme || this.state.availableTheme.light;
+      try {
+        this.state.userId = await this.Authentication.getUserDetails().ID;
+        const data = await this.UserService.user(this.state.userId);
+        this.state.userTheme = data.UserTheme || this.state.availableTheme.light;
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to get user details');
+      }
     });
   }
 }
