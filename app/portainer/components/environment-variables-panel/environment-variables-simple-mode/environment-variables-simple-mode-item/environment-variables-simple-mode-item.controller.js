@@ -1,12 +1,4 @@
-import { KEY_REGEX, VALUE_REGEX } from '@/portainer/helpers/env-vars';
-
 class EnvironmentVariablesSimpleModeItemController {
-  /* @ngInject */
-  constructor() {
-    this.KEY_REGEX = KEY_REGEX;
-    this.VALUE_REGEX = VALUE_REGEX;
-  }
-
   onChangeName(name) {
     const fieldIsInvalid = typeof name === 'undefined';
     if (fieldIsInvalid) {
