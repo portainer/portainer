@@ -32,6 +32,8 @@ type settingsUpdatePayload struct {
 	EnableEdgeComputeFeatures *bool `example:"true"`
 	// The duration of a user session
 	UserSessionTimeout *string `example:"5m"`
+	// The expiry of a Kubeconfig
+	KubeconfigExpiry *string `example:"24h" default:"0"`
 	// Whether telemetry is enabled
 	EnableTelemetry *bool `example:"false"`
 }
@@ -50,6 +52,12 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 		_, err := time.ParseDuration(*payload.UserSessionTimeout)
 		if err != nil {
 			return errors.New("Invalid user session timeout")
+		}
+	}
+	if payload.KubeconfigExpiry != nil {
+		_, err := time.ParseDuration(*payload.KubeconfigExpiry)
+		if err != nil {
+			return errors.New("Invalid Kubeconfig Expiry")
 		}
 	}
 
@@ -133,6 +141,10 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.EdgeAgentCheckinInterval != nil {
 		settings.EdgeAgentCheckinInterval = *payload.EdgeAgentCheckinInterval
+	}
+
+	if payload.KubeconfigExpiry != nil {
+		settings.KubeconfigExpiry = *payload.KubeconfigExpiry
 	}
 
 	if payload.UserSessionTimeout != nil {
