@@ -3,6 +3,7 @@ package settings
 import (
 	"errors"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/asaskevich/govalidator"
@@ -107,7 +108,7 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if payload.HelmRepositoryURL != nil {
-		settings.HelmRepositoryURL = *payload.HelmRepositoryURL
+		settings.HelmRepositoryURL = strings.TrimSuffix(*payload.HelmRepositoryURL, "/")
 	}
 
 	if payload.BlackListedLabels != nil {

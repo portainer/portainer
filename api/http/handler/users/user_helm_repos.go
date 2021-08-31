@@ -22,6 +22,8 @@ type addHelmRepoUrlPayload struct {
 }
 
 func (p *addHelmRepoUrlPayload) Validate(_ *http.Request) error {
+	p.URL = strings.TrimSuffix(p.URL, "/")
+
 	if p.URL == "" {
 		return errors.New("URL is required")
 	}
