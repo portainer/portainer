@@ -11,7 +11,6 @@ export function SettingsViewModel(data) {
   this.EnableEdgeComputeFeatures = data.EnableEdgeComputeFeatures;
   this.UserSessionTimeout = data.UserSessionTimeout;
   this.EnableTelemetry = data.EnableTelemetry;
-  this.HelmRepositoryURL = data.HelmRepositoryURL;
 }
 
 export function PublicSettingsViewModel(settings) {
