@@ -1,7 +1,11 @@
 package stacks
 
 import (
+	"fmt"
+	"io/ioutil"
 	"net/http"
+	"os"
+	"path"
 	"strconv"
 
 	"github.com/asaskevich/govalidator"
@@ -9,6 +13,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	k "github.com/portainer/portainer/api/kubernetes"
 )
@@ -90,12 +95,16 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
 	}
 
-	stackFolder := strconv.Itoa(int(stack.ID))
-	projectPath, err := handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
-	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist Kubernetes manifest file on disk", Err: err}
+	tempFileDir, _ := ioutil.TempDir("", "kub_file_content")
+	defer os.RemoveAll(tempFileDir)
+
+	if err := filesystem.WriteToFile(path.Join(tempFileDir, stack.EntryPoint), []byte(payload.StackFileContent)); err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Failed to persist deployment file in a temp directory", Err: err}
 	}
-	stack.ProjectPath = projectPath
+
+	//use temp dir as the stack project path for deployment
+	//so if the deployment failed, the original file won't be over-written
+	stack.ProjectPath = tempFileDir
 
 	_, err = handler.deployKubernetesStack(r, endpoint, stack, k.KubeAppLabels{
 		StackID: int(stack.ID),
@@ -107,6 +116,18 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to deploy Kubernetes stack via file content", Err: err}
 	}
+
+	stackFolder := strconv.Itoa(int(stack.ID))
+	projectPath, err := handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
+	if err != nil {
+		fileType := "Manifest"
+		if stack.IsComposeFormat {
+			fileType = "Compose"
+		}
+		errMsg := fmt.Sprintf("Unable to persist Kubernetes %s file on disk", fileType)
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: errMsg, Err: err}
+	}
+	stack.ProjectPath = projectPath
 
 	return nil
 }
