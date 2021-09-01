@@ -1,13 +1,12 @@
 package users
 
 import (
-	"fmt"
 	"net/http"
-	"net/url"
 	"strings"
 
 	"github.com/pkg/errors"
 
+	"github.com/portainer/libhelm"
 	errs "github.com/portainer/portainer/api/http/errors"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -22,16 +21,7 @@ type addHelmRepoUrlPayload struct {
 }
 
 func (p *addHelmRepoUrlPayload) Validate(_ *http.Request) error {
-	p.URL = strings.TrimSuffix(p.URL, "/")
-
-	if p.URL == "" {
-		return errors.New("URL is required")
-	}
-	_, err := url.ParseRequestURI(p.URL)
-	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("provided URL %q is not valid", p.URL))
-	}
-	return nil
+	return libhelm.ValidateHelmRepositoryURL(p.URL)
 }
 
 // @id UserHelmRepositoryCreate
