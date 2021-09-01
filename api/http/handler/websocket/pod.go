@@ -150,9 +150,10 @@ func (handler *Handler) hijackPodExecStartOperation(
 	err = <-errorChan
 	if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseNoStatusReceived) {
 		log.Printf("websocket error: %s \n", err.Error())
+		return nil
 	}
 
-	return nil
+	return &httperror.HandlerError{http.StatusInternalServerError, "Unable to start exec process inside container", err}
 }
 
 func (handler *Handler) getToken(request *http.Request, endpoint *portainer.Endpoint, setLocalAdminToken bool) (string, bool, error) {
