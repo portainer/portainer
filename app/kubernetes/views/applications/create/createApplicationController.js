@@ -177,6 +177,12 @@ class KubernetesCreateApplicationController {
     });
   }
 
+  async uiCanExit() {
+    if (this.stackFileContent && this.state.isEditorDirty) {
+      return this.ModalService.confirmWebEditorDiscard();
+    }
+  }
+
   setPullImageValidity(validity) {
     this.state.pullImageValidity = validity;
   }
