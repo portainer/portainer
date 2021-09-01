@@ -175,7 +175,7 @@ function shell_build_binary_azuredevops(p, a) {
 function shell_run_container() {
   return [
     'docker rm -f portainer',
-    'docker run -d -p 8000:8000 -p 9000:9000 -v ' +
+    'docker run -d -p 8000:8000 -p 9000:9000 -p 9443:9443 -v ' +
       portainer_root +
       '/dist:/app -v ' +
       portainer_data +
