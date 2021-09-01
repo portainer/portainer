@@ -4,7 +4,7 @@ import (
 	"errors"
 	"io"
 
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/remotecommand"
@@ -15,6 +15,7 @@ import (
 // using the specified command. The stdin parameter will be bound to the stdin process and the stdout process will write
 // to the stdout parameter.
 // This function only works against a local endpoint using an in-cluster config with the user's SA token.
+// This is a blocking operation.
 func (kcl *KubeClient) StartExecProcess(token string, useAdminToken bool, namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error {
 	config, err := rest.InClusterConfig()
 	if err != nil {

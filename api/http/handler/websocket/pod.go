@@ -139,10 +139,13 @@ func (handler *Handler) hijackPodExecStartOperation(
 	go streamFromWebsocketToWriter(websocketConn, stdinWriter, errorChan)
 	go streamFromReaderToWebsocket(websocketConn, stdoutReader, errorChan)
 
-	err = cli.StartExecProcess(serviceAccountToken, isAdminToken, namespace, podName, containerName, commandArray, stdinReader, stdoutWriter)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to start exec process inside container", err}
-	}
+	go func() {
+		// StartExecProcess is a blocking operation which streams IO to/from pod;
+		// this must execute in asynchronously, since the websocketConn could return errors (e.g. client disconnects) before
+		// the blocking operation is completed.
+		// The errorChan is used to propagate errors from the blocking operation to the caller.
+		errorChan <- cli.StartExecProcess(serviceAccountToken, isAdminToken, namespace, podName, containerName, commandArray, stdinReader, stdoutWriter)
+	}()
 
 	err = <-errorChan
 	if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseNoStatusReceived) {
