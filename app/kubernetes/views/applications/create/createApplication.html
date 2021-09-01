@@ -98,7 +98,6 @@
               </editor-description>
             </web-editor-form>
             <!-- #endregion -->
-
             <div ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.APPLICATION_FORM">
               <div class="col-sm-12 form-section-title">
                 Application
@@ -118,6 +117,7 @@
                     auto-focus
                     required
                     ng-disabled="ctrl.state.isEdit"
+                    data-cy="k8sAppCreate-applicationName"
                   />
                 </div>
               </div>
@@ -775,6 +775,13 @@
                   </p>
                 </div>
               </div>
+
+              <div class="form-group" ng-if="ctrl.nodeLimitsOverflow()">
+                <div class="col-sm-12 small text-danger">
+                  <i class="fa fa-exclamation-circle red-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  These reservations would exceed the resources currently available in the cluster.
+                </div>
+              </div>
               <!-- !cpu-limit-input -->
               <!-- #endregion -->
 
@@ -1396,7 +1403,7 @@
                         class="form-control"
                         name="ingress_class_{{ $index }}"
                         ng-model="publishedPort.IngressName"
-                        ng-options="ingress.Name as ingress.Name for ingress in ctrl.filteredIngresses"
+                        ng-options="ingress.Name as ingress.Name for ingress in ctrl.ingresses"
                         ng-required="!publishedPort.NeedsDeletion"
                         ng-change="ctrl.onChangePortMappingIngress($index)"
                         ng-disabled="ctrl.disableLoadBalancerEdit() || ctrl.isEditAndNotNewPublishedPort($index)"
@@ -1603,10 +1610,10 @@
                 old-form-values="ctrl.savedFormValues"
               ></kubernetes-summary-view>
             </div>
+
             <div class="col-sm-12 form-section-title" ng-if="ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.GIT">
               Actions
             </div>
-
             <!-- #region ACTIONS -->
             <div class="form-group">
               <div class="col-sm-12">

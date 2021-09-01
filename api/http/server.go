@@ -161,6 +161,7 @@ func (server *Server) Start() error {
 	endpointProxyHandler.ReverseTunnelService = server.ReverseTunnelService
 
 	var kubernetesHandler = kubehandler.NewHandler(requestBouncer, server.AuthorizationService, server.DataStore, server.KubernetesClientFactory)
+	kubernetesHandler.JwtService = server.JWTService
 
 	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"))
 

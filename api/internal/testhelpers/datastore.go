@@ -70,6 +70,21 @@ func NewDatastore(options ...datastoreOption) *datastore {
 	return &d
 }
 
+
+type stubSettingsService struct {
+	settings *portainer.Settings
+}
+
+func (s *stubSettingsService) Settings() (*portainer.Settings, error)       { return s.settings, nil }
+func (s *stubSettingsService) UpdateSettings(settings *portainer.Settings) error       { return nil }
+
+func WithSettings(settings *portainer.Settings) datastoreOption {
+	return func(d *datastore) {
+		d.settings = &stubSettingsService{settings: settings}
+	}
+}
+
+
 type stubUserService struct {
 	users []portainer.User
 }

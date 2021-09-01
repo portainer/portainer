@@ -45,6 +45,7 @@ func (store *Store) Init() error {
 			EdgeAgentCheckinInterval: portainer.DefaultEdgeAgentCheckinIntervalInSeconds,
 			TemplatesURL:             portainer.DefaultTemplatesURL,
 			UserSessionTimeout:       portainer.DefaultUserSessionTimeout,
+			KubeconfigExpiry:         portainer.DefaultKubeconfigExpiry,
 		}
 
 		err = store.SettingsService.UpdateSettings(defaultSettings)

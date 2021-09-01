@@ -68,7 +68,9 @@
                       <td>
                         <span ng-if="ctrl.application.ApplicationOwner" style="margin-right: 5px;"> <i class="fas fa-user"></i> {{ ctrl.application.ApplicationOwner }} </span>
                         <span> <i class="fas fa-clock"></i> {{ ctrl.application.CreationDate | getisodate }}</span>
-                        <span> <i class="fa fa-file-code space-left space-right" aria-hidden="true"></i> Deployed from {{ ctrl.state.appType }}</span>
+                        <span ng-if="ctrl.application.ApplicationOwner">
+                          <i class="fa fa-file-code space-left space-right" aria-hidden="true"></i> Deployed from {{ ctrl.state.appType }}</span
+                        >
                       </td>
                     </tr>
                     <tr>
@@ -217,7 +219,7 @@
               class="btn btn-sm btn-primary"
               style="margin-left: 0; margin-bottom: 15px;"
               ng-click="ctrl.rollbackApplication()"
-              ng-disabled="ctrl.application.Revisions.length < 2"
+              ng-disabled="ctrl.application.Revisions.length < 2 || ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"
             >
               <i class="fas fa-history space-right" aria-hidden="true"></i>Rollback to previous configuration
             </button>

@@ -20,6 +20,7 @@ type Handler struct {
 	dataStore               portainer.DataStore
 	kubernetesClientFactory *cli.ClientFactory
 	authorizationService    *authorization.Service
+	JwtService              portainer.JWTService
 }
 
 // NewHandler creates a handler to process pre-proxied requests to external APIs.
@@ -39,6 +40,8 @@ func NewHandler(bouncer *security.RequestBouncer, authorizationService *authoriz
 
 	kubeRouter.PathPrefix("/config").Handler(
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.getKubernetesConfig))).Methods(http.MethodGet)
+	kubeRouter.PathPrefix("/nodes_limits").Handler(
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.getKubernetesNodesLimits))).Methods(http.MethodGet)
 
 	// namespaces
 	// in the future this piece of code might be in another package (or a few different packages - namespaces/namespace?)

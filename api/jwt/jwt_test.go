@@ -10,7 +10,7 @@ import (
 )
 
 func TestGenerateSignedToken(t *testing.T) {
-	svc, err := NewService("24h")
+	svc, err := NewService("24h", nil)
 	assert.NoError(t, err, "failed to create a copy of service")
 
 	token := &portainer.TokenData{
@@ -18,9 +18,9 @@ func TestGenerateSignedToken(t *testing.T) {
 		ID:       1,
 		Role:     1,
 	}
-	expirtationTime := time.Now().Add(1 * time.Hour)
+	expiresAt := time.Now().Add(1 * time.Hour).Unix()
 
-	generatedToken, err := svc.generateSignedToken(token, &expirtationTime)
+	generatedToken, err := svc.generateSignedToken(token, expiresAt)
 	assert.NoError(t, err, "failed to generate a signed token")
 
 	parsedToken, err := jwt.ParseWithClaims(generatedToken, &claims{}, func(token *jwt.Token) (interface{}, error) {
@@ -34,5 +34,5 @@ func TestGenerateSignedToken(t *testing.T) {
 	assert.Equal(t, token.Username, tokenClaims.Username)
 	assert.Equal(t, int(token.ID), tokenClaims.UserID)
 	assert.Equal(t, int(token.Role), tokenClaims.Role)
-	assert.Equal(t, expirtationTime.Unix(), tokenClaims.ExpiresAt)
+	assert.Equal(t, expiresAt, tokenClaims.ExpiresAt)
 }
