@@ -1,11 +1,12 @@
 package jwt
 
 import (
+	"testing"
+
 	"github.com/dgrijalva/jwt-go"
 	portainer "github.com/portainer/portainer/api"
 	i "github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestService_GenerateTokenForKubeconfig(t *testing.T) {
@@ -24,7 +25,7 @@ func TestService_GenerateTokenForKubeconfig(t *testing.T) {
 
 	myFields := fields{
 		userSessionTimeout: "24h",
-		dataStore:          i.NewDatastore(i.WithSettings(mySettings)),
+		dataStore:          i.NewDatastore(i.WithSettingsService(mySettings)),
 	}
 
 	myTokenData := &portainer.TokenData{

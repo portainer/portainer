@@ -70,20 +70,24 @@ func NewDatastore(options ...datastoreOption) *datastore {
 	return &d
 }
 
-
 type stubSettingsService struct {
 	settings *portainer.Settings
 }
 
-func (s *stubSettingsService) Settings() (*portainer.Settings, error)       { return s.settings, nil }
-func (s *stubSettingsService) UpdateSettings(settings *portainer.Settings) error       { return nil }
-
-func WithSettings(settings *portainer.Settings) datastoreOption {
+func (s *stubSettingsService) Settings() (*portainer.Settings, error) {
+	return s.settings, nil
+}
+func (s *stubSettingsService) UpdateSettings(settings *portainer.Settings) error {
+	s.settings = settings
+	return nil
+}
+func WithSettingsService(settings *portainer.Settings) datastoreOption {
 	return func(d *datastore) {
-		d.settings = &stubSettingsService{settings: settings}
+		d.settings = &stubSettingsService{
+			settings: settings,
+		}
 	}
 }
-
 
 type stubUserService struct {
 	users []portainer.User
@@ -125,26 +129,5 @@ func (s *stubEdgeJobService) GetNextIdentifier() int                     { retur
 func WithEdgeJobs(js []portainer.EdgeJob) datastoreOption {
 	return func(d *datastore) {
 		d.edgeJob = &stubEdgeJobService{jobs: js}
-	}
-}
-
-type stubSettingsService struct {
-	settings *portainer.Settings
-}
-
-func (s *stubSettingsService) Settings() (*portainer.Settings, error) {
-	return s.settings, nil
-}
-
-func (s *stubSettingsService) UpdateSettings(settings *portainer.Settings) error {
-	s.settings = settings
-	return nil
-}
-
-func WithSettingsService(settings *portainer.Settings) datastoreOption {
-	return func(d *datastore) {
-		d.settings = &stubSettingsService{
-			settings: settings,
-		}
 	}
 }
