@@ -1,3 +1,5 @@
+import './applicationsDatatable.css';
+
 angular.module('portainer.kubernetes').component('kubernetesApplicationsDatatable', {
   templateUrl: './applicationsDatatable.html',
   controller: 'KubernetesApplicationsDatatableController',
@@ -11,5 +13,6 @@ angular.module('portainer.kubernetes').component('kubernetesApplicationsDatatabl
     removeAction: '<',
     refreshCallback: '<',
     onPublishingModeClick: '<',
+    isPrimary: '<',
   },
 });

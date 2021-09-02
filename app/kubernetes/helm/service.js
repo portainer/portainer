@@ -9,6 +9,8 @@ export function HelmService(HelmFactory, EndpointProvider) {
     search,
     values,
     install,
+    uninstall,
+    listReleases,
   };
 
   /**
@@ -51,5 +53,28 @@ export function HelmService(HelmFactory, EndpointProvider) {
       Values: values,
     };
     return await HelmFactory.install({ endpointId }, payload).$promise;
+  }
+
+  async function uninstall({ Name }) {
+    try {
+      await HelmFactory.uninstall({ release: Name }).$promise;
+    } catch (err) {
+      throw new PortainerError('Unable to delete release', err);
+    }
+  }
+
+  /**
+   * @description: List all helm releases based on passed in options, this basically runs `helm list`
+   * @param {object} options - Supported CLI flags to pass to Helm (binary) - flags to `helm list`
+   * @returns {Promise} - Resolves with list of helm releases
+   * @throws {PortainerError} - Rejects with error if helm list fails
+   */
+  async function listReleases({ namespace, selector, filter, output }) {
+    try {
+      const releases = await HelmFactory.list({ selector, namespace, filter, output }).$promise;
+      return releases;
+    } catch (err) {
+      throw new PortainerError('Unable to retrieve release list', err);
+    }
   }
 }

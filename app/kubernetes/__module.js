@@ -45,6 +45,16 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
       },
     };
 
+    const helmApplication = {
+      name: 'kubernetes.helm',
+      url: '/helm/:name',
+      views: {
+        'content@': {
+          component: 'kubernetesHelmApplicationView',
+        },
+      },
+    };
+
     const helmTemplates = {
       name: 'kubernetes.templates',
       url: '/templates/helm',
@@ -311,6 +321,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
     };
 
     $stateRegistryProvider.register(kubernetes);
+    $stateRegistryProvider.register(helmApplication);
     $stateRegistryProvider.register(helmTemplates);
     $stateRegistryProvider.register(applications);
     $stateRegistryProvider.register(applicationCreation);

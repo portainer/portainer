@@ -23,7 +23,7 @@ import {
   KubernetesApplicationVolumeSecretPayload,
 } from 'Kubernetes/models/application/payloads';
 import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
-import { KubernetesApplicationDeploymentTypes, KubernetesApplicationPlacementTypes } from 'Kubernetes/models/application/models';
+import { KubernetesApplicationDeploymentTypes, KubernetesApplicationPlacementTypes, KubernetesApplicationTypes, HelmApplication } from 'Kubernetes/models/application/models';
 import { KubernetesPodAffinity, KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'Kubernetes/pod/models';
 import {
   KubernetesNodeSelectorRequirementPayload,
@@ -31,6 +31,9 @@ import {
   KubernetesPodNodeAffinityPayload,
   KubernetesPreferredSchedulingTermPayload,
 } from 'Kubernetes/pod/payloads/affinities';
+
+export const PodKubernetesInstanceLabel = 'app.kubernetes.io/instance';
+export const PodManagedByLabel = 'app.kubernetes.io/managed-by';
 
 class KubernetesApplicationHelper {
   /* #region  UTILITY FUNCTIONS */
@@ -436,5 +439,48 @@ class KubernetesApplicationHelper {
     }
   }
   /* #endregion */
+
+  /**
+   * Get Helm managed applications
+   * @param {KubernetesApplication[]} applications Application list
+   * @returns {Object} { [releaseName]: [app1, app2, ...], [releaseName2]: [app3, app4, ...] }
+   */
+  static getHelmApplications(applications) {
+    // filter out all the applications that are managed by helm
+    // to identify the helm managed applications, we need to check if the applications pod labels include
+    // `app.kubernetes.io/instance` and `app.kubernetes.io/managed-by` = `helm`
+    const helmManagedApps = applications.filter((app) =>
+      app.Pods.flatMap((pod) => pod.Labels).some((label) => label && label[PodKubernetesInstanceLabel] && label[PodManagedByLabel] === 'Helm')
+    );
+
+    // groups the helm managed applications by helm release name
+    // the release name is retrieved from the `app.kubernetes.io/instance` label on the pods within the apps
+    // object structure `{ [releaseName]: [app1, app2, ...], [releaseName2]: [app3, app4, ...] }`
+    const groupedHelmApps = helmManagedApps.reduce((acc, curr) => {
+      curr.Pods.flatMap((p) => p.Labels)
+        .map((label) => label[PodKubernetesInstanceLabel])
+        .forEach((instanceStr) => (acc[instanceStr] = [...(acc[instanceStr] || []), curr]));
+      return acc;
+    }, {});
+
+    const helmAppsList = Object.entries(groupedHelmApps).map(([helmInstance, applications]) => {
+      const helmApp = new HelmApplication();
+      helmApp.Name = helmInstance;
+      helmApp.ApplicationType = KubernetesApplicationTypes.HELM;
+      helmApp.KubernetesApplications = applications;
+
+      const applicationPodStatuses = applications.flatMap((app) => app.Pods).map((pod) => pod.Status);
+      const isNotReady = applicationPodStatuses.some((status) => status !== 'Running');
+
+      helmApp.Status = isNotReady ? 'Not ready' : 'Ready';
+
+      // use earliest date
+      helmApp.CreationDate = applications.map((app) => app.CreationDate).sort((a, b) => new Date(a) - new Date(b))[0];
+
+      return helmApp;
+    });
+
+    return helmAppsList;
+  }
 }
 export default KubernetesApplicationHelper;
