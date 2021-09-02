@@ -69,8 +69,9 @@ func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Reques
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to access the DataStore", err}
 	}
 
+	// check if repo already exists - by doing case insensitive, suffix trimmed comparison
 	for _, record := range records {
-		if strings.EqualFold(record.URL, p.URL) {
+		if strings.EqualFold(strings.TrimSuffix(record.URL, "/"), strings.TrimSuffix(p.URL, "/")) {
 			errMsg := "Helm repo already registered for user"
 			return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: errMsg, Err: errors.New(errMsg)}
 		}
