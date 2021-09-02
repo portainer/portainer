@@ -13,7 +13,6 @@ import (
 	"runtime"
 	"strings"
 	"time"
-	"fmt"
 
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
