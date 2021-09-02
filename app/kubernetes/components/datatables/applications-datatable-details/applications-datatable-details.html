@@ -1,0 +1,12 @@
+<div class="col-xs-12 form-section-title">
+  Secrets
+</div>
+<table style="width: 50%;">
+  <tbody>
+    <tr>
+      <td>
+        <sensitive-details ng-repeat="secret in $ctrl.state.secrets" key="{{ secret.key }}" value="{{ secret.value }}"> </sensitive-details>
+      </td>
+    </tr>
+  </tbody>
+</table>

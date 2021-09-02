@@ -1,0 +1,49 @@
+<kubernetes-view-header title="Helm details" state="kubernetes.helm" view-ready="$ctrl.state.viewReady">
+  <a ui-sref="kubernetes.applications">Applications</a> &gt; {{ $ctrl.state.params.name }}
+</kubernetes-view-header>
+
+<kubernetes-view-loading view-ready="$ctrl.state.viewReady"></kubernetes-view-loading>
+
+<div ng-if="$ctrl.state.viewReady">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="col-sm-12 form-section-title">
+        Information
+      </div>
+      <p class="text-muted">
+        <i class="fa fa-flask orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+        This is a first version for Helm charts, for more information see this
+        <a href="https://www.portainer.io/blog/portainer-now-with-helm-support" target="_blank">blog post</a>.
+      </p>
+    </div>
+    <div class="col-sm-12">
+      <rd-widget>
+        <rd-widget-header icon="fa-dharmachakra" title-text="Release"></rd-widget-header>
+        <rd-widget-body classes="no-padding">
+          <table class="table">
+            <tbody class="release-table">
+              <tr>
+                <td>Name</td>
+                <td>
+                  {{ $ctrl.state.release.name }}
+                </td>
+              </tr>
+              <tr>
+                <td>Chart</td>
+                <td>
+                  {{ $ctrl.state.release.chart }}
+                </td>
+              </tr>
+              <tr>
+                <td>App version</td>
+                <td>
+                  {{ $ctrl.state.release.app_version }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+  </div>
+</div>
