@@ -135,19 +135,19 @@ func (handler *Handler) hijackPodExecStartOperation(
 	stdoutReader, stdoutWriter := io.Pipe()
 	defer stdoutWriter.Close()
 
+	// errorChan is used to propagate errors from the go routines to the caller.
 	errorChan := make(chan error, 1)
 	go streamFromWebsocketToWriter(websocketConn, stdinWriter, errorChan)
 	go streamFromReaderToWebsocket(websocketConn, stdoutReader, errorChan)
 
-	go func() {
-		// StartExecProcess is a blocking operation which streams IO to/from pod;
-		// this must execute in asynchronously, since the websocketConn could return errors (e.g. client disconnects) before
-		// the blocking operation is completed.
-		// The errorChan is used to propagate errors from the blocking operation to the caller.
-		errorChan <- cli.StartExecProcess(serviceAccountToken, isAdminToken, namespace, podName, containerName, commandArray, stdinReader, stdoutWriter)
-	}()
+	// StartExecProcess is a blocking operation which streams IO to/from pod;
+	// this must execute in asynchronously, since the websocketConn could return errors (e.g. client disconnects) before
+	// the blocking operation is completed.
+	go cli.StartExecProcess(serviceAccountToken, isAdminToken, namespace, podName, containerName, commandArray, stdinReader, stdoutWriter, errorChan)
 
 	err = <-errorChan
+
+	// websocket client successfully disconnected
 	if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseNoStatusReceived) {
 		log.Printf("websocket error: %s \n", err.Error())
 		return nil
