@@ -56,6 +56,11 @@ export function HelmService(HelmFactory, EndpointProvider) {
     return await HelmFactory.install({ endpointId }, payload).$promise;
   }
 
+  /**
+   * @description: Uninstall a helm chart, this basically runs `helm uninstall`
+   * @param {object} options - Options object, release `Name` is the only required option
+   * @throws {PortainerError} - Rejects with error if helm show fails
+   */
   async function uninstall({ Name }) {
     try {
       await HelmFactory.uninstall({ release: Name }).$promise;
