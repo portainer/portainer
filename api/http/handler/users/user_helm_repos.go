@@ -128,8 +128,8 @@ func (handler *Handler) userGetHelmRepos(w http.ResponseWriter, r *http.Request)
 	}
 
 	resp := struct {
-		GlobalRepo string                         `json:"global_repo"`
-		UserRepos  []portainer.HelmUserRepository `json:"user_repos"`
+		GlobalRepo string                         `json:"GlobalRepo"`
+		UserRepos  []portainer.HelmUserRepository `json:"UserRepos"`
 	}{
 		GlobalRepo: settings.HelmRepositoryURL,
 		UserRepos:  userRepos,
