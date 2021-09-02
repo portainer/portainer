@@ -2,26 +2,12 @@ import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 
 export default class HelmTemplatesController {
   /* @ngInject */
-  constructor(
-    $analytics,
-    $async,
-    $state,
-    $window,
-    $anchorScroll,
-    SettingsService,
-    Authentication,
-    UserService,
-    HelmService,
-    KubernetesResourcePoolService,
-    Notifications,
-    ModalService
-  ) {
+  constructor($analytics, $async, $state, $window, $anchorScroll, Authentication, UserService, HelmService, KubernetesResourcePoolService, Notifications, ModalService) {
     this.$analytics = $analytics;
     this.$async = $async;
     this.$window = $window;
     this.$state = $state;
     this.$anchorScroll = $anchorScroll;
-    this.SettingsService = SettingsService;
     this.Authentication = Authentication;
     this.UserService = UserService;
     this.HelmService = HelmService;
@@ -105,9 +91,9 @@ export default class HelmTemplatesController {
     this.state.reposLoading = true;
     try {
       // fetch globally set helm repo and user helm repos (parallel)
-      const [{ HelmRepositoryURL }, userHelmRepositories] = await Promise.all([this.SettingsService.settings(), this.UserService.getHelmRepositories(this.state.userId)]);
-      const userHelmReposUrls = userHelmRepositories.map((repo) => repo.URL);
-      const uniqueHelmRepos = [...new Set([HelmRepositoryURL, ...userHelmReposUrls])]; // remove duplicates
+      const { global_repo, user_repos } = await this.UserService.getHelmRepositories(this.state.userId);
+      const userHelmReposUrls = user_repos.map((repo) => repo.URL);
+      const uniqueHelmRepos = [...new Set([global_repo, ...userHelmReposUrls])]; // remove duplicates
       return uniqueHelmRepos;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve helm repo urls.');
