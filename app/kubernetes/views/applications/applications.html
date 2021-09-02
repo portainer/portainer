@@ -5,8 +5,6 @@
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
 <div ng-if="ctrl.state.viewReady">
-  <div ng-include="'app/kubernetes/templates/advancedDeploymentPanel.html'"></div>
-
   <div class="row">
     <div class="col-sm-12" data-cy="k8sApp-appList">
       <rd-widget>
