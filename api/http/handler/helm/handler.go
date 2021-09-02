@@ -5,10 +5,11 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/portainer/libhelm"
+	"github.com/portainer/libhelm/options"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/http/middlewares"
+	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes"
 )
 
@@ -39,6 +40,16 @@ func NewHandler(bouncer requestBouncer, dataStore portainer.DataStore, helmPacka
 		kubeConfigService:  kubeConfigService,
 	}
 
+	h.Use(middlewares.WithEndpoint(dataStore.Endpoint(), "id"))
+
+	// `helm list -o json`
+	h.Handle("/{id}/kubernetes/helm",
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.helmList))).Methods(http.MethodGet)
+
+	// `helm delete RELEASE_NAME`
+	h.Handle("/{id}/kubernetes/helm/{release}",
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.helmDelete))).Methods(http.MethodDelete)
+
 	// `helm install [NAME] [CHART] flags`
 	h.Handle("/{id}/kubernetes/helm",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.helmInstall))).Methods(http.MethodPost)
@@ -65,19 +76,24 @@ func NewTemplateHandler(bouncer requestBouncer, dataStore portainer.DataStore, h
 	return h
 }
 
-// GetEndpoint returns the portainer.Endpoint for the request
-func (handler *Handler) GetEndpoint(r *http.Request) (*portainer.Endpoint, *httperror.HandlerError) {
-	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+// getHelmClusterAccess obtains the core k8s cluster access details from request.
+// The cluster access includes the cluster server url, the user's bearer token and the tls certificate.
+// The cluster access is passed in as kube config CLI params to helm binary.
+func (handler *Handler) getHelmClusterAccess(r *http.Request) (*options.KubernetesClusterAccess, *httperror.HandlerError) {
+	endpoint, err := middlewares.FetchEndpoint(r)
 	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint identifier route variable", err}
+		return nil, &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint on request context", err}
 	}
 
-	endpoint, err := handler.dataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == bolterrors.ErrObjectNotFound {
-		return nil, &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
-	} else if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
+	bearerToken, err := security.ExtractBearerToken(r)
+	if err != nil {
+		return nil, &httperror.HandlerError{http.StatusUnauthorized, "Unauthorized", err}
 	}
 
-	return endpoint, nil
+	kubeConfigInternal := handler.kubeConfigService.GetKubeConfigInternal(endpoint.ID, bearerToken)
+	return &options.KubernetesClusterAccess{
+		ClusterServerURL:         kubeConfigInternal.ClusterServerURL,
+		CertificateAuthorityFile: kubeConfigInternal.CertificateAuthorityFile,
+		AuthToken:                kubeConfigInternal.AuthToken,
+	}, nil
 }

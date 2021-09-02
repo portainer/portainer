@@ -1,7 +1,7 @@
 <div class="datatable">
   <rd-widget>
     <rd-widget-body classes="no-padding">
-      <div class="toolBar">
+      <div ng-if="$ctrl.isPrimary" class="toolBar">
         <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
         <span class="small text-muted" style="float: left; margin-top: 5px;" ng-if="$ctrl.isAdmin && !$ctrl.settings.showSystem">
           <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -62,7 +62,7 @@
           </span>
         </div>
       </div>
-      <div class="actionBar">
+      <div ng-if="$ctrl.isPrimary" class="actionBar">
         <button
           type="button"
           class="btn btn-sm btn-danger"
@@ -76,7 +76,7 @@
           <i class="fa fa-plus space-right" aria-hidden="true"></i>Add application
         </button>
       </div>
-      <div class="searchBar">
+      <div ng-if="$ctrl.isPrimary" class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
         <input
           type="text"
@@ -91,13 +91,20 @@
       </div>
       <div class="table-responsive">
         <table class="table table-hover nowrap-cells" data-cy="k8sApp-appTable">
-          <thead>
+          <thead ng-class="{ 'secondary-heading': !$ctrl.isPrimary }">
             <tr>
-              <th>
-                <span class="md-checkbox">
-                  <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" data-cy="k8sApp-selectAllCheckbox" />
-                  <label for="select_all"></label>
+              <th class="datatable-wide">
+                <span ng-if="$ctrl.isPrimary">
+                  <span class="md-checkbox">
+                    <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" data-cy="k8sApp-selectAllCheckbox" />
+                    <label for="select_all"></label>
+                  </span>
+                  <a ng-click="$ctrl.expandAll()">
+                    <i ng-class="{ 'fas fa-angle-down': $ctrl.state.expandAll, 'fas fa-angle-right': !$ctrl.state.expandAll }" aria-hidden="true"></i>
+                  </a>
                 </span>
+              </th>
+              <th>
                 <a ng-click="$ctrl.changeOrderBy('Name')">
                   Name
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
@@ -149,22 +156,39 @@
           </thead>
           <tbody>
             <tr
-              dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | filter:$ctrl.isDisplayed | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit: $ctrl.tableKey))"
-              ng-class="{ active: item.Checked }"
+              ng-click="$ctrl.expandItem(item, !item.Expanded)"
+              dir-paginate-start="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | filter:$ctrl.isDisplayed | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit: $ctrl.tableKey))"
+              ng-class="{ active: item.Checked, 'secondary-body': !$ctrl.isPrimary }"
               pagination-id="$ctrl.tableKey"
+              class="interactive"
             >
               <td>
-                <span class="md-checkbox">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="$ctrl.isSystemNamespace(item)" />
+                <span ng-if="$ctrl.isPrimary" class="md-checkbox">
+                  <input
+                    id="select_{{ $index }}"
+                    type="checkbox"
+                    ng-model="item.Checked"
+                    ng-click="$ctrl.selectItem(item, $event); $event.stopPropagation()"
+                    ng-disabled="$ctrl.isSystemNamespace(item)"
+                  />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="kubernetes.applications.application({ name: item.Name, namespace: item.ResourcePool })">{{ item.Name }}</a>
+                <a><i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i></a>
+              </td>
+              <td>
+                <a ng-if="item.KubernetesApplications" ui-sref="kubernetes.helm({ name: item.Name })" ng-click="$event.stopPropagation()">{{ item.Name }} </a>
+                <a
+                  ng-if="!item.KubernetesApplications"
+                  ui-sref="kubernetes.applications.application({ name: item.Name, namespace: item.ResourcePool })"
+                  ng-click="$event.stopPropagation()"
+                  >{{ item.Name }}
+                </a>
                 <span class="label label-info image-tag label-margins" ng-if="$ctrl.isSystemNamespace(item)">system</span>
                 <span class="label label-primary image-tag label-margins" ng-if="!$ctrl.isSystemNamespace(item) && $ctrl.isExternalApplication(item)">external</span>
               </td>
               <td>{{ item.StackName }}</td>
               <td>
-                <a ui-sref="kubernetes.resourcePools.resourcePool({ id: item.ResourcePool })">{{ item.ResourcePool }}</a>
+                <a ui-sref="kubernetes.resourcePools.resourcePool({ id: item.ResourcePool })" ng-click="$event.stopPropagation()">{{ item.ResourcePool }}</a>
               </td>
               <td title="{{ item.Image }}"
                 >{{ item.Image | truncate: 64 }} <span ng-if="item.Containers.length > 1">+ {{ item.Containers.length - 1 }}</span></td
@@ -173,7 +197,10 @@
               <td ng-if="item.ApplicationType !== $ctrl.KubernetesApplicationTypes.POD">
                 <span ng-if="item.DeploymentType === $ctrl.KubernetesApplicationDeploymentTypes.REPLICATED">Replicated</span>
                 <span ng-if="item.DeploymentType === $ctrl.KubernetesApplicationDeploymentTypes.GLOBAL">Global</span>
-                <code>{{ item.RunningPodsCount }}</code> / <code>{{ item.TotalPodsCount }}</code>
+                <span ng-if="item.RunningPodsCount >= 0 && item.TotalPodsCount >= 0">
+                  <code>{{ item.RunningPodsCount }}</code> / <code>{{ item.TotalPodsCount }}</code>
+                </span>
+                <span ng-if="item.KubernetesApplications">{{ item.Status }}</span>
               </td>
               <td ng-if="item.ApplicationType === $ctrl.KubernetesApplicationTypes.POD">
                 {{ item.Pods[0].Status }}
@@ -181,7 +208,7 @@
               <td>
                 <span ng-if="item.PublishedPorts.length">
                   <span>
-                    <a ng-click="$ctrl.onPublishingModeClick(item)">
+                    <a ng-click="$ctrl.onPublishingModeClick(item); $event.stopPropagation()">
                       <i class="fa {{ item.ServiceType | kubernetesApplicationServiceTypeIcon }}" aria-hidden="true" style="margin-right: 2px;"> </i>
                       {{ item.ServiceType | kubernetesApplicationServiceTypeText }}
                     </a>
@@ -190,6 +217,33 @@
                 <span ng-if="item.PublishedPorts.length === 0">-</span>
               </td>
               <td>{{ item.CreationDate | getisodate }} {{ item.ApplicationOwner ? 'by ' + item.ApplicationOwner : '' }}</td>
+            </tr>
+            <tr dir-paginate-end ng-show="item.Expanded" ng-class="{ 'secondary-body': $ctrl.isPrimary && !item.KubernetesApplications }">
+              <td></td>
+              <td colspan="8" class="datatable-padding-vertical">
+                <span ng-if="item.KubernetesApplications">
+                  <kubernetes-applications-datatable
+                    dataset="item.KubernetesApplications"
+                    table-key="{{ item.Id }}_table"
+                    order-by="Name"
+                    remove-action="$ctrl.removeAction"
+                    refresh-callback="$ctrl.refreshCallback"
+                    on-publishing-mode-click="($ctrl.onPublishingModeClick)"
+                    is-primary="false"
+                  >
+                  </kubernetes-applications-datatable>
+                </span>
+                <span ng-if="!item.KubernetesApplications">
+                  <kubernetes-applications-datatable-url ng-if="$ctrl.getPublishUrl(item)" published-url="{{ $ctrl.getPublishUrl(item) }}"> </kubernetes-applications-datatable-url>
+                  <kubernetes-applications-datatable-details
+                    ng-if="$ctrl.hasConfigurationSecrets(item)"
+                    configurations="item.Configurations"
+                  ></kubernetes-applications-datatable-details>
+                  <div class="small text-muted" ng-if="!$ctrl.hasConfigurationSecrets(item) && !$ctrl.getPublishUrl(item)">
+                    This application has not been exposed.
+                  </div>
+                </span>
+              </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
               <td colspan="8" class="text-center text-muted">Loading...</td>
@@ -200,7 +254,7 @@
           </tbody>
         </table>
       </div>
-      <div class="footer" ng-if="$ctrl.dataset">
+      <div ng-if="$ctrl.isPrimary" class="footer" ng-if="$ctrl.dataset">
         <div class="infoBar" ng-if="$ctrl.state.selectedItemCount !== 0"> {{ $ctrl.state.selectedItemCount }} item(s) selected </div>
         <div class="paginationControls">
           <form class="form-inline">
