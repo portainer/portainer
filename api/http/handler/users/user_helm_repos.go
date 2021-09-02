@@ -117,10 +117,23 @@ func (handler *Handler) userGetHelmRepos(w http.ResponseWriter, r *http.Request)
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to get user Helm repositories", errs.ErrUnauthorized}
 	}
 
-	payload, err := handler.DataStore.HelmUserRepository().HelmUserRepositoryByUserID(portainer.UserID(userID))
+	settings, err := handler.DataStore.Settings().Settings()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+	}
+
+	userRepos, err := handler.DataStore.HelmUserRepository().HelmUserRepositoryByUserID(portainer.UserID(userID))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to get user Helm repositories", err}
 	}
 
-	return response.JSON(w, payload)
+	resp := struct {
+		GlobalRepo string                         `json:"GlobalRepo"`
+		UserRepos  []portainer.HelmUserRepository `json:"UserRepos"`
+	}{
+		GlobalRepo: settings.HelmRepositoryURL,
+		UserRepos:  userRepos,
+	}
+
+	return response.JSON(w, resp)
 }
