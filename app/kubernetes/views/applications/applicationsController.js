@@ -3,16 +3,19 @@ require('../../templates/advancedDeploymentPanel.html');
 import angular from 'angular';
 import _ from 'lodash-es';
 import KubernetesStackHelper from 'Kubernetes/helpers/stackHelper';
-import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
+import KubernetesApplicationHelper, { PodKubernetesInstanceLabel } from 'Kubernetes/helpers/application';
+import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
+import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
 
 class KubernetesApplicationsController {
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesApplicationService, Authentication, ModalService, LocalStorage) {
+  constructor($async, $state, Notifications, KubernetesApplicationService, HelmService, KubernetesConfigurationService, Authentication, ModalService, LocalStorage) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
     this.KubernetesApplicationService = KubernetesApplicationService;
-
+    this.HelmService = HelmService;
+    this.KubernetesConfigurationService = KubernetesConfigurationService;
     this.Authentication = Authentication;
     this.ModalService = ModalService;
     this.LocalStorage = LocalStorage;
@@ -65,7 +68,11 @@ class KubernetesApplicationsController {
     let actionCount = selectedItems.length;
     for (const application of selectedItems) {
       try {
-        await this.KubernetesApplicationService.delete(application);
+        if (application.ApplicationType === KubernetesApplicationTypes.HELM) {
+          await this.HelmService.uninstall(application);
+        } else {
+          await this.KubernetesApplicationService.delete(application);
+        }
         this.Notifications.success('Application successfully removed', application.Name);
         const index = this.applications.indexOf(application);
         this.applications.splice(index, 1);
@@ -102,8 +109,20 @@ class KubernetesApplicationsController {
 
   async getApplicationsAsync() {
     try {
-      const applications = await this.KubernetesApplicationService.get();
-      this.applications = applications;
+      const [applications, configurations] = await Promise.all([this.KubernetesApplicationService.get(), this.KubernetesConfigurationService.get()]);
+      const configuredApplications = KubernetesConfigurationHelper.getApplicationConfigurations(applications, configurations);
+      const helmApplications = KubernetesApplicationHelper.getHelmApplications(configuredApplications);
+
+      // filter out multi-chart helm managed applications
+      const helmAppNames = helmApplications.map((hma) => hma.Name);
+      const nonHelmApps = configuredApplications.filter(
+        (app) =>
+          !app.Pods.flatMap((pod) => pod.Labels) // flatten pod labels
+            .filter((label) => label) // filter out empty labels
+            .some((label) => helmAppNames.includes(label[PodKubernetesInstanceLabel])) // check if label key is in helmAppNames
+      );
+
+      this.applications = [...nonHelmApps, ...helmApplications];
       this.stacks = KubernetesStackHelper.stacksFromApplications(applications);
       this.ports = KubernetesApplicationHelper.portMappingsFromApplications(applications);
     } catch (err) {

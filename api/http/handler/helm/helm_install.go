@@ -13,6 +13,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
 	validation "github.com/portainer/portainer/api/kubernetes/validation"
 )
@@ -76,9 +77,9 @@ func readPayload(r *http.Request) (*installChartPayload, error) {
 // @failure 500 "Server error"
 // @router /kubernetes/helm/{release} [post]
 func (handler *Handler) helmInstall(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpoint, httperr := handler.GetEndpoint(r)
-	if httperr != nil {
-		return httperr
+	endpoint, err := middlewares.FetchEndpoint(r)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint on request context", err}
 	}
 
 	bearerToken, err := security.ExtractBearerToken(r)
