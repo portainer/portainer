@@ -27,9 +27,10 @@ type customTemplateUpdatePayload struct {
 	Note string `example:"This is my <b>custom</b> template"`
 	// Platform associated to the template.
 	// Valid values are: 1 - 'linux', 2 - 'windows'
-	Platform portainer.CustomTemplatePlatform `example:"1" enums:"1,2" validate:"required"`
-	// Type of created stack (1 - swarm, 2 - compose)
-	Type portainer.StackType `example:"1" enums:"1,2" validate:"required"`
+	// Required for Docker stacks
+	Platform portainer.CustomTemplatePlatform `example:"1" enums:"1,2"`
+	// Type of created stack (1 - swarm, 2 - compose, 3 - kubernetes)
+	Type portainer.StackType `example:"1" enums:"1,2,3" validate:"required"`
 	// Content of stack file
 	FileContent string `validate:"required"`
 }
@@ -41,10 +42,10 @@ func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.FileContent) {
 		return errors.New("Invalid file content")
 	}
-	if payload.Platform != portainer.CustomTemplatePlatformLinux && payload.Platform != portainer.CustomTemplatePlatformWindows {
+	if payload.Type != portainer.KubernetesStack && payload.Platform != portainer.CustomTemplatePlatformLinux && payload.Platform != portainer.CustomTemplatePlatformWindows {
 		return errors.New("Invalid custom template platform")
 	}
-	if payload.Type != portainer.DockerComposeStack && payload.Type != portainer.DockerSwarmStack {
+	if payload.Type != portainer.KubernetesStack && payload.Type != portainer.DockerSwarmStack && payload.Type != portainer.DockerComposeStack {
 		return errors.New("Invalid custom template type")
 	}
 	if govalidator.IsNull(payload.Description) {

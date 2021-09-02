@@ -24,14 +24,16 @@
                 </div>
 
                 <div class="col-sm-12 form-section-title">
-                  Deployment type
-                </div>
-                <box-selector radio-name="deploy" ng-model="ctrl.state.DeployType" options="ctrl.deployOptions" data-cy="k8sAppDeploy-deploymentSelector"></box-selector>
-
-                <div class="col-sm-12 form-section-title">
                   Build method
                 </div>
                 <box-selector radio-name="method" ng-model="ctrl.state.BuildMethod" options="ctrl.methodOptions" data-cy="k8sAppDeploy-buildSelector"></box-selector>
+
+                <div ng-if="ctrl.state.BuildMethod !== ctrl.BuildMethods.CUSTOM_TEMPLATE">
+                  <div class="col-sm-12 form-section-title">
+                    Deployment type
+                  </div>
+                  <box-selector radio-name="deploy" ng-model="ctrl.state.DeployType" options="ctrl.deployOptions" data-cy="k8sAppDeploy-deploymentSelector"></box-selector>
+                </div>
 
                 <!-- repository -->
                 <div ng-show="ctrl.state.BuildMethod === ctrl.BuildMethods.GIT">
@@ -62,9 +64,17 @@
                 </div>
                 <!-- !repository -->
 
+                <custom-template-selector
+                  ng-show="ctrl.state.BuildMethod === ctrl.BuildMethods.CUSTOM_TEMPLATE"
+                  new-template-path="kubernetes.templates.custom.new"
+                  stack-type="3"
+                  on-change="(ctrl.onChangeTemplateId)"
+                  value="ctrl.state.templateId"
+                ></custom-template-selector>
+
                 <!-- editor -->
                 <web-editor-form
-                  ng-if="ctrl.state.BuildMethod === ctrl.BuildMethods.WEB_EDITOR"
+                  ng-if="ctrl.state.BuildMethod === ctrl.BuildMethods.WEB_EDITOR || (ctrl.state.BuildMethod === ctrl.BuildMethods.CUSTOM_TEMPLATE && ctrl.state.templateId)"
                   identifier="kubernetes-deploy-editor"
                   value="ctrl.formValues.EditorContent"
                   on-change="(ctrl.onChangeFileContent)"

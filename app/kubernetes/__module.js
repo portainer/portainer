@@ -1,6 +1,7 @@
 import registriesModule from './registries';
+import customTemplateModule from './custom-templates';
 
-angular.module('portainer.kubernetes', ['portainer.app', registriesModule]).config([
+angular.module('portainer.kubernetes', ['portainer.app', registriesModule, customTemplateModule]).config([
   '$stateRegistryProvider',
   function ($stateRegistryProvider) {
     'use strict';
@@ -208,11 +209,14 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule]).conf
 
     const deploy = {
       name: 'kubernetes.deploy',
-      url: '/deploy',
+      url: '/deploy?templateId',
       views: {
         'content@': {
           component: 'kubernetesDeployView',
         },
+      },
+      params: {
+        templateId: '',
       },
     };
 

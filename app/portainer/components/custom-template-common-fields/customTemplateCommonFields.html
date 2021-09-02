@@ -52,7 +52,7 @@
   <!-- !icon-url-input -->
 
   <!-- platform-input -->
-  <div class="form-group">
+  <div ng-if="$ctrl.showPlatformField" class="form-group">
     <label for="platform" class="col-sm-3 col-lg-2 control-label text-left">Platform</label>
     <div class="col-sm-9 col-lg-10">
       <select class="form-control" ng-model="$ctrl.formValues.Platform" ng-options="+(opt.value) as opt.label for opt in $ctrl.platformTypes"> </select>
@@ -61,7 +61,7 @@
   <!-- !platform-input -->
 
   <!-- platform-input -->
-  <div class="form-group">
+  <div ng-if="$ctrl.showTypeField" class="form-group">
     <label for="platform" class="col-sm-3 col-lg-2 control-label text-left">Type</label>
     <div class="col-sm-9 col-lg-10">
       <select class="form-control" ng-model="$ctrl.formValues.Type" ng-options="+(opt.value) as opt.label for opt in $ctrl.templateTypes"> </select>

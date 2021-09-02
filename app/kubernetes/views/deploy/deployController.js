@@ -6,10 +6,11 @@ import { KubernetesDeployManifestTypes, KubernetesDeployBuildMethods, Kubernetes
 import { buildOption } from '@/portainer/components/box-selector';
 class KubernetesDeployController {
   /* @ngInject */
-  constructor($async, $state, $window, ModalService, Notifications, EndpointProvider, KubernetesResourcePoolService, StackService) {
+  constructor($async, $state, $window, CustomTemplateService, ModalService, Notifications, EndpointProvider, KubernetesResourcePoolService, StackService) {
     this.$async = $async;
     this.$state = $state;
     this.$window = $window;
+    this.CustomTemplateService = CustomTemplateService;
     this.ModalService = ModalService;
     this.Notifications = Notifications;
     this.EndpointProvider = EndpointProvider;
@@ -18,12 +19,13 @@ class KubernetesDeployController {
 
     this.deployOptions = [
       buildOption('method_kubernetes', 'fa fa-cubes', 'Kubernetes', 'Kubernetes manifest format', KubernetesDeployManifestTypes.KUBERNETES),
-      buildOption('method_compose', 'fa fa-docker', 'Compose', 'docker-compose format', KubernetesDeployManifestTypes.COMPOSE),
+      buildOption('method_compose', 'fab fa-docker', 'Compose', 'docker-compose format', KubernetesDeployManifestTypes.COMPOSE),
     ];
 
     this.methodOptions = [
       buildOption('method_repo', 'fab fa-github', 'Git Repository', 'Use a git repository', KubernetesDeployBuildMethods.GIT),
       buildOption('method_editor', 'fa fa-edit', 'Web editor', 'Use our Web editor', KubernetesDeployBuildMethods.WEB_EDITOR),
+      buildOption('method_template', 'fa fa-rocket', 'Custom Template', 'Use a custom template', KubernetesDeployBuildMethods.CUSTOM_TEMPLATE),
     ];
 
     this.state = {
@@ -33,6 +35,7 @@ class KubernetesDeployController {
       activeTab: 0,
       viewReady: false,
       isEditorDirty: false,
+      templateId: null,
     };
 
     this.formValues = {};
@@ -40,7 +43,7 @@ class KubernetesDeployController {
     this.BuildMethods = KubernetesDeployBuildMethods;
     this.endpointId = this.EndpointProvider.endpointID();
 
-    this.onInit = this.onInit.bind(this);
+    this.onChangeTemplateId = this.onChangeTemplateId.bind(this);
     this.deployAsync = this.deployAsync.bind(this);
     this.onChangeFileContent = this.onChangeFileContent.bind(this);
     this.getNamespacesAsync = this.getNamespacesAsync.bind(this);
@@ -75,6 +78,23 @@ class KubernetesDeployController {
     this.onChangeFormValues({ RepositoryReferenceName: value });
   }
 
+  onChangeTemplateId(templateId) {
+    return this.$async(async () => {
+      if (this.state.templateId === templateId) {
+        return;
+      }
+
+      this.state.templateId = templateId;
+
+      try {
+        const fileContent = await this.CustomTemplateService.customTemplateFile(templateId);
+        this.onChangeFileContent(fileContent);
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to load template file');
+      }
+    });
+  }
+
   onChangeFileContent(value) {
     this.formValues.EditorContent = value;
     this.state.isEditorDirty = true;
@@ -91,10 +111,20 @@ class KubernetesDeployController {
     this.state.actionInProgress = true;
 
     try {
-      const method = this.state.BuildMethod === this.BuildMethods.GIT ? KubernetesDeployRequestMethods.REPOSITORY : KubernetesDeployRequestMethods.STRING;
+      let method = KubernetesDeployRequestMethods.STRING;
+      let composeFormat = this.state.DeployType === this.ManifestDeployTypes.COMPOSE;
+
+      switch (this.state.BuildMethod) {
+        case KubernetesDeployBuildMethods.GIT:
+          method = KubernetesDeployRequestMethods.REPOSITORY;
+          break;
+        case KubernetesDeployBuildMethods.CUSTOM_TEMPLATE:
+          composeFormat = false;
+          break;
+      }
 
       const payload = {
-        ComposeFormat: this.state.DeployType === this.ManifestDeployTypes.COMPOSE,
+        ComposeFormat: composeFormat,
         Namespace: this.formValues.Namespace,
       };
 
@@ -157,20 +187,27 @@ class KubernetesDeployController {
       return this.ModalService.confirmWebEditorDiscard();
     }
   }
-  async onInit() {
-    await this.getNamespaces();
-
-    this.state.viewReady = true;
-
-    this.$window.onbeforeunload = () => {
-      if (this.formValues.EditorContent && this.state.isEditorDirty) {
-        return '';
-      }
-    };
-  }
 
   $onInit() {
-    return this.$async(this.onInit);
+    return this.$async(async () => {
+      await this.getNamespaces();
+
+      if (this.$state.params.templateId) {
+        const templateId = parseInt(this.$state.params.templateId, 10);
+        if (templateId && !Number.isNaN(templateId)) {
+          this.state.BuildMethod = KubernetesDeployBuildMethods.CUSTOM_TEMPLATE;
+          this.onChangeTemplateId(templateId);
+        }
+      }
+
+      this.state.viewReady = true;
+
+      this.$window.onbeforeunload = () => {
+        if (this.formValues.EditorContent && this.state.isEditorDirty) {
+          return '';
+        }
+      };
+    });
   }
 
   $onDestroy() {

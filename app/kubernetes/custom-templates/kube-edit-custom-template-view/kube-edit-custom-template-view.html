@@ -1,0 +1,60 @@
+<rd-header>
+  <rd-header-title title-text="Edit Custom Template">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="kubernetes.templates.custom.edit({id:$ctrl.formValues.Id})" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content> <a ui-sref="kubernetes.templates.custom">Custom templates</a> &gt; {{ $ctrl.formValues.Title }} </rd-header-content>
+</rd-header>
+
+<div class="row" ng-if="$ctrl.formValues">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <form class="form-horizontal" name="$ctrl.form">
+          <custom-template-common-fields form-values="$ctrl.formValues"></custom-template-common-fields>
+
+          <web-editor-form
+            identifier="template-editor"
+            value="$ctrl.formValues.FileContent"
+            on-change="($ctrl.onChangeFileContent)"
+            ng-required="true"
+            yml="true"
+            placeholder="# Define or paste the content of your manifest file here"
+          >
+            <editor-description>
+              <p>Templates allow deploying any kind of Kubernetes resource (Deployment, Secret, ConfigMap...)</p>
+              <p>
+                You can get more information about Kubernetes file format in the
+                <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/" target="_blank">official documentation</a>.
+              </p>
+            </editor-description>
+          </web-editor-form>
+
+          <por-access-control-form form-data="$ctrl.formValues.AccessControlData" resource-control="$ctrl.formValues.ResourceControl"></por-access-control-form>
+
+          <div class="col-sm-12 form-section-title">
+            Actions
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                ng-disabled="$ctrl.actionInProgress || $ctrl.form.$invalid || !$ctrl.formValues.Title || !$ctrl.formValues.FileContent"
+                ng-click="$ctrl.submitAction()"
+                button-spinner="$ctrl.actionInProgress"
+              >
+                <span ng-hide="$ctrl.actionInProgress">Update the template</span>
+                <span ng-show="$ctrl.actionInProgress">Update in progress...</span>
+              </button>
+              <span class="text-danger" ng-if="$ctrl.state.formValidationError" style="margin-left: 5px;">
+                {{ $ctrl.state.formValidationError }}
+              </span>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

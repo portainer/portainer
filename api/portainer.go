@@ -1243,7 +1243,7 @@ type (
 	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes endpoint
 	KubernetesDeployer interface {
 		Deploy(request *http.Request, endpoint *Endpoint, data string, namespace string) (string, error)
-		ConvertCompose(data string) ([]byte, error)
+		ConvertCompose(data []byte) ([]byte, error)
 	}
 
 	// KubernetesSnapshotter represents a service used to create Kubernetes endpoint snapshots
