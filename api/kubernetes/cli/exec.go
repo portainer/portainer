@@ -4,7 +4,7 @@ import (
 	"errors"
 	"io"
 
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/remotecommand"
@@ -15,10 +15,12 @@ import (
 // using the specified command. The stdin parameter will be bound to the stdin process and the stdout process will write
 // to the stdout parameter.
 // This function only works against a local endpoint using an in-cluster config with the user's SA token.
-func (kcl *KubeClient) StartExecProcess(token string, useAdminToken bool, namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error {
+// This is a blocking operation.
+func (kcl *KubeClient) StartExecProcess(token string, useAdminToken bool, namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer, errChan chan error) {
 	config, err := rest.InClusterConfig()
 	if err != nil {
-		return err
+		errChan <- err
+		return
 	}
 
 	if !useAdminToken {
@@ -44,7 +46,8 @@ func (kcl *KubeClient) StartExecProcess(token string, useAdminToken bool, namesp
 
 	exec, err := remotecommand.NewSPDYExecutor(config, "POST", req.URL())
 	if err != nil {
-		return err
+		errChan <- err
+		return
 	}
 
 	err = exec.Stream(remotecommand.StreamOptions{
@@ -54,9 +57,7 @@ func (kcl *KubeClient) StartExecProcess(token string, useAdminToken bool, namesp
 	})
 	if err != nil {
 		if _, ok := err.(utilexec.ExitError); !ok {
-			return errors.New("unable to start exec process")
+			errChan <- errors.New("unable to start exec process")
 		}
 	}
-
-	return nil
 }
