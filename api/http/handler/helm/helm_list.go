@@ -20,7 +20,7 @@ import (
 // @param namespace query string true "specify an optional namespace"
 // @param filter query string true "specify an optional filter"
 // @param selector query string true "specify an optional selector"
-// @success 200 {object} []release.ReleaseElement "Success"
+// @success 200 {array} release.ReleaseElement "Success"
 // @failure 400 "Invalid endpoint identifier"
 // @failure 401 "Unauthorized"
 // @failure 404 "Endpoint or ServiceAccount not found"
