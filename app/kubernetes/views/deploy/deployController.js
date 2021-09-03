@@ -122,7 +122,7 @@ class KubernetesDeployController {
             payload.AutoUpdate.Interval = this.formValues.RepositoryFetchInterval;
             metadata['automatic-updates'] = 'polling';
           } else if (this.formValues.RepositoryMechanism === `Webhook`) {
-            payload.AutoUpdate.Webhook = this.formValues.RepositoryWebhookURL;
+            payload.AutoUpdate.Webhook = this.formValues.RepositoryWebhookURL.split('/').reverse()[0];
             metadata['automatic-updates'] = 'webhook';
           }
         } else {
