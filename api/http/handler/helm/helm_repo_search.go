@@ -16,7 +16,7 @@ import (
 // @description
 // @description **Access policy**: authorized
 // @tags helm_chart
-// @param repo helm repo url
+// @param repo query string true "Helm repository URL"
 // @security jwt
 // @produce json
 // @success 200 {object} string "Success"

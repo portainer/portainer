@@ -16,6 +16,11 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
+type helmUserRepositoryResponse struct {
+	GlobalRepo string                         `json:"GlobalRepo"`
+	UserRepos  []portainer.HelmUserRepository `json:"UserRepos"`
+}
+
 type addHelmRepoUrlPayload struct {
 	URL string `json:"url"`
 }
@@ -33,6 +38,7 @@ func (p *addHelmRepoUrlPayload) Validate(_ *http.Request) error {
 // @accept json
 // @produce json
 // @param id path int true "User identifier"
+// @param payload body addHelmRepoUrlPayload true "Helm Repository"
 // @success 200 {object} portainer.HelmUserRepository "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
@@ -98,7 +104,7 @@ func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Reques
 // @security jwt
 // @produce json
 // @param id path int true "User identifier"
-// @success 200 {object} []portainer.HelmUserRepository "Success"
+// @success 200 {object} helmUserRepositoryResponse "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
 // @failure 500 "Server error"
@@ -128,10 +134,7 @@ func (handler *Handler) userGetHelmRepos(w http.ResponseWriter, r *http.Request)
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to get user Helm repositories", err}
 	}
 
-	resp := struct {
-		GlobalRepo string                         `json:"GlobalRepo"`
-		UserRepos  []portainer.HelmUserRepository `json:"UserRepos"`
-	}{
+	resp := helmUserRepositoryResponse{
 		GlobalRepo: settings.HelmRepositoryURL,
 		UserRepos:  userRepos,
 	}

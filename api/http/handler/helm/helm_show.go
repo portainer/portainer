@@ -12,13 +12,14 @@ import (
 	"github.com/portainer/libhttp/request"
 )
 
-// @id HelmList
-// @summary List Helm Chart(s)
+// @id HelmShow
+// @summary Show Helm Chart(s)
 // @description
 // @description **Access policy**: authorized
 // @tags helm_chart
-// @param repo helm repo url
-// @param chart helm chart in specified repo
+// @param repo query string true "Helm repository URL"
+// @param chart query string true "Chart name"
+// @param command path string false "chart/values/readme"
 // @security jwt
 // @accept json
 // @produce text/plain
