@@ -1,18 +1,18 @@
 export default class HelmAddRepositoryController {
   /* @ngInject */
-  constructor($async, $window, $analytics, Authentication, UserService, Notifications) {
+  constructor($async, $window, $analytics, HelmService, Notifications, EndpointProvider) {
     this.$async = $async;
     this.$window = $window;
     this.$analytics = $analytics;
-    this.Authentication = Authentication;
-    this.UserService = UserService;
+    this.HelmService = HelmService;
     this.Notifications = Notifications;
+    this.EndpointProvider = EndpointProvider;
   }
 
   async addRepository() {
     this.state.isAddingRepo = true;
     try {
-      const { URL } = await this.UserService.addHelmRepository(this.state.userId, this.state.repository);
+      const { URL } = await this.HelmService.addHelmRepository(this.EndpointProvider.currentEndpoint().Id, { url: this.state.repository });
       this.Notifications.success('Helm repository added successfully');
       this.refreshCharts([URL], true);
     } catch (err) {
@@ -27,7 +27,6 @@ export default class HelmAddRepositoryController {
       this.state = {
         isAddingRepo: false,
         repository: '',
-        userId: this.Authentication.getUserDetails().ID,
       };
     });
   }

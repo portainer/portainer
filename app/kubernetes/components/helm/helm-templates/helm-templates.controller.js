@@ -2,14 +2,13 @@ import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 
 export default class HelmTemplatesController {
   /* @ngInject */
-  constructor($analytics, $async, $state, $window, $anchorScroll, Authentication, UserService, HelmService, KubernetesResourcePoolService, Notifications, ModalService) {
+  constructor($analytics, $async, $state, $window, $anchorScroll, Authentication, HelmService, KubernetesResourcePoolService, Notifications, ModalService) {
     this.$analytics = $analytics;
     this.$async = $async;
     this.$window = $window;
     this.$state = $state;
     this.$anchorScroll = $anchorScroll;
     this.Authentication = Authentication;
-    this.UserService = UserService;
     this.HelmService = HelmService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.Notifications = Notifications;
@@ -50,7 +49,14 @@ export default class HelmTemplatesController {
   async installHelmchart() {
     this.state.actionInProgress = true;
     try {
-      await this.HelmService.install(this.state.appName, this.state.chart.repo, this.state.chart.name, this.state.values, this.state.resourcePool.Namespace.Name);
+      const payload = {
+        Name: this.state.appName,
+        Repo: this.state.chart.repo,
+        Chart: this.state.chart.name,
+        Values: this.state.values,
+        Namespace: this.state.resourcePool.Namespace.Name,
+      };
+      await this.HelmService.install(this.endpoint.Id, payload);
       this.Notifications.success('Helm Chart successfully installed');
       this.$analytics.eventTrack('kubernetes-helm-install', { category: 'kubernetes', metadata: { 'chart-name': this.state.chart.name } });
       this.state.isEditorDirty = false;
@@ -91,7 +97,7 @@ export default class HelmTemplatesController {
     this.state.reposLoading = true;
     try {
       // fetch globally set helm repo and user helm repos (parallel)
-      const { GlobalRepo, UserRepos } = await this.UserService.getHelmRepositories(this.state.userId);
+      const { GlobalRepo, UserRepos } = await this.HelmService.getHelmRepositories(this.endpoint.Id);
       const userHelmReposUrls = UserRepos.map((repo) => repo.URL);
       const uniqueHelmRepos = [...new Set([GlobalRepo, ...userHelmReposUrls])]; // remove duplicates
       return uniqueHelmRepos;
@@ -161,7 +167,6 @@ export default class HelmTemplatesController {
         isEditorDirty: false,
         chartsLoading: false,
         resourcePoolsLoading: false,
-        userId: this.Authentication.getUserDetails().ID,
         viewReady: false,
       };
 

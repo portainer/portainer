@@ -153,15 +153,6 @@ angular.module('portainer.app').factory('UserService', [
       return deferred.promise;
     };
 
-    service.getHelmRepositories = function (id) {
-      return Users.getHelmRepositories({ id }).$promise;
-    };
-
-    service.addHelmRepository = function (id, url) {
-      const payload = { url };
-      return Users.addHelmRepository({ id }, payload).$promise;
-    };
-
     return service;
   },
 ]);

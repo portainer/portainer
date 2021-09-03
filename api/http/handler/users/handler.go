@@ -54,10 +54,6 @@ func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimi
 		bouncer.PublicAccess(httperror.LoggerHandler(h.adminCheck))).Methods(http.MethodGet)
 	h.Handle("/users/admin/init",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.adminInit))).Methods(http.MethodPost)
-	h.Handle("/users/{id}/helm-repositories",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.userGetHelmRepos))).Methods(http.MethodGet)
-	h.Handle("/users/{id}/helm-repositories",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.userCreateHelmRepo))).Methods(http.MethodPost)
 
 	return h
 }

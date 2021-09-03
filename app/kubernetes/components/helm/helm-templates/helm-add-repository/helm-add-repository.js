@@ -7,5 +7,6 @@ angular.module('portainer.kubernetes').component('helmAddRepository', {
   bindings: {
     charts: '@',
     refreshCharts: '<',
+    endpoint: '<',
   },
 });

@@ -69,7 +69,7 @@ class KubernetesApplicationsController {
     for (const application of selectedItems) {
       try {
         if (application.ApplicationType === KubernetesApplicationTypes.HELM) {
-          await this.HelmService.uninstall(application);
+          await this.HelmService.uninstall(this.endpoint.Id, application);
         } else {
           await this.KubernetesApplicationService.delete(application);
         }

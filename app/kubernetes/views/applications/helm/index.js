@@ -5,4 +5,7 @@ import './helm.css';
 angular.module('portainer.kubernetes').component('kubernetesHelmApplicationView', {
   templateUrl: './helm.html',
   controller,
+  bindings: {
+    endpoint: '<',
+  },
 });
