@@ -111,6 +111,33 @@
                 </web-editor-form>
 
                 <!-- !editor -->
+                
+                <!-- url -->
+                <div ng-show="ctrl.state.BuildMethod === ctrl.BuildMethods.URL">
+                  <div class="col-sm-12 form-section-title">
+                    URL
+                  </div>
+                  <div class="form-group">
+                    <span class="col-sm-12 text-muted small">
+                      Indicate the URL to the manifest.
+                    </span>
+                  </div>
+                  <div class="form-group">
+                    <label for="manifest_url" class="col-sm-1 control-label text-left">URL</label>
+                    <div class="col-sm-11">
+                      <input
+                        type="text"
+                        class="form-control"
+                        ng-model="ctrl.formValues.ManifestURL"
+                        id="manifest_url"
+                        placeholder="https://raw.githubusercontent.com/kubernetes/website/main/content/en/examples/controllers/nginx-deployment.yaml"
+                        data-cy="k8sAppDeploy-urlFileUrl"
+                      />
+                    </div>
+                  </div>
+                </div>                
+                <!-- !url -->
+
                 <!-- actions -->
                 <div class="col-sm-12 form-section-title">
                   Actions
