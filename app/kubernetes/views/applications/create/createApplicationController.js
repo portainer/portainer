@@ -155,7 +155,7 @@ class KubernetesCreateApplicationController {
       try {
         const confirmed = await this.ModalService.confirmAsync({
           title: 'Are you sure?',
-          message: 'Any changes to this application will be overriden and may cause a service interruption. Do you wish to continue',
+          message: 'Any changes to this application will be overriden and may cause a service interruption. Do you wish to continue?',
           buttons: {
             confirm: {
               label: 'Update',
