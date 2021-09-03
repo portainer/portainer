@@ -199,7 +199,7 @@ class KubernetesResourcePoolController {
           'Reducing the quota assigned to an "in-use" namespace may have unintended consequences, including preventing running applications from functioning correctly and potentially even blocking them from running at all.',
         ingress: 'Deactivating ingresses may cause applications to be unaccessible. All ingress configurations from affected applications will be removed.',
         registries:
-          'Some registries you removed might be used by one or more applications inside this environment. Removing the registries accesses could lead to a service interruption for these applications.',
+          'Some registries you removed might be used by one or more applications inside this environment. Removing the registries access could lead to a service interruption for these applications.',
       };
       const displayedMessage = `${warnings.quota ? messages.quota + '<br/><br/>' : ''}
       ${warnings.ingress ? messages.ingress + '<br/><br/>' : ''}

@@ -21,9 +21,9 @@ angular.module('portainer.app').controller('RegistriesController', [
     };
 
     $scope.removeAction = function (selectedItems) {
-      const regAttrMsg = selectedItems.length > 1 ? 'These' : 'This';
+      const regAttrMsg = selectedItems.length > 1 ? 'hese' : 'his';
       const registriesMsg = selectedItems.length > 1 ? 'registries' : 'registry';
-      const msg = `${regAttrMsg} ${registriesMsg} might be used by applications inside one or more endpoints. Removing the ${registriesMsg} could lead to a service interruption for the applications using ${regAttrMsg} ${registriesMsg}. Do you want to remove the selected ${registriesMsg}?`;
+      const msg = `T${regAttrMsg} ${registriesMsg} might be used by applications inside one or more endpoints. Removing the ${registriesMsg} could lead to a service interruption for the applications using t${regAttrMsg} ${registriesMsg}. Do you want to remove the selected ${registriesMsg}?`;
 
       ModalService.confirmDeletion(msg, function onConfirm(confirmed) {
         if (!confirmed) {
