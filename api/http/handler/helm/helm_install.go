@@ -36,7 +36,8 @@ var errChartNameInvalid = errors.New("invalid chart name. " +
 // @security jwt
 // @accept json
 // @produce json
-// @success 201 {object} helm.Release "Created"
+// @param payload body installChartPayload true "Chart details"
+// @success 201 {object} release.Release "Created"
 // @failure 401 "Unauthorized"
 // @failure 404 "Endpoint or ServiceAccount not found"
 // @failure 500 "Server error"
