@@ -8,8 +8,8 @@ class CustomTemplateSelectorController {
   }
 
   async handleChangeTemplate(templateId) {
-    this.selectedTemplate = this.templates.find((t) => t.id === templateId);
-    this.onChange(templateId);
+    this.selectedTemplate = this.templates.find((t) => t.Id === templateId);
+    this.onChange(templateId, this.selectedTemplate);
   }
 
   $onChanges({ value }) {

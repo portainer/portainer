@@ -93,7 +93,16 @@
   </div>
   <div class="form-group">
     <div class="col-sm-12">
-      <button type="submit" class="btn btn-primary btn-sm" ng-disabled="$ctrl.actionInProgress || !registryFormCustom.$valid" button-spinner="$ctrl.actionInProgress">
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm"
+        ng-disabled="$ctrl.actionInProgress || !registryFormCustom.$valid"
+        button-spinner="$ctrl.actionInProgress"
+        analytics-on
+        analytics-category="portainer"
+        analytics-event="portainer-registry-creation"
+        analytics-properties="{ metadata: { type: 'custom' }}"
+      >
         <span ng-hide="$ctrl.actionInProgress">{{ $ctrl.formActionLabel }}</span>
         <span ng-show="$ctrl.actionInProgress">In progress...</span>
       </button>

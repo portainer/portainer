@@ -26,6 +26,7 @@ angular
     clipboard
   ) {
     $scope.onChangeTemplateId = onChangeTemplateId;
+    $scope.buildAnalyticsProperties = buildAnalyticsProperties;
 
     $scope.formValues = {
       Name: '',
@@ -54,6 +55,8 @@ angular
       editorYamlValidationError: '',
       uploadYamlValidationError: '',
       isEditorDirty: false,
+      selectedTemplate: null,
+      selectedTemplateId: null,
     };
 
     $window.onbeforeunload = () => {
@@ -75,6 +78,47 @@ angular
     $scope.removeAdditionalFiles = function (index) {
       $scope.formValues.AdditionalFiles.splice(index, 1);
     };
+
+    function buildAnalyticsProperties() {
+      const metadata = { type: methodLabel($scope.state.Method) };
+
+      if ($scope.state.Method === 'repository') {
+        metadata.automaticUpdates = 'off';
+        if ($scope.formValues.RepositoryAutomaticUpdates) {
+          metadata.automaticUpdates = autoSyncLabel($scope.formValues.RepositoryMechanism);
+        }
+        metadata.auth = $scope.formValues.RepositoryAuthentication;
+      }
+
+      if ($scope.state.Method === 'template') {
+        metadata.templateName = $scope.state.selectedTemplate.Title;
+      }
+
+      return { metadata };
+
+      function methodLabel(method) {
+        switch (method) {
+          case 'editor':
+            return 'web-editor';
+          case 'repository':
+            return 'git';
+          case 'upload':
+            return 'file-upload';
+          case 'template':
+            return 'custom-template';
+        }
+      }
+
+      function autoSyncLabel(type) {
+        switch (type) {
+          case 'Interval':
+            return 'polling';
+          case 'Webhook':
+            return 'webhook';
+        }
+        return 'off';
+      }
+    }
 
     function validateForm(accessControlData, isAdmin) {
       $scope.state.formValidationError = '';
@@ -238,10 +282,11 @@ angular
       }
     };
 
-    function onChangeTemplateId(templateId) {
+    function onChangeTemplateId(templateId, template) {
       return $async(async () => {
         try {
-          $scope.state.templateId = templateId;
+          $scope.state.selectedTemplateId = templateId;
+          $scope.state.selectedTemplate = template;
 
           const fileContent = await CustomTemplateService.customTemplateFile(templateId);
           $scope.onChangeFileContent(fileContent);

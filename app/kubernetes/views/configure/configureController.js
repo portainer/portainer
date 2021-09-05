@@ -237,6 +237,10 @@ class KubernetesConfigureController {
   }
   /* #endregion */
 
+  restrictDefaultToggledOn() {
+    return this.formValues.RestrictDefaultNamespace && !this.oldFormValues.RestrictDefaultNamespace;
+  }
+
   /* #region  ON INIT */
   async onInit() {
     this.state = {
@@ -287,6 +291,8 @@ class KubernetesConfigureController {
         ic.NeedsDeletion = false;
         return ic;
       });
+
+      this.oldFormValues = Object.assign({}, this.formValues);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve endpoint configuration');
     } finally {
