@@ -4,10 +4,12 @@ import PortainerError from 'Portainer/error';
 angular.module('portainer.kubernetes').factory('HelmService', HelmService);
 
 /* @ngInject */
-export function HelmService(HelmFactory, EndpointProvider) {
+export function HelmService(HelmFactory) {
   return {
     search,
     values,
+    getHelmRepositories,
+    addHelmRepository,
     install,
     uninstall,
     listReleases,
@@ -15,12 +17,13 @@ export function HelmService(HelmFactory, EndpointProvider) {
 
   /**
    * @description: Searches for all helm charts in a helm repo
+   * @param {string} repo - repo url to search charts for
    * @returns {Promise} - Resolves with `index.yaml` of helm charts for a repo
    * @throws {PortainerError} - Rejects with error if searching for the `index.yaml` fails
    */
-  async function search() {
+  async function search(repo) {
     try {
-      return await HelmFactory.templates().$promise;
+      return await HelmFactory.templates({ repo }).$promise;
     } catch (err) {
       throw new PortainerError('Unable to retrieve helm charts', err);
     }
@@ -28,15 +31,36 @@ export function HelmService(HelmFactory, EndpointProvider) {
 
   /**
    * @description: Show values helm of a helm chart, this basically runs `helm show values`
+   * @param {string} repo - repo url to search charts values for
+   * @param {string} chart - chart within the repo to retrieve default values
    * @returns {Promise} - Resolves with `values.yaml` of helm chart values for a repo
    * @throws {PortainerError} - Rejects with error if helm show fails
    */
-  async function values(chart) {
+  async function values(repo, chart) {
     try {
-      return await HelmFactory.show({ chart, type: 'values' }).$promise;
+      return await HelmFactory.show({ repo, chart, type: 'values' }).$promise;
     } catch (err) {
       throw new PortainerError('Unable to retrieve values from chart', err);
     }
+  }
+
+  /**
+   * @description: Show values helm of a helm chart, this basically runs `helm show values`
+   * @returns {Promise} - Resolves with an object containing list of user helm repos and default/global settings helm repo
+   * @throws {PortainerError} - Rejects with error if helm show fails
+   */
+  async function getHelmRepositories(endpointId) {
+    return await HelmFactory.getHelmRepositories({ endpointId }).$promise;
+  }
+
+  /**
+   * @description: Adds a helm repo for the calling user
+   * @param {Object} payload - helm repo url to add for the user
+   * @returns {Promise} - Resolves with `values.yaml` of helm chart values for a repo
+   * @throws {PortainerError} - Rejects with error if helm show fails
+   */
+  async function addHelmRepository(endpointId, payload) {
+    return await HelmFactory.addHelmRepository({ endpointId }, payload).$promise;
   }
 
   /**
@@ -44,20 +68,18 @@ export function HelmService(HelmFactory, EndpointProvider) {
    * @returns {Promise} - Resolves with `values.yaml` of helm chart values for a repo
    * @throws {PortainerError} - Rejects with error if helm show fails
    */
-  async function install(appname, namespace, chart, values) {
-    const endpointId = EndpointProvider.currentEndpoint().Id;
-    const payload = {
-      Name: appname,
-      Namespace: namespace,
-      Chart: chart,
-      Values: values,
-    };
+  async function install(endpointId, payload) {
     return await HelmFactory.install({ endpointId }, payload).$promise;
   }
 
-  async function uninstall({ Name }) {
+  /**
+   * @description: Uninstall a helm chart, this basically runs `helm uninstall`
+   * @param {Object} options - Options object, release `Name` is the only required option
+   * @throws {PortainerError} - Rejects with error if helm show fails
+   */
+  async function uninstall(endpointId, { Name }) {
     try {
-      await HelmFactory.uninstall({ release: Name }).$promise;
+      await HelmFactory.uninstall({ endpointId, release: Name }).$promise;
     } catch (err) {
       throw new PortainerError('Unable to delete release', err);
     }
@@ -65,13 +87,13 @@ export function HelmService(HelmFactory, EndpointProvider) {
 
   /**
    * @description: List all helm releases based on passed in options, this basically runs `helm list`
-   * @param {object} options - Supported CLI flags to pass to Helm (binary) - flags to `helm list`
+   * @param {Object} options - Supported CLI flags to pass to Helm (binary) - flags to `helm list`
    * @returns {Promise} - Resolves with list of helm releases
    * @throws {PortainerError} - Rejects with error if helm list fails
    */
-  async function listReleases({ namespace, selector, filter, output }) {
+  async function listReleases(endpointId, { namespace, selector, filter, output }) {
     try {
-      const releases = await HelmFactory.list({ selector, namespace, filter, output }).$promise;
+      const releases = await HelmFactory.list({ endpointId, selector, namespace, filter, output }).$promise;
       return releases;
     } catch (err) {
       throw new PortainerError('Unable to retrieve release list', err);

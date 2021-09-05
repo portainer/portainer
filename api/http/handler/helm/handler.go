@@ -54,23 +54,27 @@ func NewHandler(bouncer requestBouncer, dataStore portainer.DataStore, helmPacka
 	h.Handle("/{id}/kubernetes/helm",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.helmInstall))).Methods(http.MethodPost)
 
+	h.Handle("/{id}/kubernetes/helm/repositories",
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.userGetHelmRepos))).Methods(http.MethodGet)
+	h.Handle("/{id}/kubernetes/helm/repositories",
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.userCreateHelmRepo))).Methods(http.MethodPost)
+
 	return h
 }
 
 // NewTemplateHandler creates a template handler to manage endpoint group operations.
-func NewTemplateHandler(bouncer requestBouncer, dataStore portainer.DataStore, helmPackageManager libhelm.HelmPackageManager) *Handler {
+func NewTemplateHandler(bouncer requestBouncer, helmPackageManager libhelm.HelmPackageManager) *Handler {
 	h := &Handler{
 		Router:             mux.NewRouter(),
-		dataStore:          dataStore,
 		helmPackageManager: helmPackageManager,
 		requestBouncer:     bouncer,
 	}
-	// `helm search [COMMAND] [CHART] flags`
+
 	h.Handle("/templates/helm",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.helmRepoSearch))).Methods(http.MethodGet)
 
-	// `helm show [COMMAND] [CHART] flags`
-	h.Handle("/templates/helm/{chart}/{command:chart|values|readme}",
+	// helm show [COMMAND] [CHART] [REPO] flags
+	h.Handle("/templates/helm/{command:chart|values|readme}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.helmShow))).Methods(http.MethodGet)
 
 	return h

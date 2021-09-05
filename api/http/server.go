@@ -27,7 +27,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
 	"github.com/portainer/portainer/api/http/handler/endpoints"
 	"github.com/portainer/portainer/api/http/handler/file"
-	helmhandler "github.com/portainer/portainer/api/http/handler/helm"
+	"github.com/portainer/portainer/api/http/handler/helm"
 	kubehandler "github.com/portainer/portainer/api/http/handler/kubernetes"
 	"github.com/portainer/portainer/api/http/handler/motd"
 	"github.com/portainer/portainer/api/http/handler/registries"
@@ -170,9 +170,9 @@ func (server *Server) Start() error {
 
 	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"))
 
-	var endpointHelmHandler = helmhandler.NewHandler(requestBouncer, server.DataStore, server.HelmPackageManager, server.KubeConfigService)
+	var endpointHelmHandler = helm.NewHandler(requestBouncer, server.DataStore, server.HelmPackageManager, server.KubeConfigService)
 
-	var helmTemplatesHandler = helmhandler.NewTemplateHandler(requestBouncer, server.DataStore, server.HelmPackageManager)
+	var helmTemplatesHandler = helm.NewTemplateHandler(requestBouncer, server.HelmPackageManager)
 
 	var motdHandler = motd.NewHandler(requestBouncer)
 

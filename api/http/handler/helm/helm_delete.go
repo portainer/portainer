@@ -17,7 +17,8 @@ import (
 // @security jwt
 // @accept json
 // @produce json
-// @param namespace
+// @param release query string true "The name of the release/application to uninstall"
+// @param namespace query string true "An optional namespace"
 // @success 204 "Success"
 // @failure 400 "Invalid endpoint id or bad request"
 // @failure 401 "Unauthorized"
