@@ -164,6 +164,13 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 		IsComposeFormat: payload.ComposeFormat,
 	}
 
+	if payload.RepositoryAuthentication {
+		stack.GitConfig.Authentication = &gittypes.GitAuthentication{
+			Username: payload.RepositoryUsername,
+			Password: payload.RepositoryPassword,
+		}
+	}
+
 	projectPath := handler.FileService.GetStackProjectPath(strconv.Itoa(int(stack.ID)))
 	stack.ProjectPath = projectPath
 
