@@ -38,11 +38,11 @@ func Test_helmInstall(t *testing.T) {
 	is.NotNil(h, "Handler should not fail")
 
 	// Install a single chart.  We expect to get these values back
-	options := options.InstallOptions{Name: "nginx-1", Chart: "nginx", Namespace: "default"}
+	options := options.InstallOptions{Name: "nginx-1", Chart: "nginx", Namespace: "default", Repo: "https://charts.bitnami.com/bitnami"}
 	optdata, err := json.Marshal(options)
 	is.NoError(err)
 
-	t.Run("helmInstall", func(t *testing.T) {
+	t.Run("helmInstall succeeds with admin user", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPost, "/1/kubernetes/helm", bytes.NewBuffer(optdata))
 		ctx := security.StoreTokenData(req, &portainer.TokenData{ID: 1, Username: "admin", Role: 1})
 		req = req.WithContext(ctx)

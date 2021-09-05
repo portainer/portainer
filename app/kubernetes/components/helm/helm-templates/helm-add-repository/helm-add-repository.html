@@ -1,0 +1,36 @@
+<rd-widget>
+  <rd-widget-header icon="fa-dharmachakra" title-text="Additional repositories"></rd-widget-header>
+  <rd-widget-body>
+    <div class="actionBar">
+      <form class="form-horizontal">
+        <div class="form-group">
+          <span class="col-sm-12 text-muted small">
+            Add a Helm repository. All Helm charts in the repository will be added to the list.
+          </span>
+        </div>
+
+        <div class="form-group">
+          <div class="col-sm-12">
+            <input type="text" name="repo" class="form-control" ng-model="$ctrl.state.repository" placeholder="https://charts.bitnami.com/bitnami" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-sm-12">
+            <button
+              type="button"
+              class="btn btn-sm btn-default nomargin"
+              ng-click="$ctrl.addRepository()"
+              ng-disabled="$ctrl.state.isAddingRepo"
+              analytics-on
+              analytics-category="kubernetes"
+              analytics-event="kubernetes-helm-add-repository"
+            >
+              Add repository
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </rd-widget-body>
+</rd-widget>
