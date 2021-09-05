@@ -307,4 +307,65 @@ textarea {
   background: var(--text-input-textarea);
 }
 
+.daterangepicker {
+  background-color: var(--bg-daterangepicker-color);
+  border: 1px solid var(--border-daterangepicker-color);
+}
+
+.daterangepicker .drp-calendar.left {
+  background: var(--bg-calendar-color);
+}
+
+.daterangepicker .drp-calendar.left .calendar-table {
+  background: var(--bg-calendar-table-color);
+}
+
+.daterangepicker .drp-calendar.right {
+  background: var(--bg-calendar-color);
+}
+
+.daterangepicker .drp-calendar.right .calendar-table {
+  background: var(--bg-calendar-table-color);
+}
+
+.daterangepicker .calendar-table {
+  border: 1px solid var(--border-calendar-table);
+}
+
+.daterangepicker td.off,
+.daterangepicker td.off.in-range,
+.daterangepicker td.off.start-date,
+.daterangepicker td.off.end-date {
+  background-color: var(--bg-daterangepicker-end-date);
+  color: var(--text-daterangepicker-end-date);
+}
+
+.daterangepicker td.available:hover,
+.daterangepicker th.available:hover {
+  background-color: var(--bg-daterangepicker-hover);
+}
+
+.daterangepicker td.in-range {
+  background-color: var(--bg-daterangepicker-in-range);
+  color: var(--text-daterangepicker-in-range);
+}
+
+.daterangepicker td.active,
+.daterangepicker td.active:hover {
+  background-color: var(--bg-daterangepicker-active);
+  color: var(--text-daterangepicker-active);
+}
+
+.daterangepicker .drp-buttons {
+  border-top: 1px solid var(--border-daterangepicker);
+}
+
+.daterangepicker .calendar-table .next span,
+.daterangepicker .calendar-table .prev span {
+  border-color: var(--border-pre-next-month);
+}
+
+.daterangepicker:after {
+  border-bottom: 6px solid var(--border-daterangepicker-after);
+}
 /* Overide Vendor CSS */
