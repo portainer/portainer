@@ -2,15 +2,13 @@ import angular from 'angular';
 
 angular.module('portainer.kubernetes').factory('HelmFactory', HelmFactory);
 
-function HelmFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
+function HelmFactory($resource, API_ENDPOINT_ENDPOINTS) {
   const helmUrl = API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/helm';
   const templatesUrl = '/api/templates/helm';
 
   return $resource(
     helmUrl,
-    {
-      endpointId: EndpointProvider.endpointID,
-    },
+    {},
     {
       templates: {
         url: templatesUrl,
@@ -26,9 +24,18 @@ function HelmFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
           return { values: data };
         },
       },
+      getHelmRepositories: {
+        method: 'GET',
+        url: `${helmUrl}/repositories`,
+      },
+      addHelmRepository: {
+        method: 'POST',
+        url: `${helmUrl}/repositories`,
+      },
       list: {
         method: 'GET',
         isArray: true,
+        params: { namespace: '@namespace', selector: '@selector', filter: '@filter', output: '@output' },
       },
       install: { method: 'POST' },
       uninstall: {

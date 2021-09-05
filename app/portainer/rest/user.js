@@ -16,8 +16,6 @@ angular.module('portainer.app').factory('Users', [
         queryMemberships: { method: 'GET', isArray: true, params: { id: '@id', entity: 'memberships' } },
         checkAdminUser: { method: 'GET', params: { id: 'admin', entity: 'check' }, isArray: true, ignoreLoadingBar: true },
         initAdminUser: { method: 'POST', params: { id: 'admin', entity: 'init' }, ignoreLoadingBar: true },
-        getHelmRepositories: { method: 'GET', params: { id: '@id', entity: 'helm-repositories' } },
-        addHelmRepository: { method: 'POST', params: { id: '@id', entity: 'helm-repositories' } },
       }
     );
   },
