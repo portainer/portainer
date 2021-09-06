@@ -396,7 +396,7 @@ type (
 		// Membership Identifier
 		ID HelmUserRepositoryID `json:"Id" example:"1"`
 		// User identifier
-		UserID UserID `json:"UserID" example:"1"`
+		UserID UserID `json:"UserId" example:"1"`
 		// Helm repository URL
 		URL string `json:"URL" example:"https://charts.bitnami.com/bitnami"`
 	}
