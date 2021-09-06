@@ -22,7 +22,7 @@ class KubernetesRedeployAppGitFormController {
       RepositoryAuthentication: false,
       RepositoryUsername: '',
       RepositoryPassword: '',
-      // auto upadte
+      // auto update
       AutoUpdate: {
         RepositoryAutomaticUpdates: false,
         RepositoryMechanism: RepositoryMechanismTypes.INTERVAL,
