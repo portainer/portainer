@@ -54,7 +54,7 @@ angular.module('portainer.app').controller('InitAdminController', [
         })
         .then(function success(data) {
           if (data.value.length === 0) {
-            $state.go('portainer.init.endpoint');
+            $state.go('portainer.wizard');
           } else {
             $state.go('portainer.home');
           }
@@ -71,7 +71,7 @@ angular.module('portainer.app').controller('InitAdminController', [
       UserService.administratorExists()
         .then(function success(exists) {
           if (exists) {
-            $state.go('portainer.home');
+            $state.go('portainer.wizard');
           }
         })
         .catch(function error(err) {
