@@ -8,11 +8,11 @@ import { KubernetesDeployManifestTypes, KubernetesDeployBuildMethods, Kubernetes
 import { buildOption } from '@/portainer/components/box-selector';
 class KubernetesDeployController {
   /* @ngInject */
-  constructor($async, $state, $window, $analytics, ModalService, Notifications, EndpointProvider, KubernetesResourcePoolService, StackService, WebhookHelper) {
+  constructor($async, $state, $window, Authentication, ModalService, Notifications, EndpointProvider, KubernetesResourcePoolService, StackService, WebhookHelper) {
     this.$async = $async;
     this.$state = $state;
     this.$window = $window;
-    this.$analytics = $analytics;
+    this.Authentication = Authentication;
     this.ModalService = ModalService;
     this.Notifications = Notifications;
     this.EndpointProvider = EndpointProvider;
@@ -72,6 +72,7 @@ class KubernetesDeployController {
       type: buildLabel(this.state.BuildMethod),
       format: formatLabel(this.state.DeployType),
       role: roleLabel(this.Authentication.isAdmin()),
+      'automatic-updates': automaticUpdatesLabel(this.formValues.RepositoryAutomaticUpdates, this.formValues.RepositoryMechanism),
     };
 
     if (this.state.BuildMethod === KubernetesDeployBuildMethods.GIT) {
@@ -79,6 +80,17 @@ class KubernetesDeployController {
     }
 
     return { metadata };
+
+    function automaticUpdatesLabel(repositoryAutomaticUpdates, repositoryMechanism) {
+      switch (repositoryAutomaticUpdates && repositoryMechanism) {
+        case RepositoryMechanismTypes.INTERVAL:
+          return 'polling';
+        case RepositoryMechanismTypes.WEBHOOK:
+          return 'webhook';
+        default:
+          return 'off';
+      }
+    }
 
     function roleLabel(isAdmin) {
       if (isAdmin) {

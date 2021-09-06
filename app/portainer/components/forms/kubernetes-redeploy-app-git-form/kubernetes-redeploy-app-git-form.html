@@ -53,6 +53,10 @@
     ng-disabled="$ctrl.isSubmitButtonDisabled() || !$ctrl.redeployGitForm.$valid"
     style="margin-top: 7px; margin-left: 0;"
     button-spinner="$ctrl.state.saveGitSettingsInProgress"
+    analytics-on
+    analytics-category="kubernetes"
+    analytics-event="kubernetes-application-edit"
+    analytics-properties="$ctrl.buildAnalyticsProperties()"
   >
     <span ng-show="!$ctrl.state.saveGitSettingsInProgress"> Save settings </span>
     <span ng-show="$ctrl.state.saveGitSettingsInProgress">In progress...</span>

@@ -2,7 +2,7 @@ import uuidv4 from 'uuid/v4';
 import { RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
 class KubernetesRedeployAppGitFormController {
   /* @ngInject */
-  constructor($async, $state, $analytics, StackService, ModalService, Notifications, WebhookHelper) {
+  constructor($async, $state, StackService, ModalService, Notifications, WebhookHelper) {
     this.$async = $async;
     this.$state = $state;
     this.StackService = StackService;
@@ -46,23 +46,28 @@ class KubernetesRedeployAppGitFormController {
     };
   }
 
+  buildAnalyticsProperties() {
+    const metadata = {
+      'automatic-updates': automaticUpdatesLabel(this.formValues.AutoUpdate.RepositoryAutomaticUpdates, this.formValues.AutoUpdate.RepositoryMechanism),
+    };
+
+    return { metadata };
+
+    function automaticUpdatesLabel(repositoryAutomaticUpdates, repositoryMechanism) {
+      switch (repositoryAutomaticUpdates && repositoryMechanism) {
+        case RepositoryMechanismTypes.INTERVAL:
+          return 'polling';
+        case RepositoryMechanismTypes.WEBHOOK:
+          return 'webhook';
+        default:
+          return 'off';
+      }
+    }
+  }
+
   async pullAndRedeployApplication() {
     return this.$async(async () => {
       try {
-        //Analytics
-        const metadata = {};
-
-        if (this.formValues.AutoUpdate.RepositoryAutomaticUpdates) {
-          if (this.formValues.AutoUpdate.RepositoryMechanism === `Interval`) {
-            metadata['automatic-updates'] = 'polling';
-          } else if (this.formValues.AutoUpdate.RepositoryMechanism === `Webhook`) {
-            metadata['automatic-updates'] = 'webhook';
-          }
-        } else {
-          metadata['automatic-updates'] = 'off';
-        }
-        this.$analytics.eventTrack('kubernetes-application-edit', { category: 'kubernetes', metadata: metadata });
-
         const confirmed = await this.ModalService.confirmAsync({
           title: 'Are you sure?',
           message: 'Any changes to this application will be overriden by the definition in git and may cause a service interruption. Do you wish to continue?',
