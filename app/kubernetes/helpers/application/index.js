@@ -480,6 +480,9 @@ class KubernetesApplicationHelper {
       // use first app namespace as helm app namespace
       helmApp.ResourcePool = applications[0].ResourcePool;
 
+      // required for persisting table expansion state
+      helmApp.Id = helmApp.Name.toLowerCase().replaceAll(' ', '-');
+
       return helmApp;
     });
 

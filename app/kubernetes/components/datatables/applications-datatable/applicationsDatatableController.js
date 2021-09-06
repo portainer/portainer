@@ -29,10 +29,10 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
 
     this.expandItem = function (item, expanded) {
       item.Expanded = expanded;
-      if (item.Expanded && !this.state.expandedItems.includes(item.Id)) {
-        this.state.expandedItems = [...this.state.expandedItems, item.Id];
-      } else {
+      if (!item.Expanded) {
         this.state.expandedItems = this.state.expandedItems.filter((id) => id !== item.Id);
+      } else if (item.Expanded && !this.state.expandedItems.includes(item.Id)) {
+        this.state.expandedItems = [...this.state.expandedItems, item.Id];
       }
       DatatableService.setDataTableExpandedItems(this.tableKey, this.state.expandedItems);
     };
@@ -133,6 +133,11 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
       }
       if (this.filters && this.filters.state) {
         this.filters.state.open = false;
+      }
+
+      var storedExpandedItems = DatatableService.getDataTableExpandedItems(this.tableKey);
+      if (storedExpandedItems !== null) {
+        this.expandItems(storedExpandedItems);
       }
 
       var storedSettings = DatatableService.getDataTableSettings(this.tableKey);
