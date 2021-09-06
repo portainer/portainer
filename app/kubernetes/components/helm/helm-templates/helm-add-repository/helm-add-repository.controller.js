@@ -1,20 +1,27 @@
 export default class HelmAddRepositoryController {
   /* @ngInject */
-  constructor($async, $window, $analytics, HelmService, Notifications, EndpointProvider) {
+  constructor($state, $async, HelmService, Notifications, EndpointProvider) {
+    this.$state = $state;
     this.$async = $async;
-    this.$window = $window;
-    this.$analytics = $analytics;
     this.HelmService = HelmService;
     this.Notifications = Notifications;
     this.EndpointProvider = EndpointProvider;
   }
 
+  doesRepoExist() {
+    if (!this.state.repository) {
+      return false;
+    }
+    // lowercase, strip trailing slash and compare
+    return this.repos.includes(this.state.repository.toLowerCase().replace(/\/$/, ''));
+  }
+
   async addRepository() {
     this.state.isAddingRepo = true;
     try {
-      const { URL } = await this.HelmService.addHelmRepository(this.EndpointProvider.currentEndpoint().Id, { url: this.state.repository });
+      await this.HelmService.addHelmRepository(this.EndpointProvider.currentEndpoint().Id, { url: this.state.repository });
       this.Notifications.success('Helm repository added successfully');
-      this.refreshCharts([URL], true);
+      this.$state.reload();
     } catch (err) {
       this.Notifications.error('Installation error', err);
     } finally {
