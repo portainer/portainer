@@ -209,9 +209,9 @@ class KubernetesDeployController {
         payload.AdditionalFiles = this.formValues.AdditionalFiles;
         if (this.formValues.RepositoryAutomaticUpdates) {
           payload.AutoUpdate = {};
-          if (this.formValues.RepositoryMechanism === `Interval`) {
+          if (this.formValues.RepositoryMechanism === RepositoryMechanismTypes.INTERVAL) {
             payload.AutoUpdate.Interval = this.formValues.RepositoryFetchInterval;
-          } else if (this.formValues.RepositoryMechanism === `Webhook`) {
+          } else if (this.formValues.RepositoryMechanism === RepositoryMechanismTypes.WEBHOOK) {
             payload.AutoUpdate.Webhook = this.formValues.RepositoryWebhookURL.split('/').reverse()[0];
           }
         }

@@ -161,10 +161,10 @@ class StackRedeployGitFormController {
       this.formValues.AutoUpdate.RepositoryAutomaticUpdates = true;
 
       if (this.stack.AutoUpdate.Interval) {
-        this.formValues.AutoUpdate.RepositoryMechanism = `Interval`;
+        this.formValues.AutoUpdate.RepositoryMechanism = RepositoryMechanismTypes.INTERVAL;
         this.formValues.AutoUpdate.RepositoryFetchInterval = this.stack.AutoUpdate.Interval;
       } else if (this.stack.AutoUpdate.Webhook) {
-        this.formValues.AutoUpdate.RepositoryMechanism = `Webhook`;
+        this.formValues.AutoUpdate.RepositoryMechanism = RepositoryMechanismTypes.WEBHOOK;
         this.formValues.AutoUpdate.RepositoryWebhookURL = this.WebhookHelper.returnStackWebhookUrl(this.stack.AutoUpdate.Webhook);
       }
     }
