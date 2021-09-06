@@ -1,4 +1,4 @@
-import { getAgentShortVersion } from 'Portainer/views/endpoints/helpers';
+//import { getAgentShortVersion } from 'Portainer/views/endpoints/helpers';
 import { PortainerEndpointCreationTypes } from 'Portainer/models/endpoint/models';
 import { buildOption } from '@/portainer/components/box-selector';
 import { EndpointSecurityFormData } from 'Portainer/components/endpointSecurity/porEndpointSecurityModel';
@@ -167,7 +167,6 @@ export default class WizardDockerController {
 
   $onInit() {
     return this.$async(async () => {
-      const agentVersion = await this.StateManager.getState().application.version;
       this.state = {
         endpointType: 'agent',
         ConnectSocket: false,
@@ -178,7 +177,6 @@ export default class WizardDockerController {
           buildOption('API', 'fa fa-cloud', 'API', '', 'api'),
           buildOption('Socket', 'fab fa-docker', 'Socket', '', 'socket'),
         ],
-        agentShortVersion: getAgentShortVersion(agentVersion),
       };
 
       this.formValues = {
@@ -197,8 +195,8 @@ export default class WizardDockerController {
       };
 
       this.command = {
-        linuxCommand: `curl -L https://downloads.portainer.io/agent-stack-ee${this.state.agentShortVersion}.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent   `,
-        winCommand: `curl -L https://downloads.portainer.io/agent-stack-ee${this.state.agentShortVersion}-windows.yml -o agent-stack-windows.yml && docker stack deploy --compose-file=agent-stack-windows.yml portainer-agent   `,
+        linuxCommand: `curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent   `,
+        winCommand: `curl -L https://downloads.portainer.io/agent-stack-windows.yml -o agent-stack-windows.yml && docker stack deploy --compose-file=agent-stack-windows.yml portainer-agent   `,
         linuxSocket: `-v "/var/run/docker.sock:/var/run/docker.sock"  `,
         winSocket: `-v \.\pipe\docker_engine:\.\pipe\docker_engine  `,
       };

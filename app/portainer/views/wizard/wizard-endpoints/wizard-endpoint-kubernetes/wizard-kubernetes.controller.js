@@ -1,5 +1,5 @@
 import { PortainerEndpointCreationTypes } from 'Portainer/models/endpoint/models';
-import { getAgentShortVersion } from 'Portainer/views/endpoints/helpers';
+//import { getAgentShortVersion } from 'Portainer/views/endpoints/helpers';
 import { buildOption } from '@/portainer/components/box-selector';
 
 export default class WizardKubernetesController {
@@ -84,7 +84,6 @@ export default class WizardKubernetesController {
 
   $onInit() {
     return this.$async(async () => {
-      const agentVersion = await this.StateManager.getState().application.version;
       this.state = {
         endpointType: 'agent',
         actionInProgress: false,
@@ -93,12 +92,11 @@ export default class WizardKubernetesController {
           url: '',
         },
         availableOptions: [buildOption('Agent', 'fa fa-bolt', 'Agent', '', 'agent')],
-        agentShortVersion: getAgentShortVersion(agentVersion),
       };
 
       this.command = {
-        loadBalancer: `curl -L https://downloads.portainer.io/portainer-agent-ee${this.state.agentShortVersion}-k8s-lb.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml  `,
-        nodePort: `curl -L https://downloads.portainer.io/portainer-agent-ee${this.state.agentShortVersion}-k8s-nodeport.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml  `,
+        loadBalancer: `curl -L https://downloads.portainer.io/portainer-agent-k8s-lb.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml  `,
+        nodePort: `curl -L https://downloads.portainer.io/portainer-agent-k8s-nodeport.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml  `,
       };
     });
   }
