@@ -77,9 +77,9 @@ export function HelmService(HelmFactory) {
    * @param {Object} options - Options object, release `Name` is the only required option
    * @throws {PortainerError} - Rejects with error if helm show fails
    */
-  async function uninstall(endpointId, { Name }) {
+  async function uninstall(endpointId, { Name, ResourcePool }) {
     try {
-      await HelmFactory.uninstall({ endpointId, release: Name }).$promise;
+      await HelmFactory.uninstall({ endpointId, release: Name, namespace: ResourcePool }).$promise;
     } catch (err) {
       throw new PortainerError('Unable to delete release', err);
     }

@@ -477,6 +477,9 @@ class KubernetesApplicationHelper {
       // use earliest date
       helmApp.CreationDate = applications.map((app) => app.CreationDate).sort((a, b) => new Date(a) - new Date(b))[0];
 
+      // use first app namespace as helm app namespace
+      helmApp.ResourcePool = applications[0].ResourcePool;
+
       return helmApp;
     });
 
