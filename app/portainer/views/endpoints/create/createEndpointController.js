@@ -154,8 +154,9 @@ angular
 
     $scope.addKubernetesEndpoint = function () {
       var name = $scope.formValues.Name;
+      var tagIds = $scope.formValues.TagIds;
       $scope.state.actionInProgress = true;
-      EndpointService.createLocalKubernetesEndpoint(name)
+      EndpointService.createLocalKubernetesEndpoint(name, tagIds)
         .then(function success(result) {
           Notifications.success('Endpoint created', name);
           $state.go('portainer.endpoints.endpoint.kubernetesConfig', { id: result.Id });
