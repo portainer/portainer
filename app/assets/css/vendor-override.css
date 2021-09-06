@@ -385,8 +385,7 @@ input:-webkit-autofill {
   -webkit-text-fill-color: var(--text-input-autofill-color) !important;
 }
 
-.btn:hover,
-.btn:focus {
+.btn:hover {
   color: var(--text-button-hover-color);
 }
 

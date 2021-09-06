@@ -146,6 +146,7 @@ html {
   --bg-tooltip-color: var(--white-color);
   --bg-input-autofill-color: var(--white-color);
   --bg-btn-default-hover-color: var(--grey-59);
+  --bg-btn-focus: var(--grey-59);
 
   --text-main-color: var(--grey-7);
   --text-body-color: var(--grey-6);
@@ -310,6 +311,7 @@ html {
   --bg-tooltip-color: var(--grey-3);
   --bg-input-autofill-color: var(--grey-2);
   --bg-btn-default-hover-color: var(--grey-3);
+  --bg-btn-focus: var(--grey-3);
 
   --text-main-color: var(--white-color);
   --text-body-color: var(--white-color);
@@ -472,6 +474,7 @@ html {
   --bg-navtabs-hover-color: var(--grey-3);
   --bg-btn-default-hover-color: var(--grey-3);
   --bg-btn-default-color: var(--black-color);
+  --bg-btn-focus: var(--black-color);
 
   --text-main-color: var(--white-color);
   --text-body-color: var(--white-color);
