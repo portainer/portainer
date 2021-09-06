@@ -1,4 +1,5 @@
 import uuidv4 from 'uuid/v4';
+import { RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
 class KubernetesRedeployAppGitFormController {
   /* @ngInject */
   constructor($async, $state, $analytics, StackService, ModalService, Notifications, WebhookHelper) {
@@ -24,7 +25,7 @@ class KubernetesRedeployAppGitFormController {
       // auto upadte
       AutoUpdate: {
         RepositoryAutomaticUpdates: false,
-        RepositoryMechanism: 'Interval',
+        RepositoryMechanism: RepositoryMechanismTypes.INTERVAL,
         RepositoryFetchInterval: '5m',
         RepositoryWebhookURL: '',
       },

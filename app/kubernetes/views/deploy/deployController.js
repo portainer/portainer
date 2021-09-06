@@ -4,7 +4,7 @@ import stripAnsi from 'strip-ansi';
 import uuidv4 from 'uuid/v4';
 import PortainerError from 'Portainer/error';
 
-import { KubernetesDeployManifestTypes, KubernetesDeployBuildMethods, KubernetesDeployRequestMethods } from 'Kubernetes/models/deploy';
+import { KubernetesDeployManifestTypes, KubernetesDeployBuildMethods, KubernetesDeployRequestMethods, RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
 import { buildOption } from '@/portainer/components/box-selector';
 class KubernetesDeployController {
   /* @ngInject */
@@ -51,7 +51,7 @@ class KubernetesDeployController {
       AdditionalFiles: [],
       ComposeFilePathInRepository: 'deployment.yml',
       RepositoryAutomaticUpdates: true,
-      RepositoryMechanism: 'Interval',
+      RepositoryMechanism: RepositoryMechanismTypes.INTERVAL,
       RepositoryFetchInterval: '5m',
       RepositoryWebhookURL: this.WebhookHelper.returnStackWebhookUrl(uuidv4()),
     };
