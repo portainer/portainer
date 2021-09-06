@@ -1,6 +1,7 @@
 package stacks
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -118,7 +119,7 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 func (handler *Handler) startStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	switch stack.Type {
 	case portainer.DockerComposeStack:
-		return handler.ComposeStackManager.Up(stack, endpoint)
+		return handler.ComposeStackManager.Up(context.TODO(), stack, endpoint)
 	case portainer.DockerSwarmStack:
 		return handler.SwarmStackManager.Deploy(stack, true, endpoint)
 	}
