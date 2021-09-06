@@ -10,10 +10,10 @@ import (
 )
 
 // @id HelmList
-// @summary List Helm Chart(s)
+// @summary List Helm Releases
 // @description
 // @description **Access policy**: authorized
-// @tags helm_chart
+// @tags helm
 // @security jwt
 // @accept json
 // @produce json

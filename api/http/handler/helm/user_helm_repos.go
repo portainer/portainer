@@ -16,8 +16,8 @@ import (
 )
 
 type helmUserRepositoryResponse struct {
-	GlobalRepo string                         `json:"GlobalRepo"`
-	UserRepos  []portainer.HelmUserRepository `json:"UserRepos"`
+	GlobalRepository string                         `json:"GlobalRepository"`
+	UserRepositories []portainer.HelmUserRepository `json:"UserRepositories"`
 }
 
 type addHelmRepoUrlPayload struct {
@@ -32,7 +32,7 @@ func (p *addHelmRepoUrlPayload) Validate(_ *http.Request) error {
 // @summary Create a user helm repository
 // @description Create a user helm repository.
 // @description **Access policy**: authenticated
-// @tags users
+// @tags helm
 // @security jwt
 // @accept json
 // @produce json
@@ -91,7 +91,7 @@ func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Reques
 // @summary List a users helm repositories
 // @description Inspect a user helm repositories.
 // @description **Access policy**: authenticated
-// @tags users
+// @tags helm
 // @security jwt
 // @produce json
 // @param id path int true "User identifier"
@@ -118,8 +118,8 @@ func (handler *Handler) userGetHelmRepos(w http.ResponseWriter, r *http.Request)
 	}
 
 	resp := helmUserRepositoryResponse{
-		GlobalRepo: settings.HelmRepositoryURL,
-		UserRepos:  userRepos,
+		GlobalRepository: settings.HelmRepositoryURL,
+		UserRepositories: userRepos,
 	}
 
 	return response.JSON(w, resp)

@@ -96,9 +96,9 @@ export default class HelmTemplatesController {
     this.state.reposLoading = true;
     try {
       // fetch globally set helm repo and user helm repos (parallel)
-      const { GlobalRepo, UserRepos } = await this.HelmService.getHelmRepositories(this.endpoint.Id);
-      const userHelmReposUrls = UserRepos.map((repo) => repo.URL);
-      const uniqueHelmRepos = [...new Set([GlobalRepo, ...userHelmReposUrls])].map((url) => url.toLowerCase()); // remove duplicates, to lowercase
+      const { GlobalRepository, UserRepositories } = await this.HelmService.getHelmRepositories(this.endpoint.Id);
+      const userHelmReposUrls = UserRepositories.map((repo) => repo.URL);
+      const uniqueHelmRepos = [...new Set([GlobalRepository, ...userHelmReposUrls])].map((url) => url.toLowerCase()); // remove duplicates, to lowercase
       this.state.repos = uniqueHelmRepos;
       return uniqueHelmRepos;
     } catch (err) {
