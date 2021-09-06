@@ -325,7 +325,7 @@ class KubernetesResourcePoolController {
               this.formValues.Registries.push(reg);
             }
           });
-
+          this.selectedRegistries = this.formValues.Registries.map((r) => r.Name).join(', ');
           return;
         }
 

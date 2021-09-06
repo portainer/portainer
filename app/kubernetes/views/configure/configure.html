@@ -299,6 +299,11 @@
                   ng-click="ctrl.configure()"
                   ng-disabled="ctrl.state.actionInProgress || !kubernetesClusterSetupForm.$valid || !ctrl.hasValidStorageConfiguration()"
                   button-spinner="ctrl.state.actionInProgress"
+                  analytics-on
+                  analytics-if="ctrl.restrictDefaultToggledOn()"
+                  analytics-category="kubernetes"
+                  analytics-event="kubernetes-configure"
+                  analytics-properties="{ metadata: { restrictAccessToDefaultNamespace: ctrl.formValues.RestrictDefaultNamespace } }"
                 >
                   <span ng-hide="ctrl.state.actionInProgress">Save configuration</span>
                   <span ng-show="ctrl.state.actionInProgress">Saving configuration...</span>

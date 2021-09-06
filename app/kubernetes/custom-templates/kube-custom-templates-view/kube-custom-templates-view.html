@@ -1,0 +1,25 @@
+<rd-header id="view-top">
+  <rd-header-title title-text="Custom Templates">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="kubernetes.templates.custom" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>Custom Templates</rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <custom-templates-list
+      ng-if="$ctrl.templates"
+      title-text="Templates"
+      title-icon="fa-rocket"
+      templates="$ctrl.templates"
+      table-key="customTemplates"
+      is-edit-allowed="$ctrl.isEditAllowed"
+      on-select-click="($ctrl.selectTemplate)"
+      on-delete-click="($ctrl.confirmDelete)"
+      create-path="kubernetes.templates.custom.new"
+      edit-path="kubernetes.templates.custom.edit"
+    ></custom-templates-list>
+  </div>
+</div>

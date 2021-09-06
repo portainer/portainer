@@ -9,6 +9,16 @@
 </sidebar-menu-item>
 
 <sidebar-menu-item
+  path="kubernetes.templates.custom"
+  path-params="{ endpointId: $ctrl.endpointId }"
+  icon-class="fa-rocket fa-fw"
+  class-name="sidebar-list"
+  data-cy="k8sSidebar-customTemplates"
+>
+  Custom Templates
+</sidebar-menu-item>
+
+<sidebar-menu-item
   path="kubernetes.resourcePools"
   path-params="{ endpointId: $ctrl.endpointId }"
   icon-class="fa-layer-group fa-fw"

@@ -106,6 +106,7 @@ class KubernetesRedeployAppGitFormController {
   }
 
   $onInit() {
+    console.log(this);
     this.formValues.RefName = this.stack.GitConfig.ReferenceName;
     // Init auto update
     if (this.stack.AutoUpdate && (this.stack.AutoUpdate.Interval || this.stack.AutoUpdate.Webhook)) {

@@ -1,5 +1,3 @@
-require('../../templates/advancedDeploymentPanel.html');
-
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import angular from 'angular';

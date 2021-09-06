@@ -1,5 +1,3 @@
-require('../../templates/advancedDeploymentPanel.html');
-
 import angular from 'angular';
 import _ from 'lodash-es';
 import KubernetesStackHelper from 'Kubernetes/helpers/stackHelper';
