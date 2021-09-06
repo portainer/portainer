@@ -42,6 +42,7 @@ function HelmFactory($resource, API_ENDPOINT_ENDPOINTS) {
       uninstall: {
         url: `${helmUrl}/:release`,
         method: 'DELETE',
+        params: { namespace: '@namespace' },
       },
     }
   );
