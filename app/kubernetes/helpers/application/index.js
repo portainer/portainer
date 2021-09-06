@@ -469,10 +469,10 @@ class KubernetesApplicationHelper {
       helmApp.ApplicationType = KubernetesApplicationTypes.HELM;
       helmApp.KubernetesApplications = applications;
 
-      const applicationPodStatuses = applications.flatMap((app) => app.Pods).map((pod) => pod.Status);
-      const isNotReady = applicationPodStatuses.some((status) => status !== 'Running');
-
-      helmApp.Status = isNotReady ? 'Not ready' : 'Ready';
+      // the status of helm app is `Ready` based on whether the underlying RunningPodsCount of the k8s app
+      // reaches the TotalPodsCount of the app
+      const appsNotReady = applications.some((app) => app.RunningPodsCount < app.TotalPodsCount);
+      helmApp.Status = appsNotReady ? 'Not ready' : 'Ready';
 
       // use earliest date
       helmApp.CreationDate = applications.map((app) => app.CreationDate).sort((a, b) => new Date(a) - new Date(b))[0];
