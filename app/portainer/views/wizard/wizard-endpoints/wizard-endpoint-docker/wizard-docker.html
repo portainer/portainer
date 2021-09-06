@@ -99,7 +99,7 @@
     </div>
 
     <div>
-      <wizard-tls ng-if="!$ctrl.formValues.skipCertification" form-data="$ctrl.formValues.securityFormData"></wizard-tls>
+      <wizard-tls ng-if="!$ctrl.formValues.skipCertification" form-data="$ctrl.formValues.securityFormData" onChange="($ctrl.onChangeFile)"></wizard-tls>
     </div>
   </div>
 
