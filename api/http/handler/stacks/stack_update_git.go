@@ -46,7 +46,7 @@ func (payload *stackGitUpdatePayload) Validate(r *http.Request) error {
 // @produce json
 // @param id path int true "Stack identifier"
 // @param endpointId query int false "Stacks created before version 1.18.0 might not have an associated endpoint identifier. Use this optional parameter to set the endpoint identifier used by the stack."
-// @param body body updateStackGitPayload true "Git configs for pull and redeploy a stack"
+// @param body body stackGitUpdatePayload true "Git configs for pull and redeploy a stack"
 // @success 200 {object} portainer.Stack "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
