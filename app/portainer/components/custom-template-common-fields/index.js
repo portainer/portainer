@@ -5,5 +5,7 @@ angular.module('portainer.app').component('customTemplateCommonFields', {
   controller: CustomTemplateCommonFieldsController,
   bindings: {
     formValues: '=',
+    showPlatformField: '<',
+    showTypeField: '<',
   },
 });

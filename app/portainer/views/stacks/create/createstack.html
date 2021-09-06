@@ -120,11 +120,11 @@
             new-template-path="docker.templates.custom.new"
             stack-type="state.StackType"
             on-change="(onChangeTemplateId)"
-            value="state.templateId"
+            value="state.selectedTemplateId"
           ></custom-template-selector>
 
           <web-editor-form
-            ng-if="state.Method === 'editor' || (state.Method === 'template' && state.templateId)"
+            ng-if="state.Method === 'editor' || (state.Method === 'template' && state.selectedTemplateId)"
             identifier="stack-creation-editor"
             value="formValues.StackFileContent"
             on-change="(onChangeFileContent)"
@@ -164,6 +164,10 @@
               || !formValues.Name"
                 ng-click="deployStack()"
                 button-spinner="state.actionInProgress"
+                analytics-on
+                analytics-category="docker"
+                analytics-event="docker-stack-create"
+                analytics-properties="buildAnalyticsProperties()"
               >
                 <span ng-hide="state.actionInProgress">Deploy the stack</span>
                 <span ng-show="state.actionInProgress">Deployment in progress...</span>

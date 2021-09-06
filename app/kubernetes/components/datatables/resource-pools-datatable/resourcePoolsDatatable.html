@@ -60,8 +60,11 @@
         >
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.resourcePools.new" data-cy="k8sNamespace-addNamespaceButton">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add namespace
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.resourcePools.new" data-cy="k8sNamespace-addNamespaceWithFormButton">
+          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add namespace with form
+        </button>
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.deploy" data-cy="k8sNamespace-deployFromManifestButton">
+          <i class="fa fa-plus space-right" aria-hidden="true"></i>Create from manifest
         </button>
       </div>
       <div class="searchBar">
@@ -90,6 +93,13 @@
                   Name
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Namespace.Name' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Namespace.Name' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('Namespace.Status')">
+                  Status
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Namespace.Status' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Namespace.Status' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
@@ -123,6 +133,9 @@
                 </span>
                 <a ui-sref="kubernetes.resourcePools.resourcePool({ id: item.Namespace.Name })">{{ item.Namespace.Name }}</a>
                 <span style="margin-left: 5px;" class="label label-info image-tag" ng-if="$ctrl.isSystemNamespace(item)">system</span>
+              </td>
+              <td>
+                <span class="label label-{{ $ctrl.namespaceStatusColor(item.Namespace.Status) }}">{{ item.Namespace.Status }}</span>
               </td>
               <td> <i class="fa {{ item.Quota ? 'fa-toggle-on' : 'fa-toggle-off' }}" aria-hidden="true" style="margin-right: 2px;"></i> {{ item.Quota ? 'Yes' : 'No' }} </td>
               <td>{{ item.Namespace.CreationDate | getisodate }} {{ item.Namespace.ResourcePoolOwner ? 'by ' + item.Namespace.ResourcePoolOwner : '' }}</td>

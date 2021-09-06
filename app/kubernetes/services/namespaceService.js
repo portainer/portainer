@@ -41,14 +41,11 @@ class KubernetesNamespaceService {
       const data = await this.KubernetesNamespaces().get().$promise;
       const promises = _.map(data.items, (item) => this.KubernetesNamespaces().status({ id: item.metadata.name }).$promise);
       const namespaces = await $allSettled(promises);
-      const visibleNamespaces = _.map(namespaces.fulfilled, (item) => {
-        if (item.status.phase !== 'Terminating') {
-          return KubernetesNamespaceConverter.apiToNamespace(item);
-        }
+      const allNamespaces = _.map(namespaces.fulfilled, (item) => {
+        return KubernetesNamespaceConverter.apiToNamespace(item);
       });
-      const res = _.without(visibleNamespaces, undefined);
-      updateNamespaces(res);
-      return res;
+      updateNamespaces(allNamespaces);
+      return allNamespaces;
     } catch (err) {
       throw new PortainerError('Unable to retrieve namespaces', err);
     }

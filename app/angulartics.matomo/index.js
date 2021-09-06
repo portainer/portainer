@@ -1,4 +1,5 @@
 import angular from 'angular';
+import _ from 'lodash-es';
 
 const basePath = 'http://portainer-ce.app';
 
@@ -131,7 +132,8 @@ function config($analyticsProvider, $windowProvider) {
 
     let metadataString = '';
     if (metadata) {
-      metadataString = JSON.stringify(metadata).toLowerCase();
+      const kebabCasedMetadata = Object.fromEntries(Object.entries(metadata).map(([key, value]) => [_.kebabCase(key), value]));
+      metadataString = JSON.stringify(kebabCasedMetadata).toLowerCase();
     }
 
     push([

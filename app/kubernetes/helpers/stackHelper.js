@@ -6,7 +6,7 @@ class KubernetesStackHelper {
     const res = _.reduce(
       applications,
       (acc, app) => {
-        if (app.StackName !== '-') {
+        if (app.StackName) {
           let stack = _.find(acc, { Name: app.StackName, ResourcePool: app.ResourcePool });
           if (!stack) {
             stack = new KubernetesStack();
