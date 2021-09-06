@@ -84,6 +84,10 @@ fieldset[disabled] .form-control {
   background-color: var(--bg-form-control-disabled-color) !important;
 }
 
+.modal.in .modal-dialog {
+  border: var(--border-modal);
+}
+
 .modal-content {
   background-color: var(--bg-modal-content-color);
 }
@@ -367,5 +371,30 @@ textarea {
 
 .daterangepicker:after {
   border-bottom: 6px solid var(--border-daterangepicker-after);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px var(--bg-input-autofill-color) inset !important;
+  box-shadow: 0 0 0 30px var(--bg-input-autofill-color) inset !important;
+}
+
+input:-webkit-autofill {
+  -webkit-text-fill-color: var(--text-input-autofill-color) !important;
+}
+
+.btn:hover,
+.btn:focus {
+  color: var(--text-button-hover-color);
+}
+
+.btn-default:hover {
+  background-color: var(--bg-btn-default-hover-color);
+}
+
+.btn-primary:hover {
+  color: var(--white-color) !important;
 }
 /* Overide Vendor CSS */

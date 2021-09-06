@@ -60,6 +60,7 @@ html {
   --grey-56: #b2bfdc;
   --grey-57: #999;
   --grey-58: #ebf4f8;
+  --grey-59: #e6e6e6;
 
   --blue-1: #219;
   --blue-2: #337ab7;
@@ -143,6 +144,8 @@ html {
   --bg-daterangepicker-in-range: var(--grey-58);
   --bg-daterangepicker-active: var(--blue-14);
   --bg-tooltip-color: var(--white-color);
+  --bg-input-autofill-color: var(--white-color);
+  --bg-btn-default-hover-color: var(--grey-59);
 
   --text-main-color: var(--grey-7);
   --text-body-color: var(--grey-6);
@@ -188,6 +191,8 @@ html {
   --text-daterangepicker-in-range: var(--black-color);
   --text-daterangepicker-active: var(--white-color);
   --text-tooltip-color: var(--grey-6);
+  --text-input-autofill-color: var(--black-color);
+  --text-button-hover-color: var(--grey-6);
 
   --border-color: var(--grey-42);
   --border-widget-color: var(--grey-43);
@@ -220,6 +225,7 @@ html {
   --border-pre-next-month: var(--black-color);
   --border-daterangepicker-after: var(--white-color);
   --border-tooltip-color: var(--grey-47);
+  --border-modal: 0px;
 
   --hover-sidebar-color: var(--grey-37);
   --shadow-box-color: 0 3px 10px -2px var(--grey-50);
@@ -302,6 +308,8 @@ html {
   --bg-daterangepicker-in-range: var(--grey-2);
   --bg-daterangepicker-active: var(--blue-14);
   --bg-tooltip-color: var(--grey-3);
+  --bg-input-autofill-color: var(--grey-2);
+  --bg-btn-default-hover-color: var(--grey-3);
 
   --text-main-color: var(--white-color);
   --text-body-color: var(--white-color);
@@ -347,6 +355,8 @@ html {
   --text-daterangepicker-active: var(--white-color);
   --text-tooltip-color: var(--white-color);
   --text-btn-default-color: var(--white-color);
+  --text-input-autofill-color: var(--grey-8);
+  --text-button-hover-color: var(--white-color);
 
   --border-color: var(--grey-3);
   --border-widget-color: var(--grey-1);
@@ -380,6 +390,7 @@ html {
   --border-pre-next-month: var(--white-color);
   --border-daterangepicker-after: var(--grey-3);
   --border-tooltip-color: var(--grey-3);
+  --border-modal: 0px;
 
   --hover-sidebar-color: var(--grey-3);
   --blue-color: var(--blue-2);
@@ -455,6 +466,12 @@ html {
   --bg-btn-default-color: var(--black-color);
   --bg-code-color: var(--red-4);
   --bg-navtabs-color: var(--black-color);
+  --bg-input-autofill-color: var(--black-color);
+  --bg-code-color: var(--grey-2);
+  --bg-navtabs-color: var(--grey-2);
+  --bg-navtabs-hover-color: var(--grey-3);
+  --bg-btn-default-hover-color: var(--grey-3);
+  --bg-btn-default-color: var(--black-color);
 
   --text-main-color: var(--white-color);
   --text-body-color: var(--white-color);
@@ -462,8 +479,8 @@ html {
   --text-widget-header-color: var(--white-color);
   --text-link-color: var(--blue-9);
   --text-link-hover-color: var(--blue-9);
-  --text-danger-color: var(--red-6);
-  --text-code-color: var(--white-color);
+  --text-danger-color: var(--red-7);
+  --text-code-color: var(--red-7);
   --text-form-control-color: var(--white-color);
   --text-blocklist-hover-color: var(--blue-11);
   --text-boxselector-wrapper-color: var(--white-color);
@@ -490,6 +507,10 @@ html {
   --text-json-tree-branch-preview-color: var(--white-color);
   --text-pre-color: var(--white-color);
   --text-navtabs-color: var(--white-color);
+  --text-input-autofill-color: var(--white-color);
+  --text-navtabs-color: var(--white-color);
+  --text-button-hover-color: var(--white-color);
+  --text-btn-default-color: var(--white-color);
 
   --border-color: var(--grey-55);
   --border-widget-color: var(--white-color);
@@ -515,6 +536,8 @@ html {
   --border-daterangepicker-after: var(--black-color);
   --border-tooltip-color: var(--white-color);
   --border-pre-color: var(--grey-3);
+  --border-codemirror-cursor-color: var(--white-color);
+  --border-modal: 1px solid var(--white-color);
 
   --hover-sidebar-color: var(--blue-9);
   --hover-sidebar-color: var(--black-color);
