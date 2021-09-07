@@ -464,8 +464,8 @@ a[ng-click] {
   display: inline-block;
   padding: 0px 6px;
   margin-left: 10px;
-  color: var(--grey-25);
-  background-color: var(--white-color);
+  color: var(--text-small-select-color);
+  background-color: var(--bg-small-select-color);
   background-image: none;
   border-radius: 4px;
   font-size: 14px;

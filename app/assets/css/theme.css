@@ -149,6 +149,7 @@ html {
   --bg-btn-default-hover-color: var(--grey-59);
   --bg-btn-focus: var(--grey-59);
   --bg-boxselector-disabled-color: var(--white-color);
+  --bg-small-select-color: var(--white-color);
 
   --text-main-color: var(--grey-7);
   --text-body-color: var(--grey-6);
@@ -196,6 +197,7 @@ html {
   --text-tooltip-color: var(--grey-6);
   --text-input-autofill-color: var(--black-color);
   --text-button-hover-color: var(--grey-6);
+  --text-small-select-color: var(--grey-25);
 
   --border-color: var(--grey-42);
   --border-widget-color: var(--grey-43);
@@ -315,6 +317,7 @@ html {
   --bg-btn-default-hover-color: var(--grey-3);
   --bg-btn-focus: var(--grey-3);
   --bg-boxselector-disabled-color: var(--grey-54);
+  --bg-small-select-color: var(--grey-2);
 
   --text-main-color: var(--white-color);
   --text-body-color: var(--white-color);
@@ -362,6 +365,7 @@ html {
   --text-btn-default-color: var(--white-color);
   --text-input-autofill-color: var(--grey-8);
   --text-button-hover-color: var(--white-color);
+  --text-small-select-color: var(--grey-7);
 
   --border-color: var(--grey-3);
   --border-widget-color: var(--grey-1);
@@ -480,6 +484,7 @@ html {
   --bg-btn-focus: var(--black-color);
   --bg-boxselector-color: var(--black-color);
   --bg-boxselector-disabled-color: var(--black-color);
+  --bg-small-select-color: var(--black-color);
 
   --text-main-color: var(--white-color);
   --text-body-color: var(--white-color);
@@ -519,6 +524,7 @@ html {
   --text-navtabs-color: var(--white-color);
   --text-button-hover-color: var(--white-color);
   --text-btn-default-color: var(--white-color);
+  --text-small-select-color: var(--white-color);
 
   --border-color: var(--grey-55);
   --border-widget-color: var(--white-color);
