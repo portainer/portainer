@@ -4,18 +4,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/portainer/portainer/api/bolt"
-
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
-
-	"github.com/portainer/portainer/api/bolt/bolttest"
-
 	"github.com/gofrs/uuid"
-
-	"github.com/stretchr/testify/assert"
-
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/filesystem"
+	"github.com/stretchr/testify/assert"
 )
 
 func newGuidString(t *testing.T) string {
@@ -35,7 +29,7 @@ func TestService_StackByWebhookID(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode. Normally takes ~1s to run.")
 	}
-	store, teardown := bolttest.MustNewTestStore(true)
+	store, teardown := bolt.MustNewTestStore(true)
 	defer teardown()
 
 	b := stackBuilder{t: t, store: store}
@@ -93,7 +87,7 @@ func Test_RefreshableStacks(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode. Normally takes ~1s to run.")
 	}
-	store, teardown := bolttest.MustNewTestStore(true)
+	store, teardown := bolt.MustNewTestStore(true)
 	defer teardown()
 
 	staticStack := portainer.Stack{ID: 1}
