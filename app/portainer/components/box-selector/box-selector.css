@@ -27,22 +27,27 @@
 
 .boxselector_wrapper input[type='radio']:not(:disabled) ~ label {
   cursor: pointer;
+  background-color: var(--bg-boxselector-wrapper-disabled-color);
+}
+
+.boxselector_wrapper input[type='radio']:not(:disabled):hover ~ label:hover {
+  cursor: pointer;
 }
 
 .boxselector_wrapper label {
   font-weight: normal;
   font-size: 12px;
   display: block;
-  background: white;
-  border: 1px solid #333333;
+  background: var(--bg-boxselector-color);
+  border: 1px solid var(--border-boxselector-color);
   border-radius: 2px;
   padding: 10px 10px 0 10px;
   text-align: center;
-  box-shadow: 0 3px 10px -2px rgba(161, 170, 166, 0.5);
+  box-shadow: var(--shadow-boxselector-color);
   position: relative;
 }
 .boxselector_wrapper label.boxselector_disabled {
-  background: #cacaca;
+  background: var(--bg-boxselector-disabled-color) !important;
   border-color: #787878;
   color: #787878;
   cursor: not-allowed;

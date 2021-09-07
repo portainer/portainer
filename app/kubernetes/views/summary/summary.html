@@ -22,7 +22,7 @@
       <li ng-repeat="summary in $ctrl.state.resources" ng-if="summary.action && summary.kind && summary.name">
         {{ summary.action }}
         {{ $ctrl.getArticle(summary.kind, summary.action) }}
-        <span style="color: black; font-weight: 700;">{{ summary.kind }}</span> named <code>{{ summary.name }}</code>
+        <span class="summary">{{ summary.kind }}</span> named <code>{{ summary.name }}</code>
         <span ng-if="summary.type">
           of type <code>{{ summary.type }}</code></span
         >
