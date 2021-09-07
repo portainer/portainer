@@ -47,7 +47,7 @@
   position: relative;
 }
 .boxselector_wrapper label.boxselector_disabled {
-  background: #cacaca;
+  background: var(--bg-boxselector-disabled-color) !important;
   border-color: #787878;
   color: #787878;
   cursor: not-allowed;

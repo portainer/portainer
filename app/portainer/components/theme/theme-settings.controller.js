@@ -2,9 +2,8 @@ import { buildOption } from '@/portainer/components/box-selector';
 
 export default class ThemeSettingsController {
   /* @ngInject */
-  constructor($async, $state, Authentication, ThemeManager, StateManager, UserService, Notifications) {
+  constructor($async, Authentication, ThemeManager, StateManager, UserService, Notifications) {
     this.$async = $async;
-    this.$state = $state;
     this.Authentication = Authentication;
     this.ThemeManager = ThemeManager;
     this.StateManager = StateManager;
@@ -20,7 +19,6 @@ export default class ThemeSettingsController {
       await this.UserService.updateUserTheme(this.state.userId, this.state.userTheme);
       this.state.themeInProgress = false;
       this.Notifications.success('Success', 'User theme successfully updated');
-      this.$state.reload();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to update user theme');
     }
