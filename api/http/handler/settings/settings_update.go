@@ -112,7 +112,7 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if payload.HelmRepositoryURL != nil {
-		settings.HelmRepositoryURL = strings.TrimSuffix(*payload.HelmRepositoryURL, "/")
+		settings.HelmRepositoryURL = strings.TrimSuffix(strings.ToLower(*payload.HelmRepositoryURL), "/")
 	}
 
 	if payload.BlackListedLabels != nil {

@@ -92,14 +92,14 @@ export default class HelmTemplatesController {
    * @description This function is used to get the helm repo urls for the endpoint and user
    * @returns {Promise<string[]>} list of helm repo urls
    */
-
   async getHelmRepoURLs() {
     this.state.reposLoading = true;
     try {
       // fetch globally set helm repo and user helm repos (parallel)
       const { GlobalRepo, UserRepos } = await this.HelmService.getHelmRepositories(this.endpoint.Id);
       const userHelmReposUrls = UserRepos.map((repo) => repo.URL);
-      const uniqueHelmRepos = [...new Set([GlobalRepo, ...userHelmReposUrls])]; // remove duplicates
+      const uniqueHelmRepos = [...new Set([GlobalRepo, ...userHelmReposUrls])].map((url) => url.toLowerCase()); // remove duplicates, to lowercase
+      this.state.repos = uniqueHelmRepos;
       return uniqueHelmRepos;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve helm repo urls.');
@@ -113,8 +113,7 @@ export default class HelmTemplatesController {
    * @param {string[]} helmRepos list of helm repositories
    * @param {bool} append append charts returned from repo to existing list of helm charts
    */
-
-  async getLatestCharts(helmRepos, append = false) {
+  async getLatestCharts(helmRepos) {
     this.state.chartsLoading = true;
     try {
       const promiseList = helmRepos.map((repo) => this.HelmService.search(repo));
@@ -128,7 +127,7 @@ export default class HelmTemplatesController {
           ({ entries, repo }) => Object.values(entries).map((charts) => ({ ...charts[0], repo })) // flatten chart entries to single array with respective repo
         );
 
-      this.state.charts = append ? this.state.charts.concat(latestCharts) : latestCharts;
+      this.state.charts = latestCharts;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve helm repo charts.');
     } finally {
@@ -162,6 +161,7 @@ export default class HelmTemplatesController {
         resourcePool: '',
         values: null,
         originalvalues: null,
+        repos: [],
         charts: [],
         loadingValues: false,
         isEditorDirty: false,
