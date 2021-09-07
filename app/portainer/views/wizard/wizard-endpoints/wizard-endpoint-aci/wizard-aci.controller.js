@@ -10,10 +10,7 @@ export default class WizardAciController {
   }
 
   async addAciEndpoint() {
-    const name = this.formValues.name;
-    const azureApplicationId = this.formValues.azureApplicationId;
-    const azureTenantId = this.formValues.azureTenantId;
-    const azureAuthenticationKey = this.formValues.azureAuthenticationKey;
+    const { name, azureApplicationId, azureTenantId, azureAuthenticationKey } = this.formValues;
     const groupId = 1;
     const tagIds = [];
 

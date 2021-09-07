@@ -80,7 +80,7 @@ export default class WizardDockerController {
   }
 
   // Docker Agent Endpoint
-  async addDockerAgentEndpoint(name, creationType, url, publicUrl, groupId, tagIds) {
+  addDockerAgentEndpoint(name, creationType, url, publicUrl, groupId, tagIds) {
     const tsl = true;
     const tlsSkipVerify = true;
     const tlsSkipClientVerify = true;
@@ -93,7 +93,7 @@ export default class WizardDockerController {
   }
 
   // Docker Api Endpoint
-  async addDockerApiEndpoint(name, creationType, url, publicUrl, groupId, tagIds, securityData) {
+  addDockerApiEndpoint(name, creationType, url, publicUrl, groupId, tagIds, securityData) {
     const tsl = this.formValues.tls;
     const tlsSkipVerify = this.formValues.skipCertification;
     const tlsSkipClientVerify = this.formValues.skipCertification;
@@ -106,7 +106,7 @@ export default class WizardDockerController {
   }
 
   // Docker Local Endpoint
-  async addDockerLocalEndpoint(name, url, publicUrl, groupId, tagIds) {
+  addDockerLocalEndpoint(name, url, publicUrl, groupId, tagIds) {
     this.addLocalEndpoint(name, url, publicUrl, groupId, tagIds);
     this.onAnalytics('local-endpoint');
   }
