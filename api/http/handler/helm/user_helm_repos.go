@@ -58,15 +58,17 @@ func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Reques
 			Err:        err,
 		}
 	}
+	// lowercase, remove trailing slash
+	p.URL = strings.TrimSuffix(strings.ToLower(p.URL), "/")
 
 	records, err := handler.dataStore.HelmUserRepository().HelmUserRepositoryByUserID(userID)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to access the DataStore", err}
 	}
 
-	// check if repo already exists - by doing case insensitive, suffix trimmed comparison
+	// check if repo already exists - by doing case insensitive comparison
 	for _, record := range records {
-		if strings.EqualFold(strings.TrimSuffix(record.URL, "/"), strings.TrimSuffix(p.URL, "/")) {
+		if strings.EqualFold(record.URL, p.URL) {
 			errMsg := "Helm repo already registered for user"
 			return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: errMsg, Err: errors.New(errMsg)}
 		}

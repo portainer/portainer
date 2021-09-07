@@ -31,13 +31,19 @@
           </div>
         </div>
 
+        <div class="form-group" ng-show="$ctrl.doesRepoExist()">
+          <div class="col-sm-12 small text-warning">
+            <div> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Helm repo already exists. </div>
+          </div>
+        </div>
+
         <div class="form-group">
           <div class="col-sm-12">
             <button
               type="button"
               class="btn btn-sm btn-default nomargin"
               ng-click="$ctrl.addRepository()"
-              ng-disabled="$ctrl.state.isAddingRepo || addUserHelmRepoForm.repo.$invalid"
+              ng-disabled="$ctrl.state.isAddingRepo || addUserHelmRepoForm.repo.$invalid || $ctrl.doesRepoExist()"
               analytics-on
               analytics-category="kubernetes"
               analytics-event="kubernetes-helm-add-repository"
