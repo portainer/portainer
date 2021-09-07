@@ -179,7 +179,9 @@
                 <a><i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i></a>
               </td>
               <td>
-                <a ng-if="item.KubernetesApplications" ui-sref="kubernetes.helm({ name: item.Name })" ng-click="$event.stopPropagation()">{{ item.Name }} </a>
+                <a ng-if="item.KubernetesApplications" ui-sref="kubernetes.helm({ name: item.Name, namespace: item.ResourcePool })" ng-click="$event.stopPropagation()"
+                  >{{ item.Name }}
+                </a>
                 <a
                   ng-if="!item.KubernetesApplications"
                   ui-sref="kubernetes.applications.application({ name: item.Name, namespace: item.ResourcePool })"

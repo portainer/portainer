@@ -47,7 +47,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
 
     const helmApplication = {
       name: 'kubernetes.helm',
-      url: '/helm/:name',
+      url: '/helm/:namespace/:name',
       views: {
         'content@': {
           component: 'kubernetesHelmApplicationView',
