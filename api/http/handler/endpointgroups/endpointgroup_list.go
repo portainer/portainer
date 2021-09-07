@@ -23,7 +23,7 @@ import (
 func (handler *Handler) endpointGroupList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointGroups, err := handler.DataStore.EndpointGroup().EndpointGroups()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint groups from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environment groups from the database", err}
 	}
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)

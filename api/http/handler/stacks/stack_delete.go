@@ -72,9 +72,9 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == bolterrors.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the endpoint associated to the stack inside the database", err}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the environment associated to the stack inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the endpoint associated to the stack inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the environment associated to the stack inside the database", err}
 	}
 
 	resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)
@@ -85,7 +85,7 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 	if !isOrphaned {
 		err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
+			return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
 		}
 
 		if stack.Type == portainer.DockerSwarmStack || stack.Type == portainer.DockerComposeStack {
@@ -149,14 +149,14 @@ func (handler *Handler) deleteExternalStack(r *http.Request, w http.ResponseWrit
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == bolterrors.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the endpoint associated to the stack inside the database", err}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the environment associated to the stack inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the endpoint associated to the stack inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the environment associated to the stack inside the database", err}
 	}
 
 	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
 	}
 
 	stack = &portainer.Stack{

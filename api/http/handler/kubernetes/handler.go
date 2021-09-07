@@ -56,12 +56,12 @@ func kubeOnlyMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, request *http.Request) {
 		endpoint, err := middlewares.FetchEndpoint(request)
 		if err != nil {
-			httperror.WriteError(rw, http.StatusInternalServerError, "Unable to find an endpoint on request context", err)
+			httperror.WriteError(rw, http.StatusInternalServerError, "Unable to find an environment on request context", err)
 			return
 		}
 
 		if !endpointutils.IsKubernetesEndpoint(endpoint) {
-			errMessage := "Endpoint is not a kubernetes endpoint"
+			errMessage := "Environment is not a kubernetes environment"
 			httperror.WriteError(rw, http.StatusBadRequest, errMessage, errors.New(errMessage))
 			return
 		}

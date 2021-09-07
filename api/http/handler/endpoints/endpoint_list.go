@@ -60,12 +60,12 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 
 	endpointGroups, err := handler.DataStore.EndpointGroup().EndpointGroups()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint groups from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environment groups from the database", err}
 	}
 
 	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environments from the database", err}
 	}
 
 	settings, err := handler.DataStore.Settings().Settings()

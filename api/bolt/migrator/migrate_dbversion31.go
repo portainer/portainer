@@ -138,7 +138,7 @@ func (m *Migrator) updateDockerhubToDB32() error {
 func (m *Migrator) updateVolumeResourceControlToDB32() error {
 	endpoints, err := m.endpointService.Endpoints()
 	if err != nil {
-		return fmt.Errorf("failed fetching endpoints: %w", err)
+		return fmt.Errorf("failed fetching environments: %w", err)
 	}
 
 	resourceControls, err := m.resourceControlService.ResourceControls()
@@ -170,7 +170,7 @@ func (m *Migrator) updateVolumeResourceControlToDB32() error {
 
 		endpointDockerID, err := snapshotutils.FetchDockerID(snapshot)
 		if err != nil {
-			return fmt.Errorf("failed fetching endpoint docker id: %w", err)
+			return fmt.Errorf("failed fetching environment docker id: %w", err)
 		}
 
 		if volumesData, done := snapshot.SnapshotRaw.Volumes.(map[string]interface{}); done {

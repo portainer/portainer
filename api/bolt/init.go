@@ -80,7 +80,7 @@ func (store *Store) Init() error {
 	if len(groups) == 0 {
 		unassignedGroup := &portainer.EndpointGroup{
 			Name:               "Unassigned",
-			Description:        "Unassigned endpoints",
+			Description:        "Unassigned environments",
 			Labels:             []portainer.Pair{},
 			UserAccessPolicies: portainer.UserAccessPolicies{},
 			TeamAccessPolicies: portainer.TeamAccessPolicies{},

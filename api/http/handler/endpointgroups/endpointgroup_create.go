@@ -24,7 +24,7 @@ type endpointGroupCreatePayload struct {
 
 func (payload *endpointGroupCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
-		return errors.New("Invalid endpoint group name")
+		return errors.New("Invalid environment group name")
 	}
 	if payload.TagIDs == nil {
 		payload.TagIDs = []portainer.TagID{}
@@ -61,12 +61,12 @@ func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Reque
 
 	err = handler.DataStore.EndpointGroup().CreateEndpointGroup(endpointGroup)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the endpoint group inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the environment group inside the database", err}
 	}
 
 	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environments from the database", err}
 	}
 
 	for _, id := range payload.AssociatedEndpoints {
@@ -76,12 +76,12 @@ func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Reque
 
 				err := handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, &endpoint)
 				if err != nil {
-					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint", err}
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update environment", err}
 				}
 
 				err = handler.updateEndpointRelations(&endpoint, endpointGroup)
 				if err != nil {
-					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint relations changes inside the database", err}
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist environment relations changes inside the database", err}
 				}
 
 				break

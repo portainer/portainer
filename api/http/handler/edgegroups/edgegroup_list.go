@@ -51,7 +51,7 @@ func (handler *Handler) edgeGroupList(w http.ResponseWriter, r *http.Request) *h
 		if edgeGroup.Dynamic {
 			endpoints, err := handler.getEndpointsByTags(edgeGroup.TagIDs, edgeGroup.PartialMatch)
 			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints and endpoint groups for Edge group", err}
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environments and environment groups for Edge group", err}
 			}
 
 			edgeGroup.Endpoints = endpoints

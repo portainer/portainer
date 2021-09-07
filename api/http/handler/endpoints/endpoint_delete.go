@@ -26,14 +26,14 @@ import (
 func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint identifier route variable", err}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment identifier route variable", err}
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == errors.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
 	}
 
 	if endpoint.TLSConfig.TLS {
@@ -46,14 +46,14 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 
 	err = handler.DataStore.Endpoint().DeleteEndpoint(portainer.EndpointID(endpointID))
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove endpoint from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove environment from the database", err}
 	}
 
 	handler.ProxyManager.DeleteEndpointProxy(endpoint)
 
 	err = handler.DataStore.EndpointRelation().DeleteEndpointRelation(endpoint.ID)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove endpoint relation from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove environment relation from the database", err}
 	}
 
 	for _, tagID := range endpoint.TagIDs {

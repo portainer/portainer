@@ -44,12 +44,12 @@ func (handler *Handler) edgeStackCreate(w http.ResponseWriter, r *http.Request) 
 
 	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environments from database", err}
 	}
 
 	endpointGroups, err := handler.DataStore.EndpointGroup().EndpointGroups()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint groups from database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environment groups from database", err}
 	}
 
 	edgeGroups, err := handler.DataStore.EdgeGroup().EdgeGroups()
@@ -62,14 +62,14 @@ func (handler *Handler) edgeStackCreate(w http.ResponseWriter, r *http.Request) 
 	for _, endpointID := range relatedEndpoints {
 		relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpointID)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find endpoint relation in database", err}
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find environment relation in database", err}
 		}
 
 		relation.EdgeStacks[edgeStack.ID] = true
 
 		err = handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpointID, relation)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint relation in database", err}
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist environment relation in database", err}
 		}
 	}
 

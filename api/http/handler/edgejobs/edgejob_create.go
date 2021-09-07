@@ -66,7 +66,7 @@ func (payload *edgeJobCreateFromFileContentPayload) Validate(r *http.Request) er
 	}
 
 	if payload.Endpoints == nil || len(payload.Endpoints) == 0 {
-		return errors.New("Invalid endpoints payload")
+		return errors.New("Invalid environment payload")
 	}
 
 	if govalidator.IsNull(payload.FileContent) {
@@ -119,9 +119,9 @@ func (payload *edgeJobCreateFromFilePayload) Validate(r *http.Request) error {
 	payload.CronExpression = cronExpression
 
 	var endpoints []portainer.EndpointID
-	err = request.RetrieveMultiPartFormJSONValue(r, "Endpoints", &endpoints, false)
+	err = request.RetrieveMultiPartFormJSONValue(r, "Environments", &endpoints, false)
 	if err != nil {
-		return errors.New("Invalid endpoints")
+		return errors.New("Invalid environments")
 	}
 	payload.Endpoints = endpoints
 
@@ -206,7 +206,7 @@ func (handler *Handler) addAndPersistEdgeJob(edgeJob *portainer.EdgeJob, file []
 	}
 
 	if len(edgeJob.Endpoints) == 0 {
-		return errors.New("Endpoints are mandatory for an Edge job")
+		return errors.New("Environments are mandatory for an Edge job")
 	}
 
 	scriptPath, err := handler.FileService.StoreEdgeJobFileFromBytes(strconv.Itoa(int(edgeJob.ID)), file)
