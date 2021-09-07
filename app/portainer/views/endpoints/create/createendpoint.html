@@ -1,6 +1,6 @@
 <rd-header>
-  <rd-header-title title-text="Create endpoint"></rd-header-title>
-  <rd-header-content> <a ui-sref="portainer.endpoints">Endpoints</a> &gt; Add endpoint </rd-header-content>
+  <rd-header-title title-text="Create environment"></rd-header-title>
+  <rd-header-content> <a ui-sref="portainer.endpoints">Environments</a> &gt; Add environment </rd-header-content>
 </rd-header>
 
 <div class="row">
@@ -130,8 +130,8 @@
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
                 <p>
-                  Allows you to create an endpoint that can be registered with an Edge agent. The Edge agent will initiate the communications with the Portainer instance. All the
-                  required information on how to connect an Edge agent to this endpoint will be available after endpoint creation.
+                  Allows you to create an environment that can be registered with an Edge agent. The Edge agent will initiate the communications with the Portainer instance. All the
+                  required information on how to connect an Edge agent to this environment will be available after environment creation.
                 </p>
                 <p> You can read more about the Edge agent in the userguide available <a href="https://downloads.portainer.io/edge_agent_guide.pdf">here.</a> </p>
               </span>
@@ -257,7 +257,7 @@
           <div ng-if="(state.EnvironmentType === 'docker' && !formValues.ConnectSocket) || state.EnvironmentType === 'agent'">
             <div class="form-group">
               <label for="endpoint_url" class="col-sm-3 col-lg-2 control-label text-left">
-                Endpoint URL
+                Environment URL
                 <portainer-tooltip
                   position="bottom"
                   message="URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it."
@@ -328,7 +328,7 @@
                 Poll frequency
                 <portainer-tooltip
                   position="bottom"
-                  message="Interval used by this Edge agent to check in with the Portainer instance. Affects Edge endpoint management and Edge compute features."
+                  message="Interval used by this Edge agent to check in with the Portainer instance. Affects Edge environment management and Edge compute features."
                 >
                 </portainer-tooltip>
               </label>
@@ -350,7 +350,7 @@
                 Public IP
                 <portainer-tooltip
                   position="bottom"
-                  message="URL or IP address where exposed containers will be reachable. This field is optional and will default to the endpoint URL."
+                  message="URL or IP address where exposed containers will be reachable. This field is optional and will default to the environment URL."
                 >
                 </portainer-tooltip>
               </label>
@@ -487,8 +487,8 @@
                 analytics-event="portainer-endpoint-creation"
                 analytics-properties="{ metadata: { type: 'docker-api' } }"
               >
-                <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Add endpoint</span>
-                <span ng-show="state.actionInProgress">Creating endpoint...</span>
+                <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Add environment</span>
+                <span ng-show="state.actionInProgress">Creating environment...</span>
               </button>
               <button
                 ng-if="state.EnvironmentType === 'agent'"
@@ -499,8 +499,8 @@
                 button-spinner="state.actionInProgress"
                 data-cy="endpointCreate-createAgentEndpoint"
               >
-                <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Add endpoint</span>
-                <span ng-show="state.actionInProgress">Creating endpoint...</span>
+                <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Add environment</span>
+                <span ng-show="state.actionInProgress">Creating environment...</span>
               </button>
               <button
                 ng-if="state.EnvironmentType === 'edge_agent'"
@@ -515,8 +515,8 @@
                 analytics-event="portainer-endpoint-creation"
                 analytics-properties="{ metadata: { type: 'edge-agent' } }"
               >
-                <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Add endpoint</span>
-                <span ng-show="state.actionInProgress">Creating endpoint...</span>
+                <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Add environment</span>
+                <span ng-show="state.actionInProgress">Creating environment...</span>
               </button>
               <button
                 ng-if="state.EnvironmentType === 'kubernetes'"
@@ -530,8 +530,8 @@
                 analytics-event="portainer-endpoint-creation"
                 analytics-properties="{ metadata: { type: 'kubernetes-api' } }"
               >
-                <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Add endpoint</span>
-                <span ng-show="state.actionInProgress">Creating endpoint...</span>
+                <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Add environment</span>
+                <span ng-show="state.actionInProgress">Creating environment...</span>
               </button>
               <button
                 ng-if="state.EnvironmentType === 'azure'"
@@ -546,8 +546,8 @@
                 analytics-event="portainer-endpoint-creation"
                 analytics-properties="{ metadata: { type: 'azure-api' } }"
               >
-                <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Add endpoint</span>
-                <span ng-show="state.actionInProgress">Creating endpoint...</span>
+                <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Add environment</span>
+                <span ng-show="state.actionInProgress">Creating environment...</span>
               </button>
             </div>
           </div>
