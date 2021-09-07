@@ -137,10 +137,10 @@ angular.module('portainer.app').factory('EndpointService', [
       return deferred.promise;
     };
 
-    service.createLocalKubernetesEndpoint = function (name = 'local') {
+    service.createLocalKubernetesEndpoint = function (name = 'local', tagIds = []) {
       var deferred = $q.defer();
 
-      FileUploadService.createEndpoint(name, PortainerEndpointCreationTypes.LocalKubernetesEnvironment, '', '', 1, [], true, true, true)
+      FileUploadService.createEndpoint(name, PortainerEndpointCreationTypes.LocalKubernetesEnvironment, '', '', 1, tagIds, true, true, true)
         .then(function success(response) {
           deferred.resolve(response.data);
         })

@@ -168,8 +168,12 @@ function EndpointController(
       payload.URL = 'tcp://' + endpoint.URL;
     }
 
-    if (endpoint.Type === PortainerEndpointTypes.AgentOnKubernetesEnvironment || endpoint.Type === PortainerEndpointTypes.KubernetesLocalEnvironment) {
+    if (endpoint.Type === PortainerEndpointTypes.AgentOnKubernetesEnvironment) {
       payload.URL = endpoint.URL;
+    }
+
+    if (endpoint.Type === PortainerEndpointTypes.KubernetesLocalEnvironment) {
+      payload.URL = 'https://' + endpoint.URL;
     }
 
     $scope.state.actionInProgress = true;

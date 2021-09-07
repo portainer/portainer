@@ -1,6 +1,7 @@
 package stacks
 
 import (
+	"context"
 	"sync"
 
 	portainer "github.com/portainer/portainer/api"
@@ -42,5 +43,5 @@ func (d *stackDeployer) DeployComposeStack(stack *portainer.Stack, endpoint *por
 	d.swarmStackManager.Login(registries, endpoint)
 	defer d.swarmStackManager.Logout(endpoint)
 
-	return d.composeStackManager.Up(stack, endpoint)
+	return d.composeStackManager.Up(context.TODO(), stack, endpoint)
 }
