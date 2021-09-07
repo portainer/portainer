@@ -56,7 +56,7 @@ angular.module('portainer.app').factory('StackService', [
         .then(function success(data) {
           var swarm = data;
           if (swarm.Id === stack.SwarmId) {
-            deferred.reject({ msg: 'Target endpoint is located in the same Swarm cluster as the current endpoint', err: null });
+            deferred.reject({ msg: 'Target environment is located in the same Swarm cluster as the current environment', err: null });
             return;
           }
           return Stack.migrate({ id: stack.Id, endpointId: stack.EndpointId }, { EndpointID: targetEndpointId, SwarmID: swarm.Id, Name: newName }).$promise;

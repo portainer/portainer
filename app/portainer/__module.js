@@ -72,7 +72,7 @@ angular.module('portainer.app', ['portainer.oauth', componentsModule, settingsMo
 
               return endpoint;
             } catch (e) {
-              Notifications.error('Failed loading endpoint', e);
+              Notifications.error('Failed loading environment', e);
               $state.go('portainer.home', {}, { reload: true });
               return;
             }

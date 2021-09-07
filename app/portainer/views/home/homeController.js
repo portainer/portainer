@@ -63,11 +63,11 @@ angular
     function triggerSnapshot() {
       EndpointService.snapshotEndpoints()
         .then(function success() {
-          Notifications.success('Success', 'Endpoints updated');
+          Notifications.success('Success', 'Environments updated');
           $state.reload();
         })
         .catch(function error(err) {
-          Notifications.error('Failure', err, 'An error occured during endpoint snapshot');
+          Notifications.error('Failure', err, 'An error occured during environment snapshot');
         });
     }
 
@@ -86,7 +86,7 @@ angular
           deferred.resolve({ endpoints: endpoints, totalCount: data.endpoints.totalCount });
         })
         .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to retrieve endpoint information');
+          Notifications.error('Failure', err, 'Unable to retrieve environment information');
         });
       return deferred.promise;
     }

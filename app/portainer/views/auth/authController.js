@@ -129,7 +129,7 @@ class AuthenticationController {
         return this.$state.go('portainer.home');
       }
     } catch (err) {
-      this.error(err, 'Unable to retrieve endpoints');
+      this.error(err, 'Unable to retrieve environments');
     }
   }
 
