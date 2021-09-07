@@ -59,10 +59,10 @@ body,
 }
 
 .form-section-title {
-  border-bottom: 1px solid #777;
+  border-bottom: 1px solid var(--border-form-section-title-color);
   margin-top: 5px;
   margin-bottom: 15px;
-  color: #777;
+  color: var(--text-form-section-title-color);
   padding-left: 0;
 }
 
@@ -108,12 +108,33 @@ a[ng-click] {
   pointer-events: none;
 }
 
+.datatable-highlighted {
+  background-color: var(--bg-item-highlighted-color);
+}
+
+.datatable-unhighlighted {
+  background-color: var(--bg-item-highlighted-null-color);
+}
+
+.service-datatable {
+  background-color: var(--bg-item-highlighted-color);
+  padding: 2px;
+}
+
+.service-datatable thead {
+  background-color: var(--bg-service-datatable-thead) !important;
+}
+
+.service-datatable tbody {
+  background-color: var(--bg-service-datatable-tbody);
+}
+
 .tooltip.portainer-tooltip .tooltip-inner {
   font-family: Montserrat;
-  background-color: #ffffff;
+  background-color: var(--bg-tooltip-color);
   padding: 0.833em 1em;
-  color: #333333;
-  border: 1px solid #d4d4d5;
+  color: var(--text-tooltip-color);
+  border: 1px solid var(--border-tooltip-color);
   border-radius: 0.14285714rem;
   box-shadow: 0 2px 4px 0 rgba(34, 36, 38, 0.12), 0 2px 10px 0 rgba(34, 36, 38, 0.15);
 }
@@ -145,7 +166,7 @@ a[ng-click] {
 
 .fa.blue-icon,
 .fab.blue-icon {
-  color: #337ab7;
+  color: var(--blue-2);
 }
 
 .text-warning {
@@ -207,25 +228,25 @@ a[ng-click] {
   padding: 0.7rem;
   margin-bottom: 0.7rem;
   cursor: pointer;
-  border: 1px solid #cccccc;
+  border: 1px solid var(--border-blocklist-color);
   border-radius: 2px;
-  box-shadow: 0 3px 10px -2px rgba(161, 170, 166, 0.5);
+  box-shadow: var(--shadow-box-color);
 }
 
 .blocklist-item--disabled {
   cursor: auto;
-  background-color: #ececec;
+  background-color: var(--grey-12);
 }
 
 .blocklist-item--selected {
-  border: 2px solid #bbbbbb;
-  background-color: #ececec;
-  color: #2d3e63;
+  background-color: var(--bg-blocklist-item-selected-color);
+  border: 2px solid var(--border-blocklist-item-selected-color);
+  color: var(--text-blocklist-item-selected-color);
 }
 
 .blocklist-item:hover {
-  background-color: #ececec;
-  color: #2d3e63;
+  background-color: var(--bg-blocklist-hover-color);
+  color: var(--text-blocklist-hover-color);
 }
 
 .blocklist-item-box {
@@ -360,7 +381,7 @@ a[ng-click] {
 
 .panel-body {
   padding-top: 30px;
-  background-color: #ffffff;
+  background-color: var(--white-color) fff;
 }
 
 .pagination-controls {
@@ -443,8 +464,8 @@ a[ng-click] {
   display: inline-block;
   padding: 0px 6px;
   margin-left: 10px;
-  color: #555555;
-  background-color: #fff;
+  color: var(--text-small-select-color);
+  background-color: var(--bg-small-select-color);
   background-image: none;
   border-radius: 4px;
   font-size: 14px;
@@ -462,11 +483,11 @@ a[ng-click] {
 }
 
 .visualizer_container .node {
-  border: 1px dashed #337ab7;
+  border: 1px dashed var(--blue-2);
   background-color: rgb(51, 122, 183);
   background-color: rgba(51, 122, 183, 0.1);
   border-radius: 4px;
-  box-shadow: 0 3px 10px -2px rgba(161, 170, 166, 0.5);
+  box-shadow: 0 3px 10px -2px var(--grey-50);
   padding: 15px;
   margin: 5px;
 }
@@ -476,7 +497,7 @@ a[ng-click] {
   flex-direction: column;
   justify-content: center;
   text-align: center;
-  border-bottom: 1px solid #777;
+  border-bottom: 1px solid var(--grey-26);
   padding-bottom: 10px;
 }
 
@@ -486,7 +507,7 @@ a[ng-click] {
 }
 
 .visualizer_container .node .node_info .node_labels {
-  border-top: 1px solid #777;
+  border-top: 1px solid var(--grey-26);
   padding-top: 10px;
   margin-top: 10px;
 }
@@ -503,9 +524,9 @@ a[ng-click] {
 }
 
 .visualizer_container .node .tasks .task {
-  border: 1px solid #333333;
+  border: 1px solid var(--grey-6);
   border-radius: 2px;
-  box-shadow: 0 3px 10px -2px rgba(161, 170, 166, 0.5);
+  box-shadow: 0 3px 10px -2px var(--grey-50);
   padding: 10px;
   margin: 5px;
   font-size: 10px;
@@ -547,9 +568,9 @@ a[ng-click] {
 .log_viewer {
   height: 100%;
   overflow-y: scroll;
-  color: black;
+  color: var(--text-log-viewer-color);
   font-size: 0.85em;
-  background-color: white;
+  background-color: var(--bg-log-viewer-color);
 }
 
 .log_viewer.wrap_lines {
@@ -568,7 +589,7 @@ a[ng-click] {
 }
 
 .log_viewer .line_selected {
-  background-color: #c5cae9;
+  background-color: var(--bg-log-line-selected-color);
 }
 
 .row.header .meta .page {
@@ -578,7 +599,7 @@ a[ng-click] {
 .tag {
   padding: 2px 6px;
   color: white;
-  background-color: #337ab7;
+  background-color: var(--blue-2);
   border: 1px solid #2e6da4;
   border-radius: 4px;
 }
@@ -588,7 +609,7 @@ a[ng-click] {
 }
 
 .line-separator {
-  border-bottom: 1px solid #777;
+  border-bottom: 1px solid var(--grey-26);
   width: 50%;
   margin: 20px auto 10px auto;
 }
@@ -613,7 +634,7 @@ a[ng-click] {
 }
 
 .striked::after {
-  border-bottom: 0.2em solid #777777;
+  border-bottom: 0.2em solid var(--grey-26);
   content: '';
   left: 0;
   margin-top: calc(0.2em / 2 * -1);
@@ -625,7 +646,7 @@ a[ng-click] {
 
 .striketext:before,
 .striketext:after {
-  background-color: #777777;
+  background-color: var(--grey-26);
   content: '';
   display: inline-block;
   height: 1px;
@@ -657,20 +678,51 @@ a[ng-click] {
 /*angular-multi-select override*/
 .multiSelect > button {
   min-height: 30px !important;
-  background-color: unset;
-  background-image: unset;
+  background-image: var(--bg-image-multiselect-button);
+  border-color: var(--border-multiselect);
+  color: var(--text-multiselect);
+  background-color: var(--bg-multiselect-color);
+}
+
+.multiSelect > button:hover {
+  background-image: var(--bg-image-multiselect-hover);
+}
+
+.multiSelect .checkboxLayer {
+  border-color: var(--border-multiselect-checkboxlayer);
+}
+
+.multiSelect .checkBoxContainer {
+  background-color: var(--bg-multiselect-checkboxcontainer);
+}
+
+.multiSelect .multiSelectItem {
+  color: var(--text-multiselect-item);
+}
+
+.multiSelect .helperContainer {
+  background-color: var(--bg-multiselect-helpercontainer);
+}
+
+.multiSelect .multiSelectFocus {
+  background-image: var(--bg-image-multiselect);
 }
 
 .multiSelect .multiSelectItem:not(.multiSelectGroup).selected {
-  background-image: linear-gradient(#337ab7, #337ab7);
-  color: #fff;
+  background-image: var(--bg-image-multiselect);
+  color: var(--white-color);
   border: none;
 }
 
 .multiSelect .multiSelectItem:hover,
 .multiSelect .multiSelectGroup:hover {
-  background-image: linear-gradient(#337ab7, #337ab7) !important;
-  color: #fff !important;
+  border-color: var(--grey-3);
+}
+
+.multiSelect .multiSelectItem:hover,
+.multiSelect .multiSelectGroup:hover {
+  background-image: var(--bg-image-multiselect) !important;
+  color: var(--white-color) !important;
 }
 
 .multiSelect .tickMark,
@@ -696,7 +748,7 @@ a[ng-click] {
 #loading-bar .bar {
   position: relative;
   height: 3px;
-  background: #738bc0;
+  background: var(--blue-3);
 }
 /*!angular-loading-bar override*/
 
@@ -708,11 +760,11 @@ a[ng-click] {
 /* json-tree override */
 json-tree {
   font-size: 13px;
-  color: #30426a;
+  color: var(--blue-5);
 }
 
 json-tree .key {
-  color: #738bc0;
+  color: var(--blue-3);
   padding-right: 5px;
 }
 
@@ -725,7 +777,7 @@ json-tree .branch-preview {
 
 /* uib-progressbar override */
 .progress-bar {
-  color: #4e4e4e;
+  color: var(--text-progress-bar-color);
 }
 /* !uib-progressbar override */
 
@@ -756,7 +808,7 @@ json-tree .branch-preview {
 }
 
 .sk-fold-cube:before {
-  background-color: #337ab7;
+  background-color: var(--blue-2);
 }
 /* !spinkit override */
 

@@ -1,6 +1,7 @@
 package stacks
 
 import (
+	"context"
 	"os"
 	"sync"
 
@@ -50,7 +51,7 @@ func (d *stackDeployer) DeployComposeStack(stack *portainer.Stack, endpoint *por
 	d.swarmStackManager.Login(registries, endpoint)
 	defer d.swarmStackManager.Logout(endpoint)
 
-	return d.composeStackManager.Up(stack, endpoint)
+	return d.composeStackManager.Up(context.TODO(), stack, endpoint)
 }
 
 func (d *stackDeployer) DeployKubernetesStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error {

@@ -68,7 +68,7 @@ func (factory *ProxyFactory) NewAgentProxy(endpoint *portainer.Endpoint) (*Proxy
 		return nil, errors.Wrap(err, "failed starting proxy server")
 	}
 
-	return proxyServer, err
+	return proxyServer, nil
 }
 
 func (proxy *ProxyServer) start() error {

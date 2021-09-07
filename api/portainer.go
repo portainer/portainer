@@ -1003,6 +1003,8 @@ type (
 		ID       UserID `json:"Id" example:"1"`
 		Username string `json:"Username" example:"bob"`
 		Password string `json:"Password,omitempty" example:"passwd"`
+		// User Theme
+		UserTheme string `example:"dark"`
 		// User role (1 for administrator account and 2 for regular account)
 		Role UserRole `json:"Role" example:"1"`
 
@@ -1054,8 +1056,8 @@ type (
 	ComposeStackManager interface {
 		ComposeSyntaxMaxVersion() string
 		NormalizeStackName(name string) string
-		Up(stack *Stack, endpoint *Endpoint) error
-		Down(stack *Stack, endpoint *Endpoint) error
+		Up(ctx context.Context, stack *Stack, endpoint *Endpoint) error
+		Down(ctx context.Context, stack *Stack, endpoint *Endpoint) error
 	}
 
 	// CryptoService represents a service for encrypting/hashing data
@@ -1179,6 +1181,7 @@ type (
 
 	// FileService represents a service for managing files
 	FileService interface {
+		GetDockerConfigPath() string
 		GetFileContent(filePath string) ([]byte, error)
 		Rename(oldPath, newPath string) error
 		RemoveDirectory(directoryPath string) error

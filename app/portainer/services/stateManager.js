@@ -54,6 +54,11 @@ angular.module('portainer.app').factory('StateManager', [
       LocalStorage.storeApplicationState(state.application);
     };
 
+    manager.updateTheme = function (theme) {
+      state.application.theme = theme;
+      LocalStorage.storeApplicationState(state.application);
+    };
+
     manager.updateSnapshotInterval = function (interval) {
       state.application.snapshotInterval = interval;
       LocalStorage.storeApplicationState(state.application);
