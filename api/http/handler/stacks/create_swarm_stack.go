@@ -1,12 +1,13 @@
 package stacks
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"path"
 	"strconv"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
@@ -391,7 +392,7 @@ func (handler *Handler) createSwarmDeployConfig(r *http.Request, stack *portaine
 func (handler *Handler) deploySwarmStack(config *swarmStackDeploymentConfig) error {
 	isAdminOrEndpointAdmin, err := handler.userIsAdminOrEndpointAdmin(config.user, config.endpoint.ID)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to validate user admin privileges")
 	}
 
 	settings := &config.endpoint.SecuritySettings
@@ -401,30 +402,15 @@ func (handler *Handler) deploySwarmStack(config *swarmStackDeploymentConfig) err
 			path := path.Join(config.stack.ProjectPath, file)
 			stackContent, err := handler.FileService.GetFileContent(path)
 			if err != nil {
-				return err
+				return errors.WithMessage(err, "failed to get stack file content")
 			}
 
 			err = handler.isValidStackFile(stackContent, settings)
 			if err != nil {
-				return err
+				return errors.WithMessage(err, "swarm stack file content validation failed")
 			}
 		}
 	}
 
-	handler.stackCreationMutex.Lock()
-	defer handler.stackCreationMutex.Unlock()
-
-	handler.SwarmStackManager.Login(config.registries, config.endpoint)
-
-	err = handler.SwarmStackManager.Deploy(config.stack, config.prune, config.endpoint)
-	if err != nil {
-		return err
-	}
-
-	err = handler.SwarmStackManager.Logout(config.endpoint)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return handler.StackDeployer.DeploySwarmStack(config.stack, config.endpoint, config.registries, config.prune)
 }

@@ -110,7 +110,7 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 	case portainer.DockerComposeStack:
 		return handler.createComposeStack(w, r, method, endpoint, tokenData.ID)
 	case portainer.KubernetesStack:
-		return handler.createKubernetesStack(w, r, method, endpoint)
+		return handler.createKubernetesStack(w, r, method, endpoint, tokenData.ID)
 	}
 
 	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: type. Value must be one of: 1 (Swarm stack) or 2 (Compose stack)", errors.New(request.ErrInvalidQueryParameter)}
@@ -143,14 +143,14 @@ func (handler *Handler) createSwarmStack(w http.ResponseWriter, r *http.Request,
 	return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid value for query parameter: method. Value must be one of: string, repository or file", Err: errors.New(request.ErrInvalidQueryParameter)}
 }
 
-func (handler *Handler) createKubernetesStack(w http.ResponseWriter, r *http.Request, method string, endpoint *portainer.Endpoint) *httperror.HandlerError {
+func (handler *Handler) createKubernetesStack(w http.ResponseWriter, r *http.Request, method string, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	switch method {
 	case "string":
-		return handler.createKubernetesStackFromFileContent(w, r, endpoint)
+		return handler.createKubernetesStackFromFileContent(w, r, endpoint, userID)
 	case "repository":
-		return handler.createKubernetesStackFromGitRepository(w, r, endpoint)
+		return handler.createKubernetesStackFromGitRepository(w, r, endpoint, userID)
 	case "url":
-		return handler.createKubernetesStackFromManifestURL(w, r, endpoint)		
+		return handler.createKubernetesStackFromManifestURL(w, r, endpoint, userID)
 	}
 	return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid value for query parameter: method. Value must be one of: string or repository", Err: errors.New(request.ErrInvalidQueryParameter)}
 }

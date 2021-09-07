@@ -88,12 +88,14 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 			return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
 		}
 
-		access, err := handler.userCanAccessStack(securityContext, endpoint.ID, resourceControl)
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify user authorizations to validate stack access", err}
-		}
-		if !access {
-			return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", httperrors.ErrResourceAccessDenied}
+		if stack.Type == portainer.DockerSwarmStack || stack.Type == portainer.DockerComposeStack {
+			access, err := handler.userCanAccessStack(securityContext, endpoint.ID, resourceControl)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify user authorizations to validate stack access", err}
+			}
+			if !access {
+				return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", httperrors.ErrResourceAccessDenied}
+			}
 		}
 	}
 

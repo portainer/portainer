@@ -37,8 +37,8 @@ func (payload *stackGitUpdatePayload) Validate(r *http.Request) error {
 }
 
 // @id StackUpdateGit
-// @summary Redeploy a stack
-// @description Pull and redeploy a stack via Git
+// @summary Update a stack's Git configs
+// @description Update the Git settings in a stack, e.g., RepositoryReferenceName and AutoUpdate
 // @description **Access policy**: restricted
 // @tags stacks
 // @security jwt
@@ -46,7 +46,7 @@ func (payload *stackGitUpdatePayload) Validate(r *http.Request) error {
 // @produce json
 // @param id path int true "Stack identifier"
 // @param endpointId query int false "Stacks created before version 1.18.0 might not have an associated endpoint identifier. Use this optional parameter to set the endpoint identifier used by the stack."
-// @param body body updateStackGitPayload true "Git configs for pull and redeploy a stack"
+// @param body body stackGitUpdatePayload true "Git configs for pull and redeploy a stack"
 // @success 200 {object} portainer.Stack "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
@@ -98,22 +98,24 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Permission denied to access endpoint", Err: err}
 	}
 
-	resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)
-	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve a resource control associated to the stack", Err: err}
-	}
+	if stack.Type == portainer.DockerSwarmStack || stack.Type == portainer.DockerComposeStack {
+		resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)
+		if err != nil {
+			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve a resource control associated to the stack", Err: err}
+		}
 
-	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve info from request context", Err: err}
-	}
+		securityContext, err := security.RetrieveRestrictedRequestContext(r)
+		if err != nil {
+			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve info from request context", Err: err}
+		}
 
-	access, err := handler.userCanAccessStack(securityContext, endpoint.ID, resourceControl)
-	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to verify user authorizations to validate stack access", Err: err}
-	}
-	if !access {
-		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Access denied to resource", Err: httperrors.ErrResourceAccessDenied}
+		access, err := handler.userCanAccessStack(securityContext, endpoint.ID, resourceControl)
+		if err != nil {
+			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to verify user authorizations to validate stack access", Err: err}
+		}
+		if !access {
+			return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Access denied to resource", Err: httperrors.ErrResourceAccessDenied}
+		}
 	}
 
 	//stop the autoupdate job if there is any

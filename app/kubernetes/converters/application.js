@@ -15,6 +15,7 @@ import {
   KubernetesPortainerApplicationOwnerLabel,
   KubernetesPortainerApplicationStackNameLabel,
   KubernetesPortainerApplicationStackIdLabel,
+  KubernetesPortainerApplicationKindLabel,
 } from 'Kubernetes/models/application/models';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
@@ -60,6 +61,7 @@ class KubernetesApplicationConverter {
       const { labels } = data.metadata;
       res.StackId = labels[KubernetesPortainerApplicationStackIdLabel] ? parseInt(labels[KubernetesPortainerApplicationStackIdLabel], 10) : null;
       res.StackName = labels[KubernetesPortainerApplicationStackNameLabel] || '';
+      res.ApplicationKind = labels[KubernetesPortainerApplicationKindLabel] || '';
       res.ApplicationOwner = labels[KubernetesPortainerApplicationOwnerLabel] || '';
       res.ApplicationName = labels[KubernetesPortainerApplicationNameLabel] || res.Name;
     }

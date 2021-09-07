@@ -7,11 +7,11 @@ export const KubernetesDeployBuildMethods = Object.freeze({
   GIT: 1,
   WEB_EDITOR: 2,
   CUSTOM_TEMPLATE: 3,
-  URL: 4
+  URL: 4,
 });
 
 export const KubernetesDeployRequestMethods = Object.freeze({
   REPOSITORY: 'repository',
   STRING: 'string',
-  URL: 'url'
+  URL: 'url',
 });

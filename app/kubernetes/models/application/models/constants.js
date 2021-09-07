@@ -40,7 +40,10 @@ export const KubernetesApplicationQuotaDefaults = {
 };
 
 export const KubernetesPortainerApplicationStackNameLabel = 'io.portainer.kubernetes.application.stack';
+
 export const KubernetesPortainerApplicationStackIdLabel = 'io.portainer.kubernetes.application.stackid';
+
+export const KubernetesPortainerApplicationKindLabel = 'io.portainer.kubernetes.application.kind';
 
 export const KubernetesPortainerApplicationNameLabel = 'io.portainer.kubernetes.application.name';
 

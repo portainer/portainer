@@ -10,6 +10,7 @@ import {
   KubernetesApplicationQuotaDefaults,
   KubernetesApplicationTypes,
   KubernetesApplicationPlacementTypes,
+  KubernetesDeploymentTypes,
 } from 'Kubernetes/models/application/models';
 import {
   KubernetesApplicationConfigurationFormValue,
@@ -50,6 +51,7 @@ class KubernetesCreateApplicationController {
     KubernetesPersistentVolumeClaimService,
     KubernetesVolumeService,
     RegistryService,
+    StackService,
     KubernetesNodesLimitsService
   ) {
     this.$async = $async;
@@ -66,6 +68,7 @@ class KubernetesCreateApplicationController {
     this.KubernetesIngressService = KubernetesIngressService;
     this.KubernetesPersistentVolumeClaimService = KubernetesPersistentVolumeClaimService;
     this.RegistryService = RegistryService;
+    this.StackService = StackService;
     this.KubernetesNodesLimitsService = KubernetesNodesLimitsService;
 
     this.ApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
@@ -75,8 +78,11 @@ class KubernetesCreateApplicationController {
     this.ApplicationTypes = KubernetesApplicationTypes;
     this.ApplicationConfigurationFormValueOverridenKeyTypes = KubernetesApplicationConfigurationFormValueOverridenKeyTypes;
     this.ServiceTypes = KubernetesServiceTypes;
+    this.KubernetesDeploymentTypes = KubernetesDeploymentTypes;
 
     this.state = {
+      appType: this.KubernetesDeploymentTypes.APPLICATION_FORM,
+      updateWebEditorInProgress: false,
       actionInProgress: false,
       useLoadBalancer: false,
       useServerMetrics: false,
@@ -133,8 +139,50 @@ class KubernetesCreateApplicationController {
     this.updateApplicationAsync = this.updateApplicationAsync.bind(this);
     this.deployApplicationAsync = this.deployApplicationAsync.bind(this);
     this.setPullImageValidity = this.setPullImageValidity.bind(this);
+    this.onChangeFileContent = this.onChangeFileContent.bind(this);
   }
   /* #endregion */
+
+  onChangeFileContent(value) {
+    if (this.stackFileContent.replace(/(\r\n|\n|\r)/gm, '') !== value.replace(/(\r\n|\n|\r)/gm, '')) {
+      this.state.isEditorDirty = true;
+      this.stackFileContent = value;
+    }
+  }
+
+  async updateApplicationViaWebEditor() {
+    return this.$async(async () => {
+      try {
+        const confirmed = await this.ModalService.confirmAsync({
+          title: 'Are you sure?',
+          message: 'Any changes to this application will be overriden and may cause a service interruption. Do you wish to continue?',
+          buttons: {
+            confirm: {
+              label: 'Update',
+              className: 'btn-warning',
+            },
+          },
+        });
+        if (!confirmed) {
+          return;
+        }
+        this.state.updateWebEditorInProgress = true;
+        await this.StackService.updateKubeStack({ EndpointId: this.endpoint.Id, Id: this.application.StackId }, this.stackFileContent, null);
+        this.state.isEditorDirty = false;
+        await this.$state.reload();
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Failed redeploying application');
+      } finally {
+        this.state.updateWebEditorInProgress = false;
+      }
+    });
+  }
+
+  async uiCanExit() {
+    if (this.stackFileContent && this.state.isEditorDirty) {
+      return this.ModalService.confirmWebEditorDiscard();
+    }
+  }
 
   setPullImageValidity(validity) {
     this.state.pullImageValidity = validity;
@@ -1029,6 +1077,17 @@ class KubernetesCreateApplicationController {
             this.nodesLabels,
             this.ingresses
           );
+
+          if (this.application.ApplicationKind) {
+            this.state.appType = this.KubernetesDeploymentTypes[this.application.ApplicationKind.toUpperCase()];
+            if (this.application.StackId) {
+              this.stack = await this.StackService.stack(this.application.StackId);
+              if (this.application.ApplicationKind === this.KubernetesDeploymentTypes.CONTENT) {
+                this.stackFileContent = await this.StackService.getStackFile(this.application.StackId);
+              }
+            }
+          }
+
           this.formValues.OriginalIngresses = this.ingresses;
           this.formValues.ImageModel = await this.parseImageConfiguration(this.formValues.ImageModel);
           this.savedFormValues = angular.copy(this.formValues);
