@@ -25,7 +25,7 @@ func (store *Store) FailSafeMigrate(migrator *migrator.Migrator) error {
 			store.Rollback(true)
 		}
 	}()
-	return migrator.MigrateCE()
+	return migrator.Migrate()
 }
 
 // MigrateData automatically migrate the data based on the DBVersion.
