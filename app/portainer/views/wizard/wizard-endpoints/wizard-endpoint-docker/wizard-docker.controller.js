@@ -68,19 +68,19 @@ export default class WizardDockerController {
     }
     switch (type) {
       case 'agent':
-        this.addDockerAgentEndpoint(name, creationType, url, publicUrl, groupId, tagIds);
+        await this.addDockerAgentEndpoint(name, creationType, url, publicUrl, groupId, tagIds);
         break;
       case 'api':
-        this.addDockerApiEndpoint(name, creationType, url, publicUrl, groupId, tagIds, securityData);
+        await this.addDockerApiEndpoint(name, creationType, url, publicUrl, groupId, tagIds, securityData);
         break;
       case 'socket':
-        this.addDockerLocalEndpoint(name, socketUrl, publicUrl, groupId, tagIds);
+        await this.addDockerLocalEndpoint(name, socketUrl, publicUrl, groupId, tagIds);
         break;
     }
   }
 
   // Docker Agent Endpoint
-  addDockerAgentEndpoint(name, creationType, url, publicUrl, groupId, tagIds) {
+  async addDockerAgentEndpoint(name, creationType, url, publicUrl, groupId, tagIds) {
     const tsl = true;
     const tlsSkipVerify = true;
     const tlsSkipClientVerify = true;
@@ -88,12 +88,12 @@ export default class WizardDockerController {
     const tlsCertFile = null;
     const tlsKeyFile = null;
 
-    this.addRemoteEndpoint(name, creationType, url, publicUrl, groupId, tagIds, tsl, tlsSkipVerify, tlsSkipClientVerify, tlsCaFile, tlsCertFile, tlsKeyFile);
+    await this.addRemoteEndpoint(name, creationType, url, publicUrl, groupId, tagIds, tsl, tlsSkipVerify, tlsSkipClientVerify, tlsCaFile, tlsCertFile, tlsKeyFile);
     this.onAnalytics('docker-agent');
   }
 
   // Docker Api Endpoint
-  addDockerApiEndpoint(name, creationType, url, publicUrl, groupId, tagIds, securityData) {
+  async addDockerApiEndpoint(name, creationType, url, publicUrl, groupId, tagIds, securityData) {
     const tsl = this.formValues.tls;
     const tlsSkipVerify = this.formValues.skipCertification;
     const tlsSkipClientVerify = this.formValues.skipCertification;
@@ -101,13 +101,13 @@ export default class WizardDockerController {
     const tlsCertFile = tlsSkipClientVerify ? null : securityData.TLSCert;
     const tlsKeyFile = tlsSkipClientVerify ? null : securityData.TLSKey;
 
-    this.addRemoteEndpoint(name, creationType, url, publicUrl, groupId, tagIds, tsl, tlsSkipVerify, tlsSkipClientVerify, tlsCaFile, tlsCertFile, tlsKeyFile);
+    await this.addRemoteEndpoint(name, creationType, url, publicUrl, groupId, tagIds, tsl, tlsSkipVerify, tlsSkipClientVerify, tlsCaFile, tlsCertFile, tlsKeyFile);
     this.onAnalytics('docker-api');
   }
 
   // Docker Local Endpoint
-  addDockerLocalEndpoint(name, url, publicUrl, groupId, tagIds) {
-    this.addLocalEndpoint(name, url, publicUrl, groupId, tagIds);
+  async addDockerLocalEndpoint(name, url, publicUrl, groupId, tagIds) {
+    await this.addLocalEndpoint(name, url, publicUrl, groupId, tagIds);
     this.onAnalytics('local-endpoint');
   }
 
