@@ -25,6 +25,7 @@ type stackDeployer struct {
 	kubernetesDeployer  portainer.KubernetesDeployer
 }
 
+// NewStackDeployer inits a stackDeployer struct with a SwarmStackManager, a ComposeStackManager and a KubernetesDeployer
 func NewStackDeployer(swarmStackManager portainer.SwarmStackManager, composeStackManager portainer.ComposeStackManager, kubernetesDeployer portainer.KubernetesDeployer) *stackDeployer {
 	return &stackDeployer{
 		lock:                &sync.Mutex{},

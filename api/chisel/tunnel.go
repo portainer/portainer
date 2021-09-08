@@ -56,29 +56,27 @@ func (service *Service) GetTunnelDetails(endpointID portainer.EndpointID) *porta
 	}
 }
 
+// GetActiveTunnel retrieves an active tunnel which allows communicating with edge agent
 func (service *Service) GetActiveTunnel(endpoint *portainer.Endpoint) (*portainer.TunnelDetails, error) {
 	tunnel := service.GetTunnelDetails(endpoint.ID)
-	if tunnel.Status != portainer.EdgeAgentIdle {
-		return tunnel, nil
-	}
-
-	err := service.SetTunnelStatusToRequired(endpoint.ID)
-	if err != nil {
-		return nil, fmt.Errorf("failed opening tunnel to endpoint: %w", err)
-	}
-
-	if endpoint.EdgeCheckinInterval == 0 {
-		settings, err := service.dataStore.Settings().Settings()
+	if tunnel.Status == portainer.EdgeAgentIdle || tunnel.Status == portainer.EdgeAgentManagementRequired {
+		err := service.SetTunnelStatusToRequired(endpoint.ID)
 		if err != nil {
-			return nil, fmt.Errorf("failed fetching settings from db: %w", err)
+			return nil, fmt.Errorf("failed opening tunnel to endpoint: %w", err)
 		}
 
-		endpoint.EdgeCheckinInterval = settings.EdgeAgentCheckinInterval
+		if endpoint.EdgeCheckinInterval == 0 {
+			settings, err := service.dataStore.Settings().Settings()
+			if err != nil {
+				return nil, fmt.Errorf("failed fetching settings from db: %w", err)
+			}
+
+			endpoint.EdgeCheckinInterval = settings.EdgeAgentCheckinInterval
+		}
+
+		waitForAgentToConnect := time.Duration(endpoint.EdgeCheckinInterval) * time.Second
+		time.Sleep(waitForAgentToConnect * 2)
 	}
-
-	waitForAgentToConnect := time.Duration(endpoint.EdgeCheckinInterval) * time.Second
-	time.Sleep(waitForAgentToConnect * 2)
-
 	tunnel = service.GetTunnelDetails(endpoint.ID)
 
 	return tunnel, nil

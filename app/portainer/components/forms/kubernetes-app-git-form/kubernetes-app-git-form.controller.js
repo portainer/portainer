@@ -83,7 +83,6 @@ class KubernetesAppGitFormController {
   }
 
   $onInit() {
-    console.log(this);
     this.formValues.RefName = this.stack.GitConfig.ReferenceName;
     if (this.stack.GitConfig && this.stack.GitConfig.Authentication) {
       this.formValues.RepositoryUsername = this.stack.GitConfig.Authentication.Username;
