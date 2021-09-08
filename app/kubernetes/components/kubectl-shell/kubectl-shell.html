@@ -13,7 +13,7 @@
 
 <kube-config-download-button></kube-config-download-button>
 
-<div ng-if="$ctrl.state.checked" class="{{ $ctrl.state.css }}-kubectl-shell">
+<div ng-if="$ctrl.state.shell.connected" class="{{ $ctrl.state.css }}-kubectl-shell">
   <div class="shell-container">
     <div class="shell-item"><i class="fas fa-terminal" style="margin-right: 5px;"></i>kubectl shell</div>
     <div class="shell-item-right">
@@ -27,7 +27,7 @@
     </div>
   </div>
   <div>
-    <div style="padding: 0px;">
+    <div class="nopadding">
       <div>
         <div id="terminal-container" class="terminal-container">
           <div style="position: fixed; color: #fff;">Loading Terminal...</div>
