@@ -27,36 +27,24 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
       this.state.filteredDataSet.forEach((item) => this.expandItem(item, this.state.expandAll));
     };
 
+    this.isItemExpanded = function (item) {
+      return this.state.expandedItems.includes(item.Id);
+    };
+
     this.expandItem = function (item, expanded) {
-      item.Expanded = expanded;
-      if (!item.Expanded) {
+      // collapse item
+      if (!expanded) {
         this.state.expandedItems = this.state.expandedItems.filter((id) => id !== item.Id);
-      } else if (item.Expanded && !this.state.expandedItems.includes(item.Id)) {
+        // expanded item
+      } else if (expanded && !this.state.expandedItems.includes(item.Id)) {
         this.state.expandedItems = [...this.state.expandedItems, item.Id];
       }
       DatatableService.setDataTableExpandedItems(this.tableKey, this.state.expandedItems);
     };
 
-    function expandPreviouslyExpandedItem(item, storedExpandedItems) {
-      const expandedItem = storedExpandedItems.some((storedId) => storedId === item.Id);
-      if (expandedItem) {
-        ctrl.expandItem(item, true);
-      }
-    }
-
     this.expandItems = function (storedExpandedItems) {
-      let expandedItemCount = 0;
       this.state.expandedItems = storedExpandedItems;
-
-      for (let i = 0; i < this.dataset.length; i++) {
-        const item = this.dataset[i];
-        expandPreviouslyExpandedItem(item, storedExpandedItems);
-        if (item.Expanded) {
-          ++expandedItemCount;
-        }
-      }
-
-      if (expandedItemCount === this.dataset.length) {
+      if (this.state.expandedItems.length === this.dataset.length) {
         this.state.expandAll = true;
       }
     };
@@ -117,19 +105,19 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
       this.prepareTableFromDataset();
 
       this.state.orderBy = this.orderBy;
-      var storedOrder = DatatableService.getDataTableOrder(this.tableKey);
+      const storedOrder = DatatableService.getDataTableOrder(this.tableKey);
       if (storedOrder !== null) {
         this.state.reverseOrder = storedOrder.reverse;
         this.state.orderBy = storedOrder.orderBy;
       }
 
-      var textFilter = DatatableService.getDataTableTextFilters(this.tableKey);
+      const textFilter = DatatableService.getDataTableTextFilters(this.tableKey);
       if (textFilter !== null) {
         this.state.textFilter = textFilter;
         this.onTextFilterChange();
       }
 
-      var storedFilters = DatatableService.getDataTableFilters(this.tableKey);
+      const storedFilters = DatatableService.getDataTableFilters(this.tableKey);
       if (storedFilters !== null) {
         this.filters = storedFilters;
       }
@@ -137,12 +125,12 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
         this.filters.state.open = false;
       }
 
-      var storedExpandedItems = DatatableService.getDataTableExpandedItems(this.tableKey);
+      const storedExpandedItems = DatatableService.getDataTableExpandedItems(this.tableKey);
       if (storedExpandedItems !== null) {
         this.expandItems(storedExpandedItems);
       }
 
-      var storedSettings = DatatableService.getDataTableSettings(this.tableKey);
+      const storedSettings = DatatableService.getDataTableSettings(this.tableKey);
       if (storedSettings !== null) {
         this.settings = storedSettings;
         this.settings.open = false;
