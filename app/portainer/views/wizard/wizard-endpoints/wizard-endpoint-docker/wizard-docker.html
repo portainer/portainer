@@ -91,6 +91,7 @@
 
     <div class="form-group" style="padding-left: 15px; width: 40%;">
       <por-switch-field
+        ng-if="$ctrl.formValues.tls"
         ng-model="$ctrl.formValues.skipCertification"
         name="skip_certification"
         label="Skip Certification Verification"
@@ -99,7 +100,7 @@
     </div>
 
     <div>
-      <wizard-tls ng-if="!$ctrl.formValues.skipCertification" form-data="$ctrl.formValues.securityFormData" onChange="($ctrl.onChangeFile)"></wizard-tls>
+      <wizard-tls ng-if="!$ctrl.formValues.skipCertification && $ctrl.formValues.tls" form-data="$ctrl.formValues.securityFormData" onChange="($ctrl.onChangeFile)"></wizard-tls>
     </div>
   </div>
 
