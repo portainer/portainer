@@ -15,6 +15,7 @@ class KubernetesRedeployAppGitFormController {
       redeployInProgress: false,
       showConfig: false,
       isEdit: false,
+      hasUnsavedChanges: false,
     };
 
     this.formValues = {
@@ -44,6 +45,7 @@ class KubernetesRedeployAppGitFormController {
       ...this.formValues,
       ...values,
     };
+    this.state.hasUnsavedChanges = angular.toJson(this.savedFormValues) !== angular.toJson(this.formValues);
   }
 
   buildAnalyticsProperties() {
@@ -98,6 +100,8 @@ class KubernetesRedeployAppGitFormController {
       try {
         this.state.saveGitSettingsInProgress = true;
         await this.StackService.updateKubeStack({ EndpointId: this.stack.EndpointId, Id: this.stack.Id }, null, this.formValues);
+        this.savedFormValues = angular.copy(this.formValues);
+        this.state.hasUnsavedChanges = false;
         this.Notifications.success('Save stack settings successfully');
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to save application settings');
@@ -135,6 +139,8 @@ class KubernetesRedeployAppGitFormController {
       this.formValues.RepositoryAuthentication = true;
       this.state.isEdit = true;
     }
+
+    this.savedFormValues = angular.copy(this.formValues);
   }
 }
 
