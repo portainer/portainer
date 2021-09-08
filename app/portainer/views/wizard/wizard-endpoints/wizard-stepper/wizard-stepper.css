@@ -43,7 +43,7 @@
   border-bottom: 5px solid rgb(231, 231, 231);
   width: 100%;
   top: 20px;
-  left: 0%;
+  left: 0;
   z-index: 2;
 }
 
@@ -82,7 +82,7 @@
   border-bottom: 5px solid #48b400;
   width: 100%;
   top: 20px;
-  left: 10%;
+  left: 0;
   z-index: 3;
 }
 
