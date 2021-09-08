@@ -2,5 +2,9 @@
   display: grid;
   grid-template-columns: 1fr 1fr 3fr;
   padding-top: 1rem;
-  padding-bottom: 2rem;
+  padding-bottom: 0.5rem;
+}
+
+.publish-url-link {
+  width: min-content;
 }

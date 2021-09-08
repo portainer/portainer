@@ -31,6 +31,10 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
       return this.state.expandedItems.includes(item.Id);
     };
 
+    this.isExpandable = function (item) {
+      return item.KubernetesApplications || this.hasConfigurationSecrets(item) || !!this.getPublishedUrl(item).length;
+    };
+
     this.expandItem = function (item, expanded) {
       // collapse item
       if (!expanded) {
@@ -76,14 +80,27 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
       return !ctrl.isSystemNamespace(item) || ctrl.settings.showSystem;
     };
 
-    this.getPublishUrl = function (item) {
+    this.getPublishedUrl = function (item) {
       // Map all ingress rules in published ports to their respective URLs
-      const publishUrls = item.PublishedPorts.flatMap((pp) => pp.IngressRules)
+      const ingressUrls = item.PublishedPorts.flatMap((pp) => pp.IngressRules)
         .filter(({ Host, IP }) => Host || IP)
-        .map(({ Host, IP, Path }) => `http://${Host || IP}${Path}`);
+        .map(({ Host, IP, Port, Path }) => {
+          let scheme = Port === 443 ? 'https' : 'http';
+          let urlPort = Port === 80 || Port === 443 ? '' : `:${Port}`;
+          return `${scheme}://${Host || IP}${urlPort}${Path}`;
+        });
 
-      // Return the first URL
-      return publishUrls.length > 0 ? publishUrls[0] : '';
+      // Map all load balancer service ports to ip address
+      let loadBalancerURLs = [];
+      if (item.LoadBalancerIPAddress) {
+        loadBalancerURLs = item.PublishedPorts.map((pp) => `http://${item.LoadBalancerIPAddress}:${pp.Port}`);
+      }
+
+      // combine ingress urls
+      const publishedUrls = [...ingressUrls, ...loadBalancerURLs];
+
+      // Return the first URL - priority given to ingress urls, then services (load balancers)
+      return publishedUrls.length > 0 ? publishedUrls[0] : '';
     };
 
     this.hasConfigurationSecrets = function (item) {
