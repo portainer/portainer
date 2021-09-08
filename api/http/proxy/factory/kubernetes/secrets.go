@@ -158,7 +158,7 @@ func (transport *baseTransport) proxySecretDeleteOperation(request *http.Request
 }
 
 func isSecretRepresentPrivateRegistry(secret map[string]interface{}) bool {
-	if secret["type"].(string) != string(v1.SecretTypeDockerConfigJson) {
+    if secret["type"] == nil || secret["type"].(string) != string(v1.SecretTypeDockerConfigJson) {
 		return false
 	}
 
