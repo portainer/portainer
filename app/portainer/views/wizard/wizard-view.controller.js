@@ -72,15 +72,25 @@ export default class WizardViewController {
         },
       };
 
-      const endpoints = await this.EndpointService.endpoints(0, 1);
-
+      const endpoints = await this.EndpointService.endpoints();
       if (endpoints.totalCount === '0') {
         await this.createLocalKubernetesEndpoint();
         if (this.state.endpoint.kubernetesError) {
           await this.createLocalDockerEndpoint();
         }
       } else {
-        this.$state.go('portainer.home');
+        const addedLocalEndpoint = endpoints.value[0];
+        if (addedLocalEndpoint.Type === 1) {
+          this.state.endpoint.added = true;
+          this.state.endpoint.connected = 'docker';
+          this.state.local.icon = 'fab fa-docker';
+        }
+
+        if (addedLocalEndpoint.Type === 5) {
+          this.state.endpoint.added = true;
+          this.state.endpoint.connected = 'kubernetes';
+          this.state.local.icon = 'fas fa-dharmachakra';
+        }
       }
     });
   }
