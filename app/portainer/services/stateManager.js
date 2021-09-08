@@ -200,7 +200,7 @@ angular.module('portainer.app').factory('StateManager', [
           deferred.resolve();
         })
         .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to connect to the Docker endpoint', err: err });
+          deferred.reject({ msg: 'Unable to connect to the Docker environment', err: err });
         })
         .finally(function final() {
           state.loading = false;

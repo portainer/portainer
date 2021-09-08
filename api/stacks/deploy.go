@@ -51,7 +51,7 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 
 	endpoint, err := datastore.Endpoint().Endpoint(stack.EndpointID)
 	if err != nil {
-		return errors.WithMessagef(err, "failed to find the endpoint %v associated to the stack %v", stack.EndpointID, stack.ID)
+		return errors.WithMessagef(err, "failed to find the environment %v associated to the stack %v", stack.EndpointID, stack.ID)
 	}
 
 	author := stack.UpdatedBy

@@ -94,7 +94,7 @@ func (factory *ClientFactory) CreateClient(endpoint *portainer.Endpoint) (*kuber
 		return factory.buildEdgeClient(endpoint)
 	}
 
-	return nil, errors.New("unsupported endpoint type")
+	return nil, errors.New("unsupported environment type")
 }
 
 type agentHeaderRoundTripper struct {
@@ -125,7 +125,7 @@ func (factory *ClientFactory) buildEdgeClient(endpoint *portainer.Endpoint) (*ku
 	if tunnel.Status == portainer.EdgeAgentIdle {
 		err := factory.reverseTunnelService.SetTunnelStatusToRequired(endpoint.ID)
 		if err != nil {
-			return nil, fmt.Errorf("failed opening tunnel to endpoint: %w", err)
+			return nil, fmt.Errorf("failed opening tunnel to environment: %w", err)
 		}
 
 		if endpoint.EdgeCheckinInterval == 0 {

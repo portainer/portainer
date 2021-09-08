@@ -24,10 +24,10 @@ angular.module('portainer.docker', ['portainer.app']).config([
 
             if (status === 2) {
               if (!endpoint.Snapshots[0]) {
-                throw new Error('Endpoint is unreachable and there is no snapshot available for offline browsing.');
+                throw new Error('Environment is unreachable and there is no snapshot available for offline browsing.');
               }
               if (endpoint.Snapshots[0].Swarm) {
-                throw new Error('Endpoint is unreachable. Connect to another swarm manager.');
+                throw new Error('Environment is unreachable. Connect to another swarm manager.');
               }
             }
 
@@ -38,7 +38,7 @@ angular.module('portainer.docker', ['portainer.app']).config([
             const extensions = await LegacyExtensionManager.initEndpointExtensions(endpoint);
             await StateManager.updateEndpointState(endpoint, extensions);
           } catch (e) {
-            Notifications.error('Failed loading endpoint', e);
+            Notifications.error('Failed loading environment', e);
             $state.go('portainer.home', {}, { reload: true });
           }
 

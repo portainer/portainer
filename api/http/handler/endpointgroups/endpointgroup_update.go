@@ -45,7 +45,7 @@ func (payload *endpointGroupUpdatePayload) Validate(r *http.Request) error {
 func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointGroupID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint group identifier route variable", err}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment group identifier route variable", err}
 	}
 
 	var payload endpointGroupUpdatePayload
@@ -56,9 +56,9 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 
 	endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(portainer.EndpointGroupID(endpointGroupID))
 	if err == errors.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint group with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment group with the specified identifier inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint group with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment group with the specified identifier inside the database", err}
 	}
 
 	if payload.Name != "" {
@@ -123,7 +123,7 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 	if updateAuthorizations {
 		endpoints, err := handler.DataStore.Endpoint().Endpoints()
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environments from the database", err}
 		}
 
 		for _, endpoint := range endpoints {
@@ -140,13 +140,13 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 
 	err = handler.DataStore.EndpointGroup().UpdateEndpointGroup(endpointGroup.ID, endpointGroup)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint group changes inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist environment group changes inside the database", err}
 	}
 
 	if tagsChanged {
 		endpoints, err := handler.DataStore.Endpoint().Endpoints()
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environments from the database", err}
 
 		}
 
@@ -154,7 +154,7 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 			if endpoint.GroupID == endpointGroup.ID {
 				err = handler.updateEndpointRelations(&endpoint, endpointGroup)
 				if err != nil {
-					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint relations changes inside the database", err}
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist environment relations changes inside the database", err}
 				}
 			}
 		}

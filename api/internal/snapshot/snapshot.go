@@ -126,7 +126,7 @@ func (service *Service) startSnapshotLoop() error {
 	go func() {
 		err := service.snapshotEndpoints()
 		if err != nil {
-			log.Printf("[ERROR] [internal,snapshot] [message: background schedule error (endpoint snapshot).] [error: %s]", err)
+			log.Printf("[ERROR] [internal,snapshot] [message: background schedule error (environment snapshot).] [error: %s]", err)
 		}
 
 		for {
@@ -134,7 +134,7 @@ func (service *Service) startSnapshotLoop() error {
 			case <-ticker.C:
 				err := service.snapshotEndpoints()
 				if err != nil {
-					log.Printf("[ERROR] [internal,snapshot] [message: background schedule error (endpoint snapshot).] [error: %s]", err)
+					log.Printf("[ERROR] [internal,snapshot] [message: background schedule error (environment snapshot).] [error: %s]", err)
 				}
 			case <-service.shutdownCtx.Done():
 				log.Println("[DEBUG] [internal,snapshot] [message: shutting down snapshotting]")
@@ -166,13 +166,13 @@ func (service *Service) snapshotEndpoints() error {
 
 		latestEndpointReference, err := service.dataStore.Endpoint().Endpoint(endpoint.ID)
 		if latestEndpointReference == nil {
-			log.Printf("background schedule error (endpoint snapshot). Endpoint not found inside the database anymore (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
+			log.Printf("background schedule error (environment snapshot). Environment not found inside the database anymore (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
 			continue
 		}
 
 		latestEndpointReference.Status = portainer.EndpointStatusUp
 		if snapshotError != nil {
-			log.Printf("background schedule error (endpoint snapshot). Unable to create snapshot (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, snapshotError)
+			log.Printf("background schedule error (environment snapshot). Unable to create snapshot (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, snapshotError)
 			latestEndpointReference.Status = portainer.EndpointStatusDown
 		}
 
@@ -181,7 +181,7 @@ func (service *Service) snapshotEndpoints() error {
 
 		err = service.dataStore.Endpoint().UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)
 		if err != nil {
-			log.Printf("background schedule error (endpoint snapshot). Unable to update endpoint (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
+			log.Printf("background schedule error (environment snapshot). Unable to update environment (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
 			continue
 		}
 	}
@@ -201,12 +201,12 @@ func FetchDockerID(snapshot portainer.DockerSnapshot) (string, error) {
 	}
 
 	if info["Swarm"] == nil {
-		return "", errors.New("swarm endpoint is missing swarm info snapshot")
+		return "", errors.New("swarm environment is missing swarm info snapshot")
 	}
 
 	swarmInfo := info["Swarm"].(map[string]interface{})
 	if swarmInfo["Cluster"] == nil {
-		return "", errors.New("swarm endpoint is missing cluster info snapshot")
+		return "", errors.New("swarm environment is missing cluster info snapshot")
 	}
 
 	clusterInfo := swarmInfo["Cluster"].(map[string]interface{})

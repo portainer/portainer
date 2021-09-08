@@ -101,7 +101,7 @@ func Test_redeployWhenChanged(t *testing.T) {
 	tmpDir, _ := ioutil.TempDir("", "stack")
 
 	err := store.Endpoint().CreateEndpoint(&portainer.Endpoint{ID: 1})
-	assert.NoError(t, err, "error creating endpoint")
+	assert.NoError(t, err, "error creating environment")
 
 	username := "user"
 	err = store.User().CreateUser(&portainer.User{Username: username, Role: portainer.AdministratorRole})

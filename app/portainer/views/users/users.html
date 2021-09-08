@@ -75,7 +75,7 @@
                 Administrator
                 <portainer-tooltip
                   position="bottom"
-                  message="Administrators have access to Portainer settings management as well as full control over all defined endpoints and their resources."
+                  message="Administrators have access to Portainer settings management as well as full control over all defined environments and their resources."
                 ></portainer-tooltip>
               </label>
               <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.Administrator" data-cy="user-adminCheckbox" /><i></i> </label>
@@ -112,8 +112,8 @@
           <div class="form-group" ng-if="isAdmin && !formValues.Administrator && formValues.Teams.length === 0">
             <div class="col-sm-12">
               <span class="small text-muted">
-                Note: non-administrator users who aren't in a team don't have access to any endpoints by default. Head over to the
-                <a ui-sref="portainer.endpoints">Endpoints view</a> to manage their accesses.
+                Note: non-administrator users who aren't in a team don't have access to any environments by default. Head over to the
+                <a ui-sref="portainer.endpoints">Environments view</a> to manage their accesses.
               </span>
             </div>
           </div>

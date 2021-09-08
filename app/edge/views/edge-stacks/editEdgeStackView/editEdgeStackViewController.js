@@ -108,7 +108,7 @@ export class EditEdgeStackViewController {
       });
       return { endpoints, totalCount };
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve endpoint information');
+      this.Notifications.error('Failure', err, 'Unable to retrieve environment information');
     }
   }
 }

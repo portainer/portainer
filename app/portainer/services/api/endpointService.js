@@ -57,7 +57,7 @@ angular.module('portainer.app').factory('EndpointService', [
         })
         .catch(function error(err) {
           deferred.notify({ upload: false });
-          deferred.reject({ msg: 'Unable to update endpoint', err: err });
+          deferred.reject({ msg: 'Unable to update environment', err: err });
         });
       return deferred.promise;
     };
@@ -84,7 +84,7 @@ angular.module('portainer.app').factory('EndpointService', [
           deferred.resolve(response.data);
         })
         .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to create endpoint', err: err });
+          deferred.reject({ msg: 'Unable to create environment', err: err });
         });
 
       return deferred.promise;
@@ -131,7 +131,7 @@ angular.module('portainer.app').factory('EndpointService', [
           deferred.resolve(response.data);
         })
         .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to create endpoint', err: err });
+          deferred.reject({ msg: 'Unable to create environment', err: err });
         });
 
       return deferred.promise;
@@ -145,7 +145,7 @@ angular.module('portainer.app').factory('EndpointService', [
           deferred.resolve(response.data);
         })
         .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to create endpoint', err: err });
+          deferred.reject({ msg: 'Unable to create environment', err: err });
         });
 
       return deferred.promise;
