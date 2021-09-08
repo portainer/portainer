@@ -5,8 +5,7 @@ angular.module('portainer.kubernetes').component('helmAddRepository', {
   templateUrl: './helm-add-repository.html',
   controller,
   bindings: {
-    charts: '@',
-    refreshCharts: '<',
+    repos: '<',
     endpoint: '<',
   },
 });

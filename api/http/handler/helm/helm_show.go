@@ -13,7 +13,7 @@ import (
 )
 
 // @id HelmShow
-// @summary Show Helm Chart(s)
+// @summary Show Helm Chart Information
 // @description
 // @description **Access policy**: authorized
 // @tags helm_chart

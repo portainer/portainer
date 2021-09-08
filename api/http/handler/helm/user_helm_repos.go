@@ -16,8 +16,8 @@ import (
 )
 
 type helmUserRepositoryResponse struct {
-	GlobalRepo string                         `json:"GlobalRepo"`
-	UserRepos  []portainer.HelmUserRepository `json:"UserRepos"`
+	GlobalRepository string                         `json:"GlobalRepository"`
+	UserRepositories []portainer.HelmUserRepository `json:"UserRepositories"`
 }
 
 type addHelmRepoUrlPayload struct {
@@ -32,7 +32,7 @@ func (p *addHelmRepoUrlPayload) Validate(_ *http.Request) error {
 // @summary Create a user helm repository
 // @description Create a user helm repository.
 // @description **Access policy**: authenticated
-// @tags users
+// @tags helm
 // @security jwt
 // @accept json
 // @produce json
@@ -58,15 +58,17 @@ func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Reques
 			Err:        err,
 		}
 	}
+	// lowercase, remove trailing slash
+	p.URL = strings.TrimSuffix(strings.ToLower(p.URL), "/")
 
 	records, err := handler.dataStore.HelmUserRepository().HelmUserRepositoryByUserID(userID)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to access the DataStore", err}
 	}
 
-	// check if repo already exists - by doing case insensitive, suffix trimmed comparison
+	// check if repo already exists - by doing case insensitive comparison
 	for _, record := range records {
-		if strings.EqualFold(strings.TrimSuffix(record.URL, "/"), strings.TrimSuffix(p.URL, "/")) {
+		if strings.EqualFold(record.URL, p.URL) {
 			errMsg := "Helm repo already registered for user"
 			return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: errMsg, Err: errors.New(errMsg)}
 		}
@@ -89,7 +91,7 @@ func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Reques
 // @summary List a users helm repositories
 // @description Inspect a user helm repositories.
 // @description **Access policy**: authenticated
-// @tags users
+// @tags helm
 // @security jwt
 // @produce json
 // @param id path int true "User identifier"
@@ -116,8 +118,8 @@ func (handler *Handler) userGetHelmRepos(w http.ResponseWriter, r *http.Request)
 	}
 
 	resp := helmUserRepositoryResponse{
-		GlobalRepo: settings.HelmRepositoryURL,
-		UserRepos:  userRepos,
+		GlobalRepository: settings.HelmRepositoryURL,
+		UserRepositories: userRepos,
 	}
 
 	return response.JSON(w, resp)

@@ -15,7 +15,7 @@ import (
 // @summary Search Helm Charts
 // @description
 // @description **Access policy**: authorized
-// @tags helm_chart
+// @tags helm
 // @param repo query string true "Helm repository URL"
 // @security jwt
 // @produce json

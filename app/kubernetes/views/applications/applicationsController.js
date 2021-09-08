@@ -39,7 +39,7 @@ class KubernetesApplicationsController {
         const promises = _.map(stack.Applications, (app) => this.KubernetesApplicationService.delete(app));
         await Promise.all(promises);
         this.Notifications.success('Stack successfully removed', stack.Name);
-        _.remove(this.stacks, { Name: stack.Name });
+        _.remove(this.state.stacks, { Name: stack.Name });
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to remove stack');
       } finally {
@@ -72,8 +72,8 @@ class KubernetesApplicationsController {
           await this.KubernetesApplicationService.delete(application);
         }
         this.Notifications.success('Application successfully removed', application.Name);
-        const index = this.applications.indexOf(application);
-        this.applications.splice(index, 1);
+        const index = this.state.applications.indexOf(application);
+        this.state.applications.splice(index, 1);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to remove application');
       } finally {
@@ -95,7 +95,7 @@ class KubernetesApplicationsController {
 
   onPublishingModeClick(application) {
     this.state.activeTab = 1;
-    _.forEach(this.ports, (item) => {
+    _.forEach(this.state.ports, (item) => {
       item.Expanded = false;
       item.Highlighted = false;
       if (item.Name === application.Name && item.Ports.length > 1) {
@@ -120,9 +120,9 @@ class KubernetesApplicationsController {
             .some((label) => helmAppNames.includes(label[PodKubernetesInstanceLabel])) // check if label key is in helmAppNames
       );
 
-      this.applications = [...nonHelmApps, ...helmApplications];
-      this.stacks = KubernetesStackHelper.stacksFromApplications(applications);
-      this.ports = KubernetesApplicationHelper.portMappingsFromApplications(applications);
+      this.state.applications = [...nonHelmApps, ...helmApplications];
+      this.state.stacks = KubernetesStackHelper.stacksFromApplications(applications);
+      this.state.ports = KubernetesApplicationHelper.portMappingsFromApplications(applications);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve applications');
     }
@@ -138,8 +138,10 @@ class KubernetesApplicationsController {
       currentName: this.$state.$current.name,
       isAdmin: this.Authentication.isAdmin(),
       viewReady: false,
+      applications: [],
+      stacks: [],
+      ports: [],
     };
-
     await this.getApplications();
 
     this.state.viewReady = true;

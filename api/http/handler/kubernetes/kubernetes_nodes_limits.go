@@ -1,12 +1,13 @@
 package kubernetes
 
 import (
+	"net/http"
+
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
-	"net/http"
 )
 
 // @id getKubernetesNodesLimits
@@ -18,7 +19,7 @@ import (
 // @accept json
 // @produce json
 // @param id path int true "Endpoint identifier"
-// @success 200 {object} K8sNodesLimits "Success"
+// @success 200 {object} portainer.K8sNodesLimits "Success"
 // @failure 400 "Invalid request"
 // @failure 401 "Unauthorized"
 // @failure 403 "Permission denied"
