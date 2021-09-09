@@ -17,6 +17,6 @@ func IntegrationTest(t *testing.T) {
 	_, enabled := os.LookupEnv("INTEGRATION_TEST")
 
 	if !(integration || enabled) {
-		t.Skip("Skipping integration test", t)
+		t.Skip("Skipping integration test")
 	}
 }
