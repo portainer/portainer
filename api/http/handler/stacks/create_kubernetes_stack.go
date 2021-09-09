@@ -112,6 +112,7 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 		CreationDate:    time.Now().Unix(),
 		CreatedBy:       user.Username,
 		IsComposeFormat: payload.ComposeFormat,
+		OwnerUserID:     user.ID,
 	}
 
 	stackFolder := strconv.Itoa(int(stack.ID))
@@ -129,7 +130,7 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 	doCleanUp := true
 	defer handler.cleanUp(stack, &doCleanUp)
 
-	output, err := handler.deployKubernetesStack(r, endpoint, stack, k.KubeAppLabels{
+	output, err := handler.deployKubernetesStack(user.ID, endpoint, stack, k.KubeAppLabels{
 		StackID: stackID,
 		Name:    stack.Name,
 		Owner:   stack.CreatedBy,
@@ -195,6 +196,8 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 		CreatedBy:       user.Username,
 		IsComposeFormat: payload.ComposeFormat,
 		AutoUpdate:      payload.AutoUpdate,
+		AdditionalFiles: payload.AdditionalFiles,
+		OwnerUserID:     user.ID,
 	}
 
 	if payload.RepositoryAuthentication {
@@ -228,7 +231,7 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to clone git repository", Err: err}
 	}
 
-	output, err := handler.deployKubernetesStack(r, endpoint, stack, k.KubeAppLabels{
+	output, err := handler.deployKubernetesStack(user.ID, endpoint, stack, k.KubeAppLabels{
 		StackID: stackID,
 		Name:    stack.Name,
 		Owner:   stack.CreatedBy,
@@ -285,6 +288,7 @@ func (handler *Handler) createKubernetesStackFromManifestURL(w http.ResponseWrit
 		CreationDate:    time.Now().Unix(),
 		CreatedBy:       user.Username,
 		IsComposeFormat: payload.ComposeFormat,
+		OwnerUserID:     user.ID,
 	}
 
 	var manifestContent []byte
@@ -303,7 +307,7 @@ func (handler *Handler) createKubernetesStackFromManifestURL(w http.ResponseWrit
 	doCleanUp := true
 	defer handler.cleanUp(stack, &doCleanUp)
 
-	output, err := handler.deployKubernetesStack(r, endpoint, stack, k.KubeAppLabels{
+	output, err := handler.deployKubernetesStack(user.ID, endpoint, stack, k.KubeAppLabels{
 		StackID: stackID,
 		Name:    stack.Name,
 		Owner:   stack.CreatedBy,
@@ -325,7 +329,7 @@ func (handler *Handler) createKubernetesStackFromManifestURL(w http.ResponseWrit
 	return response.JSON(w, resp)
 }
 
-func (handler *Handler) deployKubernetesStack(r *http.Request, endpoint *portainer.Endpoint, stack *portainer.Stack, appLabels k.KubeAppLabels) (string, error) {
+func (handler *Handler) deployKubernetesStack(userID portainer.UserID, endpoint *portainer.Endpoint, stack *portainer.Stack, appLabels k.KubeAppLabels) (string, error) {
 	handler.stackCreationMutex.Lock()
 	defer handler.stackCreationMutex.Unlock()
 
@@ -334,5 +338,5 @@ func (handler *Handler) deployKubernetesStack(r *http.Request, endpoint *portain
 		return "", errors.Wrap(err, "failed to create temp kub deployment files")
 	}
 	defer os.RemoveAll(tempDir)
-	return handler.KubernetesDeployer.Deploy(r, endpoint, manifestFilePaths, stack.Namespace, false)
+	return handler.KubernetesDeployer.Deploy(userID, endpoint, manifestFilePaths, stack.Namespace)
 }
