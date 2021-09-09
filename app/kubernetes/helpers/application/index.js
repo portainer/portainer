@@ -455,15 +455,32 @@ class KubernetesApplicationHelper {
 
     // groups the helm managed applications by helm release name
     // the release name is retrieved from the `app.kubernetes.io/instance` label on the pods within the apps
-    // object structure `{ [releaseName]: [app1, app2, ...], [releaseName2]: [app3, app4, ...] }`
-    const groupedHelmApps = helmManagedApps.reduce((apps, app) => {
+    // `namespacedHelmReleases` object structure:
+    // {
+    //   [namespace1]: {
+    //     [releaseName]: [app1, app2, ...],
+    //   },
+    //   [namespace2]: {
+    //     [releaseName2]: [app1, app2, ...],
+    //   }
+    // }
+    const namespacedHelmReleases = {};
+    helmManagedApps.forEach((app) => {
       const labels = app.Pods.filter((p) => p.Labels).map((p) => p.Labels[PodKubernetesInstanceLabel]);
       const uniqueLabels = [...new Set(labels)];
-      uniqueLabels.forEach((instanceStr) => (apps[instanceStr] = [...(apps[instanceStr] || []), app]));
-      return apps;
-    }, {});
+      uniqueLabels.forEach((instanceStr) => {
+        const namespace = app.ResourcePool;
+        if (namespacedHelmReleases[namespace]) {
+          namespacedHelmReleases[namespace][instanceStr] = [...(namespacedHelmReleases[namespace][instanceStr] || []), app];
+        } else {
+          namespacedHelmReleases[namespace] = { [instanceStr]: [app] };
+        }
+      });
+    });
 
-    const helmAppsList = Object.entries(groupedHelmApps).map(([helmInstance, applications]) => {
+    // `helmAppsEntriesList` object structure: [ ["airflow-test", Array(5)], ["traefik", Array(1)], ["airflow-test", Array(2)], ... ]
+    const helmAppsEntriesList = Object.values(namespacedHelmReleases).flatMap((r) => Object.entries(r));
+    const helmAppsList = helmAppsEntriesList.map(([helmInstance, applications]) => {
       const helmApp = new HelmApplication();
       helmApp.Name = helmInstance;
       helmApp.ApplicationType = KubernetesApplicationTypes.HELM;
@@ -480,8 +497,8 @@ class KubernetesApplicationHelper {
       // use first app namespace as helm app namespace
       helmApp.ResourcePool = applications[0].ResourcePool;
 
-      // required for persisting table expansion state
-      helmApp.Id = helmApp.Name.toLowerCase().replaceAll(' ', '-');
+      // required for persisting table expansion state and differenting same named helm apps across different namespaces
+      helmApp.Id = helmApp.ResourcePool + '-' + helmApp.Name.toLowerCase().replaceAll(' ', '-');
 
       return helmApp;
     });
