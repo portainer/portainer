@@ -7,5 +7,7 @@ angular.module('portainer.app').component('boxSelectorItem', {
     isChecked: '<',
     option: '<',
     onChange: '<',
+    disabled: '<',
+    tooltip: '<',
   },
 });
