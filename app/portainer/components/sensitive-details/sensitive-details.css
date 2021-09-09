@@ -1,7 +1,8 @@
 .sensitive-details-container {
   display: grid;
-  grid-template-columns: 2fr 1fr 2fr;
-  grid-gap: 2rem;
+  grid-template-columns: 25ch 25ch auto;
+  gap: 2rem;
+  align-items: start;
 }
 
 .show-hide-container {
