@@ -36,7 +36,6 @@ export default class WizardKubernetesController {
         return;
       }
       await this.addRemoteEndpoint(name, creationType, url, publicUrl, groupId, tagIds, tls, tlsSkipVerify, tlsSkipClientVerify, tlsCaFile, tlsCertFile, tlsKeyFile);
-      this.onAnalytics('kubernetes-agent');
     });
   }
 
@@ -60,6 +59,7 @@ export default class WizardKubernetesController {
       this.Notifications.success('Environment connected', name);
       this.clearForm();
       this.onUpdate();
+      this.onAnalytics('kubernetes-agent');
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to conect your environment');
     } finally {

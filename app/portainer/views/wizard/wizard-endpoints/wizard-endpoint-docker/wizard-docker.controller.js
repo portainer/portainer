@@ -91,7 +91,6 @@ export default class WizardDockerController {
     const tlsKeyFile = null;
 
     await this.addRemoteEndpoint(name, creationType, url, publicUrl, groupId, tagIds, tsl, tlsSkipVerify, tlsSkipClientVerify, tlsCaFile, tlsCertFile, tlsKeyFile);
-    this.onAnalytics('docker-agent');
   }
 
   // Docker Api Endpoint
@@ -104,22 +103,16 @@ export default class WizardDockerController {
     const tlsKeyFile = tlsSkipClientVerify ? null : securityData.TLSKey;
 
     await this.addRemoteEndpoint(name, creationType, url, publicUrl, groupId, tagIds, tsl, tlsSkipVerify, tlsSkipClientVerify, tlsCaFile, tlsCertFile, tlsKeyFile);
-    this.onAnalytics('docker-api');
   }
 
-  // Docker Local Endpoint
   async addDockerLocalEndpoint(name, url, publicUrl, groupId, tagIds) {
-    await this.addLocalEndpoint(name, url, publicUrl, groupId, tagIds);
-    this.onAnalytics('local-endpoint');
-  }
-
-  async addLocalEndpoint(name, url, publicUrl, groupId, tagIds) {
     this.state.actionInProgress = true;
     try {
       await this.EndpointService.createLocalEndpoint(name, url, publicUrl, groupId, tagIds);
       this.Notifications.success('Environment connected', name);
       this.clearForm();
       this.onUpdate();
+      this.onAnalytics('local-endpoint');
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to connect your environment');
     } finally {
@@ -147,6 +140,14 @@ export default class WizardDockerController {
       this.Notifications.success('Environment connected', name);
       this.clearForm();
       this.onUpdate();
+
+      if (creationType === PortainerEndpointCreationTypes.AgentEnvironment) {
+        this.onAnalytics('docker-agent');
+      }
+
+      if (creationType === PortainerEndpointCreationTypes.LocalDockerEnvironment) {
+        this.onAnalytics('docker-api');
+      }
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to connect your environment');
     } finally {

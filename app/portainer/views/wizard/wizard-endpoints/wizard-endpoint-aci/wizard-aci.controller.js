@@ -27,12 +27,12 @@ export default class WizardAciController {
         this.Notifications.success('Environment connected', name);
         this.clearForm();
         this.onUpdate();
+        this.onAnalytics('aci-api');
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to connect your environment');
       } finally {
         this.state.actionInProgress = false;
       }
-      this.onAnalytics('aci-api');
     });
   }
 
