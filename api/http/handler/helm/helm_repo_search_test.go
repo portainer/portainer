@@ -15,6 +15,7 @@ import (
 )
 
 func Test_helmRepoSearch(t *testing.T) {
+	extended := helper.ExtendedTests(t)
 	is := assert.New(t)
 
 	helmPackageManager := test.NewMockHelmBinaryPackageManager("")
@@ -22,20 +23,34 @@ func Test_helmRepoSearch(t *testing.T) {
 
 	assert.NotNil(t, h, "Handler should not fail")
 
-	repos := []string{"https://charts.bitnami.com/bitnami", "https://portainer.github.io/k8s"}
+	type testCase struct {
+		repo    string
+		enabled bool
+	}
 
-	for _, repo := range repos {
-		t.Run(repo, func(t *testing.T) {
-			repoUrlEncoded := url.QueryEscape(repo)
-			req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/templates/helm?repo=%s", repoUrlEncoded), nil)
-			rr := httptest.NewRecorder()
-			h.ServeHTTP(rr, req)
+	tests := []testCase{
+		{"https://charts.bitnami.com/bitnami", false},
+		{"https://portainer.github.io/k8s", true},
+	}
 
-			is.Equal(http.StatusOK, rr.Code, "Status should be 200 OK")
-			body, err := io.ReadAll(rr.Body)
-			is.NoError(err, "ReadAll should not return error")
-			is.NotEmpty(body, "Body should not be empty")
-		})
+	for _, test := range tests {
+		func(tc testCase) {
+			if tc.enabled || extended {
+				t.Run(tc.repo, func(t *testing.T) {
+					t.Parallel()
+					repoUrlEncoded := url.QueryEscape(tc.repo)
+					req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/templates/helm?repo=%s", repoUrlEncoded), nil)
+					rr := httptest.NewRecorder()
+					h.ServeHTTP(rr, req)
+
+					is.Equal(http.StatusOK, rr.Code, "Status should be 200 OK")
+
+					body, err := io.ReadAll(rr.Body)
+					is.NoError(err, "ReadAll should not return error")
+					is.NotEmpty(body, "Body should not be empty")
+				})
+			}
+		}(test)
 	}
 
 	t.Run("fails on invalid URL", func(t *testing.T) {
