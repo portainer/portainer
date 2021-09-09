@@ -15,6 +15,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
+	"github.com/portainer/portainer/api/http/security"
 	k "github.com/portainer/portainer/api/kubernetes"
 )
 
@@ -95,6 +96,11 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
 	}
 
+	tokenData, err := security.RetrieveTokenData(r)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Failed to retrieve user token data", Err: err}
+	}
+
 	tempFileDir, _ := ioutil.TempDir("", "kub_file_content")
 	defer os.RemoveAll(tempFileDir)
 
@@ -106,7 +112,7 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 	//so if the deployment failed, the original file won't be over-written
 	stack.ProjectPath = tempFileDir
 
-	_, err = handler.deployKubernetesStack(r, endpoint, stack, k.KubeAppLabels{
+	_, err = handler.deployKubernetesStack(tokenData.ID, endpoint, stack, k.KubeAppLabels{
 		StackID: int(stack.ID),
 		Name:    stack.Name,
 		Owner:   stack.CreatedBy,

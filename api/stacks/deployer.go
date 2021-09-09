@@ -77,7 +77,7 @@ func (d *stackDeployer) DeployKubernetesStack(stack *portainer.Stack, endpoint *
 	}
 	defer os.RemoveAll(tempDir)
 
-	_, err = d.kubernetesDeployer.Deploy(nil, endpoint, manifestFilePaths, stack.Namespace, true)
+	_, err = d.kubernetesDeployer.Deploy(stack.OwnerUserID, endpoint, manifestFilePaths, stack.Namespace)
 	if err != nil {
 		return errors.Wrap(err, "failed to deploy kubernetes application")
 	}

@@ -3,7 +3,6 @@ package exec
 import (
 	"bytes"
 	"fmt"
-	"net/http"
 	"os/exec"
 	"path"
 	"runtime"
@@ -14,7 +13,6 @@ import (
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/proxy/factory"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
-	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 
 	portainer "github.com/portainer/portainer/api"
@@ -44,7 +42,7 @@ func NewKubernetesDeployer(kubernetesTokenCacheManager *kubernetes.TokenCacheMan
 	}
 }
 
-func (deployer *KubernetesDeployer) getToken(request *http.Request, endpoint *portainer.Endpoint, setLocalAdminToken bool, getAdminToken bool) (string, error) {
+func (deployer *KubernetesDeployer) getToken(userID portainer.UserID, endpoint *portainer.Endpoint, setLocalAdminToken bool) (string, error) {
 	kubeCLI, err := deployer.kubernetesClientFactory.GetKubeClient(endpoint)
 	if err != nil {
 		return "", err
@@ -57,20 +55,16 @@ func (deployer *KubernetesDeployer) getToken(request *http.Request, endpoint *po
 		return "", err
 	}
 
-	if getAdminToken {
-		return tokenManager.GetAdminServiceAccountToken(), nil
-	}
-
-	tokenData, err := security.RetrieveTokenData(request)
+	user, err := deployer.dataStore.User().User(userID)
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "failed to fetch the user")
 	}
 
-	if tokenData.Role == portainer.AdministratorRole {
+	if user.Role == portainer.AdministratorRole {
 		return tokenManager.GetAdminServiceAccountToken(), nil
 	}
 
-	token, err := tokenManager.GetUserServiceAccountToken(int(tokenData.ID), endpoint.ID)
+	token, err := tokenManager.GetUserServiceAccountToken(int(user.ID), endpoint.ID)
 	if err != nil {
 		return "", err
 	}
@@ -83,8 +77,8 @@ func (deployer *KubernetesDeployer) getToken(request *http.Request, endpoint *po
 
 // Deploy will deploy a Kubernetes manifest inside a specific namespace in a Kubernetes endpoint.
 // Otherwise it will use kubectl to deploy the manifest.
-func (deployer *KubernetesDeployer) Deploy(request *http.Request, endpoint *portainer.Endpoint, manifestFiles []string, namespace string, deployAsAdmin bool) (string, error) {
-	token, err := deployer.getToken(request, endpoint, endpoint.Type == portainer.KubernetesLocalEnvironment, deployAsAdmin)
+func (deployer *KubernetesDeployer) Deploy(userID portainer.UserID, endpoint *portainer.Endpoint, manifestFiles []string, namespace string) (string, error) {
+	token, err := deployer.getToken(userID, endpoint, endpoint.Type == portainer.KubernetesLocalEnvironment)
 	if err != nil {
 		return "", err
 	}
