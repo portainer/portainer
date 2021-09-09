@@ -9,13 +9,12 @@ import (
 	"testing"
 
 	"github.com/portainer/libhelm/binary/test"
-	helmtest "github.com/portainer/libhelm/libhelmtest"
 	helper "github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_helmRepoSearch(t *testing.T) {
-	helmtest.EnsureIntegrationTest(t)
+	helper.IntegrationTest(t)
 	is := assert.New(t)
 
 	helmPackageManager := test.NewMockHelmBinaryPackageManager("")
