@@ -785,3 +785,8 @@ json-tree .branch-preview {
   text-align: center;
   padding-bottom: 5px;
 }
+
+.text-overflow-ellipses {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
