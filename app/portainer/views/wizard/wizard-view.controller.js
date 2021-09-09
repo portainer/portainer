@@ -13,22 +13,10 @@ export default class WizardViewController {
    * WIZARD APPLICATION
    */
   manageLocalEndpoint() {
-    this.$analytics.eventTrack('endpoint-wizard-endpoint-select', {
-      category: 'portainer',
-      metadata: {
-        'get-started-local-endpoint': 0,
-      },
-    });
     this.$state.go('portainer.home');
   }
 
   addRemoteEndpoint() {
-    this.$analytics.eventTrack('endpoint-wizard-endpoint-select', {
-      category: 'portainer',
-      metadata: {
-        'get-started-local-endpoint': 1,
-      },
-    });
     this.$state.go('portainer.wizard.endpoints');
   }
 

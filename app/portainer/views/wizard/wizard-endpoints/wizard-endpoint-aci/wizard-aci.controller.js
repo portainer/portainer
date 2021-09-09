@@ -29,6 +29,7 @@ export default class WizardAciController {
         this.onUpdate();
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to connect your environment');
+      } finally {
         this.state.actionInProgress = false;
       }
       this.onAnalytics('aci-api');
