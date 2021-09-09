@@ -36,9 +36,7 @@ export default class WizardEndpointsController {
     this.$analytics.eventTrack('endpoint-wizard-endpoint-select', {
       category: 'portainer',
       metadata: {
-        docker: this.state.analytics.docker,
-        kubernetes: this.state.analytics.kubernetes,
-        aci: this.state.analytics.aci,
+        environment: this.state.analytics.docker + this.state.analytics.kubernetes + this.state.analytics.aci,
       },
     });
     this.state.currentStep++;
@@ -102,33 +100,33 @@ export default class WizardEndpointsController {
         if (this.state.options[0].selected) {
           this.state.options[0].selected = false;
           this.state.dockerActive = '';
-          this.state.analytics.docker = 1;
+          this.state.analytics.docker = '';
         } else {
           this.state.options[0].selected = true;
           this.state.dockerActive = 'wizard-active';
-          this.state.analytics.docker = 0;
+          this.state.analytics.docker = 'Docker/';
         }
         break;
       case 'kubernetes':
         if (this.state.options[1].selected) {
           this.state.options[1].selected = false;
           this.state.kubernetesActive = '';
-          this.state.analytics.kubernetes = 1;
+          this.state.analytics.kubernetes = '';
         } else {
           this.state.options[1].selected = true;
           this.state.kubernetesActive = 'wizard-active';
-          this.state.analytics.kubernetes = 0;
+          this.state.analytics.kubernetes = 'Kubernetes/';
         }
         break;
       case 'aci':
         if (this.state.options[2].selected) {
           this.state.options[2].selected = false;
           this.state.aciActive = '';
-          this.state.analytics.aci = 1;
+          this.state.analytics.aci = '';
         } else {
           this.state.options[2].selected = true;
           this.state.aciActive = 'wizard-active';
-          this.state.analytics.aci = 0;
+          this.state.analytics.aci = 'ACI';
         }
         break;
     }
@@ -149,9 +147,9 @@ export default class WizardEndpointsController {
         nextStep: 'Next Step',
         selections: [],
         analytics: {
-          docker: null,
-          kubernetes: null,
-          aci: null,
+          docker: '',
+          kubernetes: '',
+          aci: '',
         },
         counter: {
           localEndpoint: 0,
