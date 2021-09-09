@@ -3,6 +3,7 @@ package portainer
 import (
 	"context"
 	"io"
+	"net/http"
 	"time"
 
 	gittypes "github.com/portainer/portainer/api/git/types"
@@ -762,8 +763,6 @@ type (
 		Namespace string `example:"default"`
 		// IsComposeFormat indicates if the Kubernetes stack is created from a Docker Compose file
 		IsComposeFormat bool `example:"false"`
-		// OwnerUserID represents the Stack owner/creator's user ID
-		OwnerUserID UserID `example:"1"`
 	}
 
 	//StackAutoUpdate represents the git auto sync config for stack deployment
@@ -1250,7 +1249,7 @@ type (
 
 	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes endpoint
 	KubernetesDeployer interface {
-		Deploy(userID UserID, endpoint *Endpoint, manifestFiles []string, namespace string) (string, error)
+		Deploy(request *http.Request, endpoint *Endpoint, manifestFiles []string, namespace string, deployAsAdmin bool) (string, error)
 		ConvertCompose(data []byte) ([]byte, error)
 	}
 
