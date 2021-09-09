@@ -2,6 +2,7 @@
   display: grid;
   grid-template-columns: 25ch 25ch auto;
   gap: 2rem;
+  align-items: start;
 }
 
 .show-hide-container {
