@@ -466,10 +466,10 @@ class KubernetesApplicationHelper {
     // }
     const namespacedHelmReleases = {};
     helmManagedApps.forEach((app) => {
+      const namespace = app.ResourcePool;
       const labels = app.Pods.filter((p) => p.Labels).map((p) => p.Labels[PodKubernetesInstanceLabel]);
       const uniqueLabels = [...new Set(labels)];
       uniqueLabels.forEach((instanceStr) => {
-        const namespace = app.ResourcePool;
         if (namespacedHelmReleases[namespace]) {
           namespacedHelmReleases[namespace][instanceStr] = [...(namespacedHelmReleases[namespace][instanceStr] || []), app];
         } else {
@@ -478,7 +478,13 @@ class KubernetesApplicationHelper {
       });
     });
 
-    // `helmAppsEntriesList` object structure: [ ["airflow-test", Array(5)], ["traefik", Array(1)], ["airflow-test", Array(2)], ... ]
+    // `helmAppsEntriesList` object structure:
+    // [
+    //   ["airflow-test", Array(5)],
+    //   ["traefik", Array(1)],
+    //   ["airflow-test", Array(2)],
+    //   ...,
+    // ]
     const helmAppsEntriesList = Object.values(namespacedHelmReleases).flatMap((r) => Object.entries(r));
     const helmAppsList = helmAppsEntriesList.map(([helmInstance, applications]) => {
       const helmApp = new HelmApplication();
