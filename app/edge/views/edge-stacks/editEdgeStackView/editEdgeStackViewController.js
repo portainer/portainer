@@ -39,7 +39,7 @@ export class EditEdgeStackViewController {
       this.formValues = {
         StackFileContent: file,
         EdgeGroups: this.stack.EdgeGroups,
-        Prune: this.stack.Prune,
+        DeploymentType: this.stack.DeploymentType,
       };
       this.oldFileContent = this.formValues.StackFileContent;
     } catch (err) {
@@ -58,7 +58,7 @@ export class EditEdgeStackViewController {
   }
 
   async uiCanExit() {
-    if (this.formValues.StackFileContent !== this.oldFileContent && this.state.isEditorDirty) {
+    if (this.formValues.StackFileContent.replace(/(\r\n|\n|\r)/gm, '') !== this.oldFileContent.replace(/(\r\n|\n|\r)/gm, '') && this.state.isEditorDirty) {
       return this.ModalService.confirmWebEditorDiscard();
     }
   }
@@ -99,7 +99,7 @@ export class EditEdgeStackViewController {
 
   async getPaginatedEndpointsAsync(lastId, limit, search) {
     try {
-      const query = { search, types: [4], endpointIds: this.stackEndpointIds };
+      const query = { search, types: [4, 7], endpointIds: this.stackEndpointIds };
       const { value, totalCount } = await this.EndpointService.endpoints(lastId, limit, query);
       const endpoints = _.map(value, (endpoint) => {
         const status = this.stack.Status[endpoint.Id];

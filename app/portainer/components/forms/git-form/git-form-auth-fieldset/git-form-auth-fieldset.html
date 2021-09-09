@@ -1,6 +1,12 @@
 <div class="form-group">
   <div class="col-sm-12">
-    <por-switch-field ng-model="$ctrl.model.RepositoryAuthentication" label="Authentication" on-change="($ctrl.onChangeAuth)" data-cy="component-gitAuthToggle"></por-switch-field>
+    <por-switch-field
+      ng-model="$ctrl.model.RepositoryAuthentication"
+      label="Authentication"
+      name="authSwitch"
+      on-change="($ctrl.onChangeAuth)"
+      data-cy="component-gitAuthToggle"
+    ></por-switch-field>
   </div>
 </div>
 <div class="small text-warning" style="margin: 5px 0 15px 0;" ng-if="$ctrl.model.RepositoryAuthentication && $ctrl.showAuthExplanation">
@@ -19,6 +25,7 @@
         placeholder="git username"
         ng-change="$ctrl.onChangeUsername($ctrl.model.RepositoryUsername)"
         data-cy="component-gitUsernameInput"
+        ng-required="$ctrl.model.RepositoryAuthentication"
       />
     </div>
   </div>
