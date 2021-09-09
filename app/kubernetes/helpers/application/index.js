@@ -456,11 +456,11 @@ class KubernetesApplicationHelper {
     // groups the helm managed applications by helm release name
     // the release name is retrieved from the `app.kubernetes.io/instance` label on the pods within the apps
     // object structure `{ [releaseName]: [app1, app2, ...], [releaseName2]: [app3, app4, ...] }`
-    const groupedHelmApps = helmManagedApps.reduce((acc, curr) => {
-      curr.Pods.flatMap((p) => p.Labels)
-        .map((label) => label[PodKubernetesInstanceLabel])
-        .forEach((instanceStr) => (acc[instanceStr] = [...(acc[instanceStr] || []), curr]));
-      return acc;
+    const groupedHelmApps = helmManagedApps.reduce((apps, app) => {
+      const labels = app.Pods.filter((p) => p.Labels).map((p) => p.Labels[PodKubernetesInstanceLabel]);
+      const uniqueLabels = [...new Set(labels)];
+      uniqueLabels.forEach((instanceStr) => (apps[instanceStr] = [...(apps[instanceStr] || []), app]));
+      return apps;
     }, {});
 
     const helmAppsList = Object.entries(groupedHelmApps).map(([helmInstance, applications]) => {
