@@ -55,7 +55,7 @@
       <button
         type="submit"
         class="btn btn-primary btn-sm wizard-connect-button"
-        ng-disabled="!$ctrl.formValues.name || !$ctrl.formValues.azureApplicationId || !$ctrl.formValues.azureTenantId || !$ctrl.formValues.azureAuthenticationKey"
+        ng-disabled="!$ctrl.formValues.name || !$ctrl.formValues.azureApplicationId || !$ctrl.formValues.azureTenantId || !$ctrl.formValues.azureAuthenticationKey || $ctrl.state.actionInProgress"
         ng-click="$ctrl.addAciEndpoint()"
         button-spinner="$ctrl.state.actionInProgress"
       >

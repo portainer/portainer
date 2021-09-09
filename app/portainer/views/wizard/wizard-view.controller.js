@@ -1,3 +1,5 @@
+import { PortainerEndpointCreationTypes } from 'Portainer/models/endpoint/models';
+
 export default class WizardViewController {
   /* @ngInject */
   constructor($async, $state, EndpointService, $analytics) {
@@ -80,13 +82,13 @@ export default class WizardViewController {
         }
       } else {
         const addedLocalEndpoint = endpoints.value[0];
-        if (addedLocalEndpoint.Type === 1) {
+        if (addedLocalEndpoint.Type === PortainerEndpointCreationTypes.LocalDockerEnvironment) {
           this.state.endpoint.added = true;
           this.state.endpoint.connected = 'docker';
           this.state.local.icon = 'fab fa-docker';
         }
 
-        if (addedLocalEndpoint.Type === 5) {
+        if (addedLocalEndpoint.Type === PortainerEndpointCreationTypes.LocalKubernetesEnvironment) {
           this.state.endpoint.added = true;
           this.state.endpoint.connected = 'kubernetes';
           this.state.local.icon = 'fas fa-dharmachakra';

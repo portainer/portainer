@@ -53,9 +53,9 @@
       <button
         type="submit"
         class="btn btn-primary btn-sm wizard-connect-button"
-        ng-disabled="!$ctrl.state.formValues.name || !$ctrl.state.formValues.url"
+        ng-disabled="!$ctrl.state.formValues.name || !$ctrl.state.formValues.url || $ctrl.state.actionInProgress"
         ng-click="$ctrl.addKubernetesAgent()"
-        button-spinner="state.actionInProgress"
+        button-spinner="$ctrl.state.actionInProgress"
       >
         <span ng-hide="$ctrl.state.actionInProgress"><i class="fa fa-plug" style="margin-right: 5px;"></i> Connect </span>
         <span ng-show="$ctrl.state.actionInProgress">Connecting environment...</span>

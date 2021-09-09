@@ -23,7 +23,16 @@
             </div>
 
             <div class="wizard-step-action">
-              <button ng-click="$ctrl.nextStep()" ng-show="$ctrl.state.currentStep !== 0" type="submit" class="btn btn-primary btn-sm">
+              <button
+                ng-click="$ctrl.previousStep()"
+                ng-show="$ctrl.state.currentStep !== 0"
+                type="submit"
+                class="btn btn-primary btn-sm previous-btn"
+                ng-disabled="$ctrl.state.currentStep === 1"
+              >
+                <i class="fas fa-arrow-left space-right"></i>{{ $ctrl.state.previousStep }}
+              </button>
+              <button ng-click="$ctrl.nextStep()" ng-show="$ctrl.state.currentStep !== 0" type="submit" class="btn btn-primary btn-sm next-btn">
                 {{ $ctrl.state.nextStep }} <i class="fas fa-arrow-right space-left"></i
               ></button>
             </div>

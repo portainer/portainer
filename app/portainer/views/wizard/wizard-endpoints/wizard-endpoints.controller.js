@@ -44,6 +44,14 @@ export default class WizardEndpointsController {
     this.state.currentStep++;
   }
 
+  previousStep() {
+    this.state.section = this.state.selections[this.state.currentStep - 2].endpoint;
+    this.state.selections[this.state.currentStep - 2].stage = 'active';
+    this.state.selections[this.state.currentStep - 1].stage = '';
+    this.state.nextStep = 'Next Step';
+    this.state.currentStep--;
+  }
+
   nextStep() {
     if (this.state.currentStep >= this.state.maxStep - 1) {
       this.state.nextStep = 'Finish';
@@ -137,6 +145,7 @@ export default class WizardEndpointsController {
         kubernetesActive: '',
         aciActive: '',
         maxStep: '',
+        previousStep: 'Previous',
         nextStep: 'Next Step',
         selections: [],
         analytics: {

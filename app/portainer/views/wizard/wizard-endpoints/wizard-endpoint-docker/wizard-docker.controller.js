@@ -40,43 +40,45 @@ export default class WizardDockerController {
   }
 
   // connect docker environment
-  async connectEnvironment(type) {
-    const name = this.formValues.name;
-    const url = this.$filter('stripprotocol')(this.formValues.url);
-    const publicUrl = url.split(':')[0];
-    const overrideUrl = this.formValues.socketPath;
-    const groupId = this.formValues.groupId;
-    const tagIds = this.formValues.tagIds;
-    const securityData = this.formValues.securityFormData;
-    const socketUrl = this.formValues.overrideSocket ? overrideUrl : url;
+  connectEnvironment(type) {
+    return this.$async(async () => {
+      const name = this.formValues.name;
+      const url = this.$filter('stripprotocol')(this.formValues.url);
+      const publicUrl = url.split(':')[0];
+      const overrideUrl = this.formValues.socketPath;
+      const groupId = this.formValues.groupId;
+      const tagIds = this.formValues.tagIds;
+      const securityData = this.formValues.securityFormData;
+      const socketUrl = this.formValues.overrideSocket ? overrideUrl : url;
 
-    var creationType = null;
+      var creationType = null;
 
-    if (type === 'agent') {
-      creationType = PortainerEndpointCreationTypes.AgentEnvironment;
-    }
+      if (type === 'agent') {
+        creationType = PortainerEndpointCreationTypes.AgentEnvironment;
+      }
 
-    if (type === 'api') {
-      creationType = PortainerEndpointCreationTypes.LocalDockerEnvironment;
-    }
+      if (type === 'api') {
+        creationType = PortainerEndpointCreationTypes.LocalDockerEnvironment;
+      }
 
-    // Check name is duplicated or not
-    const nameUsed = await this.NameValidator.validateEnvironmentName(name);
-    if (nameUsed) {
-      this.Notifications.error('Failure', true, 'This name is been used, please try another one');
-      return;
-    }
-    switch (type) {
-      case 'agent':
-        await this.addDockerAgentEndpoint(name, creationType, url, publicUrl, groupId, tagIds);
-        break;
-      case 'api':
-        await this.addDockerApiEndpoint(name, creationType, url, publicUrl, groupId, tagIds, securityData);
-        break;
-      case 'socket':
-        await this.addDockerLocalEndpoint(name, socketUrl, publicUrl, groupId, tagIds);
-        break;
-    }
+      // Check name is duplicated or not
+      const nameUsed = await this.NameValidator.validateEnvironmentName(name);
+      if (nameUsed) {
+        this.Notifications.error('Failure', true, 'This name is been used, please try another one');
+        return;
+      }
+      switch (type) {
+        case 'agent':
+          await this.addDockerAgentEndpoint(name, creationType, url, publicUrl, groupId, tagIds);
+          break;
+        case 'api':
+          await this.addDockerApiEndpoint(name, creationType, url, publicUrl, groupId, tagIds, securityData);
+          break;
+        case 'socket':
+          await this.addDockerLocalEndpoint(name, socketUrl, publicUrl, groupId, tagIds);
+          break;
+      }
+    });
   }
 
   // Docker Agent Endpoint

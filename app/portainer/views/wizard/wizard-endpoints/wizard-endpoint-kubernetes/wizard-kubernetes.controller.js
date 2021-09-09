@@ -14,28 +14,30 @@ export default class WizardKubernetesController {
     this.NameValidator = NameValidator;
   }
 
-  async addKubernetesAgent() {
-    const name = this.state.formValues.name;
-    const groupId = 1;
-    const tagIds = [];
-    const url = this.$filter('stripprotocol')(this.state.formValues.url);
-    const publicUrl = url.split(':')[0];
-    const creationType = PortainerEndpointCreationTypes.AgentEnvironment;
-    const tls = true;
-    const tlsSkipVerify = true;
-    const tlsSkipClientVerify = true;
-    const tlsCaFile = null;
-    const tlsCertFile = null;
-    const tlsKeyFile = null;
+  addKubernetesAgent() {
+    return this.$async(async () => {
+      const name = this.state.formValues.name;
+      const groupId = 1;
+      const tagIds = [];
+      const url = this.$filter('stripprotocol')(this.state.formValues.url);
+      const publicUrl = url.split(':')[0];
+      const creationType = PortainerEndpointCreationTypes.AgentEnvironment;
+      const tls = true;
+      const tlsSkipVerify = true;
+      const tlsSkipClientVerify = true;
+      const tlsCaFile = null;
+      const tlsCertFile = null;
+      const tlsKeyFile = null;
 
-    // Check name is duplicated or not
-    let nameUsed = await this.NameValidator.validateEnvironmentName(name);
-    if (nameUsed) {
-      this.Notifications.error('Failure', true, 'This name is been used, please try another one');
-      return;
-    }
-    this.addRemoteEndpoint(name, creationType, url, publicUrl, groupId, tagIds, tls, tlsSkipVerify, tlsSkipClientVerify, tlsCaFile, tlsCertFile, tlsKeyFile);
-    this.onAnalytics('kubernetes-agent');
+      // Check name is duplicated or not
+      let nameUsed = await this.NameValidator.validateEnvironmentName(name);
+      if (nameUsed) {
+        this.Notifications.error('Failure', true, 'This name is been used, please try another one');
+        return;
+      }
+      await this.addRemoteEndpoint(name, creationType, url, publicUrl, groupId, tagIds, tls, tlsSkipVerify, tlsSkipClientVerify, tlsCaFile, tlsCertFile, tlsKeyFile);
+      this.onAnalytics('kubernetes-agent');
+    });
   }
 
   async addRemoteEndpoint(name, creationType, url, publicURL, groupId, tagIds, tls, tlsSkipVerify, tlsSkipClientVerify, tlsCaFile, tlsCertFile, tlsKeyFile) {

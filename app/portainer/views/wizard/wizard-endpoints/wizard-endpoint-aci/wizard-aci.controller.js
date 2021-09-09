@@ -9,29 +9,30 @@ export default class WizardAciController {
     this.NameValidator = NameValidator;
   }
 
-  async addAciEndpoint() {
-    const { name, azureApplicationId, azureTenantId, azureAuthenticationKey } = this.formValues;
-    const groupId = 1;
-    const tagIds = [];
+  addAciEndpoint() {
+    return this.$async(async () => {
+      const { name, azureApplicationId, azureTenantId, azureAuthenticationKey } = this.formValues;
+      const groupId = 1;
+      const tagIds = [];
 
-    try {
-      this.state.actionInProgress = true;
-      // Check name is duplicated or not
-      let nameUsed = await this.NameValidator.validateEnvironmentName(name);
-      if (nameUsed) {
-        this.Notifications.error('Failure', true, 'This name is been used, please try another one');
-        return;
+      try {
+        this.state.actionInProgress = true;
+        // Check name is duplicated or not
+        let nameUsed = await this.NameValidator.validateEnvironmentName(name);
+        if (nameUsed) {
+          this.Notifications.error('Failure', true, 'This name is been used, please try another one');
+          return;
+        }
+        await this.EndpointService.createAzureEndpoint(name, azureApplicationId, azureTenantId, azureAuthenticationKey, groupId, tagIds);
+        this.Notifications.success('Environment connected', name);
+        this.clearForm();
+        this.onUpdate();
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to connect your environment');
+        this.state.actionInProgress = false;
       }
-      await this.EndpointService.createAzureEndpoint(name, azureApplicationId, azureTenantId, azureAuthenticationKey, groupId, tagIds);
-      this.Notifications.success('Environment connected', name);
-      this.clearForm();
-      this.onUpdate();
-    } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to connect your environment');
-      this.state.actionInProgress = false;
-    }
-
-    this.onAnalytics('aci-api');
+      this.onAnalytics('aci-api');
+    });
   }
 
   clearForm() {

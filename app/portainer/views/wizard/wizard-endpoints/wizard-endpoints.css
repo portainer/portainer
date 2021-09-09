@@ -62,6 +62,15 @@
   border-top: 1px solid #777;
 }
 
+.next-btn {
+  float: right;
+}
+
+.previous-btn {
+  float: left;
+  margin-left: 0px !important;
+}
+
 .wizard-wrapper {
   display: grid;
   grid-template-columns: 1fr 400px;
