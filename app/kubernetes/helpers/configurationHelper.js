@@ -42,7 +42,7 @@ class KubernetesConfigurationHelper {
     const configurationsUsed = configurations.filter((config) => KubernetesConfigurationHelper.getUsingApplications(config, applications).length !== 0);
     // set the configurations used for each application in the list
     const configuredApps = applications.map((app) => {
-      const configMappedByName = configurationsUsed.filter((config) => app.ApplicationName === config.Name);
+      const configMappedByName = configurationsUsed.filter((config) => app.ApplicationName === config.Name && app.ResourcePool === config.Namespace);
       const configMappedByVolume = configurationsUsed
         .filter((config) => app.ConfigurationVolumes.some((cv) => cv.configurationName === config.Name))
         .filter((config) => !configMappedByName.some((c) => c.Name === config.Name)); // filter out duplicates that are mapped by name

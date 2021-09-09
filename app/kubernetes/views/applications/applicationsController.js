@@ -112,7 +112,7 @@ class KubernetesApplicationsController {
       const helmApplications = KubernetesApplicationHelper.getHelmApplications(configuredApplications);
 
       // filter out multi-chart helm managed applications
-      const helmAppNames = helmApplications.map((hma) => hma.Name);
+      const helmAppNames = [...new Set(helmApplications.map((hma) => hma.Name))]; // distinct helm app names
       const nonHelmApps = configuredApplications.filter(
         (app) =>
           !app.Pods.flatMap((pod) => pod.Labels) // flatten pod labels
