@@ -12,9 +12,9 @@ export default class KubeConfigController {
   }
 
   async expiryHoverMessage() {
-    const settings = await this.SettingsService.settings();
+    const settings = await this.SettingsService.publicSettings();
     const expiryDays = settings.KubeconfigExpiry;
-    switch(expiryDays) {
+    switch (expiryDays) {
       case '0':
         this.state.expiryDays = 'not expire';
         break;
@@ -34,12 +34,12 @@ export default class KubeConfigController {
   }
 
   $onInit() {
-    return this.$async(async() => {
-      this.state = { 
+    return this.$async(async () => {
+      this.state = {
         isHTTPS: this.$window.location.protocol === 'https:',
         expiryDays: '',
       };
       await this.expiryHoverMessage();
-    })
+    });
   }
 }
