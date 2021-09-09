@@ -58,11 +58,11 @@ export default class WizardEndpointsController {
       this.$analytics.eventTrack('endpoint-wizard-environment-add-finish', {
         category: 'portainer',
         metadata: {
-          'local-endpoint': this.state.counter.localEndpoint,
           'docker-agent': this.state.counter.dockerAgent,
           'docker-api': this.state.counter.dockerApi,
           'kubernetes-agent': this.state.counter.kubernetesAgent,
           'aci-api': this.state.counter.aciApi,
+          'local-endpoint': this.state.counter.localEndpoint,
         },
       });
       this.$state.go('portainer.home');
@@ -152,11 +152,11 @@ export default class WizardEndpointsController {
           aci: '',
         },
         counter: {
-          localEndpoint: 0,
           dockerAgent: 0,
           dockerApi: 0,
           kubernetesAgent: 0,
           aciApi: 0,
+          localEndpoint: 0,
         },
         options: [
           {
