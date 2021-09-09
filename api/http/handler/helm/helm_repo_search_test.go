@@ -15,6 +15,7 @@ import (
 )
 
 func Test_helmRepoSearch(t *testing.T) {
+	helper.IntegrationTest(t)
 	is := assert.New(t)
 
 	helmPackageManager := test.NewMockHelmBinaryPackageManager("")
