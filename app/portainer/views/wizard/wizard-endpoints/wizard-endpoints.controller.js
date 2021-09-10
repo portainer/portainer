@@ -59,7 +59,8 @@ export default class WizardEndpointsController {
       const endpointsAdded = await this.EndpointService.endpoints();
       const endpointsArray = endpointsAdded.value;
       const filter = endpointsArray.filter((item) => item.Type === 1 || item.Type === 5);
-      this.state.counter.localEndpoint = filter.length;
+      // NOTICE: This is the temporary fix for excluded docker api endpoint been counted as local endpoint
+      this.state.counter.localEndpoint = filter.length - this.state.counter.dockerApi;
 
       this.$analytics.eventTrack('endpoint-wizard-environment-add-finish', {
         category: 'portainer',
