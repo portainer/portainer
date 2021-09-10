@@ -112,7 +112,6 @@ export default class WizardDockerController {
       this.Notifications.success('Environment connected', name);
       this.clearForm();
       this.onUpdate();
-      this.onAnalytics('local-endpoint');
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to connect your environment');
     } finally {

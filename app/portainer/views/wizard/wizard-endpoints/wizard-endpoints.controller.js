@@ -50,11 +50,17 @@ export default class WizardEndpointsController {
     this.state.currentStep--;
   }
 
-  nextStep() {
+  async nextStep() {
     if (this.state.currentStep >= this.state.maxStep - 1) {
       this.state.nextStep = 'Finish';
     }
     if (this.state.currentStep === this.state.maxStep) {
+      // the Local Endpoint Counter from endpoints array due to including Local Endpoint been added Automatic before Wizard start
+      const endpointsAdded = await this.EndpointService.endpoints();
+      const endpointsArray = endpointsAdded.value;
+      const filter = endpointsArray.filter((item) => item.Type === 1 || item.Type === 5);
+      this.state.counter.localEndpoint = filter.length;
+
       this.$analytics.eventTrack('endpoint-wizard-environment-add-finish', {
         category: 'portainer',
         metadata: {
@@ -76,9 +82,6 @@ export default class WizardEndpointsController {
 
   addAnalytics(endpoint) {
     switch (endpoint) {
-      case 'local-endpoint':
-        this.state.counter.localEndpoint++;
-        break;
       case 'docker-agent':
         this.state.counter.dockerAgent++;
         break;
@@ -183,8 +186,8 @@ export default class WizardEndpointsController {
         ],
         selectOption: '',
       }),
-        // Initial local endpoint been added automatic when login
         (this.endpoints = []);
+
       const endpoints = await this.EndpointService.endpoints();
       this.endpoints = endpoints.value;
     });
