@@ -1,4 +1,5 @@
-<button
+<span class="interactive" tooltip-append-to-body="true" tooltip-placement="bottom" tooltip-class="portainer-tooltip" uib-tooltip="Kubeconfig file will {{ $ctrl.state.expiryDays }}">
+  <button
   ng-if="$ctrl.state.isHTTPS"
   type="button"
   class="btn btn-xs btn-primary"
@@ -9,3 +10,4 @@
 >
   Kubeconfig <i class="fas fa-download space-right"></i>
 </button>
+</span>
