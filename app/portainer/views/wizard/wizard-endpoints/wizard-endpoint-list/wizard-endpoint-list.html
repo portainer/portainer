@@ -1,0 +1,11 @@
+<rd-widget>
+  <rd-widget-header icon="fa-plug" title-text="Connected Environments"> </rd-widget-header>
+  <rd-widget-body>
+    <div class="wizard-list-wrapper" ng-repeat="endpoint in $ctrl.endpointList">
+      <div class="wizard-list-image"><i ng-class="endpoint.Type | endpointtypeicon" aria-hidden="true" style="margin-right: 2px;"></i></div>
+      <div class="wizard-list-title">{{ endpoint.Name }}</div>
+      <div class="wizard-list-subtitle">URL: {{ endpoint.URL | stripprotocol }}</div>
+      <div class="wizard-list-type">Type: {{ endpoint.Type | endpointtypename }}</div>
+    </div>
+  </rd-widget-body>
+</rd-widget>

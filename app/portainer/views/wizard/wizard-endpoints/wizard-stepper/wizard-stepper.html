@@ -1,0 +1,6 @@
+<div class="stepper-wrapper">
+  <div ng-repeat="selection in $ctrl.endpointSelections" class="stepper-item {{ selection.stage }} ">
+    <div class="step-counter">{{ $index + 1 }}</div>
+    <div class="step-name {{ selection.nameClass }}">{{ selection.endpoint }}</div>
+  </div>
+</div>
