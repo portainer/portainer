@@ -47,6 +47,25 @@ export class KubernetesApplication {
 }
 
 /**
+ * HelmApplication Model (Composite)
+ */
+export class HelmApplication {
+  constructor() {
+    this.Id = '';
+    this.Name = '';
+    this.KubernetesApplications = [];
+    this.ApplicationOwner = '';
+    this.CreationDate = 0;
+    this.ApplicationType = 'Unknown';
+    this.Status = '';
+    this.StackName = '-';
+    this.ResourcePool = '-';
+    this.Image = '-';
+    this.PublishedPorts = [];
+  }
+}
+
+/**
  * KubernetesApplicationPersistedFolder Model
  */
 const _KubernetesApplicationPersistedFolder = Object.freeze({

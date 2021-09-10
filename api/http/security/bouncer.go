@@ -199,25 +199,14 @@ func (bouncer *RequestBouncer) mwUpgradeToRestrictedRequest(next http.Handler) h
 func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var tokenData *portainer.TokenData
-		var token string
 
-		// Optionally, token might be set via the "token" query parameter.
-		// For example, in websocket requests
-		token = r.URL.Query().Get("token")
-
-		// Get token from the Authorization header
-		tokens, ok := r.Header["Authorization"]
-		if ok && len(tokens) >= 1 {
-			token = tokens[0]
-			token = strings.TrimPrefix(token, "Bearer ")
-		}
-
-		if token == "" {
-			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", httperrors.ErrUnauthorized)
+		// get token from the Authorization header or query parameter
+		token, err := ExtractBearerToken(r)
+		if err != nil {
+			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", err)
 			return
 		}
 
-		var err error
 		tokenData, err = bouncer.jwtService.ParseAndVerifyToken(token)
 		if err != nil {
 			httperror.WriteError(w, http.StatusUnauthorized, "Invalid JWT token", err)
@@ -233,10 +222,26 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 			return
 		}
 
-		ctx := storeTokenData(r, tokenData)
+		ctx := StoreTokenData(r, tokenData)
 		next.ServeHTTP(w, r.WithContext(ctx))
-		return
 	})
+}
+
+// ExtractBearerToken extracts the Bearer token from the request header or query parameter and returns the token.
+func ExtractBearerToken(r *http.Request) (string, error) {
+	// Optionally, token might be set via the "token" query parameter.
+	// For example, in websocket requests
+	token := r.URL.Query().Get("token")
+
+	tokens, ok := r.Header["Authorization"]
+	if ok && len(tokens) >= 1 {
+		token = tokens[0]
+		token = strings.TrimPrefix(token, "Bearer ")
+	}
+	if token == "" {
+		return "", httperrors.ErrUnauthorized
+	}
+	return token, nil
 }
 
 // mwSecureHeaders provides secure headers middleware for handlers.

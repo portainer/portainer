@@ -1,11 +1,13 @@
 package settings
 
 import (
-	"errors"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/asaskevich/govalidator"
+	"github.com/pkg/errors"
+	"github.com/portainer/libhelm"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -36,6 +38,8 @@ type settingsUpdatePayload struct {
 	KubeconfigExpiry *string `example:"24h" default:"0"`
 	// Whether telemetry is enabled
 	EnableTelemetry *bool `example:"false"`
+	// Helm repository URL
+	HelmRepositoryURL *string `example:"https://charts.bitnami.com/bitnami"`
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
@@ -47,6 +51,12 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 	}
 	if payload.TemplatesURL != nil && *payload.TemplatesURL != "" && !govalidator.IsURL(*payload.TemplatesURL) {
 		return errors.New("Invalid external templates URL. Must correspond to a valid URL format")
+	}
+	if payload.HelmRepositoryURL != nil && *payload.HelmRepositoryURL != "" {
+		err := libhelm.ValidateHelmRepositoryURL(*payload.HelmRepositoryURL)
+		if err != nil {
+			return errors.Wrap(err, "Invalid Helm repository URL. Must correspond to a valid URL format")
+		}
 	}
 	if payload.UserSessionTimeout != nil {
 		_, err := time.ParseDuration(*payload.UserSessionTimeout)
@@ -99,6 +109,10 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.TemplatesURL != nil {
 		settings.TemplatesURL = *payload.TemplatesURL
+	}
+
+	if payload.HelmRepositoryURL != nil {
+		settings.HelmRepositoryURL = strings.TrimSuffix(strings.ToLower(*payload.HelmRepositoryURL), "/")
 	}
 
 	if payload.BlackListedLabels != nil {

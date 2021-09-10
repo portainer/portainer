@@ -1,0 +1,9 @@
+<div class="small text-muted text-wrap">
+  <span ng-if="!$ctrl.show && $ctrl.useAsterisk">********</span>
+  <span ng-if="$ctrl.show">{{ $ctrl.value }}</span>
+</div>
+
+<button type="button" class="btn btn-link nopadding" ng-click="$ctrl.show = !$ctrl.show" title="Show/Hide value">
+  <div ng-if="!$ctrl.show"> <i class="fa fa-eye-slash"></i> Show</div>
+  <div ng-if="$ctrl.show"> <i class="fa fa-eye"></i> Hide</div>
+</button>

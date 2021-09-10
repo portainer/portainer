@@ -13,24 +13,25 @@
             <uib-tab index="0" classes="btn-sm" select="ctrl.selectTab(0)">
               <uib-tab-heading> <i class="fa fa-laptop-code space-right" aria-hidden="true"></i> Applications </uib-tab-heading>
               <kubernetes-applications-datatable
-                dataset="ctrl.applications"
+                dataset="ctrl.state.applications"
                 table-key="kubernetes.applications"
                 order-by="Name"
                 remove-action="ctrl.removeAction"
                 refresh-callback="ctrl.getApplications"
                 on-publishing-mode-click="(ctrl.onPublishingModeClick)"
+                is-primary="true"
               >
               </kubernetes-applications-datatable>
             </uib-tab>
             <uib-tab index="1" classes="btn-sm" select="ctrl.selectTab(1)">
               <uib-tab-heading> <i class="fa fa-exchange-alt space-right" aria-hidden="true"></i> Port mappings </uib-tab-heading>
-              <kubernetes-applications-ports-datatable dataset="ctrl.ports" table-key="kubernetes.applications.ports" order-by="Name" refresh-callback="ctrl.getApplications">
+              <kubernetes-applications-ports-datatable dataset="ctrl.state.ports" table-key="kubernetes.applications.ports" order-by="Name" refresh-callback="ctrl.getApplications">
               </kubernetes-applications-ports-datatable>
             </uib-tab>
             <uib-tab index="2" classes="btn-sm" select="ctrl.selectTab(2)">
               <uib-tab-heading> <i class="fa fa-th-list space-right" aria-hidden="true"></i> Stacks </uib-tab-heading>
               <kubernetes-applications-stacks-datatable
-                dataset="ctrl.stacks"
+                dataset="ctrl.state.stacks"
                 table-key="kubernetes.applications.stacks"
                 order-by="Name"
                 refresh-callback="ctrl.getApplications"

@@ -23,7 +23,7 @@ import {
   KubernetesApplicationVolumeSecretPayload,
 } from 'Kubernetes/models/application/payloads';
 import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
-import { KubernetesApplicationDeploymentTypes, KubernetesApplicationPlacementTypes } from 'Kubernetes/models/application/models';
+import { KubernetesApplicationDeploymentTypes, KubernetesApplicationPlacementTypes, KubernetesApplicationTypes, HelmApplication } from 'Kubernetes/models/application/models';
 import { KubernetesPodAffinity, KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'Kubernetes/pod/models';
 import {
   KubernetesNodeSelectorRequirementPayload,
@@ -31,6 +31,9 @@ import {
   KubernetesPodNodeAffinityPayload,
   KubernetesPreferredSchedulingTermPayload,
 } from 'Kubernetes/pod/payloads/affinities';
+
+export const PodKubernetesInstanceLabel = 'app.kubernetes.io/instance';
+export const PodManagedByLabel = 'app.kubernetes.io/managed-by';
 
 class KubernetesApplicationHelper {
   /* #region  UTILITY FUNCTIONS */
@@ -436,5 +439,77 @@ class KubernetesApplicationHelper {
     }
   }
   /* #endregion */
+
+  /**
+   * Get Helm managed applications
+   * @param {KubernetesApplication[]} applications Application list
+   * @returns {Object} { [releaseName]: [app1, app2, ...], [releaseName2]: [app3, app4, ...] }
+   */
+  static getHelmApplications(applications) {
+    // filter out all the applications that are managed by helm
+    // to identify the helm managed applications, we need to check if the applications pod labels include
+    // `app.kubernetes.io/instance` and `app.kubernetes.io/managed-by` = `helm`
+    const helmManagedApps = applications.filter((app) =>
+      app.Pods.flatMap((pod) => pod.Labels).some((label) => label && label[PodKubernetesInstanceLabel] && label[PodManagedByLabel] === 'Helm')
+    );
+
+    // groups the helm managed applications by helm release name
+    // the release name is retrieved from the `app.kubernetes.io/instance` label on the pods within the apps
+    // `namespacedHelmReleases` object structure:
+    // {
+    //   [namespace1]: {
+    //     [releaseName]: [app1, app2, ...],
+    //   },
+    //   [namespace2]: {
+    //     [releaseName2]: [app1, app2, ...],
+    //   }
+    // }
+    const namespacedHelmReleases = {};
+    helmManagedApps.forEach((app) => {
+      const namespace = app.ResourcePool;
+      const labels = app.Pods.filter((p) => p.Labels).map((p) => p.Labels[PodKubernetesInstanceLabel]);
+      const uniqueLabels = [...new Set(labels)];
+      uniqueLabels.forEach((instanceStr) => {
+        if (namespacedHelmReleases[namespace]) {
+          namespacedHelmReleases[namespace][instanceStr] = [...(namespacedHelmReleases[namespace][instanceStr] || []), app];
+        } else {
+          namespacedHelmReleases[namespace] = { [instanceStr]: [app] };
+        }
+      });
+    });
+
+    // `helmAppsEntriesList` object structure:
+    // [
+    //   ["airflow-test", Array(5)],
+    //   ["traefik", Array(1)],
+    //   ["airflow-test", Array(2)],
+    //   ...,
+    // ]
+    const helmAppsEntriesList = Object.values(namespacedHelmReleases).flatMap((r) => Object.entries(r));
+    const helmAppsList = helmAppsEntriesList.map(([helmInstance, applications]) => {
+      const helmApp = new HelmApplication();
+      helmApp.Name = helmInstance;
+      helmApp.ApplicationType = KubernetesApplicationTypes.HELM;
+      helmApp.KubernetesApplications = applications;
+
+      // the status of helm app is `Ready` based on whether the underlying RunningPodsCount of the k8s app
+      // reaches the TotalPodsCount of the app
+      const appsNotReady = applications.some((app) => app.RunningPodsCount < app.TotalPodsCount);
+      helmApp.Status = appsNotReady ? 'Not ready' : 'Ready';
+
+      // use earliest date
+      helmApp.CreationDate = applications.map((app) => app.CreationDate).sort((a, b) => new Date(a) - new Date(b))[0];
+
+      // use first app namespace as helm app namespace
+      helmApp.ResourcePool = applications[0].ResourcePool;
+
+      // required for persisting table expansion state and differenting same named helm apps across different namespaces
+      helmApp.Id = helmApp.ResourcePool + '-' + helmApp.Name.toLowerCase().replaceAll(' ', '-');
+
+      return helmApp;
+    });
+
+    return helmAppsList;
+  }
 }
 export default KubernetesApplicationHelper;

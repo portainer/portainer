@@ -11,6 +11,7 @@ export function SettingsViewModel(data) {
   this.UserSessionTimeout = data.UserSessionTimeout;
   this.EnableTelemetry = data.EnableTelemetry;
   this.KubeconfigExpiry = data.KubeconfigExpiry;
+  this.HelmRepositoryURL = data.HelmRepositoryURL;
 }
 
 export function PublicSettingsViewModel(settings) {
