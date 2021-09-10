@@ -79,6 +79,17 @@ func (transport *baseTransport) executeKubernetesRequest(request *http.Request) 
 
 	resp, err := transport.httpTransport.RoundTrip(request)
 
+	if err == nil && resp.StatusCode == http.StatusMovedPermanently {
+		oldLocation := resp.Header.Get("Location")
+		if oldLocation != "" {
+			stripedPrefix := strings.TrimSuffix(request.RequestURI, request.URL.Path)
+			// local proxy strips "/kubernetes" but agent proxy and edge agent proxy do not
+			stripedPrefix = strings.TrimSuffix(stripedPrefix, "/kubernetes")
+			newLocation := stripedPrefix + "/kubernetes" + oldLocation
+			resp.Header.Set("Location", newLocation)
+		}
+	}
+
 	return resp, err
 }
 
