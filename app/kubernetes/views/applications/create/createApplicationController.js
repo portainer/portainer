@@ -746,6 +746,10 @@ class KubernetesCreateApplicationController {
     return this.state.isEdit && !this.formValues.Placements[index].IsNew;
   }
 
+  isNewAndNotFirst(index) {
+    return !this.state.isEdit && index !== 0;
+  }
+
   showPlacementPolicySection() {
     const placements = _.filter(this.formValues.Placements, { NeedsDeletion: false });
     return placements.length !== 0;
@@ -786,11 +790,15 @@ class KubernetesCreateApplicationController {
   }
 
   isEditLBWithPorts() {
-    return this.formValues.PublishingType === KubernetesApplicationPublishingTypes.LOAD_BALANCER && _.filter(this.formValues.PublishedPorts, { IsNew: false }).length;
+    return this.formValues.PublishingType === KubernetesApplicationPublishingTypes.LOAD_BALANCER && _.filter(this.formValues.PublishedPorts, { IsNew: false }).length === 0;
   }
 
-  isProtocolOptionDisabled(index) {
-      return this.disableLoadBalancerEdit() || this.isEditAndNotNewPublishedPort(index) || this.isEditLBWithPorts();
+  isProtocolOptionDisabled(index, protocol) {
+    return (
+      this.disableLoadBalancerEdit() ||
+      (this.isEditAndNotNewPublishedPort(index) && this.formValues.PublishedPorts[index].Protocol !== protocol) ||
+      (this.isEditLBWithPorts() && this.formValues.PublishedPorts[index].Protocol !== protocol && this.isNewAndNotFirst(index))
+    );
   }
 
   /* #endregion */
