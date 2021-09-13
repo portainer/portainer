@@ -20,7 +20,7 @@
     "build": "grunt clean:all && grunt build",
     "build:server": "grunt clean:server && grunt build:server",
     "build:client": "grunt clean:client && grunt build:client",
-    "prebuild:docs": "(! command -v swag &> /dev/null) && go get -u github.com/swaggo/swag/cmd/swag@v1.7.1",
+    "prebuild:docs": "(! command -v swag &> /dev/null) && go install github.com/swaggo/swag/cmd/swag@v1.7.1",
     "build:docs": "cd api && swag init -g ./http/handler/handler.go --parseDependency --parseInternal --parseDepth 2 --markdownFiles ./",
     "clean": "grunt clean:all",
     "start": "grunt start",
