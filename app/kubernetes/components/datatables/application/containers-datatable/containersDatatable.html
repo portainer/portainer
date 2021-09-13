@@ -100,6 +100,13 @@
                 </a>
               </th>
               <th>
+              <a ng-click="$ctrl.changeOrderBy('IP')">
+                Pod IP
+                <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IP' && !$ctrl.state.reverseOrder"></i>
+                <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IP' && $ctrl.state.reverseOrder"></i>
+              </a>
+              </th>
+              <th>
                 <a ng-click="$ctrl.changeOrderBy('CreationDate')">
                   Creation date
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreationDate' && !$ctrl.state.reverseOrder"></i>
@@ -129,6 +136,7 @@
                 </span>
                 <span ng-if="!item.Node">-</span>
               </td>
+              <td>{{ item.PodIP }}</td>
               <td>{{ item.CreationDate | getisodate }}</td>
               <td>
                 <a
