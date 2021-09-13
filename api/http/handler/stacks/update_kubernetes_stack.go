@@ -113,10 +113,10 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 	stack.ProjectPath = tempFileDir
 
 	_, err = handler.deployKubernetesStack(tokenData.ID, endpoint, stack, k.KubeAppLabels{
-		StackID: int(stack.ID),
-		Name:    stack.Name,
-		Owner:   stack.CreatedBy,
-		Kind:    "content",
+		StackID:   int(stack.ID),
+		StackName: stack.Name,
+		Owner:     stack.CreatedBy,
+		Kind:      "content",
 	})
 
 	if err != nil {

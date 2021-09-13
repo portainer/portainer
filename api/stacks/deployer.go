@@ -60,9 +60,9 @@ func (d *stackDeployer) DeployKubernetesStack(stack *portainer.Stack, endpoint *
 	defer d.lock.Unlock()
 
 	appLabels := k.KubeAppLabels{
-		StackID: int(stack.ID),
-		Name:    stack.Name,
-		Owner:   stack.CreatedBy,
+		StackID:   int(stack.ID),
+		StackName: stack.Name,
+		Owner:     stack.CreatedBy,
 	}
 
 	if stack.GitConfig == nil {

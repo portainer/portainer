@@ -12,10 +12,10 @@ import (
 )
 
 type KubeAppLabels struct {
-	StackID int
-	Name    string
-	Owner   string
-	Kind    string
+	StackID   int
+	StackName string
+	Owner     string
+	Kind      string
 }
 
 // AddAppLabels adds required labels to "Resource"->metadata->labels.
@@ -95,15 +95,16 @@ func addLabels(obj map[string]interface{}, appLabels KubeAppLabels) {
 		}
 	}
 
-	name := appLabels.Name
-	if appLabels.Name == "" {
-		if n, ok := metadata["name"]; ok {
-			name = n.(string)
-		}
-	}
+	// name := appLabels.ApplicationName
+	// if appLabels.ApplicationName == "" {
+	// 	if n, ok := metadata["name"]; ok {
+	// 		name = n.(string)
+	// 	}
+	// }
 
 	labels["io.portainer.kubernetes.application.stackid"] = strconv.Itoa(appLabels.StackID)
-	labels["io.portainer.kubernetes.application.name"] = name
+	labels["io.portainer.kubernetes.application.name"] = appLabels.StackName
+	labels["io.portainer.kubernetes.application.stack"] = appLabels.StackName
 	labels["io.portainer.kubernetes.application.owner"] = appLabels.Owner
 	labels["io.portainer.kubernetes.application.kind"] = appLabels.Kind
 

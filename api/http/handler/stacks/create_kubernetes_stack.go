@@ -151,10 +151,10 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 	defer handler.cleanUp(stack, &doCleanUp)
 
 	output, err := handler.deployKubernetesStack(user.ID, endpoint, stack, k.KubeAppLabels{
-		StackID: stackID,
-		Name:    stack.Name,
-		Owner:   stack.CreatedBy,
-		Kind:    "content",
+		StackID:   stackID,
+		StackName: stack.Name,
+		Owner:     stack.CreatedBy,
+		Kind:      "content",
 	})
 
 	if err != nil {
@@ -260,10 +260,10 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 	}
 
 	output, err := handler.deployKubernetesStack(user.ID, endpoint, stack, k.KubeAppLabels{
-		StackID: stackID,
-		Name:    stack.Name,
-		Owner:   stack.CreatedBy,
-		Kind:    "git",
+		StackID:   stackID,
+		StackName: stack.Name,
+		Owner:     stack.CreatedBy,
+		Kind:      "git",
 	})
 
 	if err != nil {
@@ -345,10 +345,10 @@ func (handler *Handler) createKubernetesStackFromManifestURL(w http.ResponseWrit
 	defer handler.cleanUp(stack, &doCleanUp)
 
 	output, err := handler.deployKubernetesStack(user.ID, endpoint, stack, k.KubeAppLabels{
-		StackID: stackID,
-		Name:    stack.Name,
-		Owner:   stack.CreatedBy,
-		Kind:    "url",
+		StackID:   stackID,
+		StackName: stack.Name,
+		Owner:     stack.CreatedBy,
+		Kind:      "url",
 	})
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to deploy Kubernetes stack", Err: err}
