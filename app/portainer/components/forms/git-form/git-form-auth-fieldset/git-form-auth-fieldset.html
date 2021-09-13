@@ -9,8 +9,10 @@
 </div>
 <div ng-if="$ctrl.model.RepositoryAuthentication">
   <div class="form-group">
-    <label for="repository_username" class="col-sm-2 control-label text-left">Username</label>
-    <div class="col-sm-3">
+    <label for="repository_username" class="control-label text-left" style="display: inline-block; padding: 0 15px; min-width: 200px;">
+      Username
+    </label>
+    <div style="display: inline-block; margin-left: 15px;">
       <input
         type="text"
         class="form-control"
@@ -23,11 +25,11 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="repository_password" class="col-sm-2 control-label text-left">
+    <label for="repository_password" class="control-label text-left" style="display: inline-block; padding: 0 15px; min-width: 200px;">
       Personal Access Token
       <portainer-tooltip position="bottom" message="Provide a personal access token or password"></portainer-tooltip>
     </label>
-    <div class="col-sm-3">
+    <div style="display: inline-block; margin-left: 15px;">
       <input
         type="password"
         class="form-control"
