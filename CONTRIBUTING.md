@@ -91,7 +91,7 @@ Then build and run the project:
 $ yarn start
 ```
 
-Portainer can now be accessed at <http://localhost:9000>.
+Portainer can now be accessed at <https://localhost:9443>.
 
 Find more detailed steps at <https://documentation.portainer.io/contributing/instructions/>.
 
