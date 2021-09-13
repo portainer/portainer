@@ -95,13 +95,6 @@ func addLabels(obj map[string]interface{}, appLabels KubeAppLabels) {
 		}
 	}
 
-	// name := appLabels.ApplicationName
-	// if appLabels.ApplicationName == "" {
-	// 	if n, ok := metadata["name"]; ok {
-	// 		name = n.(string)
-	// 	}
-	// }
-
 	labels["io.portainer.kubernetes.application.stackid"] = strconv.Itoa(appLabels.StackID)
 	labels["io.portainer.kubernetes.application.name"] = appLabels.StackName
 	labels["io.portainer.kubernetes.application.stack"] = appLabels.StackName

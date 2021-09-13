@@ -112,7 +112,7 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to load user information from the database", Err: err}
 	}
-	isUnique, err := handler.checkUniqueName(endpoint, payload.StackName, 0, false)
+	isUnique, err := handler.checkUniqueStackName(endpoint, payload.StackName, 0)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to check for name collision", Err: err}
 	}
@@ -187,7 +187,7 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to load user information from the database", Err: err}
 	}
-	isUnique, err := handler.checkUniqueName(endpoint, payload.StackName, 0, false)
+	isUnique, err := handler.checkUniqueStackName(endpoint, payload.StackName, 0)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to check for name collision", Err: err}
 	}
@@ -305,7 +305,7 @@ func (handler *Handler) createKubernetesStackFromManifestURL(w http.ResponseWrit
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to load user information from the database", Err: err}
 	}
-	isUnique, err := handler.checkUniqueName(endpoint, payload.StackName, 0, false)
+	isUnique, err := handler.checkUniqueStackName(endpoint, payload.StackName, 0)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to check for name collision", Err: err}
 	}
