@@ -70,7 +70,7 @@ module.exports = {
     compress: true,
     port: 8999,
     proxy: {
-      '/api': 'http://localhost:9000',
+      '/api': 'https://localhost:9443',
     },
     open: true,
     writeToDisk: true,

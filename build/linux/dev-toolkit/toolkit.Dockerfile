@@ -2,6 +2,7 @@ FROM ubuntu:20.04
 
 # Expose port for the Portainer UI and Edge server
 EXPOSE 9000
+EXPOSE 9443
 EXPOSE 8000
 
 WORKDIR /src/portainer
