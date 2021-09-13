@@ -36,12 +36,13 @@ func (p *addHelmRepoUrlPayload) Validate(_ *http.Request) error {
 // @security jwt
 // @accept json
 // @produce json
+// @param id path int true "Endpoint identifier"
 // @param payload body addHelmRepoUrlPayload true "Helm Repository"
 // @success 200 {object} portainer.HelmUserRepository "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
 // @failure 500 "Server error"
-// @router /endpoints/:id/kubernetes/helm/repositories [post]
+// @router /endpoints/{id}/kubernetes/helm/repositories [post]
 func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
@@ -99,7 +100,7 @@ func (handler *Handler) userCreateHelmRepo(w http.ResponseWriter, r *http.Reques
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
 // @failure 500 "Server error"
-// @router /endpoints/:id/kubernetes/helm/repositories [get]
+// @router /endpoints/{id}/kubernetes/helm/repositories [get]
 func (handler *Handler) userGetHelmRepos(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {

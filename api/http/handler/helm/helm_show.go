@@ -19,7 +19,7 @@ import (
 // @tags helm_chart
 // @param repo query string true "Helm repository URL"
 // @param chart query string true "Chart name"
-// @param command path string false "chart/values/readme"
+// @param command path string true "chart/values/readme"
 // @security jwt
 // @accept json
 // @produce text/plain
