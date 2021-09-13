@@ -6,7 +6,6 @@ import (
 	"net/url"
 
 	"github.com/pkg/errors"
-	"github.com/portainer/libhelm"
 	"github.com/portainer/libhelm/options"
 	httperror "github.com/portainer/libhttp/error"
 )
@@ -40,7 +39,7 @@ func (handler *Handler) helmRepoSearch(w http.ResponseWriter, r *http.Request) *
 		Repo: repo,
 	}
 
-	result, err := libhelm.SearchRepo(searchOpts)
+	result, err := handler.helmPackageManager.SearchRepo(searchOpts)
 	if err != nil {
 		return &httperror.HandlerError{
 			StatusCode: http.StatusInternalServerError,
