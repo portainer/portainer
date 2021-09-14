@@ -65,9 +65,6 @@ class KubernetesApplicationsController {
     for (const application of selectedItems) {
       try {
         await this.KubernetesApplicationService.delete(application);
-        if (application.StackId) {
-          await this.StackService.remove({ Id: application.StackId }, false, this.endpoint.Id);
-        }
         this.Notifications.success('Application successfully removed', application.Name);
         const index = this.applications.indexOf(application);
         this.applications.splice(index, 1);
