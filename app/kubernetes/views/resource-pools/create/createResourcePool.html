@@ -162,14 +162,7 @@
             </div>
             <div class="form-group">
               <div class="col-sm-12">
-                <label class="control-label text-left">
-                  Load Balancer quota
-                </label>
-                <label class="switch" style="margin-left: 20px;" data-cy="k8sNamespaceCreate-loadBalancerQuotaToggle"> <input type="checkbox" disabled /><i></i> </label>
-                <span class="text-muted small" style="margin-left: 15px;">
-                  <i class="fa fa-user" aria-hidden="true"></i>
-                  This feature is available in <a href="https://www.portainer.io/business-upsell?from=k8s-resourcepool-lbquota" target="_blank"> Portainer Business Edition</a>.
-                </span>
+                <por-switch-field label="Load Balancer quota" name="k8s-resourcepool-Ibquota" feature="'k8s-resourcepool-Ibquota'" ng-model="lbquota"></por-switch-field>
               </div>
             </div>
             <!-- #endregion -->
@@ -213,8 +206,8 @@
               <div class="form-group" ng-if="$ctrl.formValues.IngressClasses.length === 0">
                 <div class="col-sm-12 small text-muted">
                   The ingress feature must be enabled in the
-                  <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: $ctrl.endpoint.Id})">environment configuration view</a> to be able to register ingresses inside this
-                  namespace.
+                  <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: $ctrl.endpoint.Id})">environment configuration view</a> to be able to register ingresses inside
+                  this namespace.
                 </div>
               </div>
 

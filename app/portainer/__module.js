@@ -2,6 +2,7 @@ import _ from 'lodash-es';
 
 import componentsModule from './components';
 import settingsModule from './settings';
+import featureFlagModule from './feature-flags';
 
 async function initAuthentication(authManager, Authentication, $rootScope, $state) {
   authManager.checkAuthOnRefresh();
@@ -18,7 +19,7 @@ async function initAuthentication(authManager, Authentication, $rootScope, $stat
   return await Authentication.init();
 }
 
-angular.module('portainer.app', ['portainer.oauth', componentsModule, settingsModule]).config([
+angular.module('portainer.app', ['portainer.oauth', componentsModule, settingsModule, featureFlagModule]).config([
   '$stateRegistryProvider',
   function ($stateRegistryProvider) {
     'use strict';
@@ -49,6 +50,18 @@ angular.module('portainer.app', ['portainer.oauth', componentsModule, settingsMo
         'sidebar@': {
           templateUrl: './views/sidebar/sidebar.html',
           controller: 'SidebarController',
+        },
+      },
+      resolve: {
+        featuresServiceInitialized: /* @ngInject */ function featuresServiceInitialized($async, featureService, Notifications) {
+          return $async(async () => {
+            try {
+              await featureService.init();
+            } catch (e) {
+              Notifications.error('Failed initializing features service', e);
+              throw e;
+            }
+          });
         },
       },
     };

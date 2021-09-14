@@ -1,7 +1,5 @@
 import angular from 'angular';
 
-import './por-switch-field.css';
-
 export const porSwitchField = {
   templateUrl: './por-switch-field.html',
   bindings: {
@@ -12,6 +10,7 @@ export const porSwitchField = {
     labelClass: '@',
     disabled: '<',
     onChange: '<',
+    feature: '<', // feature id
   },
 };
 
