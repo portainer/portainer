@@ -7,4 +7,5 @@
 .inline-input {
   display: inline-block;
   margin-left: 15px;
+  width: calc(100% - 235px);
 }
