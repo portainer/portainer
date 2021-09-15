@@ -11,12 +11,12 @@ import (
 )
 
 // @id EndpointGroupDeleteEndpoint
-// @summary Removes endpoint from an endpoint group
+// @summary Removes environment from an environment group
 // @description **Access policy**: administrator
 // @tags endpoint_groups
 // @security jwt
 // @param id path int true "EndpointGroup identifier"
-// @param endpointId path int true "Endpoint identifier"
+// @param endpointId path int true "Environment identifier"
 // @success 204 "Success"
 // @failure 400 "Invalid request"
 // @failure 404 "EndpointGroup not found"

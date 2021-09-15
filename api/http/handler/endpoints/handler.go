@@ -20,7 +20,7 @@ func hideFields(endpoint *portainer.Endpoint) {
 	}
 }
 
-// Handler is the HTTP handler used to handle endpoint operations.
+// Handler is the HTTP handler used to handle environment operations.
 type Handler struct {
 	*mux.Router
 	requestBouncer       *security.RequestBouncer
@@ -36,7 +36,7 @@ type Handler struct {
 	BindAddressHTTPS     string
 }
 
-// NewHandler creates a handler to manage endpoint operations.
+// NewHandler creates a handler to manage environment operations.
 func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{
 		Router:         mux.NewRouter(),

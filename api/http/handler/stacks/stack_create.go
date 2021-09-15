@@ -32,7 +32,7 @@ func (handler *Handler) cleanUp(stack *portainer.Stack, doCleanUp *bool) error {
 
 // @id StackCreate
 // @summary Deploy a new stack
-// @description Deploy a new stack into a Docker environment specified via the endpoint identifier.
+// @description Deploy a new stack into a Docker environment specified via the environment identifier.
 // @description **Access policy**: restricted
 // @tags stacks
 // @security jwt
@@ -40,7 +40,7 @@ func (handler *Handler) cleanUp(stack *portainer.Stack, doCleanUp *bool) error {
 // @produce json
 // @param type query int true "Stack deployment type. Possible values: 1 (Swarm stack) or 2 (Compose stack)." Enums(1,2)
 // @param method query string true "Stack deployment method. Possible values: file, string or repository." Enums(string, file, repository)
-// @param endpointId query int true "Identifier of the endpoint that will be used to deploy the stack"
+// @param endpointId query int true "Identifier of the environment that will be used to deploy the stack"
 // @param body_swarm_string body swarmStackFromFileContentPayload false "Required when using method=string and type=1"
 // @param body_swarm_repository body swarmStackFromGitRepositoryPayload false "Required when using method=repository and type=1"
 // @param body_compose_string body composeStackFromFileContentPayload false "Required when using method=string and type=2"

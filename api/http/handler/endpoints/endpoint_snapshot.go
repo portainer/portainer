@@ -12,15 +12,15 @@ import (
 )
 
 // @id EndpointSnapshot
-// @summary Snapshots an endpoint
-// @description Snapshots an endpoint
+// @summary Snapshots an environments
+// @description Snapshots an environments
 // @description **Access policy**: restricted
 // @tags endpoints
 // @security jwt
-// @param id path int true "Endpoint identifier"
+// @param id path int true "Environment identifier"
 // @success 204 "Success"
 // @failure 400 "Invalid request"
-// @failure 404 "Endpoint not found"
+// @failure 404 "Environment not found"
 // @failure 500 "Server error"
 // @router /endpoints/{id}/snapshot [post]
 func (handler *Handler) endpointSnapshot(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

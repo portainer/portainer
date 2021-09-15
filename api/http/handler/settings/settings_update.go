@@ -24,7 +24,7 @@ type settingsUpdatePayload struct {
 	AuthenticationMethod *int                     `example:"1"`
 	LDAPSettings         *portainer.LDAPSettings  `example:""`
 	OAuthSettings        *portainer.OAuthSettings `example:""`
-	// The interval in which endpoint snapshots are created
+	// The interval in which environment snapshots are created
 	SnapshotInterval *string `example:"5m"`
 	// URL to the templates that will be displayed in the UI when navigating to App Templates
 	TemplatesURL *string `example:"https://raw.githubusercontent.com/portainer/templates/master/templates.json"`

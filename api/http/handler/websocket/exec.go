@@ -23,7 +23,7 @@ type execStartOperationPayload struct {
 }
 
 // @summary Execute a websocket
-// @description If the nodeName query parameter is present, the request will be proxied to the underlying agent endpoint.
+// @description If the nodeName query parameter is present, the request will be proxied to the underlying agent environment.
 // @description If the nodeName query parameter is not specified, the request will be upgraded to the websocket protocol and
 // @description an ExecStart operation HTTP request will be created and hijacked.
 // @description Authentication and access is controlled via the mandatory token query parameter.
@@ -31,9 +31,9 @@ type execStartOperationPayload struct {
 // @tags websocket
 // @accept json
 // @produce json
-// @param endpointId query int true "endpoint ID of the endpoint where the resource is located"
+// @param endpointId query int true "environment ID of the environment where the resource is located"
 // @param nodeName query string false "node name"
-// @param token query string true "JWT token used for authentication against this endpoint"
+// @param token query string true "JWT token used for authentication against this environment"
 // @success 200
 // @failure 400
 // @failure 409

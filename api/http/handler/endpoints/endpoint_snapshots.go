@@ -11,8 +11,8 @@ import (
 )
 
 // @id EndpointSnapshots
-// @summary Snapshot all endpoints
-// @description Snapshot all endpoints
+// @summary Snapshot all environments
+// @description Snapshot all environments
 // @description **Access policy**: administrator
 // @tags endpoints
 // @security jwt

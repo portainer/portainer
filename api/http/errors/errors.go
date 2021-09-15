@@ -3,7 +3,7 @@ package errors
 import "errors"
 
 var (
-	// ErrEndpointAccessDenied Access denied to endpoint error
+	// ErrEndpointAccessDenied Access denied to environment error
 	ErrEndpointAccessDenied = errors.New("Access denied to environment")
 	// ErrUnauthorized Unauthorized error
 	ErrUnauthorized = errors.New("Unauthorized")

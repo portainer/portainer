@@ -35,31 +35,31 @@ type edgeJobResponse struct {
 }
 
 type endpointStatusInspectResponse struct {
-	// Status represents the endpoint status
+	// Status represents the environment status
 	Status string `json:"status" example:"REQUIRED"`
 	// The tunnel port
 	Port int `json:"port" example:"8732"`
-	// List of requests for jobs to run on the endpoint
+	// List of requests for jobs to run on the environment
 	Schedules []edgeJobResponse `json:"schedules"`
 	// The current value of CheckinInterval
 	CheckinInterval int `json:"checkin" example:"5"`
 	//
 	Credentials string `json:"credentials" example:""`
-	// List of stacks to be deployed on the endpoints
+	// List of stacks to be deployed on the environments
 	Stacks []stackStatusResponse `json:"stacks"`
 }
 
 // @id EndpointStatusInspect
-// @summary Get endpoint status
-// @description Endpoint for edge agent to check status of environment
-// @description **Access policy**: restricted only to Edge endpoints
+// @summary Get environment status
+// @description Environment for edge agent to check status of environment
+// @description **Access policy**: restricted only to Edge environments
 // @tags endpoints
 // @security jwt
-// @param id path int true "Endpoint identifier"
+// @param id path int true "Environment identifier"
 // @success 200 {object} endpointStatusInspectResponse "Success"
 // @failure 400 "Invalid request"
-// @failure 403 "Permission denied to access endpoint"
-// @failure 404 "Endpoint not found"
+// @failure 403 "Permission denied to access environment"
+// @failure 404 "Environment not found"
 // @failure 500 "Server error"
 // @router /endpoints/{id}/status [get]
 func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

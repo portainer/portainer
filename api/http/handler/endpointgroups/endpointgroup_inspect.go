@@ -10,14 +10,14 @@ import (
 	"github.com/portainer/portainer/api/bolt/errors"
 )
 
-// @summary Inspect an Endpoint group
-// @description Retrieve details abont an endpoint group.
+// @summary Inspect an Environment group
+// @description Retrieve details abont an environment group.
 // @description **Access policy**: administrator
 // @tags endpoint_groups
 // @security jwt
 // @accept json
 // @produce json
-// @param id path int true "Endpoint group identifier"
+// @param id path int true "Environment group identifier"
 // @success 200 {object} portainer.EndpointGroup "Success"
 // @failure 400 "Invalid request"
 // @failure 404 "EndpointGroup not found"

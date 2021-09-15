@@ -18,12 +18,12 @@ type configResponse struct {
 	Name             string
 }
 
-// @summary Inspect an Edge Stack for an Endpoint
+// @summary Inspect an Edge Stack for an Environment
 // @description
 // @tags edge, endpoints, edge_stacks
 // @accept json
 // @produce json
-// @param id path string true "Endpoint Id"
+// @param id path string true "Environment Id"
 // @param stackId path string true "EdgeStack Id"
 // @success 200 {object} configResponse
 // @failure 500

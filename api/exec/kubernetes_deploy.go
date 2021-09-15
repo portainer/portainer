@@ -77,7 +77,7 @@ func (deployer *KubernetesDeployer) getToken(request *http.Request, endpoint *po
 	return token, nil
 }
 
-// Deploy will deploy a Kubernetes manifest inside a specific namespace in a Kubernetes endpoint.
+// Deploy will deploy a Kubernetes manifest inside a specific namespace in a Kubernetes environment.
 // Otherwise it will use kubectl to deploy the manifest.
 func (deployer *KubernetesDeployer) Deploy(request *http.Request, endpoint *portainer.Endpoint, stackConfig string, namespace string) (string, error) {
 	if endpoint.Type == portainer.KubernetesLocalEnvironment {

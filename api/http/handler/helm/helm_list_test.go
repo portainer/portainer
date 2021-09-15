@@ -23,7 +23,7 @@ func Test_helmList(t *testing.T) {
 	defer teardown()
 
 	err := store.Endpoint().CreateEndpoint(&portainer.Endpoint{ID: 1})
-	assert.NoError(t, err, "error creating endpoint")
+	assert.NoError(t, err, "error creating environment")
 
 	err = store.User().CreateUser(&portainer.User{Username: "admin", Role: portainer.AdministratorRole})
 	assert.NoError(t, err, "error creating a user")

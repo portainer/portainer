@@ -51,7 +51,7 @@ func (factory *ProxyFactory) NewLegacyExtensionProxy(extensionAPIURL string) (ht
 	return proxy, nil
 }
 
-// NewEndpointProxy returns a new reverse proxy (filesystem based or HTTP) to an endpoint API server
+// NewEndpointProxy returns a new reverse proxy (filesystem based or HTTP) to an environment API server
 func (factory *ProxyFactory) NewEndpointProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
 	switch endpoint.Type {
 	case portainer.AzureEnvironment:

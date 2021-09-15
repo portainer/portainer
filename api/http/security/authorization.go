@@ -103,9 +103,9 @@ func AuthorizedTeamManagement(teamID portainer.TeamID, context *RestrictedReques
 	return false
 }
 
-// authorizedEndpointAccess ensure that the user can access the specified endpoint.
+// authorizedEndpointAccess ensure that the user can access the specified environment.
 // It will check if the user is part of the authorized users or part of a team that is
-// listed in the authorized teams of the endpoint and the associated group.
+// listed in the authorized teams of the environment and the associated group.
 func authorizedEndpointAccess(endpoint *portainer.Endpoint, endpointGroup *portainer.EndpointGroup, userID portainer.UserID, memberships []portainer.TeamMembership) bool {
 	groupAccess := AuthorizedAccess(userID, memberships, endpointGroup.UserAccessPolicies, endpointGroup.TeamAccessPolicies)
 	if !groupAccess {
@@ -114,7 +114,7 @@ func authorizedEndpointAccess(endpoint *portainer.Endpoint, endpointGroup *porta
 	return true
 }
 
-// authorizedEndpointGroupAccess ensure that the user can access the specified endpoint group.
+// authorizedEndpointGroupAccess ensure that the user can access the specified environment group.
 // It will check if the user is part of the authorized users or part of a team that is
 // listed in the authorized teams.
 func authorizedEndpointGroupAccess(endpointGroup *portainer.EndpointGroup, userID portainer.UserID, memberships []portainer.TeamMembership) bool {
@@ -123,7 +123,7 @@ func authorizedEndpointGroupAccess(endpointGroup *portainer.EndpointGroup, userI
 
 // AuthorizedRegistryAccess ensure that the user can access the specified registry.
 // It will check if the user is part of the authorized users or part of a team that is
-// listed in the authorized teams for a specified endpoint,
+// listed in the authorized teams for a specified environment,
 func AuthorizedRegistryAccess(registry *portainer.Registry, user *portainer.User, teamMemberships []portainer.TeamMembership, endpointID portainer.EndpointID) bool {
 	if user.Role == portainer.AdministratorRole {
 		return true
