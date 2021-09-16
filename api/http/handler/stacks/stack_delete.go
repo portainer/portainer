@@ -2,11 +2,11 @@ package stacks
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 
+	"github.com/pkg/errors"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -181,11 +181,8 @@ func (handler *Handler) deleteStack(userID portainer.UserID, stack *portainer.St
 		return handler.ComposeStackManager.Down(context.TODO(), stack, endpoint)
 	}
 	if stack.Type == portainer.KubernetesStack {
-		manifestFiles := stackutils.GetStackFilePaths(stack)
-		if _, err := handler.KubernetesDeployer.Remove(userID, endpoint, manifestFiles, stack.Namespace); err != nil {
-			return err
-		}
-		return nil
+		out, err := handler.KubernetesDeployer.Remove(userID, endpoint, stackutils.GetStackFilePaths(stack), stack.Namespace)
+		return errors.WithMessagef(err, "failed to remove kubernetes resources: %q", out)
 	}
-	return fmt.Errorf("Unsupported stack type: %v", stack.Type)
+	return fmt.Errorf("unsupported stack type: %v", stack.Type)
 }

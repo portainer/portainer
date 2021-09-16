@@ -75,52 +75,20 @@ func (deployer *KubernetesDeployer) getToken(userID portainer.UserID, endpoint *
 	return token, nil
 }
 
-// Deploy will deploy Kubernetes manifest(s) inside a specific namespace in a Kubernetes endpoint.
-// Otherwise it will use kubectl to deploy the manifest.
+// Deploy upserts Kubernetes resources defined in manifest(s)
 func (deployer *KubernetesDeployer) Deploy(userID portainer.UserID, endpoint *portainer.Endpoint, manifestFiles []string, namespace string) (string, error) {
-	token, err := deployer.getToken(userID, endpoint, endpoint.Type == portainer.KubernetesLocalEnvironment)
-	if err != nil {
-		return "", err
-	}
-
-	command := path.Join(deployer.binaryPath, "kubectl")
-	if runtime.GOOS == "windows" {
-		command = path.Join(deployer.binaryPath, "kubectl.exe")
-	}
-
-	args, proxy, err := deployer.initCommandArgsAndProxy(token, endpoint, namespace)
-	if err != nil {
-		return "", errors.Wrap(err, "failed to compose kubectl args")
-	}
-	if proxy != nil {
-		defer proxy.Close()
-	}
-
-	var fileArgs []string
-	for _, path := range manifestFiles {
-		fileArgs = append(fileArgs, "-f")
-		fileArgs = append(fileArgs, strings.TrimSpace(path))
-	}
-	args = append(args, "apply")
-	args = append(args, fileArgs...)
-
-	var stderr bytes.Buffer
-	cmd := exec.Command(command, args...)
-	cmd.Stderr = &stderr
-
-	output, err := cmd.Output()
-	if err != nil {
-		return "", errors.Wrapf(err, "failed to execute kubectl command: %q", stderr.String())
-	}
-
-	return string(output), nil
+	return deployer.command("apply", userID, endpoint, manifestFiles, namespace)
 }
 
-// Remove will delete a Kubernetes manifest(s) with kubectl
+// Remove deletes Kubernetes resources defined in manifest(s)
 func (deployer *KubernetesDeployer) Remove(userID portainer.UserID, endpoint *portainer.Endpoint, manifestFiles []string, namespace string) (string, error) {
+	return deployer.command("delete", userID, endpoint, manifestFiles, namespace)
+}
+
+func (deployer *KubernetesDeployer) command(operation string, userID portainer.UserID, endpoint *portainer.Endpoint, manifestFiles []string, namespace string) (string, error) {
 	token, err := deployer.getToken(userID, endpoint, endpoint.Type == portainer.KubernetesLocalEnvironment)
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "failed generating a user token")
 	}
 
 	command := path.Join(deployer.binaryPath, "kubectl")
@@ -128,21 +96,26 @@ func (deployer *KubernetesDeployer) Remove(userID portainer.UserID, endpoint *po
 		command = path.Join(deployer.binaryPath, "kubectl.exe")
 	}
 
-	args, proxy, err := deployer.initCommandArgsAndProxy(token, endpoint, namespace)
-	if err != nil {
-		return "", errors.Wrap(err, "failed to compose kubectl args")
-	}
-	if proxy != nil {
-		defer proxy.Close()
+	args := []string{
+		"--token", token,
+		"--namespace", namespace,
 	}
 
-	var fileArgs []string
-	for _, path := range manifestFiles {
-		fileArgs = append(fileArgs, "-f")
-		fileArgs = append(fileArgs, strings.TrimSpace(path))
+	if endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
+		url, proxy, err := deployer.getAgentURL(endpoint)
+		if err != nil {
+			return "", errors.WithMessage(err, "failed generating endpoint URL")
+		}
+
+		defer proxy.Close()
+		args = append(args, "--server", url)
+		args = append(args, "--insecure-skip-tls-verify")
 	}
-	args = append(args, "delete")
-	args = append(args, fileArgs...)
+
+	args = append(args, operation)
+	for _, path := range manifestFiles {
+		args = append(args, "-f", strings.TrimSpace(path))
+	}
 
 	var stderr bytes.Buffer
 	cmd := exec.Command(command, args...)
@@ -186,27 +159,4 @@ func (deployer *KubernetesDeployer) getAgentURL(endpoint *portainer.Endpoint) (s
 	}
 
 	return fmt.Sprintf("http://127.0.0.1:%d/kubernetes", proxy.Port), proxy, nil
-}
-
-func (deployer *KubernetesDeployer) initCommandArgsAndProxy(token string, endpoint *portainer.Endpoint, namespace string) ([]string, *factory.ProxyServer, error) {
-
-	args := make([]string, 0)
-
-	var proxy *factory.ProxyServer
-
-	if endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
-		var url string
-		var err error
-		url, proxy, err = deployer.getAgentURL(endpoint)
-		if err != nil {
-			return nil, nil, errors.WithMessage(err, "failed generating endpoint URL")
-		}
-		args = append(args, "--server", url)
-		args = append(args, "--insecure-skip-tls-verify")
-	}
-
-	args = append(args, "--token", token)
-	args = append(args, "--namespace", namespace)
-
-	return args, proxy, nil
 }
