@@ -11,6 +11,14 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+const (
+	labelPortainerAppStackID = "io.portainer.kubernetes.application.stackid"
+	labelPortainerAppName    = "io.portainer.kubernetes.application.name"
+	labelPortainerAppOwner   = "io.portainer.kubernetes.application.owner"
+	labelPortainerAppKind    = "io.portainer.kubernetes.application.kind"
+)
+
+// KubeAppLabels are labels applied to all resources deployed in a kubernetes stack
 type KubeAppLabels struct {
 	StackID int
 	Name    string
@@ -18,10 +26,20 @@ type KubeAppLabels struct {
 	Kind    string
 }
 
+// ToMap converts KubeAppLabels to a map[string]string
+func (kal *KubeAppLabels) ToMap() map[string]string {
+	return map[string]string{
+		labelPortainerAppStackID: strconv.Itoa(kal.StackID),
+		labelPortainerAppName:    kal.Name,
+		labelPortainerAppOwner:   kal.Owner,
+		labelPortainerAppKind:    kal.Kind,
+	}
+}
+
 // AddAppLabels adds required labels to "Resource"->metadata->labels.
 // It'll add those labels to all Resource (nodes with a kind property exluding a list) it can find in provided yaml.
 // Items in the yaml file could either be organised as a list or broken into multi documents.
-func AddAppLabels(manifestYaml []byte, appLabels KubeAppLabels) ([]byte, error) {
+func AddAppLabels(manifestYaml []byte, appLabels map[string]string) ([]byte, error) {
 	if bytes.Equal(manifestYaml, []byte("")) {
 		return manifestYaml, nil
 	}
@@ -58,7 +76,7 @@ func AddAppLabels(manifestYaml []byte, appLabels KubeAppLabels) ([]byte, error) 
 	return bytes.Join(docs, []byte("---\n")), nil
 }
 
-func addResourceLabels(yamlDoc interface{}, appLabels KubeAppLabels) {
+func addResourceLabels(yamlDoc interface{}, appLabels map[string]string) {
 	m, ok := yamlDoc.(map[string]interface{})
 	if !ok {
 		return
@@ -82,7 +100,7 @@ func addResourceLabels(yamlDoc interface{}, appLabels KubeAppLabels) {
 	}
 }
 
-func addLabels(obj map[string]interface{}, appLabels KubeAppLabels) {
+func addLabels(obj map[string]interface{}, appLabels map[string]string) {
 	metadata := make(map[string]interface{})
 	if m, ok := obj["metadata"]; ok {
 		metadata = m.(map[string]interface{})
@@ -95,17 +113,17 @@ func addLabels(obj map[string]interface{}, appLabels KubeAppLabels) {
 		}
 	}
 
-	name := appLabels.Name
-	if appLabels.Name == "" {
-		if n, ok := metadata["name"]; ok {
-			name = n.(string)
-		}
+	// merge app labels with existing labels
+	for k, v := range appLabels {
+		labels[k] = v
 	}
 
-	labels["io.portainer.kubernetes.application.stackid"] = strconv.Itoa(appLabels.StackID)
-	labels["io.portainer.kubernetes.application.name"] = name
-	labels["io.portainer.kubernetes.application.owner"] = appLabels.Owner
-	labels["io.portainer.kubernetes.application.kind"] = appLabels.Kind
+	// fallback to metadata name if name label not explicitly provided
+	if name, ok := labels[labelPortainerAppName]; !ok || name == "" {
+		if n, ok := metadata["name"]; ok {
+			labels[labelPortainerAppName] = n.(string)
+		}
+	}
 
 	metadata["labels"] = labels
 	obj["metadata"] = metadata
