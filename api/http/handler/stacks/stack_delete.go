@@ -105,7 +105,7 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 		stopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
 	}
 
-	err = handler.deleteStack(stack, endpoint)
+	err = handler.deleteStack(securityContext.UserID, stack, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: err.Error(), Err: err}
 	}
@@ -165,7 +165,7 @@ func (handler *Handler) deleteExternalStack(r *http.Request, w http.ResponseWrit
 		Type: portainer.DockerSwarmStack,
 	}
 
-	err = handler.deleteStack(stack, endpoint)
+	err = handler.deleteStack(securityContext.UserID, stack, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to delete stack", Err: err}
 	}
@@ -173,7 +173,7 @@ func (handler *Handler) deleteExternalStack(r *http.Request, w http.ResponseWrit
 	return response.Empty(w)
 }
 
-func (handler *Handler) deleteStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+func (handler *Handler) deleteStack(userID portainer.UserID, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	if stack.Type == portainer.DockerSwarmStack {
 		return handler.SwarmStackManager.Remove(stack, endpoint)
 	}
@@ -181,6 +181,10 @@ func (handler *Handler) deleteStack(stack *portainer.Stack, endpoint *portainer.
 		return handler.ComposeStackManager.Down(context.TODO(), stack, endpoint)
 	}
 	if stack.Type == portainer.KubernetesStack {
+		manifestFiles := stackutils.GetStackFilePaths(stack)
+		if _, err := handler.KubernetesDeployer.Remove(userID, endpoint, manifestFiles, stack.Namespace); err != nil {
+			return err
+		}
 		return nil
 	}
 	return fmt.Errorf("Unsupported stack type: %v", stack.Type)
