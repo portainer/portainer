@@ -210,8 +210,8 @@ github.com/portainer/docker-compose-wrapper v0.0.0-20210909083948-8be0d98451a1 h
 github.com/portainer/docker-compose-wrapper v0.0.0-20210909083948-8be0d98451a1/go.mod h1:WxDlJWZxCnicdLCPnLNEv7/gRhjeIVuCGmsv+iOPH3c=
 github.com/portainer/libcrypto v0.0.0-20210422035235-c652195c5c3a h1:qY8TbocN75n5PDl16o0uVr5MevtM5IhdwSelXEd4nFM=
 github.com/portainer/libcrypto v0.0.0-20210422035235-c652195c5c3a/go.mod h1:n54EEIq+MM0NNtqLeCby8ljL+l275VpolXO0ibHegLE=
-github.com/portainer/libhelm v0.0.0-20210913052337-365741c1c320 h1:wkmxoHYjWc7OB6JfSlt83mAVpnAo4/6TdL60PO4DlXk=
-github.com/portainer/libhelm v0.0.0-20210913052337-365741c1c320/go.mod h1:YvYAk7krKTzB+rFwDr0jQ3sQu2BtiXK1AR0sZH7nhJA=
+github.com/portainer/libhelm v0.0.0-20210916010643-0ac6d4427599 h1:1f8OOrxYeQt5dDA6o+0KqeqAeU3mvbFXgKEBGdi+xk8=
+github.com/portainer/libhelm v0.0.0-20210916010643-0ac6d4427599/go.mod h1:YvYAk7krKTzB+rFwDr0jQ3sQu2BtiXK1AR0sZH7nhJA=
 github.com/portainer/libhttp v0.0.0-20190806161843-ba068f58be33 h1:H8HR2dHdBf8HANSkUyVw4o8+4tegGcd+zyKZ3e599II=
 github.com/portainer/libhttp v0.0.0-20190806161843-ba068f58be33/go.mod h1:Y2TfgviWI4rT2qaOTHr+hq6MdKIE5YjgQAu7qwptTV0=
 github.com/robfig/cron/v3 v3.0.1 h1:WdRxkvbJztn8LMz/QEvLN5sBU+xKpSqwwUO1Pjr4qDs=
