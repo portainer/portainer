@@ -66,8 +66,6 @@ func (transport *baseTransport) proxyNamespacedRequest(request *http.Request, fu
 	}
 
 	switch {
-	case strings.HasPrefix(requestPath, "secrets"):
-		return transport.proxySecretRequest(request, namespace, requestPath)
 	case requestPath == "" && request.Method == "DELETE":
 		return transport.proxyNamespaceDeleteOperation(request, namespace)
 	default:
@@ -79,6 +77,7 @@ func (transport *baseTransport) executeKubernetesRequest(request *http.Request) 
 
 	resp, err := transport.httpTransport.RoundTrip(request)
 
+	// This fix was made to resolve a k8s e2e test, more detailed investigation should be done later.
 	if err == nil && resp.StatusCode == http.StatusMovedPermanently {
 		oldLocation := resp.Header.Get("Location")
 		if oldLocation != "" {
