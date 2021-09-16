@@ -1,7 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import KubernetesStackHelper from 'Kubernetes/helpers/stackHelper';
-import KubernetesApplicationHelper, { PodKubernetesInstanceLabel } from 'Kubernetes/helpers/application';
+import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
 
@@ -109,18 +109,9 @@ class KubernetesApplicationsController {
     try {
       const [applications, configurations] = await Promise.all([this.KubernetesApplicationService.get(), this.KubernetesConfigurationService.get()]);
       const configuredApplications = KubernetesConfigurationHelper.getApplicationConfigurations(applications, configurations);
-      const helmApplications = KubernetesApplicationHelper.getHelmApplications(configuredApplications);
+      const { helmApplications, nonHelmApplications } = KubernetesApplicationHelper.getNestedApplications(configuredApplications);
 
-      // filter out multi-chart helm managed applications
-      const helmAppNames = [...new Set(helmApplications.map((hma) => hma.Name))]; // distinct helm app names
-      const nonHelmApps = configuredApplications.filter(
-        (app) =>
-          !app.Pods.flatMap((pod) => pod.Labels) // flatten pod labels
-            .filter((label) => label) // filter out empty labels
-            .some((label) => helmAppNames.includes(label[PodKubernetesInstanceLabel])) // check if label key is in helmAppNames
-      );
-
-      this.state.applications = [...nonHelmApps, ...helmApplications];
+      this.state.applications = [...helmApplications, ...nonHelmApplications];
       this.state.stacks = KubernetesStackHelper.stacksFromApplications(applications);
       this.state.ports = KubernetesApplicationHelper.portMappingsFromApplications(applications);
     } catch (err) {
