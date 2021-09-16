@@ -56,6 +56,7 @@ class KubernetesApplicationConverter {
     const containers = data.spec.template ? _.without(_.concat(data.spec.template.spec.containers, data.spec.template.spec.initContainers), undefined) : data.spec.containers;
     res.Id = data.metadata.uid;
     res.Name = data.metadata.name;
+    res.Metadata = data.metadata;
 
     if (data.metadata.labels) {
       const { labels } = data.metadata;

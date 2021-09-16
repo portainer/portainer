@@ -449,8 +449,8 @@ class KubernetesApplicationHelper {
     // filter out all the applications that are managed by helm
     // to identify the helm managed applications, we need to check if the applications pod labels include
     // `app.kubernetes.io/instance` and `app.kubernetes.io/managed-by` = `helm`
-    const helmManagedApps = applications.filter((app) =>
-      app.Pods.flatMap((pod) => pod.Labels).some((label) => label && label[PodKubernetesInstanceLabel] && label[PodManagedByLabel] === 'Helm')
+    const helmManagedApps = applications.filter(
+      (app) => app.Metadata.labels && app.Metadata.labels[PodKubernetesInstanceLabel] && app.Metadata.labels[PodManagedByLabel] === 'Helm'
     );
 
     // groups the helm managed applications by helm release name
@@ -467,15 +467,12 @@ class KubernetesApplicationHelper {
     const namespacedHelmReleases = {};
     helmManagedApps.forEach((app) => {
       const namespace = app.ResourcePool;
-      const labels = app.Pods.filter((p) => p.Labels).map((p) => p.Labels[PodKubernetesInstanceLabel]);
-      const uniqueLabels = [...new Set(labels)];
-      uniqueLabels.forEach((instanceStr) => {
-        if (namespacedHelmReleases[namespace]) {
-          namespacedHelmReleases[namespace][instanceStr] = [...(namespacedHelmReleases[namespace][instanceStr] || []), app];
-        } else {
-          namespacedHelmReleases[namespace] = { [instanceStr]: [app] };
-        }
-      });
+      const instanceLabel = app.Metadata.labels[PodKubernetesInstanceLabel];
+      if (namespacedHelmReleases[namespace]) {
+        namespacedHelmReleases[namespace][instanceLabel] = [...(namespacedHelmReleases[namespace][instanceLabel] || []), app];
+      } else {
+        namespacedHelmReleases[namespace] = { [instanceLabel]: [app] };
+      }
     });
 
     // `helmAppsEntriesList` object structure:
@@ -510,6 +507,26 @@ class KubernetesApplicationHelper {
     });
 
     return helmAppsList;
+  }
+
+  /**
+   * Get nested applications -
+   * @param {KubernetesApplication[]} applications Application list
+   * @returns {Object} { helmApplications: [app1, app2, ...], nonHelmApplications: [app3, app4, ...] }
+   */
+  static getNestedApplications(applications) {
+    const helmApplications = KubernetesApplicationHelper.getHelmApplications(applications);
+
+    // filter out helm managed applications
+    const helmAppNames = [...new Set(helmApplications.map((hma) => hma.Name))]; // distinct helm app names
+    const nonHelmApplications = applications.filter((app) => {
+      if (app.Metadata.labels) {
+        return !helmAppNames.includes(app.Metadata.labels[PodKubernetesInstanceLabel]);
+      }
+      return true;
+    });
+
+    return { helmApplications, nonHelmApplications };
   }
 }
 export default KubernetesApplicationHelper;
