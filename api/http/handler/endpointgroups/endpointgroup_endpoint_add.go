@@ -11,13 +11,13 @@ import (
 )
 
 // @id EndpointGroupAddEndpoint
-// @summary Add an environment to an environment group
-// @description Add an environment to an environment group
+// @summary Add an environment(endpoint) to an environment(endpoint) group
+// @description Add an environment(endpoint) to an environment(endpoint) group
 // @description **Access policy**: administrator
 // @tags endpoint_groups
 // @security jwt
 // @param id path int true "EndpointGroup identifier"
-// @param endpointId path int true "Environment identifier"
+// @param endpointId path int true "Environment(Endpoint) identifier"
 // @success 204 "Success"
 // @failure 400 "Invalid request"
 // @failure 404 "EndpointGroup not found"

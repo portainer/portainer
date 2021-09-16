@@ -12,13 +12,13 @@ import (
 )
 
 type endpointGroupCreatePayload struct {
-	// Environment group name
+	// Environment(Endpoint) group name
 	Name string `validate:"required" example:"my-environment-group"`
-	// Environment group description
+	// Environment(Endpoint) group description
 	Description string `example:"description"`
-	// List of environment identifiers that will be part of this group
+	// List of environment(endpoint) identifiers that will be part of this group
 	AssociatedEndpoints []portainer.EndpointID `example:"1,3"`
-	// List of tag identifiers to which this environment group is associated
+	// List of tag identifiers to which this environment(endpoint) group is associated
 	TagIDs []portainer.TagID `example:"1,2"`
 }
 
@@ -32,14 +32,14 @@ func (payload *endpointGroupCreatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// @summary Create an Environment Group
-// @description Create a new environment group.
+// @summary Create an Environment(Endpoint) Group
+// @description Create a new environment(endpoint) group.
 // @description **Access policy**: administrator
 // @tags endpoint_groups
 // @security jwt
 // @accept json
 // @produce json
-// @param body body endpointGroupCreatePayload true "Environment Group details"
+// @param body body endpointGroupCreatePayload true "Environment(Endpoint) Group details"
 // @success 200 {object} portainer.EndpointGroup "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"

@@ -11,7 +11,7 @@ const (
 	settingsKey = "SETTINGS"
 )
 
-// Service represents a service for managing environment data.
+// Service represents a service for managing environment(endpoint) data.
 type Service struct {
 	connection *internal.DbConnection
 }

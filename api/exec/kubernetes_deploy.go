@@ -22,7 +22,7 @@ import (
 	"github.com/portainer/portainer/api/crypto"
 )
 
-// KubernetesDeployer represents a service to deploy resources inside a Kubernetes environment.
+// KubernetesDeployer represents a service to deploy resources inside a Kubernetes environment(endpoint).
 type KubernetesDeployer struct {
 	binaryPath                  string
 	dataStore                   portainer.DataStore
@@ -77,7 +77,7 @@ func (deployer *KubernetesDeployer) getToken(request *http.Request, endpoint *po
 	return token, nil
 }
 
-// Deploy will deploy a Kubernetes manifest inside a specific namespace in a Kubernetes environment.
+// Deploy will deploy a Kubernetes manifest inside a specific namespace in a Kubernetes environment(endpoint).
 // Otherwise it will use kubectl to deploy the manifest.
 func (deployer *KubernetesDeployer) Deploy(request *http.Request, endpoint *portainer.Endpoint, stackConfig string, namespace string) (string, error) {
 	if endpoint.Type == portainer.KubernetesLocalEnvironment {

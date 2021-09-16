@@ -67,8 +67,8 @@ type swarmStackFromFileContentPayload struct {
 	EdgeGroups []portainer.EdgeGroupID `example:"1"`
 	// Deployment type to deploy this stack
 	// Valid values are: 0 - 'compose', 1 - 'kubernetes'
-	// for compose stacks will use kompose to convert to kubernetes manifest for kubernetes environments
-	// kubernetes deploytype is enabled only for kubernetes environments
+	// for compose stacks will use kompose to convert to kubernetes manifest for kubernetes environments(endpoints)
+	// kubernetes deploytype is enabled only for kubernetes environments(endpoints)
 	DeploymentType portainer.EdgeStackDeploymentType `example:"0" enums:"0,1"`
 }
 
@@ -185,8 +185,8 @@ type swarmStackFromGitRepositoryPayload struct {
 	EdgeGroups []portainer.EdgeGroupID `example:"1"`
 	// Deployment type to deploy this stack
 	// Valid values are: 0 - 'compose', 1 - 'kubernetes'
-	// for compose stacks will use kompose to convert to kubernetes manifest for kubernetes environments
-	// kubernetes deploytype is enabled only for kubernetes environments
+	// for compose stacks will use kompose to convert to kubernetes manifest for kubernetes environments(endpoints)
+	// kubernetes deploytype is enabled only for kubernetes environments(endpoints)
 	DeploymentType portainer.EdgeStackDeploymentType `example:"0" enums:"0,1"`
 }
 
@@ -402,7 +402,7 @@ func (handler *Handler) validateUniqueName(name string) error {
 	return nil
 }
 
-// updateEndpointRelations adds a relation between the Edge Stack to the related environments
+// updateEndpointRelations adds a relation between the Edge Stack to the related environments(endpoints)
 func updateEndpointRelations(endpointRelationService portainer.EndpointRelationService, edgeStackID portainer.EdgeStackID, relatedEndpointIds []portainer.EndpointID) error {
 	for _, endpointID := range relatedEndpointIds {
 		relation, err := endpointRelationService.EndpointRelation(endpointID)

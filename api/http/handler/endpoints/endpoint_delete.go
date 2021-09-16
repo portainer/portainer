@@ -12,15 +12,15 @@ import (
 )
 
 // @id EndpointDelete
-// @summary Remove an environment
-// @description Remove an environment.
+// @summary Remove an environment(endpoint)
+// @description Remove an environment(endpoint).
 // @description **Access policy**: administrator
 // @tags endpoints
 // @security jwt
-// @param id path int true "Environment identifier"
+// @param id path int true "Environment(Endpoint) identifier"
 // @success 204 "Success"
 // @failure 400 "Invalid request"
-// @failure 404 "Environment not found"
+// @failure 404 "Environment(Endpoint) not found"
 // @failure 500 "Server error"
 // @router /endpoints/{id} [delete]
 func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

@@ -31,7 +31,7 @@ type (
 	Authorizations map[Authorization]bool
 
 	// AzureCredentials represents the credentials used to connect to an Azure
-	// environment.
+	// environment(endpoint).
 	AzureCredentials struct {
 		// Azure application ID
 		ApplicationID string `json:"ApplicationID" example:"eag7cdo9-o09l-9i83-9dO9-f0b23oe78db4"`
@@ -112,7 +112,7 @@ type (
 		Password string `json:"Password,omitempty" example:"passwd"`
 	}
 
-	// DockerSnapshot represents a snapshot of a specific Docker environment at a specific time
+	// DockerSnapshot represents a snapshot of a specific Docker environment(endpoint) at a specific time
 	DockerSnapshot struct {
 		Time                    int64             `json:"Time"`
 		DockerVersion           string            `json:"DockerVersion"`
@@ -155,7 +155,7 @@ type (
 	// EdgeGroupID represents an Edge group identifier
 	EdgeGroupID int
 
-	// EdgeJob represents a job that can run on Edge environments.
+	// EdgeJob represents a job that can run on Edge environments(endpoints).
 	EdgeJob struct {
 		// EdgeJob Identifier
 		ID             EdgeJobID                          `json:"Id" example:"1"`
@@ -168,7 +168,7 @@ type (
 		Version        int                                `json:"Version"`
 	}
 
-	// EdgeJobEndpointMeta represents a meta data object for an Edge job and Environment relation
+	// EdgeJobEndpointMeta represents a meta data object for an Edge job and Environment(Endpoint) relation
 	EdgeJobEndpointMeta struct {
 		LogsStatus  EdgeJobLogsStatus
 		CollectLogs bool
@@ -180,7 +180,7 @@ type (
 	// EdgeJobLogsStatus represent status of logs collection job
 	EdgeJobLogsStatus int
 
-	// EdgeSchedule represents a scheduled job that can run on Edge environments.
+	// EdgeSchedule represents a scheduled job that can run on Edge environments(endpoints).
 	// Deprecated in favor of EdgeJob
 	EdgeSchedule struct {
 		// EdgeSchedule Identifier
@@ -224,35 +224,35 @@ type (
 	//EdgeStackStatusType represents an edge stack status type
 	EdgeStackStatusType int
 
-	// Environment represents a Docker environment with all the info required
+	// Environment(Endpoint) represents a Docker environment(endpoint) with all the info required
 	// to connect to it
 	Endpoint struct {
-		// Environment Identifier
+		// Environment(Endpoint) Identifier
 		ID EndpointID `json:"Id" example:"1"`
-		// Environment name
+		// Environment(Endpoint) name
 		Name string `json:"Name" example:"my-environment"`
-		// Environment environment type. 1 for a Docker environment, 2 for an agent on Docker environment or 3 for an Azure environment.
+		// Environment(Endpoint) environment(endpoint) type. 1 for a Docker environment(endpoint), 2 for an agent on Docker environment(endpoint) or 3 for an Azure environment(endpoint).
 		Type EndpointType `json:"Type" example:"1"`
-		// URL or IP address of the Docker host associated to this environment
+		// URL or IP address of the Docker host associated to this environment(endpoint)
 		URL string `json:"URL" example:"docker.mydomain.tld:2375"`
-		// Environment group identifier
+		// Environment(Endpoint) group identifier
 		GroupID EndpointGroupID `json:"GroupId" example:"1"`
 		// URL or IP address where exposed containers will be reachable
 		PublicURL        string              `json:"PublicURL" example:"docker.mydomain.tld:2375"`
 		TLSConfig        TLSConfiguration    `json:"TLSConfig"`
 		Extensions       []EndpointExtension `json:"Extensions" example:""`
 		AzureCredentials AzureCredentials    `json:"AzureCredentials,omitempty" example:""`
-		// List of tag identifiers to which this environment is associated
+		// List of tag identifiers to which this environment(endpoint) is associated
 		TagIDs []TagID `json:"TagIds"`
-		// The status of the environment (1 - up, 2 - down)
+		// The status of the environment(endpoint) (1 - up, 2 - down)
 		Status EndpointStatus `json:"Status" example:"1"`
 		// List of snapshots
 		Snapshots []DockerSnapshot `json:"Snapshots" example:""`
-		// List of user identifiers authorized to connect to this environment
+		// List of user identifiers authorized to connect to this environment(endpoint)
 		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
-		// List of team identifiers authorized to connect to this environment
+		// List of team identifiers authorized to connect to this environment(endpoint)
 		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies" example:""`
-		// The identifier of the edge agent associated with this environment
+		// The identifier of the edge agent associated with this environment(endpoint)
 		EdgeID string `json:"EdgeID,omitempty" example:""`
 		// The key which is used to map the agent to Portainer
 		EdgeKey string `json:"EdgeKey" example:""`
@@ -262,7 +262,7 @@ type (
 		Kubernetes KubernetesData `json:"Kubernetes" example:""`
 		// Maximum version of docker-compose
 		ComposeSyntaxMaxVersion string `json:"ComposeSyntaxMaxVersion" example:"3.8"`
-		// Environment specific security settings
+		// Environment(Endpoint) specific security settings
 		SecuritySettings EndpointSecuritySettings
 		// LastCheckInDate mark last check-in date on checkin
 		LastCheckInDate int64
@@ -282,7 +282,7 @@ type (
 		Tags []string `json:"Tags"`
 	}
 
-	// EndpointAuthorizations represents the authorizations associated to a set of environments
+	// EndpointAuthorizations represents the authorizations associated to a set of environments(endpoints)
 	EndpointAuthorizations map[EndpointID]Authorizations
 
 	// EndpointExtension represents a deprecated form of Portainer extension
@@ -292,21 +292,21 @@ type (
 		URL  string                `json:"URL"`
 	}
 
-	// EndpointExtensionType represents the type of an environment extension. Only
-	// one extension of each type can be associated to an environment
+	// EndpointExtensionType represents the type of an environment(endpoint) extension. Only
+	// one extension of each type can be associated to an environment(endpoint)
 	EndpointExtensionType int
 
-	// EndpointGroup represents a group of environments
+	// EndpointGroup represents a group of environments(endpoints)
 	EndpointGroup struct {
-		// Environment group Identifier
+		// Environment(Endpoint) group Identifier
 		ID EndpointGroupID `json:"Id" example:"1"`
-		// Environment group name
+		// Environment(Endpoint) group name
 		Name string `json:"Name" example:"my-environment-group"`
-		// Description associated to the environment group
-		Description        string             `json:"Description" example:"Environment group description"`
+		// Description associated to the environment(endpoint) group
+		Description        string             `json:"Description" example:"Environment(Endpoint) group description"`
 		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies" example:""`
 		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies" example:""`
-		// List of tags associated to this environment group
+		// List of tags associated to this environment(endpoint) group
 		TagIDs []TagID `json:"TagIds"`
 
 		// Deprecated fields
@@ -320,20 +320,20 @@ type (
 		Tags []string `json:"Tags"`
 	}
 
-	// EndpointGroupID represents an environment group identifier
+	// EndpointGroupID represents an environment(endpoint) group identifier
 	EndpointGroupID int
 
-	// EndpointID represents an environment identifier
+	// EndpointID represents an environment(endpoint) identifier
 	EndpointID int
 
-	// EndpointStatus represents the status of an environment
+	// EndpointStatus represents the status of an environment(endpoint)
 	EndpointStatus int
 
-	// EndpointSyncJob represents a scheduled job that synchronize environments based on an external file
+	// EndpointSyncJob represents a scheduled job that synchronize environments(endpoints) based on an external file
 	// Deprecated
 	EndpointSyncJob struct{}
 
-	// EndpointSecuritySettings represents settings for an environment
+	// EndpointSecuritySettings represents settings for an environment(endpoint)
 	EndpointSecuritySettings struct {
 		// Whether non-administrator should be able to use bind mounts when creating containers
 		AllowBindMountsForRegularUsers bool `json:"allowBindMountsForRegularUsers" example:"false"`
@@ -355,10 +355,10 @@ type (
 		EnableHostManagementFeatures bool `json:"enableHostManagementFeatures" example:"true"`
 	}
 
-	// EndpointType represents the type of an environment
+	// EndpointType represents the type of an environment(endpoint)
 	EndpointType int
 
-	// EndpointRelation represents a environment relation object
+	// EndpointRelation represents a environment(endpoint) relation object
 	EndpointRelation struct {
 		EndpointID EndpointID
 		EdgeStacks map[EdgeStackID]bool
@@ -428,13 +428,13 @@ type (
 		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
 	}
 
-	// KubernetesData contains all the Kubernetes related environment information
+	// KubernetesData contains all the Kubernetes related environment(endpoint) information
 	KubernetesData struct {
 		Snapshots     []KubernetesSnapshot    `json:"Snapshots"`
 		Configuration KubernetesConfiguration `json:"Configuration"`
 	}
 
-	// KubernetesSnapshot represents a snapshot of a specific Kubernetes environment at a specific time
+	// KubernetesSnapshot represents a snapshot of a specific Kubernetes environment(endpoint) at a specific time
 	KubernetesSnapshot struct {
 		Time              int64  `json:"Time"`
 		KubernetesVersion string `json:"KubernetesVersion"`
@@ -443,7 +443,7 @@ type (
 		TotalMemory       int64  `json:"TotalMemory"`
 	}
 
-	// KubernetesConfiguration represents the configuration of a Kubernetes environment
+	// KubernetesConfiguration represents the configuration of a Kubernetes environment(endpoint)
 	KubernetesConfiguration struct {
 		UseLoadBalancer          bool                           `json:"UseLoadBalancer"`
 		UseServerMetrics         bool                           `json:"UseServerMetrics"`
@@ -649,7 +649,7 @@ type (
 		// Role name
 		Name string `json:"Name" example:"HelpDesk"`
 		// Role description
-		Description string `json:"Description" example:"Read-only access of all resources in an environment"`
+		Description string `json:"Description" example:"Read-only access of all resources in an environment(endpoint)"`
 		// Authorizations associated to a role
 		Authorizations Authorizations `json:"Authorizations"`
 		Priority       int            `json:"Priority"`
@@ -697,7 +697,7 @@ type (
 		AuthenticationMethod AuthenticationMethod `json:"AuthenticationMethod" example:"1"`
 		LDAPSettings         LDAPSettings         `json:"LDAPSettings" example:""`
 		OAuthSettings        OAuthSettings        `json:"OAuthSettings" example:""`
-		// The interval in which environment snapshots are created
+		// The interval in which environment(endpoint) snapshots are created
 		SnapshotInterval string `json:"SnapshotInterval" example:"5m"`
 		// URL to the templates that will be displayed in the UI when navigating to App Templates
 		TemplatesURL string `json:"TemplatesURL" example:"https://raw.githubusercontent.com/portainer/templates/master/templates.json"`
@@ -729,7 +729,7 @@ type (
 		AllowContainerCapabilitiesForRegularUsers bool `json:"AllowContainerCapabilitiesForRegularUsers"`
 	}
 
-	// SnapshotJob represents a scheduled job that can create environment snapshots
+	// SnapshotJob represents a scheduled job that can create environment(endpoint) snapshots
 	SnapshotJob struct{}
 
 	// SoftwareEdition represents an edition of Portainer
@@ -751,13 +751,13 @@ type (
 		Name string `json:"Name" example:"myStack"`
 		// Stack type. 1 for a Swarm stack, 2 for a Compose stack
 		Type StackType `json:"Type" example:"2"`
-		// Environment identifier. Reference the environment that will be used for deployment
+		// Environment(Endpoint) identifier. Reference the environment(endpoint) that will be used for deployment
 		EndpointID EndpointID `json:"EndpointId" example:"1"`
 		// Cluster identifier of the Swarm cluster where the stack is deployed
 		SwarmID string `json:"SwarmId" example:"jpofkc0i9uo9wtx1zesuk649w"`
 		// Path to the Stack file
 		EntryPoint string `json:"EntryPoint" example:"docker-compose.yml"`
-		// A list of environment variables used during stack deployment
+		// A list of environment(endpoint) variables used during stack deployment
 		Env []Pair `json:"Env" example:""`
 		//
 		ResourceControl *ResourceControl `json:"ResourceControl" example:""`
@@ -818,9 +818,9 @@ type (
 		ID TagID `example:"1"`
 		// Tag name
 		Name string `json:"Name" example:"org/acme"`
-		// A set of environment ids that have this tag
+		// A set of environment(endpoint) ids that have this tag
 		Endpoints map[EndpointID]bool `json:"Endpoints"`
-		// A set of environment group ids that have this tag
+		// A set of environment(endpoint) group ids that have this tag
 		EndpointGroups map[EndpointGroupID]bool `json:"EndpointGroups"`
 	}
 
@@ -893,7 +893,7 @@ type (
 		Name string `json:"name,omitempty" example:"mystackname"`
 		// URL of the template's logo
 		Logo string `json:"logo,omitempty" example:"https://cloudinovasi.id/assets/img/logos/nginx.png"`
-		// A list of environment variables used during the template deployment
+		// A list of environment(endpoint) variables used during the template deployment
 		Env []TemplateEnv `json:"env,omitempty"`
 		// A note that will be displayed in the UI. Supports HTML content
 		Note string `json:"note,omitempty" example:"This is my <b>custom</b> template"`
@@ -908,7 +908,7 @@ type (
 		Registry string `json:"registry,omitempty" example:"quay.io"`
 		// The command that will be executed in a container template
 		Command string `json:"command,omitempty" example:"ls -lah"`
-		// Name of a network that will be used on container deployment if it exists inside the environment
+		// Name of a network that will be used on container deployment if it exists inside the environment(endpoint)
 		Network string `json:"network,omitempty" example:"mynet"`
 		// A list of volumes used during the container template deployment
 		Volumes []TemplateVolume `json:"volumes,omitempty"`
@@ -927,9 +927,9 @@ type (
 		Hostname string `json:"hostname,omitempty" example:"mycontainer"`
 	}
 
-	// TemplateEnv represents a template environment variable configuration
+	// TemplateEnv represents a template environment(endpoint) variable configuration
 	TemplateEnv struct {
-		// name of the environment variable
+		// name of the environment(endpoint) variable
 		Name string `json:"name" example:"MYSQL_ROOT_PASSWORD"`
 		// Text for the label that will be generated in the UI
 		Label string `json:"label,omitempty" example:"Root password"`
@@ -992,7 +992,7 @@ type (
 		TLSKeyPath string `json:"TLSKey,omitempty" example:"/data/tls/key.pem"`
 	}
 
-	// TLSFileType represents a type of TLS file required to connect to a Docker environment.
+	// TLSFileType represents a type of TLS file required to connect to a Docker environment(endpoint).
 	// It can be either a TLS CA file, a TLS certificate file or a TLS key file
 	TLSFileType int
 
@@ -1138,7 +1138,7 @@ type (
 		CreateSignature(message string) (string, error)
 	}
 
-	// DockerSnapshotter represents a service used to create Docker environment snapshots
+	// DockerSnapshotter represents a service used to create Docker environment(endpoint) snapshots
 	DockerSnapshotter interface {
 		CreateSnapshot(endpoint *Endpoint) (*DockerSnapshot, error)
 	}
@@ -1172,7 +1172,7 @@ type (
 		GetNextIdentifier() int
 	}
 
-	// EndpointService represents a service for managing environment data
+	// EndpointService represents a service for managing environment(endpoint) data
 	EndpointService interface {
 		Endpoint(ID EndpointID) (*Endpoint, error)
 		Endpoints() ([]Endpoint, error)
@@ -1183,7 +1183,7 @@ type (
 		GetNextIdentifier() int
 	}
 
-	// EndpointGroupService represents a service for managing environment group data
+	// EndpointGroupService represents a service for managing environment(endpoint) group data
 	EndpointGroupService interface {
 		EndpointGroup(ID EndpointGroupID) (*EndpointGroup, error)
 		EndpointGroups() ([]EndpointGroup, error)
@@ -1192,7 +1192,7 @@ type (
 		DeleteEndpointGroup(ID EndpointGroupID) error
 	}
 
-	// EndpointRelationService represents a service for managing environment relations data
+	// EndpointRelationService represents a service for managing environment(endpoint) relations data
 	EndpointRelationService interface {
 		EndpointRelation(EndpointID EndpointID) (*EndpointRelation, error)
 		CreateEndpointRelation(endpointRelation *EndpointRelation) error
@@ -1256,7 +1256,7 @@ type (
 		SetUserSessionDuration(userSessionDuration time.Duration)
 	}
 
-	// KubeClient represents a service used to query a Kubernetes environment
+	// KubeClient represents a service used to query a Kubernetes environment(endpoint)
 	KubeClient interface {
 		SetupUserServiceAccount(userID int, teamIDs []int, restrictDefaultNamespace bool) error
 		GetServiceAccount(tokendata *TokenData) (*v1.ServiceAccount, error)
@@ -1274,13 +1274,13 @@ type (
 		ToggleSystemState(namespace string, isSystem bool) error
 	}
 
-	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes environment
+	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes environment(endpoint)
 	KubernetesDeployer interface {
 		Deploy(request *http.Request, endpoint *Endpoint, data string, namespace string) (string, error)
 		ConvertCompose(data []byte) ([]byte, error)
 	}
 
-	// KubernetesSnapshotter represents a service used to create Kubernetes environment snapshots
+	// KubernetesSnapshotter represents a service used to create Kubernetes environment(endpoint) snapshots
 	KubernetesSnapshotter interface {
 		CreateSnapshot(endpoint *Endpoint) (*KubernetesSnapshot, error)
 	}
@@ -1367,7 +1367,7 @@ type (
 		RefreshableStacks() ([]Stack, error)
 	}
 
-	// SnapshotService represents a service for managing environment snapshots
+	// SnapshotService represents a service for managing environment(endpoint) snapshots
 	SnapshotService interface {
 		Start()
 		Stop()
@@ -1542,7 +1542,7 @@ const (
 	_ EdgeStackStatusType = iota
 	//StatusOk represents a successfully deployed edge stack
 	StatusOk
-	//StatusError represents an edge environment which failed to deploy its edge stack
+	//StatusError represents an edge environment(endpoint) which failed to deploy its edge stack
 	StatusError
 	//StatusAcknowledged represents an acknowledged edge stack
 	StatusAcknowledged
@@ -1556,33 +1556,33 @@ const (
 
 const (
 	_ EndpointStatus = iota
-	// EndpointStatusUp is used to represent an available environment
+	// EndpointStatusUp is used to represent an available environment(endpoint)
 	EndpointStatusUp
-	// EndpointStatusDown is used to represent an unavailable environment
+	// EndpointStatusDown is used to represent an unavailable environment(endpoint)
 	EndpointStatusDown
 )
 
 const (
 	_ EndpointType = iota
-	// DockerEnvironment represents an environment connected to a Docker environment
+	// DockerEnvironment represents an environment(endpoint) connected to a Docker environment(endpoint)
 	DockerEnvironment
-	// AgentOnDockerEnvironment represents an environment connected to a Portainer agent deployed on a Docker environment
+	// AgentOnDockerEnvironment represents an environment(endpoint) connected to a Portainer agent deployed on a Docker environment(endpoint)
 	AgentOnDockerEnvironment
-	// AzureEnvironment represents an environment connected to an Azure environment
+	// AzureEnvironment represents an environment(endpoint) connected to an Azure environment(endpoint)
 	AzureEnvironment
-	// EdgeAgentOnDockerEnvironment represents an environment connected to an Edge agent deployed on a Docker environment
+	// EdgeAgentOnDockerEnvironment represents an environment(endpoint) connected to an Edge agent deployed on a Docker environment(endpoint)
 	EdgeAgentOnDockerEnvironment
-	// KubernetesLocalEnvironment represents an environment connected to a local Kubernetes environment
+	// KubernetesLocalEnvironment represents an environment(endpoint) connected to a local Kubernetes environment(endpoint)
 	KubernetesLocalEnvironment
-	// AgentOnKubernetesEnvironment represents an environment connected to a Portainer agent deployed on a Kubernetes environment
+	// AgentOnKubernetesEnvironment represents an environment(endpoint) connected to a Portainer agent deployed on a Kubernetes environment(endpoint)
 	AgentOnKubernetesEnvironment
-	// EdgeAgentOnKubernetesEnvironment represents an environment connected to an Edge agent deployed on a Kubernetes environment
+	// EdgeAgentOnKubernetesEnvironment represents an environment(endpoint) connected to an Edge agent deployed on a Kubernetes environment(endpoint)
 	EdgeAgentOnKubernetesEnvironment
 )
 
 const (
 	_ JobType = iota
-	// SnapshotJobType is a system job used to create environment snapshots
+	// SnapshotJobType is a system job used to create environment(endpoint) snapshots
 	SnapshotJobType = 2
 )
 
@@ -1701,11 +1701,11 @@ const (
 )
 
 const (
-	// EdgeAgentIdle represents an idle state for a tunnel connected to an Edge environment.
+	// EdgeAgentIdle represents an idle state for a tunnel connected to an Edge environment(endpoint).
 	EdgeAgentIdle string = "IDLE"
-	// EdgeAgentManagementRequired represents a required state for a tunnel connected to an Edge environment
+	// EdgeAgentManagementRequired represents a required state for a tunnel connected to an Edge environment(endpoint)
 	EdgeAgentManagementRequired string = "REQUIRED"
-	// EdgeAgentActive represents an active state for a tunnel connected to an Edge environment
+	// EdgeAgentActive represents an active state for a tunnel connected to an Edge environment(endpoint)
 	EdgeAgentActive string = "ACTIVE"
 )
 

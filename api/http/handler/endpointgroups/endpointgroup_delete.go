@@ -12,8 +12,8 @@ import (
 )
 
 // @id EndpointGroupDelete
-// @summary Remove an environment group
-// @description Remove an environment group.
+// @summary Remove an environment(endpoint) group
+// @description Remove an environment(endpoint) group.
 // @description **Access policy**: administrator
 // @tags endpoint_groups
 // @security jwt

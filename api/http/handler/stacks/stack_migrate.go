@@ -16,7 +16,7 @@ import (
 )
 
 type stackMigratePayload struct {
-	// Environment identifier of the target environment where the stack will be relocated
+	// Environment(Endpoint) identifier of the target environment(endpoint) where the stack will be relocated
 	EndpointID int `example:"2" validate:"required"`
 	// Swarm cluster identifier, must match the identifier of the cluster where the stack will be relocated
 	SwarmID string `example:"jpofkc0i9uo9wtx1zesuk649w"`
@@ -32,14 +32,14 @@ func (payload *stackMigratePayload) Validate(r *http.Request) error {
 }
 
 // @id StackMigrate
-// @summary Migrate a stack to another environment
-// @description  Migrate a stack from an environment to another environment. It will re-create the stack inside the target environment before removing the original stack.
+// @summary Migrate a stack to another environment(endpoint)
+// @description  Migrate a stack from an environment(endpoint) to another environment(endpoint). It will re-create the stack inside the target environment(endpoint) before removing the original stack.
 // @description **Access policy**: restricted
 // @tags stacks
 // @security jwt
 // @produce json
 // @param id path int true "Stack identifier"
-// @param endpointId query int false "Stacks created before version 1.18.0 might not have an associated environment identifier. Use this optional parameter to set the environment identifier used by the stack."
+// @param endpointId query int false "Stacks created before version 1.18.0 might not have an associated environment(endpoint) identifier. Use this optional parameter to set the environment(endpoint) identifier used by the stack."
 // @param body body stackMigratePayload true "Stack migration details"
 // @success 200 {object} portainer.Stack "Success"
 // @failure 400 "Invalid request"
@@ -99,8 +99,8 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	// TODO: this is a work-around for stacks created with Portainer version >= 1.17.1
-	// The EndpointID property is not available for these stacks, this API environment
-	// can use the optional EndpointID query parameter to associate a valid environment identifier to the stack.
+	// The EndpointID property is not available for these stacks, this API environment(endpoint)
+	// can use the optional EndpointID query parameter to associate a valid environment(endpoint) identifier to the stack.
 	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", true)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: endpointId", err}

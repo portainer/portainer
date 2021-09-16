@@ -19,8 +19,8 @@ func NewService(dataStore portainer.DataStore) *Service {
 	}
 }
 
-// DefaultEndpointAuthorizationsForEndpointAdministratorRole returns the default environment authorizations
-// associated to the environment administrator role.
+// DefaultEndpointAuthorizationsForEndpointAdministratorRole returns the default environment(endpoint) authorizations
+// associated to the environment(endpoint) administrator role.
 func DefaultEndpointAuthorizationsForEndpointAdministratorRole() portainer.Authorizations {
 	return map[portainer.Authorization]bool{
 		portainer.OperationDockerContainerArchiveInfo:         true,
@@ -157,7 +157,7 @@ func DefaultEndpointAuthorizationsForEndpointAdministratorRole() portainer.Autho
 	}
 }
 
-// DefaultEndpointAuthorizationsForHelpDeskRole returns the default environment authorizations
+// DefaultEndpointAuthorizationsForHelpDeskRole returns the default environment(endpoint) authorizations
 // associated to the helpdesk role.
 func DefaultEndpointAuthorizationsForHelpDeskRole(volumeBrowsingAuthorizations bool) portainer.Authorizations {
 	authorizations := map[portainer.Authorization]bool{
@@ -216,7 +216,7 @@ func DefaultEndpointAuthorizationsForHelpDeskRole(volumeBrowsingAuthorizations b
 	return authorizations
 }
 
-// DefaultEndpointAuthorizationsForStandardUserRole returns the default environment authorizations
+// DefaultEndpointAuthorizationsForStandardUserRole returns the default environment(endpoint) authorizations
 // associated to the standard user role.
 func DefaultEndpointAuthorizationsForStandardUserRole(volumeBrowsingAuthorizations bool) portainer.Authorizations {
 	authorizations := map[portainer.Authorization]bool{
@@ -350,7 +350,7 @@ func DefaultEndpointAuthorizationsForStandardUserRole(volumeBrowsingAuthorizatio
 	return authorizations
 }
 
-// DefaultEndpointAuthorizationsForReadOnlyUserRole returns the default environment authorizations
+// DefaultEndpointAuthorizationsForReadOnlyUserRole returns the default environment(endpoint) authorizations
 // associated to the readonly user role.
 func DefaultEndpointAuthorizationsForReadOnlyUserRole(volumeBrowsingAuthorizations bool) portainer.Authorizations {
 	authorizations := map[portainer.Authorization]bool{

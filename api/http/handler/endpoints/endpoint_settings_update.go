@@ -36,18 +36,18 @@ func (payload *endpointSettingsUpdatePayload) Validate(r *http.Request) error {
 }
 
 // @id EndpointSettingsUpdate
-// @summary Update settings for an environments
-// @description Update settings for an environments.
+// @summary Update settings for an environments(endpoints)
+// @description Update settings for an environments(endpoints).
 // @description **Access policy**: administrator
 // @security jwt
 // @tags endpoints
 // @accept json
 // @produce json
-// @param id path int true "Environment identifier"
-// @param body body endpointSettingsUpdatePayload true "Environment details"
+// @param id path int true "Environment(Endpoint) identifier"
+// @param body body endpointSettingsUpdatePayload true "Environment(Endpoint) details"
 // @success 200 {object} portainer.Endpoint "Success"
 // @failure 400 "Invalid request"
-// @failure 404 "Environment not found"
+// @failure 404 "Environment(Endpoint) not found"
 // @failure 500 "Server error"
 // @router /api/endpoints/{id}/settings [put]
 func (handler *Handler) endpointSettingsUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

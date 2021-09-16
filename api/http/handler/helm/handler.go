@@ -21,7 +21,7 @@ type requestBouncer interface {
 	AuthenticatedAccess(h http.Handler) http.Handler
 }
 
-// Handler is the HTTP handler used to handle environment group operations.
+// Handler is the HTTP handler used to handle environment(endpoint) group operations.
 type Handler struct {
 	*mux.Router
 	requestBouncer     requestBouncer
@@ -30,7 +30,7 @@ type Handler struct {
 	helmPackageManager libhelm.HelmPackageManager
 }
 
-// NewHandler creates a handler to manage environment group operations.
+// NewHandler creates a handler to manage environment(endpoint) group operations.
 func NewHandler(bouncer requestBouncer, dataStore portainer.DataStore, helmPackageManager libhelm.HelmPackageManager, kubeConfigService kubernetes.KubeConfigService) *Handler {
 	h := &Handler{
 		Router:             mux.NewRouter(),
@@ -62,7 +62,7 @@ func NewHandler(bouncer requestBouncer, dataStore portainer.DataStore, helmPacka
 	return h
 }
 
-// NewTemplateHandler creates a template handler to manage environment group operations.
+// NewTemplateHandler creates a template handler to manage environment(endpoint) group operations.
 func NewTemplateHandler(bouncer requestBouncer, helmPackageManager libhelm.HelmPackageManager) *Handler {
 	h := &Handler{
 		Router:             mux.NewRouter(),

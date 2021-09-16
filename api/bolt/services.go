@@ -196,7 +196,7 @@ func (store *Store) EdgeStack() portainer.EdgeStackService {
 	return store.EdgeStackService
 }
 
-// Environment gives access to the Environment data management layer
+// Environment(Endpoint) gives access to the Environment(Endpoint) data management layer
 func (store *Store) Endpoint() portainer.EndpointService {
 	return store.EndpointService
 }

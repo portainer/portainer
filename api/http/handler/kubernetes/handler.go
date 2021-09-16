@@ -14,7 +14,7 @@ import (
 	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
-// Handler is the HTTP handler which will natively deal with to external environments.
+// Handler is the HTTP handler which will natively deal with to external environments(endpoints).
 type Handler struct {
 	*mux.Router
 	dataStore               portainer.DataStore

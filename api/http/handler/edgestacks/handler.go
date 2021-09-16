@@ -13,7 +13,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// Handler is the HTTP handler used to handle environment group operations.
+// Handler is the HTTP handler used to handle environment(endpoint) group operations.
 type Handler struct {
 	*mux.Router
 	requestBouncer     *security.RequestBouncer
@@ -23,7 +23,7 @@ type Handler struct {
 	KubernetesDeployer portainer.KubernetesDeployer
 }
 
-// NewHandler creates a handler to manage environment group operations.
+// NewHandler creates a handler to manage environment(endpoint) group operations.
 func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{
 		Router:         mux.NewRouter(),

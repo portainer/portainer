@@ -15,8 +15,8 @@ import (
 // Authentication and access is controlled via the mandatory token query parameter.
 // The request will proxy input from the client to the pod via long-lived websocket connection.
 // The following query parameters are mandatory:
-// * token: JWT token used for authentication against this environment
-// * endpointId: environment ID of the environment where the resource is located
+// * token: JWT token used for authentication against this environment(endpoint)
+// * endpointId: environment(endpoint) ID of the environment(endpoint) where the resource is located
 func (handler *Handler) websocketShellPodExec(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)
 	if err != nil {

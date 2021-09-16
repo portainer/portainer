@@ -24,12 +24,12 @@ import (
 // @tags websocket
 // @accept json
 // @produce json
-// @param endpointId query int true "environment ID of the environment where the resource is located"
+// @param endpointId query int true "environment(endpoint) ID of the environment(endpoint) where the resource is located"
 // @param namespace query string true "namespace where the container is located"
 // @param podName query string true "name of the pod containing the container"
 // @param containerName query string true "name of the container"
 // @param command query string true "command to execute in the container"
-// @param token query string true "JWT token used for authentication against this environment"
+// @param token query string true "JWT token used for authentication against this environment(endpoint)"
 // @success 200
 // @failure 400
 // @failure 403

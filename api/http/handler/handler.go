@@ -102,11 +102,11 @@ type Handler struct {
 // @tag.name edge_templates
 // @tag.description Manage Edge Templates
 // @tag.name edge
-// @tag.description Manage Edge related environment settings
+// @tag.description Manage Edge related environment(endpoint) settings
 // @tag.name endpoints
-// @tag.description Manage Docker environments
+// @tag.description Manage Docker environments(endpoints)
 // @tag.name endpoint_groups
-// @tag.description Manage environment groups
+// @tag.description Manage environment(endpoint) groups
 // @tag.name kubernetes
 // @tag.description Manage Kubernetes cluster
 // @tag.name motd

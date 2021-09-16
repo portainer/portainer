@@ -9,9 +9,9 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
-// Service repesents a service to manage environment snapshots.
+// Service repesents a service to manage environment(endpoint) snapshots.
 // It provides an interface to start background snapshots as well as
-// specific Docker/Kubernetes environment snapshot methods.
+// specific Docker/Kubernetes environment(endpoint) snapshot methods.
 type Service struct {
 	dataStore                 portainer.DataStore
 	refreshSignal             chan struct{}
@@ -37,7 +37,7 @@ func NewService(snapshotInterval string, dataStore portainer.DataStore, dockerSn
 	}, nil
 }
 
-// Start will start a background routine to execute periodic snapshots of environments
+// Start will start a background routine to execute periodic snapshots of environments(endpoints)
 func (service *Service) Start() {
 	if service.refreshSignal != nil {
 		return
@@ -72,8 +72,8 @@ func (service *Service) SetSnapshotInterval(snapshotInterval string) error {
 	return nil
 }
 
-// SupportDirectSnapshot checks whether an environment can be used to trigger a direct a snapshot.
-// It is mostly true for all environments except Edge and Azure environments.
+// SupportDirectSnapshot checks whether an environment(endpoint) can be used to trigger a direct a snapshot.
+// It is mostly true for all environments(endpoints) except Edge and Azure environments(endpoints).
 func SupportDirectSnapshot(endpoint *portainer.Endpoint) bool {
 	switch endpoint.Type {
 	case portainer.EdgeAgentOnDockerEnvironment, portainer.EdgeAgentOnKubernetesEnvironment, portainer.AzureEnvironment:
@@ -82,8 +82,8 @@ func SupportDirectSnapshot(endpoint *portainer.Endpoint) bool {
 	return true
 }
 
-// SnapshotEndpoint will create a snapshot of the environment based on the environment type.
-// If the snapshot is a success, it will be associated to the environment.
+// SnapshotEndpoint will create a snapshot of the environment(endpoint) based on the environment(endpoint) type.
+// If the snapshot is a success, it will be associated to the environment(endpoint).
 func (service *Service) SnapshotEndpoint(endpoint *portainer.Endpoint) error {
 	switch endpoint.Type {
 	case portainer.AzureEnvironment:
@@ -189,7 +189,7 @@ func (service *Service) snapshotEndpoints() error {
 	return nil
 }
 
-// FetchDockerID fetches info.Swarm.Cluster.ID if environment is swarm and info.ID otherwise
+// FetchDockerID fetches info.Swarm.Cluster.ID if environment(endpoint) is swarm and info.ID otherwise
 func FetchDockerID(snapshot portainer.DockerSnapshot) (string, error) {
 	info, done := snapshot.SnapshotRaw.Info.(map[string]interface{})
 	if !done {

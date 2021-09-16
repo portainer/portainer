@@ -17,14 +17,14 @@ import (
 // @security jwt
 // @accept json
 // @produce json
-// @param id path int true "Environment identifier"
+// @param id path int true "Environment(Endpoint) identifier"
 // @param namespace query string true "specify an optional namespace"
 // @param filter query string true "specify an optional filter"
 // @param selector query string true "specify an optional selector"
 // @success 200 {array} release.ReleaseElement "Success"
-// @failure 400 "Invalid environment identifier"
+// @failure 400 "Invalid environment(endpoint) identifier"
 // @failure 401 "Unauthorized"
-// @failure 404 "Environment or ServiceAccount not found"
+// @failure 404 "Environment(Endpoint) or ServiceAccount not found"
 // @failure 500 "Server error"
 // @router /endpoints/{id}/kubernetes/helm [get]
 func (handler *Handler) helmList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
