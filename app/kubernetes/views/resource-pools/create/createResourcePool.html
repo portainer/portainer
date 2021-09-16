@@ -191,15 +191,13 @@
             </div>
             <div class="form-group">
               <div class="col-sm-12">
-                <label class="control-label text-left">
-                  Enable quota
-                </label>
-                <label class="switch" style="margin-left: 20px;" data-cy="k8sNamespaceCreate-enableQuotaToggle"> <input type="checkbox" disabled /><i></i> </label>
-                <span class="text-muted small" style="margin-left: 15px;">
-                  <i class="fa fa-user" aria-hidden="true"></i>
-                  This feature is available in
-                  <a href="https://www.portainer.io/business-upsell?from=k8s-resourcepool-storagequota" target="_blank"> Portainer Business Edition</a>.
-                </span>
+                <por-switch-field
+                  ng-data-cy="k8sNamespaceCreate-enableQuotaToggle"
+                  label="Enable quota"
+                  name="k8s-resourcepool-storagequota"
+                  feature="'k8s-resourcepool-storagequota'"
+                  ng-model="storagequota"
+                ></por-switch-field>
               </div>
             </div>
             <!-- #endregion -->
