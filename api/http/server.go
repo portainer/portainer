@@ -171,7 +171,7 @@ func (server *Server) Start() error {
 
 	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"))
 
-	var endpointHelmHandler = helm.NewHandler(requestBouncer, server.DataStore, server.HelmPackageManager, server.KubeConfigService)
+	var endpointHelmHandler = helm.NewHandler(requestBouncer, server.DataStore, server.KubernetesDeployer, server.HelmPackageManager, server.KubeConfigService)
 
 	var helmTemplatesHandler = helm.NewTemplateHandler(requestBouncer, server.HelmPackageManager)
 
