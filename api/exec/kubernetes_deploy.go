@@ -88,9 +88,12 @@ func (deployer *KubernetesDeployer) Deploy(userID portainer.UserID, endpoint *po
 		command = path.Join(deployer.binaryPath, "kubectl.exe")
 	}
 
-	args, err := deployer.composeConfigArgs(token, endpoint, namespace)
+	args, proxy, err := deployer.initCommandArgsAndProxy(token, endpoint, namespace)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to compose kubectl args")
+	}
+	if proxy != nil {
+		defer proxy.Close()
 	}
 
 	var fileArgs []string
@@ -125,9 +128,12 @@ func (deployer *KubernetesDeployer) Remove(userID portainer.UserID, endpoint *po
 		command = path.Join(deployer.binaryPath, "kubectl.exe")
 	}
 
-	args, err := deployer.composeConfigArgs(token, endpoint, namespace)
+	args, proxy, err := deployer.initCommandArgsAndProxy(token, endpoint, namespace)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to compose kubectl args")
+	}
+	if proxy != nil {
+		defer proxy.Close()
 	}
 
 	var fileArgs []string
@@ -182,17 +188,19 @@ func (deployer *KubernetesDeployer) getAgentURL(endpoint *portainer.Endpoint) (s
 	return fmt.Sprintf("http://127.0.0.1:%d/kubernetes", proxy.Port), proxy, nil
 }
 
-func (deployer *KubernetesDeployer) composeConfigArgs(token string, endpoint *portainer.Endpoint, namespace string) ([]string, error) {
+func (deployer *KubernetesDeployer) initCommandArgsAndProxy(token string, endpoint *portainer.Endpoint, namespace string) ([]string, *factory.ProxyServer, error) {
 
 	args := make([]string, 0)
 
-	if endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
-		url, proxy, err := deployer.getAgentURL(endpoint)
-		if err != nil {
-			return nil, errors.WithMessage(err, "failed generating endpoint URL")
-		}
+	var proxy *factory.ProxyServer
 
-		defer proxy.Close()
+	if endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
+		var url string
+		var err error
+		url, proxy, err = deployer.getAgentURL(endpoint)
+		if err != nil {
+			return nil, nil, errors.WithMessage(err, "failed generating endpoint URL")
+		}
 		args = append(args, "--server", url)
 		args = append(args, "--insecure-skip-tls-verify")
 	}
@@ -200,5 +208,5 @@ func (deployer *KubernetesDeployer) composeConfigArgs(token string, endpoint *po
 	args = append(args, "--token", token)
 	args = append(args, "--namespace", namespace)
 
-	return args, nil
+	return args, proxy, nil
 }
