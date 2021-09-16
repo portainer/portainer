@@ -135,7 +135,7 @@ func (handler *Handler) installChart(r *http.Request, p installChartPayload) (*r
 		return nil, err
 	}
 
-	manifest, err := handler.applyPortainerLabelsToHelmAppManifest(r, installOpts)
+	manifest, err := handler.applyPortainerLabelsToHelmAppManifest(r, installOpts, release.Manifest)
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +151,7 @@ func (handler *Handler) installChart(r *http.Request, p installChartPayload) (*r
 // applyPortainerLabelsToHelmAppManifest will patch all the resources deployed in the helm release manifest
 // with portainer specific labels. This is to mark the resources as managed by portainer - hence the helm apps
 // wont appear external in the portainer UI.
-func (handler *Handler) applyPortainerLabelsToHelmAppManifest(r *http.Request, installOpts options.InstallOptions) ([]byte, error) {
+func (handler *Handler) applyPortainerLabelsToHelmAppManifest(r *http.Request, installOpts options.InstallOptions, manifest string) ([]byte, error) {
 	// Patch helm release by adding with portainer labels to all deployed resources
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
@@ -162,19 +162,8 @@ func (handler *Handler) applyPortainerLabelsToHelmAppManifest(r *http.Request, i
 		return nil, errors.Wrap(err, "Unable to load user information from the database")
 	}
 
-	getOpts := options.GetOptions{
-		Name:                    installOpts.Name,
-		ReleaseResource:         "as",
-		Namespace:               installOpts.Namespace,
-		KubernetesClusterAccess: installOpts.KubernetesClusterAccess,
-	}
-	manifest, err := handler.helmPackageManager.Get(getOpts)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to get helm release manifest")
-	}
-
-	appLabels := kubernetes.GetHelmAppLabels(getOpts.Name, user.Username)
-	labeledManifest, err := kubernetes.AddAppLabels(manifest, appLabels)
+	appLabels := kubernetes.GetHelmAppLabels(installOpts.Name, user.Username)
+	labeledManifest, err := kubernetes.AddAppLabels([]byte(manifest), appLabels)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to label helm release manifest")
 	}
