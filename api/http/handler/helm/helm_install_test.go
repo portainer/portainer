@@ -13,6 +13,7 @@ import (
 	"github.com/portainer/libhelm/release"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt"
+	"github.com/portainer/portainer/api/exec/exectest"
 	"github.com/portainer/portainer/api/http/security"
 	helper "github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/portainer/portainer/api/kubernetes"
@@ -31,9 +32,10 @@ func Test_helmInstall(t *testing.T) {
 	err = store.User().CreateUser(&portainer.User{Username: "admin", Role: portainer.AdministratorRole})
 	is.NoError(err, "error creating a user")
 
+	kubernetesDeployer := exectest.NewKubernetesDeployer()
 	helmPackageManager := test.NewMockHelmBinaryPackageManager("")
 	kubeConfigService := kubernetes.NewKubeConfigCAService("", "")
-	h := NewHandler(helper.NewTestRequestBouncer(), store, helmPackageManager, kubeConfigService)
+	h := NewHandler(helper.NewTestRequestBouncer(), store, kubernetesDeployer, helmPackageManager, kubeConfigService)
 
 	is.NotNil(h, "Handler should not fail")
 
