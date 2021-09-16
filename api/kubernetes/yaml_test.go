@@ -410,7 +410,7 @@ spec:
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := AddAppLabels([]byte(tt.input), labels)
+			result, err := AddAppLabels([]byte(tt.input), labels.ToMap())
 			assert.NoError(t, err)
 			assert.Equal(t, tt.wantOutput, string(result))
 		})
@@ -451,7 +451,7 @@ spec:
       targetPort: 5000
 `
 
-	result, err := AddAppLabels([]byte(input), labels)
+	result, err := AddAppLabels([]byte(input), labels.ToMap())
 	assert.NoError(t, err)
 	assert.Equal(t, expected, string(result))
 }
@@ -487,7 +487,171 @@ spec:
       targetPort: 5000
 `
 
-	result, err := AddAppLabels([]byte(input), labels)
+	result, err := AddAppLabels([]byte(input), labels.ToMap())
 	assert.NoError(t, err)
 	assert.Equal(t, expected, string(result))
+}
+
+func Test_AddAppLabels_HelmApp(t *testing.T) {
+	labels := GetHelmAppLabels("best-name", "best-owner")
+
+	tests := []struct {
+		name       string
+		input      string
+		wantOutput string
+	}{
+		{
+			name: "bitnami nginx configmap",
+			input: `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-test-server-block
+  labels:
+    app.kubernetes.io/name: nginx
+    helm.sh/chart: nginx-9.5.4
+    app.kubernetes.io/instance: nginx-test
+    app.kubernetes.io/managed-by: Helm
+data:
+  server-blocks-paths.conf: |-
+    include  "/opt/bitnami/nginx/conf/server_blocks/ldap/*.conf";
+    include  "/opt/bitnami/nginx/conf/server_blocks/common/*.conf";
+`,
+			wantOutput: `apiVersion: v1
+data:
+  server-blocks-paths.conf: |-
+    include  "/opt/bitnami/nginx/conf/server_blocks/ldap/*.conf";
+    include  "/opt/bitnami/nginx/conf/server_blocks/common/*.conf";
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/instance: nginx-test
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nginx
+    helm.sh/chart: nginx-9.5.4
+    io.portainer.kubernetes.application.name: best-name
+    io.portainer.kubernetes.application.owner: best-owner
+  name: nginx-test-server-block
+`,
+		},
+		{
+			name: "bitnami nginx service",
+			input: `apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-test
+  labels:
+    app.kubernetes.io/name: nginx
+    helm.sh/chart: nginx-9.5.4
+    app.kubernetes.io/instance: nginx-test
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: "Cluster"
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+  selector:
+    app.kubernetes.io/name: nginx
+    app.kubernetes.io/instance: nginx-test
+`,
+			wantOutput: `apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: nginx-test
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nginx
+    helm.sh/chart: nginx-9.5.4
+    io.portainer.kubernetes.application.name: best-name
+    io.portainer.kubernetes.application.owner: best-owner
+  name: nginx-test
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+  selector:
+    app.kubernetes.io/instance: nginx-test
+    app.kubernetes.io/name: nginx
+  type: LoadBalancer
+`,
+		},
+		{
+			name: "bitnami nginx deployment",
+			input: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-test
+  labels:
+    app.kubernetes.io/name: nginx
+    helm.sh/chart: nginx-9.5.4
+    app.kubernetes.io/instance: nginx-test
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nginx
+      app.kubernetes.io/instance: nginx-test
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nginx
+        helm.sh/chart: nginx-9.5.4
+        app.kubernetes.io/instance: nginx-test
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      automountServiceAccountToken: false
+      shareProcessNamespace: false
+      serviceAccountName: default
+      containers:
+        - name: nginx
+          image: docker.io/bitnami/nginx:1.21.3-debian-10-r0
+          imagePullPolicy: "IfNotPresent"
+`,
+			wantOutput: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: nginx-test
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nginx
+    helm.sh/chart: nginx-9.5.4
+    io.portainer.kubernetes.application.name: best-name
+    io.portainer.kubernetes.application.owner: best-owner
+  name: nginx-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: nginx-test
+      app.kubernetes.io/name: nginx
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: nginx-test
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: nginx
+        helm.sh/chart: nginx-9.5.4
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - image: docker.io/bitnami/nginx:1.21.3-debian-10-r0
+          imagePullPolicy: IfNotPresent
+          name: nginx
+      serviceAccountName: default
+      shareProcessNamespace: false
+`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := AddAppLabels([]byte(tt.input), labels)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.wantOutput, string(result))
+		})
+	}
 }

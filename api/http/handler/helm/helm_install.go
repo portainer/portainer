@@ -1,17 +1,20 @@
 package helm
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"os"
 	"strings"
 
+	"github.com/pkg/errors"
 	"github.com/portainer/libhelm/options"
 	"github.com/portainer/libhelm/release"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
+	"github.com/portainer/portainer/api/http/middlewares"
+	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/kubernetes/validation"
 )
 
@@ -131,5 +134,65 @@ func (handler *Handler) installChart(r *http.Request, p installChartPayload) (*r
 	if err != nil {
 		return nil, err
 	}
+
+	manifest, err := handler.applyPortainerLabelsToHelmAppManifest(r, installOpts)
+	if err != nil {
+		return nil, err
+	}
+
+	err = handler.updateHelmAppManifest(r, manifest, installOpts.Namespace)
+	if err != nil {
+		return nil, err
+	}
+
 	return release, nil
+}
+
+// applyPortainerLabelsToHelmAppManifest will patch all the resources deployed in the helm release manifest
+// with portainer specific labels. This is to mark the resources as managed by portainer - hence the helm apps
+// wont appear external in the portainer UI.
+func (handler *Handler) applyPortainerLabelsToHelmAppManifest(r *http.Request, installOpts options.InstallOptions) ([]byte, error) {
+	// Patch helm release by adding with portainer labels to all deployed resources
+	tokenData, err := security.RetrieveTokenData(r)
+	if err != nil {
+		return nil, errors.Wrap(err, "Unable to retrieve user details from authentication token")
+	}
+	user, err := handler.dataStore.User().User(tokenData.ID)
+	if err != nil {
+		return nil, errors.Wrap(err, "Unable to load user information from the database")
+	}
+
+	getOpts := options.GetOptions{
+		Name:                    installOpts.Name,
+		ReleaseResource:         "as",
+		Namespace:               installOpts.Namespace,
+		KubernetesClusterAccess: installOpts.KubernetesClusterAccess,
+	}
+	manifest, err := handler.helmPackageManager.Get(getOpts)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get helm release manifest")
+	}
+
+	appLabels := kubernetes.GetHelmAppLabels(getOpts.Name, user.Username)
+	labeledManifest, err := kubernetes.AddAppLabels(manifest, appLabels)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to label helm release manifest")
+	}
+
+	return labeledManifest, nil
+}
+
+// updateHelmAppManifest will update the resources of helm release manifest with portainer labels using kubectl.
+// NOTE: These updates will need to be re-applied when upgrading the helm release
+func (handler *Handler) updateHelmAppManifest(r *http.Request, manifest []byte, namespace string) error {
+	endpoint, err := middlewares.FetchEndpoint(r)
+	if err != nil {
+		return errors.Wrap(err, "Unable to find an endpoint on request context")
+	}
+	_, err = handler.kubernetesDeployer.Deploy(r, endpoint, string(manifest), namespace)
+	if err != nil {
+		return errors.Wrap(err, "Unable to patch helm release using kubectl")
+	}
+
+	return nil
 }

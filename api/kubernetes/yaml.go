@@ -36,6 +36,14 @@ func (kal *KubeAppLabels) ToMap() map[string]string {
 	}
 }
 
+// GetHelmAppLabels returns the labels to be applied to portainer deployed helm applications
+func GetHelmAppLabels(name, owner string) map[string]string {
+	return map[string]string{
+		labelPortainerAppName:  name,
+		labelPortainerAppOwner: owner,
+	}
+}
+
 // AddAppLabels adds required labels to "Resource"->metadata->labels.
 // It'll add those labels to all Resource (nodes with a kind property exluding a list) it can find in provided yaml.
 // Items in the yaml file could either be organised as a list or broken into multi documents.
