@@ -7,6 +7,6 @@
     ng-disabled="$ctrl.disabled || $ctrl.limitedToBE"
     ng-change="$ctrl.onChange($ctrl.ngModel)"
   />
-  <i></i>
+  <i data-cy="{{::$ctrl.ngDataCy}}"></i>
 </label>
 <be-feature-indicator ng-if="$ctrl.limitedToBE" feature="$ctrl.feature"></be-feature-indicator>

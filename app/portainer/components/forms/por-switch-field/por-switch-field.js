@@ -8,6 +8,7 @@ export const porSwitchField = {
     label: '@',
     name: '@',
     labelClass: '@',
+    ngDataCy: '@',
     disabled: '<',
     onChange: '<',
     feature: '<', // feature id

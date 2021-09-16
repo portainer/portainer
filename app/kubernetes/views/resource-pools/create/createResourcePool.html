@@ -162,7 +162,13 @@
             </div>
             <div class="form-group">
               <div class="col-sm-12">
-                <por-switch-field label="Load Balancer quota" name="k8s-resourcepool-Ibquota" feature="'k8s-resourcepool-Ibquota'" ng-model="lbquota"></por-switch-field>
+                <por-switch-field
+                  ng-data-cy="k8sNamespaceCreate-loadBalancerQuotaToggle"
+                  label="Load Balancer quota"
+                  name="k8s-resourcepool-Ibquota"
+                  feature="'k8s-resourcepool-Ibquota'"
+                  ng-model="lbquota"
+                ></por-switch-field>
               </div>
             </div>
             <!-- #endregion -->

@@ -11,6 +11,7 @@ const porSwitch = {
     id: '@',
     className: '@',
     name: '@',
+    ngDataCy: '@',
     disabled: '<',
     onChange: '<',
     feature: '<', // feature id
