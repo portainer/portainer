@@ -30,7 +30,7 @@
         >
           <template-item-actions>
             <div ng-if="$ctrl.isEditAllowed(template)" style="display: flex;">
-              <a ui-state="$ctrl.editPath" ui-state-params="({id: template.Id})" ng-click="$event.stopPropagation();" class="btn btn-primary btn-xs" style="margin-right: 10px;">
+              <a ui-state="$ctrl.editPath" ui-state-params="{id: template.Id}" ng-click="$event.stopPropagation();" class="btn btn-primary btn-xs" style="margin-right: 10px;">
                 Edit
               </a>
               <button class="btn btn-danger btn-xs" ng-click="$ctrl.onDeleteClick(template.Id); $event.stopPropagation();">Delete</button>
