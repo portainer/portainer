@@ -10,8 +10,44 @@
       <rd-widget>
         <rd-widget-body>
           <form class="form-horizontal" name="kubernetesConfigurationCreationForm" autocomplete="off">
+            <div class="col-sm-12 form-section-title">
+              Namespace
+            </div>
+
+            <!-- resource-pool -->
+            <div class="form-group" ng-if="ctrl.formValues.ResourcePool">
+              <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Namespace</label>
+              <div class="col-sm-11">
+                <select
+                  class="form-control"
+                  id="resource-pool-selector"
+                  ng-model="ctrl.formValues.ResourcePool"
+                  ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools"
+                  data-cy="k8sConfigCreate-namespaceDropdown"
+                ></select>
+              </div>
+            </div>
+            <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
+              <div class="col-sm-12 small text-warning">
+                <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                This namespace has exhausted its resource capacity and you will not be able to deploy the configuration. Contact your administrator to expand the capacity of the
+                namespace.
+              </div>
+            </div>
+            <div class="form-group" ng-if="!ctrl.formValues.ResourcePool">
+              <div class="col-sm-12 small text-muted">
+                <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                You do not have access to any namespace. Contact your administrator to get access to a namespace.
+              </div>
+            </div>
+            <!-- !resource-pool -->
+
             <!-- name -->
-            <div class="form-group">
+            <div class="col-sm-12 form-section-title">
+              Configuration name
+            </div>
+            <div class="form-group"
+              >=
               <label for="configuration_name" class="col-sm-1 control-label text-left">Name</label>
               <div class="col-sm-11">
                 <input
@@ -43,32 +79,6 @@
               </div>
             </div>
             <!-- !name -->
-
-            <div class="col-sm-12 form-section-title">
-              Namespace
-            </div>
-
-            <!-- resource-pool -->
-            <div class="form-group">
-              <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Namespace</label>
-              <div class="col-sm-11">
-                <select
-                  class="form-control"
-                  id="resource-pool-selector"
-                  ng-model="ctrl.formValues.ResourcePool"
-                  ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools"
-                  data-cy="k8sConfigCreate-namespaceDropdown"
-                ></select>
-              </div>
-            </div>
-            <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
-              <div class="col-sm-12 small text-warning">
-                <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                This namespace has exhausted its resource capacity and you will not be able to deploy the configuration. Contact your administrator to expand the capacity of the
-                namespace.
-              </div>
-            </div>
-            <!-- !resource-pool -->
 
             <div class="col-sm-12 form-section-title">
               Configuration type

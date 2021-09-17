@@ -230,7 +230,10 @@ class KubernetesDeployController {
       });
 
       this.namespaces = namespaces;
-      this.formValues.Namespace = this.namespaces[0].Name;
+
+      if (this.namespaces.length > 0) {
+        this.formValues.Namespace = this.namespaces[0].Name;
+      }
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load namespaces data');
     }
