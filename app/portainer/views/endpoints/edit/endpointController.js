@@ -283,7 +283,7 @@ docker run -d \\
     -e CAP_HOST_MANAGEMENT=1 \\
     -e EDGE_INSECURE_POLL=${allowSelfSignedCerts ? 1 : 0} \\
     --name portainer_edge_agent \\
-    portainer/agent:2.4.0`;
+    portainer/agent`;
   }
 
   function buildWindowsStandaloneCommand(edgeId, edgeKey, allowSelfSignedCerts) {
