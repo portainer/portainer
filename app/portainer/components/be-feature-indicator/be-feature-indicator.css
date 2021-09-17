@@ -1,0 +1,14 @@
+.be-indicator {
+  border: solid 1px var(--BE-only);
+  border-radius: 15px;
+  padding: 5px 10px;
+  font-weight: 400;
+}
+
+.be-indicator:hover {
+  text-decoration: none;
+}
+
+.be-indicator:hover .be-indicator-label {
+  text-decoration: underline;
+}
