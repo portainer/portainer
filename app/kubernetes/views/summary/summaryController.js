@@ -20,7 +20,7 @@ class KubernetesSummaryController {
     $scope.$watch(
       '$ctrl.formValues',
       (formValues) => {
-        this.state.resources = this.generateResourceSummaryList(formValues);
+        this.state.resources = this.generateResourceSummaryList(angular.copy(formValues));
       },
       true
     );

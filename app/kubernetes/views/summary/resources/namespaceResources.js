@@ -5,7 +5,7 @@ import { KubernetesResourceTypes } from 'Kubernetes/models/resource-types/models
 import { getResourcesSummary } from 'Kubernetes/views/summary/resources/helpers';
 
 export default function (newFormValues, oldFormValues) {
-  const [newNamespace, newQuota, newIngresses] = KubernetesResourcePoolConverter.formValuesToResourcePool(angular.copy(newFormValues));
+  const [newNamespace, newQuota, newIngresses] = KubernetesResourcePoolConverter.formValuesToResourcePool(newFormValues);
 
   if (!(oldFormValues instanceof KubernetesResourcePoolFormValues)) {
     oldFormValues = new KubernetesResourcePoolFormValues(KubernetesResourceQuotaDefaults);
