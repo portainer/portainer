@@ -78,15 +78,15 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Permission denied to access endpoint", Err: err}
 	}
 
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve info from request context", Err: err}
+	}
+
 	if stack.Type == portainer.DockerSwarmStack || stack.Type == portainer.DockerComposeStack {
 		resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)
 		if err != nil {
 			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve a resource control associated to the stack", Err: err}
-		}
-
-		securityContext, err := security.RetrieveRestrictedRequestContext(r)
-		if err != nil {
-			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve info from request context", Err: err}
 		}
 
 		access, err := handler.userCanAccessStack(securityContext, endpoint.ID, resourceControl)
@@ -144,7 +144,7 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	stack.Name = oldName
-	err = handler.deleteStack(stack, endpoint)
+	err = handler.deleteStack(securityContext.UserID, stack, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: err.Error(), Err: err}
 	}

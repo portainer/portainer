@@ -166,8 +166,6 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist the Kubernetes stack inside the database", Err: err}
 	}
 
-	doCleanUp = false
-
 	resp := &createKubernetesStackResponse{
 		Output: output,
 	}
@@ -284,14 +282,11 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist the stack inside the database", Err: err}
 	}
 
-	doCleanUp = false
-
 	resp := &createKubernetesStackResponse{
 		Output: output,
 	}
 
 	doCleanUp = false
-
 	return response.JSON(w, resp)
 }
 
