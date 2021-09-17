@@ -51,3 +51,19 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.switch.limited {
+  pointer-events: none;
+  touch-action: none;
+}
+
+.switch.limited i {
+  opacity: 1;
+  cursor: not-allowed;
+  padding-right: 0;
+  padding-left: var(--switch-size);
+}
+
+.switch.business i {
+  background-color: var(--BE-only);
+}
