@@ -34,8 +34,18 @@ class KubernetesApplicationsController {
     let actionCount = selectedItems.length;
     for (const stack of selectedItems) {
       try {
-        const promises = _.map(stack.Applications, (app) => this.KubernetesApplicationService.delete(app));
-        await Promise.all(promises);
+        const isAppFormCreated = stack.Applications.some((x) => !x.ApplicationKind);
+
+        if (isAppFormCreated) {
+          const promises = _.map(stack.Applications, (app) => this.KubernetesApplicationService.delete(app));
+          await Promise.all(promises);
+        } else {
+          const stack = stack.Applications.find((x) => x.StackId !== null);
+          if (stack && stack.stackId) {
+            await this.StackService.remove({ Id: stack.stackId }, false, this.endpoint.Id);
+          }
+        }
+
         this.Notifications.success('Stack successfully removed', stack.Name);
         _.remove(this.stacks, { Name: stack.Name });
       } catch (err) {
