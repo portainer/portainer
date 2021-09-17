@@ -104,7 +104,7 @@ angular.module('portainer.docker').controller('ImageController', [
         try {
           const registryModel = await RegistryService.retrievePorRegistryModelFromRepository(repository, endpoint.Id);
           await ImageService.pullImage(registryModel);
-          Notifications.success('Image successfully pushed', repository);
+          Notifications.success('Image successfully pulled', repository);
         } catch (err) {
           Notifications.error('Failure', err, 'Unable to push image to repository');
         } finally {
