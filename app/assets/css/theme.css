@@ -88,8 +88,13 @@ html {
 
   --green-1: #164;
   --green-2: #1ec863;
+
+  --orange-1: #e86925;
+
+  --BE-only: var(--orange-1);
 }
 
+/* Default Theme */
 :root {
   --bg-card-color: var(--grey-10);
   --bg-main-color: var(--white-color);

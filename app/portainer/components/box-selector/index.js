@@ -15,6 +15,6 @@ angular.module('portainer.app').component('boxSelector', {
   },
 });
 
-export function buildOption(id, icon, label, description, value) {
-  return { id, icon, label, description, value };
+export function buildOption(id, icon, label, description, value, feature) {
+  return { id, icon, label, description, value, feature };
 }

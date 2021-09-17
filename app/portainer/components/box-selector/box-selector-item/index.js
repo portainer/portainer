@@ -1,7 +1,12 @@
 import angular from 'angular';
 
+import './box-selector-item.css';
+
+import controller from './box-selector-item.controller';
+
 angular.module('portainer.app').component('boxSelectorItem', {
   templateUrl: './box-selector-item.html',
+  controller,
   bindings: {
     radioName: '@',
     isChecked: '<',
