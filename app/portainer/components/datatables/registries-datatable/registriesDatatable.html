@@ -54,6 +54,21 @@
             </tr>
           </thead>
           <tbody>
+            <tr>
+              <td>
+                <span class="md-checkbox" ng-if="$ctrl.isAdmin && !$ctrl.endpointType">
+                  <input id="select_{{ $index }}" type="checkbox" disabled />
+                  <label for="select_{{ $index }}"></label>
+                </span>
+                <span>DockerHub (anonymous)</span>
+              </td>
+              <td>
+                docker.io
+              </td>
+              <td>
+                -
+              </td>
+            </tr>
             <tr
               dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))"
               ng-class="{ active: item.Checked }"
