@@ -269,6 +269,7 @@
                             ng-model="item.Host"
                             ng-change="$ctrl.onChangeIngressHostname()"
                             placeholder="foo"
+                            pattern="[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*"
                             required
                           />
                         </div>
@@ -288,6 +289,10 @@
                       >
                         <ng-messages for="resourcePoolCreationForm['hostname_' + ic.IngressClass.Name + '_' + $index].$error">
                           <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Hostname is required.</p>
+                          <p ng-message="pattern">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            This field must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com').
+                          </p>
                         </ng-messages>
                         <p ng-if="$ctrl.state.duplicates.ingressHosts.refs[ic.IngressClass.Name][$index] !== undefined">
                           <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This hostname is already used.

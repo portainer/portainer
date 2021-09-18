@@ -34,7 +34,7 @@ class KubernetesCreateResourcePoolController {
   onChangeIngressHostname() {
     const state = this.state.duplicates.ingressHosts;
     const hosts = _.flatMap(this.formValues.IngressClasses, 'Hosts');
-    const hostnames = _.map(hosts, 'Host');
+    const hostnames = _.compact(hosts.map((h) => h.Host));
     const hostnamesWithoutRemoved = _.filter(hostnames, (h) => !h.NeedsDeletion);
     const allHosts = _.flatMap(this.allIngresses, 'Hosts');
     const formDuplicates = KubernetesFormValidationHelper.getDuplicates(hostnamesWithoutRemoved);
