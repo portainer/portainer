@@ -1,6 +1,5 @@
 import _ from 'lodash-es';
 import { RegistryTypes } from 'Portainer/models/registryTypes';
-import { DockerHubViewModel } from 'Portainer/models/dockerhub';
 
 angular.module('portainer.app').controller('RegistriesController', [
   '$q',
@@ -59,7 +58,7 @@ angular.module('portainer.app').controller('RegistriesController', [
         registries: RegistryService.registries(),
       })
         .then(function success(data) {
-          $scope.registries = _.concat(new DockerHubViewModel(), data.registries);
+          $scope.registries = data.registries;
         })
         .catch(function error(err) {
           $scope.registries = [];
