@@ -1,5 +1,3 @@
-import { STATES } from '@/portainer/feature-flags/enums';
-
 export default class PorSwitchController {
   /* @ngInject */
   constructor(featureService) {
@@ -10,9 +8,7 @@ export default class PorSwitchController {
 
   $onInit() {
     if (this.feature) {
-      const state = this.featureService.selectShow(this.feature);
-
-      this.limitedToBE = state === STATES.LIMITED_BE;
+      this.limitedToBE = this.featureService.isLimitedToBE(this.feature);
     }
   }
 }

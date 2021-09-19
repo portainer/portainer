@@ -1,5 +1,3 @@
-import { STATES } from '@/portainer/feature-flags/enums';
-
 export default class BoxSelectorItemController {
   /* @ngInject */
   constructor(featureService) {
@@ -10,9 +8,7 @@ export default class BoxSelectorItemController {
 
   $onInit() {
     if (this.option.feature) {
-      const state = this.featureService.selectShow(this.option.feature);
-
-      this.limitedToBE = state === STATES.LIMITED_BE;
+      this.limitedToBE = this.featureService.isLimitedToBE(this.feature);
     }
   }
 }
