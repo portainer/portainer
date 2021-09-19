@@ -40,9 +40,9 @@ class KubernetesApplicationsController {
           const promises = _.map(stack.Applications, (app) => this.KubernetesApplicationService.delete(app));
           await Promise.all(promises);
         } else {
-          const stack = stack.Applications.find((x) => x.StackId !== null);
-          if (stack && stack.stackId) {
-            await this.StackService.remove({ Id: stack.stackId }, false, this.endpoint.Id);
+          const application = stack.Applications.find((x) => x.StackId !== null);
+          if (application && application.stackId) {
+            await this.StackService.remove({ Id: application.stackId }, false, this.endpoint.Id);
           }
         }
 
