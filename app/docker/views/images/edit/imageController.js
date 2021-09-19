@@ -106,7 +106,7 @@ angular.module('portainer.docker').controller('ImageController', [
           await ImageService.pullImage(registryModel);
           Notifications.success('Image successfully pulled', repository);
         } catch (err) {
-          Notifications.error('Failure', err, 'Unable to push image to repository');
+          Notifications.error('Failure', err, 'Unable to pull image from repository');
         } finally {
           $('#downloadResourceHint').hide();
         }
