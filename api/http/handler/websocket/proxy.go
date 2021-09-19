@@ -35,6 +35,9 @@ func (handler *Handler) proxyEdgeAgentWebsocketRequest(w http.ResponseWriter, r 
 	}
 
 	handler.ReverseTunnelService.SetTunnelStatusToActive(params.endpoint.ID)
+
+	handler.ReverseTunnelService.KeepTunnelAlive(params.endpoint.ID, r.Context(), portainer.WebSocketKeepAlive)
+
 	proxy.ServeHTTP(w, r)
 
 	return nil
