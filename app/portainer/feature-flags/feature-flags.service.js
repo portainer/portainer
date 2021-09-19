@@ -9,6 +9,7 @@ export function featureService() {
   return {
     selectShow,
     init,
+    isLimitedToBE,
   };
 
   async function init() {
@@ -24,19 +25,23 @@ export function featureService() {
     state.features = features;
   }
 
-  function selectShow(featureID) {
-    if (!state.features[featureID]) {
+  function selectShow(featureId) {
+    if (!state.features[featureId]) {
       return STATES.HIDDEN;
     }
 
-    if (state.features[featureID] <= state.currentEdition) {
+    if (state.features[featureId] <= state.currentEdition) {
       return STATES.VISIBLE;
     }
 
-    if (state.features[featureID] === EDITIONS.BE) {
+    if (state.features[featureId] === EDITIONS.BE) {
       return STATES.LIMITED_BE;
     }
 
     return STATES.HIDDEN;
+  }
+
+  function isLimitedToBE(featureId) {
+    return selectShow(featureId) === STATES.LIMITED_BE;
   }
 }
