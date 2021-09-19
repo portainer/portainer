@@ -15,7 +15,7 @@ import (
 type StackDeployer interface {
 	DeploySwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune bool) error
 	DeployComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry) error
-	DeployKubernetesStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error
+	DeployKubernetesStack(stack *portainer.Stack, endpoint *portainer.Endpoint, user *portainer.User) error
 }
 
 type stackDeployer struct {
@@ -55,14 +55,14 @@ func (d *stackDeployer) DeployComposeStack(stack *portainer.Stack, endpoint *por
 	return d.composeStackManager.Up(context.TODO(), stack, endpoint)
 }
 
-func (d *stackDeployer) DeployKubernetesStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+func (d *stackDeployer) DeployKubernetesStack(stack *portainer.Stack, endpoint *portainer.Endpoint, user *portainer.User) error {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
 	appLabels := k.KubeAppLabels{
 		StackID:   int(stack.ID),
 		StackName: stack.Name,
-		Owner:     stack.CreatedBy,
+		Owner:     user.Username,
 	}
 
 	if stack.GitConfig == nil {
@@ -77,7 +77,7 @@ func (d *stackDeployer) DeployKubernetesStack(stack *portainer.Stack, endpoint *
 	}
 	defer os.RemoveAll(tempDir)
 
-	_, err = d.kubernetesDeployer.Deploy(stack.OwnerUserID, endpoint, manifestFilePaths, stack.Namespace)
+	_, err = d.kubernetesDeployer.Deploy(user.ID, endpoint, manifestFilePaths, stack.Namespace)
 	if err != nil {
 		return errors.Wrap(err, "failed to deploy kubernetes application")
 	}
