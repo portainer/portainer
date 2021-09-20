@@ -27,14 +27,14 @@ func (handler *Handler) endpointRegistriesList(w http.ResponseWriter, r *http.Re
 
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid endpoint identifier route variable", Err: err}
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid environment identifier route variable", Err: err}
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == bolterrors.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
 	}
 
 	isAdmin := securityContext.IsAdmin
@@ -92,7 +92,7 @@ func (handler *Handler) isNamespaceAuthorized(endpoint *portainer.Endpoint, name
 
 	accessPolicies, err := kcl.GetNamespaceAccessPolicies()
 	if err != nil {
-		return false, errors.Wrap(err, "unable to retrieve endpoint's namespaces policies")
+		return false, errors.Wrap(err, "unable to retrieve environment's namespaces policies")
 	}
 
 	namespacePolicy, ok := accessPolicies[namespace]

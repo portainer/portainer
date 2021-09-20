@@ -170,8 +170,6 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 		Output: output,
 	}
 
-	doCleanUp = false
-
 	return response.JSON(w, resp)
 }
 
@@ -353,6 +351,8 @@ func (handler *Handler) createKubernetesStackFromManifestURL(w http.ResponseWrit
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist the Kubernetes stack inside the database", Err: err}
 	}
+
+	doCleanUp = false
 
 	resp := &createKubernetesStackResponse{
 		Output: output,

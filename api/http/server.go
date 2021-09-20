@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/portainer/libhelm"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/adminmonitor"
 	"github.com/portainer/portainer/api/crypto"
@@ -26,6 +27,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
 	"github.com/portainer/portainer/api/http/handler/endpoints"
 	"github.com/portainer/portainer/api/http/handler/file"
+	"github.com/portainer/portainer/api/http/handler/helm"
 	kubehandler "github.com/portainer/portainer/api/http/handler/kubernetes"
 	"github.com/portainer/portainer/api/http/handler/motd"
 	"github.com/portainer/portainer/api/http/handler/registries"
@@ -49,6 +51,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/ssl"
+	k8s "github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/scheduler"
 	stackdeployer "github.com/portainer/portainer/api/stacks"
@@ -76,11 +79,13 @@ type Server struct {
 	SwarmStackManager           portainer.SwarmStackManager
 	ProxyManager                *proxy.Manager
 	KubernetesTokenCacheManager *kubernetes.TokenCacheManager
+	KubeConfigService           k8s.KubeConfigService
 	Handler                     *handler.Handler
 	SSLService                  *ssl.Service
 	DockerClientFactory         *docker.ClientFactory
 	KubernetesClientFactory     *cli.ClientFactory
 	KubernetesDeployer          portainer.KubernetesDeployer
+	HelmPackageManager          libhelm.HelmPackageManager
 	Scheduler                   *scheduler.Scheduler
 	ShutdownCtx                 context.Context
 	ShutdownTrigger             context.CancelFunc
@@ -130,6 +135,7 @@ func (server *Server) Start() error {
 	edgeStacksHandler.DataStore = server.DataStore
 	edgeStacksHandler.FileService = server.FileService
 	edgeStacksHandler.GitService = server.GitService
+	edgeStacksHandler.KubernetesDeployer = server.KubernetesDeployer
 
 	var edgeTemplatesHandler = edgetemplates.NewHandler(requestBouncer)
 	edgeTemplatesHandler.DataStore = server.DataStore
@@ -164,6 +170,10 @@ func (server *Server) Start() error {
 	kubernetesHandler.JwtService = server.JWTService
 
 	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"))
+
+	var endpointHelmHandler = helm.NewHandler(requestBouncer, server.DataStore, server.HelmPackageManager, server.KubeConfigService)
+
+	var helmTemplatesHandler = helm.NewTemplateHandler(requestBouncer, server.HelmPackageManager)
 
 	var motdHandler = motd.NewHandler(requestBouncer)
 
@@ -241,10 +251,12 @@ func (server *Server) Start() error {
 		EdgeTemplatesHandler:   edgeTemplatesHandler,
 		EndpointGroupHandler:   endpointGroupHandler,
 		EndpointHandler:        endpointHandler,
+		EndpointHelmHandler:    endpointHelmHandler,
 		EndpointEdgeHandler:    endpointEdgeHandler,
 		EndpointProxyHandler:   endpointProxyHandler,
-		KubernetesHandler:      kubernetesHandler,
 		FileHandler:            fileHandler,
+		HelmTemplatesHandler:   helmTemplatesHandler,
+		KubernetesHandler:      kubernetesHandler,
 		MOTDHandler:            motdHandler,
 		RegistryHandler:        registryHandler,
 		ResourceControlHandler: resourceControlHandler,

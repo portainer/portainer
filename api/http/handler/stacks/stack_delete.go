@@ -25,7 +25,7 @@ import (
 // @security jwt
 // @param id path int true "Stack identifier"
 // @param external query boolean false "Set to true to delete an external stack. Only external Swarm stacks are supported"
-// @param endpointId query int false "Endpoint identifier used to remove an external stack (required when external is set to true)"
+// @param endpointId query int false "Environment(Endpoint) identifier used to remove an external stack (required when external is set to true)"
 // @success 204 "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"

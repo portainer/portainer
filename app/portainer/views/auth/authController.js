@@ -124,12 +124,12 @@ class AuthenticationController {
       const isAdmin = this.Authentication.isAdmin();
 
       if (endpoints.value.length === 0 && isAdmin) {
-        return this.$state.go('portainer.init.endpoint');
+        return this.$state.go('portainer.wizard');
       } else {
         return this.$state.go('portainer.home');
       }
     } catch (err) {
-      this.error(err, 'Unable to retrieve endpoints');
+      this.error(err, 'Unable to retrieve environments');
     }
   }
 

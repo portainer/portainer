@@ -11,7 +11,7 @@ const (
 	BucketName = "endpoint_relations"
 )
 
-// Service represents a service for managing endpoint relation data.
+// Service represents a service for managing environment(endpoint) relation data.
 type Service struct {
 	connection *internal.DbConnection
 }
@@ -28,7 +28,7 @@ func NewService(connection *internal.DbConnection) (*Service, error) {
 	}, nil
 }
 
-// EndpointRelation returns a Endpoint relation object by EndpointID
+// EndpointRelation returns a Environment(Endpoint) relation object by EndpointID
 func (service *Service) EndpointRelation(endpointID portainer.EndpointID) (*portainer.EndpointRelation, error) {
 	var endpointRelation portainer.EndpointRelation
 	identifier := internal.Itob(int(endpointID))
@@ -55,13 +55,13 @@ func (service *Service) CreateEndpointRelation(endpointRelation *portainer.Endpo
 	})
 }
 
-// UpdateEndpointRelation updates an Endpoint relation object
+// UpdateEndpointRelation updates an Environment(Endpoint) relation object
 func (service *Service) UpdateEndpointRelation(EndpointID portainer.EndpointID, endpointRelation *portainer.EndpointRelation) error {
 	identifier := internal.Itob(int(EndpointID))
 	return internal.UpdateObject(service.connection, BucketName, identifier, endpointRelation)
 }
 
-// DeleteEndpointRelation deletes an Endpoint relation object
+// DeleteEndpointRelation deletes an Environment(Endpoint) relation object
 func (service *Service) DeleteEndpointRelation(EndpointID portainer.EndpointID) error {
 	identifier := internal.Itob(int(EndpointID))
 	return internal.DeleteObject(service.connection, BucketName, identifier)

@@ -54,10 +54,15 @@ class KubernetesDeploymentConverter {
     payload.spec.template.metadata.labels.app = deployment.Name;
     payload.spec.template.metadata.labels[KubernetesPortainerApplicationNameLabel] = deployment.ApplicationName;
     payload.spec.template.spec.containers[0].name = deployment.Name;
-    payload.spec.template.spec.containers[0].image = buildImageFullURI(deployment.ImageModel);
-    if (deployment.ImageModel.Registry && deployment.ImageModel.Registry.Authentication) {
-      payload.spec.template.spec.imagePullSecrets = [{ name: `registry-${deployment.ImageModel.Registry.Id}` }];
+
+    if (deployment.ImageModel) {
+      payload.spec.template.spec.containers[0].image = buildImageFullURI(deployment.ImageModel);
+
+      if (deployment.ImageModel.Registry && deployment.ImageModel.Registry.Authentication) {
+        payload.spec.template.spec.imagePullSecrets = [{ name: `registry-${deployment.ImageModel.Registry.Id}` }];
+      }
     }
+
     payload.spec.template.spec.affinity = deployment.Affinity;
     KubernetesCommonHelper.assignOrDeleteIfEmpty(payload, 'spec.template.spec.containers[0].env', deployment.Env);
     KubernetesCommonHelper.assignOrDeleteIfEmpty(payload, 'spec.template.spec.containers[0].volumeMounts', deployment.VolumeMounts);

@@ -18,7 +18,7 @@ import (
 type Service struct{}
 
 var (
-	errInvalidEndpointProtocol       = errors.New("Invalid endpoint protocol: Portainer only supports unix://, npipe:// or tcp://")
+	errInvalidEndpointProtocol       = errors.New("Invalid environment protocol: Portainer only supports unix://, npipe:// or tcp://")
 	errSocketOrNamedPipeNotFound     = errors.New("Unable to locate Unix socket or named pipe")
 	errInvalidSnapshotInterval       = errors.New("Invalid snapshot interval")
 	errAdminPassExcludeAdminPassFile = errors.New("Cannot use --admin-password with --admin-password-file")
@@ -35,7 +35,7 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		TunnelPort:                kingpin.Flag("tunnel-port", "Port to serve the tunnel server").Default(defaultTunnelServerPort).String(),
 		Assets:                    kingpin.Flag("assets", "Path to the assets").Default(defaultAssetsDirectory).Short('a').String(),
 		Data:                      kingpin.Flag("data", "Path to the folder where the data is stored").Default(defaultDataDirectory).Short('d').String(),
-		EndpointURL:               kingpin.Flag("host", "Endpoint URL").Short('H').String(),
+		EndpointURL:               kingpin.Flag("host", "Environment URL").Short('H').String(),
 		EnableEdgeComputeFeatures: kingpin.Flag("edge-compute", "Enable Edge Compute features").Bool(),
 		NoAnalytics:               kingpin.Flag("no-analytics", "Disable Analytics in app (deprecated)").Bool(),
 		TLS:                       kingpin.Flag("tlsverify", "TLS support").Default(defaultTLS).Bool(),
@@ -47,7 +47,7 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		SSL:                       kingpin.Flag("ssl", "Secure Portainer instance using SSL (deprecated)").Default(defaultSSL).Bool(),
 		SSLCert:                   kingpin.Flag("sslcert", "Path to the SSL certificate used to secure the Portainer instance").String(),
 		SSLKey:                    kingpin.Flag("sslkey", "Path to the SSL key used to secure the Portainer instance").String(),
-		SnapshotInterval:          kingpin.Flag("snapshot-interval", "Duration between each endpoint snapshot job").Default(defaultSnapshotInterval).String(),
+		SnapshotInterval:          kingpin.Flag("snapshot-interval", "Duration between each environment snapshot job").Default(defaultSnapshotInterval).String(),
 		AdminPassword:             kingpin.Flag("admin-password", "Hashed admin password").String(),
 		AdminPasswordFile:         kingpin.Flag("admin-password-file", "Path to the file containing the password for the admin user").String(),
 		Labels:                    pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l')),

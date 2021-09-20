@@ -25,7 +25,7 @@ func WithEndpoint(endpointService portainer.EndpointService, endpointIDParam str
 
 			endpointID, err := requesthelpers.RetrieveNumericRouteVariableValue(request, endpointIDParam)
 			if err != nil {
-				httperror.WriteError(rw, http.StatusBadRequest, "Invalid endpoint identifier route variable", err)
+				httperror.WriteError(rw, http.StatusBadRequest, "Invalid environment identifier route variable", err)
 				return
 			}
 
@@ -36,7 +36,7 @@ func WithEndpoint(endpointService portainer.EndpointService, endpointIDParam str
 				if err == bolterrors.ErrObjectNotFound {
 					statusCode = http.StatusNotFound
 				}
-				httperror.WriteError(rw, statusCode, "Unable to find an endpoint with the specified identifier inside the database", err)
+				httperror.WriteError(rw, statusCode, "Unable to find an environment with the specified identifier inside the database", err)
 				return
 			}
 
@@ -51,7 +51,7 @@ func WithEndpoint(endpointService portainer.EndpointService, endpointIDParam str
 func FetchEndpoint(request *http.Request) (*portainer.Endpoint, error) {
 	contextData := request.Context().Value(contextEndpoint)
 	if contextData == nil {
-		return nil, errors.New("Unable to find endpoint data in request context")
+		return nil, errors.New("Unable to find environment data in request context")
 	}
 
 	return contextData.(*portainer.Endpoint), nil

@@ -1,15 +1,8 @@
-import controller from './git-form.controller.js';
-
-export const gitForm = {
-  templateUrl: './git-form.html',
-  controller,
+export const gitFormComposePathField = {
+  templateUrl: './git-form-compose-path-field.html',
   bindings: {
-    pathTextTitle: '@',
-    pathPlaceholder: '@',
-    model: '<',
+    deployMethod: '@',
+    value: '<',
     onChange: '<',
-    additionalFile: '<',
-    autoUpdate: '<',
-    showAuthExplanation: '<',
   },
 };

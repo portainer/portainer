@@ -296,7 +296,7 @@
                   <select
                     class="form-control"
                     ng-model="config.SelectedConfiguration"
-                    ng-options="c as c.Name for c in ctrl.configurations"
+                    ng-options="c as c.Name for c in ctrl.configurations track by c.Name"
                     ng-change="ctrl.resetConfiguration(index)"
                     ng-disabled="ctrl.formValues.Containers.length > 1"
                   ></select>
@@ -928,7 +928,7 @@
                   </p>
                   <p ng-if="ctrl.isAdmin">
                     Server metrics features must be enabled in the
-                    <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: ctrl.endpoint.Id})" class="ctrl.isAdmin">endpoint configuration view</a>.
+                    <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: ctrl.endpoint.Id})" class="ctrl.isAdmin">environment configuration view</a>.
                   </p>
                 </div>
               </div>

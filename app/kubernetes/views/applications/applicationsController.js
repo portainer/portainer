@@ -2,15 +2,18 @@ import angular from 'angular';
 import _ from 'lodash-es';
 import KubernetesStackHelper from 'Kubernetes/helpers/stackHelper';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
+import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
+import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
 
 class KubernetesApplicationsController {
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesApplicationService, Authentication, ModalService, LocalStorage, StackService) {
+  constructor($async, $state, Notifications, KubernetesApplicationService, HelmService, KubernetesConfigurationService, Authentication, ModalService, LocalStorage, StackService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
     this.KubernetesApplicationService = KubernetesApplicationService;
-
+    this.HelmService = HelmService;
+    this.KubernetesConfigurationService = KubernetesConfigurationService;
     this.Authentication = Authentication;
     this.ModalService = ModalService;
     this.LocalStorage = LocalStorage;
@@ -47,7 +50,7 @@ class KubernetesApplicationsController {
         }
 
         this.Notifications.success('Stack successfully removed', stack.Name);
-        _.remove(this.stacks, { Name: stack.Name });
+        _.remove(this.state.stacks, { Name: stack.Name });
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to remove stack');
       } finally {
@@ -74,10 +77,14 @@ class KubernetesApplicationsController {
     let actionCount = selectedItems.length;
     for (const application of selectedItems) {
       try {
-        await this.KubernetesApplicationService.delete(application);
+        if (application.ApplicationType === KubernetesApplicationTypes.HELM) {
+          await this.HelmService.uninstall(this.endpoint.Id, application);
+        } else {
+          await this.KubernetesApplicationService.delete(application);
+        }
         this.Notifications.success('Application successfully removed', application.Name);
-        const index = this.applications.indexOf(application);
-        this.applications.splice(index, 1);
+        const index = this.state.applications.indexOf(application);
+        this.state.applications.splice(index, 1);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to remove application');
       } finally {
@@ -99,7 +106,7 @@ class KubernetesApplicationsController {
 
   onPublishingModeClick(application) {
     this.state.activeTab = 1;
-    _.forEach(this.ports, (item) => {
+    _.forEach(this.state.ports, (item) => {
       item.Expanded = false;
       item.Highlighted = false;
       if (item.Name === application.Name && item.Ports.length > 1) {
@@ -111,10 +118,13 @@ class KubernetesApplicationsController {
 
   async getApplicationsAsync() {
     try {
-      const applications = await this.KubernetesApplicationService.get();
-      this.applications = applications;
-      this.stacks = KubernetesStackHelper.stacksFromApplications(applications);
-      this.ports = KubernetesApplicationHelper.portMappingsFromApplications(applications);
+      const [applications, configurations] = await Promise.all([this.KubernetesApplicationService.get(), this.KubernetesConfigurationService.get()]);
+      const configuredApplications = KubernetesConfigurationHelper.getApplicationConfigurations(applications, configurations);
+      const { helmApplications, nonHelmApplications } = KubernetesApplicationHelper.getNestedApplications(configuredApplications);
+
+      this.state.applications = [...helmApplications, ...nonHelmApplications];
+      this.state.stacks = KubernetesStackHelper.stacksFromApplications(applications);
+      this.state.ports = KubernetesApplicationHelper.portMappingsFromApplications(applications);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve applications');
     }
@@ -130,8 +140,10 @@ class KubernetesApplicationsController {
       currentName: this.$state.$current.name,
       isAdmin: this.Authentication.isAdmin(),
       viewReady: false,
+      applications: [],
+      stacks: [],
+      ports: [],
     };
-
     await this.getApplications();
 
     this.state.viewReady = true;

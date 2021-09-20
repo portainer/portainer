@@ -42,7 +42,7 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 
 	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environments from database", err}
 	}
 
 	stacks, err := handler.DataStore.Stack().Stacks()

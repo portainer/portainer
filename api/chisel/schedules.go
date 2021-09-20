@@ -6,7 +6,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
-// AddEdgeJob register an EdgeJob inside the tunnel details associated to an endpoint.
+// AddEdgeJob register an EdgeJob inside the tunnel details associated to an environment(endpoint).
 func (service *Service) AddEdgeJob(endpointID portainer.EndpointID, edgeJob *portainer.EdgeJob) {
 	tunnel := service.GetTunnelDetails(endpointID)
 

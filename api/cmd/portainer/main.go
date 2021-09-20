@@ -13,6 +13,7 @@ import (
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/docker"
 
+	"github.com/portainer/libhelm"
 	"github.com/portainer/portainer/api/exec"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/git"
@@ -100,6 +101,10 @@ func initSwarmStackManager(assetsPath string, configPath string, signatureServic
 
 func initKubernetesDeployer(kubernetesTokenCacheManager *kubeproxy.TokenCacheManager, kubernetesClientFactory *kubecli.ClientFactory, dataStore portainer.DataStore, reverseTunnelService portainer.ReverseTunnelService, signatureService portainer.DigitalSignatureService, proxyManager *proxy.Manager, assetsPath string) portainer.KubernetesDeployer {
 	return exec.NewKubernetesDeployer(kubernetesTokenCacheManager, kubernetesClientFactory, dataStore, reverseTunnelService, signatureService, proxyManager, assetsPath)
+}
+
+func initHelmPackageManager(assetsPath string) (libhelm.HelmPackageManager, error) {
+	return libhelm.NewHelmPackageManager(libhelm.HelmConfig{BinaryPath: assetsPath})
 }
 
 func initJWTService(dataStore portainer.DataStore) (portainer.JWTService, error) {
@@ -316,7 +321,7 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, dataStore portainer.Dat
 
 	err := snapshotService.SnapshotEndpoint(endpoint)
 	if err != nil {
-		log.Printf("http error: endpoint snapshot error (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
+		log.Printf("http error: environment snapshot error (environment=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
 	}
 
 	return dataStore.Endpoint().CreateEndpoint(endpoint)
@@ -362,7 +367,7 @@ func createUnsecuredEndpoint(endpointURL string, dataStore portainer.DataStore, 
 
 	err := snapshotService.SnapshotEndpoint(endpoint)
 	if err != nil {
-		log.Printf("http error: endpoint snapshot error (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
+		log.Printf("http error: environment snapshot error (environment=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
 	}
 
 	return dataStore.Endpoint().CreateEndpoint(endpoint)
@@ -379,7 +384,7 @@ func initEndpoint(flags *portainer.CLIFlags, dataStore portainer.DataStore, snap
 	}
 
 	if len(endpoints) > 0 {
-		log.Println("Instance already has defined endpoints. Skipping the endpoint defined via CLI.")
+		log.Println("Instance already has defined environments. Skipping the environment defined via CLI.")
 		return nil
 	}
 
@@ -420,6 +425,11 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Fatal(err)
 	}
 
+	sslSettings, err := sslService.GetSSLSettings()
+	if err != nil {
+		log.Fatalf("failed to get ssl settings: %s", err)
+	}
+
 	err = initKeyPair(fileService, digitalSignatureService)
 	if err != nil {
 		log.Fatalf("failed initializing key pai: %v", err)
@@ -445,6 +455,9 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	authorizationService.K8sClientFactory = kubernetesClientFactory
 
 	kubernetesTokenCacheManager := kubeproxy.NewTokenCacheManager()
+
+	kubeConfigService := kubernetes.NewKubeConfigCAService(*flags.AddrHTTPS, sslSettings.CertPath)
+
 	proxyManager := proxy.NewManager(dataStore, digitalSignatureService, reverseTunnelService, dockerClientFactory, kubernetesClientFactory, kubernetesTokenCacheManager)
 
 	dockerConfigPath := fileService.GetDockerConfigPath()
@@ -457,6 +470,11 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	}
 
 	kubernetesDeployer := initKubernetesDeployer(kubernetesTokenCacheManager, kubernetesClientFactory, dataStore, reverseTunnelService, digitalSignatureService, proxyManager, *flags.Assets)
+
+	helmPackageManager, err := initHelmPackageManager(*flags.Assets)
+	if err != nil {
+		log.Fatalf("failed initializing helm package manager: %s", err)
+	}
 
 	if dataStore.IsNew() {
 		err = updateSettingsFromFlags(dataStore, flags)
@@ -474,7 +492,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	err = initEndpoint(flags, dataStore, snapshotService)
 	if err != nil {
-		log.Fatalf("failed initializing endpoint: %v", err)
+		log.Fatalf("failed initializing environment: %v", err)
 	}
 
 	adminPasswordHash := ""
@@ -518,7 +536,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Fatalf("failed starting tunnel server: %s", err)
 	}
 
-	sslSettings, err := dataStore.SSLSettings().Settings()
+	sslDBSettings, err := dataStore.SSLSettings().Settings()
 	if err != nil {
 		log.Fatalf("failed to fetch ssl settings from DB")
 	}
@@ -533,12 +551,13 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		Status:                      applicationStatus,
 		BindAddress:                 *flags.Addr,
 		BindAddressHTTPS:            *flags.AddrHTTPS,
-		HTTPEnabled:                 sslSettings.HTTPEnabled,
+		HTTPEnabled:                 sslDBSettings.HTTPEnabled,
 		AssetsPath:                  *flags.Assets,
 		DataStore:                   dataStore,
 		SwarmStackManager:           swarmStackManager,
 		ComposeStackManager:         composeStackManager,
 		KubernetesDeployer:          kubernetesDeployer,
+		HelmPackageManager:          helmPackageManager,
 		CryptoService:               cryptoService,
 		JWTService:                  jwtService,
 		FileService:                 fileService,
@@ -547,6 +566,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		GitService:                  gitService,
 		ProxyManager:                proxyManager,
 		KubernetesTokenCacheManager: kubernetesTokenCacheManager,
+		KubeConfigService:           kubeConfigService,
 		SignatureService:            digitalSignatureService,
 		SnapshotService:             snapshotService,
 		SSLService:                  sslService,

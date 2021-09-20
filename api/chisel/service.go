@@ -141,7 +141,7 @@ func (service *Service) checkTunnels() {
 		}
 
 		elapsed := time.Since(tunnel.LastActivity)
-		log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [message: endpoint tunnel monitoring]", item.Key, tunnel.Status, elapsed.Seconds())
+		log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [message: environment tunnel monitoring]", item.Key, tunnel.Status, elapsed.Seconds())
 
 		if tunnel.Status == portainer.EdgeAgentManagementRequired && elapsed.Seconds() < requiredTimeout.Seconds() {
 			continue
@@ -156,19 +156,19 @@ func (service *Service) checkTunnels() {
 
 			endpointID, err := strconv.Atoi(item.Key)
 			if err != nil {
-				log.Printf("[ERROR] [chisel,snapshot,conversion] Invalid endpoint identifier (id: %s): %s", item.Key, err)
+				log.Printf("[ERROR] [chisel,snapshot,conversion] Invalid environment identifier (id: %s): %s", item.Key, err)
 			}
 
 			err = service.snapshotEnvironment(portainer.EndpointID(endpointID), tunnel.Port)
 			if err != nil {
-				log.Printf("[ERROR] [snapshot] Unable to snapshot Edge endpoint (id: %s): %s", item.Key, err)
+				log.Printf("[ERROR] [snapshot] Unable to snapshot Edge environment (id: %s): %s", item.Key, err)
 			}
 		}
 
 		if len(tunnel.Jobs) > 0 {
 			endpointID, err := strconv.Atoi(item.Key)
 			if err != nil {
-				log.Printf("[ERROR] [chisel,conversion] Invalid endpoint identifier (id: %s): %s", item.Key, err)
+				log.Printf("[ERROR] [chisel,conversion] Invalid environment identifier (id: %s): %s", item.Key, err)
 				continue
 			}
 

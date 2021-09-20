@@ -29,7 +29,7 @@ func (payload *edgeGroupUpdatePayload) Validate(r *http.Request) error {
 		return errors.New("TagIDs is mandatory for a dynamic Edge group")
 	}
 	if !payload.Dynamic && (payload.Endpoints == nil || len(payload.Endpoints) == 0) {
-		return errors.New("Endpoints is mandatory for a static Edge group")
+		return errors.New("Environments is mandatory for a static Edge group")
 	}
 	return nil
 }
@@ -44,7 +44,7 @@ func (payload *edgeGroupUpdatePayload) Validate(r *http.Request) error {
 // @param id path int true "EdgeGroup Id"
 // @param body body edgeGroupUpdatePayload true "EdgeGroup data"
 // @success 200 {object} portainer.EdgeGroup
-// @failure 503 Edge compute features are disabled
+// @failure 503 "Edge compute features are disabled"
 // @failure 500
 // @router /edge_groups/{id} [put]
 func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -81,12 +81,12 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 	}
 	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environments from database", err}
 	}
 
 	endpointGroups, err := handler.DataStore.EndpointGroup().EndpointGroups()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint groups from database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environment groups from database", err}
 	}
 
 	oldRelatedEndpoints := edge.EdgeGroupRelatedEndpoints(edgeGroup, endpoints, endpointGroups)
@@ -99,7 +99,7 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 		for _, endpointID := range payload.Endpoints {
 			endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
 			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint from the database", err}
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environment from the database", err}
 			}
 
 			if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
@@ -124,7 +124,7 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 	for _, endpointID := range endpointsToUpdate {
 		err = handler.updateEndpoint(endpointID)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Endpoint relation changes inside the database", err}
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Environment relation changes inside the database", err}
 		}
 	}
 

@@ -13,13 +13,14 @@ export default class KubectlShellController {
   }
 
   disconnect() {
-    this.state.checked = false;
-    this.state.icon = 'fas fa-window-minimize';
-    this.state.shell.socket.close();
-    this.state.shell.term.dispose();
-    this.state.shell.connected = false;
-    this.TerminalWindow.terminalclose();
-    this.$window.onresize = null;
+    if (this.state.shell.connected) {
+      this.state.shell.connected = false;
+      this.state.icon = 'fas fa-window-minimize';
+      this.state.shell.socket.close();
+      this.state.shell.term.dispose();
+      this.TerminalWindow.terminalclose();
+      this.$window.onresize = null;
+    }
   }
 
   screenClear() {
@@ -39,8 +40,7 @@ export default class KubectlShellController {
   }
 
   configureSocketAndTerminal(socket, term) {
-    var vm = this;
-    socket.onopen = function () {
+    socket.onopen = () => {
       const terminal_container = document.getElementById('terminal-container');
       term.open(terminal_container);
       term.setOption('cursorBlink', true);
@@ -51,31 +51,32 @@ export default class KubectlShellController {
       term.writeln('');
     };
 
-    term.on('data', function (data) {
+    term.on('data', (data) => {
       socket.send(data);
     });
 
-    this.$window.onresize = function () {
-      vm.TerminalWindow.terminalresize();
-    };
-
-    socket.onmessage = function (msg) {
+    socket.onmessage = (msg) => {
       term.write(msg.data);
     };
 
-    socket.onerror = function (err) {
+    socket.onerror = (err) => {
       this.disconnect();
-      this.Notifications.error('Failure', err, 'Websocket connection error');
-    }.bind(this);
+      if (err.target.readyState !== WebSocket.CLOSED) {
+        this.Notifications.error('Failure', err, 'Websocket connection error');
+      }
+    };
 
-    this.state.shell.socket.onclose = this.disconnect.bind(this);
+    this.$window.onresize = () => {
+      this.TerminalWindow.terminalresize();
+    };
+
+    socket.onclose = this.disconnect.bind(this);
 
     this.state.shell.connected = true;
   }
 
   connectConsole() {
     this.TerminalWindow.terminalopen();
-    this.state.checked = true;
     this.state.css = 'normal';
 
     const params = {
@@ -101,7 +102,6 @@ export default class KubectlShellController {
     return this.$async(async () => {
       this.state = {
         css: 'normal',
-        checked: false,
         icon: 'fa-window-minimize',
         shell: {
           connected: false,

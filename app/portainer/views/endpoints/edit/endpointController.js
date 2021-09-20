@@ -125,10 +125,10 @@ function EndpointController(
     try {
       $scope.state.actionInProgress = true;
       await EndpointService.deassociateEndpoint(endpoint.Id);
-      Notifications.success('Endpoint de-associated', $scope.endpoint.Name);
+      Notifications.success('Environment de-associated', $scope.endpoint.Name);
       $state.reload();
     } catch (err) {
-      Notifications.error('Failure', err, 'Unable to de-associate endpoint');
+      Notifications.error('Failure', err, 'Unable to de-associate environment');
     } finally {
       $scope.state.actionInProgress = false;
     }
@@ -179,12 +179,12 @@ function EndpointController(
     $scope.state.actionInProgress = true;
     EndpointService.updateEndpoint(endpoint.Id, payload).then(
       function success() {
-        Notifications.success('Endpoint updated', $scope.endpoint.Name);
+        Notifications.success('Environment updated', $scope.endpoint.Name);
         EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
         $state.go('portainer.endpoints', {}, { reload: true });
       },
       function error(err) {
-        Notifications.error('Failure', err, 'Unable to update endpoint');
+        Notifications.error('Failure', err, 'Unable to update environment');
         $scope.state.actionInProgress = false;
       },
       function update(evt) {
@@ -264,7 +264,7 @@ function EndpointController(
 
         configureState();
       } catch (err) {
-        Notifications.error('Failure', err, 'Unable to retrieve endpoint details');
+        Notifications.error('Failure', err, 'Unable to retrieve environment details');
       }
     });
   }

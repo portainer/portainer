@@ -28,6 +28,10 @@ func (m *Migrator) migrateDBVersionToDB32() error {
 		return err
 	}
 
+	if err := m.helmRepositoryURLToDB32(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -138,7 +142,7 @@ func (m *Migrator) updateDockerhubToDB32() error {
 func (m *Migrator) updateVolumeResourceControlToDB32() error {
 	endpoints, err := m.endpointService.Endpoints()
 	if err != nil {
-		return fmt.Errorf("failed fetching endpoints: %w", err)
+		return fmt.Errorf("failed fetching environments: %w", err)
 	}
 
 	resourceControls, err := m.resourceControlService.ResourceControls()
@@ -170,7 +174,7 @@ func (m *Migrator) updateVolumeResourceControlToDB32() error {
 
 		endpointDockerID, err := snapshotutils.FetchDockerID(snapshot)
 		if err != nil {
-			return fmt.Errorf("failed fetching endpoint docker id: %w", err)
+			return fmt.Errorf("failed fetching environment docker id: %w", err)
 		}
 
 		if volumesData, done := snapshot.SnapshotRaw.Volumes.(map[string]interface{}); done {
@@ -222,5 +226,14 @@ func (m *Migrator) kubeconfigExpiryToDB32() error {
 		return err
 	}
 	settings.KubeconfigExpiry = portainer.DefaultKubeconfigExpiry
+	return m.settingsService.UpdateSettings(settings)
+}
+
+func (m *Migrator) helmRepositoryURLToDB32() error {
+	settings, err := m.settingsService.Settings()
+	if err != nil {
+		return err
+	}
+	settings.HelmRepositoryURL = portainer.DefaultHelmRepositoryURL
 	return m.settingsService.UpdateSettings(settings)
 }

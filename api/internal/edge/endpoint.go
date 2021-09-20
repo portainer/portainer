@@ -2,7 +2,7 @@ package edge
 
 import "github.com/portainer/portainer/api"
 
-// EndpointRelatedEdgeStacks returns a list of Edge stacks related to this Endpoint
+// EndpointRelatedEdgeStacks returns a list of Edge stacks related to this Environment(Endpoint)
 func EndpointRelatedEdgeStacks(endpoint *portainer.Endpoint, endpointGroup *portainer.EndpointGroup, edgeGroups []portainer.EdgeGroup, edgeStacks []portainer.EdgeStack) []portainer.EdgeStackID {
 	relatedEdgeGroupsSet := map[portainer.EdgeGroupID]bool{}
 

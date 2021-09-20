@@ -20,7 +20,7 @@ class EndpointAccessController {
       this.endpoint = await this.EndpointService.endpoint(this.$transition$.params().id);
       this.group = await this.GroupService.group(this.endpoint.GroupId);
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve endpoint information');
+      this.Notifications.error('Failure', err, 'Unable to retrieve environment information');
     }
   }
 

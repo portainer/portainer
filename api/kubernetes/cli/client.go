@@ -49,7 +49,7 @@ func (factory *ClientFactory) RemoveKubeClient(endpoint *portainer.Endpoint) {
 	factory.endpointClients.Remove(strconv.Itoa(int(endpoint.ID)))
 }
 
-// GetKubeClient checks if an existing client is already registered for the endpoint and returns it if one is found.
+// GetKubeClient checks if an existing client is already registered for the environment(endpoint) and returns it if one is found.
 // If no client is registered, it will create a new client, register it, and returns it.
 func (factory *ClientFactory) GetKubeClient(endpoint *portainer.Endpoint) (portainer.KubeClient, error) {
 	key := strconv.Itoa(int(endpoint.ID))
@@ -93,7 +93,7 @@ func (factory *ClientFactory) CreateClient(endpoint *portainer.Endpoint) (*kuber
 		return factory.buildEdgeClient(endpoint)
 	}
 
-	return nil, errors.New("unsupported endpoint type")
+	return nil, errors.New("unsupported environment type")
 }
 
 type agentHeaderRoundTripper struct {

@@ -1,0 +1,49 @@
+<div>
+  <div>
+    <!-- tls-file-ca -->
+    <div class="form-group">
+      <label class="col-sm-3 col-lg-2 control-label text-left">TLS CA certificate</label>
+      <div class="col-sm-9 col-lg-10">
+        <button type="button" class="btn btn-sm btn-primary" ngf-select="$ctrl.onChange($file)" ng-model="$ctrl.formData.TLSCACert">Select file</button>
+        <span class="space-left">
+          {{ $ctrl.formData.TLSCACert.name }}
+          <i class="fa fa-check green-icon" ng-if="$ctrl.formData.TLSCACert" aria-hidden="true"></i>
+          <i class="fa fa-times red-icon" ng-if="!$ctrl.formData.TLSCACert" aria-hidden="true"></i>
+        </span>
+      </div>
+    </div>
+    <!-- !tls-file-ca -->
+
+    <!-- tls-files-cert-key -->
+    <div>
+      <!-- tls-file-cert -->
+      <div class="form-group">
+        <label for="tls_cert" class="col-sm-3 col-lg-2 control-label text-left">TLS certificate</label>
+        <div class="col-sm-9 col-lg-10">
+          <button type="button" class="btn btn-sm btn-primary" ngf-select="$ctrl.onChange($file)" ng-model="$ctrl.formData.TLSCert">Select file</button>
+          <span class="space-left">
+            {{ $ctrl.formData.TLSCert.name }}
+            <i class="fa fa-check green-icon" ng-if="$ctrl.formData.TLSCert" aria-hidden="true"></i>
+            <i class="fa fa-times red-icon" ng-if="!$ctrl.formData.TLSCert" aria-hidden="true"></i>
+          </span>
+        </div>
+      </div>
+      <!-- !tls-file-cert -->
+      <!-- tls-file-key -->
+      <div class="form-group">
+        <label class="col-sm-3 col-lg-2 control-label text-left">TLS key</label>
+        <div class="col-sm-9 col-lg-10">
+          <button type="button" class="btn btn-sm btn-primary" ngf-select="$ctrl.onChange($file)" ng-model="$ctrl.formData.TLSKey">Select file</button>
+          <span class="space-left">
+            {{ $ctrl.formData.TLSKey.name }}
+            <i class="fa fa-check green-icon" ng-if="$ctrl.formData.TLSKey" aria-hidden="true"></i>
+            <i class="fa fa-times red-icon" ng-if="!$ctrl.formData.TLSKey" aria-hidden="true"></i>
+          </span>
+        </div>
+      </div>
+      <!-- !tls-file-key -->
+    </div>
+    <!-- tls-files-cert-key -->
+  </div>
+  <!-- !tls-file-upload -->
+</div>

@@ -25,7 +25,7 @@ type swarmStackFromFileContentPayload struct {
 	SwarmID string `example:"jpofkc0i9uo9wtx1zesuk649w" validate:"required"`
 	// Content of the Stack file
 	StackFileContent string `example:"version: 3\n services:\n web:\n image:nginx" validate:"required"`
-	// A list of environment variables used during stack deployment
+	// A list of environment(endpoint) variables used during stack deployment
 	Env []portainer.Pair
 }
 
@@ -110,7 +110,7 @@ type swarmStackFromGitRepositoryPayload struct {
 	Name string `example:"myStack" validate:"required"`
 	// Swarm cluster identifier
 	SwarmID string `example:"jpofkc0i9uo9wtx1zesuk649w" validate:"required"`
-	// A list of environment variables used during stack deployment
+	// A list of environment(endpoint) variables used during stack deployment
 	Env []portainer.Pair
 
 	// URL of a Git repository hosting the Stack file

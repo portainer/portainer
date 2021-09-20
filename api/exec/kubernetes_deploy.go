@@ -18,7 +18,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
-// KubernetesDeployer represents a service to deploy resources inside a Kubernetes environment.
+// KubernetesDeployer represents a service to deploy resources inside a Kubernetes environment(endpoint).
 type KubernetesDeployer struct {
 	binaryPath                  string
 	dataStore                   portainer.DataStore

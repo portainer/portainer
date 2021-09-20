@@ -14,6 +14,7 @@
   font-size: 14px;
   margin-bottom: 5px;
   font-weight: bold;
+  user-select: none;
 }
 
 .boxselector_header .fa,
@@ -46,11 +47,14 @@
   box-shadow: var(--shadow-boxselector-color);
   position: relative;
 }
+
+.box-selector-item input:disabled + label,
 .boxselector_wrapper label.boxselector_disabled {
   background: var(--bg-boxselector-disabled-color) !important;
   border-color: #787878;
   color: #787878;
   cursor: not-allowed;
+  pointer-events: none;
 }
 
 .boxselector_wrapper input[type='radio']:checked + label {

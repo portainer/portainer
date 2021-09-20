@@ -20,7 +20,7 @@ angular.module('portainer.azure', ['portainer.app']).config([
             EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
             await StateManager.updateEndpointState(endpoint, []);
           } catch (e) {
-            Notifications.error('Failed loading endpoint', e);
+            Notifications.error('Failed loading environment', e);
             $state.go('portainer.home', {}, { reload: true });
           }
         });

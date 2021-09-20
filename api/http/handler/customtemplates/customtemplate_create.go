@@ -21,7 +21,7 @@ import (
 // @description **Access policy**: authenticated
 // @tags custom_templates
 // @security jwt
-// @accept json, multipart/form-data
+// @accept json,multipart/form-data
 // @produce json
 // @param method query string true "method for creating template" Enums(string, file, repository)
 // @param body_string body customTemplateFromFileContentPayload false "Required when using method=string"
@@ -279,8 +279,10 @@ func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) er
 	if err != nil {
 		return errors.New("Invalid custom template description")
 	}
-
 	payload.Description = description
+
+	logo, _ := request.RetrieveMultiPartFormValue(r, "Logo", true)
+	payload.Logo = logo
 
 	note, _ := request.RetrieveMultiPartFormValue(r, "Note", true)
 	payload.Note = note

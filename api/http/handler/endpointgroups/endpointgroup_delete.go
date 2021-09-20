@@ -12,8 +12,8 @@ import (
 )
 
 // @id EndpointGroupDelete
-// @summary Remove an endpoint group
-// @description Remove an endpoint group.
+// @summary Remove an environment(endpoint) group
+// @description Remove an environment(endpoint) group.
 // @description **Access policy**: administrator
 // @tags endpoint_groups
 // @security jwt
@@ -28,28 +28,28 @@ import (
 func (handler *Handler) endpointGroupDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointGroupID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint group identifier route variable", err}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment group identifier route variable", err}
 	}
 
 	if endpointGroupID == 1 {
-		return &httperror.HandlerError{http.StatusForbidden, "Unable to remove the default 'Unassigned' group", errors.New("Cannot remove the default endpoint group")}
+		return &httperror.HandlerError{http.StatusForbidden, "Unable to remove the default 'Unassigned' group", errors.New("Cannot remove the default environment group")}
 	}
 
 	endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(portainer.EndpointGroupID(endpointGroupID))
 	if err == bolterrors.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint group with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment group with the specified identifier inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint group with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment group with the specified identifier inside the database", err}
 	}
 
 	err = handler.DataStore.EndpointGroup().DeleteEndpointGroup(portainer.EndpointGroupID(endpointGroupID))
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the endpoint group from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the environment group from the database", err}
 	}
 
 	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environment from the database", err}
 	}
 
 	for _, endpoint := range endpoints {
@@ -57,12 +57,12 @@ func (handler *Handler) endpointGroupDelete(w http.ResponseWriter, r *http.Reque
 			endpoint.GroupID = portainer.EndpointGroupID(1)
 			err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, &endpoint)
 			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint", err}
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update environment", err}
 			}
 
 			err = handler.updateEndpointRelations(&endpoint, nil)
 			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint relations changes inside the database", err}
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist environment relations changes inside the database", err}
 			}
 		}
 	}

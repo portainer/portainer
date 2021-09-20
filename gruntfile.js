@@ -23,6 +23,7 @@ module.exports = function (grunt) {
       dockerLinuxComposeVersion: '1.27.4',
       dockerWindowsComposeVersion: '1.28.0',
       dockerComposePluginVersion: '2.0.0-beta.6',
+      helmVersion: 'v3.6.3',
       komposeVersion: 'v1.22.0',
       kubectlVersion: 'v1.18.0',
     },
@@ -42,6 +43,7 @@ module.exports = function (grunt) {
     'shell:build_binary:linux:' + arch,
     'shell:download_docker_binary:linux:' + arch,
     'shell:download_docker_compose_binary:linux:' + arch,
+    'shell:download_helm_binary:linux:' + arch,
     'shell:download_kompose_binary:linux:' + arch,
     'shell:download_kubectl_binary:linux:' + arch,
   ]);
@@ -69,6 +71,7 @@ module.exports = function (grunt) {
       'shell:build_binary:' + p + ':' + a,
       'shell:download_docker_binary:' + p + ':' + a,
       'shell:download_docker_compose_binary:' + p + ':' + a,
+      'shell:download_helm_binary:' + p + ':' + a,
       'shell:download_kompose_binary:' + p + ':' + a,
       'shell:download_kubectl_binary:' + p + ':' + a,
       'webpack:prod',
@@ -84,6 +87,7 @@ module.exports = function (grunt) {
       'shell:build_binary_azuredevops:' + p + ':' + a,
       'shell:download_docker_binary:' + p + ':' + a,
       'shell:download_docker_compose_binary:' + p + ':' + a,
+      'shell:download_helm_binary:' + p + ':' + a,
       'shell:download_kompose_binary:' + p + ':' + a,
       'shell:download_kubectl_binary:' + p + ':' + a,
       'webpack:prod',
@@ -148,6 +152,7 @@ gruntfile_cfg.shell = {
   download_docker_binary: { command: shell_download_docker_binary },
   download_kompose_binary: { command: shell_download_kompose_binary },
   download_kubectl_binary: { command: shell_download_kubectl_binary },
+  download_helm_binary: { command: shell_download_helm_binary },
   download_docker_compose_binary: { command: shell_download_docker_compose_binary },
   run_container: { command: shell_run_container },
   run_localserver: { command: shell_run_localserver, options: { async: true } },
@@ -233,6 +238,18 @@ function shell_download_docker_compose_binary(p, a) {
     else
       build/download_docker_compose_binary.sh ${ip} ${ia} ${binaryVersion};
     fi`;
+}
+
+function shell_download_helm_binary(p, a) {
+  var binaryVersion = '<%= binaries.helmVersion %>';
+
+  return [
+    'if [ -f dist/helm ] || [ -f dist/helm.exe ]; then',
+    'echo "helm binary exists";',
+    'else',
+    'build/download_helm_binary.sh ' + p + ' ' + a + ' ' + binaryVersion + ';',
+    'fi',
+  ].join(' ');
 }
 
 function shell_download_kompose_binary(p, a) {

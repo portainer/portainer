@@ -16,6 +16,7 @@ const _KubernetesApplication = Object.freeze({
   CreationDate: 0,
   Pods: [],
   Containers: [],
+  Metadata: {},
   Limits: {},
   ServiceType: '',
   ServiceId: '',
@@ -43,6 +44,25 @@ const _KubernetesApplication = Object.freeze({
 export class KubernetesApplication {
   constructor() {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesApplication)));
+  }
+}
+
+/**
+ * HelmApplication Model (Composite)
+ */
+export class HelmApplication {
+  constructor() {
+    this.Id = '';
+    this.Name = '';
+    this.KubernetesApplications = [];
+    this.ApplicationOwner = '';
+    this.CreationDate = 0;
+    this.ApplicationType = 'Unknown';
+    this.Status = '';
+    this.StackName = '-';
+    this.ResourcePool = '-';
+    this.Image = '-';
+    this.PublishedPorts = [];
   }
 }
 

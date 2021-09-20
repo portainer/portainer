@@ -21,22 +21,22 @@ func (payload *namespacesToggleSystemPayload) Validate(r *http.Request) error {
 // @id KubernetesNamespacesToggleSystem
 // @summary Toggle the system state for a namespace
 // @description  Toggle the system state for a namespace
-// @description **Access policy**: administrator or endpoint admin
+// @description **Access policy**: administrator or environment(endpoint) admin
 // @security jwt
 // @tags kubernetes
 // @accept json
-// @param id path int true "Endpoint identifier"
+// @param id path int true "Environment(Endpoint) identifier"
 // @param namespace path string true "Namespace name"
 // @param body body namespacesToggleSystemPayload true "Update details"
 // @success 200 "Success"
 // @failure 400 "Invalid request"
-// @failure 404 "Endpoint not found"
+// @failure 404 "Environment(Endpoint) not found"
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/namespaces/{namespace}/system [put]
 func (handler *Handler) namespacesToggleSystem(rw http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpoint, err := middlewares.FetchEndpoint(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint on request context", err}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment on request context", err}
 	}
 
 	namespaceName, err := request.RetrieveRouteVariableValue(r, "namespace")

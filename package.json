@@ -2,7 +2,7 @@
   "author": "Portainer.io",
   "name": "portainer",
   "homepage": "http://portainer.io",
-  "version": "2.6.3",
+  "version": "2.9.0",
   "repository": {
     "type": "git",
     "url": "git@github.com:portainer/portainer.git"
@@ -20,8 +20,8 @@
     "build": "grunt clean:all && grunt build",
     "build:server": "grunt clean:server && grunt build:server",
     "build:client": "grunt clean:client && grunt build:client",
-    "prebuild:docs": "(! command -v swag &> /dev/null) && go get -u github.com/swaggo/swag/cmd/swag",
-    "build:docs": "cd api && swag init -g ./http/handler/handler.go --markdownFiles ./",
+    "prebuild:docs": "go install github.com/swaggo/swag/cmd/swag@v1.7.1",
+    "build:docs": "cd api && swag init -g ./http/handler/handler.go --parseDependency --parseInternal --parseDepth 2 --markdownFiles ./",
     "clean": "grunt clean:all",
     "start": "grunt start",
     "start:clean": "grunt clean:all && grunt start",

@@ -310,6 +310,10 @@ a[ng-click] {
   padding-top: 15px !important;
 }
 
+.nomargin {
+  margin: 0 !important;
+}
+
 .terminal-container {
   width: 100%;
   padding: 10px 0;
@@ -832,4 +836,9 @@ json-tree .branch-preview {
   display: block;
   text-align: center;
   padding-bottom: 5px;
+}
+
+.text-wrap {
+  word-break: break-all;
+  white-space: normal;
 }

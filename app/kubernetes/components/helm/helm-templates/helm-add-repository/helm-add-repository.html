@@ -1,0 +1,58 @@
+<rd-widget>
+  <rd-widget-header icon="fa-dharmachakra" title-text="Additional repositories"></rd-widget-header>
+  <rd-widget-body>
+    <div class="actionBar">
+      <form class="form-horizontal" name="addUserHelmRepoForm">
+        <div class="form-group">
+          <span class="col-sm-12 text-muted small">
+            Add a Helm repository. All Helm charts in the repository will be added to the list.
+          </span>
+        </div>
+
+        <div class="form-group">
+          <div class="col-sm-12">
+            <input
+              type="url"
+              name="repo"
+              class="form-control"
+              ng-model="$ctrl.state.repository"
+              placeholder="https://charts.bitnami.com/bitnami"
+              ng-pattern="/^https?:///"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-group nomargin" ng-show="addUserHelmRepoForm.repo.$invalid">
+          <div class="col-sm-12 small text-warning">
+            <div ng-messages="addUserHelmRepoForm.repo.$error">
+              <p ng-message="pattern"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A valid URL beginning with http(s) is required.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" ng-show="$ctrl.doesRepoExist()">
+          <div class="col-sm-12 small text-warning">
+            <div> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Helm repo already exists. </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-sm-12">
+            <button
+              type="button"
+              class="btn btn-sm btn-default nomargin"
+              ng-click="$ctrl.addRepository()"
+              ng-disabled="$ctrl.state.isAddingRepo || addUserHelmRepoForm.repo.$invalid || $ctrl.doesRepoExist()"
+              analytics-on
+              analytics-category="kubernetes"
+              analytics-event="kubernetes-helm-add-repository"
+            >
+              Add repository
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </rd-widget-body>
+</rd-widget>

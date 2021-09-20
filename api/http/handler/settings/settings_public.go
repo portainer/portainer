@@ -22,6 +22,8 @@ type publicSettingsResponse struct {
 	OAuthLogoutURI string `json:"OAuthLogoutURI" example:"https://gitlab.com/oauth/logout"`
 	// Whether telemetry is enabled
 	EnableTelemetry bool `json:"EnableTelemetry" example:"true"`
+	// The expiry of a Kubeconfig
+	KubeconfigExpiry string `example:"24h" default:"0"`
 }
 
 // @id SettingsPublic
@@ -49,6 +51,7 @@ func generatePublicSettings(appSettings *portainer.Settings) *publicSettingsResp
 		AuthenticationMethod:      appSettings.AuthenticationMethod,
 		EnableEdgeComputeFeatures: appSettings.EnableEdgeComputeFeatures,
 		EnableTelemetry:           appSettings.EnableTelemetry,
+		KubeconfigExpiry:          appSettings.KubeconfigExpiry,
 	}
 	//if OAuth authentication is on, compose the related fields from application settings
 	if publicSettings.AuthenticationMethod == portainer.AuthenticationOAuth {

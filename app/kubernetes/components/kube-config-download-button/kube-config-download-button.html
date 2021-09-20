@@ -1,11 +1,19 @@
-<button
-  ng-if="$ctrl.state.isHTTPS"
-  type="button"
-  class="btn btn-xs btn-primary"
-  ng-click="$ctrl.downloadKubeconfig()"
-  analytics-on
-  analytics-category="kubernetes"
-  analytics-event="kubernetes-kubectl-kubeconfig"
+<span
+  class="interactive"
+  tooltip-append-to-body="true"
+  tooltip-placement="bottom"
+  tooltip-class="portainer-tooltip"
+  uib-tooltip="Kubeconfig file will {{ $ctrl.state.expiryDays }}"
 >
-  Kubeconfig <i class="fas fa-download space-right"></i>
-</button>
+  <button
+    ng-if="$ctrl.state.isHTTPS"
+    type="button"
+    class="btn btn-xs btn-primary"
+    ng-click="$ctrl.downloadKubeconfig()"
+    analytics-on
+    analytics-category="kubernetes"
+    analytics-event="kubernetes-kubectl-kubeconfig"
+  >
+    Kubeconfig <i class="fas fa-download space-right"></i>
+  </button>
+</span>

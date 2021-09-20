@@ -1,0 +1,172 @@
+<form class="form-horizontal" name="dockerWizardForm">
+  <!-- docker tab selection -->
+  <box-selector radio-name="Docker" ng-click="$ctrl.clearForm()" ng-model="$ctrl.state.endpointType" options="$ctrl.state.availableOptions"></box-selector>
+  <!-- docker tab selection -->
+  <div style="padding-left: 10px;">
+    <div class="form-group">
+      <div ng-if="$ctrl.state.endpointType === 'agent'" class="wizard-code">
+        <uib-tabset>
+          <uib-tab index="0" heading="Linux">
+            <code style="display: block; white-space: pre-wrap; padding: 16px 10px;"
+              ><h6 style="color: #000;">CLI script for installing agent on your Linux environment with Docker Swarm</h6>{{ $ctrl.command.linuxCommand
+              }}<i class="fas fa-copy wizard-copy-button" ng-click="$ctrl.copyLinuxCommand()"></i
+              ><i id="linuxCommandNotification" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none;"></i
+            ></code>
+          </uib-tab>
+
+          <uib-tab index="1" heading="Windows">
+            <code style="display: block; white-space: pre-wrap; padding: 16px 10px;"
+              ><h6 style="color: #000;">CLI script for installing agent on your Windows environment with Docker Swarm</h6>{{ $ctrl.command.winCommand
+              }}<i class="fas fa-copy wizard-copy-button" ng-click="$ctrl.copyWinCommand()"></i
+              ><i id="winCommandNotification" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none;"></i
+            ></code>
+          </uib-tab>
+        </uib-tabset>
+      </div>
+
+      <div ng-if="$ctrl.state.endpointType === 'api' || $ctrl.state.endpointType === 'socket'" class="wizard-code">
+        <uib-tabset active="state.deploymentTab">
+          <uib-tab index="0" heading="Linux">
+            <code style="display: block; white-space: pre-wrap; padding: 16px 10px;"
+              ><h6 style="color: #000;">When using the socket, ensure that you have started the Portainer container with the following Docker flag on Linux</h6
+              >{{ $ctrl.command.linuxSocket }}<i class="fas fa-copy wizard-copy-button" ng-click="$ctrl.copyLinuxSocket()"></i
+              ><i id="linuxSocketNotification" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none;"></i
+            ></code>
+          </uib-tab>
+
+          <uib-tab index="1" heading="Windows">
+            <code style="display: block; white-space: pre-wrap; padding: 16px 10px;"
+              ><h6 style="color: #000;">When using the socket, ensure that you have started the Portainer container with the following Docker flag on Windows</h6
+              >{{ $ctrl.command.winSocket }}<i class="fas fa-copy wizard-copy-button" ng-click="$ctrl.copyWinSocket()"></i
+              ><i id="winSocketNotification" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none;"></i
+            ></code>
+          </uib-tab>
+        </uib-tabset>
+      </div>
+    </div>
+  </div>
+
+  <!-- docker form section-->
+  <div class="form-group wizard-form">
+    <label for="endpoint_name" class="col-sm-3 col-lg-2 control-label text-left">Name<span class="wizard-form-required">*</span></label>
+    <div class="col-sm-9 col-lg-10">
+      <input type="text" class="form-control" name="endpoint_name" ng-model="$ctrl.formValues.name" placeholder="e.g. docker-prod01 / kubernetes-cluster01" auto-focus />
+    </div>
+  </div>
+
+  <div ng-if="$ctrl.state.endpointType === 'agent'" class="form-group">
+    <label for="endpoint_url" class="col-sm-3 col-lg-2 control-label text-left"> Environments URL<span class="wizard-form-required">*</span> </label>
+
+    <div class="col-sm-9 col-lg-10" style="margin-bottom: 15px;">
+      <input
+        ng-if="$ctrl.state.endpointType === 'agent'"
+        type="text"
+        class="form-control"
+        name="endpoint_url"
+        ng-model="$ctrl.formValues.url"
+        placeholder="e.g. 10.0.0.10:9001 or tasks.portainer_agent:9001"
+      />
+    </div>
+  </div>
+
+  <div ng-if="$ctrl.state.endpointType === 'api'">
+    <div class="form-group">
+      <label for="dockerapi_url" class="col-sm-3 col-lg-2 control-label text-left"> Docker API URL<span class="wizard-form-required">*</span> </label>
+
+      <div class="col-sm-9 col-lg-10" style="margin-bottom: 15px;">
+        <input
+          ng-if="$ctrl.state.endpointType === 'api'"
+          type="text"
+          class="form-control"
+          name="dockerapi_url"
+          ng-model="$ctrl.formValues.url"
+          placeholder="e.g. 10.0.0.10:2375 or mydocker.mydomain.com:2375"
+        />
+      </div>
+    </div>
+
+    <div class="form-group" style="padding-left: 15px; width: 15%;">
+      <por-switch-field ng-model="$ctrl.formValues.tls" name="connect_socket" label="TLS" label-class="col-sm-12 col-lg-4"></por-switch-field>
+    </div>
+
+    <div class="form-group" style="padding-left: 15px; width: 40%;">
+      <por-switch-field
+        ng-if="$ctrl.formValues.tls"
+        ng-model="$ctrl.formValues.skipCertification"
+        name="skip_certification"
+        label="Skip Certification Verification"
+        label-class="col-sm-12 col-lg-4"
+      ></por-switch-field>
+    </div>
+
+    <div>
+      <wizard-tls ng-if="!$ctrl.formValues.skipCertification && $ctrl.formValues.tls" form-data="$ctrl.formValues.securityFormData" onChange="($ctrl.onChangeFile)"></wizard-tls>
+    </div>
+  </div>
+
+  <div ng-if="$ctrl.state.endpointType === 'socket'" class="form-group" style="padding-left: 15px;">
+    <div class="form-group" style="padding-left: 15px;">
+      <label for="override_socket" class="col-sm_12 control-label text-left">
+        Override default socket path
+      </label>
+      <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="$ctrl.formValues.overrideSocket" /><i></i></label>
+    </div>
+
+    <div ng-if="$ctrl.formValues.overrideSocket">
+      <div class="form-group">
+        <label for="socket_path" class="col-sm-3 col-lg-2 control-label text-left">
+          Socket path
+          <portainer-tooltip position="bottom" message="Path to the Docker socket. Remember to bind-mount the socket, see the important notice above for more information.">
+          </portainer-tooltip>
+        </label>
+        <div class="col-sm-9 col-lg-10">
+          <input
+            type="text"
+            class="form-control"
+            name="socket_path"
+            ng-model="$ctrl.formValues.socketPath"
+            placeholder="e.g. /var/run/docker.sock (on Linux) or //./pipe/docker_engine (on Windows)"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-sm-12">
+      <button
+        ng-if="$ctrl.state.endpointType === 'agent'"
+        type="submit"
+        class="btn btn-primary btn-sm wizard-connect-button"
+        ng-disabled="!$ctrl.formValues.name || !$ctrl.formValues.url || $ctrl.state.actionInProgress"
+        ng-click="$ctrl.connectEnvironment('agent')"
+        button-spinner="$ctrl.state.actionInProgress"
+      >
+        <span ng-hide="$ctrl.state.actionInProgress"><i class="fa fa-plug" style="margin-right: 5px;"></i>Connect </span>
+        <span ng-show="$ctrl.state.actionInProgress">Connecting environment...</span>
+      </button>
+      <button
+        ng-if="$ctrl.state.endpointType === 'api'"
+        type="submit"
+        class="btn btn-primary btn-sm wizard-connect-button"
+        ng-disabled="!$ctrl.formValues.name || !$ctrl.formValues.url || $ctrl.state.actionInProgress"
+        ng-click="$ctrl.connectEnvironment('api')"
+        button-spinner="$ctrl.state.actionInProgress"
+      >
+        <span ng-hide="$ctrl.state.actionInProgress"><i class="fa fa-plug" style="margin-right: 5px;"></i>Connect </span>
+        <span ng-show="$ctrl.state.actionInProgress">Connecting environment...</span>
+      </button>
+      <button
+        ng-if="$ctrl.state.endpointType === 'socket'"
+        type="submit"
+        class="btn btn-primary btn-sm wizard-connect-button"
+        ng-disabled="!$ctrl.formValues.name || $ctrl.state.actionInProgress"
+        ng-click="$ctrl.connectEnvironment('socket')"
+        button-spinner="$ctrl.state.actionInProgress"
+      >
+        <span ng-hide="$ctrl.state.actionInProgress"><i class="fa fa-plug" style="margin-right: 5px;"></i>Connect </span>
+        <span ng-show="$ctrl.state.actionInProgress">Connecting environment...</span>
+      </button>
+    </div>
+  </div>
+</form>
