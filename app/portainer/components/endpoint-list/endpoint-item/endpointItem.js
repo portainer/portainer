@@ -10,6 +10,7 @@ angular.module('portainer.app').component('endpointItem', {
     onEdit: '<',
     isAdmin: '<',
     tags: '<',
+    endpointInitTime: '<',
   },
   controller: EndpointItemController,
 });
