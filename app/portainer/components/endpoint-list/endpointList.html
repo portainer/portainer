@@ -38,6 +38,7 @@
           on-edit="($ctrl.editAction)"
           is-admin="$ctrl.isAdmin"
           tags="$ctrl.tags"
+          endpoint-init-time="$ctrl.endpointInitTime"
         ></endpoint-item>
         <endpoint-item
           ng-if="!$ctrl.hasBackendPagination()"
@@ -47,6 +48,7 @@
           on-edit="($ctrl.editAction)"
           is-admin="$ctrl.isAdmin"
           tags="$ctrl.tags"
+          endpoint-init-time="$ctrl.endpointInitTime"
         ></endpoint-item>
         <div ng-if="$ctrl.state.loading" class="text-center text-muted" data-cy="home-loadingEndpoints">
           Loading...
