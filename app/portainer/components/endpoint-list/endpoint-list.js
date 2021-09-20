@@ -14,5 +14,6 @@ angular.module('portainer.app').component('endpointList', {
     isAdmin: '<',
     totalCount: '<',
     retrievePage: '<',
+    endpointInitTime: '<',
   },
 });

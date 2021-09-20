@@ -18,6 +18,7 @@ angular
   ) {
     $scope.state = {
       connectingToEdgeEndpoint: false,
+      homepageLoadTime: '',
     };
 
     $scope.goToEdit = function (id) {
@@ -92,6 +93,7 @@ angular
     }
 
     async function initView() {
+      $scope.state.homepageLoadTime = Math.floor(Date.now() / 1000);
       $scope.isAdmin = Authentication.isAdmin();
 
       MotdService.motd().then(function success(data) {
