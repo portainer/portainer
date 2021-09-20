@@ -39,7 +39,7 @@
             Configuration
           </div>
           <!-- namespace-input -->
-          <div class="form-group">
+          <div class="form-group" ng-if="$ctrl.state.resourcePool">
             <label for="resource-pool-selector" class="col-sm-2 control-label text-left">Namespace</label>
             <div class="col-sm-10">
               <select
@@ -50,13 +50,6 @@
                 ng-change=""
                 ng-disabled="$ctrl.state.isEdit"
               ></select>
-            </div>
-          </div>
-          <div class="form-group" ng-if="!$ctrl.state.resourcePool">
-            <div class="col-sm-12 small text-danger">
-              <i class="fa fa-exclamation-circle red-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              This namespace has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the
-              namespace.
             </div>
           </div>
           <div class="form-group" ng-if="!$ctrl.state.resourcePool">
