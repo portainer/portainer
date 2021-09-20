@@ -288,7 +288,7 @@ func (service *Service) StoreTLSFileFromBytes(folder string, fileType portainer.
 	return path.Join(service.fileStorePath, tlsFilePath), nil
 }
 
-// GetPathForTLSFile returns the absolute path to a specific TLS file for an endpoint.
+// GetPathForTLSFile returns the absolute path to a specific TLS file for an environment(endpoint).
 func (service *Service) GetPathForTLSFile(folder string, fileType portainer.TLSFileType) (string, error) {
 	var fileName string
 	switch fileType {

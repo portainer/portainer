@@ -41,7 +41,7 @@ func (kcl *KubeClient) getServiceAccountToken(serviceAccountName string) (string
 	}
 
 	// API token secret is populated asynchronously.
-	// Is it created by the controller and will depend on the environment/secret-store:
+	// Is it created by the controller and will depend on the environment(endpoint)/secret-store:
 	// https://github.com/kubernetes/kubernetes/issues/67882#issuecomment-422026204
 	// as a work-around, we wait for up to 5 seconds for the secret to be populated.
 	timeout := time.After(5 * time.Second)

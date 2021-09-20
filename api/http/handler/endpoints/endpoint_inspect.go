@@ -11,16 +11,16 @@ import (
 )
 
 // @id EndpointInspect
-// @summary Inspect an endpoint
-// @description Retrieve details about an endpoint.
+// @summary Inspect an environment(endpoint)
+// @description Retrieve details about an environment(endpoint).
 // @description **Access policy**: restricted
 // @tags endpoints
 // @security jwt
 // @produce json
-// @param id path int true "Endpoint identifier"
+// @param id path int true "Environment(Endpoint) identifier"
 // @success 200 {object} portainer.Endpoint "Success"
 // @failure 400 "Invalid request"
-// @failure 404 "Endpoint not found"
+// @failure 404 "Environment(Endpoint) not found"
 // @failure 500 "Server error"
 // @router /endpoints/{id} [get]
 func (handler *Handler) endpointInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

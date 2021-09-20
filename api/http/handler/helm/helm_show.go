@@ -25,7 +25,7 @@ import (
 // @produce text/plain
 // @success 200 {object} string "Success"
 // @failure 401 "Unauthorized"
-// @failure 404 "Endpoint or ServiceAccount not found"
+// @failure 404 "Environment(Endpoint) or ServiceAccount not found"
 // @failure 500 "Server error"
 // @router /templates/helm/{command} [get]
 func (handler *Handler) helmShow(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

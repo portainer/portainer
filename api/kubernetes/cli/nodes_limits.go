@@ -5,7 +5,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// GetNodesLimits gets the CPU and Memory limits(unused resources) of all nodes in the current k8s endpoint connection
+// GetNodesLimits gets the CPU and Memory limits(unused resources) of all nodes in the current k8s environment(endpoint) connection
 func (kcl *KubeClient) GetNodesLimits() (portainer.K8sNodesLimits, error) {
 	nodesLimits := make(portainer.K8sNodesLimits)
 

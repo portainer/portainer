@@ -22,12 +22,12 @@ import (
 // @security jwt
 // @accept json
 // @produce json
-// @param id path int true "Endpoint identifier"
+// @param id path int true "Environment(Endpoint) identifier"
 // @success 200 "Success"
 // @failure 400 "Invalid request"
 // @failure 401 "Unauthorized"
 // @failure 403 "Permission denied"
-// @failure 404 "Endpoint or ServiceAccount not found"
+// @failure 404 "Environment(Endpoint) or ServiceAccount not found"
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/config [get]
 func (handler *Handler) getKubernetesConfig(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

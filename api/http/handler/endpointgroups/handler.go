@@ -10,14 +10,14 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// Handler is the HTTP handler used to handle endpoint group operations.
+// Handler is the HTTP handler used to handle environment(endpoint) group operations.
 type Handler struct {
 	*mux.Router
 	AuthorizationService *authorization.Service
 	DataStore portainer.DataStore
 }
 
-// NewHandler creates a handler to manage endpoint group operations.
+// NewHandler creates a handler to manage environment(endpoint) group operations.
 func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{
 		Router: mux.NewRouter(),

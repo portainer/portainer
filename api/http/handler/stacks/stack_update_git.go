@@ -45,7 +45,7 @@ func (payload *stackGitUpdatePayload) Validate(r *http.Request) error {
 // @accept json
 // @produce json
 // @param id path int true "Stack identifier"
-// @param endpointId query int false "Stacks created before version 1.18.0 might not have an associated endpoint identifier. Use this optional parameter to set the endpoint identifier used by the stack."
+// @param endpointId query int false "Stacks created before version 1.18.0 might not have an associated environment(endpoint) identifier. Use this optional parameter to set the environment(endpoint) identifier used by the stack."
 // @param body body stackGitUpdatePayload true "Git configs for pull and redeploy a stack"
 // @success 200 {object} portainer.Stack "Success"
 // @failure 400 "Invalid request"
@@ -76,8 +76,8 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 	}
 
 	// TODO: this is a work-around for stacks created with Portainer version >= 1.17.1
-	// The EndpointID property is not available for these stacks, this API endpoint
-	// can use the optional EndpointID query parameter to associate a valid endpoint identifier to the stack.
+	// The EndpointID property is not available for these stacks, this API environment(endpoint)
+	// can use the optional EndpointID query parameter to associate a valid environment(endpoint) identifier to the stack.
 	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", true)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid query parameter: endpointId", Err: err}

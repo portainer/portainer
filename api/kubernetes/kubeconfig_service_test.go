@@ -110,10 +110,10 @@ func TestKubeConfigService_GetKubeConfigInternal(t *testing.T) {
 		is.True(strings.Contains(clusterAccessDetails.ClusterServerURL, ":1010"), "should contain bind address port")
 	})
 
-	t.Run("GetKubeConfigInternal contains endpoint proxy url", func(t *testing.T) {
+	t.Run("GetKubeConfigInternal contains environment proxy url", func(t *testing.T) {
 		kcs := NewKubeConfigCAService("", "")
 		clusterAccessDetails := kcs.GetKubeConfigInternal(100, "some-token")
-		is.True(strings.Contains(clusterAccessDetails.ClusterServerURL, "api/endpoints/100/kubernetes"), "should contain endpoint proxy url")
+		is.True(strings.Contains(clusterAccessDetails.ClusterServerURL, "api/endpoints/100/kubernetes"), "should contain environment proxy url")
 	})
 
 	t.Run("GetKubeConfigInternal returns insecure cluster access config", func(t *testing.T) {

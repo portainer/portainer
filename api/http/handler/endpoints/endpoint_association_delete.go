@@ -16,16 +16,16 @@ import (
 )
 
 // @id EndpointAssociationDelete
-// @summary De-association an edge endpoint
-// @description De-association an edge endpoint.
+// @summary De-association an edge environment(endpoint)
+// @description De-association an edge environment(endpoint).
 // @description **Access policy**: administrator
 // @security jwt
 // @tags endpoints
 // @produce json
-// @param id path int true "Endpoint identifier"
+// @param id path int true "Environment(Endpoint) identifier"
 // @success 200 {object} portainer.Endpoint "Success"
 // @failure 400 "Invalid request"
-// @failure 404 "Endpoint not found"
+// @failure 404 "Environment(Endpoint) not found"
 // @failure 500 "Server error"
 // @router /api/endpoints/{id}/association [put]
 func (handler *Handler) endpointAssociationDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

@@ -14,22 +14,22 @@ import (
 )
 
 // @id EndpointList
-// @summary List endpoints
-// @description List all endpoints based on the current user authorizations. Will
-// @description return all endpoints if using an administrator account otherwise it will
-// @description only return authorized endpoints.
+// @summary List environments(endpoints)
+// @description List all environments(endpoints) based on the current user authorizations. Will
+// @description return all environments(endpoints) if using an administrator account otherwise it will
+// @description only return authorized environments(endpoints).
 // @description **Access policy**: restricted
 // @tags endpoints
 // @security jwt
 // @produce json
 // @param start query int false "Start searching from"
 // @param search query string false "Search query"
-// @param groupId query int false "List endpoints of this group"
+// @param groupId query int false "List environments(endpoints) of this group"
 // @param limit query int false "Limit results to this value"
-// @param types query []int false "List endpoints of this type"
-// @param tagIds query []int false "search endpoints with these tags (depends on tagsPartialMatch)"
-// @param tagsPartialMatch query bool false "If true, will return endpoint which has one of tagIds, if false (or missing) will return only endpoints that has all the tags"
-// @param endpointIds query []int false "will return only these endpoints"
+// @param types query []int false "List environments(endpoints) of this type"
+// @param tagIds query []int false "search environments(endpoints) with these tags (depends on tagsPartialMatch)"
+// @param tagsPartialMatch query bool false "If true, will return environment(endpoint) which has one of tagIds, if false (or missing) will return only environments(endpoints) that has all the tags"
+// @param endpointIds query []int false "will return only these environments(endpoints)"
 // @success 200 {array} portainer.Endpoint "Endpoints"
 // @failure 500 "Server error"
 // @router /endpoints [get]

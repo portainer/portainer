@@ -12,7 +12,7 @@ import (
 
 // @id UploadTLS
 // @summary Upload TLS files
-// @description Use this endpoint to upload TLS files.
+// @description Use this environment(endpoint) to upload TLS files.
 // @description **Access policy**: administrator
 // @tags upload
 // @security jwt

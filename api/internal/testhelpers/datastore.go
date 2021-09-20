@@ -233,7 +233,7 @@ func (s *stubEndpointService) GetNextIdentifier() int {
 	return len(s.endpoints)
 }
 
-// WithEndpoints option will instruct datastore to return provided endpoints
+// WithEndpoints option will instruct datastore to return provided environments(endpoints)
 func WithEndpoints(endpoints []portainer.Endpoint) datastoreOption {
 	return func(d *datastore) {
 		d.endpoint = &stubEndpointService{endpoints: endpoints}

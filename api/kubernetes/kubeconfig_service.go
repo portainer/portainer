@@ -86,7 +86,7 @@ func (kccas *kubeConfigCAService) IsSecure() bool {
 	return kccas.certificateAuthorityData != ""
 }
 
-// GetKubeConfigInternal returns K8s cluster access details for the specified endpoint.
+// GetKubeConfigInternal returns K8s cluster access details for the specified environment(endpoint).
 // On startup, portainer generates a certificate against localhost at specified `httpsBindAddr` port, hence
 // the kubeconfig generated should only be utilised by internal portainer binaries as the `ClusterServerURL`
 // points to the internally accessible `https` based `localhost` address.

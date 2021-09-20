@@ -16,8 +16,8 @@ import (
 )
 
 type endpointUpdatePayload struct {
-	// Name that will be used to identify this endpoint
-	Name *string `example:"my-endpoint"`
+	// Name that will be used to identify this environment(endpoint)
+	Name *string `example:"my-environment"`
 	// URL or IP address of a Docker host
 	URL *string `example:"docker.mydomain.tld:2375"`
 	// URL or IP address where exposed containers will be reachable.\
@@ -25,13 +25,13 @@ type endpointUpdatePayload struct {
 	PublicURL *string `example:"docker.mydomain.tld:2375"`
 	// Group identifier
 	GroupID *int `example:"1"`
-	// Require TLS to connect against this endpoint
+	// Require TLS to connect against this environment(endpoint)
 	TLS *bool `example:"true"`
 	// Skip server verification when using TLS
 	TLSSkipVerify *bool `example:"false"`
 	// Skip client verification when using TLS
 	TLSSkipClientVerify *bool `example:"false"`
-	// The status of the endpoint (1 - up, 2 - down)
+	// The status of the environment(endpoint) (1 - up, 2 - down)
 	Status *int `example:"1"`
 	// Azure application ID
 	AzureApplicationID *string `example:"eag7cdo9-o09l-9i83-9dO9-f0b23oe78db4"`
@@ -39,7 +39,7 @@ type endpointUpdatePayload struct {
 	AzureTenantID *string `example:"34ddc78d-4fel-2358-8cc1-df84c8o839f5"`
 	// Azure authentication key
 	AzureAuthenticationKey *string `example:"cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk="`
-	// List of tag identifiers to which this endpoint is associated
+	// List of tag identifiers to which this environment(endpoint) is associated
 	TagIDs             []portainer.TagID `example:"1,2"`
 	UserAccessPolicies portainer.UserAccessPolicies
 	TeamAccessPolicies portainer.TeamAccessPolicies
@@ -54,18 +54,18 @@ func (payload *endpointUpdatePayload) Validate(r *http.Request) error {
 }
 
 // @id EndpointUpdate
-// @summary Update an endpoint
-// @description Update an endpoint.
+// @summary Update an environment(endpoint)
+// @description Update an environment(endpoint).
 // @description **Access policy**: administrator
 // @security jwt
 // @tags endpoints
 // @accept json
 // @produce json
-// @param id path int true "Endpoint identifier"
-// @param body body endpointUpdatePayload true "Endpoint details"
+// @param id path int true "Environment(Endpoint) identifier"
+// @param body body endpointUpdatePayload true "Environment(Endpoint) details"
 // @success 200 {object} portainer.Endpoint "Success"
 // @failure 400 "Invalid request"
-// @failure 404 "Endpoint not found"
+// @failure 404 "Environment(Endpoint) not found"
 // @failure 500 "Server error"
 // @router /endpoints/{id} [put]
 func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

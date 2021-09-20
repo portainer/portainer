@@ -14,7 +14,7 @@ import (
 // StartExecProcess will start an exec process inside a container located inside a pod inside a specific namespace
 // using the specified command. The stdin parameter will be bound to the stdin process and the stdout process will write
 // to the stdout parameter.
-// This function only works against a local endpoint using an in-cluster config with the user's SA token.
+// This function only works against a local environment(endpoint) using an in-cluster config with the user's SA token.
 // This is a blocking operation.
 func (kcl *KubeClient) StartExecProcess(token string, useAdminToken bool, namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer, errChan chan error) {
 	config, err := rest.InClusterConfig()

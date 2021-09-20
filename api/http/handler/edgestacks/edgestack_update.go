@@ -164,11 +164,11 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 
 		hasDockerEndpoint, err := hasDockerEndpoint(handler.DataStore.Endpoint(), relatedEndpointIds)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for existence of docker endpoint", err}
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for existence of docker environment", err}
 		}
 
 		if hasDockerEndpoint {
-			return &httperror.HandlerError{http.StatusBadRequest, "Edge stack with docker endpoint cannot be deployed with kubernetes config", err}
+			return &httperror.HandlerError{http.StatusBadRequest, "Edge stack with docker environment cannot be deployed with kubernetes config", err}
 		}
 
 		_, err = handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, stack.ManifestPath, []byte(payload.StackFileContent))

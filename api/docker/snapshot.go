@@ -12,7 +12,7 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
-// Snapshotter represents a service used to create endpoint snapshots
+// Snapshotter represents a service used to create environment(endpoint) snapshots
 type Snapshotter struct {
 	clientFactory *ClientFactory
 }
@@ -24,7 +24,7 @@ func NewSnapshotter(clientFactory *ClientFactory) *Snapshotter {
 	}
 }
 
-// CreateSnapshot creates a snapshot of a specific Docker endpoint
+// CreateSnapshot creates a snapshot of a specific Docker environment(endpoint)
 func (snapshotter *Snapshotter) CreateSnapshot(endpoint *portainer.Endpoint) (*portainer.DockerSnapshot, error) {
 	cli, err := snapshotter.clientFactory.CreateClient(endpoint, "")
 	if err != nil {
