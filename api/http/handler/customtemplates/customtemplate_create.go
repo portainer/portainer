@@ -279,8 +279,10 @@ func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) er
 	if err != nil {
 		return errors.New("Invalid custom template description")
 	}
-
 	payload.Description = description
+
+	logo, _ := request.RetrieveMultiPartFormValue(r, "Logo", true)
+	payload.Logo = logo
 
 	note, _ := request.RetrieveMultiPartFormValue(r, "Note", true)
 	payload.Note = note
