@@ -10,45 +10,8 @@
       <rd-widget>
         <rd-widget-body>
           <form class="form-horizontal" name="kubernetesConfigurationCreationForm" autocomplete="off">
-            <div class="col-sm-12 form-section-title">
-              Namespace
-            </div>
-
-            <!-- resource-pool -->
-            <div class="form-group" ng-if="ctrl.formValues.ResourcePool">
-              <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Namespace</label>
-              <div class="col-sm-11">
-                <select
-                  class="form-control"
-                  id="resource-pool-selector"
-                  ng-model="ctrl.formValues.ResourcePool"
-                  ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools"
-                  ng-change="ctrl.onResourcePoolSelectionChange()"
-                  data-cy="k8sConfigCreate-namespaceDropdown"
-                ></select>
-              </div>
-            </div>
-            <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
-              <div class="col-sm-12 small text-warning">
-                <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                This namespace has exhausted its resource capacity and you will not be able to deploy the configuration. Contact your administrator to expand the capacity of the
-                namespace.
-              </div>
-            </div>
-            <div class="form-group" ng-if="!ctrl.formValues.ResourcePool">
-              <div class="col-sm-12 small text-muted">
-                <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                You do not have access to any namespace. Contact your administrator to get access to a namespace.
-              </div>
-            </div>
-            <!-- !resource-pool -->
-
             <!-- name -->
-            <div class="col-sm-12 form-section-title">
-              Configuration name
-            </div>
-            <div class="form-group"
-              >=
+            <div class="form-group">
               <label for="configuration_name" class="col-sm-1 control-label text-left">Name</label>
               <div class="col-sm-11">
                 <input
@@ -82,60 +45,94 @@
             <!-- !name -->
 
             <div class="col-sm-12 form-section-title">
-              Configuration type
+              Namespace
             </div>
 
-            <div class="form-group">
+            <!-- resource-pool -->
+            <div class="form-group" ng-if="ctrl.formValues.ResourcePool">
+              <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Namespace</label>
+              <div class="col-sm-11">
+                <select
+                  class="form-control"
+                  id="resource-pool-selector"
+                  ng-model="ctrl.formValues.ResourcePool"
+                  ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools"
+                  ng-change="ctrl.onResourcePoolSelectionChange()"
+                  data-cy="k8sConfigCreate-namespaceDropdown"
+                ></select>
+              </div>
+            </div>
+            <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
+              <div class="col-sm-12 small text-warning">
+                <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                This namespace has exhausted its resource capacity and you will not be able to deploy the configuration. Contact your administrator to expand the capacity of the
+                namespace.
+              </div>
+            </div>
+            <div class="form-group" ng-if="!ctrl.formValues.ResourcePool">
               <div class="col-sm-12 small text-muted">
-                Select the type of data that you want to save in the configuration.
+                <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                You do not have access to any namespace. Contact your administrator to get access to a namespace.
               </div>
             </div>
+            <!-- !resource-pool -->
 
-            <!-- type options -->
-            <div class="form-group" style="margin-bottom: 0;">
-              <div class="boxselector_wrapper">
-                <div>
-                  <input type="radio" id="type_basic" ng-value="ctrl.KubernetesConfigurationTypes.CONFIGMAP" ng-model="ctrl.formValues.Type" />
-                  <label for="type_basic" data-cy="k8sConfigCreate-nonSensitiveButton">
-                    <div class="boxselector_header">
-                      <i class="fa fa-file-code" aria-hidden="true" style="margin-right: 2px;"></i>
-                      Non-sensitive
-                    </div>
-                    <p>This configuration holds non-sensitive information</p>
-                  </label>
-                </div>
-                <div>
-                  <input type="radio" id="type_secret" ng-value="ctrl.KubernetesConfigurationTypes.SECRET" ng-model="ctrl.formValues.Type" />
-                  <label for="type_secret" data-cy="k8sConfigCreate-sensitiveButton">
-                    <div class="boxselector_header">
-                      <i class="fa fa-user-secret" aria-hidden="true" style="margin-right: 2px;"></i>
-                      Sensitive
-                    </div>
-                    <p>This configuration holds sensitive information</p>
-                  </label>
+            <div ng-if="ctrl.formValues.ResourcePool">
+              <div class="col-sm-12 form-section-title">
+                Configuration type
+              </div>
+
+              <div class="form-group">
+                <div class="col-sm-12 small text-muted">
+                  Select the type of data that you want to save in the configuration.
                 </div>
               </div>
-            </div>
-            <!-- !type options -->
 
-            <div class="col-sm-12 form-section-title" ng-if="ctrl.formValues.Type == ctrl.KubernetesConfigurationTypes.SECRET">
-              Information
-            </div>
-            <div class="form-group" ng-if="ctrl.formValues.Type == ctrl.KubernetesConfigurationTypes.SECRET">
-              <div class="col-sm-12 small text-muted">
-                Creating a sensitive configuration will create a Kubernetes Secret of type <code>Opaque</code>. You can find more information about this in the
-                <a href="https://kubernetes.io/docs/concepts/configuration/secret/#secret-types" target="_blank">official documentation</a>.
+              <!-- type options -->
+              <div class="form-group" style="margin-bottom: 0;">
+                <div class="boxselector_wrapper">
+                  <div>
+                    <input type="radio" id="type_basic" ng-value="ctrl.KubernetesConfigurationTypes.CONFIGMAP" ng-model="ctrl.formValues.Type" />
+                    <label for="type_basic" data-cy="k8sConfigCreate-nonSensitiveButton">
+                      <div class="boxselector_header">
+                        <i class="fa fa-file-code" aria-hidden="true" style="margin-right: 2px;"></i>
+                        Non-sensitive
+                      </div>
+                      <p>This configuration holds non-sensitive information</p>
+                    </label>
+                  </div>
+                  <div>
+                    <input type="radio" id="type_secret" ng-value="ctrl.KubernetesConfigurationTypes.SECRET" ng-model="ctrl.formValues.Type" />
+                    <label for="type_secret" data-cy="k8sConfigCreate-sensitiveButton">
+                      <div class="boxselector_header">
+                        <i class="fa fa-user-secret" aria-hidden="true" style="margin-right: 2px;"></i>
+                        Sensitive
+                      </div>
+                      <p>This configuration holds sensitive information</p>
+                    </label>
+                  </div>
+                </div>
               </div>
+              <!-- !type options -->
+
+              <div class="col-sm-12 form-section-title" ng-if="ctrl.formValues.Type == ctrl.KubernetesConfigurationTypes.SECRET">
+                Information
+              </div>
+              <div class="form-group" ng-if="ctrl.formValues.Type == ctrl.KubernetesConfigurationTypes.SECRET">
+                <div class="col-sm-12 small text-muted">
+                  Creating a sensitive configuration will create a Kubernetes Secret of type <code>Opaque</code>. You can find more information about this in the
+                  <a href="https://kubernetes.io/docs/concepts/configuration/secret/#secret-types" target="_blank">official documentation</a>.
+                </div>
+              </div>
+
+              <kubernetes-configuration-data
+                ng-if="ctrl.formValues"
+                form-values="ctrl.formValues"
+                is-valid="ctrl.state.isDataValid"
+                is-creation="true"
+                is-editor-dirty="ctrl.state.isEditorDirty"
+              ></kubernetes-configuration-data>
             </div>
-
-            <kubernetes-configuration-data
-              ng-if="ctrl.formValues"
-              form-values="ctrl.formValues"
-              is-valid="ctrl.state.isDataValid"
-              is-creation="true"
-              is-editor-dirty="ctrl.state.isEditorDirty"
-            ></kubernetes-configuration-data>
-
             <!-- summary -->
             <kubernetes-summary-view
               ng-if="!(!kubernetesConfigurationCreationForm.$valid || !ctrl.isFormValid() || ctrl.state.actionInProgress)"
