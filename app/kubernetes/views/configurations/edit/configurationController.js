@@ -107,7 +107,7 @@ class KubernetesConfigurationController {
       } else {
         await this.KubernetesConfigurationService.update(this.formValues, this.configuration);
         this.Notifications.success('Configuration succesfully updated');
-        this.$state.reload();
+        this.$state.reload(this.$state.current);
       }
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to update configuration');

@@ -169,7 +169,7 @@ class KubernetesCreateApplicationController {
         this.state.updateWebEditorInProgress = true;
         await this.StackService.updateKubeStack({ EndpointId: this.endpoint.Id, Id: this.application.StackId }, this.stackFileContent, null);
         this.state.isEditorDirty = false;
-        await this.$state.reload();
+        await this.$state.reload(this.$state.current);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Failed redeploying application');
       } finally {

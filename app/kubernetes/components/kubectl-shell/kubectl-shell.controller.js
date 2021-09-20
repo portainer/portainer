@@ -10,6 +10,12 @@ export default class KubectlShellController {
     this.EndpointProvider = EndpointProvider;
     this.LocalStorage = LocalStorage;
     this.Notifications = Notifications;
+
+    $window.onbeforeunload = () => {
+      if (this.state.shell.connected) {
+        return '';
+      }
+    };
   }
 
   disconnect() {
