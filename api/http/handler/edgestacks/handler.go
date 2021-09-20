@@ -13,7 +13,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// Handler is the HTTP handler used to handle endpoint group operations.
+// Handler is the HTTP handler used to handle environment(endpoint) group operations.
 type Handler struct {
 	*mux.Router
 	requestBouncer     *security.RequestBouncer
@@ -23,7 +23,7 @@ type Handler struct {
 	KubernetesDeployer portainer.KubernetesDeployer
 }
 
-// NewHandler creates a handler to manage endpoint group operations.
+// NewHandler creates a handler to manage environment(endpoint) group operations.
 func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{
 		Router:         mux.NewRouter(),
@@ -49,7 +49,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 func (handler *Handler) convertAndStoreKubeManifestIfNeeded(edgeStack *portainer.EdgeStack, relatedEndpointIds []portainer.EndpointID) error {
 	hasKubeEndpoint, err := hasKubeEndpoint(handler.DataStore.Endpoint(), relatedEndpointIds)
 	if err != nil {
-		return fmt.Errorf("unable to check if edge stack has kube endpoints: %w", err)
+		return fmt.Errorf("unable to check if edge stack has kube environments: %w", err)
 	}
 
 	if !hasKubeEndpoint {

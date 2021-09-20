@@ -36,7 +36,7 @@ func (p *addHelmRepoUrlPayload) Validate(_ *http.Request) error {
 // @security jwt
 // @accept json
 // @produce json
-// @param id path int true "Endpoint identifier"
+// @param id path int true "Environment(Endpoint) identifier"
 // @param payload body addHelmRepoUrlPayload true "Helm Repository"
 // @success 200 {object} portainer.HelmUserRepository "Success"
 // @failure 400 "Invalid request"

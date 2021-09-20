@@ -33,7 +33,7 @@ func (payload *updateStatusPayload) Validate(r *http.Request) error {
 
 // @id EdgeStackStatusUpdate
 // @summary Update an EdgeStack status
-// @description Authorized only if the request is done by an Edge Endpoint
+// @description Authorized only if the request is done by an Edge Environment(Endpoint)
 // @tags edge_stacks
 // @accept json
 // @produce json

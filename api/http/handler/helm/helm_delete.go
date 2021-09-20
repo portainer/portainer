@@ -17,13 +17,13 @@ import (
 // @security jwt
 // @accept json
 // @produce json
-// @param id path int true "Endpoint identifier"
+// @param id path int true "Environment(Endpoint) identifier"
 // @param release path string true "The name of the release/application to uninstall"
 // @param namespace query string true "An optional namespace"
 // @success 204 "Success"
-// @failure 400 "Invalid endpoint id or bad request"
+// @failure 400 "Invalid environment(endpoint) id or bad request"
 // @failure 401 "Unauthorized"
-// @failure 404 "Endpoint or ServiceAccount not found"
+// @failure 404 "Environment(Endpoint) or ServiceAccount not found"
 // @failure 500 "Server error or helm error"
 // @router /endpoints/{id}/kubernetes/helm/{release} [delete]
 func (handler *Handler) helmDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {

@@ -13,11 +13,11 @@ import (
 )
 
 type endpointGroupUpdatePayload struct {
-	// Endpoint group name
-	Name string `example:"my-endpoint-group"`
-	// Endpoint group description
+	// Environment(Endpoint) group name
+	Name string `example:"my-environment-group"`
+	// Environment(Endpoint) group description
 	Description string `example:"description"`
-	// List of tag identifiers associated to the endpoint group
+	// List of tag identifiers associated to the environment(endpoint) group
 	TagIDs             []portainer.TagID `example:"3,4"`
 	UserAccessPolicies portainer.UserAccessPolicies
 	TeamAccessPolicies portainer.TeamAccessPolicies
@@ -28,8 +28,8 @@ func (payload *endpointGroupUpdatePayload) Validate(r *http.Request) error {
 }
 
 // @id EndpointGroupUpdate
-// @summary Update an endpoint group
-// @description Update an endpoint group.
+// @summary Update an environment(endpoint) group
+// @description Update an environment(endpoint) group.
 // @description **Access policy**: administrator
 // @tags endpoint_groups
 // @security jwt

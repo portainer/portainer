@@ -19,7 +19,7 @@ func hasEndpointPredicate(endpointService portainer.EndpointService, endpointIDs
 	for _, endpointID := range endpointIDs {
 		endpoint, err := endpointService.Endpoint(endpointID)
 		if err != nil {
-			return false, fmt.Errorf("failed to retrieve endpoint from database: %w", err)
+			return false, fmt.Errorf("failed to retrieve environment from database: %w", err)
 		}
 
 		if predicate(endpoint) {

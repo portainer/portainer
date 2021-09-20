@@ -95,7 +95,7 @@ func (service *Service) DeleteEdgeStack(ID portainer.EdgeStackID) error {
 	return internal.DeleteObject(service.connection, BucketName, identifier)
 }
 
-// GetNextIdentifier returns the next identifier for an endpoint.
+// GetNextIdentifier returns the next identifier for an environment(endpoint).
 func (service *Service) GetNextIdentifier() int {
 	return internal.GetNextIdentifier(service.connection, BucketName)
 }
