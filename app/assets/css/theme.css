@@ -150,6 +150,8 @@ html {
   --bg-btn-focus: var(--grey-59);
   --bg-boxselector-disabled-color: var(--white-color);
   --bg-small-select-color: var(--white-color);
+  --bg-app-datatable-thead: var(--grey-23);
+  --bg-app-datatable-tbody: var(--grey-24);
 
   --text-main-color: var(--grey-7);
   --text-body-color: var(--grey-6);
@@ -318,6 +320,8 @@ html {
   --bg-btn-focus: var(--grey-3);
   --bg-boxselector-disabled-color: var(--grey-54);
   --bg-small-select-color: var(--grey-2);
+  --bg-app-datatable-thead: var(--grey-1);
+  --bg-app-datatable-tbody: var(--grey-1);
 
   --text-main-color: var(--white-color);
   --text-body-color: var(--white-color);
@@ -485,6 +489,8 @@ html {
   --bg-boxselector-color: var(--black-color);
   --bg-boxselector-disabled-color: var(--black-color);
   --bg-small-select-color: var(--black-color);
+  --bg-app-datatable-thead: var(--black-color);
+  --bg-app-datatable-tbody: var(--black-color);
 
   --text-main-color: var(--white-color);
   --text-body-color: var(--white-color);
