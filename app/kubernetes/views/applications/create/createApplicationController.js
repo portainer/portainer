@@ -790,15 +790,14 @@ class KubernetesCreateApplicationController {
   }
 
   isEditLBWithPorts() {
-    return this.formValues.PublishingType === KubernetesApplicationPublishingTypes.LOAD_BALANCER && _.filter(this.formValues.PublishedPorts, { IsNew: false }).length;
+    return this.formValues.PublishingType === KubernetesApplicationPublishingTypes.LOAD_BALANCER && _.filter(this.formValues.PublishedPorts, { IsNew: false }).length === 0;
   }
 
   isProtocolOptionDisabled(index, protocol) {
     return (
       this.disableLoadBalancerEdit() ||
       (this.isEditAndNotNewPublishedPort(index) && this.formValues.PublishedPorts[index].Protocol !== protocol) ||
-      (this.isEditLBWithPorts() && this.formValues.PublishedPorts[index].Protocol !== protocol) ||
-      (this.isNewAndNotFirst(index) && this.formValues.PublishedPorts[index].Protocol !== protocol)
+      (this.isEditLBWithPorts() && this.formValues.PublishedPorts[index].Protocol !== protocol && this.isNewAndNotFirst(index))
     );
   }
 
