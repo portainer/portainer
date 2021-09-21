@@ -16,7 +16,7 @@ angular.module('portainer.app').factory('Notifications', [
 
     service.error = function (title, e, fallbackText) {
       var msg = fallbackText;
-      if (e.err && e.err.data && e.err.data.details) {
+      if (e.err && e.err.data && e.err.data.details && angular.isString(e.err.data.details)) {
         msg = e.err.data.details;
       } else if (e.err && e.err.data && e.err.data.message) {
         msg = e.err.data.message;
