@@ -49,7 +49,7 @@
             </div>
 
             <!-- resource-pool -->
-            <div class="form-group">
+            <div class="form-group" ng-if="ctrl.formValues.ResourcePool">
               <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Namespace</label>
               <div class="col-sm-11">
                 <select
@@ -57,6 +57,7 @@
                   id="resource-pool-selector"
                   ng-model="ctrl.formValues.ResourcePool"
                   ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools"
+                  ng-change="ctrl.onResourcePoolSelectionChange()"
                   data-cy="k8sConfigCreate-namespaceDropdown"
                 ></select>
               </div>
@@ -66,6 +67,12 @@
                 <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                 This namespace has exhausted its resource capacity and you will not be able to deploy the configuration. Contact your administrator to expand the capacity of the
                 namespace.
+              </div>
+            </div>
+            <div class="form-group" ng-if="!ctrl.formValues.ResourcePool">
+              <div class="col-sm-12 small text-muted">
+                <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                You do not have access to any namespace. Contact your administrator to get access to a namespace.
               </div>
             </div>
             <!-- !resource-pool -->
