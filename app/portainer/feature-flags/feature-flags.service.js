@@ -19,6 +19,7 @@ export function featureService() {
       'k8s-resourcepool-Ibquota': EDITIONS.BE,
       'k8s-resourcepool-storagequota': EDITIONS.BE,
       's3-backup-setting': EDITIONS.BE,
+      'registry-management': EDITIONS.BE,
     };
 
     state.currentEdition = currentEdition;
