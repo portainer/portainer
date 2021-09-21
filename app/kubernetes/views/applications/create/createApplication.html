@@ -301,7 +301,7 @@
                     <select
                       class="form-control"
                       ng-model="config.SelectedConfiguration"
-                      ng-options="c as c.Name for c in ctrl.configurations"
+                      ng-options="c as c.Name for c in ctrl.configurations track by c.Name"
                       ng-change="ctrl.resetConfiguration(index)"
                       ng-disabled="ctrl.formValues.Containers.length > 1"
                     ></select>
@@ -1668,50 +1668,51 @@
                   old-form-values="ctrl.savedFormValues"
                 ></kubernetes-summary-view>
               </div>
-            </div>
-            <div class="col-sm-12 form-section-title" ng-if="ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.GIT">
-              Actions
-            </div>
-            <!-- #region ACTIONS -->
-            <div class="form-group">
-              <div class="col-sm-12">
-                <button
-                  ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"
-                  type="button"
-                  class="btn btn-primary btn-sm"
-                  ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.isDeployUpdateButtonDisabled() || !ctrl.state.pullImageValidity"
-                  ng-click="ctrl.deployApplication()"
-                  button-spinner="ctrl.state.actionInProgress"
-                  data-cy="k8sAppCreate-deployButton"
-                >
-                  <span ng-show="!ctrl.state.isEdit && !ctrl.state.actionInProgress">Deploy application</span>
-                  <span ng-show="!ctrl.state.isEdit && ctrl.state.actionInProgress">Deployment in progress...</span>
-                  <span ng-show="ctrl.state.isEdit && !ctrl.state.actionInProgress">Update application</span>
-                  <span ng-show="ctrl.state.isEdit && ctrl.state.actionInProgress">Update in progress...</span>
-                </button>
-                <button
-                  ng-if="ctrl.state.isEdit && !ctrl.state.actionInProgress && ctrl.state.appType === ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"
-                  type="button"
-                  class="btn btn-sm btn-default"
-                  ui-sref="kubernetes.applications.application({ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool })"
-                >
-                  Cancel
-                </button>
-                <!-- #Web editor buttons -->
-                <button
-                  class="btn btn-sm btn-primary"
-                  ng-click="ctrl.updateApplicationViaWebEditor()"
-                  ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.CONTENT || ctrl.state.updateWebEditorInProgress"
-                  ng-disabled="!kubernetesApplicationCreationForm.$valid || !ctrl.state.isEditorDirty || ctrl.state.updateWebEditorInProgress"
-                  style="margin-top: 7px; margin-left: 0;"
-                  button-spinner="ctrl.state.updateWebEditorInProgress"
-                >
-                  <span ng-show="!ctrl.state.updateWebEditorInProgress">Update the application</span>
-                  <span ng-show="ctrl.state.updateWebEditorInProgress">Update in progress...</span>
-                </button>
+
+              <div class="col-sm-12 form-section-title" ng-if="ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.GIT">
+                Actions
               </div>
+              <!-- #region ACTIONS -->
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <button
+                    ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"
+                    type="button"
+                    class="btn btn-primary btn-sm"
+                    ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.isDeployUpdateButtonDisabled() || !ctrl.state.pullImageValidity"
+                    ng-click="ctrl.deployApplication()"
+                    button-spinner="ctrl.state.actionInProgress"
+                    data-cy="k8sAppCreate-deployButton"
+                  >
+                    <span ng-show="!ctrl.state.isEdit && !ctrl.state.actionInProgress">Deploy application</span>
+                    <span ng-show="!ctrl.state.isEdit && ctrl.state.actionInProgress">Deployment in progress...</span>
+                    <span ng-show="ctrl.state.isEdit && !ctrl.state.actionInProgress">Update application</span>
+                    <span ng-show="ctrl.state.isEdit && ctrl.state.actionInProgress">Update in progress...</span>
+                  </button>
+                  <button
+                    ng-if="ctrl.state.isEdit && !ctrl.state.actionInProgress && ctrl.state.appType === ctrl.KubernetesDeploymentTypes.APPLICATION_FORM"
+                    type="button"
+                    class="btn btn-sm btn-default"
+                    ui-sref="kubernetes.applications.application({ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool })"
+                  >
+                    Cancel
+                  </button>
+                  <!-- #Web editor buttons -->
+                  <button
+                    class="btn btn-sm btn-primary"
+                    ng-click="ctrl.updateApplicationViaWebEditor()"
+                    ng-if="ctrl.state.appType === ctrl.KubernetesDeploymentTypes.CONTENT || ctrl.state.updateWebEditorInProgress"
+                    ng-disabled="!kubernetesApplicationCreationForm.$valid || !ctrl.state.isEditorDirty || ctrl.state.updateWebEditorInProgress"
+                    style="margin-top: 7px; margin-left: 0;"
+                    button-spinner="ctrl.state.updateWebEditorInProgress"
+                  >
+                    <span ng-show="!ctrl.state.updateWebEditorInProgress">Update the application</span>
+                    <span ng-show="ctrl.state.updateWebEditorInProgress">Update in progress...</span>
+                  </button>
+                </div>
+              </div>
+              <!-- #endregion -->
             </div>
-            <!-- #endregion -->
           </form>
         </rd-widget-body>
       </rd-widget>
