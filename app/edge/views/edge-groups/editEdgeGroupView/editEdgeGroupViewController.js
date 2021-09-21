@@ -8,6 +8,11 @@ export class EditEdgeGroupController {
     this.$state = $state;
     this.$async = $async;
 
+    this.state = {
+      actionInProgress: false,
+      loaded: false,
+    };
+
     this.updateGroup = this.updateGroup.bind(this);
     this.updateGroupAsync = this.updateGroupAsync.bind(this);
   }
