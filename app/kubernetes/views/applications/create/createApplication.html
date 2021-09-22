@@ -141,6 +141,7 @@
                 <div class="col-sm-12">
                   <por-image-registry
                     model="ctrl.formValues.ImageModel"
+                    ng-if="ctrl.formValues.ResourcePool"
                     auto-complete="false"
                     label-class="col-sm-1"
                     input-class="col-sm-11"
@@ -152,7 +153,7 @@
                   ></por-image-registry>
                 </div>
               </div>
-
+            <div ng-if="ctrl.formValues.ResourcePool">
               <div class="col-sm-12 form-section-title">
                 Stack
               </div>
@@ -1607,6 +1608,7 @@
                 form-values="ctrl.formValues"
                 old-form-values="ctrl.savedFormValues"
               ></kubernetes-summary-view>
+              </div>
             </div>
 
             <div class="col-sm-12 form-section-title" ng-if="ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.GIT">
