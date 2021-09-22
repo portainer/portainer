@@ -44,7 +44,7 @@ Portainer CE is an open source project and is supported by the community. You ca
 Learn more about Portainers community support channels [here.](https://www.portainer.io/help_about)
 
 - Issues: https://github.com/portainer/portainer/issues
-- Slack (chat): https://portainer.slack.com/
+- Slack (chat): [https://portainer.slack.com/](https://join.slack.com/t/portainer/shared_invite/zt-txh3ljab-52QHTyjCqbe5RibC2lcjKA)
 
 You can join the Portainer Community by visiting community.portainer.io. This will give you advance notice of events, content and other related Portainer content.
 
