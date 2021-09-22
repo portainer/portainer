@@ -231,6 +231,7 @@
                   <kubernetes-applications-datatable
                     dataset="item.KubernetesApplications"
                     table-key="{{ item.Id }}_table"
+                    settings-key="{{ $ctrl.tableKey }}"
                     order-by="Name"
                     remove-action="$ctrl.removeAction"
                     refresh-callback="$ctrl.refreshCallback"
