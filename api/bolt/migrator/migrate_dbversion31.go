@@ -202,7 +202,7 @@ func (m *Migrator) updateVolumeResourceControlToDB32() error {
 			if err != nil {
 				return fmt.Errorf("failed deleting resource control %d: %w", resourceControl.ID, err)
 			}
-
+			log.Printf("[DEBUG] [volume migration] [message: legacy resource control(%s) has been deleted]", resourceControl.ResourceID)
 		}
 	}
 
