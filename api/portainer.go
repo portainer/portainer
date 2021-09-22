@@ -147,7 +147,7 @@ type (
 		Name         string       `json:"Name"`
 		Dynamic      bool         `json:"Dynamic"`
 		TagIDs       []TagID      `json:"TagIds"`
-		Endpoints    []EndpointID `json:"Environments"`
+		Endpoints    []EndpointID `json:"Endpoints"`
 		PartialMatch bool         `json:"PartialMatch"`
 	}
 
@@ -160,7 +160,7 @@ type (
 		ID             EdgeJobID                          `json:"Id" example:"1"`
 		Created        int64                              `json:"Created"`
 		CronExpression string                             `json:"CronExpression"`
-		Endpoints      map[EndpointID]EdgeJobEndpointMeta `json:"Environments"`
+		Endpoints      map[EndpointID]EdgeJobEndpointMeta `json:"Endpoints"`
 		Name           string                             `json:"Name"`
 		ScriptPath     string                             `json:"ScriptPath"`
 		Recurring      bool                               `json:"Recurring"`
@@ -187,7 +187,7 @@ type (
 		CronExpression string       `json:"CronExpression"`
 		Script         string       `json:"Script"`
 		Version        int          `json:"Version"`
-		Endpoints      []EndpointID `json:"Environments"`
+		Endpoints      []EndpointID `json:"Endpoints"`
 	}
 
 	//EdgeStack represents an edge stack
@@ -1326,6 +1326,7 @@ type (
 		SetTunnelStatusToActive(endpointID EndpointID)
 		SetTunnelStatusToRequired(endpointID EndpointID) error
 		SetTunnelStatusToIdle(endpointID EndpointID)
+		KeepTunnelAlive(endpointID EndpointID, ctx context.Context, maxKeepAlive time.Duration)
 		GetTunnelDetails(endpointID EndpointID) *TunnelDetails
 		GetActiveTunnel(endpoint *Endpoint) (*TunnelDetails, error)
 		AddEdgeJob(endpointID EndpointID, edgeJob *EdgeJob)
@@ -1496,6 +1497,8 @@ const (
 	DefaultUserSessionTimeout = "8h"
 	// DefaultUserSessionTimeout represents the default timeout after which the user session is cleared
 	DefaultKubeconfigExpiry = "0"
+	// WebSocketKeepAlive web socket keep alive for edge environments
+	WebSocketKeepAlive = 1 * time.Hour
 )
 
 const (

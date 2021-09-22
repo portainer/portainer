@@ -396,4 +396,8 @@ input:-webkit-autofill {
 .btn-primary:hover {
   color: var(--white-color) !important;
 }
+
+.btn-danger:hover {
+  color: var(--white-color);
+}
 /* Overide Vendor CSS */

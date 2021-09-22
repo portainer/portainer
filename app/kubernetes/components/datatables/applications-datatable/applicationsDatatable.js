@@ -8,6 +8,7 @@ angular.module('portainer.kubernetes').component('kubernetesApplicationsDatatabl
     titleIcon: '@',
     dataset: '<',
     tableKey: '@',
+    settingsKey: '@',
     orderBy: '@',
     reverseOrder: '<',
     removeAction: '<',

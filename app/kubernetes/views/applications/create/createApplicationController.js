@@ -790,15 +790,14 @@ class KubernetesCreateApplicationController {
   }
 
   isEditLBWithPorts() {
-    return this.formValues.PublishingType === KubernetesApplicationPublishingTypes.LOAD_BALANCER && _.filter(this.formValues.PublishedPorts, { IsNew: false }).length;
+    return this.formValues.PublishingType === KubernetesApplicationPublishingTypes.LOAD_BALANCER && _.filter(this.formValues.PublishedPorts, { IsNew: false }).length === 0;
   }
 
   isProtocolOptionDisabled(index, protocol) {
     return (
       this.disableLoadBalancerEdit() ||
       (this.isEditAndNotNewPublishedPort(index) && this.formValues.PublishedPorts[index].Protocol !== protocol) ||
-      (this.isEditLBWithPorts() && this.formValues.PublishedPorts[index].Protocol !== protocol) ||
-      (this.isNewAndNotFirst(index) && this.formValues.PublishedPorts[index].Protocol !== protocol)
+      (this.isEditLBWithPorts() && this.formValues.PublishedPorts[index].Protocol !== protocol && this.isNewAndNotFirst(index))
     );
   }
 
@@ -1079,10 +1078,14 @@ class KubernetesCreateApplicationController {
           );
 
           if (this.application.ApplicationKind) {
-            this.state.appType = this.KubernetesDeploymentTypes[this.application.ApplicationKind.toUpperCase()];
+            this.state.appType = KubernetesDeploymentTypes[this.application.ApplicationKind.toUpperCase()];
+            if (this.application.ApplicationKind === KubernetesDeploymentTypes.URL) {
+              this.state.appType = KubernetesDeploymentTypes.CONTENT;
+            }
+
             if (this.application.StackId) {
               this.stack = await this.StackService.stack(this.application.StackId);
-              if (this.application.ApplicationKind === this.KubernetesDeploymentTypes.CONTENT) {
+              if (this.state.appType === KubernetesDeploymentTypes.CONTENT) {
                 this.stackFileContent = await this.StackService.getStackFile(this.application.StackId);
               }
             }

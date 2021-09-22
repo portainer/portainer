@@ -118,4 +118,5 @@ export const KubernetesDeploymentTypes = Object.freeze({
   GIT: 'git',
   CONTENT: 'content',
   APPLICATION_FORM: 'application form',
+  URL: 'url',
 });

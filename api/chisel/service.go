@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
 	"strconv"
 	"time"
 
@@ -40,6 +41,55 @@ func NewService(dataStore portainer.DataStore, shutdownCtx context.Context) *Ser
 		dataStore:        dataStore,
 		shutdownCtx:      shutdownCtx,
 	}
+}
+
+// pingAgent ping the given agent so that the agent can keep the tunnel alive
+func (service *Service) pingAgent(endpointID portainer.EndpointID) error{
+	tunnel := service.GetTunnelDetails(endpointID)
+	requestURL := fmt.Sprintf("http://127.0.0.1:%d/ping", tunnel.Port)
+	req, err := http.NewRequest(http.MethodHead, requestURL, nil)
+	if err != nil {
+		return err
+	}
+
+	httpClient := &http.Client{
+		Timeout: 3 * time.Second,
+	}
+	_, err = httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// KeepTunnelAlive keeps the tunnel of the given environment for maxAlive duration, or until ctx is done
+func (service *Service) KeepTunnelAlive(endpointID portainer.EndpointID, ctx context.Context, maxAlive time.Duration) {
+	go func() {
+		log.Printf("[DEBUG] [chisel,KeepTunnelAlive] [endpoint_id: %d] [message: start for %.0f minutes]\n", endpointID, maxAlive.Minutes())
+		maxAliveTicker := time.NewTicker(maxAlive)
+		defer maxAliveTicker.Stop()
+		pingTicker := time.NewTicker(tunnelCleanupInterval)
+		defer pingTicker.Stop()
+
+		for {
+			select {
+			case <-pingTicker.C:
+				service.SetTunnelStatusToActive(endpointID)
+				err := service.pingAgent(endpointID)
+				if err != nil {
+					log.Printf("[DEBUG] [chisel,KeepTunnelAlive] [endpoint_id: %d] [warning: ping agent err=%s]\n", endpointID, err)
+				}
+			case <-maxAliveTicker.C:
+				log.Printf("[DEBUG] [chisel,KeepTunnelAlive] [endpoint_id: %d] [message: stop as %.0f minutes timeout]\n", endpointID, maxAlive.Minutes())
+				return
+			case <-ctx.Done():
+				err := ctx.Err()
+				log.Printf("[DEBUG] [chisel,KeepTunnelAlive] [endpoint_id: %d] [message: stop as err=%s]\n", endpointID, err)
+				return
+			}
+		}
+	}()
 }
 
 // StartTunnelServer starts a tunnel server on the specified addr and port.
