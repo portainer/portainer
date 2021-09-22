@@ -75,7 +75,7 @@ body,
   border-color: var(--BE-only);
 }
 
-.btn.limited-be {
+button.limited-be {
   background-color: var(--BE-only);
   border-color: var(--BE-only);
 }

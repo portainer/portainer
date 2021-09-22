@@ -401,3 +401,10 @@ input:-webkit-autofill {
   color: var(--white-color);
 }
 /* Overide Vendor CSS */
+
+.btn.disabled,
+.btn[disabled],
+fieldset[disabled] .btn {
+  pointer-events: none;
+  touch-action: none;
+}

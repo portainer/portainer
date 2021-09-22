@@ -1,4 +1,8 @@
+import _ from 'lodash-es';
+
 import { STATES } from '@/portainer/feature-flags/enums';
+
+const BASENAME = 'limitedFeature';
 
 /* @ngInject */
 export function limitedFeatureDirective(featureService) {
@@ -8,11 +12,15 @@ export function limitedFeatureDirective(featureService) {
   };
 
   function link(scope, elem, attrs) {
-    const { limitedFeatureClass, limitedFeature: featureId } = attrs;
+    const { limitedFeatureDir: featureId } = attrs;
 
     if (!featureId) {
-      throw new Error('feature is required');
+      return;
     }
+
+    const limitedFeatureAttrs = Object.keys(attrs)
+      .filter((attr) => attr.startsWith(BASENAME) && attr !== BASENAME)
+      .map((attr) => [_.kebabCase(attr.replace(BASENAME, '')), attrs[attr]]);
 
     const state = featureService.selectShow(featureId);
 
@@ -25,6 +33,9 @@ export function limitedFeatureDirective(featureService) {
       return;
     }
 
-    elem.addClass(limitedFeatureClass);
+    limitedFeatureAttrs.forEach(([attr, value = attr]) => {
+      const currentValue = elem.attr(attr) || '';
+      elem.attr(attr, `${currentValue} ${value}`);
+    });
   }
 }
