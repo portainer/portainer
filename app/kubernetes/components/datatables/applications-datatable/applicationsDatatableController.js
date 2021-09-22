@@ -147,7 +147,7 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
         this.expandItems(storedExpandedItems);
       }
 
-      const storedSettings = DatatableService.getDataTableSettings(this.tableKey);
+      const storedSettings = DatatableService.getDataTableSettings(this.settingsKey);
       if (storedSettings !== null) {
         this.settings = storedSettings;
         this.settings.open = false;
