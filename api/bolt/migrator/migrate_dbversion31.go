@@ -168,7 +168,7 @@ func (m *Migrator) updateVolumeResourceControlToDB32() error {
 
 		totalSnapshots := len(endpoint.Snapshots)
 		if totalSnapshots == 0 {
-			log.Println("[DEBUG] [volume migration] [message: no snapshots found]")
+			log.Println("[DEBUG] [volume migration] [message: no snapshot found]")
 			continue
 		}
 
