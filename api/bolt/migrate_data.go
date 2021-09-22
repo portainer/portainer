@@ -58,7 +58,6 @@ func (store *Store) MigrateData(force bool) error {
 		migrateLog.Info(fmt.Sprintf("Migrating database from version %v to %v.\n", migrator.Version(), portainer.DBVersion))
 		err = store.FailSafeMigrate(migrator)
 		if err != nil {
-			migrateLog.Error("An error occurred during database migration", err)
 			return err
 		}
 	}
