@@ -1,5 +1,3 @@
-import _ from 'lodash-es';
-import { DockerHubViewModel } from 'Portainer/models/dockerhub';
 import { RegistryTypes } from 'Portainer/models/registryTypes';
 
 class EndpointRegistriesController {
@@ -19,9 +17,8 @@ class EndpointRegistriesController {
   getRegistries() {
     return this.$async(async () => {
       try {
-        const dockerhub = new DockerHubViewModel();
         const registries = await this.EndpointService.registries(this.endpointId);
-        this.registries = _.concat(dockerhub, registries);
+        this.registries = registries;
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to retrieve registries');
       }
