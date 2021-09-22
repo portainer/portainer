@@ -1,9 +1,8 @@
-export function RoleViewModel(id, name, description, authorizations, limitedFeature) {
+export function RoleViewModel(id, name, description, authorizations) {
   this.ID = id;
   this.Name = name;
   this.Description = description;
   this.Authorizations = authorizations;
-  this.LimitedFeature = limitedFeature;
 }
 
 export const RoleTypes = Object.freeze({

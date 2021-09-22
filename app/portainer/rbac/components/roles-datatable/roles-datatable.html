@@ -34,7 +34,7 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Description' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th></th>
+              <th class="be-visual-indicator-col"></th>
             </tr>
           </thead>
           <tbody>
@@ -44,8 +44,9 @@
             >
               <td>{{ item.Name }}</td>
               <td>{{ item.Description }}</td>
-              <td>
-                <be-feature-indicator ng-if="item.LimitedFeature" feature="item.LimitedFeature"></be-feature-indicator>
+              <td class="be-visual-indicator-col" ng-switch on="$ctrl.isDefaultItem(item)">
+                <be-feature-indicator ng-switch-when="false" feature="$ctrl.limitedFeature"></be-feature-indicator>
+                <b ng-switch-when="true">Default</b>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
