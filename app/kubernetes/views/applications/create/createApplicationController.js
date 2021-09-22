@@ -1079,10 +1079,14 @@ class KubernetesCreateApplicationController {
           );
 
           if (this.application.ApplicationKind) {
-            this.state.appType = this.KubernetesDeploymentTypes[this.application.ApplicationKind.toUpperCase()];
+            this.state.appType = KubernetesDeploymentTypes[this.application.ApplicationKind.toUpperCase()];
+            if (this.application.ApplicationKind === KubernetesDeploymentTypes.URL) {
+              this.state.appType = KubernetesDeploymentTypes.CONTENT;
+            }
+
             if (this.application.StackId) {
               this.stack = await this.StackService.stack(this.application.StackId);
-              if (this.application.ApplicationKind === this.KubernetesDeploymentTypes.CONTENT) {
+              if (this.state.appType === KubernetesDeploymentTypes.CONTENT) {
                 this.stackFileContent = await this.StackService.getStackFile(this.application.StackId);
               }
             }
