@@ -54,29 +54,31 @@ func (handler *Handler) stackFile(w http.ResponseWriter, r *http.Request) *httpe
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(stack.EndpointID)
 	if err == bolterrors.ErrObjectNotFound {
 		if !securityContext.IsAdmin {
-			return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
+			return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 		}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
 	}
 
 	if endpoint != nil {
 		err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
+			return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
 		}
 
-		resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the stack", err}
-		}
+		if stack.Type == portainer.DockerSwarmStack || stack.Type == portainer.DockerComposeStack {
+			resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the stack", err}
+			}
 
-		access, err := handler.userCanAccessStack(securityContext, endpoint.ID, resourceControl)
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify user authorizations to validate stack access", err}
-		}
-		if !access {
-			return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", errors.ErrResourceAccessDenied}
+			access, err := handler.userCanAccessStack(securityContext, endpoint.ID, resourceControl)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify user authorizations to validate stack access", err}
+			}
+			if !access {
+				return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", errors.ErrResourceAccessDenied}
+			}
 		}
 	}
 

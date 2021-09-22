@@ -1,6 +1,7 @@
 import _ from 'lodash-es';
 
 import componentsModule from './components';
+import settingsModule from './settings';
 
 async function initAuthentication(authManager, Authentication, $rootScope, $state) {
   authManager.checkAuthOnRefresh();
@@ -17,7 +18,7 @@ async function initAuthentication(authManager, Authentication, $rootScope, $stat
   return await Authentication.init();
 }
 
-angular.module('portainer.app', ['portainer.oauth', componentsModule]).config([
+angular.module('portainer.app', ['portainer.oauth', componentsModule, settingsModule]).config([
   '$stateRegistryProvider',
   function ($stateRegistryProvider) {
     'use strict';
@@ -71,7 +72,7 @@ angular.module('portainer.app', ['portainer.oauth', componentsModule]).config([
 
               return endpoint;
             } catch (e) {
-              Notifications.error('Failed loading endpoint', e);
+              Notifications.error('Failed loading environment', e);
               $state.go('portainer.home', {}, { reload: true });
               return;
             }
@@ -250,6 +251,26 @@ angular.module('portainer.app', ['portainer.oauth', componentsModule]).config([
       },
     };
 
+    const wizard = {
+      name: 'portainer.wizard',
+      url: '/wizard',
+      views: {
+        'content@': {
+          component: 'wizardView',
+        },
+      },
+    };
+
+    const wizardEndpoints = {
+      name: 'portainer.wizard.endpoints',
+      url: '/endpoints',
+      views: {
+        'content@': {
+          component: 'wizardEndpoints',
+        },
+      },
+    };
+
     var initEndpoint = {
       name: 'portainer.init.endpoint',
       url: '/endpoint',
@@ -295,24 +316,12 @@ angular.module('portainer.app', ['portainer.oauth', componentsModule]).config([
       },
     };
 
-    var registryCreation = {
+    const registryCreation = {
       name: 'portainer.registries.new',
       url: '/new',
       views: {
         'content@': {
-          templateUrl: './views/registries/create/createregistry.html',
-          controller: 'CreateRegistryController',
-        },
-      },
-    };
-
-    var registryAccess = {
-      name: 'portainer.registries.registry.access',
-      url: '/access',
-      views: {
-        'content@': {
-          templateUrl: './views/registries/access/registryAccess.html',
-          controller: 'RegistryAccessController',
+          component: 'createRegistry',
         },
       },
     };
@@ -421,11 +430,12 @@ angular.module('portainer.app', ['portainer.oauth', componentsModule]).config([
     $stateRegistryProvider.register(groupCreation);
     $stateRegistryProvider.register(home);
     $stateRegistryProvider.register(init);
+    $stateRegistryProvider.register(wizard);
+    $stateRegistryProvider.register(wizardEndpoints);
     $stateRegistryProvider.register(initEndpoint);
     $stateRegistryProvider.register(initAdmin);
     $stateRegistryProvider.register(registries);
     $stateRegistryProvider.register(registry);
-    $stateRegistryProvider.register(registryAccess);
     $stateRegistryProvider.register(registryCreation);
     $stateRegistryProvider.register(settings);
     $stateRegistryProvider.register(settingsAuthentication);

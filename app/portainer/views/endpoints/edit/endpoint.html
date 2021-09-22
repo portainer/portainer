@@ -1,11 +1,11 @@
 <rd-header>
-  <rd-header-title title-text="Endpoint details">
+  <rd-header-title title-text="Environment details">
     <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.endpoints.endpoint({id: endpoint.Id})" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="portainer.endpoints">Endpoints</a> &gt; <a ui-sref="portainer.endpoints.endpoint({id: endpoint.Id})">{{ endpoint.Name }}</a>
+    <a ui-sref="portainer.endpoints">Environments</a> &gt; <a ui-sref="portainer.endpoints.endpoint({id: endpoint.Id})">{{ endpoint.Name }}</a>
   </rd-header-content>
 </rd-header>
 
@@ -14,13 +14,27 @@
     <span class="small text-muted">
       <p>
         <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-        This Edge endpoint is associated to an Edge environment {{ state.kubernetesEndpoint ? '(Kubernetes)' : '(Docker)' }}.
+        This Edge environment is associated to an Edge environment {{ state.kubernetesEndpoint ? '(Kubernetes)' : '(Docker)' }}.
       </p>
       <p>
         Edge key: <code>{{ endpoint.EdgeKey }}</code>
       </p>
       <p>
         Edge identifier: <code>{{ endpoint.EdgeID }}</code>
+      </p>
+      <p>
+        <button
+          type="button"
+          class="btn btn-primary btn-sm"
+          ng-disabled="state.actionInProgress"
+          ng-click="onDeassociateEndpoint()"
+          button-spinner="state.actionInProgress"
+          analytics-on
+          analytics-event="edge-endpoint-deassociate"
+          analytics-category="edge"
+        >
+          <span ng-hide="state.actionInProgress">De-associate</span>
+        </button>
       </p>
     </span>
   </information-panel>
@@ -39,20 +53,27 @@
           <label class="btn btn-primary" ng-model="state.platformType" uib-btn-radio="'windows'"><i class="fab fa-windows" style="margin-right: 2px;"></i> Windows</label>
         </div>
       </div>
+      <por-switch-field
+        label="Allow self-signed certs"
+        ng-model="state.allowSelfSignedCerts"
+        tooltip="When allowing self-signed certificates the edge agent will ignore the domain validation when connecting to Portainer via HTTPS"
+      ></por-switch-field>
       <div style="margin-top: 10px;">
         <uib-tabset active="state.deploymentTab">
-          <uib-tab index="0" ng-if="state.platformType === 'linux'" heading="Kubernetes">
-            <code style="display: block; white-space: pre-wrap; padding: 16px 90px;"
-              >curl https://downloads.portainer.io/portainer-edge-agent-setup.sh | sudo bash -s -- {{ randomEdgeID }} {{ endpoint.EdgeKey }}</code
-            >
+          <uib-tab index="'kubernetes'" heading="Kubernetes" ng-if="state.platformType === 'linux'">
+            <code style="display: block; white-space: pre-wrap; padding: 16px 45px;">
+              {{ dockerCommands[state.deploymentTab][state.platformType](randomEdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts) }}
+            </code>
           </uib-tab>
-          <uib-tab index="1" heading="Docker Swarm">
-            <code ng-if="state.platformType === 'linux'" style="display: block; white-space: pre-wrap; padding: 16px 90px;">{{ dockerCommands.linuxSwarm }}</code>
-            <code ng-if="state.platformType === 'windows'" style="display: block; white-space: pre-wrap; padding: 16px 90px;">{{ dockerCommands.windowsSwarm }}</code>
+          <uib-tab index="'swarm'" heading="Docker Swarm">
+            <code style="display: block; white-space: pre-wrap; padding: 16px 45px;">
+              {{ dockerCommands[state.deploymentTab][state.platformType](randomEdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts) }}
+            </code>
           </uib-tab>
-          <uib-tab index="2" heading="Docker Standalone">
-            <code ng-if="state.platformType === 'linux'" style="display: block; white-space: pre-wrap; padding: 16px 90px;">{{ dockerCommands.linuxStandalone }}</code>
-            <code ng-if="state.platformType === 'windows'" style="display: block; white-space: pre-wrap; padding: 16px 90px;">{{ dockerCommands.windowsStandalone }}</code>
+          <uib-tab index="'standalone'" heading="Docker Standalone">
+            <code style="display: block; white-space: pre-wrap; padding: 16px 45px;">
+              {{ dockerCommands[state.deploymentTab][state.platformType](randomEdgeID, endpoint.EdgeKey, state.allowSelfSignedCerts) }}
+            </code>
           </uib-tab>
         </uib-tabset>
         <div style="margin-top: 10px;">
@@ -65,7 +86,7 @@
       </div>
       <p>
         <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-        For those prestaging the edge agent, use the following join token to associate the Edge agent with this endpoint.
+        For those prestaging the edge agent, use the following join token to associate the Edge agent with this environment.
       </p>
       <p> You can read more about pre-staging in the userguide available <a href="https://downloads.portainer.io/edge_agent_guide.pdf">here.</a> </p>
       <div style="margin-top: 10px; overflow-wrap: break-word;">
@@ -107,7 +128,7 @@
           <!-- endpoint-url-input -->
           <div class="form-group" ng-if="!state.edgeEndpoint">
             <label for="endpoint_url" class="col-sm-3 col-lg-2 control-label text-left">
-              Endpoint URL
+              Environment URL
               <portainer-tooltip
                 position="bottom"
                 message="URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it."
@@ -132,7 +153,7 @@
               Public IP
               <portainer-tooltip
                 position="bottom"
-                message="URL or IP address where exposed containers will be reachable. This field is optional and will default to the endpoint URL."
+                message="URL or IP address where exposed containers will be reachable. This field is optional and will default to the environment URL."
               >
               </portainer-tooltip>
             </label>
@@ -145,7 +166,7 @@
               Poll frequency
               <portainer-tooltip
                 position="bottom"
-                message="Interval used by this Edge agent to check in with the Portainer instance. Affects Edge endpoint management and Edge compute features."
+                message="Interval used by this Edge agent to check in with the Portainer instance. Affects Edge environment management and Edge compute features."
               ></portainer-tooltip>
             </label>
             <div class="col-sm-10">
@@ -199,8 +220,8 @@
                 ng-click="updateEndpoint()"
                 button-spinner="state.actionInProgress"
               >
-                <span ng-hide="state.actionInProgress">Update endpoint</span>
-                <span ng-show="state.actionInProgress">Updating endpoint...</span>
+                <span ng-hide="state.actionInProgress">Update environment</span>
+                <span ng-show="state.actionInProgress">Updating environment...</span>
               </button>
               <a type="button" class="btn btn-default btn-sm" ui-sref="portainer.endpoints">Cancel</a>
             </div>

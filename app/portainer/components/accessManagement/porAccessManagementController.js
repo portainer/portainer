@@ -44,6 +44,7 @@ class PorAccessManagementController {
     const teamAccessPolicies = entity.TeamAccessPolicies;
     const selectedUserAccesses = _.filter(selectedAccesses, (access) => access.Type === 'user');
     const selectedTeamAccesses = _.filter(selectedAccesses, (access) => access.Type === 'team');
+
     _.forEach(selectedUserAccesses, (access) => delete userAccessPolicies[access.Id]);
     _.forEach(selectedTeamAccesses, (access) => delete teamAccessPolicies[access.Id]);
     this.updateAccess();
@@ -55,6 +56,11 @@ class PorAccessManagementController {
       const parent = this.inheritFrom;
 
       const data = await this.AccessService.accesses(entity, parent, this.roles);
+
+      if (this.filterUsers) {
+        data.availableUsersAndTeams = this.filterUsers(data.availableUsersAndTeams);
+      }
+
       this.availableUsersAndTeams = _.orderBy(data.availableUsersAndTeams, 'Name', 'asc');
       this.authorizedUsersAndTeams = data.authorizedUsersAndTeams;
     } catch (err) {

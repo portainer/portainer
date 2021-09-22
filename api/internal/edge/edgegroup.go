@@ -5,7 +5,7 @@ import (
 	"github.com/portainer/portainer/api/internal/tag"
 )
 
-// EdgeGroupRelatedEndpoints returns a list of endpoints related to this Edge group
+// EdgeGroupRelatedEndpoints returns a list of environments(endpoints) related to this Edge group
 func EdgeGroupRelatedEndpoints(edgeGroup *portainer.EdgeGroup, endpoints []portainer.Endpoint, endpointGroups []portainer.EndpointGroup) []portainer.EndpointID {
 	if !edgeGroup.Dynamic {
 		return edgeGroup.Endpoints
@@ -33,7 +33,7 @@ func EdgeGroupRelatedEndpoints(edgeGroup *portainer.EdgeGroup, endpoints []porta
 	return endpointIDs
 }
 
-// edgeGroupRelatedToEndpoint returns true is edgeGroup is associated with endpoint
+// edgeGroupRelatedToEndpoint returns true is edgeGroup is associated with environment(endpoint)
 func edgeGroupRelatedToEndpoint(edgeGroup *portainer.EdgeGroup, endpoint *portainer.Endpoint, endpointGroup *portainer.EndpointGroup) bool {
 	if !edgeGroup.Dynamic {
 		for _, endpointID := range edgeGroup.Endpoints {

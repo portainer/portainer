@@ -17,11 +17,15 @@ import (
 	"strings"
 	"time"
 
+	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
+	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/kubernetes/cli"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
 )
 
-// KubernetesDeployer represents a service to deploy resources inside a Kubernetes environment.
+// KubernetesDeployer represents a service to deploy resources inside a Kubernetes environment(endpoint).
 type KubernetesDeployer struct {
 	binaryPath                  string
 	dataStore                   portainer.DataStore
@@ -65,7 +69,7 @@ func (deployer *KubernetesDeployer) getToken(request *http.Request, endpoint *po
 		return tokenManager.GetAdminServiceAccountToken(), nil
 	}
 
-	token, err := tokenManager.GetUserServiceAccountToken(int(tokenData.ID))
+	token, err := tokenManager.GetUserServiceAccountToken(int(tokenData.ID), endpoint.ID)
 	if err != nil {
 		return "", err
 	}
@@ -76,11 +80,11 @@ func (deployer *KubernetesDeployer) getToken(request *http.Request, endpoint *po
 	return token, nil
 }
 
-// Deploy will deploy a Kubernetes manifest inside a specific namespace in a Kubernetes endpoint.
+// Deploy will deploy a Kubernetes manifest inside a specific namespace in a Kubernetes environment(endpoint).
 // Otherwise it will use kubectl to deploy the manifest.
 func (deployer *KubernetesDeployer) Deploy(request *http.Request, endpoint *portainer.Endpoint, stackConfig string, namespace string) (string, error) {
 	if endpoint.Type == portainer.KubernetesLocalEnvironment {
-		token, err := deployer.getToken(request, endpoint, true);
+		token, err := deployer.getToken(request, endpoint, true)
 		if err != nil {
 			return "", err
 		}
@@ -179,7 +183,7 @@ func (deployer *KubernetesDeployer) Deploy(request *http.Request, endpoint *port
 		return "", err
 	}
 
-	token, err := deployer.getToken(request, endpoint, false);
+	token, err := deployer.getToken(request, endpoint, false)
 	if err != nil {
 		return "", err
 	}
@@ -229,7 +233,7 @@ func (deployer *KubernetesDeployer) Deploy(request *http.Request, endpoint *port
 }
 
 // ConvertCompose leverages the kompose binary to deploy a compose compliant manifest.
-func (deployer *KubernetesDeployer) ConvertCompose(data string) ([]byte, error) {
+func (deployer *KubernetesDeployer) ConvertCompose(data []byte) ([]byte, error) {
 	command := path.Join(deployer.binaryPath, "kompose")
 	if runtime.GOOS == "windows" {
 		command = path.Join(deployer.binaryPath, "kompose.exe")
@@ -241,7 +245,7 @@ func (deployer *KubernetesDeployer) ConvertCompose(data string) ([]byte, error) 
 	var stderr bytes.Buffer
 	cmd := exec.Command(command, args...)
 	cmd.Stderr = &stderr
-	cmd.Stdin = strings.NewReader(data)
+	cmd.Stdin = bytes.NewReader(data)
 
 	output, err := cmd.Output()
 	if err != nil {

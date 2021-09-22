@@ -70,6 +70,10 @@ angular.module('portainer.app').controller('StackController', [
       }
     };
 
+    $scope.$on('$destroy', function () {
+      $scope.state.isEditorDirty = false;
+    });
+
     $scope.handleEnvVarChange = handleEnvVarChange;
     function handleEnvVarChange(value) {
       $scope.formValues.Env = value;
@@ -102,7 +106,7 @@ angular.module('portainer.app').controller('StackController', [
         ModalService.confirm({
           title: 'Are you sure?',
           message:
-            'This action will deploy a new instance of this stack on the target endpoint, please note that this does NOT relocate the content of any persistent volumes that may be attached to this stack.',
+            'This action will deploy a new instance of this stack on the target environment, please note that this does NOT relocate the content of any persistent volumes that may be attached to this stack.',
           buttons: {
             confirm: {
               label: 'Migrate',
@@ -285,13 +289,13 @@ angular.module('portainer.app').controller('StackController', [
           $scope.endpoints = data.value;
         })
         .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to retrieve endpoints');
+          Notifications.error('Failure', err, 'Unable to retrieve environments');
         });
 
       $q.all({
         stack: StackService.stack(id),
         groups: GroupService.groups(),
-        containers: ContainerService.containers(),
+        containers: ContainerService.containers(true),
       })
         .then(function success(data) {
           var stack = data.stack;

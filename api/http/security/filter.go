@@ -1,7 +1,7 @@
 package security
 
 import (
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 // FilterUserTeams filters teams based on user role.
@@ -64,23 +64,24 @@ func FilterUsers(users []portainer.User, context *RestrictedRequestContext) []po
 
 // FilterRegistries filters registries based on user role and team memberships.
 // Non administrator users only have access to authorized registries.
-func FilterRegistries(registries []portainer.Registry, context *RestrictedRequestContext) []portainer.Registry {
-	filteredRegistries := registries
-	if !context.IsAdmin {
-		filteredRegistries = make([]portainer.Registry, 0)
+func FilterRegistries(registries []portainer.Registry, user *portainer.User, teamMemberships []portainer.TeamMembership, endpointID portainer.EndpointID) []portainer.Registry {
+	if user.Role == portainer.AdministratorRole {
+		return registries
+	}
 
-		for _, registry := range registries {
-			if AuthorizedRegistryAccess(&registry, context.UserID, context.UserMemberships) {
-				filteredRegistries = append(filteredRegistries, registry)
-			}
+	filteredRegistries := []portainer.Registry{}
+
+	for _, registry := range registries {
+		if AuthorizedRegistryAccess(&registry, user, teamMemberships, endpointID) {
+			filteredRegistries = append(filteredRegistries, registry)
 		}
 	}
 
 	return filteredRegistries
 }
 
-// FilterEndpoints filters endpoints based on user role and team memberships.
-// Non administrator users only have access to authorized endpoints (can be inherited via endoint groups).
+// FilterEndpoints filters environments(endpoints) based on user role and team memberships.
+// Non administrator users only have access to authorized environments(endpoints) (can be inherited via endoint groups).
 func FilterEndpoints(endpoints []portainer.Endpoint, groups []portainer.EndpointGroup, context *RestrictedRequestContext) []portainer.Endpoint {
 	filteredEndpoints := endpoints
 
@@ -99,8 +100,8 @@ func FilterEndpoints(endpoints []portainer.Endpoint, groups []portainer.Endpoint
 	return filteredEndpoints
 }
 
-// FilterEndpointGroups filters endpoint groups based on user role and team memberships.
-// Non administrator users only have access to authorized endpoint groups.
+// FilterEndpointGroups filters environment(endpoint) groups based on user role and team memberships.
+// Non administrator users only have access to authorized environment(endpoint) groups.
 func FilterEndpointGroups(endpointGroups []portainer.EndpointGroup, context *RestrictedRequestContext) []portainer.EndpointGroup {
 	filteredEndpointGroups := endpointGroups
 

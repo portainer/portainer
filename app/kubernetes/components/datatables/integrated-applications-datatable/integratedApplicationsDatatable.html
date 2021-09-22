@@ -91,7 +91,7 @@
               <td
                 ><a ui-sref="kubernetes.applications.application({ name: item.Name, namespace: item.ResourcePool })">{{ item.Name }}</a></td
               >
-              <td>{{ item.StackName }}</td>
+              <td>{{ item.StackName || '-' }}</td>
               <td title="{{ item.Image }}">{{ item.Image | truncate: 64 }}</td>
             </tr>
             <tr ng-if="!$ctrl.dataset">

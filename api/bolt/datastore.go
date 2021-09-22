@@ -6,6 +6,8 @@ import (
 	"path"
 	"time"
 
+	"github.com/portainer/portainer/api/bolt/helmuserrepository"
+
 	"github.com/boltdb/bolt"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/customtemplate"
@@ -25,6 +27,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/role"
 	"github.com/portainer/portainer/api/bolt/schedule"
 	"github.com/portainer/portainer/api/bolt/settings"
+	"github.com/portainer/portainer/api/bolt/ssl"
 	"github.com/portainer/portainer/api/bolt/stack"
 	"github.com/portainer/portainer/api/bolt/tag"
 	"github.com/portainer/portainer/api/bolt/team"
@@ -43,32 +46,34 @@ const (
 // Store defines the implementation of portainer.DataStore using
 // BoltDB as the storage system.
 type Store struct {
-	path                    string
-	connection              *internal.DbConnection
-	isNew                   bool
-	fileService             portainer.FileService
-	CustomTemplateService   *customtemplate.Service
-	DockerHubService        *dockerhub.Service
-	EdgeGroupService        *edgegroup.Service
-	EdgeJobService          *edgejob.Service
-	EdgeStackService        *edgestack.Service
-	EndpointGroupService    *endpointgroup.Service
-	EndpointService         *endpoint.Service
-	EndpointRelationService *endpointrelation.Service
-	ExtensionService        *extension.Service
-	RegistryService         *registry.Service
-	ResourceControlService  *resourcecontrol.Service
-	RoleService             *role.Service
-	ScheduleService         *schedule.Service
-	SettingsService         *settings.Service
-	StackService            *stack.Service
-	TagService              *tag.Service
-	TeamMembershipService   *teammembership.Service
-	TeamService             *team.Service
-	TunnelServerService     *tunnelserver.Service
-	UserService             *user.Service
-	VersionService          *version.Service
-	WebhookService          *webhook.Service
+	path                      string
+	connection                *internal.DbConnection
+	isNew                     bool
+	fileService               portainer.FileService
+	CustomTemplateService     *customtemplate.Service
+	DockerHubService          *dockerhub.Service
+	EdgeGroupService          *edgegroup.Service
+	EdgeJobService            *edgejob.Service
+	EdgeStackService          *edgestack.Service
+	EndpointGroupService      *endpointgroup.Service
+	EndpointService           *endpoint.Service
+	EndpointRelationService   *endpointrelation.Service
+	ExtensionService          *extension.Service
+	HelmUserRepositoryService *helmuserrepository.Service
+	RegistryService           *registry.Service
+	ResourceControlService    *resourcecontrol.Service
+	RoleService               *role.Service
+	ScheduleService           *schedule.Service
+	SettingsService           *settings.Service
+	SSLSettingsService        *ssl.Service
+	StackService              *stack.Service
+	TagService                *tag.Service
+	TeamMembershipService     *teammembership.Service
+	TeamService               *team.Service
+	TunnelServerService       *tunnelserver.Service
+	UserService               *user.Service
+	VersionService            *version.Service
+	WebhookService            *webhook.Service
 }
 
 func (store *Store) edition() portainer.SoftwareEdition {
@@ -114,6 +119,7 @@ func (store *Store) Open() error {
 }
 
 // Close closes the BoltDB database.
+// Safe to being called multiple times.
 func (store *Store) Close() error {
 	if store.connection.DB != nil {
 		return store.connection.Close()
@@ -169,6 +175,7 @@ func (store *Store) MigrateData(force bool) error {
 			UserService:             store.UserService,
 			VersionService:          store.VersionService,
 			FileService:             store.fileService,
+			DockerhubService:        store.DockerHubService,
 			AuthorizationService:    authorization.NewService(store),
 		}
 		migrator := migrator.NewMigrator(migratorParams)

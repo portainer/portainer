@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
 type agentTransport struct {
@@ -14,17 +15,18 @@ type agentTransport struct {
 }
 
 // NewAgentTransport returns a new transport that can be used to send signed requests to a Portainer agent
-func NewAgentTransport(dataStore portainer.DataStore, signatureService portainer.DigitalSignatureService, tlsConfig *tls.Config, tokenManager *tokenManager, endpoint *portainer.Endpoint) *agentTransport {
+func NewAgentTransport(signatureService portainer.DigitalSignatureService, tlsConfig *tls.Config, tokenManager *tokenManager, endpoint *portainer.Endpoint, k8sClientFactory *cli.ClientFactory, dataStore portainer.DataStore) *agentTransport {
 	transport := &agentTransport{
-		signatureService: signatureService,
 		baseTransport: newBaseTransport(
 			&http.Transport{
 				TLSClientConfig: tlsConfig,
 			},
 			tokenManager,
 			endpoint,
+			k8sClientFactory,
 			dataStore,
 		),
+		signatureService: signatureService,
 	}
 
 	return transport
@@ -32,7 +34,7 @@ func NewAgentTransport(dataStore portainer.DataStore, signatureService portainer
 
 // RoundTrip is the implementation of the the http.RoundTripper interface
 func (transport *agentTransport) RoundTrip(request *http.Request) (*http.Response, error) {
-	token, err := getRoundTripToken(request, transport.tokenManager, transport.endpoint.ID)
+	token, err := transport.getRoundTripToken(request, transport.tokenManager)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +42,10 @@ func (transport *agentTransport) RoundTrip(request *http.Request) (*http.Respons
 	request.Header.Set(portainer.PortainerAgentKubernetesSATokenHeader, token)
 
 	if strings.HasPrefix(request.URL.Path, "/v2") {
-		decorateAgentRequest(request, transport.dataStore)
+		err := decorateAgentRequest(request, transport.dataStore)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	signature, err := transport.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)

@@ -18,6 +18,7 @@ class KubernetesResourcePoolConverter {
     namespace.Name = formValues.Name;
     namespace.ResourcePoolName = formValues.Name;
     namespace.ResourcePoolOwner = formValues.Owner;
+    namespace.IsSystem = formValues.IsSystem;
 
     const quota = KubernetesResourceQuotaConverter.resourcePoolFormValuesToResourceQuota(formValues);
 
@@ -28,7 +29,16 @@ class KubernetesResourcePoolConverter {
       }
     });
     const ingresses = _.without(ingMap, undefined);
-    return [namespace, quota, ingresses];
+    const registries = _.map(formValues.Registries, (r) => {
+      if (!r.RegistryAccesses[formValues.EndpointId]) {
+        r.RegistryAccesses[formValues.EndpointId] = { Namespaces: [] };
+      }
+      if (!_.includes(r.RegistryAccesses[formValues.EndpointId].Namespaces, formValues.Name)) {
+        r.RegistryAccesses[formValues.EndpointId].Namespaces = [...r.RegistryAccesses[formValues.EndpointId].Namespaces, formValues.Name];
+      }
+      return r;
+    });
+    return [namespace, quota, ingresses, registries];
   }
 }
 

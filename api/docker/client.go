@@ -34,15 +34,15 @@ func NewClientFactory(signatureService portainer.DigitalSignatureService, revers
 }
 
 // createClient is a generic function to create a Docker client based on
-// a specific endpoint configuration. The nodeName parameter can be used
-// with an agent enabled endpoint to target a specific node in an agent cluster.
+// a specific environment(endpoint) configuration. The nodeName parameter can be used
+// with an agent enabled environment(endpoint) to target a specific node in an agent cluster.
 func (factory *ClientFactory) CreateClient(endpoint *portainer.Endpoint, nodeName string) (*client.Client, error) {
 	if endpoint.Type == portainer.AzureEnvironment {
 		return nil, errUnsupportedEnvironmentType
 	} else if endpoint.Type == portainer.AgentOnDockerEnvironment {
 		return createAgentClient(endpoint, factory.signatureService, nodeName)
 	} else if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
-		return createEdgeClient(endpoint, factory.reverseTunnelService, nodeName)
+		return createEdgeClient(endpoint, factory.signatureService, factory.reverseTunnelService, nodeName)
 	}
 
 	if strings.HasPrefix(endpoint.URL, "unix://") || strings.HasPrefix(endpoint.URL, "npipe://") {
@@ -71,13 +71,22 @@ func createTCPClient(endpoint *portainer.Endpoint) (*client.Client, error) {
 	)
 }
 
-func createEdgeClient(endpoint *portainer.Endpoint, reverseTunnelService portainer.ReverseTunnelService, nodeName string) (*client.Client, error) {
+func createEdgeClient(endpoint *portainer.Endpoint, signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, nodeName string) (*client.Client, error) {
 	httpCli, err := httpClient(endpoint)
 	if err != nil {
 		return nil, err
 	}
 
-	headers := map[string]string{}
+	signature, err := signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
+	if err != nil {
+		return nil, err
+	}
+
+	headers := map[string]string{
+		portainer.PortainerAgentPublicKeyHeader: signatureService.EncodedPublicKey(),
+		portainer.PortainerAgentSignatureHeader: signature,
+	}
+
 	if nodeName != "" {
 		headers[portainer.PortainerAgentTargetHeader] = nodeName
 	}

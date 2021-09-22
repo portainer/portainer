@@ -1,0 +1,67 @@
+<form class="form-horizontal" name="aciWizardForm">
+  <box-selector radio-name="ACI" ng-model="$ctrl.state.endpointType" options="$ctrl.state.availableOptions"></box-selector>
+  <!-- docker form section-->
+  <div class="form-group wizard-form">
+    <label for="acir_name" class="col-sm-3 col-lg-2 control-label text-left">Name<span class="wizard-form-required">*</span></label>
+    <div class="col-sm-9 col-lg-10" style="margin-bottom: 15px;">
+      <input type="text" class="form-control" name="aci_name" ng-model="$ctrl.formValues.name" placeholder="e.g. docker-prod01 / kubernetes-cluster01" required auto-focus />
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="azure_credential_appid" class="col-sm-3 col-lg-2 control-label text-left">Application ID:<span class="wizard-form-required">*</span></label>
+    <div class="col-sm-9 col-lg-10" style="margin-bottom: 15px;">
+      <input
+        type="text"
+        class="form-control"
+        name="azure_credential_appid"
+        ng-model="$ctrl.formValues.azureApplicationId"
+        placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+        required
+      />
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="azure_credential_tenantid" class="col-sm-3 col-lg-2 control-label text-left">Tenant ID:<span class="wizard-form-required">*</span></label>
+    <div class="col-sm-9 col-lg-10" style="margin-bottom: 15px;">
+      <input
+        type="text"
+        class="form-control"
+        name="azure_credential_tenantid"
+        ng-model="$ctrl.formValues.azureTenantId"
+        placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+        required
+      />
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="azure_credential_authkey" class="col-sm-3 col-lg-2 control-label text-left">Authentication key<span class="wizard-form-required">*</span></label>
+    <div class="col-sm-9 col-lg-10">
+      <input
+        type="text"
+        class="form-control"
+        name="azure_credential_authkey"
+        ng-model="$ctrl.formValues.azureAuthenticationKey"
+        placeholder="cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk="
+        required
+      />
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-sm-12">
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm wizard-connect-button"
+        ng-disabled="!$ctrl.formValues.name || !$ctrl.formValues.azureApplicationId || !$ctrl.formValues.azureTenantId || !$ctrl.formValues.azureAuthenticationKey || $ctrl.state.actionInProgress"
+        ng-click="$ctrl.addAciEndpoint()"
+        button-spinner="$ctrl.state.actionInProgress"
+      >
+        <span ng-hide="$ctrl.state.actionInProgress"><i class="fa fa-plug" style="margin-right: 5px;"></i> Connect </span>
+        <span ng-show="$ctrl.state.actionInProgress">Connecting environment...</span>
+      </button>
+    </div>
+  </div>
+</form>

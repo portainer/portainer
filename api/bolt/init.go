@@ -44,7 +44,9 @@ func (store *Store) Init() error {
 
 			EdgeAgentCheckinInterval: portainer.DefaultEdgeAgentCheckinIntervalInSeconds,
 			TemplatesURL:             portainer.DefaultTemplatesURL,
+			HelmRepositoryURL:        portainer.DefaultHelmRepositoryURL,
 			UserSessionTimeout:       portainer.DefaultUserSessionTimeout,
+			KubeconfigExpiry:         portainer.DefaultKubeconfigExpiry,
 		}
 
 		err = store.SettingsService.UpdateSettings(defaultSettings)
@@ -55,20 +57,20 @@ func (store *Store) Init() error {
 		return err
 	}
 
-	_, err = store.DockerHubService.DockerHub()
-	if err == errors.ErrObjectNotFound {
-		defaultDockerHub := &portainer.DockerHub{
-			Authentication: false,
-			Username:       "",
-			Password:       "",
+	_, err = store.SSLSettings().Settings()
+	if err != nil {
+		if err != errors.ErrObjectNotFound {
+			return err
 		}
 
-		err := store.DockerHubService.UpdateDockerHub(defaultDockerHub)
+		defaultSSLSettings := &portainer.SSLSettings{
+			HTTPEnabled: true,
+		}
+
+		err = store.SSLSettings().UpdateSettings(defaultSSLSettings)
 		if err != nil {
 			return err
 		}
-	} else if err != nil {
-		return err
 	}
 
 	groups, err := store.EndpointGroupService.EndpointGroups()
@@ -79,7 +81,7 @@ func (store *Store) Init() error {
 	if len(groups) == 0 {
 		unassignedGroup := &portainer.EndpointGroup{
 			Name:               "Unassigned",
-			Description:        "Unassigned endpoints",
+			Description:        "Unassigned environments",
 			Labels:             []portainer.Pair{},
 			UserAccessPolicies: portainer.UserAccessPolicies{},
 			TeamAccessPolicies: portainer.TeamAccessPolicies{},

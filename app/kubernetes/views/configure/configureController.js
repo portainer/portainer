@@ -5,41 +5,31 @@ import { KubernetesFormValidationReferences } from 'Kubernetes/models/applicatio
 import { KubernetesIngressClass } from 'Kubernetes/ingress/models';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
+import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 
 class KubernetesConfigureController {
   /* #region  CONSTRUCTOR */
 
-  // TODO: technical debt
-  // $transition$ cannot be injected as bindings: { $transition$: '<' } inside app/portainer/__module.js
-  // because this view is not using a component (https://ui-router.github.io/guide/ng1/route-to-component#accessing-transition)
-  // and will cause
-  // >> Error: Cannot combine: component|bindings|componentProvider
-  // >> with: templateProvider|templateUrl|template|notify|async|controller|controllerProvider|controllerAs|resolveAs
-  // >> in stateview: 'content@@portainer.endpoints.endpoint.kubernetesConfig'
   /* @ngInject */
   constructor(
     $async,
     $state,
-    $transition$,
     Notifications,
     KubernetesStorageService,
     EndpointService,
     EndpointProvider,
     ModalService,
-    KubernetesNamespaceHelper,
     KubernetesResourcePoolService,
     KubernetesIngressService,
     KubernetesMetricsService
   ) {
     this.$async = $async;
     this.$state = $state;
-    this.$transition$ = $transition$;
     this.Notifications = Notifications;
     this.KubernetesStorageService = KubernetesStorageService;
     this.EndpointService = EndpointService;
     this.EndpointProvider = EndpointProvider;
     this.ModalService = ModalService;
-    this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesIngressService = KubernetesIngressService;
     this.KubernetesMetricsService = KubernetesMetricsService;
@@ -116,6 +106,7 @@ class KubernetesConfigureController {
     endpoint.Kubernetes.Configuration.UseLoadBalancer = this.formValues.UseLoadBalancer;
     endpoint.Kubernetes.Configuration.UseServerMetrics = this.formValues.UseServerMetrics;
     endpoint.Kubernetes.Configuration.IngressClasses = ingressClasses;
+    endpoint.Kubernetes.Configuration.RestrictDefaultNamespace = this.formValues.RestrictDefaultNamespace;
   }
 
   transformFormValues() {
@@ -155,8 +146,7 @@ class KubernetesConfigureController {
       const allResourcePools = await this.KubernetesResourcePoolService.get();
       const resourcePools = _.filter(
         allResourcePools,
-        (resourcePool) =>
-          !this.KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name) && !this.KubernetesNamespaceHelper.isDefaultNamespace(resourcePool.Namespace.Name)
+        (resourcePool) => !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name) && !KubernetesNamespaceHelper.isDefaultNamespace(resourcePool.Namespace.Name)
       );
 
       ingressesToDel.forEach((ingress) => {
@@ -247,13 +237,17 @@ class KubernetesConfigureController {
   }
   /* #endregion */
 
+  restrictDefaultToggledOn() {
+    return this.formValues.RestrictDefaultNamespace && !this.oldFormValues.RestrictDefaultNamespace;
+  }
+
   /* #region  ON INIT */
   async onInit() {
     this.state = {
       actionInProgress: false,
       displayConfigureClassPanel: {},
       viewReady: false,
-      endpointId: this.$transition$.params().id,
+      endpointId: this.$state.params.id,
       duplicates: {
         ingressClasses: new KubernetesFormValidationReferences(),
       },
@@ -268,6 +262,7 @@ class KubernetesConfigureController {
       UseLoadBalancer: false,
       UseServerMetrics: false,
       IngressClasses: [],
+      RestrictDefaultNamespace: false,
     };
 
     try {
@@ -290,13 +285,16 @@ class KubernetesConfigureController {
 
       this.formValues.UseLoadBalancer = this.endpoint.Kubernetes.Configuration.UseLoadBalancer;
       this.formValues.UseServerMetrics = this.endpoint.Kubernetes.Configuration.UseServerMetrics;
+      this.formValues.RestrictDefaultNamespace = this.endpoint.Kubernetes.Configuration.RestrictDefaultNamespace;
       this.formValues.IngressClasses = _.map(this.endpoint.Kubernetes.Configuration.IngressClasses, (ic) => {
         ic.IsNew = false;
         ic.NeedsDeletion = false;
         return ic;
       });
+
+      this.oldFormValues = Object.assign({}, this.formValues);
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve endpoint configuration');
+      this.Notifications.error('Failure', err, 'Unable to retrieve environment configuration');
     } finally {
       this.state.viewReady = true;
     }

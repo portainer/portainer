@@ -1,19 +1,17 @@
 package stacks
 
 import (
-	"errors"
-	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/docker/cli/cli/compose/loader"
 	"github.com/docker/cli/cli/compose/types"
+	"github.com/pkg/errors"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
-	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/endpointutils"
@@ -34,22 +32,22 @@ func (handler *Handler) cleanUp(stack *portainer.Stack, doCleanUp *bool) error {
 
 // @id StackCreate
 // @summary Deploy a new stack
-// @description Deploy a new stack into a Docker environment specified via the endpoint identifier.
+// @description Deploy a new stack into a Docker environment(endpoint) specified via the environment(endpoint) identifier.
 // @description **Access policy**: restricted
 // @tags stacks
 // @security jwt
-// @accept json, multipart/form-data
+// @accept json,multipart/form-data
 // @produce json
 // @param type query int true "Stack deployment type. Possible values: 1 (Swarm stack) or 2 (Compose stack)." Enums(1,2)
 // @param method query string true "Stack deployment method. Possible values: file, string or repository." Enums(string, file, repository)
-// @param endpointId query int true "Identifier of the endpoint that will be used to deploy the stack"
+// @param endpointId query int true "Identifier of the environment(endpoint) that will be used to deploy the stack"
 // @param body_swarm_string body swarmStackFromFileContentPayload false "Required when using method=string and type=1"
 // @param body_swarm_repository body swarmStackFromGitRepositoryPayload false "Required when using method=repository and type=1"
 // @param body_compose_string body composeStackFromFileContentPayload false "Required when using method=string and type=2"
 // @param body_compose_repository body composeStackFromGitRepositoryPayload false "Required when using method=repository and type=2"
 // @param Name formData string false "Name of the stack. required when method is file"
 // @param SwarmID formData string false "Swarm cluster identifier. Required when method equals file and type equals 1. required when method is file"
-// @param Env formData string false "Environment variables passed during deployment, represented as a JSON array [{'name': 'name', 'value': 'value'}]. Optional, used when method equals file and type equals 1."
+// @param Env formData string false "Environment(Endpoint) variables passed during deployment, represented as a JSON array [{'name': 'name', 'value': 'value'}]. Optional, used when method equals file and type equals 1."
 // @param file formData file false "Stack file. required when method is file"
 // @success 200 {object} portainer.CustomTemplate
 // @failure 400 "Invalid request"
@@ -73,9 +71,9 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == bolterrors.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
 	}
 
 	if endpointutils.IsDockerEndpoint(endpoint) && !endpoint.SecuritySettings.AllowStackManagementForRegularUsers {
@@ -98,7 +96,7 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 
 	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
 	}
 
 	tokenData, err := security.RetrieveTokenData(r)
@@ -112,7 +110,7 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 	case portainer.DockerComposeStack:
 		return handler.createComposeStack(w, r, method, endpoint, tokenData.ID)
 	case portainer.KubernetesStack:
-		return handler.createKubernetesStack(w, r, method, endpoint)
+		return handler.createKubernetesStack(w, r, method, endpoint, tokenData.ID)
 	}
 
 	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: type. Value must be one of: 1 (Swarm stack) or 2 (Compose stack)", errors.New(request.ErrInvalidQueryParameter)}
@@ -129,7 +127,7 @@ func (handler *Handler) createComposeStack(w http.ResponseWriter, r *http.Reques
 		return handler.createComposeStackFromFileUpload(w, r, endpoint, userID)
 	}
 
-	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: method. Value must be one of: string, repository or file", errors.New(request.ErrInvalidQueryParameter)}
+	return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid value for query parameter: method. Value must be one of: string, repository or file", Err: errors.New(request.ErrInvalidQueryParameter)}
 }
 
 func (handler *Handler) createSwarmStack(w http.ResponseWriter, r *http.Request, method string, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
@@ -142,15 +140,17 @@ func (handler *Handler) createSwarmStack(w http.ResponseWriter, r *http.Request,
 		return handler.createSwarmStackFromFileUpload(w, r, endpoint, userID)
 	}
 
-	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: method. Value must be one of: string, repository or file", errors.New(request.ErrInvalidQueryParameter)}
+	return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid value for query parameter: method. Value must be one of: string, repository or file", Err: errors.New(request.ErrInvalidQueryParameter)}
 }
 
-func (handler *Handler) createKubernetesStack(w http.ResponseWriter, r *http.Request, method string, endpoint *portainer.Endpoint) *httperror.HandlerError {
+func (handler *Handler) createKubernetesStack(w http.ResponseWriter, r *http.Request, method string, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	switch method {
 	case "string":
-		return handler.createKubernetesStackFromFileContent(w, r, endpoint)
+		return handler.createKubernetesStackFromFileContent(w, r, endpoint, userID)
 	case "repository":
-		return handler.createKubernetesStackFromGitRepository(w, r, endpoint)
+		return handler.createKubernetesStackFromGitRepository(w, r, endpoint, userID)
+	case "url":
+		return handler.createKubernetesStackFromManifestURL(w, r, endpoint, userID)
 	}
 	return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid value for query parameter: method. Value must be one of: string or repository", Err: errors.New(request.ErrInvalidQueryParameter)}
 }
@@ -232,24 +232,11 @@ func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *port
 	}
 
 	stack.ResourceControl = resourceControl
+
+	if stack.GitConfig != nil && stack.GitConfig.Authentication != nil && stack.GitConfig.Authentication.Password != "" {
+		// sanitize password in the http response to minimise possible security leaks
+		stack.GitConfig.Authentication.Password = ""
+	}
+
 	return response.JSON(w, stack)
-}
-
-func (handler *Handler) cloneAndSaveConfig(stack *portainer.Stack, projectPath, repositoryURL, refName, configFilePath string, auth bool, username, password string) error {
-	if !auth {
-		username = ""
-		password = ""
-	}
-
-	err := handler.GitService.CloneRepository(projectPath, repositoryURL, refName, username, password)
-	if err != nil {
-		return fmt.Errorf("unable to clone git repository: %w", err)
-	}
-
-	stack.GitConfig = &gittypes.RepoConfig{
-		URL:            repositoryURL,
-		ReferenceName:  refName,
-		ConfigFilePath: configFilePath,
-	}
-	return nil
 }

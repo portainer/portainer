@@ -19,7 +19,7 @@ import (
 // @produce json
 // @param id path int true "EdgeGroup Id"
 // @success 200 {object} portainer.EdgeGroup
-// @failure 503 Edge compute features are disabled
+// @failure 503 "Edge compute features are disabled"
 // @failure 500
 // @router /edge_groups/{id} [get]
 func (handler *Handler) edgeGroupInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -38,7 +38,7 @@ func (handler *Handler) edgeGroupInspect(w http.ResponseWriter, r *http.Request)
 	if edgeGroup.Dynamic {
 		endpoints, err := handler.getEndpointsByTags(edgeGroup.TagIDs, edgeGroup.PartialMatch)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints and endpoint groups for Edge group", err}
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environments and environment groups for Edge group", err}
 		}
 
 		edgeGroup.Endpoints = endpoints

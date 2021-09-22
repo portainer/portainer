@@ -1,25 +1,99 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import stripAnsi from 'strip-ansi';
-import { KubernetesDeployManifestTypes, KubernetesDeployBuildMethods, KubernetesDeployRequestMethods } from 'Kubernetes/models/deploy';
+import PortainerError from 'Portainer/error';
 
+import { KubernetesDeployManifestTypes, KubernetesDeployBuildMethods, KubernetesDeployRequestMethods } from 'Kubernetes/models/deploy';
+import { buildOption } from '@/portainer/components/box-selector';
 class KubernetesDeployController {
   /* @ngInject */
-  constructor($async, $state, $window, ModalService, Notifications, EndpointProvider, KubernetesResourcePoolService, StackService) {
+  constructor($async, $state, $window, Authentication, CustomTemplateService, ModalService, Notifications, EndpointProvider, KubernetesResourcePoolService, StackService) {
     this.$async = $async;
     this.$state = $state;
     this.$window = $window;
+    this.Authentication = Authentication;
+    this.CustomTemplateService = CustomTemplateService;
     this.ModalService = ModalService;
     this.Notifications = Notifications;
     this.EndpointProvider = EndpointProvider;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.StackService = StackService;
 
-    this.onInit = this.onInit.bind(this);
+    this.deployOptions = [
+      buildOption('method_kubernetes', 'fa fa-cubes', 'Kubernetes', 'Kubernetes manifest format', KubernetesDeployManifestTypes.KUBERNETES),
+      buildOption('method_compose', 'fab fa-docker', 'Compose', 'docker-compose format', KubernetesDeployManifestTypes.COMPOSE),
+    ];
+
+    this.methodOptions = [
+      buildOption('method_repo', 'fab fa-github', 'Git Repository', 'Use a git repository', KubernetesDeployBuildMethods.GIT),
+      buildOption('method_editor', 'fa fa-edit', 'Web editor', 'Use our Web editor', KubernetesDeployBuildMethods.WEB_EDITOR),
+      buildOption('method_url', 'fa fa-globe', 'URL', 'Specify a URL to a file', KubernetesDeployBuildMethods.URL),
+      buildOption('method_template', 'fa fa-rocket', 'Custom Template', 'Use a custom template', KubernetesDeployBuildMethods.CUSTOM_TEMPLATE),
+    ];
+
+    this.state = {
+      DeployType: KubernetesDeployManifestTypes.KUBERNETES,
+      BuildMethod: KubernetesDeployBuildMethods.GIT,
+      tabLogsDisabled: true,
+      activeTab: 0,
+      viewReady: false,
+      isEditorDirty: false,
+      templateId: null,
+    };
+
+    this.formValues = {};
+    this.ManifestDeployTypes = KubernetesDeployManifestTypes;
+    this.BuildMethods = KubernetesDeployBuildMethods;
+    this.endpointId = this.EndpointProvider.endpointID();
+
+    this.onChangeTemplateId = this.onChangeTemplateId.bind(this);
     this.deployAsync = this.deployAsync.bind(this);
-    this.editorUpdate = this.editorUpdate.bind(this);
-    this.editorUpdateAsync = this.editorUpdateAsync.bind(this);
+    this.onChangeFileContent = this.onChangeFileContent.bind(this);
     this.getNamespacesAsync = this.getNamespacesAsync.bind(this);
+    this.onChangeFormValues = this.onChangeFormValues.bind(this);
+    this.onRepoUrlChange = this.onRepoUrlChange.bind(this);
+    this.onRepoRefChange = this.onRepoRefChange.bind(this);
+    this.buildAnalyticsProperties = this.buildAnalyticsProperties.bind(this);
+  }
+
+  buildAnalyticsProperties() {
+    const metadata = {
+      type: buildLabel(this.state.BuildMethod),
+      format: formatLabel(this.state.DeployType),
+      role: roleLabel(this.Authentication.isAdmin()),
+    };
+
+    if (this.state.BuildMethod === KubernetesDeployBuildMethods.GIT) {
+      metadata.auth = this.formValues.RepositoryAuthentication;
+    }
+
+    return { metadata };
+
+    function roleLabel(isAdmin) {
+      if (isAdmin) {
+        return 'admin';
+      }
+
+      return 'standard';
+    }
+
+    function buildLabel(buildMethod) {
+      switch (buildMethod) {
+        case KubernetesDeployBuildMethods.GIT:
+          return 'git';
+        case KubernetesDeployBuildMethods.WEB_EDITOR:
+          return 'web-editor';
+      }
+    }
+
+    function formatLabel(format) {
+      switch (format) {
+        case KubernetesDeployManifestTypes.COMPOSE:
+          return 'compose';
+        case KubernetesDeployManifestTypes.KUBERNETES:
+          return 'manifest';
+      }
+    }
   }
 
   disableDeploy() {
@@ -27,19 +101,52 @@ class KubernetesDeployController {
       this.state.BuildMethod === KubernetesDeployBuildMethods.GIT &&
       (!this.formValues.RepositoryURL ||
         !this.formValues.FilePathInRepository ||
-        (this.formValues.RepositoryAuthentication && (!this.formValues.RepositoryUsername || !this.formValues.RepositoryPassword)));
-    const isWebEditorInvalid = this.state.BuildMethod === KubernetesDeployBuildMethods.WEB_EDITOR && _.isEmpty(this.formValues.EditorContent);
+        (this.formValues.RepositoryAuthentication && (!this.formValues.RepositoryUsername || !this.formValues.RepositoryPassword))) &&
+      _.isEmpty(this.formValues.Namespace);
+    const isWebEditorInvalid =
+      this.state.BuildMethod === KubernetesDeployBuildMethods.WEB_EDITOR && _.isEmpty(this.formValues.EditorContent) && _.isEmpty(this.formValues.Namespace);
+    const isURLFormInvalid = this.state.BuildMethod == KubernetesDeployBuildMethods.WEB_EDITOR.URL && _.isEmpty(this.formValues.ManifestURL);
 
-    return isGitFormInvalid || isWebEditorInvalid || _.isEmpty(this.formValues.Namespace) || this.state.actionInProgress;
+    const isNamespaceInvalid = _.isEmpty(this.formValues.Namespace);
+
+    return isGitFormInvalid || isWebEditorInvalid || isURLFormInvalid || this.state.actionInProgress || isNamespaceInvalid;
   }
 
-  async editorUpdateAsync(cm) {
-    this.formValues.EditorContent = cm.getValue();
+  onChangeFormValues(values) {
+    this.formValues = {
+      ...this.formValues,
+      ...values,
+    };
+  }
+
+  onRepoUrlChange(value) {
+    this.onChangeFormValues({ RepositoryURL: value });
+  }
+
+  onRepoRefChange(value) {
+    this.onChangeFormValues({ RepositoryReferenceName: value });
+  }
+
+  onChangeTemplateId(templateId) {
+    return this.$async(async () => {
+      if (this.state.templateId === templateId) {
+        return;
+      }
+
+      this.state.templateId = templateId;
+
+      try {
+        const fileContent = await this.CustomTemplateService.customTemplateFile(templateId);
+        this.onChangeFileContent(fileContent);
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to load template file');
+      }
+    });
+  }
+
+  onChangeFileContent(value) {
+    this.formValues.EditorContent = value;
     this.state.isEditorDirty = true;
-  }
-
-  editorUpdate(cm) {
-    return this.$async(this.editorUpdateAsync, cm);
   }
 
   displayErrorLog(log) {
@@ -53,10 +160,29 @@ class KubernetesDeployController {
     this.state.actionInProgress = true;
 
     try {
-      const method = this.state.BuildMethod === this.BuildMethods.GIT ? KubernetesDeployRequestMethods.REPOSITORY : KubernetesDeployRequestMethods.STRING;
+      let method;
+      let composeFormat = this.state.DeployType === this.ManifestDeployTypes.COMPOSE;
+
+      switch (this.state.BuildMethod) {
+        case this.BuildMethods.GIT:
+          method = KubernetesDeployRequestMethods.REPOSITORY;
+          break;
+        case this.BuildMethods.WEB_EDITOR:
+          method = KubernetesDeployRequestMethods.STRING;
+          break;
+        case KubernetesDeployBuildMethods.CUSTOM_TEMPLATE:
+          method = KubernetesDeployRequestMethods.STRING;
+          composeFormat = false;
+          break;
+        case this.BuildMethods.URL:
+          method = KubernetesDeployRequestMethods.URL;
+          break;
+        default:
+          throw new PortainerError('Unable to determine build method');
+      }
 
       const payload = {
-        ComposeFormat: this.state.DeployType === this.ManifestDeployTypes.COMPOSE,
+        ComposeFormat: composeFormat,
         Namespace: this.formValues.Namespace,
       };
 
@@ -69,8 +195,10 @@ class KubernetesDeployController {
           payload.RepositoryPassword = this.formValues.RepositoryPassword;
         }
         payload.FilePathInRepository = this.formValues.FilePathInRepository;
-      } else {
+      } else if (method === KubernetesDeployRequestMethods.STRING) {
         payload.StackFileContent = this.formValues.EditorContent;
+      } else {
+        payload.ManifestURL = this.formValues.ManifestURL;
       }
 
       await this.StackService.kubernetesDeploy(this.endpointId, method, payload);
@@ -104,7 +232,9 @@ class KubernetesDeployController {
       });
 
       this.namespaces = namespaces;
-      this.formValues.Namespace = this.namespaces[0].Name;
+      if (this.namespaces.length > 0) {
+        this.formValues.Namespace = this.namespaces[0].Name;
+      }
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load namespaces data');
     }
@@ -119,34 +249,31 @@ class KubernetesDeployController {
       return this.ModalService.confirmWebEditorDiscard();
     }
   }
-  async onInit() {
-    this.state = {
-      DeployType: KubernetesDeployManifestTypes.KUBERNETES,
-      BuildMethod: KubernetesDeployBuildMethods.GIT,
-      tabLogsDisabled: true,
-      activeTab: 0,
-      viewReady: false,
-      isEditorDirty: false,
-    };
-
-    this.formValues = {};
-    this.ManifestDeployTypes = KubernetesDeployManifestTypes;
-    this.BuildMethods = KubernetesDeployBuildMethods;
-    this.endpointId = this.EndpointProvider.endpointID();
-
-    await this.getNamespaces();
-
-    this.state.viewReady = true;
-
-    this.$window.onbeforeunload = () => {
-      if (this.formValues.EditorContent && this.state.isEditorDirty) {
-        return '';
-      }
-    };
-  }
 
   $onInit() {
-    return this.$async(this.onInit);
+    return this.$async(async () => {
+      await this.getNamespaces();
+
+      if (this.$state.params.templateId) {
+        const templateId = parseInt(this.$state.params.templateId, 10);
+        if (templateId && !Number.isNaN(templateId)) {
+          this.state.BuildMethod = KubernetesDeployBuildMethods.CUSTOM_TEMPLATE;
+          this.onChangeTemplateId(templateId);
+        }
+      }
+
+      this.state.viewReady = true;
+
+      this.$window.onbeforeunload = () => {
+        if (this.formValues.EditorContent && this.state.isEditorDirty) {
+          return '';
+        }
+      };
+    });
+  }
+
+  $onDestroy() {
+    this.state.isEditorDirty = false;
   }
 }
 

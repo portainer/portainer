@@ -5,6 +5,7 @@ angular
   .module('portainer.app')
   .controller('CreateEndpointController', function CreateEndpointController(
     $async,
+    $analytics,
     $q,
     $scope,
     $state,
@@ -111,11 +112,11 @@ angular
         $scope.state.actionInProgress = true;
         EndpointService.createLocalEndpoint(name, URL, publicURL, groupId, tagIds)
           .then(function success() {
-            Notifications.success('Endpoint created', name);
+            Notifications.success('Environment created', name);
             $state.go('portainer.endpoints', {}, { reload: true });
           })
           .catch(function error(err) {
-            Notifications.error('Failure', err, 'Unable to create endpoint');
+            Notifications.error('Failure', err, 'Unable to create environment');
           })
           .finally(function final() {
             $scope.state.actionInProgress = false;
@@ -153,30 +154,47 @@ angular
 
     $scope.addKubernetesEndpoint = function () {
       var name = $scope.formValues.Name;
+      var tagIds = $scope.formValues.TagIds;
       $scope.state.actionInProgress = true;
-      EndpointService.createLocalKubernetesEndpoint(name)
+      EndpointService.createLocalKubernetesEndpoint(name, tagIds)
         .then(function success(result) {
-          Notifications.success('Endpoint created', name);
+          Notifications.success('Environment created', name);
           $state.go('portainer.endpoints.endpoint.kubernetesConfig', { id: result.Id });
         })
         .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to create endpoint');
+          Notifications.error('Failure', err, 'Unable to create environment');
         })
         .finally(function final() {
           $scope.state.actionInProgress = false;
         });
     };
 
-    $scope.addAgentEndpoint = function () {
-      var name = $scope.formValues.Name;
-      // var URL = $filter('stripprotocol')($scope.formValues.URL);
-      var URL = $scope.formValues.URL;
-      var publicURL = $scope.formValues.PublicURL === '' ? URL.split(':')[0] : $scope.formValues.PublicURL;
-      var groupId = $scope.formValues.GroupId;
-      var tagIds = $scope.formValues.TagIds;
+    $scope.addAgentEndpoint = addAgentEndpoint;
+    async function addAgentEndpoint() {
+      return $async(async () => {
+        const name = $scope.formValues.Name;
+        const URL = $scope.formValues.URL;
+        const publicURL = $scope.formValues.PublicURL === '' ? URL.split(':')[0] : $scope.formValues.PublicURL;
+        const groupId = $scope.formValues.GroupId;
+        const tagIds = $scope.formValues.TagIds;
 
-      addEndpoint(name, PortainerEndpointCreationTypes.AgentEnvironment, URL, publicURL, groupId, tagIds, true, true, true, null, null, null);
-    };
+        const endpoint = await addEndpoint(name, PortainerEndpointCreationTypes.AgentEnvironment, URL, publicURL, groupId, tagIds, true, true, true, null, null, null);
+        $analytics.eventTrack('portainer-endpoint-creation', { category: 'portainer', metadata: { type: 'agent', platform: platformLabel(endpoint.Type) } });
+      });
+
+      function platformLabel(type) {
+        switch (type) {
+          case PortainerEndpointTypes.DockerEnvironment:
+          case PortainerEndpointTypes.AgentOnDockerEnvironment:
+          case PortainerEndpointTypes.EdgeAgentOnDockerEnvironment:
+            return 'docker';
+          case PortainerEndpointTypes.KubernetesLocalEnvironment:
+          case PortainerEndpointTypes.AgentOnKubernetesEnvironment:
+          case PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment:
+            return 'kubernetes';
+        }
+      }
+    }
 
     $scope.addEdgeAgentEndpoint = function () {
       var name = $scope.formValues.Name;
@@ -202,36 +220,38 @@ angular
       $scope.state.actionInProgress = true;
       EndpointService.createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tagIds)
         .then(function success() {
-          Notifications.success('Endpoint created', name);
+          Notifications.success('Environment created', name);
           $state.go('portainer.endpoints', {}, { reload: true });
         })
         .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to create endpoint');
+          Notifications.error('Failure', err, 'Unable to create environment');
         })
         .finally(function final() {
           $scope.state.actionInProgress = false;
         });
     }
 
-    function addEndpoint(name, creationType, URL, PublicURL, groupId, tagIds, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile, CheckinInterval) {
-      $scope.state.actionInProgress = true;
-      EndpointService.createRemoteEndpoint(
-        name,
-        creationType,
-        URL,
-        PublicURL,
-        groupId,
-        tagIds,
-        TLS,
-        TLSSkipVerify,
-        TLSSkipClientVerify,
-        TLSCAFile,
-        TLSCertFile,
-        TLSKeyFile,
-        CheckinInterval
-      )
-        .then(function success(endpoint) {
-          Notifications.success('Endpoint created', name);
+    async function addEndpoint(name, creationType, URL, PublicURL, groupId, tagIds, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile, CheckinInterval) {
+      return $async(async () => {
+        $scope.state.actionInProgress = true;
+        try {
+          const endpoint = await EndpointService.createRemoteEndpoint(
+            name,
+            creationType,
+            URL,
+            PublicURL,
+            groupId,
+            tagIds,
+            TLS,
+            TLSSkipVerify,
+            TLSSkipClientVerify,
+            TLSCAFile,
+            TLSCertFile,
+            TLSKeyFile,
+            CheckinInterval
+          );
+
+          Notifications.success('Environment created', name);
           switch (endpoint.Type) {
             case PortainerEndpointTypes.EdgeAgentOnDockerEnvironment:
             case PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment:
@@ -244,13 +264,14 @@ angular
               $state.go('portainer.endpoints', {}, { reload: true });
               break;
           }
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to create endpoint');
-        })
-        .finally(function final() {
+
+          return endpoint;
+        } catch (err) {
+          Notifications.error('Failure', err, 'Unable to create environment');
+        } finally {
           $scope.state.actionInProgress = false;
-        });
+        }
+      });
     }
 
     function initView() {

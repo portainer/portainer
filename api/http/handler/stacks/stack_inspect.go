@@ -1,8 +1,9 @@
 package stacks
 
 import (
-	"github.com/portainer/portainer/api/http/errors"
 	"net/http"
+
+	"github.com/portainer/portainer/api/http/errors"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -48,34 +49,41 @@ func (handler *Handler) stackInspect(w http.ResponseWriter, r *http.Request) *ht
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(stack.EndpointID)
 	if err == bolterrors.ErrObjectNotFound {
 		if !securityContext.IsAdmin {
-			return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
+			return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 		}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
 	}
 
 	if endpoint != nil {
 		err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
+			return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
 		}
 
-		resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the stack", err}
-		}
+		if stack.Type == portainer.DockerSwarmStack || stack.Type == portainer.DockerComposeStack {
+			resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the stack", err}
+			}
 
-		access, err := handler.userCanAccessStack(securityContext, endpoint.ID, resourceControl)
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify user authorizations to validate stack access", err}
-		}
-		if !access {
-			return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", errors.ErrResourceAccessDenied}
-		}
+			access, err := handler.userCanAccessStack(securityContext, endpoint.ID, resourceControl)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify user authorizations to validate stack access", err}
+			}
+			if !access {
+				return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", errors.ErrResourceAccessDenied}
+			}
 
-		if resourceControl != nil {
-			stack.ResourceControl = resourceControl
+			if resourceControl != nil {
+				stack.ResourceControl = resourceControl
+			}
 		}
+	}
+
+	if stack.GitConfig != nil && stack.GitConfig.Authentication != nil && stack.GitConfig.Authentication.Password != "" {
+		// sanitize password in the http response to minimise possible security leaks
+		stack.GitConfig.Authentication.Password = ""
 	}
 
 	return response.JSON(w, stack)

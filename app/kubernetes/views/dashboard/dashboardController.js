@@ -1,6 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
+import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 
 class KubernetesDashboardController {
   /* @ngInject */
@@ -13,7 +14,6 @@ class KubernetesDashboardController {
     KubernetesApplicationService,
     KubernetesConfigurationService,
     KubernetesVolumeService,
-    KubernetesNamespaceHelper,
     Authentication,
     TagService
   ) {
@@ -25,7 +25,6 @@ class KubernetesDashboardController {
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesConfigurationService = KubernetesConfigurationService;
     this.KubernetesVolumeService = KubernetesVolumeService;
-    this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
     this.Authentication = Authentication;
     this.TagService = TagService;
 
@@ -65,13 +64,8 @@ class KubernetesDashboardController {
         : '-';
 
       if (!isAdmin) {
-        this.pools = _.filter(pools, (pool) => {
-          return !this.KubernetesNamespaceHelper.isSystemNamespace(pool.Namespace.Name);
-        });
-
-        this.configurations = _.filter(configurations, (config) => {
-          return !KubernetesConfigurationHelper.isSystemToken(config);
-        });
+        this.pools = _.filter(pools, (pool) => !KubernetesNamespaceHelper.isSystemNamespace(pool.Namespace.Name));
+        this.configurations = _.filter(configurations, (config) => !KubernetesConfigurationHelper.isSystemToken(config));
       } else {
         this.pools = pools;
         this.configurations = configurations;

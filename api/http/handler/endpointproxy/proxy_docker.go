@@ -3,6 +3,7 @@ package endpointproxy
 import (
 	"errors"
 	"strconv"
+	"strings"
 	"time"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -16,24 +17,24 @@ import (
 func (handler *Handler) proxyRequestsToDockerAPI(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint identifier route variable", err}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment identifier route variable", err}
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == bolterrors.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
 	}
 
 	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
 	}
 
 	if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
 		if endpoint.EdgeID == "" {
-			return &httperror.HandlerError{http.StatusInternalServerError, "No Edge agent registered with the endpoint", errors.New("No agent available")}
+			return &httperror.HandlerError{http.StatusInternalServerError, "No Edge agent registered with the environment", errors.New("No agent available")}
 		}
 
 		tunnel := handler.ReverseTunnelService.GetTunnelDetails(endpoint.ID)
@@ -65,6 +66,12 @@ func (handler *Handler) proxyRequestsToDockerAPI(w http.ResponseWriter, r *http.
 	}
 
 	id := strconv.Itoa(endpointID)
-	http.StripPrefix("/"+id+"/docker", proxy).ServeHTTP(w, r)
+
+	prefix := "/" + id + "/agent/docker";
+	if !strings.HasPrefix(r.URL.Path, prefix) {
+		prefix = "/" + id + "/docker";
+	}
+
+	http.StripPrefix(prefix, proxy).ServeHTTP(w, r)
 	return nil
 }

@@ -10,12 +10,24 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/archive"
 	"github.com/portainer/portainer/api/crypto"
+	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/offlinegate"
 )
 
 const rwxr__r__ os.FileMode = 0744
 
-var filesToBackup = []string{"compose", "config.json", "custom_templates", "edge_jobs", "edge_stacks", "extensions", "portainer.key", "portainer.pub", "tls"}
+var filesToBackup = []string{
+	"certs",
+	"compose",
+	"config.json",
+	"custom_templates",
+	"edge_jobs",
+	"edge_stacks",
+	"extensions",
+	"portainer.key",
+	"portainer.pub",
+	"tls",
+}
 
 // Creates a tar.gz system archive and encrypts it if password is not empty. Returns a path to the archive file.
 func CreateBackupArchive(password string, gate *offlinegate.OfflineGate, datastore portainer.DataStore, filestorePath string) (string, error) {
@@ -32,7 +44,7 @@ func CreateBackupArchive(password string, gate *offlinegate.OfflineGate, datasto
 	}
 
 	for _, filename := range filesToBackup {
-		err := copyPath(filepath.Join(filestorePath, filename), backupDirPath)
+		err := filesystem.CopyPath(filepath.Join(filestorePath, filename), backupDirPath)
 		if err != nil {
 			return "", errors.Wrap(err, "Failed to create backup file")
 		}

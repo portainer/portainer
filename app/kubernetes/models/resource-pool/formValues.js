@@ -4,6 +4,9 @@ export function KubernetesResourcePoolFormValues(defaults) {
   this.CpuLimit = defaults.CpuLimit;
   this.HasQuota = false;
   this.IngressClasses = []; // KubernetesResourcePoolIngressClassFormValue
+  this.Registries = []; // RegistryViewModel
+  this.EndpointId = 0;
+  this.IsSystem = false;
 }
 
 /**

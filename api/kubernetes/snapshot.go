@@ -22,7 +22,7 @@ func NewSnapshotter(clientFactory *cli.ClientFactory) *Snapshotter {
 	}
 }
 
-// CreateSnapshot creates a snapshot of a specific Kubernetes endpoint
+// CreateSnapshot creates a snapshot of a specific Kubernetes environment(endpoint)
 func (snapshotter *Snapshotter) CreateSnapshot(endpoint *portainer.Endpoint) (*portainer.KubernetesSnapshot, error) {
 	client, err := snapshotter.clientFactory.CreateClient(endpoint)
 	if err != nil {

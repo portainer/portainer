@@ -50,7 +50,6 @@ angular.module('portainer.docker').controller('ServiceController', [
   'VolumeService',
   'ImageHelper',
   'WebhookService',
-  'EndpointProvider',
   'clipboard',
   'WebhookHelper',
   'NetworkService',
@@ -82,7 +81,6 @@ angular.module('portainer.docker').controller('ServiceController', [
     VolumeService,
     ImageHelper,
     WebhookService,
-    EndpointProvider,
     clipboard,
     WebhookHelper,
     NetworkService,
@@ -337,7 +335,7 @@ angular.module('portainer.docker').controller('ServiceController', [
             Notifications.error('Failure', err, 'Unable to delete webhook');
           });
       } else {
-        WebhookService.createServiceWebhook(service.Id, EndpointProvider.endpointID())
+        WebhookService.createServiceWebhook(service.Id, endpoint.Id)
           .then(function success(data) {
             $scope.WebhookExists = true;
             $scope.webhookID = data.Id;
@@ -688,7 +686,7 @@ angular.module('portainer.docker').controller('ServiceController', [
             availableImages: ImageService.images(),
             availableLoggingDrivers: PluginService.loggingPlugins(apiVersion < 1.25),
             availableNetworks: NetworkService.networks(true, true, apiVersion >= 1.25),
-            webhooks: WebhookService.webhooks(service.Id, EndpointProvider.endpointID()),
+            webhooks: WebhookService.webhooks(service.Id, endpoint.Id),
           });
         })
         .then(async function success(data) {

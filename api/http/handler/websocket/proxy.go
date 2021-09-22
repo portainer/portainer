@@ -22,12 +22,22 @@ func (handler *Handler) proxyEdgeAgentWebsocketRequest(w http.ResponseWriter, r 
 	endpointURL.Scheme = "ws"
 	proxy := websocketproxy.NewProxy(endpointURL)
 
+	signature, err := handler.SignatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
+	if err != nil {
+		return err
+	}
+
 	proxy.Director = func(incoming *http.Request, out http.Header) {
+		out.Set(portainer.PortainerAgentPublicKeyHeader, handler.SignatureService.EncodedPublicKey())
+		out.Set(portainer.PortainerAgentSignatureHeader, signature)
 		out.Set(portainer.PortainerAgentTargetHeader, params.nodeName)
 		out.Set(portainer.PortainerAgentKubernetesSATokenHeader, params.token)
 	}
 
 	handler.ReverseTunnelService.SetTunnelStatusToActive(params.endpoint.ID)
+
+	handler.ReverseTunnelService.KeepTunnelAlive(params.endpoint.ID, r.Context(), portainer.WebSocketKeepAlive)
+
 	proxy.ServeHTTP(w, r)
 
 	return nil

@@ -5,23 +5,27 @@ import (
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
 type edgeTransport struct {
 	*baseTransport
+	signatureService     portainer.DigitalSignatureService
 	reverseTunnelService portainer.ReverseTunnelService
 }
 
 // NewAgentTransport returns a new transport that can be used to send signed requests to a Portainer Edge agent
-func NewEdgeTransport(dataStore portainer.DataStore, reverseTunnelService portainer.ReverseTunnelService, endpoint *portainer.Endpoint, tokenManager *tokenManager) *edgeTransport {
+func NewEdgeTransport(dataStore portainer.DataStore, signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, endpoint *portainer.Endpoint, tokenManager *tokenManager, k8sClientFactory *cli.ClientFactory) *edgeTransport {
 	transport := &edgeTransport{
-		reverseTunnelService: reverseTunnelService,
 		baseTransport: newBaseTransport(
 			&http.Transport{},
 			tokenManager,
 			endpoint,
+			k8sClientFactory,
 			dataStore,
 		),
+		reverseTunnelService: reverseTunnelService,
+		signatureService:     signatureService,
 	}
 
 	return transport
@@ -29,7 +33,7 @@ func NewEdgeTransport(dataStore portainer.DataStore, reverseTunnelService portai
 
 // RoundTrip is the implementation of the the http.RoundTripper interface
 func (transport *edgeTransport) RoundTrip(request *http.Request) (*http.Response, error) {
-	token, err := getRoundTripToken(request, transport.tokenManager, transport.endpoint.ID)
+	token, err := transport.getRoundTripToken(request, transport.tokenManager)
 	if err != nil {
 		return nil, err
 	}
@@ -37,8 +41,19 @@ func (transport *edgeTransport) RoundTrip(request *http.Request) (*http.Response
 	request.Header.Set(portainer.PortainerAgentKubernetesSATokenHeader, token)
 
 	if strings.HasPrefix(request.URL.Path, "/v2") {
-		decorateAgentRequest(request, transport.dataStore)
+		err := decorateAgentRequest(request, transport.dataStore)
+		if err != nil {
+			return nil, err
+		}
 	}
+
+	signature, err := transport.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header.Set(portainer.PortainerAgentPublicKeyHeader, transport.signatureService.EncodedPublicKey())
+	request.Header.Set(portainer.PortainerAgentSignatureHeader, signature)
 
 	response, err := transport.baseTransport.RoundTrip(request)
 

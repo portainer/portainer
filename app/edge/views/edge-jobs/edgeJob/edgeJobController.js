@@ -161,7 +161,7 @@ export class EdgeJobController {
         this.results = results;
       }
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve endpoint list');
+      this.Notifications.error('Failure', err, 'Unable to retrieve environment list');
     }
 
     this.$window.onbeforeunload = () => {
@@ -169,5 +169,9 @@ export class EdgeJobController {
         return '';
       }
     };
+  }
+
+  $onDestroy() {
+    this.state.isEditorDirty = false;
   }
 }

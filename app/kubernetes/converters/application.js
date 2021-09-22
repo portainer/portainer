@@ -14,6 +14,8 @@ import {
   KubernetesPortainerApplicationNote,
   KubernetesPortainerApplicationOwnerLabel,
   KubernetesPortainerApplicationStackNameLabel,
+  KubernetesPortainerApplicationStackIdLabel,
+  KubernetesPortainerApplicationKindLabel,
 } from 'Kubernetes/models/application/models';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
@@ -54,13 +56,24 @@ class KubernetesApplicationConverter {
     const containers = data.spec.template ? _.without(_.concat(data.spec.template.spec.containers, data.spec.template.spec.initContainers), undefined) : data.spec.containers;
     res.Id = data.metadata.uid;
     res.Name = data.metadata.name;
-    res.StackName = data.metadata.labels ? data.metadata.labels[KubernetesPortainerApplicationStackNameLabel] || '-' : '-';
-    res.ApplicationOwner = data.metadata.labels ? data.metadata.labels[KubernetesPortainerApplicationOwnerLabel] || '' : '';
+    res.Metadata = data.metadata;
+
+    if (data.metadata.labels) {
+      const { labels } = data.metadata;
+      res.StackId = labels[KubernetesPortainerApplicationStackIdLabel] ? parseInt(labels[KubernetesPortainerApplicationStackIdLabel], 10) : null;
+      res.StackName = labels[KubernetesPortainerApplicationStackNameLabel] || '';
+      res.ApplicationKind = labels[KubernetesPortainerApplicationKindLabel] || '';
+      res.ApplicationOwner = labels[KubernetesPortainerApplicationOwnerLabel] || '';
+      res.ApplicationName = labels[KubernetesPortainerApplicationNameLabel] || res.Name;
+    }
+
     res.Note = data.metadata.annotations ? data.metadata.annotations[KubernetesPortainerApplicationNote] || '' : '';
-    res.ApplicationName = data.metadata.labels ? data.metadata.labels[KubernetesPortainerApplicationNameLabel] || res.Name : res.Name;
     res.ResourcePool = data.metadata.namespace;
     if (containers.length) {
       res.Image = containers[0].image;
+    }
+    if (data.spec.template && data.spec.template.spec && data.spec.template.spec.imagePullSecrets && data.spec.template.spec.imagePullSecrets.length) {
+      res.RegistryId = parseInt(data.spec.template.spec.imagePullSecrets[0].name.replace('registry-', ''), 10);
     }
     res.CreationDate = data.metadata.creationTimestamp;
     res.Env = _.without(_.flatMap(_.map(containers, 'env')), undefined);
@@ -268,7 +281,8 @@ class KubernetesApplicationConverter {
     res.Name = app.Name;
     res.StackName = app.StackName;
     res.ApplicationOwner = app.ApplicationOwner;
-    res.Image = app.Image;
+    res.ImageModel.Image = app.Image;
+    res.ImageModel.Registry.Id = app.RegistryId;
     res.ReplicaCount = app.TotalPodsCount;
     res.MemoryLimit = KubernetesResourceReservationHelper.megaBytesValue(app.Limits.Memory);
     res.CpuLimit = app.Limits.Cpu;
@@ -292,7 +306,10 @@ class KubernetesApplicationConverter {
       res.PublishingType = KubernetesApplicationPublishingTypes.INTERNAL;
     }
 
-    KubernetesApplicationHelper.generatePlacementsFormValuesFromAffinity(res, app.Pods[0].Affinity, nodesLabels);
+    if (app.Pods && app.Pods.length) {
+      KubernetesApplicationHelper.generatePlacementsFormValuesFromAffinity(res, app.Pods[0].Affinity, nodesLabels);
+    }
+
     return res;
   }
 

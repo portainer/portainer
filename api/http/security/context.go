@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 type (
@@ -17,8 +17,8 @@ const (
 	contextRestrictedRequest
 )
 
-// storeTokenData stores a TokenData object inside the request context and returns the enhanced context.
-func storeTokenData(request *http.Request, tokenData *portainer.TokenData) context.Context {
+// StoreTokenData stores a TokenData object inside the request context and returns the enhanced context.
+func StoreTokenData(request *http.Request, tokenData *portainer.TokenData) context.Context {
 	return context.WithValue(request.Context(), contextAuthenticationKey, tokenData)
 }
 
@@ -33,9 +33,9 @@ func RetrieveTokenData(request *http.Request) (*portainer.TokenData, error) {
 	return tokenData, nil
 }
 
-// storeRestrictedRequestContext stores a RestrictedRequestContext object inside the request context
+// StoreRestrictedRequestContext stores a RestrictedRequestContext object inside the request context
 // and returns the enhanced context.
-func storeRestrictedRequestContext(request *http.Request, requestContext *RestrictedRequestContext) context.Context {
+func StoreRestrictedRequestContext(request *http.Request, requestContext *RestrictedRequestContext) context.Context {
 	return context.WithValue(request.Context(), contextRestrictedRequest, requestContext)
 }
 

@@ -1,12 +1,18 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import * as JsonPatch from 'fast-json-patch';
-import { KubernetesApplicationDataAccessPolicies, KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
+import {
+  KubernetesApplicationDataAccessPolicies,
+  KubernetesApplicationDeploymentTypes,
+  KubernetesApplicationTypes,
+  KubernetesDeploymentTypes,
+} from 'Kubernetes/models/application/models';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import { KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'Kubernetes/pod/models';
 import { KubernetesPodContainerTypes } from 'Kubernetes/pod/models/index';
+import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 
 function computeTolerations(nodes, application) {
   const pod = application.Pods[0];
@@ -106,8 +112,8 @@ class KubernetesApplicationController {
     KubernetesStackService,
     KubernetesPodService,
     KubernetesNodeService,
-    KubernetesNamespaceHelper,
-    EndpointProvider
+    EndpointProvider,
+    StackService
   ) {
     this.$async = $async;
     this.$state = $state;
@@ -115,6 +121,7 @@ class KubernetesApplicationController {
     this.Notifications = Notifications;
     this.LocalStorage = LocalStorage;
     this.ModalService = ModalService;
+    this.StackService = StackService;
 
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesEventService = KubernetesEventService;
@@ -122,11 +129,10 @@ class KubernetesApplicationController {
     this.KubernetesPodService = KubernetesPodService;
     this.KubernetesNodeService = KubernetesNodeService;
 
-    this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
-
     this.KubernetesApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
     this.KubernetesApplicationTypes = KubernetesApplicationTypes;
     this.EndpointProvider = EndpointProvider;
+    this.KubernetesDeploymentTypes = KubernetesDeploymentTypes;
 
     this.ApplicationDataAccessPolicies = KubernetesApplicationDataAccessPolicies;
     this.KubernetesServiceTypes = KubernetesServiceTypes;
@@ -137,6 +143,7 @@ class KubernetesApplicationController {
     this.getApplicationAsync = this.getApplicationAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
+    this.updateApplicationKindText = this.updateApplicationKindText.bind(this);
     this.updateApplicationAsync = this.updateApplicationAsync.bind(this);
     this.redeployApplicationAsync = this.redeployApplicationAsync.bind(this);
     this.rollbackApplicationAsync = this.rollbackApplicationAsync.bind(this);
@@ -153,7 +160,7 @@ class KubernetesApplicationController {
   }
 
   isSystemNamespace() {
-    return this.KubernetesNamespaceHelper.isSystemNamespace(this.application.ResourcePool);
+    return KubernetesNamespaceHelper.isSystemNamespace(this.application.ResourcePool);
   }
 
   isExternalApplication() {
@@ -193,6 +200,10 @@ class KubernetesApplicationController {
 
   ruleCanBeDisplayed(rule) {
     return !rule.Host && !rule.IP ? false : true;
+  }
+
+  isStack() {
+    return this.application.StackId;
   }
 
   /**
@@ -258,6 +269,14 @@ class KubernetesApplicationController {
     return this.$async(this.updateApplicationAsync);
   }
 
+  updateApplicationKindText() {
+    if (this.application.ApplicationKind === this.KubernetesDeploymentTypes.GIT) {
+      this.state.appType = `git repository`;
+    } else if (this.application.ApplicationKind === this.KubernetesDeploymentTypes.CONTENT) {
+      this.state.appType = `web editor`;
+    }
+  }
+
   /**
    * EVENTS
    */
@@ -310,6 +329,11 @@ class KubernetesApplicationController {
 
       this.placements = computePlacements(nodes, this.application);
       this.state.placementWarning = _.find(this.placements, { AcceptsApplication: true }) ? false : true;
+
+      if (application.StackId) {
+        const file = await this.StackService.getStackFile(application.StackId);
+        this.stackFileContent = file;
+      }
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve application details');
     } finally {
@@ -334,6 +358,7 @@ class KubernetesApplicationController {
         namespace: this.$transition$.params().namespace,
         name: this.$transition$.params().name,
       },
+      appType: this.KubernetesDeploymentTypes.APPLICATION_FORM,
       eventWarningCount: 0,
       placementWarning: false,
       expandedNote: false,
@@ -350,6 +375,7 @@ class KubernetesApplicationController {
 
     await this.getApplication();
     await this.getEvents();
+    this.updateApplicationKindText();
     this.state.viewReady = true;
   }
 

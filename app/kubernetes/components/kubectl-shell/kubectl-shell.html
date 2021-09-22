@@ -1,0 +1,38 @@
+<button
+  type="button"
+  class="btn btn-xs btn-primary"
+  ng-click="$ctrl.connectConsole()"
+  ng-disabled="$ctrl.state.shell.connected"
+  data-cy="k8sSidebar-shellButton"
+  analytics-on
+  analytics-category="kubernetes"
+  analytics-event="kubernetes-kubectl-shell"
+>
+  <i class="fa fa-terminal space-right"></i> kubectl shell
+</button>
+
+<kube-config-download-button></kube-config-download-button>
+
+<div ng-if="$ctrl.state.shell.connected" class="{{ $ctrl.state.css }}-kubectl-shell">
+  <div class="shell-container">
+    <div class="shell-item"><i class="fas fa-terminal" style="margin-right: 5px;"></i>kubectl shell</div>
+    <div class="shell-item-right">
+      <i class="fas fa-redo-alt" ng-click="$ctrl.screenClear();" data-cy="k8sShell-refreshButton"></i>
+      <i
+        class="fas {{ $ctrl.state.icon }}"
+        ng-click="$ctrl.miniRestore();"
+        data-cy="{{ $ctrl.state.icon === '.fa-window-minimize' ? 'k8sShell-restore' : 'k8sShell-minimise' }}"
+      ></i>
+      <i class="fas fa-times" ng-click="$ctrl.disconnect()" data-cy="k8sShell-closeButton"></i>
+    </div>
+  </div>
+  <div>
+    <div class="nopadding">
+      <div>
+        <div id="terminal-container" class="terminal-container">
+          <div style="position: fixed; color: #fff;">Loading Terminal...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

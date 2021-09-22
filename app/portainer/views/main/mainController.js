@@ -3,6 +3,7 @@ angular.module('portainer.app').controller('MainController', [
   'LocalStorage',
   'StateManager',
   'EndpointProvider',
+  'ThemeManager',
   function ($scope, LocalStorage, StateManager, EndpointProvider) {
     /**
      * Sidebar Toggle & Cookie Control

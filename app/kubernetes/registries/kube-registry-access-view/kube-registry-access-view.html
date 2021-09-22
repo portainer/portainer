@@ -1,0 +1,72 @@
+<rd-header>
+  <rd-header-title title-text="Registry access"></rd-header-title>
+  <rd-header-content> <a ui-sref="kubernetes.registries">Registries</a> &gt; {{ $ctrl.registry.Name }} &gt; Access management </rd-header-content>
+</rd-header>
+
+<registry-details registry="$ctrl.registry" ng-if="$ctrl.registry"></registry-details>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-user-lock" title-text="Create access"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <div class="form-group">
+            <label class="col-sm-3 col-lg-2 control-label text-left" style="padding-top: 0;">
+              Select namespaces
+            </label>
+            <div class="col-sm-9 col-lg-4">
+              <span class="small text-muted" ng-if="!$ctrl.resourcePools.length">
+                No namespaces available.
+              </span>
+              <span
+                isteven-multi-select
+                ng-if="$ctrl.resourcePools.length"
+                input-model="$ctrl.resourcePools"
+                output-model="$ctrl.selectedResourcePools"
+                button-label="name"
+                item-label="name"
+                tick-property="ticked"
+                helper-elements="filter"
+                search-property="name"
+                translation="{nothingSelected: 'Select one or more namespaces', search: 'Search...'}"
+              >
+              </span>
+            </div>
+          </div>
+
+          <!-- actions -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button
+                type="submit"
+                class="btn btn-primary btn-sm"
+                ng-disabled="$ctrl.selectedResourcePools.length === 0 || $ctrl.state.actionInProgress"
+                ng-click="$ctrl.submit()"
+                button-spinner="$ctrl.state.actionInProgress"
+              >
+                <span ng-hide="$ctrl.state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Create access</span>
+                <span ng-show="$ctrl.state.actionInProgress">Creating access...</span>
+              </button>
+            </div>
+          </div>
+          <!-- !actions -->
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-12">
+    <strings-datatable
+      title-text="Access"
+      title-icon="fa-user-lock"
+      table-key="access_registry_resourcepools"
+      dataset="$ctrl.savedResourcePools"
+      empty-dataset-message="No namespace has been authorized yet."
+      on-remove="($ctrl.handleRemove)"
+      column-header="Namespace"
+    >
+    </strings-datatable>
+  </div>
+</div>

@@ -12,19 +12,19 @@ import (
 )
 
 type endpointGroupCreatePayload struct {
-	// Endpoint group name
-	Name string `validate:"required" example:"my-endpoint-group"`
-	// Endpoint group description
+	// Environment(Endpoint) group name
+	Name string `validate:"required" example:"my-environment-group"`
+	// Environment(Endpoint) group description
 	Description string `example:"description"`
-	// List of endpoint identifiers that will be part of this group
+	// List of environment(endpoint) identifiers that will be part of this group
 	AssociatedEndpoints []portainer.EndpointID `example:"1,3"`
-	// List of tag identifiers to which this endpoint group is associated
+	// List of tag identifiers to which this environment(endpoint) group is associated
 	TagIDs []portainer.TagID `example:"1,2"`
 }
 
 func (payload *endpointGroupCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
-		return errors.New("Invalid endpoint group name")
+		return errors.New("Invalid environment group name")
 	}
 	if payload.TagIDs == nil {
 		payload.TagIDs = []portainer.TagID{}
@@ -32,14 +32,14 @@ func (payload *endpointGroupCreatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// @summary Create an Endpoint Group
-// @description Create a new endpoint group.
+// @summary Create an Environment(Endpoint) Group
+// @description Create a new environment(endpoint) group.
 // @description **Access policy**: administrator
 // @tags endpoint_groups
 // @security jwt
 // @accept json
 // @produce json
-// @param body body endpointGroupCreatePayload true "Endpoint Group details"
+// @param body body endpointGroupCreatePayload true "Environment(Endpoint) Group details"
 // @success 200 {object} portainer.EndpointGroup "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
@@ -61,12 +61,12 @@ func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Reque
 
 	err = handler.DataStore.EndpointGroup().CreateEndpointGroup(endpointGroup)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the endpoint group inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the environment group inside the database", err}
 	}
 
 	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environments from the database", err}
 	}
 
 	for _, id := range payload.AssociatedEndpoints {
@@ -76,12 +76,12 @@ func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Reque
 
 				err := handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, &endpoint)
 				if err != nil {
-					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint", err}
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update environment", err}
 				}
 
 				err = handler.updateEndpointRelations(&endpoint, endpointGroup)
 				if err != nil {
-					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint relations changes inside the database", err}
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist environment relations changes inside the database", err}
 				}
 
 				break

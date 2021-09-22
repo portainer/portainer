@@ -1,0 +1,41 @@
+.wizard-list-wrapper {
+  display: grid;
+  grid-template-columns: 50px 1fr;
+  grid-template-areas:
+    'image title'
+    'image subtitle'
+    'image type';
+  border: 1px solid rgb(221, 221, 221);
+  border-radius: 5px;
+  margin-bottom: 10px;
+  margin-top: 3px;
+  padding: 10px;
+  box-shadow: 0 3px 10px -2px rgb(161 170 166 / 20%);
+}
+
+.wizard-list-image {
+  grid-area: image;
+  font-size: 35px;
+  color: #337ab7;
+}
+
+.wizard-list-title {
+  grid-column: title;
+  padding: 0px 5px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.wizard-list-subtitle {
+  grid-column: subtitle;
+  padding: 0px 5px;
+  font-size: 10px;
+  color: rgb(129, 129, 129);
+}
+
+.wizard-list-type {
+  grid-column: type;
+  padding: 0px 5px;
+  font-size: 10px;
+  color: rgb(129, 129, 129);
+}

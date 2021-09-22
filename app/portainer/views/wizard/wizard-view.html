@@ -1,0 +1,52 @@
+<rd-header>
+  <rd-header-title title-text="Quick Setup"></rd-header-title>
+  <rd-header-content>Environment Wizard</rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-magic" title-text="Environment Wizard"> </rd-widget-header>
+      <rd-widget-body>
+        <div class="row">
+          <div class="col-sm-12 form-section-title">
+            Welcome to Portainer
+          </div>
+          <div>
+            <span class="text-muted small" ng-show="$ctrl.state.endpoint.added">
+              We have connected your local environment of {{ $ctrl.state.endpoint.connected }} to Portainer. <br
+            /></span>
+            <span class="text-muted small" ng-show="!$ctrl.state.endpoint.loading && !$ctrl.state.endpoint.added">
+              We could not connect your local environment to Portainer. <br />
+              Please ensure your environment is correctly exposed. For help with installation vist
+              <a href="https://documentation.portainer.io/quickstart/">https://documentation.portainer.io/quickstart</a><br />
+            </span>
+            <span class="text-muted small">
+              Get started below with your local portainer or connect more container environments.
+            </span>
+          </div>
+
+          <wizard-link
+            ng-show="$ctrl.state.endpoint.added"
+            icon="$ctrl.state.local.icon"
+            title="Get Started"
+            link-title="Get Started"
+            description="Proceed using the local environment which Portainer is running in"
+            ui-sref="portainer.home"
+            analytics-on
+            analytics-category="portainer"
+            analytics-event="endpoint-wizard-endpoint-select"
+            analytics-properties="{ metadata: { environment: 'Get-started-local-environment' }}"
+          ></wizard-link>
+          <wizard-link
+            title="Add Environments"
+            link-title="Add Environments"
+            icon="$ctrl.state.remote.icon"
+            description="Connect to other environments"
+            ui-sref="portainer.wizard.endpoints"
+          ></wizard-link>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

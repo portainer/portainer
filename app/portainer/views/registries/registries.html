@@ -7,78 +7,11 @@
   <rd-header-content>Registry management</rd-header-content>
 </rd-header>
 
-<information-panel title-text="Registry usage">
-  <span class="small">
-    <p class="text-muted">
-      <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-      DockerHub credentials and registries can only be used with Docker endpoints at the time.
-    </p>
+<information-panel title-text="Information">
+  <span class="small text-muted">
+    View registries via an environment to manage access for user(s) and/or team(s)
   </span>
 </information-panel>
-
-<div class="row" ng-if="dockerhub && isAdmin">
-  <div class="col-sm-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-database" title-text="DockerHub"> </rd-widget-header>
-      <rd-widget-body>
-        <form class="form-horizontal">
-          <!-- note -->
-          <div class="form-group">
-            <span class="col-sm-12 text-muted small">
-              The DockerHub registry can be used by any user. You can specify the credentials that will be used to push &amp; pull images here.
-            </span>
-          </div>
-          <!-- !note -->
-          <!-- authentication-checkbox -->
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="registry_auth" class="control-label text-left">
-                Authentication
-                <portainer-tooltip position="bottom" message="Enable this option if you need to specify credentials to connect to push/pull private images."></portainer-tooltip>
-              </label>
-              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="dockerhub.Authentication" /><i></i> </label>
-            </div>
-          </div>
-          <!-- !authentication-checkbox -->
-          <!-- authentication-credentials -->
-          <div ng-if="dockerhub.Authentication">
-            <!-- credentials-user -->
-            <div class="form-group">
-              <label for="hub_username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>
-              <div class="col-sm-9 col-lg-10">
-                <input type="text" class="form-control" id="hub_username" ng-model="dockerhub.Username" />
-              </div>
-            </div>
-            <!-- !credentials-user -->
-            <!-- credentials-password -->
-            <div class="form-group">
-              <label for="hub_password" class="col-sm-3 col-lg-2 control-label text-left">Password</label>
-              <div class="col-sm-9 col-lg-10">
-                <input type="password" class="form-control" id="hub_password" ng-model="formValues.dockerHubPassword" placeholder="*******" />
-              </div>
-            </div>
-            <!-- !credentials-password -->
-          </div>
-          <!-- !authentication-credentials -->
-          <div class="form-group">
-            <div class="col-sm-12">
-              <button
-                type="button"
-                class="btn btn-primary btn-sm"
-                ng-disabled="state.actionInProgress || dockerhub.Authentication && (!dockerhub.Username || !formValues.dockerHubPassword)"
-                ng-click="updateDockerHub()"
-                button-spinner="state.actionInProgress"
-              >
-                <span ng-hide="state.actionInProgress">Update</span>
-                <span ng-show="state.actionInProgress">Updating DockerHub settings...</span>
-              </button>
-            </div>
-          </div>
-        </form>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-</div>
 
 <div class="row">
   <div class="col-sm-12">
@@ -88,7 +21,6 @@
       dataset="registries"
       table-key="registries"
       order-by="Name"
-      access-management="isAdmin"
       remove-action="removeAction"
       can-browse="canBrowse"
     ></registries-datatable>

@@ -1,0 +1,39 @@
+@-webkit-keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  99% {
+    opacity: 0.01;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  99% {
+    opacity: 0.01;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.copy-button-fadeout {
+  animation: fadeOut 2.5s;
+  animation-fill-mode: forwards;
+}
+
+.copy-button-copy-text {
+  opacity: 0;
+  margin-left: 7px;
+  color: #23ae89;
+}

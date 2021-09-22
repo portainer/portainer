@@ -38,7 +38,7 @@ func randomInt(min, max int) int {
 	return min + rand.Intn(max-min)
 }
 
-// GetTunnelDetails returns information about the tunnel associated to an endpoint.
+// GetTunnelDetails returns information about the tunnel associated to an environment(endpoint).
 func (service *Service) GetTunnelDetails(endpointID portainer.EndpointID) *portainer.TunnelDetails {
 	key := strconv.Itoa(int(endpointID))
 
@@ -56,7 +56,7 @@ func (service *Service) GetTunnelDetails(endpointID portainer.EndpointID) *porta
 	}
 }
 
-// SetTunnelStatusToActive update the status of the tunnel associated to the specified endpoint.
+// SetTunnelStatusToActive update the status of the tunnel associated to the specified environment(endpoint).
 // It sets the status to ACTIVE.
 func (service *Service) SetTunnelStatusToActive(endpointID portainer.EndpointID) {
 	tunnel := service.GetTunnelDetails(endpointID)
@@ -68,7 +68,7 @@ func (service *Service) SetTunnelStatusToActive(endpointID portainer.EndpointID)
 	service.tunnelDetailsMap.Set(key, tunnel)
 }
 
-// SetTunnelStatusToIdle update the status of the tunnel associated to the specified endpoint.
+// SetTunnelStatusToIdle update the status of the tunnel associated to the specified environment(endpoint).
 // It sets the status to IDLE.
 // It removes any existing credentials associated to the tunnel.
 func (service *Service) SetTunnelStatusToIdle(endpointID portainer.EndpointID) {
@@ -88,11 +88,11 @@ func (service *Service) SetTunnelStatusToIdle(endpointID portainer.EndpointID) {
 	service.tunnelDetailsMap.Set(key, tunnel)
 }
 
-// SetTunnelStatusToRequired update the status of the tunnel associated to the specified endpoint.
+// SetTunnelStatusToRequired update the status of the tunnel associated to the specified environment(endpoint).
 // It sets the status to REQUIRED.
 // If no port is currently associated to the tunnel, it will associate a random unused port to the tunnel
 // and generate temporary credentials that can be used to establish a reverse tunnel on that port.
-// Credentials are encrypted using the Edge ID associated to the endpoint.
+// Credentials are encrypted using the Edge ID associated to the environment(endpoint).
 func (service *Service) SetTunnelStatusToRequired(endpointID portainer.EndpointID) error {
 	tunnel := service.GetTunnelDetails(endpointID)
 

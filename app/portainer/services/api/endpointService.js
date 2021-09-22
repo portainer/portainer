@@ -8,17 +8,21 @@ angular.module('portainer.app').factory('EndpointService', [
     'use strict';
     var service = {
       updateSecuritySettings,
+      registries,
+      registry,
+      updateRegistryAccess,
     };
 
     service.endpoint = function (endpointID) {
       return Endpoints.get({ id: endpointID }).$promise;
     };
 
-    service.endpoints = function (start, limit, { search, type, tagIds, endpointIds, tagsPartialMatch } = {}) {
+    service.endpoints = function (start, limit, { search, types, tagIds, endpointIds, tagsPartialMatch } = {}) {
       if (tagIds && !tagIds.length) {
         return Promise.resolve({ value: [], totalCount: 0 });
       }
-      return Endpoints.query({ start, limit, search, type, tagIds: JSON.stringify(tagIds), endpointIds: JSON.stringify(endpointIds), tagsPartialMatch }).$promise;
+      return Endpoints.query({ start, limit, search, types: JSON.stringify(types), tagIds: JSON.stringify(tagIds), endpointIds: JSON.stringify(endpointIds), tagsPartialMatch })
+        .$promise;
     };
 
     service.snapshotEndpoints = function () {
@@ -37,6 +41,10 @@ angular.module('portainer.app').factory('EndpointService', [
       return Endpoints.updateAccess({ id: id }, { UserAccessPolicies: userAccessPolicies, TeamAccessPolicies: teamAccessPolicies }).$promise;
     };
 
+    service.deassociateEndpoint = function (endpointID) {
+      return Endpoints.deassociate({ id: endpointID }).$promise;
+    };
+
     service.updateEndpoint = function (id, payload) {
       var deferred = $q.defer();
       FileUploadService.uploadTLSFilesForEndpoint(id, payload.TLSCACert, payload.TLSCert, payload.TLSKey)
@@ -49,7 +57,7 @@ angular.module('portainer.app').factory('EndpointService', [
         })
         .catch(function error(err) {
           deferred.notify({ upload: false });
-          deferred.reject({ msg: 'Unable to update endpoint', err: err });
+          deferred.reject({ msg: 'Unable to update environment', err: err });
         });
       return deferred.promise;
     };
@@ -76,7 +84,7 @@ angular.module('portainer.app').factory('EndpointService', [
           deferred.resolve(response.data);
         })
         .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to create endpoint', err: err });
+          deferred.reject({ msg: 'Unable to create environment', err: err });
         });
 
       return deferred.promise;
@@ -123,21 +131,21 @@ angular.module('portainer.app').factory('EndpointService', [
           deferred.resolve(response.data);
         })
         .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to create endpoint', err: err });
+          deferred.reject({ msg: 'Unable to create environment', err: err });
         });
 
       return deferred.promise;
     };
 
-    service.createLocalKubernetesEndpoint = function (name = 'local') {
+    service.createLocalKubernetesEndpoint = function (name = 'local', tagIds = []) {
       var deferred = $q.defer();
 
-      FileUploadService.createEndpoint(name, PortainerEndpointCreationTypes.LocalKubernetesEnvironment, '', '', 1, [], true, true, true)
+      FileUploadService.createEndpoint(name, PortainerEndpointCreationTypes.LocalKubernetesEnvironment, '', '', 1, tagIds, true, true, true)
         .then(function success(response) {
           deferred.resolve(response.data);
         })
         .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to create endpoint', err: err });
+          deferred.reject({ msg: 'Unable to create environment', err: err });
         });
 
       return deferred.promise;
@@ -157,10 +165,22 @@ angular.module('portainer.app').factory('EndpointService', [
       return deferred.promise;
     };
 
+    function updateRegistryAccess(id, registryId, endpointAccesses) {
+      return Endpoints.updateRegistryAccess({ registryId, id }, endpointAccesses).$promise;
+    }
+
+    function registries(id, namespace) {
+      return Endpoints.registries({ namespace, id }).$promise;
+    }
+
     return service;
 
     function updateSecuritySettings(id, securitySettings) {
       return Endpoints.updateSecuritySettings({ id }, securitySettings).$promise;
+    }
+
+    function registry(endpointId, registryId) {
+      return Endpoints.registry({ registryId, id: endpointId }).$promise;
     }
   },
 ]);

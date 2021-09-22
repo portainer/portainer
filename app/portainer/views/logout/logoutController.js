@@ -2,7 +2,7 @@ import angular from 'angular';
 
 class LogoutController {
   /* @ngInject */
-  constructor($async, $state, $transition$, $window, Authentication, StateManager, Notifications, LocalStorage, SettingsService) {
+  constructor($async, $state, $transition$, $window, Authentication, StateManager, Notifications, LocalStorage, SettingsService, ThemeManager) {
     this.$async = $async;
     this.$state = $state;
     this.$transition$ = $transition$;
@@ -13,6 +13,7 @@ class LogoutController {
     this.Notifications = Notifications;
     this.LocalStorage = LocalStorage;
     this.SettingsService = SettingsService;
+    this.ThemeManager = ThemeManager;
 
     this.logo = this.StateManager.getState().application.logo;
     this.logoutAsync = this.logoutAsync.bind(this);
@@ -27,6 +28,8 @@ class LogoutController {
     const error = this.$transition$.params().error;
     const performApiLogout = this.$transition$.params().performApiLogout;
     const settings = await this.SettingsService.publicSettings();
+
+    this.ThemeManager.defaultTheme();
 
     try {
       await this.Authentication.logout(performApiLogout);

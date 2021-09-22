@@ -1,5 +1,5 @@
 <kubernetes-view-header title="Kubernetes features configuration" state="portainer.endpoints.endpoint.kubernetesConfig" view-ready="ctrl.state.viewReady">
-  <a ui-sref="portainer.endpoints">Endpoints</a> &gt; <a ui-sref="portainer.endpoints.endpoint({id: ctrl.endpoint.Id})">{{ ctrl.endpoint.Name }}</a> &gt; Kubernetes configuration
+  <a ui-sref="portainer.endpoints">Environment</a> &gt; <a ui-sref="portainer.endpoints.endpoint({id: ctrl.endpoint.Id})">{{ ctrl.endpoint.Name }}</a> &gt; Kubernetes configuration
 </kubernetes-view-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
@@ -145,11 +145,7 @@
                 <label class="control-label text-left">
                   Restrict access to the default namespace
                 </label>
-                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" disabled /><i></i> </label>
-                <span class="text-muted small" style="margin-left: 15px;">
-                  <i class="fa fa-user" aria-hidden="true"></i>
-                  This feature is available in <a href="https://www.portainer.io/business-upsell?from=k8s-setup-default" target="_blank"> Portainer Business Edition</a>.
-                </span>
+                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.RestrictDefaultNamespace" /><i></i> </label>
               </div>
             </div>
 
@@ -183,18 +179,18 @@
 
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
-                Enabling this feature will allow users to use specific features that leverage the metrics server component.
+                Enabling this feature will allow users to use specific features like autoscaling and to see container and node resource usage.
                 <p style="margin-top: 2px;">
                   <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                  Ensure that <a href="https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/#metrics-server" target="_blank">metrics server</a> is
-                  running inside your cluster.
+                  Ensure that <a href="https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/#metrics-server" target="_blank">metrics server</a> or
+                  <a href="https://github.com/kubernetes-sigs/prometheus-adapter" target="_blank">prometheus</a> is running inside your cluster.
                 </p>
               </span>
             </div>
             <div class="form-group">
               <div class="col-sm-12">
                 <label class="control-label text-left">
-                  Enable features using metrics server
+                  Enable features using the metrics API
                 </label>
                 <label class="switch" style="margin-left: 20px;">
                   <input type="checkbox" ng-model="ctrl.formValues.UseServerMetrics" ng-change="ctrl.enableMetricsServer()" /><i></i>
@@ -303,6 +299,11 @@
                   ng-click="ctrl.configure()"
                   ng-disabled="ctrl.state.actionInProgress || !kubernetesClusterSetupForm.$valid || !ctrl.hasValidStorageConfiguration()"
                   button-spinner="ctrl.state.actionInProgress"
+                  analytics-on
+                  analytics-if="ctrl.restrictDefaultToggledOn()"
+                  analytics-category="kubernetes"
+                  analytics-event="kubernetes-configure"
+                  analytics-properties="{ metadata: { restrictAccessToDefaultNamespace: ctrl.formValues.RestrictDefaultNamespace } }"
                 >
                   <span ng-hide="ctrl.state.actionInProgress">Save configuration</span>
                   <span ng-show="ctrl.state.actionInProgress">Saving configuration...</span>

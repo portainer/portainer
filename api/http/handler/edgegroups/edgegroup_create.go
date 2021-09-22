@@ -27,7 +27,7 @@ func (payload *edgeGroupCreatePayload) Validate(r *http.Request) error {
 		return errors.New("TagIDs is mandatory for a dynamic Edge group")
 	}
 	if !payload.Dynamic && (payload.Endpoints == nil || len(payload.Endpoints) == 0) {
-		return errors.New("Endpoints is mandatory for a static Edge group")
+		return errors.New("Environment is mandatory for a static Edge group")
 	}
 	return nil
 }
@@ -41,7 +41,7 @@ func (payload *edgeGroupCreatePayload) Validate(r *http.Request) error {
 // @produce json
 // @param body body edgeGroupCreatePayload true "EdgeGroup data"
 // @success 200 {object} portainer.EdgeGroup
-// @failure 503 Edge compute features are disabled
+// @failure 503 "Edge compute features are disabled"
 // @failure 500
 // @router /edge_groups [post]
 func (handler *Handler) edgeGroupCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -77,7 +77,7 @@ func (handler *Handler) edgeGroupCreate(w http.ResponseWriter, r *http.Request) 
 		for _, endpointID := range payload.Endpoints {
 			endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
 			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint from the database", err}
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environment from the database", err}
 			}
 
 			if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {

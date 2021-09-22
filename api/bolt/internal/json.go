@@ -17,7 +17,7 @@ func UnmarshalObject(data []byte, object interface{}) error {
 }
 
 // UnmarshalObjectWithJsoniter decodes an object from binary data
-// using the jsoniter library. It is mainly used to accelerate endpoint
+// using the jsoniter library. It is mainly used to accelerate environment(endpoint)
 // decoding at the moment.
 func UnmarshalObjectWithJsoniter(data []byte, object interface{}) error {
 	var jsoni = jsoniter.ConfigCompatibleWithStandardLibrary

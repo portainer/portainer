@@ -1,11 +1,11 @@
 package kubernetes
 
 import (
-	"fmt"
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
+	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
 type localTransport struct {
@@ -13,7 +13,7 @@ type localTransport struct {
 }
 
 // NewLocalTransport returns a new transport that can be used to send requests to the local Kubernetes API
-func NewLocalTransport(tokenManager *tokenManager, endpoint *portainer.Endpoint, dataStore portainer.DataStore) (*localTransport, error) {
+func NewLocalTransport(tokenManager *tokenManager, endpoint *portainer.Endpoint, k8sClientFactory *cli.ClientFactory, dataStore portainer.DataStore) (*localTransport, error) {
 	config, err := crypto.CreateTLSConfigurationFromBytes(nil, nil, nil, true, true)
 	if err != nil {
 		return nil, err
@@ -26,6 +26,7 @@ func NewLocalTransport(tokenManager *tokenManager, endpoint *portainer.Endpoint,
 			},
 			tokenManager,
 			endpoint,
+			k8sClientFactory,
 			dataStore,
 		),
 	}
@@ -35,12 +36,10 @@ func NewLocalTransport(tokenManager *tokenManager, endpoint *portainer.Endpoint,
 
 // RoundTrip is the implementation of the the http.RoundTripper interface
 func (transport *localTransport) RoundTrip(request *http.Request) (*http.Response, error) {
-	token, err := getRoundTripToken(request, transport.tokenManager, transport.endpoint.ID)
+	_, err := transport.prepareRoundTrip(request)
 	if err != nil {
 		return nil, err
 	}
-
-	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 
 	return transport.baseTransport.RoundTrip(request)
 }

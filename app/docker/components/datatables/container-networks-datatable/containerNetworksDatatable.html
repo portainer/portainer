@@ -73,7 +73,11 @@
                 </button>
               </td>
             </tr>
-            <tr dir-paginate-end ng-show="$ctrl.itemCanExpand(value) && value.Expanded" ng-style="{ background: value.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
+            <tr
+              dir-paginate-end
+              ng-show="$ctrl.itemCanExpand(value) && value.Expanded"
+              ng-class="{ 'datatable-highlighted': value.Highlighted, 'datatable-unhighlighted': !value.Highlighted }"
+            >
               <td colspan="1"></td>
               <td colspan="1">
                 {{ value.GlobalIPv6Address }}

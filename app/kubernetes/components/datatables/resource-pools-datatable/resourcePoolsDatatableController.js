@@ -1,10 +1,11 @@
+import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
+
 angular.module('portainer.docker').controller('KubernetesResourcePoolsDatatableController', [
   '$scope',
   '$controller',
   'Authentication',
-  'KubernetesNamespaceHelper',
   'DatatableService',
-  function ($scope, $controller, Authentication, KubernetesNamespaceHelper, DatatableService) {
+  function ($scope, $controller, Authentication, DatatableService) {
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
 
     var ctrl = this;
@@ -18,11 +19,15 @@ angular.module('portainer.docker').controller('KubernetesResourcePoolsDatatableC
     };
 
     this.canManageAccess = function (item) {
-      return item.Namespace.Name !== 'default' && !this.isSystemNamespace(item);
+      if (!this.endpoint.Kubernetes.Configuration.RestrictDefaultNamespace) {
+        return !KubernetesNamespaceHelper.isDefaultNamespace(item.Namespace.Name) && !this.isSystemNamespace(item);
+      } else {
+        return !this.isSystemNamespace(item);
+      }
     };
 
     this.disableRemove = function (item) {
-      return KubernetesNamespaceHelper.isSystemNamespace(item.Namespace.Name) || item.Namespace.Name === 'default';
+      return this.isSystemNamespace(item) || KubernetesNamespaceHelper.isDefaultNamespace(item.Namespace.Name);
     };
 
     this.isSystemNamespace = function (item) {
@@ -31,6 +36,17 @@ angular.module('portainer.docker').controller('KubernetesResourcePoolsDatatableC
 
     this.isDisplayed = function (item) {
       return !ctrl.isSystemNamespace(item) || (ctrl.settings.showSystem && ctrl.isAdmin);
+    };
+
+    this.namespaceStatusColor = function (status) {
+      switch (status.toLowerCase()) {
+        case 'active':
+          return 'success';
+        case 'terminating':
+          return 'danger';
+        default:
+          return 'primary';
+      }
     };
 
     /**

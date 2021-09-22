@@ -15,9 +15,18 @@
               <form class="form-horizontal" autocomplete="off" name="resourcePoolEditForm" style="padding: 20px; margin-top: 10px;">
                 <!-- name-input -->
                 <div class="form-group">
-                  <label for="pool_name" class="col-sm-1 control-label text-left">Name</label>
-                  <div class="col-sm-11">
-                    <input type="text" class="form-control" name="pool_name" ng-model="ctrl.pool.Namespace.Name" disabled />
+                  <div class="col-sm-12">
+                    <table class="table">
+                      <tbody>
+                        <tr>
+                          <td>Name</td>
+                          <td>
+                            {{ ctrl.pool.Namespace.Name }}
+                            <span class="label label-info image-tag label-margins" ng-if="ctrl.isSystem">system</span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
                 <!-- !name-input -->
@@ -40,10 +49,13 @@
                   <kubernetes-resource-reservation
                     ng-if="ctrl.pool.Quota"
                     description="Resource reservation represents the total amount of resource assigned to all the applications deployed inside this namespace."
-                    cpu="ctrl.state.cpuUsed"
-                    memory="ctrl.state.memoryUsed"
+                    cpu-reservation="ctrl.state.resourceReservation.CPU"
+                    memory-reservation="ctrl.state.resourceReservation.Memory"
                     cpu-limit="ctrl.formValues.CpuLimit"
                     memory-limit="ctrl.formValues.MemoryLimit"
+                    display-usage="ctrl.state.useServerMetrics"
+                    cpu-usage="ctrl.state.resourceUsage.CPU"
+                    memory-usage="ctrl.state.resourceUsage.Memory"
                   >
                   </kubernetes-resource-reservation>
                 </div>
@@ -153,7 +165,7 @@
                   <div class="form-group" ng-if="ctrl.formValues.IngressClasses.length === 0">
                     <div class="col-sm-12 small text-muted">
                       The ingress feature must be enabled in the
-                      <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: ctrl.endpoint.Id})">endpoint configuration view</a> to be able to register ingresses inside
+                      <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: ctrl.endpoint.Id})">environment configuration view</a> to be able to register ingresses inside
                       this namespace.
                     </div>
                   </div>
@@ -298,9 +310,64 @@
                   </div>
                   <!-- #endregion -->
                 </div>
+
+                <!-- #region REGISTRIES -->
+                <div>
+                  <div class="col-sm-12 form-section-title">
+                    Registries
+                  </div>
+
+                  <div class="form-group" ng-if="!ctrl.isAdmin || ctrl.isSystem">
+                    <label class="col-sm-3 col-lg-2 control-label text-left" style="padding-top: 0;">
+                      Selected registries
+                    </label>
+                    <div class="col-sm-9 col-lg-4">
+                      {{ ctrl.selectedRegistries ? ctrl.selectedRegistries : 'None' }}
+                    </div>
+                  </div>
+
+                  <div ng-if="ctrl.isAdmin && !ctrl.isSystem">
+                    <div class="form-group">
+                      <div class="col-sm-12 small text-muted">
+                        <p>
+                          <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                          Define which registry can be used by users who have access to this namespace.
+                        </p>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-sm-3 col-lg-2 control-label text-left" style="padding-top: 0;">
+                        Select registries
+                      </label>
+                      <div class="col-sm-9 col-lg-4">
+                        <span class="small text-muted" ng-if="!ctrl.registries.length && ctrl.state.isAdmin">
+                          No registries available. Head over <a ui-sref="portainer.registries">registry view</a> to define container registry.
+                        </span>
+                        <span class="small text-muted" ng-if="!ctrl.registries.length && !ctrl.state.isAdmin">
+                          No registries available. Contact your administrator to create a container registry.
+                        </span>
+                        <span
+                          isteven-multi-select
+                          ng-if="ctrl.registries.length"
+                          input-model="ctrl.registries"
+                          output-model="ctrl.formValues.Registries"
+                          button-label="Name"
+                          item-label="Name"
+                          tick-property="Checked"
+                          helper-elements="filter"
+                          search-property="Name"
+                          translation="{nothingSelected: 'Select one or more registry', search: 'Search...'}"
+                        >
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- #endregion -->
+
                 <!-- #region STORAGES -->
                 <div class="col-sm-12 form-section-title">
-                  Storages
+                  Storage
                 </div>
 
                 <div class="form-group">
@@ -338,20 +405,31 @@
                 <!-- !summary -->
 
                 <!-- actions -->
-                <div ng-if="ctrl.isAdmin && ctrl.isEditable" class="col-sm-12 form-section-title">
+                <div ng-if="ctrl.isAdmin" class="col-sm-12 form-section-title">
                   Actions
                 </div>
-                <div ng-if="ctrl.isAdmin && ctrl.isEditable" class="form-group">
+                <div ng-if="ctrl.isAdmin" class="form-group">
                   <div class="col-sm-12">
                     <button
                       type="button"
+                      ng-if="!ctrl.isSystem"
                       class="btn btn-primary btn-sm"
                       ng-disabled="!resourcePoolEditForm.$valid || ctrl.isUpdateButtonDisabled()"
                       ng-click="ctrl.updateResourcePool()"
                       button-spinner="ctrl.state.actionInProgress"
                     >
-                      <span ng-hide="ctrl.state.actionInProgress">Update namespace</span>
+                      <span ng-hide="ctrl.state.actionInProgress" data-cy="k8sNamespaceEdit-updateNamespaceButton">Update namespace</span>
                       <span ng-show="ctrl.state.actionInProgress">Update in progress...</span>
+                    </button>
+                    <button
+                      ng-if="!ctrl.isDefaultNamespace"
+                      type="button"
+                      class="btn btn-primary btn-sm"
+                      ng-click="ctrl.markUnmarkAsSystem()"
+                      button-spinner="ctrl.state.actionInProgress"
+                    >
+                      <span ng-if="ctrl.isSystem">Unmark as system</span>
+                      <span ng-if="!ctrl.isSystem">Mark as system</span>
                     </button>
                   </div>
                 </div>

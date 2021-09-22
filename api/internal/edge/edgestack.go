@@ -5,7 +5,7 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
-// EdgeStackRelatedEndpoints returns a list of endpoints related to this Edge stack
+// EdgeStackRelatedEndpoints returns a list of environments(endpoints) related to this Edge stack
 func EdgeStackRelatedEndpoints(edgeGroupIDs []portainer.EdgeGroupID, endpoints []portainer.Endpoint, endpointGroups []portainer.EndpointGroup, edgeGroups []portainer.EdgeGroup) ([]portainer.EndpointID, error) {
 	edgeStackEndpoints := []portainer.EndpointID{}
 

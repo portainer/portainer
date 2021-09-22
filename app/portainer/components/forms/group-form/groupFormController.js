@@ -38,10 +38,10 @@ class GroupFormController {
     } else if (this.pageType === 'edit') {
       this.GroupService.addEndpoint(this.model.Id, endpoint)
         .then(() => {
-          this.Notifications.success('Success', 'Endpoint successfully added to group');
+          this.Notifications.success('Success', 'Environment successfully added to group');
           this.reloadTablesContent();
         })
-        .catch((err) => this.Notifications.error('Error', err, 'Unable to add endpoint to group'));
+        .catch((err) => this.Notifications.error('Error', err, 'Unable to add environment to group'));
     }
   }
 
@@ -51,10 +51,10 @@ class GroupFormController {
     } else if (this.pageType === 'edit') {
       this.GroupService.removeEndpoint(this.model.Id, endpoint.Id)
         .then(() => {
-          this.Notifications.success('Success', 'Endpoint successfully removed from group');
+          this.Notifications.success('Success', 'Environment successfully removed from group');
           this.reloadTablesContent();
         })
-        .catch((err) => this.Notifications.error('Error', err, 'Unable to remove endpoint from group'));
+        .catch((err) => this.Notifications.error('Error', err, 'Unable to remove environment from group'));
     }
   }
 

@@ -15,7 +15,7 @@ import (
 )
 
 // @summary Attach a websocket
-// @description If the nodeName query parameter is present, the request will be proxied to the underlying agent endpoint.
+// @description If the nodeName query parameter is present, the request will be proxied to the underlying agent environment(endpoint).
 // @description If the nodeName query parameter is not specified, the request will be upgraded to the websocket protocol and
 // @description an AttachStart operation HTTP request will be created and hijacked.
 // @description Authentication and access is controlled via the mandatory token query parameter.
@@ -23,9 +23,9 @@ import (
 // @tags websocket
 // @accept json
 // @produce json
-// @param endpointId query int true "endpoint ID of the endpoint where the resource is located"
+// @param endpointId query int true "environment(endpoint) ID of the environment(endpoint) where the resource is located"
 // @param nodeName query string false "node name"
-// @param token query string true "JWT token used for authentication against this endpoint"
+// @param token query string true "JWT token used for authentication against this environment(endpoint)"
 // @success 200
 // @failure 400
 // @failure 403
@@ -48,14 +48,14 @@ func (handler *Handler) websocketAttach(w http.ResponseWriter, r *http.Request) 
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == errors.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the endpoint associated to the stack inside the database", err}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the environment associated to the stack inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the endpoint associated to the stack inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the environment associated to the stack inside the database", err}
 	}
 
 	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
 	}
 
 	params := &webSocketRequestParams{

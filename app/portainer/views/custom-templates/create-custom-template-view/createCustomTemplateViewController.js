@@ -30,6 +30,7 @@ class CreateCustomTemplateViewController {
       ComposeFilePathInRepository: 'docker-compose.yml',
       Description: '',
       Note: '',
+      Logo:'',
       Platform: 1,
       Type: 1,
       AccessControlData: new AccessControlFormData(),
@@ -175,7 +176,7 @@ class CreateCustomTemplateViewController {
     }
 
     try {
-      this.templates = await this.CustomTemplateService.customTemplates();
+      this.templates = await this.CustomTemplateService.customTemplates([1, 2]);
     } catch (err) {
       this.Notifications.error('Failure loading', err, 'Failed loading custom templates');
     }
@@ -187,6 +188,10 @@ class CreateCustomTemplateViewController {
         return '';
       }
     };
+  }
+
+  $onDestroy() {
+    this.state.isEditorDirty = false;
   }
 
   async uiCanExit() {

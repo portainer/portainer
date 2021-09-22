@@ -11,11 +11,13 @@ import (
 	"github.com/portainer/portainer/api/bolt/endpointgroup"
 	"github.com/portainer/portainer/api/bolt/endpointrelation"
 	"github.com/portainer/portainer/api/bolt/extension"
+	"github.com/portainer/portainer/api/bolt/helmuserrepository"
 	"github.com/portainer/portainer/api/bolt/registry"
 	"github.com/portainer/portainer/api/bolt/resourcecontrol"
 	"github.com/portainer/portainer/api/bolt/role"
 	"github.com/portainer/portainer/api/bolt/schedule"
 	"github.com/portainer/portainer/api/bolt/settings"
+	"github.com/portainer/portainer/api/bolt/ssl"
 	"github.com/portainer/portainer/api/bolt/stack"
 	"github.com/portainer/portainer/api/bolt/tag"
 	"github.com/portainer/portainer/api/bolt/team"
@@ -87,6 +89,12 @@ func (store *Store) initServices() error {
 	}
 	store.ExtensionService = extensionService
 
+	helmUserRepositoryService, err := helmuserrepository.NewService(store.connection)
+	if err != nil {
+		return err
+	}
+	store.HelmUserRepositoryService = helmUserRepositoryService
+
 	registryService, err := registry.NewService(store.connection)
 	if err != nil {
 		return err
@@ -104,6 +112,12 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.SettingsService = settingsService
+
+	sslSettingsService, err := ssl.NewService(store.connection)
+	if err != nil {
+		return err
+	}
+	store.SSLSettingsService = sslSettingsService
 
 	stackService, err := stack.NewService(store.connection)
 	if err != nil {
@@ -167,11 +181,6 @@ func (store *Store) CustomTemplate() portainer.CustomTemplateService {
 	return store.CustomTemplateService
 }
 
-// DockerHub gives access to the DockerHub data management layer
-func (store *Store) DockerHub() portainer.DockerHubService {
-	return store.DockerHubService
-}
-
 // EdgeGroup gives access to the EdgeGroup data management layer
 func (store *Store) EdgeGroup() portainer.EdgeGroupService {
 	return store.EdgeGroupService
@@ -187,7 +196,7 @@ func (store *Store) EdgeStack() portainer.EdgeStackService {
 	return store.EdgeStackService
 }
 
-// Endpoint gives access to the Endpoint data management layer
+// Environment(Endpoint) gives access to the Environment(Endpoint) data management layer
 func (store *Store) Endpoint() portainer.EndpointService {
 	return store.EndpointService
 }
@@ -200,6 +209,11 @@ func (store *Store) EndpointGroup() portainer.EndpointGroupService {
 // EndpointRelation gives access to the EndpointRelation data management layer
 func (store *Store) EndpointRelation() portainer.EndpointRelationService {
 	return store.EndpointRelationService
+}
+
+// HelmUserRepository access the helm user repository settings
+func (store *Store) HelmUserRepository() portainer.HelmUserRepositoryService {
+	return store.HelmUserRepositoryService
 }
 
 // Registry gives access to the Registry data management layer
@@ -220,6 +234,11 @@ func (store *Store) Role() portainer.RoleService {
 // Settings gives access to the Settings data management layer
 func (store *Store) Settings() portainer.SettingsService {
 	return store.SettingsService
+}
+
+// SSLSettings gives access to the SSL Settings data management layer
+func (store *Store) SSLSettings() portainer.SSLSettingsService {
+	return store.SSLSettingsService
 }
 
 // Stack gives access to the Stack data management layer

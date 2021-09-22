@@ -152,6 +152,24 @@ angular.module('portainer.app').factory('ModalService', [
       });
     };
 
+    service.confirmDeassociate = function (callback) {
+      const message =
+        '<p>De-associating this Edge environment will mark it as non associated and will clear the registered Edge ID.</p>' +
+        '<p>Any agent started with the Edge key associated to this environment will be able to re-associate with this environment.</p>' +
+        '<p>You can re-use the Edge ID and Edge key that you used to deploy the existing Edge agent to associate a new Edge device to this environment.</p>';
+      service.confirm({
+        title: 'About de-associating',
+        message: $sanitize(message),
+        buttons: {
+          confirm: {
+            label: 'De-associate',
+            className: 'btn-primary',
+          },
+        },
+        callback: callback,
+      });
+    };
+
     service.confirmUpdate = function (message, callback) {
       message = $sanitize(message);
       service.confirm({
@@ -240,7 +258,7 @@ angular.module('portainer.app').factory('ModalService', [
     service.confirmEndpointSnapshot = function (callback) {
       service.confirm({
         title: 'Are you sure?',
-        message: 'Triggering a manual refresh will poll each endpoint to retrieve its information, this may take a few moments.',
+        message: 'Triggering a manual refresh will poll each environment to retrieve its information, this may take a few moments.',
         buttons: {
           confirm: {
             label: 'Continue',

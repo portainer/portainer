@@ -13,10 +13,10 @@ class KubernetesClusterController {
     Notifications,
     LocalStorage,
     KubernetesNodeService,
+    KubernetesMetricsService,
     KubernetesApplicationService,
     KubernetesComponentStatusService,
-    KubernetesEndpointService,
-    EndpointProvider
+    KubernetesEndpointService
   ) {
     this.$async = $async;
     this.$state = $state;
@@ -24,10 +24,10 @@ class KubernetesClusterController {
     this.Notifications = Notifications;
     this.LocalStorage = LocalStorage;
     this.KubernetesNodeService = KubernetesNodeService;
+    this.KubernetesMetricsService = KubernetesMetricsService;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesComponentStatusService = KubernetesComponentStatusService;
     this.KubernetesEndpointService = KubernetesEndpointService;
-    this.EndpointProvider = EndpointProvider;
 
     this.onInit = this.onInit.bind(this);
     this.getNodes = this.getNodes.bind(this);
@@ -36,6 +36,7 @@ class KubernetesClusterController {
     this.getComponentStatus = this.getComponentStatus.bind(this);
     this.getComponentStatusAsync = this.getComponentStatusAsync.bind(this);
     this.getEndpointsAsync = this.getEndpointsAsync.bind(this);
+    this.hasResourceUsageAccess = this.hasResourceUsageAccess.bind(this);
   }
 
   async getComponentStatusAsync() {
@@ -65,7 +66,7 @@ class KubernetesClusterController {
         });
       }
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve endpoints');
+      this.Notifications.error('Failure', err, 'Unable to retrieve environments');
     }
   }
 
@@ -106,6 +107,10 @@ class KubernetesClusterController {
         new KubernetesResourceReservation()
       );
       this.resourceReservation.Memory = KubernetesResourceReservationHelper.megaBytesValue(this.resourceReservation.Memory);
+
+      if (this.hasResourceUsageAccess()) {
+        await this.getResourceUsage(this.endpoint.Id);
+      }
     } catch (err) {
       this.Notifications.error('Failure', 'Unable to retrieve applications', err);
     } finally {
@@ -117,14 +122,39 @@ class KubernetesClusterController {
     return this.$async(this.getApplicationsAsync);
   }
 
+  async getResourceUsage(endpointId) {
+    try {
+      const nodeMetrics = await this.KubernetesMetricsService.getNodes(endpointId);
+      const resourceUsageList = nodeMetrics.items.map((i) => i.usage);
+      const clusterResourceUsage = resourceUsageList.reduce((total, u) => {
+        total.CPU += KubernetesResourceReservationHelper.parseCPU(u.cpu);
+        total.Memory += KubernetesResourceReservationHelper.megaBytesValue(u.memory);
+        return total;
+      }, new KubernetesResourceReservation());
+      this.resourceUsage = clusterResourceUsage;
+    } catch (err) {
+      this.Notifications.error('Failure', 'Unable to retrieve cluster resource usage', err);
+    }
+  }
+
+  /**
+   * Check if resource usage stats can be displayed
+   * @returns {boolean}
+   */
+  hasResourceUsageAccess() {
+    return this.isAdmin && this.state.useServerMetrics;
+  }
+
   async onInit() {
+    this.isAdmin = this.Authentication.isAdmin();
+    const useServerMetrics = this.endpoint.Kubernetes.Configuration.UseServerMetrics;
+
     this.state = {
       applicationsLoading: true,
       viewReady: false,
       hasUnhealthyComponentStatus: false,
+      useServerMetrics,
     };
-
-    this.isAdmin = this.Authentication.isAdmin();
 
     await this.getNodes();
     if (this.isAdmin) {
@@ -134,7 +164,6 @@ class KubernetesClusterController {
     }
 
     this.state.viewReady = true;
-    this.state.useServerMetrics = this.EndpointProvider.currentEndpoint().Kubernetes.Configuration.UseServerMetrics;
   }
 
   $onInit() {

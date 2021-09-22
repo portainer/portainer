@@ -1,15 +1,15 @@
 package authorization
 
 import (
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
 // Service represents a service used to
 // update authorizations associated to a user or team.
 type Service struct {
-	dataStore portainer.DataStore
-	K8sClientFactory  *cli.ClientFactory
+	dataStore        portainer.DataStore
+	K8sClientFactory *cli.ClientFactory
 }
 
 // NewService returns a point to a new Service instance.
@@ -19,8 +19,8 @@ func NewService(dataStore portainer.DataStore) *Service {
 	}
 }
 
-// DefaultEndpointAuthorizationsForEndpointAdministratorRole returns the default endpoint authorizations
-// associated to the endpoint administrator role.
+// DefaultEndpointAuthorizationsForEndpointAdministratorRole returns the default environment(endpoint) authorizations
+// associated to the environment(endpoint) administrator role.
 func DefaultEndpointAuthorizationsForEndpointAdministratorRole() portainer.Authorizations {
 	return map[portainer.Authorization]bool{
 		portainer.OperationDockerContainerArchiveInfo:         true,
@@ -140,6 +140,7 @@ func DefaultEndpointAuthorizationsForEndpointAdministratorRole() portainer.Autho
 		portainer.OperationDockerAgentUndefined:               true,
 		portainer.OperationPortainerResourceControlCreate:     true,
 		portainer.OperationPortainerResourceControlUpdate:     true,
+		portainer.OperationPortainerRegistryUpdateAccess:      true,
 		portainer.OperationPortainerStackList:                 true,
 		portainer.OperationPortainerStackInspect:              true,
 		portainer.OperationPortainerStackFile:                 true,
@@ -156,7 +157,7 @@ func DefaultEndpointAuthorizationsForEndpointAdministratorRole() portainer.Autho
 	}
 }
 
-// DefaultEndpointAuthorizationsForHelpDeskRole returns the default endpoint authorizations
+// DefaultEndpointAuthorizationsForHelpDeskRole returns the default environment(endpoint) authorizations
 // associated to the helpdesk role.
 func DefaultEndpointAuthorizationsForHelpDeskRole(volumeBrowsingAuthorizations bool) portainer.Authorizations {
 	authorizations := map[portainer.Authorization]bool{
@@ -215,7 +216,7 @@ func DefaultEndpointAuthorizationsForHelpDeskRole(volumeBrowsingAuthorizations b
 	return authorizations
 }
 
-// DefaultEndpointAuthorizationsForStandardUserRole returns the default endpoint authorizations
+// DefaultEndpointAuthorizationsForStandardUserRole returns the default environment(endpoint) authorizations
 // associated to the standard user role.
 func DefaultEndpointAuthorizationsForStandardUserRole(volumeBrowsingAuthorizations bool) portainer.Authorizations {
 	authorizations := map[portainer.Authorization]bool{
@@ -349,7 +350,7 @@ func DefaultEndpointAuthorizationsForStandardUserRole(volumeBrowsingAuthorizatio
 	return authorizations
 }
 
-// DefaultEndpointAuthorizationsForReadOnlyUserRole returns the default endpoint authorizations
+// DefaultEndpointAuthorizationsForReadOnlyUserRole returns the default environment(endpoint) authorizations
 // associated to the readonly user role.
 func DefaultEndpointAuthorizationsForReadOnlyUserRole(volumeBrowsingAuthorizations bool) portainer.Authorizations {
 	authorizations := map[portainer.Authorization]bool{

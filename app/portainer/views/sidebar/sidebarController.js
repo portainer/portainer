@@ -1,70 +1,66 @@
-angular.module('portainer.app').controller('SidebarController', [
-  '$rootScope',
-  '$q',
-  '$scope',
-  '$transitions',
-  'StateManager',
-  'Notifications',
-  'Authentication',
-  'UserService',
-  'EndpointProvider',
-  function ($rootScope, $q, $scope, $transitions, StateManager, Notifications, Authentication, UserService, EndpointProvider) {
-    function checkPermissions(memberships) {
-      var isLeader = false;
-      angular.forEach(memberships, function (membership) {
-        if (membership.Role === 1) {
-          isLeader = true;
-        }
-      });
-      $scope.isTeamLeader = isLeader;
-    }
+angular.module('portainer.app').controller('SidebarController', SidebarController);
 
-    async function initView() {
-      $scope.uiVersion = StateManager.getState().application.version;
-      $scope.logo = StateManager.getState().application.logo;
-      $scope.showStacks = await shouldShowStacks();
+function SidebarController($rootScope, $scope, $transitions, StateManager, Notifications, Authentication, UserService, EndpointProvider) {
+  $scope.applicationState = StateManager.getState();
+  $scope.endpointState = EndpointProvider.endpoint();
 
-      let userDetails = Authentication.getUserDetails();
-      let isAdmin = Authentication.isAdmin();
-      $scope.isAdmin = isAdmin;
-      $scope.endpointId = EndpointProvider.endpointID();
-
-      $q.when(!isAdmin ? UserService.userMemberships(userDetails.ID) : [])
-        .then(function success(data) {
-          checkPermissions(data);
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to retrieve user memberships');
-        });
-
-      $transitions.onEnter({}, () => {
-        $scope.endpointId = EndpointProvider.endpointID();
-      });
-    }
-
-    initView();
-
-    async function shouldShowStacks() {
-      const isAdmin = Authentication.isAdmin();
-
-      if (isAdmin) {
-        return true;
-      }
-
-      const endpoint = EndpointProvider.currentEndpoint();
-      if (!endpoint || !endpoint.SecuritySettings) {
-        return false;
-      }
-
-      return endpoint.SecuritySettings.allowStackManagementForRegularUsers;
-    }
-
-    $transitions.onEnter({}, async () => {
-      $scope.showStacks = await shouldShowStacks();
-
-      if ($scope.applicationState.endpoint.name) {
-        document.title = `${$rootScope.defaultTitle} | ${$scope.applicationState.endpoint.name}`;
+  function checkPermissions(memberships) {
+    var isLeader = false;
+    angular.forEach(memberships, function (membership) {
+      if (membership.Role === 1) {
+        isLeader = true;
       }
     });
-  },
-]);
+    $scope.isTeamLeader = isLeader;
+  }
+
+  function isClusterAdmin() {
+    return Authentication.isAdmin();
+  }
+
+  async function initView() {
+    $scope.uiVersion = StateManager.getState().application.version;
+    $scope.logo = StateManager.getState().application.logo;
+
+    $scope.endpointId = EndpointProvider.endpointID();
+    $scope.showStacks = shouldShowStacks();
+
+    const userDetails = Authentication.getUserDetails();
+    const isAdmin = isClusterAdmin();
+    $scope.isAdmin = isAdmin;
+
+    if (!isAdmin) {
+      try {
+        const memberships = await UserService.userMemberships(userDetails.ID);
+        checkPermissions(memberships);
+      } catch (err) {
+        Notifications.error('Failure', err, 'Unable to retrieve user memberships');
+      }
+    }
+  }
+
+  initView();
+
+  function shouldShowStacks() {
+    if (isClusterAdmin()) {
+      return true;
+    }
+
+    const endpoint = EndpointProvider.currentEndpoint();
+    if (!endpoint || !endpoint.SecuritySettings) {
+      return false;
+    }
+
+    return endpoint.SecuritySettings.allowStackManagementForRegularUsers;
+  }
+
+  $transitions.onEnter({}, async () => {
+    $scope.endpointId = EndpointProvider.endpointID();
+    $scope.showStacks = shouldShowStacks();
+    $scope.isAdmin = isClusterAdmin();
+
+    if ($scope.applicationState.endpoint.name) {
+      document.title = `${$rootScope.defaultTitle} | ${$scope.applicationState.endpoint.name}`;
+    }
+  });
+}

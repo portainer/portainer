@@ -1,0 +1,399 @@
+/* Overide Vendor CSS */
+.form-control {
+  background-color: var(--bg-main-color) !important;
+  border: 1px solid var(--border-form-control-color);
+  color: var(--text-form-control-color);
+}
+
+.text-muted {
+  color: var(--text-muted-color);
+}
+
+.table > thead > tr > th {
+  border-bottom: 2px solid var(--border-table-color);
+}
+
+.table-hover > tbody > tr:hover {
+  background-color: var(--bg-hover-table-color);
+}
+
+.switch i,
+.bootbox-form .checkbox i {
+  background: var(--bg-switch-box-color);
+}
+
+.table > thead > tr > th,
+.table > tbody > tr > th,
+.table > tfoot > tr > th,
+.table > thead > tr > td,
+.table > tbody > tr > td,
+.table > tfoot > tr > td {
+  border-top: 1px solid var(--border-table-top-color);
+}
+
+a {
+  color: var(--text-link-color);
+}
+
+a:hover,
+a:focus {
+  color: var(--text-link-hover-color);
+}
+
+.input-group-addon {
+  color: var(--text-input-group-addon-color);
+  background-color: var(--bg-input-group-addon-color);
+  border: 1px solid var(--border-input-group-addon-color);
+}
+
+.btn-default {
+  color: var(--text-btn-default-color);
+  background-color: var(--bg-btn-default-color);
+  border-color: var(--border-btn-default-color);
+}
+
+.text-danger {
+  color: var(--text-danger-color);
+}
+
+.table .table {
+  background-color: var(--bg-table-color);
+}
+
+.table-bordered {
+  border-color: var(--border-table-top-color);
+}
+
+.table-bordered > thead > tr > th,
+.table-bordered > tbody > tr > th,
+.table-bordered > tfoot > tr > th,
+.table-bordered > thead > tr > td,
+.table-bordered > tbody > tr > td,
+.table-bordered > tfoot > tr > td {
+  border-color: var(--border-table-top-color);
+}
+
+.md-checkbox input[type='checkbox']:disabled + label:before {
+  background: var(--bg-md-checkbox-color) !important;
+  border-color: var(--border-md-checkbox-color) !important;
+}
+
+.form-control[disabled],
+.form-control[readonly],
+fieldset[disabled] .form-control {
+  background-color: var(--bg-form-control-disabled-color) !important;
+}
+
+.modal.in .modal-dialog {
+  border: var(--border-modal);
+}
+
+.modal-content {
+  background-color: var(--bg-modal-content-color);
+}
+
+.modal-header {
+  border-bottom: 1px solid var(--border-modal-header-color);
+}
+
+.modal-footer {
+  border-top: 1px solid var(--border-modal-header-color);
+}
+
+.close {
+  color: var(--button-close-color);
+  opacity: var(--button-opacity);
+}
+
+.close:hover,
+.close:focus {
+  color: var(--button-close-color);
+  opacity: var(--button-opacity-hover);
+}
+
+code {
+  color: var(--text-code-color);
+  background-color: var(--bg-code-color);
+}
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+  color: var(--text-navtabs-color);
+  background-color: var(--bg-navtabs-color);
+  border: 1px solid var(--border-navtabs-color);
+}
+
+.nav-tabs {
+  border-bottom: 1px solid var(--border-navtabs-color);
+}
+
+.nav-tabs > li > a:hover {
+  border-color: var(--border-navtabs-color);
+}
+
+.nav > li > a:hover,
+.nav > li > a:focus {
+  background-color: var(--bg-navtabs-hover-color);
+}
+
+.table > thead > tr > td.active,
+.table > tbody > tr > td.active,
+.table > tfoot > tr > td.active,
+.table > thead > tr > th.active,
+.table > tbody > tr > th.active,
+.table > tfoot > tr > th.active,
+.table > thead > tr.active > td,
+.table > tbody > tr.active > td,
+.table > tfoot > tr.active > td,
+.table > thead > tr.active > th,
+.table > tbody > tr.active > th,
+.table > tfoot > tr.active > th {
+  background-color: var(--bg-table-selected-color);
+}
+.table-hover > tbody > tr > td.active:hover,
+.table-hover > tbody > tr > th.active:hover,
+.table-hover > tbody > tr.active:hover > td,
+.table-hover > tbody > tr:hover > .active,
+.table-hover > tbody > tr.active:hover > th {
+  background-color: var(--bg-table-selected-color);
+}
+
+.CodeMirror-gutters {
+  background: var(--bg-codemirror-gutters-color);
+  border-right: 1px solid var(--border-codemirror-gutters-color);
+}
+
+.CodeMirror {
+  background: var(--bg-codemirror-color);
+  color: var(--text-codemirror-color);
+}
+
+.CodeMirror-selected {
+  background: var(--bg-codemirror-selected-color) !important;
+}
+
+.CodeMirror-cursor {
+  border-left: 1px solid var(--border-codemirror-cursor-color);
+}
+
+.cm-s-default .cm-atom {
+  color: var(--text-cm-default-color);
+}
+
+.cm-s-default .cm-meta {
+  color: var(--text-cm-meta-color);
+}
+
+.cm-s-default .cm-string {
+  color: var(--text-cm-string-color);
+}
+
+.cm-s-default .cm-number {
+  color: var(--text-cm-number-color);
+}
+
+.dropdown-menu {
+  background: var(--bg-dropdown-menu-color);
+}
+
+.dropdown-menu > li > a {
+  color: var(--text-dropdown-menu-color);
+}
+
+pre {
+  border: 1px solid var(--border-pre-color);
+  background-color: var(--bg-pre-color);
+  color: var(--text-pre-color);
+}
+json-tree .key {
+  color: var(--text-json-tree-color);
+}
+
+json-tree .leaf-value {
+  color: var(--text-json-tree-leaf-color);
+}
+
+json-tree .branch-preview {
+  color: var(--text-json-tree-branch-preview-color);
+}
+
+.progress {
+  background-color: var(--bg-progress-color);
+}
+
+.pagination > .disabled > span,
+.pagination > .disabled > span:hover,
+.pagination > .disabled > span:focus,
+.pagination > .disabled > a,
+.pagination > .disabled > a:hover,
+.pagination > .disabled > a:focus {
+  color: var(--text-pagination-color);
+  background-color: var(--bg-pagination-color);
+  border-color: var(--border-pagination-color);
+}
+
+.pagination > li > a,
+.pagination > li > span {
+  background-color: var(--bg-pagination-span-color);
+  border-color: var(--border-pagination-span-color);
+  color: var(--text-pagination-span-color);
+}
+
+.pagination > li > a:hover,
+.pagination > li > span:hover,
+.pagination > li > a:focus,
+.pagination > li > span:focus {
+  background-color: var(--bg-pagination-hover-color);
+  border-color: var(--border-pagination-hover-color);
+}
+
+.pagination > li > a:hover,
+.pagination > li > span:hover,
+.pagination > li > a:focus,
+.pagination > li > span:focus {
+  color: var(--text-pagination-span-hover-color);
+}
+
+.ui-select-bootstrap .ui-select-choices-row > span {
+  color: var(--text-ui-select-color);
+}
+
+.ui-select-bootstrap .ui-select-choices-row > span:hover,
+.ui-select-bootstrap .ui-select-choices-row > span:focus {
+  background-color: var(--bg-ui-select-hover-color);
+  color: var(--text-ui-select-hover-color);
+}
+
+.motd-body {
+  background-color: var(--bg-motd-body-color) !important;
+}
+
+.panel-body {
+  background-color: var(--bg-panel-body-color) !important;
+}
+
+.panel {
+  border: 1px solid var(--border-panel-color);
+}
+
+.theme-information .col-sm-12 {
+  padding-left: 0px;
+  padding-right: 0px;
+  margin-top: 15px;
+}
+
+.theme-panel {
+  margin-top: 15px;
+}
+
+.summary {
+  color: var(--text-summary-color);
+  font-weight: 700;
+}
+
+.input-sm {
+  background-color: var(--bg-input-sm-color);
+  border: 1px solid var(--border-input-sm-color);
+}
+
+.rzslider .rz-bubble {
+  color: var(--text-rzslider-color);
+}
+
+.rzslider .rz-bubble.rz-limit {
+  color: var(--text-rzslider-limit-color);
+}
+input,
+button,
+select,
+textarea {
+  background: var(--text-input-textarea);
+}
+
+.daterangepicker {
+  background-color: var(--bg-daterangepicker-color);
+  border: 1px solid var(--border-daterangepicker-color);
+}
+
+.daterangepicker .drp-calendar.left {
+  background: var(--bg-calendar-color);
+}
+
+.daterangepicker .drp-calendar.left .calendar-table {
+  background: var(--bg-calendar-table-color);
+}
+
+.daterangepicker .drp-calendar.right {
+  background: var(--bg-calendar-color);
+}
+
+.daterangepicker .drp-calendar.right .calendar-table {
+  background: var(--bg-calendar-table-color);
+}
+
+.daterangepicker .calendar-table {
+  border: 1px solid var(--border-calendar-table);
+}
+
+.daterangepicker td.off,
+.daterangepicker td.off.in-range,
+.daterangepicker td.off.start-date,
+.daterangepicker td.off.end-date {
+  background-color: var(--bg-daterangepicker-end-date);
+  color: var(--text-daterangepicker-end-date);
+}
+
+.daterangepicker td.available:hover,
+.daterangepicker th.available:hover {
+  background-color: var(--bg-daterangepicker-hover);
+}
+
+.daterangepicker td.in-range {
+  background-color: var(--bg-daterangepicker-in-range);
+  color: var(--text-daterangepicker-in-range);
+}
+
+.daterangepicker td.active,
+.daterangepicker td.active:hover {
+  background-color: var(--bg-daterangepicker-active);
+  color: var(--text-daterangepicker-active);
+}
+
+.daterangepicker .drp-buttons {
+  border-top: 1px solid var(--border-daterangepicker);
+}
+
+.daterangepicker .calendar-table .next span,
+.daterangepicker .calendar-table .prev span {
+  border-color: var(--border-pre-next-month);
+}
+
+.daterangepicker:after {
+  border-bottom: 6px solid var(--border-daterangepicker-after);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px var(--bg-input-autofill-color) inset !important;
+  box-shadow: 0 0 0 30px var(--bg-input-autofill-color) inset !important;
+}
+
+input:-webkit-autofill {
+  -webkit-text-fill-color: var(--text-input-autofill-color) !important;
+}
+
+.btn:hover {
+  color: var(--text-button-hover-color);
+}
+
+.btn-default:hover {
+  background-color: var(--bg-btn-default-hover-color);
+}
+
+.btn-primary:hover {
+  color: var(--white-color) !important;
+}
+/* Overide Vendor CSS */

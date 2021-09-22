@@ -35,49 +35,49 @@ type edgeJobResponse struct {
 }
 
 type endpointStatusInspectResponse struct {
-	// Status represents the endpoint status
+	// Status represents the environment(endpoint) status
 	Status string `json:"status" example:"REQUIRED"`
 	// The tunnel port
 	Port int `json:"port" example:"8732"`
-	// List of requests for jobs to run on the endpoint
+	// List of requests for jobs to run on the environment(endpoint)
 	Schedules []edgeJobResponse `json:"schedules"`
 	// The current value of CheckinInterval
 	CheckinInterval int `json:"checkin" example:"5"`
 	//
 	Credentials string `json:"credentials" example:""`
-	// List of stacks to be deployed on the endpoints
+	// List of stacks to be deployed on the environments(endpoints)
 	Stacks []stackStatusResponse `json:"stacks"`
 }
 
 // @id EndpointStatusInspect
-// @summary Get endpoint status
-// @description Endpoint for edge agent to check status of environment
-// @description **Access policy**: restricted only to Edge endpoints
+// @summary Get environment(endpoint) status
+// @description Environment(Endpoint) for edge agent to check status of environment(endpoint)
+// @description **Access policy**: restricted only to Edge environments(endpoints)
 // @tags endpoints
 // @security jwt
-// @param id path int true "Endpoint identifier"
+// @param id path int true "Environment(Endpoint) identifier"
 // @success 200 {object} endpointStatusInspectResponse "Success"
 // @failure 400 "Invalid request"
-// @failure 403 "Permission denied to access endpoint"
-// @failure 404 "Endpoint not found"
+// @failure 403 "Permission denied to access environment(endpoint)"
+// @failure 404 "Environment(Endpoint) not found"
 // @failure 500 "Server error"
 // @router /endpoints/{id}/status [get]
 func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint identifier route variable", err}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment identifier route variable", err}
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == bolterrors.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
 	}
 
 	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
 	}
 
 	if endpoint.EdgeID == "" {
@@ -107,7 +107,7 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 
 	err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to Unable to persist endpoint changes inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to Unable to persist environment changes inside the database", err}
 	}
 
 	settings, err := handler.DataStore.Settings().Settings()
