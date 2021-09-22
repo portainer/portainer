@@ -112,6 +112,10 @@ func (deployer *KubernetesDeployer) command(operation string, userID portainer.U
 		args = append(args, "--insecure-skip-tls-verify")
 	}
 
+	if operation == "delete" {
+		args = append(args, "--ignore-not-found=true")
+	}
+
 	args = append(args, operation)
 	for _, path := range manifestFiles {
 		args = append(args, "-f", strings.TrimSpace(path))
