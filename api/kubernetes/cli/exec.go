@@ -28,11 +28,6 @@ func (kcl *KubeClient) StartExecProcess(token string, useAdminToken bool, namesp
 		config.BearerTokenFile = ""
 	}
 
-	if !useAdminToken {
-		config.BearerToken = token
-		config.BearerTokenFile = ""
-	}
-
 	req := kcl.cli.CoreV1().RESTClient().
 		Post().
 		Resource("pods").

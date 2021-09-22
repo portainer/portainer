@@ -79,11 +79,6 @@ func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request)
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to get user service account token", err}
 	}
 
-	token, useAdminToken, err := handler.getToken(r, endpoint, false)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to get user service account token", err}
-	}
-
 	params := &webSocketRequestParams{
 		endpoint: endpoint,
 		token:    serviceAccountToken,
@@ -184,40 +179,6 @@ func (handler *Handler) getToken(request *http.Request, endpoint *portainer.Endp
 	}
 
 	token, err := tokenManager.GetUserServiceAccountToken(int(tokenData.ID), endpoint.ID)
-	if err != nil {
-		return "", false, err
-	}
-
-	if token == "" {
-		return "", false, fmt.Errorf("can not get a valid user service account token")
-	}
-
-	return token, false, nil
-}
-
-func (handler *Handler) getToken(request *http.Request, endpoint *portainer.Endpoint, setLocalAdminToken bool) (string, bool, error) {
-	tokenData, err := security.RetrieveTokenData(request)
-	if err != nil {
-		return "", false, err
-	}
-
-	kubecli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
-	if err != nil {
-		return "", false, err
-	}
-
-	tokenCache := handler.kubernetesTokenCacheManager.GetOrCreateTokenCache(int(endpoint.ID))
-
-	tokenManager, err := kubernetes.NewTokenManager(kubecli, handler.DataStore, tokenCache, setLocalAdminToken)
-	if err != nil {
-		return "", false, err
-	}
-
-	if tokenData.Role == portainer.AdministratorRole {
-		return tokenManager.GetAdminServiceAccountToken(), true, nil
-	}
-
-	token, err := tokenManager.GetUserServiceAccountToken(int(tokenData.ID))
 	if err != nil {
 		return "", false, err
 	}
