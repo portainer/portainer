@@ -147,7 +147,7 @@
                 <button
                   type="button"
                   class="btn btn-primary btn-sm"
-                  ng-disabled="!kubernetesConfigurationCreationForm.$valid || !ctrl.isFormValid() || ctrl.state.actionInProgress"
+                  ng-disabled="!kubernetesConfigurationCreationForm.$valid || !ctrl.isFormValid() || ctrl.state.actionInProgress || !ctrl.formValues.ResourcePool"
                   ng-click="ctrl.createConfiguration()"
                   button-spinner="ctrl.state.actionInProgress"
                   data-cy="k8sConfigCreate-CreateConfigButton"
