@@ -2,6 +2,7 @@ package migrator
 
 import (
 	"fmt"
+	"log"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
@@ -167,6 +168,7 @@ func (m *Migrator) updateVolumeResourceControlToDB32() error {
 
 		totalSnapshots := len(endpoint.Snapshots)
 		if totalSnapshots == 0 {
+			log.Println("[DEBUG] [volume migration] [message: no snapshots found]")
 			continue
 		}
 
@@ -179,6 +181,7 @@ func (m *Migrator) updateVolumeResourceControlToDB32() error {
 
 		if volumesData, done := snapshot.SnapshotRaw.Volumes.(map[string]interface{}); done {
 			if volumesData["Volumes"] == nil {
+				log.Println("[DEBUG] [volume migration] [message: no volume data found]")
 				continue
 			}
 
