@@ -43,6 +43,7 @@ class KubernetesDeployController {
     };
 
     this.formValues = {
+      StackName: '',
       RepositoryURL: '',
       RepositoryReferenceName: '',
       RepositoryAuthentication: true,
@@ -128,7 +129,7 @@ class KubernetesDeployController {
       this.state.BuildMethod === KubernetesDeployBuildMethods.WEB_EDITOR && _.isEmpty(this.formValues.EditorContent) && _.isEmpty(this.formValues.Namespace);
     const isURLFormInvalid = this.state.BuildMethod == KubernetesDeployBuildMethods.WEB_EDITOR.URL && _.isEmpty(this.formValues.ManifestURL);
 
-    return isGitFormInvalid || isWebEditorInvalid || isURLFormInvalid || this.state.actionInProgress;
+    return !this.formValues.StackName || isGitFormInvalid || isWebEditorInvalid || isURLFormInvalid || this.state.actionInProgress;
   }
 
   onChangeFormValues(values) {
@@ -195,6 +196,7 @@ class KubernetesDeployController {
       const payload = {
         ComposeFormat: composeFormat,
         Namespace: this.formValues.Namespace,
+        StackName: this.formValues.StackName,
       };
 
       if (method === KubernetesDeployRequestMethods.REPOSITORY) {
