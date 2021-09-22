@@ -277,7 +277,7 @@
                 id="password"
                 name="password"
                 required
-                limited-feature-dir="s3-backup-setting"
+                limited-feature-dir="s3BackupFeatureId"
                 limited-feature-class="limited-be"
               />
             </div>
@@ -297,7 +297,7 @@
               <button
                 type="button"
                 class="btn btn-primary btn-sm"
-                limited-feature-dir="s3-backup-setting"
+                limited-feature-dir="s3BackupFeatureId"
                 limited-feature-class="limited-be"
                 ng-click="downloadBackup()"
                 ng-disabled="backupPortainerForm.$invalid || state.backupInProgress || state.featureLimited"

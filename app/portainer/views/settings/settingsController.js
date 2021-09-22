@@ -1,6 +1,7 @@
 import angular from 'angular';
 
 import { buildOption } from '@/portainer/components/box-selector';
+import { S3_BACKUP_SETTING } from '@/portainer/feature-flags/feature-ids';
 
 angular.module('portainer.app').controller('SettingsController', [
   '$scope',
@@ -12,6 +13,7 @@ angular.module('portainer.app').controller('SettingsController', [
   'FileSaver',
   'Blob',
   function ($scope, $state, Notifications, SettingsService, StateManager, BackupService, FileSaver) {
+    $scope.s3BackupFeatureId = S3_BACKUP_SETTING;
     $scope.backupOptions = [
       buildOption('backup_file', 'fa fa-download', 'Download backup file', '', 'file'),
       buildOption('backup_s3', 'fa fa-upload', 'Store in S3', 'Define a cron schedule', 's3', 's3-backup-setting'),
