@@ -14,7 +14,7 @@ export default class AccessViewerController {
     this.TeamService = TeamService;
     this.TeamMembershipService = TeamMembershipService;
 
-    this.limitedFeature = 'k8s-rbac-roles';
+    this.limitedFeature = 'rbac-roles';
   }
 
   onUserSelect() {
