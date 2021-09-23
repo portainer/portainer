@@ -71,15 +71,6 @@ body,
   font-size: 0.9em;
 }
 
-.form-control.limited-be {
-  border-color: var(--BE-only);
-}
-
-button.limited-be {
-  background-color: var(--BE-only);
-  border-color: var(--BE-only);
-}
-
 input[type='checkbox'] {
   margin-top: 1px;
   vertical-align: middle;

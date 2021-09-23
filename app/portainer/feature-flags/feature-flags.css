@@ -1,0 +1,12 @@
+.form-control.limited-be {
+  border-color: var(--BE-only);
+}
+
+button.limited-be {
+  background-color: var(--BE-only);
+  border-color: var(--BE-only);
+}
+
+div.limited-be {
+  border: solid 1px var(--BE-only);
+}
