@@ -36,6 +36,7 @@
                   ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools"
                   ng-change="ctrl.onResourcePoolSelectionChange()"
                   ng-disabled="ctrl.state.isEdit"
+                  data-cy="k8sAppCreate-nsSelecet"
                 ></select>
               </div>
             </div>
@@ -178,6 +179,7 @@
                       uib-typeahead="stack for stack in ctrl.stacks | filter:$viewValue | limitTo:7"
                       typeahead-show-hint="true"
                       typeahead-min-length="0"
+                      data-cy="k8sAppCreate-stackName"
                     />
                   </div>
                 </div>
@@ -190,7 +192,13 @@
                 <div class="form-group">
                   <div class="col-sm-12">
                     <label class="control-label text-left">Environment variables</label>
-                    <span ng-if="ctrl.formValues.Containers.length <= 1" class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addEnvironmentVariable()">
+                    <span
+                      ng-if="ctrl.formValues.Containers.length <= 1"
+                      class="label label-default interactive"
+                      style="margin-left: 10px;"
+                      ng-click="ctrl.addEnvironmentVariable()"
+                      data-cy="k8sAppCreate-addEnvVarButton"
+                    >
                       <i class="fa fa-plus-circle" aria-hidden="true"></i> add environment variable
                     </span>
                   </div>
@@ -210,6 +218,7 @@
                               ng-pattern="/^[-._a-zA-Z][-._a-zA-Z0-9]*$/"
                               placeholder="foo"
                               ng-disabled="ctrl.formValues.Containers.length > 1"
+                              data-cy="k8sAppCreate-envVarName_{{ $index }}"
                               required
                             />
                           </div>
@@ -224,6 +233,7 @@
                             ng-model="envVar.Value"
                             placeholder="bar"
                             ng-disabled="ctrl.formValues.Containers.length > 1"
+                            data-cy="k8sAppCreate-envVarValue_{{ $index }}"
                           />
                         </div>
 
@@ -231,7 +241,13 @@
                           <button ng-if="!envVar.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeEnvironmentVariable(envVar)">
                             <i class="fa fa-trash-alt" aria-hidden="true"></i>
                           </button>
-                          <button ng-if="envVar.NeedsDeletion" class="btn btn-sm btn-primary" type="button" ng-click="ctrl.restoreEnvironmentVariable(envVar)">
+                          <button
+                            ng-if="envVar.NeedsDeletion"
+                            class="btn btn-sm btn-primary"
+                            type="button"
+                            ng-click="ctrl.restoreEnvironmentVariable(envVar)"
+                            data-cy="k8sAppCreate-removeEnvVarButton_{{ $index }}"
+                          >
                             <i class="fa fa-trash-restore" aria-hidden="true"></i>
                           </button>
                         </div>
@@ -277,14 +293,20 @@
                 <div class="form-group">
                   <div class="col-sm-12">
                     <label class="control-label text-left">Configurations</label>
-                    <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addConfiguration()" ng-if="ctrl.formValues.Containers.length <= 1">
+                    <span
+                      class="label label-default interactive"
+                      style="margin-left: 10px;"
+                      ng-click="ctrl.addConfiguration()"
+                      ng-if="ctrl.formValues.Containers.length <= 1"
+                      data-cy="k8sAppCreate-addConfigButton"
+                    >
                       <i class="fa fa-plus-circle" aria-hidden="true"></i> add configuration
                     </span>
                   </div>
                   <div class="col-sm-12 small text-muted" style="margin-top: 15px;" ng-if="ctrl.formValues.Configurations.length">
                     <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                    Portainer will automatically expose all the keys of a configuration as environment variables. This behavior can be overriden to filesystem mounts for each key via
-                    the override button.
+                    Portainer will automatically expose all the keys of a configuration as environment variables. This behavior can be overriden to filesystem mounts for each key
+                    via the override button.
                   </div>
                 </div>
 
@@ -298,6 +320,7 @@
                       ng-options="c as c.Name for c in ctrl.configurations track by c.Name"
                       ng-change="ctrl.resetConfiguration(index)"
                       ng-disabled="ctrl.formValues.Containers.length > 1"
+                      data-cy="k8sAppCreate-addConfigSelect_{{ $index }}"
                     ></select>
                   </div>
                   <div class="col-sm-6" style="margin-top: 2px;">
@@ -307,6 +330,7 @@
                       ng-if="!config.Overriden"
                       ng-click="ctrl.overrideConfiguration(index)"
                       ng-disabled="!config.SelectedConfiguration || ctrl.formValues.Containers.length > 1"
+                      data-cy="k8sAppCreate-configOverrideButton_{{ $index }}"
                     >
                       <i class="fa fa-list" aria-hidden="true"></i> Override
                     </button>
@@ -316,10 +340,17 @@
                       ng-if="config.Overriden"
                       ng-click="ctrl.resetConfiguration(index)"
                       ng-disabled="ctrl.formValues.Containers.length > 1"
+                      data-cy="k8sAppCreate-configAutoButton_{{ $index }}"
                     >
                       <i class="fa fa-undo" aria-hidden="true"></i> Auto
                     </button>
-                    <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeConfiguration(index)" ng-if="ctrl.formValues.Containers.length <= 1">
+                    <button
+                      class="btn btn-sm btn-danger"
+                      type="button"
+                      ng-click="ctrl.removeConfiguration(index)"
+                      ng-if="ctrl.formValues.Containers.length <= 1"
+                      data-cy="k8sAppCreate-configRemoveButton"
+                    >
                       <i class="fa fa-trash-alt" aria-hidden="true"></i> Remove
                     </button>
                   </div>
@@ -358,6 +389,7 @@
                               ng-disabled="ctrl.formValues.Containers.length > 1"
                               required
                               ng-change="ctrl.onChangeConfigurationPath()"
+                              data-cy="k8sAppCreate-pathOnDiskInput"
                             />
                           </div>
                         </div>
@@ -420,7 +452,13 @@
                 <div class="form-group" ng-if="ctrl.storageClassAvailable()">
                   <div class="col-sm-12" style="margin-top: 5px;">
                     <label class="control-label text-left">Persisted folders</label>
-                    <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addPersistedFolder()" ng-if="ctrl.isAddPersistentFolderButtonShowed()">
+                    <span
+                      class="label label-default interactive"
+                      style="margin-left: 10px;"
+                      ng-click="ctrl.addPersistedFolder()"
+                      ng-if="ctrl.isAddPersistentFolderButtonShowed()"
+                      data-cy="k8sAppCreate-addPersistentFolderButton"
+                    >
                       <i class="fa fa-plus-circle" aria-hidden="true"></i> add persisted folder
                     </span>
                   </div>
@@ -438,6 +476,7 @@
                           ng-disabled="ctrl.isEditAndExistingPersistedFolder($index) || ctrl.formValues.Containers.length > 1"
                           placeholder="/data"
                           required
+                          data-cy="k8sAppCreate-containerPathInput_{{ $index }}"
                         />
                       </div>
 
@@ -500,8 +539,16 @@
                           ng-model="persistedFolder.StorageClass"
                           ng-options="storageClass as storageClass.Name for storageClass in ctrl.storageClasses"
                           ng-disabled="ctrl.state.isEdit || ctrl.formValues.Containers.length > 1"
+                          data-cy="k8sAppCreate-storageSelect_{{ $index }}"
                         ></select>
-                        <input ng-if="!ctrl.hasMultipleStorageClassesAvailable()" type="text" class="form-control" disabled ng-model="persistedFolder.StorageClass.Name" />
+                        <input
+                          ng-if="!ctrl.hasMultipleStorageClassesAvailable()"
+                          type="text"
+                          class="form-control"
+                          disabled
+                          ng-model="persistedFolder.StorageClass.Name"
+                          data-cy="k8sAppCreate-storageClassNameInput_{{ $index }}"
+                        />
                       </div>
 
                       <div class="input-group col-sm-5 input-group-sm" ng-if="!persistedFolder.UseNewVolume" ng-class="{ striked: persistedFolder.NeedsDeletion }">
@@ -521,10 +568,22 @@
 
                       <div class="input-group col-sm-1 input-group-sm">
                         <div ng-if="!ctrl.isEditAndStatefulSet() && !ctrl.state.useExistingVolume[$index] && ctrl.formValues.Containers.length <= 1">
-                          <button ng-if="!persistedFolder.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removePersistedFolder($index)">
+                          <button
+                            ng-if="!persistedFolder.NeedsDeletion"
+                            class="btn btn-sm btn-danger"
+                            type="button"
+                            ng-click="ctrl.removePersistedFolder($index)"
+                            data-cy="k8sAppCreate-rmPersistentFolderButton"
+                          >
                             <i class="fa fa-trash-alt" aria-hidden="true"></i>
                           </button>
-                          <button ng-if="persistedFolder.NeedsDeletion" class="btn btn-sm btn-primary" type="button" ng-click="ctrl.restorePersistedFolder($index)">
+                          <button
+                            ng-if="persistedFolder.NeedsDeletion"
+                            class="btn btn-sm btn-primary"
+                            type="button"
+                            ng-click="ctrl.restorePersistedFolder($index)"
+                            data-cy="k8sAppCreate-restorePersistentButton"
+                          >
                             <i class="fa fa-trash-restore" aria-hidden="true"></i>
                           </button>
                         </div>
@@ -544,7 +603,9 @@
                         <div
                           class="small text-warning"
                           style="margin-top: 5px;"
-                          ng-show="kubernetesApplicationCreationForm['persisted_folder_path_' + $index].$invalid || ctrl.state.duplicates.persistedFolders.refs[$index] !== undefined"
+                          ng-show="
+                            kubernetesApplicationCreationForm['persisted_folder_path_' + $index].$invalid || ctrl.state.duplicates.persistedFolders.refs[$index] !== undefined
+                          "
                         >
                           <ng-messages for="kubernetesApplicationCreationForm['persisted_folder_path_' + $index].$error">
                             <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Path is required.</p>
@@ -623,7 +684,9 @@
                       </div>
                       <div
                         style="color: #767676;"
-                        ng-if="(ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.SHARED) || ctrl.state.persistedFoldersUseExistingVolumes"
+                        ng-if="
+                          (ctrl.state.isEdit && ctrl.formValues.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.SHARED) || ctrl.state.persistedFoldersUseExistingVolumes
+                        "
                       >
                         <input type="radio" id="data_access_isolated" disabled />
                         <label
@@ -694,8 +757,8 @@
                 <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded()">
                   <div class="col-sm-12 small text-muted">
                     <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                    A resource quota is set on this namespace, you must specify resource reservations. Resource reservations are applied per instance of the application. Maximums are
-                    inherited from the namespace quota.
+                    A resource quota is set on this namespace, you must specify resource reservations. Resource reservations are applied per instance of the application. Maximums
+                    are inherited from the namespace quota.
                   </div>
                 </div>
 
@@ -733,6 +796,7 @@
                       class="form-control"
                       id="memory-limit"
                       required
+                      data-cy="k8sAppCreate-memoryLimit"
                     />
                   </div>
                   <div class="col-sm-4">
@@ -798,7 +862,13 @@
                 <div class="form-group" style="margin-bottom: 0;">
                   <div class="boxselector_wrapper">
                     <div>
-                      <input type="radio" id="deployment_replicated" ng-value="ctrl.ApplicationDeploymentTypes.REPLICATED" ng-model="ctrl.formValues.DeploymentType" />
+                      <input
+                        type="radio"
+                        id="deployment_replicated"
+                        ng-value="ctrl.ApplicationDeploymentTypes.REPLICATED"
+                        ng-model="ctrl.formValues.DeploymentType"
+                        data-cy="k8sAppCreate-replicatedDeploymentButton"
+                      />
                       <label for="deployment_replicated">
                         <div class="boxselector_header">
                           <i class="fa fa-cube" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -831,6 +901,7 @@
                         ng-value="ctrl.ApplicationDeploymentTypes.GLOBAL"
                         ng-model="ctrl.formValues.DeploymentType"
                         ng-click="ctrl.unselectAutoScaler()"
+                        data-cy="k8sAppCreate-globalDeployButton"
                       />
                       <label for="deployment_global">
                         <div class="boxselector_header">
@@ -862,6 +933,7 @@
                       ng-disabled="!ctrl.supportScalableReplicaDeployment()"
                       ng-change="ctrl.enforceReplicaCountMinimum()"
                       required
+                      data-cy="k8sAppCreate-replicaCountInput"
                     />
                   </div>
                 </div>
@@ -914,7 +986,13 @@
                       Enable auto scaling for this application
                     </label>
                     <label class="switch" style="margin-left: 20px;">
-                      <input type="checkbox" class="form-control" name="enable_auto_scaling" ng-model="ctrl.formValues.AutoScaler.IsUsed" />
+                      <input
+                        type="checkbox"
+                        class="form-control"
+                        name="enable_auto_scaling"
+                        ng-model="ctrl.formValues.AutoScaler.IsUsed"
+                        data-cy="k8sAppCreate-autoScaleCheckbox"
+                      />
                       <i></i>
                     </label>
                   </div>
@@ -957,6 +1035,7 @@
                               min="0"
                               ng-max="ctrl.formValues.AutoScaler.MaxReplicas"
                               ng-model="ctrl.formValues.AutoScaler.MinReplicas"
+                              data-cy="k8sAppCreate-autoScaleMin"
                               required
                             />
                           </div>
@@ -991,7 +1070,16 @@
                         </td>
                         <td style="padding: 8px 5px 5px 0; border: none;">
                           <div class="input-group input-group-sm" style="width: 100%;">
-                            <input type="number" class="form-control" name="auto_scaler_cpu" ng-model="ctrl.formValues.AutoScaler.TargetCPUUtilization" min="1" max="100" required />
+                            <input
+                              type="number"
+                              class="form-control"
+                              name="auto_scaler_cpu"
+                              ng-model="ctrl.formValues.AutoScaler.TargetCPUUtilization"
+                              min="1"
+                              max="100"
+                              required
+                              data-cy="k8sAppCreate-targetCPUInput"
+                            />
                           </div>
                           <div class="input-group input-group-sm" ng-show="kubernetesApplicationCreationForm['auto_scaler_cpu'].$invalid">
                             <div class="small text-warning" style="margin-top: 5px;">
@@ -1044,6 +1132,7 @@
                             ng-options="label as (label.Key | kubernetesNodeLabelHumanReadbleText) for label in ctrl.nodesLabels"
                             ng-change="ctrl.onChangePlacementLabel($index)"
                             ng-disabled="ctrl.isEditAndNotNewPlacement($index)"
+                            data-cy="k8sAppCreate-placementLabel_{{ $index }}"
                           >
                           </select>
                         </div>
@@ -1053,15 +1142,28 @@
                             ng-model="placement.Value"
                             ng-options="value for value in placement.Label.Values"
                             ng-disabled="ctrl.isEditAndNotNewPlacement($index)"
+                            data-cy="k8sAppCreate-placementName_{{ $index }}"
                           >
                           </select>
                         </div>
 
                         <div class="col-sm-1 input-group">
-                          <button ng-if="!placement.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removePlacement($index)">
+                          <button
+                            ng-if="!placement.NeedsDeletion"
+                            class="btn btn-sm btn-danger"
+                            type="button"
+                            ng-click="ctrl.removePlacement($index)"
+                            data-cy="k8sAppCreate-deletePlacementButton"
+                          >
                             <i class="fa fa-trash-alt" aria-hidden="true"></i>
                           </button>
-                          <button ng-if="placement.NeedsDeletion" class="btn btn-sm btn-primary" type="button" ng-click="ctrl.restorePlacement($index)">
+                          <button
+                            ng-if="placement.NeedsDeletion"
+                            class="btn btn-sm btn-primary"
+                            type="button"
+                            ng-click="ctrl.restorePlacement($index)"
+                            data-cy="k8sAppCreate-restorePlacementButton"
+                          >
                             <i class="fa fa-trash-restore" aria-hidden="true"></i>
                           </button>
                         </div>
@@ -1094,7 +1196,13 @@
                     <div class="form-group" style="margin-bottom: 0;" ng-if="ctrl.formValues.Placements.length">
                       <div class="boxselector_wrapper">
                         <div>
-                          <input type="radio" id="placement_hard" ng-value="ctrl.ApplicationPlacementTypes.MANDATORY" ng-model="ctrl.formValues.PlacementType" />
+                          <input
+                            type="radio"
+                            id="placement_hard"
+                            ng-value="ctrl.ApplicationPlacementTypes.MANDATORY"
+                            ng-model="ctrl.formValues.PlacementType"
+                            data-cy="k8sAppCreate-mandatoryPlacementButton"
+                          />
                           <label for="placement_hard">
                             <div class="boxselector_header">
                               <i class="fa fa-tasks" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -1104,7 +1212,13 @@
                           </label>
                         </div>
                         <div>
-                          <input type="radio" id="placement_soft" ng-value="ctrl.ApplicationPlacementTypes.PREFERRED" ng-model="ctrl.formValues.PlacementType" />
+                          <input
+                            type="radio"
+                            id="placement_soft"
+                            ng-value="ctrl.ApplicationPlacementTypes.PREFERRED"
+                            ng-model="ctrl.formValues.PlacementType"
+                            data-cy="k8sAppCreate-prefferedPlacementButton"
+                          />
                           <label for="placement_soft">
                             <div class="boxselector_header">
                               <i class="fa fa-list" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -1141,11 +1255,13 @@
                         ng-model="ctrl.formValues.PublishingType"
                         ng-change="ctrl.onChangePublishedPorts()"
                         ng-disabled="ctrl.isPublishingTypeEditDisabled()"
+                        data-cy="k8sAppCreate-internalPublishButton"
                       />
                       <label
                         for="publishing_internal"
                         ng-if="
-                          !ctrl.isPublishingTypeEditDisabled() || (ctrl.isPublishingTypeEditDisabled() && ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INTERNAL)
+                          !ctrl.isPublishingTypeEditDisabled() ||
+                          (ctrl.isPublishingTypeEditDisabled() && ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INTERNAL)
                         "
                       >
                         <div class="boxselector_header">
@@ -1179,11 +1295,13 @@
                         ng-model="ctrl.formValues.PublishingType"
                         ng-change="ctrl.onChangePublishedPorts()"
                         ng-disabled="ctrl.isPublishingTypeEditDisabled()"
+                        data-cy="k8sAppCreate-clusterPublishButton"
                       />
                       <label
                         for="publishing_cluster"
                         ng-if="
-                          !ctrl.isPublishingTypeEditDisabled() || (ctrl.isPublishingTypeEditDisabled() && ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER)
+                          !ctrl.isPublishingTypeEditDisabled() ||
+                          (ctrl.isPublishingTypeEditDisabled() && ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER)
                         "
                       >
                         <div class="boxselector_header">
@@ -1216,11 +1334,13 @@
                         ng-model="ctrl.formValues.PublishingType"
                         ng-change="ctrl.onChangePublishedPorts()"
                         ng-disabled="ctrl.isPublishingTypeEditDisabled()"
+                        data-cy="k8sAppCreate-ingressPublishButton"
                       />
                       <label
                         for="publishing_ingress"
                         ng-if="
-                          !ctrl.isPublishingTypeEditDisabled() || (ctrl.isPublishingTypeEditDisabled() && ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INGRESS)
+                          !ctrl.isPublishingTypeEditDisabled() ||
+                          (ctrl.isPublishingTypeEditDisabled() && ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INGRESS)
                         "
                       >
                         <div class="boxselector_header">
@@ -1253,6 +1373,7 @@
                         ng-model="ctrl.formValues.PublishingType"
                         ng-change="ctrl.onChangePublishedPorts()"
                         ng-disabled="ctrl.isPublishingTypeEditDisabled()"
+                        data-cy="k8sAppCreate-lbPublichButton"
                       />
                       <label
                         for="publishing_loadbalancer"
@@ -1291,7 +1412,7 @@
                 <div class="form-group">
                   <div class="col-sm-12" style="margin-top: 5px;">
                     <label class="control-label text-left">Published ports</label>
-                    <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addPublishedPort()" ng-if="!ctrl.disableLoadBalancerEdit()">
+                    <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addPublishedPort()" data-cy="k8sAppCreate-addNewPortButton">
                       <i class="fa fa-plus-circle" aria-hidden="true"></i> publish a new port
                     </span>
                   </div>
@@ -1340,6 +1461,7 @@
                           ng-required="!publishedPort.NeedsDeletion"
                           ng-change="ctrl.onChangePortMappingContainerPort()"
                           ng-disabled="ctrl.disableLoadBalancerEdit() || ctrl.isEditAndNotNewPublishedPort($index)"
+                          data-cy="k8sAppCreate-containerPort_{{ $index }}"
                         />
                       </div>
 
@@ -1362,7 +1484,8 @@
                           ng-max="32767"
                           ng-change="ctrl.onChangePortMappingNodePort()"
                           ng-disabled="ctrl.disableLoadBalancerEdit() || ctrl.isEditAndNotNewPublishedPort($index)"
-                        />
+                          data-cy="k8sAppCreate-nodePort_{{ $index }}"
+                          />
                       </div>
 
                       <div
@@ -1386,6 +1509,7 @@
                           ng-required="!publishedPort.NeedsDeletion"
                           ng-change="ctrl.onChangePortMappingLoadBalancer()"
                           ng-disabled="ctrl.disableLoadBalancerEdit() || ctrl.isEditAndNotNewPublishedPort($index)"
+                          data-cy="k8sAppCreate-lbPortInput_{{ $index }}"
                         />
                       </div>
 
@@ -1406,6 +1530,7 @@
                           ng-required="!publishedPort.NeedsDeletion"
                           ng-change="ctrl.onChangePortMappingIngress($index)"
                           ng-disabled="ctrl.disableLoadBalancerEdit() || ctrl.isEditAndNotNewPublishedPort($index)"
+                          data-cy="k8sAppCreate-ingressSelect_{{ $index }}"
                         >
                           <option selected disabled hidden value="">Select an ingress</option>
                         </select>
@@ -1427,6 +1552,7 @@
                           ng-options="host as (host | kubernetesApplicationIngressEmptyHostname) for host in publishedPort.IngressHosts"
                           ng-change="ctrl.onChangePublishedPorts()"
                           ng-disabled="ctrl.disableLoadBalancerEdit() || ctrl.isEditAndNotNewPublishedPort($index)"
+                          data-cy="k8sAppCreate-hostnameSelect_{{ $index }}"
                         >
                           <option selected disabled hidden value="">Select a hostname</option>
                         </select>
@@ -1450,6 +1576,7 @@
                           ng-change="ctrl.onChangePortMappingIngressRoute()"
                           ng-pattern="/^(\/?[a-zA-Z0-9]+([a-zA-Z0-9-/_]*[a-zA-Z0-9])?|[a-zA-Z0-9]+)|(\/){1}$/"
                           ng-disabled="ctrl.disableLoadBalancerEdit() || ctrl.isEditAndNotNewPublishedPort($index)"
+                          data-cy="k8sAppCreate-ingressRoute_{{ $index }}"
                         />
                       </div>
 
@@ -1461,6 +1588,7 @@
                             uib-btn-radio="'TCP'"
                             ng-change="ctrl.onChangePortProtocol($index)"
                             ng-disabled="ctrl.isProtocolOptionDisabled($index, 'TCP')"
+                            data-cy="k8sAppCreate-TCPButton_{{ $index }}"
                             >TCP</label
                           >
                           <label
@@ -1469,6 +1597,7 @@
                             uib-btn-radio="'UDP'"
                             ng-change="ctrl.onChangePortProtocol($index)"
                             ng-disabled="ctrl.isProtocolOptionDisabled($index, 'UDP')"
+                            data-cy="k8sAppCreate-UDPButton_{{ $index }}"
                             >UDP</label
                           >
                         </div>
@@ -1477,6 +1606,7 @@
                           class="btn btn-sm btn-danger"
                           type="button"
                           ng-click="ctrl.removePublishedPort($index)"
+                          data-cy="k8sAppCreate-rmPortButton_{{ $index }}"
                         >
                           <i class="fa fa-trash-alt" aria-hidden="true"></i>
                         </button>
@@ -1485,6 +1615,7 @@
                           class="btn btn-sm btn-primary"
                           type="button"
                           ng-click="ctrl.restorePublishedPort($index)"
+                          data-cy="k8sAppCreate-restorePortButton_{{ $index }}"
                         >
                           <i class="fa fa-trash-restore" aria-hidden="true"></i>
                         </button>
@@ -1564,8 +1695,8 @@
                           <div ng-messages="kubernetesApplicationCreationForm['ingress_route_'+$index].$error">
                             <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Route is required.</p>
                             <p ng-message="pattern"
-                              ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of alphanumeric characters or the special characters: '-', '_' or
-                              '/'. It must start and end with an alphanumeric character (e.g. 'my-route', or 'route-123').</p
+                              ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of alphanumeric characters or the special characters: '-', '_'
+                              or '/'. It must start and end with an alphanumeric character (e.g. 'my-route', or 'route-123').</p
                             >
                           </div>
                           <p ng-if="ctrl.state.duplicates.publishedPorts.ingressRoutes.refs[$index] !== undefined">
@@ -1608,7 +1739,7 @@
                   form-values="ctrl.formValues"
                   old-form-values="ctrl.savedFormValues"
                 ></kubernetes-summary-view>
-                </div>
+              </div>
             </div>
 
             <div class="col-sm-12 form-section-title" ng-if="ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.GIT">
@@ -1636,6 +1767,7 @@
                   type="button"
                   class="btn btn-sm btn-default"
                   ui-sref="kubernetes.applications.application({ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool })"
+                  data-cy="k8sAppCreate-appCancelButton"
                 >
                   Cancel
                 </button>
