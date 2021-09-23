@@ -7,6 +7,12 @@ button.limited-be {
   border-color: var(--BE-only);
 }
 
-div.limited-be {
+ng-form.limited-be,
+form.limited-be {
   border: solid 1px var(--BE-only);
+  border-radius: 10px;
+  padding: 10px;
+  pointer-events: none;
+  touch-action: none;
+  display: block;
 }
