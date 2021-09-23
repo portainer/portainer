@@ -246,12 +246,6 @@ json-tree .branch-preview {
 .pagination > li > span:focus {
   background-color: var(--bg-pagination-hover-color);
   border-color: var(--border-pagination-hover-color);
-}
-
-.pagination > li > a:hover,
-.pagination > li > span:hover,
-.pagination > li > a:focus,
-.pagination > li > span:focus {
   color: var(--text-pagination-span-hover-color);
 }
 
