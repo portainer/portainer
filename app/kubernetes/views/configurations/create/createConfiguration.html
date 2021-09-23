@@ -95,7 +95,7 @@
                     <label for="type_basic" data-cy="k8sConfigCreate-nonSensitiveButton">
                       <div class="boxselector_header">
                         <i class="fa fa-file-code" aria-hidden="true" style="margin-right: 2px;"></i>
-                        Non-sensitive
+                        ConfigMap
                       </div>
                       <p>This configuration holds non-sensitive information</p>
                     </label>
@@ -105,7 +105,7 @@
                     <label for="type_secret" data-cy="k8sConfigCreate-sensitiveButton">
                       <div class="boxselector_header">
                         <i class="fa fa-user-secret" aria-hidden="true" style="margin-right: 2px;"></i>
-                        Sensitive
+                        Secret
                       </div>
                       <p>This configuration holds sensitive information</p>
                     </label>
@@ -153,7 +153,7 @@
                   button-spinner="ctrl.state.actionInProgress"
                   data-cy="k8sConfigCreate-CreateConfigButton"
                 >
-                  <span ng-hide="ctrl.state.actionInProgress">Create configuration</span>
+                  <span ng-hide="ctrl.state.actionInProgress">Create {{ ctrl.formValues.Type | kubernetesConfigurationTypeText }}</span>
                   <span ng-show="ctrl.state.actionInProgress">Creation in progress...</span>
                 </button>
               </div>
