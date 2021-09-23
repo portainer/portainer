@@ -35,7 +35,7 @@ export function limitedFeatureDirective(featureService) {
 
     limitedFeatureAttrs.forEach(([attr, value = attr]) => {
       const currentValue = elem.attr(attr) || '';
-      elem.attr(attr, `${currentValue} ${value}`);
+      elem.attr(attr, `${currentValue} ${value}`.trim());
     });
   }
 }
