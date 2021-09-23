@@ -12,7 +12,7 @@ import (
 	"github.com/portainer/libhelm/options"
 	"github.com/portainer/libhelm/release"
 	portainer "github.com/portainer/portainer/api"
-	bolt "github.com/portainer/portainer/api/bolt/bolttest"
+	"github.com/portainer/portainer/api/bolt"
 	"github.com/portainer/portainer/api/http/security"
 	helper "github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/portainer/portainer/api/kubernetes"
