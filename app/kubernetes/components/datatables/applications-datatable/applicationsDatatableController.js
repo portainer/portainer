@@ -2,6 +2,7 @@ import { KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
+import _ from 'lodash-es';
 
 angular.module('portainer.docker').controller('KubernetesApplicationsDatatableController', [
   '$scope',
@@ -21,6 +22,14 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
       expandAll: false,
       expandedItems: [],
     });
+
+    this.filters = {
+      state: {
+        open: false,
+        enabled: false,
+        values: [],
+      }
+    }
 
     this.expandAll = function () {
       this.state.expandAll = !this.state.expandAll;
@@ -113,6 +122,39 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
     this.allowSelection = function (item) {
       return !this.isSystemNamespace(item);
     };
+
+    this.applyFilters = function (value) {
+      var application = value;
+      var filters = ctrl.filters;
+      for (var i = 0; i < filters.state.values.length; i++) {
+        var filter = filters.state.values[i];
+        if (application.ApplicationType === filter.type && filter.display) {
+          return true;
+        }
+      }
+      return false;
+    };
+
+    this.onStateFilterChange = function () {
+      var filters = this.filters.state.values;
+      var filtered = false;
+      for (var i = 0; i < filters.length; i++) {
+        var filter = filters[i];
+        if (!filter.display) {
+          filtered = true;
+        }
+      }
+      this.filters.state.enabled = filtered;
+    };
+
+    this.prepareTableFromDataset = function () {
+      let availableTypeFilters = [];
+      for (var i = 0; i< this.dataset.length; i++) {
+        let item = this.dataset[i];
+        availableTypeFilters.push({ type: item.ApplicationType, display: true});
+      }
+      this.filters.state.values = _.uniqBy(availableTypeFilters, 'type');
+    }
 
     this.$onInit = function () {
       this.isAdmin = Authentication.isAdmin();
