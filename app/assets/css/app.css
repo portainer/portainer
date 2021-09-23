@@ -721,10 +721,6 @@ a[ng-click] {
 .multiSelect .multiSelectItem:hover,
 .multiSelect .multiSelectGroup:hover {
   border-color: var(--grey-3);
-}
-
-.multiSelect .multiSelectItem:hover,
-.multiSelect .multiSelectGroup:hover {
   background-image: var(--bg-image-multiselect) !important;
   color: var(--white-color) !important;
 }
