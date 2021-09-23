@@ -1,7 +1,10 @@
+import { EXTERNAL_AUTH_LDAP } from '@/portainer/feature-flags/feature-ids';
+
 export default class LdapSettingsOpenLDAPController {
   /* @ngInject */
   constructor() {
     this.domainSuffix = '';
+    this.limitedFeatureId = EXTERNAL_AUTH_LDAP;
 
     this.findDomainSuffix = this.findDomainSuffix.bind(this);
     this.parseDomainSuffix = this.parseDomainSuffix.bind(this);
