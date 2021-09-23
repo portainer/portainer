@@ -68,6 +68,7 @@ function computeContainers(data) {
       const res = new KubernetesPodContainer();
       res.Type = KubernetesPodContainerTypes.APP;
       res.PodName = data.metadata.name;
+      res.PodIP = data.status.podIP;
       res.Name = item.name;
       res.Image = item.image;
       res.ImagePullPolicy = item.imagePullPolicy;
