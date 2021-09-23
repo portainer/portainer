@@ -13,14 +13,14 @@
         <rd-widget-body classes="no-padding">
           <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
             <uib-tab index="0" classes="btn-sm" select="ctrl.selectTab(0)">
-              <uib-tab-heading> <i class="fa fa-database space-right" aria-hidden="true"></i> Volume </uib-tab-heading>
+              <uib-tab-heading data-cy="k8sVolDetail-volTab"> <i class="fa fa-database space-right" aria-hidden="true"></i> Volume </uib-tab-heading>
 
               <div style="padding: 20px;">
                 <table class="table">
                   <tbody>
                     <tr>
                       <td>Name</td>
-                      <td>
+                      <td data-cy="k8sVolDetail-volName">
                         {{ ctrl.volume.PersistentVolumeClaim.Name }}
                         <span class="label label-primary image-tag label-margins" ng-if="!ctrl.isSystemNamespace() && ctrl.isExternalVolume()">external</span>
                         <span class="label label-warning image-tag label-margins" ng-if="!ctrl.isSystemNamespace() && !ctrl.isUsed()">unused</span>
@@ -29,17 +29,19 @@
                     <tr>
                       <td>Namespace</td>
                       <td>
-                        <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.volume.ResourcePool.Namespace.Name })">{{ ctrl.volume.ResourcePool.Namespace.Name }}</a>
+                        <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.volume.ResourcePool.Namespace.Name })" data-cy="k8sVolDetail-volNamespace">{{
+                          ctrl.volume.ResourcePool.Namespace.Name
+                        }}</a>
                         <span style="margin-left: 5px;" class="label label-info image-tag" ng-if="ctrl.isSystemNamespace()">system</span>
                       </td>
                     </tr>
                     <tr>
                       <td>Storage</td>
-                      <td>{{ ctrl.volume.PersistentVolumeClaim.StorageClass.Name }}</td>
+                      <td data-cy="k8sVolDetail-volStorageClassname">{{ ctrl.volume.PersistentVolumeClaim.StorageClass.Name }}</td>
                     </tr>
                     <tr>
                       <td>Shared Access Policy</td>
-                      <td
+                      <td data-cy="k8sVolDetail-volAccessPolicy"
                         >{{ ctrl.state.volumeSharedAccessPolicy }}
                         <portainer-tooltip
                           position="bottom"
@@ -50,11 +52,13 @@
                     </tr>
                     <tr>
                       <td>Provisioner</td>
-                      <td>{{ ctrl.volume.PersistentVolumeClaim.StorageClass.Provisioner ? ctrl.volume.PersistentVolumeClaim.StorageClass.Provisioner : '-' }}</td>
+                      <td data-cy="k8sVolDetail-volProvisioner">{{
+                        ctrl.volume.PersistentVolumeClaim.StorageClass.Provisioner ? ctrl.volume.PersistentVolumeClaim.StorageClass.Provisioner : '-'
+                      }}</td>
                     </tr>
                     <tr>
                       <td>Creation date</td>
-                      <td>{{ ctrl.volume.PersistentVolumeClaim.CreationDate | getisodate }}</td>
+                      <td data-cy="k8sVolDetail-volCreatedAt">{{ ctrl.volume.PersistentVolumeClaim.CreationDate | getisodate }}</td>
                     </tr>
                     <tr>
                       <td>Size</td>
@@ -65,6 +69,7 @@
                           class="btn btn-sm btn-primary"
                           ng-click="ctrl.state.increaseSize = true"
                           ng-if="ctrl.volume.PersistentVolumeClaim.StorageClass.AllowVolumeExpansion"
+                          data-cy="k8sVolDetail-increaseSizeButton"
                           >Increase size</button
                         >
                       </td>
@@ -82,6 +87,7 @@
                                 min="0"
                                 ng-change="ctrl.onChangeSize()"
                                 required
+                                data-cy="k8sVolDetail-increaseSizeInput"
                               />
                               <span class="input-group-addon" style="padding: 0;">
                                 <select
@@ -89,13 +95,20 @@
                                   ng-change="ctrl.onChangeSize()"
                                   ng-options="unit for unit in ctrl.state.availableSizeUnits"
                                   style="width: 100%; height: 100%;"
+                                  data-cy="k8sVolDetail-increaseSizeUnits"
                                 ></select>
                               </span>
                             </div>
-                            <button type="button" class="btn btn-sm btn-primary" ng-disabled="!ctrl.sizeIsValid()" ng-click="ctrl.updateVolume()">
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-primary"
+                              ng-disabled="!ctrl.sizeIsValid()"
+                              ng-click="ctrl.updateVolume()"
+                              data-cy="k8sVolDetail-updateSizeConfirm"
+                            >
                               Update size
                             </button>
-                            <button type="button" class="btn btn-sm btn-default" ng-click="ctrl.state.increaseSize = false">
+                            <button type="button" class="btn btn-sm btn-default" ng-click="ctrl.state.increaseSize = false" data-cy="k8sVolDetail-cancelUpdateSize">
                               Cancel
                             </button>
                           </div>
@@ -119,7 +132,7 @@
             </uib-tab>
 
             <uib-tab index="1" classes="btn-sm" select="ctrl.selectTab(1)">
-              <uib-tab-heading>
+              <uib-tab-heading data-cy="k8sVolDetail-volEventsTab">
                 <i class="fa fa-history space-right" aria-hidden="true"></i> Events
                 <div ng-if="ctrl.hasEventWarnings()">
                   <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -140,7 +153,7 @@
             </uib-tab>
 
             <uib-tab index="2" ng-if="ctrl.volume.PersistentVolumeClaim.Yaml" select="ctrl.showEditor()" classes="btn-sm">
-              <uib-tab-heading> <i class="fa fa-code space-right" aria-hidden="true"></i> YAML </uib-tab-heading>
+              <uib-tab-heading data-cy="k8sVolDetail-volYamlTab"> <i class="fa fa-code space-right" aria-hidden="true"></i> YAML </uib-tab-heading>
               <div style="padding-right: 25px;" ng-if="ctrl.state.showEditorTab">
                 <kubernetes-yaml-inspector key="volume-yaml" data="ctrl.volume.PersistentVolumeClaim.Yaml"></kubernetes-yaml-inspector>
               </div>
