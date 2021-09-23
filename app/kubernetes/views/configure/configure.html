@@ -178,14 +178,14 @@
             </div>
             <div class="form-group">
               <div class="col-sm-12">
-                <label class="control-label text-left">
-                  Allow resource over-commit
-                </label>
-                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" checked disabled /><i data-cy="kubeSetup-resourceOverCommitToggle"></i> </label>
-                <span class="text-muted small" style="margin-left: 15px;">
-                  <i class="fa fa-user" aria-hidden="true"></i>
-                  This feature is available in <a href="https://www.portainer.io/business-upsell?from=k8s-setup-overcommit" target="_blank"> Portainer Business Edition</a>.
-                </span>
+                <por-switch-field
+                  label="Allow resource over-commit"
+                  name="resource-over-commit-switch"
+                  feature="'k8s-setup-default'"
+                  ng-model="ctrl.formValues.EnableResourceOverCommit"
+                  ng-change="ctrl.onChangeEnableResourceOverCommit()"
+                  ng-data-cy="kubeSetup-resourceOverCommitToggle"
+                ></por-switch-field>
               </div>
             </div>
 
