@@ -13,25 +13,17 @@
         </div>
         <div class="form-group">
           <div class="col-sm-12">
-            <div ng-if="!$ctrl.limitedToBE">
-              <span class="small text-muted" ng-if="$ctrl.users.length === 0">
-                No user available
-              </span>
-              <ui-select ng-if="$ctrl.users.length > 0" ng-model="$ctrl.selectedUser" ng-change="$ctrl.onUserSelect()">
-                <ui-select-match placeholder="Select a user">
-                  <span>{{ $select.selected.Username }}</span>
-                </ui-select-match>
-                <ui-select-choices repeat="item in ($ctrl.users | filter: $select.search)">
-                  <span>{{ item.Username }}</span>
-                </ui-select-choices>
-              </ui-select>
-            </div>
-            <div ng-if="$ctrl.limitedToBE">
-              <div class="small text-muted" style="margin-bottom: 15px;">
-                <i class="fa fa-info-circle blue-icon space-right" aria-hidden="true"></i>
-                <b>In Portainer Business Edition, this section is used to filter and see user roles, access, and relevant endpoints</b>
-              </div>
-            </div>
+            <span class="small text-muted" ng-if="$ctrl.users.length === 0">
+              No user available
+            </span>
+            <ui-select ng-if="$ctrl.users.length > 0" ng-model="$ctrl.selectedUser" ng-change="$ctrl.onUserSelect()">
+              <ui-select-match placeholder="Select a user">
+                <span>{{ $select.selected.Username }}</span>
+              </ui-select-match>
+              <ui-select-choices repeat="item in ($ctrl.users | filter: $select.search)">
+                <span>{{ item.Username }}</span>
+              </ui-select-choices>
+            </ui-select>
           </div>
         </div>
 

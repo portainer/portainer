@@ -15,6 +15,7 @@ export default class AccessViewerController {
     this.TeamMembershipService = TeamMembershipService;
 
     this.limitedFeature = 'rbac-roles';
+    this.users = [];
   }
 
   onUserSelect() {
@@ -101,9 +102,9 @@ export default class AccessViewerController {
 
   async $onInit() {
     try {
-      this.limitedToBE = this.featureService.isLimitedToBE(this.limitedFeature);
+      const limitedToBE = this.featureService.isLimitedToBE(this.limitedFeature);
 
-      if (this.limitedToBE) {
+      if (limitedToBE) {
         return;
       }
 
