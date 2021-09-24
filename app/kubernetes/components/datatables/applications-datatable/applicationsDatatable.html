@@ -180,27 +180,37 @@
                 </a>
               </td>
               <td>
-                <a ng-if="item.KubernetesApplications" ui-sref="kubernetes.helm({ name: item.Name, namespace: item.ResourcePool })" ng-click="$event.stopPropagation()"
+                <a
+                  ng-if="item.KubernetesApplications"
+                  ui-sref="kubernetes.helm({ name: item.Name, namespace: item.ResourcePool })"
+                  ng-click="$event.stopPropagation()"
+                  data-cy="k8sAppList-kubeAppName"
                   >{{ item.Name }}
                 </a>
                 <a
                   ng-if="!item.KubernetesApplications"
                   ui-sref="kubernetes.applications.application({ name: item.Name, namespace: item.ResourcePool })"
                   ng-click="$event.stopPropagation()"
+                  data-cy="k8sAppList-nonKubeAppName_{{ item.Name }}"
                   >{{ item.Name }}
                 </a>
                 <span class="label label-info image-tag label-margins" ng-if="$ctrl.isSystemNamespace(item)">system</span>
                 <span class="label label-primary image-tag label-margins" ng-if="!$ctrl.isSystemNamespace(item) && $ctrl.isExternalApplication(item)">external</span>
               </td>
-              <td>{{ item.StackName || '-' }}</td>
+              <td data-cy="k8sAppList-appStackName_{{ item.Name }}">{{ item.StackName || '-' }}</td>
               <td>
-                <a ui-sref="kubernetes.resourcePools.resourcePool({ id: item.ResourcePool })" ng-click="$event.stopPropagation()">{{ item.ResourcePool }}</a>
+                <a
+                  ui-sref="kubernetes.resourcePools.resourcePool({ id: item.ResourcePool })"
+                  ng-click="$event.stopPropagation()"
+                  data-cy="k8sAppList-appNamespace_{{ item.Name }}"
+                  >{{ item.ResourcePool }}</a
+                >
               </td>
-              <td title="{{ item.Image }}"
+              <td title="{{ item.Image }}" data-cy="k8sAppList-appImageName_{{ item.Name }}"
                 >{{ item.Image | truncate: 64 }} <span ng-if="item.Containers.length > 1">+ {{ item.Containers.length - 1 }}</span></td
               >
-              <td>{{ item.ApplicationType | kubernetesApplicationTypeText }}</td>
-              <td ng-if="item.ApplicationType !== $ctrl.KubernetesApplicationTypes.POD">
+              <td data-cy="k8sAppList-appType_{{ item.Name }}">{{ item.ApplicationType | kubernetesApplicationTypeText }}</td>
+              <td ng-if="item.ApplicationType !== $ctrl.KubernetesApplicationTypes.POD" data-cy="k8sAppList-appReplicationType_{{ item.Name }}">
                 <span ng-if="item.DeploymentType === $ctrl.KubernetesApplicationDeploymentTypes.REPLICATED">Replicated</span>
                 <span ng-if="item.DeploymentType === $ctrl.KubernetesApplicationDeploymentTypes.GLOBAL">Global</span>
                 <span ng-if="item.RunningPodsCount >= 0 && item.TotalPodsCount >= 0">
@@ -208,13 +218,13 @@
                 </span>
                 <span ng-if="item.KubernetesApplications">{{ item.Status }}</span>
               </td>
-              <td ng-if="item.ApplicationType === $ctrl.KubernetesApplicationTypes.POD">
+              <td ng-if="item.ApplicationType === $ctrl.KubernetesApplicationTypes.POD" data-cy="k8sAppList-appStatus_{{ item.Name }}">
                 {{ item.Pods[0].Status }}
               </td>
               <td>
                 <span ng-if="item.PublishedPorts.length">
                   <span>
-                    <a ng-click="$ctrl.onPublishingModeClick(item); $event.stopPropagation()">
+                    <a ng-click="$ctrl.onPublishingModeClick(item); $event.stopPropagation()" data-cy="k8sAppList-appServiceType_{{ item.Name }}">
                       <i class="fa {{ item.ServiceType | kubernetesApplicationServiceTypeIcon }}" aria-hidden="true" style="margin-right: 2px;"> </i>
                       {{ item.ServiceType | kubernetesApplicationServiceTypeText }}
                     </a>
@@ -222,7 +232,7 @@
                 </span>
                 <span ng-if="item.PublishedPorts.length === 0">-</span>
               </td>
-              <td>{{ item.CreationDate | getisodate }} {{ item.ApplicationOwner ? 'by ' + item.ApplicationOwner : '' }}</td>
+              <td data-cy="k8sAppList-appCreationDate_{{ item.Name }}">{{ item.CreationDate | getisodate }} {{ item.ApplicationOwner ? 'by ' + item.ApplicationOwner : '' }}</td>
             </tr>
             <tr dir-paginate-end ng-show="$ctrl.isExpandable(item) && $ctrl.isItemExpanded(item)" ng-class="{ 'secondary-body': $ctrl.isPrimary && !item.KubernetesApplications }">
               <td></td>

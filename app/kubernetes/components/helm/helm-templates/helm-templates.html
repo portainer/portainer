@@ -20,7 +20,7 @@
   <!-- helmchart-form -->
   <div class="col-sm-12" ng-if="$ctrl.state.chart">
     <rd-widget>
-      <rd-widget-custom-header icon="$ctrl.state.chart.icon" title-text="$ctrl.state.chart.name"></rd-widget-custom-header>
+      <rd-widget-custom-header data-cy="helmTemplateList-chartName" icon="$ctrl.state.chart.icon" title-text="$ctrl.state.chart.name"></rd-widget-custom-header>
       <rd-widget-body classes="padding">
         <form class="form-horizontal" name="$ctrl.helmTemplateCreationForm">
           <!-- description -->
@@ -30,7 +30,7 @@
             </div>
             <div class="form-group">
               <div class="col-sm-12">
-                <div class="template-note" ng-bind-html="$ctrl.state.chart.description"></div>
+                <div class="template-note" ng-bind-html="$ctrl.state.chart.description" data-cy="helmTemplateList-chartDescription"></div>
               </div>
             </div>
           </div>
@@ -49,6 +49,7 @@
                 ng-options="resourcePool.Namespace.Name for resourcePool in $ctrl.state.resourcePools"
                 ng-change=""
                 ng-disabled="$ctrl.state.isEdit"
+                data-cy="helmTemplateList-nsSelect"
               ></select>
             </div>
           </div>
@@ -72,6 +73,7 @@
                 placeholder="e.g. my-app"
                 required
                 ng-pattern="/^[a-z]([-a-z0-9]*[a-z0-9])?$/"
+                data-cy="helmTemplateList-nameInput"
               />
             </div>
           </div>
@@ -89,11 +91,16 @@
           <!-- !name-input -->
           <div class="form-group">
             <div class="col-sm-12">
-              <a class="small interactive" ng-if="!$ctrl.state.showCustomValues && !$ctrl.state.loadingValues" ng-click="$ctrl.state.showCustomValues = true;">
+              <a
+                class="small interactive"
+                ng-if="!$ctrl.state.showCustomValues && !$ctrl.state.loadingValues"
+                ng-click="$ctrl.state.showCustomValues = true;"
+                data-cy="helmTemplateList-showCustomValuesButton"
+              >
                 <i class="fa fa-plus space-right" aria-hidden="true"></i> Show custom values
               </a>
               <span class="small interactive" ng-if="$ctrl.state.loadingValues"> <i class="fa fa-sync-alt space-right" aria-hidden="true"></i> Loading values.yaml... </span>
-              <a class="small interactive" ng-if="$ctrl.state.showCustomValues" ng-click="$ctrl.state.showCustomValues = false;">
+              <a class="small interactive" ng-if="$ctrl.state.showCustomValues" ng-click="$ctrl.state.showCustomValues = false;" data-cy="helmTemplateList-hideCustomValuesButton">
                 <i class="fa fa-minus space-right" aria-hidden="true"></i> Hide custom values
               </a>
             </div>
@@ -119,6 +126,7 @@
                     yml="true"
                     on-change="($ctrl.editorUpdate)"
                     value="$ctrl.state.values"
+                    data-cy="helmTemplateList-webEditor"
                   ></code-editor>
                 </div>
               </div>
@@ -139,10 +147,10 @@
                 ng-click="$ctrl.installHelmchart()"
                 button-spinner="$ctrl.state.actionInProgress"
               >
-                <span ng-hide="$ctrl.state.actionInProgress">Install</span>
+                <span ng-hide="$ctrl.state.actionInProgress" data-cy="helmTemplateList-installButton">Install</span>
                 <span ng-hide="!$ctrl.state.actionInProgress">Helm installing in progress</span>
               </button>
-              <button type="button" class="btn btn-sm btn-default" ng-click="$ctrl.state.chart = null">Hide</button>
+              <button type="button" class="btn btn-sm btn-default" ng-click="$ctrl.state.chart = null" data-cy="helmTemplateList-hideButton">Hide</button>
             </div>
           </div>
           <!-- !helm actions -->

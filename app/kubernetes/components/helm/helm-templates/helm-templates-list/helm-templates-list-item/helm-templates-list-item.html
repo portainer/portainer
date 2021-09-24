@@ -14,7 +14,7 @@
       <!-- blocklist-item-line1 -->
       <div class="blocklist-item-line">
         <span>
-          <span class="blocklist-item-title">
+          <span class="blocklist-item-title" data-cy="helmTemplateList-chartName_{{ $ctrl.model.name }}">
             {{ $ctrl.model.name }}
           </span>
           <span class="space-left blocklist-item-subtitle">
@@ -31,10 +31,10 @@
       <span class="blocklist-item-actions" ng-transclude="actions"></span>
       <!-- blocklist-item-line2 -->
       <div class="blocklist-item-line helm-template-item-details-sub">
-        <span class="blocklist-item-desc">
+        <span class="blocklist-item-desc" data-cy="helmTemplateList-chartDescription_{{ $ctrl.model.name }}">
           {{ $ctrl.model.description }}
         </span>
-        <span class="small text-muted" ng-if="$ctrl.model.annotations.category">
+        <span class="small text-muted" ng-if="$ctrl.model.annotations.category" data-cy="helmTemplateList-chartCategory_{{ $ctrl.model.name }}">
           {{ $ctrl.model.annotations.category }}
         </span>
       </div>
