@@ -1,11 +1,6 @@
-<rd-header id="view-top">
-  <rd-header-title title-text="Helm">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="kubernetes.templates.helm" ui-sref-opts="{reload: true}">
-      <i class="fa fa-sync" aria-hidden="true"></i>
-    </a>
-  </rd-header-title>
-  <rd-header-content>Charts</rd-header-content>
-</rd-header>
+<kubernetes-view-header title="Helm" state="kubernetes.templates.helm" view-ready="true">
+  Charts
+</kubernetes-view-header>
 
 <information-panel title-text="Information" ng-if="!$ctrl.state.chart">
   <span class="small text-muted">

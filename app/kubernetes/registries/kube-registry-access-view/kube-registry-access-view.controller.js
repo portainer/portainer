@@ -44,7 +44,7 @@ export default class KubernetesRegistryAccessController {
         await this.EndpointService.updateRegistryAccess(this.endpoint.Id, this.registry.Id, {
           namespaces,
         });
-        this.$state.reload();
+        this.$state.reload(this.$state.current);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Failed saving registry access');
       }
