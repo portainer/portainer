@@ -1,4 +1,4 @@
-package dockercompose
+package agent
 
 import (
 	"net/http"
@@ -7,17 +7,17 @@ import (
 )
 
 type (
-	// AgentTransport is an http.Transport wrapper that adds custom http headers to communicate to an Agent
-	AgentTransport struct {
+	// Transport is an http.Transport wrapper that adds custom http headers to communicate to an Agent
+	Transport struct {
 		httpTransport      *http.Transport
 		signatureService   portainer.DigitalSignatureService
 		endpointIdentifier portainer.EndpointID
 	}
 )
 
-// NewAgentTransport returns a new transport that can be used to send signed requests to a Portainer agent
-func NewAgentTransport(signatureService portainer.DigitalSignatureService, httpTransport *http.Transport) *AgentTransport {
-	transport := &AgentTransport{
+// NewTransport returns a new transport that can be used to send signed requests to a Portainer agent
+func NewTransport(signatureService portainer.DigitalSignatureService, httpTransport *http.Transport) *Transport {
+	transport := &Transport{
 		httpTransport:    httpTransport,
 		signatureService: signatureService,
 	}
@@ -26,8 +26,7 @@ func NewAgentTransport(signatureService portainer.DigitalSignatureService, httpT
 }
 
 // RoundTrip is the implementation of the the http.RoundTripper interface
-func (transport *AgentTransport) RoundTrip(request *http.Request) (*http.Response, error) {
-
+func (transport *Transport) RoundTrip(request *http.Request) (*http.Response, error) {
 	signature, err := transport.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
 	if err != nil {
 		return nil, err

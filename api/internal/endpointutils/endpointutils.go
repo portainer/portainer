@@ -24,3 +24,7 @@ func IsDockerEndpoint(endpoint *portainer.Endpoint) bool {
 		endpoint.Type == portainer.AgentOnDockerEnvironment ||
 		endpoint.Type == portainer.EdgeAgentOnDockerEnvironment
 }
+
+func IsEdgeEndpoint(endpoint *portainer.Endpoint) bool {
+	return endpoint.Type == portainer.EdgeAgentOnDockerEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment
+}
