@@ -47,7 +47,7 @@ func (manager *ComposeStackManager) ComposeSyntaxMaxVersion() string {
 func (manager *ComposeStackManager) Up(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	url, proxy, err := manager.fetchEndpointProxy(endpoint)
 	if err != nil {
-		return errors.Wrap(err, "failed to fetch endpoint proxy")
+		return errors.Wrap(err, "failed to fetch environment proxy")
 	}
 
 	if proxy != nil {

@@ -23,7 +23,7 @@ func StartStackSchedules(scheduler *scheduler.Scheduler, stackdeployer StackDepl
 		stackID := stack.ID // to be captured by the scheduled function
 		jobID := scheduler.StartJobEvery(d, func() {
 			if err := RedeployWhenChanged(stackID, stackdeployer, datastore, gitService); err != nil {
-				log.WithFields(log.Fields{"stackID": stackID}).WithError(err).Error("faile to auto-deploy a stack")
+				log.WithFields(log.Fields{"stackID": stackID}).WithError(err).Error("fail to auto-deploy a stack")
 			}
 		})
 
