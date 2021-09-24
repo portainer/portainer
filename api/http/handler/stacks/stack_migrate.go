@@ -141,12 +141,14 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 		return migrationError
 	}
 
+	newName := stack.Name
 	stack.Name = oldName
 	err = handler.deleteStack(stack, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
 
+	stack.Name = newName
 	err = handler.DataStore.Stack().UpdateStack(stack.ID, stack)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack changes inside the database", err}
