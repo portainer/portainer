@@ -63,7 +63,7 @@
                       ng-pattern="/^[a-z]([-a-z0-9]*[a-z0-9])?$/"
                       ng-change="ctrl.onChangeIngressClassName($index)"
                       required
-                      data-cy="kubeSetup-ingressClassName"
+                      data-cy="kubeSetup-ingressClassName_{{ $index }}"
                     />
                   </div>
                   <div class="col-sm-3 input-group input-group-sm" ng-class="{ striked: ingressClass.NeedsDeletion }">
@@ -74,7 +74,7 @@
                       ng-model="ingressClass.Type"
                       ng-options="value as value for (key, value) in ctrl.IngressClassTypes"
                       required
-                      data-cy="kubeSetup-ingressType"
+                      data-cy="kubeSetup-ingressType_{{ $index }}"
                     >
                       <option selected disabled hidden value="">Select a type</option>
                     </select>
@@ -85,7 +85,7 @@
                       class="btn btn-sm btn-danger"
                       type="button"
                       ng-click="ctrl.removeIngressClass($index)"
-                      data-cy="kubeSetup-deleteIngress"
+                      data-cy="kubeSetup-deleteIngress_{{ $index }}"
                     >
                       <i class="fa fa-trash-alt" aria-hidden="true"></i>
                     </button>
