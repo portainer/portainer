@@ -9,9 +9,7 @@ export const beFeatureIndicator = {
   bindings: {
     feature: '<',
   },
-  transclude: {
-    children: '?indicatorChildren',
-  },
+  transclude: true,
 };
 
 angular.module('portainer.app').component('beFeatureIndicator', beFeatureIndicator);

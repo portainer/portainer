@@ -88,9 +88,7 @@
               <td>
                 <a ng-if="$ctrl.canManageAccess(item)" ng-click="$ctrl.redirectToManageAccess(item)"> <i class="fa fa-users" aria-hidden="true"></i> Manage access </a>
                 <be-feature-indicator feature="'registry-management'" ng-if="$ctrl.canBrowse(item)">
-                  <indicator-children>
-                    <span class="text-muted space-left" style="padding-right: 5px;"> <i class="fa fa-search" aria-hidden="true"></i> Browse</span>
-                  </indicator-children>
+                  <span class="text-muted space-left" style="padding-right: 5px;"> <i class="fa fa-search" aria-hidden="true"></i> Browse</span>
                 </be-feature-indicator>
 
                 <span ng-if="!$ctrl.canBrowse(item) && !$ctrl.canManageAccess(item)"> - </span>
