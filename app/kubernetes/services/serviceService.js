@@ -102,6 +102,7 @@ class KubernetesServiceService {
       const namespace = service.Namespace;
       await this.KubernetesServices(namespace).delete(params).$promise;
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error('unable to remove service', err);
     }
   }
