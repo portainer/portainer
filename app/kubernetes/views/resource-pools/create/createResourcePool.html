@@ -238,7 +238,9 @@
                   <label class="control-label text-left">
                     Allow users to use this ingress
                   </label>
-                  <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ic.Selected" /><i></i> </label>
+                  <label class="switch" style="margin-left: 20px;">
+                    <input type="checkbox" ng-model="ic.Selected" /><i data-cy="namespaceCreate-ingressToggle{{ ic.IngressClass.Name }}"></i>
+                  </label>
                 </div>
               </div>
 
@@ -253,7 +255,12 @@
                       >
                       </portainer-tooltip>
                     </label>
-                    <span class="label label-default interactive" style="margin-left: 10px;" ng-click="$ctrl.addHostname(ic)">
+                    <span
+                      class="label label-default interactive"
+                      style="margin-left: 10px;"
+                      ng-click="$ctrl.addHostname(ic)"
+                      data-cy="namespaceCreate-addHostButton{{ ic.IngressClass.Name }}"
+                    >
                       <i class="fa fa-plus-circle" aria-hidden="true"></i> add hostname
                     </span>
                   </div>
@@ -269,7 +276,9 @@
                             ng-model="item.Host"
                             ng-change="$ctrl.onChangeIngressHostname()"
                             placeholder="foo"
+                            pattern="[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*"
                             required
+                            data-cy="namespaceCreate-hostnameInput{{ ic.IngressClass.Name }}_{{ $index }}"
                           />
                         </div>
                         <div class="col-sm-1 input-group input-group-sm" ng-if="$index > 0">
@@ -288,6 +297,10 @@
                       >
                         <ng-messages for="resourcePoolCreationForm['hostname_' + ic.IngressClass.Name + '_' + $index].$error">
                           <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Hostname is required.</p>
+                          <p ng-message="pattern">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            This field must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com').
+                          </p>
                         </ng-messages>
                         <p ng-if="$ctrl.state.duplicates.ingressHosts.refs[ic.IngressClass.Name][$index] !== undefined">
                           <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This hostname is already used.
@@ -306,17 +319,19 @@
                       >
                       </portainer-tooltip>
                     </label>
-                    <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ic.RewriteTarget" /><i></i> </label>
+                    <label class="switch" style="margin-left: 20px;">
+                      <input type="checkbox" ng-model="ic.RewriteTarget" /><i data-cy="namespaceCreate-redirectRoutesToggle{{ ic.IngressClass.Name }}"></i>
+                    </label>
                   </div>
                 </div>
               </div>
               <div ng-repeat-end class="form-group" ng-if="ic.Selected" style="margin-bottom: 20px;">
                 <div class="col-sm-12">
                   <p>
-                    <a class="small interactive" ng-if="!ic.AdvancedConfig" ng-click="ic.AdvancedConfig = true">
+                    <a class="small interactive" ng-if="!ic.AdvancedConfig" ng-click="ic.AdvancedConfig = true" data-cy="namespaceCreate-advancedConfig{{ ic.IngressClass.Name }}">
                       <i class="fa fa-plus space-right" aria-hidden="true"></i> Advanced configuration
                     </a>
-                    <a class="small interactive" ng-if="ic.AdvancedConfig" ng-click="ic.AdvancedConfig = false">
+                    <a class="small interactive" ng-if="ic.AdvancedConfig" ng-click="ic.AdvancedConfig = false" data-cy="namespaceCreate-hideConfig{{ ic.IngressClass.Name }}">
                       <i class="fa fa-minus space-right" aria-hidden="true"></i> Hide configuration
                     </a>
                   </p>
@@ -331,7 +346,12 @@
 
                 <div class="col-sm-12" ng-if="ic.AdvancedConfig">
                   <label class="control-label text-left">Annotations</label>
-                  <span class="label label-default interactive" style="margin-left: 10px;" ng-click="$ctrl.addAnnotation(ic)">
+                  <span
+                    class="label label-default interactive"
+                    style="margin-left: 10px;"
+                    ng-click="$ctrl.addAnnotation(ic)"
+                    data-cy="namespaceCreate-addAnnotation{{ ic.IngressClass.Name }}"
+                  >
                     <i class="fa fa-plus-circle" aria-hidden="true"></i> add annotation
                   </span>
                 </div>
@@ -340,14 +360,33 @@
                   <div ng-repeat="annotation in ic.Annotations track by $index" style="margin-top: 2px;">
                     <div class="input-group col-sm-5 input-group-sm">
                       <span class="input-group-addon">Key</span>
-                      <input type="text" class="form-control" ng-model="annotation.Key" placeholder="nginx.ingress.kubernetes.io/rewrite-target" required />
+                      <input
+                        type="text"
+                        class="form-control"
+                        ng-model="annotation.Key"
+                        placeholder="nginx.ingress.kubernetes.io/rewrite-target"
+                        required
+                        data-cy="namespaceCreate-annotationKey{{ ic.IngressClass.Name }}"
+                      />
                     </div>
                     <div class="input-group col-sm-5 input-group-sm">
                       <span class="input-group-addon">Value</span>
-                      <input type="text" class="form-control" ng-model="annotation.Value" placeholder="/$1" required />
+                      <input
+                        type="text"
+                        class="form-control"
+                        ng-model="annotation.Value"
+                        placeholder="/$1"
+                        required
+                        data-cy="namespaceCreate-annotationValue{{ ic.IngressClass.Name }}"
+                      />
                     </div>
                     <div class="col-sm-1 input-group input-group-sm">
-                      <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removeAnnotation(ic, $index)">
+                      <button
+                        class="btn btn-sm btn-danger"
+                        type="button"
+                        ng-click="$ctrl.removeAnnotation(ic, $index)"
+                        data-cy="namespaceCreate-deleteAnnotationButton{{ ic.IngressClass.Name }}"
+                      >
                         <i class="fa fa-trash-alt" aria-hidden="true"></i>
                       </button>
                     </div>
@@ -392,6 +431,7 @@
                   helper-elements="filter"
                   search-property="Name"
                   translation="{nothingSelected: 'Select one or more registry', search: 'Search...'}"
+                  data-cy="namespaceCreate-registrySelect"
                 >
                 </span>
               </div>

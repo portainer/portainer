@@ -30,7 +30,7 @@ A clear and concise description of what you expected to happen.
 
 **Portainer Logs**
 Provide the logs of your Portainer container or Service.
-You can see how [here](https://documentation.portainer.io/archive/1.23.2/faq/#how-do-i-get-the-logs-from-portainer)
+You can see how [here](https://documentation.portainer.io/r/portainer-logs)
 
 **Steps to reproduce the issue:**
 

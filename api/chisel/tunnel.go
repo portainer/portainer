@@ -82,7 +82,7 @@ func (service *Service) GetActiveTunnel(endpoint *portainer.Endpoint) (*portaine
 	return tunnel, nil
 }
 
-// SetTunnelStatusToActive update the status of the tunnel associated to the specified endpoint.
+// SetTunnelStatusToActive update the status of the tunnel associated to the specified environment(endpoint).
 // It sets the status to ACTIVE.
 func (service *Service) SetTunnelStatusToActive(endpointID portainer.EndpointID) {
 	tunnel := service.GetTunnelDetails(endpointID)

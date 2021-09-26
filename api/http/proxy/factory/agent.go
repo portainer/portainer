@@ -23,18 +23,18 @@ type ProxyServer struct {
 
 // NewAgentProxy creates a new instance of ProxyServer that wrap http requests with agent headers
 func (factory *ProxyFactory) NewAgentProxy(endpoint *portainer.Endpoint) (*ProxyServer, error) {
+	urlString := endpoint.URL
+
 	if endpointutils.IsEdgeEndpoint((endpoint)) {
 		tunnel, err := factory.reverseTunnelService.GetActiveTunnel(endpoint)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed starting tunnel")
 		}
 
-		return &ProxyServer{
-			Port: tunnel.Port,
-		}, nil
+		urlString = fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port)
 	}
 
-	endpointURL, err := parseURL(endpoint.URL)
+	endpointURL, err := parseURL(urlString)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed parsing url %s", endpoint.URL)
 	}
