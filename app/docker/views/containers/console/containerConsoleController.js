@@ -149,7 +149,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
 
       term.fit();
       var termWidth = term.cols;
-      var termHeight = 30;
+      var termHeight = 60;
       term.resize(termWidth, termHeight);
 
       restcall(termWidth + add, termHeight + add, 1);
