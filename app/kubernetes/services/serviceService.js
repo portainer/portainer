@@ -102,8 +102,7 @@ class KubernetesServiceService {
       const namespace = service.Namespace;
       await this.KubernetesServices(namespace).delete(params).$promise;
     } catch (err) {
-      // ignoring error on deletion
-      // throw new PortainerError('Unable to remove service', err);
+      console.error('unable to remove service', err);
     }
   }
 
