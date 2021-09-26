@@ -349,7 +349,7 @@
                       type="button"
                       ng-click="ctrl.removeConfiguration(index)"
                       ng-if="ctrl.formValues.Containers.length <= 1"
-                      data-cy="k8sAppCreate-configRemoveButton"
+                      data-cy="k8sAppCreate-configRemoveButton_{{ $index }}"
                     >
                       <i class="fa fa-trash-alt" aria-hidden="true"></i> Remove
                     </button>
@@ -1485,7 +1485,7 @@
                           ng-change="ctrl.onChangePortMappingNodePort()"
                           ng-disabled="ctrl.disableLoadBalancerEdit() || ctrl.isEditAndNotNewPublishedPort($index)"
                           data-cy="k8sAppCreate-nodePort_{{ $index }}"
-                          />
+                        />
                       </div>
 
                       <div
