@@ -19,7 +19,7 @@ async function initAuthentication(authManager, Authentication, $rootScope, $stat
   return await Authentication.init();
 }
 
-angular.module('portainer.app', ['portainer.oauth', componentsModule, settingsModule, featureFlagModule]).config([
+angular.module('portainer.app', ['portainer.oauth', componentsModule, settingsModule, featureFlagModule, 'portainer.shared.datatable']).config([
   '$stateRegistryProvider',
   function ($stateRegistryProvider) {
     'use strict';
