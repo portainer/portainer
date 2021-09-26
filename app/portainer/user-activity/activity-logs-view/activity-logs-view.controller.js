@@ -2,9 +2,8 @@ import moment from 'moment';
 
 export default class ActivityLogsViewController {
   /* @ngInject */
-  constructor($async, UserActivityService, Notifications) {
+  constructor($async, Notifications) {
     this.$async = $async;
-    this.UserActivityService = UserActivityService;
     this.Notifications = Notifications;
 
     this.state = {
@@ -76,10 +75,9 @@ export default class ActivityLogsViewController {
   async loadLogs() {
     return this.$async(async () => {
       this.state.logs = null;
-      const offset = (this.state.page - 1) * this.state.limit;
       try {
-        const { logs, totalCount } = await this.UserActivityService.logs(offset, this.state.limit, this.state.sort, this.state.keyword, this.state.date);
-        this.state.logs = decorateLogs(logs);
+        const { logs, totalCount } = { logs: [{}, {}, {}, {}, {}], totalCount: 5 };
+        this.state.logs = logs;
         this.state.totalItems = totalCount;
       } catch (err) {
         this.Notifications.error('Failure', err, 'Failed loading user activity logs');
@@ -91,21 +89,5 @@ export default class ActivityLogsViewController {
     return this.$async(async () => {
       this.loadLogs();
     });
-  }
-}
-
-function decorateLogs(logs) {
-  if (!logs || !logs.length) {
-    return [];
-  }
-
-  return logs.map((log) => ({ ...log, payload: parseJSON(atob(log.payload)) }));
-}
-
-function parseJSON(json) {
-  try {
-    return JSON.parse(json);
-  } catch (e) {
-    return null;
   }
 }
