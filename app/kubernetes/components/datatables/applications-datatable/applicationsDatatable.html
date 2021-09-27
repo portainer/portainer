@@ -201,7 +201,7 @@
               >
               <td>{{ item.ApplicationType | kubernetesApplicationTypeText }}</td>
               <td ng-if="item.ApplicationType !== $ctrl.KubernetesApplicationTypes.POD">
-                <status-indicator total="item.TotalPodsCount" ready="item.RunningPodsCount"></status-indicator>
+                <status-indicator total="item.TotalPodsCount" ready="item.RunningPodsCount" helm-status="item.Status"></status-indicator>
                 <span ng-if="item.DeploymentType === $ctrl.KubernetesApplicationDeploymentTypes.REPLICATED">Replicated</span>
                 <span ng-if="item.DeploymentType === $ctrl.KubernetesApplicationDeploymentTypes.GLOBAL">Global</span>
                 <span ng-if="item.RunningPodsCount >= 0 && item.TotalPodsCount >= 0">

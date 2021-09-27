@@ -1,1 +1,2 @@
-<i aria-hidden="true" ng-class="['status-indicator', { ok: $ctrl.ready === $ctrl.total }]"></i>
+<i aria-hidden="true" ng-if="$ctrl.total" ng-class="['status-indicator', { ok: $ctrl.ready === $ctrl.total }]"></i>
+<i aria-hidden="true" ng-if="!$ctrl.total" ng-class="['status-indicator', { ok: $ctrl.helmStatus === 'Ready' } ]"></i>

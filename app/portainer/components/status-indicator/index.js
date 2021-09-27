@@ -7,6 +7,7 @@ export const statusIndicator = {
   bindings: {
     total: '<',
     ready: '<',
+    helmStatus: '<',
   },
 };
 
