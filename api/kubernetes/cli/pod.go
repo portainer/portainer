@@ -12,8 +12,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-const defaultShellPodImage = "portainer/kubectl-shell"
-
 // CreateUserShellPod will create a kubectl based shell for the specified user by mounting their respective service account.
 // The lifecycle of the pod is managed in this function; this entails management of the following pod operations:
 // - The shell pod will be scoped to specified service accounts access permissions
@@ -24,10 +22,6 @@ func (kcl *KubeClient) CreateUserShellPod(ctx context.Context, serviceAccountNam
 	maxPodKeepAliveSecondsStr := fmt.Sprintf("%d", int(portainer.WebSocketKeepAlive.Seconds()))
 
 	podPrefix := userShellPodPrefix(serviceAccountName)
-
-	if shellPodImage == "" {
-		shellPodImage = defaultShellPodImage
-	}
 
 	podSpec := &v1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
