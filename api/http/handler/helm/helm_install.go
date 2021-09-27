@@ -16,6 +16,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes"
 	"github.com/portainer/portainer/api/kubernetes/validation"
+	"golang.org/x/sync/errgroup"
 )
 
 type installChartPayload struct {
@@ -172,14 +173,39 @@ func (handler *Handler) applyPortainerLabelsToHelmAppManifest(r *http.Request, i
 }
 
 // updateHelmAppManifest will update the resources of helm release manifest with portainer labels using kubectl.
+// The resources of the manifest will be updated in parallel and individuallly since resources of a chart
+// can be deployed to different namespaces.
 // NOTE: These updates will need to be re-applied when upgrading the helm release
 func (handler *Handler) updateHelmAppManifest(r *http.Request, manifest []byte, namespace string) error {
 	endpoint, err := middlewares.FetchEndpoint(r)
 	if err != nil {
 		return errors.Wrap(err, "Unable to find an endpoint on request context")
 	}
-	_, err = handler.kubernetesDeployer.Deploy(r, endpoint, string(manifest), namespace)
+
+	// extract list of yaml resources from helm manifest
+	yamlResources, err := kubernetes.ExtractDocuments(manifest, nil)
 	if err != nil {
+		return errors.Wrap(err, "Unable to extract documents from helm release manifest")
+	}
+
+	// deploy individual resources in parallel
+	g := new(errgroup.Group)
+	for _, resource := range yamlResources {
+		resource := resource // https://golang.org/doc/faq#closures_and_goroutines
+		g.Go(func() error {
+			// get resource namespace, fallback to provided namespace if not explicit on resource
+			resourceNamespace, err := kubernetes.GetNamespace(resource)
+			if err != nil {
+				return err
+			}
+			if resourceNamespace == "" {
+				resourceNamespace = namespace
+			}
+			_, err = handler.kubernetesDeployer.Deploy(r, endpoint, string(resource), resourceNamespace)
+			return err
+		})
+	}
+	if err := g.Wait(); err != nil {
 		return errors.Wrap(err, "Unable to patch helm release using kubectl")
 	}
 

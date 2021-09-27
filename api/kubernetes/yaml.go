@@ -52,6 +52,23 @@ func AddAppLabels(manifestYaml []byte, appLabels map[string]string) ([]byte, err
 		return manifestYaml, nil
 	}
 
+	postProcessYaml := func(yamlDoc interface{}) error {
+		addResourceLabels(yamlDoc, appLabels)
+		return nil
+	}
+
+	docs, err := ExtractDocuments(manifestYaml, postProcessYaml)
+	if err != nil {
+		return nil, err
+	}
+
+	return bytes.Join(docs, []byte("---\n")), nil
+}
+
+// ExtractDocuments extracts all the documents from a yaml file
+// Optionally post-process each document with a function, which can modify the document in place.
+// Pass in nil for postProcessYaml to skip post-processing.
+func ExtractDocuments(manifestYaml []byte, postProcessYaml func(interface{}) error) ([][]byte, error) {
 	docs := make([][]byte, 0)
 	yamlDecoder := yaml.NewDecoder(bytes.NewReader(manifestYaml))
 
@@ -69,7 +86,12 @@ func AddAppLabels(manifestYaml []byte, appLabels map[string]string) ([]byte, err
 			break
 		}
 
-		addResourceLabels(m, appLabels)
+		// optionally post-process yaml
+		if postProcessYaml != nil {
+			if err := postProcessYaml(m); err != nil {
+				return nil, errors.Wrap(err, "failed to post process yaml document")
+			}
+		}
 
 		var out bytes.Buffer
 		yamlEncoder := yaml.NewEncoder(&out)
@@ -81,7 +103,26 @@ func AddAppLabels(manifestYaml []byte, appLabels map[string]string) ([]byte, err
 		docs = append(docs, out.Bytes())
 	}
 
-	return bytes.Join(docs, []byte("---\n")), nil
+	return docs, nil
+}
+
+// GetNamespace returns the namespace of a kubernetes resource from its metadata
+// It returns an empty string if namespace is not found in the resource
+func GetNamespace(manifestYaml []byte) (string, error) {
+	yamlDecoder := yaml.NewDecoder(bytes.NewReader(manifestYaml))
+	m := make(map[string]interface{})
+	err := yamlDecoder.Decode(&m)
+	if err != nil {
+		return "", errors.Wrap(err, "failed to unmarshal yaml manifest when obtaining namespace")
+	}
+
+	if _, ok := m["metadata"]; ok {
+		if namespace, ok := m["metadata"].(map[string]interface{})["namespace"]; ok {
+			return namespace.(string), nil
+		}
+	}
+
+	return "", nil
 }
 
 func addResourceLabels(yamlDoc interface{}, appLabels map[string]string) {
