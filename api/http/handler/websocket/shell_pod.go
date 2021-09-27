@@ -46,6 +46,9 @@ func (handler *Handler) websocketShellPodExec(w http.ResponseWriter, r *http.Req
 	}
 
 	settings, err := handler.DataStore.Settings().Settings()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable read settings", err}
+	}
 
 	shellPod, err := cli.CreateUserShellPod(r.Context(), serviceAccount.Name, settings.KubectlShellImage)
 	if err != nil {

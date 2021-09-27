@@ -41,7 +41,7 @@ type settingsUpdatePayload struct {
 	// Helm repository URL
 	HelmRepositoryURL *string `example:"https://charts.bitnami.com/bitnami"`
 	// Kubectl Shell Image
-	KubectlShellImage *string
+	KubectlShellImage *string `example:"portainer/kubectl-shell:latest"`
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
