@@ -3,6 +3,7 @@ package customtemplates
 import (
 	"errors"
 	"net/http"
+	"regexp"
 	"strconv"
 
 	"github.com/asaskevich/govalidator"
@@ -129,7 +130,18 @@ func (payload *customTemplateFromFileContentPayload) Validate(r *http.Request) e
 	if payload.Type != portainer.KubernetesStack && payload.Type != portainer.DockerSwarmStack && payload.Type != portainer.DockerComposeStack {
 		return errors.New("Invalid custom template type")
 	}
+	if !isValidNote(payload.Note) {
+		return errors.New("Invalid note. <img> tag is not supported")
+	}
 	return nil
+}
+
+func isValidNote(note string) bool {
+	if govalidator.IsNull(note) {
+		return true
+	}
+	match, _ := regexp.MatchString("<img", note)
+	return !match
 }
 
 func (handler *Handler) createCustomTemplateFromFileContent(r *http.Request) (*portainer.CustomTemplate, error) {
@@ -218,6 +230,9 @@ func (payload *customTemplateFromGitRepositoryPayload) Validate(r *http.Request)
 	if payload.Type != portainer.DockerSwarmStack && payload.Type != portainer.DockerComposeStack {
 		return errors.New("Invalid custom template type")
 	}
+	if !isValidNote(payload.Note) {
+		return errors.New("Invalid note. <img> tag is not supported")
+	}
 	return nil
 }
 
@@ -285,6 +300,9 @@ func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) er
 	payload.Logo = logo
 
 	note, _ := request.RetrieveMultiPartFormValue(r, "Note", true)
+	if !isValidNote(note) {
+		return errors.New("Invalid note. <img> tag is not supported")
+	}
 	payload.Note = note
 
 	typeNumeral, _ := request.RetrieveNumericMultiPartFormValue(r, "Type", true)
