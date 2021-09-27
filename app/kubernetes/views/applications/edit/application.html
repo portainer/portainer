@@ -198,14 +198,7 @@
       <rd-widget>
         <rd-widget-body>
           <div ng-if="!ctrl.isSystemNamespace()" style="margin-bottom: 15px;">
-            <button
-              ng-if="!ctrl.isExternalApplication()"
-              type="button"
-              class="btn btn-sm btn-primary"
-              ui-sref="kubernetes.applications.application.edit"
-              style="margin-left: 0;"
-              data-cy="k8sAppDetail-editAppButton"
-            >
+            <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.applications.application.edit" style="margin-left: 0;" data-cy="k8sAppDetail-editAppButton">
               <i class="fa fa-file-code space-right" aria-hidden="true"></i>Edit this application
             </button>
             <button
