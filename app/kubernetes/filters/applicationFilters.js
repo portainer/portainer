@@ -26,11 +26,11 @@ angular
       var status = _.toLower(text);
       switch (status) {
         case 'loadbalancer':
-          return 'Load balancer';
+          return 'LoadBalancer';
         case 'clusterip':
-          return 'Internal';
+          return 'ClusterIP';
         case 'nodeport':
-          return 'Cluster';
+          return 'NodePort';
       }
     };
   })
