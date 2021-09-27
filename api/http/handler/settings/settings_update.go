@@ -45,7 +45,6 @@ type settingsUpdatePayload struct {
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
-
 	if payload.AuthenticationMethod != nil && *payload.AuthenticationMethod != 1 && *payload.AuthenticationMethod != 2 && *payload.AuthenticationMethod != 3 {
 		return errors.New("Invalid authentication method value. Value must be one of: 1 (internal), 2 (LDAP/AD) or 3 (OAuth)")
 	}
