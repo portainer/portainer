@@ -1023,7 +1023,7 @@ type (
 		// User Identifier
 		ID       UserID `json:"Id" example:"1"`
 		Username string `json:"Username" example:"bob"`
-		Password string `json:"Password,omitempty" example:"passwd"`
+		Password string `json:"Password,omitempty" swaggerignore:"true"`
 		// User Theme
 		UserTheme string `example:"dark"`
 		// User role (1 for administrator account and 2 for regular account)

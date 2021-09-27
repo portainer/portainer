@@ -15,6 +15,7 @@ import (
 // @id UserInspect
 // @summary Inspect a user
 // @description Retrieve details about a user.
+// @description User passwords are filtered out, and should never be accessible.
 // @description **Access policy**: administrator
 // @tags users
 // @security jwt
