@@ -13,7 +13,7 @@ import (
 	"github.com/portainer/portainer/api/kubernetes"
 	"github.com/stretchr/testify/assert"
 
-	bolt "github.com/portainer/portainer/api/bolt/bolttest"
+	"github.com/portainer/portainer/api/bolt"
 	helper "github.com/portainer/portainer/api/internal/testhelpers"
 )
 

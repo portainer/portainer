@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
-	bolt "github.com/portainer/portainer/api/bolt/bolttest"
+	"github.com/portainer/portainer/api/bolt"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/stretchr/testify/assert"
 )
