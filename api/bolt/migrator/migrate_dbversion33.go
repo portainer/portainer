@@ -1,21 +1,32 @@
 package migrator
 
-import portainer "github.com/portainer/portainer/api"
+import (
+	portainer "github.com/portainer/portainer/api"
+)
 
-func (m *Migrator) migrateDBVersionToDB33() error {
-	if err := m.migrateSettingsToDB33(); err != nil {
+func (m *Migrator) migrateDBVersionTo34() error {
+	err := migrateStackEntryPoint(m.stackService)
+	if err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *Migrator) migrateSettingsToDB33() error {
-	settings, err := m.settingsService.Settings()
+func migrateStackEntryPoint(stackService portainer.StackService) error {
+	stacks, err := stackService.Stacks()
 	if err != nil {
 		return err
 	}
-
-	settings.KubectlShellImage = portainer.DefaultKubectlShellImage
-	return m.settingsService.UpdateSettings(settings)
+	for i := range stacks {
+		stack := &stacks[i]
+		if stack.GitConfig == nil {
+			continue
+		}
+		stack.GitConfig.ConfigFilePath = stack.EntryPoint
+		if err := stackService.UpdateStack(stack.ID, stack); err != nil {
+			return err
+		}
+	}
+	return nil
 }
