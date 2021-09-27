@@ -27,6 +27,10 @@ class TagSelectorController {
   }
 
   filterTags(searchValue) {
+    if (this.tags) {
+      this.tags.forEach((tag) => (tag.Name = _.escape(tag.Name)));
+    }
+
     let filteredTags = _.filter(this.tags, (tag) => !_.includes(this.model, tag.Id));
     if (!searchValue) {
       return filteredTags;

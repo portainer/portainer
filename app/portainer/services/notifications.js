@@ -1,3 +1,4 @@
+import _ from 'lodash-es';
 import toastr from 'toastr';
 
 angular.module('portainer.app').factory('Notifications', [
@@ -7,11 +8,11 @@ angular.module('portainer.app').factory('Notifications', [
     var service = {};
 
     service.success = function (title, text) {
-      toastr.success($sanitize(text), $sanitize(title));
+      toastr.success($sanitize(_.escape(text)), $sanitize(title));
     };
 
     service.warning = function (title, text) {
-      toastr.warning($sanitize(text), $sanitize(title), { timeOut: 6000 });
+      toastr.warning($sanitize(_.escape(text)), $sanitize(title), { timeOut: 6000 });
     };
 
     service.error = function (title, e, fallbackText) {
@@ -44,7 +45,7 @@ angular.module('portainer.app').factory('Notifications', [
       console.error(e);
 
       if (msg !== 'Invalid JWT token') {
-        toastr.error($sanitize(msg), $sanitize(title), { timeOut: 6000 });
+        toastr.error($sanitize(_.escape(msg)), $sanitize(title), { timeOut: 6000 });
       }
     };
 
