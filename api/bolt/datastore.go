@@ -116,7 +116,6 @@ func (store *Store) Open() error {
 	store.connection.DB = db
 
 	err = store.initServices()
-
 	if err != nil {
 		return err
 	}
@@ -128,7 +127,6 @@ func (store *Store) Open() error {
 	}
 
 	return nil
-
 }
 
 // Close closes the BoltDB database.
