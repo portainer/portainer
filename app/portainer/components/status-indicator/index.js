@@ -5,9 +5,7 @@ import './status-indicator.css';
 export const statusIndicator = {
   templateUrl: './status-indicator.html',
   bindings: {
-    total: '<',
-    ready: '<',
-    helmStatus: '<',
+    ok: '<',
   },
 };
 
