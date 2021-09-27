@@ -334,12 +334,12 @@
                     <td style="width: 50%;">HTTP route</td>
                   </tr>
                   <tr ng-repeat-start="port in ctrl.application.PublishedPorts">
-                    <td ng-if="!ctrl.portHasIngressRules(port)" data-cy="k8sAppDetail-containerPort">{{ port.TargetPort }}/{{ port.Protocol }}</td>
+                    <td ng-if="!ctrl.portHasIngressRules(port)" data-cy="k8sAppDetail-containerPort_{{ $index }}">{{ port.TargetPort }}/{{ port.Protocol }}</td>
                     <td ng-if="!ctrl.portHasIngressRules(port)">
-                      <span ng-if="ctrl.application.ServiceType === ctrl.KubernetesServiceTypes.NODE_PORT" data-cy="k8sAppDetail-nodePort">
+                      <span ng-if="ctrl.application.ServiceType === ctrl.KubernetesServiceTypes.NODE_PORT" data-cy="k8sAppDetail-nodePort_{{ $index }}">
                         {{ port.NodePort }}
                       </span>
-                      <span ng-if="ctrl.application.ServiceType !== ctrl.KubernetesServiceTypes.NODE_PORT" data-cy="k8sAppDetail-lbPort">
+                      <span ng-if="ctrl.application.ServiceType !== ctrl.KubernetesServiceTypes.NODE_PORT" data-cy="k8sAppDetail-lbPort_{{ $index }}">
                         {{ port.Port }}
                       </span>
                       <a
@@ -347,7 +347,7 @@
                         ng-href="http://{{ ctrl.application.LoadBalancerIPAddress }}:{{ port.Port }}"
                         target="_blank"
                         style="margin-left: 5px;"
-                        data-cy="k8sAppDetail-accessLink"
+                        data-cy="k8sAppDetail-accessLink_{{ $index }}"
                       >
                         <i class="fa fa-external-link-alt" aria-hidden="true"></i> access
                       </a>
@@ -355,12 +355,12 @@
                     <td ng-if="!ctrl.portHasIngressRules(port)">-</td>
                   </tr>
                   <tr ng-repeat-end ng-repeat="rule in port.IngressRules">
-                    <td data-cy="k8sAppDetail-httpRoute">{{ port.TargetPort }}/{{ port.Protocol }}</td>
+                    <td data-cy="k8sAppDetail-portwProtocol_{{ $index }}">{{ port.TargetPort }}/{{ port.Protocol }}</td>
                     <td>
-                      <span ng-if="ctrl.application.ServiceType === ctrl.KubernetesServiceTypes.NODE_PORT" data-cy="k8sAppDetail-nodePort">
+                      <span ng-if="ctrl.application.ServiceType === ctrl.KubernetesServiceTypes.NODE_PORT" data-cy="k8sAppDetail-nodePort_{{ $index }}">
                         {{ port.NodePort }}
                       </span>
-                      <span ng-if="ctrl.application.ServiceType !== ctrl.KubernetesServiceTypes.NODE_PORT" data-cy="k8sAppDetail-port">
+                      <span ng-if="ctrl.application.ServiceType !== ctrl.KubernetesServiceTypes.NODE_PORT" data-cy="k8sAppDetail-port_{{ $index }}">
                         {{ port.Port }}
                       </span>
                       <a
@@ -384,7 +384,7 @@
                         >pending
                       </span>
                       <span ng-if="ctrl.ruleCanBeDisplayed(rule)">
-                        <a ng-href="{{ ctrl.buildIngressRuleURL(rule) }}" target="_blank" data-cy="k8sAppDetail-httpRouteLink">
+                        <a ng-href="{{ ctrl.buildIngressRuleURL(rule) }}" target="_blank" data-cy="k8sAppDetail-httpRouteLink_{{ $index }}">
                           {{ ctrl.buildIngressRuleURL(rule) | stripprotocol }}
                         </a>
                       </span>
