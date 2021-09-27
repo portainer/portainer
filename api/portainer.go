@@ -1500,6 +1500,8 @@ const (
 	DefaultUserSessionTimeout = "8h"
 	// DefaultUserSessionTimeout represents the default timeout after which the user session is cleared
 	DefaultKubeconfigExpiry = "0"
+	// DefaultKubectlShellImage represents the default image and tag for the kubectl shell
+	DefaultKubectlShellImage = "portainer/kubectl-shell"
 	// WebSocketKeepAlive web socket keep alive for edge environments
 	WebSocketKeepAlive = 1 * time.Hour
 )
