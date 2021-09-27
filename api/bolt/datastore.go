@@ -99,13 +99,8 @@ func NewStore(storePath string, fileService portainer.FileService) (*Store, erro
 	}
 
 	databasePath := path.Join(storePath, databaseFileName)
-	databaseFileExists, err := fileService.FileExists(databasePath)
-	if err != nil {
+	if _, err := fileService.FileExists(databasePath); err != nil {
 		return nil, err
-	}
-
-	if databaseFileExists {
-		store.isNew = false
 	}
 
 	return store, nil
@@ -120,7 +115,20 @@ func (store *Store) Open() error {
 	}
 	store.connection.DB = db
 
-	return store.initServices()
+	err = store.initServices()
+
+	if err != nil {
+		return err
+	}
+
+	//if failed to retrieve DBVersion from database
+	//treat it as a new store
+	if _, err := store.VersionService.DBVersion(); err != nil {
+		store.isNew = true
+	}
+
+	return nil
+
 }
 
 // Close closes the BoltDB database.
