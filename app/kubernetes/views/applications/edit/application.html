@@ -339,7 +339,7 @@
                       <span ng-if="ctrl.application.ServiceType === ctrl.KubernetesServiceTypes.NODE_PORT" data-cy="k8sAppDetail-nodePort">
                         {{ port.NodePort }}
                       </span>
-                      <span ng-if="ctrl.application.ServiceType !== ctrl.KubernetesServiceTypes.NODE_PORT" data-cy="k8sAppDetail-containerPort">
+                      <span ng-if="ctrl.application.ServiceType !== ctrl.KubernetesServiceTypes.NODE_PORT" data-cy="k8sAppDetail-lbPort">
                         {{ port.Port }}
                       </span>
                       <a
