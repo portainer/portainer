@@ -121,9 +121,6 @@ angular.module('portainer.app').controller('UsersController', [
           assignTeamLeaders(users, data.memberships);
           $scope.users = users;
           $scope.teams = _.orderBy(data.teams, 'Name', 'asc');
-          if ($scope.teams) {
-            $scope.teams.forEach((team) => (team.Name = _.escape(team.Name)));
-          }
           $scope.AuthenticationMethod = data.settings.AuthenticationMethod;
         })
         .catch(function error(err) {
