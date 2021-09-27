@@ -1264,7 +1264,7 @@
                         <input
                           type="radio"
                           id="publishing_internal"
-                          ng-value="ctrl.ApplicationPublishingTypes.INTERNAL"
+                          ng-value="ctrl.ApplicationPublishingTypes.CLUSTER_IP"
                           ng-model="ctrl.formValues.PublishingType"
                           ng-change="ctrl.onChangePublishedPorts()"
                           ng-disabled="ctrl.isPublishingTypeEditDisabled()"
@@ -1274,7 +1274,7 @@
                           for="publishing_internal"
                           ng-if="
                             !ctrl.isPublishingTypeEditDisabled() ||
-                            (ctrl.isPublishingTypeEditDisabled() && ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INTERNAL)
+                            (ctrl.isPublishingTypeEditDisabled() && ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER_IP)
                           "
                         >
                           <div class="boxselector_header">
@@ -1285,7 +1285,7 @@
                         </label>
                         <label
                           for="publishing_internal"
-                          ng-if="ctrl.isPublishingTypeEditDisabled() && ctrl.formValues.PublishingType !== ctrl.ApplicationPublishingTypes.INTERNAL"
+                          ng-if="ctrl.isPublishingTypeEditDisabled() && ctrl.formValues.PublishingType !== ctrl.ApplicationPublishingTypes.CLUSTER_IP"
                           tooltip-append-to-body="true"
                           tooltip-placement="bottom"
                           tooltip-class="portainer-tooltip"
@@ -1304,7 +1304,7 @@
                         <input
                           type="radio"
                           id="publishing_cluster"
-                          ng-value="ctrl.ApplicationPublishingTypes.CLUSTER"
+                          ng-value="ctrl.ApplicationPublishingTypes.NODE_PORT"
                           ng-model="ctrl.formValues.PublishingType"
                           ng-change="ctrl.onChangePublishedPorts()"
                           ng-disabled="ctrl.isPublishingTypeEditDisabled()"
@@ -1314,7 +1314,7 @@
                           for="publishing_cluster"
                           ng-if="
                             !ctrl.isPublishingTypeEditDisabled() ||
-                            (ctrl.isPublishingTypeEditDisabled() && ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER)
+                            (ctrl.isPublishingTypeEditDisabled() && ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.NODE_PORT)
                           "
                         >
                           <div class="boxselector_header">
@@ -1325,7 +1325,7 @@
                         </label>
                         <label
                           for="publishing_cluster"
-                          ng-if="ctrl.isPublishingTypeEditDisabled() && ctrl.formValues.PublishingType !== ctrl.ApplicationPublishingTypes.CLUSTER"
+                          ng-if="ctrl.isPublishingTypeEditDisabled() && ctrl.formValues.PublishingType !== ctrl.ApplicationPublishingTypes.NODE_PORT"
                           tooltip-append-to-body="true"
                           tooltip-placement="bottom"
                           tooltip-class="portainer-tooltip"
@@ -1433,7 +1433,7 @@
                     <div
                       class="col-sm-12 small text-muted"
                       style="margin-top: 15px;"
-                      ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER && ctrl.formValues.PublishedPorts.length > 0"
+                      ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.NODE_PORT && ctrl.formValues.PublishedPorts.length > 0"
                     >
                       <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                       When publishing a port in cluster mode, the node port is optional. If left empty Kubernetes will use a random port number. If you wish to specify a port, use
@@ -1482,8 +1482,8 @@
                           class="col-sm-3 input-group input-group-sm"
                           ng-class="{ striked: publishedPort.NeedsDeletion }"
                           ng-if="
-                            (publishedPort.IsNew && ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER) ||
-                            (!publishedPort.IsNew && ctrl.savedFormValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER)
+                            (publishedPort.IsNew && ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.NODE_PORT) ||
+                            (!publishedPort.IsNew && ctrl.savedFormValues.PublishingType === ctrl.ApplicationPublishingTypes.NODE_PORT)
                           "
                         >
                           <span class="input-group-addon">node port</span>
@@ -1646,7 +1646,7 @@
                           kubernetesApplicationCreationForm['ingress_class_' + $index].$invalid ||
                           kubernetesApplicationCreationForm['ingress_route_' + $index].$invalid ||
                           ctrl.state.duplicates.publishedPorts.containerPorts.refs[$index] !== undefined ||
-                          (ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER &&
+                          (ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.NODE_PORT &&
                             ctrl.state.duplicates.publishedPorts.nodePorts.refs[$index] !== undefined) ||
                           (ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INGRESS &&
                             ctrl.state.duplicates.publishedPorts.ingressRoutes.refs[$index] !== undefined) ||
@@ -1674,7 +1674,7 @@
                           </div>
                         </div>
 
-                        <div class="col-sm-3 input-group input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER">
+                        <div class="col-sm-3 input-group input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.NODE_PORT">
                           <div
                             class="small text-warning"
                             style="margin-top: 5px;"

@@ -502,7 +502,7 @@ class KubernetesCreateApplicationController {
 
   onChangePortMappingNodePort() {
     const state = this.state.duplicates.publishedPorts.nodePorts;
-    if (this.formValues.PublishingType === KubernetesApplicationPublishingTypes.CLUSTER) {
+    if (this.formValues.PublishingType === KubernetesApplicationPublishingTypes.NODE_PORT) {
       const source = _.map(this.formValues.PublishedPorts, (p) => (p.NeedsDeletion ? undefined : p.NodePort));
       const duplicates = KubernetesFormValidationHelper.getDuplicates(source);
       state.refs = duplicates;
@@ -950,7 +950,7 @@ class KubernetesCreateApplicationController {
           if (this.savedFormValues) {
             this.formValues.PublishingType = this.savedFormValues.PublishingType;
           } else {
-            this.formValues.PublishingType = this.ApplicationPublishingTypes.INTERNAL;
+            this.formValues.PublishingType = this.ApplicationPublishingTypes.CLUSTER_IP;
           }
         }
         this.formValues.OriginalIngresses = this.ingresses;
