@@ -349,7 +349,7 @@
                       type="button"
                       ng-click="ctrl.removeConfiguration(index)"
                       ng-if="ctrl.formValues.Containers.length <= 1"
-                      data-cy="k8sAppCreate-configRemoveButton"
+                      data-cy="k8sAppCreate-configRemoveButton_{{ $index }}"
                     >
                       <i class="fa fa-trash-alt" aria-hidden="true"></i> Remove
                     </button>
@@ -862,14 +862,8 @@
                 <div class="form-group" style="margin-bottom: 0;">
                   <div class="boxselector_wrapper">
                     <div>
-                      <input
-                        type="radio"
-                        id="deployment_replicated"
-                        ng-value="ctrl.ApplicationDeploymentTypes.REPLICATED"
-                        ng-model="ctrl.formValues.DeploymentType"
-                        data-cy="k8sAppCreate-replicatedDeploymentButton"
-                      />
-                      <label for="deployment_replicated">
+                      <input type="radio" id="deployment_replicated" ng-value="ctrl.ApplicationDeploymentTypes.REPLICATED" ng-model="ctrl.formValues.DeploymentType" />
+                      <label for="deployment_replicated" data-cy="k8sAppCreate-replicatedDeploymentButton">
                         <div class="boxselector_header">
                           <i class="fa fa-cube" aria-hidden="true" style="margin-right: 2px;"></i>
                           Replicated
@@ -901,9 +895,8 @@
                         ng-value="ctrl.ApplicationDeploymentTypes.GLOBAL"
                         ng-model="ctrl.formValues.DeploymentType"
                         ng-click="ctrl.unselectAutoScaler()"
-                        data-cy="k8sAppCreate-globalDeployButton"
                       />
-                      <label for="deployment_global">
+                      <label for="deployment_global" data-cy="k8sAppCreate-globalDeployButton">
                         <div class="boxselector_header">
                           <i class="fa fa-cubes" aria-hidden="true" style="margin-right: 2px;"></i>
                           Global
@@ -1255,7 +1248,6 @@
                         ng-model="ctrl.formValues.PublishingType"
                         ng-change="ctrl.onChangePublishedPorts()"
                         ng-disabled="ctrl.isPublishingTypeEditDisabled()"
-                        data-cy="k8sAppCreate-internalPublishButton"
                       />
                       <label
                         for="publishing_internal"
@@ -1263,6 +1255,7 @@
                           !ctrl.isPublishingTypeEditDisabled() ||
                           (ctrl.isPublishingTypeEditDisabled() && ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INTERNAL)
                         "
+                        data-cy="k8sAppCreate-internalPublishButton"
                       >
                         <div class="boxselector_header">
                           <i class="fa fa-list-alt" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -1295,7 +1288,6 @@
                         ng-model="ctrl.formValues.PublishingType"
                         ng-change="ctrl.onChangePublishedPorts()"
                         ng-disabled="ctrl.isPublishingTypeEditDisabled()"
-                        data-cy="k8sAppCreate-clusterPublishButton"
                       />
                       <label
                         for="publishing_cluster"
@@ -1303,6 +1295,7 @@
                           !ctrl.isPublishingTypeEditDisabled() ||
                           (ctrl.isPublishingTypeEditDisabled() && ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER)
                         "
+                        data-cy="k8sAppCreate-clusterPublishButton"
                       >
                         <div class="boxselector_header">
                           <i class="fa fa-list" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -1334,7 +1327,6 @@
                         ng-model="ctrl.formValues.PublishingType"
                         ng-change="ctrl.onChangePublishedPorts()"
                         ng-disabled="ctrl.isPublishingTypeEditDisabled()"
-                        data-cy="k8sAppCreate-ingressPublishButton"
                       />
                       <label
                         for="publishing_ingress"
@@ -1342,6 +1334,7 @@
                           !ctrl.isPublishingTypeEditDisabled() ||
                           (ctrl.isPublishingTypeEditDisabled() && ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INGRESS)
                         "
+                        data-cy="k8sAppCreate-ingressPublishButton"
                       >
                         <div class="boxselector_header">
                           <i class="fa fa-route" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -1373,7 +1366,6 @@
                         ng-model="ctrl.formValues.PublishingType"
                         ng-change="ctrl.onChangePublishedPorts()"
                         ng-disabled="ctrl.isPublishingTypeEditDisabled()"
-                        data-cy="k8sAppCreate-lbPublichButton"
                       />
                       <label
                         for="publishing_loadbalancer"
@@ -1381,6 +1373,7 @@
                           !ctrl.isPublishingTypeEditDisabled() ||
                           (ctrl.isPublishingTypeEditDisabled() && ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.LOAD_BALANCER)
                         "
+                        data-cy="k8sAppCreate-lbPublishButton"
                       >
                         <div class="boxselector_header">
                           <i class="fa fa-project-diagram" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -1485,7 +1478,7 @@
                           ng-change="ctrl.onChangePortMappingNodePort()"
                           ng-disabled="ctrl.disableLoadBalancerEdit() || ctrl.isEditAndNotNewPublishedPort($index)"
                           data-cy="k8sAppCreate-nodePort_{{ $index }}"
-                          />
+                        />
                       </div>
 
                       <div

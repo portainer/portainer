@@ -28,7 +28,7 @@
                   Allow users to use external load balancer
                 </label>
                 <label class="switch" style="margin-left: 20px;">
-                  <input type="checkbox" ng-model="ctrl.formValues.UseLoadBalancer" /><i data-cy="kubeSetup-loadBalancerToggle"></i>
+                  <input type="checkbox" ng-model="ctrl.formValues.UseLoadBalancer" data-cy="kubeSetup-loadBalancerToggle" /><i></i>
                 </label>
               </div>
             </div>
@@ -45,7 +45,7 @@
             <div class="form-group">
               <div class="col-sm-12">
                 <label class="control-label text-left">Ingress controller</label>
-                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addIngressClass()" data-cy="kubeSetup-congifIngressButton">
+                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addIngressClass()" data-cy="kubeSetup-addIngressButton">
                   <i class="fa fa-plus-circle" aria-hidden="true"></i> configure ingress controller
                 </span>
               </div>
@@ -63,7 +63,7 @@
                       ng-pattern="/^[a-z]([-a-z0-9]*[a-z0-9])?$/"
                       ng-change="ctrl.onChangeIngressClassName($index)"
                       required
-                      data-cy="kubeSetup-ingressClassName"
+                      data-cy="kubeSetup-ingressClassName_{{ $index }}"
                     />
                   </div>
                   <div class="col-sm-3 input-group input-group-sm" ng-class="{ striked: ingressClass.NeedsDeletion }">
@@ -74,7 +74,7 @@
                       ng-model="ingressClass.Type"
                       ng-options="value as value for (key, value) in ctrl.IngressClassTypes"
                       required
-                      data-cy="kubeSetup-ingressType"
+                      data-cy="kubeSetup-ingressType_{{ $index }}"
                     >
                       <option selected disabled hidden value="">Select a type</option>
                     </select>
@@ -85,7 +85,7 @@
                       class="btn btn-sm btn-danger"
                       type="button"
                       ng-click="ctrl.removeIngressClass($index)"
-                      data-cy="kubeSetup-deleteIngress"
+                      data-cy="kubeSetup-deleteIngress_{{ $index }}"
                     >
                       <i class="fa fa-trash-alt" aria-hidden="true"></i>
                     </button>
@@ -156,7 +156,7 @@
                   Restrict access to the default namespace
                 </label>
                 <label class="switch" style="margin-left: 20px;">
-                  <input type="checkbox" ng-model="ctrl.formValues.RestrictDefaultNamespace" /><i data-cy="kubeSetup-restrictDefaultNsToggle"></i>
+                  <input type="checkbox" ng-model="ctrl.formValues.RestrictDefaultNamespace" data-cy="kubeSetup-restrictDefaultNsToggle" /><i></i>
                 </label>
               </div>
             </div>
@@ -181,7 +181,7 @@
                 <label class="control-label text-left">
                   Allow resource over-commit
                 </label>
-                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" checked disabled /><i data-cy="kubeSetup-resourceOverCommitToggle"></i> </label>
+                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" checked disabled data-cy="kubeSetup-resourceOverCommitToggle" /><i></i> </label>
                 <span class="text-muted small" style="margin-left: 15px;">
                   <i class="fa fa-user" aria-hidden="true"></i>
                   This feature is available in <a href="https://www.portainer.io/business-upsell?from=k8s-setup-overcommit" target="_blank"> Portainer Business Edition</a>.
@@ -205,7 +205,7 @@
                   Enable features using the metrics API
                 </label>
                 <label class="switch" style="margin-left: 20px;">
-                  <input type="checkbox" ng-model="ctrl.formValues.UseServerMetrics" ng-change="ctrl.enableMetricsServer()" /><i data-cy="kubeSetup-metricsToggle"></i>
+                  <input type="checkbox" ng-model="ctrl.formValues.UseServerMetrics" ng-change="ctrl.enableMetricsServer()" data-cy="kubeSetup-metricsToggle" /><i></i>
                 </label>
               </div>
               <div ng-if="ctrl.state.metrics.pending && ctrl.state.metrics.userClick" class="col-sm-12 small text-muted" style="margin-top: 5px;">
@@ -265,7 +265,7 @@
                       <td>
                         <div style="margin: 5px;">
                           <label class="switch" style="margin-right: 10px;">
-                            <input type="checkbox" ng-model="class.selected" /><i data-cy="kubeSetup-storageToggle{{ class.Name }}"></i>
+                            <input type="checkbox" ng-model="class.selected" data-cy="kubeSetup-storageToggle{{ class.Name }}" /><i></i>
                           </label>
                           <span>{{ class.Name }}</span>
                         </div>
@@ -288,7 +288,7 @@
                       <td>
                         <div style="margin: 5px;">
                           <label class="switch"
-                            ><input type="checkbox" ng-model="class.AllowVolumeExpansion" /><i data-cy="kubeSetup-storageExpansionToggle{{ class.Name }}"></i>
+                            ><input type="checkbox" ng-model="class.AllowVolumeExpansion" data-cy="kubeSetup-storageExpansionToggle{{ class.Name }}" /><i></i>
                           </label>
                         </div>
                       </td>
