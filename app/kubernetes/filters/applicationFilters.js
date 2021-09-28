@@ -1,6 +1,5 @@
 import _ from 'lodash-es';
 import { KubernetesApplicationDataAccessPolicies } from 'Kubernetes/models/application/models';
-import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import { KubernetesApplicationTypes, KubernetesApplicationTypeStrings } from 'Kubernetes/models/application/models';
 import { KubernetesPodNodeAffinityNodeSelectorRequirementOperators } from 'Kubernetes/pod/models';
 
@@ -31,19 +30,6 @@ angular
           return 'ClusterIP';
         case 'nodeport':
           return 'NodePort';
-      }
-    };
-  })
-  .filter('kubernetesApplicationPortsTableHeaderText', function () {
-    'use strict';
-    return function (serviceType) {
-      switch (serviceType) {
-        case KubernetesServiceTypes.LOAD_BALANCER:
-          return 'Load balancer';
-        case KubernetesServiceTypes.CLUSTER_IP:
-          return 'Application';
-        case KubernetesServiceTypes.NODE_PORT:
-          return 'Cluster node';
       }
     };
   })
