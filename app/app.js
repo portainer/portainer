@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
 
 angular.module('portainer').run([
   '$rootScope',
@@ -49,7 +50,7 @@ angular.module('portainer').run([
 
 function ping(EndpointProvider, SystemService) {
   let endpoint = EndpointProvider.currentEndpoint();
-  if (endpoint !== undefined && endpoint.Type === 4) {
+  if (endpoint !== undefined && endpoint.Type == PortainerEndpointTypes.EdgeAgentOnDockerEnvironment) {
     SystemService.ping(endpoint.Id);
   }
 }

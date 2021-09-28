@@ -2,11 +2,11 @@ package cli
 
 import (
 	"fmt"
+	cmap "github.com/orcaman/concurrent-map"
 	"net/http"
 	"strconv"
 	"sync"
 
-	cmap "github.com/orcaman/concurrent-map"
 	"github.com/pkg/errors"
 
 	portainer "github.com/portainer/portainer/api"
@@ -45,8 +45,8 @@ func NewClientFactory(signatureService portainer.DigitalSignatureService, revers
 }
 
 // Remove the cached kube client so a new one can be created
-func (factory *ClientFactory) RemoveKubeClient(endpoint *portainer.Endpoint) {
-	factory.endpointClients.Remove(strconv.Itoa(int(endpoint.ID)))
+ func (factory *ClientFactory) RemoveKubeClient(endpointID portainer.EndpointID) {
+	factory.endpointClients.Remove(strconv.Itoa(int(endpointID)))
 }
 
 // GetKubeClient checks if an existing client is already registered for the environment(endpoint) and returns it if one is found.
@@ -123,7 +123,6 @@ func (factory *ClientFactory) buildEdgeClient(endpoint *portainer.Endpoint) (*ku
 	if err != nil {
 		return nil, errors.Wrap(err, "failed activating tunnel")
 	}
-
 	endpointURL := fmt.Sprintf("http://127.0.0.1:%d/kubernetes", tunnel.Port)
 
 	return factory.createRemoteClient(endpointURL)

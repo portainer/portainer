@@ -3,6 +3,7 @@ package chisel
 import (
 	"context"
 	"fmt"
+	"github.com/portainer/portainer/api/http/proxy"
 	"log"
 	"net/http"
 	"strconv"
@@ -32,6 +33,7 @@ type Service struct {
 	snapshotService   portainer.SnapshotService
 	chiselServer      *chserver.Server
 	shutdownCtx       context.Context
+	ProxyManager      *proxy.Manager
 }
 
 // NewService returns a pointer to a new instance of Service
@@ -215,18 +217,13 @@ func (service *Service) checkTunnels() {
 			}
 		}
 
-		if len(tunnel.Jobs) > 0 {
-			endpointID, err := strconv.Atoi(item.Key)
-			if err != nil {
-				log.Printf("[ERROR] [chisel,conversion] Invalid environment identifier (id: %s): %s", item.Key, err)
-				continue
-			}
-
-			service.SetTunnelStatusToIdle(portainer.EndpointID(endpointID))
-		} else {
-			service.tunnelDetailsMap.Remove(item.Key)
+		endpointID, err := strconv.Atoi(item.Key)
+		if err != nil {
+			log.Printf("[ERROR] [chisel,conversion] Invalid environment identifier (id: %s): %s", item.Key, err)
+			continue
 		}
 
+		service.SetTunnelStatusToIdle(portainer.EndpointID(endpointID))
 	}
 }
 
