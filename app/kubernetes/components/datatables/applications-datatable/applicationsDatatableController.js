@@ -140,11 +140,7 @@ this.onStateFilterChange = function () {
 };
 
     this.prepareTableFromDataset = function () {
-      let availableTypeFilters = [];
-      for (var i = 0; i< this.dataset.length; i++) {
-        let item = this.dataset[i];
-        availableTypeFilters.push({ type: item.ApplicationType, display: true});
-      }
+const availableTypeFilters = this.dataset.map((item) => ({ type: item.ApplicationType, display: true}));
       this.filters.state.values = _.uniqBy(availableTypeFilters, 'type');
     }
 
