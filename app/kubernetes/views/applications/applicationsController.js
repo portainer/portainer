@@ -81,6 +81,14 @@ class KubernetesApplicationsController {
           await this.HelmService.uninstall(this.endpoint.Id, application);
         } else {
           await this.KubernetesApplicationService.delete(application);
+          // Update applications in stack
+          const stack = this.state.stacks.find((x) => x.Name === application.StackName);
+          const index = stack.Applications.indexOf(application);
+          stack.Applications.splice(index, 1);
+          // remove stack if no app left in the stack
+          if (stack.Applications.length === 0 && application.StackId) {
+            await this.StackService.remove({ Id: application.StackId }, false, this.endpoint.Id);
+          }
         }
         this.Notifications.success('Application successfully removed', application.Name);
         const index = this.state.applications.indexOf(application);
