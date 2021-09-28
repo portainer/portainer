@@ -60,7 +60,7 @@
                   Resource assignment
                 </label>
                 <label class="switch" style="margin-left: 20px;">
-                  <input type="checkbox" ng-model="$ctrl.formValues.HasQuota" /><i data-cy="k8sNamespaceCreate-resourceAssignmentToggle"></i>
+                  <input type="checkbox" ng-model="$ctrl.formValues.HasQuota" data-cy="k8sNamespaceCreate-resourceAssignmentToggle" /><i></i>
                 </label>
               </div>
             </div>
@@ -239,7 +239,7 @@
                     Allow users to use this ingress
                   </label>
                   <label class="switch" style="margin-left: 20px;">
-                    <input type="checkbox" ng-model="ic.Selected" /><i data-cy="namespaceCreate-ingressToggle{{ ic.IngressClass.Name }}"></i>
+                    <input type="checkbox" ng-model="ic.Selected" data-cy="namespaceCreate-ingressToggle{{ ic.IngressClass.Name }}" /><i></i>
                   </label>
                 </div>
               </div>
@@ -315,7 +315,7 @@
                       </portainer-tooltip>
                     </label>
                     <label class="switch" style="margin-left: 20px;">
-                      <input type="checkbox" ng-model="ic.RewriteTarget" /><i data-cy="namespaceCreate-redirectRoutesToggle{{ ic.IngressClass.Name }}"></i>
+                      <input type="checkbox" ng-model="ic.RewriteTarget" data-cy="namespaceCreate-redirectRoutesToggle{{ ic.IngressClass.Name }}" /><i></i>
                     </label>
                   </div>
                 </div>
