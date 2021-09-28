@@ -5,6 +5,10 @@
   font-weight: 400;
 }
 
+.be-indicator .icon {
+  color: #000000;
+}
+
 .be-indicator:hover {
   text-decoration: none;
 }
