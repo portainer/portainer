@@ -1,0 +1,73 @@
+<div class="datatable">
+  <div class="searchBar">
+    <i class="fa fa-search searchIcon" aria-hidden="true"></i>
+    <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" ng-change="$ctrl.onTextFilterChange()" placeholder="Search..." ng-model-options="{ debounce: 300 }" />
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover nowrap-cells">
+      <thead>
+        <tr>
+          <th>
+            <a ng-click="$ctrl.changeOrderBy('EndpointName')">
+              Environment
+              <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'EndpointName' && !$ctrl.state.reverseOrder"></i>
+              <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'EndpointName' && $ctrl.state.reverseOrder"></i>
+            </a>
+          </th>
+          <th>
+            <a ng-click="$ctrl.changeOrderBy('RoleName')">
+              Role
+              <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'RoleName' && !$ctrl.state.reverseOrder"></i>
+              <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'RoleName' && $ctrl.state.reverseOrder"></i>
+            </a>
+          </th>
+          <th>Access origin</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit)) track by $index"
+        >
+          <td>{{ item.EndpointName }}</td>
+          <td>{{ item.RoleName }}</td>
+          <td
+            >{{ item.TeamName ? 'Team' : 'User' }} <code ng-if="item.TeamName">{{ item.TeamName }}</code> access defined on {{ item.AccessLocation }}
+            <code ng-if="item.GroupName">{{ item.GroupName }}</code>
+            <a ng-if="item.AccessLocation === 'endpoint'" ui-sref="portainer.endpoints.endpoint.access({id: item.EndpointId})"
+              ><i style="margin-left: 5px;" class="fa fa-users" aria-hidden="true"></i> Manage access
+            </a>
+            <a ng-if="item.AccessLocation === 'endpoint group'" ui-sref="portainer.groups.group.access({id: item.GroupId})"
+              ><i style="margin-left: 5px;" class="fa fa-users" aria-hidden="true"></i> Manage access
+            </a>
+          </td>
+        </tr>
+        <tr ng-if="!$ctrl.dataset">
+          <td colspan="3" class="text-center text-muted">Select a user to show associated access and role</td>
+        </tr>
+        <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
+          <td colspan="3" class="text-center text-muted">The selected user does not have access to any environment(s)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="footer" ng-if="$ctrl.dataset">
+    <div class="infoBar" ng-if="$ctrl.state.selectedItemCount !== 0"> {{ $ctrl.state.selectedItemCount }} item(s) selected </div>
+    <div class="paginationControls">
+      <form class="form-inline">
+        <span class="limitSelector">
+          <span style="margin-right: 5px;">
+            Items per page
+          </span>
+          <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </span>
+        <dir-pagination-controls max-size="5"></dir-pagination-controls>
+      </form>
+    </div>
+  </div>
+</div>

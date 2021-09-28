@@ -21,6 +21,7 @@ export function featureService() {
       's3-backup-setting': EDITIONS.BE,
       'k8s-setup-default': EDITIONS.BE,
       'registry-management': EDITIONS.BE,
+      'rbac-roles': EDITIONS.BE,
     };
 
     state.currentEdition = currentEdition;
