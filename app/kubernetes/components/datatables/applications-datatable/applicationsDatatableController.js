@@ -135,17 +135,9 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
       return false;
     };
 
-    this.onStateFilterChange = function () {
-      var filters = this.filters.state.values;
-      var filtered = false;
-      for (var i = 0; i < filters.length; i++) {
-        var filter = filters[i];
-        if (!filter.display) {
-          filtered = true;
-        }
-      }
-      this.filters.state.enabled = filtered;
-    };
+this.onStateFilterChange = function () {
+  this.filters.state.enabled = this.filters.state.values.some((filter) => !filter.display);
+};
 
     this.prepareTableFromDataset = function () {
       let availableTypeFilters = [];
