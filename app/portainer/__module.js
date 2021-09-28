@@ -1,5 +1,6 @@
 import _ from 'lodash-es';
 
+import './rbac';
 import componentsModule from './components';
 import settingsModule from './settings';
 import featureFlagModule from './feature-flags';
@@ -20,7 +21,7 @@ async function initAuthentication(authManager, Authentication, $rootScope, $stat
   return await Authentication.init();
 }
 
-angular.module('portainer.app', ['portainer.oauth', componentsModule, settingsModule, featureFlagModule, userActivityModule, 'portainer.shared.datatable']).config([
+angular.module('portainer.app', ['portainer.oauth', 'portainer.rbac', componentsModule, settingsModule, featureFlagModule, userActivityModule, 'portainer.shared.datatable']).config([
   '$stateRegistryProvider',
   function ($stateRegistryProvider) {
     'use strict';
@@ -417,16 +418,6 @@ angular.module('portainer.app', ['portainer.oauth', componentsModule, settingsMo
       },
     };
 
-    var roles = {
-      name: 'portainer.roles',
-      url: '/roles',
-      views: {
-        'content@': {
-          templateUrl: './views/roles/roles.html',
-        },
-      },
-    };
-
     $stateRegistryProvider.register(root);
     $stateRegistryProvider.register(endpointRoot);
     $stateRegistryProvider.register(portainer);
@@ -458,7 +449,6 @@ angular.module('portainer.app', ['portainer.oauth', componentsModule, settingsMo
     $stateRegistryProvider.register(user);
     $stateRegistryProvider.register(teams);
     $stateRegistryProvider.register(team);
-    $stateRegistryProvider.register(roles);
   },
 ]);
 
