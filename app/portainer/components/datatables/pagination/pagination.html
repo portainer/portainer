@@ -1,0 +1,15 @@
+<div class="paginationControls">
+  <form class="form-inline">
+    <span class="limitSelector">
+      <span style="margin-right: 5px;"> Items per page </span>
+      <select class="form-control" ng-model="$ctrl.limit" ng-change="$ctrl.onChangeLimit($ctrl.limit)">
+        <option ng-if="$ctrl.enableNoLimit" ng-value="0">All</option>
+        <option ng-value="10">10</option>
+        <option ng-value="25">25</option>
+        <option ng-value="50">50</option>
+        <option ng-value="100">100</option>
+      </select>
+    </span>
+    <dir-pagination-controls max-size="5" on-page-change="$ctrl.onChangePage(newPageNumber)"> </dir-pagination-controls>
+  </form>
+</div>

@@ -93,6 +93,10 @@
             Registries</sidebar-menu-item
           >
 
+          <sidebar-menu label="Authentication logs" icon-class="fa-history fa-fw" path="portainer.authLogs" is-sidebar-open="toggle" children-paths="['portainer.activityLogs']">
+            <sidebar-menu-item path="portainer.activityLogs" class-name="sidebar-sublist" data-cy="portainerSidebar-activityLogs">Activity Logs</sidebar-menu-item>
+          </sidebar-menu>
+
           <sidebar-menu label="Settings" icon-class="fa-cogs fa-fw" path="portainer.settings" is-sidebar-open="toggle" children-paths="['portainer.settings.authentication']">
             <sidebar-menu-item path="portainer.settings.authentication" class-name="sidebar-sublist" data-cy="portainerSidebar-authentication">Authentication</sidebar-menu-item>
 
