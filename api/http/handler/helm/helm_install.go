@@ -156,11 +156,11 @@ func (handler *Handler) applyPortainerLabelsToHelmAppManifest(r *http.Request, i
 	// Patch helm release by adding with portainer labels to all deployed resources
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
-		return nil, errors.Wrap(err, "Unable to retrieve user details from authentication token")
+		return nil, errors.Wrap(err, "unable to retrieve user details from authentication token")
 	}
 	user, err := handler.dataStore.User().User(tokenData.ID)
 	if err != nil {
-		return nil, errors.Wrap(err, "Unable to load user information from the database")
+		return nil, errors.Wrap(err, "unable to load user information from the database")
 	}
 
 	appLabels := kubernetes.GetHelmAppLabels(installOpts.Name, user.Username)
@@ -179,13 +179,13 @@ func (handler *Handler) applyPortainerLabelsToHelmAppManifest(r *http.Request, i
 func (handler *Handler) updateHelmAppManifest(r *http.Request, manifest []byte, namespace string) error {
 	endpoint, err := middlewares.FetchEndpoint(r)
 	if err != nil {
-		return errors.Wrap(err, "Unable to find an endpoint on request context")
+		return errors.Wrap(err, "unable to find an endpoint on request context")
 	}
 
 	// extract list of yaml resources from helm manifest
 	yamlResources, err := kubernetes.ExtractDocuments(manifest, nil)
 	if err != nil {
-		return errors.Wrap(err, "Unable to extract documents from helm release manifest")
+		return errors.Wrap(err, "unable to extract documents from helm release manifest")
 	}
 
 	// deploy individual resources in parallel
@@ -206,7 +206,7 @@ func (handler *Handler) updateHelmAppManifest(r *http.Request, manifest []byte, 
 		})
 	}
 	if err := g.Wait(); err != nil {
-		return errors.Wrap(err, "Unable to patch helm release using kubectl")
+		return errors.Wrap(err, "unable to patch helm release using kubectl")
 	}
 
 	return nil
