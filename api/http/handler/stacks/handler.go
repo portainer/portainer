@@ -23,7 +23,6 @@ import (
 const defaultGitReferenceName = "refs/heads/master"
 
 var (
-	errStackAlreadyExists     = errors.New("A stack already exists with this name")
 	errWebhookIDAlreadyExists = errors.New("A webhook ID already exists")
 	errStackNotExternal       = errors.New("Not an external stack")
 )
@@ -43,6 +42,12 @@ type Handler struct {
 	KubernetesDeployer  portainer.KubernetesDeployer
 	Scheduler           *scheduler.Scheduler
 	StackDeployer       stacks.StackDeployer
+}
+
+func stackExistsError(name string) (*httperror.HandlerError){
+	msg := fmt.Sprintf("A stack with the normalized name '%s' already exists", name)
+	err := errors.New(msg)
+	return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: msg, Err: err}
 }
 
 // NewHandler creates a handler to manage stack operations.

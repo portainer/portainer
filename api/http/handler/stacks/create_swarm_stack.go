@@ -57,8 +57,7 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
 	}
 	if !isUnique {
-		errorMessage := fmt.Sprintf("A stack with the name '%s' is already running", payload.Name)
-		return &httperror.HandlerError{http.StatusConflict, errorMessage, errors.New(errorMessage)}
+		return stackExistsError(payload.Name)
 	}
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
@@ -167,7 +166,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to check for name collision", Err: err}
 	}
 	if !isUnique {
-		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("A stack with the name '%s' already exists", payload.Name), Err: errStackAlreadyExists}
+		return stackExistsError(payload.Name)
 	}
 
 	//make sure the webhook ID is unique
@@ -305,8 +304,7 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
 	}
 	if !isUnique {
-		errorMessage := fmt.Sprintf("A stack with the name '%s' is already running", payload.Name)
-		return &httperror.HandlerError{http.StatusConflict, errorMessage, errors.New(errorMessage)}
+		return stackExistsError(payload.Name)
 	}
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
