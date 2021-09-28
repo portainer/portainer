@@ -1,5 +1,5 @@
-angular.module('portainer.app').component('accessViewerDatatable', {
-  templateUrl: './accessViewerDatatable.html',
+export const accessViewerDatatable = {
+  templateUrl: './access-viewer-datatable.html',
   controller: 'GenericDatatableController',
   bindings: {
     titleText: '@',
@@ -8,4 +8,4 @@ angular.module('portainer.app').component('accessViewerDatatable', {
     orderBy: '@',
     dataset: '<',
   },
-});
+};
