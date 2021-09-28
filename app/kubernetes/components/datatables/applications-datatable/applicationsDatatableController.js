@@ -123,16 +123,8 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
       return !this.isSystemNamespace(item);
     };
 
-    this.applyFilters = function (value) {
-      var application = value;
-      var filters = ctrl.filters;
-      for (var i = 0; i < filters.state.values.length; i++) {
-        var filter = filters.state.values[i];
-        if (application.ApplicationType === filter.type && filter.display) {
-          return true;
-        }
-      }
-      return false;
+this.applyFilters = function (item) {
+      return ctrl.filters.state.values.some((filter) => item.ApplicationType === filter.type && filter.display);
     };
 
 this.onStateFilterChange = function () {
