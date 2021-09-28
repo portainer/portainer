@@ -714,6 +714,8 @@ type (
 		EnableTelemetry bool `json:"EnableTelemetry" example:"false"`
 		// Helm repository URL, defaults to "https://charts.bitnami.com/bitnami"
 		HelmRepositoryURL string `json:"HelmRepositoryURL" example:"https://charts.bitnami.com/bitnami"`
+		// KubectlImage, defaults to portainer/kubectl-shell
+		KubectlShellImage string `json:"KubectlShellImage" example:"portainer/kubectl-shell"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
@@ -1264,7 +1266,7 @@ type (
 		SetupUserServiceAccount(userID int, teamIDs []int, restrictDefaultNamespace bool) error
 		GetServiceAccount(tokendata *TokenData) (*v1.ServiceAccount, error)
 		GetServiceAccountBearerToken(userID int) (string, error)
-		CreateUserShellPod(ctx context.Context, serviceAccountName string) (*KubernetesShellPod, error)
+		CreateUserShellPod(ctx context.Context, serviceAccountName, shellPodImage string) (*KubernetesShellPod, error)
 		StartExecProcess(token string, useAdminToken bool, namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer, errChan chan error)
 		NamespaceAccessPoliciesDeleteNamespace(namespace string) error
 		GetNodesLimits() (K8sNodesLimits, error)
@@ -1498,6 +1500,8 @@ const (
 	DefaultUserSessionTimeout = "8h"
 	// DefaultUserSessionTimeout represents the default timeout after which the user session is cleared
 	DefaultKubeconfigExpiry = "0"
+	// DefaultKubectlShellImage represents the default image and tag for the kubectl shell
+	DefaultKubectlShellImage = "portainer/kubectl-shell"
 	// WebSocketKeepAlive web socket keep alive for edge environments
 	WebSocketKeepAlive = 1 * time.Hour
 )

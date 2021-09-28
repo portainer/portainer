@@ -45,7 +45,12 @@ func (handler *Handler) websocketShellPodExec(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find serviceaccount associated with user", err}
 	}
 
-	shellPod, err := cli.CreateUserShellPod(r.Context(), serviceAccount.Name)
+	settings, err := handler.DataStore.Settings().Settings()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable read settings", err}
+	}
+
+	shellPod, err := cli.CreateUserShellPod(r.Context(), serviceAccount.Name, settings.KubectlShellImage)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create user shell", err}
 	}
