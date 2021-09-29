@@ -188,10 +188,11 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
 
   $scope.isOAuthTeamMembershipFormValid = isOAuthTeamMembershipFormValid;
   function isOAuthTeamMembershipFormValid() {
-    if ($scope.settings && $scope.settings.OAuthSettings.OAuthAutoMapTeamMemberships) {
+    if ($scope.settings && $scope.settings.OAuthSettings.OAuthAutoMapTeamMemberships && $scope.settings.OAuthSettings.TeamMemberships) {
       if (!$scope.settings.OAuthSettings.TeamMemberships.OAuthClaimName) {
         return false;
       }
+
       const hasInvalidMapping = $scope.settings.OAuthSettings.TeamMemberships.OAuthClaimMappings.some((m) => !(m.ClaimValRegex && m.Team));
       if (hasInvalidMapping) {
         return false;

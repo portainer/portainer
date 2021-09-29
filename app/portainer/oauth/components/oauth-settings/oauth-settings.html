@@ -1,7 +1,8 @@
-<div
-  ><div class="col-sm-12 form-section-title">
+<div>
+  <div class="col-sm-12 form-section-title">
     Single Sign-On
   </div>
+
   <!-- SSO -->
   <div class="form-group">
     <label for="use-sso" class="control-label col-sm-2 text-left" style="padding-top: 0;">
@@ -9,7 +10,7 @@
       <portainer-tooltip position="bottom" message="When using SSO the OAuth provider is not forced to prompt for credentials."></portainer-tooltip>
     </label>
     <div class="col-sm-9">
-      <label class="switch"> <input id="use-sso" type="checkbox" ng-model="$ctrl.settings.SSO" /><i></i> </label>
+      <label class="switch"> <input id="use-sso" type="checkbox" ng-model="$ctrl.settings.SSO" ng-change="$ctrl.updateSSO()" /><i></i> </label>
     </div>
   </div>
   <!-- !SSO -->
@@ -20,35 +21,26 @@
       Hide internal authentication prompt
     </label>
     <div class="col-sm-9">
-      <label class="switch"> <input id="hide-internal-auth" type="checkbox" disabled /><i></i> </label>
-      <span class="text-muted small" style="margin-left: 15px;">
-        This feature is available in <a href="https://www.portainer.io/business-upsell?from=hide-internal-auth" target="_blank"> Portainer Business Edition</a>.
-      </span>
+      <label class="switch"> <input id="hide-internal-auth" type="checkbox" ng-model="$ctrl.settings.HideInternalAuth" /><i></i> </label>
     </div>
   </div>
   <!-- !HideInternalAuth -->
-  <div class="col-sm-12 form-section-title">
-    Automatic user provisioning
-  </div>
-  <div class="form-group">
-    <span class="col-sm-12 text-muted small">
+
+  <auto-user-provision-toggle ng-model="$ctrl.settings.OAuthAutoCreateUsers">
+    <field-description>
       With automatic user provisioning enabled, Portainer will create user(s) automatically with the standard user role. If disabled, users must be created beforehand in Portainer
       in order to login.
-    </span>
-  </div>
-  <div class="form-group">
-    <label class="col-sm-3 col-lg-2 control-label text-left">Automatic user provisioning</label>
-    <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="$ctrl.settings.OAuthAutoCreateUsers" /><i></i> </label>
-  </div>
+    </field-description>
+  </auto-user-provision-toggle>
 
   <div ng-if="$ctrl.settings.OAuthAutoCreateUsers">
     <div class="form-group">
       <span class="col-sm-12 text-muted small">
         <p>The users created by the automatic provisioning feature can be added to a default team on creation.</p>
-        <p
-          >By assigning newly created users to a team, they will be able to access the environments associated to that team. This setting is optional and if not set, newly created
-          users won't be able to access any environments.</p
-        >
+        <p>
+          By assigning newly created users to a team, they will be able to access the environments associated to that team. This setting is optional and if not set, newly created
+          users won't be able to access any environments.
+        </p>
       </span>
     </div>
     <div class="form-group">
@@ -56,37 +48,134 @@
       <span class="small text-muted" style="margin-left: 20px;" ng-if="$ctrl.teams.length === 0">
         You have not yet created any teams. Head over to the <a ui-sref="portainer.teams">Teams view</a> to manage teams.
       </span>
-      <button type="button" class="btn btn-sm btn-danger" ng-click="$ctrl.settings.DefaultTeamID = null" ng-disabled="!$ctrl.settings.DefaultTeamID" ng-if="$ctrl.teams.length > 0"
-        ><i class="fa fa-times" aria-hidden="true"></i
-      ></button>
-      <div class="col-sm-9 col-lg-9" ng-if="$ctrl.teams.length > 0">
-        <select class="form-control" ng-model="$ctrl.settings.DefaultTeamID" ng-options="team.Id as team.Name for team in $ctrl.teams">
-          <option value="">No team</option>
-        </select>
+
+      <div class="col-sm-9" ng-if="$ctrl.teams.length > 0">
+        <div class="col-sm-12 small text-muted">
+          <p>
+            <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+            The default team option will be disabled when automatic team membership is enabled
+          </p>
+        </div>
+        <div class="col-xs-11">
+          <select
+            class="form-control"
+            ng-disabled="$ctrl.settings.OAuthAutoMapTeamMemberships"
+            ng-model="$ctrl.settings.DefaultTeamID"
+            ng-options="team.Id as team.Name for team in $ctrl.teams"
+          >
+            <option value="">No team</option>
+          </select>
+        </div>
+        <button
+          type="button"
+          class="btn btn-sm btn-danger"
+          ng-click="$ctrl.settings.DefaultTeamID = null"
+          ng-disabled="!$ctrl.settings.DefaultTeamID || $ctrl.settings.OAuthAutoMapTeamMemberships"
+          ng-if="$ctrl.teams.length > 0"
+        >
+          <i class="fa fa-times" aria-hidden="true"> </i
+        ></button>
       </div>
     </div>
   </div>
 
-  <div class="col-sm-12 form-section-title">
-    Team membership
-  </div>
-  <div class="form-group">
-    <span class="col-sm-12 text-muted small">
+  <auto-team-membership-toggle ng-model="$ctrl.settings.OAuthAutoMapTeamMemberships">
+    <field-description>
       Automatic team membership synchronizes the team membership based on a custom claim in the token from the OAuth provider.
-    </span>
+    </field-description>
+  </auto-team-membership-toggle>
+
+  <div ng-if="$ctrl.settings.OAuthAutoMapTeamMemberships">
+    <div class="form-group">
+      <label class="col-sm-3 col-lg-2 control-label text-left">
+        Claim name
+        <portainer-tooltip position="bottom" message="The OpenID Connect UserInfo Claim name that contains the team identifier the user belongs to."></portainer-tooltip>
+      </label>
+      <div class="col-sm-9 col-lg-10">
+        <div class="col-xs-11 col-lg-10">
+          <input type="text" class="form-control" id="oauth_token_claim_name" ng-model="$ctrl.settings.TeamMemberships.OAuthClaimName" placeholder="groups" />
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="col-sm-3 col-lg-2 control-label text-left">
+        Statically assigned teams
+      </label>
+      <div class="col-sm-9 col-lg-10">
+        <span class="label label-default interactive" style="margin-left: 1.4em;" ng-click="$ctrl.addTeamMembershipMapping()">
+          <i class="fa fa-plus-circle" aria-hidden="true"></i> add team mapping
+        </span>
+
+        <div class="col-sm-12 form-inline" ng-repeat="mapping in $ctrl.settings.TeamMemberships.OAuthClaimMappings" style="margin-top: 0.75em;">
+          <div class="input-group input-group-sm col-sm-5">
+            <span class="input-group-addon">claim value regex</span>
+            <input type="text" class="form-control" ng-model="mapping.ClaimValRegex" />
+          </div>
+          <span style="margin: 0px 0.5em;">maps to</span>
+          <div class="input-group input-group-sm col-sm-3 col-lg-4">
+            <span class="input-group-addon">team</span>
+            <select
+              class="form-control"
+              ng-init="mapping.Team = mapping.Team || $ctrl.settings.DefaultTeamID"
+              ng-model="mapping.Team"
+              ng-options="team.Id as team.Name for team in $ctrl.teams"
+            >
+              <option selected value="">Select a team</option>
+            </select>
+          </div>
+          <button type="button" class="btn btn-sm btn-danger" ng-click="$ctrl.removeTeamMembership($index)"> <i class="fa fa-trash" aria-hidden="true"> </i></button>
+
+          <div class="small text-warning" ng-show="!mapping.ClaimValRegex" style="margin-top: 0.4em;">
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Claim value regex is required.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="col-sm-12 text-muted small" style="margin-bottom: 0.5em;">
+        The default team will be assigned when the user does not belong to any other team
+      </div>
+      <label class="col-sm-3 col-lg-2 control-label text-left">Default team</label>
+      <span class="small text-muted" style="margin-left: 20px;" ng-if="$ctrl.teams.length === 0">
+        You have not yet created any teams. Head over to the <a ui-sref="portainer.teams">Teams view</a> to manage teams.
+      </span>
+
+      <div class="col-sm-9" ng-if="$ctrl.teams.length > 0">
+        <div class="col-xs-11">
+          <select class="form-control" ng-model="$ctrl.settings.DefaultTeamID" ng-options="team.Id as team.Name for team in $ctrl.teams">
+            <option value="">No team</option>
+          </select>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="form-group">
-    <span class="text-muted small" style="margin-left: 15px;">
-      <i class="fa fa-user" aria-hidden="true"></i>
-      This feature is available in <a href="https://www.portainer.io/business-upsell?from=oauth-group-membership" target="_blank"> Portainer Business Edition</a>.
-    </span>
-  </div>
+
+  <oauth-providers-selector on-change="($ctrl.onSelectProvider)" value="$ctrl.state.provider"></oauth-providers-selector>
 
   <div class="col-sm-12 form-section-title">OAuth Configuration</div>
 
+  <div class="form-group" ng-if="$ctrl.state.provider == 'microsoft'">
+    <label for="oauth_microsoft_tenant_id" class="col-sm-3 col-lg-2 control-label text-left">
+      Tenant ID
+      <portainer-tooltip position="bottom" message="ID of the Azure Directory you wish to authenticate against. Also known as the Directory ID"></portainer-tooltip>
+    </label>
+    <div class="col-sm-9 col-lg-10">
+      <input
+        type="text"
+        class="form-control"
+        id="oauth_microsoft_tenant_id"
+        placeholder="xxxxxxxxxxxxxxxxxxxx"
+        ng-model="$ctrl.state.microsoftTenantID"
+        ng-change="$ctrl.onMicrosoftTenantIDChange()"
+      />
+    </div>
+  </div>
+
   <div class="form-group">
     <label for="oauth_client_id" class="col-sm-3 col-lg-2 control-label text-left">
-      Client ID
+      {{ $ctrl.state.provider == 'microsoft' ? 'Application ID' : 'Client ID' }}
       <portainer-tooltip position="bottom" message="Public identifier of the OAuth application"></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
@@ -96,93 +185,106 @@
 
   <div class="form-group">
     <label for="oauth_client_secret" class="col-sm-3 col-lg-2 control-label text-left">
-      Client secret
+      {{ $ctrl.state.provider == 'microsoft' ? 'Application key' : 'Client secret' }}
     </label>
     <div class="col-sm-9 col-lg-10">
       <input type="password" class="form-control" id="oauth_client_secret" ng-model="$ctrl.settings.ClientSecret" placeholder="xxxxxxxxxxxxxxxxxxxx" autocomplete="new-password" />
     </div>
   </div>
 
-  <div class="form-group">
-    <label for="oauth_authorization_uri" class="col-sm-3 col-lg-2 control-label text-left">
-      Authorization URL
-      <portainer-tooltip
-        position="bottom"
-        message="URL used to authenticate against the OAuth provider. Will redirect the user to the OAuth provider login view"
-      ></portainer-tooltip>
-    </label>
-    <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="oauth_authorization_uri" ng-model="$ctrl.settings.AuthorizationURI" placeholder="https://example.com/oauth/authorize" />
+  <div ng-if="$ctrl.state.provider == 'custom' || $ctrl.state.overrideConfiguration">
+    <div class="form-group">
+      <label for="oauth_authorization_uri" class="col-sm-3 col-lg-2 control-label text-left">
+        Authorization URL
+        <portainer-tooltip
+          position="bottom"
+          message="URL used to authenticate against the OAuth provider. Will redirect the user to the OAuth provider login view"
+        ></portainer-tooltip>
+      </label>
+      <div class="col-sm-9 col-lg-10">
+        <input type="text" class="form-control" id="oauth_authorization_uri" ng-model="$ctrl.settings.AuthorizationURI" placeholder="https://example.com/oauth/authorize" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="oauth_access_token_uri" class="col-sm-3 col-lg-2 control-label text-left">
+        Access token URL
+        <portainer-tooltip position="bottom" message="URL used by Portainer to exchange a valid OAuth authentication code for an access token"></portainer-tooltip>
+      </label>
+      <div class="col-sm-9 col-lg-10">
+        <input type="text" class="form-control" id="oauth_access_token_uri" ng-model="$ctrl.settings.AccessTokenURI" placeholder="https://example.com/oauth/token" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="oauth_resource_uri" class="col-sm-3 col-lg-2 control-label text-left">
+        Resource URL
+        <portainer-tooltip position="bottom" message="URL used by Portainer to retrieve information about the authenticated user"></portainer-tooltip>
+      </label>
+      <div class="col-sm-9 col-lg-10">
+        <input type="text" class="form-control" id="oauth_resource_uri" ng-model="$ctrl.settings.ResourceURI" placeholder="https://example.com/user" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="oauth_redirect_uri" class="col-sm-3 col-lg-2 control-label text-left">
+        Redirect URL
+        <portainer-tooltip
+          position="bottom"
+          message="URL used by the OAuth provider to redirect the user after successful authentication. Should be set to your Portainer instance URL"
+        ></portainer-tooltip>
+      </label>
+      <div class="col-sm-9 col-lg-10">
+        <input type="text" class="form-control" id="oauth_redirect_uri" ng-model="$ctrl.settings.RedirectURI" placeholder="http://yourportainer.com/" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="oauth_logout_url" class="col-sm-3 col-lg-2 control-label text-left">
+        Logout URL
+        <portainer-tooltip
+          position="bottom"
+          message="URL used by Portainer to redirect the user to the OAuth provider in order to log the user out of the identity provider session."
+        ></portainer-tooltip>
+      </label>
+      <div class="col-sm-9 col-lg-10">
+        <input type="text" class="form-control" id="oauth_logout_url" ng-model="$ctrl.settings.LogoutURI" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="oauth_user_identifier" class="col-sm-3 col-lg-2 control-label text-left">
+        User identifier
+        <portainer-tooltip
+          position="bottom"
+          message="Identifier that will be used by Portainer to create an account for the authenticated user. Retrieved from the resource server specified via the Resource URL field"
+        ></portainer-tooltip>
+      </label>
+      <div class="col-sm-9 col-lg-10">
+        <input type="text" class="form-control" id="oauth_user_identifier" ng-model="$ctrl.settings.UserIdentifier" placeholder="id" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="oauth_scopes" class="col-sm-3 col-lg-2 control-label text-left">
+        Scopes
+        <portainer-tooltip
+          position="bottom"
+          message="Scopes required by the OAuth provider to retrieve information about the authenticated user. Refer to your OAuth provider documentation for more information about this"
+        ></portainer-tooltip>
+      </label>
+      <div class="col-sm-9 col-lg-10">
+        <input type="text" class="form-control" id="oauth_scopes" ng-model="$ctrl.settings.Scopes" placeholder="id,email,name" />
+      </div>
     </div>
   </div>
 
-  <div class="form-group">
-    <label for="oauth_access_token_uri" class="col-sm-3 col-lg-2 control-label text-left">
-      Access token URL
-      <portainer-tooltip position="bottom" message="URL used by Portainer to exchange a valid OAuth authentication code for an access token"></portainer-tooltip>
-    </label>
-    <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="oauth_access_token_uri" ng-model="$ctrl.settings.AccessTokenURI" placeholder="https://example.com/oauth/token" />
-    </div>
-  </div>
-
-  <div class="form-group">
-    <label for="oauth_resource_uri" class="col-sm-3 col-lg-2 control-label text-left">
-      Resource URL
-      <portainer-tooltip position="bottom" message="URL used by Portainer to retrieve information about the authenticated user"></portainer-tooltip>
-    </label>
-    <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="oauth_resource_uri" ng-model="$ctrl.settings.ResourceURI" placeholder="https://example.com/user" />
-    </div>
-  </div>
-
-  <div class="form-group">
-    <label for="oauth_redirect_uri" class="col-sm-3 col-lg-2 control-label text-left">
-      Redirect URL
-      <portainer-tooltip
-        position="bottom"
-        message="URL used by the OAuth provider to redirect the user after successful authentication. Should be set to your Portainer instance URL"
-      ></portainer-tooltip>
-    </label>
-    <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="oauth_redirect_uri" ng-model="$ctrl.settings.RedirectURI" placeholder="http://yourportainer.com/" />
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="oauth_logout_url" class="col-sm-3 col-lg-2 control-label text-left">
-      Logout URL
-      <portainer-tooltip
-        position="bottom"
-        message="URL used by Portainer to redirect the user to the OAuth provider in order to log the user out of the identity provider session."
-      ></portainer-tooltip>
-    </label>
-    <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="oauth_logout_url" ng-model="$ctrl.settings.LogoutURI" />
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="oauth_user_identifier" class="col-sm-3 col-lg-2 control-label text-left">
-      User identifier
-      <portainer-tooltip
-        position="bottom"
-        message="Identifier that will be used by Portainer to create an account for the authenticated user. Retrieved from the resource server specified via the Resource URL field"
-      ></portainer-tooltip>
-    </label>
-    <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="oauth_user_identifier" ng-model="$ctrl.settings.UserIdentifier" placeholder="id" />
-    </div>
-  </div>
-
-  <div class="form-group">
-    <label for="oauth_scopes" class="col-sm-3 col-lg-2 control-label text-left">
-      Scopes
-      <portainer-tooltip
-        position="bottom"
-        message="Scopes required by the OAuth provider to retrieve information about the authenticated user. Refer to your OAuth provider documentation for more information about this"
-      ></portainer-tooltip>
-    </label>
-    <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="oauth_scopes" ng-model="$ctrl.settings.Scopes" placeholder="id,email,name" />
+  <div class="form-group" ng-if="$ctrl.state.provider != 'custom'">
+    <div class="col-sm-12">
+      <a class="small interactive" ng-if="!$ctrl.state.overrideConfiguration" ng-click="$ctrl.state.overrideConfiguration = true;">
+        <i class="fa fa-wrench space-right" aria-hidden="true"></i> Override default configuration
+      </a>
+      <a class="small interactive" ng-if="$ctrl.state.overrideConfiguration" ng-click="$ctrl.useDefaultProviderConfiguration($ctrl.state.provider)">
+        <i class="fa fa-cogs space-right" aria-hidden="true"></i> Use default configuration
+      </a>
     </div>
   </div>
 </div>
