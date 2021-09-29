@@ -6,5 +6,6 @@ export const ldapCustomUserSearch = {
   bindings: {
     settings: '=',
     onSearchClick: '<',
+    limitedFeature: '<',
   },
 };

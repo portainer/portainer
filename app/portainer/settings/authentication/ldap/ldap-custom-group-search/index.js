@@ -6,5 +6,6 @@ export const ldapCustomGroupSearch = {
   bindings: {
     settings: '=',
     onSearchClick: '<',
+    limitedFeature: '<',
   },
 };
