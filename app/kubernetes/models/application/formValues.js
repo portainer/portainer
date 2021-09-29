@@ -19,7 +19,7 @@ export function KubernetesApplicationFormValues() {
   this.AutoScaler = {};
   this.Containers = [];
   this.EnvironmentVariables = []; // KubernetesApplicationEnvironmentVariableFormValue lis;
-  this.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.SHARED;
+  this.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.ISOLATED;
   this.PersistedFolders = []; // KubernetesApplicationPersistedFolderFormValue lis;
   this.Configurations = []; // KubernetesApplicationConfigurationFormValue lis;
   this.PublishingType = KubernetesApplicationPublishingTypes.CLUSTER_IP;
