@@ -166,7 +166,7 @@
                   ng-data-cy="k8sNamespaceCreate-loadBalancerQuotaToggle"
                   label="Load Balancer quota"
                   name="k8s-resourcepool-Ibquota"
-                  feature="'k8s-resourcepool-Ibquota'"
+                  feature="$ctrl.LBQuotaFeatureId"
                   ng-model="lbquota"
                 ></por-switch-field>
               </div>
@@ -195,7 +195,7 @@
                   ng-data-cy="k8sNamespaceCreate-enableQuotaToggle"
                   label="Enable quota"
                   name="k8s-resourcepool-storagequota"
-                  feature="'k8s-resourcepool-storagequota'"
+                  feature="$ctrl.StorageQuotaFeatureId"
                   ng-model="storagequota"
                 ></por-switch-field>
               </div>
