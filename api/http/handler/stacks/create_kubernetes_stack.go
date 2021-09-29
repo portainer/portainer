@@ -169,6 +169,7 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 		Output: output,
 	}
 
+	doCleanUp = false
 	return response.JSON(w, resp)
 }
 
