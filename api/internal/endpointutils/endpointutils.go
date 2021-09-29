@@ -11,7 +11,7 @@ func IsLocalEndpoint(endpoint *portainer.Endpoint) bool {
 	return strings.HasPrefix(endpoint.URL, "unix://") || strings.HasPrefix(endpoint.URL, "npipe://") || endpoint.Type == 5
 }
 
-// IsKubernetesEndpoint returns true if this is a kubernetes environment(endpoint)
+// IsKubernetesEndpoint returns true if this is a kubernetes endpoint
 func IsKubernetesEndpoint(endpoint *portainer.Endpoint) bool {
 	return endpoint.Type == portainer.KubernetesLocalEnvironment ||
 		endpoint.Type == portainer.AgentOnKubernetesEnvironment ||
@@ -25,6 +25,7 @@ func IsDockerEndpoint(endpoint *portainer.Endpoint) bool {
 		endpoint.Type == portainer.EdgeAgentOnDockerEnvironment
 }
 
+// IsEdgeEndpoint returns true if this is an Edge endpoint
 func IsEdgeEndpoint(endpoint *portainer.Endpoint) bool {
 	return endpoint.Type == portainer.EdgeAgentOnDockerEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment
 }

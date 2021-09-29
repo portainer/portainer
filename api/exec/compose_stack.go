@@ -47,7 +47,7 @@ func (manager *ComposeStackManager) ComposeSyntaxMaxVersion() string {
 func (manager *ComposeStackManager) Up(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	url, proxy, err := manager.fetchEndpointProxy(endpoint)
 	if err != nil {
-		return errors.Wrap(err, "failed to fetch endpoint proxy")
+		return errors.Wrap(err, "failed to fetch environment proxy")
 	}
 
 	if proxy != nil {
@@ -80,7 +80,7 @@ func (manager *ComposeStackManager) Down(ctx context.Context, stack *portainer.S
 }
 
 // NormalizeStackName returns a new stack name with unsupported characters replaced
-func (w *ComposeStackManager) NormalizeStackName(name string) string {
+func (manager *ComposeStackManager) NormalizeStackName(name string) string {
 	r := regexp.MustCompile("[^a-z0-9]+")
 	return r.ReplaceAllString(strings.ToLower(name), "")
 }

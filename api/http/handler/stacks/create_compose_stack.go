@@ -46,7 +46,7 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 
 	payload.Name = handler.ComposeStackManager.NormalizeStackName(payload.Name)
 
-	isUnique, err := handler.checkUniqueName(endpoint, payload.Name, 0, false)
+	isUnique, err := handler.checkUniqueStackNameInDocker(endpoint, payload.Name, 0, false)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
 	}
@@ -152,7 +152,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		payload.ComposeFile = filesystem.ComposeFileDefaultName
 	}
 
-	isUnique, err := handler.checkUniqueName(endpoint, payload.Name, 0, false)
+	isUnique, err := handler.checkUniqueStackNameInDocker(endpoint, payload.Name, 0, false)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to check for name collision", Err: err}
 	}
@@ -208,11 +208,11 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to clone git repository", Err: err}
 	}
 
-	commitId, err := handler.latestCommitID(payload.RepositoryURL, payload.RepositoryReferenceName, payload.RepositoryAuthentication, payload.RepositoryUsername, payload.RepositoryPassword)
+	commitID, err := handler.latestCommitID(payload.RepositoryURL, payload.RepositoryReferenceName, payload.RepositoryAuthentication, payload.RepositoryUsername, payload.RepositoryPassword)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to fetch git repository id", Err: err}
 	}
-	stack.GitConfig.ConfigHash = commitId
+	stack.GitConfig.ConfigHash = commitID
 
 	config, configErr := handler.createComposeDeployConfig(r, stack, endpoint)
 	if configErr != nil {
@@ -281,7 +281,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 
 	payload.Name = handler.ComposeStackManager.NormalizeStackName(payload.Name)
 
-	isUnique, err := handler.checkUniqueName(endpoint, payload.Name, 0, false)
+	isUnique, err := handler.checkUniqueStackNameInDocker(endpoint, payload.Name, 0, false)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to check for name collision", Err: err}
 	}

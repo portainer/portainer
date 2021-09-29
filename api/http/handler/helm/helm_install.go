@@ -2,6 +2,7 @@ package helm
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
@@ -182,6 +183,11 @@ func (handler *Handler) updateHelmAppManifest(r *http.Request, manifest []byte, 
 		return errors.Wrap(err, "unable to find an endpoint on request context")
 	}
 
+	tokenData, err := security.RetrieveTokenData(r)
+	if err != nil {
+		return errors.Wrap(err, "unable to retrieve user details from authentication token")
+	}
+
 	// extract list of yaml resources from helm manifest
 	yamlResources, err := kubernetes.ExtractDocuments(manifest, nil)
 	if err != nil {
@@ -193,6 +199,19 @@ func (handler *Handler) updateHelmAppManifest(r *http.Request, manifest []byte, 
 	for _, resource := range yamlResources {
 		resource := resource // https://golang.org/doc/faq#closures_and_goroutines
 		g.Go(func() error {
+			tmpfile, err := ioutil.TempFile("", "helm-manifest-*")
+			if err != nil {
+				return errors.Wrap(err, "failed to create a tmp helm manifest file")
+			}
+			defer func() {
+				tmpfile.Close()
+				os.Remove(tmpfile.Name())
+			}()
+
+			if _, err := tmpfile.Write(resource); err != nil {
+				return errors.Wrap(err, "failed to write a tmp helm manifest file")
+			}
+
 			// get resource namespace, fallback to provided namespace if not explicit on resource
 			resourceNamespace, err := kubernetes.GetNamespace(resource)
 			if err != nil {
@@ -201,7 +220,8 @@ func (handler *Handler) updateHelmAppManifest(r *http.Request, manifest []byte, 
 			if resourceNamespace == "" {
 				resourceNamespace = namespace
 			}
-			_, err = handler.kubernetesDeployer.Deploy(r, endpoint, string(resource), resourceNamespace)
+
+			_, err = handler.kubernetesDeployer.Deploy(tokenData.ID, endpoint, []string{tmpfile.Name()}, resourceNamespace)
 			return err
 		})
 	}

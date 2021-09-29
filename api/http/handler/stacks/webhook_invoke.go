@@ -1,10 +1,10 @@
 package stacks
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gofrs/uuid"
+	"github.com/sirupsen/logrus"
 
 	"github.com/portainer/libhttp/response"
 
@@ -31,7 +31,10 @@ func (handler *Handler) webhookInvoke(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	if err = stacks.RedeployWhenChanged(stack.ID, handler.StackDeployer, handler.DataStore, handler.GitService); err != nil {
-		log.Printf("[ERROR] %s\n", err)
+		if _, ok := err.(*stacks.StackAuthorMissingErr); ok {
+			return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: "Autoupdate for the stack isn't available", Err: err}
+		}
+		logrus.WithError(err).Error("failed to update the stack")
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to update the stack", Err: err}
 	}
 

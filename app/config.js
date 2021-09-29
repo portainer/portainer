@@ -56,7 +56,7 @@ angular.module('portainer').config([
       closeButton: true,
       progressBar: true,
       tapToDismiss: false,
-    }
+    };
 
     Terminal.applyAddon(fit);
 

@@ -1,0 +1,11 @@
+.inline-label {
+  display: inline-block;
+  padding: 0 15px;
+  min-width: 200px;
+}
+
+.inline-input {
+  display: inline-block;
+  margin-left: 15px;
+  width: calc(100% - 235px);
+}

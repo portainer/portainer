@@ -3,7 +3,6 @@ package portainer
 import (
 	"context"
 	"io"
-	"net/http"
 	"time"
 
 	gittypes "github.com/portainer/portainer/api/git/types"
@@ -1281,7 +1280,8 @@ type (
 
 	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes environment(endpoint)
 	KubernetesDeployer interface {
-		Deploy(request *http.Request, endpoint *Endpoint, data string, namespace string) (string, error)
+		Deploy(userID UserID, endpoint *Endpoint, manifestFiles []string, namespace string) (string, error)
+		Remove(userID UserID, endpoint *Endpoint, manifestFiles []string, namespace string) (string, error)
 		ConvertCompose(data []byte) ([]byte, error)
 	}
 

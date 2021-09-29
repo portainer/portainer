@@ -15,3 +15,8 @@ export const KubernetesDeployRequestMethods = Object.freeze({
   STRING: 'string',
   URL: 'url',
 });
+
+export const RepositoryMechanismTypes = Object.freeze({
+  WEBHOOK: 'Webhook',
+  INTERVAL: 'Interval',
+});

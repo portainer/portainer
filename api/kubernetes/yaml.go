@@ -12,6 +12,7 @@ import (
 )
 
 const (
+	labelPortainerAppStack   = "io.portainer.kubernetes.application.stack"
 	labelPortainerAppStackID = "io.portainer.kubernetes.application.stackid"
 	labelPortainerAppName    = "io.portainer.kubernetes.application.name"
 	labelPortainerAppOwner   = "io.portainer.kubernetes.application.owner"
@@ -20,17 +21,18 @@ const (
 
 // KubeAppLabels are labels applied to all resources deployed in a kubernetes stack
 type KubeAppLabels struct {
-	StackID int
-	Name    string
-	Owner   string
-	Kind    string
+	StackID   int
+	StackName string
+	Owner     string
+	Kind      string
 }
 
 // ToMap converts KubeAppLabels to a map[string]string
 func (kal *KubeAppLabels) ToMap() map[string]string {
 	return map[string]string{
 		labelPortainerAppStackID: strconv.Itoa(kal.StackID),
-		labelPortainerAppName:    kal.Name,
+		labelPortainerAppStack:   kal.StackName,
+		labelPortainerAppName:    kal.StackName,
 		labelPortainerAppOwner:   kal.Owner,
 		labelPortainerAppKind:    kal.Kind,
 	}
@@ -165,13 +167,6 @@ func addLabels(obj map[string]interface{}, appLabels map[string]string) {
 	// merge app labels with existing labels
 	for k, v := range appLabels {
 		labels[k] = v
-	}
-
-	// fallback to metadata name if name label not explicitly provided
-	if name, ok := labels[labelPortainerAppName]; !ok || name == "" {
-		if n, ok := metadata["name"]; ok {
-			labels[labelPortainerAppName] = n.(string)
-		}
 	}
 
 	metadata["labels"] = labels

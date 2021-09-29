@@ -5,5 +5,6 @@ export const gitFormInfoPanel = {
     configFilePath: '<',
     additionalFiles: '<',
     className: '@',
+    type: '@',
   },
 };

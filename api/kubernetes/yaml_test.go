@@ -39,6 +39,7 @@ metadata:
     io.portainer.kubernetes.application.kind: git
     io.portainer.kubernetes.application.name: best-name
     io.portainer.kubernetes.application.owner: best-owner
+    io.portainer.kubernetes.application.stack: best-name
     io.portainer.kubernetes.application.stackid: "123"
   name: busybox
 spec:
@@ -86,6 +87,7 @@ metadata:
     io.portainer.kubernetes.application.kind: git
     io.portainer.kubernetes.application.name: best-name
     io.portainer.kubernetes.application.owner: best-owner
+    io.portainer.kubernetes.application.stack: best-name
     io.portainer.kubernetes.application.stackid: "123"
   name: busybox
 spec:
@@ -174,6 +176,7 @@ items:
         io.portainer.kubernetes.application.kind: git
         io.portainer.kubernetes.application.name: best-name
         io.portainer.kubernetes.application.owner: best-owner
+        io.portainer.kubernetes.application.stack: best-name
         io.portainer.kubernetes.application.stackid: "123"
       name: web
     spec:
@@ -194,6 +197,7 @@ items:
         io.portainer.kubernetes.application.kind: git
         io.portainer.kubernetes.application.name: best-name
         io.portainer.kubernetes.application.owner: best-owner
+        io.portainer.kubernetes.application.stack: best-name
         io.portainer.kubernetes.application.stackid: "123"
       name: redis
     spec:
@@ -216,6 +220,7 @@ items:
         io.portainer.kubernetes.application.kind: git
         io.portainer.kubernetes.application.name: best-name
         io.portainer.kubernetes.application.owner: best-owner
+        io.portainer.kubernetes.application.stack: best-name
         io.portainer.kubernetes.application.stackid: "123"
       name: web
     spec:
@@ -297,6 +302,7 @@ metadata:
     io.portainer.kubernetes.application.kind: git
     io.portainer.kubernetes.application.name: best-name
     io.portainer.kubernetes.application.owner: best-owner
+    io.portainer.kubernetes.application.stack: best-name
     io.portainer.kubernetes.application.stackid: "123"
   name: busybox
 spec:
@@ -322,6 +328,7 @@ metadata:
     io.portainer.kubernetes.application.kind: git
     io.portainer.kubernetes.application.name: best-name
     io.portainer.kubernetes.application.owner: best-owner
+    io.portainer.kubernetes.application.stack: best-name
     io.portainer.kubernetes.application.stackid: "123"
   name: web
 spec:
@@ -340,6 +347,7 @@ metadata:
     io.portainer.kubernetes.application.kind: git
     io.portainer.kubernetes.application.name: best-name
     io.portainer.kubernetes.application.owner: best-owner
+    io.portainer.kubernetes.application.stack: best-name
     io.portainer.kubernetes.application.stackid: "123"
   name: busybox
 spec:
@@ -388,6 +396,7 @@ metadata:
     io.portainer.kubernetes.application.kind: git
     io.portainer.kubernetes.application.name: best-name
     io.portainer.kubernetes.application.owner: best-owner
+    io.portainer.kubernetes.application.stack: best-name
     io.portainer.kubernetes.application.stackid: "123"
   name: web
 spec:
@@ -402,10 +411,10 @@ spec:
 	}
 
 	labels := KubeAppLabels{
-		StackID: 123,
-		Name:    "best-name",
-		Owner:   "best-owner",
-		Kind:    "git",
+		StackID:   123,
+		StackName: "best-name",
+		Owner:     "best-owner",
+		Kind:      "git",
 	}
 
 	for _, tt := range tests {
@@ -415,81 +424,6 @@ spec:
 			assert.Equal(t, tt.wantOutput, string(result))
 		})
 	}
-}
-
-func Test_AddAppLabels_PickingName_WhenLabelNameIsEmpty(t *testing.T) {
-	labels := KubeAppLabels{
-		StackID: 123,
-		Owner:   "best-owner",
-		Kind:    "git",
-	}
-
-	input := `apiVersion: v1
-kind: Service
-metadata:
-  name: web
-spec:
-  ports:
-    - name: "5000"
-      port: 5000
-      targetPort: 5000
-`
-
-	expected := `apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    io.portainer.kubernetes.application.kind: git
-    io.portainer.kubernetes.application.name: web
-    io.portainer.kubernetes.application.owner: best-owner
-    io.portainer.kubernetes.application.stackid: "123"
-  name: web
-spec:
-  ports:
-    - name: "5000"
-      port: 5000
-      targetPort: 5000
-`
-
-	result, err := AddAppLabels([]byte(input), labels.ToMap())
-	assert.NoError(t, err)
-	assert.Equal(t, expected, string(result))
-}
-
-func Test_AddAppLabels_PickingName_WhenLabelAndMetadataNameAreEmpty(t *testing.T) {
-	labels := KubeAppLabels{
-		StackID: 123,
-		Owner:   "best-owner",
-		Kind:    "git",
-	}
-
-	input := `apiVersion: v1
-kind: Service
-spec:
-  ports:
-    - name: "5000"
-      port: 5000
-      targetPort: 5000
-`
-
-	expected := `apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    io.portainer.kubernetes.application.kind: git
-    io.portainer.kubernetes.application.name: ""
-    io.portainer.kubernetes.application.owner: best-owner
-    io.portainer.kubernetes.application.stackid: "123"
-spec:
-  ports:
-    - name: "5000"
-      port: 5000
-      targetPort: 5000
-`
-
-	result, err := AddAppLabels([]byte(input), labels.ToMap())
-	assert.NoError(t, err)
-	assert.Equal(t, expected, string(result))
 }
 
 func Test_AddAppLabels_HelmApp(t *testing.T) {
@@ -658,10 +592,10 @@ spec:
 
 func Test_DocumentSeperator(t *testing.T) {
 	labels := KubeAppLabels{
-		StackID: 123,
-		Name:    "best-name",
-		Owner:   "best-owner",
-		Kind:    "git",
+		StackID:   123,
+		StackName: "best-name",
+		Owner:     "best-owner",
+		Kind:      "git",
 	}
 
 	input := `apiVersion: v1
@@ -684,6 +618,7 @@ metadata:
     io.portainer.kubernetes.application.kind: git
     io.portainer.kubernetes.application.name: best-name
     io.portainer.kubernetes.application.owner: best-owner
+    io.portainer.kubernetes.application.stack: best-name
     io.portainer.kubernetes.application.stackid: "123"
 ---
 apiVersion: v1
@@ -694,6 +629,7 @@ metadata:
     io.portainer.kubernetes.application.kind: git
     io.portainer.kubernetes.application.name: best-name
     io.portainer.kubernetes.application.owner: best-owner
+    io.portainer.kubernetes.application.stack: best-name
     io.portainer.kubernetes.application.stackid: "123"
 `
 	result, err := AddAppLabels([]byte(input), labels.ToMap())

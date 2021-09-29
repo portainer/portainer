@@ -127,7 +127,7 @@ func (handler *Handler) userCanCreateStack(securityContext *security.RestrictedR
 	return handler.userIsAdminOrEndpointAdmin(user, endpointID)
 }
 
-func (handler *Handler) checkUniqueName(endpoint *portainer.Endpoint, name string, stackID portainer.StackID, swarmMode bool) (bool, error) {
+func (handler *Handler) checkUniqueStackName(endpoint *portainer.Endpoint, name string, stackID portainer.StackID) (bool, error) {
 	stacks, err := handler.DataStore.Stack().Stacks()
 	if err != nil {
 		return false, err
@@ -137,6 +137,15 @@ func (handler *Handler) checkUniqueName(endpoint *portainer.Endpoint, name strin
 		if strings.EqualFold(stack.Name, name) && (stackID == 0 || stackID != stack.ID) && stack.EndpointID == endpoint.ID {
 			return false, nil
 		}
+	}
+
+	return true, nil
+}
+
+func (handler *Handler) checkUniqueStackNameInDocker(endpoint *portainer.Endpoint, name string, stackID portainer.StackID, swarmMode bool) (bool, error) {
+	isUniqueStackName, err := handler.checkUniqueStackName(endpoint, name, stackID)
+	if err != nil {
+		return false, err
 	}
 
 	dockerClient, err := handler.DockerClientFactory.CreateClient(endpoint, "")
@@ -171,7 +180,7 @@ func (handler *Handler) checkUniqueName(endpoint *portainer.Endpoint, name strin
 		}
 	}
 
-	return true, nil
+	return isUniqueStackName, nil
 }
 
 func (handler *Handler) checkUniqueWebhookID(webhookID string) (bool, error) {

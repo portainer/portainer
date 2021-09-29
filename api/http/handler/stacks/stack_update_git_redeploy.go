@@ -2,10 +2,8 @@ package stacks
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"path/filepath"
 	"time"
 
 	"github.com/asaskevich/govalidator"
@@ -216,15 +214,15 @@ func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, end
 		if stack.Namespace == "" {
 			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Invalid namespace", Err: errors.New("Namespace must not be empty when redeploying kubernetes stacks")}
 		}
-		content, err := ioutil.ReadFile(filepath.Join(stack.ProjectPath, stack.GitConfig.ConfigFilePath))
+		tokenData, err := security.RetrieveTokenData(r)
 		if err != nil {
-			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to read deployment.yml manifest file", Err: errors.Wrap(err, "failed to read manifest file")}
+			return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Failed to retrieve user token data", Err: err}
 		}
-		_, err = handler.deployKubernetesStack(r, endpoint, string(content), stack.IsComposeFormat, stack.Namespace, k.KubeAppLabels{
-			StackID: int(stack.ID),
-			Name:    stack.Name,
-			Owner:   stack.CreatedBy,
-			Kind:    "git",
+		_, err = handler.deployKubernetesStack(tokenData.ID, endpoint, stack, k.KubeAppLabels{
+			StackID:   int(stack.ID),
+			StackName: stack.Name,
+			Owner:     tokenData.Username,
+			Kind:      "git",
 		})
 		if err != nil {
 			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to redeploy Kubernetes stack", Err: errors.WithMessage(err, "failed to deploy kube application")}
