@@ -1,5 +1,7 @@
 import { EDITIONS, STATES } from './enums';
 
+import * as FEATURE_IDS from './feature-ids';
+
 export function featureService() {
   const state = {
     currentEdition: undefined,
@@ -16,13 +18,17 @@ export function featureService() {
     // will be loaded on runtime
     const currentEdition = EDITIONS.CE;
     const features = {
-      'k8s-resourcepool-Ibquota': EDITIONS.BE,
-      'k8s-resourcepool-storagequota': EDITIONS.BE,
-      's3-backup-setting': EDITIONS.BE,
-      'k8s-setup-default': EDITIONS.BE,
-      'registry-management': EDITIONS.BE,
-      'activity-audit': EDITIONS.BE,
-      'rbac-roles': EDITIONS.BE,
+      [FEATURE_IDS.K8S_RESOURCE_POOL_LB_QUOTA]: EDITIONS.BE,
+      [FEATURE_IDS.K8S_RESOURCE_POOL_STORAGE_QUOTA]: EDITIONS.BE,
+      [FEATURE_IDS.ACTIVITY_AUDIT]: EDITIONS.BE,
+      [FEATURE_IDS.EXTERNAL_AUTH_LDAP]: EDITIONS.BE,
+      [FEATURE_IDS.HIDE_INTERNAL_AUTH]: EDITIONS.BE,
+      [FEATURE_IDS.HIDE_INTERNAL_AUTHENTICATION_PROMPT]: EDITIONS.BE,
+      [FEATURE_IDS.K8S_SETUP_DEFAULT]: EDITIONS.BE,
+      [FEATURE_IDS.RBAC_ROLES]: EDITIONS.BE,
+      [FEATURE_IDS.REGISTRY_MANAGEMENT]: EDITIONS.BE,
+      [FEATURE_IDS.S3_BACKUP_SETTING]: EDITIONS.BE,
+      [FEATURE_IDS.TEAM_MEMBERSHIP]: EDITIONS.BE,
     };
 
     state.currentEdition = currentEdition;

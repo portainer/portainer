@@ -3,6 +3,8 @@
   border-radius: 15px;
   padding: 5px 10px;
   font-weight: 400;
+  touch-action: all;
+  pointer-events: all;
 }
 
 .be-indicator .icon {
