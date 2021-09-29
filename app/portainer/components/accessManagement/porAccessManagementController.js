@@ -1,12 +1,14 @@
 import _ from 'lodash-es';
-
 import angular from 'angular';
+
+import { RoleTypes } from '@/portainer/rbac/models/role';
 
 class PorAccessManagementController {
   /* @ngInject */
-  constructor(Notifications, AccessService) {
-    this.Notifications = Notifications;
-    this.AccessService = AccessService;
+  constructor(Notifications, AccessService, RoleService, featureService) {
+    Object.assign(this, { Notifications, AccessService, RoleService, featureService });
+
+    this.limitedToBE = false;
 
     this.unauthorizeAccess = this.unauthorizeAccess.bind(this);
     this.updateAction = this.updateAction.bind(this);
@@ -29,10 +31,11 @@ class PorAccessManagementController {
     const entity = this.accessControlledEntity;
     const oldUserAccessPolicies = entity.UserAccessPolicies;
     const oldTeamAccessPolicies = entity.TeamAccessPolicies;
+    const selectedRoleId = this.formValues.selectedRole.Id;
     const selectedUserAccesses = _.filter(this.formValues.multiselectOutput, (access) => access.Type === 'user');
     const selectedTeamAccesses = _.filter(this.formValues.multiselectOutput, (access) => access.Type === 'team');
 
-    const accessPolicies = this.AccessService.generateAccessPolicies(oldUserAccessPolicies, oldTeamAccessPolicies, selectedUserAccesses, selectedTeamAccesses, 0);
+    const accessPolicies = this.AccessService.generateAccessPolicies(oldUserAccessPolicies, oldTeamAccessPolicies, selectedUserAccesses, selectedTeamAccesses, selectedRoleId);
     this.accessControlledEntity.UserAccessPolicies = accessPolicies.userAccessPolicies;
     this.accessControlledEntity.TeamAccessPolicies = accessPolicies.teamAccessPolicies;
     this.updateAccess();
@@ -50,10 +53,40 @@ class PorAccessManagementController {
     this.updateAccess();
   }
 
+  isRoleLimitedToBE(role) {
+    if (!this.limitedToBE) {
+      return false;
+    }
+
+    return role.ID !== RoleTypes.STANDARD;
+  }
+
+  roleLabel(role) {
+    if (!this.limitedToBE) {
+      return role.Name;
+    }
+
+    if (this.isRoleLimitedToBE(role)) {
+      return `${role.Name} (Business Edition Feature)`;
+    }
+
+    return `${role.Name} (Default)`;
+  }
+
   async $onInit() {
     try {
+      if (this.limitedFeature) {
+        this.limitedToBE = this.featureService.isLimitedToBE(this.limitedFeature);
+      }
+
       const entity = this.accessControlledEntity;
       const parent = this.inheritFrom;
+
+      const roles = await this.RoleService.roles();
+      this.roles = _.orderBy(roles, 'Priority', 'asc');
+      this.formValues = {
+        selectedRole: this.roles.find((role) => !this.isRoleLimitedToBE(role)),
+      };
 
       const data = await this.AccessService.accesses(entity, parent, this.roles);
 

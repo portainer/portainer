@@ -4,17 +4,31 @@
       <rd-widget-header icon="fa-user-lock" title-text="Create access"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
+          <div ng-if="ctrl.entityType !== 'registry'" class="form-group">
+            <span class="col-sm-12 small text-warning">
+              <p>
+                <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                Adding user access will require the affected user(s) to logout and login for the changes to be taken into account.
+              </p>
+            </span>
+          </div>
+
           <por-access-management-users-selector options="ctrl.availableUsersAndTeams" value="ctrl.formValues.multiselectOutput"></por-access-management-users-selector>
 
-          <div class="form-group" ng-if="ctrl.entityType != 'registry'">
+          <div class="form-group" ng-if="ctrl.entityType !== 'registry'">
             <label class="col-sm-3 col-lg-2 control-label text-left">
               Role
             </label>
             <div class="col-sm-9 col-lg-4">
-              <span class="text-muted small">
-                <i class="fa fa-user" aria-hidden="true"></i>
-                This feature is available in <a href="https://www.portainer.io/business-upsell?from=k8s-rbac-access" target="_blank"> Portainer Business Edition</a>.
-              </span>
+              <div class="flex items-center">
+                <select
+                  class="form-control"
+                  ng-model="ctrl.formValues.selectedRole"
+                  ng-options="role as ctrl.roleLabel(role) disable when ctrl.isRoleLimitedToBE(role) for role in ctrl.roles"
+                >
+                </select>
+                <be-feature-indicator feature="ctrl.limitedFeature" class="space-left"></be-feature-indicator>
+              </div>
             </div>
           </div>
 
@@ -48,6 +62,10 @@
       title-icon="fa-user-lock"
       table-key="{{ 'access_' + ctrl.entityType }}"
       order-by="Name"
+      show-warning="ctrl.entityType !== 'registry'"
+      is-update-enabled="ctrl.entityType !== 'registry'"
+      show-roles="ctrl.entityType !== 'registry'"
+      roles="ctrl.roles"
       inherit-from="ctrl.inheritFrom"
       dataset="ctrl.authorizedUsersAndTeams"
       update-action="ctrl.updateAction"

@@ -5,6 +5,7 @@
   font-weight: 400;
   touch-action: all;
   pointer-events: all;
+  white-space: nowrap;
 }
 
 .be-indicator .icon {
