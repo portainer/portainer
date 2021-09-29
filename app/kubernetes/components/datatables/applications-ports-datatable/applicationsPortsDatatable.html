@@ -125,7 +125,7 @@
               <td>
                 <!-- LB -->
                 <span ng-if="item.ServiceType === $ctrl.KubernetesServiceTypes.LOAD_BALANCER">
-                  <span> <i class="fa fa-project-diagram" aria-hidden="true" style="margin-right: 2px;"></i> Load balancer </span>
+                  <span> <i class="fa fa-project-diagram" aria-hidden="true" style="margin-right: 2px;"></i> LoadBalancer </span>
                   <span class="text-muted small" style="margin-left: 5px;">
                     <span ng-if="item.LoadBalancerIPAddress">{{ item.LoadBalancerIPAddress }}</span>
                     <span ng-if="!item.LoadBalancerIPAddress">pending</span>
@@ -133,10 +133,10 @@
                 </span>
                 <!-- Internal -->
                 <span ng-if="item.ServiceType === $ctrl.KubernetesServiceTypes.CLUSTER_IP">
-                  <i class="fa fa-list-alt" aria-hidden="true" style="margin-right: 2px;"></i> Internal
+                  <i class="fa fa-list-alt" aria-hidden="true" style="margin-right: 2px;"></i> ClusterIP
                 </span>
                 <!-- Cluster -->
-                <span ng-if="item.ServiceType === $ctrl.KubernetesServiceTypes.NODE_PORT"> <i class="fa fa-list" aria-hidden="true" style="margin-right: 2px;"></i> Cluster </span>
+                <span ng-if="item.ServiceType === $ctrl.KubernetesServiceTypes.NODE_PORT"> <i class="fa fa-list" aria-hidden="true" style="margin-right: 2px;"></i> NodePort </span>
               </td>
               <!-- Exposed port -->
               <td>

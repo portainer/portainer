@@ -12,6 +12,7 @@ import (
 // @summary List users
 // @description List Portainer users.
 // @description Non-administrator users will only be able to list other non-administrator user accounts.
+// @description User passwords are filtered out, and should never be accessible.
 // @description **Access policy**: restricted
 // @tags users
 // @security jwt

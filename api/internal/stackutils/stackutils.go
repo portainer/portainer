@@ -48,7 +48,7 @@ func CreateTempK8SDeploymentFiles(stack *portainer.Stack, kubeDeployer portainer
 				return nil, "", errors.Wrap(err, "failed to convert docker compose file to a kube manifest")
 			}
 		}
-		manifestContent, err = k.AddAppLabels(manifestContent, appLabels)
+		manifestContent, err = k.AddAppLabels(manifestContent, appLabels.ToMap())
 		if err != nil {
 			return nil, "", errors.Wrap(err, "failed to add application labels")
 		}

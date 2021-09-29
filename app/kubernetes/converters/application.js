@@ -299,11 +299,11 @@ class KubernetesApplicationConverter {
     if (app.ServiceType === KubernetesServiceTypes.LOAD_BALANCER) {
       res.PublishingType = KubernetesApplicationPublishingTypes.LOAD_BALANCER;
     } else if (app.ServiceType === KubernetesServiceTypes.NODE_PORT) {
-      res.PublishingType = KubernetesApplicationPublishingTypes.CLUSTER;
+      res.PublishingType = KubernetesApplicationPublishingTypes.NODE_PORT;
     } else if (app.ServiceType === KubernetesServiceTypes.CLUSTER_IP && isIngress) {
       res.PublishingType = KubernetesApplicationPublishingTypes.INGRESS;
     } else {
-      res.PublishingType = KubernetesApplicationPublishingTypes.INTERNAL;
+      res.PublishingType = KubernetesApplicationPublishingTypes.CLUSTER_IP;
     }
 
     if (app.Pods && app.Pods.length) {
