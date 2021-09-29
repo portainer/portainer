@@ -1,4 +1,4 @@
-<div>
+<ng-form name="$ctrl.oauthSettingsForm">
   <div class="col-sm-12 form-section-title">
     Single Sign-On
   </div>
@@ -181,6 +181,10 @@
         placeholder="xxxxxxxxxxxxxxxxxxxx"
         ng-model="$ctrl.state.microsoftTenantID"
         ng-change="$ctrl.onMicrosoftTenantIDChange()"
+        limited-feature-dir="{{::$ctrl.limitedFeature}}"
+        limited-feature-class="limited-be"
+        limited-feature-disabled
+        required
       />
     </div>
   </div>
@@ -191,7 +195,15 @@
       <portainer-tooltip position="bottom" message="Public identifier of the OAuth application"></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="oauth_client_id" ng-model="$ctrl.settings.ClientID" placeholder="xxxxxxxxxxxxxxxxxxxx" />
+      <input
+        type="text"
+        id="oauth_client_id"
+        ng-model="$ctrl.settings.ClientID"
+        placeholder="xxxxxxxxxxxxxxxxxxxx"
+        ng-class="['form-control', { 'limited-be': $ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom' }]"
+        ng-disabled="$ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom'"
+        required
+      />
     </div>
   </div>
 
@@ -200,7 +212,17 @@
       {{ $ctrl.state.provider == 'microsoft' ? 'Application key' : 'Client secret' }}
     </label>
     <div class="col-sm-9 col-lg-10">
-      <input type="password" class="form-control" id="oauth_client_secret" ng-model="$ctrl.settings.ClientSecret" placeholder="xxxxxxxxxxxxxxxxxxxx" autocomplete="new-password" />
+      <input
+        type="password"
+        class="form-control"
+        id="oauth_client_secret"
+        ng-model="$ctrl.settings.ClientSecret"
+        placeholder="xxxxxxxxxxxxxxxxxxxx"
+        autocomplete="new-password"
+        ng-class="['form-control', { 'limited-be': $ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom' }]"
+        ng-disabled="$ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom'"
+        required
+      />
     </div>
   </div>
 
@@ -250,6 +272,7 @@
         <input type="text" class="form-control" id="oauth_redirect_uri" ng-model="$ctrl.settings.RedirectURI" placeholder="http://yourportainer.com/" />
       </div>
     </div>
+
     <div class="form-group">
       <label for="oauth_logout_url" class="col-sm-3 col-lg-2 control-label text-left">
         Logout URL
@@ -262,6 +285,7 @@
         <input type="text" class="form-control" id="oauth_logout_url" ng-model="$ctrl.settings.LogoutURI" />
       </div>
     </div>
+
     <div class="form-group">
       <label for="oauth_user_identifier" class="col-sm-3 col-lg-2 control-label text-left">
         User identifier
@@ -299,4 +323,4 @@
       </a>
     </div>
   </div>
-</div>
+</ng-form>

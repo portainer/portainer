@@ -8,7 +8,7 @@
     <rd-widget>
       <rd-widget-header icon="fa-users" title-text="Authentication"></rd-widget-header>
       <rd-widget-body>
-        <form class="form-horizontal">
+        <form class="form-horizontal" name="authSettingsForm">
           <div class="col-sm-12 form-section-title">
             Configuration
           </div>
@@ -74,7 +74,7 @@
                 type="button"
                 class="btn btn-primary btn-sm"
                 ng-click="saveSettings()"
-                ng-disabled="state.actionInProgress || (settings.AuthenticationMethod === 2 && !isLDAPFormValid()) || (settings.AuthenticationMethod === 3 && !isOAuthTeamMembershipFormValid())"
+                ng-disabled="state.actionInProgress || (settings.AuthenticationMethod === 2 && !isLDAPFormValid()) || (settings.AuthenticationMethod === 3 && !isOAuthTeamMembershipFormValid()) || authSettingsForm.$invalid"
                 button-spinner="state.actionInProgress"
               >
                 <span ng-hide="state.actionInProgress">Save settings</span>

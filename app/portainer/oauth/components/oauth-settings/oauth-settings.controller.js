@@ -3,7 +3,10 @@ import { HIDE_INTERNAL_AUTH } from '@/portainer/feature-flags/feature-ids';
 import providers, { getProviderByUrl } from './providers';
 
 export default class OAuthSettingsController {
-  constructor() {
+  /* @ngInject */
+  constructor(featureService) {
+    this.featureService = featureService;
+
     this.limitedFeature = HIDE_INTERNAL_AUTH;
 
     this.state = {
@@ -34,15 +37,17 @@ export default class OAuthSettingsController {
 
     this.state.overrideConfiguration = false;
 
-    this.settings.AuthorizationURI = provider.authUrl;
-    this.settings.AccessTokenURI = provider.accessTokenUrl;
-    this.settings.ResourceURI = provider.resourceUrl;
-    this.settings.LogoutURI = provider.logoutUrl;
-    this.settings.UserIdentifier = provider.userIdentifier;
-    this.settings.Scopes = provider.scopes;
+    if (!this.isLimitedToBE || providerId === 'custom') {
+      this.settings.AuthorizationURI = provider.authUrl;
+      this.settings.AccessTokenURI = provider.accessTokenUrl;
+      this.settings.ResourceURI = provider.resourceUrl;
+      this.settings.LogoutURI = provider.logoutUrl;
+      this.settings.UserIdentifier = provider.userIdentifier;
+      this.settings.Scopes = provider.scopes;
 
-    if (providerId === 'microsoft' && this.state.microsoftTenantID !== '') {
-      this.onMicrosoftTenantIDChange();
+      if (providerId === 'microsoft' && this.state.microsoftTenantID !== '') {
+        this.onMicrosoftTenantIDChange();
+      }
     }
   }
 
@@ -65,6 +70,12 @@ export default class OAuthSettingsController {
   }
 
   $onInit() {
+    this.isLimitedToBE = this.featureService.isLimitedToBE(this.limitedFeature);
+
+    if (this.isLimitedToBE) {
+      return;
+    }
+
     if (this.settings.RedirectURI === '') {
       this.settings.RedirectURI = window.location.origin;
     }
