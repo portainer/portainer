@@ -132,7 +132,6 @@ func (handler *Handler) createKubernetesStackFromFileContent(w http.ResponseWrit
 		CreationDate:    time.Now().Unix(),
 		CreatedBy:       user.Username,
 		IsComposeFormat: payload.ComposeFormat,
-		OwnerUserID:     user.ID,
 	}
 
 	stackFolder := strconv.Itoa(int(stack.ID))
@@ -221,7 +220,6 @@ func (handler *Handler) createKubernetesStackFromGitRepository(w http.ResponseWr
 		IsComposeFormat: payload.ComposeFormat,
 		AutoUpdate:      payload.AutoUpdate,
 		AdditionalFiles: payload.AdditionalFiles,
-		OwnerUserID:     user.ID,
 	}
 
 	if payload.RepositoryAuthentication {
@@ -318,7 +316,6 @@ func (handler *Handler) createKubernetesStackFromManifestURL(w http.ResponseWrit
 		CreationDate:    time.Now().Unix(),
 		CreatedBy:       user.Username,
 		IsComposeFormat: payload.ComposeFormat,
-		OwnerUserID:     user.ID,
 	}
 
 	var manifestContent []byte

@@ -782,8 +782,6 @@ type (
 		Namespace string `example:"default"`
 		// IsComposeFormat indicates if the Kubernetes stack is created from a Docker Compose file
 		IsComposeFormat bool `example:"false"`
-		// OwnerUserID represents the Stack owner/creator's user ID
-		OwnerUserID UserID `example:"1"`
 	}
 
 	//StackAutoUpdate represents the git auto sync config for stack deployment

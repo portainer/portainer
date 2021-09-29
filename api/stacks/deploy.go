@@ -1,6 +1,7 @@
 package stacks
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -9,6 +10,15 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	log "github.com/sirupsen/logrus"
 )
+
+type StackAuthorMissingErr struct {
+	stackID    int
+	authorName string
+}
+
+func (e *StackAuthorMissingErr) Error() string {
+	return fmt.Sprintf("stack's %v author %s is missing", e.stackID, e.authorName)
+}
 
 func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, datastore portainer.DataStore, gitService portainer.GitService) error {
 	logger := log.WithFields(log.Fields{"stackID": stackID})
@@ -21,6 +31,17 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 
 	if stack.GitConfig == nil {
 		return nil // do nothing if it isn't a git-based stack
+	}
+
+	author := stack.UpdatedBy
+	if author == "" {
+		author = stack.CreatedBy
+	}
+
+	user, err := datastore.User().UserByUsername(author)
+	if err != nil {
+		logger.WithFields(log.Fields{"author": author, "stack": stack.Name, "endpointID": stack.EndpointID}).Warn("cannot autoupdate a stack, stack author user is missing")
+		return &StackAuthorMissingErr{int(stack.ID), author}
 	}
 
 	username, password := "", ""
@@ -58,12 +79,7 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 		return errors.WithMessagef(err, "failed to find the environment %v associated to the stack %v", stack.EndpointID, stack.ID)
 	}
 
-	author := stack.UpdatedBy
-	if author == "" {
-		author = stack.CreatedBy
-	}
-
-	registries, err := getUserRegistries(datastore, author, endpoint.ID)
+	registries, err := getUserRegistries(datastore, user, endpoint.ID)
 	if err != nil {
 		return err
 	}
@@ -81,7 +97,7 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 		}
 	case portainer.KubernetesStack:
 		logger.Debugf("deploying a kube app")
-		err := deployer.DeployKubernetesStack(stack, endpoint)
+		err := deployer.DeployKubernetesStack(stack, endpoint, user)
 		if err != nil {
 			return errors.WithMessagef(err, "failed to deploy a kubternetes app stack %v", stackID)
 		}
@@ -98,15 +114,10 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 	return nil
 }
 
-func getUserRegistries(datastore portainer.DataStore, authorUsername string, endpointID portainer.EndpointID) ([]portainer.Registry, error) {
+func getUserRegistries(datastore portainer.DataStore, user *portainer.User, endpointID portainer.EndpointID) ([]portainer.Registry, error) {
 	registries, err := datastore.Registry().Registries()
 	if err != nil {
 		return nil, errors.WithMessage(err, "unable to retrieve registries from the database")
-	}
-
-	user, err := datastore.User().UserByUsername(authorUsername)
-	if err != nil {
-		return nil, errors.WithMessagef(err, "failed to fetch a stack's author [%s]", authorUsername)
 	}
 
 	if user.Role == portainer.AdministratorRole {
@@ -115,7 +126,7 @@ func getUserRegistries(datastore portainer.DataStore, authorUsername string, end
 
 	userMemberships, err := datastore.TeamMembership().TeamMembershipsByUserID(user.ID)
 	if err != nil {
-		return nil, errors.WithMessagef(err, "failed to fetch memberships of the stack author [%s]", authorUsername)
+		return nil, errors.WithMessagef(err, "failed to fetch memberships of the stack author [%s]", user.Username)
 	}
 
 	filteredRegistries := make([]portainer.Registry, 0, len(registries))
