@@ -827,6 +827,10 @@ json-tree .branch-preview {
 }
 /* !uib-typeahead override */
 
+.block {
+  display: block;
+}
+
 .my-8 {
   margin-top: 2rem;
   margin-bottom: 2rem;

@@ -5,6 +5,7 @@ const SERVER_TYPES = {
 };
 
 import { buildOpenLDAPSettingsModel } from '@/portainer/settings/authentication/ldap/ldap-settings.model';
+import { EXTERNAL_AUTH_LDAP } from '@/portainer/feature-flags/feature-ids';
 
 const DEFAULT_GROUP_FILTER = '(objectClass=groupOfNames)';
 const DEFAULT_USER_FILTER = '(objectClass=inetOrgPerson)';
@@ -18,7 +19,7 @@ export default class LdapSettingsController {
 
     this.boxSelectorOptions = [
       { id: 'ldap_custom', value: SERVER_TYPES.CUSTOM, label: 'Custom', icon: 'fa fa-server' },
-      { id: 'ldap_openldap', value: SERVER_TYPES.OPEN_LDAP, label: 'OpenLDAP', icon: 'fa fa-server' },
+      { id: 'ldap_openldap', value: SERVER_TYPES.OPEN_LDAP, label: 'OpenLDAP', icon: 'fa fa-server', feature: EXTERNAL_AUTH_LDAP },
     ];
 
     this.onTlscaCertChange = this.onTlscaCertChange.bind(this);
