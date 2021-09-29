@@ -176,7 +176,8 @@ func (m *Migrator) updateVolumeResourceControlToDB32() error {
 
 		endpointDockerID, err := snapshotutils.FetchDockerID(snapshot)
 		if err != nil {
-			return fmt.Errorf("failed fetching environment docker id: %w", err)
+			log.Printf("[WARN] [bolt,migrator,v31] [message: failed fetching environment docker id] [err: %s]", err)
+			continue
 		}
 
 		if volumesData, done := snapshot.SnapshotRaw.Volumes.(map[string]interface{}); done {
