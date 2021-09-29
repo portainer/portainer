@@ -24,7 +24,15 @@
 <div class="form-group">
   <label for="ldap_url" class="col-sm-3 col-lg-2 control-label text-left" style="display: flex; flex-wrap: wrap;">
     LDAP Server
-    <button type="button" class="label label-default interactive" style="border: 0;" ng-click="$ctrl.addLDAPUrl()">
+    <button
+      type="button"
+      class="label label-default interactive"
+      style="border: 0;"
+      ng-click="$ctrl.addLDAPUrl()"
+      limited-feature-dir="{{ $ctrl.limitedFeature }}"
+      limited-feature-disabled
+      limited-feature-class="limited-be"
+    >
       <i class="fa fa-plus-circle" aria-hidden="true"></i> Add additional server
     </button>
   </label>
@@ -93,7 +101,17 @@
   connectivity-check="$ctrl.connectivityCheck"
 ></ldap-connectivity-check>
 
-<ldap-custom-user-search style="margin-top: 5px;" settings="$ctrl.settings.SearchSettings" on-search-click="($ctrl.onSearchUsersClick)"></ldap-custom-user-search>
-<ldap-custom-group-search style="margin-top: 5px;" settings="$ctrl.settings.GroupSearchSettings" on-search-click="($ctrl.onSearchGroupsClick)"></ldap-custom-group-search>
+<ldap-custom-user-search
+  style="margin-top: 5px;"
+  settings="$ctrl.settings.SearchSettings"
+  on-search-click="($ctrl.onSearchUsersClick)"
+  limited-feature="$ctrl.limitedFeature"
+></ldap-custom-user-search>
+<ldap-custom-group-search
+  style="margin-top: 5px;"
+  settings="$ctrl.settings.GroupSearchSettings"
+  on-search-click="($ctrl.onSearchGroupsClick)"
+  limited-feature="$ctrl.limitedFeature"
+></ldap-custom-group-search>
 
-<ldap-settings-test-login settings="$ctrl.settings"></ldap-settings-test-login>
+<ldap-settings-test-login settings="$ctrl.settings" limited-feature="$ctrl.limitedFeature"></ldap-settings-test-login>

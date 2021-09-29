@@ -51,9 +51,17 @@
     </button>
   </div>
   <div class="col-sm-12" style="margin-top: 10px;">
-    <button class="btn btm-sm btn-primary" type="button" ng-click="$ctrl.search()">
+    <button
+      class="btn btm-sm btn-primary"
+      type="button"
+      ng-click="$ctrl.search()"
+      limited-feature-dir="{{ $ctrl.limitedFeature }}"
+      limited-feature-disabled
+      limited-feature-class="limited-be"
+    >
       Display User/Group matching
     </button>
+    <be-feature-indicator feature="$ctrl.limitedFeature" class="space-left"></be-feature-indicator>
   </div>
 </div>
 
