@@ -271,6 +271,7 @@ ul.sidebar .sidebar-title .form-control {
 ul.sidebar .sidebar-list a,
 ul.sidebar .sidebar-list .sidebar-sublist a {
   line-height: 36px;
+  letter-spacing: -0.03em;
 }
 
 ul.sidebar .sidebar-list .menu-icon {

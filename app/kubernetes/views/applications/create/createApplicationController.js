@@ -37,6 +37,7 @@ class KubernetesCreateApplicationController {
 
   /* @ngInject */
   constructor(
+    $scope,
     $async,
     $state,
     Notifications,
@@ -54,6 +55,7 @@ class KubernetesCreateApplicationController {
     StackService,
     KubernetesNodesLimitsService
   ) {
+    this.$scope = $scope;
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
@@ -140,6 +142,9 @@ class KubernetesCreateApplicationController {
     this.deployApplicationAsync = this.deployApplicationAsync.bind(this);
     this.setPullImageValidity = this.setPullImageValidity.bind(this);
     this.onChangeFileContent = this.onChangeFileContent.bind(this);
+    this.onServicePublishChange = this.onServicePublishChange.bind(this);
+
+    this.$scope.$watch(() => this.formValues.IsPublishingService, this.onServicePublishChange);
   }
   /* #endregion */
 
@@ -416,6 +421,27 @@ class KubernetesCreateApplicationController {
 
   /* #endregion */
 
+  onServicePublishChange() {
+    // service creation
+    if (this.formValues.PublishedPorts.length === 0) {
+      if (this.formValues.IsPublishingService) {
+        // toggle enabled
+        this.addPublishedPort();
+      }
+      return;
+    }
+
+    // service update
+    if (this.formValues.IsPublishingService) {
+      // toggle enabled
+      this.formValues.PublishedPorts.forEach((port) => (port.NeedsDeletion = false));
+    } else {
+      // toggle disabled
+      // all new ports need to be deleted, existing ports need to be marked as needing deletion
+      this.formValues.PublishedPorts = this.formValues.PublishedPorts.filter((port) => !port.IsNew).map((port) => ({ ...port, NeedsDeletion: true }));
+    }
+  }
+
   /* #region  PUBLISHED PORTS UI MANAGEMENT */
   addPublishedPort() {
     const p = new KubernetesApplicationPublishedPortFormValue();
@@ -476,7 +502,7 @@ class KubernetesCreateApplicationController {
 
   onChangePortMappingNodePort() {
     const state = this.state.duplicates.publishedPorts.nodePorts;
-    if (this.formValues.PublishingType === KubernetesApplicationPublishingTypes.CLUSTER) {
+    if (this.formValues.PublishingType === KubernetesApplicationPublishingTypes.NODE_PORT) {
       const source = _.map(this.formValues.PublishedPorts, (p) => (p.NeedsDeletion ? undefined : p.NodePort));
       const duplicates = KubernetesFormValidationHelper.getDuplicates(source);
       state.refs = duplicates;
@@ -736,10 +762,8 @@ class KubernetesCreateApplicationController {
     return this.state.isEdit && !this.formValues.PublishedPorts[index].IsNew;
   }
 
-  isNotInternalAndHasNoPublishedPorts() {
-    const toDelPorts = _.filter(this.formValues.PublishedPorts, { NeedsDeletion: true });
-    const toKeepPorts = _.without(this.formValues.PublishedPorts, ...toDelPorts);
-    return this.formValues.PublishingType !== KubernetesApplicationPublishingTypes.INTERNAL && toKeepPorts.length === 0;
+  hasNoPublishedPorts() {
+    return this.formValues.PublishedPorts.filter((port) => !port.NeedsDeletion).length === 0;
   }
 
   isEditAndNotNewPlacement(index) {
@@ -771,8 +795,8 @@ class KubernetesCreateApplicationController {
     const invalid = !this.isValid();
     const hasNoChanges = this.isEditAndNoChangesMade();
     const nonScalable = this.isNonScalable();
-    const notInternalNoPorts = this.isNotInternalAndHasNoPublishedPorts();
-    return overflow || autoScalerOverflow || inProgress || invalid || hasNoChanges || nonScalable || notInternalNoPorts;
+    const isPublishingWithoutPorts = this.formValues.IsPublishingService && this.hasNoPublishedPorts();
+    return overflow || autoScalerOverflow || inProgress || invalid || hasNoChanges || nonScalable || isPublishingWithoutPorts;
   }
 
   disableLoadBalancerEdit() {
@@ -926,7 +950,7 @@ class KubernetesCreateApplicationController {
           if (this.savedFormValues) {
             this.formValues.PublishingType = this.savedFormValues.PublishingType;
           } else {
-            this.formValues.PublishingType = this.ApplicationPublishingTypes.INTERNAL;
+            this.formValues.PublishingType = this.ApplicationPublishingTypes.CLUSTER_IP;
           }
         }
         this.formValues.OriginalIngresses = this.ingresses;
@@ -1113,6 +1137,8 @@ class KubernetesCreateApplicationController {
         if (this.state.isEdit) {
           this.nodesLimits.excludesPods(this.application.Pods, this.formValues.CpuLimit, KubernetesResourceReservationHelper.bytesValue(this.formValues.MemoryLimit));
         }
+
+        this.formValues.IsPublishingService = this.formValues.PublishedPorts.length > 0;
 
         this.updateNamespaceLimits();
         this.updateSliders();
