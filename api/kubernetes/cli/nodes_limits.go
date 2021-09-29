@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"context"
+
 	portainer "github.com/portainer/portainer/api"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -9,12 +11,12 @@ import (
 func (kcl *KubeClient) GetNodesLimits() (portainer.K8sNodesLimits, error) {
 	nodesLimits := make(portainer.K8sNodesLimits)
 
-	nodes, err := kcl.cli.CoreV1().Nodes().List(metav1.ListOptions{})
+	nodes, err := kcl.cli.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
 
-	pods, err := kcl.cli.CoreV1().Pods("").List(metav1.ListOptions{})
+	pods, err := kcl.cli.CoreV1().Pods("").List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
