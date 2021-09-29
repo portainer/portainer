@@ -76,7 +76,7 @@ func (deployer *KubernetesDeployer) getToken(request *http.Request, endpoint *po
 	return token, nil
 }
 
-// Deploy will deploy a Kubernetes manifest inside a specific namespace in a Kubernetes environment(endpoint).
+// Deploy will deploy a Kubernetes manifest inside an optional namespace in a Kubernetes environment(endpoint).
 // Otherwise it will use kubectl to deploy the manifest.
 func (deployer *KubernetesDeployer) Deploy(request *http.Request, endpoint *portainer.Endpoint, stackConfig string, namespace string) (string, error) {
 	command := path.Join(deployer.binaryPath, "kubectl")
@@ -103,7 +103,9 @@ func (deployer *KubernetesDeployer) Deploy(request *http.Request, endpoint *port
 	}
 
 	args = append(args, "--token", token)
-	args = append(args, "--namespace", namespace)
+	if namespace != "" {
+		args = append(args, "--namespace", namespace)
+	}
 	args = append(args, "apply", "-f", "-")
 
 	var stderr bytes.Buffer

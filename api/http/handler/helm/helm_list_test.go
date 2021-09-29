@@ -11,6 +11,7 @@ import (
 	"github.com/portainer/libhelm/options"
 	"github.com/portainer/libhelm/release"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/exec/exectest"
 	"github.com/portainer/portainer/api/kubernetes"
 	"github.com/stretchr/testify/assert"
 
@@ -28,9 +29,10 @@ func Test_helmList(t *testing.T) {
 	err = store.User().CreateUser(&portainer.User{Username: "admin", Role: portainer.AdministratorRole})
 	assert.NoError(t, err, "error creating a user")
 
+	kubernetesDeployer := exectest.NewKubernetesDeployer()
 	helmPackageManager := test.NewMockHelmBinaryPackageManager("")
 	kubeConfigService := kubernetes.NewKubeConfigCAService("", "")
-	h := NewHandler(helper.NewTestRequestBouncer(), store, helmPackageManager, kubeConfigService)
+	h := NewHandler(helper.NewTestRequestBouncer(), store, kubernetesDeployer, helmPackageManager, kubeConfigService)
 
 	// Install a single chart.  We expect to get these values back
 	options := options.InstallOptions{Name: "nginx-1", Chart: "nginx", Namespace: "default"}
