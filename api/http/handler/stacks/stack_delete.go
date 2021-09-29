@@ -3,7 +3,10 @@ package stacks
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"os"
+	"path"
 	"strconv"
 
 	"github.com/pkg/errors"
@@ -12,6 +15,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/filesystem"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/stackutils"
@@ -181,7 +185,40 @@ func (handler *Handler) deleteStack(userID portainer.UserID, stack *portainer.St
 		return handler.ComposeStackManager.Down(context.TODO(), stack, endpoint)
 	}
 	if stack.Type == portainer.KubernetesStack {
-		out, err := handler.KubernetesDeployer.Remove(userID, endpoint, stackutils.GetStackFilePaths(stack), stack.Namespace)
+		var manifestFiles []string
+
+		//if it is a compose format kub stack, create a temp dir and convert the manifest files into it
+		//then process the remove operation
+		if stack.IsComposeFormat {
+			fileNames := append([]string{stack.EntryPoint}, stack.AdditionalFiles...)
+			tmpDir, err := ioutil.TempDir("", "kub_delete")
+			if err != nil {
+				return errors.Wrap(err, "failed to create temp directory for deleting kub stack")
+			}
+			defer os.RemoveAll(tmpDir)
+
+			for _, fileName := range fileNames {
+				manifestFilePath := path.Join(tmpDir, fileName)
+				manifestContent, err := ioutil.ReadFile(path.Join(stack.ProjectPath, fileName))
+				if err != nil {
+					return errors.Wrap(err, "failed to read manifest file")
+				}
+
+				manifestContent, err = handler.KubernetesDeployer.ConvertCompose(manifestContent)
+				if err != nil {
+					return errors.Wrap(err, "failed to convert docker compose file to a kube manifest")
+				}
+
+				err = filesystem.WriteToFile(manifestFilePath, []byte(manifestContent))
+				if err != nil {
+					return errors.Wrap(err, "failed to create temp manifest file")
+				}
+				manifestFiles = append(manifestFiles, manifestFilePath)
+			}
+		} else {
+			manifestFiles = stackutils.GetStackFilePaths(stack)
+		}
+		out, err := handler.KubernetesDeployer.Remove(userID, endpoint, manifestFiles, stack.Namespace)
 		return errors.WithMessagef(err, "failed to remove kubernetes resources: %q", out)
 	}
 	return fmt.Errorf("unsupported stack type: %v", stack.Type)
