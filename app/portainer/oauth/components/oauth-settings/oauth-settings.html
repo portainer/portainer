@@ -5,23 +5,27 @@
 
   <!-- SSO -->
   <div class="form-group">
-    <label for="use-sso" class="control-label col-sm-2 text-left" style="padding-top: 0;">
-      Use SSO
-      <portainer-tooltip position="bottom" message="When using SSO the OAuth provider is not forced to prompt for credentials."></portainer-tooltip>
-    </label>
-    <div class="col-sm-9">
-      <label class="switch"> <input id="use-sso" type="checkbox" ng-model="$ctrl.settings.SSO" ng-change="$ctrl.updateSSO()" /><i></i> </label>
+    <div class="col-sm-12">
+      <por-switch-field
+        label="Use SSO"
+        tooltip="When using SSO the OAuth provider is not forced to prompt for credentials."
+        name="use-sso"
+        ng-model="$ctrl.settings.SSO"
+        on-change="$ctrl.updateSSO()"
+      ></por-switch-field>
     </div>
   </div>
   <!-- !SSO -->
 
   <!-- HideInternalAuth -->
   <div class="form-group" ng-if="$ctrl.settings.SSO">
-    <label for="hide-internal-auth" class="control-label col-sm-2 text-left" style="padding-top: 0;">
-      Hide internal authentication prompt
-    </label>
-    <div class="col-sm-9">
-      <label class="switch"> <input id="hide-internal-auth" type="checkbox" ng-model="$ctrl.settings.HideInternalAuth" /><i></i> </label>
+    <div class="col-sm-12">
+      <por-switch-field
+        label="Hide internal authentication prompt"
+        name="hide-internal-auth"
+        feature="$ctrl.limitedFeature"
+        ng-model="$ctrl.settings.HideInternalAuth"
+      ></por-switch-field>
     </div>
   </div>
   <!-- !HideInternalAuth -->
@@ -79,11 +83,19 @@
     </div>
   </div>
 
-  <auto-team-membership-toggle ng-model="$ctrl.settings.OAuthAutoMapTeamMemberships">
-    <field-description>
+  <div class="col-sm-12 form-section-title">
+    Team membership
+  </div>
+  <div class="form-group">
+    <div class="col-sm-12 text-muted small">
       Automatic team membership synchronizes the team membership based on a custom claim in the token from the OAuth provider.
-    </field-description>
-  </auto-team-membership-toggle>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-12">
+      <por-switch-field label="Automatic team membership" name="tls" feature="$ctrl.limitedFeature" ng-model="$ctrl.settings.OAuthAutoMapTeamMemberships"></por-switch-field>
+    </div>
+  </div>
 
   <div ng-if="$ctrl.settings.OAuthAutoMapTeamMemberships">
     <div class="form-group">

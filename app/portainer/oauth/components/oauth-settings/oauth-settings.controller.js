@@ -1,7 +1,11 @@
+import { HIDE_INTERNAL_AUTH } from '@/portainer/feature-flags/feature-ids';
+
 import providers, { getProviderByUrl } from './providers';
 
 export default class OAuthSettingsController {
   constructor() {
+    this.limitedFeature = HIDE_INTERNAL_AUTH;
+
     this.state = {
       provider: 'custom',
       overrideConfiguration: false,
