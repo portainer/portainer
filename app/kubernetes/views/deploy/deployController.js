@@ -8,7 +8,19 @@ import { KubernetesDeployManifestTypes, KubernetesDeployBuildMethods, Kubernetes
 import { buildOption } from '@/portainer/components/box-selector';
 class KubernetesDeployController {
   /* @ngInject */
-  constructor($async, $state, $window, Authentication, ModalService, Notifications, EndpointProvider, KubernetesResourcePoolService, StackService, WebhookHelper) {
+  constructor(
+    $async,
+    $state,
+    $window,
+    Authentication,
+    ModalService,
+    Notifications,
+    EndpointProvider,
+    KubernetesResourcePoolService,
+    StackService,
+    WebhookHelper,
+    CustomTemplateService
+  ) {
     this.$async = $async;
     this.$state = $state;
     this.$window = $window;
@@ -19,6 +31,7 @@ class KubernetesDeployController {
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.StackService = StackService;
     this.WebhookHelper = WebhookHelper;
+    this.CustomTemplateService = CustomTemplateService;
 
     this.deployOptions = [
       buildOption('method_kubernetes', 'fa fa-cubes', 'Kubernetes', 'Kubernetes manifest format', KubernetesDeployManifestTypes.KUBERNETES),

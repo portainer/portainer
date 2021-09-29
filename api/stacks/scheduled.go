@@ -3,8 +3,6 @@ package stacks
 import (
 	"time"
 
-	log "github.com/sirupsen/logrus"
-
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/scheduler"
@@ -21,10 +19,8 @@ func StartStackSchedules(scheduler *scheduler.Scheduler, stackdeployer StackDepl
 			return errors.Wrap(err, "Unable to parse auto update interval")
 		}
 		stackID := stack.ID // to be captured by the scheduled function
-		jobID := scheduler.StartJobEvery(d, func() {
-			if err := RedeployWhenChanged(stackID, stackdeployer, datastore, gitService); err != nil {
-				log.WithFields(log.Fields{"stackID": stackID}).WithError(err).Error("fail to auto-deploy a stack")
-			}
+		jobID := scheduler.StartJobEvery(d, func() error {
+			return RedeployWhenChanged(stackID, stackdeployer, datastore, gitService)
 		})
 
 		stack.AutoUpdate.JobID = jobID

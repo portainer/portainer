@@ -27,15 +27,17 @@ type Handler struct {
 	requestBouncer     requestBouncer
 	dataStore          portainer.DataStore
 	kubeConfigService  kubernetes.KubeConfigService
+	kubernetesDeployer portainer.KubernetesDeployer
 	helmPackageManager libhelm.HelmPackageManager
 }
 
-// NewHandler creates a handler to manage environment(endpoint) group operations.
-func NewHandler(bouncer requestBouncer, dataStore portainer.DataStore, helmPackageManager libhelm.HelmPackageManager, kubeConfigService kubernetes.KubeConfigService) *Handler {
+// NewHandler creates a handler to manage endpoint group operations.
+func NewHandler(bouncer requestBouncer, dataStore portainer.DataStore, kubernetesDeployer portainer.KubernetesDeployer, helmPackageManager libhelm.HelmPackageManager, kubeConfigService kubernetes.KubeConfigService) *Handler {
 	h := &Handler{
 		Router:             mux.NewRouter(),
 		requestBouncer:     bouncer,
 		dataStore:          dataStore,
+		kubernetesDeployer: kubernetesDeployer,
 		helmPackageManager: helmPackageManager,
 		kubeConfigService:  kubeConfigService,
 	}

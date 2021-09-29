@@ -40,6 +40,8 @@ type settingsUpdatePayload struct {
 	EnableTelemetry *bool `example:"false"`
 	// Helm repository URL
 	HelmRepositoryURL *string `example:"https://charts.bitnami.com/bitnami"`
+	// Kubectl Shell Image
+	KubectlShellImage *string `example:"portainer/kubectl-shell:latest"`
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
@@ -176,6 +178,10 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	tlsError := handler.updateTLS(settings)
 	if tlsError != nil {
 		return tlsError
+	}
+
+	if payload.KubectlShellImage != nil {
+		settings.KubectlShellImage = *payload.KubectlShellImage
 	}
 
 	err = handler.DataStore.Settings().UpdateSettings(settings)

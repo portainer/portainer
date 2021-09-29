@@ -14,7 +14,7 @@ import (
 )
 
 func TestMigrateStackEntryPoint(t *testing.T) {
-	dbConn, err := bolt.Open(path.Join(t.TempDir(), "portainer-ee-mig-33.db"), 0600, &bolt.Options{Timeout: 1 * time.Second})
+	dbConn, err := bolt.Open(path.Join(t.TempDir(), "portainer-ee-mig-34.db"), 0600, &bolt.Options{Timeout: 1 * time.Second})
 	assert.NoError(t, err, "failed to init testing DB connection")
 	defer dbConn.Close()
 

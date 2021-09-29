@@ -221,7 +221,7 @@ func (handler *Handler) deployStack(r *http.Request, stack *portainer.Stack, end
 		_, err = handler.deployKubernetesStack(tokenData.ID, endpoint, stack, k.KubeAppLabels{
 			StackID:   int(stack.ID),
 			StackName: stack.Name,
-			Owner:     stack.CreatedBy,
+			Owner:     tokenData.Username,
 			Kind:      "git",
 		})
 		if err != nil {

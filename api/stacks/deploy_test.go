@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
-	bolt "github.com/portainer/portainer/api/bolt/bolttest"
+	"github.com/portainer/portainer/api/bolt"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/stretchr/testify/assert"
 )
@@ -35,7 +35,7 @@ func (s *noopDeployer) DeployComposeStack(stack *portainer.Stack, endpoint *port
 	return nil
 }
 
-func (s *noopDeployer) DeployKubernetesStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+func (s *noopDeployer) DeployKubernetesStack(stack *portainer.Stack, endpoint *portainer.Endpoint, user *portainer.User) error {
 	return nil
 }
 
@@ -52,7 +52,11 @@ func Test_redeployWhenChanged_DoesNothingWhenNotAGitBasedStack(t *testing.T) {
 	store, teardown := bolt.MustNewTestStore(true)
 	defer teardown()
 
-	err := store.Stack().CreateStack(&portainer.Stack{ID: 1})
+	admin := &portainer.User{ID: 1, Username: "admin"}
+	err := store.User().CreateUser(admin)
+	assert.NoError(t, err, "error creating an admin")
+
+	err = store.Stack().CreateStack(&portainer.Stack{ID: 1, CreatedBy: "admin"})
 	assert.NoError(t, err, "failed to create a test stack")
 
 	err = RedeployWhenChanged(1, nil, store, &gitService{nil, ""})
@@ -65,8 +69,13 @@ func Test_redeployWhenChanged_DoesNothingWhenNoGitChanges(t *testing.T) {
 
 	tmpDir, _ := ioutil.TempDir("", "stack")
 
-	err := store.Stack().CreateStack(&portainer.Stack{
+	admin := &portainer.User{ID: 1, Username: "admin"}
+	err := store.User().CreateUser(admin)
+	assert.NoError(t, err, "error creating an admin")
+
+	err = store.Stack().CreateStack(&portainer.Stack{
 		ID:          1,
+		CreatedBy:   "admin",
 		ProjectPath: tmpDir,
 		GitConfig: &gittypes.RepoConfig{
 			URL:           "url",
@@ -84,8 +93,13 @@ func Test_redeployWhenChanged_FailsWhenCannotClone(t *testing.T) {
 	store, teardown := bolt.MustNewTestStore(true)
 	defer teardown()
 
-	err := store.Stack().CreateStack(&portainer.Stack{
-		ID: 1,
+	admin := &portainer.User{ID: 1, Username: "admin"}
+	err := store.User().CreateUser(admin)
+	assert.NoError(t, err, "error creating an admin")
+
+	err = store.Stack().CreateStack(&portainer.Stack{
+		ID:        1,
+		CreatedBy: "admin",
 		GitConfig: &gittypes.RepoConfig{
 			URL:           "url",
 			ReferenceName: "ref",
@@ -155,12 +169,12 @@ func Test_getUserRegistries(t *testing.T) {
 
 	endpointID := 123
 
-	admin := portainer.User{ID: 1, Username: "admin", Role: portainer.AdministratorRole}
-	err := store.User().CreateUser(&admin)
+	admin := &portainer.User{ID: 1, Username: "admin", Role: portainer.AdministratorRole}
+	err := store.User().CreateUser(admin)
 	assert.NoError(t, err, "error creating an admin")
 
-	user := portainer.User{ID: 2, Username: "user", Role: portainer.StandardUserRole}
-	err = store.User().CreateUser(&user)
+	user := &portainer.User{ID: 2, Username: "user", Role: portainer.StandardUserRole}
+	err = store.User().CreateUser(user)
 	assert.NoError(t, err, "error creating a user")
 
 	team := portainer.Team{ID: 1, Name: "team"}
@@ -212,13 +226,13 @@ func Test_getUserRegistries(t *testing.T) {
 	assert.NoError(t, err, "couldn't create a registry")
 
 	t.Run("admin should has access to all registries", func(t *testing.T) {
-		registries, err := getUserRegistries(store, admin.Username, portainer.EndpointID(endpointID))
+		registries, err := getUserRegistries(store, admin, portainer.EndpointID(endpointID))
 		assert.NoError(t, err)
 		assert.ElementsMatch(t, []portainer.Registry{registryReachableByUser, registryReachableByTeam, registryRestricted}, registries)
 	})
 
 	t.Run("regular user has access to registries allowed to him and/or his team", func(t *testing.T) {
-		registries, err := getUserRegistries(store, user.Username, portainer.EndpointID(endpointID))
+		registries, err := getUserRegistries(store, user, portainer.EndpointID(endpointID))
 		assert.NoError(t, err)
 		assert.ElementsMatch(t, []portainer.Registry{registryReachableByUser, registryReachableByTeam}, registries)
 	})

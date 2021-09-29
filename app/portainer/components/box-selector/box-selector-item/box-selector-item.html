@@ -14,7 +14,7 @@
     ng-value="$ctrl.option.value"
     ng-disabled="$ctrl.disabled"
   />
-  <label for="{{ $ctrl.option.id }}" ng-click="$ctrl.onChange($ctrl.option.value)" t>
+  <label for="{{ $ctrl.option.id }}" ng-click="$ctrl.onChange($ctrl.option.value)" t data-cy="edgeStackCreate-deploymentSelector_{{ $ctrl.option.value }}">
     <div class="boxselector_header">
       <i ng-class="$ctrl.option.icon" aria-hidden="true" style="margin-right: 2px;"></i>
       {{ $ctrl.option.label }}

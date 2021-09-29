@@ -287,7 +287,7 @@ json-tree .branch-preview {
   margin-top: 15px;
 }
 
-.summary {
+.bold {
   color: var(--text-summary-color);
   font-weight: 700;
 }

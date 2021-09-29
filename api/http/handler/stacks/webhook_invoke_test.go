@@ -6,15 +6,13 @@ import (
 	"testing"
 
 	"github.com/gofrs/uuid"
-	"github.com/stretchr/testify/assert"
-
 	portainer "github.com/portainer/portainer/api"
-
-	"github.com/portainer/portainer/api/bolt/bolttest"
+	"github.com/portainer/portainer/api/bolt"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestHandler_webhookInvoke(t *testing.T) {
-	store, teardown := bolttest.MustNewTestStore(true)
+	store, teardown := bolt.MustNewTestStore(true)
 	defer teardown()
 
 	webhookID := newGuidString(t)

@@ -4,7 +4,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
-func (m *Migrator) migrateDBVersionTo33() error {
+func (m *Migrator) migrateDBVersionToDB34() error {
 	err := migrateStackEntryPoint(m.stackService)
 	if err != nil {
 		return err

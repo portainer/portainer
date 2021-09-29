@@ -25,34 +25,6 @@
           </form>
           <!-- !resource-reservation -->
 
-          <!-- cluster-status -->
-          <div class="col-sm-12 form-section-title">
-            Cluster status
-          </div>
-
-          <table class="table">
-            <tbody>
-              <tr class="text-muted">
-                <td style="border-top: none; width: 25%;">Component</td>
-                <td style="border-top: none; width: 25%;">Status</td>
-                <td style="border-top: none; width: 50%;" ng-if="ctrl.hasUnhealthyComponentStatus">Error</td>
-              </tr>
-              <tr ng-repeat="cs in ctrl.componentStatuses">
-                <td style="width: 25%;">
-                  {{ cs.ComponentName }}
-                </td>
-                <td style="width: 25%;">
-                  <span ng-if="cs.Healthy"><i class="fa fa-check green-icon" aria-hidden="true" style="margin-right: 2px;"></i> healthy</span>
-                  <span ng-if="!cs.Healthy"><i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i> unhealthy</span>
-                </td>
-                <td ng-if="ctrl.hasUnhealthyComponentStatus" style="width: 50%;">
-                  {{ cs.ErrorMessage !== '' ? cs.ErrorMessage : '-' }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <!-- !cluster-status -->
-
           <!-- leader-status -->
           <div ng-if="ctrl.systemEndpoints.length > 0">
             <div class="col-sm-12 form-section-title">

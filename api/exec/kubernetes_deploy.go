@@ -95,9 +95,9 @@ func (deployer *KubernetesDeployer) command(operation string, userID portainer.U
 		command = path.Join(deployer.binaryPath, "kubectl.exe")
 	}
 
-	args := []string{
-		"--token", token,
-		"--namespace", namespace,
+	args := []string{"--token", token}
+	if namespace != "" {
+		args = append(args, "--namespace", namespace)
 	}
 
 	if endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
