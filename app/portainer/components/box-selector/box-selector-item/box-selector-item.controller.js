@@ -8,7 +8,7 @@ export default class BoxSelectorItemController {
 
   $onInit() {
     if (this.option.feature) {
-      this.limitedToBE = this.featureService.isLimitedToBE(this.feature);
+      this.limitedToBE = this.featureService.isLimitedToBE(this.option.feature);
     }
   }
 }
