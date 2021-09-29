@@ -24,7 +24,7 @@
           uib-typeahead="image for image in $ctrl.availableImages | filter:$viewValue | limitTo:5"
           ng-model="$ctrl.model.Image"
           name="image_name"
-          placeholder="e.g. myImage:myTag"
+          placeholder="e.g. my-image:my-tag"
           ng-change="$ctrl.onImageChange()"
           required
           data-cy="component-imageInput"
@@ -54,7 +54,7 @@
       </span>
       <label for="image_name" ng-class="$ctrl.labelClass" class="control-label text-left">Image </label>
       <div ng-class="$ctrl.inputClass">
-        <input type="text" class="form-control" ng-model="$ctrl.model.Image" name="image_name" placeholder="e.g. registry:port/myImage:myTag" required />
+        <input type="text" class="form-control" ng-model="$ctrl.model.Image" name="image_name" placeholder="e.g. registry:port/my-image:my-tag" required />
       </div>
     </div>
   </div>

@@ -72,8 +72,12 @@ class porImageRegistryController {
         const registries = await this.EndpointService.registries(this.endpoint.Id, this.namespace);
         this.registries = _.concat(this.defaultRegistry, registries);
 
-        const id = this.model.Registry.Id;
-        const registry = _.find(this.registries, { Id: id });
+        console.log(this.serviceInfo);
+        //const id = this.model.Registry.Id;
+        //const registry = _.find(this.registries, { Id: id });
+
+        const registry = this.registries[1];
+        this.model.Registry = registry;
         if (!registry) {
           this.model.Registry = this.defaultRegistry;
         }
@@ -99,8 +103,8 @@ class porImageRegistryController {
     });
   }
 
-  $onChanges({ namespace, endpoint }) {
-    if ((namespace || endpoint) && this.endpoint.Id) {
+  $onChanges({ namespace, endpoint, serviceInfo }) {
+    if ((namespace || endpoint || serviceInfo) && this.endpoint.Id) {
       this.reloadRegistries();
     }
   }
