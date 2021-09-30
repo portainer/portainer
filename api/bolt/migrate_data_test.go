@@ -17,12 +17,23 @@ func testVersion(store *Store, versionWant int, t *testing.T) {
 }
 
 func TestMigrateData(t *testing.T) {
-	t.Run("MigrateData for New Store", func(t *testing.T) {
+	t.Run("MigrateData for New Store & Re-Open Check", func(t *testing.T) {
 		store, teardown := MustNewTestStore(false)
 		defer teardown()
+
+		if !store.IsNew() {
+			t.Error("Expect a new DB")
+		}
+
 		store.MigrateData(false)
+
 		testVersion(store, portainer.DBVersion, t)
 		store.Close()
+
+		store.Open()
+		if store.IsNew() {
+			t.Error("Expect store to NOT be new DB")
+		}
 	})
 
 	tests := []struct {
