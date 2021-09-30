@@ -2,6 +2,7 @@
 import { PortainerEndpointCreationTypes } from 'Portainer/models/endpoint/models';
 import { buildOption } from '@/portainer/components/box-selector';
 import { EndpointSecurityFormData } from 'Portainer/components/endpointSecurity/porEndpointSecurityModel';
+import { getAgentShortVersion } from 'Portainer/views/endpoints/helpers';
 
 export default class WizardDockerController {
   /* @ngInject */
@@ -200,9 +201,12 @@ export default class WizardDockerController {
         securityFormData: new EndpointSecurityFormData(),
       };
 
+      const agentVersion = this.StateManager.getState().application.version;
+      const agentShortVersion = getAgentShortVersion(agentVersion);
+
       this.command = {
-        linuxCommand: `curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent `,
-        winCommand: `curl -L https://downloads.portainer.io/agent-stack-windows.yml -o agent-stack-windows.yml && docker stack deploy --compose-file=agent-stack-windows.yml portainer-agent `,
+        linuxCommand: `curl -L https://downloads.portainer.io/agent-stack-ce${agentShortVersion}.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent `,
+        winCommand: `curl -L https://downloads.portainer.io/agent-stack-ce${agentShortVersion}-windows.yml -o agent-stack-windows.yml && docker stack deploy --compose-file=agent-stack-windows.yml portainer-agent `,
         linuxSocket: `-v "/var/run/docker.sock:/var/run/docker.sock" `,
         winSocket: `-v \.\pipe\docker_engine:\.\pipe\docker_engine `,
       };
