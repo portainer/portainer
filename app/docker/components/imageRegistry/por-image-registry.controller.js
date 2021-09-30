@@ -72,14 +72,18 @@ class porImageRegistryController {
         const registries = await this.EndpointService.registries(this.endpoint.Id, this.namespace);
         this.registries = _.concat(this.defaultRegistry, registries);
 
-        console.log(this.serviceInfo);
-        //const id = this.model.Registry.Id;
-        //const registry = _.find(this.registries, { Id: id });
-
-        const registry = this.registries[1];
-        this.model.Registry = registry;
-        if (!registry) {
+        if (!this.serviceInfo) {
           this.model.Registry = this.defaultRegistry;
+          return;
+        }
+
+        const image = this.serviceInfo.Model.Spec.TaskTemplate.ContainerSpec.Image;
+        const serviceRegistry = await this.RegistryService.retrievePorRegistryModelFromRepository(image, this.endpoint.Id);
+
+        const serviceMatchesRegistry = serviceRegistry && serviceRegistry.Registry && image.indexOf(serviceRegistry.Registry.URL) > -1;
+        if (serviceMatchesRegistry) {
+          this.model.Image = serviceRegistry.Image;
+          this.model.Registry = serviceRegistry.Registry;
         }
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to retrieve registries');
