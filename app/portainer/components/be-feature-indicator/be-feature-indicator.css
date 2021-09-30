@@ -7,7 +7,8 @@
   pointer-events: all;
 }
 
-.be-indicator .icon {
+.be-indicator .icon,
+.be-indicator .fas {
   color: #000000;
 }
 
