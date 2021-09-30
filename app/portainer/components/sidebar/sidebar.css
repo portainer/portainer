@@ -92,7 +92,7 @@ ul.sidebar .sidebar-list a:hover .menu-icon {
 ul.sidebar .sidebar-list .menu-icon {
   padding-right: 30px;
   line-height: 40px;
-  width: fit-content;
+  width: 70px;
 }
 
 #page-wrapper:not(.open) ul.sidebar {
