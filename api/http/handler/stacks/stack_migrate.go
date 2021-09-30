@@ -2,6 +2,7 @@ package stacks
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"

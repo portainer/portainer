@@ -190,7 +190,7 @@ func (manager *SwarmStackManager) retrieveConfigurationFromDisk(path string) (ma
 }
 
 func (manager *SwarmStackManager) NormalizeStackName(name string) string {
-	r := regexp.MustCompile("[^a-z0-9]+")
+	r := regexp.MustCompile("[^-_a-z0-9]+")
 	return r.ReplaceAllString(strings.ToLower(name), "")
 }
 
