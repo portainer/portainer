@@ -16,3 +16,7 @@ form.limited-be {
   touch-action: none;
   display: block;
 }
+
+.form-control.limited-be[disabled] {
+  background-color: transparent !important;
+}
