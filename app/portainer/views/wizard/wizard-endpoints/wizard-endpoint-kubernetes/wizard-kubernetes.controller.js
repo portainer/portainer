@@ -32,7 +32,7 @@ export default class WizardKubernetesController {
       // Check name is duplicated or not
       let nameUsed = await this.NameValidator.validateEnvironmentName(name);
       if (nameUsed) {
-        this.Notifications.error('Failure', true, 'This name is been used, please try another one');
+        this.Notifications.error('Failure', null, 'This name is been used, please try another one');
         return;
       }
       await this.addRemoteEndpoint(name, creationType, url, publicUrl, groupId, tagIds, tls, tlsSkipVerify, tlsSkipClientVerify, tlsCaFile, tlsCertFile, tlsKeyFile);

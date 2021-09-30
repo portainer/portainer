@@ -357,7 +357,7 @@ class KubernetesResourcePoolController {
       }, new KubernetesResourceReservation());
       this.state.resourceUsage = namespaceResourceUsage;
     } catch (err) {
-      this.Notifications.error('Failure', 'Unable to retrieve namespace resource usage', err);
+      this.Notifications.error('Failure', err, 'Unable to retrieve namespace resource usage');
     }
   }
 

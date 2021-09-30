@@ -64,7 +64,7 @@ export default class WizardDockerController {
       // Check name is duplicated or not
       const nameUsed = await this.NameValidator.validateEnvironmentName(name);
       if (nameUsed) {
-        this.Notifications.error('Failure', true, 'This name is been used, please try another one');
+        this.Notifications.error('Failure', null, 'This name is been used, please try another one');
         return;
       }
       switch (type) {
