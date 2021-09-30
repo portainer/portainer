@@ -214,7 +214,11 @@ func findResourcesToUpdateForDB32(dockerID string, volumesData map[string]interf
 	volumes := volumesData["Volumes"].([]interface{})
 	for _, volumeMeta := range volumes {
 		volume := volumeMeta.(map[string]interface{})
-		volumeName := volume["Name"].(string)
+		volumeName, nameExist := volume["Name"].(string)
+		if !nameExist {
+			continue
+		}
+
 		oldResourceID := fmt.Sprintf("%s%s", volumeName, volume["CreatedAt"].(string))
 		resourceControl, ok := volumeResourceControls[oldResourceID]
 
