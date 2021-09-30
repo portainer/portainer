@@ -279,6 +279,7 @@
                   name="cron_rule"
                   ng-model="formValues.cronRule"
                   limited-feature-dir="{{::s3BackupFeatureId}}"
+                  limited-feature-disabled
                   limited-feature-class="limited-be"
                   required
                   cronRule
@@ -298,6 +299,7 @@
                   ng-model="formValues.accessKeyId"
                   ng-required="formValues.scheduleAutomaticBackups"
                   limited-feature-dir="{{::s3BackupFeatureId}}"
+                  limited-feature-disabled
                   limited-feature-class="limited-be"
                 />
               </div>
@@ -315,6 +317,7 @@
                   ng-model="formValues.secretAccessKey"
                   ng-required="formValues.scheduleAutomaticBackups"
                   limited-feature-dir="{{::s3BackupFeatureId}}"
+                  limited-feature-disabled
                   limited-feature-class="limited-be"
                 />
               </div>
@@ -333,6 +336,7 @@
                   ng-model="formValues.region"
                   ng-required="formValues.scheduleAutomaticBackups"
                   limited-feature-dir="{{::s3BackupFeatureId}}"
+                  limited-feature-disabled
                   limited-feature-class="limited-be"
                 />
               </div>
@@ -350,6 +354,7 @@
                   ng-model="formValues.bucketName"
                   ng-required="formValues.scheduleAutomaticBackups"
                   limited-feature-dir="{{::s3BackupFeatureId}}"
+                  limited-feature-disabled
                   limited-feature-class="limited-be"
                 />
               </div>
