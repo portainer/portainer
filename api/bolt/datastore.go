@@ -120,10 +120,8 @@ func (store *Store) Open() error {
 		return err
 	}
 
-	// if failed to retrieve DBVersion from database treat it as a new store
-	if _, err := store.VersionService.DBVersion(); err != nil {
-		store.isNew = true
-	} else {
+	// if we have DBVersion in the database then ensure we flag this as NOT a new store
+	if _, err := store.VersionService.DBVersion(); err == nil {
 		store.isNew = false
 	}
 
