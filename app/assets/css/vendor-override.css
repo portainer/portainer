@@ -408,3 +408,7 @@ fieldset[disabled] .btn {
   pointer-events: none;
   touch-action: none;
 }
+
+.multiSelect.inlineBlock button {
+  margin: 0;
+}
