@@ -90,20 +90,13 @@ func (store *Store) edition() portainer.SoftwareEdition {
 }
 
 // NewStore initializes a new Store and the associated services
-func NewStore(storePath string, fileService portainer.FileService) (*Store, error) {
-	store := &Store{
+func NewStore(storePath string, fileService portainer.FileService) *Store {
+	return &Store{
 		path:        storePath,
 		fileService: fileService,
 		isNew:       true,
 		connection:  &internal.DbConnection{},
 	}
-
-	databasePath := path.Join(storePath, databaseFileName)
-	if _, err := fileService.FileExists(databasePath); err != nil {
-		return nil, err
-	}
-
-	return store, nil
 }
 
 // Open opens and initializes the BoltDB database.
