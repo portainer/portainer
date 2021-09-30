@@ -60,8 +60,6 @@
 .switch.limited i {
   opacity: 1;
   cursor: not-allowed;
-  padding-right: 0;
-  padding-left: var(--switch-size);
 }
 
 .switch.business i {
