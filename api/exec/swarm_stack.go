@@ -8,7 +8,6 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"regexp"
 	"runtime"
 	"strings"
 
@@ -190,8 +189,7 @@ func (manager *SwarmStackManager) retrieveConfigurationFromDisk(path string) (ma
 }
 
 func (manager *SwarmStackManager) NormalizeStackName(name string) string {
-	r := regexp.MustCompile("[^a-z0-9]+")
-	return r.ReplaceAllString(strings.ToLower(name), "")
+	return stackNameNormalizeRegex.ReplaceAllString(strings.ToLower(name), "")
 }
 
 func configureFilePaths(args []string, filePaths []string) []string {

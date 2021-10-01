@@ -45,6 +45,12 @@ type Handler struct {
 	StackDeployer       stacks.StackDeployer
 }
 
+func stackExistsError(name string) (*httperror.HandlerError){
+	msg := fmt.Sprintf("A stack with the normalized name '%s' already exists", name)
+	err := errors.New(msg)
+	return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: msg, Err: err}
+}
+
 // NewHandler creates a handler to manage stack operations.
 func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{

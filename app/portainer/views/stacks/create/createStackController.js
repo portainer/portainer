@@ -1,5 +1,6 @@
 import angular from 'angular';
 import uuidv4 from 'uuid/v4';
+import { STACK_NAME_VALIDATION_REGEX } from '@/constants';
 import { RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
 import { AccessControlFormData } from '../../../components/accessControlForm/porAccessControlFormModel';
 
@@ -27,6 +28,8 @@ angular
   ) {
     $scope.onChangeTemplateId = onChangeTemplateId;
     $scope.buildAnalyticsProperties = buildAnalyticsProperties;
+
+    $scope.STACK_NAME_VALIDATION_REGEX = STACK_NAME_VALIDATION_REGEX;
 
     $scope.formValues = {
       Name: '',

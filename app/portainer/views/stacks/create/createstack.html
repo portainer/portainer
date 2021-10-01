@@ -12,7 +12,26 @@
           <div class="form-group">
             <label for="stack_name" class="col-sm-1 control-label text-left">Name</label>
             <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="formValues.Name" id="stack_name" placeholder="e.g. mystack" auto-focus />
+              <input
+                type="text"
+                class="form-control"
+                ng-model="formValues.Name"
+                id="stack_name"
+                name="stack_name"
+                placeholder="e.g. mystack"
+                auto-focus
+                ng-pattern="STACK_NAME_VALIDATION_REGEX"
+              />
+            </div>
+          </div>
+          <div class="form-group" ng-show="createStackForm.stack_name.$invalid">
+            <div class="col-sm-12 small text-warning">
+              <div ng-messages="createStackForm.stack_name.$error">
+                <p ng-message="pattern">
+                  <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                  <span>This field must consist of lower case alphanumeric characters, '_' or '-' (e.g. 'my-name', or 'abc-123').</span>
+                </p>
+              </div>
             </div>
           </div>
           <!-- !name-input -->

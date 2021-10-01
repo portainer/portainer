@@ -1,3 +1,5 @@
+import { STACK_NAME_VALIDATION_REGEX } from '@/constants';
+
 angular.module('portainer.app').controller('StackDuplicationFormController', [
   'Notifications',
   function StackDuplicationFormController(Notifications) {
@@ -12,6 +14,8 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
       endpoint: null,
       newName: '',
     };
+
+    ctrl.STACK_NAME_VALIDATION_REGEX = STACK_NAME_VALIDATION_REGEX;
 
     ctrl.isFormValidForDuplication = isFormValidForDuplication;
     ctrl.isFormValidForMigration = isFormValidForMigration;
