@@ -176,7 +176,8 @@ func (m *Migrator) updateVolumeResourceControlToDB32() error {
 
 		endpointDockerID, err := snapshotutils.FetchDockerID(snapshot)
 		if err != nil {
-			return fmt.Errorf("failed fetching environment docker id: %w", err)
+			log.Printf("[WARN] [bolt,migrator,v31] [message: failed fetching environment docker id] [err: %s]", err)
+			continue
 		}
 
 		if volumesData, done := snapshot.SnapshotRaw.Volumes.(map[string]interface{}); done {
@@ -213,7 +214,11 @@ func findResourcesToUpdateForDB32(dockerID string, volumesData map[string]interf
 	volumes := volumesData["Volumes"].([]interface{})
 	for _, volumeMeta := range volumes {
 		volume := volumeMeta.(map[string]interface{})
-		volumeName := volume["Name"].(string)
+		volumeName, nameExist := volume["Name"].(string)
+		if !nameExist {
+			continue
+		}
+
 		oldResourceID := fmt.Sprintf("%s%s", volumeName, volume["CreatedAt"].(string))
 		resourceControl, ok := volumeResourceControls[oldResourceID]
 
