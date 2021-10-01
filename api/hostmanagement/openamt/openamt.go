@@ -11,6 +11,7 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/datastore"
 )
 
 const (
@@ -25,7 +26,7 @@ type Service struct {
 }
 
 // NewService initializes a new service.
-func NewService(dataStore portainer.DataStore) *Service {
+func NewService(dataStore datastore.DataStore) *Service {
 	if !dataStore.Settings().IsFeatureFlagEnabled(portainer.FeatOpenAMT) {
 		return nil
 	}

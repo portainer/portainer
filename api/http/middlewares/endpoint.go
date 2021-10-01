@@ -11,13 +11,14 @@ import (
 	portainer "github.com/portainer/portainer/api"
 
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/datastore"
 )
 
 const (
 	contextEndpoint = "endpoint"
 )
 
-func WithEndpoint(endpointService portainer.EndpointService, endpointIDParam string) mux.MiddlewareFunc {
+func WithEndpoint(endpointService datastore.EndpointService, endpointIDParam string) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(rw http.ResponseWriter, request *http.Request) {
 			if endpointIDParam == "" {

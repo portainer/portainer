@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 
 	cmap "github.com/orcaman/concurrent-map"
@@ -27,7 +28,7 @@ type (
 )
 
 // NewManager initializes a new proxy Service
-func NewManager(dataStore portainer.DataStore, signatureService portainer.DigitalSignatureService, tunnelService portainer.ReverseTunnelService, clientFactory *docker.ClientFactory, kubernetesClientFactory *cli.ClientFactory, kubernetesTokenCacheManager *kubernetes.TokenCacheManager) *Manager {
+func NewManager(dataStore datastore.DataStore, signatureService portainer.DigitalSignatureService, tunnelService portainer.ReverseTunnelService, clientFactory *docker.ClientFactory, kubernetesClientFactory *cli.ClientFactory, kubernetesTokenCacheManager *kubernetes.TokenCacheManager) *Manager {
 	return &Manager{
 		endpointProxies:        cmap.New(),
 		legacyExtensionProxies: cmap.New(),
