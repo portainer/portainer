@@ -12,7 +12,6 @@ import (
 	"github.com/pkg/errors"
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
@@ -45,7 +44,7 @@ type Handler struct {
 	StackDeployer       stacks.StackDeployer
 }
 
-func stackExistsError(name string) (*httperror.HandlerError){
+func stackExistsError(name string) *httperror.HandlerError {
 	msg := fmt.Sprintf("A stack with the normalized name '%s' already exists", name)
 	err := errors.New(msg)
 	return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: msg, Err: err}
@@ -191,7 +190,7 @@ func (handler *Handler) checkUniqueStackNameInDocker(endpoint *portainer.Endpoin
 
 func (handler *Handler) checkUniqueWebhookID(webhookID string) (bool, error) {
 	_, err := handler.DataStore.Stack().StackByWebhookID(webhookID)
-	if err == bolterrors.ErrObjectNotFound {
+	if handler.DataStore.IsErrObjectNotFound(err) {
 		return true, nil
 	}
 	return false, err

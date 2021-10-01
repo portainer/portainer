@@ -1114,6 +1114,7 @@ type (
 		Rollback(force bool) error
 		CheckCurrentEdition() error
 		BackupTo(w io.Writer) error
+		IsErrObjectNotFound(err error) bool
 
 		CustomTemplate() CustomTemplateService
 		EdgeGroup() EdgeGroupService

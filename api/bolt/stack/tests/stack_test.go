@@ -7,7 +7,6 @@ import (
 	"github.com/gofrs/uuid"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/stretchr/testify/assert"
 )
@@ -48,7 +47,7 @@ func TestService_StackByWebhookID(t *testing.T) {
 	// returns nil and object not found error if there's no stack associated with the webhook
 	got, err = store.StackService.StackByWebhookID(newGuidString(t))
 	assert.Nil(t, got)
-	assert.ErrorIs(t, err, bolterrors.ErrObjectNotFound)
+	assert.True(t, store.IsErrObjectNotFound(err))
 }
 
 func (b *stackBuilder) createNewStack(webhookID string) portainer.Stack {

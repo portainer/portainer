@@ -8,7 +8,6 @@ import (
 
 	"github.com/portainer/libhttp/response"
 
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/stacks"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -34,7 +33,7 @@ func (handler *Handler) webhookInvoke(w http.ResponseWriter, r *http.Request) *h
 	stack, err := handler.DataStore.Stack().StackByWebhookID(webhookID.String())
 	if err != nil {
 		statusCode := http.StatusInternalServerError
-		if err == bolterrors.ErrObjectNotFound {
+		if handler.DataStore.IsErrObjectNotFound(err) {
 			statusCode = http.StatusNotFound
 		}
 		return &httperror.HandlerError{StatusCode: statusCode, Message: "Unable to find the stack by webhook ID", Err: err}
