@@ -35,11 +35,7 @@ func NewTestStore(init bool) (*Store, func(), error) {
 		return nil, nil, err
 	}
 
-	store, err := NewStore(dataStorePath, fileService)
-	if err != nil {
-		return nil, nil, err
-	}
-
+	store := NewStore(dataStorePath, fileService)
 	err = store.Open()
 	if err != nil {
 		return nil, nil, err
