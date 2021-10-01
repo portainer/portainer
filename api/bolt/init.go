@@ -3,13 +3,12 @@ package bolt
 import (
 	"github.com/gofrs/uuid"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/bolt/errors"
 )
 
 // Init creates the default data set.
 func (store *Store) Init() error {
 	instanceID, err := store.VersionService.InstanceID()
-	if err == errors.ErrObjectNotFound {
+	if store.IsErrObjectNotFound(err) {
 		uid, err := uuid.NewV4()
 		if err != nil {
 			return err
@@ -25,7 +24,7 @@ func (store *Store) Init() error {
 	}
 
 	_, err = store.SettingsService.Settings()
-	if err == errors.ErrObjectNotFound {
+	if store.IsErrObjectNotFound(err) {
 		defaultSettings := &portainer.Settings{
 			AuthenticationMethod: portainer.AuthenticationInternal,
 			BlackListedLabels:    make([]portainer.Pair, 0),
@@ -60,7 +59,7 @@ func (store *Store) Init() error {
 
 	_, err = store.SSLSettings().Settings()
 	if err != nil {
-		if err != errors.ErrObjectNotFound {
+		if !store.IsErrObjectNotFound(err) {
 			return err
 		}
 

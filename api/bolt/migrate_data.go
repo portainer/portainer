@@ -8,7 +8,6 @@ import (
 
 	werrors "github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/bolt/errors"
 	plog "github.com/portainer/portainer/api/bolt/log"
 	"github.com/portainer/portainer/api/bolt/migrator"
 	"github.com/portainer/portainer/api/internal/authorization"
@@ -48,7 +47,7 @@ func (store *Store) MigrateData(force bool) error {
 
 	// backup db file before upgrading DB to support rollback
 	isUpdating, err := store.VersionService.IsUpdating()
-	if err != nil && err != errors.ErrObjectNotFound {
+	if err != nil && !store.IsErrObjectNotFound(err) {
 		return err
 	}
 
