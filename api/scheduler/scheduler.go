@@ -8,11 +8,12 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/robfig/cron/v3"
+	"github.com/sirupsen/logrus"
 )
 
 type Scheduler struct {
-	crontab     *cron.Cron
-	shutdownCtx context.Context
+	crontab    *cron.Cron
+	activeJobs map[cron.EntryID]context.CancelFunc
 }
 
 func NewScheduler(ctx context.Context) *Scheduler {
@@ -20,7 +21,8 @@ func NewScheduler(ctx context.Context) *Scheduler {
 	crontab.Start()
 
 	s := &Scheduler{
-		crontab: crontab,
+		crontab:    crontab,
+		activeJobs: make(map[cron.EntryID]context.CancelFunc),
 	}
 
 	if ctx != nil {
@@ -43,8 +45,10 @@ func (s *Scheduler) Shutdown() error {
 	ctx := s.crontab.Stop()
 	<-ctx.Done()
 
-	for _, j := range s.crontab.Entries() {
-		s.crontab.Remove(j.ID)
+	for _, job := range s.crontab.Entries() {
+		if cancel, ok := s.activeJobs[job.ID]; ok {
+			cancel()
+		}
 	}
 
 	err := ctx.Err()
@@ -60,14 +64,36 @@ func (s *Scheduler) StopJob(jobID string) error {
 	if err != nil {
 		return errors.Wrapf(err, "failed convert jobID %q to int", jobID)
 	}
-	s.crontab.Remove(cron.EntryID(id))
+	entryID := cron.EntryID(id)
+	if cancel, ok := s.activeJobs[entryID]; ok {
+		cancel()
+	}
 
 	return nil
 }
 
 // StartJobEvery schedules a new periodic job with a given duration.
-// Returns job id that could be used to stop the given job
-func (s *Scheduler) StartJobEvery(duration time.Duration, job func()) string {
-	entryId := s.crontab.Schedule(cron.Every(duration), cron.FuncJob(job))
-	return strconv.Itoa(int(entryId))
+// Returns job id that could be used to stop the given job.
+// When job run returns an error, that job won't be run again.
+func (s *Scheduler) StartJobEvery(duration time.Duration, job func() error) string {
+	ctx, cancel := context.WithCancel(context.Background())
+
+	j := cron.FuncJob(func() {
+		if err := job(); err != nil {
+			logrus.Debug("job returned an error")
+			cancel()
+		}
+	})
+
+	entryID := s.crontab.Schedule(cron.Every(duration), j)
+
+	s.activeJobs[entryID] = cancel
+
+	go func(entryID cron.EntryID) {
+		<-ctx.Done()
+		logrus.Debug("job cancelled, stopping")
+		s.crontab.Remove(entryID)
+	}(entryID)
+
+	return strconv.Itoa(int(entryID))
 }

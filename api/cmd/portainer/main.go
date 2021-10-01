@@ -56,15 +56,22 @@ func initFileService(dataStorePath string) portainer.FileService {
 	return fileService
 }
 
-func initDataStore(dataStorePath string, fileService portainer.FileService, shutdownCtx context.Context) portainer.DataStore {
-	store, err := bolt.NewStore(dataStorePath, fileService)
-	if err != nil {
-		log.Fatalf("failed creating data store: %v", err)
-	}
-
-	err = store.Open()
+func initDataStore(dataStorePath string, rollback bool, fileService portainer.FileService, shutdownCtx context.Context) portainer.DataStore {
+	store := bolt.NewStore(dataStorePath, fileService)
+	err := store.Open()
 	if err != nil {
 		log.Fatalf("failed opening store: %v", err)
+	}
+
+	if rollback {
+		err := store.Rollback(false)
+		if err != nil {
+			log.Fatalf("failed rolling back: %s", err)
+		}
+
+		log.Println("Exiting rollback")
+		os.Exit(0)
+		return nil
 	}
 
 	err = store.Init()
@@ -399,7 +406,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	fileService := initFileService(*flags.Data)
 
-	dataStore := initDataStore(*flags.Data, fileService, shutdownCtx)
+	dataStore := initDataStore(*flags.Data, *flags.Rollback, fileService, shutdownCtx)
 
 	if err := dataStore.CheckCurrentEdition(); err != nil {
 		log.Fatal(err)
@@ -542,7 +549,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	}
 
 	scheduler := scheduler.NewScheduler(shutdownCtx)
-	stackDeployer := stacks.NewStackDeployer(swarmStackManager, composeStackManager)
+	stackDeployer := stacks.NewStackDeployer(swarmStackManager, composeStackManager, kubernetesDeployer)
 	stacks.StartStackSchedules(scheduler, stackDeployer, dataStore, gitService)
 
 	return &http.Server{

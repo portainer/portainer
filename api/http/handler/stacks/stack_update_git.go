@@ -1,10 +1,11 @@
 package stacks
 
 import (
-	"errors"
 	"net/http"
+	"time"
 
 	"github.com/asaskevich/govalidator"
+	"github.com/pkg/errors"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -98,15 +99,20 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{StatusCode: http.StatusForbidden, Message: "Permission denied to access environment", Err: err}
 	}
 
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve info from request context", Err: err}
+	}
+
+	user, err := handler.DataStore.User().User(securityContext.UserID)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Cannot find context user", Err: errors.Wrap(err, "failed to fetch the user")}
+	}
+
 	if stack.Type == portainer.DockerSwarmStack || stack.Type == portainer.DockerComposeStack {
 		resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)
 		if err != nil {
 			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve a resource control associated to the stack", Err: err}
-		}
-
-		securityContext, err := security.RetrieveRestrictedRequestContext(r)
-		if err != nil {
-			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve info from request context", Err: err}
 		}
 
 		access, err := handler.userCanAccessStack(securityContext, endpoint.ID, resourceControl)
@@ -127,6 +133,8 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 	stack.GitConfig.ReferenceName = payload.RepositoryReferenceName
 	stack.AutoUpdate = payload.AutoUpdate
 	stack.Env = payload.Env
+	stack.UpdatedBy = user.Username
+	stack.UpdateDate = time.Now().Unix()
 
 	stack.GitConfig.Authentication = nil
 	if payload.RepositoryAuthentication {

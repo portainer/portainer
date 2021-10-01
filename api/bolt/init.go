@@ -47,6 +47,7 @@ func (store *Store) Init() error {
 			HelmRepositoryURL:        portainer.DefaultHelmRepositoryURL,
 			UserSessionTimeout:       portainer.DefaultUserSessionTimeout,
 			KubeconfigExpiry:         portainer.DefaultKubeconfigExpiry,
+			KubectlShellImage:        portainer.DefaultKubectlShellImage,
 		}
 
 		err = store.SettingsService.UpdateSettings(defaultSettings)

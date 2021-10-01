@@ -1,5 +1,5 @@
 import uuidv4 from 'uuid/v4';
-
+import { RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
 class StackRedeployGitFormController {
   /* @ngInject */
   constructor($async, $state, StackService, ModalService, Notifications, WebhookHelper, FormHelper) {
@@ -28,7 +28,7 @@ class StackRedeployGitFormController {
       // auto update
       AutoUpdate: {
         RepositoryAutomaticUpdates: false,
-        RepositoryMechanism: 'Interval',
+        RepositoryMechanism: RepositoryMechanismTypes.INTERVAL,
         RepositoryFetchInterval: '5m',
         RepositoryWebhookURL: '',
       },
@@ -50,9 +50,9 @@ class StackRedeployGitFormController {
 
     function autoSyncLabel(type) {
       switch (type) {
-        case 'Interval':
+        case RepositoryMechanismTypes.INTERVAL:
           return 'polling';
-        case 'Webhook':
+        case RepositoryMechanismTypes.WEBHOOK:
           return 'webhook';
       }
       return 'off';
@@ -156,10 +156,10 @@ class StackRedeployGitFormController {
       this.formValues.AutoUpdate.RepositoryAutomaticUpdates = true;
 
       if (this.stack.AutoUpdate.Interval) {
-        this.formValues.AutoUpdate.RepositoryMechanism = `Interval`;
+        this.formValues.AutoUpdate.RepositoryMechanism = RepositoryMechanismTypes.INTERVAL;
         this.formValues.AutoUpdate.RepositoryFetchInterval = this.stack.AutoUpdate.Interval;
       } else if (this.stack.AutoUpdate.Webhook) {
-        this.formValues.AutoUpdate.RepositoryMechanism = `Webhook`;
+        this.formValues.AutoUpdate.RepositoryMechanism = RepositoryMechanismTypes.WEBHOOK;
         this.formValues.AutoUpdate.RepositoryWebhookURL = this.WebhookHelper.returnStackWebhookUrl(this.stack.AutoUpdate.Webhook);
       }
     }

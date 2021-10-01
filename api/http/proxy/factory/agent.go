@@ -24,6 +24,7 @@ type ProxyServer struct {
 // NewAgentProxy creates a new instance of ProxyServer that wrap http requests with agent headers
 func (factory *ProxyFactory) NewAgentProxy(endpoint *portainer.Endpoint) (*ProxyServer, error) {
 	urlString := endpoint.URL
+
 	if endpointutils.IsEdgeEndpoint((endpoint)) {
 		tunnel, err := factory.reverseTunnelService.GetActiveTunnel(endpoint)
 		if err != nil {

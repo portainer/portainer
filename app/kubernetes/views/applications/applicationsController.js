@@ -7,7 +7,7 @@ import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models
 
 class KubernetesApplicationsController {
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesApplicationService, HelmService, KubernetesConfigurationService, Authentication, ModalService, LocalStorage) {
+  constructor($async, $state, Notifications, KubernetesApplicationService, HelmService, KubernetesConfigurationService, Authentication, ModalService, LocalStorage, StackService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
@@ -17,6 +17,7 @@ class KubernetesApplicationsController {
     this.Authentication = Authentication;
     this.ModalService = ModalService;
     this.LocalStorage = LocalStorage;
+    this.StackService = StackService;
 
     this.onInit = this.onInit.bind(this);
     this.getApplications = this.getApplications.bind(this);
@@ -36,8 +37,18 @@ class KubernetesApplicationsController {
     let actionCount = selectedItems.length;
     for (const stack of selectedItems) {
       try {
-        const promises = _.map(stack.Applications, (app) => this.KubernetesApplicationService.delete(app));
-        await Promise.all(promises);
+        const isAppFormCreated = stack.Applications.some((x) => !x.ApplicationKind);
+
+        if (isAppFormCreated) {
+          const promises = _.map(stack.Applications, (app) => this.KubernetesApplicationService.delete(app));
+          await Promise.all(promises);
+        } else {
+          const application = stack.Applications.find((x) => x.StackId !== null);
+          if (application && application.StackId) {
+            await this.StackService.remove({ Id: application.StackId }, false, this.endpoint.Id);
+          }
+        }
+
         this.Notifications.success('Stack successfully removed', stack.Name);
         _.remove(this.state.stacks, { Name: stack.Name });
       } catch (err) {
@@ -70,6 +81,14 @@ class KubernetesApplicationsController {
           await this.HelmService.uninstall(this.endpoint.Id, application);
         } else {
           await this.KubernetesApplicationService.delete(application);
+          // Update applications in stack
+          const stack = this.state.stacks.find((x) => x.Name === application.StackName);
+          const index = stack.Applications.indexOf(application);
+          stack.Applications.splice(index, 1);
+          // remove stack if no app left in the stack
+          if (stack.Applications.length === 0 && application.StackId) {
+            await this.StackService.remove({ Id: application.StackId }, false, this.endpoint.Id);
+          }
         }
         this.Notifications.success('Application successfully removed', application.Name);
         const index = this.state.applications.indexOf(application);

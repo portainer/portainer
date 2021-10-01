@@ -1,7 +1,6 @@
 package stacks
 
 import (
-	"log"
 	"time"
 
 	"github.com/pkg/errors"
@@ -19,10 +18,9 @@ func StartStackSchedules(scheduler *scheduler.Scheduler, stackdeployer StackDepl
 		if err != nil {
 			return errors.Wrap(err, "Unable to parse auto update interval")
 		}
-		jobID := scheduler.StartJobEvery(d, func() {
-			if err := RedeployWhenChanged(stack.ID, stackdeployer, datastore, gitService); err != nil {
-				log.Printf("[ERROR] %s\n", err)
-			}
+		stackID := stack.ID // to be captured by the scheduled function
+		jobID := scheduler.StartJobEvery(d, func() error {
+			return RedeployWhenChanged(stackID, stackdeployer, datastore, gitService)
 		})
 
 		stack.AutoUpdate.JobID = jobID

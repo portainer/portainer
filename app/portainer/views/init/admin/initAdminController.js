@@ -18,7 +18,7 @@ angular.module('portainer.app').controller('InitAdminController', [
       Username: 'admin',
       Password: '',
       ConfirmPassword: '',
-      enableTelemetry: true,
+      enableTelemetry: process.env.NODE_ENV === 'production',
     };
 
     $scope.state = {

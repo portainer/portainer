@@ -30,7 +30,7 @@ class CreateCustomTemplateViewController {
       ComposeFilePathInRepository: 'docker-compose.yml',
       Description: '',
       Note: '',
-      Logo:'',
+      Logo: '',
       Platform: 1,
       Type: 1,
       AccessControlData: new AccessControlFormData(),

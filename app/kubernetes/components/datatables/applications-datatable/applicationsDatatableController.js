@@ -2,6 +2,7 @@ import { KubernetesApplicationDeploymentTypes, KubernetesApplicationTypes } from
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
+import _ from 'lodash-es';
 
 angular.module('portainer.docker').controller('KubernetesApplicationsDatatableController', [
   '$scope',
@@ -21,6 +22,14 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
       expandAll: false,
       expandedItems: [],
     });
+
+    this.filters = {
+      state: {
+        open: false,
+        enabled: false,
+        values: [],
+      },
+    };
 
     this.expandAll = function () {
       this.state.expandAll = !this.state.expandAll;
@@ -112,6 +121,19 @@ angular.module('portainer.docker').controller('KubernetesApplicationsDatatableCo
      */
     this.allowSelection = function (item) {
       return !this.isSystemNamespace(item);
+    };
+
+    this.applyFilters = function (item) {
+      return ctrl.filters.state.values.some((filter) => item.ApplicationType === filter.type && filter.display);
+    };
+
+    this.onStateFilterChange = function () {
+      this.filters.state.enabled = this.filters.state.values.some((filter) => !filter.display);
+    };
+
+    this.prepareTableFromDataset = function () {
+      const availableTypeFilters = this.dataset.map((item) => ({ type: item.ApplicationType, display: true }));
+      this.filters.state.values = _.uniqBy(availableTypeFilters, 'type');
     };
 
     this.$onInit = function () {

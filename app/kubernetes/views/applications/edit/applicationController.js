@@ -273,7 +273,9 @@ class KubernetesApplicationController {
     if (this.application.ApplicationKind === this.KubernetesDeploymentTypes.GIT) {
       this.state.appType = `git repository`;
     } else if (this.application.ApplicationKind === this.KubernetesDeploymentTypes.CONTENT) {
-      this.state.appType = `web editor`;
+      this.state.appType = `manifest`;
+    } else if (this.application.ApplicationKind === this.KubernetesDeploymentTypes.URL) {
+      this.state.appType = `manifest`;
     }
   }
 

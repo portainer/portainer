@@ -19,10 +19,10 @@ export function KubernetesApplicationFormValues() {
   this.AutoScaler = {};
   this.Containers = [];
   this.EnvironmentVariables = []; // KubernetesApplicationEnvironmentVariableFormValue lis;
-  this.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.SHARED;
+  this.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.ISOLATED;
   this.PersistedFolders = []; // KubernetesApplicationPersistedFolderFormValue lis;
   this.Configurations = []; // KubernetesApplicationConfigurationFormValue lis;
-  this.PublishingType = KubernetesApplicationPublishingTypes.INTERNAL;
+  this.PublishingType = KubernetesApplicationPublishingTypes.CLUSTER_IP;
   this.PublishedPorts = []; // KubernetesApplicationPublishedPortFormValue lis;
   this.PlacementType = KubernetesApplicationPlacementTypes.PREFERRED;
   this.Placements = []; // KubernetesApplicationPlacementFormValue lis;
