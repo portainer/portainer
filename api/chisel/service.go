@@ -13,6 +13,7 @@ import (
 	chserver "github.com/jpillora/chisel/server"
 	cmap "github.com/orcaman/concurrent-map"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/datastore"
 )
 
 const (
@@ -28,7 +29,7 @@ type Service struct {
 	serverFingerprint string
 	serverPort        string
 	tunnelDetailsMap  cmap.ConcurrentMap
-	dataStore         portainer.DataStore
+	dataStore         datastore.DataStore
 	snapshotService   portainer.SnapshotService
 	chiselServer      *chserver.Server
 	shutdownCtx       context.Context
@@ -36,7 +37,7 @@ type Service struct {
 }
 
 // NewService returns a pointer to a new instance of Service
-func NewService(dataStore portainer.DataStore, shutdownCtx context.Context) *Service {
+func NewService(dataStore datastore.DataStore, shutdownCtx context.Context) *Service {
 	return &Service{
 		tunnelDetailsMap: cmap.New(),
 		dataStore:        dataStore,

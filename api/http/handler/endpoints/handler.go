@@ -3,6 +3,7 @@ package endpoints
 import (
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
@@ -24,7 +25,7 @@ func hideFields(endpoint *portainer.Endpoint) {
 type Handler struct {
 	*mux.Router
 	requestBouncer       *security.RequestBouncer
-	DataStore            portainer.DataStore
+	DataStore            datastore.DataStore
 	FileService          portainer.FileService
 	ProxyManager         *proxy.Manager
 	ReverseTunnelService portainer.ReverseTunnelService

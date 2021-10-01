@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -17,7 +18,7 @@ func hideFields(settings *portainer.Settings) {
 // Handler is the HTTP handler used to handle settings operations.
 type Handler struct {
 	*mux.Router
-	DataStore       portainer.DataStore
+	DataStore       datastore.DataStore
 	FileService     portainer.FileService
 	JWTService      portainer.JWTService
 	LDAPService     portainer.LDAPService

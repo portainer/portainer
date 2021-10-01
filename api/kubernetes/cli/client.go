@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/datastore"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -18,7 +19,7 @@ import (
 type (
 	// ClientFactory is used to create Kubernetes clients
 	ClientFactory struct {
-		dataStore            portainer.DataStore
+		dataStore            datastore.DataStore
 		reverseTunnelService portainer.ReverseTunnelService
 		signatureService     portainer.DigitalSignatureService
 		instanceID           string
@@ -34,7 +35,7 @@ type (
 )
 
 // NewClientFactory returns a new instance of a ClientFactory
-func NewClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, instanceID string, dataStore portainer.DataStore) *ClientFactory {
+func NewClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, instanceID string, dataStore datastore.DataStore) *ClientFactory {
 	return &ClientFactory{
 		dataStore:            dataStore,
 		signatureService:     signatureService,

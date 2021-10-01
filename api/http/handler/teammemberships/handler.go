@@ -2,7 +2,7 @@ package teammemberships
 
 import (
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/http/security"
 
 	"net/http"
@@ -13,7 +13,7 @@ import (
 // Handler is the HTTP handler used to handle team membership operations.
 type Handler struct {
 	*mux.Router
-	DataStore portainer.DataStore
+	DataStore datastore.DataStore
 }
 
 // NewHandler creates a handler to manage team membership operations.

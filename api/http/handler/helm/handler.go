@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/libhelm/options"
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes"
@@ -25,14 +26,14 @@ type requestBouncer interface {
 type Handler struct {
 	*mux.Router
 	requestBouncer     requestBouncer
-	dataStore          portainer.DataStore
+	dataStore          datastore.DataStore
 	kubeConfigService  kubernetes.KubeConfigService
 	kubernetesDeployer portainer.KubernetesDeployer
 	helmPackageManager libhelm.HelmPackageManager
 }
 
 // NewHandler creates a handler to manage endpoint group operations.
-func NewHandler(bouncer requestBouncer, dataStore portainer.DataStore, kubernetesDeployer portainer.KubernetesDeployer, helmPackageManager libhelm.HelmPackageManager, kubeConfigService kubernetes.KubeConfigService) *Handler {
+func NewHandler(bouncer requestBouncer, dataStore datastore.DataStore, kubernetesDeployer portainer.KubernetesDeployer, helmPackageManager libhelm.HelmPackageManager, kubeConfigService kubernetes.KubeConfigService) *Handler {
 	h := &Handler{
 		Router:             mux.NewRouter(),
 		requestBouncer:     bouncer,

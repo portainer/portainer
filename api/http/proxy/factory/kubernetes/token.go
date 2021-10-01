@@ -1,8 +1,10 @@
 package kubernetes
 
 import (
-	portainer "github.com/portainer/portainer/api"
 	"io/ioutil"
+
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/datastore"
 )
 
 const defaultServiceAccountTokenFile = "/var/run/secrets/kubernetes.io/serviceaccount/token"
@@ -10,14 +12,14 @@ const defaultServiceAccountTokenFile = "/var/run/secrets/kubernetes.io/serviceac
 type tokenManager struct {
 	tokenCache *tokenCache
 	kubecli    portainer.KubeClient
-	dataStore  portainer.DataStore
+	dataStore  datastore.DataStore
 	adminToken string
 }
 
 // NewTokenManager returns a pointer to a new instance of tokenManager.
 // If the useLocalAdminToken parameter is set to true, it will search for the local admin service account
 // and associate it to the manager.
-func NewTokenManager(kubecli portainer.KubeClient, dataStore portainer.DataStore, cache *tokenCache, setLocalAdminToken bool) (*tokenManager, error) {
+func NewTokenManager(kubecli portainer.KubeClient, dataStore datastore.DataStore, cache *tokenCache, setLocalAdminToken bool) (*tokenManager, error) {
 	tokenManager := &tokenManager{
 		tokenCache: cache,
 		kubecli:    kubecli,

@@ -15,6 +15,7 @@ import (
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
 	"github.com/portainer/portainer/api/http/security"
@@ -29,7 +30,7 @@ type (
 	Transport struct {
 		HTTPTransport        *http.Transport
 		endpoint             *portainer.Endpoint
-		dataStore            portainer.DataStore
+		dataStore            datastore.DataStore
 		signatureService     portainer.DigitalSignatureService
 		reverseTunnelService portainer.ReverseTunnelService
 		dockerClientFactory  *docker.ClientFactory
@@ -38,7 +39,7 @@ type (
 	// TransportParameters is used to create a new Transport
 	TransportParameters struct {
 		Endpoint             *portainer.Endpoint
-		DataStore            portainer.DataStore
+		DataStore            datastore.DataStore
 		SignatureService     portainer.DigitalSignatureService
 		ReverseTunnelService portainer.ReverseTunnelService
 		DockerClientFactory  *docker.ClientFactory

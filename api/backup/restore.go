@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/archive"
 	"github.com/portainer/portainer/api/crypto"
+	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/offlinegate"
 )
@@ -18,7 +18,7 @@ import (
 var filesToRestore = append(filesToBackup, "portainer.db")
 
 // Restores system state from backup archive, will trigger system shutdown, when finished.
-func RestoreArchive(archive io.Reader, password string, filestorePath string, gate *offlinegate.OfflineGate, datastore portainer.DataStore, shutdownTrigger context.CancelFunc) error {
+func RestoreArchive(archive io.Reader, password string, filestorePath string, gate *offlinegate.OfflineGate, datastore datastore.DataStore, shutdownTrigger context.CancelFunc) error {
 	var err error
 	if password != "" {
 		archive, err = decrypt(archive, password)

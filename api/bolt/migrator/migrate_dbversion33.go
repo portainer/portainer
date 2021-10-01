@@ -1,8 +1,6 @@
 package migrator
 
-import (
-	portainer "github.com/portainer/portainer/api"
-)
+import "github.com/portainer/portainer/api/datastore"
 
 func (m *Migrator) migrateDBVersionToDB34() error {
 	err := migrateStackEntryPoint(m.stackService)
@@ -13,7 +11,7 @@ func (m *Migrator) migrateDBVersionToDB34() error {
 	return nil
 }
 
-func migrateStackEntryPoint(stackService portainer.StackService) error {
+func migrateStackEntryPoint(stackService datastore.StackService) error {
 	stacks, err := stackService.Stacks()
 	if err != nil {
 		return err

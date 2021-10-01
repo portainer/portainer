@@ -5,6 +5,7 @@ import (
 
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/http/security"
 
 	"net/http"
@@ -27,7 +28,7 @@ func hideFields(user *portainer.User) {
 // Handler is the HTTP handler used to handle user operations.
 type Handler struct {
 	*mux.Router
-	DataStore     portainer.DataStore
+	DataStore     datastore.DataStore
 	CryptoService portainer.CryptoService
 }
 

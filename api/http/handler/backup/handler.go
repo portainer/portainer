@@ -8,6 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/adminmonitor"
+	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/http/offlinegate"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -16,7 +17,7 @@ import (
 type Handler struct {
 	*mux.Router
 	bouncer         *security.RequestBouncer
-	dataStore       portainer.DataStore
+	dataStore       datastore.DataStore
 	gate            *offlinegate.OfflineGate
 	filestorePath   string
 	shutdownTrigger context.CancelFunc
@@ -24,7 +25,7 @@ type Handler struct {
 }
 
 // NewHandler creates an new instance of backup handler
-func NewHandler(bouncer *security.RequestBouncer, dataStore portainer.DataStore, gate *offlinegate.OfflineGate, filestorePath string, shutdownTrigger context.CancelFunc, adminMonitor *adminmonitor.Monitor) *Handler {
+func NewHandler(bouncer *security.RequestBouncer, dataStore datastore.DataStore, gate *offlinegate.OfflineGate, filestorePath string, shutdownTrigger context.CancelFunc, adminMonitor *adminmonitor.Monitor) *Handler {
 	h := &Handler{
 		Router:          mux.NewRouter(),
 		bouncer:         bouncer,
@@ -56,7 +57,7 @@ func adminAccess(next http.Handler) http.Handler {
 	})
 }
 
-func systemWasInitialized(dataStore portainer.DataStore) (bool, error) {
+func systemWasInitialized(dataStore datastore.DataStore) (bool, error) {
 	users, err := dataStore.User().UsersByRole(portainer.AdministratorRole)
 	if err != nil {
 		return false, err
