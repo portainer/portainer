@@ -9,6 +9,8 @@ import (
 	"github.com/portainer/portainer/api/bolt/helmuserrepository"
 
 	"github.com/boltdb/bolt"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/customtemplate"
 	"github.com/portainer/portainer/api/bolt/dockerhub"
@@ -153,4 +155,8 @@ func (store *Store) CheckCurrentEdition() error {
 		return errors.ErrWrongDBEdition
 	}
 	return nil
+}
+
+func (store *Store) IsErrObjectNotFound(e error) bool {
+	return e == bolterrors.ErrObjectNotFound
 }

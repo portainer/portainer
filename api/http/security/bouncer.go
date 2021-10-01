@@ -9,7 +9,6 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/apikey"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 )
 
@@ -172,7 +171,7 @@ func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler,
 		}
 
 		_, err = bouncer.dataStore.User().User(tokenData.ID)
-		if err != nil && err == bolterrors.ErrObjectNotFound {
+		if err != nil && bouncer.dataStore.IsErrObjectNotFound(err) {
 			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", httperrors.ErrUnauthorized)
 			return
 		} else if err != nil {
@@ -224,9 +223,12 @@ func (bouncer *RequestBouncer) mwAuthenticateFirst(tokenLookups []tokenLookup, n
 			return
 		}
 
-		user, _ := bouncer.dataStore.User().User(token.ID)
-		if user == nil {
-			httperror.WriteError(w, http.StatusUnauthorized, "An authorisation token is invalid", httperrors.ErrUnauthorized)
+		_, err := bouncer.dataStore.User().User(token.ID)
+		if err != nil && bouncer.dataStore.IsErrObjectNotFound(err) {
+			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", httperrors.ErrUnauthorized)
+			return
+		} else if err != nil {
+			httperror.WriteError(w, http.StatusInternalServerError, "Unable to retrieve user details from the database", err)
 			return
 		}
 
