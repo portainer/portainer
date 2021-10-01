@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/datastore"
 )
 
 const portainerAPIKeyPrefix = "ptr_"
@@ -16,12 +17,12 @@ const portainerAPIKeyPrefix = "ptr_"
 var ErrInvalidAPIKey = errors.New("Invalid API key")
 
 type apiKeyService struct {
-	apiKeyRepository portainer.APIKeyRepository
-	userRepository   portainer.UserService
+	apiKeyRepository datastore.APIKeyRepository
+	userRepository   datastore.UserService
 	cache            *apiKeyCache
 }
 
-func NewAPIKeyService(apiKeyRepository portainer.APIKeyRepository, userRepository portainer.UserService) *apiKeyService {
+func NewAPIKeyService(apiKeyRepository datastore.APIKeyRepository, userRepository datastore.UserService) *apiKeyService {
 	return &apiKeyService{
 		apiKeyRepository: apiKeyRepository,
 		userRepository:   userRepository,

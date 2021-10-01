@@ -13,6 +13,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/internal/edge"
 )
@@ -403,7 +404,7 @@ func (handler *Handler) validateUniqueName(name string) error {
 }
 
 // updateEndpointRelations adds a relation between the Edge Stack to the related environments(endpoints)
-func updateEndpointRelations(endpointRelationService portainer.EndpointRelationService, edgeStackID portainer.EdgeStackID, relatedEndpointIds []portainer.EndpointID) error {
+func updateEndpointRelations(endpointRelationService datastore.EndpointRelationService, edgeStackID portainer.EdgeStackID, relatedEndpointIds []portainer.EndpointID) error {
 	for _, endpointID := range relatedEndpointIds {
 		relation, err := endpointRelationService.EndpointRelation(endpointID)
 		if err != nil {

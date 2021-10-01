@@ -6,6 +6,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/apikey"
+	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/http/security"
 
 	"net/http"
@@ -30,7 +31,7 @@ type Handler struct {
 	*mux.Router
 	bouncer       *security.RequestBouncer
 	apiKeyService apikey.APIKeyService
-	DataStore     portainer.DataStore
+	DataStore     datastore.DataStore
 	CryptoService portainer.CryptoService
 }
 

@@ -5,67 +5,70 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
 type datastore struct {
-	customTemplate          portainer.CustomTemplateService
-	edgeGroup               portainer.EdgeGroupService
-	edgeJob                 portainer.EdgeJobService
-	edgeStack               portainer.EdgeStackService
-	endpoint                portainer.EndpointService
-	endpointGroup           portainer.EndpointGroupService
-	endpointRelation        portainer.EndpointRelationService
-	helmUserRepository      portainer.HelmUserRepositoryService
-	registry                portainer.RegistryService
-	resourceControl         portainer.ResourceControlService
-	apiKeyRepositoryService portainer.APIKeyRepository
-	role                    portainer.RoleService
-	sslSettings             portainer.SSLSettingsService
-	settings                portainer.SettingsService
-	stack                   portainer.StackService
-	tag                     portainer.TagService
-	teamMembership          portainer.TeamMembershipService
-	team                    portainer.TeamService
-	tunnelServer            portainer.TunnelServerService
-	user                    portainer.UserService
-	version                 portainer.VersionService
-	webhook                 portainer.WebhookService
+	customTemplate          dataservices.CustomTemplateService
+	edgeGroup               dataservices.EdgeGroupService
+	edgeJob                 dataservices.EdgeJobService
+	edgeStack               dataservices.EdgeStackService
+	endpoint                dataservices.EndpointService
+	endpointGroup           dataservices.EndpointGroupService
+	endpointRelation        dataservices.EndpointRelationService
+	helmUserRepository      dataservices.HelmUserRepositoryService
+	registry                dataservices.RegistryService
+	resourceControl         dataservices.ResourceControlService
+	apiKeyRepositoryService dataservices.APIKeyRepository
+	role                    dataservices.RoleService
+	sslSettings             dataservices.SSLSettingsService
+	settings                dataservices.SettingsService
+	stack                   dataservices.StackService
+	tag                     dataservices.TagService
+	teamMembership          dataservices.TeamMembershipService
+	team                    dataservices.TeamService
+	tunnelServer            dataservices.TunnelServerService
+	user                    dataservices.UserService
+	version                 dataservices.VersionService
+	webhook                 dataservices.WebhookService
 }
 
-func (d *datastore) BackupTo(io.Writer) error                            { return nil }
-func (d *datastore) Open() error                                         { return nil }
-func (d *datastore) Init() error                                         { return nil }
-func (d *datastore) Close() error                                        { return nil }
-func (d *datastore) CheckCurrentEdition() error                          { return nil }
-func (d *datastore) IsNew() bool                                         { return false }
-func (d *datastore) MigrateData(force bool) error                        { return nil }
-func (d *datastore) Rollback(force bool) error                           { return nil }
-func (d *datastore) CustomTemplate() portainer.CustomTemplateService     { return d.customTemplate }
-func (d *datastore) EdgeGroup() portainer.EdgeGroupService               { return d.edgeGroup }
-func (d *datastore) EdgeJob() portainer.EdgeJobService                   { return d.edgeJob }
-func (d *datastore) EdgeStack() portainer.EdgeStackService               { return d.edgeStack }
-func (d *datastore) Endpoint() portainer.EndpointService                 { return d.endpoint }
-func (d *datastore) EndpointGroup() portainer.EndpointGroupService       { return d.endpointGroup }
-func (d *datastore) EndpointRelation() portainer.EndpointRelationService { return d.endpointRelation }
-func (d *datastore) HelmUserRepository() portainer.HelmUserRepositoryService {
+func (d *datastore) BackupTo(io.Writer) error                           { return nil }
+func (d *datastore) Open() error                                        { return nil }
+func (d *datastore) Init() error                                        { return nil }
+func (d *datastore) Close() error                                       { return nil }
+func (d *datastore) CheckCurrentEdition() error                         { return nil }
+func (d *datastore) IsNew() bool                                        { return false }
+func (d *datastore) MigrateData(force bool) error                       { return nil }
+func (d *datastore) Rollback(force bool) error                          { return nil }
+func (d *datastore) CustomTemplate() dataservices.CustomTemplateService { return d.customTemplate }
+func (d *datastore) EdgeGroup() dataservices.EdgeGroupService           { return d.edgeGroup }
+func (d *datastore) EdgeJob() dataservices.EdgeJobService               { return d.edgeJob }
+func (d *datastore) EdgeStack() dataservices.EdgeStackService           { return d.edgeStack }
+func (d *datastore) Endpoint() dataservices.EndpointService             { return d.endpoint }
+func (d *datastore) EndpointGroup() dataservices.EndpointGroupService   { return d.endpointGroup }
+func (d *datastore) EndpointRelation() dataservices.EndpointRelationService {
+	return d.endpointRelation
+}
+func (d *datastore) HelmUserRepository() dataservices.HelmUserRepositoryService {
 	return d.helmUserRepository
 }
-func (d *datastore) Registry() portainer.RegistryService               { return d.registry }
-func (d *datastore) ResourceControl() portainer.ResourceControlService { return d.resourceControl }
-func (d *datastore) Role() portainer.RoleService                       { return d.role }
-func (d *datastore) APIKeyRepository() portainer.APIKeyRepository {
+func (d *datastore) Registry() dataservices.RegistryService               { return d.registry }
+func (d *datastore) ResourceControl() dataservices.ResourceControlService { return d.resourceControl }
+func (d *datastore) Role() dataservices.RoleService                       { return d.role }
+func (d *datastore) APIKeyRepository() dataservices.APIKeyRepository {
 	return d.apiKeyRepositoryService
 }
-func (d *datastore) Settings() portainer.SettingsService             { return d.settings }
-func (d *datastore) SSLSettings() portainer.SSLSettingsService       { return d.sslSettings }
-func (d *datastore) Stack() portainer.StackService                   { return d.stack }
-func (d *datastore) Tag() portainer.TagService                       { return d.tag }
-func (d *datastore) TeamMembership() portainer.TeamMembershipService { return d.teamMembership }
-func (d *datastore) Team() portainer.TeamService                     { return d.team }
-func (d *datastore) TunnelServer() portainer.TunnelServerService     { return d.tunnelServer }
-func (d *datastore) User() portainer.UserService                     { return d.user }
-func (d *datastore) Version() portainer.VersionService               { return d.version }
-func (d *datastore) Webhook() portainer.WebhookService               { return d.webhook }
+func (d *datastore) Settings() dataservices.SettingsService             { return d.settings }
+func (d *datastore) SSLSettings() dataservices.SSLSettingsService       { return d.sslSettings }
+func (d *datastore) Stack() dataservices.StackService                   { return d.stack }
+func (d *datastore) Tag() dataservices.TagService                       { return d.tag }
+func (d *datastore) TeamMembership() dataservices.TeamMembershipService { return d.teamMembership }
+func (d *datastore) Team() dataservices.TeamService                     { return d.team }
+func (d *datastore) TunnelServer() dataservices.TunnelServerService     { return d.tunnelServer }
+func (d *datastore) User() dataservices.UserService                     { return d.user }
+func (d *datastore) Version() dataservices.VersionService               { return d.version }
+func (d *datastore) Webhook() dataservices.WebhookService               { return d.webhook }
 
 type datastoreOption = func(d *datastore)
 

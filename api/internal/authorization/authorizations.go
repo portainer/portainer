@@ -2,18 +2,19 @@ package authorization
 
 import (
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
 // Service represents a service used to
 // update authorizations associated to a user or team.
 type Service struct {
-	dataStore        portainer.DataStore
+	dataStore        datastore.DataStore
 	K8sClientFactory *cli.ClientFactory
 }
 
 // NewService returns a point to a new Service instance.
-func NewService(dataStore portainer.DataStore) *Service {
+func NewService(dataStore datastore.DataStore) *Service {
 	return &Service{
 		dataStore: dataStore,
 	}
