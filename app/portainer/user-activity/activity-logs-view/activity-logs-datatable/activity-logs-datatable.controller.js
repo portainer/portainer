@@ -1,3 +1,4 @@
+import { ACTIVITY_AUDIT } from '@/portainer/feature-flags/feature-ids';
 export default class ActivityLogsDatatableController {
   /* @ngInject */
   constructor($controller, $scope, PaginationService) {
@@ -11,6 +12,7 @@ export default class ActivityLogsDatatableController {
     this.changeSort = this.changeSort.bind(this);
     this.handleChangeLimit = this.handleChangeLimit.bind(this);
     this.$onInit = $onInit.bind(this);
+    this.limitedFeature = ACTIVITY_AUDIT;
   }
 
   changeSort(key) {
