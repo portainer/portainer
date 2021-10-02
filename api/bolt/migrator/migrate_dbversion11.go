@@ -95,7 +95,7 @@ func (m *Migrator) convertLegacyStack(s *legacyStack) error {
 		return err
 	}
 
-	return m.stackService.CreateStack(stack)
+	return m.stackService.Create(stack)
 }
 
 func (m *Migrator) deleteLegacyStack(legacyID string) error {

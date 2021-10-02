@@ -225,7 +225,7 @@ func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *port
 		resourceControl = authorization.NewPrivateResourceControl(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl, userID)
 	}
 
-	err = handler.DataStore.ResourceControl().CreateResourceControl(resourceControl)
+	err = handler.DataStore.ResourceControl().Create(resourceControl)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist resource control inside the database", err}
 	}

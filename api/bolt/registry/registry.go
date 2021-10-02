@@ -66,7 +66,7 @@ func (service *Service) Registries() ([]portainer.Registry, error) {
 }
 
 // CreateRegistry creates a new registry.
-func (service *Service) CreateRegistry(registry *portainer.Registry) error {
+func (service *Service) Create(registry *portainer.Registry) error {
 	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 

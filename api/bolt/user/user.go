@@ -132,7 +132,7 @@ func (service *Service) UpdateUser(ID portainer.UserID, user *portainer.User) er
 }
 
 // CreateUser creates a new user.
-func (service *Service) CreateUser(user *portainer.User) error {
+func (service *Service) Create(user *portainer.User) error {
 	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 

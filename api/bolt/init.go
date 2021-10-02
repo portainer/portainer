@@ -88,7 +88,7 @@ func (store *Store) Init() error {
 			TagIDs:             []portainer.TagID{},
 		}
 
-		err = store.EndpointGroupService.CreateEndpointGroup(unassignedGroup)
+		err = store.EndpointGroupService.Create(unassignedGroup)
 		if err != nil {
 			return err
 		}

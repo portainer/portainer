@@ -218,7 +218,7 @@ func (handler *Handler) addAndPersistEdgeJob(edgeJob *portainer.EdgeJob, file []
 		handler.ReverseTunnelService.AddEdgeJob(endpointID, edgeJob)
 	}
 
-	return handler.DataStore.EdgeJob().CreateEdgeJob(edgeJob)
+	return handler.DataStore.EdgeJob().Create(edgeJob)
 }
 
 func convertEndpointsToMetaObject(endpoints []portainer.EndpointID) map[portainer.EndpointID]portainer.EdgeJobEndpointMeta {

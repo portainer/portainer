@@ -87,7 +87,7 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 
 	stack.CreatedBy = config.user.Username
 
-	err = handler.DataStore.Stack().CreateStack(stack)
+	err = handler.DataStore.Stack().Create(stack)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist the stack inside the database", Err: err}
 	}
@@ -233,7 +233,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 
 	stack.CreatedBy = config.user.Username
 
-	err = handler.DataStore.Stack().CreateStack(stack)
+	err = handler.DataStore.Stack().Create(stack)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist the stack inside the database", Err: err}
 	}
@@ -321,7 +321,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 
 	stack.CreatedBy = config.user.Username
 
-	err = handler.DataStore.Stack().CreateStack(stack)
+	err = handler.DataStore.Stack().Create(stack)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist the stack inside the database", Err: err}
 	}

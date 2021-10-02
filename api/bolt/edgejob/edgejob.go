@@ -65,7 +65,7 @@ func (service *Service) EdgeJob(ID portainer.EdgeJobID) (*portainer.EdgeJob, err
 }
 
 // CreateEdgeJob creates a new Edge job
-func (service *Service) CreateEdgeJob(edgeJob *portainer.EdgeJob) error {
+func (service *Service) Create(edgeJob *portainer.EdgeJob) error {
 	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 

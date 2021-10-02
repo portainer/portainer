@@ -53,10 +53,10 @@ func Test_redeployWhenChanged_DoesNothingWhenNotAGitBasedStack(t *testing.T) {
 	defer teardown()
 
 	admin := &portainer.User{ID: 1, Username: "admin"}
-	err := store.User().CreateUser(admin)
+	err := store.User().Create(admin)
 	assert.NoError(t, err, "error creating an admin")
 
-	err = store.Stack().CreateStack(&portainer.Stack{ID: 1, CreatedBy: "admin"})
+	err = store.Stack().Create(&portainer.Stack{ID: 1, CreatedBy: "admin"})
 	assert.NoError(t, err, "failed to create a test stack")
 
 	err = RedeployWhenChanged(1, nil, store, &gitService{nil, ""})
@@ -70,10 +70,10 @@ func Test_redeployWhenChanged_DoesNothingWhenNoGitChanges(t *testing.T) {
 	tmpDir, _ := ioutil.TempDir("", "stack")
 
 	admin := &portainer.User{ID: 1, Username: "admin"}
-	err := store.User().CreateUser(admin)
+	err := store.User().Create(admin)
 	assert.NoError(t, err, "error creating an admin")
 
-	err = store.Stack().CreateStack(&portainer.Stack{
+	err = store.Stack().Create(&portainer.Stack{
 		ID:          1,
 		CreatedBy:   "admin",
 		ProjectPath: tmpDir,
@@ -94,10 +94,10 @@ func Test_redeployWhenChanged_FailsWhenCannotClone(t *testing.T) {
 	defer teardown()
 
 	admin := &portainer.User{ID: 1, Username: "admin"}
-	err := store.User().CreateUser(admin)
+	err := store.User().Create(admin)
 	assert.NoError(t, err, "error creating an admin")
 
-	err = store.Stack().CreateStack(&portainer.Stack{
+	err = store.Stack().Create(&portainer.Stack{
 		ID:        1,
 		CreatedBy: "admin",
 		GitConfig: &gittypes.RepoConfig{
@@ -118,11 +118,11 @@ func Test_redeployWhenChanged(t *testing.T) {
 
 	tmpDir, _ := ioutil.TempDir("", "stack")
 
-	err := store.Endpoint().CreateEndpoint(&portainer.Endpoint{ID: 1})
+	err := store.Endpoint().Create(&portainer.Endpoint{ID: 1})
 	assert.NoError(t, err, "error creating environment")
 
 	username := "user"
-	err = store.User().CreateUser(&portainer.User{Username: username, Role: portainer.AdministratorRole})
+	err = store.User().Create(&portainer.User{Username: username, Role: portainer.AdministratorRole})
 	assert.NoError(t, err, "error creating a user")
 
 	stack := portainer.Stack{
@@ -135,7 +135,7 @@ func Test_redeployWhenChanged(t *testing.T) {
 			ReferenceName: "ref",
 			ConfigHash:    "oldHash",
 		}}
-	err = store.Stack().CreateStack(&stack)
+	err = store.Stack().Create(&stack)
 	assert.NoError(t, err, "failed to create a test stack")
 
 	t.Run("can deploy docker compose stack", func(t *testing.T) {
@@ -170,16 +170,16 @@ func Test_getUserRegistries(t *testing.T) {
 	endpointID := 123
 
 	admin := &portainer.User{ID: 1, Username: "admin", Role: portainer.AdministratorRole}
-	err := store.User().CreateUser(admin)
+	err := store.User().Create(admin)
 	assert.NoError(t, err, "error creating an admin")
 
 	user := &portainer.User{ID: 2, Username: "user", Role: portainer.StandardUserRole}
-	err = store.User().CreateUser(user)
+	err = store.User().Create(user)
 	assert.NoError(t, err, "error creating a user")
 
 	team := portainer.Team{ID: 1, Name: "team"}
 
-	store.TeamMembership().CreateTeamMembership(&portainer.TeamMembership{
+	store.TeamMembership().Create(&portainer.TeamMembership{
 		ID:     1,
 		UserID: user.ID,
 		TeamID: team.ID,
@@ -196,7 +196,7 @@ func Test_getUserRegistries(t *testing.T) {
 			},
 		},
 	}
-	err = store.Registry().CreateRegistry(&registryReachableByUser)
+	err = store.Registry().Create(&registryReachableByUser)
 	assert.NoError(t, err, "couldn't create a registry")
 
 	registryReachableByTeam := portainer.Registry{
@@ -209,7 +209,7 @@ func Test_getUserRegistries(t *testing.T) {
 			},
 		},
 	}
-	err = store.Registry().CreateRegistry(&registryReachableByTeam)
+	err = store.Registry().Create(&registryReachableByTeam)
 	assert.NoError(t, err, "couldn't create a registry")
 
 	registryRestricted := portainer.Registry{
@@ -222,7 +222,7 @@ func Test_getUserRegistries(t *testing.T) {
 			},
 		},
 	}
-	err = store.Registry().CreateRegistry(&registryRestricted)
+	err = store.Registry().Create(&registryRestricted)
 	assert.NoError(t, err, "couldn't create a registry")
 
 	t.Run("admin should has access to all registries", func(t *testing.T) {

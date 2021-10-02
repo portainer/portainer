@@ -60,7 +60,7 @@ func (handler *Handler) tagCreate(w http.ResponseWriter, r *http.Request) *httpe
 		Endpoints:      map[portainer.EndpointID]bool{},
 	}
 
-	err = handler.DataStore.Tag().CreateTag(tag)
+	err = handler.DataStore.Tag().Create(tag)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the tag inside the database", err}
 	}

@@ -66,14 +66,14 @@ func (handler *Handler) customTemplateCreate(w http.ResponseWriter, r *http.Requ
 		}
 	}
 
-	err = handler.DataStore.CustomTemplate().CreateCustomTemplate(customTemplate)
+	err = handler.DataStore.CustomTemplate().Create(customTemplate)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create custom template", err}
 	}
 
 	resourceControl := authorization.NewPrivateResourceControl(strconv.Itoa(int(customTemplate.ID)), portainer.CustomTemplateResourceControl, tokenData.ID)
 
-	err = handler.DataStore.ResourceControl().CreateResourceControl(resourceControl)
+	err = handler.DataStore.ResourceControl().Create(resourceControl)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist resource control inside the database", err}
 	}

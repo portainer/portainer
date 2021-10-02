@@ -24,10 +24,10 @@ func Test_helmDelete(t *testing.T) {
 	store, teardown := bolt.MustNewTestStore(true)
 	defer teardown()
 
-	err := store.Endpoint().CreateEndpoint(&portainer.Endpoint{ID: 1})
+	err := store.Endpoint().Create(&portainer.Endpoint{ID: 1})
 	is.NoError(err, "Error creating environment")
 
-	err = store.User().CreateUser(&portainer.User{Username: "admin", Role: portainer.AdministratorRole})
+	err = store.User().Create(&portainer.User{Username: "admin", Role: portainer.AdministratorRole})
 	is.NoError(err, "Error creating a user")
 
 	kubernetesDeployer := exectest.NewKubernetesDeployer()

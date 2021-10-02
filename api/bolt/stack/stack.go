@@ -106,7 +106,7 @@ func (service *Service) GetNextIdentifier() int {
 }
 
 // CreateStack creates a new stack.
-func (service *Service) CreateStack(stack *portainer.Stack) error {
+func (service *Service) Create(stack *portainer.Stack) error {
 	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 

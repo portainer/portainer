@@ -104,7 +104,7 @@ func (s *stubUserService) Users() ([]portainer.User, error)                     
 func (s *stubUserService) UsersByRole(role portainer.UserRole) ([]portainer.User, error) {
 	return s.users, nil
 }
-func (s *stubUserService) CreateUser(user *portainer.User) error                      { return nil }
+func (s *stubUserService) Create(user *portainer.User) error                          { return nil }
 func (s *stubUserService) UpdateUser(ID portainer.UserID, user *portainer.User) error { return nil }
 func (s *stubUserService) DeleteUser(ID portainer.UserID) error                       { return nil }
 
@@ -123,7 +123,7 @@ func (s *stubEdgeJobService) EdgeJobs() ([]portainer.EdgeJob, error) { return s.
 func (s *stubEdgeJobService) EdgeJob(ID portainer.EdgeJobID) (*portainer.EdgeJob, error) {
 	return nil, nil
 }
-func (s *stubEdgeJobService) CreateEdgeJob(edgeJob *portainer.EdgeJob) error { return nil }
+func (s *stubEdgeJobService) Create(edgeJob *portainer.EdgeJob) error { return nil }
 func (s *stubEdgeJobService) UpdateEdgeJob(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error {
 	return nil
 }
@@ -153,7 +153,7 @@ func (s *stubEndpointRelationService) EndpointRelation(ID portainer.EndpointID) 
 
 	return nil, errors.ErrObjectNotFound
 }
-func (s *stubEndpointRelationService) CreateEndpointRelation(EndpointRelation *portainer.EndpointRelation) error {
+func (s *stubEndpointRelationService) Create(EndpointRelation *portainer.EndpointRelation) error {
 	return nil
 }
 func (s *stubEndpointRelationService) UpdateEndpointRelation(ID portainer.EndpointID, relation *portainer.EndpointRelation) error {
@@ -195,7 +195,7 @@ func (s *stubEndpointService) Endpoints() ([]portainer.Endpoint, error) {
 	return s.endpoints, nil
 }
 
-func (s *stubEndpointService) CreateEndpoint(endpoint *portainer.Endpoint) error {
+func (s *stubEndpointService) Create(endpoint *portainer.Endpoint) error {
 	s.endpoints = append(s.endpoints, *endpoint)
 
 	return nil

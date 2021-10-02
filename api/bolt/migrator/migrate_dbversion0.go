@@ -15,7 +15,7 @@ func (m *Migrator) updateAdminUserToDBVersion1() error {
 			Password: u.Password,
 			Role:     portainer.AdministratorRole,
 		}
-		err = m.userService.CreateUser(admin)
+		err = m.userService.Create(admin)
 		if err != nil {
 			return err
 		}

@@ -135,7 +135,7 @@ func (service *Service) DeleteWebhook(ID portainer.WebhookID) error {
 }
 
 // CreateWebhook assign an ID to a new webhook and saves it.
-func (service *Service) CreateWebhook(webhook *portainer.Webhook) error {
+func (service *Service) Create(webhook *portainer.Webhook) error {
 	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 

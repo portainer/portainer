@@ -102,7 +102,7 @@ func (service *Service) ResourceControls() ([]portainer.ResourceControl, error) 
 }
 
 // CreateResourceControl creates a new ResourceControl object
-func (service *Service) CreateResourceControl(resourceControl *portainer.ResourceControl) error {
+func (service *Service) Create(resourceControl *portainer.ResourceControl) error {
 	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
