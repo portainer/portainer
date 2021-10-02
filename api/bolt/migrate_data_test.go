@@ -51,10 +51,10 @@ func TestMigrateData(t *testing.T) {
 		store.VersionService.StoreDBVersion(tc.version)
 
 		// Required roles by migrations 22.2
-		store.RoleService.CreateRole(&portainer.Role{ID: 1})
-		store.RoleService.CreateRole(&portainer.Role{ID: 2})
-		store.RoleService.CreateRole(&portainer.Role{ID: 3})
-		store.RoleService.CreateRole(&portainer.Role{ID: 4})
+		store.RoleService.Create(&portainer.Role{ID: 1})
+		store.RoleService.Create(&portainer.Role{ID: 2})
+		store.RoleService.Create(&portainer.Role{ID: 3})
+		store.RoleService.Create(&portainer.Role{ID: 4})
 
 		t.Run(fmt.Sprintf("MigrateData for version %d", tc.version), func(t *testing.T) {
 			store.MigrateData(true)

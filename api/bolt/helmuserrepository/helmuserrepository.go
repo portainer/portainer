@@ -56,7 +56,7 @@ func (service *Service) HelmUserRepositoryByUserID(userID portainer.UserID) ([]p
 }
 
 // CreateHelmUserRepository creates a new HelmUserRepository object.
-func (service *Service) CreateHelmUserRepository(record *portainer.HelmUserRepository) error {
+func (service *Service) Create(record *portainer.HelmUserRepository) error {
 	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 

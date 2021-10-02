@@ -86,7 +86,7 @@ func (handler *Handler) teamMembershipCreate(w http.ResponseWriter, r *http.Requ
 		Role:   portainer.MembershipRole(payload.Role),
 	}
 
-	err = handler.DataStore.TeamMembership().CreateTeamMembership(membership)
+	err = handler.DataStore.TeamMembership().Create(membership)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist team memberships inside the database", err}
 	}

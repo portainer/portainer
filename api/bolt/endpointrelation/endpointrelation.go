@@ -42,7 +42,7 @@ func (service *Service) EndpointRelation(endpointID portainer.EndpointID) (*port
 }
 
 // CreateEndpointRelation saves endpointRelation
-func (service *Service) CreateEndpointRelation(endpointRelation *portainer.EndpointRelation) error {
+func (service *Service) Create(endpointRelation *portainer.EndpointRelation) error {
 	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 

@@ -168,7 +168,7 @@ func (m *Migrator) updateDockerhubToDB32() error {
 		}
 	}
 
-	return m.registryService.CreateRegistry(registry)
+	return m.registryService.Create(registry)
 }
 
 func (m *Migrator) updateVolumeResourceControlToDB32() error {

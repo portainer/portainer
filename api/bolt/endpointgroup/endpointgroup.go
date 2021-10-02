@@ -78,7 +78,7 @@ func (service *Service) EndpointGroups() ([]portainer.EndpointGroup, error) {
 }
 
 // CreateEndpointGroup assign an ID to a new environment(endpoint) group and saves it.
-func (service *Service) CreateEndpointGroup(endpointGroup *portainer.EndpointGroup) error {
+func (service *Service) Create(endpointGroup *portainer.EndpointGroup) error {
 	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 

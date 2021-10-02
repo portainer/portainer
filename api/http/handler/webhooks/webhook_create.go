@@ -89,7 +89,7 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 		WebhookType: portainer.WebhookType(payload.WebhookType),
 	}
 
-	err = handler.DataStore.Webhook().CreateWebhook(webhook)
+	err = handler.DataStore.Webhook().Create(webhook)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the webhook inside the database", err}
 	}

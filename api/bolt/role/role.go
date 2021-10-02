@@ -66,7 +66,7 @@ func (service *Service) Roles() ([]portainer.Role, error) {
 }
 
 // CreateRole creates a new Role.
-func (service *Service) CreateRole(role *portainer.Role) error {
+func (service *Service) Create(role *portainer.Role) error {
 	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 

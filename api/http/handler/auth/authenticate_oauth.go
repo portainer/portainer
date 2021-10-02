@@ -90,7 +90,7 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 			Role:     portainer.StandardUserRole,
 		}
 
-		err = handler.DataStore.User().CreateUser(user)
+		err = handler.DataStore.User().Create(user)
 		if err != nil {
 			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist user inside the database", Err: err}
 		}
@@ -102,7 +102,7 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 				Role:   portainer.TeamMember,
 			}
 
-			err = handler.DataStore.TeamMembership().CreateTeamMembership(membership)
+			err = handler.DataStore.TeamMembership().Create(membership)
 			if err != nil {
 				return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to persist team membership inside the database", Err: err}
 			}

@@ -77,7 +77,7 @@ func (service *Service) Endpoints() ([]portainer.Endpoint, error) {
 }
 
 // CreateEndpoint assign an ID to a new environment(endpoint) and saves it.
-func (service *Service) CreateEndpoint(endpoint *portainer.Endpoint) error {
+func (service *Service) Create(endpoint *portainer.Endpoint) error {
 	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 

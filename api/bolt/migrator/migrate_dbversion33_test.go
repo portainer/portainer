@@ -34,7 +34,7 @@ func TestMigrateStackEntryPoint(t *testing.T) {
 	}
 
 	for _, s := range stacks {
-		err := stackService.CreateStack(s)
+		err := stackService.Create(s)
 		assert.NoError(t, err, "failed to create stack")
 	}
 

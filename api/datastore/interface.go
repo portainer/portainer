@@ -51,7 +51,7 @@ type (
 		GetNextIdentifier() int
 		CustomTemplates() ([]portainer.CustomTemplate, error)
 		CustomTemplate(ID portainer.CustomTemplateID) (*portainer.CustomTemplate, error)
-		CreateCustomTemplate(customTemplate *portainer.CustomTemplate) error
+		Create(customTemplate *portainer.CustomTemplate) error
 		UpdateCustomTemplate(ID portainer.CustomTemplateID, customTemplate *portainer.CustomTemplate) error
 		DeleteCustomTemplate(ID portainer.CustomTemplateID) error
 	}
@@ -60,7 +60,7 @@ type (
 	EdgeGroupService interface {
 		EdgeGroups() ([]portainer.EdgeGroup, error)
 		EdgeGroup(ID portainer.EdgeGroupID) (*portainer.EdgeGroup, error)
-		CreateEdgeGroup(group *portainer.EdgeGroup) error
+		Create(group *portainer.EdgeGroup) error
 		UpdateEdgeGroup(ID portainer.EdgeGroupID, group *portainer.EdgeGroup) error
 		DeleteEdgeGroup(ID portainer.EdgeGroupID) error
 	}
@@ -69,7 +69,7 @@ type (
 	EdgeJobService interface {
 		EdgeJobs() ([]portainer.EdgeJob, error)
 		EdgeJob(ID portainer.EdgeJobID) (*portainer.EdgeJob, error)
-		CreateEdgeJob(edgeJob *portainer.EdgeJob) error
+		Create(edgeJob *portainer.EdgeJob) error
 		UpdateEdgeJob(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error
 		DeleteEdgeJob(ID portainer.EdgeJobID) error
 		GetNextIdentifier() int
@@ -79,7 +79,7 @@ type (
 	EdgeStackService interface {
 		EdgeStacks() ([]portainer.EdgeStack, error)
 		EdgeStack(ID portainer.EdgeStackID) (*portainer.EdgeStack, error)
-		CreateEdgeStack(edgeStack *portainer.EdgeStack) error
+		Create(edgeStack *portainer.EdgeStack) error
 		UpdateEdgeStack(ID portainer.EdgeStackID, edgeStack *portainer.EdgeStack) error
 		DeleteEdgeStack(ID portainer.EdgeStackID) error
 		GetNextIdentifier() int
@@ -89,7 +89,7 @@ type (
 	EndpointService interface {
 		Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, error)
 		Endpoints() ([]portainer.Endpoint, error)
-		CreateEndpoint(endpoint *portainer.Endpoint) error
+		Create(endpoint *portainer.Endpoint) error
 		UpdateEndpoint(ID portainer.EndpointID, endpoint *portainer.Endpoint) error
 		DeleteEndpoint(ID portainer.EndpointID) error
 		Synchronize(toCreate, toUpdate, toDelete []*portainer.Endpoint) error
@@ -100,7 +100,7 @@ type (
 	EndpointGroupService interface {
 		EndpointGroup(ID portainer.EndpointGroupID) (*portainer.EndpointGroup, error)
 		EndpointGroups() ([]portainer.EndpointGroup, error)
-		CreateEndpointGroup(group *portainer.EndpointGroup) error
+		Create(group *portainer.EndpointGroup) error
 		UpdateEndpointGroup(ID portainer.EndpointGroupID, group *portainer.EndpointGroup) error
 		DeleteEndpointGroup(ID portainer.EndpointGroupID) error
 	}
@@ -108,7 +108,7 @@ type (
 	// EndpointRelationService represents a service for managing environment(endpoint) relations data
 	EndpointRelationService interface {
 		EndpointRelation(EndpointID portainer.EndpointID) (*portainer.EndpointRelation, error)
-		CreateEndpointRelation(endpointRelation *portainer.EndpointRelation) error
+		Create(endpointRelation *portainer.EndpointRelation) error
 		UpdateEndpointRelation(EndpointID portainer.EndpointID, endpointRelation *portainer.EndpointRelation) error
 		DeleteEndpointRelation(EndpointID portainer.EndpointID) error
 	}
@@ -116,7 +116,7 @@ type (
 	// HelmUserRepositoryService represents a service to manage HelmUserRepositories
 	HelmUserRepositoryService interface {
 		HelmUserRepositoryByUserID(userID portainer.UserID) ([]portainer.HelmUserRepository, error)
-		CreateHelmUserRepository(record *portainer.HelmUserRepository) error
+		Create(record *portainer.HelmUserRepository) error
 	}
 
 	// JWTService represents a service for managing JWT tokens
@@ -132,7 +132,7 @@ type (
 	RegistryService interface {
 		Registry(ID portainer.RegistryID) (*portainer.Registry, error)
 		Registries() ([]portainer.Registry, error)
-		CreateRegistry(registry *portainer.Registry) error
+		Create(registry *portainer.Registry) error
 		UpdateRegistry(ID portainer.RegistryID, registry *portainer.Registry) error
 		DeleteRegistry(ID portainer.RegistryID) error
 	}
@@ -142,7 +142,7 @@ type (
 		ResourceControl(ID portainer.ResourceControlID) (*portainer.ResourceControl, error)
 		ResourceControlByResourceIDAndType(resourceID string, resourceType portainer.ResourceControlType) (*portainer.ResourceControl, error)
 		ResourceControls() ([]portainer.ResourceControl, error)
-		CreateResourceControl(rc *portainer.ResourceControl) error
+		Create(rc *portainer.ResourceControl) error
 		UpdateResourceControl(ID portainer.ResourceControlID, resourceControl *portainer.ResourceControl) error
 		DeleteResourceControl(ID portainer.ResourceControlID) error
 	}
@@ -151,7 +151,7 @@ type (
 	RoleService interface {
 		Role(ID portainer.RoleID) (*portainer.Role, error)
 		Roles() ([]portainer.Role, error)
-		CreateRole(role *portainer.Role) error
+		Create(role *portainer.Role) error
 		UpdateRole(ID portainer.RoleID, role *portainer.Role) error
 	}
 
@@ -184,7 +184,7 @@ type (
 		StackByName(name string) (*portainer.Stack, error)
 		StacksByName(name string) ([]portainer.Stack, error)
 		Stacks() ([]portainer.Stack, error)
-		CreateStack(stack *portainer.Stack) error
+		Create(stack *portainer.Stack) error
 		UpdateStack(ID portainer.StackID, stack *portainer.Stack) error
 		DeleteStack(ID portainer.StackID) error
 		GetNextIdentifier() int
@@ -196,7 +196,7 @@ type (
 	TagService interface {
 		Tags() ([]portainer.Tag, error)
 		Tag(ID portainer.TagID) (*portainer.Tag, error)
-		CreateTag(tag *portainer.Tag) error
+		Create(tag *portainer.Tag) error
 		UpdateTag(ID portainer.TagID, tag *portainer.Tag) error
 		DeleteTag(ID portainer.TagID) error
 	}
@@ -206,7 +206,7 @@ type (
 		Team(ID portainer.TeamID) (*portainer.Team, error)
 		TeamByName(name string) (*portainer.Team, error)
 		Teams() ([]portainer.Team, error)
-		CreateTeam(team *portainer.Team) error
+		Create(team *portainer.Team) error
 		UpdateTeam(ID portainer.TeamID, team *portainer.Team) error
 		DeleteTeam(ID portainer.TeamID) error
 	}
@@ -217,7 +217,7 @@ type (
 		TeamMemberships() ([]portainer.TeamMembership, error)
 		TeamMembershipsByUserID(userID portainer.UserID) ([]portainer.TeamMembership, error)
 		TeamMembershipsByTeamID(teamID portainer.TeamID) ([]portainer.TeamMembership, error)
-		CreateTeamMembership(membership *portainer.TeamMembership) error
+		Create(membership *portainer.TeamMembership) error
 		UpdateTeamMembership(ID portainer.TeamMembershipID, membership *portainer.TeamMembership) error
 		DeleteTeamMembership(ID portainer.TeamMembershipID) error
 		DeleteTeamMembershipByUserID(userID portainer.UserID) error
@@ -236,7 +236,7 @@ type (
 		UserByUsername(username string) (*portainer.User, error)
 		Users() ([]portainer.User, error)
 		UsersByRole(role portainer.UserRole) ([]portainer.User, error)
-		CreateUser(user *portainer.User) error
+		Create(user *portainer.User) error
 		UpdateUser(ID portainer.UserID, user *portainer.User) error
 		DeleteUser(ID portainer.UserID) error
 	}
@@ -254,7 +254,7 @@ type (
 	WebhookService interface {
 		Webhooks() ([]portainer.Webhook, error)
 		Webhook(ID portainer.WebhookID) (*portainer.Webhook, error)
-		CreateWebhook(portainer *portainer.Webhook) error
+		Create(portainer *portainer.Webhook) error
 		UpdateWebhook(ID portainer.WebhookID, webhook *portainer.Webhook) error
 		WebhookByResourceID(resourceID string) (*portainer.Webhook, error)
 		WebhookByToken(token string) (*portainer.Webhook, error)

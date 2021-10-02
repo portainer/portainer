@@ -57,7 +57,7 @@ func (m *Migrator) updateEndpointsAndEndpointGroupsToDBVersion23() error {
 			EdgeStacks: map[portainer.EdgeStackID]bool{},
 		}
 
-		err = m.endpointRelationService.CreateEndpointRelation(relation)
+		err = m.endpointRelationService.Create(relation)
 		if err != nil {
 			return err
 		}

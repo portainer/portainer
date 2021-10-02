@@ -76,7 +76,7 @@ func (b *stackBuilder) createNewStack(webhookID string) portainer.Stack {
 		stack.AutoUpdate = &portainer.StackAutoUpdate{Webhook: webhookID}
 	}
 
-	err := b.store.StackService.CreateStack(&stack)
+	err := b.store.StackService.Create(&stack)
 	assert.NoError(b.t, err)
 
 	return stack
@@ -94,7 +94,7 @@ func Test_RefreshableStacks(t *testing.T) {
 	refreshableStack := portainer.Stack{ID: 3, AutoUpdate: &portainer.StackAutoUpdate{Interval: "1m"}}
 
 	for _, stack := range []*portainer.Stack{&staticStack, &stackWithWebhook, &refreshableStack} {
-		err := store.Stack().CreateStack(stack)
+		err := store.Stack().Create(stack)
 		assert.NoError(t, err)
 	}
 
