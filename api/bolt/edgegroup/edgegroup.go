@@ -77,7 +77,7 @@ func (service *Service) DeleteEdgeGroup(ID portainer.EdgeGroupID) error {
 }
 
 // CreateEdgeGroup assign an ID to a new Edge group and saves it.
-func (service *Service) CreateEdgeGroup(group *portainer.EdgeGroup) error {
+func (service *Service) Create(group *portainer.EdgeGroup) error {
 	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 

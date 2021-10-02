@@ -124,7 +124,7 @@ func (service *Service) UpdateTeamMembership(ID portainer.TeamMembershipID, memb
 }
 
 // CreateTeamMembership creates a new TeamMembership object.
-func (service *Service) CreateTeamMembership(membership *portainer.TeamMembership) error {
+func (service *Service) Create(membership *portainer.TeamMembership) error {
 	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 

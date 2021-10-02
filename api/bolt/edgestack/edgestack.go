@@ -65,7 +65,7 @@ func (service *Service) EdgeStack(ID portainer.EdgeStackID) (*portainer.EdgeStac
 }
 
 // CreateEdgeStack assign an ID to a new Edge stack and saves it.
-func (service *Service) CreateEdgeStack(edgeStack *portainer.EdgeStack) error {
+func (service *Service) Create(edgeStack *portainer.EdgeStack) error {
 	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 

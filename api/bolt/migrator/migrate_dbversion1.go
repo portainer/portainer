@@ -33,7 +33,7 @@ func (m *Migrator) updateResourceControlsToDBVersion2() error {
 			resourceControl.UserAccesses = []portainer.UserResourceAccess{userAccess}
 		}
 
-		err = m.resourceControlService.CreateResourceControl(&resourceControl)
+		err = m.resourceControlService.Create(&resourceControl)
 		if err != nil {
 			return err
 		}

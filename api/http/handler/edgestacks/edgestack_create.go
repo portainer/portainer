@@ -159,7 +159,7 @@ func (handler *Handler) createSwarmStackFromFileContent(r *http.Request) (*porta
 		return nil, fmt.Errorf("Unable to update endpoint relations: %w", err)
 	}
 
-	err = handler.DataStore.EdgeStack().CreateEdgeStack(stack)
+	err = handler.DataStore.EdgeStack().Create(stack)
 	if err != nil {
 		return nil, err
 	}
@@ -274,7 +274,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(r *http.Request) (*por
 		return nil, fmt.Errorf("Unable to update endpoint relations: %w", err)
 	}
 
-	err = handler.DataStore.EdgeStack().CreateEdgeStack(stack)
+	err = handler.DataStore.EdgeStack().Create(stack)
 	if err != nil {
 		return nil, err
 	}
@@ -381,7 +381,7 @@ func (handler *Handler) createSwarmStackFromFileUpload(r *http.Request) (*portai
 		return nil, fmt.Errorf("Unable to update endpoint relations: %w", err)
 	}
 
-	err = handler.DataStore.EdgeStack().CreateEdgeStack(stack)
+	err = handler.DataStore.EdgeStack().Create(stack)
 	if err != nil {
 		return nil, err
 	}

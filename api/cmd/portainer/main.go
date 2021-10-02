@@ -389,7 +389,7 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, dataStore datastore.Dat
 		log.Printf("http error: environment snapshot error (environment=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
 	}
 
-	return dataStore.Endpoint().CreateEndpoint(endpoint)
+	return dataStore.Endpoint().Create(endpoint)
 }
 
 func createUnsecuredEndpoint(endpointURL string, dataStore datastore.DataStore, snapshotService portainer.SnapshotService) error {
@@ -435,7 +435,7 @@ func createUnsecuredEndpoint(endpointURL string, dataStore datastore.DataStore, 
 		log.Printf("http error: environment snapshot error (environment=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
 	}
 
-	return dataStore.Endpoint().CreateEndpoint(endpoint)
+	return dataStore.Endpoint().Create(endpoint)
 }
 
 func initEndpoint(flags *portainer.CLIFlags, dataStore datastore.DataStore, snapshotService portainer.SnapshotService) error {
@@ -598,7 +598,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 				Role:     portainer.AdministratorRole,
 				Password: adminPasswordHash,
 			}
-			err := dataStore.User().CreateUser(user)
+			err := dataStore.User().Create(user)
 			if err != nil {
 				log.Fatalf("failed creating admin user: %v", err)
 			}

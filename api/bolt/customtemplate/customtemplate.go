@@ -77,7 +77,7 @@ func (service *Service) DeleteCustomTemplate(ID portainer.CustomTemplateID) erro
 }
 
 // CreateCustomTemplate assign an ID to a new custom template and saves it.
-func (service *Service) CreateCustomTemplate(customTemplate *portainer.CustomTemplate) error {
+func (service *Service) Create(customTemplate *portainer.CustomTemplate) error {
 	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 

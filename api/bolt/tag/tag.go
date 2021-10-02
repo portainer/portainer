@@ -66,7 +66,7 @@ func (service *Service) Tag(ID portainer.TagID) (*portainer.Tag, error) {
 }
 
 // CreateTag creates a new tag.
-func (service *Service) CreateTag(tag *portainer.Tag) error {
+func (service *Service) Create(tag *portainer.Tag) error {
 	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 

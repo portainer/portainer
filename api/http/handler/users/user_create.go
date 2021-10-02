@@ -94,7 +94,7 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 		}
 	}
 
-	err = handler.DataStore.User().CreateUser(user)
+	err = handler.DataStore.User().Create(user)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist user inside the database", err}
 	}

@@ -57,7 +57,7 @@ func (handler *Handler) teamCreate(w http.ResponseWriter, r *http.Request) *http
 		Name: payload.Name,
 	}
 
-	err = handler.DataStore.Team().CreateTeam(team)
+	err = handler.DataStore.Team().Create(team)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the team inside the database", err}
 	}

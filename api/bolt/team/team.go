@@ -106,7 +106,7 @@ func (service *Service) UpdateTeam(ID portainer.TeamID, team *portainer.Team) er
 }
 
 // CreateTeam creates a new Team.
-func (service *Service) CreateTeam(team *portainer.Team) error {
+func (service *Service) Create(team *portainer.Team) error {
 	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
