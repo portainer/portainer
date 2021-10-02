@@ -1,6 +1,6 @@
 import { authenticationMethodTypesMap, authenticationMethodTypesLabels } from '@/portainer/settings/authentication/auth-method-constants';
 import { authenticationActivityTypesMap, authenticationActivityTypesLabels } from '@/portainer/settings/authentication/auth-type-constants';
-import { ACTIVITY_AUDIT } from '@/portainer/feature-flags/feature-ids';
+
 class ActivityLogsDatatableController {
   /* @ngInject */
   constructor($controller, $scope, PaginationService) {
@@ -17,8 +17,6 @@ class ActivityLogsDatatableController {
 
     this.changeSort = this.changeSort.bind(this);
     this.handleChangeLimit = this.handleChangeLimit.bind(this);
-
-    this.limitedFeature = ACTIVITY_AUDIT;
   }
 
   changeSort(key) {

@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { ACTIVITY_AUDIT } from '@/portainer/feature-flags/feature-ids';
 
 export default class AuthLogsViewController {
   /* @ngInject */
@@ -6,6 +7,7 @@ export default class AuthLogsViewController {
     this.$async = $async;
     this.Notifications = Notifications;
 
+    this.limitedFeature = ACTIVITY_AUDIT;
     this.state = {
       keyword: 'f',
       date: {

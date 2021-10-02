@@ -26,7 +26,7 @@
 
       <div>
         <button type="button" class="btn btn-sm btn-primary" style="margin-right: 10px;"> <i class="fa fa-download space-right" aria-hidden="true"></i>Export as CSV </button>
-        <be-feature-indicator feature="'activity-audit'"></be-feature-indicator>
+        <be-feature-indicator feature="$ctrl.limitedFeature"></be-feature-indicator>
       </div>
     </rd-widget-body>
   </rd-widget>
@@ -39,6 +39,7 @@
     context-filter="$ctrl.state.contextFilter"
     total-items="$ctrl.state.totalItems"
     current-page="$ctrl.state.currentPage"
+    feature="{{:: $ctrl.limitedFeature}}"
     on-change-keyword="($ctrl.onChangeKeyword)"
     on-change-sort="($ctrl.onChangeSort)"
     on-change-limit="($ctrl.onChangeLimit)"

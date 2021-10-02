@@ -12,6 +12,7 @@ export const authLogsDatatable = {
     currentPage: '<',
     contextFilter: '<',
     typeFilter: '<',
+    feature: '@',
 
     onChangeContextFilter: '<',
     onChangeTypeFilter: '<',

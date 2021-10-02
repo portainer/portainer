@@ -12,6 +12,7 @@ export const activityLogsDatatable = {
     limit: '<',
     totalItems: '<',
     currentPage: '<',
+    feature: '@',
 
     onChangeContextFilter: '<',
     onChangeKeyword: '<',
