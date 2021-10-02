@@ -3,8 +3,7 @@ package tag
 import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
-
-	"github.com/boltdb/bolt"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -33,21 +32,18 @@ func NewService(connection *internal.DbConnection) (*Service, error) {
 func (service *Service) Tags() ([]portainer.Tag, error) {
 	var tags = make([]portainer.Tag, 0)
 
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var tag portainer.Tag
-			err := internal.UnmarshalObject(v, &tag)
-			if err != nil {
-				return err
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) {
+			//var tag portainer.Tag
+			tag, ok := obj.(portainer.Tag)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to Tag object")
+				return
 			}
 			tags = append(tags, tag)
-		}
-
-		return nil
-	})
+		})
 
 	return tags, err
 }
@@ -67,19 +63,14 @@ func (service *Service) Tag(ID portainer.TagID) (*portainer.Tag, error) {
 
 // CreateTag creates a new tag.
 func (service *Service) Create(tag *portainer.Tag) error {
-	return service.connection.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		id, _ := bucket.NextSequence()
-		tag.ID = portainer.TagID(id)
-
-		data, err := internal.MarshalObject(tag)
-		if err != nil {
-			return err
-		}
-
-		return bucket.Put(internal.Itob(int(tag.ID)), data)
-	})
+	return internal.CreateObject(
+		service.connection,
+		BucketName,
+		func(id uint64) (int, interface{}) {
+			tag.ID = portainer.TagID(id)
+			return int(tag.ID), tag
+		},
+		)
 }
 
 // UpdateTag updates a tag.
