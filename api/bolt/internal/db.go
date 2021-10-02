@@ -2,7 +2,6 @@ package internal
 
 import (
 	"encoding/binary"
-
 	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer/api/bolt/errors"
 )
@@ -97,4 +96,40 @@ func GetNextIdentifier(connection *DbConnection, bucketName string) int {
 	})
 
 	return identifier
+}
+
+// CreateObject creates a new object in the bucket, using the next bucket sequence id
+func CreateObject(connection *DbConnection, bucketName string, fn func(uint64) (int, interface{})) error {
+	return connection.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(bucketName))
+
+		seqId, _ := bucket.NextSequence()
+		id, tag := fn(seqId)
+
+		data, err := MarshalObject(tag)
+		if err != nil {
+			return err
+		}
+
+		return bucket.Put(Itob(int(id)), data)
+	})
+}
+
+func GetAll(connection *DbConnection, bucketName string, append func(o interface{})) error {
+	err := connection.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(bucketName))
+
+		cursor := bucket.Cursor()
+		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
+			var obj interface{}
+			err := UnmarshalObject(v, &obj)
+			if err != nil {
+				return err
+			}
+			append(obj)
+		}
+
+		return nil
+	})
+	return err
 }
