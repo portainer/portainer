@@ -1,13 +1,13 @@
 package team
 
 import (
+	"fmt"
+	"github.com/sirupsen/logrus"
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/internal"
-
-	"github.com/boltdb/bolt"
 )
 
 const (
@@ -47,54 +47,50 @@ func (service *Service) Team(ID portainer.TeamID) (*portainer.Team, error) {
 
 // TeamByName returns a team by name.
 func (service *Service) TeamByName(name string) (*portainer.Team, error) {
-	var team *portainer.Team
+	var t *portainer.Team
 
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var t portainer.Team
-			err := internal.UnmarshalObject(v, &t)
-			if err != nil {
-				return err
+	stop := fmt.Errorf("ok")
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			team, ok := obj.(portainer.Team)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to Team object")
+				return fmt.Errorf("Failed to convert to Team object: %s", obj)
 			}
-
 			if strings.EqualFold(t.Name, name) {
-				team = &t
-				break
+				t = &team
+				return stop
 			}
-		}
+			return nil
+		})
+	if err == stop {
+		return t, nil
+	}
+	if err == nil {
+		return nil, errors.ErrObjectNotFound
+	}
 
-		if team == nil {
-			return errors.ErrObjectNotFound
-		}
-
-		return nil
-	})
-
-	return team, err
+	return nil, err
 }
 
 // Teams return an array containing all the teams.
 func (service *Service) Teams() ([]portainer.Team, error) {
 	var teams = make([]portainer.Team, 0)
 
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var team portainer.Team
-			err := internal.UnmarshalObject(v, &team)
-			if err != nil {
-				return err
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			team, ok := obj.(portainer.Team)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to Team object")
+				return fmt.Errorf("Failed to convert to Team object: %s", obj)
 			}
 			teams = append(teams, team)
-		}
-
-		return nil
-	})
+			return nil
+		})
 
 	return teams, err
 }
@@ -107,19 +103,14 @@ func (service *Service) UpdateTeam(ID portainer.TeamID, team *portainer.Team) er
 
 // CreateTeam creates a new Team.
 func (service *Service) Create(team *portainer.Team) error {
-	return service.connection.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		id, _ := bucket.NextSequence()
-		team.ID = portainer.TeamID(id)
-
-		data, err := internal.MarshalObject(team)
-		if err != nil {
-			return err
-		}
-
-		return bucket.Put(internal.Itob(int(team.ID)), data)
-	})
+	return internal.CreateObject(
+		service.connection,
+		BucketName,
+		func(id uint64) (int, interface{}) {
+			team.ID = portainer.TeamID(id)
+			return int(team.ID), team
+		},
+	)
 }
 
 // DeleteTeam deletes a Team.

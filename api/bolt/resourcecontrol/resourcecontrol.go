@@ -1,10 +1,11 @@
 package resourcecontrol
 
 import (
+	"fmt"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/internal"
-
-	"github.com/boltdb/bolt"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -47,75 +48,70 @@ func (service *Service) ResourceControl(ID portainer.ResourceControlID) (*portai
 // if no ResourceControl was found.
 func (service *Service) ResourceControlByResourceIDAndType(resourceID string, resourceType portainer.ResourceControlType) (*portainer.ResourceControl, error) {
 	var resourceControl *portainer.ResourceControl
-
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-		cursor := bucket.Cursor()
-
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var rc portainer.ResourceControl
-			err := internal.UnmarshalObject(v, &rc)
-			if err != nil {
-				return err
+	stop := fmt.Errorf("ok")
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			rc, ok := obj.(portainer.ResourceControl)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to ResourceControl object")
+				return fmt.Errorf("Failed to convert to ResourceControl object: %s", obj)
 			}
 
 			if rc.ResourceID == resourceID && rc.Type == resourceType {
 				resourceControl = &rc
-				break
+				return stop
 			}
 
 			for _, subResourceID := range rc.SubResourceIDs {
 				if subResourceID == resourceID {
 					resourceControl = &rc
-					break
+					return stop
 				}
 			}
-		}
+			return nil
+		})
+	if err == stop {
+		return resourceControl, nil
+	}
+	if err == nil {
+		return nil, errors.ErrObjectNotFound
+	}
 
-		return nil
-	})
-
-	return resourceControl, err
+	return nil, err
 }
 
 // ResourceControls returns all the ResourceControl objects
 func (service *Service) ResourceControls() ([]portainer.ResourceControl, error) {
 	var rcs = make([]portainer.ResourceControl, 0)
 
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var resourceControl portainer.ResourceControl
-			err := internal.UnmarshalObject(v, &resourceControl)
-			if err != nil {
-				return err
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			rc, ok := obj.(portainer.ResourceControl)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to ResourceControl object")
+				return fmt.Errorf("Failed to convert to ResourceControl object: %s", obj)
 			}
-			rcs = append(rcs, resourceControl)
-		}
-
-		return nil
-	})
+			rcs = append(rcs, rc)
+			return nil
+		})
 
 	return rcs, err
 }
 
 // CreateResourceControl creates a new ResourceControl object
 func (service *Service) Create(resourceControl *portainer.ResourceControl) error {
-	return service.connection.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		id, _ := bucket.NextSequence()
-		resourceControl.ID = portainer.ResourceControlID(id)
-
-		data, err := internal.MarshalObject(resourceControl)
-		if err != nil {
-			return err
-		}
-
-		return bucket.Put(internal.Itob(int(resourceControl.ID)), data)
-	})
+	return internal.CreateObject(
+		service.connection,
+		BucketName,
+		func(id uint64) (int, interface{}) {
+			resourceControl.ID = portainer.ResourceControlID(id)
+			return int(resourceControl.ID), resourceControl
+		},
+	)
 }
 
 // UpdateResourceControl saves a ResourceControl object.
