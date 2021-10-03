@@ -3,10 +3,25 @@
     Group Name
   </label>
   <div class="col-sm-7" style="padding-left: 0;">
-    <input type="text" class="form-control" id="group-name-input" ng-model="$ctrl.groupName" ng-change="$ctrl.onGroupNameChange()" />
+    <input
+      type="text"
+      class="form-control"
+      id="group-name-input"
+      ng-model="$ctrl.groupName"
+      ng-change="$ctrl.onGroupNameChange()"
+      limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+      limited-feature-tabindex="-1"
+    />
   </div>
   <div class="col-sm-1">
-    <button type="button" class="btn btn-danger btn-sm" ng-if="$ctrl.onRemoveClick" ng-click="$ctrl.onRemoveClick()">
+    <button
+      type="button"
+      class="btn btn-danger btn-sm"
+      ng-if="$ctrl.onRemoveClick"
+      ng-click="$ctrl.onRemoveClick()"
+      limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+      limited-feature-tabindex="-1"
+    >
       <i class="fa fa-trash" aria-hidden="true"></i>
     </button>
   </div>
@@ -18,4 +33,5 @@
   suffix="{{ $ctrl.suffix }}"
   on-change="($ctrl.onEntriesChange)"
   on-remove-click="($ctrl.removeGroup)"
+  limited-feature-id="$ctrl.limitedFeatureId"
 ></ldap-settings-dn-builder>

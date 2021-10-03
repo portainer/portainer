@@ -27,14 +27,36 @@
   <div class="form-group">
     <label for="ldap_url" class="col-sm-3 col-lg-2 control-label text-left" style="display: flex; flex-wrap: wrap;">
       LDAP Server
-      <button type="button" class="label label-default interactive" style="border: 0;" ng-click="$ctrl.addLDAPUrl()">
+      <button
+        type="button"
+        class="label label-default interactive"
+        style="border: 0;"
+        ng-click="$ctrl.addLDAPUrl()"
+        limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+        limited-feature-tabindex="-1"
+      >
         <i class="fa fa-plus-circle" aria-hidden="true"></i> Add additional server
       </button>
     </label>
     <div class="col-sm-9 col-lg-10">
       <div ng-repeat="url in $ctrl.settings.URLs track by $index" style="display: flex; margin-bottom: 10px;">
-        <input type="text" class="form-control" id="ldap_url" ng-model="$ctrl.settings.URLs[$index]" placeholder="e.g. 10.0.0.10:389 or myldap.domain.tld:389" />
-        <button ng-if="$index > 0" class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removeLDAPUrl($index)">
+        <input
+          type="text"
+          class="form-control"
+          id="ldap_url"
+          ng-model="$ctrl.settings.URLs[$index]"
+          placeholder="e.g. 10.0.0.10:389 or myldap.domain.tld:389"
+          limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+          limited-feature-tabindex="-1"
+        />
+        <button
+          ng-if="$index > 0"
+          class="btn btn-sm btn-danger"
+          type="button"
+          ng-click="$ctrl.removeLDAPUrl($index)"
+          limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+          limited-feature-tabindex="-1"
+        >
           <i class="fa fa-trash" aria-hidden="true"></i>
         </button>
       </div>
@@ -48,7 +70,15 @@
       <portainer-tooltip position="bottom" message="Enable this option if the server is configured for Anonymous access."></portainer-tooltip>
     </label>
     <div class="col-sm-9">
-      <label class="switch"> <input type="checkbox" id="anonymous_mode" ng-model="$ctrl.settings.AnonymousMode" /><i></i> </label>
+      <label class="switch">
+        <input
+          type="checkbox"
+          id="anonymous_mode"
+          ng-model="$ctrl.settings.AnonymousMode"
+          limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+          limited-feature-tabindex="-1"
+        /><i></i>
+      </label>
     </div>
   </div>
   <!-- !Anonymous mode-->
@@ -67,6 +97,8 @@
           ng-model="$ctrl.settings.ReaderDN"
           placeholder="cn=user,dc=domain,dc=tld"
           ng-change="$ctrl.onAccountChange($ctrl.settings.ReaderDN)"
+          limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+          limited-feature-tabindex="-1"
         />
       </div>
     </div>
@@ -77,7 +109,16 @@
         <portainer-tooltip position="bottom" message="If you do not enter a password, Portainer will leave the current password unchanged."></portainer-tooltip>
       </label>
       <div class="col-sm-9">
-        <input type="password" class="form-control" id="ldap_password" ng-model="$ctrl.settings.Password" placeholder="password" autocomplete="new-password" />
+        <input
+          type="password"
+          class="form-control"
+          id="ldap_password"
+          ng-model="$ctrl.settings.Password"
+          placeholder="password"
+          autocomplete="new-password"
+          limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+          limited-feature-tabindex="-1"
+        />
       </div>
     </div>
   </div>
@@ -87,7 +128,15 @@
       Domain root
     </label>
     <div class="col-sm-9">
-      <input type="text" class="form-control" id="ldap_domain_root" ng-model="$ctrl.domainSuffix" placeholder="dc=domain,dc=tld" />
+      <input
+        type="text"
+        class="form-control"
+        id="ldap_domain_root"
+        ng-model="$ctrl.domainSuffix"
+        placeholder="dc=domain,dc=tld"
+        limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+        limited-feature-tabindex="-1"
+      />
     </div>
   </div>
 
@@ -96,6 +145,7 @@
     settings="$ctrl.settings"
     state="$ctrl.state"
     connectivity-check="$ctrl.connectivityCheck"
+    limited-feature-id="$ctrl.limitedFeatureId"
   ></ldap-connectivity-check>
 
   <ldap-settings-security
@@ -104,6 +154,7 @@
     tlsca-cert="$ctrl.tlscaCert"
     upload-in-progress="$ctrl.state.uploadInProgress"
     on-tlsca-cert-change="($ctrl.onTlscaCertChange)"
+    limited-feature-id="$ctrl.limitedFeatureId"
   ></ldap-settings-security>
 
   <ldap-connectivity-check
@@ -111,6 +162,7 @@
     settings="$ctrl.settings"
     state="$ctrl.state"
     connectivity-check="$ctrl.connectivityCheck"
+    limited-feature-id="$ctrl.limitedFeatureId"
   ></ldap-connectivity-check>
 
   <ldap-user-search
@@ -119,6 +171,7 @@
     domain-suffix="{{ $ctrl.domainSuffix }}"
     base-filter="(objectClass=inetOrgPerson)"
     on-search-click="($ctrl.onSearchUsersClick)"
+    limited-feature-id="$ctrl.limitedFeatureId"
   ></ldap-user-search>
 
   <ldap-group-search
@@ -127,7 +180,8 @@
     domain-suffix="{{ $ctrl.domainSuffix }}"
     base-filter="(objectClass=groupOfNames)"
     on-search-click="($ctrl.onSearchGroupsClick)"
+    limited-feature-id="$ctrl.limitedFeatureId"
   ></ldap-group-search>
 
-  <ldap-settings-test-login settings="$ctrl.settings"></ldap-settings-test-login>
+  <ldap-settings-test-login settings="$ctrl.settings" limited-feature-id="$ctrl.limitedFeatureId"></ldap-settings-test-login>
 </ng-form>

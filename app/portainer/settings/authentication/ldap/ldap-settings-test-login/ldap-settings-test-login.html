@@ -6,7 +6,7 @@
     <label for="ldap_test_username" style="font-size: 0.9em; margin-right: 5px;">
       Username
     </label>
-    <input type="text" class="form-control" id="ldap_test_username" ng-model="$ctrl.username" limited-feature-dir="{{::$ctrl.limitedFeature}}" limited-feature-class="limited-be" />
+    <input type="text" class="form-control" id="ldap_test_username" ng-model="$ctrl.username" limited-feature-dir="{{::$ctrl.limitedFeatureId}}" limited-feature-tabindex="-1" />
   </div>
 
   <div class="form-group" style="margin: 0;">
@@ -19,8 +19,8 @@
       id="ldap_test_password"
       ng-model="$ctrl.password"
       autocomplete="new-password"
-      limited-feature-dir="{{::$ctrl.limitedFeature}}"
-      limited-feature-class="limited-be"
+      limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+      limited-feature-tabindex="-1"
     />
   </div>
 
@@ -30,8 +30,9 @@
       class="btn btn-primary"
       ng-disabled="$ctrl.state.testStatus === $ctrl.TEST_STATUS.LOADING || !$ctrl.username || !$ctrl.password"
       ng-click="$ctrl.testLogin($ctrl.username, $ctrl.password)"
-      limited-feature-dir="{{::$ctrl.limitedFeature}}"
+      limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
       limited-feature-disabled
+      limited-feature-tabindex="-1"
     >
       <span ng-if="$ctrl.state.testStatus !== $ctrl.TEST_STATUS.LOADING">Test</span>
       <span ng-if="$ctrl.state.testStatus === $ctrl.TEST_STATUS.LOADING">Testing...</span>
@@ -40,5 +41,5 @@
     <i ng-if="$ctrl.state.testStatus === $ctrl.TEST_STATUS.FAILURE" class="fa fa-times red-icon"></i>
   </div>
 
-  <be-feature-indicator feature="$ctrl.limitedFeature" class="space-left"></be-feature-indicator>
+  <be-feature-indicator ng-if="$ctrl.showBeIndicatorIfNeeded" feature="$ctrl.limitedFeatureId" class="space-left"></be-feature-indicator>
 </div>

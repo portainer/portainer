@@ -11,6 +11,8 @@
       ng-disabled="($ctrl.state.connectivityCheckInProgress) || (!$ctrl.settings.URLs.length) || ((!$ctrl.settings.ReaderDN || !$ctrl.settings.Password) && !$ctrl.settings.AnonymousMode)"
       ng-click="$ctrl.connectivityCheck()"
       button-spinner="$ctrl.state.connectivityCheckInProgress"
+      limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+      limited-feature-tabindex="-1"
     >
       <span ng-hide="$ctrl.state.connectivityCheckInProgress">Test connectivity</span>
       <span ng-show="$ctrl.state.connectivityCheckInProgress">Testing connectivity...</span>

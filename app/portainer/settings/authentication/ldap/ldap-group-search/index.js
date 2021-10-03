@@ -9,5 +9,6 @@ export const ldapGroupSearch = {
     baseFilter: '@',
 
     onSearchClick: '<',
+    limitedFeatureId: '<',
   },
 };

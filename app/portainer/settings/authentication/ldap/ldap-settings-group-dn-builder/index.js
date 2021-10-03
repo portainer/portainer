@@ -13,5 +13,6 @@ export const ldapSettingsGroupDnBuilder = {
     // index: int >= 0
     index: '<',
     onRemoveClick: '<',
+    limitedFeatureId: '<',
   },
 };

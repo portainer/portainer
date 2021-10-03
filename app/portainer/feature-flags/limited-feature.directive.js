@@ -19,7 +19,7 @@ export function limitedFeatureDirective(featureService) {
     }
 
     const limitedFeatureAttrs = Object.keys(attrs)
-      .filter((attr) => attr.startsWith(BASENAME) && attr !== BASENAME)
+      .filter((attr) => attr.startsWith(BASENAME) && attr !== `${BASENAME}Dir`)
       .map((attr) => [_.kebabCase(attr.replace(BASENAME, '')), attrs[attr]]);
 
     const state = featureService.selectShow(featureId);

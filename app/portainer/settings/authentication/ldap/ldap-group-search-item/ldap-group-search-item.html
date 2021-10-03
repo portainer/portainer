@@ -4,7 +4,13 @@
       <span class="text-muted small">
         Extra search configuration
       </span>
-      <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.onRemoveClick($ctrl.index)">
+      <button
+        class="btn btn-sm btn-danger"
+        type="button"
+        ng-click="$ctrl.onRemoveClick($ctrl.index)"
+        limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+        limited-feature-tabindex="-1"
+      >
         <i class="fa fa-trash" aria-hidden="true"></i>
       </button>
     </div>
@@ -14,6 +20,7 @@
       suffix="{{ $ctrl.domainSuffix }}"
       ng-model="$ctrl.config.GroupBaseDN"
       on-change="($ctrl.onChangeBaseDN)"
+      limited-feature-id="$ctrl.limitedFeatureId"
     ></ldap-settings-dn-builder>
 
     <div class="form-group">
@@ -37,16 +44,34 @@
           <rd-widget-body>
             <div class="form-group no-margin-last-child" ng-repeat="entry in $ctrl.groups">
               <div class="col-sm-4">
-                <select class="form-control" ng-model="entry.type" ng-change="$ctrl.onGroupsChange()">
+                <select
+                  class="form-control"
+                  ng-model="entry.type"
+                  ng-change="$ctrl.onGroupsChange()"
+                  limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+                  limited-feature-tabindex="-1"
+                >
                   <option value="ou">OU Name</option>
                   <option value="cn">Folder Name</option>
                 </select>
               </div>
               <div class="col-sm-5">
-                <input class="form-control" ng-model="entry.value" ng-change="$ctrl.onGroupsChange()" />
+                <input
+                  class="form-control"
+                  ng-model="entry.value"
+                  ng-change="$ctrl.onGroupsChange()"
+                  limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+                  limited-feature-tabindex="-1"
+                />
               </div>
               <div class="col-sm-3 text-right">
-                <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removeGroup($index)">
+                <button
+                  class="btn btn-sm btn-danger"
+                  type="button"
+                  ng-click="$ctrl.removeGroup($index)"
+                  limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+                  limited-feature-tabindex="-1"
+                >
                   <i class="fa fa-trash-alt" aria-hidden="true"></i>
                 </button>
               </div>

@@ -6,5 +6,6 @@ export const ldapSettingsSecurity = {
     onTlscaCertChange: '<',
     uploadInProgress: '<',
     title: '@',
+    limitedFeatureId: '<',
   },
 };
