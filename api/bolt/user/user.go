@@ -1,13 +1,13 @@
 package user
 
 import (
+	"fmt"
+	"github.com/sirupsen/logrus"
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/internal"
-
-	"github.com/boltdb/bolt"
 )
 
 const (
@@ -47,55 +47,49 @@ func (service *Service) User(ID portainer.UserID) (*portainer.User, error) {
 
 // UserByUsername returns a user by username.
 func (service *Service) UserByUsername(username string) (*portainer.User, error) {
-	var user *portainer.User
-
-	username = strings.ToLower(username)
-
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-		cursor := bucket.Cursor()
-
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var u portainer.User
-			err := internal.UnmarshalObject(v, &u)
-			if err != nil {
-				return err
+	var u *portainer.User
+	stop := fmt.Errorf("ok")
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			user, ok := obj.(portainer.User)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to User object")
+				return fmt.Errorf("Failed to convert to User object: %s", obj)
 			}
-
-			if strings.EqualFold(u.Username, username) {
-				user = &u
-				break
+			if strings.EqualFold(user.Username, username) {
+				u = &user
+				return stop
 			}
-		}
+			return nil
+		})
+	if err == stop {
+		return u, nil
+	}
+	if err == nil {
+		return nil, errors.ErrObjectNotFound
+	}
 
-		if user == nil {
-			return errors.ErrObjectNotFound
-		}
-		return nil
-	})
-
-	return user, err
+	return nil, err
 }
 
 // Users return an array containing all the users.
 func (service *Service) Users() ([]portainer.User, error) {
 	var users = make([]portainer.User, 0)
 
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var user portainer.User
-			err := internal.UnmarshalObject(v, &user)
-			if err != nil {
-				return err
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			user, ok := obj.(portainer.User)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to User object")
+				return fmt.Errorf("Failed to convert to User object: %s", obj)
 			}
 			users = append(users, user)
-		}
-
-		return nil
-	})
+			return nil
+		})
 
 	return users, err
 }
@@ -103,23 +97,21 @@ func (service *Service) Users() ([]portainer.User, error) {
 // UsersByRole return an array containing all the users with the specified role.
 func (service *Service) UsersByRole(role portainer.UserRole) ([]portainer.User, error) {
 	var users = make([]portainer.User, 0)
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
 
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var user portainer.User
-			err := internal.UnmarshalObject(v, &user)
-			if err != nil {
-				return err
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			user, ok := obj.(portainer.User)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to User object")
+				return fmt.Errorf("Failed to convert to User object: %s", obj)
 			}
-
 			if user.Role == role {
 				users = append(users, user)
 			}
-		}
-		return nil
-	})
+			return nil
+		})
 
 	return users, err
 }
@@ -133,20 +125,16 @@ func (service *Service) UpdateUser(ID portainer.UserID, user *portainer.User) er
 
 // CreateUser creates a new user.
 func (service *Service) Create(user *portainer.User) error {
-	return service.connection.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
+	return internal.CreateObject(
+		service.connection,
+		BucketName,
+		func(id uint64) (int, interface{}) {
+			user.ID = portainer.UserID(id)
+			user.Username = strings.ToLower(user.Username)
 
-		id, _ := bucket.NextSequence()
-		user.ID = portainer.UserID(id)
-		user.Username = strings.ToLower(user.Username)
-
-		data, err := internal.MarshalObject(user)
-		if err != nil {
-			return err
-		}
-
-		return bucket.Put(internal.Itob(int(user.ID)), data)
-	})
+			return int(user.ID), user
+		},
+	)
 }
 
 // DeleteUser deletes a user.

@@ -1,7 +1,6 @@
 package endpointrelation
 
 import (
-	"github.com/boltdb/bolt"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
 )
@@ -43,16 +42,7 @@ func (service *Service) EndpointRelation(endpointID portainer.EndpointID) (*port
 
 // CreateEndpointRelation saves endpointRelation
 func (service *Service) Create(endpointRelation *portainer.EndpointRelation) error {
-	return service.connection.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		data, err := internal.MarshalObject(endpointRelation)
-		if err != nil {
-			return err
-		}
-
-		return bucket.Put(internal.Itob(int(endpointRelation.EndpointID)), data)
-	})
+	return internal.CreateObjectWithId(service.connection, BucketName, int(endpointRelation.EndpointID), endpointRelation)
 }
 
 // UpdateEndpointRelation updates an Environment(Endpoint) relation object

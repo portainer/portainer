@@ -1,10 +1,10 @@
 package endpointgroup
 
 import (
+	"fmt"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
-
-	"github.com/boltdb/bolt"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -58,38 +58,31 @@ func (service *Service) DeleteEndpointGroup(ID portainer.EndpointGroupID) error 
 func (service *Service) EndpointGroups() ([]portainer.EndpointGroup, error) {
 	var endpointGroups = make([]portainer.EndpointGroup, 0)
 
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var endpointGroup portainer.EndpointGroup
-			err := internal.UnmarshalObject(v, &endpointGroup)
-			if err != nil {
-				return err
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			//var tag portainer.Tag
+			endpointGroup, ok := obj.(portainer.EndpointGroup)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to EndpointGroup object")
+				return fmt.Errorf("Failed to convert to EndpointGroup object: %s", obj)
 			}
 			endpointGroups = append(endpointGroups, endpointGroup)
-		}
-
-		return nil
-	})
+			return nil
+		})
 
 	return endpointGroups, err
 }
 
 // CreateEndpointGroup assign an ID to a new environment(endpoint) group and saves it.
 func (service *Service) Create(endpointGroup *portainer.EndpointGroup) error {
-	return service.connection.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		id, _ := bucket.NextSequence()
-		endpointGroup.ID = portainer.EndpointGroupID(id)
-
-		data, err := internal.MarshalObject(endpointGroup)
-		if err != nil {
-			return err
-		}
-
-		return bucket.Put(internal.Itob(int(endpointGroup.ID)), data)
-	})
+	return internal.CreateObject(
+		service.connection,
+		BucketName,
+		func(id uint64) (int, interface{}) {
+			endpointGroup.ID = portainer.EndpointGroupID(id)
+			return int(endpointGroup.ID), endpointGroup
+		},
+	)
 }
