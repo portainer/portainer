@@ -1,6 +1,7 @@
 package bolt
 
 import (
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/customtemplate"
 	"github.com/portainer/portainer/api/bolt/dockerhub"
 	"github.com/portainer/portainer/api/bolt/edgegroup"
@@ -11,6 +12,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/endpointrelation"
 	"github.com/portainer/portainer/api/bolt/extension"
 	"github.com/portainer/portainer/api/bolt/helmuserrepository"
+	"github.com/portainer/portainer/api/bolt/internal"
 	"github.com/portainer/portainer/api/bolt/registry"
 	"github.com/portainer/portainer/api/bolt/resourcecontrol"
 	"github.com/portainer/portainer/api/bolt/role"
@@ -27,6 +29,39 @@ import (
 	"github.com/portainer/portainer/api/bolt/webhook"
 	"github.com/portainer/portainer/api/datastore"
 )
+
+// Store defines the implementation of portainer.DataStore using
+// BoltDB as the storage system.
+type Store struct {
+	path                      string
+	connection                *internal.DbConnection
+	isNew                     bool
+	fileService               portainer.FileService
+	CustomTemplateService     *customtemplate.Service
+	DockerHubService          *dockerhub.Service
+	EdgeGroupService          *edgegroup.Service
+	EdgeJobService            *edgejob.Service
+	EdgeStackService          *edgestack.Service
+	EndpointGroupService      *endpointgroup.Service
+	EndpointService           *endpoint.Service
+	EndpointRelationService   *endpointrelation.Service
+	ExtensionService          *extension.Service
+	HelmUserRepositoryService *helmuserrepository.Service
+	RegistryService           *registry.Service
+	ResourceControlService    *resourcecontrol.Service
+	RoleService               *role.Service
+	ScheduleService           *schedule.Service
+	SettingsService           *settings.Service
+	SSLSettingsService        *ssl.Service
+	StackService              *stack.Service
+	TagService                *tag.Service
+	TeamMembershipService     *teammembership.Service
+	TeamService               *team.Service
+	TunnelServerService       *tunnelserver.Service
+	UserService               *user.Service
+	VersionService            *version.Service
+	WebhookService            *webhook.Service
+}
 
 func (store *Store) initServices() error {
 	authorizationsetService, err := role.NewService(store.connection)
