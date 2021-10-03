@@ -17,6 +17,11 @@ func testVersion(store *Store, versionWant int, t *testing.T) {
 }
 
 func TestMigrateData(t *testing.T) {
+
+	t.Run("Deliberately broken", func(t *testing.T) {
+		log.Fatal("This is deliberately broken")
+	})
+
 	t.Run("MigrateData for New Store & Re-Open Check", func(t *testing.T) {
 		store, teardown := MustNewTestStore(false)
 		defer teardown()
