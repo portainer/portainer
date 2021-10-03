@@ -1,10 +1,10 @@
 package helmuserrepository
 
 import (
+	"fmt"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
-
-	"github.com/boltdb/bolt"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -33,41 +33,32 @@ func NewService(connection *internal.DbConnection) (*Service, error) {
 func (service *Service) HelmUserRepositoryByUserID(userID portainer.UserID) ([]portainer.HelmUserRepository, error) {
 	var result = make([]portainer.HelmUserRepository, 0)
 
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var record portainer.HelmUserRepository
-			err := internal.UnmarshalObject(v, &record)
-			if err != nil {
-				return err
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			record, ok := obj.(portainer.HelmUserRepository)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to HelmUserRepository object")
+				return fmt.Errorf("Failed to convert to HelmUserRepository object: %s", obj)
 			}
-
 			if record.UserID == userID {
 				result = append(result, record)
 			}
-		}
-
-		return nil
-	})
+			return nil
+		})
 
 	return result, err
 }
 
 // CreateHelmUserRepository creates a new HelmUserRepository object.
 func (service *Service) Create(record *portainer.HelmUserRepository) error {
-	return service.connection.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		id, _ := bucket.NextSequence()
-		record.ID = portainer.HelmUserRepositoryID(id)
-
-		data, err := internal.MarshalObject(record)
-		if err != nil {
-			return err
-		}
-
-		return bucket.Put(internal.Itob(int(record.ID)), data)
-	})
+	return internal.CreateObject(
+		service.connection,
+		BucketName,
+		func(id uint64) (int, interface{}) {
+			record.ID = portainer.HelmUserRepositoryID(id)
+			return int(record.ID), record
+		},
+	)
 }

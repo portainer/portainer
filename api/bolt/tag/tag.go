@@ -1,6 +1,7 @@
 package tag
 
 import (
+	"fmt"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
 	"github.com/sirupsen/logrus"
@@ -35,14 +36,14 @@ func (service *Service) Tags() ([]portainer.Tag, error) {
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) {
-			//var tag portainer.Tag
+		func(obj interface{}) error {
 			tag, ok := obj.(portainer.Tag)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to Tag object")
-				return
+				return fmt.Errorf("Failed to convert to Tag object: %s", obj)
 			}
 			tags = append(tags, tag)
+			return nil
 		})
 
 	return tags, err

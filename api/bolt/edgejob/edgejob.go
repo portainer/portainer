@@ -1,9 +1,10 @@
 package edgejob
 
 import (
-	"github.com/boltdb/bolt"
+	"fmt"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -32,21 +33,19 @@ func NewService(connection *internal.DbConnection) (*Service, error) {
 func (service *Service) EdgeJobs() ([]portainer.EdgeJob, error) {
 	var edgeJobs = make([]portainer.EdgeJob, 0)
 
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var edgeJob portainer.EdgeJob
-			err := internal.UnmarshalObject(v, &edgeJob)
-			if err != nil {
-				return err
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			//var tag portainer.Tag
+			job, ok := obj.(portainer.EdgeJob)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to EdgeJob object")
+				return fmt.Errorf("Failed to convert to EdgeJob object: %s", obj)
 			}
-			edgeJobs = append(edgeJobs, edgeJob)
-		}
-
-		return nil
-	})
+			edgeJobs = append(edgeJobs, job)
+			return nil
+		})
 
 	return edgeJobs, err
 }
@@ -66,21 +65,14 @@ func (service *Service) EdgeJob(ID portainer.EdgeJobID) (*portainer.EdgeJob, err
 
 // CreateEdgeJob creates a new Edge job
 func (service *Service) Create(edgeJob *portainer.EdgeJob) error {
-	return service.connection.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		if edgeJob.ID == 0 {
-			id, _ := bucket.NextSequence()
+	return internal.CreateObject(
+		service.connection,
+		BucketName,
+		func(id uint64) (int, interface{}) {
 			edgeJob.ID = portainer.EdgeJobID(id)
-		}
-
-		data, err := internal.MarshalObject(edgeJob)
-		if err != nil {
-			return err
-		}
-
-		return bucket.Put(internal.Itob(int(edgeJob.ID)), data)
-	})
+			return int(edgeJob.ID), edgeJob
+		},
+	)
 }
 
 // UpdateEdgeJob updates an Edge job by ID

@@ -1,9 +1,10 @@
 package customtemplate
 
 import (
-	"github.com/boltdb/bolt"
+	"fmt"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -32,21 +33,19 @@ func NewService(connection *internal.DbConnection) (*Service, error) {
 func (service *Service) CustomTemplates() ([]portainer.CustomTemplate, error) {
 	var customTemplates = make([]portainer.CustomTemplate, 0)
 
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var customTemplate portainer.CustomTemplate
-			err := internal.UnmarshalObjectWithJsoniter(v, &customTemplate)
-			if err != nil {
-				return err
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			//var tag portainer.Tag
+			customTemplate, ok := obj.(portainer.CustomTemplate)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to CustomTemplate object")
+				return fmt.Errorf("Failed to convert to CustomTemplate object: %s", obj)
 			}
 			customTemplates = append(customTemplates, customTemplate)
-		}
-
-		return nil
-	})
+			return nil
+		})
 
 	return customTemplates, err
 }
@@ -76,18 +75,10 @@ func (service *Service) DeleteCustomTemplate(ID portainer.CustomTemplateID) erro
 	return internal.DeleteObject(service.connection, BucketName, identifier)
 }
 
-// CreateCustomTemplate assign an ID to a new custom template and saves it.
+// CreateCustomTemplate uses the existing id and saves it.
+// TODO: where does the ID come from, and is it safe?
 func (service *Service) Create(customTemplate *portainer.CustomTemplate) error {
-	return service.connection.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		data, err := internal.MarshalObject(customTemplate)
-		if err != nil {
-			return err
-		}
-
-		return bucket.Put(internal.Itob(int(customTemplate.ID)), data)
-	})
+	return internal.CreateObjectWithId(service.connection, BucketName, int(customTemplate.ID), customTemplate)
 }
 
 // GetNextIdentifier returns the next identifier for a custom template.

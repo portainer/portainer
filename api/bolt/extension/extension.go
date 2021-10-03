@@ -1,10 +1,10 @@
 package extension
 
 import (
+	"fmt"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
-
-	"github.com/boltdb/bolt"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -46,37 +46,26 @@ func (service *Service) Extension(ID portainer.ExtensionID) (*portainer.Extensio
 func (service *Service) Extensions() ([]portainer.Extension, error) {
 	var extensions = make([]portainer.Extension, 0)
 
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var extension portainer.Extension
-			err := internal.UnmarshalObject(v, &extension)
-			if err != nil {
-				return err
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			//var tag portainer.Tag
+			extension, ok := obj.(portainer.Extension)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to Extension object")
+				return fmt.Errorf("Failed to convert to Extension object: %s", obj)
 			}
 			extensions = append(extensions, extension)
-		}
-
-		return nil
-	})
+			return nil
+		})
 
 	return extensions, err
 }
 
 // Persist persists a extension inside the database.
 func (service *Service) Persist(extension *portainer.Extension) error {
-	return service.connection.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		data, err := internal.MarshalObject(extension)
-		if err != nil {
-			return err
-		}
-
-		return bucket.Put(internal.Itob(int(extension.ID)), data)
-	})
+	return internal.CreateObjectWithId(service.connection, BucketName, int(extension.ID), extension)
 }
 
 // DeleteExtension deletes a Extension.

@@ -1,11 +1,11 @@
 package webhook
 
 import (
+	"fmt"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/internal"
-
-	"github.com/boltdb/bolt"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -34,21 +34,18 @@ func NewService(connection *internal.DbConnection) (*Service, error) {
 func (service *Service) Webhooks() ([]portainer.Webhook, error) {
 	var webhooks = make([]portainer.Webhook, 0)
 
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var webhook portainer.Webhook
-			err := internal.UnmarshalObject(v, &webhook)
-			if err != nil {
-				return err
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			webhook, ok := obj.(portainer.Webhook)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to Webhook object")
+				return fmt.Errorf("Failed to convert to Webhook object: %s", obj)
 			}
 			webhooks = append(webhooks, webhook)
-		}
-
-		return nil
-	})
+			return nil
+		})
 
 	return webhooks, err
 }
@@ -68,64 +65,60 @@ func (service *Service) Webhook(ID portainer.WebhookID) (*portainer.Webhook, err
 
 // WebhookByResourceID returns a webhook by the ResourceID it is associated with.
 func (service *Service) WebhookByResourceID(ID string) (*portainer.Webhook, error) {
-	var webhook *portainer.Webhook
-
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-		cursor := bucket.Cursor()
-
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var w portainer.Webhook
-			err := internal.UnmarshalObject(v, &w)
-			if err != nil {
-				return err
+	var w *portainer.Webhook
+	stop := fmt.Errorf("ok")
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			webhook, ok := obj.(portainer.Webhook)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to Webhook object")
+				return fmt.Errorf("Failed to convert to Webhook object: %s", obj)
 			}
-
-			if w.ResourceID == ID {
-				webhook = &w
-				break
+			if webhook.ResourceID == ID {
+				w = &webhook
+				return stop
 			}
-		}
+			return nil
+		})
+	if err == stop {
+		return w, nil
+	}
+	if err == nil {
+		return nil, errors.ErrObjectNotFound
+	}
 
-		if webhook == nil {
-			return errors.ErrObjectNotFound
-		}
-
-		return nil
-	})
-
-	return webhook, err
+	return nil, err
 }
 
 // WebhookByToken returns a webhook by the random token it is associated with.
 func (service *Service) WebhookByToken(token string) (*portainer.Webhook, error) {
-	var webhook *portainer.Webhook
-
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-		cursor := bucket.Cursor()
-
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var w portainer.Webhook
-			err := internal.UnmarshalObject(v, &w)
-			if err != nil {
-				return err
+	var w *portainer.Webhook
+	stop := fmt.Errorf("ok")
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			webhook, ok := obj.(portainer.Webhook)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to Webhook object")
+				return fmt.Errorf("Failed to convert to Webhook object: %s", obj)
 			}
-
-			if w.Token == token {
-				webhook = &w
-				break
+			if webhook.Token == token {
+				w = &webhook
+				return stop
 			}
-		}
+			return nil
+		})
+	if err == stop {
+		return w, nil
+	}
+	if err == nil {
+		return nil, errors.ErrObjectNotFound
+	}
 
-		if webhook == nil {
-			return errors.ErrObjectNotFound
-		}
-
-		return nil
-	})
-
-	return webhook, err
+	return nil, err
 }
 
 // DeleteWebhook deletes a webhook.
@@ -136,17 +129,12 @@ func (service *Service) DeleteWebhook(ID portainer.WebhookID) error {
 
 // CreateWebhook assign an ID to a new webhook and saves it.
 func (service *Service) Create(webhook *portainer.Webhook) error {
-	return service.connection.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		id, _ := bucket.NextSequence()
-		webhook.ID = portainer.WebhookID(id)
-
-		data, err := internal.MarshalObject(webhook)
-		if err != nil {
-			return err
-		}
-
-		return bucket.Put(internal.Itob(int(webhook.ID)), data)
-	})
+	return internal.CreateObject(
+		service.connection,
+		BucketName,
+		func(id uint64) (int, interface{}) {
+			webhook.ID = portainer.WebhookID(id)
+			return int(webhook.ID), webhook
+		},
+	)
 }

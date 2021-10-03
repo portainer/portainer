@@ -1,9 +1,10 @@
 package edgestack
 
 import (
-	"github.com/boltdb/bolt"
+	"fmt"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -32,21 +33,19 @@ func NewService(connection *internal.DbConnection) (*Service, error) {
 func (service *Service) EdgeStacks() ([]portainer.EdgeStack, error) {
 	var stacks = make([]portainer.EdgeStack, 0)
 
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var stack portainer.EdgeStack
-			err := internal.UnmarshalObject(v, &stack)
-			if err != nil {
-				return err
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			//var tag portainer.Tag
+			stack, ok := obj.(portainer.EdgeStack)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to EdgeStack object")
+				return fmt.Errorf("Failed to convert to EdgeStack object: %s", obj)
 			}
 			stacks = append(stacks, stack)
-		}
-
-		return nil
-	})
+			return nil
+		})
 
 	return stacks, err
 }
@@ -66,21 +65,14 @@ func (service *Service) EdgeStack(ID portainer.EdgeStackID) (*portainer.EdgeStac
 
 // CreateEdgeStack assign an ID to a new Edge stack and saves it.
 func (service *Service) Create(edgeStack *portainer.EdgeStack) error {
-	return service.connection.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		if edgeStack.ID == 0 {
-			id, _ := bucket.NextSequence()
+	return internal.CreateObject(
+		service.connection,
+		BucketName,
+		func(id uint64) (int, interface{}) {
 			edgeStack.ID = portainer.EdgeStackID(id)
-		}
-
-		data, err := internal.MarshalObject(edgeStack)
-		if err != nil {
-			return err
-		}
-
-		return bucket.Put(internal.Itob(int(edgeStack.ID)), data)
-	})
+			return int(edgeStack.ID), edgeStack
+		},
+	)
 }
 
 // UpdateEdgeStack updates an Edge stack.
