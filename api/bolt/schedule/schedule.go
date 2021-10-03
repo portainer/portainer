@@ -1,8 +1,10 @@
 package schedule
 
 import (
+	"fmt"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
+	"github.com/sirupsen/logrus"
 
 	"github.com/boltdb/bolt"
 )
@@ -58,21 +60,18 @@ func (service *Service) DeleteSchedule(ID portainer.ScheduleID) error {
 func (service *Service) Schedules() ([]portainer.Schedule, error) {
 	var schedules = make([]portainer.Schedule, 0)
 
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var schedule portainer.Schedule
-			err := internal.UnmarshalObject(v, &schedule)
-			if err != nil {
-				return err
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			schedule, ok := obj.(portainer.Schedule)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to Schedule object")
+				return fmt.Errorf("Failed to convert to Schedule object: %s", obj)
 			}
 			schedules = append(schedules, schedule)
-		}
-
-		return nil
-	})
+			return nil
+		})
 
 	return schedules, err
 }
@@ -82,28 +81,25 @@ func (service *Service) Schedules() ([]portainer.Schedule, error) {
 func (service *Service) SchedulesByJobType(jobType portainer.JobType) ([]portainer.Schedule, error) {
 	var schedules = make([]portainer.Schedule, 0)
 
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var schedule portainer.Schedule
-			err := internal.UnmarshalObject(v, &schedule)
-			if err != nil {
-				return err
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			schedule, ok := obj.(portainer.Schedule)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to Schedule object")
+				return fmt.Errorf("Failed to convert to Schedule object: %s", obj)
 			}
 			if schedule.JobType == jobType {
 				schedules = append(schedules, schedule)
 			}
-		}
-
-		return nil
-	})
+			return nil
+		})
 
 	return schedules, err
 }
 
-// CreateSchedule assign an ID to a new schedule and saves it.
+// Create assign an ID to a new schedule and saves it.
 func (service *Service) CreateSchedule(schedule *portainer.Schedule) error {
 	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))

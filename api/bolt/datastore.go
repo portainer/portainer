@@ -5,77 +5,17 @@ import (
 	"path"
 	"time"
 
-	"github.com/portainer/portainer/api/bolt/apikeyrepository"
-	"github.com/portainer/portainer/api/bolt/helmuserrepository"
-
 	"github.com/boltdb/bolt"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/bolt/customtemplate"
-	"github.com/portainer/portainer/api/bolt/dockerhub"
-	"github.com/portainer/portainer/api/bolt/edgegroup"
-	"github.com/portainer/portainer/api/bolt/edgejob"
-	"github.com/portainer/portainer/api/bolt/edgestack"
-	"github.com/portainer/portainer/api/bolt/endpoint"
-	"github.com/portainer/portainer/api/bolt/endpointgroup"
-	"github.com/portainer/portainer/api/bolt/endpointrelation"
 	"github.com/portainer/portainer/api/bolt/errors"
-	"github.com/portainer/portainer/api/bolt/extension"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/internal"
-	"github.com/portainer/portainer/api/bolt/registry"
-	"github.com/portainer/portainer/api/bolt/resourcecontrol"
-	"github.com/portainer/portainer/api/bolt/role"
-	"github.com/portainer/portainer/api/bolt/schedule"
-	"github.com/portainer/portainer/api/bolt/settings"
-	"github.com/portainer/portainer/api/bolt/ssl"
-	"github.com/portainer/portainer/api/bolt/stack"
-	"github.com/portainer/portainer/api/bolt/tag"
-	"github.com/portainer/portainer/api/bolt/team"
-	"github.com/portainer/portainer/api/bolt/teammembership"
-	"github.com/portainer/portainer/api/bolt/tunnelserver"
-	"github.com/portainer/portainer/api/bolt/user"
-	"github.com/portainer/portainer/api/bolt/version"
-	"github.com/portainer/portainer/api/bolt/webhook"
 )
 
 const (
 	databaseFileName = "portainer.db"
 )
-
-// Store defines the implementation of portainer.DataStore using
-// BoltDB as the storage system.
-type Store struct {
-	path                      string
-	connection                *internal.DbConnection
-	isNew                     bool
-	fileService               portainer.FileService
-	CustomTemplateService     *customtemplate.Service
-	DockerHubService          *dockerhub.Service
-	EdgeGroupService          *edgegroup.Service
-	EdgeJobService            *edgejob.Service
-	EdgeStackService          *edgestack.Service
-	EndpointGroupService      *endpointgroup.Service
-	EndpointService           *endpoint.Service
-	EndpointRelationService   *endpointrelation.Service
-	ExtensionService          *extension.Service
-	HelmUserRepositoryService *helmuserrepository.Service
-	RegistryService           *registry.Service
-	ResourceControlService    *resourcecontrol.Service
-	RoleService               *role.Service
-	APIKeyRepositoryService   *apikeyrepository.Service
-	ScheduleService           *schedule.Service
-	SettingsService           *settings.Service
-	SSLSettingsService        *ssl.Service
-	StackService              *stack.Service
-	TagService                *tag.Service
-	TeamMembershipService     *teammembership.Service
-	TeamService               *team.Service
-	TunnelServerService       *tunnelserver.Service
-	UserService               *user.Service
-	VersionService            *version.Service
-	WebhookService            *webhook.Service
-}
 
 func (store *Store) version() (int, error) {
 	version, err := store.VersionService.DBVersion()

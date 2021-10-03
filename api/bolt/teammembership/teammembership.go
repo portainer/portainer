@@ -1,8 +1,10 @@
 package teammembership
 
 import (
+	"fmt"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
+	"github.com/sirupsen/logrus"
 
 	"github.com/boltdb/bolt"
 )
@@ -46,21 +48,18 @@ func (service *Service) TeamMembership(ID portainer.TeamMembershipID) (*portaine
 func (service *Service) TeamMemberships() ([]portainer.TeamMembership, error) {
 	var memberships = make([]portainer.TeamMembership, 0)
 
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var membership portainer.TeamMembership
-			err := internal.UnmarshalObject(v, &membership)
-			if err != nil {
-				return err
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			membership, ok := obj.(portainer.TeamMembership)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to TeamMembership object")
+				return fmt.Errorf("Failed to convert to TeamMembership object: %s", obj)
 			}
 			memberships = append(memberships, membership)
-		}
-
-		return nil
-	})
+			return nil
+		})
 
 	return memberships, err
 }
@@ -69,24 +68,20 @@ func (service *Service) TeamMemberships() ([]portainer.TeamMembership, error) {
 func (service *Service) TeamMembershipsByUserID(userID portainer.UserID) ([]portainer.TeamMembership, error) {
 	var memberships = make([]portainer.TeamMembership, 0)
 
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var membership portainer.TeamMembership
-			err := internal.UnmarshalObject(v, &membership)
-			if err != nil {
-				return err
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			membership, ok := obj.(portainer.TeamMembership)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to TeamMembership object")
+				return fmt.Errorf("Failed to convert to TeamMembership object: %s", obj)
 			}
-
 			if membership.UserID == userID {
 				memberships = append(memberships, membership)
 			}
-		}
-
-		return nil
-	})
+			return nil
+		})
 
 	return memberships, err
 }
@@ -95,24 +90,20 @@ func (service *Service) TeamMembershipsByUserID(userID portainer.UserID) ([]port
 func (service *Service) TeamMembershipsByTeamID(teamID portainer.TeamID) ([]portainer.TeamMembership, error) {
 	var memberships = make([]portainer.TeamMembership, 0)
 
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var membership portainer.TeamMembership
-			err := internal.UnmarshalObject(v, &membership)
-			if err != nil {
-				return err
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			membership, ok := obj.(portainer.TeamMembership)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to TeamMembership object")
+				return fmt.Errorf("Failed to convert to TeamMembership object: %s", obj)
 			}
-
 			if membership.TeamID == teamID {
 				memberships = append(memberships, membership)
 			}
-		}
-
-		return nil
-	})
+			return nil
+		})
 
 	return memberships, err
 }
@@ -125,19 +116,14 @@ func (service *Service) UpdateTeamMembership(ID portainer.TeamMembershipID, memb
 
 // CreateTeamMembership creates a new TeamMembership object.
 func (service *Service) Create(membership *portainer.TeamMembership) error {
-	return service.connection.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		id, _ := bucket.NextSequence()
-		membership.ID = portainer.TeamMembershipID(id)
-
-		data, err := internal.MarshalObject(membership)
-		if err != nil {
-			return err
-		}
-
-		return bucket.Put(internal.Itob(int(membership.ID)), data)
-	})
+	return internal.CreateObject(
+		service.connection,
+		BucketName,
+		func(id uint64) (int, interface{}) {
+			membership.ID = portainer.TeamMembershipID(id)
+			return int(membership.ID), membership
+		},
+	)
 }
 
 // DeleteTeamMembership deletes a TeamMembership object.

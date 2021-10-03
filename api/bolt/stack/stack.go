@@ -1,6 +1,8 @@
 package stack
 
 import (
+	"fmt"
+	"github.com/sirupsen/logrus"
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
@@ -48,33 +50,31 @@ func (service *Service) Stack(ID portainer.StackID) (*portainer.Stack, error) {
 
 // StackByName returns a stack object by name.
 func (service *Service) StackByName(name string) (*portainer.Stack, error) {
-	var stack *portainer.Stack
-
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-		cursor := bucket.Cursor()
-
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var t portainer.Stack
-			err := internal.UnmarshalObject(v, &t)
-			if err != nil {
-				return err
+	var s *portainer.Stack
+	stop := fmt.Errorf("ok")
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			stack, ok := obj.(portainer.Stack)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to Stack object")
+				return fmt.Errorf("Failed to convert to Stack object: %s", obj)
 			}
-
-			if t.Name == name {
-				stack = &t
-				break
+			if stack.Name == name {
+				s = &stack
+				return stop
 			}
-		}
+			return nil
+		})
+	if err == stop {
+		return s, nil
+	}
+	if err == nil {
+		return nil, errors.ErrObjectNotFound
+	}
 
-		if stack == nil {
-			return errors.ErrObjectNotFound
-		}
-
-		return nil
-	})
-
-	return stack, err
+	return nil, err
 }
 
 // Stacks returns an array containing all the stacks with same name
@@ -106,21 +106,18 @@ func (service *Service) StacksByName(name string) ([]portainer.Stack, error) {
 func (service *Service) Stacks() ([]portainer.Stack, error) {
 	var stacks = make([]portainer.Stack, 0)
 
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var stack portainer.Stack
-			err := internal.UnmarshalObject(v, &stack)
-			if err != nil {
-				return err
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			stack, ok := obj.(portainer.Stack)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to Stack object")
+				return fmt.Errorf("Failed to convert to Stack object: %s", obj)
 			}
 			stacks = append(stacks, stack)
-		}
-
-		return nil
-	})
+			return nil
+		})
 
 	return stacks, err
 }
