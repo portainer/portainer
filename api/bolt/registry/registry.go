@@ -1,10 +1,10 @@
 package registry
 
 import (
+	"fmt"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
-
-	"github.com/boltdb/bolt"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -46,40 +46,32 @@ func (service *Service) Registry(ID portainer.RegistryID) (*portainer.Registry, 
 func (service *Service) Registries() ([]portainer.Registry, error) {
 	var registries = make([]portainer.Registry, 0)
 
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var registry portainer.Registry
-			err := internal.UnmarshalObject(v, &registry)
-			if err != nil {
-				return err
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			registry, ok := obj.(portainer.Registry)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to Registry object")
+				return fmt.Errorf("Failed to convert to Registry object: %s", obj)
 			}
 			registries = append(registries, registry)
-		}
-
-		return nil
-	})
+			return nil
+		})
 
 	return registries, err
 }
 
 // CreateRegistry creates a new registry.
 func (service *Service) Create(registry *portainer.Registry) error {
-	return service.connection.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		id, _ := bucket.NextSequence()
-		registry.ID = portainer.RegistryID(id)
-
-		data, err := internal.MarshalObject(registry)
-		if err != nil {
-			return err
-		}
-
-		return bucket.Put(internal.Itob(int(registry.ID)), data)
-	})
+	return internal.CreateObject(
+		service.connection,
+		BucketName,
+		func(id uint64) (int, interface{}) {
+			registry.ID = portainer.RegistryID(id)
+			return int(registry.ID), registry
+		},
+	)
 }
 
 // UpdateRegistry updates an registry.

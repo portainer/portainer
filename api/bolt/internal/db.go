@@ -104,9 +104,9 @@ func CreateObject(connection *DbConnection, bucketName string, fn func(uint64) (
 		bucket := tx.Bucket([]byte(bucketName))
 
 		seqId, _ := bucket.NextSequence()
-		id, tag := fn(seqId)
+		id, obj := fn(seqId)
 
-		data, err := MarshalObject(tag)
+		data, err := MarshalObject(obj)
 		if err != nil {
 			return err
 		}
@@ -115,7 +115,21 @@ func CreateObject(connection *DbConnection, bucketName string, fn func(uint64) (
 	})
 }
 
-func GetAll(connection *DbConnection, bucketName string, append func(o interface{})) error {
+// CreateObjectWithId creates a new object in the bucket, using the specified id
+func CreateObjectWithId(connection *DbConnection, bucketName string, id int, obj interface{}) error {
+	return connection.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(bucketName))
+
+		data, err := MarshalObject(obj)
+		if err != nil {
+			return err
+		}
+
+		return bucket.Put(Itob(int(id)), data)
+	})
+}
+
+func GetAll(connection *DbConnection, bucketName string, append func(o interface{}) error) error {
 	err := connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
@@ -126,7 +140,10 @@ func GetAll(connection *DbConnection, bucketName string, append func(o interface
 			if err != nil {
 				return err
 			}
-			append(obj)
+			err = append(obj)
+			if err != nil {
+				return err
+			}
 		}
 
 		return nil
