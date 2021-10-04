@@ -38,7 +38,7 @@
   </label>
   <div class="col-sm-9 col-lg-10">
     <div ng-repeat="url in $ctrl.settings.URLs track by $index" style="display: flex; margin-bottom: 10px;">
-      <input type="text" class="form-control" id="ldap_url" ng-model="$ctrl.settings.URLs[$index]" placeholder="e.g. 10.0.0.10:389 or myldap.domain.tld:389" />
+      <input type="text" class="form-control" id="ldap_url" ng-model="$ctrl.settings.URLs[$index]" placeholder="e.g. 10.0.0.10:389 or myldap.domain.tld:389" required />
       <button ng-if="$index > 0" class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removeLDAPUrl($index)">
         <i class="fa fa-trash" aria-hidden="true"></i>
       </button>

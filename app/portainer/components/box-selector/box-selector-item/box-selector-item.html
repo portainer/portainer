@@ -15,7 +15,7 @@
     ng-value="$ctrl.option.value"
     ng-disabled="$ctrl.disabled"
   />
-  <label for="{{ $ctrl.option.id }}" ng-click="$ctrl.onChange($ctrl.option.value, $ctrl.limitedToBE)">
+  <label for="{{ $ctrl.option.id }}" ng-click="$ctrl.handleChange($ctrl.option.value, $ctrl.limitedToBE)">
     <i class="fas fa-briefcase limited-icon" ng-if="$ctrl.limitedToBE"></i>
 
     <div class="boxselector_header">

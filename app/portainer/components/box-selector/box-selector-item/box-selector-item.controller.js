@@ -6,6 +6,11 @@ export default class BoxSelectorItemController {
     this.limitedToBE = false;
   }
 
+  handleChange(value) {
+    this.formCtrl.$setValidity(this.radioName, !this.limitedToBE, this.formCtrl);
+    this.onChange(value);
+  }
+
   $onInit() {
     if (this.option.feature) {
       this.limitedToBE = this.featureService.isLimitedToBE(this.option.feature);

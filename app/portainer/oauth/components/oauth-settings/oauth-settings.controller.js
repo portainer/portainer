@@ -48,6 +48,9 @@ export default class OAuthSettingsController {
       if (providerId === 'microsoft' && this.state.microsoftTenantID !== '') {
         this.onMicrosoftTenantIDChange();
       }
+    } else {
+      this.settings.ClientID = '';
+      this.settings.ClientSecret = '';
     }
   }
 
