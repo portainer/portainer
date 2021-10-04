@@ -1,9 +1,10 @@
 package edgegroup
 
 import (
-	"github.com/boltdb/bolt"
+	"fmt"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -32,21 +33,18 @@ func NewService(connection *internal.DbConnection) (*Service, error) {
 func (service *Service) EdgeGroups() ([]portainer.EdgeGroup, error) {
 	var groups = make([]portainer.EdgeGroup, 0)
 
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var group portainer.EdgeGroup
-			err := internal.UnmarshalObjectWithJsoniter(v, &group)
-			if err != nil {
-				return err
+	err := internal.GetAllWithJsoniter(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			group, ok := obj.(portainer.EdgeGroup)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to EdgeGroup object")
+				return fmt.Errorf("Failed to convert to EdgeGroup object: %s", obj)
 			}
 			groups = append(groups, group)
-		}
-
-		return nil
-	})
+			return nil
+		})
 
 	return groups, err
 }
@@ -78,17 +76,12 @@ func (service *Service) DeleteEdgeGroup(ID portainer.EdgeGroupID) error {
 
 // CreateEdgeGroup assign an ID to a new Edge group and saves it.
 func (service *Service) Create(group *portainer.EdgeGroup) error {
-	return service.connection.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		id, _ := bucket.NextSequence()
-		group.ID = portainer.EdgeGroupID(id)
-
-		data, err := internal.MarshalObject(group)
-		if err != nil {
-			return err
-		}
-
-		return bucket.Put(internal.Itob(int(group.ID)), data)
-	})
+	return internal.CreateObject(
+		service.connection,
+		BucketName,
+		func(id uint64) (int, interface{}) {
+			group.ID = portainer.EdgeGroupID(id)
+			return int(group.ID), group
+		},
+	)
 }
