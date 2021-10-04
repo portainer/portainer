@@ -1,9 +1,11 @@
 package endpoint
 
 import (
+	"fmt"
 	"github.com/boltdb/bolt"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -57,21 +59,18 @@ func (service *Service) DeleteEndpoint(ID portainer.EndpointID) error {
 func (service *Service) Endpoints() ([]portainer.Endpoint, error) {
 	var endpoints = make([]portainer.Endpoint, 0)
 
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var endpoint portainer.Endpoint
-			err := internal.UnmarshalObjectWithJsoniter(v, &endpoint)
-			if err != nil {
-				return err
+	err := internal.GetAllWithJsoniter(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			endpoint, ok := obj.(portainer.Endpoint)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to Endpoint object")
+				return fmt.Errorf("Failed to convert to Endpoint object: %s", obj)
 			}
 			endpoints = append(endpoints, endpoint)
-		}
-
-		return nil
-	})
+			return nil
+		})
 
 	return endpoints, err
 }
