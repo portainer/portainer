@@ -150,3 +150,26 @@ func GetAll(connection *DbConnection, bucketName string, append func(o interface
 	})
 	return err
 }
+
+// TODO: decide which Unmarshal to use, and use one...
+func GetAllWithJsoniter(connection *DbConnection, bucketName string, append func(o interface{}) error) error {
+	err := connection.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(bucketName))
+
+		cursor := bucket.Cursor()
+		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
+			var obj interface{}
+			err := UnmarshalObjectWithJsoniter(v, &obj)
+			if err != nil {
+				return err
+			}
+			err = append(obj)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+	return err
+}
