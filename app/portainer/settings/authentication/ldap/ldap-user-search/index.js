@@ -8,6 +8,7 @@ export const ldapUserSearch = {
     domainSuffix: '@',
     showUsernameFormat: '<',
     baseFilter: '@',
+    limitedFeatureId: '<',
 
     onSearchClick: '<',
   },

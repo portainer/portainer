@@ -2,13 +2,18 @@
   border-color: var(--BE-only);
 }
 
+.form-control.limited-be.no-border {
+  border-color: var(--border-form-control-color);
+}
+
 button.limited-be {
   background-color: var(--BE-only);
   border-color: var(--BE-only);
 }
 
 ng-form.limited-be,
-form.limited-be {
+form.limited-be,
+div.limited-be {
   border: solid 1px var(--BE-only);
   padding: 10px;
   pointer-events: none;

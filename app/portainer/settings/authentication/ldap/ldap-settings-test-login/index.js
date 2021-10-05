@@ -5,6 +5,7 @@ export const ldapSettingsTestLogin = {
   controller,
   bindings: {
     settings: '=',
-    limitedFeature: '<',
+    limitedFeatureId: '<',
+    showBeIndicatorIfNeeded: '<',
   },
 };

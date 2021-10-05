@@ -4,7 +4,14 @@
       <span class="text-muted small">
         Extra search configuration
       </span>
-      <button ng-if="$ctrl.index > 0" class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.onRemoveClick($ctrl.index)">
+      <button
+        ng-if="$ctrl.index > 0"
+        class="btn btn-sm btn-danger"
+        type="button"
+        ng-click="$ctrl.onRemoveClick($ctrl.index)"
+        limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+        limited-feature-tabindex="-1"
+      >
         <i class="fa fa-trash" aria-hidden="true"></i>
       </button>
     </div>
@@ -16,8 +23,23 @@
       <div class="col-sm-8">
         <div class="input-group">
           <div class="input-group-btn">
-            <button class="btn btn-primary" ng-model="$ctrl.config.UserNameAttribute" uib-btn-radio="'sAMAccountName'" style="margin-left: 0px;">username</button>
-            <button class="btn btn-primary" ng-model="$ctrl.config.UserNameAttribute" uib-btn-radio="'userPrincipalName'">user@domainname</button>
+            <button
+              class="btn btn-primary"
+              ng-model="$ctrl.config.UserNameAttribute"
+              uib-btn-radio="'sAMAccountName'"
+              style="margin-left: 0px;"
+              limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+              limited-feature-tabindex="-1"
+              >username</button
+            >
+            <button
+              class="btn btn-primary"
+              ng-model="$ctrl.config.UserNameAttribute"
+              uib-btn-radio="'userPrincipalName'"
+              limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+              limited-feature-tabindex="-1"
+              >user@domainname</button
+            >
           </div>
         </div>
       </div>
@@ -37,12 +59,20 @@
       label="User Search Path (optional)"
       suffix="{{ $ctrl.domainSuffix }}"
       on-change="($ctrl.onBaseDNChange)"
+      limited-feature-id="$ctrl.limitedFeatureId"
     ></ldap-settings-dn-builder>
 
     <div class="form-group no-margin-last-child">
       <div class="col-sm-12" style="margin-bottom: 5px;">
         <label class="control-label text-left">Allowed Groups (optional)</label>
-        <button type="button" class="label label-default interactive" style="margin-left: 10px; border: 0;" ng-click="$ctrl.addGroup()">
+        <button
+          type="button"
+          class="label label-default interactive"
+          style="margin-left: 10px; border: 0;"
+          ng-click="$ctrl.addGroup()"
+          limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+          limited-feature-tabindex="-1"
+        >
           <i class="fa fa-plus-circle" aria-hidden="true"></i> add another group
         </button>
       </div>
@@ -56,6 +86,7 @@
                 suffix="{{ $ctrl.domainSuffix }}"
                 on-change="($ctrl.onGroupChange)"
                 on-remove-click="($ctrl.removeGroup)"
+                limited-feature-id="$ctrl.limitedFeatureId"
               ></ldap-settings-group-dn-builder>
             </rd-widget-body>
           </rd-widget>

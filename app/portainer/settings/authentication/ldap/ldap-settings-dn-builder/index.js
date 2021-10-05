@@ -11,5 +11,6 @@ export const ldapSettingsDnBuilder = {
     // suffix: string (dc=,dc=,)
     suffix: '@',
     label: '@',
+    limitedFeatureId: '<',
   },
 };

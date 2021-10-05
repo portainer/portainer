@@ -10,5 +10,6 @@ export const ldapUserSearchItem = {
     domainSuffix: '@',
     baseFilter: '@',
     onRemoveClick: '<',
+    limitedFeatureId: '<',
   },
 };

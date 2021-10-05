@@ -29,7 +29,7 @@
       class="label label-default interactive"
       style="border: 0;"
       ng-click="$ctrl.addLDAPUrl()"
-      limited-feature-dir="{{ $ctrl.limitedFeature }}"
+      limited-feature-dir="{{ $ctrl.limitedFeatureId }}"
       limited-feature-disabled
       limited-feature-class="limited-be"
     >
@@ -105,13 +105,15 @@
   style="margin-top: 5px;"
   settings="$ctrl.settings.SearchSettings"
   on-search-click="($ctrl.onSearchUsersClick)"
-  limited-feature="$ctrl.limitedFeature"
+  limited-feature-id="$ctrl.limitedFeatureId"
 ></ldap-custom-user-search>
 <ldap-custom-group-search
   style="margin-top: 5px;"
   settings="$ctrl.settings.GroupSearchSettings"
   on-search-click="($ctrl.onSearchGroupsClick)"
-  limited-feature="$ctrl.limitedFeature"
+  limited-feature-id="$ctrl.limitedFeatureId"
 ></ldap-custom-group-search>
 
-<ldap-settings-test-login settings="$ctrl.settings" limited-feature="$ctrl.limitedFeature"></ldap-settings-test-login>
+<div limited-feature-dir="{{ $ctrl.limitedFeatureId }}" limited-feature-class="limited-be">
+  <ldap-settings-test-login settings="$ctrl.settings" limited-feature-id="$ctrl.limitedFeatureId" show-be-indicator-if-needed="true"></ldap-settings-test-login>
+</div>
