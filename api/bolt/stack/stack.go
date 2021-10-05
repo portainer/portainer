@@ -129,22 +129,7 @@ func (service *Service) GetNextIdentifier() int {
 
 // CreateStack creates a new stack.
 func (service *Service) Create(stack *portainer.Stack) error {
-	return service.connection.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		// We manually manage sequences for stacks
-		err := bucket.SetSequence(uint64(stack.ID))
-		if err != nil {
-			return err
-		}
-
-		data, err := internal.MarshalObject(stack)
-		if err != nil {
-			return err
-		}
-
-		return bucket.Put(internal.Itob(int(stack.ID)), data)
-	})
+	return internal.CreateObjectWithSetSequence(service.connection, BucketName, int(stack.ID), stack)
 }
 
 // UpdateStack updates a stack.
