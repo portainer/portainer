@@ -513,6 +513,12 @@ type (
 		AutoCreateUsers bool `json:"AutoCreateUsers" example:"true"`
 	}
 
+	// LDAPUser represents a LDAP user
+	LDAPUser struct {
+		Name   string
+		Groups []string
+	}
+
 	// LicenseInformation represents information about an extension license
 	LicenseInformation struct {
 		LicenseKey string `json:"LicenseKey,omitempty"`
@@ -1295,6 +1301,8 @@ type (
 		AuthenticateUser(username, password string, settings *LDAPSettings) error
 		TestConnectivity(settings *LDAPSettings) error
 		GetUserGroups(username string, settings *LDAPSettings) ([]string, error)
+		SearchGroups(settings *LDAPSettings) ([]LDAPUser, error)
+		SearchUsers(settings *LDAPSettings) ([]string, error)
 	}
 
 	// OAuthService represents a service used to authenticate users using OAuth

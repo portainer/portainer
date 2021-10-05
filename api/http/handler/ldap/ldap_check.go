@@ -1,4 +1,4 @@
-package settings
+package ldap
 
 import (
 	"net/http"
@@ -7,42 +7,43 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/filesystem"
 )
 
-type settingsLDAPCheckPayload struct {
+type checkPayload struct {
 	LDAPSettings portainer.LDAPSettings
 }
 
-func (payload *settingsLDAPCheckPayload) Validate(r *http.Request) error {
+func (payload *checkPayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// @id SettingsLDAPCheck
+// @id LDAPCheck
 // @summary Test LDAP connectivity
 // @description Test LDAP connectivity using LDAP details
 // @description **Access policy**: administrator
-// @tags settings
+// @tags ldap
 // @security jwt
 // @accept json
-// @param body body settingsLDAPCheckPayload true "details"
+// @param body body checkPayload true "details"
 // @success 204 "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
-// @router /settings/ldap/check [put]
-func (handler *Handler) settingsLDAPCheck(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	var payload settingsLDAPCheckPayload
+// @router /ldap/check [post]
+func (handler *Handler) ldapCheck(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	var payload checkPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	if (payload.LDAPSettings.TLSConfig.TLS || payload.LDAPSettings.StartTLS) && !payload.LDAPSettings.TLSConfig.TLSSkipVerify {
-		caCertPath, _ := handler.FileService.GetPathForTLSFile(filesystem.LDAPStorePath, portainer.TLSFileCA)
-		payload.LDAPSettings.TLSConfig.TLSCACertPath = caCertPath
+	settings := &payload.LDAPSettings
+
+	err = handler.prefillSettings(settings)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to fetch default settings", err}
 	}
 
-	err = handler.LDAPService.TestConnectivity(&payload.LDAPSettings)
+	err = handler.LDAPService.TestConnectivity(settings)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to connect to LDAP server", err}
 	}

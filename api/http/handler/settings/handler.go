@@ -5,7 +5,7 @@ import (
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -35,8 +35,6 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AdminAccess(httperror.LoggerHandler(h.settingsUpdate))).Methods(http.MethodPut)
 	h.Handle("/settings/public",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.settingsPublic))).Methods(http.MethodGet)
-	h.Handle("/settings/authentication/checkLDAP",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.settingsLDAPCheck))).Methods(http.MethodPut)
 
 	return h
 }
