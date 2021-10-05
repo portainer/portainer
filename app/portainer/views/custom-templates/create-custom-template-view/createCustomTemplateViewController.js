@@ -44,7 +44,7 @@ class CreateCustomTemplateViewController {
       fromStack: false,
       loading: true,
       isEditorDirty: false,
-      templateNameError: TEMPLATE_NAME_VALIDATION_REGEX,
+      templateNameRegex: TEMPLATE_NAME_VALIDATION_REGEX,
     };
 
     this.templates = [];

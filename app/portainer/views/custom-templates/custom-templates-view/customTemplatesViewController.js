@@ -45,7 +45,7 @@ class CustomTemplatesViewController {
       actionInProgress: false,
       isEditorVisible: false,
       deployable: false,
-      templateNameError: TEMPLATE_NAME_VALIDATION_REGEX,
+      templateNameRegex: TEMPLATE_NAME_VALIDATION_REGEX,
     };
 
     this.currentUser = {

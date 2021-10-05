@@ -7,6 +7,6 @@ angular.module('portainer.app').component('customTemplateCommonFields', {
     formValues: '=',
     showPlatformField: '<',
     showTypeField: '<',
-    nameError: '<',
+    nameRegex: '<',
   },
 });

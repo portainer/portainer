@@ -22,7 +22,7 @@
         <div class="form-group">
           <label for="template_name" class="col-sm-2 control-label text-left">Name</label>
           <div class="col-sm-10">
-            <input type="text" name="template_name" class="form-control" ng-model="$ctrl.formValues.name" ng-pattern="$ctrl.nameError" placeholder="e.g. myStack" required />
+            <input type="text" name="template_name" class="form-control" ng-model="$ctrl.formValues.name" ng-pattern="$ctrl.nameRegex" placeholder="e.g. myStack" required />
           </div>
         </div>
         <div class="form-group" ng-show="stackTemplateForm.template_name.$invalid">
