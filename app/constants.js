@@ -31,3 +31,4 @@ angular
 
 export const PORTAINER_FADEOUT = 1500;
 export const STACK_NAME_VALIDATION_REGEX = '^[-_a-z0-9]+$';
+export const TEMPLATE_NAME_VALIDATION_REGEX = '^[-_a-z0-9]+$';

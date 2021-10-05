@@ -8,6 +8,7 @@ angular.module('portainer.app').component('stackFromTemplateForm', {
     state: '=',
     createTemplate: '<',
     unselectTemplate: '<',
+    nameError: '<',
   },
   transclude: {
     advanced: '?advancedForm',
