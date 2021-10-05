@@ -100,9 +100,15 @@
 
 .box-selector-item .limited-icon {
   position: absolute;
-  left: 3em;
+  left: 1em;
   top: calc(50% - 0.5em);
   height: 1em;
+}
+
+@media (min-width: 992px) {
+  .box-selector-item .limited-icon {
+    left: 2em;
+  }
 }
 
 .box-selector-item.limited.business :checked + label {
