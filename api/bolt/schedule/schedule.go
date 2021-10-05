@@ -5,8 +5,6 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
 	"github.com/sirupsen/logrus"
-
-	"github.com/boltdb/bolt"
 )
 
 const (
@@ -101,22 +99,7 @@ func (service *Service) SchedulesByJobType(jobType portainer.JobType) ([]portain
 
 // Create assign an ID to a new schedule and saves it.
 func (service *Service) CreateSchedule(schedule *portainer.Schedule) error {
-	return service.connection.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		// We manually manage sequences for schedules
-		err := bucket.SetSequence(uint64(schedule.ID))
-		if err != nil {
-			return err
-		}
-
-		data, err := internal.MarshalObject(schedule)
-		if err != nil {
-			return err
-		}
-
-		return bucket.Put(internal.Itob(int(schedule.ID)), data)
-	})
+	return internal.CreateObjectWithSetSequence(service.connection, BucketName, int(schedule.ID), schedule)
 }
 
 // GetNextIdentifier returns the next identifier for a schedule.

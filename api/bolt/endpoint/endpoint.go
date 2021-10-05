@@ -77,22 +77,7 @@ func (service *Service) Endpoints() ([]portainer.Endpoint, error) {
 
 // CreateEndpoint assign an ID to a new environment(endpoint) and saves it.
 func (service *Service) Create(endpoint *portainer.Endpoint) error {
-	return service.connection.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		// We manually manage sequences for environments(endpoints)
-		err := bucket.SetSequence(uint64(endpoint.ID))
-		if err != nil {
-			return err
-		}
-
-		data, err := internal.MarshalObject(endpoint)
-		if err != nil {
-			return err
-		}
-
-		return bucket.Put(internal.Itob(int(endpoint.ID)), data)
-	})
+	return internal.CreateObjectWithSetSequence(service.connection, BucketName, int(endpoint.ID), endpoint)
 }
 
 // GetNextIdentifier returns the next identifier for an environment(endpoint).

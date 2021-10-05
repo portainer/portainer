@@ -129,6 +129,27 @@ func CreateObjectWithId(connection *DbConnection, bucketName string, id int, obj
 	})
 }
 
+// CreateObjectWithSetSequence creates a new object in the bucket, using the specified id, and sets the bucket sequence
+// avoid this :)
+func CreateObjectWithSetSequence(connection *DbConnection, bucketName string, id int, obj interface{}) error {
+	return connection.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(bucketName))
+
+		// We manually manage sequences for schedules
+		err := bucket.SetSequence(uint64(id))
+		if err != nil {
+			return err
+		}
+
+		data, err := MarshalObject(obj)
+		if err != nil {
+			return err
+		}
+
+		return bucket.Put(Itob(int(id)), data)
+	})
+}
+
 func GetAll(connection *DbConnection, bucketName string, append func(o interface{}) error) error {
 	err := connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
