@@ -105,12 +105,6 @@
   height: 1em;
 }
 
-@media (min-width: 768px) {
-  .box-selector-item .limited-icon {
-    left: 1em;
-  }
-}
-
 @media (min-width: 992px) {
   .box-selector-item .limited-icon {
     left: 2em;
