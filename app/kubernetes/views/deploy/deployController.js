@@ -63,7 +63,7 @@ class KubernetesDeployController {
       RepositoryUsername: '',
       RepositoryPassword: '',
       AdditionalFiles: [],
-      ComposeFilePathInRepository: 'deployment.yml',
+      ComposeFilePathInRepository: '',
       RepositoryAutomaticUpdates: true,
       RepositoryMechanism: RepositoryMechanismTypes.INTERVAL,
       RepositoryFetchInterval: '5m',
