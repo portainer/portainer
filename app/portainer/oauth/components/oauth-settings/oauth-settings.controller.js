@@ -38,18 +38,18 @@ export default class OAuthSettingsController {
     this.state.overrideConfiguration = false;
 
     if (!this.isLimitedToBE || providerId === 'custom') {
-      this.settings.AuthorizationURI = provider.authUrl;
-      this.settings.AccessTokenURI = provider.accessTokenUrl;
-      this.settings.ResourceURI = provider.resourceUrl;
-      this.settings.LogoutURI = provider.logoutUrl;
-      this.settings.UserIdentifier = provider.userIdentifier;
-      this.settings.Scopes = provider.scopes;
+      this.settings.ClientID = this.settings.ClientID ? this.settings.ClientID : '';
+      this.settings.AuthorizationURI = this.settings.AuthorizationURI ? this.settings.AuthorizationURI : provider.authUrl;
+      this.settings.AccessTokenURI = this.settings.AccessTokenURI ? this.settings.AccessTokenURI : provider.accessTokenUrl;
+      this.settings.ResourceURI = this.settings.ResourceURI ? this.settings.ResourceURI : provider.resourceUrl;
+      this.settings.LogoutURI = this.settings.LogoutURI ? this.settings.LogoutURI : provider.logoutUrl;
+      this.settings.UserIdentifier = this.settings.UserIdentifier ? this.settings.UserIdentifier : provider.userIdentifier;
+      this.settings.Scopes = this.settings.Scopes ? this.settings.Scopes : provider.scopes;
 
       if (providerId === 'microsoft' && this.state.microsoftTenantID !== '') {
         this.onMicrosoftTenantIDChange();
       }
     } else {
-      this.settings.ClientID = '';
       this.settings.ClientSecret = '';
     }
   }
