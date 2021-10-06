@@ -16,4 +16,8 @@ export default class BoxSelectorItemController {
       this.limitedToBE = this.featureService.isLimitedToBE(this.option.feature);
     }
   }
+
+  $onDestroy() {
+    this.formCtrl.$setValidity(this.radioName, true, this.formCtrl);
+  }
 }
