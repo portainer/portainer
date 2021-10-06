@@ -237,7 +237,15 @@
         ></portainer-tooltip>
       </label>
       <div class="col-sm-9 col-lg-10">
-        <input type="text" class="form-control" id="oauth_authorization_uri" ng-model="$ctrl.settings.AuthorizationURI" placeholder="https://example.com/oauth/authorize" />
+        <input
+          type="text"
+          class="form-control"
+          id="oauth_authorization_uri"
+          ng-model="$ctrl.settings.AuthorizationURI"
+          placeholder="https://example.com/oauth/authorize"
+          ng-class="['form-control', { 'limited-be': $ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom' }]"
+          ng-disabled="$ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom'"
+        />
       </div>
     </div>
 
@@ -247,7 +255,15 @@
         <portainer-tooltip position="bottom" message="URL used by Portainer to exchange a valid OAuth authentication code for an access token"></portainer-tooltip>
       </label>
       <div class="col-sm-9 col-lg-10">
-        <input type="text" class="form-control" id="oauth_access_token_uri" ng-model="$ctrl.settings.AccessTokenURI" placeholder="https://example.com/oauth/token" />
+        <input
+          type="text"
+          class="form-control"
+          id="oauth_access_token_uri"
+          ng-model="$ctrl.settings.AccessTokenURI"
+          placeholder="https://example.com/oauth/token"
+          ng-class="['form-control', { 'limited-be': $ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom' }]"
+          ng-disabled="$ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom'"
+        />
       </div>
     </div>
 
@@ -257,7 +273,15 @@
         <portainer-tooltip position="bottom" message="URL used by Portainer to retrieve information about the authenticated user"></portainer-tooltip>
       </label>
       <div class="col-sm-9 col-lg-10">
-        <input type="text" class="form-control" id="oauth_resource_uri" ng-model="$ctrl.settings.ResourceURI" placeholder="https://example.com/user" />
+        <input
+          type="text"
+          class="form-control"
+          id="oauth_resource_uri"
+          ng-model="$ctrl.settings.ResourceURI"
+          placeholder="https://example.com/user"
+          ng-class="['form-control', { 'limited-be': $ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom' }]"
+          ng-disabled="$ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom'"
+        />
       </div>
     </div>
 
@@ -270,7 +294,15 @@
         ></portainer-tooltip>
       </label>
       <div class="col-sm-9 col-lg-10">
-        <input type="text" class="form-control" id="oauth_redirect_uri" ng-model="$ctrl.settings.RedirectURI" placeholder="http://yourportainer.com/" />
+        <input
+          type="text"
+          class="form-control"
+          id="oauth_redirect_uri"
+          ng-model="$ctrl.settings.RedirectURI"
+          placeholder="http://yourportainer.com/"
+          ng-class="['form-control', { 'limited-be': $ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom' }]"
+          ng-disabled="$ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom'"
+        />
       </div>
     </div>
 
@@ -283,7 +315,14 @@
         ></portainer-tooltip>
       </label>
       <div class="col-sm-9 col-lg-10">
-        <input type="text" class="form-control" id="oauth_logout_url" ng-model="$ctrl.settings.LogoutURI" />
+        <input
+          type="text"
+          class="form-control"
+          id="oauth_logout_url"
+          ng-model="$ctrl.settings.LogoutURI"
+          ng-class="['form-control', { 'limited-be': $ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom' }]"
+          ng-disabled="$ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom'"
+        />
       </div>
     </div>
 
@@ -296,7 +335,15 @@
         ></portainer-tooltip>
       </label>
       <div class="col-sm-9 col-lg-10">
-        <input type="text" class="form-control" id="oauth_user_identifier" ng-model="$ctrl.settings.UserIdentifier" placeholder="id" />
+        <input
+          type="text"
+          class="form-control"
+          id="oauth_user_identifier"
+          ng-model="$ctrl.settings.UserIdentifier"
+          placeholder="id"
+          ng-class="['form-control', { 'limited-be': $ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom' }]"
+          ng-disabled="$ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom'"
+        />
       </div>
     </div>
 
@@ -309,7 +356,15 @@
         ></portainer-tooltip>
       </label>
       <div class="col-sm-9 col-lg-10">
-        <input type="text" class="form-control" id="oauth_scopes" ng-model="$ctrl.settings.Scopes" placeholder="id,email,name" />
+        <input
+          type="text"
+          class="form-control"
+          id="oauth_scopes"
+          ng-model="$ctrl.settings.Scopes"
+          placeholder="id,email,name"
+          ng-class="['form-control', { 'limited-be': $ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom' }]"
+          ng-disabled="$ctrl.isLimitedToBE && $ctrl.state.provider !== 'custom'"
+        />
       </div>
     </div>
   </div>
