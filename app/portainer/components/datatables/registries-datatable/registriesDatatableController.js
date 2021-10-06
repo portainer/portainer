@@ -1,5 +1,5 @@
 import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
-
+import { REGISTRY_MANAGEMENT } from '@/portainer/feature-flags/feature-ids';
 angular.module('portainer.docker').controller('RegistriesDatatableController', RegistriesDatatableController);
 
 /* @ngInject */
@@ -45,6 +45,7 @@ function RegistriesDatatableController($scope, $controller, $state, Authenticati
   };
 
   this.$onInit = function () {
+    this.limitedFeature = REGISTRY_MANAGEMENT;
     this.isAdmin = Authentication.isAdmin();
     this.setDefaults();
     this.prepareTableFromDataset();

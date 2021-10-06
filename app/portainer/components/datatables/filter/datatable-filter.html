@@ -1,0 +1,32 @@
+<div uib-dropdown dropdown-append-to-body auto-close="outsideClick" is-open="$ctrl.isOpen">
+  <span ng-transclude></span>
+  <div class="filter-button">
+    <span uib-dropdown-toggle class="table-filter" ng-class="{ 'filter-active': $ctrl.isEnabled() }">
+      Filter
+      <i class="fa" ng-class="[$ctrl.isEnabled() ? 'fa-check' : 'fa-filter']" aria-hidden="true"></i>
+    </span>
+  </div>
+  <div class="dropdown-menu" style="min-width: 0;" uib-dropdown-menu>
+    <div class="tableMenu">
+      <div class="menuContent">
+        <div class="md-checkbox" ng-repeat="filter in $ctrl.labels track by filter.value">
+          <input
+            id="filter_{{ $ctrl.filterKey }}_{{ $index }}"
+            type="checkbox"
+            ng-value="filter.value"
+            ng-checked="$ctrl.state.includes(filter.value)"
+            ng-click="$ctrl.onChangeItem(filter.value)"
+          />
+          <label for="filter_{{ $ctrl.filterKey }}_{{ $index }}">
+            {{ filter.label }}
+          </label>
+        </div>
+      </div>
+      <div>
+        <a class="btn btn-default btn-sm" ng-click="$ctrl.isOpen = false;">
+          Close
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

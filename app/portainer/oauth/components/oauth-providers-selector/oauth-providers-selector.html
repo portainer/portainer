@@ -2,18 +2,4 @@
   Provider
 </div>
 
-<div class="form-group"></div>
-<div class="form-group" style="margin-bottom: 0;">
-  <div class="boxselector_wrapper">
-    <div ng-repeat="provider in $ctrl.providers" ng-click="$ctrl.onSelect(provider, true)">
-      <input type="radio" id="{{ 'oauth_provider_' + provider.name }}" ng-model="$ctrl.provider" ng-value="provider" />
-      <label for="{{ 'oauth_provider_' + provider.name }}">
-        <div class="boxselector_header">
-          <i ng-class="provider.icon" aria-hidden="true" style="margin-right: 2px;"></i>
-          {{ provider.label }}
-        </div>
-        <p>{{ provider.description }}</p>
-      </label>
-    </div>
-  </div>
-</div>
+<box-selector ng-model="$ctrl.value" options="$ctrl.options" on-change="($ctrl.onChange)" radio-name="oauth_provider"></box-selector>

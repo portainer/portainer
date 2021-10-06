@@ -1,0 +1,157 @@
+<ng-form class="ad-settings" limited-feature-dir="{{::$ctrl.limitedFeatureId}}" limited-feature-class="limited-be">
+  <be-feature-indicator feature="$ctrl.limitedFeatureId" class="my-8 block"></be-feature-indicator>
+
+  <auto-user-provision-toggle ng-model="$ctrl.settings.AutoCreateUsers">
+    <field-description>
+      With automatic user provisioning enabled, Portainer will create user(s) automatically with standard user role and assign them to team(s) which matches to LDAP group name(s).
+      If disabled, users must be created in Portainer beforehand.
+    </field-description>
+  </auto-user-provision-toggle>
+
+  <div>
+    <div class="col-sm-12 form-section-title">
+      Information
+    </div>
+    <div class="form-group col-sm-12 text-muted small">
+      When using Microsoft AD authentication, Portainer will delegate user authentication to the Domain Controller(s) configured below; if there is no connectivity, Portainer will
+      fallback to internal authentication.
+    </div>
+  </div>
+
+  <div class="col-sm-12 form-section-title">
+    AD configuration
+  </div>
+
+  <div class="form-group">
+    <div class="col-sm-12 small text-muted">
+      <p>
+        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+        You can configure multiple AD Controllers for authentication fallback. Make sure all servers are using the same configuration (i.e. if TLS is enabled, they should all use
+        the same certificates).
+      </p>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="ldap_url" class="col-sm-3 col-lg-2 control-label text-left" style="display: flex; flex-wrap: wrap;">
+      AD Controller
+      <button
+        type="button"
+        class="label label-default interactive"
+        style="border: 0;"
+        ng-click="$ctrl.addLDAPUrl()"
+        limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+        limited-feature-tabindex="-1"
+      >
+        <i class="fa fa-plus-circle" aria-hidden="true"></i> Add additional server
+      </button>
+    </label>
+    <div class="col-sm-9 col-lg-10">
+      <div ng-repeat="url in $ctrl.settings.URLs track by $index" style="display: flex; margin-bottom: 10px;">
+        <input
+          type="text"
+          class="form-control"
+          id="ldap_url"
+          ng-model="$ctrl.settings.URLs[$index]"
+          placeholder="e.g. 10.0.0.10:389 or myldap.domain.tld:389"
+          limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+          limited-feature-tabindex="-1"
+        />
+        <button
+          ng-if="$index > 0"
+          class="btn btn-sm btn-danger"
+          type="button"
+          ng-click="$ctrl.removeLDAPUrl($index)"
+          limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+          limited-feature-tabindex="-1"
+        >
+          <i class="fa fa-trash" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="ldap_username" class="col-sm-3 control-label text-left">
+      Service Account
+      <portainer-tooltip position="bottom" message="Account that will be used to search for users."></portainer-tooltip>
+    </label>
+    <div class="col-sm-9">
+      <input
+        type="text"
+        class="form-control"
+        id="ldap_username"
+        ng-model="$ctrl.settings.ReaderDN"
+        placeholder="reader@domain.tld"
+        ng-change="$ctrl.onAccountChange($ctrl.settings.ReaderDN)"
+        limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+        limited-feature-tabindex="-1"
+      />
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="ldap_password" class="col-sm-3 control-label text-left">
+      Service Account Password
+      <portainer-tooltip position="bottom" message="If you do not enter a password, Portainer will leave the current password unchanged."></portainer-tooltip>
+    </label>
+    <div class="col-sm-9">
+      <input
+        type="password"
+        class="form-control"
+        id="ldap_password"
+        ng-model="$ctrl.settings.Password"
+        placeholder="password"
+        autocomplete="new-password"
+        limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+        limited-feature-tabindex="-1"
+      />
+    </div>
+  </div>
+
+  <ldap-connectivity-check
+    ng-if="!$ctrl.settings.TLSConfig.TLS && !$ctrl.settings.StartTLS"
+    settings="$ctrl.settings"
+    state="$ctrl.state"
+    connectivity-check="$ctrl.connectivityCheck"
+    limited-feature-id="$ctrl.limitedFeatureId"
+  ></ldap-connectivity-check>
+
+  <ldap-settings-security
+    title="AD Connectivity Security"
+    settings="$ctrl.settings"
+    tlsca-cert="$ctrl.tlscaCert"
+    upload-in-progress="$ctrl.state.uploadInProgress"
+    on-tlsca-cert-change="($ctrl.onTlscaCertChange)"
+    limited-feature-id="$ctrl.limitedFeatureId"
+  ></ldap-settings-security>
+
+  <ldap-connectivity-check
+    ng-if="$ctrl.settings.TLSConfig.TLS || $ctrl.settings.StartTLS"
+    settings="$ctrl.settings"
+    state="$ctrl.state"
+    connectivity-check="$ctrl.connectivityCheck"
+    limited-feature-id="$ctrl.limitedFeatureId"
+  ></ldap-connectivity-check>
+
+  <ldap-user-search
+    style="margin-top: 5px;"
+    show-username-format="true"
+    settings="$ctrl.settings.SearchSettings"
+    domain-suffix="{{ $ctrl.domainSuffix }}"
+    base-filter="(objectClass=user)"
+    on-search-click="($ctrl.searchUsers)"
+    limited-feature-id="$ctrl.limitedFeatureId"
+  ></ldap-user-search>
+
+  <ldap-group-search
+    style="margin-top: 5px;"
+    settings="$ctrl.settings.GroupSearchSettings"
+    domain-suffix="{{ $ctrl.domainSuffix }}"
+    base-filter="(objectClass=group)"
+    on-search-click="($ctrl.searchGroups)"
+    limited-feature-id="$ctrl.limitedFeatureId"
+  ></ldap-group-search>
+
+  <ldap-settings-test-login settings="$ctrl.settings" limited-feature-id="$ctrl.limitedFeatureId"></ldap-settings-test-login>
+</ng-form>

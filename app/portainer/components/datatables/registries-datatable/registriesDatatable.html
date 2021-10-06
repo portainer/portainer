@@ -87,15 +87,10 @@
               </td>
               <td>
                 <a ng-if="$ctrl.canManageAccess(item)" ng-click="$ctrl.redirectToManageAccess(item)"> <i class="fa fa-users" aria-hidden="true"></i> Manage access </a>
-                <span
-                  ng-if="$ctrl.canBrowse(item)"
-                  class="text-muted space-left"
-                  style="cursor: pointer;"
-                  data-toggle="tooltip"
-                  title="This feature is available in Portainer Business Edition"
-                >
-                  <i class="fa fa-search" aria-hidden="true"></i> Browse</span
-                >
+                <be-feature-indicator feature="$ctrl.limitedFeature" ng-if="$ctrl.canBrowse(item)">
+                  <span class="text-muted space-left" style="padding-right: 5px;"> <i class="fa fa-search" aria-hidden="true"></i> Browse</span>
+                </be-feature-indicator>
+
                 <span ng-if="!$ctrl.canBrowse(item) && !$ctrl.canManageAccess(item)"> - </span>
               </td>
             </tr>

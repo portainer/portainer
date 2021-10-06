@@ -1,0 +1,66 @@
+<div class="datatable datatable-empty">
+  <rd-widget>
+    <rd-widget-body classes="no-padding">
+      <datatable-titlebar title="Activity Logs" icon="fa-history" feature="{{::$ctrl.feature}}"></datatable-titlebar>
+      <datatable-searchbar on-change="($ctrl.onChangeKeyword)" ng-model="$ctrl.keyword"></datatable-searchbar>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th class="small-column">
+                <a ng-click="$ctrl.changeSort('Timestamp')">
+                  Time
+                  <datatable-sort-icon key="Timestamp" selected-sort-key="{{ $ctrl.sort.key }}" reverse-order="$ctrl.sort.desc"></datatable-sort-icon>
+                </a>
+              </th>
+              <th class="small-column">
+                <a ng-click="$ctrl.changeSort('Username')">
+                  User
+                  <datatable-sort-icon key="Username" selected-sort-key="{{ $ctrl.sort.key }}" reverse-order="$ctrl.sort.desc"></datatable-sort-icon>
+                </a>
+              </th>
+              <th class="small-column">
+                <a ng-click="$ctrl.changeSort('Context')">
+                  Environment
+                  <datatable-sort-icon key="Context" selected-sort-key="{{ $ctrl.sort.key }}" reverse-order="$ctrl.sort.desc"></datatable-sort-icon>
+                </a>
+              </th>
+
+              <th>
+                Action
+              </th>
+              <th>
+                Payload
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr dir-paginate-start="item in $ctrl.logs | itemsPerPage: $ctrl.limit" total-items="$ctrl.totalItems" current-page="$ctrl.currentPage">
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr dir-paginate-end ng-show="item.Expanded">
+              <td colspan="5">
+                <json-tree object="item.payload" root-name="containerInfo.Id" start-expanded="true"></json-tree>
+              </td>
+            </tr>
+            <tr ng-if="!$ctrl.logs">
+              <td class="text-center text-muted" colspan="5">Loading...</td>
+            </tr>
+            <tr ng-if="$ctrl.logs.length === 0">
+              <td class="text-center text-muted" colspan="8">
+                No logs available.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="footer" ng-if="$ctrl.logs">
+        <datatable-pagination limit="$ctrl.limit" on-change-limit="($ctrl.handleChangeLimit)" on-change-page="($ctrl.onChangePage)"></datatable-pagination>
+      </div>
+    </rd-widget-body>
+  </rd-widget>
+</div>
