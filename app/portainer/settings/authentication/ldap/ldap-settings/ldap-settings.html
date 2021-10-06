@@ -1,0 +1,41 @@
+<div>
+  <auto-user-provision-toggle ng-model="$ctrl.settings.AutoCreateUsers">
+    <field-description>
+      With automatic user provisioning enabled, Portainer will create user(s) automatically with standard user role and assign them to team(s) which matches to LDAP group name(s).
+      If disabled, users must be created in Portainer beforehand.
+    </field-description>
+  </auto-user-provision-toggle>
+
+  <div class="col-sm-12 form-section-title">
+    Server Type
+  </div>
+
+  <box-selector
+    style="margin-bottom: 0;"
+    radio-name="ldap-server-type-selector"
+    ng-model="$ctrl.settings.ServerType"
+    options="$ctrl.boxSelectorOptions"
+    on-change="($ctrl.onChangeServerType)"
+  ></box-selector>
+
+  <ldap-settings-custom
+    ng-if="$ctrl.settings.ServerType === $ctrl.SERVER_TYPES.CUSTOM"
+    settings="$ctrl.settings"
+    tlsca-cert="$ctrl.tlscaCert"
+    state="$ctrl.state"
+    on-tlsca-cert-change="($ctrl.onTlscaCertChange)"
+    connectivity-check="$ctrl.connectivityCheck"
+    on-search-users-click="($ctrl.searchUsers)"
+    on-search-groups-click="($ctrl.searchGroups)"
+  ></ldap-settings-custom>
+  <ldap-settings-open-ldap
+    ng-if="$ctrl.settings.ServerType === $ctrl.SERVER_TYPES.OPEN_LDAP"
+    settings="$ctrl.settings"
+    tlsca-cert="$ctrl.tlscaCert"
+    state="$ctrl.state"
+    on-tlsca-cert-change="($ctrl.onTlscaCertChange)"
+    connectivity-check="$ctrl.connectivityCheck"
+    on-search-users-click="($ctrl.searchUsers)"
+    on-search-groups-click="($ctrl.searchGroups)"
+  ></ldap-settings-open-ldap>
+</div>

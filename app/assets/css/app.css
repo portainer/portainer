@@ -816,10 +816,6 @@ json-tree .branch-preview {
 }
 /* !spinkit override */
 
-.w-full {
-  width: 100%;
-}
-
 /* uib-typeahead override */
 #scrollable-dropdown-menu .dropdown-menu {
   max-height: 300px;
@@ -827,15 +823,31 @@ json-tree .branch-preview {
 }
 /* !uib-typeahead override */
 
-.my-8 {
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-}
-
 .kubectl-shell {
   display: block;
   text-align: center;
   padding-bottom: 5px;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.flex {
+  display: flex;
+}
+
+.block {
+  display: block;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.my-8 {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
 }
 
 .text-wrap {

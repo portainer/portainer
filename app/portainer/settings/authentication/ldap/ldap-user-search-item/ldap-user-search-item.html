@@ -1,0 +1,106 @@
+<rd-widget>
+  <rd-widget-body>
+    <div ng-if="$ctrl.index > 0" style="margin-bottom: 10px;">
+      <span class="text-muted small">
+        Extra search configuration
+      </span>
+      <button
+        ng-if="$ctrl.index > 0"
+        class="btn btn-sm btn-danger"
+        type="button"
+        ng-click="$ctrl.onRemoveClick($ctrl.index)"
+        limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+        limited-feature-tabindex="-1"
+      >
+        <i class="fa fa-trash" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div class="form-group" ng-if="$ctrl.showUsernameFormat">
+      <div class="col-sm-4" style="margin-bottom: 5px;">
+        <label class="control-label text-left">Username Format</label>
+      </div>
+      <div class="col-sm-8">
+        <div class="input-group">
+          <div class="input-group-btn">
+            <button
+              class="btn btn-primary"
+              ng-model="$ctrl.config.UserNameAttribute"
+              uib-btn-radio="'sAMAccountName'"
+              style="margin-left: 0px;"
+              limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+              limited-feature-tabindex="-1"
+              >username</button
+            >
+            <button
+              class="btn btn-primary"
+              ng-model="$ctrl.config.UserNameAttribute"
+              uib-btn-radio="'userPrincipalName'"
+              limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+              limited-feature-tabindex="-1"
+              >user@domainname</button
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="col-sm-4 control-label text-left">
+        Root Domain
+      </label>
+      <div class="col-sm-8">
+        {{ $ctrl.config.BaseDN }}
+      </div>
+    </div>
+
+    <ldap-settings-dn-builder
+      ng-model="$ctrl.config.BaseDN"
+      label="User Search Path (optional)"
+      suffix="{{ $ctrl.domainSuffix }}"
+      on-change="($ctrl.onBaseDNChange)"
+      limited-feature-id="$ctrl.limitedFeatureId"
+    ></ldap-settings-dn-builder>
+
+    <div class="form-group no-margin-last-child">
+      <div class="col-sm-12" style="margin-bottom: 5px;">
+        <label class="control-label text-left">Allowed Groups (optional)</label>
+        <button
+          type="button"
+          class="label label-default interactive"
+          style="margin-left: 10px; border: 0;"
+          ng-click="$ctrl.addGroup()"
+          limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+          limited-feature-tabindex="-1"
+        >
+          <i class="fa fa-plus-circle" aria-hidden="true"></i> add another group
+        </button>
+      </div>
+      <div class="col-sm-12">
+        <div ng-repeat="group in $ctrl.groups track by $index" style="margin-bottom: 10px;">
+          <rd-widget>
+            <rd-widget-body>
+              <ldap-settings-group-dn-builder
+                ng-model="group"
+                index="$index"
+                suffix="{{ $ctrl.domainSuffix }}"
+                on-change="($ctrl.onGroupChange)"
+                on-remove-click="($ctrl.removeGroup)"
+                limited-feature-id="$ctrl.limitedFeatureId"
+              ></ldap-settings-group-dn-builder>
+            </rd-widget-body>
+          </rd-widget>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="col-sm-4 control-label text-left">
+        User Filter
+      </label>
+      <div class="col-sm-8">
+        {{ $ctrl.config.Filter }}
+      </div>
+    </div>
+  </rd-widget-body>
+</rd-widget>

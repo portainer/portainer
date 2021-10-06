@@ -4,10 +4,10 @@ export default class BoxSelectorController {
     this.change = this.change.bind(this);
   }
 
-  change(value) {
+  change(value, limited) {
     this.ngModel = value;
     if (this.onChange) {
-      this.onChange(value);
+      this.onChange(value, limited);
     }
   }
 

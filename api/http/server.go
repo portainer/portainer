@@ -29,6 +29,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/file"
 	"github.com/portainer/portainer/api/http/handler/helm"
 	kubehandler "github.com/portainer/portainer/api/http/handler/kubernetes"
+	"github.com/portainer/portainer/api/http/handler/ldap"
 	"github.com/portainer/portainer/api/http/handler/motd"
 	"github.com/portainer/portainer/api/http/handler/registries"
 	"github.com/portainer/portainer/api/http/handler/resourcecontrols"
@@ -175,6 +176,11 @@ func (server *Server) Start() error {
 
 	var helmTemplatesHandler = helm.NewTemplateHandler(requestBouncer, server.HelmPackageManager)
 
+	var ldapHandler = ldap.NewHandler(requestBouncer)
+	ldapHandler.DataStore = server.DataStore
+	ldapHandler.FileService = server.FileService
+	ldapHandler.LDAPService = server.LDAPService
+
 	var motdHandler = motd.NewHandler(requestBouncer)
 
 	var registryHandler = registries.NewHandler(requestBouncer)
@@ -255,6 +261,7 @@ func (server *Server) Start() error {
 		EndpointEdgeHandler:    endpointEdgeHandler,
 		EndpointProxyHandler:   endpointProxyHandler,
 		FileHandler:            fileHandler,
+		LDAPHandler:            ldapHandler,
 		HelmTemplatesHandler:   helmTemplatesHandler,
 		KubernetesHandler:      kubernetesHandler,
 		MOTDHandler:            motdHandler,

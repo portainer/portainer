@@ -92,6 +92,10 @@
   float: none;
 }
 
+.datatable.datatable-empty .table > tbody > tr > td {
+  padding: 15px 0;
+}
+
 .tableMenu {
   color: #767676;
   padding: 10px;
