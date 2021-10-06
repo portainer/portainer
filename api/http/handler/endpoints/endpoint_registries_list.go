@@ -13,7 +13,18 @@ import (
 	"github.com/portainer/portainer/api/internal/endpointutils"
 )
 
-// GET request on /endpoints/{id}/registries?namespace
+// @id endpointRegistriesList
+// @summary List Registries on environment
+// @description List all registries based on the current user authorizations in current environment.
+// @description **Access policy**: authenticated
+// @tags endpoints
+// @param namespace query string false "required if kubernetes environment, will show registries by namespace"
+// @security jwt
+// @produce json
+// @param id path int true "Environment(Endpoint) identifier"
+// @success 200 {array} portainer.Registry "Success"
+// @failure 500 "Server error"
+// @router /endpoints/{id}/registries [get]
 func (handler *Handler) endpointRegistriesList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {

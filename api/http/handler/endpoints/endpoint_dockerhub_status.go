@@ -18,11 +18,27 @@ import (
 )
 
 type dockerhubStatusResponse struct {
+	// Remaiming images to pull
 	Remaining int `json:"remaining"`
-	Limit     int `json:"limit"`
+	// Daily limit
+	Limit int `json:"limit"`
 }
 
-// GET request on /api/endpoints/{id}/dockerhub/{registryId}
+// @id endpointDockerhubStatus
+// @summary fetch docker pull limits
+// @description get docker pull limits for a docker hub registry in the environment
+// @description **Access policy**:
+// @tags endpoints
+// @security jwt
+// @produce json
+// @param id path int true "endpoint ID"
+// @param registryId path int true "registry ID"
+// @success 200 {object} dockerhubStatusResponse "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 "registry or endpoint not found"
+// @failure 500 "Server error"
+// @router /endpoints/{id}/dockerhub/{registryId} [get]
 func (handler *Handler) endpointDockerhubStatus(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
