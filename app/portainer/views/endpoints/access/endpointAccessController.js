@@ -1,5 +1,7 @@
 import angular from 'angular';
 
+import { RBAC_ROLES } from '@/portainer/feature-flags/feature-ids';
+
 class EndpointAccessController {
   /* @ngInject */
   constructor($state, $transition$, Notifications, EndpointService, GroupService, $async) {
@@ -9,6 +11,8 @@ class EndpointAccessController {
     this.EndpointService = EndpointService;
     this.GroupService = GroupService;
     this.$async = $async;
+
+    this.limitedFeature = RBAC_ROLES;
 
     this.updateAccess = this.updateAccess.bind(this);
     this.updateAccessAsync = this.updateAccessAsync.bind(this);

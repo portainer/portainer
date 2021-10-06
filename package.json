@@ -91,7 +91,7 @@
     "jquery": "^3.5.1",
     "js-base64": "^3.6.0",
     "js-yaml": "^3.14.0",
-    "lodash-es": "^4.17.15",
+    "lodash-es": "^4.17.21",
     "moment": "^2.21.0",
     "ng-file-upload": "~12.2.13",
     "parse-duration": "^1.0.0",
@@ -162,7 +162,7 @@
   "resolutions": {
     "jquery": "^3.5.1",
     "decompress": "^4.2.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "js-yaml": "^3.14.0",
     "minimist": "^1.2.5",
     "http-proxy": "^1.18.1"

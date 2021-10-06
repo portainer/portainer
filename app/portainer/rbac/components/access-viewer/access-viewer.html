@@ -1,0 +1,43 @@
+<div class="col-sm-12" style="margin-bottom: 0px;">
+  <rd-widget>
+    <rd-widget-header icon="fa-user-lock">
+      <header-title>
+        Effective access viewer
+        <be-feature-indicator feature="$ctrl.limitedFeature" class="space-left"></be-feature-indicator>
+      </header-title>
+    </rd-widget-header>
+    <rd-widget-body>
+      <form class="form-horizontal">
+        <div class="col-sm-12 form-section-title">
+          User
+        </div>
+        <div class="form-group">
+          <div class="col-sm-12">
+            <span class="small text-muted" ng-if="$ctrl.users.length === 0">
+              No user available
+            </span>
+            <ui-select ng-if="$ctrl.users.length > 0" ng-model="$ctrl.selectedUser" ng-change="$ctrl.onUserSelect()">
+              <ui-select-match placeholder="Select a user">
+                <span>{{ $select.selected.Username }}</span>
+              </ui-select-match>
+              <ui-select-choices repeat="item in ($ctrl.users | filter: $select.search)">
+                <span>{{ item.Username }}</span>
+              </ui-select-choices>
+            </ui-select>
+          </div>
+        </div>
+
+        <div class="col-sm-12 form-section-title">
+          Access
+        </div>
+        <div>
+          <div class="small text-muted" style="margin-bottom: 15px;">
+            <i class="fa fa-info-circle blue-icon space-right" aria-hidden="true"></i>
+            Effective role for each environment will be displayed for the selected user
+          </div>
+        </div>
+        <access-viewer-datatable table-key="access_viewer" dataset="$ctrl.userRoles" order-by="EndpointName"> </access-viewer-datatable>
+      </form>
+    </rd-widget-body>
+  </rd-widget>
+</div>
