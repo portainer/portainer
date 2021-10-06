@@ -18,7 +18,6 @@ import (
 // @description **Access policy**: administrator
 // @tags users
 // @security jwt
-// @accept json
 // @produce json
 // @param id path int true "User identifier"
 // @success 204 "Success"

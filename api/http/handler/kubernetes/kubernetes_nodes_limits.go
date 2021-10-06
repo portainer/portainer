@@ -13,7 +13,7 @@ import (
 // @id getKubernetesNodesLimits
 // @summary Get CPU and memory limits of all nodes within k8s cluster
 // @description Get CPU and memory limits of all nodes within k8s cluster
-// @description **Access policy**: authorized
+// @description **Access policy**: authenticated
 // @tags kubernetes
 // @security jwt
 // @accept json

@@ -18,7 +18,7 @@ type fileResponse struct {
 // @id CustomTemplateFile
 // @summary Get Template stack file content.
 // @description Retrieve the content of the Stack file for the specified custom template
-// @description **Access policy**: authorized
+// @description **Access policy**: authenticated
 // @tags custom_templates
 // @security jwt
 // @produce json

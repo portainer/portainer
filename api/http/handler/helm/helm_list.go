@@ -12,7 +12,7 @@ import (
 // @id HelmList
 // @summary List Helm Releases
 // @description
-// @description **Access policy**: authorized
+// @description **Access policy**: authenticated
 // @tags helm
 // @security jwt
 // @accept json

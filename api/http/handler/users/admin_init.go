@@ -32,7 +32,7 @@ func (payload *adminInitPayload) Validate(r *http.Request) error {
 // @summary Initialize administrator account
 // @description Initialize the 'admin' user account.
 // @description **Access policy**: public
-// @tags
+// @tags users
 // @accept json
 // @produce json
 // @param body body adminInitPayload true "User details"

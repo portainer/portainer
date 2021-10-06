@@ -24,7 +24,7 @@ type stackListOperationFilters struct {
 // @description List all stacks based on the current user authorizations.
 // @description Will return all stacks if using an administrator account otherwise it
 // @description will only return the list of stacks the user have access to.
-// @description **Access policy**: restricted
+// @description **Access policy**: authenticated
 // @tags stacks
 // @security jwt
 // @param filters query string false "Filters to process on the stack list. Encoded as JSON (a map[string]string). For example, {"SwarmID": "jpofkc0i9uo9wtx1zesuk649w"} will only return stacks that are part of the specified Swarm cluster. Available filters: EndpointID, SwarmID."

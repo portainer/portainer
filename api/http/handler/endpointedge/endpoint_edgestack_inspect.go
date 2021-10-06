@@ -19,7 +19,7 @@ type configResponse struct {
 }
 
 // @summary Inspect an Edge Stack for an Environment(Endpoint)
-// @description
+// @description **Access policy**: public
 // @tags edge, endpoints, edge_stacks
 // @accept json
 // @produce json

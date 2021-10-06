@@ -36,9 +36,9 @@ func (payload *endpointSettingsUpdatePayload) Validate(r *http.Request) error {
 }
 
 // @id EndpointSettingsUpdate
-// @summary Update settings for an environments(endpoints)
-// @description Update settings for an environments(endpoints).
-// @description **Access policy**: administrator
+// @summary Update settings for an environment(endpoint)
+// @description Update settings for an environment(endpoint).
+// @description **Access policy**: authenticated
 // @security jwt
 // @tags endpoints
 // @accept json

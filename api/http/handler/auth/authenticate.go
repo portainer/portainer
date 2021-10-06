@@ -39,6 +39,7 @@ func (payload *authenticatePayload) Validate(r *http.Request) error {
 
 // @id AuthenticateUser
 // @summary Authenticate
+// @description **Access policy**: public
 // @description Use this environment(endpoint) to authenticate against Portainer using a username and password.
 // @tags auth
 // @accept json

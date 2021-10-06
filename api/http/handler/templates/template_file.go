@@ -39,7 +39,7 @@ func (payload *filePayload) Validate(r *http.Request) error {
 // @id TemplateFile
 // @summary Get a template's file
 // @description Get a template's file
-// @description **Access policy**: restricted
+// @description **Access policy**: authenticated
 // @tags templates
 // @security jwt
 // @accept json
