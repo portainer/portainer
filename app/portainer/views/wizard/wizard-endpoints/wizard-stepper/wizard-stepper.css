@@ -30,11 +30,11 @@
 .stepper-item::before {
   position: absolute;
   content: '';
-  border-bottom: 5px solid var(--bg-stepper-item-counter);
   width: 100%;
   top: 20px;
   left: -100%;
   z-index: 2;
+  border-bottom: 5px solid var(--bg-stepper-item-counter);
 }
 
 .stepper-item::after {
