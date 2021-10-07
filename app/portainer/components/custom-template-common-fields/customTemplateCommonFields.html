@@ -5,7 +5,27 @@
       Title
     </label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" ng-model="$ctrl.formValues.Title" id="template_title" name="template_title" placeholder="e.g. mytemplate" auto-focus required />
+      <input
+        type="text"
+        class="form-control"
+        ng-model="$ctrl.formValues.Title"
+        ng-pattern="$ctrl.nameRegex"
+        id="template_title"
+        name="template_title"
+        placeholder="e.g. mytemplate"
+        auto-focus
+        required
+      />
+    </div>
+  </div>
+  <div class="form-group" ng-show="commonCustomTemplateForm.template_title.$invalid">
+    <div class="col-sm-12 small text-warning">
+      <div ng-messages="commonCustomTemplateForm.template_title.$error">
+        <p ng-message="pattern">
+          <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+          <span>This field must consist of lower case alphanumeric characters, '_' or '-' (e.g. 'my-name', or 'abc-123').</span>
+        </p>
+      </div>
     </div>
   </div>
   <div class="form-group" ng-show="commonCustomTemplateForm.template_title.$invalid">
