@@ -235,10 +235,6 @@ func (s *stubEndpointService) DeleteEndpoint(ID portainer.EndpointID) error {
 	return nil
 }
 
-func (s *stubEndpointService) Synchronize(toCreate []*portainer.Endpoint, toUpdate []*portainer.Endpoint, toDelete []*portainer.Endpoint) error {
-	panic("not implemented")
-}
-
 func (s *stubEndpointService) GetNextIdentifier() int {
 	return len(s.endpoints)
 }
