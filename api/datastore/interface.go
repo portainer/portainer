@@ -92,7 +92,6 @@ type (
 		Create(endpoint *portainer.Endpoint) error
 		UpdateEndpoint(ID portainer.EndpointID, endpoint *portainer.Endpoint) error
 		DeleteEndpoint(ID portainer.EndpointID) error
-		Synchronize(toCreate, toUpdate, toDelete []*portainer.Endpoint) error
 		GetNextIdentifier() int
 	}
 
