@@ -5,8 +5,6 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
 	"github.com/sirupsen/logrus"
-
-	"github.com/boltdb/bolt"
 )
 
 const (
@@ -134,50 +132,38 @@ func (service *Service) DeleteTeamMembership(ID portainer.TeamMembershipID) erro
 
 // DeleteTeamMembershipByUserID deletes all the TeamMembership object associated to a UserID.
 func (service *Service) DeleteTeamMembershipByUserID(userID portainer.UserID) error {
-	return service.connection.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var membership portainer.TeamMembership
-			err := internal.UnmarshalObject(v, &membership)
-			if err != nil {
-				return err
+	return internal.DeleteAllObjects(
+		service.connection,
+		BucketName,
+		func(obj interface{}) (id int, ok bool) {
+			membership, ok := obj.(portainer.TeamMembership)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to TeamMembership object")
+				//return fmt.Errorf("Failed to convert to TeamMembership object: %s", obj)
+				return -1, false
 			}
-
 			if membership.UserID == userID {
-				err := bucket.Delete(internal.Itob(int(membership.ID)))
-				if err != nil {
-					return err
-				}
+				return int(membership.ID), true
 			}
-		}
-
-		return nil
-	})
+			return -1, false
+		})
 }
 
 // DeleteTeamMembershipByTeamID deletes all the TeamMembership object associated to a TeamID.
 func (service *Service) DeleteTeamMembershipByTeamID(teamID portainer.TeamID) error {
-	return service.connection.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var membership portainer.TeamMembership
-			err := internal.UnmarshalObject(v, &membership)
-			if err != nil {
-				return err
+	return internal.DeleteAllObjects(
+		service.connection,
+		BucketName,
+		func(obj interface{}) (id int, ok bool) {
+			membership, ok := obj.(portainer.TeamMembership)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to TeamMembership object")
+				//return fmt.Errorf("Failed to convert to TeamMembership object: %s", obj)
+				return -1, false
 			}
-
 			if membership.TeamID == teamID {
-				err := bucket.Delete(internal.Itob(int(membership.ID)))
-				if err != nil {
-					return err
-				}
+				return int(membership.ID), true
 			}
-		}
-
-		return nil
-	})
+			return -1, false
+		})
 }

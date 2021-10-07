@@ -8,9 +8,6 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/internal"
-
-	"github.com/boltdb/bolt"
-	pkgerrors "github.com/pkg/errors"
 )
 
 const (
@@ -147,72 +144,64 @@ func (service *Service) DeleteStack(ID portainer.StackID) error {
 // StackByWebhookID returns a pointer to a stack object by webhook ID.
 // It returns nil, errors.ErrObjectNotFound if there's no stack associated with the webhook ID.
 func (service *Service) StackByWebhookID(id string) (*portainer.Stack, error) {
-	if id == "" {
-		return nil, pkgerrors.New("webhook ID can't be empty string")
+	/////
+	type hasWebHookId struct {
+		AutoUpdate *struct {
+			WebhookID string `json:"Webhook"`
+		} `json:"AutoUpdate"`
 	}
-	var stack portainer.Stack
-	found := false
 
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-		cursor := bucket.Cursor()
-
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var t struct {
-				AutoUpdate *struct {
-					WebhookID string `json:"Webhook"`
-				} `json:"AutoUpdate"`
-			}
-
-			err := internal.UnmarshalObject(v, &t)
-			if err != nil {
-				return err
+	var s *portainer.Stack
+	stop := fmt.Errorf("ok")
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			t, ok := obj.(hasWebHookId)
+			if !ok {
+				return nil
 			}
 
 			if t.AutoUpdate != nil && strings.EqualFold(t.AutoUpdate.WebhookID, id) {
-				found = true
-				err := internal.UnmarshalObject(v, &stack)
-				if err != nil {
-					return err
+				stack, ok := obj.(portainer.Stack)
+				if !ok {
+					logrus.WithField("obj", obj).Errorf("Failed to convert to Stack object")
+					return fmt.Errorf("Failed to convert to Stack object: %s", obj)
 				}
-				break
+				s = &stack
+				return stop
 			}
-		}
-
-		return nil
-	})
-
-	if err != nil {
-		return nil, err
+			return nil
+		})
+	if err == stop {
+		return s, nil
 	}
-	if !found {
+	if err == nil {
 		return nil, errors.ErrObjectNotFound
 	}
 
-	return &stack, nil
+	return nil, err
+
 }
 
 // RefreshableStacks returns stacks that are configured for a periodic update
 func (service *Service) RefreshableStacks() ([]portainer.Stack, error) {
 	stacks := make([]portainer.Stack, 0)
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-		cursor := bucket.Cursor()
 
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			stack := portainer.Stack{}
-			err := internal.UnmarshalObject(v, &stack)
-			if err != nil {
-				return err
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			stack, ok := obj.(portainer.Stack)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to Stack object")
+				return fmt.Errorf("Failed to convert to Stack object: %s", obj)
 			}
-
 			if stack.AutoUpdate != nil && stack.AutoUpdate.Interval != "" {
 				stacks = append(stacks, stack)
 			}
-		}
-
-		return nil
-	})
+			return nil
+		})
 
 	return stacks, err
 }
