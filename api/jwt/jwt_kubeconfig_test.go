@@ -5,6 +5,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/datastore"
 	i "github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/stretchr/testify/assert"
 )
@@ -12,7 +13,7 @@ import (
 func TestService_GenerateTokenForKubeconfig(t *testing.T) {
 	type fields struct {
 		userSessionTimeout string
-		dataStore          portainer.DataStore
+		dataStore          datastore.DataStore
 	}
 
 	type args struct {
