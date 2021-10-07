@@ -2,7 +2,6 @@ package endpoint
 
 import (
 	"fmt"
-	"github.com/boltdb/bolt"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
 	"github.com/sirupsen/logrus"
@@ -83,47 +82,4 @@ func (service *Service) Create(endpoint *portainer.Endpoint) error {
 // GetNextIdentifier returns the next identifier for an environment(endpoint).
 func (service *Service) GetNextIdentifier() int {
 	return internal.GetNextIdentifier(service.connection, BucketName)
-}
-
-// Synchronize creates, updates and deletes environments(endpoints) inside a single transaction.
-func (service *Service) Synchronize(toCreate, toUpdate, toDelete []*portainer.Endpoint) error {
-	return service.connection.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		for _, endpoint := range toCreate {
-			id, _ := bucket.NextSequence()
-			endpoint.ID = portainer.EndpointID(id)
-
-			data, err := internal.MarshalObject(endpoint)
-			if err != nil {
-				return err
-			}
-
-			err = bucket.Put(internal.Itob(int(endpoint.ID)), data)
-			if err != nil {
-				return err
-			}
-		}
-
-		for _, endpoint := range toUpdate {
-			data, err := internal.MarshalObject(endpoint)
-			if err != nil {
-				return err
-			}
-
-			err = bucket.Put(internal.Itob(int(endpoint.ID)), data)
-			if err != nil {
-				return err
-			}
-		}
-
-		for _, endpoint := range toDelete {
-			err := bucket.Delete(internal.Itob(int(endpoint.ID)))
-			if err != nil {
-				return err
-			}
-		}
-
-		return nil
-	})
 }
