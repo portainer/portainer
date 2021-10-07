@@ -2,8 +2,9 @@ package stack
 
 import (
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"strings"
+
+	"github.com/sirupsen/logrus"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
@@ -78,23 +79,20 @@ func (service *Service) StackByName(name string) (*portainer.Stack, error) {
 func (service *Service) StacksByName(name string) ([]portainer.Stack, error) {
 	var stacks = make([]portainer.Stack, 0)
 
-	err := service.connection.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var t portainer.Stack
-			err := internal.UnmarshalObject(v, &t)
-			if err != nil {
-				return err
+	err := internal.GetAll(
+		service.connection,
+		BucketName,
+		func(obj interface{}) error {
+			stack, ok := obj.(portainer.Stack)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to Stack object")
+				return fmt.Errorf("Failed to convert to Stack object: %s", obj)
 			}
-
-			if t.Name == name {
-				stacks = append(stacks, t)
+			if stack.Name == name {
+				stacks = append(stacks, stack)
 			}
-		}
-
-		return nil
-	})
+			return nil
+		})
 
 	return stacks, err
 }
