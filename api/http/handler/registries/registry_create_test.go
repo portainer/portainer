@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/stretchr/testify/assert"
 )
@@ -36,18 +37,18 @@ func Test_registryCreatePayload_Validate(t *testing.T) {
 }
 
 type testRegistryService struct {
-	portainer.RegistryService
+	datastore.RegistryService
 	createRegistry func(r *portainer.Registry) error
 	updateRegistry func(ID portainer.RegistryID, r *portainer.Registry) error
 	getRegistry    func(ID portainer.RegistryID) (*portainer.Registry, error)
 }
 
 type testDataStore struct {
-	portainer.DataStore
+	datastore.DataStore
 	registry *testRegistryService
 }
 
-func (t testDataStore) Registry() portainer.RegistryService {
+func (t testDataStore) Registry() datastore.RegistryService {
 	return t.registry
 }
 

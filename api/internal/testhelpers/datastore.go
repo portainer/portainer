@@ -4,71 +4,76 @@ import (
 	"io"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/bolt/errors"
 )
 
-type datastore struct {
-	customTemplate     portainer.CustomTemplateService
-	edgeGroup          portainer.EdgeGroupService
-	edgeJob            portainer.EdgeJobService
-	edgeStack          portainer.EdgeStackService
-	endpoint           portainer.EndpointService
-	endpointGroup      portainer.EndpointGroupService
-	endpointRelation   portainer.EndpointRelationService
-	helmUserRepository portainer.HelmUserRepositoryService
-	registry           portainer.RegistryService
-	resourceControl    portainer.ResourceControlService
-	role               portainer.RoleService
-	sslSettings        portainer.SSLSettingsService
-	settings           portainer.SettingsService
-	stack              portainer.StackService
-	tag                portainer.TagService
-	teamMembership     portainer.TeamMembershipService
-	team               portainer.TeamService
-	tunnelServer       portainer.TunnelServerService
-	user               portainer.UserService
-	version            portainer.VersionService
-	webhook            portainer.WebhookService
+type testDatastore struct {
+	customTemplate     datastore.CustomTemplateService
+	edgeGroup          datastore.EdgeGroupService
+	edgeJob            datastore.EdgeJobService
+	edgeStack          datastore.EdgeStackService
+	endpoint           datastore.EndpointService
+	endpointGroup      datastore.EndpointGroupService
+	endpointRelation   datastore.EndpointRelationService
+	helmUserRepository datastore.HelmUserRepositoryService
+	registry           datastore.RegistryService
+	resourceControl    datastore.ResourceControlService
+	role               datastore.RoleService
+	sslSettings        datastore.SSLSettingsService
+	settings           datastore.SettingsService
+	stack              datastore.StackService
+	tag                datastore.TagService
+	teamMembership     datastore.TeamMembershipService
+	team               datastore.TeamService
+	tunnelServer       datastore.TunnelServerService
+	user               datastore.UserService
+	version            datastore.VersionService
+	webhook            datastore.WebhookService
 }
 
-func (d *datastore) BackupTo(io.Writer) error                            { return nil }
-func (d *datastore) Open() error                                         { return nil }
-func (d *datastore) Init() error                                         { return nil }
-func (d *datastore) Close() error                                        { return nil }
-func (d *datastore) CheckCurrentEdition() error                          { return nil }
-func (d *datastore) IsNew() bool                                         { return false }
-func (d *datastore) MigrateData(force bool) error                        { return nil }
-func (d *datastore) Rollback(force bool) error                           { return nil }
-func (d *datastore) CustomTemplate() portainer.CustomTemplateService     { return d.customTemplate }
-func (d *datastore) EdgeGroup() portainer.EdgeGroupService               { return d.edgeGroup }
-func (d *datastore) EdgeJob() portainer.EdgeJobService                   { return d.edgeJob }
-func (d *datastore) EdgeStack() portainer.EdgeStackService               { return d.edgeStack }
-func (d *datastore) Endpoint() portainer.EndpointService                 { return d.endpoint }
-func (d *datastore) EndpointGroup() portainer.EndpointGroupService       { return d.endpointGroup }
-func (d *datastore) EndpointRelation() portainer.EndpointRelationService { return d.endpointRelation }
-func (d *datastore) HelmUserRepository() portainer.HelmUserRepositoryService {
+func (d *testDatastore) BackupTo(io.Writer) error                        { return nil }
+func (d *testDatastore) Open() error                                     { return nil }
+func (d *testDatastore) Init() error                                     { return nil }
+func (d *testDatastore) Close() error                                    { return nil }
+func (d *testDatastore) CheckCurrentEdition() error                      { return nil }
+func (d *testDatastore) IsNew() bool                                     { return false }
+func (d *testDatastore) MigrateData(force bool) error                    { return nil }
+func (d *testDatastore) Rollback(force bool) error                       { return nil }
+func (d *testDatastore) CustomTemplate() datastore.CustomTemplateService { return d.customTemplate }
+func (d *testDatastore) EdgeGroup() datastore.EdgeGroupService           { return d.edgeGroup }
+func (d *testDatastore) EdgeJob() datastore.EdgeJobService               { return d.edgeJob }
+func (d *testDatastore) EdgeStack() datastore.EdgeStackService           { return d.edgeStack }
+func (d *testDatastore) Endpoint() datastore.EndpointService             { return d.endpoint }
+func (d *testDatastore) EndpointGroup() datastore.EndpointGroupService   { return d.endpointGroup }
+func (d *testDatastore) EndpointRelation() datastore.EndpointRelationService { return d.endpointRelation }
+func (d *testDatastore) HelmUserRepository() datastore.HelmUserRepositoryService {
 	return d.helmUserRepository
 }
-func (d *datastore) Registry() portainer.RegistryService               { return d.registry }
-func (d *datastore) ResourceControl() portainer.ResourceControlService { return d.resourceControl }
-func (d *datastore) Role() portainer.RoleService                       { return d.role }
-func (d *datastore) Settings() portainer.SettingsService               { return d.settings }
-func (d *datastore) SSLSettings() portainer.SSLSettingsService         { return d.sslSettings }
-func (d *datastore) Stack() portainer.StackService                     { return d.stack }
-func (d *datastore) Tag() portainer.TagService                         { return d.tag }
-func (d *datastore) TeamMembership() portainer.TeamMembershipService   { return d.teamMembership }
-func (d *datastore) Team() portainer.TeamService                       { return d.team }
-func (d *datastore) TunnelServer() portainer.TunnelServerService       { return d.tunnelServer }
-func (d *datastore) User() portainer.UserService                       { return d.user }
-func (d *datastore) Version() portainer.VersionService                 { return d.version }
-func (d *datastore) Webhook() portainer.WebhookService                 { return d.webhook }
+func (d *testDatastore) Registry() datastore.RegistryService               { return d.registry }
+func (d *testDatastore) ResourceControl() datastore.ResourceControlService { return d.resourceControl }
+func (d *testDatastore) Role() datastore.RoleService                       { return d.role }
+func (d *testDatastore) Settings() datastore.SettingsService               { return d.settings }
+func (d *testDatastore) SSLSettings() datastore.SSLSettingsService         { return d.sslSettings }
+func (d *testDatastore) Stack() datastore.StackService                     { return d.stack }
+func (d *testDatastore) Tag() datastore.TagService                         { return d.tag }
+func (d *testDatastore) TeamMembership() datastore.TeamMembershipService   { return d.teamMembership }
+func (d *testDatastore) Team() datastore.TeamService                       { return d.team }
+func (d *testDatastore) TunnelServer() datastore.TunnelServerService       { return d.tunnelServer }
+func (d *testDatastore) User() datastore.UserService                       { return d.user }
+func (d *testDatastore) Version() datastore.VersionService                 { return d.version }
+func (d *testDatastore) Webhook() datastore.WebhookService                 { return d.webhook }
 
-type datastoreOption = func(d *datastore)
+func (d *testDatastore) IsErrObjectNotFound(e error) bool {
+	return false
+}
 
-// NewDatastore creates new instance of datastore.
+type datastoreOption = func(d *testDatastore)
+
+// NewDatastore creates new instance of testDatastore.
 // Will apply options before returning, opts will be applied from left to right.
-func NewDatastore(options ...datastoreOption) *datastore {
-	d := datastore{}
+func NewDatastore(options ...datastoreOption) *testDatastore {
+	d := testDatastore{}
 	for _, o := range options {
 		o(&d)
 	}
@@ -87,7 +92,7 @@ func (s *stubSettingsService) UpdateSettings(settings *portainer.Settings) error
 	return nil
 }
 func WithSettingsService(settings *portainer.Settings) datastoreOption {
-	return func(d *datastore) {
+	return func(d *testDatastore) {
 		d.settings = &stubSettingsService{
 			settings: settings,
 		}
@@ -108,9 +113,9 @@ func (s *stubUserService) Create(user *portainer.User) error                    
 func (s *stubUserService) UpdateUser(ID portainer.UserID, user *portainer.User) error { return nil }
 func (s *stubUserService) DeleteUser(ID portainer.UserID) error                       { return nil }
 
-// WithUsers datastore option that will instruct datastore to return provided users
+// WithUsers testDatastore option that will instruct testDatastore to return provided users
 func WithUsers(us []portainer.User) datastoreOption {
-	return func(d *datastore) {
+	return func(d *testDatastore) {
 		d.user = &stubUserService{users: us}
 	}
 }
@@ -130,9 +135,9 @@ func (s *stubEdgeJobService) UpdateEdgeJob(ID portainer.EdgeJobID, edgeJob *port
 func (s *stubEdgeJobService) DeleteEdgeJob(ID portainer.EdgeJobID) error { return nil }
 func (s *stubEdgeJobService) GetNextIdentifier() int                     { return 0 }
 
-// WithEdgeJobs option will instruct datastore to return provided jobs
+// WithEdgeJobs option will instruct testDatastore to return provided jobs
 func WithEdgeJobs(js []portainer.EdgeJob) datastoreOption {
-	return func(d *datastore) {
+	return func(d *testDatastore) {
 		d.edgeJob = &stubEdgeJobService{jobs: js}
 	}
 }
@@ -170,9 +175,9 @@ func (s *stubEndpointRelationService) DeleteEndpointRelation(ID portainer.Endpoi
 }
 func (s *stubEndpointRelationService) GetNextIdentifier() int { return 0 }
 
-// WithEndpointRelations option will instruct datastore to return provided jobs
+// WithEndpointRelations option will instruct testDatastore to return provided jobs
 func WithEndpointRelations(relations []portainer.EndpointRelation) datastoreOption {
-	return func(d *datastore) {
+	return func(d *testDatastore) {
 		d.endpointRelation = &stubEndpointRelationService{relations: relations}
 	}
 }
@@ -229,9 +234,9 @@ func (s *stubEndpointService) GetNextIdentifier() int {
 	return len(s.endpoints)
 }
 
-// WithEndpoints option will instruct datastore to return provided environments(endpoints)
+// WithEndpoints option will instruct testDatastore to return provided environments(endpoints)
 func WithEndpoints(endpoints []portainer.Endpoint) datastoreOption {
-	return func(d *datastore) {
+	return func(d *testDatastore) {
 		d.endpoint = &stubEndpointService{endpoints: endpoints}
 	}
 }
