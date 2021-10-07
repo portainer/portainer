@@ -15,12 +15,14 @@ class porImageRegistryController {
     this.Notifications = Notifications;
 
     this.onRegistryChange = this.onRegistryChange.bind(this);
+    this.onImageChange = this.onImageChange.bind(this);
 
     this.registries = [];
     this.images = [];
     this.defaultRegistry = new DockerHubViewModel();
 
     this.$scope.$watch(() => this.model.Registry, this.onRegistryChange);
+    this.$scope.$watch(() => this.model.Image, this.onImageChange);
   }
 
   isKnownRegistry(registry) {
@@ -62,6 +64,12 @@ class porImageRegistryController {
     }
   }
 
+  async onImageChange() {
+    if (!this.isDockerHubRegistry()) {
+      this.setValidity(true);
+    }
+  }
+
   displayedRegistryURL() {
     return this.getRegistryURL(this.model.Registry) || 'docker.io';
   }
@@ -71,6 +79,13 @@ class porImageRegistryController {
       try {
         const registries = await this.EndpointService.registries(this.endpoint.Id, this.namespace);
         this.registries = _.concat(this.defaultRegistry, registries);
+
+        const id = this.model.Registry.Id;
+        const registry = _.find(this.registries, { Id: id });
+        if (registry) {
+          this.model.Registry = registry;
+          return;
+        }
 
         if (!this.serviceInfo) {
           this.model.Registry = this.defaultRegistry;
