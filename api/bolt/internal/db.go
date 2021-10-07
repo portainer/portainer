@@ -81,6 +81,32 @@ func DeleteObject(connection *DbConnection, bucketName string, key []byte) error
 	})
 }
 
+// DeleteAllObjects delete all objects where matching() returns (id, ok).
+// TODO: think about how to return the error inside (maybe change ok to type err, and use "notfound"?
+func DeleteAllObjects(connection *DbConnection, bucketName string, matching func(o interface{}) (id int, ok bool)) error {
+	return connection.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(bucketName))
+
+		cursor := bucket.Cursor()
+		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
+			var obj interface{}
+			err := UnmarshalObject(v, &obj)
+			if err != nil {
+				return err
+			}
+
+			if id, ok := matching(obj); ok {
+				err := bucket.Delete(Itob(id))
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+		return nil
+	})
+}
+
 // GetNextIdentifier is a generic function that returns the specified bucket identifier incremented by 1.
 func GetNextIdentifier(connection *DbConnection, bucketName string) int {
 	var identifier int
