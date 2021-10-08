@@ -11,7 +11,7 @@ if [ "${PLATFORM}" == 'linux' ]; then
   mv "helm" "dist/helm"
   chmod +x "dist/helm"
 elif [ "${PLATFORM}" == 'mac' ]; then
-  wget -qO- "https://get.helm.sh/helm-canary-darwin-${ARCH}.tar.gz" | tar -x -z --strip-components 1 "darwin-${ARCH}/helm"
+  wget -qO- "https://get.helm.sh/helm-canary-darwin-amd64.tar.gz" | tar -x -z --strip-components 1 "darwin-amd64/helm"
   mv "helm" "dist/helm"
   chmod +x "dist/helm"
 elif [ "${PLATFORM}" == 'windows' ]; then
