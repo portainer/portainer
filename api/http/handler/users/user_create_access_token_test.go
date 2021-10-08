@@ -26,11 +26,11 @@ func Test_userCreateAccessToken(t *testing.T) {
 
 	// create admin and standard user(s)
 	adminUser := &portainer.User{ID: 1, Username: "admin", Role: portainer.AdministratorRole}
-	err := store.User().CreateUser(adminUser)
+	err := store.User().Create(adminUser)
 	is.NoError(err, "error creating admin user")
 
 	user := &portainer.User{ID: 2, Username: "standard", Role: portainer.StandardUserRole}
-	err = store.User().CreateUser(user)
+	err = store.User().Create(user)
 	is.NoError(err, "error creating user")
 
 	// setup services

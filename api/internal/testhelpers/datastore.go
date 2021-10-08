@@ -56,7 +56,7 @@ func (d *testDatastore) HelmUserRepository() datastore.HelmUserRepositoryService
 func (d *testDatastore) Registry() datastore.RegistryService               { return d.registry }
 func (d *testDatastore) ResourceControl() datastore.ResourceControlService { return d.resourceControl }
 func (d *testDatastore) Role() datastore.RoleService                       { return d.role }
-func (d *datastore) APIKeyRepository() datastore.APIKeyRepository {
+func (d *testDatastore) APIKeyRepository() datastore.APIKeyRepository {
 	return d.apiKeyRepositoryService
 }
 func (d *testDatastore) Settings() datastore.SettingsService             { return d.settings }

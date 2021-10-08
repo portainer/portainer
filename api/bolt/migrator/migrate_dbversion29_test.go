@@ -1,6 +1,7 @@
 package migrator
 
 import (
+	"github.com/portainer/portainer/api/datastore/settings"
 	"os"
 	"path"
 	"testing"
@@ -8,7 +9,6 @@ import (
 
 	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer/api/bolt/internal"
-	"github.com/portainer/portainer/api/bolt/settings"
 )
 
 var (
