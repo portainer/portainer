@@ -19,7 +19,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection datastore.Connection) (*Service, error) {
-	err := connection.CreateBucket(BucketName)
+	err := connection.SetServiceName(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func NewService(connection datastore.Connection) (*Service, error) {
 // Role returns a Role by ID
 func (service *Service) Role(ID portainer.RoleID) (*portainer.Role, error) {
 	var set portainer.Role
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 
 	err := service.connection.GetObject(BucketName, identifier, &set)
 	if err != nil {
@@ -75,6 +75,6 @@ func (service *Service) Create(role *portainer.Role) error {
 
 // UpdateRole updates a role.
 func (service *Service) UpdateRole(ID portainer.RoleID, role *portainer.Role) error {
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.UpdateObject(BucketName, identifier, role)
 }

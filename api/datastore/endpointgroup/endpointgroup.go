@@ -19,7 +19,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection datastore.Connection) (*Service, error) {
-	err := connection.CreateBucket(BucketName)
+	err := connection.SetServiceName(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func NewService(connection datastore.Connection) (*Service, error) {
 // EndpointGroup returns an environment(endpoint) group by ID.
 func (service *Service) EndpointGroup(ID portainer.EndpointGroupID) (*portainer.EndpointGroup, error) {
 	var endpointGroup portainer.EndpointGroup
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 
 	err := service.connection.GetObject(BucketName, identifier, &endpointGroup)
 	if err != nil {
@@ -44,13 +44,13 @@ func (service *Service) EndpointGroup(ID portainer.EndpointGroupID) (*portainer.
 
 // UpdateEndpointGroup updates an environment(endpoint) group.
 func (service *Service) UpdateEndpointGroup(ID portainer.EndpointGroupID, endpointGroup *portainer.EndpointGroup) error {
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.UpdateObject(BucketName, identifier, endpointGroup)
 }
 
 // DeleteEndpointGroup deletes an environment(endpoint) group.
 func (service *Service) DeleteEndpointGroup(ID portainer.EndpointGroupID) error {
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.DeleteObject(BucketName, identifier)
 }
 

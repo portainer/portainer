@@ -20,7 +20,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection datastore.Connection) (*Service, error) {
-	err := connection.CreateBucket(BucketName)
+	err := connection.SetServiceName(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func NewService(connection datastore.Connection) (*Service, error) {
 // ResourceControl returns a ResourceControl object by ID
 func (service *Service) ResourceControl(ID portainer.ResourceControlID) (*portainer.ResourceControl, error) {
 	var resourceControl portainer.ResourceControl
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 
 	err := service.connection.GetObject(BucketName, identifier, &resourceControl)
 	if err != nil {
@@ -115,12 +115,12 @@ func (service *Service) Create(resourceControl *portainer.ResourceControl) error
 
 // UpdateResourceControl saves a ResourceControl object.
 func (service *Service) UpdateResourceControl(ID portainer.ResourceControlID, resourceControl *portainer.ResourceControl) error {
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.UpdateObject(BucketName, identifier, resourceControl)
 }
 
 // DeleteResourceControl deletes a ResourceControl object by ID
 func (service *Service) DeleteResourceControl(ID portainer.ResourceControlID) error {
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.DeleteObject(BucketName, identifier)
 }

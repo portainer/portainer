@@ -19,7 +19,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection datastore.Connection) (*Service, error) {
-	err := connection.CreateBucket(BucketName)
+	err := connection.SetServiceName(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (service *Service) Tags() ([]portainer.Tag, error) {
 // Tag returns a tag by ID.
 func (service *Service) Tag(ID portainer.TagID) (*portainer.Tag, error) {
 	var tag portainer.Tag
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 
 	err := service.connection.GetObject(BucketName, identifier, &tag)
 	if err != nil {
@@ -75,12 +75,12 @@ func (service *Service) Create(tag *portainer.Tag) error {
 
 // UpdateTag updates a tag.
 func (service *Service) UpdateTag(ID portainer.TagID, tag *portainer.Tag) error {
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.UpdateObject(BucketName, identifier, tag)
 }
 
 // DeleteTag deletes a tag.
 func (service *Service) DeleteTag(ID portainer.TagID) error {
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.DeleteObject(BucketName, identifier)
 }

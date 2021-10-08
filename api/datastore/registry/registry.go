@@ -19,7 +19,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection datastore.Connection) (*Service, error) {
-	err := connection.CreateBucket(BucketName)
+	err := connection.SetServiceName(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func NewService(connection datastore.Connection) (*Service, error) {
 // Registry returns an registry by ID.
 func (service *Service) Registry(ID portainer.RegistryID) (*portainer.Registry, error) {
 	var registry portainer.Registry
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 
 	err := service.connection.GetObject(BucketName, identifier, &registry)
 	if err != nil {
@@ -75,12 +75,12 @@ func (service *Service) Create(registry *portainer.Registry) error {
 
 // UpdateRegistry updates an registry.
 func (service *Service) UpdateRegistry(ID portainer.RegistryID, registry *portainer.Registry) error {
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.UpdateObject(BucketName, identifier, registry)
 }
 
 // DeleteRegistry deletes an registry.
 func (service *Service) DeleteRegistry(ID portainer.RegistryID) error {
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.DeleteObject(BucketName, identifier)
 }

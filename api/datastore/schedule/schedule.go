@@ -19,7 +19,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection datastore.Connection) (*Service, error) {
-	err := connection.CreateBucket(BucketName)
+	err := connection.SetServiceName(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func NewService(connection datastore.Connection) (*Service, error) {
 // Schedule returns a schedule by ID.
 func (service *Service) Schedule(ID portainer.ScheduleID) (*portainer.Schedule, error) {
 	var schedule portainer.Schedule
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 
 	err := service.connection.GetObject(BucketName, identifier, &schedule)
 	if err != nil {
@@ -44,13 +44,13 @@ func (service *Service) Schedule(ID portainer.ScheduleID) (*portainer.Schedule, 
 
 // UpdateSchedule updates a schedule.
 func (service *Service) UpdateSchedule(ID portainer.ScheduleID, schedule *portainer.Schedule) error {
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.UpdateObject(BucketName, identifier, schedule)
 }
 
 // DeleteSchedule deletes a schedule.
 func (service *Service) DeleteSchedule(ID portainer.ScheduleID) error {
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.DeleteObject(BucketName, identifier)
 }
 
