@@ -3,6 +3,7 @@ package helm
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/portainer/portainer/api/database"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -12,7 +13,6 @@ import (
 	"github.com/portainer/libhelm/options"
 	"github.com/portainer/libhelm/release"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/bolt"
 	"github.com/portainer/portainer/api/exec/exectest"
 	"github.com/portainer/portainer/api/http/security"
 	helper "github.com/portainer/portainer/api/internal/testhelpers"
@@ -23,7 +23,7 @@ import (
 func Test_helmInstall(t *testing.T) {
 	is := assert.New(t)
 
-	store, teardown := bolt.MustNewTestStore(true)
+	store, teardown := database.MustNewTestStore(true)
 	defer teardown()
 
 	err := store.Endpoint().Create(&portainer.Endpoint{ID: 1})

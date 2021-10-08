@@ -3,6 +3,7 @@ package middlewares
 import (
 	"context"
 	"errors"
+	bolterrors "github.com/portainer/portainer/api/dataservices/errors"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -10,15 +11,14 @@ import (
 	requesthelpers "github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
-	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
 const (
 	contextEndpoint = "endpoint"
 )
 
-func WithEndpoint(endpointService datastore.EndpointService, endpointIDParam string) mux.MiddlewareFunc {
+func WithEndpoint(endpointService dataservices.EndpointService, endpointIDParam string) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(rw http.ResponseWriter, request *http.Request) {
 			if endpointIDParam == "" {

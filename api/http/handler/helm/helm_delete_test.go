@@ -2,6 +2,7 @@ package helm
 
 import (
 	"fmt"
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -14,14 +15,13 @@ import (
 	"github.com/portainer/portainer/api/kubernetes"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/portainer/portainer/api/bolt"
 	helper "github.com/portainer/portainer/api/internal/testhelpers"
 )
 
 func Test_helmDelete(t *testing.T) {
 	is := assert.New(t)
 
-	store, teardown := bolt.MustNewTestStore(true)
+	store, teardown := database.MustNewTestStore(true)
 	defer teardown()
 
 	err := store.Endpoint().Create(&portainer.Endpoint{ID: 1})

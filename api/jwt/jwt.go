@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/dataservices"
 
 	"fmt"
 	"time"
@@ -17,7 +17,7 @@ import (
 type Service struct {
 	secret             []byte
 	userSessionTimeout time.Duration
-	dataStore          datastore.DataStore
+	dataStore          dataservices.DataStore
 }
 
 type claims struct {
@@ -33,7 +33,7 @@ var (
 )
 
 // NewService initializes a new service. It will generate a random key that will be used to sign JWT tokens.
-func NewService(userSessionDuration string, dataStore datastore.DataStore) (*Service, error) {
+func NewService(userSessionDuration string, dataStore dataservices.DataStore) (*Service, error) {
 	userSessionTimeout, err := time.ParseDuration(userSessionDuration)
 	if err != nil {
 		return nil, err

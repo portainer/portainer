@@ -7,14 +7,14 @@ import (
 
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/dataservices"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 )
 
 type (
 	// RequestBouncer represents an entity that manages API request accesses
 	RequestBouncer struct {
-		dataStore  datastore.DataStore
+		dataStore  dataservices.DataStore
 		jwtService portainer.JWTService
 	}
 
@@ -29,7 +29,7 @@ type (
 )
 
 // NewRequestBouncer initializes a new RequestBouncer
-func NewRequestBouncer(dataStore datastore.DataStore, jwtService portainer.JWTService) *RequestBouncer {
+func NewRequestBouncer(dataStore dataservices.DataStore, jwtService portainer.JWTService) *RequestBouncer {
 	return &RequestBouncer{
 		dataStore:  dataStore,
 		jwtService: jwtService,

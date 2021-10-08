@@ -13,7 +13,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/adminmonitor"
 	"github.com/portainer/portainer/api/crypto"
-	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/handler"
 	"github.com/portainer/portainer/api/http/handler/auth"
@@ -73,9 +73,9 @@ type Server struct {
 	CryptoService               portainer.CryptoService
 	SignatureService            portainer.DigitalSignatureService
 	SnapshotService             portainer.SnapshotService
-	FileService                 portainer.FileService
-	DataStore                   datastore.DataStore
-	GitService                  portainer.GitService
+	FileService portainer.FileService
+	DataStore   dataservices.DataStore
+	GitService  portainer.GitService
 	JWTService                  portainer.JWTService
 	LDAPService                 portainer.LDAPService
 	OAuthService                portainer.OAuthService

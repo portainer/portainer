@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/middlewares"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
@@ -18,14 +18,14 @@ import (
 // Handler is the HTTP handler which will natively deal with to external environments(endpoints).
 type Handler struct {
 	*mux.Router
-	dataStore               datastore.DataStore
+	dataStore               dataservices.DataStore
 	kubernetesClientFactory *cli.ClientFactory
 	authorizationService    *authorization.Service
 	JwtService              portainer.JWTService
 }
 
 // NewHandler creates a handler to process pre-proxied requests to external APIs.
-func NewHandler(bouncer *security.RequestBouncer, authorizationService *authorization.Service, dataStore datastore.DataStore, kubernetesClientFactory *cli.ClientFactory) *Handler {
+func NewHandler(bouncer *security.RequestBouncer, authorizationService *authorization.Service, dataStore dataservices.DataStore, kubernetesClientFactory *cli.ClientFactory) *Handler {
 	h := &Handler{
 		Router:                  mux.NewRouter(),
 		dataStore:               dataStore,

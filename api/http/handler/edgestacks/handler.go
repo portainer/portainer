@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -16,9 +16,9 @@ import (
 // Handler is the HTTP handler used to handle environment(endpoint) group operations.
 type Handler struct {
 	*mux.Router
-	requestBouncer     *security.RequestBouncer
-	DataStore          datastore.DataStore
-	FileService        portainer.FileService
+	requestBouncer *security.RequestBouncer
+	DataStore      dataservices.DataStore
+	FileService    portainer.FileService
 	GitService         portainer.GitService
 	KubernetesDeployer portainer.KubernetesDeployer
 }

@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 
@@ -25,10 +25,10 @@ type baseTransport struct {
 	tokenManager     *tokenManager
 	endpoint         *portainer.Endpoint
 	k8sClientFactory *cli.ClientFactory
-	dataStore        datastore.DataStore
+	dataStore        dataservices.DataStore
 }
 
-func newBaseTransport(httpTransport *http.Transport, tokenManager *tokenManager, endpoint *portainer.Endpoint, k8sClientFactory *cli.ClientFactory, dataStore datastore.DataStore) *baseTransport {
+func newBaseTransport(httpTransport *http.Transport, tokenManager *tokenManager, endpoint *portainer.Endpoint, k8sClientFactory *cli.ClientFactory, dataStore dataservices.DataStore) *baseTransport {
 	return &baseTransport{
 		httpTransport:    httpTransport,
 		tokenManager:     tokenManager,
@@ -137,7 +137,7 @@ func (transport *baseTransport) getRoundTripToken(request *http.Request, tokenMa
 
 // #region DECORATE FUNCTIONS
 
-func decorateAgentRequest(r *http.Request, dataStore datastore.DataStore) error {
+func decorateAgentRequest(r *http.Request, dataStore dataservices.DataStore) error {
 	requestPath := strings.TrimPrefix(r.URL.Path, "/v2")
 
 	switch {
@@ -148,7 +148,7 @@ func decorateAgentRequest(r *http.Request, dataStore datastore.DataStore) error 
 	return nil
 }
 
-func decorateAgentDockerHubRequest(r *http.Request, dataStore datastore.DataStore) error {
+func decorateAgentDockerHubRequest(r *http.Request, dataStore dataservices.DataStore) error {
 	requestPath, registryIdString := path.Split(r.URL.Path)
 
 	registryID, err := strconv.Atoi(registryIdString)

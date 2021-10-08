@@ -2,6 +2,7 @@ package helm
 
 import (
 	"encoding/json"
+	"github.com/portainer/portainer/api/database"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -15,12 +16,11 @@ import (
 	"github.com/portainer/portainer/api/kubernetes"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/portainer/portainer/api/bolt"
 	helper "github.com/portainer/portainer/api/internal/testhelpers"
 )
 
 func Test_helmList(t *testing.T) {
-	store, teardown := bolt.MustNewTestStore(true)
+	store, teardown := database.MustNewTestStore(true)
 	defer teardown()
 
 	err := store.Endpoint().Create(&portainer.Endpoint{ID: 1})

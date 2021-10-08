@@ -6,20 +6,20 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
 var logFatalf = log.Fatalf
 
 type Monitor struct {
-	timeout          time.Duration
-	datastore        datastore.DataStore
-	shutdownCtx      context.Context
+	timeout     time.Duration
+	datastore   dataservices.DataStore
+	shutdownCtx context.Context
 	cancellationFunc context.CancelFunc
 }
 
 // New creates a monitor that when started will wait for the timeout duration and then shutdown the application unless it has been initialized.
-func New(timeout time.Duration, datastore datastore.DataStore, shutdownCtx context.Context) *Monitor {
+func New(timeout time.Duration, datastore dataservices.DataStore, shutdownCtx context.Context) *Monitor {
 	return &Monitor{
 		timeout:     timeout,
 		datastore:   datastore,
@@ -33,7 +33,7 @@ func (m *Monitor) Start() {
 	m.cancellationFunc = cancellationFunc
 
 	go func() {
-		log.Println("[DEBUG] [internal,init] [message: start initialization monitor ]")
+		log.Println("[DEBUG] [boltdb,init] [message: start initialization monitor ]")
 		select {
 		case <-time.After(m.timeout):
 			initialized, err := m.WasInitialized()
@@ -41,12 +41,12 @@ func (m *Monitor) Start() {
 				logFatalf("%s", err)
 			}
 			if !initialized {
-				logFatalf("[FATAL] [internal,init] No administrator account was created in %f mins. Shutting down the Portainer instance for security reasons", m.timeout.Minutes())
+				logFatalf("[FATAL] [boltdb,init] No administrator account was created in %f mins. Shutting down the Portainer instance for security reasons", m.timeout.Minutes())
 			}
 		case <-cancellationCtx.Done():
-			log.Println("[DEBUG] [internal,init] [message: canceling initialization monitor]")
+			log.Println("[DEBUG] [boltdb,init] [message: canceling initialization monitor]")
 		case <-m.shutdownCtx.Done():
-			log.Println("[DEBUG] [internal,init] [message: shutting down initialization monitor]")
+			log.Println("[DEBUG] [boltdb,init] [message: shutting down initialization monitor]")
 		}
 	}()
 }
