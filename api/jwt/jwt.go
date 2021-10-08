@@ -8,7 +8,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/securecookie"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
 // scope represents JWT scopes that are supported in JWT claims.
@@ -18,7 +18,7 @@ type scope string
 type Service struct {
 	secrets            map[scope][]byte
 	userSessionTimeout time.Duration
-	dataStore          datastore.DataStore
+	dataStore          dataservices.DataStore
 }
 
 type claims struct {
@@ -40,7 +40,7 @@ const (
 )
 
 // NewService initializes a new service. It will generate a random key that will be used to sign JWT tokens.
-func NewService(userSessionDuration string, dataStore datastore.DataStore) (*Service, error) {
+func NewService(userSessionDuration string, dataStore dataservices.DataStore) (*Service, error) {
 	userSessionTimeout, err := time.ParseDuration(userSessionDuration)
 	if err != nil {
 		return nil, err
@@ -67,7 +67,7 @@ func NewService(userSessionDuration string, dataStore datastore.DataStore) (*Ser
 	return service, nil
 }
 
-func getOrCreateKubeSecret(dataStore datastore.DataStore) ([]byte, error) {
+func getOrCreateKubeSecret(dataStore dataservices.DataStore) ([]byte, error) {
 	settings, err := dataStore.Settings().Settings()
 	if err != nil {
 		return nil, err

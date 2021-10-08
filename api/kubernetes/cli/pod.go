@@ -93,7 +93,7 @@ func (kcl *KubeClient) CreateUserShellPod(ctx context.Context, serviceAccountNam
 // waitForPodStatus will wait until duration d (from now) for a pod to reach defined phase/status.
 // The pod status will be polled at specified delay until the pod reaches ready state.
 func (kcl *KubeClient) waitForPodStatus(ctx context.Context, phase v1.PodPhase, pod *v1.Pod) error {
-	log.Printf("[DEBUG] [internal,kubernetes/pod] [message: waiting for pod ready: pod=%s... ]\n", pod.Name)
+	log.Printf("[DEBUG] [boltdb,kubernetes/pod] [message: waiting for pod ready: pod=%s... ]\n", pod.Name)
 
 	pollDelay := 500 * time.Millisecond
 	for {

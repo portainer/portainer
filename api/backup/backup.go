@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/portainer/portainer/api/archive"
 	"github.com/portainer/portainer/api/crypto"
-	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/offlinegate"
 )
@@ -30,7 +30,7 @@ var filesToBackup = []string{
 }
 
 // Creates a tar.gz system archive and encrypts it if password is not empty. Returns a path to the archive file.
-func CreateBackupArchive(password string, gate *offlinegate.OfflineGate, datastore datastore.DataStore, filestorePath string) (string, error) {
+func CreateBackupArchive(password string, gate *offlinegate.OfflineGate, datastore dataservices.DataStore, filestorePath string) (string, error) {
 	unlock := gate.Lock()
 	defer unlock()
 
@@ -65,7 +65,7 @@ func CreateBackupArchive(password string, gate *offlinegate.OfflineGate, datasto
 	return archivePath, nil
 }
 
-func backupDb(backupDirPath string, datastore datastore.DataStore) error {
+func backupDb(backupDirPath string, datastore dataservices.DataStore) error {
 	backupWriter, err := os.Create(filepath.Join(backupDirPath, "portainer.db"))
 	if err != nil {
 		return err

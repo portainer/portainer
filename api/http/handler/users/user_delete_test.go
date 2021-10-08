@@ -8,7 +8,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/apikey"
-	"github.com/portainer/portainer/api/bolt"
+	"github.com/portainer/portainer/api/database"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/jwt"
 	"github.com/stretchr/testify/assert"
@@ -17,7 +17,7 @@ import (
 func Test_deleteUserRemovesAccessTokens(t *testing.T) {
 	is := assert.New(t)
 
-	store, teardown := bolt.MustNewTestStore(true)
+	store, teardown := database.MustNewTestStore(true)
 	defer teardown()
 
 	// create standard user

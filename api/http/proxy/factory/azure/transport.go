@@ -8,7 +8,7 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/client"
 )
 
@@ -22,9 +22,9 @@ type (
 		credentials *portainer.AzureCredentials
 		client      *client.HTTPClient
 		token       *azureAPIToken
-		mutex       sync.Mutex
-		dataStore   datastore.DataStore
-		endpoint    *portainer.Endpoint
+		mutex     sync.Mutex
+		dataStore dataservices.DataStore
+		endpoint  *portainer.Endpoint
 	}
 
 	azureRequestContext struct {
@@ -37,7 +37,7 @@ type (
 
 // NewTransport returns a pointer to a new instance of Transport that implements the HTTP Transport
 // interface for proxying requests to the Azure API.
-func NewTransport(credentials *portainer.AzureCredentials, dataStore datastore.DataStore, endpoint *portainer.Endpoint) *Transport {
+func NewTransport(credentials *portainer.AzureCredentials, dataStore dataservices.DataStore, endpoint *portainer.Endpoint) *Transport {
 	return &Transport{
 		credentials: credentials,
 		client:      client.NewHTTPClient(),

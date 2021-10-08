@@ -6,7 +6,7 @@ import (
 	"net/url"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 
 	"github.com/portainer/portainer/api/kubernetes/cli"
@@ -19,8 +19,8 @@ const azureAPIBaseURL = "https://management.azure.com"
 type (
 	// ProxyFactory is a factory to create reverse proxies
 	ProxyFactory struct {
-		dataStore                   datastore.DataStore
-		signatureService            portainer.DigitalSignatureService
+		dataStore        dataservices.DataStore
+		signatureService portainer.DigitalSignatureService
 		reverseTunnelService        portainer.ReverseTunnelService
 		dockerClientFactory         *docker.ClientFactory
 		kubernetesClientFactory     *cli.ClientFactory
@@ -29,7 +29,7 @@ type (
 )
 
 // NewProxyFactory returns a pointer to a new instance of a ProxyFactory
-func NewProxyFactory(dataStore datastore.DataStore, signatureService portainer.DigitalSignatureService, tunnelService portainer.ReverseTunnelService, clientFactory *docker.ClientFactory, kubernetesClientFactory *cli.ClientFactory, kubernetesTokenCacheManager *kubernetes.TokenCacheManager) *ProxyFactory {
+func NewProxyFactory(dataStore dataservices.DataStore, signatureService portainer.DigitalSignatureService, tunnelService portainer.ReverseTunnelService, clientFactory *docker.ClientFactory, kubernetesClientFactory *cli.ClientFactory, kubernetesTokenCacheManager *kubernetes.TokenCacheManager) *ProxyFactory {
 	return &ProxyFactory{
 		dataStore:                   dataStore,
 		signatureService:            signatureService,

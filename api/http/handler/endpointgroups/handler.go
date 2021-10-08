@@ -3,7 +3,7 @@ package endpointgroups
 import (
 	"net/http"
 
-	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/internal/authorization"
 
 	"github.com/gorilla/mux"
@@ -15,7 +15,7 @@ import (
 type Handler struct {
 	*mux.Router
 	AuthorizationService *authorization.Service
-	DataStore            datastore.DataStore
+	DataStore            dataservices.DataStore
 }
 
 // NewHandler creates a handler to manage environment(endpoint) group operations.
