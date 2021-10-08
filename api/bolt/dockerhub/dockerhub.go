@@ -18,7 +18,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection *internal.DbConnection) (*Service, error) {
-	err := internal.CreateBucket(connection, BucketName)
+	err := connection.CreateBucket(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func NewService(connection *internal.DbConnection) (*Service, error) {
 func (service *Service) DockerHub() (*portainer.DockerHub, error) {
 	var dockerhub portainer.DockerHub
 
-	err := internal.GetObject(service.connection, BucketName, []byte(dockerHubKey), &dockerhub)
+	err := service.connection.GetObject(BucketName, []byte(dockerHubKey), &dockerhub)
 	if err != nil {
 		return nil, err
 	}
@@ -42,5 +42,5 @@ func (service *Service) DockerHub() (*portainer.DockerHub, error) {
 
 // UpdateDockerHub updates a DockerHub object.
 func (service *Service) UpdateDockerHub(dockerhub *portainer.DockerHub) error {
-	return internal.UpdateObject(service.connection, BucketName, []byte(dockerHubKey), dockerhub)
+	return service.connection.UpdateObject(BucketName, []byte(dockerHubKey), dockerhub)
 }

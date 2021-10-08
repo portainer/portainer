@@ -19,7 +19,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection *internal.DbConnection) (*Service, error) {
-	err := internal.CreateBucket(connection, BucketName)
+	err := connection.CreateBucket(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -33,8 +33,7 @@ func NewService(connection *internal.DbConnection) (*Service, error) {
 func (service *Service) Tags() ([]portainer.Tag, error) {
 	var tags = make([]portainer.Tag, 0)
 
-	err := internal.GetAll(
-		service.connection,
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.Tag{},
 		func(obj interface{}) (interface{}, error) {
@@ -55,7 +54,7 @@ func (service *Service) Tag(ID portainer.TagID) (*portainer.Tag, error) {
 	var tag portainer.Tag
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.connection, BucketName, identifier, &tag)
+	err := service.connection.GetObject(BucketName, identifier, &tag)
 	if err != nil {
 		return nil, err
 	}
@@ -65,8 +64,7 @@ func (service *Service) Tag(ID portainer.TagID) (*portainer.Tag, error) {
 
 // CreateTag creates a new tag.
 func (service *Service) Create(tag *portainer.Tag) error {
-	return internal.CreateObject(
-		service.connection,
+	return service.connection.CreateObject(
 		BucketName,
 		func(id uint64) (int, interface{}) {
 			tag.ID = portainer.TagID(id)
@@ -78,11 +76,11 @@ func (service *Service) Create(tag *portainer.Tag) error {
 // UpdateTag updates a tag.
 func (service *Service) UpdateTag(ID portainer.TagID, tag *portainer.Tag) error {
 	identifier := internal.Itob(int(ID))
-	return internal.UpdateObject(service.connection, BucketName, identifier, tag)
+	return service.connection.UpdateObject(BucketName, identifier, tag)
 }
 
 // DeleteTag deletes a tag.
 func (service *Service) DeleteTag(ID portainer.TagID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.connection, BucketName, identifier)
+	return service.connection.DeleteObject(BucketName, identifier)
 }

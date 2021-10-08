@@ -19,7 +19,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection *internal.DbConnection) (*Service, error) {
-	err := internal.CreateBucket(connection, BucketName)
+	err := connection.CreateBucket(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (service *Service) TeamMembership(ID portainer.TeamMembershipID) (*portaine
 	var membership portainer.TeamMembership
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.connection, BucketName, identifier, &membership)
+	err := service.connection.GetObject(BucketName, identifier, &membership)
 	if err != nil {
 		return nil, err
 	}
@@ -46,8 +46,7 @@ func (service *Service) TeamMembership(ID portainer.TeamMembershipID) (*portaine
 func (service *Service) TeamMemberships() ([]portainer.TeamMembership, error) {
 	var memberships = make([]portainer.TeamMembership, 0)
 
-	err := internal.GetAll(
-		service.connection,
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.TeamMembership{},
 		func(obj interface{}) (interface{}, error) {
@@ -67,8 +66,7 @@ func (service *Service) TeamMemberships() ([]portainer.TeamMembership, error) {
 func (service *Service) TeamMembershipsByUserID(userID portainer.UserID) ([]portainer.TeamMembership, error) {
 	var memberships = make([]portainer.TeamMembership, 0)
 
-	err := internal.GetAll(
-		service.connection,
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.TeamMembership{},
 		func(obj interface{}) (interface{}, error) {
@@ -90,8 +88,7 @@ func (service *Service) TeamMembershipsByUserID(userID portainer.UserID) ([]port
 func (service *Service) TeamMembershipsByTeamID(teamID portainer.TeamID) ([]portainer.TeamMembership, error) {
 	var memberships = make([]portainer.TeamMembership, 0)
 
-	err := internal.GetAll(
-		service.connection,
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.TeamMembership{},
 		func(obj interface{}) (interface{}, error) {
@@ -112,13 +109,12 @@ func (service *Service) TeamMembershipsByTeamID(teamID portainer.TeamID) ([]port
 // UpdateTeamMembership saves a TeamMembership object.
 func (service *Service) UpdateTeamMembership(ID portainer.TeamMembershipID, membership *portainer.TeamMembership) error {
 	identifier := internal.Itob(int(ID))
-	return internal.UpdateObject(service.connection, BucketName, identifier, membership)
+	return service.connection.UpdateObject(BucketName, identifier, membership)
 }
 
 // CreateTeamMembership creates a new TeamMembership object.
 func (service *Service) Create(membership *portainer.TeamMembership) error {
-	return internal.CreateObject(
-		service.connection,
+	return service.connection.CreateObject(
 		BucketName,
 		func(id uint64) (int, interface{}) {
 			membership.ID = portainer.TeamMembershipID(id)
@@ -130,13 +126,12 @@ func (service *Service) Create(membership *portainer.TeamMembership) error {
 // DeleteTeamMembership deletes a TeamMembership object.
 func (service *Service) DeleteTeamMembership(ID portainer.TeamMembershipID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.connection, BucketName, identifier)
+	return service.connection.DeleteObject(BucketName, identifier)
 }
 
 // DeleteTeamMembershipByUserID deletes all the TeamMembership object associated to a UserID.
 func (service *Service) DeleteTeamMembershipByUserID(userID portainer.UserID) error {
-	return internal.DeleteAllObjects(
-		service.connection,
+	return service.connection.DeleteAllObjects(
 		BucketName,
 		func(obj interface{}) (id int, ok bool) {
 			membership, ok := obj.(portainer.TeamMembership)
@@ -154,8 +149,7 @@ func (service *Service) DeleteTeamMembershipByUserID(userID portainer.UserID) er
 
 // DeleteTeamMembershipByTeamID deletes all the TeamMembership object associated to a TeamID.
 func (service *Service) DeleteTeamMembershipByTeamID(teamID portainer.TeamID) error {
-	return internal.DeleteAllObjects(
-		service.connection,
+	return service.connection.DeleteAllObjects(
 		BucketName,
 		func(obj interface{}) (id int, ok bool) {
 			membership, ok := obj.(portainer.TeamMembership)

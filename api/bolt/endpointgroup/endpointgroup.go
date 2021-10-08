@@ -19,7 +19,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection *internal.DbConnection) (*Service, error) {
-	err := internal.CreateBucket(connection, BucketName)
+	err := connection.CreateBucket(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (service *Service) EndpointGroup(ID portainer.EndpointGroupID) (*portainer.
 	var endpointGroup portainer.EndpointGroup
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.connection, BucketName, identifier, &endpointGroup)
+	err := service.connection.GetObject(BucketName, identifier, &endpointGroup)
 	if err != nil {
 		return nil, err
 	}
@@ -45,21 +45,20 @@ func (service *Service) EndpointGroup(ID portainer.EndpointGroupID) (*portainer.
 // UpdateEndpointGroup updates an environment(endpoint) group.
 func (service *Service) UpdateEndpointGroup(ID portainer.EndpointGroupID, endpointGroup *portainer.EndpointGroup) error {
 	identifier := internal.Itob(int(ID))
-	return internal.UpdateObject(service.connection, BucketName, identifier, endpointGroup)
+	return service.connection.UpdateObject(BucketName, identifier, endpointGroup)
 }
 
 // DeleteEndpointGroup deletes an environment(endpoint) group.
 func (service *Service) DeleteEndpointGroup(ID portainer.EndpointGroupID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.connection, BucketName, identifier)
+	return service.connection.DeleteObject(BucketName, identifier)
 }
 
 // EndpointGroups return an array containing all the environment(endpoint) groups.
 func (service *Service) EndpointGroups() ([]portainer.EndpointGroup, error) {
 	var endpointGroups = make([]portainer.EndpointGroup, 0)
 
-	err := internal.GetAll(
-		service.connection,
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.EndpointGroup{},
 		func(obj interface{}) (interface{}, error) {
@@ -78,8 +77,7 @@ func (service *Service) EndpointGroups() ([]portainer.EndpointGroup, error) {
 
 // CreateEndpointGroup assign an ID to a new environment(endpoint) group and saves it.
 func (service *Service) Create(endpointGroup *portainer.EndpointGroup) error {
-	return internal.CreateObject(
-		service.connection,
+	return service.connection.CreateObject(
 		BucketName,
 		func(id uint64) (int, interface{}) {
 			endpointGroup.ID = portainer.EndpointGroupID(id)

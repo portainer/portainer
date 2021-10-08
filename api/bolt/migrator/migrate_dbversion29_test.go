@@ -41,7 +41,7 @@ func initTestingSettingsService(dbConn *bolt.DB, preSetObj map[string]interface{
 		return nil, err
 	}
 	//insert a obj
-	if err := internal.UpdateObject(internalDBConn, "settings", []byte("SETTINGS"), preSetObj); err != nil {
+	if err := internalDBConn.UpdateObject("settings", []byte("SETTINGS"), preSetObj); err != nil {
 		return nil, err
 	}
 	return settingsService, nil

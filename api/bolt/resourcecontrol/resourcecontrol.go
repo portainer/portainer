@@ -20,7 +20,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection *internal.DbConnection) (*Service, error) {
-	err := internal.CreateBucket(connection, BucketName)
+	err := connection.CreateBucket(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +35,7 @@ func (service *Service) ResourceControl(ID portainer.ResourceControlID) (*portai
 	var resourceControl portainer.ResourceControl
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.connection, BucketName, identifier, &resourceControl)
+	err := service.connection.GetObject(BucketName, identifier, &resourceControl)
 	if err != nil {
 		return nil, err
 	}
@@ -49,8 +49,7 @@ func (service *Service) ResourceControl(ID portainer.ResourceControlID) (*portai
 func (service *Service) ResourceControlByResourceIDAndType(resourceID string, resourceType portainer.ResourceControlType) (*portainer.ResourceControl, error) {
 	var resourceControl *portainer.ResourceControl
 	stop := fmt.Errorf("ok")
-	err := internal.GetAll(
-		service.connection,
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.ResourceControl{},
 		func(obj interface{}) (interface{}, error) {
@@ -87,8 +86,7 @@ func (service *Service) ResourceControlByResourceIDAndType(resourceID string, re
 func (service *Service) ResourceControls() ([]portainer.ResourceControl, error) {
 	var rcs = make([]portainer.ResourceControl, 0)
 
-	err := internal.GetAll(
-		service.connection,
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.ResourceControl{},
 		func(obj interface{}) (interface{}, error) {
@@ -106,8 +104,7 @@ func (service *Service) ResourceControls() ([]portainer.ResourceControl, error) 
 
 // CreateResourceControl creates a new ResourceControl object
 func (service *Service) Create(resourceControl *portainer.ResourceControl) error {
-	return internal.CreateObject(
-		service.connection,
+	return service.connection.CreateObject(
 		BucketName,
 		func(id uint64) (int, interface{}) {
 			resourceControl.ID = portainer.ResourceControlID(id)
@@ -119,11 +116,11 @@ func (service *Service) Create(resourceControl *portainer.ResourceControl) error
 // UpdateResourceControl saves a ResourceControl object.
 func (service *Service) UpdateResourceControl(ID portainer.ResourceControlID, resourceControl *portainer.ResourceControl) error {
 	identifier := internal.Itob(int(ID))
-	return internal.UpdateObject(service.connection, BucketName, identifier, resourceControl)
+	return service.connection.UpdateObject(BucketName, identifier, resourceControl)
 }
 
 // DeleteResourceControl deletes a ResourceControl object by ID
 func (service *Service) DeleteResourceControl(ID portainer.ResourceControlID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.connection, BucketName, identifier)
+	return service.connection.DeleteObject(BucketName, identifier)
 }

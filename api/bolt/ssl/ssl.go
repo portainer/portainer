@@ -18,7 +18,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection *internal.DbConnection) (*Service, error) {
-	err := internal.CreateBucket(connection, BucketName)
+	err := connection.CreateBucket(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func NewService(connection *internal.DbConnection) (*Service, error) {
 func (service *Service) Settings() (*portainer.SSLSettings, error) {
 	var settings portainer.SSLSettings
 
-	err := internal.GetObject(service.connection, BucketName, []byte(key), &settings)
+	err := service.connection.GetObject(BucketName, []byte(key), &settings)
 	if err != nil {
 		return nil, err
 	}
@@ -42,5 +42,5 @@ func (service *Service) Settings() (*portainer.SSLSettings, error) {
 
 // UpdateSettings persists a SSLSettings object.
 func (service *Service) UpdateSettings(settings *portainer.SSLSettings) error {
-	return internal.UpdateObject(service.connection, BucketName, []byte(key), settings)
+	return service.connection.UpdateObject(BucketName, []byte(key), settings)
 }

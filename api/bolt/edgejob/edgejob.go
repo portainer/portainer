@@ -19,7 +19,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection *internal.DbConnection) (*Service, error) {
-	err := internal.CreateBucket(connection, BucketName)
+	err := connection.CreateBucket(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -33,8 +33,7 @@ func NewService(connection *internal.DbConnection) (*Service, error) {
 func (service *Service) EdgeJobs() ([]portainer.EdgeJob, error) {
 	var edgeJobs = make([]portainer.EdgeJob, 0)
 
-	err := internal.GetAll(
-		service.connection,
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.EdgeJob{},
 		func(obj interface{}) (interface{}, error) {
@@ -56,7 +55,7 @@ func (service *Service) EdgeJob(ID portainer.EdgeJobID) (*portainer.EdgeJob, err
 	var edgeJob portainer.EdgeJob
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.connection, BucketName, identifier, &edgeJob)
+	err := service.connection.GetObject(BucketName, identifier, &edgeJob)
 	if err != nil {
 		return nil, err
 	}
@@ -66,8 +65,7 @@ func (service *Service) EdgeJob(ID portainer.EdgeJobID) (*portainer.EdgeJob, err
 
 // CreateEdgeJob creates a new Edge job
 func (service *Service) Create(edgeJob *portainer.EdgeJob) error {
-	return internal.CreateObject(
-		service.connection,
+	return service.connection.CreateObject(
 		BucketName,
 		func(id uint64) (int, interface{}) {
 			edgeJob.ID = portainer.EdgeJobID(id)
@@ -79,16 +77,16 @@ func (service *Service) Create(edgeJob *portainer.EdgeJob) error {
 // UpdateEdgeJob updates an Edge job by ID
 func (service *Service) UpdateEdgeJob(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error {
 	identifier := internal.Itob(int(ID))
-	return internal.UpdateObject(service.connection, BucketName, identifier, edgeJob)
+	return service.connection.UpdateObject(BucketName, identifier, edgeJob)
 }
 
 // DeleteEdgeJob deletes an Edge job
 func (service *Service) DeleteEdgeJob(ID portainer.EdgeJobID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.connection, BucketName, identifier)
+	return service.connection.DeleteObject(BucketName, identifier)
 }
 
 // GetNextIdentifier returns the next identifier for an environment(endpoint).
 func (service *Service) GetNextIdentifier() int {
-	return internal.GetNextIdentifier(service.connection, BucketName)
+	return service.connection.GetNextIdentifier(BucketName)
 }

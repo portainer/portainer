@@ -17,7 +17,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection *internal.DbConnection) (*Service, error) {
-	err := internal.CreateBucket(connection, BucketName)
+	err := connection.CreateBucket(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func (service *Service) EndpointRelation(endpointID portainer.EndpointID) (*port
 	var endpointRelation portainer.EndpointRelation
 	identifier := internal.Itob(int(endpointID))
 
-	err := internal.GetObject(service.connection, BucketName, identifier, &endpointRelation)
+	err := service.connection.GetObject(BucketName, identifier, &endpointRelation)
 	if err != nil {
 		return nil, err
 	}
@@ -42,17 +42,17 @@ func (service *Service) EndpointRelation(endpointID portainer.EndpointID) (*port
 
 // CreateEndpointRelation saves endpointRelation
 func (service *Service) Create(endpointRelation *portainer.EndpointRelation) error {
-	return internal.CreateObjectWithId(service.connection, BucketName, int(endpointRelation.EndpointID), endpointRelation)
+	return service.connection.CreateObjectWithId(BucketName, int(endpointRelation.EndpointID), endpointRelation)
 }
 
 // UpdateEndpointRelation updates an Environment(Endpoint) relation object
 func (service *Service) UpdateEndpointRelation(EndpointID portainer.EndpointID, endpointRelation *portainer.EndpointRelation) error {
 	identifier := internal.Itob(int(EndpointID))
-	return internal.UpdateObject(service.connection, BucketName, identifier, endpointRelation)
+	return service.connection.UpdateObject(BucketName, identifier, endpointRelation)
 }
 
 // DeleteEndpointRelation deletes an Environment(Endpoint) relation object
 func (service *Service) DeleteEndpointRelation(EndpointID portainer.EndpointID) error {
 	identifier := internal.Itob(int(EndpointID))
-	return internal.DeleteObject(service.connection, BucketName, identifier)
+	return service.connection.DeleteObject(BucketName, identifier)
 }
