@@ -82,25 +82,8 @@ class porImageRegistryController {
 
         const id = this.model.Registry.Id;
         const registry = _.find(this.registries, { Id: id });
-        if (registry) {
-          this.model.Registry = registry;
-          return;
-        }
-
-        if (!this.serviceInfo) {
+        if (!registry) {
           this.model.Registry = this.defaultRegistry;
-          return;
-        }
-
-        const image = this.serviceInfo.Model.Spec.TaskTemplate.ContainerSpec.Image;
-        const serviceRegistry = await this.RegistryService.retrievePorRegistryModelFromRepository(image, this.endpoint.Id);
-        if (serviceRegistry) {
-          this.model.Registry = serviceRegistry.Registry;
-
-          const showImage = !(serviceRegistry.Registry.Type === RegistryTypes.ANONYMOUS && serviceRegistry.Image.indexOf('/') > -1);
-          if (showImage) {
-            this.model.Image = serviceRegistry.Image;
-          }
         }
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to retrieve registries');
@@ -124,8 +107,8 @@ class porImageRegistryController {
     });
   }
 
-  $onChanges({ namespace, endpoint, serviceInfo }) {
-    if ((namespace || endpoint || serviceInfo) && this.endpoint.Id) {
+  $onChanges({ namespace, endpoint }) {
+    if ((namespace || endpoint) && this.endpoint.Id) {
       this.reloadRegistries();
     }
   }

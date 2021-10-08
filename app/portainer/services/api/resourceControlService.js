@@ -103,7 +103,7 @@ angular.module('portainer.app').factory('ResourceControlService', [
     }
 
     /**
-     * Retrive users and team details for ResourceControlViewModel
+     * Retrieve users and team details for ResourceControlViewModel
      * @param {ResourceControlViewModel} resourceControl ResourceControl view model
      */
     function retrieveOwnershipDetails(resourceControl) {
