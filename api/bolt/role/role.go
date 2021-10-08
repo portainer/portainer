@@ -19,7 +19,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection *internal.DbConnection) (*Service, error) {
-	err := internal.CreateBucket(connection, BucketName)
+	err := connection.CreateBucket(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (service *Service) Role(ID portainer.RoleID) (*portainer.Role, error) {
 	var set portainer.Role
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.connection, BucketName, identifier, &set)
+	err := service.connection.GetObject(BucketName, identifier, &set)
 	if err != nil {
 		return nil, err
 	}
@@ -46,8 +46,7 @@ func (service *Service) Role(ID portainer.RoleID) (*portainer.Role, error) {
 func (service *Service) Roles() ([]portainer.Role, error) {
 	var sets = make([]portainer.Role, 0)
 
-	err := internal.GetAll(
-		service.connection,
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.Role{},
 		func(obj interface{}) (interface{}, error) {
@@ -65,8 +64,7 @@ func (service *Service) Roles() ([]portainer.Role, error) {
 
 // CreateRole creates a new Role.
 func (service *Service) Create(role *portainer.Role) error {
-	return internal.CreateObject(
-		service.connection,
+	return service.connection.CreateObject(
 		BucketName,
 		func(id uint64) (int, interface{}) {
 			role.ID = portainer.RoleID(id)
@@ -78,5 +76,5 @@ func (service *Service) Create(role *portainer.Role) error {
 // UpdateRole updates a role.
 func (service *Service) UpdateRole(ID portainer.RoleID, role *portainer.Role) error {
 	identifier := internal.Itob(int(ID))
-	return internal.UpdateObject(service.connection, BucketName, identifier, role)
+	return service.connection.UpdateObject(BucketName, identifier, role)
 }

@@ -22,7 +22,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection *internal.DbConnection) (*Service, error) {
-	err := internal.CreateBucket(connection, BucketName)
+	err := connection.CreateBucket(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func (service *Service) Team(ID portainer.TeamID) (*portainer.Team, error) {
 	var team portainer.Team
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.connection, BucketName, identifier, &team)
+	err := service.connection.GetObject(BucketName, identifier, &team)
 	if err != nil {
 		return nil, err
 	}
@@ -50,8 +50,7 @@ func (service *Service) TeamByName(name string) (*portainer.Team, error) {
 	var t *portainer.Team
 
 	stop := fmt.Errorf("ok")
-	err := internal.GetAll(
-		service.connection,
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.Team{},
 		func(obj interface{}) (interface{}, error) {
@@ -80,8 +79,7 @@ func (service *Service) TeamByName(name string) (*portainer.Team, error) {
 func (service *Service) Teams() ([]portainer.Team, error) {
 	var teams = make([]portainer.Team, 0)
 
-	err := internal.GetAll(
-		service.connection,
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.Team{},
 		func(obj interface{}) (interface{}, error) {
@@ -100,13 +98,12 @@ func (service *Service) Teams() ([]portainer.Team, error) {
 // UpdateTeam saves a Team.
 func (service *Service) UpdateTeam(ID portainer.TeamID, team *portainer.Team) error {
 	identifier := internal.Itob(int(ID))
-	return internal.UpdateObject(service.connection, BucketName, identifier, team)
+	return service.connection.UpdateObject(BucketName, identifier, team)
 }
 
 // CreateTeam creates a new Team.
 func (service *Service) Create(team *portainer.Team) error {
-	return internal.CreateObject(
-		service.connection,
+	return service.connection.CreateObject(
 		BucketName,
 		func(id uint64) (int, interface{}) {
 			team.ID = portainer.TeamID(id)
@@ -118,5 +115,5 @@ func (service *Service) Create(team *portainer.Team) error {
 // DeleteTeam deletes a Team.
 func (service *Service) DeleteTeam(ID portainer.TeamID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.connection, BucketName, identifier)
+	return service.connection.DeleteObject(BucketName, identifier)
 }

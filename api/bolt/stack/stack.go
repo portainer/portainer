@@ -22,7 +22,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection *internal.DbConnection) (*Service, error) {
-	err := internal.CreateBucket(connection, BucketName)
+	err := connection.CreateBucket(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func (service *Service) Stack(ID portainer.StackID) (*portainer.Stack, error) {
 	var stack portainer.Stack
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.connection, BucketName, identifier, &stack)
+	err := service.connection.GetObject(BucketName, identifier, &stack)
 	if err != nil {
 		return nil, err
 	}
@@ -50,8 +50,7 @@ func (service *Service) StackByName(name string) (*portainer.Stack, error) {
 	var s *portainer.Stack
 
 	stop := fmt.Errorf("ok")
-	err := internal.GetAll(
-		service.connection,
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.Stack{},
 		func(obj interface{}) (interface{}, error) {
@@ -80,8 +79,7 @@ func (service *Service) StackByName(name string) (*portainer.Stack, error) {
 func (service *Service) Stacks() ([]portainer.Stack, error) {
 	var stacks = make([]portainer.Stack, 0)
 
-	err := internal.GetAll(
-		service.connection,
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.Stack{},
 		func(obj interface{}) (interface{}, error) {
@@ -99,24 +97,24 @@ func (service *Service) Stacks() ([]portainer.Stack, error) {
 
 // GetNextIdentifier returns the next identifier for a stack.
 func (service *Service) GetNextIdentifier() int {
-	return internal.GetNextIdentifier(service.connection, BucketName)
+	return service.connection.GetNextIdentifier(BucketName)
 }
 
 // CreateStack creates a new stack.
 func (service *Service) Create(stack *portainer.Stack) error {
-	return internal.CreateObjectWithSetSequence(service.connection, BucketName, int(stack.ID), stack)
+	return service.connection.CreateObjectWithSetSequence(BucketName, int(stack.ID), stack)
 }
 
 // UpdateStack updates a stack.
 func (service *Service) UpdateStack(ID portainer.StackID, stack *portainer.Stack) error {
 	identifier := internal.Itob(int(ID))
-	return internal.UpdateObject(service.connection, BucketName, identifier, stack)
+	return service.connection.UpdateObject(BucketName, identifier, stack)
 }
 
 // DeleteStack deletes a stack.
 func (service *Service) DeleteStack(ID portainer.StackID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.connection, BucketName, identifier)
+	return service.connection.DeleteObject(BucketName, identifier)
 }
 
 // StackByWebhookID returns a pointer to a stack object by webhook ID.
@@ -124,8 +122,7 @@ func (service *Service) DeleteStack(ID portainer.StackID) error {
 func (service *Service) StackByWebhookID(id string) (*portainer.Stack, error) {
 	var s *portainer.Stack
 	stop := fmt.Errorf("ok")
-	err := internal.GetAll(
-		service.connection,
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.Stack{},
 		func(obj interface{}) (interface{}, error) {
@@ -157,8 +154,7 @@ func (service *Service) StackByWebhookID(id string) (*portainer.Stack, error) {
 func (service *Service) RefreshableStacks() ([]portainer.Stack, error) {
 	stacks := make([]portainer.Stack, 0)
 
-	err := internal.GetAll(
-		service.connection,
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.Stack{},
 		func(obj interface{}) (interface{}, error) {

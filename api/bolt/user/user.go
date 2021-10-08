@@ -22,7 +22,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection *internal.DbConnection) (*Service, error) {
-	err := internal.CreateBucket(connection, BucketName)
+	err := connection.CreateBucket(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func (service *Service) User(ID portainer.UserID) (*portainer.User, error) {
 	var user portainer.User
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.connection, BucketName, identifier, &user)
+	err := service.connection.GetObject(BucketName, identifier, &user)
 	if err != nil {
 		return nil, err
 	}
@@ -49,8 +49,7 @@ func (service *Service) User(ID portainer.UserID) (*portainer.User, error) {
 func (service *Service) UserByUsername(username string) (*portainer.User, error) {
 	var u *portainer.User
 	stop := fmt.Errorf("ok")
-	err := internal.GetAll(
-		service.connection,
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.User{},
 		func(obj interface{}) (interface{}, error) {
@@ -79,8 +78,7 @@ func (service *Service) UserByUsername(username string) (*portainer.User, error)
 func (service *Service) Users() ([]portainer.User, error) {
 	var users = make([]portainer.User, 0)
 
-	err := internal.GetAll(
-		service.connection,
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.User{},
 		func(obj interface{}) (interface{}, error) {
@@ -100,8 +98,7 @@ func (service *Service) Users() ([]portainer.User, error) {
 func (service *Service) UsersByRole(role portainer.UserRole) ([]portainer.User, error) {
 	var users = make([]portainer.User, 0)
 
-	err := internal.GetAll(
-		service.connection,
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.User{},
 		func(obj interface{}) (interface{}, error) {
@@ -123,13 +120,12 @@ func (service *Service) UsersByRole(role portainer.UserRole) ([]portainer.User, 
 func (service *Service) UpdateUser(ID portainer.UserID, user *portainer.User) error {
 	identifier := internal.Itob(int(ID))
 	user.Username = strings.ToLower(user.Username)
-	return internal.UpdateObject(service.connection, BucketName, identifier, user)
+	return service.connection.UpdateObject(BucketName, identifier, user)
 }
 
 // CreateUser creates a new user.
 func (service *Service) Create(user *portainer.User) error {
-	return internal.CreateObject(
-		service.connection,
+	return service.connection.CreateObject(
 		BucketName,
 		func(id uint64) (int, interface{}) {
 			user.ID = portainer.UserID(id)
@@ -143,5 +139,5 @@ func (service *Service) Create(user *portainer.User) error {
 // DeleteUser deletes a user.
 func (service *Service) DeleteUser(ID portainer.UserID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.connection, BucketName, identifier)
+	return service.connection.DeleteObject(BucketName, identifier)
 }

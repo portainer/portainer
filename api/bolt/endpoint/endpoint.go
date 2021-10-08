@@ -19,7 +19,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection *internal.DbConnection) (*Service, error) {
-	err := internal.CreateBucket(connection, BucketName)
+	err := connection.CreateBucket(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (service *Service) Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, 
 	var endpoint portainer.Endpoint
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.connection, BucketName, identifier, &endpoint)
+	err := service.connection.GetObject(BucketName, identifier, &endpoint)
 	if err != nil {
 		return nil, err
 	}
@@ -45,21 +45,20 @@ func (service *Service) Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, 
 // UpdateEndpoint updates an environment(endpoint).
 func (service *Service) UpdateEndpoint(ID portainer.EndpointID, endpoint *portainer.Endpoint) error {
 	identifier := internal.Itob(int(ID))
-	return internal.UpdateObject(service.connection, BucketName, identifier, endpoint)
+	return service.connection.UpdateObject(BucketName, identifier, endpoint)
 }
 
 // DeleteEndpoint deletes an environment(endpoint).
 func (service *Service) DeleteEndpoint(ID portainer.EndpointID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.connection, BucketName, identifier)
+	return service.connection.DeleteObject(BucketName, identifier)
 }
 
 // Endpoints return an array containing all the environments(endpoints).
 func (service *Service) Endpoints() ([]portainer.Endpoint, error) {
 	var endpoints = make([]portainer.Endpoint, 0)
 
-	err := internal.GetAllWithJsoniter(
-		service.connection,
+	err := service.connection.GetAllWithJsoniter(
 		BucketName,
 		&portainer.Endpoint{},
 		func(obj interface{}) (interface{}, error) {
@@ -77,10 +76,10 @@ func (service *Service) Endpoints() ([]portainer.Endpoint, error) {
 
 // CreateEndpoint assign an ID to a new environment(endpoint) and saves it.
 func (service *Service) Create(endpoint *portainer.Endpoint) error {
-	return internal.CreateObjectWithSetSequence(service.connection, BucketName, int(endpoint.ID), endpoint)
+	return service.connection.CreateObjectWithSetSequence(BucketName, int(endpoint.ID), endpoint)
 }
 
 // GetNextIdentifier returns the next identifier for an environment(endpoint).
 func (service *Service) GetNextIdentifier() int {
-	return internal.GetNextIdentifier(service.connection, BucketName)
+	return service.connection.GetNextIdentifier(BucketName)
 }

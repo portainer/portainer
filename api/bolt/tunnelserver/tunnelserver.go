@@ -18,7 +18,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection *internal.DbConnection) (*Service, error) {
-	err := internal.CreateBucket(connection, BucketName)
+	err := connection.CreateBucket(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func NewService(connection *internal.DbConnection) (*Service, error) {
 func (service *Service) Info() (*portainer.TunnelServerInfo, error) {
 	var info portainer.TunnelServerInfo
 
-	err := internal.GetObject(service.connection, BucketName, []byte(infoKey), &info)
+	err := service.connection.GetObject(BucketName, []byte(infoKey), &info)
 	if err != nil {
 		return nil, err
 	}
@@ -42,5 +42,5 @@ func (service *Service) Info() (*portainer.TunnelServerInfo, error) {
 
 // UpdateInfo persists a TunnelServerInfo object.
 func (service *Service) UpdateInfo(settings *portainer.TunnelServerInfo) error {
-	return internal.UpdateObject(service.connection, BucketName, []byte(infoKey), settings)
+	return service.connection.UpdateObject(BucketName, []byte(infoKey), settings)
 }

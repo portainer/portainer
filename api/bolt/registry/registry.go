@@ -19,7 +19,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection *internal.DbConnection) (*Service, error) {
-	err := internal.CreateBucket(connection, BucketName)
+	err := connection.CreateBucket(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (service *Service) Registry(ID portainer.RegistryID) (*portainer.Registry, 
 	var registry portainer.Registry
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.connection, BucketName, identifier, &registry)
+	err := service.connection.GetObject(BucketName, identifier, &registry)
 	if err != nil {
 		return nil, err
 	}
@@ -46,8 +46,7 @@ func (service *Service) Registry(ID portainer.RegistryID) (*portainer.Registry, 
 func (service *Service) Registries() ([]portainer.Registry, error) {
 	var registries = make([]portainer.Registry, 0)
 
-	err := internal.GetAll(
-		service.connection,
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.Registry{},
 		func(obj interface{}) (interface{}, error) {
@@ -65,8 +64,7 @@ func (service *Service) Registries() ([]portainer.Registry, error) {
 
 // CreateRegistry creates a new registry.
 func (service *Service) Create(registry *portainer.Registry) error {
-	return internal.CreateObject(
-		service.connection,
+	return service.connection.CreateObject(
 		BucketName,
 		func(id uint64) (int, interface{}) {
 			registry.ID = portainer.RegistryID(id)
@@ -78,11 +76,11 @@ func (service *Service) Create(registry *portainer.Registry) error {
 // UpdateRegistry updates an registry.
 func (service *Service) UpdateRegistry(ID portainer.RegistryID, registry *portainer.Registry) error {
 	identifier := internal.Itob(int(ID))
-	return internal.UpdateObject(service.connection, BucketName, identifier, registry)
+	return service.connection.UpdateObject(BucketName, identifier, registry)
 }
 
 // DeleteRegistry deletes an registry.
 func (service *Service) DeleteRegistry(ID portainer.RegistryID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.connection, BucketName, identifier)
+	return service.connection.DeleteObject(BucketName, identifier)
 }

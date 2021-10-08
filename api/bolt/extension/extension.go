@@ -19,7 +19,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection *internal.DbConnection) (*Service, error) {
-	err := internal.CreateBucket(connection, BucketName)
+	err := connection.CreateBucket(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (service *Service) Extension(ID portainer.ExtensionID) (*portainer.Extensio
 	var extension portainer.Extension
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.connection, BucketName, identifier, &extension)
+	err := service.connection.GetObject(BucketName, identifier, &extension)
 	if err != nil {
 		return nil, err
 	}
@@ -46,8 +46,7 @@ func (service *Service) Extension(ID portainer.ExtensionID) (*portainer.Extensio
 func (service *Service) Extensions() ([]portainer.Extension, error) {
 	var extensions = make([]portainer.Extension, 0)
 
-	err := internal.GetAll(
-		service.connection,
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.Extension{},
 		func(obj interface{}) (interface{}, error) {
@@ -65,11 +64,11 @@ func (service *Service) Extensions() ([]portainer.Extension, error) {
 
 // Persist persists a extension inside the database.
 func (service *Service) Persist(extension *portainer.Extension) error {
-	return internal.CreateObjectWithId(service.connection, BucketName, int(extension.ID), extension)
+	return service.connection.CreateObjectWithId(BucketName, int(extension.ID), extension)
 }
 
 // DeleteExtension deletes a Extension.
 func (service *Service) DeleteExtension(ID portainer.ExtensionID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.connection, BucketName, identifier)
+	return service.connection.DeleteObject(BucketName, identifier)
 }

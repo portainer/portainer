@@ -19,7 +19,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection *internal.DbConnection) (*Service, error) {
-	err := internal.CreateBucket(connection, BucketName)
+	err := connection.CreateBucket(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -35,8 +35,7 @@ func (service *Service) CustomTemplates() ([]portainer.CustomTemplate, error) {
 
 
 
-	err := internal.GetAll(
-		service.connection,
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.CustomTemplate{},
 		func(obj interface{}) (interface{}, error) {
@@ -58,7 +57,7 @@ func (service *Service) CustomTemplate(ID portainer.CustomTemplateID) (*portaine
 	var customTemplate portainer.CustomTemplate
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.connection, BucketName, identifier, &customTemplate)
+	err := service.connection.GetObject(BucketName, identifier, &customTemplate)
 	if err != nil {
 		return nil, err
 	}
@@ -69,22 +68,22 @@ func (service *Service) CustomTemplate(ID portainer.CustomTemplateID) (*portaine
 // UpdateCustomTemplate updates an custom template.
 func (service *Service) UpdateCustomTemplate(ID portainer.CustomTemplateID, customTemplate *portainer.CustomTemplate) error {
 	identifier := internal.Itob(int(ID))
-	return internal.UpdateObject(service.connection, BucketName, identifier, customTemplate)
+	return service.connection.UpdateObject(BucketName, identifier, customTemplate)
 }
 
 // DeleteCustomTemplate deletes an custom template.
 func (service *Service) DeleteCustomTemplate(ID portainer.CustomTemplateID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.connection, BucketName, identifier)
+	return service.connection.DeleteObject(BucketName, identifier)
 }
 
 // CreateCustomTemplate uses the existing id and saves it.
 // TODO: where does the ID come from, and is it safe?
 func (service *Service) Create(customTemplate *portainer.CustomTemplate) error {
-	return internal.CreateObjectWithId(service.connection, BucketName, int(customTemplate.ID), customTemplate)
+	return service.connection.CreateObjectWithId(BucketName, int(customTemplate.ID), customTemplate)
 }
 
 // GetNextIdentifier returns the next identifier for a custom template.
 func (service *Service) GetNextIdentifier() int {
-	return internal.GetNextIdentifier(service.connection, BucketName)
+	return service.connection.GetNextIdentifier(BucketName)
 }
