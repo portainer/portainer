@@ -30,17 +30,17 @@
 .stepper-item::before {
   position: absolute;
   content: '';
-  border-bottom: 5px solid rgb(231, 231, 231);
   width: 100%;
   top: 20px;
   left: -100%;
   z-index: 2;
+  border-bottom: 5px solid var(--bg-stepper-item-counter);
 }
 
 .stepper-item::after {
   position: absolute;
   content: '';
-  border-bottom: 5px solid rgb(231, 231, 231);
+  border-bottom: 5px solid var(--bg-stepper-item-counter);
   width: 100%;
   top: 20px;
   left: 0;
@@ -56,13 +56,13 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgb(231, 231, 231);
+  background: var(--bg-stepper-item-counter);
   margin-bottom: 6px;
 }
 
 .stepper-item.active {
   font-weight: bold;
-  background: #fff;
+  background: var(--bg-stepper-item-active);
   content: none;
 }
 
