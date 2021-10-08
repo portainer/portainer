@@ -1,13 +1,13 @@
 package migrator
 
 import (
+	"github.com/portainer/portainer/api/datastore/stack"
 	"strconv"
 	"strings"
 
 	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
-	"github.com/portainer/portainer/api/bolt/stack"
 )
 
 func (m *Migrator) updateEndpointsToVersion12() error {

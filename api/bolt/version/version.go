@@ -1,12 +1,12 @@
 package version
 
 import (
+	"github.com/portainer/portainer/api/bolt/internal"
 	"strconv"
 
 	"github.com/boltdb/bolt"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
-	"github.com/portainer/portainer/api/bolt/internal"
 )
 
 const (

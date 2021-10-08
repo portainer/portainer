@@ -13,7 +13,7 @@ type DbConnection struct {
 // Itob returns an 8-byte big endian representation of v.
 // This function is typically used for encoding integer IDs to byte slices
 // so that they can be used as BoltDB keys.
-func Itob(v int) []byte {
+func (connection *DbConnection) Itob(v int) []byte {
 	b := make([]byte, 8)
 	binary.BigEndian.PutUint64(b, uint64(v))
 	return b
@@ -96,7 +96,7 @@ func (connection *DbConnection) DeleteAllObjects(bucketName string, matching fun
 			}
 
 			if id, ok := matching(obj); ok {
-				err := bucket.Delete(Itob(id))
+				err := bucket.Delete(connection.Itob(id))
 				if err != nil {
 					return err
 				}
@@ -137,7 +137,7 @@ func (connection *DbConnection) CreateObject(bucketName string, fn func(uint64) 
 			return err
 		}
 
-		return bucket.Put(Itob(int(id)), data)
+		return bucket.Put(connection.Itob(int(id)), data)
 	})
 }
 
@@ -151,7 +151,7 @@ func (connection *DbConnection) CreateObjectWithId(bucketName string, id int, ob
 			return err
 		}
 
-		return bucket.Put(Itob(int(id)), data)
+		return bucket.Put(connection.Itob(int(id)), data)
 	})
 }
 
@@ -172,7 +172,7 @@ func (connection *DbConnection) CreateObjectWithSetSequence(bucketName string, i
 			return err
 		}
 
-		return bucket.Put(Itob(int(id)), data)
+		return bucket.Put(connection.Itob(int(id)), data)
 	})
 }
 
