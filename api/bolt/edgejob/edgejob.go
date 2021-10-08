@@ -36,15 +36,16 @@ func (service *Service) EdgeJobs() ([]portainer.EdgeJob, error) {
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
+		&portainer.EdgeJob{},
+		func(obj interface{}) (interface{}, error) {
 			//var tag portainer.Tag
-			job, ok := obj.(portainer.EdgeJob)
+			job, ok := obj.(*portainer.EdgeJob)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to EdgeJob object")
-				return fmt.Errorf("Failed to convert to EdgeJob object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to EdgeJob object: %s", obj)
 			}
-			edgeJobs = append(edgeJobs, job)
-			return nil
+			edgeJobs = append(edgeJobs, *job)
+			return &portainer.EdgeJob{}, nil
 		})
 
 	return edgeJobs, err

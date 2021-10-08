@@ -33,18 +33,21 @@ func NewService(connection *internal.DbConnection) (*Service, error) {
 func (service *Service) CustomTemplates() ([]portainer.CustomTemplate, error) {
 	var customTemplates = make([]portainer.CustomTemplate, 0)
 
+
+
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
+		&portainer.CustomTemplate{},
+		func(obj interface{}) (interface{}, error) {
 			//var tag portainer.Tag
-			customTemplate, ok := obj.(portainer.CustomTemplate)
+			customTemplate, ok := obj.(*portainer.CustomTemplate)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to CustomTemplate object")
-				return fmt.Errorf("Failed to convert to CustomTemplate object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to CustomTemplate object: %s", obj)
 			}
-			customTemplates = append(customTemplates, customTemplate)
-			return nil
+			customTemplates = append(customTemplates, *customTemplate)
+			return &portainer.CustomTemplate{}, nil
 		})
 
 	return customTemplates, err

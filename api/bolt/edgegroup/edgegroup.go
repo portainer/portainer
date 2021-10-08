@@ -36,14 +36,15 @@ func (service *Service) EdgeGroups() ([]portainer.EdgeGroup, error) {
 	err := internal.GetAllWithJsoniter(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
-			group, ok := obj.(portainer.EdgeGroup)
+		&portainer.EdgeGroup{},
+		func(obj interface{}) (interface{}, error) {
+			group, ok := obj.(*portainer.EdgeGroup)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to EdgeGroup object")
-				return fmt.Errorf("Failed to convert to EdgeGroup object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to EdgeGroup object: %s", obj)
 			}
-			groups = append(groups, group)
-			return nil
+			groups = append(groups, *group)
+			return &portainer.EdgeGroup{}, nil
 		})
 
 	return groups, err

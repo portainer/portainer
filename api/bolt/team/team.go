@@ -53,17 +53,18 @@ func (service *Service) TeamByName(name string) (*portainer.Team, error) {
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
-			team, ok := obj.(portainer.Team)
+		&portainer.Team{},
+		func(obj interface{}) (interface{}, error) {
+			team, ok := obj.(*portainer.Team)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to Team object")
-				return fmt.Errorf("Failed to convert to Team object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to Team object: %s", obj)
 			}
 			if strings.EqualFold(t.Name, name) {
-				t = &team
-				return stop
+				t = team
+				return nil, stop
 			}
-			return nil
+			return &portainer.Team{}, nil
 		})
 	if err == stop {
 		return t, nil
@@ -82,14 +83,15 @@ func (service *Service) Teams() ([]portainer.Team, error) {
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
-			team, ok := obj.(portainer.Team)
+		&portainer.Team{},
+		func(obj interface{}) (interface{}, error) {
+			team, ok := obj.(*portainer.Team)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to Team object")
-				return fmt.Errorf("Failed to convert to Team object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to Team object: %s", obj)
 			}
-			teams = append(teams, team)
-			return nil
+			teams = append(teams, *team)
+			return &portainer.Team{}, nil
 		})
 
 	return teams, err

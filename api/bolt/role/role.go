@@ -49,14 +49,15 @@ func (service *Service) Roles() ([]portainer.Role, error) {
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
-			set, ok := obj.(portainer.Role)
+		&portainer.Role{},
+		func(obj interface{}) (interface{}, error) {
+			set, ok := obj.(*portainer.Role)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to Role object")
-				return fmt.Errorf("Failed to convert to Role object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to Role object: %s", obj)
 			}
-			sets = append(sets, set)
-			return nil
+			sets = append(sets, *set)
+			return &portainer.Role{}, nil
 		})
 
 	return sets, err

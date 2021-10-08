@@ -61,14 +61,15 @@ func (service *Service) Endpoints() ([]portainer.Endpoint, error) {
 	err := internal.GetAllWithJsoniter(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
-			endpoint, ok := obj.(portainer.Endpoint)
+		&portainer.Endpoint{},
+		func(obj interface{}) (interface{}, error) {
+			endpoint, ok := obj.(*portainer.Endpoint)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to Endpoint object")
-				return fmt.Errorf("Failed to convert to Endpoint object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to Endpoint object: %s", obj)
 			}
-			endpoints = append(endpoints, endpoint)
-			return nil
+			endpoints = append(endpoints, *endpoint)
+			return &portainer.Endpoint{}, nil
 		})
 
 	return endpoints, err

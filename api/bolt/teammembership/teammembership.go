@@ -49,14 +49,15 @@ func (service *Service) TeamMemberships() ([]portainer.TeamMembership, error) {
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
-			membership, ok := obj.(portainer.TeamMembership)
+		&portainer.TeamMembership{},
+		func(obj interface{}) (interface{}, error) {
+			membership, ok := obj.(*portainer.TeamMembership)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to TeamMembership object")
-				return fmt.Errorf("Failed to convert to TeamMembership object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to TeamMembership object: %s", obj)
 			}
-			memberships = append(memberships, membership)
-			return nil
+			memberships = append(memberships, *membership)
+			return &portainer.TeamMembership{}, nil
 		})
 
 	return memberships, err
@@ -69,16 +70,17 @@ func (service *Service) TeamMembershipsByUserID(userID portainer.UserID) ([]port
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
-			membership, ok := obj.(portainer.TeamMembership)
+		&portainer.TeamMembership{},
+		func(obj interface{}) (interface{}, error) {
+			membership, ok := obj.(*portainer.TeamMembership)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to TeamMembership object")
-				return fmt.Errorf("Failed to convert to TeamMembership object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to TeamMembership object: %s", obj)
 			}
 			if membership.UserID == userID {
-				memberships = append(memberships, membership)
+				memberships = append(memberships, *membership)
 			}
-			return nil
+			return &portainer.TeamMembership{}, nil
 		})
 
 	return memberships, err
@@ -91,16 +93,17 @@ func (service *Service) TeamMembershipsByTeamID(teamID portainer.TeamID) ([]port
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
-			membership, ok := obj.(portainer.TeamMembership)
+		&portainer.TeamMembership{},
+		func(obj interface{}) (interface{}, error) {
+			membership, ok := obj.(*portainer.TeamMembership)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to TeamMembership object")
-				return fmt.Errorf("Failed to convert to TeamMembership object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to TeamMembership object: %s", obj)
 			}
 			if membership.TeamID == teamID {
-				memberships = append(memberships, membership)
+				memberships = append(memberships, *membership)
 			}
-			return nil
+			return &portainer.TeamMembership{}, nil
 		})
 
 	return memberships, err
