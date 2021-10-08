@@ -73,7 +73,11 @@
                 </button>
               </td>
             </tr>
-            <tr dir-paginate-end ng-show="$ctrl.itemCanExpand(value) && value.Expanded" ng-style="{ background: value.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
+            <tr
+              dir-paginate-end
+              ng-show="$ctrl.itemCanExpand(value) && value.Expanded"
+              ng-class="{ 'datatable-highlighted': value.Highlighted, 'datatable-unhighlighted': !value.Highlighted }"
+            >
               <td colspan="1"></td>
               <td colspan="1">
                 {{ value.GlobalIPv6Address }}
@@ -98,7 +102,7 @@
               <span style="margin-right: 5px;">
                 Items per page
               </span>
-              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
+              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">
                 <option value="0">All</option>
                 <option value="10">10</option>
                 <option value="25">25</option>

@@ -1,5 +1,5 @@
 <rd-header>
-  <rd-header-title title-text="Endpoint group access"></rd-header-title>
+  <rd-header-title title-text="Environment group access"></rd-header-title>
   <rd-header-content>
     <a ui-sref="portainer.groups">Groups</a> &gt; <a ui-sref="portainer.groups.group({id: group.Id})">{{ group.Name }}</a> &gt; Access management
   </rd-header-content>
@@ -31,4 +31,5 @@
   entity-type="group"
   action-in-progress="state.actionInProgress"
   update-access="updateAccess"
+  limited-feature="limitedFeature"
 ></por-access-management>

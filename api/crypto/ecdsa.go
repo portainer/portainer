@@ -22,7 +22,7 @@ const (
 )
 
 // ECDSAService is a service used to create digital signatures when communicating with
-// an agent based environment. It will automatically generates a key pair using ECDSA or
+// an agent based environment(endpoint). It will automatically generates a key pair using ECDSA or
 // can also reuse an existing ECDSA key pair.
 type ECDSAService struct {
 	privateKey    *ecdsa.PrivateKey

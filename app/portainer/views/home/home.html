@@ -4,7 +4,7 @@
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
-  <rd-header-content>Endpoints</rd-header-content>
+  <rd-header-content>Environments</rd-header-content>
 </rd-header>
 
 <motd-panel ng-if="motd && motd.Message !== '' && applicationState.UI.dismissedInfoHash !== motd.Hash" motd="motd" dismiss-action="dismissImportantInformation(motd.Hash)">
@@ -26,7 +26,7 @@
   style="width: 100%; height: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;"
   ng-if="state.connectingToEdgeEndpoint"
 >
-  Connecting to the Edge endpoint...
+  Connecting to the Edge environment...
   <i class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
 </div>
 
@@ -35,8 +35,8 @@
     <p>
       <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
       No environment available for management. Please head over the
-      <a ui-sref="portainer.endpoints.new"> endpoints view </a>
-      to add an endpoint.
+      <a ui-sref="portainer.endpoints.new"> environments view </a>
+      to add an environment.
     </p>
   </span>
 </information-panel>
@@ -44,7 +44,7 @@
 <div class="row" ng-if="!state.connectingToEdgeEndpoint">
   <div class="col-sm-12">
     <endpoint-list
-      title-text="Endpoints"
+      title-text="Environments"
       title-icon="fa-plug"
       endpoints="endpoints"
       table-key="home_endpoints"
@@ -56,6 +56,7 @@
       is-admin="isAdmin"
       total-count="totalCount"
       retrieve-page="getPaginatedEndpoints"
+      endpoint-init-time="state.homepageLoadTime"
     ></endpoint-list>
   </div>
 </div>

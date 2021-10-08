@@ -1,4 +1,5 @@
 import _ from 'lodash-es';
+import { RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
 import { StackViewModel, OrphanedStackViewModel } from '../../models/stack';
 
 angular.module('portainer.app').factory('StackService', [
@@ -15,6 +16,7 @@ angular.module('portainer.app').factory('StackService', [
     'use strict';
     var service = {
       updateGit,
+      updateKubeGit,
     };
 
     service.stack = function (id) {
@@ -55,7 +57,7 @@ angular.module('portainer.app').factory('StackService', [
         .then(function success(data) {
           var swarm = data;
           if (swarm.Id === stack.SwarmId) {
-            deferred.reject({ msg: 'Target endpoint is located in the same Swarm cluster as the current endpoint', err: null });
+            deferred.reject({ msg: 'Target environment is located in the same Swarm cluster as the current environment', err: null });
             return;
           }
           return Stack.migrate({ id: stack.Id, endpointId: stack.EndpointId }, { EndpointID: targetEndpointId, SwarmID: swarm.Id, Name: newName }).$promise;
@@ -268,6 +270,35 @@ angular.module('portainer.app').factory('StackService', [
       return Stack.update({ endpointId: stack.EndpointId }, { id: stack.Id, StackFileContent: stackFile, Env: env, Prune: prune }).$promise;
     };
 
+    service.updateKubeStack = function (stack, stackFile, gitConfig) {
+      let payload = {};
+
+      if (stackFile) {
+        payload = {
+          StackFileContent: stackFile,
+        };
+      } else {
+        const autoUpdate = {};
+        if (gitConfig.AutoUpdate && gitConfig.AutoUpdate.RepositoryAutomaticUpdates) {
+          if (gitConfig.AutoUpdate.RepositoryMechanism === RepositoryMechanismTypes.INTERVAL) {
+            autoUpdate.Interval = gitConfig.AutoUpdate.RepositoryFetchInterval;
+          } else if (gitConfig.AutoUpdate.RepositoryMechanism === RepositoryMechanismTypes.WEBHOOK) {
+            autoUpdate.Webhook = gitConfig.AutoUpdate.RepositoryWebhookURL.split('/').reverse()[0];
+          }
+        }
+
+        payload = {
+          AutoUpdate: autoUpdate,
+          RepositoryReferenceName: gitConfig.RefName,
+          RepositoryAuthentication: gitConfig.RepositoryAuthentication,
+          RepositoryUsername: gitConfig.RepositoryUsername,
+          RepositoryPassword: gitConfig.RepositoryPassword,
+        };
+      }
+
+      return Stack.update({ id: stack.Id, endpointId: stack.EndpointId }, payload).$promise;
+    };
+
     service.createComposeStackFromFileUpload = function (name, stackFile, env, endpointId) {
       return FileUploadService.createComposeStack(name, stackFile, env, endpointId);
     };
@@ -326,12 +357,18 @@ angular.module('portainer.app').factory('StackService', [
         Name: name,
         RepositoryURL: repositoryOptions.RepositoryURL,
         RepositoryReferenceName: repositoryOptions.RepositoryReferenceName,
-        ComposeFilePathInRepository: repositoryOptions.ComposeFilePathInRepository,
+        ComposeFile: repositoryOptions.ComposeFilePathInRepository,
+        AdditionalFiles: repositoryOptions.AdditionalFiles,
         RepositoryAuthentication: repositoryOptions.RepositoryAuthentication,
         RepositoryUsername: repositoryOptions.RepositoryUsername,
         RepositoryPassword: repositoryOptions.RepositoryPassword,
         Env: env,
       };
+
+      if (repositoryOptions.AutoUpdate) {
+        payload.AutoUpdate = repositoryOptions.AutoUpdate;
+      }
+
       return Stack.create({ method: 'repository', type: 2, endpointId: endpointId }, payload).$promise;
     };
 
@@ -346,12 +383,18 @@ angular.module('portainer.app').factory('StackService', [
             SwarmID: swarm.Id,
             RepositoryURL: repositoryOptions.RepositoryURL,
             RepositoryReferenceName: repositoryOptions.RepositoryReferenceName,
-            ComposeFilePathInRepository: repositoryOptions.ComposeFilePathInRepository,
+            ComposeFile: repositoryOptions.ComposeFilePathInRepository,
+            AdditionalFiles: repositoryOptions.AdditionalFiles,
             RepositoryAuthentication: repositoryOptions.RepositoryAuthentication,
             RepositoryUsername: repositoryOptions.RepositoryUsername,
             RepositoryPassword: repositoryOptions.RepositoryPassword,
             Env: env,
           };
+
+          if (repositoryOptions.AutoUpdate) {
+            payload.AutoUpdate = repositoryOptions.AutoUpdate;
+          }
+
           return Stack.create({ method: 'repository', type: 1, endpointId: endpointId }, payload).$promise;
         })
         .then(function success(data) {
@@ -404,6 +447,44 @@ angular.module('portainer.app').factory('StackService', [
         }
       ).$promise;
     }
+
+    function updateKubeGit(id, endpointId, namespace, gitConfig) {
+      return Stack.updateGit(
+        { endpointId, id },
+        {
+          Namespace: namespace,
+          RepositoryReferenceName: gitConfig.RefName,
+          RepositoryAuthentication: gitConfig.RepositoryAuthentication,
+          RepositoryUsername: gitConfig.RepositoryUsername,
+          RepositoryPassword: gitConfig.RepositoryPassword,
+        }
+      ).$promise;
+    }
+
+    service.updateGitStackSettings = function (id, endpointId, env, gitConfig) {
+      // prepare auto update
+      const autoUpdate = {};
+
+      if (gitConfig.AutoUpdate.RepositoryAutomaticUpdates) {
+        if (gitConfig.AutoUpdate.RepositoryMechanism === RepositoryMechanismTypes.INTERVAL) {
+          autoUpdate.Interval = gitConfig.AutoUpdate.RepositoryFetchInterval;
+        } else if (gitConfig.AutoUpdate.RepositoryMechanism === RepositoryMechanismTypes.WEBHOOK) {
+          autoUpdate.Webhook = gitConfig.AutoUpdate.RepositoryWebhookURL.split('/').reverse()[0];
+        }
+      }
+
+      return Stack.updateGitStackSettings(
+        { endpointId, id },
+        {
+          AutoUpdate: autoUpdate,
+          Env: env,
+          RepositoryReferenceName: gitConfig.RefName,
+          RepositoryAuthentication: gitConfig.RepositoryAuthentication,
+          RepositoryUsername: gitConfig.RepositoryUsername,
+          RepositoryPassword: gitConfig.RepositoryPassword,
+        }
+      ).$promise;
+    };
 
     return service;
   },

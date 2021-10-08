@@ -4,7 +4,7 @@
     <div class="col-sm-6 col-sm-offset-3">
       <!-- login box logo -->
       <div class="row">
-        <img ng-if="!ctrl.logo" src="~@/assets/images/logo_alt.png" class="simple-box-logo" alt="Portainer" />
+        <img ng-if="!ctrl.logo" src="~@/assets/images/logo_alt.svg" class="simple-box-logo" alt="Portainer" />
         <img ng-if="ctrl.logo" ng-src="{{ ctrl.logo }}" class="simple-box-logo" />
       </div>
       <!-- !login box logo -->
@@ -52,13 +52,13 @@
             <!-- !username input -->
             <div class="input-group" ng-if="ctrl.state.showStandardLogin">
               <span class="input-group-addon"><i class="fa fa-user" aria-hidden="true"></i></span>
-              <input id="username" type="text" class="form-control" name="username" ng-model="ctrl.formValues.Username" auto-focus />
+              <input id="username" type="text" class="form-control" name="username" ng-model="ctrl.formValues.Username" auto-focus data-cy="auth-usernameInput" />
             </div>
 
             <!-- password input -->
             <div class="input-group" ng-if="ctrl.state.showStandardLogin">
               <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
-              <input id="password" type="password" class="form-control" name="password" ng-model="ctrl.formValues.Password" />
+              <input id="password" type="password" class="form-control" name="password" ng-model="ctrl.formValues.Password" data-cy="auth-passwordInput" />
             </div>
 
             <div class="form-group" ng-if="ctrl.state.showStandardLogin">
@@ -70,6 +70,7 @@
                   ng-click="ctrl.authenticateUser()"
                   button-spinner="ctrl.state.loginInProgress"
                   ng-disabled="ctrl.state.loginInProgress"
+                  data-cy="auth-loginButton"
                 >
                   <span ng-hide="ctrl.state.loginInProgress"><i class="fa fa-sign-in-alt" aria-hidden="true"></i> Login</span>
                   <span ng-show="ctrl.state.loginInProgress">Login in progress...</span>

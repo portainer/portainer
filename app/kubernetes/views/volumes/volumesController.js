@@ -1,5 +1,3 @@
-require('../../templates/advancedDeploymentPanel.html');
-
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import angular from 'angular';
@@ -70,7 +68,7 @@ class KubernetesVolumesController {
       } finally {
         --actionCount;
         if (actionCount === 0) {
-          this.$state.reload();
+          this.$state.reload(this.$state.current);
         }
       }
     }

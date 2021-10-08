@@ -15,9 +15,18 @@
               <form class="form-horizontal" autocomplete="off" name="resourcePoolEditForm" style="padding: 20px; margin-top: 10px;">
                 <!-- name-input -->
                 <div class="form-group">
-                  <label for="pool_name" class="col-sm-1 control-label text-left">Name</label>
-                  <div class="col-sm-11">
-                    <input type="text" class="form-control" name="pool_name" ng-model="ctrl.pool.Namespace.Name" disabled />
+                  <div class="col-sm-12">
+                    <table class="table">
+                      <tbody>
+                        <tr>
+                          <td>Name</td>
+                          <td>
+                            {{ ctrl.pool.Namespace.Name }}
+                            <span class="label label-info image-tag label-margins" ng-if="ctrl.isSystem">system</span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
                 <!-- !name-input -->
@@ -137,14 +146,13 @@
                 </div>
                 <div class="form-group">
                   <div class="col-sm-12">
-                    <label class="control-label text-left">
-                      Load Balancer quota
-                    </label>
-                    <label class="switch" style="margin-left: 20px;"> <input type="checkbox" disabled /><i></i> </label>
-                    <span class="text-muted small" style="margin-left: 15px;">
-                      <i class="fa fa-user" aria-hidden="true"></i>
-                      This feature is available in <a href="https://www.portainer.io/business-upsell?from=k8s-resourcepool-lbquota" target="_blank"> Portainer Business Edition</a>.
-                    </span>
+                    <por-switch-field
+                      ng-data-cy="k8sNamespaceCreate-loadBalancerQuotaToggle"
+                      label="Load Balancer quota"
+                      name="k8s-resourcepool-Lbquota"
+                      feature="ctrl.LBQuotaFeatureId"
+                      ng-model="lbquota"
+                    ></por-switch-field>
                   </div>
                 </div>
                 <!-- #endregion -->
@@ -156,7 +164,7 @@
                   <div class="form-group" ng-if="ctrl.formValues.IngressClasses.length === 0">
                     <div class="col-sm-12 small text-muted">
                       The ingress feature must be enabled in the
-                      <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: ctrl.endpoint.Id})">endpoint configuration view</a> to be able to register ingresses inside
+                      <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: ctrl.endpoint.Id})">environment configuration view</a> to be able to register ingresses inside
                       this namespace.
                     </div>
                   </div>
@@ -212,6 +220,7 @@
                                 ng-model="item.Host"
                                 ng-change="ctrl.onChangeIngressHostname()"
                                 placeholder="foo"
+                                pattern="[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*"
                                 required
                               />
                             </div>
@@ -231,6 +240,11 @@
                           >
                             <ng-messages for="resourcePoolEditForm['hostname_' + ic.IngressClass.Name + '_' + $index].$error">
                               <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Hostname is required.</p>
+                              <p ng-message="pattern">
+                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                This field must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g.
+                                'example.com').
+                              </p>
                             </ng-messages>
                             <p ng-if="item.Duplicate">
                               <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
@@ -308,16 +322,16 @@
                     Registries
                   </div>
 
-                  <div class="form-group" ng-if="!ctrl.isAdmin">
+                  <div class="form-group" ng-if="!ctrl.isAdmin || ctrl.isSystem">
                     <label class="col-sm-3 col-lg-2 control-label text-left" style="padding-top: 0;">
                       Selected registries
                     </label>
                     <div class="col-sm-9 col-lg-4">
-                      {{ ctrl.selectedRegistries }}
+                      {{ ctrl.selectedRegistries ? ctrl.selectedRegistries : 'None' }}
                     </div>
                   </div>
 
-                  <div ng-if="ctrl.isAdmin">
+                  <div ng-if="ctrl.isAdmin && !ctrl.isSystem">
                     <div class="form-group">
                       <div class="col-sm-12 small text-muted">
                         <p>
@@ -358,7 +372,7 @@
 
                 <!-- #region STORAGES -->
                 <div class="col-sm-12 form-section-title">
-                  Storages
+                  Storage
                 </div>
 
                 <div class="form-group">
@@ -374,15 +388,13 @@
                 </div>
                 <div class="form-group">
                   <div class="col-sm-12">
-                    <label class="control-label text-left">
-                      Enable quota
-                    </label>
-                    <label class="switch" style="margin-left: 20px;"> <input type="checkbox" disabled /><i></i> </label>
-                    <span class="text-muted small" style="margin-left: 15px;">
-                      <i class="fa fa-user" aria-hidden="true"></i>
-                      This feature is available in
-                      <a href="https://www.portainer.io/business-upsell?from=k8s-resourcepool-storagequota" target="_blank"> Portainer Business Edition</a>.
-                    </span>
+                    <por-switch-field
+                      ng-data-cy="k8sNamespaceCreate-enableQuotaToggle"
+                      label="Enable quota"
+                      name="k8s-resourcepool-storagequota"
+                      feature="ctrl.StorageQuotaFeatureId"
+                      ng-model="storagequota"
+                    ></por-switch-field>
                   </div>
                 </div>
                 <!-- #endregion -->
@@ -396,20 +408,31 @@
                 <!-- !summary -->
 
                 <!-- actions -->
-                <div ng-if="ctrl.isAdmin && ctrl.isEditable" class="col-sm-12 form-section-title">
+                <div ng-if="ctrl.isAdmin" class="col-sm-12 form-section-title">
                   Actions
                 </div>
-                <div ng-if="ctrl.isAdmin && ctrl.isEditable" class="form-group">
+                <div ng-if="ctrl.isAdmin" class="form-group">
                   <div class="col-sm-12">
                     <button
                       type="button"
+                      ng-if="!ctrl.isSystem"
                       class="btn btn-primary btn-sm"
                       ng-disabled="!resourcePoolEditForm.$valid || ctrl.isUpdateButtonDisabled()"
                       ng-click="ctrl.updateResourcePool()"
                       button-spinner="ctrl.state.actionInProgress"
                     >
-                      <span ng-hide="ctrl.state.actionInProgress">Update namespace</span>
+                      <span ng-hide="ctrl.state.actionInProgress" data-cy="k8sNamespaceEdit-updateNamespaceButton">Update namespace</span>
                       <span ng-show="ctrl.state.actionInProgress">Update in progress...</span>
+                    </button>
+                    <button
+                      ng-if="!ctrl.isDefaultNamespace"
+                      type="button"
+                      class="btn btn-primary btn-sm"
+                      ng-click="ctrl.markUnmarkAsSystem()"
+                      button-spinner="ctrl.state.actionInProgress"
+                    >
+                      <span ng-if="ctrl.isSystem">Unmark as system</span>
+                      <span ng-if="!ctrl.isSystem">Mark as system</span>
                     </button>
                   </div>
                 </div>

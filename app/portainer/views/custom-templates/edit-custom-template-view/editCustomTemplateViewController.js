@@ -112,7 +112,7 @@ class EditCustomTemplateViewController {
     this.getTemplate();
 
     try {
-      this.templates = await this.CustomTemplateService.customTemplates();
+      this.templates = await this.CustomTemplateService.customTemplates([1, 2]);
     } catch (err) {
       this.Notifications.error('Failure loading', err, 'Failed loading custom templates');
     }

@@ -82,8 +82,7 @@
           <tbody>
             <tr
               dir-paginate-start="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit: $ctrl.tableKey))"
-              ng-class="{ active: item.Checked }"
-              ng-style="{ background: item.Highlighted ? '#d5e8f3' : '' }"
+              ng-class="{ active: item.Checked, 'datatable-highlighted': item.Highlighted }"
               ng-click="$ctrl.expandItem(item, !item.Expanded)"
               pagination-id="$ctrl.tableKey"
             >
@@ -95,7 +94,12 @@
               <td>{{ item.Name }}</td>
               <td>{{ item.Size }}</td>
             </tr>
-            <tr dir-paginate-end ng-show="item.Expanded" ng-repeat="vol in item.Volumes" ng-style="{ background: item.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
+            <tr
+              dir-paginate-end
+              ng-show="item.Expanded"
+              ng-repeat="vol in item.Volumes"
+              ng-class="{ 'datatable-highlighted': item.Highlighted, 'datatable-unhighlighted': !item.Highlighted }"
+            >
               <td></td>
               <td>
                 <a ui-sref="kubernetes.volumes.volume({ name: vol.PersistentVolumeClaim.Name, namespace: vol.PersistentVolumeClaim.Namespace })">
@@ -123,7 +127,7 @@
               <span style="margin-right: 5px;">
                 Items per page
               </span>
-              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
+              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">
                 <option value="0">All</option>
                 <option value="10">10</option>
                 <option value="25">25</option>

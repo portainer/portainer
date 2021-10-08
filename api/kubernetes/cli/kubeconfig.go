@@ -25,7 +25,7 @@ func (kcl *KubeClient) GetKubeConfig(ctx context.Context, apiServerURL string, b
 }
 
 // generateKubeconfig will generate and return kubeconfig resource - usable by `kubectl` cli
-// which will allow the client to connect directly to k8s server endpoint via portainer (proxy)
+// which will allow the client to connect directly to k8s server environment(endpoint) via portainer (proxy)
 func generateKubeconfig(apiServerURL, bearerToken, serviceAccountName string) *clientV1.Config {
 	const (
 		KubeConfigPortainerContext = "portainer-ctx"

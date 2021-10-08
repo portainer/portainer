@@ -1,0 +1,13 @@
+.status-indicator {
+  padding: 0 !important;
+  margin-right: 1ch;
+  border-radius: 50%;
+  background-color: var(--red-3);
+  height: 10px;
+  width: 10px;
+  display: inline-block;
+}
+
+.ok {
+  background-color: var(--green-3);
+}

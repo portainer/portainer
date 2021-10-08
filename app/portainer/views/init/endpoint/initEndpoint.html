@@ -5,13 +5,13 @@
       <!-- simple box logo -->
       <div class="row">
         <img ng-if="ctrl.logo" ng-src="{{ ctrl.logo }}" class="simple-box-logo" />
-        <img ng-if="!ctrl.logo" src="~@/assets/images/logo_alt.png" class="simple-box-logo" alt="Portainer" />
+        <img ng-if="!ctrl.logo" src="~@/assets/images/logo_alt.svg" class="simple-box-logo" alt="Portainer" />
       </div>
       <!-- !simple box logo -->
-      <!-- init-endpoint panel -->
+      <!-- init-environment panel -->
       <div class="panel panel-default">
         <div class="panel-body">
-          <!-- init-endpoint form -->
+          <!-- init-environment form -->
           <form class="simple-box-form form-horizontal">
             <!-- note -->
             <div class="form-group">
@@ -22,7 +22,7 @@
               </div>
             </div>
             <!-- !note -->
-            <!-- endpoint-type -->
+            <!-- environment-type -->
             <div class="form-group" style="margin-bottom: 0;">
               <div class="boxselector_wrapper">
                 <div ng-repeat="type in ctrl.endpointSections">
@@ -37,8 +37,8 @@
                 </div>
               </div>
             </div>
-            <!-- !endpoint-type  -->
-            <!-- endpoint-type-details -->
+            <!-- !environment-type  -->
+            <!-- environment-type-details -->
             <div ng-if="ctrl.formValues.ConnectionType === ctrl.PortainerEndpointConnectionTypes.DOCKER_LOCAL">
               <ng-include src="'app/portainer/views/init/endpoint/includes/localDocker.html'"></ng-include>
             </div>
@@ -48,7 +48,7 @@
             <div ng-if="ctrl.formValues.ConnectionType === ctrl.PortainerEndpointConnectionTypes.AGENT">
               <ng-include src="'app/portainer/views/init/endpoint/includes/agent.html'"></ng-include>
             </div>
-            <!-- !endpoint-type-details -->
+            <!-- !environment-type-details -->
             <!-- actions -->
             <div class="form-group">
               <div class="col-sm-12">
@@ -69,10 +69,10 @@
             </div>
             <!-- !actions -->
           </form>
-          <!-- !init-endpoint form -->
+          <!-- !init-environment form -->
         </div>
       </div>
-      <!-- !init-endpoint panel -->
+      <!-- !init-environment panel -->
     </div>
   </div>
   <!-- !simple box -->

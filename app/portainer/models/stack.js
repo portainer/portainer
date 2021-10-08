@@ -7,6 +7,7 @@ export function StackViewModel(data) {
   this.EndpointId = data.EndpointId;
   this.SwarmId = data.SwarmId;
   this.Env = data.Env ? data.Env : [];
+  this.IsComposeFormat = data.IsComposeFormat;
   if (data.ResourceControl && data.ResourceControl.Id !== 0) {
     this.ResourceControl = new ResourceControlViewModel(data.ResourceControl);
   }
@@ -20,6 +21,8 @@ export function StackViewModel(data) {
   this.Orphaned = false;
   this.Checked = false;
   this.GitConfig = data.GitConfig;
+  this.AdditionalFiles = data.AdditionalFiles;
+  this.AutoUpdate = data.AutoUpdate;
 }
 
 export function ExternalStackViewModel(name, type, creationDate) {

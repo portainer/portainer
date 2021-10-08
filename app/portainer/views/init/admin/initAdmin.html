@@ -5,7 +5,7 @@
       <!-- simple box logo -->
       <div class="row">
         <img ng-if="logo" ng-src="{{ logo }}" class="simple-box-logo" />
-        <img ng-if="!logo" src="~@/assets/images/logo_alt.png" class="simple-box-logo" alt="Portainer" />
+        <img ng-if="!logo" src="~@/assets/images/logo_alt.svg" class="simple-box-logo" alt="Portainer" />
       </div>
       <!-- !simple box logo -->
       <!-- init password panel -->
@@ -126,7 +126,7 @@
             <div class="form-group">
               <div class="col-sm-9">
                 <span class="small text-muted">
-                  This will restore the Portainer metadata which contains information about the endpoints, stacks and applications, as well as the configured users.
+                  This will restore the Portainer metadata which contains information about the environments, stacks and applications, as well as the configured users.
                 </span>
               </div>
             </div>
@@ -167,7 +167,15 @@
             <!-- select-file-input -->
             <div class="form-group">
               <div class="col-sm-12">
-                <button class="btn btn-sm btn-primary" ngf-select accept=".tar.gz,.encrypted" ng-model="formValues.BackupFile" auto-focus>Select file</button>
+                <button
+                  class="btn btn-sm btn-primary"
+                  ngf-select
+                  accept=".gz,.encrypted"
+                  ngf-accept="'application/x-tar,application/x-gzip'"
+                  ng-model="formValues.BackupFile"
+                  auto-focus
+                  >Select file</button
+                >
                 <span style="margin-left: 5px;">
                   {{ formValues.BackupFile.name }}
                   <i class="fa fa-times red-icon" ng-if="!formValues.BackupFile" aria-hidden="true"></i>

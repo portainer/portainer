@@ -18,10 +18,13 @@
             {{ $ctrl.model.Title }}
           </span>
           <span class="space-left blocklist-item-subtitle">
-            <span>
+            <span ng-if="$ctrl.model.Type != 3">
               <i class="fab fa-linux" aria-hidden="true" ng-if="$ctrl.model.Platform === 1 || $ctrl.model.Platform === 'linux' || !$ctrl.model.Platform"></i>
               <span ng-if="!$ctrl.model.Platform"> &amp; </span>
               <i class="fab fa-windows" aria-hidden="true" ng-if="$ctrl.model.Platform === 2 || $ctrl.model.Platform === 'windows' || !$ctrl.model.Platform"></i>
+            </span>
+            <span ng-if="$ctrl.model.Type === 3">
+              <i class="fa fa-dharmachakra" aria-hidden="true"></i>
             </span>
             <span>
               {{ $ctrl.typeLabel }}

@@ -1,0 +1,15 @@
+<div class="form-group" ng-class="$ctrl.className">
+  <div class="col-sm-12">
+    <p>
+      This {{ $ctrl.type }} was deployed from the git repository <code>{{ $ctrl.url }}</code>
+      .
+    </p>
+    <p>
+      Update
+      <code
+        >{{ $ctrl.configFilePath }}<span ng-if="$ctrl.additionalFiles.length > 0">, {{ $ctrl.additionalFiles.join(',') }}</span></code
+      >
+      in git and pull from here to update the {{ $ctrl.type }}.
+    </p>
+  </div>
+</div>

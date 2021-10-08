@@ -3,23 +3,30 @@ import * as fit from 'xterm/lib/addons/fit/fit';
 
 export default class KubectlShellController {
   /* @ngInject */
-  constructor(TerminalWindow, $window, $async, EndpointProvider, LocalStorage, KubernetesConfigService, Notifications) {
+  constructor(TerminalWindow, $window, $async, EndpointProvider, LocalStorage, Notifications) {
     this.$async = $async;
     this.$window = $window;
     this.TerminalWindow = TerminalWindow;
     this.EndpointProvider = EndpointProvider;
     this.LocalStorage = LocalStorage;
-    this.KubernetesConfigService = KubernetesConfigService;
     this.Notifications = Notifications;
+
+    $window.onbeforeunload = () => {
+      if (this.state.shell.connected) {
+        return '';
+      }
+    };
   }
 
   disconnect() {
-    this.state.checked = false;
-    this.state.icon = 'fas fa-window-minimize';
-    this.state.shell.socket.close();
-    this.state.shell.term.dispose();
-    this.state.shell.connected = false;
-    this.TerminalWindow.terminalclose();
+    if (this.state.shell.connected) {
+      this.state.shell.connected = false;
+      this.state.icon = 'fas fa-window-minimize';
+      this.state.shell.socket.close();
+      this.state.shell.term.dispose();
+      this.TerminalWindow.terminalclose();
+      this.$window.onresize = null;
+    }
   }
 
   screenClear() {
@@ -39,7 +46,7 @@ export default class KubectlShellController {
   }
 
   configureSocketAndTerminal(socket, term) {
-    socket.onopen = function () {
+    socket.onopen = () => {
       const terminal_container = document.getElementById('terminal-container');
       term.open(terminal_container);
       term.setOption('cursorBlink', true);
@@ -50,31 +57,32 @@ export default class KubectlShellController {
       term.writeln('');
     };
 
-    term.on('data', function (data) {
+    term.on('data', (data) => {
       socket.send(data);
     });
 
-    this.$window.onresize = function () {
-      term.fit();
-    };
-
-    socket.onmessage = function (msg) {
+    socket.onmessage = (msg) => {
       term.write(msg.data);
     };
 
-    socket.onerror = function (err) {
+    socket.onerror = (err) => {
       this.disconnect();
-      this.Notifications.error('Failure', err, 'Websocket connection error');
-    }.bind(this);
+      if (err.target.readyState !== WebSocket.CLOSED) {
+        this.Notifications.error('Failure', err, 'Websocket connection error');
+      }
+    };
 
-    this.state.shell.socket.onclose = this.disconnect.bind(this);
+    this.$window.onresize = () => {
+      this.TerminalWindow.terminalresize();
+    };
+
+    socket.onclose = this.disconnect.bind(this);
 
     this.state.shell.connected = true;
   }
 
   connectConsole() {
     this.TerminalWindow.terminalopen();
-    this.state.checked = true;
     this.state.css = 'normal';
 
     const params = {
@@ -82,7 +90,7 @@ export default class KubectlShellController {
       endpointId: this.EndpointProvider.endpointID(),
     };
 
-    const wsProtocol = this.state.isHTTPS ? 'wss://' : 'ws://';
+    const wsProtocol = this.$window.location.protocol === 'https:' ? 'wss://' : 'ws://';
     const path = '/api/websocket/kubernetes-shell';
     const queryParams = Object.entries(params)
       .map(([k, v]) => `${k}=${v}`)
@@ -96,17 +104,11 @@ export default class KubectlShellController {
     this.configureSocketAndTerminal(this.state.shell.socket, this.state.shell.term);
   }
 
-  async downloadKubeconfig() {
-    await this.KubernetesConfigService.downloadConfig();
-  }
-
   $onInit() {
     return this.$async(async () => {
       this.state = {
         css: 'normal',
-        checked: false,
         icon: 'fa-window-minimize',
-        isHTTPS: this.$window.location.protocol === 'https:',
         shell: {
           connected: false,
           socket: null,

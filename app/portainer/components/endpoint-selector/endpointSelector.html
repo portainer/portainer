@@ -1,5 +1,5 @@
 <ui-select ng-model="$ctrl.model">
-  <ui-select-match placeholder="Select an endpoint">
+  <ui-select-match placeholder="Select an environment">
     <span>{{ $select.selected.Name }}</span>
   </ui-select-match>
   <ui-select-choices group-by="$ctrl.groupEndpoints" group-filter="$ctrl.sortGroups" repeat="endpoint in ($ctrl.endpoints | filter: $select.search) track by endpoint.Id">

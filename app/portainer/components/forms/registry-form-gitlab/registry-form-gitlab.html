@@ -133,6 +133,10 @@
         class="btn btn-primary btn-sm"
         ng-disabled="$ctrl.actionInProgress || !$ctrl.state.gitlab.selectedItemCount"
         button-spinner="$ctrl.actionInProgress"
+        analytics-on
+        analytics-category="portainer"
+        analytics-event="portainer-registry-creation"
+        analytics-properties="{ metadata: { type: 'gitlab' } }"
       >
         <span ng-hide="$ctrl.actionInProgress">Create registries</span>
         <span ng-show="$ctrl.actionInProgress">In progress...</span>

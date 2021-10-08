@@ -1,0 +1,65 @@
+<form class="form-horizontal" name="kubernetesWizardForm">
+  <box-selector radio-name="Kubernetes" ng-model="$ctrl.state.endpointType" options="$ctrl.state.availableOptions"></box-selector>
+  <!-- docker tab selection -->
+  <div style="padding-left: 10px;">
+    <div class="form-group">
+      <div class="wizard-code">
+        <uib-tabset active="state.deploymentTab">
+          <uib-tab index="0" heading="Kubernetes via load balancer">
+            <code style="display: block; white-space: pre-wrap; padding: 16px 10px;"
+              ><h6 style="color: #000;">CLI script for installing agent on your endpoint</h6>{{ $ctrl.command.loadBalancer
+              }}<i class="fas fa-copy wizard-copy-button" ng-click="$ctrl.copyLoadBalancer()"></i
+              ><i id="loadBalancerNotification" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none;"></i
+            ></code>
+          </uib-tab>
+
+          <uib-tab index="1" heading="Kubernetes via node port">
+            <code style="display: block; white-space: pre-wrap; padding: 16px 10px;"
+              ><h6 style="color: #000;">CLI script for installing agent on your endpoint</h6>{{ $ctrl.command.nodePort
+              }}<i class="fas fa-copy wizard-copy-button" ng-click="$ctrl.copyNodePort()"></i
+              ><i id="nodePortNotification" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none;"></i
+            ></code>
+          </uib-tab>
+        </uib-tabset>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group wizard-form">
+    <label for="endpoint_name" class="col-sm-3 col-lg-2 control-label text-left">Name<span class="wizard-form-required">*</span></label>
+    <div class="col-sm-9 col-lg-10" style="margin-bottom: 15px;">
+      <input
+        type="text"
+        class="form-control"
+        name="endpoint_name"
+        ng-model="$ctrl.state.formValues.name"
+        placeholder="e.g. docker-prod01 / kubernetes-cluster01"
+        required
+        auto-focus
+      />
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="endpoint_url" class="col-sm-3 col-lg-2 control-label text-left"> Environments URL<span class="wizard-form-required">*</span> </label>
+
+    <div class="col-sm-9 col-lg-10" style="margin-bottom: 15px;">
+      <input type="text" class="form-control" name="endpoint_url" ng-model="$ctrl.state.formValues.url" placeholder="e.g. 10.0.0.10:9001 or tasks.portainer_agent:9001" required />
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-sm-12">
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm wizard-connect-button"
+        ng-disabled="!$ctrl.state.formValues.name || !$ctrl.state.formValues.url || $ctrl.state.actionInProgress"
+        ng-click="$ctrl.addKubernetesAgent()"
+        button-spinner="$ctrl.state.actionInProgress"
+      >
+        <span ng-hide="$ctrl.state.actionInProgress"><i class="fa fa-plug" style="margin-right: 5px;"></i> Connect </span>
+        <span ng-show="$ctrl.state.actionInProgress">Connecting environment...</span>
+      </button>
+    </div>
+  </div>
+</form>

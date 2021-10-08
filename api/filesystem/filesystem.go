@@ -43,6 +43,8 @@ const (
 	BinaryStorePath = "bin"
 	// EdgeJobStorePath represents the subfolder where schedule files are stored.
 	EdgeJobStorePath = "edge_jobs"
+	// DockerConfigPath represents the subfolder where docker configuration is stored.
+	DockerConfigPath = "docker_config"
 	// ExtensionRegistryManagementStorePath represents the subfolder where files related to the
 	// registry management extension are stored.
 	ExtensionRegistryManagementStorePath = "extensions"
@@ -100,12 +102,22 @@ func NewService(dataStorePath, fileStorePath string) (*Service, error) {
 		return nil, err
 	}
 
+	err = service.createDirectoryInStore(DockerConfigPath)
+	if err != nil {
+		return nil, err
+	}
+
 	return service, nil
 }
 
 // GetBinaryFolder returns the full path to the binary store on the filesystem
 func (service *Service) GetBinaryFolder() string {
 	return path.Join(service.fileStorePath, BinaryStorePath)
+}
+
+// GetDockerConfigPath returns the full path to the docker config store on the filesystem
+func (service *Service) GetDockerConfigPath() string {
+	return path.Join(service.fileStorePath, DockerConfigPath)
 }
 
 // RemoveDirectory removes a directory on the filesystem.
@@ -276,7 +288,7 @@ func (service *Service) StoreTLSFileFromBytes(folder string, fileType portainer.
 	return path.Join(service.fileStorePath, tlsFilePath), nil
 }
 
-// GetPathForTLSFile returns the absolute path to a specific TLS file for an endpoint.
+// GetPathForTLSFile returns the absolute path to a specific TLS file for an environment(endpoint).
 func (service *Service) GetPathForTLSFile(folder string, fileType portainer.TLSFileType) (string, error) {
 	var fileName string
 	switch fileType {

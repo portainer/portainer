@@ -46,6 +46,7 @@ class KubernetesNodeController {
     this.getEndpointsAsync = this.getEndpointsAsync.bind(this);
     this.updateNodeAsync = this.updateNodeAsync.bind(this);
     this.drainNodeAsync = this.drainNodeAsync.bind(this);
+    this.hasResourceUsageAccess = this.hasResourceUsageAccess.bind(this);
     this.getNodeUsageAsync = this.getNodeUsageAsync.bind(this);
   }
 
@@ -237,7 +238,7 @@ class KubernetesNodeController {
         });
       }
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve endpoints');
+      this.Notifications.error('Failure', err, 'Unable to retrieve environments');
     }
   }
 
@@ -252,7 +253,7 @@ class KubernetesNodeController {
         await this.drainNode();
       }
       this.Notifications.success('Node updated successfully');
-      this.$state.reload();
+      this.$state.reload(this.$state.current);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to update node');
     }
@@ -332,6 +333,10 @@ class KubernetesNodeController {
     return this.$async(this.getNodesAsync);
   }
 
+  hasResourceUsageAccess() {
+    return this.state.isAdmin && this.state.useServerMetrics;
+  }
+
   async getNodeUsageAsync() {
     try {
       const nodeName = this.$transition$.params().name;
@@ -397,7 +402,7 @@ class KubernetesNodeController {
       this.memoryLimit = KubernetesResourceReservationHelper.megaBytesValue(this.node.Memory);
       this.state.isContainPortainer = _.find(this.applications, { ApplicationName: 'portainer' });
 
-      if (this.state.isAdmin) {
+      if (this.hasResourceUsageAccess()) {
         await this.getNodeUsage();
       }
     } catch (err) {
@@ -412,9 +417,11 @@ class KubernetesNodeController {
   }
 
   async onInit() {
+    this.availabilities = KubernetesNodeAvailabilities;
+
     this.state = {
       isAdmin: this.Authentication.isAdmin(),
-      activeTab: 0,
+      activeTab: this.LocalStorage.getActiveTab('node'),
       currentName: this.$state.$current.name,
       dataLoading: true,
       eventsLoading: true,
@@ -428,14 +435,8 @@ class KubernetesNodeController {
       hasDuplicateLabelKeys: false,
       isDrainOperation: false,
       isContainPortainer: false,
-      useServerMetrics: false,
+      useServerMetrics: this.endpoint.Kubernetes.Configuration.UseServerMetrics,
     };
-
-    this.availabilities = KubernetesNodeAvailabilities;
-
-    this.state.useServerMetrics = this.endpoint.Kubernetes.Configuration.UseServerMetrics;
-
-    this.state.activeTab = this.LocalStorage.getActiveTab('node');
 
     await this.getNodes();
     await this.getEvents();

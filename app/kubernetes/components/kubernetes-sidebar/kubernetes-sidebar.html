@@ -1,0 +1,88 @@
+<sidebar-menu-item
+  path="kubernetes.dashboard"
+  path-params="{ endpointId: $ctrl.endpointId }"
+  icon-class="fa-tachometer-alt fa-fw"
+  class-name="sidebar-list"
+  data-cy="k8sSidebar-dashboard"
+>
+  Dashboard
+</sidebar-menu-item>
+
+<sidebar-menu-item
+  path="kubernetes.templates.custom"
+  path-params="{ endpointId: $ctrl.endpointId }"
+  icon-class="fa-rocket fa-fw"
+  class-name="sidebar-list"
+  data-cy="k8sSidebar-customTemplates"
+>
+  Custom Templates
+</sidebar-menu-item>
+
+<sidebar-menu-item
+  path="kubernetes.resourcePools"
+  path-params="{ endpointId: $ctrl.endpointId }"
+  icon-class="fa-layer-group fa-fw"
+  class-name="sidebar-list"
+  data-cy="k8sSidebar-namespaces"
+>
+  Namespaces
+</sidebar-menu-item>
+
+<sidebar-menu-item path="kubernetes.templates.helm" path-params="{ endpointId: $ctrl.endpointId }" icon-class="fa-dharmachakra fa-fw" class-name="sidebar-list">
+  Helm
+</sidebar-menu-item>
+
+<sidebar-menu-item
+  path="kubernetes.applications"
+  path-params="{ endpointId: $ctrl.endpointId }"
+  icon-class="fa-laptop-code fa-fw"
+  class-name="sidebar-list"
+  data-cy="k8sSidebar-applications"
+>
+  Applications
+</sidebar-menu-item>
+
+<sidebar-menu-item
+  path="kubernetes.configurations"
+  path-params="{ endpointId: $ctrl.endpointId }"
+  icon-class="fa-file-code fa-fw"
+  class-name="sidebar-list"
+  data-cy="k8sSidebar-configurations"
+>
+  ConfigMaps & Secrets
+</sidebar-menu-item>
+
+<sidebar-menu-item path="kubernetes.volumes" path-params="{ endpointId: $ctrl.endpointId }" icon-class="fa-database fa-fw" class-name="sidebar-list" data-cy="k8sSidebar-volumes">
+  Volumes
+</sidebar-menu-item>
+
+<sidebar-menu
+  icon-class="fa-server fa-fw"
+  label="Cluster"
+  path="kubernetes.cluster"
+  path-params="{ endpointId: $ctrl.endpointId }"
+  is-sidebar-open="$ctrl.isSidebarOpen"
+  children-paths="['kubernetes.cluster', 'portainer.endpoints.endpoint.kubernetesConfig', 'kubernetes.registries', 'kubernetes.registries.access']"
+>
+  <div ng-if="$ctrl.adminAccess">
+    <sidebar-menu-item
+      authorization="K8sClusterSetupRW"
+      path="portainer.endpoints.endpoint.kubernetesConfig"
+      path-params="{ id: $ctrl.endpointId }"
+      class-name="sidebar-sublist"
+      data-cy="k8sSidebar-setup"
+    >
+      Setup
+    </sidebar-menu-item>
+
+    <sidebar-menu-item
+      authorization="PortainerRegistryList"
+      path="kubernetes.registries"
+      path-params="{ endpointId: $ctrl.endpointId }"
+      class-name="sidebar-sublist"
+      data-cy="k8sSidebar-registries"
+    >
+      Registries
+    </sidebar-menu-item>
+  </div>
+</sidebar-menu>

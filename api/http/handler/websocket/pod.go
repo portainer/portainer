@@ -24,12 +24,12 @@ import (
 // @tags websocket
 // @accept json
 // @produce json
-// @param endpointId query int true "endpoint ID of the endpoint where the resource is located"
+// @param endpointId query int true "environment(endpoint) ID of the environment(endpoint) where the resource is located"
 // @param namespace query string true "namespace where the container is located"
 // @param podName query string true "name of the pod containing the container"
 // @param containerName query string true "name of the container"
 // @param command query string true "command to execute in the container"
-// @param token query string true "JWT token used for authentication against this endpoint"
+// @param token query string true "JWT token used for authentication against this environment(endpoint)"
 // @success 200
 // @failure 400
 // @failure 403
@@ -64,14 +64,14 @@ func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request)
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == bolterrors.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the endpoint associated to the stack inside the database", err}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the environment associated to the stack inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the endpoint associated to the stack inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the environment associated to the stack inside the database", err}
 	}
 
 	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
 	}
 
 	serviceAccountToken, isAdminToken, err := handler.getToken(r, endpoint, false)
@@ -135,21 +135,25 @@ func (handler *Handler) hijackPodExecStartOperation(
 	stdoutReader, stdoutWriter := io.Pipe()
 	defer stdoutWriter.Close()
 
+	// errorChan is used to propagate errors from the go routines to the caller.
 	errorChan := make(chan error, 1)
 	go streamFromWebsocketToWriter(websocketConn, stdinWriter, errorChan)
 	go streamFromReaderToWebsocket(websocketConn, stdoutReader, errorChan)
 
-	err = cli.StartExecProcess(serviceAccountToken, isAdminToken, namespace, podName, containerName, commandArray, stdinReader, stdoutWriter)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to start exec process inside container", err}
-	}
+	// StartExecProcess is a blocking operation which streams IO to/from pod;
+	// this must execute in asynchronously, since the websocketConn could return errors (e.g. client disconnects) before
+	// the blocking operation is completed.
+	go cli.StartExecProcess(serviceAccountToken, isAdminToken, namespace, podName, containerName, commandArray, stdinReader, stdoutWriter, errorChan)
 
 	err = <-errorChan
+
+	// websocket client successfully disconnected
 	if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseNoStatusReceived) {
 		log.Printf("websocket error: %s \n", err.Error())
+		return nil
 	}
 
-	return nil
+	return &httperror.HandlerError{http.StatusInternalServerError, "Unable to start exec process inside container", err}
 }
 
 func (handler *Handler) getToken(request *http.Request, endpoint *portainer.Endpoint, setLocalAdminToken bool) (string, bool, error) {

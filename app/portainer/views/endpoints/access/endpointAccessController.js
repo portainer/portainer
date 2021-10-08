@@ -1,5 +1,7 @@
 import angular from 'angular';
 
+import { RBAC_ROLES } from '@/portainer/feature-flags/feature-ids';
+
 class EndpointAccessController {
   /* @ngInject */
   constructor($state, $transition$, Notifications, EndpointService, GroupService, $async) {
@@ -9,6 +11,8 @@ class EndpointAccessController {
     this.EndpointService = EndpointService;
     this.GroupService = GroupService;
     this.$async = $async;
+
+    this.limitedFeature = RBAC_ROLES;
 
     this.updateAccess = this.updateAccess.bind(this);
     this.updateAccessAsync = this.updateAccessAsync.bind(this);
@@ -20,7 +24,7 @@ class EndpointAccessController {
       this.endpoint = await this.EndpointService.endpoint(this.$transition$.params().id);
       this.group = await this.GroupService.group(this.endpoint.GroupId);
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve endpoint information');
+      this.Notifications.error('Failure', err, 'Unable to retrieve environment information');
     }
   }
 
@@ -33,7 +37,7 @@ class EndpointAccessController {
       this.state.actionInProgress = true;
       await this.EndpointService.updateEndpoint(this.$transition$.params().id, this.endpoint);
       this.Notifications.success('Access successfully updated');
-      this.$state.reload();
+      this.$state.reload(this.$state.current);
     } catch (err) {
       this.state.actionInProgress = false;
       this.Notifications.error('Failure', err, 'Unable to update accesses');

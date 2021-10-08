@@ -12,18 +12,14 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-const shellPodImage = "portainer/kubectl-shell"
-
 // CreateUserShellPod will create a kubectl based shell for the specified user by mounting their respective service account.
 // The lifecycle of the pod is managed in this function; this entails management of the following pod operations:
 // - The shell pod will be scoped to specified service accounts access permissions
 // - The shell pod will be automatically removed if it's not ready after specified period of time
 // - The shell pod will be automatically removed after a specified max life (prevent zombie pods)
 // - The shell pod will be automatically removed if request is cancelled (or client closes websocket connection)
-func (kcl *KubeClient) CreateUserShellPod(ctx context.Context, serviceAccountName string) (*portainer.KubernetesShellPod, error) {
-	// Schedule the pod for automatic removal
-	maxPodKeepAlive := 1 * time.Hour
-	maxPodKeepAliveSecondsStr := fmt.Sprintf("%d", int(maxPodKeepAlive.Seconds()))
+func (kcl *KubeClient) CreateUserShellPod(ctx context.Context, serviceAccountName, shellPodImage string) (*portainer.KubernetesShellPod, error) {
+	maxPodKeepAliveSecondsStr := fmt.Sprintf("%d", int(portainer.WebSocketKeepAlive.Seconds()))
 
 	podPrefix := userShellPodPrefix(serviceAccountName)
 
@@ -81,7 +77,7 @@ func (kcl *KubeClient) CreateUserShellPod(ctx context.Context, serviceAccountNam
 	// Handle pod lifecycle/cleanup - terminate pod after maxPodKeepAlive or upon request (long-lived) cancellation
 	go func() {
 		select {
-		case <-time.After(maxPodKeepAlive):
+		case <-time.After(portainer.WebSocketKeepAlive):
 			log.Println("[DEBUG] [internal,kubernetes/pod] [message: pod removal schedule duration exceeded]")
 			kcl.cli.CoreV1().Pods(portainerNamespace).Delete(shellPod.Name, nil)
 		case <-ctx.Done():

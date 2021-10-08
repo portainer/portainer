@@ -11,7 +11,7 @@ const (
 	BucketName = "endpoints"
 )
 
-// Service represents a service for managing endpoint data.
+// Service represents a service for managing environment(endpoint) data.
 type Service struct {
 	connection *internal.DbConnection
 }
@@ -28,7 +28,7 @@ func NewService(connection *internal.DbConnection) (*Service, error) {
 	}, nil
 }
 
-// Endpoint returns an endpoint by ID.
+// Endpoint returns an environment(endpoint) by ID.
 func (service *Service) Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, error) {
 	var endpoint portainer.Endpoint
 	identifier := internal.Itob(int(ID))
@@ -41,19 +41,19 @@ func (service *Service) Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, 
 	return &endpoint, nil
 }
 
-// UpdateEndpoint updates an endpoint.
+// UpdateEndpoint updates an environment(endpoint).
 func (service *Service) UpdateEndpoint(ID portainer.EndpointID, endpoint *portainer.Endpoint) error {
 	identifier := internal.Itob(int(ID))
 	return internal.UpdateObject(service.connection, BucketName, identifier, endpoint)
 }
 
-// DeleteEndpoint deletes an endpoint.
+// DeleteEndpoint deletes an environment(endpoint).
 func (service *Service) DeleteEndpoint(ID portainer.EndpointID) error {
 	identifier := internal.Itob(int(ID))
 	return internal.DeleteObject(service.connection, BucketName, identifier)
 }
 
-// Endpoints return an array containing all the endpoints.
+// Endpoints return an array containing all the environments(endpoints).
 func (service *Service) Endpoints() ([]portainer.Endpoint, error) {
 	var endpoints = make([]portainer.Endpoint, 0)
 
@@ -76,12 +76,12 @@ func (service *Service) Endpoints() ([]portainer.Endpoint, error) {
 	return endpoints, err
 }
 
-// CreateEndpoint assign an ID to a new endpoint and saves it.
+// CreateEndpoint assign an ID to a new environment(endpoint) and saves it.
 func (service *Service) CreateEndpoint(endpoint *portainer.Endpoint) error {
 	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
-		// We manually manage sequences for endpoints
+		// We manually manage sequences for environments(endpoints)
 		err := bucket.SetSequence(uint64(endpoint.ID))
 		if err != nil {
 			return err
@@ -96,12 +96,12 @@ func (service *Service) CreateEndpoint(endpoint *portainer.Endpoint) error {
 	})
 }
 
-// GetNextIdentifier returns the next identifier for an endpoint.
+// GetNextIdentifier returns the next identifier for an environment(endpoint).
 func (service *Service) GetNextIdentifier() int {
 	return internal.GetNextIdentifier(service.connection, BucketName)
 }
 
-// Synchronize creates, updates and deletes endpoints inside a single transaction.
+// Synchronize creates, updates and deletes environments(endpoints) inside a single transaction.
 func (service *Service) Synchronize(toCreate, toUpdate, toDelete []*portainer.Endpoint) error {
 	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))

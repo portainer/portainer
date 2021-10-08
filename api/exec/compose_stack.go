@@ -1,13 +1,17 @@
 package exec
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path"
-	"regexp"
+	"path/filepath"
 	"strings"
 
-	wrapper "github.com/portainer/docker-compose-wrapper"
+	"github.com/pkg/errors"
+
+	libstack "github.com/portainer/docker-compose-wrapper"
+	"github.com/portainer/docker-compose-wrapper/compose"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy"
@@ -16,41 +20,33 @@ import (
 
 // ComposeStackManager is a wrapper for docker-compose binary
 type ComposeStackManager struct {
-	wrapper      *wrapper.ComposeWrapper
-	configPath   string
+	deployer     libstack.Deployer
 	proxyManager *proxy.Manager
 }
 
 // NewComposeStackManager returns a docker-compose wrapper if corresponding binary present, otherwise nil
 func NewComposeStackManager(binaryPath string, configPath string, proxyManager *proxy.Manager) (*ComposeStackManager, error) {
-	wrap, err := wrapper.NewComposeWrapper(binaryPath)
+	deployer, err := compose.NewComposeDeployer(binaryPath, configPath)
 	if err != nil {
 		return nil, err
 	}
 
 	return &ComposeStackManager{
-		wrapper:      wrap,
+		deployer:     deployer,
 		proxyManager: proxyManager,
-		configPath:   configPath,
 	}, nil
 }
 
-// NormalizeStackName returns a new stack name with unsupported characters replaced
-func (w *ComposeStackManager) NormalizeStackName(name string) string {
-	r := regexp.MustCompile("[^a-z0-9]+")
-	return r.ReplaceAllString(strings.ToLower(name), "")
-}
-
 // ComposeSyntaxMaxVersion returns the maximum supported version of the docker compose syntax
-func (w *ComposeStackManager) ComposeSyntaxMaxVersion() string {
+func (manager *ComposeStackManager) ComposeSyntaxMaxVersion() string {
 	return portainer.ComposeSyntaxMaxVersion
 }
 
 // Up builds, (re)creates and starts containers in the background. Wraps `docker-compose up -d` command
-func (w *ComposeStackManager) Up(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
-	url, proxy, err := w.fetchEndpointProxy(endpoint)
+func (manager *ComposeStackManager) Up(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+	url, proxy, err := manager.fetchEndpointProxy(endpoint)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to fetch environment proxy")
 	}
 
 	if proxy != nil {
@@ -59,18 +55,17 @@ func (w *ComposeStackManager) Up(stack *portainer.Stack, endpoint *portainer.End
 
 	envFilePath, err := createEnvFile(stack)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to create env file")
 	}
 
-	filePath := stackFilePath(stack)
-
-	_, err = w.wrapper.Up([]string{filePath}, url, stack.Name, envFilePath, w.configPath)
-	return err
+	filePaths := getStackFiles(stack)
+	err = manager.deployer.Deploy(ctx, stack.ProjectPath, url, stack.Name, filePaths, envFilePath)
+	return errors.Wrap(err, "failed to deploy a stack")
 }
 
 // Down stops and removes containers, networks, images, and volumes. Wraps `docker-compose down --remove-orphans` command
-func (w *ComposeStackManager) Down(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
-	url, proxy, err := w.fetchEndpointProxy(endpoint)
+func (manager *ComposeStackManager) Down(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+	url, proxy, err := manager.fetchEndpointProxy(endpoint)
 	if err != nil {
 		return err
 	}
@@ -78,27 +73,27 @@ func (w *ComposeStackManager) Down(stack *portainer.Stack, endpoint *portainer.E
 		defer proxy.Close()
 	}
 
-	filePath := stackFilePath(stack)
-
-	_, err = w.wrapper.Down([]string{filePath}, url, stack.Name)
-	return err
+	filePaths := getStackFiles(stack)
+	err = manager.deployer.Remove(ctx, stack.ProjectPath, url, stack.Name, filePaths)
+	return errors.Wrap(err, "failed to remove a stack")
 }
 
-func stackFilePath(stack *portainer.Stack) string {
-	return path.Join(stack.ProjectPath, stack.EntryPoint)
+// NormalizeStackName returns a new stack name with unsupported characters replaced
+func (manager *ComposeStackManager) NormalizeStackName(name string) string {
+	return stackNameNormalizeRegex.ReplaceAllString(strings.ToLower(name), "")
 }
 
-func (w *ComposeStackManager) fetchEndpointProxy(endpoint *portainer.Endpoint) (string, *factory.ProxyServer, error) {
+func (manager *ComposeStackManager) fetchEndpointProxy(endpoint *portainer.Endpoint) (string, *factory.ProxyServer, error) {
 	if strings.HasPrefix(endpoint.URL, "unix://") || strings.HasPrefix(endpoint.URL, "npipe://") {
 		return "", nil, nil
 	}
 
-	proxy, err := w.proxyManager.CreateComposeProxyServer(endpoint)
+	proxy, err := manager.proxyManager.CreateAgentProxyServer(endpoint)
 	if err != nil {
 		return "", nil, err
 	}
 
-	return fmt.Sprintf("http://127.0.0.1:%d", proxy.Port), proxy, nil
+	return fmt.Sprintf("tcp://127.0.0.1:%d", proxy.Port), proxy, nil
 }
 
 func createEnvFile(stack *portainer.Stack) (string, error) {
@@ -118,5 +113,29 @@ func createEnvFile(stack *portainer.Stack) (string, error) {
 	}
 	envfile.Close()
 
-	return envFilePath, nil
+	return "stack.env", nil
+}
+
+// getStackFiles returns list of stack's confile file paths.
+// items in the list would be sanitized according to following criterias:
+// 1. no empty paths
+// 2. no "../xxx" paths that are trying to escape stack folder
+// 3. no dir paths
+// 4. root paths would be made relative
+func getStackFiles(stack *portainer.Stack) []string {
+	paths := make([]string, 0, len(stack.AdditionalFiles)+1)
+
+	for _, p := range append([]string{stack.EntryPoint}, stack.AdditionalFiles...) {
+		if strings.HasPrefix(p, "/") {
+			p = `.` + p
+		}
+
+		if p == `` || p == `.` || strings.HasPrefix(p, `..`) || strings.HasSuffix(p, string(filepath.Separator)) {
+			continue
+		}
+
+		paths = append(paths, p)
+	}
+
+	return paths
 }

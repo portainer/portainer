@@ -4,7 +4,7 @@
       Name
     </label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="group_name" name="group_name" ng-model="$ctrl.model.Name" required auto-focus />
+      <input type="text" class="form-control" id="group_name" name="group_name" ng-model="$ctrl.model.Name" required auto-focus data-cy="edgeGroupCreate-groupNameInput" />
     </div>
   </div>
   <div class="form-group" ng-show="EdgeGroupForm.group_name.$invalid">
@@ -30,7 +30,7 @@
             <i class="fa fa-list-ol" aria-hidden="true" style="margin-right: 2px;"></i>
             Static
           </div>
-          <p>Manually select Edge endpoints</p>
+          <p>Manually select Edge environments</p>
         </label>
       </div>
       <div class="boxselector">
@@ -40,7 +40,7 @@
             <i class="fa fa-tags" aria-hidden="true" style="margin-right: 2px;"></i>
             Dynamic
           </div>
-          <p>Automatically associate endpoints via tags</p>
+          <p>Automatically associate environments via tags</p>
         </label>
       </div>
     </div>
@@ -49,9 +49,9 @@
   <!-- StaticGroup -->
   <div ng-if="!$ctrl.model.Dynamic">
     <div ng-if="!$ctrl.noEndpoints">
-      <!-- endpoints -->
+      <!-- environments -->
       <div class="col-sm-12 form-section-title">
-        Associated endpoints
+        Associated environments
       </div>
       <div class="form-group">
         <associated-endpoints-selector
@@ -65,7 +65,9 @@
       </div>
     </div>
     <div class="form-group" ng-if="$ctrl.noEndpoints">
-      <div class="col-sm-12 small text-muted"> No Edge endpoints are available. Head over to the <a ui-sref="portainer.endpoints">Endpoints view</a> to add endpoints. </div>
+      <div class="col-sm-12 small text-muted">
+        No Edge environments are available. Head over to the <a ui-sref="portainer.endpoints">Environments view</a> to add environments.
+      </div>
     </div>
   </div>
   <!-- !StaticGroup -->
@@ -84,7 +86,7 @@
               <i class="fa fa-tag" aria-hidden="true" style="margin-right: 2px;"></i>
               Partial match
             </div>
-            <p>Associate any endpoint matching at least one of the selected tags</p>
+            <p>Associate any environment matching at least one of the selected tags</p>
           </label>
         </div>
         <div class="boxselector">
@@ -94,7 +96,7 @@
               <i class="fa fa-tag" aria-hidden="true" style="margin-right: 2px;"></i>
               Full match
             </div>
-            <p>Associate any endpoint matching all of the selected tags</p>
+            <p>Associate any environment matching all of the selected tags</p>
           </label>
         </div>
       </div>
@@ -106,7 +108,7 @@
       </div>
     </div>
     <div class="col-sm-12 form-section-title">
-      Associated endpoints by tags
+      Associated environments by tags
     </div>
     <div class="col-sm-12 form-group">
       <group-association-table
@@ -138,6 +140,7 @@
         class="btn btn-primary btn-sm"
         ng-disabled="$ctrl.actionInProgress || !EdgeGroupForm.$valid || (!$ctrl.model.Dynamic && !$ctrl.model.Endpoints.length) || ($ctrl.model.Dynamic && !$ctrl.model.TagIds.length)"
         button-spinner="$ctrl.actionInProgress"
+        data-cy="edgeGroupCreate-addGroupButton"
       >
         <span ng-hide="$ctrl.actionInProgress">{{ $ctrl.formActionLabel }}</span>
         <span ng-show="$ctrl.actionInProgress">In progress...</span>

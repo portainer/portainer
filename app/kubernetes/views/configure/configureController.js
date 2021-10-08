@@ -5,7 +5,8 @@ import { KubernetesFormValidationReferences } from 'Kubernetes/models/applicatio
 import { KubernetesIngressClass } from 'Kubernetes/ingress/models';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
-
+import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
+import { K8S_SETUP_DEFAULT } from '@/portainer/feature-flags/feature-ids';
 class KubernetesConfigureController {
   /* #region  CONSTRUCTOR */
 
@@ -18,7 +19,6 @@ class KubernetesConfigureController {
     EndpointService,
     EndpointProvider,
     ModalService,
-    KubernetesNamespaceHelper,
     KubernetesResourcePoolService,
     KubernetesIngressService,
     KubernetesMetricsService
@@ -30,7 +30,6 @@ class KubernetesConfigureController {
     this.EndpointService = EndpointService;
     this.EndpointProvider = EndpointProvider;
     this.ModalService = ModalService;
-    this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesIngressService = KubernetesIngressService;
     this.KubernetesMetricsService = KubernetesMetricsService;
@@ -39,6 +38,7 @@ class KubernetesConfigureController {
 
     this.onInit = this.onInit.bind(this);
     this.configureAsync = this.configureAsync.bind(this);
+    this.limitedFeature = K8S_SETUP_DEFAULT;
   }
   /* #endregion */
 
@@ -147,8 +147,7 @@ class KubernetesConfigureController {
       const allResourcePools = await this.KubernetesResourcePoolService.get();
       const resourcePools = _.filter(
         allResourcePools,
-        (resourcePool) =>
-          !this.KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name) && !this.KubernetesNamespaceHelper.isDefaultNamespace(resourcePool.Namespace.Name)
+        (resourcePool) => !KubernetesNamespaceHelper.isSystemNamespace(resourcePool.Namespace.Name) && !KubernetesNamespaceHelper.isDefaultNamespace(resourcePool.Namespace.Name)
       );
 
       ingressesToDel.forEach((ingress) => {
@@ -239,6 +238,10 @@ class KubernetesConfigureController {
   }
   /* #endregion */
 
+  restrictDefaultToggledOn() {
+    return this.formValues.RestrictDefaultNamespace && !this.oldFormValues.RestrictDefaultNamespace;
+  }
+
   /* #region  ON INIT */
   async onInit() {
     this.state = {
@@ -289,8 +292,10 @@ class KubernetesConfigureController {
         ic.NeedsDeletion = false;
         return ic;
       });
+
+      this.oldFormValues = Object.assign({}, this.formValues);
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve endpoint configuration');
+      this.Notifications.error('Failure', err, 'Unable to retrieve environment configuration');
     } finally {
       this.state.viewReady = true;
     }

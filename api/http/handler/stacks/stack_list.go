@@ -1,8 +1,9 @@
 package stacks
 
 import (
-	httperrors "github.com/portainer/portainer/api/http/errors"
 	"net/http"
+
+	httperrors "github.com/portainer/portainer/api/http/errors"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -41,7 +42,7 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 
 	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environments from database", err}
 	}
 
 	stacks, err := handler.DataStore.Stack().Stacks()
@@ -78,6 +79,13 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 		}
 
 		stacks = authorization.FilterAuthorizedStacks(stacks, user, userTeamIDs)
+	}
+
+	for _, stack := range stacks {
+		if stack.GitConfig != nil && stack.GitConfig.Authentication != nil && stack.GitConfig.Authentication.Password != "" {
+			// sanitize password in the http response to minimise possible security leaks
+			stack.GitConfig.Authentication.Password = ""
+		}
 	}
 
 	return response.JSON(w, stacks)

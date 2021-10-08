@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
+import { TEMPLATE_NAME_VALIDATION_REGEX } from '@/constants';
 
 class CreateCustomTemplateViewController {
   /* @ngInject */
@@ -30,6 +31,7 @@ class CreateCustomTemplateViewController {
       ComposeFilePathInRepository: 'docker-compose.yml',
       Description: '',
       Note: '',
+      Logo: '',
       Platform: 1,
       Type: 1,
       AccessControlData: new AccessControlFormData(),
@@ -42,7 +44,9 @@ class CreateCustomTemplateViewController {
       fromStack: false,
       loading: true,
       isEditorDirty: false,
+      templateNameRegex: TEMPLATE_NAME_VALIDATION_REGEX,
     };
+
     this.templates = [];
 
     this.createCustomTemplate = this.createCustomTemplate.bind(this);
@@ -175,7 +179,7 @@ class CreateCustomTemplateViewController {
     }
 
     try {
-      this.templates = await this.CustomTemplateService.customTemplates();
+      this.templates = await this.CustomTemplateService.customTemplates([1, 2]);
     } catch (err) {
       this.Notifications.error('Failure loading', err, 'Failed loading custom templates');
     }

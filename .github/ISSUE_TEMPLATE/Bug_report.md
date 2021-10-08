@@ -4,7 +4,6 @@ about: Create a bug report
 title: ''
 labels: bug/need-confirmation, kind/bug
 assignees: ''
-
 ---
 
 <!--
@@ -31,7 +30,7 @@ A clear and concise description of what you expected to happen.
 
 **Portainer Logs**
 Provide the logs of your Portainer container or Service.
-You can see how [here](https://documentation.portainer.io/archive/1.23.2/faq/#how-do-i-get-the-logs-from-portainer)
+You can see how [here](https://documentation.portainer.io/r/portainer-logs)
 
 **Steps to reproduce the issue:**
 
@@ -46,7 +45,7 @@ You can see how [here](https://documentation.portainer.io/archive/1.23.2/faq/#ho
 - Docker version (managed by Portainer):
 - Kubernetes version (managed by Portainer):
 - Platform (windows/linux):
-- Command used to start Portainer (`docker run -p 9000:9000 portainer/portainer`):
+- Command used to start Portainer (`docker run -p 9443:9443 portainer/portainer`):
 - Browser:
 - Use Case (delete as appropriate): Using Portainer at Home, Using Portainer in a Commerical setup.
 - Have you reviewed our technical documentation and knowledge base? Yes/No

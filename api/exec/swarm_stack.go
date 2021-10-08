@@ -8,17 +8,17 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"regexp"
 	"runtime"
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/stackutils"
 )
 
 // SwarmStackManager represents a service for managing stacks.
 type SwarmStackManager struct {
 	binaryPath           string
-	dataPath             string
+	configPath           string
 	signatureService     portainer.DigitalSignatureService
 	fileService          portainer.FileService
 	reverseTunnelService portainer.ReverseTunnelService
@@ -26,16 +26,16 @@ type SwarmStackManager struct {
 
 // NewSwarmStackManager initializes a new SwarmStackManager service.
 // It also updates the configuration of the Docker CLI binary.
-func NewSwarmStackManager(binaryPath, dataPath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService, reverseTunnelService portainer.ReverseTunnelService) (*SwarmStackManager, error) {
+func NewSwarmStackManager(binaryPath, configPath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService, reverseTunnelService portainer.ReverseTunnelService) (*SwarmStackManager, error) {
 	manager := &SwarmStackManager{
 		binaryPath:           binaryPath,
-		dataPath:             dataPath,
+		configPath:           configPath,
 		signatureService:     signatureService,
 		fileService:          fileService,
 		reverseTunnelService: reverseTunnelService,
 	}
 
-	err := manager.updateDockerCLIConfiguration(dataPath)
+	err := manager.updateDockerCLIConfiguration(manager.configPath)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func NewSwarmStackManager(binaryPath, dataPath string, signatureService portaine
 
 // Login executes the docker login command against a list of registries (including DockerHub).
 func (manager *SwarmStackManager) Login(registries []portainer.Registry, endpoint *portainer.Endpoint) {
-	command, args := manager.prepareDockerCommandAndArgs(manager.binaryPath, manager.dataPath, endpoint)
+	command, args := manager.prepareDockerCommandAndArgs(manager.binaryPath, manager.configPath, endpoint)
 	for _, registry := range registries {
 		if registry.Authentication {
 			registryArgs := append(args, "login", "--username", registry.Username, "--password", registry.Password, registry.URL)
@@ -56,34 +56,35 @@ func (manager *SwarmStackManager) Login(registries []portainer.Registry, endpoin
 
 // Logout executes the docker logout command.
 func (manager *SwarmStackManager) Logout(endpoint *portainer.Endpoint) error {
-	command, args := manager.prepareDockerCommandAndArgs(manager.binaryPath, manager.dataPath, endpoint)
+	command, args := manager.prepareDockerCommandAndArgs(manager.binaryPath, manager.configPath, endpoint)
 	args = append(args, "logout")
 	return runCommandAndCaptureStdErr(command, args, nil, "")
 }
 
 // Deploy executes the docker stack deploy command.
 func (manager *SwarmStackManager) Deploy(stack *portainer.Stack, prune bool, endpoint *portainer.Endpoint) error {
-	stackFilePath := path.Join(stack.ProjectPath, stack.EntryPoint)
-	command, args := manager.prepareDockerCommandAndArgs(manager.binaryPath, manager.dataPath, endpoint)
+	filePaths := stackutils.GetStackFilePaths(stack)
+	command, args := manager.prepareDockerCommandAndArgs(manager.binaryPath, manager.configPath, endpoint)
 
 	if prune {
-		args = append(args, "stack", "deploy", "--prune", "--with-registry-auth", "--compose-file", stackFilePath, stack.Name)
+		args = append(args, "stack", "deploy", "--prune", "--with-registry-auth")
 	} else {
-		args = append(args, "stack", "deploy", "--with-registry-auth", "--compose-file", stackFilePath, stack.Name)
+		args = append(args, "stack", "deploy", "--with-registry-auth")
 	}
+
+	args = configureFilePaths(args, filePaths)
+	args = append(args, stack.Name)
 
 	env := make([]string, 0)
 	for _, envvar := range stack.Env {
 		env = append(env, envvar.Name+"="+envvar.Value)
 	}
-
-	stackFolder := path.Dir(stackFilePath)
-	return runCommandAndCaptureStdErr(command, args, env, stackFolder)
+	return runCommandAndCaptureStdErr(command, args, env, stack.ProjectPath)
 }
 
 // Remove executes the docker stack rm command.
 func (manager *SwarmStackManager) Remove(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
-	command, args := manager.prepareDockerCommandAndArgs(manager.binaryPath, manager.dataPath, endpoint)
+	command, args := manager.prepareDockerCommandAndArgs(manager.binaryPath, manager.configPath, endpoint)
 	args = append(args, "stack", "rm", stack.Name)
 	return runCommandAndCaptureStdErr(command, args, nil, "")
 }
@@ -107,7 +108,7 @@ func runCommandAndCaptureStdErr(command string, args []string, env []string, wor
 	return nil
 }
 
-func (manager *SwarmStackManager) prepareDockerCommandAndArgs(binaryPath, dataPath string, endpoint *portainer.Endpoint) (string, []string) {
+func (manager *SwarmStackManager) prepareDockerCommandAndArgs(binaryPath, configPath string, endpoint *portainer.Endpoint) (string, []string) {
 	// Assume Linux as a default
 	command := path.Join(binaryPath, "docker")
 
@@ -116,7 +117,7 @@ func (manager *SwarmStackManager) prepareDockerCommandAndArgs(binaryPath, dataPa
 	}
 
 	args := make([]string, 0)
-	args = append(args, "--config", dataPath)
+	args = append(args, "--config", configPath)
 
 	endpointURL := endpoint.URL
 	if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
@@ -143,8 +144,8 @@ func (manager *SwarmStackManager) prepareDockerCommandAndArgs(binaryPath, dataPa
 	return command, args
 }
 
-func (manager *SwarmStackManager) updateDockerCLIConfiguration(dataPath string) error {
-	configFilePath := path.Join(dataPath, "config.json")
+func (manager *SwarmStackManager) updateDockerCLIConfiguration(configPath string) error {
+	configFilePath := path.Join(configPath, "config.json")
 	config, err := manager.retrieveConfigurationFromDisk(configFilePath)
 	if err != nil {
 		return err
@@ -188,6 +189,12 @@ func (manager *SwarmStackManager) retrieveConfigurationFromDisk(path string) (ma
 }
 
 func (manager *SwarmStackManager) NormalizeStackName(name string) string {
-	r := regexp.MustCompile("[^a-z0-9]+")
-	return r.ReplaceAllString(strings.ToLower(name), "")
+	return stackNameNormalizeRegex.ReplaceAllString(strings.ToLower(name), "")
+}
+
+func configureFilePaths(args []string, filePaths []string) []string {
+	for _, path := range filePaths {
+		args = append(args, "--compose-file", path)
+	}
+	return args
 }

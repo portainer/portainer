@@ -57,7 +57,7 @@ angular.module('portainer.app').factory('EndpointService', [
         })
         .catch(function error(err) {
           deferred.notify({ upload: false });
-          deferred.reject({ msg: 'Unable to update endpoint', err: err });
+          deferred.reject({ msg: 'Unable to update environment', err: err });
         });
       return deferred.promise;
     };
@@ -84,7 +84,7 @@ angular.module('portainer.app').factory('EndpointService', [
           deferred.resolve(response.data);
         })
         .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to create endpoint', err: err });
+          deferred.reject({ msg: 'Unable to create environment', err: err });
         });
 
       return deferred.promise;
@@ -131,21 +131,21 @@ angular.module('portainer.app').factory('EndpointService', [
           deferred.resolve(response.data);
         })
         .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to create endpoint', err: err });
+          deferred.reject({ msg: 'Unable to create environment', err: err });
         });
 
       return deferred.promise;
     };
 
-    service.createLocalKubernetesEndpoint = function (name = 'local') {
+    service.createLocalKubernetesEndpoint = function (name = 'local', tagIds = []) {
       var deferred = $q.defer();
 
-      FileUploadService.createEndpoint(name, PortainerEndpointCreationTypes.LocalKubernetesEnvironment, '', '', 1, [], true, true, true)
+      FileUploadService.createEndpoint(name, PortainerEndpointCreationTypes.LocalKubernetesEnvironment, '', '', 1, tagIds, true, true, true)
         .then(function success(response) {
           deferred.resolve(response.data);
         })
         .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to create endpoint', err: err });
+          deferred.reject({ msg: 'Unable to create environment', err: err });
         });
 
       return deferred.promise;

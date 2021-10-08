@@ -2,10 +2,11 @@ package migrator
 
 import (
 	"fmt"
+	"log"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
-	endpointutils "github.com/portainer/portainer/api/internal/endpoint"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 	snapshotutils "github.com/portainer/portainer/api/internal/snapshot"
 )
 
@@ -27,6 +28,14 @@ func (m *Migrator) migrateDBVersionToDB32() error {
 
 	err = m.updateVolumeResourceControlToDB32()
 	if err != nil {
+		return err
+	}
+
+	if err := m.kubeconfigExpiryToDB32(); err != nil {
+		return err
+	}
+
+	if err := m.helmRepositoryURLToDB32(); err != nil {
 		return err
 	}
 
@@ -140,7 +149,7 @@ func (m *Migrator) updateDockerhubToDB32() error {
 func (m *Migrator) updateVolumeResourceControlToDB32() error {
 	endpoints, err := m.endpointService.Endpoints()
 	if err != nil {
-		return fmt.Errorf("failed fetching endpoints: %w", err)
+		return fmt.Errorf("failed fetching environments: %w", err)
 	}
 
 	resourceControls, err := m.resourceControlService.ResourceControls()
@@ -165,6 +174,7 @@ func (m *Migrator) updateVolumeResourceControlToDB32() error {
 
 		totalSnapshots := len(endpoint.Snapshots)
 		if totalSnapshots == 0 {
+			log.Println("[DEBUG] [volume migration] [message: no snapshot found]")
 			continue
 		}
 
@@ -172,11 +182,13 @@ func (m *Migrator) updateVolumeResourceControlToDB32() error {
 
 		endpointDockerID, err := snapshotutils.FetchDockerID(snapshot)
 		if err != nil {
-			return fmt.Errorf("failed fetching endpoint docker id: %w", err)
+			log.Printf("[WARN] [bolt,migrator,v31] [message: failed fetching environment docker id] [err: %s]", err)
+			continue
 		}
 
 		if volumesData, done := snapshot.SnapshotRaw.Volumes.(map[string]interface{}); done {
 			if volumesData["Volumes"] == nil {
+				log.Println("[DEBUG] [volume migration] [message: no volume data found]")
 				continue
 			}
 
@@ -197,7 +209,7 @@ func (m *Migrator) updateVolumeResourceControlToDB32() error {
 			if err != nil {
 				return fmt.Errorf("failed deleting resource control %d: %w", resourceControl.ID, err)
 			}
-
+			log.Printf("[DEBUG] [volume migration] [message: legacy resource control(%s) has been deleted]", resourceControl.ResourceID)
 		}
 	}
 
@@ -208,7 +220,11 @@ func findResourcesToUpdateForDB32(dockerID string, volumesData map[string]interf
 	volumes := volumesData["Volumes"].([]interface{})
 	for _, volumeMeta := range volumes {
 		volume := volumeMeta.(map[string]interface{})
-		volumeName := volume["Name"].(string)
+		volumeName, nameExist := volume["Name"].(string)
+		if !nameExist {
+			continue
+		}
+
 		oldResourceID := fmt.Sprintf("%s%s", volumeName, volume["CreatedAt"].(string))
 		resourceControl, ok := volumeResourceControls[oldResourceID]
 
@@ -227,4 +243,22 @@ func (m *Migrator) updateAdminGroupSearchSettingsToDB32() error {
 		legacySettings.LDAPSettings.AdminGroupSearchSettings = []portainer.LDAPGroupSearchSettings{}
 	}
 	return m.settingsService.UpdateSettings(legacySettings)
+}
+
+func (m *Migrator) kubeconfigExpiryToDB32() error {
+	settings, err := m.settingsService.Settings()
+	if err != nil {
+		return err
+	}
+	settings.KubeconfigExpiry = portainer.DefaultKubeconfigExpiry
+	return m.settingsService.UpdateSettings(settings)
+}
+
+func (m *Migrator) helmRepositoryURLToDB32() error {
+	settings, err := m.settingsService.Settings()
+	if err != nil {
+		return err
+	}
+	settings.HelmRepositoryURL = portainer.DefaultHelmRepositoryURL
+	return m.settingsService.UpdateSettings(settings)
 }

@@ -8,7 +8,7 @@ context('Init admin user test', () => {
       cy.url().should('include', 'init/endpoint');
       cy.saveLocalStorage();
     });
-    it('Select local docker endpoint and init', function () {
+    it('Select local docker environment and init', function () {
       cy.initEndpoint();
       cy.url().should('include', 'home');
     });

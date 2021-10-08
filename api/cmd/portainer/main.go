@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 
-	wrapper "github.com/portainer/docker-compose-wrapper"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt"
 	"github.com/portainer/portainer/api/chisel"
@@ -14,6 +13,7 @@ import (
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/docker"
 
+	"github.com/portainer/libhelm"
 	"github.com/portainer/portainer/api/exec"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/git"
@@ -29,8 +29,9 @@ import (
 	"github.com/portainer/portainer/api/kubernetes"
 	kubecli "github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/ldap"
-	"github.com/portainer/portainer/api/libcompose"
 	"github.com/portainer/portainer/api/oauth"
+	"github.com/portainer/portainer/api/scheduler"
+	"github.com/portainer/portainer/api/stacks"
 )
 
 func initCLI() *portainer.CLIFlags {
@@ -55,15 +56,22 @@ func initFileService(dataStorePath string) portainer.FileService {
 	return fileService
 }
 
-func initDataStore(dataStorePath string, fileService portainer.FileService, shutdownCtx context.Context) portainer.DataStore {
-	store, err := bolt.NewStore(dataStorePath, fileService)
-	if err != nil {
-		log.Fatalf("failed creating data store: %v", err)
-	}
-
-	err = store.Open()
+func initDataStore(dataStorePath string, rollback bool, fileService portainer.FileService, shutdownCtx context.Context) portainer.DataStore {
+	store := bolt.NewStore(dataStorePath, fileService)
+	err := store.Open()
 	if err != nil {
 		log.Fatalf("failed opening store: %v", err)
+	}
+
+	if rollback {
+		err := store.Rollback(false)
+		if err != nil {
+			log.Fatalf("failed rolling back: %s", err)
+		}
+
+		log.Println("Exiting rollback")
+		os.Exit(0)
+		return nil
 	}
 
 	err = store.Init()
@@ -85,26 +93,25 @@ func shutdownDatastore(shutdownCtx context.Context, datastore portainer.DataStor
 	datastore.Close()
 }
 
-func initComposeStackManager(assetsPath string, dataStorePath string, reverseTunnelService portainer.ReverseTunnelService, proxyManager *proxy.Manager) portainer.ComposeStackManager {
-	composeWrapper, err := exec.NewComposeStackManager(assetsPath, dataStorePath, proxyManager)
+func initComposeStackManager(assetsPath string, configPath string, reverseTunnelService portainer.ReverseTunnelService, proxyManager *proxy.Manager) portainer.ComposeStackManager {
+	composeWrapper, err := exec.NewComposeStackManager(assetsPath, configPath, proxyManager)
 	if err != nil {
-		if err == wrapper.ErrBinaryNotFound {
-			log.Printf("[INFO] [message: docker-compose binary not found, falling back to libcompose]")
-			return libcompose.NewComposeStackManager(dataStorePath, reverseTunnelService)
-		}
-
-		log.Fatalf("failed initalizing compose stack manager; err=%s", err)
+		log.Fatalf("failed creating compose manager: %s", err)
 	}
 
 	return composeWrapper
 }
 
-func initSwarmStackManager(assetsPath string, dataStorePath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService, reverseTunnelService portainer.ReverseTunnelService) (portainer.SwarmStackManager, error) {
-	return exec.NewSwarmStackManager(assetsPath, dataStorePath, signatureService, fileService, reverseTunnelService)
+func initSwarmStackManager(assetsPath string, configPath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService, reverseTunnelService portainer.ReverseTunnelService) (portainer.SwarmStackManager, error) {
+	return exec.NewSwarmStackManager(assetsPath, configPath, signatureService, fileService, reverseTunnelService)
 }
 
-func initKubernetesDeployer(kubernetesTokenCacheManager *kubeproxy.TokenCacheManager, kubernetesClientFactory *kubecli.ClientFactory, dataStore portainer.DataStore, reverseTunnelService portainer.ReverseTunnelService, signatureService portainer.DigitalSignatureService, assetsPath string) portainer.KubernetesDeployer {
-	return exec.NewKubernetesDeployer(kubernetesTokenCacheManager, kubernetesClientFactory, dataStore, reverseTunnelService, signatureService, assetsPath)
+func initKubernetesDeployer(kubernetesTokenCacheManager *kubeproxy.TokenCacheManager, kubernetesClientFactory *kubecli.ClientFactory, dataStore portainer.DataStore, reverseTunnelService portainer.ReverseTunnelService, signatureService portainer.DigitalSignatureService, proxyManager *proxy.Manager, assetsPath string) portainer.KubernetesDeployer {
+	return exec.NewKubernetesDeployer(kubernetesTokenCacheManager, kubernetesClientFactory, dataStore, reverseTunnelService, signatureService, proxyManager, assetsPath)
+}
+
+func initHelmPackageManager(assetsPath string) (libhelm.HelmPackageManager, error) {
+	return libhelm.NewHelmPackageManager(libhelm.HelmConfig{BinaryPath: assetsPath})
 }
 
 func initJWTService(dataStore portainer.DataStore) (portainer.JWTService, error) {
@@ -117,7 +124,7 @@ func initJWTService(dataStore portainer.DataStore) (portainer.JWTService, error)
 		settings.UserSessionTimeout = portainer.DefaultUserSessionTimeout
 		dataStore.Settings().UpdateSettings(settings)
 	}
-	jwtService, err := jwt.NewService(settings.UserSessionTimeout)
+	jwtService, err := jwt.NewService(settings.UserSessionTimeout, dataStore)
 	if err != nil {
 		return nil, err
 	}
@@ -181,9 +188,10 @@ func initSnapshotService(snapshotInterval string, dataStore portainer.DataStore,
 	return snapshotService, nil
 }
 
-func initStatus(flags *portainer.CLIFlags) *portainer.Status {
+func initStatus(instanceID string) *portainer.Status {
 	return &portainer.Status{
-		Version: portainer.APIVersion,
+		Version:    portainer.APIVersion,
+		InstanceID: instanceID,
 	}
 }
 
@@ -320,7 +328,7 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, dataStore portainer.Dat
 
 	err := snapshotService.SnapshotEndpoint(endpoint)
 	if err != nil {
-		log.Printf("http error: endpoint snapshot error (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
+		log.Printf("http error: environment snapshot error (environment=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
 	}
 
 	return dataStore.Endpoint().CreateEndpoint(endpoint)
@@ -366,7 +374,7 @@ func createUnsecuredEndpoint(endpointURL string, dataStore portainer.DataStore, 
 
 	err := snapshotService.SnapshotEndpoint(endpoint)
 	if err != nil {
-		log.Printf("http error: endpoint snapshot error (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
+		log.Printf("http error: environment snapshot error (environment=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
 	}
 
 	return dataStore.Endpoint().CreateEndpoint(endpoint)
@@ -383,7 +391,7 @@ func initEndpoint(flags *portainer.CLIFlags, dataStore portainer.DataStore, snap
 	}
 
 	if len(endpoints) > 0 {
-		log.Println("Instance already has defined endpoints. Skipping the endpoint defined via CLI.")
+		log.Println("Instance already has defined environments. Skipping the environment defined via CLI.")
 		return nil
 	}
 
@@ -398,7 +406,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	fileService := initFileService(*flags.Data)
 
-	dataStore := initDataStore(*flags.Data, fileService, shutdownCtx)
+	dataStore := initDataStore(*flags.Data, *flags.Rollback, fileService, shutdownCtx)
 
 	if err := dataStore.CheckCurrentEdition(); err != nil {
 		log.Fatal(err)
@@ -422,6 +430,11 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	sslService, err := initSSLService(*flags.AddrHTTPS, *flags.Data, *flags.SSLCert, *flags.SSLKey, fileService, dataStore, shutdownTrigger)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	sslSettings, err := sslService.GetSSLSettings()
+	if err != nil {
+		log.Fatalf("failed to get ssl settings: %s", err)
 	}
 
 	err = initKeyPair(fileService, digitalSignatureService)
@@ -448,16 +461,27 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	authorizationService := authorization.NewService(dataStore)
 	authorizationService.K8sClientFactory = kubernetesClientFactory
 
-	swarmStackManager, err := initSwarmStackManager(*flags.Assets, *flags.Data, digitalSignatureService, fileService, reverseTunnelService)
-	if err != nil {
-		log.Fatalf("failed initializing swarm stack manager: %v", err)
-	}
 	kubernetesTokenCacheManager := kubeproxy.NewTokenCacheManager()
+
+	kubeConfigService := kubernetes.NewKubeConfigCAService(*flags.AddrHTTPS, sslSettings.CertPath)
+
 	proxyManager := proxy.NewManager(dataStore, digitalSignatureService, reverseTunnelService, dockerClientFactory, kubernetesClientFactory, kubernetesTokenCacheManager)
 
-	composeStackManager := initComposeStackManager(*flags.Assets, *flags.Data, reverseTunnelService, proxyManager)
+	dockerConfigPath := fileService.GetDockerConfigPath()
 
-	kubernetesDeployer := initKubernetesDeployer(kubernetesTokenCacheManager, kubernetesClientFactory, dataStore, reverseTunnelService, digitalSignatureService, *flags.Assets)
+	composeStackManager := initComposeStackManager(*flags.Assets, dockerConfigPath, reverseTunnelService, proxyManager)
+
+	swarmStackManager, err := initSwarmStackManager(*flags.Assets, dockerConfigPath, digitalSignatureService, fileService, reverseTunnelService)
+	if err != nil {
+		log.Fatalf("failed initializing swarm stack manager: %s", err)
+	}
+
+	kubernetesDeployer := initKubernetesDeployer(kubernetesTokenCacheManager, kubernetesClientFactory, dataStore, reverseTunnelService, digitalSignatureService, proxyManager, *flags.Assets)
+
+	helmPackageManager, err := initHelmPackageManager(*flags.Assets)
+	if err != nil {
+		log.Fatalf("failed initializing helm package manager: %s", err)
+	}
 
 	if dataStore.IsNew() {
 		err = updateSettingsFromFlags(dataStore, flags)
@@ -471,11 +495,11 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Fatalf("failed loading edge jobs from database: %v", err)
 	}
 
-	applicationStatus := initStatus(flags)
+	applicationStatus := initStatus(instanceID)
 
 	err = initEndpoint(flags, dataStore, snapshotService)
 	if err != nil {
-		log.Fatalf("failed initializing endpoint: %v", err)
+		log.Fatalf("failed initializing environment: %v", err)
 	}
 
 	adminPasswordHash := ""
@@ -519,10 +543,14 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Fatalf("failed starting tunnel server: %s", err)
 	}
 
-	sslSettings, err := dataStore.SSLSettings().Settings()
+	sslDBSettings, err := dataStore.SSLSettings().Settings()
 	if err != nil {
 		log.Fatalf("failed to fetch ssl settings from DB")
 	}
+
+	scheduler := scheduler.NewScheduler(shutdownCtx)
+	stackDeployer := stacks.NewStackDeployer(swarmStackManager, composeStackManager, kubernetesDeployer)
+	stacks.StartStackSchedules(scheduler, stackDeployer, dataStore, gitService)
 
 	return &http.Server{
 		AuthorizationService:        authorizationService,
@@ -530,12 +558,13 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		Status:                      applicationStatus,
 		BindAddress:                 *flags.Addr,
 		BindAddressHTTPS:            *flags.AddrHTTPS,
-		HTTPEnabled:                 sslSettings.HTTPEnabled,
+		HTTPEnabled:                 sslDBSettings.HTTPEnabled,
 		AssetsPath:                  *flags.Assets,
 		DataStore:                   dataStore,
 		SwarmStackManager:           swarmStackManager,
 		ComposeStackManager:         composeStackManager,
 		KubernetesDeployer:          kubernetesDeployer,
+		HelmPackageManager:          helmPackageManager,
 		CryptoService:               cryptoService,
 		JWTService:                  jwtService,
 		FileService:                 fileService,
@@ -544,13 +573,16 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		GitService:                  gitService,
 		ProxyManager:                proxyManager,
 		KubernetesTokenCacheManager: kubernetesTokenCacheManager,
+		KubeConfigService:           kubeConfigService,
 		SignatureService:            digitalSignatureService,
 		SnapshotService:             snapshotService,
 		SSLService:                  sslService,
 		DockerClientFactory:         dockerClientFactory,
 		KubernetesClientFactory:     kubernetesClientFactory,
+		Scheduler:                   scheduler,
 		ShutdownCtx:                 shutdownCtx,
 		ShutdownTrigger:             shutdownTrigger,
+		StackDeployer:               stackDeployer,
 	}
 }
 

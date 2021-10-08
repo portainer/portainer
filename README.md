@@ -44,7 +44,7 @@ Portainer CE is an open source project and is supported by the community. You ca
 Learn more about Portainers community support channels [here.](https://www.portainer.io/help_about)
 
 - Issues: https://github.com/portainer/portainer/issues
-- Slack (chat): https://portainer.io/slack/
+- Slack (chat): [https://portainer.slack.com/](https://join.slack.com/t/portainer/shared_invite/zt-txh3ljab-52QHTyjCqbe5RibC2lcjKA)
 
 You can join the Portainer Community by visiting community.portainer.io. This will give you advance notice of events, content and other related Portainer content.
 
@@ -56,6 +56,10 @@ You can join the Portainer Community by visiting community.portainer.io. This wi
 ## Security
 
 - Here at Portainer, we believe in [responsible disclosure](https://en.wikipedia.org/wiki/Responsible_disclosure) of security issues. If you have found a security issue, please report it to <security@portainer.io>.
+
+## WORK FOR US
+
+If you are a developer, and our code in this repo makes sense to you, we would love to hear from you. We are always on the hunt for awesome devs, either freelance or employed. Drop us a line to info@portainer.io with your details and we will be in touch.
 
 ## Privacy
 

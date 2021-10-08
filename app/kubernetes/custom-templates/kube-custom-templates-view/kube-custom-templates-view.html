@@ -1,0 +1,20 @@
+<kubernetes-view-header title="Custom Templates" state="kubernetes.templates.custom" view-ready="true">
+  Custom Templates
+</kubernetes-view-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <custom-templates-list
+      ng-if="$ctrl.templates"
+      title-text="Templates"
+      title-icon="fa-rocket"
+      templates="$ctrl.templates"
+      table-key="customTemplates"
+      is-edit-allowed="$ctrl.isEditAllowed"
+      on-select-click="($ctrl.selectTemplate)"
+      on-delete-click="($ctrl.confirmDelete)"
+      create-path="kubernetes.templates.custom.new"
+      edit-path="kubernetes.templates.custom.edit"
+    ></custom-templates-list>
+  </div>
+</div>

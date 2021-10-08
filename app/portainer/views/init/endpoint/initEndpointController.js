@@ -61,7 +61,7 @@ class InitEndpointController {
       case PortainerEndpointConnectionTypes.AGENT:
         return this.createAgentEndpoint();
       default:
-        this.Notifications.error('Failure', 'Unable to determine which action to do to create endpoint');
+        this.Notifications.error('Failure', 'Unable to determine which action to do to create environment');
     }
   }
 

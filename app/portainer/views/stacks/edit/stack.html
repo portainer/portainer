@@ -26,7 +26,7 @@
                     <p class="text-muted">
                       <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                       <span ng-if="external">This stack was created outside of Portainer. Control over this stack is limited.</span>
-                      <span ng-if="orphaned">This stack is orphaned. You can reassociate it with the current environment using the "Associate to this endpoint" feature.</span>
+                      <span ng-if="orphaned">This stack is orphaned. You can reassociate it with the current environment using the "Associate to this environment" feature.</span>
                     </p>
                   </span>
                 </div>
@@ -82,10 +82,10 @@
               <!-- associate -->
               <div ng-if="orphaned">
                 <div class="col-sm-12 form-section-title">
-                  Associate to this endpoint
+                  Associate to this environment
                 </div>
                 <p class="small text-muted">
-                  This feature allows you to reassociate this stack to the current endpoint.
+                  This feature allows you to reassociate this stack to the current environment.
                 </p>
                 <form class="form-horizontal">
                   <por-access-control-form form-data="formValues.AccessControlData" hide-title="true"></por-access-control-form>
@@ -125,7 +125,7 @@
           </uib-tab>
           <!-- !tab-info -->
           <!-- tab-file -->
-          <uib-tab index="1" select="showEditor()" ng-if="!external">
+          <uib-tab index="1" select="showEditor()" ng-if="!external && !stack.GitConfig">
             <uib-tab-heading> <i class="fa fa-pencil-alt space-right" aria-hidden="true"></i> Editor </uib-tab-heading>
             <form class="form-horizontal" ng-if="state.showEditorTab" style="margin-top: 10px;" name="stackUpdateForm">
               <div class="form-group">
@@ -214,6 +214,7 @@
       order-by="Status"
       show-host-column="false"
       show-add-action="false"
+      not-auto-focus="true"
     ></containers-datatable>
   </div>
 </div>
@@ -233,6 +234,7 @@
       show-task-logs-button="applicationState.endpoint.apiVersion >= 1.30"
       show-add-action="false"
       show-stack-column="false"
+      not-auto-focus="true"
     ></services-datatable>
   </div>
 </div>

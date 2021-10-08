@@ -1,0 +1,155 @@
+.wizard-endpoints {
+  display: block;
+  width: 200px;
+  height: 300px;
+  border: 1px solid rgb(163, 163, 163);
+  border-radius: 5px;
+  float: left;
+  margin-right: 15px;
+  padding: 25px 20px;
+  cursor: pointer;
+  box-shadow: 0 3px 10px -2px rgb(161 170 166 / 60%);
+}
+
+.wizard-endpoints:hover {
+  box-shadow: 0 3px 10px -2px rgb(161 170 166 / 80%);
+  border: 1px solid #3ca4ff;
+  color: #337ab7;
+}
+
+.wizard-active:hover {
+  color: #fff;
+}
+
+.wizard-active {
+  background: #337ab7;
+  color: #fff;
+  border: 1px solid #3ca4ff;
+  box-shadow: 0 3px 10px -2px rgb(161 170 166 / 80%);
+}
+
+.wizard-form-required {
+  color: rgb(255, 24, 24);
+  padding: 0px 5px;
+}
+
+.wizard-form {
+  margin-top: 40px;
+}
+
+.wizard-code {
+  margin-right: 15px;
+}
+
+.wizard-action {
+  margin-top: 20px;
+}
+
+.wizard-connect-button {
+  margin-left: 0px !important;
+  margin-top: 40px;
+}
+
+.wizard-copy-button {
+  color: #444;
+  cursor: pointer;
+}
+
+.wizard-step-action {
+  padding-top: 40px;
+  padding-bottom: 40px;
+  text-align: right;
+  border-top: 1px solid #777;
+}
+
+.next-btn {
+  float: right;
+}
+
+.previous-btn {
+  float: left;
+  margin-left: 0px !important;
+}
+
+.wizard-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  grid-template-areas:
+    'main sidebar'
+    'footer sidebar';
+}
+
+.wizard-main {
+  grid-column: main;
+}
+
+.wizard-aside {
+  grid-column: sidebar;
+  margin-right: 15px;
+}
+
+.wizard-footer {
+  grid-column: footer;
+}
+
+.wizard-endpoint-section {
+  padding-right: 10px;
+}
+
+.wizard-main-title {
+  margin-bottom: 10px;
+}
+
+.wizard-env-section {
+  display: block;
+  padding: 10px;
+  border: 1px solid red;
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  height: 600px;
+  text-align: center;
+}
+
+.wizard-env-icon {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.wizard-content-wrapper {
+  position: relative;
+  left: 50%;
+}
+
+.wizard-content {
+  float: left;
+  position: relative;
+  left: -50%;
+}
+
+.wizard-section {
+  display: grid;
+  justify-content: left;
+  align-content: left;
+  gap: 10px;
+  grid-auto-flow: column;
+  margin-bottom: 20px;
+}
+
+.wizard-section-title {
+  font-size: 32px;
+  margin-top: 30px;
+  margin-bottom: 15px;
+}
+.wizard-setion-subtitle {
+  font-size: 18px;
+}
+
+.wizard-section-action {
+  margin-top: 50px;
+  margin-bottom: 20px;
+}
+
+.no-margin {
+  margin-left: 0px;
+}

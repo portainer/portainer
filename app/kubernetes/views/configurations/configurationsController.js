@@ -1,5 +1,3 @@
-require('../../templates/advancedDeploymentPanel.html');
-
 import angular from 'angular';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 
@@ -53,7 +51,7 @@ class KubernetesConfigurationsController {
       } finally {
         --actionCount;
         if (actionCount === 0) {
-          this.$state.reload();
+          this.$state.reload(this.$state.current);
         }
       }
     }

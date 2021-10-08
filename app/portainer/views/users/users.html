@@ -25,7 +25,16 @@
             </label>
             <div class="col-sm-8">
               <div class="input-group">
-                <input type="text" class="form-control" id="username" ng-model="formValues.Username" ng-change="checkUsernameValidity()" placeholder="e.g. jdoe" auto-focus />
+                <input
+                  type="text"
+                  class="form-control"
+                  id="username"
+                  ng-model="formValues.Username"
+                  ng-change="checkUsernameValidity()"
+                  placeholder="e.g. jdoe"
+                  auto-focus
+                  data-cy="user-usernameInput"
+                />
                 <span class="input-group-addon"><i ng-class="{ true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[state.validUsername]" aria-hidden="true"></i></span>
               </div>
             </div>
@@ -37,7 +46,7 @@
             <div class="col-sm-8">
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
-                <input type="password" class="form-control" ng-model="formValues.Password" id="password" />
+                <input type="password" class="form-control" ng-model="formValues.Password" id="password" data-cy="user-passwordInput" />
               </div>
             </div>
           </div>
@@ -48,7 +57,7 @@
             <div class="col-sm-8">
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
-                <input type="password" class="form-control" ng-model="formValues.ConfirmPassword" id="confirm_password" />
+                <input type="password" class="form-control" ng-model="formValues.ConfirmPassword" id="confirm_password" data-cy="user-passwordConfirmInput" />
                 <span class="input-group-addon"
                   ><i
                     ng-class="{ true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[formValues.Password !== '' && formValues.Password === formValues.ConfirmPassword]"
@@ -66,10 +75,10 @@
                 Administrator
                 <portainer-tooltip
                   position="bottom"
-                  message="Administrators have access to Portainer settings management as well as full control over all defined endpoints and their resources."
+                  message="Administrators have access to Portainer settings management as well as full control over all defined environments and their resources."
                 ></portainer-tooltip>
               </label>
-              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.Administrator" /><i></i> </label>
+              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.Administrator" data-cy="user-adminCheckbox" /><i></i> </label>
             </div>
           </div>
           <!-- !admin-checkbox -->
@@ -94,6 +103,7 @@
                 search-property="Name"
                 translation="{nothingSelected: 'Select one or more teams', search: 'Search...'}"
                 style="margin-left: 20px;"
+                data-cy="user-teamSelect"
               >
               </span>
             </div>
@@ -102,8 +112,8 @@
           <div class="form-group" ng-if="isAdmin && !formValues.Administrator && formValues.Teams.length === 0">
             <div class="col-sm-12">
               <span class="small text-muted">
-                Note: non-administrator users who aren't in a team don't have access to any endpoints by default. Head over to the
-                <a ui-sref="portainer.endpoints">Endpoints view</a> to manage their accesses.
+                Note: non-administrator users who aren't in a team don't have access to any environments by default. Head over to the
+                <a ui-sref="portainer.endpoints">Environments view</a> to manage their accesses.
               </span>
             </div>
           </div>
@@ -115,6 +125,7 @@
                 ng-disabled="state.actionInProgress || !state.validUsername || formValues.Username === '' || (AuthenticationMethod === 1 && formValues.Password === '') || (AuthenticationMethod === 1 && formValues.Password !== formValues.ConfirmPassword)"
                 ng-click="addUser()"
                 button-spinner="state.actionInProgress"
+                data-cy="user-createUserButton"
               >
                 <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Create user</span>
                 <span ng-show="state.actionInProgress">Creating user...</span>

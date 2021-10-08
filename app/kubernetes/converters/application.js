@@ -14,6 +14,8 @@ import {
   KubernetesPortainerApplicationNote,
   KubernetesPortainerApplicationOwnerLabel,
   KubernetesPortainerApplicationStackNameLabel,
+  KubernetesPortainerApplicationStackIdLabel,
+  KubernetesPortainerApplicationKindLabel,
 } from 'Kubernetes/models/application/models';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
@@ -54,10 +56,18 @@ class KubernetesApplicationConverter {
     const containers = data.spec.template ? _.without(_.concat(data.spec.template.spec.containers, data.spec.template.spec.initContainers), undefined) : data.spec.containers;
     res.Id = data.metadata.uid;
     res.Name = data.metadata.name;
-    res.StackName = data.metadata.labels ? data.metadata.labels[KubernetesPortainerApplicationStackNameLabel] || '-' : '-';
-    res.ApplicationOwner = data.metadata.labels ? data.metadata.labels[KubernetesPortainerApplicationOwnerLabel] || '' : '';
+    res.Metadata = data.metadata;
+
+    if (data.metadata.labels) {
+      const { labels } = data.metadata;
+      res.StackId = labels[KubernetesPortainerApplicationStackIdLabel] ? parseInt(labels[KubernetesPortainerApplicationStackIdLabel], 10) : null;
+      res.StackName = labels[KubernetesPortainerApplicationStackNameLabel] || '';
+      res.ApplicationKind = labels[KubernetesPortainerApplicationKindLabel] || '';
+      res.ApplicationOwner = labels[KubernetesPortainerApplicationOwnerLabel] || '';
+      res.ApplicationName = labels[KubernetesPortainerApplicationNameLabel] || res.Name;
+    }
+
     res.Note = data.metadata.annotations ? data.metadata.annotations[KubernetesPortainerApplicationNote] || '' : '';
-    res.ApplicationName = data.metadata.labels ? data.metadata.labels[KubernetesPortainerApplicationNameLabel] || res.Name : res.Name;
     res.ResourcePool = data.metadata.namespace;
     if (containers.length) {
       res.Image = containers[0].image;
@@ -289,11 +299,11 @@ class KubernetesApplicationConverter {
     if (app.ServiceType === KubernetesServiceTypes.LOAD_BALANCER) {
       res.PublishingType = KubernetesApplicationPublishingTypes.LOAD_BALANCER;
     } else if (app.ServiceType === KubernetesServiceTypes.NODE_PORT) {
-      res.PublishingType = KubernetesApplicationPublishingTypes.CLUSTER;
+      res.PublishingType = KubernetesApplicationPublishingTypes.NODE_PORT;
     } else if (app.ServiceType === KubernetesServiceTypes.CLUSTER_IP && isIngress) {
       res.PublishingType = KubernetesApplicationPublishingTypes.INGRESS;
     } else {
-      res.PublishingType = KubernetesApplicationPublishingTypes.INTERNAL;
+      res.PublishingType = KubernetesApplicationPublishingTypes.CLUSTER_IP;
     }
 
     if (app.Pods && app.Pods.length) {

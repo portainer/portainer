@@ -1,0 +1,46 @@
+<!-- helm chart -->
+<div ng-class="{ 'blocklist-item--selected': $ctrl.model.Selected }" class="blocklist-item template-item" ng-click="$ctrl.onSelect($ctrl.model)">
+  <div class="blocklist-item-box">
+    <!-- helmchart-image -->
+    <span ng-if="$ctrl.model.icon">
+      <img class="blocklist-item-logo" ng-src="{{ $ctrl.model.icon }}" />
+    </span>
+    <span class="blocklist-item-logo" ng-if="!$ctrl.model.icon">
+      <i class="fa fa-dharmachakra fa-4x blue-icon" aria-hidden="true"></i>
+    </span>
+    <!-- !helmchart-image -->
+    <!-- helmchart-details -->
+    <div class="col-sm-12 helm-template-item-details">
+      <!-- blocklist-item-line1 -->
+      <div class="blocklist-item-line">
+        <span>
+          <span class="blocklist-item-title">
+            {{ $ctrl.model.name }}
+          </span>
+          <span class="space-left blocklist-item-subtitle">
+            <span>
+              <i class="fa fa-dharmachakra" aria-hidden="true"></i>
+            </span>
+            <span>
+              Helm
+            </span>
+          </span>
+        </span>
+      </div>
+      <!-- !blocklist-item-line1 -->
+      <span class="blocklist-item-actions" ng-transclude="actions"></span>
+      <!-- blocklist-item-line2 -->
+      <div class="blocklist-item-line helm-template-item-details-sub">
+        <span class="blocklist-item-desc">
+          {{ $ctrl.model.description }}
+        </span>
+        <span class="small text-muted" ng-if="$ctrl.model.annotations.category">
+          {{ $ctrl.model.annotations.category }}
+        </span>
+      </div>
+      <!-- !blocklist-item-line2 -->
+    </div>
+    <!-- !helmchart-details -->
+  </div>
+  <!-- !helm chart -->
+</div>

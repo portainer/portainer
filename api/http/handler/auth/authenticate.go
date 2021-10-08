@@ -40,7 +40,7 @@ func (payload *authenticatePayload) Validate(r *http.Request) error {
 
 // @id AuthenticateUser
 // @summary Authenticate
-// @description Use this endpoint to authenticate against Portainer using a username and password.
+// @description Use this environment(endpoint) to authenticate against Portainer using a username and password.
 // @tags auth
 // @accept json
 // @produce json

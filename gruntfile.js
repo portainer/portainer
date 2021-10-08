@@ -2,11 +2,13 @@ var os = require('os');
 var loadGruntTasks = require('load-grunt-tasks');
 const webpackDevConfig = require('./webpack/webpack.develop');
 const webpackProdConfig = require('./webpack/webpack.production');
+const webpackTestingConfig = require('./webpack/webpack.testing');
 
 var arch = os.arch();
 if (arch === 'x64') arch = 'amd64';
 
 var portainer_data = '${PORTAINER_DATA:-/tmp/portainer}';
+var portainer_root = process.env.PORTAINER_PROJECT ? process.env.PORTAINER_PROJECT : process.env.PWD;
 
 module.exports = function (grunt) {
   loadGruntTasks(grunt, {
@@ -21,6 +23,8 @@ module.exports = function (grunt) {
       dockerWindowsVersion: '19-03-12',
       dockerLinuxComposeVersion: '1.27.4',
       dockerWindowsComposeVersion: '1.28.0',
+      dockerComposePluginVersion: '2.0.0-beta.6',
+      helmVersion: 'v3.6.3',
       komposeVersion: 'v1.22.0',
       kubectlVersion: 'v1.18.0',
     },
@@ -40,6 +44,7 @@ module.exports = function (grunt) {
     'shell:build_binary:linux:' + arch,
     'shell:download_docker_binary:linux:' + arch,
     'shell:download_docker_compose_binary:linux:' + arch,
+    'shell:download_helm_binary:linux:' + arch,
     'shell:download_kompose_binary:linux:' + arch,
     'shell:download_kubectl_binary:linux:' + arch,
   ]);
@@ -67,24 +72,26 @@ module.exports = function (grunt) {
       'shell:build_binary:' + p + ':' + a,
       'shell:download_docker_binary:' + p + ':' + a,
       'shell:download_docker_compose_binary:' + p + ':' + a,
+      'shell:download_helm_binary:' + p + ':' + a,
       'shell:download_kompose_binary:' + p + ':' + a,
       'shell:download_kubectl_binary:' + p + ':' + a,
       'webpack:prod',
     ]);
   });
 
-  grunt.task.registerTask('devopsbuild', 'devopsbuild:<platform>:<arch>', function (p, a) {
+  grunt.task.registerTask('devopsbuild', 'devopsbuild:<platform>:<arch>:<env>', function (p, a, env = 'prod') {
     grunt.task.run([
       'config:prod',
-      'env:prod',
+      `env:${env}`,
       'clean:all',
       'copy:assets',
       'shell:build_binary_azuredevops:' + p + ':' + a,
       'shell:download_docker_binary:' + p + ':' + a,
       'shell:download_docker_compose_binary:' + p + ':' + a,
+      'shell:download_helm_binary:' + p + ':' + a,
       'shell:download_kompose_binary:' + p + ':' + a,
       'shell:download_kubectl_binary:' + p + ':' + a,
-      'webpack:prod',
+      `webpack:${env}`,
     ]);
   });
 };
@@ -99,12 +106,16 @@ gruntfile_cfg.env = {
   prod: {
     NODE_ENV: 'production',
   },
+  testing: {
+    NODE_ENV: 'testing',
+  },
 };
 
 gruntfile_cfg.webpack = {
   dev: webpackDevConfig,
   devWatch: Object.assign({ watch: true }, webpackDevConfig),
   prod: webpackProdConfig,
+  testing: webpackTestingConfig,
 };
 
 gruntfile_cfg.config = {
@@ -143,6 +154,7 @@ gruntfile_cfg.shell = {
   download_docker_binary: { command: shell_download_docker_binary },
   download_kompose_binary: { command: shell_download_kompose_binary },
   download_kubectl_binary: { command: shell_download_kubectl_binary },
+  download_helm_binary: { command: shell_download_helm_binary },
   download_docker_compose_binary: { command: shell_download_docker_compose_binary },
   run_container: { command: shell_run_container },
   run_localserver: { command: shell_run_localserver, options: { async: true } },
@@ -171,7 +183,9 @@ function shell_build_binary_azuredevops(p, a) {
 function shell_run_container() {
   return [
     'docker rm -f portainer',
-    'docker run -d -p 8000:8000 -p 9000:9000 -v $(pwd)/dist:/app -v ' +
+    'docker run -d -p 8000:8000 -p 9000:9000 -p 9443:9443 -v ' +
+      portainer_root +
+      '/dist:/app -v ' +
       portainer_data +
       ':/data -v /var/run/docker.sock:/var/run/docker.sock:z -v /var/run/docker.sock:/var/run/alternative.sock:z -v /tmp:/tmp --name portainer portainer/base /app/portainer',
   ].join(';');
@@ -191,7 +205,7 @@ function shell_download_docker_binary(p, a) {
   var ip = ps[p] === undefined ? p : ps[p];
   var ia = as[a] === undefined ? a : as[a];
   var binaryVersion = p === 'windows' ? '<%= binaries.dockerWindowsVersion %>' : '<%= binaries.dockerLinuxVersion %>';
-  
+
   return [
     'if [ -f dist/docker ] || [ -f dist/docker.exe ]; then',
     'echo "docker binary exists";',
@@ -207,19 +221,42 @@ function shell_download_docker_compose_binary(p, a) {
   var ip = ps[p] || p;
   var ia = as[a] || a;
   var binaryVersion = p === 'windows' ? '<%= binaries.dockerWindowsComposeVersion %>' : '<%= binaries.dockerLinuxComposeVersion %>';
-  
+
+  // plugin
+  if (p === 'linux' && a !== 'amd64') {
+    if (a === 'arm64') {
+      ia = 'arm64';
+    }
+
+    if (a === 'arm') {
+      ia = 'armv7';
+    }
+    binaryVersion = '<%= binaries.dockerComposePluginVersion %>';
+  }
+
+  return `
+    if [ -f dist/docker-compose ] || [ -f dist/docker-compose.exe ] || [ -f dist/docker-compose.plugin ] || [ -f dist/docker-compose.plugin.exe ]; then
+      echo "Docker Compose binary exists";
+    else
+      build/download_docker_compose_binary.sh ${ip} ${ia} ${binaryVersion};
+    fi`;
+}
+
+function shell_download_helm_binary(p, a) {
+  var binaryVersion = '<%= binaries.helmVersion %>';
+
   return [
-    'if [ -f dist/docker-compose ] || [ -f dist/docker-compose.exe ]; then',
-    'echo "Docker Compose binary exists";',
+    'if [ -f dist/helm ] || [ -f dist/helm.exe ]; then',
+    'echo "helm binary exists";',
     'else',
-    'build/download_docker_compose_binary.sh ' + ip + ' ' + ia + ' ' + binaryVersion + ';',
+    'build/download_helm_binary.sh ' + p + ' ' + a + ' ' + binaryVersion + ';',
     'fi',
   ].join(' ');
 }
 
 function shell_download_kompose_binary(p, a) {
   var binaryVersion = '<%= binaries.komposeVersion %>';
-  
+
   return [
     'if [ -f dist/kompose ] || [ -f dist/kompose.exe ]; then',
     'echo "kompose binary exists";',
@@ -231,7 +268,7 @@ function shell_download_kompose_binary(p, a) {
 
 function shell_download_kubectl_binary(p, a) {
   var binaryVersion = '<%= binaries.kubectlVersion %>';
-  
+
   return [
     'if [ -f dist/kubectl ] || [ -f dist/kubectl.exe ]; then',
     'echo "kubectl binary exists";',

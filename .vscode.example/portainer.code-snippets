@@ -163,5 +163,19 @@
       "// @failure 500 \"Server error\"",
       "// @router /{id} [get]"
     ]
+  },
+  "analytics": {
+    "prefix": "nlt",
+    "body": ["analytics-on", "analytics-category=\"$1\"", "analytics-event=\"$2\""],
+    "description": "analytics"
+  },
+  "analytics-if": {
+    "prefix": "nltf",
+    "body": ["analytics-if=\"$1\""],
+    "description": "analytics"
+  },
+  "analytics-metadata": {
+    "prefix": "nltm",
+    "body": "analytics-properties=\"{ metadata: { $1 } }\""
   }
 }

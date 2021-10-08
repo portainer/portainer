@@ -1,0 +1,18 @@
+<rd-header>
+  <rd-header-title title-text="Roles">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.roles" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>Role management</rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <roles-datatable title-text="Roles" title-icon="fa-file-code" dataset="$ctrl.roles" table-key="roles"></roles-datatable>
+  </div>
+</div>
+
+<div class="row">
+  <access-viewer> </access-viewer>
+</div>

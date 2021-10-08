@@ -171,7 +171,7 @@
               allow-checkbox="true"
             >
             </tr>
-            <tr dir-paginate-end ng-show="item.Expanded" ng-repeat="it in item.Subs" style="background: #d5e8f3;" network-row-content item="it" parent-ctrl="$ctrl"> </tr>
+            <tr dir-paginate-end ng-show="item.Expanded" ng-repeat="it in item.Subs" class="datatable-highlighted" network-row-content item="it" parent-ctrl="$ctrl"> </tr>
             <tr ng-if="!$ctrl.dataset">
               <td colspan="9" class="text-center text-muted">Loading...</td>
             </tr>
@@ -189,7 +189,7 @@
               <span style="margin-right: 5px;">
                 Items per page
               </span>
-              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
+              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()" data-cy="component-paginationSelect">
                 <option value="0">All</option>
                 <option value="10">10</option>
                 <option value="25">25</option>

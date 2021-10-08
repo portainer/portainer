@@ -1,6 +1,7 @@
 package stacks
 
 import (
+	"context"
 	"errors"
 	"net/http"
 
@@ -45,16 +46,20 @@ func (handler *Handler) stackStop(w http.ResponseWriter, r *http.Request) *httpe
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a stack with the specified identifier inside the database", err}
 	}
 
+	if stack.Type == portainer.KubernetesStack {
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Stopping a kubernetes stack is not supported", Err: err}
+	}
+
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(stack.EndpointID)
 	if err == bolterrors.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
 	}
 
 	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
 	}
 
 	resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)
@@ -74,6 +79,12 @@ func (handler *Handler) stackStop(w http.ResponseWriter, r *http.Request) *httpe
 		return &httperror.HandlerError{http.StatusBadRequest, "Stack is already inactive", errors.New("Stack is already inactive")}
 	}
 
+	// stop scheduler updates of the stack before stopping
+	if stack.AutoUpdate != nil && stack.AutoUpdate.JobID != "" {
+		stopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
+		stack.AutoUpdate.JobID = ""
+	}
+
 	err = handler.stopStack(stack, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to stop stack", err}
@@ -85,13 +96,18 @@ func (handler *Handler) stackStop(w http.ResponseWriter, r *http.Request) *httpe
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update stack status", err}
 	}
 
+	if stack.GitConfig != nil && stack.GitConfig.Authentication != nil && stack.GitConfig.Authentication.Password != "" {
+		// sanitize password in the http response to minimise possible security leaks
+		stack.GitConfig.Authentication.Password = ""
+	}
+
 	return response.JSON(w, stack)
 }
 
 func (handler *Handler) stopStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	switch stack.Type {
 	case portainer.DockerComposeStack:
-		return handler.ComposeStackManager.Down(stack, endpoint)
+		return handler.ComposeStackManager.Down(context.TODO(), stack, endpoint)
 	case portainer.DockerSwarmStack:
 		return handler.SwarmStackManager.Remove(stack, endpoint)
 	}

@@ -10,13 +10,21 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// websocketShellPodExec handles GET requests on /websocket/pod?token=<token>&endpointId=<endpointID>
-// The request will be upgraded to the websocket protocol.
-// Authentication and access is controlled via the mandatory token query parameter.
-// The request will proxy input from the client to the pod via long-lived websocket connection.
-// The following query parameters are mandatory:
-// * token: JWT token used for authentication against this endpoint
-// * endpointId: endpoint ID of the endpoint where the resource is located
+// @summary Execute a websocket on kubectl shell pod
+// @description The request will be upgraded to the websocket protocol. The request will proxy input from the client to the pod via long-lived websocket connection.
+// @description **Access policy**: authenticated
+// @security jwt
+// @tags websocket
+// @accept json
+// @produce json
+// @param endpointId query int true "environment(endpoint) ID of the environment(endpoint) where the resource is located"
+// @param token query string true "JWT token used for authentication against this environment(endpoint)"
+// @success 200
+// @failure 400
+// @failure 403
+// @failure 404
+// @failure 500
+// @router /websocket/kubernetes-shell [get]
 func (handler *Handler) websocketShellPodExec(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)
 	if err != nil {
@@ -25,14 +33,14 @@ func (handler *Handler) websocketShellPodExec(w http.ResponseWriter, r *http.Req
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == bolterrors.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the endpoint associated to the stack inside the database", err}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the environment associated to the stack inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the endpoint associated to the stack inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the environment associated to the stack inside the database", err}
 	}
 
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
 	}
 
 	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
@@ -45,7 +53,12 @@ func (handler *Handler) websocketShellPodExec(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find serviceaccount associated with user", err}
 	}
 
-	shellPod, err := cli.CreateUserShellPod(r.Context(), serviceAccount.Name)
+	settings, err := handler.DataStore.Settings().Settings()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable read settings", err}
+	}
+
+	shellPod, err := cli.CreateUserShellPod(r.Context(), serviceAccount.Name, settings.KubectlShellImage)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create user shell", err}
 	}
@@ -86,17 +99,12 @@ func (handler *Handler) websocketShellPodExec(w http.ResponseWriter, r *http.Req
 		return nil
 	}
 
-	serviceAccountToken, isAdminToken, err := handler.getToken(r, endpoint, false)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to get user service account token", err}
-	}
-
 	handlerErr := handler.hijackPodExecStartOperation(
 		w,
 		r,
 		cli,
-		serviceAccountToken,
-		isAdminToken,
+		"",
+		true,
 		endpoint,
 		shellPod.Namespace,
 		shellPod.PodName,

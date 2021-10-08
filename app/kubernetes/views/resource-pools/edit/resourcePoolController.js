@@ -15,6 +15,8 @@ import { KubernetesFormValidationReferences } from 'Kubernetes/models/applicatio
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
 import KubernetesResourceQuotaConverter from 'Kubernetes/converters/resourceQuota';
+import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
+import { K8S_RESOURCE_POOL_LB_QUOTA, K8S_RESOURCE_POOL_STORAGE_QUOTA } from '@/portainer/feature-flags/feature-ids';
 
 class KubernetesResourcePoolController {
   /* #region  CONSTRUCTOR */
@@ -34,7 +36,6 @@ class KubernetesResourcePoolController {
     KubernetesEventService,
     KubernetesPodService,
     KubernetesApplicationService,
-    KubernetesNamespaceHelper,
     KubernetesIngressService,
     KubernetesVolumeService
   ) {
@@ -53,13 +54,15 @@ class KubernetesResourcePoolController {
       KubernetesEventService,
       KubernetesPodService,
       KubernetesApplicationService,
-      KubernetesNamespaceHelper,
       KubernetesIngressService,
       KubernetesVolumeService,
     });
 
     this.IngressClassTypes = KubernetesIngressClassTypes;
     this.ResourceQuotaDefaults = KubernetesResourceQuotaDefaults;
+
+    this.LBQuotaFeatureId = K8S_RESOURCE_POOL_LB_QUOTA;
+    this.StorageQuotaFeatureId = K8S_RESOURCE_POOL_STORAGE_QUOTA;
 
     this.updateResourcePoolAsync = this.updateResourcePoolAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
@@ -171,13 +174,13 @@ class KubernetesResourcePoolController {
   }
 
   /* #region  UPDATE NAMESPACE */
-  async updateResourcePoolAsync() {
+  async updateResourcePoolAsync(oldFormValues, newFormValues) {
     this.state.actionInProgress = true;
     try {
       this.checkDefaults();
-      await this.KubernetesResourcePoolService.patch(this.savedFormValues, this.formValues);
+      await this.KubernetesResourcePoolService.patch(oldFormValues, newFormValues);
       this.Notifications.success('Namespace successfully updated', this.pool.Namespace.Name);
-      this.$state.reload();
+      this.$state.reload(this.$state.current);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to create namespace');
     } finally {
@@ -186,28 +189,66 @@ class KubernetesResourcePoolController {
   }
 
   updateResourcePool() {
-    const willBeDeleted = _.filter(this.formValues.IngressClasses, { WasSelected: true, Selected: false });
+    const ingressesToDelete = _.filter(this.formValues.IngressClasses, { WasSelected: true, Selected: false });
+    const registriesToDelete = _.filter(this.registries, { WasChecked: true, Checked: false });
     const warnings = {
       quota: this.hasResourceQuotaBeenReduced(),
-      ingress: willBeDeleted.length !== 0,
+      ingress: ingressesToDelete.length !== 0,
+      registries: registriesToDelete.length !== 0,
     };
 
-    if (warnings.quota || warnings.ingress) {
+    if (warnings.quota || warnings.ingress || warnings.registries) {
       const messages = {
         quota:
           'Reducing the quota assigned to an "in-use" namespace may have unintended consequences, including preventing running applications from functioning correctly and potentially even blocking them from running at all.',
         ingress: 'Deactivating ingresses may cause applications to be unaccessible. All ingress configurations from affected applications will be removed.',
+        registries:
+          'Some registries you removed might be used by one or more applications inside this environment. Removing the registries access could lead to a service interruption for these applications.',
       };
-      const displayedMessage = `${warnings.quota ? messages.quota : ''}${warnings.quota && warnings.ingress ? '<br/><br/>' : ''}
-      ${warnings.ingress ? messages.ingress : ''}<br/><br/>Do you wish to continue?`;
+      const displayedMessage = `${warnings.quota ? messages.quota + '<br/><br/>' : ''}
+      ${warnings.ingress ? messages.ingress + '<br/><br/>' : ''}
+      ${warnings.registries ? messages.registries + '<br/><br/>' : ''}
+      Do you wish to continue?`;
       this.ModalService.confirmUpdate(displayedMessage, (confirmed) => {
         if (confirmed) {
-          return this.$async(this.updateResourcePoolAsync);
+          return this.$async(this.updateResourcePoolAsync, this.savedFormValues, this.formValues);
         }
       });
     } else {
-      return this.$async(this.updateResourcePoolAsync);
+      return this.$async(this.updateResourcePoolAsync, this.savedFormValues, this.formValues);
     }
+  }
+
+  async confirmMarkUnmarkAsSystem() {
+    const message = this.isSystem
+      ? 'Unmarking this namespace as system will allow non administrator users to manage it and the resources in contains depending on the access control settings. Are you sure?'
+      : 'Marking this namespace as a system namespace will prevent non administrator users from managing it and the resources it contains. Are you sure?';
+
+    return new Promise((resolve) => {
+      this.ModalService.confirmUpdate(message, resolve);
+    });
+  }
+
+  markUnmarkAsSystem() {
+    return this.$async(async () => {
+      try {
+        const namespaceName = this.$state.params.id;
+        this.state.actionInProgress = true;
+
+        const confirmed = await this.confirmMarkUnmarkAsSystem();
+        if (!confirmed) {
+          return;
+        }
+        await this.KubernetesResourcePoolService.toggleSystem(this.endpoint.Id, namespaceName, !this.isSystem);
+
+        this.Notifications.success('Namespace successfully updated', namespaceName);
+        this.$state.reload(this.$state.current);
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to create namespace');
+      } finally {
+        this.state.actionInProgress = false;
+      }
+    });
   }
   /* #endregion */
 
@@ -244,7 +285,9 @@ class KubernetesResourcePoolController {
           return app;
         });
 
-        await this.getResourceUsage(this.pool.Namespace.Name);
+        if (this.state.useServerMetrics) {
+          await this.getResourceUsage(this.pool.Namespace.Name);
+        }
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to retrieve applications.');
       } finally {
@@ -260,7 +303,7 @@ class KubernetesResourcePoolController {
       this.state.ingressesLoading = true;
       try {
         const namespace = this.pool.Namespace.Name;
-        this.allIngresses = await this.KubernetesIngressService.get();
+        this.allIngresses = await this.KubernetesIngressService.get(this.state.hasWriteAuthorization ? '' : namespace);
         this.ingresses = _.filter(this.allIngresses, { Namespace: namespace });
         _.forEach(this.ingresses, (ing) => {
           ing.Namespace = namespace;
@@ -289,10 +332,11 @@ class KubernetesResourcePoolController {
           this.registries.forEach((reg) => {
             if (reg.RegistryAccesses && reg.RegistryAccesses[this.endpoint.Id] && reg.RegistryAccesses[this.endpoint.Id].Namespaces.includes(namespace)) {
               reg.Checked = true;
+              reg.WasChecked = true;
               this.formValues.Registries.push(reg);
             }
           });
-
+          this.selectedRegistries = this.formValues.Registries.map((r) => r.Name).join(', ');
           return;
         }
 
@@ -359,6 +403,7 @@ class KubernetesResourcePoolController {
         this.formValues = new KubernetesResourcePoolFormValues(KubernetesResourceQuotaDefaults);
         this.formValues.Name = this.pool.Namespace.Name;
         this.formValues.EndpointId = this.endpoint.Id;
+        this.formValues.IsSystem = this.pool.Namespace.IsSystem;
 
         _.forEach(nodes, (item) => {
           this.state.sliderMaxMemory += filesizeParser(item.Memory);
@@ -375,11 +420,9 @@ class KubernetesResourcePoolController {
           this.state.resourceReservation.CPU = quota.CpuLimitUsed;
           this.state.resourceReservation.Memory = KubernetesResourceReservationHelper.megaBytesValue(quota.MemoryLimitUsed);
         }
-
-        this.isEditable = !this.KubernetesNamespaceHelper.isSystemNamespace(this.pool.Namespace.Name);
-        if (this.pool.Namespace.Name === 'default') {
-          this.isEditable = false;
-        }
+        this.isSystem = KubernetesNamespaceHelper.isSystemNamespace(this.pool.Namespace.Name);
+        this.isDefaultNamespace = KubernetesNamespaceHelper.isDefaultNamespace(this.pool.Namespace.Name);
+        this.isEditable = !this.isSystem && !this.isDefaultNamespace;
 
         await this.getEvents();
         await this.getApplications();

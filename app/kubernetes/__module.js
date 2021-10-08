@@ -1,6 +1,7 @@
 import registriesModule from './registries';
+import customTemplateModule from './custom-templates';
 
-angular.module('portainer.kubernetes', ['portainer.app', registriesModule]).config([
+angular.module('portainer.kubernetes', ['portainer.app', registriesModule, customTemplateModule]).config([
   '$stateRegistryProvider',
   function ($stateRegistryProvider) {
     'use strict';
@@ -11,7 +12,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule]).conf
       parent: 'endpoint',
       abstract: true,
 
-      onEnter: /* @ngInject */ function onEnter($async, $state, endpoint, EndpointProvider, KubernetesHealthService, Notifications, StateManager) {
+      onEnter: /* @ngInject */ function onEnter($async, $state, endpoint, EndpointProvider, KubernetesHealthService, KubernetesNamespaceService, Notifications, StateManager) {
         return $async(async () => {
           if (![5, 6, 7].includes(endpoint.Type)) {
             $state.go('portainer.home');
@@ -34,11 +35,33 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule]).conf
             if (endpoint.Type === 7 && endpoint.Status === 2) {
               throw new Error('Unable to contact Edge agent, please ensure that the agent is properly running on the remote environment.');
             }
+
+            await KubernetesNamespaceService.get();
           } catch (e) {
-            Notifications.error('Failed loading endpoint', e);
+            Notifications.error('Failed loading environment', e);
             $state.go('portainer.home', {}, { reload: true });
           }
         });
+      },
+    };
+
+    const helmApplication = {
+      name: 'kubernetes.helm',
+      url: '/helm/:namespace/:name',
+      views: {
+        'content@': {
+          component: 'kubernetesHelmApplicationView',
+        },
+      },
+    };
+
+    const helmTemplates = {
+      name: 'kubernetes.templates.helm',
+      url: '/helm',
+      views: {
+        'content@': {
+          component: 'helmTemplatesView',
+        },
       },
     };
 
@@ -206,11 +229,14 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule]).conf
 
     const deploy = {
       name: 'kubernetes.deploy',
-      url: '/deploy',
+      url: '/deploy?templateId',
       views: {
         'content@': {
           component: 'kubernetesDeployView',
         },
+      },
+      params: {
+        templateId: '',
       },
     };
 
@@ -295,6 +321,8 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule]).conf
     };
 
     $stateRegistryProvider.register(kubernetes);
+    $stateRegistryProvider.register(helmApplication);
+    $stateRegistryProvider.register(helmTemplates);
     $stateRegistryProvider.register(applications);
     $stateRegistryProvider.register(applicationCreation);
     $stateRegistryProvider.register(application);

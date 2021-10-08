@@ -1,0 +1,27 @@
+name: Close Stale Issues
+on:
+  schedule:
+  - cron: '0 12 * * *'
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+
+    steps:
+    - uses: actions/stale@v4.0.0
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+        # Issue Config
+        days-before-issue-stale: 60
+        days-before-issue-close: 7
+        stale-issue-label: 'status/stale'
+        exempt-all-issue-milestones: true # Do not stale issues in a milestone
+        exempt-issue-labels: kind/enhancement, kind/style, kind/workaround, kind/refactor, bug/need-confirmation, bug/confirmed, status/discuss
+        stale-issue-message: 'This issue has been marked as stale as it has not had recent activity, it will be closed if no further activity occurs in the next 7 days. If you believe that it has been incorrectly labelled as stale, leave a comment and the label will be removed.'
+        close-issue-message: 'Since no further activity has appeared on this issue it will be closed. If you believe that it has been incorrectly closed, leave a comment mentioning `portainer/support` and one of our staff will then review the issue. Note - If it is an old bug report, make sure that it is reproduceable in the latest version of Portainer as it may have already been fixed.'
+        
+        # Pull Request Config
+        days-before-pr-stale: -1 # Do not stale pull request
+        days-before-pr-close: -1 # Do not close pull request

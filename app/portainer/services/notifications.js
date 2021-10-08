@@ -1,3 +1,4 @@
+import _ from 'lodash-es';
 import toastr from 'toastr';
 
 angular.module('portainer.app').factory('Notifications', [
@@ -7,19 +8,19 @@ angular.module('portainer.app').factory('Notifications', [
     var service = {};
 
     service.success = function (title, text) {
-      toastr.success($sanitize(text), $sanitize(title));
+      toastr.success($sanitize(_.escape(text)), $sanitize(title));
     };
 
     service.warning = function (title, text) {
-      toastr.warning($sanitize(text), $sanitize(title), { timeOut: 6000 });
+      toastr.warning($sanitize(_.escape(text)), $sanitize(title), { timeOut: 6000 });
     };
 
     service.error = function (title, e, fallbackText) {
       var msg = fallbackText;
-      if (e.err && e.err.data && e.err.data.message) {
-        msg = e.err.data.message;
-      } else if (e.err && e.err.data && e.err.data.details) {
+      if (e.err && e.err.data && e.err.data.details && typeof e.err.data.details === 'string') {
         msg = e.err.data.details;
+      } else if (e.err && e.err.data && e.err.data.message) {
+        msg = e.err.data.message;
       } else if (e.data && e.data.details) {
         msg = e.data.details;
       } else if (e.data && e.data.message) {
@@ -40,8 +41,11 @@ angular.module('portainer.app').factory('Notifications', [
         msg = e.msg;
       }
 
+      // eslint-disable-next-line no-console
+      console.error(e);
+
       if (msg !== 'Invalid JWT token') {
-        toastr.error($sanitize(msg), $sanitize(title), { timeOut: 6000 });
+        toastr.error($sanitize(_.escape(msg)), $sanitize(title), { timeOut: 6000 });
       }
     };
 

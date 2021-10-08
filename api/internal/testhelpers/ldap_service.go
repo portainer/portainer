@@ -6,7 +6,7 @@ import (
 
 type ldapService struct{}
 
-// NewGitService creates new mock for portainer.GitService.
+// NewLDAPService creates new mock for portainer.LDAPService
 func NewLDAPService() *ldapService {
 	return &ldapService{}
 }
@@ -31,4 +31,12 @@ func (service *ldapService) SearchAdminGroups(settings *portainer.LDAPSettings) 
 
 func (service *ldapService) TestConnectivity(settings *portainer.LDAPSettings) error {
 	return nil
+}
+
+func (service *ldapService) SearchGroups(settings *portainer.LDAPSettings) ([]portainer.LDAPUser, error) {
+	return []portainer.LDAPUser{}, nil
+}
+
+func (service *ldapService) SearchUsers(settings *portainer.LDAPSettings) ([]string, error) {
+	return []string{}, nil
 }

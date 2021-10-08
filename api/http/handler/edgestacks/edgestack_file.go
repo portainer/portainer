@@ -26,7 +26,7 @@ type stackFileResponse struct {
 // @success 200 {object} stackFileResponse
 // @failure 500
 // @failure 400
-// @failure 503 Edge compute features are disabled
+// @failure 503 "Edge compute features are disabled"
 // @router /edge_stacks/{id}/file [get]
 func (handler *Handler) edgeStackFile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
@@ -41,7 +41,12 @@ func (handler *Handler) edgeStackFile(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an edge stack with the specified identifier inside the database", err}
 	}
 
-	stackFileContent, err := handler.FileService.GetFileContent(path.Join(stack.ProjectPath, stack.EntryPoint))
+	fileName := stack.EntryPoint
+	if stack.DeploymentType == portainer.EdgeStackDeploymentKubernetes {
+		fileName = stack.ManifestPath
+	}
+
+	stackFileContent, err := handler.FileService.GetFileContent(path.Join(stack.ProjectPath, fileName))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Compose file from disk", err}
 	}

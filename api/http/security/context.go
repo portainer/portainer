@@ -17,8 +17,8 @@ const (
 	contextRestrictedRequest
 )
 
-// storeTokenData stores a TokenData object inside the request context and returns the enhanced context.
-func storeTokenData(request *http.Request, tokenData *portainer.TokenData) context.Context {
+// StoreTokenData stores a TokenData object inside the request context and returns the enhanced context.
+func StoreTokenData(request *http.Request, tokenData *portainer.TokenData) context.Context {
 	return context.WithValue(request.Context(), contextAuthenticationKey, tokenData)
 }
 

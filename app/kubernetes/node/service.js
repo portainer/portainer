@@ -26,7 +26,9 @@ class KubernetesNodeService {
       const [details, yaml] = await Promise.all([this.KubernetesNodes().get(params).$promise, this.KubernetesNodes().getYaml(params).$promise]);
       return KubernetesNodeConverter.apiToNodeDetails(details, yaml);
     } catch (err) {
-      throw new PortainerError('Unable to retrieve node details', err);
+      // changing the structure of error message to fix [object, Object] issue
+      const errData = err.data;
+      throw new PortainerError('Unable to retrieve node details', errData);
     }
   }
 

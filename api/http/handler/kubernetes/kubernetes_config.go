@@ -3,18 +3,15 @@ package kubernetes
 import (
 	"errors"
 	"fmt"
-	"strings"
+	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
-	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	kcli "github.com/portainer/portainer/api/kubernetes/cli"
-
-	"net/http"
 )
 
 // @id GetKubernetesConfig
@@ -25,46 +22,38 @@ import (
 // @security jwt
 // @accept json
 // @produce json
-// @param id path int true "Endpoint identifier"
+// @param id path int true "Environment(Endpoint) identifier"
 // @success 200 "Success"
 // @failure 400 "Invalid request"
 // @failure 401 "Unauthorized"
 // @failure 403 "Permission denied"
-// @failure 404 "Endpoint or ServiceAccount not found"
+// @failure 404 "Environment(Endpoint) or ServiceAccount not found"
 // @failure 500 "Server error"
 // @router /kubernetes/{id}/config [get]
 func (handler *Handler) getKubernetesConfig(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	if r.TLS == nil {
-		return &httperror.HandlerError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    "Kubernetes config generation only supported on portainer instances running with TLS",
-			Err:        errors.New("missing request TLS config"),
-		}
-	}
-
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint identifier route variable", err}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment identifier route variable", err}
 	}
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := handler.dataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == bolterrors.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
-	}
-
-	bearerToken, err := extractBearerToken(r)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusUnauthorized, "Unauthorized", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
 	}
 
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access environment", err}
 	}
 
-	cli, err := handler.KubernetesClientFactory.GetKubeClient(endpoint)
+	bearerToken, err := handler.JwtService.GenerateTokenForKubeconfig(tokenData)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to generate JWT token", err}
+	}
+
+	cli, err := handler.kubernetesClientFactory.GetKubeClient(endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create Kubernetes client", err}
 	}
@@ -76,32 +65,20 @@ func (handler *Handler) getKubernetesConfig(w http.ResponseWriter, r *http.Reque
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to generate Kubeconfig", err}
 	}
 
+	filenameBase := fmt.Sprintf("%s-%s", tokenData.Username, endpoint.Name)
 	contentAcceptHeader := r.Header.Get("Accept")
 	if contentAcceptHeader == "text/yaml" {
 		yaml, err := kcli.GenerateYAML(config)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Failed to generate Kubeconfig", err}
 		}
-		w.Header().Set("Content-Disposition", `attachment; filename=config.yaml`)
+
+		w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; %s.yaml", filenameBase))
 		return YAML(w, yaml)
 	}
 
-	w.Header().Set("Content-Disposition", `attachment; filename="config.json"`)
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; %s.json", filenameBase))
 	return response.JSON(w, config)
-}
-
-// extractBearerToken extracts user's portainer bearer token from request auth header
-func extractBearerToken(r *http.Request) (string, error) {
-	token := ""
-	tokens := r.Header["Authorization"]
-	if len(tokens) >= 1 {
-		token = tokens[0]
-		token = strings.TrimPrefix(token, "Bearer ")
-	}
-	if token == "" {
-		return "", httperrors.ErrUnauthorized
-	}
-	return token, nil
 }
 
 // getProxyUrl generates portainer proxy url which acts as proxy to k8s api server

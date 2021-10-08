@@ -2,9 +2,10 @@ package bolt
 
 import (
 	"io"
-	"log"
 	"path"
 	"time"
+
+	"github.com/portainer/portainer/api/bolt/helmuserrepository"
 
 	"github.com/boltdb/bolt"
 	portainer "github.com/portainer/portainer/api"
@@ -19,7 +20,6 @@ import (
 	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/extension"
 	"github.com/portainer/portainer/api/bolt/internal"
-	"github.com/portainer/portainer/api/bolt/migrator"
 	"github.com/portainer/portainer/api/bolt/registry"
 	"github.com/portainer/portainer/api/bolt/resourcecontrol"
 	"github.com/portainer/portainer/api/bolt/role"
@@ -34,7 +34,6 @@ import (
 	"github.com/portainer/portainer/api/bolt/user"
 	"github.com/portainer/portainer/api/bolt/version"
 	"github.com/portainer/portainer/api/bolt/webhook"
-	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 const (
@@ -44,33 +43,42 @@ const (
 // Store defines the implementation of portainer.DataStore using
 // BoltDB as the storage system.
 type Store struct {
-	path                    string
-	connection              *internal.DbConnection
-	isNew                   bool
-	fileService             portainer.FileService
-	CustomTemplateService   *customtemplate.Service
-	DockerHubService        *dockerhub.Service
-	EdgeGroupService        *edgegroup.Service
-	EdgeJobService          *edgejob.Service
-	EdgeStackService        *edgestack.Service
-	EndpointGroupService    *endpointgroup.Service
-	EndpointService         *endpoint.Service
-	EndpointRelationService *endpointrelation.Service
-	ExtensionService        *extension.Service
-	RegistryService         *registry.Service
-	ResourceControlService  *resourcecontrol.Service
-	RoleService             *role.Service
-	ScheduleService         *schedule.Service
-	SettingsService         *settings.Service
-	SSLSettingsService      *ssl.Service
-	StackService            *stack.Service
-	TagService              *tag.Service
-	TeamMembershipService   *teammembership.Service
-	TeamService             *team.Service
-	TunnelServerService     *tunnelserver.Service
-	UserService             *user.Service
-	VersionService          *version.Service
-	WebhookService          *webhook.Service
+	path                      string
+	connection                *internal.DbConnection
+	isNew                     bool
+	fileService               portainer.FileService
+	CustomTemplateService     *customtemplate.Service
+	DockerHubService          *dockerhub.Service
+	EdgeGroupService          *edgegroup.Service
+	EdgeJobService            *edgejob.Service
+	EdgeStackService          *edgestack.Service
+	EndpointGroupService      *endpointgroup.Service
+	EndpointService           *endpoint.Service
+	EndpointRelationService   *endpointrelation.Service
+	ExtensionService          *extension.Service
+	HelmUserRepositoryService *helmuserrepository.Service
+	RegistryService           *registry.Service
+	ResourceControlService    *resourcecontrol.Service
+	RoleService               *role.Service
+	ScheduleService           *schedule.Service
+	SettingsService           *settings.Service
+	SSLSettingsService        *ssl.Service
+	StackService              *stack.Service
+	TagService                *tag.Service
+	TeamMembershipService     *teammembership.Service
+	TeamService               *team.Service
+	TunnelServerService       *tunnelserver.Service
+	UserService               *user.Service
+	VersionService            *version.Service
+	WebhookService            *webhook.Service
+}
+
+func (store *Store) version() (int, error) {
+	version, err := store.VersionService.DBVersion()
+	if err == errors.ErrObjectNotFound {
+		version = 0
+	}
+	return version, err
 }
 
 func (store *Store) edition() portainer.SoftwareEdition {
@@ -82,25 +90,13 @@ func (store *Store) edition() portainer.SoftwareEdition {
 }
 
 // NewStore initializes a new Store and the associated services
-func NewStore(storePath string, fileService portainer.FileService) (*Store, error) {
-	store := &Store{
+func NewStore(storePath string, fileService portainer.FileService) *Store {
+	return &Store{
 		path:        storePath,
 		fileService: fileService,
 		isNew:       true,
 		connection:  &internal.DbConnection{},
 	}
-
-	databasePath := path.Join(storePath, databaseFileName)
-	databaseFileExists, err := fileService.FileExists(databasePath)
-	if err != nil {
-		return nil, err
-	}
-
-	if databaseFileExists {
-		store.isNew = false
-	}
-
-	return store, nil
 }
 
 // Open opens and initializes the BoltDB database.
@@ -112,7 +108,17 @@ func (store *Store) Open() error {
 	}
 	store.connection.DB = db
 
-	return store.initServices()
+	err = store.initServices()
+	if err != nil {
+		return err
+	}
+
+	// if we have DBVersion in the database then ensure we flag this as NOT a new store
+	if _, err := store.VersionService.DBVersion(); err == nil {
+		store.isNew = false
+	}
+
+	return nil
 }
 
 // Close closes the BoltDB database.
@@ -130,64 +136,6 @@ func (store *Store) IsNew() bool {
 	return store.isNew
 }
 
-// CheckCurrentEdition checks if current edition is community edition
-func (store *Store) CheckCurrentEdition() error {
-	if store.edition() != portainer.PortainerCE {
-		return errors.ErrWrongDBEdition
-	}
-	return nil
-}
-
-// MigrateData automatically migrate the data based on the DBVersion.
-// This process is only triggered on an existing database, not if the database was just created.
-// if force is true, then migrate regardless.
-func (store *Store) MigrateData(force bool) error {
-	if store.isNew && !force {
-		return store.VersionService.StoreDBVersion(portainer.DBVersion)
-	}
-
-	version, err := store.VersionService.DBVersion()
-	if err == errors.ErrObjectNotFound {
-		version = 0
-	} else if err != nil {
-		return err
-	}
-
-	if version < portainer.DBVersion {
-		migratorParams := &migrator.Parameters{
-			DB:                      store.connection.DB,
-			DatabaseVersion:         version,
-			EndpointGroupService:    store.EndpointGroupService,
-			EndpointService:         store.EndpointService,
-			EndpointRelationService: store.EndpointRelationService,
-			ExtensionService:        store.ExtensionService,
-			RegistryService:         store.RegistryService,
-			ResourceControlService:  store.ResourceControlService,
-			RoleService:             store.RoleService,
-			ScheduleService:         store.ScheduleService,
-			SettingsService:         store.SettingsService,
-			StackService:            store.StackService,
-			TagService:              store.TagService,
-			TeamMembershipService:   store.TeamMembershipService,
-			UserService:             store.UserService,
-			VersionService:          store.VersionService,
-			FileService:             store.fileService,
-			DockerhubService:        store.DockerHubService,
-			AuthorizationService:    authorization.NewService(store),
-		}
-		migrator := migrator.NewMigrator(migratorParams)
-
-		log.Printf("Migrating database from version %v to %v.\n", version, portainer.DBVersion)
-		err = migrator.Migrate()
-		if err != nil {
-			log.Printf("An error occurred during database migration: %s\n", err)
-			return err
-		}
-	}
-
-	return nil
-}
-
 // BackupTo backs up db to a provided writer.
 // It does hot backup and doesn't block other database reads and writes
 func (store *Store) BackupTo(w io.Writer) error {
@@ -195,4 +143,12 @@ func (store *Store) BackupTo(w io.Writer) error {
 		_, err := tx.WriteTo(w)
 		return err
 	})
+}
+
+// CheckCurrentEdition checks if current edition is community edition
+func (store *Store) CheckCurrentEdition() error {
+	if store.edition() != portainer.PortainerCE {
+		return errors.ErrWrongDBEdition
+	}
+	return nil
 }
