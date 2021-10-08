@@ -52,17 +52,18 @@ func (service *Service) UserByUsername(username string) (*portainer.User, error)
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
-			user, ok := obj.(portainer.User)
+		&portainer.User{},
+		func(obj interface{}) (interface{}, error) {
+			user, ok := obj.(*portainer.User)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to User object")
-				return fmt.Errorf("Failed to convert to User object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to User object: %s", obj)
 			}
 			if strings.EqualFold(user.Username, username) {
-				u = &user
-				return stop
+				u = user
+				return nil, stop
 			}
-			return nil
+			return &portainer.User{}, nil
 		})
 	if err == stop {
 		return u, nil
@@ -81,14 +82,15 @@ func (service *Service) Users() ([]portainer.User, error) {
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
-			user, ok := obj.(portainer.User)
+		&portainer.User{},
+		func(obj interface{}) (interface{}, error) {
+			user, ok := obj.(*portainer.User)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to User object")
-				return fmt.Errorf("Failed to convert to User object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to User object: %s", obj)
 			}
-			users = append(users, user)
-			return nil
+			users = append(users, *user)
+			return &portainer.User{}, nil
 		})
 
 	return users, err
@@ -101,16 +103,17 @@ func (service *Service) UsersByRole(role portainer.UserRole) ([]portainer.User, 
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
-			user, ok := obj.(portainer.User)
+		&portainer.User{},
+		func(obj interface{}) (interface{}, error) {
+			user, ok := obj.(*portainer.User)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to User object")
-				return fmt.Errorf("Failed to convert to User object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to User object: %s", obj)
 			}
 			if user.Role == role {
-				users = append(users, user)
+				users = append(users, *user)
 			}
-			return nil
+			return &portainer.User{}, nil
 		})
 
 	return users, err

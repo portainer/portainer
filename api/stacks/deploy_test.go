@@ -188,6 +188,7 @@ func Test_getUserRegistries(t *testing.T) {
 
 	registryReachableByUser := portainer.Registry{
 		ID: 1,
+		Name: "registryReachableByUser",
 		RegistryAccesses: portainer.RegistryAccesses{
 			portainer.EndpointID(endpointID): {
 				UserAccessPolicies: map[portainer.UserID]portainer.AccessPolicy{
@@ -201,6 +202,7 @@ func Test_getUserRegistries(t *testing.T) {
 
 	registryReachableByTeam := portainer.Registry{
 		ID: 2,
+		Name: "registryReachableByTeam",
 		RegistryAccesses: portainer.RegistryAccesses{
 			portainer.EndpointID(endpointID): {
 				TeamAccessPolicies: map[portainer.TeamID]portainer.AccessPolicy{
@@ -214,6 +216,7 @@ func Test_getUserRegistries(t *testing.T) {
 
 	registryRestricted := portainer.Registry{
 		ID: 3,
+		Name: "registryRestricted",
 		RegistryAccesses: portainer.RegistryAccesses{
 			portainer.EndpointID(endpointID): {
 				UserAccessPolicies: map[portainer.UserID]portainer.AccessPolicy{

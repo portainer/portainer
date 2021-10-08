@@ -36,16 +36,17 @@ func (service *Service) HelmUserRepositoryByUserID(userID portainer.UserID) ([]p
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
-			record, ok := obj.(portainer.HelmUserRepository)
+		&portainer.HelmUserRepository{},
+		func(obj interface{}) (interface{}, error) {
+			record, ok := obj.(*portainer.HelmUserRepository)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to HelmUserRepository object")
-				return fmt.Errorf("Failed to convert to HelmUserRepository object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to HelmUserRepository object: %s", obj)
 			}
 			if record.UserID == userID {
-				result = append(result, record)
+				result = append(result, *record)
 			}
-			return nil
+			return &portainer.HelmUserRepository{}, nil
 		})
 
 	return result, err

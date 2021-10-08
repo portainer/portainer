@@ -100,7 +100,9 @@ func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *
 		Quay:             payload.Quay,
 	}
 
-	registries, err := handler.DataStore.Registry().Registries()
+	rs := handler.DataStore.Registry()
+
+	registries, err := rs.Registries()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
 	}
@@ -110,7 +112,7 @@ func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
-	err = handler.DataStore.Registry().Create(registry)
+	err = rs.Create(registry)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the registry inside the database", err}
 	}

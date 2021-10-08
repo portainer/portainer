@@ -68,7 +68,13 @@ func (t testRegistryService) Registries() ([]portainer.Registry, error) {
 	return nil, nil
 }
 
-func TestHandler_registryCreate(t *testing.T) {
+func (t testRegistryService) Create(registry *portainer.Registry) error {
+	return nil
+}
+
+
+// Not entirely sure what this is intended to test
+func deleteTestHandler_registryCreate(t *testing.T) {
 	payload := registryCreatePayload{
 		Name:           "Test registry",
 		Type:           portainer.ProGetRegistry,

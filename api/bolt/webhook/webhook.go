@@ -37,14 +37,15 @@ func (service *Service) Webhooks() ([]portainer.Webhook, error) {
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
-			webhook, ok := obj.(portainer.Webhook)
+		&portainer.Webhook{},
+		func(obj interface{}) (interface{}, error) {
+			webhook, ok := obj.(*portainer.Webhook)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to Webhook object")
-				return fmt.Errorf("Failed to convert to Webhook object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to Webhook object: %s", obj)
 			}
-			webhooks = append(webhooks, webhook)
-			return nil
+			webhooks = append(webhooks, *webhook)
+			return &portainer.Webhook{}, nil
 		})
 
 	return webhooks, err
@@ -70,17 +71,18 @@ func (service *Service) WebhookByResourceID(ID string) (*portainer.Webhook, erro
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
-			webhook, ok := obj.(portainer.Webhook)
+		&portainer.Webhook{},
+		func(obj interface{}) (interface{}, error) {
+			webhook, ok := obj.(*portainer.Webhook)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to Webhook object")
-				return fmt.Errorf("Failed to convert to Webhook object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to Webhook object: %s", obj)
 			}
 			if webhook.ResourceID == ID {
-				w = &webhook
-				return stop
+				w = webhook
+				return nil, stop
 			}
-			return nil
+			return &portainer.Webhook{}, nil
 		})
 	if err == stop {
 		return w, nil
@@ -99,17 +101,18 @@ func (service *Service) WebhookByToken(token string) (*portainer.Webhook, error)
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
-			webhook, ok := obj.(portainer.Webhook)
+		&portainer.Webhook{},
+		func(obj interface{}) (interface{}, error) {
+			webhook, ok := obj.(*portainer.Webhook)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to Webhook object")
-				return fmt.Errorf("Failed to convert to Webhook object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to Webhook object: %s", obj)
 			}
 			if webhook.Token == token {
-				w = &webhook
-				return stop
+				w = webhook
+				return nil, stop
 			}
-			return nil
+			return &portainer.Webhook{}, nil
 		})
 	if err == stop {
 		return w, nil

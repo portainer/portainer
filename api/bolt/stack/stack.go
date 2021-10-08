@@ -48,21 +48,23 @@ func (service *Service) Stack(ID portainer.StackID) (*portainer.Stack, error) {
 // StackByName returns a stack object by name.
 func (service *Service) StackByName(name string) (*portainer.Stack, error) {
 	var s *portainer.Stack
+
 	stop := fmt.Errorf("ok")
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
-			stack, ok := obj.(portainer.Stack)
+		&portainer.Stack{},
+		func(obj interface{}) (interface{}, error) {
+			stack, ok := obj.(*portainer.Stack)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to Stack object")
-				return fmt.Errorf("Failed to convert to Stack object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to Stack object: %s", obj)
 			}
 			if stack.Name == name {
-				s = &stack
-				return stop
+				s = stack
+				return nil, stop
 			}
-			return nil
+			return &portainer.Stack{}, nil
 		})
 	if err == stop {
 		return s, nil
@@ -81,14 +83,15 @@ func (service *Service) Stacks() ([]portainer.Stack, error) {
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
-			stack, ok := obj.(portainer.Stack)
+		&portainer.Stack{},
+		func(obj interface{}) (interface{}, error) {
+			stack, ok := obj.(*portainer.Stack)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to Stack object")
-				return fmt.Errorf("Failed to convert to Stack object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to Stack object: %s", obj)
 			}
-			stacks = append(stacks, stack)
-			return nil
+			stacks = append(stacks, *stack)
+			return &portainer.Stack{}, nil
 		})
 
 	return stacks, err
@@ -119,34 +122,25 @@ func (service *Service) DeleteStack(ID portainer.StackID) error {
 // StackByWebhookID returns a pointer to a stack object by webhook ID.
 // It returns nil, errors.ErrObjectNotFound if there's no stack associated with the webhook ID.
 func (service *Service) StackByWebhookID(id string) (*portainer.Stack, error) {
-	/////
-	type hasWebHookId struct {
-		AutoUpdate *struct {
-			WebhookID string `json:"Webhook"`
-		} `json:"AutoUpdate"`
-	}
-
 	var s *portainer.Stack
 	stop := fmt.Errorf("ok")
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
-			t, ok := obj.(hasWebHookId)
+		&portainer.Stack{},
+		func(obj interface{}) (interface{}, error) {
+			var ok bool
+			s, ok = obj.(*portainer.Stack)
+
 			if !ok {
-				return nil
+				logrus.WithField("obj", obj).Errorf("Failed to convert to Stack object")
+				return &portainer.Stack{}, nil
 			}
 
-			if t.AutoUpdate != nil && strings.EqualFold(t.AutoUpdate.WebhookID, id) {
-				stack, ok := obj.(portainer.Stack)
-				if !ok {
-					logrus.WithField("obj", obj).Errorf("Failed to convert to Stack object")
-					return fmt.Errorf("Failed to convert to Stack object: %s", obj)
-				}
-				s = &stack
-				return stop
+			if s.AutoUpdate != nil && strings.EqualFold(s.AutoUpdate.Webhook, id) {
+				return nil, stop
 			}
-			return nil
+			return &portainer.Stack{}, nil
 		})
 	if err == stop {
 		return s, nil
@@ -166,16 +160,17 @@ func (service *Service) RefreshableStacks() ([]portainer.Stack, error) {
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
-			stack, ok := obj.(portainer.Stack)
+		&portainer.Stack{},
+		func(obj interface{}) (interface{}, error) {
+			stack, ok := obj.(*portainer.Stack)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to Stack object")
-				return fmt.Errorf("Failed to convert to Stack object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to Stack object: %s", obj)
 			}
 			if stack.AutoUpdate != nil && stack.AutoUpdate.Interval != "" {
-				stacks = append(stacks, stack)
+				stacks = append(stacks, *stack)
 			}
-			return nil
+			return &portainer.Stack{}, nil
 		})
 
 	return stacks, err

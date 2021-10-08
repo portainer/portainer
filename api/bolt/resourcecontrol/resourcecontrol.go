@@ -52,25 +52,26 @@ func (service *Service) ResourceControlByResourceIDAndType(resourceID string, re
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
-			rc, ok := obj.(portainer.ResourceControl)
+		&portainer.ResourceControl{},
+		func(obj interface{}) (interface{}, error) {
+			rc, ok := obj.(*portainer.ResourceControl)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to ResourceControl object")
-				return fmt.Errorf("Failed to convert to ResourceControl object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to ResourceControl object: %s", obj)
 			}
 
 			if rc.ResourceID == resourceID && rc.Type == resourceType {
-				resourceControl = &rc
-				return stop
+				resourceControl = rc
+				return nil, stop
 			}
 
 			for _, subResourceID := range rc.SubResourceIDs {
 				if subResourceID == resourceID {
-					resourceControl = &rc
-					return stop
+					resourceControl = rc
+					return nil, stop
 				}
 			}
-			return nil
+			return &portainer.ResourceControl{}, nil
 		})
 	if err == stop {
 		return resourceControl, nil
@@ -89,14 +90,15 @@ func (service *Service) ResourceControls() ([]portainer.ResourceControl, error) 
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
-			rc, ok := obj.(portainer.ResourceControl)
+		&portainer.ResourceControl{},
+		func(obj interface{}) (interface{}, error) {
+			rc, ok := obj.(*portainer.ResourceControl)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to ResourceControl object")
-				return fmt.Errorf("Failed to convert to ResourceControl object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to ResourceControl object: %s", obj)
 			}
-			rcs = append(rcs, rc)
-			return nil
+			rcs = append(rcs, *rc)
+			return &portainer.ResourceControl{}, nil
 		})
 
 	return rcs, err

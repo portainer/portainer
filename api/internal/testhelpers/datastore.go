@@ -4,8 +4,8 @@ import (
 	"io"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/datastore"
 )
 
 type testDatastore struct {
