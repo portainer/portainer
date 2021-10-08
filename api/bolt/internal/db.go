@@ -176,18 +176,17 @@ func CreateObjectWithSetSequence(connection *DbConnection, bucketName string, id
 	})
 }
 
-func GetAll(connection *DbConnection, bucketName string, append func(o interface{}) error) error {
+func GetAll(connection *DbConnection, bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error {
 	err := connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var obj interface{}
-			err := UnmarshalObject(v, &obj)
+			err := UnmarshalObject(v, obj)
 			if err != nil {
 				return err
 			}
-			err = append(obj)
+			obj, err = append(obj)
 			if err != nil {
 				return err
 			}
@@ -199,18 +198,17 @@ func GetAll(connection *DbConnection, bucketName string, append func(o interface
 }
 
 // TODO: decide which Unmarshal to use, and use one...
-func GetAllWithJsoniter(connection *DbConnection, bucketName string, append func(o interface{}) error) error {
+func GetAllWithJsoniter(connection *DbConnection, bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error {
 	err := connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var obj interface{}
-			err := UnmarshalObjectWithJsoniter(v, &obj)
+			err := UnmarshalObjectWithJsoniter(v, obj)
 			if err != nil {
 				return err
 			}
-			err = append(obj)
+			obj, err = append(obj)
 			if err != nil {
 				return err
 			}

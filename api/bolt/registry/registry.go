@@ -49,14 +49,15 @@ func (service *Service) Registries() ([]portainer.Registry, error) {
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
-			registry, ok := obj.(portainer.Registry)
+		&portainer.Registry{},
+		func(obj interface{}) (interface{}, error) {
+			registry, ok := obj.(*portainer.Registry)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to Registry object")
-				return fmt.Errorf("Failed to convert to Registry object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to Registry object: %s", obj)
 			}
-			registries = append(registries, registry)
-			return nil
+			registries = append(registries, *registry)
+			return &portainer.Registry{}, nil
 		})
 
 	return registries, err

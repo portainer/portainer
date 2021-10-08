@@ -61,15 +61,16 @@ func (service *Service) EndpointGroups() ([]portainer.EndpointGroup, error) {
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
+		&portainer.EndpointGroup{},
+		func(obj interface{}) (interface{}, error) {
 			//var tag portainer.Tag
-			endpointGroup, ok := obj.(portainer.EndpointGroup)
+			endpointGroup, ok := obj.(*portainer.EndpointGroup)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to EndpointGroup object")
-				return fmt.Errorf("Failed to convert to EndpointGroup object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to EndpointGroup object: %s", obj)
 			}
-			endpointGroups = append(endpointGroups, endpointGroup)
-			return nil
+			endpointGroups = append(endpointGroups, *endpointGroup)
+			return &portainer.EndpointGroup{}, nil
 		})
 
 	return endpointGroups, err

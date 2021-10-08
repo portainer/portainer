@@ -49,15 +49,15 @@ func (service *Service) Extensions() ([]portainer.Extension, error) {
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
-			//var tag portainer.Tag
-			extension, ok := obj.(portainer.Extension)
+		&portainer.Extension{},
+		func(obj interface{}) (interface{}, error) {
+			extension, ok := obj.(*portainer.Extension)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to Extension object")
-				return fmt.Errorf("Failed to convert to Extension object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to Extension object: %s", obj)
 			}
-			extensions = append(extensions, extension)
-			return nil
+			extensions = append(extensions, *extension)
+			return &portainer.Extension{}, nil
 		})
 
 	return extensions, err

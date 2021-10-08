@@ -36,15 +36,16 @@ func (service *Service) EdgeStacks() ([]portainer.EdgeStack, error) {
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
+		&portainer.EdgeStack{},
+		func(obj interface{}) (interface{}, error) {
 			//var tag portainer.Tag
-			stack, ok := obj.(portainer.EdgeStack)
+			stack, ok := obj.(*portainer.EdgeStack)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to EdgeStack object")
-				return fmt.Errorf("Failed to convert to EdgeStack object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to EdgeStack object: %s", obj)
 			}
-			stacks = append(stacks, stack)
-			return nil
+			stacks = append(stacks, *stack)
+			return &portainer.EdgeStack{}, nil
 		})
 
 	return stacks, err

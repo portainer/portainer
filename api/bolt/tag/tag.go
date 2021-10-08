@@ -36,14 +36,15 @@ func (service *Service) Tags() ([]portainer.Tag, error) {
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
-			tag, ok := obj.(portainer.Tag)
+		&portainer.Tag{},
+		func(obj interface{}) (interface{}, error) {
+			tag, ok := obj.(*portainer.Tag)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to Tag object")
-				return fmt.Errorf("Failed to convert to Tag object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to Tag object: %s", obj)
 			}
-			tags = append(tags, tag)
-			return nil
+			tags = append(tags, *tag)
+			return &portainer.Tag{}, nil
 		})
 
 	return tags, err

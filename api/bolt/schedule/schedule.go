@@ -61,14 +61,15 @@ func (service *Service) Schedules() ([]portainer.Schedule, error) {
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
-			schedule, ok := obj.(portainer.Schedule)
+		&portainer.Schedule{},
+		func(obj interface{}) (interface{}, error) {
+			schedule, ok := obj.(*portainer.Schedule)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to Schedule object")
-				return fmt.Errorf("Failed to convert to Schedule object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to Schedule object: %s", obj)
 			}
-			schedules = append(schedules, schedule)
-			return nil
+			schedules = append(schedules, *schedule)
+			return &portainer.Schedule{}, nil
 		})
 
 	return schedules, err
@@ -82,16 +83,17 @@ func (service *Service) SchedulesByJobType(jobType portainer.JobType) ([]portain
 	err := internal.GetAll(
 		service.connection,
 		BucketName,
-		func(obj interface{}) error {
-			schedule, ok := obj.(portainer.Schedule)
+		&portainer.Schedule{},
+		func(obj interface{}) (interface{}, error) {
+			schedule, ok := obj.(*portainer.Schedule)
 			if !ok {
 				logrus.WithField("obj", obj).Errorf("Failed to convert to Schedule object")
-				return fmt.Errorf("Failed to convert to Schedule object: %s", obj)
+				return nil, fmt.Errorf("Failed to convert to Schedule object: %s", obj)
 			}
 			if schedule.JobType == jobType {
-				schedules = append(schedules, schedule)
+				schedules = append(schedules, *schedule)
 			}
-			return nil
+			return &portainer.Schedule{}, nil
 		})
 
 	return schedules, err
