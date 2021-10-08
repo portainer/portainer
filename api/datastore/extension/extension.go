@@ -19,7 +19,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection datastore.Connection) (*Service, error) {
-	err := connection.CreateBucket(BucketName)
+	err := connection.SetServiceName(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func NewService(connection datastore.Connection) (*Service, error) {
 // Extension returns a extension by ID
 func (service *Service) Extension(ID portainer.ExtensionID) (*portainer.Extension, error) {
 	var extension portainer.Extension
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 
 	err := service.connection.GetObject(BucketName, identifier, &extension)
 	if err != nil {
@@ -69,6 +69,6 @@ func (service *Service) Persist(extension *portainer.Extension) error {
 
 // DeleteExtension deletes a Extension.
 func (service *Service) DeleteExtension(ID portainer.ExtensionID) error {
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.DeleteObject(BucketName, identifier)
 }

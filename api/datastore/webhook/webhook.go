@@ -20,7 +20,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection datastore.Connection) (*Service, error) {
-	err := connection.CreateBucket(BucketName)
+	err := connection.SetServiceName(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (service *Service) Webhooks() ([]portainer.Webhook, error) {
 // Webhook returns a webhook by ID.
 func (service *Service) Webhook(ID portainer.WebhookID) (*portainer.Webhook, error) {
 	var webhook portainer.Webhook
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 
 	err := service.connection.GetObject(BucketName, identifier, &webhook)
 	if err != nil {
@@ -123,7 +123,7 @@ func (service *Service) WebhookByToken(token string) (*portainer.Webhook, error)
 
 // DeleteWebhook deletes a webhook.
 func (service *Service) DeleteWebhook(ID portainer.WebhookID) error {
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.DeleteObject(BucketName, identifier)
 }
 
