@@ -19,7 +19,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection datastore.Connection) (*Service, error) {
-	err := connection.CreateBucket(BucketName)
+	err := connection.SetServiceName(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func (service *Service) CustomTemplates() ([]portainer.CustomTemplate, error) {
 // CustomTemplate returns an custom template by ID.
 func (service *Service) CustomTemplate(ID portainer.CustomTemplateID) (*portainer.CustomTemplate, error) {
 	var customTemplate portainer.CustomTemplate
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 
 	err := service.connection.GetObject(BucketName, identifier, &customTemplate)
 	if err != nil {
@@ -67,13 +67,13 @@ func (service *Service) CustomTemplate(ID portainer.CustomTemplateID) (*portaine
 
 // UpdateCustomTemplate updates an custom template.
 func (service *Service) UpdateCustomTemplate(ID portainer.CustomTemplateID, customTemplate *portainer.CustomTemplate) error {
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.UpdateObject(BucketName, identifier, customTemplate)
 }
 
 // DeleteCustomTemplate deletes an custom template.
 func (service *Service) DeleteCustomTemplate(ID portainer.CustomTemplateID) error {
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.DeleteObject(BucketName, identifier)
 }
 

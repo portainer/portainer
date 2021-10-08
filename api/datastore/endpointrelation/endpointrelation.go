@@ -17,7 +17,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection datastore.Connection) (*Service, error) {
-	err := connection.CreateBucket(BucketName)
+	err := connection.SetServiceName(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,7 @@ func NewService(connection datastore.Connection) (*Service, error) {
 // EndpointRelation returns a Environment(Endpoint) relation object by EndpointID
 func (service *Service) EndpointRelation(endpointID portainer.EndpointID) (*portainer.EndpointRelation, error) {
 	var endpointRelation portainer.EndpointRelation
-	identifier := service.connection.Itob(int(endpointID))
+	identifier := service.connection.ConvertToKey(int(endpointID))
 
 	err := service.connection.GetObject(BucketName, identifier, &endpointRelation)
 	if err != nil {
@@ -47,12 +47,12 @@ func (service *Service) Create(endpointRelation *portainer.EndpointRelation) err
 
 // UpdateEndpointRelation updates an Environment(Endpoint) relation object
 func (service *Service) UpdateEndpointRelation(EndpointID portainer.EndpointID, endpointRelation *portainer.EndpointRelation) error {
-	identifier := service.connection.Itob(int(EndpointID))
+	identifier := service.connection.ConvertToKey(int(EndpointID))
 	return service.connection.UpdateObject(BucketName, identifier, endpointRelation)
 }
 
 // DeleteEndpointRelation deletes an Environment(Endpoint) relation object
 func (service *Service) DeleteEndpointRelation(EndpointID portainer.EndpointID) error {
-	identifier := service.connection.Itob(int(EndpointID))
+	identifier := service.connection.ConvertToKey(int(EndpointID))
 	return service.connection.DeleteObject(BucketName, identifier)
 }

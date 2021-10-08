@@ -19,7 +19,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection datastore.Connection) (*Service, error) {
-	err := connection.CreateBucket(BucketName)
+	err := connection.SetServiceName(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (service *Service) EdgeStacks() ([]portainer.EdgeStack, error) {
 // EdgeStack returns an Edge stack by ID.
 func (service *Service) EdgeStack(ID portainer.EdgeStackID) (*portainer.EdgeStack, error) {
 	var stack portainer.EdgeStack
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 
 	err := service.connection.GetObject(BucketName, identifier, &stack)
 	if err != nil {
@@ -76,13 +76,13 @@ func (service *Service) Create(edgeStack *portainer.EdgeStack) error {
 
 // UpdateEdgeStack updates an Edge stack.
 func (service *Service) UpdateEdgeStack(ID portainer.EdgeStackID, edgeStack *portainer.EdgeStack) error {
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.UpdateObject(BucketName, identifier, edgeStack)
 }
 
 // DeleteEdgeStack deletes an Edge stack.
 func (service *Service) DeleteEdgeStack(ID portainer.EdgeStackID) error {
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.DeleteObject(BucketName, identifier)
 }
 

@@ -19,7 +19,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection datastore.Connection) (*Service, error) {
-	err := connection.CreateBucket(BucketName)
+	err := connection.SetServiceName(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (service *Service) EdgeJobs() ([]portainer.EdgeJob, error) {
 // EdgeJob returns an Edge job by ID
 func (service *Service) EdgeJob(ID portainer.EdgeJobID) (*portainer.EdgeJob, error) {
 	var edgeJob portainer.EdgeJob
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 
 	err := service.connection.GetObject(BucketName, identifier, &edgeJob)
 	if err != nil {
@@ -76,13 +76,13 @@ func (service *Service) Create(edgeJob *portainer.EdgeJob) error {
 
 // UpdateEdgeJob updates an Edge job by ID
 func (service *Service) UpdateEdgeJob(ID portainer.EdgeJobID, edgeJob *portainer.EdgeJob) error {
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.UpdateObject(BucketName, identifier, edgeJob)
 }
 
 // DeleteEdgeJob deletes an Edge job
 func (service *Service) DeleteEdgeJob(ID portainer.EdgeJobID) error {
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.DeleteObject(BucketName, identifier)
 }
 

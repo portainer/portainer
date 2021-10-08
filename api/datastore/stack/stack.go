@@ -22,7 +22,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection datastore.Connection) (*Service, error) {
-	err := connection.CreateBucket(BucketName)
+	err := connection.SetServiceName(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +35,7 @@ func NewService(connection datastore.Connection) (*Service, error) {
 // Stack returns a stack object by ID.
 func (service *Service) Stack(ID portainer.StackID) (*portainer.Stack, error) {
 	var stack portainer.Stack
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 
 	err := service.connection.GetObject(BucketName, identifier, &stack)
 	if err != nil {
@@ -107,13 +107,13 @@ func (service *Service) Create(stack *portainer.Stack) error {
 
 // UpdateStack updates a stack.
 func (service *Service) UpdateStack(ID portainer.StackID, stack *portainer.Stack) error {
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.UpdateObject(BucketName, identifier, stack)
 }
 
 // DeleteStack deletes a stack.
 func (service *Service) DeleteStack(ID portainer.StackID) error {
-	identifier := service.connection.Itob(int(ID))
+	identifier := service.connection.ConvertToKey(int(ID))
 	return service.connection.DeleteObject(BucketName, identifier)
 }
 

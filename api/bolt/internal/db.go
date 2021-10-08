@@ -10,17 +10,17 @@ type DbConnection struct {
 	*bolt.DB
 }
 
-// Itob returns an 8-byte big endian representation of v.
+// ConvertToKey returns an 8-byte big endian representation of v.
 // This function is typically used for encoding integer IDs to byte slices
 // so that they can be used as BoltDB keys.
-func (connection *DbConnection) Itob(v int) []byte {
+func (connection *DbConnection) ConvertToKey(v int) []byte {
 	b := make([]byte, 8)
 	binary.BigEndian.PutUint64(b, uint64(v))
 	return b
 }
 
 // CreateBucket is a generic function used to create a bucket inside a bolt database.
-func (connection *DbConnection) CreateBucket(bucketName string) error {
+func (connection *DbConnection) SetServiceName(bucketName string) error {
 	return connection.Update(func(tx *bolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte(bucketName))
 		if err != nil {
@@ -96,7 +96,7 @@ func (connection *DbConnection) DeleteAllObjects(bucketName string, matching fun
 			}
 
 			if id, ok := matching(obj); ok {
-				err := bucket.Delete(connection.Itob(id))
+				err := bucket.Delete(connection.ConvertToKey(id))
 				if err != nil {
 					return err
 				}
@@ -137,7 +137,7 @@ func (connection *DbConnection) CreateObject(bucketName string, fn func(uint64) 
 			return err
 		}
 
-		return bucket.Put(connection.Itob(int(id)), data)
+		return bucket.Put(connection.ConvertToKey(int(id)), data)
 	})
 }
 
@@ -151,7 +151,7 @@ func (connection *DbConnection) CreateObjectWithId(bucketName string, id int, ob
 			return err
 		}
 
-		return bucket.Put(connection.Itob(int(id)), data)
+		return bucket.Put(connection.ConvertToKey(int(id)), data)
 	})
 }
 
@@ -172,7 +172,7 @@ func (connection *DbConnection) CreateObjectWithSetSequence(bucketName string, i
 			return err
 		}
 
-		return bucket.Put(connection.Itob(int(id)), data)
+		return bucket.Put(connection.ConvertToKey(int(id)), data)
 	})
 }
 
