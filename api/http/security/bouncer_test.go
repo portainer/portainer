@@ -9,6 +9,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/bolt"
+	"github.com/portainer/portainer/api/datastore"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/jwt"
 	"github.com/stretchr/testify/assert"
@@ -19,10 +20,10 @@ var testHandler200 = http.HandlerFunc(func(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusOK)
 })
 
-func tokenLookupSucceed(dataStore portainer.DataStore, jwtService portainer.JWTService) tokenLookup {
+func tokenLookupSucceed(dataStore datastore.DataStore, jwtService datastore.JWTService) tokenLookup {
 	return func(r *http.Request) *portainer.TokenData {
 		uid := portainer.UserID(1)
-		dataStore.User().CreateUser(&portainer.User{ID: uid})
+		dataStore.User().Create(&portainer.User{ID: uid})
 		jwtService.GenerateToken(&portainer.TokenData{ID: uid})
 		return &portainer.TokenData{ID: 1}
 	}
@@ -263,7 +264,7 @@ func Test_apiKeyLookup(t *testing.T) {
 
 	// create standard user
 	user := &portainer.User{ID: 2, Username: "standard", Role: portainer.StandardUserRole}
-	err := store.User().CreateUser(user)
+	err := store.User().Create(user)
 	is.NoError(err, "error creating user")
 
 	// setup services

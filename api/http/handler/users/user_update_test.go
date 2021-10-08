@@ -22,7 +22,7 @@ func Test_updateUserRemovesAccessTokens(t *testing.T) {
 
 	// create standard user
 	user := &portainer.User{ID: 2, Username: "standard", Role: portainer.StandardUserRole}
-	err := store.User().CreateUser(user)
+	err := store.User().Create(user)
 	is.NoError(err, "error creating user")
 
 	// setup services

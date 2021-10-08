@@ -4,7 +4,7 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
-	"github.com/portainer/portainer/api/bolt/user"
+	"github.com/portainer/portainer/api/datastore/user"
 )
 
 func (m *Migrator) updateAdminUserToDBVersion1() error {
