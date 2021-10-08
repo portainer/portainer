@@ -2,7 +2,7 @@ package docker
 
 import (
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/registryutils"
 )
@@ -28,7 +28,7 @@ type (
 )
 
 func createRegistryAuthenticationHeader(
-	dataStore datastore.DataStore,
+	dataStore dataservices.DataStore,
 	registryId portainer.RegistryID,
 	accessContext *registryAccessContext,
 ) (authenticationHeader registryAuthenticationHeader, err error) {

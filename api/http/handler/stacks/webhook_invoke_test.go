@@ -1,18 +1,18 @@
 package stacks
 
 import (
+	"github.com/portainer/portainer/api/database"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/gofrs/uuid"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/bolt"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestHandler_webhookInvoke(t *testing.T) {
-	store, teardown := bolt.MustNewTestStore(true)
+	store, teardown := database.MustNewTestStore(true)
 	defer teardown()
 
 	webhookID := newGuidString(t)

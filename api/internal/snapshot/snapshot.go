@@ -7,15 +7,15 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
 // Service repesents a service to manage environment(endpoint) snapshots.
 // It provides an interface to start background snapshots as well as
 // specific Docker/Kubernetes environment(endpoint) snapshot methods.
 type Service struct {
-	dataStore                 datastore.DataStore
-	refreshSignal             chan struct{}
+	dataStore     dataservices.DataStore
+	refreshSignal chan struct{}
 	snapshotIntervalInSeconds float64
 	dockerSnapshotter         portainer.DockerSnapshotter
 	kubernetesSnapshotter     portainer.KubernetesSnapshotter
@@ -23,7 +23,7 @@ type Service struct {
 }
 
 // NewService creates a new instance of a service
-func NewService(snapshotInterval string, dataStore datastore.DataStore, dockerSnapshotter portainer.DockerSnapshotter, kubernetesSnapshotter portainer.KubernetesSnapshotter, shutdownCtx context.Context) (*Service, error) {
+func NewService(snapshotInterval string, dataStore dataservices.DataStore, dockerSnapshotter portainer.DockerSnapshotter, kubernetesSnapshotter portainer.KubernetesSnapshotter, shutdownCtx context.Context) (*Service, error) {
 	snapshotFrequency, err := time.ParseDuration(snapshotInterval)
 	if err != nil {
 		return nil, err
@@ -127,7 +127,7 @@ func (service *Service) startSnapshotLoop() error {
 	go func() {
 		err := service.snapshotEndpoints()
 		if err != nil {
-			log.Printf("[ERROR] [internal,snapshot] [message: background schedule error (environment snapshot).] [error: %s]", err)
+			log.Printf("[ERROR] [boltdb,snapshot] [message: background schedule error (environment snapshot).] [error: %s]", err)
 		}
 
 		for {
@@ -135,14 +135,14 @@ func (service *Service) startSnapshotLoop() error {
 			case <-ticker.C:
 				err := service.snapshotEndpoints()
 				if err != nil {
-					log.Printf("[ERROR] [internal,snapshot] [message: background schedule error (environment snapshot).] [error: %s]", err)
+					log.Printf("[ERROR] [boltdb,snapshot] [message: background schedule error (environment snapshot).] [error: %s]", err)
 				}
 			case <-service.shutdownCtx.Done():
-				log.Println("[DEBUG] [internal,snapshot] [message: shutting down snapshotting]")
+				log.Println("[DEBUG] [boltdb,snapshot] [message: shutting down snapshotting]")
 				ticker.Stop()
 				return
 			case <-service.refreshSignal:
-				log.Println("[DEBUG] [internal,snapshot] [message: shutting down snapshotting]")
+				log.Println("[DEBUG] [boltdb,snapshot] [message: shutting down snapshotting]")
 				ticker.Stop()
 				return
 			}

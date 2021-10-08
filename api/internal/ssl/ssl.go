@@ -10,19 +10,19 @@ import (
 	"github.com/pkg/errors"
 	"github.com/portainer/libcrypto"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/dataservices"
 )
 
 // Service represents a service to manage SSL certificates
 type Service struct {
-	fileService     portainer.FileService
-	dataStore       datastore.DataStore
-	rawCert         *tls.Certificate
+	fileService portainer.FileService
+	dataStore   dataservices.DataStore
+	rawCert     *tls.Certificate
 	shutdownTrigger context.CancelFunc
 }
 
 // NewService returns a pointer to a new Service
-func NewService(fileService portainer.FileService, dataStore datastore.DataStore, shutdownTrigger context.CancelFunc) *Service {
+func NewService(fileService portainer.FileService, dataStore dataservices.DataStore, shutdownTrigger context.CancelFunc) *Service {
 	return &Service{
 		fileService:     fileService,
 		dataStore:       dataStore,
@@ -166,6 +166,6 @@ func (service *Service) generateSelfSignedCertificates(ip, certPath, keyPath str
 		return errors.New("host can't be empty")
 	}
 
-	log.Printf("[INFO] [internal,ssl] [message: no cert files found, generating self signed ssl certificates]")
+	log.Printf("[INFO] [boltdb,ssl] [message: no cert files found, generating self signed ssl certificates]")
 	return libcrypto.GenerateCertsForHost("localhost", ip, certPath, keyPath, time.Now().AddDate(5, 0, 0))
 }

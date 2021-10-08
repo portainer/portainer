@@ -5,11 +5,11 @@ import (
 
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/scheduler"
 )
 
-func StartStackSchedules(scheduler *scheduler.Scheduler, stackdeployer StackDeployer, datastore datastore.DataStore, gitService portainer.GitService) error {
+func StartStackSchedules(scheduler *scheduler.Scheduler, stackdeployer StackDeployer, datastore dataservices.DataStore, gitService portainer.GitService) error {
 	stacks, err := datastore.Stack().RefreshableStacks()
 	if err != nil {
 		return errors.Wrap(err, "failed to fetch refreshable stacks")

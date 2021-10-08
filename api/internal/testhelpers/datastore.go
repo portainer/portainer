@@ -3,72 +3,75 @@ package testhelpers
 import (
 	"io"
 
+	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/dataservices/errors"
+
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/bolt/errors"
-	"github.com/portainer/portainer/api/datastore"
 )
 
 type testDatastore struct {
-	customTemplate          datastore.CustomTemplateService
-	edgeGroup               datastore.EdgeGroupService
-	edgeJob                 datastore.EdgeJobService
-	edgeStack               datastore.EdgeStackService
-	endpoint                datastore.EndpointService
-	endpointGroup           datastore.EndpointGroupService
-	endpointRelation        datastore.EndpointRelationService
-	helmUserRepository      datastore.HelmUserRepositoryService
-	registry                datastore.RegistryService
-	resourceControl         datastore.ResourceControlService
-	apiKeyRepositoryService datastore.APIKeyRepository
-	role                    datastore.RoleService
-	sslSettings             datastore.SSLSettingsService
-	settings                datastore.SettingsService
-	stack                   datastore.StackService
-	tag                     datastore.TagService
-	teamMembership          datastore.TeamMembershipService
-	team                    datastore.TeamService
-	tunnelServer            datastore.TunnelServerService
-	user                    datastore.UserService
-	version                 datastore.VersionService
-	webhook                 datastore.WebhookService
+	customTemplate          dataservices.CustomTemplateService
+	edgeGroup               dataservices.EdgeGroupService
+	edgeJob                 dataservices.EdgeJobService
+	edgeStack               dataservices.EdgeStackService
+	endpoint                dataservices.EndpointService
+	endpointGroup           dataservices.EndpointGroupService
+	endpointRelation        dataservices.EndpointRelationService
+	helmUserRepository      dataservices.HelmUserRepositoryService
+	registry                dataservices.RegistryService
+	resourceControl         dataservices.ResourceControlService
+	apiKeyRepositoryService dataservices.APIKeyRepository
+	role                    dataservices.RoleService
+	sslSettings             dataservices.SSLSettingsService
+	settings                dataservices.SettingsService
+	stack                   dataservices.StackService
+	tag                     dataservices.TagService
+	teamMembership          dataservices.TeamMembershipService
+	team                    dataservices.TeamService
+	tunnelServer            dataservices.TunnelServerService
+	user                    dataservices.UserService
+	version                 dataservices.VersionService
+	webhook                 dataservices.WebhookService
 }
 
-func (d *testDatastore) BackupTo(io.Writer) error                        { return nil }
-func (d *testDatastore) Open() error                                     { return nil }
-func (d *testDatastore) Init() error                                     { return nil }
-func (d *testDatastore) Close() error                                    { return nil }
-func (d *testDatastore) CheckCurrentEdition() error                      { return nil }
-func (d *testDatastore) IsNew() bool                                     { return false }
-func (d *testDatastore) MigrateData(force bool) error                    { return nil }
-func (d *testDatastore) Rollback(force bool) error                       { return nil }
-func (d *testDatastore) CustomTemplate() datastore.CustomTemplateService { return d.customTemplate }
-func (d *testDatastore) EdgeGroup() datastore.EdgeGroupService           { return d.edgeGroup }
-func (d *testDatastore) EdgeJob() datastore.EdgeJobService               { return d.edgeJob }
-func (d *testDatastore) EdgeStack() datastore.EdgeStackService           { return d.edgeStack }
-func (d *testDatastore) Endpoint() datastore.EndpointService             { return d.endpoint }
-func (d *testDatastore) EndpointGroup() datastore.EndpointGroupService   { return d.endpointGroup }
-func (d *testDatastore) EndpointRelation() datastore.EndpointRelationService {
+func (d *testDatastore) BackupTo(io.Writer) error                           { return nil }
+func (d *testDatastore) Open() error                                        { return nil }
+func (d *testDatastore) Init() error                                        { return nil }
+func (d *testDatastore) Close() error                                       { return nil }
+func (d *testDatastore) CheckCurrentEdition() error                         { return nil }
+func (d *testDatastore) IsNew() bool                                        { return false }
+func (d *testDatastore) MigrateData(force bool) error                       { return nil }
+func (d *testDatastore) Rollback(force bool) error                          { return nil }
+func (d *testDatastore) CustomTemplate() dataservices.CustomTemplateService { return d.customTemplate }
+func (d *testDatastore) EdgeGroup() dataservices.EdgeGroupService           { return d.edgeGroup }
+func (d *testDatastore) EdgeJob() dataservices.EdgeJobService               { return d.edgeJob }
+func (d *testDatastore) EdgeStack() dataservices.EdgeStackService           { return d.edgeStack }
+func (d *testDatastore) Endpoint() dataservices.EndpointService             { return d.endpoint }
+func (d *testDatastore) EndpointGroup() dataservices.EndpointGroupService   { return d.endpointGroup }
+func (d *testDatastore) EndpointRelation() dataservices.EndpointRelationService {
 	return d.endpointRelation
 }
-func (d *testDatastore) HelmUserRepository() datastore.HelmUserRepositoryService {
+func (d *testDatastore) HelmUserRepository() dataservices.HelmUserRepositoryService {
 	return d.helmUserRepository
 }
-func (d *testDatastore) Registry() datastore.RegistryService               { return d.registry }
-func (d *testDatastore) ResourceControl() datastore.ResourceControlService { return d.resourceControl }
-func (d *testDatastore) Role() datastore.RoleService                       { return d.role }
-func (d *testDatastore) APIKeyRepository() datastore.APIKeyRepository {
+func (d *testDatastore) Registry() dataservices.RegistryService { return d.registry }
+func (d *testDatastore) ResourceControl() dataservices.ResourceControlService {
+	return d.resourceControl
+}
+func (d *testDatastore) Role() dataservices.RoleService { return d.role }
+func (d *testDatastore) APIKeyRepository() dataservices.APIKeyRepository {
 	return d.apiKeyRepositoryService
 }
-func (d *testDatastore) Settings() datastore.SettingsService             { return d.settings }
-func (d *testDatastore) SSLSettings() datastore.SSLSettingsService       { return d.sslSettings }
-func (d *testDatastore) Stack() datastore.StackService                   { return d.stack }
-func (d *testDatastore) Tag() datastore.TagService                       { return d.tag }
-func (d *testDatastore) TeamMembership() datastore.TeamMembershipService { return d.teamMembership }
-func (d *testDatastore) Team() datastore.TeamService                     { return d.team }
-func (d *testDatastore) TunnelServer() datastore.TunnelServerService     { return d.tunnelServer }
-func (d *testDatastore) User() datastore.UserService                     { return d.user }
-func (d *testDatastore) Version() datastore.VersionService               { return d.version }
-func (d *testDatastore) Webhook() datastore.WebhookService               { return d.webhook }
+func (d *testDatastore) Settings() dataservices.SettingsService             { return d.settings }
+func (d *testDatastore) SSLSettings() dataservices.SSLSettingsService       { return d.sslSettings }
+func (d *testDatastore) Stack() dataservices.StackService                   { return d.stack }
+func (d *testDatastore) Tag() dataservices.TagService                       { return d.tag }
+func (d *testDatastore) TeamMembership() dataservices.TeamMembershipService { return d.teamMembership }
+func (d *testDatastore) Team() dataservices.TeamService                     { return d.team }
+func (d *testDatastore) TunnelServer() dataservices.TunnelServerService     { return d.tunnelServer }
+func (d *testDatastore) User() dataservices.UserService                     { return d.user }
+func (d *testDatastore) Version() dataservices.VersionService               { return d.version }
+func (d *testDatastore) Webhook() dataservices.WebhookService               { return d.webhook }
 
 func (d *testDatastore) IsErrObjectNotFound(e error) bool {
 	return false

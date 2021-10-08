@@ -6,7 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes/cli"
@@ -23,9 +23,9 @@ func hideFields(registry *portainer.Registry, hideAccesses bool) {
 // Handler is the HTTP handler used to handle registry operations.
 type Handler struct {
 	*mux.Router
-	requestBouncer   *security.RequestBouncer
-	DataStore        datastore.DataStore
-	FileService      portainer.FileService
+	requestBouncer *security.RequestBouncer
+	DataStore      dataservices.DataStore
+	FileService    portainer.FileService
 	ProxyManager     *proxy.Manager
 	K8sClientFactory *cli.ClientFactory
 }
