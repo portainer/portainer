@@ -20,7 +20,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection *internal.DbConnection) (*Service, error) {
-	err := internal.CreateBucket(connection, BucketName)
+	err := connection.CreateBucket(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -34,8 +34,7 @@ func NewService(connection *internal.DbConnection) (*Service, error) {
 func (service *Service) Webhooks() ([]portainer.Webhook, error) {
 	var webhooks = make([]portainer.Webhook, 0)
 
-	err := internal.GetAll(
-		service.connection,
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.Webhook{},
 		func(obj interface{}) (interface{}, error) {
@@ -56,7 +55,7 @@ func (service *Service) Webhook(ID portainer.WebhookID) (*portainer.Webhook, err
 	var webhook portainer.Webhook
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.connection, BucketName, identifier, &webhook)
+	err := service.connection.GetObject(BucketName, identifier, &webhook)
 	if err != nil {
 		return nil, err
 	}
@@ -68,8 +67,7 @@ func (service *Service) Webhook(ID portainer.WebhookID) (*portainer.Webhook, err
 func (service *Service) WebhookByResourceID(ID string) (*portainer.Webhook, error) {
 	var w *portainer.Webhook
 	stop := fmt.Errorf("ok")
-	err := internal.GetAll(
-		service.connection,
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.Webhook{},
 		func(obj interface{}) (interface{}, error) {
@@ -98,8 +96,7 @@ func (service *Service) WebhookByResourceID(ID string) (*portainer.Webhook, erro
 func (service *Service) WebhookByToken(token string) (*portainer.Webhook, error) {
 	var w *portainer.Webhook
 	stop := fmt.Errorf("ok")
-	err := internal.GetAll(
-		service.connection,
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.Webhook{},
 		func(obj interface{}) (interface{}, error) {
@@ -127,13 +124,12 @@ func (service *Service) WebhookByToken(token string) (*portainer.Webhook, error)
 // DeleteWebhook deletes a webhook.
 func (service *Service) DeleteWebhook(ID portainer.WebhookID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.connection, BucketName, identifier)
+	return service.connection.DeleteObject(BucketName, identifier)
 }
 
 // CreateWebhook assign an ID to a new webhook and saves it.
 func (service *Service) Create(webhook *portainer.Webhook) error {
-	return internal.CreateObject(
-		service.connection,
+	return service.connection.CreateObject(
 		BucketName,
 		func(id uint64) (int, interface{}) {
 			webhook.ID = portainer.WebhookID(id)

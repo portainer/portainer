@@ -19,7 +19,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection *internal.DbConnection) (*Service, error) {
-	err := internal.CreateBucket(connection, BucketName)
+	err := connection.CreateBucket(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -33,8 +33,7 @@ func NewService(connection *internal.DbConnection) (*Service, error) {
 func (service *Service) EdgeGroups() ([]portainer.EdgeGroup, error) {
 	var groups = make([]portainer.EdgeGroup, 0)
 
-	err := internal.GetAllWithJsoniter(
-		service.connection,
+	err := service.connection.GetAllWithJsoniter(
 		BucketName,
 		&portainer.EdgeGroup{},
 		func(obj interface{}) (interface{}, error) {
@@ -55,7 +54,7 @@ func (service *Service) EdgeGroup(ID portainer.EdgeGroupID) (*portainer.EdgeGrou
 	var group portainer.EdgeGroup
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.connection, BucketName, identifier, &group)
+	err := service.connection.GetObject(BucketName, identifier, &group)
 	if err != nil {
 		return nil, err
 	}
@@ -66,19 +65,18 @@ func (service *Service) EdgeGroup(ID portainer.EdgeGroupID) (*portainer.EdgeGrou
 // UpdateEdgeGroup updates an Edge group.
 func (service *Service) UpdateEdgeGroup(ID portainer.EdgeGroupID, group *portainer.EdgeGroup) error {
 	identifier := internal.Itob(int(ID))
-	return internal.UpdateObject(service.connection, BucketName, identifier, group)
+	return service.connection.UpdateObject(BucketName, identifier, group)
 }
 
 // DeleteEdgeGroup deletes an Edge group.
 func (service *Service) DeleteEdgeGroup(ID portainer.EdgeGroupID) error {
 	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.connection, BucketName, identifier)
+	return service.connection.DeleteObject(BucketName, identifier)
 }
 
 // CreateEdgeGroup assign an ID to a new Edge group and saves it.
 func (service *Service) Create(group *portainer.EdgeGroup) error {
-	return internal.CreateObject(
-		service.connection,
+	return service.connection.CreateObject(
 		BucketName,
 		func(id uint64) (int, interface{}) {
 			group.ID = portainer.EdgeGroupID(id)

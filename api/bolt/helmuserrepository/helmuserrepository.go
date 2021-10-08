@@ -19,7 +19,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection *internal.DbConnection) (*Service, error) {
-	err := internal.CreateBucket(connection, BucketName)
+	err := connection.CreateBucket(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -33,8 +33,7 @@ func NewService(connection *internal.DbConnection) (*Service, error) {
 func (service *Service) HelmUserRepositoryByUserID(userID portainer.UserID) ([]portainer.HelmUserRepository, error) {
 	var result = make([]portainer.HelmUserRepository, 0)
 
-	err := internal.GetAll(
-		service.connection,
+	err := service.connection.GetAll(
 		BucketName,
 		&portainer.HelmUserRepository{},
 		func(obj interface{}) (interface{}, error) {
@@ -54,8 +53,7 @@ func (service *Service) HelmUserRepositoryByUserID(userID portainer.UserID) ([]p
 
 // CreateHelmUserRepository creates a new HelmUserRepository object.
 func (service *Service) Create(record *portainer.HelmUserRepository) error {
-	return internal.CreateObject(
-		service.connection,
+	return service.connection.CreateObject(
 		BucketName,
 		func(id uint64) (int, interface{}) {
 			record.ID = portainer.HelmUserRepositoryID(id)

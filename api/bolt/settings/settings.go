@@ -18,7 +18,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(connection *internal.DbConnection) (*Service, error) {
-	err := internal.CreateBucket(connection, BucketName)
+	err := connection.CreateBucket(BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func NewService(connection *internal.DbConnection) (*Service, error) {
 func (service *Service) Settings() (*portainer.Settings, error) {
 	var settings portainer.Settings
 
-	err := internal.GetObject(service.connection, BucketName, []byte(settingsKey), &settings)
+	err := service.connection.GetObject(BucketName, []byte(settingsKey), &settings)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (service *Service) Settings() (*portainer.Settings, error) {
 
 // UpdateSettings persists a Settings object.
 func (service *Service) UpdateSettings(settings *portainer.Settings) error {
-	return internal.UpdateObject(service.connection, BucketName, []byte(settingsKey), settings)
+	return service.connection.UpdateObject(BucketName, []byte(settingsKey), settings)
 }
 
 func (service *Service) IsFeatureFlagEnabled(feature portainer.Feature) bool {

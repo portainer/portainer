@@ -20,7 +20,7 @@ func Itob(v int) []byte {
 }
 
 // CreateBucket is a generic function used to create a bucket inside a bolt database.
-func CreateBucket(connection *DbConnection, bucketName string) error {
+func (connection *DbConnection) CreateBucket(bucketName string) error {
 	return connection.Update(func(tx *bolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte(bucketName))
 		if err != nil {
@@ -31,7 +31,7 @@ func CreateBucket(connection *DbConnection, bucketName string) error {
 }
 
 // GetObject is a generic function used to retrieve an unmarshalled object from a bolt database.
-func GetObject(connection *DbConnection, bucketName string, key []byte, object interface{}) error {
+func (connection *DbConnection) GetObject(bucketName string, key []byte, object interface{}) error {
 	var data []byte
 
 	err := connection.View(func(tx *bolt.Tx) error {
@@ -55,7 +55,7 @@ func GetObject(connection *DbConnection, bucketName string, key []byte, object i
 }
 
 // UpdateObject is a generic function used to update an object inside a bolt database.
-func UpdateObject(connection *DbConnection, bucketName string, key []byte, object interface{}) error {
+func (connection *DbConnection) UpdateObject(bucketName string, key []byte, object interface{}) error {
 	return connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
@@ -74,7 +74,7 @@ func UpdateObject(connection *DbConnection, bucketName string, key []byte, objec
 }
 
 // DeleteObject is a generic function used to delete an object inside a bolt database.
-func DeleteObject(connection *DbConnection, bucketName string, key []byte) error {
+func (connection *DbConnection) DeleteObject(bucketName string, key []byte) error {
 	return connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 		return bucket.Delete(key)
@@ -83,7 +83,7 @@ func DeleteObject(connection *DbConnection, bucketName string, key []byte) error
 
 // DeleteAllObjects delete all objects where matching() returns (id, ok).
 // TODO: think about how to return the error inside (maybe change ok to type err, and use "notfound"?
-func DeleteAllObjects(connection *DbConnection, bucketName string, matching func(o interface{}) (id int, ok bool)) error {
+func (connection *DbConnection) DeleteAllObjects(bucketName string, matching func(o interface{}) (id int, ok bool)) error {
 	return connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
@@ -108,7 +108,7 @@ func DeleteAllObjects(connection *DbConnection, bucketName string, matching func
 }
 
 // GetNextIdentifier is a generic function that returns the specified bucket identifier incremented by 1.
-func GetNextIdentifier(connection *DbConnection, bucketName string) int {
+func (connection *DbConnection) GetNextIdentifier(bucketName string) int {
 	var identifier int
 
 	connection.Update(func(tx *bolt.Tx) error {
@@ -125,7 +125,7 @@ func GetNextIdentifier(connection *DbConnection, bucketName string) int {
 }
 
 // CreateObject creates a new object in the bucket, using the next bucket sequence id
-func CreateObject(connection *DbConnection, bucketName string, fn func(uint64) (int, interface{})) error {
+func (connection *DbConnection) CreateObject(bucketName string, fn func(uint64) (int, interface{})) error {
 	return connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
@@ -142,7 +142,7 @@ func CreateObject(connection *DbConnection, bucketName string, fn func(uint64) (
 }
 
 // CreateObjectWithId creates a new object in the bucket, using the specified id
-func CreateObjectWithId(connection *DbConnection, bucketName string, id int, obj interface{}) error {
+func (connection *DbConnection) CreateObjectWithId(bucketName string, id int, obj interface{}) error {
 	return connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
@@ -157,7 +157,7 @@ func CreateObjectWithId(connection *DbConnection, bucketName string, id int, obj
 
 // CreateObjectWithSetSequence creates a new object in the bucket, using the specified id, and sets the bucket sequence
 // avoid this :)
-func CreateObjectWithSetSequence(connection *DbConnection, bucketName string, id int, obj interface{}) error {
+func (connection *DbConnection) CreateObjectWithSetSequence(bucketName string, id int, obj interface{}) error {
 	return connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
@@ -176,7 +176,7 @@ func CreateObjectWithSetSequence(connection *DbConnection, bucketName string, id
 	})
 }
 
-func GetAll(connection *DbConnection, bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error {
+func (connection *DbConnection) GetAll(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error {
 	err := connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
@@ -198,7 +198,7 @@ func GetAll(connection *DbConnection, bucketName string, obj interface{}, append
 }
 
 // TODO: decide which Unmarshal to use, and use one...
-func GetAllWithJsoniter(connection *DbConnection, bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error {
+func (connection *DbConnection) GetAllWithJsoniter(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error {
 	err := connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
