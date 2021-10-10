@@ -29,6 +29,7 @@ export function featureService() {
       [FEATURE_IDS.REGISTRY_MANAGEMENT]: EDITIONS.BE,
       [FEATURE_IDS.S3_BACKUP_SETTING]: EDITIONS.BE,
       [FEATURE_IDS.TEAM_MEMBERSHIP]: EDITIONS.BE,
+      [FEATURE_IDS.FORCE_REDEPLOYMENT]: EDITIONS.BE,
     };
 
     state.currentEdition = currentEdition;

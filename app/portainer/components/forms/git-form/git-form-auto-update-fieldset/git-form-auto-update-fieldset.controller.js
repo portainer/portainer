@@ -1,4 +1,4 @@
-import { HIDE_INTERNAL_AUTH } from '@/portainer/feature-flags/feature-ids';
+import { FORCE_REDEPLOYMENT } from '@/portainer/feature-flags/feature-ids';
 
 class GitFormAutoUpdateFieldsetController {
   /* @ngInject */
@@ -8,7 +8,7 @@ class GitFormAutoUpdateFieldsetController {
     this.onChangeInterval = this.onChangeField('RepositoryFetchInterval');
     this.clipboard = clipboard;
 
-    this.limitedFeature = HIDE_INTERNAL_AUTH;
+    this.limitedFeature = FORCE_REDEPLOYMENT;
   }
 
   copyWebhook() {
