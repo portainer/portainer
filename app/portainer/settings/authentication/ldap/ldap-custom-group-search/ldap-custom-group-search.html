@@ -1,0 +1,73 @@
+<div class="col-sm-12 form-section-title" style="float: initial;">
+  Group search configurations
+</div>
+
+<rd-widget ng-repeat="config in $ctrl.settings | limitTo: (1 - $ctrl.settings)" style="display: block; margin-bottom: 10px;">
+  <rd-widget-body>
+    <div class="form-group" ng-if="$index > 0" style="margin-bottom: 10px;">
+      <span class="col-sm-12 text-muted small">
+        Extra search configuration
+      </span>
+    </div>
+
+    <div class="form-group">
+      <label for="ldap_group_basedn_{{ $index }}" class="col-sm-4 col-md-2 control-label text-left">
+        Group Base DN
+        <portainer-tooltip position="bottom" message="The distinguished name of the element from which the LDAP server will search for groups."></portainer-tooltip>
+      </label>
+      <div class="col-sm-8 col-md-4">
+        <input type="text" class="form-control" id="ldap_group_basedn_{{ $index }}" ng-model="config.GroupBaseDN" placeholder="dc=ldap,dc=domain,dc=tld" />
+      </div>
+
+      <label for="ldap_group_att_{{ $index }}" class="col-sm-4 col-md-2 control-label text-left">
+        Group Membership Attribute
+        <portainer-tooltip position="bottom" message="LDAP attribute which denotes the group membership."></portainer-tooltip>
+      </label>
+      <div class="col-sm-8 col-md-4">
+        <input type="text" class="form-control" id="ldap_group_att_{{ $index }}" ng-model="config.GroupAttribute" placeholder="member" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="ldap_group_filter_{{ $index }}" class="col-sm-4 col-md-2 control-label text-left">
+        Group Filter
+        <portainer-tooltip position="bottom" message="The LDAP search filter used to select group elements, optional."></portainer-tooltip>
+      </label>
+      <div ng-class="{ 'col-sm-7 col-md-9': $index, 'col-sm-8 col-md-10': !$index }">
+        <input type="text" class="form-control" id="ldap_group_filter_{{ $index }}" ng-model="config.GroupFilter" placeholder="(objectClass=account)" />
+      </div>
+      <div class="col-sm-1" ng-if="$index > 0">
+        <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.onRemoveClick($index)">
+          <i class="fa fa-trash" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  </rd-widget-body>
+</rd-widget>
+
+<div class="form-group" style="margin-top: 10px;">
+  <div class="col-sm-12">
+    <button class="label label-default interactive" style="border: 0;" ng-click="$ctrl.onAddClick()">
+      <i class="fa fa-plus-circle" aria-hidden="true"></i> add group search configuration
+    </button>
+  </div>
+  <div class="col-sm-12" style="margin-top: 10px;">
+    <button
+      class="btn btm-sm btn-primary"
+      type="button"
+      ng-click="$ctrl.search()"
+      limited-feature-dir="{{ $ctrl.limitedFeatureId }}"
+      limited-feature-tabindex="-1"
+      limited-feature-disabled
+      limited-feature-class="limited-be"
+    >
+      Display User/Group matching
+    </button>
+    <be-feature-indicator feature="$ctrl.limitedFeatureId" class="space-left"></be-feature-indicator>
+  </div>
+</div>
+
+<div ng-if="$ctrl.showTable">
+  <div class="form-group">
+    <ldap-groups-datatable dataset="$ctrl.groups" title-text="Groups" title-icon="fa-users" table-key="ldapGroups"></ldap-groups-datatable>
+  </div>
+</div>

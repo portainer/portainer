@@ -3,6 +3,7 @@ import uuidv4 from 'uuid/v4';
 
 import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 import { EndpointSecurityFormData } from '@/portainer/components/endpointSecurity/porEndpointSecurityModel';
+import { getAgentShortVersion } from 'Portainer/views/endpoints/helpers';
 
 angular.module('portainer.app').controller('EndpointController', EndpointController);
 
@@ -22,7 +23,8 @@ function EndpointController(
   Notifications,
   Authentication,
   SettingsService,
-  ModalService
+  ModalService,
+  StateManager
 ) {
   const DEPLOYMENT_TABS = {
     SWARM: 'swarm',
@@ -66,6 +68,9 @@ function EndpointController(
     allowSelfSignedCerts: true,
   };
 
+  $scope.agentVersion = StateManager.getState().application.version;
+  $scope.agentShortVersion = getAgentShortVersion($scope.agentVersion);
+
   $scope.dockerCommands = {
     [DEPLOYMENT_TABS.STANDALONE]: {
       [PLATFORM_TYPES.LINUX]: buildLinuxStandaloneCommand,
@@ -87,7 +92,13 @@ function EndpointController(
 
   $scope.copyEdgeAgentDeploymentCommand = copyEdgeAgentDeploymentCommand;
   function copyEdgeAgentDeploymentCommand() {
-    const command = $scope.dockerCommands[$scope.state.deploymentTab][$scope.state.platformType]($scope.randomEdgeID, $scope.endpoint.EdgeKey, $scope.state.allowSelfSignedCerts);
+    const command = $scope.dockerCommands[$scope.state.deploymentTab][$scope.state.platformType](
+      $scope.agentVersion,
+      $scope.agentShortVersion,
+      $scope.randomEdgeID,
+      $scope.endpoint.EdgeKey,
+      $scope.state.allowSelfSignedCerts
+    );
     clipboard.copyText(command.trim());
     $('#copyNotificationDeploymentCommand').show().fadeOut(2500);
   }
@@ -269,7 +280,7 @@ function EndpointController(
     });
   }
 
-  function buildLinuxStandaloneCommand(edgeId, edgeKey, allowSelfSignedCerts) {
+  function buildLinuxStandaloneCommand(agentVersion, agentShortVersion, edgeId, edgeKey, allowSelfSignedCerts) {
     return `
 docker run -d \\
     -v /var/run/docker.sock:/var/run/docker.sock \\
@@ -283,10 +294,10 @@ docker run -d \\
     -e CAP_HOST_MANAGEMENT=1 \\
     -e EDGE_INSECURE_POLL=${allowSelfSignedCerts ? 1 : 0} \\
     --name portainer_edge_agent \\
-    portainer/agent`;
+    portainer/agent:${agentVersion}`;
   }
 
-  function buildWindowsStandaloneCommand(edgeId, edgeKey, allowSelfSignedCerts) {
+  function buildWindowsStandaloneCommand(agentVersion, agentShortVersion, edgeId, edgeKey, allowSelfSignedCerts) {
     return `
 docker run -d \\
   --mount type=npipe,src=\\\\.\\pipe\\docker_engine,dst=\\\\.\\pipe\\docker_engine \\
@@ -299,10 +310,10 @@ docker run -d \\
   -e CAP_HOST_MANAGEMENT=1 \\
   -e EDGE_INSECURE_POLL=${allowSelfSignedCerts ? 1 : 0} \\
   --name portainer_edge_agent \\
-  portainer/agent`;
+  portainer/agent:${agentVersion}`;
   }
 
-  function buildLinuxSwarmCommand(edgeId, edgeKey, allowSelfSignedCerts) {
+  function buildLinuxSwarmCommand(agentVersion, agentShortVersion, edgeId, edgeKey, allowSelfSignedCerts) {
     return `
 docker network create \\
   --driver overlay \\
@@ -323,10 +334,10 @@ docker service create \\
   --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volumes \\
   --mount type=bind,src=//,dst=/host \\
   --mount type=volume,src=portainer_agent_data,dst=/data \\
-  portainer/agent`;
+  portainer/agent:${agentVersion}`;
   }
 
-  function buildWindowsSwarmCommand(edgeId, edgeKey, allowSelfSignedCerts) {
+  function buildWindowsSwarmCommand(agentVersion, agentShortVersion, edgeId, edgeKey, allowSelfSignedCerts) {
     return `
 docker network create \\
   --driver overlay \\
@@ -345,12 +356,12 @@ docker service create \\
   --mount type=npipe,src=\\\\.\\pipe\\docker_engine,dst=\\\\.\\pipe\\docker_engine \\
   --mount type=bind,src=C:\\ProgramData\\docker\\volumes,dst=C:\\ProgramData\\docker\\volumes \\
   --mount type=volume,src=portainer_agent_data,dst=C:\\data \\
-  portainer/agent`;
+  portainer/agent:${agentVersion}`;
   }
 
-  function buildKubernetesCommand(edgeId, edgeKey, allowSelfSignedCerts) {
+  function buildKubernetesCommand(agentVersion, agentShortVersion, edgeId, edgeKey, allowSelfSignedCerts) {
     return `
-curl https://downloads.portainer.io/portainer-ce29-edge-agent-setup.sh | bash -s -- ${edgeId} ${edgeKey} ${allowSelfSignedCerts ? '1' : ''}
+curl https://downloads.portainer.io/portainer-ce${agentShortVersion}-edge-agent-setup.sh | bash -s -- ${edgeId} ${edgeKey} ${allowSelfSignedCerts ? '1' : ''}
 `;
   }
 

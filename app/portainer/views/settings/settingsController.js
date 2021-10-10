@@ -1,3 +1,8 @@
+import angular from 'angular';
+
+import { buildOption } from '@/portainer/components/box-selector';
+import { S3_BACKUP_SETTING } from '@/portainer/feature-flags/feature-ids';
+
 angular.module('portainer.app').controller('SettingsController', [
   '$scope',
   '$state',
@@ -8,6 +13,12 @@ angular.module('portainer.app').controller('SettingsController', [
   'FileSaver',
   'Blob',
   function ($scope, $state, Notifications, SettingsService, StateManager, BackupService, FileSaver) {
+    $scope.s3BackupFeatureId = S3_BACKUP_SETTING;
+    $scope.backupOptions = [
+      buildOption('backup_file', 'fa fa-download', 'Download backup file', '', 'file'),
+      buildOption('backup_s3', 'fa fa-upload', 'Store in S3', 'Define a cron schedule', 's3', S3_BACKUP_SETTING),
+    ];
+
     $scope.state = {
       actionInProgress: false,
       availableEdgeAgentCheckinOptions: [
@@ -47,7 +58,10 @@ angular.module('portainer.app').controller('SettingsController', [
         },
       ],
       backupInProgress: false,
+      featureLimited: false,
     };
+
+    $scope.BACKUP_FORM_TYPES = { S3: 's3', FILE: 'file' };
 
     $scope.formValues = {
       customLogo: false,
@@ -57,6 +71,12 @@ angular.module('portainer.app').controller('SettingsController', [
       enableTelemetry: false,
       passwordProtect: false,
       password: '',
+      backupFormType: $scope.BACKUP_FORM_TYPES.FILE,
+    };
+
+    $scope.onBackupOptionsChange = function (type, limited) {
+      $scope.formValues.backupFormType = type;
+      $scope.state.featureLimited = limited;
     };
 
     $scope.removeFilteredContainerLabel = function (index) {

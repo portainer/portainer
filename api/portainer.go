@@ -3,7 +3,6 @@ package portainer
 import (
 	"context"
 	"io"
-	"net/http"
 	"time"
 
 	gittypes "github.com/portainer/portainer/api/git/types"
@@ -66,6 +65,7 @@ type (
 		SSL                       *bool
 		SSLCert                   *string
 		SSLKey                    *string
+		Rollback                  *bool
 		SnapshotInterval          *string
 	}
 
@@ -513,6 +513,12 @@ type (
 		AutoCreateUsers bool `json:"AutoCreateUsers" example:"true"`
 	}
 
+	// LDAPUser represents a LDAP user
+	LDAPUser struct {
+		Name   string
+		Groups []string
+	}
+
 	// LicenseInformation represents information about an extension license
 	LicenseInformation struct {
 		LicenseKey string `json:"LicenseKey,omitempty"`
@@ -713,6 +719,8 @@ type (
 		EnableTelemetry bool `json:"EnableTelemetry" example:"false"`
 		// Helm repository URL, defaults to "https://charts.bitnami.com/bitnami"
 		HelmRepositoryURL string `json:"HelmRepositoryURL" example:"https://charts.bitnami.com/bitnami"`
+		// KubectlImage, defaults to portainer/kubectl-shell
+		KubectlShellImage string `json:"KubectlShellImage" example:"portainer/kubectl-shell"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
@@ -1022,7 +1030,7 @@ type (
 		// User Identifier
 		ID       UserID `json:"Id" example:"1"`
 		Username string `json:"Username" example:"bob"`
-		Password string `json:"Password,omitempty" example:"passwd"`
+		Password string `json:"Password,omitempty" swaggerignore:"true"`
 		// User Theme
 		UserTheme string `example:"dark"`
 		// User role (1 for administrator account and 2 for regular account)
@@ -1103,6 +1111,7 @@ type (
 		Close() error
 		IsNew() bool
 		MigrateData(force bool) error
+		Rollback(force bool) error
 		CheckCurrentEdition() error
 		BackupTo(w io.Writer) error
 
@@ -1204,6 +1213,7 @@ type (
 	FileService interface {
 		GetDockerConfigPath() string
 		GetFileContent(filePath string) ([]byte, error)
+		Copy(fromFilePath string, toFilePath string, deleteIfExists bool) error
 		Rename(oldPath, newPath string) error
 		RemoveDirectory(directoryPath string) error
 		StoreTLSFileFromBytes(folder string, fileType TLSFileType, data []byte) (string, error)
@@ -1261,7 +1271,7 @@ type (
 		SetupUserServiceAccount(userID int, teamIDs []int, restrictDefaultNamespace bool) error
 		GetServiceAccount(tokendata *TokenData) (*v1.ServiceAccount, error)
 		GetServiceAccountBearerToken(userID int) (string, error)
-		CreateUserShellPod(ctx context.Context, serviceAccountName string) (*KubernetesShellPod, error)
+		CreateUserShellPod(ctx context.Context, serviceAccountName, shellPodImage string) (*KubernetesShellPod, error)
 		StartExecProcess(token string, useAdminToken bool, namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer, errChan chan error)
 		NamespaceAccessPoliciesDeleteNamespace(namespace string) error
 		GetNodesLimits() (K8sNodesLimits, error)
@@ -1276,7 +1286,8 @@ type (
 
 	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes environment(endpoint)
 	KubernetesDeployer interface {
-		Deploy(request *http.Request, endpoint *Endpoint, data string, namespace string) (string, error)
+		Deploy(userID UserID, endpoint *Endpoint, manifestFiles []string, namespace string) (string, error)
+		Remove(userID UserID, endpoint *Endpoint, manifestFiles []string, namespace string) (string, error)
 		ConvertCompose(data []byte) ([]byte, error)
 	}
 
@@ -1290,6 +1301,8 @@ type (
 		AuthenticateUser(username, password string, settings *LDAPSettings) error
 		TestConnectivity(settings *LDAPSettings) error
 		GetUserGroups(username string, settings *LDAPSettings) ([]string, error)
+		SearchGroups(settings *LDAPSettings) ([]LDAPUser, error)
+		SearchUsers(settings *LDAPSettings) ([]string, error)
 	}
 
 	// OAuthService represents a service used to authenticate users using OAuth
@@ -1326,6 +1339,7 @@ type (
 		SetTunnelStatusToIdle(endpointID EndpointID)
 		KeepTunnelAlive(endpointID EndpointID, ctx context.Context, maxKeepAlive time.Duration)
 		GetTunnelDetails(endpointID EndpointID) *TunnelDetails
+		GetActiveTunnel(endpoint *Endpoint) (*TunnelDetails, error)
 		AddEdgeJob(endpointID EndpointID, edgeJob *EdgeJob)
 		RemoveEdgeJob(edgeJobID EdgeJobID)
 	}
@@ -1456,7 +1470,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "2.9.0"
+	APIVersion = "2.9.1"
 	// DBVersion is the version number of the Portainer database
 	DBVersion = 32
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
@@ -1494,6 +1508,8 @@ const (
 	DefaultUserSessionTimeout = "8h"
 	// DefaultUserSessionTimeout represents the default timeout after which the user session is cleared
 	DefaultKubeconfigExpiry = "0"
+	// DefaultKubectlShellImage represents the default image and tag for the kubectl shell
+	DefaultKubectlShellImage = "portainer/kubectl-shell"
 	// WebSocketKeepAlive web socket keep alive for edge environments
 	WebSocketKeepAlive = 1 * time.Hour
 )

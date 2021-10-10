@@ -146,14 +146,13 @@
                 </div>
                 <div class="form-group">
                   <div class="col-sm-12">
-                    <label class="control-label text-left">
-                      Load Balancer quota
-                    </label>
-                    <label class="switch" style="margin-left: 20px;"> <input type="checkbox" disabled /><i></i> </label>
-                    <span class="text-muted small" style="margin-left: 15px;">
-                      <i class="fa fa-user" aria-hidden="true"></i>
-                      This feature is available in <a href="https://www.portainer.io/business-upsell?from=k8s-resourcepool-lbquota" target="_blank"> Portainer Business Edition</a>.
-                    </span>
+                    <por-switch-field
+                      ng-data-cy="k8sNamespaceCreate-loadBalancerQuotaToggle"
+                      label="Load Balancer quota"
+                      name="k8s-resourcepool-Lbquota"
+                      feature="ctrl.LBQuotaFeatureId"
+                      ng-model="lbquota"
+                    ></por-switch-field>
                   </div>
                 </div>
                 <!-- #endregion -->
@@ -221,6 +220,7 @@
                                 ng-model="item.Host"
                                 ng-change="ctrl.onChangeIngressHostname()"
                                 placeholder="foo"
+                                pattern="[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*"
                                 required
                               />
                             </div>
@@ -240,6 +240,11 @@
                           >
                             <ng-messages for="resourcePoolEditForm['hostname_' + ic.IngressClass.Name + '_' + $index].$error">
                               <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Hostname is required.</p>
+                              <p ng-message="pattern">
+                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                This field must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g.
+                                'example.com').
+                              </p>
                             </ng-messages>
                             <p ng-if="item.Duplicate">
                               <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
@@ -383,15 +388,13 @@
                 </div>
                 <div class="form-group">
                   <div class="col-sm-12">
-                    <label class="control-label text-left">
-                      Enable quota
-                    </label>
-                    <label class="switch" style="margin-left: 20px;"> <input type="checkbox" disabled /><i></i> </label>
-                    <span class="text-muted small" style="margin-left: 15px;">
-                      <i class="fa fa-user" aria-hidden="true"></i>
-                      This feature is available in
-                      <a href="https://www.portainer.io/business-upsell?from=k8s-resourcepool-storagequota" target="_blank"> Portainer Business Edition</a>.
-                    </span>
+                    <por-switch-field
+                      ng-data-cy="k8sNamespaceCreate-enableQuotaToggle"
+                      label="Enable quota"
+                      name="k8s-resourcepool-storagequota"
+                      feature="ctrl.StorageQuotaFeatureId"
+                      ng-model="storagequota"
+                    ></por-switch-field>
                   </div>
                 </div>
                 <!-- #endregion -->

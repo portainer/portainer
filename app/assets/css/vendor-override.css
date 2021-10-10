@@ -281,7 +281,7 @@ json-tree .branch-preview {
   margin-top: 15px;
 }
 
-.summary {
+.bold {
   color: var(--text-summary-color);
   font-weight: 700;
 }
@@ -390,4 +390,19 @@ input:-webkit-autofill {
 .btn-primary:hover {
   color: var(--white-color) !important;
 }
+
+.btn-danger:hover {
+  color: var(--white-color);
+}
 /* Overide Vendor CSS */
+
+.btn.disabled,
+.btn[disabled],
+fieldset[disabled] .btn {
+  pointer-events: none;
+  touch-action: none;
+}
+
+.multiSelect.inlineBlock button {
+  margin: 0;
+}

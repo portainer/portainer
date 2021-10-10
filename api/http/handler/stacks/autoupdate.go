@@ -17,10 +17,8 @@ func startAutoupdate(stackID portainer.StackID, interval string, scheduler *sche
 		return "", &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Unable to parse stack's auto update interval", Err: err}
 	}
 
-	jobID = scheduler.StartJobEvery(d, func() {
-		if err := stacks.RedeployWhenChanged(stackID, stackDeployer, datastore, gitService); err != nil {
-			log.Printf("[ERROR] [http,stacks] [message: failed redeploying] [err: %s]\n", err)
-		}
+	jobID = scheduler.StartJobEvery(d, func() error {
+		return stacks.RedeployWhenChanged(stackID, stackDeployer, datastore, gitService)
 	})
 
 	return jobID, nil

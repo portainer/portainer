@@ -2,9 +2,13 @@ package stackutils
 
 import (
 	"fmt"
+	"io/ioutil"
 	"path"
 
+	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/filesystem"
+	k "github.com/portainer/portainer/api/kubernetes"
 )
 
 // ResourceControlID returns the stack resource control id
@@ -19,4 +23,40 @@ func GetStackFilePaths(stack *portainer.Stack) []string {
 		filePaths = append(filePaths, path.Join(stack.ProjectPath, file))
 	}
 	return filePaths
+}
+
+// CreateTempK8SDeploymentFiles reads manifest files from original stack project path
+// then add app labels into the file contents and create temp files for deployment
+// return temp file paths and temp dir
+func CreateTempK8SDeploymentFiles(stack *portainer.Stack, kubeDeployer portainer.KubernetesDeployer, appLabels k.KubeAppLabels) ([]string, string, error) {
+	fileNames := append([]string{stack.EntryPoint}, stack.AdditionalFiles...)
+	var manifestFilePaths []string
+	tmpDir, err := ioutil.TempDir("", "kub_deployment")
+	if err != nil {
+		return nil, "", errors.Wrap(err, "failed to create temp kub deployment directory")
+	}
+
+	for _, fileName := range fileNames {
+		manifestFilePath := path.Join(tmpDir, fileName)
+		manifestContent, err := ioutil.ReadFile(path.Join(stack.ProjectPath, fileName))
+		if err != nil {
+			return nil, "", errors.Wrap(err, "failed to read manifest file")
+		}
+		if stack.IsComposeFormat {
+			manifestContent, err = kubeDeployer.ConvertCompose(manifestContent)
+			if err != nil {
+				return nil, "", errors.Wrap(err, "failed to convert docker compose file to a kube manifest")
+			}
+		}
+		manifestContent, err = k.AddAppLabels(manifestContent, appLabels.ToMap())
+		if err != nil {
+			return nil, "", errors.Wrap(err, "failed to add application labels")
+		}
+		err = filesystem.WriteToFile(manifestFilePath, []byte(manifestContent))
+		if err != nil {
+			return nil, "", errors.Wrap(err, "failed to create temp manifest file")
+		}
+		manifestFilePaths = append(manifestFilePaths, manifestFilePath)
+	}
+	return manifestFilePaths, tmpDir, nil
 }

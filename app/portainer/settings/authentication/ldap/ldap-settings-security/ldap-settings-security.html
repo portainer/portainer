@@ -1,0 +1,72 @@
+<div class="col-sm-12 form-section-title">
+  {{ $ctrl.title || 'LDAP security' }}
+</div>
+
+<!-- starttls -->
+<div class="form-group" ng-if="!$ctrl.settings.TLSConfig.TLS">
+  <label for="tls" class="control-label col-sm-3 text-left" style="padding-top: 0;">
+    Use StartTLS
+    <portainer-tooltip
+      position="bottom"
+      message="Enable this option if want to use StartTLS to secure the connection to the server. Ignored if Use TLS is selected."
+    ></portainer-tooltip>
+  </label>
+  <div class="col-sm-9">
+    <label class="switch">
+      <input type="checkbox" ng-model="$ctrl.settings.StartTLS" limited-feature-dir="{{::$ctrl.limitedFeatureId}}" limited-feature-tabindex="-1" /><i></i>
+    </label>
+  </div>
+</div>
+<!-- !starttls -->
+
+<!-- tls-checkbox -->
+<div class="form-group" ng-if="!$ctrl.settings.StartTLS">
+  <label for="tls" class="control-label col-sm-3 text-left" style="padding-top: 0;">
+    Use TLS
+    <portainer-tooltip position="bottom" message="Enable this option if you need to specify TLS certificates to connect to the LDAP server."></portainer-tooltip>
+  </label>
+  <div class="col-sm-9">
+    <label class="switch">
+      <input type="checkbox" ng-model="$ctrl.settings.TLSConfig.TLS" limited-feature-dir="{{::$ctrl.limitedFeatureId}}" limited-feature-tabindex="-1" /><i></i>
+    </label>
+  </div>
+</div>
+<!-- !tls-checkbox -->
+
+<!-- tls-skip-verify -->
+<div class="form-group">
+  <label for="tls" class="control-label col-sm-3 text-left" style="padding-top: 0;">
+    Skip verification of server certificate
+    <portainer-tooltip position="bottom" message="Skip the verification of the server TLS certificate. Not recommended on unsecured networks."></portainer-tooltip>
+  </label>
+  <div class="col-sm-9">
+    <label class="switch">
+      <input type="checkbox" ng-model="$ctrl.settings.TLSConfig.TLSSkipVerify" limited-feature-dir="{{::$ctrl.limitedFeatureId}}" limited-feature-tabindex="-1" /><i></i>
+    </label>
+  </div>
+</div>
+<!-- !tls-skip-verify -->
+
+<!-- ca-input -->
+<div class="form-group" ng-if="$ctrl.settings.TLSConfig.TLS || ($ctrl.settings.StartTLS && !$ctrl.settings.TLSConfig.TLSSkipVerify)">
+  <label class="col-sm-3 control-label text-left">TLS CA certificate</label>
+  <div class="col-sm-9">
+    <button
+      type="button"
+      class="btn btn-sm btn-primary"
+      ngf-select="$ctrl.onTlscaCertChange($file)"
+      ng-model="$ctrl.tlscaCert"
+      limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+      limited-feature-tabindex="-1"
+    >
+      Select file
+    </button>
+    <span style="margin-left: 5px;">
+      {{ $ctrl.tlscaCert.name }}
+      <i class="fa fa-check green-icon" ng-if="$ctrl.tlscaCert && $ctrl.tlscaCert === $ctrl.settings.TLSConfig.TLSCACert" aria-hidden="true"></i>
+      <i class="fa fa-times red-icon" ng-if="!$ctrl.tlscaCert" aria-hidden="true"></i>
+      <i class="fa fa-circle-notch fa-spin" ng-if="$ctrl.uploadInProgress"></i>
+    </span>
+  </div>
+</div>
+<!-- !ca-input -->

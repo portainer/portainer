@@ -38,7 +38,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/portainer/docker-compose-wrapper v0.0.0-20210909083948-8be0d98451a1
 	github.com/portainer/libcrypto v0.0.0-20210422035235-c652195c5c3a
-	github.com/portainer/libhelm v0.0.0-20210906035629-b5635edd5d97
+	github.com/portainer/libhelm v0.0.0-20210929000907-825e93d62108
 	github.com/portainer/libhttp v0.0.0-20190806161843-ba068f58be33
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/sirupsen/logrus v1.8.1
@@ -46,6 +46,7 @@ require (
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
+	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	gotest.tools v2.2.0+incompatible // indirect

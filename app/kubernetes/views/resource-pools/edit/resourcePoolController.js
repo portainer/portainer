@@ -16,6 +16,7 @@ import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHel
 import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
 import KubernetesResourceQuotaConverter from 'Kubernetes/converters/resourceQuota';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
+import { K8S_RESOURCE_POOL_LB_QUOTA, K8S_RESOURCE_POOL_STORAGE_QUOTA } from '@/portainer/feature-flags/feature-ids';
 
 class KubernetesResourcePoolController {
   /* #region  CONSTRUCTOR */
@@ -59,6 +60,9 @@ class KubernetesResourcePoolController {
 
     this.IngressClassTypes = KubernetesIngressClassTypes;
     this.ResourceQuotaDefaults = KubernetesResourceQuotaDefaults;
+
+    this.LBQuotaFeatureId = K8S_RESOURCE_POOL_LB_QUOTA;
+    this.StorageQuotaFeatureId = K8S_RESOURCE_POOL_STORAGE_QUOTA;
 
     this.updateResourcePoolAsync = this.updateResourcePoolAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
@@ -176,7 +180,7 @@ class KubernetesResourcePoolController {
       this.checkDefaults();
       await this.KubernetesResourcePoolService.patch(oldFormValues, newFormValues);
       this.Notifications.success('Namespace successfully updated', this.pool.Namespace.Name);
-      this.$state.reload();
+      this.$state.reload(this.$state.current);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to create namespace');
     } finally {
@@ -238,7 +242,7 @@ class KubernetesResourcePoolController {
         await this.KubernetesResourcePoolService.toggleSystem(this.endpoint.Id, namespaceName, !this.isSystem);
 
         this.Notifications.success('Namespace successfully updated', namespaceName);
-        this.$state.reload();
+        this.$state.reload(this.$state.current);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to create namespace');
       } finally {

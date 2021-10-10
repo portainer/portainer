@@ -1,0 +1,39 @@
+<div class="col-sm-12 form-section-title" style="float: initial;">
+  Group search configurations
+</div>
+
+<div style="margin-top: 10px;" ng-repeat="config in $ctrl.settings | limitTo: (1 - $ctrl.settings)">
+  <ldap-group-search-item
+    config="config"
+    domain-suffix="{{ $ctrl.domainSuffix }}"
+    index="$index"
+    base-filter="{{ $ctrl.baseFilter }}"
+    on-remove-click="($ctrl.onRemoveClick)"
+    limited-feature-id="$ctrl.limitedFeatureId"
+  ></ldap-group-search-item>
+</div>
+
+<div class="form-group" style="margin-top: 10px;">
+  <div class="col-sm-12">
+    <button
+      class="label label-default interactive"
+      style="border: 0;"
+      ng-click="$ctrl.onAddClick()"
+      limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+      limited-feature-tabindex="-1"
+    >
+      <i class="fa fa-plus-circle" aria-hidden="true"></i> add group search configuration
+    </button>
+  </div>
+  <div class="col-sm-12" style="margin-top: 10px;">
+    <button class="btn btm-sm btn-primary" type="button" ng-click="$ctrl.search()" limited-feature-dir="{{::$ctrl.limitedFeatureId}}" limited-feature-tabindex="-1">
+      Display User/Group matching
+    </button>
+  </div>
+</div>
+
+<div ng-if="$ctrl.showTable">
+  <div class="form-group">
+    <ldap-groups-datatable dataset="$ctrl.groups" title-text="Groups" title-icon="fa-users" table-key="ldapGroups"></ldap-groups-datatable>
+  </div>
+</div>

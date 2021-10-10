@@ -96,7 +96,7 @@ class KubernetesVolumeController {
         this.Notifications.success('Applications successfully redeployed');
       }
 
-      this.$state.reload();
+      this.$state.reload(this.$state.current);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to update volume.');
     }

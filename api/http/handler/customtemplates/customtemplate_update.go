@@ -51,6 +51,9 @@ func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Description) {
 		return errors.New("Invalid custom template description")
 	}
+	if !isValidNote(payload.Note) {
+		return errors.New("Invalid note. <img> tag is not supported")
+	}
 	return nil
 }
 

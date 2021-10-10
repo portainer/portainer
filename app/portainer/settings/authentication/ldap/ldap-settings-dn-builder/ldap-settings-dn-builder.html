@@ -1,0 +1,69 @@
+<div class="form-group ldap-dn-builder">
+  <div class="col-sm-12" style="margin-bottom: 5px;">
+    <label class="control-label text-left">{{ $ctrl.label || 'DN entries' }}</label>
+    <button
+      type="button"
+      class="label label-default interactive"
+      style="margin-left: 10px; border: 0;"
+      ng-click="$ctrl.addEntry()"
+      limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+      limited-feature-tabindex="-1"
+    >
+      <i class="fa fa-plus-circle" aria-hidden="true"></i> add another entry
+    </button>
+  </div>
+  <div class="col-sm-12" ng-if="$ctrl.entries.length">
+    <rd-widget>
+      <rd-widget-body>
+        <div class="form-group no-margin-last-child" ng-repeat="entry in $ctrl.entries">
+          <div class="col-sm-4">
+            <select class="form-control" ng-model="entry.type" ng-change="$ctrl.onEntriesChange()" limited-feature-dir="{{::$ctrl.limitedFeatureId}}" limited-feature-tabindex="-1">
+              <option value="ou">OU Name</option>
+              <option value="cn">Folder Name</option>
+            </select>
+          </div>
+          <div class="col-sm-5">
+            <input
+              class="form-control"
+              ng-model="entry.value"
+              ng-change="$ctrl.onEntriesChange()"
+              limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+              limited-feature-tabindex="-1"
+            />
+          </div>
+          <div class="col-sm-3 text-right">
+            <button
+              class="btn btn-sm btn-primary"
+              type="button"
+              ng-disabled="$first"
+              ng-click="$ctrl.moveUp($index)"
+              limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+              limited-feature-tabindex="-1"
+            >
+              <i class="fa fa-arrow-up" aria-hidden="true"></i>
+            </button>
+            <button
+              class="btn btn-sm btn-primary"
+              type="button"
+              ng-disabled="$last"
+              ng-click="$ctrl.moveDown($index)"
+              limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+              limited-feature-tabindex="-1"
+            >
+              <i class="fa fa-arrow-down" aria-hidden="true"></i>
+            </button>
+            <button
+              class="btn btn-sm btn-danger"
+              type="button"
+              ng-click="$ctrl.removeEntry($index)"
+              limited-feature-dir="{{::$ctrl.limitedFeatureId}}"
+              limited-feature-tabindex="-1"
+            >
+              <i class="fa fa-trash" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

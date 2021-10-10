@@ -42,7 +42,7 @@ class KubernetesServiceConverter {
     res.StackName = formValues.StackName ? formValues.StackName : formValues.Name;
     res.ApplicationOwner = formValues.ApplicationOwner;
     res.ApplicationName = formValues.Name;
-    if (formValues.PublishingType === KubernetesApplicationPublishingTypes.CLUSTER) {
+    if (formValues.PublishingType === KubernetesApplicationPublishingTypes.NODE_PORT) {
       res.Type = KubernetesServiceTypes.NODE_PORT;
     } else if (formValues.PublishingType === KubernetesApplicationPublishingTypes.LOAD_BALANCER) {
       res.Type = KubernetesServiceTypes.LOAD_BALANCER;

@@ -487,6 +487,7 @@ class KubernetesApplicationHelper {
       const helmApp = new HelmApplication();
       helmApp.Name = helmInstance;
       helmApp.ApplicationType = KubernetesApplicationTypes.HELM;
+      helmApp.ApplicationOwner = applications[0].ApplicationOwner;
       helmApp.KubernetesApplications = applications;
 
       // the status of helm app is `Ready` based on whether the underlying RunningPodsCount of the k8s app

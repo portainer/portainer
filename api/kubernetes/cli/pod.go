@@ -12,15 +12,13 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-const shellPodImage = "portainer/kubectl-shell"
-
 // CreateUserShellPod will create a kubectl based shell for the specified user by mounting their respective service account.
 // The lifecycle of the pod is managed in this function; this entails management of the following pod operations:
 // - The shell pod will be scoped to specified service accounts access permissions
 // - The shell pod will be automatically removed if it's not ready after specified period of time
 // - The shell pod will be automatically removed after a specified max life (prevent zombie pods)
 // - The shell pod will be automatically removed if request is cancelled (or client closes websocket connection)
-func (kcl *KubeClient) CreateUserShellPod(ctx context.Context, serviceAccountName string) (*portainer.KubernetesShellPod, error) {
+func (kcl *KubeClient) CreateUserShellPod(ctx context.Context, serviceAccountName, shellPodImage string) (*portainer.KubernetesShellPod, error) {
 	maxPodKeepAliveSecondsStr := fmt.Sprintf("%d", int(portainer.WebSocketKeepAlive.Seconds()))
 
 	podPrefix := userShellPodPrefix(serviceAccountName)

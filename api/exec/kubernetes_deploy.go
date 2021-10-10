@@ -2,24 +2,19 @@ package exec
 
 import (
 	"bytes"
-	"encoding/json"
-	"errors"
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"net/url"
 	"os/exec"
 	"path"
 	"runtime"
 	"strings"
-	"time"
 
+	"github.com/pkg/errors"
+	"github.com/portainer/portainer/api/http/proxy"
+	"github.com/portainer/portainer/api/http/proxy/factory"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
-	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/crypto"
 )
 
 // KubernetesDeployer represents a service to deploy resources inside a Kubernetes environment(endpoint).
@@ -30,10 +25,11 @@ type KubernetesDeployer struct {
 	signatureService            portainer.DigitalSignatureService
 	kubernetesClientFactory     *cli.ClientFactory
 	kubernetesTokenCacheManager *kubernetes.TokenCacheManager
+	proxyManager                *proxy.Manager
 }
 
 // NewKubernetesDeployer initializes a new KubernetesDeployer service.
-func NewKubernetesDeployer(kubernetesTokenCacheManager *kubernetes.TokenCacheManager, kubernetesClientFactory *cli.ClientFactory, datastore portainer.DataStore, reverseTunnelService portainer.ReverseTunnelService, signatureService portainer.DigitalSignatureService, binaryPath string) *KubernetesDeployer {
+func NewKubernetesDeployer(kubernetesTokenCacheManager *kubernetes.TokenCacheManager, kubernetesClientFactory *cli.ClientFactory, datastore portainer.DataStore, reverseTunnelService portainer.ReverseTunnelService, signatureService portainer.DigitalSignatureService, proxyManager *proxy.Manager, binaryPath string) *KubernetesDeployer {
 	return &KubernetesDeployer{
 		binaryPath:                  binaryPath,
 		dataStore:                   datastore,
@@ -41,32 +37,33 @@ func NewKubernetesDeployer(kubernetesTokenCacheManager *kubernetes.TokenCacheMan
 		signatureService:            signatureService,
 		kubernetesClientFactory:     kubernetesClientFactory,
 		kubernetesTokenCacheManager: kubernetesTokenCacheManager,
+		proxyManager:                proxyManager,
 	}
 }
 
-func (deployer *KubernetesDeployer) getToken(request *http.Request, endpoint *portainer.Endpoint, setLocalAdminToken bool) (string, error) {
-	tokenData, err := security.RetrieveTokenData(request)
-	if err != nil {
-		return "", err
-	}
-
-	kubecli, err := deployer.kubernetesClientFactory.GetKubeClient(endpoint)
+func (deployer *KubernetesDeployer) getToken(userID portainer.UserID, endpoint *portainer.Endpoint, setLocalAdminToken bool) (string, error) {
+	kubeCLI, err := deployer.kubernetesClientFactory.GetKubeClient(endpoint)
 	if err != nil {
 		return "", err
 	}
 
 	tokenCache := deployer.kubernetesTokenCacheManager.GetOrCreateTokenCache(int(endpoint.ID))
 
-	tokenManager, err := kubernetes.NewTokenManager(kubecli, deployer.dataStore, tokenCache, setLocalAdminToken)
+	tokenManager, err := kubernetes.NewTokenManager(kubeCLI, deployer.dataStore, tokenCache, setLocalAdminToken)
 	if err != nil {
 		return "", err
 	}
 
-	if tokenData.Role == portainer.AdministratorRole {
+	user, err := deployer.dataStore.User().User(userID)
+	if err != nil {
+		return "", errors.Wrap(err, "failed to fetch the user")
+	}
+
+	if user.Role == portainer.AdministratorRole {
 		return tokenManager.GetAdminServiceAccountToken(), nil
 	}
 
-	token, err := tokenManager.GetUserServiceAccountToken(int(tokenData.ID), endpoint.ID)
+	token, err := tokenManager.GetUserServiceAccountToken(int(user.ID), endpoint.ID)
 	if err != nil {
 		return "", err
 	}
@@ -77,156 +74,62 @@ func (deployer *KubernetesDeployer) getToken(request *http.Request, endpoint *po
 	return token, nil
 }
 
-// Deploy will deploy a Kubernetes manifest inside a specific namespace in a Kubernetes environment(endpoint).
-// Otherwise it will use kubectl to deploy the manifest.
-func (deployer *KubernetesDeployer) Deploy(request *http.Request, endpoint *portainer.Endpoint, stackConfig string, namespace string) (string, error) {
-	if endpoint.Type == portainer.KubernetesLocalEnvironment {
-		token, err := deployer.getToken(request, endpoint, true)
-		if err != nil {
-			return "", err
-		}
+// Deploy upserts Kubernetes resources defined in manifest(s)
+func (deployer *KubernetesDeployer) Deploy(userID portainer.UserID, endpoint *portainer.Endpoint, manifestFiles []string, namespace string) (string, error) {
+	return deployer.command("apply", userID, endpoint, manifestFiles, namespace)
+}
 
-		command := path.Join(deployer.binaryPath, "kubectl")
-		if runtime.GOOS == "windows" {
-			command = path.Join(deployer.binaryPath, "kubectl.exe")
-		}
+// Remove deletes Kubernetes resources defined in manifest(s)
+func (deployer *KubernetesDeployer) Remove(userID portainer.UserID, endpoint *portainer.Endpoint, manifestFiles []string, namespace string) (string, error) {
+	return deployer.command("delete", userID, endpoint, manifestFiles, namespace)
+}
 
-		args := make([]string, 0)
-		args = append(args, "--server", endpoint.URL)
-		args = append(args, "--insecure-skip-tls-verify")
-		args = append(args, "--token", token)
+func (deployer *KubernetesDeployer) command(operation string, userID portainer.UserID, endpoint *portainer.Endpoint, manifestFiles []string, namespace string) (string, error) {
+	token, err := deployer.getToken(userID, endpoint, endpoint.Type == portainer.KubernetesLocalEnvironment)
+	if err != nil {
+		return "", errors.Wrap(err, "failed generating a user token")
+	}
+
+	command := path.Join(deployer.binaryPath, "kubectl")
+	if runtime.GOOS == "windows" {
+		command = path.Join(deployer.binaryPath, "kubectl.exe")
+	}
+
+	args := []string{"--token", token}
+	if namespace != "" {
 		args = append(args, "--namespace", namespace)
-		args = append(args, "apply", "-f", "-")
+	}
 
-		var stderr bytes.Buffer
-		cmd := exec.Command(command, args...)
-		cmd.Stderr = &stderr
-		cmd.Stdin = strings.NewReader(stackConfig)
-
-		output, err := cmd.Output()
+	if endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
+		url, proxy, err := deployer.getAgentURL(endpoint)
 		if err != nil {
-			return "", errors.New(stderr.String())
+			return "", errors.WithMessage(err, "failed generating endpoint URL")
 		}
 
-		return string(output), nil
+		defer proxy.Close()
+		args = append(args, "--server", url)
+		args = append(args, "--insecure-skip-tls-verify")
 	}
 
-	// agent
-
-	endpointURL := endpoint.URL
-	if endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
-		tunnel := deployer.reverseTunnelService.GetTunnelDetails(endpoint.ID)
-		if tunnel.Status == portainer.EdgeAgentIdle {
-
-			err := deployer.reverseTunnelService.SetTunnelStatusToRequired(endpoint.ID)
-			if err != nil {
-				return "", err
-			}
-
-			settings, err := deployer.dataStore.Settings().Settings()
-			if err != nil {
-				return "", err
-			}
-
-			waitForAgentToConnect := time.Duration(settings.EdgeAgentCheckinInterval) * time.Second
-			time.Sleep(waitForAgentToConnect * 2)
-		}
-
-		endpointURL = fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port)
+	if operation == "delete" {
+		args = append(args, "--ignore-not-found=true")
 	}
 
-	transport := &http.Transport{}
-
-	if endpoint.TLSConfig.TLS {
-		tlsConfig, err := crypto.CreateTLSConfigurationFromDisk(endpoint.TLSConfig.TLSCACertPath, endpoint.TLSConfig.TLSCertPath, endpoint.TLSConfig.TLSKeyPath, endpoint.TLSConfig.TLSSkipVerify)
-		if err != nil {
-			return "", err
-		}
-		transport.TLSClientConfig = tlsConfig
+	args = append(args, operation)
+	for _, path := range manifestFiles {
+		args = append(args, "-f", strings.TrimSpace(path))
 	}
 
-	httpCli := &http.Client{
-		Transport: transport,
-	}
+	var stderr bytes.Buffer
+	cmd := exec.Command(command, args...)
+	cmd.Stderr = &stderr
 
-	if !strings.HasPrefix(endpointURL, "http") {
-		endpointURL = fmt.Sprintf("https://%s", endpointURL)
-	}
-
-	url, err := url.Parse(fmt.Sprintf("%s/v2/kubernetes/stack", endpointURL))
+	output, err := cmd.Output()
 	if err != nil {
-		return "", err
+		return "", errors.Wrapf(err, "failed to execute kubectl command: %q", stderr.String())
 	}
 
-	reqPayload, err := json.Marshal(
-		struct {
-			StackConfig string
-			Namespace   string
-		}{
-			StackConfig: stackConfig,
-			Namespace:   namespace,
-		})
-	if err != nil {
-		return "", err
-	}
-
-	req, err := http.NewRequest(http.MethodPost, url.String(), bytes.NewReader(reqPayload))
-	if err != nil {
-		return "", err
-	}
-
-	signature, err := deployer.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
-	if err != nil {
-		return "", err
-	}
-
-	token, err := deployer.getToken(request, endpoint, false)
-	if err != nil {
-		return "", err
-	}
-
-	req.Header.Set(portainer.PortainerAgentPublicKeyHeader, deployer.signatureService.EncodedPublicKey())
-	req.Header.Set(portainer.PortainerAgentSignatureHeader, signature)
-	req.Header.Set(portainer.PortainerAgentKubernetesSATokenHeader, token)
-
-	resp, err := httpCli.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		var errorResponseData struct {
-			Message string
-			Details string
-		}
-		err = json.NewDecoder(resp.Body).Decode(&errorResponseData)
-		if err != nil {
-			output, parseStringErr := ioutil.ReadAll(resp.Body)
-			if parseStringErr != nil {
-				return "", parseStringErr
-			}
-
-			return "", fmt.Errorf("Failed parsing, body: %s, error: %w", output, err)
-
-		}
-
-		return "", fmt.Errorf("Deployment to agent failed: %s", errorResponseData.Details)
-	}
-
-	var responseData struct{ Output string }
-	err = json.NewDecoder(resp.Body).Decode(&responseData)
-	if err != nil {
-		parsedOutput, parseStringErr := ioutil.ReadAll(resp.Body)
-		if parseStringErr != nil {
-			return "", parseStringErr
-		}
-
-		return "", fmt.Errorf("Failed decoding, body: %s, err: %w", parsedOutput, err)
-	}
-
-	return responseData.Output, nil
-
+	return string(output), nil
 }
 
 // ConvertCompose leverages the kompose binary to deploy a compose compliant manifest.
@@ -250,4 +153,13 @@ func (deployer *KubernetesDeployer) ConvertCompose(data []byte) ([]byte, error) 
 	}
 
 	return output, nil
+}
+
+func (deployer *KubernetesDeployer) getAgentURL(endpoint *portainer.Endpoint) (string, *factory.ProxyServer, error) {
+	proxy, err := deployer.proxyManager.CreateAgentProxyServer(endpoint)
+	if err != nil {
+		return "", nil, err
+	}
+
+	return fmt.Sprintf("http://127.0.0.1:%d/kubernetes", proxy.Port), proxy, nil
 }

@@ -1,14 +1,13 @@
 package cli
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 	"sync"
-	"time"
 
 	cmap "github.com/orcaman/concurrent-map"
+	"github.com/pkg/errors"
 
 	portainer "github.com/portainer/portainer/api"
 	"k8s.io/client-go/kubernetes"
@@ -116,36 +115,18 @@ func (rt *agentHeaderRoundTripper) RoundTrip(req *http.Request) (*http.Response,
 func (factory *ClientFactory) buildAgentClient(endpoint *portainer.Endpoint) (*kubernetes.Clientset, error) {
 	endpointURL := fmt.Sprintf("https://%s/kubernetes", endpoint.URL)
 
-	return factory.createRemoteClient(endpointURL);
+	return factory.createRemoteClient(endpointURL)
 }
 
 func (factory *ClientFactory) buildEdgeClient(endpoint *portainer.Endpoint) (*kubernetes.Clientset, error) {
-	tunnel := factory.reverseTunnelService.GetTunnelDetails(endpoint.ID)
-
-	if tunnel.Status == portainer.EdgeAgentIdle {
-		err := factory.reverseTunnelService.SetTunnelStatusToRequired(endpoint.ID)
-		if err != nil {
-			return nil, fmt.Errorf("failed opening tunnel to environment: %w", err)
-		}
-
-		if endpoint.EdgeCheckinInterval == 0 {
-			settings, err := factory.dataStore.Settings().Settings()
-			if err != nil {
-				return nil, fmt.Errorf("failed fetching settings from db: %w", err)
-			}
-
-			endpoint.EdgeCheckinInterval = settings.EdgeAgentCheckinInterval
-		}
-
-		waitForAgentToConnect := time.Duration(endpoint.EdgeCheckinInterval) * time.Second
-		time.Sleep(waitForAgentToConnect * 2)
-
-		tunnel = factory.reverseTunnelService.GetTunnelDetails(endpoint.ID)
+	tunnel, err := factory.reverseTunnelService.GetActiveTunnel(endpoint)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed activating tunnel")
 	}
 
 	endpointURL := fmt.Sprintf("http://127.0.0.1:%d/kubernetes", tunnel.Port)
 
-	return factory.createRemoteClient(endpointURL);
+	return factory.createRemoteClient(endpointURL)
 }
 
 func (factory *ClientFactory) createRemoteClient(endpointURL string) (*kubernetes.Clientset, error) {

@@ -1,0 +1,64 @@
+<div class="datatable datatable-empty">
+  <rd-widget>
+    <rd-widget-body classes="no-padding">
+      <datatable-titlebar title="Authentication Events" icon="fa-history" feature="{{::$ctrl.feature}}"></datatable-titlebar>
+      <datatable-searchbar on-change="($ctrl.onChangeKeyword)" ng-model="$ctrl.keyword"></datatable-searchbar>
+      <div class="table-responsive">
+        <table class="table table-hover nowrap-cells">
+          <thead>
+            <tr>
+              <th>
+                <a>
+                  Time
+                  <datatable-sort-icon key="Timestamp" selected-sort-key="{{ $ctrl.sort.key }}" reverse-order="$ctrl.sort.desc"></datatable-sort-icon>
+                </a>
+              </th>
+              <th>
+                <a>
+                  Origin
+                  <datatable-sort-icon key="Origin" selected-sort-key="{{ $ctrl.sort.key }}" reverse-order="$ctrl.sort.desc"></datatable-sort-icon>
+                </a>
+              </th>
+              <th>
+                <a>
+                  Context
+                  <datatable-sort-icon key="Context" selected-sort-key="{{ $ctrl.sort.key }}" reverse-order="$ctrl.sort.desc"></datatable-sort-icon>
+                </a>
+                <datatable-filter labels="$ctrl.contextFilterLabels" filter-key="context" state="$ctrl.contextFilter" on-change="($ctrl.onChangeContextFilter)"> </datatable-filter>
+              </th>
+              <th>
+                <a>
+                  User
+                  <datatable-sort-icon key="Username" selected-sort-key="{{ $ctrl.sort.key }}" reverse-order="$ctrl.sort.desc"></datatable-sort-icon>
+                </a>
+              </th>
+              <th>
+                Result
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr dir-paginate="item in $ctrl.logs | itemsPerPage: $ctrl.limit" total-items="$ctrl.totalItems" current-page="$ctrl.currentPage">
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr ng-if="!$ctrl.logs">
+              <td class="text-center text-muted" colspan="5">Loading...</td>
+            </tr>
+            <tr ng-if="$ctrl.state.logs.length === 0">
+              <td class="text-center text-muted" colspan="8">
+                No logs available.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="footer" ng-if="$ctrl.logs">
+        <datatable-pagination limit="$ctrl.limit" on-change-limit="($ctrl.handleChangeLimit)" on-change-page="($ctrl.onChangePage)"></datatable-pagination>
+      </div>
+    </rd-widget-body>
+  </rd-widget>
+</div>

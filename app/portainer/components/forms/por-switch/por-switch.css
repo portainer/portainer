@@ -1,0 +1,68 @@
+/* switch box */
+
+.switch,
+.bootbox-checkbox-list > .checkbox > label {
+  --switch-size: 24px;
+}
+
+.switch.small {
+  --switch-size: 12px;
+}
+
+.switch input {
+  display: none;
+}
+
+.switch i,
+.bootbox-form .checkbox i {
+  display: inline-block;
+  vertical-align: middle;
+  cursor: pointer;
+  padding-right: var(--switch-size);
+  transition: all ease 0.2s;
+  -webkit-transition: all ease 0.2s;
+  -moz-transition: all ease 0.2s;
+  -o-transition: all ease 0.2s;
+  border-radius: var(--switch-size);
+  box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.5);
+}
+
+.switch i:before,
+.bootbox-form .checkbox i:before {
+  display: block;
+  content: '';
+  width: var(--switch-size);
+  height: var(--switch-size);
+  border-radius: var(--switch-size);
+  background: white;
+  box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.5);
+}
+
+.switch :checked + i,
+.bootbox-form .checkbox :checked ~ i {
+  padding-right: 0;
+  padding-left: var(--switch-size);
+  -webkit-box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.5), inset 0 0 40px #337ab7;
+  -moz-box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.5), inset 0 0 40px #337ab7;
+  box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.5), inset 0 0 40px #337ab7;
+}
+
+.switch :disabled + i {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.switch.limited {
+  pointer-events: none;
+  touch-action: none;
+}
+
+.switch.limited i {
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+.switch.business i {
+  background-color: var(--BE-only);
+  box-shadow: inset 0 0 1px rgb(0 0 0 / 50%), inset 0 0 40px var(--BE-only);
+}

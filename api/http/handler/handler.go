@@ -18,6 +18,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/file"
 	"github.com/portainer/portainer/api/http/handler/helm"
 	"github.com/portainer/portainer/api/http/handler/kubernetes"
+	"github.com/portainer/portainer/api/http/handler/ldap"
 	"github.com/portainer/portainer/api/http/handler/motd"
 	"github.com/portainer/portainer/api/http/handler/registries"
 	"github.com/portainer/portainer/api/http/handler/resourcecontrols"
@@ -53,6 +54,7 @@ type Handler struct {
 	HelmTemplatesHandler   *helm.Handler
 	KubernetesHandler      *kubernetes.Handler
 	FileHandler            *file.Handler
+	LDAPHandler            *ldap.Handler
 	MOTDHandler            *motd.Handler
 	RegistryHandler        *registries.Handler
 	ResourceControlHandler *resourcecontrols.Handler
@@ -72,7 +74,7 @@ type Handler struct {
 }
 
 // @title PortainerCE API
-// @version 2.9.0
+// @version 2.9.1
 // @description.markdown api-description.md
 // @termsOfService
 
@@ -189,6 +191,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		default:
 			http.StripPrefix("/api", h.EndpointHandler).ServeHTTP(w, r)
 		}
+	case strings.HasPrefix(r.URL.Path, "/api/ldap"):
+		http.StripPrefix("/api", h.LDAPHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/motd"):
 		http.StripPrefix("/api", h.MOTDHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/registries"):

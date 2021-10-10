@@ -6,7 +6,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"regexp"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -47,7 +46,7 @@ func (manager *ComposeStackManager) ComposeSyntaxMaxVersion() string {
 func (manager *ComposeStackManager) Up(ctx context.Context, stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	url, proxy, err := manager.fetchEndpointProxy(endpoint)
 	if err != nil {
-		return errors.Wrap(err, "failed to featch environment proxy")
+		return errors.Wrap(err, "failed to fetch environment proxy")
 	}
 
 	if proxy != nil {
@@ -80,9 +79,8 @@ func (manager *ComposeStackManager) Down(ctx context.Context, stack *portainer.S
 }
 
 // NormalizeStackName returns a new stack name with unsupported characters replaced
-func (w *ComposeStackManager) NormalizeStackName(name string) string {
-	r := regexp.MustCompile("[^a-z0-9]+")
-	return r.ReplaceAllString(strings.ToLower(name), "")
+func (manager *ComposeStackManager) NormalizeStackName(name string) string {
+	return stackNameNormalizeRegex.ReplaceAllString(strings.ToLower(name), "")
 }
 
 func (manager *ComposeStackManager) fetchEndpointProxy(endpoint *portainer.Endpoint) (string, *factory.ProxyServer, error) {
@@ -90,12 +88,12 @@ func (manager *ComposeStackManager) fetchEndpointProxy(endpoint *portainer.Endpo
 		return "", nil, nil
 	}
 
-	proxy, err := manager.proxyManager.CreateComposeProxyServer(endpoint)
+	proxy, err := manager.proxyManager.CreateAgentProxyServer(endpoint)
 	if err != nil {
 		return "", nil, err
 	}
 
-	return fmt.Sprintf("tcp://127.0.0.1:%d", proxy.Port), proxy, nil
+	return fmt.Sprintf("http://127.0.0.1:%d", proxy.Port), proxy, nil
 }
 
 func createEnvFile(stack *portainer.Stack) (string, error) {

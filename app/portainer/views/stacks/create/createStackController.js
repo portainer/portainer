@@ -1,6 +1,7 @@
 import angular from 'angular';
 import uuidv4 from 'uuid/v4';
-
+import { STACK_NAME_VALIDATION_REGEX } from '@/constants';
+import { RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
 import { AccessControlFormData } from '../../../components/accessControlForm/porAccessControlFormModel';
 
 angular
@@ -28,6 +29,8 @@ angular
     $scope.onChangeTemplateId = onChangeTemplateId;
     $scope.buildAnalyticsProperties = buildAnalyticsProperties;
 
+    $scope.STACK_NAME_VALIDATION_REGEX = STACK_NAME_VALIDATION_REGEX;
+
     $scope.formValues = {
       Name: '',
       StackFileContent: '',
@@ -42,7 +45,7 @@ angular
       ComposeFilePathInRepository: 'docker-compose.yml',
       AccessControlData: new AccessControlFormData(),
       RepositoryAutomaticUpdates: true,
-      RepositoryMechanism: 'Interval',
+      RepositoryMechanism: RepositoryMechanismTypes.INTERVAL,
       RepositoryFetchInterval: '5m',
       RepositoryWebhookURL: WebhookHelper.returnStackWebhookUrl(uuidv4()),
     };
@@ -111,9 +114,9 @@ angular
 
       function autoSyncLabel(type) {
         switch (type) {
-          case 'Interval':
+          case RepositoryMechanismTypes.INTERVAL:
             return 'polling';
-          case 'Webhook':
+          case RepositoryMechanismTypes.WEBHOOK:
             return 'webhook';
         }
         return 'off';
@@ -166,9 +169,9 @@ angular
     function getAutoUpdatesProperty(repositoryOptions) {
       if ($scope.formValues.RepositoryAutomaticUpdates) {
         repositoryOptions.AutoUpdate = {};
-        if ($scope.formValues.RepositoryMechanism === 'Interval') {
+        if ($scope.formValues.RepositoryMechanism === RepositoryMechanismTypes.INTERVAL) {
           repositoryOptions.AutoUpdate.Interval = $scope.formValues.RepositoryFetchInterval;
-        } else if ($scope.formValues.RepositoryMechanism === 'Webhook') {
+        } else if ($scope.formValues.RepositoryMechanism === RepositoryMechanismTypes.WEBHOOK) {
           repositoryOptions.AutoUpdate.Webhook = $scope.formValues.RepositoryWebhookURL.split('/').reverse()[0];
         }
       }

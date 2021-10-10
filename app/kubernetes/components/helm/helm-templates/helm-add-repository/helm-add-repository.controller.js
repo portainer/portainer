@@ -21,7 +21,7 @@ export default class HelmAddRepositoryController {
     try {
       await this.HelmService.addHelmRepository(this.EndpointProvider.currentEndpoint().Id, { url: this.state.repository });
       this.Notifications.success('Helm repository added successfully');
-      this.$state.reload();
+      this.$state.reload(this.$state.current);
     } catch (err) {
       this.Notifications.error('Installation error', err);
     } finally {

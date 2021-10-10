@@ -9,11 +9,12 @@ import (
 	"github.com/portainer/libhelm/binary/test"
 	"github.com/portainer/libhelm/options"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/exec/exectest"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes"
 	"github.com/stretchr/testify/assert"
 
-	bolt "github.com/portainer/portainer/api/bolt/bolttest"
+	"github.com/portainer/portainer/api/bolt"
 	helper "github.com/portainer/portainer/api/internal/testhelpers"
 )
 
@@ -29,9 +30,10 @@ func Test_helmDelete(t *testing.T) {
 	err = store.User().CreateUser(&portainer.User{Username: "admin", Role: portainer.AdministratorRole})
 	is.NoError(err, "Error creating a user")
 
+	kubernetesDeployer := exectest.NewKubernetesDeployer()
 	helmPackageManager := test.NewMockHelmBinaryPackageManager("")
 	kubeConfigService := kubernetes.NewKubeConfigCAService("", "")
-	h := NewHandler(helper.NewTestRequestBouncer(), store, helmPackageManager, kubeConfigService)
+	h := NewHandler(helper.NewTestRequestBouncer(), store, kubernetesDeployer, helmPackageManager, kubeConfigService)
 
 	is.NotNil(h, "Handler should not fail")
 

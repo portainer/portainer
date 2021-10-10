@@ -51,13 +51,13 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 
 	payload.Name = handler.SwarmStackManager.NormalizeStackName(payload.Name)
 
-	isUnique, err := handler.checkUniqueName(endpoint, payload.Name, 0, true)
+	isUnique, err := handler.checkUniqueStackNameInDocker(endpoint, payload.Name, 0, true)
+
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
 	}
 	if !isUnique {
-		errorMessage := fmt.Sprintf("A stack with the name '%s' is already running", payload.Name)
-		return &httperror.HandlerError{http.StatusConflict, errorMessage, errors.New(errorMessage)}
+		return stackExistsError(payload.Name)
 	}
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
@@ -161,12 +161,12 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 
 	payload.Name = handler.SwarmStackManager.NormalizeStackName(payload.Name)
 
-	isUnique, err := handler.checkUniqueName(endpoint, payload.Name, 0, true)
+	isUnique, err := handler.checkUniqueStackNameInDocker(endpoint, payload.Name, 0, true)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to check for name collision", Err: err}
 	}
 	if !isUnique {
-		return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: fmt.Sprintf("A stack with the name '%s' already exists", payload.Name), Err: errStackAlreadyExists}
+		return stackExistsError(payload.Name)
 	}
 
 	//make sure the webhook ID is unique
@@ -218,11 +218,11 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to clone git repository", Err: err}
 	}
 
-	commitId, err := handler.latestCommitID(payload.RepositoryURL, payload.RepositoryReferenceName, payload.RepositoryAuthentication, payload.RepositoryUsername, payload.RepositoryPassword)
+	commitID, err := handler.latestCommitID(payload.RepositoryURL, payload.RepositoryReferenceName, payload.RepositoryAuthentication, payload.RepositoryUsername, payload.RepositoryPassword)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to fetch git repository id", Err: err}
 	}
-	stack.GitConfig.ConfigHash = commitId
+	stack.GitConfig.ConfigHash = commitID
 
 	config, configErr := handler.createSwarmDeployConfig(r, stack, endpoint, false)
 	if configErr != nil {
@@ -298,13 +298,13 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 
 	payload.Name = handler.SwarmStackManager.NormalizeStackName(payload.Name)
 
-	isUnique, err := handler.checkUniqueName(endpoint, payload.Name, 0, true)
+	isUnique, err := handler.checkUniqueStackNameInDocker(endpoint, payload.Name, 0, true)
+
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
 	}
 	if !isUnique {
-		errorMessage := fmt.Sprintf("A stack with the name '%s' is already running", payload.Name)
-		return &httperror.HandlerError{http.StatusConflict, errorMessage, errors.New(errorMessage)}
+		return stackExistsError(payload.Name)
 	}
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()

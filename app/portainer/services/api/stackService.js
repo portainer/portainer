@@ -1,4 +1,5 @@
 import _ from 'lodash-es';
+import { RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
 import { StackViewModel, OrphanedStackViewModel } from '../../models/stack';
 
 angular.module('portainer.app').factory('StackService', [
@@ -277,7 +278,17 @@ angular.module('portainer.app').factory('StackService', [
           StackFileContent: stackFile,
         };
       } else {
+        const autoUpdate = {};
+        if (gitConfig.AutoUpdate && gitConfig.AutoUpdate.RepositoryAutomaticUpdates) {
+          if (gitConfig.AutoUpdate.RepositoryMechanism === RepositoryMechanismTypes.INTERVAL) {
+            autoUpdate.Interval = gitConfig.AutoUpdate.RepositoryFetchInterval;
+          } else if (gitConfig.AutoUpdate.RepositoryMechanism === RepositoryMechanismTypes.WEBHOOK) {
+            autoUpdate.Webhook = gitConfig.AutoUpdate.RepositoryWebhookURL.split('/').reverse()[0];
+          }
+        }
+
         payload = {
+          AutoUpdate: autoUpdate,
           RepositoryReferenceName: gitConfig.RefName,
           RepositoryAuthentication: gitConfig.RepositoryAuthentication,
           RepositoryUsername: gitConfig.RepositoryUsername,
@@ -455,9 +466,9 @@ angular.module('portainer.app').factory('StackService', [
       const autoUpdate = {};
 
       if (gitConfig.AutoUpdate.RepositoryAutomaticUpdates) {
-        if (gitConfig.AutoUpdate.RepositoryMechanism === 'Interval') {
+        if (gitConfig.AutoUpdate.RepositoryMechanism === RepositoryMechanismTypes.INTERVAL) {
           autoUpdate.Interval = gitConfig.AutoUpdate.RepositoryFetchInterval;
-        } else if (gitConfig.AutoUpdate.RepositoryMechanism === 'Webhook') {
+        } else if (gitConfig.AutoUpdate.RepositoryMechanism === RepositoryMechanismTypes.WEBHOOK) {
           autoUpdate.Webhook = gitConfig.AutoUpdate.RepositoryWebhookURL.split('/').reverse()[0];
         }
       }

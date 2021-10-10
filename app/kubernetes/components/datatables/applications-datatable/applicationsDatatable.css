@@ -1,9 +1,9 @@
 .secondary-heading {
-  background-color: #e7f6ff !important;
+  background-color: var(--bg-app-datatable-thead) !important;
 }
 
 .secondary-body {
-  background-color: #f1f9fd;
+  background-color: var(--bg-app-datatable-tbody);
 }
 
 .datatable-wide {
