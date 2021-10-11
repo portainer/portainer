@@ -1,4 +1,5 @@
 export function buildLdapSettingsModel() {
+  console.log(`bbb`);
   return {
     AnonymousMode: true,
     ReaderDN: '',
@@ -17,6 +18,13 @@ export function buildLdapSettingsModel() {
       },
     ],
     GroupSearchSettings: [
+      {
+        GroupBaseDN: '',
+        GroupFilter: '',
+        GroupAttribute: '',
+      },
+    ],
+    AdminGroupSearchSettings: [
       {
         GroupBaseDN: '',
         GroupFilter: '',
