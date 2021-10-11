@@ -1,5 +1,6 @@
 import _ from 'lodash-es';
 import toastr from 'toastr';
+import lodash from 'lodash-es';
 
 angular.module('portainer.app').factory('Notifications', [
   '$sanitize',
@@ -15,31 +16,35 @@ angular.module('portainer.app').factory('Notifications', [
       toastr.warning($sanitize(_.escape(text)), $sanitize(title), { timeOut: 6000 });
     };
 
+    function pickErrorMsg(e) {
+      const props = [
+        'err.data.details',
+        'err.data.message',
+        'data.details',
+        'data.message',
+        'data.content',
+        'data.error',
+        'message',
+        'err.data[0].message',
+        'err.data.err',
+        'data.err',
+        'msg',
+      ];
+
+      let msg = '';
+
+      lodash.forEach(props, (prop) => {
+        const val = lodash.get(e, prop);
+        if (typeof val === 'string') {
+          msg = msg || val;
+        }
+      });
+
+      return msg;
+    }
+
     service.error = function (title, e, fallbackText) {
-      var msg = fallbackText;
-      if (e.err && e.err.data && e.err.data.details && typeof e.err.data.details === 'string') {
-        msg = e.err.data.details;
-      } else if (e.err && e.err.data && e.err.data.message) {
-        msg = e.err.data.message;
-      } else if (e.data && e.data.details) {
-        msg = e.data.details;
-      } else if (e.data && e.data.message) {
-        msg = e.data.message;
-      } else if (e.data && e.data.content) {
-        msg = e.data.content;
-      } else if (e.data && e.data.error) {
-        msg = e.data.error;
-      } else if (e.message) {
-        msg = e.message;
-      } else if (e.err && e.err.data && e.err.data.length > 0 && e.err.data[0].message) {
-        msg = e.err.data[0].message;
-      } else if (e.err && e.err.data && e.err.data.err) {
-        msg = e.err.data.err;
-      } else if (e.data && e.data.err) {
-        msg = e.data.err;
-      } else if (e.msg) {
-        msg = e.msg;
-      }
+      const msg = pickErrorMsg(e) || fallbackText;
 
       // eslint-disable-next-line no-console
       console.error(e);

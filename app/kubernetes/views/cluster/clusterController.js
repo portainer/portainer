@@ -95,7 +95,7 @@ class KubernetesClusterController {
         await this.getResourceUsage(this.endpoint.Id);
       }
     } catch (err) {
-      this.Notifications.error('Failure', 'Unable to retrieve applications', err);
+      this.Notifications.error('Failure', err, 'Unable to retrieve applications');
     } finally {
       this.state.applicationsLoading = false;
     }
@@ -116,7 +116,7 @@ class KubernetesClusterController {
       }, new KubernetesResourceReservation());
       this.resourceUsage = clusterResourceUsage;
     } catch (err) {
-      this.Notifications.error('Failure', 'Unable to retrieve cluster resource usage', err);
+      this.Notifications.error('Failure', err, 'Unable to retrieve cluster resource usage');
     }
   }
 
