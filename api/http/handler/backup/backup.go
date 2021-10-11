@@ -29,7 +29,7 @@ func (p *backupPayload) Validate(r *http.Request) error {
 // @security jwt
 // @accept json
 // @produce octet-stream
-// @param body body backupPayload false "Password to encrypt the backup with"
+// @param body body backupPayload false "An object contains the password to encrypt the backup with"
 // @success 200 "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
