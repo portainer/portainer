@@ -17,7 +17,7 @@ type templateFileFormat struct {
 
 // @id EdgeTemplateList
 // @summary Fetches the list of Edge Templates
-// @description
+// @description **Access policy**: administrator
 // @tags edge_templates
 // @security jwt
 // @accept json

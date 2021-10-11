@@ -15,7 +15,7 @@ import (
 // @id RegistryDelete
 // @summary Remove a registry
 // @description Remove a registry
-// @description **Access policy**: administrator
+// @description **Access policy**: restricted
 // @tags registries
 // @security jwt
 // @param id path int true "Registry identifier"

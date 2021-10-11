@@ -81,7 +81,7 @@ func (payload *registryConfigurePayload) Validate(r *http.Request) error {
 // @id RegistryConfigure
 // @summary Configures a registry
 // @description Configures a registry.
-// @description **Access policy**: admin
+// @description **Access policy**: restricted
 // @tags registries
 // @security jwt
 // @accept json

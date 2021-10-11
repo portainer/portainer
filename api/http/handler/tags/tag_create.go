@@ -29,6 +29,7 @@ func (payload *tagCreatePayload) Validate(r *http.Request) error {
 // @description **Access policy**: administrator
 // @tags tags
 // @security jwt
+// @accept json
 // @produce json
 // @param body body tagCreatePayload true "Tag details"
 // @success 200 {object} portainer.Tag "Success"

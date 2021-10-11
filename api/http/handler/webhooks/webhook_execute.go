@@ -16,9 +16,8 @@ import (
 
 // @summary Execute a webhook
 // @description Acts on a passed in token UUID to restart the docker service
+// @description **Access policy**: public
 // @tags webhooks
-// @accept json
-// @produce json
 // @param token path string true "Webhook token"
 // @success 202 "Webhook executed"
 // @failure 400

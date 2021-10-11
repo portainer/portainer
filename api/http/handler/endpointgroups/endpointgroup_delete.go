@@ -17,8 +17,6 @@ import (
 // @description **Access policy**: administrator
 // @tags endpoint_groups
 // @security jwt
-// @accept json
-// @produce json
 // @param id path int true "EndpointGroup identifier"
 // @success 204 "Success"
 // @failure 400 "Invalid request"

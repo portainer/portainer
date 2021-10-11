@@ -21,7 +21,22 @@ func (payload *registryAccessPayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// PUT request on /endpoints/{id}/registries/{registryId}
+// @id endpointRegistryAccess
+// @summary update registry access for environment
+// @description **Access policy**: authenticated
+// @tags endpoints
+// @security jwt
+// @accept json
+// @produce json
+// @param id path int true "Environment(Endpoint) identifier"
+// @param registryId path int true "Registry identifier"
+// @param body body registryAccessPayload true "details"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 "Endpoint not found"
+// @failure 500 "Server error"
+// @router /endpoints/{id}/registries/{registryId} [put]
 func (handler *Handler) endpointRegistryAccess(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

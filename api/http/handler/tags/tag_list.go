@@ -10,7 +10,7 @@ import (
 // @id TagList
 // @summary List tags
 // @description List tags.
-// @description **Access policy**: administrator
+// @description **Access policy**: authenticated
 // @tags tags
 // @security jwt
 // @produce json

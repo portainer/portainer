@@ -16,10 +16,9 @@ import (
 
 // @id EdgeJobCreate
 // @summary Create an EdgeJob
-// @description
+// @description **Access policy**: administrator
 // @tags edge_jobs
 // @security jwt
-// @accept json
 // @produce json
 // @param method query string true "Creation Method" Enums(file, string)
 // @param body_string body edgeJobCreateFromFileContentPayload true "EdgeGroup data when method is string"
