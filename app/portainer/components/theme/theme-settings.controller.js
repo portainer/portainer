@@ -43,12 +43,14 @@ export default class ThemeSettingsController {
         buildOption('light', 'fas fa-sun', 'Light Theme', 'Default color mode', 'light'),
         buildOption('dark', 'fas fa-moon', 'Dark Theme', 'Dark color mode', 'dark'),
         buildOption('highcontrast', 'fas fa-adjust', 'High Contrast', 'High contrast color mode', 'highcontrast'),
+        buildOption('auto', '', 'Automatic', 'Synchronise with OS', 'auto'),
       ];
 
       this.state.availableTheme = {
         light: 'light',
         dark: 'dark',
         highContrast: 'highcontrast',
+        auto: 'auto',
       };
 
       try {
