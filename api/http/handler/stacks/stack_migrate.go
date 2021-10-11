@@ -34,7 +34,7 @@ func (payload *stackMigratePayload) Validate(r *http.Request) error {
 // @id StackMigrate
 // @summary Migrate a stack to another environment(endpoint)
 // @description  Migrate a stack from an environment(endpoint) to another environment(endpoint). It will re-create the stack inside the target environment(endpoint) before removing the original stack.
-// @description **Access policy**: restricted
+// @description **Access policy**: authenticated
 // @tags stacks
 // @security jwt
 // @produce json

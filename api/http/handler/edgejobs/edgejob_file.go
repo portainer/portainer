@@ -16,10 +16,9 @@ type edgeJobFileResponse struct {
 
 // @id EdgeJobFile
 // @summary Fetch a file of an EdgeJob
-// @description
+// @description **Access policy**: administrator
 // @tags edge_jobs
 // @security jwt
-// @accept json
 // @produce json
 // @param id path string true "EdgeJob Id"
 // @success 200 {object} edgeJobFileResponse

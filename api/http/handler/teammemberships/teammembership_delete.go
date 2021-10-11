@@ -15,7 +15,7 @@ import (
 // @id TeamMembershipDelete
 // @summary Remove a team membership
 // @description Remove a team membership. Access is only available to administrators leaders of the associated team.
-// @description **Access policy**: restricted
+// @description **Access policy**: administrator
 // @tags team_memberships
 // @security jwt
 // @param id path int true "TeamMembership identifier"

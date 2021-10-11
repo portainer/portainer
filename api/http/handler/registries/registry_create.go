@@ -62,7 +62,7 @@ func (payload *registryCreatePayload) Validate(_ *http.Request) error {
 // @id RegistryCreate
 // @summary Create a new registry
 // @description Create a new registry.
-// @description **Access policy**: administrator
+// @description **Access policy**: restricted
 // @tags registries
 // @security jwt
 // @accept json

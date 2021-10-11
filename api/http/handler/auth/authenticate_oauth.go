@@ -44,6 +44,7 @@ func (handler *Handler) authenticateOAuth(code string, settings *portainer.OAuth
 
 // @id ValidateOAuth
 // @summary Authenticate with OAuth
+// @description **Access policy**: public
 // @tags auth
 // @accept json
 // @produce json

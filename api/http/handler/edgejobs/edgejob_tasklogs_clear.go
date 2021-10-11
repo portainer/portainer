@@ -13,10 +13,9 @@ import (
 
 // @id EdgeJobTasksClear
 // @summary Clear the log for a specifc task on an EdgeJob
-// @description
+// @description **Access policy**: administrator
 // @tags edge_jobs
 // @security jwt
-// @accept json
 // @produce json
 // @param id path string true "EdgeJob Id"
 // @param taskID path string true "Task Id"

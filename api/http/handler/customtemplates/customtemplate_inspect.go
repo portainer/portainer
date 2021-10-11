@@ -19,7 +19,6 @@ import (
 // @description **Access policy**: authenticated
 // @tags custom_templates
 // @security jwt
-// @accept json
 // @produce json
 // @param id path int true "Template identifier"
 // @success 200 {object} portainer.CustomTemplate "Success"

@@ -9,10 +9,9 @@ import (
 
 // @id EdgeStackList
 // @summary Fetches the list of EdgeStacks
-// @description
+// @description **Access policy**: administrator
 // @tags edge_stacks
 // @security jwt
-// @accept json
 // @produce json
 // @success 200 {array} portainer.EdgeStack
 // @failure 500

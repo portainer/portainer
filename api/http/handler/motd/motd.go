@@ -26,7 +26,9 @@ type motdData struct {
 	Style         string            `json:"style"`
 }
 
+// @id MOTD
 // @summary fetches the message of the day
+// @description **Access policy**: restricted
 // @tags motd
 // @security jwt
 // @produce json

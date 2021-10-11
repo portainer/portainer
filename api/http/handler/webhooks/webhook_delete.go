@@ -10,11 +10,9 @@ import (
 )
 
 // @summary Delete a webhook
-// @description
+// @description **Access policy**: authenticated
 // @security jwt
 // @tags webhooks
-// @accept json
-// @produce json
 // @param id path int true "Webhook id"
 // @success 202 "Webhook deleted"
 // @failure 400

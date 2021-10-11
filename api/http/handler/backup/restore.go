@@ -22,10 +22,9 @@ type restorePayload struct {
 // @description Triggers a system restore using provided backup file
 // @description **Access policy**: public
 // @tags backup
-// @param FileContent body []byte true "Content of the backup"
-// @param FileName body string true "File name"
-// @param Password body string false "Password to decrypt the backup with"
-// @success 200  "Success"
+// @accept json
+// @param restorePayload body restorePayload true "Restore request payload"
+// @success 200 "Success"
 // @failure 400 "Invalid request"
 // @failure 500 "Server error"
 // @router /restore [post]

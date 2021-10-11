@@ -14,7 +14,7 @@ import (
 // @id RegistryInspect
 // @summary Inspect a registry
 // @description Retrieve details about a registry.
-// @description **Access policy**: administrator
+// @description **Access policy**: restricted
 // @tags registries
 // @security jwt
 // @produce json

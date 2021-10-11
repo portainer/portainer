@@ -17,10 +17,9 @@ type decoratedEdgeGroup struct {
 
 // @id EdgeGroupList
 // @summary list EdgeGroups
-// @description
+// @description **Access policy**: administrator
 // @tags edge_groups
 // @security jwt
-// @accept json
 // @produce json
 // @success 200 {array} portainer.EdgeGroup{HasEdgeStack=bool} "EdgeGroups"
 // @failure 500

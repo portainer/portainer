@@ -37,7 +37,7 @@ func (payload *registryUpdatePayload) Validate(r *http.Request) error {
 // @id RegistryUpdate
 // @summary Update a registry
 // @description Update a registry
-// @description **Access policy**: administrator
+// @description **Access policy**: restricted
 // @tags registries
 // @security jwt
 // @accept json

@@ -38,7 +38,7 @@ func (payload *resourceControlUpdatePayload) Validate(r *http.Request) error {
 // @id ResourceControlUpdate
 // @summary Update a resource control
 // @description Update a resource control
-// @description **Access policy**: restricted
+// @description **Access policy**: authenticated
 // @tags resource_controls
 // @security jwt
 // @accept json

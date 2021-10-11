@@ -345,7 +345,7 @@ class KubernetesNodeController {
       this.resourceUsage.CPU = KubernetesResourceReservationHelper.parseCPU(node.usage.cpu);
       this.resourceUsage.Memory = KubernetesResourceReservationHelper.megaBytesValue(node.usage.memory);
     } catch (err) {
-      this.Notifications.error('Failure', 'Unable to retrieve node resource usage', err);
+      this.Notifications.error('Failure', err, 'Unable to retrieve node resource usage');
     }
   }
 

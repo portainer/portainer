@@ -21,7 +21,7 @@ func (payload *logsPayload) Validate(r *http.Request) error {
 
 // endpointEdgeJobsLogs
 // @summary Inspect an EdgeJob Log
-// @description
+// @description **Access policy**: public
 // @tags edge, endpoints
 // @accept json
 // @produce json

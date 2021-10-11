@@ -10,6 +10,7 @@ import (
 
 // @id Logout
 // @summary Logout
+// @description **Access policy**: authenticated
 // @security jwt
 // @tags auth
 // @success 204 "Success"

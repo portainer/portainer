@@ -23,7 +23,7 @@ func (payload *teamUpdatePayload) Validate(r *http.Request) error {
 // @summary Update a team
 // @description Update a team.
 // @description **Access policy**: administrator
-// @tags
+// @tags teams
 // @security jwt
 // @accept json
 // @produce json

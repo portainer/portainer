@@ -13,7 +13,7 @@ import (
 // @id HelmRepoSearch
 // @summary Search Helm Charts
 // @description
-// @description **Access policy**: authorized
+// @description **Access policy**: authenticated
 // @tags helm
 // @param repo query string true "Helm repository URL"
 // @security jwt
