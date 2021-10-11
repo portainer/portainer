@@ -1,6 +1,6 @@
 # Contributing Guidelines
 
-Some basic conventions for contributing to this project.
+Some basic conventions for contributing to this proje
 
 ## General
 
