@@ -24,11 +24,7 @@ func (store *Store) edition() portainer.SoftwareEdition {
 }
 
 // NewStore initializes a new Store and the associated services
-func NewStore(storePath string, fileService portainer.FileService) *Store {
-	connection, err := NewDatabase(storePath, fileService)
-	if err != nil {
-		panic(err)
-	}
+func NewStore(storePath string, fileService portainer.FileService, connection portainer.Connection) *Store {
 	return &Store{
 		fileService: fileService,
 		isNew:       true,
