@@ -61,9 +61,13 @@ func initFileService(dataStorePath string) portainer.FileService {
 	return fileService
 }
 
-func initDataStore(dataStorePath string, rollback bool, fileService portainer.FileService, shutdownCtx context.Context) dataservices.DataStore {
-	store := database.NewStore(dataStorePath, fileService)
-	err := store.Open()
+func initDataStore(storePath string, rollback bool, fileService portainer.FileService, shutdownCtx context.Context) dataservices.DataStore {
+	connection, err := database.NewDatabase(storePath, fileService)
+	if err !=nil {
+		panic(err)
+	}
+	store := database.NewStore(storePath, fileService, connection)
+	err = store.Open()
 	if err != nil {
 		log.Fatalf("failed opening store: %v", err)
 	}
