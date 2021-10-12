@@ -50,8 +50,8 @@ func Test_GetKubeConfig(t *testing.T) {
 			ObjectMeta: metav1.ObjectMeta{Name: tokenData.Username},
 		}
 
-		k.cli.CoreV1().ServiceAccounts(portainerNamespace).Create(serviceAccount)
-		defer k.cli.CoreV1().ServiceAccounts(portainerNamespace).Delete(serviceAccount.Name, nil)
+		k.cli.CoreV1().ServiceAccounts(portainerNamespace).Create(context.Background(), serviceAccount, metav1.CreateOptions{})
+		defer k.cli.CoreV1().ServiceAccounts(portainerNamespace).Delete(context.Background(), serviceAccount.Name, metav1.DeleteOptions{})
 
 		_, err := k.GetKubeConfig(context.Background(), "localhost", "abc", tokenData)
 
@@ -75,8 +75,8 @@ func Test_GetKubeConfig(t *testing.T) {
 			ObjectMeta: metav1.ObjectMeta{Name: nonAdminUserName},
 		}
 
-		k.cli.CoreV1().ServiceAccounts(portainerNamespace).Create(serviceAccount)
-		defer k.cli.CoreV1().ServiceAccounts(portainerNamespace).Delete(serviceAccount.Name, nil)
+		k.cli.CoreV1().ServiceAccounts(portainerNamespace).Create(context.Background(), serviceAccount, metav1.CreateOptions{})
+		defer k.cli.CoreV1().ServiceAccounts(portainerNamespace).Delete(context.Background(), serviceAccount.Name, metav1.DeleteOptions{})
 
 		_, err := k.GetKubeConfig(context.Background(), "localhost", "abc", tokenData)
 

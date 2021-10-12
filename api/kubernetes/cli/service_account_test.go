@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
@@ -39,11 +40,11 @@ func Test_GetServiceAccount(t *testing.T) {
 				Name: tokenData.Username,
 			},
 		}
-		_, err := k.cli.CoreV1().ServiceAccounts(portainerNamespace).Create(serviceAccount)
+		_, err := k.cli.CoreV1().ServiceAccounts(portainerNamespace).Create(context.Background(), serviceAccount, metav1.CreateOptions{})
 		if err != nil {
 			t.Errorf("failed to create service acount; err=%s", err)
 		}
-		defer k.cli.CoreV1().ServiceAccounts(portainerNamespace).Delete(serviceAccount.Name, nil)
+		defer k.cli.CoreV1().ServiceAccounts(portainerNamespace).Delete(context.Background(), serviceAccount.Name, metav1.DeleteOptions{})
 
 		sa, err := k.GetServiceAccount(tokenData)
 		if err != nil {
@@ -72,11 +73,11 @@ func Test_GetServiceAccount(t *testing.T) {
 				Name: serviceAccountName,
 			},
 		}
-		_, err := k.cli.CoreV1().ServiceAccounts(portainerNamespace).Create(serviceAccount)
+		_, err := k.cli.CoreV1().ServiceAccounts(portainerNamespace).Create(context.Background(), serviceAccount, metav1.CreateOptions{})
 		if err != nil {
 			t.Errorf("failed to create service acount; err=%s", err)
 		}
-		defer k.cli.CoreV1().ServiceAccounts(portainerNamespace).Delete(serviceAccount.Name, nil)
+		defer k.cli.CoreV1().ServiceAccounts(portainerNamespace).Delete(context.Background(), serviceAccount.Name, metav1.DeleteOptions{})
 
 		sa, err := k.GetServiceAccount(tokenData)
 		if err != nil {
