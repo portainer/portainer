@@ -1,5 +1,4 @@
 export function buildLdapSettingsModel() {
-  console.log(`bbb`);
   return {
     AnonymousMode: true,
     ReaderDN: '',

@@ -33,7 +33,6 @@ export default class LdapCustomAdminGroupController {
   }
 
   async $onInit() {
-    console.log(this);
     if (this.settings.AdminAutoPopulate && this.settings.AdminGroups && this.settings.AdminGroups.length > 0) {
       const settings = {
         ...this.settings,
