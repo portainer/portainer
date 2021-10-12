@@ -30,17 +30,21 @@ func MustNewTestStore(init bool) (*Store, func()) {
 
 func NewTestStore(init bool) (*Store, func(), error) {
 	// Creates unique temp directory in a concurrency friendly manner.
-	dataStorePath, err := ioutil.TempDir("", "boltdb")
+	storePath, err := ioutil.TempDir("", "boltdb")
 	if err != nil {
 		return nil, nil, errors.Wrap(errTempDir, err.Error())
 	}
 
-	fileService, err := filesystem.NewService(dataStorePath, "")
+	fileService, err := filesystem.NewService(storePath, "")
 	if err != nil {
 		return nil, nil, err
 	}
 
-	store := NewStore(dataStorePath, fileService)
+	connection, err := NewDatabase(storePath, fileService)
+	if err !=nil {
+		panic(err)
+	}
+	store := NewStore(storePath, fileService, connection)
 	err = store.Open()
 	if err != nil {
 		return nil, nil, err
@@ -54,19 +58,19 @@ func NewTestStore(init bool) (*Store, func(), error) {
 	}
 
 	teardown := func() {
-		teardown(store, dataStorePath)
+		teardown(store, storePath)
 	}
 
 	return store, teardown, nil
 }
 
-func teardown(store *Store, dataStorePath string) {
+func teardown(store *Store, storePath string) {
 	err := store.Close()
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	err = os.RemoveAll(dataStorePath)
+	err = os.RemoveAll(storePath)
 	if err != nil {
 		log.Fatalln(err)
 	}
