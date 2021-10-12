@@ -153,5 +153,14 @@
     limited-feature-id="$ctrl.limitedFeatureId"
   ></ldap-group-search>
 
+  <ldap-custom-admin-group
+    style="margin-top: 5px;"
+    settings="$ctrl.settings"
+    on-search-click="($ctrl.onSearchAdminGroupsClick)"
+    selected-admin-groups="$ctrl.selectedAdminGroups"
+    default-admin-group-search-filter="'(objectClass=groupOfNames)'"
+    limited-feature-id="$ctrl.limitedFeatureId"
+  ></ldap-custom-admin-group>
+
   <ldap-settings-test-login settings="$ctrl.settings" limited-feature-id="$ctrl.limitedFeatureId"></ldap-settings-test-login>
 </ng-form>

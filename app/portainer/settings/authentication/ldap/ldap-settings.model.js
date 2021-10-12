@@ -23,6 +23,13 @@ export function buildLdapSettingsModel() {
         GroupAttribute: '',
       },
     ],
+    AdminGroupSearchSettings: [
+      {
+        GroupBaseDN: '',
+        GroupFilter: '',
+        GroupAttribute: '',
+      },
+    ],
     AutoCreateUsers: true,
   };
 }

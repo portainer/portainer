@@ -221,7 +221,7 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
         if (settings.LDAPSettings.ServerType === 2) {
           $scope.formValues.ldap.adSettings = settings.LDAPSettings;
         } else {
-          $scope.formValues.ldap.ldapSettings = settings.LDAPSettings;
+          $scope.formValues.ldap.ldapSettings = Object.assign($scope.formValues.ldap.ldapSettings, settings.LDAPSettings);
         }
 
         if (settings.LDAPSettings.URL) {
