@@ -37,6 +37,25 @@
             <node-selector model="formValues.NodeName"> </node-selector>
             <!-- !node-selection -->
           </div>
+          <div class="row" authorization="DockerImageCreate">
+            <div class="col-lg-12 col-md-12 col-xs-12">
+              <rd-widget>
+                <rd-widget-header icon="fa-tag" title-text="Tag the image"></rd-widget-header>
+                <rd-widget-body>
+                    <!-- image-and-registry -->
+                    <por-image-registry
+                      model="formValues.RegistryModel"
+                      label-class="col-sm-1"
+                      input-class="col-sm-11"
+                      endpoint="endpoint"
+                      is-admin="isAdmin"
+                      set-validity="setPullImageValidity"
+                      check-rate-limits="true"
+                    ></por-image-registry>
+                </rd-widget-body>
+              </rd-widget>
+            </div>
+          </div>
           <!-- actions -->
           <div class="col-sm-12 form-section-title">
             Actions
