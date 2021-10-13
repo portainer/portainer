@@ -53,7 +53,7 @@ func (transport *baseTransport) proxyNamespaceDeleteOperation(request *http.Requ
 	}
 
 	for _, s := range stacks {
-		if s.Namespace == namespace {
+		if s.Namespace == namespace && s.EndpointID == transport.endpoint.ID {
 			if err := transport.dataStore.Stack().DeleteStack(s.ID); err != nil {
 				return nil, err
 			}
