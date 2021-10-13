@@ -206,7 +206,7 @@ export default class WizardDockerController {
 
       this.command = {
         linuxCommand: `curl -L https://downloads.portainer.io/agent-stack-ce${agentShortVersion}.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent `,
-        winCommand: `curl -L https://downloads.portainer.io/agent-stack-ce${agentShortVersion}-windows.yml -o agent-stack-windows.yml && docker stack deploy --compose-file=agent-stack-windows.yml portainer-agent `,
+        winCommand: `curl https://downloads.portainer.io/agent-stack-ce${agentShortVersion}-windows.yml -o agent-stack-windows.yml ; docker stack deploy --compose-file=agent-stack-windows.yml portainer-agent `,
         linuxSocket: `-v "/var/run/docker.sock:/var/run/docker.sock" `,
         winSocket: `-v \.\pipe\docker_engine:\.\pipe\docker_engine `,
       };
