@@ -13,11 +13,9 @@ import (
 
 // @id EdgeGroupDelete
 // @summary Deletes an EdgeGroup
-// @description
+// @description **Access policy**: administrator
 // @tags edge_groups
 // @security jwt
-// @accept json
-// @produce json
 // @param id path int true "EdgeGroup Id"
 // @success 204
 // @failure 503 "Edge compute features are disabled"

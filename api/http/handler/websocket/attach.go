@@ -18,7 +18,7 @@ import (
 // @description If the nodeName query parameter is present, the request will be proxied to the underlying agent environment(endpoint).
 // @description If the nodeName query parameter is not specified, the request will be upgraded to the websocket protocol and
 // @description an AttachStart operation HTTP request will be created and hijacked.
-// @description Authentication and access is controlled via the mandatory token query parameter.
+// @description **Access policy**: authenticated
 // @security jwt
 // @tags websocket
 // @accept json

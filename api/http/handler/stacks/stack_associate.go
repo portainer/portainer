@@ -14,7 +14,22 @@ import (
 	"github.com/portainer/portainer/api/internal/stackutils"
 )
 
-// PUT request on /api/stacks/:id/associate?endpointId=<endpointId>&swarmId=<swarmId>&orphanedRunning=<orphanedRunning>
+// @id StackAssociate
+// @summary Associate an orphaned stack to a new environment(endpoint)
+// @description **Access policy**: administrator
+// @tags stacks
+// @security jwt
+// @produce json
+// @param id path int true "Stack identifier"
+// @param endpointId query int true "Stacks created before version 1.18.0 might not have an associated environment(endpoint) identifier. Use this optional parameter to set the environment(endpoint) identifier used by the stack."
+// @param swarmId query int true "Swarm identifier"
+// @param orphanedRunning query boolean true "Indicates whether the stack is orphaned"
+// @success 200 {object} portainer.Stack "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 "Stack not found"
+// @failure 500 "Server error"
+// @router /stacks/{id}/associate [put]
 func (handler *Handler) stackAssociate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

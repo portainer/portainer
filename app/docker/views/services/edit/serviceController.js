@@ -501,7 +501,7 @@ angular.module('portainer.docker').controller('ServiceController', [
       ServiceService.update(service, config, 'previous')
         .then(function (data) {
           if (data.message && data.message.match(/^rpc error:/)) {
-            Notifications.error(data.message, 'Error');
+            Notifications.error('Failure', data, 'Error');
           } else {
             Notifications.success('Success', 'Service successfully rolled back');
             $scope.cancelChanges({});
@@ -550,7 +550,7 @@ angular.module('portainer.docker').controller('ServiceController', [
       ServiceService.update(service, config).then(
         function (data) {
           if (data.message && data.message.match(/^rpc error:/)) {
-            Notifications.error(data.message, 'Error');
+            Notifications.error('Failure', data, 'Error');
           } else {
             Notifications.success('Service successfully updated', 'Service updated');
           }

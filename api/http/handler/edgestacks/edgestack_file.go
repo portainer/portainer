@@ -17,10 +17,9 @@ type stackFileResponse struct {
 
 // @id EdgeStackFile
 // @summary Fetches the stack file for an EdgeStack
-// @description
+// @description **Access policy**: administrator
 // @tags edge_stacks
 // @security jwt
-// @accept json
 // @produce json
 // @param id path string true "EdgeStack Id"
 // @success 200 {object} stackFileResponse

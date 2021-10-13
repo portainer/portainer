@@ -16,7 +16,7 @@ import (
 // @id CustomTemplateDelete
 // @summary Remove a template
 // @description Remove a template.
-// @description **Access policy**: authorized
+// @description **Access policy**: authenticated
 // @tags custom_templates
 // @security jwt
 // @param id path int true "Template identifier"

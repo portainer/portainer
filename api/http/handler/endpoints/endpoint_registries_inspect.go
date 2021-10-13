@@ -12,7 +12,20 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// GET request on /endpoints/{id}/registries/{registryId}
+// @id endpointRegistryInspect
+// @summary get registry for environment
+// @description **Access policy**: authenticated
+// @tags endpoints
+// @security jwt
+// @produce json
+// @param id path int true "identifier"
+// @param registryId path int true "Registry identifier"
+// @success 200 {object} portainer.Registry "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied"
+// @failure 404 "Registry not found"
+// @failure 500 "Server error"
+// @router /endpoints/{id}/registries/{registryId} [get]
 func (handler *Handler) endpointRegistryInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

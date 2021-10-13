@@ -12,6 +12,13 @@ import (
 	"github.com/portainer/portainer/api/bolt/errors"
 )
 
+// @id endpointExtensionRemove
+// @tags endpoints
+// @deprecated
+// @param id path int true "Environment(Endpoint) identifier"
+// @param extensionType path string true "Extension Type"
+// @success 204 "Success"
+// @router /endpoints/{id}/extensions/{extensionType} [delete]
 func (handler *Handler) endpointExtensionRemove(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

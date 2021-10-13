@@ -33,7 +33,7 @@ func (payload *webhookCreatePayload) Validate(r *http.Request) error {
 }
 
 // @summary Create a webhook
-// @description
+// @description **Access policy**: authenticated
 // @security jwt
 // @tags webhooks
 // @accept json

@@ -13,11 +13,9 @@ import (
 
 // @id EdgeJobDelete
 // @summary Delete an EdgeJob
-// @description
+// @description **Access policy**: administrator
 // @tags edge_jobs
 // @security jwt
-// @accept json
-// @produce json
 // @param id path string true "EdgeJob Id"
 // @success 204
 // @failure 500

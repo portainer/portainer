@@ -12,9 +12,9 @@ import (
 )
 
 // @id EndpointSnapshot
-// @summary Snapshots an environments(endpoints)
-// @description Snapshots an environments(endpoints)
-// @description **Access policy**: restricted
+// @summary Snapshots an environment(endpoint)
+// @description Snapshots an environment(endpoint)
+// @description **Access policy**: administrator
 // @tags endpoints
 // @security jwt
 // @param id path int true "Environment(Endpoint) identifier"
