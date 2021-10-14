@@ -15,12 +15,14 @@ class porImageRegistryController {
     this.Notifications = Notifications;
 
     this.onRegistryChange = this.onRegistryChange.bind(this);
+    this.onImageChange = this.onImageChange.bind(this);
 
     this.registries = [];
     this.images = [];
     this.defaultRegistry = new DockerHubViewModel();
 
     this.$scope.$watch(() => this.model.Registry, this.onRegistryChange);
+    this.$scope.$watch(() => this.model.Image, this.onImageChange);
   }
 
   isKnownRegistry(registry) {
@@ -59,6 +61,12 @@ class porImageRegistryController {
     this.prepareAutocomplete();
     if (this.model.Registry.Type === RegistryTypes.GITLAB && this.model.Image) {
       this.model.Image = _.replace(this.model.Image, this.model.Registry.Gitlab.ProjectPath, '');
+    }
+  }
+
+  async onImageChange() {
+    if (!this.isDockerHubRegistry()) {
+      this.setValidity(true);
     }
   }
 
