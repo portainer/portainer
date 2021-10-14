@@ -79,6 +79,13 @@ func (bouncer *RequestBouncer) AuthenticatedAccess(h http.Handler) http.Handler 
 	return h
 }
 
+// KubernetesAccess is similar to AuthenticatedAccess, adding a kubeconfig-specific JWT token validation
+func (bouncer *RequestBouncer) KubernetesAccess(h http.Handler) http.Handler {
+	h = bouncer.mwUpgradeToRestrictedRequest(h)
+	h = bouncer.mwAuthenticatedKubeUser(h)
+	return h
+}
+
 // AuthorizedEndpointOperation retrieves the JWT token from the request context and verifies
 // that the user can access the specified environment(endpoint).
 // An error is returned when access to the environments(endpoints) is denied or if the user do not have the required
@@ -132,7 +139,13 @@ func (bouncer *RequestBouncer) AuthorizedEdgeEndpointOperation(r *http.Request, 
 // - add secure handlers to the response
 // - parse the JWT token and put it into the http context.
 func (bouncer *RequestBouncer) mwAuthenticatedUser(h http.Handler) http.Handler {
-	h = bouncer.mwCheckAuthentication(h)
+	h = bouncer.mwCheckAuthentication(h, false)
+	h = mwSecureHeaders(h)
+	return h
+}
+
+func (bouncer *RequestBouncer) mwAuthenticatedKubeUser(h http.Handler) http.Handler {
+	h = bouncer.mwCheckAuthentication(h, true)
 	h = mwSecureHeaders(h)
 	return h
 }
@@ -196,7 +209,7 @@ func (bouncer *RequestBouncer) mwUpgradeToRestrictedRequest(next http.Handler) h
 // mwCheckAuthentication provides Authentication middleware for handlers
 //
 // It parses the JWT token and adds the parsed token data to the http context
-func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Handler {
+func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler, isKube bool) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var tokenData *portainer.TokenData
 
@@ -207,7 +220,7 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 			return
 		}
 
-		tokenData, err = bouncer.jwtService.ParseAndVerifyToken(token)
+		tokenData, err = bouncer.jwtService.ParseAndVerifyToken(token, isKube)
 		if err != nil {
 			httperror.WriteError(w, http.StatusUnauthorized, "Invalid JWT token", err)
 			return

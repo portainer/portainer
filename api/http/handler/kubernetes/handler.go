@@ -34,7 +34,7 @@ func NewHandler(bouncer *security.RequestBouncer, authorizationService *authoriz
 
 	kubeRouter := h.PathPrefix("/kubernetes/{id}").Subrouter()
 
-	kubeRouter.Use(bouncer.AuthenticatedAccess)
+	kubeRouter.Use(bouncer.KubernetesAccess)
 	kubeRouter.Use(middlewares.WithEndpoint(dataStore.Endpoint(), "id"))
 	kubeRouter.Use(kubeOnlyMiddleware)
 

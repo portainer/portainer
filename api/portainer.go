@@ -544,6 +544,7 @@ type (
 		DefaultTeamID        TeamID `json:"DefaultTeamID"`
 		SSO                  bool   `json:"SSO"`
 		LogoutURI            string `json:"LogoutURI"`
+		KubeSecretKey        []byte `json:"KubeSecretKey"`
 	}
 
 	// Pair defines a key/value string pair
@@ -1262,7 +1263,7 @@ type (
 		GenerateToken(data *TokenData) (string, error)
 		GenerateTokenForOAuth(data *TokenData, expiryTime *time.Time) (string, error)
 		GenerateTokenForKubeconfig(data *TokenData) (string, error)
-		ParseAndVerifyToken(token string) (*TokenData, error)
+		ParseAndVerifyToken(token string, isKube bool) (*TokenData, error)
 		SetUserSessionDuration(userSessionDuration time.Duration)
 	}
 

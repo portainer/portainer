@@ -1,6 +1,7 @@
 package jwt
 
 import (
+	i "github.com/portainer/portainer/api/internal/testhelpers"
 	"testing"
 	"time"
 
@@ -10,7 +11,8 @@ import (
 )
 
 func TestGenerateSignedToken(t *testing.T) {
-	svc, err := NewService("24h", nil)
+	dataStore := i.NewDatastore(i.WithSettingsService(&portainer.Settings{}))
+	svc, err := NewService("24h", dataStore)
 	assert.NoError(t, err, "failed to create a copy of service")
 
 	token := &portainer.TokenData{
