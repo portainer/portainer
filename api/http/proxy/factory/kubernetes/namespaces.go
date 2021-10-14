@@ -46,5 +46,19 @@ func (transport *baseTransport) proxyNamespaceDeleteOperation(request *http.Requ
 			}
 		}
 	}
+
+	stacks, err := transport.dataStore.Stack().Stacks()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, s := range stacks {
+		if s.Namespace == namespace && s.EndpointID == transport.endpoint.ID {
+			if err := transport.dataStore.Stack().DeleteStack(s.ID); err != nil {
+				return nil, err
+			}
+		}
+	}
+
 	return transport.executeKubernetesRequest(request)
 }
