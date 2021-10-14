@@ -69,17 +69,19 @@ class porImageRegistryController {
   async reloadRegistries() {
     return this.$async(async () => {
       try {
+        let showDefaultRegistry = false;
         this.registries = await this.EndpointService.registries(this.endpoint.Id, this.namespace);
 
         // hide default(anonymous) dockerhub registry if user has an authenticated one
         if (!this.registries.some((registry) => registry.Type === RegistryTypes.DOCKERHUB)) {
+          showDefaultRegistry = true;
           this.registries.push(this.defaultRegistry);
         }
 
         const id = this.model.Registry.Id;
         const registry = _.find(this.registries, { Id: id });
         if (!registry) {
-          this.model.Registry = this.registries[0];
+          this.model.Registry = showDefaultRegistry ? this.defaultRegistry : this.registries[0];
         }
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to retrieve registries');
