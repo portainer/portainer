@@ -7,7 +7,7 @@ KOMPOSE_VERSION=$3
 if [ "${PLATFORM}" == 'linux' ]; then
   wget -O "dist/kompose" "https://github.com/kubernetes/kompose/releases/download/${KOMPOSE_VERSION}/kompose-${PLATFORM}-${ARCH}"
   chmod +x "dist/kompose"
-elif [ "${PLATFORM}" == 'mac' ]; then
+elif [ "${PLATFORM}" == 'darwin' ]; then
   wget -O "dist/kompose" "https://github.com/kubernetes/kompose/releases/download/${KOMPOSE_VERSION}/kompose-darwin-amd64"
   chmod +x "dist/kompose"
 elif [ "${PLATFORM}" == 'windows' ]; then

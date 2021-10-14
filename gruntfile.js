@@ -63,6 +63,16 @@ module.exports = function (grunt) {
 
   grunt.registerTask('start:toolkit', ['start:localserver', 'start:client']);
 
+  const platform = os.platform();
+  grunt.registerTask('build:local_dist', [
+    'shell:build_binary:' + platform + ':' + arch,
+    'shell:download_docker_binary:' + platform + ':' + arch,
+    'shell:download_docker_compose_binary:' + platform + ':' + arch,
+    'shell:download_helm_binary:' + platform + ':' + arch,
+    'shell:download_kompose_binary:' + platform + ':' + arch,
+    'shell:download_kubectl_binary:' + platform + ':' + arch,
+  ]);
+
   grunt.task.registerTask('release', 'release:<platform>:<arch>', function (p = 'linux', a = arch) {
     grunt.task.run([
       'config:prod',
@@ -163,7 +173,7 @@ gruntfile_cfg.shell = {
 
 function shell_build_binary(p, a) {
   var binfile = 'dist/portainer';
-  if (p === 'linux') {
+  if (p === 'linux' || p === 'darwin') {
     return ['if [ -f ' + binfile + ' ]; then', 'echo "Portainer binary exists";', 'else', 'build/build_binary.sh ' + p + ' ' + a + ';', 'fi'].join(' ');
   } else {
     return [
