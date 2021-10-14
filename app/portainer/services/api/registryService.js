@@ -111,25 +111,36 @@ angular.module('portainer.app').factory('RegistryService', [
     // matching precedence:
     // 1. registryId matched
     // 2. both domain name and username matched (for dockerhub only)
-    // 3. only domain matched
+    // 3. only URL matched
+    // 4. pick up the first dockerhub registry
     function findBestMatchRegistry(repository, registries, registryId) {
-      const matchedRegistries = [];
+      let highMatch, lowMatch;
 
-      registries.forEach((registry) => {
-        if (registry.Id === registryId) {
+      for (const registry of registries) {
+        if (registry.Id == registryId) {
           return registry;
         }
 
-        if (registry.Type === RegistryTypes.DOCKERHUB && _.includes(repository, registry.Username)) {
-          matchedRegistries.unshift(registry);
+        if (registry.Type === RegistryTypes.DOCKERHUB) {
+          // try to match repository examples:
+          //   <USERNAME>/nginx:latest
+          //   docker.io/<USERNAME>/nginx:latest
+          if (repository.startsWith(registry.Username + '/') || repository.startsWith(getURL(registry) + '/' + registry.Username + '/')) {
+            highMatch = registry;
+          }
+
+          // try to match repository examples:
+          //   portainer/portainer-ee:latest
+          //   <NON-USERNAME>/portainer-ee:latest
+          lowMatch = lowMatch || registry;
         }
 
         if (_.includes(repository, getURL(registry))) {
-          matchedRegistries.push(registry);
+          lowMatch = registry;
         }
-      });
+      }
 
-      return matchedRegistries[0];
+      return highMatch || lowMatch;
     }
 
     function retrievePorRegistryModelFromRepositoryWithRegistries(repository, registries, registryId) {
