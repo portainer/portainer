@@ -1,6 +1,8 @@
 package database
 
 import (
+	"io/ioutil"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/dataservices/customtemplate"
@@ -27,6 +29,8 @@ import (
 	"github.com/portainer/portainer/api/dataservices/user"
 	"github.com/portainer/portainer/api/dataservices/version"
 	"github.com/portainer/portainer/api/dataservices/webhook"
+	"github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v3"
 )
 
 // Store defines the implementation of portainer.DataStore using
@@ -313,4 +317,99 @@ func (store *Store) Version() dataservices.VersionService {
 // Webhook gives access to the Webhook data management layer
 func (store *Store) Webhook() dataservices.WebhookService {
 	return store.WebhookService
+}
+
+func (store *Store) Export(filename string) (err error) {
+	backup := make(map[string]interface{})
+
+	backup[store.CustomTemplate().BucketName()], err = store.CustomTemplate().CustomTemplates()
+	if err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	}
+	backup[store.EdgeGroup().BucketName()], err = store.EdgeGroup().EdgeGroups()
+	if err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	}
+	backup[store.EdgeJob().BucketName()], err = store.EdgeJob().EdgeJobs()
+	if err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	}
+	backup[store.EdgeStack().BucketName()], err = store.EdgeStack().EdgeStacks()
+	if err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	}
+	backup[store.Endpoint().BucketName()], err = store.Endpoint().Endpoints()
+	if err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	}
+	backup[store.EndpointGroup().BucketName()], err = store.EndpointGroup().EndpointGroups()
+	if err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	}
+	backup[store.EndpointRelation().BucketName()], err = store.EndpointRelation().EndpointRelations()
+	if err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	}
+	backup[store.HelmUserRepository().BucketName()], err = store.HelmUserRepository().HelmUserRepositorys()
+	if err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	}
+	backup[store.Registry().BucketName()], err = store.Registry().Registries()
+	if err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	}
+	backup[store.ResourceControl().BucketName()], err = store.ResourceControl().ResourceControls()
+	if err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	}
+	backup[store.Role().BucketName()], err = store.Role().Roles()
+	if err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	}
+	backup[store.Settings().BucketName()], err = store.Settings().Settings()
+	if err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	}
+	backup[store.SSLSettings().BucketName()], err = store.SSLSettings().Settings()
+	if err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	}
+	backup[store.Stack().BucketName()], err = store.Stack().Stacks()
+	if err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	}
+	backup[store.Tag().BucketName()], err = store.Tag().Tags()
+	if err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	}
+	backup[store.TeamMembership().BucketName()], err = store.TeamMembership().TeamMemberships()
+	if err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	}
+	backup[store.Team().BucketName()], err = store.Team().Teams()
+	if err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	}
+	backup[store.TunnelServer().BucketName()], err = store.TunnelServer().Info()
+	if err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	}
+	backup[store.User().BucketName()], err = store.User().Users()
+	if err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	}
+	backup[store.Version().BucketName()] = store.Version()
+	if err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	}
+	backup[store.Webhook().BucketName()], err = store.Webhook().Webhooks()
+	if err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	}
+
+	b, err := yaml.Marshal(backup)
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile(filename, b, 0600)
 }
