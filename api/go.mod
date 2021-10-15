@@ -15,6 +15,7 @@ require (
 	github.com/docker/docker v20.10.9+incompatible
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/g07cha/defender v0.0.0-20180505193036-5665c627c814
+	github.com/ghodss/yaml v1.0.0
 	github.com/go-git/go-git/v5 v5.3.0
 	github.com/go-ldap/ldap/v3 v3.1.8
 	github.com/gofrs/uuid v4.0.0+incompatible
@@ -26,6 +27,7 @@ require (
 	github.com/jpillora/chisel v0.0.0-20190724232113-f3a8df20e389
 	github.com/json-iterator/go v1.1.11
 	github.com/koding/websocketproxy v0.0.0-20181220232114-7ed82d81a28c
+	github.com/konoui/boltdb-exporter v0.0.1
 	github.com/moby/term v0.0.0-20210619224110-3f7ff695adc6 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/orcaman/concurrent-map v0.0.0-20190826125027-8c72a8bb44f6
@@ -37,7 +39,6 @@ require (
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
-	github.com/swaggo/swag v1.7.3
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
