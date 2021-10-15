@@ -1,9 +1,12 @@
 package security
 
 import (
+	"bytes"
 	"errors"
 	"net/http"
+	"net/http/httptest"
 	"strings"
+	"sync"
 
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
@@ -26,6 +29,9 @@ type (
 		UserID          portainer.UserID
 		UserMemberships []portainer.TeamMembership
 	}
+
+	// MiddlewareFunc is function signature which middlewares must satisfy
+	MiddlewareFunc func(next http.Handler) http.Handler
 )
 
 // NewRequestBouncer initializes a new RequestBouncer
@@ -34,6 +40,51 @@ func NewRequestBouncer(dataStore portainer.DataStore, jwtService portainer.JWTSe
 		dataStore:  dataStore,
 		jwtService: jwtService,
 	}
+}
+
+// AnyAuth passes down the request to the underlying handler by running it through all the provided middlewares.
+// If any of the provided middlewares are satisfied, the request will be processed by the underlying handler.
+func (bouncer *RequestBouncer) AnyAuth(middlewares []MiddlewareFunc, next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// if middlewares provided are nil or empty, serve request as is and return
+		if len(middlewares) == 0 || middlewares == nil {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		wantResponse := []byte("ok")
+		testHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Write(wantResponse)
+		})
+
+		var workingMiddleware MiddlewareFunc
+		wg := sync.WaitGroup{}
+		wg.Add(len(middlewares))
+
+		// process the request against test handler in parallel through all the provided middelwares
+		// the last middleware that returns a successful response response will served the request to the actual handler
+		for _, m := range middlewares {
+			go func(middleware MiddlewareFunc) {
+				rr := httptest.NewRecorder()
+				h := middleware(testHandler)
+				h.ServeHTTP(rr, r)
+				if bytes.Equal(rr.Body.Bytes(), wantResponse) {
+					workingMiddleware = middleware
+				}
+				wg.Done()
+			}(m)
+		}
+		wg.Wait()
+
+		// if none of the middlewares passed, utilise the first middleware in the chain to return the error
+		if workingMiddleware == nil {
+			middlewares[0](next).ServeHTTP(w, r)
+			return
+		}
+
+		// note: the workingMiddleware is the last middleware in the chain (if multiple middlewares passed)
+		workingMiddleware(next).ServeHTTP(w, r)
+	})
 }
 
 // PublicAccess defines a security check for public API environments(endpoints).
