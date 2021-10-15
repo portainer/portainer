@@ -8,6 +8,9 @@ type Connection interface {
 	Open() error
 	Close() error
 
+	// write the db contents to filename as yaml (the schema needs defining)
+	ExportRaw(filename string) error
+
 	//Rollback(force bool) error
 	//MigrateData(migratorParams *database.MigratorParameters, force bool) error
 

@@ -2,12 +2,20 @@ package boltdb
 
 import (
 	"encoding/binary"
+	"fmt"
+	"io"
+	"io/ioutil"
+	"log"
+	"os"
+	"path"
+	"time"
+
 	"github.com/boltdb/bolt"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices/errors"
-	"io"
-	"path"
-	"time"
+
+	"github.com/ghodss/yaml"
+	"github.com/konoui/boltdb-exporter/pkg/exporter"
 )
 
 const (
@@ -15,8 +23,8 @@ const (
 )
 
 type DbConnection struct {
-	Path                      string
-	FileService               portainer.FileService
+	Path        string
+	FileService portainer.FileService
 
 	*bolt.DB
 }
@@ -31,7 +39,15 @@ func (connection *DbConnection) GetStorePath() string {
 
 // Open opens and initializes the BoltDB database.
 func (connection *DbConnection) Open() error {
+	databaseExportPath := path.Join(connection.Path, fmt.Sprintf("raw-%s-%d.yaml", DatabaseFileName, time.Now().Unix()))
+	if err := connection.ExportRaw(databaseExportPath); err != nil {
+		log.Printf("raw export to %s error: %s", databaseExportPath, err)
+	} else {
+		log.Printf("raw export to %s success", databaseExportPath)
+	}
+
 	databasePath := path.Join(connection.Path, DatabaseFileName)
+
 	db, err := bolt.Open(databasePath, 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		return err
@@ -56,6 +72,19 @@ func (connection *DbConnection) BackupTo(w io.Writer) error {
 		_, err := tx.WriteTo(w)
 		return err
 	})
+}
+
+func (connection *DbConnection) ExportRaw(filename string) error {
+	databasePath := path.Join(connection.Path, DatabaseFileName)
+	if _, err := os.Stat(databasePath); err != nil {
+		return fmt.Errorf("stat on %s failed: %s", err)
+	}
+
+	b, err := exporter.Export(databasePath, yaml.Marshal)
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile(filename, b, 0600)
 }
 
 // ConvertToKey returns an 8-byte big endian representation of v.
