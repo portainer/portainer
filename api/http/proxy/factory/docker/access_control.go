@@ -122,17 +122,11 @@ func (transport *Transport) createPrivateResourceControl(resourceIdentifier stri
 }
 
 func (transport *Transport) getInheritedResourceControlFromServiceOrStack(resourceIdentifier, nodeName string, resourceType portainer.ResourceControlType, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
-	client := transport.dockerClient
-
-	if nodeName != "" {
-		dockerClient, err := transport.dockerClientFactory.CreateClient(transport.endpoint, nodeName)
-		if err != nil {
-			return nil, err
-		}
-		defer dockerClient.Close()
-
-		client = dockerClient
+	client, err := transport.dockerClientFactory.CreateClient(transport.endpoint, nodeName)
+	if err != nil {
+		return nil, err
 	}
+	defer client.Close()
 
 	switch resourceType {
 	case portainer.ContainerResourceControl:

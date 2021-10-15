@@ -14,7 +14,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/docker/docker/client"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
@@ -33,7 +32,6 @@ type (
 		dataStore            portainer.DataStore
 		signatureService     portainer.DigitalSignatureService
 		reverseTunnelService portainer.ReverseTunnelService
-		dockerClient         *client.Client
 		dockerClientFactory  *docker.ClientFactory
 	}
 
@@ -63,11 +61,6 @@ type (
 
 // NewTransport returns a pointer to a new Transport instance.
 func NewTransport(parameters *TransportParameters, httpTransport *http.Transport) (*Transport, error) {
-	dockerClient, err := parameters.DockerClientFactory.CreateClient(parameters.Endpoint, "")
-	if err != nil {
-		return nil, err
-	}
-
 	transport := &Transport{
 		endpoint:             parameters.Endpoint,
 		dataStore:            parameters.DataStore,
@@ -75,7 +68,6 @@ func NewTransport(parameters *TransportParameters, httpTransport *http.Transport
 		reverseTunnelService: parameters.ReverseTunnelService,
 		dockerClientFactory:  parameters.DockerClientFactory,
 		HTTPTransport:        httpTransport,
-		dockerClient:         dockerClient,
 	}
 
 	return transport, nil

@@ -21,6 +21,10 @@ export default class EndpointHelper {
     ].includes(endpoint.Type);
   }
 
+  static isEdgeEndpoint(endpoint) {
+    return [PortainerEndpointTypes.EdgeAgentOnDockerEnvironment, PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment].includes(endpoint.Type);
+  }
+
   static mapGroupNameToEndpoint(endpoints, groups) {
     for (var i = 0; i < endpoints.length; i++) {
       var endpoint = endpoints[i];
