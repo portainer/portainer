@@ -86,7 +86,7 @@ func (service *Service) defaultExpireAt() int64 {
 
 // GenerateToken generates a new JWT token.
 func (service *Service) GenerateToken(data *portainer.TokenData) (string, error) {
-	return service.generateSignedToken(data, service.defaultExpireAt())
+	return service.generateSignedToken(data, service.defaultExpireAt(), service.secret)
 }
 
 // GenerateTokenForOAuth generates a new JWT for OAuth login
@@ -96,7 +96,7 @@ func (service *Service) GenerateTokenForOAuth(data *portainer.TokenData, expiryT
 	if expiryTime != nil && !expiryTime.IsZero() {
 		expireAt = expiryTime.Unix()
 	}
-	return service.generateSignedToken(data, expireAt)
+	return service.generateSignedToken(data, expireAt, service.secret)
 }
 
 // ParseAndVerifyToken parses a JWT token and verify its validity. It returns an error if token is invalid.
@@ -153,15 +153,7 @@ func (service *Service) SetUserSessionDuration(userSessionDuration time.Duration
 	service.userSessionTimeout = userSessionDuration
 }
 
-func (service *Service) generateSignedToken(data *portainer.TokenData, expiresAt int64) (string, error) {
-	return generateSignedTokenWithSecret(data, expiresAt, service.secret)
-}
-
-func (service *Service) generateSignedTokenForKubeconfig(data *portainer.TokenData, expiresAt int64) (string, error) {
-	return generateSignedTokenWithSecret(data, expiresAt, service.kubeSecret)
-}
-
-func generateSignedTokenWithSecret(data *portainer.TokenData, expiresAt int64, secret []byte) (string, error) {
+func (service *Service)  generateSignedToken(data *portainer.TokenData, expiresAt int64, secret []byte) (string, error) {
 	cl := claims{
 		UserID:   int(data.ID),
 		Username: data.Username,
