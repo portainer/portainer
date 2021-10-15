@@ -43,7 +43,7 @@ func CreateBackupArchive(password string, gate *offlinegate.OfflineGate, datasto
 
 	{
 		// new export
-		exportFilename := path.Join(backupDirPath, fmt.Sprintf("export-%d.yaml", time.Now().Unix()))
+		exportFilename := path.Join(backupDirPath, fmt.Sprintf("export-%d.json", time.Now().Unix()))
 
 		err := datastore.Export(exportFilename)
 		if err != nil {

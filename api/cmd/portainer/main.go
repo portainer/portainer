@@ -96,7 +96,7 @@ func initDataStore(storePath string, rollback bool, fileService portainer.FileSe
 
 	go func() {
 		<-shutdownCtx.Done()
-		exportFilename := path.Join(storePath, fmt.Sprintf("export-%d.yaml", time.Now().Unix()))
+		exportFilename := path.Join(storePath, fmt.Sprintf("export-%d.json", time.Now().Unix()))
 
 		err := store.Export(exportFilename)
 		if err != nil {
