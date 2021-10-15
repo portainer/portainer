@@ -54,7 +54,7 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 	if payload.TemplatesURL != nil && *payload.TemplatesURL != "" && !govalidator.IsURL(*payload.TemplatesURL) {
 		return errors.New("Invalid external templates URL. Must correspond to a valid URL format")
 	}
-	if payload.HelmRepositoryURL != nil && *payload.HelmRepositoryURL != "" {
+	if payload.HelmRepositoryURL != nil && *payload.HelmRepositoryURL != "" && *payload.HelmRepositoryURL != portainer.DefaultHelmRepositoryURL {
 		err := libhelm.ValidateHelmRepositoryURL(*payload.HelmRepositoryURL)
 		if err != nil {
 			return errors.Wrap(err, "Invalid Helm repository URL. Must correspond to a valid URL format")
