@@ -3,6 +3,7 @@ package backup
 import (
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/offlinegate"
+	"github.com/sirupsen/logrus"
 )
 
 const rwxr__r__ os.FileMode = 0744
@@ -37,6 +39,18 @@ func CreateBackupArchive(password string, gate *offlinegate.OfflineGate, datasto
 	backupDirPath := filepath.Join(filestorePath, "backup", time.Now().Format("2006-01-02_15-04-05"))
 	if err := os.MkdirAll(backupDirPath, rwxr__r__); err != nil {
 		return "", errors.Wrap(err, "Failed to create backup dir")
+	}
+
+	{
+		// new export
+		exportFilename := path.Join(backupDirPath, fmt.Sprintf("export-%d.yaml", time.Now().Unix()))
+
+		err := datastore.Export(exportFilename)
+		if err != nil {
+			logrus.WithError(err).Debugf("failed to export to %s", exportFilename)
+		} else {
+			logrus.Debugf("exported to %s", exportFilename)
+		}
 	}
 
 	if err := backupDb(backupDirPath, datastore); err != nil {

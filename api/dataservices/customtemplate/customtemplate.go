@@ -2,6 +2,7 @@ package customtemplate
 
 import (
 	"fmt"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/sirupsen/logrus"
 )
@@ -14,6 +15,10 @@ const (
 // Service represents a service for managing custom template data.
 type Service struct {
 	connection portainer.Connection
+}
+
+func (service *Service) BucketName() string {
+	return BucketName
 }
 
 // NewService creates a new instance of a service.
@@ -31,8 +36,6 @@ func NewService(connection portainer.Connection) (*Service, error) {
 // CustomTemplates return an array containing all the custom templates.
 func (service *Service) CustomTemplates() ([]portainer.CustomTemplate, error) {
 	var customTemplates = make([]portainer.CustomTemplate, 0)
-
-
 
 	err := service.connection.GetAll(
 		BucketName,

@@ -2,6 +2,7 @@ package tag
 
 import (
 	"fmt"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/sirupsen/logrus"
 )
@@ -14,6 +15,10 @@ const (
 // Service represents a service for managing environment(endpoint) data.
 type Service struct {
 	connection portainer.Connection
+}
+
+func (service *Service) BucketName() string {
+	return BucketName
 }
 
 // NewService creates a new instance of a service.
@@ -69,7 +74,7 @@ func (service *Service) Create(tag *portainer.Tag) error {
 			tag.ID = portainer.TagID(id)
 			return int(tag.ID), tag
 		},
-		)
+	)
 }
 
 // UpdateTag updates a tag.
