@@ -2,6 +2,7 @@ package webhook
 
 import (
 	"fmt"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices/errors"
 	"github.com/sirupsen/logrus"
@@ -15,6 +16,10 @@ const (
 // Service represents a service for managing webhook data.
 type Service struct {
 	connection portainer.Connection
+}
+
+func (service *Service) BucketName() string {
+	return BucketName
 }
 
 // NewService creates a new instance of a service.

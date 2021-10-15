@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"strconv"
 	"strings"
+	"time"
 
-	"github.com/portainer/portainer/api/database"
+	"github.com/sirupsen/logrus"
 
 	"github.com/portainer/libhelm"
 	portainer "github.com/portainer/portainer/api"
@@ -16,6 +18,7 @@ import (
 	"github.com/portainer/portainer/api/chisel"
 	"github.com/portainer/portainer/api/cli"
 	"github.com/portainer/portainer/api/crypto"
+	"github.com/portainer/portainer/api/database"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/exec"
@@ -63,7 +66,7 @@ func initFileService(dataStorePath string) portainer.FileService {
 
 func initDataStore(storePath string, rollback bool, fileService portainer.FileService, shutdownCtx context.Context) dataservices.DataStore {
 	connection, err := database.NewDatabase(storePath, fileService)
-	if err !=nil {
+	if err != nil {
 		panic(err)
 	}
 	store := database.NewStore(storePath, fileService, connection)
@@ -93,13 +96,19 @@ func initDataStore(storePath string, rollback bool, fileService portainer.FileSe
 		log.Fatalf("failed migration: %v", err)
 	}
 
-	go shutdownDatastore(shutdownCtx, store)
-	return store
-}
+	go func() {
+		<-shutdownCtx.Done()
+		exportFilename := path.Join(storePath, fmt.Sprintf("export-%d.yaml", time.Now().Unix()))
 
-func shutdownDatastore(shutdownCtx context.Context, datastore dataservices.DataStore) {
-	<-shutdownCtx.Done()
-	datastore.Close()
+		err := store.Export(exportFilename)
+		if err != nil {
+			logrus.WithError(err).Debugf("failed to export to %s", exportFilename)
+		} else {
+			logrus.Debugf("exported to %s", exportFilename)
+		}
+		connection.Close()
+	}()
+	return store
 }
 
 func initComposeStackManager(assetsPath string, configPath string, reverseTunnelService portainer.ReverseTunnelService, proxyManager *proxy.Manager) portainer.ComposeStackManager {

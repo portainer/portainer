@@ -2,6 +2,7 @@ package helmuserrepository
 
 import (
 	"fmt"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/sirupsen/logrus"
 )
@@ -16,6 +17,10 @@ type Service struct {
 	connection portainer.Connection
 }
 
+func (service *Service) BucketName() string {
+	return BucketName
+}
+
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
 	err := connection.SetServiceName(BucketName)
@@ -26,6 +31,26 @@ func NewService(connection portainer.Connection) (*Service, error) {
 	return &Service{
 		connection: connection,
 	}, nil
+}
+
+//HelmUserRepository returns an array of all HelmUserRepository
+func (service *Service) HelmUserRepositorys() ([]portainer.HelmUserRepository, error) {
+	var repos = make([]portainer.HelmUserRepository, 0)
+
+	err := service.connection.GetAll(
+		BucketName,
+		&portainer.HelmUserRepository{},
+		func(obj interface{}) (interface{}, error) {
+			r, ok := obj.(*portainer.HelmUserRepository)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to HelmUserRepository object")
+				return nil, fmt.Errorf("Failed to convert to HelmUserRepository object: %s", obj)
+			}
+			repos = append(repos, *r)
+			return &portainer.HelmUserRepository{}, nil
+		})
+
+	return repos, err
 }
 
 // HelmUserRepositoryByUserID return an array containing all the HelmUserRepository objects where the specified userID is present.

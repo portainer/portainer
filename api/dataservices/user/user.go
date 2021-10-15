@@ -2,9 +2,10 @@ package user
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/portainer/portainer/api/dataservices/errors"
 	"github.com/sirupsen/logrus"
-	"strings"
 
 	portainer "github.com/portainer/portainer/api"
 )
@@ -17,6 +18,10 @@ const (
 // Service represents a service for managing environment(endpoint) data.
 type Service struct {
 	connection portainer.Connection
+}
+
+func (service *Service) BucketName() string {
+	return BucketName
 }
 
 // NewService creates a new instance of a service.

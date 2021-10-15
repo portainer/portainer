@@ -1,7 +1,10 @@
 package endpointrelation
 
 import (
+	"fmt"
+
 	portainer "github.com/portainer/portainer/api"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -14,6 +17,10 @@ type Service struct {
 	connection portainer.Connection
 }
 
+func (service *Service) BucketName() string {
+	return BucketName
+}
+
 // NewService creates a new instance of a service.
 func NewService(connection portainer.Connection) (*Service, error) {
 	err := connection.SetServiceName(BucketName)
@@ -24,6 +31,26 @@ func NewService(connection portainer.Connection) (*Service, error) {
 	return &Service{
 		connection: connection,
 	}, nil
+}
+
+//EndpointRelations returns an array of all EndpointRelations
+func (service *Service) EndpointRelations() ([]portainer.EndpointRelation, error) {
+	var all = make([]portainer.EndpointRelation, 0)
+
+	err := service.connection.GetAll(
+		BucketName,
+		&portainer.EndpointRelation{},
+		func(obj interface{}) (interface{}, error) {
+			r, ok := obj.(*portainer.EndpointRelation)
+			if !ok {
+				logrus.WithField("obj", obj).Errorf("Failed to convert to EndpointRelation object")
+				return nil, fmt.Errorf("Failed to convert to EndpointRelation object: %s", obj)
+			}
+			all = append(all, *r)
+			return &portainer.EndpointRelation{}, nil
+		})
+
+	return all, err
 }
 
 // EndpointRelation returns a Environment(Endpoint) relation object by EndpointID
