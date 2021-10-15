@@ -61,6 +61,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     endpoint
   ) {
     $scope.create = create;
+    $scope.update = update;
     $scope.endpoint = endpoint;
 
     $scope.formValues = {
@@ -758,6 +759,26 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       return true;
     }
 
+    function updateLimits(config) {
+      return ContainerService.updateLimits($transition$.params().from, config).then(onUpdateSuccess).catch(notifyOnError);
+
+      function onUpdateSuccess() {
+        Notifications.success('Limits updated');
+      }
+
+      function notifyOnError(err) {
+        Notifications.error('Failure', err, 'Update Limits fail');
+        return $q.reject(err);
+      }
+    }
+
+    function update() {
+      var config = angular.copy($scope.config);
+      prepareResources(config);
+      updateLimits(config);
+      return 
+    }
+    
     function create() {
       var oldContainer = null;
       HttpRequestHelper.setPortainerAgentTargetHeader($scope.formValues.NodeName);
