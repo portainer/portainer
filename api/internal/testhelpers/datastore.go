@@ -34,6 +34,7 @@ type testDatastore struct {
 	webhook                 dataservices.WebhookService
 }
 
+func (d *testDatastore) Export(filename string) (err error)                 { return nil }
 func (d *testDatastore) BackupTo(io.Writer) error                           { return nil }
 func (d *testDatastore) Open() error                                        { return nil }
 func (d *testDatastore) Init() error                                        { return nil }
@@ -93,6 +94,8 @@ type stubSettingsService struct {
 	settings *portainer.Settings
 }
 
+func (s *stubSettingsService) BucketName() string { return "settings" }
+
 func (s *stubSettingsService) Settings() (*portainer.Settings, error) {
 	return s.settings, nil
 }
@@ -115,6 +118,7 @@ type stubUserService struct {
 	users []portainer.User
 }
 
+func (s *stubUserService) BucketName() string                                      { return "users" }
 func (s *stubUserService) User(ID portainer.UserID) (*portainer.User, error)       { return nil, nil }
 func (s *stubUserService) UserByUsername(username string) (*portainer.User, error) { return nil, nil }
 func (s *stubUserService) Users() ([]portainer.User, error)                        { return s.users, nil }
@@ -135,6 +139,8 @@ func WithUsers(us []portainer.User) datastoreOption {
 type stubEdgeJobService struct {
 	jobs []portainer.EdgeJob
 }
+
+func (s *stubEdgeJobService) BucketName() string { return "edge_jobs" }
 
 func (s *stubEdgeJobService) EdgeJobs() ([]portainer.EdgeJob, error) { return s.jobs, nil }
 func (s *stubEdgeJobService) EdgeJob(ID portainer.EdgeJobID) (*portainer.EdgeJob, error) {
@@ -157,6 +163,8 @@ func WithEdgeJobs(js []portainer.EdgeJob) datastoreOption {
 type stubEndpointRelationService struct {
 	relations []portainer.EndpointRelation
 }
+
+func (s *stubEndpointRelationService) BucketName() string { return "endpoint_relations" }
 
 func (s *stubEndpointRelationService) EndpointRelations() ([]portainer.EndpointRelation, error) {
 	return s.relations, nil
@@ -197,6 +205,8 @@ func WithEndpointRelations(relations []portainer.EndpointRelation) datastoreOpti
 type stubEndpointService struct {
 	endpoints []portainer.Endpoint
 }
+
+func (s *stubEndpointService) BucketName() string { return "endpoints" }
 
 func (s *stubEndpointService) Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, error) {
 	for _, endpoint := range s.endpoints {
