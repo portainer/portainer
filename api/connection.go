@@ -8,7 +8,7 @@ type Connection interface {
 	Open() error
 	Close() error
 
-	// write the db contents to filename as yaml (the schema needs defining)
+	// write the db contents to filename as json (the schema needs defining)
 	ExportRaw(filename string) error
 
 	//Rollback(force bool) error
