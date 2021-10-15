@@ -1,6 +1,7 @@
 package database
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"strconv"
 
@@ -32,7 +33,6 @@ import (
 	"github.com/portainer/portainer/api/dataservices/version"
 	"github.com/portainer/portainer/api/dataservices/webhook"
 	"github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v3"
 )
 
 // Store defines the implementation of portainer.DataStore using
@@ -333,103 +333,255 @@ func (store *Store) Webhook() dataservices.WebhookService {
 	return store.WebhookService
 }
 
-func (store *Store) Export(filename string) (err error) {
-	backup := make(map[string]interface{})
+type storeExport struct {
+	CustomTemplate     []portainer.CustomTemplate
+	EdgeGroup          []portainer.EdgeGroup
+	EdgeJob            []portainer.EdgeJob
+	EdgeStack          []portainer.EdgeStack
+	Endpoint           []portainer.Endpoint
+	EndpointGroup      []portainer.EndpointGroup
+	EndpointRelation   []portainer.EndpointRelation
+	HelmUserRepository []portainer.HelmUserRepository
+	Registry           []portainer.Registry
+	ResourceControl    []portainer.ResourceControl
+	Role               []portainer.Role
+	Settings           portainer.Settings
+	SSLSettings        portainer.SSLSettings
+	Stack              []portainer.Stack
+	Tag                []portainer.Tag
+	TeamMembership     []portainer.TeamMembership
+	Team               []portainer.Team
+	TunnelServer       portainer.TunnelServerInfo
+	User               []portainer.User
+	Version            map[string]string
+	webhook            []portainer.Webhook
+}
 
-	backup[store.CustomTemplate().BucketName()], err = store.CustomTemplate().CustomTemplates()
+func (store *Store) Export(filename string) (err error) {
+
+	backup := storeExport{}
+
+	if c, err := store.CustomTemplate().CustomTemplates(); err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	} else {
+		backup.CustomTemplate = c
+	}
+	if e, err := store.EdgeGroup().EdgeGroups(); err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	} else {
+		backup.EdgeGroup = e
+	}
+	if e, err := store.EdgeJob().EdgeJobs(); err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	} else {
+		backup.EdgeJob = e
+	}
+	if e, err := store.EdgeStack().EdgeStacks(); err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	} else {
+		backup.EdgeStack = e
+	}
+	if e, err := store.Endpoint().Endpoints(); err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	} else {
+		backup.Endpoint = e
+	}
+	if e, err := store.EndpointGroup().EndpointGroups(); err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	} else {
+		backup.EndpointGroup = e
+	}
+	if r, err := store.EndpointRelation().EndpointRelations(); err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	} else {
+		backup.EndpointRelation = r
+	}
+	if r, err := store.HelmUserRepository().HelmUserRepositorys(); err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	} else {
+		backup.HelmUserRepository = r
+	}
+	if r, err := store.Registry().Registries(); err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	} else {
+		backup.Registry = r
+	}
+	if c, err := store.ResourceControl().ResourceControls(); err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	} else {
+		backup.ResourceControl = c
+	}
+	if role, err := store.Role().Roles(); err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	} else {
+		backup.Role = role
+	}
+	if settings, err := store.Settings().Settings(); err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	} else {
+		backup.Settings = *settings
+	}
+	if settings, err := store.SSLSettings().Settings(); err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	} else {
+		backup.SSLSettings = *settings
+	}
+	if t, err := store.Stack().Stacks(); err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	} else {
+		backup.Stack = t
+	}
+	if t, err := store.Tag().Tags(); err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	} else {
+		backup.Tag = t
+	}
+	if t, err := store.TeamMembership().TeamMemberships(); err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	} else {
+		backup.TeamMembership = t
+	}
+	if t, err := store.Team().Teams(); err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	} else {
+		backup.Team = t
+	}
+	if info, err := store.TunnelServer().Info(); err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	} else {
+		backup.TunnelServer = *info
+	}
+	if users, err := store.User().Users(); err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	} else {
+		backup.User = users
+	}
+	v, err := store.Version().DBVersion()
 	if err != nil {
 		logrus.WithError(err).Debugf("Export boom")
 	}
-	backup[store.EdgeGroup().BucketName()], err = store.EdgeGroup().EdgeGroups()
-	if err != nil {
-		logrus.WithError(err).Debugf("Export boom")
-	}
-	backup[store.EdgeJob().BucketName()], err = store.EdgeJob().EdgeJobs()
-	if err != nil {
-		logrus.WithError(err).Debugf("Export boom")
-	}
-	backup[store.EdgeStack().BucketName()], err = store.EdgeStack().EdgeStacks()
-	if err != nil {
-		logrus.WithError(err).Debugf("Export boom")
-	}
-	backup[store.Endpoint().BucketName()], err = store.Endpoint().Endpoints()
-	if err != nil {
-		logrus.WithError(err).Debugf("Export boom")
-	}
-	backup[store.EndpointGroup().BucketName()], err = store.EndpointGroup().EndpointGroups()
-	if err != nil {
-		logrus.WithError(err).Debugf("Export boom")
-	}
-	backup[store.EndpointRelation().BucketName()], err = store.EndpointRelation().EndpointRelations()
-	if err != nil {
-		logrus.WithError(err).Debugf("Export boom")
-	}
-	backup[store.HelmUserRepository().BucketName()], err = store.HelmUserRepository().HelmUserRepositorys()
-	if err != nil {
-		logrus.WithError(err).Debugf("Export boom")
-	}
-	backup[store.Registry().BucketName()], err = store.Registry().Registries()
-	if err != nil {
-		logrus.WithError(err).Debugf("Export boom")
-	}
-	backup[store.ResourceControl().BucketName()], err = store.ResourceControl().ResourceControls()
-	if err != nil {
-		logrus.WithError(err).Debugf("Export boom")
-	}
-	backup[store.Role().BucketName()], err = store.Role().Roles()
-	if err != nil {
-		logrus.WithError(err).Debugf("Export boom")
-	}
-	backup[store.Settings().BucketName()], err = store.Settings().Settings()
-	if err != nil {
-		logrus.WithError(err).Debugf("Export boom")
-	}
-	backup[store.SSLSettings().BucketName()], err = store.SSLSettings().Settings()
-	if err != nil {
-		logrus.WithError(err).Debugf("Export boom")
-	}
-	backup[store.Stack().BucketName()], err = store.Stack().Stacks()
-	if err != nil {
-		logrus.WithError(err).Debugf("Export boom")
-	}
-	backup[store.Tag().BucketName()], err = store.Tag().Tags()
-	if err != nil {
-		logrus.WithError(err).Debugf("Export boom")
-	}
-	backup[store.TeamMembership().BucketName()], err = store.TeamMembership().TeamMemberships()
-	if err != nil {
-		logrus.WithError(err).Debugf("Export boom")
-	}
-	backup[store.Team().BucketName()], err = store.Team().Teams()
-	if err != nil {
-		logrus.WithError(err).Debugf("Export boom")
-	}
-	backup[store.TunnelServer().BucketName()], err = store.TunnelServer().Info()
-	if err != nil {
-		logrus.WithError(err).Debugf("Export boom")
-	}
-	backup[store.User().BucketName()], err = store.User().Users()
-	if err != nil {
-		logrus.WithError(err).Debugf("Export boom")
-	}
-	v, _ := store.Version().DBVersion()
 	instance, _ := store.Version().InstanceID()
 	//edition, _ := store.Version().Edition()
-	backup[store.Version().BucketName()] = map[string]string{
+	backup.Version = map[string]string{
 		"DB_VERSION":  strconv.Itoa(v),
 		"INSTANCE_ID": instance,
 	}
-	if err != nil {
-		logrus.WithError(err).Debugf("Export boom")
-	}
-	backup[store.Webhook().BucketName()], err = store.Webhook().Webhooks()
-	if err != nil {
-		logrus.WithError(err).Debugf("Export boom")
-	}
 
-	b, err := yaml.Marshal(backup)
+	// backup[store.Webhook().BucketName()], err = store.Webhook().Webhooks()
+	// if err != nil {
+	// 	logrus.WithError(err).Debugf("Export boom")
+	// }
+
+	b, err := json.Marshal(backup)
 	if err != nil {
 		return err
 	}
 	return ioutil.WriteFile(filename, b, 0600)
+}
+
+func (store *Store) Import(filename string) (err error) {
+	backup := storeExport{}
+
+	s, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal([]byte(s), &backup)
+	if err != nil {
+		return err
+	}
+
+	// TODO: yup, this is bad, and should be in a version struct...
+	if dbversion, ok := backup.Version["DB_VERSION"]; ok {
+		if v, err := strconv.Atoi(dbversion); err == nil {
+			if err := store.Version().StoreDBVersion(v); err != nil {
+				logrus.WithError(err).Errorf("DB_VERSION import issue")
+			}
+		}
+	}
+	if instanceID, ok := backup.Version["INSTANCE_ID"]; ok {
+		if err := store.Version().StoreInstanceID(instanceID); err != nil {
+			logrus.WithError(err).Errorf("INSTANCE_ID import issue")
+		}
+	}
+
+	// backup[store.CustomTemplate().BucketName()], err = store.CustomTemplate().CustomTemplates()
+	// if err != nil {
+	// 	logrus.WithError(err).Debugf("Export boom")
+	// }
+	// backup[store.EdgeGroup().BucketName()], err = store.EdgeGroup().EdgeGroups()
+	// if err != nil {
+	// 	logrus.WithError(err).Debugf("Export boom")
+	// }
+	// backup[store.EdgeJob().BucketName()], err = store.EdgeJob().EdgeJobs()
+	// if err != nil {
+	// 	logrus.WithError(err).Debugf("Export boom")
+	// }
+	// backup[store.EdgeStack().BucketName()], err = store.EdgeStack().EdgeStacks()
+	// if err != nil {
+	// 	logrus.WithError(err).Debugf("Export boom")
+	// }
+	// backup[store.Endpoint().BucketName()], err = store.Endpoint().Endpoints()
+	// if err != nil {
+	// 	logrus.WithError(err).Debugf("Export boom")
+	// }
+	// backup[store.EndpointGroup().BucketName()], err = store.EndpointGroup().EndpointGroups()
+	// if err != nil {
+	// 	logrus.WithError(err).Debugf("Export boom")
+	// }
+	// backup[store.EndpointRelation().BucketName()], err = store.EndpointRelation().EndpointRelations()
+	// if err != nil {
+	// 	logrus.WithError(err).Debugf("Export boom")
+	// }
+	// backup[store.HelmUserRepository().BucketName()], err = store.HelmUserRepository().HelmUserRepositorys()
+	// if err != nil {
+	// 	logrus.WithError(err).Debugf("Export boom")
+	// }
+	// backup[store.Registry().BucketName()], err = store.Registry().Registries()
+	// if err != nil {
+	// 	logrus.WithError(err).Debugf("Export boom")
+	// }
+	// backup[store.ResourceControl().BucketName()], err = store.ResourceControl().ResourceControls()
+	// if err != nil {
+	// 	logrus.WithError(err).Debugf("Export boom")
+	// }
+	// backup[store.Role().BucketName()], err = store.Role().Roles()
+	// if err != nil {
+	// 	logrus.WithError(err).Debugf("Export boom")
+	// }
+	store.Settings().UpdateSettings(&backup.Settings)
+	store.SSLSettings().UpdateSettings(&backup.SSLSettings)
+	// backup[store.Stack().BucketName()], err = store.Stack().Stacks()
+	// if err != nil {
+	// 	logrus.WithError(err).Debugf("Export boom")
+	// }
+	// backup[store.Tag().BucketName()], err = store.Tag().Tags()
+	// if err != nil {
+	// 	logrus.WithError(err).Debugf("Export boom")
+	// }
+	// backup[store.TeamMembership().BucketName()], err = store.TeamMembership().TeamMemberships()
+	// if err != nil {
+	// 	logrus.WithError(err).Debugf("Export boom")
+	// }
+	// backup[store.Team().BucketName()], err = store.Team().Teams()
+	// if err != nil {
+	// 	logrus.WithError(err).Debugf("Export boom")
+	// }
+	// backup[store.TunnelServer().BucketName()], err = store.TunnelServer().Info()
+	// if err != nil {
+	// 	logrus.WithError(err).Debugf("Export boom")
+	// }
+
+	for _, user := range backup.User {
+		if err := store.User().UpdateUser(user.ID, &user); err != nil {
+			logrus.WithField("user", user).WithError(err).Errorf("User: Failed to Update Database")
+		}
+	}
+
+	// backup[store.Webhook().BucketName()], err = store.Webhook().Webhooks()
+	// if err != nil {
+	// 	logrus.WithError(err).Debugf("Export boom")
+	// }
+
+	return nil
 }

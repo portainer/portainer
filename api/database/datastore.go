@@ -5,6 +5,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices/errors"
+	"github.com/sirupsen/logrus"
 )
 
 func (store *Store) version() (int, error) {
@@ -47,6 +48,18 @@ func (store *Store) Open() error {
 	// if we have DBVersion in the database then ensure we flag this as NOT a new store
 	if _, err := store.VersionService.DBVersion(); err == nil {
 		store.isNew = false
+	} else {
+		// its new, lets see if there's an import.yml file, and if there is, import it
+		importFile := "/data/import.json"
+		if exists, _ := store.fileService.FileExists(importFile); exists {
+			if err := store.Import(importFile); err != nil {
+				logrus.WithError(err).Debugf("import %s failed", importFile)
+
+				// TODO: should really rollback on failure, but then we have nothing.
+			} else {
+				logrus.Printf("Successfully imported %s to new portainer database", importFile)
+			}
+		}
 	}
 
 	return nil
