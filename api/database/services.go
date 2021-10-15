@@ -334,27 +334,29 @@ func (store *Store) Webhook() dataservices.WebhookService {
 }
 
 type storeExport struct {
-	CustomTemplate     []portainer.CustomTemplate
-	EdgeGroup          []portainer.EdgeGroup
-	EdgeJob            []portainer.EdgeJob
-	EdgeStack          []portainer.EdgeStack
-	Endpoint           []portainer.Endpoint
-	EndpointGroup      []portainer.EndpointGroup
-	EndpointRelation   []portainer.EndpointRelation
-	HelmUserRepository []portainer.HelmUserRepository
-	Registry           []portainer.Registry
-	ResourceControl    []portainer.ResourceControl
-	Role               []portainer.Role
-	Settings           portainer.Settings
-	SSLSettings        portainer.SSLSettings
-	Stack              []portainer.Stack
-	Tag                []portainer.Tag
-	TeamMembership     []portainer.TeamMembership
-	Team               []portainer.Team
-	TunnelServer       portainer.TunnelServerInfo
-	User               []portainer.User
-	Version            map[string]string
-	webhook            []portainer.Webhook
+	CustomTemplate     []portainer.CustomTemplate     `json:"customtemplates,omitempty"`
+	EdgeGroup          []portainer.EdgeGroup          `json:"edgegroups,omitempty"`
+	EdgeJob            []portainer.EdgeJob            `json:"edgejobs,omitempty"`
+	EdgeStack          []portainer.EdgeStack          `json:"edge_stack,omitempty"`
+	Endpoint           []portainer.Endpoint           `json:"endpoints,omitempty"`
+	EndpointGroup      []portainer.EndpointGroup      `json:"endpoint_groups,omitempty"`
+	EndpointRelation   []portainer.EndpointRelation   `json:"endpoint_relations,omitempty"`
+	Extensions         []portainer.Extension          `json:"extension,omitempty"`
+	HelmUserRepository []portainer.HelmUserRepository `json:"helm_user_repository,omitempty"`
+	Registry           []portainer.Registry           `json:"registries,omitempty"`
+	ResourceControl    []portainer.ResourceControl    `json:"resource_control,omitempty"`
+	Role               []portainer.Role               `json:"roles,omitempty"`
+	Schedules          []portainer.Schedule           `json:"schedules,omitempty"`
+	Settings           portainer.Settings             `json:"customtemplates,omitempty"`
+	SSLSettings        portainer.SSLSettings          `json:"ssl,omitempty"`
+	Stack              []portainer.Stack              `json:"stacks,omitempty"`
+	Tag                []portainer.Tag                `json:"tags,omitempty"`
+	TeamMembership     []portainer.TeamMembership     `json:"team_membership,omitempty"`
+	Team               []portainer.Team               `json:"teams,omitempty"`
+	TunnelServer       portainer.TunnelServerInfo     `json:"tunnel_server,omitempty"`
+	User               []portainer.User               `json:"users,omitempty"`
+	Version            map[string]string              `json:"version,omitempty"`
+	webhook            []portainer.Webhook            `json:"webhooks,omitempty"`
 }
 
 func (store *Store) Export(filename string) (err error) {
@@ -396,6 +398,11 @@ func (store *Store) Export(filename string) (err error) {
 	} else {
 		backup.EndpointRelation = r
 	}
+	if r, err := store.ExtensionService.Extensions(); err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	} else {
+		backup.Extensions = r
+	}
 	if r, err := store.HelmUserRepository().HelmUserRepositorys(); err != nil {
 		logrus.WithError(err).Debugf("Export boom")
 	} else {
@@ -415,6 +422,11 @@ func (store *Store) Export(filename string) (err error) {
 		logrus.WithError(err).Debugf("Export boom")
 	} else {
 		backup.Role = role
+	}
+	if r, err := store.ScheduleService.Schedules(); err != nil {
+		logrus.WithError(err).Debugf("Export boom")
+	} else {
+		backup.Schedules = r
 	}
 	if settings, err := store.Settings().Settings(); err != nil {
 		logrus.WithError(err).Debugf("Export boom")
@@ -472,7 +484,7 @@ func (store *Store) Export(filename string) (err error) {
 	// 	logrus.WithError(err).Debugf("Export boom")
 	// }
 
-	b, err := json.Marshal(backup)
+	b, err := json.MarshalIndent(backup, "", "  ")
 	if err != nil {
 		return err
 	}
@@ -505,72 +517,55 @@ func (store *Store) Import(filename string) (err error) {
 		}
 	}
 
-	// backup[store.CustomTemplate().BucketName()], err = store.CustomTemplate().CustomTemplates()
-	// if err != nil {
-	// 	logrus.WithError(err).Debugf("Export boom")
-	// }
-	// backup[store.EdgeGroup().BucketName()], err = store.EdgeGroup().EdgeGroups()
-	// if err != nil {
-	// 	logrus.WithError(err).Debugf("Export boom")
-	// }
-	// backup[store.EdgeJob().BucketName()], err = store.EdgeJob().EdgeJobs()
-	// if err != nil {
-	// 	logrus.WithError(err).Debugf("Export boom")
-	// }
-	// backup[store.EdgeStack().BucketName()], err = store.EdgeStack().EdgeStacks()
-	// if err != nil {
-	// 	logrus.WithError(err).Debugf("Export boom")
-	// }
-	// backup[store.Endpoint().BucketName()], err = store.Endpoint().Endpoints()
-	// if err != nil {
-	// 	logrus.WithError(err).Debugf("Export boom")
-	// }
-	// backup[store.EndpointGroup().BucketName()], err = store.EndpointGroup().EndpointGroups()
-	// if err != nil {
-	// 	logrus.WithError(err).Debugf("Export boom")
-	// }
-	// backup[store.EndpointRelation().BucketName()], err = store.EndpointRelation().EndpointRelations()
-	// if err != nil {
-	// 	logrus.WithError(err).Debugf("Export boom")
-	// }
+	for _, v := range backup.CustomTemplate {
+		store.CustomTemplate().UpdateCustomTemplate(v.ID, &v)
+	}
+	for _, v := range backup.EdgeGroup {
+		store.EdgeGroup().UpdateEdgeGroup(v.ID, &v)
+	}
+	for _, v := range backup.EdgeJob {
+		store.EdgeJob().UpdateEdgeJob(v.ID, &v)
+	}
+	for _, v := range backup.EdgeStack {
+		store.EdgeStack().UpdateEdgeStack(v.ID, &v)
+	}
+	for _, v := range backup.Endpoint {
+		store.Endpoint().UpdateEndpoint(v.ID, &v)
+	}
+	for _, v := range backup.EndpointGroup {
+		store.EndpointGroup().UpdateEndpointGroup(v.ID, &v)
+	}
+	for _, v := range backup.EndpointRelation {
+		store.EndpointRelation().UpdateEndpointRelation(v.EndpointID, &v)
+	}
 	// backup[store.HelmUserRepository().BucketName()], err = store.HelmUserRepository().HelmUserRepositorys()
-	// if err != nil {
-	// 	logrus.WithError(err).Debugf("Export boom")
+	// for _, v := range backup.HelmUserRepository {
+	// 	store.HelmUserRepository().UpdateHelmUserRepository(v.ID, &v)
 	// }
-	// backup[store.Registry().BucketName()], err = store.Registry().Registries()
-	// if err != nil {
-	// 	logrus.WithError(err).Debugf("Export boom")
-	// }
-	// backup[store.ResourceControl().BucketName()], err = store.ResourceControl().ResourceControls()
-	// if err != nil {
-	// 	logrus.WithError(err).Debugf("Export boom")
-	// }
-	// backup[store.Role().BucketName()], err = store.Role().Roles()
-	// if err != nil {
-	// 	logrus.WithError(err).Debugf("Export boom")
-	// }
+	for _, v := range backup.Registry {
+		store.Registry().UpdateRegistry(v.ID, &v)
+	}
+	for _, v := range backup.ResourceControl {
+		store.ResourceControl().UpdateResourceControl(v.ID, &v)
+	}
+	for _, v := range backup.Role {
+		store.Role().UpdateRole(v.ID, &v)
+	}
 	store.Settings().UpdateSettings(&backup.Settings)
 	store.SSLSettings().UpdateSettings(&backup.SSLSettings)
-	// backup[store.Stack().BucketName()], err = store.Stack().Stacks()
-	// if err != nil {
-	// 	logrus.WithError(err).Debugf("Export boom")
-	// }
-	// backup[store.Tag().BucketName()], err = store.Tag().Tags()
-	// if err != nil {
-	// 	logrus.WithError(err).Debugf("Export boom")
-	// }
-	// backup[store.TeamMembership().BucketName()], err = store.TeamMembership().TeamMemberships()
-	// if err != nil {
-	// 	logrus.WithError(err).Debugf("Export boom")
-	// }
-	// backup[store.Team().BucketName()], err = store.Team().Teams()
-	// if err != nil {
-	// 	logrus.WithError(err).Debugf("Export boom")
-	// }
-	// backup[store.TunnelServer().BucketName()], err = store.TunnelServer().Info()
-	// if err != nil {
-	// 	logrus.WithError(err).Debugf("Export boom")
-	// }
+	for _, v := range backup.Stack {
+		store.Stack().UpdateStack(v.ID, &v)
+	}
+	for _, v := range backup.Tag {
+		store.Tag().UpdateTag(v.ID, &v)
+	}
+	for _, v := range backup.TeamMembership {
+		store.TeamMembership().UpdateTeamMembership(v.ID, &v)
+	}
+	for _, v := range backup.Team {
+		store.Team().UpdateTeam(v.ID, &v)
+	}
+	store.TunnelServer().UpdateInfo(&backup.TunnelServer)
 
 	for _, user := range backup.User {
 		if err := store.User().UpdateUser(user.ID, &user); err != nil {

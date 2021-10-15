@@ -13,9 +13,6 @@ import (
 	"github.com/boltdb/bolt"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices/errors"
-
-	"github.com/ghodss/yaml"
-	"github.com/konoui/boltdb-exporter/pkg/exporter"
 )
 
 const (
@@ -39,7 +36,7 @@ func (connection *DbConnection) GetStorePath() string {
 
 // Open opens and initializes the BoltDB database.
 func (connection *DbConnection) Open() error {
-	databaseExportPath := path.Join(connection.Path, fmt.Sprintf("raw-%s-%d.yaml", DatabaseFileName, time.Now().Unix()))
+	databaseExportPath := path.Join(connection.Path, fmt.Sprintf("raw-%s-%d.json", DatabaseFileName, time.Now().Unix()))
 	if err := connection.ExportRaw(databaseExportPath); err != nil {
 		log.Printf("raw export to %s error: %s", databaseExportPath, err)
 	} else {
@@ -80,7 +77,7 @@ func (connection *DbConnection) ExportRaw(filename string) error {
 		return fmt.Errorf("stat on %s failed: %s", databasePath, err)
 	}
 
-	b, err := exporter.Export(databasePath, yaml.Marshal)
+	b, err := exportJson(databasePath)
 	if err != nil {
 		return err
 	}
