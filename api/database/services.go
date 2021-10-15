@@ -2,6 +2,7 @@ package database
 
 import (
 	"io/ioutil"
+	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
@@ -398,7 +399,13 @@ func (store *Store) Export(filename string) (err error) {
 	if err != nil {
 		logrus.WithError(err).Debugf("Export boom")
 	}
-	backup[store.Version().BucketName()] = store.Version()
+	v, _ := store.Version().DBVersion()
+	instance, _ := store.Version().InstanceID()
+	//edition, _ := store.Version().Edition()
+	backup[store.Version().BucketName()] = map[string]string{
+		"DB_VERSION":  strconv.Itoa(v),
+		"INSTANCE_ID": instance,
+	}
 	if err != nil {
 		logrus.WithError(err).Debugf("Export boom")
 	}
