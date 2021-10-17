@@ -6,10 +6,10 @@ import activityLogsViewModule from './activity-logs-view';
 export default angular.module('portainer.app.user-activity', [authLogsViewModule, activityLogsViewModule]).config(config).name;
 
 /* @ngInject */
-function config($stateRegistryProvider, $browser) {
+function config($stateRegistryProvider) {
   $stateRegistryProvider.register({
     name: 'portainer.authLogs',
-    url: `${$browser.baseHref()}auth-logs`,
+    url: '/auth-logs',
     views: {
       'content@': {
         component: 'authLogsView',
@@ -19,7 +19,7 @@ function config($stateRegistryProvider, $browser) {
 
   $stateRegistryProvider.register({
     name: 'portainer.activityLogs',
-    url: `${$browser.baseHref()}activity-logs`,
+    url: '/activity-logs',
     views: {
       'content@': {
         component: 'activityLogsView',
