@@ -1,10 +1,11 @@
 angular.module('portainer.app').factory('Teams', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_TEAMS',
-  function TeamsFactory($resource, API_ENDPOINT_TEAMS) {
+  function TeamsFactory($resource, $browser, API_ENDPOINT_TEAMS) {
     'use strict';
     return $resource(
-      API_ENDPOINT_TEAMS + '/:id/:entity/:entityId',
+      `${$browser.baseHref()}${API_ENDPOINT_TEAMS}/:id/:entity/:entityId`,
       {},
       {
         create: { method: 'POST', ignoreLoadingBar: true },

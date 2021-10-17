@@ -2,12 +2,13 @@ import { rawResponse } from 'Kubernetes/rest/response/transform';
 
 angular.module('portainer.kubernetes').factory('KubernetesNamespaces', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_ENDPOINTS',
   'EndpointProvider',
-  function KubernetesNamespacesFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
+  function KubernetesNamespacesFactory($resource, $browser, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
     'use strict';
     return function () {
-      const url = API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/api/v1/namespaces/:id/:action';
+      const url = $browser.baseHref() + API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/api/v1/namespaces/:id/:action';
       return $resource(
         url,
         {

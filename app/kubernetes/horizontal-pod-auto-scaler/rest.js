@@ -2,12 +2,18 @@ import { rawResponse } from 'Kubernetes/rest/response/transform';
 
 angular.module('portainer.kubernetes').factory('KubernetesHorizontalPodAutoScalers', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_ENDPOINTS',
   'EndpointProvider',
-  function KubernetesHorizontalPodAutoScalersFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
+  function KubernetesHorizontalPodAutoScalersFactory($resource, $browser, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
     'use strict';
     return function (namespace) {
-      const url = API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/apis/autoscaling/v1' + (namespace ? '/namespaces/:namespace' : '') + '/horizontalpodautoscalers/:id/:action';
+      const url =
+        $browser.baseHref() +
+        API_ENDPOINT_ENDPOINTS +
+        '/:endpointId/kubernetes/apis/autoscaling/v1' +
+        (namespace ? '/namespaces/:namespace' : '') +
+        '/horizontalpodautoscalers/:id/:action';
       return $resource(
         url,
         {

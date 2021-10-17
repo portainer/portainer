@@ -2,12 +2,13 @@ import { rawResponse } from 'Kubernetes/rest/response/transform';
 
 angular.module('portainer.kubernetes').factory('KubernetesServices', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_ENDPOINTS',
   'EndpointProvider',
-  function KubernetesServicesFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
+  function KubernetesServicesFactory($resource, $browser, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
     'use strict';
     return function (namespace) {
-      const url = API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/api/v1' + (namespace ? '/namespaces/:namespace' : '') + '/services/:id/:action';
+      const url = $browser.baseHref() + API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/api/v1' + (namespace ? '/namespaces/:namespace' : '') + '/services/:id/:action';
       return $resource(
         url,
         {

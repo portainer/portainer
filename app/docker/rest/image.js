@@ -3,15 +3,16 @@ import { imageGetResponse } from './response/image';
 
 angular.module('portainer.docker').factory('Image', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_ENDPOINTS',
   'EndpointProvider',
   'HttpRequestHelper',
   'ImagesInterceptor',
-  function ImageFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, HttpRequestHelper, ImagesInterceptor) {
+  function ImageFactory($resource, $browser, API_ENDPOINT_ENDPOINTS, EndpointProvider, HttpRequestHelper, ImagesInterceptor) {
     'use strict';
 
     return $resource(
-      API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/images/:id/:action',
+      `${$browser.baseHref()}${API_ENDPOINT_ENDPOINTS}/:endpointId/docker/images/:id/:action`,
       {
         endpointId: EndpointProvider.endpointID,
       },

@@ -1,14 +1,15 @@
 angular.module('portainer.azure').factory('ContainerGroup', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_ENDPOINTS',
   'EndpointProvider',
-  function ContainerGroupFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
+  function ContainerGroupFactory($resource, $browser, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
     'use strict';
 
     var resource = {};
 
     var base = $resource(
-      API_ENDPOINT_ENDPOINTS + '/:endpointId/azure/subscriptions/:subscriptionId/providers/Microsoft.ContainerInstance/containerGroups',
+      `${$browser.baseHref()}${API_ENDPOINT_ENDPOINTS}` + `/:endpointId/azure/subscriptions/:subscriptionId/providers/Microsoft.ContainerInstance/containerGroups`,
       {
         endpointId: EndpointProvider.endpointID,
         'api-version': '2018-04-01',
@@ -19,7 +20,7 @@ angular.module('portainer.azure').factory('ContainerGroup', [
     );
 
     var withResourceGroup = $resource(
-      API_ENDPOINT_ENDPOINTS +
+      `${$browser.baseHref()}${API_ENDPOINT_ENDPOINTS}` +
         '/:endpointId/azure/subscriptions/:subscriptionId/resourceGroups/:resourceGroupName/providers/Microsoft.ContainerInstance/containerGroups/:containerGroupName',
       {
         endpointId: EndpointProvider.endpointID,

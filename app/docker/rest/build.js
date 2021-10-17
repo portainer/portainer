@@ -2,12 +2,13 @@ import { jsonObjectsToArrayHandler } from './response/handlers';
 
 angular.module('portainer.docker').factory('Build', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_ENDPOINTS',
   'EndpointProvider',
-  function BuildFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
+  function BuildFactory($resource, $browser, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
     'use strict';
     return $resource(
-      API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/build',
+      `${$browser.baseHref()}${API_ENDPOINT_ENDPOINTS}/:endpointId/docker/build`,
       {
         endpointId: EndpointProvider.endpointID,
       },

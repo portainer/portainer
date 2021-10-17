@@ -3,13 +3,14 @@ import * as fit from 'xterm/lib/addons/fit/fit';
 
 export default class KubectlShellController {
   /* @ngInject */
-  constructor(TerminalWindow, $window, $async, EndpointProvider, LocalStorage, Notifications) {
+  constructor(TerminalWindow, $window, $async, EndpointProvider, LocalStorage, Notifications, $browser) {
     this.$async = $async;
     this.$window = $window;
     this.TerminalWindow = TerminalWindow;
     this.EndpointProvider = EndpointProvider;
     this.LocalStorage = LocalStorage;
     this.Notifications = Notifications;
+    this.$browser = $browser;
 
     $window.onbeforeunload = () => {
       if (this.state.shell.connected) {
@@ -91,7 +92,7 @@ export default class KubectlShellController {
     };
 
     const wsProtocol = this.$window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-    const path = '/api/websocket/kubernetes-shell';
+    const path = this.$browser.baseHref() + '/api/websocket/kubernetes-shell';
     const queryParams = Object.entries(params)
       .map(([k, v]) => `${k}=${v}`)
       .join('&');

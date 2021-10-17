@@ -2,14 +2,15 @@ import { jsonObjectsToArrayHandler } from './response/handlers';
 
 angular.module('portainer.docker').factory('System', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_ENDPOINTS',
   'EndpointProvider',
   'InfoInterceptor',
   'VersionInterceptor',
-  function SystemFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, InfoInterceptor, VersionInterceptor) {
+  function SystemFactory($resource, $browser, API_ENDPOINT_ENDPOINTS, EndpointProvider, InfoInterceptor, VersionInterceptor) {
     'use strict';
     return $resource(
-      API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/:action/:subAction',
+      `${$browser.baseHref()}${API_ENDPOINT_ENDPOINTS}/:endpointId/docker/:action/:subAction`,
       {
         name: '@name',
         endpointId: EndpointProvider.endpointID,

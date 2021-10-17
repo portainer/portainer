@@ -1,10 +1,11 @@
 angular.module('portainer.app').factory('Settings', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_SETTINGS',
-  function SettingsFactory($resource, API_ENDPOINT_SETTINGS) {
+  function SettingsFactory($resource, $browser, API_ENDPOINT_SETTINGS) {
     'use strict';
     return $resource(
-      API_ENDPOINT_SETTINGS + '/:subResource/:action',
+      `${$browser.baseHref()}${API_ENDPOINT_SETTINGS}/:subResource/:action`,
       {},
       {
         get: { method: 'GET' },

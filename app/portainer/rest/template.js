@@ -1,9 +1,10 @@
 angular.module('portainer.app').factory('Templates', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_TEMPLATES',
-  function TemplatesFactory($resource, API_ENDPOINT_TEMPLATES) {
+  function TemplatesFactory($resource, $browser, API_ENDPOINT_TEMPLATES) {
     return $resource(
-      API_ENDPOINT_TEMPLATES + '/:action',
+      `${$browser.baseHref()}${API_ENDPOINT_TEMPLATES}/:action`,
       {},
       {
         query: { method: 'GET' },

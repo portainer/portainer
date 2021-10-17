@@ -4,7 +4,7 @@ import providers, { getProviderByUrl } from './providers';
 
 export default class OAuthSettingsController {
   /* @ngInject */
-  constructor(featureService) {
+  constructor($browser, featureService) {
     this.featureService = featureService;
 
     this.limitedFeature = HIDE_INTERNAL_AUTH;
@@ -22,6 +22,7 @@ export default class OAuthSettingsController {
     this.updateSSO = this.updateSSO.bind(this);
     this.addTeamMembershipMapping = this.addTeamMembershipMapping.bind(this);
     this.removeTeamMembership = this.removeTeamMembership.bind(this);
+    this.$browser = $browser;
   }
 
   onMicrosoftTenantIDChange() {
@@ -80,7 +81,7 @@ export default class OAuthSettingsController {
     }
 
     if (this.settings.RedirectURI === '') {
-      this.settings.RedirectURI = window.location.origin;
+      this.settings.RedirectURI = window.location.origin + this.$browser.baseHref();
     }
 
     if (this.settings.AuthorizationURI) {

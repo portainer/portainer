@@ -2,13 +2,14 @@ import { genericHandler } from './response/handlers';
 
 angular.module('portainer.docker').factory('Network', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_ENDPOINTS',
   'EndpointProvider',
   'NetworksInterceptor',
-  function NetworkFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, NetworksInterceptor) {
+  function NetworkFactory($resource, $browser, API_ENDPOINT_ENDPOINTS, EndpointProvider, NetworksInterceptor) {
     'use strict';
     return $resource(
-      API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/networks/:id/:action',
+      `${$browser.baseHref()}${API_ENDPOINT_ENDPOINTS}/:endpointId/docker/networks/:id/:action`,
       {
         id: '@id',
         endpointId: EndpointProvider.endpointID,

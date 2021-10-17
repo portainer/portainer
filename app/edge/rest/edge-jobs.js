@@ -1,8 +1,8 @@
 angular.module('portainer.edge').factory('EdgeJobs', EdgeJobsFactory);
 
-function EdgeJobsFactory($resource, API_ENDPOINT_EDGE_JOBS) {
+function EdgeJobsFactory($resource, $browser, API_ENDPOINT_EDGE_JOBS) {
   return $resource(
-    API_ENDPOINT_EDGE_JOBS + '/:id/:action',
+    `${$browser.baseHref()}${API_ENDPOINT_EDGE_JOBS}/:id/:action`,
     {},
     {
       create: { method: 'POST' },

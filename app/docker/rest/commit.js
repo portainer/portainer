@@ -1,11 +1,12 @@
 angular.module('portainer.docker').factory('Commit', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_ENDPOINTS',
   'EndpointProvider',
-  function CommitFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
+  function CommitFactory($resource, $browser, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
     'use strict';
     return $resource(
-      API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/commit',
+      `${$browser.baseHref()}${API_ENDPOINT_ENDPOINTS}/:endpointId/docker/commit`,
       {
         endpointId: EndpointProvider.endpointID,
       },

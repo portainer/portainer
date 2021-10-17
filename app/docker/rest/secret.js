@@ -1,11 +1,12 @@
 angular.module('portainer.docker').factory('Secret', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_ENDPOINTS',
   'EndpointProvider',
-  function SecretFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
+  function SecretFactory($resource, $browser, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
     'use strict';
     return $resource(
-      API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/secrets/:id/:action',
+      `${$browser.baseHref()}${API_ENDPOINT_ENDPOINTS}/:endpointId/docker/secrets/:id/:action`,
       {
         endpointId: EndpointProvider.endpointID,
       },

@@ -1,11 +1,12 @@
 angular.module('portainer.app').factory('Stack', [
   '$resource',
+  '$browser',
   'EndpointProvider',
   'API_ENDPOINT_STACKS',
-  function StackFactory($resource, EndpointProvider, API_ENDPOINT_STACKS) {
+  function StackFactory($resource, $browser, EndpointProvider, API_ENDPOINT_STACKS) {
     'use strict';
     return $resource(
-      API_ENDPOINT_STACKS + '/:id/:action/:subaction',
+      `${$browser.baseHref()}${API_ENDPOINT_STACKS}/:id/:action/:subaction`,
       {},
       {
         get: { method: 'GET', params: { id: '@id' } },

@@ -23,7 +23,7 @@ type (
 		signatureService     portainer.DigitalSignatureService
 		instanceID           string
 		endpointClients      cmap.ConcurrentMap
-	}
+		baseURL              string	}
 
 	// KubeClient represent a service used to execute Kubernetes operations
 	KubeClient struct {
@@ -34,14 +34,20 @@ type (
 )
 
 // NewClientFactory returns a new instance of a ClientFactory
-func NewClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, instanceID string, dataStore portainer.DataStore) *ClientFactory {
+func NewClientFactory(baseURL string, signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, instanceID string, dataStore portainer.DataStore) *ClientFactory {
 	return &ClientFactory{
 		dataStore:            dataStore,
 		signatureService:     signatureService,
 		reverseTunnelService: reverseTunnelService,
 		instanceID:           instanceID,
 		endpointClients:      cmap.New(),
+		baseURL:              baseURL,
 	}
+}
+
+// Get Base URL
+func (factory *ClientFactory) GetBaseURL() string {
+	return factory.baseURL;
 }
 
 // Remove the cached kube client so a new one can be created

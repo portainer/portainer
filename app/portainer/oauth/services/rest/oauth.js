@@ -1,10 +1,11 @@
 angular.module('portainer.oauth').factory('OAuth', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_OAUTH',
-  function OAuthFactory($resource, API_ENDPOINT_OAUTH) {
+  function OAuthFactory($resource, $browser, API_ENDPOINT_OAUTH) {
     'use strict';
     return $resource(
-      API_ENDPOINT_OAUTH + '/:action',
+      `${$browser.baseHref()}${API_ENDPOINT_OAUTH}/:action`,
       {},
       {
         validate: {

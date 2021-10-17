@@ -2,13 +2,14 @@ import { genericHandler, logsHandler } from './response/handlers';
 
 angular.module('portainer.docker').factory('Container', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_ENDPOINTS',
   'EndpointProvider',
   'ContainersInterceptor',
-  function ContainerFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, ContainersInterceptor) {
+  function ContainerFactory($resource, $browser, API_ENDPOINT_ENDPOINTS, EndpointProvider, ContainersInterceptor) {
     'use strict';
     return $resource(
-      API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/containers/:id/:action',
+      `${$browser.baseHref()}${API_ENDPOINT_ENDPOINTS}/:endpointId/docker/containers/:id/:action`,
       {
         name: '@name',
         endpointId: EndpointProvider.endpointID,

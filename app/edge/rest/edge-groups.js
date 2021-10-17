@@ -1,8 +1,8 @@
 import angular from 'angular';
 
-angular.module('portainer.edge').factory('EdgeGroups', function EdgeGroupsFactory($resource, API_ENDPOINT_EDGE_GROUPS) {
+angular.module('portainer.edge').factory('EdgeGroups', function EdgeGroupsFactory($resource, $browser, API_ENDPOINT_EDGE_GROUPS) {
   return $resource(
-    API_ENDPOINT_EDGE_GROUPS + '/:id/:action',
+    `${$browser.baseHref()}${API_ENDPOINT_EDGE_GROUPS}/:id/:action`,
     {},
     {
       create: { method: 'POST', ignoreLoadingBar: true },

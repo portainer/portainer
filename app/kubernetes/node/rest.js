@@ -2,12 +2,13 @@ import { rawResponse } from 'Kubernetes/rest/response/transform';
 
 angular.module('portainer.kubernetes').factory('KubernetesNodes', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_ENDPOINTS',
   'EndpointProvider',
-  function KubernetesNodesFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
+  function KubernetesNodesFactory($resource, $browser, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
     'use strict';
     return function () {
-      const url = API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/api/v1/nodes/:id/:action';
+      const url = $browser.baseHref() + API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/api/v1/nodes/:id/:action';
       return $resource(
         url,
         {

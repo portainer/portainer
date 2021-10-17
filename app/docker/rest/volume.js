@@ -2,10 +2,11 @@ import { genericHandler } from './response/handlers';
 
 angular.module('portainer.docker').factory('Volume', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_ENDPOINTS',
   'EndpointProvider',
   'VolumesInterceptor',
-  function VolumeFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, VolumesInterceptor) {
+  function VolumeFactory($resource, $browser, API_ENDPOINT_ENDPOINTS, EndpointProvider, VolumesInterceptor) {
     'use strict';
 
     function addVolumeNameToHeader(config) {
@@ -13,7 +14,7 @@ angular.module('portainer.docker').factory('Volume', [
     }
 
     return $resource(
-      API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/volumes/:id/:action',
+      `${$browser.baseHref()}${API_ENDPOINT_ENDPOINTS}/:endpointId/docker/volumes/:id/:action`,
       {
         endpointId: EndpointProvider.endpointID,
       },

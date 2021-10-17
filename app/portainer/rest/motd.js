@@ -1,10 +1,11 @@
 angular.module('portainer.app').factory('Motd', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_MOTD',
-  function MotdFactory($resource, API_ENDPOINT_MOTD) {
+  function MotdFactory($resource, $browser, API_ENDPOINT_MOTD) {
     'use strict';
     return $resource(
-      API_ENDPOINT_MOTD,
+      `${$browser.baseHref()}${API_ENDPOINT_MOTD}`,
       {},
       {
         get: {

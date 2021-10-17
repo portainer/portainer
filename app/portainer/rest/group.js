@@ -1,10 +1,11 @@
 angular.module('portainer.app').factory('EndpointGroups', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_ENDPOINT_GROUPS',
-  function EndpointGroupsFactory($resource, API_ENDPOINT_ENDPOINT_GROUPS) {
+  function EndpointGroupsFactory($resource, $browser, API_ENDPOINT_ENDPOINT_GROUPS) {
     'use strict';
     return $resource(
-      API_ENDPOINT_ENDPOINT_GROUPS + '/:id/:action',
+      `${$browser.baseHref()}${API_ENDPOINT_ENDPOINT_GROUPS}/:id/:action`,
       {},
       {
         create: { method: 'POST', ignoreLoadingBar: true },

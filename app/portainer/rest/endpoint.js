@@ -2,11 +2,12 @@ import getEndpointsTotalCount from './transform/getEndpointsTotalCount';
 
 angular.module('portainer.app').factory('Endpoints', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_ENDPOINTS',
-  function EndpointsFactory($resource, API_ENDPOINT_ENDPOINTS) {
+  function EndpointsFactory($resource, $browser, API_ENDPOINT_ENDPOINTS) {
     'use strict';
     return $resource(
-      API_ENDPOINT_ENDPOINTS + '/:id/:action',
+      `${$browser.baseHref()}${API_ENDPOINT_ENDPOINTS}/:id/:action`,
       {},
       {
         query: {
@@ -25,22 +26,22 @@ angular.module('portainer.app').factory('Endpoints', [
         updateSecuritySettings: { method: 'PUT', params: { id: '@id', action: 'settings' } },
         dockerhubLimits: {
           method: 'GET',
-          url: `${API_ENDPOINT_ENDPOINTS}/:id/dockerhub/:registryId`,
+          url: `${$browser.baseHref()}${API_ENDPOINT_ENDPOINTS}/:id/dockerhub/:registryId`,
         },
         registries: {
           method: 'GET',
-          url: `${API_ENDPOINT_ENDPOINTS}/:id/registries`,
+          url: `${$browser.baseHref()}${API_ENDPOINT_ENDPOINTS}/:id/registries`,
           params: { id: '@id', namespace: '@namespace' },
           isArray: true,
         },
         registry: {
-          url: `${API_ENDPOINT_ENDPOINTS}/:id/registries/:registryId`,
+          url: `${$browser.baseHref()}${API_ENDPOINT_ENDPOINTS}/:id/registries/:registryId`,
           method: 'GET',
           params: { id: '@id', namespace: '@namespace', registryId: '@registryId' },
         },
         updateRegistryAccess: {
           method: 'PUT',
-          url: `${API_ENDPOINT_ENDPOINTS}/:id/registries/:registryId`,
+          url: `${$browser.baseHref()}${API_ENDPOINT_ENDPOINTS}/:id/registries/:registryId`,
           params: { id: '@id', registryId: '@registryId' },
         },
       }

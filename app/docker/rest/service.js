@@ -2,13 +2,14 @@ import { logsHandler } from './response/handlers';
 
 angular.module('portainer.docker').factory('Service', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_ENDPOINTS',
   'EndpointProvider',
   'HttpRequestHelper',
-  function ServiceFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, HttpRequestHelper) {
+  function ServiceFactory($resource, $browser, API_ENDPOINT_ENDPOINTS, EndpointProvider, HttpRequestHelper) {
     'use strict';
     return $resource(
-      API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/services/:id/:action',
+      `${$browser.baseHref()}${API_ENDPOINT_ENDPOINTS}/:endpointId/docker/services/:id/:action`,
       {
         endpointId: EndpointProvider.endpointID,
       },

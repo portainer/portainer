@@ -1,10 +1,11 @@
 angular.module('portainer.app').factory('TeamMemberships', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_TEAM_MEMBERSHIPS',
-  function TeamMembershipsFactory($resource, API_ENDPOINT_TEAM_MEMBERSHIPS) {
+  function TeamMembershipsFactory($resource, $browser, API_ENDPOINT_TEAM_MEMBERSHIPS) {
     'use strict';
     return $resource(
-      API_ENDPOINT_TEAM_MEMBERSHIPS + '/:id/:action',
+      `${$browser.baseHref()}${API_ENDPOINT_TEAM_MEMBERSHIPS}/:id/:action`,
       {},
       {
         create: { method: 'POST', ignoreLoadingBar: true },

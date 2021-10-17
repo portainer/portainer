@@ -1,10 +1,11 @@
 angular.module('portainer.app').factory('Webhooks', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_WEBHOOKS',
-  function WebhooksFactory($resource, API_ENDPOINT_WEBHOOKS) {
+  function WebhooksFactory($resource, $browser, API_ENDPOINT_WEBHOOKS) {
     'use strict';
     return $resource(
-      API_ENDPOINT_WEBHOOKS + '/:id',
+      `${$browser.baseHref()}${API_ENDPOINT_WEBHOOKS}/:id`,
       {},
       {
         query: { method: 'GET', isArray: true },

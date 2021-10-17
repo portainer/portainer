@@ -1,10 +1,11 @@
 angular.module('portainer.app').factory('Registries', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_REGISTRIES',
-  function RegistriesFactory($resource, API_ENDPOINT_REGISTRIES) {
+  function RegistriesFactory($resource, $browser, API_ENDPOINT_REGISTRIES) {
     'use strict';
     return $resource(
-      API_ENDPOINT_REGISTRIES + '/:id/:action',
+      `${$browser.baseHref()}${API_ENDPOINT_REGISTRIES}/:id/:action`,
       {},
       {
         create: { method: 'POST', ignoreLoadingBar: true },

@@ -1,11 +1,12 @@
 angular.module('portainer.docker').factory('Node', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_ENDPOINTS',
   'EndpointProvider',
-  function NodeFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
+  function NodeFactory($resource, $browser, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
     'use strict';
     return $resource(
-      API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/nodes/:id/:action',
+      `${$browser.baseHref()}${API_ENDPOINT_ENDPOINTS}/:endpointId/docker/nodes/:id/:action`,
       {
         endpointId: EndpointProvider.endpointID,
       },

@@ -1,10 +1,11 @@
 angular.module('portainer.app').factory('ResourceControl', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_RESOURCE_CONTROLS',
-  function ResourceControlFactory($resource, API_ENDPOINT_RESOURCE_CONTROLS) {
+  function ResourceControlFactory($resource, $browser, API_ENDPOINT_RESOURCE_CONTROLS) {
     'use strict';
     return $resource(
-      API_ENDPOINT_RESOURCE_CONTROLS + '/:id',
+      `${$browser.baseHref()}${API_ENDPOINT_RESOURCE_CONTROLS}/:id`,
       {},
       {
         create: { method: 'POST', ignoreLoadingBar: true },

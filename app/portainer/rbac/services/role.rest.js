@@ -1,7 +1,7 @@
 /* @ngInject */
-export function RolesFactory($resource, API_ENDPOINT_ROLES) {
+export function RolesFactory($resource, $browser, API_ENDPOINT_ROLES) {
   return $resource(
-    API_ENDPOINT_ROLES + '/:id',
+    `${$browser.baseHref()}${API_ENDPOINT_ROLES}/:id`,
     {},
     {
       create: { method: 'POST', ignoreLoadingBar: true },

@@ -1,11 +1,12 @@
 angular.module('portainer.kubernetes').factory('KubernetesMetrics', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_ENDPOINTS',
   'EndpointProvider',
-  function KubernetesMetrics($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
+  function KubernetesMetrics($resource, $browser, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
     'use strict';
     return function (namespace) {
-      const url = API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/apis/metrics.k8s.io/v1beta1';
+      const url = $browser.baseHref() + API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/apis/metrics.k8s.io/v1beta1';
       const podUrl = `${url}${namespace ? '/namespaces/:namespace' : ''}/pods/:id`;
 
       return $resource(

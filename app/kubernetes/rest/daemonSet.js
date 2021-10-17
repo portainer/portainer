@@ -2,12 +2,13 @@ import { rawResponse } from 'Kubernetes/rest/response/transform';
 
 angular.module('portainer.kubernetes').factory('KubernetesDaemonSets', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_ENDPOINTS',
   'EndpointProvider',
-  function KubernetesDaemonSetsFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
+  function KubernetesDaemonSetsFactory($resource, $browser, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
     'use strict';
     return function (namespace) {
-      const url = API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/apis/apps/v1' + (namespace ? '/namespaces/:namespace' : '') + '/daemonsets/:id/:action';
+      const url = $browser.baseHref() + API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/apis/apps/v1' + (namespace ? '/namespaces/:namespace' : '') + '/daemonsets/:id/:action';
       return $resource(
         url,
         {

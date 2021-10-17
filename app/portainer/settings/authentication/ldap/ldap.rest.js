@@ -1,9 +1,9 @@
 const API_ENDPOINT_LDAP = 'api/ldap';
 
 /* @ngInject */
-export function LDAP($resource) {
+export function LDAP($resource, $browser) {
   return $resource(
-    `${API_ENDPOINT_LDAP}/:action`,
+    `${$browser.baseHref()}${API_ENDPOINT_LDAP}/:action`,
     {},
     {
       check: { method: 'POST', params: { action: 'check' } },

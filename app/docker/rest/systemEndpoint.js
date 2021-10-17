@@ -1,10 +1,11 @@
 angular.module('portainer.docker').factory('SystemEndpoint', [
   '$resource',
+  '$browser',
   'API_ENDPOINT_ENDPOINTS',
-  function SystemEndpointFactory($resource, API_ENDPOINT_ENDPOINTS) {
+  function SystemEndpointFactory($resource, $browser, API_ENDPOINT_ENDPOINTS) {
     'use strict';
     return $resource(
-      API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/:action/:subAction',
+      `${$browser.baseHref()}${API_ENDPOINT_ENDPOINTS}/:endpointId/docker/:action/:subAction`,
       {
         name: '@name',
       },
