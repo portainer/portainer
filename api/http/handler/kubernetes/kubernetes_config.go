@@ -59,8 +59,7 @@ func (handler *Handler) getKubernetesConfig(w http.ResponseWriter, r *http.Reque
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create Kubernetes client", err}
 	}
 
-	baseURL := handler.kubernetesClientFactory.GetBaseURL();
-	apiServerURL := getProxyUrl(r, baseURL, endpointID)
+	apiServerURL := getProxyUrl(r, handler.BaseURL, endpointID)
 
 	config, err := cli.GetKubeConfig(r.Context(), apiServerURL, bearerToken, tokenData)
 	if err != nil {

@@ -173,7 +173,7 @@ func initDockerClientFactory(signatureService portainer.DigitalSignatureService,
 }
 
 func initKubernetesClientFactory(baseURL string, signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, instanceID string, dataStore portainer.DataStore) *kubecli.ClientFactory {
-	return kubecli.NewClientFactory(baseURL, signatureService, reverseTunnelService, instanceID, dataStore)
+	return kubecli.NewClientFactory(signatureService, reverseTunnelService, instanceID, dataStore)
 }
 
 func initSnapshotService(snapshotInterval string, dataStore portainer.DataStore, dockerClientFactory *docker.ClientFactory, kubernetesClientFactory *kubecli.ClientFactory, shutdownCtx context.Context) (portainer.SnapshotService, error) {
@@ -583,6 +583,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		ShutdownCtx:                 shutdownCtx,
 		ShutdownTrigger:             shutdownTrigger,
 		StackDeployer:               stackDeployer,
+		BaseURL:                     *flags.BaseURL,
 	}
 }
 
