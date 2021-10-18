@@ -2,20 +2,14 @@ import _ from 'lodash';
 
 angular.module('portainer.app').factory('RegistryModalService', ModalServiceFactory);
 
-function ModalServiceFactory($q, EndpointService, Notifications, ModalService, RegistryService) {
+function ModalServiceFactory($q, ModalService, RegistryService) {
   const service = {};
 
   function registries2Options(registries) {
-    const options = [];
-
-    for (const registry of registries) {
-      options.push({
-        text: registry.Name,
-        value: String(registry.Id),
-      });
-    }
-
-    return options;
+    return registries.map((r) => ({
+      text: r.Name,
+      value: String(r.Id),
+    }));
   }
 
   service.registryModal = async function (repository, registries) {
