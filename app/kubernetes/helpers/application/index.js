@@ -289,6 +289,12 @@ class KubernetesApplicationHelper {
       }
       res.Protocol = port.Protocol;
       res.ContainerPort = port.TargetPort;
+
+      // when editing an external app ports, backup the ServicePort to the form values so that the service can be correctly patched
+      if (port.Port !== port.TargetPort) {
+        res.ServicePort = port.Port;
+      }
+
       if (serviceType === KubernetesServiceTypes.LOAD_BALANCER) {
         res.LoadBalancerPort = port.Port;
         res.LoadBalancerNodePort = port.NodePort;

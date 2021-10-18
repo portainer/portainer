@@ -16,7 +16,8 @@ function _publishedPortToServicePort(formValues, publishedPort, type) {
     const name = formValues.Name;
     const res = new KubernetesServicePort();
     res.name = _.toLower(name + '-' + publishedPort.ContainerPort + '-' + publishedPort.Protocol);
-    res.port = type === KubernetesServiceTypes.LOAD_BALANCER ? publishedPort.LoadBalancerPort : publishedPort.ContainerPort;
+    // if generatePublishedPortsFormValuesFromPublishedPorts backups the ServicePort then use it instead of ContainerPort
+    res.port = type === KubernetesServiceTypes.LOAD_BALANCER ? publishedPort.LoadBalancerPort : publishedPort.ServicePort || publishedPort.ContainerPort;
     res.targetPort = publishedPort.ContainerPort;
     res.protocol = publishedPort.Protocol;
     if (type === KubernetesServiceTypes.NODE_PORT && publishedPort.NodePort) {
@@ -48,7 +49,7 @@ class KubernetesServiceConverter {
       res.Type = KubernetesServiceTypes.LOAD_BALANCER;
     }
     const ports = _.map(formValues.PublishedPorts, (item) => _publishedPortToServicePort(formValues, item, res.Type));
-    res.Ports = _.uniqBy(_.without(ports, undefined), (p) => p.targetPort + p.protocol);
+    res.Ports = _.uniqBy(_.without(ports, undefined), (p) => p.targetPort + p.protocol + p.port);
     return res;
   }
 
