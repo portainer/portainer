@@ -50,15 +50,6 @@ var mwFailEveryRequest = mwFailAfterDuration(0, http.StatusBadRequest)
 func Test_middlewares(t *testing.T) {
 	is := assert.New(t)
 
-	// tests := []struct {
-	// 	name       string
-	// 	input      string
-	// 	wantOutput http.StatusCode
-	// }{
-
-	// 	}
-	// }
-	// dummy request
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 
 	t.Run("mwPassEveryRequest passes with HTTP 302", func(t *testing.T) {
