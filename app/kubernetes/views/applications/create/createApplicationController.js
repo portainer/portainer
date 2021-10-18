@@ -2,6 +2,7 @@ import angular from 'angular';
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import * as JsonPatch from 'fast-json-patch';
+import { RegistryTypes } from '@/portainer/models/registryTypes';
 
 import {
   KubernetesApplicationDataAccessPolicies,
@@ -191,6 +192,10 @@ class KubernetesCreateApplicationController {
 
   setPullImageValidity(validity) {
     this.state.pullImageValidity = validity;
+  }
+
+  imageValidityIsValid() {
+    return this.state.pullImageValidity || this.formValues.ImageModel.Registry.Type !== RegistryTypes.DOCKERHUB;
   }
 
   onChangeName() {
