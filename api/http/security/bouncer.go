@@ -183,7 +183,12 @@ func (bouncer *RequestBouncer) AuthorizedEdgeEndpointOperation(r *http.Request, 
 // - add secure handlers to the response
 // - parse the JWT token and put it into the http context.
 func (bouncer *RequestBouncer) mwAuthenticatedUser(h http.Handler) http.Handler {
-	h = bouncer.mwCheckJWTAuthentication(h)
+	// Use AnyAuth middleware to support multiple auth paradigms
+	// currently supported auth: JWT Auth, API-Key Auth
+	h = bouncer.AnyAuth([]mux.MiddlewareFunc{
+		bouncer.mwCheckJWTAuthentication,
+		bouncer.mwCheckAPIKeyAuthentication,
+	}, h)
 	h = mwSecureHeaders(h)
 	return h
 }
