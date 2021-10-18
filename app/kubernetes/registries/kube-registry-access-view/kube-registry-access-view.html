@@ -15,7 +15,7 @@
             <label class="col-sm-3 col-lg-2 control-label text-left" style="padding-top: 0;">
               Select namespaces
             </label>
-            <div class="col-sm-9 col-lg-4">
+            <div class="col-sm-9 col-lg-4" style="margin-bottom: 15px;">
               <span class="small text-muted" ng-if="!$ctrl.resourcePools.length">
                 No namespaces available.
               </span>
@@ -32,6 +32,10 @@
                 translation="{nothingSelected: 'Select one or more namespaces', search: 'Search...'}"
               >
               </span>
+            </div>
+            <div class="col-sm-12 small text-muted">
+              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              Note: adding this registry will expose the registry credentials to all users of this namespace
             </div>
           </div>
 
