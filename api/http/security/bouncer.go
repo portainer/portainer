@@ -32,6 +32,8 @@ type (
 	}
 )
 
+const apiKeyHeader = "X-API-KEY"
+
 // NewRequestBouncer initializes a new RequestBouncer
 func NewRequestBouncer(dataStore portainer.DataStore, jwtService portainer.JWTService) *RequestBouncer {
 	return &RequestBouncer{
@@ -181,7 +183,7 @@ func (bouncer *RequestBouncer) AuthorizedEdgeEndpointOperation(r *http.Request, 
 // - add secure handlers to the response
 // - parse the JWT token and put it into the http context.
 func (bouncer *RequestBouncer) mwAuthenticatedUser(h http.Handler) http.Handler {
-	h = bouncer.mwCheckAuthentication(h)
+	h = bouncer.mwCheckJWTAuthentication(h)
 	h = mwSecureHeaders(h)
 	return h
 }
@@ -242,10 +244,9 @@ func (bouncer *RequestBouncer) mwUpgradeToRestrictedRequest(next http.Handler) h
 	})
 }
 
-// mwCheckAuthentication provides Authentication middleware for handlers
-//
-// It parses the JWT token and adds the parsed token data to the http context
-func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Handler {
+// mwCheckJWTAuthentication provides JWT Authentication middleware for handlers.
+// It parses the JWT token from request `Authorization` header and adds the parsed token data to the http context.
+func (bouncer *RequestBouncer) mwCheckJWTAuthentication(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var tokenData *portainer.TokenData
 
