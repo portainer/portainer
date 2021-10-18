@@ -277,6 +277,39 @@ func (bouncer *RequestBouncer) mwCheckJWTAuthentication(next http.Handler) http.
 	})
 }
 
+// mwCheckAPIKeyAuthentication provides api-key Authentication middleware for handlers.
+// It parses the api-key from request `X-API-KEY` header, generates users portainer token data
+// and adds the parsed token data to the http context.
+func (bouncer *RequestBouncer) mwCheckAPIKeyAuthentication(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var tokenData *portainer.TokenData
+
+		// get api-key from the request header
+		_, err := extractAPIKey(r)
+		if err != nil {
+			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", err)
+			return
+		}
+
+		// TODO - use datastore to verify apiKey (exists and matches hash)
+		// TODO - match apikey to user
+		// TODO - generate *portainer.TokenData based for the matched user
+		// TODO - store this generated *portainer.TokenData into request context (to be used by other middlewares)
+
+		_, err = bouncer.dataStore.User().User(tokenData.ID)
+		if err != nil && err == bolterrors.ErrObjectNotFound {
+			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", httperrors.ErrUnauthorized)
+			return
+		} else if err != nil {
+			httperror.WriteError(w, http.StatusInternalServerError, "Unable to retrieve user details from the database", err)
+			return
+		}
+
+		ctx := StoreTokenData(r, tokenData)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
 // extractBearerToken extracts the Bearer token from the request header or query parameter and returns the token.
 func extractBearerToken(r *http.Request) (string, error) {
 	// Optionally, token might be set via the "token" query parameter.
@@ -292,6 +325,19 @@ func extractBearerToken(r *http.Request) (string, error) {
 		return "", httperrors.ErrUnauthorized
 	}
 	return token, nil
+}
+
+// extractAPIKey extracts the api key from the `X-API-KEY` request header (if present).
+func extractAPIKey(r *http.Request) (string, error) {
+	var apiKey string
+	apiKeys, ok := r.Header[http.CanonicalHeaderKey(apiKeyHeader)]
+	if ok {
+		apiKey = apiKeys[0]
+	}
+	if apiKey == "" {
+		return "", httperrors.ErrUnauthorized
+	}
+	return apiKey, nil
 }
 
 // mwSecureHeaders provides secure headers middleware for handlers.

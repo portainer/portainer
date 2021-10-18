@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -167,5 +168,59 @@ func Test_AnyAuth(t *testing.T) {
 
 			is.Equal(tt.wantStatusCode, rr.Code, fmt.Sprintf("Status should be %d", tt.wantStatusCode))
 		})
+	}
+}
+
+func Test_extractAPIKey(t *testing.T) {
+	is := assert.New(t)
+
+	tt := []struct {
+		name               string
+		requestHeader      string
+		requestHeaderValue string
+		wantApiKey         string
+		doesError          bool
+	}{
+		{
+			name:               "missing request header",
+			requestHeader:      "",
+			requestHeaderValue: "",
+			wantApiKey:         "",
+			doesError:          true,
+		},
+		{
+			name:               "invalid api-key request header",
+			requestHeader:      "api-key",
+			requestHeaderValue: "abc",
+			wantApiKey:         "",
+			doesError:          true,
+		},
+		{
+			name:               "valid api-key request header",
+			requestHeader:      "X-API-KEY",
+			requestHeaderValue: "abc",
+			wantApiKey:         "abc",
+			doesError:          false,
+		},
+		{
+			name:               "valid api-key request header case-insensitive canonical check",
+			requestHeader:      "x-api-key",
+			requestHeaderValue: "def",
+			wantApiKey:         "def",
+			doesError:          false,
+		},
+	}
+
+	for _, test := range tt {
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(test.requestHeader, test.requestHeaderValue)
+		apiKey, err := extractAPIKey(req)
+		is.Equal(test.wantApiKey, apiKey)
+		if test.doesError {
+			is.Error(err, "Should return error")
+			is.ErrorIs(err, httperrors.ErrUnauthorized)
+		} else {
+			is.NoError(err)
+		}
 	}
 }
