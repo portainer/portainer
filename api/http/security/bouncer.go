@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
@@ -29,9 +30,6 @@ type (
 		UserID          portainer.UserID
 		UserMemberships []portainer.TeamMembership
 	}
-
-	// MiddlewareFunc is function signature which middlewares must satisfy
-	MiddlewareFunc func(next http.Handler) http.Handler
 )
 
 // NewRequestBouncer initializes a new RequestBouncer
@@ -44,7 +42,7 @@ func NewRequestBouncer(dataStore portainer.DataStore, jwtService portainer.JWTSe
 
 // AnyAuth passes down the request to the underlying handler by running it through all the provided middlewares.
 // If any of the provided middlewares are satisfied, the request will be processed by the underlying handler.
-func (bouncer *RequestBouncer) AnyAuth(middlewares []MiddlewareFunc, next http.Handler) http.Handler {
+func (bouncer *RequestBouncer) AnyAuth(middlewares []mux.MiddlewareFunc, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// if middlewares provided are nil or empty, serve request as is and return
 		if len(middlewares) == 0 || middlewares == nil {
@@ -57,14 +55,14 @@ func (bouncer *RequestBouncer) AnyAuth(middlewares []MiddlewareFunc, next http.H
 			w.Write(wantResponse)
 		})
 
-		var workingMiddleware MiddlewareFunc
+		var workingMiddleware mux.MiddlewareFunc
 		wg := sync.WaitGroup{}
 		wg.Add(len(middlewares))
 
 		// process the request against test handler in parallel through all the provided middelwares
 		// the last middleware that returns a successful response response will served the request to the actual handler
 		for _, m := range middlewares {
-			go func(middleware MiddlewareFunc) {
+			go func(middleware mux.MiddlewareFunc) {
 				rr := httptest.NewRecorder()
 				h := middleware(testHandler)
 				h.ServeHTTP(rr, r)

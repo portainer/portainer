@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -85,7 +86,7 @@ func Test_AnyAuth(t *testing.T) {
 
 	tests := []struct {
 		name            string
-		inputMiddlwares []MiddlewareFunc
+		inputMiddlwares []mux.MiddlewareFunc
 		wantStatusCode  int
 	}{
 		{
@@ -95,17 +96,17 @@ func Test_AnyAuth(t *testing.T) {
 		},
 		{
 			name:            "AnyAuth middleware succeeds with passing middleware",
-			inputMiddlwares: []MiddlewareFunc{mwPassEveryRequest},
+			inputMiddlwares: []mux.MiddlewareFunc{mwPassEveryRequest},
 			wantStatusCode:  http.StatusFound,
 		},
 		{
 			name:            "AnyAuth fails with failing middleware",
-			inputMiddlwares: []MiddlewareFunc{mwFailEveryRequest},
+			inputMiddlwares: []mux.MiddlewareFunc{mwFailEveryRequest},
 			wantStatusCode:  http.StatusBadRequest,
 		},
 		{
 			name: "AnyAuth succeeds if first middleware successfully handles request",
-			inputMiddlwares: []MiddlewareFunc{
+			inputMiddlwares: []mux.MiddlewareFunc{
 				mwPassEveryRequest,
 				mwFailEveryRequest,
 			},
@@ -113,7 +114,7 @@ func Test_AnyAuth(t *testing.T) {
 		},
 		{
 			name: "AnyAuth succeeds if last middleware successfully handles request",
-			inputMiddlwares: []MiddlewareFunc{
+			inputMiddlwares: []mux.MiddlewareFunc{
 				mwFailEveryRequest,
 				mwPassEveryRequest,
 			},
@@ -121,7 +122,7 @@ func Test_AnyAuth(t *testing.T) {
 		},
 		{
 			name: "AnyAuth succeeds if first middleware successfully handles request after a failing middleware",
-			inputMiddlwares: []MiddlewareFunc{
+			inputMiddlwares: []mux.MiddlewareFunc{
 				mwSucceedAfterDuration(time.Millisecond*50, http.StatusFound),
 				mwFailEveryRequest,
 			},
@@ -129,7 +130,7 @@ func Test_AnyAuth(t *testing.T) {
 		},
 		{
 			name: "AnyAuth succeeds if last middleware successfully handles request after a failing middleware",
-			inputMiddlwares: []MiddlewareFunc{
+			inputMiddlwares: []mux.MiddlewareFunc{
 				mwFailEveryRequest,
 				mwSucceedAfterDuration(time.Millisecond*50, http.StatusFound),
 			},
@@ -137,7 +138,7 @@ func Test_AnyAuth(t *testing.T) {
 		},
 		{
 			name: "AnyAuth succeeds if any middleware passes regardless of order and time",
-			inputMiddlwares: []MiddlewareFunc{
+			inputMiddlwares: []mux.MiddlewareFunc{
 				mwFailEveryRequest,
 				mwSucceedAfterDuration(time.Millisecond*25, http.StatusFound),
 				mwFailAfterDuration(time.Millisecond*50, http.StatusUnauthorized),
@@ -146,7 +147,7 @@ func Test_AnyAuth(t *testing.T) {
 		},
 		{
 			name: "AnyAuth uses last succeeding middleware if multiple middlewares pass",
-			inputMiddlwares: []MiddlewareFunc{
+			inputMiddlwares: []mux.MiddlewareFunc{
 				mwFailEveryRequest,
 				mwPassEveryRequest,
 				mwSucceedAfterDuration(time.Millisecond*25, http.StatusOK),
@@ -156,7 +157,7 @@ func Test_AnyAuth(t *testing.T) {
 		},
 		{
 			name: "AnyAuth uses first failing middleware if all middlewares fail",
-			inputMiddlwares: []MiddlewareFunc{
+			inputMiddlwares: []mux.MiddlewareFunc{
 				mwFailEveryRequest, // is used since earliest failing middleware
 				mwFailAfterDuration(time.Millisecond*25, http.StatusUnauthorized),
 				mwFailAfterDuration(time.Millisecond*50, http.StatusForbidden),
