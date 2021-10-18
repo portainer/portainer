@@ -250,7 +250,7 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 		var tokenData *portainer.TokenData
 
 		// get token from the Authorization header or query parameter
-		token, err := ExtractBearerToken(r)
+		token, err := extractBearerToken(r)
 		if err != nil {
 			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", err)
 			return
@@ -276,8 +276,8 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 	})
 }
 
-// ExtractBearerToken extracts the Bearer token from the request header or query parameter and returns the token.
-func ExtractBearerToken(r *http.Request) (string, error) {
+// extractBearerToken extracts the Bearer token from the request header or query parameter and returns the token.
+func extractBearerToken(r *http.Request) (string, error) {
 	// Optionally, token might be set via the "token" query parameter.
 	// For example, in websocket requests
 	token := r.URL.Query().Get("token")
