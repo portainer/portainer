@@ -3,6 +3,7 @@ package customtemplates
 import (
 	"errors"
 	"net/http"
+	"path"
 	"regexp"
 	"strconv"
 
@@ -268,6 +269,13 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 	err = handler.GitService.CloneRepository(projectPath, payload.RepositoryURL, payload.RepositoryReferenceName, repositoryUsername, repositoryPassword)
 	if err != nil {
 		return nil, err
+	}
+
+	entryPath := path.Join(projectPath, customTemplate.EntryPoint)
+	if exists, err := handler.FileService.FileExists(entryPath); err != nil {
+		return nil, err
+	} else if !exists {
+		return nil, errors.New("Invalid Compose file. Ensure that the Compose file path is correct")
 	}
 
 	return customTemplate, nil
