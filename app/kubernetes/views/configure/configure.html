@@ -141,6 +141,24 @@
               </span>
             </div>
 
+            <!-- auto update window -->
+            <div class="col-sm-12 form-section-title">
+              Auto Update Settings
+            </div>
+
+            <div class="form-group">
+              <div class="col-sm-12">
+                <por-switch-field
+                  ng-model="$ctrl.state.autoUpdateSettings.Enabled"
+                  name="disableSysctlSettingForRegularUsers"
+                  label="Enable auto update time window"
+                  feature="ctrl.limitedFeatureAutoWindow"
+                  tooltip="Specify a timeframe during which automatic updates can occur in this environment."
+                >
+                </por-switch-field>
+              </div>
+            </div>
+
             <div class="col-sm-12 form-section-title">
               Security
             </div>
