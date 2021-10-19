@@ -91,7 +91,11 @@ func createEdgeClient(endpoint *portainer.Endpoint, signatureService portainer.D
 		headers[portainer.PortainerAgentTargetHeader] = nodeName
 	}
 
-	tunnel := reverseTunnelService.GetTunnelDetails(endpoint.ID)
+	tunnel, err := reverseTunnelService.GetActiveTunnel(endpoint)
+	if err != nil {
+		return nil, err
+	}
+	
 	endpointURL := fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port)
 
 	return client.NewClientWithOpts(
