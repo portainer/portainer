@@ -63,7 +63,7 @@ module.exports = function (grunt) {
     grunt.task.run([
       `shell:download_docker_binary:${platform}:${a}`,
       `shell:download_docker_compose_binary:${platform}:${a}`,
-      `shell:download_helm_binary:${platform}:${arch}`,
+      `shell:download_helm_binary:${platform}:${a}`,
       `shell:download_kompose_binary:${platform}:${a}`,
       `shell:download_kubectl_binary:${platform}:${a}`,
     ]);
