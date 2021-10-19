@@ -1263,7 +1263,7 @@ type (
 		GenerateToken(data *TokenData) (string, error)
 		GenerateTokenForOAuth(data *TokenData, expiryTime *time.Time) (string, error)
 		GenerateTokenForKubeconfig(data *TokenData) (string, error)
-		ParseAndVerifyToken(token string, isKube bool) (*TokenData, error)
+		ParseAndVerifyToken(token string) (*TokenData, error)
 		SetUserSessionDuration(userSessionDuration time.Duration)
 	}
 
