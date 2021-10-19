@@ -46,14 +46,15 @@
   </div>
 </div>
 
-<!-- Anonymous mode-->
 <div class="form-group">
-  <div class="col-sm-12">
-    <label for="anonymous_mode" class="control-label text-left">
-      Anonymous mode
-      <portainer-tooltip position="bottom" message="Enable this option if the server is configured for Anonymous access."></portainer-tooltip>
+  <label for="anonymous_mode" class="control-label text-left col-sm-3 col-lg-2" style="padding-top: 0;">
+    Anonymous mode
+    <portainer-tooltip position="bottom" message="Enable this option if the server is configured for Anonymous access."></portainer-tooltip>
+  </label>
+  <div class="col-sm-9 col-lg-10">
+    <label class="switch">
+      <input type="checkbox" id="anonymous_mode" ng-model="$ctrl.settings.AnonymousMode" limited-feature-dir="{{::$ctrl.limitedFeatureId}}" limited-feature-tabindex="-1" /><i></i>
     </label>
-    <label class="switch" style="margin-left: 20px;"> <input type="checkbox" id="anonymous_mode" ng-model="$ctrl.settings.AnonymousMode" /><i></i> </label>
   </div>
 </div>
 <!-- !Anonymous mode-->
@@ -114,17 +115,19 @@
   limited-feature-id="$ctrl.limitedFeatureId"
 ></ldap-custom-group-search>
 
-<div limited-feature-dir="{{ $ctrl.limitedFeatureId }}" limited-feature-class="limited-be" style="margin-bottom: 20px;">
-  <ldap-custom-admin-group
-    style="margin-top: 5px;"
-    settings="$ctrl.settings"
-    on-search-click="($ctrl.onSearchAdminGroupsClick)"
-    selected-admin-groups="$ctrl.selectedAdminGroups"
-    default-admin-group-search-filter="'(objectClass=groupOfNames)'"
-    limited-feature-id="$ctrl.limitedFeatureId"
-  ></ldap-custom-admin-group>
-</div>
+<ldap-custom-admin-group
+  style="margin-top: 5px;"
+  settings="$ctrl.settings"
+  on-search-click="($ctrl.onSearchAdminGroupsClick)"
+  selected-admin-groups="$ctrl.selectedAdminGroups"
+  default-admin-group-search-filter="'(objectClass=groupOfNames)'"
+  limited-feature-id="$ctrl.limitedFeatureId"
+  is-limited-feature-self-contained="true"
+></ldap-custom-admin-group>
 
-<div limited-feature-dir="{{ $ctrl.limitedFeatureId }}" limited-feature-class="limited-be">
-  <ldap-settings-test-login settings="$ctrl.settings" limited-feature-id="$ctrl.limitedFeatureId" show-be-indicator-if-needed="true"></ldap-settings-test-login>
-</div>
+<ldap-settings-test-login
+  settings="$ctrl.settings"
+  limited-feature-id="$ctrl.limitedFeatureId"
+  show-be-indicator-if-needed="true"
+  is-limited-feature-self-contained="true"
+></ldap-settings-test-login>

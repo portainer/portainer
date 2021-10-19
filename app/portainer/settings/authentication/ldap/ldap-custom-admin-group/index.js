@@ -9,5 +9,6 @@ export const ldapCustomAdminGroup = {
     defaultAdminGroupSearchFilter: '<',
     onSearchClick: '<',
     limitedFeatureId: '<',
+    isLimitedFeatureSelfContained: '<',
   },
 };

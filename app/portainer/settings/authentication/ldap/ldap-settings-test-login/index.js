@@ -7,5 +7,6 @@ export const ldapSettingsTestLogin = {
     settings: '=',
     limitedFeatureId: '<',
     showBeIndicatorIfNeeded: '<',
+    isLimitedFeatureSelfContained: '<',
   },
 };
