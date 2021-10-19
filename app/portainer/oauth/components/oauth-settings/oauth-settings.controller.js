@@ -61,7 +61,7 @@ export default class OAuthSettingsController {
   }
 
   updateSSO() {
-    this.settings.HideInternalAuth = this.settings.SSO;
+    this.settings.HideInternalAuth = this.featureService.isLimitedToBE(this.limitedFeature) ? false : this.settings.SSO;
   }
 
   addTeamMembershipMapping() {
