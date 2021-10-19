@@ -308,6 +308,17 @@ angular.module('portainer.app').factory('ModalService', [
       );
     };
 
+    service.selectRegistry = function (options) {
+      var box = bootbox.prompt({
+        title: 'Which registry do you want to use?',
+        inputType: 'select',
+        value: options.defaultValue,
+        inputOptions: options.options,
+        callback: options.callback,
+      });
+      applyBoxCSS(box);
+    };
+
     return service;
   },
 ]);
