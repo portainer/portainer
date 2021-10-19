@@ -38,3 +38,20 @@ func TestGenerateSignedToken(t *testing.T) {
 	assert.Equal(t, int(token.Role), tokenClaims.Role)
 	assert.Equal(t, expiresAt, tokenClaims.ExpiresAt)
 }
+
+func TestGenerateSignedToken_InvalidScope(t *testing.T) {
+	dataStore := i.NewDatastore(i.WithSettingsService(&portainer.Settings{}))
+	svc, err := NewService("24h", dataStore)
+	assert.NoError(t, err, "failed to create a copy of service")
+
+	token := &portainer.TokenData{
+		Username: "Joe",
+		ID:       1,
+		Role:     1,
+	}
+	expiresAt := time.Now().Add(1 * time.Hour).Unix()
+
+	_, err = svc.generateSignedToken(token, expiresAt, "testing")
+	assert.Error(t, err)
+	assert.Equal(t, "invalid scope: testing", err.Error())
+}
