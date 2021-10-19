@@ -22,11 +22,11 @@ func TestGenerateSignedToken(t *testing.T) {
 	}
 	expiresAt := time.Now().Add(1 * time.Hour).Unix()
 
-	generatedToken, err := svc.generateSignedToken(token, expiresAt, svc.secret)
+	generatedToken, err := svc.generateSignedToken(token, expiresAt, defaultScope)
 	assert.NoError(t, err, "failed to generate a signed token")
 
 	parsedToken, err := jwt.ParseWithClaims(generatedToken, &claims{}, func(token *jwt.Token) (interface{}, error) {
-		return svc.secret, nil
+		return svc.secrets[defaultScope], nil
 	})
 	assert.NoError(t, err, "failed to parse generated token")
 
