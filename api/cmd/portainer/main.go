@@ -172,7 +172,7 @@ func initDockerClientFactory(signatureService portainer.DigitalSignatureService,
 	return docker.NewClientFactory(signatureService, reverseTunnelService)
 }
 
-func initKubernetesClientFactory(baseURL string, signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, instanceID string, dataStore portainer.DataStore) *kubecli.ClientFactory {
+func initKubernetesClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService, instanceID string, dataStore portainer.DataStore) *kubecli.ClientFactory {
 	return kubecli.NewClientFactory(signatureService, reverseTunnelService, instanceID, dataStore)
 }
 
@@ -450,7 +450,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	}
 
 	dockerClientFactory := initDockerClientFactory(digitalSignatureService, reverseTunnelService)
-	kubernetesClientFactory := initKubernetesClientFactory(*flags.BaseURL, digitalSignatureService, reverseTunnelService, instanceID, dataStore)
+	kubernetesClientFactory := initKubernetesClientFactory(digitalSignatureService, reverseTunnelService, instanceID, dataStore)
 
 	snapshotService, err := initSnapshotService(*flags.SnapshotInterval, dataStore, dockerClientFactory, kubernetesClientFactory, shutdownCtx)
 	if err != nil {
