@@ -1,7 +1,7 @@
-import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
-import { KubernetesConfigurationFormValuesEntry } from 'Kubernetes/models/configuration/formvalues';
 import _ from 'lodash-es';
 import YAML from 'yaml';
+import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
+import { KubernetesConfigurationFormValuesEntry } from 'Kubernetes/models/configuration/formvalues';
 
 class KubernetesConfigurationHelper {
   static getUsingApplications(config, applications) {

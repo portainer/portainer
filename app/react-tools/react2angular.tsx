@@ -1,6 +1,5 @@
 import { UIRouterContextComponent } from '@uirouter/react-hybrid';
 import ReactDOM from 'react-dom';
-
 import { IComponentOptions, IController } from 'angular';
 
 function toProps(

@@ -1,7 +1,6 @@
 import _ from 'lodash-es';
-import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
-
 import angular from 'angular';
+import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
 
 class CreateConfigController {
   /* @ngInject */

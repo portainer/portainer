@@ -1,9 +1,9 @@
 import angular from 'angular';
 import _ from 'lodash-es';
+import filesizeParser from 'filesize-parser';
 import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import { KubernetesStorageClassAccessPolicies } from 'Kubernetes/models/storage-class/models';
-import filesizeParser from 'filesize-parser';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
 
 class KubernetesVolumeController {
