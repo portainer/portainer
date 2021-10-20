@@ -175,6 +175,7 @@ func TestRollback(t *testing.T) {
 		testVersion(store, version, t)
 	})
 }
+
 // isFileExist is helper function to check for file existence
 func isFileExist(path string) bool {
 	matches, err := filepath.Glob(path)

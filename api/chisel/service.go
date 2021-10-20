@@ -28,9 +28,9 @@ const (
 type Service struct {
 	serverFingerprint string
 	serverPort        string
-	tunnelDetailsMap cmap.ConcurrentMap
-	dataStore        dataservices.DataStore
-	snapshotService  portainer.SnapshotService
+	tunnelDetailsMap  cmap.ConcurrentMap
+	dataStore         dataservices.DataStore
+	snapshotService   portainer.SnapshotService
 	chiselServer      *chserver.Server
 	shutdownCtx       context.Context
 	ProxyManager      *proxy.Manager

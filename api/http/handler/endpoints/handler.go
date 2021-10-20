@@ -24,9 +24,9 @@ func hideFields(endpoint *portainer.Endpoint) {
 // Handler is the HTTP handler used to handle environment(endpoint) operations.
 type Handler struct {
 	*mux.Router
-	requestBouncer *security.RequestBouncer
-	DataStore      dataservices.DataStore
-	FileService    portainer.FileService
+	requestBouncer       *security.RequestBouncer
+	DataStore            dataservices.DataStore
+	FileService          portainer.FileService
 	ProxyManager         *proxy.Manager
 	ReverseTunnelService portainer.ReverseTunnelService
 	SnapshotService      portainer.SnapshotService

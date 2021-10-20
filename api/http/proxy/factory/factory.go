@@ -19,8 +19,8 @@ const azureAPIBaseURL = "https://management.azure.com"
 type (
 	// ProxyFactory is a factory to create reverse proxies
 	ProxyFactory struct {
-		dataStore        dataservices.DataStore
-		signatureService portainer.DigitalSignatureService
+		dataStore                   dataservices.DataStore
+		signatureService            portainer.DigitalSignatureService
 		reverseTunnelService        portainer.ReverseTunnelService
 		dockerClientFactory         *docker.ClientFactory
 		kubernetesClientFactory     *cli.ClientFactory

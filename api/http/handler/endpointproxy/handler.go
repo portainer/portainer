@@ -12,8 +12,8 @@ import (
 // Handler is the HTTP handler used to proxy requests to external APIs.
 type Handler struct {
 	*mux.Router
-	DataStore      dataservices.DataStore
-	requestBouncer *security.RequestBouncer
+	DataStore            dataservices.DataStore
+	requestBouncer       *security.RequestBouncer
 	ProxyManager         *proxy.Manager
 	ReverseTunnelService portainer.ReverseTunnelService
 }
