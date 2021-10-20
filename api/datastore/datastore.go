@@ -10,7 +10,7 @@ import (
 
 func (store *Store) version() (int, error) {
 	version, err := store.VersionService.DBVersion()
-	if err == errors.ErrObjectNotFound {
+	if store.IsErrObjectNotFound(err) {
 		version = 0
 	}
 	return version, err
@@ -18,7 +18,7 @@ func (store *Store) version() (int, error) {
 
 func (store *Store) edition() portainer.SoftwareEdition {
 	edition, err := store.VersionService.Edition()
-	if err == errors.ErrObjectNotFound {
+	if store.IsErrObjectNotFound(err) {
 		edition = portainer.PortainerCE
 	}
 	return edition
