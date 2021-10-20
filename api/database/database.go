@@ -7,6 +7,6 @@ import (
 
 // NewDatabase should use config options to return a connection to the requested database
 // ie, its going to be a factory at some point.
-func NewDatabase(storePath string, fileService portainer.FileService) (connection portainer.Connection, err error) {
-	return &boltdb.DbConnection{Path: storePath, FileService: fileService}, nil
+func NewDatabase(storePath string) (connection portainer.Connection, err error) {
+	return &boltdb.DbConnection{Path: storePath}, nil
 }
