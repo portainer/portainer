@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/boltdb/bolt"
-	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices/errors"
 )
 
@@ -20,8 +19,7 @@ const (
 )
 
 type DbConnection struct {
-	Path        string
-	FileService portainer.FileService
+	Path string
 
 	*bolt.DB
 }
