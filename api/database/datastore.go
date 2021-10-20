@@ -89,6 +89,7 @@ func (store *Store) CheckCurrentEdition() error {
 	return nil
 }
 
+// TODO: move the use of this to dataservices.IsErrObjectNotFound()?
 func (store *Store) IsErrObjectNotFound(e error) bool {
 	return e == errors.ErrObjectNotFound
 }
