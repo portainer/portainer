@@ -1,7 +1,8 @@
-package database
+package datastore
 
 import (
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/database"
 	"io/ioutil"
 	"log"
 	"os"
@@ -40,7 +41,7 @@ func NewTestStore(init bool) (*Store, func(), error) {
 		return nil, nil, err
 	}
 
-	connection, err := NewDatabase(storePath, fileService)
+	connection, err := database.NewDatabase(storePath, fileService)
 	if err != nil {
 		panic(err)
 	}

@@ -2,7 +2,7 @@ package helm
 
 import (
 	"encoding/json"
-	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/datastore"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -20,7 +20,7 @@ import (
 )
 
 func Test_helmList(t *testing.T) {
-	store, teardown := database.MustNewTestStore(true)
+	store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	err := store.Endpoint().Create(&portainer.Endpoint{ID: 1})

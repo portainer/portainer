@@ -1,8 +1,7 @@
 package tests
 
 import (
-	// TODO:this is the only file in dataservices that uses database
-	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/datastore"
 	"testing"
 	"time"
 
@@ -22,14 +21,14 @@ func newGuidString(t *testing.T) string {
 type stackBuilder struct {
 	t     *testing.T
 	count int
-	store *database.Store
+	store *datastore.Store
 }
 
 func TestService_StackByWebhookID(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode. Normally takes ~1s to run.")
 	}
-	store, teardown := database.MustNewTestStore(true)
+	store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	b := stackBuilder{t: t, store: store}
@@ -87,7 +86,7 @@ func Test_RefreshableStacks(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode. Normally takes ~1s to run.")
 	}
-	store, teardown := database.MustNewTestStore(true)
+	store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	staticStack := portainer.Stack{ID: 1}
