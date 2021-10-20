@@ -34,7 +34,6 @@ type testDatastore struct {
 	webhook                 dataservices.WebhookService
 }
 
-func (d *testDatastore) Export(filename string) (err error)                 { return nil }
 func (d *testDatastore) BackupTo(io.Writer) error                           { return nil }
 func (d *testDatastore) Open() error                                        { return nil }
 func (d *testDatastore) Init() error                                        { return nil }
@@ -76,6 +75,13 @@ func (d *testDatastore) Webhook() dataservices.WebhookService               { re
 
 func (d *testDatastore) IsErrObjectNotFound(e error) bool {
 	return false
+}
+
+func (d *testDatastore) Export(filename string) (err error) {
+	return nil
+}
+func (d *testDatastore) Import(filename string) (err error) {
+	return nil
 }
 
 type datastoreOption = func(d *testDatastore)
@@ -140,8 +146,7 @@ type stubEdgeJobService struct {
 	jobs []portainer.EdgeJob
 }
 
-func (s *stubEdgeJobService) BucketName() string { return "edge_jobs" }
-
+func (s *stubEdgeJobService) BucketName() string                     { return "edgejob" }
 func (s *stubEdgeJobService) EdgeJobs() ([]portainer.EdgeJob, error) { return s.jobs, nil }
 func (s *stubEdgeJobService) EdgeJob(ID portainer.EdgeJobID) (*portainer.EdgeJob, error) {
 	return nil, nil
@@ -164,8 +169,7 @@ type stubEndpointRelationService struct {
 	relations []portainer.EndpointRelation
 }
 
-func (s *stubEndpointRelationService) BucketName() string { return "endpoint_relations" }
-
+func (s *stubEndpointRelationService) BucketName() string { return "endpoint_relation" }
 func (s *stubEndpointRelationService) EndpointRelations() ([]portainer.EndpointRelation, error) {
 	return s.relations, nil
 }
@@ -206,8 +210,7 @@ type stubEndpointService struct {
 	endpoints []portainer.Endpoint
 }
 
-func (s *stubEndpointService) BucketName() string { return "endpoints" }
-
+func (s *stubEndpointService) BucketName() string { return "endpoint" }
 func (s *stubEndpointService) Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, error) {
 	for _, endpoint := range s.endpoints {
 		if endpoint.ID == ID {
