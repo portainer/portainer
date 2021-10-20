@@ -3,6 +3,7 @@ package dataservices
 // 	"github.com/portainer/portainer/api/dataservices"
 
 import (
+	"github.com/portainer/portainer/api/dataservices/errors"
 	"io"
 	"time"
 
@@ -283,3 +284,7 @@ type (
 		BucketName() string
 	}
 )
+
+func IsErrObjectNotFound(e error) bool {
+	return e == errors.ErrObjectNotFound
+}
