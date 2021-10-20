@@ -1,4 +1,4 @@
-package database
+package datastore
 
 import (
 	"github.com/gofrs/uuid"

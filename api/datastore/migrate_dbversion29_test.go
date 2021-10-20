@@ -1,8 +1,8 @@
-package database
+package datastore
 
 import (
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/database/migrator"
+	"github.com/portainer/portainer/api/datastore/migrator"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"testing"
 )

@@ -2,7 +2,6 @@ package migrator
 
 import (
 	portainer "github.com/portainer/portainer/api"
-	plog "github.com/portainer/portainer/api/database/log"
 	"github.com/portainer/portainer/api/dataservices/dockerhub"
 	"github.com/portainer/portainer/api/dataservices/endpoint"
 	"github.com/portainer/portainer/api/dataservices/endpointgroup"
@@ -18,6 +17,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices/teammembership"
 	"github.com/portainer/portainer/api/dataservices/user"
 	"github.com/portainer/portainer/api/dataservices/version"
+	plog "github.com/portainer/portainer/api/datastore/log"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
 

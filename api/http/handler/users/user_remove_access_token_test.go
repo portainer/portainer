@@ -9,7 +9,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/apikey"
-	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/jwt"
 	"github.com/stretchr/testify/assert"
@@ -18,7 +18,7 @@ import (
 func Test_userRemoveAccessToken(t *testing.T) {
 	is := assert.New(t)
 
-	store, teardown := database.MustNewTestStore(true)
+	store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	// create admin and standard user(s)

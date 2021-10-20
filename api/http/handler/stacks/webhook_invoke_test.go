@@ -1,7 +1,7 @@
 package stacks
 
 import (
-	"github.com/portainer/portainer/api/database"
+	"github.com/portainer/portainer/api/datastore"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -12,7 +12,7 @@ import (
 )
 
 func TestHandler_webhookInvoke(t *testing.T) {
-	store, teardown := database.MustNewTestStore(true)
+	store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	webhookID := newGuidString(t)

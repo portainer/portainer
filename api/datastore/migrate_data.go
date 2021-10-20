@@ -1,17 +1,17 @@
-package database
+package datastore
 
 import (
 	"fmt"
 	"runtime/debug"
 
 	"github.com/portainer/portainer/api/cli"
-	"github.com/portainer/portainer/api/database/migrator"
 	"github.com/portainer/portainer/api/dataservices/errors"
+	plog "github.com/portainer/portainer/api/datastore/log"
+	"github.com/portainer/portainer/api/datastore/migrator"
 	"github.com/portainer/portainer/api/internal/authorization"
 
 	werrors "github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
-	plog "github.com/portainer/portainer/api/database/log"
 )
 
 const beforePortainerVersionUpgradeBackup = "portainer.db.bak"

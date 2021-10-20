@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/portainer/portainer/api/datastore"
 	"log"
 	"os"
 	"path"
@@ -69,7 +70,7 @@ func initDataStore(storePath string, rollback bool, fileService portainer.FileSe
 	if err != nil {
 		panic(err)
 	}
-	store := database.NewStore(storePath, fileService, connection)
+	store := datastore.NewStore(storePath, fileService, connection)
 	err = store.Open()
 	if err != nil {
 		log.Fatalf("failed opening store: %v", err)
