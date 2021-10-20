@@ -3,7 +3,6 @@ package middlewares
 import (
 	"context"
 	"errors"
-	bolterrors "github.com/portainer/portainer/api/dataservices/errors"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -35,7 +34,7 @@ func WithEndpoint(endpointService dataservices.EndpointService, endpointIDParam 
 			if err != nil {
 				statusCode := http.StatusInternalServerError
 
-				if err == bolterrors.ErrObjectNotFound {
+				if dataservices.IsErrObjectNotFound(err) {
 					statusCode = http.StatusNotFound
 				}
 				httperror.WriteError(rw, statusCode, "Unable to find an environment with the specified identifier inside the database", err)
