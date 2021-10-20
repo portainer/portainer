@@ -20,7 +20,7 @@ type settingsUpdatePayload struct {
 	LogoURL *string `example:"https://mycompany.mydomain.tld/logo.png"`
 	// A list of label name & value that will be used to hide containers when querying containers
 	BlackListedLabels []portainer.Pair
-	// Active authentication method for the Portainer instance. Valid values are: 1 for boltdb, 2 for LDAP, or 3 for oauth
+	// Active authentication method for the Portainer instance. Valid values are: 1 for internal, 2 for LDAP, or 3 for oauth
 	AuthenticationMethod *int                     `example:"1"`
 	LDAPSettings         *portainer.LDAPSettings  `example:""`
 	OAuthSettings        *portainer.OAuthSettings `example:""`
@@ -46,7 +46,7 @@ type settingsUpdatePayload struct {
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 	if payload.AuthenticationMethod != nil && *payload.AuthenticationMethod != 1 && *payload.AuthenticationMethod != 2 && *payload.AuthenticationMethod != 3 {
-		return errors.New("Invalid authentication method value. Value must be one of: 1 (boltdb), 2 (LDAP/AD) or 3 (OAuth)")
+		return errors.New("Invalid authentication method value. Value must be one of: 1 (internal), 2 (LDAP/AD) or 3 (OAuth)")
 	}
 	if payload.LogoURL != nil && *payload.LogoURL != "" && !govalidator.IsURL(*payload.LogoURL) {
 		return errors.New("Invalid logo URL. Must correspond to a valid URL format")
