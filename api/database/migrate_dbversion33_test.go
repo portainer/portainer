@@ -1,25 +1,18 @@
-package migrator
+package database
 
 import (
-	"github.com/portainer/portainer/api/dataservices/stack"
-	"path"
-	"testing"
-	"time"
-
-	"github.com/boltdb/bolt"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/database/boltdb"
+	"github.com/portainer/portainer/api/database/migrator"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestMigrateStackEntryPoint(t *testing.T) {
-	dbConn, err := bolt.Open(path.Join(t.TempDir(), "portainer-ee-mig-34.db"), 0600, &bolt.Options{Timeout: 1 * time.Second})
-	assert.NoError(t, err, "failed to init testing DB connection")
-	defer dbConn.Close()
+	store, teardown := MustNewTestStore(false)
+	defer teardown()
 
-	stackService, err := stack.NewService(&boltdb.DbConnection{DB: dbConn})
-	assert.NoError(t, err, "failed to init testing Stack service")
+	stackService := store.Stack()
 
 	stacks := []*portainer.Stack{
 		{
@@ -38,10 +31,18 @@ func TestMigrateStackEntryPoint(t *testing.T) {
 		assert.NoError(t, err, "failed to create stack")
 	}
 
-	err = migrateStackEntryPoint(stackService)
+	s, err := stackService.Stack(1)
+	assert.NoError(t, err)
+	assert.Nil(t, s.GitConfig, "first stack should not have git config")
+
+	s, err = stackService.Stack(2)
+	assert.NoError(t, err)
+	assert.Equal(t, "", s.GitConfig.ConfigFilePath, "not migrated yet migrated")
+
+	err = migrator.MigrateStackEntryPoint(stackService)
 	assert.NoError(t, err, "failed to migrate entry point to Git ConfigFilePath")
 
-	s, err := stackService.Stack(1)
+	s, err = stackService.Stack(1)
 	assert.NoError(t, err)
 	assert.Nil(t, s.GitConfig, "first stack should not have git config")
 
