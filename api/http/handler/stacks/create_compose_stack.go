@@ -3,7 +3,6 @@ package stacks
 import (
 	"fmt"
 	"net/http"
-	"path"
 	"strconv"
 	"time"
 
@@ -389,10 +388,9 @@ func (handler *Handler) deployComposeStack(config *composeStackDeploymentConfig)
 		!isAdminOrEndpointAdmin {
 
 		for _, file := range append([]string{config.stack.EntryPoint}, config.stack.AdditionalFiles...) {
-			path := path.Join(config.stack.ProjectPath, file)
-			stackContent, err := handler.FileService.GetFileContent(path)
+			stackContent, err := handler.FileService.GetFileContent(config.stack.ProjectPath, file)
 			if err != nil {
-				return errors.Wrapf(err, "failed to get stack file content `%q`", path)
+				return errors.Wrapf(err, "failed to get stack file content `%q`", file)
 			}
 
 			err = handler.isValidStackFile(stackContent, securitySettings)

@@ -20,7 +20,7 @@ func ResourceControlID(endpointID portainer.EndpointID, name string) string {
 func GetStackFilePaths(stack *portainer.Stack) []string {
 	var filePaths []string
 	for _, file := range append([]string{stack.EntryPoint}, stack.AdditionalFiles...) {
-		filePaths = append(filePaths, path.Join(stack.ProjectPath, file))
+		filePaths = append(filePaths, path.Join(stack.ProjectPath, path.Join("/", file)))
 	}
 	return filePaths
 }
@@ -37,6 +37,7 @@ func CreateTempK8SDeploymentFiles(stack *portainer.Stack, kubeDeployer portainer
 	}
 
 	for _, fileName := range fileNames {
+		fileName = path.Join("/", fileName)
 		manifestFilePath := path.Join(tmpDir, fileName)
 		manifestContent, err := ioutil.ReadFile(path.Join(stack.ProjectPath, fileName))
 		if err != nil {

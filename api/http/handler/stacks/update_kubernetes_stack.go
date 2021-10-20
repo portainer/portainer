@@ -104,7 +104,7 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 	tempFileDir, _ := ioutil.TempDir("", "kub_file_content")
 	defer os.RemoveAll(tempFileDir)
 
-	if err := filesystem.WriteToFile(path.Join(tempFileDir, stack.EntryPoint), []byte(payload.StackFileContent)); err != nil {
+	if err := filesystem.WriteToFile(path.Join(tempFileDir, path.Join("/", stack.EntryPoint)), []byte(payload.StackFileContent)); err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to persist deployment file in a temp directory", Err: err}
 	}
 

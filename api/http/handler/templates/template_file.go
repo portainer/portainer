@@ -4,7 +4,6 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	"path"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
@@ -68,9 +67,7 @@ func (handler *Handler) templateFile(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to clone git repository", err}
 	}
 
-	composeFilePath := path.Join(projectPath, payload.ComposeFilePathInRepository)
-
-	fileContent, err := handler.FileService.GetFileContent(composeFilePath)
+	fileContent, err := handler.FileService.GetFileContent(projectPath, payload.ComposeFilePathInRepository)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Failed loading file content", err}
 	}
