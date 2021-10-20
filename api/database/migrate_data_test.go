@@ -45,7 +45,7 @@ func TestMigrateData(t *testing.T) {
 		version         int
 		expectedVersion int
 	}{
-		{version: 2, expectedVersion: portainer.DBVersion},
+		{version: 17, expectedVersion: portainer.DBVersion},
 		{version: 21, expectedVersion: portainer.DBVersion},
 	}
 	for _, tc := range tests {
@@ -77,7 +77,7 @@ func TestMigrateData(t *testing.T) {
 		store, teardown := MustNewTestStore(false)
 		defer teardown()
 
-		version := 2
+		version := 17
 		store.VersionService.StoreDBVersion(version)
 
 		store.MigrateData(true)
