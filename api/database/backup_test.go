@@ -2,7 +2,6 @@ package database
 
 import (
 	"fmt"
-	"github.com/portainer/portainer/api/database/boltdb"
 	"os"
 	"path"
 	"testing"
@@ -15,9 +14,7 @@ func TestCreateBackupFolders(t *testing.T) {
 	defer teardown()
 
 	connection := store.GetConnection()
-	dbconnection := connection.(*boltdb.DbConnection)
-
-	backupPath := path.Join(dbconnection.Path, backupDefaults.backupDir)
+	backupPath := path.Join(connection.GetStorePath(), backupDefaults.backupDir)
 
 	if isFileExist(backupPath) {
 		t.Error("Expect backups folder to not exist")
@@ -44,17 +41,14 @@ func TestStoreCreation(t *testing.T) {
 
 func TestBackup(t *testing.T) {
 	store, teardown := MustNewTestStore(true)
-
 	connection := store.GetConnection()
-	dbconnection := connection.(*boltdb.DbConnection)
-
 	defer teardown()
 
 	t.Run("Backup should create default db backup", func(t *testing.T) {
 		store.VersionService.StoreDBVersion(portainer.DBVersion)
 		store.backupWithOptions(nil)
 
-		backupFileName := path.Join(dbconnection.GetStorePath(), "backups", "common", fmt.Sprintf("portainer.db.%03d.*", portainer.DBVersion))
+		backupFileName := path.Join(connection.GetStorePath(), "backups", "common", fmt.Sprintf("portainer.db.%03d.*", portainer.DBVersion))
 		if !isFileExist(backupFileName) {
 			t.Errorf("Expect backup file to be created %s", backupFileName)
 		}
@@ -65,7 +59,7 @@ func TestBackup(t *testing.T) {
 			BackupFileName: beforePortainerVersionUpgradeBackup,
 			BackupDir:      store.commonBackupDir(),
 		})
-		backupFileName := path.Join(dbconnection.GetStorePath(), "backups", "common", beforePortainerVersionUpgradeBackup)
+		backupFileName := path.Join(connection.GetStorePath(), "backups", "common", beforePortainerVersionUpgradeBackup)
 		if !isFileExist(backupFileName) {
 			t.Errorf("Expect backup file to be created %s", backupFileName)
 		}

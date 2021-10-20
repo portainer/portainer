@@ -30,7 +30,7 @@ func MustNewTestStore(init bool) (*Store, func()) {
 
 func NewTestStore(init bool) (*Store, func(), error) {
 	// Creates unique temp directory in a concurrency friendly manner.
-	storePath, err := ioutil.TempDir("", "boltdb")
+	storePath, err := ioutil.TempDir("", "test-store")
 	if err != nil {
 		return nil, nil, errors.Wrap(errTempDir, err.Error())
 	}

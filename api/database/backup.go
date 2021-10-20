@@ -2,7 +2,6 @@ package database
 
 import (
 	"fmt"
-	"github.com/portainer/portainer/api/database/boltdb"
 	"os"
 	"path"
 	"time"
@@ -10,19 +9,12 @@ import (
 	plog "github.com/portainer/portainer/api/database/log"
 )
 
-// TODO: this intermeshing with boltdb shows how much backup needs to not use boldb impementation
-//  we should be exporting, and importing - moving this into boltdb seems to be worse?
-
-// TODO: even weirder - this code seems to be used for testing, but not in actual backups?
-
 var backupDefaults = struct {
-	backupDir        string
-	commonDir        string
-	databaseFileName string
+	backupDir string
+	commonDir string
 }{
 	"backups",
 	"common",
-	boltdb.DatabaseFileName,
 }
 
 var backupLog = plog.NewScopedLog("database, backup")
@@ -92,7 +84,7 @@ func (store *Store) setupOptions(options *BackupOptions) *BackupOptions {
 		options.BackupDir = store.commonBackupDir()
 	}
 	if options.BackupFileName == "" {
-		options.BackupFileName = fmt.Sprintf("%s.%s.%s", backupDefaults.databaseFileName, fmt.Sprintf("%03d", options.Version), time.Now().Format("20060102150405"))
+		options.BackupFileName = fmt.Sprintf("%s.%s.%s", store.connection.GetDatabaseFilename(), fmt.Sprintf("%03d", options.Version), time.Now().Format("20060102150405"))
 	}
 	if options.BackupPath == "" {
 		options.BackupPath = path.Join(options.BackupDir, options.BackupFileName)
