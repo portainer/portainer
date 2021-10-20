@@ -43,7 +43,7 @@ var (
 func NewKubeConfigCAService(httpsBindAddr string, tlsCertPath string) KubeConfigService {
 	certificateAuthorityData, err := getCertificateAuthorityData(tlsCertPath)
 	if err != nil {
-		log.Printf("[DEBUG] [boltdb,kubeconfig] [message: %s, generated KubeConfig will be insecure]", err.Error())
+		log.Printf("[DEBUG] [internal,kubeconfig] [message: %s, generated KubeConfig will be insecure]", err.Error())
 	}
 
 	return &kubeConfigCAService{
@@ -88,7 +88,7 @@ func (kccas *kubeConfigCAService) IsSecure() bool {
 
 // GetKubeConfigInternal returns K8s cluster access details for the specified environment(endpoint).
 // On startup, portainer generates a certificate against localhost at specified `httpsBindAddr` port, hence
-// the kubeconfig generated should only be utilised by boltdb portainer binaries as the `ClusterServerURL`
+// the kubeconfig generated should only be utilised by internal portainer binaries as the `ClusterServerURL`
 // points to the internally accessible `https` based `localhost` address.
 // The struct can be used to:
 // - generate a kubeconfig file

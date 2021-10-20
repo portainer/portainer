@@ -33,7 +33,7 @@ func (m *Monitor) Start() {
 	m.cancellationFunc = cancellationFunc
 
 	go func() {
-		log.Println("[DEBUG] [boltdb,init] [message: start initialization monitor ]")
+		log.Println("[DEBUG] [internal,init] [message: start initialization monitor ]")
 		select {
 		case <-time.After(m.timeout):
 			initialized, err := m.WasInitialized()
@@ -41,12 +41,12 @@ func (m *Monitor) Start() {
 				logFatalf("%s", err)
 			}
 			if !initialized {
-				logFatalf("[FATAL] [boltdb,init] No administrator account was created in %f mins. Shutting down the Portainer instance for security reasons", m.timeout.Minutes())
+				logFatalf("[FATAL] [internal,init] No administrator account was created in %f mins. Shutting down the Portainer instance for security reasons", m.timeout.Minutes())
 			}
 		case <-cancellationCtx.Done():
-			log.Println("[DEBUG] [boltdb,init] [message: canceling initialization monitor]")
+			log.Println("[DEBUG] [internal,init] [message: canceling initialization monitor]")
 		case <-m.shutdownCtx.Done():
-			log.Println("[DEBUG] [boltdb,init] [message: shutting down initialization monitor]")
+			log.Println("[DEBUG] [internal,init] [message: shutting down initialization monitor]")
 		}
 	}()
 }
