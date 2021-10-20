@@ -64,7 +64,7 @@ func initFileService(dataStorePath string) portainer.FileService {
 }
 
 func initDataStore(storePath string, rollback bool, fileService portainer.FileService, shutdownCtx context.Context) dataservices.DataStore {
-	connection, err := database.NewDatabase(storePath)
+	connection, err := database.NewDatabase("boltdb", storePath)
 	if err != nil {
 		panic(err)
 	}
