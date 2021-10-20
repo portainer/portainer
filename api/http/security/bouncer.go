@@ -1,14 +1,10 @@
 package security
 
 import (
-	"bytes"
 	"errors"
 	"net/http"
-	"net/http/httptest"
 	"strings"
-	"sync"
 
-	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
@@ -30,6 +26,16 @@ type (
 		UserID          portainer.UserID
 		UserMemberships []portainer.TeamMembership
 	}
+
+	// authError is the error struct that captures data to populate the http.WriteError in the caller
+	authError struct {
+		statusCode int
+		message    string
+		err        error
+	}
+
+	// verificationFunc is the function signature for any auth based functions
+	verificationFunc func(*http.Request) (*portainer.TokenData, *authError)
 )
 
 const apiKeyHeader = "X-API-KEY"
@@ -40,51 +46,6 @@ func NewRequestBouncer(dataStore portainer.DataStore, jwtService portainer.JWTSe
 		dataStore:  dataStore,
 		jwtService: jwtService,
 	}
-}
-
-// AnyAuth passes down the request to the underlying handler by running it through all the provided middlewares.
-// If any of the provided middlewares are satisfied, the request will be processed by the underlying handler.
-func (bouncer *RequestBouncer) AnyAuth(middlewares []mux.MiddlewareFunc, next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// if middlewares provided are nil or empty, serve request as is and return
-		if len(middlewares) == 0 || middlewares == nil {
-			next.ServeHTTP(w, r)
-			return
-		}
-
-		wantResponse := []byte("ok")
-		testHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write(wantResponse)
-		})
-
-		var workingMiddleware mux.MiddlewareFunc
-		wg := sync.WaitGroup{}
-		wg.Add(len(middlewares))
-
-		// process the request against test handler in parallel through all the provided middelwares
-		// the last middleware that returns a successful response response will served the request to the actual handler
-		for _, m := range middlewares {
-			go func(middleware mux.MiddlewareFunc) {
-				rr := httptest.NewRecorder()
-				h := middleware(testHandler)
-				h.ServeHTTP(rr, r)
-				if bytes.Equal(rr.Body.Bytes(), wantResponse) {
-					workingMiddleware = middleware
-				}
-				wg.Done()
-			}(m)
-		}
-		wg.Wait()
-
-		// if none of the middlewares passed, utilise the first middleware in the chain to return the error
-		if workingMiddleware == nil {
-			middlewares[0](next).ServeHTTP(w, r)
-			return
-		}
-
-		// note: the workingMiddleware is the last middleware in the chain (if multiple middlewares passed)
-		workingMiddleware(next).ServeHTTP(w, r)
-	})
 }
 
 // PublicAccess defines a security check for public API environments(endpoints).
@@ -183,11 +144,11 @@ func (bouncer *RequestBouncer) AuthorizedEdgeEndpointOperation(r *http.Request, 
 // - add secure handlers to the response
 // - parse the JWT token and put it into the http context.
 func (bouncer *RequestBouncer) mwAuthenticatedUser(h http.Handler) http.Handler {
-	// Use AnyAuth middleware to support multiple auth paradigms
+	// Use mwAnyAuth middleware to support multiple auth paradigms
 	// currently supported auth: JWT Auth, API-Key Auth
-	h = bouncer.AnyAuth([]mux.MiddlewareFunc{
-		bouncer.mwCheckJWTAuthentication,
-		bouncer.mwCheckAPIKeyAuthentication,
+	h = bouncer.mwAnyAuth([]verificationFunc{
+		bouncer.processJWTAuth,
+		bouncer.processAPIKeyAuth,
 	}, h)
 	h = mwSecureHeaders(h)
 	return h
@@ -249,31 +210,31 @@ func (bouncer *RequestBouncer) mwUpgradeToRestrictedRequest(next http.Handler) h
 	})
 }
 
-// mwCheckJWTAuthentication provides JWT Authentication middleware for handlers.
-// It parses the JWT token from request `Authorization` header and adds the parsed token data to the http context.
-func (bouncer *RequestBouncer) mwCheckJWTAuthentication(next http.Handler) http.Handler {
+// mwAnyAuth provides middleware for to support multiple auth paradigms.
+// If any of the verificationFunc's in the list passes, the last passing function will be used to process the request.
+func (bouncer *RequestBouncer) mwAnyAuth(tokenFetchers []verificationFunc, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var tokenData *portainer.TokenData
+		tokenData := &portainer.TokenData{}
+		finalAuthError := &authError{http.StatusUnauthorized, "Unauthorized", httperrors.ErrUnauthorized}
 
-		// get token from the Authorization header or query parameter
-		token, err := extractBearerToken(r)
-		if err != nil {
-			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", err)
+		for _, tokenFetcher := range tokenFetchers {
+			token, authErr := tokenFetcher(r)
+			if authErr != nil {
+				finalAuthError = authErr
+			}
+			if token != nil {
+				tokenData = token
+			}
+		}
+
+		if (tokenData == &portainer.TokenData{}) {
+			httperror.WriteError(w, finalAuthError.statusCode, finalAuthError.message, finalAuthError.err)
 			return
 		}
 
-		tokenData, err = bouncer.jwtService.ParseAndVerifyToken(token)
-		if err != nil {
-			httperror.WriteError(w, http.StatusUnauthorized, "Invalid JWT token", err)
-			return
-		}
-
-		_, err = bouncer.dataStore.User().User(tokenData.ID)
-		if err != nil && err == bolterrors.ErrObjectNotFound {
+		user, _ := bouncer.dataStore.User().User(tokenData.ID)
+		if user == nil {
 			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", httperrors.ErrUnauthorized)
-			return
-		} else if err != nil {
-			httperror.WriteError(w, http.StatusInternalServerError, "Unable to retrieve user details from the database", err)
 			return
 		}
 
@@ -282,37 +243,42 @@ func (bouncer *RequestBouncer) mwCheckJWTAuthentication(next http.Handler) http.
 	})
 }
 
-// mwCheckAPIKeyAuthentication provides api-key Authentication middleware for handlers.
-// It parses the api-key from request `X-API-KEY` header, generates users portainer token data
-// and adds the parsed token data to the http context.
-func (bouncer *RequestBouncer) mwCheckAPIKeyAuthentication(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var tokenData *portainer.TokenData
+// processJWTAuth provides JWT authentication checks for the request.
+// processJWTAuth parses the JWT token from request `Authorization` header and returns the token data
+func (bouncer *RequestBouncer) processJWTAuth(r *http.Request) (*portainer.TokenData, *authError) {
+	// get token from the Authorization header or query parameter
+	token, err := extractBearerToken(r)
+	if err != nil {
+		return nil, &authError{http.StatusUnauthorized, "Unauthorized", err}
+	}
 
-		// get api-key from the request header
-		_, err := extractAPIKey(r)
-		if err != nil {
-			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", err)
-			return
-		}
+	tokenData, err := bouncer.jwtService.ParseAndVerifyToken(token)
+	if err != nil {
+		return nil, &authError{http.StatusUnauthorized, "Invalid JWT token", err}
+	}
 
-		// TODO - use datastore to verify apiKey (exists and matches hash)
-		// TODO - match apikey to user
-		// TODO - generate *portainer.TokenData based for the matched user
-		// TODO - store this generated *portainer.TokenData into request context (to be used by other middlewares)
+	return tokenData, nil
+}
 
-		_, err = bouncer.dataStore.User().User(tokenData.ID)
-		if err != nil && err == bolterrors.ErrObjectNotFound {
-			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", httperrors.ErrUnauthorized)
-			return
-		} else if err != nil {
-			httperror.WriteError(w, http.StatusInternalServerError, "Unable to retrieve user details from the database", err)
-			return
-		}
+// processAPIKeyAuth provides api-key authentication checks for the request.
+// It parses the api-key from request `X-API-KEY` header and uses it to generate the
+// respective user's portainer token data.
+func (bouncer *RequestBouncer) processAPIKeyAuth(r *http.Request) (*portainer.TokenData, *authError) {
+	// get api-key from the request header
+	_, err := extractAPIKey(r)
+	if err != nil {
+		return nil, &authError{http.StatusUnauthorized, "Unauthorized", err}
+	}
 
-		ctx := StoreTokenData(r, tokenData)
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
+	// TODO: hash API-Key
+	// TODO: compare API-Key with the one stored in the database
+	// TODO: retrieve user associated to the API-Key
+	// TODO: generate a new token for the user
+	// TODO: return generated token
+
+	var tokenData *portainer.TokenData
+
+	return tokenData, nil
 }
 
 // extractBearerToken extracts the Bearer token from the request header or query parameter and returns the token.

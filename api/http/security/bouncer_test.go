@@ -5,10 +5,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
-	"github.com/gorilla/mux"
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt"
 	httperrors "github.com/portainer/portainer/api/http/errors"
+	"github.com/portainer/portainer/api/jwt"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,144 +18,83 @@ var testHandler200 = http.HandlerFunc(func(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusOK)
 })
 
-// mwSucceedAfterDuration is a simple middleware which succeeds after specified duration
-// for tests, we can specify desired HTTP status code to check for
-func mwSucceedAfterDuration(d time.Duration, httpStatusCode int) func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			time.Sleep(d)
-
-			// override response code to signal that middleware has succeeded
-			w.WriteHeader(httpStatusCode)
-
-			next.ServeHTTP(w, r)
-		})
+func verificationFuncSucceedWrapper(dataStore portainer.DataStore, jwtService portainer.JWTService) verificationFunc {
+	return func(r *http.Request) (*portainer.TokenData, *authError) {
+		uid := portainer.UserID(1)
+		dataStore.User().CreateUser(&portainer.User{ID: uid})
+		jwtService.GenerateToken(&portainer.TokenData{ID: uid})
+		return &portainer.TokenData{ID: 1}, nil
 	}
 }
 
-// mwFailAfterDuration is a simple middleware which fails after specified duration with specified HTTP status code
-func mwFailAfterDuration(d time.Duration, httpStatusCode int) func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			time.Sleep(d)
-			http.Error(w, "Malformed Content-Type header", httpStatusCode)
-		})
+func verificationFuncFailWrapper(authErr authError) verificationFunc {
+	return func(r *http.Request) (*portainer.TokenData, *authError) {
+		return nil, &authErr
 	}
 }
 
-// define instantly succeeding and failing middlewares
-var mwPassEveryRequest = mwSucceedAfterDuration(0, http.StatusFound)
-var mwFailEveryRequest = mwFailAfterDuration(0, http.StatusBadRequest)
-
-// Test_middlewares is a set of simple tests to validate testing middlewares declared above so that they can be
-// utilised in more complex tests below.
-func Test_middlewares(t *testing.T) {
-	is := assert.New(t)
-
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
-
-	t.Run("mwPassEveryRequest passes with HTTP 302", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-
-		h := mwPassEveryRequest(testHandler200)
-		h.ServeHTTP(rr, req)
-
-		is.Equal(http.StatusFound, rr.Code, "Status should be 302 Found")
-	})
-
-	t.Run("mwFailEveryRequest fails with HTTP 400", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-
-		h := mwFailEveryRequest(testHandler200)
-		h.ServeHTTP(rr, req)
-
-		is.Equal(http.StatusBadRequest, rr.Code, "Status should be 400 Bad Request")
-	})
+func verificationFuncFail(r *http.Request) (*portainer.TokenData, *authError) {
+	return nil, &authError{statusCode: http.StatusUnauthorized, message: "Unauthorized", err: httperrors.ErrUnauthorized}
 }
 
-func Test_AnyAuth(t *testing.T) {
+func Test_mwAnyAuth(t *testing.T) {
 	is := assert.New(t)
-	bouncer := NewRequestBouncer(nil, nil)
+
+	store, teardown := bolt.MustNewTestStore(true)
+	defer teardown()
+
+	jwtService, err := jwt.NewService("1h", nil)
+	assert.NoError(t, err, "failed to create a copy of service")
+
+	bouncer := NewRequestBouncer(store, jwtService)
 
 	tests := []struct {
-		name            string
-		inputMiddlwares []mux.MiddlewareFunc
-		wantStatusCode  int
+		name                   string
+		verificationMiddlwares []verificationFunc
+		wantStatusCode         int
 	}{
 		{
-			name:            "AnyAuth middleware passes with no middleware",
-			inputMiddlwares: nil,
-			wantStatusCode:  http.StatusOK,
+			name:                   "mwAnyAuth middleware passes with no middleware",
+			verificationMiddlwares: nil,
+			wantStatusCode:         http.StatusUnauthorized,
 		},
 		{
-			name:            "AnyAuth middleware succeeds with passing middleware",
-			inputMiddlwares: []mux.MiddlewareFunc{mwPassEveryRequest},
-			wantStatusCode:  http.StatusFound,
-		},
-		{
-			name:            "AnyAuth fails with failing middleware",
-			inputMiddlwares: []mux.MiddlewareFunc{mwFailEveryRequest},
-			wantStatusCode:  http.StatusBadRequest,
-		},
-		{
-			name: "AnyAuth succeeds if first middleware successfully handles request",
-			inputMiddlwares: []mux.MiddlewareFunc{
-				mwPassEveryRequest,
-				mwFailEveryRequest,
+			name: "mwAnyAuth middleware succeeds with passing middleware",
+			verificationMiddlwares: []verificationFunc{
+				verificationFuncSucceedWrapper(store, jwtService),
 			},
-			wantStatusCode: http.StatusFound,
+			wantStatusCode: http.StatusOK,
 		},
 		{
-			name: "AnyAuth succeeds if last middleware successfully handles request",
-			inputMiddlwares: []mux.MiddlewareFunc{
-				mwFailEveryRequest,
-				mwPassEveryRequest,
+			name: "mwAnyAuth fails with failing middleware",
+			verificationMiddlwares: []verificationFunc{
+				verificationFuncFail,
 			},
-			wantStatusCode: http.StatusFound,
+			wantStatusCode: http.StatusUnauthorized,
 		},
 		{
-			name: "AnyAuth succeeds if first middleware successfully handles request after a failing middleware",
-			inputMiddlwares: []mux.MiddlewareFunc{
-				mwSucceedAfterDuration(time.Millisecond*50, http.StatusFound),
-				mwFailEveryRequest,
+			name: "mwAnyAuth succeeds if first middleware successfully handles request",
+			verificationMiddlwares: []verificationFunc{
+				verificationFuncSucceedWrapper(store, jwtService),
+				verificationFuncFail,
 			},
-			wantStatusCode: http.StatusFound,
+			wantStatusCode: http.StatusOK,
 		},
 		{
-			name: "AnyAuth succeeds if last middleware successfully handles request after a failing middleware",
-			inputMiddlwares: []mux.MiddlewareFunc{
-				mwFailEveryRequest,
-				mwSucceedAfterDuration(time.Millisecond*50, http.StatusFound),
+			name: "mwAnyAuth succeeds if last middleware successfully handles request",
+			verificationMiddlwares: []verificationFunc{
+				verificationFuncFail,
+				verificationFuncSucceedWrapper(store, jwtService),
 			},
-			wantStatusCode: http.StatusFound,
+			wantStatusCode: http.StatusOK,
 		},
 		{
-			name: "AnyAuth succeeds if any middleware passes regardless of order and time",
-			inputMiddlwares: []mux.MiddlewareFunc{
-				mwFailEveryRequest,
-				mwSucceedAfterDuration(time.Millisecond*25, http.StatusFound),
-				mwFailAfterDuration(time.Millisecond*50, http.StatusUnauthorized),
+			name: "mwAnyAuth returns unauthorized if all middlewares fail",
+			verificationMiddlwares: []verificationFunc{
+				verificationFuncFailWrapper(authError{http.StatusInternalServerError, "Internal Server Error", httperrors.ErrResourceAccessDenied}),
+				verificationFuncFailWrapper(authError{http.StatusForbidden, "Forbidden", httperrors.ErrEndpointAccessDenied}),
 			},
-			wantStatusCode: http.StatusFound,
-		},
-		{
-			name: "AnyAuth uses last succeeding middleware if multiple middlewares pass",
-			inputMiddlwares: []mux.MiddlewareFunc{
-				mwFailEveryRequest,
-				mwPassEveryRequest,
-				mwSucceedAfterDuration(time.Millisecond*25, http.StatusOK),
-				mwSucceedAfterDuration(time.Millisecond*50, http.StatusAccepted), // is used since latest succeeding middleware
-			},
-			wantStatusCode: http.StatusAccepted,
-		},
-		{
-			name: "AnyAuth uses first failing middleware if all middlewares fail",
-			inputMiddlwares: []mux.MiddlewareFunc{
-				mwFailEveryRequest, // is used since earliest failing middleware
-				mwFailAfterDuration(time.Millisecond*25, http.StatusUnauthorized),
-				mwFailAfterDuration(time.Millisecond*50, http.StatusForbidden),
-			},
-			wantStatusCode: http.StatusBadRequest,
+			wantStatusCode: http.StatusUnauthorized,
 		},
 	}
 
@@ -163,11 +103,65 @@ func Test_AnyAuth(t *testing.T) {
 			req := httptest.NewRequest(http.MethodGet, "/", nil)
 			rr := httptest.NewRecorder()
 
-			h := bouncer.AnyAuth(tt.inputMiddlwares, testHandler200)
+			h := bouncer.mwAnyAuth(tt.verificationMiddlwares, testHandler200)
 			h.ServeHTTP(rr, req)
 
 			is.Equal(tt.wantStatusCode, rr.Code, fmt.Sprintf("Status should be %d", tt.wantStatusCode))
 		})
+	}
+}
+
+func Test_extractBearerToken(t *testing.T) {
+	is := assert.New(t)
+
+	tt := []struct {
+		name               string
+		requestHeader      string
+		requestHeaderValue string
+		wantToken          string
+		doesError          bool
+	}{
+		{
+			name:               "missing request header",
+			requestHeader:      "",
+			requestHeaderValue: "",
+			wantToken:          "",
+			doesError:          true,
+		},
+		{
+			name:               "invalid authorization request header",
+			requestHeader:      "authorisation", // note: `s`
+			requestHeaderValue: "abc",
+			wantToken:          "",
+			doesError:          true,
+		},
+		{
+			name:               "valid authorization request header",
+			requestHeader:      "AUTHORIZATION",
+			requestHeaderValue: "abc",
+			wantToken:          "abc",
+			doesError:          false,
+		},
+		{
+			name:               "valid authorization request header case-insensitive canonical check",
+			requestHeader:      "authorization",
+			requestHeaderValue: "def",
+			wantToken:          "def",
+			doesError:          false,
+		},
+	}
+
+	for _, test := range tt {
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(test.requestHeader, test.requestHeaderValue)
+		apiKey, err := extractBearerToken(req)
+		is.Equal(test.wantToken, apiKey)
+		if test.doesError {
+			is.Error(err, "Should return error")
+			is.ErrorIs(err, httperrors.ErrUnauthorized)
+		} else {
+			is.NoError(err)
+		}
 	}
 }
 
