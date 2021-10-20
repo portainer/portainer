@@ -1325,7 +1325,7 @@ definitions:
         type: boolean
       AuthenticationMethod:
         description: 'Active authentication method for the Portainer instance. Valid
-          values are: 1 for boltdb, 2 for LDAP, or 3 for oauth'
+          values are: 1 for internal, 2 for LDAP, or 3 for oauth'
         example: 1
         type: integer
       BlackListedLabels:
@@ -2004,7 +2004,7 @@ definitions:
         type: boolean
       AuthenticationMethod:
         description: 'Active authentication method for the Portainer instance. Valid
-          values are: 1 for boltdb, 2 for LDAP, or 3 for oauth'
+          values are: 1 for internal, 2 for LDAP, or 3 for oauth'
         example: 1
         type: integer
       EnableEdgeComputeFeatures:
@@ -2069,7 +2069,7 @@ definitions:
         type: boolean
       authenticationMethod:
         description: 'Active authentication method for the Portainer instance. Valid
-          values are: 1 for boltdb, 2 for LDAP, or 3 for oauth'
+          values are: 1 for internal, 2 for LDAP, or 3 for oauth'
         example: 1
         type: integer
       blackListedLabels:

@@ -699,7 +699,7 @@ type (
 		LogoURL string `json:"LogoURL" example:"https://mycompany.mydomain.tld/logo.png"`
 		// A list of label name & value that will be used to hide containers when querying containers
 		BlackListedLabels []Pair `json:"BlackListedLabels"`
-		// Active authentication method for the Portainer instance. Valid values are: 1 for boltdb, 2 for LDAP, or 3 for oauth
+		// Active authentication method for the Portainer instance. Valid values are: 1 for internal, 2 for LDAP, or 3 for oauth
 		AuthenticationMethod AuthenticationMethod `json:"AuthenticationMethod" example:"1"`
 		LDAPSettings         LDAPSettings         `json:"LDAPSettings" example:""`
 		OAuthSettings        OAuthSettings        `json:"OAuthSettings" example:""`
@@ -1289,7 +1289,7 @@ const (
 
 const (
 	_ AuthenticationMethod = iota
-	// AuthenticationInternal represents the boltdb authentication method (authentication against Portainer API)
+	// AuthenticationInternal represents the internal authentication method (authentication against Portainer API)
 	AuthenticationInternal
 	// AuthenticationLDAP represents the LDAP authentication method (authentication against a LDAP server)
 	AuthenticationLDAP

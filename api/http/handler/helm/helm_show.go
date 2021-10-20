@@ -46,7 +46,7 @@ func (handler *Handler) helmShow(w http.ResponseWriter, r *http.Request) *httper
 	cmd, err := request.RetrieveRouteVariableValue(r, "command")
 	if err != nil {
 		cmd = "all"
-		log.Printf("[DEBUG] [boltdb,helm] [message: command not provided, defaulting to %s]", cmd)
+		log.Printf("[DEBUG] [internal,helm] [message: command not provided, defaulting to %s]", cmd)
 	}
 
 	showOptions := options.ShowOptions{
