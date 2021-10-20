@@ -25,7 +25,7 @@ export default class ThemeSettingsController {
   }
 
   setTheme(theme) {
-    if (theme === 'auto') {
+    if (theme === 'auto' || !theme) {
       this.ThemeManager.autoTheme();
     } else {
       this.ThemeManager.setTheme(theme);
@@ -39,7 +39,7 @@ export default class ThemeSettingsController {
         userId: null,
         userTheme: '',
         initTheme: '',
-        defaultTheme: 'light',
+        defaultTheme: 'auto',
         themeInProgress: false,
       };
 
