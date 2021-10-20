@@ -127,7 +127,7 @@ func (service *Service) startSnapshotLoop() error {
 	go func() {
 		err := service.snapshotEndpoints()
 		if err != nil {
-			log.Printf("[ERROR] [boltdb,snapshot] [message: background schedule error (environment snapshot).] [error: %s]", err)
+			log.Printf("[ERROR] [internal,snapshot] [message: background schedule error (environment snapshot).] [error: %s]", err)
 		}
 
 		for {
@@ -135,14 +135,14 @@ func (service *Service) startSnapshotLoop() error {
 			case <-ticker.C:
 				err := service.snapshotEndpoints()
 				if err != nil {
-					log.Printf("[ERROR] [boltdb,snapshot] [message: background schedule error (environment snapshot).] [error: %s]", err)
+					log.Printf("[ERROR] [internal,snapshot] [message: background schedule error (environment snapshot).] [error: %s]", err)
 				}
 			case <-service.shutdownCtx.Done():
-				log.Println("[DEBUG] [boltdb,snapshot] [message: shutting down snapshotting]")
+				log.Println("[DEBUG] [internal,snapshot] [message: shutting down snapshotting]")
 				ticker.Stop()
 				return
 			case <-service.refreshSignal:
-				log.Println("[DEBUG] [boltdb,snapshot] [message: shutting down snapshotting]")
+				log.Println("[DEBUG] [internal,snapshot] [message: shutting down snapshotting]")
 				ticker.Stop()
 				return
 			}
