@@ -41,7 +41,7 @@ func NewTestStore(init bool) (*Store, func(), error) {
 		return nil, nil, err
 	}
 
-	connection, err := database.NewDatabase(storePath)
+	connection, err := database.NewDatabase("boltdb", storePath)
 	if err != nil {
 		panic(err)
 	}
