@@ -3,7 +3,7 @@ package migrator
 import "github.com/portainer/portainer/api/dataservices"
 
 func (m *Migrator) migrateDBVersionToDB34() error {
-	err := migrateStackEntryPoint(m.stackService)
+	err := MigrateStackEntryPoint(m.stackService)
 	if err != nil {
 		return err
 	}
@@ -11,7 +11,8 @@ func (m *Migrator) migrateDBVersionToDB34() error {
 	return nil
 }
 
-func migrateStackEntryPoint(stackService dataservices.StackService) error {
+// MigrateStackEntryPoint exported for testing (blah.)
+func MigrateStackEntryPoint(stackService dataservices.StackService) error {
 	stacks, err := stackService.Stacks()
 	if err != nil {
 		return err
