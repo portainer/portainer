@@ -71,7 +71,7 @@ func TestMigrateSettings(t *testing.T) {
 		FileService:             store.fileService,
 		DockerhubService:        store.DockerHubService,
 		AuthorizationService:    authorization.NewService(store),
-	}, store.connection)
+	})
 	if err := m.MigrateSettingsToDB30(); err != nil {
 		t.Errorf("failed to update settings: %v", err)
 	}

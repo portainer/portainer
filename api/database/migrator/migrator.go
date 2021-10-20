@@ -1,9 +1,7 @@
 package migrator
 
 import (
-	"github.com/boltdb/bolt"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/database/boltdb"
 	plog "github.com/portainer/portainer/api/database/log"
 	"github.com/portainer/portainer/api/dataservices/dockerhub"
 	"github.com/portainer/portainer/api/dataservices/endpoint"
@@ -28,7 +26,6 @@ var migrateLog = plog.NewScopedLog("database, migrate")
 type (
 	// Migrator defines a service to migrate data after a Portainer version update.
 	Migrator struct {
-		db               *bolt.DB
 		currentDBVersion int
 
 		endpointGroupService    *endpointgroup.Service
@@ -55,9 +52,8 @@ type (
 )
 
 // NewMigrator creates a new Migrator.
-func NewMigrator(parameters *MigratorParameters, connection portainer.Connection) *Migrator {
+func NewMigrator(parameters *MigratorParameters) *Migrator {
 	return &Migrator{
-		db:                      connection.(*boltdb.DbConnection).DB,
 		currentDBVersion:        parameters.DatabaseVersion,
 		endpointGroupService:    parameters.EndpointGroupService,
 		endpointService:         parameters.EndpointService,
