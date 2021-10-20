@@ -23,6 +23,7 @@ func (store *Store) Init() error {
 		return err
 	}
 
+	// TODO: these need to also be applied when importing
 	_, err = store.SettingsService.Settings()
 	if store.IsErrObjectNotFound(err) {
 		defaultSettings := &portainer.Settings{
