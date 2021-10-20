@@ -16,9 +16,9 @@ import (
 // Handler is an http handler responsible for backup and restore portainer state
 type Handler struct {
 	*mux.Router
-	bouncer   *security.RequestBouncer
-	dataStore dataservices.DataStore
-	gate      *offlinegate.OfflineGate
+	bouncer         *security.RequestBouncer
+	dataStore       dataservices.DataStore
+	gate            *offlinegate.OfflineGate
 	filestorePath   string
 	shutdownTrigger context.CancelFunc
 	adminMonitor    *adminmonitor.Monitor

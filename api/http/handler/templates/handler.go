@@ -13,8 +13,8 @@ import (
 // Handler represents an HTTP API handler for managing templates.
 type Handler struct {
 	*mux.Router
-	DataStore  dataservices.DataStore
-	GitService portainer.GitService
+	DataStore   dataservices.DataStore
+	GitService  portainer.GitService
 	FileService portainer.FileService
 }
 

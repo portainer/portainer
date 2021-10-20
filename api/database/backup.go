@@ -66,6 +66,7 @@ type BackupOptions struct {
 	BackupFileName string
 	BackupPath     string
 }
+
 // getBackupRestoreOptions returns options to store db at common backup dir location; used by:
 // - db backup prior to version upgrade
 // - db rollback
