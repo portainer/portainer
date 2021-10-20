@@ -41,7 +41,7 @@ func NewTestStore(init bool) (*Store, func(), error) {
 	}
 
 	connection, err := NewDatabase(storePath, fileService)
-	if err !=nil {
+	if err != nil {
 		panic(err)
 	}
 	store := NewStore(storePath, fileService, connection)

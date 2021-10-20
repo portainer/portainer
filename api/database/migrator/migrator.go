@@ -104,4 +104,3 @@ type MigratorParameters struct {
 	AuthorizationService    *authorization.Service
 	DockerhubService        *dockerhub.Service
 }
-

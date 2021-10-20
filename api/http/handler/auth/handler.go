@@ -15,8 +15,8 @@ import (
 // Handler is the HTTP handler used to handle authentication operations.
 type Handler struct {
 	*mux.Router
-	DataStore     dataservices.DataStore
-	CryptoService portainer.CryptoService
+	DataStore                   dataservices.DataStore
+	CryptoService               portainer.CryptoService
 	JWTService                  portainer.JWTService
 	LDAPService                 portainer.LDAPService
 	OAuthService                portainer.OAuthService

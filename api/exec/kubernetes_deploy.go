@@ -20,9 +20,9 @@ import (
 
 // KubernetesDeployer represents a service to deploy resources inside a Kubernetes environment(endpoint).
 type KubernetesDeployer struct {
-	binaryPath           string
-	dataStore            dataservices.DataStore
-	reverseTunnelService portainer.ReverseTunnelService
+	binaryPath                  string
+	dataStore                   dataservices.DataStore
+	reverseTunnelService        portainer.ReverseTunnelService
 	signatureService            portainer.DigitalSignatureService
 	kubernetesClientFactory     *cli.ClientFactory
 	kubernetesTokenCacheManager *kubernetes.TokenCacheManager

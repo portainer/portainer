@@ -29,18 +29,18 @@ type (
 	// interception of requests and rewriting of responses.
 	Transport struct {
 		HTTPTransport        *http.Transport
-		endpoint         *portainer.Endpoint
-		dataStore        dataservices.DataStore
-		signatureService portainer.DigitalSignatureService
+		endpoint             *portainer.Endpoint
+		dataStore            dataservices.DataStore
+		signatureService     portainer.DigitalSignatureService
 		reverseTunnelService portainer.ReverseTunnelService
 		dockerClientFactory  *docker.ClientFactory
 	}
 
 	// TransportParameters is used to create a new Transport
 	TransportParameters struct {
-		Endpoint         *portainer.Endpoint
-		DataStore        dataservices.DataStore
-		SignatureService portainer.DigitalSignatureService
+		Endpoint             *portainer.Endpoint
+		DataStore            dataservices.DataStore
+		SignatureService     portainer.DigitalSignatureService
 		ReverseTunnelService portainer.ReverseTunnelService
 		DockerClientFactory  *docker.ClientFactory
 	}

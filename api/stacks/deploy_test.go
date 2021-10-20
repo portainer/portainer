@@ -187,7 +187,7 @@ func Test_getUserRegistries(t *testing.T) {
 	})
 
 	registryReachableByUser := portainer.Registry{
-		ID: 1,
+		ID:   1,
 		Name: "registryReachableByUser",
 		RegistryAccesses: portainer.RegistryAccesses{
 			portainer.EndpointID(endpointID): {
@@ -201,7 +201,7 @@ func Test_getUserRegistries(t *testing.T) {
 	assert.NoError(t, err, "couldn't create a registry")
 
 	registryReachableByTeam := portainer.Registry{
-		ID: 2,
+		ID:   2,
 		Name: "registryReachableByTeam",
 		RegistryAccesses: portainer.RegistryAccesses{
 			portainer.EndpointID(endpointID): {
@@ -215,7 +215,7 @@ func Test_getUserRegistries(t *testing.T) {
 	assert.NoError(t, err, "couldn't create a registry")
 
 	registryRestricted := portainer.Registry{
-		ID: 3,
+		ID:   3,
 		Name: "registryRestricted",
 		RegistryAccesses: portainer.RegistryAccesses{
 			portainer.EndpointID(endpointID): {

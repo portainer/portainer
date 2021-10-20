@@ -12,9 +12,9 @@ import (
 var logFatalf = log.Fatalf
 
 type Monitor struct {
-	timeout     time.Duration
-	datastore   dataservices.DataStore
-	shutdownCtx context.Context
+	timeout          time.Duration
+	datastore        dataservices.DataStore
+	shutdownCtx      context.Context
 	cancellationFunc context.CancelFunc
 }
 

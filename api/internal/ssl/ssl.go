@@ -15,9 +15,9 @@ import (
 
 // Service represents a service to manage SSL certificates
 type Service struct {
-	fileService portainer.FileService
-	dataStore   dataservices.DataStore
-	rawCert     *tls.Certificate
+	fileService     portainer.FileService
+	dataStore       dataservices.DataStore
+	rawCert         *tls.Certificate
 	shutdownTrigger context.CancelFunc
 }
 

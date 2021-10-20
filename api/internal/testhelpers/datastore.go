@@ -32,13 +32,13 @@ type testDatastore struct {
 	webhook            dataservices.WebhookService
 }
 
-func (d *testDatastore) BackupTo(io.Writer) error                        { return nil }
-func (d *testDatastore) Open() error                                     { return nil }
-func (d *testDatastore) Init() error                                     { return nil }
-func (d *testDatastore) Close() error                                    { return nil }
-func (d *testDatastore) CheckCurrentEdition() error                      { return nil }
-func (d *testDatastore) IsNew() bool                                     { return false }
-func (d *testDatastore) MigrateData(force bool) error                    { return nil }
+func (d *testDatastore) BackupTo(io.Writer) error                           { return nil }
+func (d *testDatastore) Open() error                                        { return nil }
+func (d *testDatastore) Init() error                                        { return nil }
+func (d *testDatastore) Close() error                                       { return nil }
+func (d *testDatastore) CheckCurrentEdition() error                         { return nil }
+func (d *testDatastore) IsNew() bool                                        { return false }
+func (d *testDatastore) MigrateData(force bool) error                       { return nil }
 func (d *testDatastore) Rollback(force bool) error                          { return nil }
 func (d *testDatastore) CustomTemplate() dataservices.CustomTemplateService { return d.customTemplate }
 func (d *testDatastore) EdgeGroup() dataservices.EdgeGroupService           { return d.edgeGroup }
@@ -46,12 +46,16 @@ func (d *testDatastore) EdgeJob() dataservices.EdgeJobService               { re
 func (d *testDatastore) EdgeStack() dataservices.EdgeStackService           { return d.edgeStack }
 func (d *testDatastore) Endpoint() dataservices.EndpointService             { return d.endpoint }
 func (d *testDatastore) EndpointGroup() dataservices.EndpointGroupService   { return d.endpointGroup }
-func (d *testDatastore) EndpointRelation() dataservices.EndpointRelationService { return d.endpointRelation }
+func (d *testDatastore) EndpointRelation() dataservices.EndpointRelationService {
+	return d.endpointRelation
+}
 func (d *testDatastore) HelmUserRepository() dataservices.HelmUserRepositoryService {
 	return d.helmUserRepository
 }
-func (d *testDatastore) Registry() dataservices.RegistryService             { return d.registry }
-func (d *testDatastore) ResourceControl() dataservices.ResourceControlService { return d.resourceControl }
+func (d *testDatastore) Registry() dataservices.RegistryService { return d.registry }
+func (d *testDatastore) ResourceControl() dataservices.ResourceControlService {
+	return d.resourceControl
+}
 func (d *testDatastore) Role() dataservices.RoleService                     { return d.role }
 func (d *testDatastore) Settings() dataservices.SettingsService             { return d.settings }
 func (d *testDatastore) SSLSettings() dataservices.SSLSettingsService       { return d.sslSettings }

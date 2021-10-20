@@ -73,9 +73,9 @@ type Server struct {
 	CryptoService               portainer.CryptoService
 	SignatureService            portainer.DigitalSignatureService
 	SnapshotService             portainer.SnapshotService
-	FileService portainer.FileService
-	DataStore   dataservices.DataStore
-	GitService  portainer.GitService
+	FileService                 portainer.FileService
+	DataStore                   dataservices.DataStore
+	GitService                  portainer.GitService
 	JWTService                  portainer.JWTService
 	LDAPService                 portainer.LDAPService
 	OAuthService                portainer.OAuthService

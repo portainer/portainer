@@ -25,9 +25,9 @@ type requestBouncer interface {
 // Handler is the HTTP handler used to handle environment(endpoint) group operations.
 type Handler struct {
 	*mux.Router
-	requestBouncer    requestBouncer
-	dataStore         dataservices.DataStore
-	kubeConfigService kubernetes.KubeConfigService
+	requestBouncer     requestBouncer
+	dataStore          dataservices.DataStore
+	kubeConfigService  kubernetes.KubeConfigService
 	kubernetesDeployer portainer.KubernetesDeployer
 	helmPackageManager libhelm.HelmPackageManager
 }

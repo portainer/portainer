@@ -22,9 +22,9 @@ type (
 		credentials *portainer.AzureCredentials
 		client      *client.HTTPClient
 		token       *azureAPIToken
-		mutex     sync.Mutex
-		dataStore dataservices.DataStore
-		endpoint  *portainer.Endpoint
+		mutex       sync.Mutex
+		dataStore   dataservices.DataStore
+		endpoint    *portainer.Endpoint
 	}
 
 	azureRequestContext struct {

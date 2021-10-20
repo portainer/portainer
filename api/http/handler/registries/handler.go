@@ -23,9 +23,9 @@ func hideFields(registry *portainer.Registry, hideAccesses bool) {
 // Handler is the HTTP handler used to handle registry operations.
 type Handler struct {
 	*mux.Router
-	requestBouncer *security.RequestBouncer
-	DataStore      dataservices.DataStore
-	FileService    portainer.FileService
+	requestBouncer   *security.RequestBouncer
+	DataStore        dataservices.DataStore
+	FileService      portainer.FileService
 	ProxyManager     *proxy.Manager
 	K8sClientFactory *cli.ClientFactory
 }

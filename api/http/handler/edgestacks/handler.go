@@ -16,9 +16,9 @@ import (
 // Handler is the HTTP handler used to handle environment(endpoint) group operations.
 type Handler struct {
 	*mux.Router
-	requestBouncer *security.RequestBouncer
-	DataStore      dataservices.DataStore
-	FileService    portainer.FileService
+	requestBouncer     *security.RequestBouncer
+	DataStore          dataservices.DataStore
+	FileService        portainer.FileService
 	GitService         portainer.GitService
 	KubernetesDeployer portainer.KubernetesDeployer
 }

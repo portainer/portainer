@@ -14,8 +14,8 @@ import (
 // It provides an interface to start background snapshots as well as
 // specific Docker/Kubernetes environment(endpoint) snapshot methods.
 type Service struct {
-	dataStore     dataservices.DataStore
-	refreshSignal chan struct{}
+	dataStore                 dataservices.DataStore
+	refreshSignal             chan struct{}
 	snapshotIntervalInSeconds float64
 	dockerSnapshotter         portainer.DockerSnapshotter
 	kubernetesSnapshotter     portainer.KubernetesSnapshotter
