@@ -166,6 +166,6 @@ func (service *Service) generateSelfSignedCertificates(ip, certPath, keyPath str
 		return errors.New("host can't be empty")
 	}
 
-	log.Printf("[INFO] [boltdb,ssl] [message: no cert files found, generating self signed ssl certificates]")
+	log.Printf("[INFO] [internal,ssl] [message: no cert files found, generating self signed ssl certificates]")
 	return libcrypto.GenerateCertsForHost("localhost", ip, certPath, keyPath, time.Now().AddDate(5, 0, 0))
 }
