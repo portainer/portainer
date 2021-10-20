@@ -1,12 +1,11 @@
-package database
+package datastore
 
 import (
 	"fmt"
+	plog "github.com/portainer/portainer/api/datastore/log"
 	"os"
 	"path"
 	"time"
-
-	plog "github.com/portainer/portainer/api/database/log"
 )
 
 var backupDefaults = struct {

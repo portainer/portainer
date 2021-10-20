@@ -7,12 +7,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/portainer/portainer/api/database"
-
 	"github.com/portainer/libhelm/binary/test"
 	"github.com/portainer/libhelm/options"
 	"github.com/portainer/libhelm/release"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/exec/exectest"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/jwt"
@@ -25,7 +24,7 @@ import (
 func Test_helmList(t *testing.T) {
 	is := assert.New(t)
 
-	store, teardown := database.MustNewTestStore(true)
+	store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	err := store.Endpoint().Create(&portainer.Endpoint{ID: 1})

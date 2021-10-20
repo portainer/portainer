@@ -6,8 +6,8 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/cli"
-	"github.com/portainer/portainer/api/database"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/datastore"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -21,7 +21,7 @@ func (m mockKingpinSetting) SetValue(value kingpin.Value) {
 func Test_enableFeaturesFromFlags(t *testing.T) {
 	is := assert.New(t)
 
-	store, teardown := database.MustNewTestStore(true)
+	store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	tests := []struct {
@@ -81,7 +81,7 @@ func Test_optionalFeature(t *testing.T) {
 
 	is := assert.New(t)
 
-	store, teardown := database.MustNewTestStore(true)
+	store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	// Enable the test feature

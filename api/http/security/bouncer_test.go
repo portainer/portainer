@@ -8,8 +8,8 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/apikey"
-	"github.com/portainer/portainer/api/database"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/datastore"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/jwt"
 	"github.com/stretchr/testify/assert"
@@ -36,7 +36,7 @@ func tokenLookupFail(r *http.Request) *portainer.TokenData {
 func Test_mwAuthenticateFirst(t *testing.T) {
 	is := assert.New(t)
 
-	store, teardown := database.MustNewTestStore(true)
+	store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	jwtService, err := jwt.NewService("1h", store)
@@ -259,7 +259,7 @@ func Test_extractAPIKeyQueryParam(t *testing.T) {
 func Test_apiKeyLookup(t *testing.T) {
 	is := assert.New(t)
 
-	store, teardown := database.MustNewTestStore(true)
+	store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	// create standard user
