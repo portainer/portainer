@@ -71,7 +71,7 @@ func (store *Store) FailSafeMigrate(migrator *migrator.Migrator) (err error) {
 // This process is only triggered on an existing database, not if the database was just created.
 // if force is true, then migrate regardless.
 func (store *Store) connectionMigrateData(migratorParams *migrator.MigratorParameters, force bool) error {
-	migrator := migrator.NewMigrator(migratorParams, store.connection)
+	migrator := migrator.NewMigrator(migratorParams)
 
 	// backup db file before upgrading DB to support rollback
 	isUpdating, err := migratorParams.VersionService.IsUpdating()
