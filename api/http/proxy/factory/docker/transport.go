@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -125,6 +126,14 @@ func (transport *Transport) ProxyDockerRequest(request *http.Request) (*http.Res
 }
 
 func (transport *Transport) executeDockerRequest(request *http.Request) (*http.Response, error) {
+
+	//var body []byte
+	_, err := utils.CopyBody(request)
+	if err != nil {
+		logrus.WithError(err).Debugf("[docker transport] failed parsing body")
+	}
+	//body = bodyBytes
+
 	response, err := transport.HTTPTransport.RoundTrip(request)
 
 	if transport.endpoint.Type != portainer.EdgeAgentOnDockerEnvironment {

@@ -7,6 +7,23 @@ import (
 	"strconv"
 )
 
+func CopyBody(request *http.Request) ([]byte, error) {
+	if request.Body == nil {
+		return nil, nil
+	}
+
+	bodyBytes, err := ioutil.ReadAll(request.Body)
+	if err != nil {
+		return nil, nil
+	}
+
+	request.Body.Close()
+	// recreate body to pass to actual request handler
+	request.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+
+	return bodyBytes, nil
+}
+
 // GetRequestAsMap returns the response content as a generic JSON object
 func GetRequestAsMap(request *http.Request) (map[string]interface{}, error) {
 	data, err := getRequestBody(request)
