@@ -27,15 +27,8 @@ type (
 		UserMemberships []portainer.TeamMembership
 	}
 
-	// authError is the error struct that captures data to populate the http.WriteError in the caller
-	authError struct {
-		statusCode int
-		message    string
-		err        error
-	}
-
-	// verificationFunc is the function signature for any auth based functions
-	verificationFunc func(*http.Request) (*portainer.TokenData, *authError)
+	// tokenLookup looks up a token in the request
+	tokenLookup func(*http.Request) *portainer.TokenData
 )
 
 const apiKeyHeader = "X-API-KEY"
@@ -140,15 +133,13 @@ func (bouncer *RequestBouncer) AuthorizedEdgeEndpointOperation(r *http.Request, 
 	return nil
 }
 
-// handlers are applied backwards to the incoming request:
-// - add secure handlers to the response
-// - parse the JWT token and put it into the http context.
+// mwAuthenticatedUser authenticates a request by
+// - adding a secure handlers to the response
+// - authenticating the request with a valid token
 func (bouncer *RequestBouncer) mwAuthenticatedUser(h http.Handler) http.Handler {
-	// Use mwAnyAuth middleware to support multiple auth paradigms
-	// currently supported auth: JWT Auth, API-Key Auth
-	h = bouncer.mwAnyAuth([]verificationFunc{
-		bouncer.processJWTAuth,
-		bouncer.processAPIKeyAuth,
+	h = bouncer.mwAuthenticateFirst([]tokenLookup{
+		bouncer.jwtAuthLookup,
+		bouncer.apiKeyLookup,
 	}, h)
 	h = mwSecureHeaders(h)
 	return h
@@ -210,64 +201,58 @@ func (bouncer *RequestBouncer) mwUpgradeToRestrictedRequest(next http.Handler) h
 	})
 }
 
-// mwAnyAuth provides middleware for to support multiple auth paradigms.
-// If any of the verificationFunc's in the list passes, the last passing function will be used to process the request.
-func (bouncer *RequestBouncer) mwAnyAuth(tokenFetchers []verificationFunc, next http.Handler) http.Handler {
+// mwAuthenticateFirst authenticates a request an auth token.
+// A result of a first succeded token lookup would be used for the authentication.
+func (bouncer *RequestBouncer) mwAuthenticateFirst(tokenLookups []tokenLookup, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		tokenData := &portainer.TokenData{}
-		finalAuthError := &authError{http.StatusUnauthorized, "Unauthorized", httperrors.ErrUnauthorized}
+		var token *portainer.TokenData
 
-		for _, tokenFetcher := range tokenFetchers {
-			token, authErr := tokenFetcher(r)
-			if authErr != nil {
-				finalAuthError = authErr
-			}
+		for _, lookup := range tokenLookups {
+			token = lookup(r)
+
 			if token != nil {
-				tokenData = token
+				break
 			}
 		}
 
-		if (tokenData == &portainer.TokenData{}) {
-			httperror.WriteError(w, finalAuthError.statusCode, finalAuthError.message, finalAuthError.err)
+		if token == nil {
+			httperror.WriteError(w, http.StatusUnauthorized, "A valid authorisation token is missing", httperrors.ErrUnauthorized)
 			return
 		}
 
-		user, _ := bouncer.dataStore.User().User(tokenData.ID)
+		user, _ := bouncer.dataStore.User().User(token.ID)
 		if user == nil {
-			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", httperrors.ErrUnauthorized)
+			httperror.WriteError(w, http.StatusUnauthorized, "An authorisation token is invalid", httperrors.ErrUnauthorized)
 			return
 		}
 
-		ctx := StoreTokenData(r, tokenData)
+		ctx := StoreTokenData(r, token)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
-// processJWTAuth provides JWT authentication checks for the request.
-// processJWTAuth parses the JWT token from request `Authorization` header and returns the token data
-func (bouncer *RequestBouncer) processJWTAuth(r *http.Request) (*portainer.TokenData, *authError) {
+// jwtAuthLookup looks up a valid bearer in the request.
+func (bouncer *RequestBouncer) jwtAuthLookup(r *http.Request) *portainer.TokenData {
 	// get token from the Authorization header or query parameter
 	token, err := extractBearerToken(r)
 	if err != nil {
-		return nil, &authError{http.StatusUnauthorized, "Unauthorized", err}
+		return nil
 	}
 
 	tokenData, err := bouncer.jwtService.ParseAndVerifyToken(token)
 	if err != nil {
-		return nil, &authError{http.StatusUnauthorized, "Invalid JWT token", err}
+		return nil
 	}
 
-	return tokenData, nil
+	return tokenData
 }
 
-// processAPIKeyAuth provides api-key authentication checks for the request.
-// It parses the api-key from request `X-API-KEY` header and uses it to generate the
-// respective user's portainer token data.
-func (bouncer *RequestBouncer) processAPIKeyAuth(r *http.Request) (*portainer.TokenData, *authError) {
+// apiKeyLookup looks up an api key and token in the request.
+func (bouncer *RequestBouncer) apiKeyLookup(r *http.Request) *portainer.TokenData {
 	// get api-key from the request header
-	_, err := extractAPIKey(r)
-	if err != nil {
-		return nil, &authError{http.StatusUnauthorized, "Unauthorized", err}
+	_, ok := extractAPIKey(r)
+	if !ok {
+		return nil
 	}
 
 	// TODO: hash API-Key
@@ -278,7 +263,7 @@ func (bouncer *RequestBouncer) processAPIKeyAuth(r *http.Request) (*portainer.To
 
 	var tokenData *portainer.TokenData
 
-	return tokenData, nil
+	return tokenData
 }
 
 // extractBearerToken extracts the Bearer token from the request header or query parameter and returns the token.
@@ -298,17 +283,14 @@ func extractBearerToken(r *http.Request) (string, error) {
 	return token, nil
 }
 
-// extractAPIKey extracts the api key from the `X-API-KEY` request header (if present).
-func extractAPIKey(r *http.Request) (string, error) {
-	var apiKey string
-	apiKeys, ok := r.Header[http.CanonicalHeaderKey(apiKeyHeader)]
-	if ok {
-		apiKey = apiKeys[0]
+// extractAPIKey extracts the api key from the api key request header (if present).
+func extractAPIKey(r *http.Request) (apikey string, ok bool) {
+	apikey = r.Header.Get(apiKeyHeader)
+	if apikey == "" {
+		return
 	}
-	if apiKey == "" {
-		return "", httperrors.ErrUnauthorized
-	}
-	return apiKey, nil
+
+	return apikey, true
 }
 
 // mwSecureHeaders provides secure headers middleware for handlers.

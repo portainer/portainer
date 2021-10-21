@@ -18,26 +18,20 @@ var testHandler200 = http.HandlerFunc(func(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusOK)
 })
 
-func verificationFuncSucceedWrapper(dataStore portainer.DataStore, jwtService portainer.JWTService) verificationFunc {
-	return func(r *http.Request) (*portainer.TokenData, *authError) {
+func tokenLookupSucceed(dataStore portainer.DataStore, jwtService portainer.JWTService) tokenLookup {
+	return func(r *http.Request) *portainer.TokenData {
 		uid := portainer.UserID(1)
 		dataStore.User().CreateUser(&portainer.User{ID: uid})
 		jwtService.GenerateToken(&portainer.TokenData{ID: uid})
-		return &portainer.TokenData{ID: 1}, nil
+		return &portainer.TokenData{ID: 1}
 	}
 }
 
-func verificationFuncFailWrapper(authErr authError) verificationFunc {
-	return func(r *http.Request) (*portainer.TokenData, *authError) {
-		return nil, &authErr
-	}
+func tokenLookupFail(r *http.Request) *portainer.TokenData {
+	return nil
 }
 
-func verificationFuncFail(r *http.Request) (*portainer.TokenData, *authError) {
-	return nil, &authError{statusCode: http.StatusUnauthorized, message: "Unauthorized", err: httperrors.ErrUnauthorized}
-}
-
-func Test_mwAnyAuth(t *testing.T) {
+func Test_mwAuthenticateFirst(t *testing.T) {
 	is := assert.New(t)
 
 	store, teardown := bolt.MustNewTestStore(true)
@@ -50,51 +44,43 @@ func Test_mwAnyAuth(t *testing.T) {
 
 	tests := []struct {
 		name                   string
-		verificationMiddlwares []verificationFunc
+		verificationMiddlwares []tokenLookup
 		wantStatusCode         int
 	}{
 		{
-			name:                   "mwAnyAuth middleware passes with no middleware",
+			name:                   "mwAuthenticateFirst middleware passes with no middleware",
 			verificationMiddlwares: nil,
 			wantStatusCode:         http.StatusUnauthorized,
 		},
 		{
-			name: "mwAnyAuth middleware succeeds with passing middleware",
-			verificationMiddlwares: []verificationFunc{
-				verificationFuncSucceedWrapper(store, jwtService),
+			name: "mwAuthenticateFirst middleware succeeds with passing middleware",
+			verificationMiddlwares: []tokenLookup{
+				tokenLookupSucceed(store, jwtService),
 			},
 			wantStatusCode: http.StatusOK,
 		},
 		{
-			name: "mwAnyAuth fails with failing middleware",
-			verificationMiddlwares: []verificationFunc{
-				verificationFuncFail,
+			name: "mwAuthenticateFirst fails with failing middleware",
+			verificationMiddlwares: []tokenLookup{
+				tokenLookupFail,
 			},
 			wantStatusCode: http.StatusUnauthorized,
 		},
 		{
-			name: "mwAnyAuth succeeds if first middleware successfully handles request",
-			verificationMiddlwares: []verificationFunc{
-				verificationFuncSucceedWrapper(store, jwtService),
-				verificationFuncFail,
+			name: "mwAuthenticateFirst succeeds if first middleware successfully handles request",
+			verificationMiddlwares: []tokenLookup{
+				tokenLookupSucceed(store, jwtService),
+				tokenLookupFail,
 			},
 			wantStatusCode: http.StatusOK,
 		},
 		{
-			name: "mwAnyAuth succeeds if last middleware successfully handles request",
-			verificationMiddlwares: []verificationFunc{
-				verificationFuncFail,
-				verificationFuncSucceedWrapper(store, jwtService),
+			name: "mwAuthenticateFirst succeeds if last middleware successfully handles request",
+			verificationMiddlwares: []tokenLookup{
+				tokenLookupFail,
+				tokenLookupSucceed(store, jwtService),
 			},
 			wantStatusCode: http.StatusOK,
-		},
-		{
-			name: "mwAnyAuth returns unauthorized if all middlewares fail",
-			verificationMiddlwares: []verificationFunc{
-				verificationFuncFailWrapper(authError{http.StatusInternalServerError, "Internal Server Error", httperrors.ErrResourceAccessDenied}),
-				verificationFuncFailWrapper(authError{http.StatusForbidden, "Forbidden", httperrors.ErrEndpointAccessDenied}),
-			},
-			wantStatusCode: http.StatusUnauthorized,
 		},
 	}
 
@@ -103,7 +89,7 @@ func Test_mwAnyAuth(t *testing.T) {
 			req := httptest.NewRequest(http.MethodGet, "/", nil)
 			rr := httptest.NewRecorder()
 
-			h := bouncer.mwAnyAuth(tt.verificationMiddlwares, testHandler200)
+			h := bouncer.mwAuthenticateFirst(tt.verificationMiddlwares, testHandler200)
 			h.ServeHTTP(rr, req)
 
 			is.Equal(tt.wantStatusCode, rr.Code, fmt.Sprintf("Status should be %d", tt.wantStatusCode))
@@ -173,48 +159,43 @@ func Test_extractAPIKey(t *testing.T) {
 		requestHeader      string
 		requestHeaderValue string
 		wantApiKey         string
-		doesError          bool
+		succeeds           bool
 	}{
 		{
 			name:               "missing request header",
 			requestHeader:      "",
 			requestHeaderValue: "",
 			wantApiKey:         "",
-			doesError:          true,
+			succeeds:           false,
 		},
 		{
 			name:               "invalid api-key request header",
 			requestHeader:      "api-key",
 			requestHeaderValue: "abc",
 			wantApiKey:         "",
-			doesError:          true,
+			succeeds:           false,
 		},
 		{
 			name:               "valid api-key request header",
-			requestHeader:      "X-API-KEY",
+			requestHeader:      apiKeyHeader,
 			requestHeaderValue: "abc",
 			wantApiKey:         "abc",
-			doesError:          false,
+			succeeds:           true,
 		},
 		{
 			name:               "valid api-key request header case-insensitive canonical check",
 			requestHeader:      "x-api-key",
 			requestHeaderValue: "def",
 			wantApiKey:         "def",
-			doesError:          false,
+			succeeds:           true,
 		},
 	}
 
 	for _, test := range tt {
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
 		req.Header.Set(test.requestHeader, test.requestHeaderValue)
-		apiKey, err := extractAPIKey(req)
+		apiKey, ok := extractAPIKey(req)
 		is.Equal(test.wantApiKey, apiKey)
-		if test.doesError {
-			is.Error(err, "Should return error")
-			is.ErrorIs(err, httperrors.ErrUnauthorized)
-		} else {
-			is.NoError(err)
-		}
+		is.Equal(test.succeeds, ok)
 	}
 }
