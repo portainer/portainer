@@ -12,6 +12,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
   'HttpRequestHelper',
   'LocalStorage',
   'CONSOLE_COMMANDS_LABEL_PREFIX',
+  '$browser',
   function (
     $scope,
     $transition$,
@@ -23,7 +24,8 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
     ExecService,
     HttpRequestHelper,
     LocalStorage,
-    CONSOLE_COMMANDS_LABEL_PREFIX
+    CONSOLE_COMMANDS_LABEL_PREFIX,
+    $browser
   ) {
     var socket, term;
 
@@ -69,7 +71,8 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
           };
 
           var url =
-            window.location.href.split('#')[0] +
+            window.location.origin +
+            $browser.baseHref() +
             'api/websocket/attach?' +
             Object.keys(params)
               .map((k) => k + '=' + params[k])
@@ -109,8 +112,8 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
           };
 
           var url =
-            window.location.href.split('#')[0] +
-            'api/websocket/exec?' +
+            window.location.origin +
+            $browser.baseHref() +
             Object.keys(params)
               .map((k) => k + '=' + params[k])
               .join('&');

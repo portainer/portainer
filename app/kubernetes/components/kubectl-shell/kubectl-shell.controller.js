@@ -92,7 +92,7 @@ export default class KubectlShellController {
     };
 
     const wsProtocol = this.$window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-    const path = this.$browser.baseHref() + '/api/websocket/kubernetes-shell';
+    const path = this.$browser.baseHref() + 'api/websocket/kubernetes-shell';
     const queryParams = Object.entries(params)
       .map(([k, v]) => `${k}=${v}`)
       .join('&');

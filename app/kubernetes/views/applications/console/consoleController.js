@@ -3,13 +3,14 @@ import { Terminal } from 'xterm';
 
 class KubernetesApplicationConsoleController {
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesApplicationService, EndpointProvider, LocalStorage) {
+  constructor($async, $state, Notifications, KubernetesApplicationService, EndpointProvider, LocalStorage, $browser) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.EndpointProvider = EndpointProvider;
     this.LocalStorage = LocalStorage;
+    this.$browser = $browser;
 
     this.onInit = this.onInit.bind(this);
   }
@@ -59,7 +60,8 @@ class KubernetesApplicationConsoleController {
     };
 
     let url =
-      window.location.href.split('#')[0] +
+      window.location.origin +
+      this.$browser.baseHref() +
       'api/websocket/pod?' +
       Object.keys(params)
         .map((k) => k + '=' + params[k])
