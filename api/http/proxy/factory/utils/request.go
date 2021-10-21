@@ -7,6 +7,7 @@ import (
 	"strconv"
 )
 
+// CopyBody copies the request body and recreates it
 func CopyBody(request *http.Request) ([]byte, error) {
 	if request.Body == nil {
 		return nil, nil

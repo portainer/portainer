@@ -385,11 +385,13 @@ func (transport *Transport) proxyImageRequest(request *http.Request) (*http.Resp
 	switch requestPath := request.URL.Path; requestPath {
 	case "/images/create":
 		return transport.replaceRegistryAuthenticationHeader(request)
+	case "/images/load":
+		_, _ = utils.CopyBody(request)
+		fallthrough
 	default:
 		if path.Base(requestPath) == "push" && request.Method == http.MethodPost {
 			return transport.replaceRegistryAuthenticationHeader(request)
 		}
-		_, _ = utils.CopyBody(request)
 		return transport.executeDockerRequest(request)
 	}
 }
