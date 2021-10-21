@@ -12,6 +12,17 @@
         <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.snapshotAction()" data-cy="home-refreshEndpointsButton">
           <i class="fa fa-sync space-right" aria-hidden="true"></i>Refresh
         </button>
+        <button
+          ng-if="$ctrl.showKubeconfigButton()"
+          type="button"
+          class="btn btn-sm btn-primary"
+          ng-click="$ctrl.showKubeconfigModal()"
+          analytics-on
+          analytics-category="kubernetes"
+          analytics-event="kubernetes-kubectl-kubeconfig-multi"
+        >
+          <i class="fas fa-download space-right"></i> kubeconfig
+        </button>
       </div>
 
       <div class="searchBar">

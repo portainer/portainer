@@ -2,17 +2,42 @@ import angular from 'angular';
 
 class KubernetesConfigService {
   /* @ngInject */
-  constructor(KubernetesConfig, FileSaver) {
+  constructor(KubernetesConfig, FileSaver, Notifications, SettingsService) {
     this.KubernetesConfig = KubernetesConfig;
     this.FileSaver = FileSaver;
+    this.Notifications = Notifications;
+    this.SettingsService = SettingsService;
   }
 
-  async downloadConfig() {
-    const response = await this.KubernetesConfig.get();
-    const headers = response.headers();
-    const contentDispositionHeader = headers['content-disposition'];
-    const filename = contentDispositionHeader.replace('attachment;', '').trim();
-    return this.FileSaver.saveAs(response.data, filename);
+  async downloadKubeconfigFile(environmentIDs) {
+    try {
+      const response = await this.KubernetesConfig.get(environmentIDs);
+      const headers = response.headers();
+      const contentDispositionHeader = headers['content-disposition'];
+      const filename = contentDispositionHeader.replace('attachment;', '').trim();
+      return this.FileSaver.saveAs(response.data, filename);
+    } catch (e) {
+      this.Notifications.error('Failed downloading kubeconfig file', e);
+    }
+  }
+
+  async expiryMessage() {
+    const settings = await this.SettingsService.publicSettings();
+    const expiryDays = settings.KubeconfigExpiry;
+    const prefix = 'Kubeconfig file will ';
+    switch (expiryDays) {
+      case '0':
+        return prefix + 'not expire.';
+      case '24h':
+        return prefix + 'expire in 1 day.';
+      case '168h':
+        return prefix + 'expire in 7 days.';
+      case '720h':
+        return prefix + 'expire in 30 days.';
+      case '8640h':
+        return prefix + 'expire in 1 year.';
+    }
+    return '';
   }
 }
 

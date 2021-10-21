@@ -82,17 +82,20 @@ angular.module('portainer.app').factory('ModalService', [
       applyBoxCSS(box);
     }
 
-    function customPrompt(options, optionToggled) {
+    function customCheckboxPrompt(options) {
       var box = bootbox.prompt({
         title: options.title,
-        inputType: options.inputType,
+        inputType: 'checkbox',
         inputOptions: options.inputOptions,
         buttons: confirmButtons(options),
         callback: options.callback,
       });
       applyBoxCSS(box);
       box.find('.bootbox-body').prepend('<p>' + options.message + '</p>');
-      box.find('.bootbox-input-checkbox').prop('checked', optionToggled);
+      box.find('.bootbox-input-checkbox').prop('checked', options.optionToggled);
+      if (options.showCheck) {
+        box.find('.bootbox-input-checkbox').addClass('visible');
+      }
     }
 
     service.confirmAccessControlUpdate = function (callback) {
@@ -231,28 +234,25 @@ angular.module('portainer.app').factory('ModalService', [
     };
 
     service.confirmContainerRecreation = function (callback) {
-      customPrompt(
-        {
-          title: 'Are you sure?',
-          message:
-            "You're about to re-create this container, any non-persisted data will be lost. This container will be removed and another one will be created using the same configuration.",
-          inputType: 'checkbox',
-          inputOptions: [
-            {
-              text: 'Pull latest image<i></i>',
-              value: '1',
-            },
-          ],
-          buttons: {
-            confirm: {
-              label: 'Recreate',
-              className: 'btn-danger',
-            },
+      customCheckboxPrompt({
+        title: 'Are you sure?',
+        message:
+          "You're about to re-create this container, any non-persisted data will be lost. This container will be removed and another one will be created using the same configuration.",
+        inputOptions: [
+          {
+            text: 'Pull latest image<i></i>',
+            value: '1',
           },
-          callback: callback,
+        ],
+        buttons: {
+          confirm: {
+            label: 'Recreate',
+            className: 'btn-danger',
+          },
         },
-        false
-      );
+        callback: callback,
+        optionToggled: false,
+      });
     };
 
     service.confirmEndpointSnapshot = function (callback) {
@@ -285,27 +285,24 @@ angular.module('portainer.app').factory('ModalService', [
 
     service.confirmServiceForceUpdate = function (message, callback) {
       message = $sanitize(message);
-      customPrompt(
-        {
-          title: 'Are you sure ?',
-          message: message,
-          inputType: 'checkbox',
-          inputOptions: [
-            {
-              text: 'Pull latest image version<i></i>',
-              value: '1',
-            },
-          ],
-          buttons: {
-            confirm: {
-              label: 'Update',
-              className: 'btn-primary',
-            },
+      customCheckboxPrompt({
+        title: 'Are you sure ?',
+        message: message,
+        inputOptions: [
+          {
+            text: 'Pull latest image version<i></i>',
+            value: '1',
           },
-          callback: callback,
+        ],
+        buttons: {
+          confirm: {
+            label: 'Update',
+            className: 'btn-primary',
+          },
         },
-        false
-      );
+        callback: callback,
+        optionToggled: false,
+      });
     };
 
     service.selectRegistry = function (options) {
@@ -317,6 +314,24 @@ angular.module('portainer.app').factory('ModalService', [
         callback: options.callback,
       });
       applyBoxCSS(box);
+    };
+
+    service.confirmKubeconfigSelection = function (options, expiryMessage, callback) {
+      const message = 'Select the kubernetes environment(s) to add to the kubeconfig file.</br>' + expiryMessage;
+      customCheckboxPrompt({
+        title: 'Download kubeconfig file',
+        message: $sanitize(message),
+        inputOptions: options,
+        buttons: {
+          confirm: {
+            label: 'Download file',
+            className: 'btn-primary',
+          },
+        },
+        callback: callback,
+        optionToggled: true,
+        showCheck: true,
+      });
     };
 
     return service;

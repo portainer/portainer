@@ -6,11 +6,10 @@ angular.module('portainer.kubernetes').factory('KubernetesConfig', KubernetesCon
 function KubernetesConfigFactory($http, EndpointProvider, API_ENDPOINT_KUBERNETES) {
   return { get };
 
-  async function get() {
-    const endpointID = EndpointProvider.endpointID();
+  async function get(environmentIDs) {
     return $http({
       method: 'GET',
-      url: `${API_ENDPOINT_KUBERNETES}/${endpointID}/config`,
+      url: `${API_ENDPOINT_KUBERNETES}/config?ids=[${environmentIDs}]`,
       responseType: 'blob',
       headers: {
         Accept: 'text/yaml',

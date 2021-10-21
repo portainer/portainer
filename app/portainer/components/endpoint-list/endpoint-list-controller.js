@@ -3,7 +3,10 @@ import _ from 'lodash-es';
 angular.module('portainer.app').controller('EndpointListController', [
   'DatatableService',
   'PaginationService',
-  function EndpointListController(DatatableService, PaginationService) {
+  'ModalService',
+  'KubernetesConfigService',
+  'Notifications',
+  function EndpointListController(DatatableService, PaginationService, ModalService, KubernetesConfigService, Notifications) {
     this.state = {
       totalFilteredEndpoints: this.totalCount,
       textFilter: '',
@@ -92,6 +95,37 @@ angular.module('portainer.app').controller('EndpointListController', [
     function convertStatusToString(status) {
       return status === 1 ? 'up' : 'down';
     }
+
+    this.showKubeconfigButton = function () {
+      if (window.location.protocol !== 'https:') {
+        return false;
+      }
+      return _.some(this.endpoints, (endpoint) => isKubernetesMode(endpoint));
+    };
+
+    function isKubernetesMode(endpoint) {
+      return [5, 6, 7].indexOf(endpoint.Type) > -1;
+    }
+
+    this.showKubeconfigModal = async function () {
+      const kubeEnvironments = _.filter(this.endpoints, (endpoint) => isKubernetesMode(endpoint));
+      const options = kubeEnvironments.map(function (environment) {
+        return {
+          text: `${environment.Name} (${environment.URL})`,
+          value: environment.Id,
+        };
+      });
+
+      const expiryMessage = await KubernetesConfigService.expiryMessage();
+
+      ModalService.confirmKubeconfigSelection(options, expiryMessage, async function (selectedEnvironmentIDs) {
+        if (selectedEnvironmentIDs.length === 0) {
+          Notifications.warning('No environment was selected');
+          return;
+        }
+        await KubernetesConfigService.downloadKubeconfigFile(selectedEnvironmentIDs);
+      });
+    };
 
     this.$onInit = function () {
       var textFilter = DatatableService.getDataTableTextFilters(this.tableKey);
