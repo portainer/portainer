@@ -2,23 +2,18 @@ import angular from 'angular';
 
 class KubernetesConfigService {
   /* @ngInject */
-  constructor(KubernetesConfig, FileSaver, Notifications, SettingsService) {
+  constructor(KubernetesConfig, FileSaver, SettingsService) {
     this.KubernetesConfig = KubernetesConfig;
     this.FileSaver = FileSaver;
-    this.Notifications = Notifications;
     this.SettingsService = SettingsService;
   }
 
   async downloadKubeconfigFile(environmentIDs) {
-    try {
-      const response = await this.KubernetesConfig.get(environmentIDs);
-      const headers = response.headers();
-      const contentDispositionHeader = headers['content-disposition'];
-      const filename = contentDispositionHeader.replace('attachment;', '').trim();
-      return this.FileSaver.saveAs(response.data, filename);
-    } catch (e) {
-      this.Notifications.error('Failed downloading kubeconfig file', e);
-    }
+    const response = await this.KubernetesConfig.get(environmentIDs);
+    const headers = response.headers();
+    const contentDispositionHeader = headers['content-disposition'];
+    const filename = contentDispositionHeader.replace('attachment;', '').trim();
+    return this.FileSaver.saveAs(response.data, filename);
   }
 
   async expiryMessage() {

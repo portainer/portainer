@@ -1,4 +1,5 @@
 import _ from 'lodash-es';
+import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 
 angular.module('portainer.app').controller('EndpointListController', [
   'DatatableService',
@@ -104,7 +105,11 @@ angular.module('portainer.app').controller('EndpointListController', [
     };
 
     function isKubernetesMode(endpoint) {
-      return [5, 6, 7].indexOf(endpoint.Type) > -1;
+      return [
+        PortainerEndpointTypes.KubernetesLocalEnvironment,
+        PortainerEndpointTypes.AgentOnKubernetesEnvironment,
+        PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment,
+      ].includes(endpoint.Type);
     }
 
     this.showKubeconfigModal = async function () {
@@ -116,14 +121,23 @@ angular.module('portainer.app').controller('EndpointListController', [
         };
       });
 
-      const expiryMessage = await KubernetesConfigService.expiryMessage();
+      let expiryMessage = '';
+      try {
+        expiryMessage = await KubernetesConfigService.expiryMessage();
+      } catch (e) {
+        Notifications.error('Failed fetching kubeconfig expiry time', e);
+      }
 
       ModalService.confirmKubeconfigSelection(options, expiryMessage, async function (selectedEnvironmentIDs) {
         if (selectedEnvironmentIDs.length === 0) {
           Notifications.warning('No environment was selected');
           return;
         }
-        await KubernetesConfigService.downloadKubeconfigFile(selectedEnvironmentIDs);
+        try {
+          await KubernetesConfigService.downloadKubeconfigFile(selectedEnvironmentIDs);
+        } catch (e) {
+          Notifications.error('Failed downloading kubeconfig file', e);
+        }
       });
     };
 

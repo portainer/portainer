@@ -70,6 +70,16 @@ func (handler *Handler) filterUserKubeEndpoints(r *http.Request) ([]portainer.En
 		return nil, &httperror.HandlerError{http.StatusBadRequest, "Can't provide both 'ids' and 'excludeIds' parameters", errors.New("invalid parameters")}
 	}
 
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+	}
+
+	endpointGroups, err := handler.dataStore.EndpointGroup().EndpointGroups()
+	if err != nil {
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environment groups from the database", err}
+	}
+
 	if len(endpointIDs) > 0 {
 		var endpoints []portainer.Endpoint
 		for _, endpointID := range endpointIDs {
@@ -78,16 +88,11 @@ func (handler *Handler) filterUserKubeEndpoints(r *http.Request) ([]portainer.En
 				return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environment from the database", err}
 			}
 			if !endpointutils.IsKubernetesEndpoint(endpoint) {
-				return nil, &httperror.HandlerError{http.StatusInternalServerError, "invalid environment type", errors.New("invalid environment type")}
+				continue
 			}
 			endpoints = append(endpoints, *endpoint)
 		}
 		return endpoints, nil
-	}
-
-	endpointGroups, err := handler.dataStore.EndpointGroup().EndpointGroups()
-	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve environment groups from the database", err}
 	}
 
 	var kubeEndpoints []portainer.Endpoint
@@ -100,11 +105,6 @@ func (handler *Handler) filterUserKubeEndpoints(r *http.Request) ([]portainer.En
 			continue
 		}
 		kubeEndpoints = append(kubeEndpoints, endpoint)
-	}
-
-	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
 	filteredEndpoints := security.FilterEndpoints(kubeEndpoints, endpointGroups, securityContext)
