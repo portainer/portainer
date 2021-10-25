@@ -14,12 +14,14 @@ import searchUIModel from '../../search/models';
 // * It is not possible to search across stacks
 // * The error handling layer and debugging messages in the backend are pretty lightweight
 // * It uses some CSS hacks with :before to properly display icons in HTML inputs
+// * It wasn't tested/validated at scale (e.g. a lot of environments/resources)
 
 // TLDR
 // * No support for ACI environments
 // * No support for Kubernetes environments
 // * No support to search across stacks
 // * Edge/Swarm+Agent not tested likely to not work
+// * Not tested at scale
 
 export default class SearchController {
   /* @ngInject */
@@ -39,9 +41,9 @@ export default class SearchController {
       this.$state.go('azure.dashboard', { endpointId: envId });
       return;
     }
-    
+
     // TODO: need to properly handle Edge environments redirects
-    if (envType === "edge") {}
+    // if (envType === "edge") {}
   
     if (envType === "kubernetes") {
       this.$state.go('kubernetes.dashboard', { endpointId: envId });
