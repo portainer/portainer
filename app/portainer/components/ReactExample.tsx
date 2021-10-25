@@ -1,5 +1,4 @@
 import { useSref } from '@uirouter/react';
-import { UIRouterContextComponent } from '@uirouter/react-hybrid';
 
 import { Link } from './Link';
 import styles from './ReactExample.module.css';
@@ -16,18 +15,16 @@ export function ReactExample({ text }: ReactExampleProps) {
   const { onClick, href } = useSref(route);
 
   return (
-    <UIRouterContextComponent>
-      <div className={styles.redBg}>
-        {text}
-        <div>
-          <a href={href} onClick={onClick}>
-            Registries useSref
-          </a>
-        </div>
-        <div>
-          <Link to={route}>Registries Link</Link>
-        </div>
+    <div className={styles.redBg}>
+      {text}
+      <div>
+        <a href={href} onClick={onClick}>
+          Registries useSref
+        </a>
       </div>
-    </UIRouterContextComponent>
+      <div>
+        <Link to={route}>Registries Link</Link>
+      </div>
+    </div>
   );
 }

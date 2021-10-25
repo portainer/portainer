@@ -3991,24 +3991,12 @@
     "@typescript-eslint/types" "4.33.0"
     eslint-visitor-keys "^2.0.0"
 
-"@uirouter/angularjs@1.0.11":
-  version "1.0.11"
-  resolved "https://registry.yarnpkg.com/@uirouter/angularjs/-/angularjs-1.0.11.tgz#ced1ec8bea68a5db7dcfd77a43b7b8b9a2953540"
-  integrity sha512-AG6DT1mYEGLyRt8/Ggf/1teh4pp0yB99GTufC/pY6FfxmkrVE44dv9bGTOrcEETiPgu1SezsqTMjbXEv55JxCw==
-  dependencies:
-    "@uirouter/core" "5.0.11"
-
-"@uirouter/angularjs@1.0.29":
+"@uirouter/angularjs@1.0.29", "@uirouter/angularjs@^1.0.29":
   version "1.0.29"
   resolved "https://registry.yarnpkg.com/@uirouter/angularjs/-/angularjs-1.0.29.tgz#e1a88cb323b664ee3fdc6242931383fcc7e2152f"
   integrity sha512-RImWnBarNixkMto0o8stEaGwZmvhv5cnuOLXyMU2pY8MP2rgEF74ZNJTLeJCW14LR7XDUxVH8Mk8bPI6lxedmQ==
   dependencies:
     "@uirouter/core" "6.0.7"
-
-"@uirouter/core@5.0.11":
-  version "5.0.11"
-  resolved "https://registry.yarnpkg.com/@uirouter/core/-/core-5.0.11.tgz#bec461fcda767d79c98f6647cc9313ef9e5de03a"
-  integrity sha512-x8js8f0nJivRMlxVyFcP5VmHyI091qUYCSEP69+m3uTCsIlCvLWmQiT4/FY7YBe9go6tYBBzPV+dWseg5XMD8Q==
 
 "@uirouter/core@6.0.7":
   version "6.0.7"
@@ -4024,16 +4012,7 @@
     "@uirouter/core" "6.0.7"
     "@uirouter/react" "1.0.6"
 
-"@uirouter/react@1.0.6":
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/@uirouter/react/-/react-1.0.6.tgz#c45f5aa06b6136a2beb26a0229a931a86da2d6ec"
-  integrity sha512-/14Q7wPs9RyiJ0ubwzs4KELebSG35e/YgsdRBJqtyNrPRWuJqiPO1pR8qG71/rNCtCsqQgVr14sUNIXS0GOSCQ==
-  dependencies:
-    "@uirouter/core" "6.0.7"
-    classnames "^2.2.5"
-    prop-types "^15.6.1"
-
-"@uirouter/react@^1.0.7":
+"@uirouter/react@1.0.6", "@uirouter/react@^1.0.7":
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/@uirouter/react/-/react-1.0.7.tgz#2ddc3996a011b77f4579a72eebfb3243bf04c909"
   integrity sha512-CRCEk6fh/Fy/iAUkctPWpgrEC4DR1D/hnrpqyGshDcAuCfRVSYluRPkurzV74p1LG1pksCVlThH/0aJK9+G/MQ==
@@ -6122,7 +6101,7 @@ class-utils@^0.3.5:
     isobject "^3.0.0"
     static-extend "^0.1.1"
 
-classnames@^2.2.5, classnames@^2.3.1:
+classnames@^2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.3.1.tgz#dfcfa3891e306ec1dad105d0e88f4417b8535e8e"
   integrity sha512-OlQdbZ7gLfGarSqxesMesDa5uz7KFbID8Kpq/SxIoNGDqY8lSYs0D+hhtBXhcdB3rcbXArFr7vlHheLk1voeNA==
