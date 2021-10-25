@@ -386,7 +386,10 @@ func (transport *Transport) proxyImageRequest(request *http.Request) (*http.Resp
 	case "/images/create":
 		return transport.replaceRegistryAuthenticationHeader(request)
 	case "/images/load":
-		_, _ = utils.CopyBody(request)
+		_, err := utils.CopyBody(request)
+		if err != nil {
+			return nil, err
+		}
 		fallthrough
 	default:
 		if path.Base(requestPath) == "push" && request.Method == http.MethodPost {
