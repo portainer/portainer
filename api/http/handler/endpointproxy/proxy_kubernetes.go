@@ -3,13 +3,11 @@ package endpointproxy
 import (
 	"errors"
 	"fmt"
-	"strings"
-	"time"
-
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	"strings"
 
 	"net/http"
 )
@@ -37,22 +35,9 @@ func (handler *Handler) proxyRequestsToKubernetesAPI(w http.ResponseWriter, r *h
 			return &httperror.HandlerError{http.StatusInternalServerError, "No Edge agent registered with the environment", errors.New("No agent available")}
 		}
 
-		tunnel := handler.ReverseTunnelService.GetTunnelDetails(endpoint.ID)
-		if tunnel.Status == portainer.EdgeAgentIdle {
-			handler.ProxyManager.DeleteEndpointProxy(endpoint)
-
-			err := handler.ReverseTunnelService.SetTunnelStatusToRequired(endpoint.ID)
-			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update tunnel status", err}
-			}
-
-			settings, err := handler.DataStore.Settings().Settings()
-			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
-			}
-
-			waitForAgentToConnect := time.Duration(settings.EdgeAgentCheckinInterval) * time.Second
-			time.Sleep(waitForAgentToConnect * 2)
+		_, err := handler.ReverseTunnelService.GetActiveTunnel(endpoint)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to get the active tunnel", err}
 		}
 	}
 

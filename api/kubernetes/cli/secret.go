@@ -1,12 +1,12 @@
 package cli
 
 import (
+	"context"
 	"errors"
 	"time"
 
+	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
-
-	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -24,7 +24,7 @@ func (kcl *KubeClient) createServiceAccountToken(serviceAccountName string) erro
 		Type: "kubernetes.io/service-account-token",
 	}
 
-	_, err := kcl.cli.CoreV1().Secrets(portainerNamespace).Create(serviceAccountSecret)
+	_, err := kcl.cli.CoreV1().Secrets(portainerNamespace).Create(context.TODO(), serviceAccountSecret, metav1.CreateOptions{})
 	if err != nil && !k8serrors.IsAlreadyExists(err) {
 		return err
 	}
@@ -35,7 +35,7 @@ func (kcl *KubeClient) createServiceAccountToken(serviceAccountName string) erro
 func (kcl *KubeClient) getServiceAccountToken(serviceAccountName string) (string, error) {
 	serviceAccountSecretName := userServiceAccountTokenSecretName(serviceAccountName, kcl.instanceID)
 
-	secret, err := kcl.cli.CoreV1().Secrets(portainerNamespace).Get(serviceAccountSecretName, metav1.GetOptions{})
+	secret, err := kcl.cli.CoreV1().Secrets(portainerNamespace).Get(context.TODO(), serviceAccountSecretName, metav1.GetOptions{})
 	if err != nil {
 		return "", err
 	}
@@ -51,7 +51,7 @@ func (kcl *KubeClient) getServiceAccountToken(serviceAccountName string) (string
 		case <-timeout:
 			return "", errors.New("unable to find secret token associated to user service account (timeout)")
 		default:
-			secret, err = kcl.cli.CoreV1().Secrets(portainerNamespace).Get(serviceAccountSecretName, metav1.GetOptions{})
+			secret, err = kcl.cli.CoreV1().Secrets(portainerNamespace).Get(context.TODO(), serviceAccountSecretName, metav1.GetOptions{})
 			if err != nil {
 				return "", err
 			}

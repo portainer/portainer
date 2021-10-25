@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"context"
+
 	rbacv1 "k8s.io/api/rbac/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -9,7 +11,7 @@ import (
 func getPortainerUserDefaultPolicies() []rbacv1.PolicyRule {
 	return []rbacv1.PolicyRule{
 		{
-			Verbs:     []string{"list"},
+			Verbs:     []string{"list", "get"},
 			Resources: []string{"namespaces", "nodes"},
 			APIGroups: []string{""},
 		},
@@ -19,8 +21,8 @@ func getPortainerUserDefaultPolicies() []rbacv1.PolicyRule {
 			APIGroups: []string{"storage.k8s.io"},
 		},
 		{
-			Verbs:     []string{"list"},
-			Resources: []string{"namespaces", "pods"},
+			Verbs:     []string{"list", "get"},
+			Resources: []string{"namespaces", "pods", "nodes"},
 			APIGroups: []string{"metrics.k8s.io"},
 		},
 	}
@@ -34,10 +36,10 @@ func (kcl *KubeClient) upsertPortainerK8sClusterRoles() error {
 		Rules: getPortainerUserDefaultPolicies(),
 	}
 
-	_, err := kcl.cli.RbacV1().ClusterRoles().Create(clusterRole)
-	if err != nil  {
+	_, err := kcl.cli.RbacV1().ClusterRoles().Create(context.TODO(), clusterRole, metav1.CreateOptions{})
+	if err != nil {
 		if k8serrors.IsAlreadyExists(err) {
-			_, err = kcl.cli.RbacV1().ClusterRoles().Update(clusterRole)
+			_, err = kcl.cli.RbacV1().ClusterRoles().Update(context.TODO(), clusterRole, metav1.UpdateOptions{})
 		}
 		if err != nil {
 			return err

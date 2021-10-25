@@ -15,12 +15,14 @@ class porImageRegistryController {
     this.Notifications = Notifications;
 
     this.onRegistryChange = this.onRegistryChange.bind(this);
+    this.onImageChange = this.onImageChange.bind(this);
 
     this.registries = [];
     this.images = [];
     this.defaultRegistry = new DockerHubViewModel();
 
     this.$scope.$watch(() => this.model.Registry, this.onRegistryChange);
+    this.$scope.$watch(() => this.model.Image, this.onImageChange);
   }
 
   isKnownRegistry(registry) {
@@ -62,6 +64,12 @@ class porImageRegistryController {
     }
   }
 
+  async onImageChange() {
+    if (!this.isDockerHubRegistry()) {
+      this.setValidity(true);
+    }
+  }
+
   displayedRegistryURL() {
     return this.getRegistryURL(this.model.Registry) || 'docker.io';
   }
@@ -69,13 +77,19 @@ class porImageRegistryController {
   async reloadRegistries() {
     return this.$async(async () => {
       try {
-        const registries = await this.EndpointService.registries(this.endpoint.Id, this.namespace);
-        this.registries = _.concat(this.defaultRegistry, registries);
+        let showDefaultRegistry = false;
+        this.registries = await this.EndpointService.registries(this.endpoint.Id, this.namespace);
+
+        // hide default(anonymous) dockerhub registry if user has an authenticated one
+        if (!this.registries.some((registry) => registry.Type === RegistryTypes.DOCKERHUB)) {
+          showDefaultRegistry = true;
+          this.registries.push(this.defaultRegistry);
+        }
 
         const id = this.model.Registry.Id;
         const registry = _.find(this.registries, { Id: id });
         if (!registry) {
-          this.model.Registry = this.defaultRegistry;
+          this.model.Registry = showDefaultRegistry ? this.defaultRegistry : this.registries[0];
         }
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to retrieve registries');

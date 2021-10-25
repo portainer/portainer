@@ -1392,7 +1392,7 @@ type (
 
 	// SwarmStackManager represents a service to manage Swarm stacks
 	SwarmStackManager interface {
-		Login(registries []Registry, endpoint *Endpoint)
+		Login(registries []Registry, endpoint *Endpoint) error
 		Logout(endpoint *Endpoint) error
 		Deploy(stack *Stack, prune bool, endpoint *Endpoint) error
 		Remove(stack *Stack, endpoint *Endpoint) error
@@ -1472,7 +1472,7 @@ const (
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "2.9.1"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 32
+	DBVersion = 33
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
 	ComposeSyntaxMaxVersion = "3.9"
 	// AssetsServerURL represents the URL of the Portainer asset server

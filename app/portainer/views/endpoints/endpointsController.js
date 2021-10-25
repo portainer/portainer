@@ -3,11 +3,16 @@ import EndpointHelper from 'Portainer/helpers/endpointHelper';
 
 angular.module('portainer.app').controller('EndpointsController', EndpointsController);
 
-function EndpointsController($q, $scope, $state, $async, EndpointService, GroupService, Notifications) {
+function EndpointsController($q, $scope, $state, $async, EndpointService, GroupService, ModalService, Notifications) {
   $scope.removeAction = removeAction;
 
   function removeAction(endpoints) {
-    return $async(removeActionAsync, endpoints);
+    ModalService.confirmDeletion('This action will remove all configurations associated to your environment(s). Continue?', (confirmed) => {
+      if (!confirmed) {
+        return;
+      }
+      return $async(removeActionAsync, endpoints);
+    });
   }
 
   async function removeActionAsync(endpoints) {

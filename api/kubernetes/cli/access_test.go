@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"sync"
 	"testing"
 
@@ -51,10 +52,10 @@ func Test_NamespaceAccessPoliciesDeleteNamespace_updatesPortainerConfig_whenConf
 					"NamespaceAccessPolicies": `{"ns1":{"UserAccessPolicies":{"2":{"RoleId":0}}}, "ns2":{"UserAccessPolicies":{"2":{"RoleId":0}}}}`,
 				},
 			}
-			_, err := k.cli.CoreV1().ConfigMaps(portainerNamespace).Create(config)
+			_, err := k.cli.CoreV1().ConfigMaps(portainerNamespace).Create(context.Background(), config, metav1.CreateOptions{})
 			assert.NoError(t, err, "failed to create a portainer config")
 			defer func() {
-				k.cli.CoreV1().ConfigMaps(portainerNamespace).Delete(portainerConfigMapName, nil)
+				k.cli.CoreV1().ConfigMaps(portainerNamespace).Delete(context.Background(), portainerConfigMapName, metav1.DeleteOptions{})
 			}()
 
 			err = k.NamespaceAccessPoliciesDeleteNamespace(test.namespaceToDelete)

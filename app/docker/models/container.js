@@ -100,7 +100,7 @@ export function ContainerStatsViewModel(data) {
     }
   }
   this.Networks = _.values(data.networks);
-  if (data.blkio_stats !== undefined) {
+  if (data.blkio_stats !== undefined && data.blkio_stats.io_service_bytes_recursive !== null) {
     //TODO: take care of multiple block devices
     var readData = data.blkio_stats.io_service_bytes_recursive.find((d) => d.op === 'Read');
     if (readData === undefined) {

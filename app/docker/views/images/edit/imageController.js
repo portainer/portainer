@@ -17,6 +17,8 @@ angular.module('portainer.docker').controller('ImageController', [
   'FileSaver',
   'Blob',
   'endpoint',
+  'EndpointService',
+  'RegistryModalService',
   function (
     $async,
     $q,
@@ -32,7 +34,9 @@ angular.module('portainer.docker').controller('ImageController', [
     ModalService,
     FileSaver,
     Blob,
-    endpoint
+    endpoint,
+    EndpointService,
+    RegistryModalService
   ) {
     $scope.endpoint = endpoint;
     $scope.isAdmin = Authentication.isAdmin();
@@ -84,11 +88,13 @@ angular.module('portainer.docker').controller('ImageController', [
 
     async function pushTag(repository) {
       return $async(async () => {
-        $('#uploadResourceHint').show();
         try {
-          const registryModel = await RegistryService.retrievePorRegistryModelFromRepository(repository, endpoint.Id);
-          await ImageService.pushImage(registryModel);
-          Notifications.success('Image successfully pushed', repository);
+          const registryModel = await RegistryModalService.registryModal(repository, $scope.registries);
+          if (registryModel) {
+            $('#uploadResourceHint').show();
+            await ImageService.pushImage(registryModel);
+            Notifications.success('Image successfully pushed', repository);
+          }
         } catch (err) {
           Notifications.error('Failure', err, 'Unable to push image to repository');
         } finally {
@@ -100,11 +106,13 @@ angular.module('portainer.docker').controller('ImageController', [
     $scope.pullTag = pullTag;
     async function pullTag(repository) {
       return $async(async () => {
-        $('#downloadResourceHint').show();
         try {
-          const registryModel = await RegistryService.retrievePorRegistryModelFromRepository(repository, endpoint.Id);
-          await ImageService.pullImage(registryModel);
-          Notifications.success('Image successfully pulled', repository);
+          const registryModel = await RegistryModalService.registryModal(repository, $scope.registries);
+          if (registryModel) {
+            $('#downloadResourceHint').show();
+            await ImageService.pullImage(registryModel);
+            Notifications.success('Image successfully pulled', repository);
+          }
         } catch (err) {
           Notifications.error('Failure', err, 'Unable to pull image from repository');
         } finally {
@@ -171,8 +179,15 @@ angular.module('portainer.docker').controller('ImageController', [
       });
     };
 
-    function initView() {
+    async function initView() {
       HttpRequestHelper.setPortainerAgentTargetHeader($transition$.params().nodeName);
+
+      try {
+        $scope.registries = await RegistryService.loadRegistriesForDropdown(endpoint.Id);
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to load registries');
+      }
+
       $q.all({
         image: ImageService.image($transition$.params().id),
         history: ImageService.history($transition$.params().id),
