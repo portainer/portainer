@@ -38,7 +38,7 @@
     class="btn btn-sm btn-primary"
     ng-click="$ctrl.submit()"
     ng-if="!$ctrl.formValues.AutoUpdate.RepositoryAutomaticUpdates"
-    ng-disabled="$ctrl.isSubmitButtonDisabled() || $ctrl.state.hasUnsavedChanges || !$ctrl.redeployGitForm.$valid"
+    ng-disabled="$ctrl.isSubmitButtonDisabled() || $ctrl.state.hasUnsavedChanges || !$ctrl.redeployGitForm.$valid || ($ctrl.formValues.RepositoryAuthentication && !$ctrl.formValues.RepositoryPassword)"
     style="margin-top: 7px; margin-left: 0;"
     button-spinner="$ctrl.state.redeployInProgress"
     analytics-on
