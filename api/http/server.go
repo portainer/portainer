@@ -34,6 +34,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/registries"
 	"github.com/portainer/portainer/api/http/handler/resourcecontrols"
 	"github.com/portainer/portainer/api/http/handler/roles"
+	"github.com/portainer/portainer/api/http/handler/search"
 	"github.com/portainer/portainer/api/http/handler/settings"
 	sslhandler "github.com/portainer/portainer/api/http/handler/ssl"
 	"github.com/portainer/portainer/api/http/handler/stacks"
@@ -192,6 +193,9 @@ func (server *Server) Start() error {
 	var resourceControlHandler = resourcecontrols.NewHandler(requestBouncer)
 	resourceControlHandler.DataStore = server.DataStore
 
+	var searchHandler = search.NewHandler(requestBouncer);
+	searchHandler.DataStore = server.DataStore
+
 	var settingsHandler = settings.NewHandler(requestBouncer)
 	settingsHandler.DataStore = server.DataStore
 	settingsHandler.FileService = server.FileService
@@ -267,6 +271,7 @@ func (server *Server) Start() error {
 		MOTDHandler:            motdHandler,
 		RegistryHandler:        registryHandler,
 		ResourceControlHandler: resourceControlHandler,
+		SearchHandler:			searchHandler,
 		SettingsHandler:        settingsHandler,
 		SSLHandler:             sslHandler,
 		StatusHandler:          statusHandler,

@@ -52,7 +52,7 @@
  * Header
  */
 .row.header {
-  height: 60px;
+  height: 80px;
   background: var(--bg-row-header-color);
   margin-bottom: 15px;
 }

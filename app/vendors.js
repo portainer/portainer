@@ -13,6 +13,7 @@ import 'angular-loading-bar/build/loading-bar.css';
 import 'angular-moment-picker/dist/angular-moment-picker.min.css';
 import 'angular-multiselect/isteven-multi-select.css';
 import 'spinkit/spinkit.min.css';
+import 'autocompleter/autocomplete.min.css'
 
 import angular from 'angular';
 import 'moment';
@@ -37,5 +38,6 @@ import 'angular-ui-bootstrap';
 import 'angular-moment-picker';
 import 'angular-multiselect/isteven-multi-select.js';
 import 'angulartics/dist/angulartics.min.js';
+import 'autocompleter/autocomplete.min.js'
 
 window.angular = angular;

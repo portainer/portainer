@@ -1,0 +1,107 @@
+.search-bar {
+    width: 98%;
+    margin-top: 5px;
+}
+
+.autocomplete .group {
+    background: white;
+}
+
+.searchbox {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 2px;
+}
+
+.boxitem {
+    margin: 2px;
+}
+
+.boxgroup {
+    margin-left: 2px;
+    margin-bottom: 5px;
+    color: #767676;
+    font-weight: bold;
+}
+
+.boxitem-icon {
+    float: left;
+}
+
+.boxitem-name {
+    margin-left: 25px;
+}
+
+.boxitem-icon-ico-container:before {
+    position: absolute;
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    content: '\f1b3';
+    color: #286090;
+}
+
+.boxitem-icon-ico-image:before {
+    position: absolute;
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    content: '\f24d';
+    color: #286090;
+}
+
+.boxitem-icon-ico-volume:before {
+    position: absolute;
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    content: '\f0a0';
+    color: #286090;
+}
+
+.boxitem-icon-ico-network:before {
+    position: absolute;
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    content: '\f0e8';
+    color: #286090;
+}
+
+
+.boxitem-icon-ico-docker:before {
+    position: absolute;
+    font-family: 'Font Awesome 5 Brands';
+    font-weight: 900;
+    content: '\f395';
+    color: #286090;
+}
+
+.boxitem-icon-ico-kubernetes:before {
+    position: absolute;
+    font-family: 'Font Awesome 5 Brands';
+    font-weight: 900;
+    content: '\f655';
+    color: #286090;
+}
+
+.boxitem-icon-ico-edge:before {
+    position: absolute;
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    content: '\f0c2';
+    color: #286090;
+}
+
+.boxitem-icon-ico-generic:before {
+    position: absolute;
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    content: '\f128';
+    color: #286090;
+}
+
+.boxitem-env {
+    float: right;
+}
+
+.boxitem-env-name {
+    margin-left: 25px;
+}
