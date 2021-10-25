@@ -68,10 +68,14 @@ type Service struct {
 	fileStorePath string
 }
 
-// joinPaths takes a trusted root path and a list of untrusted paths and joins
+// JoinPaths takes a trusted root path and a list of untrusted paths and joins
 // them together using directory separators while enforcing that the untrusted
 // paths cannot go higher up than the trusted root
-func joinPaths(trustedRoot string, untrustedPaths ...string) string {
+func JoinPaths(trustedRoot string, untrustedPaths ...string) string {
+	if trustedRoot == "" {
+		trustedRoot = "."
+	}
+
 	return path.Join(trustedRoot, path.Join(append([]string{"/"}, untrustedPaths...)...))
 }
 
@@ -80,7 +84,7 @@ func joinPaths(trustedRoot string, untrustedPaths ...string) string {
 func NewService(dataStorePath, fileStorePath string) (*Service, error) {
 	service := &Service{
 		dataStorePath: dataStorePath,
-		fileStorePath: joinPaths(dataStorePath, fileStorePath),
+		fileStorePath: JoinPaths(dataStorePath, fileStorePath),
 	}
 
 	err := os.MkdirAll(dataStorePath, 0755)
@@ -118,12 +122,12 @@ func NewService(dataStorePath, fileStorePath string) (*Service, error) {
 
 // GetBinaryFolder returns the full path to the binary store on the filesystem
 func (service *Service) GetBinaryFolder() string {
-	return joinPaths(service.fileStorePath, BinaryStorePath)
+	return JoinPaths(service.fileStorePath, BinaryStorePath)
 }
 
 // GetDockerConfigPath returns the full path to the docker config store on the filesystem
 func (service *Service) GetDockerConfigPath() string {
-	return joinPaths(service.fileStorePath, DockerConfigPath)
+	return JoinPaths(service.fileStorePath, DockerConfigPath)
 }
 
 // RemoveDirectory removes a directory on the filesystem.
@@ -134,7 +138,7 @@ func (service *Service) RemoveDirectory(directoryPath string) error {
 // GetStackProjectPath returns the absolute path on the FS for a stack based
 // on its identifier.
 func (service *Service) GetStackProjectPath(stackIdentifier string) string {
-	return joinPaths(service.wrapFileStore(ComposeStorePath), stackIdentifier)
+	return JoinPaths(service.wrapFileStore(ComposeStorePath), stackIdentifier)
 }
 
 // Copy copies the file on fromFilePath to toFilePath
@@ -200,13 +204,13 @@ func (service *Service) Copy(fromFilePath string, toFilePath string, deleteIfExi
 // StoreStackFileFromBytes creates a subfolder in the ComposeStorePath and stores a new file from bytes.
 // It returns the path to the folder where the file is stored.
 func (service *Service) StoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error) {
-	stackStorePath := joinPaths(ComposeStorePath, stackIdentifier)
+	stackStorePath := JoinPaths(ComposeStorePath, stackIdentifier)
 	err := service.createDirectoryInStore(stackStorePath)
 	if err != nil {
 		return "", err
 	}
 
-	composeFilePath := joinPaths(stackStorePath, fileName)
+	composeFilePath := JoinPaths(stackStorePath, fileName)
 	r := bytes.NewReader(data)
 
 	err = service.createFileInStore(composeFilePath, r)
@@ -220,19 +224,19 @@ func (service *Service) StoreStackFileFromBytes(stackIdentifier, fileName string
 // GetEdgeStackProjectPath returns the absolute path on the FS for a edge stack based
 // on its identifier.
 func (service *Service) GetEdgeStackProjectPath(edgeStackIdentifier string) string {
-	return joinPaths(service.wrapFileStore(EdgeStackStorePath), edgeStackIdentifier)
+	return JoinPaths(service.wrapFileStore(EdgeStackStorePath), edgeStackIdentifier)
 }
 
 // StoreEdgeStackFileFromBytes creates a subfolder in the EdgeStackStorePath and stores a new file from bytes.
 // It returns the path to the folder where the file is stored.
 func (service *Service) StoreEdgeStackFileFromBytes(edgeStackIdentifier, fileName string, data []byte) (string, error) {
-	stackStorePath := joinPaths(EdgeStackStorePath, edgeStackIdentifier)
+	stackStorePath := JoinPaths(EdgeStackStorePath, edgeStackIdentifier)
 	err := service.createDirectoryInStore(stackStorePath)
 	if err != nil {
 		return "", err
 	}
 
-	composeFilePath := joinPaths(stackStorePath, fileName)
+	composeFilePath := JoinPaths(stackStorePath, fileName)
 	r := bytes.NewReader(data)
 
 	err = service.createFileInStore(composeFilePath, r)
@@ -247,13 +251,13 @@ func (service *Service) StoreEdgeStackFileFromBytes(edgeStackIdentifier, fileNam
 // ExtensionRegistryManagementStorePath and stores a new file from bytes.
 // It returns the path to the folder where the file is stored.
 func (service *Service) StoreRegistryManagementFileFromBytes(folder, fileName string, data []byte) (string, error) {
-	extensionStorePath := joinPaths(ExtensionRegistryManagementStorePath, folder)
+	extensionStorePath := JoinPaths(ExtensionRegistryManagementStorePath, folder)
 	err := service.createDirectoryInStore(extensionStorePath)
 	if err != nil {
 		return "", err
 	}
 
-	file := joinPaths(extensionStorePath, fileName)
+	file := JoinPaths(extensionStorePath, fileName)
 	r := bytes.NewReader(data)
 
 	err = service.createFileInStore(file, r)
@@ -267,7 +271,7 @@ func (service *Service) StoreRegistryManagementFileFromBytes(folder, fileName st
 // StoreTLSFileFromBytes creates a folder in the TLSStorePath and stores a new file from bytes.
 // It returns the path to the newly created file.
 func (service *Service) StoreTLSFileFromBytes(folder string, fileType portainer.TLSFileType, data []byte) (string, error) {
-	storePath := joinPaths(TLSStorePath, folder)
+	storePath := JoinPaths(TLSStorePath, folder)
 	err := service.createDirectoryInStore(storePath)
 	if err != nil {
 		return "", err
@@ -285,7 +289,7 @@ func (service *Service) StoreTLSFileFromBytes(folder string, fileType portainer.
 		return "", ErrUndefinedTLSFileType
 	}
 
-	tlsFilePath := joinPaths(storePath, fileName)
+	tlsFilePath := JoinPaths(storePath, fileName)
 	r := bytes.NewReader(data)
 	err = service.createFileInStore(tlsFilePath, r)
 	if err != nil {
@@ -307,12 +311,12 @@ func (service *Service) GetPathForTLSFile(folder string, fileType portainer.TLSF
 	default:
 		return "", ErrUndefinedTLSFileType
 	}
-	return joinPaths(service.wrapFileStore(TLSStorePath), folder, fileName), nil
+	return JoinPaths(service.wrapFileStore(TLSStorePath), folder, fileName), nil
 }
 
 // DeleteTLSFiles deletes a folder in the TLS store path.
 func (service *Service) DeleteTLSFiles(folder string) error {
-	storePath := joinPaths(service.wrapFileStore(TLSStorePath), folder)
+	storePath := JoinPaths(service.wrapFileStore(TLSStorePath), folder)
 	return os.RemoveAll(storePath)
 }
 
@@ -330,16 +334,19 @@ func (service *Service) DeleteTLSFile(folder string, fileType portainer.TLSFileT
 		return ErrUndefinedTLSFileType
 	}
 
-	filePath := joinPaths(service.wrapFileStore(TLSStorePath), folder, fileName)
+	filePath := JoinPaths(service.wrapFileStore(TLSStorePath), folder, fileName)
 
 	return os.Remove(filePath)
 }
 
 // GetFileContent returns the content of a file as bytes.
 func (service *Service) GetFileContent(trustedRoot, filePath string) ([]byte, error) {
-	content, err := os.ReadFile(joinPaths(trustedRoot, filePath))
+	content, err := os.ReadFile(JoinPaths(trustedRoot, filePath))
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("could not get the contents of the file '%s'", filePath))
+		if filePath == "" {
+			filePath = trustedRoot
+		}
+		return nil, fmt.Errorf("could not get the contents of the file '%s'", filePath)
 	}
 
 	return content, nil
@@ -367,13 +374,13 @@ func (service *Service) FileExists(filePath string) (bool, error) {
 
 // KeyPairFilesExist checks for the existence of the key files.
 func (service *Service) KeyPairFilesExist() (bool, error) {
-	privateKeyPath := joinPaths(service.dataStorePath, PrivateKeyFile)
+	privateKeyPath := JoinPaths(service.dataStorePath, PrivateKeyFile)
 	exists, err := service.FileExists(privateKeyPath)
 	if err != nil || !exists {
 		return false, err
 	}
 
-	publicKeyPath := joinPaths(service.dataStorePath, PublicKeyFile)
+	publicKeyPath := JoinPaths(service.dataStorePath, PublicKeyFile)
 	exists, err = service.FileExists(publicKeyPath)
 	if err != nil || !exists {
 		return false, err
@@ -455,19 +462,19 @@ func (service *Service) getContentFromPEMFile(filePath string) ([]byte, error) {
 // GetCustomTemplateProjectPath returns the absolute path on the FS for a custom template based
 // on its identifier.
 func (service *Service) GetCustomTemplateProjectPath(identifier string) string {
-	return joinPaths(service.wrapFileStore(CustomTemplateStorePath), identifier)
+	return JoinPaths(service.wrapFileStore(CustomTemplateStorePath), identifier)
 }
 
 // StoreCustomTemplateFileFromBytes creates a subfolder in the CustomTemplateStorePath and stores a new file from bytes.
 // It returns the path to the folder where the file is stored.
 func (service *Service) StoreCustomTemplateFileFromBytes(identifier, fileName string, data []byte) (string, error) {
-	customTemplateStorePath := joinPaths(CustomTemplateStorePath, identifier)
+	customTemplateStorePath := JoinPaths(CustomTemplateStorePath, identifier)
 	err := service.createDirectoryInStore(customTemplateStorePath)
 	if err != nil {
 		return "", err
 	}
 
-	templateFilePath := joinPaths(customTemplateStorePath, fileName)
+	templateFilePath := JoinPaths(customTemplateStorePath, fileName)
 	r := bytes.NewReader(data)
 
 	err = service.createFileInStore(templateFilePath, r)
@@ -481,19 +488,19 @@ func (service *Service) StoreCustomTemplateFileFromBytes(identifier, fileName st
 // GetEdgeJobFolder returns the absolute path on the filesystem for an Edge job based
 // on its identifier.
 func (service *Service) GetEdgeJobFolder(identifier string) string {
-	return joinPaths(service.wrapFileStore(EdgeJobStorePath), identifier)
+	return JoinPaths(service.wrapFileStore(EdgeJobStorePath), identifier)
 }
 
 // StoreEdgeJobFileFromBytes creates a subfolder in the EdgeJobStorePath and stores a new file from bytes.
 // It returns the path to the folder where the file is stored.
 func (service *Service) StoreEdgeJobFileFromBytes(identifier string, data []byte) (string, error) {
-	edgeJobStorePath := joinPaths(EdgeJobStorePath, identifier)
+	edgeJobStorePath := JoinPaths(EdgeJobStorePath, identifier)
 	err := service.createDirectoryInStore(edgeJobStorePath)
 	if err != nil {
 		return "", err
 	}
 
-	filePath := joinPaths(edgeJobStorePath, createEdgeJobFileName(identifier))
+	filePath := JoinPaths(edgeJobStorePath, createEdgeJobFileName(identifier))
 	r := bytes.NewReader(data)
 	err = service.createFileInStore(filePath, r)
 	if err != nil {
@@ -527,13 +534,13 @@ func (service *Service) GetEdgeJobTaskLogFileContent(edgeJobID string, taskID st
 
 // StoreEdgeJobTaskLogFileFromBytes stores the log file
 func (service *Service) StoreEdgeJobTaskLogFileFromBytes(edgeJobID, taskID string, data []byte) error {
-	edgeJobStorePath := joinPaths(EdgeJobStorePath, edgeJobID)
+	edgeJobStorePath := JoinPaths(EdgeJobStorePath, edgeJobID)
 	err := service.createDirectoryInStore(edgeJobStorePath)
 	if err != nil {
 		return err
 	}
 
-	filePath := joinPaths(edgeJobStorePath, fmt.Sprintf("logs_%s", taskID))
+	filePath := JoinPaths(edgeJobStorePath, fmt.Sprintf("logs_%s", taskID))
 	r := bytes.NewReader(data)
 	return service.createFileInStore(filePath, r)
 }
@@ -549,7 +556,7 @@ func (service *Service) GetTemporaryPath() (string, error) {
 		return "", err
 	}
 
-	return joinPaths(service.wrapFileStore(TempPath), uid.String()), nil
+	return JoinPaths(service.wrapFileStore(TempPath), uid.String()), nil
 }
 
 // GetDataStorePath returns path to data folder
@@ -558,12 +565,12 @@ func (service *Service) GetDatastorePath() string {
 }
 
 func (service *Service) wrapFileStore(filepath string) string {
-	return joinPaths(service.fileStorePath, filepath)
+	return JoinPaths(service.fileStorePath, filepath)
 }
 
 func defaultCertPathUnderFileStore() (string, string) {
-	certPath := joinPaths(SSLCertPath, DefaultSSLCertFilename)
-	keyPath := joinPaths(SSLCertPath, DefaultSSLKeyFilename)
+	certPath := JoinPaths(SSLCertPath, DefaultSSLCertFilename)
+	keyPath := JoinPaths(SSLCertPath, DefaultSSLKeyFilename)
 	return certPath, keyPath
 }
 
@@ -628,7 +635,9 @@ func MoveDirectory(originalPath, newPath string) error {
 	alreadyExists, err := FileExists(newPath)
 	if err != nil {
 		return err
-	} else if alreadyExists {
+	}
+
+	if alreadyExists {
 		return errors.New("Target path already exists")
 	}
 

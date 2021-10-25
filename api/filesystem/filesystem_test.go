@@ -27,21 +27,53 @@ func TestJoinPaths(t *testing.T) {
 		untrusted string
 		expected  string
 	}{
+		{"", "", "."},
+		{"", ".", "."},
+		{"", "d/e/f", "d/e/f"},
+		{"", "./d/e/f", "d/e/f"},
+		{"", "../d/e/f", "d/e/f"},
+		{"", "/d/e/f", "d/e/f"},
+		{"", "../../../etc/shadow", "etc/shadow"},
+
+		{".", "", "."},
+		{".", ".", "."},
+		{".", "d/e/f", "d/e/f"},
+		{".", "./d/e/f", "d/e/f"},
+		{".", "../d/e/f", "d/e/f"},
+		{".", "/d/e/f", "d/e/f"},
+		{".", "../../../etc/shadow", "etc/shadow"},
+
+		{"./", "", "."},
+		{"./", ".", "."},
+		{"./", "d/e/f", "d/e/f"},
+		{"./", "./d/e/f", "d/e/f"},
+		{"./", "../d/e/f", "d/e/f"},
+		{"./", "/d/e/f", "d/e/f"},
+		{"./", "../../../etc/shadow", "etc/shadow"},
+
+		{"a/b/c", "", "a/b/c"},
+		{"a/b/c", ".", "a/b/c"},
 		{"a/b/c", "d/e/f", "a/b/c/d/e/f"},
 		{"a/b/c", "./d/e/f", "a/b/c/d/e/f"},
 		{"a/b/c", "../d/e/f", "a/b/c/d/e/f"},
 		{"a/b/c", "../../../etc/shadow", "a/b/c/etc/shadow"},
 
+		{"/a/b/c", "", "/a/b/c"},
+		{"/a/b/c", ".", "/a/b/c"},
 		{"/a/b/c", "d/e/f", "/a/b/c/d/e/f"},
 		{"/a/b/c", "./d/e/f", "/a/b/c/d/e/f"},
 		{"/a/b/c", "../d/e/f", "/a/b/c/d/e/f"},
 		{"/a/b/c", "../../../etc/shadow", "/a/b/c/etc/shadow"},
 
+		{"./a/b/c", "", "a/b/c"},
+		{"./a/b/c", ".", "a/b/c"},
 		{"./a/b/c", "d/e/f", "a/b/c/d/e/f"},
 		{"./a/b/c", "./d/e/f", "a/b/c/d/e/f"},
 		{"./a/b/c", "../d/e/f", "a/b/c/d/e/f"},
 		{"./a/b/c", "../../../etc/shadow", "a/b/c/etc/shadow"},
 
+		{"../a/b/c", "", "../a/b/c"},
+		{"../a/b/c", ".", "../a/b/c"},
 		{"../a/b/c", "d/e/f", "../a/b/c/d/e/f"},
 		{"../a/b/c", "./d/e/f", "../a/b/c/d/e/f"},
 		{"../a/b/c", "../d/e/f", "../a/b/c/d/e/f"},
@@ -49,9 +81,9 @@ func TestJoinPaths(t *testing.T) {
 	}
 
 	for _, c := range ts {
-		r := joinPaths(c.trusted, c.untrusted)
+		r := JoinPaths(c.trusted, c.untrusted)
 		if r != c.expected {
-			t.Fatalf("expected %s, got %s. Inputs = '%s', '%s'", c.expected, r, c.trusted, c.untrusted)
+			t.Fatalf("expected '%s', got '%s'. Inputs = '%s', '%s'", c.expected, r, c.trusted, c.untrusted)
 		}
 	}
 }
