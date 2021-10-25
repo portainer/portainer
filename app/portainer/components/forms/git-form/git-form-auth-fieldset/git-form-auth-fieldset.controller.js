@@ -25,21 +25,13 @@ class GitFormComposeAuthFieldsetController {
     if (!auth) {
       this.authValues.username = this.model.RepositoryUsername;
       this.authValues.password = this.model.RepositoryPassword;
-      this.onChange({
-        ...this.model,
-        RepositoryAuthentication: true,
-        RepositoryUsername: '',
-        RepositoryPassword: '',
-      });
-
-      return;
     }
 
     this.onChange({
       ...this.model,
-      RepositoryAuthentication: false,
-      RepositoryUsername: this.authValues.username,
-      RepositoryPassword: this.authValues.password,
+      RepositoryAuthentication: auth,
+      RepositoryUsername: auth ? this.authValues.username : '',
+      RepositoryPassword: auth ? this.authValues.password : '',
     });
   }
 
