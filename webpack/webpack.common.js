@@ -10,8 +10,10 @@ const ESLintPlugin = require('eslint-webpack-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
 
+const CopyPlugin = require('copy-webpack-plugin');
 const pkg = require('../package.json');
 const projectRoot = path.resolve(__dirname, '..');
+
 
 module.exports = {
   entry: {
@@ -133,6 +135,14 @@ module.exports = {
       shorthands: true,
       collections: true,
       paths: true,
+    }),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'translations',
+          to: 'locales',
+        },
+      ],
     }),
   ],
   optimization: {
