@@ -15,6 +15,7 @@ import searchUIModel from '../../search/models';
 // * The error handling layer and debugging messages in the backend are pretty lightweight
 // * It uses some CSS hacks with :before to properly display icons in HTML inputs
 // * It wasn't tested/validated at scale (e.g. a lot of environments/resources)
+// * Do not apply dark mode / high contrast theme
 
 // TLDR
 // * No support for ACI environments
@@ -22,6 +23,7 @@ import searchUIModel from '../../search/models';
 // * No support to search across stacks
 // * Edge/Swarm+Agent not tested likely to not work
 // * Not tested at scale
+// * Do not support dark mode / high contrast themes
 
 export default class SearchController {
   /* @ngInject */
