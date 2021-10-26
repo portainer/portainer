@@ -1,9 +1,9 @@
 package customtemplate
 
 import (
-	"github.com/boltdb/bolt"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
+	bolt "go.etcd.io/bbolt"
 )
 
 const (

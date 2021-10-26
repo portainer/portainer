@@ -1,9 +1,9 @@
 package migrator
 
 import (
-	"github.com/boltdb/bolt"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
+	bolt "go.etcd.io/bbolt"
 )
 
 func (m *Migrator) updateResourceControlsToDBVersion2() error {

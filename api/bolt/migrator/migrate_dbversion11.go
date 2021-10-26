@@ -4,10 +4,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/boltdb/bolt"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
 	"github.com/portainer/portainer/api/bolt/stack"
+	bolt "go.etcd.io/bbolt"
 )
 
 func (m *Migrator) updateEndpointsToVersion12() error {

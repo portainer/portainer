@@ -1,10 +1,10 @@
 package migrator
 
 import (
-	"github.com/boltdb/bolt"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/user"
+	bolt "go.etcd.io/bbolt"
 )
 
 func (m *Migrator) updateAdminUserToDBVersion1() error {

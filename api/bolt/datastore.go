@@ -7,7 +7,6 @@ import (
 
 	"github.com/portainer/portainer/api/bolt/helmuserrepository"
 
-	"github.com/boltdb/bolt"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/customtemplate"
 	"github.com/portainer/portainer/api/bolt/dockerhub"
@@ -34,6 +33,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/user"
 	"github.com/portainer/portainer/api/bolt/version"
 	"github.com/portainer/portainer/api/bolt/webhook"
+	bolt "go.etcd.io/bbolt"
 )
 
 const (

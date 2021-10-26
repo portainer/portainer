@@ -5,12 +5,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/boltdb/bolt"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
 	"github.com/portainer/portainer/api/bolt/stack"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/stretchr/testify/assert"
+	bolt "go.etcd.io/bbolt"
 )
 
 func TestMigrateStackEntryPoint(t *testing.T) {

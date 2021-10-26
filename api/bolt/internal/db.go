@@ -3,8 +3,8 @@ package internal
 import (
 	"encoding/binary"
 
-	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer/api/bolt/errors"
+	bolt "go.etcd.io/bbolt"
 )
 
 type DbConnection struct {

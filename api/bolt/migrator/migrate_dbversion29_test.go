@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer/api/bolt/internal"
 	"github.com/portainer/portainer/api/bolt/settings"
+	bolt "go.etcd.io/bbolt"
 )
 
 var (

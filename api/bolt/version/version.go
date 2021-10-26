@@ -3,10 +3,10 @@ package version
 import (
 	"strconv"
 
-	"github.com/boltdb/bolt"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/internal"
+	bolt "go.etcd.io/bbolt"
 )
 
 const (

@@ -4,7 +4,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
 
-	"github.com/boltdb/bolt"
+	bolt "go.etcd.io/bbolt"
 )
 
 const (

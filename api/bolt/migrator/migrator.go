@@ -1,7 +1,6 @@
 package migrator
 
 import (
-	"github.com/boltdb/bolt"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/dockerhub"
 	"github.com/portainer/portainer/api/bolt/endpoint"
@@ -20,6 +19,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/user"
 	"github.com/portainer/portainer/api/bolt/version"
 	"github.com/portainer/portainer/api/internal/authorization"
+	bolt "go.etcd.io/bbolt"
 )
 
 var migrateLog = plog.NewScopedLog("bolt, migrate")
