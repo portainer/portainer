@@ -76,7 +76,13 @@ func JoinPaths(trustedRoot string, untrustedPaths ...string) string {
 		trustedRoot = "."
 	}
 
-	return filepath.Join(trustedRoot, filepath.Join(append([]string{"/"}, untrustedPaths...)...))
+	p := filepath.Join(trustedRoot, filepath.Join(append([]string{"/"}, untrustedPaths...)...))
+
+	if filepath.VolumeName(trustedRoot) == "" && filepath.VolumeName(p) != "" {
+		p, _ = filepath.Rel(filepath.VolumeName(p)+"/", p)
+	}
+
+	return p
 }
 
 // NewService initializes a new service. It creates a data directory and a directory to store files
