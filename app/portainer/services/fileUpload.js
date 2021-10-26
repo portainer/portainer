@@ -36,7 +36,7 @@ angular.module('portainer.app').factory('FileUploadService', [
     service.loadImages = function (file) {
       var endpointID = EndpointProvider.endpointID();
       return Upload.http({
-        url: 'api/endpoints/' + endpointID + '/docker/images/load',
+        url: 'api/endpoints/' + endpointID + '/docker/images/load?quiet=1',
         headers: {
           'Content-Type': file.type,
         },
