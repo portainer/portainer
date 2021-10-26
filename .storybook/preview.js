@@ -1,5 +1,7 @@
 import '../app/assets/css';
 
+import { pushStateLocationPlugin, UIRouter } from '@uirouter/react';
+
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },
   controls: {
@@ -9,3 +11,11 @@ export const parameters = {
     },
   },
 };
+
+export const decorators = [
+  (Story) => (
+    <UIRouter plugins={[pushStateLocationPlugin]}>
+      <Story />
+    </UIRouter>
+  ),
+];
