@@ -385,6 +385,11 @@ func (transport *Transport) proxyImageRequest(request *http.Request) (*http.Resp
 	switch requestPath := request.URL.Path; requestPath {
 	case "/images/create":
 		return transport.replaceRegistryAuthenticationHeader(request)
+	case "/images/load":
+		q := request.URL.Query()
+		q.Add("quiet", "1") // suppress Transfer-Encoding: chunked for arm
+		request.URL.RawQuery = q.Encode()
+		fallthrough
 	default:
 		if path.Base(requestPath) == "push" && request.Method == http.MethodPost {
 			return transport.replaceRegistryAuthenticationHeader(request)
