@@ -6,13 +6,13 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"path/filepath"
 
 	"github.com/gofrs/uuid"
 	portainer "github.com/portainer/portainer/api"
 
 	"io"
 	"os"
-	"path"
 )
 
 const (
@@ -76,7 +76,7 @@ func JoinPaths(trustedRoot string, untrustedPaths ...string) string {
 		trustedRoot = "."
 	}
 
-	return path.Join(trustedRoot, path.Join(append([]string{"/"}, untrustedPaths...)...))
+	return filepath.Join(trustedRoot, filepath.Join(append([]string{"/"}, untrustedPaths...)...))
 }
 
 // NewService initializes a new service. It creates a data directory and a directory to store files
