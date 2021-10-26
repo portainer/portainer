@@ -387,7 +387,7 @@ func (transport *Transport) proxyImageRequest(request *http.Request) (*http.Resp
 		return transport.replaceRegistryAuthenticationHeader(request)
 	case "/images/load":
 		q := request.URL.Query()
-		q.Add("quiet", "1") // suppress Transfer-Encoding: chunked for arm
+		q.Add("quiet", "true") // suppress Transfer-Encoding: chunked for arm
 		request.URL.RawQuery = q.Encode()
 		fallthrough
 	default:
