@@ -1,4 +1,5 @@
 import { Terminal } from 'xterm';
+import { baseHref } from '@/portainer/helpers/pathHelper';
 
 angular.module('portainer.docker').controller('ContainerConsoleController', [
   '$scope',
@@ -69,7 +70,8 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
           };
 
           var url =
-            window.location.href.split('#')[0] +
+            window.location.origin +
+            baseHref() +
             'api/websocket/attach?' +
             Object.keys(params)
               .map((k) => k + '=' + params[k])
@@ -109,7 +111,8 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
           };
 
           var url =
-            window.location.href.split('#')[0] +
+            window.location.origin +
+            baseHref() +
             'api/websocket/exec?' +
             Object.keys(params)
               .map((k) => k + '=' + params[k])

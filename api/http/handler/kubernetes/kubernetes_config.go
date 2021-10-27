@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -58,7 +59,7 @@ func (handler *Handler) getKubernetesConfig(w http.ResponseWriter, r *http.Reque
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create Kubernetes client", err}
 	}
 
-	apiServerURL := getProxyUrl(r, endpointID)
+	apiServerURL := getProxyUrl(r, handler.BaseURL, endpointID)
 
 	config, err := cli.GetKubeConfig(r.Context(), apiServerURL, bearerToken, tokenData)
 	if err != nil {
@@ -82,8 +83,11 @@ func (handler *Handler) getKubernetesConfig(w http.ResponseWriter, r *http.Reque
 }
 
 // getProxyUrl generates portainer proxy url which acts as proxy to k8s api server
-func getProxyUrl(r *http.Request, endpointID int) string {
-	return fmt.Sprintf("https://%s/api/endpoints/%d/kubernetes", r.Host, endpointID)
+func getProxyUrl(r *http.Request, baseURL string, endpointID int) string {
+	if baseURL != "/" {
+		baseURL = fmt.Sprintf("/%s/", strings.Trim(baseURL, "/"))
+	}
+	return fmt.Sprintf("https://%s%sapi/endpoints/%d/kubernetes", r.Host, baseURL, endpointID)
 }
 
 // YAML writes yaml response as string to writer. Returns a pointer to a HandlerError if encoding fails.
