@@ -92,7 +92,8 @@ func (handler *Handler) filterUserKubeEndpoints(r *http.Request) ([]portainer.En
 			}
 			endpoints = append(endpoints, *endpoint)
 		}
-		return endpoints, nil
+		filteredEndpoints := security.FilterEndpoints(endpoints, endpointGroups, securityContext)
+		return filteredEndpoints, nil
 	}
 
 	var kubeEndpoints []portainer.Endpoint
