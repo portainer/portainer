@@ -36,8 +36,8 @@ func TestMigrateData(t *testing.T) {
 		testVersion(store, portainer.DBVersion, t)
 		store.Close()
 
-		newStore, _ = store.Open()
-		if newStore {
+		store.Open()
+		if store.isNew {
 			t.Error("Expect store to NOT be new DB")
 		}
 	})

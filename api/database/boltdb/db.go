@@ -12,36 +12,39 @@ import (
 
 	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer/api/dataservices/errors"
-)
-
-const (
-	DatabaseFileName = "portainer.db"
+	"github.com/sirupsen/logrus"
 )
 
 type DbConnection struct {
-	Path string
+	Path          string
+	EncryptionKey string
 
 	*bolt.DB
 }
 
 func (connection *DbConnection) GetDatabaseFilename() string {
-	return DatabaseFileName
+	if connection.EncryptionKey == "" {
+		return "portainer.db"
+	}
+	return "portainer.edb"
 }
 
 func (connection *DbConnection) GetStorePath() string {
 	return connection.Path
 }
 
-// Open opens and initializes the BoltDB database.
+// Opens the BoltDB database.
 func (connection *DbConnection) Open() error {
-	databaseExportPath := path.Join(connection.Path, fmt.Sprintf("raw-%s-%d.json", DatabaseFileName, time.Now().Unix()))
+	databaseExportPath := path.Join(connection.Path, fmt.Sprintf("raw-%s-%d.json", connection.GetDatabaseFilename(), time.Now().Unix()))
 	if err := connection.ExportRaw(databaseExportPath); err != nil {
 		log.Printf("raw export to %s error: %s", databaseExportPath, err)
 	} else {
 		log.Printf("raw export to %s success", databaseExportPath)
 	}
 
-	databasePath := path.Join(connection.Path, DatabaseFileName)
+	databasePath := path.Join(connection.Path, connection.GetDatabaseFilename())
+
+	logrus.WithField("dbPath", databasePath).WithField("try Passphrase", connection.EncryptionKey != "").Debugf("opening database")
 
 	db, err := bolt.Open(databasePath, 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
@@ -70,12 +73,12 @@ func (connection *DbConnection) BackupTo(w io.Writer) error {
 }
 
 func (connection *DbConnection) ExportRaw(filename string) error {
-	databasePath := path.Join(connection.Path, DatabaseFileName)
+	databasePath := path.Join(connection.Path, connection.GetDatabaseFilename())
 	if _, err := os.Stat(databasePath); err != nil {
 		return fmt.Errorf("stat on %s failed: %s", databasePath, err)
 	}
 
-	b, err := exportJson(databasePath)
+	b, err := exportJson(databasePath, connection.EncryptionKey)
 	if err != nil {
 		return err
 	}
@@ -104,6 +107,7 @@ func (connection *DbConnection) SetServiceName(bucketName string) error {
 
 // GetObject is a generic function used to retrieve an unmarshalled object from a database database.
 func (connection *DbConnection) GetObject(bucketName string, key []byte, object interface{}) error {
+	logrus.WithField("bucket", bucketName).WithField("key", string(key)).Infof("GetObject")
 	var data []byte
 
 	err := connection.View(func(tx *bolt.Tx) error {
@@ -123,15 +127,17 @@ func (connection *DbConnection) GetObject(bucketName string, key []byte, object 
 		return err
 	}
 
-	return UnmarshalObject(data, object)
+	return UnmarshalObject(data, object, connection.EncryptionKey)
 }
 
 // UpdateObject is a generic function used to update an object inside a database database.
 func (connection *DbConnection) UpdateObject(bucketName string, key []byte, object interface{}) error {
+	logrus.WithField("bucket", bucketName).WithField("key", string(key)).Infof("UpdateObject")
+
 	return connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
-		data, err := MarshalObject(object)
+		data, err := MarshalObject(object, connection.EncryptionKey)
 		if err != nil {
 			return err
 		}
@@ -147,6 +153,8 @@ func (connection *DbConnection) UpdateObject(bucketName string, key []byte, obje
 
 // DeleteObject is a generic function used to delete an object inside a database database.
 func (connection *DbConnection) DeleteObject(bucketName string, key []byte) error {
+	logrus.WithField("bucket", bucketName).WithField("key", string(key)).Infof("DeleteObject")
+
 	return connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 		return bucket.Delete(key)
@@ -156,13 +164,15 @@ func (connection *DbConnection) DeleteObject(bucketName string, key []byte) erro
 // DeleteAllObjects delete all objects where matching() returns (id, ok).
 // TODO: think about how to return the error inside (maybe change ok to type err, and use "notfound"?
 func (connection *DbConnection) DeleteAllObjects(bucketName string, matching func(o interface{}) (id int, ok bool)) error {
+	logrus.WithField("bucket", bucketName).Infof("DeleteAllObjects")
+
 	return connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var obj interface{}
-			err := UnmarshalObject(v, &obj)
+			err := UnmarshalObject(v, &obj, connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -198,13 +208,15 @@ func (connection *DbConnection) GetNextIdentifier(bucketName string) int {
 
 // CreateObject creates a new object in the bucket, using the next bucket sequence id
 func (connection *DbConnection) CreateObject(bucketName string, fn func(uint64) (int, interface{})) error {
+	logrus.WithField("bucket", bucketName).Infof("CreateObject")
+
 	return connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
 		seqId, _ := bucket.NextSequence()
 		id, obj := fn(seqId)
 
-		data, err := MarshalObject(obj)
+		data, err := MarshalObject(obj, connection.EncryptionKey)
 		if err != nil {
 			return err
 		}
@@ -215,10 +227,12 @@ func (connection *DbConnection) CreateObject(bucketName string, fn func(uint64) 
 
 // CreateObjectWithId creates a new object in the bucket, using the specified id
 func (connection *DbConnection) CreateObjectWithId(bucketName string, id int, obj interface{}) error {
+	logrus.WithField("bucket", bucketName).WithField("id", id).Infof("CreateObjectWithId")
+
 	return connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
-		data, err := MarshalObject(obj)
+		data, err := MarshalObject(obj, connection.EncryptionKey)
 		if err != nil {
 			return err
 		}
@@ -239,7 +253,7 @@ func (connection *DbConnection) CreateObjectWithSetSequence(bucketName string, i
 			return err
 		}
 
-		data, err := MarshalObject(obj)
+		data, err := MarshalObject(obj, connection.EncryptionKey)
 		if err != nil {
 			return err
 		}
@@ -249,12 +263,14 @@ func (connection *DbConnection) CreateObjectWithSetSequence(bucketName string, i
 }
 
 func (connection *DbConnection) GetAll(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error {
+	logrus.WithField("bucket", bucketName).Infof("GetAll")
+
 	err := connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			err := UnmarshalObject(v, obj)
+			err := UnmarshalObject(v, obj, connection.EncryptionKey)
 			if err != nil {
 				return err
 			}
@@ -271,12 +287,14 @@ func (connection *DbConnection) GetAll(bucketName string, obj interface{}, appen
 
 // TODO: decide which Unmarshal to use, and use one...
 func (connection *DbConnection) GetAllWithJsoniter(bucketName string, obj interface{}, append func(o interface{}) (interface{}, error)) error {
+	logrus.WithField("bucket", bucketName).Infof("GetAllWithJsoniter")
+
 	err := connection.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
 
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			err := UnmarshalObjectWithJsoniter(v, obj)
+			err := UnmarshalObjectWithJsoniter(v, obj, connection.EncryptionKey)
 			if err != nil {
 				return err
 			}

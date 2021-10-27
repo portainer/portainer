@@ -19,6 +19,7 @@ const beforePortainerVersionUpgradeBackup = "portainer.db.bak"
 var migrateLog = plog.NewScopedLog("database, migrate")
 
 func (store *Store) MigrateData() error {
+
 	version, err := store.version()
 	if err != nil {
 		return err

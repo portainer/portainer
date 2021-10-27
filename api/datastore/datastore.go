@@ -5,6 +5,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices/errors"
+	"github.com/sirupsen/logrus"
 )
 
 func (store *Store) version() (int, error) {
@@ -28,28 +29,57 @@ func NewStore(storePath string, fileService portainer.FileService, connection po
 	return &Store{
 		fileService: fileService,
 		connection:  connection,
+		isNew: true,
 	}
 }
 
+func (store *Store) IsNew() bool {
+	return store.isNew
+}
+
 // Open opens and initializes the BoltDB database.
-func (store *Store) Open() (newStore bool, err error) {
-	newStore = true
-	err = store.connection.Open()
+func (store *Store) Open() error {
+	err := store.connection.Open()
 	if err != nil {
-		return newStore, err
+		return err
 	}
 
+	// This creates the accessor structures, and should not mutate the data in any way
 	err = store.initServices()
 	if err != nil {
-		return newStore, err
+		return err
 	}
 
 	// if we have DBVersion in the database then ensure we flag this as NOT a new store
-	if _, err := store.VersionService.DBVersion(); err == nil {
-		newStore = false
+	if version, err := store.VersionService.DBVersion(); err == nil {
+		store.isNew = false
+		logrus.WithField("version", version).Infof("Opened existing store")
+	} else {
+		if err.Error() == "encrypted string too short" {
+			// TODO: this is a magic string in boltdb/json.go
+			// TODO: reopen without passphrase, then resave with encryption?
+			logrus.WithError(err).Debugf("open db failed - seems its not encrypted?")
+			return err
+		}
+		if store.IsErrObjectNotFound(err) {
+			// its new, lets see if there's an import.yml file, and if there is, import it
+			importFile := "/data/import.json"
+			if exists, _ := store.fileService.FileExists(importFile); exists {
+				if err := store.Import(importFile); err != nil {
+					logrus.WithError(err).Debugf("import %s failed", importFile)
+
+					// TODO: should really rollback on failure, but then we have nothing.
+				} else {
+					logrus.Printf("Successfully imported %s to new portainer database", importFile)
+				}
+			}
+		} else {
+			logrus.WithError(err).Debugf("open db failed")
+			return err
+		}
 	}
 
-	return newStore, nil
+	return nil
 }
 
 func (store *Store) Close() error {

@@ -42,28 +42,29 @@ func NewTestStore(init bool) (bool, *Store, func(), error) {
 		return false, nil, nil, err
 	}
 
-	connection, err := database.NewDatabase("boltdb", storePath)
+	// TODO: add the UX to get the key from somewhere we consider "safe"
+	connection, err := database.NewDatabase("boltdb", storePath, "apassphrasewhichneedstobe32bytes")
 	if err != nil {
 		panic(err)
 	}
 	store := NewStore(storePath, fileService, connection)
-	newStore, err := store.Open()
+	err = store.Open()
 	if err != nil {
-		return newStore, nil, nil, err
+		return store.isNew, nil, nil, err
 	}
 
 	if init {
 		err = store.Init()
 		if err != nil {
-			return newStore, nil, nil, err
+			return store.isNew, nil, nil, err
 		}
 	}
 
-	if newStore {
+	if store.isNew {
 		// from MigrateData
 		store.VersionService.StoreDBVersion(portainer.DBVersion)
 		if err != nil {
-			return newStore, nil, nil, err
+			return store.isNew, nil, nil, err
 		}
 	}
 
@@ -71,7 +72,7 @@ func NewTestStore(init bool) (bool, *Store, func(), error) {
 		teardown(store, storePath)
 	}
 
-	return newStore, store, teardown, nil
+	return store.isNew, store, teardown, nil
 }
 
 func teardown(store *Store, storePath string) {

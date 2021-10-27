@@ -39,7 +39,8 @@ import (
 // BoltDB as the storage system.
 type Store struct {
 	connection portainer.Connection
-
+	isNew bool
+	
 	fileService               portainer.FileService
 	CustomTemplateService     *customtemplate.Service
 	DockerHubService          *dockerhub.Service
