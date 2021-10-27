@@ -3,10 +3,9 @@ package testhelpers
 import (
 	"io"
 
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/dataservices/errors"
-
-	portainer "github.com/portainer/portainer/api"
 )
 
 type testDatastore struct {
@@ -35,12 +34,11 @@ type testDatastore struct {
 }
 
 func (d *testDatastore) BackupTo(io.Writer) error                           { return nil }
-func (d *testDatastore) Open() error                                        { return nil }
+func (d *testDatastore) Open() (bool, error)                                { return false, nil }
 func (d *testDatastore) Init() error                                        { return nil }
 func (d *testDatastore) Close() error                                       { return nil }
 func (d *testDatastore) CheckCurrentEdition() error                         { return nil }
-func (d *testDatastore) IsNew() bool                                        { return false }
-func (d *testDatastore) MigrateData(force bool) error                       { return nil }
+func (d *testDatastore) MigrateData() error                                 { return nil }
 func (d *testDatastore) Rollback(force bool) error                          { return nil }
 func (d *testDatastore) CustomTemplate() dataservices.CustomTemplateService { return d.customTemplate }
 func (d *testDatastore) EdgeGroup() dataservices.EdgeGroupService           { return d.edgeGroup }

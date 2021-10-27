@@ -39,7 +39,6 @@ import (
 // BoltDB as the storage system.
 type Store struct {
 	connection portainer.Connection
-	isNew      bool
 
 	fileService               portainer.FileService
 	CustomTemplateService     *customtemplate.Service
@@ -347,7 +346,7 @@ type storeExport struct {
 	ResourceControl    []portainer.ResourceControl    `json:"resource_control,omitempty"`
 	Role               []portainer.Role               `json:"roles,omitempty"`
 	Schedules          []portainer.Schedule           `json:"schedules,omitempty"`
-	Settings           portainer.Settings             `json:"customtemplates,omitempty"`
+	Settings           portainer.Settings             `json:"settings,omitempty"`
 	SSLSettings        portainer.SSLSettings          `json:"ssl,omitempty"`
 	Stack              []portainer.Stack              `json:"stacks,omitempty"`
 	Tag                []portainer.Tag                `json:"tags,omitempty"`
@@ -356,7 +355,7 @@ type storeExport struct {
 	TunnelServer       portainer.TunnelServerInfo     `json:"tunnel_server,omitempty"`
 	User               []portainer.User               `json:"users,omitempty"`
 	Version            map[string]string              `json:"version,omitempty"`
-	webhook            []portainer.Webhook            `json:"webhooks,omitempty"`
+	Webhook            []portainer.Webhook            `json:"webhooks,omitempty"`
 }
 
 func (store *Store) Export(filename string) (err error) {

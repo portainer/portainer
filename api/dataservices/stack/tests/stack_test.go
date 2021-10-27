@@ -1,9 +1,10 @@
 package tests
 
 import (
-	"github.com/portainer/portainer/api/datastore"
 	"testing"
 	"time"
+
+	"github.com/portainer/portainer/api/datastore"
 
 	"github.com/gofrs/uuid"
 	portainer "github.com/portainer/portainer/api"
@@ -28,7 +29,7 @@ func TestService_StackByWebhookID(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode. Normally takes ~1s to run.")
 	}
-	store, teardown := datastore.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	b := stackBuilder{t: t, store: store}
@@ -86,7 +87,7 @@ func Test_RefreshableStacks(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode. Normally takes ~1s to run.")
 	}
-	store, teardown := datastore.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	staticStack := portainer.Stack{ID: 1}

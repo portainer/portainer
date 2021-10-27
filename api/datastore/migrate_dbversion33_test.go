@@ -1,15 +1,16 @@
 package datastore
 
 import (
+	"testing"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/datastore/migrator"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestMigrateStackEntryPoint(t *testing.T) {
-	store, teardown := MustNewTestStore(false)
+	_, store, teardown := MustNewTestStore(false)
 	defer teardown()
 
 	stackService := store.Stack()

@@ -50,7 +50,7 @@ export default class WizardAciController {
       this.state = {
         actionInProgress: false,
         endpointType: 'api',
-        availableOptions: [buildOption('API', 'fa fa-database', 'API', '', 'api')],
+        availableOptions: [buildOption('API', 'fa fa-bolt', 'API', '', 'api')],
       };
       this.formValues = {
         name: '',

@@ -36,7 +36,7 @@ func tokenLookupFail(r *http.Request) *portainer.TokenData {
 func Test_mwAuthenticateFirst(t *testing.T) {
 	is := assert.New(t)
 
-	store, teardown := datastore.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	jwtService, err := jwt.NewService("1h", store)
@@ -259,7 +259,7 @@ func Test_extractAPIKeyQueryParam(t *testing.T) {
 func Test_apiKeyLookup(t *testing.T) {
 	is := assert.New(t)
 
-	store, teardown := datastore.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	// create standard user

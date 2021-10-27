@@ -22,7 +22,7 @@ import (
 func Test_helmDelete(t *testing.T) {
 	is := assert.New(t)
 
-	store, teardown := datastore.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	err := store.Endpoint().Create(&portainer.Endpoint{ID: 1})

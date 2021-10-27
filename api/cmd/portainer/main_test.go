@@ -21,7 +21,7 @@ func (m mockKingpinSetting) SetValue(value kingpin.Value) {
 func Test_enableFeaturesFromFlags(t *testing.T) {
 	is := assert.New(t)
 
-	store, teardown := datastore.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	tests := []struct {
@@ -81,7 +81,7 @@ func Test_optionalFeature(t *testing.T) {
 
 	is := assert.New(t)
 
-	store, teardown := datastore.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	// Enable the test feature

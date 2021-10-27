@@ -3,9 +3,10 @@ package dataservices
 // 	"github.com/portainer/portainer/api/dataservices"
 
 import (
-	"github.com/portainer/portainer/api/dataservices/errors"
 	"io"
 	"time"
+
+	"github.com/portainer/portainer/api/dataservices/errors"
 
 	portainer "github.com/portainer/portainer/api"
 )
@@ -13,11 +14,10 @@ import (
 type (
 	// DataStore defines the interface to manage the data
 	DataStore interface {
-		Open() error
+		Open() (newStore bool, err error)
 		Init() error
 		Close() error
-		IsNew() bool
-		MigrateData(force bool) error
+		MigrateData() error
 		Rollback(force bool) error
 		CheckCurrentEdition() error
 		BackupTo(w io.Writer) error
