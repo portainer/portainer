@@ -24,7 +24,7 @@ func (store *Store) Init() error {
 	}
 
 	// TODO: these need to also be applied when importing
-	_, err = store.SettingsService.Settings()
+	settings, err := store.SettingsService.Settings()
 	if store.IsErrObjectNotFound(err) {
 		defaultSettings := &portainer.Settings{
 			AuthenticationMethod: portainer.AuthenticationInternal,
@@ -56,6 +56,11 @@ func (store *Store) Init() error {
 		}
 	} else if err != nil {
 		return err
+	} else if err == nil {
+		if settings.UserSessionTimeout == "" {
+			settings.UserSessionTimeout = portainer.DefaultUserSessionTimeout
+			store.Settings().UpdateSettings(settings)
+		}
 	}
 
 	_, err = store.SSLSettings().Settings()

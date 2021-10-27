@@ -2,10 +2,11 @@ package stacks
 
 import (
 	"errors"
-	"github.com/portainer/portainer/api/datastore"
 	"io/ioutil"
 	"strings"
 	"testing"
+
+	"github.com/portainer/portainer/api/datastore"
 
 	portainer "github.com/portainer/portainer/api"
 	gittypes "github.com/portainer/portainer/api/git/types"
@@ -40,7 +41,7 @@ func (s *noopDeployer) DeployKubernetesStack(stack *portainer.Stack, endpoint *p
 }
 
 func Test_redeployWhenChanged_FailsWhenCannotFindStack(t *testing.T) {
-	store, teardown := datastore.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	err := RedeployWhenChanged(1, nil, store, nil)
@@ -49,7 +50,7 @@ func Test_redeployWhenChanged_FailsWhenCannotFindStack(t *testing.T) {
 }
 
 func Test_redeployWhenChanged_DoesNothingWhenNotAGitBasedStack(t *testing.T) {
-	store, teardown := datastore.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	admin := &portainer.User{ID: 1, Username: "admin"}
@@ -64,7 +65,7 @@ func Test_redeployWhenChanged_DoesNothingWhenNotAGitBasedStack(t *testing.T) {
 }
 
 func Test_redeployWhenChanged_DoesNothingWhenNoGitChanges(t *testing.T) {
-	store, teardown := datastore.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	tmpDir, _ := ioutil.TempDir("", "stack")
@@ -90,7 +91,7 @@ func Test_redeployWhenChanged_DoesNothingWhenNoGitChanges(t *testing.T) {
 
 func Test_redeployWhenChanged_FailsWhenCannotClone(t *testing.T) {
 	cloneErr := errors.New("failed to clone")
-	store, teardown := datastore.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	admin := &portainer.User{ID: 1, Username: "admin"}
@@ -113,7 +114,7 @@ func Test_redeployWhenChanged_FailsWhenCannotClone(t *testing.T) {
 }
 
 func Test_redeployWhenChanged(t *testing.T) {
-	store, teardown := datastore.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	tmpDir, _ := ioutil.TempDir("", "stack")
@@ -164,7 +165,7 @@ func Test_redeployWhenChanged(t *testing.T) {
 }
 
 func Test_getUserRegistries(t *testing.T) {
-	store, teardown := datastore.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	endpointID := 123

@@ -17,11 +17,7 @@ const beforePortainerVersionUpgradeBackup = "portainer.db.bak"
 
 var migrateLog = plog.NewScopedLog("database, migrate")
 
-func (store *Store) MigrateData(force bool) error {
-	if store.isNew && !force {
-		return store.VersionService.StoreDBVersion(portainer.DBVersion)
-	}
-
+func (store *Store) MigrateData() error {
 	version, err := store.version()
 	if err != nil {
 		return err
@@ -48,7 +44,7 @@ func (store *Store) MigrateData(force bool) error {
 		AuthorizationService:    authorization.NewService(store),
 	}
 
-	return store.connectionMigrateData(migratorParams, force)
+	return store.connectionMigrateData(migratorParams)
 }
 
 // FailSafeMigrate backup and restore DB if migration fail
@@ -68,7 +64,7 @@ func (store *Store) FailSafeMigrate(migrator *migrator.Migrator) (err error) {
 // MigrateData automatically migrate the data based on the DBVersion.
 // This process is only triggered on an existing database, not if the database was just created.
 // if force is true, then migrate regardless.
-func (store *Store) connectionMigrateData(migratorParams *migrator.MigratorParameters, force bool) error {
+func (store *Store) connectionMigrateData(migratorParams *migrator.MigratorParameters) error {
 	migrator := migrator.NewMigrator(migratorParams)
 
 	// backup db file before upgrading DB to support rollback

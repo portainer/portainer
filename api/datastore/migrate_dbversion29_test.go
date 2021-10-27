@@ -1,10 +1,11 @@
 package datastore
 
 import (
+	"testing"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/datastore/migrator"
 	"github.com/portainer/portainer/api/internal/authorization"
-	"testing"
 )
 
 const dummyLogoURL = "example.com"
@@ -32,7 +33,7 @@ func setup(store *Store) error {
 }
 
 func TestMigrateSettings(t *testing.T) {
-	store, teardown := MustNewTestStore(false)
+	_, store, teardown := MustNewTestStore(false)
 	defer teardown()
 
 	err := setup(store)

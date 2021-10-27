@@ -2,10 +2,11 @@ package helm
 
 import (
 	"fmt"
-	"github.com/portainer/portainer/api/datastore"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/portainer/portainer/api/datastore"
 
 	"github.com/portainer/libhelm/binary/test"
 	"github.com/portainer/libhelm/options"
@@ -21,7 +22,7 @@ import (
 func Test_helmDelete(t *testing.T) {
 	is := assert.New(t)
 
-	store, teardown := datastore.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	err := store.Endpoint().Create(&portainer.Endpoint{ID: 1})
