@@ -78,6 +78,7 @@ func JoinPaths(trustedRoot string, untrustedPaths ...string) string {
 
 	p := filepath.Join(trustedRoot, filepath.Join(append([]string{"/"}, untrustedPaths...)...))
 
+	// avoid setting a volume name from the untrusted paths
 	if filepath.VolumeName(trustedRoot) == "" && filepath.VolumeName(p) != "" {
 		p, _ = filepath.Rel(filepath.VolumeName(p)+"/", p)
 	}
