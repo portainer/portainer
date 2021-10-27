@@ -580,7 +580,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
           $scope.formValues.RegistryModel = model;
         })
         .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to retrive registry');
+          Notifications.error('Failure', err, 'Unable to retrieve registry');
         });
     }
 

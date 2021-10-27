@@ -59,6 +59,12 @@ func (service *Service) GetTunnelDetails(endpointID portainer.EndpointID) *porta
 // GetActiveTunnel retrieves an active tunnel which allows communicating with edge agent
 func (service *Service) GetActiveTunnel(endpoint *portainer.Endpoint) (*portainer.TunnelDetails, error) {
 	tunnel := service.GetTunnelDetails(endpoint.ID)
+
+	if tunnel.Status == portainer.EdgeAgentActive {
+		// update the LastActivity
+		service.SetTunnelStatusToActive(endpoint.ID)
+	}
+
 	if tunnel.Status == portainer.EdgeAgentIdle || tunnel.Status == portainer.EdgeAgentManagementRequired {
 		err := service.SetTunnelStatusToRequired(endpoint.ID)
 		if err != nil {
@@ -74,9 +80,18 @@ func (service *Service) GetActiveTunnel(endpoint *portainer.Endpoint) (*portaine
 			endpoint.EdgeCheckinInterval = settings.EdgeAgentCheckinInterval
 		}
 
-		waitForAgentToConnect := time.Duration(endpoint.EdgeCheckinInterval) * time.Second
-		time.Sleep(waitForAgentToConnect * 2)
+		waitForAgentToConnect := 2 * time.Duration(endpoint.EdgeCheckinInterval)
+
+		for waitForAgentToConnect >= 0 {
+			waitForAgentToConnect--
+			time.Sleep(time.Second)
+			tunnel = service.GetTunnelDetails(endpoint.ID)
+			if tunnel.Status == portainer.EdgeAgentActive {
+				break
+			}
+		}
 	}
+
 	tunnel = service.GetTunnelDetails(endpoint.ID)
 
 	return tunnel, nil
@@ -112,6 +127,8 @@ func (service *Service) SetTunnelStatusToIdle(endpointID portainer.EndpointID) {
 
 	key := strconv.Itoa(int(endpointID))
 	service.tunnelDetailsMap.Set(key, tunnel)
+
+	service.ProxyManager.DeleteEndpointProxy(endpointID)
 }
 
 // SetTunnelStatusToRequired update the status of the tunnel associated to the specified environment(endpoint).

@@ -146,6 +146,10 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 			Username: payload.RepositoryUsername,
 			Password: password,
 		}
+		_, err = handler.GitService.LatestCommitID(stack.GitConfig.URL, stack.GitConfig.ReferenceName, stack.GitConfig.Authentication.Username, stack.GitConfig.Authentication.Password)
+		if err != nil {
+			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to fetch git repository", Err: err}
+		}
 	}
 
 	if payload.AutoUpdate != nil && payload.AutoUpdate.Interval != "" {
