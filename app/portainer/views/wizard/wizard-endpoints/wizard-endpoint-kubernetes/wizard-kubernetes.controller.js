@@ -94,7 +94,7 @@ export default class WizardKubernetesController {
           name: '',
           url: '',
         },
-        availableOptions: [buildOption('Agent', 'fa fa-database', 'Agent', '', 'agent')],
+        availableOptions: [buildOption('Agent', 'fa fa-bolt', 'Agent', '', 'agent')],
       };
 
       const agentVersion = this.StateManager.getState().application.version;

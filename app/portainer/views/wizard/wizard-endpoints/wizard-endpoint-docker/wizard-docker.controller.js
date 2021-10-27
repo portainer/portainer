@@ -179,7 +179,7 @@ export default class WizardDockerController {
         actionInProgress: false,
         endpoints: [],
         availableOptions: [
-          buildOption('Agent', 'fa fa-database', 'Agent', '', 'agent'),
+          buildOption('Agent', 'fa fa-bolt', 'Agent', '', 'agent'),
           buildOption('API', 'fa fa-cloud', 'API', '', 'api'),
           buildOption('Socket', 'fab fa-docker', 'Socket', '', 'socket'),
         ],

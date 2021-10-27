@@ -17,7 +17,7 @@ import (
 func Test_updateUserRemovesAccessTokens(t *testing.T) {
 	is := assert.New(t)
 
-	store, teardown := datastore.MustNewTestStore(true)
+	_, store, teardown := datastore.MustNewTestStore(true)
 	defer teardown()
 
 	// create standard user

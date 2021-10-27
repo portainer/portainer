@@ -5,7 +5,6 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices/errors"
-	"github.com/sirupsen/logrus"
 )
 
 func (store *Store) version() (int, error) {
@@ -28,51 +27,33 @@ func (store *Store) edition() portainer.SoftwareEdition {
 func NewStore(storePath string, fileService portainer.FileService, connection portainer.Connection) *Store {
 	return &Store{
 		fileService: fileService,
-		isNew:       true,
 		connection:  connection,
 	}
 }
 
 // Open opens and initializes the BoltDB database.
-func (store *Store) Open() error {
-	err := store.connection.Open()
+func (store *Store) Open() (newStore bool, err error) {
+	newStore = true
+	err = store.connection.Open()
 	if err != nil {
-		return err
+		return newStore, err
 	}
 
 	err = store.initServices()
 	if err != nil {
-		return err
+		return newStore, err
 	}
 
 	// if we have DBVersion in the database then ensure we flag this as NOT a new store
 	if _, err := store.VersionService.DBVersion(); err == nil {
-		store.isNew = false
-	} else {
-		// its new, lets see if there's an import.yml file, and if there is, import it
-		importFile := "/data/import.json"
-		if exists, _ := store.fileService.FileExists(importFile); exists {
-			if err := store.Import(importFile); err != nil {
-				logrus.WithError(err).Debugf("import %s failed", importFile)
-
-				// TODO: should really rollback on failure, but then we have nothing.
-			} else {
-				logrus.Printf("Successfully imported %s to new portainer database", importFile)
-			}
-		}
+		newStore = false
 	}
 
-	return nil
+	return newStore, nil
 }
 
 func (store *Store) Close() error {
 	return store.connection.Close()
-}
-
-// IsNew returns true if the database was just created and false if it is re-using
-// existing data.
-func (store *Store) IsNew() bool {
-	return store.isNew
 }
 
 // BackupTo backs up db to a provided writer.

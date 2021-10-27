@@ -2,10 +2,11 @@ package datastore
 
 import (
 	"fmt"
-	plog "github.com/portainer/portainer/api/datastore/log"
 	"os"
 	"path"
 	"time"
+
+	plog "github.com/portainer/portainer/api/datastore/log"
 )
 
 var backupDefaults = struct {
@@ -127,7 +128,8 @@ func (store *Store) restoreWithOptions(options *BackupOptions) error {
 		return err
 	}
 
-	return store.Open()
+	_, err = store.Open()
+	return err
 }
 
 // RemoveWithOptions removes backup database based on supplied options

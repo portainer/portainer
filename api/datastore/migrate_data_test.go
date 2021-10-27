@@ -23,20 +23,21 @@ func testVersion(store *Store, versionWant int, t *testing.T) {
 
 func TestMigrateData(t *testing.T) {
 	t.Run("MigrateData for New Store & Re-Open Check", func(t *testing.T) {
-		store, teardown := MustNewTestStore(false)
+		newStore, store, teardown := MustNewTestStore(false)
 		defer teardown()
 
-		if !store.IsNew() {
+		if !newStore {
 			t.Error("Expect a new DB")
 		}
 
-		store.MigrateData(false)
+		// not called for new stores
+		//store.MigrateData()
 
 		testVersion(store, portainer.DBVersion, t)
 		store.Close()
 
-		store.Open()
-		if store.IsNew() {
+		newStore, _ = store.Open()
+		if newStore {
 			t.Error("Expect store to NOT be new DB")
 		}
 	})
@@ -49,7 +50,7 @@ func TestMigrateData(t *testing.T) {
 		{version: 21, expectedVersion: portainer.DBVersion},
 	}
 	for _, tc := range tests {
-		store, teardown := MustNewTestStore(true)
+		_, store, teardown := MustNewTestStore(true)
 		defer teardown()
 
 		// Setup data
@@ -62,7 +63,7 @@ func TestMigrateData(t *testing.T) {
 		store.RoleService.Create(&portainer.Role{ID: 4})
 
 		t.Run(fmt.Sprintf("MigrateData for version %d", tc.version), func(t *testing.T) {
-			store.MigrateData(true)
+			store.MigrateData()
 			testVersion(store, tc.expectedVersion, t)
 		})
 
@@ -74,23 +75,23 @@ func TestMigrateData(t *testing.T) {
 	}
 
 	t.Run("Error in MigrateData should restore backup before MigrateData", func(t *testing.T) {
-		store, teardown := MustNewTestStore(false)
+		_, store, teardown := MustNewTestStore(false)
 		defer teardown()
 
 		version := 17
 		store.VersionService.StoreDBVersion(version)
 
-		store.MigrateData(true)
+		store.MigrateData()
 
 		testVersion(store, version, t)
 	})
 
 	t.Run("MigrateData should create backup file upon update", func(t *testing.T) {
-		store, teardown := MustNewTestStore(false)
+		_, store, teardown := MustNewTestStore(false)
 		defer teardown()
 		store.VersionService.StoreDBVersion(0)
 
-		store.MigrateData(true)
+		store.MigrateData()
 
 		options := store.setupOptions(getBackupRestoreOptions(store.commonBackupDir()))
 
@@ -100,12 +101,12 @@ func TestMigrateData(t *testing.T) {
 	})
 
 	t.Run("MigrateData should fail to create backup if database file is set to updating", func(t *testing.T) {
-		store, teardown := MustNewTestStore(false)
+		_, store, teardown := MustNewTestStore(false)
 		defer teardown()
 
 		store.VersionService.StoreIsUpdating(true)
 
-		store.MigrateData(true)
+		store.MigrateData()
 
 		options := store.setupOptions(getBackupRestoreOptions(store.commonBackupDir()))
 
@@ -115,10 +116,10 @@ func TestMigrateData(t *testing.T) {
 	})
 
 	t.Run("MigrateData should not create backup on startup if portainer version matches db", func(t *testing.T) {
-		store, teardown := MustNewTestStore(false)
+		_, store, teardown := MustNewTestStore(false)
 		defer teardown()
 
-		store.MigrateData(true)
+		store.MigrateData()
 
 		options := store.setupOptions(getBackupRestoreOptions(store.commonBackupDir()))
 
@@ -130,7 +131,7 @@ func TestMigrateData(t *testing.T) {
 }
 
 func Test_getBackupRestoreOptions(t *testing.T) {
-	store, teardown := MustNewTestStore(false)
+	_, store, teardown := MustNewTestStore(false)
 	defer teardown()
 
 	options := getBackupRestoreOptions(store.commonBackupDir())
@@ -149,7 +150,7 @@ func Test_getBackupRestoreOptions(t *testing.T) {
 func TestRollback(t *testing.T) {
 	t.Run("Rollback should restore upgrade after backup", func(t *testing.T) {
 		version := 21
-		store, teardown := MustNewTestStore(false)
+		_, store, teardown := MustNewTestStore(false)
 		defer teardown()
 		store.VersionService.StoreDBVersion(version)
 
