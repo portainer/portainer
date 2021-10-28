@@ -1,12 +1,12 @@
 <ng-form name="autoUpdateForm">
   <div class="form-group">
     <div class="col-sm-12">
-      <por-switch-field name="autoUpdate" ng-model="$ctrl.model.RepositoryAutomaticUpdates" label="Automatic updates" on-change="($ctrl.onChangeAutoUpdate)"></por-switch-field>
+      <por-switch-field name="autoUpdate" ng-model="$ctrl.model.RepositoryAutomaticUpdates" label="Automatic Updates" on-change="($ctrl.onChangeAutoUpdate)"></por-switch-field>
     </div>
   </div>
   <div class="small text-warning" style="margin: 5px 0 10px 0;" ng-if="$ctrl.model.RepositoryAutomaticUpdates">
     <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
-    <span class="text-muted">Any changes to this stack made locally in Portainer will be overriden by the definition in git and may cause service interruption.</span>
+    <span class="text-muted">Any changes to this stack made locally in Portainer will be overriden by an updated git definition, which may cause service interruption.</span>
   </div>
   <div class="form-group" ng-if="$ctrl.model.RepositoryAutomaticUpdates">
     <label for="repository_mechanism" class="col-sm-1 control-label text-left">
@@ -56,6 +56,15 @@
         interval-format
       />
     </div>
+  </div>
+  <div class="form-group" ng-if="$ctrl.model.RepositoryAutomaticUpdates">
+    <div class="col-sm-12">
+      <por-switch-field name="forceUpdate" feature="$ctrl.limitedFeature" ng-model="$ctrl.model.RepositoryAutomaticUpdatesForce" label="Force Redeployment"></por-switch-field>
+    </div>
+  </div>
+  <div class="small text-warning" style="margin: 5px 0 10px 0;" ng-if="$ctrl.model.RepositoryAutomaticUpdates">
+    <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+    <span class="text-muted">Any changes to this stack made locally in Portainer will be overriden by the current git definition and may cause service interruption.</span>
   </div>
   <div class="form-group col-md-12" ng-show="autoUpdateForm.repository_fetch_interval.$touched && autoUpdateForm.repository_fetch_interval.$invalid">
     <div class="small text-warning">
