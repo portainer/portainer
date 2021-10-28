@@ -8,6 +8,11 @@
       <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
       This is a first version for Helm charts, for more information see this <a href="https://www.portainer.io/blog/portainer-now-with-helm-support" target="_blank">blog post</a>.
     </p>
+    <p ng-if="$ctrl.state.globalRepository === ''">
+      <i class="fa fa-exclamation-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      <span>The Global Helm Repository is not configured.</span>
+      <a ng-if="$ctrl.state.isAdmin" ui-sref="portainer.settings">Configure Global Helm Repository in Settings</a>
+    </p>
   </span>
 </information-panel>
 
