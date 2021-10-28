@@ -18,14 +18,16 @@ const beforePortainerVersionUpgradeBackup = "portainer.db.bak"
 var migrateLog = plog.NewScopedLog("bolt, migrate")
 
 // FailSafeMigrate backup and restore DB if migration fail
-func (store *Store) FailSafeMigrate(migrator *migrator.Migrator) error {
+func (store *Store) FailSafeMigrate(migrator *migrator.Migrator) (err error) {
 	defer func() {
-		if err := recover(); err != nil {
-			migrateLog.Info(fmt.Sprintf("Error during migration, recovering [%v]", err))
+		if e := recover(); e != nil {
 			store.Rollback(true)
+			err = fmt.Errorf("%v", e)
 		}
 	}()
-	return migrator.Migrate()
+
+	err = migrator.Migrate()
+	return
 }
 
 // MigrateData automatically migrate the data based on the DBVersion.
