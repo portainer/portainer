@@ -100,7 +100,7 @@ export default class HelmTemplatesController {
       const { GlobalRepository, UserRepositories } = await this.HelmService.getHelmRepositories(this.endpoint.Id);
       this.state.globalRepository = GlobalRepository;
       const userHelmReposUrls = UserRepositories.map((repo) => repo.URL);
-      const uniqueHelmRepos = [...new Set([GlobalRepository, ...userHelmReposUrls])].map((url) => url.toLowerCase()); // remove duplicates, to lowercase
+      const uniqueHelmRepos = [...new Set([GlobalRepository, ...userHelmReposUrls])].map((url) => url.toLowerCase()).filter((url) => url); // remove duplicates and blank, to lowercase
       this.state.repos = uniqueHelmRepos;
       return uniqueHelmRepos;
     } catch (err) {
