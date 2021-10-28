@@ -23,7 +23,7 @@ function toProps(
   );
 }
 
-export function react2Angular<T>(
+export function react2angular<T>(
   Component: React.ComponentType<T>,
   propNames: string[]
 ): IComponentOptions {
@@ -54,3 +54,5 @@ export function react2Angular<T>(
     this.$onDestroy = () => ReactDOM.unmountComponentAtNode(el);
   }
 }
+
+export const r2a = react2angular;

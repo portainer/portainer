@@ -1,5 +1,7 @@
 import { useSref } from '@uirouter/react';
 
+import { react2angular } from '@/react-tools/react2angular';
+
 import { Link } from './Link';
 import styles from './ReactExample.module.css';
 
@@ -28,3 +30,5 @@ export function ReactExample({ text }: ReactExampleProps) {
     </div>
   );
 }
+
+export const ReactExampleAngular = react2angular(ReactExample, ['text']);
