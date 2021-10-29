@@ -26,8 +26,9 @@ func (store *Store) FailSafeMigrate(migrator *migrator.Migrator) (err error) {
 		}
 	}()
 
-	err = migrator.Migrate()
-	return
+	// !Important: we must use a named return value in the function definition and not a local
+	// !variable referenced from the closure or else the return value will be incorrectly set
+	return migrator.Migrate()
 }
 
 // MigrateData automatically migrate the data based on the DBVersion.
