@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	"github.com/gofrs/uuid"
 	portainer "github.com/portainer/portainer/api"
@@ -79,8 +80,9 @@ func JoinPaths(trustedRoot string, untrustedPaths ...string) string {
 	p := filepath.Join(trustedRoot, filepath.Join(append([]string{"/"}, untrustedPaths...)...))
 
 	// avoid setting a volume name from the untrusted paths
-	if filepath.VolumeName(trustedRoot) == "" && filepath.VolumeName(p) != "" {
-		p, _ = filepath.Rel(filepath.VolumeName(p)+"/", p)
+	vnp := filepath.VolumeName(p)
+	if filepath.VolumeName(trustedRoot) == "" && vnp != "" {
+		return strings.TrimPrefix(strings.TrimPrefix(p, vnp), `\`)
 	}
 
 	return p
