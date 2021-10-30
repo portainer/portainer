@@ -1,11 +1,11 @@
-#FROM ubuntu:20.04
 FROM gitpod/openvscode-server:latest
 
 EXPOSE 3000
+EXPOSE 9443
+EXPOSE 9000
+EXPOSE 8000
 
 USER root
-
-# WORKDIR /src/portainer
 
 # Set TERM as noninteractive to suppress debconf errors
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
@@ -51,4 +51,5 @@ RUN cd /tmp \
 	&& tar -xf ${GO_VERSION}.tar.gz \
 	&& mv go /usr/local
 
- USER openvscode-server 
+# Configuring Golang
+ENV PATH "$PATH:/usr/local/go/bin"

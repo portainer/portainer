@@ -138,7 +138,6 @@ function shell_build_binary_azuredevops(platform, arch) {
 }
 
 function shell_run_container() {
-  const portainerData = '${PORTAINER_DATA:-/tmp/portainer}';
   const portainerRoot = process.env.PORTAINER_PROJECT ? process.env.PORTAINER_PROJECT : process.env.PWD;
 
   return `
@@ -148,7 +147,7 @@ function shell_run_container() {
       -p 9000:9000 \
       -p 9443:9443 \
       -v ${portainerRoot}/dist:/app \
-      -v ${portainerData}:/data \
+      -v portainer_dev:/data \
       -v /var/run/docker.sock:/var/run/docker.sock:z \
       -v /var/run/docker.sock:/var/run/alternative.sock:z \
       -v /tmp:/tmp \
