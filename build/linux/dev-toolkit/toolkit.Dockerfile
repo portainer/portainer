@@ -1,17 +1,17 @@
-FROM ubuntu:20.04
+#FROM ubuntu:20.04
+FROM gitpod/openvscode-server:latest
 
-# Expose port for the Portainer UI and Edge server
-EXPOSE 9000
-EXPOSE 9443
-EXPOSE 8000
+EXPOSE 3000
 
-WORKDIR /src/portainer
+USER root
+
+# WORKDIR /src/portainer
 
 # Set TERM as noninteractive to suppress debconf errors
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
 # Set default go version
-ARG GO_VERSION=go1.16.6.linux-amd64
+ARG GO_VERSION=go1.16.9.linux-amd64
 
 # Install packages
 RUN apt-get update --fix-missing && apt-get install -qq \
@@ -51,8 +51,4 @@ RUN cd /tmp \
 	&& tar -xf ${GO_VERSION}.tar.gz \
 	&& mv go /usr/local
 
-# Copy run script
-COPY run.sh /
-RUN chmod +x /run.sh
-
-ENTRYPOINT ["/run.sh"]
+ USER openvscode-server 
