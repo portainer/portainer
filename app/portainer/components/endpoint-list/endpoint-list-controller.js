@@ -1,4 +1,5 @@
 import _ from 'lodash-es';
+import { ENDPOINTS_POLLING_INTERVAL, ENDPOINTS_FIRST_PAGE_LIMIT } from '@/constants';
 
 angular.module('portainer.app').controller('EndpointListController', [
   'DatatableService',
@@ -76,7 +77,7 @@ angular.module('portainer.app').controller('EndpointListController', [
 
         const hasOfflineEndpoint = data.endpoints.some((e) => e.Status !== 1);
         if (hasOfflineEndpoint) {
-          this.state.pollingTimeout = setTimeout(() => this.getCurrentPage(start, paginatedItemLimit, textFilter), 30000);
+          this.state.pollingTimeout = setTimeout(() => this.getCurrentPage(start, paginatedItemLimit, textFilter), ENDPOINTS_POLLING_INTERVAL);
         }
       });
     };
@@ -88,7 +89,7 @@ angular.module('portainer.app').controller('EndpointListController', [
         this.state.filteredEndpoints = [];
         const start = (this.state.pageNumber - 1) * this.state.paginatedItemLimit + 1;
 
-        this.getCurrentPage(start, this.state.pageNumber === 1 ? 100 : this.state.paginatedItemLimit, this.state.textFilter);
+        this.getCurrentPage(start, this.state.pageNumber === 1 ? ENDPOINTS_FIRST_PAGE_LIMIT : this.state.paginatedItemLimit, this.state.textFilter);
       }
     };
 
