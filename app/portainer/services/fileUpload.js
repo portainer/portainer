@@ -1,4 +1,3 @@
-import { PortainerEndpointCreationTypes } from 'Portainer/models/endpoint/models';
 import { genericHandler, jsonObjectsToArrayHandler } from '../../docker/rest/response/handlers';
 
 angular.module('portainer.app').factory('FileUploadService', [
@@ -123,58 +122,6 @@ angular.module('portainer.app').factory('FileUploadService', [
       });
     };
 
-    service.createEndpoint = function (
-      name,
-      creationType,
-      URL,
-      PublicURL,
-      groupID,
-      tagIds,
-      TLS,
-      TLSSkipVerify,
-      TLSSkipClientVerify,
-      TLSCAFile,
-      TLSCertFile,
-      TLSKeyFile,
-      checkinInterval
-    ) {
-      return Upload.upload({
-        url: 'api/endpoints',
-        data: {
-          Name: name,
-          EndpointCreationType: creationType,
-          URL: URL,
-          PublicURL: PublicURL,
-          GroupID: groupID,
-          TagIds: Upload.json(tagIds),
-          TLS: TLS,
-          TLSSkipVerify: TLSSkipVerify,
-          TLSSkipClientVerify: TLSSkipClientVerify,
-          TLSCACertFile: TLSCAFile,
-          TLSCertFile: TLSCertFile,
-          TLSKeyFile: TLSKeyFile,
-          CheckinInterval: checkinInterval,
-        },
-        ignoreLoadingBar: true,
-      });
-    };
-
-    service.createAzureEndpoint = function (name, applicationId, tenantId, authenticationKey, groupId, tagIds) {
-      return Upload.upload({
-        url: 'api/endpoints',
-        data: {
-          Name: name,
-          EndpointCreationType: PortainerEndpointCreationTypes.AzureEnvironment,
-          GroupID: groupId,
-          TagIds: Upload.json(tagIds),
-          AzureApplicationID: applicationId,
-          AzureTenantID: tenantId,
-          AzureAuthenticationKey: authenticationKey,
-        },
-        ignoreLoadingBar: true,
-      });
-    };
-
     service.uploadLDAPTLSFiles = function (TLSCAFile, TLSCertFile, TLSKeyFile) {
       var queue = [];
 
@@ -186,22 +133,6 @@ angular.module('portainer.app').factory('FileUploadService', [
       }
       if (TLSKeyFile) {
         queue.push(uploadFile('api/upload/tls/key?folder=ldap', TLSKeyFile));
-      }
-
-      return $q.all(queue);
-    };
-
-    service.uploadTLSFilesForEndpoint = function (endpointID, TLSCAFile, TLSCertFile, TLSKeyFile) {
-      var queue = [];
-
-      if (TLSCAFile) {
-        queue.push(uploadFile('api/upload/tls/ca?folder=' + endpointID, TLSCAFile));
-      }
-      if (TLSCertFile) {
-        queue.push(uploadFile('api/upload/tls/cert?folder=' + endpointID, TLSCertFile));
-      }
-      if (TLSKeyFile) {
-        queue.push(uploadFile('api/upload/tls/key?folder=' + endpointID, TLSKeyFile));
       }
 
       return $q.all(queue);
