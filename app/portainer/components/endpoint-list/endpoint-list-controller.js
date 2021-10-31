@@ -13,17 +13,6 @@ angular.module('portainer.app').controller('EndpointListController', [
       loading: true,
     };
 
-    this.$onChanges = function (changesObj) {
-      this.handleEndpointsChange(changesObj.endpoints);
-    };
-
-    this.handleEndpointsChange = function (endpoints) {
-      if (!endpoints || !endpoints.currentValue) {
-        return;
-      }
-      this.onTextFilterChange();
-    };
-
     this.onTextFilterChange = function () {
       this.state.loading = true;
       var filterValue = this.state.textFilter;
@@ -66,16 +55,40 @@ angular.module('portainer.app').controller('EndpointListController', [
       return this.totalCount && this.totalCount > 100;
     };
 
+    this.clearPollTimeout = function () {
+      if (this.state.pollingTimeout) {
+        clearTimeout(this.state.pollingTimeout);
+        this.state.pollingTimeout = 0;
+      }
+    };
+
+    this.$onDestory = function () {
+      this.clearPollTimeout();
+    };
+
+    this.getCurrentPage = function (start, paginatedItemLimit, textFilter) {
+      this.retrievePage(start, paginatedItemLimit, textFilter).then((data) => {
+        this.state.filteredEndpoints = data.endpoints;
+        this.state.totalFilteredEndpoints = data.totalCount;
+        this.state.loading = false;
+        this.totalCount = data.totalCount;
+        this.endpoints = data.endpoints;
+
+        const hasOfflineEndpoint = data.endpoints.some((e) => e.Status !== 1);
+        if (hasOfflineEndpoint) {
+          this.state.pollingTimeout = setTimeout(() => this.getCurrentPage(start, paginatedItemLimit, textFilter), 30000);
+        }
+      });
+    };
+
     this.paginationChangedAction = function () {
-      if (this.hasBackendPagination()) {
+      this.clearPollTimeout();
+      if (this.state.pageNumber === 1 || this.hasBackendPagination()) {
         this.state.loading = true;
         this.state.filteredEndpoints = [];
         const start = (this.state.pageNumber - 1) * this.state.paginatedItemLimit + 1;
-        this.retrievePage(start, this.state.paginatedItemLimit, this.state.textFilter).then((data) => {
-          this.state.filteredEndpoints = data.endpoints;
-          this.state.totalFilteredEndpoints = data.totalCount;
-          this.state.loading = false;
-        });
+
+        this.getCurrentPage(start, this.state.pageNumber === 1 ? 100 : this.state.paginatedItemLimit, this.state.textFilter);
       }
     };
 
@@ -96,11 +109,11 @@ angular.module('portainer.app').controller('EndpointListController', [
     this.$onInit = function () {
       var textFilter = DatatableService.getDataTableTextFilters(this.tableKey);
       this.state.paginatedItemLimit = PaginationService.getPaginationLimit(this.tableKey);
-      if (textFilter !== null) {
+      if (textFilter) {
         this.state.textFilter = textFilter;
-      } else {
-        this.paginationChangedAction();
       }
+
+      this.paginationChangedAction();
     };
   },
 ]);

@@ -99,20 +99,6 @@ angular
       MotdService.motd().then(function success(data) {
         $scope.motd = data;
       });
-
-      try {
-        const [{ totalCount, endpoints }, tags] = await Promise.all([getPaginatedEndpoints(0, 100), TagService.tags()]);
-        $scope.tags = tags;
-
-        $scope.totalCount = totalCount;
-        if (totalCount > 100) {
-          $scope.endpoints = [];
-        } else {
-          $scope.endpoints = endpoints;
-        }
-      } catch (err) {
-        Notifications.error('Failed loading page data', err);
-      }
     }
 
     initView();
