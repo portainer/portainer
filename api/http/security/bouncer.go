@@ -138,7 +138,7 @@ func (bouncer *RequestBouncer) AuthorizedEdgeEndpointOperation(r *http.Request, 
 // - authenticating the request with a valid token
 func (bouncer *RequestBouncer) mwAuthenticatedUser(h http.Handler) http.Handler {
 	h = bouncer.mwAuthenticateFirst([]tokenLookup{
-		bouncer.jwtAuthLookup,
+		bouncer.JWTAuthLookup,
 		bouncer.apiKeyLookup,
 	}, h)
 	h = mwSecureHeaders(h)
@@ -231,8 +231,8 @@ func (bouncer *RequestBouncer) mwAuthenticateFirst(tokenLookups []tokenLookup, n
 	})
 }
 
-// jwtAuthLookup looks up a valid bearer in the request.
-func (bouncer *RequestBouncer) jwtAuthLookup(r *http.Request) *portainer.TokenData {
+// JWTAuthLookup looks up a valid bearer in the request.
+func (bouncer *RequestBouncer) JWTAuthLookup(r *http.Request) *portainer.TokenData {
 	// get token from the Authorization header or query parameter
 	token, err := extractBearerToken(r)
 	if err != nil {

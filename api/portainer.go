@@ -664,6 +664,20 @@ type (
 	// RoleID represents a role identifier
 	RoleID int
 
+	// RoleID represents a role identifier
+	APIKeyID int
+
+	// APIKey represents an API key
+	APIKey struct {
+		ID          APIKeyID `json:"Id" example:"1"`
+		UserID      UserID   `json:"UserId" example:"1"`
+		Description string
+		Prefix      [3]rune   `json:"prefix"`      // API key identifier (3 char prefix)
+		DateCreated time.Time `json:"dateCreated"` // Date when the API key was created (UTC)
+		LastUsed    time.Time `json:"lastUsed"`    // Date when the API key was last used (UTC)
+		Digest      [32]byte  `json:"digest"`      // Digest represents the hash of the raw API key
+	}
+
 	// Schedule represents a scheduled job.
 	// It only contains a pointer to one of the JobRunner implementations
 	// based on the JobType.
@@ -1126,6 +1140,7 @@ type (
 		Registry() RegistryService
 		ResourceControl() ResourceControlService
 		Role() RoleService
+		APIKeyRepository() APIKeyRepositoryService
 		Settings() SettingsService
 		SSLSettings() SSLSettingsService
 		Stack() StackService
@@ -1350,6 +1365,12 @@ type (
 		Roles() ([]Role, error)
 		CreateRole(role *Role) error
 		UpdateRole(ID RoleID, role *Role) error
+	}
+
+	// APIKeyRepositoryService
+	APIKeyRepositoryService interface {
+		GetAPIKeysByUserID(userID UserID) ([]APIKey, error)
+		CreateKey(key *APIKey) error
 	}
 
 	// SettingsService represents a service for managing application settings
