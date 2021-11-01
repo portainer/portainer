@@ -33,20 +33,25 @@ angular.module('portainer.docker').controller('ImportImageController', [
       const registryModel = $scope.formValues.RegistryModel;
       if (registryModel.Image) {
         const image = ImageHelper.createImageConfigForContainer(registryModel);
-        ImageService.tagImage(id, image.fromImage).catch(function error(err) {
+        return ImageService.tagImage(id, image.fromImage).catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to tag image');
         });
       }
+      return null;
     }
 
-    $scope.uploadImage = function () {
+    $scope.uploadImage = async function () {
       $scope.state.actionInProgress = true;
 
       var nodeName = $scope.formValues.NodeName;
       HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
       var file = $scope.formValues.UploadFile;
-      ImageService.uploadImage(file)
+      await ImageService.uploadImage(file)
         .then(async function success(res) {
+          if (res.data.error) {
+            Notifications.error('Failure', res.data.error, 'Unable to upload image');
+            return;
+          }
           if (res.data.stream) {
             var regex = /Loaded.*?: (.*?)\n$/g;
             var imageIds = regex.exec(res.data.stream);
