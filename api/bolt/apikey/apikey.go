@@ -29,7 +29,7 @@ func NewService(connection *internal.DbConnection) (*Service, error) {
 	}, nil
 }
 
-// GetAPIKeysByUserID return an slice containing all the APIKeys a user has access to.
+// GetAPIKeysByUserID returns a slice containing all the APIKeys a user has access to.
 func (service *Service) GetAPIKeysByUserID(userID portainer.UserID) ([]portainer.APIKey, error) {
 	var result = make([]portainer.APIKey, 0)
 
