@@ -282,7 +282,9 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 
 	if err != nil {
 		return nil, err
-	} else if !exists {
+	}
+
+	if !exists {
 		return nil, errors.New("Invalid Compose file, ensure that the Compose file path is correct")
 	}
 
