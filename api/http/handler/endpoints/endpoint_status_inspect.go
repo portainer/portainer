@@ -131,7 +131,7 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 			Version:        job.Version,
 		}
 
-		file, err := handler.FileService.GetFileContent(job.ScriptPath)
+		file, err := handler.FileService.GetFileContent("", job.ScriptPath)
 
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Edge job script file", err}

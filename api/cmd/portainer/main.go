@@ -506,7 +506,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	adminPasswordHash := ""
 	if *flags.AdminPasswordFile != "" {
-		content, err := fileService.GetFileContent(*flags.AdminPasswordFile)
+		content, err := fileService.GetFileContent(*flags.AdminPasswordFile, "")
 		if err != nil {
 			log.Fatalf("failed getting admin password file: %v", err)
 		}

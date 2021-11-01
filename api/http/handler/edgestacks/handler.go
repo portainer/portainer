@@ -3,7 +3,6 @@ package edgestacks
 import (
 	"fmt"
 	"net/http"
-	"path"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -56,7 +55,7 @@ func (handler *Handler) convertAndStoreKubeManifestIfNeeded(edgeStack *portainer
 		return nil
 	}
 
-	composeConfig, err := handler.FileService.GetFileContent(path.Join(edgeStack.ProjectPath, edgeStack.EntryPoint))
+	composeConfig, err := handler.FileService.GetFileContent(edgeStack.ProjectPath, edgeStack.EntryPoint)
 	if err != nil {
 		return fmt.Errorf("unable to retrieve Compose file from disk: %w", err)
 	}

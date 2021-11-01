@@ -2,7 +2,6 @@ package edgestacks
 
 import (
 	"net/http"
-	"path"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -45,7 +44,7 @@ func (handler *Handler) edgeStackFile(w http.ResponseWriter, r *http.Request) *h
 		fileName = stack.ManifestPath
 	}
 
-	stackFileContent, err := handler.FileService.GetFileContent(path.Join(stack.ProjectPath, fileName))
+	stackFileContent, err := handler.FileService.GetFileContent(stack.ProjectPath, fileName)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Compose file from disk", err}
 	}
