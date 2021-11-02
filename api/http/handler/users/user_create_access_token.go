@@ -41,6 +41,7 @@ type accessTokenResponse struct {
 // @param body body userAccessTokenCreatePayload true "details"
 // @success 200 {object} accessTokenResponse "Success"
 // @failure 400 "Invalid request"
+// @failure 401 "Unauthorized"
 // @failure 403 "Permission denied"
 // @failure 404 "User not found"
 // @failure 500 "Server error"
