@@ -50,9 +50,7 @@ angular.module('portainer.docker').controller('ImportImageController', [
         .then(async function success(res) {
           if (res.data.error) {
             Notifications.error('Failure', res.data.error, 'Unable to upload image');
-            return;
-          }
-          if (res.data.stream) {
+          } else if (res.data.stream) {
             var regex = /Loaded.*?: (.*?)\n$/g;
             var imageIds = regex.exec(res.data.stream);
             if (imageIds && imageIds.length == 2) {
