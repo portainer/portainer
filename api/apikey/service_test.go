@@ -1,6 +1,7 @@
 package apikey
 
 import (
+	"crypto/sha256"
 	"encoding/base64"
 	"testing"
 
@@ -45,6 +46,19 @@ func Test_GenerateApiKey(t *testing.T) {
 		apiKeyFromCache, ok := service.cache.GetAPIKey(string(apiKey.Digest[:]))
 		is.True(ok)
 		is.Equal(apiKey, apiKeyFromCache)
+	})
+
+	t.Run("Decoded raw api-key digest matches generated digest", func(t *testing.T) {
+		rawKey, apiKey, err := service.GenerateApiKey(1, "test-4")
+		is.NoError(err)
+
+		encodedKey := base64.StdEncoding.EncodeToString(rawKey) // this will be provided by the user
+		decodedKey, err := base64.StdEncoding.DecodeString(encodedKey)
+		is.NoError(err)
+
+		generatedDigest := sha256.Sum256(decodedKey)
+
+		is.Equal(apiKey.Digest, generatedDigest)
 	})
 }
 
