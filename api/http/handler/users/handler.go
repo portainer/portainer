@@ -5,6 +5,7 @@ import (
 
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/http/security"
 
 	"net/http"
@@ -28,15 +29,17 @@ func hideFields(user *portainer.User) {
 type Handler struct {
 	*mux.Router
 	bouncer       *security.RequestBouncer
+	apiKeyService apikey.APIKeyService
 	DataStore     portainer.DataStore
 	CryptoService portainer.CryptoService
 }
 
 // NewHandler creates a handler to manage user operations.
-func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimiter) *Handler {
+func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimiter, apiKeyService apikey.APIKeyService) *Handler {
 	h := &Handler{
-		Router:  mux.NewRouter(),
-		bouncer: bouncer,
+		Router:        mux.NewRouter(),
+		bouncer:       bouncer,
+		apiKeyService: apiKeyService,
 	}
 	h.Handle("/users",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.userCreate))).Methods(http.MethodPost)

@@ -12,6 +12,7 @@ import (
 	"github.com/portainer/libhelm"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/adminmonitor"
+	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/handler"
@@ -74,6 +75,7 @@ type Server struct {
 	FileService                 portainer.FileService
 	DataStore                   portainer.DataStore
 	GitService                  portainer.GitService
+	APIKeyService               apikey.APIKeyService
 	JWTService                  portainer.JWTService
 	LDAPService                 portainer.LDAPService
 	OAuthService                portainer.OAuthService
@@ -232,7 +234,7 @@ func (server *Server) Start() error {
 	var uploadHandler = upload.NewHandler(requestBouncer)
 	uploadHandler.FileService = server.FileService
 
-	var userHandler = users.NewHandler(requestBouncer, rateLimiter)
+	var userHandler = users.NewHandler(requestBouncer, rateLimiter, server.APIKeyService)
 	userHandler.DataStore = server.DataStore
 	userHandler.CryptoService = server.CryptoService
 

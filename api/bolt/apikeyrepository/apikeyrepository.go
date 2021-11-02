@@ -1,4 +1,4 @@
-package apikey
+package apikeyrepository
 
 import (
 	portainer "github.com/portainer/portainer/api"
@@ -48,15 +48,41 @@ func (service *Service) GetAPIKeysByUserID(userID portainer.UserID) ([]portainer
 				result = append(result, record)
 			}
 		}
-
 		return nil
 	})
 
 	return result, err
 }
 
-// CreateKey creates a new APIKey object.
-func (service *Service) CreateKey(record *portainer.APIKey) error {
+// GetAPIKeyByDigest returns the API key for the associated digest.
+// Note: there is a 1-to-1 mapping of api-key and digest
+func (service *Service) GetAPIKeyByDigest(digest string) (portainer.APIKey, error) {
+	var result portainer.APIKey
+
+	err := service.connection.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(BucketName))
+
+		cursor := bucket.Cursor()
+		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
+			var record portainer.APIKey
+			err := internal.UnmarshalObject(v, &record)
+			if err != nil {
+				return err
+			}
+
+			if string(record.Digest[:]) == digest {
+				result = record
+				return nil
+			}
+		}
+		return nil
+	})
+
+	return result, err
+}
+
+// CreateAPIKey creates a new APIKey object.
+func (service *Service) CreateAPIKey(record *portainer.APIKey) error {
 	return service.connection.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
@@ -69,5 +95,13 @@ func (service *Service) CreateKey(record *portainer.APIKey) error {
 		}
 
 		return bucket.Put(internal.Itob(int(record.ID)), data)
+	})
+}
+
+func (service *Service) DeleteAPIKey(ID portainer.APIKeyID) error {
+	return service.connection.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(BucketName))
+
+		return bucket.Delete(internal.Itob(int(ID)))
 	})
 }

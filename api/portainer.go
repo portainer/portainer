@@ -664,7 +664,7 @@ type (
 	// RoleID represents a role identifier
 	RoleID int
 
-	// RoleID represents a role identifier
+	// APIKeyID represents an API key identifier
 	APIKeyID int
 
 	// APIKey represents an API key
@@ -1140,7 +1140,7 @@ type (
 		Registry() RegistryService
 		ResourceControl() ResourceControlService
 		Role() RoleService
-		APIKeyRepository() APIKeyRepositoryService
+		APIKeyRepository() APIKeyRepository
 		Settings() SettingsService
 		SSLSettings() SSLSettingsService
 		Stack() StackService
@@ -1368,9 +1368,11 @@ type (
 	}
 
 	// APIKeyRepositoryService
-	APIKeyRepositoryService interface {
+	APIKeyRepository interface {
 		GetAPIKeysByUserID(userID UserID) ([]APIKey, error)
-		CreateKey(key *APIKey) error
+		CreateAPIKey(key *APIKey) error
+		GetAPIKeyByDigest(digest string) (APIKey, error)
+		DeleteAPIKey(ID APIKeyID) error
 	}
 
 	// SettingsService represents a service for managing application settings

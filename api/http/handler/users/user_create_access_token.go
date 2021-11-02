@@ -1,13 +1,10 @@
 package users
 
 import (
-	"crypto/sha256"
 	"errors"
 	"net/http"
-	"time"
 
 	"github.com/asaskevich/govalidator"
-	"github.com/gorilla/securecookie"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -75,7 +72,7 @@ func (handler *Handler) userCreateAccessToken(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to create user access token", httperrors.ErrUnauthorized}
 	}
 
-	user, err := handler.DataStore.User().User(portainer.UserID(userID))
+	_, err = handler.DataStore.User().User(portainer.UserID(userID))
 	if err != nil {
 		if err == bolterrors.ErrObjectNotFound {
 			return &httperror.HandlerError{http.StatusNotFound, "Unable to find a user with the specified identifier inside the database", err}
@@ -83,26 +80,10 @@ func (handler *Handler) userCreateAccessToken(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a user with the specified identifier inside the database", err}
 	}
 
-	rawAPIKey, apiKey := generateApiKey(user.ID, payload)
-	err = handler.DataStore.APIKeyRepository().CreateKey(&apiKey)
+	rawAPIKey, err := handler.apiKeyService.GenerateApiKey(portainer.UserID(userID), payload.Description)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist api-key to the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Internal Server Error", err}
 	}
 
 	return response.JSON(w, accessTokenResponse{rawAPIKey})
-}
-
-// generateApiKey generates an API key for a user; returns rawApiKey (for one-time display) - along with the APIKey struct.
-func generateApiKey(userID portainer.UserID, payload userAccessTokenCreatePayload) ([]byte, portainer.APIKey) {
-	rawAPIKey := securecookie.GenerateRandomKey(32)
-	rawAPIKeyChars := []rune(string(rawAPIKey))
-	hashDigest := sha256.Sum256(rawAPIKey)
-	apiKey := portainer.APIKey{
-		UserID:      userID,
-		Description: payload.Description,
-		Prefix:      [3]rune{rawAPIKeyChars[0], rawAPIKeyChars[1], rawAPIKeyChars[2]},
-		DateCreated: time.Now(),
-		Digest:      hashDigest,
-	}
-	return rawAPIKey, apiKey
 }
