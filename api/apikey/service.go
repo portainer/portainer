@@ -2,6 +2,7 @@ package apikey
 
 import (
 	"crypto/sha256"
+	"encoding/base64"
 	"time"
 
 	"github.com/gorilla/securecookie"
@@ -22,30 +23,30 @@ func NewAPIKeyService(apiKeyRepository portainer.APIKeyRepository) *apiKeyServic
 	}
 }
 
-// GenerateApiKey generates an API key for a user; returns rawApiKey (for one-time display).
+// GenerateApiKey generates an API key for a user; also returns rawApiKey (for one-time display).
 // The generated API key is stored in the database.
-func (a *apiKeyService) GenerateApiKey(userID portainer.UserID, description string) ([]byte, error) {
+func (a *apiKeyService) GenerateApiKey(userID portainer.UserID, description string) ([]byte, *portainer.APIKey, error) {
 	rawAPIKey := securecookie.GenerateRandomKey(32)
-	rawAPIKeyChars := []rune(string(rawAPIKey))
+	encodedRawAPIKey := base64.StdEncoding.EncodeToString(rawAPIKey)
 	hashDigest := sha256.Sum256(rawAPIKey)
 
 	apiKey := &portainer.APIKey{
 		UserID:      userID,
 		Description: description,
-		Prefix:      [3]rune{rawAPIKeyChars[0], rawAPIKeyChars[1], rawAPIKeyChars[2]},
+		Prefix:      [3]rune{rune(encodedRawAPIKey[0]), rune(encodedRawAPIKey[1]), rune(encodedRawAPIKey[2])},
 		DateCreated: time.Now(),
 		Digest:      hashDigest,
 	}
 
 	err := a.apiKeyRepository.CreateAPIKey(apiKey)
 	if err != nil {
-		return nil, errors.Wrap(err, "Unable to create API key")
+		return nil, nil, errors.Wrap(err, "Unable to create API key")
 	}
 
 	// persist api-key to cache
 	a.cache.Set(apiKey)
 
-	return rawAPIKey, nil
+	return rawAPIKey, apiKey, nil
 }
 
 // GetAPIKeys returns all the API keys associated to a user.
