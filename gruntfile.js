@@ -56,7 +56,14 @@ module.exports = function (grunt) {
   });
 
   grunt.task.registerTask('devopsbuild', 'devopsbuild:<platform>:<arch>:<env>', function (platform, a = arch, env = 'prod') {
-    grunt.task.run([`env:${env}`, 'clean:all', `shell:build_binary_azuredevops:${platform}:${a}`, `download_binaries:${platform}:${a}`, `webpack:${env}`]);
+    grunt.task.run([
+      `env:${env}`,
+      'clean:all',
+      `shell:build_binary_azuredevops:${platform}:${a}`,
+      `download_binaries:${platform}:${a}`,
+      `webpack:${env}`,
+      `shell:storybook:${env}`,
+    ]);
   });
 
   grunt.task.registerTask('download_binaries', 'download_binaries:<platform>:<arch>', function (platform = 'linux', a = arch) {
@@ -109,7 +116,18 @@ gruntConfig.shell = {
   run_container: { command: shell_run_container },
   run_localserver: { command: shell_run_localserver, options: { async: true } },
   install_yarndeps: { command: shell_install_yarndeps },
+  storybook: { command: shell_storybook },
 };
+
+function shell_storybook(env) {
+  if (env === 'production') {
+    return '';
+  }
+
+  return `
+    yarn build-storybook
+  `;
+}
 
 function shell_build_binary(platform, arch) {
   const binfile = 'dist/portainer';

@@ -43,7 +43,7 @@
     "test:server": "cd api && go test ./...",
     "test:client": "jest",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook -o ./dist/storybook"
   },
   "scriptsComments": {
     "build": "Build the entire app (backend/frontend) in development mode",
