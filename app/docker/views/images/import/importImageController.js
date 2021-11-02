@@ -62,9 +62,10 @@ angular.module('portainer.docker').controller('ImportImageController', [
         } else {
           Notifications.success('The uploaded tar file contained multiple images. The provided tag therefore has been ignored.');
         }
-        $scope.state.actionInProgress = false;
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to upload image');
+      } finally {
+        $scope.state.actionInProgress = false;
       }
     };
   },
