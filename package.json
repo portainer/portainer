@@ -63,6 +63,7 @@
     "node": ">= 0.8.4"
   },
   "dependencies": {
+    "@aws-crypto/sha256-js": "^2.0.0",
     "@babel/polyfill": "^7.2.5",
     "@fortawesome/fontawesome-free": "^5.11.2",
     "@nxmix/tokenize-ansi": "^3.0.0",

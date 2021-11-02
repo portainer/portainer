@@ -127,8 +127,8 @@ type (
 		ImageCount              int               `json:"ImageCount"`
 		ServiceCount            int               `json:"ServiceCount"`
 		StackCount              int               `json:"StackCount"`
-		NodeCount               int               `json:"NodeCount"`
 		SnapshotRaw             DockerSnapshotRaw `json:"DockerSnapshotRaw"`
+		NodeCount               int               `json:"NodeCount"`
 	}
 
 	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
@@ -416,6 +416,11 @@ type (
 		OrganisationName string `json:"OrganisationName"`
 	}
 
+	// EcrData represents data required for ECR registry
+	EcrData struct {
+		Region string
+	}
+
 	// JobType represents a job type
 	JobType int
 
@@ -561,8 +566,8 @@ type (
 	Registry struct {
 		// Registry Identifier
 		ID RegistryID `json:"Id" example:"1"`
-		// Registry Type (1 - Quay, 2 - Azure, 3 - Custom, 4 - Gitlab, 5 - ProGet, 6 - DockerHub)
-		Type RegistryType `json:"Type" enums:"1,2,3,4,5,6"`
+		// Registry Type (1 - Quay, 2 - Azure, 3 - Custom, 4 - Gitlab, 5 - ProGet, 6 - DockerHub, 7 - ECR)
+		Type RegistryType `json:"Type" enums:"1,2,3,4,5,6,7"`
 		// Registry Name
 		Name string `json:"Name" example:"my-registry"`
 		// URL or IP address of the Docker registry
@@ -571,13 +576,14 @@ type (
 		BaseURL string `json:"BaseURL" example:"registry.mydomain.tld:2375"`
 		// Is authentication against this registry enabled
 		Authentication bool `json:"Authentication" example:"true"`
-		// Username used to authenticate against this registry
+		// Username or AccessKeyID used to authenticate against this registry
 		Username string `json:"Username" example:"registry user"`
-		// Password used to authenticate against this registry
+		// Password or SecretAccessKey used to authenticate against this registry
 		Password                string                           `json:"Password,omitempty" example:"registry_password"`
 		ManagementConfiguration *RegistryManagementConfiguration `json:"ManagementConfiguration"`
 		Gitlab                  GitlabRegistryData               `json:"Gitlab"`
 		Quay                    QuayRegistryData                 `json:"Quay"`
+		Ecr                  	EcrData                       	 `json:"Ecr"`
 		RegistryAccesses        RegistryAccesses                 `json:"RegistryAccesses"`
 
 		// Deprecated fields
@@ -590,6 +596,10 @@ type (
 		AuthorizedUsers []UserID `json:"AuthorizedUsers"`
 		// Deprecated in DBVersion == 18
 		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
+
+		// Stores temporary access token
+		AccessToken       string `json:"AccessToken,omitempty"`
+		AccessTokenExpiry int64  `json:"AccessTokenExpiry,omitempty"`
 	}
 
 	RegistryAccesses map[EndpointID]RegistryAccessPolicies
@@ -606,11 +616,14 @@ type (
 	// RegistryManagementConfiguration represents a configuration that can be used to query
 	// the registry API via the registry management extension.
 	RegistryManagementConfiguration struct {
-		Type           RegistryType     `json:"Type"`
-		Authentication bool             `json:"Authentication"`
-		Username       string           `json:"Username"`
-		Password       string           `json:"Password"`
-		TLSConfig      TLSConfiguration `json:"TLSConfig"`
+		Type              RegistryType     `json:"Type"`
+		Authentication    bool             `json:"Authentication"`
+		Username          string           `json:"Username"`
+		Password          string           `json:"Password"`
+		TLSConfig         TLSConfiguration `json:"TLSConfig"`
+		Ecr               EcrData          `json:"Ecr"`
+		AccessToken       string           `json:"AccessToken,omitempty"`
+		AccessTokenExpiry int64            `json:"AccessTokenExpiry,omitempty"`
 	}
 
 	// RegistryType represents a type of registry
@@ -1654,6 +1667,8 @@ const (
 	ProGetRegistry
 	// DockerHubRegistry represents a dockerhub registry
 	DockerHubRegistry
+	// EcrRegistry represents an ECR registry
+	EcrRegistry
 )
 
 const (

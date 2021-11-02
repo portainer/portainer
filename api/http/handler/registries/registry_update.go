@@ -2,6 +2,7 @@ package registries
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/internal/endpointutils"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -26,8 +27,12 @@ type registryUpdatePayload struct {
 	Username *string `example:"registry_user"`
 	// Password used to authenticate against this registry. required when Authentication is true
 	Password         *string `example:"registry_password"`
-	RegistryAccesses *portainer.RegistryAccesses
+	// Quay data
 	Quay             *portainer.QuayRegistryData
+	// Registry access control
+	RegistryAccesses *portainer.RegistryAccesses `json:",omitempty"`
+	// ECR data
+	Ecr              *portainer.EcrData          `json:",omitempty" example:"{Region: \"ap-southeast-2\"}"`
 }
 
 func (payload *registryUpdatePayload) Validate(r *http.Request) error {
@@ -55,6 +60,7 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
+
 	if !securityContext.IsAdmin {
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update registry", httperrors.ErrResourceAccessDenied}
 	}
@@ -81,29 +87,41 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 		registry.Name = *payload.Name
 	}
 
-	shouldUpdateSecrets := false
-
 	if registry.Type == portainer.ProGetRegistry && payload.BaseURL != nil {
 		registry.BaseURL = *payload.BaseURL
 	}
 
+	shouldUpdateSecrets := false
+
 	if payload.Authentication != nil {
+		shouldUpdateSecrets = shouldUpdateSecrets || (registry.Authentication != *payload.Authentication)
+
 		if *payload.Authentication {
 			registry.Authentication = true
-			shouldUpdateSecrets = shouldUpdateSecrets || (payload.Username != nil && *payload.Username != registry.Username) || (payload.Password != nil && *payload.Password != registry.Password)
 
 			if payload.Username != nil {
+				shouldUpdateSecrets = shouldUpdateSecrets || (registry.Username != *payload.Username)
 				registry.Username = *payload.Username
 			}
 
 			if payload.Password != nil && *payload.Password != "" {
+				shouldUpdateSecrets = shouldUpdateSecrets || (registry.Password != *payload.Password)
 				registry.Password = *payload.Password
 			}
 
+			if registry.Type == portainer.EcrRegistry && payload.Ecr != nil && payload.Ecr.Region != "" {
+				shouldUpdateSecrets = shouldUpdateSecrets || (registry.Ecr.Region != payload.Ecr.Region)
+				registry.Ecr.Region = payload.Ecr.Region
+			}
 		} else {
 			registry.Authentication = false
 			registry.Username = ""
 			registry.Password = ""
+
+			registry.Ecr.Region = ""
+
+			registry.AccessToken = ""
+			registry.AccessTokenExpiry = 0
 		}
 	}
 
@@ -115,6 +133,7 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
 		}
+
 		for _, r := range registries {
 			if r.ID != registry.ID && handler.registriesHaveSameURLAndCredentials(&r, registry) {
 				return &httperror.HandlerError{http.StatusConflict, "Another registry with the same URL and credentials already exists", errors.New("A registry is already defined for this URL and credentials")}
@@ -123,13 +142,16 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if shouldUpdateSecrets {
+		registry.AccessToken = ""
+		registry.AccessTokenExpiry = 0
+
 		for endpointID, endpointAccess := range registry.RegistryAccesses {
 			endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update access to registry", err}
 			}
 
-			if endpoint.Type == portainer.KubernetesLocalEnvironment || endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
+			if endpointutils.IsKubernetesEndpoint(endpoint) {
 				err = handler.updateEndpointRegistryAccess(endpoint, registry, endpointAccess)
 				if err != nil {
 					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update access to registry", err}
