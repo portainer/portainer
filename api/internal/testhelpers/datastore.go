@@ -18,7 +18,7 @@ type datastore struct {
 	helmUserRepository      portainer.HelmUserRepositoryService
 	registry                portainer.RegistryService
 	resourceControl         portainer.ResourceControlService
-	apiKeyRepositoryService portainer.APIKeyRepositoryService
+	apiKeyRepositoryService portainer.APIKeyRepository
 	role                    portainer.RoleService
 	sslSettings             portainer.SSLSettingsService
 	settings                portainer.SettingsService
@@ -53,7 +53,7 @@ func (d *datastore) HelmUserRepository() portainer.HelmUserRepositoryService {
 func (d *datastore) Registry() portainer.RegistryService               { return d.registry }
 func (d *datastore) ResourceControl() portainer.ResourceControlService { return d.resourceControl }
 func (d *datastore) Role() portainer.RoleService                       { return d.role }
-func (d *datastore) APIKeyRepository() portainer.APIKeyRepositoryService {
+func (d *datastore) APIKeyRepository() portainer.APIKeyRepository {
 	return d.apiKeyRepositoryService
 }
 func (d *datastore) Settings() portainer.SettingsService             { return d.settings }
