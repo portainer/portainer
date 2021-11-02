@@ -29,15 +29,14 @@ angular.module('portainer.docker').controller('ImportImageController', [
       $scope.state.pullImageValidity = validity;
     }
 
-    function tagImage(id) {
+    async function tagImage(id) {
       const registryModel = $scope.formValues.RegistryModel;
       if (registryModel.Image) {
         const image = ImageHelper.createImageConfigForContainer(registryModel);
-        return ImageService.tagImage(id, image.fromImage).catch(function error(err) {
+        await ImageService.tagImage(id, image.fromImage).catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to tag image');
         });
       }
-      return null;
     }
 
     $scope.uploadImage = async function () {
