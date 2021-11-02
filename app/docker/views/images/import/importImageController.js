@@ -33,9 +33,11 @@ angular.module('portainer.docker').controller('ImportImageController', [
       const registryModel = $scope.formValues.RegistryModel;
       if (registryModel.Image) {
         const image = ImageHelper.createImageConfigForContainer(registryModel);
-        await ImageService.tagImage(id, image.fromImage).catch(function error(err) {
+        try {
+          await ImageService.tagImage(id, image.fromImage);
+        } catch (err) {
           Notifications.error('Failure', err, 'Unable to tag image');
-        });
+        }
       }
     }
 
