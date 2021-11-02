@@ -46,16 +46,20 @@ settings:
 overrides:
   - files:
       - app/**/*.ts{,x}
+    parserOptions:
+      project: './tsconfig.json'
     parser: '@typescript-eslint/parser'
     plugins:
       - '@typescript-eslint'
     extends:
       - airbnb
       - airbnb-typescript
+      - 'plugin:eslint-comments/recommended'
       - 'plugin:react-hooks/recommended'
       - 'plugin:react/jsx-runtime'
       - 'plugin:@typescript-eslint/recommended'
       - 'plugin:@typescript-eslint/eslint-recommended'
+      - 'plugin:promise/recommended'
       - prettier # should be last
     settings:
       react:
