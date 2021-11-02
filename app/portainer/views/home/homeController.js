@@ -99,6 +99,13 @@ angular
       MotdService.motd().then(function success(data) {
         $scope.motd = data;
       });
+
+      try {
+        const tags = TagService.tags();
+        $scope.tags = tags;
+      } catch (err) {
+        Notifications.error('Failed loading page data', err);
+      }
     }
 
     initView();
