@@ -9,7 +9,7 @@
       </p>
     </div>
   </div>
-  <git-form-auto-update-fieldset model="$ctrl.formValues.AutoUpdate" on-change="($ctrl.onChange)"></git-form-auto-update-fieldset>
+  <git-form-auto-update-fieldset model="$ctrl.formValues.AutoUpdate" on-change="($ctrl.onChangeAutoUpdate)"></git-form-auto-update-fieldset>
   <div class="form-group">
     <div class="col-sm-12">
       <p>
@@ -36,7 +36,6 @@
   <button
     class="btn btn-sm btn-primary"
     ng-click="$ctrl.pullAndRedeployApplication()"
-    ng-if="!$ctrl.formValues.AutoUpdate.RepositoryAutomaticUpdates"
     ng-disabled="$ctrl.isSubmitButtonDisabled() || $ctrl.state.hasUnsavedChanges|| !$ctrl.redeployGitForm.$valid"
     style="margin-top: 7px; margin-left: 0;"
     button-spinner="$ctrl.state.redeployInProgress"

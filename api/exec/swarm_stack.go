@@ -191,7 +191,7 @@ func (manager *SwarmStackManager) updateDockerCLIConfiguration(configPath string
 func (manager *SwarmStackManager) retrieveConfigurationFromDisk(path string) (map[string]interface{}, error) {
 	var config map[string]interface{}
 
-	raw, err := manager.fileService.GetFileContent(path)
+	raw, err := manager.fileService.GetFileContent(path, "")
 	if err != nil {
 		return make(map[string]interface{}), nil
 	}

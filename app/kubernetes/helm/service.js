@@ -45,7 +45,7 @@ export function HelmService(HelmFactory) {
   }
 
   /**
-   * @description: Show values helm of a helm chart, this basically runs `helm show values`
+   * @description: Get a list of all the helm repositories available for the current user
    * @returns {Promise} - Resolves with an object containing list of user helm repos and default/global settings helm repo
    * @throws {PortainerError} - Rejects with error if helm show fails
    */

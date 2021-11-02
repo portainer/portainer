@@ -192,8 +192,8 @@ func (service *Service) RefreshableStacks() ([]portainer.Stack, error) {
 		bucket := tx.Bucket([]byte(BucketName))
 		cursor := bucket.Cursor()
 
-		var stack portainer.Stack
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
+			stack := portainer.Stack{}
 			err := internal.UnmarshalObject(v, &stack)
 			if err != nil {
 				return err

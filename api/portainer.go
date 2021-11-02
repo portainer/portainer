@@ -1212,7 +1212,7 @@ type (
 	// FileService represents a service for managing files
 	FileService interface {
 		GetDockerConfigPath() string
-		GetFileContent(filePath string) ([]byte, error)
+		GetFileContent(trustedRootPath, filePath string) ([]byte, error)
 		Copy(fromFilePath string, toFilePath string, deleteIfExists bool) error
 		Rename(oldPath, newPath string) error
 		RemoveDirectory(directoryPath string) error
@@ -1470,9 +1470,9 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "2.9.1"
+	APIVersion = "2.9.3"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 32
+	DBVersion = 33
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
 	ComposeSyntaxMaxVersion = "3.9"
 	// AssetsServerURL represents the URL of the Portainer asset server

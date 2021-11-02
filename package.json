@@ -2,7 +2,7 @@
   "author": "Portainer.io",
   "name": "portainer",
   "homepage": "http://portainer.io",
-  "version": "2.9.1",
+  "version": "2.9.3",
   "repository": {
     "type": "git",
     "url": "git@github.com:portainer/portainer.git"
@@ -37,7 +37,8 @@
     "format": "prettier --loglevel warn --write \"**/*.{js,css,html}\"",
     "lint": "yarn lint:client; yarn lint:server",
     "lint:server": "cd api && golangci-lint run -E exportloopref",
-    "lint:client": "eslint --cache --fix ."
+    "lint:client": "eslint --cache --fix .",
+    "test:server": "cd api && go test ./..."
   },
   "scriptsComments": {
     "build": "Build the entire app (backend/frontend) in development mode",

@@ -39,7 +39,7 @@ func (handler *Handler) edgeJobFile(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an Edge job with the specified identifier inside the database", err}
 	}
 
-	edgeJobFileContent, err := handler.FileService.GetFileContent(edgeJob.ScriptPath)
+	edgeJobFileContent, err := handler.FileService.GetFileContent("", edgeJob.ScriptPath)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Edge job script file from disk", err}
 	}

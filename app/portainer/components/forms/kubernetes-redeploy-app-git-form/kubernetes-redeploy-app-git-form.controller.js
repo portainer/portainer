@@ -34,6 +34,7 @@ class KubernetesRedeployAppGitFormController {
 
     this.onChange = this.onChange.bind(this);
     this.onChangeRef = this.onChangeRef.bind(this);
+    this.onChangeAutoUpdate = this.onChangeAutoUpdate.bind(this);
   }
 
   onChangeRef(value) {
@@ -46,6 +47,15 @@ class KubernetesRedeployAppGitFormController {
       ...values,
     };
     this.state.hasUnsavedChanges = angular.toJson(this.savedFormValues) !== angular.toJson(this.formValues);
+  }
+
+  onChangeAutoUpdate(values) {
+    this.onChange({
+      AutoUpdate: {
+        ...this.formValues.AutoUpdate,
+        ...values,
+      },
+    });
   }
 
   buildAnalyticsProperties() {
