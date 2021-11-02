@@ -7,6 +7,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const pkg = require('../package.json');
 const projectRoot = path.resolve(__dirname, '..');
@@ -150,5 +151,10 @@ module.exports = {
       '@': path.resolve(projectRoot, 'app'),
     },
     extensions: ['.js', '.ts', '.tsx'],
+    plugins: [
+      new TsconfigPathsPlugin({
+        extensions: ['.js', '.ts', '.tsx'],
+      }),
+    ],
   },
 };
