@@ -65,6 +65,18 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
       },
     };
 
+    const endpointKubernetesConfiguration = {
+      name: 'kubernetes.configure',
+      url: '/configure',
+      views: {
+        'content@': {
+          templateUrl: './views/configure/configure.html',
+          controller: 'KubernetesConfigureController',
+          controllerAs: 'ctrl',
+        },
+      },
+    };
+
     const applications = {
       name: 'kubernetes.applications',
       url: '/applications',
@@ -323,6 +335,7 @@ angular.module('portainer.kubernetes', ['portainer.app', registriesModule, custo
     $stateRegistryProvider.register(kubernetes);
     $stateRegistryProvider.register(helmApplication);
     $stateRegistryProvider.register(helmTemplates);
+    $stateRegistryProvider.register(endpointKubernetesConfiguration);
     $stateRegistryProvider.register(applications);
     $stateRegistryProvider.register(applicationCreation);
     $stateRegistryProvider.register(application);
