@@ -36,7 +36,8 @@ func Test_GenerateApiKey(t *testing.T) {
 		is.NoError(err)
 
 		encodedKey := base64.StdEncoding.EncodeToString(rawKey)
-		is.Equal(encodedKey[:3], string(apiKey.Prefix[:]))
+		is.Equal(encodedKey[:3], apiKey.Prefix)
+		is.Len(apiKey.Prefix, 3)
 	})
 
 	t.Run("Successfully caches API key", func(t *testing.T) {
