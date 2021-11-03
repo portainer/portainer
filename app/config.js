@@ -1,4 +1,3 @@
-import toastr from 'toastr';
 import { Terminal } from 'xterm';
 import * as fit from 'xterm/lib/addons/fit/fit';
 
@@ -49,13 +48,6 @@ angular.module('portainer').config([
         };
       },
     ]);
-
-    toastr.options = {
-      timeOut: 3000,
-      closeButton: true,
-      progressBar: true,
-      tapToDismiss: false,
-    };
 
     Terminal.applyAddon(fit);
 
