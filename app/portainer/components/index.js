@@ -5,4 +5,8 @@ import gitFormModule from './forms/git-form';
 import porAccessManagementModule from './accessManagement';
 import formComponentsModule from './form-components';
 
-export default angular.module('portainer.app.components', [sidebarModule, gitFormModule, porAccessManagementModule, formComponentsModule]).name;
+import { ReactExampleAngular } from './ReactExample';
+
+export default angular
+  .module('portainer.app.components', [sidebarModule, gitFormModule, porAccessManagementModule, formComponentsModule])
+  .component('reactExample', ReactExampleAngular).name;

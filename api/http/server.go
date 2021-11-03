@@ -38,6 +38,7 @@ import (
 	sslhandler "github.com/portainer/portainer/api/http/handler/ssl"
 	"github.com/portainer/portainer/api/http/handler/stacks"
 	"github.com/portainer/portainer/api/http/handler/status"
+	"github.com/portainer/portainer/api/http/handler/storybook"
 	"github.com/portainer/portainer/api/http/handler/tags"
 	"github.com/portainer/portainer/api/http/handler/teammemberships"
 	"github.com/portainer/portainer/api/http/handler/teams"
@@ -213,6 +214,8 @@ func (server *Server) Start() error {
 	stackHandler.ComposeStackManager = server.ComposeStackManager
 	stackHandler.StackDeployer = server.StackDeployer
 
+	var storybookHandler = storybook.NewHandler(server.AssetsPath)
+
 	var tagHandler = tags.NewHandler(requestBouncer)
 	tagHandler.DataStore = server.DataStore
 
@@ -271,6 +274,7 @@ func (server *Server) Start() error {
 		SSLHandler:             sslHandler,
 		StatusHandler:          statusHandler,
 		StackHandler:           stackHandler,
+		StorybookHandler:       storybookHandler,
 		TagHandler:             tagHandler,
 		TeamHandler:            teamHandler,
 		TeamMembershipHandler:  teamMembershipHandler,

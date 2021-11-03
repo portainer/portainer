@@ -17,12 +17,75 @@ plugins:
 parserOptions:
   ecmaVersion: 2018
   sourceType: module
+  project: './tsconfig.json'
   ecmaFeatures:
     modules: true
 
 rules:
-  no-control-regex: off
+  no-control-regex: 'off'
   no-empty: warn
   no-empty-function: warn
-  no-useless-escape: off
-  import/order: error
+  no-useless-escape: 'off'
+  import/order:
+    [
+      'error',
+      {
+        pathGroups: [{ pattern: '@/**', group: 'internal' }, { pattern: '{Kubernetes,Portainer,Agent,Azure,Docker}/**', group: 'internal' }],
+        groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+        pathGroupsExcludedImportTypes: ['internal'],
+      },
+    ]
+
+settings:
+  'import/resolver':
+    alias:
+      map:
+        - ['@', './app']
+      extensions: ['.js', '.ts', '.tsx']
+
+overrides:
+  - files:
+      - app/**/*.ts{,x}
+    parserOptions:
+      project: './tsconfig.json'
+    parser: '@typescript-eslint/parser'
+    plugins:
+      - '@typescript-eslint'
+    extends:
+      - airbnb
+      - airbnb-typescript
+      - 'plugin:eslint-comments/recommended'
+      - 'plugin:react-hooks/recommended'
+      - 'plugin:react/jsx-runtime'
+      - 'plugin:@typescript-eslint/recommended'
+      - 'plugin:@typescript-eslint/eslint-recommended'
+      - 'plugin:promise/recommended'
+      - prettier # should be last
+    settings:
+      react:
+        version: 'detect'
+    rules:
+      import/order:
+        ['error', { pathGroups: [{ pattern: '@/**', group: 'internal' }], groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'], 'newlines-between': 'always' }]
+      func-style: [error, 'declaration']
+      import/prefer-default-export: off
+      no-use-before-define: ['error', { functions: false }]
+      '@typescript-eslint/no-use-before-define': ['error', { functions: false }]
+      no-shadow: 'off'
+      '@typescript-eslint/no-shadow': off
+      jsx-a11y/no-autofocus: warn
+      react/forbid-prop-types: off
+      react/require-default-props: off
+      react/no-array-index-key: off
+      react/jsx-filename-extension: [0]
+      import/no-extraneous-dependencies: ['error', { devDependencies: true }]
+      '@typescript-eslint/explicit-module-boundary-types': off
+      '@typescript-eslint/no-unused-vars': 'error'
+      '@typescript-eslint/no-explicit-any': 'error'
+  - files:
+      - app/**/*.test.*
+    extends:
+      - 'plugin:jest/recommended'
+      - 'plugin:jest/style'
+    env:
+      'jest/globals': true

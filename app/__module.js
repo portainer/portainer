@@ -2,6 +2,7 @@ import './assets/css';
 import '@babel/polyfill';
 
 import angular from 'angular';
+import { UI_ROUTER_REACT_HYBRID } from '@uirouter/react-hybrid';
 
 import './matomo-setup';
 import analyticsModule from './angulartics.matomo';
@@ -15,6 +16,7 @@ import './portainer/__module';
 angular.module('portainer', [
   'ui.bootstrap',
   'ui.router',
+  UI_ROUTER_REACT_HYBRID,
   'ui.select',
   'isteven-multi-select',
   'ngSanitize',
@@ -44,7 +46,10 @@ angular.module('portainer', [
 
 if (require) {
   var req = require.context('./', true, /^(.*\.(js$))[^.]*$/im);
-  req.keys().forEach(function (key) {
-    req(key);
-  });
+  req
+    .keys()
+    .filter((path) => !path.includes('.test'))
+    .forEach(function (key) {
+      req(key);
+    });
 }
