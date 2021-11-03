@@ -260,6 +260,7 @@ func (bouncer *RequestBouncer) apiKeyLookup(r *http.Request) *portainer.TokenDat
 	// TODO: retrieve user associated to the API-Key
 	// TODO: generate a new token for the user
 	// TODO: return generated token
+	// TODO: update apiKey last accessed time
 
 	var tokenData *portainer.TokenData
 
