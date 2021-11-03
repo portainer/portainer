@@ -11,6 +11,8 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
+var ErrInvalidAPIKey = errors.New("Invalid API key")
+
 type apiKeyService struct {
 	apiKeyRepository portainer.APIKeyRepository
 	cache            *apiKeyCache
@@ -33,9 +35,9 @@ func (a *apiKeyService) GenerateApiKey(userID portainer.UserID, description stri
 	apiKey := &portainer.APIKey{
 		UserID:      userID,
 		Description: description,
-		Prefix:      [3]rune{rune(encodedRawAPIKey[0]), rune(encodedRawAPIKey[1]), rune(encodedRawAPIKey[2])},
+		Prefix:      encodedRawAPIKey[:3],
 		DateCreated: time.Now(),
-		Digest:      hashDigest,
+		Digest:      &hashDigest,
 	}
 
 	err := a.apiKeyRepository.CreateAPIKey(apiKey)
@@ -85,7 +87,7 @@ func (a *apiKeyService) DeleteAPIKey(userID portainer.UserID, apiKeyID portainer
 	}
 
 	if apiKey == nil {
-		return errors.New("Invalid API key ID")
+		return ErrInvalidAPIKey
 	}
 
 	// retrieve api-keys from cache

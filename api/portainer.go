@@ -672,10 +672,10 @@ type (
 		ID          APIKeyID `json:"Id" example:"1"`
 		UserID      UserID   `json:"UserId" example:"1"`
 		Description string
-		Prefix      [3]rune   `json:"prefix"`      // API key identifier (3 char prefix)
-		DateCreated time.Time `json:"dateCreated"` // Date when the API key was created (UTC)
-		LastUsed    time.Time `json:"lastUsed"`    // Date when the API key was last used (UTC)
-		Digest      [32]byte  `json:"digest"`      // Digest represents the hash of the raw API key
+		Prefix      string    `json:"prefix"`           // API key identifier (3 char prefix)
+		DateCreated time.Time `json:"dateCreated"`      // Date when the API key was created (UTC)
+		LastUsed    time.Time `json:"lastUsed"`         // Date when the API key was last used (UTC)
+		Digest      *[32]byte `json:"digest,omitempty"` // Digest represents the hash of the raw API key
 	}
 
 	// Schedule represents a scheduled job.
