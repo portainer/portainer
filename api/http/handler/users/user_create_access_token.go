@@ -26,7 +26,8 @@ func (payload *userAccessTokenCreatePayload) Validate(r *http.Request) error {
 }
 
 type accessTokenResponse struct {
-	APIKey []byte `json:"apiKey"`
+	RawAPIKey []byte           `json:"rawAPIKey"`
+	APIKey    portainer.APIKey `json:"apiKey"`
 }
 
 // @id UserGenerateAPIKey
@@ -81,10 +82,10 @@ func (handler *Handler) userCreateAccessToken(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a user with the specified identifier inside the database", err}
 	}
 
-	rawAPIKey, _, err := handler.apiKeyService.GenerateApiKey(portainer.UserID(userID), payload.Description)
+	rawAPIKey, apiKey, err := handler.apiKeyService.GenerateApiKey(portainer.UserID(userID), payload.Description)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Internal Server Error", err}
 	}
 
-	return response.JSON(w, accessTokenResponse{rawAPIKey})
+	return response.JSON(w, accessTokenResponse{rawAPIKey, *apiKey})
 }
