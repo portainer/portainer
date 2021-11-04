@@ -116,7 +116,7 @@ func initHelmPackageManager(assetsPath string) (libhelm.HelmPackageManager, erro
 }
 
 func initAPIKeyService(datastore portainer.DataStore) apikey.APIKeyService {
-	return apikey.NewAPIKeyService(datastore.APIKeyRepository())
+	return apikey.NewAPIKeyService(datastore.APIKeyRepository(), datastore.User())
 }
 
 func initJWTService(dataStore portainer.DataStore) (portainer.JWTService, error) {

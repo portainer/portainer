@@ -26,7 +26,7 @@ func (payload *userAccessTokenCreatePayload) Validate(r *http.Request) error {
 }
 
 type accessTokenResponse struct {
-	RawAPIKey []byte           `json:"rawAPIKey"`
+	RawAPIKey string           `json:"rawAPIKey"`
 	APIKey    portainer.APIKey `json:"apiKey"`
 }
 
@@ -74,7 +74,7 @@ func (handler *Handler) userCreateAccessToken(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to create user access token", httperrors.ErrUnauthorized}
 	}
 
-	_, err = handler.DataStore.User().User(portainer.UserID(userID))
+	user, err := handler.DataStore.User().User(portainer.UserID(userID))
 	if err != nil {
 		if err == bolterrors.ErrObjectNotFound {
 			return &httperror.HandlerError{http.StatusNotFound, "Unable to find a user with the specified identifier inside the database", err}
@@ -82,7 +82,7 @@ func (handler *Handler) userCreateAccessToken(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a user with the specified identifier inside the database", err}
 	}
 
-	rawAPIKey, apiKey, err := handler.apiKeyService.GenerateApiKey(portainer.UserID(userID), payload.Description)
+	rawAPIKey, apiKey, err := handler.apiKeyService.GenerateApiKey(*user, payload.Description)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Internal Server Error", err}
 	}

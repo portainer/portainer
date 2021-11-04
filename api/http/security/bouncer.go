@@ -4,9 +4,11 @@ import (
 	"errors"
 	"net/http"
 	"strings"
+	"time"
 
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/apikey"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 )
@@ -14,8 +16,9 @@ import (
 type (
 	// RequestBouncer represents an entity that manages API request accesses
 	RequestBouncer struct {
-		dataStore  portainer.DataStore
-		jwtService portainer.JWTService
+		dataStore     portainer.DataStore
+		jwtService    portainer.JWTService
+		apiKeyService apikey.APIKeyService
 	}
 
 	// RestrictedRequestContext is a data structure containing information
@@ -34,10 +37,11 @@ type (
 const apiKeyHeader = "X-API-KEY"
 
 // NewRequestBouncer initializes a new RequestBouncer
-func NewRequestBouncer(dataStore portainer.DataStore, jwtService portainer.JWTService) *RequestBouncer {
+func NewRequestBouncer(dataStore portainer.DataStore, jwtService portainer.JWTService, apiKeyService apikey.APIKeyService) *RequestBouncer {
 	return &RequestBouncer{
-		dataStore:  dataStore,
-		jwtService: jwtService,
+		dataStore:     dataStore,
+		jwtService:    jwtService,
+		apiKeyService: apiKeyService,
 	}
 }
 
@@ -247,22 +251,41 @@ func (bouncer *RequestBouncer) JWTAuthLookup(r *http.Request) *portainer.TokenDa
 	return tokenData
 }
 
-// apiKeyLookup looks up an api key and token in the request.
+// apiKeyLookup looks up an verifies an api-key by:
+// - computing the digest of the raw api-key
+// - verifying it exists in cache/database
+// - matching the key to a user (ID, Role)
+// If the key is valid/verified, the last updated time of the key is updated.
+// Successful verification of the key will return a TokenData object - since the downstream handlers
+// utilise the token injected in the request context.
 func (bouncer *RequestBouncer) apiKeyLookup(r *http.Request) *portainer.TokenData {
-	// get api-key from the request header
-	_, ok := extractAPIKey(r)
+	rawAPIKey, ok := extractAPIKey(r)
 	if !ok {
 		return nil
 	}
 
-	// TODO: hash API-Key
-	// TODO: compare API-Key with the one stored in the database
-	// TODO: retrieve user associated to the API-Key
-	// TODO: generate a new token for the user
-	// TODO: return generated token
-	// TODO: update apiKey last accessed time
+	digest, err := bouncer.apiKeyService.HashRaw(rawAPIKey)
+	if err != nil {
+		return nil
+	}
 
-	var tokenData *portainer.TokenData
+	user, apiKey, err := bouncer.apiKeyService.GetDigestUserAndKey(digest)
+	if err != nil {
+		return nil
+	}
+
+	tokenData := &portainer.TokenData{
+		ID:       user.ID,
+		Username: user.Username,
+		Role:     user.Role,
+	}
+	if _, err := bouncer.jwtService.GenerateToken(tokenData); err != nil {
+		return nil
+	}
+
+	// update the last used time of the key
+	apiKey.LastUsed = time.Now().UTC()
+	bouncer.apiKeyService.UpdateAPIKey(&apiKey)
 
 	return tokenData
 }

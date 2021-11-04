@@ -675,7 +675,7 @@ type (
 		Prefix      string    `json:"prefix"`           // API key identifier (3 char prefix)
 		DateCreated time.Time `json:"dateCreated"`      // Date when the API key was created (UTC)
 		LastUsed    time.Time `json:"lastUsed"`         // Date when the API key was last used (UTC)
-		Digest      *[32]byte `json:"digest,omitempty"` // Digest represents the hash of the raw API key
+		Digest      []byte    `json:"digest,omitempty"` // Digest represents the hash of the raw API key
 	}
 
 	// Schedule represents a scheduled job.
@@ -1371,7 +1371,8 @@ type (
 	APIKeyRepository interface {
 		GetAPIKeysByUserID(userID UserID) ([]APIKey, error)
 		CreateAPIKey(key *APIKey) error
-		GetAPIKeyByDigest(digest string) (APIKey, error)
+		GetAPIKeyByDigest(digest []byte) (*APIKey, error)
+		UpdateAPIKey(key *APIKey) error
 		DeleteAPIKey(ID APIKeyID) error
 	}
 

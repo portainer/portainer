@@ -1,6 +1,8 @@
 package apikeyrepository
 
 import (
+	"bytes"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
 
@@ -56,7 +58,7 @@ func (service *Service) GetAPIKeysByUserID(userID portainer.UserID) ([]portainer
 
 // GetAPIKeyByDigest returns the API key for the associated digest.
 // Note: there is a 1-to-1 mapping of api-key and digest
-func (service *Service) GetAPIKeyByDigest(digest string) (portainer.APIKey, error) {
+func (service *Service) GetAPIKeyByDigest(digest []byte) (*portainer.APIKey, error) {
 	var result portainer.APIKey
 
 	err := service.connection.View(func(tx *bolt.Tx) error {
@@ -70,7 +72,7 @@ func (service *Service) GetAPIKeyByDigest(digest string) (portainer.APIKey, erro
 				return err
 			}
 
-			if string(record.Digest[:]) == digest {
+			if bytes.Equal(record.Digest, digest) {
 				result = record
 				return nil
 			}
@@ -78,7 +80,7 @@ func (service *Service) GetAPIKeyByDigest(digest string) (portainer.APIKey, erro
 		return nil
 	})
 
-	return result, err
+	return &result, err
 }
 
 // CreateAPIKey creates a new APIKey object.
@@ -96,6 +98,11 @@ func (service *Service) CreateAPIKey(record *portainer.APIKey) error {
 
 		return bucket.Put(internal.Itob(int(record.ID)), data)
 	})
+}
+
+func (service *Service) UpdateAPIKey(key *portainer.APIKey) error {
+	identifier := internal.Itob(int(key.ID))
+	return internal.UpdateObject(service.connection, BucketName, identifier, key)
 }
 
 func (service *Service) DeleteAPIKey(ID portainer.APIKeyID) error {

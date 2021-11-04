@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/bolt"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/jwt"
@@ -40,7 +41,9 @@ func Test_mwAuthenticateFirst(t *testing.T) {
 	jwtService, err := jwt.NewService("1h", nil)
 	assert.NoError(t, err, "failed to create a copy of service")
 
-	bouncer := NewRequestBouncer(store, jwtService)
+	apiKeyService := apikey.NewAPIKeyService(nil, nil)
+
+	bouncer := NewRequestBouncer(store, jwtService, apiKeyService)
 
 	tests := []struct {
 		name                   string

@@ -1,50 +1,52 @@
 package apikey
 
 import (
-	"sync"
-
 	cmap "github.com/orcaman/concurrent-map"
 	portainer "github.com/portainer/portainer/api"
 )
 
+// entry is a tuple containing the user and API key associated to an API key digest
+type entry struct {
+	user   portainer.User
+	apiKey portainer.APIKey
+}
+
+// apiKeyCache is a concurrency-safe, in-memory cache which primarily exists for to reduce database roundtrips.
+// We store the api-key digest (keys) and the associated user and key-data (values) in the cache.
+// This is required because HTTP requests will contain only the api-key digest in the x-api-key request header;
+// digest value must be mapped to a portainer user (and respective key data) for validation.
+// This cache is used to avoid multiple database queries to retrieve these user/key associated to the digest.
 type apiKeyCache struct {
-	cache cmap.ConcurrentMap
-	mux   sync.RWMutex
+	cache cmap.ConcurrentMap // map[string]entry
 }
 
 // NewAPIKeyCache creates a new cache for API keys
 func NewAPIKeyCache() *apiKeyCache {
-	return &apiKeyCache{
-		cache: cmap.New(),
-	}
+	return &apiKeyCache{cache: cmap.New()}
 }
 
-// GetAPIKey returns the api-key associated to an api-key digest
+// Get returns the user/key associated to an api-key's digest
 // This is required because HTTP requests will contain the digest of the API key in header,
-// the digest value must be mapped to an api-key to map to a portainer user.
-func (c *apiKeyCache) GetAPIKey(digest string) (*portainer.APIKey, bool) {
-	c.mux.RLock()
-	defer c.mux.RUnlock()
-
-	apiKey, ok := c.cache.Get(digest)
+// the digest value must be mapped to a portainer user.
+func (c *apiKeyCache) Get(digest []byte) (portainer.User, portainer.APIKey, bool) {
+	val, ok := c.cache.Get(string(digest))
 	if !ok {
-		return nil, false
+		return portainer.User{}, portainer.APIKey{}, false
 	}
-	return apiKey.(*portainer.APIKey), true
+	tuple := val.(entry)
+
+	return tuple.user, tuple.apiKey, true
 }
 
-// Set persists an API key to the cache
-func (c *apiKeyCache) Set(apikey *portainer.APIKey) {
-	c.mux.Lock()
-	defer c.mux.Unlock()
-
-	c.cache.Set(string(apikey.Digest[:]), apikey)
+// Set persists a user/key entry to the cache
+func (c *apiKeyCache) Set(digest []byte, user portainer.User, apiKey portainer.APIKey) {
+	c.cache.Set(string(digest), entry{
+		user:   user,
+		apiKey: apiKey,
+	})
 }
 
-// Delete removes an API key from the cache
-func (c *apiKeyCache) Delete(digest string) {
-	c.mux.Lock()
-	defer c.mux.Unlock()
-
-	c.cache.Remove(digest)
+// Delete evicts a digest's user/key entry key from the cache
+func (c *apiKeyCache) Delete(digest []byte) {
+	c.cache.Remove(string(digest))
 }

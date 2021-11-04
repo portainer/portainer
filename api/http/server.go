@@ -99,7 +99,7 @@ type Server struct {
 func (server *Server) Start() error {
 	kubernetesTokenCacheManager := server.KubernetesTokenCacheManager
 
-	requestBouncer := security.NewRequestBouncer(server.DataStore, server.JWTService)
+	requestBouncer := security.NewRequestBouncer(server.DataStore, server.JWTService, server.APIKeyService)
 
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
 	offlineGate := offlinegate.NewOfflineGate()
