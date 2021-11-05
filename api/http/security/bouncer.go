@@ -3,6 +3,7 @@ package security
 import (
 	"errors"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -307,14 +308,25 @@ func extractBearerToken(r *http.Request) (string, error) {
 	return token, nil
 }
 
-// extractAPIKey extracts the api key from the api key request header (if present).
+// extractAPIKey extracts the api key from the api key request header or query params.
 func extractAPIKey(r *http.Request) (apikey string, ok bool) {
+	// extract the API key from the request header
 	apikey = r.Header.Get(apiKeyHeader)
-	if apikey == "" {
-		return
+	if apikey != "" {
+		return apikey, true
 	}
 
-	return apikey, true
+	// extract the API key from query params.
+	// Since there is no way to case-insensitive extract query parameters,
+	// we need upper-case the query params to check for presence of the "X-API-KEY" param.
+	var query url.Values = r.URL.Query()
+	for k, v := range query {
+		if strings.ToUpper(k) == apiKeyHeader {
+			return v[0], true
+		}
+	}
+
+	return "", false
 }
 
 // mwSecureHeaders provides secure headers middleware for handlers.

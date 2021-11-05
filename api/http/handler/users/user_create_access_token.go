@@ -20,7 +20,7 @@ type userAccessTokenCreatePayload struct {
 
 func (payload *userAccessTokenCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Description) || govalidator.Contains(payload.Description, " ") {
-		return errors.New("Invalid description. Must not contain any whitespace")
+		return errors.New("invalid description. Must not contain any whitespace")
 	}
 	return nil
 }
@@ -51,7 +51,7 @@ func (handler *Handler) userCreateAccessToken(w http.ResponseWriter, r *http.Req
 	// specifically require JWT auth for this endpoint since API-Key based auth is not supported
 	t := handler.bouncer.JWTAuthLookup(r)
 	if t == nil {
-		return &httperror.HandlerError{http.StatusUnauthorized, "", errors.New("JWT Authentication required")}
+		return &httperror.HandlerError{http.StatusUnauthorized, "Auth not supported", errors.New("JWT Authentication required")}
 	}
 
 	var payload userAccessTokenCreatePayload
