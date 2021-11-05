@@ -1,0 +1,7 @@
+.text-left {
+    float: left;
+}
+
+.fa-caret-down, .text-left {
+    size: 100px
+}
