@@ -5,6 +5,7 @@ import componentsModule from './components';
 import settingsModule from './settings';
 import featureFlagModule from './feature-flags';
 import userActivityModule from './user-activity';
+import servicesModule from './services';
 
 async function initAuthentication(authManager, Authentication, $rootScope, $state) {
   authManager.checkAuthOnRefresh();
@@ -22,7 +23,16 @@ async function initAuthentication(authManager, Authentication, $rootScope, $stat
 }
 
 angular
-  .module('portainer.app', ['portainer.oauth', 'portainer.rbac', componentsModule, settingsModule, featureFlagModule, userActivityModule, 'portainer.shared.datatable'])
+  .module('portainer.app', [
+    'portainer.oauth',
+    'portainer.rbac',
+    componentsModule,
+    settingsModule,
+    featureFlagModule,
+    userActivityModule,
+    'portainer.shared.datatable',
+    servicesModule,
+  ])
   .config([
     '$stateRegistryProvider',
     function ($stateRegistryProvider) {
