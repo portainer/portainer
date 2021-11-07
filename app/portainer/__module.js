@@ -36,8 +36,6 @@ angular
   .config([
     '$stateRegistryProvider',
     function ($stateRegistryProvider) {
-      'use strict';
-
       var root = {
         name: 'root',
         abstract: true,
