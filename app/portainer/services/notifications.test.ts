@@ -20,7 +20,11 @@ it('calling error with Error should show error message', () => {
 
   error(title, new Error(errorMessage), fallback);
 
-  expect(toastr.error).toHaveBeenCalledWith(errorMessage, title, expect.anything());
+  expect(toastr.error).toHaveBeenCalledWith(
+    errorMessage,
+    title,
+    expect.anything()
+  );
 });
 
 it('calling error without Error should show fallback message', () => {
