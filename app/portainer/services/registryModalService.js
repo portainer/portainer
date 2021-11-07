@@ -20,8 +20,8 @@ function ModalServiceFactory($q, ModalService, RegistryService) {
     const defaultValue = String(_.get(registryModel, 'Registry.Id', '0'));
 
     ModalService.selectRegistry({
-      options,
-      defaultValue,
+      inputOptions: options,
+      value: defaultValue,
       callback: (registryId) => {
         if (registryId) {
           const registryModel = RegistryService.retrievePorRegistryModelFromRepositoryWithRegistries(repository, registries, registryId);
