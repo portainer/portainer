@@ -13,7 +13,8 @@
     },
     {
       "files": [
-        "*.{j,t}sx"
+        "*.{j,t}sx",
+        "*.ts"
       ],
       "options": {
         "printWidth": 80,
