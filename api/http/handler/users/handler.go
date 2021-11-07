@@ -52,7 +52,11 @@ func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimi
 	h.Handle("/users/{id}",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.userDelete))).Methods(http.MethodDelete)
 	h.Handle("/users/{id}/tokens",
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.userGetAccessTokens))).Methods(http.MethodGet)
+	h.Handle("/users/{id}/tokens",
 		rateLimiter.LimitAccess(bouncer.RestrictedAccess(httperror.LoggerHandler(h.userCreateAccessToken)))).Methods(http.MethodPost)
+	h.Handle("/users/{id}/tokens/{keyID}",
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.userRemoveAccessToken))).Methods(http.MethodDelete)
 	h.Handle("/users/{id}/memberships",
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.userMemberships))).Methods(http.MethodGet)
 	h.Handle("/users/{id}/passwd",
