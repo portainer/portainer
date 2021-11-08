@@ -110,6 +110,7 @@ func (a *apiKeyService) DeleteAPIKey(userID portainer.UserID, apiKeyID portainer
 	for _, key := range apiKeys {
 		if key.ID == apiKeyID {
 			apiKey = &key
+			break
 		}
 	}
 
