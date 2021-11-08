@@ -3,7 +3,6 @@ package security
 import (
 	"errors"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
 
@@ -318,7 +317,7 @@ func extractAPIKey(r *http.Request) (apikey string, ok bool) {
 
 	// extract the API key from query params.
 	// Case-insensitive check for the "X-API-KEY" query param.
-	var query url.Values = r.URL.Query()
+	query := r.URL.Query()
 	for k, v := range query {
 		if strings.EqualFold(k, apiKeyHeader) {
 			return v[0], true
