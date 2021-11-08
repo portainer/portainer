@@ -50,7 +50,7 @@ angular.module('portainer.docker').controller('LogViewerController', [
     this.downloadLogs = function () {
       const newlineBreaker = navigator.userAgent.indexOf('Windows NT') > -1 ? '\r\n' : '\n';
       // The original decoded logs have a CR in the beginning of each lines except for the first line. Just replace once.
-      const data = new Blob([_.reduce(this.state.filteredLogs, (acc, log) => acc + log.line.replace(/^\r|\r$/, newlineBreaker), '')]);
+      const data = new Blob([_.reduce(this.state.filteredLogs, (acc, log) => acc + log.line.replace(/^\r/, newlineBreaker), '')]);
       FileSaver.saveAs(data, this.resourceName + '_logs.txt');
     };
   },
