@@ -4,6 +4,7 @@ import (
 	"bytes"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/internal"
 
 	"github.com/boltdb/bolt"
@@ -98,6 +99,28 @@ func (service *Service) CreateAPIKey(record *portainer.APIKey) error {
 
 		return bucket.Put(internal.Itob(int(record.ID)), data)
 	})
+}
+
+// GetAPIKey retrieves an existing APIKey object by api key ID.
+func (service *Service) GetAPIKey(keyID portainer.APIKeyID) (*portainer.APIKey, error) {
+	var apiKey *portainer.APIKey
+
+	err := service.connection.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(BucketName))
+		item := bucket.Get(internal.Itob(int(keyID)))
+		if item == nil {
+			return errors.ErrObjectNotFound
+		}
+
+		err := internal.UnmarshalObject(item, &apiKey)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	return apiKey, err
 }
 
 func (service *Service) UpdateAPIKey(key *portainer.APIKey) error {

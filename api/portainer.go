@@ -1369,11 +1369,12 @@ type (
 
 	// APIKeyRepositoryService
 	APIKeyRepository interface {
-		GetAPIKeysByUserID(userID UserID) ([]APIKey, error)
 		CreateAPIKey(key *APIKey) error
-		GetAPIKeyByDigest(digest []byte) (*APIKey, error)
+		GetAPIKey(keyID APIKeyID) (*APIKey, error)
 		UpdateAPIKey(key *APIKey) error
 		DeleteAPIKey(ID APIKeyID) error
+		GetAPIKeysByUserID(userID UserID) ([]APIKey, error)
+		GetAPIKeyByDigest(digest []byte) (*APIKey, error)
 	}
 
 	// SettingsService represents a service for managing application settings

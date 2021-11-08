@@ -203,7 +203,7 @@ func Test_DeleteAPIKey(t *testing.T) {
 		is.NoError(err)
 		is.Equal(*apiKey, apiKeyGot)
 
-		err = service.DeleteAPIKey(user.ID, apiKey.ID)
+		err = service.DeleteAPIKey(apiKey.ID)
 		is.NoError(err)
 
 		_, _, err = service.GetDigestUserAndKey(apiKey.Digest)
@@ -219,7 +219,7 @@ func Test_DeleteAPIKey(t *testing.T) {
 		is.True(ok)
 		is.Equal(*apiKey, apiKeyFromCache)
 
-		err = service.DeleteAPIKey(user.ID, apiKey.ID)
+		err = service.DeleteAPIKey(apiKey.ID)
 		is.NoError(err)
 
 		_, _, ok = service.cache.Get(apiKey.Digest)

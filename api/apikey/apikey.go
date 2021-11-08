@@ -11,5 +11,5 @@ type APIKeyService interface {
 	GetAPIKeys(userID portainer.UserID) ([]portainer.APIKey, error)
 	GetDigestUserAndKey(digest []byte) (portainer.User, portainer.APIKey, error)
 	UpdateAPIKey(apiKey *portainer.APIKey) error
-	DeleteAPIKey(userID portainer.UserID, apiKeyID portainer.APIKeyID) error
+	DeleteAPIKey(apiKeyID portainer.APIKeyID) error
 }

@@ -100,7 +100,7 @@ func (handler *Handler) deleteUser(w http.ResponseWriter, user *portainer.User) 
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user API keys from the database", err}
 	}
 	for _, k := range apiKeys {
-		err = handler.apiKeyService.DeleteAPIKey(k.UserID, k.ID)
+		err = handler.apiKeyService.DeleteAPIKey(k.ID)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove user API key from the database", err}
 		}

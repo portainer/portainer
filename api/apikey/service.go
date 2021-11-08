@@ -3,6 +3,7 @@ package apikey
 import (
 	"crypto/sha256"
 	"encoding/base64"
+	"fmt"
 	"time"
 
 	"github.com/gorilla/securecookie"
@@ -100,26 +101,14 @@ func (a *apiKeyService) UpdateAPIKey(apiKey *portainer.APIKey) error {
 }
 
 // DeleteAPIKey deletes an API key and removes the digest/api-key entry from the cache.
-func (a *apiKeyService) DeleteAPIKey(userID portainer.UserID, apiKeyID portainer.APIKeyID) error {
-	apiKeys, err := a.GetAPIKeys(userID)
+func (a *apiKeyService) DeleteAPIKey(apiKeyID portainer.APIKeyID) error {
+	// get api-key digest to remove from cache
+	apiKey, err := a.apiKeyRepository.GetAPIKey(apiKeyID)
 	if err != nil {
-		return errors.Wrap(err, "Unable to retrieve API keys associated to the user")
-	}
-
-	var apiKey *portainer.APIKey
-	for _, key := range apiKeys {
-		if key.ID == apiKeyID {
-			apiKey = &key
-			break
-		}
-	}
-
-	if apiKey == nil {
-		return ErrInvalidAPIKey
+		return errors.Wrap(err, fmt.Sprintf("Unable to retrieve API key: %d", apiKeyID))
 	}
 
 	// delete the user/api-key from cache
 	a.cache.Delete(apiKey.Digest)
-
 	return a.apiKeyRepository.DeleteAPIKey(apiKeyID)
 }

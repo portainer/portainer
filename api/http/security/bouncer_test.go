@@ -302,7 +302,7 @@ func Test_apiKeyLookup(t *testing.T) {
 	t.Run("valid x-api-key header succeeds api-key lookup", func(t *testing.T) {
 		rawAPIKey, apiKey, err := apiKeyService.GenerateApiKey(*user, "test")
 		is.NoError(err)
-		defer apiKeyService.DeleteAPIKey(user.ID, apiKey.ID)
+		defer apiKeyService.DeleteAPIKey(apiKey.ID)
 
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
 		req.Header.Add("x-api-key", rawAPIKey)
@@ -316,7 +316,7 @@ func Test_apiKeyLookup(t *testing.T) {
 	t.Run("successful api-key lookup updates token last used time", func(t *testing.T) {
 		rawAPIKey, apiKey, err := apiKeyService.GenerateApiKey(*user, "test")
 		is.NoError(err)
-		defer apiKeyService.DeleteAPIKey(user.ID, apiKey.ID)
+		defer apiKeyService.DeleteAPIKey(apiKey.ID)
 
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
 		req.Header.Add("x-api-key", rawAPIKey)
