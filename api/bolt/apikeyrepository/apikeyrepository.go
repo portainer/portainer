@@ -14,7 +14,7 @@ const (
 	BucketName = "api_key"
 )
 
-// Service represents a service for managing environment(endpoint) data.
+// Service represents a service for managing api-key data.
 type Service struct {
 	connection *internal.DbConnection
 }
