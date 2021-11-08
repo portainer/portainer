@@ -164,7 +164,7 @@ angular
       EndpointService.createLocalKubernetesEndpoint(name, tagIds)
         .then(function success(result) {
           Notifications.success('Environment created', name);
-          $state.go('portainer.endpoints.endpoint.kubernetesConfig', { id: result.Id });
+          $state.go('portainer.k8sendpoint.kubernetesConfig', { id: result.Id });
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to create environment');
@@ -263,7 +263,7 @@ angular
               $state.go('portainer.endpoints.endpoint', { id: endpoint.Id });
               break;
             case PortainerEndpointTypes.AgentOnKubernetesEnvironment:
-              $state.go('portainer.endpoints.endpoint.kubernetesConfig', { id: endpoint.Id });
+              $state.go('portainer.k8sendpoint.kubernetesConfig', { id: endpoint.Id });
               break;
             default:
               $state.go('portainer.endpoints', {}, { reload: true });
