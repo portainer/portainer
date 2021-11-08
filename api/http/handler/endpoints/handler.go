@@ -4,6 +4,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/demo"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/kubernetes/cli"
@@ -35,6 +36,7 @@ type requestBouncer interface {
 type Handler struct {
 	*mux.Router
 	requestBouncer       requestBouncer
+	demoService          *demo.Service
 	DataStore            dataservices.DataStore
 	FileService          portainer.FileService
 	ProxyManager         *proxy.Manager
@@ -48,10 +50,11 @@ type Handler struct {
 }
 
 // NewHandler creates a handler to manage environment(endpoint) operations.
-func NewHandler(bouncer requestBouncer) *Handler {
+func NewHandler(bouncer requestBouncer, demoService *demo.Service) *Handler {
 	h := &Handler{
 		Router:         mux.NewRouter(),
 		requestBouncer: bouncer,
+		demoService:    demoService,
 	}
 
 	h.Handle("/endpoints",
