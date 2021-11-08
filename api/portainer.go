@@ -51,6 +51,7 @@ type (
 		Assets                    *string
 		Data                      *string
 		EnableEdgeComputeFeatures *bool
+		EnableOpenAMTFeatures     *bool
 		EndpointURL               *string
 		Labels                    *[]Pair
 		Logo                      *string
@@ -711,6 +712,8 @@ type (
 		EdgeAgentCheckinInterval int `json:"EdgeAgentCheckinInterval" example:"5"`
 		// Whether edge compute features are enabled
 		EnableEdgeComputeFeatures bool `json:"EnableEdgeComputeFeatures" example:""`
+		// Whether OpenAMT features are enabled or not
+		EnableOpenAMTFeatures bool `json:"EnableOpenAMTFeatures" example:""`
 		// The duration of a user session
 		UserSessionTimeout string `json:"UserSessionTimeout" example:"5m"`
 		// The expiry of a Kubeconfig
