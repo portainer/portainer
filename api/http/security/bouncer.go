@@ -317,11 +317,10 @@ func extractAPIKey(r *http.Request) (apikey string, ok bool) {
 	}
 
 	// extract the API key from query params.
-	// Since there is no way to case-insensitive extract query parameters,
-	// we need upper-case the query params to check for presence of the "X-API-KEY" param.
+	// Case-insensitive check for the "X-API-KEY" query param.
 	var query url.Values = r.URL.Query()
 	for k, v := range query {
-		if strings.ToUpper(k) == apiKeyHeader {
+		if strings.EqualFold(k, apiKeyHeader) {
 			return v[0], true
 		}
 	}
