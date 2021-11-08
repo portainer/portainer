@@ -23,7 +23,7 @@ func NewAPIKeyService(apiKeyRepository portainer.APIKeyRepository, userRepositor
 	return &apiKeyService{
 		apiKeyRepository: apiKeyRepository,
 		userRepository:   userRepository,
-		cache:            NewAPIKeyCache(),
+		cache:            NewAPIKeyCache(time.Hour),
 	}
 }
 
