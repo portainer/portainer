@@ -33,7 +33,7 @@ func (a *apiKeyService) HashRaw(rawKey string) ([]byte, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "Unable to decode raw API key")
 	}
-	hashDigest := sha256.Sum256([]byte(decodedRawAPIKey))
+	hashDigest := sha256.Sum256(decodedRawAPIKey)
 	return hashDigest[:], nil
 }
 
