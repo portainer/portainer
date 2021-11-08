@@ -6,17 +6,12 @@ import { Select, Props } from './Select';
 function renderDefault({
   name = 'default name',
   options = [],
-  selectedOption = '1',
-  customOnChange = () => {},
+  value = '1',
+  onChange = () => {},
   children = null,
 }: Partial<PropsWithChildren<Props>> = {}) {
   return render(
-    <Select
-      name={name}
-      options={options}
-      selectedOption={selectedOption}
-      customOnChange={customOnChange}
-    >
+    <Select name={name} options={options} value={value} onChange={onChange}>
       {children}
     </Select>
   );

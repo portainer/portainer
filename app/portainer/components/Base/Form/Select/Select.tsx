@@ -1,30 +1,21 @@
-import { ChangeEvent, PropsWithChildren, useState } from 'react';
+import { ChangeEvent, PropsWithChildren } from 'react';
 
 import './Select.css';
 
 export interface Props {
   name: string;
   options: { text: string; value: string }[];
-  selectedOption?: string;
-  customOnChange?: (value: string) => void;
+  value: string;
+  onChange: (value: ChangeEvent<HTMLSelectElement>) => void;
 }
 
 export function Select({
   name,
   options,
-  selectedOption,
-  customOnChange,
+  value,
+  onChange,
   children,
 }: PropsWithChildren<Props>) {
-  const [selectValue, setSelectValue] = useState(selectedOption);
-
-  function onChange(value: ChangeEvent<HTMLSelectElement>) {
-    setSelectValue(value.target.value);
-    if (customOnChange) {
-      customOnChange(value.target.value);
-    }
-  }
-
   const selectOptions = options.map((option) => (
     <option key={option.value} value={option.value}>
       {option.text}
@@ -41,8 +32,8 @@ export function Select({
           id={name}
           name={name}
           className="form-control"
-          value={selectValue}
-          onChange={(v) => onChange(v)}
+          value={value}
+          onChange={onChange}
         >
           {selectOptions}
         </select>

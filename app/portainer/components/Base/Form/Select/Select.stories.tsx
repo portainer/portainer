@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/react';
-import { PropsWithChildren } from 'react';
+import { ChangeEvent, PropsWithChildren, useState } from 'react';
 
 import { Select, Props } from './Select';
 
@@ -11,11 +11,21 @@ export default {
 function Template({
   name,
   options,
-  selectedOption,
+  value,
   children,
 }: JSX.IntrinsicAttributes & PropsWithChildren<Props>) {
+  const [selectValue, setSelectValue] = useState(value);
+  function onChange(value: ChangeEvent<HTMLSelectElement>) {
+    setSelectValue(value.target.value);
+  }
+
   return (
-    <Select name={name} options={options} selectedOption={selectedOption}>
+    <Select
+      name={name}
+      options={options}
+      value={selectValue}
+      onChange={onChange}
+    >
       {children}
     </Select>
   );
@@ -23,7 +33,7 @@ function Template({
 
 export const Primary: Story<PropsWithChildren<Props>> = Template.bind({});
 Primary.args = {
-  name: 'My Select',
+  children: 'Custom Select',
   options: [
     {
       text: 'Option 1',
@@ -38,5 +48,5 @@ Primary.args = {
       value: '3',
     },
   ],
-  children: 'Custom Select',
+  name: 'my_select',
 };
