@@ -9,7 +9,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -76,10 +75,7 @@ func (handler *Handler) userCreateAccessToken(w http.ResponseWriter, r *http.Req
 
 	user, err := handler.DataStore.User().User(portainer.UserID(userID))
 	if err != nil {
-		if err == bolterrors.ErrObjectNotFound {
-			return &httperror.HandlerError{http.StatusNotFound, "Unable to find a user with the specified identifier inside the database", err}
-		}
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a user with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusBadRequest, "Unable to find a user", err}
 	}
 
 	rawAPIKey, apiKey, err := handler.apiKeyService.GenerateApiKey(*user, payload.Description)
