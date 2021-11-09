@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/bolt"
 	"github.com/portainer/portainer/api/chisel"
 	"github.com/portainer/portainer/api/cli"
@@ -114,6 +115,10 @@ func initKubernetesDeployer(kubernetesTokenCacheManager *kubeproxy.TokenCacheMan
 
 func initHelmPackageManager(assetsPath string) (libhelm.HelmPackageManager, error) {
 	return libhelm.NewHelmPackageManager(libhelm.HelmConfig{BinaryPath: assetsPath})
+}
+
+func initAPIKeyService(datastore portainer.DataStore) apikey.APIKeyService {
+	return apikey.NewAPIKeyService(datastore.APIKeyRepository(), datastore.User())
 }
 
 func initJWTService(dataStore portainer.DataStore) (portainer.JWTService, error) {
@@ -457,6 +462,8 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Fatal(err)
 	}
 
+	apiKeyService := initAPIKeyService(dataStore)
+
 	jwtService, err := initJWTService(dataStore)
 	if err != nil {
 		log.Fatalf("failed initializing JWT service: %v", err)
@@ -618,6 +625,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		KubernetesDeployer:          kubernetesDeployer,
 		HelmPackageManager:          helmPackageManager,
 		CryptoService:               cryptoService,
+		APIKeyService:               apiKeyService,
 		JWTService:                  jwtService,
 		FileService:                 fileService,
 		LDAPService:                 ldapService,
