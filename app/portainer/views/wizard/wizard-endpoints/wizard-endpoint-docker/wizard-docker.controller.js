@@ -1,7 +1,7 @@
 import { PortainerEndpointCreationTypes } from 'Portainer/models/endpoint/models';
 import { EndpointSecurityFormData } from 'Portainer/components/endpointSecurity/porEndpointSecurityModel';
 import { getAgentShortVersion } from 'Portainer/views/endpoints/helpers';
-import { buildOption } from '@/portainer/components/box-selector';
+import { buildOption } from '@/portainer/components/BoxSelector';
 
 export default class WizardDockerController {
   /* @ngInject */
@@ -13,6 +13,41 @@ export default class WizardDockerController {
     this.clipboard = clipboard;
     this.$filter = $filter;
     this.NameValidator = NameValidator;
+
+    this.state = {
+      endpointType: 'agent',
+      ConnectSocket: false,
+      actionInProgress: false,
+      endpoints: [],
+      availableOptions: [
+        buildOption('Agent', 'fa fa-bolt', 'Agent', '', 'agent'),
+        buildOption('API', 'fa fa-cloud', 'API', '', 'api'),
+        buildOption('Socket', 'fab fa-docker', 'Socket', '', 'socket'),
+      ],
+    };
+
+    this.formValues = {
+      name: '',
+      url: '',
+      publicURL: '',
+      groupId: 1,
+      tagIds: [],
+      environmentUrl: '',
+      dockerApiurl: '',
+      socketPath: '',
+      overrideSocket: false,
+      skipCertification: false,
+      tls: false,
+      securityFormData: new EndpointSecurityFormData(),
+    };
+
+    this.command = {};
+
+    this.onChangeEndpointType = this.onChangeEndpointType.bind(this);
+  }
+
+  onChangeEndpointType(endpointType) {
+    this.state.endpointType = endpointType;
   }
 
   copyLinuxCommand() {
@@ -173,33 +208,6 @@ export default class WizardDockerController {
 
   $onInit() {
     return this.$async(async () => {
-      this.state = {
-        endpointType: 'agent',
-        ConnectSocket: false,
-        actionInProgress: false,
-        endpoints: [],
-        availableOptions: [
-          buildOption('Agent', 'fa fa-bolt', 'Agent', '', 'agent'),
-          buildOption('API', 'fa fa-cloud', 'API', '', 'api'),
-          buildOption('Socket', 'fab fa-docker', 'Socket', '', 'socket'),
-        ],
-      };
-
-      this.formValues = {
-        name: '',
-        url: '',
-        publicURL: '',
-        groupId: 1,
-        tagIds: [],
-        environmentUrl: '',
-        dockerApiurl: '',
-        socketPath: '',
-        overrideSocket: false,
-        skipCertification: false,
-        tls: false,
-        securityFormData: new EndpointSecurityFormData(),
-      };
-
       const agentVersion = this.StateManager.getState().application.version;
       const agentShortVersion = getAgentShortVersion(agentVersion);
 

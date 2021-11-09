@@ -1,5 +1,5 @@
 <form class="form-horizontal" name="aciWizardForm">
-  <box-selector radio-name="ACI" ng-model="$ctrl.state.endpointType" options="$ctrl.state.availableOptions"></box-selector>
+  <box-selector radio-name="'ACI'" value="$ctrl.state.endpointType" options="$ctrl.state.availableOptions" on-change="($ctrl.onChangeEndpointType)"></box-selector>
   <!-- docker form section-->
   <div class="form-group wizard-form">
     <label for="acir_name" class="col-sm-3 col-lg-2 control-label text-left">Name<span class="wizard-form-required">*</span></label>

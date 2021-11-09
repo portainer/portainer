@@ -1,5 +1,5 @@
 <form class="form-horizontal" name="kubernetesWizardForm">
-  <box-selector radio-name="Kubernetes" ng-model="$ctrl.state.endpointType" options="$ctrl.state.availableOptions"></box-selector>
+  <box-selector radio-name="'Kubernetes'" value="$ctrl.state.endpointType" options="$ctrl.state.availableOptions" on-change="($ctrl.onChangeEndpointType)"></box-selector>
   <!-- docker tab selection -->
   <div style="padding-left: 10px;">
     <div class="form-group">

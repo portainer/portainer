@@ -31,11 +31,11 @@
               Changing from default is only recommended if you have additional layers of authentication in front of Portainer.
             </span>
           </div>
+
           <div class="col-sm-12 form-section-title">
             Authentication method
           </div>
-
-          <box-selector radio-name="authOptions" ng-model="authMethod" options="authOptions" on-change="(onChangeAuthMethod)"></box-selector>
+          <box-selector radio-name="'authOptions'" value="authMethod" options="authOptions" on-change="(onChangeAuthMethod)"></box-selector>
 
           <div ng-if="authenticationMethodSelected(1)">
             <div class="col-sm-12 form-section-title">

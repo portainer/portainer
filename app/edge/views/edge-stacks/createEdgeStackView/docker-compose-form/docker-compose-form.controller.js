@@ -23,7 +23,8 @@ class DockerComposeFormController {
     this.formValues = values;
   }
 
-  onChangeMethod() {
+  onChangeMethod(method) {
+    this.state.Method = method;
     this.formValues.StackFileContent = '';
     this.selectedTemplate = null;
   }
