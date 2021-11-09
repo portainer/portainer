@@ -1,11 +1,11 @@
 package apikey
 
 import (
-	"time"
-
-	cmap "github.com/orcaman/concurrent-map"
+	lru "github.com/hashicorp/golang-lru"
 	portainer "github.com/portainer/portainer/api"
 )
+
+const defaultAPIKeyCacheSize = 1024
 
 // entry is a tuple containing the user and API key associated to an API key digest
 type entry struct {
@@ -19,13 +19,15 @@ type entry struct {
 // digest value must be mapped to a portainer user (and respective key data) for validation.
 // This cache is used to avoid multiple database queries to retrieve these user/key associated to the digest.
 type apiKeyCache struct {
-	cache               cmap.ConcurrentMap // map[string]entry
-	keyEvictionDuration time.Duration      // duration after which an API key is automatically evicted from the cache
+	// cache type [string]entry cache (key: string(digest), value: user/key entry)
+	// note: []byte keys are not supported by golang-lru Cache
+	cache *lru.Cache
 }
 
 // NewAPIKeyCache creates a new cache for API keys
-func NewAPIKeyCache(keyEvictionDuration time.Duration) *apiKeyCache {
-	return &apiKeyCache{cache: cmap.New(), keyEvictionDuration: keyEvictionDuration}
+func NewAPIKeyCache(cacheSize int) *apiKeyCache {
+	cache, _ := lru.New(cacheSize)
+	return &apiKeyCache{cache: cache}
 }
 
 // Get returns the user/key associated to an api-key's digest
@@ -43,16 +45,10 @@ func (c *apiKeyCache) Get(digest []byte) (portainer.User, portainer.APIKey, bool
 
 // Set persists a user/key entry to the cache
 func (c *apiKeyCache) Set(digest []byte, user portainer.User, apiKey portainer.APIKey) {
-	c.cache.Set(string(digest), entry{
+	c.cache.Add(string(digest), entry{
 		user:   user,
 		apiKey: apiKey,
 	})
-
-	// automatically evict set key after keyEvictionDuration
-	go func() {
-		<-time.After(c.keyEvictionDuration)
-		c.cache.Remove(string(digest))
-	}()
 }
 
 // Delete evicts a digest's user/key entry key from the cache
