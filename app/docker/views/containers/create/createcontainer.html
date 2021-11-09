@@ -12,81 +12,6 @@
     </p>
   </span>
 </information-panel>
-<information-panel title-text="Resources" ng-if="state.mode == 'duplicate'">
-  <form class="form-horizontal" style="margin-top: 15px;">
-    <!-- <div class="col-sm-12 form-section-title">
-      Resources
-    </div> -->
-    <!-- memory-reservation-input -->
-    <div class="form-group">
-      <label for="memory-reservation" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
-        Memory reservation
-      </label>
-      <div class="col-sm-3">
-        <slider model="formValues.MemoryReservation" floor="0" ceil="state.sliderMaxMemory" step="256" ng-if="state.sliderMaxMemory"></slider>
-      </div>
-      <div class="col-sm-2">
-        <input type="number" min="0" class="form-control" ng-model="formValues.MemoryReservation" id="memory-reservation" />
-      </div>
-      <div class="col-sm-4">
-        <p class="small text-muted" style="margin-top: 7px;">
-          Memory soft limit (<b>MB</b>)
-        </p>
-      </div>
-    </div>
-    <!-- !memory-reservation-input -->
-    <!-- memory-limit-input -->
-    <div class="form-group">
-      <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
-        Memory limit
-      </label>
-      <div class="col-sm-3">
-        <slider model="formValues.MemoryLimit" floor="0" ceil="state.sliderMaxMemory" step="256" ng-if="state.sliderMaxMemory"></slider>
-      </div>
-      <div class="col-sm-2">
-        <input type="number" min="0" class="form-control" ng-model="formValues.MemoryLimit" id="memory-limit" />
-      </div>
-      <div class="col-sm-4">
-        <p class="small text-muted" style="margin-top: 7px;">
-          Memory limit (<b>MB</b>)
-        </p>
-      </div>
-    </div>
-    <!-- !memory-limit-input -->
-    <!-- cpu-limit-input -->
-    <div class="form-group">
-      <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
-        CPU limit
-      </label>
-      <div class="col-sm-5">
-        <slider model="formValues.CpuLimit" floor="0" ceil="state.sliderMaxCpu" step="0.25" precision="2" ng-if="state.sliderMaxCpu"></slider>
-      </div>
-      <div class="col-sm-4" style="margin-top: 20px;">
-        <p class="small text-muted">
-          Maximum CPU usage
-        </p>
-      </div>
-    </div>
-    <!-- !cpu-limit-input -->
-
-    <div class="form-group">
-      <div class="col-sm-12">
-        <button
-          type="button"
-          class="btn btn-primary btn-sm"
-          ng-disabled="state.actionInProgress || !formValues.RegistryModel.Image || (!formValues.RegistryModel.Registry && fromContainer)"
-          ng-click="update()"
-          button-spinner="state.actionInProgress"
-        >
-          <span ng-hide="state.actionInProgress">Update Limits</span>
-          <span ng-show="state.actionInProgress">Update in progress...</span>
-        </button>
-        <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
-      </div>
-    </div>
-    <!-- !actions -->
-  </form>
-</information-panel>
 
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
@@ -783,11 +708,11 @@
                 <!-- !sysctls-input-list -->
               </div>
               <!-- !sysctls -->
-              <div class="col-sm-12 form-section-title" ng-if="state.mode != 'duplicate'">
+              <div class="col-sm-12 form-section-title">
                 Resources
               </div>
               <!-- memory-reservation-input -->
-              <div class="form-group" ng-if="state.mode != 'duplicate'">
+              <div class="form-group">
                 <label for="memory-reservation" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
                   Memory reservation
                 </label>
@@ -805,7 +730,7 @@
               </div>
               <!-- !memory-reservation-input -->
               <!-- memory-limit-input -->
-              <div class="form-group" ng-if="state.mode != 'duplicate'">
+              <div class="form-group">
                 <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
                   Memory limit
                 </label>
@@ -823,7 +748,7 @@
               </div>
               <!-- !memory-limit-input -->
               <!-- cpu-limit-input -->
-              <div class="form-group" ng-if="state.mode != 'duplicate'">
+              <div class="form-group">
                 <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
                   CPU limit
                 </label>
@@ -837,6 +762,21 @@
                 </div>
               </div>
               <!-- !cpu-limit-input -->
+
+              <!-- update-limit-btn -->
+              <div class="form-group" ng-if="state.mode == 'duplicate'">
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm"
+                  ng-disabled="state.actionInProgress || !formValues.RegistryModel.Image || (!formValues.RegistryModel.Registry && fromContainer)"
+                  ng-click="update()"
+                  button-spinner="state.actionInProgress"
+                >
+                  <span ng-hide="state.actionInProgress">Update Limits</span>
+                  <span ng-show="state.actionInProgress">Update in progress...</span>
+                </button>
+              </div>
+              <!-- !update-limit-btn -->
             </form>
           </div>
           <!-- !tab-runtime-resources -->
