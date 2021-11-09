@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gorilla/securecookie"
 	"github.com/pkg/errors"
 
 	portainer "github.com/portainer/portainer/api"
@@ -41,7 +40,7 @@ func (a *apiKeyService) HashRaw(rawKey string) ([]byte, error) {
 // GenerateApiKey generates a base64 encoded raw API key for a user (for one-time display).
 // The generated API key is stored in the cache and database.
 func (a *apiKeyService) GenerateApiKey(user portainer.User, description string) (string, *portainer.APIKey, error) {
-	rawAPIKey := securecookie.GenerateRandomKey(32)
+	rawAPIKey := generateRandomKey(32)
 	encodedRawAPIKey := base64.StdEncoding.EncodeToString(rawAPIKey)
 	hashDigest := sha256.Sum256(rawAPIKey)
 
