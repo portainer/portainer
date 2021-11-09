@@ -664,6 +664,20 @@ type (
 	// RoleID represents a role identifier
 	RoleID int
 
+	// APIKeyID represents an API key identifier
+	APIKeyID int
+
+	// APIKey represents an API key
+	APIKey struct {
+		ID          APIKeyID  `json:"id" example:"1"`
+		UserID      UserID    `json:"userId" example:"1"`
+		Description string    `json:"description" example:"portainer-api-key"`
+		Prefix      string    `json:"prefix"`           // API key identifier (3 char prefix)
+		DateCreated time.Time `json:"dateCreated"`      // Date when the API key was created (UTC)
+		LastUsed    time.Time `json:"lastUsed"`         // Date when the API key was last used (UTC)
+		Digest      []byte    `json:"digest,omitempty"` // Digest represents SHA256 hash of the raw API key
+	}
+
 	// Schedule represents a scheduled job.
 	// It only contains a pointer to one of the JobRunner implementations
 	// based on the JobType.
@@ -1126,6 +1140,7 @@ type (
 		Registry() RegistryService
 		ResourceControl() ResourceControlService
 		Role() RoleService
+		APIKeyRepository() APIKeyRepository
 		Settings() SettingsService
 		SSLSettings() SSLSettingsService
 		Stack() StackService
@@ -1350,6 +1365,16 @@ type (
 		Roles() ([]Role, error)
 		CreateRole(role *Role) error
 		UpdateRole(ID RoleID, role *Role) error
+	}
+
+	// APIKeyRepositoryService
+	APIKeyRepository interface {
+		CreateAPIKey(key *APIKey) error
+		GetAPIKey(keyID APIKeyID) (*APIKey, error)
+		UpdateAPIKey(key *APIKey) error
+		DeleteAPIKey(ID APIKeyID) error
+		GetAPIKeysByUserID(userID UserID) ([]APIKey, error)
+		GetAPIKeyByDigest(digest []byte) (*APIKey, error)
 	}
 
 	// SettingsService represents a service for managing application settings
