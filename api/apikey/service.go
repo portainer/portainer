@@ -93,11 +93,13 @@ func (a *apiKeyService) GetDigestUserAndKey(digest []byte) (portainer.User, port
 	return *user, *apiKey, nil
 }
 
-// UpdateAPIKey updates an API key and clears the user/api-key cache entry for the digest.
+// UpdateAPIKey updates an API key and in cache and database.
 func (a *apiKeyService) UpdateAPIKey(apiKey *portainer.APIKey) error {
-	if user, _, ok := a.cache.Get(apiKey.Digest); ok {
-		a.cache.Set(apiKey.Digest, user, *apiKey)
+	user, _, err := a.GetDigestUserAndKey(apiKey.Digest)
+	if err != nil {
+		return errors.Wrap(err, "Unable to retrieve API key")
 	}
+	a.cache.Set(apiKey.Digest, user, *apiKey)
 	return a.apiKeyRepository.UpdateAPIKey(apiKey)
 }
 
