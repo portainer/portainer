@@ -37,6 +37,7 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		Data:                      kingpin.Flag("data", "Path to the folder where the data is stored").Default(defaultDataDirectory).Short('d').String(),
 		EndpointURL:               kingpin.Flag("host", "Environment URL").Short('H').String(),
 		EnableEdgeComputeFeatures: kingpin.Flag("edge-compute", "Enable Edge Compute features").Bool(),
+		EnableOpenAMTFeatures:     kingpin.Flag("open-amt", "Enable OpenAMT features").Hidden().Bool(),
 		NoAnalytics:               kingpin.Flag("no-analytics", "Disable Analytics in app (deprecated)").Bool(),
 		TLS:                       kingpin.Flag("tlsverify", "TLS support").Default(defaultTLS).Bool(),
 		TLSSkipVerify:             kingpin.Flag("tlsskipverify", "Disable TLS server verification").Default(defaultTLSSkipVerify).Bool(),

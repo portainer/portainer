@@ -204,6 +204,7 @@ func updateSettingsFromFlags(dataStore portainer.DataStore, flags *portainer.CLI
 	settings.LogoURL = *flags.Logo
 	settings.SnapshotInterval = *flags.SnapshotInterval
 	settings.EnableEdgeComputeFeatures = *flags.EnableEdgeComputeFeatures
+	settings.EnableOpenAMTFeatures = *flags.EnableOpenAMTFeatures
 	settings.EnableTelemetry = true
 	settings.OAuthSettings.SSO = true
 
@@ -235,6 +236,17 @@ func updateSettingsFromFlags(dataStore portainer.DataStore, flags *portainer.CLI
 	}
 
 	return nil
+}
+
+func overrideSettingsFromFlags(dataStore portainer.DataStore, flags *portainer.CLIFlags) error {
+	settings, err := dataStore.Settings().Settings()
+	if err != nil {
+		return err
+	}
+
+	settings.EnableOpenAMTFeatures = *flags.EnableOpenAMTFeatures
+
+	return dataStore.Settings().UpdateSettings(settings)
 }
 
 func loadAndParseKeyPair(fileService portainer.FileService, signatureService portainer.DigitalSignatureService) error {
@@ -490,6 +502,11 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		if err != nil {
 			log.Fatalf("failed updating settings from flags: %v", err)
 		}
+	}
+
+	err = overrideSettingsFromFlags(dataStore, flags)
+	if err != nil {
+		log.Fatalf("failed updating settings from flags: %v", err)
 	}
 
 	err = edge.LoadEdgeJobs(dataStore, reverseTunnelService)

@@ -16,6 +16,8 @@ type publicSettingsResponse struct {
 	AuthenticationMethod portainer.AuthenticationMethod `json:"AuthenticationMethod" example:"1"`
 	// Whether edge compute features are enabled
 	EnableEdgeComputeFeatures bool `json:"EnableEdgeComputeFeatures" example:"true"`
+	// Whether OpenAMT features are enabled or not
+	EnableOpenAMTFeatures bool `json:"EnableOpenAMTFeatures" example:"true"`
 	// The URL used for oauth login
 	OAuthLoginURI string `json:"OAuthLoginURI" example:"https://gitlab.com/oauth"`
 	// The URL used for oauth logout
