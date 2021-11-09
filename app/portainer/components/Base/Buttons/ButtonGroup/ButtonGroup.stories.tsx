@@ -12,16 +12,9 @@ export default {
 
 function Template({
   size,
-  children,
 }: JSX.IntrinsicAttributes & PropsWithChildren<Props>) {
-  return <ButtonGroup size={size}>{children}</ButtonGroup>;
-}
-
-export const Primary: Story<PropsWithChildren<Props>> = Template.bind({});
-Primary.args = {
-  size: 'small',
-  children: (
-    <>
+  return (
+    <ButtonGroup size={size}>
       <Button color="success" onClick={() => {}}>
         <i className="fa fa-play space-right" aria-hidden="true" />
         Start
@@ -46,8 +39,13 @@ Primary.args = {
         <i className="fa fa-trash-alt space-right" aria-hidden="true" />
         Remove
       </Button>
-    </>
-  ),
+    </ButtonGroup>
+  );
+}
+
+export const Primary: Story<PropsWithChildren<Props>> = Template.bind({});
+Primary.args = {
+  size: 'small',
 };
 
 export function Xsmall() {

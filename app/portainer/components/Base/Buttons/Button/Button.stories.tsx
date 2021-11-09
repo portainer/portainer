@@ -10,39 +10,25 @@ export default {
 
 function Template({
   onClick,
-  type,
   color,
   size,
   disabled,
-  children,
 }: JSX.IntrinsicAttributes & PropsWithChildren<Props>) {
   return (
-    <Button
-      onClick={onClick}
-      type={type}
-      color={color}
-      size={size}
-      disabled={disabled}
-    >
-      {children}
+    <Button onClick={onClick} color={color} size={size} disabled={disabled}>
+      <i className="fa fa-download" aria-hidden="true" /> Primary Button
     </Button>
   );
 }
 
 export const Primary: Story<PropsWithChildren<Props>> = Template.bind({});
 Primary.args = {
-  type: 'button',
   color: 'primary',
   size: 'small',
   disabled: false,
   onClick: () => {
     alert('Hello Button!');
   },
-  children: (
-    <>
-      <i className="fa fa-download" aria-hidden="true" /> Primary Button
-    </>
-  ),
 };
 
 export function Disabled() {
