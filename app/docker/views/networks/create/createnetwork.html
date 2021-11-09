@@ -35,10 +35,8 @@
             <div class="col-sm-12" style="margin-top: 5px;">
               <label class="control-label text-left">
                 Driver options
-                <portainer-tooltip
-                  position="bottom"
-                  message="Driver options are specific to the selected driver. Please refer to the selected driver documentation."
-                ></portainer-tooltip>
+                <portainer-tooltip position="bottom" message="Driver options are specific to the selected driver. Please refer to the selected driver documentation.">
+                </portainer-tooltip>
               </label>
               <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addDriverOption()">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> add driver option
@@ -192,7 +190,7 @@
             <!-- !labels-input-list -->
           </div>
           <!-- !labels-->
-          <!-- boltdb -->
+          <!-- internal -->
           <div class="form-group" ng-hide="config.Driver === 'macvlan' && formValues.Macvlan.Scope === 'local'">
             <div class="col-sm-12">
               <label for="ownership" class="control-label text-left">
@@ -205,7 +203,7 @@
               </label>
             </div>
           </div>
-          <!-- !boltdb -->
+          <!-- !internal -->
           <!-- attachable -->
           <div class="form-group" ng-hide="config.Driver === 'macvlan' && formValues.Macvlan.Scope === 'local'">
             <div class="col-sm-12">

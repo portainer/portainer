@@ -35,5 +35,5 @@ export const PortainerEndpointInitFormValueEndpointSections = Object.freeze([
     'fas fa-dharmachakra',
     'Manage the local Kubernetes environment'
   ),
-  new PortainerEndpointInitFormValueEndpointSection(PortainerEndpointConnectionTypes.AGENT, 'Agent', 'fa fa-database', 'Connect to a Portainer agent'),
+  new PortainerEndpointInitFormValueEndpointSection(PortainerEndpointConnectionTypes.AGENT, 'Agent', 'fa fa-bolt', 'Connect to a Portainer agent'),
 ]);
