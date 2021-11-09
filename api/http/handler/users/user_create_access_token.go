@@ -48,8 +48,7 @@ type accessTokenResponse struct {
 // @router /users/{id}/tokens [post]
 func (handler *Handler) userCreateAccessToken(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	// specifically require JWT auth for this endpoint since API-Key based auth is not supported
-	t := handler.bouncer.JWTAuthLookup(r)
-	if t == nil {
+	if jwt := handler.bouncer.JWTAuthLookup(r); jwt == nil {
 		return &httperror.HandlerError{http.StatusUnauthorized, "Auth not supported", errors.New("JWT Authentication required")}
 	}
 
