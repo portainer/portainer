@@ -1,3 +1,5 @@
+import clsx from 'clsx';
+
 import styles from './AddButton.module.css';
 
 export interface Props {
@@ -8,7 +10,12 @@ export interface Props {
 export function AddButton({ label, onClick }: Props) {
   return (
     <button
-      className={`label label-default interactive ${styles.addButton}`}
+      className={clsx(
+        'label',
+        'label-default',
+        'interactive',
+        styles.addButton
+      )}
       type="button"
       onClick={onClick}
     >

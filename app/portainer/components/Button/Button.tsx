@@ -1,4 +1,5 @@
 import { PropsWithChildren } from 'react';
+import clsx from 'clsx';
 
 type Type = 'submit' | 'reset' | 'button';
 type Color = 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'link';
@@ -24,7 +25,7 @@ export function Button({
       /* eslint-disable-next-line react/button-has-type */
       type={type}
       disabled={disabled}
-      className={`btn btn-${color} ${sizeClass(size)}`}
+      className={clsx('btn', `btn-${color}`, sizeClass(size))}
       onClick={onClick}
     >
       {children}
