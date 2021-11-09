@@ -1,8 +1,7 @@
 import { Meta, Story } from '@storybook/react';
 import { PropsWithChildren } from 'react';
 
-import { Button } from '../Button/Button';
-
+import { Button } from './Button';
 import { ButtonGroup, Props } from './ButtonGroup';
 
 export default {
