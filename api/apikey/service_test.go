@@ -170,7 +170,7 @@ func Test_UpdateAPIKey(t *testing.T) {
 
 	})
 
-	t.Run("Successfully removes api-key from cache upon update", func(t *testing.T) {
+	t.Run("Successfully updates api-key in cache upon api-key update", func(t *testing.T) {
 		_, apiKey, err := service.GenerateApiKey(portainer.User{ID: 1}, "test-x2")
 		is.NoError(err)
 
@@ -178,11 +178,15 @@ func Test_UpdateAPIKey(t *testing.T) {
 		is.True(ok)
 		is.Equal(*apiKey, apiKeyFromCache)
 
+		apiKey.LastUsed = time.Now().UTC()
+		is.NotEqual(*apiKey, apiKeyFromCache)
+
 		err = service.UpdateAPIKey(apiKey)
 		is.NoError(err)
 
-		_, _, ok = service.cache.Get(apiKey.Digest)
-		is.False(ok)
+		_, updatedAPIKeyFromCache, ok := service.cache.Get(apiKey.Digest)
+		is.True(ok)
+		is.Equal(*apiKey, updatedAPIKeyFromCache)
 	})
 }
 
