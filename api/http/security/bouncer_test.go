@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/bolt"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/jwt"
@@ -40,7 +41,9 @@ func Test_mwAuthenticateFirst(t *testing.T) {
 	jwtService, err := jwt.NewService("1h", nil)
 	assert.NoError(t, err, "failed to create a copy of service")
 
-	bouncer := NewRequestBouncer(store, jwtService)
+	apiKeyService := apikey.NewAPIKeyService(nil, nil)
+
+	bouncer := NewRequestBouncer(store, jwtService, apiKeyService)
 
 	tests := []struct {
 		name                   string
@@ -105,35 +108,35 @@ func Test_extractBearerToken(t *testing.T) {
 		requestHeader      string
 		requestHeaderValue string
 		wantToken          string
-		doesError          bool
+		succeeds           bool
 	}{
 		{
 			name:               "missing request header",
 			requestHeader:      "",
 			requestHeaderValue: "",
 			wantToken:          "",
-			doesError:          true,
+			succeeds:           false,
 		},
 		{
 			name:               "invalid authorization request header",
 			requestHeader:      "authorisation", // note: `s`
 			requestHeaderValue: "abc",
 			wantToken:          "",
-			doesError:          true,
+			succeeds:           false,
 		},
 		{
 			name:               "valid authorization request header",
 			requestHeader:      "AUTHORIZATION",
 			requestHeaderValue: "abc",
 			wantToken:          "abc",
-			doesError:          false,
+			succeeds:           true,
 		},
 		{
 			name:               "valid authorization request header case-insensitive canonical check",
 			requestHeader:      "authorization",
 			requestHeaderValue: "def",
 			wantToken:          "def",
-			doesError:          false,
+			succeeds:           true,
 		},
 	}
 
@@ -142,7 +145,7 @@ func Test_extractBearerToken(t *testing.T) {
 		req.Header.Set(test.requestHeader, test.requestHeaderValue)
 		apiKey, err := extractBearerToken(req)
 		is.Equal(test.wantToken, apiKey)
-		if test.doesError {
+		if !test.succeeds {
 			is.Error(err, "Should return error")
 			is.ErrorIs(err, httperrors.ErrUnauthorized)
 		} else {
@@ -151,7 +154,7 @@ func Test_extractBearerToken(t *testing.T) {
 	}
 }
 
-func Test_extractAPIKey(t *testing.T) {
+func Test_extractAPIKeyHeader(t *testing.T) {
 	is := assert.New(t)
 
 	tt := []struct {
@@ -198,4 +201,134 @@ func Test_extractAPIKey(t *testing.T) {
 		is.Equal(test.wantApiKey, apiKey)
 		is.Equal(test.succeeds, ok)
 	}
+}
+
+func Test_extractAPIKeyQueryParam(t *testing.T) {
+	is := assert.New(t)
+
+	tt := []struct {
+		name            string
+		queryParam      string
+		queryParamValue string
+		wantApiKey      string
+		succeeds        bool
+	}{
+		{
+			name:            "missing request header",
+			queryParam:      "",
+			queryParamValue: "",
+			wantApiKey:      "",
+			succeeds:        false,
+		},
+		{
+			name:            "invalid api-key request header",
+			queryParam:      "api-key",
+			queryParamValue: "abc",
+			wantApiKey:      "",
+			succeeds:        false,
+		},
+		{
+			name:            "valid api-key request header",
+			queryParam:      apiKeyHeader,
+			queryParamValue: "abc",
+			wantApiKey:      "abc",
+			succeeds:        true,
+		},
+		{
+			name:            "valid api-key request header case-insensitive canonical check",
+			queryParam:      "x-api-key",
+			queryParamValue: "def",
+			wantApiKey:      "def",
+			succeeds:        true,
+		},
+	}
+
+	for _, test := range tt {
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		q := req.URL.Query()
+		q.Add(test.queryParam, test.queryParamValue)
+		req.URL.RawQuery = q.Encode()
+
+		apiKey, ok := extractAPIKey(req)
+		is.Equal(test.wantApiKey, apiKey)
+		is.Equal(test.succeeds, ok)
+	}
+}
+
+func Test_apiKeyLookup(t *testing.T) {
+	is := assert.New(t)
+
+	store, teardown := bolt.MustNewTestStore(true)
+	defer teardown()
+
+	// create standard user
+	user := &portainer.User{ID: 2, Username: "standard", Role: portainer.StandardUserRole}
+	err := store.User().CreateUser(user)
+	is.NoError(err, "error creating user")
+
+	// setup services
+	jwtService, err := jwt.NewService("1h", store)
+	is.NoError(err, "Error initiating jwt service")
+	apiKeyService := apikey.NewAPIKeyService(store.APIKeyRepository(), store.User())
+	bouncer := NewRequestBouncer(store, jwtService, apiKeyService)
+
+	t.Run("missing x-api-key header fails api-key lookup", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		// req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwt))
+		token := bouncer.apiKeyLookup(req)
+		is.Nil(token)
+	})
+
+	t.Run("invalid x-api-key header fails api-key lookup", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Add("x-api-key", "random-failing-api-key")
+		token := bouncer.apiKeyLookup(req)
+		is.Nil(token)
+	})
+
+	t.Run("valid x-api-key header succeeds api-key lookup", func(t *testing.T) {
+		rawAPIKey, _, err := apiKeyService.GenerateApiKey(*user, "test")
+		is.NoError(err)
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Add("x-api-key", rawAPIKey)
+
+		token := bouncer.apiKeyLookup(req)
+
+		expectedToken := &portainer.TokenData{ID: user.ID, Username: user.Username, Role: portainer.StandardUserRole}
+		is.Equal(expectedToken, token)
+	})
+
+	t.Run("valid x-api-key header succeeds api-key lookup", func(t *testing.T) {
+		rawAPIKey, apiKey, err := apiKeyService.GenerateApiKey(*user, "test")
+		is.NoError(err)
+		defer apiKeyService.DeleteAPIKey(apiKey.ID)
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Add("x-api-key", rawAPIKey)
+
+		token := bouncer.apiKeyLookup(req)
+
+		expectedToken := &portainer.TokenData{ID: user.ID, Username: user.Username, Role: portainer.StandardUserRole}
+		is.Equal(expectedToken, token)
+	})
+
+	t.Run("successful api-key lookup updates token last used time", func(t *testing.T) {
+		rawAPIKey, apiKey, err := apiKeyService.GenerateApiKey(*user, "test")
+		is.NoError(err)
+		defer apiKeyService.DeleteAPIKey(apiKey.ID)
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Add("x-api-key", rawAPIKey)
+
+		token := bouncer.apiKeyLookup(req)
+
+		expectedToken := &portainer.TokenData{ID: user.ID, Username: user.Username, Role: portainer.StandardUserRole}
+		is.Equal(expectedToken, token)
+
+		_, apiKeyUpdated, err := apiKeyService.GetDigestUserAndKey(apiKey.Digest)
+		is.NoError(err)
+
+		is.True(apiKeyUpdated.LastUsed.After(apiKey.LastUsed))
+	})
 }
