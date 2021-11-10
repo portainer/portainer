@@ -1,9 +1,10 @@
 import angular from 'angular';
+import _ from 'lodash-es';
 import EndpointHelper from 'Portainer/helpers/endpointHelper';
 
 angular.module('portainer.app').controller('EndpointsController', EndpointsController);
 
-function EndpointsController($q, $scope, $state, $async, EndpointService, GroupService, ModalService, Notifications) {
+function EndpointsController($q, $scope, $state, $async, EndpointService, GroupService, ModalService, Notifications, EndpointProvider, StateManager) {
   $scope.removeAction = removeAction;
 
   function removeAction(endpoints) {
@@ -25,7 +26,18 @@ function EndpointsController($q, $scope, $state, $async, EndpointService, GroupS
         Notifications.error('Failure', err, 'Unable to remove environment');
       }
     }
-
+    const endpointId = EndpointProvider.endpointID();
+    // If the current endpoint was deleted, then clean endpoint store
+    if (
+      _.find(endpoints, function (item) {
+        return item.Id === endpointId;
+      })
+    ) {
+      EndpointProvider.clean();
+      StateManager.cleanEndpoint();
+      // trigger sidebar rerender
+      $scope.applicationState.endpoint = {};
+    }
     $state.reload();
   }
 
