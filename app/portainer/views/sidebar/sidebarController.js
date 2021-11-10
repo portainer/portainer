@@ -58,6 +58,7 @@ function SidebarController($rootScope, $scope, $transitions, StateManager, Notif
     $scope.endpointId = EndpointProvider.endpointID();
     $scope.showStacks = shouldShowStacks();
     $scope.isAdmin = isClusterAdmin();
+
     if ($scope.applicationState.endpoint.name) {
       document.title = `${$rootScope.defaultTitle} | ${$scope.applicationState.endpoint.name}`;
     }
