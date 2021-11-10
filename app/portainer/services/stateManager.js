@@ -48,6 +48,7 @@ angular.module('portainer.app').factory('StateManager', [
       state.endpoint = {};
       state.application = {};
     };
+
     manager.cleanEndpoint = function () {
       state.endpoint = {};
     };

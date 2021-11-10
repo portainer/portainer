@@ -26,6 +26,7 @@ function EndpointsController($q, $scope, $state, $async, EndpointService, GroupS
         Notifications.error('Failure', err, 'Unable to remove environment');
       }
     }
+
     const endpointId = EndpointProvider.endpointID();
     // If the current endpoint was deleted, then clean endpoint store
     if (
@@ -38,6 +39,7 @@ function EndpointsController($q, $scope, $state, $async, EndpointService, GroupS
       // trigger sidebar rerender
       $scope.applicationState.endpoint = {};
     }
+
     $state.reload();
   }
 
