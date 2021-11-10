@@ -97,24 +97,9 @@ func initDataStore(flags *portainer.CLIFlags, fileService portainer.FileService,
 		// from MigrateData
 		store.VersionService.StoreDBVersion(portainer.DBVersion)
 
-		// EXPERIMENTAL - if used with an incomplete json file, it will fail, as we don't have a way to default the model values
-		importFile := "/data/import.json"
-		if exists, _ := fileService.FileExists(importFile); exists {
-			if err := store.Import(importFile); err != nil {
-				logrus.WithError(err).Debugf("import %s failed", importFile)
+		// EXPERIMENTAL, will only activate if `/data/import.json` exists
+		importFromJson(fileService, store)
 
-				// TODO: should really rollback on failure, but then we have nothing.
-			} else {
-				logrus.Printf("Successfully imported %s to new portainer database", importFile)
-			}
-			// TODO: this is bad - its to ensure that any defaults that were broken in import, or migrations get set back to what we want
-			// I also suspect that everything from "Init to Init" is potentially a migraiton
-			err = store.Init()
-			if err != nil {
-				log.Fatalf("failed initializing data store: %v", err)
-			}
-		}
-		// Allow the flags to over-ride the import too
 		err := updateSettingsFromFlags(store, flags)
 		if err != nil {
 			log.Fatalf("failed updating settings from flags: %v", err)
@@ -132,6 +117,7 @@ func initDataStore(flags *portainer.CLIFlags, fileService portainer.FileService,
 		}
 	}
 
+	// this is for the db restore functionality - needs more tests.
 	go func() {
 		<-shutdownCtx.Done()
 		exportFilename := path.Join(*flags.Data, fmt.Sprintf("export-%d.json", time.Now().Unix()))
