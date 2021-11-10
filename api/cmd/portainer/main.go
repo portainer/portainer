@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -204,7 +205,6 @@ func updateSettingsFromFlags(dataStore portainer.DataStore, flags *portainer.CLI
 	settings.LogoURL = *flags.Logo
 	settings.SnapshotInterval = *flags.SnapshotInterval
 	settings.EnableEdgeComputeFeatures = *flags.EnableEdgeComputeFeatures
-	settings.EnableOpenAMTFeatures = *flags.EnableOpenAMTFeatures
 	settings.EnableTelemetry = true
 	settings.OAuthSettings.SSO = true
 
@@ -244,7 +244,16 @@ func overrideSettingsFromFlags(dataStore portainer.DataStore, flags *portainer.C
 		return err
 	}
 
-	settings.EnableOpenAMTFeatures = *flags.EnableOpenAMTFeatures
+	for _, feat := range *flags.FeatureFlags {
+		switch feat {
+		case "open-amt":
+			settings.FeatureFlagSettings.EnableOpenAMTFeatures = true
+		// case "edge-compute":
+		// 	settings.EnableEdgeComputeFeatures = true
+		default:
+			return fmt.Errorf("feature flag %s not supported", feat)
+		}
+	}
 
 	return dataStore.Settings().UpdateSettings(settings)
 }

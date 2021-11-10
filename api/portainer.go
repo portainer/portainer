@@ -50,8 +50,8 @@ type (
 		AdminPasswordFile         *string
 		Assets                    *string
 		Data                      *string
+		FeatureFlags              *[]string
 		EnableEdgeComputeFeatures *bool
-		EnableOpenAMTFeatures     *bool
 		EndpointURL               *string
 		Labels                    *[]Pair
 		Logo                      *string
@@ -547,6 +547,12 @@ type (
 		LogoutURI            string `json:"LogoutURI"`
 	}
 
+	// FeatureFlagSettings represents the settings for supported feature flags
+	FeatureFlagSettings struct {
+		// Whether OpenAMT features are enabled or not
+		EnableOpenAMTFeatures bool `json:"EnableOpenAMTFeatures" example:"true"`
+	}
+
 	// Pair defines a key/value string pair
 	Pair struct {
 		Name  string `json:"name" example:"name"`
@@ -704,6 +710,7 @@ type (
 		AuthenticationMethod AuthenticationMethod `json:"AuthenticationMethod" example:"1"`
 		LDAPSettings         LDAPSettings         `json:"LDAPSettings" example:""`
 		OAuthSettings        OAuthSettings        `json:"OAuthSettings" example:""`
+		FeatureFlagSettings  FeatureFlagSettings  `json:"FeatureFlagSettings" example:""`
 		// The interval in which environment(endpoint) snapshots are created
 		SnapshotInterval string `json:"SnapshotInterval" example:"5m"`
 		// URL to the templates that will be displayed in the UI when navigating to App Templates
@@ -712,8 +719,6 @@ type (
 		EdgeAgentCheckinInterval int `json:"EdgeAgentCheckinInterval" example:"5"`
 		// Whether edge compute features are enabled
 		EnableEdgeComputeFeatures bool `json:"EnableEdgeComputeFeatures" example:""`
-		// Whether OpenAMT features are enabled or not
-		EnableOpenAMTFeatures bool `json:"EnableOpenAMTFeatures" example:""`
 		// The duration of a user session
 		UserSessionTimeout string `json:"UserSessionTimeout" example:"5m"`
 		// The expiry of a Kubeconfig
