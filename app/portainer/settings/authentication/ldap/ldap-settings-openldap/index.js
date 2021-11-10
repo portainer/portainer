@@ -8,9 +8,10 @@ export const ldapSettingsOpenLdap = {
     tlscaCert: '=',
     state: '=',
     connectivityCheck: '<',
-
     onTlscaCertChange: '<',
     onSearchUsersClick: '<',
     onSearchGroupsClick: '<',
+    onSaveSettings: '<',
+    saveButtonState: '<',
   },
 };

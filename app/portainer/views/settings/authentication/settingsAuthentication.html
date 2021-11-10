@@ -45,6 +45,8 @@
             tlsca-cert="formValues.TLSCACert"
             state="state"
             connectivity-check="LDAPConnectivityCheck"
+            on-save-settings="(saveSettings)"
+            save-button-state="state.actionInProgress"
           ></ldap-settings>
 
           <ad-settings

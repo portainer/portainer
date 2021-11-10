@@ -11,5 +11,7 @@ export const ldapSettingsCustom = {
     connectivityCheck: '<',
     onSearchUsersClick: '<',
     onSearchGroupsClick: '<',
+    onSaveSettings: '<',
+    saveButtonState: '<',
   },
 };

@@ -131,3 +131,10 @@
   show-be-indicator-if-needed="true"
   is-limited-feature-self-contained="true"
 ></ldap-settings-test-login>
+
+<save-auth-settings-button
+  on-save-settings="($ctrl.onSaveSettings)"
+  save-button-state="($ctrl.saveButtonState)"
+  save-button-disabled="!$ctrl.isLDAPFormValid()"
+  limited-feature-dir="{{ $ctrl.limitedFeatureId }}"
+></save-auth-settings-button>
