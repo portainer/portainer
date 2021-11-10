@@ -244,14 +244,14 @@ func overrideSettingsFromFlags(dataStore portainer.DataStore, flags *portainer.C
 		return err
 	}
 
+	// loop through feature flags to check if they are supported
 	for _, feat := range *flags.FeatureFlags {
-		switch feat {
-		case "open-amt":
-			settings.FeatureFlagSettings.EnableOpenAMTFeatures = true
-		// case "edge-compute":
-		// 	settings.EnableEdgeComputeFeatures = true
-		default:
-			return fmt.Errorf("feature flag %s not supported", feat)
+		for _, supportedFeat := range portainer.SupportedFeatureFlags {
+			if portainer.Feature(feat) == supportedFeat {
+				settings.FeatureFlagSettings[portainer.Feature(feat)] = true
+			} else {
+				return fmt.Errorf("invalid feature flag: %s", feat)
+			}
 		}
 	}
 

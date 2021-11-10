@@ -547,12 +547,6 @@ type (
 		LogoutURI            string `json:"LogoutURI"`
 	}
 
-	// FeatureFlagSettings represents the settings for supported feature flags
-	FeatureFlagSettings struct {
-		// Whether OpenAMT features are enabled or not
-		EnableOpenAMTFeatures bool `json:"EnableOpenAMTFeatures" example:"true"`
-	}
-
 	// Pair defines a key/value string pair
 	Pair struct {
 		Name  string `json:"name" example:"name"`
@@ -700,6 +694,9 @@ type (
 		RetryInterval int
 	}
 
+	// Feature represents a feature that can be enabled or disabled via feature flags
+	Feature string
+
 	// Settings represents the application settings
 	Settings struct {
 		// URL to a logo that will be displayed on the login page as well as on top of the sidebar. Will use default Portainer logo when value is empty string
@@ -710,7 +707,7 @@ type (
 		AuthenticationMethod AuthenticationMethod `json:"AuthenticationMethod" example:"1"`
 		LDAPSettings         LDAPSettings         `json:"LDAPSettings" example:""`
 		OAuthSettings        OAuthSettings        `json:"OAuthSettings" example:""`
-		FeatureFlagSettings  FeatureFlagSettings  `json:"FeatureFlagSettings" example:""`
+		FeatureFlagSettings  map[Feature]bool     `json:"FeatureFlagSettings" example:""`
 		// The interval in which environment(endpoint) snapshots are created
 		SnapshotInterval string `json:"SnapshotInterval" example:"5m"`
 		// URL to the templates that will be displayed in the UI when navigating to App Templates
@@ -1521,6 +1518,14 @@ const (
 	// WebSocketKeepAlive web socket keep alive for edge environments
 	WebSocketKeepAlive = 1 * time.Hour
 )
+
+// Supported feature flags
+const (
+	FeatOpenAMT Feature = "open-amt"
+)
+
+// List of supported features
+var SupportedFeatureFlags = []Feature{FeatOpenAMT}
 
 const (
 	_ AuthenticationMethod = iota
