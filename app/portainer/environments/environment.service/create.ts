@@ -1,12 +1,9 @@
 import PortainerError from '@/portainer/error';
 import axios, { parseAxiosError } from '@/portainer/services/axios';
+import { type EnvironmentGroupId } from '@/portainer/environment-groups/types';
+import { type TagId } from '@/portainer/tags/types';
 
-import {
-  Environment,
-  EnvironmentGroupId,
-  EnvironmentCreationTypes,
-  TagId,
-} from '../types';
+import { type Environment, EnvironmentCreationTypes } from '../types';
 
 import { arrayToJson, buildUrl, json2formData } from './utils';
 

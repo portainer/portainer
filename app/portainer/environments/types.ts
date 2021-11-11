@@ -1,3 +1,6 @@
+import { TagId } from '@/portainer/tags/types';
+import { EnvironmentGroupId } from '@/portainer/environment-groups/types';
+
 export type EnvironmentId = number;
 
 export enum EnvironmentType {
@@ -15,13 +18,6 @@ export enum EnvironmentType {
   AgentOnKubernetes,
   // EdgeAgentOnKubernetes represents an environment(endpoint) connected to an Edge agent deployed on a Kubernetes environment(endpoint)
   EdgeAgentOnKubernetes,
-}
-
-export type TagId = number;
-
-export interface Tag {
-  Id: TagId;
-  Name: string;
 }
 
 export enum EnvironmentStatus {
@@ -63,6 +59,7 @@ export interface Environment {
   Type: EnvironmentType;
   TagIds: TagId[];
   GroupName: string;
+  GroupId: EnvironmentGroupId;
   EdgeID?: string;
   EdgeCheckinInterval?: number;
   LastCheckInDate?: number;
@@ -85,7 +82,11 @@ export enum EnvironmentCreationTypes {
   LocalKubernetesEnvironment,
 }
 
-export type EnvironmentGroupId = number;
+export enum PlatformType {
+  Docker,
+  Kubernetes,
+  Azure,
+}
 
 export interface EnvironmentSettings {
   // Whether non-administrator should be able to use bind mounts when creating containers

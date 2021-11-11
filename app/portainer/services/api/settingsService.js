@@ -1,50 +1,32 @@
-import { SettingsViewModel, PublicSettingsViewModel } from '../../models/settings';
+import { SettingsViewModel } from '../../models/settings';
 
-angular.module('portainer.app').factory('SettingsService', [
-  '$q',
-  'Settings',
-  function SettingsServiceFactory($q, Settings) {
-    'use strict';
-    var service = {};
+import { publicSettings } from './settings.service';
 
-    service.settings = function () {
-      var deferred = $q.defer();
+angular.module('portainer.app').factory('SettingsService', SettingsServiceFactory);
 
-      Settings.get()
-        .$promise.then(function success(data) {
-          var settings = new SettingsViewModel(data);
-          deferred.resolve(settings);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve application settings', err: err });
-        });
+function SettingsServiceFactory($q, Settings) {
+  return {
+    settings,
+    update,
+    publicSettings,
+  };
 
-      return deferred.promise;
-    };
+  function settings() {
+    var deferred = $q.defer();
 
-    service.update = function (settings) {
-      return Settings.update({}, settings).$promise;
-    };
+    Settings.get()
+      .$promise.then(function success(data) {
+        var settings = new SettingsViewModel(data);
+        deferred.resolve(settings);
+      })
+      .catch(function error(err) {
+        deferred.reject({ msg: 'Unable to retrieve application settings', err: err });
+      });
 
-    service.publicSettings = function () {
-      var deferred = $q.defer();
+    return deferred.promise;
+  }
 
-      Settings.publicSettings()
-        .$promise.then(function success(data) {
-          var settings = new PublicSettingsViewModel(data);
-          deferred.resolve(settings);
-        })
-        .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve application settings', err: err });
-        });
-
-      return deferred.promise;
-    };
-
-    service.checkLDAPConnectivity = function (settings) {
-      return Settings.checkLDAPConnectivity({}, settings).$promise;
-    };
-
-    return service;
-  },
-]);
+  function update(settings) {
+    return Settings.update({}, settings).$promise;
+  }
+}
