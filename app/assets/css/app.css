@@ -826,6 +826,10 @@ json-tree .branch-preview {
   margin-bottom: 2rem;
 }
 
+.m-r-10 {
+  margin-right: 10px;
+}
+
 .text-wrap {
   word-break: break-all;
   white-space: normal;

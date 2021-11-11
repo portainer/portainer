@@ -13,7 +13,7 @@ button[disabled].limited-be.oauth-save-settings-button {
 }
 
 button.limited-be.oauth-save-settings-button {
-  background-color: #337ab7;
+  background-color: var(--blue-2);
   border-color: transparent;
 }
 

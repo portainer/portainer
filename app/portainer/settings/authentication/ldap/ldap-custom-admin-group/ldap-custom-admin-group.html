@@ -1,8 +1,8 @@
-<div class="col-sm-12 form-section-title" ng-style="$ctrl.isLimitedFeatureSelfContained && { 'padding-bottom': '15px' }" style="float: initial; margin-top: 30px;">
+<div class="col-sm-12 form-section-title ldap-custom-admin-group-title" ng-style="$ctrl.isLimitedFeatureSelfContained && { 'padding-bottom': '15px' }">
   Auto-populate team admins <be-feature-indicator feature="$ctrl.limitedFeatureId" class="space-left" ng-if="$ctrl.isLimitedFeatureSelfContained"></be-feature-indicator>
 </div>
 
-<rd-widget ng-repeat="config in $ctrl.settings.AdminGroupSearchSettings | limitTo: (1 - $ctrl.settings.AdminGroupSearchSettings)" style="display: block; margin-bottom: 10px;">
+<rd-widget ng-repeat="config in $ctrl.settings.AdminGroupSearchSettings | limitTo: (1 - $ctrl.settings.AdminGroupSearchSettings)">
   <rd-widget-body>
     <div class="form-group" ng-if="$index > 0" style="margin-bottom: 10px;">
       <span class="col-sm-12 text-muted small">

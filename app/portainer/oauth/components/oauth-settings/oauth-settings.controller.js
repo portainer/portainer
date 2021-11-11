@@ -74,7 +74,6 @@ export default class OAuthSettingsController {
   }
 
   isOAuthTeamMembershipFormValid() {
-    console.log(this.settings);
     if (this.settings.OAuthAutoMapTeamMemberships && this.settings.TeamMemberships) {
       if (!this.settings.TeamMemberships.OAuthClaimName) {
         return false;
