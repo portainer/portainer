@@ -239,17 +239,20 @@ func updateSettingsFromFlags(dataStore portainer.DataStore, flags *portainer.CLI
 	return nil
 }
 
-func overrideSettingsFromFlags(dataStore portainer.DataStore, flags *portainer.CLIFlags) error {
+// enableFeaturesFromFlags turns on or off feature flags
+// e.g.  portainer --feat open-amt=true --feat fdo=true ...
+func enableFeaturesFromFlags(dataStore portainer.DataStore, flags *portainer.CLIFlags) error {
 	settings, err := dataStore.Settings().Settings()
 	if err != nil {
 		return err
 	}
 
-	// loop through feature flags to check if they are supported
-	if settings.FeatureFlagSettings == nil {
-		settings.FeatureFlagSettings = make(map[portainer.Feature]bool)
-	}
+	// TODO: Revisit this in the future.
+	// Lets the FeatureFlagSettings each time (even though they are persisted in the DB)
+	// This allows us to default to default all settings to off
+	settings.FeatureFlagSettings = make(map[portainer.Feature]bool)
 
+	// loop through feature flags to check if they are supported
 	for _, feat := range *flags.FeatureFlags {
 		var correspondingFeature *portainer.Feature
 		for i, supportedFeat := range portainer.SupportedFeatureFlags {
@@ -534,9 +537,9 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		}
 	}
 
-	err = overrideSettingsFromFlags(dataStore, flags)
+	err = enableFeaturesFromFlags(dataStore, flags)
 	if err != nil {
-		log.Fatalf("failed updating settings from flags: %v", err)
+		log.Fatalf("failed enabling feature flag: %v", err)
 	}
 
 	err = edge.LoadEdgeJobs(dataStore, reverseTunnelService)
