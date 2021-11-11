@@ -1,5 +1,4 @@
 import angular from 'angular';
-import _ from 'lodash-es';
 import EndpointHelper from 'Portainer/helpers/endpointHelper';
 
 angular.module('portainer.app').controller('EndpointsController', EndpointsController);
@@ -29,12 +28,7 @@ function EndpointsController($q, $scope, $state, $async, EndpointService, GroupS
 
     const endpointId = EndpointProvider.endpointID();
     // If the current endpoint was deleted, then clean endpoint store
-    if (
-      _.find(endpoints, function (item) {
-        return item.Id === endpointId;
-      })
-    ) {
-      EndpointProvider.clean();
+    if (endpoints.some((item) => item.Id === endpointId)) {
       StateManager.cleanEndpoint();
       // trigger sidebar rerender
       $scope.applicationState.endpoint = {};
