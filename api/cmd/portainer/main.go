@@ -14,6 +14,7 @@ import (
 	"github.com/portainer/portainer/api/cli"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/docker"
+	"github.com/portainer/portainer/api/intel/openamt"
 
 	"github.com/portainer/libhelm"
 	"github.com/portainer/portainer/api/exec"
@@ -468,6 +469,8 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	gitService := initGitService()
 
+	openAMTService := openamt.NewService()
+
 	cryptoService := initCryptoService()
 
 	digitalSignatureService := initDigitalSignatureService()
@@ -623,6 +626,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		LDAPService:                 ldapService,
 		OAuthService:                oauthService,
 		GitService:                  gitService,
+		OpenAMTService:              openAMTService,
 		ProxyManager:                proxyManager,
 		KubernetesTokenCacheManager: kubernetesTokenCacheManager,
 		KubeConfigService:           kubeConfigService,

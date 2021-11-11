@@ -1256,6 +1256,11 @@ type (
 		LatestCommitID(repositoryURL, referenceName, username, password string) (string, error)
 	}
 
+	// OpenAMTService represents a service for managing OpenAMT
+	OpenAMTService interface {
+		ConfigureDefault() error
+	}
+
 	// HelmUserRepositoryService represents a service to manage HelmUserRepositories
 	HelmUserRepositoryService interface {
 		HelmUserRepositoryByUserID(userID UserID) ([]HelmUserRepository, error)
