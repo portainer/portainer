@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
@@ -245,14 +246,28 @@ func overrideSettingsFromFlags(dataStore portainer.DataStore, flags *portainer.C
 	}
 
 	// loop through feature flags to check if they are supported
+	if settings.FeatureFlagSettings == nil {
+		settings.FeatureFlagSettings = make(map[portainer.Feature]bool)
+	}
+
 	for _, feat := range *flags.FeatureFlags {
+		var correspondingFeature *portainer.Feature
 		for _, supportedFeat := range portainer.SupportedFeatureFlags {
-			if portainer.Feature(feat) == supportedFeat {
-				settings.FeatureFlagSettings[portainer.Feature(feat)] = true
-			} else {
-				return fmt.Errorf("invalid feature flag: %s", feat)
+			if strings.EqualFold(feat.Name, string(supportedFeat)) {
+				correspondingFeature = &supportedFeat
 			}
 		}
+
+		if correspondingFeature == nil {
+			return fmt.Errorf("feature flag '%s' is unsupported", feat.Name)
+		}
+
+		v, err := strconv.ParseBool(feat.Value)
+		if err != nil {
+			return fmt.Errorf("feature flag's '%s' value should be true or false", feat.Name)
+		}
+
+		settings.FeatureFlagSettings[*correspondingFeature] = v
 	}
 
 	return dataStore.Settings().UpdateSettings(settings)

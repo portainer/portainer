@@ -50,7 +50,7 @@ type (
 		AdminPasswordFile         *string
 		Assets                    *string
 		Data                      *string
-		FeatureFlags              *[]string
+		FeatureFlags              *[]Pair
 		EnableEdgeComputeFeatures *bool
 		EndpointURL               *string
 		Labels                    *[]Pair
@@ -389,6 +389,9 @@ type (
 	// ExtensionID represents a extension identifier
 	ExtensionID int
 
+	// Feature represents a feature that can be enabled or disabled via feature flags
+	Feature string
+
 	// GitlabRegistryData represents data required for gitlab registry to work
 	GitlabRegistryData struct {
 		ProjectID   int    `json:"ProjectId"`
@@ -693,9 +696,6 @@ type (
 		RetryCount    int
 		RetryInterval int
 	}
-
-	// Feature represents a feature that can be enabled or disabled via feature flags
-	Feature string
 
 	// Settings represents the application settings
 	Settings struct {
