@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
@@ -204,7 +206,6 @@ func updateSettingsFromFlags(dataStore portainer.DataStore, flags *portainer.CLI
 	settings.LogoURL = *flags.Logo
 	settings.SnapshotInterval = *flags.SnapshotInterval
 	settings.EnableEdgeComputeFeatures = *flags.EnableEdgeComputeFeatures
-	settings.EnableOpenAMTFeatures = *flags.EnableOpenAMTFeatures
 	settings.EnableTelemetry = true
 	settings.OAuthSettings.SSO = true
 
@@ -238,13 +239,45 @@ func updateSettingsFromFlags(dataStore portainer.DataStore, flags *portainer.CLI
 	return nil
 }
 
-func overrideSettingsFromFlags(dataStore portainer.DataStore, flags *portainer.CLIFlags) error {
+// enableFeaturesFromFlags turns on or off feature flags
+// e.g.  portainer --feat open-amt --feat fdo=true ... (defaults to true)
+// note, settins persisted to the DB.  To turn off --feat open-amt=false
+func enableFeaturesFromFlags(dataStore portainer.DataStore, flags *portainer.CLIFlags) error {
 	settings, err := dataStore.Settings().Settings()
 	if err != nil {
 		return err
 	}
 
-	settings.EnableOpenAMTFeatures = *flags.EnableOpenAMTFeatures
+	if settings.FeatureFlagSettings == nil {
+		settings.FeatureFlagSettings = make(map[portainer.Feature]bool)
+	}
+
+	// loop through feature flags to check if they are supported
+	for _, feat := range *flags.FeatureFlags {
+		var correspondingFeature *portainer.Feature
+		for i, supportedFeat := range portainer.SupportedFeatureFlags {
+			if strings.EqualFold(feat.Name, string(supportedFeat)) {
+				correspondingFeature = &portainer.SupportedFeatureFlags[i]
+			}
+		}
+
+		if correspondingFeature == nil {
+			return fmt.Errorf("unknown feature flag '%s'", feat.Name)
+		}
+
+		featureState, err := strconv.ParseBool(feat.Value)
+		if err != nil {
+			return fmt.Errorf("feature flag's '%s' value should be true or false", feat.Name)
+		}
+
+		if featureState {
+			log.Printf("Feature %v : on", *correspondingFeature)
+		} else {
+			log.Printf("Feature %v : off", *correspondingFeature)
+		}
+
+		settings.FeatureFlagSettings[*correspondingFeature] = featureState
+	}
 
 	return dataStore.Settings().UpdateSettings(settings)
 }
@@ -504,9 +537,9 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		}
 	}
 
-	err = overrideSettingsFromFlags(dataStore, flags)
+	err = enableFeaturesFromFlags(dataStore, flags)
 	if err != nil {
-		log.Fatalf("failed updating settings from flags: %v", err)
+		log.Fatalf("failed enabling feature flag: %v", err)
 	}
 
 	err = edge.LoadEdgeJobs(dataStore, reverseTunnelService)
