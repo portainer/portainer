@@ -1,0 +1,140 @@
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-laptop" title-text="Intel OpenAMT"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal" name="$ctrl.openAMTForm">
+          <span class="small">
+            <p class="text-muted">
+              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              The will enable Portainer to interact with an OpenAMT MPS API.
+            </p>
+          </span>
+
+          <por-switch-field ng-model="$ctrl.formValues.enableOpenAMT" label="Enable OpenAMT"></por-switch-field>
+
+          <div ng-show="$ctrl.formValues.enableOpenAMT">
+            <hr />
+
+            <div class="form-group">
+              <label for="domain_name" class="col-sm-3 control-label text-left">
+                Domain Name
+              </label>
+              <div class="col-sm-8">
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="$ctrl.formValues.domainName"
+                  id="domain_name"
+                  placeholder="Enter the FQDN that is associated with the provisioning certificate (i.e amtdomain.com)"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <span class="col-sm-12">
+                Upload the Provisioning Certificate .pfx file. This certificate must contain the private key.
+              </span>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <button class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.formValues.certFile" ngf-pattern=".pfx" name="certFile">
+                  Select file
+                </button>
+                <span style="margin-left: 5px;">
+                  {{ $ctrl.formValues.certFile.name }}
+                  <i class="fa fa-times red-icon" ng-if="!$ctrl.formValues.certFile" aria-hidden="true"></i>
+                </span>
+              </div>
+            </div>
+            <div class="form-group col-md-12" ng-show="$ctrl.openAMTForm.certFile.$invalid">
+              <div class="small text-warning">
+                <div ng-messages="$ctrl.openAMTForm.certFile.$error">
+                  <p ng-message="pattern"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> File type is invalid.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="certificate_password" class="col-sm-3 control-label text-left">
+                Provisioning Certificate Password
+              </label>
+              <div class="col-sm-8">
+                <input type="password" class="form-control" ng-model="$ctrl.formValues.certPassword" id="certificate_password" placeholder="*****" required />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="col-sm-12">
+                <por-switch-field ng-model="$ctrl.formValues.useWirelessConfig" label="Wireless Config"></por-switch-field>
+              </div>
+            </div>
+            <div ng-show="$ctrl.formValues.useWirelessConfig">
+              <div class="form-group">
+                <label for="wifi_auth_method" class="col-sm-3 control-label text-left">
+                  Authentication Method
+                </label>
+                <div class="col-sm-8">
+                  <select class="form-control" ng-model="$ctrl.formValues.wifiAuthenticationMethod" required>
+                    <option value="4">WPA PSK</option>
+                    <option value="6">WPA2 PSK</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="wifi_encrypt_method" class="col-sm-3 control-label text-left">
+                  Encryption Method
+                </label>
+                <div class="col-sm-8">
+                  <select class="form-control" ng-model="$ctrl.formValues.wifiEncryptionMethod" id="wifi_encrypt_method" required>
+                    <option value="3">TKIP</option>
+                    <option value="4">CCMP</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="wifi_ssid" class="col-sm-3 control-label text-left">
+                  SSID
+                </label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control" ng-model="$ctrl.formValues.wifiSsid" id="wifi_ssid" placeholder="SSIID" required />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="wifi_pass" class="col-sm-3 control-label text-left">
+                  PSK Passphrase
+                </label>
+                <div class="col-sm-8">
+                  <input type="password" class="form-control" ng-model="$ctrl.formValues.wifiPskPass" id="wifi_pass" placeholder="******" required />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <hr />
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                ng-disabled="$ctrl.state.actionInProgress || !$ctrl.isFormChanged()"
+                ng-click="$ctrl.save()"
+                button-spinner="$ctrl.state.actionInProgress"
+                analytics-on
+                analytics-category="portainer"
+                analytics-event="portainer-settings-edit"
+                analytics-properties="{ metadata: { forceHTTPS: $ctrl.formValues.forceHTTPS } }"
+              >
+                <span ng-hide="$ctrl.state.actionInProgress || $ctrl.state.reloadingPage">Submit</span>
+                <span ng-show="$ctrl.state.actionInProgress">Deployment in progress...</span>
+                <span ng-show="$ctrl.state.reloadingPage">Reloading Page...</span>
+              </button>
+              <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

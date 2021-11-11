@@ -31,6 +31,7 @@ import (
 	kubehandler "github.com/portainer/portainer/api/http/handler/kubernetes"
 	"github.com/portainer/portainer/api/http/handler/ldap"
 	"github.com/portainer/portainer/api/http/handler/motd"
+	openamthandler "github.com/portainer/portainer/api/http/handler/openamt"
 	"github.com/portainer/portainer/api/http/handler/registries"
 	"github.com/portainer/portainer/api/http/handler/resourcecontrols"
 	"github.com/portainer/portainer/api/http/handler/roles"
@@ -203,6 +204,8 @@ func (server *Server) Start() error {
 	var sslHandler = sslhandler.NewHandler(requestBouncer)
 	sslHandler.SSLService = server.SSLService
 
+	var openAMTHandler = openamthandler.NewHandler(requestBouncer)
+
 	var stackHandler = stacks.NewHandler(requestBouncer)
 	stackHandler.DataStore = server.DataStore
 	stackHandler.DockerClientFactory = server.DockerClientFactory
@@ -268,6 +271,7 @@ func (server *Server) Start() error {
 		HelmTemplatesHandler:   helmTemplatesHandler,
 		KubernetesHandler:      kubernetesHandler,
 		MOTDHandler:            motdHandler,
+		OpenAMTHandler:         openAMTHandler,
 		RegistryHandler:        registryHandler,
 		ResourceControlHandler: resourceControlHandler,
 		SettingsHandler:        settingsHandler,
