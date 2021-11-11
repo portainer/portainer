@@ -1522,10 +1522,14 @@ const (
 // Supported feature flags
 const (
 	FeatOpenAMT Feature = "open-amt"
+	FeatFDO     Feature = "fdo"
 )
 
 // List of supported features
-var SupportedFeatureFlags = []Feature{FeatOpenAMT}
+var SupportedFeatureFlags = []Feature{
+	FeatOpenAMT,
+	FeatFDO,
+}
 
 const (
 	_ AuthenticationMethod = iota

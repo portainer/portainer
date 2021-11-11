@@ -252,22 +252,28 @@ func overrideSettingsFromFlags(dataStore portainer.DataStore, flags *portainer.C
 
 	for _, feat := range *flags.FeatureFlags {
 		var correspondingFeature *portainer.Feature
-		for _, supportedFeat := range portainer.SupportedFeatureFlags {
+		for i, supportedFeat := range portainer.SupportedFeatureFlags {
 			if strings.EqualFold(feat.Name, string(supportedFeat)) {
-				correspondingFeature = &supportedFeat
+				correspondingFeature = &portainer.SupportedFeatureFlags[i]
 			}
 		}
 
 		if correspondingFeature == nil {
-			return fmt.Errorf("feature flag '%s' is unsupported", feat.Name)
+			return fmt.Errorf("unknown feature flag '%s'", feat.Name)
 		}
 
-		v, err := strconv.ParseBool(feat.Value)
+		featureState, err := strconv.ParseBool(feat.Value)
 		if err != nil {
 			return fmt.Errorf("feature flag's '%s' value should be true or false", feat.Name)
 		}
 
-		settings.FeatureFlagSettings[*correspondingFeature] = v
+		if featureState {
+			log.Printf("Feature %v : on", *correspondingFeature)
+		} else {
+			log.Printf("Feature %v : off", *correspondingFeature)
+		}
+
+		settings.FeatureFlagSettings[*correspondingFeature] = featureState
 	}
 
 	return dataStore.Settings().UpdateSettings(settings)
