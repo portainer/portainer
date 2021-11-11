@@ -1,7 +1,6 @@
 import angular from 'angular';
 
-import { ReactExampleAngular } from '@/portainer/components/ReactExample';
-
 import { sslCertificate } from './ssl-certificate';
+import { openAMT } from './open-amt';
 
-export default angular.module('portainer.settings.general', []).component('sslCertificateSettings', sslCertificate).component('intelOpenAmtSettings', ReactExampleAngular).name;
+export default angular.module('portainer.settings.general', []).component('sslCertificateSettings', sslCertificate).component('openAmtSettings', openAMT).name;
