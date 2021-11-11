@@ -266,6 +266,8 @@ type (
 		SecuritySettings EndpointSecuritySettings
 		// LastCheckInDate mark last check-in date on checkin
 		LastCheckInDate int64
+		// QueryDate of each query with the endpoints list
+		QueryDate int64 
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
