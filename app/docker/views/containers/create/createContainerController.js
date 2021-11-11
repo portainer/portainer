@@ -7,6 +7,8 @@ import { ContainerCapabilities, ContainerCapability } from '../../../models/cont
 import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
 import { ContainerDetailsViewModel } from '../../../models/container';
 
+import './createcontainer.css';
+
 angular.module('portainer.docker').controller('CreateContainerController', [
   '$q',
   '$scope',
@@ -759,26 +761,21 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       return true;
     }
 
-    function updateLimits(config) {
-      return ContainerService.updateLimits($transition$.params().from, config).then(onUpdateSuccess).catch(notifyOnError);
-
-      function onUpdateSuccess() {
+    async function updateLimits(config) {
+      try {
+        await ContainerService.updateLimits($transition$.params().from, config);
         Notifications.success('Limits updated');
-      }
-
-      function notifyOnError(err) {
+      } catch (err) {
         Notifications.error('Failure', err, 'Update Limits fail');
-        return $q.reject(err);
       }
     }
 
-    function update() {
+    async function update() {
       var config = angular.copy($scope.config);
       prepareResources(config);
-      updateLimits(config);
-      return 
+      await updateLimits(config);
     }
-    
+
     function create() {
       var oldContainer = null;
       HttpRequestHelper.setPortainerAgentTargetHeader($scope.formValues.NodeName);

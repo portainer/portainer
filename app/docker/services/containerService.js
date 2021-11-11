@@ -97,13 +97,17 @@ angular.module('portainer.docker').factory('ContainerService', [
     }
 
     function updateLimits(id, config) {
-      return Container.update({ id: id },
-        { 
-          //MemorySwap: must be set, -1: non limits, 0: treated as unset(cause update error).
-          MemoryReservation: config.HostConfig.MemoryReservation, "Memory": config.HostConfig.Memory, "MemorySwap": -1,
-          NanoCpus: config.HostConfig.NanoCpus
+      return Container.update(
+        { id: id },
+        {
+          // MemorySwap: must be set
+          // -1: non limits, 0: treated as unset(cause update error).
+          MemoryReservation: config.HostConfig.MemoryReservation,
+          Memory: config.HostConfig.Memory,
+          MemorySwap: -1,
+          NanoCpus: config.HostConfig.NanoCpus,
         }
-        ).$promise;
+      ).$promise;
     }
 
     service.createContainer = function (configuration) {

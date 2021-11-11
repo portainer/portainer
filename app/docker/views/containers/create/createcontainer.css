@@ -1,0 +1,8 @@
+.edit-resources {
+  padding: 20px;
+  border: 1px solid var(--border-widget-color);
+}
+
+.widget .edit-resources button {
+  margin-left: 15px;
+}
