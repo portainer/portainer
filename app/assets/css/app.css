@@ -885,3 +885,7 @@ json-tree .branch-preview {
   word-break: break-all;
   white-space: normal;
 }
+
+.space-x-1 {
+  margin-left: 0.25rem;
+}
