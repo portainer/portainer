@@ -80,16 +80,7 @@ func (service *Service) GetActiveTunnel(endpoint *portainer.Endpoint) (*portaine
 			endpoint.EdgeCheckinInterval = settings.EdgeAgentCheckinInterval
 		}
 
-		waitForAgentToConnect := 2 * time.Duration(endpoint.EdgeCheckinInterval)
-
-		for waitForAgentToConnect >= 0 {
-			waitForAgentToConnect--
-			time.Sleep(time.Second)
-			tunnel = service.GetTunnelDetails(endpoint.ID)
-			if tunnel.Status == portainer.EdgeAgentActive {
-				break
-			}
-		}
+		time.Sleep(2 * time.Duration(endpoint.EdgeCheckinInterval) * time.Second)
 	}
 
 	tunnel = service.GetTunnelDetails(endpoint.ID)
