@@ -4,13 +4,16 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+
 	httperror "github.com/portainer/libhttp/error"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 )
 
 // Handler is the HTTP handler used to handle OpenAMT operations.
 type Handler struct {
 	*mux.Router
+	OpenAMTService portainer.OpenAMTService
 }
 
 // NewHandler returns a new Handler

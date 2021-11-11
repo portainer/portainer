@@ -10,18 +10,19 @@ import (
 )
 
 type openAMTSubmitPayload struct {
-	EnableOpenAMT *bool
-	CertFileText *string
-	CertPassword *string
-	DomainName *string
-	UseWirelessConfig *bool
+	EnableOpenAMT            *bool
+	CertFileText             *string
+	CertPassword             *string
+	DomainName               *string
+	UseWirelessConfig        *bool
 	WifiAuthenticationMethod *string
-	WifiEncryptionMethod *string
-	WifiSSID *string
-	WifiPskPass *string
+	WifiEncryptionMethod     *string
+	WifiSSID                 *string
+	WifiPskPass              *string
 }
 
 func (payload *openAMTSubmitPayload) Validate(r *http.Request) error {
+	return nil //TODO remove
 	if *payload.EnableOpenAMT {
 		if payload.DomainName == nil || *payload.DomainName == "" {
 			return errors.New("domain name must be provided")
@@ -73,6 +74,11 @@ func (handler *Handler) openAMTSubmit(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	if *payload.EnableOpenAMT {
+		err := handler.OpenAMTService.ConfigureDefault()
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "error configuring OpenAMT server", err}
+		}
+
 		return &httperror.HandlerError{http.StatusNotImplemented, "not implemented", errors.New("not implemented")}
 	}
 

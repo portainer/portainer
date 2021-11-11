@@ -76,6 +76,7 @@ type Server struct {
 	FileService                 portainer.FileService
 	DataStore                   portainer.DataStore
 	GitService                  portainer.GitService
+	OpenAMTService              portainer.OpenAMTService
 	JWTService                  portainer.JWTService
 	LDAPService                 portainer.LDAPService
 	OAuthService                portainer.OAuthService
@@ -205,6 +206,7 @@ func (server *Server) Start() error {
 	sslHandler.SSLService = server.SSLService
 
 	var openAMTHandler = openamthandler.NewHandler(requestBouncer)
+	openAMTHandler.OpenAMTService = server.OpenAMTService
 
 	var stackHandler = stacks.NewHandler(requestBouncer)
 	stackHandler.DataStore = server.DataStore
