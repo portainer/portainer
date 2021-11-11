@@ -50,6 +50,7 @@ type (
 		AdminPasswordFile         *string
 		Assets                    *string
 		Data                      *string
+		FeatureFlags              *[]Pair
 		EnableEdgeComputeFeatures *bool
 		EndpointURL               *string
 		Labels                    *[]Pair
@@ -388,6 +389,9 @@ type (
 	// ExtensionID represents a extension identifier
 	ExtensionID int
 
+	// Feature represents a feature that can be enabled or disabled via feature flags
+	Feature string
+
 	// GitlabRegistryData represents data required for gitlab registry to work
 	GitlabRegistryData struct {
 		ProjectID   int    `json:"ProjectId"`
@@ -703,6 +707,7 @@ type (
 		AuthenticationMethod AuthenticationMethod `json:"AuthenticationMethod" example:"1"`
 		LDAPSettings         LDAPSettings         `json:"LDAPSettings" example:""`
 		OAuthSettings        OAuthSettings        `json:"OAuthSettings" example:""`
+		FeatureFlagSettings  map[Feature]bool     `json:"FeatureFlagSettings" example:""`
 		// The interval in which environment(endpoint) snapshots are created
 		SnapshotInterval string `json:"SnapshotInterval" example:"5m"`
 		// URL to the templates that will be displayed in the UI when navigating to App Templates
@@ -1513,6 +1518,18 @@ const (
 	// WebSocketKeepAlive web socket keep alive for edge environments
 	WebSocketKeepAlive = 1 * time.Hour
 )
+
+// Supported feature flags
+const (
+	FeatOpenAMT Feature = "open-amt"
+	FeatFDO     Feature = "fdo"
+)
+
+// List of supported features
+var SupportedFeatureFlags = []Feature{
+	FeatOpenAMT,
+	FeatFDO,
+}
 
 const (
 	_ AuthenticationMethod = iota
