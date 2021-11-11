@@ -42,7 +42,7 @@ export function Disabled() {
 export function Warning() {
   return (
     <Button color="warning" onClick={() => {}}>
-      Warning Button{' '}
+      Warning Button
     </Button>
   );
 }
@@ -50,7 +50,7 @@ export function Warning() {
 export function Success() {
   return (
     <Button color="success" onClick={() => {}}>
-      Success Button{' '}
+      Success Button
     </Button>
   );
 }
