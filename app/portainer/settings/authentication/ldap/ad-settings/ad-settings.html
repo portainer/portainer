@@ -168,5 +168,6 @@
     on-save-settings="($ctrl.onSaveSettings)"
     save-button-state="($ctrl.saveButtonState)"
     limited-feature-id="$ctrl.limitedFeatureId"
+    save-button-disabled="(!$ctrl.isLDAPFormValid)"
   ></save-auth-settings-button>
 </ng-form>
