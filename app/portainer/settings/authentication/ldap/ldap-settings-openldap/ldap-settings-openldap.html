@@ -187,6 +187,7 @@
   <save-auth-settings-button
     on-save-settings="($ctrl.onSaveSettings)"
     save-button-state="($ctrl.saveButtonState)"
+    save-button-disabled="!$ctrl.saveButtonDisabled()"
     limited-feature-id="$ctrl.limitedFeatureId"
   ></save-auth-settings-button>
 </ng-form>

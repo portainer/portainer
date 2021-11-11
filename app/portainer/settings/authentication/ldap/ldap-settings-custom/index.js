@@ -14,5 +14,6 @@ export const ldapSettingsCustom = {
     onSearchGroupsClick: '<',
     onSaveSettings: '<',
     saveButtonState: '<',
+    saveButtonDisabled: '<',
   },
 };

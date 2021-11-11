@@ -13,5 +13,6 @@ export const ldapSettingsOpenLdap = {
     onSearchGroupsClick: '<',
     onSaveSettings: '<',
     saveButtonState: '<',
+    saveButtonDisabled: '<',
   },
 };

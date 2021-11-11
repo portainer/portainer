@@ -29,6 +29,7 @@
     on-search-groups-click="($ctrl.searchGroups)"
     on-save-settings="($ctrl.onSaveSettings)"
     save-button-state="($ctrl.saveButtonState)"
+    save-button-disabled="$ctrl.isLDAPFormValid"
   ></ldap-settings-custom>
   <ldap-settings-open-ldap
     ng-if="$ctrl.settings.ServerType === $ctrl.SERVER_TYPES.OPEN_LDAP"
@@ -41,5 +42,6 @@
     on-search-groups-click="($ctrl.searchGroups)"
     on-save-settings="($ctrl.onSaveSettings)"
     save-button-state="($ctrl.saveButtonState)"
+    save-button-disabled="$ctrl.isLDAPFormValid"
   ></ldap-settings-open-ldap>
 </div>

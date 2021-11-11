@@ -3,7 +3,7 @@ const SERVER_TYPES = {
   OPEN_LDAP: 1,
   AD: 2,
 };
-
+import _ from 'lodash-es';
 import { buildLdapSettingsModel, buildOpenLDAPSettingsModel } from '@/portainer/settings/authentication/ldap/ldap-settings.model';
 import { EXTERNAL_AUTH_LDAP } from '@/portainer/feature-flags/feature-ids';
 
@@ -69,5 +69,16 @@ export default class LdapSettingsController {
       GroupSearchSettings: this.settings.GroupSearchSettings.map((search) => ({ ...search, GroupFilter: search.GroupFilter || DEFAULT_GROUP_FILTER })),
     };
     return this.LDAPService.groups(settings);
+  }
+
+  isLDAPFormValid() {
+    const ldapSettings = this.settings;
+    const isTLSMode = ldapSettings.TLSConfig.TLS || ldapSettings.StartTLS;
+
+    return (
+      _.compact(ldapSettings.URLs).length &&
+      (ldapSettings.AnonymousMode || (ldapSettings.ReaderDN && ldapSettings.Password)) &&
+      (!isTLSMode || this.TLSCACert || ldapSettings.TLSConfig.TLSSkipVerify)
+    );
   }
 }
