@@ -9,7 +9,7 @@ import (
 	"github.com/portainer/libhttp/response"
 )
 
-type openAMTSubmitPayload struct {
+type openAMTConfigureDefaultPayload struct {
 	EnableOpenAMT            *bool
 	CertFileText             *string
 	CertPassword             *string
@@ -21,7 +21,7 @@ type openAMTSubmitPayload struct {
 	WifiPskPass              *string
 }
 
-func (payload *openAMTSubmitPayload) Validate(r *http.Request) error {
+func (payload *openAMTConfigureDefaultPayload) Validate(r *http.Request) error {
 	return nil //TODO remove
 	if *payload.EnableOpenAMT {
 		if payload.DomainName == nil || *payload.DomainName == "" {
@@ -52,7 +52,7 @@ func (payload *openAMTSubmitPayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// @id OpenAMTSubmit
+// @id OpenAMTConfigureDefault
 // @summary Enable OpenAMT capabilities
 // @description Enable OpenAMT capabilities
 // @description **Access policy**: administrator
@@ -60,14 +60,14 @@ func (payload *openAMTSubmitPayload) Validate(r *http.Request) error {
 // @security jwt
 // @accept json
 // @produce json
-// @param body body openAMTSubmitPayload true "OpenAMT Settings"
+// @param body body openAMTConfigureDefaultPayload true "OpenAMT Settings"
 // @success 204 "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied to access settings"
 // @failure 500 "Server error"
 // @router /open-amt [put]
-func (handler *Handler) openAMTSubmit(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	var payload openAMTSubmitPayload
+func (handler *Handler) openAMTConfigureDefault(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	var payload openAMTConfigureDefaultPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
