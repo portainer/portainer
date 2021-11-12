@@ -2,12 +2,11 @@ package apikey
 
 import (
 	"crypto/sha256"
-	"encoding/base64"
 	"log"
+	"strings"
 	"testing"
 	"time"
 
-	"github.com/gorilla/securecookie"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt"
 	"github.com/stretchr/testify/assert"
@@ -16,24 +15,6 @@ import (
 func Test_SatisfiesAPIKeyServiceInterface(t *testing.T) {
 	is := assert.New(t)
 	is.Implements((*APIKeyService)(nil), NewAPIKeyService(nil, nil))
-}
-
-func Test_HashRaw(t *testing.T) {
-	is := assert.New(t)
-
-	store, teardown := bolt.MustNewTestStore(true)
-	defer teardown()
-
-	service := NewAPIKeyService(store.APIKeyRepository(), store.User())
-
-	t.Run("Successfully decodes base64 encoded string and generates hash digest", func(t *testing.T) {
-		rawAPIKey := securecookie.GenerateRandomKey(32)
-		encodedRawAPIKey := base64.StdEncoding.EncodeToString(rawAPIKey)
-		digest, err := service.HashRaw(encodedRawAPIKey)
-		is.NoError(err)
-		is.NotEmpty(digest)
-		is.Len(digest, 32)
-	})
 }
 
 func Test_GenerateApiKey(t *testing.T) {
@@ -53,12 +34,20 @@ func Test_GenerateApiKey(t *testing.T) {
 		is.Equal(desc, apiKey.Description)
 	})
 
-	t.Run("Prefix matches encoded key prefix", func(t *testing.T) {
+	t.Run("Api key prefix is 7 chars", func(t *testing.T) {
 		rawKey, apiKey, err := service.GenerateApiKey(portainer.User{ID: 1}, "test-2")
 		is.NoError(err)
 
-		is.Equal(rawKey[:3], apiKey.Prefix)
-		is.Len(apiKey.Prefix, 3)
+		is.Equal(rawKey[:7], apiKey.Prefix)
+		is.Len(apiKey.Prefix, 7)
+	})
+
+	t.Run("Api key has 'ptr_' as prefix", func(t *testing.T) {
+		rawKey, _, err := service.GenerateApiKey(portainer.User{ID: 1}, "test-x")
+		is.NoError(err)
+
+		is.Equal(portainerAPIKeyPrefix, "ptr_")
+		is.True(strings.HasPrefix(rawKey, "ptr_"))
 	})
 
 	t.Run("Successfully caches API key", func(t *testing.T) {
@@ -76,10 +65,7 @@ func Test_GenerateApiKey(t *testing.T) {
 		rawKey, apiKey, err := service.GenerateApiKey(portainer.User{ID: 1}, "test-4")
 		is.NoError(err)
 
-		decodedKey, err := base64.StdEncoding.DecodeString(rawKey)
-		is.NoError(err)
-
-		generatedDigest := sha256.Sum256(decodedKey)
+		generatedDigest := sha256.Sum256([]byte(rawKey))
 
 		is.Equal(apiKey.Digest, generatedDigest[:])
 	})

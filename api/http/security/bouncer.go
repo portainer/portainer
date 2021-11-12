@@ -264,10 +264,7 @@ func (bouncer *RequestBouncer) apiKeyLookup(r *http.Request) *portainer.TokenDat
 		return nil
 	}
 
-	digest, err := bouncer.apiKeyService.HashRaw(rawAPIKey)
-	if err != nil {
-		return nil
-	}
+	digest := bouncer.apiKeyService.HashRaw(rawAPIKey)
 
 	user, apiKey, err := bouncer.apiKeyService.GetDigestUserAndKey(digest)
 	if err != nil {

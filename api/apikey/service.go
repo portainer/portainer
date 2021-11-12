@@ -11,6 +11,8 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
+const portainerAPIKeyPrefix = "ptr_"
+
 var ErrInvalidAPIKey = errors.New("Invalid API key")
 
 type apiKeyService struct {
@@ -28,26 +30,24 @@ func NewAPIKeyService(apiKeyRepository portainer.APIKeyRepository, userRepositor
 }
 
 // HashRaw computes a hash digest of provided base64 encoded raw API key.
-func (a *apiKeyService) HashRaw(rawKey string) ([]byte, error) {
-	decodedRawAPIKey, err := base64.StdEncoding.DecodeString(rawKey)
-	if err != nil {
-		return nil, errors.Wrap(err, "Unable to decode raw API key")
-	}
-	hashDigest := sha256.Sum256(decodedRawAPIKey)
-	return hashDigest[:], nil
+func (a *apiKeyService) HashRaw(rawKey string) []byte {
+	hashDigest := sha256.Sum256([]byte(rawKey))
+	return hashDigest[:]
 }
 
 // GenerateApiKey generates a base64 encoded raw API key for a user (for one-time display).
 // The generated API key is stored in the cache and database.
 func (a *apiKeyService) GenerateApiKey(user portainer.User, description string) (string, *portainer.APIKey, error) {
-	rawAPIKey := generateRandomKey(32)
-	encodedRawAPIKey := base64.StdEncoding.EncodeToString(rawAPIKey)
-	hashDigest := sha256.Sum256(rawAPIKey)
+	randKey := generateRandomKey(32)
+	encodedRawAPIKey := base64.StdEncoding.EncodeToString(randKey)
+	prefixedAPIKey := portainerAPIKeyPrefix + encodedRawAPIKey
+
+	hashDigest := sha256.Sum256([]byte(prefixedAPIKey))
 
 	apiKey := &portainer.APIKey{
 		UserID:      user.ID,
 		Description: description,
-		Prefix:      encodedRawAPIKey[:3],
+		Prefix:      prefixedAPIKey[:7],
 		DateCreated: time.Now(),
 		Digest:      hashDigest[:],
 	}
@@ -60,7 +60,7 @@ func (a *apiKeyService) GenerateApiKey(user portainer.User, description string) 
 	// persist api-key to cache
 	a.cache.Set(apiKey.Digest, user, *apiKey)
 
-	return encodedRawAPIKey, apiKey, nil
+	return prefixedAPIKey, apiKey, nil
 }
 
 // GetAPIKeys returns all the API keys associated to a user.
