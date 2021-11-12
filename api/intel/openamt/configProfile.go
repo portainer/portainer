@@ -25,7 +25,7 @@ type (
 	}
 )
 
-func (service *Service) createOrUpdateAMTProfile(token, profileName string, ciraConfigName string, wirelessConfigName string) (*Profile, error) {
+func (service *Service) createOrUpdateAMTProfile(token, profileName string, ciraConfigName string, useWirelessConfig bool) (*Profile, error) {
 	profile, err := service.getAMTProfile(token, profileName)
 	if err != nil {
 		return nil, err
@@ -36,7 +36,7 @@ func (service *Service) createOrUpdateAMTProfile(token, profileName string, cira
 		method = http.MethodPatch
 	}
 
-	profile, err = service.saveAMTProfile(method, token, profileName, ciraConfigName, wirelessConfigName)
+	profile, err = service.saveAMTProfile(method, token, profileName, ciraConfigName, useWirelessConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -62,23 +62,23 @@ func (service *Service) getAMTProfile(token string, profileName string) (*Profil
 	return &result, nil
 }
 
-func (service *Service) saveAMTProfile(method string, token string, profileName string, ciraConfigName string, wirelessConfigName string) (*Profile, error) {
+func (service *Service) saveAMTProfile(method string, token string, profileName string, ciraConfigName string, useWirelessConfig bool) (*Profile, error) {
 	url := fmt.Sprintf("https://%v/rps/api/v1/admin/profiles", MpsServerAddress)
 
 	profile := Profile{
-		ProfileName: profileName,
-		Activation: "acmactivate",
-		GenerateRandomPassword: true,
+		ProfileName:                profileName,
+		Activation:                 "acmactivate",
+		GenerateRandomPassword:     true,
 		GenerateRandomMEBxPassword: true,
-		CIRAConfigName: &ciraConfigName,
-		Tags: []string{},
-		DHCPEnabled: true,
+		CIRAConfigName:             &ciraConfigName,
+		Tags:                       []string{},
+		DHCPEnabled:                true,
 	}
-	if wirelessConfigName != "" {
+	if useWirelessConfig {
 		profile.WIFIConfigs = []WifiConfig{
 			{
-				Priority: 1,
-				ProfileName: wirelessConfigName,
+				Priority:    1,
+				ProfileName: DefaultWirelessConfigName,
 			},
 		}
 	}
