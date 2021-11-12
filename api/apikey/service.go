@@ -29,27 +29,27 @@ func NewAPIKeyService(apiKeyRepository portainer.APIKeyRepository, userRepositor
 	}
 }
 
-// HashRaw computes a hash digest of provided base64 encoded raw API key.
+// HashRaw computes a hash digest of provided raw API key.
 func (a *apiKeyService) HashRaw(rawKey string) []byte {
 	hashDigest := sha256.Sum256([]byte(rawKey))
 	return hashDigest[:]
 }
 
-// GenerateApiKey generates a base64 encoded raw API key for a user (for one-time display).
+// GenerateApiKey generates a raw API key for a user (for one-time display).
 // The generated API key is stored in the cache and database.
 func (a *apiKeyService) GenerateApiKey(user portainer.User, description string) (string, *portainer.APIKey, error) {
 	randKey := generateRandomKey(32)
 	encodedRawAPIKey := base64.StdEncoding.EncodeToString(randKey)
 	prefixedAPIKey := portainerAPIKeyPrefix + encodedRawAPIKey
 
-	hashDigest := sha256.Sum256([]byte(prefixedAPIKey))
+	hashDigest := a.HashRaw(prefixedAPIKey)
 
 	apiKey := &portainer.APIKey{
 		UserID:      user.ID,
 		Description: description,
 		Prefix:      prefixedAPIKey[:7],
 		DateCreated: time.Now(),
-		Digest:      hashDigest[:],
+		Digest:      hashDigest,
 	}
 
 	err := a.apiKeyRepository.CreateAPIKey(apiKey)
