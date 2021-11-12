@@ -61,7 +61,7 @@ func parseError(responseBody []byte) error {
 	return nil
 }
 
-func (service *Service) ConfigureDefault() error {
+func (service *Service) ConfigureDefault(certFileText string, certPassword string, domainSuffix string, useWirelessConfig bool, wifiAuthenticationMethod string, wifiEncryptionMethod string, wifiSSID string, wifiPskPass string) error {
 	token, err := service.executeAuthenticationRequest()
 	if err != nil {
 		return err
@@ -72,13 +72,21 @@ func (service *Service) ConfigureDefault() error {
 		return err
 	}
 
-	profile, err := service.createOrUpdateAMTProfile(token.Token, DefaultProfileName, ciraConfig.ConfigName, "")
+	//TODO wifi
+
+	profile, err := service.createOrUpdateAMTProfile(token.Token, DefaultProfileName, ciraConfig.ConfigName, useWirelessConfig)
+	if err != nil {
+		return err
+	}
+
+	domain, err := service.createOrUpdateDomain(token.Token, DefaultDomainName, domainSuffix, certFileText, certPassword)
 	if err != nil {
 		return err
 	}
 
 	fmt.Println(ciraConfig.ConfigName)
 	fmt.Println(profile.ProfileName)
+	fmt.Println(domain.DomainName)
 
 	return nil
 }

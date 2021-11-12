@@ -10,40 +10,39 @@ import (
 )
 
 type openAMTConfigureDefaultPayload struct {
-	EnableOpenAMT            *bool
-	CertFileText             *string
-	CertPassword             *string
-	DomainName               *string
-	UseWirelessConfig        *bool
-	WifiAuthenticationMethod *string
-	WifiEncryptionMethod     *string
-	WifiSSID                 *string
-	WifiPskPass              *string
+	EnableOpenAMT            bool
+	CertFileText             string
+	CertPassword             string
+	DomainName               string
+	UseWirelessConfig        bool
+	WifiAuthenticationMethod string
+	WifiEncryptionMethod     string
+	WifiSSID                 string
+	WifiPskPass              string
 }
 
 func (payload *openAMTConfigureDefaultPayload) Validate(r *http.Request) error {
-	return nil //TODO remove
-	if *payload.EnableOpenAMT {
-		if payload.DomainName == nil || *payload.DomainName == "" {
+	if payload.EnableOpenAMT {
+		if payload.DomainName == "" {
 			return errors.New("domain name must be provided")
 		}
-		if payload.CertFileText == nil || *payload.CertFileText == "" {
-			return errors.New("certificate file must be provided")
+		if payload.CertFileText == "" {
+			//return errors.New("certificate file must be provided") TODO
 		}
-		if payload.CertPassword == nil || *payload.CertPassword == "" {
-			return errors.New("certificate password must be provided")
+		if payload.CertPassword == "" {
+			//return errors.New("certificate password must be provided") TODO
 		}
-		if *payload.UseWirelessConfig {
-			if payload.WifiAuthenticationMethod == nil || *payload.WifiAuthenticationMethod == "" {
+		if payload.UseWirelessConfig {
+			if payload.WifiAuthenticationMethod == "" {
 				return errors.New("wireless authentication method must be provided")
 			}
-			if payload.WifiEncryptionMethod == nil || *payload.WifiEncryptionMethod == "" {
+			if payload.WifiEncryptionMethod == "" {
 				return errors.New("wireless encryption method must be provided")
 			}
-			if payload.WifiSSID == nil || *payload.WifiSSID == "" {
+			if payload.WifiSSID == "" {
 				return errors.New("wireless config SSID must be provided")
 			}
-			if payload.WifiPskPass == nil || *payload.WifiPskPass == "" {
+			if payload.WifiPskPass == "" {
 				return errors.New("wireless config PSK passphrase must be provided")
 			}
 		}
@@ -73,13 +72,11 @@ func (handler *Handler) openAMTConfigureDefault(w http.ResponseWriter, r *http.R
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	if *payload.EnableOpenAMT {
-		err := handler.OpenAMTService.ConfigureDefault()
+	if payload.EnableOpenAMT {
+		err := handler.OpenAMTService.ConfigureDefault(payload.CertFileText, payload.CertPassword, payload.DomainName, payload.UseWirelessConfig, payload.WifiAuthenticationMethod, payload.WifiEncryptionMethod, payload.WifiSSID, payload.WifiPskPass)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "error configuring OpenAMT server", err}
 		}
-
-		return &httperror.HandlerError{http.StatusNotImplemented, "not implemented", errors.New("not implemented")}
 	}
 
 	return response.Empty(w)
