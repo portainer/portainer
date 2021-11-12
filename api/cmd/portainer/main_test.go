@@ -92,7 +92,7 @@ func Test_optionalFeature(t *testing.T) {
 		is.Equal("enabled", optionalFunc(store))
 	})
 
-	// Same store, so the ff should still be enabled
+	// Same store, so the feature flag should still be enabled
 	t.Run(fmt.Sprintf("%s succeeds:%v", FeatTest, true), func(t *testing.T) {
 		is.Equal("enabled", optionalFunc(store))
 	})
@@ -106,7 +106,7 @@ func Test_optionalFeature(t *testing.T) {
 		is.Equal("disabled", optionalFunc(store))
 	})
 
-	// Same store, so ff should still be disabled
+	// Same store, so feature flag should still be disabled
 	t.Run(fmt.Sprintf("%s succeeds:%v", FeatTest, true), func(t *testing.T) {
 		is.Equal("disabled", optionalFunc(store))
 	})
