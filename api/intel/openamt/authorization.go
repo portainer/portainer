@@ -9,7 +9,7 @@ import (
 )
 
 type authenticationResponse struct {
-	Token    string `json:"token"`
+	Token string `json:"token"`
 }
 
 func (service *Service) executeAuthenticationRequest() (*authenticationResponse, error) {
@@ -17,7 +17,7 @@ func (service *Service) executeAuthenticationRequest() (*authenticationResponse,
 
 	payload := map[string]string{
 		"username": MpsServerAdminUser,
-		"password": "chelo.Port2021", // TODO prompt/autogenerate on deploy stack and save in datastore
+		"password": "mypassword", // TODO prompt/autogenerate on deploy stack and save in datastore
 	}
 	jsonValue, _ := json.Marshal(payload)
 

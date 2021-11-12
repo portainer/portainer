@@ -8,24 +8,24 @@ import (
 
 type (
 	Profile struct {
-		ProfileName                string       `json:"profileName"`
-		Activation                 string       `json:"activation"`
-		CIRAConfigName             *string      `json:"ciraConfigName"`
-		GenerateRandomPassword     bool         `json:"generateRandomPassword"`
-		GenerateRandomMEBxPassword bool         `json:"generateRandomMEBxPassword"`
-		Tags                       []string     `json:"tags"`
-		DHCPEnabled                bool         `json:"dhcpEnabled"`
-		TenantId                   string       `json:"tenantId"`
-		WIFIConfigs                []WifiConfig `json:"wifiConfigs"`
+		ProfileName                string              `json:"profileName"`
+		Activation                 string              `json:"activation"`
+		CIRAConfigName             *string             `json:"ciraConfigName"`
+		GenerateRandomPassword     bool                `json:"generateRandomPassword"`
+		GenerateRandomMEBxPassword bool                `json:"generateRandomMEBxPassword"`
+		Tags                       []string            `json:"tags"`
+		DHCPEnabled                bool                `json:"dhcpEnabled"`
+		TenantId                   string              `json:"tenantId"`
+		WIFIConfigs                []ProfileWifiConfig `json:"wifiConfigs"`
 	}
 
-	WifiConfig struct {
+	ProfileWifiConfig struct {
 		Priority    int    `json:"priority"`
 		ProfileName string `json:"profileName"`
 	}
 )
 
-func (service *Service) createOrUpdateAMTProfile(token, profileName string, ciraConfigName string, useWirelessConfig bool) (*Profile, error) {
+func (service *Service) createOrUpdateAMTProfile(token string, profileName string, ciraConfigName string, wirelessConfig string) (*Profile, error) {
 	profile, err := service.getAMTProfile(token, profileName)
 	if err != nil {
 		return nil, err
@@ -36,7 +36,7 @@ func (service *Service) createOrUpdateAMTProfile(token, profileName string, cira
 		method = http.MethodPatch
 	}
 
-	profile, err = service.saveAMTProfile(method, token, profileName, ciraConfigName, useWirelessConfig)
+	profile, err = service.saveAMTProfile(method, token, profileName, ciraConfigName, wirelessConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (service *Service) getAMTProfile(token string, profileName string) (*Profil
 	return &result, nil
 }
 
-func (service *Service) saveAMTProfile(method string, token string, profileName string, ciraConfigName string, useWirelessConfig bool) (*Profile, error) {
+func (service *Service) saveAMTProfile(method string, token string, profileName string, ciraConfigName string, wirelessConfig string) (*Profile, error) {
 	url := fmt.Sprintf("https://%v/rps/api/v1/admin/profiles", MpsServerAddress)
 
 	profile := Profile{
@@ -74,8 +74,8 @@ func (service *Service) saveAMTProfile(method string, token string, profileName 
 		Tags:                       []string{},
 		DHCPEnabled:                true,
 	}
-	if useWirelessConfig {
-		profile.WIFIConfigs = []WifiConfig{
+	if wirelessConfig != "" {
+		profile.WIFIConfigs = []ProfileWifiConfig{
 			{
 				Priority:    1,
 				ProfileName: DefaultWirelessConfigName,

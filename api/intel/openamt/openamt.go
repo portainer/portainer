@@ -61,7 +61,7 @@ func parseError(responseBody []byte) error {
 	return nil
 }
 
-func (service *Service) ConfigureDefault(certFileText string, certPassword string, domainSuffix string, useWirelessConfig bool, wifiAuthenticationMethod string, wifiEncryptionMethod string, wifiSSID string, wifiPskPass string) error {
+func (service *Service) ConfigureDefault(certFileText string, certPassword string, domainSuffix string, useWirelessConfig bool, wifiAuthenticationMethod int, wifiEncryptionMethod int, wifiSSID string, wifiPskPass string) error {
 	token, err := service.executeAuthenticationRequest()
 	if err != nil {
 		return err
@@ -72,9 +72,16 @@ func (service *Service) ConfigureDefault(certFileText string, certPassword strin
 		return err
 	}
 
-	//TODO wifi
+	wirelessConfigName := ""
+	if useWirelessConfig {
+		wirlessConfig, err := service.createOrUpdateWirelessConfig(token.Token, DefaultWirelessConfigName, wifiAuthenticationMethod, wifiEncryptionMethod, wifiSSID, wifiPskPass)
+		if err != nil {
+			return err
+		}
+		wirelessConfigName = wirlessConfig.ProfileName
+	}
 
-	profile, err := service.createOrUpdateAMTProfile(token.Token, DefaultProfileName, ciraConfig.ConfigName, useWirelessConfig)
+	profile, err := service.createOrUpdateAMTProfile(token.Token, DefaultProfileName, ciraConfig.ConfigName, wirelessConfigName)
 	if err != nil {
 		return err
 	}
@@ -91,7 +98,7 @@ func (service *Service) ConfigureDefault(certFileText string, certPassword strin
 	return nil
 }
 
-func (service *Service) executeSaveRequest(method, url, token string, payload []byte) ([]byte, error) {
+func (service *Service) executeSaveRequest(method string, url string, token string, payload []byte) ([]byte, error) {
 	req, err := http.NewRequest(method, url, bytes.NewBuffer(payload))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", token))
@@ -116,7 +123,7 @@ func (service *Service) executeSaveRequest(method, url, token string, payload []
 	return responseBody, nil
 }
 
-func (service *Service) executeGetRequest(url, token string) ([]byte, error) {
+func (service *Service) executeGetRequest(url string, token string) ([]byte, error) {
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", token))
