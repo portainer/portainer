@@ -1259,7 +1259,7 @@ type (
 
 	// OpenAMTService represents a service for managing OpenAMT
 	OpenAMTService interface {
-		ConfigureDefault(certFileText string, certPassword string, domainSuffix string, useWirelessConfig bool, wifiAuthenticationMethod string, wifiEncryptionMethod string, wifiSSID string, wifiPskPass string) error
+		ConfigureDefault(certFileText string, certPassword string, domainSuffix string, useWirelessConfig bool, wifiAuthenticationMethod int, wifiEncryptionMethod int, wifiSSID string, wifiPskPass string) error
 	}
 
 	// HelmUserRepositoryService represents a service to manage HelmUserRepositories

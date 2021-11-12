@@ -3,6 +3,7 @@ package openamt
 import (
 	"errors"
 	"net/http"
+	"strconv"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -73,7 +74,15 @@ func (handler *Handler) openAMTConfigureDefault(w http.ResponseWriter, r *http.R
 	}
 
 	if payload.EnableOpenAMT {
-		err := handler.OpenAMTService.ConfigureDefault(payload.CertFileText, payload.CertPassword, payload.DomainName, payload.UseWirelessConfig, payload.WifiAuthenticationMethod, payload.WifiEncryptionMethod, payload.WifiSSID, payload.WifiPskPass)
+		wifiAuthenticationMethod, err := strconv.Atoi(payload.WifiAuthenticationMethod)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusBadRequest, "Invalid Wifi AuthenticationMethod value", err}
+		}
+		wifiEncryptionMethod, err := strconv.Atoi(payload.WifiEncryptionMethod)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusBadRequest, "Invalid Wifi EncryptionMethod value", err}
+		}
+		err = handler.OpenAMTService.ConfigureDefault(payload.CertFileText, payload.CertPassword, payload.DomainName, payload.UseWirelessConfig, wifiAuthenticationMethod, wifiEncryptionMethod, payload.WifiSSID, payload.WifiPskPass)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "error configuring OpenAMT server", err}
 		}

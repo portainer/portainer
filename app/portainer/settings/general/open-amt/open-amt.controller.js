@@ -45,8 +45,6 @@ class OpenAmtController {
     return this.$async(async () => {
       this.state.actionInProgress = true;
       try {
-        // eslint-disable-next-line no-debugger
-        debugger;
         this.formValues.certFileText = this.formValues.certFile ? await this.formValues.certFile.text() : null;
         await this.OpenAMTService.submit(this.formValues);
 

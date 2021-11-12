@@ -16,7 +16,7 @@ type (
 	}
 )
 
-func (service *Service) createOrUpdateDomain(token string, domainName, domainSuffix, provisioningCert, provisioningCertPassword string) (*Domain, error) {
+func (service *Service) createOrUpdateDomain(token string, domainName string, domainSuffix string, provisioningCert string, provisioningCertPassword string) (*Domain, error) {
 	domain, err := service.getDomain(token, domainName)
 	if err != nil {
 		return nil, err
@@ -53,13 +53,13 @@ func (service *Service) getDomain(token string, domainName string) (*Domain, err
 	return &result, nil
 }
 
-func (service *Service) saveDomain(method string, token string, domainName, domainSuffix, provisioningCert, provisioningCertPassword string) (*Domain, error) {
+func (service *Service) saveDomain(method string, token string, domainName string, domainSuffix string, provisioningCert string, provisioningCertPassword string) (*Domain, error) {
 	url := fmt.Sprintf("https://%v/rps/api/v1/admin/domains", MpsServerAddress)
 
 	profile := Domain{
 		DomainName:                    domainName,
 		DomainSuffix:                  domainSuffix,
-		ProvisioningCert:              " ", // TODO do we prompt user or use own certificate?
+		ProvisioningCert:              " ",          // TODO do we prompt user or use own certificate?
 		ProvisioningCertPassword:      "certPass!1", // TODO what do we use here?
 		ProvisioningCertStorageFormat: "string",
 	}
