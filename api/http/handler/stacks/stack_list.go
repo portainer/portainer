@@ -108,7 +108,7 @@ func filterStacks(stacks []portainer.Stack, filters *stackListOperationFilters, 
 		if stack.Type == portainer.DockerComposeStack && stack.EndpointID == portainer.EndpointID(filters.EndpointID) {
 			filteredStacks = append(filteredStacks, stack)
 		}
-		if stack.Type == portainer.DockerSwarmStack && (stack.SwarmID == filters.SwarmID || filters.SwarmID == "") {
+		if stack.Type == portainer.DockerSwarmStack && stack.SwarmID == filters.SwarmID {
 			filteredStacks = append(filteredStacks, stack)
 		}
 	}
