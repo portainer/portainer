@@ -22,7 +22,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		Router: mux.NewRouter(),
 	}
 	h.Handle("/open-amt",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.openAMTSubmit))).Methods(http.MethodPut)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.openAMTConfigureDefault))).Methods(http.MethodPost)
 
 	return h
 }

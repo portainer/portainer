@@ -10,7 +10,7 @@ function OpenAMTFactory($resource) {
     API_ENDPOINT_OPEN_AMT,
     {},
     {
-      submit: { method: 'PUT' },
+      submit: { method: 'POST' },
     }
   );
 }
