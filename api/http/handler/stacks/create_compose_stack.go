@@ -80,6 +80,7 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
 	}
+
 	if !isUnique {
 		stack, err := handler.DataStore.Stack().StackByName(payload.Name)
 		if err != nil {
