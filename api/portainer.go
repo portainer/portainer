@@ -1373,6 +1373,7 @@ type (
 	StackService interface {
 		Stack(ID StackID) (*Stack, error)
 		StackByName(name string) (*Stack, error)
+		StacksByName(name string) ([]Stack, error)
 		Stacks() ([]Stack, error)
 		CreateStack(stack *Stack) error
 		UpdateStack(ID StackID, stack *Stack) error
