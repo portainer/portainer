@@ -1,5 +1,6 @@
 import { Terminal } from 'xterm';
 import * as fit from 'xterm/lib/addons/fit/fit';
+import { agentInterceptor } from './portainer/services/axios';
 
 angular.module('portainer').config([
   '$urlRouterProvider',
@@ -32,22 +33,11 @@ angular.module('portainer').config([
     $httpProvider.defaults.headers.put['Content-Type'] = 'application/json';
     $httpProvider.defaults.headers.patch['Content-Type'] = 'application/json';
 
-    $httpProvider.interceptors.push([
-      'HttpRequestHelper',
-      function (HttpRequestHelper) {
-        return {
-          request: function (config) {
-            if (config.url.indexOf('/docker/') > -1) {
-              config.headers['X-PortainerAgent-Target'] = HttpRequestHelper.portainerAgentTargetHeader();
-              if (HttpRequestHelper.portainerAgentManagerOperation()) {
-                config.headers['X-PortainerAgent-ManagerOperation'] = '1';
-              }
-            }
-            return config;
-          },
-        };
-      },
-    ]);
+    $httpProvider.interceptors.push(function () {
+      return {
+        request: agentInterceptor,
+      };
+    });
 
     Terminal.applyAddon(fit);
 
