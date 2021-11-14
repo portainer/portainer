@@ -241,7 +241,7 @@ func updateSettingsFromFlags(dataStore portainer.DataStore, flags *portainer.CLI
 
 // enableFeaturesFromFlags turns on or off feature flags
 // e.g.  portainer --feat open-amt --feat fdo=true ... (defaults to true)
-// note, settins persisted to the DB.  To turn off --feat open-amt=false
+// note, settings are persisted to the DB. To turn off `--feat open-amt=false`
 func enableFeaturesFromFlags(dataStore portainer.DataStore, flags *portainer.CLIFlags) error {
 	settings, err := dataStore.Settings().Settings()
 	if err != nil {

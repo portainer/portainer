@@ -38,7 +38,7 @@ func (l *pairListBool) IsCumulative() bool {
 	return true
 }
 
-func boolPairs(s kingpin.Settings) (target *[]portainer.Pair) {
+func BoolPairs(s kingpin.Settings) (target *[]portainer.Pair) {
 	target = new([]portainer.Pair)
 	s.SetValue((*pairListBool)(target))
 	return
