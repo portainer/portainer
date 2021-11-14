@@ -1,17 +1,20 @@
 import _ from 'lodash-es';
+import { IAttributes, IDirective, IScope } from 'angular';
 
-import { STATES } from '@/portainer/feature-flags/enums';
+import { FeatureState } from '@/portainer/feature-flags/enums';
+
+import { selectShow } from './feature-flags.service';
 
 const BASENAME = 'limitedFeature';
 
 /* @ngInject */
-export function limitedFeatureDirective(featureService) {
+export function limitedFeatureDirective(): IDirective {
   return {
     restrict: 'A',
     link,
   };
 
-  function link(scope, elem, attrs) {
+  function link(scope: IScope, elem: JQLite, attrs: IAttributes) {
     const { limitedFeatureDir: featureId } = attrs;
 
     if (!featureId) {
@@ -22,14 +25,14 @@ export function limitedFeatureDirective(featureService) {
       .filter((attr) => attr.startsWith(BASENAME) && attr !== `${BASENAME}Dir`)
       .map((attr) => [_.kebabCase(attr.replace(BASENAME, '')), attrs[attr]]);
 
-    const state = featureService.selectShow(featureId);
+    const state = selectShow(featureId);
 
-    if (state === STATES.HIDDEN) {
+    if (state === FeatureState.HIDDEN) {
       elem.hide();
       return;
     }
 
-    if (state === STATES.VISIBLE) {
+    if (state === FeatureState.VISIBLE) {
       return;
     }
 

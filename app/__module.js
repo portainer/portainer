@@ -13,6 +13,11 @@ import './docker/__module';
 import './edge/__module';
 import './portainer/__module';
 
+import { init as initFeatureService } from './portainer/feature-flags/feature-flags.service';
+import { Edition } from './portainer/feature-flags/enums';
+
+initFeatureService(Edition.CE);
+
 angular.module('portainer', [
   'ui.bootstrap',
   'ui.router',

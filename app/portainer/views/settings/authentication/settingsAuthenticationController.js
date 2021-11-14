@@ -1,7 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 
-import { HIDE_INTERNAL_AUTH } from '@/portainer/feature-flags/feature-ids';
+import { FeatureId } from '@/portainer/feature-flags/enums';
 import { buildLdapSettingsModel, buildAdSettingsModel } from '@/portainer/settings/authentication/ldap/ldap-settings.model';
 
 angular.module('portainer.app').controller('SettingsAuthenticationController', SettingsAuthenticationController);
@@ -47,7 +47,7 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
   $scope.authOptions = [
     { id: 'auth_internal', icon: 'fa fa-users', label: 'Internal', description: 'Internal authentication mechanism', value: 1 },
     { id: 'auth_ldap', icon: 'fa fa-users', label: 'LDAP', description: 'LDAP authentication', value: 2 },
-    { id: 'auth_ad', icon: 'fab fa-microsoft', label: 'Microsoft Active Directory', description: 'AD authentication', value: 4, feature: HIDE_INTERNAL_AUTH },
+    { id: 'auth_ad', icon: 'fab fa-microsoft', label: 'Microsoft Active Directory', description: 'AD authentication', value: 4, feature: FeatureId.HIDE_INTERNAL_AUTH },
     { id: 'auth_oauth', icon: 'fa fa-users', label: 'OAuth', description: 'OAuth authentication', value: 3 },
   ];
 

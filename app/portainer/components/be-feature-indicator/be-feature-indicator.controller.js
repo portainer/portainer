@@ -1,9 +1,11 @@
+import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
+
 const BE_URL = 'https://www.portainer.io/business-upsell?from=';
 
 export default class BeIndicatorController {
   /* @ngInject */
-  constructor(featureService) {
-    Object.assign(this, { featureService });
+  constructor() {
+    Object.assign(this, {});
 
     this.limitedToBE = false;
   }
@@ -12,7 +14,7 @@ export default class BeIndicatorController {
     if (this.feature) {
       this.url = `${BE_URL}${this.feature}`;
 
-      this.limitedToBE = this.featureService.isLimitedToBE(this.feature);
+      this.limitedToBE = isLimitedToBE(this.feature);
     }
   }
 }
