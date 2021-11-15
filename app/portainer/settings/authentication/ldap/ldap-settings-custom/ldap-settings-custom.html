@@ -14,7 +14,7 @@
 <div class="form-group">
   <div class="col-sm-12 small text-muted">
     <p>
-      <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      <i class="fa fa-info-circle blue-icon m-r-2" aria-hidden="true"></i>
       You can configure multiple LDAP Servers for authentication fallback. Make sure all servers are using the same configuration (i.e. if TLS is enabled, they should all use the
       same certificates).
     </p>
@@ -22,12 +22,11 @@
 </div>
 
 <div class="form-group">
-  <label for="ldap_url" class="col-sm-3 col-lg-2 control-label text-left" style="display: flex; flex-wrap: wrap;">
+  <label for="ldap_url" class="col-sm-3 col-lg-2 control-label text-left dispay-flex flex-wrap">
     LDAP Server
     <button
       type="button"
-      class="label label-default interactive"
-      style="border: 0;"
+      class="label label-default interactive no-border"
       ng-click="$ctrl.addLDAPUrl()"
       limited-feature-dir="{{ $ctrl.limitedFeatureId }}"
       limited-feature-disabled
@@ -37,7 +36,7 @@
     </button>
   </label>
   <div class="col-sm-9 col-lg-10">
-    <div ng-repeat="url in $ctrl.settings.URLs track by $index" style="display: flex; margin-bottom: 10px;">
+    <div class="m-b-10 dispay-flex" ng-repeat="url in $ctrl.settings.URLs track by $index">
       <input type="text" class="form-control" id="ldap_url" ng-model="$ctrl.settings.URLs[$index]" placeholder="e.g. 10.0.0.10:389 or myldap.domain.tld:389" required />
       <button ng-if="$index > 0" class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removeLDAPUrl($index)">
         <i class="fa fa-trash" aria-hidden="true"></i>
@@ -103,20 +102,20 @@
 ></ldap-connectivity-check>
 
 <ldap-custom-user-search
-  style="margin-top: 5px;"
+  class="m-r-5"
   settings="$ctrl.settings.SearchSettings"
   on-search-click="($ctrl.onSearchUsersClick)"
   limited-feature-id="$ctrl.limitedFeatureId"
 ></ldap-custom-user-search>
 <ldap-custom-group-search
-  style="margin-top: 5px;"
+  class="m-r-5"
   settings="$ctrl.settings.GroupSearchSettings"
   on-search-click="($ctrl.onSearchGroupsClick)"
   limited-feature-id="$ctrl.limitedFeatureId"
 ></ldap-custom-group-search>
 
 <ldap-custom-admin-group
-  style="margin-top: 5px;"
+  class="m-r-5"
   settings="$ctrl.settings"
   on-search-click="($ctrl.onSearchAdminGroupsClick)"
   selected-admin-groups="$ctrl.selectedAdminGroups"
