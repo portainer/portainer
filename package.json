@@ -106,6 +106,7 @@
     "parse-duration": "^1.0.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-tooltip": "^4.2.21",
     "source-map-loader": "^1.1.2",
     "spinkit": "^2.0.1",
     "splitargs": "github:deviantony/splitargs#semver:~0.2.0",
