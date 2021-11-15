@@ -548,6 +548,7 @@ type (
 		DefaultTeamID        TeamID `json:"DefaultTeamID"`
 		SSO                  bool   `json:"SSO"`
 		LogoutURI            string `json:"LogoutURI"`
+		KubeSecretKey        []byte `json:"KubeSecretKey"`
 	}
 
 	// Pair defines a key/value string pair
