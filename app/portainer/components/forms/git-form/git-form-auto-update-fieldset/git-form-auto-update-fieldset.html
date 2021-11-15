@@ -1,7 +1,7 @@
 <ng-form name="autoUpdateForm">
   <div class="form-group">
     <div class="col-sm-12">
-      <por-switch-field name="autoUpdate" ng-model="$ctrl.model.RepositoryAutomaticUpdates" label="Automatic Updates" on-change="($ctrl.onChangeAutoUpdate)"></por-switch-field>
+      <por-switch-field name="'autoUpdate'" checked="$ctrl.model.RepositoryAutomaticUpdates" label="'Automatic Updates'" on-change="($ctrl.onChangeAutoUpdate)"></por-switch-field>
     </div>
   </div>
   <div class="small text-warning" style="margin: 5px 0 10px 0;" ng-if="$ctrl.model.RepositoryAutomaticUpdates">
@@ -59,7 +59,13 @@
   </div>
   <div class="form-group" ng-if="$ctrl.model.RepositoryAutomaticUpdates">
     <div class="col-sm-12">
-      <por-switch-field name="forceUpdate" feature="$ctrl.limitedFeature" ng-model="$ctrl.model.RepositoryAutomaticUpdatesForce" label="Force Redeployment"></por-switch-field>
+      <por-switch-field
+        name="'forceUpdate'"
+        feature-id="$ctrl.limitedFeature"
+        checked="$ctrl.model.RepositoryAutomaticUpdatesForce"
+        label="'Force Redeployment'"
+        on-change="($ctrl.onChangeAutoUpdateForce)"
+      ></por-switch-field>
     </div>
   </div>
   <div class="small text-warning" style="margin: 5px 0 10px 0;" ng-if="$ctrl.model.RepositoryAutomaticUpdates">

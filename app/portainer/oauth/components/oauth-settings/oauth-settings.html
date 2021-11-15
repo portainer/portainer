@@ -7,11 +7,11 @@
   <div class="form-group">
     <div class="col-sm-12">
       <por-switch-field
-        label="Use SSO"
-        tooltip="When using SSO the OAuth provider is not forced to prompt for credentials."
-        name="use-sso"
-        ng-model="$ctrl.settings.SSO"
-        on-change="$ctrl.updateSSO()"
+        label="'Use SSO'"
+        tooltip="'When using SSO the OAuth provider is not forced to prompt for credentials.'"
+        name="'use-sso'"
+        checked="$ctrl.settings.SSO"
+        on-change="($ctrl.updateSSO)"
       ></por-switch-field>
     </div>
   </div>
@@ -21,10 +21,11 @@
   <div class="form-group" ng-if="$ctrl.settings.SSO">
     <div class="col-sm-12">
       <por-switch-field
-        label="Hide internal authentication prompt"
-        name="hide-internal-auth"
-        feature="$ctrl.limitedFeature"
-        ng-model="$ctrl.settings.HideInternalAuth"
+        label="'Hide internal authentication prompt'"
+        name="'hide-internal-auth'"
+        feature-id="$ctrl.limitedFeature"
+        checked="$ctrl.settings.HideInternalAuth"
+        on-change="($ctrl.onChangeHideInternalAuth)"
       ></por-switch-field>
     </div>
   </div>
@@ -93,7 +94,13 @@
   </div>
   <div class="form-group">
     <div class="col-sm-12">
-      <por-switch-field label="Automatic team membership" name="tls" feature="$ctrl.limitedFeature" ng-model="$ctrl.settings.OAuthAutoMapTeamMemberships"></por-switch-field>
+      <por-switch-field
+        label="'Automatic team membership'"
+        name="'tls'"
+        feature="$ctrl.limitedFeature"
+        checked="$ctrl.settings.OAuthAutoMapTeamMemberships"
+        on-change="($ctrl.onToggleAutoTeamMembership)"
+      ></por-switch-field>
     </div>
   </div>
 

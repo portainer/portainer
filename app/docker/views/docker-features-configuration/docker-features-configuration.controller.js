@@ -2,8 +2,9 @@ import { FeatureId } from '@/portainer/feature-flags/enums';
 
 export default class DockerFeaturesConfigurationController {
   /* @ngInject */
-  constructor($async, EndpointService, Notifications, StateManager) {
+  constructor($async, $scope, EndpointService, Notifications, StateManager) {
     this.$async = $async;
+    this.$scope = $scope;
     this.EndpointService = EndpointService;
     this.Notifications = Notifications;
     this.StateManager = StateManager;
@@ -26,9 +27,45 @@ export default class DockerFeaturesConfigurationController {
 
     this.state = {
       actionInProgress: false,
+      autoUpdateSettings: { Enabled: false },
+      timeZone: '',
     };
 
     this.save = this.save.bind(this);
+    this.onChangeField = this.onChangeField.bind(this);
+    this.onToggleAutoUpdate = this.onToggleAutoUpdate.bind(this);
+    this.onChangeEnableHostManagementFeatures = this.onChangeField('enableHostManagementFeatures');
+    this.onChangeAllowVolumeBrowserForRegularUsers = this.onChangeField('allowVolumeBrowserForRegularUsers');
+    this.onChangeDisableBindMountsForRegularUsers = this.onChangeField('disableBindMountsForRegularUsers');
+    this.onChangeDisablePrivilegedModeForRegularUsers = this.onChangeField('disablePrivilegedModeForRegularUsers');
+    this.onChangeDisableHostNamespaceForRegularUsers = this.onChangeField('disableHostNamespaceForRegularUsers');
+    this.onChangeDisableStackManagementForRegularUsers = this.onChangeField('disableStackManagementForRegularUsers');
+    this.onChangeDisableDeviceMappingForRegularUsers = this.onChangeField('disableDeviceMappingForRegularUsers');
+    this.onChangeDisableContainerCapabilitiesForRegularUsers = this.onChangeField('disableContainerCapabilitiesForRegularUsers');
+    this.onChangeDisableSysctlSettingForRegularUsers = this.onChangeField('disableSysctlSettingForRegularUsers');
+  }
+
+  onToggleAutoUpdate(value) {
+    return this.$scope.$evalAsync(() => {
+      this.state.autoUpdateSettings.Enabled = value;
+    });
+  }
+
+  onChange(values) {
+    return this.$scope.$evalAsync(() => {
+      this.formValues = {
+        ...this.formValues,
+        ...values,
+      };
+    });
+  }
+
+  onChangeField(field) {
+    return (value) => {
+      this.onChange({
+        [field]: value,
+      });
+    };
   }
 
   isContainerEditDisabled() {

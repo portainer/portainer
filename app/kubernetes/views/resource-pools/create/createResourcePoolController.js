@@ -17,10 +17,11 @@ import { FeatureId } from '@/portainer/feature-flags/enums';
 class KubernetesCreateResourcePoolController {
   /* #region  CONSTRUCTOR */
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesNodeService, KubernetesResourcePoolService, KubernetesIngressService, Authentication, EndpointService) {
+  constructor($async, $state, $scope, Notifications, KubernetesNodeService, KubernetesResourcePoolService, KubernetesIngressService, Authentication, EndpointService) {
     Object.assign(this, {
       $async,
       $state,
+      $scope,
       Notifications,
       KubernetesNodeService,
       KubernetesResourcePoolService,
@@ -31,9 +32,23 @@ class KubernetesCreateResourcePoolController {
 
     this.IngressClassTypes = KubernetesIngressClassTypes;
     this.LBQuotaFeatureId = FeatureId.K8S_RESOURCE_POOL_LB_QUOTA;
-    this.StorageQuotaFeatureId = FeatureId.K8S_RESOURCE_POOL_STORAGE_QUOTA;
+
+    this.onToggleStorageQuota = this.onToggleStorageQuota.bind(this);
+    this.onToggleLoadBalancerQuota = this.onToggleLoadBalancerQuota.bind(this);
   }
   /* #endregion */
+
+  onToggleStorageQuota(storageClassName, enabled) {
+    this.$scope.$evalAsync(() => {
+      this.formValues.StorageClasses = this.formValues.StorageClasses.map((sClass) => (sClass.Name !== storageClassName ? sClass : { ...sClass, Selected: enabled }));
+    });
+  }
+
+  onToggleLoadBalancerQuota(enabled) {
+    this.$scope.$evalAsync(() => {
+      this.formValues.UseLoadBalancersQuota = enabled;
+    });
+  }
 
   onChangeIngressHostname() {
     const state = this.state.duplicates.ingressHosts;

@@ -163,11 +163,12 @@
             <div class="form-group">
               <div class="col-sm-12">
                 <por-switch-field
-                  ng-data-cy="k8sNamespaceCreate-loadBalancerQuotaToggle"
-                  label="Load Balancer quota"
-                  name="k8s-resourcepool-Ibquota"
-                  feature="$ctrl.LBQuotaFeatureId"
-                  ng-model="lbquota"
+                  data-cy="'k8sNamespaceCreate-loadBalancerQuotaToggle'"
+                  label="'Load Balancer quota'"
+                  name="'k8s-resourcepool-Ibquota'"
+                  feature-id="$ctrl.LBQuotaFeatureId"
+                  checked="$ctrl.formValues.UseLoadBalancersQuota"
+                  on-change="($ctrl.onToggleLoadBalancerQuota)"
                 ></por-switch-field>
               </div>
             </div>
@@ -189,17 +190,9 @@
               <i class="fa fa-route" aria-hidden="true" style="margin-right: 2px;"></i>
               standard
             </div>
-            <div class="form-group">
-              <div class="col-sm-12">
-                <por-switch-field
-                  ng-data-cy="k8sNamespaceCreate-enableQuotaToggle"
-                  label="Enable quota"
-                  name="k8s-resourcepool-storagequota"
-                  feature="$ctrl.StorageQuotaFeatureId"
-                  ng-model="storagequota"
-                ></por-switch-field>
-              </div>
-            </div>
+
+            <storage-class-switch value="sc.Selected" name="sc.Name" on-change="(ctrl.onToggleStorageQuota)" authorization="K8sResourcePoolDetailsW"></storage-class-switch>
+
             <!-- #endregion -->
 
             <div ng-if="$ctrl.state.canUseIngress">
@@ -435,6 +428,56 @@
             </div>
             <!-- #endregion -->
 
+            <<<<<<< HEAD =======
+            <div ng-if="$ctrl.formValues.StorageClasses.length">
+              <div class="col-sm-12 form-section-title">
+                Storage
+              </div>
+              <div class="form-group">
+                <div class="col-sm-12 small text-muted">
+                  <p>
+                    <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Quotas can be set on each storage option to prevent users from exceeding a specific threshold when deploying applications. You can set a quota to 0 to
+                    effectively prevent the usage of a specific storage option inside this namespace.
+                  </p>
+                </div>
+              </div>
+
+              <div ng-repeat-start="sc in $ctrl.formValues.StorageClasses track by sc.Name">
+                <div class="form-section-title text-muted col-sm-12" style="width: 100%;">
+                  <div style="border-bottom: 1px solid #cdcdcd; padding-bottom: 5px;">
+                    <i class="fa fa-route" aria-hidden="true" style="margin-right: 2px;"></i> {{ sc.Name }}
+                  </div>
+                </div>
+                <storage-class-switch on-change="($ctrl.onToggleStorageQuota)" value="sc.Selected" name="sc.Name"></storage-class-switch>
+              </div>
+
+              <div ng-repeat-end ng-if="sc.Selected">
+                <div class="form-group">
+                  <label class="control-label text-left col-sm-2">
+                    Maximum usage
+                  </label>
+                  <div class="col-sm-8">
+                    <input type="number" class="form-control" name="storage_class_size_{{ $index }}" ng-model="sc.Size" placeholder="20" min="0" ng-min="0" required />
+                  </div>
+                  <div class="col-sm-2">
+                    <select class="form-control" ng-model="sc.SizeUnit" ng-options="unit for unit in $ctrl.state.availableSizeUnits"></select>
+                  </div>
+                </div>
+
+                <div class="form-group" ng-show="resourcePoolCreationForm['storage_class_size_' + $index].$invalid">
+                  <div class="col-sm-12 small text-warning">
+                    <div ng-messages="resourcePoolCreationForm['storage_class_size_' + $index].$error">
+                      <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Size is required.</p>
+                      <p ng-message="number"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Invalid number.</p>
+                      <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This value must be greater than zero.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            >>>>>>> fd9d41ecc... feat(app): create switch react component
             <!-- summary -->
             <kubernetes-summary-view ng-if="resourcePoolCreationForm.$valid && !$ctrl.isCreateButtonDisabled()" form-values="$ctrl.formValues"></kubernetes-summary-view>
             <!-- !summary -->

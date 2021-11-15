@@ -74,6 +74,12 @@ angular.module('portainer.app').controller('SettingsController', [
       backupFormType: $scope.BACKUP_FORM_TYPES.FILE,
     };
 
+    $scope.onToggleAutoBackups = function onToggleAutoBackups(checked) {
+      $scope.$evalAsync(() => {
+        $scope.formValues.scheduleAutomaticBackups = checked;
+      });
+    };
+
     $scope.onBackupOptionsChange = function (type, limited) {
       $scope.formValues.backupFormType = type;
       $scope.state.featureLimited = limited;
