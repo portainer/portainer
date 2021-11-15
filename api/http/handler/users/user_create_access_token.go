@@ -38,6 +38,7 @@ type accessTokenResponse struct {
 // @security jwt
 // @accept json
 // @produce json
+// @param id path int true "User identifier"
 // @param body body userAccessTokenCreatePayload true "details"
 // @success 201 {object} accessTokenResponse "Created"
 // @failure 400 "Invalid request"

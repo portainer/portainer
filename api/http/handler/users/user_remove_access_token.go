@@ -21,6 +21,8 @@ import (
 // @tags users
 // @security jwt
 // @security ApiKeyAuth
+// @param id path int true "User identifier"
+// @param keyID path int true "Api Key identifier"
 // @success 204 "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
