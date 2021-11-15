@@ -66,11 +66,13 @@ func Test_userGetAccessTokens(t *testing.T) {
 		is.NoError(err, "response should be list json")
 
 		is.Len(resp, 1)
-		is.Nil(resp[0].Digest)
-		is.Equal(apiKey.ID, resp[0].ID)
-		is.Equal(apiKey.UserID, resp[0].UserID)
-		is.Equal(apiKey.Prefix, resp[0].Prefix)
-		is.Equal(apiKey.Description, resp[0].Description)
+		if len(resp) == 1 {
+			is.Nil(resp[0].Digest)
+			is.Equal(apiKey.ID, resp[0].ID)
+			is.Equal(apiKey.UserID, resp[0].UserID)
+			is.Equal(apiKey.Prefix, resp[0].Prefix)
+			is.Equal(apiKey.Description, resp[0].Description)
+		}
 	})
 
 	t.Run("admin can retrieve standard user API Key", func(t *testing.T) {
