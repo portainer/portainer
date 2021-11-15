@@ -69,6 +69,8 @@ function createEventDetails(event) {
             details = 'Exec instance created';
           } else if (event.Action.indexOf('exec_start') === 0) {
             details = 'Exec instance started';
+          } else if (event.Action.indexOf('exec_die') === 0) {
+            details = 'Exec instance exited  ';
           } else {
             details = 'Unsupported event';
           }
