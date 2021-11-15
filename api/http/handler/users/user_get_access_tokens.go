@@ -21,6 +21,7 @@ import (
 // @security jwt
 // @security ApiKeyAuth
 // @produce json
+// @param id path int true "User identifier"
 // @success 200 {array} portainer.APIKey "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
