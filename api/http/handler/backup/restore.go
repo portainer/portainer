@@ -12,9 +12,9 @@ import (
 )
 
 type restorePayload struct {
-	FileContent []byte
-	FileName    string
-	Password    string
+	FileContent []byte `json:"file"`
+	FileName    string `json:"filename"`
+	Password    string `json:"password,omitempty"`
 }
 
 // @id Restore
