@@ -39,7 +39,7 @@ type accessTokenResponse struct {
 // @accept json
 // @produce json
 // @param body body userAccessTokenCreatePayload true "details"
-// @success 200 {object} accessTokenResponse "Success"
+// @success 201 {object} accessTokenResponse "Created"
 // @failure 400 "Invalid request"
 // @failure 401 "Unauthorized"
 // @failure 403 "Permission denied"
@@ -82,5 +82,6 @@ func (handler *Handler) userCreateAccessToken(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusInternalServerError, "Internal Server Error", err}
 	}
 
+	w.WriteHeader(http.StatusCreated)
 	return response.JSON(w, accessTokenResponse{rawAPIKey, *apiKey})
 }
