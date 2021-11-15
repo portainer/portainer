@@ -1,5 +1,6 @@
 import moment from 'moment';
 import _ from 'lodash-es';
+import { NEW_LINE_BREAKER } from '@/constants';
 
 angular.module('portainer.docker').controller('LogViewerController', [
   'clipboard',
@@ -48,9 +49,8 @@ angular.module('portainer.docker').controller('LogViewerController', [
     };
 
     this.downloadLogs = function () {
-      const newlineBreaker = navigator.userAgent.indexOf('Windows NT') > -1 ? '\r\n' : '\n';
-      // The original decoded logs have a CR in the beginning of each lines except for the first line. Just replace once.
-      const data = new Blob([_.reduce(this.state.filteredLogs, (acc, log) => acc + log.line.replace(/^\r/, newlineBreaker), '')]);
+      // To make the feature of downloading container logs working both on Windows and Linux, we need to use correct new line breakers on corresponding OS.
+      const data = new Blob([_.reduce(this.state.filteredLogs, (acc, log) => acc + log.line + NEW_LINE_BREAKER, '')]);
       FileSaver.saveAs(data, this.resourceName + '_logs.txt');
     };
   },
