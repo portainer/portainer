@@ -35,9 +35,6 @@ func Test_deleteUserRemovesAccessTokens(t *testing.T) {
 	h := NewHandler(requestBouncer, rateLimiter, apiKeyService)
 	h.DataStore = store
 
-	// generate standard and admin user tokens
-	// jwt, _ := jwtService.GenerateToken(&portainer.TokenData{ID: user.ID, Username: user.Username, Role: user.Role})
-
 	t.Run("standard user deletion removes all associated access tokens", func(t *testing.T) {
 		_, _, err := apiKeyService.GenerateApiKey(*user, "test-user-token")
 		is.NoError(err)
@@ -47,13 +44,13 @@ func Test_deleteUserRemovesAccessTokens(t *testing.T) {
 		is.Len(keys, 1)
 
 		rr := httptest.NewRecorder()
-		h.deleteUser(httptest.NewRecorder(), user)
 
-		is.Equal(http.StatusOK, rr.Code)
+		h.deleteUser(rr, user)
+
+		is.Equal(http.StatusNoContent, rr.Code)
 
 		keys, err = apiKeyService.GetAPIKeys(user.ID)
 		is.NoError(err)
 		is.Equal(0, len(keys))
 	})
-
 }
