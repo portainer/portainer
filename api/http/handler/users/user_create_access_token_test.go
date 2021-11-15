@@ -58,7 +58,7 @@ func Test_userCreateAccessToken(t *testing.T) {
 		rr := httptest.NewRecorder()
 		h.ServeHTTP(rr, req)
 
-		is.Equal(http.StatusOK, rr.Code)
+		is.Equal(http.StatusCreated, rr.Code)
 
 		body, err := io.ReadAll(rr.Body)
 		is.NoError(err, "ReadAll should not return error")
