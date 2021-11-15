@@ -90,7 +90,7 @@ class StackRedeployGitFormController {
       try {
         const confirmed = await this.ModalService.confirmAsync({
           title: 'Are you sure?',
-          message: 'Any changes to this stack made locally in Portainer will be overridden by the definition in git and may cause a service interruption. Do you wish to continue',
+          message: 'Any changes to this stack or application made locally in Portainer will be overridden, which may cause service interruption.',
           buttons: {
             confirm: {
               label: 'Update',
