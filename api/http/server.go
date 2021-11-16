@@ -205,7 +205,10 @@ func (server *Server) Start() error {
 	var sslHandler = sslhandler.NewHandler(requestBouncer)
 	sslHandler.SSLService = server.SSLService
 
-	var openAMTHandler = openamthandler.NewHandler(requestBouncer)
+	openAMTHandler, err := openamthandler.NewHandler(requestBouncer, server.DataStore)
+	if err != nil {
+		return err
+	}
 	openAMTHandler.OpenAMTService = server.OpenAMTService
 
 	var stackHandler = stacks.NewHandler(requestBouncer)
