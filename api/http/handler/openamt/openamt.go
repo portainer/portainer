@@ -40,7 +40,7 @@ func (payload *openAMTConfigureDefaultPayload) Validate(r *http.Request) error {
 			return errors.New("domain name must be provided")
 		}
 		if payload.CertFileText == "" {
-			//return errors.New("certificate file must be provided") TODO
+			return errors.New("certificate file must be provided")
 		}
 		if payload.CertPassword == "" {
 			return errors.New("certificate password must be provided")
