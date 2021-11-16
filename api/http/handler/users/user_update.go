@@ -15,8 +15,8 @@ import (
 )
 
 type userUpdatePayload struct {
-	Username string `validate:"required" example:"bob"`
-	Password string `validate:"required" example:"cg9Wgky3"`
+	Username  string `validate:"required" example:"bob"`
+	Password  string `validate:"required" example:"cg9Wgky3"`
 	UserTheme string `example:"dark"`
 	// User role (1 for administrator account and 2 for regular account)
 	Role int `validate:"required" enums:"1,2" example:"2"`
@@ -38,6 +38,7 @@ func (payload *userUpdatePayload) Validate(r *http.Request) error {
 // @description Update user details. A regular user account can only update his details.
 // @description **Access policy**: authenticated
 // @tags users
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json

@@ -25,6 +25,7 @@ func (payload *registryAccessPayload) Validate(r *http.Request) error {
 // @summary update registry access for environment
 // @description **Access policy**: authenticated
 // @tags endpoints
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json

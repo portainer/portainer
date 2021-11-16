@@ -19,6 +19,7 @@ import (
 // @summary De-association an edge environment(endpoint)
 // @description De-association an edge environment(endpoint).
 // @description **Access policy**: administrator
+// @security ApiKeyAuth
 // @security jwt
 // @tags endpoints
 // @produce json

@@ -18,8 +18,8 @@ import (
 // @description Only the calling user or admin can retrieve api-keys.
 // @description **Access policy**: authenticated
 // @tags users
-// @security jwt
 // @security ApiKeyAuth
+// @security jwt
 // @produce json
 // @param id path int true "User identifier"
 // @success 200 {array} portainer.APIKey "Success"

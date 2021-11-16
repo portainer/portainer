@@ -16,6 +16,7 @@ type webhookListOperationFilters struct {
 
 // @summary List webhooks
 // @description **Access policy**: authenticated
+// @security ApiKeyAuth
 // @security jwt
 // @tags webhooks
 // @accept json
