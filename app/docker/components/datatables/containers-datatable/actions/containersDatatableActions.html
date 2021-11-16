@@ -8,7 +8,7 @@
       type="button"
       class="btn btn-sm btn-success"
       ng-click="$ctrl.startAction($ctrl.selectedItems)"
-      ng-disabled="$ctrl.selectedItemCount === 0 || $ctrl.noStoppedItemsSelected"
+      ng-disabled="$ctrl.selectedItemCount === 0 || $ctrl.noStoppedItemsSelected || $ctrl.portainerItselfSelected"
     >
       <i class="fa fa-play space-right" aria-hidden="true"></i>Start
     </button>
@@ -17,7 +17,7 @@
       type="button"
       class="btn btn-sm btn-danger"
       ng-click="$ctrl.stopAction($ctrl.selectedItems)"
-      ng-disabled="$ctrl.selectedItemCount === 0 || $ctrl.noRunningItemsSelected"
+      ng-disabled="$ctrl.selectedItemCount === 0 || $ctrl.noRunningItemsSelected || $ctrl.portainerItselfSelected"
     >
       <i class="fa fa-stop space-right" aria-hidden="true"></i>Stop
     </button>
@@ -35,7 +35,7 @@
       type="button"
       class="btn btn-sm btn-primary"
       ng-click="$ctrl.restartAction($ctrl.selectedItems)"
-      ng-disabled="$ctrl.selectedItemCount === 0"
+      ng-disabled="$ctrl.selectedItemCount === 0 || $ctrl.portainerItselfSelected"
     >
       <i class="fa fa-sync space-right" aria-hidden="true"></i>Restart
     </button>
@@ -44,7 +44,7 @@
       type="button"
       class="btn btn-sm btn-primary"
       ng-click="$ctrl.pauseAction($ctrl.selectedItems)"
-      ng-disabled="$ctrl.selectedItemCount === 0 || $ctrl.noRunningItemsSelected"
+      ng-disabled="$ctrl.selectedItemCount === 0 || $ctrl.noRunningItemsSelected || $ctrl.portainerItselfSelected"
     >
       <i class="fa fa-pause space-right" aria-hidden="true"></i>Pause
     </button>
@@ -53,7 +53,7 @@
       type="button"
       class="btn btn-sm btn-primary"
       ng-click="$ctrl.resumeAction($ctrl.selectedItems)"
-      ng-disabled="$ctrl.selectedItemCount === 0 || $ctrl.noPausedItemsSelected"
+      ng-disabled="$ctrl.selectedItemCount === 0 || $ctrl.noPausedItemsSelected || $ctrl.portainerItselfSelected"
     >
       <i class="fa fa-play space-right" aria-hidden="true"></i>Resume
     </button>
@@ -61,7 +61,7 @@
       authorization="DockerContainerDelete"
       type="button"
       class="btn btn-sm btn-danger"
-      ng-disabled="$ctrl.selectedItemCount === 0"
+      ng-disabled="$ctrl.selectedItemCount === 0 || $ctrl.portainerItselfSelected"
       ng-click="$ctrl.removeAction($ctrl.selectedItems)"
     >
       <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove

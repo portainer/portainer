@@ -33,6 +33,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
   'PluginService',
   'HttpRequestHelper',
   'endpoint',
+  'DockerHelper',
   function (
     $q,
     $scope,
@@ -58,7 +59,8 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     SystemService,
     PluginService,
     HttpRequestHelper,
-    endpoint
+    endpoint,
+    DockerHelper
   ) {
     $scope.create = create;
     $scope.endpoint = endpoint;
@@ -634,6 +636,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
             $scope.formValues.AccessControlData.AccessControlEnabled = false;
           }
           $scope.fromContainer = fromContainer;
+          $scope.state.portainerItselfSelected = DockerHelper.shortenContainerId(fromContainer.Id) === $scope.currentPortainerId;
           $scope.state.mode = 'duplicate';
           $scope.config = ContainerHelper.configFromContainer(fromContainer.Model);
           loadFromContainerCmd(d);

@@ -1,11 +1,13 @@
 import _ from 'lodash-es';
 
 angular.module('portainer.docker').controller('ContainersDatatableController', [
+  '$rootScope',
   '$scope',
   '$controller',
   'DatatableService',
   'EndpointProvider',
-  function ($scope, $controller, DatatableService, EndpointProvider) {
+  'DockerHelper',
+  function ($rootScope, $scope, $controller, DatatableService, EndpointProvider, DockerHelper) {
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
 
     var ctrl = this;
@@ -90,6 +92,7 @@ angular.module('portainer.docker').controller('ContainersDatatableController', [
       this.state.noStoppedItemsSelected = true;
       this.state.noRunningItemsSelected = true;
       this.state.noPausedItemsSelected = true;
+      this.state.portainerItselfSelected = false;
 
       for (var i = 0; i < this.dataset.length; i++) {
         var item = this.dataset[i];
@@ -106,6 +109,10 @@ angular.module('portainer.docker').controller('ContainersDatatableController', [
         this.state.noStoppedItemsSelected = false;
       } else if (['running', 'healthy', 'unhealthy', 'starting'].indexOf(item.Status) !== -1) {
         this.state.noRunningItemsSelected = false;
+      }
+      // cannot get currentPortainerId from $scope. Don't known why, get data from $rootScope directly as a workaround.
+      if (DockerHelper.shortenContainerId(item.Id) === $rootScope.currentPortainerId) {
+        this.state.portainerItselfSelected = true;
       }
     };
 

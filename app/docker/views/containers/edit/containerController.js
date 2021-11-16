@@ -22,6 +22,7 @@ angular.module('portainer.docker').controller('ContainerController', [
   'HttpRequestHelper',
   'Authentication',
   'endpoint',
+  'DockerHelper',
   function (
     $q,
     $scope,
@@ -41,7 +42,8 @@ angular.module('portainer.docker').controller('ContainerController', [
     ImageService,
     HttpRequestHelper,
     Authentication,
-    endpoint
+    endpoint,
+    DockerHelper
   ) {
     $scope.endpoint = endpoint;
     $scope.isAdmin = Authentication.isAdmin();
@@ -79,6 +81,7 @@ angular.module('portainer.docker').controller('ContainerController', [
           $scope.container = container;
           $scope.container.edit = false;
           $scope.container.newContainerName = $filter('trimcontainername')(container.Name);
+          $scope.state.portainerItselfSelected = DockerHelper.shortenContainerId(container.Id) === $scope.currentPortainerId;
 
           if (container.State.Running) {
             $scope.activityTime = moment.duration(moment(container.State.StartedAt).utc().diff(moment().utc())).humanize();

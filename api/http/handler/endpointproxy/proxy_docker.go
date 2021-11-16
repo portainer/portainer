@@ -6,6 +6,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	"os"
 	"strconv"
 	"strings"
 
@@ -52,9 +53,15 @@ func (handler *Handler) proxyRequestsToDockerAPI(w http.ResponseWriter, r *http.
 
 	id := strconv.Itoa(endpointID)
 
-	prefix := "/" + id + "/agent/docker";
+	prefix := "/" + id + "/agent/docker"
 	if !strings.HasPrefix(r.URL.Path, prefix) {
-		prefix = "/" + id + "/docker";
+		prefix = "/" + id + "/docker"
+	}
+
+	// use hostname as the current  portainer id
+	hostname, err := os.Hostname()
+	if err == nil {
+		w.Header().Add("X-Portainer-ID", hostname)
 	}
 
 	http.StripPrefix(prefix, proxy).ServeHTTP(w, r)
