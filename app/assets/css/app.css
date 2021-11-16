@@ -600,7 +600,7 @@ a[ng-click] {
   padding-top: 7px;
 }
 
-.tag {
+.tag:not(.token) {
   padding: 2px 6px;
   color: white;
   background-color: var(--blue-2);
