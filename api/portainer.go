@@ -40,6 +40,34 @@ type (
 		AuthenticationKey string `json:"AuthenticationKey" example:"cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk="`
 	}
 
+	// OpenAMTConfiguration represents the credentials and configurations used to connect to an OpenAMT MPS server
+	OpenAMTConfiguration struct {
+		MPSURL                string
+		Credentials           MPSCredentials
+		DomainConfiguration   DomainConfiguration
+		WirelessConfiguration WirelessConfiguration
+	}
+
+	MPSCredentials struct {
+		MPSUser     string
+		MPSPassword string
+		MPSToken    string // retrieved from API
+	}
+
+	DomainConfiguration struct {
+		CertFileText string
+		CertPassword string
+		DomainName   string
+	}
+
+	WirelessConfiguration struct {
+		UseWirelessConfig    bool
+		AuthenticationMethod string
+		EncryptionMethod     string
+		SSID                 string
+		PskPass              string
+	}
+
 	// CLIFlags represents the available flags on the CLI
 	CLIFlags struct {
 		Addr                      *string
@@ -1259,7 +1287,7 @@ type (
 
 	// OpenAMTService represents a service for managing OpenAMT
 	OpenAMTService interface {
-		ConfigureDefault(certFileText string, certPassword string, domainSuffix string, useWirelessConfig bool, wifiAuthenticationMethod int, wifiEncryptionMethod int, wifiSSID string, wifiPskPass string) error
+		ConfigureDefault(configuration OpenAMTConfiguration) error
 	}
 
 	// HelmUserRepositoryService represents a service to manage HelmUserRepositories

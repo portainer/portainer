@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	portainer "github.com/portainer/portainer/api"
 )
 
 type (
@@ -25,8 +27,8 @@ type (
 	}
 )
 
-func (service *Service) createOrUpdateAMTProfile(token string, profileName string, ciraConfigName string, wirelessConfig string) (*Profile, error) {
-	profile, err := service.getAMTProfile(token, profileName)
+func (service *Service) createOrUpdateAMTProfile(configuration portainer.OpenAMTConfiguration, profileName string, ciraConfigName string, wirelessConfig string) (*Profile, error) {
+	profile, err := service.getAMTProfile(configuration, profileName)
 	if err != nil {
 		return nil, err
 	}
@@ -36,17 +38,17 @@ func (service *Service) createOrUpdateAMTProfile(token string, profileName strin
 		method = http.MethodPatch
 	}
 
-	profile, err = service.saveAMTProfile(method, token, profileName, ciraConfigName, wirelessConfig)
+	profile, err = service.saveAMTProfile(method, configuration, profileName, ciraConfigName, wirelessConfig)
 	if err != nil {
 		return nil, err
 	}
 	return profile, nil
 }
 
-func (service *Service) getAMTProfile(token string, profileName string) (*Profile, error) {
-	url := fmt.Sprintf("https://%v/rps/api/v1/admin/profiles/%v", MpsServerAddress, profileName)
+func (service *Service) getAMTProfile(configuration portainer.OpenAMTConfiguration, profileName string) (*Profile, error) {
+	url := fmt.Sprintf("https://%v/rps/api/v1/admin/profiles/%v", configuration.MPSURL, profileName)
 
-	responseBody, err := service.executeGetRequest(url, token)
+	responseBody, err := service.executeGetRequest(url, configuration.Credentials.MPSToken)
 	if err != nil {
 		return nil, err
 	}
@@ -62,8 +64,8 @@ func (service *Service) getAMTProfile(token string, profileName string) (*Profil
 	return &result, nil
 }
 
-func (service *Service) saveAMTProfile(method string, token string, profileName string, ciraConfigName string, wirelessConfig string) (*Profile, error) {
-	url := fmt.Sprintf("https://%v/rps/api/v1/admin/profiles", MpsServerAddress)
+func (service *Service) saveAMTProfile(method string, configuration portainer.OpenAMTConfiguration, profileName string, ciraConfigName string, wirelessConfig string) (*Profile, error) {
+	url := fmt.Sprintf("https://%v/rps/api/v1/admin/profiles", configuration.MPSURL)
 
 	profile := Profile{
 		ProfileName:                profileName,
@@ -84,7 +86,7 @@ func (service *Service) saveAMTProfile(method string, token string, profileName 
 	}
 	payload, _ := json.Marshal(profile)
 
-	responseBody, err := service.executeSaveRequest(method, url, token, payload)
+	responseBody, err := service.executeSaveRequest(method, url, configuration.Credentials.MPSToken, payload)
 	if err != nil {
 		return nil, err
 	}

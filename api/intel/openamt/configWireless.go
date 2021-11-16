@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
+
+	portainer "github.com/portainer/portainer/api"
 )
 
 type (
@@ -16,8 +19,8 @@ type (
 	}
 )
 
-func (service *Service) createOrUpdateWirelessConfig(token string, configName string, authenticationMethod int, encryptionMethod int, ssid string, pskPass string) (*WirelessProfile, error) {
-	wirelessConfig, err := service.getWirelessConfig(token, configName)
+func (service *Service) createOrUpdateWirelessConfig(configuration portainer.OpenAMTConfiguration, wirelessConfigName string) (*WirelessProfile, error) {
+	wirelessConfig, err := service.getWirelessConfig(configuration, wirelessConfigName)
 	if err != nil {
 		return nil, err
 	}
@@ -27,17 +30,17 @@ func (service *Service) createOrUpdateWirelessConfig(token string, configName st
 		method = http.MethodPatch
 	}
 
-	wirelessConfig, err = service.saveWirelessConfig(method, token, configName, authenticationMethod, encryptionMethod, ssid, pskPass)
+	wirelessConfig, err = service.saveWirelessConfig(method, configuration, wirelessConfigName)
 	if err != nil {
 		return nil, err
 	}
 	return wirelessConfig, nil
 }
 
-func (service *Service) getWirelessConfig(token string, configName string) (*WirelessProfile, error) {
-	url := fmt.Sprintf("https://%v/rps/api/v1/admin/wirelessconfigs/%v", MpsServerAddress, configName)
+func (service *Service) getWirelessConfig(configuration portainer.OpenAMTConfiguration, configName string) (*WirelessProfile, error) {
+	url := fmt.Sprintf("https://%v/rps/api/v1/admin/wirelessconfigs/%v", configuration.MPSURL, configName)
 
-	responseBody, err := service.executeGetRequest(url, token)
+	responseBody, err := service.executeGetRequest(url, configuration.Credentials.MPSToken)
 	if err != nil {
 		return nil, err
 	}
@@ -53,19 +56,28 @@ func (service *Service) getWirelessConfig(token string, configName string) (*Wir
 	return &result, nil
 }
 
-func (service *Service) saveWirelessConfig(method string, token string, configName string, authenticationMethod int, encryptionMethod int, ssid string, pskPassphrase string) (*WirelessProfile, error) {
-	url := fmt.Sprintf("https://%v/rps/api/v1/admin/wirelessconfigs", MpsServerAddress)
+func (service *Service) saveWirelessConfig(method string, configuration portainer.OpenAMTConfiguration, configName string) (*WirelessProfile, error) {
+	parsedAuthenticationMethod, err := strconv.Atoi(configuration.WirelessConfiguration.AuthenticationMethod)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing wireless authentication method: %v", err.Error())
+	}
+	parsedEncryptionMethod, err := strconv.Atoi(configuration.WirelessConfiguration.EncryptionMethod)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing wireless encryption method: %v", err.Error())
+	}
+
+	url := fmt.Sprintf("https://%v/rps/api/v1/admin/wirelessconfigs", configuration.MPSURL)
 
 	config := WirelessProfile{
 		ProfileName:          configName,
-		AuthenticationMethod: authenticationMethod,
-		EncryptionMethod:     encryptionMethod,
-		SSID:                 ssid,
-		PSKPassphrase:        pskPassphrase,
+		AuthenticationMethod: parsedAuthenticationMethod,
+		EncryptionMethod:     parsedEncryptionMethod,
+		SSID:                 configuration.WirelessConfiguration.SSID,
+		PSKPassphrase:        configuration.WirelessConfiguration.PskPass,
 	}
 	payload, _ := json.Marshal(config)
 
-	responseBody, err := service.executeSaveRequest(method, url, token, payload)
+	responseBody, err := service.executeSaveRequest(method, url, configuration.Credentials.MPSToken, payload)
 	if err != nil {
 		return nil, err
 	}
