@@ -8,6 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
+	"github.com/sirupsen/logrus"
 )
 
 type openAMTConfigureDefaultPayload struct {
@@ -70,23 +71,29 @@ func (handler *Handler) openAMTConfigureDefault(w http.ResponseWriter, r *http.R
 	var payload openAMTConfigureDefaultPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
+		logrus.WithError(err).Error("Invalid request payload")
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
 	if payload.EnableOpenAMT {
 		wifiAuthenticationMethod, err := strconv.Atoi(payload.WifiAuthenticationMethod)
 		if err != nil {
+			logrus.WithError(err).Error("Invalid Wifi AuthenticationMethod value")
 			return &httperror.HandlerError{http.StatusBadRequest, "Invalid Wifi AuthenticationMethod value", err}
 		}
 		wifiEncryptionMethod, err := strconv.Atoi(payload.WifiEncryptionMethod)
 		if err != nil {
+			logrus.WithError(err).Error("Invalid Wifi EncryptionMethod value")
 			return &httperror.HandlerError{http.StatusBadRequest, "Invalid Wifi EncryptionMethod value", err}
 		}
 		err = handler.OpenAMTService.ConfigureDefault(payload.CertFileText, payload.CertPassword, payload.DomainName, payload.UseWirelessConfig, wifiAuthenticationMethod, wifiEncryptionMethod, payload.WifiSSID, payload.WifiPskPass)
 		if err != nil {
+			logrus.WithError(err).Error("error configuring OpenAMT server")
 			return &httperror.HandlerError{http.StatusInternalServerError, "error configuring OpenAMT server", err}
 		}
 	}
+
+	logrus.WithError(err).Error("no OpenAMT response")
 
 	return response.Empty(w)
 }
