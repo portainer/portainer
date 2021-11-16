@@ -17,12 +17,20 @@ type Handler struct {
 }
 
 // NewHandler returns a new Handler
-func NewHandler(bouncer *security.RequestBouncer) *Handler {
+func NewHandler(bouncer *security.RequestBouncer, dataStore portainer.DataStore) (*Handler, error) {
 	h := &Handler{
 		Router: mux.NewRouter(),
 	}
-	h.Handle("/open-amt",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.openAMTConfigureDefault))).Methods(http.MethodPost)
 
-	return h
+	settings, err := dataStore.Settings().Settings()
+	if err != nil {
+		return nil, err
+	}
+
+	featureEnabled, _ := settings.FeatureFlagSettings[portainer.FeatOpenAMT]
+	if featureEnabled {
+		h.Handle("/open-amt", bouncer.AdminAccess(httperror.LoggerHandler(h.openAMTConfigureDefault))).Methods(http.MethodPost)
+	}
+
+	return h, nil
 }
