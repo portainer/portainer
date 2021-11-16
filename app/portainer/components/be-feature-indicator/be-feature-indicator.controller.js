@@ -5,8 +5,6 @@ const BE_URL = 'https://www.portainer.io/business-upsell?from=';
 export default class BeIndicatorController {
   /* @ngInject */
   constructor() {
-    Object.assign(this, {});
-
     this.limitedToBE = false;
   }
 
