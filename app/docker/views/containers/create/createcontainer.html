@@ -714,7 +714,7 @@
                 </div>
                 <!-- memory-reservation-input -->
                 <div class="form-group">
-                  <label for="memory-reservation" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
+                  <label for="memory-reservation" class="col-sm-3 col-lg-2 control-label text-left mt-20">
                     Memory reservation
                   </label>
                   <div class="col-sm-3">
@@ -724,7 +724,7 @@
                     <input type="number" min="0" class="form-control" ng-model="formValues.MemoryReservation" id="memory-reservation" />
                   </div>
                   <div class="col-sm-4">
-                    <p class="small text-muted" style="margin-top: 7px;">
+                    <p class="small text-muted mt-7">
                       Memory soft limit (<b>MB</b>)
                     </p>
                   </div>
@@ -732,7 +732,7 @@
                 <!-- !memory-reservation-input -->
                 <!-- memory-limit-input -->
                 <div class="form-group">
-                  <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
+                  <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left mt-20">
                     Memory limit
                   </label>
                   <div class="col-sm-3">
@@ -742,7 +742,7 @@
                     <input type="number" min="0" class="form-control" ng-model="formValues.MemoryLimit" id="memory-limit" />
                   </div>
                   <div class="col-sm-4">
-                    <p class="small text-muted" style="margin-top: 7px;">
+                    <p class="small text-muted mt-7">
                       Memory limit (<b>MB</b>)
                     </p>
                   </div>
@@ -750,13 +750,13 @@
                 <!-- !memory-limit-input -->
                 <!-- cpu-limit-input -->
                 <div class="form-group">
-                  <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
+                  <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left mt-20">
                     CPU limit
                   </label>
                   <div class="col-sm-5">
                     <slider model="formValues.CpuLimit" floor="0" ceil="state.sliderMaxCpu" step="0.25" precision="2" ng-if="state.sliderMaxCpu"></slider>
                   </div>
-                  <div class="col-sm-4" style="margin-top: 20px;">
+                  <div class="col-sm-4 mt-20">
                     <p class="small text-muted">
                       Maximum CPU usage
                     </p>
