@@ -1,6 +1,8 @@
 import { Meta } from '@storybook/react';
 import { useState } from 'react';
 
+import { TextInput, Select } from '../Input';
+
 import { FormControl } from './FormControl';
 
 export default {
@@ -17,13 +19,7 @@ export function TextField({ label, tooltip = '' }: TextFieldProps) {
   const inputId = 'input';
   return (
     <FormControl inputId={inputId} label={label} tooltip={tooltip}>
-      <input
-        id={inputId}
-        type="text"
-        className="form-control"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-      />
+      <TextInput id={inputId} type="text" value={value} onChange={setValue} />
     </FormControl>
   );
 }
@@ -33,29 +29,26 @@ TextField.args = {
   tooltip: '',
 };
 
-export function Select({ label, tooltip = '' }: TextFieldProps) {
+export function SelectField({ label, tooltip = '' }: TextFieldProps) {
   const options = [
     { value: 1, label: 'one' },
     { value: 2, label: 'two' },
   ];
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState(0);
   const inputId = 'input';
   return (
     <FormControl inputId={inputId} label={label} tooltip={tooltip}>
-      <select
+      <Select
         className="form-control"
         value={value}
-        onChange={(e) => setValue(e.target.value)}
-      >
-        {options.map((item) => (
-          <option value={item.value}>{item.label}</option>
-        ))}
-      </select>
+        onChange={(value) => setValue(value)}
+        options={options}
+      />
     </FormControl>
   );
 }
 
-Select.args = {
+SelectField.args = {
   label: 'select',
   tooltip: '',
 };
