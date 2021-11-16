@@ -3,7 +3,7 @@
     <rd-widget>
       <rd-widget-header icon="fa-laptop" title-text="Intel OpenAMT"></rd-widget-header>
       <rd-widget-body>
-        <form class="form-horizontal" name="$ctrl.openAMTForm">
+        <form class="form-horizontal" name="openAMTForm">
           <por-switch-field ng-model="$ctrl.formValues.enableOpenAMT" label="Enable edge OpenAMT"></por-switch-field>
           <span class="small">
             <p class="text-muted" style="margin-top: 10px;">
@@ -14,6 +14,88 @@
 
           <div ng-show="$ctrl.formValues.enableOpenAMT">
             <hr />
+
+            <div class="form-group">
+              <label for="mps_url" class="col-sm-3 control-label text-left">
+                MPS URL
+              </label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" ng-model="$ctrl.formValues.mpsURL" id="mps_url" name="mps_url" placeholder="Enter the MPS URL" required />
+              </div>
+            </div>
+            <div class="form-group col-md-12" ng-show="openAMTForm.mps_url.$invalid">
+              <div class="small text-warning">
+                <div ng-messages="openAMTForm.mps_url.$error">
+                  <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="mps_user" class="col-sm-3 control-label text-left">
+                MPS User
+              </label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" ng-model="$ctrl.formValues.mpsUser" id="mps_user" name="mps_user" placeholder="Enter the MPS User" required />
+              </div>
+            </div>
+            <div class="form-group col-md-12" ng-show="openAMTForm.mps_user.$invalid">
+              <div class="small text-warning">
+                <div ng-messages="openAMTForm.mps_user.$error">
+                  <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="mps_user" class="col-sm-3 control-label text-left">
+                MPS Password
+              </label>
+              <div class="col-sm-8">
+                <input
+                  type="password"
+                  class="form-control"
+                  ng-model="$ctrl.formValues.mpsPassword"
+                  id="mps_password"
+                  name="mps_password"
+                  placeholder="Enter the MPS Password"
+                  required
+                />
+              </div>
+            </div>
+            <div class="form-group col-md-12" ng-show="openAMTForm.mps_password.$invalid">
+              <div class="small text-warning">
+                <div ng-messages="openAMTForm.mps_password.$error">
+                  <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
+              </div>
+            </div>
+
+            <hr />
+
+            <div class="form-group">
+              <label for="domain_name" class="col-sm-3 control-label text-left">
+                Domain Name
+              </label>
+              <div class="col-sm-8">
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="$ctrl.formValues.domainName"
+                  id="domain_name"
+                  name="domain_name"
+                  placeholder="Enter the FQDN that is associated with the provisioning certificate (i.e amtdomain.com)"
+                  required
+                />
+              </div>
+            </div>
+            <div class="form-group col-md-12" ng-show="openAMTForm.domain_name.$invalid">
+              <div class="small text-warning">
+                <div ng-messages="openAMTForm.domain_name.$error">
+                  <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
+              </div>
+            </div>
 
             <div class="form-group">
               <span class="col-sm-12">
@@ -31,9 +113,9 @@
                 </span>
               </div>
             </div>
-            <div class="form-group col-md-12" ng-show="$ctrl.openAMTForm.certFile.$invalid">
+            <div class="form-group col-md-12" ng-show="openAMTForm.certFile.$invalid">
               <div class="small text-warning">
-                <div ng-messages="$ctrl.openAMTForm.certFile.$error">
+                <div ng-messages="openAMTForm.certFile.$error">
                   <p ng-message="pattern"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> File type is invalid.</p>
                 </div>
               </div>
@@ -44,25 +126,26 @@
                 Provisioning Certificate Password
               </label>
               <div class="col-sm-8">
-                <input type="password" class="form-control" ng-model="$ctrl.formValues.certPassword" id="certificate_password" placeholder="*****" required />
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="domain_name" class="col-sm-3 control-label text-left">
-                Domain Name
-              </label>
-              <div class="col-sm-8">
                 <input
-                  type="text"
+                  type="password"
                   class="form-control"
-                  ng-model="$ctrl.formValues.domainName"
-                  id="domain_name"
-                  placeholder="Enter the FQDN that is associated with the provisioning certificate (i.e amtdomain.com)"
+                  ng-model="$ctrl.formValues.certPassword"
+                  id="certificate_password"
+                  name="certificate_password"
+                  placeholder="**********"
                   required
                 />
               </div>
             </div>
+            <div class="form-group col-md-12" ng-show="openAMTForm.certificate_password.$invalid">
+              <div class="small text-warning">
+                <div ng-messages="openAMTForm.certificate_password.$error">
+                  <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
+              </div>
+            </div>
+
+            <hr />
 
             <div class="form-group">
               <div class="col-sm-12">
@@ -75,7 +158,7 @@
                   Authentication Method
                 </label>
                 <div class="col-sm-8">
-                  <select class="form-control" ng-model="$ctrl.formValues.wifiAuthenticationMethod" required>
+                  <select class="form-control" ng-model="$ctrl.formValues.wifiAuthenticationMethod">
                     <option value="4">WPA PSK</option>
                     <option value="6">WPA2 PSK</option>
                   </select>
@@ -86,7 +169,7 @@
                   Encryption Method
                 </label>
                 <div class="col-sm-8">
-                  <select class="form-control" ng-model="$ctrl.formValues.wifiEncryptionMethod" id="wifi_encrypt_method" required>
+                  <select class="form-control" ng-model="$ctrl.formValues.wifiEncryptionMethod" id="wifi_encrypt_method">
                     <option value="3">TKIP</option>
                     <option value="4">CCMP</option>
                   </select>
@@ -97,7 +180,14 @@
                   SSID
                 </label>
                 <div class="col-sm-8">
-                  <input type="text" class="form-control" ng-model="$ctrl.formValues.wifiSsid" id="wifi_ssid" placeholder="SSIID" required />
+                  <input
+                    type="text"
+                    class="form-control"
+                    ng-model="$ctrl.formValues.wifiSsid"
+                    id="wifi_ssid"
+                    placeholder="SSIID"
+                    ng-required="$ctrl.formValues.useWirelessConfig"
+                  />
                 </div>
               </div>
               <div class="form-group">
@@ -105,7 +195,14 @@
                   PSK Passphrase
                 </label>
                 <div class="col-sm-8">
-                  <input type="password" class="form-control" ng-model="$ctrl.formValues.wifiPskPass" id="wifi_pass" placeholder="******" required />
+                  <input
+                    type="password"
+                    class="form-control"
+                    ng-model="$ctrl.formValues.wifiPskPass"
+                    id="wifi_pass"
+                    placeholder="******"
+                    ng-required="$ctrl.formValues.useWirelessConfig"
+                  />
                 </div>
               </div>
             </div>
@@ -117,7 +214,7 @@
               <button
                 type="button"
                 class="btn btn-primary btn-sm"
-                ng-disabled="$ctrl.state.actionInProgress || !$ctrl.isFormChanged()"
+                ng-disabled="$ctrl.state.actionInProgress || !$ctrl.isFormChanged() || !openAMTForm.$valid || !$ctrl.formValues.certFile"
                 ng-click="$ctrl.save()"
                 button-spinner="$ctrl.state.actionInProgress"
               >

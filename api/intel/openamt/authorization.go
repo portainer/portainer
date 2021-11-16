@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	portainer "github.com/portainer/portainer/api"
 	"io/ioutil"
 	"net/http"
 )
@@ -12,12 +13,12 @@ type authenticationResponse struct {
 	Token string `json:"token"`
 }
 
-func (service *Service) executeAuthenticationRequest() (*authenticationResponse, error) {
-	loginURL := fmt.Sprintf("https://%v/mps/login/api/v1/authorize", MpsServerAddress)
+func (service *Service) executeAuthenticationRequest(configuration portainer.OpenAMTConfiguration) (*authenticationResponse, error) {
+	loginURL := fmt.Sprintf("https://%v/mps/login/api/v1/authorize", configuration.MPSURL)
 
 	payload := map[string]string{
-		"username": MpsServerAdminUser,
-		"password": "mypassword", // TODO prompt/autogenerate on deploy stack and save in datastore
+		"username": configuration.Credentials.MPSUser,
+		"password": configuration.Credentials.MPSPassword,
 	}
 	jsonValue, _ := json.Marshal(payload)
 

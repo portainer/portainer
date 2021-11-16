@@ -2,17 +2,19 @@ package openamt
 
 import (
 	"errors"
-	"net/http"
-	"strconv"
-
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/sirupsen/logrus"
+	"net/http"
 )
 
 type openAMTConfigureDefaultPayload struct {
 	EnableOpenAMT            bool
+	MPSURL                   string
+	MPSUser                  string
+	MPSPassword              string
 	CertFileText             string
 	CertPassword             string
 	DomainName               string
@@ -25,6 +27,15 @@ type openAMTConfigureDefaultPayload struct {
 
 func (payload *openAMTConfigureDefaultPayload) Validate(r *http.Request) error {
 	if payload.EnableOpenAMT {
+		if payload.MPSURL == "" {
+			return errors.New("MPS Url must be provided")
+		}
+		if payload.MPSUser == "" {
+			return errors.New("MPS User must be provided")
+		}
+		if payload.MPSPassword == "" {
+			return errors.New("MPS Password must be provided")
+		}
 		if payload.DomainName == "" {
 			return errors.New("domain name must be provided")
 		}
@@ -32,7 +43,7 @@ func (payload *openAMTConfigureDefaultPayload) Validate(r *http.Request) error {
 			//return errors.New("certificate file must be provided") TODO
 		}
 		if payload.CertPassword == "" {
-			//return errors.New("certificate password must be provided") TODO
+			return errors.New("certificate password must be provided")
 		}
 		if payload.UseWirelessConfig {
 			if payload.WifiAuthenticationMethod == "" {
@@ -72,28 +83,37 @@ func (handler *Handler) openAMTConfigureDefault(w http.ResponseWriter, r *http.R
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		logrus.WithError(err).Error("Invalid request payload")
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
 	}
 
 	if payload.EnableOpenAMT {
-		wifiAuthenticationMethod, err := strconv.Atoi(payload.WifiAuthenticationMethod)
-		if err != nil {
-			logrus.WithError(err).Error("Invalid Wifi AuthenticationMethod value")
-			return &httperror.HandlerError{http.StatusBadRequest, "Invalid Wifi AuthenticationMethod value", err}
+		configuration := portainer.OpenAMTConfiguration{
+			MPSURL: payload.MPSURL,
+			Credentials: portainer.MPSCredentials{
+				MPSUser:     payload.MPSUser,
+				MPSPassword: payload.MPSPassword,
+			},
+			DomainConfiguration: portainer.DomainConfiguration{
+				CertFileText: payload.CertFileText,
+				CertPassword: payload.CertPassword,
+				DomainName:   payload.DomainName,
+			},
+			WirelessConfiguration: portainer.WirelessConfiguration{
+				UseWirelessConfig:    payload.UseWirelessConfig,
+				AuthenticationMethod: payload.WifiAuthenticationMethod,
+				EncryptionMethod:     payload.WifiEncryptionMethod,
+				SSID:                 payload.WifiSSID,
+				PskPass:              payload.WifiPskPass,
+			},
 		}
-		wifiEncryptionMethod, err := strconv.Atoi(payload.WifiEncryptionMethod)
-		if err != nil {
-			logrus.WithError(err).Error("Invalid Wifi EncryptionMethod value")
-			return &httperror.HandlerError{http.StatusBadRequest, "Invalid Wifi EncryptionMethod value", err}
-		}
-		err = handler.OpenAMTService.ConfigureDefault(payload.CertFileText, payload.CertPassword, payload.DomainName, payload.UseWirelessConfig, wifiAuthenticationMethod, wifiEncryptionMethod, payload.WifiSSID, payload.WifiPskPass)
+
+		err = handler.OpenAMTService.ConfigureDefault(configuration)
 		if err != nil {
 			logrus.WithError(err).Error("error configuring OpenAMT server")
-			return &httperror.HandlerError{http.StatusInternalServerError, "error configuring OpenAMT server", err}
+			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "error configuring OpenAMT server", Err: err}
 		}
 	}
 
-	logrus.WithError(err).Error("no OpenAMT response")
-
+	logrus.Info("OpenAMT enabled")
 	return response.Empty(w)
 }

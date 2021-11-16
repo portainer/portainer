@@ -6,14 +6,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	portainer "github.com/portainer/portainer/api"
 	"io/ioutil"
 	"net/http"
 	"time"
 )
 
 const (
-	MpsServerAddress          = "127.0.0.1" // TODO: this is the same IP that must be used for the OpenAMT stack deployment, is this value right?
-	MpsServerAdminUser        = "admin"
 	DefaultCIRAConfigName     = "ciraConfigDefault"
 	DefaultWirelessConfigName = "wirelessProfileDefault"
 	DefaultProfileName        = "profileAMTDefault"
@@ -61,39 +60,36 @@ func parseError(responseBody []byte) error {
 	return nil
 }
 
-func (service *Service) ConfigureDefault(certFileText string, certPassword string, domainSuffix string, useWirelessConfig bool, wifiAuthenticationMethod int, wifiEncryptionMethod int, wifiSSID string, wifiPskPass string) error {
-	token, err := service.executeAuthenticationRequest()
+func (service *Service) ConfigureDefault(configuration portainer.OpenAMTConfiguration) error {
+	token, err := service.executeAuthenticationRequest(configuration)
 	if err != nil {
 		return err
 	}
+	configuration.Credentials.MPSToken = token.Token
 
-	ciraConfig, err := service.createOrUpdateCIRAConfig(token.Token, DefaultCIRAConfigName)
+	ciraConfig, err := service.createOrUpdateCIRAConfig(configuration, DefaultCIRAConfigName)
 	if err != nil {
 		return err
 	}
 
 	wirelessConfigName := ""
-	if useWirelessConfig {
-		wirlessConfig, err := service.createOrUpdateWirelessConfig(token.Token, DefaultWirelessConfigName, wifiAuthenticationMethod, wifiEncryptionMethod, wifiSSID, wifiPskPass)
+	if configuration.WirelessConfiguration.UseWirelessConfig {
+		wirelessConfig, err := service.createOrUpdateWirelessConfig(configuration, DefaultWirelessConfigName)
 		if err != nil {
 			return err
 		}
-		wirelessConfigName = wirlessConfig.ProfileName
+		wirelessConfigName = wirelessConfig.ProfileName
 	}
 
-	profile, err := service.createOrUpdateAMTProfile(token.Token, DefaultProfileName, ciraConfig.ConfigName, wirelessConfigName)
+	_, err = service.createOrUpdateAMTProfile(configuration, DefaultProfileName, ciraConfig.ConfigName, wirelessConfigName)
 	if err != nil {
 		return err
 	}
 
-	domain, err := service.createOrUpdateDomain(token.Token, DefaultDomainName, domainSuffix, certFileText, certPassword)
+	_, err = service.createOrUpdateDomain(configuration, DefaultDomainName)
 	if err != nil {
 		return err
 	}
-
-	fmt.Println(ciraConfig.ConfigName)
-	fmt.Println(profile.ProfileName)
-	fmt.Println(domain.DomainName)
 
 	return nil
 }
