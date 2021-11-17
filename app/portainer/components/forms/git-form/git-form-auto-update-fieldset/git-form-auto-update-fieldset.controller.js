@@ -1,4 +1,4 @@
-import { FORCE_REDEPLOYMENT } from '@/portainer/feature-flags/feature-ids';
+import { FeatureId } from '@/portainer/feature-flags/enums';
 
 class GitFormAutoUpdateFieldsetController {
   /* @ngInject */
@@ -8,7 +8,7 @@ class GitFormAutoUpdateFieldsetController {
     this.onChangeInterval = this.onChangeField('RepositoryFetchInterval');
     this.clipboard = clipboard;
 
-    this.limitedFeature = FORCE_REDEPLOYMENT;
+    this.limitedFeature = FeatureId.FORCE_REDEPLOYMENT;
   }
 
   copyWebhook() {

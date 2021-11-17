@@ -1,8 +1,8 @@
+import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
+
 export default class BoxSelectorItemController {
   /* @ngInject */
-  constructor(featureService) {
-    Object.assign(this, { featureService });
-
+  constructor() {
     this.limitedToBE = false;
   }
 
@@ -13,7 +13,7 @@ export default class BoxSelectorItemController {
 
   $onInit() {
     if (this.option.feature) {
-      this.limitedToBE = this.featureService.isLimitedToBE(this.option.feature);
+      this.limitedToBE = isLimitedToBE(this.option.feature);
     }
   }
 
