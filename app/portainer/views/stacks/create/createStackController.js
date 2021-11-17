@@ -197,6 +197,7 @@ angular
           RepositoryAuthentication: $scope.formValues.RepositoryAuthentication,
           RepositoryUsername: $scope.formValues.RepositoryUsername,
           RepositoryPassword: $scope.formValues.RepositoryPassword,
+          AutoUpdate: { Interval: '' },
         };
 
         getAutoUpdatesProperty(repositoryOptions);
