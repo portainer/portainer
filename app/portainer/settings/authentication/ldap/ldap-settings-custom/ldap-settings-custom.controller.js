@@ -1,8 +1,8 @@
-import { EXTERNAL_AUTH_LDAP } from '@/portainer/feature-flags/feature-ids';
+import { FeatureId } from '@/portainer/feature-flags/enums';
 
 export default class LdapSettingsCustomController {
   constructor() {
-    this.limitedFeatureId = EXTERNAL_AUTH_LDAP;
+    this.limitedFeatureId = FeatureId.EXTERNAL_AUTH_LDAP;
   }
 
   addLDAPUrl() {

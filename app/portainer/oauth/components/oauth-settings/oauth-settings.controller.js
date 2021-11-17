@@ -1,13 +1,12 @@
-import { HIDE_INTERNAL_AUTH } from '@/portainer/feature-flags/feature-ids';
+import { FeatureId } from '@/portainer/feature-flags/enums';
+import { isLimitedToBE } from '@/portainer/feature-flags/feature-flags.service';
 
 import providers, { getProviderByUrl } from './providers';
 
 export default class OAuthSettingsController {
   /* @ngInject */
-  constructor(featureService) {
-    this.featureService = featureService;
-
-    this.limitedFeature = HIDE_INTERNAL_AUTH;
+  constructor() {
+    this.limitedFeature = FeatureId.HIDE_INTERNAL_AUTH;
 
     this.state = {
       provider: 'custom',
@@ -73,7 +72,7 @@ export default class OAuthSettingsController {
   }
 
   $onInit() {
-    this.isLimitedToBE = this.featureService.isLimitedToBE(this.limitedFeature);
+    this.isLimitedToBE = isLimitedToBE(this.limitedFeature);
 
     if (this.isLimitedToBE) {
       return;
