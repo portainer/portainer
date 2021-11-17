@@ -43,7 +43,7 @@ jobs:
       run: yarn build:docs
 
     - name: Install swagger-cli
-      run: yarn add -D @apidevtools/swagger-cli
+      run: yarn global add @apidevtools/swagger-cli
 
     - name: Validate docs
       run: yarn validate:docs
