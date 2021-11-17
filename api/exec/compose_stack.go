@@ -182,6 +182,11 @@ func createNetworkEnvFile(stack *portainer.Stack) error {
 }
 
 func extractNetworkName(filePath string) (StringSet, error) {
+	if info, err := os.Stat(filePath); errors.Is(err,
+		os.ErrNotExist) || info.IsDir() {
+		return nil, nil
+	}
+
 	stackFileContent, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, err
