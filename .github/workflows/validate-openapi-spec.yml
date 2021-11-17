@@ -1,4 +1,4 @@
-name: Validate Openapi Spec
+name: Validate
 
 on:
   pull_request:
@@ -8,7 +8,7 @@ on:
       - 'release/*'
 
 jobs:
-  validate-openapi-spec:
+  openapi-spec:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Code
