@@ -64,18 +64,6 @@ angular
             controller: 'SidebarController',
           },
         },
-        resolve: {
-          featuresServiceInitialized: /* @ngInject */ function featuresServiceInitialized($async, featureService, Notifications) {
-            return $async(async () => {
-              try {
-                await featureService.init();
-              } catch (e) {
-                Notifications.error('Failed initializing features service', e);
-                throw e;
-              }
-            });
-          },
-        },
       };
 
       var endpointRoot = {

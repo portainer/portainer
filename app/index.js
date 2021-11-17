@@ -16,6 +16,11 @@ import './portainer/__module';
 import { onStartupAngular } from './app';
 import { configApp } from './config';
 
+import { init as initFeatureService } from './portainer/feature-flags/feature-flags.service';
+import { Edition } from './portainer/feature-flags/enums';
+
+initFeatureService(Edition.CE);
+
 angular
   .module('portainer', [
     'ui.bootstrap',

@@ -1,4 +1,4 @@
-import { HIDE_AUTO_UPDATE_WINDOW } from 'Portainer/feature-flags/feature-ids';
+import { FeatureId } from '@/portainer/feature-flags/enums';
 
 export default class DockerFeaturesConfigurationController {
   /* @ngInject */
@@ -8,7 +8,7 @@ export default class DockerFeaturesConfigurationController {
     this.Notifications = Notifications;
     this.StateManager = StateManager;
 
-    this.limitedFeature = HIDE_AUTO_UPDATE_WINDOW;
+    this.limitedFeature = FeatureId.HIDE_AUTO_UPDATE_WINDOW;
 
     this.formValues = {
       enableHostManagementFeatures: false,

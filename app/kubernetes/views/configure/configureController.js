@@ -6,8 +6,8 @@ import { KubernetesIngressClass } from 'Kubernetes/ingress/models';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import { KubernetesIngressClassTypes } from 'Kubernetes/ingress/constants';
 import KubernetesNamespaceHelper from 'Kubernetes/helpers/namespaceHelper';
-import { K8S_SETUP_DEFAULT } from '@/portainer/feature-flags/feature-ids';
-import { HIDE_AUTO_UPDATE_WINDOW } from 'Portainer/feature-flags/feature-ids';
+import { FeatureId } from '@/portainer/feature-flags/enums';
+
 class KubernetesConfigureController {
   /* #region  CONSTRUCTOR */
 
@@ -39,8 +39,8 @@ class KubernetesConfigureController {
 
     this.onInit = this.onInit.bind(this);
     this.configureAsync = this.configureAsync.bind(this);
-    this.limitedFeature = K8S_SETUP_DEFAULT;
-    this.limitedFeatureAutoWindow = HIDE_AUTO_UPDATE_WINDOW;
+    this.limitedFeature = FeatureId.K8S_SETUP_DEFAULT;
+    this.limitedFeatureAutoWindow = FeatureId.HIDE_AUTO_UPDATE_WINDOW;
   }
   /* #endregion */
 
