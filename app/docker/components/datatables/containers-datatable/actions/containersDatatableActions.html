@@ -26,7 +26,7 @@
       type="button"
       class="btn btn-sm btn-danger"
       ng-click="$ctrl.killAction($ctrl.selectedItems)"
-      ng-disabled="$ctrl.selectedItemCount === 0"
+      ng-disabled="$ctrl.selectedItemCount === 0 || $ctrl.portainerItselfSelected"
     >
       <i class="fa fa-bomb space-right" aria-hidden="true"></i>Kill
     </button>
