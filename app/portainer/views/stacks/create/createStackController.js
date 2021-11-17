@@ -159,6 +159,7 @@ angular
           RepositoryAuthentication: $scope.formValues.RepositoryAuthentication,
           RepositoryUsername: $scope.formValues.RepositoryUsername,
           RepositoryPassword: $scope.formValues.RepositoryPassword,
+          AutoUpdate: { Interval: '' },
         };
 
         getAutoUpdatesProperty(repositoryOptions);
@@ -169,7 +170,6 @@ angular
 
     function getAutoUpdatesProperty(repositoryOptions) {
       if ($scope.formValues.RepositoryAutomaticUpdates) {
-        repositoryOptions.AutoUpdate = {};
         if ($scope.formValues.RepositoryMechanism === RepositoryMechanismTypes.INTERVAL) {
           repositoryOptions.AutoUpdate.Interval = $scope.formValues.RepositoryFetchInterval;
         } else if ($scope.formValues.RepositoryMechanism === RepositoryMechanismTypes.WEBHOOK) {
