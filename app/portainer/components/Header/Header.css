@@ -18,9 +18,7 @@ body.hamburg .row.header .meta {
   font-size: 17px;
   padding-top: 11px;
 }
-.row.header .meta .breadcrumb-links {
-  font-size: 10px;
-}
+
 .row.header .meta div {
   white-space: nowrap;
   overflow: hidden;

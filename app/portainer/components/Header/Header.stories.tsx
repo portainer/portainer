@@ -5,6 +5,7 @@ import { UserContext } from '@/portainer/hooks/useUser';
 import { UserViewModel } from '@/portainer/models/user';
 
 import { Header } from './Header';
+import { Breadcrumbs } from './Breadcrumbs/Breadcrumbs';
 
 import { HeaderContent, HeaderTitle } from '.';
 
@@ -25,7 +26,10 @@ function Template({ title }: StoryProps) {
       <Header>
         <HeaderTitle title={title} />
         <HeaderContent>
-          <Link to="example">Container instances</Link> {'> Add container'}
+          <Breadcrumbs>
+            <Link to="example">Container instances</Link>
+            Add container
+          </Breadcrumbs>
         </HeaderContent>
       </Header>
     </UserContext.Provider>
