@@ -38,7 +38,7 @@ func Test_mwAuthenticateFirst(t *testing.T) {
 	store, teardown := bolt.MustNewTestStore(true)
 	defer teardown()
 
-	jwtService, err := jwt.NewService("1h", nil)
+	jwtService, err := jwt.NewService("1h", store)
 	assert.NoError(t, err, "failed to create a copy of service")
 
 	apiKeyService := apikey.NewAPIKeyService(nil, nil)
