@@ -1,26 +1,17 @@
 class OpenAmtController {
   /* @ngInject */
-  constructor($async, $state, OpenAMTService, Notifications) {
-    Object.assign(this, { $async, $state, OpenAMTService, Notifications });
+  constructor($async, $state, OpenAMTService, SettingsService, Notifications) {
+    Object.assign(this, { $async, $state, OpenAMTService, SettingsService, Notifications });
 
-    this.cert = null;
-    this.originalValues = {
-      enableOpenAMT: false,
-      certFile: null,
-      certPassword: '',
-      domainName: '',
-      useWirelessConfig: false,
-      wifiAuthenticationMethod: '4',
-      wifiEncryptionMethod: '3',
-      wifiSsid: '',
-      wifiPskPass: '',
-    };
-
+    this.originalValues = {};
     this.formValues = {
       enableOpenAMT: false,
+      mpsURL: '',
+      mpsUser: '',
+      mpsPassword: '',
+      domainName: '',
       certFile: null,
       certPassword: '',
-      domainName: '',
       useWirelessConfig: false,
       wifiAuthenticationMethod: '4',
       wifiEncryptionMethod: '3',
@@ -29,9 +20,7 @@ class OpenAmtController {
     };
 
     this.state = {
-      showForm: false,
       actionInProgress: false,
-      reloadingPage: false,
     };
 
     this.save = this.save.bind(this);
@@ -39,6 +28,10 @@ class OpenAmtController {
 
   isFormChanged() {
     return Object.entries(this.originalValues).some(([key, value]) => value !== this.formValues[key]);
+  }
+
+  isFormValid() {
+    return !this.formValues.enableOpenAMT || this.formValues.certFile != null;
   }
 
   async readFile() {
@@ -69,11 +62,38 @@ class OpenAmtController {
         await this.OpenAMTService.submit(this.formValues);
 
         await new Promise((resolve) => setTimeout(resolve, 2000));
-        this.Notifications.success('OpenAMT successfully updated');
+        this.Notifications.success(`OpenAMT successfully ${this.formValues.enableOpenAMT ? 'enabled' : 'disabled'}`);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Failed applying changes');
       }
       this.state.actionInProgress = false;
+    });
+  }
+
+  async $onInit() {
+    return this.$async(async () => {
+      try {
+        const data = await this.SettingsService.settings();
+        const config = data.OpenAMTConfiguration;
+
+        this.formValues = {
+          ...this.formValues,
+          enableOpenAMT: config.Enabled,
+          mpsURL: config.MPSURL,
+          mpsUser: config.Credentials.MPSUser,
+          domainName: config.DomainConfiguration.DomainName,
+          useWirelessConfig: config.WirelessConfiguration.UseWirelessConfig,
+          wifiAuthenticationMethod: config.WirelessConfiguration.AuthenticationMethod,
+          wifiEncryptionMethod: config.WirelessConfiguration.EncryptionMethod,
+          wifiSsid: config.WirelessConfiguration.SSID,
+        };
+
+        this.originalValues = {
+          ...this.formValues,
+        };
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Failed loading settings');
+      }
     });
   }
 }

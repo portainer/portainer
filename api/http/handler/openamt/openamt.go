@@ -77,7 +77,7 @@ func (payload *openAMTConfigureDefaultPayload) Validate(r *http.Request) error {
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied to access settings"
 // @failure 500 "Server error"
-// @router /open-amt [put]
+// @router /open-amt [post]
 func (handler *Handler) openAMTConfigureDefault(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload openAMTConfigureDefaultPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
@@ -87,33 +87,92 @@ func (handler *Handler) openAMTConfigureDefault(w http.ResponseWriter, r *http.R
 	}
 
 	if payload.EnableOpenAMT {
-		configuration := portainer.OpenAMTConfiguration{
-			MPSURL: payload.MPSURL,
-			Credentials: portainer.MPSCredentials{
-				MPSUser:     payload.MPSUser,
-				MPSPassword: payload.MPSPassword,
-			},
-			DomainConfiguration: portainer.DomainConfiguration{
-				CertFileText: payload.CertFileText,
-				CertPassword: payload.CertPassword,
-				DomainName:   payload.DomainName,
-			},
-			WirelessConfiguration: portainer.WirelessConfiguration{
-				UseWirelessConfig:    payload.UseWirelessConfig,
-				AuthenticationMethod: payload.WifiAuthenticationMethod,
-				EncryptionMethod:     payload.WifiEncryptionMethod,
-				SSID:                 payload.WifiSSID,
-				PskPass:              payload.WifiPskPass,
-			},
-		}
-
-		err = handler.OpenAMTService.ConfigureDefault(configuration)
+		err = handler.enableOpenAMT(payload)
 		if err != nil {
-			logrus.WithError(err).Error("error configuring OpenAMT server")
-			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "error configuring OpenAMT server", Err: err}
+			return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Error enabling OpenAMT", Err: err}
 		}
+		return response.Empty(w)
 	}
 
-	logrus.Info("OpenAMT enabled")
+	err = handler.disableOpenAMT()
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Error disabling OpenAMT", Err: err}
+	}
 	return response.Empty(w)
+}
+
+func (handler *Handler) enableOpenAMT(configurationPayload openAMTConfigureDefaultPayload) error {
+	configuration := portainer.OpenAMTConfiguration{
+		Enabled: true,
+		MPSURL:  configurationPayload.MPSURL,
+		Credentials: portainer.MPSCredentials{
+			MPSUser:     configurationPayload.MPSUser,
+			MPSPassword: configurationPayload.MPSPassword,
+		},
+		DomainConfiguration: portainer.DomainConfiguration{
+			CertFileText: configurationPayload.CertFileText,
+			CertPassword: configurationPayload.CertPassword,
+			DomainName:   configurationPayload.DomainName,
+		},
+		WirelessConfiguration: portainer.WirelessConfiguration{
+			UseWirelessConfig:    configurationPayload.UseWirelessConfig,
+			AuthenticationMethod: configurationPayload.WifiAuthenticationMethod,
+			EncryptionMethod:     configurationPayload.WifiEncryptionMethod,
+			SSID:                 configurationPayload.WifiSSID,
+			PskPass:              configurationPayload.WifiPskPass,
+		},
+	}
+
+	err := handler.OpenAMTService.ConfigureDefault(configuration)
+	if err != nil {
+		logrus.WithError(err).Error("error configuring OpenAMT server")
+		return err
+	}
+
+	err = handler.saveConfiguration(configuration)
+	if err != nil {
+		logrus.WithError(err).Error("error updating OpenAMT configurations")
+		return err
+	}
+
+	logrus.Info("OpenAMT successfully enabled")
+	return nil
+}
+
+func (handler *Handler) saveConfiguration(configuration portainer.OpenAMTConfiguration) error {
+	settings, err := handler.DataStore.Settings().Settings()
+	if err != nil {
+		return err
+	}
+
+	configuration.Credentials.MPSPassword = ""
+	configuration.Credentials.MPSToken = ""
+	configuration.DomainConfiguration.CertFileText = ""
+	configuration.DomainConfiguration.CertPassword = ""
+	configuration.WirelessConfiguration.PskPass = ""
+
+	settings.OpenAMTConfiguration = configuration
+	err = handler.DataStore.Settings().UpdateSettings(settings)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (handler *Handler) disableOpenAMT() error {
+	settings, err := handler.DataStore.Settings().Settings()
+	if err != nil {
+		return err
+	}
+
+	settings.OpenAMTConfiguration.Enabled = false
+
+	err = handler.DataStore.Settings().UpdateSettings(settings)
+	if err != nil {
+		return err
+	}
+
+	logrus.Info("OpenAMT successfully disabled")
+	return nil
 }
