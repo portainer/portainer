@@ -43,7 +43,13 @@ jobs:
       run: yarn build:docs
 
     - name: Install swagger-cli
-      run: yarn global add @apidevtools/swagger-cli
+      run: yarn global add swagger2openapi
 
-    - name: Validate docs
-      run: yarn validate:docs
+    # OpenAPI2.0 does not support multiple body params (which we utilise in some of our handlers).
+    # OAS3.0 however does support multiple body params - hence its best to convert the generated OAS 2.0
+    # to OAS 3.0 and validate the output of generated OAS 3.0 instead.
+    - name: Convert OpenAPI 2.0 spec to OpenAPI 3.0
+      run: swagger2openapi --warnOnly api/docs/swagger.yaml -o api/docs/openapi.yaml
+
+    - name: Validate generated OpenAPI 3.0 spec
+      run: swagger2openapi -y api/docs/openapi.yaml
