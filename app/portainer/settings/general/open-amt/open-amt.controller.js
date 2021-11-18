@@ -42,6 +42,7 @@ class OpenAmtController {
         fileReader.fileName = file.name;
         fileReader.onload = (e) => {
           const base64 = e.target.result;
+          // remove prefix of "data:application/x-pkcs12;base64," returned by "readAsDataURL()"
           const index = base64.indexOf('base64,');
           const cert = base64.substring(index + 7, base64.length);
           resolve(cert);
