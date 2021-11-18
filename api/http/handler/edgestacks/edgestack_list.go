@@ -11,6 +11,7 @@ import (
 // @summary Fetches the list of EdgeStacks
 // @description **Access policy**: administrator
 // @tags edge_stacks
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @success 200 {array} portainer.EdgeStack

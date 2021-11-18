@@ -15,6 +15,7 @@ import (
 // @description Use this environment(endpoint) to upload TLS files.
 // @description **Access policy**: administrator
 // @tags upload
+// @security ApiKeyAuth
 // @security jwt
 // @accept multipart/form-data
 // @produce json

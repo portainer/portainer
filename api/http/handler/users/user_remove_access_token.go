@@ -19,8 +19,8 @@ import (
 // @description Only the calling user or admin can remove api-key.
 // @description **Access policy**: authenticated
 // @tags users
-// @security jwt
 // @security ApiKeyAuth
+// @security jwt
 // @param id path int true "User identifier"
 // @param keyID path int true "Api Key identifier"
 // @success 204 "Success"

@@ -58,6 +58,7 @@ func (payload *resourceControlCreatePayload) Validate(r *http.Request) error {
 // @description Create a new resource control to restrict access to a Docker resource.
 // @description **Access policy**: administrator
 // @tags resource_controls
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json

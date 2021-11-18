@@ -19,6 +19,7 @@ type edgeJobInspectResponse struct {
 // @summary Inspect an EdgeJob
 // @description **Access policy**: administrator
 // @tags edge_jobs
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param id path string true "EdgeJob Id"

@@ -14,6 +14,7 @@ import (
 // @description
 // @description **Access policy**: authenticated
 // @tags helm
+// @security ApiKeyAuth
 // @security jwt
 // @param id path int true "Environment(Endpoint) identifier"
 // @param release path string true "The name of the release/application to uninstall"

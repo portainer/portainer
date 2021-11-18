@@ -16,6 +16,7 @@ import (
 // @description Snapshots an environment(endpoint)
 // @description **Access policy**: administrator
 // @tags endpoints
+// @security ApiKeyAuth
 // @security jwt
 // @param id path int true "Environment(Endpoint) identifier"
 // @success 204 "Success"

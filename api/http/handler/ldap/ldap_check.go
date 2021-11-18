@@ -22,6 +22,7 @@ func (payload *checkPayload) Validate(r *http.Request) error {
 // @description Test LDAP connectivity using LDAP details
 // @description **Access policy**: administrator
 // @tags ldap
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @param body body checkPayload true "details"

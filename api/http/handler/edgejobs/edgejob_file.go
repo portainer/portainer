@@ -18,6 +18,7 @@ type edgeJobFileResponse struct {
 // @summary Fetch a file of an EdgeJob
 // @description **Access policy**: administrator
 // @tags edge_jobs
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param id path string true "EdgeJob Id"
