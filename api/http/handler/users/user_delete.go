@@ -17,6 +17,7 @@ import (
 // @description Remove a user.
 // @description **Access policy**: administrator
 // @tags users
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param id path int true "User identifier"

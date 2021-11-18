@@ -18,6 +18,7 @@ import (
 // @description Remove a template.
 // @description **Access policy**: authenticated
 // @tags custom_templates
+// @security ApiKeyAuth
 // @security jwt
 // @param id path int true "Template identifier"
 // @success 204 "Success"

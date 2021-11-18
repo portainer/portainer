@@ -16,6 +16,7 @@ import (
 // @description Remove a team.
 // @description **Access policy**: administrator
 // @tags teams
+// @security ApiKeyAuth
 // @security jwt
 // @param id path string true "Team Id"
 // @success 204 "Success"

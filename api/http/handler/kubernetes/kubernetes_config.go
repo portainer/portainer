@@ -21,6 +21,7 @@ import (
 // @description Generates kubeconfig file enabling client communication with k8s api server
 // @description **Access policy**: authenticated
 // @tags kubernetes
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json

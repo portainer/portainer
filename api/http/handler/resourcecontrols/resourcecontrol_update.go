@@ -40,6 +40,7 @@ func (payload *resourceControlUpdatePayload) Validate(r *http.Request) error {
 // @description Update a resource control
 // @description **Access policy**: authenticated
 // @tags resource_controls
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json
