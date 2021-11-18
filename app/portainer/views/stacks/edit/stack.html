@@ -110,7 +110,7 @@
               </div>
               <!-- !associate -->
 
-              <stack-redeploy-git-form ng-if="stack.GitConfig" model="stack.GitConfig" stack="stack" authorization="PortainerStackUpdate"> </stack-redeploy-git-form>
+              <stack-redeploy-git-form ng-if="stack.GitConfig && stack.AutoUpdate" model="stack.GitConfig" stack="stack" authorization="PortainerStackUpdate"> </stack-redeploy-git-form>
               <stack-duplication-form
                 ng-if="regular && endpoints.length > 0"
                 endpoints="endpoints"
