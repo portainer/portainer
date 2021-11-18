@@ -21,7 +21,7 @@ type decoratedEdgeGroup struct {
 // @tags edge_groups
 // @security jwt
 // @produce json
-// @success 200 {array} portainer.EdgeGroup{HasEdgeStack=bool} "EdgeGroups"
+// @success 200 {array} decoratedEdgeGroup "EdgeGroups"
 // @failure 500
 // @failure 503 "Edge compute features are disabled"
 // @router /edge_groups [get]
