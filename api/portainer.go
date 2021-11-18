@@ -42,30 +42,31 @@ type (
 
 	// OpenAMTConfiguration represents the credentials and configurations used to connect to an OpenAMT MPS server
 	OpenAMTConfiguration struct {
-		MPSURL                string
-		Credentials           MPSCredentials
-		DomainConfiguration   DomainConfiguration
-		WirelessConfiguration WirelessConfiguration
+		Enabled               bool                  `json:"Enabled"`
+		MPSURL                string                `json:"MPSURL"`
+		Credentials           MPSCredentials        `json:"Credentials"`
+		DomainConfiguration   DomainConfiguration   `json:"DomainConfiguration"`
+		WirelessConfiguration WirelessConfiguration `json:"WirelessConfiguration"`
 	}
 
 	MPSCredentials struct {
-		MPSUser     string
-		MPSPassword string
-		MPSToken    string // retrieved from API
+		MPSUser     string `json:"MPSUser"`
+		MPSPassword string `json:"MPSPassword"`
+		MPSToken    string `json:"MPSToken"` // retrieved from API
 	}
 
 	DomainConfiguration struct {
-		CertFileText string
-		CertPassword string
-		DomainName   string
+		CertFileText string `json:"CertFileText"`
+		CertPassword string `json:"CertPassword"`
+		DomainName   string `json:"DomainName"`
 	}
 
 	WirelessConfiguration struct {
-		UseWirelessConfig    bool
-		AuthenticationMethod string
-		EncryptionMethod     string
-		SSID                 string
-		PskPass              string
+		UseWirelessConfig    bool   `json:"UseWirelessConfig"`
+		AuthenticationMethod string `json:"AuthenticationMethod"`
+		EncryptionMethod     string `json:"EncryptionMethod"`
+		SSID                 string `json:"SSID"`
+		PskPass              string `json:"PskPass"`
 	}
 
 	// CLIFlags represents the available flags on the CLI
@@ -736,6 +737,7 @@ type (
 		AuthenticationMethod AuthenticationMethod `json:"AuthenticationMethod" example:"1"`
 		LDAPSettings         LDAPSettings         `json:"LDAPSettings" example:""`
 		OAuthSettings        OAuthSettings        `json:"OAuthSettings" example:""`
+		OpenAMTConfiguration OpenAMTConfiguration `json:"OpenAMTConfiguration" example:""`
 		FeatureFlagSettings  map[Feature]bool     `json:"FeatureFlagSettings" example:""`
 		// The interval in which environment(endpoint) snapshots are created
 		SnapshotInterval string `json:"SnapshotInterval" example:"5m"`

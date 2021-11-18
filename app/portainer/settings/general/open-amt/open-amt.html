@@ -20,7 +20,15 @@
                 MPS URL
               </label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" ng-model="$ctrl.formValues.mpsURL" id="mps_url" name="mps_url" placeholder="Enter the MPS URL" required />
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="$ctrl.formValues.mpsURL"
+                  id="mps_url"
+                  name="mps_url"
+                  placeholder="Enter the MPS URL"
+                  ng-required="$ctrl.formValues.enableOpenAMT"
+                />
               </div>
             </div>
             <div class="form-group col-md-12" ng-show="openAMTForm.mps_url.$invalid">
@@ -36,7 +44,15 @@
                 MPS User
               </label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" ng-model="$ctrl.formValues.mpsUser" id="mps_user" name="mps_user" placeholder="Enter the MPS User" required />
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="$ctrl.formValues.mpsUser"
+                  id="mps_user"
+                  name="mps_user"
+                  placeholder="Enter the MPS User"
+                  ng-required="$ctrl.formValues.enableOpenAMT"
+                />
               </div>
             </div>
             <div class="form-group col-md-12" ng-show="openAMTForm.mps_user.$invalid">
@@ -50,6 +66,10 @@
             <div class="form-group">
               <label for="mps_user" class="col-sm-3 control-label text-left">
                 MPS Password
+                <portainer-tooltip
+                  position="bottom"
+                  message="Needs to be 8-32 characters including one uppercase, one lowercase letters, one base-10 digit and one special character."
+                ></portainer-tooltip>
               </label>
               <div class="col-sm-8">
                 <input
@@ -59,7 +79,7 @@
                   id="mps_password"
                   name="mps_password"
                   placeholder="Enter the MPS Password"
-                  required
+                  ng-required="$ctrl.formValues.enableOpenAMT"
                 />
               </div>
             </div>
@@ -76,6 +96,7 @@
             <div class="form-group">
               <label for="domain_name" class="col-sm-3 control-label text-left">
                 Domain Name
+                <portainer-tooltip position="bottom" message="Enter the FQDN that is associated with the provisioning certificate (i.e amtdomain.com)"></portainer-tooltip>
               </label>
               <div class="col-sm-8">
                 <input
@@ -84,8 +105,8 @@
                   ng-model="$ctrl.formValues.domainName"
                   id="domain_name"
                   name="domain_name"
-                  placeholder="Enter the FQDN that is associated with the provisioning certificate (i.e amtdomain.com)"
-                  required
+                  placeholder="Enter the Domain Name"
+                  ng-required="$ctrl.formValues.enableOpenAMT"
                 />
               </div>
             </div>
@@ -98,13 +119,15 @@
             </div>
 
             <div class="form-group">
-              <span class="col-sm-12">
-                Upload the Provisioning Certificate .pfx file. This certificate must contain the private key.
-              </span>
-            </div>
-            <div class="form-group">
-              <div class="col-sm-12">
-                <button class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.formValues.certFile" ngf-pattern=".pfx" name="certFile">
+              <label for="certificate_file" class="col-sm-3 control-label text-left">
+                Provisioning Certificate File (.pfx)
+                <portainer-tooltip
+                  position="bottom"
+                  message="Supported CAs are Comodo, DigiCert, Entrust and GoDaddy. The certificate must contain the private key."
+                ></portainer-tooltip>
+              </label>
+              <div class="col-sm-8">
+                <button style="margin-left: 0px !important;" class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.formValues.certFile" ngf-pattern=".pfx" name="certFile">
                   Upload file
                 </button>
                 <span style="margin-left: 5px;">
@@ -124,6 +147,10 @@
             <div class="form-group">
               <label for="certificate_password" class="col-sm-3 control-label text-left">
                 Provisioning Certificate Password
+                <portainer-tooltip
+                  position="bottom"
+                  message="Needs to be 8-32 characters including one uppercase, one lowercase letters, one base-10 digit and one special character."
+                ></portainer-tooltip>
               </label>
               <div class="col-sm-8">
                 <input
@@ -133,7 +160,7 @@
                   id="certificate_password"
                   name="certificate_password"
                   placeholder="**********"
-                  required
+                  ng-required="$ctrl.formValues.enableOpenAMT"
                 />
               </div>
             </div>
@@ -186,13 +213,14 @@
                     ng-model="$ctrl.formValues.wifiSsid"
                     id="wifi_ssid"
                     placeholder="SSIID"
-                    ng-required="$ctrl.formValues.useWirelessConfig"
+                    ng-required="$ctrl.formValues.enableOpenAMT && $ctrl.formValues.useWirelessConfig"
                   />
                 </div>
               </div>
               <div class="form-group">
                 <label for="wifi_pass" class="col-sm-3 control-label text-left">
                   PSK Passphrase
+                  <portainer-tooltip position="bottom" message="PSK Passphrase length should be greater than or equal to 8 and less than or equal to 63"></portainer-tooltip>
                 </label>
                 <div class="col-sm-8">
                   <input
@@ -201,7 +229,7 @@
                     ng-model="$ctrl.formValues.wifiPskPass"
                     id="wifi_pass"
                     placeholder="******"
-                    ng-required="$ctrl.formValues.useWirelessConfig"
+                    ng-required="$ctrl.formValues.enableOpenAMT && $ctrl.formValues.useWirelessConfig"
                   />
                 </div>
               </div>
@@ -214,13 +242,12 @@
               <button
                 type="button"
                 class="btn btn-primary btn-sm"
-                ng-disabled="$ctrl.state.actionInProgress || !$ctrl.isFormChanged() || !openAMTForm.$valid || !$ctrl.formValues.certFile"
+                ng-disabled="$ctrl.state.actionInProgress || !openAMTForm.$valid || !$ctrl.isFormChanged() || !$ctrl.isFormValid()"
                 ng-click="$ctrl.save()"
                 button-spinner="$ctrl.state.actionInProgress"
               >
-                <span ng-hide="$ctrl.state.actionInProgress || $ctrl.state.reloadingPage">Save Settings</span>
-                <span ng-show="$ctrl.state.actionInProgress">Deployment in progress...</span>
-                <span ng-show="$ctrl.state.reloadingPage">Reloading Page...</span>
+                <span ng-hide="$ctrl.state.actionInProgress">Save Settings</span>
+                <span ng-show="$ctrl.state.actionInProgress">In progress...</span>
               </button>
               <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
             </div>

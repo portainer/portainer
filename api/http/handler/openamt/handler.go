@@ -14,6 +14,7 @@ import (
 type Handler struct {
 	*mux.Router
 	OpenAMTService portainer.OpenAMTService
+	DataStore      portainer.DataStore
 }
 
 // NewHandler returns a new Handler
