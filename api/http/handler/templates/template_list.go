@@ -31,7 +31,6 @@ func (handler *Handler) templateList(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	resp, err := http.Get(settings.TemplatesURL)
-	resp, err = http.Get("https://raw.githubusercontent.com/cheloRydel/templates/master/templates-2.0.json")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve templates via the network", err}
 	}
