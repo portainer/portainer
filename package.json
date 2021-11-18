@@ -22,6 +22,7 @@
     "build:client": "grunt clean:client && grunt build:client",
     "prebuild:docs": "go install github.com/swaggo/swag/cmd/swag@v1.7.1",
     "build:docs": "cd api && swag init -g ./http/handler/handler.go --parseDependency --parseInternal --parseDepth 2 --markdownFiles ./",
+    "validate:docs": "swagger2openapi --warnOnly api/docs/swagger.yaml -o api/docs/openapi.yaml && swagger-cli validate api/docs/openapi.yaml",
     "clean": "grunt clean:all",
     "start": "grunt start",
     "start:clean": "grunt clean:all && grunt start",
@@ -119,6 +120,7 @@
     "yaml": "^1.10.0"
   },
   "devDependencies": {
+    "@apidevtools/swagger-cli": "^4.0.4",
     "@babel/core": "^7.1.2",
     "@babel/preset-env": "^7.1.0",
     "@babel/preset-react": "^7.14.5",
@@ -191,6 +193,7 @@
     "speed-measure-webpack-plugin": "^1.2.3",
     "storybook-css-modules-preset": "^1.1.1",
     "style-loader": "2",
+    "swagger2openapi": "^7.0.8",
     "tsconfig-paths-webpack-plugin": "^3.5.1",
     "typescript": "^4.4.3",
     "url-loader": "^1.1.1",
