@@ -3,14 +3,16 @@ import clsx from 'clsx';
 import styles from './AddButton.module.css';
 
 export interface Props {
+  className?: string;
   label: string;
   onClick: () => void;
 }
 
-export function AddButton({ label, onClick }: Props) {
+export function AddButton({ label, onClick, className }: Props) {
   return (
     <button
       className={clsx(
+        className,
         'label',
         'label-default',
         'interactive',

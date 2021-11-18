@@ -1,4 +1,3 @@
-import clsx from 'clsx';
 import { HTMLInputTypeAttribute } from 'react';
 
 import { BaseInput } from './BaseInput';
@@ -23,7 +22,7 @@ export function TextInput({
     <BaseInput
       id={id}
       type={type}
-      className={clsx(className, 'form-control')}
+      className={className}
       value={value}
       onChange={onChange}
       disabled={disabled}
