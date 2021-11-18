@@ -1,6 +1,8 @@
 import clsx from 'clsx';
 import { PropsWithChildren } from 'react';
 
+import { ButtonGroup, Size } from '../../Button/ButtonGroup';
+
 import styles from './ButtonSelector.module.css';
 
 export interface Option<T> {
@@ -12,29 +14,27 @@ interface Props<T> {
   value: T;
   onChange(value: T): void;
   options: Option<T>[];
+  size?: Size;
 }
 
 export function ButtonSelector<T extends string | number>({
   value,
   onChange,
+  size,
   options,
-  children,
-}: PropsWithChildren<Props<T>>) {
+}: Props<T>) {
   return (
-    <div className="input-group">
-      <div className={clsx('input-group-btn', styles.group)}>
-        {options.map((option) => (
-          <OptionItem
-            key={option.value}
-            selected={value === option.value}
-            onChange={() => onChange(option.value)}
-          >
-            {option.label || option.value.toString()}
-          </OptionItem>
-        ))}
-      </div>
-      {children}
-    </div>
+    <ButtonGroup size={size} className={styles.group}>
+      {options.map((option) => (
+        <OptionItem
+          key={option.value}
+          selected={value === option.value}
+          onChange={() => onChange(option.value)}
+        >
+          {option.label || option.value.toString()}
+        </OptionItem>
+      ))}
+    </ButtonGroup>
   );
 }
 

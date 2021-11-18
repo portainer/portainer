@@ -1,17 +1,19 @@
 import { PropsWithChildren } from 'react';
 import clsx from 'clsx';
 
-type Size = 'xsmall' | 'small' | 'large';
+export type Size = 'xsmall' | 'small' | 'large';
 export interface Props {
   size?: Size;
+  className?: string;
 }
 
 export function ButtonGroup({
   size = 'small',
   children,
+  className,
 }: PropsWithChildren<Props>) {
   return (
-    <div className={clsx('btn-group', sizeClass(size))} role="group">
+    <div className={clsx('btn-group', sizeClass(size), className)} role="group">
       {children}
     </div>
   );
