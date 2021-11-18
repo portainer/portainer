@@ -64,6 +64,7 @@ func (payload *registryCreatePayload) Validate(_ *http.Request) error {
 // @description Create a new registry.
 // @description **Access policy**: restricted
 // @tags registries
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json
