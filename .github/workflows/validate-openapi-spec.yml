@@ -39,7 +39,7 @@ jobs:
     - name: Prebuild docs
       run: yarn prebuild:docs
 
-    - name: Build docs
+    - name: Build OpenAPI 2.0 Spec
       run: yarn build:docs
 
     - name: Install swagger-cli
