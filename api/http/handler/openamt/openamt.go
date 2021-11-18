@@ -1,13 +1,19 @@
 package openamt
 
 import (
+	"encoding/base64"
 	"errors"
+	"fmt"
+	"net/http"
+	"strings"
+
+	"github.com/sirupsen/logrus"
+	"software.sslmate.com/src/go-pkcs12"
+
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/sirupsen/logrus"
-	"net/http"
 )
 
 type openAMTConfigureDefaultPayload struct {
@@ -87,6 +93,11 @@ func (handler *Handler) openAMTConfigureDefault(w http.ResponseWriter, r *http.R
 	}
 
 	if payload.EnableOpenAMT {
+		certificateErr := validateCertificate(payload.CertFileText, payload.CertPassword)
+		if certificateErr != nil {
+			return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Error validating certificate", Err: certificateErr}
+		}
+
 		err = handler.enableOpenAMT(payload)
 		if err != nil {
 			return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Error enabling OpenAMT", Err: err}
@@ -99,6 +110,37 @@ func (handler *Handler) openAMTConfigureDefault(w http.ResponseWriter, r *http.R
 		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Error disabling OpenAMT", Err: err}
 	}
 	return response.Empty(w)
+}
+
+func validateCertificate(certificateRaw string, certificatePassword string) error {
+	certificateData, err := base64.StdEncoding.Strict().DecodeString(certificateRaw)
+	if err != nil {
+		return err
+	}
+
+	_, certificate, _, err := pkcs12.DecodeChain(certificateData, certificatePassword)
+	if err != nil {
+		return err
+	}
+
+	if certificate == nil {
+		return errors.New("certificate could not be decoded")
+	}
+
+	issuer := certificate.Issuer.CommonName
+	if !isValidIssuer(issuer) {
+		return fmt.Errorf("certificate issuer is invalid: %v", issuer)
+	}
+
+	return nil
+}
+
+func isValidIssuer(issuer string) bool {
+	formattedIssuer := strings.ToLower(strings.ReplaceAll(issuer, " ", ""))
+	return strings.Contains(formattedIssuer, "comodo") ||
+		strings.Contains(formattedIssuer, "digicert") ||
+		strings.Contains(formattedIssuer, "entrust") ||
+		strings.Contains(formattedIssuer, "godaddy")
 }
 
 func (handler *Handler) enableOpenAMT(configurationPayload openAMTConfigureDefaultPayload) error {
