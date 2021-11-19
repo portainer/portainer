@@ -75,7 +75,7 @@ The feature request process is similar to the bug report process but has an extr
 
 ![portainer_featurerequest_workflow](https://user-images.githubusercontent.com/5485061/45727229-5ad39f00-bbf5-11e8-9550-16ba66c50615.png)
 
-## Build Portainer locally
+## Build and run Portainer locally
 
 Ensure you have Docker, Node.js, yarn, and Golang installed in the correct versions.
 
@@ -85,7 +85,7 @@ Install dependencies with yarn:
 $ yarn
 ```
 
-Then build and run the project:
+Then build and run the project in a Docker container:
 
 ```sh
 $ yarn start
@@ -94,6 +94,16 @@ $ yarn start
 Portainer can now be accessed at <https://localhost:9443>.
 
 Find more detailed steps at <https://documentation.portainer.io/contributing/instructions/>.
+
+### Build customisation
+
+By default, `yarn start` will use `/tmp/portainer/` for the data store, so it won't persist over reboots.
+
+You can customise the following settings:
+
+- `PORTAINER_DATA`: The host dir or volume name used by portainer (default `/tmp/portainer`)
+- `PORTAINER_PROJECT`: The root dir of the repository - `${portainerRoot}/dist/` is imported into the container to get the build artifacts and external tools (defaults to `your current dir`)
+- `PORTAINER_FLAGS`: a list of flags to be used on the portainer commandline, in the form `--admin-password=<pwd hash> --feat fdo=false --feat open-amt` (default: `""`)
 
 ## Adding api docs
 
