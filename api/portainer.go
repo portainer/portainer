@@ -1532,6 +1532,9 @@ var SupportedFeatureFlags = []Feature{
 	FeatFDO,
 }
 
+// PortainerId a UUID of the current portainer instance
+var PortainerId = ""
+
 const (
 	_ AuthenticationMethod = iota
 	// AuthenticationInternal represents the internal authentication method (authentication against Portainer API)

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -286,7 +287,9 @@ func (server *Server) Start() error {
 	}
 
 	handler := offlineGate.WaitingMiddleware(time.Minute, server.Handler)
-
+	// use hostname as the current  portainer id, ignore errors
+	hostname, _ := os.Hostname()
+	portainer.PortainerId = hostname
 	if server.HTTPEnabled {
 		go func() {
 			log.Printf("[INFO] [http,server] [message: starting HTTP server on port %s]", server.BindAddress)

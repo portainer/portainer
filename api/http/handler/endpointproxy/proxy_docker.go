@@ -6,7 +6,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
-	"os"
 	"strconv"
 	"strings"
 
@@ -59,10 +58,7 @@ func (handler *Handler) proxyRequestsToDockerAPI(w http.ResponseWriter, r *http.
 	}
 
 	// use hostname as the current  portainer id
-	hostname, err := os.Hostname()
-	if err == nil {
-		w.Header().Add("X-Portainer-ID", hostname)
-	}
+	w.Header().Add("X-Portainer-ID", portainer.PortainerId)
 
 	http.StripPrefix(prefix, proxy).ServeHTTP(w, r)
 	return nil
