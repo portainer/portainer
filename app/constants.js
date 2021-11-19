@@ -32,3 +32,5 @@ angular
 export const PORTAINER_FADEOUT = 1500;
 export const STACK_NAME_VALIDATION_REGEX = '^[-_a-z0-9]+$';
 export const TEMPLATE_NAME_VALIDATION_REGEX = '^[-_a-z0-9]+$';
+export const BROWSER_OS_PLATFORM = navigator.userAgent.indexOf('Windows NT') > -1 ? 'win' : 'lin';
+export const NEW_LINE_BREAKER = BROWSER_OS_PLATFORM === 'win' ? '\r\n' : '\n';
