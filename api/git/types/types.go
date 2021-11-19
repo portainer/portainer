@@ -12,6 +12,8 @@ type RepoConfig struct {
 	Authentication *GitAuthentication
 	// Repository hash
 	ConfigHash string `example:"bc4c183d756879ea4d173315338110b31004b8e0"`
+	// Whether the content of this repo is as a template.
+	AsTemplate bool `example:"false"`
 }
 
 type GitAuthentication struct {

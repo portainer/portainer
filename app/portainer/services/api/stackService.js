@@ -363,6 +363,7 @@ angular.module('portainer.app').factory('StackService', [
         RepositoryUsername: repositoryOptions.RepositoryUsername,
         RepositoryPassword: repositoryOptions.RepositoryPassword,
         Env: env,
+        RepositoryContentAsTemplate: repositoryOptions.RepositoryContentAsTemplate,
       };
 
       if (repositoryOptions.AutoUpdate) {
@@ -389,6 +390,7 @@ angular.module('portainer.app').factory('StackService', [
             RepositoryUsername: repositoryOptions.RepositoryUsername,
             RepositoryPassword: repositoryOptions.RepositoryPassword,
             Env: env,
+            RepositoryContentAsTemplate: repositoryOptions.RepositoryContentAsTemplate,
           };
 
           if (repositoryOptions.AutoUpdate) {
