@@ -1,4 +1,4 @@
-package openamt
+package intel
 
 import (
 	"net/http"
@@ -10,7 +10,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// Handler is the HTTP handler used to handle OpenAMT operations.
+// Handler is the HTTP handler used to handle Intel operations.
 type Handler struct {
 	*mux.Router
 	OpenAMTService portainer.OpenAMTService

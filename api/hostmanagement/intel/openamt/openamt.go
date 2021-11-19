@@ -6,10 +6,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	portainer "github.com/portainer/portainer/api"
 	"io/ioutil"
 	"net/http"
 	"time"
+
+	portainer "github.com/portainer/portainer/api"
 )
 
 const (

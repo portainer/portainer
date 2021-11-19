@@ -1,4 +1,4 @@
-package openamt
+package intel
 
 import (
 	"encoding/base64"
