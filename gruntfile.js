@@ -131,7 +131,7 @@ function shell_storybook(env) {
 
 function shell_build_binary(platform, arch) {
   const binfile = 'dist/portainer';
-  if (platform === 'linux') {
+  if (platform === 'linux' || platform === 'darwin') {
     return `
       if [ -f ${binfile} ]; then
         echo "Portainer binary exists";
