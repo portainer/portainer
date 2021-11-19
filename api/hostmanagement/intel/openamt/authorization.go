@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	portainer "github.com/portainer/portainer/api"
 	"io/ioutil"
 	"net/http"
+
+	portainer "github.com/portainer/portainer/api"
 )
 
 type authenticationResponse struct {

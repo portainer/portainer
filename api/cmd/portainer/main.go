@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	openamt2 "github.com/portainer/portainer/api/hostmanagement/intel/openamt"
 	"log"
 	"os"
 	"strconv"
@@ -19,6 +18,7 @@ import (
 	"github.com/portainer/portainer/api/exec"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/git"
+	"github.com/portainer/portainer/api/hostmanagement/intel/openamt"
 	"github.com/portainer/portainer/api/http"
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/http/proxy"
@@ -468,7 +468,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 
 	gitService := initGitService()
 
-	openAMTService := openamt2.NewService()
+	openAMTService := openamt.NewService()
 
 	cryptoService := initCryptoService()
 
