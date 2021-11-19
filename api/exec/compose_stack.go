@@ -125,28 +125,28 @@ func createEnvFile(stack *portainer.Stack) (string, error) {
 }
 
 func createNetworkEnvFile(stack *portainer.Stack) error {
-	ss := NewStringSet()
+	networkNameSet := NewStringSet()
 
 	for _, filePath := range stackutils.GetStackFilePaths(stack) {
-		ssName, err := extractNetworkName(filePath)
+		networkNames, err := extractNetworkNames(filePath)
 		if err != nil {
 			return err
 		}
 
-		if ssName == nil || ssName.Len() == 0 {
+		if networkNames == nil || networkNames.Len() == 0 {
 			continue
 		}
 
-		ss.Merge(ssName)
+		networkNameSet.Union(networkNames)
 	}
 
-	for _, s := range ss.List() {
+	for _, s := range networkNameSet.List() {
 		if _, ok := os.LookupEnv(s); ok {
-			ss.Remove(s)
+			networkNameSet.Remove(s)
 		}
 	}
 
-	if ss.Len() == 0 {
+	if networkNameSet.Len() == 0 {
 		return nil
 	}
 
@@ -158,7 +158,7 @@ func createNetworkEnvFile(stack *portainer.Stack) error {
 
 	defer envfile.Close()
 
-	var stackFunc = func(name string) (string, bool) {
+	var scanEnvSettingFunc = func(name string) (string, bool) {
 		if stack.Env != nil {
 			for _, v := range stack.Env {
 				if name == v.Name {
@@ -170,8 +170,8 @@ func createNetworkEnvFile(stack *portainer.Stack) error {
 		return "", false
 	}
 
-	for _, s := range ss.List() {
-		if v, ok := stackFunc(s); ok {
+	for _, s := range networkNameSet.List() {
+		if v, ok := scanEnvSettingFunc(s); ok {
 			envfile.WriteString(fmt.Sprintf("%s=%s\n", s, v))
 		} else {
 			envfile.WriteString(fmt.Sprintf("%s\n", s))
@@ -181,7 +181,7 @@ func createNetworkEnvFile(stack *portainer.Stack) error {
 	return nil
 }
 
-func extractNetworkName(filePath string) (StringSet, error) {
+func extractNetworkNames(filePath string) (StringSet, error) {
 	if info, err := os.Stat(filePath); errors.Is(err,
 		os.ErrNotExist) || info.IsDir() {
 		return nil, nil
@@ -222,7 +222,7 @@ func extractNetworkName(filePath string) (StringSet, error) {
 	}
 
 	re := regexp.MustCompile(`^\$\{?([^\}]+)\}?$`)
-	ss := NewStringSet()
+	networkNames := NewStringSet()
 
 	for _, v := range networkContent {
 		matched := re.FindAllStringSubmatch(v.Name, -1)
@@ -239,13 +239,13 @@ func extractNetworkName(filePath string) (StringSet, error) {
 				continue
 			}
 
-			ss.Add(matched[0][1])
+			networkNames.Add(matched[0][1])
 		}
 	}
 
-	if ss.Len() == 0 {
+	if networkNames.Len() == 0 {
 		return nil, nil
 	}
 
-	return ss, nil
+	return networkNames, nil
 }

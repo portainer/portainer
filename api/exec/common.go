@@ -43,7 +43,7 @@ func (s StringSet) List() []string {
 	return list
 }
 
-func (s StringSet) Merge(x StringSet) {
+func (s StringSet) Union(x StringSet) {
 	if x.Len() != 0 {
 		for _, v := range x.List() {
 			s.Add(v)
