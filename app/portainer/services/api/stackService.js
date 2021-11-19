@@ -389,8 +389,8 @@ angular.module('portainer.app').factory('StackService', [
             RepositoryAuthentication: repositoryOptions.RepositoryAuthentication,
             RepositoryUsername: repositoryOptions.RepositoryUsername,
             RepositoryPassword: repositoryOptions.RepositoryPassword,
-            Env: env,
             RepositoryContentAsTemplate: repositoryOptions.RepositoryContentAsTemplate,
+            Env: env,
           };
 
           if (repositoryOptions.AutoUpdate) {

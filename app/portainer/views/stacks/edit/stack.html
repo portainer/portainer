@@ -110,7 +110,7 @@
               </div>
               <!-- !associate -->
 
-              <stack-redeploy-git-form ng-if="stack.GitConfig && !stack.GitConfig.AsTemplate" model="stack.GitConfig" stack="stack" authorization="PortainerStackUpdate">
+              <stack-redeploy-git-form ng-if="stack.GitConfig && !stack.IsGitContentAsTemplate" model="stack.GitConfig" stack="stack" authorization="PortainerStackUpdate">
               </stack-redeploy-git-form>
               <stack-duplication-form
                 ng-if="regular && endpoints.length > 0"
@@ -126,7 +126,7 @@
           </uib-tab>
           <!-- !tab-info -->
           <!-- tab-file -->
-          <uib-tab index="1" select="showEditor()" ng-if="!external && (!stack.GitConfig || (stack.GitConfig && stack.GitConfig.AsTemplate))">
+          <uib-tab index="1" select="showEditor()" ng-if="!external && (!stack.GitConfig || stack.IsGitContentAsTemplate)">
             <uib-tab-heading> <i class="fa fa-pencil-alt space-right" aria-hidden="true"></i> Editor </uib-tab-heading>
             <form class="form-horizontal" ng-if="state.showEditorTab" style="margin-top: 10px;" name="stackUpdateForm">
               <div class="form-group">

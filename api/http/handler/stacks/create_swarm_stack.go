@@ -120,8 +120,9 @@ type swarmStackFromGitRepositoryPayload struct {
 	// Username used in basic authentication. Required when RepositoryAuthentication is true.
 	RepositoryUsername string `example:"myGitUsername"`
 	// Password used in basic authentication. Required when RepositoryAuthentication is true.
-	RepositoryPassword          string `example:"myGitPassword"`
-	RepositoryContentAsTemplate bool   `example:"false"`
+	RepositoryPassword string `example:"myGitPassword"`
+	// Whether the content in the git repository is template
+	RepositoryContentAsTemplate bool `example:"false"`
 	// Path to the Stack file inside the Git repository
 	ComposeFile string `example:"docker-compose.yml" default:"docker-compose.yml"`
 	// Applicable when deploying with multiple stack files
@@ -194,11 +195,11 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 			URL:            payload.RepositoryURL,
 			ReferenceName:  payload.RepositoryReferenceName,
 			ConfigFilePath: payload.ComposeFile,
-			AsTemplate:     payload.RepositoryContentAsTemplate,
 		},
-		Env:          payload.Env,
-		Status:       portainer.StackStatusActive,
-		CreationDate: time.Now().Unix(),
+		IsGitContentAsTemplate: payload.RepositoryContentAsTemplate,
+		Env:                    payload.Env,
+		Status:                 portainer.StackStatusActive,
+		CreationDate:           time.Now().Unix(),
 	}
 
 	if payload.RepositoryAuthentication {
