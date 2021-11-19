@@ -158,6 +158,7 @@ function shell_build_binary_azuredevops(platform, arch) {
 function shell_run_container() {
   const portainerData = '${PORTAINER_DATA:-/tmp/portainer}';
   const portainerRoot = process.env.PORTAINER_PROJECT ? process.env.PORTAINER_PROJECT : process.env.PWD;
+  const portainerFlags = '${PORTAINER_FLAGS:-}';
 
   return `
     docker rm -f portainer
@@ -172,7 +173,7 @@ function shell_run_container() {
       -v /tmp:/tmp \
       --name portainer \
       portainer/base \
-      /app/portainer
+      /app/portainer ${portainerFlags}
   `;
 }
 
