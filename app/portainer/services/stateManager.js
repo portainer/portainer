@@ -79,6 +79,7 @@ angular.module('portainer.app').factory('StateManager', [
       state.application.version = status.Version;
       state.application.edition = status.Edition;
       state.application.instanceId = status.InstanceID;
+      state.application.portainerContainerId = status.PortainerContainerID;
 
       state.application.enableTelemetry = settings.EnableTelemetry;
       state.application.logo = settings.LogoURL;

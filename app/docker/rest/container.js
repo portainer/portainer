@@ -5,8 +5,7 @@ angular.module('portainer.docker').factory('Container', [
   'API_ENDPOINT_ENDPOINTS',
   'EndpointProvider',
   'ContainersInterceptor',
-  'ContainerInterceptor',
-  function ContainerFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, ContainersInterceptor, ContainerInterceptor) {
+  function ContainerFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, ContainersInterceptor) {
     'use strict';
     return $resource(
       API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/containers/:id/:action',
@@ -24,7 +23,6 @@ angular.module('portainer.docker').factory('Container', [
         get: {
           method: 'GET',
           params: { action: 'json' },
-          interceptor: ContainerInterceptor,
         },
         stop: {
           method: 'POST',

@@ -80,7 +80,6 @@
         selected-items="$ctrl.state.selectedItems"
         selected-item-count="$ctrl.state.selectedItemCount"
         no-stopped-items-selected="$ctrl.state.noStoppedItemsSelected"
-        portainer-itself-selected="$ctrl.state.portainerItselfSelected"
         no-running-items-selected="$ctrl.state.noRunningItemsSelected"
         no-paused-items-selected="$ctrl.state.noPausedItemsSelected"
         show-add-action="$ctrl.showAddAction"
@@ -218,7 +217,7 @@
                   ng-if="!$ctrl.offlineMode"
                   authorization="DockerContainerStart, DockerContainerStop, DockerContainerKill, DockerContainerRestart, DockerContainerPause, DockerContainerUnpause, DockerContainerDelete, DockerContainerCreate"
                 >
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
+                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="item.isPortainer" />
                   <label for="select_{{ $index }}"></label>
                 </span>
                 <a ng-if="!$ctrl.offlineMode" ui-sref="docker.containers.container({ id: item.Id, nodeName: item.NodeName })" title="{{ item | containername }}">{{

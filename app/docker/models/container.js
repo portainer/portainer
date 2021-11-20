@@ -22,7 +22,7 @@ export function createStatus(statusText) {
   return 'running';
 }
 
-export function ContainerViewModel(data) {
+export function ContainerViewModel(data, portainerContainerId) {
   this.Id = data.Id;
   this.Status = createStatus(data.Status);
   this.State = data.State;
@@ -44,6 +44,8 @@ export function ContainerViewModel(data) {
     this.StackName = this.Labels['com.docker.stack.namespace'];
   }
   this.Mounts = data.Mounts;
+
+  this.isPortainer = portainerContainerId === this.Id.substr(0, 12);
 
   this.Ports = [];
   if (data.Ports) {
@@ -124,7 +126,7 @@ export function ContainerStatsViewModel(data) {
   }
 }
 
-export function ContainerDetailsViewModel(data) {
+export function ContainerDetailsViewModel(data, portainerContainerId) {
   this.Model = data;
   this.Id = data.Id;
   this.State = data.State;
@@ -139,4 +141,5 @@ export function ContainerDetailsViewModel(data) {
   if (data.Portainer && data.Portainer.ResourceControl) {
     this.ResourceControl = new ResourceControlViewModel(data.Portainer.ResourceControl);
   }
+  this.isPortainer = portainerContainerId === this.Id.substr(0, 12);
 }

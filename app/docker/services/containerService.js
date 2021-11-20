@@ -6,7 +6,8 @@ angular.module('portainer.docker').factory('ContainerService', [
   'ResourceControlService',
   'LogHelper',
   '$timeout',
-  function ContainerServiceFactory($q, Container, ResourceControlService, LogHelper, $timeout) {
+  'LocalStorage',
+  function ContainerServiceFactory($q, Container, ResourceControlService, LogHelper, $timeout, LocalStorage) {
     'use strict';
     var service = {};
 
@@ -15,7 +16,7 @@ angular.module('portainer.docker').factory('ContainerService', [
 
       Container.get({ id: id })
         .$promise.then(function success(data) {
-          var container = new ContainerDetailsViewModel(data);
+          var container = new ContainerDetailsViewModel(data, LocalStorage.getApplicationState().portainerContainerId);
           deferred.resolve(container);
         })
         .catch(function error(err) {
@@ -28,9 +29,11 @@ angular.module('portainer.docker').factory('ContainerService', [
     service.containers = function (all, filters) {
       var deferred = $q.defer();
       Container.query({ all: all, filters: filters })
+
         .$promise.then(function success(data) {
+          const portainerContainerId = LocalStorage.getApplicationState().portainerContainerId;
           var containers = data.map(function (item) {
-            return new ContainerViewModel(item);
+            return new ContainerViewModel(item, portainerContainerId);
           });
           deferred.resolve(containers);
         })

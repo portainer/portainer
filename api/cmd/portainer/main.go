@@ -191,9 +191,17 @@ func initSnapshotService(snapshotInterval string, dataStore portainer.DataStore,
 }
 
 func initStatus(instanceID string) *portainer.Status {
+	// use hostname as the current  portainer id
+	hostname, _ := os.Hostname()
 	return &portainer.Status{
 		Version:    portainer.APIVersion,
 		InstanceID: instanceID,
+		// TODO: technical debt
+		// Reference issue: JIRA EE-917
+		// https://social.msdn.microsoft.com/Forums/en-US/5e5bff27-7511-4fb2-9ffa-207520d0ffb8/how-to-gain-windows-container-id-in-windows-container?forum=windowscontainers
+		// Because Windows container cannot obtain container ID from /proc/self/cgroups like linux container,
+		// as a workaround, we currently use hostname as container ID.
+		PortainerContainerID: hostname,
 	}
 }
 
