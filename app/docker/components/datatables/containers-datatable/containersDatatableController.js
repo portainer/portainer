@@ -1,12 +1,11 @@
 import _ from 'lodash-es';
 
 angular.module('portainer.docker').controller('ContainersDatatableController', [
-  '$rootScope',
   '$scope',
   '$controller',
   'DatatableService',
   'EndpointProvider',
-  function ($rootScope, $scope, $controller, DatatableService, EndpointProvider) {
+  function ($scope, $controller, DatatableService, EndpointProvider) {
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
 
     var ctrl = this;

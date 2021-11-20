@@ -826,7 +826,7 @@ type (
 		InstanceID string `example:"299ab403-70a8-4c05-92f7-bf7a994d50df"`
 		// TODO: technical debt
 		// Reference issue: JIRA EE-917
-		// tech debt Because the current docker management in portainer is done mostly by the frontend,
+		// Because the current docker management in portainer is done mostly by the frontend,
 		// the backend only has api forwarding, and there is no secondary processing of the docker api response content.
 		// In order to quickly complete the purpose of marking the portainer container,
 		// we record the container id for comparison.
@@ -1541,9 +1541,6 @@ var SupportedFeatureFlags = []Feature{
 	FeatOpenAMT,
 	FeatFDO,
 }
-
-// PortainerId a UUID of the current portainer instance
-var PortainerId = ""
 
 const (
 	_ AuthenticationMethod = iota

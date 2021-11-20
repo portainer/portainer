@@ -57,9 +57,6 @@ func (handler *Handler) proxyRequestsToDockerAPI(w http.ResponseWriter, r *http.
 		prefix = "/" + id + "/docker"
 	}
 
-	// use hostname as the current  portainer id
-	w.Header().Add("X-Portainer-ID", portainer.PortainerId)
-
 	http.StripPrefix(prefix, proxy).ServeHTTP(w, r)
 	return nil
 }

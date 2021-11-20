@@ -1,8 +1,7 @@
 angular.module('portainer.app').factory('ContainersInterceptor', [
-  '$rootScope',
   '$q',
   'EndpointProvider',
-  function ($rootScope, $q, EndpointProvider) {
+  function ($q, EndpointProvider) {
     'use strict';
     var interceptor = {};
 
