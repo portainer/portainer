@@ -105,6 +105,7 @@
     "moment": "^2.21.0",
     "ng-file-upload": "~12.2.13",
     "parse-duration": "^1.0.0",
+    "rc-slider": "^9.7.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-tooltip": "^4.2.21",
