@@ -1,6 +1,6 @@
 import { PropsWithChildren, ReactNode } from 'react';
 
-import { Tooltip } from '@/portainer/components/Tooltip';
+import { Tooltip } from '@/portainer/components/Tip/Tooltip';
 
 export interface Props {
   inputId: string;
