@@ -1,3 +1,5 @@
+import { AxiosError } from 'axios';
+
 import PortainerError from '@/portainer/error';
 import axios from '@/portainer/services/axios';
 
@@ -183,11 +185,19 @@ async function createEndpoint(
   }
 
   const formPayload = json2formData(payload);
+  try {
+    const { data: endpoint } = await axios.post<Environment>(
+      buildUrl(),
+      formPayload
+    );
 
-  const { data: endpoint } = await axios.post<Environment>(
-    buildUrl(),
-    formPayload
-  );
+    return endpoint;
+  } catch (e) {
+    const axiosError = e as AxiosError;
+    if (!axiosError.isAxiosError) {
+      throw e;
+    }
 
-  return endpoint;
+    throw new Error(axiosError.response?.data.message);
+  }
 }

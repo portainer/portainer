@@ -1,3 +1,5 @@
+import { AxiosError } from 'axios';
+
 import axios from '@/portainer/services/axios';
 import PortainerError from '@/portainer/error';
 
@@ -48,24 +50,64 @@ export async function getEndpoints(
     params.endpointIds = arrayToJson(endpointIds);
   }
 
-  const response = await axios.get<Environment[]>(url, { params });
+  try {
+    const response = await axios.get<Environment[]>(url, { params });
 
-  const totalCount = response.headers['X-Total-Count'];
+    const totalCount = response.headers['X-Total-Count'];
 
-  return { totalCount: parseInt(totalCount, 10), value: response.data };
+    return { totalCount: parseInt(totalCount, 10), value: response.data };
+  } catch (e) {
+    const axiosError = e as AxiosError;
+
+    if (!axiosError.isAxiosError) {
+      throw e;
+    }
+
+    throw new Error(axiosError.response?.data.message);
+  }
 }
 
 export async function getEndpoint(id: EnvironmentId) {
-  const { data: endpoint } = await axios.get<Environment>(buildUrl(id));
-  return endpoint;
+  try {
+    const { data: endpoint } = await axios.get<Environment>(buildUrl(id));
+    return endpoint;
+  } catch (e) {
+    const axiosError = e as AxiosError;
+
+    if (!axiosError.isAxiosError) {
+      throw e;
+    }
+
+    throw new Error(axiosError.response?.data.message);
+  }
 }
 
 export async function snapshotEndpoints() {
-  await axios.post<void>(buildUrl(undefined, 'snapshot'));
+  try {
+    await axios.post<void>(buildUrl(undefined, 'snapshot'));
+  } catch (e) {
+    const axiosError = e as AxiosError;
+
+    if (!axiosError.isAxiosError) {
+      throw e;
+    }
+
+    throw new Error(axiosError.response?.data.message);
+  }
 }
 
 export async function snapshotEndpoint(id: EnvironmentId) {
-  await axios.post<void>(buildUrl(id, 'snapshot'));
+  try {
+    await axios.post<void>(buildUrl(id, 'snapshot'));
+  } catch (e) {
+    const axiosError = e as AxiosError;
+
+    if (!axiosError.isAxiosError) {
+      throw e;
+    }
+
+    throw new Error(axiosError.response?.data.message);
+  }
 }
 
 export async function endpointsByGroup(
@@ -78,7 +120,17 @@ export async function endpointsByGroup(
 }
 
 export async function disassociateEndpoint(id: EnvironmentId) {
-  await axios.delete(buildUrl(id, 'association'));
+  try {
+    await axios.delete(buildUrl(id, 'association'));
+  } catch (e) {
+    const axiosError = e as AxiosError;
+
+    if (!axiosError.isAxiosError) {
+      throw e;
+    }
+
+    throw new Error(axiosError.response?.data.message);
+  }
 }
 
 interface UpdatePayload {
@@ -107,7 +159,7 @@ async function uploadTLSFilesForEndpoint(
   tlsCert?: File,
   tlsKey?: File
 ) {
-  return Promise.all([
+  await Promise.all([
     uploadCert('ca', tlscaCert),
     uploadCert('cert', tlsCert),
     uploadCert('key', tlsKey),
@@ -117,10 +169,19 @@ async function uploadTLSFilesForEndpoint(
     if (!cert) {
       return null;
     }
+    try {
+      return axios.post<void>(`upload/tls/${type}`, cert, {
+        params: { folder: id },
+      });
+    } catch (e) {
+      const axiosError = e as AxiosError;
 
-    return axios.post<void>(`upload/tls/${type}`, cert, {
-      params: { folder: id },
-    });
+      if (!axiosError.isAxiosError) {
+        throw e;
+      }
+
+      throw new Error(axiosError.response?.data.message);
+    }
   }
 }
 
@@ -142,16 +203,34 @@ export async function updateEndpoint(
     );
 
     return endpoint;
-  } catch (err) {
-    throw new PortainerError('Unable to update environment', err as Error);
+  } catch (e) {
+    const axiosError = e as AxiosError;
+    if (!axiosError.isAxiosError) {
+      throw e;
+    }
+
+    throw new PortainerError(
+      'Unable to update environment',
+      new Error(axiosError.response?.data.message)
+    );
   }
 }
 
 export async function deleteEndpoint(id: EnvironmentId) {
-  await axios.delete(buildUrl(id));
+  try {
+    await axios.delete(buildUrl(id));
+  } catch (e) {
+    const axiosError = e as AxiosError;
+
+    if (!axiosError.isAxiosError) {
+      throw e;
+    }
+
+    throw new Error(axiosError.response?.data.message);
+  }
 }
 
-export function updatePoolAccess(
+export async function updatePoolAccess(
   id: EnvironmentId,
   resourcePool: string,
   usersToAdd: UserId[],
@@ -159,28 +238,58 @@ export function updatePoolAccess(
   usersToRemove: UserId[],
   teamsToRemove: TeamId[]
 ) {
-  return axios.put<void>(`${buildUrl(id, 'pools')}/${resourcePool}/access`, {
-    usersToAdd,
-    teamsToAdd,
-    usersToRemove,
-    teamsToRemove,
-  });
+  try {
+    await axios.put<void>(`${buildUrl(id, 'pools')}/${resourcePool}/access`, {
+      usersToAdd,
+      teamsToAdd,
+      usersToRemove,
+      teamsToRemove,
+    });
+  } catch (e) {
+    const axiosError = e as AxiosError;
+
+    if (!axiosError.isAxiosError) {
+      throw e;
+    }
+
+    throw new Error(axiosError.response?.data.message);
+  }
 }
 
-export function forceUpdateService(
+export async function forceUpdateService(
   id: EnvironmentId,
   serviceID: string,
   pullImage: boolean
 ) {
-  return axios.put(buildUrl(id, 'forceupdateservice'), {
-    serviceID,
-    pullImage,
-  });
+  try {
+    await axios.put(buildUrl(id, 'forceupdateservice'), {
+      serviceID,
+      pullImage,
+    });
+  } catch (e) {
+    const axiosError = e as AxiosError;
+
+    if (!axiosError.isAxiosError) {
+      throw e;
+    }
+
+    throw new Error(axiosError.response?.data.message);
+  }
 }
 
-export function updateSettings(
+export async function updateSettings(
   id: EnvironmentId,
   settings: EnvironmentSettings
 ) {
-  return axios.put(buildUrl(id, 'settings'), settings);
+  try {
+    await axios.put(buildUrl(id, 'settings'), settings);
+  } catch (e) {
+    const axiosError = e as AxiosError;
+
+    if (!axiosError.isAxiosError) {
+      throw e;
+    }
+
+    throw new Error(axiosError.response?.data.message);
+  }
 }

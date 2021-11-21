@@ -1,3 +1,5 @@
+import { AxiosError } from 'axios';
+
 import axios from '@/portainer/services/axios';
 
 import {
@@ -24,27 +26,51 @@ export async function updateEnvironmentRegistryAccess(
   registryId: RegistryId,
   access: RegistryAccess
 ) {
-  return axios.put<void>(buildRegistryUrl(id, registryId), access);
+  try {
+    await axios.put<void>(buildRegistryUrl(id, registryId), access);
+  } catch (e) {
+    const axiosError = e as AxiosError;
+    if (!axiosError.isAxiosError) {
+      throw e;
+    }
+    throw new Error(axiosError.response?.data.message);
+  }
 }
 
 export async function getEnvironmentRegistries(
   id: EnvironmentId,
   namespace: string
 ) {
-  const { data } = await axios.get<Registry[]>(buildRegistryUrl(id), {
-    params: { namespace },
-  });
-  return data;
+  try {
+    const { data } = await axios.get<Registry[]>(buildRegistryUrl(id), {
+      params: { namespace },
+    });
+    return data;
+  } catch (e) {
+    const axiosError = e as AxiosError;
+    if (!axiosError.isAxiosError) {
+      throw e;
+    }
+    throw new Error(axiosError.response?.data.message);
+  }
 }
 
 export async function getEnvironmentRegistry(
   endpointId: EnvironmentId,
   registryId: RegistryId
 ) {
-  const { data } = await axios.get<Registry>(
-    buildRegistryUrl(endpointId, registryId)
-  );
-  return data;
+  try {
+    const { data } = await axios.get<Registry>(
+      buildRegistryUrl(endpointId, registryId)
+    );
+    return data;
+  } catch (e) {
+    const axiosError = e as AxiosError;
+    if (!axiosError.isAxiosError) {
+      throw e;
+    }
+    throw new Error(axiosError.response?.data.message);
+  }
 }
 
 function buildRegistryUrl(id: EnvironmentId, registryId?: RegistryId) {
