@@ -142,7 +142,7 @@ func Test_UpdateAPIKey(t *testing.T) {
 		_, apiKey, err := service.GenerateApiKey(user, "test-x")
 		is.NoError(err)
 
-		apiKey.LastUsed = time.Now().UTC()
+		apiKey.LastUsed = time.Now().UTC().Unix()
 		err = service.UpdateAPIKey(apiKey)
 		is.NoError(err)
 
@@ -164,7 +164,7 @@ func Test_UpdateAPIKey(t *testing.T) {
 		is.True(ok)
 		is.Equal(*apiKey, apiKeyFromCache)
 
-		apiKey.LastUsed = time.Now().UTC()
+		apiKey.LastUsed = time.Now().UTC().Unix()
 		is.NotEqual(*apiKey, apiKeyFromCache)
 
 		err = service.UpdateAPIKey(apiKey)
