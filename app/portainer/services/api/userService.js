@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { UserViewModel } from '../../models/user';
+import { UserViewModel, UserTokenModel } from '../../models/user';
 import { TeamMembershipModel } from '../../models/teamMembership';
 
 angular.module('portainer.app').factory('UserService', [
@@ -45,6 +45,27 @@ angular.module('portainer.app').factory('UserService', [
         });
 
       return deferred.promise;
+    };
+
+    service.getUserTokens = function (id) {
+      var deferred = $q.defer();
+
+      Users.getUserTokens({ id: id })
+        .$promise.then(function success(data) {
+          var userTokens = data.map(function (item) {
+            return new UserTokenModel(item);
+          });
+          deferred.resolve(userTokens);
+        })
+        .catch(function error(err) {
+          deferred.reject({ msg: 'Unable to retrieve users', err: err });
+        });
+
+      return deferred.promise;
+    };
+
+    service.deleteToken = function (id, tokenId) {
+      return Users.deleteToken({ id: id, tokenId: tokenId }).$promise;
     };
 
     service.createUser = function (username, password, role, teamIds) {
