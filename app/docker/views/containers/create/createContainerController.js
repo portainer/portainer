@@ -33,7 +33,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
   'PluginService',
   'HttpRequestHelper',
   'endpoint',
-  'LocalStorage',
+  'StateManager',
   function (
     $q,
     $scope,
@@ -60,7 +60,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     PluginService,
     HttpRequestHelper,
     endpoint,
-    LocalStorage
+    StateManager
   ) {
     $scope.create = create;
     $scope.endpoint = endpoint;
@@ -631,7 +631,9 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       // Get container
       Container.get({ id: $transition$.params().from })
         .$promise.then(function success(d) {
-          var fromContainer = new ContainerDetailsViewModel(d, LocalStorage.getApplicationState().portainerContainerId);
+          const state = StateManager.getState();
+          const { portainerContainerId } = state.application;
+          var fromContainer = new ContainerDetailsViewModel(d, portainerContainerId);
           if (fromContainer.ResourceControl && fromContainer.ResourceControl.Public) {
             $scope.formValues.AccessControlData.AccessControlEnabled = false;
           }
