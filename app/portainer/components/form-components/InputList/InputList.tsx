@@ -27,14 +27,13 @@ type OnChangeEvent<T> =
       fromIndex: number;
       to: number;
     };
-// interface OnChangeEvent<T>
 
 interface Props<T> {
   label: string;
   value: T[];
   onChange(value: T[], e: OnChangeEvent<T>): void;
   itemBuilder?(): T;
-  item?: ComponentType<ItemProps<T>>; // ElementType<ItemProps<T>>;
+  item?: ComponentType<ItemProps<T>>;
   tooltip?: string;
   addLabel?: string;
   itemKeyGetter?(item: T, index: number): Key;
