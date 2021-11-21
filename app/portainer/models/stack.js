@@ -23,7 +23,6 @@ export function StackViewModel(data) {
   this.GitConfig = data.GitConfig;
   this.AdditionalFiles = data.AdditionalFiles;
   this.AutoUpdate = data.AutoUpdate;
-  this.IsGitContentAsTemplate = data.IsGitContentAsTemplate;
 }
 
 export function ExternalStackViewModel(name, type, creationDate) {

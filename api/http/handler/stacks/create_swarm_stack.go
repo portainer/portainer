@@ -26,6 +26,8 @@ type swarmStackFromFileContentPayload struct {
 	StackFileContent string `example:"version: 3\n services:\n web:\n image:nginx" validate:"required"`
 	// A list of environment(endpoint) variables used during stack deployment
 	Env []portainer.Pair
+	// Whether the stack is from a template and what is its template source.
+	TemplateFrom int `example:"1"`
 }
 
 func (payload *swarmStackFromFileContentPayload) Validate(r *http.Request) error {
@@ -70,6 +72,7 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 		Env:          payload.Env,
 		Status:       portainer.StackStatusActive,
 		CreationDate: time.Now().Unix(),
+		TemplateFrom: portainer.TemplateFrom(payload.TemplateFrom),
 	}
 
 	stackFolder := strconv.Itoa(int(stack.ID))
@@ -121,8 +124,8 @@ type swarmStackFromGitRepositoryPayload struct {
 	RepositoryUsername string `example:"myGitUsername"`
 	// Password used in basic authentication. Required when RepositoryAuthentication is true.
 	RepositoryPassword string `example:"myGitPassword"`
-	// Whether the content in the git repository is template
-	RepositoryContentAsTemplate bool `example:"false"`
+	// Whether the stack is from a template and what is its template source.
+	TemplateFrom int `example:"1"`
 	// Path to the Stack file inside the Git repository
 	ComposeFile string `example:"docker-compose.yml" default:"docker-compose.yml"`
 	// Applicable when deploying with multiple stack files
@@ -191,15 +194,15 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 		EntryPoint:      payload.ComposeFile,
 		AdditionalFiles: payload.AdditionalFiles,
 		AutoUpdate:      payload.AutoUpdate,
+		TemplateFrom:    portainer.TemplateFrom(payload.TemplateFrom),
 		GitConfig: &gittypes.RepoConfig{
 			URL:            payload.RepositoryURL,
 			ReferenceName:  payload.RepositoryReferenceName,
 			ConfigFilePath: payload.ComposeFile,
 		},
-		IsGitContentAsTemplate: payload.RepositoryContentAsTemplate,
-		Env:                    payload.Env,
-		Status:                 portainer.StackStatusActive,
-		CreationDate:           time.Now().Unix(),
+		Env:          payload.Env,
+		Status:       portainer.StackStatusActive,
+		CreationDate: time.Now().Unix(),
 	}
 
 	if payload.RepositoryAuthentication {

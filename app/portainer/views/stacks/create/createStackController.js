@@ -142,7 +142,11 @@ angular
 
       if (method === 'template' || method === 'editor') {
         var stackFileContent = $scope.formValues.StackFileContent;
-        return StackService.createSwarmStackFromFileContent(name, stackFileContent, env, endpointId);
+        let templateFrom;
+        if (method === 'template') {
+          templateFrom = 2;
+        }
+        return StackService.createSwarmStackFromFileContent(name, stackFileContent, env, endpointId, templateFrom);
       }
 
       if (method === 'upload') {
@@ -159,7 +163,6 @@ angular
           RepositoryAuthentication: $scope.formValues.RepositoryAuthentication,
           RepositoryUsername: $scope.formValues.RepositoryUsername,
           RepositoryPassword: $scope.formValues.RepositoryPassword,
-          AutoUpdate: { Interval: '' },
         };
 
         getAutoUpdatesProperty(repositoryOptions);
@@ -170,6 +173,7 @@ angular
 
     function getAutoUpdatesProperty(repositoryOptions) {
       if ($scope.formValues.RepositoryAutomaticUpdates) {
+        repositoryOptions.AutoUpdate = {};
         if ($scope.formValues.RepositoryMechanism === RepositoryMechanismTypes.INTERVAL) {
           repositoryOptions.AutoUpdate.Interval = $scope.formValues.RepositoryFetchInterval;
         } else if ($scope.formValues.RepositoryMechanism === RepositoryMechanismTypes.WEBHOOK) {
@@ -184,7 +188,11 @@ angular
 
       if (method === 'editor' || method === 'template') {
         var stackFileContent = $scope.formValues.StackFileContent;
-        return StackService.createComposeStackFromFileContent(name, stackFileContent, env, endpointId);
+        let templateFrom;
+        if (method === 'template') {
+          templateFrom = 2;
+        }
+        return StackService.createComposeStackFromFileContent(name, stackFileContent, env, endpointId, templateFrom);
       } else if (method === 'upload') {
         var stackFile = $scope.formValues.StackFile;
         return StackService.createComposeStackFromFileUpload(name, stackFile, env, endpointId);
@@ -197,7 +205,6 @@ angular
           RepositoryAuthentication: $scope.formValues.RepositoryAuthentication,
           RepositoryUsername: $scope.formValues.RepositoryUsername,
           RepositoryPassword: $scope.formValues.RepositoryPassword,
-          AutoUpdate: { Interval: '' },
         };
 
         getAutoUpdatesProperty(repositoryOptions);
