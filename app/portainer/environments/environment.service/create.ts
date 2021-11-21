@@ -1,11 +1,22 @@
 import PortainerError from '@/portainer/error';
 import axios from '@/portainer/services/axios';
 
-import { Environment, EnvironmentGroupId, EnvironmentCreationTypes, TagId } from '../types';
+import {
+  Environment,
+  EnvironmentGroupId,
+  EnvironmentCreationTypes,
+  TagId,
+} from '../types';
 
 import { arrayToJson, buildUrl, json2formData } from './utils';
 
-export async function createLocalEndpoint(name = 'local', URL: string, publicUrl: string, groupId: EnvironmentGroupId = 1, tagIds: TagId[] = []) {
+export async function createLocalEndpoint(
+  name = 'local',
+  URL: string,
+  publicUrl: string,
+  groupId: EnvironmentGroupId = 1,
+  tagIds: TagId[] = []
+) {
   let endpointURL = URL;
   if (endpointURL !== '') {
     if (endpointURL.includes('//./pipe/')) {
@@ -16,21 +27,39 @@ export async function createLocalEndpoint(name = 'local', URL: string, publicUrl
     }
   }
   try {
-    return await createEndpoint(name, EnvironmentCreationTypes.LocalDockerEnvironment, { url: endpointURL, publicUrl, groupId, tagIds });
+    return await createEndpoint(
+      name,
+      EnvironmentCreationTypes.LocalDockerEnvironment,
+      { url: endpointURL, publicUrl, groupId, tagIds }
+    );
   } catch (err) {
     throw new PortainerError('Unable to create environment', err as Error);
   }
 }
 
-export async function createLocalKubernetesEndpoint(name = 'local', tagIds: TagId[] = []) {
+export async function createLocalKubernetesEndpoint(
+  name = 'local',
+  tagIds: TagId[] = []
+) {
   try {
-    return await createEndpoint(name, EnvironmentCreationTypes.LocalKubernetesEnvironment, { tagIds, groupId: 1, tls: { skipClientVerify: true, skipVerify: true } });
+    return await createEndpoint(
+      name,
+      EnvironmentCreationTypes.LocalKubernetesEnvironment,
+      { tagIds, groupId: 1, tls: { skipClientVerify: true, skipVerify: true } }
+    );
   } catch (err) {
     throw new PortainerError('Unable to create environment', err as Error);
   }
 }
 
-export async function createAzureEndpoint(name: string, applicationId: string, tenantId: string, authenticationKey: string, groupId: EnvironmentGroupId, tagIds: TagId[]) {
+export async function createAzureEndpoint(
+  name: string,
+  applicationId: string,
+  tenantId: string,
+  authenticationKey: string,
+  groupId: EnvironmentGroupId,
+  tagIds: TagId[]
+) {
   try {
     await createEndpoint(name, EnvironmentCreationTypes.AzureEnvironment, {
       groupId,
@@ -109,7 +138,11 @@ interface EndpointOptions {
   tls?: TLSSettings;
 }
 
-async function createEndpoint(name: string, creationType: EnvironmentCreationTypes, options?: EndpointOptions) {
+async function createEndpoint(
+  name: string,
+  creationType: EnvironmentCreationTypes,
+  options?: EndpointOptions
+) {
   let payload: Record<string, unknown> = {
     Name: name,
     EndpointCreationType: creationType,
@@ -151,7 +184,10 @@ async function createEndpoint(name: string, creationType: EnvironmentCreationTyp
 
   const formPayload = json2formData(payload);
 
-  const { data: endpoint } = await axios.post<Environment>(buildUrl(), formPayload);
+  const { data: endpoint } = await axios.post<Environment>(
+    buildUrl(),
+    formPayload
+  );
 
   return endpoint;
 }

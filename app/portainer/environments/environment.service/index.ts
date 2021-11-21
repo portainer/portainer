@@ -1,7 +1,16 @@
 import axios from '@/portainer/services/axios';
 import PortainerError from '@/portainer/error';
 
-import { Environment, EnvironmentGroupId, EnvironmentId, EnvironmentType, EnvironmentSettings, TagId, TeamId, UserId } from '../types';
+import {
+  Environment,
+  EnvironmentGroupId,
+  EnvironmentId,
+  EnvironmentType,
+  EnvironmentSettings,
+  TagId,
+  TeamId,
+  UserId,
+} from '../types';
 
 import { arrayToJson, buildUrl } from './utils';
 
@@ -14,7 +23,11 @@ interface EndpointsQuery {
   groupId?: EnvironmentGroupId;
 }
 
-export async function getEndpoints(start: number, limit: number, { types, tagIds, endpointIds, ...query }: EndpointsQuery = {}) {
+export async function getEndpoints(
+  start: number,
+  limit: number,
+  { types, tagIds, endpointIds, ...query }: EndpointsQuery = {}
+) {
   if (tagIds && tagIds.length === 0) {
     return { totalCount: 0, value: <Environment[]>[] };
   }
@@ -55,7 +68,12 @@ export async function snapshotEndpoint(id: EnvironmentId) {
   await axios.post<void>(buildUrl(id, 'snapshot'));
 }
 
-export async function endpointsByGroup(start: number, limit: number, search: string, groupId: EnvironmentGroupId) {
+export async function endpointsByGroup(
+  start: number,
+  limit: number,
+  search: string,
+  groupId: EnvironmentGroupId
+) {
   return getEndpoints(start, limit, { search, groupId });
 }
 
@@ -83,8 +101,17 @@ interface UpdatePayload {
   AzureAuthenticationKey: string;
 }
 
-async function uploadTLSFilesForEndpoint(id: EnvironmentId, tlscaCert?: File, tlsCert?: File, tlsKey?: File) {
-  return Promise.all([uploadCert('ca', tlscaCert), uploadCert('cert', tlsCert), uploadCert('key', tlsKey)]);
+async function uploadTLSFilesForEndpoint(
+  id: EnvironmentId,
+  tlscaCert?: File,
+  tlsCert?: File,
+  tlsKey?: File
+) {
+  return Promise.all([
+    uploadCert('ca', tlscaCert),
+    uploadCert('cert', tlsCert),
+    uploadCert('key', tlsKey),
+  ]);
 
   function uploadCert(type: 'ca' | 'cert' | 'key', cert?: File) {
     if (!cert) {
@@ -97,11 +124,22 @@ async function uploadTLSFilesForEndpoint(id: EnvironmentId, tlscaCert?: File, tl
   }
 }
 
-export async function updateEndpoint(id: EnvironmentId, payload: UpdatePayload) {
+export async function updateEndpoint(
+  id: EnvironmentId,
+  payload: UpdatePayload
+) {
   try {
-    await uploadTLSFilesForEndpoint(id, payload.TLSCACert, payload.TLSCert, payload.TLSKey);
+    await uploadTLSFilesForEndpoint(
+      id,
+      payload.TLSCACert,
+      payload.TLSCert,
+      payload.TLSKey
+    );
 
-    const { data: endpoint } = await axios.put<Environment>(buildUrl(id), payload);
+    const { data: endpoint } = await axios.put<Environment>(
+      buildUrl(id),
+      payload
+    );
 
     return endpoint;
   } catch (err) {
@@ -113,7 +151,14 @@ export async function deleteEndpoint(id: EnvironmentId) {
   await axios.delete(buildUrl(id));
 }
 
-export function updatePoolAccess(id: EnvironmentId, resourcePool: string, usersToAdd: UserId[], teamsToAdd: TeamId[], usersToRemove: UserId[], teamsToRemove: TeamId[]) {
+export function updatePoolAccess(
+  id: EnvironmentId,
+  resourcePool: string,
+  usersToAdd: UserId[],
+  teamsToAdd: TeamId[],
+  usersToRemove: UserId[],
+  teamsToRemove: TeamId[]
+) {
   return axios.put<void>(`${buildUrl(id, 'pools')}/${resourcePool}/access`, {
     usersToAdd,
     teamsToAdd,
@@ -122,13 +167,20 @@ export function updatePoolAccess(id: EnvironmentId, resourcePool: string, usersT
   });
 }
 
-export function forceUpdateService(id: EnvironmentId, serviceID: string, pullImage: boolean) {
+export function forceUpdateService(
+  id: EnvironmentId,
+  serviceID: string,
+  pullImage: boolean
+) {
   return axios.put(buildUrl(id, 'forceupdateservice'), {
     serviceID,
     pullImage,
   });
 }
 
-export function updateSettings(id: EnvironmentId, settings: EnvironmentSettings) {
+export function updateSettings(
+  id: EnvironmentId,
+  settings: EnvironmentSettings
+) {
   return axios.put(buildUrl(id, 'settings'), settings);
 }

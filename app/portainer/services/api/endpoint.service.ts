@@ -11,8 +11,17 @@ import {
   updatePoolAccess,
   updateSettings,
 } from '@/portainer/environments/environment.service';
-import { createLocalEndpoint, createAzureEndpoint, createLocalKubernetesEndpoint, createRemoteEndpoint } from '@/portainer/environments/environment.service/create';
-import { getEnvironmentRegistries, getEnvironmentRegistry, updateEnvironmentRegistryAccess } from '@/portainer/environments/environment.service/registries';
+import {
+  createLocalEndpoint,
+  createAzureEndpoint,
+  createLocalKubernetesEndpoint,
+  createRemoteEndpoint,
+} from '@/portainer/environments/environment.service/create';
+import {
+  getEnvironmentRegistries,
+  getEnvironmentRegistry,
+  updateEnvironmentRegistryAccess,
+} from '@/portainer/environments/environment.service/registries';
 
 /* @ngInject */
 export function EndpointService() {
