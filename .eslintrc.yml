@@ -82,6 +82,7 @@ overrides:
       '@typescript-eslint/explicit-module-boundary-types': off
       '@typescript-eslint/no-unused-vars': 'error'
       '@typescript-eslint/no-explicit-any': 'error'
+      'jsx-a11y/label-has-associated-control': ['error', { 'assert': 'either' }]
   - files:
       - app/**/*.test.*
     extends:
