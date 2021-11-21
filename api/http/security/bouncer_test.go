@@ -329,6 +329,6 @@ func Test_apiKeyLookup(t *testing.T) {
 		_, apiKeyUpdated, err := apiKeyService.GetDigestUserAndKey(apiKey.Digest)
 		is.NoError(err)
 
-		is.True(apiKeyUpdated.LastUsed.After(apiKey.LastUsed))
+		is.True(apiKeyUpdated.LastUsed > apiKey.LastUsed)
 	})
 }
