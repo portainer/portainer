@@ -57,7 +57,8 @@
         label="Allow self-signed certs"
         ng-model="state.allowSelfSignedCerts"
         tooltip="When allowing self-signed certificates the edge agent will ignore the domain validation when connecting to Portainer via HTTPS"
-      ></por-switch-field>
+      >
+      </por-switch-field>
       <div style="margin-top: 10px;">
         <uib-tabset active="state.deploymentTab">
           <uib-tab index="'kubernetes'" heading="Kubernetes" ng-if="state.platformType === 'linux'">
@@ -167,7 +168,8 @@
               <portainer-tooltip
                 position="bottom"
                 message="Interval used by this Edge agent to check in with the Portainer instance. Affects Edge environment management and Edge compute features."
-              ></portainer-tooltip>
+              >
+              </portainer-tooltip>
             </label>
             <div class="col-sm-10">
               <select
@@ -210,6 +212,63 @@
             </div>
             <por-endpoint-security form-data="formValues.SecurityFormData" endpoint="endpoint"></por-endpoint-security>
           </div>
+          <!-- open-amt info (settings.FeatureFlagSettings && settings.FeatureFlagSettings['open-amt']) -->
+          <div ng-if="state.managementinfo !== ''">
+            <div class="col-sm-12 form-section-title">
+              Open Active Management Technology
+            </div>
+            <div class="form-group">
+              <label for="endpoint_managementinfo" class="col-sm-3 col-lg-2 control-label text-left">
+                Debug Info
+                <portainer-tooltip position="bottom" message="AMT Debug.."> </portainer-tooltip>
+              </label>
+              <div class="col-sm-9 col-lg-10">
+                <input
+                  type="text"
+                  ng-disabled="true"
+                  class="form-control"
+                  id="endpoint_managementinfo"
+                  ng-model="endpoint.ManagementInfoRaw"
+                  placeholder="querying node AMT info..."
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="endpoint_managementinfoVersion" class="col-sm-3 col-lg-2 control-label text-left">
+                AMT Version
+                <portainer-tooltip position="bottom" message="AMT Version"> </portainer-tooltip>
+              </label>
+              <div class="col-sm-9 col-lg-10">
+                <input
+                  type="text"
+                  ng-disabled="true"
+                  class="form-control"
+                  id="endpoint_managementinfoVersion"
+                  ng-model="endpoint.ManagementInfo.AMT"
+                  placeholder="querying node AMT info..."
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="endpoint_managementinfoControlMode" class="col-sm-3 col-lg-2 control-label text-left">
+                Control Mode
+                <portainer-tooltip position="bottom" message="AMT Control Mode"> </portainer-tooltip>
+              </label>
+              <div class="col-sm-9 col-lg-10">
+                <input
+                  type="text"
+                  ng-disabled="true"
+                  class="form-control"
+                  id="endpoint_managementinfoControlMode"
+                  ng-model="endpoint.ManagementInfo['Control Mode']"
+                  placeholder="querying node AMT info..."
+                />
+              </div>
+            </div>
+          </div>
+          <!-- !open-amt info -->
           <!-- !endpoint-security -->
           <div class="form-group">
             <div class="col-sm-12">

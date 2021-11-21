@@ -7,6 +7,7 @@ import (
 
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -15,6 +16,9 @@ type Handler struct {
 	*mux.Router
 	OpenAMTService portainer.OpenAMTService
 	DataStore      portainer.DataStore
+
+	// used by OpenAMTHostInfo
+	DockerClientFactory *docker.ClientFactory
 }
 
 // NewHandler returns a new Handler
@@ -31,6 +35,7 @@ func NewHandler(bouncer *security.RequestBouncer, dataStore portainer.DataStore)
 	featureEnabled, _ := settings.FeatureFlagSettings[portainer.FeatOpenAMT]
 	if featureEnabled {
 		h.Handle("/open_amt", bouncer.AdminAccess(httperror.LoggerHandler(h.openAMTConfigureDefault))).Methods(http.MethodPost)
+		h.Handle("/open-amt/{id}/info", bouncer.AdminAccess(httperror.LoggerHandler(h.OpenAMTHostInfo))).Methods(http.MethodGet)
 	}
 
 	return h, nil

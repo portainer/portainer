@@ -24,7 +24,8 @@ function EndpointController(
   Authentication,
   SettingsService,
   ModalService,
-  StateManager
+  StateManager,
+  OpenAMTService
 ) {
   const DEPLOYMENT_TABS = {
     SWARM: 'swarm',
@@ -246,6 +247,7 @@ function EndpointController(
 
   async function initView() {
     return $async(async () => {
+      var openAmt = false;
       try {
         const [endpoint, groups, tags, settings] = await Promise.all([
           EndpointService.endpoint($transition$.params().id),
@@ -265,7 +267,6 @@ function EndpointController(
         if (endpoint.Type === PortainerEndpointTypes.EdgeAgentOnDockerEnvironment || endpoint.Type === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment) {
           $scope.edgeKeyDetails = decodeEdgeKey(endpoint.EdgeKey);
           $scope.randomEdgeID = uuidv4();
-
           $scope.state.availableEdgeAgentCheckinOptions[0].key += ` (${settings.EdgeAgentCheckinInterval} seconds)`;
         }
 
@@ -273,9 +274,29 @@ function EndpointController(
         $scope.groups = groups;
         $scope.availableTags = tags;
 
+        if (settings.FeatureFlagSettings && settings.FeatureFlagSettings['open-amt']) {
+          openAmt = true;
+        }
+
         configureState();
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to retrieve environment details');
+      }
+
+      if (openAmt) {
+        // TODO: if we know this env/node isn't connected (ie, we have no conectionto Docker), then don't try (is is a server side response?)
+        try {
+          const [amtinfo] = await Promise.all([OpenAMTService.info($transition$.params().id)]);
+
+          $scope.endpoint.ManagementInfoRaw = amtinfo.Text;
+          try {
+            $scope.endpoint.ManagementInfo = JSON.parse(amtinfo.Text);
+          } catch (err) {
+            console.log('Failure', err, 'Unable to JSON parse AMT info: ' + amtinfo.Text);
+          }
+        } catch (err) {
+          Notifications.error('Failure', err, 'Unable to retrieve AMT environment details');
+        }
       }
     });
   }
