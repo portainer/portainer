@@ -48,7 +48,7 @@ func (a *apiKeyService) GenerateApiKey(user portainer.User, description string) 
 		UserID:      user.ID,
 		Description: description,
 		Prefix:      prefixedAPIKey[:7],
-		DateCreated: time.Now(),
+		DateCreated: time.Now().Unix(),
 		Digest:      hashDigest,
 	}
 
