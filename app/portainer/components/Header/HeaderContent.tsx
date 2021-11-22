@@ -16,23 +16,25 @@ export function HeaderContent({ children }: PropsWithChildren<unknown>) {
     <div className="breadcrumb-links">
       <div className="pull-left">{children}</div>
       {user && (
-        <div className="pull-right">
-          <Link to="portainer.account" className={styles.myAccount}>
-            <u>
-              <i className="fa fa-wrench" aria-hidden="true" />
-              my account
-            </u>
+        <div className={clsx('pull-right', styles.userLinks)}>
+          <Link to="portainer.account" className={styles.link}>
+            <i
+              className={clsx('fa fa-wrench', styles.linkIcon)}
+              aria-hidden="true"
+            />
+            <span className={styles.linkText}>my account</span>
           </Link>
           <Link
             to="portainer.logout"
             params={{ performApiLogout: true }}
-            className={clsx('text-danger', styles.logOut)}
+            className={clsx('text-danger', styles.link)}
             data-cy="template-logoutButton"
           >
-            <u>
-              <i className="fa fa-sign-out-alt" aria-hidden="true" />
-              log out
-            </u>
+            <i
+              className={clsx('fa fa-sign-out-alt', styles.linkIcon)}
+              aria-hidden="true"
+            />
+            <span className={styles.linkText}>log out</span>
           </Link>
         </div>
       )}
