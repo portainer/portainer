@@ -31,7 +31,9 @@ export function Select<T extends number | string>({
       onChange={handleChange}
     >
       {options.map((item) => (
-        <option value={item.value}>{item.label}</option>
+        <option value={item.value} key={item.value}>
+          {item.label}
+        </option>
       ))}
     </select>
   );

@@ -33,7 +33,7 @@ export function BaseInput({
       readOnly={readonly}
       required={required}
       type={type}
-      className={clsx(className, 'form-control')}
+      className={clsx('form-control', className)}
       onChange={(e) => onChange(e.target.value)}
       rows={rows}
     />
