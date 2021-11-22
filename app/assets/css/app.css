@@ -859,7 +859,7 @@ json-tree .branch-preview {
 }
 
 .no-margin {
-  margin: 0;
+  margin: 0 !important;
 }
 
 .no-border {
