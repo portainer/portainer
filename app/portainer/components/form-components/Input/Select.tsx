@@ -20,6 +20,7 @@ export function Select<T extends number | string>({
   disabled,
   id,
   required,
+  placeholder,
 }: Props<T>) {
   return (
     <select
@@ -28,6 +29,7 @@ export function Select<T extends number | string>({
       id={id}
       required={required}
       className={clsx(className, 'form-control')}
+      placeholder={placeholder}
       onChange={handleChange}
     >
       {options.map((item) => (

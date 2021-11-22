@@ -18,6 +18,7 @@ export function TextInput({
   disabled,
   readonly,
   required,
+  placeholder,
 }: TextInputProps) {
   return (
     <BaseInput
@@ -29,6 +30,7 @@ export function TextInput({
       disabled={disabled}
       readonly={readonly}
       required={required}
+      placeholder={placeholder}
     />
   );
 }

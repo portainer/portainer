@@ -16,6 +16,7 @@ export function NumberInput({
   value,
   className,
   readonly,
+  placeholder,
   onChange,
 }: Props) {
   return (
@@ -27,6 +28,7 @@ export function NumberInput({
       disabled={disabled}
       readonly={readonly}
       required={required}
+      placeholder={placeholder}
       onChange={(value) => onChange(parseFloat(value))}
     />
   );
