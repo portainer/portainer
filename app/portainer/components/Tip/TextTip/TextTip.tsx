@@ -7,17 +7,14 @@ export interface Props {
   text?: string;
 }
 
-export function TextTip({
-  text = "",
-  children,
-}: PropsWithChildren<Props>) {
+export function TextTip({ text = '', children }: PropsWithChildren<Props>) {
   return (
-    <p className="text-muted">
+    <p className="text-muted small">
       <i
         aria-hidden="true"
         className={clsx(
-          "fa fa-exclamation-circle",
-          "orange-icon",
+          'fa fa-exclamation-circle',
+          'orange-icon',
           styles.textMargin
         )}
       />
