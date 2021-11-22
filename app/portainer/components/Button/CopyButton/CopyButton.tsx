@@ -42,7 +42,7 @@ export function CopyButton({
     <>
       <Button
         className={className}
-        size="medium"
+        size="small"
         onClick={onClick}
         title="Copy Value"
         type="button"
