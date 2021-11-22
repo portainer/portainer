@@ -1,8 +1,6 @@
 import _ from 'lodash-es';
 import { ResourceControlViewModel } from 'Portainer/models/resourceControl/resourceControl';
 
-export const isPortainer = (portainerContainerId, containerId) => portainerContainerId === containerId.substr(0, 12);
-
 export function createStatus(statusText) {
   var status = _.toLower(statusText);
 
@@ -24,7 +22,7 @@ export function createStatus(statusText) {
   return 'running';
 }
 
-export function ContainerViewModel(data, portainerContainerId) {
+export function ContainerViewModel(data) {
   this.Id = data.Id;
   this.Status = createStatus(data.Status);
   this.State = data.State;
@@ -47,7 +45,7 @@ export function ContainerViewModel(data, portainerContainerId) {
   }
   this.Mounts = data.Mounts;
 
-  this.isPortainer = isPortainer(portainerContainerId, this.Id);
+  this.IsPortainer = data.IsPortainer;
 
   this.Ports = [];
   if (data.Ports) {
@@ -128,7 +126,7 @@ export function ContainerStatsViewModel(data) {
   }
 }
 
-export function ContainerDetailsViewModel(data, portainerContainerId) {
+export function ContainerDetailsViewModel(data) {
   this.Model = data;
   this.Id = data.Id;
   this.State = data.State;
@@ -143,5 +141,5 @@ export function ContainerDetailsViewModel(data, portainerContainerId) {
   if (data.Portainer && data.Portainer.ResourceControl) {
     this.ResourceControl = new ResourceControlViewModel(data.Portainer.ResourceControl);
   }
-  this.isPortainer = isPortainer(portainerContainerId, this.Id);
+  this.IsPortainer = data.IsPortainer;
 }

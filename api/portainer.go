@@ -824,15 +824,7 @@ type (
 		Version string `json:"Version" example:"2.0.0"`
 		// Server Instance ID
 		InstanceID string `example:"299ab403-70a8-4c05-92f7-bf7a994d50df"`
-		// TODO: technical debt
-		// Reference issue: JIRA EE-917
-		// Because the current docker management in portainer is done mostly by the frontend,
-		// the backend only has api forwarding, and there is no secondary processing of the docker api response content.
-		// In order to quickly complete the purpose of marking the portainer container,
-		// we record the container id for comparison.
-		// If the response content of docker api was fully structured in the future,
-		// we would like to do some decorations. After then,
-		// the judgment of whether the container is portainer will be completed at the backend.
+		// PortainerContainerID stored to identify this container is portainer
 		PortainerContainerID string `example:"772e3e178fd0"`
 	}
 
@@ -1974,3 +1966,6 @@ const (
 	AzurePathContainerGroups = "/subscriptions/*/providers/Microsoft.ContainerInstance/containerGroups"
 	AzurePathContainerGroup  = "/subscriptions/*/resourceGroups/*/providers/Microsoft.ContainerInstance/containerGroups/*"
 )
+
+// ServerStatus cache
+var ServerStatus Status

@@ -4,7 +4,6 @@ export function StatusViewModel(data) {
   this.Version = data.Version;
   this.Edition = data.Edition;
   this.InstanceID = data.InstanceID;
-  this.PortainerContainerID = data.PortainerContainerID;
 }
 
 export function StatusVersionViewModel(data) {
