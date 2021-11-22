@@ -54,9 +54,6 @@ func (payload *kubernetesStringDeploymentPayload) Validate(r *http.Request) erro
 	if govalidator.IsNull(payload.StackFileContent) {
 		return errors.New("Invalid stack file content")
 	}
-	if govalidator.IsNull(payload.Namespace) {
-		return errors.New("Invalid namespace")
-	}
 	if govalidator.IsNull(payload.StackName) {
 		return errors.New("Invalid stack name")
 	}
@@ -64,9 +61,6 @@ func (payload *kubernetesStringDeploymentPayload) Validate(r *http.Request) erro
 }
 
 func (payload *kubernetesGitDeploymentPayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Namespace) {
-		return errors.New("Invalid namespace")
-	}
 	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
 		return errors.New("Invalid repository URL. Must correspond to a valid URL format")
 	}

@@ -70,6 +70,7 @@ class KubernetesDeployController {
       RepositoryFetchInterval: '5m',
       RepositoryWebhookURL: this.WebhookHelper.returnStackWebhookUrl(uuidv4()),
     };
+
     this.ManifestDeployTypes = KubernetesDeployManifestTypes;
     this.BuildMethods = KubernetesDeployBuildMethods;
     this.endpointId = this.EndpointProvider.endpointID();
@@ -209,9 +210,15 @@ class KubernetesDeployController {
           throw new PortainerError('Unable to determine build method');
       }
 
+      let deployNamespace = '';
+
+      if (this.formValues.Namespace !== 'default') {
+        deployNamespace = this.formValues.Namespace;
+      }
+
       const payload = {
         ComposeFormat: composeFormat,
-        Namespace: this.formValues.Namespace,
+        Namespace: deployNamespace,
         StackName: this.formValues.StackName,
       };
 
