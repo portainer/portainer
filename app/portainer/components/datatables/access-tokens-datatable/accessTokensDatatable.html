@@ -87,7 +87,7 @@
                 {{ item.dateCreated | getisodatefromtimestamp }}
               </td>
               <td>
-                {{ item.lastUsed | getisodatefromtimestamp }}
+                <span ng-if="item.lastUsed > 0">{{ item.lastUsed | getisodatefromtimestamp }}</span>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
