@@ -77,6 +77,31 @@ func (service *Service) StackByName(name string) (*portainer.Stack, error) {
 	return stack, err
 }
 
+// Stacks returns an array containing all the stacks with same name
+func (service *Service) StacksByName(name string) ([]portainer.Stack, error) {
+	var stacks = make([]portainer.Stack, 0)
+
+	err := service.connection.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(BucketName))
+		cursor := bucket.Cursor()
+		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
+			var t portainer.Stack
+			err := internal.UnmarshalObject(v, &t)
+			if err != nil {
+				return err
+			}
+
+			if t.Name == name {
+				stacks = append(stacks, t)
+			}
+		}
+
+		return nil
+	})
+
+	return stacks, err
+}
+
 // Stacks returns an array containing all the stacks.
 func (service *Service) Stacks() ([]portainer.Stack, error) {
 	var stacks = make([]portainer.Stack, 0)

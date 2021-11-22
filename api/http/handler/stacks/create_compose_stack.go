@@ -2,6 +2,7 @@ package stacks
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -14,6 +15,7 @@ import (
 	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/stackutils"
 )
 
 type composeStackFromFileContentPayload struct {
@@ -35,6 +37,36 @@ func (payload *composeStackFromFileContentPayload) Validate(r *http.Request) err
 	}
 	return nil
 }
+func (handler *Handler) checkAndCleanStackDupFromSwarm(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID, stack *portainer.Stack) error {
+	resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)
+	if err != nil {
+		return err
+	}
+	// stop scheduler updates of the stack before removal
+	if stack.AutoUpdate != nil {
+		stopAutoupdate(stack.ID, stack.AutoUpdate.JobID, *handler.Scheduler)
+	}
+
+	err = handler.DataStore.Stack().DeleteStack(stack.ID)
+	if err != nil {
+		return err
+	}
+
+	if resourceControl != nil {
+		err = handler.DataStore.ResourceControl().DeleteResourceControl(resourceControl.ID)
+		if err != nil {
+			log.Printf("[ERROR] [Stack] Unable to remove the associated resource control from the database for stack: [%+v].", stack)
+		}
+	}
+
+	if exists, _ := handler.FileService.FileExists(stack.ProjectPath); exists {
+		err = handler.FileService.RemoveDirectory(stack.ProjectPath)
+		if err != nil {
+			log.Printf("Unable to remove stack files from disk for stack: [%+v].", stack)
+		}
+	}
+	return nil
+}
 
 func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	var payload composeStackFromFileContentPayload
@@ -49,8 +81,22 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for name collision", err}
 	}
+
 	if !isUnique {
-		return stackExistsError(payload.Name)
+		stacks, err := handler.DataStore.Stack().StacksByName(payload.Name)
+		if err != nil {
+			return stackExistsError(payload.Name)
+		}
+		for _, stack := range stacks {
+			if stack.Type != portainer.DockerComposeStack && stack.EndpointID == endpoint.ID {
+				err := handler.checkAndCleanStackDupFromSwarm(w, r, endpoint, userID, &stack)
+				if err != nil {
+					return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
+				}
+			} else {
+				return stackExistsError(payload.Name)
+			}
+		}
 	}
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
@@ -154,8 +200,22 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to check for name collision", Err: err}
 	}
+
 	if !isUnique {
-		return stackExistsError(payload.Name)
+		stacks, err := handler.DataStore.Stack().StacksByName(payload.Name)
+		if err != nil {
+			return stackExistsError(payload.Name)
+		}
+		for _, stack := range stacks {
+			if stack.Type != portainer.DockerComposeStack && stack.EndpointID == endpoint.ID {
+				err := handler.checkAndCleanStackDupFromSwarm(w, r, endpoint, userID, &stack)
+				if err != nil {
+					return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
+				}
+			} else {
+				return stackExistsError(payload.Name)
+			}
+		}
 	}
 
 	//make sure the webhook ID is unique
@@ -283,8 +343,22 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to check for name collision", Err: err}
 	}
+
 	if !isUnique {
-		return stackExistsError(payload.Name)
+		stacks, err := handler.DataStore.Stack().StacksByName(payload.Name)
+		if err != nil {
+			return stackExistsError(payload.Name)
+		}
+		for _, stack := range stacks {
+			if stack.Type != portainer.DockerComposeStack && stack.EndpointID == endpoint.ID {
+				err := handler.checkAndCleanStackDupFromSwarm(w, r, endpoint, userID, &stack)
+				if err != nil {
+					return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
+				}
+			} else {
+				return stackExistsError(payload.Name)
+			}
+		}
 	}
 
 	stackID := handler.DataStore.Stack().GetNextIdentifier()
