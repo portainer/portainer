@@ -4,16 +4,14 @@ import "regexp"
 
 var stackNameNormalizeRegex = regexp.MustCompile("[^-_a-z0-9]+")
 
-var _exists = struct{}{}
-
-type StringSet map[string]struct{}
+type StringSet map[string]bool
 
 func NewStringSet() StringSet {
 	return make(StringSet)
 }
 
 func (s StringSet) Add(x string) {
-	s[x] = _exists
+	s[x] = true
 }
 
 func (s StringSet) Remove(x string) {

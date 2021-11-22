@@ -102,7 +102,7 @@ func createEnvFile(stack *portainer.Stack) (string, error) {
 	// workaround for EE-1862. It will have to be removed when
 	// docker/compose upgraded to v2.x.
 	if err := createNetworkEnvFile(stack); err != nil {
-		return "", err
+		return "", errors.Wrap(err, "failed to create network env file")
 	}
 
 	if stack.Env == nil || len(stack.Env) == 0 {
