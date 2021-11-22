@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"path"
 	"strconv"
 
 	"github.com/asaskevich/govalidator"
@@ -74,6 +73,10 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 				Username: payload.RepositoryUsername,
 				Password: password,
 			}
+			_, err := handler.GitService.LatestCommitID(stack.GitConfig.URL, stack.GitConfig.ReferenceName, stack.GitConfig.Authentication.Username, stack.GitConfig.Authentication.Password)
+			if err != nil {
+				return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to fetch git repository", Err: err}
+			}
 		} else {
 			stack.GitConfig.Authentication = nil
 		}
@@ -104,7 +107,7 @@ func (handler *Handler) updateKubernetesStack(r *http.Request, stack *portainer.
 	tempFileDir, _ := ioutil.TempDir("", "kub_file_content")
 	defer os.RemoveAll(tempFileDir)
 
-	if err := filesystem.WriteToFile(path.Join(tempFileDir, stack.EntryPoint), []byte(payload.StackFileContent)); err != nil {
+	if err := filesystem.WriteToFile(filesystem.JoinPaths(tempFileDir, stack.EntryPoint), []byte(payload.StackFileContent)); err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to persist deployment file in a temp directory", Err: err}
 	}
 

@@ -100,6 +100,32 @@ func (m *Migrator) updateDockerhubToDB32() error {
 		RegistryAccesses: portainer.RegistryAccesses{},
 	}
 
+	// The following code will make this function idempotent.
+	// i.e. if run again, it will not change the data.  It will ensure that
+	// we only have one migrated registry entry. Duplicates will be removed
+	// if they exist and which has been happening due to earlier migration bugs
+	migrated := false
+	registries, _ := m.registryService.Registries()
+	for _, r := range registries {
+		if r.Type == registry.Type &&
+			r.Name == registry.Name &&
+			r.URL == registry.URL &&
+			r.Authentication == registry.Authentication {
+
+			if !migrated {
+				// keep this one entry
+				migrated = true
+			} else {
+				// delete subsequent duplicates
+				m.registryService.DeleteRegistry(portainer.RegistryID(r.ID))
+			}
+		}
+	}
+
+	if migrated {
+		return nil
+	}
+
 	endpoints, err := m.endpointService.Endpoints()
 	if err != nil {
 		return err
@@ -218,8 +244,12 @@ func findResourcesToUpdateForDB32(dockerID string, volumesData map[string]interf
 		if !nameExist {
 			continue
 		}
+		createTime, createTimeExist := volume["CreatedAt"].(string)
+		if !createTimeExist {
+			continue
+		}
 
-		oldResourceID := fmt.Sprintf("%s%s", volumeName, volume["CreatedAt"].(string))
+		oldResourceID := fmt.Sprintf("%s%s", volumeName, createTime)
 		resourceControl, ok := volumeResourceControls[oldResourceID]
 
 		if ok {

@@ -32,6 +32,7 @@ class KubernetesDeployController {
     this.StackService = StackService;
     this.WebhookHelper = WebhookHelper;
     this.CustomTemplateService = CustomTemplateService;
+    this.DeployMethod = 'manifest';
 
     this.deployOptions = [
       buildOption('method_kubernetes', 'fa fa-cubes', 'Kubernetes', 'Kubernetes manifest format', KubernetesDeployManifestTypes.KUBERNETES),
@@ -79,6 +80,7 @@ class KubernetesDeployController {
     this.getNamespacesAsync = this.getNamespacesAsync.bind(this);
     this.onChangeFormValues = this.onChangeFormValues.bind(this);
     this.buildAnalyticsProperties = this.buildAnalyticsProperties.bind(this);
+    this.onDeployTypeChange = this.onDeployTypeChange.bind(this);
   }
 
   buildAnalyticsProperties() {
@@ -278,6 +280,14 @@ class KubernetesDeployController {
 
   getNamespaces() {
     return this.$async(this.getNamespacesAsync);
+  }
+
+  onDeployTypeChange(value) {
+    if (value == this.ManifestDeployTypes.COMPOSE) {
+      this.DeployMethod = 'compose';
+    } else {
+      this.DeployMethod = 'manifest';
+    }
   }
 
   async uiCanExit() {

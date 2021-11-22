@@ -49,6 +49,7 @@ type (
 		AdminPasswordFile         *string
 		Assets                    *string
 		Data                      *string
+		FeatureFlags              *[]Pair
 		EnableEdgeComputeFeatures *bool
 		EndpointURL               *string
 		Labels                    *[]Pair
@@ -387,6 +388,9 @@ type (
 	// ExtensionID represents a extension identifier
 	ExtensionID int
 
+	// Feature represents a feature that can be enabled or disabled via feature flags
+	Feature string
+
 	// GitlabRegistryData represents data required for gitlab registry to work
 	GitlabRegistryData struct {
 		ProjectID   int    `json:"ProjectId"`
@@ -543,6 +547,7 @@ type (
 		DefaultTeamID        TeamID `json:"DefaultTeamID"`
 		SSO                  bool   `json:"SSO"`
 		LogoutURI            string `json:"LogoutURI"`
+		KubeSecretKey        []byte `json:"KubeSecretKey"`
 	}
 
 	// Pair defines a key/value string pair
@@ -702,6 +707,7 @@ type (
 		AuthenticationMethod AuthenticationMethod `json:"AuthenticationMethod" example:"1"`
 		LDAPSettings         LDAPSettings         `json:"LDAPSettings" example:""`
 		OAuthSettings        OAuthSettings        `json:"OAuthSettings" example:""`
+		FeatureFlagSettings  map[Feature]bool     `json:"FeatureFlagSettings" example:""`
 		// The interval in which environment(endpoint) snapshots are created
 		SnapshotInterval string `json:"SnapshotInterval" example:"5m"`
 		// URL to the templates that will be displayed in the UI when navigating to App Templates
@@ -1211,7 +1217,7 @@ type (
 	// FileService represents a service for managing files
 	FileService interface {
 		GetDockerConfigPath() string
-		GetFileContent(filePath string) ([]byte, error)
+		GetFileContent(trustedRootPath, filePath string) ([]byte, error)
 		Copy(fromFilePath string, toFilePath string, deleteIfExists bool) error
 		Rename(oldPath, newPath string) error
 		RemoveDirectory(directoryPath string) error
@@ -1371,6 +1377,7 @@ type (
 	StackService interface {
 		Stack(ID StackID) (*Stack, error)
 		StackByName(name string) (*Stack, error)
+		StacksByName(name string) ([]Stack, error)
 		Stacks() ([]Stack, error)
 		CreateStack(stack *Stack) error
 		UpdateStack(ID StackID, stack *Stack) error
@@ -1468,9 +1475,9 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "2.9.1"
+	APIVersion = "2.9.3"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 33
+	DBVersion = 35
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
 	ComposeSyntaxMaxVersion = "3.9"
 	// AssetsServerURL represents the URL of the Portainer asset server
@@ -1511,6 +1518,18 @@ const (
 	// WebSocketKeepAlive web socket keep alive for edge environments
 	WebSocketKeepAlive = 1 * time.Hour
 )
+
+// Supported feature flags
+const (
+	FeatOpenAMT Feature = "open-amt"
+	FeatFDO     Feature = "fdo"
+)
+
+// List of supported features
+var SupportedFeatureFlags = []Feature{
+	FeatOpenAMT,
+	FeatFDO,
+}
 
 const (
 	_ AuthenticationMethod = iota

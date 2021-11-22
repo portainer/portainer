@@ -16,6 +16,8 @@ type publicSettingsResponse struct {
 	AuthenticationMethod portainer.AuthenticationMethod `json:"AuthenticationMethod" example:"1"`
 	// Whether edge compute features are enabled
 	EnableEdgeComputeFeatures bool `json:"EnableEdgeComputeFeatures" example:"true"`
+	// Supported feature flags
+	Features map[portainer.Feature]bool `json:"Features"`
 	// The URL used for oauth login
 	OAuthLoginURI string `json:"OAuthLoginURI" example:"https://gitlab.com/oauth"`
 	// The URL used for oauth logout
@@ -52,6 +54,7 @@ func generatePublicSettings(appSettings *portainer.Settings) *publicSettingsResp
 		EnableEdgeComputeFeatures: appSettings.EnableEdgeComputeFeatures,
 		EnableTelemetry:           appSettings.EnableTelemetry,
 		KubeconfigExpiry:          appSettings.KubeconfigExpiry,
+		Features:                  appSettings.FeatureFlagSettings,
 	}
 	//if OAuth authentication is on, compose the related fields from application settings
 	if publicSettings.AuthenticationMethod == portainer.AuthenticationOAuth {

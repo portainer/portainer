@@ -9,3 +9,5 @@ export const TEAM_MEMBERSHIP = 'team-membership';
 export const HIDE_INTERNAL_AUTH = 'hide-internal-auth';
 export const EXTERNAL_AUTH_LDAP = 'external-auth-ldap';
 export const ACTIVITY_AUDIT = 'activity-audit';
+export const HIDE_AUTO_UPDATE_WINDOW = 'hide-auto-update-window';
+export const FORCE_REDEPLOYMENT = 'force-redeployment';

@@ -301,7 +301,7 @@ func (m *Migrator) Migrate() error {
 		}
 	}
 
-	// Portainer 2.9.1
+	// Portainer 2.9.1, 2.9.2
 	if m.currentDBVersion < 33 {
 		err := m.migrateDBVersionToDB33()
 		if err != nil {
@@ -313,6 +313,13 @@ func (m *Migrator) Migrate() error {
 	if m.currentDBVersion < 34 {
 		if err := m.migrateDBVersionToDB34(); err != nil {
 			return migrationError(err, "migrateDBVersionToDB34")
+		}
+	}
+
+	// Portainer 2.9.3 (yep out of order, but 2.10 is EE only)
+	if m.currentDBVersion < 35 {
+		if err := m.migrateDBVersionToDB35(); err != nil {
+			return migrationError(err, "migrateDBVersionToDB35")
 		}
 	}
 

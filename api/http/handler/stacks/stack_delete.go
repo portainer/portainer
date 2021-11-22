@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"path"
 	"strconv"
 
 	"github.com/pkg/errors"
@@ -198,8 +197,8 @@ func (handler *Handler) deleteStack(userID portainer.UserID, stack *portainer.St
 			defer os.RemoveAll(tmpDir)
 
 			for _, fileName := range fileNames {
-				manifestFilePath := path.Join(tmpDir, fileName)
-				manifestContent, err := ioutil.ReadFile(path.Join(stack.ProjectPath, fileName))
+				manifestFilePath := filesystem.JoinPaths(tmpDir, fileName)
+				manifestContent, err := handler.FileService.GetFileContent(stack.ProjectPath, fileName)
 				if err != nil {
 					return errors.Wrap(err, "failed to read manifest file")
 				}

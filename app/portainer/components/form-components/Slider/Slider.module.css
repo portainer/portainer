@@ -1,0 +1,32 @@
+.root {
+  margin: 0 25px;
+}
+
+.slider {
+  padding-top: 50px;
+}
+
+.slider :global .rc-slider-handle {
+  width: 32px;
+  height: 32px;
+  margin-top: -14px;
+  border-radius: 16px;
+  cursor: pointer;
+  background-color: #0db9f0;
+}
+
+.slider :global .rc-slider-handle:after {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 8px;
+  height: 8px;
+  background: #ffffff;
+  border-radius: 4px;
+  content: '';
+}
+
+.slider :global .rc-slider-mark-text,
+.slider :global .rc-slider-tooltip-inner {
+  font-family: Montserrat, serif;
+}

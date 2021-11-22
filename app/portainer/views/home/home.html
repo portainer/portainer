@@ -1,3 +1,5 @@
+<!-- <react-example text="'text'"></react-example> -->
+
 <rd-header>
   <rd-header-title title-text="Home">
     <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.home" ui-sref-opts="{reload: true}">
@@ -46,7 +48,6 @@
     <endpoint-list
       title-text="Environments"
       title-icon="fa-plug"
-      endpoints="endpoints"
       table-key="home_endpoints"
       tags="tags"
       dashboard-action="goToDashboard"
@@ -54,7 +55,6 @@
       snapshot-action="triggerSnapshot"
       edit-action="goToEdit"
       is-admin="isAdmin"
-      total-count="totalCount"
       retrieve-page="getPaginatedEndpoints"
       endpoint-init-time="state.homepageLoadTime"
     ></endpoint-list>

@@ -3,7 +3,6 @@ package stackutils
 import (
 	"fmt"
 	"io/ioutil"
-	"path"
 
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
@@ -20,7 +19,7 @@ func ResourceControlID(endpointID portainer.EndpointID, name string) string {
 func GetStackFilePaths(stack *portainer.Stack) []string {
 	var filePaths []string
 	for _, file := range append([]string{stack.EntryPoint}, stack.AdditionalFiles...) {
-		filePaths = append(filePaths, path.Join(stack.ProjectPath, file))
+		filePaths = append(filePaths, filesystem.JoinPaths(stack.ProjectPath, file))
 	}
 	return filePaths
 }
@@ -37,8 +36,8 @@ func CreateTempK8SDeploymentFiles(stack *portainer.Stack, kubeDeployer portainer
 	}
 
 	for _, fileName := range fileNames {
-		manifestFilePath := path.Join(tmpDir, fileName)
-		manifestContent, err := ioutil.ReadFile(path.Join(stack.ProjectPath, fileName))
+		manifestFilePath := filesystem.JoinPaths(tmpDir, fileName)
+		manifestContent, err := ioutil.ReadFile(filesystem.JoinPaths(stack.ProjectPath, fileName))
 		if err != nil {
 			return nil, "", errors.Wrap(err, "failed to read manifest file")
 		}

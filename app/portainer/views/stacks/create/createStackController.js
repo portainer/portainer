@@ -1,8 +1,9 @@
 import angular from 'angular';
 import uuidv4 from 'uuid/v4';
+
+import { AccessControlFormData } from '@/portainer/components/accessControlForm/porAccessControlFormModel';
 import { STACK_NAME_VALIDATION_REGEX } from '@/constants';
-import { RepositoryMechanismTypes } from 'Kubernetes/models/deploy';
-import { AccessControlFormData } from '../../../components/accessControlForm/porAccessControlFormModel';
+import { RepositoryMechanismTypes } from '@/kubernetes/models/deploy';
 
 angular
   .module('portainer.app')

@@ -1,8 +1,8 @@
 import _ from 'lodash-es';
 
-import * as envVarsUtils from '@/portainer/helpers/env-vars';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
+import * as envVarsUtils from '@/portainer/helpers/env-vars';
 import { ContainerCapabilities, ContainerCapability } from '../../../models/containerCapabilities';
 import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
 import { ContainerDetailsViewModel } from '../../../models/container';

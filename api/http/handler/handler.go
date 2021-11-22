@@ -27,6 +27,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/ssl"
 	"github.com/portainer/portainer/api/http/handler/stacks"
 	"github.com/portainer/portainer/api/http/handler/status"
+	"github.com/portainer/portainer/api/http/handler/storybook"
 	"github.com/portainer/portainer/api/http/handler/tags"
 	"github.com/portainer/portainer/api/http/handler/teammemberships"
 	"github.com/portainer/portainer/api/http/handler/teams"
@@ -63,6 +64,7 @@ type Handler struct {
 	SSLHandler             *ssl.Handler
 	StackHandler           *stacks.Handler
 	StatusHandler          *status.Handler
+	StorybookHandler       *storybook.Handler
 	TagHandler             *tags.Handler
 	TeamMembershipHandler  *teammemberships.Handler
 	TeamHandler            *teams.Handler
@@ -74,7 +76,7 @@ type Handler struct {
 }
 
 // @title PortainerCE API
-// @version 2.9.1
+// @version 2.9.3
 // @description.markdown api-description.md
 // @termsOfService
 
@@ -227,6 +229,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.WebSocketHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/webhooks"):
 		http.StripPrefix("/api", h.WebhookHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/storybook"):
+		http.StripPrefix("/storybook", h.StorybookHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/"):
 		h.FileHandler.ServeHTTP(w, r)
 	}

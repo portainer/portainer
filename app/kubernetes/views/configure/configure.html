@@ -1,4 +1,4 @@
-<kubernetes-view-header title="Kubernetes features configuration" state="portainer.endpoints.endpoint.kubernetesConfig" view-ready="ctrl.state.viewReady">
+<kubernetes-view-header title="Kubernetes features configuration" state="portainer.k8sendpoint.kubernetesConfig" view-ready="ctrl.state.viewReady">
   <a ui-sref="portainer.endpoints">Environment</a> &gt; <a ui-sref="portainer.endpoints.endpoint({id: ctrl.endpoint.Id})">{{ ctrl.endpoint.Name }}</a> &gt; Kubernetes configuration
 </kubernetes-view-header>
 
@@ -139,6 +139,24 @@
                   Traefik support is experimental.
                 </p>
               </span>
+            </div>
+
+            <!-- auto update window -->
+            <div class="col-sm-12 form-section-title">
+              Change Window Setting
+            </div>
+
+            <div class="form-group">
+              <div class="col-sm-12">
+                <por-switch-field
+                  ng-model="$ctrl.state.autoUpdateSettings.Enabled"
+                  name="disableSysctlSettingForRegularUsers"
+                  label="Enable Change Window"
+                  feature="ctrl.limitedFeatureAutoWindow"
+                  tooltip="Specify a timeframe during which automatic updates can occur in this environment."
+                >
+                </por-switch-field>
+              </div>
             </div>
 
             <div class="col-sm-12 form-section-title">
