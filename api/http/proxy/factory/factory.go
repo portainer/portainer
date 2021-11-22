@@ -63,6 +63,17 @@ func (factory *ProxyFactory) NewEndpointProxy(endpoint *portainer.Endpoint) (htt
 	return factory.newDockerProxy(endpoint)
 }
 
+// NewGenericProxy returns a generic reverse proxy with no special handling
+func (factory *ProxyFactory) NewGenericProxy(uri string) (http.Handler, error) {
+	origin, err := url.Parse(uri)
+	if err != nil {
+		return nil, err
+	}
+
+	return newSingleHostReverseProxyWithHostHeader(origin), nil
+	//return httputil.NewSingleHostReverseProxy(origin), nil
+}
+
 // NewGitlabProxy returns a new HTTP proxy to a Gitlab API server
 func (factory *ProxyFactory) NewGitlabProxy(gitlabAPIUri string) (http.Handler, error) {
 	return newGitlabProxy(gitlabAPIUri)

@@ -98,10 +98,13 @@ func (handler *Handler) openAMTConfigureDefault(w http.ResponseWriter, r *http.R
 			return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Error validating certificate", Err: certificateErr}
 		}
 
+		logrus.Printf("Payload: %#v", payload)
+
 		err = handler.enableOpenAMT(payload)
 		if err != nil {
 			return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Error enabling OpenAMT", Err: err}
 		}
+
 		return response.Empty(w)
 	}
 
@@ -192,6 +195,8 @@ func (handler *Handler) saveConfiguration(configuration portainer.OpenAMTConfigu
 	configuration.DomainConfiguration.CertFileText = ""
 	configuration.DomainConfiguration.CertPassword = ""
 	configuration.WirelessConfiguration.PskPass = ""
+
+	logrus.Info("saving...")
 
 	settings.OpenAMTConfiguration = configuration
 	err = handler.DataStore.Settings().UpdateSettings(settings)

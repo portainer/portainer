@@ -28,8 +28,7 @@ type Service struct {
 // NewService initializes a new service.
 func NewService() *Service {
 	return &Service{
-		httpsClient:
-		&http.Client{
+		httpsClient: &http.Client{
 			Timeout: time.Second * time.Duration(5),
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},

@@ -22,6 +22,7 @@ type (
 		proxyFactory           *factory.ProxyFactory
 		endpointProxies        cmap.ConcurrentMap
 		legacyExtensionProxies cmap.ConcurrentMap
+		genericProxies         cmap.ConcurrentMap
 		k8sClientFactory       *cli.ClientFactory
 	}
 )
@@ -31,6 +32,7 @@ func NewManager(dataStore portainer.DataStore, signatureService portainer.Digita
 	return &Manager{
 		endpointProxies:        cmap.New(),
 		legacyExtensionProxies: cmap.New(),
+		genericProxies:         cmap.New(),
 		k8sClientFactory:       kubernetesClientFactory,
 		proxyFactory:           factory.NewProxyFactory(dataStore, signatureService, tunnelService, clientFactory, kubernetesClientFactory, kubernetesTokenCacheManager),
 	}
@@ -89,6 +91,27 @@ func (manager *Manager) GetLegacyExtensionProxy(key string) http.Handler {
 	if !ok {
 		return nil
 	}
+	return proxy.(http.Handler)
+}
+
+// CreateGenericProxy creates a new HTTP universal reverse proxy with a given key
+func (manager *Manager) CreateGenericProxy(key, uri string) (http.Handler, error) {
+	proxy, err := manager.proxyFactory.NewGenericProxy(uri)
+	if err != nil {
+		return nil, err
+	}
+
+	manager.genericProxies.Set(key, proxy)
+	return proxy, nil
+}
+
+// GetGenericProxy returns the universal proxy associated with the given key
+func (manager *Manager) GetGenericProxy(key string) http.Handler {
+	proxy, ok := manager.genericProxies.Get(key)
+	if !ok {
+		return nil
+	}
+
 	return proxy.(http.Handler)
 }
 

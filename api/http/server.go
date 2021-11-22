@@ -211,6 +211,7 @@ func (server *Server) Start() error {
 	}
 	intelHandler.OpenAMTService = server.OpenAMTService
 	intelHandler.DataStore = server.DataStore
+	intelHandler.ProxyManager = server.ProxyManager
 
 	var stackHandler = stacks.NewHandler(requestBouncer)
 	stackHandler.DataStore = server.DataStore
