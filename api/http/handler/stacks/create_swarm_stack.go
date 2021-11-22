@@ -26,7 +26,7 @@ type swarmStackFromFileContentPayload struct {
 	StackFileContent string `example:"version: 3\n services:\n web:\n image:nginx" validate:"required"`
 	// A list of environment(endpoint) variables used during stack deployment
 	Env []portainer.Pair
-	// Whether the stack is from a template and what is its template source.
+	// Whether the stack is from a template and what is its template source. (1 - app template, 2 - custom template)
 	TemplateFrom int `example:"1"`
 }
 
@@ -124,7 +124,7 @@ type swarmStackFromGitRepositoryPayload struct {
 	RepositoryUsername string `example:"myGitUsername"`
 	// Password used in basic authentication. Required when RepositoryAuthentication is true.
 	RepositoryPassword string `example:"myGitPassword"`
-	// Whether the stack is from a template and what is its template source.
+	// Whether the stack is from a template and what is its template source. (1 - app template, 2 - custom template)
 	TemplateFrom int `example:"1"`
 	// Path to the Stack file inside the Git repository
 	ComposeFile string `example:"docker-compose.yml" default:"docker-compose.yml"`

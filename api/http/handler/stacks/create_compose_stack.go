@@ -23,7 +23,7 @@ type composeStackFromFileContentPayload struct {
 	StackFileContent string `example:"version: 3\n services:\n web:\n image:nginx" validate:"required"`
 	// A list of environment(endpoint) variables used during stack deployment
 	Env []portainer.Pair `example:""`
-	// Whether the stack is from a template and what is its template source.
+	// Whether the stack is from a template and what is its template source. (1 - app template, 2 - custom template)
 	TemplateFrom int `example:"1"`
 }
 
@@ -120,7 +120,7 @@ type composeStackFromGitRepositoryPayload struct {
 	AutoUpdate *portainer.StackAutoUpdate
 	// A list of environment(endpoint) variables used during stack deployment
 	Env []portainer.Pair
-	// Whether the stack is from a template and what is its template source.
+	// Whether the stack is from a template and what is its template source. (1 - app template, 2 - custom template)
 	TemplateFrom int `example:"1"`
 }
 
@@ -183,7 +183,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		EntryPoint:      payload.ComposeFile,
 		AdditionalFiles: payload.AdditionalFiles,
 		AutoUpdate:      payload.AutoUpdate,
-		Env:             payload.Env, // Whether the stack is from a template and what is its template source.
+		Env:             payload.Env,
 		TemplateFrom:    portainer.TemplateFrom(payload.TemplateFrom),
 		GitConfig: &gittypes.RepoConfig{
 			URL:            payload.RepositoryURL,

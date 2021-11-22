@@ -142,11 +142,7 @@ angular
 
       if (method === 'template' || method === 'editor') {
         var stackFileContent = $scope.formValues.StackFileContent;
-        let templateFrom;
-        if (method === 'template') {
-          templateFrom = 2;
-        }
-        return StackService.createSwarmStackFromFileContent(name, stackFileContent, env, endpointId, templateFrom);
+        return StackService.createSwarmStackFromFileContent(name, stackFileContent, env, endpointId, method === 'template' ? 2 : null);
       }
 
       if (method === 'upload') {
@@ -188,11 +184,7 @@ angular
 
       if (method === 'editor' || method === 'template') {
         var stackFileContent = $scope.formValues.StackFileContent;
-        let templateFrom;
-        if (method === 'template') {
-          templateFrom = 2;
-        }
-        return StackService.createComposeStackFromFileContent(name, stackFileContent, env, endpointId, templateFrom);
+        return StackService.createComposeStackFromFileContent(name, stackFileContent, env, endpointId, method === 'template' ? 2 : null);
       } else if (method === 'upload') {
         var stackFile = $scope.formValues.StackFile;
         return StackService.createComposeStackFromFileUpload(name, stackFile, env, endpointId);
