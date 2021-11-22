@@ -10,12 +10,16 @@ import { CopyButton } from '@/portainer/components/Button/CopyButton';
 
 import styles from './CreateAccessToken.module.css';
 
+interface AccessTokenResponse {
+  rawAPIKey: string;
+}
+
 export interface Props {
   // userId for whom the access token is generated for
   userId: number;
 
   // onSubmit dispatches a successful matomo analytics event
-  onSubmit: () => void;
+  onSubmit: (description: string) => Promise<AccessTokenResponse>;
 
   // onSuccess is called when upon clicking the done button
   onSuccess: () => void;
@@ -25,7 +29,6 @@ export interface Props {
 }
 
 export function CreateAccessToken({
-  userId,
   onSubmit,
   onSuccess,
   onError,
@@ -42,25 +45,8 @@ export function CreateAccessToken({
 
     setIsLoading(true);
     try {
-      const res = await fetch(`/api/users/${userId}/tokens`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage
-            .getItem('portainer.JWT')
-            ?.replace(/['"]+/g, '')}`,
-        },
-        body: JSON.stringify({ description }),
-      });
-      if (res.ok) {
-        const json = await res.json();
-        setAccessToken(json.rawAPIKey);
-
-        // dispatch matamo analytics event
-        onSubmit();
-      } else {
-        onError('Error', res.statusText, res.statusText);
-      }
+      const response = await onSubmit(description);
+      setAccessToken(response.rawAPIKey);
     } catch (err) {
       onError('Failure', err, 'Failed to generate access token');
     } finally {

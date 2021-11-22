@@ -157,6 +157,19 @@ angular.module('portainer.app').factory('UserService', [
       return deferred.promise;
     };
 
+    service.createAccessToken = function (id, description) {
+      const deferred = $q.defer();
+      const payload = { description };
+      Users.createAccessToken({ id }, payload)
+        .$promise.then((data) => {
+          deferred.resolve(data);
+        })
+        .catch(function error(err) {
+          deferred.reject({ msg: 'Unable to create user', err: err });
+        });
+      return deferred.promise;
+    };
+
     service.initAdministrator = function (username, password) {
       return Users.initAdminUser({ Username: username, Password: password }).$promise;
     };

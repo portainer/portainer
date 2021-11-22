@@ -1,10 +1,11 @@
 export default class CreateUserAccessTokenController {
   /* @ngInject */
-  constructor($async, $state, $analytics, Authentication, Notifications) {
+  constructor($async, $state, $analytics, Authentication, UserService, Notifications) {
     this.$async = $async;
     this.$state = $state;
     this.$analytics = $analytics;
     this.Authentication = Authentication;
+    this.UserService = UserService;
     this.Notifications = Notifications;
 
     this.onSubmit = this.onSubmit.bind(this);
@@ -12,8 +13,11 @@ export default class CreateUserAccessTokenController {
     this.onError = this.onError.bind(this);
   }
 
-  onSubmit() {
+  async onSubmit(description) {
+    const accessToken = await this.UserService.createAccessToken(this.state.userId, description);
+    // Dispatch analytics event upon success accessToken generation
     this.$analytics.eventTrack('portainer-account-access-token-create', { category: 'portainer' });
+    return accessToken;
   }
 
   onSuccess() {
