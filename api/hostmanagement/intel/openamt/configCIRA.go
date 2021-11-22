@@ -7,7 +7,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
+	"strings"
 
 	portainer "github.com/portainer/portainer/api"
 )
@@ -69,11 +71,16 @@ func (service *Service) saveCIRAConfig(method string, configuration portainer.Op
 		return nil, err
 	}
 
+	addressFormat, err := addressFormat(configuration.MPSURL)
+	if err != nil {
+		return nil, err
+	}
+
 	config := CIRAConfig{
 		ConfigName:          configName,
 		MPSServerAddress:    configuration.MPSURL,
-		ServerAddressFormat: 3,
 		CommonName:          configuration.MPSURL,
+		ServerAddressFormat: addressFormat,
 		MPSPort:             4433,
 		Username:            "admin",
 		MPSRootCertificate:  certificate,
@@ -93,6 +100,20 @@ func (service *Service) saveCIRAConfig(method string, configuration portainer.Op
 		return nil, err
 	}
 	return &result, nil
+}
+
+func addressFormat(url string) (int, error) {
+	ip := net.ParseIP(url)
+	if ip == nil {
+		return 201, nil // FQDN
+	}
+	if strings.Contains(url, ".") {
+		return 3, nil // IPV4
+	}
+	if strings.Contains(url, ":") {
+		return 4, nil // IPV6
+	}
+	return 0, fmt.Errorf("could not determine server address format for %v", url)
 }
 
 func (service *Service) getCIRACertificate(configuration portainer.OpenAMTConfiguration) (string, error) {
