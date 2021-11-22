@@ -440,8 +440,23 @@ a[ng-click] {
   display: none;
 }
 
+.bootbox-form .visible {
+  position: initial !important;
+  display: initial !important;
+  margin-left: 10px !important;
+  margin-top: -2px !important;
+}
+
 .bootbox-form label {
   padding-left: 0;
+}
+
+.bootbox-checkbox-list {
+  max-height: 200px;
+  overflow-y: scroll;
+  background-color: var(--white-color);
+  border: 1px solid var(--grey-48);
+  border-radius: 4px;
 }
 
 .small-select {

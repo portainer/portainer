@@ -1,4 +1,5 @@
 import _ from 'lodash-es';
+import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 
 const ENDPOINTS_POLLING_INTERVAL = 30000; // in ms
 const ENDPOINTS_CACHE_SIZE = 100;
@@ -6,8 +7,10 @@ const ENDPOINTS_CACHE_SIZE = 100;
 angular.module('portainer.app').controller('EndpointListController', [
   'DatatableService',
   'PaginationService',
+  'ModalService',
+  'KubernetesConfigService',
   'Notifications',
-  function EndpointListController(DatatableService, PaginationService, Notifications) {
+  function EndpointListController(DatatableService, PaginationService, ModalService, KubernetesConfigService, Notifications) {
     this.state = {
       totalFilteredEndpoints: null,
       textFilter: '',
@@ -125,6 +128,50 @@ angular.module('portainer.app').controller('EndpointListController', [
     function convertStatusToString(status) {
       return status === 1 ? 'up' : 'down';
     }
+
+    this.showKubeconfigButton = function () {
+      if (window.location.protocol !== 'https:') {
+        return false;
+      }
+      return _.some(this.endpoints, (endpoint) => isKubernetesMode(endpoint));
+    };
+
+    function isKubernetesMode(endpoint) {
+      return [
+        PortainerEndpointTypes.KubernetesLocalEnvironment,
+        PortainerEndpointTypes.AgentOnKubernetesEnvironment,
+        PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment,
+      ].includes(endpoint.Type);
+    }
+
+    this.showKubeconfigModal = async function () {
+      const kubeEnvironments = _.filter(this.endpoints, (endpoint) => isKubernetesMode(endpoint));
+      const options = kubeEnvironments.map(function (environment) {
+        return {
+          text: `${environment.Name} (${environment.URL})`,
+          value: environment.Id,
+        };
+      });
+
+      let expiryMessage = '';
+      try {
+        expiryMessage = await KubernetesConfigService.expiryMessage();
+      } catch (e) {
+        Notifications.error('Failed fetching kubeconfig expiry time', e);
+      }
+
+      ModalService.confirmKubeconfigSelection(options, expiryMessage, async function (selectedEnvironmentIDs) {
+        if (selectedEnvironmentIDs.length === 0) {
+          Notifications.warning('No environment was selected');
+          return;
+        }
+        try {
+          await KubernetesConfigService.downloadKubeconfigFile(selectedEnvironmentIDs);
+        } catch (e) {
+          Notifications.error('Failed downloading kubeconfig file', e);
+        }
+      });
+    };
 
     this.$onInit = function () {
       var textFilter = DatatableService.getDataTableTextFilters(this.tableKey);
