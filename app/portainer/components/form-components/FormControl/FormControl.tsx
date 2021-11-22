@@ -1,6 +1,9 @@
 import { PropsWithChildren, ReactNode } from 'react';
+import clsx from 'clsx';
 
 import { Tooltip } from '@/portainer/components/Tip/Tooltip';
+
+import styles from './FormControl.module.css';
 
 export interface Props {
   inputId: string;
@@ -19,7 +22,7 @@ export function FormControl({
 }: PropsWithChildren<Props>) {
   return (
     <div>
-      <div className="form-group">
+      <div className={clsx('form-group', styles.container)}>
         <label
           htmlFor={inputId}
           className="col-sm-3 col-lg-2 control-label text-left"
@@ -33,7 +36,13 @@ export function FormControl({
 
       {errors && (
         <div className="form-group col-md-12">
-          <div className="small text-warning">{errors}</div>
+          <div className="small text-warning">
+            <i
+              className={clsx('fa fa-exclamation-triangle', styles.spaceRight)}
+              aria-hidden="true"
+            />
+            {errors}
+          </div>
         </div>
       )}
     </div>
