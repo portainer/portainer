@@ -9,5 +9,6 @@ export const ldapSettings = {
     connectivityCheck: '<',
     onSaveSettings: '<',
     saveButtonState: '<',
+    isLdapFormValid: '<',
   },
 };
