@@ -19,6 +19,10 @@ class OpenAmtController {
       wifiPskPass: '',
     };
 
+    this.originalValues = {
+      ...this.formValues,
+    };
+
     this.state = {
       actionInProgress: false,
     };
@@ -77,21 +81,23 @@ class OpenAmtController {
         const data = await this.SettingsService.settings();
         const config = data.OpenAMTConfiguration;
 
-        this.formValues = {
-          ...this.formValues,
-          enableOpenAMT: config.Enabled,
-          mpsURL: config.MPSURL,
-          mpsUser: config.Credentials.MPSUser,
-          domainName: config.DomainConfiguration.DomainName,
-          useWirelessConfig: config.WirelessConfiguration.UseWirelessConfig,
-          wifiAuthenticationMethod: config.WirelessConfiguration.AuthenticationMethod,
-          wifiEncryptionMethod: config.WirelessConfiguration.EncryptionMethod,
-          wifiSsid: config.WirelessConfiguration.SSID,
-        };
+        if (config) {
+          this.formValues = {
+            ...this.formValues,
+            enableOpenAMT: config.Enabled,
+            mpsURL: config.MPSURL,
+            mpsUser: config.Credentials.MPSUser,
+            domainName: config.DomainConfiguration.DomainName,
+            useWirelessConfig: config.WirelessConfiguration.UseWirelessConfig,
+            wifiAuthenticationMethod: config.WirelessConfiguration.AuthenticationMethod,
+            wifiEncryptionMethod: config.WirelessConfiguration.EncryptionMethod,
+            wifiSsid: config.WirelessConfiguration.SSID,
+          };
 
-        this.originalValues = {
-          ...this.formValues,
-        };
+          this.originalValues = {
+            ...this.formValues,
+          };
+        }
       } catch (err) {
         this.Notifications.error('Failure', err, 'Failed loading settings');
       }
