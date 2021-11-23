@@ -58,7 +58,7 @@ angular.module('portainer.app').factory('UserService', [
           deferred.resolve(userTokens);
         })
         .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to retrieve users', err: err });
+          deferred.reject({ msg: 'Unable to retrieve user tokens', err: err });
         });
 
       return deferred.promise;
