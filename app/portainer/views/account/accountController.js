@@ -35,7 +35,7 @@ angular.module('portainer.app').controller('AccountController', [
           return;
         }
         let actionCount = selectedItems.length;
-        angular.forEach(selectedItems, function (token) {
+        selectedItems.forEach(token => {
           UserService.deleteToken($scope.userID, token.id)
             .then(function success() {
               Notifications.success('Token successfully removed');
