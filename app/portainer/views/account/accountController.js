@@ -30,7 +30,7 @@ angular.module('portainer.app').controller('AccountController', [
     $scope.removeAction = (selectedItems) => {
       const msg = 'Do you want to remove the selected access token(s)? Any script or application using these tokens will no longer be able to invoke the Portainer API.';
 
-      ModalService.confirmDeletion(msg, function onConfirm(confirmed) {
+      ModalService.confirmDeletion(msg, function (confirmed) {
         if (!confirmed) {
           return;
         }
