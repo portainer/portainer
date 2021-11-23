@@ -100,6 +100,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       actionInProgress: false,
       mode: '',
       pullImageValidity: true,
+      settingUnlimitedResources: false,
     };
 
     $scope.handleEnvVarChange = handleEnvVarChange;
@@ -761,10 +762,27 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       return true;
     }
 
+    $scope.handleResourceChange = handleResourceChange;
+    function handleResourceChange() {
+      $scope.state.settingUnlimitedResources = false;
+      if (
+        ($scope.config.HostConfig.Memory > 0 && $scope.formValues.MemoryLimit === 0) ||
+        ($scope.config.HostConfig.MemoryReservation > 0 && $scope.formValues.MemoryReservation === 0) ||
+        ($scope.config.HostConfig.NanoCpus > 0 && $scope.formValues.CpuLimit === 0)
+      ) {
+        $scope.state.settingUnlimitedResources = true;
+      }
+    }
+
     async function updateLimits(config) {
       try {
-        await ContainerService.updateLimits($transition$.params().from, config);
-        Notifications.success('Limits updated');
+        if ($scope.state.settingUnlimitedResources) {
+          create();
+        } else {
+          await ContainerService.updateLimits($transition$.params().from, config);
+          initView();
+          Notifications.success('Limits updated');
+        }
       } catch (err) {
         Notifications.error('Failure', err, 'Update Limits fail');
       }

@@ -4,7 +4,7 @@
 }
 
 .widget .edit-resources button {
-  margin-left: 15px;
+  margin-left: 0;
 }
 
 .mt-20 {
@@ -13,4 +13,8 @@
 
 .mt-7 {
   margin-top: 7px;
+}
+
+.mt-10 {
+  margin-top: 10px;
 }
