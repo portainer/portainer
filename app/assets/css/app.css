@@ -836,6 +836,10 @@ json-tree .branch-preview {
   align-items: center;
 }
 
+.space-y-8 > * + * {
+  margin-top: 2rem;
+}
+
 .my-8 {
   margin-top: 2rem;
   margin-bottom: 2rem;

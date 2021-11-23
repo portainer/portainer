@@ -3,6 +3,7 @@ export interface InputProps {
   className?: string;
   required?: boolean;
   disabled?: boolean;
+  placeholder?: string;
 }
 
 export interface ChangeProps<T> {

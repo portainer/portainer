@@ -11,6 +11,9 @@ export function Textarea({
   onChange,
   value,
   id,
+  placeholder,
+  disabled,
+  required,
 }: Props & InputProps) {
   return (
     <BaseInput
@@ -20,6 +23,9 @@ export function Textarea({
       className={className}
       value={value}
       onChange={onChange}
+      placeholder={placeholder}
+      disabled={disabled}
+      required={required}
     />
   );
 }
