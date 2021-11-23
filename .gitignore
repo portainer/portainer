@@ -3,9 +3,11 @@ bower_components
 dist
 portainer-checksum.txt
 api/cmd/portainer/portainer*
+storybook-static
 .tmp
 **/.vscode/settings.json
 **/.vscode/tasks.json
+*.DS_Store
 
 .eslintcache
 __debug_bin

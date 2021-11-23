@@ -1,11 +1,12 @@
 package cli
 
 import (
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 
 	"fmt"
-	"gopkg.in/alecthomas/kingpin.v2"
 	"strings"
+
+	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 type pairList []portainer.Pair

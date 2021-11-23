@@ -22,5 +22,5 @@ func (service *Service) GenerateTokenForKubeconfig(data *portainer.TokenData) (s
 		expiryAt = 0
 	}
 
-	return service.generateSignedToken(data, expiryAt)
+	return service.generateSignedToken(data, expiryAt, kubeConfigScope)
 }

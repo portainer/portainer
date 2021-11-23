@@ -32,21 +32,23 @@ func NewHandler(bouncer *security.RequestBouncer, authorizationService *authoriz
 		authorizationService:    authorizationService,
 	}
 
-	kubeRouter := h.PathPrefix("/kubernetes/{id}").Subrouter()
-
+	kubeRouter := h.PathPrefix("/kubernetes").Subrouter()
 	kubeRouter.Use(bouncer.AuthenticatedAccess)
-	kubeRouter.Use(middlewares.WithEndpoint(dataStore.Endpoint(), "id"))
-	kubeRouter.Use(kubeOnlyMiddleware)
-
 	kubeRouter.PathPrefix("/config").Handler(
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.getKubernetesConfig))).Methods(http.MethodGet)
-	kubeRouter.PathPrefix("/nodes_limits").Handler(
+
+	// endpoints
+	endpointRouter := kubeRouter.PathPrefix("/{id}").Subrouter()
+	endpointRouter.Use(middlewares.WithEndpoint(dataStore.Endpoint(), "id"))
+	endpointRouter.Use(kubeOnlyMiddleware)
+
+	endpointRouter.PathPrefix("/nodes_limits").Handler(
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.getKubernetesNodesLimits))).Methods(http.MethodGet)
 
 	// namespaces
 	// in the future this piece of code might be in another package (or a few different packages - namespaces/namespace?)
 	// to keep it simple, we've decided to leave it like this.
-	namespaceRouter := kubeRouter.PathPrefix("/namespaces/{namespace}").Subrouter()
+	namespaceRouter := endpointRouter.PathPrefix("/namespaces/{namespace}").Subrouter()
 	namespaceRouter.Handle("/system", bouncer.RestrictedAccess(httperror.LoggerHandler(h.namespacesToggleSystem))).Methods(http.MethodPut)
 
 	return h

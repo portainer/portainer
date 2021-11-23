@@ -148,8 +148,13 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		if clientSecret == "" {
 			clientSecret = settings.OAuthSettings.ClientSecret
 		}
+		kubeSecret := payload.OAuthSettings.KubeSecretKey
+		if kubeSecret == nil {
+			kubeSecret = settings.OAuthSettings.KubeSecretKey
+		}
 		settings.OAuthSettings = *payload.OAuthSettings
 		settings.OAuthSettings.ClientSecret = clientSecret
+		settings.OAuthSettings.KubeSecretKey = kubeSecret
 	}
 
 	if payload.EnableEdgeComputeFeatures != nil {

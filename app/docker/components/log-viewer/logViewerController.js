@@ -24,13 +24,13 @@ angular.module('portainer.docker').controller('LogViewerController', [
     };
 
     this.copy = function () {
-      clipboard.copyText(this.state.filteredLogs.map((log) => log.line));
+      clipboard.copyText(this.state.filteredLogs.map((log) => log.line).join(''));
       $('#refreshRateChange').show();
       $('#refreshRateChange').fadeOut(2000);
     };
 
     this.copySelection = function () {
-      clipboard.copyText(this.state.selectedLines);
+      clipboard.copyText(this.state.selectedLines.join(''));
       $('#refreshRateChange').show();
       $('#refreshRateChange').fadeOut(2000);
     };
