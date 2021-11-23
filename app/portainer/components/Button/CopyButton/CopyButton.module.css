@@ -3,6 +3,11 @@
   animation-fill-mode: forwards;
 }
 
+.container {
+  display: flex;
+  align-items: baseline;
+}
+
 .display-text {
   opacity: 0;
   margin-left: 7px;

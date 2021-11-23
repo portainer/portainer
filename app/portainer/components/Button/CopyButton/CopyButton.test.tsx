@@ -12,23 +12,14 @@ test('should display a CopyButton with children', async () => {
   expect(button).toBeTruthy();
 });
 
-test('should display a CopyButton with label prop', async () => {
-  const label = 'something new';
-  const { findByText } = render(<CopyButton copyText="" label={label} />);
-
-  const button = await findByText(label);
-  expect(button).toBeTruthy();
-});
-
 test('CopyButton should copy text to clipboard', async () => {
   // override navigator.clipboard.writeText (to test copy to clipboard functionality)
   let clipboardText = '';
+  const writeText = jest.fn((text) => {
+    clipboardText = text;
+  });
   Object.assign(navigator, {
-    clipboard: {
-      writeText: (text: string) => {
-        clipboardText = text;
-      },
-    },
+    clipboard: { writeText },
   });
 
   const children = 'button';
@@ -42,4 +33,5 @@ test('CopyButton should copy text to clipboard', async () => {
 
   fireEvent.click(button);
   expect(clipboardText).toBe(copyText);
+  expect(writeText).toHaveBeenCalled();
 });

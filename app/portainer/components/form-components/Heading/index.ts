@@ -1,1 +1,0 @@
-export { Heading } from './Heading';

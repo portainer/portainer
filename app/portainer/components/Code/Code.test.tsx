@@ -9,11 +9,3 @@ test('should display a Code with children', async () => {
   const heading = await findByText(children);
   expect(heading).toBeTruthy();
 });
-
-test('should display a Code with text prop', async () => {
-  const text = 'text code with 2';
-  const { findByText } = render(<Code text={text} />);
-
-  const heading = await findByText(text);
-  expect(heading).toBeTruthy();
-});

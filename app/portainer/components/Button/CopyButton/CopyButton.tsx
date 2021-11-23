@@ -6,7 +6,6 @@ import { Button } from '../Button';
 import styles from './CopyButton.module.css';
 
 export interface Props {
-  label?: string;
   copyText: string;
   fadeDelay?: number;
   displayText?: string;
@@ -14,10 +13,9 @@ export interface Props {
 }
 
 export function CopyButton({
-  label,
   copyText,
   fadeDelay = 1000,
-  displayText,
+  displayText = 'copied',
   className,
   children,
 }: PropsWithChildren<Props>) {
@@ -39,7 +37,7 @@ export function CopyButton({
   }
 
   return (
-    <>
+    <div className={styles.container}>
       <Button
         className={className}
         size="small"
@@ -47,15 +45,12 @@ export function CopyButton({
         title="Copy Value"
         type="button"
       >
-        <i className="fa fa-copy space-right" aria-hidden="true" />{' '}
-        {label || children}
+        <i className="fa fa-copy space-right" aria-hidden="true" /> {children}
       </Button>
 
       <span className={clsx(isFading && styles.fadeout, styles.displayText)}>
         <i className="fa fa-check" aria-hidden="true" /> {displayText}
       </span>
-      {/* <button type="button" className="btn btn-link nopadding" title="Copy Value"> <i className="fa fa-copy" /> Copy </button> */}
-      {/* <span ng-class="{ 'copy-button-fadeout': $ctrl.state.isFading }" class="copy-button-copy-text"> <i class="fa fa-check" aria-hidden="true"></i> copied </span> */}
-    </>
+    </div>
   );
 }

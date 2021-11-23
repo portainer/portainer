@@ -9,13 +9,12 @@ export default {
 } as Meta;
 
 function Template({
-  label,
   copyText,
   displayText,
   children,
 }: JSX.IntrinsicAttributes & PropsWithChildren<Props>) {
   return (
-    <CopyButton label={label} copyText={copyText} displayText={displayText}>
+    <CopyButton copyText={copyText} displayText={displayText}>
       {children}
     </CopyButton>
   );
@@ -23,13 +22,13 @@ function Template({
 
 export const Primary: Story<PropsWithChildren<Props>> = Template.bind({});
 Primary.args = {
-  label: 'Example heading',
+  children: 'Copy to clipboard',
   copyText: 'this will be copied to clipboard',
 };
 
-export const WithChildren: Story<PropsWithChildren<Props>> = Template.bind({});
-WithChildren.args = {
-  children: 'This is a heading with children',
+export const NoCopyText: Story<PropsWithChildren<Props>> = Template.bind({});
+NoCopyText.args = {
+  children: 'Copy to clipboard without copied text',
   copyText: 'clipboard override',
-  displayText: 'copied',
+  displayText: '',
 };

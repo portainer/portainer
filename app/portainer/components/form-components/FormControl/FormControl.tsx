@@ -38,7 +38,7 @@ export function FormControl({
         <div className="form-group col-md-12">
           <div className="small text-warning">
             <i
-              className={clsx('fa fa-exclamation-triangle', styles.spaceRight)}
+              className="fa fa-exclamation-triangle space-right"
               aria-hidden="true"
             />
             {errors}
