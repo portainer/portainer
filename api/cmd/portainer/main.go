@@ -279,6 +279,8 @@ func enableFeaturesFromFlags(dataStore portainer.DataStore, flags *portainer.CLI
 		settings.FeatureFlagSettings[*correspondingFeature] = featureState
 	}
 
+	settings.FeatureFlagSettings[portainer.FeatOpenAMT] = true // TODO
+
 	return dataStore.Settings().UpdateSettings(settings)
 }
 

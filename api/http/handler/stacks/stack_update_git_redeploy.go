@@ -139,6 +139,7 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		repositoryUsername = payload.RepositoryUsername
 	}
 
+	// stack.GitConfig.URL = "https://github.com/cheloRydel/templates" //TODO
 	err = handler.GitService.CloneRepository(stack.ProjectPath, stack.GitConfig.URL, payload.RepositoryReferenceName, repositoryUsername, repositoryPassword)
 	if err != nil {
 		restoreError := filesystem.MoveDirectory(backupProjectPath, stack.ProjectPath)
