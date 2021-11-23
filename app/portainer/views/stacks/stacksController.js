@@ -1,7 +1,9 @@
+import { isOfflineEndpoint } from '@/portainer/helpers/endpointHelper';
+
 angular.module('portainer.app').controller('StacksController', StacksController);
 
 /* @ngInject */
-function StacksController($scope, $state, Notifications, StackService, ModalService, EndpointProvider, Authentication, endpoint) {
+function StacksController($scope, $state, Notifications, StackService, ModalService, Authentication, endpoint) {
   $scope.removeAction = function (selectedItems) {
     ModalService.confirmDeletion('Do you want to remove the selected stack(s)? Associated services will be removed as well.', function onConfirm(confirmed) {
       if (!confirmed) {
@@ -12,8 +14,8 @@ function StacksController($scope, $state, Notifications, StackService, ModalServ
   };
 
   function deleteSelectedStacks(stacks) {
-    var endpointId = EndpointProvider.endpointID();
-    var actionCount = stacks.length;
+    const endpointId = endpoint.Id;
+    let actionCount = stacks.length;
     angular.forEach(stacks, function (stack) {
       StackService.remove(stack, stack.External, endpointId)
         .then(function success() {
@@ -39,15 +41,14 @@ function StacksController($scope, $state, Notifications, StackService, ModalServ
   $scope.getStacks = getStacks;
 
   function getStacks() {
-    var endpointMode = $scope.applicationState.endpoint.mode;
-    var endpointId = EndpointProvider.endpointID();
+    const endpointMode = $scope.applicationState.endpoint.mode;
+    const endpointId = endpoint.Id;
 
     const includeOrphanedStacks = Authentication.isAdmin();
     StackService.stacks(true, endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER', endpointId, includeOrphanedStacks)
-      .then(function success(data) {
-        var stacks = data;
+      .then(function success(stacks) {
         $scope.stacks = stacks;
-        $scope.offlineMode = EndpointProvider.offlineMode();
+        $scope.offlineMode = isOfflineEndpoint(endpoint);
       })
       .catch(function error(err) {
         $scope.stacks = [];

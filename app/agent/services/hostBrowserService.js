@@ -2,7 +2,8 @@ import angular from 'angular';
 
 angular.module('portainer.agent').factory('HostBrowserService', HostBrowserServiceFactory);
 
-function HostBrowserServiceFactory(Browse, Upload, API_ENDPOINT_ENDPOINTS, EndpointProvider, StateManager) {
+/* @ngInject */
+function HostBrowserServiceFactory(Browse, Upload, API_ENDPOINT_ENDPOINTS, StateManager) {
   return { ls, get, delete: deletePath, rename, upload };
 
   function ls(path) {
@@ -25,14 +26,14 @@ function HostBrowserServiceFactory(Browse, Upload, API_ENDPOINT_ENDPOINTS, Endpo
     return Browse.rename({}, payload).$promise;
   }
 
-  function upload(path, file, onProgress) {
+  function upload(endpointId, Path, file, onProgress) {
     const agentVersion = StateManager.getAgentApiVersion();
-    const url = `${API_ENDPOINT_ENDPOINTS}/${EndpointProvider.endpointID()}/docker${agentVersion > 1 ? '/v' + agentVersion : ''}/browse/put`;
+    const url = `${API_ENDPOINT_ENDPOINTS}/${endpointId}/docker${agentVersion > 1 ? '/v' + agentVersion : ''}/browse/put`;
 
     return new Promise((resolve, reject) => {
       Upload.upload({
         url: url,
-        data: { file: file, Path: path },
+        data: { file, Path },
       }).then(resolve, reject, onProgress);
     });
   }

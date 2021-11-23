@@ -2,10 +2,10 @@ import { Terminal } from 'xterm';
 
 angular.module('portainer.docker').controller('ContainerConsoleController', [
   '$scope',
+  '$state',
   '$transition$',
   'ContainerService',
   'ImageService',
-  'EndpointProvider',
   'Notifications',
   'ContainerHelper',
   'ExecService',
@@ -14,10 +14,10 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
   'CONSOLE_COMMANDS_LABEL_PREFIX',
   function (
     $scope,
+    $state,
     $transition$,
     ContainerService,
     ImageService,
-    EndpointProvider,
     Notifications,
     ContainerHelper,
     ExecService,
@@ -64,7 +64,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
 
           const params = {
             token: LocalStorage.getJWT(),
-            endpointId: EndpointProvider.endpointID(),
+            endpointId: $state.params.endpointId,
             id: attachId,
           };
 
@@ -104,7 +104,7 @@ angular.module('portainer.docker').controller('ContainerConsoleController', [
         .then(function success(data) {
           const params = {
             token: LocalStorage.getJWT(),
-            endpointId: EndpointProvider.endpointID(),
+            endpointId: $state.params.endpointId,
             id: data.Id,
           };
 

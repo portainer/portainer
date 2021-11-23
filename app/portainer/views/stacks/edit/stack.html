@@ -115,7 +115,7 @@
                 ng-if="regular && endpoints.length > 0"
                 endpoints="endpoints"
                 groups="groups"
-                current-endpoint-id="currentEndpointId"
+                current-endpoint-id="endpoint.Id"
                 on-duplicate="duplicateStack(name, endpointId)"
                 on-migrate="migrateStack(name, endpointId)"
                 yaml-error="state.yamlError"
@@ -215,6 +215,7 @@
       show-host-column="false"
       show-add-action="false"
       not-auto-focus="true"
+      endpoint-public-url="endpoint.PublicURL"
     ></containers-datatable>
   </div>
 </div>
@@ -235,6 +236,8 @@
       show-add-action="false"
       show-stack-column="false"
       not-auto-focus="true"
+      endpoint-public-url="endpoint.PublicURL"
+      endpoint-id="endpoint.Id"
     ></services-datatable>
   </div>
 </div>
