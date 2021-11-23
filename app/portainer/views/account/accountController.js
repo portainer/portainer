@@ -36,7 +36,7 @@ angular.module('portainer.app').controller('AccountController', [
         }
         let actionCount = selectedTokens.length;
         selectedTokens.forEach((token) => {
-          UserService.deleteToken($scope.userID, token.id)
+          UserService.deleteAccessToken($scope.userID, token.id)
             .then(() => {
               Notifications.success('Token successfully removed');
               var index = $scope.tokens.indexOf(token);
@@ -87,7 +87,7 @@ angular.module('portainer.app').controller('AccountController', [
           Notifications.error('Failure', err, 'Unable to retrieve application settings');
         });
 
-      UserService.getUserTokens($scope.userID)
+      UserService.getAccessTokens($scope.userID)
         .then(function success(data) {
           $scope.tokens = data;
         })

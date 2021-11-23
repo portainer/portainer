@@ -18,8 +18,8 @@ angular.module('portainer.app').factory('Users', [
         checkAdminUser: { method: 'GET', params: { id: 'admin', entity: 'check' }, isArray: true, ignoreLoadingBar: true },
         initAdminUser: { method: 'POST', params: { id: 'admin', entity: 'init' }, ignoreLoadingBar: true },
         createAccessToken: { url: `${API_ENDPOINT_USERS}/:id/tokens`, method: 'POST', params: { id: '@id' }, ignoreLoadingBar: true },
-        getUserTokens: { method: 'GET', params: { id: '@id', entity: 'tokens' }, isArray: true },
-        deleteToken: { url: `${API_ENDPOINT_USERS}/:id/tokens/:tokenId`, method: 'DELETE', params: { id: '@id', entityId: '@tokenId' } },
+        getAccessTokens: { method: 'GET', params: { id: '@id', entity: 'tokens' }, isArray: true },
+        deleteAccessToken: { url: `${API_ENDPOINT_USERS}/:id/tokens/:tokenId`, method: 'DELETE', params: { id: '@id', entityId: '@tokenId' } },
       }
     );
   },
