@@ -5,6 +5,7 @@ import (
 )
 
 func (m *Migrator) migrateDBVersionToDB34() error {
+	migrateLog.Info("Migrating stacks")
 	err := migrateStackEntryPoint(m.stackService)
 	if err != nil {
 		return err

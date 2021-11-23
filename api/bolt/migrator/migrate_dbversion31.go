@@ -11,24 +11,29 @@ import (
 )
 
 func (m *Migrator) migrateDBVersionToDB32() error {
+	migrateLog.Info("Updating registries")
 	err := m.updateRegistriesToDB32()
 	if err != nil {
 		return err
 	}
 
+	migrateLog.Info("Updating dockerhub")
 	err = m.updateDockerhubToDB32()
 	if err != nil {
 		return err
 	}
 
+	migrateLog.Info("Updating resource controls")
 	if err := m.updateVolumeResourceControlToDB32(); err != nil {
 		return err
 	}
 
+	migrateLog.Info("Updating kubeconfig expiry")
 	if err := m.kubeconfigExpiryToDB32(); err != nil {
 		return err
 	}
 
+	migrateLog.Info("Setting default helm repository url")
 	if err := m.helmRepositoryURLToDB32(); err != nil {
 		return err
 	}

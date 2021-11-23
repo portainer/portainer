@@ -5,6 +5,7 @@ import (
 )
 
 func (m *Migrator) updateEndpointSettingsToDB25() error {
+	migrateLog.Info("Updating endpoint settings")
 	settings, err := m.settingsService.Settings()
 	if err != nil {
 		return err
