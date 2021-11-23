@@ -23,7 +23,7 @@ func (store *Store) FailSafeMigrate(migrator *migrator.Migrator) (err error) {
 	defer func() {
 		if e := recover(); e != nil {
 			store.Rollback(true)
-			err = fmt.Errorf("%v %v", e, string(debug.Stack()))
+			err = fmt.Errorf("%v %s", e, string(debug.Stack()))
 		}
 	}()
 
