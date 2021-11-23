@@ -76,7 +76,9 @@ angular.module('portainer.docker').controller('ContainersDatatableController', [
       },
     };
 
-    this.allowSelection = (item) => !item.IsPortainer;
+    this.allowSelection = function (item) {
+      return !item.IsPortainer;
+    };
 
     this.onColumnVisibilityChange = onColumnVisibilityChange.bind(this);
     function onColumnVisibilityChange(columns) {

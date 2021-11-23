@@ -824,8 +824,6 @@ type (
 		Version string `json:"Version" example:"2.0.0"`
 		// Server Instance ID
 		InstanceID string `example:"299ab403-70a8-4c05-92f7-bf7a994d50df"`
-		// PortainerContainerID stored to identify this container is portainer
-		PortainerContainerID string `example:"772e3e178fd0"`
 	}
 
 	// Tag represents a tag that can be associated to a resource
@@ -1966,6 +1964,3 @@ const (
 	AzurePathContainerGroups = "/subscriptions/*/providers/Microsoft.ContainerInstance/containerGroups"
 	AzurePathContainerGroup  = "/subscriptions/*/resourceGroups/*/providers/Microsoft.ContainerInstance/containerGroups/*"
 )
-
-// ServerStatus cache
-var ServerStatus Status
