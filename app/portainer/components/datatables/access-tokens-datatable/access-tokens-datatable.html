@@ -35,7 +35,7 @@
           <thead>
             <tr>
               <th>
-                <span class="md-checkbox" ng-if="$ctrl.isAdmin">
+                <span class="md-checkbox">
                   <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                   <label for="select_all"></label>
                 </span>
@@ -74,7 +74,7 @@
               ng-class="{ active: item.Checked }"
             >
               <td>
-                <span class="md-checkbox" ng-if="$ctrl.isAdmin">
+                <span class="md-checkbox">
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
