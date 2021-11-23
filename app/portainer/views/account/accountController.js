@@ -27,7 +27,7 @@ angular.module('portainer.app').controller('AccountController', [
         });
     };
 
-    $scope.removeAction = (selectedItems) => {
+    $scope.removeAction = (selectedTokens) => {
       const msg = 'Do you want to remove the selected access token(s)? Any script or application using these tokens will no longer be able to invoke the Portainer API.';
 
       ModalService.confirmDeletion(msg, function (confirmed) {
@@ -37,15 +37,15 @@ angular.module('portainer.app').controller('AccountController', [
         let actionCount = selectedItems.length;
         selectedItems.forEach(token => {
           UserService.deleteToken($scope.userID, token.id)
-            .then(function success() {
+            .then(() => {
               Notifications.success('Token successfully removed');
               var index = $scope.tokens.indexOf(token);
               $scope.tokens.splice(index, 1);
             })
-            .catch(function error(err) {
+            .catch((err) => {
               Notifications.error('Failure', err, 'Unable to remove token');
             })
-            .finally(function final() {
+            .finally(() => {
               --actionCount;
               if (actionCount === 0) {
                 $state.reload();
