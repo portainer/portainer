@@ -73,11 +73,17 @@ func (handler *Handler) executeServiceWebhook(w http.ResponseWriter, endpoint *p
 	}
 
 	service.Spec.TaskTemplate.ForceUpdate++
+	
+	var imageName = strings.Split(service.Spec.TaskTemplate.ContainerSpec.Image, "@sha")[0]
 
 	if imageTag != "" {
-		service.Spec.TaskTemplate.ContainerSpec.Image = strings.Split(service.Spec.TaskTemplate.ContainerSpec.Image, ":")[0] + ":" + imageTag
+		var tagIndex = strings.LastIndex(imageName, ":")
+		if tagIndex == -1 {
+	  		tagIndex = len(imageName)
+		}
+		service.Spec.TaskTemplate.ContainerSpec.Image = imageName[:tagIndex] + ":" + imageTag
 	} else {
-		service.Spec.TaskTemplate.ContainerSpec.Image = strings.Split(service.Spec.TaskTemplate.ContainerSpec.Image, "@sha")[0]
+		service.Spec.TaskTemplate.ContainerSpec.Image = imageName
 	}
 
 	_, err = dockerClient.ServiceUpdate(context.Background(), resourceID, service.Version, service.Spec, dockertypes.ServiceUpdateOptions{QueryRegistry: true})
