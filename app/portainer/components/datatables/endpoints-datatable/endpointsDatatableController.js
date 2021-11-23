@@ -50,6 +50,13 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
       this.paginationChanged();
     };
 
+    this.showOpenAMT = function () {
+      console.log('showOpenAMT');
+      const featureFlagValue = this.settings && this.settings.FeatureFlagSettings && this.settings.FeatureFlagSettings['open-amt'];
+      const featureEnabled = this.settings && this.settings.OpenAMTConfiguration && this.settings.OpenAMTConfiguration.Enabled;
+      return true || (featureFlagValue && featureEnabled); // TODO
+    };
+
     /**
      * Overridden
      */

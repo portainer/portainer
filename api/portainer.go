@@ -48,6 +48,14 @@ type (
 		WirelessConfiguration *WirelessConfiguration `json:"WirelessConfiguration"`
 	}
 
+	// OpenAMTDeviceInformation represents an AMT managed device information
+	OpenAMTDeviceInformation struct {
+		GUID             string `json:"guid"`
+		HostName         string `json:"hostname"`
+		ConnectionStatus bool   `json:"connectionStatus"`
+		PowerState       int    `json:"powerstate"`
+	}
+
 	MPSCredentials struct {
 		MPSUser     string `json:"MPSUser"`
 		MPSPassword string `json:"MPSPassword"`
@@ -294,7 +302,8 @@ type (
 		SecuritySettings EndpointSecuritySettings
 		// LastCheckInDate mark last check-in date on checkin
 		LastCheckInDate int64
-
+		// MPS Server status
+		MPSStatus string `json:"MPSStatus,omitempty"`
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
 		TLS           bool   `json:"TLS,omitempty"`
@@ -1288,6 +1297,7 @@ type (
 	// OpenAMTService represents a service for managing OpenAMT
 	OpenAMTService interface {
 		ConfigureDefault(configuration OpenAMTConfiguration) error
+		DeviceInformation(configuration OpenAMTConfiguration, deviceGUID string) (*OpenAMTDeviceInformation, error)
 	}
 
 	// HelmUserRepositoryService represents a service to manage HelmUserRepositories

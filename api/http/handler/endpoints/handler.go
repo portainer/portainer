@@ -32,6 +32,7 @@ type Handler struct {
 	K8sClientFactory     *cli.ClientFactory
 	ComposeStackManager  portainer.ComposeStackManager
 	AuthorizationService *authorization.Service
+	OpenAMTService       portainer.OpenAMTService
 	BindAddress          string
 	BindAddressHTTPS     string
 }

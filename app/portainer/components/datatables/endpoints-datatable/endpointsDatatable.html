@@ -53,6 +53,13 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Type' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
+              <th ng-show="$ctrl.showOpenAMT()">
+                <a ng-click="$ctrl.changeOrderBy('MPSStatus')">
+                  MPS Status
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'MPSStatus' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'MPSStatus' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('URL')">
                   URL
@@ -87,6 +94,11 @@
                 <span>
                   <i ng-class="item.Type | endpointtypeicon" aria-hidden="true" style="margin-right: 2px;"></i>
                   {{ item.Type | endpointtypename }}
+                </span>
+              </td>
+              <td ng-show="$ctrl.showOpenAMT()">
+                <span>
+                  {{ item.MPSStatus }}
                 </span>
               </td>
               <td>

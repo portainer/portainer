@@ -152,3 +152,34 @@ func (service *Service) executeGetRequest(url string, token string) ([]byte, err
 
 	return responseBody, nil
 }
+
+func (service *Service) DeviceInformation(configuration portainer.OpenAMTConfiguration, deviceGUID string) (*portainer.OpenAMTDeviceInformation, error) {
+	token, err := service.executeAuthenticationRequest(configuration)
+	if err != nil {
+		return nil, err
+	}
+	configuration.Credentials.MPSToken = token.Token
+
+	device, err := service.getDevice(configuration, deviceGUID)
+	if err != nil {
+		return nil, err
+	}
+	if device == nil {
+		return nil, nil
+	}
+
+	powerState, err := service.getDevicePowerState(configuration, deviceGUID)
+	if err != nil {
+		return nil, err
+	}
+	if powerState == nil {
+		return nil, nil
+	}
+
+	return &portainer.OpenAMTDeviceInformation{
+		GUID:             device.GUID,
+		ConnectionStatus: device.ConnectionStatus,
+		HostName:         device.HostName,
+		PowerState:       powerState.State,
+	}, nil
+}
