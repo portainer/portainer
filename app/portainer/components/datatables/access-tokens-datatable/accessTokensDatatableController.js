@@ -1,7 +1,6 @@
-angular.module('portainer.app').controller('AccessTokensDatatableController', AccessTokensDatatableController);
-
-/* @ngInject */
-function AccessTokensDatatableController($scope, $controller, Authentication, DatatableService) {
+export default class AccessTokensDatatableController {
+  /* @ngInject*/
+  constructor($scope, $controller, Authentication, DatatableService) {
   angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
 
   this.$onInit = function () {
