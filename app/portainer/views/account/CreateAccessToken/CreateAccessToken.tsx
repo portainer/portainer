@@ -5,7 +5,7 @@ import { TextInput } from '@/portainer/components/form-components/Input';
 import { Button } from '@/portainer/components/Button';
 import { Heading } from '@/portainer/components/form-components/Heading';
 import { TextTip } from '@/portainer/components/Tip/TextTip';
-import { Code } from '@/edge/components/Code';
+import { Code } from '@/portainer/components/Code';
 import { CopyButton } from '@/portainer/components/Button/CopyButton';
 
 import styles from './CreateAccessToken.module.css';
