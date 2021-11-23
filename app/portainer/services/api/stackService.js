@@ -320,17 +320,16 @@ angular.module('portainer.app').factory('StackService', [
 
       return deferred.promise;
     };
-    service.createComposeStackFromFileContent = function (name, stackFileContent, env, endpointId, templateFrom) {
+    service.createComposeStackFromFileContent = function (name, stackFileContent, env, endpointId) {
       var payload = {
         Name: name,
         StackFileContent: stackFileContent,
         Env: env,
-        TemplateFrom: templateFrom,
       };
       return Stack.create({ method: 'string', type: 2, endpointId: endpointId }, payload).$promise;
     };
 
-    service.createSwarmStackFromFileContent = function (name, stackFileContent, env, endpointId, templateFrom) {
+    service.createSwarmStackFromFileContent = function (name, stackFileContent, env, endpointId) {
       var deferred = $q.defer();
 
       SwarmService.swarm()
@@ -340,7 +339,6 @@ angular.module('portainer.app').factory('StackService', [
             SwarmID: swarm.Id,
             StackFileContent: stackFileContent,
             Env: env,
-            TemplateFrom: templateFrom,
           };
           return Stack.create({ method: 'string', type: 1, endpointId: endpointId }, payload).$promise;
         })
@@ -365,7 +363,7 @@ angular.module('portainer.app').factory('StackService', [
         RepositoryUsername: repositoryOptions.RepositoryUsername,
         RepositoryPassword: repositoryOptions.RepositoryPassword,
         Env: env,
-        TemplateFrom: repositoryOptions.TemplateFrom,
+        FromAppTemplate: repositoryOptions.FromAppTemplate,
       };
 
       if (repositoryOptions.AutoUpdate) {
@@ -392,7 +390,7 @@ angular.module('portainer.app').factory('StackService', [
             RepositoryUsername: repositoryOptions.RepositoryUsername,
             RepositoryPassword: repositoryOptions.RepositoryPassword,
             Env: env,
-            TemplateFrom: repositoryOptions.TemplateFrom,
+            FromAppTemplate: repositoryOptions.FromAppTemplate,
           };
 
           if (repositoryOptions.AutoUpdate) {

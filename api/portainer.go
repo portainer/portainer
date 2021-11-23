@@ -793,8 +793,8 @@ type (
 		AutoUpdate *StackAutoUpdate `json:"AutoUpdate"`
 		// The git config of this stack
 		GitConfig *gittypes.RepoConfig
-		// Whether the stack is from a template and what is its template source. (1 - app template, 2 - custom template)
-		TemplateFrom TemplateFrom `example:"1"`
+		// Whether the stack is from a app template
+		FromAppTemplate bool `example:"false"`
 		// Kubernetes namespace if stack is a kube application
 		Namespace string `example:"default"`
 		// IsComposeFormat indicates if the Kubernetes stack is created from a Docker Compose file
@@ -983,9 +983,6 @@ type (
 
 	// TemplateType represents the type of a template
 	TemplateType int
-
-	// TemplateFrom represents the source type of a template
-	TemplateFrom int
 
 	// TemplateVolume represents a template volume configuration
 	TemplateVolume struct {
@@ -1717,14 +1714,6 @@ const (
 	ComposeStackTemplate
 	// EdgeStackTemplate represents a template used to deploy an Edge stack
 	EdgeStackTemplate
-)
-
-const (
-	_ TemplateFrom = iota
-	// FromAppTemplate represents the template is from App Template
-	FromAppTemplate
-	// FromCustomTemplate represents the template is from Custom Template
-	FromCustomTemplate
 )
 
 const (
