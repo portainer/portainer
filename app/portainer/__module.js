@@ -116,7 +116,7 @@ angular
       };
 
       const tokenCreation = {
-        name: 'portainer.tokens',
+        name: 'portainer.account.new-access-token',
         url: '/tokens/new',
         views: {
           'content@': {
