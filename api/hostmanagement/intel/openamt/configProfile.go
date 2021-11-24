@@ -13,8 +13,10 @@ type (
 		ProfileName                string              `json:"profileName"`
 		Activation                 string              `json:"activation"`
 		CIRAConfigName             *string             `json:"ciraConfigName"`
-		GenerateRandomPassword     bool                `json:"generateRandomPassword"`
+		GenerateRandomAMTPassword  bool                `json:"generateRandomPassword"`
+		AMTPassword                string              `json:"amtPassword"`
 		GenerateRandomMEBxPassword bool                `json:"generateRandomMEBxPassword"`
+		MEBXPassword               string              `json:"mebxPassword"`
 		Tags                       []string            `json:"tags"`
 		DHCPEnabled                bool                `json:"dhcpEnabled"`
 		TenantId                   string              `json:"tenantId"`
@@ -70,8 +72,10 @@ func (service *Service) saveAMTProfile(method string, configuration portainer.Op
 	profile := Profile{
 		ProfileName:                profileName,
 		Activation:                 "acmactivate",
-		GenerateRandomPassword:     true,
-		GenerateRandomMEBxPassword: true,
+		GenerateRandomAMTPassword:  false,
+		GenerateRandomMEBxPassword: false,
+		AMTPassword:                configuration.Credentials.MPSPassword,
+		MEBXPassword:               configuration.Credentials.MPSPassword,
 		CIRAConfigName:             &ciraConfigName,
 		Tags:                       []string{},
 		DHCPEnabled:                true,

@@ -187,11 +187,7 @@ func (handler *Handler) saveConfiguration(configuration portainer.OpenAMTConfigu
 		return err
 	}
 
-	configuration.Credentials.MPSPassword = ""
 	configuration.Credentials.MPSToken = ""
-	configuration.DomainConfiguration.CertFileText = ""
-	configuration.DomainConfiguration.CertPassword = ""
-	configuration.WirelessConfiguration.PskPass = ""
 
 	settings.OpenAMTConfiguration = configuration
 	err = handler.DataStore.Settings().UpdateSettings(settings)

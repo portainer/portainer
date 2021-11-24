@@ -18,8 +18,8 @@ type (
 	}
 )
 
-func (service *Service) createOrUpdateDomain(configuration portainer.OpenAMTConfiguration, domainName string) (*Domain, error) {
-	domain, err := service.getDomain(configuration, domainName)
+func (service *Service) createOrUpdateDomain(configuration portainer.OpenAMTConfiguration,) (*Domain, error) {
+	domain, err := service.getDomain(configuration)
 	if err != nil {
 		return nil, err
 	}
@@ -29,15 +29,15 @@ func (service *Service) createOrUpdateDomain(configuration portainer.OpenAMTConf
 		method = http.MethodPatch
 	}
 
-	domain, err = service.saveDomain(method, configuration, domainName)
+	domain, err = service.saveDomain(method, configuration)
 	if err != nil {
 		return nil, err
 	}
 	return domain, nil
 }
 
-func (service *Service) getDomain(configuration portainer.OpenAMTConfiguration, domainName string) (*Domain, error) {
-	url := fmt.Sprintf("https://%v/rps/api/v1/admin/domains/%v", configuration.MPSURL, domainName)
+func (service *Service) getDomain(configuration portainer.OpenAMTConfiguration) (*Domain, error) {
+	url := fmt.Sprintf("https://%v/rps/api/v1/admin/domains/%v", configuration.MPSURL, configuration.DomainConfiguration.DomainName)
 
 	responseBody, err := service.executeGetRequest(url, configuration.Credentials.MPSToken)
 	if err != nil {
@@ -55,11 +55,11 @@ func (service *Service) getDomain(configuration portainer.OpenAMTConfiguration, 
 	return &result, nil
 }
 
-func (service *Service) saveDomain(method string, configuration portainer.OpenAMTConfiguration, domainName string) (*Domain, error) {
+func (service *Service) saveDomain(method string, configuration portainer.OpenAMTConfiguration) (*Domain, error) {
 	url := fmt.Sprintf("https://%v/rps/api/v1/admin/domains", configuration.MPSURL)
 
 	profile := Domain{
-		DomainName:                    domainName,
+		DomainName:                    configuration.DomainConfiguration.DomainName,
 		DomainSuffix:                  configuration.DomainConfiguration.DomainName,
 		ProvisioningCert:              configuration.DomainConfiguration.CertFileText,
 		ProvisioningCertPassword:      configuration.DomainConfiguration.CertPassword,

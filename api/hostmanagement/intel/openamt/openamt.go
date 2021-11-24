@@ -17,7 +17,6 @@ const (
 	DefaultCIRAConfigName     = "ciraConfigDefault"
 	DefaultWirelessConfigName = "wirelessProfileDefault"
 	DefaultProfileName        = "profileAMTDefault"
-	DefaultDomainName         = "domainDefault"
 )
 
 // Service represents a service for managing an OpenAMT server.
@@ -87,7 +86,7 @@ func (service *Service) ConfigureDefault(configuration portainer.OpenAMTConfigur
 		return err
 	}
 
-	_, err = service.createOrUpdateDomain(configuration, DefaultDomainName)
+	_, err = service.createOrUpdateDomain(configuration)
 	if err != nil {
 		return err
 	}
