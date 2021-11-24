@@ -64,3 +64,38 @@ func Test_createEnvFile(t *testing.T) {
 		})
 	}
 }
+
+func Test_createNetworkEnvFile(t *testing.T) {
+	dir := t.TempDir()
+	buf := []byte(`
+version: '3.6'
+services:
+  nginx-example:
+    image: nginx:latest
+networks:
+  default:
+    name: ${test}
+    driver: bridge
+`)
+	if err := ioutil.WriteFile(path.Join(dir,
+		"docker-compose.yml"), buf, 0644); err != nil {
+		t.Fatalf("Failed to create yaml file: %s", err)
+	}
+
+	stack := &portainer.Stack{
+		ProjectPath: dir,
+		EntryPoint:  "docker-compose.yml",
+		Env:         []portainer.Pair{},
+	}
+
+	if err := createNetworkEnvFile(stack); err != nil {
+		t.Fatalf("Failed to create network env file: %s", err)
+	}
+
+	content, err := ioutil.ReadFile(path.Join(dir, ".env"))
+	if err != nil {
+		t.Fatalf("Failed to read network env file: %s", err)
+	}
+
+	assert.Equal(t, "test\n", string(content))
+}
