@@ -115,6 +115,16 @@ angular
         },
       };
 
+      const tokenCreation = {
+        name: 'portainer.account.new-access-token',
+        url: '/tokens/new',
+        views: {
+          'content@': {
+            component: 'createUserAccessToken',
+          },
+        },
+      };
+
       var authentication = {
         name: 'portainer.auth',
         url: '/auth',
@@ -429,6 +439,7 @@ angular
       $stateRegistryProvider.register(endpointRoot);
       $stateRegistryProvider.register(portainer);
       $stateRegistryProvider.register(account);
+      $stateRegistryProvider.register(tokenCreation);
       $stateRegistryProvider.register(authentication);
       $stateRegistryProvider.register(logout);
       $stateRegistryProvider.register(endpoints);

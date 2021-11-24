@@ -1,0 +1,8 @@
+.container {
+  display: flex;
+  align-items: center;
+}
+
+.space-right {
+  margin-right: 1rem;
+}

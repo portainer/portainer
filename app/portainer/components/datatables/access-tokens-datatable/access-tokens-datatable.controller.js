@@ -1,10 +1,9 @@
 export default class AccessTokensDatatableController {
   /* @ngInject*/
-  constructor($scope, $controller, Authentication, DatatableService) {
+  constructor($scope, $controller, DatatableService) {
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
 
     this.$onInit = function () {
-      this.isAdmin = Authentication.isAdmin();
       this.setDefaults();
       this.prepareTableFromDataset();
 
