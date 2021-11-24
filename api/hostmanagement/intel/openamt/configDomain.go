@@ -18,7 +18,7 @@ type (
 	}
 )
 
-func (service *Service) createOrUpdateDomain(configuration portainer.OpenAMTConfiguration,) (*Domain, error) {
+func (service *Service) createOrUpdateDomain(configuration portainer.OpenAMTConfiguration) (*Domain, error) {
 	domain, err := service.getDomain(configuration)
 	if err != nil {
 		return nil, err
