@@ -1,9 +1,13 @@
+import EndpointHelper from '@/portainer/helpers/endpointHelper';
+
 angular.module('portainer.app').controller('EndpointsDatatableController', [
   '$scope',
   '$controller',
   'DatatableService',
   'PaginationService',
-  function ($scope, $controller, DatatableService, PaginationService) {
+  'SettingsService',
+  'OpenAMTService',
+  function ($scope, $controller, DatatableService, PaginationService, SettingsService, OpenAMTService) {
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
 
     this.state = Object.assign(this.state, {
@@ -12,6 +16,8 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
       filteredDataSet: [],
       totalFilteredDataset: 0,
       pageNumber: 1,
+      showAMTInfo: false,
+      amtDevices: {},
     });
 
     this.paginationChanged = function () {
@@ -22,10 +28,28 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
         .then((data) => {
           this.state.filteredDataSet = data.endpoints;
           this.state.totalFilteredDataSet = data.totalCount;
+
+          this.fetchAMTDevicesInfo();
         })
         .finally(() => {
           this.state.loading = false;
         });
+    };
+
+    this.fetchAMTDevicesInfo = function () {
+      for (const endpoint of this.state.filteredDataSet) {
+        if (this.showAMTNodes(endpoint) && !this.state.amtDevices[endpoint.Id]) {
+          this.state.amtDevices[endpoint.Id] = [];
+          OpenAMTService.getDevices(endpoint.Id)
+            .then((data) => {
+              console.log('success!');
+              console.log(data);
+            })
+            .catch((e) => {
+              console.error('ERROR in show AMT info', e);
+            });
+        }
+      }
     };
 
     this.onPageChange = function (newPageNumber) {
@@ -50,17 +74,29 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
       this.paginationChanged();
     };
 
-    this.showOpenAMT = function () {
-      console.log('showOpenAMT');
+    this.setShowAMTInfo = async function () {
+      this.settings = await SettingsService.settings();
       const featureFlagValue = this.settings && this.settings.FeatureFlagSettings && this.settings.FeatureFlagSettings['open-amt'];
       const featureEnabled = this.settings && this.settings.OpenAMTConfiguration && this.settings.OpenAMTConfiguration.Enabled;
-      return true || (featureFlagValue && featureEnabled); // TODO
+      this.state.showAMTInfo = featureFlagValue && featureEnabled;
+    };
+
+    this.showAMTNodes = function (item) {
+      return this.state.showAMTInfo && EndpointHelper.isAgentEndpoint(item); // TODO && endpoint.ConnectedAMT
+    };
+
+    this.expandItem = function (item, expanded) {
+      if (!this.showAMTNodes(item)) {
+        return;
+      }
+
+      item.Expanded = expanded;
     };
 
     /**
      * Overridden
      */
-    this.$onInit = function () {
+    this.$onInit = async function () {
       this.setDefaults();
       this.prepareTableFromDataset();
 
@@ -84,6 +120,7 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
         this.filters.state.open = false;
       }
 
+      await this.setShowAMTInfo();
       this.paginationChanged();
     };
   },

@@ -40,6 +40,8 @@
                   <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                   <label for="select_all"></label>
                 </span>
+              </th>
+              <th>
                 <a ng-click="$ctrl.changeOrderBy('Name')">
                   Name
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
@@ -51,13 +53,6 @@
                   Type
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Type' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Type' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
-              <th ng-show="$ctrl.showOpenAMT()">
-                <a ng-click="$ctrl.changeOrderBy('MPSStatus')">
-                  MPS Status
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'MPSStatus' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'MPSStatus' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
@@ -79,7 +74,8 @@
           </thead>
           <tbody>
             <tr
-              dir-paginate="item in $ctrl.state.filteredDataSet | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit"
+              ng-click="$ctrl.expandItem(item, !item.Expanded)"
+              dir-paginate-start="item in $ctrl.state.filteredDataSet | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit"
               total-items="$ctrl.state.totalFilteredDataSet"
               ng-class="{ active: item.Checked }"
             >
@@ -88,17 +84,17 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
+              </td>
+              <td>
                 <a ui-sref="portainer.endpoints.endpoint({id: item.Id})">{{ item.Name }}</a>
+                <a style="float: right;" ng-show="$ctrl.showAMTNodes(item)"
+                  ><i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i
+                ></a>
               </td>
               <td>
                 <span>
                   <i ng-class="item.Type | endpointtypeicon" aria-hidden="true" style="margin-right: 2px;"></i>
                   {{ item.Type | endpointtypename }}
-                </span>
-              </td>
-              <td ng-show="$ctrl.showOpenAMT()">
-                <span>
-                  {{ item.MPSStatus }}
                 </span>
               </td>
               <td>
@@ -108,6 +104,21 @@
               <td>{{ item.GroupName }}</td>
               <td>
                 <a ui-sref="portainer.endpoints.endpoint.access({id: item.Id})"> <i class="fa fa-users" aria-hidden="true"></i> Manage access </a>
+              </td>
+            </tr>
+            <tr dir-paginate-end ng-show="item.Expanded">
+              <td></td>
+              <td colspan="8">
+                <amt-devices-datatable
+                  devices="$ctrl.state.amtDevices[item.Id]"
+                  service-id="item.Id"
+                  table-key="service-tasks"
+                  order-by="Status.State"
+                  nodes="$ctrl.nodes"
+                  agent-proxy="$ctrl.agentProxy"
+                  show-task-logs-button="$ctrl.showTaskLogsButton"
+                  text-filter="$ctrl.state.textFilter"
+                ></amt-devices-datatable>
               </td>
             </tr>
             <tr ng-if="$ctrl.state.loading">
