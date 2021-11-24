@@ -16,6 +16,7 @@ func (m *Migrator) migrateSettingsToDB33() error {
 		return err
 	}
 
+	migrateLog.Info("Setting default kubectl shell image")
 	settings.KubectlShellImage = portainer.DefaultKubectlShellImage
 	return m.settingsService.UpdateSettings(settings)
 }
