@@ -43,8 +43,8 @@ func (s StringSet) List() []string {
 
 func (s StringSet) Union(x StringSet) {
 	if x.Len() != 0 {
-		for _, v := range x.List() {
-			s.Add(v)
+		for k := range x {
+			s.Add(k)
 		}
 	}
 }
