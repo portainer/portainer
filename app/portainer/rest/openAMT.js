@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-const API_ENDPOINT_OPEN_AMT = 'api/open-amt';
+const API_ENDPOINT_OPEN_AMT = 'api/open_amt';
 
 angular.module('portainer.app').factory('OpenAMT', OpenAMTFactory);
 

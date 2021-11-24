@@ -1,4 +1,4 @@
-package intel
+package openamt
 
 import (
 	"net/http"
@@ -10,7 +10,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// Handler is the HTTP handler used to handle Intel operations.
+// Handler is the HTTP handler used to handle OpenAMT operations.
 type Handler struct {
 	*mux.Router
 	OpenAMTService portainer.OpenAMTService
@@ -30,7 +30,7 @@ func NewHandler(bouncer *security.RequestBouncer, dataStore portainer.DataStore)
 
 	featureEnabled, _ := settings.FeatureFlagSettings[portainer.FeatOpenAMT]
 	if featureEnabled {
-		h.Handle("/open-amt", bouncer.AdminAccess(httperror.LoggerHandler(h.openAMTConfigureDefault))).Methods(http.MethodPost)
+		h.Handle("/open_amt", bouncer.AdminAccess(httperror.LoggerHandler(h.openAMTConfigureDefault))).Methods(http.MethodPost)
 	}
 
 	return h, nil

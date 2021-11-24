@@ -73,7 +73,7 @@ func (service *Service) ConfigureDefault(configuration portainer.OpenAMTConfigur
 	}
 
 	wirelessConfigName := ""
-	if configuration.WirelessConfiguration.UseWirelessConfig {
+	if configuration.WirelessConfiguration != nil {
 		wirelessConfig, err := service.createOrUpdateWirelessConfig(configuration, DefaultWirelessConfigName)
 		if err != nil {
 			return err

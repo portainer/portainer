@@ -1,4 +1,4 @@
-package intel
+package openamt
 
 import (
 	"encoding/base64"
@@ -83,7 +83,7 @@ func (payload *openAMTConfigureDefaultPayload) Validate(r *http.Request) error {
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied to access settings"
 // @failure 500 "Server error"
-// @router /open-amt [post]
+// @router /open_amt [post]
 func (handler *Handler) openAMTConfigureDefault(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload openAMTConfigureDefaultPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
@@ -156,13 +156,15 @@ func (handler *Handler) enableOpenAMT(configurationPayload openAMTConfigureDefau
 			CertPassword: configurationPayload.CertPassword,
 			DomainName:   configurationPayload.DomainName,
 		},
-		WirelessConfiguration: portainer.WirelessConfiguration{
-			UseWirelessConfig:    configurationPayload.UseWirelessConfig,
+	}
+
+	if configurationPayload.UseWirelessConfig {
+		configuration.WirelessConfiguration = &portainer.WirelessConfiguration{
 			AuthenticationMethod: configurationPayload.WifiAuthenticationMethod,
 			EncryptionMethod:     configurationPayload.WifiEncryptionMethod,
 			SSID:                 configurationPayload.WifiSSID,
 			PskPass:              configurationPayload.WifiPskPass,
-		},
+		}
 	}
 
 	err := handler.OpenAMTService.ConfigureDefault(configuration)
