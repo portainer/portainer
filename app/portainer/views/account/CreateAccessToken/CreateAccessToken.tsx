@@ -1,4 +1,5 @@
 import { PropsWithChildren, useEffect, useState } from 'react';
+import { useRouter } from '@uirouter/react';
 
 import { Widget, WidgetBody } from '@/portainer/components/widget';
 import { FormControl } from '@/portainer/components/form-components/FormControl';
@@ -22,20 +23,17 @@ export interface Props {
   // onSubmit dispatches a successful matomo analytics event
   onSubmit: (description: string) => Promise<AccessTokenResponse>;
 
-  // onSuccess is called when upon clicking the done button
-  onSuccess: () => void;
-
   // onError is called when an error occurs; this is a callback to Notifications.error
   onError: (heading: string, err: unknown, message: string) => void;
 }
 
 export function CreateAccessToken({
   onSubmit,
-  onSuccess,
   onError,
 }: PropsWithChildren<Props>) {
+  const router = useRouter();
   const [description, setDescription] = useState('');
-  const [errorText, setErrorText] = useState<string>('');
+  const [errorText, setErrorText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [accessToken, setAccessToken] = useState('');
 
@@ -101,7 +99,10 @@ export function CreateAccessToken({
               </CopyButton>
             </div>
 
-            <Button type="button" onClick={onSuccess}>
+            <Button
+              type="button"
+              onClick={() => router.stateService.go('portainer.account')}
+            >
               Done
             </Button>
           </>

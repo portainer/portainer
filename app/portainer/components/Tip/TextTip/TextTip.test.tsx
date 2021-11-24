@@ -9,11 +9,3 @@ test('should display a TextTip with children', async () => {
   const heading = await findByText(children);
   expect(heading).toBeTruthy();
 });
-
-test('should display a TextTip with text prop', async () => {
-  const text = 'text tip testing 2';
-  const { findByText } = render(<TextTip text={text} />);
-
-  const heading = await findByText(text);
-  expect(heading).toBeTruthy();
-});

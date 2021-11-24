@@ -3,11 +3,7 @@ import clsx from 'clsx';
 
 import styles from './TextTip.module.css';
 
-export interface Props {
-  text?: string;
-}
-
-export function TextTip({ text = '', children }: PropsWithChildren<Props>) {
+export function TextTip({ children }: PropsWithChildren<unknown>) {
   return (
     <p className="text-muted small">
       <i
@@ -18,7 +14,7 @@ export function TextTip({ text = '', children }: PropsWithChildren<Props>) {
           styles.textMargin
         )}
       />
-      {text || children}
+      {children}
     </p>
   );
 }
