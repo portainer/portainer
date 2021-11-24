@@ -130,7 +130,7 @@ func createNetworkEnvFile(stack *portainer.Stack) error {
 	for _, filePath := range stackutils.GetStackFilePaths(stack) {
 		networkNames, err := extractNetworkNames(filePath)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "failed to extract network name")
 		}
 
 		if networkNames == nil || networkNames.Len() == 0 {
