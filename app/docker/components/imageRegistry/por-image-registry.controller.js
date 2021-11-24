@@ -86,6 +86,9 @@ class porImageRegistryController {
           this.registries.push(this.defaultRegistry);
         }
 
+        // Sort the registries by Name
+        this.registries.sort((a, b) => a.Name.localeCompare(b.Name));
+
         const id = this.model.Registry.Id;
         const registry = _.find(this.registries, { Id: id });
         if (!registry) {
