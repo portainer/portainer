@@ -28,28 +28,10 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
         .then((data) => {
           this.state.filteredDataSet = data.endpoints;
           this.state.totalFilteredDataSet = data.totalCount;
-
-          this.fetchAMTDevicesInfo();
         })
         .finally(() => {
           this.state.loading = false;
         });
-    };
-
-    this.fetchAMTDevicesInfo = function () {
-      for (const endpoint of this.state.filteredDataSet) {
-        if (this.showAMTNodes(endpoint) && !this.state.amtDevices[endpoint.Id]) {
-          this.state.amtDevices[endpoint.Id] = [];
-          OpenAMTService.getDevices(endpoint.Id)
-            .then((data) => {
-              console.log('success!');
-              console.log(data);
-            })
-            .catch((e) => {
-              console.error('ERROR in show AMT info', e);
-            });
-        }
-      }
     };
 
     this.onPageChange = function (newPageNumber) {
@@ -91,6 +73,23 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
       }
 
       item.Expanded = expanded;
+      this.fetchAMTDeviceInfo(item);
+    };
+
+    this.fetchAMTDeviceInfo = function (endpoint) {
+      if (!this.showAMTNodes(endpoint) || this.state.amtDevices[endpoint.Id]) {
+        return;
+      }
+
+      OpenAMTService.getDevices(endpoint.Id)
+        .then((data) => {
+          console.log('success!');
+          console.log(data);
+          this.state.amtDevices[endpoint.Id] = data.Devices;
+        })
+        .catch((e) => {
+          console.error('ERROR in show AMT info', e);
+        });
     };
 
     /**

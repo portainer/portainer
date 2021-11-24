@@ -2,43 +2,27 @@
   <table class="table table-condensed table-hover nowrap-cells">
     <thead>
       <tr>
-        <th>Nodes</th>
+        <th>Hostname</th>
         <th>MPS Status</th>
-        <th>Node Status</th>
-        <th>Node Type</th>
+        <th>Power State</th>
         <th>Actions</th>
       </tr>
     </thead>
     <tbody>
-      <tr ng-repeat="item in $ctrl.devices">
-        <td class="text-center">
-          <span class="label label-{{ item.Status.State | taskstatusbadge }} space-right">{{ item.Status.State }}</span>
-        </td>
+      <tr ng-repeat="device in $ctrl.devices">
+        <td>{{ device.hostname }}</td>
+        <td>{{ device.connectionStatus ? 'Connected' : 'Disconnected' }}</td>
+        <td>{{ $ctrl.parsePowerState(device.powerstate) }}</td>
         <td>
-          <a ng-if="!$ctrl.agentProxy || !item.Container" ui-sref="docker.tasks.task({id: item.Id})" class="monospaced">{{ item.Id }}</a>
-          <a ng-if="$ctrl.agentProxy && item.Container" ui-sref="docker.containers.container({ id: item.Container.Id, nodeName: item.Container.NodeName })" class="monospaced">{{
-            item.Id
-          }}</a>
+          <div class="btn-group btn-group-xs" role="group" aria-label="..." style="display: inline-flex;">
+            <a style="margin: 0 2.5px;" title="Power up the device">
+              <i class="fa fa-file-alt space-right" aria-hidden="true"></i>
+            </a>
+          </div>
         </td>
-        <td>
-          <container-quick-actions
-            ng-if="!$ctrl.agentProxy || !item.Container"
-            container-id="item.ContainerId"
-            task-id="item.Id"
-            status="item.Status.State"
-            state="$ctrl.state"
-          ></container-quick-actions>
-          <container-quick-actions
-            ng-if="$ctrl.agentProxy && item.Container"
-            container-id="item.Container.Id"
-            node-name="item.Container.NodeName"
-            status="item.Status.State"
-            state="$ctrl.state"
-          ></container-quick-actions>
-        </td>
-        <td>{{ item.Slot ? item.Slot : '-' }}</td>
-        <td>{{ item.NodeId | tasknodename: $ctrl.nodes }}</td>
-        <td>{{ item.Updated | getisodate }}</td>
+      </tr>
+      <tr ng-if="!$ctrl.devices">
+        <td colspan="5" class="text-center text-muted">Loading...</td>
       </tr>
       <tr ng-if="$ctrl.devices.length === 0">
         <td colspan="5" class="text-center text-muted">No devices found.</td>

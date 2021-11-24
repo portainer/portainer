@@ -31,6 +31,7 @@ func NewHandler(bouncer *security.RequestBouncer, dataStore portainer.DataStore)
 	featureEnabled, _ := settings.FeatureFlagSettings[portainer.FeatOpenAMT]
 	if featureEnabled {
 		h.Handle("/open_amt", bouncer.AdminAccess(httperror.LoggerHandler(h.openAMTConfigureDefault))).Methods(http.MethodPost)
+		h.Handle("/open_amt/{id}/devices", bouncer.AdminAccess(httperror.LoggerHandler(h.OpenAMTDevices))).Methods(http.MethodGet)
 	}
 
 	return h, nil

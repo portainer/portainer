@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"sync"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
@@ -28,7 +29,7 @@ type Service struct {
 func NewService() *Service {
 	return &Service{
 		httpsClient: &http.Client{
-			Timeout: time.Second * time.Duration(5),
+			Timeout: time.Second * time.Duration(10),
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			},
@@ -160,26 +161,54 @@ func (service *Service) DeviceInformation(configuration portainer.OpenAMTConfigu
 	}
 	configuration.Credentials.MPSToken = token.Token
 
-	device, err := service.getDevice(configuration, deviceGUID)
-	if err != nil {
-		return nil, err
-	}
-	if device == nil {
-		return nil, nil
-	}
+	amtErrors := make(chan error)
+	wgDone := make(chan bool)
 
-	powerState, err := service.getDevicePowerState(configuration, deviceGUID)
-	if err != nil {
+	var wg sync.WaitGroup
+	var resultDevice *Device
+	var resultPowerState *DevicePowerState
+	wg.Add(2)
+
+	go func() {
+		device, err := service.getDevice(configuration, deviceGUID)
+		if err != nil {
+			amtErrors <- err
+		}
+		if device == nil {
+			amtErrors <- fmt.Errorf("device %s not found", deviceGUID)
+		}
+		resultDevice = device
+		wg.Done()
+	}()
+
+	go func() {
+		powerState, err := service.getDevicePowerState(configuration, deviceGUID)
+		if err != nil {
+			amtErrors <- err
+		}
+		if powerState == nil {
+			amtErrors <- fmt.Errorf("device %s power state not found", deviceGUID)
+		}
+		resultPowerState = powerState
+		wg.Done()
+	}()
+
+	go func() {
+		wg.Wait()
+		close(wgDone)
+	}()
+
+	select {
+	case <-wgDone:
+		break
+	case err := <-amtErrors:
 		return nil, err
-	}
-	if powerState == nil {
-		return nil, nil
 	}
 
 	return &portainer.OpenAMTDeviceInformation{
-		GUID:             device.GUID,
-		ConnectionStatus: device.ConnectionStatus,
-		HostName:         device.HostName,
-		PowerState:       powerState.State,
+		GUID:             resultDevice.GUID,
+		HostName:         resultDevice.HostName,
+		ConnectionStatus: resultDevice.ConnectionStatus,
+		PowerState:       resultPowerState.State,
 	}, nil
 }

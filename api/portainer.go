@@ -302,8 +302,6 @@ type (
 		SecuritySettings EndpointSecuritySettings
 		// LastCheckInDate mark last check-in date on checkin
 		LastCheckInDate int64
-		// MPS Server status
-		MPSStatus string `json:"MPSStatus,omitempty"`
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
 		TLS           bool   `json:"TLS,omitempty"`

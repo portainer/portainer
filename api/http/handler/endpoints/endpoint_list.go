@@ -1,7 +1,6 @@
 package endpoints
 
 import (
-	"github.com/portainer/portainer/api/internal/endpointutils"
 	"net/http"
 	"strconv"
 	"strings"
@@ -118,12 +117,6 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 		paginatedEndpoints[idx].ComposeSyntaxMaxVersion = handler.ComposeStackManager.ComposeSyntaxMaxVersion()
 		if paginatedEndpoints[idx].EdgeCheckinInterval == 0 {
 			paginatedEndpoints[idx].EdgeCheckinInterval = settings.EdgeAgentCheckinInterval
-		}
-
-		// TODO this should be in a separate API
-		openAMTEnabled, _ := settings.FeatureFlagSettings[portainer.FeatOpenAMT]
-		if openAMTEnabled && settings.OpenAMTConfiguration.Enabled {
-			paginatedEndpoints[idx].MPSStatus = handler.fetchMPSStatus(&paginatedEndpoints[idx], settings.OpenAMTConfiguration)
 		}
 	}
 
@@ -327,25 +320,4 @@ func filteredEndpointsByIds(endpoints []portainer.Endpoint, ids []portainer.Endp
 
 	return filteredEndpoints
 
-}
-
-func (handler *Handler) fetchMPSStatus(endpoint *portainer.Endpoint, config portainer.OpenAMTConfiguration) string {
-	if !endpointutils.IsAgentEndpoint(endpoint) {
-		return "Incompatible"
-	}
-	/*if !endpoint.MPSURL {
-		return "no link"
-	}
-	deviceGUID := endpoint.mpsDeviceGUID // TODO do we save this when executing RPC activation?
-	*/
-	deviceGUID := "4c4c4544-004b-3910-8037-b6c04f504633"
-	device, err := handler.OpenAMTService.DeviceInformation(config, deviceGUID)
-	if err != nil {
-		return "error fetching"
-	}
-
-	if device != nil && device.ConnectionStatus {
-		return "Running " + strconv.Itoa(device.PowerState)
-	}
-	return "Syncing"
 }

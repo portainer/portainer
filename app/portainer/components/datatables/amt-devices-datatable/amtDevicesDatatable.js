@@ -3,13 +3,5 @@ angular.module('portainer.docker').component('amtDevicesDatatable', {
   controller: 'AMTDevicesDatatableController',
   bindings: {
     devices: '<',
-    serviceId: '<',
-    tableKey: '@',
-    orderBy: '@',
-    reverseOrder: '<',
-    nodes: '<',
-    agentProxy: '<',
-    textFilter: '=',
-    showTaskLogsButton: '<',
   },
 });

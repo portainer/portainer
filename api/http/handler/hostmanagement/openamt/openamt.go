@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"net/http"
 	"strings"
 
@@ -201,6 +202,7 @@ func (handler *Handler) saveConfiguration(configuration portainer.OpenAMTConfigu
 }
 
 func (handler *Handler) disableOpenAMT() error {
+
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return err
@@ -215,4 +217,43 @@ func (handler *Handler) disableOpenAMT() error {
 
 	logrus.Info("OpenAMT successfully disabled")
 	return nil
+}
+
+
+type OpenAMTDevices struct {
+	Devices []portainer.OpenAMTDeviceInformation
+}
+// TODO API documentation
+func (handler *Handler) OpenAMTDevices(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment identifier route variable", err}
+	}
+
+	_, err = handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
+	if err == bolterrors.ErrObjectNotFound {
+		return &httperror.HandlerError{StatusCode: http.StatusNotFound, Message: "Unable to find an endpoint with the specified identifier inside the database", Err: err}
+	} else if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to find an endpoint with the specified identifier inside the database", Err: err}
+	}
+
+	settings, err := handler.DataStore.Settings().Settings()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+	}
+
+	guid := "4c4c4544-004b-3910-8037-b6c04f504633"
+	// TODO use endpoint.AMTDeviceGUID ?
+	device, err := handler.OpenAMTService.DeviceInformation(settings.OpenAMTConfiguration, guid)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve device information", err}
+	}
+
+	devicesInformation := OpenAMTDevices{
+		Devices: []portainer.OpenAMTDeviceInformation{
+			*device,
+		},
+	}
+
+	return response.JSON(w, devicesInformation)
 }
