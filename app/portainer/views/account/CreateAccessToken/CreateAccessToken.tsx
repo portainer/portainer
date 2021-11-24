@@ -83,22 +83,20 @@ export function CreateAccessToken({
         </div>
         {accessToken && (
           <>
-            <div className="col-sm-12 form-section-title">
-              <FormSectionTitle>New access token</FormSectionTitle>
-              <TextTip>
-                Please copy the new access token. You won&#39;t be able to view
-                the token again.
-              </TextTip>
-              <Code>{accessToken}</Code>
-              <CopyButton
-                copyText={accessToken}
-                className={styles.copyButton}
-                displayText=""
-              >
-                Copy access token
-              </CopyButton>
-            </div>
-
+            <FormSectionTitle>New access token</FormSectionTitle>
+            <TextTip>
+              Please copy the new access token. You won&#39;t be able to view
+              the token again.
+            </TextTip>
+            <Code>{accessToken}</Code>
+            <CopyButton
+              copyText={accessToken}
+              className={styles.copyButton}
+              displayText=""
+            >
+              Copy access token
+            </CopyButton>
+            <hr />
             <Button
               type="button"
               onClick={() => router.stateService.go('portainer.account')}
