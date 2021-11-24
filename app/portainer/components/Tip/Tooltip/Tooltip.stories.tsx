@@ -4,7 +4,7 @@ import { Tooltip, Props } from './Tooltip';
 
 export default {
   component: Tooltip,
-  title: 'Components/Tooltip',
+  title: 'Components/Tip/Tooltip',
 } as Meta;
 
 function Template({ message, position }: JSX.IntrinsicAttributes & Props) {
