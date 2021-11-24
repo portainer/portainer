@@ -82,13 +82,13 @@ networks:
 		t.Fatalf("Failed to create yaml file: %s", err)
 	}
 
-	stack := &portainer.Stack{
+	stackWithoutEnv := &portainer.Stack{
 		ProjectPath: dir,
 		EntryPoint:  "docker-compose.yml",
 		Env:         []portainer.Pair{},
 	}
 
-	if err := createNetworkEnvFile(stack); err != nil {
+	if err := createNetworkEnvFile(stackWithoutEnv); err != nil {
 		t.Fatalf("Failed to create network env file: %s", err)
 	}
 
@@ -98,4 +98,23 @@ networks:
 	}
 
 	assert.Equal(t, "test\n", string(content))
+
+	stackWithEnv := &portainer.Stack{
+		ProjectPath: dir,
+		EntryPoint:  "docker-compose.yml",
+		Env: []portainer.Pair{
+			{Name: "test", Value: "test-value"},
+		},
+	}
+
+	if err := createNetworkEnvFile(stackWithEnv); err != nil {
+		t.Fatalf("Failed to create network env file: %s", err)
+	}
+
+	content, err = ioutil.ReadFile(path.Join(dir, ".env"))
+	if err != nil {
+		t.Fatalf("Failed to read network env file: %s", err)
+	}
+
+	assert.Equal(t, "test=test-value\n", string(content))
 }
