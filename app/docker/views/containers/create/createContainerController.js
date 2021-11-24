@@ -780,7 +780,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
           create();
         } else {
           await ContainerService.updateLimits($transition$.params().from, config);
-          initView();
+          $scope.config = config;
           Notifications.success('Limits updated');
         }
       } catch (err) {
@@ -789,9 +789,11 @@ angular.module('portainer.docker').controller('CreateContainerController', [
     }
 
     async function update() {
+      $scope.state.actionInProgress = true;
       var config = angular.copy($scope.config);
       prepareResources(config);
       await updateLimits(config);
+      $scope.state.actionInProgress = false;
     }
 
     function create() {
