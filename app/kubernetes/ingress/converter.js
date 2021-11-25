@@ -59,8 +59,7 @@ export class KubernetesIngressConverter {
       const ingress = _.find(ingresses, { Name: p.IngressName });
       if (ingress) {
         if (p.NeedsDeletion) {
-          const path = _.find(ingress.Paths, { Port: p.ContainerPort, ServiceName: serviceName, Path: p.IngressRoute });
-          _.remove(ingress.Paths, path);
+          _.remove(ingress.Paths, (path) => path.Port === p.ContainerPort && path.ServiceName === serviceName && path.Path === p.IngressRoute);
         } else if (isPublishingToIngress && p.IsNew) {
           const rule = new KubernetesIngressRule();
           rule.IngressName = ingress.Name;
