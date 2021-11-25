@@ -153,7 +153,7 @@ func createNetworkEnvFile(stack *portainer.Stack) error {
 	envfile, err := os.OpenFile(path.Join(stack.ProjectPath, ".env"),
 		os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to open env file")
 	}
 
 	defer envfile.Close()
@@ -189,13 +189,13 @@ func extractNetworkNames(filePath string) (StringSet, error) {
 
 	stackFileContent, err := os.ReadFile(filePath)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to open yaml file")
 	}
 
 	config, err := loader.ParseYAML(stackFileContent)
 	if err != nil {
 		// invalid stack file
-		return nil, err
+		return nil, errors.Wrap(err, "invalid stack file")
 	}
 
 	var version string
