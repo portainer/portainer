@@ -10,6 +10,6 @@ export const adSettings = {
     connectivityCheck: '<',
     onSaveSettings: '<',
     saveButtonState: '<',
-    isLdapFormValid: '<',
+    isLdapFormValid: '&?',
   },
 };
