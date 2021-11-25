@@ -24,13 +24,13 @@ angular.module('portainer.docker').controller('LogViewerController', [
     };
 
     this.copy = function () {
-      clipboard.copyText(this.state.filteredLogs.map((log) => log.line).join(''));
+      clipboard.copyText(this.state.filteredLogs.map((log) => log.line).join(NEW_LINE_BREAKER));
       $('#refreshRateChange').show();
       $('#refreshRateChange').fadeOut(2000);
     };
 
     this.copySelection = function () {
-      clipboard.copyText(this.state.selectedLines.join(''));
+      clipboard.copyText(this.state.selectedLines.join(NEW_LINE_BREAKER));
       $('#refreshRateChange').show();
       $('#refreshRateChange').fadeOut(2000);
     };
@@ -49,7 +49,8 @@ angular.module('portainer.docker').controller('LogViewerController', [
     };
 
     this.downloadLogs = function () {
-      // To make the feature of downloading container logs working both on Windows and Linux, we need to use correct new line breakers on corresponding OS.
+      // To make the feature of downloading container logs working both on Windows and Linux,
+      // we need to use correct new line breakers on corresponding OS.
       const data = new Blob([_.reduce(this.state.filteredLogs, (acc, log) => acc + log.line + NEW_LINE_BREAKER, '')]);
       FileSaver.saveAs(data, this.resourceName + '_logs.txt');
     };
