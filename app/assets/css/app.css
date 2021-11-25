@@ -459,6 +459,11 @@ a[ng-click] {
   border-radius: 4px;
 }
 
+:root[theme='dark'] .bootbox-checkbox-list,
+:root[theme='highcontrast'] .bootbox-checkbox-list {
+  background-color: var(--black-color);
+}
+
 .small-select {
   display: inline-block;
   padding: 0px 6px;
