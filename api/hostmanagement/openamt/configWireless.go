@@ -38,7 +38,7 @@ func (service *Service) createOrUpdateWirelessConfig(configuration portainer.Ope
 }
 
 func (service *Service) getWirelessConfig(configuration portainer.OpenAMTConfiguration, configName string) (*WirelessProfile, error) {
-	url := fmt.Sprintf("https://%v/rps/api/v1/admin/wirelessconfigs/%v", configuration.MPSURL, configName)
+	url := fmt.Sprintf("https://%s/rps/api/v1/admin/wirelessconfigs/%s", configuration.MPSURL, configName)
 
 	responseBody, err := service.executeGetRequest(url, configuration.Credentials.MPSToken)
 	if err != nil {
@@ -59,14 +59,14 @@ func (service *Service) getWirelessConfig(configuration portainer.OpenAMTConfigu
 func (service *Service) saveWirelessConfig(method string, configuration portainer.OpenAMTConfiguration, configName string) (*WirelessProfile, error) {
 	parsedAuthenticationMethod, err := strconv.Atoi(configuration.WirelessConfiguration.AuthenticationMethod)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing wireless authentication method: %v", err.Error())
+		return nil, fmt.Errorf("error parsing wireless authentication method: %s", err.Error())
 	}
 	parsedEncryptionMethod, err := strconv.Atoi(configuration.WirelessConfiguration.EncryptionMethod)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing wireless encryption method: %v", err.Error())
+		return nil, fmt.Errorf("error parsing wireless encryption method: %s", err.Error())
 	}
 
-	url := fmt.Sprintf("https://%v/rps/api/v1/admin/wirelessconfigs", configuration.MPSURL)
+	url := fmt.Sprintf("https://%s/rps/api/v1/admin/wirelessconfigs", configuration.MPSURL)
 
 	config := WirelessProfile{
 		ProfileName:          configName,

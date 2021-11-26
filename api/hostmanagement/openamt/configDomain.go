@@ -37,7 +37,7 @@ func (service *Service) createOrUpdateDomain(configuration portainer.OpenAMTConf
 }
 
 func (service *Service) getDomain(configuration portainer.OpenAMTConfiguration) (*Domain, error) {
-	url := fmt.Sprintf("https://%v/rps/api/v1/admin/domains/%v", configuration.MPSURL, configuration.DomainConfiguration.DomainName)
+	url := fmt.Sprintf("https://%s/rps/api/v1/admin/domains/%s", configuration.MPSURL, configuration.DomainConfiguration.DomainName)
 
 	responseBody, err := service.executeGetRequest(url, configuration.Credentials.MPSToken)
 	if err != nil {
@@ -56,7 +56,7 @@ func (service *Service) getDomain(configuration portainer.OpenAMTConfiguration) 
 }
 
 func (service *Service) saveDomain(method string, configuration portainer.OpenAMTConfiguration) (*Domain, error) {
-	url := fmt.Sprintf("https://%v/rps/api/v1/admin/domains", configuration.MPSURL)
+	url := fmt.Sprintf("https://%s/rps/api/v1/admin/domains", configuration.MPSURL)
 
 	profile := Domain{
 		DomainName:                    configuration.DomainConfiguration.DomainName,

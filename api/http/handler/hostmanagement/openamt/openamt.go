@@ -71,8 +71,8 @@ func (payload *openAMTConfigureDefaultPayload) Validate(r *http.Request) error {
 }
 
 // @id OpenAMTConfigureDefault
-// @summary Enable OpenAMT capabilities
-// @description Enable OpenAMT capabilities
+// @summary Enable Portainer's OpenAMT capabilities
+// @description Enable Portainer's OpenAMT capabilities
 // @description **Access policy**: administrator
 // @tags intel
 // @security jwt

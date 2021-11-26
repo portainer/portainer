@@ -97,7 +97,7 @@ func (service *Service) ConfigureDefault(configuration portainer.OpenAMTConfigur
 func (service *Service) executeSaveRequest(method string, url string, token string, payload []byte) ([]byte, error) {
 	req, err := http.NewRequest(method, url, bytes.NewBuffer(payload))
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", token))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 
 	response, err := service.httpsClient.Do(req)
 	if err != nil {
@@ -113,7 +113,7 @@ func (service *Service) executeSaveRequest(method string, url string, token stri
 		if errorResponse != nil {
 			return nil, errorResponse
 		}
-		return nil, errors.New(fmt.Sprintf("unexpected status code %v", response.Status))
+		return nil, errors.New(fmt.Sprintf("unexpected status code %s", response.Status))
 	}
 
 	return responseBody, nil
@@ -122,7 +122,7 @@ func (service *Service) executeSaveRequest(method string, url string, token stri
 func (service *Service) executeGetRequest(url string, token string) ([]byte, error) {
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", token))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 
 	response, err := service.httpsClient.Do(req)
 	if err != nil {
@@ -141,7 +141,7 @@ func (service *Service) executeGetRequest(url string, token string) ([]byte, err
 		if errorResponse != nil {
 			return nil, errorResponse
 		}
-		return nil, errors.New(fmt.Sprintf("unexpected status code %v", response.Status))
+		return nil, errors.New(fmt.Sprintf("unexpected status code %s", response.Status))
 	}
 
 	return responseBody, nil

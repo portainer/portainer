@@ -45,7 +45,7 @@ func (service *Service) createOrUpdateCIRAConfig(configuration portainer.OpenAMT
 }
 
 func (service *Service) getCIRAConfig(configuration portainer.OpenAMTConfiguration, configName string) (*CIRAConfig, error) {
-	url := fmt.Sprintf("https://%v/rps/api/v1/admin/ciraconfigs/%v", configuration.MPSURL, configName)
+	url := fmt.Sprintf("https://%s/rps/api/v1/admin/ciraconfigs/%s", configuration.MPSURL, configName)
 
 	responseBody, err := service.executeGetRequest(url, configuration.Credentials.MPSToken)
 	if err != nil {
@@ -64,7 +64,7 @@ func (service *Service) getCIRAConfig(configuration portainer.OpenAMTConfigurati
 }
 
 func (service *Service) saveCIRAConfig(method string, configuration portainer.OpenAMTConfiguration, configName string) (*CIRAConfig, error) {
-	url := fmt.Sprintf("https://%v/rps/api/v1/admin/ciraconfigs", configuration.MPSURL)
+	url := fmt.Sprintf("https://%s/rps/api/v1/admin/ciraconfigs", configuration.MPSURL)
 
 	certificate, err := service.getCIRACertificate(configuration)
 	if err != nil {
@@ -113,14 +113,14 @@ func addressFormat(url string) (int, error) {
 	if strings.Contains(url, ":") {
 		return 4, nil // IPV6
 	}
-	return 0, fmt.Errorf("could not determine server address format for %v", url)
+	return 0, fmt.Errorf("could not determine server address format for %s", url)
 }
 
 func (service *Service) getCIRACertificate(configuration portainer.OpenAMTConfiguration) (string, error) {
-	loginURL := fmt.Sprintf("https://%v/mps/api/v1/ciracert", configuration.MPSURL)
+	loginURL := fmt.Sprintf("https://%s/mps/api/v1/ciracert", configuration.MPSURL)
 
 	req, err := http.NewRequest(http.MethodGet, loginURL, nil)
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", configuration.Credentials.MPSToken))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", configuration.Credentials.MPSToken))
 
 	response, err := service.httpsClient.Do(req)
 	if err != nil {
@@ -128,7 +128,7 @@ func (service *Service) getCIRACertificate(configuration portainer.OpenAMTConfig
 	}
 
 	if response.StatusCode != http.StatusOK {
-		return "", errors.New(fmt.Sprintf("unexpected status code %v", response.Status))
+		return "", errors.New(fmt.Sprintf("unexpected status code %s", response.Status))
 	}
 
 	certificate, err := io.ReadAll(response.Body)
