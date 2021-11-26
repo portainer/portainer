@@ -1,17 +1,31 @@
 import angular from 'angular';
 
-const API_ENDPOINT_OPEN_AMT = 'api/open_amt';
-
 angular.module('portainer.app').factory('OpenAMT', OpenAMTFactory);
 
 /* @ngInject */
 function OpenAMTFactory($resource) {
   return $resource(
-    API_ENDPOINT_OPEN_AMT + '/:id/:action',
+    'api/open_amt/:endpointId/:action/:deviceId',
     {},
     {
-      submit: { method: 'POST' },
-      getDevices: { method: 'GET', params: { id: '@id', action: 'devices' } },
+      submit: {
+        method: 'POST',
+      },
+      getDevices: {
+        method: 'GET',
+        params: {
+          id: '@endpointId',
+          action: 'devices',
+        },
+      },
+      executeDeviceAction: {
+        method: 'GET',
+        params: {
+          id: '@endpointId',
+          action: '@action',
+          deviceGUID: '@deviceId',
+        },
+      },
     }
   );
 }

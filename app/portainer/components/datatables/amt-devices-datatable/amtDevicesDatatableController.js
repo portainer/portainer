@@ -1,8 +1,15 @@
 angular.module('portainer.docker').controller('AMTDevicesDatatableController', [
   '$scope',
   '$controller',
-  function ($scope, $controller) {
+  'OpenAMTService',
+  'ModalService',
+  'Notifications',
+  function ($scope, $controller, OpenAMTService, ModalService, Notifications) {
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
+
+    this.state = Object.assign(this.state, {
+      executingAction: false,
+    });
 
     this.parsePowerState = function (powerStateIntValue) {
       // https://app.swaggerhub.com/apis-docs/rbheopenamt/mps/1.4.0#/AMT/get_api_v1_amt_power_state__guid_
@@ -20,6 +27,34 @@ angular.module('portainer.docker').controller('AMTDevicesDatatableController', [
           return 'Hibernate';
         case 9:
           return 'Power Cycle';
+      }
+    };
+
+    this.executeDeviceAction = async function (deviceGUID, action) {
+      try {
+        const confirmed = await ModalService.confirmAsync({
+          title: `Confirm`,
+          message: `Are you sure you want to ${action} the device?`,
+          buttons: {
+            confirm: {
+              label: 'Confirm',
+              className: 'btn-warning',
+            },
+          },
+        });
+        if (!confirmed) {
+          return;
+        }
+        console.log(`Execute ${action} on ${deviceGUID}`);
+        this.state.executingAction = true;
+        //TODO use correct endpointid
+        await OpenAMTService.executeDeviceAction({ endpointId: '', action: action, deviceGUID: deviceGUID });
+        // reload
+      } catch (err) {
+        console.log(err);
+        Notifications.error('Failure', err, `Failed to ${action} the device`);
+      } finally {
+        this.state.executingAction = false;
       }
     };
 

@@ -7,6 +7,7 @@ function OpenAMTServiceFactory(OpenAMT) {
   return {
     submit,
     getDevices,
+    executeDeviceAction,
   };
 
   function submit(formValues) {
@@ -14,6 +15,10 @@ function OpenAMTServiceFactory(OpenAMT) {
   }
 
   function getDevices(endpointID) {
-    return OpenAMT.getDevices({ id: endpointID }).$promise;
+    return OpenAMT.getDevices({ endpointId: endpointID }).$promise;
+  }
+
+  function executeDeviceAction(endpointID, action, deviceGUID) {
+    return OpenAMT.executeDeviceAction({ endpointId: endpointID, action: action, deviceGUID: deviceGUID }).$promise;
   }
 }
