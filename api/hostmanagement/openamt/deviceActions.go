@@ -35,7 +35,7 @@ func (service *Service) executeDeviceAction(configuration portainer.OpenAMTConfi
 	}
 
 	if response.Body.ReturnValue != 0 {
-		return fmt.Errorf("failed to execute action, error %v: %s", response.Body.ReturnValue, response.Body.ReturnValueStr)
+		return fmt.Errorf("failed to execute action, error status %v: %s", response.Body.ReturnValue, response.Body.ReturnValueStr)
 	}
 
 	return nil

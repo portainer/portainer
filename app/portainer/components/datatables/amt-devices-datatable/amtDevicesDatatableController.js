@@ -6,13 +6,7 @@ angular.module('portainer.docker').controller('AMTDevicesDatatableController', [
   'ModalService',
   'Notifications',
   function ($scope, $state, $controller, OpenAMTService, ModalService, Notifications) {
-    angular.extend(
-      this,
-      $controller('GenericDatatableController', {
-        $scope: $scope,
-        $state: $state,
-      })
-    );
+    angular.extend(this, $controller('GenericDatatableController', { $scope: $scope, $state: $state }));
 
     this.state = Object.assign(this.state, {
       executingAction: {},
@@ -39,8 +33,10 @@ angular.module('portainer.docker').controller('AMTDevicesDatatableController', [
 
     this.executeDeviceAction = async function (deviceGUID, action) {
       try {
+        console.log(this.endpointId);
+        console.log(`Execute ${action} on ${deviceGUID} ${this.endpointId}`);
         const confirmed = await ModalService.confirmAsync({
-          title: `Confirm`,
+          title: `Confirm action`,
           message: `Are you sure you want to ${action} the device?`,
           buttons: {
             confirm: {
@@ -52,10 +48,9 @@ angular.module('portainer.docker').controller('AMTDevicesDatatableController', [
         if (!confirmed) {
           return;
         }
-        console.log(`Execute ${action} on ${deviceGUID}`);
         this.state.executingAction[deviceGUID] = true;
-        // TODO use correct endpointid
-        await OpenAMTService.executeDeviceAction('22', deviceGUID, action);
+
+        await OpenAMTService.executeDeviceAction(this.endpointId, deviceGUID, action);
         Notifications.success(`${action} action sent successfully`);
         $state.reload();
       } catch (err) {
