@@ -1,14 +1,21 @@
 angular.module('portainer.docker').controller('AMTDevicesDatatableController', [
   '$scope',
+  '$state',
   '$controller',
   'OpenAMTService',
   'ModalService',
   'Notifications',
-  function ($scope, $controller, OpenAMTService, ModalService, Notifications) {
-    angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
+  function ($scope, $state, $controller, OpenAMTService, ModalService, Notifications) {
+    angular.extend(
+      this,
+      $controller('GenericDatatableController', {
+        $scope: $scope,
+        $state: $state,
+      })
+    );
 
     this.state = Object.assign(this.state, {
-      executingAction: false,
+      executingAction: {},
     });
 
     this.parsePowerState = function (powerStateIntValue) {
@@ -46,15 +53,16 @@ angular.module('portainer.docker').controller('AMTDevicesDatatableController', [
           return;
         }
         console.log(`Execute ${action} on ${deviceGUID}`);
-        this.state.executingAction = true;
+        this.state.executingAction[deviceGUID] = true;
         // TODO use correct endpointid
         await OpenAMTService.executeDeviceAction('22', deviceGUID, action);
         Notifications.success(`${action} action sent successfully`);
+        $state.reload();
       } catch (err) {
         console.log(err);
         Notifications.error('Failure', err, `Failed to ${action} the device`);
       } finally {
-        this.state.executingAction = false;
+        this.state.executingAction[deviceGUID] = false;
       }
     };
 
