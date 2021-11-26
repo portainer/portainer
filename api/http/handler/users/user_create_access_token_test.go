@@ -126,10 +126,21 @@ func Test_userAccessTokenCreatePayload(t *testing.T) {
 		},
 		{
 			payload:    userAccessTokenCreatePayload{Description: "test token"},
-			shouldFail: true,
+			shouldFail: false,
 		},
 		{
 			payload:    userAccessTokenCreatePayload{Description: "test-token "},
+			shouldFail: false,
+		},
+		{
+			payload: userAccessTokenCreatePayload{Description: `
+this string is longer than 128 characters and hence this will fail.
+this string is longer than 128 characters and hence this will fail.
+this string is longer than 128 characters and hence this will fail.
+this string is longer than 128 characters and hence this will fail.
+this string is longer than 128 characters and hence this will fail.
+this string is longer than 128 characters and hence this will fail.
+`},
 			shouldFail: true,
 		},
 	}

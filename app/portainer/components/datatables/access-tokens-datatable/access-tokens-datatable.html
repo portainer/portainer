@@ -78,7 +78,7 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a>{{ item.description }}</a>
+                {{ item.description }}
               </td>
               <td>
                 {{ item.prefix }}
