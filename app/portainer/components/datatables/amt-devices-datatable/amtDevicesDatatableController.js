@@ -47,9 +47,9 @@ angular.module('portainer.docker').controller('AMTDevicesDatatableController', [
         }
         console.log(`Execute ${action} on ${deviceGUID}`);
         this.state.executingAction = true;
-        //TODO use correct endpointid
-        await OpenAMTService.executeDeviceAction({ endpointId: '', action: action, deviceGUID: deviceGUID });
-        // reload
+        // TODO use correct endpointid
+        await OpenAMTService.executeDeviceAction('22', deviceGUID, action);
+        Notifications.success(`${action} action sent successfully`);
       } catch (err) {
         console.log(err);
         Notifications.error('Failure', err, `Failed to ${action} the device`);

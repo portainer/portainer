@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -18,6 +19,10 @@ const (
 	DefaultCIRAConfigName     = "ciraConfigDefault"
 	DefaultWirelessConfigName = "wirelessProfileDefault"
 	DefaultProfileName        = "profileAMTDefault"
+
+	PowerOnAction  = 2
+	PowerOffAction = 8
+	RestartAction  = 5
 )
 
 // Service represents a service for managing an OpenAMT server.
@@ -29,7 +34,7 @@ type Service struct {
 func NewService() *Service {
 	return &Service{
 		httpsClient: &http.Client{
-			Timeout: time.Second * time.Duration(10),
+			Timeout: time.Second * time.Duration(60),
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			},
@@ -211,4 +216,36 @@ func (service *Service) DeviceInformation(configuration portainer.OpenAMTConfigu
 		ConnectionStatus: resultDevice.ConnectionStatus,
 		PowerState:       resultPowerState.State,
 	}, nil
+}
+
+func (service *Service) ExecuteDeviceAction(configuration portainer.OpenAMTConfiguration, deviceGUID string, action string) error {
+	parsedAction, err := parseAction(action)
+	if err != nil {
+		return err
+	}
+
+	token, err := service.executeAuthenticationRequest(configuration)
+	if err != nil {
+		return err
+	}
+	configuration.Credentials.MPSToken = token.Token
+
+	err = service.executeDeviceAction(configuration, deviceGUID, parsedAction)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func parseAction(actionRaw string) (int, error) {
+	switch strings.ToLower(actionRaw) {
+	case "power up":
+		return PowerOnAction, nil
+	case "power off":
+		return PowerOffAction, nil
+	case "restart":
+		return RestartAction, nil
+	}
+	return 0, fmt.Errorf("unsupported device action %s", actionRaw)
 }

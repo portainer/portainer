@@ -219,7 +219,6 @@ func (handler *Handler) disableOpenAMT() error {
 	return nil
 }
 
-
 type Devices struct {
 	Devices []portainer.OpenAMTDeviceInformation
 }
@@ -237,8 +236,8 @@ type Devices struct {
 // @failure 403 "Permission denied to access settings"
 // @failure 500 "Server error"
 // @router /open_amt/{id}/devices [get]
-func (handler *Handler) OpenAMTDevices(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+func (handler *Handler) openAMTDevices(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "endpointId")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment identifier route variable", err}
 	}
@@ -272,4 +271,55 @@ func (handler *Handler) OpenAMTDevices(w http.ResponseWriter, r *http.Request) *
 	}
 
 	return response.JSON(w, devicesInformation)
+}
+
+type deviceActionPayload struct {
+	DeviceID     string
+	DeviceAction string
+}
+
+func (payload *deviceActionPayload) Validate(r *http.Request) error {
+	if payload.DeviceAction == "" {
+		return errors.New("device action must be provided")
+	}
+	if payload.DeviceID == "" {
+		return errors.New("device GUID must be provided")
+	}
+	return nil
+}
+
+// @id DeviceAction
+// @summary Execute out of band action on an AMT managed device
+// @description Execute out of band action on an AMT managed device
+// @description **Access policy**: administrator
+// @tags intel
+// @security jwt
+// @accept json
+// @produce json
+// @param body body deviceActionPayload true "Device Action"
+// @success 204 "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied to access settings"
+// @failure 500 "Server error"
+// @router /open_amt/{id}/devices/{deviceId}/{deviceAction} [post]
+func (handler *Handler) deviceAction(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	var payload deviceActionPayload
+	err := request.DecodeAndValidateJSONPayload(r, &payload)
+	if err != nil {
+		logrus.WithError(err).Error("Invalid request payload")
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Invalid request payload", Err: err}
+	}
+
+	settings, err := handler.DataStore.Settings().Settings()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+	}
+
+	err = handler.OpenAMTService.ExecuteDeviceAction(settings.OpenAMTConfiguration, payload.DeviceID, payload.DeviceAction)
+	if err != nil {
+		logrus.WithError(err).Error("Error executing device action")
+		return &httperror.HandlerError{StatusCode: http.StatusBadRequest, Message: "Error executing device action", Err: err}
+	}
+
+	return response.Empty(w)
 }
