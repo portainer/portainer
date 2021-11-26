@@ -88,11 +88,14 @@ class OpenAmtController {
             mpsURL: config.MPSURL,
             mpsUser: config.Credentials.MPSUser,
             domainName: config.DomainConfiguration.DomainName,
-            useWirelessConfig: config.WirelessConfiguration.UseWirelessConfig,
-            wifiAuthenticationMethod: config.WirelessConfiguration.AuthenticationMethod,
-            wifiEncryptionMethod: config.WirelessConfiguration.EncryptionMethod,
-            wifiSsid: config.WirelessConfiguration.SSID,
           };
+
+          if (config.WirelessConfiguration) {
+            this.formValues.useWirelessConfig = config.WirelessConfiguration.UseWirelessConfig;
+            this.formValues.wifiAuthenticationMethod = config.WirelessConfiguration.AuthenticationMethod;
+            this.formValues.wifiEncryptionMethod = config.WirelessConfiguration.EncryptionMethod;
+            this.formValues.wifiSsid = config.WirelessConfiguration.SSID;
+          }
 
           this.originalValues = {
             ...this.formValues,
