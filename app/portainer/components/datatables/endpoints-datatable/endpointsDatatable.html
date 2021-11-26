@@ -109,16 +109,7 @@
             <tr dir-paginate-end ng-show="item.Expanded">
               <td></td>
               <td colspan="8">
-                <amt-devices-datatable
-                  devices="$ctrl.state.amtDevices[item.Id]"
-                  service-id="item.Id"
-                  table-key="service-tasks"
-                  order-by="Status.State"
-                  nodes="$ctrl.nodes"
-                  agent-proxy="$ctrl.agentProxy"
-                  show-task-logs-button="$ctrl.showTaskLogsButton"
-                  text-filter="$ctrl.state.textFilter"
-                ></amt-devices-datatable>
+                <amt-devices-datatable devices="$ctrl.state.amtDevices[item.Id]" error="$ctrl.state.amtDevicesErrors[item.Id]"></amt-devices-datatable>
               </td>
             </tr>
             <tr ng-if="$ctrl.state.loading">

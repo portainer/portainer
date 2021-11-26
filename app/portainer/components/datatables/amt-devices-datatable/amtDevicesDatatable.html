@@ -18,14 +18,23 @@
             <a style="margin: 0 2.5px;" title="Power up the device">
               <i class="fa fa-file-alt space-right" aria-hidden="true"></i>
             </a>
+            <a style="margin: 0 2.5px;" title="Power off the device">
+              <i class="fa fa-file-alt space-right" aria-hidden="true"></i>
+            </a>
+            <a style="margin: 0 2.5px;" title="Restart the device">
+              <i class="fa fa-file-alt space-right" aria-hidden="true"></i>
+            </a>
           </div>
         </td>
       </tr>
-      <tr ng-if="!$ctrl.devices">
+      <tr ng-if="!$ctrl.devices && !$ctrl.error">
         <td colspan="5" class="text-center text-muted">Loading...</td>
       </tr>
       <tr ng-if="$ctrl.devices.length === 0">
         <td colspan="5" class="text-center text-muted">No devices found.</td>
+      </tr>
+      <tr ng-if="$ctrl.error">
+        <td colspan="5" class="text-center text-muted">{{ $ctrl.error }}</td>
       </tr>
     </tbody>
   </table>

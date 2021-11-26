@@ -18,6 +18,7 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
       pageNumber: 1,
       showAMTInfo: false,
       amtDevices: {},
+      amtDevicesErrors: {},
     });
 
     this.paginationChanged = function () {
@@ -83,12 +84,12 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
 
       OpenAMTService.getDevices(endpoint.Id)
         .then((data) => {
-          console.log('success!');
           console.log(data);
           this.state.amtDevices[endpoint.Id] = data.Devices;
         })
         .catch((e) => {
-          console.error('ERROR in show AMT info', e);
+          console.log(e);
+          this.state.amtDevicesErrors[endpoint.Id] = 'Error fetching devices information: ' + e.statusText;
         });
     };
 

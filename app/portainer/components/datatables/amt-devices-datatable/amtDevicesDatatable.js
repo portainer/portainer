@@ -3,5 +3,6 @@ angular.module('portainer.docker').component('amtDevicesDatatable', {
   controller: 'AMTDevicesDatatableController',
   bindings: {
     devices: '<',
+    error: '<',
   },
 });
