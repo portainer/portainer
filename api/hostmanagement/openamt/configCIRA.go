@@ -120,6 +120,9 @@ func (service *Service) getCIRACertificate(configuration portainer.OpenAMTConfig
 	loginURL := fmt.Sprintf("https://%s/mps/api/v1/ciracert", configuration.MPSURL)
 
 	req, err := http.NewRequest(http.MethodGet, loginURL, nil)
+	if err != nil {
+		return "", err
+	}
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", configuration.Credentials.MPSToken))
 
 	response, err := service.httpsClient.Do(req)

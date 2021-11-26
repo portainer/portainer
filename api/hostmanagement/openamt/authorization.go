@@ -24,6 +24,9 @@ func (service *Service) executeAuthenticationRequest(configuration portainer.Ope
 	jsonValue, _ := json.Marshal(payload)
 
 	req, err := http.NewRequest(http.MethodPost, loginURL, bytes.NewBuffer(jsonValue))
+	if err != nil {
+		return nil, err
+	}
 	req.Header.Set("Content-Type", "application/json")
 
 	response, err := service.httpsClient.Do(req)

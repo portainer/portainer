@@ -27,8 +27,7 @@ type Service struct {
 // NewService initializes a new service.
 func NewService() *Service {
 	return &Service{
-		httpsClient:
-		&http.Client{
+		httpsClient: &http.Client{
 			Timeout: time.Second * time.Duration(5),
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -96,6 +95,9 @@ func (service *Service) ConfigureDefault(configuration portainer.OpenAMTConfigur
 
 func (service *Service) executeSaveRequest(method string, url string, token string, payload []byte) ([]byte, error) {
 	req, err := http.NewRequest(method, url, bytes.NewBuffer(payload))
+	if err != nil {
+		return nil, err
+	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 
@@ -121,6 +123,10 @@ func (service *Service) executeSaveRequest(method string, url string, token stri
 
 func (service *Service) executeGetRequest(url string, token string) ([]byte, error) {
 	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 
