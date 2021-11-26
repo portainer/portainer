@@ -18,8 +18,14 @@ type userAccessTokenCreatePayload struct {
 }
 
 func (payload *userAccessTokenCreatePayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Description) || govalidator.Contains(payload.Description, " ") {
-		return errors.New("invalid description. Must not contain any whitespace")
+	if govalidator.IsNull(payload.Description) {
+		return errors.New("invalid description. cannot be empty")
+	}
+	if govalidator.HasWhitespaceOnly(payload.Description) {
+		return errors.New("invalid description. cannot contain only whitespaces")
+	}
+	if govalidator.MinStringLength(payload.Description, "128") {
+		return errors.New("invalid description. cannot be longer than 128 characters")
 	}
 	return nil
 }

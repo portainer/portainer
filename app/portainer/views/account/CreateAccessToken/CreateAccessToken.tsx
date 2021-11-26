@@ -40,8 +40,6 @@ export function CreateAccessToken({
   useEffect(() => {
     if (description.length === 0) {
       setErrorText('this field is required');
-    } else if (description.replaceAll(' ', '') !== description) {
-      setErrorText('this field cannot contain spaces');
     } else setErrorText('');
   }, [description]);
 
