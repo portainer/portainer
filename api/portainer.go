@@ -300,6 +300,8 @@ type (
 		ComposeSyntaxMaxVersion string `json:"ComposeSyntaxMaxVersion" example:"3.8"`
 		// Environment(Endpoint) specific security settings
 		SecuritySettings EndpointSecuritySettings
+		// The identifier of the AMT Device associated with this environment(endpoint)
+		AMTDeviceGUID string `json:"AMTDeviceGUID,omitempty" example:"4c4c4544-004b-3910-8037-b6c04f504633"`
 		// LastCheckInDate mark last check-in date on checkin
 		LastCheckInDate int64
 		// Deprecated fields

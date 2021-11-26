@@ -65,7 +65,7 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
     };
 
     this.showAMTNodes = function (item) {
-      return this.state.showAMTInfo && EndpointHelper.isAgentEndpoint(item); // TODO && endpoint.ConnectedAMT
+      return this.state.showAMTInfo && EndpointHelper.isAgentEndpoint(item) && item.AMTDeviceGUID;
     };
 
     this.expandItem = function (item, expanded) {

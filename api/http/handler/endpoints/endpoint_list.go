@@ -118,6 +118,10 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 		if paginatedEndpoints[idx].EdgeCheckinInterval == 0 {
 			paginatedEndpoints[idx].EdgeCheckinInterval = settings.EdgeAgentCheckinInterval
 		}
+		// TODO for testing
+		if paginatedEndpoints[idx].ID == 25 {
+			// paginatedEndpoints[idx].AMTDeviceGUID = "4c4c4544-004b-3910-8037-b6c04f504633"
+		}
 	}
 
 	w.Header().Set("X-Total-Count", strconv.Itoa(filteredEndpointCount))
