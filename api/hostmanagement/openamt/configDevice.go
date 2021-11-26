@@ -18,7 +18,7 @@ type DevicePowerState struct {
 }
 
 func (service *Service) getDevice(configuration portainer.OpenAMTConfiguration, deviceGUID string) (*Device, error) {
-	url := fmt.Sprintf("https://%v/mps/api/v1/devices/%v", configuration.MPSURL, deviceGUID)
+	url := fmt.Sprintf("https://%s/mps/api/v1/devices/%s", configuration.MPSURL, deviceGUID)
 
 	responseBody, err := service.executeGetRequest(url, configuration.Credentials.MPSToken)
 	if err != nil {
@@ -37,7 +37,7 @@ func (service *Service) getDevice(configuration portainer.OpenAMTConfiguration, 
 }
 
 func (service *Service) getDevicePowerState(configuration portainer.OpenAMTConfiguration, deviceGUID string) (*DevicePowerState, error) {
-	url := fmt.Sprintf("https://%v/mps/api/v1/amt/power/state/%v", configuration.MPSURL, deviceGUID)
+	url := fmt.Sprintf("https://%s/mps/api/v1/amt/power/state/%s", configuration.MPSURL, deviceGUID)
 
 	responseBody, err := service.executeGetRequest(url, configuration.Credentials.MPSToken)
 	if err != nil {
