@@ -6,8 +6,7 @@ angular.module('portainer.docker').factory('ContainerService', [
   'ResourceControlService',
   'LogHelper',
   '$timeout',
-  'StateManager',
-  function ContainerServiceFactory($q, Container, ResourceControlService, LogHelper, $timeout, StateManager) {
+  function ContainerServiceFactory($q, Container, ResourceControlService, LogHelper, $timeout) {
     'use strict';
     var service = {};
 
@@ -16,9 +15,7 @@ angular.module('portainer.docker').factory('ContainerService', [
 
       Container.get({ id: id })
         .$promise.then(function success(data) {
-          const state = StateManager.getState();
-          const { portainerContainerId } = state.application;
-          var container = new ContainerDetailsViewModel(data, portainerContainerId);
+          var container = new ContainerDetailsViewModel(data);
           deferred.resolve(container);
         })
         .catch(function error(err) {
@@ -32,10 +29,8 @@ angular.module('portainer.docker').factory('ContainerService', [
       var deferred = $q.defer();
       Container.query({ all: all, filters: filters })
         .$promise.then(function success(data) {
-          const state = StateManager.getState();
-          const { portainerContainerId } = state.application;
           var containers = data.map(function (item) {
-            return new ContainerViewModel(item, portainerContainerId);
+            return new ContainerViewModel(item);
           });
           deferred.resolve(containers);
         })
