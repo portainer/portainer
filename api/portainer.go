@@ -418,7 +418,7 @@ type (
 
 	// EcrData represents data required for ECR registry
 	EcrData struct {
-		Region string
+		Region string `json:"Region" example:"ap-southeast-2"`
 	}
 
 	// JobType represents a job type

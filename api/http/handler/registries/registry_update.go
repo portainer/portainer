@@ -32,7 +32,7 @@ type registryUpdatePayload struct {
 	// Registry access control
 	RegistryAccesses *portainer.RegistryAccesses `json:",omitempty"`
 	// ECR data
-	Ecr              *portainer.EcrData          `json:",omitempty" example:"{Region: \"ap-southeast-2\"}"`
+	Ecr              *portainer.EcrData          `json:",omitempty"`
 }
 
 func (payload *registryUpdatePayload) Validate(r *http.Request) error {
