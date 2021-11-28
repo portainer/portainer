@@ -845,6 +845,54 @@ json-tree .branch-preview {
   margin-bottom: 2rem;
 }
 
+.m-l-5 {
+  margin-left: 5px;
+}
+
+.m-l-20 {
+  margin-left: 20px;
+}
+
+.m-l-30 {
+  margin-left: 30px;
+}
+
+.m-r-2 {
+  margin-right: 2px;
+}
+
+.m-r-5 {
+  margin-right: 5px;
+}
+
+.m-t-10 {
+  margin-top: 10px;
+}
+
+.m-t-10 {
+  margin-top: 10px;
+}
+
+.m-b-10 {
+  margin-bottom: 10px;
+}
+
+.no-margin {
+  margin: 0 !important;
+}
+
+.no-border {
+  border: none;
+}
+
+.dispay-flex {
+  display: flex;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
 .text-wrap {
   word-break: break-all;
   white-space: normal;

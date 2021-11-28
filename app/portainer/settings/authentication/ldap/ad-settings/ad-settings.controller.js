@@ -3,8 +3,9 @@ import { HIDE_INTERNAL_AUTH } from '@/portainer/feature-flags/feature-ids';
 
 export default class AdSettingsController {
   /* @ngInject */
-  constructor(LDAPService) {
+  constructor(LDAPService, featureService) {
     this.LDAPService = LDAPService;
+    this.featureService = featureService;
 
     this.domainSuffix = '';
     this.limitedFeatureId = HIDE_INTERNAL_AUTH;
@@ -53,6 +54,10 @@ export default class AdSettingsController {
 
   removeLDAPUrl(index) {
     this.settings.URLs.splice(index, 1);
+  }
+
+  isSaveSettingButtonDisabled() {
+    return this.featureService.isLimitedToBE(this.limitedFeatureId) || !this.isLdapFormValid();
   }
 
   $onInit() {
