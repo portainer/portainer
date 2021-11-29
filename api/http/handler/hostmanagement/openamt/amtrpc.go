@@ -36,13 +36,12 @@ const (
 // @description **Access policy**: administrator
 // @tags intel
 // @security jwt
-// @accept json
 // @produce json
-// @success 204 "Success"
+// @success 200 "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied to access settings"
 // @failure 500 "Server error"
-// @router /manage/{id}/info [get]
+// @router /open_amt/{id}/info [get]
 func (handler *Handler) openAMTHostInfo(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
