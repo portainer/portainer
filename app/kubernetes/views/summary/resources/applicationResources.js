@@ -46,7 +46,7 @@ function getCreatedApplicationResources(formValues) {
     services.forEach((service) => {
       resources.push({ action: CREATE, kind: KubernetesResourceTypes.SERVICE, name: service.Name, type: service.Type || KubernetesServiceTypes.CLUSTER_IP });
       if (formValues.OriginalIngresses.length !== 0) {
-        const ingresses = KubernetesIngressConverter.newapplicationFormValuesToIngresses(formValues, service.Name, service.Ports);
+        const ingresses = KubernetesIngressConverter.newApplicationFormValuesToIngresses(formValues, service.Name, service.Ports);
         resources.push(...getIngressUpdateSummary(formValues.OriginalIngresses, ingresses));
       }
     });

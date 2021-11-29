@@ -1,3 +1,5 @@
+import _ from 'lodash-es';
+
 export default class KubernetesApplicationIngressController {
   /* @ngInject */
   constructor($async, KubernetesIngressService) {
@@ -12,11 +14,11 @@ export default class KubernetesApplicationIngressController {
       const ingresses = await this.KubernetesIngressService.get(this.application.ResourcePool);
       const services = this.application.Services;
 
-      services.forEach((service) => {
-        ingresses.filter((ingress) => {
-          ingress.Paths.map((element) => {
-            if (element.ServiceName === service.metadata.name) {
-              this.applicationIngress.push(element);
+      _.forEach(services, (service) => {
+        _.forEach(ingresses, (ingress) => {
+          _.forEach(ingress.Paths, (path) => {
+            if (path.ServiceName === service.metadata.name) {
+              this.applicationIngress.push(path);
               this.hasIngress = true;
             }
           });

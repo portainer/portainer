@@ -3,16 +3,18 @@
     <tbody>
       <tr class="text-muted">
         <td style="width: 15%;">Ingress name</td>
-        <td style="width: 15%;">Service name</td>
+        <td style="width: 10%;">Service name</td>
         <td style="width: 10%;">Host</td>
         <td style="width: 10%;">port</td>
-        <td style="width: 10%;">HTTP Route</td>
+        <td style="width: 10%;"></td>
+        <td style="width: 15%;">HTTP Route</td>
       </tr>
       <tr ng-repeat="ingress in $ctrl.applicationIngress">
         <td>{{ ingress.IngressName }}</td>
         <td>{{ ingress.ServiceName }}</td>
         <td>{{ ingress.Host }}</td>
         <td>{{ ingress.Port }}</td>
+        <td>{{ ingress.Path }}</td>
         <td
           ><a href="http://{{ ingress.Host }}{{ ingress.Path }}">{{ ingress.Host }}{{ ingress.Path }}</a></td
         >

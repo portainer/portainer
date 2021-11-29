@@ -12,5 +12,7 @@ angular.module('portainer.kubernetes').component('kubeServicesItemView', {
     originalIngresses: '<',
     isEdit: '<',
     serviceName: '<',
+    multiItemDisable: '<',
+    serviceIndex: '<',
   },
 });
