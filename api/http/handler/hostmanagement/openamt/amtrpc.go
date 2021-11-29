@@ -43,7 +43,7 @@ const (
 // @failure 403 "Permission denied to access settings"
 // @failure 500 "Server error"
 // @router /manage/{id}/info [get]
-func (handler *Handler) OpenAMTHostInfo(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) openAMTHostInfo(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment identifier route variable", err}
@@ -60,7 +60,7 @@ func (handler *Handler) OpenAMTHostInfo(w http.ResponseWriter, r *http.Request) 
 
 	ctx := context.TODO()
 	// pull the image so we can check if there's a new one
-	// TODO: these should be able to be over-ridden (don't hardcode the assuption that secure users can access Docker Hub, or that its even the orchestrator's "global namespace")
+	// TODO: these should be able to be over-ridden (don't hardcode the assumption that secure users can access Docker Hub, or that its even the orchestrator's "global namespace")
 	cmdLine := []string{"amtinfo", "--json"}
 	output, err := handler.PullAndRunContainer(ctx, endpoint, rpcGoImageName, rpcGoContainerName, cmdLine)
 	if err != nil {
@@ -102,9 +102,9 @@ func (handler *Handler) PullAndRunContainer(ctx context.Context, endpoint *porta
 
 // TODO: ideally, pullImage and runContainer will become a simple version of the use compose abstraction that can be called from withing Portainer.
 // TODO: the idea being that if we have an internal struct of a parsed compose file, we can also populate that struct programatically, and run it to get the result I'm getting here.
-// TODO: likley an upgrade and absrtaction of DeployComposeStack/DeploySwarmStack/DeployKubernetesStack
+// TODO: likeley an upgrade and abstraction of DeployComposeStack/DeploySwarmStack/DeployKubernetesStack
 // pullImage will pull the image to the specified environment
-// TODO: add k8s implemenation
+// TODO: add k8s implementation
 // TODO: work out registry auth
 func pullImage(ctx context.Context, docker *client.Client, imageName string) error {
 	r, err := docker.ImagePull(ctx, imageName, types.ImagePullOptions{})

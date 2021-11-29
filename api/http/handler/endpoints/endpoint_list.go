@@ -120,7 +120,7 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 		}
 		// TODO for testing
 		if paginatedEndpoints[idx].ID == 25 {
-			paginatedEndpoints[idx].AMTDeviceGUID = "4c4c4544-004b-3910-8037-b6c04f504633"
+			// paginatedEndpoints[idx].AMTDeviceGUID = "4c4c4544-004b-3910-8037-b6c04f504633"
 		}
 	}
 

@@ -30,8 +30,8 @@ func NewHandler(bouncer *security.RequestBouncer, dataStore portainer.DataStore)
 	}
 
 	h.Handle("/open_amt", bouncer.AdminAccess(httperror.LoggerHandler(h.openAMTConfigureDefault))).Methods(http.MethodPost)
-	h.Handle("/open_amt/{id}/info", bouncer.AdminAccess(httperror.LoggerHandler(h.OpenAMTHostInfo))).Methods(http.MethodGet)
-	h.Handle("/open_amt/{id}/devices", bouncer.AdminAccess(httperror.LoggerHandler(h.OpenAMTDevices))).Methods(http.MethodGet)
+	h.Handle("/open_amt/{id}/info", bouncer.AdminAccess(httperror.LoggerHandler(h.openAMTHostInfo))).Methods(http.MethodGet)
+	h.Handle("/open_amt/{id}/devices", bouncer.AdminAccess(httperror.LoggerHandler(h.openAMTDevices))).Methods(http.MethodGet)
 
 	return h, nil
 }
