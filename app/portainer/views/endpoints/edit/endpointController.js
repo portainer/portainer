@@ -4,6 +4,7 @@ import uuidv4 from 'uuid/v4';
 import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 import { EndpointSecurityFormData } from '@/portainer/components/endpointSecurity/porEndpointSecurityModel';
 import { getAgentShortVersion } from 'Portainer/views/endpoints/helpers';
+import EndpointHelper from '@/portainer/helpers/endpointHelper';
 
 angular.module('portainer.app').controller('EndpointController', EndpointController);
 
@@ -275,17 +276,18 @@ function EndpointController(
         $scope.groups = groups;
         $scope.availableTags = tags;
 
-        const featureFlagValue = settings && settings.FeatureFlagSettings && settings.FeatureFlagSettings['open-amt'];
-        const featureEnabled = settings && settings.OpenAMTConfiguration && settings.OpenAMTConfiguration.Enabled;
-        $scope.state.showAMTInfo = featureFlagValue && featureEnabled;
+        if (EndpointHelper.isDockerEndpoint(endpoint)) {
+          const featureFlagValue = settings && settings.FeatureFlagSettings && settings.FeatureFlagSettings['open-amt'];
+          const featureEnabled = settings && settings.OpenAMTConfiguration && settings.OpenAMTConfiguration.Enabled;
+          $scope.state.showAMTInfo = featureFlagValue && featureEnabled;
+        }
 
         configureState();
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to retrieve environment details');
       }
 
-      if ($scope.state.showAMTInfo) {
-        // TODO: if we know this env/node isn't connected (ie, we have no conectionto Docker), then don't try (is is a server side response?)
+      if ($scope.state.showAMTInfo && EndpointHelper.isDockerEndpoint($scope.endpoint)) {
         try {
           const [amtInfo] = await Promise.all([OpenAMTService.info($transition$.params().id)]);
 
