@@ -24,7 +24,8 @@ function EndpointController(
   Authentication,
   SettingsService,
   ModalService,
-  StateManager
+  StateManager,
+  OpenAMTService
 ) {
   const DEPLOYMENT_TABS = {
     SWARM: 'swarm',
@@ -66,6 +67,7 @@ function EndpointController(
       { key: '1 day', value: 86400 },
     ],
     allowSelfSignedCerts: true,
+    showAMTInfo: false,
   };
 
   $scope.agentVersion = StateManager.getState().application.version;
@@ -273,9 +275,32 @@ function EndpointController(
         $scope.groups = groups;
         $scope.availableTags = tags;
 
+        const featureFlagValue = settings && settings.FeatureFlagSettings && settings.FeatureFlagSettings['open-amt'];
+        const featureEnabled = settings && settings.OpenAMTConfiguration && settings.OpenAMTConfiguration.Enabled;
+        $scope.state.showAMTInfo = featureFlagValue && featureEnabled;
+
         configureState();
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to retrieve environment details');
+      }
+
+      if ($scope.state.showAMTInfo) {
+        // TODO: if we know this env/node isn't connected (ie, we have no conectionto Docker), then don't try (is is a server side response?)
+        try {
+          const [amtInfo] = await Promise.all([OpenAMTService.info($transition$.params().id)]);
+
+          $scope.endpoint.ManagementInfoRaw = amtInfo.Text;
+          try {
+            $scope.endpoint.ManagementInfo = JSON.parse(amtInfo.Text);
+          } catch (err) {
+            console.log('Failure', err, 'Unable to JSON parse AMT info: ' + amtInfo.Text);
+            $scope.endpoint.ManagementInfo = {};
+            $scope.endpoint.ManagementInfo['AMT'] = '-';
+            $scope.endpoint.ManagementInfo['Control Mode'] = '-';
+          }
+        } catch (err) {
+          Notifications.error('Failure', err, 'Unable to retrieve AMT environment details');
+        }
       }
     });
   }

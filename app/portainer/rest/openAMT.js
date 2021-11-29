@@ -11,6 +11,7 @@ function OpenAMTFactory($resource) {
     {},
     {
       submit: { method: 'POST' },
+      info: { method: 'GET', params: { id: '@id', action: 'info' } },
       getDevices: { method: 'GET', params: { id: '@id', action: 'devices' } },
     }
   );

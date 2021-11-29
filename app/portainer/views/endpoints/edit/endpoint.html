@@ -211,6 +211,46 @@
             <por-endpoint-security form-data="formValues.SecurityFormData" endpoint="endpoint"></por-endpoint-security>
           </div>
           <!-- !endpoint-security -->
+          <!-- open-amt info -->
+          <div ng-if="state.managementinfo !== ''">
+            <div class="col-sm-12 form-section-title">
+              Open Active Management Technology
+            </div>
+            <div class="form-group">
+              <label for="endpoint_managementinfo" class="col-sm-3 col-lg-2 control-label text-left">
+                Raw Information
+              </label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="text" ng-disabled="true" class="form-control" id="endpoint_managementinfo" ng-model="endpoint.ManagementInfoRaw" placeholder="Loading..." />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="endpoint_managementinfoVersion" class="col-sm-3 col-lg-2 control-label text-left">
+                AMT Version
+              </label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="text" ng-disabled="true" class="form-control" id="endpoint_managementinfoVersion" ng-model="endpoint.ManagementInfo['AMT']" placeholder="Loading..." />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="endpoint_managementinfoControlMode" class="col-sm-3 col-lg-2 control-label text-left">
+                Control Mode
+              </label>
+              <div class="col-sm-9 col-lg-10">
+                <input
+                  type="text"
+                  ng-disabled="true"
+                  class="form-control"
+                  id="endpoint_managementinfoControlMode"
+                  ng-model="endpoint.ManagementInfo['Control Mode']"
+                  placeholder="Loading..."
+                />
+              </div>
+            </div>
+          </div>
+          <!-- !open-amt info -->
           <div class="form-group">
             <div class="col-sm-12">
               <button
