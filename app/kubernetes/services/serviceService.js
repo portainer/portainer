@@ -14,6 +14,8 @@ class KubernetesServiceService {
     this.createAsync = this.createAsync.bind(this);
     this.patchAsync = this.patchAsync.bind(this);
     this.deleteAsync = this.deleteAsync.bind(this);
+    this.deleteAllAsync = this.deleteAllAsync.bind(this);
+    this.clearAsync = this.clearAsync.bind(this);
   }
 
   /**
@@ -95,7 +97,43 @@ class KubernetesServiceService {
   /**
    * DELETE
    */
-  async deleteAsync(service) {
+  async deleteAsync(services) {
+    services.forEach(async (service) => {
+      try {
+        const params = new KubernetesCommonParams();
+        params.id = service.metadata.name;
+        const namespace = service.metadata.namespace;
+        await this.KubernetesServices(namespace).delete(params).$promise;
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('unable to remove service', err);
+      }
+    });
+  }
+
+  delete(services) {
+    return this.$async(this.deleteAsync, services);
+  }
+
+  async clearAsync(services) {
+    services.forEach(async (service) => {
+      try {
+        const params = new KubernetesCommonParams();
+        params.id = service.Name;
+        const namespace = service.Namespace;
+        await this.KubernetesServices(namespace).delete(params).$promise;
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('unable to remove service', err);
+      }
+    });
+  }
+
+  clear(services) {
+    return this.$async(this.clearAsync, services);
+  }
+
+  async deleteAllAsync(service) {
     try {
       const params = new KubernetesCommonParams();
       params.id = service.Name;
@@ -107,8 +145,8 @@ class KubernetesServiceService {
     }
   }
 
-  delete(service) {
-    return this.$async(this.deleteAsync, service);
+  deleteAll(service) {
+    return this.$async(this.deleteAllAsync, service);
   }
 }
 

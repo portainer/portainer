@@ -318,6 +318,7 @@ class KubernetesApplicationController {
       this.application = application;
       this.allContainers = KubernetesApplicationHelper.associateAllContainersAndApplication(application);
       this.formValues.Note = this.application.Note;
+      this.formValues.Services = this.application.Services;
       if (this.application.Note) {
         this.state.expandedNote = true;
       }
@@ -366,6 +367,7 @@ class KubernetesApplicationController {
       expandedNote: false,
       useIngress: false,
       useServerMetrics: this.EndpointProvider.currentEndpoint().Kubernetes.Configuration.UseServerMetrics,
+      publicUrl: this.EndpointProvider.currentEndpoint().PublicURL,
     };
 
     this.state.activeTab = this.LocalStorage.getActiveTab('application');

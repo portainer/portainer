@@ -1,0 +1,209 @@
+<form name="serviceForm">
+  <div class="small text-warning" ng-show="$ctrl.originalIngresses.length === 0">
+    <p style="margin-top: 10px;">
+      <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Ingress is not configured in this namespace, please select another namespace with ingress enabled.
+    </p>
+  </div>
+  <div style="margin-top: 5px; margin-bottom: 5px;">
+    <label class="control-label text-left">Published ports</label>
+    <span
+      class="label label-default interactive"
+      style="margin-left: 10px;"
+      ng-click="$ctrl.addPort()"
+      ng-if="!ctrl.disableLoadBalancerEdit()"
+      data-cy="k8sAppCreate-addNewPortButton"
+    >
+      <i class="fa fa-plus-circle" aria-hidden="true"></i> publish a new port
+    </span>
+  </div>
+  <div ng-repeat="servicePort in $ctrl.servicePorts" style="margin-top: 10px;">
+    <div
+      class="input-group input-group-sm"
+      ng-class="{
+        striked: publishedPort.NeedsDeletion,
+        'col-sm-2': ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INGRESS,
+        'col-sm-3': ctrl.formValues.PublishingType !== ctrl.ApplicationPublishingTypes.INGRESS
+      }"
+    >
+      <span class="input-group-addon">container port</span>
+      <input
+        type="number"
+        class="form-control"
+        name="container_port_{{ $index }}"
+        ng-model="servicePort.targetPort"
+        placeholder="80"
+        ng-min="1"
+        ng-max="65535"
+        ng-disabled="$ctrl.originalIngresses.length === 0"
+        required
+        data-cy="k8sAppCreate-containerPort_{{ $index }}"
+      />
+    </div>
+
+    <div
+      class="input-group input-group-sm"
+      ng-class="{
+        striked: publishedPort.NeedsDeletion,
+        'col-sm-2': ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INGRESS,
+        'col-sm-3': ctrl.formValues.PublishingType !== ctrl.ApplicationPublishingTypes.INGRESS
+      }"
+    >
+      <span class="input-group-addon">service port</span>
+      <input
+        type="number"
+        class="form-control"
+        name="service_port_{{ $index }}"
+        ng-model="servicePort.port"
+        placeholder="80"
+        ng-min="1"
+        ng-max="65535"
+        ng-disabled="$ctrl.originalIngresses.length === 0"
+        required
+        data-cy="k8sAppCreate-containerPort_{{ $index }}"
+      />
+    </div>
+
+    <div
+      ng-if="$ctrl.serviceType === 2"
+      class="input-group input-group-sm"
+      ng-class="{
+        striked: publishedPort.NeedsDeletion,
+        'col-sm-2': ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.INGRESS,
+        'col-sm-3': ctrl.formValues.PublishingType !== ctrl.ApplicationPublishingTypes.INGRESS
+      }"
+    >
+      <span class="input-group-addon">nodeport</span>
+      <input
+        type="number"
+        class="form-control"
+        name="node_port_{{ $index }}"
+        ng-model="servicePort.nodePort"
+        placeholder="30080"
+        ng-min="30000"
+        ng-max="32767"
+        data-cy="k8sAppCreate-containerPort_{{ $index }}"
+      />
+    </div>
+
+    <div ng-if="$ctrl.serviceType === 3" class="input-group input-group-sm" ng-class="col - sm - 2">
+      <span class="input-group-addon">loadbalancer port</span>
+      <input
+        type="number"
+        class="form-control"
+        name="loadbalancer_port_{{ $index }}"
+        ng-model="servicePort.port"
+        placeholder="80"
+        ng-min="1"
+        ng-max="65535"
+        required
+        ng-change="ctrl.onChangePortMappingContainerPort()"
+        ng-disabled="ctrl.disableLoadBalancerEdit() || ctrl.isEditAndNotNewPublishedPort($index)"
+        data-cy="k8sAppCreate-containerPort_{{ $index }}"
+      />
+    </div>
+
+    <div ng-if="$ctrl.serviceType === 1 && $ctrl.ingressType" class="input-group input-group-sm" ng-class="col - sm - 2">
+      <span class="input-group-addon">ingress</span>
+      <select
+        class="form-control"
+        name="ingress_port_{{ $index }}"
+        ng-model="servicePort.ingress.IngressName"
+        required
+        ng-disabled="$ctrl.originalIngresses.length === 0"
+        ng-options="ingress.Name as ingress.Name for ingress in $ctrl.originalIngresses"
+        data-cy="k8sAppCreate-containerPort_{{ $index }}"
+      >
+        <option selected disabled hidden value="">Select an ingress</option>
+      </select>
+    </div>
+
+    <div ng-if="$ctrl.serviceType === 1 && $ctrl.ingressType" class="input-group input-group-sm" ng-class="col - sm - 2">
+      <span class="input-group-addon">hostname</span>
+      <select
+        class="form-control"
+        name="hostname_port_{{ $index }}"
+        ng-model="servicePort.ingress.Host"
+        required
+        ng-disabled="$ctrl.originalIngresses.length === 0"
+        ng-options="ingress.Hosts as ingress.Hosts for ingress in $ctrl.originalIngresses"
+        data-cy="k8sAppCreate-containerPort_{{ $index }}"
+      >
+        <option selected disabled hidden value="">Select a hostname</option>
+      </select>
+    </div>
+
+    <div ng-if="$ctrl.serviceType === 1 && $ctrl.ingressType" class="input-group input-group-sm" ng-class="col - sm - 2">
+      <span class="input-group-addon">route</span>
+      <input
+        class="form-control"
+        name="route_port_{{ $index }}"
+        ng-model="servicePort.ingress.Path"
+        placeholder="80"
+        required
+        ng-change="ctrl.onChangePortMappingContainerPort()"
+        ng-disabled="$ctrl.originalIngresses.length === 0"
+        data-cy="k8sAppCreate-containerPort_{{ $index }}"
+      />
+    </div>
+
+    <div class="input-group col-sm-2 input-group-sm">
+      <div class="btn-group btn-group-sm" ng-class="{ striked: publishedPort.NeedsDeletion }">
+        <label
+          class="btn btn-primary"
+          ng-model="servicePort.protocol"
+          uib-btn-radio="'TCP'"
+          ng-change="ctrl.onChangePortProtocol($index)"
+          ng-disabled="ctrl.isProtocolOptionDisabled($index, 'TCP')"
+          data-cy="k8sAppCreate-TCPButton_{{ $index }}"
+          >TCP</label
+        >
+        <label
+          class="btn btn-primary"
+          ng-model="servicePort.protocol"
+          uib-btn-radio="'UDP'"
+          ng-change="ctrl.onChangePortProtocol($index)"
+          ng-disabled="ctrl.isProtocolOptionDisabled($index, 'UDP')"
+          data-cy="k8sAppCreate-UDPButton_{{ $index }}"
+          >UDP</label
+        >
+      </div>
+      <button
+        ng-if="!ctrl.disableLoadBalancerEdit() && !publishedPort.NeedsDeletion"
+        class="btn btn-sm btn-danger"
+        type="button"
+        ng-click="$ctrl.removePort($index)"
+        data-cy="k8sAppCreate-rmPortButton_{{ $index }}"
+      >
+        <i class="fa fa-trash-alt" aria-hidden="true"></i>
+      </button>
+    </div>
+    <p ng-if="ctrl.state.duplicates.publishedPorts.nodePorts.refs[$index] !== undefined">
+      <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This port is already used.
+    </p>
+    <div class="small text-warning" style="margin-top: 5px;">
+      <div ng-messages="serviceForm['container_port_'+$index].$error">
+        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Container port number is required.</p>
+        <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Container port number must be inside the range 1-65535.</p>
+        <p ng-message="max"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Container port number must be inside the range 1-65535.</p>
+      </div>
+    </div>
+    <div class="small text-warning" style="margin-top: 5px;">
+      <div ng-messages="serviceForm['service_port_'+$index].$error">
+        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Service port number is required.</p>
+        <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Container port number must be inside the range 1-65535.</p>
+        <p ng-message="max"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Container port number must be inside the range 1-65535.</p>
+      </div>
+    </div>
+    <div class="small text-warning" style="margin-top: 5px;">
+      <div ng-messages="serviceForm['node_port_'+$index].$error">
+        <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Node port number must be inside the range 30000-32767 or blank for system allocated.</p>
+        <p ng-message="max"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Node port number must be inside the range 30000-32767 or blank for system allocated.</p>
+      </div>
+    </div>
+    <div class="small text-warning" style="margin-top: 5px;">
+      <div ng-messages="serviceForm['route_port_'+$index].$error">
+        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Route is required.</p>
+      </div>
+    </div>
+  </div>
+</form>

@@ -76,6 +76,46 @@ export class KubernetesIngressConverter {
     return ingresses;
   }
 
+  static newapplicationFormValuesToIngressesDelete(application) {
+    const ingresses = angular.copy(application.Ingresses);
+    application.Services.forEach((service) => {
+      ingresses.forEach((ingress) => {
+        const path = _.find(ingress.Paths, { ServiceName: service.metadata.name });
+        if (path) {
+          _.remove(ingress.Paths, path);
+        }
+      });
+    });
+    return ingresses;
+  }
+
+  static newapplicationFormValuesToIngresses(formValues, serviceName, servicePorts) {
+    const ingresses = angular.copy(formValues.OriginalIngresses);
+    servicePorts.forEach((port) => {
+      const ingress = _.find(ingresses, { Name: port.ingress.IngressName });
+      if (ingress) {
+        const rule = new KubernetesIngressRule();
+        rule.ServiceName = serviceName;
+        rule.IngressName = port.ingress.IngressName;
+        rule.Host = port.ingress.Host;
+        rule.Path = _.startsWith(port.ingress.Path, '/') ? port.ingress.Path : '/' + port.ingress.Path;
+        rule.Port = port.port;
+
+        ingress.Paths.push(rule);
+      }
+    });
+    return ingresses;
+  }
+
+  static oldIngressRemoved(formValues, serviceName) {
+    const ingresses = angular.copy(formValues.OriginalIngresses);
+    ingresses.forEach((ingress) => {
+      const match = _.find(ingress.Paths, { ServiceName: serviceName });
+      _.remove(ingress.Paths, match);
+    });
+    return ingresses;
+  }
+
   /**
    *
    * @param {KubernetesResourcePoolIngressClassFormValue[]} formValues
