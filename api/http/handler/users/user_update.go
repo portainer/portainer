@@ -115,5 +115,8 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist user changes inside the database", err}
 	}
 
+	// remove all of the users persisted API keys
+	handler.apiKeyService.InvalidateUserKeyCache(user.ID)
+
 	return response.JSON(w, user)
 }

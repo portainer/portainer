@@ -216,3 +216,74 @@ func Test_DeleteAPIKey(t *testing.T) {
 		is.False(ok)
 	})
 }
+
+func Test_InvalidateUserKeyCache(t *testing.T) {
+	is := assert.New(t)
+
+	store, teardown := bolt.MustNewTestStore(true)
+	defer teardown()
+
+	service := NewAPIKeyService(store.APIKeyRepository(), store.User())
+
+	t.Run("Successfully updates evicts keys from cache", func(t *testing.T) {
+		// generate api keys
+		user := portainer.User{ID: 1}
+		_, apiKey1, err := service.GenerateApiKey(user, "test-1")
+		is.NoError(err)
+
+		_, apiKey2, err := service.GenerateApiKey(user, "test-2")
+		is.NoError(err)
+
+		// verify api keys are present in cache
+		_, apiKeyFromCache, ok := service.cache.Get(apiKey1.Digest)
+		is.True(ok)
+		is.Equal(*apiKey1, apiKeyFromCache)
+
+		_, apiKeyFromCache, ok = service.cache.Get(apiKey2.Digest)
+		is.True(ok)
+		is.Equal(*apiKey2, apiKeyFromCache)
+
+		// evict cache
+		ok = service.InvalidateUserKeyCache(user.ID)
+		is.True(ok)
+
+		// verify users keys have been flushed from cache
+		_, _, ok = service.cache.Get(apiKey1.Digest)
+		is.False(ok)
+
+		_, _, ok = service.cache.Get(apiKey2.Digest)
+		is.False(ok)
+	})
+
+	t.Run("User key eviction does not affect other users keys", func(t *testing.T) {
+		// generate keys for 2 users
+		user1 := portainer.User{ID: 1}
+		_, apiKey1, err := service.GenerateApiKey(user1, "test-1")
+		is.NoError(err)
+
+		user2 := portainer.User{ID: 2}
+		_, apiKey2, err := service.GenerateApiKey(user2, "test-2")
+		is.NoError(err)
+
+		// verify keys in cache
+		_, apiKeyFromCache, ok := service.cache.Get(apiKey1.Digest)
+		is.True(ok)
+		is.Equal(*apiKey1, apiKeyFromCache)
+
+		_, apiKeyFromCache, ok = service.cache.Get(apiKey2.Digest)
+		is.True(ok)
+		is.Equal(*apiKey2, apiKeyFromCache)
+
+		// evict key of single user from cache
+		ok = service.cache.InvalidateUserKeyCache(user1.ID)
+		is.True(ok)
+
+		// verify user1 key has been flushed from cache
+		_, _, ok = service.cache.Get(apiKey1.Digest)
+		is.False(ok)
+
+		// verify user2 key is still in cache
+		_, _, ok = service.cache.Get(apiKey2.Digest)
+		is.True(ok)
+	})
+}

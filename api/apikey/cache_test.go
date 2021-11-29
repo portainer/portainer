@@ -146,3 +146,36 @@ func Test_apiKeyCacheLRU(t *testing.T) {
 		})
 	}
 }
+
+func Test_apiKeyCacheInvalidateUserKeyCache(t *testing.T) {
+	is := assert.New(t)
+
+	keyCache := NewAPIKeyCache(10)
+
+	t.Run("Removes users keys from cache", func(t *testing.T) {
+		keyCache.cache.Add(string("foo"), entry{user: portainer.User{ID: 1}, apiKey: portainer.APIKey{}})
+
+		ok := keyCache.InvalidateUserKeyCache(1)
+		is.True(ok)
+
+		_, ok = keyCache.cache.Get(string("foo"))
+		is.False(ok)
+	})
+
+	t.Run("Does not affect other keys", func(t *testing.T) {
+		keyCache.cache.Add(string("foo"), entry{user: portainer.User{ID: 1}, apiKey: portainer.APIKey{}})
+		keyCache.cache.Add(string("bar"), entry{user: portainer.User{ID: 2}, apiKey: portainer.APIKey{}})
+
+		ok := keyCache.InvalidateUserKeyCache(1)
+		is.True(ok)
+
+		ok = keyCache.InvalidateUserKeyCache(1)
+		is.False(ok)
+
+		_, ok = keyCache.cache.Get(string("foo"))
+		is.False(ok)
+
+		_, ok = keyCache.cache.Get(string("bar"))
+		is.True(ok)
+	})
+}

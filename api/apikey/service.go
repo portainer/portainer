@@ -115,3 +115,7 @@ func (a *apiKeyService) DeleteAPIKey(apiKeyID portainer.APIKeyID) error {
 	a.cache.Delete(apiKey.Digest)
 	return a.apiKeyRepository.DeleteAPIKey(apiKeyID)
 }
+
+func (a *apiKeyService) InvalidateUserKeyCache(userId portainer.UserID) bool {
+	return a.cache.InvalidateUserKeyCache(userId)
+}
