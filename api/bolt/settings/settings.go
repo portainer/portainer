@@ -44,3 +44,17 @@ func (service *Service) Settings() (*portainer.Settings, error) {
 func (service *Service) UpdateSettings(settings *portainer.Settings) error {
 	return internal.UpdateObject(service.connection, BucketName, []byte(settingsKey), settings)
 }
+
+func (s *Service) IsFeatureFlagEnabled(ff portainer.Feature) bool {
+	settings, err := s.Settings()
+	if err != nil {
+		return false
+	}
+
+	featureflag, ok := settings.FeatureFlagSettings[portainer.FeatOpenAMT]
+	if ok {
+		return featureflag
+	}
+
+	return false
+}

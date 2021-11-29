@@ -23,13 +23,8 @@ func NewHandler(bouncer *security.RequestBouncer, dataStore portainer.DataStore)
 		Router: mux.NewRouter(),
 	}
 
-	settings, err := dataStore.Settings().Settings()
-	if err != nil {
-		return nil, err
-	}
-
-	featureEnabled, _ := settings.FeatureFlagSettings[portainer.FeatOpenAMT]
-	if featureEnabled {
+	// TODO: consider returning a nil handler.
+	if dataStore.Settings().IsFeatureFlagEnabled(portainer.FeatOpenAMT) {
 		h.Handle("/open_amt", bouncer.AdminAccess(httperror.LoggerHandler(h.openAMTConfigureDefault))).Methods(http.MethodPost)
 	}
 

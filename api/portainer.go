@@ -1394,6 +1394,7 @@ type (
 	SettingsService interface {
 		Settings() (*Settings, error)
 		UpdateSettings(settings *Settings) error
+		IsFeatureFlagEnabled(ff Feature) bool
 	}
 
 	// Server defines the interface to serve the API
