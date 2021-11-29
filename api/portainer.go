@@ -67,6 +67,14 @@ type (
 		PskPass              string `json:"PskPass"`
 	}
 
+	// OpenAMTDeviceInformation represents an AMT managed device information
+	OpenAMTDeviceInformation struct {
+		GUID             string `json:"guid"`
+		HostName         string `json:"hostname"`
+		ConnectionStatus bool   `json:"connectionStatus"`
+		PowerState       int    `json:"powerstate"`
+	}
+
 	// CLIFlags represents the available flags on the CLI
 	CLIFlags struct {
 		Addr                      *string
@@ -292,6 +300,8 @@ type (
 		ComposeSyntaxMaxVersion string `json:"ComposeSyntaxMaxVersion" example:"3.8"`
 		// Environment(Endpoint) specific security settings
 		SecuritySettings EndpointSecuritySettings
+		// The identifier of the AMT Device associated with this environment(endpoint)
+		AMTDeviceGUID string `json:"AMTDeviceGUID,omitempty" example:"4c4c4544-004b-3910-8037-b6c04f504633"`
 		// LastCheckInDate mark last check-in date on checkin
 		LastCheckInDate int64
 
@@ -1288,6 +1298,7 @@ type (
 	// OpenAMTService represents a service for managing OpenAMT
 	OpenAMTService interface {
 		ConfigureDefault(configuration OpenAMTConfiguration) error
+		DeviceInformation(configuration OpenAMTConfiguration, deviceGUID string) (*OpenAMTDeviceInformation, error)
 	}
 
 	// HelmUserRepositoryService represents a service to manage HelmUserRepositories

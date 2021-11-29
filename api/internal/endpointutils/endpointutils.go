@@ -30,6 +30,14 @@ func IsEdgeEndpoint(endpoint *portainer.Endpoint) bool {
 	return endpoint.Type == portainer.EdgeAgentOnDockerEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment
 }
 
+// IsAgentEndpoint returns true if this is an Agent endpoint
+func IsAgentEndpoint(endpoint *portainer.Endpoint) bool {
+	return endpoint.Type == portainer.AgentOnDockerEnvironment ||
+		endpoint.Type == portainer.EdgeAgentOnDockerEnvironment ||
+		endpoint.Type == portainer.AgentOnKubernetesEnvironment ||
+		endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment
+}
+
 // FilterByExcludeIDs receives an environment(endpoint) array and returns a filtered array using an excludeIds param
 func FilterByExcludeIDs(endpoints []portainer.Endpoint, excludeIds []portainer.EndpointID) []portainer.Endpoint {
 	if len(excludeIds) == 0 {

@@ -1,0 +1,41 @@
+<div class="amt-devices-datatable">
+  <table class="table table-condensed table-hover nowrap-cells">
+    <thead>
+      <tr>
+        <th>Hostname</th>
+        <th>MPS Status</th>
+        <th>Power State</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="device in $ctrl.devices">
+        <td>{{ device.hostname }}</td>
+        <td>{{ device.connectionStatus ? 'Connected' : 'Disconnected' }}</td>
+        <td>{{ $ctrl.parsePowerState(device.powerstate) }}</td>
+        <td>
+          <div class="btn-group btn-group-xs" role="group" aria-label="..." style="display: inline-flex;">
+            <a style="margin: 0 2.5px;" title="Power up the device">
+              <i class="fa fa-file-alt space-right" aria-hidden="true"></i>
+            </a>
+            <a style="margin: 0 2.5px;" title="Power off the device">
+              <i class="fa fa-file-alt space-right" aria-hidden="true"></i>
+            </a>
+            <a style="margin: 0 2.5px;" title="Restart the device">
+              <i class="fa fa-file-alt space-right" aria-hidden="true"></i>
+            </a>
+          </div>
+        </td>
+      </tr>
+      <tr ng-if="!$ctrl.devices && !$ctrl.error">
+        <td colspan="5" class="text-center text-muted">Loading...</td>
+      </tr>
+      <tr ng-if="$ctrl.devices.length === 0">
+        <td colspan="5" class="text-center text-muted">No devices found.</td>
+      </tr>
+      <tr ng-if="$ctrl.error">
+        <td colspan="5" class="text-center text-muted">{{ $ctrl.error }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
