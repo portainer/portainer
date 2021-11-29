@@ -53,6 +53,7 @@ function VolumeBrowserServiceFactory(StateManager, Browse, BrowseVersion1, API_E
       Upload.upload({
         url: url,
         data: { file, Path: path },
+        resumeChunkSize: "100kb",
       }).then(resolve, reject, onProgress);
     });
   }

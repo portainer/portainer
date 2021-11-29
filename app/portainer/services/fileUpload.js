@@ -27,6 +27,7 @@ angular.module('portainer.app').factory('FileUploadService', [
           dockerfile: path,
         },
         ignoreLoadingBar: true,
+        resumeChunkSize: "100kb",
         transformResponse: function (data) {
           return jsonObjectsToArrayHandler(data);
         },
@@ -42,6 +43,7 @@ angular.module('portainer.app').factory('FileUploadService', [
         },
         data: file,
         ignoreLoadingBar: true,
+        resumeChunkSize: "100kb",
         transformResponse: genericHandler,
       });
     };
@@ -81,6 +83,7 @@ angular.module('portainer.app').factory('FileUploadService', [
           Env: Upload.json(env),
         },
         ignoreLoadingBar: true,
+        resumeChunkSize: "100kb",
       });
     };
 
@@ -93,6 +96,7 @@ angular.module('portainer.app').factory('FileUploadService', [
           Env: Upload.json(env),
         },
         ignoreLoadingBar: true,
+        resumeChunkSize: "100kb",
       });
     };
 
@@ -105,6 +109,7 @@ angular.module('portainer.app').factory('FileUploadService', [
           ...payload,
         },
         ignoreLoadingBar: true,
+        resumeChunkSize: "100kb",
       });
     };
 
@@ -113,6 +118,7 @@ angular.module('portainer.app').factory('FileUploadService', [
         url: 'api/custom_templates?method=file',
         data,
         ignoreLoadingBar: true,
+        resumeChunkSize: "100kb",
       });
     };
 
@@ -156,6 +162,7 @@ angular.module('portainer.app').factory('FileUploadService', [
           CheckinInterval: checkinInterval,
         },
         ignoreLoadingBar: true,
+        resumeChunkSize: "100kb",
       });
     };
 
@@ -172,6 +179,7 @@ angular.module('portainer.app').factory('FileUploadService', [
           AzureAuthenticationKey: authenticationKey,
         },
         ignoreLoadingBar: true,
+        resumeChunkSize: "100kb",
       });
     };
 
