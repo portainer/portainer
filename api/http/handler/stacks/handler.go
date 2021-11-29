@@ -18,9 +18,10 @@ import (
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/scheduler"
 	"github.com/portainer/portainer/api/stacks"
+	"github.com/sirupsen/logrus"
 )
 
-const defaultGitReferenceName = "refs/heads/master"
+const defaultGitReferenceName = ""
 
 var (
 	errStackAlreadyExists     = errors.New("A stack already exists with this name")
@@ -45,7 +46,7 @@ type Handler struct {
 	StackDeployer       stacks.StackDeployer
 }
 
-func stackExistsError(name string) (*httperror.HandlerError){
+func stackExistsError(name string) *httperror.HandlerError {
 	msg := fmt.Sprintf("A stack with the normalized name '%s' already exists", name)
 	err := errors.New(msg)
 	return &httperror.HandlerError{StatusCode: http.StatusConflict, Message: msg, Err: err}
@@ -202,6 +203,8 @@ func (handler *Handler) clone(projectPath, repositoryURL, refName string, auth b
 		username = ""
 		password = ""
 	}
+
+	logrus.WithField("repositoryURL", repositoryURL).WithField("refName", refName).WithField("dst", projectPath).Info("clone repository")
 
 	err := handler.GitService.CloneRepository(projectPath, repositoryURL, refName, username, password)
 	if err != nil {

@@ -68,6 +68,11 @@ func (c gitClient) download(ctx context.Context, dst string, opt cloneOptions) e
 }
 
 func (c gitClient) latestCommitID(ctx context.Context, opt fetchOptions) (string, error) {
+	if opt.referenceName == "" {
+		// allow the remote git to give us whatever is default.
+		return "", nil
+	}
+
 	remote := git.NewRemote(memory.NewStorage(), &config.RemoteConfig{
 		Name: "origin",
 		URLs: []string{opt.repositoryUrl},
@@ -153,7 +158,7 @@ func (service *Service) cloneRepository(destination string, options cloneOptions
 	return service.git.download(context.TODO(), destination, options)
 }
 
-// LatestCommitID returns SHA1 of the latest commit of the specified reference
+// LatestCommitID returns SHA1 of the latest commit of the specified reference (or an empty string if referenceName is "" - to allow git to use its defaults.)
 func (service *Service) LatestCommitID(repositoryURL, referenceName, username, password string) (string, error) {
 	options := fetchOptions{
 		repositoryUrl: repositoryURL,

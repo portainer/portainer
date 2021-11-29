@@ -57,20 +57,13 @@ func RedeployWhenChanged(stackID portainer.StackID, deployer StackDeployer, data
 	if strings.EqualFold(newHash, string(stack.GitConfig.ConfigHash)) {
 		return nil
 	}
-
-	cloneParams := &cloneRepositoryParameters{
-		url:   stack.GitConfig.URL,
-		ref:   stack.GitConfig.ReferenceName,
-		toDir: stack.ProjectPath,
-	}
-	if stack.GitConfig.Authentication != nil {
-		cloneParams.auth = &gitAuth{
-			username: username,
-			password: password,
-		}
-	}
-
-	if err := cloneGitRepository(gitService, cloneParams); err != nil {
+	if err := gitService.CloneRepository(
+		stack.ProjectPath,
+		stack.GitConfig.URL,
+		stack.GitConfig.ReferenceName,
+		username,
+		password,
+	); err != nil {
 		return errors.WithMessagef(err, "failed to do a fresh clone of the stack %v", stack.ID)
 	}
 
@@ -137,23 +130,4 @@ func getUserRegistries(datastore portainer.DataStore, user *portainer.User, endp
 	}
 
 	return filteredRegistries, nil
-}
-
-type cloneRepositoryParameters struct {
-	url   string
-	ref   string
-	toDir string
-	auth  *gitAuth
-}
-
-type gitAuth struct {
-	username string
-	password string
-}
-
-func cloneGitRepository(gitService portainer.GitService, cloneParams *cloneRepositoryParameters) error {
-	if cloneParams.auth != nil {
-		return gitService.CloneRepository(cloneParams.toDir, cloneParams.url, cloneParams.ref, cloneParams.auth.username, cloneParams.auth.password)
-	}
-	return gitService.CloneRepository(cloneParams.toDir, cloneParams.url, cloneParams.ref, "", "")
 }
