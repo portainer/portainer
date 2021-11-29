@@ -15,6 +15,7 @@
         <td>{{ $ctrl.parsePowerState(device.powerstate) }} <i class="fa fa-cog fa-spin" ng-show="$ctrl.state.executingAction[device.guid]" style="margin-left: 5px;"></i></td>
         <td>
           <div class="btn-group btn-group-xs" role="group" aria-label="..." style="display: inline-flex;">
+<<<<<<< HEAD
             <a style="margin: 0 2.5px;" title="Power up the device" ng-click="$ctrl.executeDeviceAction(device.guid, 'power up')">
               <i class="fa fa-plug space-right" aria-hidden="true"></i>
             </a>
@@ -22,6 +23,15 @@
               <i class="fa fa-power-off space-right" aria-hidden="true"></i>
             </a>
             <a style="margin: 0 2.5px;" title="Restart the device" ng-click="$ctrl.executeDeviceAction(device.guid, 'restart')">
+=======
+            <a style="margin: 0 2.5px;" title="Power up the device">
+              <i class="fa fa-plug space-right" aria-hidden="true"></i>
+            </a>
+            <a style="margin: 0 2.5px;" title="Power off the device">
+              <i class="fa fa-power-off space-right" aria-hidden="true"></i>
+            </a>
+            <a style="margin: 0 2.5px;" title="Restart the device">
+>>>>>>> 0976f0aa3 (comment out amt device id for tetsing)
               <i class="fa fa-sync space-right" aria-hidden="true"></i>
             </a>
           </div>
