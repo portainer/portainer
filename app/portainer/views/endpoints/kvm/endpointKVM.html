@@ -1,0 +1,25 @@
+<rd-header>
+  <rd-header-title title-text="Environment"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="portainer.endpoints">KVM</a> &gt; <a ui-sref="portainer.endpoints.endpoint({id: ctrl.endpoint.Id})">{{ ctrl.endpoint.Name }}</a> &gt; KVM Control
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <div class="datatable">
+      <rd-widget>
+        <rd-widget-body classes="no-padding">
+          <div class="toolBar">
+            <div class="toolBarTitle"> <i class="fa" aria-hidden="true" style="margin-right: 2px;"></i> Back to Environments </div>
+          </div>
+          <div class="actionBar">
+            <kvm-control text="'text'"></kvm-control>
+          </div>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+
+  </div>
+</div>
+

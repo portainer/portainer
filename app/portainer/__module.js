@@ -209,6 +209,18 @@ angular
         },
       };
 
+      var endpointKVM = {
+        name: 'portainer.endpoints.endpoint.kvm',
+        url: '/kvm?deviceId',
+        views: {
+          'content@': {
+            templateUrl: './views/endpoints/kvm/endpointKVM.html',
+            controller: 'EndpointKVMController',
+            controllerAs: 'ctrl',
+          },
+        },
+      };
+
       var groups = {
         name: 'portainer.groups',
         url: '/groups',
@@ -435,6 +447,7 @@ angular
       $stateRegistryProvider.register(endpoint);
       $stateRegistryProvider.register(k8sendpoint);
       $stateRegistryProvider.register(endpointAccess);
+      $stateRegistryProvider.register(endpointKVM);
       $stateRegistryProvider.register(endpointCreation);
       $stateRegistryProvider.register(endpointKubernetesConfiguration);
       $stateRegistryProvider.register(groups);
