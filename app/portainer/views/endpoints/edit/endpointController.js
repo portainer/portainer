@@ -287,7 +287,7 @@ function EndpointController(
         Notifications.error('Failure', err, 'Unable to retrieve environment details');
       }
 
-      if ($scope.state.showAMTInfo && EndpointHelper.isDockerEndpoint($scope.endpoint)) {
+      if ($scope.state.showAMTInfo) {
         try {
           const [amtInfo] = await Promise.all([OpenAMTService.info($transition$.params().id)]);
 
