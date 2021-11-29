@@ -15,7 +15,7 @@ type APIKeyService interface {
 	GetDigestUserAndKey(digest []byte) (portainer.User, portainer.APIKey, error)
 	UpdateAPIKey(apiKey *portainer.APIKey) error
 	DeleteAPIKey(apiKeyID portainer.APIKeyID) error
-	EvictUserKeyCache(userId portainer.UserID) bool
+	InvalidateUserKeyCache(userId portainer.UserID) bool
 }
 
 // generateRandomKey generates a random key of specified length

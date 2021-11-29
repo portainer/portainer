@@ -147,7 +147,7 @@ func Test_apiKeyCacheLRU(t *testing.T) {
 	}
 }
 
-func Test_apiKeyCacheEvictUserKeyCache(t *testing.T) {
+func Test_apiKeyCacheInvalidateUserKeyCache(t *testing.T) {
 	is := assert.New(t)
 
 	keyCache := NewAPIKeyCache(10)
@@ -155,7 +155,7 @@ func Test_apiKeyCacheEvictUserKeyCache(t *testing.T) {
 	t.Run("Removes users keys from cache", func(t *testing.T) {
 		keyCache.cache.Add(string("foo"), entry{user: portainer.User{ID: 1}, apiKey: portainer.APIKey{}})
 
-		ok := keyCache.EvictUserKeyCache(1)
+		ok := keyCache.InvalidateUserKeyCache(1)
 		is.True(ok)
 
 		_, ok = keyCache.cache.Get(string("foo"))
@@ -166,7 +166,7 @@ func Test_apiKeyCacheEvictUserKeyCache(t *testing.T) {
 		keyCache.cache.Add(string("foo"), entry{user: portainer.User{ID: 1}, apiKey: portainer.APIKey{}})
 		keyCache.cache.Add(string("bar"), entry{user: portainer.User{ID: 2}, apiKey: portainer.APIKey{}})
 
-		ok := keyCache.EvictUserKeyCache(1)
+		ok := keyCache.InvalidateUserKeyCache(1)
 		is.True(ok)
 
 		_, ok = keyCache.cache.Get(string("foo"))

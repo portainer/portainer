@@ -217,7 +217,7 @@ func Test_DeleteAPIKey(t *testing.T) {
 	})
 }
 
-func Test_EvictUserKeyCache(t *testing.T) {
+func Test_InvalidateUserKeyCache(t *testing.T) {
 	is := assert.New(t)
 
 	store, teardown := bolt.MustNewTestStore(true)
@@ -244,7 +244,7 @@ func Test_EvictUserKeyCache(t *testing.T) {
 		is.Equal(*apiKey2, apiKeyFromCache)
 
 		// evict cache
-		ok = service.EvictUserKeyCache(user.ID)
+		ok = service.InvalidateUserKeyCache(user.ID)
 		is.True(ok)
 
 		// verify users keys have been flushed from cache
@@ -275,7 +275,7 @@ func Test_EvictUserKeyCache(t *testing.T) {
 		is.Equal(*apiKey2, apiKeyFromCache)
 
 		// evict key of single user from cache
-		ok = service.cache.EvictUserKeyCache(user1.ID)
+		ok = service.cache.InvalidateUserKeyCache(user1.ID)
 		is.True(ok)
 
 		// verify user1 key has been flushed from cache

@@ -116,7 +116,7 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	// remove all of the users persisted API keys
-	handler.apiKeyService.EvictUserKeyCache(user.ID)
+	handler.apiKeyService.InvalidateUserKeyCache(user.ID)
 
 	return response.JSON(w, user)
 }
