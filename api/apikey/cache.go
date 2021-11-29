@@ -56,6 +56,7 @@ func (c *apiKeyCache) Delete(digest []byte) {
 	c.cache.Remove(string(digest))
 }
 
+// InvalidateUserKeyCache loops through all the api-keys associated to a user and removes them from the cache
 func (c *apiKeyCache) InvalidateUserKeyCache(userId portainer.UserID) bool {
 	present := false
 	for _, k := range c.cache.Keys() {
