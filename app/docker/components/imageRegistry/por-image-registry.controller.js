@@ -80,10 +80,14 @@ class porImageRegistryController {
         let showDefaultRegistry = false;
         this.registries = await this.EndpointService.registries(this.endpoint.Id, this.namespace);
 
+        // Sort the registries by Name
+        this.registries.sort((a, b) => a.Name.localeCompare(b.Name));
+
         // hide default(anonymous) dockerhub registry if user has an authenticated one
         if (!this.registries.some((registry) => registry.Type === RegistryTypes.DOCKERHUB)) {
           showDefaultRegistry = true;
-          this.registries.push(this.defaultRegistry);
+          // Add dockerhub on top
+          this.registries.splice(0, 0, this.defaultRegistry);
         }
 
         const id = this.model.Registry.Id;
