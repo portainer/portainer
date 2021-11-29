@@ -803,7 +803,7 @@ class KubernetesCreateApplicationController {
     if (this.application) {
       return KubernetesApplicationHelper.isExternalApplication(this.application);
     } else {
-      return '';
+      return false;
     }
   }
 

@@ -14,8 +14,8 @@ class KubernetesServiceService {
     this.createAsync = this.createAsync.bind(this);
     this.patchAsync = this.patchAsync.bind(this);
     this.deleteAsync = this.deleteAsync.bind(this);
+    this.deleteSingleAsync = this.deleteSingleAsync.bind(this);
     this.deleteAllAsync = this.deleteAllAsync.bind(this);
-    this.clearAsync = this.clearAsync.bind(this);
   }
 
   /**
@@ -115,8 +115,8 @@ class KubernetesServiceService {
     return this.$async(this.deleteAsync, services);
   }
 
-  async clearAsync(services) {
-    services.forEach(async (service) => {
+  async deleteAllAsync(formValuesServices) {
+    formValuesServices.forEach(async (service) => {
       try {
         const params = new KubernetesCommonParams();
         params.id = service.Name;
@@ -129,11 +129,11 @@ class KubernetesServiceService {
     });
   }
 
-  clear(services) {
-    return this.$async(this.clearAsync, services);
+  deleteAll(formValuesServices) {
+    return this.$async(this.deleteAllAsync, formValuesServices);
   }
 
-  async deleteAllAsync(service) {
+  async deleteSingleAsync(service) {
     try {
       const params = new KubernetesCommonParams();
       params.id = service.Name;
@@ -145,8 +145,8 @@ class KubernetesServiceService {
     }
   }
 
-  deleteAll(service) {
-    return this.$async(this.deleteAllAsync, service);
+  deleteSingle(service) {
+    return this.$async(this.deleteSingleAsync, service);
   }
 }
 

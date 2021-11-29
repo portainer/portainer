@@ -22,7 +22,7 @@ const _KubernetesService = Object.freeze({
   ApplicationOwner: '',
   Note: '',
   Ingress: false,
-  Selector: '',
+  Selector: {},
 });
 
 export class KubernetesService {
