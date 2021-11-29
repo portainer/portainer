@@ -255,7 +255,7 @@ func (handler *Handler) OpenAMTDevices(w http.ResponseWriter, r *http.Request) *
 
 	// TODO for testing
 	if endpoint.ID == 25 {
-		// endpoint.AMTDeviceGUID = "4c4c4544-004b-3910-8037-b6c04f504633"
+		endpoint.AMTDeviceGUID = "4c4c4544-004b-3910-8037-b6c04f504633"
 	}
 
 	device, err := handler.OpenAMTService.DeviceInformation(settings.OpenAMTConfiguration, endpoint.AMTDeviceGUID)

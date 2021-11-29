@@ -74,6 +74,7 @@
           </thead>
           <tbody>
             <tr
+              ng-click="$ctrl.expandItem(item, !item.Expanded)"
               dir-paginate-start="item in $ctrl.state.filteredDataSet | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit"
               total-items="$ctrl.state.totalFilteredDataSet"
               ng-class="{ active: item.Checked }"
@@ -83,6 +84,8 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
+              </td>
+              <td>
                 <a ui-sref="portainer.endpoints.endpoint({id: item.Id})">{{ item.Name }}</a>
                 <a style="float: right;" ng-show="$ctrl.showAMTNodes(item)">
                   <i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i>
