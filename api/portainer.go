@@ -39,6 +39,34 @@ type (
 		AuthenticationKey string `json:"AuthenticationKey" example:"cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk="`
 	}
 
+	// OpenAMTConfiguration represents the credentials and configurations used to connect to an OpenAMT MPS server
+	OpenAMTConfiguration struct {
+		Enabled               bool                   `json:"Enabled"`
+		MPSURL                string                 `json:"MPSURL"`
+		Credentials           MPSCredentials         `json:"Credentials"`
+		DomainConfiguration   DomainConfiguration    `json:"DomainConfiguration"`
+		WirelessConfiguration *WirelessConfiguration `json:"WirelessConfiguration"`
+	}
+
+	MPSCredentials struct {
+		MPSUser     string `json:"MPSUser"`
+		MPSPassword string `json:"MPSPassword"`
+		MPSToken    string `json:"MPSToken"` // retrieved from API
+	}
+
+	DomainConfiguration struct {
+		CertFileText string `json:"CertFileText"`
+		CertPassword string `json:"CertPassword"`
+		DomainName   string `json:"DomainName"`
+	}
+
+	WirelessConfiguration struct {
+		AuthenticationMethod string `json:"AuthenticationMethod"`
+		EncryptionMethod     string `json:"EncryptionMethod"`
+		SSID                 string `json:"SSID"`
+		PskPass              string `json:"PskPass"`
+	}
+
 	// CLIFlags represents the available flags on the CLI
 	CLIFlags struct {
 		Addr                      *string
@@ -707,6 +735,7 @@ type (
 		AuthenticationMethod AuthenticationMethod `json:"AuthenticationMethod" example:"1"`
 		LDAPSettings         LDAPSettings         `json:"LDAPSettings" example:""`
 		OAuthSettings        OAuthSettings        `json:"OAuthSettings" example:""`
+		OpenAMTConfiguration OpenAMTConfiguration `json:"OpenAMTConfiguration" example:""`
 		FeatureFlagSettings  map[Feature]bool     `json:"FeatureFlagSettings" example:""`
 		// The interval in which environment(endpoint) snapshots are created
 		SnapshotInterval string `json:"SnapshotInterval" example:"5m"`
@@ -1256,6 +1285,11 @@ type (
 		LatestCommitID(repositoryURL, referenceName, username, password string) (string, error)
 	}
 
+	// OpenAMTService represents a service for managing OpenAMT
+	OpenAMTService interface {
+		ConfigureDefault(configuration OpenAMTConfiguration) error
+	}
+
 	// HelmUserRepositoryService represents a service to manage HelmUserRepositories
 	HelmUserRepositoryService interface {
 		HelmUserRepositoryByUserID(userID UserID) ([]HelmUserRepository, error)
@@ -1360,6 +1394,7 @@ type (
 	SettingsService interface {
 		Settings() (*Settings, error)
 		UpdateSettings(settings *Settings) error
+		IsFeatureFlagEnabled(feature Feature) bool
 	}
 
 	// Server defines the interface to serve the API

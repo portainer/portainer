@@ -8,17 +8,17 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/portainer/libhelm"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt"
 	"github.com/portainer/portainer/api/chisel"
 	"github.com/portainer/portainer/api/cli"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/docker"
-
-	"github.com/portainer/libhelm"
 	"github.com/portainer/portainer/api/exec"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/git"
+	"github.com/portainer/portainer/api/hostmanagement/openamt"
 	"github.com/portainer/portainer/api/http"
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/http/proxy"
@@ -462,11 +462,18 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Fatalf("failed initializing JWT service: %v", err)
 	}
 
+	err = enableFeaturesFromFlags(dataStore, flags)
+	if err != nil {
+		log.Fatalf("failed enabling feature flag: %v", err)
+	}
+
 	ldapService := initLDAPService()
 
 	oauthService := initOAuthService()
 
 	gitService := initGitService()
+
+	openAMTService := openamt.NewService(dataStore)
 
 	cryptoService := initCryptoService()
 
@@ -535,11 +542,6 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		if err != nil {
 			log.Fatalf("failed updating settings from flags: %v", err)
 		}
-	}
-
-	err = enableFeaturesFromFlags(dataStore, flags)
-	if err != nil {
-		log.Fatalf("failed enabling feature flag: %v", err)
 	}
 
 	err = edge.LoadEdgeJobs(dataStore, reverseTunnelService)
@@ -623,6 +625,7 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		LDAPService:                 ldapService,
 		OAuthService:                oauthService,
 		GitService:                  gitService,
+		OpenAMTService:              openAMTService,
 		ProxyManager:                proxyManager,
 		KubernetesTokenCacheManager: kubernetesTokenCacheManager,
 		KubeConfigService:           kubeConfigService,
