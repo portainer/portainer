@@ -169,6 +169,9 @@ func Test_apiKeyCacheInvalidateUserKeyCache(t *testing.T) {
 		ok := keyCache.InvalidateUserKeyCache(1)
 		is.True(ok)
 
+		ok = keyCache.InvalidateUserKeyCache(1)
+		is.False(ok)
+
 		_, ok = keyCache.cache.Get(string("foo"))
 		is.False(ok)
 
