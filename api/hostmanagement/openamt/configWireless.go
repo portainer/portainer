@@ -38,7 +38,7 @@ func (service *Service) createOrUpdateWirelessConfig(configuration portainer.Ope
 }
 
 func (service *Service) getWirelessConfig(configuration portainer.OpenAMTConfiguration, configName string) (*WirelessProfile, error) {
-	url := fmt.Sprintf("https://%s/rps/api/v1/admin/wirelessconfigs/%s", configuration.MPSURL, configName)
+	url := fmt.Sprintf("https://%s/rps/api/v1/admin/wirelessconfigs/%s", configuration.MPSServer, configName)
 
 	responseBody, err := service.executeGetRequest(url, configuration.Credentials.MPSToken)
 	if err != nil {
@@ -66,7 +66,7 @@ func (service *Service) saveWirelessConfig(method string, configuration portaine
 		return nil, fmt.Errorf("error parsing wireless encryption method: %s", err.Error())
 	}
 
-	url := fmt.Sprintf("https://%s/rps/api/v1/admin/wirelessconfigs", configuration.MPSURL)
+	url := fmt.Sprintf("https://%s/rps/api/v1/admin/wirelessconfigs", configuration.MPSServer)
 
 	config := WirelessProfile{
 		ProfileName:          configName,

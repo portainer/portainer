@@ -48,7 +48,7 @@ func (service *Service) createOrUpdateAMTProfile(configuration portainer.OpenAMT
 }
 
 func (service *Service) getAMTProfile(configuration portainer.OpenAMTConfiguration, profileName string) (*Profile, error) {
-	url := fmt.Sprintf("https://%s/rps/api/v1/admin/profiles/%s", configuration.MPSURL, profileName)
+	url := fmt.Sprintf("https://%s/rps/api/v1/admin/profiles/%s", configuration.MPSServer, profileName)
 
 	responseBody, err := service.executeGetRequest(url, configuration.Credentials.MPSToken)
 	if err != nil {
@@ -67,7 +67,7 @@ func (service *Service) getAMTProfile(configuration portainer.OpenAMTConfigurati
 }
 
 func (service *Service) saveAMTProfile(method string, configuration portainer.OpenAMTConfiguration, profileName string, ciraConfigName string, wirelessConfig string) (*Profile, error) {
-	url := fmt.Sprintf("https://%s/rps/api/v1/admin/profiles", configuration.MPSURL)
+	url := fmt.Sprintf("https://%s/rps/api/v1/admin/profiles", configuration.MPSServer)
 
 	profile := Profile{
 		ProfileName:                profileName,

@@ -45,7 +45,7 @@ func (service *Service) createOrUpdateCIRAConfig(configuration portainer.OpenAMT
 }
 
 func (service *Service) getCIRAConfig(configuration portainer.OpenAMTConfiguration, configName string) (*CIRAConfig, error) {
-	url := fmt.Sprintf("https://%s/rps/api/v1/admin/ciraconfigs/%s", configuration.MPSURL, configName)
+	url := fmt.Sprintf("https://%s/rps/api/v1/admin/ciraconfigs/%s", configuration.MPSServer, configName)
 
 	responseBody, err := service.executeGetRequest(url, configuration.Credentials.MPSToken)
 	if err != nil {
@@ -64,22 +64,22 @@ func (service *Service) getCIRAConfig(configuration portainer.OpenAMTConfigurati
 }
 
 func (service *Service) saveCIRAConfig(method string, configuration portainer.OpenAMTConfiguration, configName string) (*CIRAConfig, error) {
-	url := fmt.Sprintf("https://%s/rps/api/v1/admin/ciraconfigs", configuration.MPSURL)
+	url := fmt.Sprintf("https://%s/rps/api/v1/admin/ciraconfigs", configuration.MPSServer)
 
 	certificate, err := service.getCIRACertificate(configuration)
 	if err != nil {
 		return nil, err
 	}
 
-	addressFormat, err := addressFormat(configuration.MPSURL)
+	addressFormat, err := addressFormat(configuration.MPSServer)
 	if err != nil {
 		return nil, err
 	}
 
 	config := CIRAConfig{
 		ConfigName:          configName,
-		MPSServerAddress:    configuration.MPSURL,
-		CommonName:          configuration.MPSURL,
+		MPSServerAddress:    configuration.MPSServer,
+		CommonName:          configuration.MPSServer,
 		ServerAddressFormat: addressFormat,
 		MPSPort:             4433,
 		Username:            "admin",
@@ -117,7 +117,7 @@ func addressFormat(url string) (int, error) {
 }
 
 func (service *Service) getCIRACertificate(configuration portainer.OpenAMTConfiguration) (string, error) {
-	loginURL := fmt.Sprintf("https://%s/mps/api/v1/ciracert", configuration.MPSURL)
+	loginURL := fmt.Sprintf("https://%s/mps/api/v1/ciracert", configuration.MPSServer)
 
 	req, err := http.NewRequest(http.MethodGet, loginURL, nil)
 	if err != nil {
