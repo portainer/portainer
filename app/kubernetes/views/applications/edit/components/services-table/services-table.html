@@ -1,0 +1,89 @@
+<!-- table -->
+<div style="margin-top: 15px;">
+  <table class="table">
+    <tbody>
+      <tr class="text-muted">
+        <td style="width: 15%;">Service name</td>
+        <td style="width: 10%;">Type</td>
+        <td style="width: 10%;">Cluster IP</td>
+        <td style="width: 10%;">External IP</td>
+        <td style="width: 10%;">Container port</td>
+        <td style="width: 15%;">Service port(s)</td>
+      </tr>
+      <tr ng-repeat-start="service in $ctrl.services">
+        <td>{{ service.metadata.name }}</td>
+        <td>{{ service.spec.type }}</td>
+        <td>{{ service.spec.clusterIP }}</td>
+        <td>{{ service.spec.externalIP ? service.spec.externalIP : '-' }}</td>
+        <td data-cy="k8sAppDetail-containerPort">
+          <div ng-repeat="port in service.spec.ports">{{ port.targetPort }}</div>
+        </td>
+        <td ng-if="!ctrl.portHasIngressRules(port)">
+          <div ng-repeat="port in service.spec.ports">
+            <a ng-if="port.nodePort" ng-href="http://{{ $ctrl.publicUrl }}:{{ port.nodePort }}" target="_blank" style="margin-left: 5px;">
+              <i class="fa fa-external-link-alt" aria-hidden="true"></i>
+              <span data-cy="k8sAppDetail-containerPort">
+                {{ port.port }}
+              </span>
+              <span>{{ port.nodePort ? ':' : '' }}</span>
+              <span data-cy="k8sAppDetail-nodePort"> {{ port.nodePort }}/{{ port.protocol }} </span>
+            </a>
+            <div ng-if="!port.nodePort">
+              <span data-cy="k8sAppDetail-containerPort">
+                {{ port.port }}
+              </span>
+              <span>{{ port.nodePort ? ':' : '' }}</span>
+              <span data-cy="k8sAppDetail-nodePort"> {{ port.nodePort }}/{{ port.protocol }} </span>
+            </div>
+            <a
+              ng-if="$ctrl.application.LoadBalancerIPAddress"
+              ng-href="http://{{ ctrl.$application.LoadBalancerIPAddress }}:{{ port.Port }}"
+              target="_blank"
+              style="margin-left: 5px;"
+              data-cy="k8sAppDetail-accessLink"
+            >
+              <i class="fa fa-external-link-alt" aria-hidden="true"></i> access
+            </a>
+          </div>
+        </td>
+      </tr>
+
+      <tr ng-repeat-end ng-repeat="rule in port.IngressRules">
+        <td data-cy="k8sAppDetail-httpRoute">{{ port.TargetPort }}/{{ port.Protocol }}</td>
+        <td>
+          <span ng-if="$ctrl.application.ServiceType === ctrl.KubernetesServiceTypes.NODE_PORT" data-cy="k8sAppDetail-nodePort">
+            {{ port.NodePort }}
+          </span>
+          <span ng-if="$ctrl.application.ServiceType !== ctrl.KubernetesServiceTypes.NODE_PORT" data-cy="k8sAppDetail-port">
+            {{ port.Port }}
+          </span>
+          <a
+            ng-if="$ctrl.application.LoadBalancerIPAddress"
+            ng-href="http://{{ $ctrl.application.LoadBalancerIPAddress }}:{{ port.Port }}"
+            target="_blank"
+            style="margin-left: 5px;"
+          >
+            <i class="fa fa-external-link-alt" aria-hidden="true"></i> access
+          </a>
+        </td>
+        <td>
+          <span
+            ng-if="!ctrl.ruleCanBeDisplayed(rule)"
+            class="text-muted"
+            tooltip-append-to-body="true"
+            tooltip-placement="bottom"
+            tooltip-class="portainer-tooltip"
+            uib-tooltip="Ingress controller IP address not available yet"
+            style="cursor: pointer;"
+            >pending
+          </span>
+          <span ng-if="ctrl.ruleCanBeDisplayed(rule)">
+            <a ng-href="{{ ctrl.buildIngressRuleURL(rule) }}" target="_blank" data-cy="k8sAppDetail-httpRouteLink">
+              {{ ctrl.buildIngressRuleURL(rule) | stripprotocol }}
+            </a>
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

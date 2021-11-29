@@ -1,6 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import * as JsonPatch from 'fast-json-patch';
+
 import {
   KubernetesApplicationDataAccessPolicies,
   KubernetesApplicationDeploymentTypes,
@@ -112,7 +113,6 @@ class KubernetesApplicationController {
     KubernetesStackService,
     KubernetesPodService,
     KubernetesNodeService,
-
     StackService
   ) {
     this.$async = $async;
@@ -317,6 +317,7 @@ class KubernetesApplicationController {
       this.application = application;
       this.allContainers = KubernetesApplicationHelper.associateAllContainersAndApplication(application);
       this.formValues.Note = this.application.Note;
+      this.formValues.Services = this.application.Services;
       if (this.application.Note) {
         this.state.expandedNote = true;
       }
@@ -347,6 +348,12 @@ class KubernetesApplicationController {
   }
 
   async onInit() {
+    const endpointId = this.LocalStorage.getEndpointID();
+    const endpoints = this.LocalStorage.getEndpoints();
+    const endpoint =  _.find(endpoints, function(item) {
+      return item.Id === endpointId
+    })
+
     this.state = {
       activeTab: 0,
       currentName: this.$state.$current.name,
@@ -365,6 +372,7 @@ class KubernetesApplicationController {
       expandedNote: false,
       useIngress: false,
       useServerMetrics: this.endpoint.Kubernetes.Configuration.UseServerMetrics,
+      publicUrl: endpoint.PublicURL,
     };
 
     this.state.activeTab = this.LocalStorage.getActiveTab('application');

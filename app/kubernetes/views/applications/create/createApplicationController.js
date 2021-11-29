@@ -799,6 +799,14 @@ class KubernetesCreateApplicationController {
     return overflow || autoScalerOverflow || inProgress || invalid || hasNoChanges || nonScalable || isPublishingWithoutPorts;
   }
 
+  isExternalApplication() {
+    if (this.application) {
+      return KubernetesApplicationHelper.isExternalApplication(this.application);
+    } else {
+      return '';
+    }
+  }
+
   disableLoadBalancerEdit() {
     return (
       this.state.isEdit &&

@@ -40,7 +40,17 @@ export default function (formValues, oldFormValues = {}) {
 function getCreatedApplicationResources(formValues) {
   const resources = [];
 
-  let [app, headlessService, service, claims] = KubernetesApplicationConverter.applicationFormValuesToApplication(formValues);
+  let [app, headlessService, services, service, claims] = KubernetesApplicationConverter.applicationFormValuesToApplication(formValues);
+
+  if (services) {
+    services.forEach((service) => {
+      resources.push({ action: CREATE, kind: KubernetesResourceTypes.SERVICE, name: service.Name, type: service.Type || KubernetesServiceTypes.CLUSTER_IP });
+      if (formValues.OriginalIngresses.length !== 0) {
+        const ingresses = KubernetesIngressConverter.newapplicationFormValuesToIngresses(formValues, service.Name, service.Ports);
+        resources.push(...getIngressUpdateSummary(formValues.OriginalIngresses, ingresses));
+      }
+    });
+  }
 
   if (service) {
     // Service
@@ -87,16 +97,15 @@ function getCreatedApplicationResources(formValues) {
 function getUpdatedApplicationResources(oldFormValues, newFormValues) {
   const resources = [];
 
-  const [oldApp, oldHeadlessService, oldService, oldClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(oldFormValues);
-  const [newApp, newHeadlessService, newService, newClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(newFormValues);
-
+  const [oldApp, oldHeadlessService, oldServices, oldService, oldClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(oldFormValues);
+  const [newApp, newHeadlessService, newServices, newService, newClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(newFormValues);
   const oldAppResourceType = getApplicationResourceType(oldApp);
   const newAppResourceType = getApplicationResourceType(newApp);
 
   if (oldAppResourceType !== newAppResourceType) {
     // Deployment
     resources.push({ action: DELETE, kind: oldAppResourceType, name: oldApp.Name });
-    if (oldService) {
+    if (oldService && oldServices) {
       // Service
       resources.push({ action: DELETE, kind: KubernetesResourceTypes.SERVICE, name: oldService.Name, type: oldService.Type || KubernetesServiceTypes.CLUSTER_IP });
     }
@@ -129,7 +138,7 @@ function getUpdatedApplicationResources(oldFormValues, newFormValues) {
   // Deployment
   resources.push({ action: UPDATE, kind: oldAppResourceType, name: oldApp.Name });
 
-  if (oldService && newService) {
+  if (oldService && newService && oldServices && newServices) {
     // Service
     const serviceUpdateResourceSummary = getServiceUpdateResourceSummary(oldService, newService);
     if (serviceUpdateResourceSummary) {
