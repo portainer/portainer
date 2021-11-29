@@ -55,3 +55,14 @@ func (c *apiKeyCache) Set(digest []byte, user portainer.User, apiKey portainer.A
 func (c *apiKeyCache) Delete(digest []byte) {
 	c.cache.Remove(string(digest))
 }
+
+func (c *apiKeyCache) EvictUserKeyCache(userId portainer.UserID) bool {
+	present := false
+	for _, k := range c.cache.Keys() {
+		user, _, _ := c.Get([]byte(k.(string)))
+		if user.ID == userId {
+			present = c.cache.Remove(k)
+		}
+	}
+	return present
+}
