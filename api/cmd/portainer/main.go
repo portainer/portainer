@@ -462,13 +462,18 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Fatalf("failed initializing JWT service: %v", err)
 	}
 
+	err = enableFeaturesFromFlags(dataStore, flags)
+	if err != nil {
+		log.Fatalf("failed enabling feature flag: %v", err)
+	}
+
 	ldapService := initLDAPService()
 
 	oauthService := initOAuthService()
 
 	gitService := initGitService()
 
-	openAMTService := openamt.NewService()
+	openAMTService := openamt.NewService(dataStore)
 
 	cryptoService := initCryptoService()
 
@@ -537,11 +542,6 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		if err != nil {
 			log.Fatalf("failed updating settings from flags: %v", err)
 		}
-	}
-
-	err = enableFeaturesFromFlags(dataStore, flags)
-	if err != nil {
-		log.Fatalf("failed enabling feature flag: %v", err)
 	}
 
 	err = edge.LoadEdgeJobs(dataStore, reverseTunnelService)

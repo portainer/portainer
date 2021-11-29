@@ -25,8 +25,10 @@ type Service struct {
 }
 
 // NewService initializes a new service.
-func NewService() *Service {
-	// TODO: consider returning a nil service pointer if AMT feature flag is false.
+func NewService(dataStore portainer.DataStore) *Service {
+	if !dataStore.Settings().IsFeatureFlagEnabled(portainer.FeatOpenAMT) {
+		return nil
+	}
 	return &Service{
 		httpsClient: &http.Client{
 			Timeout: time.Second * time.Duration(5),

@@ -19,14 +19,15 @@ type Handler struct {
 
 // NewHandler returns a new Handler
 func NewHandler(bouncer *security.RequestBouncer, dataStore portainer.DataStore) (*Handler, error) {
+	if !dataStore.Settings().IsFeatureFlagEnabled(portainer.FeatOpenAMT) {
+		return nil, nil
+	}
+
 	h := &Handler{
 		Router: mux.NewRouter(),
 	}
 
-	// TODO: consider returning a nil handler.
-	if dataStore.Settings().IsFeatureFlagEnabled(portainer.FeatOpenAMT) {
-		h.Handle("/open_amt", bouncer.AdminAccess(httperror.LoggerHandler(h.openAMTConfigureDefault))).Methods(http.MethodPost)
-	}
+	h.Handle("/open_amt", bouncer.AdminAccess(httperror.LoggerHandler(h.openAMTConfigureDefault))).Methods(http.MethodPost)
 
 	return h, nil
 }

@@ -86,7 +86,7 @@ func (s *stubSettingsService) UpdateSettings(settings *portainer.Settings) error
 	s.settings = settings
 	return nil
 }
-func (s *stubSettingsService) IsFeatureFlagEnabled(ff portainer.Feature) bool {
+func (s *stubSettingsService) IsFeatureFlagEnabled(feature portainer.Feature) bool {
 	return false
 }
 func WithSettingsService(settings *portainer.Settings) datastoreOption {

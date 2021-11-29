@@ -209,8 +209,10 @@ func (server *Server) Start() error {
 	if err != nil {
 		return err
 	}
-	openAMTHandler.OpenAMTService = server.OpenAMTService
-	openAMTHandler.DataStore = server.DataStore
+	if openAMTHandler != nil {
+		openAMTHandler.OpenAMTService = server.OpenAMTService
+		openAMTHandler.DataStore = server.DataStore
+	}
 
 	var stackHandler = stacks.NewHandler(requestBouncer)
 	stackHandler.DataStore = server.DataStore

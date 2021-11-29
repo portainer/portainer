@@ -45,15 +45,15 @@ func (service *Service) UpdateSettings(settings *portainer.Settings) error {
 	return internal.UpdateObject(service.connection, BucketName, []byte(settingsKey), settings)
 }
 
-func (s *Service) IsFeatureFlagEnabled(ff portainer.Feature) bool {
-	settings, err := s.Settings()
+func (service *Service) IsFeatureFlagEnabled(feature portainer.Feature) bool {
+	settings, err := service.Settings()
 	if err != nil {
 		return false
 	}
 
-	featureflag, ok := settings.FeatureFlagSettings[portainer.FeatOpenAMT]
+	featureFlagSetting, ok := settings.FeatureFlagSettings[portainer.FeatOpenAMT]
 	if ok {
-		return featureflag
+		return featureFlagSetting
 	}
 
 	return false
