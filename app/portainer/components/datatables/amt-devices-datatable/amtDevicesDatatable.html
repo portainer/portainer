@@ -12,16 +12,16 @@
       <tr ng-repeat="device in $ctrl.devices">
         <td>{{ device.hostname }}</td>
         <td>{{ device.connectionStatus ? 'Connected' : 'Disconnected' }}</td>
-        <td>{{ $ctrl.parsePowerState(device.powerstate) }}</td>
+        <td>{{ $ctrl.parsePowerState(device.powerstate) }} <i class="fa fa-cog fa-spin" ng-show="$ctrl.state.executingAction[device.guid]" style="margin-left: 5px;"></i></td>
         <td>
           <div class="btn-group btn-group-xs" role="group" aria-label="..." style="display: inline-flex;">
-            <a style="margin: 0 2.5px;" title="Power up the device">
+            <a style="margin: 0 2.5px;" title="Power up the device" ng-click="$ctrl.executeDeviceAction(device.guid, 'power up')">
               <i class="fa fa-plug space-right" aria-hidden="true"></i>
             </a>
-            <a style="margin: 0 2.5px;" title="Power off the device">
+            <a style="margin: 0 2.5px;" title="Power off the device" ng-click="$ctrl.executeDeviceAction(device.guid, 'power off')">
               <i class="fa fa-power-off space-right" aria-hidden="true"></i>
             </a>
-            <a style="margin: 0 2.5px;" title="Restart the device">
+            <a style="margin: 0 2.5px;" title="Restart the device" ng-click="$ctrl.executeDeviceAction(device.guid, 'restart')">
               <i class="fa fa-sync space-right" aria-hidden="true"></i>
             </a>
           </div>
