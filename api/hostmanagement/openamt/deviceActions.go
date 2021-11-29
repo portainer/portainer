@@ -17,7 +17,7 @@ type ActionResponse struct {
 }
 
 func (service *Service) executeDeviceAction(configuration portainer.OpenAMTConfiguration, deviceGUID string, action int) error {
-	url := fmt.Sprintf("https://%s/mps/api/v1/amt/power/action/%s", configuration.MPSURL, deviceGUID)
+	url := fmt.Sprintf("https://%s/mps/api/v1/amt/power/action/%s", configuration.MPSServer, deviceGUID)
 
 	payload := map[string]int{
 		"action": action,
