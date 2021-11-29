@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	portainer "github.com/portainer/portainer/api"
 )
@@ -39,4 +40,16 @@ func (service *Service) executeDeviceAction(configuration portainer.OpenAMTConfi
 	}
 
 	return nil
+}
+
+func parseAction(actionRaw string) (int, error) {
+	switch strings.ToLower(actionRaw) {
+	case "power up":
+		return PowerUpAction, nil
+	case "power off":
+		return PowerOffAction, nil
+	case "restart":
+		return RestartAction, nil
+	}
+	return 0, fmt.Errorf("unsupported device action %s", actionRaw)
 }

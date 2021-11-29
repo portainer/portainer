@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strings"
 	"sync"
 	"time"
 
@@ -20,7 +19,7 @@ const (
 	DefaultWirelessConfigName = "wirelessProfileDefault"
 	DefaultProfileName        = "profileAMTDefault"
 
-	PowerOnAction  = 2
+	PowerUpAction  = 2
 	PowerOffAction = 8
 	RestartAction  = 5
 )
@@ -240,16 +239,4 @@ func (service *Service) ExecuteDeviceAction(configuration portainer.OpenAMTConfi
 	}
 
 	return nil
-}
-
-func parseAction(actionRaw string) (int, error) {
-	switch strings.ToLower(actionRaw) {
-	case "power up":
-		return PowerOnAction, nil
-	case "power off":
-		return PowerOffAction, nil
-	case "restart":
-		return RestartAction, nil
-	}
-	return 0, fmt.Errorf("unsupported device action %s", actionRaw)
 }
