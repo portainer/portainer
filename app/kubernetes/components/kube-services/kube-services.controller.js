@@ -46,10 +46,6 @@ export default class KubeServicesViewController {
     this.formValues.Services[index].Ports.push(p);
   }
 
-  updateIngress() {
-    this.state.serviceType[3].active = true;
-  }
-
   serviceType(type) {
     switch (type) {
       case KubernetesServiceTypes.CLUSTER_IP:
@@ -96,9 +92,7 @@ export default class KubeServicesViewController {
         },
       ],
       selected: KubernetesApplicationPublishingTypes.CLUSTER_IP,
-      nameIndex: '',
+      nameIndex: this.formValues.Services.length,
     };
-    const serviceNumber = this.formValues.Services.length;
-    this.state.nameIndex = serviceNumber;
   }
 }

@@ -224,11 +224,11 @@ class KubernetesApplicationService {
     let [app, headlessService, services, service, claims] = KubernetesApplicationConverter.applicationFormValuesToApplication(formValues);
 
     if (services) {
-      services.forEach((service) => {
+      services.forEach(async (service) => {
         this.KubernetesServiceService.create(service);
         if (service.Ingress) {
           const ingresses = KubernetesIngressConverter.newApplicationFormValuesToIngresses(formValues, service.Name, service.Ports);
-          Promise.all(this._generateIngressPatchPromises(formValues.OriginalIngresses, ingresses));
+          await Promise.all(this._generateIngressPatchPromises(formValues.OriginalIngresses, ingresses));
         }
       });
     }
@@ -315,7 +315,7 @@ class KubernetesApplicationService {
         await this.KubernetesServiceService.create(service);
         if (service.Ingress) {
           const ingresses = KubernetesIngressConverter.newApplicationFormValuesToIngresses(oldFormValues, service.Name, service.Ports);
-          Promise.all(this._generateIngressPatchPromises(oldFormValues.OriginalIngresses, ingresses));
+          await Promise.all(this._generateIngressPatchPromises(oldFormValues.OriginalIngresses, ingresses));
         }
       });
     }
@@ -327,7 +327,7 @@ class KubernetesApplicationService {
           await Promise.all(this._generateIngressPatchPromises(oldFormValues.OriginalIngresses, ingresses));
         }
       });
-      await this.KubernetesServiceService.clear(oldServices);
+      await this.KubernetesServiceService.deleteAll(oldServices);
     }
 
     if (oldServices.length !== 0 && newServices.length !== 0) {
@@ -351,10 +351,10 @@ class KubernetesApplicationService {
       oldServices.forEach(async (oldService) => {
         const newServiceMatched = _.find(newServices, { Name: oldService.Name });
         if (!newServiceMatched) {
-          await this.KubernetesServiceService.deleteAll(oldService);
+          await this.KubernetesServiceService.deleteSingle(oldService);
           if (oldService.Ingress) {
             const ingresses = KubernetesIngressConverter.deleteIngressByServiceName(oldFormValues, oldService);
-            Promise.all(this._generateIngressPatchPromises(oldFormValues.OriginalIngresses, ingresses));
+            await Promise.all(this._generateIngressPatchPromises(oldFormValues.OriginalIngresses, ingresses));
           }
         }
       });
