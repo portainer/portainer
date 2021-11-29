@@ -186,9 +186,6 @@ func (service *Service) DeviceInformation(configuration portainer.OpenAMTConfigu
 		if err != nil {
 			amtErrors <- err
 		}
-		if powerState == nil {
-			amtErrors <- fmt.Errorf("device %s power state not found", deviceGUID)
-		}
 		resultPowerState = powerState
 		wg.Done()
 	}()
@@ -205,10 +202,14 @@ func (service *Service) DeviceInformation(configuration portainer.OpenAMTConfigu
 		return nil, err
 	}
 
-	return &portainer.OpenAMTDeviceInformation{
+	deviceInformation := &portainer.OpenAMTDeviceInformation{
 		GUID:             resultDevice.GUID,
 		HostName:         resultDevice.HostName,
 		ConnectionStatus: resultDevice.ConnectionStatus,
-		PowerState:       resultPowerState.State,
-	}, nil
+	}
+	if resultPowerState != nil {
+		deviceInformation.PowerState = resultPowerState.State
+	}
+
+	return deviceInformation, nil
 }

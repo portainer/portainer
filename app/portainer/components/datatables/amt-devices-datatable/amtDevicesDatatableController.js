@@ -20,6 +20,8 @@ angular.module('portainer.docker').controller('AMTDevicesDatatableController', [
           return 'Hibernate';
         case 9:
           return 'Power Cycle';
+        default:
+          return '-';
       }
     };
 
