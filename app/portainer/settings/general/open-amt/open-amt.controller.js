@@ -91,7 +91,7 @@ class OpenAmtController {
           };
 
           if (config.WirelessConfiguration) {
-            this.formValues.useWirelessConfig = config.WirelessConfiguration.UseWirelessConfig;
+            this.formValues.useWirelessConfig = true;
             this.formValues.wifiAuthenticationMethod = config.WirelessConfiguration.AuthenticationMethod;
             this.formValues.wifiEncryptionMethod = config.WirelessConfiguration.EncryptionMethod;
             this.formValues.wifiSsid = config.WirelessConfiguration.SSID;
