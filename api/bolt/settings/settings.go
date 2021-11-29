@@ -51,7 +51,7 @@ func (service *Service) IsFeatureFlagEnabled(feature portainer.Feature) bool {
 		return false
 	}
 
-	featureFlagSetting, ok := settings.FeatureFlagSettings[portainer.FeatOpenAMT]
+	featureFlagSetting, ok := settings.FeatureFlagSettings[feature]
 	if ok {
 		return featureFlagSetting
 	}

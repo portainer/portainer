@@ -6,7 +6,7 @@ class OpenAmtController {
     this.originalValues = {};
     this.formValues = {
       enableOpenAMT: false,
-      mpsURL: '',
+      mpsServer: '',
       mpsUser: '',
       mpsPassword: '',
       domainName: '',
@@ -85,7 +85,7 @@ class OpenAmtController {
           this.formValues = {
             ...this.formValues,
             enableOpenAMT: config.Enabled,
-            mpsURL: config.MPSURL,
+            mpsServer: config.MPSServer,
             mpsUser: config.Credentials.MPSUser,
             domainName: config.DomainConfiguration.DomainName,
           };
