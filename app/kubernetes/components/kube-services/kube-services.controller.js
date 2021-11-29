@@ -1,4 +1,5 @@
-import { KubernetesService, KubernetesServicePort } from 'Kubernetes/models/service/models';
+import { KubernetesService, KubernetesServicePort, KubernetesServiceTypes } from 'Kubernetes/models/service/models';
+import { KubernetesApplicationPublishingTypes } from 'Kubernetes/models/application/models/constants';
 
 export default class KubeServicesViewController {
   /* @ngInject */
@@ -8,8 +9,8 @@ export default class KubeServicesViewController {
 
   addEntry(service) {
     const p = new KubernetesService();
-    if (service === 4) {
-      p.Type = 1;
+    if (service === KubernetesApplicationPublishingTypes.INGRESS) {
+      p.Type = KubernetesApplicationPublishingTypes.CLUSTER_IP;
       p.Ingress = true;
     } else {
       p.Type = service;
@@ -17,12 +18,12 @@ export default class KubeServicesViewController {
 
     p.Selector = this.formValues.Selector;
 
-    p.Name = this.validName();
+    p.Name = this.getUniqName();
     this.state.nameIndex += 1;
     this.formValues.Services.push(p);
   }
 
-  validName() {
+  getUniqName() {
     let name = this.formValues.Name + '-' + this.state.nameIndex;
     const services = this.formValues.Services;
     services.forEach((service) => {
@@ -31,8 +32,8 @@ export default class KubeServicesViewController {
         name = this.formValues.Name + '-' + this.state.nameIndex;
       }
     });
-    const validName = this.formValues.Name + '-' + this.state.nameIndex;
-    return validName;
+    const UniqName = this.formValues.Name + '-' + this.state.nameIndex;
+    return UniqName;
   }
 
   deleteService(index) {
@@ -51,26 +52,26 @@ export default class KubeServicesViewController {
 
   serviceType(type) {
     switch (type) {
-      case 1:
+      case KubernetesServiceTypes.CLUSTER_IP:
         return 'ClusterIP';
-      case 2:
+      case KubernetesServiceTypes.NODE_PORT:
         return 'NodePort';
-      case 3:
+      case KubernetesServiceTypes.LOAD_BALANCER:
         return 'Load Balancer';
-      case 4:
+      case KubernetesServiceTypes.INGRESS:
         return 'Ingress';
     }
   }
 
   iconStyle(type) {
     switch (type) {
-      case 1:
+      case KubernetesApplicationPublishingTypes.CLUSTER_IP:
         return 'fa fa-list-alt';
-      case 2:
+      case KubernetesApplicationPublishingTypes.NODE_PORT:
         return 'fa fa-list';
-      case 3:
+      case KubernetesApplicationPublishingTypes.LOAD_BALANCER:
         return 'fa fa-project-diagram';
-      case 4:
+      case KubernetesApplicationPublishingTypes.INGRESS:
         return 'fa fa-route';
     }
   }
@@ -78,27 +79,23 @@ export default class KubeServicesViewController {
     this.state = {
       serviceType: [
         {
-          typeName: 'ClusterIP',
-          typeValue: 1,
-          active: true,
+          typeName: KubernetesServiceTypes.CLUSTER_IP,
+          typeValue: KubernetesApplicationPublishingTypes.CLUSTER_IP,
         },
         {
-          typeName: 'NodePort',
-          typeValue: 2,
-          active: true,
+          typeName: KubernetesServiceTypes.NODE_PORT,
+          typeValue: KubernetesApplicationPublishingTypes.NODE_PORT,
         },
         {
-          typeName: 'LocaBalancer',
-          typeValue: 3,
-          active: true,
+          typeName: KubernetesServiceTypes.LOAD_BALANCER,
+          typeValue: KubernetesApplicationPublishingTypes.LOAD_BALANCER,
         },
         {
-          typeName: 'Ingress',
-          typeValue: 4,
-          active: true,
+          typeName: KubernetesServiceTypes.INGRESS,
+          typeValue: KubernetesApplicationPublishingTypes.INGRESS,
         },
       ],
-      selected: 1,
+      selected: KubernetesApplicationPublishingTypes.CLUSTER_IP,
       nameIndex: '',
     };
     const serviceNumber = this.formValues.Services.length;

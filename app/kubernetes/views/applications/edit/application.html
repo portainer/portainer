@@ -260,75 +260,13 @@
           </div>
 
           <div ng-if="ctrl.application.PublishedPorts.length > 0">
-            <!-- LB notice -->
-            <div ng-if="ctrl.application.ServiceType === ctrl.KubernetesServiceTypes.LOAD_BALANCER">
-              <div class="small text-muted">
-                <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                This application is exposed through a service of type <span class="bold">{{ ctrl.application.ServiceType }}</span
-                >. Refer to the port configuration below to access it.
-              </div>
-              <div style="margin-top: 10px;" class="small text-muted">
-                <span ng-if="!ctrl.application.LoadBalancerIPAddress">
-                  <p> Load balancer status: <i class="fa fa-cog fa-spin" style="margin-left: 2px;"></i> pending </p>
-                  <p>
-                    <u>what does the "pending" status means?</u>
-                    <portainer-tooltip
-                      position="bottom"
-                      message="A pending status means that Portainer delegated the request to the provider responsible for creating the external load balancer. If it stays in pending state for long, this means that this capability might not be supported or you might have an issue with your cluster provider. Contact your cluster administrator for more information."
-                    >
-                    </portainer-tooltip>
-                  </p>
-                </span>
-                <span ng-if="ctrl.application.LoadBalancerIPAddress">
-                  <p> Load balancer status: <i class="fa fa-check green-icon" style="margin-left: 2px;"></i> available </p>
-                  <p>
-                    Load balancer IP address: {{ ctrl.application.LoadBalancerIPAddress }}
-                    <span class="btn btn-primary btn-xs" ng-click="ctrl.copyLoadBalancerIP()" style="margin-left: 5px;">
-                      <i class="fa fa-copy space-right" aria-hidden="true"></i>Copy
-                    </span>
-                    <span id="copyNotificationLB" style="margin-left: 7px; display: none; color: #23ae89;" class="small">
-                      <i class="fa fa-check" aria-hidden="true"></i> copied
-                    </span>
-                  </p>
-                </span>
-              </div>
-            </div>
-
-            <!-- NodePort notice -->
-            <div ng-if="ctrl.application.ServiceType === ctrl.KubernetesServiceTypes.NODE_PORT">
-              <div class="small text-muted">
-                <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                This application is exposed through a service of type <span class="bold">{{ ctrl.application.ServiceType }}</span
-                >. It can be reached using the IP address of any node in your cluster using the port configuration below.
-              </div>
-            </div>
-
-            <!-- ClusterIP notice -->
-            <div ng-if="ctrl.application.ServiceType === ctrl.KubernetesServiceTypes.CLUSTER_IP && !ctrl.state.useIngress">
-              <div class="small text-muted">
-                <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                This application is exposed through a service of type <span class="bold">{{ ctrl.application.ServiceType }}</span
-                >. It can be reached via the application name <code>{{ ctrl.application.ServiceName }}</code> and the port configuration below.
-                <span class="btn btn-primary btn-xs" ng-click="ctrl.copyApplicationName()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy</span>
-                <span id="copyNotificationApplicationName" style="margin-left: 7px; display: none; color: #23ae89;" class="small"
-                  ><i class="fa fa-check" aria-hidden="true"></i> copied</span
-                >
-              </div>
-            </div>
-
-            <!-- Ingress notice -->
-            <div ng-if="ctrl.application.ServiceType === ctrl.KubernetesServiceTypes.CLUSTER_IP && ctrl.state.useIngress">
+            <!-- Services notice -->
+            <div>
               <div class="small text-muted">
                 <p>
                   <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                  This application is exposed through a service of type <span class="bold">{{ ctrl.application.ServiceType }}</span
-                  >. It can be reached via the application name <code>{{ ctrl.application.ServiceName }}</code> and the port configuration below.
-                  <span class="btn btn-primary btn-xs" ng-click="ctrl.copyApplicationName()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy</span>
-                  <span id="copyNotificationApplicationName" style="margin-left: 7px; display: none; color: #23ae89;" class="small"
-                    ><i class="fa fa-check" aria-hidden="true"></i> copied</span
-                  >
+                  This application is exposed through service(s) as below:
                 </p>
-                <p>It is also associated to an <span class="bold">Ingress</span> and can be accessed via specific HTTP route(s).</p>
               </div>
             </div>
 
