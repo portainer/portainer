@@ -65,7 +65,7 @@ func (handler *Handler) openAMTHostInfo(w http.ResponseWriter, r *http.Request) 
 	ctx := context.TODO()
 	// pull the image so we can check if there's a new one
 	// TODO: these should be able to be over-ridden (don't hardcode the assumption that secure users can access Docker Hub, or that its even the orchestrator's "global namespace")
-	cmdLine := []string{"amtinfo", "--json"}
+	cmdLine := []string{"--force-recreate", "--no-cache", "amtinfo", "--json"}
 	output, err := handler.PullAndRunContainer(ctx, endpoint, rpcGoImageName, rpcGoContainerName, cmdLine)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: output, Err: err}
