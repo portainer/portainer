@@ -16,24 +16,24 @@
             <hr />
 
             <div class="form-group">
-              <label for="mps_url" class="col-sm-3 control-label text-left">
-                MPS URL
+              <label for="mps_server" class="col-sm-3 control-label text-left">
+                MPS Server
               </label>
               <div class="col-sm-8">
                 <input
                   type="text"
                   class="form-control"
-                  ng-model="$ctrl.formValues.mpsURL"
-                  id="mps_url"
-                  name="mps_url"
-                  placeholder="Enter the MPS URL"
+                  ng-model="$ctrl.formValues.mpsServer"
+                  id="mps_server"
+                  name="mps_server"
+                  placeholder="Enter the MPS Server"
                   ng-required="$ctrl.formValues.enableOpenAMT"
                 />
               </div>
             </div>
-            <div class="form-group col-md-12" ng-show="openAMTForm.mps_url.$invalid">
+            <div class="form-group col-md-12" ng-show="openAMTForm.mps_server.$invalid">
               <div class="small text-warning">
-                <div ng-messages="openAMTForm.mps_url.$error">
+                <div ng-messages="openAMTForm.mps_server.$error">
                   <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
                 </div>
               </div>

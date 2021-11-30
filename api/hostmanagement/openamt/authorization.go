@@ -15,7 +15,7 @@ type authenticationResponse struct {
 }
 
 func (service *Service) executeAuthenticationRequest(configuration portainer.OpenAMTConfiguration) (*authenticationResponse, error) {
-	loginURL := fmt.Sprintf("https://%s/mps/login/api/v1/authorize", configuration.MPSURL)
+	loginURL := fmt.Sprintf("https://%s/mps/login/api/v1/authorize", configuration.MPSServer)
 
 	payload := map[string]string{
 		"username": configuration.Credentials.MPSUser,
