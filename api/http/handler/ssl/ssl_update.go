@@ -28,6 +28,7 @@ func (payload *sslUpdatePayload) Validate(r *http.Request) error {
 // @description Update the ssl settings.
 // @description **Access policy**: administrator
 // @tags ssl
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json

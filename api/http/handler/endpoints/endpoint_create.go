@@ -152,6 +152,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 // @description  Create a new environment(endpoint) that will be used to manage an environment(endpoint).
 // @description **Access policy**: administrator
 // @tags endpoints
+// @security ApiKeyAuth
 // @security jwt
 // @accept multipart/form-data
 // @produce json

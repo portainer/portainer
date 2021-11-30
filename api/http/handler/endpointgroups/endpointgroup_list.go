@@ -15,6 +15,7 @@ import (
 // @description only return authorized environment(endpoint) groups.
 // @description **Access policy**: restricted
 // @tags endpoint_groups
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @success 200 {array} portainer.EndpointGroup "Environment(Endpoint) group"

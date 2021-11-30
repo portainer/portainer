@@ -54,6 +54,7 @@ type endpointStatusInspectResponse struct {
 // @description Environment(Endpoint) for edge agent to check status of environment(endpoint)
 // @description **Access policy**: restricted only to Edge environments(endpoints)
 // @tags endpoints
+// @security ApiKeyAuth
 // @security jwt
 // @param id path int true "Environment(Endpoint) identifier"
 // @success 200 {object} endpointStatusInspectResponse "Success"

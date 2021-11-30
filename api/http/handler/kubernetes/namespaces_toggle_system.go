@@ -22,6 +22,7 @@ func (payload *namespacesToggleSystemPayload) Validate(r *http.Request) error {
 // @summary Toggle the system state for a namespace
 // @description  Toggle the system state for a namespace
 // @description **Access policy**: administrator or environment(endpoint) admin
+// @security ApiKeyAuth
 // @security jwt
 // @tags kubernetes
 // @accept json

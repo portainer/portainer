@@ -26,6 +26,7 @@ func (p *backupPayload) Validate(r *http.Request) error {
 // @description  Creates an archive with a system data snapshot that could be used to restore the system.
 // @description **Access policy**: admin
 // @tags backup
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce octet-stream

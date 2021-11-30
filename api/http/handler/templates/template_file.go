@@ -40,6 +40,7 @@ func (payload *filePayload) Validate(r *http.Request) error {
 // @description Get a template's file
 // @description **Access policy**: authenticated
 // @tags templates
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json

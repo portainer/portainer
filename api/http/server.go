@@ -98,7 +98,7 @@ type Server struct {
 func (server *Server) Start() error {
 	kubernetesTokenCacheManager := server.KubernetesTokenCacheManager
 
-	requestBouncer := security.NewRequestBouncer(server.DataStore, server.JWTService)
+	requestBouncer := security.NewRequestBouncer(server.DataStore, server.JWTService, server.APIKeyService)
 
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
 	offlineGate := offlinegate.NewOfflineGate()
@@ -173,7 +173,7 @@ func (server *Server) Start() error {
 
 	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"))
 
-	var endpointHelmHandler = helm.NewHandler(requestBouncer, server.DataStore, server.KubernetesDeployer, server.HelmPackageManager, server.KubeConfigService)
+	var endpointHelmHandler = helm.NewHandler(requestBouncer, server.DataStore, server.JWTService, server.KubernetesDeployer, server.HelmPackageManager, server.KubeConfigService)
 
 	var helmTemplatesHandler = helm.NewTemplateHandler(requestBouncer, server.HelmPackageManager)
 
@@ -235,7 +235,7 @@ func (server *Server) Start() error {
 	var uploadHandler = upload.NewHandler(requestBouncer)
 	uploadHandler.FileService = server.FileService
 
-	var userHandler = users.NewHandler(requestBouncer, rateLimiter)
+	var userHandler = users.NewHandler(requestBouncer, rateLimiter, server.APIKeyService)
 	userHandler.DataStore = server.DataStore
 	userHandler.CryptoService = server.CryptoService
 

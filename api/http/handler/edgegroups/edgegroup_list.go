@@ -19,6 +19,7 @@ type decoratedEdgeGroup struct {
 // @summary list EdgeGroups
 // @description **Access policy**: administrator
 // @tags edge_groups
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @success 200 {array} decoratedEdgeGroup "EdgeGroups"

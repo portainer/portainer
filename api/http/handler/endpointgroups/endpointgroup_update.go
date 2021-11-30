@@ -32,6 +32,7 @@ func (payload *endpointGroupUpdatePayload) Validate(r *http.Request) error {
 // @description Update an environment(endpoint) group.
 // @description **Access policy**: administrator
 // @tags endpoint_groups
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json

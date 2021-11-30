@@ -14,6 +14,7 @@ import (
 // @description
 // @description **Access policy**: authenticated
 // @tags helm
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json

@@ -24,6 +24,7 @@ func (payload *teamUpdatePayload) Validate(r *http.Request) error {
 // @description Update a team.
 // @description **Access policy**: administrator
 // @tags teams
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json

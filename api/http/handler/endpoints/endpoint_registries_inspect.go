@@ -16,6 +16,7 @@ import (
 // @summary get registry for environment
 // @description **Access policy**: authenticated
 // @tags endpoints
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param id path int true "identifier"
