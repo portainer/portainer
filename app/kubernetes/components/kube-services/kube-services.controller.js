@@ -48,14 +48,14 @@ export default class KubeServicesViewController {
 
   serviceType(type) {
     switch (type) {
-      case KubernetesServiceTypes.CLUSTER_IP:
-        return 'ClusterIP';
-      case KubernetesServiceTypes.NODE_PORT:
-        return 'NodePort';
-      case KubernetesServiceTypes.LOAD_BALANCER:
-        return 'Load Balancer';
-      case KubernetesServiceTypes.INGRESS:
-        return 'Ingress';
+      case KubernetesApplicationPublishingTypes.CLUSTER_IP:
+        return KubernetesServiceTypes.CLUSTER_IP;
+      case KubernetesApplicationPublishingTypes.NODE_PORT:
+        return KubernetesServiceTypes.NODE_PORT;
+      case KubernetesApplicationPublishingTypes.LOAD_BALANCER:
+        return KubernetesServiceTypes.LOAD_BALANCER;
+      case KubernetesApplicationPublishingTypes.INGRESS:
+        return KubernetesServiceTypes.INGRESS;
     }
   }
 
