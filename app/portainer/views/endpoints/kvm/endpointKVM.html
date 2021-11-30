@@ -1,7 +1,8 @@
 <rd-header>
   <rd-header-title title-text="KVM Control"></rd-header-title>
   <rd-header-content>
-    <a ui-sref="portainer.endpoints">Environments</a> &gt; <a ui-sref="portainer.endpoints.endpoint({id: ctrl.endpoint.Id})">{{ ctrl.endpoint.Name }}</a> &gt; {{ ctrl.deviceName }} > KVM Control
+    <a ui-sref="portainer.endpoints">Environments</a> &gt; <a ui-sref="portainer.endpoints.endpoint({id: $state.endpoint.Id})">{{ $state.endpoint.Name }}</a> &gt;
+    {{ $state.deviceName }} > KVM Control
   </rd-header-content>
 </rd-header>
 
@@ -11,19 +12,13 @@
       <rd-widget>
         <rd-widget-body classes="no-padding">
           <div class="toolBar">
-            <div class="toolBarTitle"> KVM </div>
+            <div class="toolBarTitle">KVM Control</div>
           </div>
           <div class="actionBar">
-            <kvm-control
-              device-id="ctrl.deviceId"
-              server="ctrl.mpsServer"
-              token="ctrl.mpsToken">
-            </kvm-control>
+            <kvm-control device-id="$state.deviceId" server="$state.mpsServer" token="$state.mpsToken"> </kvm-control>
           </div>
         </rd-widget-body>
       </rd-widget>
     </div>
-
   </div>
 </div>
-

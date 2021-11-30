@@ -8,25 +8,24 @@ class EndpointKVMController {
     this.$transition$ = $transition$;
     this.OpenAMTService = OpenAMTService;
     this.Notifications = Notifications;
-    this.EndpointService = EndpointService
+    this.EndpointService = EndpointService;
 
-    this.endpointId = $transition$.params().id;
-    this.deviceId = $transition$.params().deviceId;
-    this.deviceName = $transition$.params().deviceName;
+    this.$state.endpointId = $transition$.params().id;
+    this.$state.deviceId = $transition$.params().deviceId;
+    this.$state.deviceName = $transition$.params().deviceName;
   }
 
   async $onInit() {
     try {
-      this.endpoint = this.EndpointService.endpoint(this.endpointId);
+      this.$state.endpoint = await this.EndpointService.endpoint(this.$state.endpointId);
 
-      const mpsAuthorization = await this.OpenAMTService.authorization(this.endpoint);
-      console.log(mpsAuthorization);
-      this.server = mps
+      const mpsAuthorization = await this.OpenAMTService.authorization(this.$state.endpointId);
+      this.$state.mpsServer = mpsAuthorization.Server;
+      this.$state.mpsToken = mpsAuthorization.Token;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve environment information');
     }
   }
-
 }
 
 export default EndpointKVMController;

@@ -222,9 +222,9 @@ type AuthorizationResponse struct {
 	Token  string
 }
 
-// @id OpenAMTHostCredentials
-// @summary Request OpenAMT credentials from a node
-// @description Request OpenAMT credentials from a node
+// @id OpenAMTHostAuthorization
+// @summary Request OpenAMT Authorization from a node
+// @description Request OpenAMT Authorization from a node
 // @description **Access policy**: administrator
 // @tags intel
 // @security jwt
@@ -234,7 +234,7 @@ type AuthorizationResponse struct {
 // @failure 403 "Permission denied to access settings"
 // @failure 500 "Server error"
 // @router /open_amt/{id}/credentials [get]
-func (handler *Handler) openAMTHostCredentials(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) openAMTHostAuthorization(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}

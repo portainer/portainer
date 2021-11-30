@@ -216,7 +216,6 @@ angular
           'content@': {
             templateUrl: './views/endpoints/kvm/endpointKVM.html',
             controller: 'EndpointKVMController',
-            controllerAs: 'ctrl',
           },
         },
       };
