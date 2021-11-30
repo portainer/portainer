@@ -257,7 +257,7 @@ angular.module('portainer.app').controller('TemplatesController', [
           deployable = endpoint.mode.provider === DOCKER_SWARM_MODE;
           break;
         case 3:
-          deployable = endpoint.mode.provider === DOCKER_STANDALONE;
+          deployable = endpoint.mode.provider === DOCKER_SWARM_MODE || endpoint.mode.provider === DOCKER_STANDALONE;
           break;
       }
       return deployable;
