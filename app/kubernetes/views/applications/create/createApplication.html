@@ -1246,7 +1246,13 @@
                       Enable publishing for this application
                     </label>
                     <label class="switch" style="margin-left: 20px;">
-                      <input type="checkbox" class="form-control" name="enable_port_publishing" ng-model="ctrl.formValues.IsPublishingService" />
+                      <input
+                        type="checkbox"
+                        class="form-control"
+                        name="enable_port_publishing"
+                        ng-model="ctrl.formValues.IsPublishingService"
+                        ng-change="ctrl.onServicePublishChange()"
+                      />
                       <i></i>
                     </label>
                   </div>
