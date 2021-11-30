@@ -72,7 +72,7 @@ export function CreateAccessToken({
             />
           </FormControl>
           <Button
-            disabled={!!errorText}
+            disabled={!!errorText || !!accessToken}
             onClick={generateAccessToken}
             className={styles.addButton}
           >
