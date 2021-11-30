@@ -14,5 +14,6 @@ angular.module('portainer.kubernetes').component('kubeServicesItemView', {
     serviceName: '<',
     multiItemDisable: '<',
     serviceIndex: '<',
+    loadbalancerEnabled: '<',
   },
 });
