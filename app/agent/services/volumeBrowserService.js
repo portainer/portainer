@@ -52,6 +52,7 @@ function VolumeBrowserServiceFactory(StateManager, Browse, BrowseVersion1, API_E
     return new Promise((resolve, reject) => {
       Upload.upload({
         url: url,
+        resumeChunkSize: '50MB',
         data: { file, Path: path },
       }).then(resolve, reject, onProgress);
     });
