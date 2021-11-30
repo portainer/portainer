@@ -38,7 +38,29 @@
         <i class="fa fa-trash-alt" aria-hidden="true"></i> Remove
       </button>
     </div>
-    <div ng-if="$ctrl.formValues.Services[$index].Ingress">
+
+    <div ng-if="$ctrl.formValues.Services[$index].Ingress && $ctrl.formValues.OriginalIngresses.length === 0">
+      <div class="text-muted">
+        <i class="fa fa-route" aria-hidden="true" style="margin-right: 2px;"></i>
+        Ingress
+      </div>
+      <div class="small text-warning">
+        <p style="margin-top: 10px;">
+          <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Ingress is not configured in this namespace, select another namespace or click here to configure ingress.
+        </p>
+      </div>
+      <button
+        type="button"
+        class="btn btn-sm btn-danger space-right"
+        style="margin-left: 0; margin-top: 10px;"
+        ng-click="$ctrl.deleteService( $index )"
+        data-cy="k8sConfigCreate-removeButton"
+      >
+        <i class="fa fa-trash-alt" aria-hidden="true"></i> Remove
+      </button>
+    </div>
+
+    <div ng-if="$ctrl.formValues.Services[$index].Ingress && $ctrl.formValues.OriginalIngresses.length !== 0">
       <div class="text-muted">
         <i class="fa fa-route" aria-hidden="true" style="margin-right: 2px;"></i>
         Ingress
