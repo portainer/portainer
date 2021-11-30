@@ -1,6 +1,7 @@
 package migrator
 
 func (m *Migrator) migrateDBVersionToDB30() error {
+	migrateLog.Info("Updating legacy settings")
 	if err := m.migrateSettingsToDB30(); err != nil {
 		return err
 	}
@@ -13,6 +14,7 @@ func (m *Migrator) migrateSettingsToDB30() error {
 	if err != nil {
 		return err
 	}
+
 	legacySettings.OAuthSettings.SSO = false
 	legacySettings.OAuthSettings.LogoutURI = ""
 	return m.settingsService.UpdateSettings(legacySettings)

@@ -18,6 +18,7 @@ import (
 // @summary Associate an orphaned stack to a new environment(endpoint)
 // @description **Access policy**: administrator
 // @tags stacks
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param id path int true "Stack identifier"

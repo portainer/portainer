@@ -1,3 +1,4 @@
+import './ldap-custom-admin-group.css';
 import controller from './ldap-custom-admin-group.controller';
 
 export const ldapCustomAdminGroup = {
@@ -9,5 +10,6 @@ export const ldapCustomAdminGroup = {
     defaultAdminGroupSearchFilter: '<',
     onSearchClick: '<',
     limitedFeatureId: '<',
+    isLimitedFeatureSelfContained: '<',
   },
 };

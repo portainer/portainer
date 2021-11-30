@@ -8,17 +8,18 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/portainer/libhelm"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/bolt"
 	"github.com/portainer/portainer/api/chisel"
 	"github.com/portainer/portainer/api/cli"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/docker"
-
-	"github.com/portainer/libhelm"
 	"github.com/portainer/portainer/api/exec"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/git"
+	"github.com/portainer/portainer/api/hostmanagement/openamt"
 	"github.com/portainer/portainer/api/http"
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/http/proxy"
@@ -114,6 +115,10 @@ func initKubernetesDeployer(kubernetesTokenCacheManager *kubeproxy.TokenCacheMan
 
 func initHelmPackageManager(assetsPath string) (libhelm.HelmPackageManager, error) {
 	return libhelm.NewHelmPackageManager(libhelm.HelmConfig{BinaryPath: assetsPath})
+}
+
+func initAPIKeyService(datastore portainer.DataStore) apikey.APIKeyService {
+	return apikey.NewAPIKeyService(datastore.APIKeyRepository(), datastore.User())
 }
 
 func initJWTService(dataStore portainer.DataStore) (portainer.JWTService, error) {
@@ -457,9 +462,16 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		log.Fatal(err)
 	}
 
+	apiKeyService := initAPIKeyService(dataStore)
+
 	jwtService, err := initJWTService(dataStore)
 	if err != nil {
 		log.Fatalf("failed initializing JWT service: %v", err)
+	}
+
+	err = enableFeaturesFromFlags(dataStore, flags)
+	if err != nil {
+		log.Fatalf("failed enabling feature flag: %v", err)
 	}
 
 	ldapService := initLDAPService()
@@ -467,6 +479,8 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	oauthService := initOAuthService()
 
 	gitService := initGitService()
+
+	openAMTService := openamt.NewService(dataStore)
 
 	cryptoService := initCryptoService()
 
@@ -535,11 +549,6 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		if err != nil {
 			log.Fatalf("failed updating settings from flags: %v", err)
 		}
-	}
-
-	err = enableFeaturesFromFlags(dataStore, flags)
-	if err != nil {
-		log.Fatalf("failed enabling feature flag: %v", err)
 	}
 
 	err = edge.LoadEdgeJobs(dataStore, reverseTunnelService)
@@ -618,11 +627,13 @@ func buildServer(flags *portainer.CLIFlags) portainer.Server {
 		KubernetesDeployer:          kubernetesDeployer,
 		HelmPackageManager:          helmPackageManager,
 		CryptoService:               cryptoService,
+		APIKeyService:               apiKeyService,
 		JWTService:                  jwtService,
 		FileService:                 fileService,
 		LDAPService:                 ldapService,
 		OAuthService:                oauthService,
 		GitService:                  gitService,
+		OpenAMTService:              openAMTService,
 		ProxyManager:                proxyManager,
 		KubernetesTokenCacheManager: kubernetesTokenCacheManager,
 		KubeConfigService:           kubeConfigService,

@@ -1,9 +1,18 @@
 function createEventDetails(event) {
   var eventAttr = event.Actor.Attributes;
   var details = '';
+
+  var action = event.Action;
+  var extra = '';
+  var hasColon = action.indexOf(':');
+  if (hasColon != -1) {
+    extra = action.substring(hasColon);
+    action = action.substring(0, hasColon);
+  }
+
   switch (event.Type) {
     case 'container':
-      switch (event.Action) {
+      switch (action) {
         case 'stop':
           details = 'Container ' + eventAttr.name + ' stopped';
           break;
@@ -64,20 +73,21 @@ function createEventDetails(event) {
         case 'update':
           details = 'Container ' + eventAttr.name + ' updated';
           break;
+        case 'exec_create':
+          details = 'Exec instance created';
+          break;
+        case 'exec_start':
+          details = 'Exec instance started';
+          break;
+        case 'exec_die':
+          details = 'Exec instance exited';
+          break;
         default:
-          if (event.Action.indexOf('exec_create') === 0) {
-            details = 'Exec instance created';
-          } else if (event.Action.indexOf('exec_start') === 0) {
-            details = 'Exec instance started';
-          } else if (event.Action.indexOf('exec_die') === 0) {
-            details = 'Exec instance exited  ';
-          } else {
-            details = 'Unsupported event';
-          }
+          details = 'Unsupported event';
       }
       break;
     case 'image':
-      switch (event.Action) {
+      switch (action) {
         case 'delete':
           details = 'Image deleted';
           break;
@@ -107,7 +117,7 @@ function createEventDetails(event) {
       }
       break;
     case 'network':
-      switch (event.Action) {
+      switch (action) {
         case 'create':
           details = 'Network ' + eventAttr.name + ' created';
           break;
@@ -128,7 +138,7 @@ function createEventDetails(event) {
       }
       break;
     case 'volume':
-      switch (event.Action) {
+      switch (action) {
         case 'create':
           details = 'Volume ' + event.Actor.ID + ' created';
           break;
@@ -148,7 +158,7 @@ function createEventDetails(event) {
     default:
       details = 'Unsupported event';
   }
-  return details;
+  return details + extra;
 }
 
 export function EventViewModel(data) {

@@ -17,6 +17,7 @@ import (
 // @description Remove a team membership. Access is only available to administrators leaders of the associated team.
 // @description **Access policy**: administrator
 // @tags team_memberships
+// @security ApiKeyAuth
 // @security jwt
 // @param id path int true "TeamMembership identifier"
 // @success 204 "Success"

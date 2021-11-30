@@ -6,15 +6,22 @@
   border-color: var(--border-form-control-color);
 }
 
-button.limited-be {
+button.limited-be,
+button[disabled].limited-be.oauth-save-settings-button {
   background-color: var(--BE-only);
   border-color: var(--BE-only);
+}
+
+button.limited-be.oauth-save-settings-button {
+  background-color: var(--blue-2);
+  border-color: transparent;
 }
 
 ng-form.limited-be,
 form.limited-be,
 div.limited-be {
   border: solid 1px var(--BE-only);
+  box-shadow: var(--shadow-boxselector-color);
   padding: 10px;
   pointer-events: none;
   touch-action: none;

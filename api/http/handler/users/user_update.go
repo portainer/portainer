@@ -15,8 +15,8 @@ import (
 )
 
 type userUpdatePayload struct {
-	Username string `validate:"required" example:"bob"`
-	Password string `validate:"required" example:"cg9Wgky3"`
+	Username  string `validate:"required" example:"bob"`
+	Password  string `validate:"required" example:"cg9Wgky3"`
 	UserTheme string `example:"dark"`
 	// User role (1 for administrator account and 2 for regular account)
 	Role int `validate:"required" enums:"1,2" example:"2"`
@@ -38,6 +38,7 @@ func (payload *userUpdatePayload) Validate(r *http.Request) error {
 // @description Update user details. A regular user account can only update his details.
 // @description **Access policy**: authenticated
 // @tags users
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json
@@ -113,6 +114,9 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist user changes inside the database", err}
 	}
+
+	// remove all of the users persisted API keys
+	handler.apiKeyService.InvalidateUserKeyCache(user.ID)
 
 	return response.JSON(w, user)
 }

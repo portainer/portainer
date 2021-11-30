@@ -25,6 +25,7 @@ import (
 // @description Remove a stack.
 // @description **Access policy**: restricted
 // @tags stacks
+// @security ApiKeyAuth
 // @security jwt
 // @param id path int true "Stack identifier"
 // @param external query boolean false "Set to true to delete an external stack. Only external Swarm stacks are supported"

@@ -11,24 +11,29 @@ import (
 )
 
 func (m *Migrator) migrateDBVersionToDB32() error {
+	migrateLog.Info("Updating registries")
 	err := m.updateRegistriesToDB32()
 	if err != nil {
 		return err
 	}
 
+	migrateLog.Info("Updating dockerhub")
 	err = m.updateDockerhubToDB32()
 	if err != nil {
 		return err
 	}
 
+	migrateLog.Info("Updating resource controls")
 	if err := m.updateVolumeResourceControlToDB32(); err != nil {
 		return err
 	}
 
+	migrateLog.Info("Updating kubeconfig expiry")
 	if err := m.kubeconfigExpiryToDB32(); err != nil {
 		return err
 	}
 
+	migrateLog.Info("Setting default helm repository url")
 	if err := m.helmRepositoryURLToDB32(); err != nil {
 		return err
 	}
@@ -98,6 +103,32 @@ func (m *Migrator) updateDockerhubToDB32() error {
 		Username:         dockerhub.Username,
 		Password:         dockerhub.Password,
 		RegistryAccesses: portainer.RegistryAccesses{},
+	}
+
+	// The following code will make this function idempotent.
+	// i.e. if run again, it will not change the data.  It will ensure that
+	// we only have one migrated registry entry. Duplicates will be removed
+	// if they exist and which has been happening due to earlier migration bugs
+	migrated := false
+	registries, _ := m.registryService.Registries()
+	for _, r := range registries {
+		if r.Type == registry.Type &&
+			r.Name == registry.Name &&
+			r.URL == registry.URL &&
+			r.Authentication == registry.Authentication {
+
+			if !migrated {
+				// keep this one entry
+				migrated = true
+			} else {
+				// delete subsequent duplicates
+				m.registryService.DeleteRegistry(portainer.RegistryID(r.ID))
+			}
+		}
+	}
+
+	if migrated {
+		return nil
 	}
 
 	endpoints, err := m.endpointService.Endpoints()

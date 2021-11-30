@@ -22,6 +22,7 @@ require (
 	github.com/gorilla/mux v1.7.3
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/websocket v1.4.2
+	github.com/hashicorp/golang-lru v0.5.4
 	github.com/joho/godotenv v1.3.0
 	github.com/jpillora/chisel v0.0.0-20190724232113-f3a8df20e389
 	github.com/json-iterator/go v1.1.11
@@ -33,11 +34,10 @@ require (
 	github.com/portainer/docker-compose-wrapper v0.0.0-20211018221743-10a04c9d4f19
 	github.com/portainer/libcrypto v0.0.0-20210422035235-c652195c5c3a
 	github.com/portainer/libhelm v0.0.0-20210929000907-825e93d62108
-	github.com/portainer/libhttp v0.0.0-20190806161843-ba068f58be33
+	github.com/portainer/libhttp v0.0.0-20211021135806-13e6c55c5fbc
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
-	github.com/swaggo/swag v1.7.3
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
@@ -47,4 +47,5 @@ require (
 	k8s.io/api v0.22.2
 	k8s.io/apimachinery v0.22.2
 	k8s.io/client-go v0.22.2
+	software.sslmate.com/src/go-pkcs12 v0.0.0-20210415151418-c5206de65a78
 )

@@ -7,7 +7,6 @@ import (
 
 	gittypes "github.com/portainer/portainer/api/git/types"
 	v1 "k8s.io/api/core/v1"
-	clientV1 "k8s.io/client-go/tools/clientcmd/api/v1"
 )
 
 type (
@@ -38,6 +37,34 @@ type (
 		TenantID string `json:"TenantID" example:"34ddc78d-4fel-2358-8cc1-df84c8o839f5"`
 		// Azure authentication key
 		AuthenticationKey string `json:"AuthenticationKey" example:"cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk="`
+	}
+
+	// OpenAMTConfiguration represents the credentials and configurations used to connect to an OpenAMT MPS server
+	OpenAMTConfiguration struct {
+		Enabled               bool                   `json:"Enabled"`
+		MPSServer             string                 `json:"MPSServer"`
+		Credentials           MPSCredentials         `json:"Credentials"`
+		DomainConfiguration   DomainConfiguration    `json:"DomainConfiguration"`
+		WirelessConfiguration *WirelessConfiguration `json:"WirelessConfiguration"`
+	}
+
+	MPSCredentials struct {
+		MPSUser     string `json:"MPSUser"`
+		MPSPassword string `json:"MPSPassword"`
+		MPSToken    string `json:"MPSToken"` // retrieved from API
+	}
+
+	DomainConfiguration struct {
+		CertFileText string `json:"CertFileText"`
+		CertPassword string `json:"CertPassword"`
+		DomainName   string `json:"DomainName"`
+	}
+
+	WirelessConfiguration struct {
+		AuthenticationMethod string `json:"AuthenticationMethod"`
+		EncryptionMethod     string `json:"EncryptionMethod"`
+		SSID                 string `json:"SSID"`
+		PskPass              string `json:"PskPass"`
 	}
 
 	// CLIFlags represents the available flags on the CLI
@@ -669,6 +696,20 @@ type (
 	// RoleID represents a role identifier
 	RoleID int
 
+	// APIKeyID represents an API key identifier
+	APIKeyID int
+
+	// APIKey represents an API key
+	APIKey struct {
+		ID          APIKeyID `json:"id" example:"1"`
+		UserID      UserID   `json:"userId" example:"1"`
+		Description string   `json:"description" example:"portainer-api-key"`
+		Prefix      string   `json:"prefix"`           // API key identifier (7 char prefix)
+		DateCreated int64    `json:"dateCreated"`      // Unix timestamp (UTC) when the API key was created
+		LastUsed    int64    `json:"lastUsed"`         // Unix timestamp (UTC) when the API key was last used
+		Digest      []byte   `json:"digest,omitempty"` // Digest represents SHA256 hash of the raw API key
+	}
+
 	// Schedule represents a scheduled job.
 	// It only contains a pointer to one of the JobRunner implementations
 	// based on the JobType.
@@ -708,6 +749,7 @@ type (
 		AuthenticationMethod AuthenticationMethod `json:"AuthenticationMethod" example:"1"`
 		LDAPSettings         LDAPSettings         `json:"LDAPSettings" example:""`
 		OAuthSettings        OAuthSettings        `json:"OAuthSettings" example:""`
+		OpenAMTConfiguration OpenAMTConfiguration `json:"OpenAMTConfiguration" example:""`
 		FeatureFlagSettings  map[Feature]bool     `json:"FeatureFlagSettings" example:""`
 		// The interval in which environment(endpoint) snapshots are created
 		SnapshotInterval string `json:"SnapshotInterval" example:"5m"`
@@ -1132,6 +1174,7 @@ type (
 		Registry() RegistryService
 		ResourceControl() ResourceControlService
 		Role() RoleService
+		APIKeyRepository() APIKeyRepository
 		Settings() SettingsService
 		SSLSettings() SSLSettingsService
 		Stack() StackService
@@ -1257,6 +1300,11 @@ type (
 		LatestCommitID(repositoryURL, referenceName, username, password string) (string, error)
 	}
 
+	// OpenAMTService represents a service for managing OpenAMT
+	OpenAMTService interface {
+		ConfigureDefault(configuration OpenAMTConfiguration) error
+	}
+
 	// HelmUserRepositoryService represents a service to manage HelmUserRepositories
 	HelmUserRepositoryService interface {
 		HelmUserRepositoryByUserID(userID UserID) ([]HelmUserRepository, error)
@@ -1286,7 +1334,6 @@ type (
 		DeleteRegistrySecret(registry *Registry, namespace string) error
 		CreateRegistrySecret(registry *Registry, namespace string) error
 		IsRegistrySecret(namespace, secretName string) (bool, error)
-		GetKubeConfig(ctx context.Context, apiServerURL string, bearerToken string, tokenData *TokenData) (*clientV1.Config, error)
 		ToggleSystemState(namespace string, isSystem bool) error
 	}
 
@@ -1358,10 +1405,21 @@ type (
 		UpdateRole(ID RoleID, role *Role) error
 	}
 
+	// APIKeyRepositoryService
+	APIKeyRepository interface {
+		CreateAPIKey(key *APIKey) error
+		GetAPIKey(keyID APIKeyID) (*APIKey, error)
+		UpdateAPIKey(key *APIKey) error
+		DeleteAPIKey(ID APIKeyID) error
+		GetAPIKeysByUserID(userID UserID) ([]APIKey, error)
+		GetAPIKeyByDigest(digest []byte) (*APIKey, error)
+	}
+
 	// SettingsService represents a service for managing application settings
 	SettingsService interface {
 		Settings() (*Settings, error)
 		UpdateSettings(settings *Settings) error
+		IsFeatureFlagEnabled(feature Feature) bool
 	}
 
 	// Server defines the interface to serve the API
@@ -1379,6 +1437,7 @@ type (
 	StackService interface {
 		Stack(ID StackID) (*Stack, error)
 		StackByName(name string) (*Stack, error)
+		StacksByName(name string) ([]Stack, error)
 		Stacks() ([]Stack, error)
 		CreateStack(stack *Stack) error
 		UpdateStack(ID StackID, stack *Stack) error
@@ -1478,7 +1537,7 @@ const (
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "2.9.3"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 33
+	DBVersion = 35
 	// ComposeSyntaxMaxVersion is a maximum supported version of the docker compose syntax
 	ComposeSyntaxMaxVersion = "3.9"
 	// AssetsServerURL represents the URL of the Portainer asset server

@@ -17,7 +17,7 @@ type Handler struct {
 	DockerClientFactory *docker.ClientFactory
 }
 
-// NewHandler creates a handler to manage settings operations.
+// NewHandler creates a handler to manage webhooks operations.
 func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{
 		Router: mux.NewRouter(),

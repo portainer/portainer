@@ -182,7 +182,8 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
     return (
       _.compact(ldapSettings.URLs).length &&
       (ldapSettings.AnonymousMode || (ldapSettings.ReaderDN && ldapSettings.Password)) &&
-      (!isTLSMode || $scope.formValues.TLSCACert || ldapSettings.TLSConfig.TLSSkipVerify)
+      (!isTLSMode || $scope.formValues.TLSCACert || ldapSettings.TLSConfig.TLSSkipVerify) &&
+      (!$scope.settings.LDAPSettings.AdminAutoPopulate || ($scope.settings.LDAPSettings.AdminAutoPopulate && $scope.formValues.selectedAdminGroups.length > 0))
     );
   }
 
