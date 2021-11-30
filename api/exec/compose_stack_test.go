@@ -97,7 +97,7 @@ networks:
 		t.Fatalf("Failed to read network env file: %s", err)
 	}
 
-	assert.Equal(t, "test\n", string(content))
+	assert.Equal(t, "test=None\n", string(content))
 
 	stackWithEnv := &portainer.Stack{
 		ProjectPath: dir,

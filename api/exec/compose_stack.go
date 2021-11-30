@@ -146,7 +146,7 @@ func createNetworkEnvFile(stack *portainer.Stack) error {
 		}
 	}
 
-	if networkNameSet.Len() == 0 {
+	if networkNameSet.Len() == 0 && stack.Env == nil {
 		return nil
 	}
 
@@ -171,14 +171,18 @@ func createNetworkEnvFile(stack *portainer.Stack) error {
 	}
 
 	for _, s := range networkNameSet.List() {
-		if v, ok := scanEnvSettingFunc(s); ok {
-			envfile.WriteString(fmt.Sprintf("%s=%s\n", s, v))
-		} else {
+		if _, ok := scanEnvSettingFunc(s); !ok {
 			stack.Env = append(stack.Env, portainer.Pair{
 				Name:  s,
 				Value: "None",
 			})
-			envfile.WriteString(fmt.Sprintf("%s\n", s))
+		}
+	}
+
+	if stack.Env != nil {
+		for _, v := range stack.Env {
+			envfile.WriteString(
+				fmt.Sprintf("%s=%s\n", v.Name, v.Value))
 		}
 	}
 
