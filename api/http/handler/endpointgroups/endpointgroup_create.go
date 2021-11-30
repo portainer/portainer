@@ -36,6 +36,7 @@ func (payload *endpointGroupCreatePayload) Validate(r *http.Request) error {
 // @description Create a new environment(endpoint) group.
 // @description **Access policy**: administrator
 // @tags endpoint_groups
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json

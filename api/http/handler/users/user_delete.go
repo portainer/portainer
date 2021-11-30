@@ -17,6 +17,7 @@ import (
 // @description Remove a user.
 // @description **Access policy**: administrator
 // @tags users
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param id path int true "User identifier"
@@ -92,6 +93,18 @@ func (handler *Handler) deleteUser(w http.ResponseWriter, user *portainer.User) 
 	err = handler.DataStore.TeamMembership().DeleteTeamMembershipByUserID(user.ID)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove user memberships from the database", err}
+	}
+
+	// Remove all of the users persisted API keys
+	apiKeys, err := handler.apiKeyService.GetAPIKeys(user.ID)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user API keys from the database", err}
+	}
+	for _, k := range apiKeys {
+		err = handler.apiKeyService.DeleteAPIKey(k.ID)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove user API key from the database", err}
+		}
 	}
 
 	return response.Empty(w)

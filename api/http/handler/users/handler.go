@@ -5,6 +5,7 @@ import (
 
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/apikey"
 	"github.com/portainer/portainer/api/http/security"
 
 	"net/http"
@@ -27,14 +28,18 @@ func hideFields(user *portainer.User) {
 // Handler is the HTTP handler used to handle user operations.
 type Handler struct {
 	*mux.Router
+	bouncer       *security.RequestBouncer
+	apiKeyService apikey.APIKeyService
 	DataStore     portainer.DataStore
 	CryptoService portainer.CryptoService
 }
 
 // NewHandler creates a handler to manage user operations.
-func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimiter) *Handler {
+func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimiter, apiKeyService apikey.APIKeyService) *Handler {
 	h := &Handler{
-		Router: mux.NewRouter(),
+		Router:        mux.NewRouter(),
+		bouncer:       bouncer,
+		apiKeyService: apiKeyService,
 	}
 	h.Handle("/users",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.userCreate))).Methods(http.MethodPost)
@@ -46,6 +51,12 @@ func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimi
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.userUpdate))).Methods(http.MethodPut)
 	h.Handle("/users/{id}",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.userDelete))).Methods(http.MethodDelete)
+	h.Handle("/users/{id}/tokens",
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.userGetAccessTokens))).Methods(http.MethodGet)
+	h.Handle("/users/{id}/tokens",
+		rateLimiter.LimitAccess(bouncer.RestrictedAccess(httperror.LoggerHandler(h.userCreateAccessToken)))).Methods(http.MethodPost)
+	h.Handle("/users/{id}/tokens/{keyID}",
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.userRemoveAccessToken))).Methods(http.MethodDelete)
 	h.Handle("/users/{id}/memberships",
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.userMemberships))).Methods(http.MethodGet)
 	h.Handle("/users/{id}/passwd",

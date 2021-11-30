@@ -19,6 +19,7 @@ type fileResponse struct {
 // @description Retrieve the content of the Stack file for the specified custom template
 // @description **Access policy**: authenticated
 // @tags custom_templates
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param id path int true "Template identifier"

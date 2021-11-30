@@ -2,7 +2,7 @@ import { ComponentType } from 'react';
 import clsx from 'clsx';
 
 import { AddButton, Button } from '@/portainer/components/Button';
-import { Tooltip } from '@/portainer/components/Tooltip';
+import { Tooltip } from '@/portainer/components/Tip/Tooltip';
 
 import { TextInput } from '../Input';
 

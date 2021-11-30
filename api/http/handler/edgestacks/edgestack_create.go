@@ -21,6 +21,7 @@ import (
 // @summary Create an EdgeStack
 // @description **Access policy**: administrator
 // @tags edge_stacks
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param method query string true "Creation Method" Enums(file,string,repository)
