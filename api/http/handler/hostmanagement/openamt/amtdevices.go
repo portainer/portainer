@@ -48,7 +48,7 @@ func (handler *Handler) openAMTDevices(w http.ResponseWriter, r *http.Request) *
 	}
 
 	// TODO delete after INT-7 is implemented, currently used for OpenAMT testing
-	endpoint.AMTDeviceGUID = "4c4c4544-004b-3910-8037-b6c04f504633"
+	// endpoint.AMTDeviceGUID = "4c4c4544-004b-3910-8037-b6c04f504633"
 
 	device, err := handler.OpenAMTService.DeviceInformation(settings.OpenAMTConfiguration, endpoint.AMTDeviceGUID)
 	if err != nil {
