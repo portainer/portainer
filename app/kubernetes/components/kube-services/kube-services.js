@@ -7,5 +7,6 @@ angular.module('portainer.kubernetes').component('kubeServicesView', {
   bindings: {
     formValues: '=',
     isEdit: '<',
+    loadbalancerEnabled: '<',
   },
 });

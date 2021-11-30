@@ -76,8 +76,8 @@ export class KubernetesIngressConverter {
     return ingresses;
   }
 
-  static applicationFormValuesToDeleteIngresses(application) {
-    const ingresses = angular.copy(application.Ingresses);
+  static applicationFormValuesToDeleteIngresses(formValues, application) {
+    const ingresses = angular.copy(formValues.OriginalIngresses);
     application.Services.forEach((service) => {
       ingresses.forEach((ingress) => {
         const path = _.find(ingress.Paths, { ServiceName: service.metadata.name });

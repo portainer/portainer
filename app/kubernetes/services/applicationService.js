@@ -433,9 +433,14 @@ class KubernetesApplicationService {
       await this.KubernetesServiceService.delete(application.Services);
 
       if (application.Ingresses.length) {
-        const ingresses = KubernetesIngressConverter.applicationFormValuesToDeleteIngresses(application);
+        const originalIngresses = await this.KubernetesIngressService.get(payload.Namespace);
+        const formValues = {
+          OriginalIngresses: originalIngresses,
+          PublishedPorts: KubernetesApplicationHelper.generatePublishedPortsFormValuesFromPublishedPorts(application.ServiceType, application.PublishedPorts),
+        };
+        const ingresses = KubernetesIngressConverter.applicationFormValuesToDeleteIngresses(formValues, application);
 
-        await Promise.all(this._generateIngressPatchPromises(application.Ingresses, ingresses));
+        await Promise.all(this._generateIngressPatchPromises(formValues.OriginalIngresses, ingresses));
       }
     }
     if (!_.isEmpty(application.AutoScaler)) {
