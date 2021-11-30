@@ -14,6 +14,14 @@ type authenticationResponse struct {
 	Token string `json:"token"`
 }
 
+func (service *Service) Authorization(configuration portainer.OpenAMTConfiguration) (string, error) {
+	token, err := service.executeAuthenticationRequest(configuration)
+	if err != nil {
+		return "", err
+	}
+	return token.Token, nil
+}
+
 func (service *Service) executeAuthenticationRequest(configuration portainer.OpenAMTConfiguration) (*authenticationResponse, error) {
 	loginURL := fmt.Sprintf("https://%s/mps/login/api/v1/authorize", configuration.MPSServer)
 

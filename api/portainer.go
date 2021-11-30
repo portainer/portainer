@@ -1300,6 +1300,7 @@ type (
 
 	// OpenAMTService represents a service for managing OpenAMT
 	OpenAMTService interface {
+		Authorization(configuration OpenAMTConfiguration) (string, error)
 		ConfigureDefault(configuration OpenAMTConfiguration) error
 		DeviceInformation(configuration OpenAMTConfiguration, deviceGUID string) (*OpenAMTDeviceInformation, error)
 		ExecuteDeviceAction(configuration OpenAMTConfiguration, deviceGUID string, action string) error

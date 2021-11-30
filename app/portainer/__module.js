@@ -211,7 +211,7 @@ angular
 
       var endpointKVM = {
         name: 'portainer.endpoints.endpoint.kvm',
-        url: '/kvm?deviceId',
+        url: '/kvm?deviceId&deviceName',
         views: {
           'content@': {
             templateUrl: './views/endpoints/kvm/endpointKVM.html',

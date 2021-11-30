@@ -216,3 +216,38 @@ func (handler *Handler) disableOpenAMT() error {
 	logrus.Info("OpenAMT successfully disabled")
 	return nil
 }
+
+type AuthorizationResponse struct {
+	Server string
+	Token  string
+}
+
+// @id OpenAMTHostCredentials
+// @summary Request OpenAMT credentials from a node
+// @description Request OpenAMT credentials from a node
+// @description **Access policy**: administrator
+// @tags intel
+// @security jwt
+// @produce json
+// @success 200 "Success"
+// @failure 400 "Invalid request"
+// @failure 403 "Permission denied to access settings"
+// @failure 500 "Server error"
+// @router /open_amt/{id}/credentials [get]
+func (handler *Handler) openAMTHostCredentials(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	settings, err := handler.DataStore.Settings().Settings()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+	}
+
+	token, err := handler.OpenAMTService.Authorization(settings.OpenAMTConfiguration)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Error on authorization request", err}
+	}
+
+	credentials := AuthorizationResponse{
+		Server: settings.OpenAMTConfiguration.MPSServer,
+		Token:  token,
+	}
+	return response.JSON(w, credentials)
+}

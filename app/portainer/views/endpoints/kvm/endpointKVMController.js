@@ -2,25 +2,29 @@ import angular from 'angular';
 
 class EndpointKVMController {
   /* @ngInject */
-  constructor($state, OpenAMTService, $async) {
+  constructor($state, $transition$, EndpointService, OpenAMTService, Notifications, $async) {
     this.$state = $state;
     this.$async = $async;
+    this.$transition$ = $transition$;
     this.OpenAMTService = OpenAMTService;
+    this.Notifications = Notifications;
+    this.EndpointService = EndpointService
 
-    // this.updateAccess = this.updateAccess.bind(this);
+    this.endpointId = $transition$.params().id;
+    this.deviceId = $transition$.params().deviceId;
+    this.deviceName = $transition$.params().deviceName;
   }
 
   async $onInit() {
     try {
-      // TODO fetch mps server && token
-      // this.state.loaded = true;
-    } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to connect to device');
-    }
-  }
+      this.endpoint = this.EndpointService.endpoint(this.endpointId);
 
-  updateAccess() {
-    return this.$async(this.updateAccessAsync);
+      const mpsAuthorization = await this.OpenAMTService.authorization(this.endpoint);
+      console.log(mpsAuthorization);
+      this.server = mps
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve environment information');
+    }
   }
 
 }
