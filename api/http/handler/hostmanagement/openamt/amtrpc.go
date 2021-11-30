@@ -2,11 +2,6 @@ package openamt
 
 import (
 	"context"
-	"io"
-	"io/ioutil"
-	"log"
-	"net/http"
-
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
@@ -17,6 +12,9 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/sirupsen/logrus"
+	"io/ioutil"
+	"log"
+	"net/http"
 )
 
 type OpenAMTHostInfo struct {
@@ -60,7 +58,7 @@ func (handler *Handler) openAMTHostInfo(w http.ResponseWriter, r *http.Request) 
 	ctx := context.TODO()
 	// pull the image so we can check if there's a new one
 	// TODO: these should be able to be over-ridden (don't hardcode the assumption that secure users can access Docker Hub, or that its even the orchestrator's "global namespace")
-	cmdLine := []string{"amtinfo", "--json"}
+	cmdLine := []string{"--force-recreate", "--no-cache", "amtinfo", "--json"}
 	output, err := handler.PullAndRunContainer(ctx, endpoint, rpcGoImageName, rpcGoContainerName, cmdLine)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: output, Err: err}
@@ -106,24 +104,20 @@ func (handler *Handler) PullAndRunContainer(ctx context.Context, endpoint *porta
 // TODO: add k8s implementation
 // TODO: work out registry auth
 func pullImage(ctx context.Context, docker *client.Client, imageName string) error {
-	r, err := docker.ImagePull(ctx, imageName, types.ImagePullOptions{})
+	out, err := docker.ImagePull(ctx, imageName, types.ImagePullOptions{})
 	if err != nil {
 		logrus.WithError(err).WithField("imageName", imageName).Error("Could not pull image from registry")
 		return err
 	}
-	// yeah, swiped this, need to figure out a good way to wait til its done...
-	b := make([]byte, 8)
-	for {
-		_, err := r.Read(b)
-		// TODO: should convert json text to a struct and show just the text messages
-		//if n > 0 {
-		//fmt.Printf(string(b))
-		//}
-		if err == io.EOF {
-			break
-		}
+
+	defer out.Close()
+	outputBytes, err := ioutil.ReadAll(out)
+	if err != nil {
+		logrus.WithError(err).WithField("imageName", imageName).Error("Could not read image pull output")
+		return err
 	}
-	r.Close()
+
+	log.Printf("%s imaged pulled with output:\n%s", imageName, string(outputBytes))
 
 	return nil
 }
@@ -133,7 +127,7 @@ func pullImage(ctx context.Context, docker *client.Client, imageName string) err
 // TODO: add k8s support
 func runContainer(ctx context.Context, docker *client.Client, imageName, containerName string, cmdLine []string) (output string, err error) {
 	envs := []string{}
-	create, err := docker.ContainerCreate(
+	created, err := docker.ContainerCreate(
 		ctx,
 		&container.Config{
 			Image:        imageName,
@@ -149,12 +143,13 @@ func runContainer(ctx context.Context, docker *client.Client, imageName, contain
 		},
 		&network.NetworkingConfig{},
 		nil,
-		containerName)
+		containerName,
+	)
 	if err != nil {
 		logrus.WithError(err).WithField("imagename", imageName).WithField("containername", containerName).Error("creating container")
 		return "", err
 	}
-	err = docker.ContainerStart(ctx, create.ID, types.ContainerStartOptions{})
+	err = docker.ContainerStart(ctx, created.ID, types.ContainerStartOptions{})
 	if err != nil {
 		logrus.WithError(err).WithField("imagename", imageName).WithField("containername", containerName).Error("starting container")
 		return "", err
@@ -162,7 +157,7 @@ func runContainer(ctx context.Context, docker *client.Client, imageName, contain
 
 	log.Printf("%s container created and started\n", containerName)
 
-	statusCh, errCh := docker.ContainerWait(ctx, create.ID, container.WaitConditionNotRunning)
+	statusCh, errCh := docker.ContainerWait(ctx, created.ID, container.WaitConditionNotRunning)
 	var statusCode int64
 	select {
 	case err := <-errCh:
@@ -175,13 +170,13 @@ func runContainer(ctx context.Context, docker *client.Client, imageName, contain
 	}
 	logrus.WithField("status", statusCode).Debug("container wait status")
 
-	out, err := docker.ContainerLogs(ctx, create.ID, types.ContainerLogsOptions{ShowStdout: true})
+	out, err := docker.ContainerLogs(ctx, created.ID, types.ContainerLogsOptions{ShowStdout: true})
 	if err != nil {
 		logrus.WithError(err).WithField("imagename", imageName).WithField("containername", containerName).Error("getting container log")
 		return "", err
 	}
 
-	err = docker.ContainerRemove(ctx, create.ID, types.ContainerRemoveOptions{})
+	err = docker.ContainerRemove(ctx, created.ID, types.ContainerRemoveOptions{})
 	if err != nil {
 		logrus.WithError(err).WithField("imagename", imageName).WithField("containername", containerName).Error("removing container")
 		return "", err
