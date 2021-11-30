@@ -70,7 +70,7 @@ class KubernetesServiceConverter {
       }
       res.Ingress = service.Ingress;
 
-      if (service.Selector) {
+      if (service.Selector !== undefined) {
         res.Selector = service.Selector;
       } else {
         res.Selector = {
@@ -102,6 +102,9 @@ class KubernetesServiceConverter {
     const res = KubernetesServiceConverter.applicationFormValuesToService(formValues);
     res.Name = KubernetesServiceHelper.generateHeadlessServiceName(formValues.Name);
     res.Headless = true;
+    res.Selector = {
+      app: formValues.Name,
+    };
     return res;
   }
 
