@@ -42,7 +42,7 @@ type (
 	// OpenAMTConfiguration represents the credentials and configurations used to connect to an OpenAMT MPS server
 	OpenAMTConfiguration struct {
 		Enabled               bool                   `json:"Enabled"`
-		MPSServer             string                 `json:"MPSServer"`
+		MPSURL                string                 `json:"MPSURL"`
 		Credentials           MPSCredentials         `json:"Credentials"`
 		DomainConfiguration   DomainConfiguration    `json:"DomainConfiguration"`
 		WirelessConfiguration *WirelessConfiguration `json:"WirelessConfiguration"`
