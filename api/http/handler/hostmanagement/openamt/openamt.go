@@ -18,7 +18,7 @@ import (
 
 type openAMTConfigureDefaultPayload struct {
 	EnableOpenAMT            bool
-	MPSServer                string
+	MPSURL                   string
 	MPSUser                  string
 	MPSPassword              string
 	CertFileText             string
@@ -33,8 +33,8 @@ type openAMTConfigureDefaultPayload struct {
 
 func (payload *openAMTConfigureDefaultPayload) Validate(r *http.Request) error {
 	if payload.EnableOpenAMT {
-		if payload.MPSServer == "" {
-			return errors.New("MPS Server must be provided")
+		if payload.MPSURL == "" {
+			return errors.New("MPS Url must be provided")
 		}
 		if payload.MPSUser == "" {
 			return errors.New("MPS User must be provided")
@@ -145,8 +145,8 @@ func isValidIssuer(issuer string) bool {
 
 func (handler *Handler) enableOpenAMT(configurationPayload openAMTConfigureDefaultPayload) error {
 	configuration := portainer.OpenAMTConfiguration{
-		Enabled:   true,
-		MPSServer: configurationPayload.MPSServer,
+		Enabled: true,
+		MPSURL:  configurationPayload.MPSURL,
 		Credentials: portainer.MPSCredentials{
 			MPSUser:     configurationPayload.MPSUser,
 			MPSPassword: configurationPayload.MPSPassword,
