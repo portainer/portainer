@@ -42,7 +42,10 @@ func newBaseTransport(httpTransport *http.Transport, tokenManager *tokenManager,
 // proxyKubernetesRequest intercepts a Kubernetes API request and apply logic based
 // on the requested operation.
 func (transport *baseTransport) proxyKubernetesRequest(request *http.Request) (*http.Response, error) {
-	apiVersionRe := regexp.MustCompile(`^(/kubernetes)?/api/v[0-9](\.[0-9])?`)
+	// URL path examples:
+	// http://localhost:9000/api/endpoints/3/kubernetes/api/v1/namespaces
+	// http://localhost:9000/api/endpoints/3/kubernetes/apis/apps/v1/namespaces/default/deployments
+	apiVersionRe := regexp.MustCompile(`^(/kubernetes)?/(api|apis/apps)/v[0-9](\.[0-9])?`)
 	requestPath := apiVersionRe.ReplaceAllString(request.URL.Path, "")
 
 	switch {
@@ -66,6 +69,10 @@ func (transport *baseTransport) proxyNamespacedRequest(request *http.Request, fu
 	}
 
 	switch {
+	case strings.HasPrefix(requestPath, "pods"):
+		return transport.proxyPodsRequest(request, namespace, requestPath)
+	case strings.HasPrefix(requestPath, "deployments"):
+		return transport.proxyDeploymentsRequest(request, namespace, requestPath)
 	case requestPath == "" && request.Method == "DELETE":
 		return transport.proxyNamespaceDeleteOperation(request, namespace)
 	default:
