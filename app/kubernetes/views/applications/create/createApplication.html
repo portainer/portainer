@@ -1291,6 +1291,9 @@
               <!-- kubernetes services options -->
             </div>
 
+            <!-- kubernetes summary for external application -->
+            <kubernetes-summary-view ng-if="ctrl.isExternalApplication()" form-values="ctrl.formValues" old-form-values="ctrl.savedFormValues"></kubernetes-summary-view>
+            <!-- kubernetes summary for external application -->
             <div class="col-sm-12 form-section-title" ng-if="ctrl.state.appType !== ctrl.KubernetesDeploymentTypes.GIT">
               Actions
             </div>
