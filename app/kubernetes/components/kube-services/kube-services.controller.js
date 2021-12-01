@@ -3,9 +3,10 @@ import { KubernetesApplicationPublishingTypes } from 'Kubernetes/models/applicat
 
 export default class KubeServicesViewController {
   /* @ngInject */
-  constructor($async, EndpointProvider) {
+  constructor($async, EndpointProvider, Authentication) {
     this.$async = $async;
     this.EndpointProvider = EndpointProvider;
+    this.Authentication = Authentication;
   }
 
   addEntry(service) {
@@ -58,6 +59,10 @@ export default class KubeServicesViewController {
       case KubernetesApplicationPublishingTypes.INGRESS:
         return KubernetesServiceTypes.INGRESS;
     }
+  }
+
+  isAdmin() {
+    return this.Authentication.isAdmin();
   }
 
   iconStyle(type) {

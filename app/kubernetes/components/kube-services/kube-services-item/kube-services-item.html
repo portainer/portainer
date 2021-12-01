@@ -1,9 +1,12 @@
 <form name="serviceForm">
-  <div class="small text-warning" ng-show="$ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.LOAD_BALANCER && !$ctrl.loadbalancerEnabled">
+  <div ng-if="$ctrl.isAdmin()" class="small text-warning" ng-show="$ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.LOAD_BALANCER && !$ctrl.loadbalancerEnabled">
     <p style="margin-top: 10px;">
       <i class="fa fa-exclamation-circle" aria-hidden="true"></i> No Load balancer is available in this cluster, click
       <a ui-sref="portainer.k8sendpoint.kubernetesConfig({id: $ctrl.state.endpointId})">here</a> to configure load balancer.
     </p>
+  </div>
+  <div ng-if="!$ctrl.isAdmin()" class="small text-warning" ng-show="$ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.LOAD_BALANCER && !$ctrl.loadbalancerEnabled">
+    <p style="margin-top: 10px;"> <i class="fa fa-exclamation-circle" aria-hidden="true"></i> No Load balancer is available in this cluster, contract your administrator. </p>
   </div>
 
   <div

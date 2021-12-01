@@ -44,10 +44,15 @@
         <i class="fa fa-route" aria-hidden="true" style="margin-right: 2px;"></i>
         Ingress
       </div>
-      <div class="small text-warning">
+      <div ng-if="$ctrl.isAdmin()" class="small text-warning">
         <p style="margin-top: 10px;">
           <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Ingress is not configured in this namespace, select another namespace or click
           <a ui-sref="portainer.k8sendpoint.kubernetesConfig({id: $ctrl.state.endpointId})">here</a> to configure ingress.
+        </p>
+      </div>
+      <div ng-if="!$ctrl.isAdmin()" class="small text-warning">
+        <p style="margin-top: 10px;">
+          <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Ingress is not configured in this namespace, select another namespace or contact your administrator.
         </p>
       </div>
       <button

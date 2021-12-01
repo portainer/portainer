@@ -6,8 +6,9 @@ import { KubernetesApplicationPublishingTypes } from 'Kubernetes/models/applicat
 
 export default class KubeServicesItemViewController {
   /* @ngInject */
-  constructor(EndpointProvider) {
+  constructor(EndpointProvider, Authentication) {
     this.EndpointProvider = EndpointProvider;
+    this.Authentication = Authentication;
   }
 
   addPort() {
@@ -28,6 +29,10 @@ export default class KubeServicesItemViewController {
 
   removePort(index) {
     this.servicePorts.splice(index, 1);
+  }
+
+  isAdmin() {
+    return this.Authentication.isAdmin();
   }
 
   onChangeContainerPort() {
