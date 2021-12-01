@@ -236,8 +236,6 @@ function getVolumeClaimUpdateResourceSummary(oldPVC, newPVC) {
 
 // getServiceUpdateResourceSummary replicates KubernetesServiceService.patch
 function getServiceUpdateResourceSummary(oldServices, newServices) {
-  console.log(oldServices);
-  console.log(newServices);
   let summary = [];
   newServices.forEach((newService) => {
     const oldServiceMatched = _.find(oldServices, { Name: newService.Name });

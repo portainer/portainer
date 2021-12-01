@@ -5,6 +5,11 @@ import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHel
 import { KubernetesApplicationPublishingTypes } from 'Kubernetes/models/application/models/constants';
 
 export default class KubeServicesItemViewController {
+  /* @ngInject */
+  constructor(EndpointProvider) {
+    this.EndpointProvider = EndpointProvider;
+  }
+
   addPort() {
     const p = new KubernetesServicePort();
     p.nodePort = '';
@@ -62,6 +67,7 @@ export default class KubeServicesItemViewController {
         servicePort: new KubernetesFormValidationReferences(),
         nodePort: new KubernetesFormValidationReferences(),
       },
+      endpointId: this.EndpointProvider.endpointID(),
     };
   }
 }
