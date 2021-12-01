@@ -26,7 +26,7 @@ export default class KubeServicesItemViewController {
   }
 
   onChangeContainerPort() {
-    const state = this.state.duplicates.servicePorts;
+    const state = this.state.duplicates.targetPort;
     const source = _.map(this.servicePorts, (sp) => sp.targetPort);
     const duplicates = KubernetesFormValidationHelper.getDuplicates(source);
     state.refs = duplicates;
@@ -34,7 +34,7 @@ export default class KubeServicesItemViewController {
   }
 
   onChangeServicePort() {
-    const state = this.state.duplicates.servicePorts;
+    const state = this.state.duplicates.servicePort;
     const source = _.map(this.servicePorts, (sp) => sp.port);
     const duplicates = KubernetesFormValidationHelper.getDuplicates(source);
     state.refs = duplicates;
@@ -42,7 +42,7 @@ export default class KubeServicesItemViewController {
   }
 
   onChangeNodePort() {
-    const state = this.state.duplicates.servicePorts;
+    const state = this.state.duplicates.nodePort;
     const source = _.map(this.servicePorts, (sp) => sp.nodePort);
     const duplicates = KubernetesFormValidationHelper.getDuplicates(source);
     state.refs = duplicates;
@@ -58,7 +58,9 @@ export default class KubeServicesItemViewController {
 
     this.state = {
       duplicates: {
-        servicePorts: new KubernetesFormValidationReferences(),
+        targetPort: new KubernetesFormValidationReferences(),
+        servicePort: new KubernetesFormValidationReferences(),
+        nodePort: new KubernetesFormValidationReferences(),
       },
     };
   }

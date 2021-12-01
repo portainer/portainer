@@ -157,7 +157,14 @@
       </div>
 
       <div class="small text-warning" style="margin-top: 5px;">
-        <p ng-if="$ctrl.state.duplicates.servicePorts.refs[$index] !== undefined"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This port is already used. </p>
+        <p ng-if="$ctrl.state.duplicates.servicePort.refs[$index] !== undefined">
+          <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This service port is already used.
+        </p>
+      </div>
+      <div class="small text-warning" style="margin-top: 5px;">
+        <p ng-if="$ctrl.state.duplicates.targetPort.refs[$index] !== undefined">
+          <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This container port is already used.
+        </p>
       </div>
 
       <div class="small text-warning" style="margin-top: 5px;">
