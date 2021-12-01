@@ -74,6 +74,18 @@ class CreateRegistryController {
     this.model.Authentication = true;
   }
 
+  useDefaultEcrConfiguration() {
+    this.model.Ecr.Region = '';
+  }
+
+  selectEcr() {
+    this.model.Name = '';
+    this.model.URL = '';
+    this.model.Authentication = false;
+    this.model.Ecr = {};
+    this.useDefaultEcrConfiguration();
+  }
+
   retrieveGitlabRegistries() {
     return this.$async(async () => {
       this.state.actionInProgress = true;

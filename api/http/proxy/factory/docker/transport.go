@@ -414,7 +414,10 @@ func (transport *Transport) replaceRegistryAuthenticationHeader(request *http.Re
 			return nil, err
 		}
 
-		authenticationHeader := createRegistryAuthenticationHeader(originalHeaderData.RegistryId, accessContext)
+		authenticationHeader, err := createRegistryAuthenticationHeader(transport.dataStore, originalHeaderData.RegistryId, accessContext)
+		if err != nil {
+			return nil, err
+		}
 
 		headerData, err := json.Marshal(authenticationHeader)
 		if err != nil {
