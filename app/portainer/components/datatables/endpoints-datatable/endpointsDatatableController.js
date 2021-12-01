@@ -2,6 +2,7 @@ import EndpointHelper from '@/portainer/helpers/endpointHelper';
 
 angular.module('portainer.app').controller('EndpointsDatatableController', [
   '$scope',
+  '$state',
   '$controller',
   'DatatableService',
   'PaginationService',
@@ -9,7 +10,7 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
   'ModalService',
   'Notifications',
   'OpenAMTService',
-  function ($scope, $controller, DatatableService, PaginationService, SettingsService, ModalService, Notifications, OpenAMTService) {
+  function ($scope, $state, $controller, DatatableService, PaginationService, SettingsService, ModalService, Notifications, OpenAMTService) {
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
 
     this.state = Object.assign(this.state, {
@@ -90,7 +91,7 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
         })
         .catch((e) => {
           console.log(e);
-          this.state.amtDevicesErrors[endpoint.Id] = 'Error fetching devices information: ' + e.statusText;
+          this.state.amtDevicesErrors[endpoint.Id] = 'Error fetching devices information: ' + e.data.details;
         });
     };
 
@@ -111,11 +112,11 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
 
           Notifications.success('Successfully associated with OpenAMT', endpoint.Name);
         } catch (err) {
-          Notifications.error('Failure', err, 'Unable to associated with OpenAMT');
+          Notifications.error('Failure', err, 'Unable to associate with OpenAMT');
         }
       }
 
-      // $state.reload();
+      $state.reload();
     };
 
     /**

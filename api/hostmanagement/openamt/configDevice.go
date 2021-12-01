@@ -3,6 +3,7 @@ package openamt
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	portainer "github.com/portainer/portainer/api"
 )
@@ -22,6 +23,9 @@ func (service *Service) getDevice(configuration portainer.OpenAMTConfiguration, 
 
 	responseBody, err := service.executeGetRequest(url, configuration.Credentials.MPSToken)
 	if err != nil {
+		if strings.EqualFold(err.Error(), "invalid value") {
+			return nil, nil
+		}
 		return nil, err
 	}
 	if responseBody == nil {
