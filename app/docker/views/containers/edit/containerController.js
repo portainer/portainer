@@ -302,7 +302,7 @@ angular.module('portainer.docker').controller('ContainerController', [
           return $q.when();
         }
         return RegistryService.retrievePorRegistryModelFromRepository(container.Config.Image, endpoint.Id).then((registryModel) => {
-          return ImageService.pullImage(registryModel, true);
+          return ImageService.pullImage(registryModel, false);
         });
       }
 
