@@ -209,6 +209,14 @@ class KubernetesApplicationService {
   }
   /* #endregion */
 
+  async createService(service, formValues) {
+    await this.KubernetesServiceService.create(service);
+    if (service.Ingress) {
+      const ingresses = KubernetesIngressConverter.newApplicationFormValuesToIngresses(formValues, service.Name, service.Ports);
+      await Promise.all(this._generateIngressPatchPromises(formValues.OriginalIngresses, ingresses));
+    }
+  }
+
   /* #region  CREATE */
   // TODO: review
   // resource creation flow
@@ -223,15 +231,11 @@ class KubernetesApplicationService {
     // formValues -> Application
     let [app, headlessService, services, service, claims] = KubernetesApplicationConverter.applicationFormValuesToApplication(formValues);
 
-    if (services) {
-      services.forEach(async (service) => {
-        this.KubernetesServiceService.create(service);
-        if (service.Ingress) {
-          const ingresses = KubernetesIngressConverter.newApplicationFormValuesToIngresses(formValues, service.Name, service.Ports);
-          await Promise.all(this._generateIngressPatchPromises(formValues.OriginalIngresses, ingresses));
-        }
-      });
-    }
+    await Promise.all(
+      _.map(services, async (service) => {
+          return this.createService(service, formValues);
+      })
+    );
 
     if (service) {
       await this.KubernetesServiceService.create(service);
