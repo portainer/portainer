@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	clientV1 "k8s.io/client-go/tools/clientcmd/api/v1"
 
@@ -160,6 +161,14 @@ func buildCluster(r *http.Request, endpoint portainer.Endpoint) clientV1.NamedCl
 			InsecureSkipTLSVerify: true,
 		},
 	}
+}
+
+// getProxyUrl generates portainer proxy url which acts as proxy to k8s api server
+func getProxyUrl(r *http.Request, baseURL string, endpointID int) string {
+	if baseURL != "/" {
+		baseURL = fmt.Sprintf("/%s/", strings.Trim(baseURL, "/"))
+	}
+	return fmt.Sprintf("https://%s%sapi/endpoints/%d/kubernetes", r.Host, baseURL, endpointID)
 }
 
 func buildClusterName(endpointName string) string {

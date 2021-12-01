@@ -1,3 +1,5 @@
+import { baseHref } from '@/portainer/helpers/pathHelper';
+
 angular.module('portainer.app').factory('WebhookHelper', [
   '$location',
   'API_ENDPOINT_WEBHOOKS',
@@ -11,11 +13,11 @@ angular.module('portainer.app').factory('WebhookHelper', [
     const displayPort = (protocol === 'http' && port === 80) || (protocol === 'https' && port === 443) ? '' : ':' + port;
 
     helper.returnWebhookUrl = function (token) {
-      return `${protocol}://${$location.host()}${displayPort}/${API_ENDPOINT_WEBHOOKS}/${token}`;
+      return `${protocol}://${$location.host()}${displayPort}${baseHref()}${API_ENDPOINT_WEBHOOKS}/${token}`;
     };
 
     helper.returnStackWebhookUrl = function (token) {
-      return `${protocol}://${$location.host()}${displayPort}/${API_ENDPOINT_STACKS}/webhooks/${token}`;
+      return `${protocol}://${$location.host()}${displayPort}${baseHref()}${API_ENDPOINT_STACKS}/webhooks/${token}`;
     };
 
     return helper;
