@@ -134,7 +134,7 @@ func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenD
 			return nil, &httperror.HandlerError{http.StatusInternalServerError, fmt.Sprintf("unable to find serviceaccount associated with user; username=%s", tokenData.Username), err}
 		}
 
-		configClusters[idx] = buildCluster(r, endpoint)
+		configClusters[idx] = buildCluster(r, endpoint, handler.BaseURL)
 		configContexts[idx] = buildContext(serviceAccount.Name, endpoint)
 		if !authInfosSet[serviceAccount.Name] {
 			configAuthInfos = append(configAuthInfos, buildAuthInfo(serviceAccount.Name, bearerToken))
@@ -152,8 +152,11 @@ func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenD
 	}, nil
 }
 
-func buildCluster(r *http.Request, endpoint portainer.Endpoint) clientV1.NamedCluster {
-	proxyURL := fmt.Sprintf("https://%s/api/endpoints/%d/kubernetes", r.Host, endpoint.ID)
+func buildCluster(r *http.Request, endpoint portainer.Endpoint, baseURL string) clientV1.NamedCluster {
+	if baseURL != "/" {
+		baseURL = fmt.Sprintf("/%s/", strings.Trim(baseURL, "/"))
+	}
+	proxyURL := fmt.Sprintf("https://%s%sapi/endpoints/%d/kubernetes", r.Host, baseURL, endpoint.ID)
 	return clientV1.NamedCluster{
 		Name: buildClusterName(endpoint.Name),
 		Cluster: clientV1.Cluster{
@@ -161,14 +164,6 @@ func buildCluster(r *http.Request, endpoint portainer.Endpoint) clientV1.NamedCl
 			InsecureSkipTLSVerify: true,
 		},
 	}
-}
-
-// getProxyUrl generates portainer proxy url which acts as proxy to k8s api server
-func getProxyUrl(r *http.Request, baseURL string, endpointID int) string {
-	if baseURL != "/" {
-		baseURL = fmt.Sprintf("/%s/", strings.Trim(baseURL, "/"))
-	}
-	return fmt.Sprintf("https://%s%sapi/endpoints/%d/kubernetes", r.Host, baseURL, endpointID)
 }
 
 func buildClusterName(endpointName string) string {
