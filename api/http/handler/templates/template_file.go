@@ -1,6 +1,7 @@
 package templates
 
 import (
+	"encoding/json"
 	"errors"
 	"log"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
+	portainer "github.com/portainer/portainer/api"
 )
 
 type filePayload struct {
@@ -35,6 +37,34 @@ func (payload *filePayload) Validate(r *http.Request) error {
 	return nil
 }
 
+func (handler *Handler) ifRequestedTemplateExists(payload *filePayload) *httperror.HandlerError {
+	settings, err := handler.DataStore.Settings().Settings()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+	}
+
+	resp, err := http.Get(settings.TemplatesURL)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve templates via the network", err}
+	}
+	defer resp.Body.Close()
+
+	var templates struct {
+		Templates []portainer.Template
+	}
+	err = json.NewDecoder(resp.Body).Decode(&templates)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to parse template file", err}
+	}
+
+	for _, t := range templates.Templates {
+		if t.Repository.URL == payload.RepositoryURL && t.Repository.StackFile == payload.ComposeFilePathInRepository {
+			return nil
+		}
+	}
+	return &httperror.HandlerError{http.StatusInternalServerError, "Invalid template", errors.New("requested template does not exist")}
+}
+
 // @id TemplateFile
 // @summary Get a template's file
 // @description Get a template's file
@@ -54,6 +84,10 @@ func (handler *Handler) templateFile(w http.ResponseWriter, r *http.Request) *ht
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+	}
+
+	if err := handler.ifRequestedTemplateExists(&payload); err != nil {
+		return err
 	}
 
 	projectPath, err := handler.FileService.GetTemporaryPath()
