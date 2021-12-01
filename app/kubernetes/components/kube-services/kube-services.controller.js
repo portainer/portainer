@@ -3,8 +3,9 @@ import { KubernetesApplicationPublishingTypes } from 'Kubernetes/models/applicat
 
 export default class KubeServicesViewController {
   /* @ngInject */
-  constructor($async) {
+  constructor($async, EndpointProvider) {
     this.$async = $async;
+    this.EndpointProvider = EndpointProvider;
   }
 
   addEntry(service) {
@@ -93,6 +94,7 @@ export default class KubeServicesViewController {
       ],
       selected: KubernetesApplicationPublishingTypes.CLUSTER_IP,
       nameIndex: this.formValues.Services.length,
+      endpointId: this.EndpointProvider.endpointID(),
     };
   }
 }
