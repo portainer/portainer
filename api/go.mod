@@ -6,6 +6,9 @@ require (
 	github.com/Microsoft/go-winio v0.4.17
 	github.com/alecthomas/units v0.0.0-20210208195552-ff826a37aa15 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535
+	github.com/aws/aws-sdk-go-v2 v1.11.1
+	github.com/aws/aws-sdk-go-v2/credentials v1.6.2
+	github.com/aws/aws-sdk-go-v2/service/ecr v1.10.1
 	github.com/boltdb/bolt v1.3.1
 	github.com/containerd/containerd v1.5.7 // indirect
 	github.com/coreos/go-semver v0.3.0

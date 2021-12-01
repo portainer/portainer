@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/registryutils"
 	"github.com/portainer/portainer/api/internal/stackutils"
 )
 
@@ -22,17 +23,25 @@ type SwarmStackManager struct {
 	signatureService     portainer.DigitalSignatureService
 	fileService          portainer.FileService
 	reverseTunnelService portainer.ReverseTunnelService
+	dataStore            portainer.DataStore
 }
 
 // NewSwarmStackManager initializes a new SwarmStackManager service.
 // It also updates the configuration of the Docker CLI binary.
-func NewSwarmStackManager(binaryPath, configPath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService, reverseTunnelService portainer.ReverseTunnelService) (*SwarmStackManager, error) {
+func NewSwarmStackManager(
+	binaryPath, configPath string,
+	signatureService portainer.DigitalSignatureService,
+	fileService portainer.FileService,
+	reverseTunnelService portainer.ReverseTunnelService,
+	datastore portainer.DataStore,
+) (*SwarmStackManager, error) {
 	manager := &SwarmStackManager{
 		binaryPath:           binaryPath,
 		configPath:           configPath,
 		signatureService:     signatureService,
 		fileService:          fileService,
 		reverseTunnelService: reverseTunnelService,
+		dataStore:            datastore,
 	}
 
 	err := manager.updateDockerCLIConfiguration(manager.configPath)
@@ -51,7 +60,17 @@ func (manager *SwarmStackManager) Login(registries []portainer.Registry, endpoin
 	}
 	for _, registry := range registries {
 		if registry.Authentication {
-			registryArgs := append(args, "login", "--username", registry.Username, "--password", registry.Password, registry.URL)
+			err = registryutils.EnsureRegTokenValid(manager.dataStore, &registry)
+			if err != nil {
+				return err
+			}
+
+			username, password, err := registryutils.GetRegEffectiveCredential(&registry)
+			if err != nil {
+				return err
+			}
+
+			registryArgs := append(args, "login", "--username", username, "--password", password, registry.URL)
 			runCommandAndCaptureStdErr(command, registryArgs, nil, "")
 		}
 	}
