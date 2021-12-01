@@ -2,6 +2,10 @@ package openamt
 
 import (
 	"context"
+	"io/ioutil"
+	"log"
+	"net/http"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
@@ -12,9 +16,6 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/sirupsen/logrus"
-	"io/ioutil"
-	"log"
-	"net/http"
 )
 
 type OpenAMTHostInfo struct {
@@ -58,7 +59,7 @@ func (handler *Handler) openAMTHostInfo(w http.ResponseWriter, r *http.Request) 
 	ctx := context.TODO()
 	// pull the image so we can check if there's a new one
 	// TODO: these should be able to be over-ridden (don't hardcode the assumption that secure users can access Docker Hub, or that its even the orchestrator's "global namespace")
-	cmdLine := []string{"--force-recreate", "--no-cache", "amtinfo", "--json"}
+	cmdLine := []string{"amtinfo", "--json"}
 	output, err := handler.PullAndRunContainer(ctx, endpoint, rpcGoImageName, rpcGoContainerName, cmdLine)
 	if err != nil {
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: output, Err: err}
