@@ -720,7 +720,7 @@ class KubernetesCreateApplicationController {
   }
 
   publishViaLoadBalancerEnabled() {
-    return this.state.useLoadBalancer;
+    return this.state.useLoadBalancer && this.state.maxLoadBalancersQuota !== 0;
   }
 
   publishViaIngressEnabled() {

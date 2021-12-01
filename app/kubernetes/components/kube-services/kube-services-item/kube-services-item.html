@@ -69,7 +69,7 @@
         />
       </div>
 
-      <div ng-if="$ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.LOAD_BALANCER" class="input-group input-group-sm" ng-class="col - sm - 2">
+      <div ng-if="$ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.LOAD_BALANCER" class="input-group input-group-sm">
         <span class="input-group-addon">loadbalancer port</span>
         <input
           type="number"
@@ -85,7 +85,7 @@
         />
       </div>
 
-      <div ng-if="$ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.CLUSTER_IP && $ctrl.ingressType" class="input-group input-group-sm" ng-class="col - sm - 2">
+      <div ng-if="$ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.CLUSTER_IP && $ctrl.ingressType" class="input-group input-group-sm">
         <span class="input-group-addon">ingress</span>
         <select
           ng-init="servicePort.ingress.IngressName = $ctrl.originalIngresses[0].Name"
@@ -101,7 +101,7 @@
         </select>
       </div>
 
-      <div ng-if="$ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.CLUSTER_IP && $ctrl.ingressType" class="input-group input-group-sm" ng-class="col - sm - 2">
+      <div ng-if="$ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.CLUSTER_IP && $ctrl.ingressType" class="input-group input-group-sm">
         <span class="input-group-addon">hostname</span>
         <select
           ng-init="servicePort.ingress.Host = $ctrl.originalIngresses[0].Hosts"
@@ -117,7 +117,7 @@
         </select>
       </div>
 
-      <div ng-if="$ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.CLUSTER_IP && $ctrl.ingressType" class="input-group input-group-sm" ng-class="col - sm - 2">
+      <div ng-if="$ctrl.serviceType === $ctrl.KubernetesApplicationPublishingTypes.CLUSTER_IP && $ctrl.ingressType" class="input-group input-group-sm">
         <span class="input-group-addon">route</span>
         <input
           class="form-control"
@@ -152,61 +152,85 @@
             >UDP</label
           >
         </div>
-        <button ng-show="!$ctrl.multiItemDisable" class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removePort($index)" data-cy="k8sAppCreate-rmPortButton_{{ $index }}">
+        <button
+          ng-disabled="$ctrl.servicePorts.length === 1"
+          ng-show="!$ctrl.multiItemDisable"
+          class="btn btn-sm btn-danger"
+          type="button"
+          ng-click="$ctrl.removePort($index)"
+          data-cy="k8sAppCreate-rmPortButton_{{ $index }}"
+        >
           <i class="fa fa-trash-alt" aria-hidden="true"></i>
         </button>
       </div>
 
-      <div class="small text-warning" style="margin-top: 5px;">
-        <p ng-if="$ctrl.state.duplicates.servicePort.refs[$index] !== undefined">
-          <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This service port is already used.
-        </p>
-      </div>
-      <div class="small text-warning" style="margin-top: 5px;">
-        <p ng-if="$ctrl.state.duplicates.targetPort.refs[$index] !== undefined">
-          <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This container port is already used.
-        </p>
-      </div>
+      <div class="col-sm-12 input-group input-group-sm">
+        <div class="col-sm-2">
+          <div class="small text-warning" style="margin-top: 5px;">
+            <p ng-if="$ctrl.state.duplicates.targetPort.refs[$index] !== undefined">
+              <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This container port is already used.
+            </p>
+          </div>
+          <div class="small text-warning" ng-messages="serviceForm['container_port_'+$index].$error">
+            <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Container port number is required.</p>
+            <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Container port number must be inside the range 1-65535.</p>
+            <p ng-message="max"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Container port number must be inside the range 1-65535.</p>
+          </div>
+        </div>
 
-      <div class="small text-warning" style="margin-top: 5px;">
-        <div ng-messages="serviceForm['container_port_'+$index].$error">
-          <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Container port number is required.</p>
-          <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Container port number must be inside the range 1-65535.</p>
-          <p ng-message="max"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Container port number must be inside the range 1-65535.</p>
+        <div class="col-sm-2">
+          <div class="small text-warning" style="margin-top: 5px;">
+            <p ng-if="$ctrl.state.duplicates.servicePort.refs[$index] !== undefined">
+              <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This service port is already used.
+            </p>
+          </div>
+          <div class="small text-warning" style="margin-top: 5px;">
+            <div ng-messages="serviceForm['service_port_'+$index].$error">
+              <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Service port number is required.</p>
+              <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Container port number must be inside the range 1-65535.</p>
+              <p ng-message="max"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Container port number must be inside the range 1-65535.</p>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="small text-warning" style="margin-top: 5px;">
-        <div ng-messages="serviceForm['service_port_'+$index].$error">
-          <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Service port number is required.</p>
-          <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Container port number must be inside the range 1-65535.</p>
-          <p ng-message="max"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Container port number must be inside the range 1-65535.</p>
-        </div>
-      </div>
-      <div class="small text-warning" style="margin-top: 5px;">
-        <div ng-messages="serviceForm['node_port_'+$index].$error">
-          <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Node port number must be inside the range 30000-32767 or blank for system allocated.</p>
-          <p ng-message="max"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Node port number must be inside the range 30000-32767 or blank for system allocated.</p>
-        </div>
-      </div>
-      <div class="small text-warning" style="margin-top: 5px;">
-        <div ng-messages="serviceForm['route_port_'+$index].$error">
-          <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Route is required.</p>
-        </div>
-      </div>
 
-      <div class="small text-warning" style="margin-top: 5px;">
-        <div ng-messages="serviceForm['hostname_port_'+$index].$error">
-          <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Host is required.</p>
+        <div class="col-sm-6">
+          <div class="small text-warning" style="margin-top: 5px;">
+            <div ng-messages="serviceForm['node_port_'+$index].$error">
+              <p ng-message="min"
+                ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Node port number must be inside the range 30000-32767 or blank for system allocated.</p
+              >
+              <p ng-message="max"
+                ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Node port number must be inside the range 30000-32767 or blank for system allocated.</p
+              >
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="small text-warning" style="margin-top: 5px;">
-        <div ng-messages="serviceForm['ingress_route_'+$index].$error">
-          <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Route is required.</p>
-          <p ng-message="pattern"
-            ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of alphanumeric characters or the special characters: '-', '_' or '/'. It must
-            start and end with an alphanumeric character (e.g. 'my-route', or 'route-123').</p
-          >
+        <div class="col-sm-2">
+          <div class="small text-warning" style="margin-top: 5px;">
+            <div ng-messages="serviceForm['ingress_port_'+$index].$error">
+              <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Ingress selection is required.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-sm-2">
+          <div class="small text-warning" style="margin-top: 5px;">
+            <div ng-messages="serviceForm['hostname_port_'+$index].$error">
+              <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Host is required.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-8" ng-show="">
+          <div class="small text-warning" style="margin-top: 5px;">
+            <div ng-messages="serviceForm['ingress_route_'+$index].$error">
+              <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Route is required.</p>
+              <p ng-message="pattern"
+                ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of alphanumeric characters or the special characters: '-', '_' or '/'. It
+                must start and end with an alphanumeric character (e.g. 'my-route', or 'route-123').</p
+              >
+            </div>
+          </div>
         </div>
       </div>
     </div>
