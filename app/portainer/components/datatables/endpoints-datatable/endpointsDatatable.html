@@ -17,6 +17,16 @@
         <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.endpoints.new" data-cy="endpoint-addEndpointButton">
           <i class="fa fa-plus space-right" aria-hidden="true"></i>Add environment
         </button>
+        <button
+          type="button"
+          class="btn btn-sm btn-primary"
+          ng-show="$ctrl.state.showAMTInfo"
+          ng-disabled="$ctrl.state.selectedItemCount === 0"
+          ng-click="$ctrl.associateOpenAMT($ctrl.state.selectedItems)"
+          data-cy="endpoint-associateOpenAMTButton"
+        >
+          <i class="fa fa-link space-right" aria-hidden="true"></i>Associate with OpenAMT
+        </button>
       </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
@@ -74,7 +84,6 @@
           </thead>
           <tbody>
             <tr
-              ng-click="$ctrl.expandItem(item, !item.Expanded)"
               dir-paginate-start="item in $ctrl.state.filteredDataSet | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit"
               total-items="$ctrl.state.totalFilteredDataSet"
               ng-class="{ active: item.Checked }"
@@ -87,7 +96,7 @@
               </td>
               <td>
                 <a ui-sref="portainer.endpoints.endpoint({id: item.Id})">{{ item.Name }}</a>
-                <a style="float: right;" ng-show="$ctrl.showAMTNodes(item)">
+                <a style="float: right;" ng-show="$ctrl.showAMTNodes(item)" ng-click="$ctrl.expandItem(item, !item.Expanded)">
                   <i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i>
                 </a>
               </td>
