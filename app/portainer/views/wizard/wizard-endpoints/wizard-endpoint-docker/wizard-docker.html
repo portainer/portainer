@@ -1,6 +1,12 @@
 <form class="form-horizontal" name="dockerWizardForm">
   <!-- docker tab selection -->
-  <box-selector radio-name="Docker" ng-click="$ctrl.clearForm()" ng-model="$ctrl.state.endpointType" options="$ctrl.state.availableOptions"></box-selector>
+  <box-selector
+    radio-name="'Docker'"
+    ng-click="$ctrl.clearForm()"
+    value="$ctrl.state.endpointType"
+    options="$ctrl.state.availableOptions"
+    on-change="($ctrl.onChangeEndpointType)"
+  ></box-selector>
   <!-- docker tab selection -->
   <div style="padding-left: 10px;">
     <div class="form-group">

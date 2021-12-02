@@ -1,4 +1,4 @@
-import { buildOption } from '@/portainer/components/box-selector';
+import { buildOption } from '@/portainer/components/BoxSelector';
 
 export default class WizardAciController {
   /* @ngInject */
@@ -7,6 +7,24 @@ export default class WizardAciController {
     this.EndpointService = EndpointService;
     this.Notifications = Notifications;
     this.NameValidator = NameValidator;
+
+    this.state = {
+      actionInProgress: false,
+      endpointType: 'api',
+      availableOptions: [buildOption('API', 'fa fa-bolt', 'API', '', 'api')],
+    };
+    this.formValues = {
+      name: '',
+      azureApplicationId: '',
+      azureTenantId: '',
+      azureAuthenticationKey: '',
+    };
+
+    this.onChangeEndpointType = this.onChangeEndpointType.bind(this);
+  }
+
+  onChangeEndpointType(endpointType) {
+    this.state.endpointType = endpointType;
   }
 
   addAciEndpoint() {
@@ -43,21 +61,5 @@ export default class WizardAciController {
       azureTenantId: '',
       azureAuthenticationKey: '',
     };
-  }
-
-  $onInit() {
-    return this.$async(async () => {
-      this.state = {
-        actionInProgress: false,
-        endpointType: 'api',
-        availableOptions: [buildOption('API', 'fa fa-bolt', 'API', '', 'api')],
-      };
-      this.formValues = {
-        name: '',
-        azureApplicationId: '',
-        azureTenantId: '',
-        azureAuthenticationKey: '',
-      };
-    });
   }
 }

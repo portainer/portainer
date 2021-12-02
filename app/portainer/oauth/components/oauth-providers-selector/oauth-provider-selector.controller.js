@@ -1,4 +1,4 @@
-import { buildOption } from '@/portainer/components/box-selector';
+import { buildOption } from '@/portainer/components/BoxSelector';
 import { FeatureId } from '@/portainer/feature-flags/enums';
 
 export default class OAuthProviderSelectorController {

@@ -10,8 +10,8 @@
   <rd-widget-header icon="fa-palette" title-text="Change user theme"></rd-widget-header>
   <rd-widget-body>
     <form class="theme-panel">
-      <!-- Theme -->
-      <box-selector radio-name="theme" ng-model="$ctrl.state.userTheme" options="$ctrl.state.availableThemes" on-change="($ctrl.setTheme)"></box-selector>
+      <!-- Theme Selector-->
+      <box-selector radio-name="'theme'" value="$ctrl.state.userTheme" options="$ctrl.state.availableThemes" on-change="($ctrl.setTheme)"></box-selector>
       <button ng-click="$ctrl.updateTheme()" class="btn btn-primary btn-sm">Update theme</button>
       <!-- !Theme -->
     </form>
