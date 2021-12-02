@@ -7,6 +7,8 @@ import { buildLdapSettingsModel, buildAdSettingsModel } from '@/portainer/settin
 angular.module('portainer.app').controller('SettingsAuthenticationController', SettingsAuthenticationController);
 
 function SettingsAuthenticationController($q, $scope, $state, Notifications, SettingsService, FileUploadService, TeamService, LDAPService) {
+  $scope.authMethod = 1;
+
   $scope.state = {
     uploadInProgress: false,
     actionInProgress: false,
@@ -52,6 +54,8 @@ function SettingsAuthenticationController($q, $scope, $state, Notifications, Set
   ];
 
   $scope.onChangeAuthMethod = function onChangeAuthMethod(value) {
+    $scope.authMethod = value;
+
     if (value === 4) {
       $scope.settings.AuthenticationMethod = 2;
       $scope.formValues.ldap.serverType = 2;
