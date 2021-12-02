@@ -70,11 +70,11 @@ func parseError(responseBody []byte) error {
 }
 
 func (service *Service) ConfigureDefault(configuration portainer.OpenAMTConfiguration) error {
-	token, err := service.executeAuthenticationRequest(configuration)
+	token, err := service.Authorization(configuration)
 	if err != nil {
 		return err
 	}
-	configuration.Credentials.MPSToken = token.Token
+	configuration.Credentials.MPSToken = token
 
 	ciraConfig, err := service.createOrUpdateCIRAConfig(configuration, defaultCIRAConfigName)
 	if err != nil {
@@ -164,11 +164,11 @@ func (service *Service) executeGetRequest(url string, token string) ([]byte, err
 }
 
 func (service *Service) DeviceInformation(configuration portainer.OpenAMTConfiguration, deviceGUID string) (*portainer.OpenAMTDeviceInformation, error) {
-	token, err := service.executeAuthenticationRequest(configuration)
+	token, err := service.Authorization(configuration)
 	if err != nil {
 		return nil, err
 	}
-	configuration.Credentials.MPSToken = token.Token
+	configuration.Credentials.MPSToken = token
 
 	amtErrors := make(chan error)
 	wgDone := make(chan bool)
@@ -229,11 +229,11 @@ func (service *Service) ExecuteDeviceAction(configuration portainer.OpenAMTConfi
 		return err
 	}
 
-	token, err := service.executeAuthenticationRequest(configuration)
+	token, err := service.Authorization(configuration)
 	if err != nil {
 		return err
 	}
-	configuration.Credentials.MPSToken = token.Token
+	configuration.Credentials.MPSToken = token
 
 	err = service.executeDeviceAction(configuration, deviceGUID, int(parsedAction))
 	if err != nil {
