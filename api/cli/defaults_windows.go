@@ -19,4 +19,5 @@ const (
 	defaultSSLKeyPath          = "C:\\certs\\portainer.key"
 	defaultSnapshotInterval    = "5m"
 	defaultBaseURL             = "/"
+	defaultSecretKeyName       = "portainer"
 )
