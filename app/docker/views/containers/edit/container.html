@@ -14,25 +14,29 @@
       <rd-widget-header icon="fa-cogs" title-text="Actions"></rd-widget-header>
       <rd-widget-body classes="padding">
         <div class="btn-group" role="group" aria-label="...">
-          <button authorization="DockerContainerStart" class="btn btn-success btn-sm" ng-click="start()" ng-disabled="container.State.Running"
+          <button authorization="DockerContainerStart" class="btn btn-success btn-sm" ng-click="start()" ng-disabled="container.State.Running || container.IsPortainer"
             ><i class="fa fa-play space-right" aria-hidden="true"></i>Start</button
           >
-          <button authorization="DockerContainerStop" class="btn btn-danger btn-sm" ng-click="stop()" ng-disabled="!container.State.Running"
+          <button authorization="DockerContainerStop" class="btn btn-danger btn-sm" ng-click="stop()" ng-disabled="!container.State.Running || container.IsPortainer"
             ><i class="fa fa-stop space-right" aria-hidden="true"></i>Stop</button
           >
-          <button authorization="DockerContainerKill" class="btn btn-danger btn-sm" ng-click="kill()" ng-disabled="!container.State.Running"
+          <button authorization="DockerContainerKill" class="btn btn-danger btn-sm" ng-click="kill()" ng-disabled="!container.State.Running || container.IsPortainer"
             ><i class="fa fa-bomb space-right" aria-hidden="true"></i>Kill</button
           >
-          <button authorization="DockerContainerRestart" class="btn btn-primary btn-sm" ng-click="restart()" ng-disabled="!container.State.Running"
+          <button authorization="DockerContainerRestart" class="btn btn-primary btn-sm" ng-click="restart()" ng-disabled="!container.State.Running || container.IsPortainer"
             ><i class="fa fa-sync space-right" aria-hidden="true"></i>Restart</button
           >
-          <button authorization="DockerContainerPause" class="btn btn-primary btn-sm" ng-click="pause()" ng-disabled="!container.State.Running || container.State.Paused"
+          <button
+            authorization="DockerContainerPause"
+            class="btn btn-primary btn-sm"
+            ng-click="pause()"
+            ng-disabled="!container.State.Running || container.State.Paused || container.IsPortainer"
             ><i class="fa fa-pause space-right" aria-hidden="true"></i>Pause</button
           >
-          <button authorization="DockerContainerUnpause" class="btn btn-primary btn-sm" ng-click="unpause()" ng-disabled="!container.State.Paused"
+          <button authorization="DockerContainerUnpause" class="btn btn-primary btn-sm" ng-click="unpause()" ng-disabled="!container.State.Paused || container.IsPortainer"
             ><i class="fa fa-play space-right" aria-hidden="true"></i>Resume</button
           >
-          <button authorization="DockerContainerDelete" class="btn btn-danger btn-sm" ng-click="confirmRemove()"
+          <button authorization="DockerContainerDelete" class="btn btn-danger btn-sm" ng-click="confirmRemove()" ng-disabled="container.IsPortainer"
             ><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove</button
           >
         </div>
@@ -40,7 +44,7 @@
           <button
             type="button"
             class="btn btn-danger btn-sm"
-            ng-disabled="state.recreateContainerInProgress"
+            ng-disabled="state.recreateContainerInProgress || container.IsPortainer"
             ng-click="recreate()"
             button-spinner="state.recreateContainerInProgress"
           >

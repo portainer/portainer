@@ -168,7 +168,8 @@
               <button
                 type="button"
                 class="btn btn-primary btn-sm"
-                ng-disabled="state.actionInProgress || !formValues.RegistryModel.Image || (!formValues.RegistryModel.Registry && fromContainer)"
+                ng-disabled="state.actionInProgress || !formValues.RegistryModel.Image || (!formValues.RegistryModel.Registry && fromContainer)
+                             || (fromContainer.IsPortainer && fromContainer.Name === '/' + config.name)"
                 ng-click="create()"
                 button-spinner="state.actionInProgress"
               >
