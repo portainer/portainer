@@ -15,13 +15,15 @@ import (
 )
 
 const (
-	DefaultCIRAConfigName     = "ciraConfigDefault"
-	DefaultWirelessConfigName = "wirelessProfileDefault"
-	DefaultProfileName        = "profileAMTDefault"
+	defaultCIRAConfigName     = "ciraConfigDefault"
+	defaultWirelessConfigName = "wirelessProfileDefault"
+	defaultProfileName        = "profileAMTDefault"
 
-	PowerUpState  portainer.PowerState = 2
-	PowerOffState portainer.PowerState = 8
-	RestartState  portainer.PowerState = 5
+	httpClientTimeout = 30
+
+	powerUpState  portainer.PowerState = 2
+	powerOffState portainer.PowerState = 8
+	restartState  portainer.PowerState = 5
 )
 
 // Service represents a service for managing an OpenAMT server.
@@ -36,7 +38,7 @@ func NewService(dataStore portainer.DataStore) *Service {
 	}
 	return &Service{
 		httpsClient: &http.Client{
-			Timeout: time.Second * time.Duration(60),
+			Timeout: time.Second * time.Duration(httpClientTimeout),
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			},
@@ -74,21 +76,21 @@ func (service *Service) ConfigureDefault(configuration portainer.OpenAMTConfigur
 	}
 	configuration.Credentials.MPSToken = token.Token
 
-	ciraConfig, err := service.createOrUpdateCIRAConfig(configuration, DefaultCIRAConfigName)
+	ciraConfig, err := service.createOrUpdateCIRAConfig(configuration, defaultCIRAConfigName)
 	if err != nil {
 		return err
 	}
 
 	wirelessConfigName := ""
 	if configuration.WirelessConfiguration != nil {
-		wirelessConfig, err := service.createOrUpdateWirelessConfig(configuration, DefaultWirelessConfigName)
+		wirelessConfig, err := service.createOrUpdateWirelessConfig(configuration, defaultWirelessConfigName)
 		if err != nil {
 			return err
 		}
 		wirelessConfigName = wirelessConfig.ProfileName
 	}
 
-	_, err = service.createOrUpdateAMTProfile(configuration, DefaultProfileName, ciraConfig.ConfigName, wirelessConfigName)
+	_, err = service.createOrUpdateAMTProfile(configuration, defaultProfileName, ciraConfig.ConfigName, wirelessConfigName)
 	if err != nil {
 		return err
 	}

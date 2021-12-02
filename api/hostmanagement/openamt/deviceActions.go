@@ -45,11 +45,11 @@ func (service *Service) executeDeviceAction(configuration portainer.OpenAMTConfi
 func parseAction(actionRaw string) (portainer.PowerState, error) {
 	switch strings.ToLower(actionRaw) {
 	case "power up":
-		return PowerUpState, nil
+		return powerUpState, nil
 	case "power off":
-		return PowerOffState, nil
+		return powerOffState, nil
 	case "restart":
-		return RestartState, nil
+		return restartState, nil
 	}
 	return 0, fmt.Errorf("unsupported device action %s", actionRaw)
 }

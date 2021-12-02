@@ -84,7 +84,7 @@ func (service *Service) saveAMTProfile(method string, configuration portainer.Op
 		profile.WIFIConfigs = []ProfileWifiConfig{
 			{
 				Priority:    1,
-				ProfileName: DefaultWirelessConfigName,
+				ProfileName: defaultWirelessConfigName,
 			},
 		}
 	}
