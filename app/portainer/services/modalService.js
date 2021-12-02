@@ -82,20 +82,6 @@ angular.module('portainer.app').factory('ModalService', [
       applyBoxCSS(box);
     }
 
-    service.confirmWithInput = function (message, callback) {
-      prompt({
-        title: message,
-        inputType: 'text',
-        buttons: {
-          confirm: {
-            label: 'Associate',
-            className: 'btn-primary',
-          },
-        },
-        callback: callback,
-      });
-    };
-
     function customCheckboxPrompt(options) {
       var box = bootbox.prompt({
         title: options.title,

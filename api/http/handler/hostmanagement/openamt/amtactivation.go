@@ -13,9 +13,9 @@ import (
 	"github.com/portainer/portainer/api/internal/endpointutils"
 )
 
-// @id openAMTAssociate
+// @id openAMTActivate
 // @summary Activate OpenAMT device and associate to agent endpoint
-// @description Activate OpenAMT device and associate to agent endpointint
+// @description Activate OpenAMT device and associate to agent endpoint
 // @description **Access policy**: administrator
 // @tags intel
 // @security jwt
@@ -25,15 +25,9 @@ import (
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied to access settings"
 // @failure 500 "Server error"
-// @router /open_amt/{id}/associate [post]
-func (handler *Handler) openAMTAssociate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+// @router /open_amt/{id}/activate [post]
+func (handler *Handler) openAMTActivate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
-	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment identifier route variable", err}
-	}
-
-	// TODO: retrieve this from RPC amtinfo
-	deviceID, err := request.RetrieveRouteVariableValue(r, "deviceId")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid environment identifier route variable", err}
 	}
@@ -48,17 +42,25 @@ func (handler *Handler) openAMTAssociate(w http.ResponseWriter, r *http.Request)
 		return &httperror.HandlerError{http.StatusBadRequest, errMsg, errors.New(errMsg)}
 	}
 
-	_, err = handler.DataStore.Settings().Settings()
+	hostInfo, _, err := handler.getEndpointAMTInfo(endpoint)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve AMT information", Err: err}
+	}
+	if hostInfo.UUID == "" {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve Device UUID", Err: errors.New("Unable to retrieve Device UUID")}
+	}
+
+	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
 	}
 
-	/* device, err := handler.OpenAMTService.ActivateDevice(settings.OpenAMTConfiguration, endpoint.AMTDeviceGUID)
+	err = handler.activateDevice(endpoint, *settings)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve device information", err}
-	} */
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to activate device", err}
+	}
 
-	endpoint.AMTDeviceGUID = deviceID
+	endpoint.AMTDeviceGUID = hostInfo.UUID
 	err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist environment changes inside the database", err}

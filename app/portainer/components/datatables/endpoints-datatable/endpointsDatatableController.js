@@ -96,12 +96,31 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
     };
 
     this.associateOpenAMT = function (endpoints) {
-      ModalService.confirmWithInput('This operation will associate the selected environments with OpenAMT', (confirmed) => {
-        if (!confirmed) {
-          return;
-        }
-        const deviceId = confirmed; // TODO this is done for testing
-        return this.associateOpenAMTAsync(endpoints, deviceId);
+      ModalService.confirm({
+        title: 'Are you sure?',
+        message: 'This operation will associate the selected environments with OpenAMT.',
+        buttons: {
+          confirm: {
+            label: 'Associate',
+            className: 'btn-primary',
+          },
+        },
+        callback: async function onConfirm(confirmed) {
+          if (!confirmed) {
+            return;
+          }
+          for (let endpoint of endpoints) {
+            try {
+              await OpenAMTService.activateDevice(endpoint.Id);
+
+              Notifications.success('Successfully associated with OpenAMT', endpoint.Name);
+            } catch (err) {
+              Notifications.error('Failure', err, 'Unable to associate with OpenAMT');
+            }
+          }
+
+          $state.reload();
+        },
       });
     };
 

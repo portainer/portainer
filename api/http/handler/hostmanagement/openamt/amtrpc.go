@@ -3,9 +3,13 @@ package openamt
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
+	"github.com/docker/docker/api/types/filters"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -62,21 +66,31 @@ func (handler *Handler) openAMTHostInfo(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to find an endpoint with the specified identifier inside the database", Err: err}
 	}
 
+	amtInfo, output, err := handler.getEndpointAMTInfo(endpoint)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: output, Err: err}
+	}
+
+	return response.JSON(w, amtInfo)
+}
+
+func (handler *Handler) getEndpointAMTInfo(endpoint *portainer.Endpoint) (*HostInfo, string, error) {
 	ctx := context.TODO()
+
 	// pull the image so we can check if there's a new one
 	// TODO: these should be able to be over-ridden (don't hardcode the assumption that secure users can access Docker Hub, or that its even the orchestrator's "global namespace")
 	cmdLine := []string{"amtinfo", "--json"}
 	output, err := handler.PullAndRunContainer(ctx, endpoint, rpcGoImageName, rpcGoContainerName, cmdLine)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: output, Err: err}
+		return nil, output, err
 	}
 
 	amtInfo := HostInfo{}
 	_ = json.Unmarshal([]byte(output), &amtInfo)
-	amtInfo.EndpointID = portainer.EndpointID(endpointID)
+	amtInfo.EndpointID = portainer.EndpointID(endpoint.ID)
 	amtInfo.RawOutput = output
 
-	return response.JSON(w, amtInfo)
+	return &amtInfo, "", nil
 }
 
 func (handler *Handler) PullAndRunContainer(ctx context.Context, endpoint *portainer.Endpoint, imageName, containerName string, cmdLine []string) (output string, err error) {
@@ -135,6 +149,24 @@ func pullImage(ctx context.Context, docker *client.Client, imageName string) err
 // TODO: add k8s support
 func runContainer(ctx context.Context, docker *client.Client, imageName, containerName string, cmdLine []string) (output string, err error) {
 	envs := []string{}
+
+	opts := types.ContainerListOptions{All: true}
+	opts.Filters = filters.NewArgs()
+	opts.Filters.Add("name", containerName)
+	existingContainers, err := docker.ContainerList(ctx, opts)
+	if err != nil {
+		logrus.WithError(err).WithField("imagename", imageName).WithField("containername", containerName).Error("listing existing container")
+		return "", err
+	}
+
+	if len(existingContainers) > 0 {
+		err = docker.ContainerRemove(ctx, existingContainers[0].ID, types.ContainerRemoveOptions{Force: true})
+		if err != nil {
+			logrus.WithError(err).WithField("imagename", imageName).WithField("containername", containerName).Error("removing existing container")
+			return "", err
+		}
+	}
+
 	created, err := docker.ContainerCreate(
 		ctx,
 		&container.Config{
@@ -196,4 +228,29 @@ func runContainer(ctx context.Context, docker *client.Client, imageName, contain
 		return "", err
 	}
 	return string(outputBytes), nil
+}
+
+func (handler *Handler) activateDevice(endpoint *portainer.Endpoint, settings portainer.Settings) error {
+	ctx := context.TODO()
+
+	config := settings.OpenAMTConfiguration
+	cmdLine := []string{
+		"activate", "-json",
+		"-u", fmt.Sprintf("wss://%s/activate", config.MPSServer),
+		"-profile", "profileAMTDefault", // TODO save this value in settings
+		"-d", config.DomainConfiguration.DomainName,
+		"-password", config.Credentials.MPSPassword, // TODO works because this is the password used in saveAMTProfile,
+		"-n",
+	}
+	output, err := handler.PullAndRunContainer(ctx, endpoint, rpcGoImageName, rpcGoContainerName, cmdLine)
+	if err != nil {
+		return err
+	}
+
+	activated := strings.Contains(output, "CIRA: Configured")
+	if !activated {
+		return errors.New("failed to activate device")
+	}
+
+	return nil
 }
