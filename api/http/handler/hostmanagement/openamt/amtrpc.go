@@ -235,12 +235,12 @@ func (handler *Handler) activateDevice(endpoint *portainer.Endpoint, settings po
 
 	config := settings.OpenAMTConfiguration
 	cmdLine := []string{
-		"activate", "-json",
+		"activate",
+		"-n",
 		"-u", fmt.Sprintf("wss://%s/activate", config.MPSServer),
 		"-profile", "profileAMTDefault", // TODO save this value in settings
 		"-d", config.DomainConfiguration.DomainName,
 		"-password", config.Credentials.MPSPassword,
-		"-n",
 	}
 
 
@@ -257,10 +257,10 @@ func (handler *Handler) deactivateDevice(endpoint *portainer.Endpoint, settings 
 
 	config := settings.OpenAMTConfiguration
 	cmdLine := []string{
-		"deactivate", "-json",
-		"-u", fmt.Sprintf("wss://%s/activate", config.MPSServer),
-		"-password", config.Credentials.MPSPassword, // TODO works because this is the password used in saveAMTProfile,
+		"deactivate",
 		"-n",
+		"-u", fmt.Sprintf("wss://%s/activate", config.MPSServer),
+		"-password", config.Credentials.MPSPassword,
 	}
 	_, err := handler.PullAndRunContainer(ctx, endpoint, rpcGoImageName, rpcGoContainerName, cmdLine)
 	if err != nil {

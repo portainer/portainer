@@ -3,7 +3,6 @@ package openamt
 import (
 	"errors"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -67,7 +66,7 @@ func (handler *Handler) openAMTActivate(w http.ResponseWriter, r *http.Request) 
 
 	err = handler.OpenAMTService.EnableDeviceFeatures(settings.OpenAMTConfiguration, hostInfo.UUID)
 	if err != nil {
-		logrus.WithError(err).WithField("uuid", hostInfo.UUID).Error("Could not enable AMT features on device")
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to enable AMT Features", Err: errors.New("unable to enable AMT Features")}
 	}
 
 	endpoint.AMTDeviceGUID = hostInfo.UUID

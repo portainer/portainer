@@ -14,9 +14,9 @@ func (service *Service) enableDeviceFeatures(configuration portainer.OpenAMTConf
 		"enableIDER":  true,
 		"enableKVM":   true,
 		"enableSOL":   true,
+		"redirection": true,
 		"userConsent": "none",
 		"optInState":  0,
-		"redirection": false,
 	}
 	jsonValue, _ := json.Marshal(payload)
 
