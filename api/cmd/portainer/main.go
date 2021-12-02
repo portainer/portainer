@@ -458,10 +458,30 @@ func initEndpoint(flags *portainer.CLIFlags, dataStore portainer.DataStore, snap
 	return createUnsecuredEndpoint(*flags.EndpointURL, dataStore, snapshotService)
 }
 
+func initSecretKey(fileName string) string {
+	ok, _ := filesystem.FileExists("/run/secrets/" + fileName)
+	if !ok {
+		log.Println(fmt.Sprintf("encryption secret file `%s` does not exists", fileName))
+		return ""
+	}
+
+	content, err := os.ReadFile("/run/secrets/" + fileName)
+	if err != nil {
+		log.Println(fmt.Sprintf("error reading encryption key file: %s", err.Error()))
+		return ""
+	}
+
+	return string(content)
+}
+
 func buildServer(flags *portainer.CLIFlags) portainer.Server {
 	shutdownCtx, shutdownTrigger := context.WithCancel(context.Background())
 
 	fileService := initFileService(*flags.Data)
+	encryptionKey := initSecretKey(*flags.SecretKeyName)
+	if encryptionKey == "" {
+		log.Println("proceeding without encryption key")
+	}
 
 	dataStore := initDataStore(*flags.Data, *flags.Rollback, fileService, shutdownCtx)
 

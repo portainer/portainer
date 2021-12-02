@@ -95,6 +95,7 @@ type (
 		SSLKey                    *string
 		Rollback                  *bool
 		SnapshotInterval          *string
+		SecretKeyName             *string
 	}
 
 	// CustomTemplate represents a custom template
