@@ -118,8 +118,8 @@ func (handler *Handler) PullAndRunContainer(ctx context.Context, endpoint *porta
 }
 
 // TODO: ideally, pullImage and runContainer will become a simple version of the use compose abstraction that can be called from withing Portainer.
-// TODO: the idea being that if we have an internal struct of a parsed compose file, we can also populate that struct programatically, and run it to get the result I'm getting here.
-// TODO: likeley an upgrade and abstraction of DeployComposeStack/DeploySwarmStack/DeployKubernetesStack
+// TODO: the idea being that if we have an internal struct of a parsed compose file, we can also populate that struct programmatically, and run it to get the result I'm getting here.
+// TODO: likely an upgrade and abstraction of DeployComposeStack/DeploySwarmStack/DeployKubernetesStack
 // pullImage will pull the image to the specified environment
 // TODO: add k8s implementation
 // TODO: work out registry auth
@@ -146,7 +146,6 @@ func pullImage(ctx context.Context, docker *client.Client, imageName string) err
 // runContainer should be used to run a short command that returns information to stdout
 // TODO: add k8s support
 func runContainer(ctx context.Context, docker *client.Client, imageName, containerName string, cmdLine []string) (output string, err error) {
-	envs := []string{}
 
 	opts := types.ContainerListOptions{All: true}
 	opts.Filters = filters.NewArgs()
@@ -170,7 +169,7 @@ func runContainer(ctx context.Context, docker *client.Client, imageName, contain
 		&container.Config{
 			Image:        imageName,
 			Cmd:          cmdLine,
-			Env:          envs,
+			Env:          []string{},
 			Tty:          true,
 			OpenStdin:    true,
 			AttachStdout: true,
@@ -225,6 +224,9 @@ func runContainer(ctx context.Context, docker *client.Client, imageName, contain
 		logrus.WithError(err).WithField("imagename", imageName).WithField("containername", containerName).Error("read container output")
 		return "", err
 	}
+
+	log.Printf("%s container finished with output:\n%s", containerName, string(outputBytes))
+
 	return string(outputBytes), nil
 }
 
@@ -237,9 +239,11 @@ func (handler *Handler) activateDevice(endpoint *portainer.Endpoint, settings po
 		"-u", fmt.Sprintf("wss://%s/activate", config.MPSServer),
 		"-profile", "profileAMTDefault", // TODO save this value in settings
 		"-d", config.DomainConfiguration.DomainName,
-		"-password", config.Credentials.MPSPassword, // TODO works because this is the password used in saveAMTProfile,
+		"-password", config.Credentials.MPSPassword,
 		"-n",
 	}
+
+
 	_, err := handler.PullAndRunContainer(ctx, endpoint, rpcGoImageName, rpcGoContainerName, cmdLine)
 	if err != nil {
 		return err
