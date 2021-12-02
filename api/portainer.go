@@ -1097,6 +1097,7 @@ type (
 		Token       string      `json:"Token"`
 		ResourceID  string      `json:"ResourceId"`
 		EndpointID  EndpointID  `json:"EndpointId"`
+		RegistryID  RegistryID  `json:"RegistryId"`
 		WebhookType WebhookType `json:"Type"`
 	}
 

@@ -2,6 +2,8 @@ package webhooks
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/registryutils"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -16,6 +18,7 @@ import (
 type webhookCreatePayload struct {
 	ResourceID  string
 	EndpointID  int
+	RegistryID portainer.RegistryID
 	WebhookType int
 }
 
@@ -60,6 +63,27 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusConflict, "A webhook for this resource already exists", errors.New("A webhook for this resource already exists")}
 	}
 
+	endpointID := portainer.EndpointID(payload.EndpointID)
+
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
+	if err == bolterrors.ErrObjectNotFound {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an environment with the specified identifier inside the database", err}
+	} else if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an environment with the specified identifier inside the database", err}
+	}
+
+	if payload.RegistryID != 0 {
+		tokenData, err := security.RetrieveTokenData(r)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user authentication token", err}
+		}
+
+		_, err = registryutils.GetAccessibleRegistry(handler.DataStore, tokenData.ID, endpointID, payload.RegistryID)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusForbidden, "Permission deny to access registry", err}
+		}
+	}
+
 	token, err := uuid.NewV4()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Error creating unique token", err}
@@ -68,7 +92,8 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 	webhook = &portainer.Webhook{
 		Token:       token.String(),
 		ResourceID:  payload.ResourceID,
-		EndpointID:  portainer.EndpointID(payload.EndpointID),
+		EndpointID:  endpointID,
+		RegistryID:  payload.RegistryID,
 		WebhookType: portainer.WebhookType(payload.WebhookType),
 	}
 
