@@ -3,16 +3,10 @@ package openamt
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"github.com/docker/docker/api/types/filters"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"strings"
-
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	httperror "github.com/portainer/libhttp/error"
@@ -21,16 +15,20 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/sirupsen/logrus"
+	"io/ioutil"
+	"log"
+	"net/http"
 )
 
 type HostInfo struct {
-	EndpointID  portainer.EndpointID `json:"EndpointID"`
-	RawOutput   string               `json:"RawOutput"`
-	AMT         string               `json:"AMT"`
-	UUID        string               `json:"UUID"`
-	DNSSuffix   string               `json:"DNS Suffix"`
-	BuildNumber string               `json:"Build Number"`
-	ControlMode string               `json:"Control Mode"`
+	EndpointID     portainer.EndpointID `json:"EndpointID"`
+	RawOutput      string               `json:"RawOutput"`
+	AMT            string               `json:"AMT"`
+	UUID           string               `json:"UUID"`
+	DNSSuffix      string               `json:"DNS Suffix"`
+	BuildNumber    string               `json:"Build Number"`
+	ControlMode    string               `json:"Control Mode"`
+	ControlModeRaw int                  `json:"Control Mode (Raw)"`
 }
 
 const (
@@ -87,7 +85,7 @@ func (handler *Handler) getEndpointAMTInfo(endpoint *portainer.Endpoint) (*HostI
 
 	amtInfo := HostInfo{}
 	_ = json.Unmarshal([]byte(output), &amtInfo)
-	amtInfo.EndpointID = portainer.EndpointID(endpoint.ID)
+	amtInfo.EndpointID = endpoint.ID
 	amtInfo.RawOutput = output
 
 	return &amtInfo, "", nil
@@ -242,14 +240,27 @@ func (handler *Handler) activateDevice(endpoint *portainer.Endpoint, settings po
 		"-password", config.Credentials.MPSPassword, // TODO works because this is the password used in saveAMTProfile,
 		"-n",
 	}
-	output, err := handler.PullAndRunContainer(ctx, endpoint, rpcGoImageName, rpcGoContainerName, cmdLine)
+	_, err := handler.PullAndRunContainer(ctx, endpoint, rpcGoImageName, rpcGoContainerName, cmdLine)
 	if err != nil {
 		return err
 	}
 
-	activated := strings.Contains(output, "CIRA: Configured")
-	if !activated {
-		return errors.New("failed to activate device")
+	return nil
+}
+
+func (handler *Handler) deactivateDevice(endpoint *portainer.Endpoint, settings portainer.Settings) error {
+	ctx := context.TODO()
+
+	config := settings.OpenAMTConfiguration
+	cmdLine := []string{
+		"deactivate", "-json",
+		"-u", fmt.Sprintf("wss://%s/activate", config.MPSServer),
+		"-password", config.Credentials.MPSPassword, // TODO works because this is the password used in saveAMTProfile,
+		"-n",
+	}
+	_, err := handler.PullAndRunContainer(ctx, endpoint, rpcGoImageName, rpcGoContainerName, cmdLine)
+	if err != nil {
+		return err
 	}
 
 	return nil

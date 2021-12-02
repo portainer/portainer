@@ -42,13 +42,6 @@ func (handler *Handler) openAMTActivate(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusBadRequest, errMsg, errors.New(errMsg)}
 	}
 
-	hostInfo, _, err := handler.getEndpointAMTInfo(endpoint)
-	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve AMT information", Err: err}
-	}
-	if hostInfo.UUID == "" {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve Device UUID", Err: errors.New("Unable to retrieve Device UUID")}
-	}
 
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
@@ -59,6 +52,19 @@ func (handler *Handler) openAMTActivate(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to activate device", err}
 	}
+
+	hostInfo, _, err := handler.getEndpointAMTInfo(endpoint)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve AMT information", Err: err}
+	}
+	if hostInfo.ControlModeRaw < 1 {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Failed to activate device", Err: errors.New("failed to activate device")}
+	}
+	if hostInfo.UUID == "" {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve device UUID", Err: errors.New("unable to retrieve device UUID")}
+	}
+
+	// TODO enable KVM
 
 	endpoint.AMTDeviceGUID = hostInfo.UUID
 	err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
