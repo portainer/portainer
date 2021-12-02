@@ -291,14 +291,16 @@ function EndpointController(
         try {
           const [amtInfo] = await Promise.all([OpenAMTService.info($transition$.params().id)]);
 
-          $scope.endpoint.ManagementInfoRaw = amtInfo.Text;
+          $scope.endpoint.ManagementInfo = {};
           try {
-            $scope.endpoint.ManagementInfo = JSON.parse(amtInfo.Text);
+            $scope.endpoint.ManagementInfo = JSON.parse(amtInfo.RawOutput);
           } catch (err) {
-            console.log('Failure', err, 'Unable to JSON parse AMT info: ' + amtInfo.Text);
-            $scope.endpoint.ManagementInfo = {};
-            $scope.endpoint.ManagementInfo['AMT'] = '-';
+            console.log('Failure', err, 'Unable to JSON parse AMT info: ' + amtInfo.RawOutput);
+            $scope.endpoint.ManagementInfo['AMT'] = amtInfo.RawOutput;
+            $scope.endpoint.ManagementInfo['UUID'] = '-';
             $scope.endpoint.ManagementInfo['Control Mode'] = '-';
+            $scope.endpoint.ManagementInfo['Build Number'] = '-';
+            $scope.endpoint.ManagementInfo['DNS Suffix'] = '-';
           }
         } catch (err) {
           Notifications.error('Failure', err, 'Unable to retrieve AMT environment details');

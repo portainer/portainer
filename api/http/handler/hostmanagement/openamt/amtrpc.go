@@ -2,6 +2,7 @@ package openamt
 
 import (
 	"context"
+	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -18,14 +19,19 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type OpenAMTHostInfo struct {
-	Endpoint portainer.EndpointID
-	Text     string
+type HostInfo struct {
+	EndpointID  portainer.EndpointID `json:"EndpointID"`
+	RawOutput   string               `json:"RawOutput"`
+	AMT         string               `json:"AMT"`
+	UUID        string               `json:"UUID"`
+	DNSSuffix   string               `json:"DNS Suffix"`
+	BuildNumber string               `json:"Build Number"`
+	ControlMode string               `json:"Control Mode"`
 }
 
 const (
 	// TODO: this should get extracted to some configurable - don't assume Docker Hub is everyone's global namespace, or that they're allowed to pull images from the internet
-	rpcGoImageName     = "ptrrd/openamt:rpc-go"
+	rpcGoImageName     = "ptrrd/openamt:rpc-go-json"
 	rpcGoContainerName = "openamt-rpc-go"
 )
 
@@ -65,10 +71,11 @@ func (handler *Handler) openAMTHostInfo(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: output, Err: err}
 	}
 
-	amtInfo := OpenAMTHostInfo{
-		Endpoint: portainer.EndpointID(endpointID),
-		Text:     output,
-	}
+	amtInfo := HostInfo{}
+	_ = json.Unmarshal([]byte(output), &amtInfo)
+	amtInfo.EndpointID = portainer.EndpointID(endpointID)
+	amtInfo.RawOutput = output
+
 	return response.JSON(w, amtInfo)
 }
 
