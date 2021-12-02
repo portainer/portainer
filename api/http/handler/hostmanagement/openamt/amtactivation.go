@@ -3,6 +3,7 @@ package openamt
 import (
 	"errors"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -64,7 +65,10 @@ func (handler *Handler) openAMTActivate(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve device UUID", Err: errors.New("unable to retrieve device UUID")}
 	}
 
-	// TODO enable KVM
+	err = handler.OpenAMTService.EnableDeviceFeatures(settings.OpenAMTConfiguration, hostInfo.UUID)
+	if err != nil {
+		logrus.WithError(err).WithField("uuid", hostInfo.UUID).Error("Could not enable AMT features on device")
+	}
 
 	endpoint.AMTDeviceGUID = hostInfo.UUID
 	err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)

@@ -1303,6 +1303,7 @@ type (
 		Authorization(configuration OpenAMTConfiguration) (string, error)
 		ConfigureDefault(configuration OpenAMTConfiguration) error
 		DeviceInformation(configuration OpenAMTConfiguration, deviceGUID string) (*OpenAMTDeviceInformation, error)
+		EnableDeviceFeatures(configuration OpenAMTConfiguration, deviceGUID string) error
 		ExecuteDeviceAction(configuration OpenAMTConfiguration, deviceGUID string, action string) error
 	}
 
