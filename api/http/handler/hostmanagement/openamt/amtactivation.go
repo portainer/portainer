@@ -64,6 +64,7 @@ func (handler *Handler) openAMTActivate(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve device UUID", Err: errors.New("unable to retrieve device UUID")}
 	}
 
+	// TODO don't pull the same image twice
 	// TODO enable KVM
 
 	endpoint.AMTDeviceGUID = hostInfo.UUID
