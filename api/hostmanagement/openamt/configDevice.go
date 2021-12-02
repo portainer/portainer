@@ -14,7 +14,7 @@ type Device struct {
 }
 
 type DevicePowerState struct {
-	State int `json:"powerstate"`
+	State portainer.PowerState `json:"powerstate"`
 }
 
 func (service *Service) getDevice(configuration portainer.OpenAMTConfiguration, deviceGUID string) (*Device, error) {

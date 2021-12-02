@@ -19,9 +19,9 @@ const (
 	DefaultWirelessConfigName = "wirelessProfileDefault"
 	DefaultProfileName        = "profileAMTDefault"
 
-	PowerUpAction  = 2
-	PowerOffAction = 8
-	RestartAction  = 5
+	PowerUpState  portainer.PowerState = 2
+	PowerOffState portainer.PowerState = 8
+	RestartState  portainer.PowerState = 5
 )
 
 // Service represents a service for managing an OpenAMT server.
@@ -233,7 +233,7 @@ func (service *Service) ExecuteDeviceAction(configuration portainer.OpenAMTConfi
 	}
 	configuration.Credentials.MPSToken = token.Token
 
-	err = service.executeDeviceAction(configuration, deviceGUID, parsedAction)
+	err = service.executeDeviceAction(configuration, deviceGUID, int(parsedAction))
 	if err != nil {
 		return err
 	}

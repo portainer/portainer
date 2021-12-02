@@ -69,11 +69,14 @@ type (
 
 	// OpenAMTDeviceInformation represents an AMT managed device information
 	OpenAMTDeviceInformation struct {
-		GUID             string `json:"guid"`
-		HostName         string `json:"hostname"`
-		ConnectionStatus bool   `json:"connectionStatus"`
-		PowerState       int    `json:"powerstate"`
+		GUID             string     `json:"guid"`
+		HostName         string     `json:"hostname"`
+		ConnectionStatus bool       `json:"connectionStatus"`
+		PowerState       PowerState `json:"powerstate"`
 	}
+
+	// PowerState represents an AMT managed device power state
+	PowerState int
 
 	// CLIFlags represents the available flags on the CLI
 	CLIFlags struct {
