@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	clientV1 "k8s.io/client-go/tools/clientcmd/api/v1"
 
@@ -21,6 +22,7 @@ import (
 // @description Generates kubeconfig file enabling client communication with k8s api server
 // @description **Access policy**: authenticated
 // @tags kubernetes
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json
@@ -132,7 +134,7 @@ func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenD
 			return nil, &httperror.HandlerError{http.StatusInternalServerError, fmt.Sprintf("unable to find serviceaccount associated with user; username=%s", tokenData.Username), err}
 		}
 
-		configClusters[idx] = buildCluster(r, endpoint)
+		configClusters[idx] = buildCluster(r, handler.BaseURL, endpoint)
 		configContexts[idx] = buildContext(serviceAccount.Name, endpoint)
 		if !authInfosSet[serviceAccount.Name] {
 			configAuthInfos = append(configAuthInfos, buildAuthInfo(serviceAccount.Name, bearerToken))
@@ -150,8 +152,11 @@ func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenD
 	}, nil
 }
 
-func buildCluster(r *http.Request, endpoint portainer.Endpoint) clientV1.NamedCluster {
-	proxyURL := fmt.Sprintf("https://%s/api/endpoints/%d/kubernetes", r.Host, endpoint.ID)
+func buildCluster(r *http.Request, baseURL string, endpoint portainer.Endpoint) clientV1.NamedCluster {
+	if baseURL != "/" {
+		baseURL = fmt.Sprintf("/%s/", strings.Trim(baseURL, "/"))
+	}
+	proxyURL := fmt.Sprintf("https://%s%sapi/endpoints/%d/kubernetes", r.Host, baseURL, endpoint.ID)
 	return clientV1.NamedCluster{
 		Name: buildClusterName(endpoint.Name),
 		Cluster: clientV1.Cluster{

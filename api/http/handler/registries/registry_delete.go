@@ -17,6 +17,7 @@ import (
 // @description Remove a registry
 // @description **Access policy**: restricted
 // @tags registries
+// @security ApiKeyAuth
 // @security jwt
 // @param id path int true "Registry identifier"
 // @success 204 "Success"

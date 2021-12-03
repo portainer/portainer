@@ -78,6 +78,7 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 // @description Update Portainer settings.
 // @description **Access policy**: administrator
 // @tags settings
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json

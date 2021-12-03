@@ -14,6 +14,7 @@ import (
 // @summary Inspect an EdgeStack
 // @description **Access policy**: administrator
 // @tags edge_stacks
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param id path string true "EdgeStack Id"

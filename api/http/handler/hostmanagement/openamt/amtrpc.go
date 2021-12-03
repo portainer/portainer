@@ -4,9 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
+
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	httperror "github.com/portainer/libhttp/error"
@@ -15,9 +20,6 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/sirupsen/logrus"
-	"io/ioutil"
-	"log"
-	"net/http"
 )
 
 type HostInfo struct {
@@ -85,6 +87,7 @@ func (handler *Handler) getEndpointAMTInfo(endpoint *portainer.Endpoint) (*HostI
 
 	amtInfo := HostInfo{}
 	_ = json.Unmarshal([]byte(output), &amtInfo)
+
 	amtInfo.EndpointID = endpoint.ID
 	amtInfo.RawOutput = output
 
@@ -146,7 +149,6 @@ func pullImage(ctx context.Context, docker *client.Client, imageName string) err
 // runContainer should be used to run a short command that returns information to stdout
 // TODO: add k8s support
 func runContainer(ctx context.Context, docker *client.Client, imageName, containerName string, cmdLine []string) (output string, err error) {
-
 	opts := types.ContainerListOptions{All: true}
 	opts.Filters = filters.NewArgs()
 	opts.Filters.Add("name", containerName)

@@ -11,6 +11,7 @@ import (
 
 // @summary Delete a webhook
 // @description **Access policy**: authenticated
+// @security ApiKeyAuth
 // @security jwt
 // @tags webhooks
 // @param id path int true "Webhook id"

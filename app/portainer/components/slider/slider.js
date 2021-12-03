@@ -3,7 +3,7 @@ angular.module('portainer.app').component('slider', {
   controller: 'SliderController',
   bindings: {
     model: '=',
-    onChange: '&',
+    onChange: '<',
     floor: '<',
     ceil: '<',
     step: '<',

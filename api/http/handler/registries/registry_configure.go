@@ -21,7 +21,8 @@ type registryConfigurePayload struct {
 	Username string `example:"registry_user"`
 	// Password used to authenticate against this registry. required when Authentication is true
 	Password string `example:"registry_password"`
-
+	// ECR region
+	Region  string
 	// Use TLS
 	TLS bool `example:"true"`
 	// Skip the verification of the server TLS certificate
@@ -47,6 +48,9 @@ func (payload *registryConfigurePayload) Validate(r *http.Request) error {
 
 		password, _ := request.RetrieveMultiPartFormValue(r, "Password", true)
 		payload.Password = password
+
+		region, _ := request.RetrieveMultiPartFormValue(r, "Region", true)
+		payload.Region = region
 	}
 
 	useTLS, _ := request.RetrieveBooleanMultiPartFormValue(r, "TLS", true)
@@ -83,6 +87,7 @@ func (payload *registryConfigurePayload) Validate(r *http.Request) error {
 // @description Configures a registry.
 // @description **Access policy**: restricted
 // @tags registries
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json
@@ -132,6 +137,10 @@ func (handler *Handler) registryConfigure(w http.ResponseWriter, r *http.Request
 			registry.ManagementConfiguration.Password = registry.Password
 		} else {
 			registry.ManagementConfiguration.Password = payload.Password
+		}
+
+		if payload.Region != "" {
+			registry.ManagementConfiguration.Ecr.Region = payload.Region
 		}
 	}
 

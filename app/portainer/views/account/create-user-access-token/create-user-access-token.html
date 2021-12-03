@@ -1,0 +1,11 @@
+<rd-header>
+  <rd-header-title title-text="Create access token"></rd-header-title>
+  <rd-header-content> <a ui-sref="portainer.account">User settings</a> &gt; Add access token </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <!-- mount react feature/view -->
+    <create-access-token user-id="$ctrl.state.userId" on-submit="($ctrl.onSubmit)" on-success="($ctrl.onSuccess)" on-error="($ctrl.onError)"></create-access-token>
+  </div>
+</div>

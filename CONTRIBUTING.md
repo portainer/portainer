@@ -120,6 +120,7 @@ When adding a new route to an existing handler use the following as a template (
 // @description
 // @description **Access policy**:
 // @tags
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json

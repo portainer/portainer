@@ -217,7 +217,7 @@
                   ng-if="!$ctrl.offlineMode"
                   authorization="DockerContainerStart, DockerContainerStop, DockerContainerKill, DockerContainerRestart, DockerContainerPause, DockerContainerUnpause, DockerContainerDelete, DockerContainerCreate"
                 >
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
+                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="!$ctrl.allowSelection(item)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
                 <a ng-if="!$ctrl.offlineMode" ui-sref="docker.containers.container({ id: item.Id, nodeName: item.NodeName })" title="{{ item | containername }}">{{
