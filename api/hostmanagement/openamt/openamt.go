@@ -15,9 +15,15 @@ import (
 )
 
 const (
-	DefaultCIRAConfigName     = "ciraConfigDefault"
-	DefaultWirelessConfigName = "wirelessProfileDefault"
-	DefaultProfileName        = "profileAMTDefault"
+	defaultCIRAConfigName     = "ciraConfigDefault"
+	defaultWirelessConfigName = "wirelessProfileDefault"
+	defaultProfileName        = "profileAMTDefault"
+
+	httpClientTimeout = 30
+
+	powerUpState  portainer.PowerState = 2
+	powerOffState portainer.PowerState = 8
+	restartState  portainer.PowerState = 5
 )
 
 // Service represents a service for managing an OpenAMT server.
@@ -32,7 +38,7 @@ func NewService(dataStore portainer.DataStore) *Service {
 	}
 	return &Service{
 		httpsClient: &http.Client{
-			Timeout: time.Second * time.Duration(5),
+			Timeout: time.Second * time.Duration(httpClientTimeout),
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			},
@@ -70,21 +76,21 @@ func (service *Service) ConfigureDefault(configuration portainer.OpenAMTConfigur
 	}
 	configuration.Credentials.MPSToken = token.Token
 
-	ciraConfig, err := service.createOrUpdateCIRAConfig(configuration, DefaultCIRAConfigName)
+	ciraConfig, err := service.createOrUpdateCIRAConfig(configuration, defaultCIRAConfigName)
 	if err != nil {
 		return err
 	}
 
 	wirelessConfigName := ""
 	if configuration.WirelessConfiguration != nil {
-		wirelessConfig, err := service.createOrUpdateWirelessConfig(configuration, DefaultWirelessConfigName)
+		wirelessConfig, err := service.createOrUpdateWirelessConfig(configuration, defaultWirelessConfigName)
 		if err != nil {
 			return err
 		}
 		wirelessConfigName = wirelessConfig.ProfileName
 	}
 
-	_, err = service.createOrUpdateAMTProfile(configuration, DefaultProfileName, ciraConfig.ConfigName, wirelessConfigName)
+	_, err = service.createOrUpdateAMTProfile(configuration, defaultProfileName, ciraConfig.ConfigName, wirelessConfigName)
 	if err != nil {
 		return err
 	}
@@ -215,4 +221,24 @@ func (service *Service) DeviceInformation(configuration portainer.OpenAMTConfigu
 	}
 
 	return deviceInformation, nil
+}
+
+func (service *Service) ExecuteDeviceAction(configuration portainer.OpenAMTConfiguration, deviceGUID string, action string) error {
+	parsedAction, err := parseAction(action)
+	if err != nil {
+		return err
+	}
+
+	token, err := service.executeAuthenticationRequest(configuration)
+	if err != nil {
+		return err
+	}
+	configuration.Credentials.MPSToken = token.Token
+
+	err = service.executeDeviceAction(configuration, deviceGUID, int(parsedAction))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

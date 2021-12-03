@@ -69,11 +69,14 @@ type (
 
 	// OpenAMTDeviceInformation represents an AMT managed device information
 	OpenAMTDeviceInformation struct {
-		GUID             string `json:"guid"`
-		HostName         string `json:"hostname"`
-		ConnectionStatus bool   `json:"connectionStatus"`
-		PowerState       int    `json:"powerstate"`
+		GUID             string     `json:"guid"`
+		HostName         string     `json:"hostname"`
+		ConnectionStatus bool       `json:"connectionStatus"`
+		PowerState       PowerState `json:"powerstate"`
 	}
+
+	// PowerState represents an AMT managed device power state
+	PowerState int
 
 	// CLIFlags represents the available flags on the CLI
 	CLIFlags struct {
@@ -622,7 +625,7 @@ type (
 		ManagementConfiguration *RegistryManagementConfiguration `json:"ManagementConfiguration"`
 		Gitlab                  GitlabRegistryData               `json:"Gitlab"`
 		Quay                    QuayRegistryData                 `json:"Quay"`
-		Ecr                  	EcrData                       	 `json:"Ecr"`
+		Ecr                     EcrData                          `json:"Ecr"`
 		RegistryAccesses        RegistryAccesses                 `json:"RegistryAccesses"`
 
 		// Deprecated fields
@@ -1328,6 +1331,7 @@ type (
 	OpenAMTService interface {
 		ConfigureDefault(configuration OpenAMTConfiguration) error
 		DeviceInformation(configuration OpenAMTConfiguration, deviceGUID string) (*OpenAMTDeviceInformation, error)
+		ExecuteDeviceAction(configuration OpenAMTConfiguration, deviceGUID string, action string) error
 	}
 
 	// HelmUserRepositoryService represents a service to manage HelmUserRepositories

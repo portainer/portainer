@@ -109,7 +109,7 @@
             <tr dir-paginate-end ng-show="item.Expanded">
               <td></td>
               <td colspan="8">
-                <amt-devices-datatable devices="$ctrl.state.amtDevices[item.Id]" error="$ctrl.state.amtDevicesErrors[item.Id]"></amt-devices-datatable>
+                <amt-devices-datatable endpoint-id="item.Id" devices="$ctrl.state.amtDevices[item.Id]" error="$ctrl.state.amtDevicesErrors[item.Id]"> </amt-devices-datatable>
               </td>
             </tr>
             <tr ng-if="$ctrl.state.loading">
