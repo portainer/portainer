@@ -64,12 +64,6 @@ func (handler *Handler) openAMTActivate(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to retrieve device UUID", Err: errors.New("unable to retrieve device UUID")}
 	}
 
-	// TODO wait for device to be online
-	err = handler.OpenAMTService.EnableDeviceFeatures(settings.OpenAMTConfiguration, hostInfo.UUID)
-	if err != nil {
-		//return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to enable AMT Features", Err: errors.New("unable to enable AMT Features")}
-	}
-
 	endpoint.AMTDeviceGUID = hostInfo.UUID
 	err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
 	if err != nil {
