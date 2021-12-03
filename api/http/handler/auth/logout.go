@@ -11,6 +11,7 @@ import (
 // @id Logout
 // @summary Logout
 // @description **Access policy**: authenticated
+// @security ApiKeyAuth
 // @security jwt
 // @tags auth
 // @success 204 "Success"

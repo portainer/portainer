@@ -1,4 +1,5 @@
 import { HIDE_INTERNAL_AUTH } from '@/portainer/feature-flags/feature-ids';
+import { baseHref } from '@/portainer/helpers/pathHelper';
 
 import providers, { getProviderByUrl } from './providers';
 
@@ -95,7 +96,7 @@ export default class OAuthSettingsController {
     }
 
     if (this.settings.RedirectURI === '') {
-      this.settings.RedirectURI = window.location.origin;
+      this.settings.RedirectURI = window.location.origin + baseHref();
     }
 
     if (this.settings.AuthorizationURI) {

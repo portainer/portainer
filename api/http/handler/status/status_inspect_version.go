@@ -27,6 +27,7 @@ type githubData struct {
 // @summary Check for portainer updates
 // @description Check if portainer has an update available
 // @description **Access policy**: authenticated
+// @security ApiKeyAuth
 // @security jwt
 // @tags status
 // @produce json

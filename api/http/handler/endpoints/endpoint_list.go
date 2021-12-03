@@ -20,6 +20,7 @@ import (
 // @description only return authorized environments(endpoints).
 // @description **Access policy**: restricted
 // @tags endpoints
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param start query int false "Start searching from"
@@ -120,7 +121,7 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 		}
 
 		// TODO delete after INT-7 is implemented, currently used for OpenAMT testing
-		// paginatedEndpoints[idx].AMTDeviceGUID = "4c4c4544-004b-3910-8037-b6c04f504633"
+		paginatedEndpoints[idx].AMTDeviceGUID = "4c4c4544-004b-3910-8037-b6c04f504633"
 	}
 
 	w.Header().Set("X-Total-Count", strconv.Itoa(filteredEndpointCount))
