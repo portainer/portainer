@@ -64,7 +64,7 @@
                 <button
                   type="button"
                   class="btn btn-xs btn-danger"
-                  ng-disabled="$ctrl.leaveNetworkActionInProgress"
+                  ng-disabled="$ctrl.leaveNetworkActionInProgress || $ctrl.container.IsPortainer"
                   button-spinner="$ctrl.leaveNetworkActionInProgress"
                   ng-click="$ctrl.leaveNetworkAction($ctrl.container, key)"
                 >

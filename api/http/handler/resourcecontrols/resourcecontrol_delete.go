@@ -15,6 +15,7 @@ import (
 // @description Remove a resource control.
 // @description **Access policy**: administrator
 // @tags resource_controls
+// @security ApiKeyAuth
 // @security jwt
 // @param id path int true "Resource control identifier"
 // @success 204 "Success"

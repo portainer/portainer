@@ -12,6 +12,7 @@ import (
 // @description Retrieve Portainer settings.
 // @description **Access policy**: administrator
 // @tags settings
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @success 200 {object} portainer.Settings "Success"

@@ -12,6 +12,7 @@ import (
 // @description List all roles available for use
 // @description **Access policy**: administrator
 // @tags roles
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @success 200 {array} portainer.Role "Success"

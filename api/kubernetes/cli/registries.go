@@ -8,6 +8,7 @@ import (
 
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/registryutils"
 	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -15,6 +16,8 @@ import (
 
 const (
 	secretDockerConfigKey = ".dockerconfigjson"
+	labelRegistryType = "io.portainer.kubernetes.registry.type"
+	annotationRegistryID = "portainer.io/registry.id"
 )
 
 type (
@@ -38,12 +41,17 @@ func (kcl *KubeClient) DeleteRegistrySecret(registry *portainer.Registry, namesp
 	return nil
 }
 
-func (kcl *KubeClient) CreateRegistrySecret(registry *portainer.Registry, namespace string) error {
+func (kcl *KubeClient) CreateRegistrySecret(registry *portainer.Registry, namespace string) (err error) {
+	username, password, err := registryutils.GetRegEffectiveCredential(registry)
+	if err != nil {
+		return
+	}
+
 	config := dockerConfig{
 		Auths: map[string]registryDockerConfig{
 			registry.URL: {
-				Username: registry.Username,
-				Password: registry.Password,
+				Username: username,
+				Password: password,
 			},
 		},
 	}
@@ -57,8 +65,11 @@ func (kcl *KubeClient) CreateRegistrySecret(registry *portainer.Registry, namesp
 		TypeMeta: metav1.TypeMeta{},
 		ObjectMeta: metav1.ObjectMeta{
 			Name: registrySecretName(registry),
+			Labels: map[string]string{
+				labelRegistryType: strconv.Itoa(int(registry.Type)),
+			},
 			Annotations: map[string]string{
-				"portainer.io/registry.id": strconv.Itoa(int(registry.ID)),
+				annotationRegistryID: strconv.Itoa(int(registry.ID)),
 			},
 		},
 		Data: map[string][]byte{

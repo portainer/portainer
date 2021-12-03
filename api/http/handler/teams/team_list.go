@@ -13,6 +13,7 @@ import (
 // @description List teams. For non-administrator users, will only list the teams they are member of.
 // @description **Access policy**: restricted
 // @tags teams
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @success 200 {array} portainer.Team "Success"

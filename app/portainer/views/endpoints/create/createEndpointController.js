@@ -1,5 +1,6 @@
 import { PortainerEndpointCreationTypes, PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
 import { getAgentShortVersion } from 'Portainer/views/endpoints/helpers';
+import { baseHref } from '@/portainer/helpers/pathHelper';
 import { EndpointSecurityFormData } from '../../../components/endpointSecurity/porEndpointSecurityModel';
 
 angular
@@ -84,7 +85,8 @@ angular
     };
 
     $scope.setDefaultPortainerInstanceURL = function () {
-      $scope.formValues.URL = window.location.origin;
+      const baseHREF = baseHref();
+      $scope.formValues.URL = window.location.origin + (baseHREF !== '/' ? baseHREF : '');
     };
 
     $scope.resetEndpointURL = function () {

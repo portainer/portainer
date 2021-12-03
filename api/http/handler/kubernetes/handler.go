@@ -21,15 +21,17 @@ type Handler struct {
 	kubernetesClientFactory *cli.ClientFactory
 	authorizationService    *authorization.Service
 	JwtService              portainer.JWTService
+	BaseURL                 string
 }
 
 // NewHandler creates a handler to process pre-proxied requests to external APIs.
-func NewHandler(bouncer *security.RequestBouncer, authorizationService *authorization.Service, dataStore portainer.DataStore, kubernetesClientFactory *cli.ClientFactory) *Handler {
+func NewHandler(bouncer *security.RequestBouncer, authorizationService *authorization.Service, dataStore portainer.DataStore, kubernetesClientFactory *cli.ClientFactory, baseURL string) *Handler {
 	h := &Handler{
 		Router:                  mux.NewRouter(),
 		dataStore:               dataStore,
 		kubernetesClientFactory: kubernetesClientFactory,
 		authorizationService:    authorizationService,
+		BaseURL:                 baseURL,
 	}
 
 	kubeRouter := h.PathPrefix("/kubernetes").Subrouter()

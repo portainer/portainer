@@ -2,7 +2,6 @@ package openamt
 
 import (
 	"errors"
-	"github.com/sirupsen/logrus"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -10,6 +9,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type Devices struct {

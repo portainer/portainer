@@ -12,6 +12,7 @@ import (
 // @description List tags.
 // @description **Access policy**: authenticated
 // @tags tags
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @success 200 {array} portainer.Tag "Success"

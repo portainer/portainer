@@ -15,6 +15,7 @@ import (
 // @description Retrieve details about an environment(endpoint).
 // @description **Access policy**: restricted
 // @tags endpoints
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param id path int true "Environment(Endpoint) identifier"

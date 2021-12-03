@@ -13,6 +13,7 @@ import (
 // @summary Execute a websocket on kubectl shell pod
 // @description The request will be upgraded to the websocket protocol. The request will proxy input from the client to the pod via long-lived websocket connection.
 // @description **Access policy**: authenticated
+// @security ApiKeyAuth
 // @security jwt
 // @tags websocket
 // @accept json
