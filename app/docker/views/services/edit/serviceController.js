@@ -336,7 +336,7 @@ angular.module('portainer.docker').controller('ServiceController', [
             Notifications.error('Failure', err, 'Unable to delete webhook');
           });
       } else {
-        WebhookService.createServiceWebhook(service.Id, endpoint.Id)
+        WebhookService.createServiceWebhook(service.Id, endpoint.Id, this.initialRegistryID)
           .then(function success(data) {
             $scope.WebhookExists = true;
             $scope.webhookID = data.Id;
@@ -769,6 +769,7 @@ angular.module('portainer.docker').controller('ServiceController', [
           const image = $scope.service.Model.Spec.TaskTemplate.ContainerSpec.Image;
           RegistryService.retrievePorRegistryModelFromRepository(image, endpoint.Id).then((model) => {
             $scope.formValues.RegistryModel = model;
+            this.initialRegistryID = _.get(model, 'Registry.ID', 0);
           });
 
           // Default values
