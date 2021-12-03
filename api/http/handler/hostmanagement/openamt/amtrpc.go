@@ -3,12 +3,15 @@ package openamt
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/filters"
+
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	httperror "github.com/portainer/libhttp/error"
@@ -20,13 +23,14 @@ import (
 )
 
 type HostInfo struct {
-	EndpointID  portainer.EndpointID `json:"EndpointID"`
-	RawOutput   string               `json:"RawOutput"`
-	AMT         string               `json:"AMT"`
-	UUID        string               `json:"UUID"`
-	DNSSuffix   string               `json:"DNS Suffix"`
-	BuildNumber string               `json:"Build Number"`
-	ControlMode string               `json:"Control Mode"`
+	EndpointID     portainer.EndpointID `json:"EndpointID"`
+	RawOutput      string               `json:"RawOutput"`
+	AMT            string               `json:"AMT"`
+	UUID           string               `json:"UUID"`
+	DNSSuffix      string               `json:"DNS Suffix"`
+	BuildNumber    string               `json:"Build Number"`
+	ControlMode    string               `json:"Control Mode"`
+	ControlModeRaw int                  `json:"Control Mode (Raw)"`
 }
 
 const (
@@ -62,21 +66,32 @@ func (handler *Handler) openAMTHostInfo(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to find an endpoint with the specified identifier inside the database", Err: err}
 	}
 
+	amtInfo, output, err := handler.getEndpointAMTInfo(endpoint)
+	if err != nil {
+		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: output, Err: err}
+	}
+
+	return response.JSON(w, amtInfo)
+}
+
+func (handler *Handler) getEndpointAMTInfo(endpoint *portainer.Endpoint) (*HostInfo, string, error) {
 	ctx := context.TODO()
+
 	// pull the image so we can check if there's a new one
 	// TODO: these should be able to be over-ridden (don't hardcode the assumption that secure users can access Docker Hub, or that its even the orchestrator's "global namespace")
 	cmdLine := []string{"amtinfo", "--json"}
 	output, err := handler.PullAndRunContainer(ctx, endpoint, rpcGoImageName, rpcGoContainerName, cmdLine)
 	if err != nil {
-		return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: output, Err: err}
+		return nil, output, err
 	}
 
 	amtInfo := HostInfo{}
 	_ = json.Unmarshal([]byte(output), &amtInfo)
-	amtInfo.EndpointID = portainer.EndpointID(endpointID)
+
+	amtInfo.EndpointID = endpoint.ID
 	amtInfo.RawOutput = output
 
-	return response.JSON(w, amtInfo)
+	return &amtInfo, "", nil
 }
 
 func (handler *Handler) PullAndRunContainer(ctx context.Context, endpoint *portainer.Endpoint, imageName, containerName string, cmdLine []string) (output string, err error) {
@@ -106,8 +121,8 @@ func (handler *Handler) PullAndRunContainer(ctx context.Context, endpoint *porta
 }
 
 // TODO: ideally, pullImage and runContainer will become a simple version of the use compose abstraction that can be called from withing Portainer.
-// TODO: the idea being that if we have an internal struct of a parsed compose file, we can also populate that struct programatically, and run it to get the result I'm getting here.
-// TODO: likeley an upgrade and abstraction of DeployComposeStack/DeploySwarmStack/DeployKubernetesStack
+// TODO: the idea being that if we have an internal struct of a parsed compose file, we can also populate that struct programmatically, and run it to get the result I'm getting here.
+// TODO: likely an upgrade and abstraction of DeployComposeStack/DeploySwarmStack/DeployKubernetesStack
 // pullImage will pull the image to the specified environment
 // TODO: add k8s implementation
 // TODO: work out registry auth
@@ -134,13 +149,29 @@ func pullImage(ctx context.Context, docker *client.Client, imageName string) err
 // runContainer should be used to run a short command that returns information to stdout
 // TODO: add k8s support
 func runContainer(ctx context.Context, docker *client.Client, imageName, containerName string, cmdLine []string) (output string, err error) {
-	envs := []string{}
+	opts := types.ContainerListOptions{All: true}
+	opts.Filters = filters.NewArgs()
+	opts.Filters.Add("name", containerName)
+	existingContainers, err := docker.ContainerList(ctx, opts)
+	if err != nil {
+		logrus.WithError(err).WithField("imagename", imageName).WithField("containername", containerName).Error("listing existing container")
+		return "", err
+	}
+
+	if len(existingContainers) > 0 {
+		err = docker.ContainerRemove(ctx, existingContainers[0].ID, types.ContainerRemoveOptions{Force: true})
+		if err != nil {
+			logrus.WithError(err).WithField("imagename", imageName).WithField("containername", containerName).Error("removing existing container")
+			return "", err
+		}
+	}
+
 	created, err := docker.ContainerCreate(
 		ctx,
 		&container.Config{
 			Image:        imageName,
 			Cmd:          cmdLine,
-			Env:          envs,
+			Env:          []string{},
 			Tty:          true,
 			OpenStdin:    true,
 			AttachStdout: true,
@@ -195,5 +226,48 @@ func runContainer(ctx context.Context, docker *client.Client, imageName, contain
 		logrus.WithError(err).WithField("imagename", imageName).WithField("containername", containerName).Error("read container output")
 		return "", err
 	}
+
+	log.Printf("%s container finished with output:\n%s", containerName, string(outputBytes))
+
 	return string(outputBytes), nil
+}
+
+func (handler *Handler) activateDevice(endpoint *portainer.Endpoint, settings portainer.Settings) error {
+	ctx := context.TODO()
+
+	config := settings.OpenAMTConfiguration
+	cmdLine := []string{
+		"activate",
+		"-n",
+		"-u", fmt.Sprintf("wss://%s/activate", config.MPSServer),
+		"-profile", "profileAMTDefault",
+		"-d", config.DomainConfiguration.DomainName,
+		"-password", config.Credentials.MPSPassword,
+	}
+
+
+	_, err := handler.PullAndRunContainer(ctx, endpoint, rpcGoImageName, rpcGoContainerName, cmdLine)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (handler *Handler) deactivateDevice(endpoint *portainer.Endpoint, settings portainer.Settings) error {
+	ctx := context.TODO()
+
+	config := settings.OpenAMTConfiguration
+	cmdLine := []string{
+		"deactivate",
+		"-n",
+		"-u", fmt.Sprintf("wss://%s/activate", config.MPSServer),
+		"-password", config.Credentials.MPSPassword,
+	}
+	_, err := handler.PullAndRunContainer(ctx, endpoint, rpcGoImageName, rpcGoContainerName, cmdLine)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

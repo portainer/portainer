@@ -2,12 +2,15 @@ import EndpointHelper from '@/portainer/helpers/endpointHelper';
 
 angular.module('portainer.app').controller('EndpointsDatatableController', [
   '$scope',
+  '$state',
   '$controller',
   'DatatableService',
   'PaginationService',
   'SettingsService',
+  'ModalService',
+  'Notifications',
   'OpenAMTService',
-  function ($scope, $controller, DatatableService, PaginationService, SettingsService, OpenAMTService) {
+  function ($scope, $state, $controller, DatatableService, PaginationService, SettingsService, ModalService, Notifications, OpenAMTService) {
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
 
     this.state = Object.assign(this.state, {
@@ -88,8 +91,51 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
         })
         .catch((e) => {
           console.log(e);
-          this.state.amtDevicesErrors[endpoint.Id] = 'Error fetching devices information: ' + e.statusText;
+          this.state.amtDevicesErrors[endpoint.Id] = 'Error fetching devices information: ' + e.data.details;
         });
+    };
+
+    this.associateOpenAMT = function (endpoints) {
+      ModalService.confirm({
+        title: 'Are you sure?',
+        message: 'This operation will associate the selected environments with OpenAMT.',
+        buttons: {
+          confirm: {
+            label: 'Associate',
+            className: 'btn-primary',
+          },
+        },
+        callback: async function onConfirm(confirmed) {
+          if (!confirmed) {
+            return;
+          }
+          for (let endpoint of endpoints) {
+            try {
+              await OpenAMTService.activateDevice(endpoint.Id);
+
+              Notifications.success('Successfully associated with OpenAMT', endpoint.Name);
+            } catch (err) {
+              Notifications.error('Failure', err, 'Unable to associate with OpenAMT');
+            }
+          }
+
+          $state.reload();
+        },
+      });
+    };
+
+    this.associateOpenAMTAsync = async function (endpoints, deviceId) {
+      for (let endpoint of endpoints) {
+        try {
+          await OpenAMTService.associateEndpoint(endpoint.Id, deviceId);
+
+          Notifications.success('Successfully associated with OpenAMT', endpoint.Name);
+        } catch (err) {
+          Notifications.error('Failure', err, 'Unable to associate with OpenAMT');
+        }
+      }
+
+      $state.reload();
     };
 
     /**

@@ -17,6 +17,16 @@
         <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.endpoints.new" data-cy="endpoint-addEndpointButton">
           <i class="fa fa-plus space-right" aria-hidden="true"></i>Add environment
         </button>
+        <button
+          type="button"
+          class="btn btn-sm btn-primary"
+          ng-show="$ctrl.state.showAMTInfo"
+          ng-disabled="$ctrl.state.selectedItemCount === 0"
+          ng-click="$ctrl.associateOpenAMT($ctrl.state.selectedItems)"
+          data-cy="endpoint-associateOpenAMTButton"
+        >
+          <i class="fa fa-link space-right" aria-hidden="true"></i>Associate with OpenAMT
+        </button>
       </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>

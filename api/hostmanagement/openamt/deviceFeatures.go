@@ -1,0 +1,29 @@
+package openamt
+
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+
+	portainer "github.com/portainer/portainer/api"
+)
+
+func (service *Service) enableDeviceFeatures(configuration portainer.OpenAMTConfiguration, deviceGUID string) error {
+	url := fmt.Sprintf("https://%s/mps/api/v1/amt/features/%s", configuration.MPSServer, deviceGUID)
+
+	payload := map[string]interface{}{
+		"enableSOL":   true,
+		"enableIDER":  true,
+		"enableKVM":   true,
+		"redirection": true,
+		"userConsent": "none",
+	}
+	jsonValue, _ := json.Marshal(payload)
+
+	_, err := service.executeSaveRequest(http.MethodPost, url, configuration.Credentials.MPSToken, jsonValue)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

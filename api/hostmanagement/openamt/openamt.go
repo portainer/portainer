@@ -17,7 +17,7 @@ import (
 const (
 	defaultCIRAConfigName     = "ciraConfigDefault"
 	defaultWirelessConfigName = "wirelessProfileDefault"
-	defaultProfileName        = "profileAMTDefault"
+	DefaultProfileName        = "profileAMTDefault"
 
 	httpClientTimeout = 30
 
@@ -90,7 +90,7 @@ func (service *Service) ConfigureDefault(configuration portainer.OpenAMTConfigur
 		wirelessConfigName = wirelessConfig.ProfileName
 	}
 
-	_, err = service.createOrUpdateAMTProfile(configuration, defaultProfileName, ciraConfig.ConfigName, wirelessConfigName)
+	_, err = service.createOrUpdateAMTProfile(configuration, DefaultProfileName, ciraConfig.ConfigName, wirelessConfigName)
 	if err != nil {
 		return err
 	}
@@ -236,6 +236,21 @@ func (service *Service) ExecuteDeviceAction(configuration portainer.OpenAMTConfi
 	configuration.Credentials.MPSToken = token
 
 	err = service.executeDeviceAction(configuration, deviceGUID, int(parsedAction))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (service *Service) EnableDeviceFeatures(configuration portainer.OpenAMTConfiguration, deviceGUID string) error {
+	token, err := service.Authorization(configuration)
+	if err != nil {
+		return err
+	}
+	configuration.Credentials.MPSToken = token
+
+	err = service.enableDeviceFeatures(configuration, deviceGUID)
 	if err != nil {
 		return err
 	}
