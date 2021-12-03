@@ -240,7 +240,7 @@ func (handler *Handler) activateDevice(endpoint *portainer.Endpoint, settings po
 		"activate",
 		"-n",
 		"-u", fmt.Sprintf("wss://%s/activate", config.MPSServer),
-		"-profile", "profileAMTDefault", // TODO save this value in settings
+		"-profile", "profileAMTDefault",
 		"-d", config.DomainConfiguration.DomainName,
 		"-password", config.Credentials.MPSPassword,
 	}
