@@ -1,9 +1,13 @@
+import EndpointHelper from '@/portainer/helpers/endpointHelper';
+
 angular.module('portainer.app').controller('EndpointsDatatableController', [
   '$scope',
   '$controller',
   'DatatableService',
   'PaginationService',
-  function ($scope, $controller, DatatableService, PaginationService) {
+  'SettingsService',
+  'OpenAMTService',
+  function ($scope, $controller, DatatableService, PaginationService, SettingsService, OpenAMTService) {
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
 
     this.state = Object.assign(this.state, {
@@ -12,6 +16,9 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
       filteredDataSet: [],
       totalFilteredDataset: 0,
       pageNumber: 1,
+      showAMTInfo: false,
+      amtDevices: {},
+      amtDevicesErrors: {},
     });
 
     this.paginationChanged = function () {
@@ -50,10 +57,46 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
       this.paginationChanged();
     };
 
+    this.setShowAMTInfo = async function () {
+      this.settings = await SettingsService.settings();
+      const featureFlagValue = this.settings && this.settings.FeatureFlagSettings && this.settings.FeatureFlagSettings['open-amt'];
+      const featureEnabled = this.settings && this.settings.OpenAMTConfiguration && this.settings.OpenAMTConfiguration.Enabled;
+      this.state.showAMTInfo = featureFlagValue && featureEnabled;
+    };
+
+    this.showAMTNodes = function (item) {
+      return this.state.showAMTInfo && EndpointHelper.isAgentEndpoint(item) && item.AMTDeviceGUID;
+    };
+
+    this.expandItem = function (item, expanded) {
+      if (!this.showAMTNodes(item)) {
+        return;
+      }
+
+      item.Expanded = expanded;
+      this.fetchAMTDeviceInfo(item);
+    };
+
+    this.fetchAMTDeviceInfo = function (endpoint) {
+      if (!this.showAMTNodes(endpoint) || this.state.amtDevices[endpoint.Id]) {
+        return;
+      }
+
+      OpenAMTService.getDevices(endpoint.Id)
+        .then((data) => {
+          console.log(data);
+          this.state.amtDevices[endpoint.Id] = data.Devices;
+        })
+        .catch((e) => {
+          console.log(e);
+          this.state.amtDevicesErrors[endpoint.Id] = 'Error fetching devices information: ' + e.statusText;
+        });
+    };
+
     /**
      * Overridden
      */
-    this.$onInit = function () {
+    this.$onInit = async function () {
       this.setDefaults();
       this.prepareTableFromDataset();
 
@@ -77,6 +120,7 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
         this.filters.state.open = false;
       }
 
+      await this.setShowAMTInfo();
       this.paginationChanged();
     };
   },

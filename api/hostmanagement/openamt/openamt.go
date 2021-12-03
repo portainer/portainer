@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"sync"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
@@ -154,4 +155,64 @@ func (service *Service) executeGetRequest(url string, token string) ([]byte, err
 	}
 
 	return responseBody, nil
+}
+
+func (service *Service) DeviceInformation(configuration portainer.OpenAMTConfiguration, deviceGUID string) (*portainer.OpenAMTDeviceInformation, error) {
+	token, err := service.executeAuthenticationRequest(configuration)
+	if err != nil {
+		return nil, err
+	}
+	configuration.Credentials.MPSToken = token.Token
+
+	amtErrors := make(chan error)
+	wgDone := make(chan bool)
+
+	var wg sync.WaitGroup
+	var resultDevice *Device
+	var resultPowerState *DevicePowerState
+	wg.Add(2)
+
+	go func() {
+		device, err := service.getDevice(configuration, deviceGUID)
+		if err != nil {
+			amtErrors <- err
+		}
+		if device == nil {
+			amtErrors <- fmt.Errorf("device %s not found", deviceGUID)
+		}
+		resultDevice = device
+		wg.Done()
+	}()
+
+	go func() {
+		powerState, err := service.getDevicePowerState(configuration, deviceGUID)
+		if err != nil {
+			amtErrors <- err
+		}
+		resultPowerState = powerState
+		wg.Done()
+	}()
+
+	go func() {
+		wg.Wait()
+		close(wgDone)
+	}()
+
+	select {
+	case <-wgDone:
+		break
+	case err := <-amtErrors:
+		return nil, err
+	}
+
+	deviceInformation := &portainer.OpenAMTDeviceInformation{
+		GUID:             resultDevice.GUID,
+		HostName:         resultDevice.HostName,
+		ConnectionStatus: resultDevice.ConnectionStatus,
+	}
+	if resultPowerState != nil {
+		deviceInformation.PowerState = resultPowerState.State
+	}
+
+	return deviceInformation, nil
 }

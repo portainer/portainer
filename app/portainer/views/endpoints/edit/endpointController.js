@@ -4,6 +4,7 @@ import uuidv4 from 'uuid/v4';
 import { PortainerEndpointTypes } from '@/portainer/models/endpoint/models';
 import { EndpointSecurityFormData } from '@/portainer/components/endpointSecurity/porEndpointSecurityModel';
 import { getAgentShortVersion } from 'Portainer/views/endpoints/helpers';
+import EndpointHelper from '@/portainer/helpers/endpointHelper';
 
 angular.module('portainer.app').controller('EndpointController', EndpointController);
 
@@ -24,7 +25,8 @@ function EndpointController(
   Authentication,
   SettingsService,
   ModalService,
-  StateManager
+  StateManager,
+  OpenAMTService
 ) {
   const DEPLOYMENT_TABS = {
     SWARM: 'swarm',
@@ -66,6 +68,7 @@ function EndpointController(
       { key: '1 day', value: 86400 },
     ],
     allowSelfSignedCerts: true,
+    showAMTInfo: false,
   };
 
   $scope.agentVersion = StateManager.getState().application.version;
@@ -273,9 +276,35 @@ function EndpointController(
         $scope.groups = groups;
         $scope.availableTags = tags;
 
+        if (EndpointHelper.isDockerEndpoint(endpoint)) {
+          const featureFlagValue = settings && settings.FeatureFlagSettings && settings.FeatureFlagSettings['open-amt'];
+          const featureEnabled = settings && settings.OpenAMTConfiguration && settings.OpenAMTConfiguration.Enabled;
+          $scope.state.showAMTInfo = featureFlagValue && featureEnabled;
+        }
+
         configureState();
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to retrieve environment details');
+      }
+
+      if ($scope.state.showAMTInfo) {
+        try {
+          const [amtInfo] = await Promise.all([OpenAMTService.info($transition$.params().id)]);
+
+          $scope.endpoint.ManagementInfo = {};
+          try {
+            $scope.endpoint.ManagementInfo = JSON.parse(amtInfo.RawOutput);
+          } catch (err) {
+            console.log('Failure', err, 'Unable to JSON parse AMT info: ' + amtInfo.RawOutput);
+            $scope.endpoint.ManagementInfo['AMT'] = amtInfo.RawOutput;
+            $scope.endpoint.ManagementInfo['UUID'] = '-';
+            $scope.endpoint.ManagementInfo['Control Mode'] = '-';
+            $scope.endpoint.ManagementInfo['Build Number'] = '-';
+            $scope.endpoint.ManagementInfo['DNS Suffix'] = '-';
+          }
+        } catch (err) {
+          Notifications.error('Failure', err, 'Unable to retrieve AMT environment details');
+        }
       }
     });
   }

@@ -215,6 +215,7 @@ func (server *Server) Start() error {
 	if openAMTHandler != nil {
 		openAMTHandler.OpenAMTService = server.OpenAMTService
 		openAMTHandler.DataStore = server.DataStore
+		openAMTHandler.DockerClientFactory = server.DockerClientFactory
 	}
 
 	var stackHandler = stacks.NewHandler(requestBouncer)
