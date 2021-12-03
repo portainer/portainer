@@ -7,6 +7,7 @@ function OpenAMTServiceFactory(OpenAMT) {
   return {
     submit,
     info,
+    authorization,
     getDevices,
     executeDeviceAction,
   };
@@ -17,6 +18,10 @@ function OpenAMTServiceFactory(OpenAMT) {
 
   function info(endpointID) {
     return OpenAMT.info({ id: endpointID }).$promise;
+  }
+
+  function authorization(endpointID) {
+    return OpenAMT.authorization({ id: endpointID }).$promise;
   }
 
   function getDevices(endpointID) {

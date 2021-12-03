@@ -84,7 +84,6 @@ angular.module('portainer.app').controller('EndpointsDatatableController', [
 
       OpenAMTService.getDevices(endpoint.Id)
         .then((data) => {
-          console.log(data);
           this.state.amtDevices[endpoint.Id] = data.Devices;
         })
         .catch((e) => {
