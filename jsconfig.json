@@ -13,5 +13,8 @@
       "@/*": ["../app/*"],
     }
   },
-  "exclude": ["api", "build", "dist", "distribution", "node_modules", "test", "webpack"]
+  "exclude": ["api", "build", "dist", "distribution", "node_modules", "test", "webpack"],
+  "typeAcquisition": {
+    "include": ["jest"]
+  }
 }

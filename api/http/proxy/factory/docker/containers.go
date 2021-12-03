@@ -69,6 +69,11 @@ func (transport *Transport) containerListOperation(response *http.Response, exec
 		}
 	}
 
+	responseArray, err = transport.applyPortainerContainers(responseArray)
+	if err != nil {
+		return err
+	}
+
 	return utils.RewriteResponse(response, responseArray, http.StatusOK)
 }
 
@@ -87,6 +92,8 @@ func (transport *Transport) containerInspectOperation(response *http.Response, e
 		resourceType:                portainer.ContainerResourceControl,
 		labelsObjectSelector:        selectorContainerLabelsFromContainerInspectOperation,
 	}
+
+	responseObject, _ = transport.applyPortainerContainer(responseObject)
 
 	return transport.applyAccessControlOnResource(resourceOperationParameters, responseObject, response, executor)
 }

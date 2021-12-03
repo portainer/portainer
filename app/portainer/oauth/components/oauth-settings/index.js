@@ -6,6 +6,8 @@ angular.module('portainer.oauth').component('oauthSettings', {
   bindings: {
     settings: '=',
     teams: '<',
+    onSaveSettings: '<',
+    saveButtonState: '<',
   },
   controller,
 });

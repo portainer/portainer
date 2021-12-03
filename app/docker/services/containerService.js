@@ -90,9 +90,24 @@ angular.module('portainer.docker').factory('ContainerService', [
     };
 
     service.updateRestartPolicy = updateRestartPolicy;
+    service.updateLimits = updateLimits;
 
     function updateRestartPolicy(id, restartPolicy, maximumRetryCounts) {
       return Container.update({ id: id }, { RestartPolicy: { Name: restartPolicy, MaximumRetryCount: maximumRetryCounts } }).$promise;
+    }
+
+    function updateLimits(id, config) {
+      return Container.update(
+        { id: id },
+        {
+          // MemorySwap: must be set
+          // -1: non limits, 0: treated as unset(cause update error).
+          MemoryReservation: config.HostConfig.MemoryReservation,
+          Memory: config.HostConfig.Memory,
+          MemorySwap: -1,
+          NanoCpus: config.HostConfig.NanoCpus,
+        }
+      ).$promise;
     }
 
     service.createContainer = function (configuration) {

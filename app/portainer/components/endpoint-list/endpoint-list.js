@@ -4,7 +4,6 @@ angular.module('portainer.app').component('endpointList', {
   bindings: {
     titleText: '@',
     titleIcon: '@',
-    endpoints: '<',
     tags: '<',
     tableKey: '@',
     dashboardAction: '<',
@@ -12,7 +11,6 @@ angular.module('portainer.app').component('endpointList', {
     showSnapshotAction: '<',
     editAction: '<',
     isAdmin: '<',
-    totalCount: '<',
     retrievePage: '<',
     endpointInitTime: '<',
   },

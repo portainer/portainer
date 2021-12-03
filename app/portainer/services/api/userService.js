@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { UserViewModel } from '../../models/user';
+import { UserViewModel, UserTokenModel } from '../../models/user';
 import { TeamMembershipModel } from '../../models/teamMembership';
 
 angular.module('portainer.app').factory('UserService', [
@@ -134,6 +134,40 @@ angular.module('portainer.app').factory('UserService', [
         });
 
       return deferred.promise;
+    };
+
+    service.createAccessToken = function (id, description) {
+      const deferred = $q.defer();
+      const payload = { description };
+      Users.createAccessToken({ id }, payload)
+        .$promise.then((data) => {
+          deferred.resolve(data);
+        })
+        .catch(function error(err) {
+          deferred.reject({ msg: 'Unable to create user', err: err });
+        });
+      return deferred.promise;
+    };
+
+    service.getAccessTokens = function (id) {
+      var deferred = $q.defer();
+
+      Users.getAccessTokens({ id: id })
+        .$promise.then(function success(data) {
+          var userTokens = data.map(function (item) {
+            return new UserTokenModel(item);
+          });
+          deferred.resolve(userTokens);
+        })
+        .catch(function error(err) {
+          deferred.reject({ msg: 'Unable to retrieve user tokens', err: err });
+        });
+
+      return deferred.promise;
+    };
+
+    service.deleteAccessToken = function (id, tokenId) {
+      return Users.deleteAccessToken({ id: id, tokenId: tokenId }).$promise;
     };
 
     service.initAdministrator = function (username, password) {

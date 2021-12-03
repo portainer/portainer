@@ -45,7 +45,13 @@
                   <div class="col-sm-12 form-section-title">
                     Deployment type
                   </div>
-                  <box-selector radio-name="deploy" ng-model="ctrl.state.DeployType" options="ctrl.deployOptions" data-cy="k8sAppDeploy-deploymentSelector"></box-selector>
+                  <box-selector
+                    radio-name="deploy"
+                    ng-model="ctrl.state.DeployType"
+                    on-change="(ctrl.onDeployTypeChange)"
+                    options="ctrl.deployOptions"
+                    data-cy="k8sAppDeploy-deploymentSelector"
+                  ></box-selector>
                 </div>
 
                 <!-- repository -->
@@ -58,6 +64,7 @@
                   show-auth-explanation="true"
                   path-text-title="Manifest path"
                   path-placeholder="deployment.yml"
+                  deploy-method="{{ ctrl.DeployMethod }}"
                 ></git-form>
                 <!-- !repository -->
 

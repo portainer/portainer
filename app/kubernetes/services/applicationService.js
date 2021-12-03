@@ -346,10 +346,14 @@ class KubernetesApplicationService {
     await apiService.patch(oldAppPayload, newAppPayload);
   }
 
-  // accept either formValues or applications as parameters
-  // depending on partial value
+  // accept either formValues or applications as parameters depending on partial value
   // true = KubernetesApplication
   // false = KubernetesApplicationFormValues
+  //
+  // e.g. signatures are
+  //
+  // patch(oldValues: KubernetesApplication, newValues: KubernetesApplication, partial: (undefined | false)): Promise<unknown>
+  // patch(oldValues: KubernetesApplicationFormValues, newValues: KubernetesApplicationFormValues, partial: true): Promise<unknown>
   patch(oldValues, newValues, partial = false) {
     if (partial) {
       return this.$async(this.patchPartialAsync, oldValues, newValues);

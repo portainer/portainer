@@ -15,6 +15,7 @@ import (
 // @summary Deletes an EdgeGroup
 // @description **Access policy**: administrator
 // @tags edge_groups
+// @security ApiKeyAuth
 // @security jwt
 // @param id path int true "EdgeGroup Id"
 // @success 204

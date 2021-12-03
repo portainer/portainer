@@ -129,25 +129,6 @@ a[ng-click] {
   background-color: var(--bg-service-datatable-tbody);
 }
 
-.tooltip.portainer-tooltip .tooltip-inner {
-  font-family: Montserrat;
-  background-color: var(--bg-tooltip-color);
-  padding: 0.833em 1em;
-  color: var(--text-tooltip-color);
-  border: 1px solid var(--border-tooltip-color);
-  border-radius: 0.14285714rem;
-  box-shadow: 0 2px 4px 0 rgba(34, 36, 38, 0.12), 0 2px 10px 0 rgba(34, 36, 38, 0.15);
-}
-
-.tooltip.portainer-tooltip .tooltip-arrow {
-  display: none;
-}
-
-.fa.tooltip-icon {
-  margin-left: 5px;
-  font-size: 1.3em;
-}
-
 .fa.green-icon {
   color: #23ae89;
 }
@@ -326,7 +307,6 @@ a[ng-click] {
 .custom-header-ico {
   max-width: 32px;
   max-height: 32px;
-  margin-right: 2px;
 }
 
 .btn-responsive {
@@ -460,8 +440,28 @@ a[ng-click] {
   display: none;
 }
 
+.bootbox-form .visible {
+  position: initial !important;
+  display: initial !important;
+  margin-left: 10px !important;
+  margin-top: -2px !important;
+}
+
 .bootbox-form label {
   padding-left: 0;
+}
+
+.bootbox-checkbox-list {
+  max-height: 200px;
+  overflow-y: scroll;
+  background-color: var(--white-color);
+  border: 1px solid var(--grey-48);
+  border-radius: 4px;
+}
+
+:root[theme='dark'] .bootbox-checkbox-list,
+:root[theme='highcontrast'] .bootbox-checkbox-list {
+  background-color: var(--black-color);
 }
 
 .small-select {
@@ -600,7 +600,7 @@ a[ng-click] {
   padding-top: 7px;
 }
 
-.tag {
+.tag:not(.token) {
   padding: 2px 6px;
   color: white;
   background-color: var(--blue-2);
@@ -841,9 +841,61 @@ json-tree .branch-preview {
   align-items: center;
 }
 
+.space-y-8 > * + * {
+  margin-top: 2rem;
+}
+
 .my-8 {
   margin-top: 2rem;
   margin-bottom: 2rem;
+}
+
+.m-l-5 {
+  margin-left: 5px;
+}
+
+.m-l-20 {
+  margin-left: 20px;
+}
+
+.m-l-30 {
+  margin-left: 30px;
+}
+
+.m-r-2 {
+  margin-right: 2px;
+}
+
+.m-r-5 {
+  margin-right: 5px;
+}
+
+.m-t-10 {
+  margin-top: 10px;
+}
+
+.m-t-10 {
+  margin-top: 10px;
+}
+
+.m-b-10 {
+  margin-bottom: 10px;
+}
+
+.no-margin {
+  margin: 0 !important;
+}
+
+.no-border {
+  border: none;
+}
+
+.dispay-flex {
+  display: flex;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
 }
 
 .text-wrap {

@@ -56,7 +56,14 @@ module.exports = function (grunt) {
   });
 
   grunt.task.registerTask('devopsbuild', 'devopsbuild:<platform>:<arch>:<env>', function (platform, a = arch, env = 'prod') {
-    grunt.task.run([`env:${env}`, 'clean:all', `shell:build_binary_azuredevops:${platform}:${a}`, `download_binaries:${platform}:${a}`, `webpack:${env}`]);
+    grunt.task.run([
+      `env:${env}`,
+      'clean:all',
+      `shell:build_binary_azuredevops:${platform}:${a}`,
+      `download_binaries:${platform}:${a}`,
+      `webpack:${env}`,
+      `shell:storybook:${env}`,
+    ]);
   });
 
   grunt.task.registerTask('download_binaries', 'download_binaries:<platform>:<arch>', function (platform = 'linux', a = arch) {
@@ -109,11 +116,22 @@ gruntConfig.shell = {
   run_container: { command: shell_run_container },
   run_localserver: { command: shell_run_localserver, options: { async: true } },
   install_yarndeps: { command: shell_install_yarndeps },
+  storybook: { command: shell_storybook },
 };
+
+function shell_storybook(env) {
+  if (env === 'production') {
+    return '';
+  }
+
+  return `
+    yarn build-storybook
+  `;
+}
 
 function shell_build_binary(platform, arch) {
   const binfile = 'dist/portainer';
-  if (platform === 'linux') {
+  if (platform === 'linux' || platform === 'darwin') {
     return `
       if [ -f ${binfile} ]; then
         echo "Portainer binary exists";
@@ -140,6 +158,7 @@ function shell_build_binary_azuredevops(platform, arch) {
 function shell_run_container() {
   const portainerData = '${PORTAINER_DATA:-/tmp/portainer}';
   const portainerRoot = process.env.PORTAINER_PROJECT ? process.env.PORTAINER_PROJECT : process.env.PWD;
+  const portainerFlags = '${PORTAINER_FLAGS:-}';
 
   return `
     docker rm -f portainer
@@ -154,7 +173,7 @@ function shell_run_container() {
       -v /tmp:/tmp \
       --name portainer \
       portainer/base \
-      /app/portainer
+      /app/portainer ${portainerFlags}
   `;
 }
 

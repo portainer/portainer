@@ -11,7 +11,20 @@ angular.module('portainer.app').factory('StateManager', [
   'APPLICATION_CACHE_VALIDITY',
   'AgentPingService',
   '$analytics',
-  function StateManagerFactory($q, $async, SystemService, InfoHelper, LocalStorage, SettingsService, StatusService, APPLICATION_CACHE_VALIDITY, AgentPingService, $analytics) {
+  'EndpointProvider',
+  function StateManagerFactory(
+    $q,
+    $async,
+    SystemService,
+    InfoHelper,
+    LocalStorage,
+    SettingsService,
+    StatusService,
+    APPLICATION_CACHE_VALIDITY,
+    AgentPingService,
+    $analytics,
+    EndpointProvider
+  ) {
     var manager = {};
 
     var state = {
@@ -47,6 +60,11 @@ angular.module('portainer.app').factory('StateManager', [
     manager.clean = function () {
       state.endpoint = {};
       state.application = {};
+    };
+
+    manager.cleanEndpoint = function () {
+      state.endpoint = {};
+      EndpointProvider.clean();
     };
 
     manager.updateLogo = function (logoURL) {

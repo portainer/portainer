@@ -42,6 +42,7 @@ func (payload *stackGitUpdatePayload) Validate(r *http.Request) error {
 // @description Update the Git settings in a stack, e.g., RepositoryReferenceName and AutoUpdate
 // @description **Access policy**: authenticated
 // @tags stacks
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json
@@ -53,7 +54,7 @@ func (payload *stackGitUpdatePayload) Validate(r *http.Request) error {
 // @failure 403 "Permission denied"
 // @failure 404 "Not found"
 // @failure 500 "Server error"
-// @router /stacks/{id}/git [put]
+// @router /stacks/{id}/git [post]
 func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
@@ -136,7 +137,6 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 	stack.UpdatedBy = user.Username
 	stack.UpdateDate = time.Now().Unix()
 
-	stack.GitConfig.Authentication = nil
 	if payload.RepositoryAuthentication {
 		password := payload.RepositoryPassword
 		if password == "" && stack.GitConfig != nil && stack.GitConfig.Authentication != nil {
@@ -150,6 +150,8 @@ func (handler *Handler) stackUpdateGit(w http.ResponseWriter, r *http.Request) *
 		if err != nil {
 			return &httperror.HandlerError{StatusCode: http.StatusInternalServerError, Message: "Unable to fetch git repository", Err: err}
 		}
+	} else {
+		stack.GitConfig.Authentication = nil
 	}
 
 	if payload.AutoUpdate != nil && payload.AutoUpdate.Interval != "" {

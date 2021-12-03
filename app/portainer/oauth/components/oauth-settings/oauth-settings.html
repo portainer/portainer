@@ -1,4 +1,4 @@
-<ng-form name="$ctrl.oauthSettingsForm">
+<ng-form name="oauthSettingsForm">
   <div class="col-sm-12 form-section-title">
     Single Sign-On
   </div>
@@ -379,4 +379,12 @@
       </a>
     </div>
   </div>
+  <save-auth-settings-button
+    on-save-settings="($ctrl.onSaveSettings)"
+    save-button-state="($ctrl.saveButtonState)"
+    save-button-disabled="!$ctrl.isOAuthTeamMembershipFormValid() || oauthSettingsForm.$invalid"
+    limited-feature-id="$ctrl.limitedFeature"
+    limited-feature-class="$ctrl.limitedFeatureClass"
+    class-name="'oauth-save-settings-button'"
+  ></save-auth-settings-button>
 </ng-form>

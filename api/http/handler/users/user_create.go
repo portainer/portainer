@@ -39,6 +39,7 @@ func (payload *userCreatePayload) Validate(r *http.Request) error {
 // @description Only administrators can create an administrator user account.
 // @description **Access policy**: restricted
 // @tags users
+// @security ApiKeyAuth
 // @security jwt
 // @accept json
 // @produce json

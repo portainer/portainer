@@ -17,6 +17,7 @@ import (
 // @description Retrieve details about a team. Access is only available for administrator and leaders of that team.
 // @description **Access policy**: administrator
 // @tags teams
+// @security ApiKeyAuth
 // @security jwt
 // @produce json
 // @param id path int true "Team identifier"
