@@ -130,7 +130,7 @@ func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenD
 
 		serviceAccount, err := handler.getOrCreateServiceAccount(cli, tokenData, endpoint)
 		if err != nil {
-			return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve service account", err}
+			return nil, &httperror.HandlerError{http.StatusInternalServerError, fmt.Sprintf("unable to retrieve serviceaccount associated with user; username=%s", tokenData.Username), err}
 		}
 
 		configClusters[idx] = buildCluster(r, endpoint)
