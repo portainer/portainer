@@ -1,5 +1,6 @@
 import { Terminal } from 'xterm';
 import * as fit from 'xterm/lib/addons/fit/fit';
+import { baseHref } from '@/portainer/helpers/pathHelper';
 
 export default class KubectlShellController {
   /* @ngInject */
@@ -91,7 +92,7 @@ export default class KubectlShellController {
     };
 
     const wsProtocol = this.$window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-    const path = '/api/websocket/kubernetes-shell';
+    const path = baseHref() + 'api/websocket/kubernetes-shell';
     const queryParams = Object.entries(params)
       .map(([k, v]) => `${k}=${v}`)
       .join('&');
