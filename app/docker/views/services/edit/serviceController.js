@@ -348,12 +348,12 @@ angular.module('portainer.docker').controller('ServiceController', [
       }
     };
 
-    $scope.updateWebhookRegistryId = function (service) {
+    $scope.updateWebhookRegistryId = function () {
       const newRegistryID = _.get($scope.formValues.RegistryModel, 'Registry.Id', 0);
       const registryChanged = $scope.initialRegistryID != newRegistryID;
 
       if ($scope.WebhookExists && registryChanged) {
-        WebhookService.updateServiceWebhook($scope.webhookID, service.Id, endpoint.Id, newRegistryID)
+        WebhookService.updateServiceWebhook($scope.webhookID, newRegistryID)
           .then(function success() {})
           .catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to update webhook');
@@ -569,7 +569,7 @@ angular.module('portainer.docker').controller('ServiceController', [
             Notifications.error('Failure', data, 'Error');
           } else {
             Notifications.success('Service successfully updated', 'Service updated');
-            $scope.updateWebhookRegistryId(service);
+            $scope.updateWebhookRegistryId();
           }
           $scope.cancelChanges({});
           initView();
