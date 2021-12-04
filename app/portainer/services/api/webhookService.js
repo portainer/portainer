@@ -29,8 +29,8 @@ angular.module('portainer.app').factory('WebhookService', [
       return Webhooks.create({ ResourceID: serviceID, EndpointID: endpointID, WebhookType: 1, registryID }).$promise;
     };
 
-    service.updateServiceWebhook = function (id, serviceID, endpointID, registryID) {
-      return Webhooks.update({ id, ResourceID: serviceID, EndpointID: endpointID, WebhookType: 1, registryID }).$promise;
+    service.updateServiceWebhook = function (id, registryID) {
+      return Webhooks.update({ id, registryID }).$promise;
     };
 
     service.deleteWebhook = function (id) {
