@@ -50,7 +50,7 @@ func GetAccessibleRegistry(
 	}
 
 	if !hasPermission {
-		err = fmt.Errorf("rser does not has permission to get the registry")
+		err = fmt.Errorf("user does not has permission to get the registry")
 		return nil, err
 	}
 
