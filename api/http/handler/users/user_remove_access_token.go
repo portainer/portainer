@@ -56,6 +56,15 @@ func (handler *Handler) userRemoveAccessToken(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a user with the specified identifier inside the database", err}
 	}
 
+	// check if the key exists and the key belongs to the user
+	apiKey, err := handler.apiKeyService.GetAPIKey(portainer.APIKeyID(apiKeyID))
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "API Key not found", err}
+	}
+	if apiKey.UserID != portainer.UserID(userID) {
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to remove api-key", httperrors.ErrUnauthorized}
+	}
+
 	err = handler.apiKeyService.DeleteAPIKey(portainer.APIKeyID(apiKeyID))
 	if err != nil {
 		if err == apikey.ErrInvalidAPIKey {

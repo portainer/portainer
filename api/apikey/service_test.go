@@ -71,6 +71,26 @@ func Test_GenerateApiKey(t *testing.T) {
 	})
 }
 
+func Test_GetAPIKey(t *testing.T) {
+	is := assert.New(t)
+
+	store, teardown := bolt.MustNewTestStore(true)
+	defer teardown()
+
+	service := NewAPIKeyService(store.APIKeyRepository(), store.User())
+
+	t.Run("Successfully returns all API keys", func(t *testing.T) {
+		user := portainer.User{ID: 1}
+		_, apiKey, err := service.GenerateApiKey(user, "test-1")
+		is.NoError(err)
+
+		apiKeyGot, err := service.GetAPIKey(apiKey.ID)
+		is.NoError(err)
+
+		is.Equal(apiKey, apiKeyGot)
+	})
+}
+
 func Test_GetAPIKeys(t *testing.T) {
 	is := assert.New(t)
 
