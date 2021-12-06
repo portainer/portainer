@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"net/http"
 
-	clientV1 "k8s.io/client-go/tools/clientcmd/api/v1"
-
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -14,6 +12,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/endpointutils"
 	kcli "github.com/portainer/portainer/api/kubernetes/cli"
+	clientV1 "k8s.io/client-go/tools/clientcmd/api/v1"
 )
 
 // @id GetKubernetesConfig
@@ -123,21 +122,14 @@ func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenD
 	authInfosSet := make(map[string]bool)
 
 	for idx, endpoint := range endpoints {
-		cli, err := handler.kubernetesClientFactory.GetKubeClient(&endpoint)
-		if err != nil {
-			return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to create Kubernetes client", err}
-		}
-
-		serviceAccount, err := cli.GetServiceAccount(tokenData)
-		if err != nil {
-			return nil, &httperror.HandlerError{http.StatusInternalServerError, fmt.Sprintf("unable to find serviceaccount associated with user; username=%s", tokenData.Username), err}
-		}
+		instanceID := handler.kubernetesClientFactory.GetInstanceID()
+		serviceAccountName := kcli.UserServiceAccountName(int(tokenData.ID), instanceID)
 
 		configClusters[idx] = buildCluster(r, endpoint)
-		configContexts[idx] = buildContext(serviceAccount.Name, endpoint)
-		if !authInfosSet[serviceAccount.Name] {
-			configAuthInfos = append(configAuthInfos, buildAuthInfo(serviceAccount.Name, bearerToken))
-			authInfosSet[serviceAccount.Name] = true
+		configContexts[idx] = buildContext(serviceAccountName, endpoint)
+		if !authInfosSet[serviceAccountName] {
+			configAuthInfos = append(configAuthInfos, buildAuthInfo(serviceAccountName, bearerToken))
+			authInfosSet[serviceAccountName] = true
 		}
 	}
 
