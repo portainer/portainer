@@ -52,6 +52,16 @@ func TestStoreFull(t *testing.T) {
 		"Registries": func(t *testing.T) {
 			store.testRegistries(t)
 		},
+		"Resource Control": func(t *testing.T) {
+			store.testResourceControl(t)
+		},
+		"Schedules": func(t *testing.T) {
+			store.testSchedules(t)
+		},
+		"Tags": func(t *testing.T) {
+			store.testTags(t)
+		},
+
 		// "Test Title": func(t *testing.T) {
 		// },
 	}
@@ -349,4 +359,60 @@ func (store *Store) testRegistries(t *testing.T) {
 	actualReg2, err := regService.Registry(reg2.ID)
 	is.NoError(err)
 	is.Equal(reg2, actualReg2, "registries differ")
+}
+
+func (store *Store) testResourceControl(t *testing.T) {
+	// is := assert.New(t)
+	// resControl := store.ResourceControl()
+	// ctrl := &portainer.ResourceControl{
+	// }
+	// resControl().Create()
+}
+
+func (store *Store) testSchedules(t *testing.T) {
+	is := assert.New(t)
+
+	schedule := store.ScheduleService
+	s := &portainer.Schedule{
+		ID:             portainer.ScheduleID(schedule.GetNextIdentifier()),
+		Name:           "My Custom Schedule 1",
+		CronExpression: "*/5 * * * * portainer /bin/sh -c echo 'hello world'",
+	}
+
+	err := schedule.CreateSchedule(s)
+	is.NoError(err, "CreateSchedule should succeed")
+
+	actual, err := schedule.Schedule(s.ID)
+	is.NoError(err, "schedule should be found")
+	is.Equal(s, actual, "schedules differ")
+}
+
+func (store *Store) testTags(t *testing.T) {
+	is := assert.New(t)
+
+	tags := store.TagService
+
+	tag1 := &portainer.Tag{
+		ID:   1,
+		Name: "Tag 1",
+	}
+
+	tag2 := &portainer.Tag{
+		ID:   2,
+		Name: "Tag 1",
+	}
+
+	err := tags.Create(tag1)
+	is.NoError(err, "Tags.Create should succeed")
+
+	err = tags.Create(tag2)
+	is.NoError(err, "Tags.Create should succeed")
+
+	actual, err := tags.Tag(tag1.ID)
+	is.NoError(err, "tag1 should be found")
+	is.Equal(tag1, actual, "tags differ")
+
+	actual, err = tags.Tag(tag2.ID)
+	is.NoError(err, "tag2 should be found")
+	is.Equal(tag2, actual, "tags differ")
 }
