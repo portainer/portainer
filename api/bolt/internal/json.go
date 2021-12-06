@@ -65,7 +65,7 @@ func UnmarshalObjectWithJsoniter(data []byte, object interface{}, passphrase str
 // https://gist.github.com/atoponce/07d8d4c833873be2f68c34f9afc5a78a#symmetric-encryption
 
 func encrypt(plaintext []byte, passphrase string) (encrypted []byte, err error) {
-	logrus.Infof("encrypt")
+	logrus.Infof("encrypt: " + passphrase)
 	block, _ := aes.NewCipher([]byte(passphrase))
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
