@@ -55,7 +55,7 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		Labels:                    pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l')),
 		Logo:                      kingpin.Flag("logo", "URL for the logo displayed in the UI").String(),
 		Templates:                 kingpin.Flag("templates", "URL to the templates definitions.").Short('t').String(),
-		SecretKeyName:             kingpin.Flag("secret-key-name", "Secret key name for encryption").Default(defaultSecretKeyName).String(),
+		SecretKeyName:             kingpin.Flag("secret-key-name", "Secret key name for encryption and will be used as /run/secrets/<secret-key-name>.").Default(defaultSecretKeyName).String(),
 	}
 
 	kingpin.Parse()
