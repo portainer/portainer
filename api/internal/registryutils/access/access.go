@@ -1,4 +1,4 @@
-package registryutils
+package access
 
 import (
 	"fmt"
