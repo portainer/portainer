@@ -44,7 +44,7 @@ func NewClientFactory(signatureService portainer.DigitalSignatureService, revers
 	}
 }
 
-func (factory *ClientFactory) GetInstantID() (instanceID string) {
+func (factory *ClientFactory) GetInstanceID() (instanceID string) {
 	return factory.instanceID
 }
 

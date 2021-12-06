@@ -122,8 +122,8 @@ func (handler *Handler) buildConfig(r *http.Request, tokenData *portainer.TokenD
 	authInfosSet := make(map[string]bool)
 
 	for idx, endpoint := range endpoints {
-		instantID := handler.kubernetesClientFactory.GetInstantID()
-		serviceAccountName := kcli.UserServiceAccountName(int(tokenData.ID), instantID)
+		instanceID := handler.kubernetesClientFactory.GetInstanceID()
+		serviceAccountName := kcli.UserServiceAccountName(int(tokenData.ID), instanceID)
 
 		configClusters[idx] = buildCluster(r, endpoint)
 		configContexts[idx] = buildContext(serviceAccountName, endpoint)
