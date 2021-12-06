@@ -114,7 +114,7 @@ func (handler *Handler) deviceAction(w http.ResponseWriter, r *http.Request) *ht
 
 type deviceFeaturesPayload struct {
 	DeviceID        string
-	EnabledFeatures portainer.OpenAMTDeviceEnabledFeatures `json:"Payload"`
+	EnabledFeatures portainer.OpenAMTDeviceEnabledFeatures
 }
 
 func (payload *deviceFeaturesPayload) Validate(r *http.Request) error {
