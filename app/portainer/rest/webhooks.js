@@ -9,6 +9,7 @@ angular.module('portainer.app').factory('Webhooks', [
       {
         query: { method: 'GET', isArray: true },
         create: { method: 'POST' },
+        update: { method: 'PUT', params: { id: '@id' } },
         remove: { method: 'DELETE', params: { id: '@id' } },
       }
     );
