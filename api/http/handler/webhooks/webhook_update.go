@@ -2,7 +2,7 @@ package webhooks
 
 import (
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/internal/registryutils"
+	"github.com/portainer/portainer/api/internal/registryutils/access"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -59,7 +59,7 @@ func (handler *Handler) webhookUpdate(w http.ResponseWriter, r *http.Request) *h
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user authentication token", err}
 		}
 
-		_, err = registryutils.GetAccessibleRegistry(handler.DataStore, tokenData.ID, webhook.EndpointID, payload.RegistryID)
+		_, err = access.GetAccessibleRegistry(handler.DataStore, tokenData.ID, webhook.EndpointID, payload.RegistryID)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusForbidden, "Permission deny to access registry", err}
 		}
