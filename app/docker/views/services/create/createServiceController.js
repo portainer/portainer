@@ -492,7 +492,8 @@ angular.module('portainer.docker').controller('CreateServiceController', [
           const resourceControl = data.Portainer.ResourceControl;
           const userId = Authentication.getUserDetails().ID;
           const rcPromise = ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
-          const webhookPromise = $q.when(endpoint.Type !== 4 && $scope.formValues.Webhook && WebhookService.createServiceWebhook(serviceId, endpoint.Id));
+          const registryID = $scope.formValues.RegistryModel.Registry.Id;
+          const webhookPromise = $q.when(endpoint.Type !== 4 && $scope.formValues.Webhook && WebhookService.createServiceWebhook(serviceId, endpoint.Id, registryID));
           return $q.all([rcPromise, webhookPromise]);
         })
         .then(function success() {
